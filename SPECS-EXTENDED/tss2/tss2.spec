@@ -8,21 +8,22 @@ Distribution:   Azure Linux
 %global incname ibmtss
 
 Name:		tss2
-Version:	1331
-Release:	5%{?dist}
-Summary:	IBM's TCG Software Stack (TSS) for TPM 2.0 and related utilities
+# this is the release of the TSS library
+Version:        2.3.2
+# this is the release of the fedora package, goes back to 1 when version changes
+Release:        2%{?dist}
+Summary:        IBM's TCG Software Stack (TSS) for TPM 2.0 and related utilities
 
-License:	BSD
-URL:		http://sourceforge.net/projects/ibmtpm20tss/
-Source0:	https://sourceforge.net/projects/ibmtpm20tss/files/ibmtss%{version}.tar.gz
-Patch1: flags-fixup.patch
-Patch2: hash_generate.patch
-Patch3: picfix.patch
+License:        BSD-3-Clause AND LicenseRef-TCGL
+URL:            https://sourceforge.net/projects/ibmtpm20tss/
+Source0:        https://sourceforge.net/projects/ibmtpm20tss/files/ibmtss%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
+BuildRequires:  automake
+BuildRequires:  autoconf
+BuildRequires:  libtool
 BuildRequires:  gcc
-BuildRequires:	help2man
-BuildRequires:	openssl-devel
-Requires:	openssl
+BuildRequires:  openssl-devel
+Requires:       openssl
 
 %description
 TSS2 is a user space Trusted Computing Group's Software Stack (TSS) for
@@ -30,12 +31,12 @@ TPM 2.0.  It implements the functionality equivalent to the TCG TSS
 working group's ESAPI, SAPI, and TCTI layers (and perhaps more) but with
 a hopefully far simpler interface.
 
-It comes with about 80 "TPM tools" that can be used for rapid prototyping,
+It comes with about 120 "TPM tools" that can be used for rapid prototyping,
 education and debugging. 
 
 %package devel
-Summary:	Development libraries and headers for IBM's TSS 2.0
-Requires:	%{name}%{?_isa} = %{version}-%{release}
+Summary:        Development libraries and headers for IBM's TSS 2.0
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 Development libraries and headers for IBM's TSS 2.0. You will need this in
@@ -45,58 +46,90 @@ order to build TSS 2.0 applications.
 %autosetup -p1 -c %{name}-%{version}
 
 %build
-# nonstandard variable names are used in place of CFLAGS and LDFLAGS
-pushd utils
+autoreconf -vi
+%configure --disable-static --disable-tpm-1.2 --program-prefix=tss
 CCFLAGS="%{optflags}" \
 LNFLAGS="%{__global_ldflags}" \
-make -f makefile.fedora %{?_smp_mflags} 
-popd
+%{make_build}
 
 %install
-# Prefix for namespacing
-BIN_PREFIX=tss
-mkdir -p %{buildroot}/%{_bindir}
-mkdir -p %{buildroot}/%{_libdir}
-mkdir -p %{buildroot}/%{_includedir}/%{incname}/
-mkdir -p %{buildroot}/%{_mandir}/man1
-pushd utils
-# Pick out executables and copy with namespacing
-for f in *; do
-	if [[ -x $f && -f $f && ! $f =~ .*\..* ]]; then
-		cp -p $f %{buildroot}/%{_bindir}/${BIN_PREFIX}$f
-	fi;
-done
-cp -p *.so.1.1 %{buildroot}/%{_libdir}
-cp -p %{incname}/*.h %{buildroot}/%{_includedir}/%{incname}/
-cp -p man/man1/tss*.1 %{buildroot}/%{_mandir}/man1/
-popd
-
-
-# Make symbolic links to the shared lib
-pushd %{buildroot}/%{_libdir}
-rm -f libibmtss.so.1
-ln -sf libibmtss.so.1.1 libibmtss.so.1
-rm -f libibmtss.so
-ln -sf libibmtss.so.1 libibmtss.so
-popd
+%make_install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %ldconfig_scriptlets
 
+# files in the tss2 package
 %files
 %license LICENSE
+# becomes /usr/bin/tss*, the command line utilities
 %{_bindir}/tss*
-%{_libdir}/libibmtss.so.1
-%{_libdir}/libibmtss.so.1.*
+# becomes /usr/lib64
+%{_libdir}/libibmtss.so.2
+%{_libdir}/libibmtss.so.2.*
+%{_libdir}/libibmtssutils.so.2
+%{_libdir}/libibmtssutils.so.2.*
 %attr(0644, root, root) %{_mandir}/man1/tss*.1*
 
+# files devel is the tss2-devel package
 %files devel
+# becomes /usr/include/ibmtss, the headers
 %{_includedir}/%{incname}
+# becomes /usr/lib64
 %{_libdir}/libibmtss.so
-%doc ibmtss.doc
+%{_libdir}/libibmtssutils.so
+%doc ibmtss.docx
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1331-5
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Jan 13 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.3.2-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- Removed epoch
+- License verified
+
+* Thu Aug 15 2024 Ken Goldman <kgoldman@us.ibm.com> - 1:2.3.2-1
+- Trivial fixes for Fedora 41 Openssl 3.2.2 removal of SHA-1 signing
+* Mon May 20 2024 Ken Goldman <kgoldman@us.ibm.com> - 1:2.3.1-1
+- Add support for loadexternal schemes
+- Fix ObjectTemplates to accept caller curveID
+- Add Nuvoton configure utilities to VS projects
+- ifdef out functions deprecated with openssl 3.x
+- Recode the OpenSSL pkeyutl uses.  OpenSSL 3.x no longer ignores the oaep hash algorithm for the pkcs1 scheme.
+- Add userWithAuth to unseal policy sample scripts.  This is best practice.
+- Add policyparameters, policycapability
+
+* Fri Oct 6 2023 Ken Goldman <kgoldman@us.ibm.com> - 1:2.1.1-2
+- Update license
+
+* Fri Sep 29 2023 Ken Goldman <kgoldman@us.ibm.com> - 1:2.1.1-1
+- Updates to release 2.1
+
+* Mon Aug 21 2023 Jerry Snitselaar <jsnitsel@redhat.com> - 1:1.6.0-8
+- migrated to SPDX license
+- resolves: rhbz#2219549* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.6.0-5
+
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.6.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 1:1.6.0-3
+- Rebuilt with OpenSSL 3.0.0
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.6.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Feb 8 2021 Jerry Snitselaar <jsnitsel@redhat.com> - 1.6.0-1
+- Rebase to v1.6.0 release.
+- Manpage cleanup.
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1331-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1331-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Feb 14 2020 Tom Stellard <tstellar@redhat.com> - 1331-5
+- Use make_build macro
+- https://docs.fedoraproject.org/en-US/packaging-guidelines/#_parallel_make
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1331-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

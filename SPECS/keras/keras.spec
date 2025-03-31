@@ -3,7 +3,7 @@
 Summary:        Keras is a high-level neural networks API.
 Name:           keras
 Version:        3.3.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ URL:            https://keras.io/
 Source0:        https://github.com/keras-team/keras/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 #Removes circular dependency between keras and tensorflow. Plus Enables Wheel installation.
 Patch00:        0001-Add-Keras-3.3.3.patch
+Patch01:        CVE-2025-1550.patch
 BuildRequires:  git
 BuildRequires:  libstdc++-devel
 BuildRequires:  pyproject-rpm-macros
@@ -69,6 +70,9 @@ python3 pip_build.py --install
 
 
 %changelog
+* Wed Mar 12 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 3.3.3-2
+- Patch for CVE-2025-1550
+
 * Mon Jun 24 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.3.3-1
 - Update keras to 3.3.3 to fix GC issue.
 

@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -328,6 +328,9 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Thu Mar 06 2025 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-10
+- Add tmpfs fix for cloud-utils-growpart.
+
 * Wed Nov 20 2024 George Mileka <gmileka@microsoft.com> - 2.20240226-9
 - Enable SELinux for LiveOS ISO.
 

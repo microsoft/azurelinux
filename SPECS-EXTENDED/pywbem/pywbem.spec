@@ -1,17 +1,26 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %{?python_enable_dependency_generator}
 
 Name:           pywbem
-Version:        0.15.0
-Release:        3%{?dist}
+Version:        0.17.6
+Epoch:          1
+Release:        12%{?dist}
 Summary:        Python WBEM client interface and related utilities
-License:        LGPLv2
+License:        LGPL-2.1-or-later
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/pywbem/pywbem
-Source0:        https://github.com/pywbem/pywbem/archive/v%{version}/%{name}-%{version}.tar.gz
-BuildRequires:  python3-pip python3-PyYAML python3-ply python3-rpm-macros
-BuildRequires:  python3-pbr
+Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch1:         0001-use-unittest-mock.patch
+Patch2:         0002-coverity-deadcode.patch
+Patch3:         0003-coverity-forward-null.patch
+Patch4:         0004-coverity-identifier-typo.patch
+Patch5:         0005-python3_12.patch
+BuildRequires:  python3-pip
+BuildRequires:  python3-PyYAML
+BuildRequires:  python3-ply
+BuildRequires:  python3-rpm-macros
 BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 BuildArch:      noarch
 
 %description
@@ -41,15 +50,14 @@ for more information about WBEM.
 
 %prep
 %setup -q -n %{name}-%{version}
+%autosetup -p1
 
 %build
-PBR_VERSION="%{version}" CFLAGS="%{optflags}" %{__python3} setup.py build
-
+CFLAGS="%{optflags}" %{__python3} setup.py build
 
 %install
 rm -rf %{buildroot}
 env PYTHONPATH=%{buildroot}/%{python3_sitelib} \
-    PBR_VERSION="%{version}" \
     %{__python3} setup.py install -O1 --skip-build --root %{buildroot}
 rm -rf %{buildroot}/usr/bin/*.bat
 # wbemcli are conflicting with sblim-wbemcli
@@ -68,11 +76,62 @@ mv -v %{buildroot}/%{_bindir}/wbemcli.py %{buildroot}/%{_bindir}/pywbemcli.py
 %doc README.rst
 
 %changelog
-* Fri Oct 29 2021 Muhammad Falak <mwani@microsft.com> - 0.15.0-3
-- Remove epoch
+* Fri Dec 20 2024 Akhila Guruju <v-guakhila@microsoft.com> - 1:0.17.6-12
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:0.15.0-2
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.17.6-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1:0.17.6-10
+- Rebuilt for Python 3.13
+
+* Wed Mar 13 2024 Tony Asleson <tasleson@redhat.com> - 1:0.17.6-9
+- Changes to support python 3.12
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.17.6-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.17.6-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Tony Asleson <tasleson@redhat.com> - 1:0.17.6-6
+- migrated to SPDX license
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 1:0.17.6-5
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.17.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.17.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1:0.17.6-2
+- Rebuilt for Python 3.11
+
+* Tue Apr 12 2022  Tony Asleson <tasleson@redhat.com> - 1:0.17.6-1
+- Update to 0.17.6 which is the latest release that doesn't introduce
+  dependencies which we don't have available.
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.15.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.15.0-6
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jun 23 2021 Tony Asleson <tasleson@redhat.com> - 1:0.15.0-5
+- Remove python pbr build dependency
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1:0.15.0-4
+- Rebuilt for Python 3.10
+
+* Tue Feb 9 2021 Tony Asleson <tasleson@redhat.com> 1:0.15.0-3
+- https://bugzilla.redhat.com/show_bug.cgi?id=1922368
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.15.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Fri Oct 23 2020 Tony Asleson <tasleson@redhat.com> - 0.15.0-1
 - Update to 0.15.0 for python 3.8 fixes

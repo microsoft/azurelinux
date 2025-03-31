@@ -1,4 +1,4 @@
-%global last-known-kernel 6.6.64.2
+%global last-known-kernel 6.6.82.1-1
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -26,20 +26,14 @@
 # take path to kernel sources if provided, otherwise look in default location (for non KMP rpms).
 %{!?K_SRC: %global K_SRC /lib/modules/%{KVERSION}/build}
 
-%if "%{KMP}" == "1"
-%global _name kernel-mft-mlnx
-%else
-%global _name kernel-mft
-%endif
-
 %{!?version: %global version 4.30.0}
 %{!?_release: %global _release 1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
 
-Name:		 kernel-mft
+Name:		 mft_kernel
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 4.30.0
-Release:	 1%{?dist}
+Release:	 13%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -59,6 +53,10 @@ BuildRequires:  kmod
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
+# Azure Linux attempts to match the spec file name and the "Name" tag.
+# Upstream's mft_kernel spec set rpm name as kernel-mft. To comply, we
+# set "Name" as mft_kernel but add a "Provides" for kernel-mft.
+Provides:       kernel-mft = %{version}-%{release}
 
 %description
 mft kernel module(s)
@@ -230,6 +228,42 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
+* Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.30.0-13
+- Bump release to rebuild for new kernel release
+
+* Tue Mar 11 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.30.0-12
+- Bump release to rebuild for new kernel release
+
+* Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 4.30.0-11
+- Bump release to rebuild for new kernel release
+
+* Wed Mar 05 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-10
+- Bump release to rebuild for new kernel release
+
+* Tue Mar 04 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-9
+- Bump release to rebuild for new kernel release
+
+* Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 4.30.0-8
+- Bump release to rebuild for new kernel release
+
+* Tue Feb 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-7
+- Bump release to rebuild for new kernel release
+
+* Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 4.30.0-6
+- Bump release to rebuild for new kernel release
+
+* Tue Feb 04 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 4.30.0-5
+- Bump release to rebuild for new kernel release
+
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 4.30.0-4
+- Bump release to rebuild for new kernel release
+
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 4.30.0-3
+- Bump release to match kernel
+
+* Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-2
+- Bump release to match kernel
+
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 4.30.0-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

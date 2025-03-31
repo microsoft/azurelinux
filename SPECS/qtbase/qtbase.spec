@@ -35,7 +35,7 @@
 Name:         qtbase
 Summary:      Qt6 - QtBase components
 Version:      6.6.3
-Release:      2%{?dist}
+Release:      3%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -97,6 +97,7 @@ Patch61: qtbase-cxxflag.patch
 
 # fix for new mariadb
 Patch65: qtbase-mysql.patch
+Patch66: CVE-2025-30348.patch
 
 # Do not check any files in %%{_qt_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -701,6 +702,9 @@ fi
 %{_qt_plugindir}/platformthemes/libqxdgdesktopportal.so
 
 %changelog
+* Wed Mar 26 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 6.6.3-3
+- Fix CVE-2025-30348
+
 * Thu Jan 16 2025 Lanze Liu <lanzeliu@micrsoft.com> - 6.6.3-2
 - Added a patch for addressing CVE-2024-56732
 

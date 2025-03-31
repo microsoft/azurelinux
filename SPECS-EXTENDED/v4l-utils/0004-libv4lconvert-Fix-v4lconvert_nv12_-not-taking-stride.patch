@@ -1,0 +1,125 @@
+From 8cbe059875452301c61db309d3087fb496b7223d Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Sun, 16 Oct 2022 16:04:13 +0200
+Subject: [PATCH v4l-utils 4/5] libv4lconvert: Fix v4lconvert_nv12_*() not
+ taking stride into account
+
+The atomisp driver can generate V4L2_PIX_FMT_NV12 buffers where
+stride != width. Where as v4lconvert_nv12_*() assumed that
+stride == width is always true.
+
+Add a stride argument to v4lconvert_nv12_*() to fix this.
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ lib/libv4lconvert/libv4lconvert-priv.h |  4 ++--
+ lib/libv4lconvert/libv4lconvert.c      |  8 ++++----
+ lib/libv4lconvert/rgbyuv.c             | 18 +++++++++++++-----
+ 3 files changed, 19 insertions(+), 11 deletions(-)
+
+diff --git a/lib/libv4lconvert/libv4lconvert-priv.h b/lib/libv4lconvert/libv4lconvert-priv.h
+index f87a43a4..f361f2a0 100644
+--- a/lib/libv4lconvert/libv4lconvert-priv.h
++++ b/lib/libv4lconvert/libv4lconvert-priv.h
+@@ -287,10 +287,10 @@ void v4lconvert_hsv_to_rgb24(const unsigned char *src, unsigned char *dest,
+ 		int width, int height, int bgr, int Xin, unsigned char hsv_enc);
+ 
+ void v4lconvert_nv12_to_rgb24(const unsigned char *src, unsigned char *dest,
+-		int width, int height, int bgr);
++		int width, int height, int stride, int bgr);
+ 
+ void v4lconvert_nv12_to_yuv420(const unsigned char *src, unsigned char *dest,
+-		int width, int height, int yvu);
++		int width, int height, int stride, int yvu);
+ 
+ void v4lconvert_rotate90(unsigned char *src, unsigned char *dest,
+ 		struct v4l2_format *fmt);
+diff --git a/lib/libv4lconvert/libv4lconvert.c b/lib/libv4lconvert/libv4lconvert.c
+index 77f9eca5..d0d38286 100644
+--- a/lib/libv4lconvert/libv4lconvert.c
++++ b/lib/libv4lconvert/libv4lconvert.c
+@@ -937,16 +937,16 @@ static int v4lconvert_convert_pixfmt(struct v4lconvert_data *data,
+ 	case V4L2_PIX_FMT_NV12:
+ 		switch (dest_pix_fmt) {
+ 		case V4L2_PIX_FMT_RGB24:
+-			v4lconvert_nv12_to_rgb24(src, dest, width, height, 0);
++			v4lconvert_nv12_to_rgb24(src, dest, width, height, bytesperline, 0);
+ 			break;
+ 		case V4L2_PIX_FMT_BGR24:
+-			v4lconvert_nv12_to_rgb24(src, dest, width, height, 1);
++			v4lconvert_nv12_to_rgb24(src, dest, width, height, bytesperline, 1);
+ 			break;
+ 		case V4L2_PIX_FMT_YUV420:
+-			v4lconvert_nv12_to_yuv420(src, dest, width, height, 0);
++			v4lconvert_nv12_to_yuv420(src, dest, width, height, bytesperline, 0);
+ 			break;
+ 		case V4L2_PIX_FMT_YVU420:
+-			v4lconvert_nv12_to_yuv420(src, dest, width, height, 1);
++			v4lconvert_nv12_to_yuv420(src, dest, width, height, bytesperline, 1);
+ 			break;
+ 		}
+ 		break;
+diff --git a/lib/libv4lconvert/rgbyuv.c b/lib/libv4lconvert/rgbyuv.c
+index f9017016..e9fe6df9 100644
+--- a/lib/libv4lconvert/rgbyuv.c
++++ b/lib/libv4lconvert/rgbyuv.c
+@@ -857,11 +857,11 @@ void v4lconvert_hsv_to_rgb24(const unsigned char *src, unsigned char *dest,
+ }
+ 
+ void v4lconvert_nv12_to_rgb24(const unsigned char *src, unsigned char *dest,
+-		int width, int height, int bgr)
++		int width, int height, int stride, int bgr)
+ {
+ 	int i, j;
+ 	const unsigned char *ysrc = src;
+-	const unsigned char *uvsrc = src + width * height;
++	const unsigned char *uvsrc = src + stride * height;
+ 
+ 	for (i = 0; i < height; i++) {
+ 		for (j = 0; j < width; j ++) {
+@@ -879,18 +879,21 @@ void v4lconvert_nv12_to_rgb24(const unsigned char *src, unsigned char *dest,
+ 				uvsrc += 2;
+ 		}
+ 
++		ysrc += stride - width;
+ 		/* Rewind u and v for next line */
+ 		if (!(i&1))
+ 			uvsrc -= width;
++		else
++			uvsrc += stride - width;
+ 	}
+ }
+ 
+ void v4lconvert_nv12_to_yuv420(const unsigned char *src, unsigned char *dest,
+-		int width, int height, int yvu)
++		int width, int height, int stride, int yvu)
+ {
+ 	int i, j;
+ 	const unsigned char *ysrc = src;
+-	const unsigned char *uvsrc = src + width * height;
++	const unsigned char *uvsrc = src + stride * height;
+ 	unsigned char *ydst = dest;
+ 	unsigned char *udst, *vdst;
+ 
+@@ -902,7 +905,7 @@ void v4lconvert_nv12_to_yuv420(const unsigned char *src, unsigned char *dest,
+ 		vdst = udst + ((width / 2) * (height / 2));
+ 	}
+ 
+-	for (i = 0; i < height; i++)
++	for (i = 0; i < height; i++) {
+ 		for (j = 0; j < width; j++) {
+ 			*ydst++ = *ysrc++;
+ 			if (((i % 2) == 0) && ((j % 2) == 0)) {
+@@ -910,4 +913,9 @@ void v4lconvert_nv12_to_yuv420(const unsigned char *src, unsigned char *dest,
+ 				*vdst++ = *uvsrc++;
+ 			}
+ 		}
++
++		ysrc += stride - width;
++		if ((i % 2) == 0)
++			uvsrc += stride - width;
++	}
+ }
+-- 
+2.37.3
+

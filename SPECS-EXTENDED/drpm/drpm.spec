@@ -8,20 +8,14 @@ Distribution:   Azure Linux
 %endif
 
 Name:           drpm
-Version:        0.5.0
-Release:        2%{?dist}
+Version:        0.5.2
+Release:        1%{?dist}
 Summary:        A library for making, reading and applying deltarpm packages
 # the entire source code is LGPLv2+, except src/drpm_diff.c and src/drpm_search.c which are BSD
 License:        LGPLv2+ and BSD
 URL:            https://github.com/rpm-software-management/%{name}
 Source:         %{url}/releases/download/%{version}/%{name}-%{version}.tar.bz2
 
-
-# add workaround for gcc7 on ppc64le temporary before it's fixed in gcc
-# https://bugzilla.redhat.com/show_bug.cgi?id=1420350
-Patch1:         drpm-0.3.0-workaround-ppc64le-gcc.patch
-
-BuildRequires:  gcc-c++
 BuildRequires:  cmake >= 2.8.5
 BuildRequires:  gcc
 
@@ -58,24 +52,17 @@ The drpm-devel package provides a C interface (drpm.h) for the drpm library.
 
 %prep
 %autosetup -p1
-mkdir build
 
 %build
-pushd build
-%cmake .. -DWITH_ZSTD:BOOL=%{?with_zstd:ON}%{!?with_zstd:OFF} -DHAVE_LZLIB_DEVEL:BOOL=%{?suse_version:ON}%{!?suse_version:OFF} 
-%make_build
-make doc
-popd
+%cmake -DWITH_ZSTD:BOOL=%{?with_zstd:ON}%{!?with_zstd:OFF} -DHAVE_LZLIB_DEVEL:BOOL=%{?suse_version:ON}%{!?suse_version:OFF}
+%cmake_build
+%cmake_build --target doc
 
 %install
-pushd build
-%make_install
-popd
+%cmake_install
 
 %check
-pushd build
-ctest -VV
-popd
+%ctest
 
 %if (0%{?rhel} && 0%{?rhel} < 8) || 0%{?suse_version}
 %post -p /sbin/ldconfig
@@ -88,12 +75,16 @@ popd
 %license COPYING LICENSE.BSD
 
 %files devel
-%doc build/doc/html/
+%doc doc/html/
 %{_libdir}/lib%{name}.so
 %{_includedir}/%{name}.h
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Fri Oct 25 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.5.2-1
+- Update to version 0.5.2
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

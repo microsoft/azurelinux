@@ -1,65 +1,115 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global srcname requests-file
 
 Name:           python-%{srcname}
-Version:        1.4.3
-Release:        15%{?dist}
+Version:        2.0.0
+Release:        5%{?dist}
 Summary:        Transport adapter for using file:// URLs with python-requests
 
-License:        ASL 2.0
+License:        Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/dashea/requests-file
-Source0:        %pypi_source
+Source0:        %{pypi_source}#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
+BuildRequires:  python3-devel
+BuildRequires:  python3dist(pytest)
+BuildRequires: 	python3-pip
+BuildRequires: 	python3-wheel
+BuildRequires: 	python3-setuptools_scm
+BuildRequires: 	python3-requests
 
-%description
+%global _description %{expand:
 Requests-File is a transport adapter for use with the Requests Python
-library to allow local file system access via file:// URLs.
+library to allow local file system access via file:// URLs.}
 
-This is the Python 2 version of the requests_file module
+%description %_description
 
 %package -n python3-requests-file
-Summary:        Transport adapter for using file:// URLs with python3-requests
-%{?python_provide:%python_provide python3-%{srcname}}
+Summary:        %{summary}
 
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-requests
-BuildRequires:  python3-six
-
-Requires:       python3-requests
-Requires:       python3-six
-
-%description -n python3-requests-file
-Requests-File is a transport adapter for use with the Requests Python
-library to allow local file system access via file:// URLs.
-
-This is the Python 3 version of the requests_file module
+%description -n python3-requests-file %_description
 
 %prep
 %autosetup -n %{srcname}-%{version}
-rm -rf requests_file.egg-info
+
+%generate_buildrequires
+%pyproject_buildrequires
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files requests_file
 
 %check
-%{__python3} setup.py test
+%{pytest}
 
-%files -n python3-requests-file
+%files -n python3-requests-file -f %{pyproject_files}
 %license LICENSE
 %doc README.rst
-%{python3_sitelib}/requests_file.py*
-%{python3_sitelib}/__pycache__/requests_file.*
-%{python3_sitelib}/requests_file*.egg-info*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.3-15
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Feb 27 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.0.0-5
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 2.0.0-3
+- Rebuilt for Python 3.13
+
+* Fri Feb 02 2024 Yaakov Selkowitz <yselkowi@redhat.com> - 2.0.0-2
+- Avoid tox dependency
+
+* Mon Jan 29 2024 David Shea <reallylongword@gmail.com> - 2.0.0-1
+- Update to version 2.0.0
+- Apply current python packaging recommendations to the spec file
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 1.5.1-9
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1.5.1-6
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 1.5.1-3
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Dec 14 2020 David Shea <reallylongword@gmail.com> - 1.5.1-1
+- Make Content-Length optional
+- Fix python2 compatibility
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.3-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sat May 23 2020 Miro Hrončok <mhroncok@redhat.com> - 1.4.3-15
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.3-14
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

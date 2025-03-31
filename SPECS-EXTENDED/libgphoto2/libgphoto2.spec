@@ -3,11 +3,11 @@ Distribution:   Azure Linux
 %bcond_with gp2ddb
 
 %global udevdir %(pkg-config --variable=udevdir udev)
-%global port_version 0.12.0
+%global port_version 0.12.2
 
 Name:           libgphoto2
-Version:        2.5.27
-Release:        2%{?dist}
+Version:        2.5.31
+Release:        1%{?dist}
 Summary:        Library for accessing digital cameras
 # GPLV2+ for the main lib (due to exif.c) and most plugins, some plugins GPLv2
 License:        GPLv2+ and GPLv2
@@ -15,7 +15,6 @@ URL:            http://www.gphoto.org/
 
 Source0:        http://downloads.sourceforge.net/gphoto/%{name}-%{version}.tar.bz2
 Patch1:         gphoto2-pkgcfg.patch
-Patch2:         gphoto2-device-return.patch
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -94,7 +93,7 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool libgphot
 %install
 %make_install INSTALL="install -p" mandir=%{_mandir}
 
-pushd packaging/linux-hotplug/
+pushd packaging/generic/
   export LIBDIR=%{buildroot}%{_libdir}
   export CAMLIBS=%{buildroot}%{_libdir}/%{name}/%{version}
   export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
@@ -146,7 +145,7 @@ rm -rf %{buildroot}%{_datadir}/libgphoto2_port/*/vcamera/
 %{_datadir}/libgphoto2/
 
 %files devel
-%doc __doc/*
+%doc %{_defaultdocdir}/%{name}_port/*
 %{_bindir}/gphoto2-config
 %{_bindir}/gphoto2-port-config
 %{_includedir}/gphoto2/
@@ -158,6 +157,10 @@ rm -rf %{buildroot}%{_datadir}/libgphoto2_port/*/vcamera/
 %{_mandir}/man3/%{name}_port.3*
 
 %changelog
+* Wed Oct 16 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 2.5.31-1
+- Update to current upstream
+- License Verified
+
 * Fri Mar 26 2021 Henry Li <lihl@microsoft.com> - 2.5.27-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - systemd-devel contains the .pc file to provide pkgconfig variables

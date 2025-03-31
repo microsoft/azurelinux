@@ -1,0 +1,57 @@
+From 5e05ee09a3bc7331549d8e141dac0ccaf30feda5 Mon Sep 17 00:00:00 2001
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+Date: Fri, 14 Feb 2025 14:24:05 +0800
+Subject: [PATCH 3/7] erofs-utils: mkfs: add missing `errno = 0` before
+ strto[u]l
+
+strtoull(3) says:
+
+```
+Since strtoul() can legitimately return 0 or ULONG_MAX (ULLONG_MAX for
+strtoull()) on both success and failure, the calling program should set
+errno to 0 before the call, and then determine if an error occurred by
+checking whether errno has a nonzero value after the call.
+```
+
+Otherwise, `--workers=` could exit with `invalid worker number`.
+
+Fixes: 7894301e1a80 ("erofs-utils: mkfs: add `--workers=#` parameter")
+Fixes: 0132cb5ea7d0 ("erofs-utils: mkfs: add `--zfeature-bits` option")
+Fixes: 7550a30c332c ("erofs-utils: enable incremental builds")
+Signed-off-by: Gao Xiang <hsiangkao@linux.alibaba.com>
+Link: https://lore.kernel.org/r/20250214062407.3281416-1-hsiangkao@linux.alibaba.com
+---
+ mkfs/main.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/mkfs/main.c b/mkfs/main.c
+index 53d330b..b2396d0 100644
+--- a/mkfs/main.c
++++ b/mkfs/main.c
+@@ -814,6 +814,7 @@ static int mkfs_parse_options_cfg(int argc, char *argv[])
+ 		case 520: {
+ 			unsigned int processors;
+ 
++			errno = 0;
+ 			cfg.c_mt_workers = strtoul(optarg, &endptr, 0);
+ 			if (errno || *endptr != '\0') {
+ 				erofs_err("invalid worker number %s", optarg);
+@@ -828,6 +829,7 @@ static int mkfs_parse_options_cfg(int argc, char *argv[])
+ 		}
+ #endif
+ 		case 521:
++			errno = 0;
+ 			i = strtol(optarg, &endptr, 0);
+ 			if (errno || *endptr != '\0') {
+ 				erofs_err("invalid zfeature bits %s", optarg);
+@@ -844,6 +846,7 @@ static int mkfs_parse_options_cfg(int argc, char *argv[])
+ 			} else if (!strcmp(optarg, "rvsp")) {
+ 				dataimport_mode = EROFS_MKFS_DATA_IMPORT_RVSP;
+ 			} else {
++				errno = 0;
+ 				dataimport_mode = strtol(optarg, &endptr, 0);
+ 				if (errno || *endptr != '\0') {
+ 					erofs_err("invalid --%s=%s",
+-- 
+2.48.1
+

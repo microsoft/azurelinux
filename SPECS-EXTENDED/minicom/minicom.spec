@@ -1,47 +1,32 @@
+Summary: 	A text-based modem control and terminal emulation program
+Name: 		minicom
+Version: 	2.9
+Release: 	4%{?dist}
+URL: 		https://salsa.debian.org/minicom-team/minicom
+# The file 'src/wildmat.c' is LicenseRef-Fedora-Public-Domain.
+# Some LGPL-2.0-or-later files (e.g., 'lib/getopt.c', 'lib/error.c')
+# *may* be used in building of certain files (minicom, ascii-xfr, runscript).
+# They are probably not actually used, but I wasn't able to exclude them from
+# the build process completely yet.
+# The rest is simply GPL-2.0-or-later.
+License: 	GPL-2.0-or-later AND LGPL-2.0-or-later AND LicenseRef-Fedora-Public-Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Summary: A text-based modem control and terminal emulation program
-Name: minicom
-Version: 2.7.1
-Release: 14%{?dist}
-URL: https://salsa.debian.org/minicom-team/minicom
-# Some files are built from Public Domain files in addition to GPLv2+ files
-# (/usr/bin/minicom). Some LGPLv2+ files *may* be used in building of certain
-# files (minicom, ascii-xfr, runscript). They are probably not actually used,
-# but I wasn't able to exclude them from the build process completely yet.
-# The rest is simply GPLv2+.
-License: GPLv2+ and LGPLv2+ and Public Domain
 #ExcludeArch: s390 s390x
 
-Source0: https://alioth.debian.org/frs/download.php/file/4215/%{name}-%{version}.tar.gz
+Source0: 	https://salsa.debian.org/minicom-team/minicom/-/archive/%{version}/%{name}-%{version}.tar.gz
 
-# Upstream patch:
-Patch1: 0001-Add-a-missing-va_end-call.patch
-# Upstream patch:
-Patch2: 0002-Make-sure-strings-copied-by-strncpy-are-null-termina.patch
-# Upstream patch:
-Patch3: 0003-Fix-file-descriptor-leaks.patch
-# Upstream patch:
-Patch4: 0004-Fix-a-directory-handle-leak.patch
-# Upstream patch:
-Patch5: 0005-Fix-a-read-past-end-of-buffer.patch
-# Upstream patch:
-Patch6: 0006-Fix-a-warning-about-an-unused-variable.patch
-# Upstream patch:
-Patch7: 0007-loadconv-Add-missing-fclose.patch
-# Upstream patch:
-Patch8: 0001-Drop-superfluous-global-variable-definitions.patch
-# Upstream patch:
-Patch9: 0002-Drop-superfluous-global-variable-definitions.patch
-# Upstream patch:
-Patch10: 0003-Drop-superfluous-global-variable-definitions.patch
-
-BuildRequires: lockdev-devel ncurses-devel autoconf automake gettext-devel
-BuildRequires: gcc
+BuildRequires: 	make
+BuildRequires: 	lockdev-devel
+BuildRequires:	ncurses-devel
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	gettext-devel
+BuildRequires: 	gcc
 # For %%autosetup -S git:
-BuildRequires: git
-Requires: lockdev lrzsz
-
+BuildRequires: 	git
+Requires: 	lockdev
+Requires:	lrzsz
 
 %description
 Minicom is a simple text-based modem control and terminal emulation
@@ -49,13 +34,11 @@ program somewhat similar to MSDOS Telix. Minicom includes a dialing
 directory, full ANSI and VT100 emulation, an (external) scripting
 language, and other features.
 
-
 %prep
 %autosetup -S git
 
 cp -pr doc doc_
 rm -f doc_/Makefile*
-
 
 %build
 #./autogen.sh
@@ -68,13 +51,11 @@ rm -f lib/snprintf.c
 %configure
 %make_build
 
-
 %install
 %make_install
 mkdir -p %{buildroot}%{_sysconfdir}
 
 %find_lang %{name}
-
 
 %files -f %{name}.lang
 %doc ChangeLog AUTHORS NEWS TODO doc_/*
@@ -86,10 +67,55 @@ mkdir -p %{buildroot}%{_sysconfdir}
 %{_bindir}/ascii-xfr
 %{_mandir}/man1/*
 
-
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.1-14
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jan 16 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.9-4
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.9-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon May 20 2024 Pavol Žáčik <pzacik@redhat.com> - 2.9-2
+- Enable separate test reporting (in ci.fmf)
+
+* Fri May 10 2024 Pavol Žáčik <pzacik@redhat.com> - 2.9-1
+- Rebase to upstream version 2.9
+
+* Fri May 10 2024 Pavol Žáčik <pzacik@redhat.com> - 2.8-8
+- Add fmf test plans and gating configuration
+
+* Fri Feb 16 2024 Pavol Žáčik <pzacik@redhat.com> - 2.8-7
+- Migrate to SPDX license tags
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.8-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.8-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.8-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu May 26 2022 Jan Zerdik <jzerdik@redhat.com> - 2.8-1
+- Rebuilt to new upstream version 2.8 fixes rhbz#1913187
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Mon Feb 10 2020 Ondřej Lysoněk <olysonek@redhat.com> - 2.7.1-13
 - Fix build with gcc 10
@@ -482,3 +508,4 @@ mkdir -p %{buildroot}%{_sysconfdir}
 
 * Thu Jul 10 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
+

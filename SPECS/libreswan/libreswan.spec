@@ -11,6 +11,7 @@
     INITSYSTEM=systemd \\\
     PYTHON_BINARY=%{__python3} \\\
     SHELL_BINARY=%{_bindir}/sh \\\
+    DEFAULT_DNSSEC_ROOTKEY_FILE="/var/lib/unbound/root.key" \\\
     USE_DNSSEC=true \\\
     USE_LABELED_IPSEC=true \\\
     USE_LDAP=true \\\
@@ -25,8 +26,8 @@
 
 Summary:        Internet Key Exchange (IKEv1 and IKEv2) implementation for IPsec
 Name:           libreswan
-Version:        4.7
-Release:        7%{?dist}
+Version:        4.15
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,10 +37,6 @@ Source0:        https://github.com/libreswan/libreswan/archive/refs/tags/v%{vers
 Source3:        https://download.libreswan.org/cavs/ikev1_dsa.fax.bz2
 Source4:        https://download.libreswan.org/cavs/ikev1_psk.fax.bz2
 Source5:        https://download.libreswan.org/cavs/ikev2.fax.bz2
-Patch0:         CVE-2023-38710.patch
-Patch1:         CVE-2023-38711.patch
-Patch2:         CVE-2023-38712.patch
-Patch3:         capng_apply.patch
 
 BuildRequires: audit-libs-devel
 BuildRequires: bison
@@ -177,7 +174,7 @@ certutil -N -d sql:$tmpdir --empty-password
 
 %files
 %license CREDITS COPYING LICENSE
-%doc CHANGES README* 
+%doc CHANGES README*
 %doc docs/*.* docs/examples
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/ipsec.conf
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ipsec.secrets
@@ -197,6 +194,10 @@ certutil -N -d sql:$tmpdir --empty-password
 %doc %{_mandir}/*/*
 
 %changelog
+* Sat Mar 29 2025 Kanishk Bansal <kanbansal@microsoft.com> - 4.15-1
+- Upgrade to 4.15 to fix CVE-2024-3652, CVE-2024-2357, CVE-2023-30570
+- Remove previously applied patches
+
 * Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 4.7-7
 - Add capng_apply.patch to fix build break
 

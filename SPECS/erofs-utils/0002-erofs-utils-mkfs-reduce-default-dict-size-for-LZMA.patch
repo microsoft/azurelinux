@@ -1,0 +1,47 @@
+From d180c898bd0842eaeb54ca0073e6f444bdae8c40 Mon Sep 17 00:00:00 2001
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+Date: Thu, 13 Feb 2025 03:15:45 +0800
+Subject: [PATCH 2/7] erofs-utils: mkfs: reduce default dict size for LZMA
+
+Change the default dictionary size to 4 times the pcluster size.
+This will halve the LZMA internal dictionary size to a maximum of
+4MiB per LZMA worker (one worker per CPU in the kernel implementation
+unless the module parameter `lzma_streams=` is given.)
+
+It has a very slight impact on the final image sizes, yet users can
+always use `-zlzma,dictsize=` to specify a custom value.
+
+  _________________________________________________________________________
+ |______ Testset _____|_______ Vanilla _________|_________ After __________| Command Line
+ |  CoreOS            |   741978112 (708 MiB)   |   742293504 (708 MiB)    | -zlzma,6 -Eall-fragments,fragdedupe=inode -C8192
+ |                    |   687501312 (656 MiB)   |   687652864 (656 MiB)    | -zlzma,6 -Eall-fragments,fragdedupe=inode -C131072
+ |____________________|__ 658485248 (628 MiB) __|__ 658698240 (629 MiB)  __| -zlzma,6 -Eall-fragments,fragdedupe=inode -C1048576
+ |  Fedora KIWI       |  2974957568 (2838 MiB)  |  2977394688 (2840 MiB)   | -zlzma,6 -Eall-fragments,fragdedupe=inode -C8192
+ |                    |  2684272640 (2560 MiB)  |  2686750720 (2563 MiB)   | -zlzma,6 -Eall-fragments,fragdedupe=inode -C131072
+ |____________________|_ 2550800384 (2433 MiB) _|_ 2553278464 (2435 MiB) __| -zlzma,6 -Eall-fragments,fragdedupe=inode -C1048576
+ |  AOSP system       |   432562176 (413 MiB)   |   432738304 (413 MiB)    | -zlzma,6 -Eall-fragments,fragdedupe=inode -C8192
+ |  partition         |   393277440 (376 MiB)   |   393351168 (376 MiB)    | -zlzma,6 -Eall-fragments,fragdedupe=inode -C131072
+ |____________________|__ 379260928 (362 MiB) __|__ 379285504 (362 MiB)  __| -zlzma,6 -Eall-fragments,fragdedupe=inode -C1048576
+
+Link: https://lore.kernel.org/r/20250212191545.580768-1-hsiangkao@linux.alibaba.com
+Signed-off-by: Gao Xiang <hsiangkao@linux.alibaba.com>
+---
+ lib/compressor_liblzma.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/compressor_liblzma.c b/lib/compressor_liblzma.c
+index d609a28..c4ba585 100644
+--- a/lib/compressor_liblzma.c
++++ b/lib/compressor_liblzma.c
+@@ -75,7 +75,7 @@ static int erofs_compressor_liblzma_setdictsize(struct erofs_compress *c,
+ 			dict_size = erofs_compressor_lzma.default_dictsize;
+ 		} else {
+ 			dict_size = min_t(u32, Z_EROFS_LZMA_MAX_DICT_SIZE,
+-					  cfg.c_mkfs_pclustersize_max << 3);
++					  cfg.c_mkfs_pclustersize_max << 2);
+ 			if (dict_size < 32768)
+ 				dict_size = 32768;
+ 		}
+-- 
+2.48.1
+

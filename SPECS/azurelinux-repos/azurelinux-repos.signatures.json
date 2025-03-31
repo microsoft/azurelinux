@@ -3,6 +3,8 @@
   "MICROSOFT-RPM-GPG-KEY": "1092f37ec429e58bf9c7f898df17c3c32eb2ce3c4c037afb8ffe2d2b42e16e89",
   "azurelinux-amd.repo": "cbe8cefea3cf99c1450d0b329c57bdb647ae15c10468c243573e33b9c4891120",
   "azurelinux-amd-preview.repo": "723c3505d064c3b9ef436d700f748de7deca0de845d07d3fdeeafaf45949c070",
+  "azurelinux-cloud-native-preview.repo": "b5dbb1dbaf540d62338926b67ae96b69b1193c93bcbfa8558ee02763c2f73907",
+  "azurelinux-cloud-native.repo": "f8b140d6e3db7f5c8f534311a890ae658128a054b03cdc5f80fa20c05243f9fc",
   "azurelinux-debuginfo-preview.repo": "af36f823d923dd8b1a27efa7199552339f9e1315813078a4591ef855654b3017",
   "azurelinux-debuginfo.repo": "ac8c1c699122e46e7501f04f1f0240e1eec322e5bb6102f6db5d1ce7215d7f5b",
   "azurelinux-extended-debuginfo-preview.repo": "d29514a9962b0975cd4b32132f5cb5290930f6d0d582b46ef5d2cde6840dc9e0",

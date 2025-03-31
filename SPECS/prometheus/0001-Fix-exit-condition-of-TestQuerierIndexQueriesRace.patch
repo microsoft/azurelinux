@@ -1,0 +1,30 @@
+From 41bc1097c65a402355dc2b0b9402811a78389b63 Mon Sep 17 00:00:00 2001
+From: Dimitar Dimitrov <dimitar.dimitrov@grafana.com>
+Date: Wed, 20 Sep 2023 17:41:33 +0200
+Subject: [PATCH] Fix exit condition of TestQuerierIndexQueriesRace
+
+The test was introduced in # but was changed during the code review and not reran with the faulty code since then.
+
+Closes #
+
+Signed-off-by: Dimitar Dimitrov <dimitar.dimitrov@grafana.com>
+---
+ tsdb/querier_test.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tsdb/querier_test.go b/tsdb/querier_test.go
+index 8cfd5d141..2c5ff7477 100644
+--- a/tsdb/querier_test.go
++++ b/tsdb/querier_test.go
+@@ -2248,7 +2248,7 @@ func TestQuerierIndexQueriesRace(t *testing.T) {
+ func appendSeries(t *testing.T, ctx context.Context, wg *sync.WaitGroup, h *Head) {
+ 	defer wg.Done()
+ 
+-	for i := 0; ctx.Err() != nil; i++ {
++	for i := 0; ctx.Err() == nil; i++ {
+ 		app := h.Appender(context.Background())
+ 		_, err := app.Append(0, labels.FromStrings(labels.MetricName, "metric", "n", strconv.Itoa(i), "m", "0"), 0, 0)
+ 		require.NoError(t, err)
+-- 
+2.33.8
+

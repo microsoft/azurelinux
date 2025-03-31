@@ -1,8 +1,7 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.23.3-20241202.3.src.tar.gz
-%global ms_go_revision  2
-%global go_priority %(echo %{version}.%{ms_go_revision} | tr -d .)
+%global ms_go_filename  go1.24.1-20250304.4.src.tar.gz
+%global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
 %else
@@ -15,8 +14,8 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.23.3
-Release:        2%{?dist}
+Version:        1.24.1
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,6 +30,8 @@ Patch0:         go14_bootstrap_aarch64.patch
 Source2:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.20230802.5.src.tar.gz
 # bootstrap 02
 Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.20240206.2.src.tar.gz
+# bootstrap 03
+Source4:        https://github.com/microsoft/go/releases/download/v1.22.12-2/go1.22.12-20250211.4.src.tar.gz
 
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -51,6 +52,9 @@ mv -v go go-bootstrap-01
 
 tar xf %{SOURCE3} --no-same-owner
 mv -v go go-bootstrap-02
+
+tar xf %{SOURCE4} --no-same-owner
+mv -v go go-bootstrap-03
 
 %setup -q -n go
 
@@ -85,6 +89,7 @@ function go_bootstrap() {
 go_bootstrap 00
 go_bootstrap 01
 go_bootstrap 02
+go_bootstrap 03
 
 # Build current go version
 export GOHOSTOS=linux
@@ -134,17 +139,10 @@ EOF
 
 %post -p /sbin/ldconfig
 
-alternatives --install %{_bindir}/go go %{goroot}/bin/go %{go_priority}
-alternatives --install %{_bindir}/gofmt gofmt %{goroot}/bin/gofmt %{go_priority}
-
 %postun
 /sbin/ldconfig
 if [ $1 -eq 0 ]; then
   # This is uninstall
-  alternatives --remove go %{goroot}/bin/go
-  alternatives --remove gofmt %{goroot}/bin/gofmt
-
-  rm %{_sysconfdir}/profile.d/go-exports.sh
   rm -rf /opt/go
   exit 0
 fi
@@ -162,6 +160,17 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Mar 05 2025 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.24.1-1
+- Bump version to 1.24.1-1
+
+* Fri Feb 14 2025 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.24.0-1
+- Bump version to 1.24.0-1
+
+* Tue Feb 04 2025 Tobias Brick <tobiasb@microsoft.com> - 1.23.3-3
+- Fix post scriptlet
+- Remove calls to alternatives
+- Don't manually delete go-exports.sh
+
 * Tue Dec 03 2024 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.23.3-2
 - Bump version to 1.23.3-2
 
@@ -186,7 +195,7 @@ fi
 * Tue Jun 04 2024 Davis Goodin <dagood@microsoft.com> - 1.22.4-1
 - Bump version to 1.22.4-1
 
-* Tue May 07 2024 Davis Goodin <dagood@microsoft.com> - 1.22.3-1
+* Mon May 27 2024 Davis Goodin <dagood@microsoft.com> - 1.22.3-1
 - Bump version to 1.22.3-1
 
 * Wed May 08 2024 Davis Goodin <dagood@microsoft.com> - 1.21.9-2

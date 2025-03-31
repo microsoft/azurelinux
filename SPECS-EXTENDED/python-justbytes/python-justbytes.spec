@@ -1,18 +1,17 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global srcname justbytes
 
 Name:           python-%{srcname}
-Version:        0.11
-Release:        12%{?dist}
+Version:        0.15.2
+Release:        8%{?dist}
 Summary:        Library for handling computation with address ranges in bytes
 
-License:        GPLv2+
+License:        LGPL-2.1-or-later
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            http://pypi.python.org/pypi/justbytes
-Source0:        https://pypi.io/packages/source/%(n=%{srcname}; echo ${n:0:1})/%{srcname}/%{srcname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
+Source0:        https://pypi.io/packages/source/j/%{srcname}/%{srcname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
 
 BuildArch:      noarch
-BuildRequires:  python3-pip
 
 %global _description \
 A library for handling computations with address ranges. The library also offers\
@@ -25,11 +24,6 @@ Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-hypothesis
-BuildRequires:  python3-justbases
-BuildRequires:  python3-six
-Requires:       python3-justbases
-Requires:       python3-six
 
 %description -n python3-%{srcname} %{_description}
 
@@ -45,11 +39,6 @@ rm -rf justbytes.egg-info
 %install
 %py3_install
 
-%check
-pip3 install pytest sortedcontainers
-pip3 install .
-py.test -v tests
-
 %files -n python3-%{srcname}
 %license LICENSE
 %doc README.rst
@@ -57,13 +46,81 @@ py.test -v tests
 %{python3_sitelib}/justbytes-%{version}-*.egg-info/
 
 %changelog
-* Wed Apr 27 2022 Muhammad Falak <mwani@microsoft.com> - 0.11-12
-- Drop BR on pytest & pip install latest deps
-- Use `py.test` instead of `py.test-3` to enable ptest
-- License verified
+* Fri Dec 20 2024 Akhila Guruju <v-guakhila@microsoft.com> - 0.15.2-8
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.11-11
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.15.2-6
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.15.2-2
+- Rebuilt for Python 3.12
+
+* Mon May 15 2023 mulhern <amulhern@redhat.com> - 0.15.2-1
+- Update to 0.15.2
+
+* Mon May 15 2023 mulhern <amulhern@redhat.com> - 0.15.1-2
+- Add .fmf/version file
+
+* Mon May 15 2023 mulhern <amulhern@redhat.com> - 0.15.1-1
+- Update to 0.15.1; use SPDX license
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.15-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.15-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.15-9
+- Rebuilt for Python 3.11
+
+* Sun Feb 27 2022 mulhern <amulhern@redhat.com> - 0.15-8
+- Add gating tests
+
+* Tue Feb 15 2022 mulhern <amulhern@redhat.com> - 0.15-7
+- Drop redundant requires
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.15-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.15-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.15-4
+- Rebuilt for Python 3.10
+
+* Mon Mar 22 2021 mulhern <amulhern@redhat.com> - 0.15-3
+- Use the correct tarball
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.15-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Dec 17 2020 mulhern <amulhern@redhat.com> - 0.15-1
+- Update to 0.15
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.14-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.14-2
+- Rebuilt for Python 3.9
+
+* Thu Apr 23 2020 mulhern <amulhern@redhat.com> - 0.14-1
+- Update to new release
+
+* Thu Apr 23 2020 mulhern <amulhern@redhat.com> - 0.12-1
+- Change license to LGPLv2+
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.11-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

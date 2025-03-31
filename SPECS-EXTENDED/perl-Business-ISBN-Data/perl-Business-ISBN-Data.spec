@@ -1,21 +1,19 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Business-ISBN-Data
-Version:        20191107
-Release:        3%{?dist}
+Version:        20240930.001
+Release:        2%{?dist}
 Summary:        The data pack for Business::ISBN
-License:        Artistic 2.0
+License:        Artistic-2.0
 URL:            https://metacpan.org/release/Business-ISBN-Data
-Source0:        https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Business-ISBN-Data-%{version}.tar.gz#/perl-Business-ISBN-Data-%{version}.tar.gz
-Patch0:         Business-ISBN-Data-20120719-shellbang.patch
+Source0:        https://cpan.metacpan.org/modules/by-module/Business/Business-ISBN-Data-%{version}.tar.gz#/perl-Business-ISBN-Data-%{version}.tar.gz
 BuildArch:      noarch
 # Module Build
 BuildRequires:  coreutils
-BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.64
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(Test::Manifest) >= 1.21
 # Module Runtime
@@ -23,14 +21,17 @@ BuildRequires:  perl(Carp)
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(File::Spec::Functions)
 BuildRequires:  perl(strict)
-BuildRequires:  perl(vars)
+BuildRequires:  perl(utf8)
 BuildRequires:  perl(warnings)
 # Test Suite
+BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Test::More) >= 0.95
 BuildRequires:  perl(Test::Pod) >= 1.00
 BuildRequires:  perl(Test::Pod::Coverage)
-# Runtime
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+
+# Dependencies
+# (none)
 
 %description
 This is a data pack for Business::ISBN.  You can update
@@ -40,17 +41,13 @@ Most of the interesting stuff is in Business::ISBN.
 %prep
 %setup -q -n Business-ISBN-Data-%{version}
 
-# Fix shellbang and script permissions for make_data.pl
-%patch 0
-chmod -c +x make_data.pl
-
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 %{make_build}
 
 %install
 %{make_install}
-%{_fixperms} %{buildroot}
+%{_fixperms} -c %{buildroot}
 
 %check
 make test
@@ -62,8 +59,261 @@ make test
 %{_mandir}/man3/Business::ISBN::Data.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20191107-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Dec 12 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 20240930.001-2
+- Initial CBL-Mariner import from Fedora 41 (license: MIT).
+- License verified
+
+* Mon Sep 30 2024 Jitka Plesnikova <jplesnik@redhat.com> - 20240930.001-1
+- 20240930.001 bump (rhbz#2315652)
+
+* Thu Sep 19 2024 Paul Howarth <paul@city-fan.org> - 20240918.001-1
+- 20240918.001 bump
+
+* Sun Sep 15 2024 Paul Howarth <paul@city-fan.org> - 20240914.001-1
+- 20240914.001 bump (rhbz#2312391)
+
+* Fri Sep  6 2024 Paul Howarth <paul@city-fan.org> - 20240906.001-1
+- 20240906.001 bump (rhbz#2310418)
+
+* Wed Aug 21 2024 Paul Howarth <paul@city-fan.org> - 20240821.001-1
+- 20240821.001 bump (rhbz#2306448)
+
+* Tue Aug 20 2024 Paul Howarth <paul@city-fan.org> - 20240820.001-1
+- 20240820.001 bump
+
+* Sat Aug 17 2024 Paul Howarth <paul@city-fan.org> - 20240817.001-1
+- 20240817.001 bump
+
+* Thu Aug 15 2024 Paul Howarth <paul@city-fan.org> - 20240815.001-1
+- 20240815.001 bump (rhbz#2305174)
+
+* Wed Aug  7 2024 Paul Howarth <paul@city-fan.org> - 20240807.001-1
+- 20240807.001 bump (rhbz#2303454)
+
+* Sat Aug  3 2024 Paul Howarth <paul@city-fan.org> - 20240803.001-1
+- 20240803.001 bump (rhbz#2302579)
+
+* Thu Jul 25 2024 Paul Howarth <paul@city-fan.org> - 20240725.001-1
+- 20240725.001 bump
+
+* Fri Jul 19 2024 Paul Howarth <paul@city-fan.org> - 20240718.001-1
+- 20240718.001 bump (rhbz#2298736)
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20240716.001-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jul 16 2024 Paul Howarth <paul@city-fan.org> - 20240716.001-1
+- 20240716.001 bump (rhbz#2298226)
+
+* Wed Jul 10 2024 Paul Howarth <paul@city-fan.org> - 20240710.001-1
+- 20240710.001 bump (rhbz#2297072)
+
+* Tue Jul  9 2024 Paul Howarth <paul@city-fan.org> - 20240709.001-1
+- 20240709.001 bump (rhbz#2296627)
+
+* Sat Jun 15 2024 Paul Howarth <paul@city-fan.org> - 20240614.001-1
+- 20240614.001 bump (rhbz#2292468)
+
+* Sun Jun  2 2024 Paul Howarth <paul@city-fan.org> - 20240601.001-1
+- 20240601.001 bump (rhbz#2284202)
+
+* Fri May 24 2024 Paul Howarth <paul@city-fan.org> - 20240523.001-1
+- 20240523.001 bump (rhbz#2283021)
+
+* Fri May 10 2024 Paul Howarth <paul@city-fan.org> - 20240509.001-1
+- 20240509.001 bump
+
+* Mon Apr 29 2024 Jitka Plesnikova <jplesnik@redhat.com> - 20240426.001-1
+- 20240426.001 bump (rhbz#2277396)
+
+* Sat Apr 20 2024 Paul Howarth <paul@city-fan.org> - 20240420.001-1
+- 20240420.001 bump (rhbz#2276198)
+
+* Sun Apr 14 2024 Paul Howarth <paul@city-fan.org> - 20240413.001-1
+- 20240413.001 bump (rhbz#2274936)
+
+* Sun Mar 24 2024 Paul Howarth <paul@city-fan.org> - 20240323.001-1
+- 20240323.001 bump (rhbz#2271173)
+
+* Thu Mar 21 2024 Paul Howarth <paul@city-fan.org> - 20240321.001-1
+- 20240321.001 bump
+
+* Wed Mar 13 2024 Paul Howarth <paul@city-fan.org> - 20240313.001-1
+- 20240313.001 bump (rhbz#2269338)
+
+* Fri Mar  8 2024 Paul Howarth <paul@city-fan.org> - 20240308.001-1
+- 20240308.001 bump (rhbz#2268556)
+
+* Sun Mar  3 2024 Paul Howarth <paul@city-fan.org> - 20240302.001-1
+- 20240302.001 bump (rhbz#2267478)
+
+* Fri Mar  1 2024 Paul Howarth <paul@city-fan.org> - 20240229.001-1
+- 20240229.001 bump (rhbz#2267133)
+
+* Sun Feb 11 2024 Paul Howarth <paul@city-fan.org> - 20240209.001-1
+- 20240209.001 bump (rhbz#2263590)
+
+* Tue Feb 06 2024 Jitka Plesnikova <jplesnik@redhat.com> - 20240206.001-1
+- 20240206.001 bump (rhbz#2262917)
+
+* Fri Jan 26 2024 Jitka Plesnikova <jplesnik@redhat.com> - 20240126.001-1
+- 20240126.001 bump (rhbz#2260428)
+
+* Tue Jan 23 2024 Paul Howarth <paul@city-fan.org> - 20240123.001-1
+- 20240123.001 bump
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20240116.001-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Jan 16 2024 Paul Howarth <paul@city-fan.org> - 20240116.001-1
+- 20240116.001 bump (rhbz#2258613)
+
+* Fri Jan 12 2024 Paul Howarth <paul@city-fan.org> - 20240111.001-1
+- 20240111.001 bump (rhbz#2257961)
+
+* Thu Dec 21 2023 Paul Howarth <paul@city-fan.org> - 20231220.001-1
+- 20231220.001 bump (rhbz#2255496)
+
+* Fri Dec 15 2023 Paul Howarth <paul@city-fan.org> - 20231215.001-1
+- 20231215.001 bump (rhbz#2254689)
+
+* Thu Nov 30 2023 Paul Howarth <paul@city-fan.org> - 20231130.001-1
+- 20231130.001 bump
+
+* Sat Nov 25 2023 Paul Howarth <paul@city-fan.org> - 20231125.001-1
+- 20231125.001 bump (rhbz#2251459)
+
+* Sun Nov 19 2023 Paul Howarth <paul@city-fan.org> - 20231118.001-1
+- 20231118.001 bump (rhbz#2250416)
+
+* Tue Nov 14 2023 Paul Howarth <paul@city-fan.org> - 20231114.001-1
+- 20231114.001 bump (rhbz#2249602)
+
+* Fri Nov 10 2023 Paul Howarth <paul@city-fan.org> - 20231110.001-1
+- 20231110.001 bump (rhbz#2249035)
+
+* Thu Nov  2 2023 Paul Howarth <paul@city-fan.org> - 20231102.001-1
+- 20231102.001 bump (rhbz#2247582)
+
+* Tue Oct 31 2023 Paul Howarth <paul@city-fan.org> - 20231031.001-1
+- 20231031.001 bump (rhbz#2247270)
+
+* Fri Oct 20 2023 Paul Howarth <paul@city-fan.org> - 20231020.001-1
+- 20231020.001 bump (rhbz#2245229)
+
+* Fri Oct 13 2023 Paul Howarth <paul@city-fan.org> - 20231013.001-1
+- 20231013.001 bump (rhbz#2243835)
+
+* Tue Oct 10 2023 Paul Howarth <paul@city-fan.org> - 20231010.001-1
+- 20231010.001 bump (rhbz#2243069)
+
+* Sun Oct  8 2023 Paul Howarth <paul@city-fan.org> - 20231006.001-1
+- 20231006.001 bump (rhbz#2242684)
+
+* Tue Sep 26 2023 Paul Howarth <paul@city-fan.org> - 20230926.001-1
+- 20230926.001 bump
+
+* Sun Sep 24 2023 Paul Howarth <paul@city-fan.org> - 20230923.001-1
+- 20230923.001 bump (rhbz#2240303)
+
+* Thu Sep  7 2023 Paul Howarth <paul@city-fan.org> - 20230907.001-1
+- 20230907.001 bump (rhbz#2237858)
+
+* Tue Sep  5 2023 Paul Howarth <paul@city-fan.org> - 20230904.001-1
+- 20230904.001 bump (rhbz#2237353)
+
+* Wed Aug 30 2023 Jitka Plesnikova <jplesnik@redhat.com> - 20230830.001-1
+- 20230830.001 bump (rhbz#2236151)
+
+* Tue Aug 22 2023 Paul Howarth <paul@city-fan.org> - 20230822.001-1
+- 20230822.001 bump (rhbz#2233365)
+
+* Fri Aug 11 2023 Paul Howarth <paul@city-fan.org> - 20230811.001-1
+- 20230811.001 bump (rhbz#2231347)
+
+* Sun Jul 30 2023 Paul Howarth <paul@city-fan.org> - 20230729.001-1
+- 20230729.001 bump (rhbz#2227461)
+
+* Thu Jul 20 2023 Paul Howarth <paul@city-fan.org> - 20230719.001-1
+- 20230719.001 bump (rhbz#2224116)
+
+* Wed Jul 19 2023 Jitka Plesnikova <jplesnik@redhat.com> - 20230718.001-1
+- 20230718.001 bump (rhbz#2223772)
+
+* Sun Jul 16 2023 Paul Howarth <paul@city-fan.org> - 20230714.001-1
+- 20230714.001 bump (rhbz#2222866)
+
+* Fri Jul  7 2023 Paul Howarth <paul@city-fan.org> - 20230707.001-1
+- 20230707.001 bump (rhbz#2221022)
+
+* Mon Jun 26 2023 Paul Howarth <paul@city-fan.org> - 20230626.001-1
+- 20230626.001 bump (rhbz#2217555)
+
+* Mon May 29 2023 Jitka Plesnikova <jplesnik@redhat.com> - 20230528.001-1
+- 20230528.001 bump
+
+* Wed May 17 2023 Jitka Plesnikova <jplesnik@redhat.com> - 20230516.001-1
+- 20230516.001 bump
+
+* Thu May  4 2023 Paul Howarth <paul@city-fan.org> - 20230426.002-1
+- 20230426.002 bump
+
+* Thu Apr 27 2023 Jitka Plesnikova <jplesnik@redhat.com> - 20230426.001-1
+- 20230426.001 bump (rhbz#2190042)
+
+* Mon Apr 10 2023 Paul Howarth <paul@city-fan.org> - 20230410.001-1
+- 20230410.001 bump (rhbz#2185525)
+
+* Mon Apr 03 2023 Jitka Plesnikova <jplesnik@redhat.com> - 20230331.001-1
+- 20230331.001 bump
+
+* Thu Mar 23 2023 Jitka Plesnikova <jplesnik@redhat.com> - 20230322.001-1
+- 20230322.001 bump
+
+* Fri Mar 17 2023 Paul Howarth <paul@city-fan.org> - 20230316.001-1
+- 20230316.001 bump (rhbz#2179198)
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20210112.006-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20210112.006-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 20210112.006-5
+- Perl 5.36 rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20210112.006-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20210112.006-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 20210112.006-2
+- Perl 5.34 rebuild
+
+* Tue Feb 16 2021 Jitka Plesnikova <jplesnik@redhat.com> - 20210112.006-1
+- 20210112.006 bump
+
+* Sat Feb 13 2021 Paul Howarth <paul@city-fan.org> - 20210112.005-1
+- 20210112.005 bump
+
+* Wed Feb 10 2021 Jitka Plesnikova <jplesnik@redhat.com> - 20210112.004-1
+- 20210112.004 bump
+
+* Sun Feb  7 2021 Paul Howarth <paul@city-fan.org> - 20210112.002-1
+- 20210112.002 bump
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20210112.001-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jan 19 2021 Jitka Plesnikova <jplesnik@redhat.com> - 20210112.001-1
+- 20210112.001 bump
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 20191107-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 20191107-3
+- Perl 5.32 rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 20191107-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

@@ -1,17 +1,22 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           libbsd
-Version:        0.10.0
-Release:        3%{?dist}
+Version:        0.12.2
+Release:        1%{?dist}
 Summary:        Library providing BSD-compatible functions for portability
-URL:            http://libbsd.freedesktop.org/
+URL:            https://libbsd.freedesktop.org/
 License:        BSD and ISC and Copyright only and Public Domain
 
-Source0:        http://libbsd.freedesktop.org/releases/libbsd-%{version}.tar.xz
-Patch1:         %{name}-0.8.3-deprecated.patch
-Patch2:         %{name}-0.8.6-compat.patch
+Source0:        https://libbsd.freedesktop.org/releases/libbsd-%{version}.tar.xz
+Source1:        https://libbsd.freedesktop.org/releases/libbsd-%{version}.tar.xz.asc
+Source2:        https://keys.openpgp.org/vks/v1/by-fingerprint/4F3E74F436050C10F5696574B972BF3EA4AE57A3
+Source3:        libbsd-cdefs.h
 
 BuildRequires:  gcc
+BuildRequires:  gnupg2
+BuildRequires:  libmd-devel
+BuildRequires:  make
+
 %description
 libbsd provides useful functions commonly found on BSD systems, and
 lacking on others like GNU systems, thus making it easier to port
@@ -21,6 +26,7 @@ code over and over again on each project.
 %package devel
 Summary:        Development files for libbsd
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       libmd-devel
 
 %description devel
 Development files for the libbsd library.
@@ -37,11 +43,8 @@ configured using "pkg-config --libs libbsd-ctor".
 #     http://lists.freedesktop.org/archives/libbsd/2013-July/000091.html
 
 %prep
-%setup -q
-%if 0%{?rhel} && 0%{?rhel} < 7
-%patch 1 -p1 -b .deprecated
-%patch 2 -p1 -b .compat
-%endif
+%autosetup
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 
 %build
 %configure
@@ -60,13 +63,16 @@ rm %{buildroot}%{_libdir}/%{name}.la
 # remove manual pages that conflict with man-pages package
 rm %{buildroot}%{_mandir}/man3/explicit_bzero.3bsd
 
+# avoid file conflicts in multilib installations of -devel subpackage
+mv -f %{buildroot}%{_includedir}/bsd/sys/cdefs{,-%{__isa_bits}}.h
+install -p -m 0644 %{SOURCE3} %{buildroot}%{_includedir}/bsd/sys/cdefs.h
 
 %ldconfig_scriptlets
 
 %files
 %license COPYING
 %doc README TODO ChangeLog
-%{_libdir}/%{name}.so.*
+%{_libdir}/%{name}.so.0*
 
 %files devel
 %{_mandir}/man3/*.3bsd.*
@@ -81,6 +87,10 @@ rm %{buildroot}%{_mandir}/man3/explicit_bzero.3bsd
 %{_libdir}/pkgconfig/%{name}-ctor.pc
 
 %changelog
+* Wed Nov 06 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 0.12.2-1
+- Update version to 0.12.2
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

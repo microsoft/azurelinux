@@ -19,7 +19,7 @@
 Summary:        CNI plugin providing multiple interfaces in containers
 Name:           multus
 Version:        4.0.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,6 +30,7 @@ Source0:        https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/
 Patch0:         CVE-2023-3978.patch
 Patch1:         CVE-2023-44487.patch
 Patch2:         CVE-2023-45288.patch
+Patch3:         CVE-2024-45338.patch
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 
@@ -72,6 +73,9 @@ install -D -m0644 deployments/multus-daemonset-crio.yml %{buildroot}%{_datadir}/
 %{_datarootdir}/k8s-yaml/multus/multus.yaml
 
 %changelog
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 4.0.2-4
+- Add patch for CVE-2024-45338
+
 * Fri Nov 22 2024 Xiaohong Deng <xiaohongdeng@microsoft.com> - 4.0.2-3
 - Add patches to resolve CVE-2023-39325, CVE-2023-44487 and CVE-2023-45288.
 - CVE-2023-39325 is a subset of CVE-2023-44487 and the patches are combined.

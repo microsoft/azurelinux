@@ -1,0 +1,47 @@
+From 0e66dc19b9f93c247dd938f8099626573df0e998 Mon Sep 17 00:00:00 2001
+From: Dimitar Dimitrov <dimitar.dimitrov@grafana.com>
+Date: Thu, 21 Sep 2023 12:30:08 +0200
+Subject: [PATCH] Improve sensitivity of TestQuerierIndexQueriesRace
+
+Currently, the two goroutines race against each other and it's possible that the main test goroutine finishes way earlier than appendSeries has had a chance to run at all.
+
+I tested this change by breaking the code that X fixed and running the race test 100 times. Without the additional time.Sleep the test failed 11 times. With the sleep it failed 65 out of the 100 runs. Which is still not ideal, but it's a step forward.
+
+Signed-off-by: Dimitar Dimitrov <dimitar.dimitrov@grafana.com>
+---
+ tsdb/querier_test.go | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/tsdb/querier_test.go b/tsdb/querier_test.go
+index 2c5ff7477..4938443c2 100644
+--- a/tsdb/querier_test.go
++++ b/tsdb/querier_test.go
+@@ -2221,6 +2221,7 @@ func TestQuerierIndexQueriesRace(t *testing.T) {
+ 	for _, c := range testCases {
+ 		c := c
+ 		t.Run(fmt.Sprintf("%v", c.matchers), func(t *testing.T) {
++			t.Parallel()
+ 			db := openTestDB(t, DefaultOptions(), nil)
+ 			h := db.Head()
+ 			t.Cleanup(func() {
+@@ -2240,6 +2241,9 @@ func TestQuerierIndexQueriesRace(t *testing.T) {
+ 				values, _, err := q.LabelValues("n", c.matchers...)
+ 				require.NoError(t, err)
+ 				require.Emptyf(t, values, `label values for label "n" should be empty`)
++
++				// Sleep to give the appends some change to run.
++				time.Sleep(time.Millisecond)
+ 			}
+ 		})
+ 	}
+@@ -2256,6 +2260,7 @@ func appendSeries(t *testing.T, ctx context.Context, wg *sync.WaitGroup, h *Head
+ 		require.NoError(t, err)
+ 
+ 		// Throttle down the appends to keep the test somewhat nimble.
++		// Otherwise, we end up appending thousands or millions of samples.
+ 		time.Sleep(time.Millisecond)
+ 	}
+ }
+-- 
+2.33.8
+

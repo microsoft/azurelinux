@@ -1,21 +1,17 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:				libraqm
-Version:			0.7.0
-Release:			7%{?dist}
+Version:			0.8.0
+Release:			1%{?dist}
 License:			MIT
 Summary:			Complex Textlayout Library
 Summary(ar):		مكتبة رقم للنّصوص المركّبة
 URL:				https://github.com/HOST-Oman/libraqm
-Source:				https://github.com/HOST-Oman/libraqm/releases/download/v%{version}/raqm-%{version}.tar.gz
+Source:				%{url}/releases/download/v%{version}/raqm-%{version}.tar.xz
+Patch0:                         libraqm-3f50e35.patch
 
-%if 0%{?el7}
-BuildRequires:      python2
-%else
-BuildRequires:      python3
-%endif
-BuildRequires:    %{_bindir}/xsltproc
-BuildRequires:    gcc
+BuildRequires:		meson
+BuildRequires:		gcc
 BuildRequires:		freetype-devel
 BuildRequires:		harfbuzz-devel
 BuildRequires:		fribidi-devel
@@ -55,29 +51,23 @@ This package contains documentation files for raqm.
 وثائق مكتبة رقم.
 
 %prep
-%setup -q -n raqm-%{version}
-%if ! 0%{?el7}
-sed s:python:%{__python3}:g -i tests/Makefile.in #Fixed in next release on upstream
-%endif
-%configure --disable-gtk-doc
+%autosetup -p1 -n raqm-%{version}
 
 %build
-make %{?_smp_mflags}
-
+%meson -Ddocs=true
+%meson_build
 %check
 %if 0%{?el7}
 export LC_ALL=en_US.UTF-8
 %else
 export LC_ALL=C.utf8
 %endif
-make check
-
+%meson_test
 %install
-%make_install
+%meson_install
 rm -f %{buildroot}%{_libdir}/*.{la,a}
 
-%ldconfig_scriptlets devel
-
+%ldconfig_scriptlets
 %files
 %license COPYING
 %{_libdir}/libraqm.so.*
@@ -91,10 +81,13 @@ rm -f %{buildroot}%{_libdir}/*.{la,a}
 
 %files docs
 %license COPYING
-%doc AUTHORS NEWS README
+%doc AUTHORS NEWS README.md
 %{_datadir}/gtk-doc/html/raqm
 
 %changelog
+* Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.8.0-1
+- Update to version 0.8.0
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.0-7
 - Adding BR on '%%{_bindir}/xsltproc'.
 - Disabled gtk doc generation to remove network dependency during build-time.

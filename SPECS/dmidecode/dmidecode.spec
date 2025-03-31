@@ -1,6 +1,6 @@
 Summary:	Tool to analyze BIOS DMI data
 Name:		dmidecode
-Version:	3.5
+Version:	3.6
 Release:    1%{?dist}
 License:	GPLv2+
 URL:		http://www.nongnu.org/dmidecode/
@@ -25,6 +25,9 @@ make DESTDIR=%{buildroot} prefix=%{_prefix} install
 %{_mandir}/man8/*
 
 %changelog
+* Fri Jan 24 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.6-1
+- Auto-upgrade to 3.6 - 55875043 - NVIDIA (GB200) properties support
+
 * Tue May 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5-1
 - Auto-upgrade to 3.5 - to fix CVE-2023-30630
 
