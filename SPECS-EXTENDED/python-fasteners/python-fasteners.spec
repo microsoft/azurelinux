@@ -1,7 +1,5 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %bcond tests %{undefined rhel}
 Name:           python-fasteners
 Version:        0.19
