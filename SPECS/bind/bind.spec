@@ -10,7 +10,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.20.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -360,8 +360,7 @@ if [ $1 -gt 1 ]; then \
     fi \
   done \
 fi
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+
 %ldconfig_scriptlets libs
 
 %post chroot
@@ -528,6 +527,9 @@ fi;
 %{_mandir}/man1/named-nzd2nzf.1*
 
 %changelog
+* Tue Feb 25 2025 Tobias Brick <tobiasb@microsoft.com> - 9.20.5-2
+- Fix warning during package uninstall.
+
 * Tue Feb 04 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.20.5-1
 - Auto-upgrade to 9.20.5 - to fix CVE-2024-12705 & CVE-2024-11187
 - Refresh nongit-fix patch to apply cleanly.
