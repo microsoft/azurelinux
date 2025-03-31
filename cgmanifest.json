@@ -10901,8 +10901,8 @@
         "type": "other",
         "other": {
           "name": "libreswan",
-          "version": "4.7",
-          "downloadUrl": "https://github.com/libreswan/libreswan/archive/refs/tags/v4.7.tar.gz"
+          "version": "4.15",
+          "downloadUrl": "https://github.com/libreswan/libreswan/archive/refs/tags/v4.15.tar.gz"
         }
       }
     },
