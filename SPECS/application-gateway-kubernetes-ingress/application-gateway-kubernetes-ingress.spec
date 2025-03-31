@@ -2,7 +2,7 @@
 Summary:        Application Gateway Ingress Controller
 Name:           application-gateway-kubernetes-ingress
 Version:        1.7.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,7 @@ Source0:        https://github.com/Azure/application-gateway-kubernetes-ingress/
 # NOTE: govendor-v1 format is for inplace CVE updates so that we do not have to overwrite in the blob-store.
 # After fixing any possible CVE for the vendored source, we must bump v1 -> v2
 Source1:        %{name}-%{version}-govendor-v1.tar.gz
+Patch0:         CVE-2025-30204.patch
 
 BuildRequires:  golang >= 1.23
 
@@ -25,6 +26,7 @@ to act as the ingress for an AKS cluster.
 
 rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
 
 %build
 export VERSION=%{version}
@@ -43,6 +45,9 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 %{_bindir}/appgw-ingress
 
 %changelog
+* Sat Mar 29 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.7.7-2
+- Patch CVE-2025-30204
+
 * Tue Feb 04 2025 Gary Swalling <gaswal@microsoft.com> - 1.7.7-1
 - Upgrade to v1.7.7 with golang.org/x/net v0.33.0 for CVE-2023-39325, CVE-2023-44487,
 - CVE-2023-45288, CVE-2024-51744, CVE-2024-35255, CVE-2023-3978
