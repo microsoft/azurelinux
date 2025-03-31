@@ -5,9 +5,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary: A GTK widget for VNC clients
 Name: gtk-vnc
-Version: 1.3.0
-Release: 3%{?dist}
-License: LGPLv2+
+Version: 1.3.1
+Release: 1%{?dist}
+License: LGPLv2.1+
 Source: https://download.gnome.org/sources/%{name}/%{verdir}/%{name}-%{version}.tar.xz
 URL: https://gitlab.gnome.org/GNOME/gtk-vnc
 Requires: gvnc = %{version}-%{release}
@@ -166,6 +166,10 @@ chmod -x examples/*.pl examples/*.js examples/*.py
 %{_datadir}/gir-1.0/GtkVnc-2.0.gir
 
 %changelog
+* Wed Oct 23 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.3.1-1
+- Upgrade to version 1.3.1
+- License Verified
+
 * Mon Mar 06 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.3.0-3
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License Verified

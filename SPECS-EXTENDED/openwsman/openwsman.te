@@ -1,0 +1,74 @@
+policy_module(openwsman, 1.0.0)
+
+########################################
+#
+# Declarations
+#
+
+type openwsman_t;
+type openwsman_exec_t;
+init_daemon_domain(openwsman_t, openwsman_exec_t)
+
+type openwsman_tmp_t;
+files_tmp_file(openwsman_tmp_t)
+
+type openwsman_tmpfs_t;
+files_tmpfs_file(openwsman_tmpfs_t)
+
+type openwsman_log_t;
+logging_log_file(openwsman_log_t)
+
+type openwsman_run_t;
+files_pid_file(openwsman_run_t)
+
+type openwsman_unit_file_t;
+systemd_unit_file(openwsman_unit_file_t)
+
+########################################
+#
+# openwsman local policy
+#
+
+allow openwsman_t self:capability setuid;
+
+allow openwsman_t self:process { fork };
+allow openwsman_t self:fifo_file rw_fifo_file_perms;
+allow openwsman_t self:unix_stream_socket create_stream_socket_perms;
+allow openwsman_t self:tcp_socket { accept create_socket_perms listen };
+
+manage_files_pattern(openwsman_t, openwsman_tmp_t, openwsman_tmp_t)
+manage_dirs_pattern(openwsman_t, openwsman_tmp_t, openwsman_tmp_t)
+files_tmp_filetrans(openwsman_t, openwsman_tmp_t, { dir file })
+
+manage_files_pattern(openwsman_t, openwsman_tmpfs_t, openwsman_tmpfs_t)
+manage_dirs_pattern(openwsman_t, openwsman_tmpfs_t, openwsman_tmpfs_t)
+fs_tmpfs_filetrans(openwsman_t, openwsman_tmpfs_t, { dir file })
+
+manage_files_pattern(openwsman_t, openwsman_log_t, openwsman_log_t)
+logging_log_filetrans(openwsman_t, openwsman_log_t, { file })
+
+manage_files_pattern(openwsman_t, openwsman_run_t, openwsman_run_t)
+files_pid_filetrans(openwsman_t, openwsman_run_t, { file })
+
+auth_use_nsswitch(openwsman_t)
+auth_domtrans_chkpwd(openwsman_t)
+
+corenet_tcp_connect_pegasus_https_port(openwsman_t)
+corenet_tcp_bind_vnc_port(openwsman_t)
+corenet_tcp_bind_http_port(openwsman_t)
+
+dev_read_urand(openwsman_t)
+
+logging_send_syslog_msg(openwsman_t)
+logging_send_audit_msgs(openwsman_t)
+
+optional_policy(`
+    sblim_stream_connect_sfcbd(openwsman_t)
+    sblim_rw_semaphores_sfcbd(openwsman_t)
+    sblim_getattr_exec_sfcbd(openwsman_t)
+')
+
+optional_policy(`
+    unconfined_domain(openwsman_t)
+')
+

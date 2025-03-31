@@ -1,20 +1,24 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Name:           iio-sensor-proxy
-Version:        3.0
+Version:        3.5
 Release:        5%{?dist}
 Summary:        IIO accelerometer sensor to input device proxy
 
-License:        GPLv3+
-URL:            https://github.com/hadess/iio-sensor-proxy
-Source0:        https://gitlab.freedesktop.org/hadess/%{name}/uploads/de965bcb444552d328255639b241ce73/%{name}-%{version}.tar.xz
+# tests/unittest_inspector.py is LGPL-2.1-or-later but it is not packaged
+License:        GPL-3.0-or-later
+URL:            https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/
+Source0:        https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/uploads/ae095b693b6317f14dfa4212c5c36c1a/iio-sensor-proxy-3.5.tar.xz
 
-BuildRequires:  %{_bindir}/xsltproc
-BuildRequires:  make
+BuildRequires:  meson
 BuildRequires:  gcc
+BuildRequires:  gtk-doc
+BuildRequires:  pkgconfig(udev)
+BuildRequires:  pkgconfig(systemd)
 BuildRequires:  pkgconfig(gio-2.0)
 BuildRequires:  pkgconfig(gudev-1.0)
+BuildRequires:  pkgconfig(polkit-gobject-1)
 BuildRequires:  systemd
+BuildRequires:  umockdev
+BuildRequires:  python3-dbusmock
 %{?systemd_requires}
 
 %description
@@ -22,6 +26,7 @@ BuildRequires:  systemd
 
 %package docs
 Summary:        Documentation for %{name}
+License:        GFDL-1.1-or-later
 BuildArch:      noarch
 
 %description docs
@@ -31,14 +36,11 @@ This package contains the documentation for %{name}.
 %autosetup
 
 %build
-%configure \
-  --disable-silent-rules \
-  --disable-gtk-doc \
-  --disable-gtk-tests
-%make_build
+%meson -Dgtk_doc=true -Dgtk-tests=false
+%meson_build
 
 %install
-%make_install
+%meson_install
 
 %post
 %systemd_post %{name}.service
@@ -51,12 +53,13 @@ This package contains the documentation for %{name}.
 
 %files
 %license COPYING
-%doc README
+%doc README.md
 %{_bindir}/monitor-sensor
-%{_sbindir}/%{name}
+%{_libexecdir}/%{name}
 %{_unitdir}/%{name}.service
 %{_udevrulesdir}/*-%{name}.rules
-%{_sysconfdir}/dbus-1/system.d/net.hadess.SensorProxy.conf
+%{_datadir}/dbus-1/system.d/net.hadess.SensorProxy.conf
+%{_datadir}/polkit-1/actions/net.hadess.SensorProxy.policy
 
 %files docs
 %dir %{_datadir}/gtk-doc/
@@ -64,19 +67,62 @@ This package contains the documentation for %{name}.
 %{_datadir}/gtk-doc/html/%{name}/
 
 %changelog
-* Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.0-5
-- Fix build issue for systemd/systemd-bootstrap confusion
+* Wed Nov 13 2024 Michel Lind <salimma@fedoraproject.org> - 3.5-5
+- Update URL
+- Resolves: rhbz#2324439
 
-* Tue Mar 22 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-4
-- Fixing configuration step in %%build.
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.5-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-3
-- Adding BR on '%%{_bindir}/xsltproc'.
-- Disabled gtk doc generation to remove network dependency during build-time.
-- License verified.
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Jul 25 2023 Bastien Nocera <bnocera@redhat.com> - 3.5-1
+- Update to 3.5
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jul 15 2022 Bastien Nocera <bnocera@redhat.com> - 3.4-1
++ iio-sensor-proxy-3.4-1
+- Update to 3.4
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Aug 16 2021 Bastien Nocera <bnocera@redhat.com> - 3.3-1
++ iio-sensor-proxy-3.3-1
+- Update to 3.3
+
+* Sun Aug 15 2021 Bastien Nocera <bnocera@redhat.com> - 3.2-1
++ iio-sensor-proxy-3.2-1
+- Update to 3.2
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jun 14 2021 Bastien Nocera <bnocera@redhat.com> - 3.1-1
++ iio-sensor-proxy-3.1-1
+- Update to 3.1
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 3.0-4
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Mon Mar 23 2020 Bastien Nocera <bnocera@redhat.com> - 3.0-1
 + iio-sensor-proxy-3.0-1

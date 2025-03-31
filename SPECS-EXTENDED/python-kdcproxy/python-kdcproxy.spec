@@ -1,28 +1,26 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global realname kdcproxy
 
 Name:           python-%{realname}
-Version:        0.4.2
-Release:        5%{?dist}
+Version:        1.0.0
+Release:        18%{?dist}
 Summary:        MS-KKDCP (kerberos proxy) WSGI module
 
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/latchset/%{realname}
-Source0:        https://github.com/latchset/%{realname}/releases/download/v%{version}/%{realname}-%{version}.tar.gz#/python-%{realname}-%{version}.tar.gz
+Source0:        https://github.com/latchset/%{realname}/releases/download/v%{version}/%{realname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
+Patch0: 	Drop-coverage-from-tests.patch
 
 BuildArch:      noarch
 BuildRequires:  git
 
-BuildRequires:  python3-asn1crypto
 BuildRequires:  python3-devel
 BuildRequires:  python3-dns
-%if 0%{?with_check}
-BuildRequires:  python3-coverage
-BuildRequires:  python3-mock
-BuildRequires:  python3-pip
-%endif
-
+BuildRequires:  python3-pyasn1
+BuildRequires:  python3-pytest
+BuildRequires:  python3-setuptools
 
 %description
 This package contains a Python WSGI module for proxying KDC requests over
@@ -32,7 +30,7 @@ minimal configuration.
 %package -n python3-%{realname}
 Summary:        MS-KKDCP (kerberos proxy) WSGI module
 Requires:       python3-dns
-Requires:       python3-asn1crypto
+Requires:       python3-pyasn1
 
 %{?python_provide:%python_provide python3-%{realname}}
 
@@ -51,8 +49,7 @@ minimal configuration.
 %py3_install
 
 %check
-%{__python3} -m pip install pytest==7.1.2
-KDCPROXY_ASN1MOD=asn1crypto %{__python3} -m pytest
+%{__python3} -m pytest
 
 %files -n python3-%{realname}
 %doc README
@@ -61,12 +58,72 @@ KDCPROXY_ASN1MOD=asn1crypto %{__python3} -m pytest
 %{python3_sitelib}/%{realname}-%{version}-*.egg-info
 
 %changelog
-* Tue Aug 30 2022 Muhammad Falak <mwani@microsoft.com> - 0.4.2-5
-- Add BR on python-pip and drop BR on pytest to enable ptest
+* Fri Mar 14 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.0.0-18
+-  Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.2-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.0.0-16
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 1.0.0-12
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jun 14 2022 Python Maint <python-maint@redhat.com> - 1.0.0-9
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.0.0-6
+- Rebuilt for Python 3.10
+
+* Thu Apr 08 2021 Robbie Harwood <rharwood@redhat.com> - 1.0.0-5
+- Actually drop coverage dependency
+
+* Fri Jan 29 2021 Robbie Harwood <rharwood@redhat.com> - 1.0.0-4
+- Drop unused dependency on python3-mock
+- Resolves: #1922344
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jan 20 2021 Robbie Harwood <rharwood@redhat.com> - 1.0.0-2
+- Drop coverage from tests
+- Resolves: #1916739
+
+* Tue Dec 08 2020 Robbie Harwood <rharwood@redhat.com> - 1.0.0-1
+- New upstream version (1.0.0)
+- Drop asn1crypto in favor of pyasn1
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Thu Jun 25 2020 Robbie Harwood <rharwood@redhat.com> - 0.4.2-5
+- Explicitly depend on python3-setuptools
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.4.2-4
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

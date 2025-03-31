@@ -1,12 +1,11 @@
 Name:           perl-DateTime-Format-Strptime
-Version:        1.77
-Release:        3%{?dist}
+Epoch:          1
+Version:        1.79
+Release:        11%{?dist}
 Summary:        Parse and format strptime and strftime patterns
-License:        Artistic 2.0
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:        Artistic-2.0
 URL:            https://metacpan.org/release/DateTime-Format-Strptime
-Source0:        https://cpan.metacpan.org/modules/by-module/DateTime/DateTime-Format-Strptime-%{version}.tar.gz#/perl-DateTime-Format-Strptime-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/DateTime/DateTime-Format-Strptime-%{version}.tar.gz
 BuildArch:      noarch
 # Module Build
 BuildRequires:  coreutils
@@ -18,7 +17,7 @@ BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(constant)
 BuildRequires:  perl(DateTime) >= 1.00
-BuildRequires:  perl(DateTime::Locale) >= 1.23
+BuildRequires:  perl(DateTime::Locale) >= 1.30
 BuildRequires:  perl(DateTime::Locale::Base)
 BuildRequires:  perl(DateTime::TimeZone) >= 2.09
 BuildRequires:  perl(Exporter)
@@ -44,8 +43,8 @@ BuildRequires:  perl(utf8)
 # Optional Tests
 BuildRequires:  perl(CPAN::Meta) >= 2.120900
 BuildRequires:  perl(CPAN::Meta::Prereqs)
-# Runtime
-Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
+# Dependencies
+# (none)
 
 %description
 This module implements most of strptime(3), the POSIX function that is the
@@ -75,11 +74,59 @@ make test
 %{_mandir}/man3/DateTime::Format::Strptime::Types.3*
 
 %changelog
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.77-3
-- Remove epoch
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.79-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:1.77-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.79-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.79-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.79-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.79-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.79-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1:1.79-5
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.79-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.79-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sat May 22 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1:1.79-2
+- Perl 5.34 rebuild
+
+* Mon May  3 2021 Paul Howarth <paul@city-fan.org> - 1:1.79-1
+- Update to 1.79
+  - Fix too-strict type checking for time zones: this module now uses the same
+    check as DateTime itself, which allows for things that don't subclass
+    DateTime::TimeZone as long as they provide the same API (GH#30)
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.78-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Dec 16 2020 Paul Howarth <paul@city-fan.org> - 1:1.78-1
+- Update to 1.78
+  - Fix tests for new failure caused by locale data changes in DateTime::Locale
+    1.29 (GH#28)
+  - Added a warning about using locale-specific patterns; some of these patterns
+    can change quite a bit as the locale data is updated, so using them for
+    parsing does not produce stable results across time - this is what caused
+    the test failures that this release fixes
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.77-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1:1.77-2
+- Perl 5.32 rebuild
 
 * Mon Mar  2 2020 Paul Howarth <paul@city-fan.org> - 1:1.77-1
 - Update to 1.77

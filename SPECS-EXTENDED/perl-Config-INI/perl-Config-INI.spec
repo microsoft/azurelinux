@@ -1,21 +1,22 @@
 Name:           perl-Config-INI
-Version:        0.025
-Release:        16%{?dist}
+Version:        0.029
+Release:        1%{?dist}
 Summary:        Config::INI Perl module
-License:        GPL+ or Artistic
+# Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Config-INI
-Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Config-INI-%{version}.tar.gz#/perl-Config-INI-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Config-INI-%{version}.tar.gz
 BuildArch:      noarch
+BuildRequires: make
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(IO::File) >= 1.14
 BuildRequires:  perl(IO::String)
-BuildRequires:  perl(Mixin::Linewise::Readers)
+BuildRequires:  perl(Mixin::Linewise::Readers) >= 0.110
 BuildRequires:  perl(Mixin::Linewise::Writers)
 BuildRequires:  perl(Test::More)
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %{?perl_default_filter}
 
@@ -26,19 +27,15 @@ Config::INI - simple .ini-file format.
 %setup -q -n Config-INI-%{version}
 
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+/usr/bin/perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
-
-find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} \;
-find $RPM_BUILD_ROOT -depth -type d -exec rmdir {} 2>/dev/null \;
-
+%{make_install}
 %{_fixperms} $RPM_BUILD_ROOT/*
 
 %check
-make test
+%{make_build} test
 
 %files
 %doc Changes README examples
@@ -47,6 +44,10 @@ make test
 %{_mandir}/man3/Config*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.029-1
+- Update to version 0.029
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.025-16
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

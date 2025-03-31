@@ -1,0 +1,13 @@
+--- ./src/Makefile.0001	2023-10-21 16:00:40.560156632 +0100
++++ ./src/Makefile	2023-10-21 16:02:21.463841775 +0100
+@@ -15,9 +15,8 @@ INSTALL_BINARY_DIR	=	/usr/bin/
+ 
+ INCLUDES	=	-I.
+ LIBRARIES	=	-ldl -lm -lsndfile
+-CFLAGS		=	$(INCLUDES) -Wall -Werror -O2 -fPIC 		\
+-			-DDEFAULT_LADSPA_PATH=$(INSTALL_PLUGINS_DIR)
+ BINFLAGS	=	-fPIE -pie
++CFLAGS		=	$(INCLUDES) -Wall -Werror -O2 -fPIC
+ CXXFLAGS	=	$(CFLAGS)
+ PLUGINS		=	../plugins/amp.so				\
+ 			../plugins/delay.so				\

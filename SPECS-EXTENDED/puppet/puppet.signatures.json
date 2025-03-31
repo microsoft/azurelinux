@@ -1,18 +1,20 @@
 {
  "Signatures": {
+  "RPM-GPG-KEY-puppet-20250406": "4d5a9c73f97235eebe8c69f728aa2efcc8e1ee02282f972efdbbbd3a430be454",
   "logrotate": "fd243fc2ef85724b74931c69b176db4765efadf1bfef6a780b9c34f7b67b4b92",
-  "puppet-7.34.0.tar.gz": "35883253c172cbb59d4fe5b9aad28beb2d48a2898c58f2ed25c7923f3a82d3ad",
+  "puppet-8.6.0.tar.gz": "7158dda2f491c7a8591fd237bb83b2ee4fec4f6b036b2eddc94c0c8efc22e241",
+  "puppet-8.6.0.tar.gz.asc": "1d378e150e5863fd4b019745caf3e22ce4c9605996bdf34a8d0a91cbd08d9682",
   "puppet-nm-dispatcher.systemd": "5a5c70a18b706d7bdc498e099684c8a0ddd27b28779b1b71a95a0726bf2335c5",
-  "puppetlabs-augeas_core-1.5.0.tar.gz": "470406981b7638869acb4ecc75e2fd079b5999b5aeeb8324b9b475fe07bca935",
-  "puppetlabs-cron_core-1.3.0.tar.gz": "2a7be4004acc3881357b2e11db1a8937f4d64d37d8ce38872cefe1c7c4a2a6ef",
-  "puppetlabs-host_core-1.3.0.tar.gz": "3583352bf60cb9013907b880868c1eeee053d2dd647a4f9e388a34cba373622d",
-  "puppetlabs-mount_core-1.3.0.tar.gz": "5924b9e974f6fa592cea29cbe93a07b5d7e08bbf2e98145f7ae7157305946b4a",
+  "puppetlabs-augeas_core-1.4.0.tar.gz": "037be878ff36959cdf4fdab935d71e5f679757ce11b19dc912da8d0698415617",
+  "puppetlabs-cron_core-1.2.1.tar.gz": "09ed75d8141b6b3cd28add91c1de9803ff1a353e2f504112cec53ad209dbdd4b",
+  "puppetlabs-host_core-1.2.0.tar.gz": "a45d7fed47ae1c707fabaec9a1d6da4d8e2fd23bcfb998e6406b4c8e2eed056e",
+  "puppetlabs-mount_core-1.2.0.tar.gz": "ed437a07e9457fac21e1c87e53b44b7cf4f98c4d5e509dd5ffdea6c5dd96c6ee",
   "puppetlabs-scheduled_task-3.2.0.tar.gz": "9f0ba59b55caadeb658ba2d5cc51f0a76136d4bb5fffe008bbd5c911b42ac43f",
-  "puppetlabs-selinux_core-1.4.0.tar.gz": "140e41c1ab4c0523b46b0e89f3316945ae4b5328e661da87aebfc33628d92b57",
-  "puppetlabs-sshkeys_core-2.5.0.tar.gz": "b67365307a2b21c1ba2ecf444c3e4895244559d8c5bd40cc2ead4d33fe27cd11",
-  "puppetlabs-yumrepo_core-1.2.0.tar.gz": "6fd02331be8267165e75c4eb00030a88be4401fe8d4eeea45365cc270140f44a",
-  "puppetlabs-zfs_core-1.6.1.tar.gz": "8971b3bc892590fb94faf6ce16af9a543038f799f37f73ffd4dabe020914ab35",
-  "puppetlabs-zone_core-1.2.0.tar.gz": "7c722015b3d16b6a48bec1b6f79dd7369cfd0de70731f17b94c27553f7e08096",
+  "puppetlabs-selinux_core-1.3.0.tar.gz": "593ad4cc9d311528b6be0fdaa6ce08bf46acb21ff0d035ef3c6f2e548c43433d",
+  "puppetlabs-sshkeys_core-2.4.0.tar.gz": "033eb694359974ce1d9154526f42a01c2bc64abbcd4f587a5f25dff03135171b",
+  "puppetlabs-yumrepo_core-2.0.0.tar.gz": "c9ca5a82c0d77df69f02f194a0aa038dd8e93333d7350cf017f095badda244a5",
+  "puppetlabs-zfs_core-1.4.0.tar.gz": "fcdf3440d5cf5e76a2ae452fc8eb6b8a589721e7c5a8832c2984e60f1962d5fa",
+  "puppetlabs-zone_core-1.1.0.tar.gz": "9d8241938e56145ce15827415e5c6b74002407b4548c12b5ef165423adfc725b",
   "start-puppet-wrapper": "6212b08fc6f057a5ce14c7a12e2577adac236053e0e32ebad71c7b68d32e9b82"
  }
 }

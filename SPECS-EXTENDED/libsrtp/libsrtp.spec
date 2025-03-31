@@ -1,17 +1,20 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global shortname srtp
-
 Name:		libsrtp
-Version:	2.3.0
-Release:	3%{?dist}
+Version:	2.6.0
+Release:	1%{?dist}
 Summary:	An implementation of the Secure Real-time Transport Protocol (SRTP)
-License:	BSD
+License:	BSD-3-Clause
 URL:		https://github.com/cisco/libsrtp
-Source0:	https://github.com/cisco/libsrtp/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-BuildRequires:	gcc, nss-devel, libpcap-devel
-# Fix shared lib so ldconfig doesn't complain
-Patch0:		libsrtp-2.3.0-shared-fix.patch
+Source0:	https://github.com/cisco/libsrtp/archive/v%{version}.tar.gz
+BuildRequires:	gcc
+BuildRequires:	doxygen
+BuildRequires:	meson
+BuildRequires:	procps-ng
+BuildRequires:	pkgconfig(openssl)
+BuildRequires:	pkgconfig(libpcap)
+Provides:	libsrtp-tools = %{version}-%{release}
+Obsoletes:	libsrtp-tools < 2.6.0-1
 
 %description
 This package provides an implementation of the Secure Real-time
@@ -21,7 +24,6 @@ a supporting cryptographic kernel.
 %package devel
 Summary:	Development files for %{name}
 Requires:	%{name}%{?_isa} = %{version}-%{release}
-Requires:	pkgconfig
 
 %description devel
 The %{name}-devel package contains libraries and header files for
@@ -29,36 +31,28 @@ developing applications that use %{name}.
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch 0 -p1 -b .sharedfix
-
-%if 0%{?rhel} > 0
-%ifarch ppc64
-sed -i 's/-z noexecstack//' Makefile.in
-%endif
-%endif
 
 %build
-export CFLAGS="%{optflags} -fPIC"
-%configure --enable-nss
-make %{?_smp_mflags} shared_library
-
+%meson -Dcrypto-library=openssl -Dcrypto-library-kdf=disabled
+%meson_build
 %install
-make install DESTDIR=%{buildroot}
-find %{buildroot} -name '*.la' -exec rm -f {} ';'
-
-%ldconfig_scriptlets
-
+%meson_install
+%check
+%meson_test
 %files
 %license LICENSE
 %doc CHANGES README.md
 %{_libdir}/*.so.*
 
 %files devel
-%{_includedir}/%{shortname}2/
+%{_includedir}/srtp2/
 %{_libdir}/pkgconfig/libsrtp2.pc
 %{_libdir}/*.so
 
 %changelog
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.6.0-1
+- Update to version 2.6.0
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

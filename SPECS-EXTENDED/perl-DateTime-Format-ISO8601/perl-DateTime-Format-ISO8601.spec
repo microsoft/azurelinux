@@ -1,75 +1,147 @@
-# Run optional test
-%if 0%{?rhel}
-%bcond_with perl_DateTime_Format_ISO8601_enables_optional_test
-%else
-%bcond_without perl_DateTime_Format_ISO8601_enables_optional_test
-%endif
-
 Name:       perl-DateTime-Format-ISO8601 
-Version:    0.08
-Release:    24%{?dist}
+Version:    0.16
+Release:    12%{?dist}
 # LICENSE, lib/DateTime/Format/ISO8601.pod -> GPL+ or Artistic
-License:    GPL+ or Artistic 
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-Summary:    Parses ISO8601 formats 
-URL:        https://metacpan.org/release/DateTime-Format-ISO8601
-Source:     https://cpan.metacpan.org/authors/id/J/JH/JHOBLITT/DateTime-Format-ISO8601-%{version}.tar.gz 
+License:    GPL-1.0-or-later OR Artistic-1.0-Perl
+Summary:    Parses ISO8601 date-time formats
+Url:        https://metacpan.org/release/DateTime-Format-ISO8601
+Source:     https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/DateTime-Format-ISO8601-%{version}.tar.gz
 BuildArch:  noarch
+BuildRequires:  coreutils
+BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(Module::Build)
-# Run-time
-BuildRequires:  perl(Carp)
-BuildRequires:  perl(DateTime) >= 0.18
-BuildRequires:  perl(DateTime::Format::Builder) >= 0.77
-BuildRequires:  perl(Params::Validate)
+BuildRequires:  perl(Config)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
-BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
-# Tests
-BuildRequires:  perl(lib)
-BuildRequires:  perl(Test::More)
-%if %{with perl_DateTime_Format_ISO8601_enables_optional_test}
-# Optional tests
-BuildRequires:  perl(File::Find::Rule)
-BuildRequires:  perl(Test::Distribution)
-BuildRequires:  perl(Test::Pod) >= 0.95
-%endif
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:       perl(DateTime) >= 0.18
-Requires:       perl(DateTime::Format::Builder) >= 0.77
+# Run-time:
+BuildRequires:  perl(Carp)
+BuildRequires:  perl(DateTime) >= 1.45
+BuildRequires:  perl(DateTime::Format::Builder) >= 0.77
+BuildRequires:  perl(namespace::autoclean)
+BuildRequires:  perl(Params::ValidationCompiler) >= 0.26
+BuildRequires:  perl(parent)
+BuildRequires:  perl(Specio) >= 0.18
+BuildRequires:  perl(Specio::Declare)
+BuildRequires:  perl(Specio::Exporter)
+BuildRequires:  perl(Specio::Library::Builtins)
+# Tests:
+BuildRequires:  perl(File::Spec)
+BuildRequires:  perl(Test::More) >= 1.302015
+BuildRequires:  perl(Test2::V0)
+# Optional tests:
+# CPAN::Meta not helpful
+# CPAN::Meta::Prereqs not helpful
 
 # Remove under-specified dependencies
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(DateTime(::Format::Builder)?\\)$
+%global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}^perl\\(Test::More\\)$
 
 %description
 Parses almost all ISO8601 date and time formats. ISO8601 time-intervals
 will be supported in a later release.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+Requires:       perl(Test::More) >= 1.302015
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n DateTime-Format-ISO8601-%{version}
+# Help file to recognise the Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1' "$F"
+    chmod +x "$F"
+done
 
 %build
-perl Build.PL installdirs=vendor
-./Build
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-./Build install destdir=%{buildroot} create_packlist=0
+%{make_install}
+# Install tests
+mkdir -p %{buildroot}/%{_libexecdir}/%{name}
+cp -a t %{buildroot}/%{_libexecdir}/%{name}
+cat > %{buildroot}/%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+unset AUTHOR_TESTING
+cd %{_libexecdir}/%{name} && exec prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+EOF
+chmod +x %{buildroot}/%{_libexecdir}/%{name}/test
 %{_fixperms} %{buildroot}/*
 
 %check
-./Build test
+unset AUTHOR_TESTING
+export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
+make test
 
 %files
 %license LICENSE
-%doc README Changes Todo
+%doc CONTRIBUTING.md README.md Changes Todo
 %{perl_vendorlib}/*
 %{_mandir}/man3/*.3*
 
+%files tests
+%{_libexecdir}/%{name}
+
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.08-24
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.16-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.16-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.16-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.16-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.16-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Dec 19 2022 Michal Josef Špaček <mspacek@redhat.com> - 0.16-7
+- Update license to SPDX format
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.16-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.16-5
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.16-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.16-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sun May 23 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.16-2
+- Perl 5.34 rebuild
+
+* Mon Feb 15 2021 Petr Pisar <ppisar@redhat.com> - 0.16-1
+- 0.16 bump
+- Package tests
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.15-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Oct 26 2020 Petr Pisar <ppisar@redhat.com> - 0.15-1
+- 0.15 bump
+
+* Tue Aug 18 2020 Petr Pisar <ppisar@redhat.com> - 0.14-1
+- 0.14 bump
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.08-24
+- Perl 5.32 rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-23
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

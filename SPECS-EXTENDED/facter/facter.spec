@@ -1,33 +1,29 @@
-## START: Set by rpmautospec
-## (rpmautospec version 0.2.5)
-%define autorelease(e:s:pb:) %{?-p:0.}%{lua:
-    release_number = 1;
-    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
-    print(release_number + base_release_number - 1);
-}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{?dist}
-## END: Set by rpmautospec
-
 %global gem_name facter
-%global debug_package %{nil}
 
 Name:           facter
-Version:        4.2.13
+Version:        4.8.0
 Release:        1%{?dist}
 Summary:        Command and ruby library for gathering system information
 Vendor:		Microsoft Corporation
 Distribution:   Azure Linux
-License:        ASL 2.0
+
+License:        Apache-2.0
 URL:            https://github.com/puppetlabs/facter
 Source0:        https://downloads.puppetlabs.com/%{name}/%{name}-%{version}.gem
+Source1:        https://downloads.puppetlabs.com/%{name}/%{name}-%{version}.gem.asc
+Source2:        https://downloads.puppetlabs.com/puppet-gpg-signing-key-20250406.pub
+
 
 BuildRequires:  gnupg2
 BuildRequires:  rubygems-devel
-BuildRequires:  ruby >= 2.3
+BuildRequires:  ruby >= 2.5
 Requires:       ruby(rubygems)
+Requires:       ruby(release) >= 2.5
 
 # Add runtime deps for testing
 BuildRequires:  rubygem(hocon) >= 1.3
 BuildRequires:  rubygem(thor) >= 1.0.1
+BuildRequires:  rubygem(sys-filesystem)
 
 # Binaries that Facter can call for complete facts
 %ifarch %ix86 x86_64 ia64
@@ -36,6 +32,9 @@ Requires:       pciutils
 Requires:       virt-what
 %endif
 Requires:       net-tools
+
+# Soft dependency for the mountpoints fact
+Requires:       rubygem(sys-filesystem)
 
 Provides:       ruby-%{name} = %{version}
 Obsoletes:      ruby-%{name} < 4
@@ -65,7 +64,9 @@ Documentation for %{name}.
 
 
 %prep
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %setup -q -n %{gem_name}-%{version}
+%gemspec_add_dep -g sys-filesystem
 
 %build
 gem build ../%{gem_name}-%{version}.gemspec
@@ -85,7 +86,7 @@ rm -rf %{buildroot}/%{gem_instdir}/bin
 %check
 # No test suite can run since the spec files are not part of the gem
 # So try to run the executable and see if that works
-GEM_HOME="%{buildroot}%{gem_dir}" %{buildroot}%{_bindir}/facter
+GEM_HOME="%{buildroot}%{gem_dir}" %{buildroot}%{_bindir}/facter --help
 
 
 %files
@@ -100,6 +101,10 @@ GEM_HOME="%{buildroot}%{gem_dir}" %{buildroot}%{_bindir}/facter
 %doc %{gem_docdir}
 
 %changelog
+* Wed Oct 30 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 4.8.0-1
+- Upgrade to 4.8.0
+- License verified
+
 * Tue May 07 2024 Andy Zaugg <azaugg@linkedin.com> 4.2.13-1
 - Bumped version to facter version which has Mariner Linux Support
 

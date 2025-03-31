@@ -1,8 +1,8 @@
 %global apiversion 0.4
 
 Name:		libwps
-Version:	0.4.11
-Release:	2%{?dist}
+Version:	0.4.14
+Release:	1%{?dist}
 Summary:	A library for import of Microsoft Works documents
 
 License:	LGPLv2+ or MPLv2.0
@@ -100,6 +100,10 @@ install -m 0644 wks2*.1 wps2*.1 %{buildroot}/%{_mandir}/man1
 %doc docs/doxygen/html
 
 %changelog
+* Mon Dec 02 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.4.14-1
+- Updated to version 0.4.14
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.11-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

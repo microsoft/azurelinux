@@ -2,13 +2,14 @@
 
 Summary:        A library for import of WordPerfect Graphics images
 Name:           libwpg
-Version:        0.3.3
-Release:        9%{?dist}
-License:        LGPL-2.0-or-later OR MPL-2.0
+Version:        0.3.4
+Release:        1%{?dist}
+License:        LGPL-2.1-or-later OR MPL-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://libwpg.sourceforge.net/
 Source0:        https://download.sourceforge.net/libwpg/%{name}-%{version}.tar.xz
+BuildRequires:  boost-devel
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
 BuildRequires:  help2man
@@ -28,7 +29,7 @@ Corel software, such as WordPerfect and Presentations.
 
 %package devel
 Summary:        Development files for %{name}
-License:        LGPL-2.0-or-later OR MPL-2.0
+License:        LGPL-2.1-or-later OR MPL-2.0
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
@@ -37,7 +38,7 @@ developing applications that use %{name}.
 
 %package doc
 Summary:        Documentation of %{name} API
-License:        LGPL-2.0-or-later OR MPL-2.0
+License:        LGPL-2.1-or-later OR MPL-2.0
 BuildArch:      noarch
 
 %description doc
@@ -48,7 +49,7 @@ Summary:        Tools to convert WordPerfect Graphics images to other formats
 # wpg2svgbatch.pl says "GPL", without specifying version, and points to
 # http://www.gnu.org/copyleft/gpl.html . I assume this means "any
 # version".
-License:        (LGPL-2.0-or-later OR MPL-2.0) AND GPL+
+License:        (LGPLv2+ or MPLv2.0) and GPL+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description tools
@@ -64,11 +65,11 @@ sed -i \
     -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
     -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
     libtool
-%make_build
+make %{?_smp_mflags}
 
 %install
-%make_install
-find %{buildroot} -type f -name "*.la" -delete -print
+make install DESTDIR=%{buildroot}
+find %{buildroot} -name '*.la' -exec rm -f {} ';'
 # we install API docs directly from build
 rm -rf %{buildroot}/%{_docdir}/%{name}
 
@@ -108,6 +109,10 @@ install -m 0644 wpg2*.1 %{buildroot}/%{_mandir}/man1
 %{_mandir}/man1/wpg2svgbatch.pl.1*
 
 %changelog
+* Wed Dec 04 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.3.4-1
+- Updated to version 0.3.4
+- License verified
+
 * Wed Jan 18 2023 Suresh Thelkar <sthelkar@microsoft.com> - 0.3.3-9
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified

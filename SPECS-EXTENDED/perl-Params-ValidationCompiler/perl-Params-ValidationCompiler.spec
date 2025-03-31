@@ -6,14 +6,12 @@
 %endif
 
 Name:		perl-Params-ValidationCompiler
-Version:	0.30
-Release:	7%{?dist}
+Version:	0.31
+Release:	6%{?dist}
 Summary:	Build an optimized subroutine parameter validator once, use it forever
-License:	Artistic 2.0
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:	Artistic-2.0
 URL:		https://metacpan.org/release/Params-ValidationCompiler
-Source0:	https://cpan.metacpan.org/modules/by-module/Params/Params-ValidationCompiler-%{version}.tar.gz#/perl-Params-ValidationCompiler-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/modules/by-module/Params/Params-ValidationCompiler-%{version}.tar.gz
 BuildArch:	noarch
 # Build
 BuildRequires:	coreutils
@@ -24,7 +22,7 @@ BuildRequires:	perl(ExtUtils::MakeMaker) > 6.75
 # Module
 BuildRequires:	perl(B)
 BuildRequires:	perl(Carp)
-BuildRequires:	perl(Class::XSAccessor)
+BuildRequires:	perl(Class::XSAccessor) >= 1.17
 BuildRequires:	perl(Eval::Closure)
 BuildRequires:	perl(Exception::Class)
 BuildRequires:	perl(Exporter)
@@ -58,8 +56,7 @@ BuildRequires:	perl(Types::Standard)
 %endif
 %endif
 # Dependencies
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Recommends:	perl(Class::XSAccessor)
+Recommends:	perl(Class::XSAccessor) >= 1.17
 Recommends:	perl(Sub::Util) >= 1.40
 
 %description
@@ -89,8 +86,59 @@ make test
 %{_mandir}/man3/Params::ValidationCompiler::Exceptions.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.30-7
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.31-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.31-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.31-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.31-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.31-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sun Jan  8 2023 Paul Howarth <paul@city-fan.org> - 0.31-1
+- Update to 0.31
+  - Require Class::XSAccessor 1.17+ when trying to load it; earlier versions
+    cause test failures (GH#27)
+- Use SPDX-format license tag
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.30-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jun 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.30-16
+- Perl 5.36 re-rebuild of bootstrapped packages
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.30-15
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.30-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.30-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon May 24 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.30-12
+- Perl 5.34 re-rebuild of bootstrapped packages
+
+* Sat May 22 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.30-11
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.30-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.30-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.30-8
+- Perl 5.32 re-rebuild of bootstrapped packages
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.30-7
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.30-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
