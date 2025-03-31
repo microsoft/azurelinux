@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           gphoto2
-Version:        2.5.27
-Release:        2%{?dist}
+Version:        2.5.28
+Release:        1%{?dist}
 Summary:        Software for accessing digital cameras
 License:        GPLv2+
 Url:            http://www.gphoto.org/
@@ -47,6 +47,10 @@ rm %{buildroot}%{_docdir}/%{name}/test-hook.sh
 %{_mandir}/man1/gphoto2.1*
 
 %changelog
+* Wed Oct 16 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 2.5.28-1
+- Upgrade to current upstream
+- Verify License
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.27-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

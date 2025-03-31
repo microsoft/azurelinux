@@ -1,158 +1,254 @@
-%global compatver 2.1.0
-%define base_name jexl
-%define short_name commons-%{base_name}
-Summary:        Java Expression Language (JEXL)
-Name:           apache-%{short_name}
-Version:        2.1.1
-Release:        3%{?dist}
+## START: Set by rpmautospec
+## (rpmautospec version 0.6.5)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 3;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
+
+# Break a dependency cycle: apache-commons-jexl -> jacoco -> maven-reporting-api
+#   -> maven-doxia -> apache-commons-configuration -> apache-commons-jexl
+%bcond bootstrap 0
+
+Name:           apache-commons-jexl
+Version:        3.4.0
+Release:        %autorelease
+Summary:        Java Expression Language
+
 License:        Apache-2.0
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-Group:          Development/Libraries/Java
-URL:            https://commons.apache.org/jexl
-Source0:        https://downloads.apache.org/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
-Source1:        build.xml
-Source2:        common.xml
-Source3:        jexl2-compat-build.xml
-# Patch to fix test failure with junit 4.11
-Patch0:         001-Fix-tests.patch
-# Fix javadoc build
-Patch1:         apache-commons-jexl-javadoc.patch
-Patch2:         0001-Port-to-current-javacc.patch
-BuildRequires:  ant
-BuildRequires:  ant-junit
-BuildRequires:  apache-commons-logging
-BuildRequires:  fdupes
-BuildRequires:  java-devel
-BuildRequires:  javacc
-BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  javapackages-tools
-Requires:       apache-commons-logging
-Provides:       %{short_name} = %{version}-%{release}
 BuildArch:      noarch
+#ExclusiveArch:  %{java_arches} noarch
+URL:            https://commons.apache.org/proper/commons-jexl/
+VCS:            git:https://github.com/apache/commons-jexl.git
+Source0:        https://archive.apache.org/dist/commons/jexl/source/commons-jexl-%{version}-src.tar.gz
+Source1:        https://archive.apache.org/dist/commons/jexl/source/commons-jexl-%{version}-src.tar.gz.asc
+Source2:        https://downloads.apache.org/commons/KEYS
+
+# Use the codehaus version of javacc-maven-plugin, which is available from
+# Fedora, instead of ph-javacc-maven-plugin, which is not.
+Patch:          %{name}-javacc.patch
+# Fix malformed javadoc constructs
+Patch:          %{name}-javadoc.patch
+
+BuildRequires:  gnupg2
+BuildRequires:  maven-local
+BuildRequires:  mvn(com.google.code.gson:gson)
+BuildRequires:  mvn(commons-logging:commons-logging)
+BuildRequires:  mvn(org.apache.commons:commons-lang3)
+BuildRequires:  mvn(org.apache.commons:commons-parent:pom:)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-assembly-plugin)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-compiler-plugin)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-jar-plugin)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-surefire-plugin)
+BuildRequires:  mvn(org.apiguardian:apiguardian-api)
+BuildRequires:  mvn(org.codehaus.mojo:javacc-maven-plugin)
+BuildRequires:  mvn(org.junit.jupiter:junit-jupiter)
+BuildRequires:  mvn(org.junit.jupiter:junit-jupiter-params)
+
+%if %{without bootstrap}
+BuildRequires:  mvn(org.jacoco:jacoco-maven-plugin)
+%endif
 
 %description
-Java Expression Language (JEXL) is an expression language engine which can be
-embedded in applications and frameworks.  JEXL is inspired by Jakarta Velocity
-and the Expression Language defined in the JavaServer Pages Standard Tag
-Library version 1.1 (JSTL) and JavaServer Pages version 2.0 (JSP).  While
-inspired by JSTL EL, it must be noted that JEXL is not a compatible
-implementation of EL as defined in JSTL 1.1 (JSR-052) or JSP 2.0 (JSR-152).
-For a compatible implementation of these specifications, see the Commons EL
-project.
+JEXL is a library intended to facilitate the implementation of scripting
+features in applications and frameworks written in Java.  JEXL
+implements an Expression Language based on some extensions to the JSTL
+Expression Language supporting most of the constructs seen in shell
+script or ECMAScript.  Its goal is to expose scripting features usable
+by technical operatives or consultants working with enterprise
+platforms.
 
-JEXL attempts to bring some of the lessons learned by the Velocity community
-about expression languages in templating to a wider audience.  Commons Jelly
-needed Velocity-ish method access, it just had to have it.
-
-%package javadoc
-Summary:        Javadocs for %{name}
-Group:          Documentation/HTML
-Provides:       %{short_name}-javadoc = %{version}-%{release}
-
-%description javadoc
-This package contains the API documentation for %{name}.
+%javadoc_package
 
 %prep
-%setup -q -n %{short_name}-%{version}-src
-cp %{SOURCE1} .
-cp %{SOURCE2} .
-cp %{SOURCE3} jexl2-compat/build.xml
-%patch 0 -p1 -b .test
-%patch 1 -p1 -b .javadoc
-%patch 2 -p1
+%{gpgverify} --data=%{SOURCE0} --signature=%{SOURCE1} --keyring=%{SOURCE2}
+%autosetup -n commons-jexl3-%{version}-src -p1
 
-# Java 1.6 contains bsf 3.0, so we don't need the dependency in the pom.xml file
-%pom_remove_dep org.apache.bsf:bsf-api
-find \( -name '*.jar' -o -name '*.class' \) -delete
-# Fix line endings
-find -name '*.txt' -exec sed -i 's/\r//' '{}' +
+# Remove workaround for fixed JavaCC bug.
+# The workaround now causes build failure.
+%pom_remove_plugin :maven-antrun-plugin
 
-# Drop "-SNAPSHOT" from version
-%pom_xpath_set "pom:project/pom:version" %{compatver} jexl2-compat
-%pom_xpath_set "pom:dependency[pom:artifactId='commons-jexl']/pom:version" %{version} jexl2-compat
+# Work around @{argLine} expansion failure
+%pom_xpath_remove //pom:argLine
 
-%pom_remove_parent . jexl2-compat
+# Not needed for RPM builds
+%pom_xpath_remove //pom:reporting
+%pom_remove_plugin :animal-sniffer-maven-plugin
+%pom_remove_plugin :apache-rat-plugin
+%pom_remove_plugin :japicmp-maven-plugin
+%pom_remove_plugin :maven-checkstyle-plugin
+%pom_remove_plugin :maven-javadoc-plugin
+%pom_remove_plugin :maven-pmd-plugin
+%pom_remove_plugin :maven-scm-publish-plugin
+%pom_remove_plugin :spotbugs-maven-plugin
+
+# Not available in Fedora
+%pom_remove_dep :concurrentlinkedhashmap-lru
+rm src/test/java/org/apache/commons/jexl3/{CachePerformanceTest,ConcurrentCache}.java
+
+# Needed for the tests
+%pom_add_dep org.apiguardian:apiguardian-api:1.1.2:test
+
+# Break a dependency cycle in bootstrap mode
+%if %{with bootstrap}
+%pom_remove_plugin :jacoco-maven-plugin
+%endif
 
 %build
-mkdir -p lib
-build-jar-repository -s lib commons-logging
-
-# build.xml target "gen-sources" complains about missing Packages directory, creating one
-export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
-mkdir -p $JAVA_HOME/Packages
-
-# Mariner does not provide internal API's to call Suns java compiler.
-# Setting this to false
-sed -i -E "s/canRun = comSunToolsJavacMain.*$/canRun = false;/" ./src/test/java/org/apache/commons/jexl2/ClassCreator.java
-
-# commons-jexl
-%{ant} \
-  -Djavacc.home=%{_datadir}/java \
-  jar javadoc
-
-# commons-jexl-compat
-%{ant} \
-  -f jexl2-compat/build.xml \
-  -Dproject.version=%{compatver} \
-  jar javadoc
+%mvn_build
 
 %install
-# jars
-install -dm 0755 %{buildroot}%{_javadir}/%{name}
-install -pm 0644 target/%{short_name}-%{version}.jar %{buildroot}%{_javadir}/%{name}/%{short_name}.jar
-ln -sf %{name}/%{short_name}.jar %{buildroot}%{_javadir}/%{short_name}.jar
-install -pm 0644 jexl2-compat/target/%{short_name}-compat-%{compatver}.jar %{buildroot}%{_javadir}/%{name}/%{short_name}-compat.jar
-ln -sf %{name}/%{short_name}-compat.jar %{buildroot}%{_javadir}/%{short_name}-compat.jar
-# poms
-install -dm 0755 %{buildroot}%{_mavenpomdir}/%{name}
-install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}/%{short_name}.pom
-%add_maven_depmap %{name}/%{short_name}.pom %{name}/%{short_name}.jar
-install -pm 0644 jexl2-compat/pom.xml  %{buildroot}%{_mavenpomdir}/%{name}/%{short_name}-compat.pom
-%add_maven_depmap %{name}/%{short_name}-compat.pom %{name}/%{short_name}-compat.jar
-# javadoc
-install -dm 0755 %{buildroot}%{_javadocdir}/%{name}/jexl2-compat
-cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
-cp -pr jexl2-compat/target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/jexl2-compat/
-%fdupes -s %{buildroot}%{_javadocdir}
-
-%check
-# commons-jexl
-%{ant} \
-  -Djavacc.home=%{_datadir}/java \
-  test
-
-%{ant} \
-  -f jexl2-compat/build.xml \
-  -Dproject.version=%{compatver} \
-  test
+%mvn_install
 
 %files -f .mfiles
-%license LICENSE.txt
-%doc NOTICE.txt RELEASE-NOTES.txt
-%{_javadir}/%{short_name}*.jar
-
-%files javadoc
-%license LICENSE.txt
-%doc NOTICE.txt
-%{_javadocdir}/%{name}
+%doc RELEASE-NOTES.txt
+%license LICENSE.txt NOTICE.txt
 
 %changelog
-* Mon Nov 14 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.1.1-3
-- Fix build errors
-  * create 'Packages' directory under JDK_HOME
-  * disable tests sources flag for invoking sun javac compiler
-- Enable check section
-- License verified
+## START: Generated by rpmautospec
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.4.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.1-2
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Tue Jul 16 2024 Jerry James <loganjerry@gmail.com> - 3.4.0-2
+- Minor spec file simplifications
 
-* Tue Nov 17 2020 Ruying Chen <v-ruyche@microsoft.com> - 2.1.1-1.7
-- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
-- Use javapackages-local-bootstrap to avoid build cycle.
-- Fix linebreak in sed command.
+* Thu Jun 06 2024 Jerry James <loganjerry@gmail.com> - 3.4.0-1
+- Version 3.4.0
+- Add patch to fix malformed javadoc constructs
 
-* Thu Feb 28 2019 Fridrich Strba <fstrba@suse.com>
-- Initial package based on Fedora rpm
-- Generate and sanitize ant build files
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Jan 16 2024 Jerry James <loganjerry@gmail.com> - 3.3-4
+- Add bootstrap mode to break a dependency cycle
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 18 2023 Jerry James <loganjerry@gmail.com> - 3.3-1
+- Version 3.3
+
+* Tue Jul 18 2023 Tomas Hrcka <thrcka@redhat.com> - 2.1.1-26
+- Unretirement request: https://pagure.io/releng/issue/11549
+
+* Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
+* Tue Nov 05 2019 Fabio Valentini <decathorpe@gmail.com> - 2.1.1-24
+- Add missing maven compiler source and target overrides.
+
+* Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
+* Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
+* Thu Jul 12 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
+* Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
+* Wed Jul 26 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
+* Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
+* Wed Sep 07 2016 Michael Simacek <msimacek@redhat.com> - 2.1.1-17
+- Port to current javacc
+
+* Wed Jun 15 2016 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.1-16
+- Regenerate build-requires
+
+* Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
+* Mon Jul 27 2015 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.1-14
+- Build compat package in the same reactor as main module
+
+* Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.1.1-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
+* Wed Apr 15 2015 Orion Poplawski <orion@cora.nwra.com> - 2.1.1-12
+- Add patch to fix javadoc build
+
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.1.1-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
+* Tue Mar 04 2014 Stanislav Ochotnicky <sochotnicky@redhat.com> - 2.1.1-10
+- Use Requires: java-headless rebuild (#1067528)
+
+* Thu Jan 02 2014 Michal Srb <msrb@redhat.com> - 2.1.1-9
+- Build JEXL 1.x compat artifact
+- Fix directory ownership
+
+* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.1.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
+* Mon Jul  1 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 2.1.1-7
+- Install NOTICE file with javadoc package
+
+* Fri Jun 28 2013 Orion Poplawski <orion@cora.nwra.com> - 2.1.1-6
+- Update to current maven spec guidelines to fix build (bug 979497)
+- Add patch to fix test with junit 4.11
+
+* Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.1.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
+* Wed Feb 06 2013 Java SIG <java-devel@lists.fedoraproject.org> - 2.1.1-4
+- Update for https://fedoraproject.org/wiki/Fedora_19_Maven_Rebuild
+- Replace maven BuildRequires with maven-local
+
+* Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.1.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
+* Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.1.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
+* Sat Dec 24 2011 Orion Poplawski <orion@cora.nwra.com> - 2.1.1-1
+- Update to 2.1.1
+
+* Mon Dec 12 2011 Orion Poplawski <orion@cora.nwra.com> - 2.1-1
+- Update to 2.1
+- Update bsf patch
+- Add needed BRs
+
+* Tue Oct 11 2011 Stanislav Ochotnicky <sochotnicky@redhat.com> - 2.0.1-4
+- Packaging fixes
+- New maven macro for depmaps (include a compat depmap) #745118
+
+* Mon Feb 07 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
+* Mon Dec 6 2010 Orion Poplawski <orion@cora.nwra.com> - 2.0.1-3
+- Use BR apache-commons-parent
+
+* Tue Jul 13 2010 Orion Poplawski <orion@cora.nwra.com> - 2.0.1-2
+- Add license to javadoc package
+
+* Wed May 26 2010 Orion Poplawski <orion@cora.nwra.com> - 2.0.1-1
+- Update to 2.0.1
+- Require Java 1.6 or greater
+- Drop language level patch
+- Add patch to remove bsf-api 3.0 dependency from pom.xml as this is provided
+  by Java 1.6
+- Fix depmap group id
+
+* Sat Jan 9 2010 Orion Poplawski <orion@cora.nwra.com> - 1.1-3
+- Drop gcj support
+- Fix javadoc group
+- Bump java levels in pom.xml
+
+* Thu Jan 7 2010 Orion Poplawski <orion@cora.nwra.com> - 1.1-2
+- Rename to apache-commons-jexl
+
+* Tue Oct 27 2009 Orion Poplawski <orion@cora.nwra.com> - 1.1-1
+- Initial Fedora Package
+
+## END: Generated by rpmautospec

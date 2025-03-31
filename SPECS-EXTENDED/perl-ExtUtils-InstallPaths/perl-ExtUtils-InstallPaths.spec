@@ -1,6 +1,6 @@
 Name:		perl-ExtUtils-InstallPaths
-Version:	0.012
-Release:	9%{?dist}
+Version:	0.014
+Release:	1%{?dist}
 Summary:	Build.PL install path logic made easy
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -17,12 +17,11 @@ BuildRequires:	perl-interpreter
 BuildRequires:	perl(ExtUtils::MakeMaker)
 # Module
 BuildRequires:	perl(Carp)
-BuildRequires:	perl(ExtUtils::Config) >= 0.002
+BuildRequires:	perl(ExtUtils::Config) >= 0.009
 BuildRequires:	perl(File::Spec)
 BuildRequires:	perl(strict)
 BuildRequires:	perl(warnings)
 # Test Suite
-BuildRequires:	perl(Config)
 BuildRequires:	perl(File::Spec::Functions) >= 0.83
 BuildRequires:	perl(File::Temp)
 BuildRequires:	perl(Test::More)
@@ -67,6 +66,10 @@ make test
 %{_mandir}/man3/ExtUtils::InstallPaths.3*
 
 %changelog
+* Fri Dec 20 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.014-1
+- Update to 0.014
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.012-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

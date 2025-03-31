@@ -1,0 +1,38 @@
+From 1d04fdfce6edea685596fbb18920799c70f1d7fa Mon Sep 17 00:00:00 2001
+From: Yuya Higashi <higashi.yuya@fujitsu.com>
+Date: Mon, 26 Dec 2022 09:18:15 +0900
+Subject: [PATCH 2/3] virt-top: fix to parse init-file correctly
+
+This fixes the following runtime error when parsing init-file.
+
+$ virt-top --init-file <(echo "sort id")
+Error: Invalid_argument("String.sub / Bytes.sub")
+Raised at Stdlib.invalid_arg in file "stdlib.ml", line 30, characters 20-45
+Called from Stdlib__String.sub in file "string.ml" (inlined), line 50, characters 2-23
+Called from Utils.split in file "utils.ml", line 82, characters 24-68
+Called from Utils.read_config_file.(fun) in file "utils.ml", line 114, characters 23-37
+Called from Stdlib__List.map in file "list.ml", line 92, characters 20-23
+Called from Top.start_up.try_to_read_init_file in file "top.ml", line 153, characters 17-42
+Called from Main.script_mode in file "main.ml", line 37, characters 6-17
+
+Signed-off-by: Yuya Higashi <higashi.yuya@fujitsu.com>
+---
+ src/utils.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/utils.ml b/src/utils.ml
+index 1f00803..8dfb255 100644
+--- a/src/utils.ml
++++ b/src/utils.ml
+@@ -79,7 +79,7 @@ let trim ?(test = isspace) str =
+ let split str sep =
+   try
+     let i = String.index str sep in
+-    String.sub str 0 i, String.sub str (i+1) (String.length str - 1)
++    String.sub str 0 i, String.sub str (i+1) (String.length str - i - 1)
+   with
+     Not_found -> str, ""
+ 
+-- 
+2.42.0
+

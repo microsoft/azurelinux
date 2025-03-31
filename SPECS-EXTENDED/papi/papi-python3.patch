@@ -1,0 +1,10 @@
+diff --git a/src/high-level/scripts/papi_hl_output_writer.py b/src/high-level/scripts/papi_hl_output_writer.py
+index 123d2cd0..34bfbd73 100755
+--- a/src/high-level/scripts/papi_hl_output_writer.py
++++ b/src/high-level/scripts/papi_hl_output_writer.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python3
+ from __future__ import division
+ from collections import OrderedDict
+ 

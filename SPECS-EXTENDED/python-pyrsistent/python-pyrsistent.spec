@@ -1,10 +1,55 @@
-%{!?python3_sitearch: %define python3_sitearch %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-%{!?__python3: %global __python3 /usr/bin/python3}
-%{!?py3_build: %define py3_build CFLAGS="%{optflags}" %{__python3} setup.py build}
-%{!?py3_install: %define py3_install %{__python3} setup.py install --skip-build --root %{buildroot}}
+## START: Set by rpmautospec
+## (rpmautospec version 0.6.5)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 8;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
 
-%global pypi_name pyrsistent
+# Sphinx-generated HTML documentation is not suitable for packaging; see
+# https://bugzilla.redhat.com/show_bug.cgi?id=2006555 for discussion.
+#
+# We can generate PDF documentation as a substitute.
+%bcond doc 1
+
+Name:           python-pyrsistent
+Summary:        Persistent/Functional/Immutable data structures
+Version:        0.20.0
+Release:        %autorelease
+
+# The entire source is (SPDX) MIT, except pyrsistent/_toolz.py which is BSD-3-Clause.
+License:        MIT AND BSD-3-Clause
+URL:            https://github.com/tobgu/pyrsistent/
+Source:         %{url}/archive/v%{version}/pyrsistent-%{version}.tar.gz
+
+# Replace _PyList_Extend with PyList_SetSlice
+# https://github.com/tobgu/pyrsistent/pull/284
+#
+# Together with the 0.20.0 release, this fixes:
+#
+# python-pyrsistent fails to build with Python 3.13: implicit declaration of
+# function ‘Py_TRASHCAN_SAFE_BEGIN’, ‘Py_TRASHCAN_SAFE_END’, ‘_PyList_Extend’
+# https://bugzilla.redhat.com/show_bug.cgi?id=2246349
+Patch:          %{url}/pull/284.patch
+
+BuildRequires:  python3-devel
+BuildRequires:  gcc
+
+# For Sphinx documentation
+%if %{with doc}
+BuildRequires:  make
+BuildRequires:  python3-sphinx-latex
+BuildRequires:  latexmk
+%endif
+
+# There is fancy machinery in setup.py to add pytest-runner to setup_requires
+# in setup.py when it looks like tests are to be executed. Since we will not use
+# “python3 setup.py test” to run tests, we can do without this dependency.
+
+# Note that pyrsistent/_toolz.py contains a bit of code ported from toolz, but
+# not enough to constitute a bundled dependency.
 
 %global common_description %{expand:
 Pyrsistent is a number of persistent collections (by some referred to as
@@ -15,68 +60,230 @@ All methods on a data structure that would normally mutate it instead
 return a new copy of the structure containing the requested updates. The
 original structure is left untouched.}
 
-Name:           python-%{pypi_name}
-Summary:        Persistent/Functional/Immutable data structures
-Version:        0.17.3
-Release:        3%{?dist}
-License:        MIT
-URL:            http://github.com/tobgu/pyrsistent/
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
-# relax dependencies specified in setup.py
-Patch0:         00-relax-dependencies.patch
-BuildRequires:  gcc
-BuildRequires:  python3-devel
-BuildRequires:  python3-hypothesis
-BuildRequires:  python3-pytest
-BuildRequires:  python3-pytest-runner
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-six
-BuildRequires:  python3-xml
-
 %description %{common_description}
 
-%package -n     python3-%{pypi_name}
+
+%package -n     python3-pyrsistent
 Summary:        %{summary}
 
-%{?python_provide:%python_provide python3-%{pypi_name}}
+%description -n python3-pyrsistent %{common_description}
 
-%description -n python3-%{pypi_name} %{common_description}
+
+%if %{with doc}
+%package        doc
+Summary:        Documentation for pyrsistent
+# The Sphinx documentation does contain content based on pyrsistent/_toolz.py,
+# so the full License carries over from the base package.
+
+BuildArch:      noarch
+
+%description doc %{common_description}
+%endif
+
 
 %prep
-%autosetup -n %{pypi_name}-%{version} -p1
+%autosetup -n pyrsistent-%{version} -p1
 
-# Remove bundled egg-info
-rm -rf %{pypi_name}.egg-info
+# Remove all version pins for documentation dependencies. These tend to just be
+# the latest versions at the time of release, and are generally not based on
+# any particular analysis. In any case, we must attempt to use whatever is
+# packaged.
+sed -r 's/[>=]=.*//' docs/requirements.in | tee docs/requirements.in.unpinned
+
+# Loosen exact-version pins in requirements.txt; we must tolerate newer
+# versions and use what is packaged.
+#
+# We do not need:
+#   - hypothesis, not included in RHEL
+#   - memory-profiler or psutil, since we are not running the memorytest*
+#     environment from tox.ini
+#   - pip-tools, since it is for making pinned requirements files
+#   - pyperform, since we are not running the benchmarks from
+#     performance_suites/
+#   - tox, since we are not using tox to run the tests
+#   - twine, since it is for maintainer PyPI uploads
+
+sed -r \
+    -e 's/==/>=/' \
+    -e '/\b(memory-profiler|pip-tools|psutil|pyperform|tox|twine)\b/d' \
+%if %{defined rhel}
+    -e '/\bhypothesis\b/d' \
+%endif
+    requirements.txt %{?with_doc:docs/requirements.in.unpinned} |
+  tee requirements-filtered.txt
+
+
+%generate_buildrequires
+%pyproject_buildrequires requirements-filtered.txt
+
 
 %build
-%py3_build
+%pyproject_wheel
+
+# Default SPHINXOPTS are '-W -n', but -W turns warnings into errors and there
+# are some warnings. We want to build the documentation as best we can anyway.
+# Additionally, we parallelize sphinx-build.
+%if %{with doc}
+PYTHONPATH="${PWD}" %make_build -C docs latex \
+    SPHINXOPTS='-n -j%{?_smp_build_ncpus}'
+%make_build -C docs/build/latex LATEXMKOPTS='-quiet'
+%endif
+
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files -l pyrsistent _pyrsistent_version pvectorc
+
 
 %check
-%{__python3} setup.py test
+# See tox.ini:
+%pytest %{?rhel:--ignore=tests/hypothesis_vector_test.py}
+%pytest --doctest-modules pyrsistent
 
-%files -n python3-%{pypi_name}
-%doc README.rst
-%license LICENCE.mit
 
-%{python3_sitearch}/_pyrsistent_version.py
-%{python3_sitearch}/__pycache__/*
+%files -n python3-pyrsistent -f %{pyproject_files}
+%if %{without doc}
+%doc CHANGES.txt README.rst
+%endif
 
-%{python3_sitearch}/%{pypi_name}/
-%{python3_sitearch}/pvectorc.cpython-3*.so
-%{python3_sitearch}/%{pypi_name}-%{version}-py%{python3_version}.egg-info/
+
+%if %{with doc}
+%files doc
+%license LICENSE.mit
+%doc CHANGES.txt README.rst
+%doc docs/build/latex/Pyrsistent.pdf
+%endif
+
 
 %changelog
-* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.17.3-3
-- Release bump to fix package information.
-- License verified.
+## START: Generated by rpmautospec
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Thu Oct 22 2020 Steve Laughman <steve.laughman@microsoft.com> - 0.17.3-2
-- Initial CBL-Mariner import from Fedora 33 (license: MIT)
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.20.0-7
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 18 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.20.0-3
+- Assert that %%pyproject_files contains a license file
+
+* Thu Oct 26 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.20.0-2
+- Patch for Python 3.13 (close RHBZ#2246349)
+
+* Thu Oct 26 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.20.0-1
+- Update to 0.20.0 (fix RHBZ#2246235, fix RHBZ#2246349)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.19.3-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jul 12 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.19.3-9
+- When PDF docs are disabled, omit the -doc subpackage
+
+* Fri Jul 07 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.19.3-8
+- Use new (rpm 4.17.1+) bcond style
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 0.19.3-7
+- Rebuilt for Python 3.12
+
+* Mon May 29 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.19.3-6
+- Drop an unnecessary BuildRequires on pytest-runner
+
+* Sat Mar 18 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.19.3-4
+- Don’t assume %%_smp_mflags is -j%%_smp_build_ncpus
+
+* Fri Feb 10 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 0.19.3-3
+- Avoid python-hypothesis dependency in RHEL builds
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.19.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Dec 29 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.19.3-1
+- Update to 0.19.3 (close RHBZ#2156882)
+
+* Thu Dec 29 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.19.2-3
+- Package from git tag instead of commit
+
+* Wed Nov 30 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.19.2-2
+- Drop default -r argument to pyproject_buildrequires
+
+* Thu Nov 03 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.19.2-1
+- Update to 0.19.2 (close RHBZ#2138666)
+
+* Mon Oct 31 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.18.1-5
+- Update License to SPDX
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.18.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.18.1-3
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.18.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jan 14 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.18.1-1
+- Update to 0.18.1
+
+* Fri Jan 14 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.18.0-11
+- Make pyrsistent._pmap doctests order-insensitive
+
+* Thu Jan 13 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.18.0-10
+- Skip doctest that fails on Python 3.11a3 (close RHBZ#2040164)
+
+* Fri Nov 26 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.18.0-9
+- Reduce LaTeX PDF build verbosity
+
+* Wed Sep 29 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.18.0-8
+- Generate PDF instead of HTML Sphinx documentation.
+
+* Mon Sep 13 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.18.0-7
+- Let pyproject-rpm-macros handle the license file
+
+* Sun Sep 12 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.18.0-6
+- Drop BR on pyproject-rpm-macros, now implied by python3-devel
+
+* Sun Sep 12 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.18.0-5
+- Reduce macro indirection in the spec file
+
+* Tue Jul 27 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.18.0-4
+- Move %%generate_buildrequires after %%prep to make the spec file easier
+  to follow
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.18.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jun 29 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.18.0-1
+- Update to 0.18.0 (closes RHBZ#1977038)
+
+* Mon Jun 14 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.17.3-8
+- Port to pyproject-rpm-macros
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.17.3-7
+- Rebuilt for Python 3.10
+
+* Thu Mar 25 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.17.3-6
+- Improved source URL (better tarball name)
+
+* Fri Feb 19 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.17.3-5
+- Parallelize Sphinx documentation build
+
+* Fri Feb 19 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.17.3-4
+- Use the GitHub tarball instead of the PyPI tarball
+- Switch URL to HTTPS
+
+* Thu Feb 18 2021 Benjamin A. Beasley <code@musicinmybrain.net> - 0.17.3-3
+- Replace pypi_name macro with srcname
+- Update BR’s
+- Run the doctests
+- Build documentation in a new -doc subpackage
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Sun Sep 27 2020 José Lemos Neto <LemosJoseX@protonmail.com> - 0.17.3-1
 - update to version 0.17.3
@@ -158,3 +365,6 @@ rm -rf %{pypi_name}.egg-info
 * Tue Sep 13 2016 Devrim Gündüz <devrim@gunduz.org> 0.11.13-1
 - Initial packaging for PostgreSQL YUM repository, to satisfy
   pgadmin4 dependency.
+
+
+## END: Generated by rpmautospec

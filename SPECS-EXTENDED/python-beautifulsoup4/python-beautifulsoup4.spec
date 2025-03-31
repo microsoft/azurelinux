@@ -1,40 +1,65 @@
-%global srcname beautifulsoup4
+# Ciruclar dependency with soupsieve which must be disabled at times
+%bcond soupsieve 1
+%bcond tests 1
+
+Name:           python-beautifulsoup4
+Version:        4.12.3
+Release:        8%{?dist}
+Summary:        HTML/XML parser for quick-turnaround applications like screen-scraping
+License:        MIT
+Vendor:         Microsoft Corporation                                                          
+Distribution:   Azure Linux
+URL:            https://www.crummy.com/software/BeautifulSoup/
+Source0:        https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# https://git.launchpad.net/beautifulsoup/commit/?id=9786a62726de5a8caba10021c4d4a58c8a3e9e3f
+
+Patch0:         soupsieve26.patch
+
+BuildArch:      noarch
+# html5lib BR just for test coverage
+%if %{with tests}
+BuildRequires:  python3-html5lib
+BuildRequires:  python3-lxml
+%endif
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-wheel
+BuildRequires:  python3-hatchling
+BuildRequires:  python3-pathspec
+BuildRequires:  python3-trove-classifiers
+BuildRequires:  python3-tox
+BuildRequires:  python-filelock
+BuildRequires:  python3-toml
+BuildRequires:  python3-virtualenv
+BuildRequires:  python3-colorama
+BuildRequires:  python3-chardet
+BuildRequires:  python-cachetools
+BuildRequires:  python3-pyproject-api
+%if %{with soupsieve}
+BuildRequires:  python3-packaging
+BuildRequires:  python3-soupsieve
+%endif
+
 %global _description %{expand:
 Beautiful Soup is a Python HTML/XML parser designed for quick
 turnaround projects like screen-scraping. Three features make it
 powerful:
+
 Beautiful Soup won't choke if you give it bad markup.
+
 Beautiful Soup provides a few simple methods and Pythonic idioms for
+navigating, searching, and modifying a parse tree.
+
 Beautiful Soup automatically converts incoming documents to Unicode
 and outgoing documents to UTF-8.
+
 Beautiful Soup parses anything you give it.
+
 Valuable data that was once locked up in poorly-designed websites is
 now within your reach. Projects that would have taken hours take only
 minutes with Beautiful Soup.}
-
-# Ciruclar dependency with soupsieve which must be disabled at times
-%bcond_without  soupsieve
-Summary:        HTML/XML parser for quick-turnaround applications like screen-scraping
-Name:           python-%{srcname}
-Version:        4.11.2
-Release:        2%{?dist}
-License:        MIT
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://www.crummy.com/software/BeautifulSoup/
-Source0:        https://files.pythonhosted.org/packages/source/b/%{srcname}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-BuildArch:      noarch
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-%if %{with soupsieve}
-BuildRequires:  python3-pytest
-BuildRequires:  python3-soupsieve
-%endif
-BuildRequires:  python3-lxml
-# html5lib BR just for test coverage
-%if 0%{?with_check}
-BuildRequires:  python3-html5lib
-%endif
 
 %description %_description
 
@@ -50,32 +75,75 @@ Obsoletes:      python3-BeautifulSoup < 1:3.2.1-2
 %description -n python3-beautifulsoup4 %_description
 
 %prep
-%autosetup -n %{srcname}-%{version}
-rm -rf %{py3dir} && cp -a . %{py3dir}
+%autosetup -p1 -n beautifulsoup4-%{version}
+# Fix compatibility with lxml 5.3.0
+# Reported upstream: https://bugs.launchpad.net/beautifulsoup/+bug/2076897
+sed -i "s/strip_cdata=False,//" bs4/builder/_lxml.py
+
+%generate_buildrequires
+%pyproject_buildrequires %{?with_tests: -t}
 
 %build
-pushd %{py3dir}
-%py3_build
+%pyproject_wheel
 
 %install
-pushd %{py3dir}
-%py3_install
+%pyproject_install
+%pyproject_save_files bs4
 
+%if %{with tests}
 %check
-%py3_check_import bs4
-pushd %{py3dir}
-python3 -m unittest discover -s bs4 || :
+python3 -m tox -q --recreate -e py312
+%endif
 
 %files -n python3-beautifulsoup4
 %license LICENSE
-%doc NEWS.txt
-%{python3_sitelib}/beautifulsoup4-%{version}*.egg-info
+%doc NEWS.txt CHANGELOG
+%{python3_sitelib}/beautifulsoup4-%{version}.dist-info/
 %{python3_sitelib}/bs4
 
 %changelog
-* Wed Mar 08 2023 Sumedh Sharma <sumsharma@microsoft.com> - 4.11.2-2
-- Initial CBL-Mariner import from Fedora 38 (license: MIT)
-- license verified
+* Fri Mar 21 2025 Jyoti kanase <v-jykanase@microsoft.com> -  4.12.3-8
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Tue Aug 13 2024 Lumír Balhar <lbalhar@redhat.com> - 4.12.3-7
+- Fix compatibility with lxml 5.3.0
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.12.3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 4.12.3-5
+- Rebuilt for Python 3.13
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 4.12.3-4
+- Bootstrap for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.12.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.12.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jan 17 2024 Terje Rosten <terje.rosten@ntnu.no> - 4.12.3-1
+- 4.12.3
+
+* Sat Dec 16 2023 Terje Rosten <terje.rosten@ntnu.no> - 4.12.2-5
+- Add patch from upstream to fix test issue with libxml2 2.12.1 (bz#2251911)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.12.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jun 16 2023 Python Maint <python-maint@redhat.com> - 4.12.2-3
+- Rebuilt for Python 3.12
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 4.12.2-2
+- Bootstrap for Python 3.12
+
+* Thu Apr 13 2023 Terje Rosten <terje.rosten@ntnu.no> - 4.12.2-1
+- 4.12.2
+
+* Mon Mar 20 2023 Terje Rosten <terje.rosten@ntnu.no> - 4.12.0-1
+- 4.12.0
 
 * Thu Feb 02 2023 Terje Rosten <terje.rosten@ntnu.no> - 4.11.2-1
 - 4.11.2
@@ -285,3 +353,4 @@ python3 -m unittest discover -s bs4 || :
 
 * Sat Mar 24 2012 Terje Rosten <terje.rosten@ntnu.no> - 4.0.1-1
 - initial package based on python-BeautifulSoup.
+

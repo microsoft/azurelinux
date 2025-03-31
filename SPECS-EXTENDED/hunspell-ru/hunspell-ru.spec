@@ -1,14 +1,18 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+%if 0%{?fedora} > 35
+%global dict_dirname hunspell 
+%else
+%global dict_dirname myspell
+%endif
 Name: hunspell-ru
 Summary: Russian hunspell dictionaries
 Version: 0.99g5
-Release: 19%{?dist}
+Release: 29%{?dist}
+Epoch: 1
 # Upstream source is gone now and recent alternative don't have license
 # Source: http://releases.mozilla.org/pub/mozilla.org/addons/3703/russian_spellchecking_dictionary-0.4.4-fx+tb+sm.xpi
 Source: russian_spellchecking_dictionary-0.4.4-fx+tb+sm.xpi
 URL: http://scon155.phys.msu.su/eng/lebedev.html
-License: BSD
+License: BSD-3-Clause-Modification
 BuildArch: noarch
 
 Requires: hunspell
@@ -23,26 +27,58 @@ Russian hunspell dictionaries.
 %build
 
 %install
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/myspell
-cp -p dictionaries/ru.dic $RPM_BUILD_ROOT/%{_datadir}/myspell/ru_RU.dic
-cp -p dictionaries/ru.aff $RPM_BUILD_ROOT/%{_datadir}/myspell/ru_RU.aff
-pushd $RPM_BUILD_ROOT/%{_datadir}/myspell/
+mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
+cp -p dictionaries/ru.dic $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}/ru_RU.dic
+cp -p dictionaries/ru.aff $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}/ru_RU.aff
+pushd $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}/
 ru_RU_aliases="ru_UA"
 for lang in $ru_RU_aliases; do
         ln -s ru_RU.aff $lang.aff
         ln -s ru_RU.dic $lang.dic
 done
 
+
 %files
 %doc dictionaries/Changelog dictionaries/LICENSE dictionaries/README
-%{_datadir}/myspell/*
+%{_datadir}/%{dict_dirname}/*
 
 %changelog
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> -0.99g5-19
-- Remove epoch
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.99g5-29
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:0.99g5-18
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.99g5-28
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.99g5-27
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.99g5-26
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Feb 22 2023 Caolán McNamar <caolanm@redhat.com> 1:0.99g5-25
+- migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.99g5-24
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.99g5-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Feb 11 2022 Vishal Vijayraghavan <vishalvvr@fedoraproject.org> - 1:0.99g5-22
+- rename install directory name from myspell to hunspell
+- https://fedoraproject.org/wiki/Changes/Hunspell_dictionary_dir_change
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.99g5-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.99g5-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.99g5-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.99g5-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.99g5-17
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

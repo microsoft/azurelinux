@@ -30,7 +30,7 @@ ExecStart=/usr/bin/mrtg /etc/mrtg/mrtg.cfg --lock-file /var/lock/mrtg/mrtg_l --c
 # - RunAsDaemon: no; (periodic invocation) :
 #Type=oneshot
 Type=simple
-StandardOutput=syslog
+LogLevelMax=notice
 
 [Install]
 WantedBy=multi-user.target

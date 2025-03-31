@@ -2,11 +2,14 @@
  "Signatures": {
   "filter-provides-mrtg.sh": "b0a38aaef25b20a70335c10efa877282013496ae1f409ffc9b57303e412611d5",
   "filter-requires-mrtg.sh": "0cf0ed44bba1bd9a6cd50256aa25e1abff40fb8e9be1fc366510d172432d4d42",
-  "mrtg-2.17.7.tar.gz": "9b94cb268fb15b0304ad3bb3ec92b9a8a16dacfcee72baac19298224a2c332c3",
-  "mrtg-2.17.7.tar.gz.md5": "b49567aec8941fb353b3b7997a56afc260547f8fb13836519fd53f7d348ddae0",
+  "mrtg-2.17.10.tar.gz": "c7f11cb5e217a500d87ee3b5d26c58a8652edbc0d3291688bb792b010fae43ac",
+  "mrtg-2.17.10.tar.gz.md5": "db0332605d859748a29a0c3c04cefd9163b6890f55c640bcf9602930e467fe37",
   "mrtg-httpd.conf": "aeac5894ef6e1e23905df55ed3d8eefa21b9824f8f4b26c0c362c9eed834a46d",
   "mrtg.cfg": "014186bf47c54e2ce6e4e4e49733fc8b6daed75300870e324818aac7bf923396",
-  "mrtg.service": "83d69716930556c6b2b6ccf9606efc61c0a9a6dbe10a218e6201ab413570c835",
+  "mrtg.fc": "88f4d5a1d62bf1f66b28461def0b908b6e498782f3c8072bbb992dac98ba8ba4",
+  "mrtg.if": "9a596842da82b1c3b8308ffab9ca5d5c88a2d39b0f44968b0ab67222c6b93f8c",
+  "mrtg.service": "2e629387988d2ea51d5348a8c80eed567799446dac591b8e924dae2521587e96",
+  "mrtg.te": "6af51f3731a8e11cc7d1821cfc0511c2748cecfed9b25af3fe5b595b83751798",
   "mrtg.timer": "8880b9b344f6e8de54dfa9b367f8c9a6571c2cafe95a6fa822c77816b61df1d2",
   "mrtg.tmpfiles": "9ddee4dc98c26bef578ffb9a504103868360e683a12aa9e95b1f9c00432bdb5c"
  }

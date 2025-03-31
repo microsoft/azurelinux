@@ -1,31 +1,68 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+# RubyGems's macros expect gem_name to exist.
+%global		gem_name %{name}
+
+# defining macros needed by SELinux
+# unless running a flatpak build.
+%if 0%{?flatpak}
+%global with_selinux 0
+%else
+%global with_selinux 1
+%global selinuxtype targeted
+%global modulename openwsman
+%endif
+
+# Bindings install in the wrong path for a flatpak build; this could be fixed, but
+# we don't currently need the bindings for any Flatpak'ed application
+%if 0%{?flatpak}
+%global with_ruby 0
+%global with_perl 0
+%global with_python 0
+%else
+%global with_ruby 1
+%global with_perl 1
+%global with_python 1
+%endif
 
 Name:		openwsman
-Version:	2.6.8
-Release:	13%{?dist}
+Version:	2.7.2
+Release:	11%{?dist}
 Summary:	Open source Implementation of WS-Management
 
-License:	BSD
+License:	BSD-3-Clause AND MIT
 URL:		http://www.openwsman.org/
-Source0:	https://github.com/Openwsman/openwsman/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:	https://github.com/Openwsman/openwsman/archive/v%{version}.tar.gz
 # help2man generated manpage for openwsmand binary
 Source1:	openwsmand.8.gz
 # service file for systemd
 Source2:	openwsmand.service
 # script for testing presence of the certificates in ExecStartPre
 Source3:	owsmantestcert.sh
+# Source100-102: selinux policy for openwsman, extracted
+# from https://github.com/fedora-selinux/selinux-policy
+%if 0%{with_selinux}
+Source100: %{modulename}.te
+Source101: %{modulename}.if
+Source102: %{modulename}.fc
+%endif
 Patch1:		openwsman-2.4.0-pamsetup.patch
 Patch2:		openwsman-2.4.12-ruby-binding-build.patch
 Patch3:		openwsman-2.6.2-openssl-1.1-fix.patch
 Patch4:		openwsman-2.6.5-http-status-line.patch
-Patch5:		openwsman-2.6.5-libcurl-error-codes-update.patch
-Patch6:		openwsman-2.6.8-CVE-2019-3816.patch
-Patch7:		openwsman-2.6.8-CVE-2019-3833.patch
+Patch5:		openwsman-2.6.8-update-ssleay-conf.patch
+Patch6:		openwsman-2.7.2-fix-ftbfs.patch
+BuildRequires:	make
 BuildRequires:	swig
 BuildRequires:	libcurl-devel libxml2-devel pam-devel sblim-sfcc-devel
-BuildRequires:	python3 python3-devel perl-interpreter
-BuildRequires:	perl-devel perl-generators pkgconfig openssl-devel
+%if %{with_python}
+BuildRequires:	python3 python3-devel
+%endif
+%if %{with_ruby}
+BuildRequires:	ruby ruby-devel rubygems-devel
+%endif
+%if %{with_perl}
+BuildRequires:	perl-interpreter perl-devel perl-generators
+%endif
+BuildRequires:	pkgconfig openssl-devel
 BuildRequires:	cmake
 BuildRequires:	systemd-units
 BuildRequires:	gcc gcc-c++
@@ -40,7 +77,7 @@ requirements that exposes a set of operations focused on and covers
 all system management aspects.
 
 %package -n libwsman1
-License:	BSD
+License:	BSD-3-Clause AND MIT
 Summary:	Open source Implementation of WS-Management
 Provides:	%{name} = %{version}-%{release}
 Obsoletes:	%{name} < %{version}-%{release}
@@ -49,7 +86,7 @@ Obsoletes:	%{name} < %{version}-%{release}
 Openwsman library for packages dependent on openwsman.
 
 %package -n libwsman-devel
-License:	BSD
+License:	BSD-3-Clause AND MIT
 Summary:	Open source Implementation of WS-Management
 Provides:	%{name}-devel = %{version}-%{release}
 Obsoletes:	%{name}-devel < %{version}-%{release}
@@ -63,22 +100,28 @@ Requires:	libcurl-devel
 Development files for openwsman.
 
 %package client
-License:	BSD
+License:	BSD-3-Clause AND MIT
 Summary:	Openwsman Client libraries
 
 %description client
 Openwsman Client libraries.
 
 %package server
-License:	BSD
+License:	BSD-3-Clause AND MIT
 Summary:	Openwsman Server and service libraries
 Requires:	libwsman1 = %{version}-%{release}
+%if 0%{?with_selinux}
+# This ensures that the *-selinux package and all it’s dependencies are not pulled
+# into containers and other systems that do not use SELinux
+Requires:  (%{name}-selinux if selinux-policy-%{selinuxtype})
+%endif
 
 %description server
 Openwsman Server and service libraries.
 
+%if %{with_python}
 %package python3
-License:	BSD
+License:	BSD-3-Clause AND MIT
 Summary:	Python bindings for openwsman client API
 Requires:	%{__python3}
 Requires:	libwsman1 = %{version}-%{release}
@@ -86,28 +129,64 @@ Requires:	libwsman1 = %{version}-%{release}
 
 %description python3
 This package provides Python3 bindings to access the openwsman client API.
+%endif
 
+%if %{with_ruby}
+%package -n rubygem-%{gem_name}
+License:	BSD-3-Clause AND MIT
+Summary:	Ruby client bindings for Openwsman
+Obsoletes:	%{name}-ruby < %{version}-%{release}
+Requires:	libwsman1 = %{version}-%{release}
 
+%description -n rubygem-%{gem_name}
+The openwsman gem provides a Ruby API to manage systems using
+the WS-Management protocol.
+
+%package -n rubygem-%{gem_name}-doc
+Summary:	Documentation for %{name}
+Requires:	rubygem-%{gem_name} = %{version}-%{release}
+BuildArch:	noarch
+
+%description -n rubygem-%{gem_name}-doc
+Documentation for rubygem-%{gem_name}
+%endif
+
+%if %{with_perl}
 %package perl
-License:	BSD
-Requires:	perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+License:	BSD-3-Clause AND MIT
 Summary:	Perl bindings for openwsman client API
 Requires:	libwsman1 = %{version}-%{release}
 
 %description perl
 This package provides Perl bindings to access the openwsman client API.
+%endif
 
+%package winrs
+Summary:	Windows Remote Shell
+Requires:	rubygem-%{gem_name} = %{version}-%{release}
+
+%description winrs
+This is a command line tool for the Windows Remote Shell protocol.
+You can use it to send shell commands to a remote Windows hosts.
+
+%if 0%{?with_selinux}
+# SELinux subpackage
+%package selinux
+Summary:   openwsman SELinux policy
+BuildArch: noarch
+Requires:  selinux-policy-%{selinuxtype}
+Requires(post): selinux-policy-%{selinuxtype}
+BuildRequires: selinux-policy-devel
+%{?selinux_requires}
+
+%description selinux
+Custom SELinux policy module
+%endif
 
 %prep
 %setup -q
 
-%patch 1 -p1 -b .pamsetup
-%patch 2 -p1 -b .ruby-binding-build
-%patch 3 -p1 -b .openssl-1.1-fix
-%patch 4 -p1 -b .http-status-line
-%patch 5 -p1 -b .libcurl-error-codes-update
-%patch 6 -p1 -b .CVE-2019-3816
-%patch 7 -p1 -b .CVE-2019-3833
+%autopatch -p1
 
 %build
 # Removing executable permissions on .c and .h files to fix rpmlint warnings. 
@@ -117,11 +196,11 @@ rm -rf build
 mkdir build
 
 export RPM_OPT_FLAGS="$RPM_OPT_FLAGS -DFEDORA -DNO_SSL_CALLBACK"
-export CFLAGS="-D_GNU_SOURCE -fPIE -DPIE"
-export LDFLAGS="$LDFLAGS -Wl,-z,now -pie"
+export CFLAGS="$RPM_OPT_FLAGS -fPIC -pie -Wl,-z,relro -Wl,-z,now"
+export CXXFLAGS="$RPM_OPT_FLAGS -fPIC -pie -Wl,-z,relro -Wl,-z,now"
 cd build
 cmake \
-	-DCMAKE_INSTALL_PREFIX=/usr \
+	-DCMAKE_INSTALL_PREFIX=%{_prefix} \
 	-DCMAKE_VERBOSE_MAKEFILE=TRUE \
 	-DCMAKE_BUILD_TYPE=Release \
 	-DCMAKE_C_FLAGS_RELEASE:STRING="$RPM_OPT_FLAGS -fno-strict-aliasing" \
@@ -131,26 +210,55 @@ cmake \
 	-DLIB=%{_lib} \
 	-DBUILD_JAVA=no \
 	-DBUILD_PYTHON=no \
+%if ! %{with_python}
+	-DBUILD_PYTHON3=no \
+%endif
+%if ! %{with_perl}
+	-DBUILD_PERL=no \
+%endif
+%if ! %{with_ruby}
+	-DBUILD_RUBY=no \
+%endif
 	..
 
 make
 
+%if %{with_ruby}
 # Make the freshly build openwsman libraries available to build the gem's
 # binary extension.
 export LIBRARY_PATH=%{_builddir}/%{name}-%{version}/build/src/lib
 export CPATH=%{_builddir}/%{name}-%{version}/include/
 export LD_LIBRARY_PATH=%{_builddir}/%{name}-%{version}/build/src/lib/
 
+%gem_install -n ./bindings/ruby/%{name}-%{version}.gem
+%endif
+
+%if 0%{?with_selinux}
+# SELinux policy (originally from selinux-policy-contrib)
+# this policy module will override the production module
+mkdir selinux
+cp -p %{SOURCE100} %{SOURCE101} %{SOURCE102} selinux/
+make -f %{_datadir}/selinux/devel/Makefile %{modulename}.pp
+bzip2 -9 %{modulename}.pp
+%endif
 
 %install
 cd build
 
+%if %{with_ruby}
+# Do not install the ruby extension, we are proviging the rubygem- instead.
+echo -n > bindings/ruby/cmake_install.cmake
+%endif
 
-make DESTDIR=%{buildroot} install
+%make_install
 cd ..
 rm -f %{buildroot}/%{_libdir}/*.la
 rm -f %{buildroot}/%{_libdir}/openwsman/plugins/*.la
 rm -f %{buildroot}/%{_libdir}/openwsman/authenticators/*.la
+%if %{with_ruby}
+[ -d %{buildroot}/%{ruby_vendorlibdir} ] && rm -f %{buildroot}/%{ruby_vendorlibdir}/openwsmanplugin.rb
+[ -d %{buildroot}/%{ruby_vendorlibdir} ] && rm -f %{buildroot}/%{ruby_vendorlibdir}/openwsman.rb
+%endif
 mkdir -p %{buildroot}%{_sysconfdir}/init.d
 install -m 644 etc/openwsman.conf %{buildroot}/%{_sysconfdir}/openwsman
 install -m 644 etc/openwsman_client.conf %{buildroot}/%{_sysconfdir}/openwsman
@@ -165,6 +273,22 @@ cp %SOURCE1 %{buildroot}/%{_mandir}/man8/
 install -m 644 include/wsman-xml.h %{buildroot}/%{_includedir}/openwsman
 install -m 644 include/wsman-xml-binding.h %{buildroot}/%{_includedir}/openwsman
 install -m 644 include/wsman-dispatcher.h %{buildroot}/%{_includedir}/openwsman
+
+%if %{with_ruby}
+mkdir -p %{buildroot}%{gem_dir}
+cp -pa ./build%{gem_dir}/* \
+	%{buildroot}%{gem_dir}/
+
+rm -rf %{buildroot}%{gem_instdir}/ext
+
+mkdir -p %{buildroot}%{gem_extdir_mri}
+cp -a ./build%{gem_extdir_mri}/{gem.build_complete,*.so} %{buildroot}%{gem_extdir_mri}/
+%endif
+
+%if 0%{?with_selinux}
+install -D -m 0644 build/%{modulename}.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}/%{modulename}.pp.bz2
+install -D -p -m 0644 build/selinux/%{modulename}.if %{buildroot}%{_datadir}/selinux/devel/include/distributed/%{name}.if
+%endif
 
 %ldconfig_scriptlets -n libwsman1
 
@@ -182,6 +306,28 @@ rm -f /var/log/wsmand.log
 
 %ldconfig_scriptlets client
 
+%if 0%{?with_selinux}
+# SELinux contexts are saved so that only affected files can be
+# relabeled after the policy module installation
+%pre selinux
+%selinux_relabel_pre -s %{selinuxtype}
+
+%post selinux
+%selinux_modules_install -s %{selinuxtype} %{_datadir}/selinux/packages/%{selinuxtype}/%{modulename}.pp.bz2
+%selinux_relabel_post -s %{selinuxtype}
+
+if [ "$1" -le "1" ]; then # First install
+   # the service needs to be restarted for the custom label to be applied
+   %systemd_postun_with_restart openwsmand.service
+fi
+
+%postun selinux
+if [ $1 -eq 0 ]; then
+    %selinux_modules_uninstall -s %{selinuxtype} %{modulename}
+    %selinux_relabel_post -s %{selinuxtype}
+fi
+%endif
+
 %files -n libwsman1
 %doc AUTHORS COPYING ChangeLog README.md TODO
 %{_libdir}/libwsman.so.*
@@ -194,17 +340,35 @@ rm -f /var/log/wsmand.log
 %{_libdir}/pkgconfig/*
 %{_libdir}/*.so
 
+%if %{with_python}
 %files python3
 %doc AUTHORS COPYING ChangeLog README.md
 %{python3_sitearch}/*.so
 %{python3_sitearch}/*.py
 %{python3_sitearch}/__pycache__/*
+%endif
 
+%if %{with_ruby}
+%files -n rubygem-%{gem_name}
+%doc AUTHORS COPYING ChangeLog README.md
+%dir %{gem_instdir}
+%{gem_libdir}
+%{gem_extdir_mri}
+%exclude %{gem_cache}
+%{gem_spec}
+%endif
 
+%if %{with_ruby}
+%files -n rubygem-%{gem_name}-doc
+%doc %{gem_docdir}
+%endif
+
+%if %{with_perl}
 %files perl
 %doc AUTHORS COPYING ChangeLog README.md
 %{perl_vendorarch}/openwsman.so
 %{perl_vendorlib}/openwsman.pm
+%endif
 
 %files server
 %doc AUTHORS COPYING ChangeLog README.md
@@ -232,13 +396,143 @@ rm -f /var/log/wsmand.log
 %doc AUTHORS COPYING ChangeLog README.md
 %{_libdir}/libwsman_clientpp.so.*
 %config(noreplace) %{_sysconfdir}/openwsman/openwsman_client.conf
+
+%files winrs
 %{_bindir}/winrs
 
+%if 0%{?with_selinux}
+%files selinux
+%{_datadir}/selinux/packages/%{selinuxtype}/%{modulename}.pp.*
+%{_datadir}/selinux/devel/include/distributed/%{modulename}.if
+%ghost %verify(not md5 size mode mtime) %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/%{modulename}
+%endif
 
 %changelog
-* Thu Jun 10 2021 Muhammad Falak Wani <mwani@microsoft.com> - 2.6.8-13
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove support for building ruby-gem
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.2-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jun 25 2024 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.2-10
+- Rebuild
+  Resolves: #2290726
+
+* Tue Jun 18 2024 Python Maint <python-maint@redhat.com> - 2.7.2-9
+- Rebuilt for Python 3.13
+
+* Wed Jun 12 2024 Jitka Plesnikova <jplesnik@redhat.com> - 2.7.2-8
+- Perl 5.40 rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 2.7.2-7
+- Rebuilt for Python 3.13
+
+* Fri May 10 2024 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.2-6
+- Update license tags in subpackages to SPDX format
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.2-4
+- Fix FTBFS
+  Resolves: #2259165
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jan 03 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.7.2-2
+- Rebuild for https://fedoraproject.org/wiki/Changes/Ruby_3.3
+
+* Thu Aug 31 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.2-1
+- Update to openwsman-2.7.2
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 2.7.1-13
+- Perl 5.38 rebuild
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 2.7.1-12
+- Rebuilt for Python 3.12
+
+* Tue Feb 14 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.1-11
+- SPDX migration
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Jan 04 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.7.1-9
+- Rebuild for https://fedoraproject.org/wiki/Changes/Ruby_3.2
+
+* Fri Oct 21 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.1-8
+- Fix Ruby bindings for swig 4.1 (backported from upstream)
+  Resolves: #2136510
+- Remove mixed use of spaces and tabs from spec file
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jul 20 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.1-6
+- Improve handling of HTTP 401 Unauthorized
+
+* Wed Jun 15 2022 Python Maint <python-maint@redhat.com> - 2.7.1-5
+- Rebuilt for Python 3.11
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.7.1-4
+- Perl 5.36 rebuild
+
+* Thu Jan 27 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.7.1-3
+- F-36: rebuild against ruby31
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Nov 11 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.1-1
+- Update to openwsman-2.7.1
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 2.7.0-6
+- Rebuilt with OpenSSL 3.0.0
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jun 08 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.0-4
+- Incorporate -selinux subpackage
+  See https://fedoraproject.org/wiki/SELinux/IndependentPolicy
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.7.0-3
+- Rebuilt for Python 3.10
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.7.0-2
+- Perl 5.34 rebuild
+
+* Tue Mar 09 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.0-1
+- Update to openwsman-2.7.0 (thanks for a patch to Bastian Germann)
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.6.8-20
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.8-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jan 06 2021 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.6.8-18
+- F-34: rebuild against ruby 3.0
+
+* Tue Sep 22 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.6.8-17
+- Use make macros, patch by Tom Stellard <tstellar@redhat.com>
+  (https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro)
+- Update flags, enable LTO
+- Remove RANDFILE and increase default bits in ssleay.conf
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.8-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 08 2020 Jeff Law <law@redhat.com> - 2.6.8-15
+- Disable LTO
+
+* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.6.8-14
+- Perl 5.32 rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 2.6.8-13
+- Rebuilt for Python 3.9
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.8-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

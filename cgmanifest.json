@@ -4390,8 +4390,8 @@
         "type": "other",
         "other": {
           "name": "glib",
-          "version": "2.78.1",
-          "downloadUrl": "https://ftp.gnome.org/pub/gnome/sources/glib/2.78/glib-2.78.1.tar.xz"
+          "version": "2.78.6",
+          "downloadUrl": "https://ftp.gnome.org/pub/gnome/sources/glib/2.78/glib-2.78.6.tar.xz"
         }
       }
     },
@@ -8231,6 +8231,16 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
+          "version": "6.6.82.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.82.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kernel-ipe",
           "version": "6.6.82.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.82.1.tar.gz"
         }
@@ -14152,8 +14162,8 @@
         "type": "other",
         "other": {
           "name": "netsniff-ng",
-          "version": "0.6.8",
-          "downloadUrl": "http://www.netsniff-ng.org/pub/netsniff-ng/netsniff-ng-0.6.8.tar.xz"
+          "version": "0.6.9",
+          "downloadUrl": "https://github.com/netsniff-ng/netsniff-ng/archive/refs/tags/v0.6.9.tar.gz"
         }
       }
     },
@@ -22053,8 +22063,8 @@
         "type": "other",
         "other": {
           "name": "python-beautifulsoup4",
-          "version": "4.11.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-4.11.2.tar.gz"
+          "version": "4.12.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-4.12.3.tar.gz"
         }
       }
     },
@@ -22353,8 +22363,8 @@
         "type": "other",
         "other": {
           "name": "python-curio",
-          "version": "1.4",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/curio/curio-1.4.tar.gz"
+          "version": "1.6^1.1484546",
+          "downloadUrl": "https://github.com/dabeaz/curio/archive/148454621f9bd8dd843f591e87715415431f6979/curio-1484546.tar.gz"
         }
       }
     },
@@ -30849,7 +30859,7 @@
         "other": {
           "name": "xpp3",
           "version": "1.1.4c",
-          "downloadUrl": "http://www.extreme.indiana.edu/dist/java-repository/xpp3/distributions/xpp3-1.1.4c_src.tgz"
+          "downloadUrl": "https://www.extreme.indiana.edu/dist/java-repository/xpp3/distributions/xpp3-1.1.4c_src.tgz"
         }
       }
     },

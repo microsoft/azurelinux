@@ -1,0 +1,32 @@
+From 8f62f7c6888659f3b66d5861d46fb9b3a34ff169 Mon Sep 17 00:00:00 2001
+From: Marius Vollmer <mvollmer@redhat.com>
+Date: Thu, 22 Feb 2024 16:49:24 +0200
+Subject: [PATCH] udiskslinuxblock: Survive a missing /etc/fstab
+
+This is similar to b79f6840ca82551e672156153b7e13328f0ba19d, which
+solved the same problem for /etc/crypttab.
+---
+ src/udiskslinuxblock.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/src/udiskslinuxblock.c b/src/udiskslinuxblock.c
+index 829dd5f78..a3fa183be 100644
+--- a/src/udiskslinuxblock.c
++++ b/src/udiskslinuxblock.c
+@@ -1541,7 +1541,15 @@ add_remove_fstab_entry (UDisksBlock *block,
+                             &contents,
+                             NULL,
+                             error))
+-    goto out;
++    {
++      if (g_error_matches (*error, G_FILE_ERROR, G_FILE_ERROR_NOENT))
++        {
++          contents = g_strdup ("");
++          g_clear_error (error);
++        }
++      else
++        goto out;
++    }
+ 
+   lines = g_strsplit (contents, "\n", 0);
+ 

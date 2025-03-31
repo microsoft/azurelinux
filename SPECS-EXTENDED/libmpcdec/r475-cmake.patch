@@ -1,0 +1,31 @@
+diff -ur musepack_src_r475.orig/CMakeLists.txt musepack_src_r475/CMakeLists.txt
+--- musepack_src_r475.orig/CMakeLists.txt	2010-07-13 07:15:24.000000000 -0400
++++ musepack_src_r475/CMakeLists.txt	2023-02-07 11:02:43.230330382 -0500
+@@ -15,9 +15,6 @@
+ 
+ add_definitions(-DFAST_MATH -DCVD_FASTLOG)
+ 
+-if(NOT MSVC)
+-  set(CMAKE_C_FLAGS "-O3 -Wall -fomit-frame-pointer -pipe")
+-endif(NOT MSVC)
+ 
+ add_subdirectory(libmpcdec)
+ add_subdirectory(libmpcpsy)
+diff -ur musepack_src_r475.orig/include/CMakeLists.txt musepack_src_r475/include/CMakeLists.txt
+--- musepack_src_r475.orig/include/CMakeLists.txt	2009-08-03 05:44:13.000000000 -0400
++++ musepack_src_r475/include/CMakeLists.txt	2023-02-07 11:02:59.430391038 -0500
+@@ -1 +1 @@
+-INSTALL(DIRECTORY mpc DESTINATION include)
++INSTALL(DIRECTORY mpc DESTINATION include PATTERN ".svn" EXCLUDE)
+diff -ur musepack_src_r475.orig/libmpcdec/CMakeLists.txt musepack_src_r475/libmpcdec/CMakeLists.txt
+--- musepack_src_r475.orig/libmpcdec/CMakeLists.txt	2010-08-21 11:55:01.000000000 -0400
++++ musepack_src_r475/libmpcdec/CMakeLists.txt	2023-02-07 11:03:43.119554606 -0500
+@@ -1,6 +1,8 @@
+ include_directories(${libmpc_SOURCE_DIR}/include)
+ if(SHARED)
+   add_library(mpcdec SHARED huffman mpc_decoder mpc_reader streaminfo mpc_bits_reader mpc_demux requant synth_filter ${libmpc_SOURCE_DIR}/common/crc32)
++  set_target_properties(mpcdec PROPERTIES SOVERSION 6 VERSION 6.0.0)
++  install(TARGETS mpcdec DESTINATION "lib${LIB_SUFFIX}")
+ else(SHARED)
+   add_library(mpcdec_static STATIC huffman mpc_decoder mpc_reader streaminfo mpc_bits_reader mpc_demux requant synth_filter ${libmpc_SOURCE_DIR}/common/crc32)
+ endif(SHARED)

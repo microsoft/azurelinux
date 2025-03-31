@@ -20,7 +20,7 @@
  
  #if defined(VISUAL_OS_WIN32)
  #include <windows.h>
-@@ -154,6 +165,46 @@ static void check_os_altivec_support( vo
+@@ -154,6 +165,46 @@ static void check_os_altivec_support( void )
  	if (err == 0)
  		if (has_vu != 0)
  			__lv_cpu_caps.hasAltiVec = 1;
