@@ -1,13 +1,22 @@
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+
 Name:           python-testresources
 Version:        2.0.1
-Release:        16%{?dist}
+Release:        17%{?dist}
 Summary:        Testresources, a pyunit extension for managing expensive test resources
 
 License:        ASL 2.0 and BSD and GPLv2+
 # file testresources/tests/TestUtil.py is GPLv2+
 URL:            https://github.com/testing-cabal/testresources
-Source:         %{pypi_source testresources}
+Source:         https://github.com/testing-cabal/testresources/archive/refs/tags/2.0.1.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
+%define _python_dist_allow_version_zero 1
+
+BuildRequires: python3-setuptools_scm
+BuildRequires: python3-pip
+BuildRequires: python3-wheel
+BuildRequires: python3-pytest
 
 %global _description %{expand:
 testresources: extensions to python unittest to allow declarative use
@@ -21,36 +30,33 @@ BuildRequires:  python3-devel
 
 %description -n python3-testresources %{_description}
 
-
 %prep
 %setup -q -n testresources-%{version}
 # replace removed unittest aliases
 sed -i 's/failIf/assertFalse/' testresources/tests/test_resourced_test_case.py
 
-
 %generate_buildrequires
 %pyproject_buildrequires -x test
 
-
 %build
 %pyproject_wheel
-
 
 %install
 %pyproject_install
 %pyproject_save_files testresources
 
-
 %check
 %{python3} -m testtools.run testresources.tests.test_suite
-
 
 %files -n python3-testresources -f %{pyproject_files}
 %license Apache-2.0 BSD
 %doc README.rst NEWS doc
 
-
 %changelog
+* Mon Mar 24 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.0.1-17
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
 * Wed Aug 14 2024 Carl George <carlwgeorge@fedoraproject.org> - 2.0.1-16
 - Run tests with testtools instead of setup.py
 
