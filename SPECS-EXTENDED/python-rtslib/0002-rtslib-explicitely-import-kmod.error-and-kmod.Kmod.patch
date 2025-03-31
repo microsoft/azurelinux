@@ -1,0 +1,35 @@
+From c1378f28f7abce6f8993a43c34d5e287b092bb1e Mon Sep 17 00:00:00 2001
+From: Maurizio Lombardi <mlombard@redhat.com>
+Date: Wed, 2 Aug 2023 12:00:41 +0200
+Subject: [PATCH] rtslib: explicitely import "kmod.error" and "kmod.Kmod"
+
+While updating python-kmod to be able to be compiled with Cython 3.0,
+I encountered a failure due to rtslib not finding the "error" and "Kmod"
+modules.
+
+$ targetcli
+module 'kmod' has no attribute 'error'
+
+If I explicitely import those two modules the failure goes away.
+
+Signed-off-by: Maurizio Lombardi <mlombard@redhat.com>
+---
+ rtslib/utils.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/rtslib/utils.py b/rtslib/utils.py
+index 61e486a80836..630ebb721465 100644
+--- a/rtslib/utils.py
++++ b/rtslib/utils.py
+@@ -423,6 +423,8 @@ def modprobe(module):
+ 
+     try:
+         import kmod
++        import kmod.error
++        import kmod.Kmod
+     except ImportError:
+         process = subprocess.Popen(("modprobe", module),
+                                    stdout=subprocess.PIPE,
+-- 
+2.39.3
+
