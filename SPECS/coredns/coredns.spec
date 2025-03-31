@@ -3,7 +3,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.1
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,6 +42,7 @@ Patch7:         CVE-2025-22868.patch
 # https://github.com/coredns/coredns/commit/d8ecde1080e7cbbeb98257ba4e03a271f16b4cd9
 Patch8:         coredns-example-net-test.patch
 Patch9:         CVE-2024-53259.patch
+Patch10:        CVE-2025-30204.patch
 
 BuildRequires:  msft-golang
 
@@ -80,6 +81,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %{_bindir}/%{name}
 
 %changelog
+* Mon Mar 31 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.11.1-16
+- Fix CVE-2025-30204 with an upstream patch
+
 * Wed Mar 19 2025 Mayank Singh <mayansingh@microsoft.com> - 1.11.1-15
 - Fix CVE-2024-53259 with an upstream patch
 
@@ -110,7 +114,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 * Wed Apr 17 2024 Bala <balakumaran.kannan@microsoft.com> - 1.11.1-6
 - Patched vendored quic-go package to address CVE-2024-22189
 
-* Fri Feb 10 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.11.1-5
+* Sat Feb 10 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.11.1-5
 - patched vendored quic-go package to address CVE-2023-49295
 
 * Thu Feb 08 2024 Muhammad Falak <mwani@microsoft.com> - 1.11.1-4
@@ -123,7 +127,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 * Mon Jan 29 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.11.1-2
 - Address CVE-2023-44487 by patching vendored golang.org/x/net
 
-* Tue Oct 18 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.11.1-1
+* Wed Oct 18 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.11.1-1
 - Upgrade to 1.11.1 to match version required by kubernetes
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.3-10
