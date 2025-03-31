@@ -11,11 +11,11 @@ Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
 # Source0: https://github.com/microsoft/kata-containers/tree/jiria/solar
-Source0: %{name}-%{version}.tar.gz
+Source0: %{_distro_sources_url}/%{name}-%{version}.tar.gz
 # Note: the %%{name}-%%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache run:
 #   [repo_root]/toolkit/scripts/build_cargo_cache.sh %%{name}-%%{version}.tar.gz %%{name}-%%{name}-%%{version}
-Source1: %{name}-%{version}-cargo.tar.gz
+Source1:  %{_distro_sources_url}/%{name}-%{version}-cargo.tar.gz
 
 %{?systemd_requires}
 
@@ -72,6 +72,8 @@ fi
 %changelog
 * Fri Mar 28 2025 Dallas Delaney <dadelan@microsoft.com> - 0.0.13-2
 - Add package to specs-extended
+- License verified
+- Original version for Azure Linux
 
 * Tue Dec 31 2024 Jiri Appl <jiria@microsoft.com> - 0.0.13-1
 - Initial version
