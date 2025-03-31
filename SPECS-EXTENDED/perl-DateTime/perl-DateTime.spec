@@ -6,14 +6,13 @@
 %endif
 
 Name:           perl-DateTime
-Version:        1.52
-Release:        3%{?dist}
+Epoch:          2
+Version:        1.65
+Release:        6%{?dist}
 Summary:        Date and time object for Perl
-License:        Artistic 2.0
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:        Artistic-2.0
 URL:            https://metacpan.org/release/DateTime
-Source0:        https://cpan.metacpan.org/modules/by-module/DateTime/DateTime-%{version}.tar.gz#/perl-DateTime-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/DateTime/DateTime-%{version}.tar.gz
 # Build:
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -24,10 +23,9 @@ BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 # Run-time:
-BuildRequires:  perl(base)
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(DateTime::Locale) >= 1.06
-BuildRequires:  perl(DateTime::TimeZone) >= 2.02
+BuildRequires:  perl(DateTime::TimeZone) >= 2.44
 BuildRequires:  perl(Dist::CheckConflicts) >= 0.02
 BuildRequires:  perl(integer)
 BuildRequires:  perl(namespace::autoclean) >= 0.19
@@ -42,6 +40,7 @@ BuildRequires:  perl(Specio::Exporter)
 BuildRequires:  perl(Specio::Library::Builtins)
 BuildRequires:  perl(Specio::Library::Numeric)
 BuildRequires:  perl(Specio::Library::String)
+BuildRequires:  perl(Specio::Subs)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(Try::Tiny)
 BuildRequires:  perl(warnings)
@@ -55,6 +54,7 @@ BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(Test::Fatal)
 BuildRequires:  perl(Test::More) >= 0.96
 BuildRequires:  perl(Test::Warnings) >= 0.005
+BuildRequires:  perl(Test::Without::Module)
 BuildRequires:  perl(utf8)
 %if %{with perl_DateTime_enables_optional_test} && !%{defined perl_bootstrap}
 # Optional Tests:
@@ -64,7 +64,6 @@ BuildRequires:  perl(Storable)
 BuildRequires:  perl(Test::Warn)
 %endif
 # Dependencies:
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(XSLoader)
 
 # Avoid provides from DateTime.so
@@ -107,21 +106,125 @@ make test
 %{perl_vendorarch}/DateTime/
 %{perl_vendorarch}/DateTime.pm
 %{_mandir}/man3/DateTime.3*
+%{_mandir}/man3/DateTime::Conflicts.3*
 %{_mandir}/man3/DateTime::Duration.3*
 %{_mandir}/man3/DateTime::Infinite.3*
 %{_mandir}/man3/DateTime::LeapSecond.3*
 %{_mandir}/man3/DateTime::Types.3*
 
 %changelog
-* Thu Jan 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.52-3
-- Removing epochs.
-- License verified.
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.65-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2:1.52-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Jun 12 2024 Jitka Plesnikova <jplesnik@redhat.com> - 2:1.65-5
+- Perl 5.40 re-rebuild of bootstrapped packages
+
+* Tue Jun 11 2024 Jitka Plesnikova <jplesnik@redhat.com> - 2:1.65-4
+- Perl 5.40 rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.65-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.65-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Nov  6 2023 Paul Howarth <paul@city-fan.org> - 2:1.65-1
+- Update to 1.65 (rhbz#2248104)
+  - Fix builds on macOS with Perls before 5.22.0; this seems to have the same
+    issue as Windows on older Perls (GH#141)
+
+* Mon Oct 23 2023 Paul Howarth <paul@city-fan.org> - 2:1.63-1
+- Update to 1.63 (rhbz#2245551)
+  - Switched to using the 'Perl_isfinite' function instead of trying to
+    implement this ourselves in XS code; this should fix quadmath builds on
+    Windows (GH#139)
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.59-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jul 12 2023 Jitka Plesnikova <jplesnik@redhat.com> - 2:1.59-4
+- Perl 5.38 re-rebuild of bootstrapped packages
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 2:1.59-3
+- Perl 5.38 rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.59-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Oct 24 2022 Paul Howarth <paul@city-fan.org> - 2:1.59-1
+- Update to 1.59
+  - Fixed tests to pass with DateTime::Locale 1.37+ (GH#34)
+- Use SPDX-format license tag
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.58-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jun 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2:1.58-3
+- Perl 5.36 re-rebuild of bootstrapped packages
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2:1.58-2
+- Perl 5.36 rebuild
+
+* Tue Apr 19 2022 Paul Howarth <paul@city-fan.org> - 2:1.58-1
+- Update to 1.58
+  - Fixed tests so that they ignore the value set in the
+    'PERL_DATETIME_DEFAULT_TZ' env var, if one exists (GH#128)
+
+* Thu Mar  3 2022 Paul Howarth <paul@city-fan.org> - 2:1.57-1
+- Update to 1.57
+  - The last release would die if Sub::Util was not available, but this
+    should just be an optional requirement (GH#131); this is the second
+    time I've introduced this bug, so now there's a test to make sure
+    that DateTime can be loaded if Sub::Util is not installed, which will
+    hopefully prevent a third occurrence of this bug
+
+* Thu Mar  3 2022 Paul Howarth <paul@city-fan.org> - 2:1.56-1
+- Update to 1.56
+  - The DateTime->from_epoch constructor now accepts a single, non-hashref
+    argument, and validates it as an epoch value (GH#119)
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.55-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Dec 24 2021 Paul Howarth <paul@city-fan.org> - 2:1.55-1
+- Update to 1.55
+  - Another documentation fix release; this fixes some mistakes, fixes some
+    broken links, and removes all references to the long-dead datetime.perl.org
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.54-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon May 24 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2:1.54-5
+- Perl 5.34 re-rebuild of bootstrapped packages
+
+* Mon May 24 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2:1.54-4
+- Perl 5.34 re-rebuild of bootstrapped packages
+
+* Sun May 23 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2:1.54-3
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.54-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Dec  5 2020 Paul Howarth <paul@city-fan.org> - 2:1.54-1
+- Update to 1.54
+  - Documentation updates
+
+* Mon Nov  9 2020 Paul Howarth <paul@city-fan.org> - 2:1.53-1
+- Update to 1.53
+  - Added a $dt->rfc3339 method, based on discussion in GH#109
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.52-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2:1.52-3
+- Perl 5.32 re-rebuild of bootstrapped packages
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2:1.52-2
+- Perl 5.32 rebuild
 
 * Mon Mar  2 2020 Paul Howarth <paul@city-fan.org> - 2:1.52-1
-- Update to 1.51
+- Update to 1.52
   - Added a $dt->is_between($dt1, $dt2) method (based on GH#97)
   - Simplify the calculation of leap seconds in XS (GH#91); this is a little
     more efficient for most use cases (anything with future or recent past

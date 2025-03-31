@@ -1,0 +1,56 @@
+--- z3-z3-4.12.2/scripts/mk_util.py.orig	2023-05-12 13:59:04.000000000 -0600
++++ z3-z3-4.12.2/scripts/mk_util.py	2023-07-06 11:53:06.045350565 -0600
+@@ -34,7 +34,7 @@ EXAMP_DEBUG_FLAG=''
+ LDFLAGS=getenv("LDFLAGS", "")
+ JNI_HOME=getenv("JNI_HOME", None)
+ OCAMLC=getenv("OCAMLC", "ocamlc")
+-OCAMLOPT=getenv("OCAMLOPT", "ocamlopt")
++OCAMLOPT=getenv("OCAMLOPT", None)
+ OCAML_LIB=getenv("OCAML_LIB", None)
+ OCAMLFIND=getenv("OCAMLFIND", "ocamlfind")
+ DOTNET="dotnet"
+@@ -460,13 +460,9 @@ def check_ml():
+         raise MKException('Failed testing ocamlc compiler. Set environment variable OCAMLC with the path to the Ocaml compiler')
+     if is_verbose():
+         print ('Testing %s...' % OCAMLOPT)
+-    r = exec_cmd([OCAMLOPT, '-o', 'a.out', 'hello.ml'])
+-    if r != 0:
+-        raise MKException('Failed testing ocamlopt compiler. Set environment variable OCAMLOPT with the path to the Ocaml native compiler. Note that ocamlopt may require flexlink to be in your path.')
+     try:
+         rmf('hello.cmi')
+         rmf('hello.cmo')
+-        rmf('hello.cmx')
+         rmf('a.out')
+         rmf('hello.o')
+     except:
+@@ -2069,7 +2065,7 @@ class MLComponent(Component):
+             out.write('\t%s -linkall -shared -o %s.cmxs -I . -I %s %s.cmxa\n' % (OCAMLOPTF, z3mls, self.sub_dir, z3mls))
+ 
+             out.write('\n')
+-            out.write('ml: %s.cma %s.cmxa %s.cmxs\n' % (z3mls, z3mls, z3mls))
++            out.write('ml: %s.cma\n' % z3mls)
+             if IS_OSX:
+                 out.write('\tinstall_name_tool -id %s/libz3.dylib libz3.dylib\n' % (stubs_install_path))
+                 out.write('\tinstall_name_tool -change libz3.dylib %s/libz3.dylib api/ml/dllz3ml.so\n' % (stubs_install_path))
+@@ -2091,8 +2087,6 @@ class MLComponent(Component):
+             out.write(get_component(Z3_DLL_COMPONENT).dll_name + '$(SO_EXT) ')
+             out.write(os.path.join(self.sub_dir, 'META '))
+             out.write(os.path.join(self.sub_dir, 'z3ml.cma '))
+-            out.write(os.path.join(self.sub_dir, 'z3ml.cmxa '))
+-            out.write(os.path.join(self.sub_dir, 'z3ml.cmxs '))
+ 
+     def mk_install(self, out):
+         if is_ml_enabled() and self._install_bindings():
+@@ -2119,12 +2113,9 @@ class MLComponent(Component):
+                 else:
+                     out.write(' ' + os.path.join(self.sub_dir, m) + '.mli')
+                 out.write(' ' + os.path.join(self.sub_dir, m) + '.cmi')
+-                out.write(' ' + os.path.join(self.sub_dir, m) + '.cmx')
+             out.write(' %s' % ((os.path.join(self.sub_dir, 'libz3ml$(LIB_EXT)'))))
+             out.write(' %s' % ((os.path.join(self.sub_dir, 'z3ml$(LIB_EXT)'))))
+             out.write(' %s' % ((os.path.join(self.sub_dir, 'z3ml.cma'))))
+-            out.write(' %s' % ((os.path.join(self.sub_dir, 'z3ml.cmxa'))))
+-            out.write(' %s' % ((os.path.join(self.sub_dir, 'z3ml.cmxs'))))
+             out.write(' %s' % ((os.path.join(self.sub_dir, 'dllz3ml'))))
+             if is_windows() or is_cygwin_mingw() or is_msys2():
+                 out.write('.dll')

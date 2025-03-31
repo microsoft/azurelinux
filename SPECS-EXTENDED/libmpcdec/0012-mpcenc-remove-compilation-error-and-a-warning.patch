@@ -1,0 +1,35 @@
+From d12f274173940bc67118625d1b4829e31a8e7e79 Mon Sep 17 00:00:00 2001
+From: r2d <r2d@c51c8d5e-032a-db11-a0f2-0002b3467eef>
+Date: Tue, 12 Jan 2016 21:08:49 +0000
+Subject: [PATCH 12/19] mpcenc : remove compilation error and a warning
+
+git-svn-id: http://svn.musepack.net/libmpc/trunk@488 c51c8d5e-032a-db11-a0f2-0002b3467eef
+---
+ mpcenc/mpcenc.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/mpcenc/mpcenc.c b/mpcenc/mpcenc.c
+index 84f6376..776a890 100644
+--- a/mpcenc/mpcenc.c
++++ b/mpcenc/mpcenc.c
+@@ -1023,7 +1023,7 @@ EvalParameters (PsyModel * m, int argc, char** argv, char** InputFile, char** Ou
+         }
+         else if ( 0 == strcmp ( arg, "stderr") ) {                                      // Offset for threshold in quiet
+             if ( ++k >= argc ) { stderr_printf ( errmsg, arg ); return -1; }
+-            stderr = freopen ( argv[k], "a", stderr );
++            if ( 0 == freopen ( argv[k], "a", stderr ) ) { stderr_printf ("invalid stderr filename"); return -1; }
+         }
+         else if ( 0 == strcmp ( arg, "ltq")  ||  0 == strcmp ( arg, "ath") ) {          // threshold in quiet
+             if ( ++k >= argc ) { stderr_printf ( errmsg, arg ); return -1; }
+@@ -1458,6 +1458,8 @@ static void Init_FPU ( void )
+     _asm { fstcw cw };
+     cw  &=  ~0x300;
+ 	_asm { fldcw cw };
++#else
++    (void)cw; // remove unused variable warning
+ #endif
+ }
+ 
+-- 
+2.46.0
+

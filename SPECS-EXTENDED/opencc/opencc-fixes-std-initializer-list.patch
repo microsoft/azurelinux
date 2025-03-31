@@ -1,0 +1,13 @@
+Index: OpenCC-ver.1.1.7/src/Segments.hpp
+===================================================================
+--- OpenCC-ver.1.1.7.orig/src/Segments.hpp
++++ OpenCC-ver.1.1.7/src/Segments.hpp
+@@ -32,7 +32,7 @@ public:
+   Segments() {}
+ 
+   Segments(std::initializer_list<const char*> initList) {
+-    for (const std::string& item : initList) {
++    for (const std::string item : initList) {
+       AddSegment(item);
+     }
+   }

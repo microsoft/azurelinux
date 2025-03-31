@@ -2,22 +2,25 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           rasqal
 Version:        0.9.33
-Release:        13%{?dist}
+Release:        14%{?dist}
 Summary:        RDF Query Library
 
 License:        LGPLv2+ or ASL 2.0
 URL:            http://librdf.org/rasqal/
 Source:         http://download.librdf.org/source/%{name}-%{version}.tar.gz
 
+BuildRequires:  make
 BuildRequires:  gcc-c++
 BuildRequires:  libxml2-devel
 BuildRequires:  mpfr-devel
-BuildRequires:  pcre-devel
 BuildRequires:  raptor2-devel
 # for the testsuite
 BuildRequires:  perl(Pod::Usage)
 BuildRequires:  perl(XML::DOM)
-#BuildRequires:  %{_bindir}/rapper
+
+# Upstream PR: https://github.com/dajobe/rasqal/pull/11
+Patch1: define-printf.patch
+Patch2: rasqal-configure-c99-2.patch
 
 %description
 Rasqal is a library providing full support for querying Resource
@@ -31,23 +34,24 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description    devel
 Libraries, includes etc to develop with the Rasqal RDF query language library.
 
-
 %prep
 %setup -q
+%patch -P1 -p1 -b .printf
+%patch -P2 -p1
 
 # hack to nuke rpaths
 %if "%{_libdir}" != "/usr/lib"
 sed -i -e 's|"/lib /usr/lib|"/%{_lib} %{_libdir}|' configure
 %endif
 
-
 %build
 %configure \
+  --with-digest-library=gcrypt\
+  --disable-pcre \
   --disable-static\
   --enable-release
 
 %make_build
-
 
 %install
 %make_install
@@ -93,6 +97,10 @@ fi
 
 
 %changelog
+* Fri Mar 07 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.9.33-14
+- fix build for 0.9.33
+- License Verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.33-13
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

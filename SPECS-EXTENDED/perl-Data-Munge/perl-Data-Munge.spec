@@ -1,58 +1,102 @@
+%global cpan_version 0.111
 Name:           perl-Data-Munge
-Version:        0.097
-Release:        11%{?dist}
+Version:        0.111
+Release:        2%{?dist}
 Summary:        Utility functions for working with perl data structures and code references
-License:        GPL+ or Artistic
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Data-Munge
-Source0:        https://cpan.metacpan.org/modules/by-module/Data/Data-Munge-%{version}.tar.gz#/perl-Data-Munge-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/Data/Data-Munge-%{cpan_version}.tar.gz
 BuildArch:      noarch
-BuildRequires:  findutils
+# build requirements
+BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(File::Find)
 BuildRequires:  perl(File::Spec)
+# Run-time:
+# Scalar::Util not used since perl 5.016
+BuildRequires:  perl(Exporter)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-# Run-time:
-BuildRequires:  perl(base)
-BuildRequires:  perl(Exporter)
-# Scalar::Util not used since perl 5.016
 # Tests:
-BuildRequires:  perl(Test::More)
-BuildRequires:  perl(Test::Warnings)
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+BuildRequires:  perl(Test2::V0)
+BuildRequires:  perl(Test::Pod)
 
 %description
 This module defines a few generally useful utility functions that process
 perl data structures and code references.
 
 %prep
-%setup -q -n Data-Munge-%{version}
+%setup -q -n Data-Munge-%{cpan_version}
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+/usr/bin/perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -name .packlist -delete
+%{make_install}
 %{_fixperms} $RPM_BUILD_ROOT/*
 
 %check
-make test
+%{make_build} test
 
 %files
 %doc Changes README
-%{perl_vendorlib}/*
-%{_mandir}/man3/*
+%{perl_vendorlib}/Data*
+%{_mandir}/man3/Data*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.097-11
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.111-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jul 11 2024 Emmanuel Seyman <emmanuel@seyman.fr> - 0.111-1
+- Update to 0.111
+
+* Sun Apr 07 2024 Emmanuel Seyman <emmanuel@seyman.fr> - 0.101-1
+- Update to 0.101
+- Migrate to SPDX license
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.100-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.100-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.100-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sun Apr 02 2023 Emmanuel Seyman <emmanuel@seyman.fr> - 0.100-1
+- Update to 0.10
+- Use %%{make_build} and %%{make_install} where appropriate
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.097-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.097-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.097-17
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.097-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.097-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.097-14
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.097-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.097-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.097-11
+- Perl 5.32 rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.097-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

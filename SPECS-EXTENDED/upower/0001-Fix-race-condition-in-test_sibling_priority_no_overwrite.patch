@@ -1,0 +1,26 @@
+From 9ee76826bd41a5d3a377dfd6f5835f42ec50be9a Mon Sep 17 00:00:00 2001
+From: Stuart Hayhurst <stuart.a.hayhurst@gmail.com>
+Date: Wed, 25 Sep 2024 16:56:11 +0100
+Subject: [PATCH] Fix race condition in test_sibling_priority_no_overwrite
+
+---
+ src/linux/integration-test.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/linux/integration-test.py b/src/linux/integration-test.py
+index 6b1514a9..f6c804a4 100755
+--- a/src/linux/integration-test.py
++++ b/src/linux/integration-test.py
+@@ -3148,8 +3148,8 @@ class Tests(dbusmock.DBusTestCase):
+     def test_sibling_priority_no_overwrite(self):
+         'Test siblings using the fallback device do not overwrite previous guesses'
+ 
+-        self.start_daemon()
+         self.testbed.add_from_file(os.path.join(edir, 'tests/wacom-pen-digitiser.device'))
++        self.start_daemon()
+ 
+         self.assertDevs({
+             'battery_wacom_battery_0': {
+-- 
+GitLab
+

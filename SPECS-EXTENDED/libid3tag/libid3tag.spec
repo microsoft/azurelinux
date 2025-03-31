@@ -1,31 +1,23 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           libid3tag
-Version:        0.15.1b
-Release:        33%{?dist}
+Version:        0.16.3
+Release:        7%{?dist}
 Summary:        ID3 tag manipulation library
 
-License:        GPLv2+
-URL:            http://www.underbit.com/products/mad/
-Source0:        http://downloads.sourceforge.net/mad/%{name}-%{version}.tar.gz
-Patch0:         libid3tag-0.15.1b-fix_overflow.patch
-Patch1:         libid3tag-0.15.1b-id3v1-zero-padding.patch
-Patch2:         libid3tag-0.15.1b-handle-unknown-encoding.patch
-Patch3:         libid3tag-0.15.1b-id3v2-endless-loop.patch
-# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=869598
-Patch4:         libid3tag-0.15.1b-gperf-size_t.patch
+License:        GPL-2.0-or-later
+URL:            https://codeberg.org/tenacityteam/libid3tag
+Source0:        https://codeberg.org/tenacityteam/libid3tag/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         cmake-hook-genre.dat-and-gperf-files-generation.patch
 
-BuildRequires:  gcc
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  libtool
+BuildRequires:  gcc-c++
+BuildRequires:  cmake
 BuildRequires:  gperf
 BuildRequires:  zlib-devel >= 1.1.4
 
 %description
 libid3tag is a library for reading and (eventually) writing ID3 tags,
 both ID3v1 and the various versions of ID3v2.
-
 
 %package        devel
 Summary:        Development files for %{name}
@@ -34,64 +26,72 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description    devel
 ID3 tag library development files.
 
-
 %prep
-%setup -q
-%patch 0 -p0 -b .CVE-2008-2109
-%patch 1 -p1 -b .zero-padding
-%patch 2 -p1 -b .unknown-encoding
-%patch 3 -p0 -b .endless-loop
-%patch 4 -p1 -b .gperf
-
-touch NEWS AUTHORS ChangeLog
-
-# Force these files to be regenerated from the .gperf sources.
-rm compat.c frametype.c
-
-# *.pc originally from the Debian package.
-cat << \EOF > %{name}.pc
-prefix=%{_prefix}
-exec_prefix=%{_exec_prefix}
-libdir=%{_libdir}
-includedir=%{_includedir}
-
-Name: id3tag
-Description: ID3 tag manipulation library
-Requires:
-Version: %{version}
-Libs: -lid3tag
-Cflags:
-EOF
-
+%autosetup -p1 -n %{name}
 
 %build
-# Run autoreconf so that it doesn't check for cxx and doesn't clobber CFLAGS
-autoreconf -vfi
-%configure --disable-static
-%make_build
-
+%cmake
+%cmake_build
 
 %install
-%make_install
-rm -vf $RPM_BUILD_ROOT%{_libdir}/*.la
-install -Dpm 644 %{name}.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/id3tag.pc
+%cmake_install
 
 %ldconfig_scriptlets
 
 %files
 %doc CHANGES CREDITS README TODO
 %license COPYING COPYRIGHT
-%{_libdir}/libid3tag.so.*
+%{_libdir}/libid3tag.so.0*
 
 %files devel
 %{_includedir}/id3tag.h
 %{_libdir}/libid3tag.so
+%{_libdir}/cmake/id3tag/
 %{_libdir}/pkgconfig/id3tag.pc
 
-
 %changelog
+* Fri Oct 10 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.16.3-7
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Apr 17 2024 Peter Lemenkov <lemenkov@gmail.com> - 0.16.3-5
+- Use autorelease macro
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Dec 14 2023 Leigh Scott <leigh123linux@gmail.com> - 0.16.3-1
+- Update to 0.16.3
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Aug 31 2022 Leigh Scott <leigh123linux@gmail.com> - 0.16.2-1
+- Update to 0.16.2
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.1b-37
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.1b-36
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.1b-35
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.1b-34
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.1b-33
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15.1b-33
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+  Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.1b-32
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -228,10 +228,6 @@ install -Dpm 644 %{name}.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/id3tag.pc
 - Provide mp3-cmdline virtual package and alternative.
 - Build shared library.
 
-* Fri Apr  4 2003 Ville Skyttä <ville.skytta at iki.fi> - 0:0.14.2-0.fdr.1.b
-- Update to current Fedora guidelines.
-- Exclude %%{_libdir}/*.la.
-
 * Thu Feb 20 2003 Ville Skyttä <ville.skytta at iki.fi> - 0.14.2b-1.fedora.1
 - First Fedora release, based on Matthias Saou's work.
 
@@ -247,3 +243,4 @@ install -Dpm 644 %{name}.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/id3tag.pc
 
 * Mon Jan 28 2002 Bill Nottingham <notting@redhat.com>
 - split libmad off into a separate package
+

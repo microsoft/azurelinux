@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.10
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,7 @@ Source2:        iptables
 Source3:        iptables.stop
 Source4:        ip4save
 Source5:        ip6save
+Source6:        iptables.conf
 BuildRequires:  jansson-devel
 BuildRequires:  libmnl-devel
 BuildRequires:  libnftnl-devel
@@ -54,6 +55,9 @@ It contains the libraries and header files to create applications.
 %install
 %make_install
 
+# Create the /etc/modules-load.d directory if it doesn't exist
+install -vdm755 %{buildroot}/etc/modules-load.d
+
 #   Install daemon scripts
 install -vdm755 %{buildroot}%{_unitdir}
 install -m 644 %{SOURCE1} %{buildroot}%{_unitdir}
@@ -62,6 +66,7 @@ install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/scripts
 install -m 755 %{SOURCE3} %{buildroot}%{_sysconfdir}/systemd/scripts
 install -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/systemd/scripts
 install -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/systemd/scripts
+install -m 644 %{SOURCE6} %{buildroot}/etc/modules-load.d
 
 find %{buildroot} -name '*.a'  -delete
 find %{buildroot} -type f -name "*.la" -delete -print
@@ -123,6 +128,7 @@ fi
 /usr/share/xtables/iptables.xslt
 %ghost %{_sbindir}/ip{,6}tables{,-save,-restore}
 %ghost %{_sbindir}/{eb,arp}tables{,-save,-restore}
+/etc/modules-load.d/iptables.conf
 
 %files devel
 %{_libdir}/*.so
@@ -131,6 +137,9 @@ fi
 %{_mandir}/man3/*
 
 %changelog
+* Thu Jan 16 2025 Dallas Delaney <dadelan@microsoft.com> - 1.8.10-4
+- Add back kernel modules that were removed by enabling nftables
+
 * Tue Nov 12 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.8.10-3
 - Enable nftables and use alternatives.
 

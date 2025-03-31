@@ -1,20 +1,21 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Business-ISBN
-%global cpan_version 3.005
+%global cpan_version 3.009
 Version:        %(echo '%{cpan_version}' | tr '_' '.'})
-Release:        3%{?dist}
+Release:        1%{?dist}
 Summary:        Perl module to work with International Standard Book Numbers
 
 License:        Artistic 2.0
 URL:            https://metacpan.org/release/Business-ISBN
-Source0:        https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Business-ISBN-%{cpan_version}.tar.gz#/perl-Business-ISBN-%{cpan_version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/B/BR/BRIANDFOY/Business-ISBN-%{cpan_version}.tar.gz#/perl-Business-ISBN-%{cpan_version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
+BuildRequires:  perl(Config)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(File::Spec::Functions)
@@ -23,7 +24,7 @@ BuildRequires:  perl(warnings)
 # Test::Manifest 1.21 is optional
 # Run-time:
 BuildRequires:  perl(base)
-BuildRequires:  perl(Business::ISBN::Data) >= 20191107
+BuildRequires:  perl(Business::ISBN::Data) >= 20230322.001
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Exporter)
@@ -43,8 +44,26 @@ Requires:       perl(GD::Barcode::EAN13)
 This modules handles International Standard Book Numbers, including
 ISBN-10 and ISBN-13.
 
+For exporting ISBN into a bar code, with png_barcode(), you need to install
+GD::Barcode::EAN13 Perl module.
+
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n Business-ISBN-%{cpan_version}
+
+# Help generators to recognize Perl scripts
+for F in `find t -name *.t`; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
@@ -52,18 +71,38 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 
 %install
 %{make_install}
-%{_fixperms} -c $RPM_BUILD_ROOT/*
+%{_fixperms} -c %{buildroot}/*
+
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+# Remove release tests
+rm %{buildroot}%{_libexecdir}/%{name}/t/pod*
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+cd %{_libexecdir}/%{name} && exec prove -I . -r -j "$(getconf _NPROCESSORS_ONLN)"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 
 %check
+export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 make test
+
 
 %files
 %license LICENSE
 %doc Changes README.pod
-%{perl_vendorlib}/*
-%{_mandir}/man3/*.3*
+%{perl_vendorlib}/Business*
+%{_mandir}/man3/Business::ISBN*.3*
+
+%files tests
+%{_libexecdir}/%{name}
 
 %changelog
+* Fri Dec 13 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 3.009-1
+- Update to 3.009
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.005-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

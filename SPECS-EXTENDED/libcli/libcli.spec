@@ -1,22 +1,24 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 %global _hardened_build 1
-%global commit0 e60d4cca3d0e702c60ad0f9e2eecaa461baa4744
 
 Name: libcli
-Version: 1.9.7
+Version: 1.10.7
 Release: 1%{?dist}
 Summary: A shared library for a Cisco-like cli
 License: LGPLv2+
 URL: https://github.com/dparrish/libcli
-Source0: https://github.com/dparrish/libcli/archives/%{commit0}.tar.gz
-Patch0: libcli-win32issue.patch
+Source0: https://github.com/dparrish/libcli/archive/refs/tags/V%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
+Patch0: calloc.patch
 
 %package devel
 Summary: Development files for libcli
 Requires: %{name}%{?_isa} = %{version}-%{release}
 
 BuildRequires:  gcc
+BuildRequires:  make
+
 %description
 Libcli provides a shared library for including a Cisco-like command-line 
 interface into other software. It's a telnet interface which supports 
@@ -32,9 +34,7 @@ user-definable function tree.
 These are the development files.
 
 %prep
-%setup -qn %{name}-%{commit0}
-
-%patch 0 -p1
+%autosetup -p0
 
 %build
 
@@ -44,22 +44,26 @@ make %{?_smp_mflags}
 install -d -p %{buildroot}%{_includedir}
 install -p -m 644 libcli*.h %{buildroot}%{_includedir}/
 install -d -p %{buildroot}%{_libdir}
-install -p -m 755 libcli.so.1.9.7 %{buildroot}%{_libdir}/
-ln -s %{_libdir}/libcli.so.1.9.7 %{buildroot}%{_libdir}/libcli.so.1.9
-ln -s %{_libdir}/libcli.so.1.9 %{buildroot}%{_libdir}/libcli.so
+install -p -m 755 libcli.so.%{version} %{buildroot}%{_libdir}/
+ln -s %{_libdir}/libcli.so.%{version} %{buildroot}%{_libdir}/libcli.so.1.10
+ln -s %{_libdir}/libcli.so.1.10 %{buildroot}%{_libdir}/libcli.so
 
 %ldconfig_scriptlets
 
 %files
 %doc COPYING
-%{_libdir}/*.so.*
+%{_libdir}/*.so.1.10*
 
 %files devel
-%doc README
+%doc README.md
 %{_libdir}/*.so
 %{_includedir}/*.h
 
 %changelog
+* Mon Nov 11 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 1.10.7-1
+- Update to 1.10.7
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.7-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

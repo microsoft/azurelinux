@@ -40,6 +40,7 @@ a template language, which is heavily inspired by Kid.
 rm -rf %{modname}.egg-info
  
 find examples -type f | xargs chmod a-x
+
  
 %generate_buildrequires
 %pyproject_buildrequires -x i18n
@@ -65,6 +66,7 @@ sed -i -e '/_speedups.c/d' %{pyproject_files}
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Disable debuginfo 
 - Disable RPM complaining about shipping *.so binaries as noarch
+
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

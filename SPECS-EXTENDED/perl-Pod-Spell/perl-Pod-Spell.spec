@@ -1,47 +1,42 @@
 Name:           perl-Pod-Spell
-Version:        1.20
-Release:        15%{?dist}
+Version:        1.27
+Release:        1%{?dist}
 Summary:        A formatter for spell-checking POD
-License:        Artistic 2.0
+License:        Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Pod-Spell
-Source0:        https://cpan.metacpan.org/modules/by-module/Pod/Pod-Spell-%{version}.tar.gz#/perl-Pod-Spell-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/Pod/Pod-Spell-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
-BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(Config)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(File::ShareDir::Install) >= 0.06
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-BuildRequires:  sed
 # Run-time:
-BuildRequires:  perl(Carp)
 BuildRequires:  perl(Class::Tiny)
 BuildRequires:  perl(constant)
 BuildRequires:  perl(File::ShareDir)
+BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(Lingua::EN::Inflect)
 BuildRequires:  perl(locale)
 BuildRequires:  perl(parent)
-BuildRequires:  perl(Path::Tiny)
-BuildRequires:  perl(Pod::Escapes)
-BuildRequires:  perl(Pod::Parser)
+BuildRequires:  perl(Pod::Simple)
 BuildRequires:  perl(Text::Wrap)
 # Optional run-time:
 # I18N::Langinfo not used at tests
 # POSIX not used at tests
 # Tests:
-BuildRequires:  perl(File::Spec)
+BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Temp) >= 0.17
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
-BuildRequires:  perl(Test::Deep)
 BuildRequires:  perl(Test::More) >= 0.96
 BuildRequires:  perl(utf8)
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(File::ShareDir)
 Recommends:     perl(I18N::Langinfo)
 Recommends:     perl(POSIX)
@@ -53,20 +48,45 @@ effort into actual formatting, and it suppresses things that look like
 Perl symbols or Perl jargon (so that your spell-checking program won't
 complain about mystery words like "$thing" or "Foo::Bar" or "hashref").
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+ 
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n Pod-Spell-%{version}
-sed -i -e '/^#!/ c #!%{__perl}' bin/podspell
+
+# Help generators to recognize Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
-find %{buildroot} -type f -name .packlist -delete
+%{make_install}
 %{_fixperms} -c %{buildroot}
 
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+mkdir -p %{buildroot}%{_libexecdir}/%{name}/bin
+ln -s %{_bindir}/podspell %{buildroot}%{_libexecdir}/%{name}/bin
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+cd %{_libexecdir}/%{name} && exec prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
+
 %check
+export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 make test
 
 %files
@@ -79,7 +99,14 @@ make test
 %{_mandir}/man3/Pod::Spell.3*
 %{_mandir}/man3/Pod::Wordlist.3*
 
+%files tests
+%{_libexecdir}/%{name}
+
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.27-1
+- Update to version 1.27
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:                   delve
-Version:                1.5.0
-Release:                16%{?dist}
+Version:                1.23.0
+Release:                1%{?dist}
 Summary:                A debugger for the Go programming language
 
 License:                MIT
@@ -19,7 +19,7 @@ BuildRequires:          lsof
 Provides:               dlv = %{version}
 
 # https://github.com/go-delve/delve/pull/2223
-Patch0:                 golang-1.15.4-TestStepIntoWrapperForEmbeddedPointer.patch
+Patch0:	         0001-Skipping-due-issues-with-the-go-version-in-Fedora.patch
 
 
 %description
@@ -56,7 +56,7 @@ install -Dpm 0755 bin/dlv %{buildroot}%{_bindir}/dlv
 
 
 %check
-export GO111MODULE=off
+#export GO111MODULE=off
 export GOPATH="%{_builddir}/%{name}-%{version}/_build"
 cd "_build/src/github.com/go-delve/%{name}"
 for d in $(go list ./... | grep -v cmd | grep -v scripts); do
@@ -72,6 +72,10 @@ done
 
 
 %changelog
+* Fri Nov 04 2024 Sreenivasulu Malavathula <v-smalavathuh@microsoft.com> - 1.23.0-1
+- Update CBL-Mariner import from Fedora 41 (license: MIT).
+- License verified.
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.0-16
 - Bump release to rebuild with go 1.20.10
 

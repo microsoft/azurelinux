@@ -1,16 +1,15 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           babeltrace
-Version:        1.5.7
-Release:        7%{?dist}
+Version:        1.5.11
+Release:        1%{?dist}
 Summary:        Trace Viewer and Converter, mainly for the Common Trace Format
-License:        MIT and GPLv2
-URL:            https://www.efficios.com/babeltrace
+License:        MIT, LGPLv2.1, and GPLv2
+URL:            https://babeltrace.org
 Source0:        https://www.efficios.com/files/%{name}/%{name}-%{version}.tar.bz2
 Source1:        https://www.efficios.com/files/%{name}/%{name}-%{version}.tar.bz2.asc
 # gpg2 --export --export-options export-minimal 7F49314A26E0DE78427680E05F1B2A0789F12B11 > gpgkey-7F49314A26E0DE78427680E05F1B2A0789F12B11.gpg
 Source2:        gpgkey-7F49314A26E0DE78427680E05F1B2A0789F12B11.gpg
-Patch0:         python39.patch
 
 BuildRequires:  bison >= 2.4
 BuildRequires:  flex >= 2.5.35
@@ -117,6 +116,10 @@ rm -f %{buildroot}/%{_pkgdocdir}/std-ext-lib.txt
 
 
 %changelog
+* Mon Sep 30 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.5.11-1
+- Fix compatibility with python 3.12
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.7-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

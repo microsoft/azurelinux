@@ -2,12 +2,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:      mythes
 Summary:   A thesaurus library
-Version:   1.2.4
-Release:   14%{?dist}
-# Source:  https://github.com/hunspell/mythes/archive/refs/heads/master.zip
-Source:    https://github.com/hunspell/mythes/archive/refs/heads/%{name}-%{version}.tar.gz
+Version:   1.2.5
+Release:   8%{?dist}
+Source:    https://github.com/hunspell/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 URL:       https://github.com/hunspell/mythes
-License:   BSD and MIT
+License:   BSD-3-Clause-Modification AND MIT
+BuildRequires: make
 BuildRequires: hunspell-devel, gcc-c++
 
 %description
@@ -27,15 +27,16 @@ Includes and definitions for developing with mythes
 
 %build
 %configure --disable-rpath --disable-static
-make %{?_smp_mflags}
+%make_build
 
 %check
+make check
 ./example th_en_US_new.idx th_en_US_new.dat checkme.lst
 ./example morph.idx morph.dat morph.lst morph.aff morph.dic
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make DESTDIR=$RPM_BUILD_ROOT install
+%make_install
 rm -f $RPM_BUILD_ROOT/%{_libdir}/*.a
 rm -f $RPM_BUILD_ROOT/%{_libdir}/*.la
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/mythes
@@ -55,8 +56,46 @@ mkdir -p $RPM_BUILD_ROOT/%{_datadir}/mythes
 %{_bindir}/th_gen_idx.pl
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-14
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Dec 30 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.2.5-8
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.5-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.5-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.5-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Feb 23 2023 Caolán McNamara <caolanm@redhat.com> - 1.2.5-3
+- migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sun Aug 21 2022 Caolán McNamara <caolanm@redhat.com> - 1.2.5-1
+- latest version
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.4-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.4-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.4-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.4-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.4-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 14 2020 Tom Stellard <tstellar@redhat.com> - 1.2.4-14
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.4-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

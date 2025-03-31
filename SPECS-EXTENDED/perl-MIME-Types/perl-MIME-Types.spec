@@ -1,11 +1,11 @@
 # No Mojolicious prior to Fedora 14
 # Mojolicious in Fedora 14 is too old
 # No Mojolicious in EPEL
-
+%if 0%{?fedora} > 14
 %global have_mojo 1
-
-
-
+%else
+%global have_mojo 0
+%endif
 
 # Run extra test
 %if 0%{?rhel}
@@ -15,14 +15,12 @@
 %endif
 
 Name:           perl-MIME-Types
-Version:        2.17
-Release:        9%{?dist}
+Version:        2.26
+Release:        2%{?dist}
 Summary:        MIME types module for Perl
-License:        GPL+ or Artistic
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/MIME-Types
-Source0:        https://cpan.metacpan.org/authors/id/M/MA/MARKOV/MIME-Types-%{version}.tar.gz#/perl-MIME-Types-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/MIME/MIME-Types-%{version}.tar.gz
 BuildArch:      noarch
 # Module Build
 BuildRequires:  coreutils
@@ -46,7 +44,7 @@ BuildRequires:  perl(strict)
 BuildRequires:  perl(vars)
 # Test Suite
 BuildRequires:  perl(lib)
-BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Test::More) >= 0.88
 BuildRequires:  perl(warnings)
 %if %{with perl_MIME_Types_enables_extra_test}
 # Extra Tests
@@ -54,7 +52,6 @@ BuildRequires:  perl(Test::MinimumVersion)
 BuildRequires:  perl(Test::Pod) >= 1.00
 %endif
 # Runtime
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 MIME types are used in many applications, for instance as part of e-mail
@@ -115,8 +112,88 @@ make test TEST_FILES="xt/*.t"
 %endif
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.17-9
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.26-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Feb  6 2024 Paul Howarth <paul@city-fan.org> - 2.26-1
+- Update to 2.26
+  - IANA updates
+  - Support multi-level extensions
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.24-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.24-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.24-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.24-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Dec 28 2022 Paul Howarth <paul@city-fan.org> - 2.24-1
+- Update to 2.24
+  - IANA updates
+  - vnd.gentoo officially took 'tar' and 'tbz2', but 'application/x-tar' resp
+    'x-gtar' prevails
+- Use SPDX-format license tag
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.22-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.22-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.22-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Oct 28 2021 Paul Howarth <paul@city-fan.org> - 2.22-1
+- Update to 2.22
+  - webm keeps on producing unexpected results (GH#13)
+  - IANA updates
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.21-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 28 2021 Paul Howarth <paul@city-fan.org> - 2.21-1
+- Update to 2.21
+  - application/octet-stream is better for .dat (GH#11)
+  - Add video/webm, which Google forgot to register (GH#12)
+  - Add image/webp, which Google registered too late (GH#12)
+
+* Sat May 22 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.20-2
+- Perl 5.34 rebuild
+
+* Fri Apr 23 2021 Paul Howarth <paul@city-fan.org> - 2.20-1
+- Update to 2.20
+  - heif/heic/heifs/heics/hif fix (GH#9)
+  - No 'and' and 'or' extensions (GH#9)
+  - application/octet-stream is better for .bin (GH#10)
+
+* Fri Apr 16 2021 Paul Howarth <paul@city-fan.org> - 2.19-1
+- Update to 2.19
+  - Update with the newest data from IANA and Apache httpd
+  - mp4 preference is video/mp4 (GH#5)
+  - yt preference is video/vnd.youtube.yt (GH#6)
+  - 3gp and 3gpp preference is video/3gpp (GH#7)
+- Use author-independent source URL
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.18-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Dec 10 2020 Paul Howarth <paul@city-fan.org> - 2.18-1
+- Update to 2.18
+  - Update with newest data
+  - Mojo 6.0 changed types() into mapping()
+  - Mojo 7.94 adds experimental file_type()
+  - Mojo 7.94 adds experimental content_type()
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.17-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.17-9
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.17-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

@@ -1,70 +1,64 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-%{!?__python3: %global __python3 /usr/bin/python3}
-
-# what it's called on pypi
 %global srcname testtools
-# what it's imported as
-%global libname %{srcname}
-# name of egg info directory
-%global eggname %{srcname}
-# package name fragment
-%global pkgname %{srcname}
-
 %global common_description %{expand:
 testtools is a set of extensions to the Python standard library's unit testing
 framework.}
 
 # To build this package in a new environment (i.e. a new EPEL branch), you'll
-# need to build in a particular order.
+# need to build in a particular order.  Duplicate numbered steps can happen at
+# the same time.
 #
-# 1. python-testtools with the tests disabled
-# 2. python-fixtures with the tests disabled
+# 1. bootstrap python-extras
+# 1. bootstrap python-fixtures
+# 2. bootstrap python-testtools
+# 3. python-extras
+# 3. python-fixtures
 # 3. python-testscenarios
-# 4. python-testtools and python-fixtures with tests enabled
-%bcond_with tests
-%bcond_without docs
+# 4. python-testresources
+# 5. python-testtools
+%bcond_with bootstrap
 
-Name:           python-%{pkgname}
-Version:        2.4.0
-Release:        9%{?dist}
-Summary:        Extensions to the Python unit testing framework
+Name:           python-%{srcname}
+Version:        2.7.1
+Release:        8%{?dist}
+Summary:        Extensions to the Python standard library unit testing framework
 License:        MIT
-URL:            https://launchpad.net/testtools
+URL:            https://github.com/testing-cabal/testtools
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://files.pythonhosted.org/packages/source/t/%{libname}/%{libname}-%{version}.tar.gz
-Patch0:         testtools-2.4.0-remove_backports.patch
-# Reported as:
-# https://github.com/testing-cabal/testtools/pull/293
-Patch1:         testtools-2.4.0-fix_py39_test.patch
+Source:         https://files.pythonhosted.org/packages/07/a7/3f3daee7a525d5288b84581448d21a39d0b9ae9f4a235d99850682944857/testtools-2.7.1.tar.gz#/%{name}-%{version}.tar.gz
+# When rebasing patches, be aware that setup.cfg uses spaces in the git source,
+# but tabs in the PyPI tarball.
+
+# Compatibility with pytest 8
+# https://github.com/testing-cabal/testtools/commit/48e689b4
+Patch:          Treat-methodName-runTest-similar-to-unittest.TestCas.patch
+
 BuildArch:      noarch
+BuildRequires:  python3-pip
+BuildRequires:  python3-hatchling
+BuildRequires:  python3-pathspec 
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-twisted
+BuildRequires:  python3-hatch-vcs
+BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-wheel
+BuildRequires:  python3-trove-classifiers
+#BuildRequires:  python3-testscenarios
+#BuildRequires:  python3-fixtures
+BuildRequires:   python3-typing-extensions
 
 %description %{common_description}
 
-%package -n python3-%{pkgname}
+%package -n python3-%{srcname}
 Summary:        %{summary}
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-extras
-BuildRequires:  python3-mimeparse
-BuildRequires:  python3-pbr
-BuildRequires:  python3-sphinx
-BuildRequires:  python3-xml
-#BuildRequires:  %{py3_dist setuptools extras python-mimeparse pbr}
-%if %{with tests}
-BuildRequires:  python3-testscenarios
-#BuildRequires:  %{py3_dist testscenarios}
-%endif
-%{?python_provide:%python_provide python3-%{pkgname}}
 
-%description -n python3-%{pkgname} %{common_description}
+%description -n python3-%{srcname} %{common_description}
 
-%if %{with docs}
+%if %{without bootstrap}
 %package        doc
+BuildRequires:  make
 BuildRequires:  python3-sphinx
-BuildRequires:  python3-sphinxcontrib-websupport
-#BuildRequires:  %{py3_dist sphinx}
 Summary:        Documentation for %{name}
 
 # https://fedoraproject.org/wiki/Packaging:No_Bundled_Libraries#Packages_granted_temporary_exceptions
@@ -74,45 +68,128 @@ Provides:       bundled(jquery)
 This package contains HTML documentation for %{name}.
 %endif
 
+
 %prep
 %autosetup -p 1 -n %{srcname}-%{version}
-rm -rf %{eggname}.egg-info
-rm testtools/_compat2x.py
+
+
+%generate_buildrequires
+%pyproject_buildrequires %{!?with_bootstrap:-x test -x twisted}
+
 
 %build
-CFLAGS="%{optflags}" %{__python3} setup.py build
+%pyproject_wheel
 
-%if %{with docs}
-PYTHONPATH=$PWD make SPHINXBUILD=sphinx-build3 -C doc html
+%if %{without bootstrap}
+make -C doc html
 %endif
+
 
 %install
-%{__python3} setup.py install --skip-build --root %{buildroot}
+%pyproject_install
+%pyproject_save_files %{srcname}
 
-%if %{with tests}
+
 %check
-make PYTHON=%{__python3} check
+%if %{without bootstrap}
+PYTHONPATH=%{buildroot}%{python3_sitelib} %{python3} -m testtools.run testtools.tests.test_suite
+# Typically we would want an %%else condition to run an import check, but it
+# will fail during the bootstrap phase, so leave it out.
 %endif
 
-%files -n python3-%{pkgname}
-%license LICENSE
-%doc NEWS
-%doc README.rst
-%{python3_sitelib}/%{libname}
-%{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
+%files -n python3-%{srcname} -f %{pyproject_files}
+%license %{python3_sitelib}/testtools-2.7.1.dist-info/licenses/*
+%doc NEWS README.rst
 
-%if %{with docs}
+%if %{without bootstrap}
 %files doc
 %doc doc/_build/html/*
 %endif
 
+
 %changelog
-* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.0-9
-- Release bump to fix package information.
+* Fri Dec 21 2025 Jyoti kanase <v-jykanase@microsoft.com> -  2.7.1-8
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
-* Tue Oct 13 2020 Steve Laughman <steve.laughman@microsoft.com> - 2.4.0-8
-- Initial CBL-Mariner import from Fedora 33 (license: MIT)
+* Tue Jul 23 2024 Tomáš Hrnčiar <thrnciar@redhat.com> - 2.7.1-7
+- Backport upstream patch needed for compatibility with pytest 8
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sun Jun 09 2024 Python Maint <python-maint@redhat.com> - 2.7.1-5
+- Rebuilt for Python 3.13
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 2.7.1-4
+- Bootstrap for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Nov 03 2023 Joel Capitao <jcapitao@redhat.com> - 2.7.1-1
+- Update to 2.7.1 (rhbz#2247544)
+
+* Thu Sep 14 2023 Michel Lind <salimma@fedoraproject.org> - 2.6.0-2
+- Certify that we are using the SPDX license identifier
+
+* Thu Aug 03 2023 Michel Alexandre Salim <salimma@fedoraproject.org> - 2.6.0-1
+- Update to 2.6.0 (rhbz#2178177, rhbz#2226353)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jul 03 2023 Python Maint <python-maint@redhat.com> - 2.5.0-13
+- Rebuilt for Python 3.12
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 2.5.0-12
+- Bootstrap for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 15 2022 Python Maint <python-maint@redhat.com> - 2.5.0-9
+- Rebuilt for Python 3.11
+
+* Wed Jun 15 2022 Python Maint <python-maint@redhat.com> - 2.5.0-8
+- Bootstrap for Python 3.11
+
+* Fri Apr 29 2022 Carl George <carl@george.computer> - 2.5.0-7
+- Switch to bootstrap macros
+
+* Fri Apr 29 2022 Carl George <carl@george.computer> - 2.5.0-6
+- Disable tests for EPEL9 bootstrap
+
+* Tue Apr 26 2022 Carl George <carl@george.computer> - 2.5.0-5
+- Convert to pyproject macros
+
+* Tue Apr 26 2022 Carl George <carl@george.computer> - 2.5.0-4
+- Fix Python 3.10 (final, not beta) FTBFS
+- Resolves: rhbz#2046915
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jul 16 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2.5.0-1
+- Update to 2.5.0
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.4.0-10
+- Rebuilt for Python 3.10
+
+* Wed Jun 02 2021 Python Maint <python-maint@redhat.com> - 2.4.0-9
+- Bootstrap for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.0-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

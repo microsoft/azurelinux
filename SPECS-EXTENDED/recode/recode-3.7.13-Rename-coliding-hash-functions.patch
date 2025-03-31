@@ -1,0 +1,15 @@
+diff -ur a/lib/hash.h b/lib/hash.h
+--- a/lib/hash.h	2023-01-04 23:06:45.000000000 +0100
++++ b/lib/hash.h	2023-01-17 13:04:05.200398680 +0100
+@@ -24,6 +24,11 @@
+ #ifndef HASH_H_
+ # define HASH_H_
+ 
++#define hash_lookup recode_hash_lookup
++#define hash_delete recode_hash_delete
++#define hash_free   recode_hash_free
++#define hash_insert recode_hash_insert
++
+ # include <stdio.h>
+ 
+ # ifdef __cplusplus

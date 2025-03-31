@@ -1,12 +1,12 @@
 Name:           perl-Mixin-Linewise
-Version:        0.108
-Release:        17%{?dist}
+Version:        0.111
+Release:        1%{?dist}
 Summary:        Write your linewise code for handles; this does the rest
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Mixin-Linewise
-Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Mixin-Linewise-%{version}.tar.gz#/perl-Mixin-Linewise-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Mixin-Linewise-%{version}.tar.gz
 BuildArch:      noarch
 # Build
 BuildRequires:  coreutils
@@ -14,7 +14,8 @@ BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(:VERSION) >= 5.12
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.78
 # Module
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(IO::File)
@@ -32,7 +33,6 @@ BuildRequires:  perl(utf8)
 BuildRequires:  perl(CPAN::Meta) >= 2.120900
 BuildRequires:  perl(CPAN::Meta::Prereqs)
 # Runtime
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 It's boring to deal with opening files for IO, converting strings to
@@ -64,6 +64,10 @@ make test
 %{_mandir}/man3/Mixin::Linewise::Writers.3*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.111-1
+- Update to version 0.111
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.108-17
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

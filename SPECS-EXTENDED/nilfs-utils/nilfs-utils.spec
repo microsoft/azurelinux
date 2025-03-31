@@ -1,17 +1,22 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global _root_libdir	/%{_lib}
-%global _root_sbindir 	/sbin
 
 Name:		nilfs-utils
-Version:	2.2.8
-Release:	3%{?dist}
+Version:	2.2.11
+Release:	4%{?dist}
 Summary:	Utilities for managing NILFS v2 filesystems
 
 License:	GPLv2+
-URL:		http://nilfs.sourceforge.net
-Source0:	http://nilfs.sourceforge.net/download/%{name}-%{version}.tar.bz2
-BuildRequires:	gcc, libuuid-devel, libmount-devel
+URL:		https://nilfs.sourceforge.net
+Source0:	https://nilfs.sourceforge.net/download/%{name}-%{version}.tar.bz2
+Source1:	https://nilfs.sourceforge.net/download/%{name}-%{version}.tar.bz2.asc
+Source2:	8B055AE86DEFF458.asc
+BuildRequires:  make
+BuildRequires:	gcc
+BuildRequires:  libuuid-devel
+BuildRequires:  libmount-devel
+BuildRequires:  gnupg2
+
 
 %description
 Userspace utilities for creating and mounting NILFS v2 filesystems.
@@ -29,34 +34,35 @@ filesystem-specific programs. If you install nilfs-utils-devel, you'll
 also want to install nilfs-utils.
 
 %prep
-%setup -q
+%autosetup -n %{name}-%{version}
 
 %build
 # geez, make install is trying to run ldconfig on the system
-%configure LDCONFIG=/bin/true --disable-static --libdir %{_root_libdir}
+%configure LDCONFIG=/bin/true --disable-static
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
-rm -f $RPM_BUILD_ROOT/%{_root_libdir}/libnilfs*.la
+make install DESTDIR=$RPM_BUILD_ROOT sbindir=%_sbindir root_sbindir=%_sbindir
+rm -f $RPM_BUILD_ROOT/%{_libdir}/libnilfs*.la
 
 %ldconfig_scriptlets
 
 %files
 %doc COPYING ChangeLog
 %config(noreplace) /etc/nilfs_cleanerd.conf
-%{_root_sbindir}/mkfs.nilfs2
-%{_root_sbindir}/mount.nilfs2
-%{_root_sbindir}/nilfs_cleanerd
-%{_root_sbindir}/umount.nilfs2
+%{_sbindir}/mkfs.nilfs2
+%{_sbindir}/mount.nilfs2
+%{_sbindir}/nilfs_cleanerd
+%{_sbindir}/umount.nilfs2
 %{_sbindir}/nilfs-tune
 %{_sbindir}/nilfs-clean
 %{_sbindir}/nilfs-resize
-%{_root_libdir}/libnilfscleaner.so.*
-%{_root_libdir}/libnilfsgc.so.*
+%{_libdir}/libnilfscleaner.so.*
+%{_libdir}/libnilfsgc.so.*
+%{_libdir}/libnilfs.so.*
 %{_bindir}/chcp
 %{_bindir}/dumpseg
 %{_bindir}/lscp
@@ -78,19 +84,58 @@ rm -f $RPM_BUILD_ROOT/%{_root_libdir}/libnilfs*.la
 %{_mandir}/man8/nilfs-tune.8.gz
 %{_mandir}/man8/nilfs-clean.8.gz
 %{_mandir}/man8/nilfs-resize.8.gz
-%{_root_libdir}/libnilfs.so.*
 
 %files devel
-%{_root_libdir}/libnilfs.so
-%{_root_libdir}/libnilfscleaner.so
-%{_root_libdir}/libnilfsgc.so
+%{_libdir}/libnilfs.so
+%{_libdir}/libnilfscleaner.so
+%{_libdir}/libnilfsgc.so
 %{_includedir}/nilfs.h
-%{_includedir}/nilfs2_fs.h
 %{_includedir}/nilfs_cleaner.h
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.8-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Feb 06 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.2.11-4
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.11-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jul 09 2024 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.2.11-2
+- Rebuilt for the bin-sbin merge
+
+* Thu Apr 04 2024 Eric Sandeen <sandeen@redhat.com> 2.2.11-1
+- New upstream release
+- Add gpg verification of tarball
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.9-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.9-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.9-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.9-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.9-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 20 2022 Eric Sandeen <sandeen@redhat.com> 2.2.9-1
+- New upstream release
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.8-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.8-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.8-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.8-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

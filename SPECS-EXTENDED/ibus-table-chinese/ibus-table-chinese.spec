@@ -1,22 +1,19 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global message_level 6
 %global ibus_tables_dir %{_datadir}/ibus-table/tables
 %global ibus_icons_dir %{_datadir}/ibus-table/icons
-%global createdb ibus-table-createdb
 Name:           ibus-table-chinese
-Version:        1.8.3
-Release:        3%{?dist}
+Version:        1.8.12
+Release:        6%{?dist}
 Summary:        Chinese input tables for IBus
 Summary(zh_CN): 中文码表输入法
 Summary(zh_TW): 中文碼表輸入法
-License:        GPLv3+
-URL:            https://github.com/definite/ibus-table-chinese
-Source0:        https://github.com/definite/ibus-table-chinese/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+License:        GPL-3.0-or-later
+URL:            https://github.com/mike-fabian/ibus-table-chinese
+Source0:        https://github.com/mike-fabian/ibus-table-chinese/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-BuildRequires:  cmake >= 2.6.2
-BuildRequires:  cmake-fedora
+BuildRequires:  cmake >= 3.0.0
 BuildRequires:  ibus-table-devel >= 1.10.0
+BuildRequires: make
 Requires:       ibus-table >= 1.10.0
 Obsoletes:      ibus-table-yinma < 1.3
 Obsoletes:      ibus-table-xingma < 1.3
@@ -31,13 +28,11 @@ Input tables themselves are in subpackages.
 ibus-table-chinese 提供了中文碼表輸入法的基礎架構。
     輸入法本身則在子套件裡。
 
-
-
 %package array
 Summary:       Array input methods
 Summary(zh_CN): 行列输入法
 Summary(zh_TW): 行列輸入法
-License:       Freely redistributable without restriction
+License:        LicenseRef-Fedora-UltraPermissive
 Requires:       %{name} = %{version}-%{release}
 Provides:       ibus-table-array30 = %{version}-%{release}
 Obsoletes:      ibus-table-array30 < 1.3
@@ -63,7 +58,7 @@ array30-big: 27489 characters + Unicode ExtB.
 Summary:       Cangjie based input methods
 Summary(zh_TW): 倉頡輸入法
 Summary(zh_CN): 仓颉输入法
-License:       Freely redistributable without restriction
+License:        LicenseRef-Fedora-UltraPermissive AND GPL-2.0-only
 Requires:       %{name} = %{version}-%{release}
 Provides:       ibus-table-cangjie = %{version}-%{release}
 Obsoletes:      ibus-table-cangjie < 1.3
@@ -79,7 +74,7 @@ Cangjie3, Canjie5, and Cangjie big tables.
 %package cantonese
 Summary:        Cantonese input methods
 Summary(zh_TW): 粵語輸入法
-License:       GPLv2 and GPLv3+ and Freely redistributable without restriction
+License:        GPL-2.0-only AND GPL-3.0-or-later AND MIT
 Requires:       %{name} = %{version}-%{release}
 Provides:       ibus-table-cantonese = %{version}-%{release}
 Obsoletes:      ibus-table-cantonese < 1.3
@@ -98,7 +93,7 @@ and jyutping.
 Summary:        Easy input method
 Summary(zh_CN): 轻松输入法
 Summary(zh_TW): 輕鬆輸入法
-License:        GPLv2
+License:        GPL-2.0-only
 Requires:       %{name} = %{version}-%{release}
 Provides:       ibus-table-easy = %{version}-%{release}
 Obsoletes:      ibus-table-easy < 1.3
@@ -116,7 +111,7 @@ Easy phrase-wise input method.
 Summary: Erbi input method
 Summary(zh_CN): 二笔输入法
 Summary(zh_TW): 二筆輸入法
-License:       GPLv2+
+License:        GPL-2.0-or-later
 Requires:       %{name} = %{version}-%{release}
 Provides:       ibus-table-erbi = %{version}-%{release}
 Obsoletes:      ibus-table-erbi < 1.3
@@ -136,12 +131,11 @@ and  Erbi Qin-Song (erbi-qs)
 小林子二筆 (erbi)
 以及青松二筆 (erbi-qs)
 
-
 %package quick
 Summary:       Quick-to-learn input methods
 Summary(zh_CN): 速成输入法
 Summary(zh_TW): 速成輸入法
-License:       Freely redistributable without restriction
+License:        LicenseRef-Fedora-UltraPermissive
 Requires:       %{name} = %{version}-%{release}
 Provides:       ibus-table-quick = %{version}-%{release}
 Obsoletes:      ibus-table-quick < 1.3
@@ -152,8 +146,7 @@ but only need Canjie's first and last word-root
 to form a character.
 
 Includes:
-Quick3, Quick5 and Quick-Classic,
-and Smart Cangjie 6.
+Quick3, Quick5 and Quick-Classic.
 
 %description -l zh_TW quick
 速成輸入法，又稱簡易輸入法，為倉頡輸入法之簡化版本。
@@ -166,7 +159,7 @@ and Smart Cangjie 6.
 Summary: Smart Cangjie
 Summary(zh_CN): 快速仓颉输入法
 Summary(zh_TW): 快速倉頡輸入法
-License:       GPLv3+
+License:        GPL-3.0-or-later
 Requires:       %{name} = %{version}-%{release}
 Provides:       ibus-table-cangjie = %{version}-%{release}
 Obsoletes:      ibus-table-cangjie < 1.3
@@ -203,7 +196,7 @@ This package includes the Smart Cangjie 6.
 Summary: Stroke 5 input method
 Summary(zh_CN): 笔顺五码输入法
 Summary(zh_TW): 筆順五碼輸入法
-License:        GPLv3+
+License:        GPL-3.0-or-later
 Requires:       %{name} = %{version}-%{release}
 Provides:       ibus-table-stroke5 = %{version}-%{release}
 Obsoletes:      ibus-table-stroke5 < 1.3
@@ -222,7 +215,7 @@ Stroke5 input method.
 Summary: Wu pronunciation input method
 Summary(zh_CN): 上海吳语注音输入法
 Summary(zh_TW): 上海吳語注音輸入法
-License:        GPLv2+
+License:        GPL-2.0-or-later
 Requires:       %{name} = %{version}-%{release}
 Provides:       ibus-table-wu = %{version}-%{release}
 Obsoletes:      ibus-table-wu < 1.3
@@ -244,7 +237,7 @@ URL: http://input.foruto.com/wu/
 Summary: Haifeng Wubi input method
 Summary(zh_CN): 海峰五笔输入法
 Summary(zh_TW): 海峰五筆輸入法
-License:        BSD
+License:        0BSD
 Requires:       %{name} = %{version}-%{release}
 Provides:       ibus-table-wubi = %{version}-%{release}
 Obsoletes:      ibus-table-wubi < 1.3
@@ -259,12 +252,11 @@ Haifeng Wubi 86.
 %description -l zh_TW wubi-haifeng
 海峰五筆輸入法。包含：海峰五筆86。
 
-
 %package wubi-jidian
 Summary: Jidian Wubi 86 input method, JiShuang 6.0
 Summary(zh_CN): 极点五笔86输入法 极爽词库 6.0
 Summary(zh_TW): 極點五筆86輸入法 極爽詞庫 6.0
-License:       Freely redistributable without restriction
+License:        LicenseRef-Fedora-UltraPermissive
 Requires:       %{name} = %{version}-%{release}
 Provides:       ibus-table-wubi = %{version}-%{release}
 Obsoletes:      ibus-table-wubi < 1.3
@@ -283,7 +275,7 @@ Wubi 86.
 Summary: YongMa input method
 Summary(zh_CN): 永码输入法
 Summary(zh_TW): 永碼輸入法
-License:        GPLv3
+License:        GPL-3.0-only
 Requires:       %{name} = %{version}-%{release}
 Provides:       ibus-table-yong = %{version}-%{release}
 Obsoletes:      ibus-table-yong < 1.3
@@ -299,7 +291,7 @@ YongMa input method.
 
 %package cantonyale
 Summary:        Cantonese input method based on yale romanization
-License:        GPLv2
+License:        GPL-2.0-only
 Requires:       %{name} = %{version}-%{release}
 
 %description cantonyale
@@ -307,277 +299,222 @@ Cantonese input method based on yale romanization
 
 %prep
 %setup -q -n %{name}-%{version}
-%{__sed} -i 's/\r//' tables/wubi-haifeng/COPYING
 
 %build
-sed -i '49 a LIST(INSERT CMAKE_MODULE_PATH 0 %{_datadir}/cmake/Modules/)' CMakeLists.txt
-# $RPM_OPT_FLAGS should be loaded from cmake macro.
-%cmake -DMANAGE_MESSAGE_LEVEL=%{message_level} -DCMAKE_FEDORA_ENABLE_FEDORA_BUILD=1 .
-%__make VERBOSE=1  %{?_smp_mflags}
+cmake -B build-noarch -S .
+make -C build-noarch
 
 %install
 rm -rf %{buildroot}
-make install DESTDIR=%{buildroot}
+make -C build-noarch install DESTDIR=%{buildroot}
 
 # Register as AppStream components to be visible in the software center
-#
-# NOTE: It would be *awesome* if these files were maintained by the upstream
-# project, translated and installed into the right place during `make install`.
-#
-# See http://www.freedesktop.org/software/appstream/docs/ for more details.
-#
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/appdata
-cat > $RPM_BUILD_ROOT%{_datadir}/appdata/stroke5.appdata.xml <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<component type="inputmethod">
-  <id>stroke5.db</id>
-  <metadata_license>CC0-1.0</metadata_license>
-  <name>Stroke 5</name>
-  <summary>Chinese input method</summary>
-  <description>
-    <p>
-      Stroke 5 is a very simple stroke-based Chinese input method.
-      It was designed specifically for people with limited hand mobility or computer
-      literacy, like the elderly or disabled.
-    </p>
-    <p>
-      Input methods are typing systems allowing users to input complex languages.
-      They are necessary because these contain too many characters to simply be laid
-      out on a traditional keyboard.
-    </p>
-  </description>
-  <url type="homepage">https://code.google.com/p/ibus/</url>
-  <url type="bugtracker">https://code.google.com/p/ibus/issues/list</url>
-  <url type="help">https://code.google.com/p/ibus/wiki/FAQ</url>
-  <languages>
-    <lang percentage="100">zh_CN</lang>
-    <lang percentage="100">zh_HK</lang>
-    <lang percentage="100">zh_SG</lang>
-    <lang percentage="100">zh_TW</lang>
-  </languages>
-  <update_contact><!-- upstream-contact_at_email.com --></update_contact>
-</component>
-EOF
-cat > $RPM_BUILD_ROOT%{_datadir}/appdata/wubi-haifeng86.appdata.xml <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<component type="inputmethod">
-  <id>wubi-haifeng86.db</id>
-  <metadata_license>CC0-1.0</metadata_license>
-  <name>HaiFeng Wubi 86</name>
-  <summary>Simplified Chinese input method</summary>
-  <description>
-    <p>
-      The HaiFeng Wubi 86 input method is designed for entering Simplified Chinese text.
-    </p>
-    <p>
-      Input methods are typing systems allowing users to input complex languages.
-      They are necessary because these contain too many characters to simply be laid
-      out on a traditional keyboard.
-    </p>
-  </description>
-  <url type="homepage">http://code.google.com/p/ibus/</url>
-  <url type="bugtracker">https://code.google.com/p/ibus/issues/list</url>
-  <url type="help">https://code.google.com/p/ibus/wiki/FAQ</url>
-  <languages>
-    <lang percentage="100">zh_CN</lang>
-    <lang percentage="100">zh_HK</lang>
-    <lang percentage="100">zh_SG</lang>
-    <lang percentage="100">zh_TW</lang>
-  </languages>
-  <update_contact><!-- upstream-contact_at_email.com --></update_contact>
-</component>
-EOF
-cat > $RPM_BUILD_ROOT%{_datadir}/appdata/wubi-jidian86.appdata.xml <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<component type="inputmethod">
-  <id>wubi-jidian86.db</id>
-  <metadata_license>CC0-1.0</metadata_license>
-  <name>Jidian Wubi 86</name>
-  <summary>Simplified Chinese input method</summary>
-  <description>
-    <p>
-      The Jidian Wubi 86 input method is designed for entering Simplified Chinese text.
-    </p>
-    <p>
-      Input methods are typing systems allowing users to input complex languages.
-      They are necessary because these contain too many characters to simply be laid
-      out on a traditional keyboard.
-    </p>
-  </description>
-  <url type="homepage">http://code.google.com/p/ibus/</url>
-  <url type="bugtracker">https://code.google.com/p/ibus/issues/list</url>
-  <url type="help">https://code.google.com/p/ibus/wiki/FAQ</url>
-  <languages>
-    <lang percentage="100">zh_CN</lang>
-    <lang percentage="100">zh_HK</lang>
-    <lang percentage="100">zh_SG</lang>
-    <lang percentage="100">zh_TW</lang>
-  </languages>
-  <update_contact><!-- upstream-contact_at_email.com --></update_contact>
-</component>
-EOF
-cat > $RPM_BUILD_ROOT%{_datadir}/appdata/cantonyale.appdata.xml <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<component type="inputmethod">
-  <id>cantonyale.db</id>
-  <metadata_license>CC0-1.0</metadata_license>
-  <name>cantonyale</name>
-  <summary>Cantonese input method based on yale romanization</summary>
-  <description>
-    <p>
-      The cantonyale input method is designed to enter Chinese text using yale romanization.
-    </p>
-    <p>
-      Input methods are typing systems allowing users to input complex languages.
-      They are necessary because these contain too many characters to simply be laid
-      out on a traditional keyboard.
-    </p>
-  </description>
-  <url type="homepage">http://code.google.com/p/ibus/</url>
-  <url type="bugtracker">https://code.google.com/p/ibus/issues/list</url>
-  <url type="help">https://code.google.com/p/ibus/wiki/FAQ</url>
-  <languages>
-    <lang percentage="100">zh_CN</lang>
-    <lang percentage="100">zh_HK</lang>
-    <lang percentage="100">zh_SG</lang>
-    <lang percentage="100">zh_TW</lang>
-  </languages>
-  <update_contact><!-- upstream-contact_at_email.com --></update_contact>
-</component>
-EOF
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/metainfo
+cp metainfo/*.appdata.xml $RPM_BUILD_ROOT%{_datadir}/metainfo
 
 # We install document using doc 
 rm -fr %{buildroot}%{_docdir}/*
 
-
-
-%post array
-%{createdb} -i -n %{ibus_tables_dir}/array30.db
-%{createdb} -i -n %{ibus_tables_dir}/array30-big.db
-
-%post cangjie
-%{createdb} -i -n %{ibus_tables_dir}/cangjie3.db
-%{createdb} -i -n %{ibus_tables_dir}/cangjie5.db
-%{createdb} -i -n %{ibus_tables_dir}/cangjie-big.db
-
-%post cantonese
-%{createdb} -i -n %{ibus_tables_dir}/cantonese.db
-%{createdb} -i -n %{ibus_tables_dir}/cantonhk.db
-%{createdb} -i -n %{ibus_tables_dir}/jyutping.db
-
-%post easy
-%{createdb} -i -n %{ibus_tables_dir}/easy-big.db
-
-%post erbi
-%{createdb} -i -n %{ibus_tables_dir}/erbi.db
-%{createdb} -i -n %{ibus_tables_dir}/erbi-qs.db
-
-%post quick
-%{createdb} -i -n %{ibus_tables_dir}/quick3.db
-%{createdb} -i -n %{ibus_tables_dir}/quick5.db
-%{createdb} -i -n %{ibus_tables_dir}/quick-classic.db
-
-%post scj
-%{createdb} -i -n %{ibus_tables_dir}/scj6.db
-
-%post stroke5
-%{createdb} -i -n %{ibus_tables_dir}/stroke5.db
-
-%post wu
-%{createdb} -i -n %{ibus_tables_dir}/wu.db
-
-%post wubi-haifeng
-%{createdb} -i -n %{ibus_tables_dir}/wubi-haifeng86.db
-
-%post wubi-jidian
-%{createdb} -i -n %{ibus_tables_dir}/wubi-jidian86.db
-
-%post yong
-%{createdb} -i -n %{ibus_tables_dir}/yong.db
-
-%post cantonyale
-%{createdb} -i -n %{ibus_tables_dir}/cantonyale.db
-
 %files
-%doc 
+%doc AUTHORS README ChangeLog COPYING
 
 %files array
+%{_datadir}/metainfo/ibus-table-chinese-array.appdata.xml
 %{ibus_icons_dir}/array30.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/array30.db
+%{ibus_tables_dir}/array30.db
 %{ibus_icons_dir}/array30-big.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/array30-big.db
+%{ibus_tables_dir}/array30-big.db
 
 %files cangjie
+%{_datadir}/metainfo/ibus-table-chinese-cangjie.appdata.xml
 %{ibus_icons_dir}/cangjie3.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/cangjie3.db
+%{ibus_tables_dir}/cangjie3.db
 %{ibus_icons_dir}/cangjie5.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/cangjie5.db
+%{ibus_tables_dir}/cangjie5.db
 %{ibus_icons_dir}/cangjie-big.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/cangjie-big.db
+%{ibus_tables_dir}/cangjie-big.db
 
 %files cantonese
+%{_datadir}/metainfo/ibus-table-chinese-cantonese.appdata.xml
 %{ibus_icons_dir}/cantonese.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/cantonese.db
+%{ibus_tables_dir}/cantonese.db
 %{ibus_icons_dir}/cantonhk.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/cantonhk.db
+%{ibus_tables_dir}/cantonhk.db
 %{ibus_icons_dir}/jyutping.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/jyutping.db
+%{ibus_tables_dir}/jyutping.db
 
 %files easy
+%{_datadir}/metainfo/ibus-table-chinese-easy.appdata.xml
 %{ibus_icons_dir}/easy-big.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/easy-big.db
+%{ibus_tables_dir}/easy-big.db
 
 %files erbi
+%{_datadir}/metainfo/ibus-table-chinese-erbi.appdata.xml
 %{ibus_icons_dir}/erbi.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/erbi.db
+%{ibus_tables_dir}/erbi.db
 %{ibus_icons_dir}/erbi-qs.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/erbi-qs.db
+%{ibus_tables_dir}/erbi-qs.db
 
 %files quick
+%{_datadir}/metainfo/ibus-table-chinese-quick.appdata.xml
 %{ibus_icons_dir}/quick3.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/quick3.db
+%{ibus_tables_dir}/quick3.db
 %{ibus_icons_dir}/quick5.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/quick5.db
+%{ibus_tables_dir}/quick5.db
 %{ibus_icons_dir}/quick-classic.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/quick-classic.db
+%{ibus_tables_dir}/quick-classic.db
 
 %files scj
+%{_datadir}/metainfo/ibus-table-chinese-scj.appdata.xml
 %{ibus_icons_dir}/scj6.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/scj6.db
+%{ibus_tables_dir}/scj6.db
 
 %files stroke5
-%{_datadir}/appdata/stroke5.appdata.xml
+%{_datadir}/metainfo/ibus-table-chinese-stroke5.appdata.xml
 %{ibus_icons_dir}/stroke5.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/stroke5.db
+%{ibus_tables_dir}/stroke5.db
 
 %files wu
+%{_datadir}/metainfo/ibus-table-chinese-wu.appdata.xml
 %{ibus_icons_dir}/wu.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/wu.db
+%{ibus_tables_dir}/wu.db
 
 %files wubi-haifeng
-%{_datadir}/appdata/wubi-haifeng86.appdata.xml
+%{_datadir}/metainfo/ibus-table-chinese-wubi-haifeng86.appdata.xml
 %doc tables/wubi-haifeng/COPYING tables/wubi-haifeng/README
 %{ibus_icons_dir}/wubi-haifeng86.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/wubi-haifeng86.db
+%{ibus_tables_dir}/wubi-haifeng86.db
 
 %files wubi-jidian
-%{_datadir}/appdata/wubi-jidian86.appdata.xml
+%{_datadir}/metainfo/ibus-table-chinese-wubi-jidian86.appdata.xml
 %{ibus_icons_dir}/wubi-jidian86.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/wubi-jidian86.db
+%{ibus_tables_dir}/wubi-jidian86.db
 
 %files yong
+%{_datadir}/metainfo/ibus-table-chinese-yong.appdata.xml
 %{ibus_icons_dir}/yong.*
 %{ibus_tables_dir}/yong.db
 
 %files cantonyale
-%{_datadir}/appdata/cantonyale.appdata.xml
+%{_datadir}/metainfo/ibus-table-chinese-cantonyale.appdata.xml
 %{ibus_icons_dir}/cantonyale.*
-%verify(not size md5 mtime) %{ibus_tables_dir}/cantonyale.db
+%{ibus_tables_dir}/cantonyale.db
 
 %changelog
-* Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.3-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Supplement CMake module search path with the location of cmake-fedora's modules
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.12-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.12-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.12-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.12-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.12-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Dec 12 2022 Mike FABIAN <mfabian@redhat.com> - 1.8.12-1
+- Update to 1.8.12
+- appdata.xml files are now included upstream, remove from the .spec file
+- Migrate license tags to SPDX format
+
+* Sun Oct 30 2022 Mike FABIAN <mfabian@redhat.com> - 1.8.11-1
+- Update to 1.8.11
+- Improve punctuation support in jyutping.txt, cantonese.txt, cantonhk.txt, cantonyale.txt
+  (Resolves: https://github.com/mike-fabian/ibus-table-chinese/issues/7)
+- Improve “improve_jyutping.py” to allow comments in the table
+- Update of jyutping.txt for Unicode 15.0.0 final release
+
+* Tue Oct 25 2022 Mike FABIAN <mfabian@redhat.com> - 1.8.10-1
+- Update to 1.8.10
+- Improve punctuation support in cangjie5.txt, cangjie3.txt, cangjie-big.txt,
+  quick5.txt, quick3.txt, quick-classic.txt
+  (Resolves: https://github.com/kaio/ibus-table/issues/73)
+- Remove obsolete patch: Make-build-outside-of-the-source-tree-possible.patch
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.9-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jul 13 2022 Mike FABIAN <mfabian@redhat.com> - 1.8.9-1
+- Update to 1.8.9
+- Add tones to Jyutping.txt table
+  (Resolves: https://github.com/mike-fabian/ibus-table-chinese/issues/6)
+  Tonal markers according to
+  https://github.com/rime/rime-cantonese/blob/main/README-en.md#tonal-markers
+  were added:
+  1. v: High level, e.g. siv → 詩; High level checked, e.g. sikv → 色
+  2. x: Medium rising, e.g. six → 史
+  3. q: Medium level, e.g. siq→ 試; Medium level checked, e.g. sekq → 錫
+  4. vv: Low falling, e.g. sivv → 時
+  5. xx: Low rising, e.g. sixx → 市
+  6. qq: Low level, e.g. siqq→ 事; Low level checked, e.g. sikqq → 食
+ 
+* Wed Feb 09 2022 Mike FABIAN <mfabian@redhat.com> - 1.8.8-1
+- Update to 1.8.8
+- Add PINYIN_MODE = TRUE to cangjie-big.txt, quick-classic.txt, and erbi.txt
+- Make “Traditional Chinese only” the default for quick5
+- Improve the quick5.txt table in a similar way the cangjie5.txt
+  table was recently improved
+  (Resolves: https://github.com/mike-fabian/ibus-table-chinese/issues/4)
+- Build outside of the source tree
+  (Resolves: https://github.com/mike-fabian/ibus-table-chinese/issues/2)
+
+* Sat Jan 29 2022 Mike FABIAN <mfabian@redhat.com> - 1.8.7-2
+- Don’t index the databases in the post install
+
+* Mon Jan 24 2022 Mike FABIAN <mfabian@redhat.com> - 1.8.7-1
+- Update to 1.8.7
+- Make “Traditional Chinese only” the default for cangjie5
+  (Resolves: https://github.com/mike-fabian/ibus-table-chinese/issues/2)
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jan 18 2022 Mike FABIAN <mfabian@redhat.com> - 1.8.6-1
+- Update to 1.8.6
+- Increase serial number of cangjie5.txt and erbi-qs.txt
+
+* Tue Jan 11 2022 Mike FABIAN <mfabian@redhat.com> - 1.8.5-1
+- Update to 1.8.5
+- erbi-qs.txt: add table_extra tag for auxiliary code
+  (Resolves: https://github.com/definite/ibus-table-chinese/pull/18)
+
+* Mon Jan 10 2022 Mike FABIAN <mfabian@redhat.com> - 1.8.4-1
+- Update to 1.8.4
+- Another improvement for cangjie5.txt
+- Change URLs in .spec file to point to new upstream repo
+- Remove patches which are included upstream.
+
+* Thu Dec 30 2021 Mike FABIAN <mfabian@redhat.com> - 1.8.3-11
+- Improve cangjie5.txt
+- Resolves: https://github.com/mike-fabian/ibus-table/issues/76
+
+* Tue Dec 28 2021 Mike FABIAN <mfabian@redhat.com> - 1.8.3-10
+- Add appdata.xml files for the subpackages where they were missing
+- Fix URLs in existing appdata.xml files
+- Resolves: rhbz#2035337
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.3-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sun May 16 2021 Mike FABIAN <mfabian@redhat.com> - 1.8.3-8
+- Correct misplaced non-alphabetic symbol in wubi-jidian table
+- Resolves: https://github.com/definite/ibus-table-chinese/pull/16
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Nov 03 2020 Mike FABIAN <mfabian@redhat.com> - 1.8.3-6
+- Remove BuildRequirement of cmake-fedora
+
+* Thu Jul 30 2020 Mike FABIAN <mfabian@redhat.com> - 1.8.3-5
+- Fix build on rawhide
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Thu Jul 16 2020 Mike FABIAN <mfabian@redhat.com> - 1.8.3-2
 - bump release number to force a rebuild with newer ibus-table >= 1.10.0

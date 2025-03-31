@@ -1,11 +1,5 @@
 {
  "Signatures": {
-  "pppoe-connect": "5ec49da5dd0c37ef8d44f9a5e936d7da8962fdda82e0f6911beb7f7eee55bffa",
-  "pppoe-server.service": "b0c7d3794d86c4831a8a86b10a9e93de5fc74ec0ad1dad69c765d7b6dabe2911",
-  "pppoe-setup": "ebde9256a43f7aa830fd592042e52109f5bbcf65c0375b43104224b3b8a3ccc7",
-  "pppoe-start": "62024fa05daee6c79d7b1d90c4c2043421e06b1b35dc4aa9c3384cf7c241dbb4",
-  "pppoe-status": "348f7ec2c76ab6d64022291b3c0228c6289c03eee91487dc42e59b2ceca50248",
-  "pppoe-stop": "ba52014d97c686eec8a2799698a831f6425b3895692816a0455c44edc48c6e80",
-  "rp-pppoe-3.12.tar.gz": "00794e04031546b0e9b8cf286f2a6d1ccfc4a621b2a3abb2d7ef2a7ab7cc86c2"
+  "rp-pppoe-4.0.tar.gz": "41ac34e5db4482f7a558780d3b897bdbb21fae3fef4645d2852c3c0c19d81cea"
  }
 }

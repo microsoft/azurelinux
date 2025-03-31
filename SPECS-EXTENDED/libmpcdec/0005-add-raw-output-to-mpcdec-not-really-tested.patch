@@ -1,0 +1,186 @@
+From a19f87fe308e84416eccf9279febff84b080c1c7 Mon Sep 17 00:00:00 2001
+From: r2d <r2d@c51c8d5e-032a-db11-a0f2-0002b3467eef>
+Date: Fri, 30 Mar 2012 21:52:54 +0000
+Subject: [PATCH 05/19] add raw output to mpcdec, not really tested
+
+git-svn-id: http://svn.musepack.net/libmpc/trunk@480 c51c8d5e-032a-db11-a0f2-0002b3467eef
+---
+ mpcdec/mpcdec.c | 98 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 84 insertions(+), 14 deletions(-)
+
+diff --git a/mpcdec/mpcdec.c b/mpcdec/mpcdec.c
+index b60483f..5ad3dd3 100644
+--- a/mpcdec/mpcdec.c
++++ b/mpcdec/mpcdec.c
+@@ -39,6 +39,8 @@
+ #include "../libmpcdec/internal.h"
+ #include <libwaveformat.h>
+ #include <getopt.h>
++#include <math.h>
++#include <byteswap.h>
+ 
+ #ifdef _MSC_VER
+ #include <crtdbg.h>
+@@ -75,6 +77,44 @@ t_wav_uint32 mpc_wav_output_seek(void* p_user_data, t_wav_uint32 p_position)
+     return (t_wav_uint32) !fseek(p_handle, p_position, SEEK_SET);
+ }
+ 
++#ifdef MPC_FIXED_POINT
++
++static int raw_output_int16(FILE * file, short * buff, int cnt, mpc_bool_t reverse_endian)
++{
++	int i;
++	for (i = 0; i < cnt; i++) {
++		short out = buff[i];
++		if (reverse_endian)
++			out = bswap_16(out);
++		if (fwrite(&out, sizeof(out), 1, file) != 1)
++			return -1;
++	}
++	return 0;
++}
++
++#else
++
++static int raw_output_float32(FILE * file, float * buff, int cnt, mpc_bool_t reverse_endian)
++{
++	int i;
++	for (i = 0; i < cnt; i++) {
++		int tmp = nearbyintf(buff[i] * (1 << 15));
++		short out;
++		if (tmp > ((1 << 15) - 1))
++			tmp = ((1 << 15) - 1);
++		if (tmp < -(1 << 15))
++			tmp = -(1 << 15);
++		if (reverse_endian)
++			tmp = bswap_16((short) tmp);
++		out = (short)tmp;
++		if (fwrite(&out, sizeof(out), 1, file) != 1)
++			return -1;
++	}
++	return 0;
++}
++
++#endif
++
+ static void print_info(mpc_streaminfo * info, char * filename)
+ {
+ 	int time = (int) mpc_streaminfo_get_length(info);
+@@ -108,6 +148,8 @@ usage(const char *exename)
+ 			"-i : print file information on stdout\n"
+ 			"-c : check the file for stream errors\n"
+ 			"     (doesn't fully decode, outfile will be ignored)\n"
++			"-r : output raw data (left/right) in machine native endian\n"
++			"-e : reverse raw data endianness\n"
+ 			"-h : print this help\n"
+             "you can use stdin and stdout as resp. <infile.mpc> and\n"
+             "<outfile.wav> replacing the file name by \"-\"\n", exename);
+@@ -121,13 +163,16 @@ main(int argc, char **argv)
+ 	mpc_streaminfo si;
+ 	mpc_status err;
+ 	mpc_bool_t info = MPC_FALSE, is_wav_output = MPC_FALSE, check = MPC_FALSE;
++	mpc_bool_t is_raw_output = MPC_FALSE, reverse_endian = MPC_FALSE;
+     MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH];
+-    clock_t begin, end, sum; int total_samples; t_wav_output_file wav_output;
++    clock_t begin, end, sum; int total_samples;
++	t_wav_output_file wav_output;
++	t_wav_output_file_callback wavo_fc;
+ 	int c;
+ 
+     fprintf(stderr, About);
+ 
+-	while ((c = getopt(argc , argv, "ihc")) != -1) {
++	while ((c = getopt(argc , argv, "ihcre")) != -1) {
+ 		switch (c) {
+ 			case 'i':
+ 				info = MPC_TRUE;
+@@ -135,6 +180,12 @@ main(int argc, char **argv)
+ 			case 'c':
+ 				check = MPC_TRUE;
+ 				break;
++			case 'r':
++				is_raw_output = MPC_TRUE;
++				break;
++			case 'e':
++				reverse_endian = MPC_TRUE;
++				break;
+ 			case 'h':
+ 				usage(argv[0]);
+ 				return 0;
+@@ -165,22 +216,29 @@ main(int argc, char **argv)
+ 		return 0;
+ 	}
+ 
+-	if (!check)
+-		is_wav_output = argc - optind > 1;
+-    if(is_wav_output)
++	if (check) {
++		is_raw_output = MPC_FALSE;
++	} else if (argc - optind > 1 && is_raw_output == MPC_FALSE) {
++		is_wav_output = MPC_TRUE;
++	};
++	
++    if (is_wav_output || is_raw_output)
+     {
+-        t_wav_output_file_callback wavo_fc;
+         memset(&wav_output, 0, sizeof wav_output);
+         wavo_fc.m_seek      = mpc_wav_output_seek;
+         wavo_fc.m_write     = mpc_wav_output_write;
+-		if (strcmp(argv[optind + 1], "-") == 0) {
++		if (strcmp(argv[optind + 1], "-") == 0 || (is_raw_output && argc - optind <= 1)) {
+ 			SET_BINARY_MODE(stdout);
+ 		    wavo_fc.m_user_data = stdout;
+ 		} else
+ 			wavo_fc.m_user_data = fopen(argv[optind + 1], "wb");
+-        if(!wavo_fc.m_user_data) return !MPC_STATUS_OK;
+-        err = waveformat_output_open(&wav_output, wavo_fc, si.channels, 16, 0, si.sample_freq, (t_wav_uint32) si.samples * si.channels);
+-        if(!err) return !MPC_STATUS_OK;
++        if(!wavo_fc.m_user_data)
++			return !MPC_STATUS_OK;
++		
++		if (is_wav_output) {
++			if (!waveformat_output_open(&wav_output, wavo_fc, si.channels, 16, 0, si.sample_freq, (t_wav_uint32) si.samples * si.channels))
++				return !MPC_STATUS_OK;
++		}
+     }
+ 
+     sum = total_samples = 0;
+@@ -199,7 +257,7 @@ main(int argc, char **argv)
+         total_samples += frame.samples;
+         sum           += end - begin;
+ 
+-		if(is_wav_output) {
++		if (is_wav_output || is_raw_output) {
+ #ifdef MPC_FIXED_POINT
+ 			mpc_int16_t tmp_buff[MPC_DECODER_BUFFER_LENGTH];
+ 			int i;
+@@ -209,11 +267,23 @@ main(int argc, char **argv)
+ 				if (tmp < -(1 << 15)) tmp = -(1 << 15);
+ 				tmp_buff[i] = tmp;
+ 			}
+-			if(waveformat_output_process_int16(&wav_output, tmp_buff, frame.samples * si.channels) < 0)
++#endif
++			if (is_wav_output) {
++#ifdef MPC_FIXED_POINT
++				if(waveformat_output_process_int16(&wav_output, tmp_buff, frame.samples * si.channels) < 0)
++#else
++				if(waveformat_output_process_float32(&wav_output, sample_buffer, frame.samples * si.channels) < 0)
++#endif
++					break;
++			}
++			if (is_raw_output) {
++#ifdef MPC_FIXED_POINT
++				if (raw_output_int16(wavo_fc.m_user_data, tmp_buff, frame.samples * si.channels, reverse_endian) < 0)
+ #else
+-			if(waveformat_output_process_float32(&wav_output, sample_buffer, frame.samples * si.channels) < 0)
++				if (raw_output_float32(wavo_fc.m_user_data, sample_buffer, frame.samples * si.channels, reverse_endian) < 0)
+ #endif
+-                break;
++					break;
++			}
+ 		}
+     }
+ 
+-- 
+2.46.0
+

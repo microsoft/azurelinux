@@ -1,0 +1,29 @@
+From ada9f82dbab5b07da49ca47e0b799b456d696b1a Mon Sep 17 00:00:00 2001
+From: Daniel Foster <daniel@amesite.me>
+Date: Fri, 13 Oct 2023 05:51:48 +0000
+Subject: [PATCH] Fix version command
+
+---
+ dao/main.cc | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/dao/main.cc b/dao/main.cc
+index 8bf4590..4fd447f 100644
+--- a/dao/main.cc
++++ b/dao/main.cc
+@@ -2489,8 +2489,10 @@ int main(int argc, char **argv)
+     options.commitSettings(settings, settingsPath);
+ 
+     // Just show version ? We're done.
+-    if (options.command == SHOW_VERSION)
+-	goto fail;
++    if (options.command == SHOW_VERSION) {
++        printVersion();
++        goto fail;
++    }
+ 
+     errPrintParams.no_utf8 = options.no_utf8;
+     filePrintParams.no_utf8 = options.no_utf8;
+-- 
+2.43.0
+
