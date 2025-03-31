@@ -45,7 +45,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    40%{?dist}
+Release:    41%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    BSD-2-Clause-Patent and OpenSSL and MIT
 URL:        http://www.tianocore.org
@@ -121,11 +121,13 @@ Patch0025: CVE-2023-45235.patch
 Patch0026: CVE-2023-45237.patch
 Patch0027: CVE-2023-45236.patch
 
+# Patches for the vendored OpenSSL are in the range from 1000 to 1999 (inclusive).
 Patch1000: CVE-2023-0464.patch
 Patch1001: CVE-2023-3817.patch
 Patch1002: CVE-2023-0465.patch
 Patch1003: CVE-2023-2650.patch
 Patch1004: improve-safety-of-DH.patch
+Patch1005: vendored-openssl-1.1.1-Only-free-the-read-buffers-if-we-re-not-using-them.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -306,18 +308,16 @@ git config am.keepcr true
 # -M Apply patches up to 999
 %autopatch -M 999
 
-cp -a -- %{SOURCE1} .
+# Unpack the vendored OpenSSL tarball.
+# Add it to the git index so that we can use autopatch, which
+# uses git am since we set it up that way initially.
+# Only apply patches between 1000 and 1999 (inclusive).
 tar -C CryptoPkg/Library/OpensslLib -a -f %{SOURCE2} -x
-# Need to patch CVE-2023-0464 in the bundled openssl
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1000}
-# Need to patch CVE-2023-3817 in the bundled openssl
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1001}
-# Need to patch CVE-2023-0465 in the bundled openssl
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1002}
-# Need to patch CVE-2023-2650 in the bundled openssl
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1003}
-# Apply patch "improve-safety-of-DH.patch"
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1004}
+git add .
+git commit -m 'add vendored openssl'
+%autopatch -p1 -m 1000 -M 1999
+
+cp -a -- %{SOURCE1} .
 
 # extract softfloat into place
 tar -xf %{SOURCE3} --strip-components=1 --directory ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3/
@@ -711,6 +711,9 @@ $tests_ok
 
 
 %changelog
+* Mon Mar 24 2025 Tobias Brick <tobiasb@microsoft.com> - 20230301gitf80f052277c8-41
+- Patch vendored openssl to only free read buffers if not in use.
+
 * Mon Sep 16 2024 Minghe Ren <mingheren@microsoft.com> - 20230301gitf80f052277c8-40
 - Add CVE-2022-36763, CVE-2022-36765, CVE-2023-45230, CVE-2023-45232, CVE-2023-45234, CVE-2023-45235, CVE-2023-45236, CVE-2023-45237 patch
 - Add fix-tpm-build-issue-from-CVE-2022-36763.patch 
