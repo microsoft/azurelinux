@@ -23,8 +23,13 @@ Patch2:         CVE-2024-6104.patch
 Patch3:         CVE-2024-24786.patch
 Patch4:         CVE-2023-44487.patch
 Patch5:         CVE-2025-22868.patch
+<<<<<<< HEAD
 Patch6:         0001-Fix-exit-condition-of-TestQuerierIndexQueriesRace.patch
 Patch7:         0002-Improve-sensitivity-of-TestQuerierIndexQueriesRace.patch
+=======
+Patch6:         CVE-2025-30204.patch
+
+>>>>>>> 6c42c8dd9 (Patch `prometheus` for CVE-2025-30204 [High] (#13193))
 BuildRequires:  golang
 BuildRequires:  nodejs
 BuildRequires:  nodejs-npm
@@ -141,8 +146,13 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
+<<<<<<< HEAD
 * Thu Mar 13 2025 Andrew Phelps <anphel@microsoft.com> - 2.45.4-9
 - Add patches to fix test reliability issues with TestQuerierIndexQueriesRace
+=======
+* Sun Mar 30 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.45.4-9
+- Patch CVE-2025-30204
+>>>>>>> 6c42c8dd9 (Patch `prometheus` for CVE-2025-30204 [High] (#13193))
 
 * Thu Mar 06 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.45.4-8
 - Fix CVE-2025-22868
