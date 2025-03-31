@@ -1,25 +1,25 @@
 %global srcname simpleline
 
-Name: python-%{srcname}
-Summary: A Python library for creating text UI
-Url: https://github.com/rhinstaller/python-%{srcname}
-Version: 1.9.0
-Release: 13%{?dist}
+Name: 		python-%{srcname}
+Summary: 	A Python library for creating text UI
+Url: 		https://github.com/rhinstaller/python-%{srcname}
+Version: 	1.9.0
+Release: 	13%{?dist}
 # This tarball was created from upstream git:
 #   git clone https://github.com/rhinstaller/python-simpleline
 #   cd python-simpleline && make archive
-Source0: https://github.com/rhinstaller/python-%{srcname}/releases/download/%{version}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0: 	https://github.com/rhinstaller/python-%{srcname}/releases/download/%{version}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-License: LGPL-3.0-or-later
+License: 	LGPL-3.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-BuildArch: noarch
-BuildRequires: make
-BuildRequires: python3-devel
-BuildRequires: gettext
-BuildRequires: python3-setuptools
-BuildRequires: intltool
-BuildRequires: python3-gobject-base
+BuildArch: 	noarch
+BuildRequires: 	make
+BuildRequires: 	python3-devel
+BuildRequires: 	gettext
+BuildRequires: 	python3-setuptools
+BuildRequires: 	intltool
+BuildRequires: 	python3-gobject-base
 
 %description
 Simpleline is a Python library for creating text UI.
@@ -31,7 +31,7 @@ Printed lines are never rewritten!
 
 %package -n python3-%{srcname}
 Summary: A Python3 library for creating text UI
-Requires: rpm-python3
+Requires: 	rpm-python3
 
 %{?python_provide:%python_provide python3-%{srcname}}
 
@@ -43,7 +43,7 @@ is appended to the bottom of the screen.
 Printed lines are never rewritten!
 
 %prep
-%setup -q -n %{srcname}-%{version}
+%autosetup -n %{srcname}-%{version}
 
 %build
 %make_build
@@ -54,7 +54,6 @@ make DESTDIR=%{buildroot} install
 
 %check
 make test
-
 
 %files -n python3-%{srcname} -f python-%{srcname}.lang
 %license LICENSE.md
