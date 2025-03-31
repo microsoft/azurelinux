@@ -4,11 +4,11 @@ Date: Mon, 20 Apr 2020 09:29:12 +0200
 Subject: [PATCH] Adapt build
 
 ---
- build.xml | 54 +++---------------------------------------------------
- 1 file changed, 3 insertions(+), 51 deletions(-)
+ build.xml | 61 +++----------------------------------------------------
+ 1 file changed, 3 insertions(+), 58 deletions(-)
 
 diff --git a/build.xml b/build.xml
-index cd7c2ed..16368e2 100644
+index ed632c2..d80abff 100644
 --- a/build.xml
 +++ b/build.xml
 @@ -112,17 +112,7 @@ For instructions on how to build JDOM, please view the README.txt file.
@@ -26,7 +26,7 @@ index cd7c2ed..16368e2 100644
 -		<!-- this is used for testing Java5 (the test sets stax.dir) -->
 -		<pathelement location="${stax.dir}/jsr173_1.0_api.jar" />
 -		<pathelement location="${stax.dir}/sjsxp.jar" />
-+          <fileset dir="${lib.dir}" includes="*.jar" />
++		<fileset dir="${lib.dir}" includes="*.jar" />
  	</path>
  
  	<path id="core.class.path">
@@ -39,7 +39,7 @@ index cd7c2ed..16368e2 100644
  	    description="Builds the Jars">
  		<fixcrlf srcdir="." includes="**/*.bat" excludes="build*.*" eol="crlf"/>
  		<fixcrlf srcdir="." includes="**/*.sh" excludes="build*.*" eol="lf"/>
-@@ -316,21 +306,6 @@ For instructions on how to build JDOM, please view the README.txt file.
+@@ -316,27 +306,6 @@ For instructions on how to build JDOM, please view the README.txt file.
  			<fileset dir="${core.build}" includes="**/*.class" />
  			<fileset dir="${metainf.build}" excludes="**/MANIFEST.MF" />
  		</jar>
@@ -53,15 +53,21 @@ index cd7c2ed..16368e2 100644
 -		</jar>
 -		<jar destfile="${package}/${jarbase}-javadoc.jar" 
 -			basedir="${build.javadocs}" includes="**/*" />
+-
 -		<jar jarfile="${package}/${jarbase}-sources.jar" >
 -			<fileset dir="${core.src}" includes="**/*" />
+-		</jar>
+-		<jar jarfile="${package}/${jarbase}-junit-sources.jar" >
 -			<fileset dir="${junit.src}" includes="**/*" />
+-		</jar>
+-		<jar jarfile="${package}/${jarbase}-contrib-sources.jar" >
 -			<fileset dir="${contrib.src}" includes="**/*" />
 -		</jar>
- 	    	    
+-	    	    
  	</target>
  	
-@@ -500,7 +475,7 @@ For instructions on how to build JDOM, please view the README.txt file.
+ 	<target name="androidtests" depends="jars">
+@@ -505,7 +474,7 @@ For instructions on how to build JDOM, please view the README.txt file.
  		<delete dir="${mavendir}" includes="**/*" failonerror="false"/>
  	</target>
  	
@@ -70,7 +76,7 @@ index cd7c2ed..16368e2 100644
  		description="Prepares Maven bundle to load on to Sonatype Nexus for Maven-Central">
  		<mkdir dir="${mavendir}" />
  		<mkdir dir="${mavendir}/core" />
-@@ -512,8 +487,6 @@ For instructions on how to build JDOM, please view the README.txt file.
+@@ -517,8 +486,6 @@ For instructions on how to build JDOM, please view the README.txt file.
  		
  		<!-- copy the build jar -->
  		<copy tofile="${mavendir}/core/${mavenbase}.jar" file="${package}/${jarbase}.jar"/>
@@ -79,10 +85,11 @@ index cd7c2ed..16368e2 100644
  		
  		<!-- load the license in to the ${license} property -->
  		<loadfile property="license" srcfile="LICENSE.txt" />
-@@ -528,27 +501,6 @@ For instructions on how to build JDOM, please view the README.txt file.
+@@ -532,28 +499,6 @@ For instructions on how to build JDOM, please view the README.txt file.
+ 				<filter token="license" value="${license}" />
  			</filterset>
  		</copy>
- 		
+-		
 -		<exec dir="${mavendir}/core" executable="${gpg}">
 -			<arg value="-abv"/>
 -			<arg value="${mavenbase}.pom"/>
@@ -108,5 +115,5 @@ index cd7c2ed..16368e2 100644
  	
  </project>
 -- 
-2.25.2
+2.37.2
 

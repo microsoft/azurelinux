@@ -1,0 +1,36 @@
+From 2cd62bbd935849f6f57e56074bd004036b8ed866 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Tue, 19 Nov 2024 16:43:52 -0800
+Subject: [PATCH] images: add type and formats for erofs and squashfs to back
+ FEX
+
+See https://fedoraproject.org/wiki/Changes/FEX ,
+https://pagure.io/koji/pull-request/4219 ,
+https://pagure.io/fedora-kiwi-descriptions/c/03aacd1 etc. We
+seem to be growing these images in Fedora composes, so we need
+a type and formats for them in productmd. These seem to be the
+logical choices - all these image formats seem to be intended for
+use with FEX, so I'm putting them all under the type 'fex'.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ productmd/images.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/productmd/images.py b/productmd/images.py
+index 4300911..ebaaebc 100644
+--- a/productmd/images.py
++++ b/productmd/images.py
+@@ -107,6 +107,9 @@ IMAGE_TYPE_FORMAT_MAPPING = {
+     'vpc': ['vhd'],
+     'vhd-compressed': ['vhd.gz', 'vhd.xz'],
+     'vsphere-ova': ['vsphere.ova'],
++    # these back FEX:
++    # https://fedoraproject.org/wiki/Changes/FEX
++    'fex': ['erofs.xz', 'erofs.gz', 'erofs', 'squashfs.xz', 'squashfs.gz', 'squashfs'],
+ }
+ 
+ #: supported image types
+-- 
+2.47.0
+

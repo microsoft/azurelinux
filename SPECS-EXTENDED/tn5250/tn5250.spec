@@ -5,17 +5,17 @@ Distribution:   Azure Linux
 
 Summary:   5250 Telnet protocol and Terminal
 Name:      tn5250
-Version:   0.17.4
-Release:   26%{?dist}
-License:   LGPLv2+
-Source:    http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+Version:   0.17.6
+Release:   4%{?dist}
+# doc/tn5250*.1 are GPLv2+
+License:   LGPL-2.1-or-later
+URL:       https://github.com/tn5250/tn5250
+Source:    %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:   xt5250.desktop
-# https://github.com/sharkcz/tn5250/tree/fedora
-Patch0:    tn5250-0.17.4-fedora.patch
-URL:       http://tn5250.sourceforge.net/
 Requires:  dialog
 Requires:  xterm
 Requires:  hicolor-icon-theme
+BuildRequires: make
 BuildRequires: gcc
 BuildRequires: ncurses-devel
 BuildRequires: openssl-devel
@@ -39,8 +39,7 @@ Libraries and header files to use with lib5250.
 
 
 %prep
-%setup -q
-%patch 0 -p1 -b .fedora
+%autosetup -p1
 
 autoreconf -vfi
 
@@ -48,27 +47,27 @@ autoreconf -vfi
 %build
 %configure --disable-static --disable-silent-rules
 
-make %{?_smp_mflags}
+%make_build
 
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
+%make_install
 
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{name}
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/icons/hicolor/{48x48,64x64}/apps
-install -m644 -p linux/5250.tcap $RPM_BUILD_ROOT/%{_datadir}/%{name}
-install -m644 -p linux/5250.terminfo $RPM_BUILD_ROOT/%{_datadir}/%{name}
-install -m644 -p tn5250-48x48.png $RPM_BUILD_ROOT/%{_datadir}/icons/hicolor/48x48/apps/tn5250.png
-install -m644 -p tn5250-62x48.png $RPM_BUILD_ROOT/%{_datadir}/icons/hicolor/64x64/apps/tn5250.png
-install -m644 -p tn5250-48x48.xpm $RPM_BUILD_ROOT/%{_datadir}/icons/hicolor/48x48/apps/tn5250.xpm
-install -m644 -p tn5250-62x48.xpm $RPM_BUILD_ROOT/%{_datadir}/icons/hicolor/64x64/apps/tn5250.xpm
-rm -f $RPM_BUILD_ROOT/%{_libdir}/lib5250.la
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/applications
+mkdir -p %{buildroot}/%{_datadir}/%{name}
+mkdir -p %{buildroot}/%{_datadir}/icons/hicolor/{48x48,64x64}/apps
+install -m644 -p linux/5250.tcap %{buildroot}/%{_datadir}/%{name}
+install -m644 -p linux/5250.terminfo %{buildroot}/%{_datadir}/%{name}
+install -m644 -p tn5250-48x48.png %{buildroot}/%{_datadir}/icons/hicolor/48x48/apps/tn5250.png
+install -m644 -p tn5250-62x48.png %{buildroot}/%{_datadir}/icons/hicolor/64x64/apps/tn5250.png
+install -m644 -p tn5250-48x48.xpm %{buildroot}/%{_datadir}/icons/hicolor/48x48/apps/tn5250.xpm
+install -m644 -p tn5250-62x48.xpm %{buildroot}/%{_datadir}/icons/hicolor/64x64/apps/tn5250.xpm
+rm -f %{buildroot}/%{_libdir}/lib5250.la
+mkdir -p %{buildroot}/%{_datadir}/applications
 desktop-file-install  \
-   --dir $RPM_BUILD_ROOT/%{_datadir}/applications %{SOURCE1}
+   --dir %{buildroot}/%{_datadir}/applications %{SOURCE1}
 cp -pf linux/README README.Linux
 
-/usr/bin/tic -o $RPM_BUILD_ROOT/%{_datadir}/terminfo linux/5250.terminfo
+/usr/bin/tic -o %{buildroot}/%{_datadir}/terminfo linux/5250.terminfo
 
 
 %files
@@ -91,8 +90,46 @@ cp -pf linux/README README.Linux
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.17.4-26
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Jan 13 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.17.6-4
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Oct 17 2023 Dan Horák <dan[at]danny.cz> - 0.17.6-1
+- updated to 0.17.6
+- modernize spec file
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.4-34
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.4-33
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sun Nov 27 2022 Florian Weimer <fweimer@redhat.com> - 0.17.4-32
+- Port sources to C99
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.4-31
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.4-30
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 0.17.4-29
+- Rebuilt with OpenSSL 3.0.0
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.4-28
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.4-27
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.4-26
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.4-25
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

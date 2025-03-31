@@ -1,7 +1,9 @@
 {
  "Signatures": {
-  "rpmlint-1.11.tar.gz": "2ea1f4726382bcf24652ea710b4e98fdfd7f83a7c44a7ee2f5eaf5b201be9ac3",
-  "rpmlint-etc.config": "a67ac4b60d488a3f6c9b90a5c51ea3889b57201cef8f72862ba82a35e8cb7b96",
-  "rpmlint.config": "228c2598e5a25677245acede3ad790a209aa4e67aeca9ddc2f218b34588d43e0"
+  "fedora.toml": "5e9100a61e778d0485730beec8afd6f9b563b6290fdaa9f436e1a5d8d30552db",
+  "rpmlint-2.5.0.tar.gz": "a9276782bd9ebca2337ae61a498d4d444e0dce003447409b2339b4cce67b6762",
+  "scoring.toml": "2064a55889fafe8149019e323c8eb763f1689ce8cf4f45b2d38770a78782717a",
+  "users-groups.toml": "e9e0349183469a644faf12ca1f34573c81b3aec5fc470ed80b3841cb840d9638",
+  "warn-on-functions.toml": "06eaf8cca5eb80a8381e3f3c289f4de37d468c7cad919a1c1506981ccc2fae6a"
  }
 }

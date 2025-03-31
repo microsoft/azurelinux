@@ -1,18 +1,16 @@
 Name:           perl-SGMLSpm
 Version:        1.03ii
-Release:        49%{?dist}
+Release:        63%{?dist}
 Summary:        Perl library for parsing the output of nsgmls
 
-License:        GPLv2+
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:        GPL-2.0-or-later
 URL:            https://metacpan.org/release/SGMLSpm
-Source0:        https://cpan.metacpan.org/authors/id/D/DM/DMEGG/SGMLSpm-%{version}.tar.gz#/perl-SGMLSpm-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/D/DM/DMEGG/SGMLSpm-%{version}.tar.gz
 
 BuildArch:      noarch
+BuildRequires: make
 BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
-Requires:  perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Requires:       openjade
 
 %description
@@ -41,8 +39,50 @@ make install_system \
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.03ii-49
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.03ii-63
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.03ii-62
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.03ii-61
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Jul 25 2023 Michal Josef Špaček <mspacek@redhat.com> - 1.03ii-60
+- Update license to SPDX format
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.03ii-59
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.03ii-58
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.03ii-57
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.03ii-56
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.03ii-55
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.03ii-54
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.03ii-53
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.03ii-52
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.03ii-51
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.03ii-50
+- Perl 5.32 re-rebuild of bootstrapped packages
+
+* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.03ii-49
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.03ii-48
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

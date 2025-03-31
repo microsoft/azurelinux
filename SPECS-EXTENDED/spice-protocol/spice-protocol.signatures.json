@@ -1,7 +1,7 @@
 {
  "Signatures": {
-  "spice-protocol-0.14.3.tar.xz": "f986e5bc2a1598532c4897f889afb0df9257ac21c160c083703ae7c8de99487a",
-  "spice-protocol-0.14.3.tar.xz.sig": "498b2673fb904050b62a15d91d39ad6a35644aa27d34684fb3f20528f6681c72",
+  "spice-protocol-0.14.4.tar.xz": "04ffba610d9fd441cfc47dfaa135d70096e60b1046d2119d8db2f8ea0d17d912",
+  "spice-protocol-0.14.4.tar.xz.sig": "d5416f50a49220967d9ef66c25e75b8b6c51d4d372dea48c5d55249f865a989e",
   "victortoso-E37A484F.keyring": "baf674e73d98c2070ee63a914d192111d0df4777f64a9f523a1f9096dce2b6f7"
  }
 }

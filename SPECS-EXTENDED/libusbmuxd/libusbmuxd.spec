@@ -1,17 +1,18 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:          libusbmuxd
-Version:       2.0.0
-Release:       3%{?dist}
+Version:       2.1.0
+Release:       1%{?dist}
 Summary:       Client library USB multiplex daemon for Apple's iOS devices
 
-License:       LGPLv2+
+License:       LGPLv2.1+
 URL:           http://www.libimobiledevice.org/
-Source0:       https://github.com/libimobiledevice/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:       https://github.com/libimobiledevice/%{name}/releases/download/%{version}/%{name}-%{version}.tar.bz2
 
 BuildRequires:  gcc
 BuildRequires:  libplist-devel >= 2.1.0
 BuildRequires:  autoconf automake libtool
+BuildRequires:  libimobiledevice-glue-devel
 
 %description
 libusbmuxd is the client library used for communicating with Apple's iPod Touch,
@@ -35,9 +36,7 @@ Obsoletes: usbmuxd-devel < 1.0.9
 Files for development with %{name}.
 
 %prep
-%setup -q
-
-NOCONFIGURE=1 ./autogen.sh
+%autosetup -p1
 
 %build
 %configure --disable-static
@@ -62,18 +61,24 @@ make check
 %{!?_licensedir:%global license %%doc}
 %license COPYING
 %doc README.md AUTHORS
-%{_libdir}/libusbmuxd.so.*
+%{_libdir}/libusbmuxd-2.0.so.*
 
 %files utils
+%doc %{_mandir}/man1/inetcat.1.gz
+%doc %{_mandir}/man1/iproxy.1.gz
 %{_bindir}/iproxy
-%{_bindir}/icat
+%{_bindir}/inetcat
 
 %files devel
 %{_includedir}/usbmuxd*
-%{_libdir}/pkgconfig/libusbmuxd.pc
-%{_libdir}/libusbmuxd.so
+%{_libdir}/pkgconfig/libusbmuxd-2.0.pc
+%{_libdir}/libusbmuxd-2.0.so
 
 %changelog
+* Tue Oct 29 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 2.1.0-1
+- Upgrade to 2.1.0
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

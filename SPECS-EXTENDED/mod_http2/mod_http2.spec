@@ -1,35 +1,43 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 # Module Magic Number
 %{!?_httpd_mmn: %global _httpd_mmn %(cat %{_includedir}/httpd/.mmn 2>/dev/null || echo 0-0)}
 
 Name:		mod_http2
-Version:	1.15.14
-Release:	2%{?dist}
+Version:	2.0.29
+Release:	3%{?dist}
 Summary:	module implementing HTTP/2 for Apache 2
-License:	ASL 2.0
+License:	Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:		https://icing.github.io/mod_h2/
 Source0:	https://github.com/icing/mod_h2/releases/download/v%{version}/mod_http2-%{version}.tar.gz
-Patch1:         mod_http2-1.14.1-buildfix.patch
+BuildRequires:  make
 BuildRequires:  gcc
-BuildRequires:	pkgconfig, httpd-devel >= 2.4.20, libnghttp2-devel >= 1.7.0, openssl-devel >= 1.0.2
-Requires:	httpd-mmn
-Conflicts:      httpd < 2.4.25-8
+BuildRequires:  pkgconfig
+BuildRequires:	httpd-devel >= 2.4.20
+BuildRequires:	libnghttp2-devel >= 1.7.0
+BuildRequires:	openssl-devel >= 1.0.2
+BuildRequires:  autoconf
+BuildRequires:	libtool
+BuildRequires:	/usr/bin/hostname
+Requires:       httpd-mmn
+Conflicts:      httpd < 2.4.48
+# https://bugzilla.redhat.com/show_bug.cgi?id=2131458
+Conflicts:      libnghttp2 < 1.50.0-1
 
 %description
 The mod_h2 Apache httpd module implements the HTTP2 protocol (h2+h2c) on
 top of libnghttp2 for httpd 2.4 servers.
 
 %prep
-%setup -q
-%patch 1 -p1 -b .buildfix
+%autosetup
 
 %build
-%configure
-make %{?_smp_mflags} V=1
+autoreconf -i
+%configure --with-apxs=%{_httpd_apxs}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 rm -rf %{buildroot}/etc/httpd/share/doc/
 
 # create configuration
@@ -46,8 +54,85 @@ echo "LoadModule proxy_http2_module modules/mod_proxy_http2.so" > %{buildroot}%{
 %{_httpd_moddir}/mod_proxy_http2.so
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.15.14-2
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+* Wed Mar 12 2025 <v-guakhila@microsoft.com> - 2.0.29-3
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.29-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jul 11 2024 Luboš Uhliarik <luhliari@redhat.com> - 2.0.29-1
+- new version 2.0.29
+
+* Fri Apr  5 2024 Joe Orton <jorton@redhat.com> - 2.0.27-1
+- update to 2.0.27
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.26-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.26-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jan 17 2024 Luboš Uhliarik <luhliari@redhat.com> - 2.0.26-1
+- new version 2.0.26
+
+* Sat Oct 21 2023 Luboš Uhliarik <luhliari@redhat.com> - 2.0.25-1
+- new version 2.0.25
+
+* Mon Sep 11 2023 Luboš Uhliarik <luhliari@redhat.com> - 2.0.22-1
+- new version 2.0.22
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.18-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 01 2023 Luboš Uhliarik <luhliari@redhat.com> - 2.0.18-1
+- new version 2.0.18
+- SPDX migration
+
+* Wed Apr 12 2023 Luboš Uhliarik <luhliari@redhat.com> - 2.0.14-1
+- new version 2.0.14
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.11-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Dec 20 2022 Joe Orton <jorton@redhat.com> - 2.0.11-1
+- update to 2.0.11
+- fix conflict with older libnghttp2
+
+* Thu Oct  6 2022 Joe Orton <jorton@redhat.com> - 2.0.9-1
+- update to 2.0.9
+
+* Fri Sep 23 2022 Joe Orton <jorton@redhat.com> - 2.0.7-1
+- update to 2.0.7
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.15.24-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.15.24-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Sep 17 2021 Joe Orton <jorton@redhat.com> - 1.15.24-1
+- update to 1.15.24
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 1.15.23-2
+- Rebuilt with OpenSSL 3.0.0
+
+* Fri Aug  6 2021 Joe Orton <jorton@redhat.com> - 1.15.23-1
+- update to 1.15.23
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.15.19-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 11 2021 Luboš Uhliarik <luhliari@redhat.com> - 1.15.19-1
+- new version 1.15.19
+- Resolves: #1968014 - CVE-2021-31618 httpd: NULL pointer dereference on
+  specially crafted HTTP/2 request
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.15.14-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Aug 27 2020 Joe Orton <jorton@redhat.com> - 1.15.14-2
+- use apxs via _httpd_apxs macro
 
 * Mon Aug 17 2020 Joe Orton <jorton@redhat.com> - 1.15.14-1
 - update to 1.15.14

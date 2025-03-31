@@ -16,8 +16,8 @@ Distribution:   Azure Linux
 
 Summary:	A dynamic, any to any, pixel format conversion library
 Name:		babl
-Version:	0.1.82
-Release:	3%{?dist}
+Version:	0.1.108
+Release:	1%{?dist}
 
 # Compute some version related macros
 # Ugly hack, you need to get your quoting backslashes/percent signs straight
@@ -68,7 +68,7 @@ This package contains documentation needed for developing with %{name}.
 %autosetup -p1
 
 %build
-%meson
+%meson -Dgi-docgen=disabled -Dwith-docs=false
 %meson_build
 
 %install
@@ -101,6 +101,7 @@ popd
 %files
 %license docs/COPYING*
 %doc AUTHORS NEWS
+%{_bindir}/babl
 %{_libdir}/libbabl-%{apiver}.so.0*
 %{_libdir}/babl-%{apiver}/
 %dir %{_libdir}/girepository-1.0
@@ -109,7 +110,7 @@ popd
 %files devel
 %{_includedir}/babl-%{apiver}/
 %{_libdir}/libbabl-%{apiver}.so
-%{_libdir}/pkgconfig/%{name}.pc
+%{_libdir}/pkgconfig/%{name}-0.1.pc
 %dir %{_datadir}/gir-1.0
 %{_datadir}/gir-1.0/Babl-%{apiver}.gir
 %{_datadir}/vala/
@@ -118,6 +119,10 @@ popd
 %doc %{develdocdir}
 
 %changelog
+* Mon Nov 18 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.1.108-1
+- Catch up to upstream
+- License verified.
+
 * Fri Mar 18 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.82-3
 - Adding BR on "openssh-clients" to provide "scp".
 - License verified.

@@ -1,23 +1,17 @@
-Summary:        A remote mail retrieval and forwarding utility
-Name:           fetchmail
-Version:        6.4.22
-Release:        1%{?dist}
-# For a breakdown of the licensing, see COPYING
-License:        GPL+ AND Public Domain
+Summary: A remote mail retrieval and forwarding utility
+Name: fetchmail
+Version: 6.4.39
+Release: 2%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://www.fetchmail.info/
-Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
-# systemd service file
-Source2:        fetchmail.service
-# example configuration file
-Source3:        fetchmailrc.example
-BuildRequires:  gcc
-BuildRequires:  gettext-devel
-BuildRequires:  krb5-devel
-BuildRequires:  openssl-devel
-BuildRequires:  python3-devel
-BuildRequires:  systemd
+
+Source0: https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
+Source1: https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz.asc
+URL: https://www.fetchmail.info/
+# For a breakdown of the licensing, see COPYING
+License: GPL-2.0-or-later AND LicenseRef-Fedora-Public-Domain
+BuildRequires: gcc gettext-devel krb5-devel openssl-devel python3-devel
+BuildRequires: make
 
 %description
 Fetchmail is a remote mail retrieval and forwarding utility intended
@@ -31,35 +25,17 @@ Install fetchmail if you need to retrieve mail over SLIP or PPP
 connections.
 
 %prep
-%autosetup -p1
+%setup -q
 
 %build
-%configure \
-    --enable-ETRN \
-    --enable-IMAP \
-    --enable-NTLM \
-    --enable-POP3 \
-    --enable-RPA \
-    --enable-SDPS \
-    --enable-fallback=no \
-    --enable-nls\
-    --with-gssapi \
-    --with-kerberos5 \
-    --with-ssl \
-    --without-hesiod 
-
-%make_build
+%configure --enable-POP3 --enable-IMAP --with-ssl --without-hesiod \
+	--enable-ETRN --enable-NTLM --enable-SDPS --enable-RPA \
+	--enable-nls --with-kerberos5 --with-gssapi \
+	--enable-fallback=no
+make
 
 %install
-%make_install DESTDIR=%{buildroot}
-
-# install example systemd unit
-mkdir -p %{buildroot}%{_unitdir}
-install -p -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/fetchmail.service
-
-# install example config file
-mkdir -p %{buildroot}%{_sysconfdir}
-install -p -m 600 %{SOURCE3} %{buildroot}%{_sysconfdir}/fetchmailrc.example
+make install DESTDIR=$RPM_BUILD_ROOT
 
 # remove fetchmailconf stuff
 rm -f %{buildroot}%{_bindir}/fetchmailconf*
@@ -67,29 +43,178 @@ rm -f %{buildroot}%{_mandir}/man1/fetchmailconf.1*
 rm -f %{buildroot}%{python3_sitelib}/fetchmailconf.py*
 rm -f %{buildroot}%{python3_sitelib}/__pycache__/fetchmailconf*
 
-%find_lang %{name}
+%find_lang %name
 
 %files -f %{name}.lang
-%license COPYING
-%doc FAQ FEATURES NEWS NOTES README README.SSL TODO
+%doc COPYING FAQ FEATURES NEWS NOTES README README.SSL TODO contrib/systemd
 %{_bindir}/fetchmail
 %{_mandir}/man1/fetchmail.1*
-%{_unitdir}/fetchmail.service
-%config(noreplace) %attr(0600, mail, mail) %{_sysconfdir}/fetchmailrc.example
 
 %changelog
-* Thu Aug 31 2023 Muhammad Falak <mwani@microsoft.com> - 6.4.22-1
-- Upgrade version to address CVE-2021-39272 & CVE-2021-36386
-- License verified
-- Lint spec
-- Switch to %autosetup, %make_build & %make_install
+* Fri Dec 28 2024 Jyoti kanase <v-jykanase@microsoft.com> -  6.4.39-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.4.8-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jul 25 2024 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.39-1
+- Update to fetchmail-6.4.39
 
-* Tue Jul 07 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.8-1
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.4.38-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Feb 01 2024 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.38-1
+- Update to fetchmail-6.4.38
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.4.37-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.4.37-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 6.4.37-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu May 25 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.37-2
+- SPDX migration
+
+* Thu Mar 09 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.37-1
+- Update to fetchmail-6.4.37
+
+* Mon Jan 30 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.36-1
+- Update to fetchmail-6.4.36
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 6.4.35-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jan 06 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.35-1
+- Update to fetchmail-6.4.35
+
+* Mon Oct 17 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.34-1
+- Update to fetchmail-6.4.34
+
+* Mon Sep 12 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.33-1
+- Update to fetchmail-6.4.33
+
+* Thu Aug 04 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.32-1
+- Update to fetchmail-6.4.32
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.4.31-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jul 18 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.31-1
+- Update to fetchmail-6.4.31
+
+* Thu May 05 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.30-1
+- Update to fetchmail-6.4.30
+
+* Mon Mar 21 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.29-1
+- Update to fetchmail-6.4.29
+- Remove example config file and service unit, include systemd related
+  documentation from upstream contrib directory
+  Resolves: #2027047
+
+* Thu Mar 17 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.28-1
+- Update to fetchmail-6.4.28
+
+* Wed Mar 02 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.27-1
+- Update to fetchmail-6.4.27
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.4.26-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jan 06 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.26-1
+- Update to fetchmail-6.4.26
+
+* Tue Dec 14 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.25-1
+- Update to fetchmail-6.4.25
+
+* Mon Nov 22 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.24-1
+- Update to fetchmail-6.4.24
+
+* Mon Nov 01 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.23-1
+- Update to fetchmail-6.4.23
+
+* Thu Sep 16 2021 Sahana Prasad <sahana@redhat.com> - 6.4.22-2
+- Rebuilt with OpenSSL 3.0.0
+
+* Thu Sep 16 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.22-1
+- Update to fetchmail-6.4.22 (CVE-2021-39272)
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 6.4.21-2
+- Rebuilt with OpenSSL 3.0.0
+
+* Mon Aug 16 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.21-1
+- Update to fetchmail-6.4.21
+
+* Tue Aug 03 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.20-1
+- Update to fetchmail-6.4.20 (CVE-2021-36386)
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 6.4.19-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Apr 28 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.19-1
+- Update to fetchmail-6.4.19
+
+* Wed Mar 31 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.18-1
+- Update to fetchmail-6.4.18
+
+* Thu Mar 11 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.17-1
+- Update to fetchmail-6.4.17
+
+* Thu Feb 11 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.16-1
+- Update to fetchmail-6.4.16
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 6.4.15-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jan 12 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.15-1
+- Update to fetchmail-6.4.15
+
+* Thu Dec 10 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.14-2
+- Revert change that added sgid bit to fetchmail
+  Resolves: #1906353
+
+* Mon Nov 30 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.14-1
+- Update to fetchmail-6.4.14
+
+* Thu Oct 29 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.13-1
+- Update to fetchmail-6.4.13
+
+* Tue Sep 15 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.12-1
+- Update to fetchmail-6.4.12
+
+* Wed Sep 02 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.11-1
+- Update to fetchmail-6.4.11
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 6.4.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Thu Jun 18 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.8-1
 - Update to fetchmail-6.4.8
-  Resolves: #1853446
+  Resolves: #1846929
+
+* Tue Jun 02 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.6-1
+- Update to fetchmail-6.4.6
+  Resolves: #1841525
+
+* Thu May 28 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.5-2
+- Change group of fetchmail to mail and set sgid bit on it
+  Resolves: #1619069
+
+* Thu May 14 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.5-1
+- Update to fetchmail-6.4.5
+  Resolves: #1833072
+
+* Mon Apr 27 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.4-1
+- Update to fetchmail-6.4.4
+  Resolves: #1828038
+
+* Mon Apr 06 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.3-1
+- Update to fetchmail-6.4.3
+  Resolves: #1820999
+
+* Tue Feb 18 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 6.4.2-1
+- Update to fetchmail-6.4.2
+  Resolves: #1803270
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 6.4.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

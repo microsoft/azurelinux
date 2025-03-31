@@ -3,7 +3,7 @@
 Summary:        Local network service discovery
 Name:           avahi
 Version:        0.8
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,7 @@ Patch5:         CVE-2023-38472.patch
 Patch6:         CVE-2023-38473.patch
 Patch7:         CVE-2023-38470.patch
 Patch8:         CVE-2023-38471.patch
+Patch9:         CVE-2024-52616.patch
 BuildRequires:  automake
 BuildRequires:  dbus-devel >= 0.90
 BuildRequires:  dbus-glib-devel >= 0.70
@@ -425,6 +426,9 @@ exit 0
 %endif
 
 %changelog
+* Thu Feb 13 2024 Kanishk Bansal <kanbansal@microsoft.com> - 0.8-5
+- Fix CVE-2024-52616 with an upstream patch
+
 * Mon Dec 02 2024 Kanishk Bansal <kanbansal@microsoft.com> - 0.8-4
 - Fix CVE-2023-38471 with an upstream patch
 - Fix CVE-2023-38470 with an upstream patch

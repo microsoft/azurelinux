@@ -1,5 +1,9 @@
 {
  "Signatures": {
-  "perl-DBD-mysql-4.050.tar.gz": "4f48541ff15a0a7405f76adc10f81627c33996fbf56c95c26c094444c0928d78"
+  "DBD-mysql-5.010.tar.gz": "2ca2ff39d93e89d4f7446e5f0faf03805e9167ee9b8a04ba7cb246e2cb46eee7",
+  "test-clean.t": "3c9a5d1a77e5ffe50aadce53b78c33cecdebfdfb89316251de9684b9d89d7599",
+  "test-env.sh": "0588c644613e286f5bc01666049fef1cd6c963460ecf66602150dfc6fabe71aa",
+  "test-setup.t": "b41bb1a3475d2f23b0512a63a1d3f81ac6a160edc51900c82f0b8416d32e6bcc",
+  "testrules.yml": "3fbf28c6c09951ea1921030e9031236793434f3eaba7e6465fad0d0d647a997d"
  }
 }

@@ -1,3 +1,5 @@
+%undefine __cmake_in_source_build
+
 ## 1.11 currently disables tests with BUILD_SHARED_LIBS=ON
 #bcond_without tests
 #bcond_without doc
@@ -5,32 +7,33 @@
 Summary:        Audio Meta-Data Library
 Name:           taglib
 Version:        1.13.1
-Release:        1%{?dist}
-License:        LGPLv2 OR MPLv1.1
+Release:        2%{?dist}
+License:    (LGPL-2.1-only OR MPL-1.1) AND BSD-2-Clause AND LGPL-2.1-only
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://taglib.github.io/
+URL:        https://taglib.github.io/
+%if 0%{?snap:1}
+Source0:    taglib-%{version}-%{snap}.tar.gz
+%else
+Source0:    https://taglib.github.io/releases/taglib-%{version}%{?beta}.tar.gz
+%endif
 # The snapshot tarballs generated with the following script:
-Source1:        taglib-snapshot.sh
+Source1:    taglib-snapshot.sh
 # http://bugzilla.redhat.com/343241
+# fix multilib, and drop -lz flag to consumers (probably only needed for static linking)
 Patch102:       taglib-1.13.1-multilib.patch
 
-BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
-BuildRequires:  pkgconfig
-BuildRequires:  zlib-devel
-%if 0%{?snap:1}
-Source0:        taglib-%{version}-%{snap}.tar.gz
-%else
-Source0:        http://taglib.github.io/releases/taglib-%{version}%{?beta}.tar.gz
-%endif
+BuildRequires: cmake
+BuildRequires: pkgconfig
+BuildRequires: zlib-devel
 %if %{with tests}
-BuildRequires:  cppunit-devel
+BuildRequires: cppunit-devel
 %endif
 %if %{with doc}
-BuildRequires:  doxygen
-BuildRequires:  graphviz
+BuildRequires: doxygen
+BuildRequires: graphviz
 %endif
 
 %description
@@ -40,49 +43,47 @@ files, Ogg Vorbis comments and ID3 tags and Vorbis comments in FLAC, MPC,
 Speex, WavPack, TrueAudio files, as well as APE Tags.
 
 %package doc
-Summary:        API Documentation for %{name}
-BuildArch:      noarch
+Summary: API Documentation for %{name}
+BuildArch: noarch
 
 %description doc
 This is API documentation generated from the TagLib source code.
 
 %package devel
-Summary:        Development files for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Summary: Development files for %{name}
+Requires: %{name}%{?_isa} = %{version}-%{release}
 %if ! %{with doc}
-Obsoletes:      %{name}-doc
+Obsoletes: %{name}-doc < %{version}-%{release}
 %endif
 
 %description devel
 Files needed when building software with %{name}.
+
 
 %prep
 %autosetup -n taglib-%{version}%{?beta} -p1
 
 
 %build
-mkdir %{_target_platform}
-pushd %{_target_platform}
-%cmake .. \
+%{cmake} \
 %if %{with tests}
   -DBUILD_TESTS:BOOL=ON \
 %endif
   -DCMAKE_BUILD_TYPE:STRING="Release"
-popd
 
-%make_build -C %{_target_platform}
+%cmake_build
 
 %if %{with doc}
-make docs -C %{_target_platform}
+%cmake_build --target docs
 %endif
 
 
 %install
-make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
+%cmake_install
 
 %if %{with doc}
 rm -fr %{apidocdir} ; mkdir %{apidocdir}
-cp -a %{_target_platform}/doc/html/ %{apidocdir}/
+cp -a %{_vpath_builddir}/doc/html/ %{apidocdir}/
 ln -s html/index.html %{apidocdir}
 find %{apidocdir} -name '*.md5' | xargs rm -fv
 %endif
@@ -95,7 +96,7 @@ test "$(pkg-config --modversion taglib_c)" = "%{version}"
 %if %{with tests}
 #ln -s ../../tests/data %{_target_platform}/tests/
 #LD_LIBRARY_PATH=%{buildroot}%{_libdir}:$LD_LIBRARY_PATH \
-make check -C %{_target_platform}
+%ctest
 %endif
 
 %ldconfig_scriptlets
@@ -122,12 +123,51 @@ make check -C %{_target_platform}
 
 
 %changelog
-* Mon Sep 18 2023 Archana Choudhary <archana1@microsoft.com> - 1.13.1-1
-- Upgrade to 1.13.1 - CVE-2018-11439, CVE-2017-12678
+* Fri Jan 10 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.13.1-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.1-13
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sat Jan 04 2025 Uwe Klotz <uwe.klotz@gmail.com> - 1.13.1-1
+- Upgrade to v1.13.1
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.12-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.12-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.12-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.12-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.12-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.12-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.12-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Mar 29 2021 Rex Dieter <rdieter@fedoraproject.org> - 1.12-4
+- fix multilib.patch (#1943870)
+
+* Wed Mar 03 2021 Rex Dieter <rdieter@fedoraproject.org> - 1.12-3
+- -devel: fix/drop -lz references in taglib-config, taglib.pc
+
+* Tue Feb 16 2021 Rex Dieter <rdieter@fedoraproject.org> - 1.12-2
+- use versioned obsoletes
+
+* Tue Feb 16 2021 David King <amigadave@amigadave.com> - 1.12-1
+- Update to 1.12 (#1584870)
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.11.1-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.11.1-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.11.1-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -240,6 +280,7 @@ make check -C %{_target_platform}
 
 * Thu Sep 06 2012 Rex Dieter <rdieter@fedoraproject.org> 1.8-1
 - taglib-1.8
+
 -* Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.7.2-2
 -- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
@@ -368,7 +409,7 @@ make check -C %{_target_platform}
 - svn20071111 snapshot (#376241)
 
 * Thu Sep 27 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.5-0.5.20070924svn
-- -BR: automake 
+- -BR: automake
 - +BR: zlib-devel
 
 * Thu Sep 27 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.5-0.4.20070924svn

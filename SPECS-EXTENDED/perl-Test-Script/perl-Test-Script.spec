@@ -1,12 +1,10 @@
 Name:           perl-Test-Script
-Version:        1.26
-Release:        3%{?dist}
+Version:        1.29
+Release:        12%{?dist}
 Summary:        Cross-platform basic tests for scripts
-License:        GPL+ or Artistic
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Script
-Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Test-Script-%{version}.tar.gz#/perl-Test-Script-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Test-Script-%{version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  %{__perl}
@@ -31,7 +29,6 @@ BuildRequires:  perl(Text::ParseWords)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description
 The intent of this module is to provide a series of basic tests for scripts
@@ -41,11 +38,11 @@ in the bin directory of your Perl distribution.
 %setup -q -n Test-Script-%{version}
 
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
-%{__make} %{?_smp_mflags}
+%{__perl} Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-%{__make} pure_install DESTDIR=$RPM_BUILD_ROOT
+%{make_install} DESTDIR=$RPM_BUILD_ROOT
 %{_fixperms} $RPM_BUILD_ROOT/*
 
 %check
@@ -58,8 +55,54 @@ in the bin directory of your Perl distribution.
 %{_mandir}/man3/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.26-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.29-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.29-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.29-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.29-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.29-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Nov 30 2022 Ralf Corsépius <corsepiu@fedoraproject.org> - 1.29-7
+- Convert license to SPDX.
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.29-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.29-5
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.29-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.29-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.29-2
+- Perl 5.34 rebuild
+
+* Mon May 17 2021 Ralf Corsépius <corsepiu@fedoraproject.org> - 1.29-1
+- Update to 1.29.
+- Modernize spec.
+
+* Sat Mar 13 2021 Ralf Corsépius <corsepiu@fedoraproject.org> - 1.27-1
+- Update to 1.27.
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.26-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.26-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.26-3
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.26-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

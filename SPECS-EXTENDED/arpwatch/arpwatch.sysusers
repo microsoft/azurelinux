@@ -1,0 +1,2 @@
+#Type Name      ID  GECOS                         Home directory     Shell
+u     arpwatch  -   "Service user for arpwatch"   /var/lib/arpwatch  /sbin/nologin

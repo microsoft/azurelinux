@@ -1,0 +1,149 @@
+policy_module(mrtg, 1.9.0)
+
+########################################
+#
+# Declarations
+#
+
+type mrtg_t;
+type mrtg_exec_t;
+init_system_domain(mrtg_t, mrtg_exec_t)
+
+type mrtg_initrc_exec_t;
+init_script_file(mrtg_initrc_exec_t)
+
+type mrtg_etc_t;
+files_config_file(mrtg_etc_t)
+
+type mrtg_lock_t;
+files_lock_file(mrtg_lock_t)
+
+type mrtg_log_t;
+logging_log_file(mrtg_log_t)
+
+type mrtg_var_lib_t;
+files_type(mrtg_var_lib_t)
+
+type mrtg_var_run_t;
+files_pid_file(mrtg_var_run_t)
+
+########################################
+#
+# Local policy
+#
+
+allow mrtg_t self:capability { chown setgid setuid };
+dontaudit mrtg_t self:capability sys_tty_config;
+allow mrtg_t self:process signal_perms;
+allow mrtg_t self:fifo_file rw_fifo_file_perms;
+
+allow mrtg_t mrtg_etc_t:dir list_dir_perms;
+allow mrtg_t mrtg_etc_t:file read_file_perms;
+allow mrtg_t mrtg_etc_t:lnk_file read_lnk_file_perms;
+
+allow mrtg_t mrtg_lock_t:dir manage_dir_perms;
+allow mrtg_t mrtg_lock_t:file manage_file_perms;
+allow mrtg_t mrtg_lock_t:lnk_file manage_lnk_file_perms;
+files_lock_filetrans(mrtg_t, mrtg_lock_t, { dir file })
+
+manage_dirs_pattern(mrtg_t, mrtg_log_t, mrtg_log_t)
+append_files_pattern(mrtg_t, mrtg_log_t, mrtg_log_t)
+create_files_pattern(mrtg_t, mrtg_log_t, mrtg_log_t)
+setattr_files_pattern(mrtg_t, mrtg_log_t, mrtg_log_t)
+logging_log_filetrans(mrtg_t, mrtg_log_t, { dir file })
+
+manage_files_pattern(mrtg_t, mrtg_var_lib_t, mrtg_var_lib_t)
+manage_lnk_files_pattern(mrtg_t, mrtg_var_lib_t, mrtg_var_lib_t)
+
+allow mrtg_t mrtg_var_run_t:file manage_file_perms;
+files_pid_filetrans(mrtg_t, mrtg_var_run_t, file)
+
+kernel_read_system_state(mrtg_t)
+kernel_read_network_state(mrtg_t)
+kernel_read_kernel_sysctls(mrtg_t)
+
+corecmd_exec_bin(mrtg_t)
+corecmd_exec_shell(mrtg_t)
+
+corenet_all_recvfrom_netlabel(mrtg_t)
+corenet_tcp_sendrecv_generic_if(mrtg_t)
+corenet_tcp_sendrecv_generic_node(mrtg_t)
+
+corenet_sendrecv_all_client_packets(mrtg_t)
+corenet_tcp_connect_all_ports(mrtg_t)
+corenet_tcp_sendrecv_all_ports(mrtg_t)
+
+dev_read_sysfs(mrtg_t)
+dev_read_urand(mrtg_t)
+
+domain_use_interactive_fds(mrtg_t)
+domain_dontaudit_search_all_domains_state(mrtg_t)
+
+files_getattr_tmp_dirs(mrtg_t)
+files_read_etc_runtime_files(mrtg_t)
+files_search_var(mrtg_t)
+files_search_locks(mrtg_t)
+files_search_var_lib(mrtg_t)
+files_search_spool(mrtg_t)
+
+fs_search_auto_mountpoints(mrtg_t)
+fs_getattr_all_fs(mrtg_t)
+fs_list_inotifyfs(mrtg_t)
+
+term_dontaudit_use_console(mrtg_t)
+
+init_use_fds(mrtg_t)
+init_use_script_ptys(mrtg_t)
+init_read_utmp(mrtg_t)
+init_dontaudit_write_utmp(mrtg_t)
+
+auth_use_nsswitch(mrtg_t)
+
+libs_read_lib_files(mrtg_t)
+
+logging_send_syslog_msg(mrtg_t)
+
+selinux_dontaudit_getattr_dir(mrtg_t)
+
+userdom_use_inherited_user_terminals(mrtg_t)
+userdom_dontaudit_read_user_home_content_files(mrtg_t)
+userdom_dontaudit_use_unpriv_user_fds(mrtg_t)
+userdom_dontaudit_list_admin_dir(mrtg_t)
+
+netutils_domtrans_ping(mrtg_t)
+
+ifdef(`enable_mls',`
+	corenet_udp_sendrecv_lo_if(mrtg_t)
+')
+
+optional_policy(`
+	apache_manage_sys_content(mrtg_t)
+')
+
+optional_policy(`
+	cron_system_entry(mrtg_t, mrtg_exec_t)
+')
+
+optional_policy(`
+	hostname_exec(mrtg_t)
+')
+
+optional_policy(`
+	hddtemp_domtrans(mrtg_t)
+')
+
+optional_policy(`
+	seutil_sigchld_newrole(mrtg_t)
+')
+
+optional_policy(`
+	quota_dontaudit_getattr_db(mrtg_t)
+')
+
+optional_policy(`
+	snmp_read_snmp_var_lib_files(mrtg_t)
+')
+
+optional_policy(`
+	udev_read_db(mrtg_t)
+')

@@ -1,0 +1,21 @@
+commit c7528139dc8a6999fea65d94f7b8fbb424a6bd06
+Author: Chrissie Caulfield <ccaulfie@redhat.com>
+Date:   Mon Nov 20 12:15:21 2023 +0000
+
+    doxygen2man: Include libxml/parser.h (#494)
+    
+    This seems to be needed for newer versions of libxml
+    but shouldn't break older ones (CI to confirm!)
+
+diff --git a/doxygen2man/doxygen2man.c b/doxygen2man/doxygen2man.c
+index 3dab47d..a90fefb 100644
+--- a/doxygen2man/doxygen2man.c
++++ b/doxygen2man/doxygen2man.c
+@@ -31,6 +31,7 @@
+ #include <errno.h>
+ #include <ctype.h>
+ #include <libxml/tree.h>
++#include <libxml/parser.h>
+ #include <qb/qblist.h>
+ #include <qb/qbmap.h>
+ #include "cstring.h"

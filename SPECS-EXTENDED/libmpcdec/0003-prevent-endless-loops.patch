@@ -1,0 +1,26 @@
+From 73ce57718c1dca4a788e18946a42af3bacfad8b3 Mon Sep 17 00:00:00 2001
+From: r2d <r2d@c51c8d5e-032a-db11-a0f2-0002b3467eef>
+Date: Fri, 30 Mar 2012 19:54:01 +0000
+Subject: [PATCH 03/19] prevent endless loops
+
+git-svn-id: http://svn.musepack.net/libmpc/trunk@478 c51c8d5e-032a-db11-a0f2-0002b3467eef
+---
+ libmpcdec/mpc_demux.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libmpcdec/mpc_demux.c b/libmpcdec/mpc_demux.c
+index 4d74dc7..c28a9a0 100644
+--- a/libmpcdec/mpc_demux.c
++++ b/libmpcdec/mpc_demux.c
+@@ -633,7 +633,7 @@ mpc_status mpc_demux_decode(mpc_demux * d, mpc_frame_info * i) {
+ 		if (MPC_IS_FAILURE(s))
+ 			i->bits = -1; // we pretend it's end of file
+ 
+-		if (MPC_IS_FAILURE(s) || i->samples > 0)
++		if (i->bits == -1 || i->samples > 0)
+ 			return s;
+ 	}
+ }
+-- 
+2.46.0
+

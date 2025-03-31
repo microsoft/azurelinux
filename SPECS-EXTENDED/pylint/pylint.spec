@@ -1,116 +1,323 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-Name:           pylint
-Version:        2.4.4
-Release:        4%{?dist}
-Summary:        Analyzes Python code looking for bugs and signs of poor quality
-License:        GPLv2+
-URL:            http://www.pylint.org/
-Source0:        %{pypi_source}
+## START: Set by rpmautospec
+## (rpmautospec version 0.7.3)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 1;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
 
+# Remove -s from Python shebang - ensure that extensions installed with pip
+# to user locations are seen and properly loaded
+%undefine _py3_shebang_s
+
+%global forgeurl https://github.com/PyCQA/pylint
+%global basever 3.3.2
+#%%global prever b0
+Version:        3.3.2
+%forgemeta
+
+Name:           pylint
+Release:        %autorelease
+Summary:        Analyzes Python code looking for bugs and signs of poor quality
+License:        GPL-2.0-or-later
+URL:            https://github.com/pylint-dev/pylint
+Source0:        %{forgeurl}/archive/v%{basever}/pylint-%{basever}.tar.gz
+#Patch0:         7829.patch apply when rebased then re-enable tests
 BuildArch:      noarch
 
+BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
 # For tests
-BuildRequires:  python3-astroid >= 2.0.2
-BuildRequires:  python3-isort
-BuildRequires:  python3-mccabe
-BuildRequires:  python3-pytest
-BuildRequires:  python3-pytest-runner
+BuildRequires:  python3-GitPython
+BuildRequires:  python3-pytest-benchmark
+BuildRequires:  python3-typing-extensions
 
 # For the main pylint package
 Requires:       python3-%{name} = %{version}-%{release}
 
-%description
-Pylint is a Python source code analyzer which looks for programming
-errors, helps enforcing a coding standard and sniffs for some code
-smells (as defined in Martin Fowler's Refactoring book).
-Pylint can be seen as another PyChecker since nearly all tests you
-can do with PyChecker can also be done with Pylint. However, Pylint
-offers some more features, like checking length of lines of code,
-checking if variable names are well-formed according to your coding
-standard, or checking if declared interfaces are truly implemented,
-and much more.
-Additionally, it is possible to write plugins to add your own checks.
+%global _description %{expand:
+Pylint is a Python source code analyzer which looks for programming errors,
+helps enforcing a coding standard and sniffs for some code smells (as defined in
+Martin Fowler's Refactoring book). Pylint can be seen as another PyChecker since
+nearly all tests you can do with PyChecker can also be done with Pylint.
+However, Pylint offers some more features, like checking length of lines of
+code, checking if variable names are well-formed according to your coding
+standard, or checking if declared interfaces are truly implemented, and much
+more.
+
+Additionally, it is possible to write plugins to add your own checks.}
+
+%description %_description
 
 %package -n python3-%{name}
 Summary:        %{summary}
-Requires:       python3-astroid >= 2.3.0
-Requires:       python3-setuptools
-Requires:       python3-mccabe
-Requires:       python3-isort
-Obsoletes:      python3-pylint-gui < 1.7
-%{?python_provide:%python_provide python3-%{name}}
 
-%description -n python3-%{name}
-Pylint is a Python source code analyzer which looks for programming
-errors, helps enforcing a coding standard and sniffs for some code
-smells (as defined in Martin Fowler's Refactoring book).
-Pylint can be seen as another PyChecker since nearly all tests you
-can do with PyChecker can also be done with Pylint. However, Pylint
-offers some more features, like checking length of lines of code,
-checking if variable names are well-formed according to your coding
-standard, or checking if declared interfaces are truly implemented,
-and much more.
-Additionally, it is possible to write plugins to add your own checks.
+%description -n python3-%{name} %_description
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-%{basever}
+# Relax version requirements
+sed -i -e 's/"setuptools>=[^"]*"/"setuptools"/' pyproject.toml
 
-# Convert DOS line endings to Unix
-sed -i 's/\r//g' README.rst
+%generate_buildrequires
+%pyproject_buildrequires
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 rm -rf %{buildroot}%{python3_sitelib}/pylint/test
 
-mkdir -pm 755 %{buildroot}%{_mandir}/man1
-install -pm 644 man/*.1 %{buildroot}%{_mandir}/man1/
-
 # Add -%%{python3_version} to the binaries and manpages for backwards compatibility
-for NAME in epylint pylint pyreverse symilar; do
+for NAME in pylint pyreverse symilar; do
     mv %{buildroot}%{_bindir}/{$NAME,${NAME}-%{python3_version}}
     ln -s ${NAME}-%{python3_version} %{buildroot}%{_bindir}/${NAME}-3
-    mv %{buildroot}%{_mandir}/man1/{${NAME}.1,${NAME}-%{python3_version}.1}
-    ln -s ${NAME}-%{python3_version}.1 %{buildroot}%{_mandir}/man1/${NAME}-3.1
     ln -s ${NAME}-%{python3_version} %{buildroot}%{_bindir}/${NAME}
-    ln -s ${NAME}-%{python3_version}.1 %{buildroot}%{_mandir}/man1/${NAME}.1
 done
 
 %check
 export PYTHONPATH=%{buildroot}%{python3_sitelib}
-%{__python3} bin/pylint -rn --rcfile=pylintrc --load-plugins=pylint.extensions.docparams, pylint.extensions.mccabe pylint || :
-# Skip failing tests.
-%{__python3} -m pytest -v -k "not (test_by_module_statement_value or import_outside_toplevel or deprecated_methods_py38 or member_checks_py37)"
+# astroid gets confused if pylint is importable both from buildroot/sitelib
+# (see above) and the location we're running the tests from, so we'll
+# move it out of the way here
+#mkdir src
+#mv pylint src
+# Skip benchmarks
+# It's not immediately clear why the delected tests fail
+%{__python3} -m pytest -v --ignore=benchmark \
+  --deselect=tests/test_functional.py::test_functional[missing_timeout] \
+  --deselect=tests/test_functional.py::test_functional[wrong_import_order]
 
 %files
-%doc README.rst ChangeLog examples elisp
-%license COPYING
-%{_bindir}/epylint
+%doc CONTRIBUTORS.txt
+%license LICENSE
 %{_bindir}/pylint
+%{_bindir}/pylint-config
 %{_bindir}/pyreverse
 %{_bindir}/symilar
-%{_mandir}/man1/epylint.1*
-%{_mandir}/man1/pylint.1*
-%{_mandir}/man1/pyreverse.1*
-%{_mandir}/man1/symilar.1*
 
 %files -n python3-%{name}
-%license COPYING
+%license LICENSE
 %{python3_sitelib}/pylint*
 # backwards compatible versioned executables and manpages:
 %{_bindir}/*-3
 %{_bindir}/*-%{python3_version}
-%{_mandir}/man1/*-3.1*
-%{_mandir}/man1/*-%{python3_version}.1*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.4-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+## START: Generated by rpmautospec
+* Mon Dec 02 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.3.2-1
+- 3.3.2
+
+* Wed Oct 23 2024 Orion Poplawski <orion@nwra.com> - 3.3.1-2
+- Use %%pyproject_buildrequires and re-enable tests
+
+* Tue Sep 24 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.3.1-1
+- 3.3.1
+
+* Fri Sep 20 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.3.0-1
+- 3.3.0
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jul 03 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.2.5-1
+- 3.2.5
+
+* Wed Jun 12 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.2.3-2
+- Python 3.13 rebuild.
+
+* Thu Jun 06 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.2.3-1
+- 3.2.3
+
+* Mon May 20 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.2.2-1
+- 3.2.2
+
+* Fri May 17 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.2.0-1
+- 3.2.0
+
+* Mon Feb 26 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.1.0-2
+- 3.1.0
+
+* Mon Feb 26 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.1.0-1
+- 3.1.0
+
+* Fri Feb 23 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.0.4-1
+- 3.0.4
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jan 10 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.0.3-4
+- Update URL
+
+* Tue Jan 09 2024 Gwyn Ciesla <gwync@protonmail.com> - 3.0.3-3
+- Drop -s from shebang
+
+* Tue Dec 12 2023 Gwyn Ciesla <gwync@protonmail.com> - 3.0.3-2
+- Fix isort pin
+
+* Mon Dec 11 2023 Gwyn Ciesla <gwync@protonmail.com> - 3.0.3-1
+- 3.0.3
+
+* Mon Oct 23 2023 Gwyn Ciesla <gwync@protonmail.com> - 3.0.2-1
+- 3.0.2
+
+* Thu Oct 05 2023 Gwyn Ciesla <gwync@protonmail.com> - 3.0.1-1
+- 3.0.1
+
+* Tue Oct 03 2023 Gwyn Ciesla <gwync@protonmail.com> - 3.0.0-1
+- 3.0.0
+
+* Tue Sep 26 2023 Gwyn Ciesla <gwync@protonmail.com> - 3.0.0~a7-1
+- Version correction
+
+* Mon Sep 25 2023 Gwyn Ciesla <gwync@protonmail.com> - 3.0.0a7-1
+- 3.0.0a7
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.17.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Vojtech Trefny <vtrefny@redhat.com> - 2.17.4-3
+- Backport "Use astroid.Context enum" from upstream
+
+* Mon Jul 10 2023 Gwyn Ciesla <gwync@protonmail.com> - 2.17.4-2
+- sources
+
+* Mon Jul 10 2023 Gwyn Ciesla <gwync@protonmail.com> - 2.17.4-1
+- 2.17.4, unpin astroid
+
+* Sun Jul 02 2023 Python Maint <python-maint@redhat.com> - 2.17.2-2
+- Rebuilt for Python 3.12
+
+* Mon Apr 03 2023 Gwyn Ciesla <gwync@protonmail.com> - 2.17.2-1
+- 2.17.2
+
+* Wed Mar 22 2023 Gwyn Ciesla <gwync@protonmail.com> - 2.17.1-1
+- 2.17.1
+
+* Wed Mar 08 2023 Gwyn Ciesla <gwync@protonmail.com> - 2.17.0-1
+- 2.17.0
+
+* Tue Mar 07 2023 Gwyn Ciesla <gwync@protonmail.com> - 2.16.4-1
+- 2.16.4
+
+* Fri Mar 03 2023 Gwyn Ciesla <gwync@protonmail.com> - 2.16.3-2
+- migrated to SPDX license
+
+* Fri Mar 03 2023 Gwyn Ciesla <gwync@protonmail.com> - 2.16.3-1
+- 2.16.3
+
+* Mon Feb 13 2023 Gwyn Ciesla <gwync@protonmail.com> - 2.16.2-1
+- 2.16.2
+
+* Thu Feb 02 2023 Yaakov Selkowitz <yselkowitz@fedoraproject.org> - 2.15.10-6
+- BuildRequire pyproject-rpm-macros explicitly
+
+* Wed Feb 01 2023 Gwyn Ciesla <gwync@protonmail.com> - 2.15.10-5
+- Adjust astroid pin
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.15.10-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Jan 16 2023 Miro Hrončok <miro@hroncok.cz> - 2.15.10-3
+- Remove an unneeded build dependency on deprecated python3-toml
+- https://fedoraproject.org/wiki/Changes/DeprecatePythonToml
+
+* Fri Jan 13 2023 Gwyn Ciesla <gwync@protonmail.com> - 2.15.10-2
+- br pip
+
+* Fri Jan 13 2023 Gwyn Ciesla <gwync@protonmail.com> - 2.15.10-1
+- 2.15.10
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.14.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jul 12 2022 Adam Williamson <awilliam@redhat.com> - 2.14.4-2
+- Replace syntax_test error fix with a more upstreamable one
+
+* Tue Jul 12 2022 Adam Williamson <awilliam@redhat.com> - 2.14.4-1
+- Update to 2.14.4, bump astroid dep, fix and re-enable tests
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 2.13.7-2
+- Rebuilt for Python 3.11
+
+* Fri Apr 22 2022 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.13.7-1
+- Version 2.13.7 (rhbz#1944393)
+
+* Fri Apr 22 2022 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.12.2-4
+- Deduplicate %%description
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.12.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jan 06 2022 Gwyn Ciesla <gwync@protonmail.com> - 2.12.2-1
+- 2.12.2
+
+* Fri Oct 08 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.11.1-1
+- 2.11.1
+
+* Wed Sep 15 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.10.2-1
+- 2.10.2
+
+* Tue Aug 10 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.9.6-1
+- 2.9.6
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.7.4-2
+- Rebuilt for Python 3.10
+
+* Thu Apr 15 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.7.4-1
+- 2.7.4
+
+* Mon Mar 29 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.7.3-1
+- 2.7.3
+
+* Mon Mar 01 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.7.2-1
+- 2.7.2
+
+* Tue Feb 23 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.7.1-1
+- 2.7.1
+
+* Tue Feb 16 2021 Gwyn Ciesla <gwync@protonmail.com> - 2.6.2-1
+- 2.6.2
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Nov 17 2020 Gwyn Ciesla <gwync@protonmail.com> - 2.6.0-2
+- Patch for upstream issue 3882
+
+* Fri Aug 21 2020 Gwyn Ciesla <gwync@protonmail.com> - 2.6.0-1
+- 2.6.0
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 08 2020 Gwyn Ciesla <gwync@protonmail.com> - 2.5.3-2
+- Adapt to isort 5.x
+
+* Fri Jun 19 2020 Gwyn Ciesla <gwync@protonmail.com> - 2.5.3-1
+- 2.5.3
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 2.5.2-2
+- Rebuilt for Python 3.9
+
+* Tue May 05 2020 Gwyn Ciesla <gwync@protonmail.com> - 2.5.2-1
+- 2.5.2
+
+* Tue May 05 2020 Gwyn Ciesla <gwync@protonmail.com> - 2.5.1-1
+- 2.5.1
+
+* Thu Apr 30 2020 Gwyn Ciesla <gwync@protonmail.com> - 2.5.0-1
+- 2.5.0
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.4-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -467,3 +674,5 @@ export PYTHONPATH=%{buildroot}%{python3_sitelib}
 
 * Fri Apr 22 2005 Konstantin Ryabitsev <icon@linux.duke.edu> - 0.6.4-1
 - Initial packaging.
+
+## END: Generated by rpmautospec

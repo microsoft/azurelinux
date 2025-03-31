@@ -1,21 +1,15 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global srcname into-dbus-python
 
 Name:           python-%{srcname}
-Version:        0.07
-Release:        6%{?dist}
+Version:        0.8.2
+Release:        8%{?dist}
 Summary:        Transformer to dbus-python types
-
-License:        ASL 2.0
+License:        Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/stratis-storage/into-dbus-python
-Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
-
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
-
-%if 0%{?with_check}
-BuildRequires:  python3-pip
-%endif
 
 %global _description \
 Facilities for converting an object that inhabits core Python types, e.g.,\
@@ -29,12 +23,7 @@ Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-dbus-signature-pyparsing
-BuildRequires:  python3-dbus
-BuildRequires:  python3-hypothesis
-BuildRequires:  python3-hs-dbus-signature
-Requires:       python3-dbus-signature-pyparsing
-Requires:       python3-dbus
+
 
 %description -n python3-%{srcname} %{_description}
 
@@ -49,11 +38,6 @@ Python 3 version.
 %install
 %py3_install
 
-%check
-pip3 install pytest==7.1.3 sortedcontainers
-pip3 install .
-pytest -v tests
-
 %files -n python3-%{srcname}
 %license LICENSE
 %doc README.rst
@@ -61,15 +45,66 @@ pytest -v tests
 %{python3_sitelib}/into_dbus_python-*.egg-info/
 
 %changelog
-* Tue Nov 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.07-6
-- Freezing "pytest" deps to version 7.1.3 to avoid regressions.
+* Fri Dec 20 2024 Akhila Guruju <v-guakhila@microsoft.com> - 0.8.2-8
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
 
-* Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.07-5
-- Drop BR on pytest & pip install latest deps to enable ptest
-- License verified
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.07-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.8.2-6
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.8.2-2
+- Rebuilt for Python 3.12
+
+* Thu May 4 2023 mulhern <amulhern@redhat.com> - 0.8.2-1
+- Upgrade to new release; fix license field; use TMT format tests
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.08-7
+- Rebuilt for Python 3.11
+
+* Fri Feb 25 2022 mulhern <amulhern@redhat.com> - 0.08.6
+- Add gating tests
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 29 2021 mulhern <amulhern@redhat.com> - 0.08-5
+- Remove redundant requires
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.08-3
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Dec 7 2020 mulhern<amulhern@redhat.com> - 0.08-1
+- New version: 0.08
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.07-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.07-4
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.07-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
