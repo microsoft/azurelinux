@@ -1,24 +1,27 @@
 
 Summary:        Exif and Iptc metadata manipulation library
 Name:           exiv2
-Version:        0.28.0
+Version:        0.28.3
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.exiv2.org/
+URL:            https://www.exiv2.org/
 Source0:        https://github.com/Exiv2/exiv2/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
 BuildRequires:  cmake
-BuildRequires:  curl-devel
-BuildRequires:  doxygen
-BuildRequires:  expat-devel
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
+BuildRequires:  pkgconfig
+BuildRequires:  pkgconfig(expat)
+BuildRequires:  pkgconfig(INIReader)
+BuildRequires:  pkgconfig(zlib)
+# docs
+BuildRequires:  doxygen
 BuildRequires:  graphviz
-BuildRequires:  libssh2-devel
 BuildRequires:  libxslt
-BuildRequires:  zlib-devel
-BuildRequires:  inih-devel
+
+
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description
@@ -64,19 +67,18 @@ BuildArch:      noarch
 
 %build
 
-%{cmake} . \
+%{cmake}  \
   -DCMAKE_INSTALL_DOCDIR="%{_pkgdocdir}" \
   -DEXIV2_BUILD_DOC:BOOL=ON \
   -DEXIV2_ENABLE_NLS:BOOL=ON \
   -DEXIV2_BUILD_SAMPLES:BOOL=OFF
 
-%make_build
-%make_build doc
+%cmake_build
+%cmake_build --target doc
 
 
 %install
-make install/fast DESTDIR=%{buildroot}
-
+%cmake_install
 %find_lang exiv2 --with-man
 
 ## unpackaged files
@@ -91,9 +93,7 @@ test -x %{buildroot}%{_libdir}/libexiv2.so
 
 %files -f exiv2.lang
 %license COPYING
-%doc doc/ChangeLog
-# README is mostly installation instructions
-#doc README.md
+%license COPYING doc/COPYING-XMPSDK
 %{_bindir}/exiv2
 %{_mandir}/man1/exiv2*.1*
 
@@ -114,6 +114,10 @@ test -x %{buildroot}%{_libdir}/libexiv2.so
 
 
 %changelog
+* Wed Oct 23 2024 Jyoti kanase <v-jykanase@microsoft.com> - 0.28.3-1
+- Update to version 0.28.3
+- License verified
+
 * Mon Sep 18 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 0.28.0-1
 - Upgrade version to address 24 CVE:
   CVE-2019-13504, CVE-2019-17402, CVE-2019-20421, 

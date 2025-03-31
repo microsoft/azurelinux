@@ -1,0 +1,36 @@
+From c876adc774e7bb3c896b013f13d7c6ce80e79544 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Thu, 26 Oct 2023 09:53:40 -0400
+Subject: [PATCH] Replace _PyList_Extend with PyList_SetSlice
+
+This private function is no longer exported in Python 3.13.
+
+It is possible that a PyList_Extend() function-like macro may be added
+before Python 3.13 final, but using PyList_SetSlice() directly will
+still work.
+
+https://github.com/python/cpython/pull/108451
+
+https://github.com/python/cpython/issues/111138
+---
+ pvectorcmodule.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/pvectorcmodule.c b/pvectorcmodule.c
+index 8667abb..9b83a56 100644
+--- a/pvectorcmodule.c
++++ b/pvectorcmodule.c
+@@ -1313,12 +1313,10 @@ static PyObject *PVectorEvolver_append(PVectorEvolver *self, PyObject *args) {
+ }
+ 
+ static PyObject *PVectorEvolver_extend(PVectorEvolver *self, PyObject *args) {
+-  PyObject *retVal = _PyList_Extend((PyListObject *)self->appendList, args);
+-  if (retVal == NULL) {
++  if (PyList_SetSlice(self->appendList, PY_SSIZE_T_MAX, PY_SSIZE_T_MAX, args) < 0) {
+     return NULL;
+   }
+ 
+-  Py_DECREF(retVal);
+   Py_INCREF(self);
+   return (PyObject*)self;
+ }

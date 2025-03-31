@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.osgi</groupId>
+  <artifactId>osgi.annotation</artifactId>
+  <version>8.1.0</version>
+  <description>OSGi Annotation Release 8, Annotations for use in compiling bundles</description>
+  <name>org.osgi:osgi.annotation</name>
+  <url>https://docs.osgi.org/</url>
+  <organization>
+    <name>Eclipse Foundation</name>
+  </organization>
+  <licenses>
+    <license>
+      <name>Apache-2.0</name>
+      <url>https://opensource.org/licenses/Apache-2.0</url>
+      <distribution>repo</distribution>
+      <comments>This program and the accompanying materials are made available under the terms of the Apache License, Version 2.0.</comments>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://github.com/osgi/osgi</url>
+    <connection>scm:git:https://github.com/osgi/osgi.git</connection>
+    <developerConnection>scm:git:git@github.com:osgi/osgi.git</developerConnection>
+    <tag>8.0.0.1</tag>
+  </scm>
+  <developers>
+    <developer>
+      <id>osgi</id>
+      <email>osgi-wg@eclipse.org</email>
+      <name>OSGi Working Group</name>
+      <organization>Eclipse Foundation</organization>
+      <organizationUrl>https://www.osgi.org/</organizationUrl>
+    </developer>
+  </developers>
+</project>

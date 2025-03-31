@@ -1,20 +1,24 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global smallversion 0.4
 
 Name:           libvisual
-Version:        0.4.0
-Release:        30%{?dist}
+Version:        0.4.1
+Release:        5%{?dist}
+Epoch:          1
+
 Summary:        Abstraction library for audio visualisation plugins
-License:        LGPLv2+
-URL:            http://libvisual.sf.net
-Source0:        http://dl.sf.net/libvisual/libvisual-%{version}.tar.gz
-BuildRequires:  gcc-c++
-BuildRequires:  xorg-x11-proto-devel
-# https://bugzilla.redhat.com/show_bug.cgi?id=435771
+License:        LGPL-2.1-or-later
+URL:            https://libvisual.sf.net
+Source0:        https://sourceforge.net/projects/%{name}/files/%{name}/%{name}-%{version}/%{name}-%{version}.tar.bz2
+
 Patch0:         libvisual-0.4.0-better-altivec-detection.patch
-Patch1:         libvisual-0.4.0-inlinedefineconflict.patch
-Patch2:		libvisual-0.4.0-format-security.patch
+Patch1:         libvisual-0.4.0-respect-environment-ldflags.patch
+Patch2:         libvisual-c99.patch
+
+BuildRequires:  automake
+BuildRequires:  gcc-c++
+BuildRequires:  make
+BuildRequires:  sdl12-compat-devel
+BuildRequires:  xorg-x11-proto-devel
 
 %description
 Libvisual is an abstraction library that comes between applications and
@@ -31,7 +35,7 @@ anywhere he wants.
 
 %package        devel
 Summary:        Development files for libvisual
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description    devel
 Libvisual is an abstraction library that comes between applications and
@@ -41,24 +45,57 @@ This package contains the files needed to build an application with libvisual.
 
 %prep
 %setup -q
-%patch 0 -p1 -b .altivec-detection
-%patch 1 -p1 -b .inlinedefineconflict
-%patch 2 -p1 -b .format-security
+%patch -P0 -p1 -b .better-altivec-detection
+%patch -P1 -p1 -b .respect-environment-ldflags
+%patch -P2 -p1 -b .c99
 
 %build
-%ifarch i386
-export CFLAGS="${RPM_OPT_FLAGS} -mmmx"
-%endif
 %configure
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
+
+# Avoid multilib conflicts
+case `uname -i` in
+  i386 | ppc | s390 | sparc )
+    wordsize="32"
+    ;;
+  x86_64 | ppc64 | s390x | sparc64 )
+    wordsize="64"
+    ;;
+  *)
+    wordsize=""
+    ;;
+esac
+
+if test -n "$wordsize"
+then
+  mv %{buildroot}%{_includedir}/libvisual-%{smallversion}/libvisual/lvconfig.h \
+     %{buildroot}%{_includedir}/libvisual-%{smallversion}/libvisual/lvconfig-$wordsize.h
+
+  cat >%{buildroot}%{_includedir}/libvisual-%{smallversion}/libvisual/lvconfig.h <<EOF
+#ifndef __LV_CONFIG_H_MULTILIB__
+#define __LV_CONFIG_H_MULTILIB__
+
+#include <bits/wordsize.h>
+
+#if __WORDSIZE == 32
+# include "lvconfig-32.h"
+#elif __WORDSIZE == 64
+# include "lvconfig-64.h"
+#else
+# error "unexpected value for __WORDSIZE macro"
+#endif
+
+#endif
+EOF
+
+fi
+
 find %{buildroot} -type f -name "*.la" -exec rm -f {} ';'
 
 %find_lang %{name}-%{smallversion}
-
-%ldconfig_scriptlets
 
 %files -f %{name}-%{smallversion}.lang
 %doc AUTHORS ChangeLog NEWS README TODO
@@ -73,11 +110,53 @@ find %{buildroot} -type f -name "*.la" -exec rm -f {} ';'
 
 
 %changelog
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.4.0-30
-- Remove epoch
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.4.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:0.4.0-29
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.4.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.4.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.4.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Feb 08 2023 Vitaly Zaitsev <vitaly@easycoding.org> - 1:0.4.1-1
+- Updated to version 0.4.1.
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.4.0-38
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Jan 09 2023 Florian Weimer <fweimer@redhat.com> - 1:0.4.0-37
+- C99 compatibility fixes
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.4.0-36
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.4.0-35
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Sep 23 2021 Timm Bäder <tbaeder@redhat.com> - 1:0.4.0-34
+- Add patch to respect environment LDFLAGS
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.4.0-33
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.4.0-32
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jan 19 2021 Kalev Lember <klember@redhat.com> - 1:0.4.0-31
+- Use make_build/make_install macros
+- Drop unneeded ldconfig_scriptlets macro call
+- Remove a no longer needed -mmmx CFLAGS addition
+- Disable strict aliasing
+
+* Fri Jan 15 2021 Kalev Lember <klember@redhat.com> - 1:0.4.0-30
+- Fix multilib conflicts in lvconfig.h
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.4.0-29
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.4.0-28
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

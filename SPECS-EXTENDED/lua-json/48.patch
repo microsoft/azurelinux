@@ -1,0 +1,37 @@
+From 473d61d262a1c86a69ad9b4882352d122e42f3fa Mon Sep 17 00:00:00 2001
+From: Josh <jokajak@gmail.com>
+Date: Thu, 20 Jul 2023 15:49:33 -0400
+Subject: [PATCH] feat: support lpeg 1.1
+
+This changeset adds support for lpeg 1.1 which updated the lpeg.version from a function to a string.
+
+Therefore we have to check the type of the value.
+
+Refs: #47
+---
+ lua/json/decode/util.lua | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/lua/json/decode/util.lua b/lua/json/decode/util.lua
+index 2493bf3..8b23751 100644
+--- a/lua/json/decode/util.lua
++++ b/lua/json/decode/util.lua
+@@ -17,6 +17,8 @@ local table_concat = require("table").concat
+ 
+ local merge = require("json.util").merge
+ 
++local type = type
++
+ local _ENV = nil
+ 
+ local function get_invalid_character_info(input, index)
+@@ -94,7 +96,8 @@ local unicode_ignored = (unicode_space + comment)^0
+ 
+ -- Parse the lpeg version skipping patch-values
+ -- LPEG <= 0.7 have no version value... so 0.7 is value
+-local DecimalLpegVersion = lpeg.version and tonumber(lpeg.version():match("^(%d+%.%d+)")) or 0.7
++-- LPEG >= 1.1 uses a string for the version instead of function
++local DecimalLpegVersion = lpeg.version and tonumber((type(lpeg.version) == "string" and lpeg.version or lpeg.version()):match("^(%d+%.%d+)")) or 0.7
+ 
+ local function setObjectKeyForceNumber(t, key, value)
+ 	key = tonumber(key) or key

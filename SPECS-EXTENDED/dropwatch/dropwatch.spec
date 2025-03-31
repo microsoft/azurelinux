@@ -1,17 +1,13 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name: dropwatch
-Version: 1.5.3
-Release: 6%{?dist}
+Version: 1.5.4
+Release: 1%{?dist}
 Summary: Kernel dropped packet monitor
 
-License: GPLv2+
+License: GPL-2.0-or-later
 URL: https://github.com/nhorman/dropwatch
 Source0: https://github.com/nhorman/dropwatch/archive/v%{version}/%{name}-%{version}.tar.gz
-Patch0: %{name}-gcc11.patch
-Patch1: %{name}-install-dwdump-manpage.patch
-Patch2: %{name}-configure-update-obsoleted-m4-macros.patch
-Patch3: %{name}-Fix-license-specifiers.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -39,7 +35,6 @@ network packets.
 ./autogen.sh
 %configure
 %make_build
-
 %install
 %{make_install}
 
@@ -52,6 +47,10 @@ network packets.
 %license COPYING
 
 %changelog
+* Thu Oct 24 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.5.4-1
+- Update to version 1.5.4
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.3-6
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 

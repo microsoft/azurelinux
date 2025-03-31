@@ -1,28 +1,36 @@
+%global cpan_name DBD-mysql
+
+# Disable leak tests
+%bcond_with perl_DBD_MySQL_enables_leak_test
+
+%global mysqlname mysql
+
 Name:           perl-DBD-MySQL
-Version:        4.050
-Release:        7%{?dist}
+Version:        5.010
+Release:        1%{?dist}
 Summary:        A MySQL interface for Perl
-License:        GPL+ or Artistic
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://metacpan.org/release/DBD-mysql
-Source0:        https://cpan.metacpan.org/authors/id/D/DV/DVEEDEN/DBD-mysql-%{version}.tar.gz#/perl-DBD-mysql-%{version}.tar.gz
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+URL:            https://metacpan.org/release/%{cpan_name}
+Source0:        https://cpan.metacpan.org/authors/id/D/DV/DVEEDEN/%{cpan_name}-%{version}.tar.gz
+Source1:        test-setup.t
+Source2:        test-clean.t
+Source3:        testrules.yml
+Source4:        test-env.sh
+
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
-BuildRequires:  mariadb-connector-c
-BuildRequires:  mariadb-connector-c-devel
+BuildRequires:  make
+# DBD::mysql v5.x requires MySQL 8.x client libraries for building
+BuildRequires:  %{mysqlname}-devel
 BuildRequires:  openssl-devel
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(Carp)
 BuildRequires:  perl(Config)
 BuildRequires:  perl(Data::Dumper)
-BuildRequires:  perl(DBI) >= 1.609
 BuildRequires:  perl(DBI::DBD)
 BuildRequires:  perl(Devel::CheckLib) >= 1.09
-BuildRequires:  perl(DynaLoader)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(File::Copy)
@@ -33,10 +41,37 @@ BuildRequires:  perl(strict)
 BuildRequires:  perl(utf8)
 BuildRequires:  perl(warnings)
 BuildRequires:  zlib-devel
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Run-time
+BuildRequires:  perl(Carp)
+BuildRequires:  perl(DBI) >= 1.609
+BuildRequires:  perl(DBI::Const::GetInfoType)
+BuildRequires:  perl(DynaLoader)
+# Tests
+BuildRequires:  %{mysqlname}
+BuildRequires:  %{mysqlname}-server
+BuildRequires:  perl(B)
+BuildRequires:  perl(bigint)
+# Required to process t/testrules.yml
+BuildRequires:  perl(CPAN::Meta::YAML)
+BuildRequires:  perl(Encode)
+BuildRequires:  perl(lib)
+BuildRequires:  perl(Test::Deep)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Time::HiRes)
+BuildRequires:  perl(vars)
+# Optional tests
+%if %{with perl_DBD_MySQL_enables_leak_test}
+BuildRequires:  perl(Proc::ProcessTable)
+BuildRequires:  perl(Storable)
+%endif
+
 Provides:       perl-DBD-mysql = %{version}-%{release}
 
 %{?perl_default_filter}
+
+# Filter modules bundled for tests
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libexecdir}
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(.*lib.pl\\)
 
 %description 
 DBD::mysql is the Perl5 Database Interface driver for the MySQL database. In
@@ -44,37 +79,201 @@ other words: DBD::mysql is an interface between the Perl programming language
 and the MySQL programming API that comes with the MySQL relational database
 management system.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+Requires:       coreutils
+Requires:       shadow-utils
+Requires:       %{mysqlname}
+Requires:       %{mysqlname}-server
+# Required to process t/testrules.yml
+Requires:       perl(CPAN::Meta::YAML)
+# Optional tests
+%if %{with perl_DBD_MariaDB_enables_leak_test}
+Requires:       perl(Proc::ProcessTable)
+Requires:       perl(Storable)
+%endif
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
-%setup -q -n DBD-mysql-%{version}
+%autosetup -p1 -n %{cpan_name}-%{version}
 
 # Correct file permissions
 find . -type f | xargs chmod -x
 
+cp %{SOURCE1} %{SOURCE2} %{SOURCE3} t/
+cp %{SOURCE4} .
+
+# Help file to recognise the Perl scripts and normalize shebangs
+for F in t/*.t t/*.pl; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
+
 %build
+. %{SOURCE4}
 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}" \
-  NO_PACKLIST=1 NO_PERLLOCAL=1
-%make_build
+  NO_PACKLIST=1 NO_PERLLOCAL=1 \
+  --testdb=$DBD_MYSQL_TESTDB \
+  --testuser=$DBD_MYSQL_TESTUSER \
+  --testpassword=$DBD_MYSQL_TESTPASSWORD \
+  --testhost=$DBD_MYSQL_TESTHOST \
+  --testsocket=$DBD_MYSQL_TESTSOCKET
+%{make_build}
 
 %install
-%make_install
+%{make_install}
 find %{buildroot} -type f -name '*.bs' -empty -delete
 %{_fixperms} %{buildroot}/*
 
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+cp %{SOURCE4} %{buildroot}%{_libexecdir}/%{name}
+# Replace build dir by template
+perl -i -pe 's{%{_builddir}/.*mysql.sock}{_TEST_SOCKET_}' %{buildroot}%{_libexecdir}/%{name}/t/mysql.mtest
+# Remove release tests
+rm %{buildroot}%{_libexecdir}/%{name}/t/manifest.t
+rm %{buildroot}%{_libexecdir}/%{name}/t/pod.t
+
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/usr/bin/bash
+set -e
+# The tests write to temporary database which is placed in $DIR/t/testdb
+DIR=$(mktemp -d)
+pushd "$DIR"
+cp -a %{_libexecdir}/%{name}/* ./
+. $DIR/$(basename %{SOURCE4})
+%{!?with_perl_DBD_MySQL_enables_leak_test:unset EXTENDED_TESTING}
+perl -i -pe "s{_TEST_SOCKET_}{$DBD_MYSQL_TESTSOCKET}" $DIR/t/mysql.mtest
+
+# Test setup and tests have to be executed by non-root user
+if [ `id -u` -ne 0 ]; then
+    prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+else
+    getent group $DBD_MYSQL_TESTUSER >/dev/null || \
+        groupadd -r $DBD_MYSQL_TESTUSER
+    getent passwd $DBD_MYSQL_TESTUSER >/dev/null || \
+        useradd -g $DBD_MYSQL_TESTUSER $DBD_MYSQL_TESTUSER
+    chown -hR $DBD_MYSQL_TESTUSER:$DBD_MYSQL_TESTUSER $DIR
+    su $DBD_MYSQL_TESTUSER -c "prove -I . -j \"$(getconf _NPROCESSORS_ONLN)\""
+    chown -hR root:root $DIR
+    getent passwd $DBD_MYSQL_TESTUSER &>/dev/null && userdel -r $DBD_MYSQL_TESTUSER
+    getent group $DBD_MYSQL_TESTUSER &>/dev/null && groupdel $DBD_MYSQL_TESTUSER
+fi
+
+popd
+rm -rf "$DIR"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
+
 %check
-# Full test coverage requires a live MySQL database
-#make test
+# Set MySQL and DBD::mysql test environment
+. %{SOURCE4}
+unset RELEASE_TESTING
+make test %{?with_perl_DBD_MySQL_enables_leak_test:EXTENDED_TESTING=1}
 
 %files
 %license LICENSE
 %doc Changes README.md
-%{perl_vendorarch}/Bundle/
 %{perl_vendorarch}/DBD/
 %{perl_vendorarch}/auto/DBD/
-%{_mandir}/man3/*.3*
+%{_mandir}/man3/DBD::mysql*.3*
+
+%files tests
+%{_libexecdir}/%{name}
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.050-7
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Nov 12 2024 Jitka Plesnikova <jplesnik@redhat.com> - 5.010-1
+- 5.010 bump (rhbz#2325333)
+
+* Mon Sep 23 2024 Jitka Plesnikova <jplesnik@redhat.com> - 5.009-1
+- 5.009 bump (rhbz#2313530)
+
+* Mon Aug 12 2024 Jitka Plesnikova <jplesnik@redhat.com> - 5.008-1
+- 5.008 bump (rhbz#2301565)
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.007-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jul 03 2024 Jitka Plesnikova <jplesnik@redhat.com> - 5.007-1
+- 5.007 bump (rhbz#2295347)
+
+* Tue Jun 11 2024 Jitka Plesnikova <jplesnik@redhat.com> - 5.006-2
+- Perl 5.40 rebuild
+
+* Wed Jun 05 2024 Jitka Plesnikova <jplesnik@redhat.com> - 5.006-1
+- 5.006 bump (rhbz#2290474)
+
+* Mon May 06 2024 Jitka Plesnikova <jplesnik@redhat.com> - 5.005-1
+- 5.005 bump (rhbz#2278129)
+
+* Wed Mar 27 2024 Jitka Plesnikova <jplesnik@redhat.com> - 5.004-2
+- community-mysql was replaced by mysql
+- remove using of %%{eln} macro (rhbz#2271821)
+
+* Tue Mar 19 2024 Jitka Plesnikova <jplesnik@redhat.com> - 5.004-1
+- 5.004 bump (rhbz#2270256)
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.003-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.003-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Dec 01 2023 Jitka Plesnikova <jplesnik@redhat.com> - 5.003-1
+- 5.003 bump (rhbz#2252375)
+
+* Tue Oct 24 2023 Jitka Plesnikova <jplesnik@redhat.com> - 5.002-1
+- 5.002 bump (rhbz#2245834)
+
+* Thu Oct 19 2023 Jitka Plesnikova <jplesnik@redhat.com> - 5.001-2
+- Use community-mysql also for ELN
+
+* Wed Oct 04 2023 Jitka Plesnikova <jplesnik@redhat.com> - 5.001-1
+- 5.001 bump (rhbz#2242077)
+  Since this version, MySQL 8.x has to be used for build
+- Package tests
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.050-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 4.050-17
+- Perl 5.38 rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.050-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.050-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 4.050-14
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.050-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.050-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 4.050-11
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.050-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.050-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 4.050-8
+- Perl 5.32 rebuild
+
+* Fri Mar 13 2020 Petr Pisar <ppisar@redhat.com> - 4.050-7
+- Remove a useless shebang (bug #1813195)
 
 * Tue Feb 04 2020 Tom Stellard <tstellar@redhat.com> - 4.050-6
 - Use make_build/make_install macros

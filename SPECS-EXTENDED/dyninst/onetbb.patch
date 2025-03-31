@@ -1,0 +1,12 @@
+--- dyninst-12.2.0/cmake/Modules/FindTBB.cmake~	2023-06-27 22:52:25.396598265 +0100
++++ dyninst-12.2.0/cmake/Modules/FindTBB.cmake	2023-06-27 22:52:27.776601825 +0100
+@@ -154,7 +154,8 @@
+ if(TBB_INCLUDE_DIRS)
+     # Starting in 2020.1.1, tbb_stddef.h is replaced by version.h
+     set(_version_files "${TBB_INCLUDE_DIRS}/tbb/tbb_stddef.h"
+-                       "${TBB_INCLUDE_DIRS}/tbb/version.h")
++                       "${TBB_INCLUDE_DIRS}/tbb/version.h"
++                       "${TBB_INCLUDE_DIRS}/oneapi/tbb/version.h")
+     foreach(f IN ITEMS ${_version_files})
+         if(EXISTS ${f})
+             set(_version_file ${f})

@@ -1,0 +1,78 @@
+diff --git a/minimum-constraints.txt b/minimum-constraints.txt
+index 570295ab..e771637b 100644
+--- a/minimum-constraints.txt
++++ b/minimum-constraints.txt
+@@ -92,7 +92,6 @@ wheel==0.33.5; python_version >= '3.8'
+ # Direct dependencies for install (must be consistent with requirements.txt)
+ 
+ M2Crypto==0.31.0
+-mock==2.0.0
+ ordereddict==1.1
+ ply==3.10
+ PyYAML==3.11; python_version == '2.6'
+diff --git a/pywbem_mock/_wbemconnection_mock.py b/pywbem_mock/_wbemconnection_mock.py
+index aa27b305..3eedb330 100644
+--- a/pywbem_mock/_wbemconnection_mock.py
++++ b/pywbem_mock/_wbemconnection_mock.py
+@@ -40,7 +40,7 @@ try:
+     from collections import Counter
+ except ImportError:
+     from backport_collections import Counter
+-from mock import Mock
++from unittest.mock import Mock
+ import six
+ 
+ # pylint: disable=ungrouped-imports
+diff --git a/requirements.txt b/requirements.txt
+index 3ac782d5..1e5cd238 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -11,9 +11,6 @@
+ 
+ # On Windows, M2Crypto must be installed via pywbem_os_setup.bat
+ M2Crypto>=0.31.0; python_version < '3.0' and sys_platform != 'win32'
+-mock>=2.0.0,<3.0.0; python_version == '2.6'
+-mock>=2.0.0,<4.0.0; python_version >= '2.7' and python_version <= '3.5'
+-mock>=2.0.0; python_version >= '3.6'
+ ordereddict>=1.1; python_version == '2.6'
+ ply>=3.10
+ # PyYAML 5.3 has removed support for Python 3.4; fixes narrow build error
+diff --git a/tests/unittest/pywbem/test_cim_obj.py b/tests/unittest/pywbem/test_cim_obj.py
+index 2f6b89d2..d3f8a9aa 100755
+--- a/tests/unittest/pywbem/test_cim_obj.py
++++ b/tests/unittest/pywbem/test_cim_obj.py
+@@ -9,7 +9,7 @@ from __future__ import absolute_import, print_function
+ import sys
+ import re
+ from datetime import timedelta, datetime
+-from mock import patch
++from unittest.mock import patch
+ try:
+     from collections import OrderedDict
+ except ImportError:
+diff --git a/tests/unittest/pywbem/test_itermethods.py b/tests/unittest/pywbem/test_itermethods.py
+index f7d0f8da..c613c3df 100644
+--- a/tests/unittest/pywbem/test_itermethods.py
++++ b/tests/unittest/pywbem/test_itermethods.py
+@@ -24,7 +24,7 @@ from __future__ import absolute_import, print_function
+ import pytest
+ import six
+ 
+-from mock import Mock
++from unittest.mock import Mock
+ 
+ # pylint: disable=wrong-import-position, wrong-import-order, invalid-name
+ from ...utils import import_installed
+diff --git a/tests/unittest/pywbem/test_valuemapping.py b/tests/unittest/pywbem/test_valuemapping.py
+index bf93b87c..263294a5 100644
+--- a/tests/unittest/pywbem/test_valuemapping.py
++++ b/tests/unittest/pywbem/test_valuemapping.py
+@@ -7,7 +7,7 @@ from __future__ import absolute_import
+ 
+ import re
+ import pytest
+-from mock import Mock
++from unittest.mock import Mock
+ 
+ # pylint: disable=wrong-import-position, wrong-import-order, invalid-name
+ from ...utils import import_installed

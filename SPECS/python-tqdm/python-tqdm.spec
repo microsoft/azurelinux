@@ -7,14 +7,14 @@ with "tqdm(iterable)", and you are done!
 Summary:        Fast, Extensible Progress Meter
 Name:           python-%{srcname}
 Version:        4.66.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MPLv2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/tqdm/tqdm
 Source0:        %{pypi_source}
 BuildArch:      noarch
-
+Patch0:         CVE-2024-34062.patch
 %description %{_description}
 
 %package -n python3-%{srcname}
@@ -40,7 +40,7 @@ Python 3 version.
 
 %prep
 export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
-%autosetup -n %{srcname}-%{version}
+%autosetup -p1 -n %{srcname}-%{version}
 chmod -x tqdm/completion.sh
 
 # https://github.com/tqdm/tqdm/pull/1292
@@ -90,6 +90,9 @@ pip3 install iniconfig \
 
 
 %changelog
+* Fri Feb 07 2025 Kanishk Bansal <kanbansal@microsoft.com> - 4.66.2-2
+- Patch CVE-2024-34062
+
 * Tue Mar 26 2024 Henry Li <lihl@microsoft.com> - 4.66.2-1
 - Upgrade version to v4.66.2
 - Modify Source0

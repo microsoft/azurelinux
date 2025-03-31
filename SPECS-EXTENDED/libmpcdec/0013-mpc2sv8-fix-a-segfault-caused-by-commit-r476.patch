@@ -1,0 +1,57 @@
+From 9d68c3c358bee5eb440afcc516023df1b0cab2bb Mon Sep 17 00:00:00 2001
+From: r2d <r2d@c51c8d5e-032a-db11-a0f2-0002b3467eef>
+Date: Tue, 12 Jan 2016 22:33:48 +0000
+Subject: [PATCH 13/19] mpc2sv8 : fix a segfault caused by commit r476
+
+git-svn-id: http://svn.musepack.net/libmpc/trunk@489 c51c8d5e-032a-db11-a0f2-0002b3467eef
+---
+ include/mpc/mpcdec.h  | 2 ++
+ libmpcdec/mpc_demux.c | 2 +-
+ mpc2sv8/mpc2sv8.c     | 4 ++--
+ 3 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/include/mpc/mpcdec.h b/include/mpc/mpcdec.h
+index c723595..52fd070 100644
+--- a/include/mpc/mpcdec.h
++++ b/include/mpc/mpcdec.h
+@@ -116,6 +116,8 @@ MPC_API void mpc_set_replay_level(mpc_demux * d, float level, mpc_bool_t use_gai
+                           mpc_bool_t use_title, mpc_bool_t clip_prevention);
+ /// decode frame
+ MPC_API mpc_status mpc_demux_decode(mpc_demux * d, mpc_frame_info * i);
++/// decode frame : use mpc_demux_decode() instead. This function is only used by mpc2sv8.
++MPC_API mpc_status mpc_demux_decode_inner(mpc_demux * d, mpc_frame_info * i);
+ /// get streaminfo
+ MPC_API void mpc_demux_get_info(mpc_demux * d, mpc_streaminfo * i);
+ /// seeks to a given sample
+diff --git a/libmpcdec/mpc_demux.c b/libmpcdec/mpc_demux.c
+index c28a9a0..8b60dad 100644
+--- a/libmpcdec/mpc_demux.c
++++ b/libmpcdec/mpc_demux.c
+@@ -566,7 +566,7 @@ void mpc_demux_get_info(mpc_demux * d, mpc_streaminfo * i)
+ 	memcpy(i, &d->si, sizeof d->si);
+ }
+ 
+-static mpc_status mpc_demux_decode_inner(mpc_demux * d, mpc_frame_info * i)
++mpc_status mpc_demux_decode_inner(mpc_demux * d, mpc_frame_info * i)
+ {
+ 	mpc_bits_reader r;
+ 	if (d->si.stream_version >= 8) {
+diff --git a/mpc2sv8/mpc2sv8.c b/mpc2sv8/mpc2sv8.c
+index 7b77a1b..9a0237c 100644
+--- a/mpc2sv8/mpc2sv8.c
++++ b/mpc2sv8/mpc2sv8.c
+@@ -162,9 +162,9 @@ int convert(char * sv7file, char * sv8file)
+ 		mpc_frame_info frame;
+ 
+ 		demux->d->samples_to_skip = MPC_FRAME_LENGTH + MPC_DECODER_SYNTH_DELAY;
+-		err = mpc_demux_decode(demux, &frame);
++        err = mpc_demux_decode_inner(demux, &frame);
+ 
+-		if(frame.bits == -1) break;
++        if (MPC_IS_FAILURE(err) || frame.bits == -1) break;
+ 
+ 		datacpy(demux->d, &e);
+ 		writeBitstream_SV8 ( &e, si.max_band); // write SV8-Bitstream
+-- 
+2.46.0
+

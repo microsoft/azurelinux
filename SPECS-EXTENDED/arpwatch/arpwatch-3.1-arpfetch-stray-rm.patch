@@ -1,0 +1,11 @@
+Fix stray rm (of an undefined variable).
+
+diff -Naur arpwatch-3.1-original/arpfetch arpwatch-3.1/arpfetch
+--- arpwatch-3.1-original/arpfetch	2013-02-16 03:10:28.000000000 -0500
++++ arpwatch-3.1/arpfetch	2020-11-07 11:22:59.344575624 -0500
+@@ -29,5 +29,3 @@
+ 	    ea = $2
+ 	    print ea "\t" ip
+     }'
+-
+-rm -f ${t1}

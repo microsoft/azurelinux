@@ -1,0 +1,31 @@
+From 80516f601ce5f1cee44848615dffe4252f2d205f Mon Sep 17 00:00:00 2001
+From: Reuben Thomas <rrt@sc3d.org>
+Date: Fri, 17 Feb 2023 12:52:19 +0000
+Subject: [PATCH] src/task.c: only close input stream when we opened it (fix
+ #48)
+
+Thanks to Remi Collet for the bug report and fix.
+---
+ src/task.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/task.c b/src/task.c
+index 2977a03..e302858 100644
+--- a/src/task.c
++++ b/src/task.c
+@@ -353,9 +353,10 @@ recode_perform_task (RECODE_TASK task)
+                   SUBTASK_RETURN (subtask);
+                 }
+ 
+-              /* Close the input file. */
++              /* Close the input file when we opened it. */
+ 
+-              if (subtask->input.file)
++              if (subtask->input.file && subtask->input.name &&
++                  subtask->input.name[0])
+                 fclose (subtask->input.file);
+             }
+ #endif
+-- 
+2.39.1
+

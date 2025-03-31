@@ -1,0 +1,61 @@
+From 930afd9bf6d2a0324d806fd7ce2eeba7a223d2d1 Mon Sep 17 00:00:00 2001
+From: Jerry James <loganjerry@gmail.com>
+Date: Sat, 25 Mar 2023 15:17:02 -0600
+Subject: [PATCH] Fix javadoc errors in JavaCharStream.template
+
+Signed-off-by: Jerry James <loganjerry@gmail.com>
+---
+ src/main/resources/templates/JavaCharStream.template | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/src/main/resources/templates/JavaCharStream.template b/src/main/resources/templates/JavaCharStream.template
+index dc56b5b..07ee0de 100644
+--- a/src/main/resources/templates/JavaCharStream.template
++++ b/src/main/resources/templates/JavaCharStream.template
+@@ -501,7 +501,6 @@ class JavaCharStream
+ 
+ /** Constructor.
+  * @param dstream the underlying data source.
+- * @param startline line number of the first character of the stream, mostly for error messages.
+  */
+   public JavaCharStream(java.io.Reader dstream)
+   {
+@@ -570,7 +569,7 @@ class JavaCharStream
+  * @param encoding the character encoding of the data stream.
+  * @param startline line number of the first character of the stream, mostly for error messages.
+  * @param startcolumn column number of the first character of the stream.
+- * @throws UnsupportedEncodingException encoding is invalid or unsupported.
++ * @throws java.io.UnsupportedEncodingException encoding is invalid or unsupported.
+  */
+   public JavaCharStream(java.io.InputStream dstream, String encoding, int startline,
+                         int startcolumn) throws java.io.UnsupportedEncodingException
+@@ -592,7 +591,7 @@ class JavaCharStream
+ /** Constructor.
+  * @param dstream the underlying data source.
+  * @param encoding the character encoding of the data stream.
+- * @throws UnsupportedEncodingException encoding is invalid or unsupported.
++ * @throws java.io.UnsupportedEncodingException encoding is invalid or unsupported.
+  */
+   public JavaCharStream(java.io.InputStream dstream, String encoding) throws java.io.UnsupportedEncodingException
+   {
+@@ -636,7 +635,7 @@ class JavaCharStream
+  * @param encoding the character encoding of the data stream.
+  * @param startline line number of the first character of the stream, mostly for error messages.
+  * @param startcolumn column number of the first character of the stream.
+- * @throws UnsupportedEncodingException encoding is invalid or unsupported.
++ * @throws java.io.UnsupportedEncodingException encoding is invalid or unsupported.
+  */
+   public void ReInit(java.io.InputStream dstream, String encoding, int startline,
+                      int startcolumn) throws java.io.UnsupportedEncodingException
+@@ -656,7 +655,7 @@ class JavaCharStream
+ /** Reinitialise.
+  * @param dstream the underlying data source.
+  * @param encoding the character encoding of the data stream.
+- * @throws UnsupportedEncodingException encoding is invalid or unsupported.
++ * @throws java.io.UnsupportedEncodingException encoding is invalid or unsupported.
+  */
+   public void ReInit(java.io.InputStream dstream, String encoding) throws java.io.UnsupportedEncodingException
+   {
+-- 
+2.39.2
+

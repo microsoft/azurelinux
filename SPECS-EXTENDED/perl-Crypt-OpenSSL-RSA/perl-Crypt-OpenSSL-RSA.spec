@@ -1,12 +1,12 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Crypt-OpenSSL-RSA
-Version:        0.31
-Release:        6%{?dist}
+Version:        0.33
+Release:        1%{?dist}
 Summary:        Perl interface to OpenSSL for RSA
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Crypt-OpenSSL-RSA
-Source0:        https://cpan.metacpan.org/authors/id/T/TO/TODDR/Crypt-OpenSSL-RSA-%{version}.tar.gz#/perl-Crypt-OpenSSL-RSA-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/T/TO/TODDR/Crypt-OpenSSL-RSA-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  findutils
 BuildRequires:  make
@@ -31,7 +31,6 @@ BuildRequires:  perl(base)
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::More)
 
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Requires:       perl(Crypt::OpenSSL::Random)
 Requires:	perl(Crypt::OpenSSL::Bignum)
 
@@ -39,14 +38,14 @@ Requires:	perl(Crypt::OpenSSL::Bignum)
 Crypt::OpenSSL::RSA - RSA encoding and decoding, using the openSSL libraries
 
 %prep
-%setup -q -n Crypt-OpenSSL-RSA-%{version}
+%autosetup -p1 -n Crypt-OpenSSL-RSA-%{version}
 
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
+%{make_install}
 find %{buildroot} -type f -name '*.bs' -size 0 -delete
 %{_fixperms} %{buildroot}/*
 
@@ -61,6 +60,10 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Fri Dec 23 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.33-1
+- Update to version 0.33
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.31-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

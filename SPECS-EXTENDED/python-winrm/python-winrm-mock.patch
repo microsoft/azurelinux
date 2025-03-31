@@ -1,0 +1,23 @@
+diff -up pywinrm-0.4.3/winrm/tests/conftest.py.mock pywinrm-0.4.3/winrm/tests/conftest.py
+--- pywinrm-0.4.3/winrm/tests/conftest.py.mock	2022-04-13 22:09:29.000000000 -0600
++++ pywinrm-0.4.3/winrm/tests/conftest.py	2022-08-30 21:37:31.679474945 -0600
+@@ -3,7 +3,7 @@ import os
+ import uuid
+ import xmltodict
+ from pytest import skip, fixture
+-from mock import patch
++from unittest.mock import patch
+ 
+ 
+ open_shell_request = """\
+diff -up pywinrm-0.4.3/winrm/tests/test_transport.py.mock pywinrm-0.4.3/winrm/tests/test_transport.py
+--- pywinrm-0.4.3/winrm/tests/test_transport.py.mock	2022-04-13 22:09:29.000000000 -0600
++++ pywinrm-0.4.3/winrm/tests/test_transport.py	2022-08-30 21:37:10.942270644 -0600
+@@ -1,6 +1,6 @@
+ # coding=utf-8
+ import os
+-import mock
++from unittest import mock
+ import unittest
+ 
+ from winrm import transport

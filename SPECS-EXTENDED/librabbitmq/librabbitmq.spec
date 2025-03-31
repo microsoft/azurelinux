@@ -2,14 +2,16 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 # Fedora spec file for librabbitmq
 #
-# Copyright (c) 2012-2019 Remi Collet
-# License: CC-BY-SA
+# Copyright (c) 2012-2024 Remi Collet
+# License: CC-BY-SA-4.0
 # http://creativecommons.org/licenses/by-sa/4.0/
 #
 # Please, preserve the changelog entries
 #
 
-%global gh_commit   ffe918a5fcef72038a88054dca3c56762b1953d4
+%bcond_without      tests
+
+%global gh_commit   124722b5045baa41a24ce2e2d7c52a47467e7ac0
 %global gh_short    %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner    alanxz
 %global gh_project  rabbitmq-c
@@ -18,20 +20,22 @@ Distribution:   Azure Linux
 
 Name:      %{libname}
 Summary:   Client library for AMQP
-Version:   0.10.0
-Release:   4%{?dist}
+Version:   0.14.0
+Release:   1%{?dist}
 License:   MIT
 URL:       https://github.com/alanxz/rabbitmq-c
 
 Source0:   https://github.com/%{gh_owner}/%{gh_project}/archive/%{gh_commit}/%{gh_project}-%{version}-%{gh_short}.tar.gz
 
+
 BuildRequires: gcc
-BuildRequires: cmake > 2.8
-BuildRequires: openssl-devel
+BuildRequires: cmake >= 3.22
+BuildRequires: openssl-devel >= 1.1.1
 # For tools
-BuildRequires: popt-devel > 1.14
+BuildRequires: popt-devel >= 1.14
 # For man page
 BuildRequires: xmlto
+BuildRequires: make
 
 
 %description
@@ -50,7 +54,7 @@ for %{name}.
 
 %package tools
 Summary:    Example tools built using the librabbitmq package
-Requires:   %{name}%{?_isa} = %{version}
+Requires:   %{name}%{?_isa} = %{version}-%{release}
 
 %description tools
 This package contains example tools built using %{name}.
@@ -76,38 +80,65 @@ sed -e '/test_basic/d' -i tests/CMakeLists.txt
 %build
 # static lib required for tests
 %cmake \
+  -DBUILD_TOOLS:BOOL=ON \
   -DBUILD_TOOLS_DOCS:BOOL=ON \
-  -DBUILD_STATIC_LIBS:BOOL=ON \
-  .
+%if %{with tests}
+  -DINSTALL_STATIC_LIBS:BOOL=OFF \
+%else
+  -DBUILD_TESTING:BOOL=OFF \
+  -DBUILD_STATIC_LIBS:BOOL=OFF \
+%endif
+  -S .
 
+%if 0%{?cmake_build:1}
+%cmake_build
+%else
 make %{_smp_mflags}
+%endif
 
 
 %install
+%if 0%{?cmake_install:1}
+%cmake_install
+%else
 make install  DESTDIR="%{buildroot}"
-
-rm %{buildroot}%{_libdir}/%{libname}.a
+%endif
 
 
 %check
 : check .pc is usable
 grep @ %{buildroot}%{_libdir}/pkgconfig/librabbitmq.pc && exit 1
+grep %{version} %{buildroot}%{_libdir}/pkgconfig/librabbitmq.pc || exit 1
+: check cmake files are usable
+grep static %{buildroot}%{_libdir}/cmake/rabbitmq-c/*.cmake && exit 1
+ 
 
+%if %{with tests}
 : upstream tests
+%if 0%{?ctest:1}
+%ctest
+%else
 make test
+%endif
+%else
+: Tests disabled
+%endif
 
 
 %files
-%license LICENSE-MIT
-%{_libdir}/%{libname}.so.%{soname}*
+%license LICENSE
+%{_libdir}/%{libname}.so.%{soname}
+%{_libdir}/%{libname}.so.%{version}
 
 
 %files devel
-%doc AUTHORS THANKS TODO *.md
+%doc AUTHORS THANKS *.md
 %doc Examples
 %{_libdir}/%{libname}.so
 %{_includedir}/amqp*
+%{_includedir}/rabbitmq-c
 %{_libdir}/pkgconfig/%{libname}.pc
+%{_libdir}/cmake/rabbitmq-c
 
 %files tools
 %{_bindir}/amqp-*
@@ -116,6 +147,9 @@ make test
 
 
 %changelog
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.14.0-1
+- Update to version 0.14.0
+
 * Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 0.10.0-4
 - License verified
 

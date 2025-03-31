@@ -1,0 +1,25 @@
+From 19b0e905fa82b6972cb10e7382839251c31c9c95 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ralf=20Cors=C3=A9pius?= <corsepiu@fedoraproject.org>
+Date: Mon, 4 Apr 2022 12:48:28 +0200
+Subject: [PATCH] File-Find-Rule-Perl-1.16-fedora
+
+---
+ t/03_no_index.t | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/t/03_no_index.t b/t/03_no_index.t
+index b88f7d2..e31da26 100644
+--- a/t/03_no_index.t
++++ b/t/03_no_index.t
+@@ -39,6 +39,8 @@ SCOPE: {
+                         Makefile.old
+ 		};
+ 		my @files = sort grep {
++			! /^(debug|elf).*\.list/
++			and
+ 			! /^debian\b/
+ 			and
+ 			! /(?:^|\W)\.\w/
+-- 
+2.35.1
+

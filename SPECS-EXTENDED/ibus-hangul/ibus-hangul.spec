@@ -1,29 +1,25 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global require_ibus_version 1.3.99
 %global require_libhangul_version 0.1.0
 
 Name:       ibus-hangul
-Version:    1.5.4
-Release:    2%{?dist}
+Version:    1.5.5
+Release:    6%{?dist}
 Summary:    The Hangul engine for IBus input platform
-License:    GPLv2+
+License:    GPL-2.0-or-later
 URL:        https://github.com/libhangul/ibus-hangul
-Source0:    https://github.com/libhangul/ibus-hangul/releases/download/%{version}/%{name}-%{version}.tar.gz
+Source0:    https://github.com/libhangul/ibus-hangul/releases/download/%{version}/%{name}-%{version}.tar.xz
 
 # not upstreamed patches
 Patch1:     ibus-hangul-setup-abspath.patch
 
 BuildRequires:  gettext-devel, automake, libtool
-BuildRequires:  intltool
-BuildRequires:  libtool
 BuildRequires:  libhangul-devel >= %{require_libhangul_version}
 BuildRequires:  pkgconfig
 BuildRequires:  ibus-devel >= %{require_ibus_version}
 BuildRequires:  desktop-file-utils
 BuildRequires:  python3-devel
-BuildRequires:  gnome-common
 BuildRequires:  gtk3-devel
+BuildRequires:  make
 
 Requires:   ibus >= %{require_ibus_version}
 Requires:   libhangul >= %{require_libhangul_version}
@@ -34,59 +30,32 @@ Requires:   python3
 The Hangul engine for IBus platform. It provides Korean input method from
 libhangul.
 
-%prep
-%setup -q
-%patch 1 -p1 -b .setup-abspath
+%package tests
+Summary:        Tests for the %{name} package
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-# autopoint -f
-# AUTOPOINT='intltoolize --automake --copy' autoreconf -fi
+%description tests
+The %{name}-tests package contains tests that can be used to verify
+the functionality of the installed %{name} package.
+
+%prep
+%autosetup -p1
 
 %build
 ./autogen.sh
-%configure --disable-static --with-python=python3 %{?_with_hotkeys}
-# make -C po update-gmo
+%configure \
+           --disable-static \
+           --with-python=python3 \
+           %{?_with_hotkeys} \
+           --enable-installed-tests \
+           %{nil}
+
 make %{?_smp_mflags}
 
 %install
 make DESTDIR=${RPM_BUILD_ROOT} install INSTALL="install -p"
 
 %py_byte_compile %{python3} $RPM_BUILD_ROOT%{_datadir}/ibus-hangul/setup
-
-# Register as an AppStream component to be visible in the software center
-#
-# NOTE: It would be *awesome* if this file was maintained by the upstream
-# project, translated and installed into the right place during `make install`.
-#
-# See http://www.freedesktop.org/software/appstream/docs/ for more details.
-#
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/appdata
-cat > $RPM_BUILD_ROOT%{_datadir}/appdata/hangul.appdata.xml <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<component type="inputmethod">
-  <id>hangul.xml</id>
-  <metadata_license>CC0-1.0</metadata_license>
-  <name>Hangul</name>
-  <summary>Korean input method</summary>
-  <description>
-    <p>
-      The Hangul input method is designed for entering Korean text.
-    </p>
-    <p>
-      Input methods are typing systems allowing users to input complex languages.
-      They are necessary because these contain too many characters to simply be laid
-      out on a traditional keyboard.
-    </p>
-  </description>
-  <url type="homepage">http://code.google.com/p/ibus/</url>
-  <compulsory_for_desktop>GNOME</compulsory_for_desktop>
-  <project_group>GNOME</project_group>
-  <developer_name>The GNOME Project</developer_name>
-  <url type="bugtracker">https://code.google.com/p/ibus/issues/list</url>
-  <url type="donation">http://www.gnome.org/friends/</url>
-  <url type="help">https://code.google.com/p/ibus/wiki/FAQ</url>
-  <update_contact><!-- upstream-contact_at_email.com --></update_contact>
-</component>
-EOF
 
 rm -f ${RPM_BUILD_ROOT}%{_bindir}/ibus-setup-hangul
 sed -i 's!^Exec=ibus-setup-hangul!Exec=%{_libexecdir}/ibus-setup-hangul!' ${RPM_BUILD_ROOT}%{_datadir}/applications/ibus-setup-hangul.desktop
@@ -95,19 +64,15 @@ desktop-file-validate ${RPM_BUILD_ROOT}%{_datadir}/applications/ibus-setup-hangu
 
 %find_lang %{name}
 
-%post
-[ -x %{_bindir}/ibus ] && \
-  %{_bindir}/ibus write-cache --system &>/dev/null || :
-
-%postun
-[ -x %{_bindir}/ibus ] && \
-  %{_bindir}/ibus write-cache --system &>/dev/null || :
+%check
+make check \
+    DISABLE_GUI_TESTS="ibus-hangul" \
+    VERBOSE=1
 
 %files -f %{name}.lang
 %doc AUTHORS COPYING README
 %{_libexecdir}/ibus-engine-hangul
 %{_libexecdir}/ibus-setup-hangul
-%{_datadir}/appdata/*.appdata.xml
 %{_datadir}/metainfo/*.metainfo.xml
 %{_datadir}/glib-2.0/schemas/*.gschema.xml
 %{_datadir}/ibus-hangul
@@ -115,9 +80,74 @@ desktop-file-validate ${RPM_BUILD_ROOT}%{_datadir}/applications/ibus-setup-hangu
 %{_datadir}/applications/ibus-setup-hangul.desktop
 %{_datadir}/icons/hicolor/*/apps/*
 
+%files tests
+%dir %{_libexecdir}/installed-tests
+%{_libexecdir}/installed-tests/ibus-hangul
+%dir %{_datadir}/installed-tests
+%{_datadir}/installed-tests/ibus-hangul
+
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.4-2
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.5-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.5-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.5-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue May  9 2023 Peng Wu <pwu@redhat.com> - 1.5.5-2
+- Migrate to SPDX license
+
+* Thu May  4 2023 Peng Wu <pwu@redhat.com> - 1.5.5-1
+- Update to 1.5.5
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.4-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Nov 25 2022 Peng Wu <pwu@redhat.com> - 1.5.4-14
+- Update ibus-hangul-gtk4-sync.patch
+
+* Tue Aug 23 2022 Peng Wu <pwu@redhat.com> - 1.5.4-13
+- Rebuild the package
+
+* Fri Aug 19 2022 Peng Wu <pwu@redhat.com> - 1.5.4-12
+- Fix forward key event issue with ibus-gtk4
+- Add ibus-hangul-gtk4-sync.patch
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.4-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jul 21 2022 Tomas Popela <tpopela@redhat.com> - 1.5.4-10
+- Drop BR on gnome-common as the project was moved away from intltool
+- Drop duplicated libtool BR
+
+* Fri Jun 10 2022 Peng Wu <pwu@redhat.com> - 1.5.4-9
+- Drop BuildRequires: intltool
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.4-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.4-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 18 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.4-6
+- Delete ibus write-cache in scriptlet
+
+* Wed Apr 21 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.5.4-5
+- Resolves: #1948197 Change post to posttrans
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Sep 10 2020 Peng Wu <pwu@redhat.com> - 1.5.4-3
+- Add tests sub package
+
+* Wed Sep  2 2020 Peng Wu <pwu@redhat.com> - 1.5.4-2
+- Clean up the spec file
 
 * Mon Aug 24 2020 Peng Wu <pwu@redhat.com> - 1.5.4-1
 - Update to 1.5.4

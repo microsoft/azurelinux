@@ -1,8 +1,7 @@
 {
  "Signatures": {
-  "build.xml": "d2015a7ad262e893f7ecdd3c50ebbbe2be103b0c7b4722e521ab612d7deaba30",
-  "common.xml": "c5fa49a0b9561aeb972a4ae3f059daf3164cb282ff49710ef3d64b040714cbef",
-  "commons-jexl-2.1.1-src.tar.gz": "5f06cfec88f0ce1bc51958e9ec1410af7029f2a5eb2e0b167d5d71bec43027aa",
-  "jexl2-compat-build.xml": "5c90115b37805d07ada118205191bcd3d9f5c431bd7c5761d2ff072d868fdbe5"
+  "KEYS": "4230519a17c7106b4e18cf199dc7224302ac7a225d3a86963d253dd92b8fc638",
+  "commons-jexl-3.4.0-src.tar.gz": "a0e4fd3f7c32175c13b5b19fa52abb47bfa005e1b4b143a63acd18d63e793dd8",
+  "commons-jexl-3.4.0-src.tar.gz.asc": "987baed70cda5bc7e10b3a43ae1da963168da5f06e7c8c963383d59f070673aa"
  }
 }
