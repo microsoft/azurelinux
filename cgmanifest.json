@@ -1197,8 +1197,8 @@
         "type": "other",
         "other": {
           "name": "boom-boot",
-          "version": "1.2",
-          "downloadUrl": "https://github.com/snapshotmanager/boom/archive/1.2/boom-1.2.tar.gz"
+          "version": "1.6.5",
+          "downloadUrl": "https://github.com/snapshotmanager/boom/archive/1.6.5/boom-boot-1.6.5.tar.gz"
         }
       }
     },
