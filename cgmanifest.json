@@ -11171,8 +11171,8 @@
         "type": "other",
         "other": {
           "name": "libssh",
-          "version": "0.10.5",
-          "downloadUrl": "https://www.libssh.org/files/0.10/libssh-0.10.5.tar.xz"
+          "version": "0.10.6",
+          "downloadUrl": "https://www.libssh.org/files/0.10/libssh-0.10.6.tar.xz"
         }
       }
     },
@@ -29736,8 +29736,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.1.1164",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.1164.tar.gz"
+          "version": "9.1.1198",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.1198.tar.gz"
         }
       }
     },
