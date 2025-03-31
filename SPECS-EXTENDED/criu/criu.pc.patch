@@ -1,0 +1,27 @@
+From 341ef149ee259d9432ea4c01507eefab2ef8b83c Mon Sep 17 00:00:00 2001
+From: Radostin Stoyanov <radostin@redhat.com>
+Date: Thu, 14 Oct 2021 12:58:56 +0100
+Subject: [PATCH] criu.pc: Add libprotobuf-c as a dependency
+
+CRIU has a dependency on protobuf-c-devel. We express this dependency
+in pkgconfig to be auto-detected when building a package.
+
+Signed-off-by: Radostin Stoyanov <radostin@redhat.com>
+---
+ lib/c/criu.pc.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/c/criu.pc.in b/lib/c/criu.pc.in
+index 33986d10d..bcced5033 100644
+--- a/lib/c/criu.pc.in
++++ b/lib/c/criu.pc.in
+@@ -4,5 +4,6 @@ includedir=@includedir@
+ Name: CRIU
+ Description: RPC library for userspace checkpoint and restore
+ Version: @version@
++Requires.private: libprotobuf-c
+ Libs: -L${libdir} -lcriu
+ Cflags: -I${includedir}
+--
+2.31.1
+

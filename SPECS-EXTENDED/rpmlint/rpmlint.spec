@@ -1,135 +1,276 @@
-
-# Disable automatic compilation of Python files in /usr/share/rpmlint
-%global _python_bytecompile_extra 0
-
-%global python %{__python3}
-%global pytest pytest-3
-
-# linitng is flaky, so we fake it
-%global flake8 true
+# pass --without tests to skip the test suite
+%bcond_without tests
 
 Name:           rpmlint
-Version:        1.11
-Release:        8%{?dist}
+Version:        2.5.0
+Release:        10%{?dist}
 Summary:        Tool for checking common errors in RPM packages
 License:        GPL-2.0-or-later
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 URL:            https://github.com/rpm-software-management/rpmlint
-Source0:        %{url}/archive/rpmlint-%{version}.tar.gz
-Source1:        %{name}.config
-Source3:        %{name}-etc.config
+Source0:        %{url}/archive/%{version}/rpmlint-%{version}.tar.gz
+# Taken from https://github.com/rpm-software-management/rpmlint/tree/main/configs/Fedora
+Source1:        fedora.toml
+Source3:        scoring.toml
+Source4:        users-groups.toml
+Source5:        warn-on-functions.toml
 
-# https://github.com/rpm-software-management/rpmlint/pull/199
-Patch199:       rpmlint-1.10-suppress-locale-error.patch
-# https://github.com/rpm-software-management/rpmlint/pull/212
-Patch212:       rpmlint-1.11-rpm4.15.patch
+# Fix from @danigm to reset checks for each package
+# https://github.com/rpm-software-management/rpmlint/pull/1163
+Patch0:         https://patch-diff.githubusercontent.com/raw/rpm-software-management/rpmlint/pull/1163.patch
 
 BuildArch:      noarch
+
+# use git to apply patches; it handles binary diffs
+BuildRequires:  git-core
 BuildRequires:  python3-devel
-BuildRequires:  python3-rpm >= 4.4.2.2
-BuildRequires:  python3-pytest
-#BuildRequires:  python3-flake8-import-order
-Requires:       python3
-Requires:       python3-rpm >= 4.4.2.2
-BuildRequires:  sed >= 3.95
+# tests
+%if %{with tests}
 %if ! 0%{?rhel}
-# no bash-completion for RHEL
-BuildRequires:  bash-completion
+BuildRequires:  dash
+BuildRequires:  devscripts-checkbashisms
 %endif
-# python-magic and python-enchant are actually optional dependencies, but
-# they bring quite desirable features.
-Requires:       python3-magic
-BuildRequires:  python3-magic
-Requires:       python3-enchant
-Requires:       /usr/bin/appstream-util
-Requires:       /usr/bin/cpio
-Requires:       /usr/bin/bzip2
-Requires:       /usr/bin/desktop-file-validate
+BuildRequires:  hunspell-cs
+BuildRequires:  hunspell-en-US
+BuildRequires:  python3dist(pytest)
+%if ! 0%{?rhel}
+BuildRequires:  python3dist(pytest-xdist)
+%endif
+BuildRequires:  /usr/bin/appstream-util
 BuildRequires:  /usr/bin/desktop-file-validate
-Requires:       /usr/bin/groff
-Requires:       /usr/bin/gtbl
-Requires:       /usr/bin/man
-Requires:       /usr/bin/perl
-BuildRequires:  /usr/bin/perl
-Requires:       /usr/bin/readelf
-Requires:       /bin/xz
+%endif
+%if ! 0%{?rhel}
+Requires:       dash
+Requires:       devscripts-checkbashisms
+%endif
+Requires:       rpm-build
+Requires:       /usr/bin/appstream-util
+Requires:       /usr/bin/desktop-file-validate
+%if 0%{?fedora}
+Requires:       rpmlint-fedora-license-data
+%endif
 
 %description
 rpmlint is a tool for checking common errors in RPM packages. Binary
 and source packages as well as spec files can be checked.
 
-
 %prep
-%setup -q -n %{name}-%{name}-%{version}
-%patch 199 -p1
-%patch 212 -p1
+%autosetup -p1 -Sgit
 
-
-# Remove binary write mode
-sed -i "s/'wb'/'w'/" PostCheck.py
-
-
-sed -i -e /MenuCheck/d Config.py
-cp -p config config.example
-install -pm 644 %{SOURCE3} config
-
-
-%build
-make COMPILE_PYC=1 PYTHON=%{python}
-
-
-%install
-touch rpmlint.pyc rpmlint.pyo # just for the %%exclude to work everywhere
-make install DESTDIR=$RPM_BUILD_ROOT ETCDIR=%{_sysconfdir} MANDIR=%{_mandir} \
-  LIBDIR=%{_datadir}/rpmlint BINDIR=%{_bindir} PYTHON=%{python}
-install -pm 644 %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/rpmlint/config
+# Replace python-magic dep with file-magic (rhbz#1899279)
+sed -i 's/python-magic/file-magic/g' pyproject.toml
 
 %if 0%{?rhel}
-rm -rf %{buildroot}%{_sysconfdir}/bash_completion.d/
+# Avoid extra dependencies for checks not needed in RHEL
+# pybeam: ErlangCheck
+sed -i -e '/pybeam/d' pyproject.toml
+sed -i -e '/ErlangCheck/d' rpmlint/configdefaults.toml test/test_lint.py
 %endif
 
+# Don't lint the code or measure coverage in %%check
+# On RHEL, also avoid xdist by disabling parallelism
+sed -i -e '/^ *--cov=rpmlint$/d' %{?rhel:-e '/^ *-n auto$/d'} pytest.ini
+
+# Avoid warnings about pytest.mark.no_cover marker
+sed -i '/^@pytest.mark.no_cover/d' test/test_lint.py
+
+%generate_buildrequires
+%pyproject_buildrequires
+
+%build
+%pyproject_wheel
+
+%install
+%pyproject_install
+%pyproject_save_files %{name}
+
+mkdir -p %{buildroot}%{_sysconfdir}/xdg/rpmlint/
+%if 0%{?fedora}
+cp -a %{SOURCE1} %{SOURCE3} %{SOURCE4} %{SOURCE5} %{buildroot}%{_sysconfdir}/xdg/rpmlint/
+%endif
 
 %check
-%if 0%{?rhel} == 6
-# EPEL6 pytest doesn't support -k, so we sed the test names to skip them
-# TestPythonBytecodeMtime.test_pyc_mtime/magic_from_chunk has 2.6 incompatible code
-sed -i 's/test_pyc_m/xxx_pyc_m/' test/test_files.py
-# TestSourceCheck.test_inconsistent_file_extension only works with magic >= 5.05
-sed -i 's/test_inconsistent_file_extension/xxx_inconsistent_file_extension/' test/test_sources.py
+%if %{with tests}
+%pytest %{?rhel:--ignore test/test_erlang.py}
 %endif
 
-make check PYTHON=%{python} PYTEST=%{pytest} FLAKE8=%{flake8}
-
-
-%files
-%license COPYING
-%doc README.md config.example
-%config(noreplace) %{_sysconfdir}/rpmlint/
-
-%{_datadir}/bash-completion/
-
-
-
-
+%files -f %{pyproject_files}
+%doc README.md
+%dir %{_sysconfdir}/xdg/rpmlint
+%if 0%{?fedora}
+%config(noreplace) %{_sysconfdir}/xdg/rpmlint/*.toml
+%endif
 %{_bindir}/rpmdiff
 %{_bindir}/rpmlint
-%{_datadir}/rpmlint/
-%{_mandir}/man1/rpmdiff.1*
-%{_mandir}/man1/rpmlint.1*
 
 %changelog
-* Wed Feb 01 2023 Henry Li <lihl@microsoft.com> - 1.11-8
-- Remove AGPL-related licenses from rpmlint.config
-- License Verified
+* Wed Dec 11 2024 Miro Hrončok <mhroncok@redhat.com> - 2.5.0-10
+- Fixup a bad regex in the spelling errors filter
 
-* Tue Jun 22 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11-7
-- Removing option to build with Python 2.
-- Replacing dependency on 'rpm-python3' with 'python3-rpm'.
+* Wed Dec 11 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 2.5.0-9
+- Add more jargon to the filtered-out spelling errors
 
-* Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Making binaries paths compatible with CBL-Mariner's paths.
+* Wed Nov 13 2024 Miro Hrončok <mhroncok@redhat.com> - 2.5.0-8
+- Filter out more common false positive spelling-errors
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jun 08 2024 Python Maint <python-maint@redhat.com> - 2.5.0-6
+- Rebuilt for Python 3.13
+
+* Thu Jan 25 2024 Miro Hrončok <mhroncok@redhat.com> - 2.5.0-5
+- Filter out python-missing-require warnings,
+  Fedora's style of Python requirements is not supported
+- Resolves: rhbz#2260169
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jan  4 2024 Tom Callaway <spot@fedoraproject.org> - 2.5.0-3
+- reset checks after each package, thanks to Daniel García Moreno
+
+* Sat Nov 25 2023 Zephyr Lykos <fedora@mochaa.ws> - 2.5.0-2
+- Migrate patches to pyproject.toml (rhbz#1899279)
+
+* Tue Nov 21 2023 Tom Callaway <spot@fedoraproject.org> - 2.5.0-1
+- update to 2.5.0
+
+* Mon Jul 24 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 2.4.0-11
+- Disable ErlangCheck by default in RHEL builds
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 2.4.0-9
+- Rebuilt for Python 3.12
+
+* Thu May 25 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 2.4.0-8
+- Limit deps and don't ship Fedora config in RHEL builds
+
+* Thu May 25 2023 Todd Zullinger <tmz@pobox.com> - 2.4.0-7
+- adjust for rpm-4.19.0 API changes
+
+* Mon Mar 20 2023 Todd Zullinger <tmz@pobox.com> - 2.4.0-6
+- handle license exception in grouping, better (rhbz#2175241)
+
+* Mon Mar 06 2023 Todd Zullinger <tmz@pobox.com> - 2.4.0-5
+- handle license exception in grouping (rhbz#2175241)
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Oct 07 2022 Todd Zullinger <tmz@pobox.com> - 2.4.0-3
+- disable various errors/warnings for debug/devel packages
+- fix broken regex for no-manual-page-for-binary check (rhbz#2132936)
+- ignore missing-hash-section error (rhbz#2132969)
+
+* Wed Oct 05 2022 Miro Hrončok <mhroncok@redhat.com> - 2.4.0-2
+- remove the license list, depend on rpmlint-fedora-license-data instead
+
+* Tue Oct 04 2022 Todd Zullinger <tmz@pobox.com> - 2.4.0-1
+- update to 2.4.0 (rhbz#2088759)
+- use python build-dependency generator
+- own %%{_sysconfdir}/xdg/rpmlint directory
+
+* Sat Sep 24 2022 Todd Zullinger <tmz@pobox.com> - 2.3.0-1
+- update to 2.3.0 (rhbz#2088759)
+- convert license to SPDX and correct to GPL-2.0-or-later
+- enable tests by default, avoid warnings about pytest.mark.no_cover marker
+
+* Sat Sep 24 2022 Tom Callaway <spot@fedoraproject.org> - 2.2.0-7
+- update licenses.toml to reflect change in Fedora licensing identifiers
+
+* Mon Aug 08 2022 Miro Hrončok <mhroncok@redhat.com> - 2.2.0-6
+- Require desktop-file-validate to avoid a fatal error when the RPM has .desktop files
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jun 14 2022 Python Maint <python-maint@redhat.com> - 2.2.0-4
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jan  6 2022 Tom Callaway <spot@fedoraproject.org> - 2.2.0-2
+- disable no-library-dependency-for/on checks in Fedora
+
+* Thu Dec 09 2021 Stephen Smoogen <ssmoogen@redhat.com> - 2.2.0-1
+- Update to upstream 2.2.0
+
+* Tue Dec 07 2021 Neal Gompa <ngompa@fedoraproject.org> - 2.1.0-6
+- Fix some rpmlint policy issues
+
+* Tue Oct  5 2021 Tom Callaway <spot@fedoraproject.org> - 2.1.0-5
+- add explicit Requires for pyenchant
+
+* Thu Sep 16 2021 Tom Callaway <spot@fedoraproject.org> - 2.1.0-4
+- fix rpmlintrc load from cmdline option (bz2000018)
+
+* Sun Sep 05 2021 Miro Hrončok <mhroncok@redhat.com> - 2.1.0-3
+- Ignore hidden-file-or-dir for .cargo-checksum.json
+
+* Tue Aug 17 2021 Tom Callaway <spot@fedoraproject.org> - 2.1.0-2
+- include iso-639-2 collective language codes in LANGUAGES
+
+* Tue Aug 17 2021 Tom Callaway <spot@fedoraproject.org> - 2.1.0-1
+- update to 2.1.0
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jul  7 2021 Tom Callaway <spot@fedoraproject.org> - 2.0.0-5
+- add Requires: rpm-build
+
+* Thu Jul  1 2021 Tom Callaway <spot@fedoraproject.org> - 2.0.0-4
+- fix rpmlint -i where it wrongly assumes a tmp dir
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.0.0-3
+- Rebuilt for Python 3.10
+
+* Fri Jun  4 2021 Tom Callaway <spot@fedoraproject.org> - 2.0.0-2
+- add dash and checkbashisms as Requires
+
+* Thu Jun  3 2021 Tom Callaway <spot@fedoraproject.org> - 2.0.0-1
+- update to 2.0.0
+
+* Tue May 11 2021 Todd Zullinger <tmz@pobox.com> - 1.11-17
+- use proper folder _sourcedir for spec files (upstream PR#633)
+  Resolves: rhbz#1959363
+
+* Tue Apr 13 2021 Miro Hrončok <mhroncok@redhat.com> - 1.11-16
+- Filter out empty specfile-errors, they are duplicates
+
+* Fri Feb  5 2021 Tom Callaway <spot@fedoraproject.org> - 1.11-15
+- correct hard-coded version in Makefile
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.11-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jan 25 2021 Miro Hrončok <mhroncok@redhat.com> - 1.11-13
+- Filter out empty py.typed files in Python site-packages
+
+* Fri Aug 21 2020 Miro Hrončok <mhroncok@redhat.com> - 1.11-12
+- Filter out empty REQUESTED files in pip installed Python metadata dist-info dirs
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.11-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Thu Jul 16 2020 Miro Hrončok <mhroncok@redhat.com> - 1.11-10
+- Don't use the %%python_sitelib macro, because it errors
+- See https://fedoraproject.org/wiki/Changes/PythonMacroError
+
+* Tue Jun 23 2020 Tom Callaway <spot@fedoraproject.org> - 1.11-9
+- use python3-file-magic on f33+
+
+* Tue Jun 16 2020 Tom Callaway <spot@fedoraproject.org> - 1.11-8
+- turn *-not-linked-against-libc from errors to warnings (bz1749738)
+
+* Wed Jun 10 2020 Tom Callaway <spot@fedoraproject.org> - 1.11-7
+- add /usr/bin/python[23] as valid shells
+
+* Sun May 24 2020 Miro Hrončok <mhroncok@redhat.com> - 1.11-6
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.11-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

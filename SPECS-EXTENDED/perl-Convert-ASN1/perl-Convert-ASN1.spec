@@ -1,23 +1,19 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 # Perform optional tests
 %bcond_without perl_Convert_ASN1_enables_optional_test
 
 Summary:        ASN.1 encode/decode library
 Name:           perl-Convert-ASN1
-Version:        0.27
-Release:        21%{?dist}
-License:        GPL+ or Artistic
+Version:        0.34
+Release:        5%{?dist}
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Convert-ASN1
-Source0:        https://cpan.metacpan.org/authors/id/G/GB/GBARR/Convert-ASN1-%{version}.tar.gz#/perl-Convert-ASN1-%{version}.tar.gz
-# Correct shebangs in the tests
-Patch0:         Convert-ASN1-0.27-Correct-shebangs-in-tests.patch
+Source0:        https://cpan.metacpan.org/authors/id/T/TI/TIMLEGGE/Convert-ASN1-%{version}.tar.gz#/perl-Convert-ASN1-%{version}.tar.gz
+
 # Allow running tests from a read-only location,
 # <https://github.com/gbarr/perl-Convert-ASN1/pull/40>
-Patch1:         Convert-ASN1-0.27-Use-temporary-output-files-for-tests.patch
-# Fix unsafe decoding in indef case,
-# <https://github.com/gbarr/perl-Convert-ASN1/pull/15>
-Patch2:         Convert-ASN1-0.27-CVE-2013-7488.patch
+Patch0:         Convert-ASN1-0.27-Use-temporary-output-files-for-tests.patch
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
@@ -43,11 +39,12 @@ BuildRequires:  perl(bytes)
 BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(IO::Socket)
 BuildRequires:  perl(Math::BigInt) >= 1.997
+BuildRequires:  perl(Test::More) >= 0.90
 %if %{with perl_Convert_ASN1_enables_optional_test}
 # Optional tests:
 BuildRequires:  perl(Data::Dumper)
 %endif
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Suggests:       perl(bytes)
 Requires:       perl(Carp)
 Requires:       perl(Encode)
@@ -76,11 +73,13 @@ Tests from %{name}-%{version}. Execute them
 with "%{_libexecdir}/%{name}/test".
 
 %prep
-%setup -q -n Convert-ASN1-%{version}
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
-chmod +x t/*.t
+%autosetup -p1 -n Convert-ASN1-%{version}
+
+# Help file to recognise the Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
@@ -99,26 +98,76 @@ chmod +x %{buildroot}/%{_libexecdir}/%{name}/test
 
 %check
 unset YYDEBUG
+export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 make test
 
 %files
 %license LICENSE
 %doc ChangeLog OldChanges README.md examples/
 %{perl_vendorlib}/Convert/
-%{_mandir}/man3/*.3pm*
+%{_mandir}/man3/Convert::ASN1*.3pm*
 
 %files tests
 %{_libexecdir}/%{name}
 
 %changelog
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.27-21
-- Remove epoch
+* Thu Dec 19 2024 Jyoti kanase <v-jykanase@microsoft.com> -  0.34-5
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.27-20
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.34-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Mon Nov 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.27-19
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.34-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.34-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Aug 21 2023 Jitka Plesnikova <jplesnik@redhat.com> - 0.34-1
+- 0.34 bump (bug #2229845)
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.33-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.33-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.33-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.33-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.33-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Sep 23 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.33-1
+- 0.33 bump
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.31-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.31-1
+- 0.31 bump
+
+* Wed May 26 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.29-1
+- 0.29 bump
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.27-23
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.27-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Nov 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.27-21
 - Fix unsafe decoding in indef case (CVE-2013-7488)
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.27-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.27-19
+- Perl 5.32 rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.27-18
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

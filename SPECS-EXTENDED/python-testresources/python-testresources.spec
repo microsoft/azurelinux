@@ -1,72 +1,115 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global pypi_name testresources
 
-Name:           python-%{pypi_name}
-Version:        1.0.0
-Release:        16%{?dist}
+Name:           python-testresources
+Version:        2.0.1
+Release:        17%{?dist}
 Summary:        Testresources, a pyunit extension for managing expensive test resources
 
 License:        ASL 2.0 and BSD and GPLv2+
 # file testresources/tests/TestUtil.py is GPLv2+
-URL:            https://launchpad.net/testresources
-Source0:        https://pypi.python.org/packages/source/t/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/python-%{pypi_name}-%{version}.tar.gz
+URL:            https://github.com/testing-cabal/testresources
+Source:         https://github.com/testing-cabal/testresources/archive/refs/tags/2.0.1.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
+%define _python_dist_allow_version_zero 1
 
-%description
+BuildRequires: python3-setuptools_scm
+BuildRequires: python3-pip
+BuildRequires: python3-wheel
+BuildRequires: python3-pytest
+
+%global _description %{expand:
 testresources: extensions to python unittest to allow declarative use
-of resources by test cases.
+of resources by test cases.}
 
-%package -n python3-%{pypi_name}
-Summary:        Testresources, a pyunit extension for managing expensive test resources
-%{?python_provide:%python_provide python3-%{pypi_name}}
-BuildRequires: python3-devel
-BuildRequires: python3-setuptools
-BuildRequires: python3-testtools
-BuildRequires: python3-fixtures
-BuildRequires: python3-pbr
-Requires: python3-pbr
+%description %{_description}
 
-%description -n python3-%{pypi_name}
-testresources: extensions to python unittest to allow declarative use
-of resources by test cases.
+%package -n python3-testresources
+Summary:        %{summary}
+BuildRequires:  python3-devel
 
+%description -n python3-testresources %{_description}
 
 %prep
-%setup -q -n %{pypi_name}-%{version}
-# Remove bundled egg-info
-rm -rf lib/%{pypi_name}.egg-info
+%setup -q -n testresources-%{version}
+# replace removed unittest aliases
+sed -i 's/failIf/assertFalse/' testresources/tests/test_resourced_test_case.py
 
+%generate_buildrequires
+%pyproject_buildrequires -x test
 
 %build
-%py3_build
-
+%pyproject_wheel
 
 %install
-%py3_install
-
+%pyproject_install
+%pyproject_save_files testresources
 
 %check
-# tests fail on python3.5
-# testresources/tests/test_optimising_test_suite.py", line 527, in
-# testBasicSortTests
-# testtools.matchers._impl.MismatchError:
-# [test_three, test_one, test_two, test_four] not in
-#   [[test_one, test_two, test_three, test_four],
-#   [test_three, test_two, test_one, test_four]]:
-#      failed with permutation [test_one, test_two, test_three, test_four]
-# %{__python3} setup.py test
+%{python3} -m testtools.run testresources.tests.test_suite
 
-
-%files -n python3-%{pypi_name}
-%doc README NEWS doc
-%{python3_sitelib}/%{pypi_name}
-%{python3_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
+%files -n python3-testresources -f %{pyproject_files}
+%license Apache-2.0 BSD
+%doc README.rst NEWS doc
 
 %changelog
-* Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 1.0.0-16
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Add understated dependency on python3-pbr
+* Mon Mar 24 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.0.1-17
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Wed Aug 14 2024 Carl George <carlwgeorge@fedoraproject.org> - 2.0.1-16
+- Run tests with testtools instead of setup.py
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 2.0.1-14
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 2.0.1-10
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 15 2022 Python Maint <python-maint@redhat.com> - 2.0.1-7
+- Rebuilt for Python 3.11
+
+* Sat Apr 30 2022 Carl George <carl@george.computer> - 2.0.1-6
+- Convert to pyproject macros
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.0.1-3
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Sep 10 2020 Joel Capitao <jcapitao@redhat.com> - 2.0.1-1
+- Update to 2.0.1
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1.0.0-16
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

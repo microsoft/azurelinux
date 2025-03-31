@@ -1,33 +1,28 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
 
 %global srcname markup
-%bcond_with tests
-%bcond_with docs
+%global giturl  https://github.com/aantron/markup.ml
 
 Name:           ocaml-%{srcname}
-Version:        1.0.0
-Release:        5%{?dist}
+Version:        1.0.3
+Release:        18%{?dist}
 Summary:        Error-recovering streaming HTML5 and XML parsers for OCaml
 
 License:        MIT
-URL:            http://aantron.github.io/markup.ml/
+URL:            https://aantron.github.io/markup.ml/
 Source0:        https://github.com/aantron/markup.ml/archive/%{version}/%{srcname}-%{version}.tar.gz
 
-BuildRequires:  ocaml >= 4.02.0
-BuildRequires:  ocaml-bisect-ppx-devel >= 2.0.0
+BuildRequires:  ocaml >= 4.03.0
+BuildRequires:  ocaml-bisect-ppx-devel >= 2.5.0
 BuildRequires:  ocaml-dune >= 2.7.0
 BuildRequires:  ocaml-lwt-devel
-BuildRequires:  ocaml-uutf-devel >= 1.0.0
-%if %{with tests}
 BuildRequires:  ocaml-ounit-devel
-%endif
-%if %{with docs}
-BuildRequires:  ocaml-ocamldoc
-%endif
+BuildRequires:  ocaml-uutf-devel >= 1.0.0
 
 %description
 Markup.ml is a pair of parsers implementing the HTML5 and XML
@@ -69,7 +64,6 @@ This package contains an adapter between Markup.ml and Lwt.
 Summary:        Development files for %{name}-lwt
 Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 Requires:       %{name}-lwt%{?_isa} = %{version}-%{release}
-Requires:       ocaml-bisect-ppx-devel%{?_isa}
 Requires:       ocaml-lwt-devel%{?_isa}
 
 %description    lwt-devel
@@ -77,7 +71,7 @@ The %{name}-lwt-devel package contains libraries and signature files for
 developing applications that use %{name}-lwt.
 
 %prep
-%autosetup -n %{srcname}.ml-%{version} -p1
+%autosetup -n markup.ml-%{version} -p1
 
 # The uchar package is a forward compatibility package for OCaml versions prior
 # to 4.03.  We have a later OCaml in Fedora; uchar is in the standard library.
@@ -86,107 +80,113 @@ developing applications that use %{name}-lwt.
 sed -i '/uchar/d' markup.opam
 
 %build
-dune build %{?_smp_mflags} @install
-
-%if %{with docs}
-# Build the documentation.  Unfortunately, ocamldoc is not smart enough to
-# figure out that Kstream is Markup.Kstream.  I have not been able to figure
-# out how to convince it, so the temporary hacked-up copy of markup.mli is
-# my way of working around the problem.  We should really build documentation
-# with odoc, but this package is a build dependency of odoc.
-mkdir tmp
-sed '/Kstream/d' _build/default/src/markup.mli > tmp/markup.mli
-
-mkdir html
-ocamldoc -html -d html -css-style doc/style.css -I +lwt -I +lwt/unix \
-  -I _build/install/default/lib/markup \
-  -I _build/install/default/lib/markup-lwt \
-  -I _build/install/default/lib/markup-lwt/unix \
-  tmp/markup.mli \
-  _build/default/src/lwt/markup_lwt.mli \
-  _build/default/src/lwt_unix/markup_lwt_unix.mli
-%endif
+%dune_build
 
 %install
-dune install --destdir=%{buildroot}
-
-# We install the documentation with the doc macro
-rm -fr %{buildroot}%{_prefix}/doc
-
-%ifarch %{ocaml_native_compiler}
-# Add missing executable bits
-find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod 0755 {} \+
-%endif
+%dune_install -s
 
 %check
-%if %{with tests}
-dune runtest
-%endif
+%dune_check
 
-%files
+%files -f .ofiles-markup
 %doc README.md
 %license LICENSE.md
-%dir %{_libdir}/ocaml/%{srcname}/
-%{_libdir}/ocaml/%{srcname}/META
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cma
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmxs
-%endif
 
-%files devel
-%if %{with docs}
-%doc html/*
-%endif
-%{_libdir}/ocaml/%{srcname}/dune-package
-%{_libdir}/ocaml/%{srcname}/opam
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.a
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmx
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmxa
-%endif
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmt
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmti
-%{_libdir}/ocaml/%{srcname}/*.ml
-%{_libdir}/ocaml/%{srcname}/*.mli
+%files devel -f .ofiles-markup-devel
 
-%files lwt
-%dir %{_libdir}/ocaml/%{srcname}-lwt/
-%dir %{_libdir}/ocaml/%{srcname}-lwt/unix/
-%{_libdir}/ocaml/%{srcname}-lwt/META
-%{_libdir}/ocaml/%{srcname}-lwt/%{srcname}_lwt.cma
-%{_libdir}/ocaml/%{srcname}-lwt/%{srcname}_lwt.cmi
-%{_libdir}/ocaml/%{srcname}-lwt/unix/%{srcname}_lwt_unix.cma
-%{_libdir}/ocaml/%{srcname}-lwt/unix/%{srcname}_lwt_unix.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}-lwt/%{srcname}_lwt.cmxs
-%{_libdir}/ocaml/%{srcname}-lwt/unix/%{srcname}_lwt_unix.cmxs
-%endif
+%files lwt -f .ofiles-markup-lwt
 
-%files lwt-devel
-%{_libdir}/ocaml/%{srcname}-lwt/dune-package
-%{_libdir}/ocaml/%{srcname}-lwt/opam
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}-lwt/%{srcname}_lwt.a
-%{_libdir}/ocaml/%{srcname}-lwt/%{srcname}_lwt.cmx
-%{_libdir}/ocaml/%{srcname}-lwt/%{srcname}_lwt.cmxa
-%{_libdir}/ocaml/%{srcname}-lwt/unix/%{srcname}_lwt_unix.a
-%{_libdir}/ocaml/%{srcname}-lwt/unix/%{srcname}_lwt_unix.cmx
-%{_libdir}/ocaml/%{srcname}-lwt/unix/%{srcname}_lwt_unix.cmxa
-%endif
-%{_libdir}/ocaml/%{srcname}-lwt/%{srcname}_lwt.cmt
-%{_libdir}/ocaml/%{srcname}-lwt/%{srcname}_lwt.cmti
-%{_libdir}/ocaml/%{srcname}-lwt/%{srcname}_lwt.ml
-%{_libdir}/ocaml/%{srcname}-lwt/%{srcname}_lwt.mli
-%{_libdir}/ocaml/%{srcname}-lwt/unix/%{srcname}_lwt_unix.cmt
-%{_libdir}/ocaml/%{srcname}-lwt/unix/%{srcname}_lwt_unix.cmti
-%{_libdir}/ocaml/%{srcname}-lwt/unix/%{srcname}_lwt_unix.ml
-%{_libdir}/ocaml/%{srcname}-lwt/unix/%{srcname}_lwt_unix.mli
+%files lwt-devel -f .ofiles-markup-lwt-devel
 
 %changelog
-* Mon Aug 09 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.0-5
-- Initial CBL-Mariner import from Fedora 34 (license: MIT).
-- Remove test, docs circular dependencies
+* Wed Jan 08 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0.3-18
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.3-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jun 19 2024 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-16
+- OCaml 5.2.0 ppc64le fix
+
+* Wed May 29 2024 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-15
+- OCaml 5.2.0 for Fedora 41
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.3-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.3-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 18 2023 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-12
+- OCaml 5.1.1 + s390x code gen fix for Fedora 40
+
+* Tue Dec 12 2023 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-11
+- OCaml 5.1.1 rebuild for Fedora 40
+
+* Thu Oct 05 2023 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-10
+- OCaml 5.1 rebuild for Fedora 40
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.3-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-8
+- OCaml 5.0 rebuild for Fedora 39
+
+* Mon Jul 10 2023 Jerry James <loganjerry@gmail.com> - 1.0.3-7
+- OCaml 5.0.0 rebuild
+
+* Tue Jan 24 2023 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-6
+- Rebuild OCaml packages for F38
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Aug 18 2022 Jerry James <loganjerry@gmail.com> - 1.0.3-4
+- Rebuild for ocaml-lwt 5.6.1
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jul 20 2022 Jerry James <loganjerry@gmail.com> - 1.0.3-2
+- Use new OCaml macros
+
+* Sun Jun 19 2022 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-2
+- OCaml 4.14.0 rebuild
+
+* Wed Apr 27 2022 Jerry James <loganjerry@gmail.com> - 1.0.3-1
+- Version 1.0.3
+- Drop upstreamed patch for OCaml 4.13.1 compatibility
+
+* Mon Feb 28 2022 Jerry James <loganjerry@gmail.com> - 1.0.2-7
+- Rebuild for ocaml-uutf 1.0.3
+
+* Fri Feb 04 2022 Richard W.M. Jones <rjones@redhat.com> - 1.0.2-6
+- OCaml 4.13.1 rebuild to remove package notes
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Jan  3 2022 Jerry James <loganjerry@gmail.com> - 1.0.2-4
+- Rebuild for changed ocaml-lwt hashes
+
+* Tue Oct 05 2021 Richard W.M. Jones <rjones@redhat.com> - 1.0.2-3
+- OCaml 4.13.1 build
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jul  5 2021 Jerry James <loganjerry@gmail.com> - 1.0.2-1
+- Version 1.0.2
+
+* Tue Jun 22 2021 Jerry James <loganjerry@gmail.com> - 1.0.1-1
+- Version 1.0.1
+
+* Thu Jun  3 2021 Richard W.M. Jones <rjones@redhat.com> - 1.0.0-6
+- Rebuild for new ocaml-lwt.
+
+* Mon Mar  1 21:30:59 GMT 2021 Richard W.M. Jones <rjones@redhat.com> - 1.0.0-5
+- OCaml 4.12.0 build
 
 * Mon Feb 22 2021 Jerry James <loganjerry@gmail.com> - 1.0.0-4
 - Rebuild for ocaml-lwt 5.4.0

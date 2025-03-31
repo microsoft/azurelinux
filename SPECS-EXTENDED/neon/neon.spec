@@ -1,19 +1,39 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+
 %bcond_without tests
+
+%bcond_with pkcs11
+
+%bcond_with libproxy
+
+# Disable automatic .la file removal
+%global __brp_remove_la_files %nil
 
 Summary: An HTTP and WebDAV client library
 Name: neon
-Version: 0.31.2
-Release: 2%{?dist}
-License: LGPLv2+
+Version: 0.33.0
+Release: 3%{?dist}
+License: LGPL-2.0-or-later
 URL: https://notroj.github.io/neon/
 Source0: https://notroj.github.io/neon/neon-%{version}.tar.gz
-Patch0: neon-0.27.0-multilib.patch
-BuildRequires:  gcc-c++
-BuildRequires: expat-devel, openssl-devel, zlib-devel, krb5-devel, libproxy-devel
-BuildRequires: pkgconfig, pakchois-devel
-Requires: ca-certificates
+Patch0: neon-0.32.2-multilib.patch
+BuildRequires: expat-devel
+BuildRequires: openssl-devel
+BuildRequires: zlib-devel
+BuildRequires: krb5-devel
+
+BuildRequires: pkgconfig
+BuildRequires: make
+BuildRequires: gcc
+BuildRequires: xmlto
+
+%if %{with pkcs11}
+BuildRequires: pakchois-devel
+%endif
+%if %{with libproxy}
+BuildRequires: libproxy-devel
+%endif
 %if %{with tests}
 # SSL tests require openssl binary, PKCS#11 testing need certutil
 BuildRequires: /usr/bin/perl, /usr/bin/openssl, /usr/bin/certutil
@@ -31,29 +51,31 @@ Summary: Development libraries and C header files for the neon library
 Requires: neon = %{version}-%{release}, openssl-devel, zlib-devel, expat-devel
 Requires: pkgconfig
 # Documentation is GPLv2+
-License: LGPLv2+ and GPLv2+
+License: LGPL-2.0-or-later AND GPL-2.0-or-later
 
 %description devel
 The development library for the C language HTTP and WebDAV client library.
 
 %prep
-%setup -q
-%patch 0 -p1 -b .multilib
+%autosetup -p1
 
 # prevent installation of HTML docs
-sed -ibak '/^install-docs/s/install-html//' Makefile.in
+sed -i '/^install-docs/s/install-html//' Makefile.in
 
 %build
-export CC="%{__cc} -pthread"
 %configure --with-expat --enable-shared --disable-static \
         --enable-warnings \
         --with-ssl=openssl --enable-threadsafe-ssl=posix \
+%if %{with libproxy}
         --with-libproxy
-make %{?_smp_mflags}
+%else
+        --without-libproxy
+%endif
+%make_build
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
+%make_install
 
 sed -ri "/^dependency_libs/{s,-l[^ ']*,,g}" \
       $RPM_BUILD_ROOT%{_libdir}/libneon.la
@@ -82,8 +104,82 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.31.2-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Dec 17 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.33.0-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.33.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jan 30 2024 Joe Orton <jorton@redhat.com> - 0.33.0-1
+- update to 0.33.0
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.32.5-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.32.5-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Sep 29 2023 Joe Orton <jorton@redhat.com> - 0.32.5-3
+- migrated to SPDX license
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.32.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jan 23 2023 Joe Orton <jorton@redhat.com> - 0.32.5-1
+- update to 0.32.5
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.32.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Sep  5 2022 Joe Orton <jorton@redhat.com> - 0.32.3-1
+- update to 0.32.3
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.32.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 27 2022 Timm Bäder <tbaeder@redhat.com> - 0.32.2-4
+- Disable automatic .la file removal
+- https://fedoraproject.org/wiki/Changes/RemoveLaFiles
+
+* Thu Jan 27 2022 Joe Orton <jorton@redhat.com> - 0.32.2-3
+- strip LIBS exported by neon-config to the minimum
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.32.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jan 13 2022 Joe Orton <jorton@redhat.com> - 0.32.2-1
+- update to 0.32.2
+
+* Tue Sep 21 2021 Joe Orton <jorton@redhat.com> - 0.32.1-1
+- update to 0.32.1
+- add bcond for libproxy support
+
+* Mon Sep 20 2021 Joe Orton <jorton@redhat.com> - 0.32.0-1
+- update to 0.32.0
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 0.31.2-8
+- Rebuilt with OpenSSL 3.0.0
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.31.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Feb  4 2021 Joe Orton <jorton@redhat.com> - 0.31.2-6
+- add bcond for PKCS#11 support
+- use make macros
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.31.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Aug 26 2020 Joe Orton <jorton@redhat.com> - 0.31.2-4
+- fix tests with current OpenSSL (#1863681)
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.31.2-3
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.31.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jun 24 2020 Joe Orton <jorton@redhat.com> - 0.31.2-1
 - update to 0.31.2

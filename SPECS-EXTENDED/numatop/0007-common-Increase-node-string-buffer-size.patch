@@ -1,0 +1,29 @@
+From e21a7f17997f2e611e8f706761065c8ec6576f5c Mon Sep 17 00:00:00 2001
+From: Dridi Boukelmoune <dridi.boukelmoune@gmail.com>
+Date: Mon, 4 Mar 2024 23:16:27 +0100
+Subject: [PATCH 7/9] common: Increase node string buffer size
+
+Since the maximum number of CPUs was doubled, it might be reasonable to
+double the size of the buffer for the string representation.
+
+Refs 6f6cc3b24d84c413556639b64a62aca6ad0b21cc
+---
+ common/os/os_win.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/common/os/os_win.c b/common/os/os_win.c
+index 29afc19..c0de320 100644
+--- a/common/os/os_win.c
++++ b/common/os/os_win.c
+@@ -222,7 +222,7 @@ nodedetail_line_show(win_reg_t *reg, char *title, char *value, int line)
+ void
+ os_nodedetail_data(dyn_nodedetail_t *dyn, win_reg_t *seg)
+ {
+-	char s1[256], s2[32];
++	char s1[512], s2[32];
+ 	node_t *node;
+ 	win_countvalue_t value;
+ 	node_meminfo_t meminfo;
+-- 
+2.44.0
+

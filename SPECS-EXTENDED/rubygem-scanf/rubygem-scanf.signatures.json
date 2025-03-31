@@ -1,0 +1,10 @@
+{
+ "Signatures": {
+  "LICENSE.txt": "a5e3042dacb53eebda91f3b1caefbfec8307711df8c4ed1ed20e4e97c43307a4",
+  "data.txt": "9df04e450b0904c7249f9e4025861aeac7e551d0adfad9864b7df1249b26ed12",
+  "scanf-1.0.0.gem": "533db7f7e5acafea1a145d6c5329cef667a58fbcb7d64379a808ff1199ee1b00",
+  "test_scanf.rb": "6634f40ebc8be0cd9a49d44a30b3b88ba8d5c3949bc2f289d343001679f0e313",
+  "test_scanfblocks.rb": "5f814484553f435f2ff5db42a0f1c28072f7dbcac80b68d7719185fa2d966636",
+  "test_scanfio.rb": "39103477fa0f1942adf0e3532490d90c13deb5bb0a56657ac84c649b67ed78a5"
+ }
+}

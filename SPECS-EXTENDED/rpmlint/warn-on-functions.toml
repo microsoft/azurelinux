@@ -1,0 +1,25 @@
+# Additional warnings on specific function calls
+[WarnOnFunction]
+
+[WarnOnFunction.crypto-policy-non-compliance-openssl]
+f_name = "SSL_CTX_set_cipher_list"
+good_param = "PROFILE=SYSTEM"
+description = """This application package calls a function to explicitly set crypto ciphers
+for SSL/TLS. That may cause the application not to use the system-wide set
+cryptographic policy and should be modified in accordance to:
+https://fedoraproject.org/wiki/Packaging:CryptoPolicies"""
+
+[WarnOnFunction.crypto-policy-non-compliance-gnutls-1]
+f_name = "gnutls_priority_set_direct"
+description = """This application package calls a function to explicitly set crypto ciphers
+for SSL/TLS. That may cause the application not to use the system-wide set
+cryptographic policy and should be modified in accordance to:
+https://fedoraproject.org/wiki/Packaging:CryptoPolicies"""
+
+[WarnOnFunction.crypto-policy-non-compliance-gnutls-2]
+f_name = "gnutls_priority_init"
+good_param = "SYSTEM"
+description = """This application package calls a function to explicitly set crypto ciphers
+for SSL/TLS. That may cause the application not to use the system-wide set
+cryptographic policy and should be modified in accordance to:
+https://fedoraproject.org/wiki/Packaging:CryptoPolicies"""

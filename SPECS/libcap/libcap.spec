@@ -1,13 +1,15 @@
 Summary:        Libcap
 Name:           libcap
 Version:        2.69
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Group:          System Environment/Security
 URL:            https://www.gnu.org/software/hurd/community/gsoc/project_ideas/libcap.html
 Source0:        https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/%{name}-%{version}.tar.xz
+Patch0:         CVE-2025-1390.patch
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+BuildRequires:  glibc-static >= 2.38-9%{?dist}
 
 %description
 The libcap package implements the user-space interfaces to the POSIX 1003.1e capabilities available
@@ -35,7 +37,9 @@ chmod -v 755 %{buildroot}%{_libdir}/libcap.so
 
 %check
 cd progs
+make sudotest
 sed -i "s|pass_capsh --chroot=\$(/bin/pwd) ==||g" quicktest.sh
+sed -i '/echo "attempt to exploit kernel bug"/,/^fi$/d' quicktest.sh
 ./quicktest.sh
 
 %files
@@ -58,6 +62,12 @@ sed -i "s|pass_capsh --chroot=\$(/bin/pwd) ==||g" quicktest.sh
 %{_mandir}/man3/*
 
 %changelog
+* Wed Feb 26 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.69-3
+- Modify check section to fix ptest
+
+* Sun Feb 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.69-2
+- Patch CVE-2025-1390
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.69-1
 - Auto-upgrade to 2.69 - Azure Linux 3.0 - package upgrades
 

@@ -1,0 +1,43 @@
+From 7d7bb84fde91bef9ee7eba924cbdfa74639cc4fe Mon Sep 17 00:00:00 2001
+From: Kate Hsuan <hpa@redhat.com>
+Date: Tue, 18 Jun 2024 15:04:29 +0800
+Subject: [PATCH] linux: up-enumerator-udev: Find the correct parent id for
+ input devices
+
+The parent id for the devices under "/sys/devices/virtual/misc/uhid/*"
+points to /sys/devices/virtual/misc/uhid. It will cause the device
+information to be updated incorrectly. For example, the type for a mouse is
+updated to "keyboard". This patch makes sure the correct parent id for
+each input device.
+
+Resolves: #268 #286
+---
+ src/linux/up-enumerator-udev.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/src/linux/up-enumerator-udev.c b/src/linux/up-enumerator-udev.c
+index 36e3887b..553f6524 100644
+--- a/src/linux/up-enumerator-udev.c
++++ b/src/linux/up-enumerator-udev.c
+@@ -66,8 +66,17 @@ device_parent_id (GUdevDevice *dev)
+ 		return NULL;
+ 
+ 	/* Continue walk if the parent is a "hid"  device  */
+-	if (g_strcmp0 (subsystem, "hid") == 0)
++	if (g_strcmp0 (subsystem, "hid") == 0) {
++		/* if the parent is under /sys/devices/virtual/misc/uhid, the device should be input devices
++		 * and return the path immediately to make sure they belongs to the correct parent. 
++		 * for example:
++		 * root@fedora:/sys/devices/virtual/misc/uhid# ls
++		 * 0005:046D:B01A.0005  0005:05AC:0250.000B  dev  power  subsystem  uevent */
++		if (g_strrstr (g_udev_device_get_sysfs_path (parent), "/sys/devices/virtual/misc/uhid"))
++			return g_strdup (g_udev_device_get_sysfs_path (parent));
++
+ 		return device_parent_id (parent);
++	}
+ 
+ 	/* Also skip over USB interfaces, we care about full devices */
+ 	if (g_strcmp0 (subsystem, "usb") == 0 &&
+-- 
+GitLab
+

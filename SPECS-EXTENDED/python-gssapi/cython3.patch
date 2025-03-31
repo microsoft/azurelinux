@@ -1,0 +1,14 @@
+Backport of https://github.com/pythongssapi/python-gssapi/pull/321
+
+diff --git a/gssapi/raw/_enum_extensions/ext_dce.pyx b/gssapi/raw/_enum_extensions/ext_dce.pyx
+index fd2989ae..190c8285 100644
+--- a/gssapi/raw/_enum_extensions/ext_dce.pyx
++++ b/gssapi/raw/_enum_extensions/ext_dce.pyx
+@@ -1,6 +1,6 @@
+ from gssapi.raw.cython_types cimport OM_uint32
+ 
+-import gssapi.raw._enum_extensions as ext_registry
++from gssapi.raw import _enum_extensions as ext_registry
+ 
+ 
+ cdef extern from "python_gssapi_ext.h":

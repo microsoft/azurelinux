@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 # Conditionals
 # Invoke "rpmbuild --without <feature>" or "rpmbuild --with <feature>"
 # to disable or enable specific features
@@ -14,29 +12,34 @@ Distribution:   Azure Linux
 %bcond_without runautogen
 %bcond_without userflags
 
+%global gitver %{?numcomm:.%{numcomm}}%{?alphatag:.%{alphatag}}%{?dirty:.%{dirty}}
 %global gittarver %{?numcomm:.%{numcomm}}%{?alphatag:-%{alphatag}}%{?dirty:-%{dirty}}
 
-Name: corosync
-Summary: The Corosync Cluster Engine and Application Programming Interfaces
-Version: 3.0.4
-Release: 3%{?dist}
-License: BSD
-URL: http://corosync.github.io/corosync/
-Source0: http://build.clusterlabs.org/corosync/releases/%{name}-%{version}%{?gittarver}.tar.gz
+Name: 		corosync
+Summary: 	The Corosync Cluster Engine and Application Programming Interfaces
+Version: 	3.1.9
+Release: 	2%{?dist}
+License: 	BSD-3-Clause
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+URL: 		https://corosync.github.io/corosync/
+Source0: 	https://build.clusterlabs.org/corosync/releases/%{name}-%{version}%{?gittarver}.tar.gz#/%{name}-%{version}.tar.gz
 
 # Runtime bits
 # The automatic dependency overridden in favor of explicit version lock
 Requires: corosynclib%{?_isa} = %{version}-%{release}
 
+# Support crypto reload
+Requires: 	libknet1 >= 1.18
 # NSS crypto plugin should be always installed
-Requires: libknet1-crypto-nss-plugin
+Requires: 	libknet1-crypto-nss-plugin >= 1.18
 
 # Build bits
-BuildRequires: gcc
-BuildRequires: groff
-BuildRequires: libqb-devel
-BuildRequires: libknet1-devel
-BuildRequires: zlib-devel
+BuildRequires: 	gcc
+BuildRequires: 	groff
+BuildRequires: 	libqb-devel
+BuildRequires: 	libknet1-devel >= 1.18
+BuildRequires: 	zlib-devel
 %if %{with runautogen}
 BuildRequires: autoconf automake libtool
 %endif
@@ -66,6 +69,7 @@ Requires: libxslt
 %if %{with vqsim}
 BuildRequires: readline-devel
 %endif
+BuildRequires: make
 
 %prep
 %setup -q -n %{name}-%{version}%{?gittarver}
@@ -107,14 +111,14 @@ BuildRequires: readline-devel
 	--with-systemddir=%{_unitdir} \
 	--docdir=%{_docdir}
 
-make %{_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 
 %if %{with dbus}
 mkdir -p -m 0700 %{buildroot}/%{_sysconfdir}/dbus-1/system.d
-install -m 644 %{_builddir}/%{name}-%{version}%{?gittarver}/conf/corosync-signals.conf %{buildroot}/%{_sysconfdir}/dbus-1/system.d/corosync-signals.conf
+install -m 644 %{_builddir}/%{name}-%{version}%{?gittarver}/conf/corosync-signals.conf %{buildroot}/%{_datadir}/dbus-1/system.d/corosync-signals.conf
 %endif
 
 ## tree fixup
@@ -183,7 +187,7 @@ fi
 %config(noreplace) %{_sysconfdir}/sysconfig/corosync
 %config(noreplace) %{_sysconfdir}/logrotate.d/corosync
 %if %{with dbus}
-%{_sysconfdir}/dbus-1/system.d/corosync-signals.conf
+%{_datadir}/dbus-1/system.d/corosync-signals.conf
 %endif
 %if %{with snmp}
 %{_datadir}/snmp/mibs/COROSYNC-MIB.txt
@@ -287,17 +291,100 @@ network splits)
 %endif
 
 %changelog
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.4-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Wed Feb 05 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.1.9-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
 
-* Mon Nov 02 2020 Jan Friesse <jfriesse@redhat.com> - 3.0.4-2
+* Fri Nov 15 2024 Jan Friesse <jfriesse@redhat.com> - 3.1.9-1
+- New upstream release
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.8-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Nov 15 2023 Jan Friesse <jfriesse@redhat.com> - 3.1.8-1
+- New upstream release
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 06 2023 Jan Friesse <jfriesse@redhat.com> - 3.1.7-3
+- migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Nov 15 2022 Jan Friesse <jfriesse@redhat.com> - 3.1.7-1
+- New upstream release
+
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Mar 30 2022 Jan Friesse <jfriesse@redhat.com> - 3.1.6-3
+- Use copytruncate method for logrotate
+
+* Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Nov 15 2021 Jan Friesse <jfriesse@redhat.com> - 3.1.6-1
+- New upstream release
+
+* Wed Aug 04 2021 Jan Friesse <jfriesse@redhat.com> - 3.1.5-1
+- New upstream release
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 03 2021 Jan Friesse <jfriesse@redhat.com> - 3.1.4-1
+- New upstream release
+
+* Fri May 21 2021 Jan Friesse <jfriesse@redhat.com> - 3.1.3-1
+- New upstream release
+
+* Tue Apr 06 2021 Jan Friesse <jfriesse@redhat.com> - 3.1.2-1
+- New upstream release
+
+* Wed Mar 31 2021 Jan Friesse <jfriesse@redhat.com> - 3.1.1-1
+- New upstream release
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Nov 02 2020 Jan Friesse <jfriesse@redhat.com> - 3.1.0-2
 - Add isa version of corosync-devel
 - Add release to corosync-devel version to match autogenerated
   corosynclib-devel provides
 
+* Tue Oct 20 2020 Jan Friesse <jfriesse@redhat.com> - 3.1.0-1
+- New upstream release
+
+* Thu Aug 27 2020 Josef Řídký <jridky@redhat.com> - 3.0.4-6
+- Rebuilt for new net-snmp release
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.4-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 13 2020 Tom Stellard <tstellar@redhat.com> - 3.0.4-4
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Wed May 13 2020 Jan Friesse <jfriesse@redhat.com> - 3.0.4-3
+- Fix typo in the changelog
+
+* Wed May 13 2020 Jan Friesse <jfriesse@redhat.com> - 3.0.4-2
+- Rebuild for new libqb
+
 * Thu Apr 23 2020 Jan Friesse <jfriesse@redhat.com> - 3.0.4-1
 - New upstream release
+
+* Fri Mar 27 2020 Jan Friesse <jfriesse@redhat.com> - 3.0.3-3
+- Add CI tests
+- Enable gating
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

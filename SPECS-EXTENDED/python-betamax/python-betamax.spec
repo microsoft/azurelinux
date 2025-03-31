@@ -1,25 +1,20 @@
-%{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?__python3: %global __python3 /usr/bin/python3}
-%{!?py3_build: %define py3_build CFLAGS="%{optflags}" %{__python3} setup.py build}
-%{!?py3_install: %define py3_install %{__python3} setup.py install --skip-build --root %{buildroot}}
-
 %global srcname betamax
 
 # tests need internet access therefore disabled by default
 # $ fedpkg mockbuild --enable-network --with=tests
 %bcond_with tests
 
-Summary:        VCR imitation for python-requests
 Name:           python-%{srcname}
-Version:        0.8.1
-Release:        12%{?dist}
-License:        ASL 2.0
+Version:        0.9.0
+Release:        4%{?dist}
+Summary:        VCR imitation for python-requests
+
+License:        Apache-2.0
 URL:            https://github.com/sigmavirus24/%{srcname}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Group:          Development/Languages
-Source0:        https://github.com/sigmavirus24/%{srcname}/archive/%{version}/%{srcname}-%{version}.tar.gz
+Source0:        %{url}/archive/%{version}/%{srcname}-%{version}.tar.gz
+
 BuildArch:      noarch
 
 %global _description \
@@ -28,12 +23,11 @@ much easier.
 
 %description %{_description}
 
-%package -n     python3-%{srcname}
+%package -n python3-%{srcname}
 Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 %if %{with tests}
 BuildRequires:  python3-pytest
 BuildRequires:  python3-requests >= 2.0
@@ -63,14 +57,60 @@ py.test-%{python3_version} -vk "$TEST_SELECTOR"
 %endif
 
 %files -n python3-%{srcname}
-%license LICENSE
 %doc README.rst
+%license LICENSE
 %{python3_sitelib}/%{srcname}/
 %{python3_sitelib}/%{srcname}-*.egg-info/
 
 %changelog
-* Mon Oct 19 2020 Steve Laughman <steve.laughman@microsoft.com> - 0.8.1-12
-- Initial CBL-Mariner import from Fedora 33 (license: MIT)
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.9.0-4
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.9.0-2
+- Rebuilt for Python 3.13
+
+* Fri Feb 09 2024 Gwyn Ciesla <gwync@protonmail.com> - 0.9.0-1
+- 0.9.0
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.8.1-20
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Dec 05 2022 Parag Nemade <pnemade AT redhat DOT com> - 0.8.1-18
+- Update license tag to SPDX format
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.8.1-16
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.8.1-13
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-11
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

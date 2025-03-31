@@ -2,8 +2,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:        A straightforward implementation of DBM
 Name:           kyotocabinet
-Version:        1.2.78
-Release:        2%{?dist}
+Version:        1.2.80
+Release:        1%{?dist}
 License:        GPLv3
 URL:            https://dbmx.net/%{name}/
 Source:         https://dbmx.net/%{name}/pkg/%{name}-%{version}.tar.gz
@@ -144,6 +144,10 @@ make check
 %doc COPYING doc/api/* kyotocabinet.idl
 
 %changelog
+* Fri Oct 21 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.2.80-1
+- Upgrade kyotocabinet version from 1.2.78 to 1.2.80
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.78-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 

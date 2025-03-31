@@ -1,0 +1,357 @@
+From 5905cc991fa466239fba4b6cd7f9f3bda5a87641 Mon Sep 17 00:00:00 2001
+From: Zhang Sheng <zhangsheng@uniontech.com>
+Date: Wed, 24 Mar 2021 13:50:05 +0800
+Subject: [PATCH] libudffs: Fix misspelling
+
+---
+ libudffs/extent.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libudffs/extent.c b/libudffs/extent.c
+index 827d2b7..382962e 100644
+--- a/libudffs/extent.c
++++ b/libudffs/extent.c
+@@ -449,7 +449,7 @@ struct udf_desc *find_desc(struct udf_extent *ext, uint32_t offset)
+ /**
+  * @brief allocate a new udf_descriptor having a udf_data item and insert it
+  *        into the udf_descriptor list of a udf_extent ordered by block number
+- * @oaram ext the udf_extent containing the udf_descriptor list head
++ * @param ext the udf_extent containing the udf_descriptor list head
+  * @param ident the tag ident of the new udf_descriptor
+  * @param offset the first block the new descriptor describes
+  * @param length the length of the udf_data item payload in bytes
+
+From 0d92ec4627e9921c4d8fa6f9db2ec584d5c8e3ad Mon Sep 17 00:00:00 2001
+From: Zhang Sheng <zhangsheng@uniontech.com>
+Date: Thu, 1 Apr 2021 21:15:16 +0800
+Subject: [PATCH] wrudf: Fix incorrect return value checking for `lseek`
+
+---
+ wrudf/wrudf-cdrw.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wrudf/wrudf-cdrw.c b/wrudf/wrudf-cdrw.c
+index 7e4391e..569c578 100644
+--- a/wrudf/wrudf-cdrw.c
++++ b/wrudf/wrudf-cdrw.c
+@@ -583,7 +583,7 @@ readSingleBlock(uint32_t pbn)
+ 	    return blockBuffer;
+     } else {
+ 	off = lseek(device, 2048 * pbn, SEEK_SET);
+-	if( off != (off_t)-1 )
++	if( off == (off_t)-1 )
+ 	    return NULL;
+ 	len = read(device, blockBuffer, 2048);
+ 	if( len != 2048 )
+
+From 6063117955e96f2acd4425dade79fa1428a6cced Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>
+Date: Tue, 20 Apr 2021 00:13:03 +0200
+Subject: [PATCH] bswap: Fix typo
+
+---
+ include/bswap.h | 96 ++++++++++++++++++++++++-------------------------
+ 1 file changed, 48 insertions(+), 48 deletions(-)
+
+diff --git a/include/bswap.h b/include/bswap.h
+index 8cfc7ff..e436903 100644
+--- a/include/bswap.h
++++ b/include/bswap.h
+@@ -28,17 +28,17 @@
+ #include <stdint.h>
+ #include <sys/types.h>
+ 
+-#define constant_swab16(x) \
++#define constant_swap16(x) \
+ 	((uint16_t)((((uint16_t)(x) & 0x00FFU) << 8) | \
+ 		  (((uint16_t)(x) & 0xFF00U) >> 8)))
+  
+-#define constant_swab32(x) \
++#define constant_swap32(x) \
+ 	((uint32_t)((((uint32_t)(x) & 0x000000FFU) << 24) | \
+ 		  (((uint32_t)(x) & 0x0000FF00U) <<  8) | \
+ 		  (((uint32_t)(x) & 0x00FF0000U) >>  8) | \
+ 		  (((uint32_t)(x) & 0xFF000000U) >> 24)))
+ 
+-#define constant_swab64(x) \
++#define constant_swap64(x) \
+ 	((uint64_t)((((uint64_t)(x) & 0x00000000000000FFULL) << 56) | \
+ 		  (((uint64_t)(x) & 0x000000000000FF00ULL) << 40) | \
+ 		  (((uint64_t)(x) & 0x0000000000FF0000ULL) << 24) | \
+@@ -48,13 +48,13 @@
+ 		  (((uint64_t)(x) & 0x00FF000000000000ULL) >> 40) | \
+ 		  (((uint64_t)(x) & 0xFF00000000000000ULL) >> 56)))
+ 
+-static inline uint16_t swab16(uint16_t x)
++static inline uint16_t swap16(uint16_t x)
+ {
+ 	return ((uint16_t)((((uint16_t)(x) & 0x00FFU) << 8) | \
+ 			   (((uint16_t)(x) & 0xFF00U) >> 8)));
+ }
+  
+-static inline uint32_t swab32(uint32_t x)
++static inline uint32_t swap32(uint32_t x)
+ {
+ 	return ((uint32_t)((((uint32_t)(x) & 0x000000FFU) << 24) | \
+ 			   (((uint32_t)(x) & 0x0000FF00U) <<  8) | \
+@@ -62,7 +62,7 @@ static inline uint32_t swab32(uint32_t x)
+ 			   (((uint32_t)(x) & 0xFF000000U) >> 24)));
+ }
+ 
+-static inline uint64_t swab64(uint64_t x)
++static inline uint64_t swap64(uint64_t x)
+ {
+ 	return ((uint64_t)((((uint64_t)(x) & 0x00000000000000FFULL) << 56) | \
+ 			   (((uint64_t)(x) & 0x000000000000FF00ULL) << 40) | \
+@@ -74,17 +74,17 @@ static inline uint64_t swab64(uint64_t x)
+ 			   (((uint64_t)(x) & 0xFF00000000000000ULL) >> 56)));
+ }
+ 
+-#define constant_swab16p(x) \
++#define constant_swap16p(x) \
+ 	((uint16_t)(((*(uint16_t *)(x) & 0x00FFU) << 8) | \
+ 		  ((*(uint16_t *)(x) & 0xFF00U) >> 8)))
+ 
+-#define constant_swab32p(x) \
++#define constant_swap32p(x) \
+ 	((uint32_t)(((*(uint32_t *)(x) & 0x000000FFU) << 24) | \
+ 		  ((*(uint32_t *)(x) & 0x0000FF00U) <<  8) | \
+ 		  ((*(uint32_t *)(x) & 0x00FF0000U) >>  8) | \
+ 		  ((*(uint32_t *)(x) & 0xFF000000U) >> 24)))
+ 
+-#define constant_swab64p(x) \
++#define constant_swap64p(x) \
+ 	((uint64_t)(((*(uint64_t *)(x) & 0x00000000000000FFULL) << 56) | \
+ 		  ((*(uint64_t *)(x) & 0x000000000000FF00ULL) << 40) | \
+ 		  ((*(uint64_t *)(x) & 0x0000000000FF0000ULL) << 24) | \
+@@ -95,13 +95,13 @@ static inline uint64_t swab64(uint64_t x)
+ 		  ((*(uint64_t *)(x) & 0xFF00000000000000ULL) >> 56)))
+ 
+ 
+-static inline uint16_t swab16p(uint16_t *x)
++static inline uint16_t swap16p(uint16_t *x)
+ {
+ 	return ((uint16_t)(((*(uint16_t *)(x) & 0x00FFU) << 8) | \
+ 			   ((*(uint16_t *)(x) & 0xFF00U) >> 8)));
+ }
+ 
+-static inline uint32_t swab32p(uint32_t *x)
++static inline uint32_t swap32p(uint32_t *x)
+ {
+ 	return ((uint32_t)(((*(uint32_t *)(x) & 0x000000FFU) << 24) | \
+ 			   ((*(uint32_t *)(x) & 0x0000FF00U) <<  8) | \
+@@ -109,7 +109,7 @@ static inline uint32_t swab32p(uint32_t *x)
+ 			   ((*(uint32_t *)(x) & 0xFF000000U) >> 24)));
+ }
+ 
+-static inline uint64_t swab64p(uint64_t *x)
++static inline uint64_t swap64p(uint64_t *x)
+ {
+ 	return ((uint64_t)(((*(uint64_t *)(x) & 0x00000000000000FFULL) << 56) | \
+ 			   ((*(uint64_t *)(x) & 0x000000000000FF00ULL) << 40) | \
+@@ -124,37 +124,37 @@ static inline uint64_t swab64p(uint64_t *x)
+ #ifdef WORDS_BIGENDIAN
+ 
+ #define le16_to_cpu(x) (__builtin_constant_p(x) ? \
+-			constant_swab16(x) : \
+-			swab16(x))
++			constant_swap16(x) : \
++			swap16(x))
+  
+ #define le32_to_cpu(x) (__builtin_constant_p(x) ? \
+-			constant_swab32(x) : \
+-			swab32(x))
++			constant_swap32(x) : \
++			swap32(x))
+ 
+ #define le64_to_cpu(x) (__builtin_constant_p(x) ? \
+-			constant_swab64(x) : \
+-			swab64(x))
++			constant_swap64(x) : \
++			swap64(x))
+ 
+ 
+-#define constant_le16_to_cpu(x) constant_swab16((x))
+-#define constant_le32_to_cpu(x) constant_swab32((x))
+-#define constant_le64_to_cpu(x) constant_swab64((x))
++#define constant_le16_to_cpu(x) constant_swap16((x))
++#define constant_le32_to_cpu(x) constant_swap32((x))
++#define constant_le64_to_cpu(x) constant_swap64((x))
+ 
+ #define le16_to_cpup(x) (__builtin_constant_p(x) ? \
+-			constant_swab16p(x) : \
+-			swab16p(x))
++			constant_swap16p(x) : \
++			swap16p(x))
+ 
+ #define le32_to_cpup(x) (__builtin_constant_p(x) ? \
+-			constant_swab32p(x) : \
+-			swab32p(x))
++			constant_swap32p(x) : \
++			swap32p(x))
+ 
+ #define le64_to_cpup(x) (__builtin_constant_p(x) ? \
+-			constant_swab64p(x) : \
+-			swab64p(x))
++			constant_swap64p(x) : \
++			swap64p(x))
+ 
+-#define constant_le16_to_cpup(x) constant_swab16p((x))
+-#define constant_le32_to_cpup(x) constant_swab32p((x))
+-#define constant_le64_to_cpup(x) constant_swab64p((x))
++#define constant_le16_to_cpup(x) constant_swap16p((x))
++#define constant_le32_to_cpup(x) constant_swap32p((x))
++#define constant_le64_to_cpup(x) constant_swap64p((x))
+ 
+ #define be16_to_cpu(x) ((uint16_t)(x))
+ #define be32_to_cpu(x) ((uint32_t)(x))
+@@ -191,37 +191,37 @@ static inline uint64_t swab64p(uint64_t *x)
+ #define constant_le64_to_cpup(x) (*(uint64_t *)(x))
+ 
+ #define be16_to_cpu(x) (__builtin_constant_p(x) ? \
+-			constant_swab16(x) : \
+-			swab16(x))
++			constant_swap16(x) : \
++			swap16(x))
+  
+ #define be32_to_cpu(x) (__builtin_constant_p(x) ? \
+-			constant_swab32(x) : \
+-			swab32(x))
++			constant_swap32(x) : \
++			swap32(x))
+ 
+ #define be64_to_cpu(x) (__builtin_constant_p(x) ? \
+-			constant_swab64(x) : \
+-			swab64(x))
++			constant_swap64(x) : \
++			swap64(x))
+ 
+ 
+-#define constant_be16_to_cpu(x) constant_swab16((x))
+-#define constant_be32_to_cpu(x) constant_swab32((x))
+-#define constant_be64_to_cpu(x) constant_swab64((x))
++#define constant_be16_to_cpu(x) constant_swap16((x))
++#define constant_be32_to_cpu(x) constant_swap32((x))
++#define constant_be64_to_cpu(x) constant_swap64((x))
+ 
+ #define be16_to_cpup(x) (__builtin_constant_p(x) ? \
+-			constant_swab16p(x) : \
+-			swab16p(x))
++			constant_swap16p(x) : \
++			swap16p(x))
+ 
+ #define be32_to_cpup(x) (__builtin_constant_p(x) ? \
+-			constant_swab32p(x) : \
+-			swab32p(x))
++			constant_swap32p(x) : \
++			swap32p(x))
+ 
+ #define be64_to_cpup(x) (__builtin_constant_p(x) ? \
+-			constant_swab64p(x) : \
+-			swab64p(x))
++			constant_swap64p(x) : \
++			swap64p(x))
+ 
+-#define constant_be16_to_cpup(x) constant_swab16p((x))
+-#define constant_be32_to_cpup(x) constant_swab32p((x))
+-#define constant_be64_to_cpup(x) constant_swab64p((x))
++#define constant_be16_to_cpup(x) constant_swap16p((x))
++#define constant_be32_to_cpup(x) constant_swap32p((x))
++#define constant_be64_to_cpup(x) constant_swap64p((x))
+ 
+ #endif /* WORDS_BIGENDIAN */
+ 
+
+From 07c5f12de1f9d3582b21d78296b7d05403dca008 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>
+Date: Tue, 20 Apr 2021 00:13:26 +0200
+Subject: [PATCH] mkudffs: Add missing branch for mmc_profile detection
+
+---
+ mkudffs/options.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/mkudffs/options.c b/mkudffs/options.c
+index 58d810a..0b9e4a7 100644
+--- a/mkudffs/options.c
++++ b/mkudffs/options.c
+@@ -797,6 +797,10 @@ void parse_args(int argc, char *argv[], struct udf_disc *disc, char **device, in
+ 						else /* All other disc statuses means that medium is recordable = CD-R */
+ 							mmc_profile = 0x09;
+ 					}
++					else
++					{
++						mmc_profile = 0x00; /* Unknown optical disc */
++					}
+ 				}
+ 				else
+ 				{
+
+From 7a432b0bcd76cbd6a79925cde213f5d9073df137 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>
+Date: Sat, 12 Jun 2021 12:09:05 +0200
+Subject: [PATCH] wrudf: Fix parsing Volume Descriptor Sequence
+
+Fixes reading Reserve Volume Descriptor Sequence and fixes crashing when
+readTaggedBlock() returns NULL.
+---
+ wrudf/wrudf.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/wrudf/wrudf.c b/wrudf/wrudf.c
+index 79ca383..7a500c9 100644
+--- a/wrudf/wrudf.c
++++ b/wrudf/wrudf.c
+@@ -93,6 +93,7 @@ void
+ initialise(char *devicename) 
+ {
+     uint32_t			i, len, blkno, lastblk, size;
++    int				inMainSeq;
+     long_ad			*fsdAd;
+     short_ad			*adSpaceMap;
+     struct sparablePartitionMap *spm;
+@@ -158,17 +159,17 @@ initialise(char *devicename)
+     /* read Volume Descriptor Sequence */
+     blkno = extentMainVolDescSeq.extLocation;
+     len = extentMainVolDescSeq.extLength;
++    inMainSeq = 1;
+ 
+     for( i = 0; i < len; blkno++, i += 2048 ) {
+-	int	inMainSeq = 1;
+-
+ 	if( (p = readTaggedBlock(blkno, ABSOLUTE)) == NULL ) {
+ 	    if( !inMainSeq ) 
+ 		fail("Volume Descriptor Sequences read failure\n");
+-	    blkno = extentRsrvVolDescSeq.extLocation;
++	    blkno = extentRsrvVolDescSeq.extLocation - 1;
+ 	    len = extentRsrvVolDescSeq.extLength;
+ 	    inMainSeq = 0;
+-	    i = 0;
++	    i = (uint32_t) -2048;
++	    continue;
+ 	}
+ 	switch( p->descTag.tagIdent ) {
+ 	case TAG_IDENT_PVD:
+
+From b08c75d234d69b2d1cf07dc639d432db767a775f Mon Sep 17 00:00:00 2001
+From: Jiri Kucera <jkucera@redhat.com>
+Date: Sun, 13 Jun 2021 19:37:47 +0200
+Subject: [PATCH] wrudf-cdr.c: Exit on allocation failure
+
+---
+ wrudf/wrudf-cdr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wrudf/wrudf-cdr.c b/wrudf/wrudf-cdr.c
+index 538167a..27883da 100644
+--- a/wrudf/wrudf-cdr.c
++++ b/wrudf/wrudf-cdr.c
+@@ -26,7 +26,7 @@ uint32_t newVATentry() {
+ 	sizeVAT += 2048;
+ 	vat = realloc(vat, sizeVAT);
+ 	if( vat == NULL )
+-	    printf("VAT reallocation failed\n");
++	    fail("VAT reallocation failed\n");
+     }
+     /* could go through VAT and try to find unused 0xFFFFFFFF entry rather than alloc new one at the end */
+     vat[newVATindex] = getNWA() - pd->partitionStartingLocation;

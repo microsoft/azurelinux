@@ -1,15 +1,21 @@
+# Use File::Slurper for reading file content
+%bcond_without perl_Config_AutoConf_enables_File_Slurper
+# Use Scalar::Util for detecting numbers
+%bcond_without perl_Config_AutoConf_enables_Scalar_Util
+
 Name:           perl-Config-AutoConf
-Version:        0.318
-Release:        3%{?dist}
+Version:        0.320
+Release:        1%{?dist}
 Summary:        A module to implement some of AutoConf macros in pure Perl
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Config-AutoConf
-Source0:        https://cpan.metacpan.org/authors/id/R/RE/REHSACK/Config-AutoConf-%{version}.tar.gz#/perl-Config-AutoConf-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/A/AM/AMBS/Config-AutoConf-%{version}.tar.gz
 BuildArch:      noarch
 # Build
 BuildRequires:  gcc
+BuildRequires:  make
 BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
@@ -23,16 +29,26 @@ BuildRequires:  perl(Config)
 BuildRequires:  perl(constant)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(File::Basename)
+%if %{with perl_Config_AutoConf_enables_File_Slurper}
 BuildRequires:  perl(File::Slurper)
+%endif
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(File::Temp)
+%if %{with perl_Config_AutoConf_enables_Scalar_Util}
+BuildRequires:  perl(Scalar::Util) >= 1.18
+%endif
 BuildRequires:  perl(Text::ParseWords)
 # Tests only
 BuildRequires:  perl(Cwd)
 BuildRequires:  perl(ExtUtils::CBuilder)
 # Unused BuildRequires:  perl(IO::String)
 BuildRequires:  perl(Test::More)
-Requires:       perl(:MODULE_COMPAT_%(eval "$(/usr/bin/perl -V:version)"; echo $version))
+%if %{with perl_Config_AutoConf_enables_File_Slurper}
+Suggests:       perl(File::Slurper)
+%endif
+%if %{with perl_Config_AutoConf_enables_Scalar_Util}
+Suggests:       perl(Scalar::Util) >= 1.18
+%endif
 
 %description
 This module simulates some of the tasks autoconf macros do.  To detect
@@ -58,6 +74,10 @@ a command, a library and similar.
 %{_mandir}/man3/*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.320-1
+- Update to version 0.320
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.318-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
