@@ -253,9 +253,9 @@ libxml2-devel-2.11.5-4.azl3.x86_64.rpm
 libxcrypt-4.4.36-2.azl3.x86_64.rpm
 libxcrypt-debuginfo-4.4.36-2.azl3.x86_64.rpm
 libxcrypt-devel-4.4.36-2.azl3.x86_64.rpm
-libxslt-1.1.39-1.azl3.x86_64.rpm
-libxslt-debuginfo-1.1.39-1.azl3.x86_64.rpm
-libxslt-devel-1.1.39-1.azl3.x86_64.rpm
+libxslt-1.1.43-1.azl3.x86_64.rpm
+libxslt-debuginfo-1.1.43-1.azl3.x86_64.rpm
+libxslt-devel-1.1.43-1.azl3.x86_64.rpm
 lua-5.4.6-1.azl3.x86_64.rpm
 lua-debuginfo-5.4.6-1.azl3.x86_64.rpm
 lua-devel-5.4.6-1.azl3.x86_64.rpm
