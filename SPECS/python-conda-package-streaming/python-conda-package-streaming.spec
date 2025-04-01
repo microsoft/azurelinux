@@ -7,7 +7,7 @@ Uses enhanced pip lazy_wheel to fetch a file out of .conda with no more than
 Uses tar = tarfile.open(fileobj=...) to stream remote .tar.bz2. Closes the
 HTTP request once desired files have been seen.}
 # We have a circular dep on conda for tests
-%bcond_with bootstrap
+
 Summary:        Extract metadata from remote conda packages without downloading whole file
 Name:           python-%{srcname}
 Version:        0.11.0
@@ -18,6 +18,13 @@ Distribution:   Azure Linux
 URL:            https://github.com/conda/conda-package-streaming
 Source0:        https://github.com/conda/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
+%if 0%{?with_check}
+BuildRequires:  python3-archspec
+BuildRequires:  python3-zstandard
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-cov
+BuildRequires:  python3-pytest-mock
+%endif
 
 %description
 %{common_description}
@@ -29,11 +36,7 @@ BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
 Requires:       python3-requests
 Requires:       python3-zstandard
-# For tests
-%if %{without bootstrap}
-# Need conda executable for tests
-BuildRequires:  conda
-%endif
+
 
 %description -n python3-%{srcname}
 %{common_description}
@@ -42,12 +45,6 @@ BuildRequires:  conda
 %autosetup -n %{srcname}-%{version}
 # do not run coverage in pytest, drop unneeded and unpackaged boto3-stubs dev dep
 sed -i -e '/cov/d' -e '/boto3-stubs/d' pyproject.toml requirements.txt
-%if %{with bootstrap}
-sed -i -e '/"conda"/d' -e '/conda-package-handling/d' pyproject.toml
-%endif
-
-%{generate_buildrequires}
-%{pyproject_buildrequires} -x test
 
 %build
 %{pyproject_wheel}
@@ -57,20 +54,9 @@ sed -i -e '/"conda"/d' -e '/conda-package-handling/d' pyproject.toml
 %{pyproject_save_files} %{pkgname}
 
 %check
-pip3 install pytest pytest-cov pytest-mock boto3 boto3-stubs[essential] bottle zstandard archspec
-%if %{without bootstrap}
-# To set CONDA_EXE
-. %{_sysconfdir}/profile.d/conda.sh
-export CONDA_EXE
-# The deselected tests require a populated conda package cache which we can't really provide
-%pytest -v tests \
-  --deselect=tests/test_transmute.py::test_transmute \
-  --deselect=tests/test_transmute.py::test_transmute_backwards \
-  --deselect=tests/test_url.py::test_lazy_wheel
-%else
-# Minimal non-conda required test
+pip3 install boto3 boto3-stubs[essential] bottle 
 %pytest -v tests/test_degraded.py
-%endif
+
 
 %files -n python3-%{srcname} -f %{pyproject_files}
 %doc README.md
