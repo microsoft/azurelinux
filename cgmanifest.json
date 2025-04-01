@@ -1967,8 +1967,8 @@
         "type": "other",
         "other": {
           "name": "conda",
-          "version": "24.1.2",
-          "downloadUrl": "https://github.com/conda/conda/archive/24.1.2/conda-24.1.2.tar.gz"
+          "version": "24.3.0",
+          "downloadUrl": "https://github.com/conda/conda/archive/24.3.0/conda-24.3.0.tar.gz"
         }
       }
     },
@@ -21942,6 +21942,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-archspec",
+          "version": "0.2.5",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/a/archspec/archspec-0.2.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-argcomplete",
           "version": "1.10.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/a/argcomplete/argcomplete-1.10.0.tar.gz"
@@ -22095,6 +22105,16 @@
           "name": "python-blivet",
           "version": "3.2.2",
           "downloadUrl": "http://github.com/storaged-project/blivet/archive/blivet-3.2.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-boltons",
+          "version": "25.0.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/boltons/boltons-25.0.0.tar.gz"
         }
       }
     },
@@ -22272,9 +22292,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-conda-libmamba-solver",
+          "version": "24.9.0",
+          "downloadUrl": "https://github.com/conda/conda-libmamba-solver/archive/24.9.0/conda-libmamba-solver-24.9.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-conda-package-handling",
           "version": "2.2.0",
           "downloadUrl": "https://github.com/conda/conda-package-handling/archive/2.2.0/conda-package-handling-2.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-conda-package-streaming",
+          "version": "0.11.0",
+          "downloadUrl": "https://github.com/conda/conda-package-streaming/archive/v0.11.0/conda-package-streaming-0.11.0.tar.gz"
         }
       }
     },
@@ -23455,6 +23495,16 @@
           "name": "python-memcached",
           "version": "1.59",
           "downloadUrl": "https://github.com/linsomniac/python-memcached/archive/1.59.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-menuinst",
+          "version": "2.2.0",
+          "downloadUrl": "https://github.com/conda/menuinst/archive/2.2.0/menuinst-2.2.0.tar.gz"
         }
       }
     },
@@ -25475,6 +25525,16 @@
           "name": "python-zope-interface",
           "version": "6.1",
           "downloadUrl": "https://pypi.python.org/packages/source/z/zope.interface/zope.interface-6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-zstandard",
+          "version": "0.23.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/z/zstandard/zstandard-0.23.0.tar.gz"
         }
       }
     },
