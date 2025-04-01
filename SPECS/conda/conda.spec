@@ -95,7 +95,7 @@ BuildRequires:  python%{python3_pkgversion}-responses
 %endif
 
 Requires:       %py3_reqs
-Requires:       python%{python3_pkgversion}-boltons
+# Requires:       python%{python3_pkgversion}-boltons
 
 # Some versions in conda/_vendor/vendor.txt
 Provides:       bundled(python%{python3_pkgversion}-appdirs) = 1.2.0
