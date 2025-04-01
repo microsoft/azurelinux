@@ -22292,6 +22292,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-conda-libmamba-solver",
+          "version": "24.9.0",
+          "downloadUrl": "https://github.com/conda/conda-libmamba-solver/archive/refs/tags/24.9.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-conda-package-handling",
           "version": "2.2.0",
           "downloadUrl": "https://github.com/conda/conda-package-handling/archive/2.2.0/conda-package-handling-2.2.0.tar.gz"
