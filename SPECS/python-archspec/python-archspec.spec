@@ -12,7 +12,7 @@ Version:        0.2.5
 Release:        3%{?dist}
 License:        Apache-2.0 OR MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/archspec/archspec
 Source:         %{pypi_source}
 BuildRequires:  python3-devel

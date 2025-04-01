@@ -95,7 +95,12 @@ BuildRequires:  python%{python3_pkgversion}-responses
 %endif
 
 Requires:       %py3_reqs
-# Requires:       python%{python3_pkgversion}-boltons
+Requires:       python%{python3_pkgversion}-boltons
+Requires:       python3-archspec
+Requires:       python3-conda-package-streaming
+Requires:       python3-menuinst
+Requires:       python3-platformdirs
+Requires:       python3-jsonpatch
 
 # Some versions in conda/_vendor/vendor.txt
 Provides:       bundled(python%{python3_pkgversion}-appdirs) = 1.2.0
@@ -433,6 +438,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 %changelog
 * Wed Feb 26 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-1
 - Auto-upgrade to 24.3.0 - fixes subprocess_call when stdin is bytes
+- Add missing runtime dependencies archspec, boltons, menuinst, and conda-package-streaming 
 
 * Fri Jun 14 2024 Sam Meluch <sammeluch@microsoft.com> - 24.1.2-2
 - Add pytest and pip install archspec to fix package tests

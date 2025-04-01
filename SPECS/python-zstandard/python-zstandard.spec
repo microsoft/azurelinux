@@ -6,7 +6,7 @@ Version:        0.23.0
 Release:        2%{?dist}
 License:        (BSD-3-Clause OR GPL-2.0-only) AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/indygreg/python-zstandard
 Source0:        %{pypi_source}
 # relax dependencies so that auto BR generation works

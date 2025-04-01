@@ -16,7 +16,7 @@ Version:        2.2.0
 Release:        8%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/conda/menuinst
 Source:         %{url}/archive/%{version}/%{srcname}-%{version}.tar.gz
 BuildRequires:  python3-devel

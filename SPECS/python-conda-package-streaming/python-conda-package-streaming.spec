@@ -1,34 +1,26 @@
 %global srcname conda-package-streaming
 %global pkgname conda_package_streaming
-
-# We have a circular dep on conda for tests
-%bcond_with bootstrap
-
-Distribution:   Azure Linux
-Name:           python-%{srcname}
-Vendor:         Microsoft Corporation
-Version:        0.11.0
-Release:        2%{?dist}
-Summary:        Extract metadata from remote conda packages without downloading whole file
-
-License:        BSD-3-Clause
-URL:            https://github.com/conda/conda-package-streaming
-Source0:        https://github.com/conda/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
-
-BuildArch:      noarch
-
 %global common_description %{expand:Download conda metadata from packages without transferring entire file. Get
 metadata from local .tar.bz2 packages without reading entire files.
-
 Uses enhanced pip lazy_wheel to fetch a file out of .conda with no more than
 3 range requests, but usually 2.
-
 Uses tar = tarfile.open(fileobj=...) to stream remote .tar.bz2. Closes the
 HTTP request once desired files have been seen.}
+# We have a circular dep on conda for tests
+%bcond_with bootstrap
+Summary:        Extract metadata from remote conda packages without downloading whole file
+Name:           python-%{srcname}
+Version:        0.11.0
+Release:        2%{?dist}
+License:        BSD-3-Clause
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+URL:            https://github.com/conda/conda-package-streaming
+Source0:        https://github.com/conda/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
+BuildArch:      noarch
 
 %description
 %{common_description}
-
 
 %package -n python3-%{srcname}
 Summary:        %{summary}
@@ -46,7 +38,6 @@ BuildRequires:  conda
 %description -n python3-%{srcname}
 %{common_description}
 
-
 %prep
 %autosetup -n %{srcname}-%{version}
 # do not run coverage in pytest, drop unneeded and unpackaged boto3-stubs dev dep
@@ -55,21 +46,21 @@ sed -i -e '/cov/d' -e '/boto3-stubs/d' pyproject.toml requirements.txt
 sed -i -e '/"conda"/d' -e '/conda-package-handling/d' pyproject.toml
 %endif
 
-%generate_buildrequires
-%pyproject_buildrequires -x test
+%{generate_buildrequires}
+%{pyproject_buildrequires} -x test
 
 %build
-%pyproject_wheel
+%{pyproject_wheel}
 
 %install
-%pyproject_install
-%pyproject_save_files %{pkgname}
+%{pyproject_install}
+%{pyproject_save_files} %{pkgname}
 
 %check
 pip3 install pytest pytest-cov pytest-mock boto3 boto3-stubs[essential] bottle zstandard archspec
 %if %{without bootstrap}
 # To set CONDA_EXE
-. /etc/profile.d/conda.sh
+. %{_sysconfdir}/profile.d/conda.sh
 export CONDA_EXE
 # The deselected tests require a populated conda package cache which we can't really provide
 %pytest -v tests \
@@ -84,7 +75,6 @@ export CONDA_EXE
 %files -n python3-%{srcname} -f %{pyproject_files}
 %doc README.md
 %license %{python3_sitelib}/conda_package_streaming-%{version}.dist-info/LICENSE
-
 
 %changelog
 * Sat Jan 18 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.11.0-2
