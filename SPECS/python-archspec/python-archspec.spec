@@ -36,12 +36,12 @@ rm -rf archspec/json/.git*
 
 
 %build
-%{pyproject_wheel}
+%pyproject_wheel
 
 
 %install
-%{pyproject_install}
-%{pyproject_save_files} %{srcname}
+%pyproject_install
+%pyproject_save_files %{srcname}
 
 
 %check

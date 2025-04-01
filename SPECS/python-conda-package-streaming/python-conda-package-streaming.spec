@@ -11,7 +11,7 @@ HTTP request once desired files have been seen.}
 Summary:        Extract metadata from remote conda packages without downloading whole file
 Name:           python-%{srcname}
 Version:        0.11.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,7 +22,6 @@ BuildArch:      noarch
 BuildRequires:  python3-archspec
 BuildRequires:  python3-zstandard
 BuildRequires:  python3-pytest
-BuildRequires:  python3-pytest-cov
 BuildRequires:  python3-pytest-mock
 %endif
 
@@ -47,22 +46,26 @@ Requires:       python3-zstandard
 sed -i -e '/cov/d' -e '/boto3-stubs/d' pyproject.toml requirements.txt
 
 %build
-%{pyproject_wheel}
+%pyproject_wheel
 
 %install
-%{pyproject_install}
-%{pyproject_save_files} %{pkgname}
+%pyproject_install
+%pyproject_save_files %{pkgname}
 
 %check
-pip3 install boto3 boto3-stubs[essential] bottle 
-%pytest -v tests/test_degraded.py
+pip3 install pytest-cov==6.1.0 boto3==1.37.24 boto3-stubs[essential]==1.37.24 bottle==0.13.2
+%pytest -v tests/test_degraded.py 
 
 
 %files -n python3-%{srcname} -f %{pyproject_files}
 %doc README.md
-%license %{python3_sitelib}/conda_package_streaming-%{version}.dist-info/LICENSE
+%license LICENSE
 
 %changelog
+* Tue Apr 01 2025 Riken Maharjan <rmaharjan@microsoft.com> - 0.11.0-3
+- Initial Azure Linux import from Fedora 42 (license: MIT)
+- License Verified
+
 * Sat Jan 18 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.11.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
 

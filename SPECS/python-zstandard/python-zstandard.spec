@@ -32,21 +32,21 @@ BuildRequires:  python3dist(pytest-xdist)
 %description -n python3-%{pypi_name}
 %{desc}
 
-%{pyproject_extras_subpkg} -n python3-%{pypi_name} cffi
+%pyproject_extras_subpkg -n python3-%{pypi_name} cffi
 
 %prep
 %autosetup -n %{pypi_name}-%{version}
 rm -r %{pypi_name}.egg-info
 
 %build
-%{pyproject_wheel}
+%pyproject_wheel
 
 %install
-%{pyproject_install}
-%{pyproject_save_files} %{pypi_name}
+%pyproject_install
+%pyproject_save_files %{pypi_name}
 
 %check
-%{pyproject_check_import}
+%pyproject_check_import
 %if %{with check}
 mv zstandard{,.src}
 export ZSTD_SLOW_TESTS=1

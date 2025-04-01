@@ -47,13 +47,13 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 
 %build
 export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
-%{pyproject_wheel}
+%pyproject_wheel
 
 
 %install
 export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
-%{pyproject_install}
-%{pyproject_save_files} %{srcname}
+%pyproject_install
+%pyproject_save_files %{srcname}
 
 
 %check

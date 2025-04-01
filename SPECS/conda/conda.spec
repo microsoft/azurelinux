@@ -95,7 +95,7 @@ BuildRequires:  python%{python3_pkgversion}-responses
 %endif
 
 Requires:       %py3_reqs
-Requires:       python%{python3_pkgversion}-boltons
+Requires:       python3-boltons
 Requires:       python3-archspec
 Requires:       python3-conda-package-streaming
 Requires:       python3-menuinst
