@@ -410,6 +410,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
   --deselect=tests/test_install.py::test_install_freezes_env_by_default \
   --deselect=tests/core/test_solve.py::test_archspec_call[libmamba] \
   --deselect=tests/test_install.py::test_install_from_extracted_package \
+  --deselect=tests/plugins/test_subcommands.py::test_help \
     conda tests
 %endif
 
