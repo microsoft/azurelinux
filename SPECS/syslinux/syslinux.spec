@@ -37,15 +37,7 @@ Provides: %{name}-static = %{version}-%{release}
 Headers and libraries for syslinux development.
 
 %prep
-%setup -q -n %{name}-%{version}-pre1
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
-%patch 3 -p1
-%patch 4 -p1
-%patch 5 -p1
-%patch 6 -p1
-%patch 7 -p1
+%autosetup -n %{name}-%{version}-pre1 -p1
 
 %build
 # gcc 11.2.0 and above produce error: "cc1: error: '-fcf-protection' is not compatible with this target"
