@@ -22294,7 +22294,7 @@
         "other": {
           "name": "python-conda-libmamba-solver",
           "version": "24.9.0",
-          "downloadUrl": "https://github.com/conda/conda-libmamba-solver/archive/refs/tags/24.9.0.tar.gz"
+          "downloadUrl": "https://github.com/conda/conda-libmamba-solver/archive/24.9.0/conda-libmamba-solver-24.9.0.tar.gz"
         }
       }
     },
