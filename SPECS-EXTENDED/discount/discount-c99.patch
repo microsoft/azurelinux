@@ -1,0 +1,156 @@
+This is already fixed upstream as of this commit:
+
+commit 7afa5c62427d63177201a0f7d9254dfc6e3fca3f
+Author: David Seifert <soap@gentoo.org>
+Date:   Thu Oct 27 19:23:22 2022 +0200
+
+    Make C99 clean
+    
+    * Clang 16 (and likely GCC 14) will enforce strict C99 semantics
+      and break old K&R C declarations and require correct C89
+      function prototypes.
+    
+    Bug: https://bugs.gentoo.org/870952
+    Clang: https://discourse.llvm.org/t/configure-script-breakage-with-the-new-werror-implicit-function-declaration/65213/9
+
+But the changes do not backport cleanly to the Fedora version.
+
+diff --git a/configure.inc b/configure.inc
+index a5520da28316c8aa..3672a5602a1e2ccf 100755
+--- a/configure.inc
++++ b/configure.inc
+@@ -898,7 +898,7 @@ EOF
+ # AC_C_VOLATILE checks to see if the compiler supports the volatile keyword
+ #
+ AC_C_VOLATILE () {
+-    echo 'f() { volatile char me=1; }' > ngc$$.c
++    echo 'void f() { volatile char me=1; }' > ngc$$.c
+     LOGN "checking for \"volatile\" keyword"
+ 
+     if __MAKEDOTO ngc$$.c; then
+@@ -955,7 +955,7 @@ AC_WHATIS() {
+ 	    echo "#include <${x}>"
+ 	done
+ 
+-	echo "main() { printf(\"${MACRO}=\\\"${__fmt}\\\"\\n\", ${MACRO}); }" )  > _ngc$$.c
++	echo "int main() { printf(\"${MACRO}=\\\"${__fmt}\\\"\\n\", ${MACRO}); }" )  > _ngc$$.c
+ 
+     if $AC_CC $AC_CFLAGS -o _ngc$$ _ngc$$.c; then
+ 	./_ngc$$
+@@ -1590,7 +1590,8 @@ AC_PROG_INSTALL () {
+     fi
+ 
+     # see if we can strip binaries
+-    echo 'main() { puts("hello, sailor!"); }' > ngc$$.c
++    echo '#include <stdio.h>' > ngc$$.c
++    echo 'int main() { puts("hello, sailor!"); }' >> ngc$$.c
+     if $AC_CC -o ngc$$ ngc$$.c; then
+ 	if $PROG_INSTALL -s -m 444 ngc$$ inst$$; then
+ 	    _strip="-s"
+diff --git a/configure.sh b/configure.sh
+index da9fa147fda1756a..90febd50bf58e212 100755
+--- a/configure.sh
++++ b/configure.sh
+@@ -141,8 +141,8 @@ if AC_CHECK_HEADERS sys/stat.h && AC_CHECK_FUNCS stat; then
+ cat > ngc$$.c << EOF
+ #include <sys/stat.h>
+ 
+-main(argc, argv)
+-char **argv;
++int
++main(int argc, char **argv)
+ {
+    struct stat info;
+ 
+diff --git a/gethopt.c b/gethopt.c
+index 4c6e4cedb17539a8..730b5b32b8b2d626 100644
+--- a/gethopt.c
++++ b/gethopt.c
+@@ -47,6 +47,7 @@ struct h_context *ctx;
+ int
+ hopterr(ctx,val)
+ struct h_context *ctx;
++int val;
+ {
+     int old = ctx->opterr;
+     
+@@ -246,8 +247,7 @@ struct h_opt opts[] = {
+ 
+ 
+ int
+-main(argc, argv)
+-char **argv;
++main(int argc, char **argv)
+ {
+     struct h_opt *ret;
+     struct h_context ctx;
+diff --git a/mkd2html.c b/mkd2html.c
+index cbe2b7a3bdf26cf1..6801dac8c20f4bda 100644
+--- a/mkd2html.c
++++ b/mkd2html.c
+@@ -85,8 +85,7 @@ extern char* mkd_h1_title(MMIOT *);
+ 
+ 
+ int
+-main(argc, argv)
+-char **argv;
++main(int argc, char **argv)
+ {
+     char *h;
+     char *source = 0, *dest = 0;
+diff --git a/theme.c b/theme.c
+index 8cfeef35e1413f34..39703282eaf9acac 100644
+--- a/theme.c
++++ b/theme.c
+@@ -527,8 +527,7 @@ struct h_opt opts[] = {
+ #define NROPTS (sizeof opts / sizeof opts[0])
+ 
+ int
+-main(argc, argv)
+-char **argv;
++main(int argc, char **argv)
+ {
+     char *template = "page.theme";
+     char *source = "stdin";
+diff --git a/tools/cols.c b/tools/cols.c
+index df80a1b0841b9f84..c7c6f49c8c28f23b 100644
+--- a/tools/cols.c
++++ b/tools/cols.c
+@@ -2,8 +2,7 @@
+ #include <stdlib.h>
+ 
+ int
+-main(argc, argv)
+-char **argv;
++main(int argc, char **argv)
+ {
+     register int c;
+     int xp;
+diff --git a/tools/echo.c b/tools/echo.c
+index f13028e64810db92..069863e5cca9c4f2 100644
+--- a/tools/echo.c
++++ b/tools/echo.c
+@@ -4,8 +4,7 @@
+ 
+ 
+ int
+-main(argc, argv)
+-char **argv;
++main(int argc, char **argv)
+ {
+     int nl = 1;
+     int i;
+diff --git a/tools/pandoc_headers.c b/tools/pandoc_headers.c
+index dcc8821b06bb02e9..affc286e2135ec13 100644
+--- a/tools/pandoc_headers.c
++++ b/tools/pandoc_headers.c
+@@ -50,8 +50,7 @@ struct h_opt opts[] = {
+ #define NROPTS (sizeof opts / sizeof opts[0])
+ 
+ int
+-main(argc, argv)
+-char **argv;
++main(int argc, char **argv)
+ {
+     int show_author=0, show_title=0, show_date=0;
+     MMIOT *p;

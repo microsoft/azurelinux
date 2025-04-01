@@ -1,7 +1,7 @@
 Summary:        Kubernetes daemon to detect and report node issues
 Name:           node-problem-detector
-Version:        0.8.15
-Release:        4%{?dist}
+Version:        0.8.20
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,11 +37,10 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 #           -cf %%{name}-%%{version}-test-vendor.tar.gz vendor
 #
 Source2:        %{name}-%{version}-test-vendor.tar.gz
-Patch0:         0001-remove-arch-specific-logic-from-makefile.patch
-Patch1:         0001-add-Mariner-and-Azure-Linux-OS-Versions.patch
-Patch2:         CVE-2024-24786.patch
-Patch3:         CVE-2024-45338.patch
-Patch4:         CVE-2023-45288.patch
+Patch1:         0001-remove-arch-specific-logic-from-makefile.patch
+Patch2:         CVE-2024-45338.patch
+Patch3:         CVE-2025-22868.patch
+Patch4:         CVE-2025-22869.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
 Requires:       azurelinux-release
@@ -63,15 +62,12 @@ Default configuration files for node-problem-detector
 
 %prep
 %autosetup -p1 -N
-%patch 0 -p1
 %patch 1 -p1
-%patch 2 -p1
-%patch 4 -p1
+%patch 3 -p1
 
 # create vendor folder from the vendor tarball
 tar -xf %{SOURCE1} --no-same-owner
-%patch 2 -p1
-%patch 4 -p1
+%patch 3 -p1
 pushd test
 tar -xf %{SOURCE2} --no-same-owner
 %patch 2 -p1
@@ -111,6 +107,14 @@ make test
 %config(noreplace) %{_sysconfdir}/node-problem-detector.d/*
 
 %changelog
+* Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.8.20-2
+- Address CVE-2025-22868 and CVE-2025-22869 with an upstream patch.
+- Correct the name and SHA256 checksum of vendor tarballs.
+- Remove previously applied patches that are no longer required.
+
+* Thu Feb 27 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.20-1
+- Auto-upgrade to 0.8.20 - fix CVE-2023-44487
+
 * Fri Feb 14 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.8.15-4
 - Address CVE-2023-45288
 

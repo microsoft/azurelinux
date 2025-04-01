@@ -12,7 +12,7 @@
 Name:            mft_kernel
 Summary:         %{name} Kernel Module for the %{KVERSION} kernel
 Version:         4.30.0
-Release:         7%{?dist}
+Release:         13%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
 
@@ -74,6 +74,24 @@ popd
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
+* Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.30.0-13
+- Bump release to rebuild for new kernel release
+
+* Tue Mar 11 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.30.0-12
+- Bump release to rebuild for new kernel release
+
+* Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 4.30.0-11
+- Bump release to rebuild for new kernel release
+
+* Wed Mar 05 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-10
+- Bump release to rebuild for new kernel release
+
+* Tue Mar 04 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-9
+- Bump release to rebuild for new kernel release
+
+* Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 4.30.0-8
+- Bump release to rebuild for new kernel release
+
 * Tue Feb 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-7
 - Bump release to rebuild for new kernel release
 
@@ -92,7 +110,7 @@ popd
 * Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-2
 - Bump release to match kernel
 
-* Tue Dec  16 2024 Binu Jose Philip <bphilip@microsoft.com> - 4.30.0-1
+* Tue Dec 17 2024 Binu Jose Philip <bphilip@microsoft.com> - 4.30.0-1
 - Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

@@ -4,19 +4,26 @@ Distribution:   Azure Linux
 
 Summary: Window Navigator Construction Kit
 Name: libwnck3
-Version: 3.36.0
-Release: 3%{?dist}
+Version: 43.1
+Release: 2%{?dist}
 URL: http://download.gnome.org/sources/%{source_name}/
-Source0: http://download.gnome.org/sources/%{source_name}/3.36/%{source_name}-%{version}.tar.xz
-License: GPLv2
+Source0: https://download.gnome.org/sources/%{source_name}/43/%{source_name}-%{version}.tar.xz
+License: LGPL-2.0-or-later
 
-BuildRequires: %{_bindir}/xsltproc
+# https://gitlab.gnome.org/GNOME/libwnck/-/merge_requests/10
+Patch1:        libwnck_0001-Expose-window-scaling-factor_v43.1.patch
+Patch2:        libwnck_0002-icons-Use-cairo-surfaces-to-render-icons_v43.1.patch
+Patch3:        libwnck_0003-xutils-Change-icons-to-being-cairo-surfaces_v43.1.patch
+Patch4:        libwnck_0004-icons-Mark-GdkPixbuf-icons-as-deprecated_v43.1.patch
+Patch5:        libwnck_0005-tasklist-Add-surface-loader-function_v43.1.patch
+
 BuildRequires: gcc
 BuildRequires: meson
 BuildRequires: gettext
 BuildRequires: glib2-devel
 BuildRequires: gobject-introspection-devel
 BuildRequires: gtk3-devel
+BuildRequires: gtk-doc
 BuildRequires: libXres-devel
 BuildRequires: pango-devel
 BuildRequires: startup-notification-devel
@@ -36,29 +43,24 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-
 %prep
-%setup -q -n %{source_name}-%{version}
-
+%autosetup -n %{source_name}-%{version} -p1
 
 %build
-%meson -Dgtk_doc=false
+%meson -Dgtk_doc=true
 %meson_build
-
 
 %install
 %meson_install
 
 %find_lang %{source_name}-3.0 --with-gnome --all-name
 
-
 %ldconfig_scriptlets
-
 
 %files -f %{source_name}-3.0.lang
 %license COPYING
 %doc AUTHORS README NEWS
-%{_libdir}/%{source_name}-3.so.*
+%{_libdir}/%{source_name}-3.so.0*
 %{_bindir}/wnck-urgency-monitor
 %{_libdir}/girepository-1.0/Wnck-3.0.typelib
 
@@ -68,16 +70,74 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/*
 %{_includedir}/%{source_name}-3.0/
 %{_datadir}/gir-1.0/Wnck-3.0.gir
-
+%doc %{_datadir}/gtk-doc
 
 %changelog
-* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.0-3
-- Adding BR on '%%{_bindir}/xsltproc'.
-- Disabled gtk doc generation to remove network dependency during build-time.
-- License verified.
+* Mon 18 Sreenivasulu Malavathula <vsmalavathu@microsoft.com> - 43.1-2
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.0-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Oct 07 2024 Wolfgang Ulbrich <raveit65.sun@gmail.com> - 43.1-1
+- update to 43.1
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 43.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 43.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 43.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Nov 21 2023 Wolfgang Ulbrich <fedora@raveit.de> - 43.0-6
+- fix rhbz (#2242944)
+- disable Revert-pager-do-not-change-workspace-size-from-size patch
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 43.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 43.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Oct 07 2022 Wolfgang Ulbrich <fedora@raveit.de> - 43.0-3
+- fix https://bugs.launchpad.net/ubuntu/+source/libwnck3/+bug/1990263
+
+* Thu Sep 29 2022 Wolfgang Ulbrich <fedora@raveit.de> - 43.0-2
+- fix https://gitlab.gnome.org/GNOME/libwnck/-/issues/154
+
+* Mon Sep 19 2022 Wolfgang Ulbrich <fedora@raveit.de> - 43.0-1
+- update to 43.0
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 40.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Feb 19 2022 Wolfgang Ulbrich <fedora@raveit.de> - 40.1-1
+- update to 40.1
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 40.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sun Dec 12 2021 Wolfgang Ulbrich <fedora@raveit.de> - 40.0-4
+- use https://gitlab.gnome.org/GNOME/libwnck/-/commit/bd8ab37
+- Scale tasklist icons
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 40.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 11 2021 Wolfgang Ulbrich <fedora@raveit.de> - 40.0-2
+- revert https://gitlab.gnome.org/GNOME/libwnck/-/commit/3456b74
+- fixes rhbz #1971048
+- and https://github.com/mate-desktop/mate-panel/issues/1230
+ 
+* Wed May 26 2021 Kalev Lember <klember@redhat.com> - 40.0-1
+- Update to 40.0
+- Tighten soname globs
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.36.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.36.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Sat Mar 28 2020 Wolfgang Ulbrich <fedora@raveit.de> - 3.36.0-1
 - update to 3.36.0

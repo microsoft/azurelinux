@@ -26,7 +26,7 @@
 #
 #
 
-%global last-known-kernel 6.6.76.1
+%global last-known-kernel 6.6.82.1-1
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -64,7 +64,7 @@
 Summary:	 srp driver
 Name:		 srp
 Version:	 24.10
-Release:	 7%{?dist}
+Release:	 13%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -253,6 +253,24 @@ fi
 %endif
 
 %changelog
+* Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-13
+- Bump release to rebuild for new kernel release
+
+* Tue Mar 11 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-12
+- Bump release to rebuild for new kernel release
+
+* Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 24.10-11
+- Bump release to rebuild for new kernel release
+
+* Wed Mar 05 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-10
+- Bump release to rebuild for new kernel release
+
+* Tue Mar 04 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-9
+- Bump release to rebuild for new kernel release
+
+* Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 24.10-8
+- Bump release to rebuild for new kernel release
+
 * Tue Feb 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-7
 - Bump release to rebuild for new kernel release
 
@@ -271,8 +289,9 @@ fi
 * Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-2
 - Bump release to match kernel
 
-* Thu Jan 9 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
+* Thu Jan 9 2025 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
+
 * Thu Feb 20 2014 Alaa Hleihel <alaa@mellanox.com>
 - Initial packaging

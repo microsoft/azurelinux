@@ -1,4 +1,4 @@
-%global last-known-kernel 6.6.76.1
+%global last-known-kernel 6.6.82.1-1
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -33,7 +33,7 @@
 Name:		 mft_kernel
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 4.30.0
-Release:	 7%{?dist}
+Release:	 13%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -228,6 +228,24 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
+* Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.30.0-13
+- Bump release to rebuild for new kernel release
+
+* Tue Mar 11 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.30.0-12
+- Bump release to rebuild for new kernel release
+
+* Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 4.30.0-11
+- Bump release to rebuild for new kernel release
+
+* Wed Mar 05 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-10
+- Bump release to rebuild for new kernel release
+
+* Tue Mar 04 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-9
+- Bump release to rebuild for new kernel release
+
+* Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 4.30.0-8
+- Bump release to rebuild for new kernel release
+
 * Tue Feb 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-7
 - Bump release to rebuild for new kernel release
 

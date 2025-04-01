@@ -26,7 +26,7 @@
 # KMP is disabled by default
 %{!?KMP: %global KMP 0}
 
-%global last-known-kernel 6.6.76.1
+%global last-known-kernel 6.6.82.1-1
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -53,7 +53,7 @@
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
 Name:		 knem
 Version:	 1.1.4.90mlnx3
-Release:	 7%{?dist}
+Release:	 13%{?dist}
 Provides:	 knem-mlnx = %{version}-%{release}
 Obsoletes:	 knem-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
@@ -116,7 +116,7 @@ EOF)
 %global flavors_to_build default
 
 %package -n %{non_kmp_pname}
-Release: 7%{?dist}
+Release: 13%{?dist}
 Summary: KNEM: High-Performance Intra-Node MPI Communication
 Group: System Environment/Libraries
 %description -n %{non_kmp_pname}
@@ -282,6 +282,24 @@ fi
 %endif
 
 %changelog
+* Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.4.90mlnx3-13
+- Bump release to rebuild for new kernel release
+
+* Tue Mar 11 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.4.90mlnx3-12
+- Bump release to rebuild for new kernel release
+
+* Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 1.1.4.90mlnx3-11
+- Bump release to rebuild for new kernel release
+
+* Wed Mar 05 2025 Rachel Menge <rachelmenge@microsoft.com> - 1.1.4.90mlnx3-10
+- Bump release to rebuild for new kernel release
+
+* Tue Mar 04 2025 Rachel Menge <rachelmenge@microsoft.com> - 1.1.4.90mlnx3-9
+- Bump release to rebuild for new kernel release
+
+* Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 1.1.4.90mlnx3-8
+- Bump release to rebuild for new kernel release
+
 * Tue Feb 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 1.1.4.90mlnx3-7
 - Bump release to rebuild for new kernel release
 

@@ -10,7 +10,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.20.5
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,6 +33,7 @@ Source14:       named-chroot.files
 Source15:       https://gitlab.isc.org/isc-projects/dlz-modules/-/archive/main/dlz-modules-main.tar.gz
 
 Patch0:         nongit-fix.patch
+Patch1:         fix-maybe-uninitialized-warning-in-dlz_mysqldyn_mod.patch
 
 BuildRequires:  gcc
 BuildRequires:  git
@@ -55,6 +56,7 @@ BuildRequires:  systemd-libs
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  userspace-rcu-devel
 
+Requires:       %{name}-libs = %{version}-%{release}
 Requires:       libuv
 Requires:       openssl
 Requires:       userspace-rcu
@@ -190,7 +192,15 @@ Summary:        BIND utilities
 
 %prep
 %setup -q
-%patch 0 -p1
+
+# DLZ modules do not support oot builds. Copy files into build
+mkdir -p build/contrib/dlz
+pushd build/contrib/dlz
+tar --no-same-owner -xf %{SOURCE15}
+mv dlz-modules-main/modules ./
+popd
+
+%autopatch -p1
 
 # Copying auxiliary files with libtoolize. Some files will be replaced by libtoolize -c -f.
 # The files "compile", "depcomp", and "missing" will be deleted by this process, as some
@@ -203,13 +213,6 @@ mv backup/* .
 rmdir backup
 
 %build
-# DLZ modules do not support oot builds. Copy files into build
-mkdir -p build/contrib/dlz
-pushd build/contrib/dlz
-tar --no-same-owner -xf %{SOURCE15}
-mv dlz-modules-main/modules ./
-popd
-
 ./configure \
     --prefix=%{_prefix} \
     --localstatedir=%{_var} \
@@ -375,9 +378,6 @@ fi;
 %dir %{_libdir}/bind
 %{_libdir}/bind/filter-a.so
 %{_libdir}/bind/filter-aaaa.so
-%{_libdir}/libdns*.so
-%{_libdir}/libisc*.so
-%{_libdir}/libns*.so
 %dir %{_libdir}/named
 %{_libdir}/named/*.so
 %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/sysconfig/named
@@ -446,16 +446,15 @@ fi;
 %doc build/contrib/dlz/modules/sqlite3/testing/*
 
 %files libs
-%{_libdir}/*-%{version}*.so
+%{_libdir}/libdns*.so
+%{_libdir}/libisc*.so
+%{_libdir}/libns*.so
 
 %files license
 %license LICENSE
 %license COPYRIGHT
 
 %files devel
-%{_libdir}/libisc*.so
-%{_libdir}/libns*.so
-%{_libdir}/libdns*.so
 %dir %{_includedir}/bind9
 %{_includedir}/bind9/config.h
 %{_includedir}/bind9/isccc
@@ -511,14 +510,24 @@ fi;
 
 %files utils
 %defattr(-,root,root)
+%{_bindir}/dig
+%{_bindir}/delv
+%{_bindir}/host
+%{_bindir}/nslookup
+%{_bindir}/nsupdate
+%{_bindir}/arpaname
 %{_sbindir}/ddns-confgen
 %{_sbindir}/tsig-keygen
 %{_bindir}/nsec3hash
 %{_bindir}/named-checkzone
 %{_bindir}/named-compilezone
 %{_bindir}/named-nzd2nzf
-%{_bindir}/*
-%{_mandir}/man1/*
+%{_mandir}/man1/host.1*
+%{_mandir}/man1/nsupdate.1*
+%{_mandir}/man1/dig.1*
+%{_mandir}/man1/delv.1*
+%{_mandir}/man1/nslookup.1*
+%{_mandir}/man1/arpaname.1*
 %{_mandir}/man8/ddns-confgen.8*
 %{_mandir}/man8/tsig-keygen.8*
 %{_mandir}/man1/nsec3hash.1*
@@ -527,6 +536,14 @@ fi;
 %{_mandir}/man1/named-nzd2nzf.1*
 
 %changelog
+* Tue Feb 11 2025 Andrew Phelps <anphel@microsoft.com> - 9.20.5-4
+- Remove duplicate shared object files in base and devel packages
+- Remove duplicate files from utils package
+- Add requires for bind-libs from base package
+
+* Thu Feb 27 2025 Tobias Brick <tobiasb@microsoft.com> - 9.20.5-3
+- Fix uninitialized memory warning.
+
 * Tue Feb 25 2025 Tobias Brick <tobiasb@microsoft.com> - 9.20.5-2
 - Fix warning during package uninstall.
 

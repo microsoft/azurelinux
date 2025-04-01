@@ -3,7 +3,7 @@
 Summary:        An advanced file and recursive website downloader
 Name:           wget
 Version:        2.1.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPL-3.0-or-later AND LGPL-3.0-or-later AND GFDL-1.3-or-later
 URL:            https://gitlab.com/gnuwget/wget2
 Group:          System Environment/NetworkingPrograms
@@ -56,6 +56,10 @@ BuildRequires:  tar
 BuildRequires:  texinfo
 %if 0%{?with_check}
 BuildRequires:  perl
+# wget test fails to find libwget.so.2, this BuildRequires fixes the issue
+# Due to azl using hydrated builds for testing, the circular dependency is OK
+# for testing
+BuildRequires:  %{name}-libs%{?_isa} = %{version}-%{release}
 %endif
 
 Provides:       webclient
@@ -137,6 +141,8 @@ echo ".so man1/%{name}.1" > %{buildroot}%{_mandir}/man1/wget.1
 
 %{_fixperms} %{buildroot}/*
 
+%check
+%make_build check
 
 %files -f %{name}2.lang
 %defattr(-,root,root)
@@ -157,6 +163,9 @@ echo ".so man1/%{name}.1" > %{buildroot}%{_mandir}/man1/wget.1
 %{_mandir}/man3/libwget*.3*
 
 %changelog
+* Mon Feb 24 2025 Sam Meluch <sammeluch@microsoft.com> - 2.1.0-6
+- Add %check section from Fedora upstream.
+
 * Mon Sep 23 2024 Tobias Brick <tobiasb@microsoft.com> - 2.1.0-5
 - Align fix for SSL read and write error check with upstream.
 

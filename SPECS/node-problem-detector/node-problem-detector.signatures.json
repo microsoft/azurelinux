@@ -1,7 +1,7 @@
 {
- "Signatures": {
-  "node-problem-detector-0.8.15.tar.gz": "349cfd7f995218abb208391b16a4c5191877dfaf9d6208700fe6225de62fab2f",
-  "node-problem-detector-0.8.15-vendor.tar.gz": "8515aad9f408d7e040f4589a649799f6ace8a777bc74d9a2a18cafd0092ac25c",
-  "node-problem-detector-0.8.15-test-vendor.tar.gz": "cdff5ed0f4ceb009b3b34eb52980dd94dc204fbaf2bac78bc6f4ac662843d782"
- }
+  "Signatures": {
+    "node-problem-detector-0.8.20-vendor.tar.gz": "e5baa02e9ab94fdc16f9ebe50c5cb513daee7e50fd349357c53df6fd0c2e98a2",
+    "node-problem-detector-0.8.20-test-vendor.tar.gz": "4a7f7e879234c938b09a62bef08387478424b88f0eac683891ab8b201cb69c8a",
+    "node-problem-detector-0.8.20.tar.gz": "0580a72d59483997dc5ef68b8f65c6119ad3373347624d555d89b3ad9947380e"
+  }
 }

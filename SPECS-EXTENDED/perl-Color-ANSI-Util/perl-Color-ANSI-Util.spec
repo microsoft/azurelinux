@@ -3,8 +3,8 @@
 
 Summary:        Routines for dealing with ANSI colors
 Name:           perl-Color-ANSI-Util
-Version:        0.164
-Release:        6%{?dist}
+Version:        0.165
+Release:        1%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -69,6 +69,10 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Tue Dec 10 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.165-1
+- Update to current upstream
+- License verified
+
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.164-6
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

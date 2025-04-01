@@ -4,26 +4,41 @@ Distribution:   Azure Linux
 
 Summary:	Modular text mode IRC client with Perl scripting
 Name:		irssi
-Version:	1.2.2
-Release:	6%{?dist}
+Version:	1.4.5
+Release:	1%{?dist}
 
-License:	GPLv2+
+License:	gpl-2.0-or-later AND gpl-2.0-only AND gfdl-1.1-or-later AND licenseref-fedora-public-domain AND hpnd-markus-kuhn
 URL:		http://irssi.org/
 Source0:	https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz
-Source1:	irssi-config.h
-BuildRequires:	ncurses-devel openssl-devel zlib-devel
-BuildRequires:	pkgconfig glib2-devel perl-devel perl-generators perl(ExtUtils::Embed)
-BuildRequires:	autoconf automake libtool utf8proc-devel libotr-devel
-Requires:	perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+Source1:	https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz.asc
+Source2:	gpgkey-7EE65E3082A5FB06AC7C368D00CCB587DDBEF0E1.asc
+Source3:	irssi-config.h
 
-# rhbz#1773190
-Obsoletes:	irc-otr
-# https://github.com/irssi/irssi/pull/1183
-Patch0:		irssi-1.2.2-ctrl-space-fix.patch
+BuildRequires:	make
+BuildRequires:	ncurses-devel
+BuildRequires:	openssl-devel
+BuildRequires:	zlib-devel
+BuildRequires:	pkgconf-pkg-config
+BuildRequires:	glib2-devel
+BuildRequires:	gnupg2
+BuildRequires:	perl-devel
+BuildRequires:	perl-generators
+BuildRequires:	perl(ExtUtils::Embed)
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool
+BuildRequires:	utf8proc-devel
+BuildRequires:	libotr-devel
+
+Requires:	perl(lib)
+Requires:	perl(Symbol)
+# https://github.com/irssi/irssi/issues/1374
+Patch0:		irssi-1.4.1-botti-perl-link-fix.patch
 
 %package devel
 Summary:	Development package for irssi
 Requires:	%{name} = %{version}-%{release}
+Requires:	pkgconf-pkg-config
 
 %description
 Irssi is a modular IRC client with Perl scripting. Only text-mode
@@ -39,32 +54,32 @@ being maintained.
 
 
 %prep
-%setup -q
-%patch 0 -p1 -b .ctrl-space-fix
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
+%autosetup -p1
 
 
 %build
-autoreconf -i
+autoreconf -fi
 %configure --with-textui		\
 	--with-proxy			\
 	--with-bot			\
-	--with-perl=yes			\
+	--with-perl=module		\
 	--with-perl-lib=vendor		\
 	--enable-true-color		\
 	--with-otr=yes
 
-make %{_smp_mflags} CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing"
+%make_build CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing"
 mv irssi-config.h irssi-config-$(getconf LONG_BIT).h
-cp -p %{SOURCE1} irssi-config.h
+cp -p %{SOURCE3} irssi-config.h
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
-%makeinstall PERL_INSTALL_ROOT=$RPM_BUILD_ROOT INSTALL="%{__install} -p"
+%make_install
 install -p irssi-config-$(getconf LONG_BIT).h $RPM_BUILD_ROOT%{_includedir}/%{name}/irssi-config-$(getconf LONG_BIT).h
 
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/modules/lib*.*a
 rm -Rf $RPM_BUILD_ROOT/%{_docdir}/%{name}
+rm -f $RPM_BUILD_ROOT%{perl_archlib}/perllocal.pod
 find $RPM_BUILD_ROOT%{perl_vendorarch} -type f -a -name '*.bs' -a -empty -exec rm -f {} ';'
 find $RPM_BUILD_ROOT%{perl_vendorarch} -type f -a -name .packlist -exec rm {} ';'
 chmod -R u+w $RPM_BUILD_ROOT%{perl_vendorarch}
@@ -86,9 +101,14 @@ chmod -R u+w $RPM_BUILD_ROOT%{perl_vendorarch}
 
 %files devel
 %{_includedir}/irssi/
+%{_libdir}/pkgconfig/irssi-1.pc
 
 
 %changelog
+* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.4.5-1
+- Update to version 1.4.5
+- License verified.
+
 * Thu Jul  8 2021 Muhammad Falak R Wani <mwani@microsoft.com> - 1.2.2-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Fix Patch directive `Patch -> Patch0`
