@@ -160,7 +160,7 @@ fi
 
 %changelog
 * Mon Mar 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.24.1-1
-- Bump to 1.24.1
+- Bump version to 1.24.1 to address CVE-2025-22870, CVE-2024-45341, CVE-2024-45336, CVE-2024-34158
 
 * Tue Feb 18 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.23.6-1
 - Bump version to 1.23.6 to resolve CVE-2025-25199
