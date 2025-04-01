@@ -1,54 +1,52 @@
 %global pypi_name zstandard
-
 %global desc This project provides Python bindings for interfacing with the Zstandard compression library. A C extension and CFFI interface are provided.
+Summary:        Zstandard bindings for Python
+Name:           python-%{pypi_name}
+Version:        0.23.0
+Release:        2%{?dist}
+License:        (BSD-3-Clause OR GPL-2.0-only) AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-Name: python-%{pypi_name}
-Version: 0.23.0
-Release: 2%{?dist}
-Summary: Zstandard bindings for Python
-License: (BSD-3-Clause OR GPL-2.0-only) AND MIT
-URL: https://github.com/indygreg/python-zstandard
-Source0: %{pypi_source}
+Distribution:   Mariner
+URL:            https://github.com/indygreg/python-zstandard
+Source0:        %{pypi_source}
 # relax dependencies so that auto BR generation works
-
 
 %description
 %{desc}
 
 %package -n python3-%{pypi_name}
-Summary: %{summary}
-BuildRequires: gcc
-BuildRequires: libzstd-devel
-BuildRequires: python3-devel
-BuildRequires: python3-pip
-BuildRequires: python3-wheel
-Requires:      python3-cffi
-%if %{with check}
-BuildRequires: python3dist(pytest)
-BuildRequires: python3dist(pytest-xdist)
-%endif
+Summary:        %{summary}
+BuildRequires:  gcc
+BuildRequires:  libzstd-devel
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+Requires:       python3-cffi
 # https://github.com/indygreg/python-zstandard/issues/48
-Provides: bundled(zstd) = 1.5.6
+Provides:       bundled(zstd) = 1.5.6
+%if %{with check}
+BuildRequires:  python3dist(pytest)
+BuildRequires:  python3dist(pytest-xdist)
+%endif
 
 %description -n python3-%{pypi_name}
 %{desc}
 
-%pyproject_extras_subpkg -n python3-%{pypi_name} cffi
+%{pyproject_extras_subpkg} -n python3-%{pypi_name} cffi
 
 %prep
 %autosetup -n %{pypi_name}-%{version}
 rm -r %{pypi_name}.egg-info
 
 %build
-%pyproject_wheel
+%{pyproject_wheel}
 
 %install
-%pyproject_install
-%pyproject_save_files %{pypi_name}
+%{pyproject_install}
+%{pyproject_save_files} %{pypi_name}
 
 %check
-%pyproject_check_import
+%{pyproject_check_import}
 %if %{with check}
 mv zstandard{,.src}
 export ZSTD_SLOW_TESTS=1
@@ -62,6 +60,10 @@ mv zstandard{.src,}
 %doc README.rst
 
 %changelog
+* Tue Apr 01 2025 Riken Maharjan <rmaharjan@microsoft.com> - 0.23.0-3
+- Initial Azure Linux import from Fedora 42 (license: MIT)
+- License Verified
+
 * Sat Jan 18 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.23.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
 
@@ -148,4 +150,3 @@ mv zstandard{.src,}
 * Fri May 29 2020 Dominik Mierzejewski <dominik@greysector.net> 0.13.0-1
 - initial build
 - skip some tests on s390x (https://github.com/indygreg/python-zstandard/issues/105)
-
