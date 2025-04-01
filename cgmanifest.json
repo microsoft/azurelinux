@@ -23504,7 +23504,7 @@
         "other": {
           "name": "python-menuinst",
           "version": "2.2.0",
-          "downloadUrl": "https://github.com/conda/menuinst/archive/refs/tags/2.2.0.tar.gz"
+          "downloadUrl": "https://github.com/conda/menuinst/archive/2.2.0/menuinst-2.2.0.tar.gz"
         }
       }
     },
