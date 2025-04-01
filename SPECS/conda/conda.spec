@@ -32,6 +32,13 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-pluggy
 %if 0%{?with_check}
 BuildRequires:  python3-pytest
+BuildRequires:  python3-archspec
+BuildRequires:  python3-boltons
+BuildRequires:  python3-conda-libmamba-solver
+BuildRequires:  python3-conda-package-streaming
+BuildRequires:  python3-jsonpatch
+BuildRequires:  python3-menuinst
+BuildRequires:  python3-platformdirs
 %endif
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
@@ -192,7 +199,7 @@ install -m 0644 -Dt %{buildroot}%{bash_completionsdir}/ %SOURCE1
 
 %check
 %if 0%{?with_check}
-pip3 install archspec iniconfig flask pytest-xprocess zstandard conda-package-streaming flaky pytest-timeout boltons
+pip3 install iniconfig flask pytest-xprocess flaky pytest-timeout 
 export PATH=%{buildroot}%{_bindir}:$PATH
 PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 
