@@ -1,5 +1,7 @@
 {
  "Signatures": {
-  "pacemaker-2.1.5.tar.gz": "7654b78f08d4994b9fd31b8592addbd7f4b173e2cbf30336722419f1ce45e185"
+  "nagios-agents-metadata-105ab8a7b2c16b9a29cf1c1596b80136eeef332b.tar.gz": "b21880770bde3b1006379ec5ddc252198988206ebb8ab26e05f7afe983b359f2",
+  "pacemaker-49aab9983.tar.gz": "e26835b694dd49293b26c98e1cd733a35ee42c5bc1b7fa3ef1337a98b8f887e1",
+  "pacemaker.sysusers": "b599209cf97e03f192393c16ca8a93ffd8ddcb1ea9db73a60d6480fa7d89800b"
  }
 }

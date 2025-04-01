@@ -1,0 +1,11 @@
+Remove extraneous error messages of the form:
+ err message: .debug_loclists section missing
+ err message: invalid DWARF
+which are repeated in some circumstances without adding useful context
+
+--- dyninst-12.1.0/symtabAPI/src/dwarfWalker.C
++++ dyninst-12.1.0/symtabAPI/src/dwarfWalker.C
+@@ -1858,1 +1858,1 @@
+-                cerr << "err message: " << dwarf_errmsg(dwarf_errno()) << endl;
++	        dwarf_printf("(0x%lx) Error while decoding location: %s\n", id(), dwarf_errmsg(dwarf_errno()));
+

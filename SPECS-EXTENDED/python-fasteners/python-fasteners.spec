@@ -1,117 +1,161 @@
-%bcond_without tests
-# The python-diskcache package, used in some of the tests, has been retired.
-%bcond_with diskcache
-
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+%bcond tests %{undefined rhel}
 Name:           python-fasteners
-Version:        0.18
-Release:        2%{?dist}
+Version:        0.19
+Release:        1%{?dist}
 Summary:        A python package that provides useful locks
+
 License:        Apache-2.0
 URL:            https://github.com/harlowja/fasteners
 # We need to use the GitHub archive instead of the PyPI sdist to get tests.
-Source0:        %{url}/archive/%{version}/fasteners-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
-# Backport 80a3eaed75276faf21034e7e6c626fd19485ea39 “Move eventlet tests to
-# main folder and to child process”. Fixes “Tests hang with eventlet support”
-# https://github.com/harlowja/fasteners/issues/101. (As an alternative, we
-# could run pytest on tests/ and tests_eventlet/ in separate invocations.) See
-# https://github.com/harlowja/fasteners/issues/101#issuecomment-1249462951.
-Patch:          %{url}/commit/80a3eaed75276faf21034e7e6c626fd19485ea39.patch
+Source:         %{url}/archive/%{version}/fasteners-%{version}.tar.gz
 
 BuildArch:      noarch
-
+ 
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
-BuildRequires:  pyproject-rpm-macros
+BuildRequires:  pyproject-rpm-macros            
 BuildRequires:  python3-packaging
 BuildRequires:  python3-requests
 BuildRequires:  python3-wheel
+BuildRequires:  python3-pytest
+BuildRequires:  python3-diskcache
 
 %global common_description %{expand:
 Cross platform locks for threads and processes}
-
+ 
 %description %{common_description}
-
-
+ 
+ 
 %package -n python3-fasteners
 Summary:        A python package that provides useful locks
 
-# The mkdocs-generated HTML documentation is not suitable for packaging; see
-# https://bugzilla.redhat.com/show_bug.cgi?id=2006555 for discussion.
-#
-# The Provides/Obsoletes can be removed after F38 reaches end-of-life.
-Provides:       python-fasteners-doc = %{version}-%{release}
-Obsoletes:      python-fasteners-doc < 0.18-1
-
 %description -n python3-fasteners %{common_description}
-
-
+ 
+ 
 %prep
-%autosetup -p1 -n fasteners-%{version}
-%if %{without diskcache}
-sed -r -i '/\b(diskcache)\b/d' requirements-test.txt
-%endif
-
-
+%autosetup -n fasteners-%{version}
+# Omit eventlet integration tests:
+#   python-eventlet fails to build with Python 3.13: AttributeError: module
+#   'eventlet.green.thread' has no attribute 'start_joinable_thread'
+#   https://bugzilla.redhat.com/show_bug.cgi?id=2290561
+sed -r 's/^eventlet\b/# &/' requirements-test.txt |
+  tee requirements-test-filtered.txt
+ 
 %generate_buildrequires
-%pyproject_buildrequires %{?with_tests:requirements-test.txt}
-
-
+%pyproject_buildrequires %{?with_tests:requirements-test-filtered.txt}
+ 
 %build
 %pyproject_wheel
-
-
+ 
 %install
 %pyproject_install
+
 %pyproject_save_files fasteners
-
-
+ 
 %check
 %if %{with tests}
-%pytest %{?!with_diskcache:--ignore=tests/test_reader_writer_lock.py} -v
+# See notes in %%prep:
+ignore="${ignore-} --ignore=tests/test_eventlet.py"
+ 
+
+%pytest ${ignore-} -v
 %else
 %pyproject_check_import -e 'fasteners.pywin32*'
 %endif
-
-
+ 
+ 
 %files -n python3-fasteners -f %{pyproject_files}
-# pyproject_files handles LICENSE; verify with “rpm -qL -p …”
 %doc CHANGELOG.md
 %doc README.md
-
-
+ 
 %changelog
-* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 0.18-2
-- Convert 'Release' tag to '[number].[distribution]' format
-- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+* Tue Mar 25 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.19-1
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
-* Fri Sep 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> 0.18-1
+* Mon Jul 22 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 0.19-9
+- Omit eventlet integration tests
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.19-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jul 16 2024 Python Maint <python-maint@redhat.com> - 0.19-7
+- Finish Python 3.13 bootstrap
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.19-6
+- Bootstrap for Python 3.13
+
+* Mon May 20 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 0.19-5
+- Drop -doc Provides/Obsoletes for historical upgrade path
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.19-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.19-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 18 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.19-2
+- Assert that %%pyproject_files contains a license file
+
+* Sat Sep 30 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.19-1
+- Update to 0.19 (close RHBZ#2240009)
+
+* Sat Sep 30 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.18-10
+- Restore python-diskcache test dependency since it was unretired
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.18-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jul 08 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.18-8
+- Cleaner build conditional for tests
+
+* Fri Jul 07 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.18-7
+- Use new (rpm 4.17.1+) bcond style
+
+* Thu Jun 29 2023 Python Maint <python-maint@redhat.com> - 0.18-6
+- Rebuilt for Python 3.12
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.18-5
+- Bootstrap for Python 3.12
+
+* Fri May 19 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 0.18-3
+- Disable tests by default in RHEL builds
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.18-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Sep 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.18-1
 - Update to 0.18 (close RHBZ#2126965)
 - The separate -doc subpackage is dropped since upstream switched from
   sphinx to mkdocs
 
-* Fri Sep 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> 0.17.3-5
+* Thu Sep 15 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.17.3-7
 - Update License to SPDX
 
-* Fri Sep 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> 0.17.3-4
+* Mon Aug 22 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.17.3-6
 - Parallelize sphinx-build
 
-* Fri Sep 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> 0.17.3-3
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jul 07 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.17.3-4
 - Fix extra newline in description
 
-* Mon May 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> 0.17.3-2
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.17.3-3
+- Rebuilt for Python 3.11
+
+* Mon May 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.17.3-2
 - Build Sphinx docs as PDF in a new -doc subpackage
 
-* Mon May 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> 0.17.3-1
+* Mon May 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.17.3-1
 - Update to 0.17.3 (close RHBZ#1712140)
 
-* Mon May 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> 0.17-4
+* Mon May 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.17-4
 - Use pyproject-rpm-macros
 
-* Mon May 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> 0.17-3
+* Mon May 16 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.17-3
 - Drop EPEL8 conditionals
 
 * Tue May 03 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.17-1
@@ -222,4 +266,3 @@ sed -r -i '/\b(diskcache)\b/d' requirements-test.txt
 
 * Thu Jun 11 2015 Matthias Runge <mrunge@redhat.com> - 0.9.0-1
 - Initial package. (rhbz#1230548)
-

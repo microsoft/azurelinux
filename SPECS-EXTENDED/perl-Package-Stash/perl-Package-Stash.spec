@@ -6,24 +6,29 @@
 %endif
 
 Name:		perl-Package-Stash
-Version:	0.38
-Release:	7%{?dist}
+Version:	0.40
+Release:	8%{?dist}
 Summary:	Routines for manipulating stashes
-License:	GPL+ or Artistic
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Package-Stash
-Source0:	https://cpan.metacpan.org/modules/by-module/Package/Package-Stash-%{version}.tar.gz#/perl-Package-Stash-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/modules/by-module/Package/Package-Stash-%{version}.tar.gz
 BuildArch:	noarch
 # Module Build
 BuildRequires:	coreutils
 BuildRequires:	findutils
+BuildRequires:	gcc
 BuildRequires:	make
+BuildRequires:	perl-devel
 BuildRequires:	perl-generators
 BuildRequires:	perl-interpreter
 BuildRequires:	perl(Config)
+BuildRequires:	perl(DynaLoader)
+BuildRequires:	perl(Exporter)
 BuildRequires:	perl(ExtUtils::MakeMaker)
-BuildRequires:	perl(File::Spec)
+BuildRequires:	perl(ExtUtils::Mksymlists)
+BuildRequires:	perl(File::Basename)
+BuildRequires:	perl(File::Spec::Functions)
+BuildRequires:	perl(File::Temp)
 BuildRequires:	perl(Text::ParseWords)
 # Module Runtime
 BuildRequires:	perl(B)
@@ -39,21 +44,21 @@ BuildRequires:	perl(Symbol)
 BuildRequires:	perl(warnings)
 # Test Suite
 BuildRequires:	perl(base)
-BuildRequires:	perl(IO::Handle)
-BuildRequires:	perl(IPC::Open3)
+BuildRequires:	perl(CPAN::Meta::Check) >= 0.011
+BuildRequires:	perl(CPAN::Meta::Requirements)
+BuildRequires:	perl(File::Spec)
 BuildRequires:	perl(lib)
-BuildRequires:	perl(blib)
 BuildRequires:	perl(Test::Fatal)
 BuildRequires:	perl(Test::More) >= 0.88
-BuildRequires:	perl(Test::Requires)
+BuildRequires:	perl(Test::Needs)
 %if %{with perl_Package_Stash_enables_optional_test}
 # Optional Tests
 BuildRequires:	perl(CPAN::Meta) >= 2.120900
+BuildRequires:	perl(Module::Runtime::Conflicts)
 BuildRequires:	perl(Package::Anon)
 BuildRequires:	perl(Variable::Magic)
 %endif
-# Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Dependencies
 # For performance and consistency
 Requires:	perl(Package::Stash::XS) >= 0.26
 # Not found by rpm auto-provides
@@ -80,25 +85,66 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
-%if 0%{?_licensedir:1}
 %license LICENSE
-%else
-%doc LICENSE
-%endif
 %doc Changes CONTRIBUTING README
 %{_bindir}/package-stash-conflicts
 %{perl_vendorlib}/Package/
-%{_mandir}/man1/package-stash-conflicts.1*
 %{_mandir}/man3/Package::Stash.3*
 %{_mandir}/man3/Package::Stash::PP.3*
 
 %changelog
-* Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 0.38-7
-- Add an explicit BR on `perl(blib)` to enable ptest
-- License verified
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.40-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.38-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.40-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.40-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.40-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.40-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.40-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.40-2
+- Perl 5.36 rebuild
+
+* Mon Feb 21 2022 Paul Howarth <paul@city-fan.org> - 0.40-1
+- Update to 0.40
+  - Update bundled version of ExtUtils::HasCompiler, for new new Apple include
+    paths
+- Use %%license unconditionally
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.39-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.39-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.39-3
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.39-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sun Nov 22 2020 Paul Howarth <paul@city-fan.org> - 0.39-1
+- Update to 0.39
+  - Updated distribution metadata and packaging
+  - Configuration phase now uses ExtUtils::HasCompiler
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.38-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.38-7
+- Perl 5.32 rebuild
+
+* Tue Mar 10 2020 Paul Howarth <paul@city-fan.org> - 0.38-6
+- BR: perl(blib) for t/00-compile.t
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.38-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

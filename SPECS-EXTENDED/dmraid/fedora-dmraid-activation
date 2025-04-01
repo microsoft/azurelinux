@@ -21,5 +21,8 @@ if ! strstr "$cmdline" nodmraid && [ -x /sbin/dmraid ]; then
 			/sbin/kpartx -u -a "/dev/mapper/$dmname"
 		done
 		IFS=$SAVEIFS
+	# dmraid says "no block devices found" on machines with an eMMC
+	elif [ "$dmraidsets" = "no raid disks" -o "$dmraidsets" = "no block devices found" ]; then
+		systemctl disable dmraid-activation.service
 	fi
 fi

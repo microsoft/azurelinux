@@ -1,0 +1,80 @@
+From a76fdf96c3af9ce9d21a3985c4be8a1aa6eea661 Mon Sep 17 00:00:00 2001
+From: Dominique Leuenberger <dimstar@opensuse.org>
+Date: Fri, 5 Apr 2024 10:28:16 +0200
+Subject: [PATCH] build: Fix build against, and require, libgit2 1.8.0
+
+---
+ libgit2-glib/ggit-clone-options.c        | 1 +
+ libgit2-glib/ggit-cred-ssh-interactive.c | 2 +-
+ libgit2-glib/ggit-remote-callbacks.h     | 1 +
+ libgit2-glib/ggit-types.h                | 3 ++-
+ meson.build                              | 2 +-
+ 5 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/libgit2-glib/ggit-clone-options.c b/libgit2-glib/ggit-clone-options.c
+index b47fdb1..30c7d86 100644
+--- a/libgit2-glib/ggit-clone-options.c
++++ b/libgit2-glib/ggit-clone-options.c
+@@ -19,6 +19,7 @@
+  */
+ 
+ #include <git2.h>
++#include <git2/sys/errors.h>
+ #include <gio/gio.h>
+ 
+ #include "ggit-clone-options.h"
+diff --git a/libgit2-glib/ggit-cred-ssh-interactive.c b/libgit2-glib/ggit-cred-ssh-interactive.c
+index 4f60f8b..0bdca95 100644
+--- a/libgit2-glib/ggit-cred-ssh-interactive.c
++++ b/libgit2-glib/ggit-cred-ssh-interactive.c
+@@ -191,7 +191,7 @@ callback_wrapper (const char                            *name,
+ 	{
+ 		gchar *text;
+ 
+-		text = g_strndup (prompts[i].text, prompts[i].length);
++		text = g_strndup ((const gchar *)prompts[i].text, prompts[i].length);
+ 
+ 		wprompts[i] = ggit_cred_ssh_interactive_prompt_new (wname,
+ 		                                                    winstruction,
+diff --git a/libgit2-glib/ggit-remote-callbacks.h b/libgit2-glib/ggit-remote-callbacks.h
+index 3005ff4..2340712 100644
+--- a/libgit2-glib/ggit-remote-callbacks.h
++++ b/libgit2-glib/ggit-remote-callbacks.h
+@@ -24,6 +24,7 @@
+ 
+ #include <glib-object.h>
+ #include <git2.h>
++#include <git2/sys/errors.h>
+ #include <libgit2-glib/ggit-cred.h>
+ 
+ G_BEGIN_DECLS
+diff --git a/libgit2-glib/ggit-types.h b/libgit2-glib/ggit-types.h
+index 7e28975..2a2ed99 100644
+--- a/libgit2-glib/ggit-types.h
++++ b/libgit2-glib/ggit-types.h
+@@ -355,7 +355,8 @@ typedef enum
+ 	GGIT_CONFIG_LEVEL_XDG         = 3,
+ 	GGIT_CONFIG_LEVEL_GLOBAL      = 4,
+ 	GGIT_CONFIG_LEVEL_LOCAL       = 5,
+-	GGIT_CONFIG_LEVEL_APP         = 6,
++	GGIT_CONFIG_LEVEL_WORKTREE    = 6,
++	GGIT_CONFIG_LEVEL_APP         = 7,
+ 	GGIT_CONFIG_LEVEL_HIGHEST     = -1
+ } GgitConfigLevel;
+ 
+diff --git a/meson.build b/meson.build
+index e54a8b4..c21107d 100644
+--- a/meson.build
++++ b/meson.build
+@@ -126,7 +126,7 @@ glib_dep = dependency('glib-2.0', version: '>=' + glib_req)
+ gobject_dep = dependency('gobject-2.0', version: '>=' + glib_req)
+ gio_dep = dependency('gio-2.0', version: '>=' + glib_req)
+ 
+-libgit2_dep = dependency('libgit2', version: '>= 0.25.0')
++libgit2_dep = dependency('libgit2', version: '>= 1.8.0')
+ 
+ # XXX: Not nice, but probably our best option
+ enable_gir = get_option('introspection') and find_program('g-ir-scanner', required: false).found()
+-- 
+GitLab
+

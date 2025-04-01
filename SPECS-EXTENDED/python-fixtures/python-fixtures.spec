@@ -1,75 +1,81 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 %global pypi_name fixtures
-
-%bcond_without tests
-
+# fixtures has a circular dependency with testtools
+%bcond_with bootstrap
 Name:           python-%{pypi_name}
-Version:        3.0.0
-Release:        18%{?dist}
+Version:        4.0.1
+Release:        1%{?dist}
 Summary:        Fixtures, reusable state for writing clean tests and more
+License:        Apache-2.0 OR BSD-3-Clause
+URL:            https://github.com/testing-cabal/fixtures
+Source:         %pypi_source 
 
-License:        ASL 2.0 or BSD
-URL:            https://launchpad.net/python-fixtures
-Source0:        http://pypi.python.org/packages/source/f/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
+BuildRequires:  python3-pip
+BuildRequires:  python3-pbr
+BuildRequires:  python3-wheel
+BuildRequires:  python3-tox
+BuildRequires:  python3-tox-current-env
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-py
+BuildRequires:  python3-filelock
+BuildRequires:  python3-six
+BuildRequires:  python3-toml
+#BuildRequires:  python3-testtools
+BuildRequires:  python3-extras
+ 
 BuildArch:      noarch
 
+%global _description %{expand:
+Fixtures defines a Python contract for reusable state / support logic,
+primarily for unit testing.  Helper and adaption logic is included to make it
+easy to write your own fixtures using the fixtures contract.  Glue code is
+provided that makes using fixtures that meet the Fixtures contract in unittest
+compatible test cases easy and straight forward.}
 
-%global _description\
-Fixtures defines a Python contract for reusable state / support logic,\
-primarily for unit testing. Helper and adaption logic is included to\
-make it easy to write your own fixtures using the fixtures contract.\
-Glue code is provided that makes using fixtures that meet the Fixtures\
-contract in unit test compatible test cases easy and straight forward.
+%description %{_description}
 
-%description %_description
+%package -n python%{python3_pkgversion}-%{pypi_name}
+Summary:        %{summary}
+BuildRequires:  python%{python3_pkgversion}-devel
 
+%description -n python%{python3_pkgversion}-%{pypi_name} %{_description}
 
-%package -n python3-%{pypi_name}
-Summary:        Fixtures, reusable state for writing clean tests and more
-BuildArch:      noarch
-
-BuildRequires:  python3-devel
-BuildRequires:  python3-pbr >= 0.11
-
-%if %{with tests}
-BuildRequires:  python3-mock
-BuildRequires:  python3-testtools >= 0.9.22
+%if %{without bootstrap}
+%pyproject_extras_subpkg -n python%{python3_pkgversion}-%{pypi_name} streams
 %endif
 
-Requires:       python3-testtools >= 0.9.22
-Requires:       python3-six
-%{?python_provide:%python_provide python3-%{pypi_name}}
-
-%description -n python3-%{pypi_name}
-Fixtures defines a Python contract for reusable state / support logic,
-primarily for unit testing. Helper and adaption logic is included to
-make it easy to write your own fixtures using the fixtures contract.
-Glue code is provided that makes using fixtures that meet the Fixtures
-contract in unit test compatible test cases easy and straight forward.
-
-
 %prep
-%autosetup -n %{pypi_name}-%{version}
+%autosetup -p1 -n %{pypi_name}-%{version}
+
+# The code supports falling back to the standard library mock, but some tests
+# intentionally only test with the pypi mock.
+sed -e '/mock/d' -i setup.cfg
+sed -e 's/import mock/import unittest.mock as mock/' -i fixtures/tests/_fixtures/test_mockpatch.py
+
+%generate_buildrequires
+%pyproject_buildrequires %{!?with_bootstrap:-t -x streams}
 
 %build
-%py3_build
-
+%pyproject_wheel
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files %{pypi_name}
 
-%if %{with tests}
 %check
-%{__python3} -m testtools.run fixtures.test_suite
-%endif # if with tests
+%if %{without bootstrap}
+%tox
+%endif
 
-
-%files -n python3-%{pypi_name}
-%doc README GOALS NEWS Apache-2.0 BSD COPYING
-%{python3_sitelib}/%{pypi_name}
-%{python3_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
+%files -n python%{python3_pkgversion}-%{pypi_name} -f %{pyproject_files}
+%license Apache-2.0 BSD
+%doc README.rst GOALS NEWS
 
 %changelog
+* Thu Feb 20 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 4.0.1-1
+- Upgrade to version 4.0.1
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.0-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

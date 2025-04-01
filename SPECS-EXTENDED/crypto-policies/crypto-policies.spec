@@ -1,32 +1,47 @@
-%global git_date 20200619
+%global git_date 20241029
+%global git_commit 8baf55743b6f68ae889584b194970f8f3f613a8c
+%{?git_commit:%global git_commit_hash %(c=%{git_commit}; echo ${c:0:7})}
+
 %global _python_bytecompile_extra 0
-Summary:        System-wide crypto policies
+
+# File used as marker to preserve the auto-bindmount of the FIPS policy across
+# upgrades while temporarily removing it for the RPM transaction.
+%define rpmstatedir %{_localstatedir}/lib/rpm-state/%{name}
+%define rpmstate_autopolicy %{rpmstatedir}/autopolicy-reapplication-needed
+
 Name:           crypto-policies
 Version:        %{git_date}
-Release:        5%{?dist}
-License:        LGPL-2.0-or-later
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+Release:        1.git%{git_commit_hash}%{?dist}
+Summary:        System-wide crypto policies
+
+License:        LGPL-2.1-or-later
 URL:            https://gitlab.com/redhat-crypto/fedora-crypto-policies
-Source0:        https://gitlab.com/redhat-crypto/fedora-crypto-policies/-/archive/f32-updates/fedora-crypto-policies-f32-updates.tar.gz
-BuildRequires:  asciidoc
-BuildRequires:  bind
-BuildRequires:  gnutls-utils >= 3.6.0
-BuildRequires:  java-devel
-BuildRequires:  libxslt
-BuildRequires:  openssl
-BuildRequires:  perl-generators
-BuildRequires:  perl-interpreter
-BuildRequires:  python3-devel
-BuildRequires:  perl(File::Copy)
-BuildRequires:  perl(File::Temp)
-BuildRequires:  perl(File::Which)
-BuildRequires:  perl(File::pushd)
-Conflicts:      gnutls < 3.6.11
-Conflicts:      libreswan < 3.28
-Conflicts:      nss < 3.44
-Conflicts:      openssh < 8.2p1
-BuildArch:      noarch
+Source0:        https://gitlab.com/redhat-crypto/fedora-crypto-policies/-/archive/%{git_commit_hash}/%{name}-git%{git_commit_hash}.tar.gz
+
+BuildArch: noarch
+#ExclusiveArch:  %{java_arches} noarch
+BuildRequires: asciidoc
+BuildRequires: libxslt
+BuildRequires: openssl
+BuildRequires: nss-tools
+BuildRequires: gnutls-utils
+BuildRequires: openssh-clients
+BuildRequires: java-devel
+BuildRequires: bind
+BuildRequires: python3-devel >= 3.12
+BuildRequires: python3-pytest
+BuildRequires: make
+BuildRequires: sequoia-policy-config
+BuildRequires: systemd-rpm-macros
+
+Conflicts: openssl-libs < 3.0.2-2
+Conflicts: nss < 3.101
+Conflicts: libreswan < 3.28
+Conflicts: openssh < 9.0p1-5
+Conflicts: gnutls < 3.8.6-6
+
+# Most users want this, the split is mostly for Fedora CoreOS
+Recommends: crypto-policies-scripts
 
 %description
 This package provides pre-built configuration files with
@@ -34,8 +49,10 @@ cryptographic policies for various cryptographic back-ends,
 such as SSL/TLS libraries.
 
 %package scripts
-Summary:        Tool to switch between crypto policies
-Requires:       %{name} = %{version}-%{release}
+Summary: Tool to switch between crypto policies
+Requires: %{name} = %{version}-%{release}
+Recommends: (grubby if kernel)
+Provides: fips-mode-setup = %{version}-%{release}
 
 %description scripts
 This package provides a tool update-crypto-policies, which applies
@@ -43,21 +60,12 @@ the policies provided by the crypto-policies package. These can be
 either the pre-built policies from the base package or custom policies
 defined in simple policy definition files.
 
-%package -n fips-mode-setup
-Summary:        Enable or disable system FIPS mode
-Requires:       %{name} = %{version}-%{release}
-Requires:       %{name}-scripts = %{version}-%{release}
-Requires:       dracut
-Requires:       grubby
-
-%description -n fips-mode-setup
-The package provides a tool to enable or disable the system FIPS mode.
+The package also provides a tool fips-mode-setup, which can be used
+to enable or disable the system FIPS mode.
 
 %prep
-%autosetup -n fedora-crypto-policies-f32-updates
-# Fix path to asciidoc xsl documents
-# asciidoc installs these in %{_sysconfdir} by default, not %{_datadir}
-sed -i 's#/usr/share/asciidoc#%{_sysconfdir}/asciidoc#g' Makefile
+%setup -q -n fedora-crypto-policies-%{git_commit_hash}-%{git_commit}
+%autopatch -p1
 
 %build
 %make_build
@@ -74,11 +82,21 @@ mkdir -p -m 755 %{buildroot}%{_bindir}
 
 make DESTDIR=%{buildroot} DIR=%{_datarootdir}/crypto-policies MANDIR=%{_mandir} %{?_smp_mflags} install
 install -p -m 644 default-config %{buildroot}%{_sysconfdir}/crypto-policies/config
+install -p -m 644 default-fips-config %{buildroot}%{_datarootdir}/crypto-policies/default-fips-config
 touch %{buildroot}%{_sysconfdir}/crypto-policies/state/current
 touch %{buildroot}%{_sysconfdir}/crypto-policies/state/CURRENT.pol
 
+# Drop pre-generated GOST-ONLY & BSI policies, we do not need to ship the files
+rm -rf %{buildroot}%{_datarootdir}/crypto-policies/GOST-ONLY
+rm -rf %{buildroot}%{_datarootdir}/crypto-policies/BSI
+# Same for the experimental test-only TEST-FEDORA41
+rm -rf %{buildroot}%{_datarootdir}/crypto-policies/TEST-FEDORA41
+# and FEDORA40, a legacy snapshot of Fedora 40 DEFAULT
+rm -rf %{buildroot}%{_datarootdir}/crypto-policies/FEDORA40
+# Not having symlinks is also more robust for upgraders when policies go away
+
 # Create back-end configs for mounting with read-only /etc/
-for d in LEGACY DEFAULT NEXT FUTURE FIPS ; do
+for d in LEGACY DEFAULT FUTURE FIPS ; do
     mkdir -p -m 755 %{buildroot}%{_datarootdir}/crypto-policies/back-ends/$d
     for f in %{buildroot}%{_datarootdir}/crypto-policies/$d/* ; do
         ln $f %{buildroot}%{_datarootdir}/crypto-policies/back-ends/$d/$(basename $f .txt).config
@@ -92,7 +110,84 @@ done
 %py_byte_compile %{__python3} %{buildroot}%{_datadir}/crypto-policies/python
 
 %check
-make check %{?_smp_mflags}
+make test %{?_smp_mflags} SKIP_LINTING=1
+
+# Migrate away from removed policies; can be dropped 3 releases later
+%pretrans -p <lua>
+if posix.access("%{_sysconfdir}/crypto-policies/config") then
+    local cf = io.open("%{_sysconfdir}/crypto-policies/config", "r")
+    if cf then
+        local prev = cf:read()
+        cf:close()
+        local new
+        if prev == "TEST-FEDORA39" or prev:sub(1, 14) == "TEST-FEDORA39:" then
+            new = "DEFAULT" .. prev:sub(14)
+        elseif prev == "FEDORA38" or prev:sub(1, 9) == "FEDORA38:" then
+            new = "DEFAULT" .. prev:sub(9)
+        else
+            new = prev
+        end
+        while new:find(":FEDORA32:") ~= nil do
+            new = new:gsub(":FEDORA32:", ":")
+        end
+        new = new:gsub(":FEDORA32$", "")
+        if new ~= prev then
+            cf = io.open("%{_sysconfdir}/crypto-policies/config", "w")
+            if cf then
+                cf:write(new)
+                cf:close()
+            end
+        end
+    end
+end
+
+if arg[2] == 2 then
+    posix.unlink("%{rpmstate_autopolicy}")
+
+    local mountinfo = io.open("/proc/self/mountinfo", "r");
+    if mountinfo then
+        local mountpoints = {}
+        for mount in mountinfo:lines() do
+            -- See proc_pid_mountinfo(5) for the format
+            local pos, _, _, _, _, mountroot, mountpoint = string.find(mount, "^(%d+) (%d+) (%d+:%d+) ([^ ]+) ([^ ]+) ")
+            if pos == nil then
+                print("Failed to parse /proc/self/mountinfo line, ignoring:", mount)
+            else
+                mountpoints[mountpoint] = mountroot
+            end
+        end
+        mountinfo:close()
+
+        local expected_backend_suffix = "/%{name}/back-ends/FIPS"
+        local expected_config_suffix = "/%{name}/default-fips-config"
+
+        local backends_automount =
+            mountpoints["%{_sysconfdir}/%{name}/back-ends"] and
+            string.sub(mountpoints["%{_sysconfdir}/%{name}/back-ends"], string.len(expected_backend_suffix) * -1, -1) == expected_backend_suffix
+        local config_automount =
+            mountpoints["%{_sysconfdir}/%{name}/config"] and
+            string.sub(mountpoints["%{_sysconfdir}/%{name}/config"], string.len(expected_config_suffix) * -1, -1) == expected_config_suffix
+
+        if backends_automount and config_automount then
+            if posix.access("%{_bindir}/umount", "x") then
+                rpm.execute("%{_bindir}/umount", "%{_sysconfdir}/%{name}/config")
+                rpm.execute("%{_bindir}/umount", "%{_sysconfdir}/%{name}/back-ends")
+            end
+
+            local res, msg, errno = posix.mkdir("%{rpmstatedir}")
+            if res ~= 0 and errno ~= 17  then -- 17 is EEXIST
+                print("Failed to create state directory: " .. msg)
+            else
+                local marker, err = io.open("%{rpmstate_autopolicy}", "w+")
+                if not marker then
+                    print("Failed to create marker file %{rpmstate_autopolicy} for automatic FIPS policy bind-mount: " .. err)
+                else
+                    marker:close()
+                end
+            end
+        end
+    end
+end
 
 %post -p <lua>
 if not posix.access("%{_sysconfdir}/crypto-policies/config") then
@@ -116,15 +211,28 @@ if not posix.access("%{_sysconfdir}/crypto-policies/config") then
     end
     local policypath = "%{_datarootdir}/crypto-policies/"..policy
     for fn in posix.files(policypath) do
-        local backend = fn:gsub(".*/", ""):gsub("%%..*", "")
-        local cfgfn = "%{_sysconfdir}/crypto-policies/back-ends/"..backend..".config"
-        posix.unlink(cfgfn)
-        posix.symlink(policypath.."/"..fn, cfgfn)
+        if fn ~= "." and fn ~= ".." then
+            local backend = fn:gsub(".*/", ""):gsub("%%..*", "")
+            local cfgfn = "%{_sysconfdir}/crypto-policies/back-ends/"..backend..".config"
+            posix.unlink(cfgfn)
+            posix.symlink(policypath.."/"..fn, cfgfn)
+        end
+    end
+else
+    if posix.access("%{rpmstate_autopolicy}") then
+        os.execute("%{_libexecdir}/fips-crypto-policy-overlay >/dev/null 2>/dev/null || :")
+        posix.unlink("%{rpmstate_autopolicy}")
     end
 end
 
+%pre
+# Drop removed javasystem backend; can be dropped in F43
+rm -f "%{_sysconfdir}/crypto-policies/back-ends/javasystem.config" || :
+exit 0
+
 %posttrans scripts
 %{_bindir}/update-crypto-policies --no-check >/dev/null 2>/dev/null || :
+
 
 %files
 
@@ -138,17 +246,22 @@ end
 
 %ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/config
 
-%ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/gnutls.config
-%ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/openssl.config
-%ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/opensslcnf.config
-%ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/openssh.config
-%ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/opensshserver.config
-%ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/nss.config
-%ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/bind.config
-%ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/java.config
-%ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/krb5.config
-%ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/libreswan.config
-%ghost %config(missingok,noreplace) %{_sysconfdir}/crypto-policies/back-ends/libssh.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/gnutls.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/openssl.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/opensslcnf.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/openssh.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/opensshserver.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/nss.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/bind.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/java.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/krb5.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/libreswan.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/libssh.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/openssl_fips.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/sequoia.config
+%ghost %config(missingok,noreplace) %verify(not mode) %{_sysconfdir}/crypto-policies/back-ends/rpm-sequoia.config
+# %verify(not mode) comes from the fact
+# these turn into symlinks and back to regular files at will, see bz1898986
 
 %ghost %{_sysconfdir}/crypto-policies/state/current
 %ghost %{_sysconfdir}/crypto-policies/state/CURRENT.pol
@@ -156,14 +269,18 @@ end
 %{_mandir}/man7/crypto-policies.7*
 %{_datarootdir}/crypto-policies/LEGACY
 %{_datarootdir}/crypto-policies/DEFAULT
-%{_datarootdir}/crypto-policies/NEXT
 %{_datarootdir}/crypto-policies/FUTURE
 %{_datarootdir}/crypto-policies/FIPS
 %{_datarootdir}/crypto-policies/EMPTY
 %{_datarootdir}/crypto-policies/back-ends
 %{_datarootdir}/crypto-policies/default-config
+%{_datarootdir}/crypto-policies/default-fips-config
 %{_datarootdir}/crypto-policies/reload-cmds.sh
 %{_datarootdir}/crypto-policies/policies
+
+%{_libexecdir}/fips-setup-helper
+%{_libexecdir}/fips-crypto-policy-overlay
+%{_unitdir}/fips-crypto-policy-overlay.service
 
 %license COPYING.LESSER
 
@@ -172,26 +289,328 @@ end
 %{_mandir}/man8/update-crypto-policies.8*
 %{_datarootdir}/crypto-policies/python
 
-%files -n fips-mode-setup
 %{_bindir}/fips-mode-setup
 %{_bindir}/fips-finish-install
 %{_mandir}/man8/fips-mode-setup.8*
 %{_mandir}/man8/fips-finish-install.8*
 
 %changelog
-* Wed Mar 01 2023 Muhammad Falak <mwani@microsoft.com> - 20200619-5
-- Switch to autosetup
-- License verified
+* Tue Oct 29 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20241029-1.git8baf557
+- Bump version for the f41 package to sort higher that the f40 one
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200619-4
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Thu Oct 10 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20241010-1.git8baf557
+- LEGACY: enable 192-bit ciphers for nss pkcs12/smime
+- openssl: map NULL to TLS_SHA256_SHA256:TLS_SHA384_SHA384
 
-* Fri Oct 08 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200619-3.git781bbd4
-- Changing the conflicting version of 'nss' to fit the versioning for CBL-Mariner.
+* Fri Sep 27 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20240927-1.git93b7251
+- nss: be stricter with new purposes
 
-* Thu Aug 12 2021 Thomas Crain <thcrain@microsoft.com> - 20200619-2.git781bbd4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Fix path to asciidoc xsl files in Makefile
+* Wed Aug 28 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20240828-1.git5f66e81
+- fips-mode-setup: small Argon2 detection fix
+
+* Mon Aug 26 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20240826-1.gite824389
+- SHA1: add __openssl_block_sha1_signatures = 0
+
+* Thu Aug 22 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20240822-1.git64c9381
+- fips-mode-setup: block if LUKS devices using Argon2 are detected
+
+* Wed Aug 07 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20240807-1.git5795660
+- fips-crypto-policy-overlay: a unit to automount FIPS policy when fips=1
+- fips-setup-helper: add a libexec helper for anaconda
+- fips-mode-setup: force --no-bootcfg when UKI is detected
+
+* Fri Aug 02 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20240802-1.git2e5e430
+- nss: rewrite backend for nss 3.101
+
+* Thu Jul 25 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20240725-1.git9555558
+- gnutls: wire X25519-KYBER768 to GROUP-X25519-KYBER768
+- openssh: make dss no longer enableble, support is dropped
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20240717-2.git154fd4e
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jul 17 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20240717-1.git154fd4e
+- Changes/OpenSSLDistrustSHA1SigVer: implement, see below
+- DEFAULT: switch to rh-allow-sha1-signatures = no...
+- TEST-FEDORA41: reset to DEFAULT
+- FEDORA40: introduce with the previous contents of DEFAULT
+- nss: wire XYBER768D00 to X25519-KYBER768, not KYBER768
+- TEST-PQ: disable KYBER768
+
+* Tue Jul 16 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20240715-2.gitf8b6a29
+- fix running pre scriptlet in first transaction ever, pre-coreutils
+
+* Mon Jul 15 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20240715-1.gitf8b6a29
+- BSI: Update BSI policy for new 2024 minimum recommendations
+- java: use and include jdk.disabled.namedCurves
+- ec_min_size: introduce and use in java, default to 256
+- java: stop specifying jdk.tls.namedGroups in javasystem
+- java: drop unused javasystem backend
+
+* Fri Jun 28 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20240628-1.gitddd11d3
+- nss: wire KYBER768 to XYBER768D00
+- java: start controlling / disable DTLSv1.0
+- java: disable anon ciphersuites, tying them to NULL
+- java: respect more key size restrictions
+- java: specify jdk.tls.namedGroups system property
+- java: make hash, mac and sign more orthogonal
+- fips-mode-setup: add another scary "unsupported"
+- fips-mode-setup: flashy ticking warning upon use
+- BSI: switch to 3072 minimum RSA key size
+
+* Tue May 21 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20240521-1.gitf71d135
+- nss: unconditionally include p11-kit-proxy
+- TEST-PQ: update algorithm list, mark all PQ algorithms experimental
+
+* Wed May 15 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20240515-1.gita24a14b
+- gnutls: use tls-session-hash option, enforcing EMS in FIPS mode
+- gnutls: DTLS 0.9 is controllable again
+- gnutls: remove extraneous newline
+- openssh: remove support for old names of RequiredRSASize
+
+* Wed Mar 20 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20240320-1.git58e3d95
+- modules/FEDORA32, FEDORA38, TEST-FEDORA39: drop
+- openssl: mark liboqsprovider groups optional with ?
+- TEST-PQ: add more group and sign values, marked experimental
+- TEST-FEDORA41: add a new policy with __openssl_block_sha1_signatures = 1
+- TEST-PQ: also enable sntrup761x25519-sha512@openssh.com
+
+* Mon Mar 04 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20240304-1.git0375239
+- packaging: remove perl build-dependency, it's not needed anymore
+- packaging: stop linting at check-time, relying on upstream CI instead
+- packaging: drop stale workarounds
+- libreswan: do not use up pfs= / ikev2= keywords for default behaviour
+
+* Tue Feb 27 2024 Jiri Vanek <jvanek@redhat.com> - 20240201-2.git9f501f3
+- Rebuilt for java-21-openjdk as system jdk
+
+* Thu Feb 01 2024 Alexander Sosedkin <asosedkin@redhat.com> - 20240201-1.git9f501f3
+- fips-finish-install: make sure ostree is detected in chroot
+- fips-mode-setup: make sure ostree is detected in chroot
+- java: disable ChaCha20-Poly1305 where applicable
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20231204-3.git1e3a2e4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20231204-2.git1e3a2e4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 04 2023 Alexander Sosedkin <asosedkin@redhat.com> - 20231204-1.git1e3a2e4
+- TEST-PQ: add a subpolicy to test post-quantum algorithms. Do not rely on.
+
+* Mon Nov 13 2023 Clemens Lang <cllang@redhat.com> - 20231113-1.gitb402e82
+- fips-mode-setup: Write error messages to stderr
+- fips-mode-setup: Fix some shellcheck warnings
+- fips-mode-setup: Fix test for empty /boot
+- fips-mode-setup: Avoid 'boot=UUID=' if /boot == /
+
+* Thu Nov 09 2023 Clemens Lang <cllang@redhat.com> - 20231109-1.gitadb5572
+- Restore support for scoped ssh_etm directives
+- Print matches in syntax deprecation warnings
+
+* Tue Nov 07 2023 Clemens Lang <cllang@redhat.com> - 20231107-1.gitd5877b3
+- fips-mode-setup: Fix usage with --no-bootcfg
+
+* Tue Nov 07 2023 Clemens Lang <cllang@redhat.com> - 20231107-1.git8f49dfa
+- turn ssh_etm into an etm@SSH tri-state
+- fips-mode-setup: increase chroot-friendliness (rhbz#2164847)
+
+* Wed Sep 20 2023 Alexander Sosedkin <asosedkin@redhat.com> - 20230920-1.git570ea89
+- OSPP subpolicy: tighten beyond reason for OSPP 4.3
+- fips-mode-setup: more thorough --disable, still unsupported
+
+* Tue Jul 25 2023 Alexander Sosedkin <asosedkin@redhat.com> - 20230731-1.git5ed06e0
+- BSI: start a BSI TR 02102 policy
+- krb5: sort enctypes mac-first, cipher-second, prioritize SHA-2 ones
+- FIPS: enforce EMS in FIPS mode
+- NO-ENFORCE-EMS: add subpolicy to undo the EMS enforcement in FIPS mode
+- nss: implement EMS enforcement in FIPS mode (not enabled yet)
+- openssl: implement EMS enforcement in FIPS mode
+- gnutls: implement EMS enforcement in FIPS mode (not enabled yet)
+- docs: replace `FIPS 140-2` with just `FIPS 140`
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20230614-2.git5f3458e
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 14 2023 Alexander Sosedkin <asosedkin@redhat.com> - 20230614-1.git5f3458e
+- policies: restore group order to old OpenSSL default order
+
+* Thu Apr 20 2023 Alexander Sosedkin <asosedkin@redhat.com> - 20230420-1.git3d08ae7
+- openssl: specify Groups explicitly
+- openssl: add support for Brainpool curves
+
+* Wed Mar 01 2023 Alexander Sosedkin <asosedkin@redhat.com> - 20230301-1.git2ea6d2a
+- rpm-sequoia: add separate rpm-sequoia backend
+- DEFAULT: allow SHA-1 and 1024 bit DSA in RPM (https://pagure.io/fesco/issue/2960)
+
+* Mon Feb 20 2023 Alexander Sosedkin <asosedkin@redhat.com> - 20230220-1.git8c7de04
+- Makefile: support asciidoc 10
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20221215-2.gita4c31a3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Dec 15 2022 Alexander Sosedkin <asosedkin@redhat.com> - 20221215-1.gita4c31a3
+- bind: expand the list of disableable algorithms
+
+* Thu Nov 10 2022 Alexander Sosedkin <asosedkin@redhat.com> - 20221110-1.git87a75f4
+- sequoia: introduce new backend
+- migrate license tag to SPDX
+
+* Mon Oct 03 2022 Alexander Sosedkin <asosedkin@redhat.com> - 20221003-1.gitcb1ad32
+- openssh: force RequiredRSASize option name
+
+* Wed Aug 24 2022 Alexander Sosedkin <asosedkin@redhat.com> - 20220824-2.git2187e9c
+- revert premature Fedora 38 Rawhide SHA-1 "jump scare" until
+  https://fedoraproject.org/wiki/Changes/StrongCryptoSettings3Forewarning2
+  gets approved
+
+* Wed Aug 24 2022 Alexander Sosedkin <asosedkin@redhat.com> - 20220824-1.gitd4b71ab
+- disable SHA-1 further for a Fedora 38 Rawhide "jump scare"
+  as described at
+  https://fedoraproject.org/wiki/Changes/StrongCryptoSettings3Forewarning2
+  This change will be reverted for the branched-off Fedora 38,
+  but never for Fedora 39.
+  Thus the change will reach the users with Fedora 39 release.
+  `update-crypto-policies --set FEDORA38` for the former, obsolete DEFAULT.
+- openssh: control HostbasedAcceptedAlgorithms
+  Systems having it set at /etc/ssh/sshd_config
+  will have the value ignored and should instead configure it per-host.
+
+* Mon Aug 15 2022 Alexander Sosedkin <asosedkin@redhat.com> - 20220815-1.gite4ed860
+- openssh: add RSAMinSize option following min_rsa_size
+
+* Tue Aug 02 2022 Alexander Sosedkin <asosedkin@redhat.com> - 20220802-1.gita99dfd2
+- tests/java: fix java.security.disableSystemPropertiesFile=true
+- docs: add customization recommendation
+
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20220428-3.gitdfb10ea
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jul 08 2022 Jiri Vanek <jvanek@redhat.com> - 20220428-2.gitdfb10ea
+- Rebuilt for Drop i686 JDKs
+
+* Thu Apr 28 2022 Alexander Sosedkin <asosedkin@redhat.com> - 20220428-1.gitdfb10ea
+- policies: add FEDORA38 and TEST-FEDORA39
+- fix condition of conflicting with openssl
+
+* Wed Apr 27 2022 Alexander Sosedkin <asosedkin@redhat.com> - 20220427-1.gitca01c3e
+- bind: control ED25519/ED448
+
+* Tue Apr 12 2022 Alexander Sosedkin <asosedkin@redhat.com> - 20220412-1.git97fe449
+- openssl: disable SHA-1 signatures in FUTURE/NO-SHA1
+- skip pylint until it's fixed in Fedora (tracked in bz206983)
+
+* Mon Apr 04 2022 Alexander Sosedkin <asosedkin@redhat.com> - 20220404-1.git17914f1
+- fips-mode-setup: improve handling FIPS plus subpolicies
+- fips-mode-setup: catch more inconsistencies, clarify --check
+- fips-mode-setup, fips-finish-install: abandon /etc/system-fips
+- openssh: add support for sntrup761x25519-sha512@openssh.com
+
+* Sat Feb 05 2022 Jiri Vanek <jvanek@redhat.com> - 20220203-2.git112f859
+- Rebuilt for java-17-openjdk as system jdk
+
+* Thu Feb 03 2022 Alexander Sosedkin <asosedkin@redhat.com> - 20220203-1.git112f859
+- gnutls: enable SHAKE, needed for Ed448
+- fips-mode-setup: improve handling FIPS plus subpolicies
+
+* Wed Jan 19 2022 Alexander Sosedkin <asosedkin@redhat.com> - 20220119-1.git50109e7
+- gnutls: switch to allowlisting
+  (https://fedoraproject.org/wiki/Changes/GnutlsAllowlisting)
+- openssl: add newlines at the end of the output
+
+* Mon Nov 15 2021 Alexander Sosedkin <asosedkin@redhat.com> - 20211115-1.git1b1c04c
+- OSPP: relax -ECDSA-SHA2-512, -FFDHE-*
+- fips-mode-setup, fips-finish-install: call zipl more often (s390x-specific)
+
+* Fri Sep 17 2021 Alexander Sosedkin <asosedkin@redhat.com> - 20210917-1.gitc9d86d1
+- openssl: fix disabling ChaCha20
+- fix minor things found by pylint 2.11
+
+* Thu Aug 19 2021 Alexander Sosedkin <asosedkin@redhat.com> - 20210819-1.gitd0fdcfb
+- gnutls: revert hard-disabling DTLS 0.9
+- update-crypto-policies: fix --check's sorting when walking the directories
+- update-crypto-policies: always regenerate the policy to --check against
+- fix minor things found by new pylint
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20210621-2.gita0e819e
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jun 21 2021 Alexander Sosedkin <asosedkin@redhat.com> - 20210621-1.gita0e819e
+- bump LEGACY key size requirements from 1023 to 1024
+- add javasystem backend
+- *ssh: condition ecdh-sha2-nistp384 on SECP384R1
+- set %verify(not mode) for backend sometimes-symlinks-sometimes-not
+
+* Tue Jun 15 2021 Alexander Sosedkin <asosedkin@redhat.com> - 20210615-1.giteed6c85
+- implement scoped policies, e.g., cipher@SSH = ...
+- implement algorithm globbing, e.g., cipher@SSH = -*-CBC
+- deprecate derived properties:
+  tls_cipher, ssh_cipher, ssh_group, ike_protocol, sha1_in_dnssec
+- deprecate unscoped form of protocol property
+- openssl: set MinProtocol / MaxProtocol separately for TLS and DTLS
+- openssh: use PubkeyAcceptedAlgorithms instead of PubkeyAcceptedKeyTypes
+- libssh: respect ssh_certs
+- restrict FIPS:OSPP further
+- improve Python 3.10 compatibility
+- update documentation
+- expand upstream test coverage
+
+* Sat Feb 13 2021 Alexander Sosedkin <asosedkin@redhat.com> - 20210213-1.git5c710c0
+- exclude RC4 from LEGACY
+- introduce rc4_md5_in_krb5 to narrow AD_SUPPORT's impact
+- an assortment of small fixes
+
+* Wed Jan 27 2021 Alexander Sosedkin <asosedkin@redhat.com> - 20210127-2.gitb21c811
+- fix comparison in %post lua scriptlet
+
+* Wed Jan 27 2021 Alexander Sosedkin <asosedkin@redhat.com> - 20210127-1.gitb21c811
+- don't create /etc/crypto-policies/back-ends/.config in %post
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20210118-2.gitb21c811
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jan 18 2021 Alexander Sosedkin <asosedkin@redhat.com> - 20210118-1.gitb21c811
+- output sigalgs required by nss >=3.59 (or 3.60 in Fedora case)
+- bump Python requirement to 3.6
+
+* Tue Dec 15 2020 Alexander Sosedkin <asosedkin@redhat.com> - 20201215-1.giteb57e00
+- Kerberos 5: Fix policy generator to account for macs
+
+* Tue Dec 08 2020 Alexander Sosedkin <asosedkin@redhat.com> - 20201208-1.git70def9f
+- add AES-192 support (non-TLS scenarios)
+- add documentation of the --check option
+
+* Wed Sep 23 2020 Tomáš Mráz <tmraz@redhat.com> - 20200918-1.git85dccc5
+- add RSA-PSK algorithm support
+- add GOST algorithms support for openssl
+- add GOST-ONLY policy and fix GOST subpolicy
+- update-crypto-policies: added --check parameter to perform
+  comparison of actual configuration files with the policy
+
+* Thu Aug 13 2020 Tomáš Mráz <tmraz@redhat.com> - 20200813-1.git66d4068
+- libreswan: enable X25519 group
+- libreswan: properly disable FFDH in ECDHE-ONLY subpolicy
+- libreswan: add generation of authby parameter based on sign property
+- libssh: Add diffie-hellman-group14-sha256
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 20200702-2.gitc40cede
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 13 2020 Tomáš Mráz <tmraz@redhat.com> - 20200702-1.gitc40cede
+- OSPP subpolicy: remove AES-CCM
+- openssl: handle the AES-CCM removal properly
+- openssh/libssh: drop CBC ciphersuites from DEFAULT and FIPS
+- add AD-SUPPORT subpolicy which re-enables RC4 for Kerberos
+- gnutls: disallow X448/ED448 in FIPS policy
+- merge fips-mode-setup package into the scripts subpackage
+
+* Thu Jun 25 2020 Tomáš Mráz <tmraz@redhat.com> - 20200625-1.gitb298a9e
+- DEFAULT policy: Drop DH < 2048 bits, TLS 1.0, 1.1, SHA-1
+- make the NEXT policy just an alias for DEFAULT as they are now identical
+- policies: introduce sha1_in_dnssec value for BIND
+- add SHA1 and FEDORA32 policy modules to provide backwards compatibility
+  they can be applied as DEFAULT:SHA1 or DEFAULT:FEDORA32
+- avoid duplicates of list items in resulting policy
 
 * Wed Jun 24 2020 Tomáš Mráz <tmraz@redhat.com> - 20200619-1.git781bbd4
 - gnutls: enable DSA signatures in LEGACY
@@ -562,3 +981,4 @@ end
 
 * Mon May 19 2014 Nikos Mavrogiannopoulos <nmav@redhat.com> - 0.9-1-20140519gitf15621a
 - Initial package build
+

@@ -1,40 +1,38 @@
 %define majorver 8.6
-%define vers %{majorver}.10
-Summary:        The graphical toolkit for the Tcl scripting language
-Name:           tk
-Version:        %{vers}
-Release:        6%{?dist}
-License:        TCL
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://tcl.sourceforge.net
-Source0:        https://download.sourceforge.net/sourceforge/tcl/%{name}%{version}-src.tar.gz
-Patch0:         tk-8.6.10-make.patch
-Patch1:         tk-8.6.10-conf.patch
-Patch2:         tk-8.6.7-no-fonts-fix.patch
-# https://core.tcl-lang.org/tk/tktview/dccd82bdc70dc25bb6709a6c14880a92104dda43
-Patch3:         tk-8.6.10-font-sizes-fix.patch
-BuildRequires:  autoconf
-BuildRequires:  gcc
-BuildRequires:  libX11-devel
-BuildRequires:  libXft-devel
-BuildRequires:  tcl-devel >= %{vers}
-Requires:       tcl >= %{vers}
+%define vers %{majorver}.14
+
+Summary: The graphical toolkit for the Tcl scripting language
+Name: tk
+Version: %{vers}
+Release: 2%{?dist}
+Epoch:   1
+License: TCL AND HPND-Pbmplus AND CC-BY-SA-3.0 AND MIT-open-group AND MIT
+URL: http://tcl.sourceforge.net
+Source0: http://download.sourceforge.net/sourceforge/tcl/%{name}%{version}-src.tar.gz
+Requires: tcl = %{epoch}:%{vers}
+BuildRequires: make
+BuildRequires: gcc
+BuildRequires: tcl-devel = %{epoch}:%{vers}, autoconf
+BuildRequires: libX11-devel
+BuildRequires: libXft-devel
 # panedwindow.n from itcl conflicts
-Conflicts:      itcl <= 3.2
-Obsoletes:      tile <= 0.8.2
-Provides:       tile = 0.8.2
+Conflicts: itcl <= 3.2
+Obsoletes: tile <= 0.8.2
+Provides: tile = 0.8.2
+Patch1: tk-8.6.12-make.patch
+Patch2: tk-8.6.12-conf.patch
+# https://core.tcl-lang.org/tk/tktview/dccd82bdc70dc25bb6709a6c14880a92104dda43
+Patch3: tk-8.6.10-font-sizes-fix.patch
 
 %description
 When paired with the Tcl scripting language, Tk provides a fast and powerful
 way to create cross-platform GUI applications.
 
 %package devel
-Summary:        Tk graphical toolkit development files
-Requires:       %{name} = %{version}-%{release}
-Requires:       libX11-devel
-Requires:       libXft-devel
-Requires:       tcl-devel >= %{vers}
+Summary: Tk graphical toolkit development files
+Requires: %{name} = %{epoch}:%{version}-%{release}
+Requires: tcl-devel = %{epoch}:%{vers}
+Requires: libX11-devel libXft-devel
 
 %description devel
 When paired with the Tcl scripting language, Tk provides a fast and powerful
@@ -49,7 +47,7 @@ The package contains the development files and man pages for tk.
 cd unix
 autoconf
 %configure --enable-threads
-make %{?_smp_mflags} CFLAGS="%{optflags}" TK_LIBRARY=%{_datadir}/%{name}%{majorver}
+%make_build CFLAGS="%{optflags}" TK_LIBRARY=%{_datadir}/%{name}%{majorver}
 
 %check
 # do not run "make test" by default since it requires an X display
@@ -79,6 +77,11 @@ find generic unix -name "*.h" -exec cp -p '{}' %{buildroot}/%{_includedir}/%{nam
 # remove buildroot traces
 sed -i -e "s|$PWD/unix|%{_libdir}|; s|$PWD|%{_includedir}/%{name}-private|" %{buildroot}/%{_libdir}/%{name}Config.sh
 
+%if 0%{?flatpak}
+mkdir -p %{buildroot}%{_usr}/bin
+ln -s %{_bindir}/wish %{_bindir}/wish%{majorver} %{buildroot}%{_usr}/bin/
+%endif
+
 %pre
 [ ! -h %{_prefix}/%{_lib}/%{name}%{majorver} ] || rm %{_prefix}/%{_lib}/%{name}%{majorver}
 
@@ -92,8 +95,10 @@ sed -i -e "s|$PWD/unix|%{_libdir}|; s|$PWD|%{_includedir}/%{name}-private|" %{bu
 %{_libdir}/%{name}%{majorver}
 %{_mandir}/man1/*
 %{_mandir}/mann/*
-%license license.terms
-%doc README.md changes
+%if 0%{?flatpak}
+%{_usr}/bin/wish*
+%endif
+%doc README.md changes license.terms
 
 %files devel
 %{_includedir}/*
@@ -105,15 +110,51 @@ sed -i -e "s|$PWD/unix|%{_libdir}|; s|$PWD|%{_includedir}/%{name}-private|" %{bu
 %{_datadir}/%{name}%{majorver}/tkAppInit.c
 
 %changelog
-* Tue Jan 03 2023 Sumedh Sharma <sumsharma@microsoft.com> - 8.6.10-6
-- Fix Requires on tcl/tcl-devel with version contraints
-- License verified
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.6.14-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Thu Oct 28 2021 Muhammad Falak <mwani@microsft.com> - 8.6.10-5
-- Remove epoch
+* Thu Feb 29 2024 Jaroslav Škarvada <jskarvad@redhat.com> - 1:8.6.14-1
+- New version
+  Related: rhbz#2267019
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:8.6.10-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.6.13-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Dec 12 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 1:8.6.13-2
+- Converted license to SPDX
+
+* Tue Aug 29 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 1:8.6.13-1
+- New version
+  Related: rhbz#2231272
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.6.12-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.6.12-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.6.12-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.6.12-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Nov 23 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 1:8.6.12-1
+- New version
+  Related: rhbz#1488695
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.6.10-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.6.10-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.6.10-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 22 2020 Tom Stellard <tstellar@redhat.com> - 1:8.6.10-4
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.6.10-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

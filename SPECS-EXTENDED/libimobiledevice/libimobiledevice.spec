@@ -1,96 +1,144 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-Name:          libimobiledevice
-Version:       1.2.1
-Release:       1%{?dist}
-Summary:       Library for connecting to mobile devices
+## START: Set by rpmautospec
+## (rpmautospec version 0.6.5)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 5;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
 
-License:       LGPLv2+
-URL:           http://www.libimobiledevice.org/
-Source0:       http://www.libimobiledevice.org/downloads/%{name}-1.2.0.tar.bz2
-# Upstream patches, generated with:
-# git format-patch --stdout  344409e1d1ad917d377b256214c5411dda82e6b0...9b857fc42cdc4921e1e3f190c5ea907774e04758
-# b5a70e9aaf538dad0aba0b800b122955e8ac494b
-# 26373b334889f5ae2e2737ff447eb25b1700fa2f
-# 97f8ac9e9ad9ee73ca635a26831bfe950a5d673b
-# were manually removed
-Patch0:        a7568f456d10f1aff61534e3216201a857865247...9b857fc42cdc4921e1e3f190c5ea907774e04758.patch
+%global forgeurl https://github.com/libimobiledevice/libimobiledevice
+%global commit 6fc41f57fc607df9b07446ca45bdf754225c9bd9
+%global date 20230705
+%{?commit:%global shortcommit %(c=%{commit}; echo ${c:0:7})}
 
-BuildRequires: glib2-devel
-BuildRequires: openssl-devel
-BuildRequires: libgcrypt-devel
-BuildRequires: libplist-devel
-BuildRequires: libtasn1-devel
-BuildRequires: libusbmuxd-devel
-BuildRequires: libusbx-devel
-BuildRequires: libxml2-devel
-BuildRequires: readline-devel
-BuildRequires: swig
-BuildRequires: git-core
-BuildRequires: autoconf automake libtool
+Name:           libimobiledevice
+Version:        1.3.0^%{date}git%{shortcommit}
+Release:        %autorelease
+Summary:        Library for connecting to mobile devices
+
+License:        LGPL-2.0-or-later
+URL:            https://www.libimobiledevice.org/
+Source:         %{forgeurl}/archive/%{commit}/%{name}-%{commit}.tar.gz
+
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  gcc
+BuildRequires:  libtool
+BuildRequires:  make
+
+BuildRequires:  glib2-devel
+BuildRequires:  openssl-devel
+BuildRequires:  libgcrypt-devel
+BuildRequires:  libimobiledevice-glue-devel
+BuildRequires:  libplist-devel
+BuildRequires:  libtasn1-devel
+BuildRequires:  libusbmuxd-devel
+BuildRequires:  libusbx-devel
+BuildRequires:  libxml2-devel
+BuildRequires:  readline-devel
+
+# Applications using libimobiledevice might use sockets provided by usbmuxd to work
+Recommends: usbmuxd
 
 %description
-libimobiledevice is a library for connecting to mobile devices including phones 
+libimobiledevice is a library for connecting to mobile devices including phones
 and music players
 
-%package devel
-Summary: Development package for libimobiledevice
-Requires: %{name}%{?_isa} = %{version}-%{release}
+%package        devel
+Summary:        Development package for libimobiledevice
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-%description devel
+%description    devel
 Files for development with libimobiledevice.
 
-%package utils
-Summary: Utilites for libimobiledevice
-Requires: %{name}%{?_isa} = %{version}-%{release}
+%package        utils
+Summary:        Utilites for libimobiledevice
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-%description utils
+%description    utils
 Utilites for use with libimobiledevice.
 
 %prep
-%autosetup -S git_am -n %{name}-1.2.0
+%autosetup -p1 -n %{name}-%{commit}
 
-# Fix dir permissions on html docs
-chmod +x docs/html
-
-ACLOCAL="aclocal -I m4" autoreconf -f -i
+%if %{defined commit}
+echo %{version} > .tarball-version
+%endif
 
 %build
-%configure --disable-static --enable-openssl --enable-dev-tools --without-cython
-# Remove rpath as per https://fedoraproject.org/wiki/Packaging/Guidelines#Beware_of_Rpath
-sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
-sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-
-make %{?_smp_mflags} V=1
+NOCONFIGURE=1 ./autogen.sh
+%configure --disable-static --without-cython
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
-
-#Remove libtool archives.
-find %{buildroot} -type f -name "*.la" -delete
-
-%ldconfig_scriptlets
+%make_install
 
 %files
-%{!?_licensedir:%global license %%doc}
 %license COPYING.LESSER
 %doc AUTHORS README.md
-%{_libdir}/libimobiledevice.so.6*
+%{_libdir}/libimobiledevice-1.0.so.6*
 
 %files utils
-%doc %{_datadir}/man/man1/idevice*
+%doc %{_datadir}/man/man1/idevice*.1*
 %{_bindir}/idevice*
 
 %files devel
-%doc docs/html/
 %{_libdir}/pkgconfig/libimobiledevice-1.0.pc
-%{_libdir}/libimobiledevice.so
+%{_libdir}/libimobiledevice-1.0.so
 %{_includedir}/libimobiledevice/
 
 %changelog
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.1-1
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+## START: Generated by rpmautospec
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0^20230705git6fc41f5-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0^20230705git6fc41f5-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0^20230705git6fc41f5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Oct 07 2023 Chandradeep Dey <codesigning@chandradeepdey.com> - 1.3.0^20230705git6fc41f5-2
+- Add usbmuxd as a recommended package
+
+* Thu Jul 27 2023 Davide Cavalca <dcavalca@fedoraproject.org> - 1.3.0^20230705git6fc41f5-1
+- Update to git snapshot 6fc41f5
+
+* Thu Jul 27 2023 Davide Cavalca <dcavalca@fedoraproject.org> - 1.3.0-14
+- Update specfile to the latest guidelines
+
+* Thu Jul 27 2023 Davide Cavalca <dcavalca@fedoraproject.org> - 1.3.0-13
+- Convert license tag to SPDX
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 1.3.0-5
+- Rebuilt with OpenSSL 3.0.0
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 16 2020 Bastien Nocera <bnocera@redhat.com> - 1.3.0-1
++ libimobiledevice-1.3.0-1
+- Update to 1.3.0
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-0.3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -333,3 +381,5 @@ find %{buildroot} -type f -name "*.la" -delete
 
 * Sat Nov 29 2008 Peter Robinson <pbrobinson@gmail.com> 0.1.0-1
 - Initial package
+
+## END: Generated by rpmautospec

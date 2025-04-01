@@ -1,12 +1,12 @@
-diff -up openwsman-2.4.12/bindings/ruby/extconf.rb.orig openwsman-2.4.12/bindings/ruby/extconf.rb
---- openwsman-2.4.12/bindings/ruby/extconf.rb.orig	2015-02-09 09:28:58.232581263 +0100
-+++ openwsman-2.4.12/bindings/ruby/extconf.rb	2015-02-09 09:38:22.836772879 +0100
+diff -up openwsman-2.7.2/bindings/ruby/extconf.rb.orig openwsman-2.7.2/bindings/ruby/extconf.rb
+--- openwsman-2.7.2/bindings/ruby/extconf.rb.orig	2022-12-28 16:43:03.000000000 +0100
++++ openwsman-2.7.2/bindings/ruby/extconf.rb	2023-08-09 12:50:21.361216733 +0200
 @@ -32,7 +32,7 @@ swig = find_executable("swig")
  raise "SWIG not found" unless swig
  
  major, minor, path = RUBY_VERSION.split(".")
 -raise "SWIG failed to run" unless system("#{swig} -ruby -autorename -DRUBY_VERSION=#{major}#{minor} -I. -I/usr/include/openwsman -o openwsman_wrap.c openwsman.i")
-+raise "SWIG failed to run" unless system("#{swig} -ruby -autorename -DRUBY_VERSION=#{major}#{minor} -I. -I/usr/include/openwsman -I/builddir/build/BUILD/openwsman-2.6.8/include/ -o openwsman_wrap.c openwsman.i")
++raise "SWIG failed to run" unless system("#{swig} -ruby -autorename -DRUBY_VERSION=#{major}#{minor} -I. -I/usr/include/openwsman -I/builddir/build/BUILD/openwsman-2.7.2-build/openwsman-2.7.2/include/ -o openwsman_wrap.c openwsman.i")
  
  $CPPFLAGS = "-I/usr/include/openwsman -I.."
  

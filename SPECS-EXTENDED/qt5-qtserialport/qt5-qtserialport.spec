@@ -1,47 +1,46 @@
 %global qt_module qtserialport
 
-Summary:        Qt5 - SerialPort component
-Name:           qt5-%{qt_module}
-Version:        5.15.9
-Release:        2%{?dist}
+Summary: Qt5 - SerialPort component
+Name:    qt5-%{qt_module}
+Version: 5.15.15
+Release: 1%{?dist}
+
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
-License:        LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://www.qt.io
-Source0:        https://download.qt.io/official_releases/qt/5.15/%{version}/submodules/%{qt_module}-everywhere-opensource-src-%{version}.tar.xz#/%{name}-%{version}.tar.xz
+License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
+Url:     http://www.qt.io
+%global majmin %(echo %{version} | cut -d. -f1-2)
+Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-opensource-src-%{version}.tar.xz
+
+BuildRequires: make
+BuildRequires: qt5-qtbase-devel >= %{version}
+BuildRequires: pkgconfig(libudev)
+
+BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
-BuildRequires:  make
-BuildRequires:  pkgconfig
-BuildRequires:  qt5-qtbase-devel >= %{version}
-BuildRequires:  qt5-qtbase-private-devel
-BuildRequires:  pkgconfig(libudev)
 
 %description
 Qt Serial Port provides the basic functionality, which includes configuring,
 I/O operations, getting and setting the control signals of the RS-232 pinouts.
 
 %package devel
-Summary:        Development files for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       qt5-qtbase-devel%{?_isa}
-
+Summary: Development files for %{name}
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: qt5-qtbase-devel%{?_isa}
 %description devel
 %{summary}.
 
 %package examples
-Summary:        Programming examples for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
+Summary: Programming examples for %{name}
+Requires: %{name}%{?_isa} = %{version}-%{release}
 %description examples
 %{summary}.
 
+
 %prep
-%autosetup -n %{qt_module}-everywhere-src-%{version}
+%setup -q -n %{qt_module}-everywhere-src-%{version}
 
 
 %build
-rm -rf examples
 %{qmake_qt5} \
   %{?_qt5_examplesdir:CONFIG+=qt_example_installs}
 
@@ -49,7 +48,7 @@ rm -rf examples
 
 
 %install
-%make_install INSTALL_ROOT=%{buildroot}
+make install INSTALL_ROOT=%{buildroot}
 
 ## .prl/.la file love
 # nuke .prl reference(s) to %%buildroot, excessive (.la-like) libs
@@ -86,11 +85,40 @@ popd
 %{_qt5_docdir}/qtserialport/
 %endif
 
+%files examples
+%{_qt5_examplesdir}/
+
 
 %changelog
-* Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 5.15.9-2
-- Initial CBL-Mariner import from Fedora 38 (license: MIT)
-- License verified
+* Wed Sep 04 2024 Jan Grulich <jgrulich@redhat.com> - 5.15.15-1
+- 5.15.15
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.14-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed May 29 2024 Jan Grulich <jgrulich@redhat.com> - 5.15.14-1
+- 5.15.14
+
+* Thu Mar 14 2024 Jan Grulich <jgrulich@redhat.com> - 5.15.13-1
+- 5.15.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.12-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.12-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Jan 02 2024 Jan Grulich <jgrulich@redhat.com> - 5.15.12-1
+- 5.15.12
+
+* Fri Oct 06 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.11-1
+- 5.15.11
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jun 12 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.10-1
+- 5.15.10
 
 * Tue Apr 11 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.9-1
 - 5.15.9

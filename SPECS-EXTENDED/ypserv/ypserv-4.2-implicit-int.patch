@@ -1,0 +1,12 @@
+diff -ruN ypserv-4.2/configure.ac ypserv-4.2.orig/configure.ac
+--- ypserv-4.2/configure.ac	2022-12-01 13:22:38.493164313 +0100
++++ ypserv-4.2.orig/configure.ac	2022-12-01 13:13:06.411943797 +0100
+@@ -99,7 +99,7 @@
+ AC_CACHE_CHECK(for -fpie, libc_cv_fpie, [dnl
+   cat > conftest.c <<EOF
+ int foo;
+-main () { return 0;}
++int main () { return 0;}
+ EOF
+   if test "$USE_PIE" = "yes" &&
+ 	AC_TRY_COMMAND([${CC-cc} $CFLAGS $CPPFLAGS $LDFLAGS -pie -fpie

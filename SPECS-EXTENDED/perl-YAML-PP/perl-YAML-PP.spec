@@ -1,18 +1,11 @@
-%global __requires_exclude %{?__requires_exclude:__requires_exclude|}^perl\\(Scalar::Util\\)$
-%global __requires_exclude %{__requires_exclude}|^perl\\(YAML::PP::Test)\s*$
-%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libexecdir}
-
-Summary:        YAML 1.2 processor
 Name:           perl-YAML-PP
-Version:        0.031
+Version:        0.38.0
 Release:        2%{?dist}
-License:        GPL+ OR Artistic
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+Summary:        YAML 1.2 processor
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/YAML-PP/
-Source0:        https://cpan.metacpan.org/authors/id/T/TI/TINITA/YAML-PP-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/T/TI/TINITA/YAML-PP-v%{version}.tar.gz
 BuildArch:      noarch
-
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
@@ -21,18 +14,18 @@ BuildRequires:  perl-interpreter
 BuildRequires:  perl(:VERSION) >= 5.8.0
 BuildRequires:  perl(Config)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(File::Copy)
-BuildRequires:  perl(FindBin)
-BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-
 # Run-time
 BuildRequires:  perl(B)
 BuildRequires:  perl(B::Deparse)
+BuildRequires:  perl(base)
+BuildRequires:  perl(boolean)
 BuildRequires:  perl(Carp)
+BuildRequires:  perl(constant)
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Encode)
+BuildRequires:  perl(experimental)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(Getopt::Long)
@@ -40,33 +33,29 @@ BuildRequires:  perl(HTML::Entities)
 BuildRequires:  perl(JSON::PP)
 BuildRequires:  perl(MIME::Base64)
 BuildRequires:  perl(Module::Load)
+BuildRequires:  perl(overload)
 BuildRequires:  perl(Scalar::Util) >= 1.07
 BuildRequires:  perl(Term::ANSIColor) >= 4.02
 BuildRequires:  perl(Tie::Array)
 BuildRequires:  perl(Tie::Hash)
 BuildRequires:  perl(Tie::StdArray)
 BuildRequires:  perl(Tie::StdHash)
-BuildRequires:  perl(base)
-BuildRequires:  perl(boolean)
-BuildRequires:  perl(constant)
-BuildRequires:  perl(overload)
-
-%if 0%{?with_check}
+# Tests
+BuildRequires:  perl(blib) >= 1.01
 BuildRequires:  perl(File::Spec)
+BuildRequires:  perl(FindBin)
 BuildRequires:  perl(IO::File)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
+BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::Deep)
 BuildRequires:  perl(Test::More) >= 0.98
 BuildRequires:  perl(Test::Warn)
 BuildRequires:  perl(Tie::IxHash)
-BuildRequires:  perl(blib) >= 1.01
-BuildRequires:  perl(lib)
-%endif
-
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(boolean)
 Requires:       perl(B::Deparse)
 Requires:       perl(Cpanel::JSON::XS)
+Requires:       perl(experimental)
 Requires:       perl(HTML::Entities)
 Requires:       perl(JSON::PP)
 Requires:       perl(JSON::XS)
@@ -74,14 +63,18 @@ Requires:       perl(Scalar::Util) >= 1.07
 Requires:       perl(Term::ANSIColor)
 Requires:       perl(Tie::IxHash)
 Requires:       perl(YAML::PP::Schema::Include)
-Requires:       perl(boolean)
 # bin/yamlpp-load can use various YAML implementations on user's request:
 Suggests:       perl(YAML)
 Suggests:       perl(YAML::PP::LibYAML)
 Suggests:       perl(YAML::PP::LibYAML::Parser)
+Suggests:       perl(YAML::PP::Ref)
 Suggests:       perl(YAML::Syck)
 Suggests:       perl(YAML::Tiny)
 Suggests:       perl(YAML::XS)
+
+%global __requires_exclude %{?__requires_exclude:__requires_exclude|}^perl\\(Scalar::Util\\)$
+%global __requires_exclude %{__requires_exclude}|^perl\\(YAML::PP::Test)\s*$
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libexecdir}
 
 %description
 YAML::PP is a modern, modular YAML processor.
@@ -97,7 +90,7 @@ Tests from %{name}. Execute them
 with "%{_libexecdir}/%{name}/test".
 
 %prep
-%setup -q -n YAML-PP-%{version}
+%setup -q -n YAML-PP-v%{version}
 
 for i in $(find e* -type f); do
     chmod -x "$i"
@@ -112,10 +105,10 @@ done
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%make_build
+%{make_build}
 
 %install
-%make_install
+%{make_install}
 %{_fixperms} %{buildroot}/*
 
 # Install tests
@@ -138,7 +131,7 @@ chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 
 %check
 export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
-%make_build test
+make test
 
 %files
 %license LICENSE
@@ -151,9 +144,50 @@ export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print
 %{_libexecdir}/%{name}
 
 %changelog
-* Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.031-2
-- Initial CBL-Mariner import from Fedora 36 (license: MIT).
-- License verified.
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.38.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jan 30 2024 Jitka Plesnikova <jplesnik@redhat.com> - 0.38.0-1
+- 0.38.0 bump (rhbz#2261841)
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.37.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.37.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Nov 10 2023 Jitka Plesnikova <jplesnik@redhat.com> - 0.37.0-1
+- 0.37.0 bump (rhbz#2248901)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.036-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu May 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 0.036-1
+- 0.036 bump
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.035-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Oct 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.035-1
+- 0.035 bump
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.034-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jul 11 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.034-1
+- 0.034 bump
+
+* Tue Jun 28 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.033-1
+- 0.033 bump
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.032-2
+- Perl 5.36 rebuild
+
+* Wed Mar 23 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.032-1
+- 0.032 bump
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.031-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
 * Mon Jan 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.031-1
 - 0.031 bump

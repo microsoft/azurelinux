@@ -1,0 +1,21 @@
+commit 6b2c08bcd0e1c34db4b1bf9946a201f03595e36d
+Author: Tomas Korbar <tkorbar@redhat.com>
+Date:   Thu Apr 13 10:20:08 2023 +0200
+
+    Remove sync-mutex from MAKEFLAGS
+
+diff --git a/mk/make-config.sh b/mk/make-config.sh
+index 2d7c619..c12d317 100644
+--- a/mk/make-config.sh
++++ b/mk/make-config.sh
+@@ -1555,6 +1555,10 @@ if feat_yes DOTLOCK; then
+    printf "#real below OPTIONAL_PS_DOTLOCK = \$(VAL_PS_DOTLOCK)\n" >> ${newmk}
+ fi
+ 
++
++# remove sync-mutex option
++MAKEFLAGS=$(printf %b "${MAKEFLAGS}" | ${sed} -e "s#--sync-mutex=[a-zA-Z0-9:/]*##")
++
+ for i in \
+    CWDDIR TOPDIR OBJDIR INCDIR SRCDIR \
+          MX_CWDDIR MX_INCDIR MX_SRCDIR \

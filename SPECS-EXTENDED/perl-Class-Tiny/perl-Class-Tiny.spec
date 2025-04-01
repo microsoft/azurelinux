@@ -6,15 +6,16 @@
 %endif
 
 Name:           perl-Class-Tiny
-Version:        1.006
-Release:        13%{?dist}
+Version:        1.008
+Release:        1%{?dist}
 Summary:        Minimalist class construction
-License:        ASL 2.0
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Class-Tiny
-Source0:        https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Class-Tiny-%{version}.tar.gz#/perl-Class-Tiny-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Class-Tiny-%{version}.tar.gz
 BuildArch:      noarch
+BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
@@ -39,7 +40,6 @@ BuildRequires:  perl(Test::More) >= 0.96
 # Optional test
 BuildRequires:  perl(Test::FailWarnings)
 %endif
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # Devel::GlobalDestruction not needed on Perl >= 5.14
 # mro on Perl >= 5.10
 Requires:       perl(mro)
@@ -68,11 +68,11 @@ of code. Here is a list of features:
 %setup -q -n Class-Tiny-%{version}
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
+%{make_install}
 %{_fixperms} $RPM_BUILD_ROOT/*
 
 %check
@@ -85,6 +85,10 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.008-1
+- Update to version 1.008
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.006-13
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

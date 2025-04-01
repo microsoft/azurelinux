@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 #
 # Copyright (C)  Heinz Mauelshagen, 2004-2010 Red Hat GmbH. All rights reserved.
 #
@@ -9,7 +7,7 @@ Distribution:   Azure Linux
 Summary: Device-mapper RAID tool and library
 Name: dmraid
 Version: 1.0.0.rc16
-Release: 46%{?dist}
+Release: 60%{?dist}
 License: GPLv2+
 URL: http://people.redhat.com/heinzm/sw/dmraid
 
@@ -17,19 +15,26 @@ BuildRequires: device-mapper-devel >= 1.02.02-2
 BuildRequires: device-mapper-event-devel
 BuildRequires: libselinux-devel
 BuildRequires: libsepol-devel
-BuildRequires: systemd
+BuildRequires: systemd-rpm-macros
 BuildRequires: gcc
+BuildRequires: make
 Requires: device-mapper >= 1.02.02-2
-Requires: dmraid-events
+Requires: dmraid-libs = %{version}-%{release}
 Requires: kpartx
 Requires: systemd
 Requires(post): systemd >= 195-4
+Recommends: dmraid-events = %{version}-%{release}
+# Splitting libraries out to -libs subpackage
+Conflicts: dmraid < 1.0.0.rc16-48
+Obsoletes: dmraid < 1.0.0.rc16-48
 
-Source0: https://people.redhat.com/heinzm/sw/dmraid/src/old/%{name}-%{version}.tar.bz2
+# This was:https://people.redhat.com/heinzm/sw/dmraid/src/dmraid-1.0.0.rc16.tar.bz2
+# but that link no longer works
+Source0: %{name}-%{version}.tar.bz2
 Source1: fedora-dmraid-activation
 Source2: dmraid-activation.service
 
-Patch0: dmraid-1.0.0.rc16-test_devices.patch
+#Patch0: dmraid-1.0.0.rc16-test_devices.patch
 Patch1: ddf1_lsi_persistent_name.patch
 Patch2: pdc_raid10_failure.patch
 Patch3: return_error_wo_disks.patch
@@ -49,24 +54,39 @@ Patch15: dmraid-fix-errors-and-warnings-triggered-by-CFLAGS.patch
 Patch16: dmraid-fix-destdir.patch
 Patch17: dmraid-fix-missing-destdir.patch
 Patch18: dmraid-fix-so-flags.patch
+Patch19: dmraid-use-modern-run-lock-dir.patch
+Patch20: dmraid-c99.patch
 
 %description
 DMRAID supports RAID device discovery, RAID set activation, creation,
 removal, rebuild and display of properties for ATARAID/DDF1 metadata on
 Linux >= 2.4 using device-mapper.
 
+%package -n dmraid-libs
+Summary: System libraries for dmraid
+# Splitting libraries out to -libs subpackage
+Conflicts: dmraid < 1.0.0.rc16-48
+Obsoletes: dmraid < 1.0.0.rc16-48
+
+%description -n dmraid-libs
+dmraid-libs provides the system libraries for RAID device discovery,
+RAID set activation and display of properties for ATARAID volumes.
+
 %package -n dmraid-devel
 Summary: Development libraries and headers for dmraid
-Requires: dmraid = %{version}-%{release}, sgpio
+Requires: dmraid-libs = %{version}-%{release}
+Requires: sgpio
 
 %description -n dmraid-devel
 dmraid-devel provides a library interface for RAID device discovery,
 RAID set activation and display of properties for ATARAID volumes.
 
 %package -n dmraid-events
-Summary: dmevent_tool (Device-mapper event tool) and DSO
-Requires: dmraid = %{version}-%{release}, sgpio
+Summary: Device-mapper event tool (dmevent_tool) and DSO
+Requires: dmraid-libs = %{version}-%{release}
+Requires: dmraid = %{version}-%{release}
 Requires: device-mapper-event
+Requires: sgpio
 
 %description -n dmraid-events
 Provides a dmeventd DSO and the dmevent_tool to register devices with it
@@ -74,38 +94,19 @@ for device monitoring.  All active RAID sets should be manually registered
 with dmevent_tool.
 
 %package -n dmraid-events-logwatch
-Summary: dmraid logwatch-based email reporting
-Requires: dmraid-events = %{version}-%{release}, logwatch
-Requires: cronie
+Summary: Logwatch-based email reporting for dmraid
+Requires: dmraid-events = %{version}-%{release}
+Requires: crontabs
+Requires: logwatch
 
 %description -n dmraid-events-logwatch
 Provides device failure reporting via logwatch-based email reporting.
-Device failure reporting has to be activated manually by activating the 
+Device failure reporting has to be activated manually by activating the
 /etc/cron.d/dmeventd-logwatch entry and by calling the dmevent_tool
 (see manual page for examples) for any active RAID sets.
 
 %prep
-%setup -q -n dmraid/%{version}
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
-%patch 3 -p1
-%patch 4 -p1
-%patch 5 -p1
-%patch 6 -p1
-%patch 7 -p1
-%patch 8 -p1
-
-%patch 9 -p1
-# %%patch10 -p1
-%patch 11 -p1
-%patch 12 -p1
-%patch 13 -p1
-%patch 14 -p1
-%patch 15 -p1
-%patch 16 -p1
-%patch 17 -p1
-%patch 18 -p1
+%autosetup -n dmraid/%{version} -p1
 
 %build
 %global _libdir /%{_lib}
@@ -118,13 +119,12 @@ make
 # TODO: Do we really need to create all these dirs ourselves here? Should make install do that?
 # - it is necessary to create directories for logwatch files, and likely for
 # others not installed by make
-install -m 755 -d %{buildroot}{%{_libdir},%{_sbindir},%{_bindir},%{_libdir},%{_includedir}/dmraid/,/var/lock/dmraid,/etc/cron.d/,/etc/logwatch/conf/services/,/etc/logwatch/scripts/services/,/var/cache/logwatch/dmeventd}
+install -m 755 -d %{buildroot}{%{_libdir},%{_sbindir},%{_bindir},%{_libdir},%{_includedir}/dmraid/,/etc/cron.d/,/etc/logwatch/conf/services/,/etc/logwatch/scripts/services/,/var/cache/logwatch/dmeventd}
 make DESTDIR=%{buildroot} install
-ln -s dmraid %{buildroot}%{_sbindir}/dmraid.static
 
 # Provide convenience link from dmevent_tool
 (cd %{buildroot}%{_sbindir} ; ln -f dmevent_tool dm_dso_reg_tool)
-(cd %{buildroot}%{_mandir}/man8 ; ln -f dmevent_tool.8 dm_dso_reg_tool.8 ; ln -f dmraid.8 dmraid.static.8)
+(cd %{buildroot}%{_mandir}/man8 ; ln -f dmevent_tool.8 dm_dso_reg_tool.8)
 
 install -p -m 644 include/dmraid/*.h %{buildroot}%{_includedir}/dmraid/
 
@@ -161,19 +161,22 @@ rm -f %{buildroot}%{_libdir}/libdmraid.a
 
 %files
 %license LICENSE LICENSE_GPL LICENSE_LGPL
-%doc CHANGELOG CREDITS KNOWN_BUGS README TODO doc/dmraid_design.txt
+%doc CREDITS README
 %{_mandir}/man8/dmraid*
 %{_sbindir}/dmraid
-%{_sbindir}/dmraid.static
-%{_libdir}/libdmraid.so*
-%{_libdir}/libdmraid-events-isw.so*
 %{_prefix}/lib/systemd/fedora-dmraid-activation
 %{_unitdir}/dmraid-activation.service
-%ghost /var/lock/dmraid
+
+%files -n dmraid-libs
+%license LICENSE LICENSE_GPL LICENSE_LGPL
+%{_libdir}/libdmraid.so.*
+%{_libdir}/libdmraid-events-isw.so.*
 
 %files -n dmraid-devel
-%dir %{_includedir}/dmraid
-%{_includedir}/dmraid/*
+%doc KNOWN_BUGS TODO doc/dmraid_design.txt
+%{_libdir}/libdmraid.so
+%{_libdir}/libdmraid-events-isw.so
+%{_includedir}/dmraid
 
 %files -n dmraid-events
 %{_mandir}/man8/dmevent_tool*
@@ -188,12 +191,57 @@ rm -f %{buildroot}%{_libdir}/libdmraid.a
 %ghost /var/cache/logwatch/dmeventd/syslogpattern.txt
 
 %changelog
-* Tue Jan 10 2023 Osama Esmail <osamaesmail@microsoft.com> - 1.0.0.rc16-46
-- Replacing crontabs with cronie (removing crontabs rpm because of redundancy)
-- License verified
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0.rc16-60
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0.rc16-45
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0.rc16-59
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0.rc16-58
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Nov 22 2023 Florian Weimer <fweimer@redhat.com> - 1.0.0.rc16-57
+- Update dmraid-c99.patch with -Wreturn-mismatch fix (#2148733)
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0.rc16-56
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0.rc16-55
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sun Nov 27 2022 Florian Weimer <fweimer@redhat.com> - 1.0.0.rc16-54
+- Add a missing int type to avoid errors with C99 compilers (#2148733)
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0.rc16-53
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0.rc16-52
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0.rc16-51
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0.rc16-50
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Oct 07 2020 Marian Csontos <mcsontos@redhat.com> - 1.0.0.rc16-49
+- Fix dependency on cron
+
+* Tue Oct 06 2020 Neal Gompa <ngompa13@gmail.com> - 1.0.0.rc16-48
+- Minor cleanups to the spec to better align to packaging guidelines
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0.rc16-47
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0.rc16-46
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Thu Jul 23 2020 Hans de Goede <hdegoede@redhat.com> - 1.0.0.rc16-45
+- Make dmraid-activation.service disable itself if no supported raid-sets
+  are found (rhbz#1795014)
+- Drop ancient no longer necessary dmraid.static > dmraid symlink
+- Fix a bunch of rpmlint errors
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0.rc16-44
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

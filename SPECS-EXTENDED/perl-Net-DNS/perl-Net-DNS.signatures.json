@@ -1,5 +1,7 @@
 {
  "Signatures": {
-  "perl-Net-DNS-1.21.tar.gz": "ddefe13b28084ffcc8f10a96b3c13c59449dbf6fc371c006d129630ea0ce767a"
+  "Net-DNS-1.47.tar.gz": "fec3dab10ac82dbac26b1ae2e367909256f420835d96cda7dc1b508e29938f0b",
+  "Net-DNS-1.47.tar.gz.sig": "218922d566f006ba0abc7376545ace90e62284498b9d599d8fdaed669a939092",
+  "willem.nlnetlabs.nl": "8e5acf8db1cd5ade14e8df4b43bad2bf757477a9ba3186ccd93489cd62de72de"
  }
 }

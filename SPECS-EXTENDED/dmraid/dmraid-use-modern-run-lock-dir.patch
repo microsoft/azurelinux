@@ -1,0 +1,12 @@
+diff -up 1.0.0.rc16/lib/locking/locking.c~ 1.0.0.rc16/lib/locking/locking.c
+--- 1.0.0.rc16/lib/locking/locking.c~	2009-09-16 10:55:23.000000000 +0200
++++ 1.0.0.rc16/lib/locking/locking.c	2020-07-23 13:50:07.613361274 +0200
+@@ -12,7 +12,7 @@
+ #include "internal.h"
+ 
+ /* File locking private data. */
+-static const char *lock_file = "/var/lock/dmraid/.lock";
++static const char *lock_file = "/run/lock/dmraid.lock";
+ static int lf = -1;
+ 
+ /* flock file. */

@@ -3,13 +3,13 @@ Distribution:   Azure Linux
 %global _hardened_build 1
 
 Name:    ppp
-Version: 2.4.7
-Release: 36%{?dist}
+Version: 2.5.0
+Release: 1%{?dist}
 Summary: The Point-to-Point Protocol daemon
-License: BSD and LGPLv2+ and GPLv2+ and Public Domain
+License: bsd-3-clause AND zlib AND licenseref-fedora-public-domain AND bsd-attribution-hpnd-disclaimer AND bsd-4.3tahoe AND bsd-4-clause-uc AND apache-2.0 AND lgpl-2.0-or-later AND (gpl-2.0-or-later OR bsd-2-clause OR bsd-3-clause OR bsd-4-clause) AND gpl-2.0-or-later AND xlock AND gpl-1.0-or-later AND mackerras-3-clause-acknowledgment AND mackerras-3-clause AND hpnd-fenneberg-Livingston AND sun-ppp AND hpnd-inria-imag AND sun-ppp-2000
 URL:     http://www.samba.org/ppp
 
-Source0: ftp://ftp.samba.org/pub/ppp/ppp-%{version}.tar.gz
+Source0: https://github.com/paulusmack/ppp/archive/ppp-%{version}.tar.gz
 Source1: ppp-pam.conf
 Source2: ppp-logrotate.conf
 Source3: ppp-tmpfiles.conf
@@ -19,53 +19,38 @@ Source6: ip-up
 Source7: ip-up.ipv6to4
 Source8: ipv6-down
 Source9: ipv6-up
-Source10: ifup-ppp
-Source11: ifdown-ppp
 Source12: ppp-watch.tar.xz
+Source13: ipv6-up.initscripts
+Source14: ipv6-down.initscripts
 
 # Fedora-specific
-Patch0001:      0001-build-sys-use-gcc-as-our-compiler-of-choice.patch
-Patch0002:      0002-build-sys-enable-PAM-support.patch
-Patch0003:      0003-build-sys-utilize-compiler-flags-handed-to-us-by-rpm.patch
-Patch0004:      0004-doc-add-configuration-samples.patch
-Patch0005:      0005-build-sys-don-t-hardcode-LIBDIR-but-set-it-according.patch
-Patch0006:      0006-scritps-use-change_resolv_conf-function.patch
-Patch0007:      0007-build-sys-don-t-strip-binaries-during-installation.patch
-Patch0008:      0008-build-sys-use-prefix-usr-instead-of-usr-local.patch
-Patch0009:      0009-pppd-introduce-ipv6-accept-remote.patch
-Patch0010:      0010-build-sys-enable-CBCP.patch
-Patch0011:      0011-build-sys-don-t-put-connect-errors-log-to-etc-ppp.patch
-Patch0012:      0012-pppd-we-don-t-want-to-accidentally-leak-fds.patch
-Patch0013:      0013-everywhere-O_CLOEXEC-harder.patch
-Patch0014:      0014-everywhere-use-SOCK_CLOEXEC-when-creating-socket.patch
-Patch0015:      0015-pppd-move-pppd-database-to-var-run-ppp.patch
-Patch0016:      0016-rp-pppoe-add-manpage-for-pppoe-discovery.patch
-Patch0018:      0018-scritps-fix-ip-up.local-sample.patch
-Patch0019:      0019-sys-linux-rework-get_first_ethernet.patch
-Patch0020:      0020-pppd-put-lock-files-in-var-lock-ppp.patch
-Patch0021:      0021-build-sys-compile-pppol2tp-plugin-with-RPM_OPT_FLAGS.patch
-Patch0022:      0022-build-sys-compile-pppol2tp-with-multilink-support.patch
-Patch0023:      0023-build-sys-install-rp-pppoe-plugin-files-with-standar.patch
-Patch0024:      0024-build-sys-install-pppoatm-plugin-files-with-standard.patch
-Patch0025:      0025-pppd-install-pppd-binary-using-standard-perms-755.patch
-# https://www.nikhef.nl/~janjust/ppp/ppp-2.4.7-eaptls-mppe-1.300.patch
-Patch0026:      ppp-2.4.7-eaptls-mppe-1.300.patch
-Patch0028:      0028-pppoe-include-netinet-in.h-before-linux-in.h.patch
+Patch0: ppp-2.5.0-use-change-resolv-function.patch
 
-# rhbz#1556132
-Patch0029:      ppp-2.4.7-DES-openssl.patch
-# https://github.com/paulusmack/ppp/pull/95
-Patch0030:      ppp-2.4.7-honor-ldflags.patch
-Patch0031:      ppp-2.4.7-coverity-scan-fixes.patch
-Patch0032:      ppp-2.4.7-CVE-2020-8597.patch
+# https://github.com/ppp-project/ppp/commit/7f89208b860ea0c41636410bfdb6a609b2772f47
+Patch1: ppp-2.5.0-radiusclient-parser-fix.patch
 
+BuildRequires: libtool
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: make
 BuildRequires: gcc
-BuildRequires: pam-devel, libpcap-devel, systemd, systemd-devel, glib2-devel
+BuildRequires: pam-devel
+BuildRequires: libpcap-devel
+BuildRequires: systemd
+BuildRequires: systemd-devel
+BuildRequires: glib2-devel
 BuildRequires: openssl-devel
 
-Requires: glibc >= 2.0.6, /etc/pam.d/system-auth, libpcap >= 0.8.3-6, systemd
+Provides: bundled(linux-atm) = 2.4.1
+Requires: glibc >= 2.0.6
+Requires: /etc/pam.d/system-auth
+Requires: libpcap >= 0.8.3-6
+Requires: systemd
 Requires(pre): /usr/bin/getent
 Requires(pre): /usr/sbin/groupadd
+
+# Subpackage removed and obsoleted in F40
+Obsoletes: network-scripts-ppp < %{version}-%{release}
 
 %description
 The ppp package contains the PPP (Point-to-Point Protocol) daemon and
@@ -74,37 +59,29 @@ transmitting datagrams over serial point-to-point links. PPP is
 usually used to dial in to an ISP (Internet Service Provider) or other
 organization over a modem and phone line.
 
-%package -n network-scripts-%{name}
-Summary: PPP legacy network service support
-Requires: network-scripts
-Supplements: (%{name} and network-scripts)
-
-%description -n network-scripts-%{name}
-This provides the ifup and ifdown scripts for use with the legacy network
-service.
 
 %package devel
 Summary: Headers for ppp plugin development
 Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: pkgconf-pkg-config
 
 %description devel
 This package contains the header files for building plugins for ppp.
 
 %prep
-%setup -q
-%autopatch -p1
+%autosetup -p1 -n %{name}-%{name}-%{version}
 
 tar -xJf %{SOURCE12}
 
 %build
-export RPM_OPT_FLAGS="$RPM_OPT_FLAGS -fPIC -Wall -fno-strict-aliasing"
-export RPM_LD_FLAGS="$LDFLAGS"
-%configure
-make %{?_smp_mflags} LDFLAGS="%{?build_ldflags}"
-make -C ppp-watch %{?_smp_mflags} LDFLAGS="%{?build_ldflags}"
+autoreconf -fi
+export CFLAGS="%{build_cflags} -fno-strict-aliasing"
+%configure --enable-systemd --enable-cbcp --with-pam --disable-openssl-engine
+%make_build
+%make_build -C ppp-watch LDFLAGS="%{?build_ldflags} -pie"
 
 %install
-make INSTROOT=%{buildroot} install install-etcppp
+%make_install
 find scripts -type f | xargs chmod a-x
 make ROOT=%{buildroot} -C ppp-watch install
 
@@ -131,10 +108,15 @@ install -p %{SOURCE6} %{buildroot}%{_sysconfdir}/ppp/ip-up
 install -p %{SOURCE7} %{buildroot}%{_sysconfdir}/ppp/ip-up.ipv6to4
 install -p %{SOURCE8} %{buildroot}%{_sysconfdir}/ppp/ipv6-down
 install -p %{SOURCE9} %{buildroot}%{_sysconfdir}/ppp/ipv6-up
+install -p %{SOURCE13} %{buildroot}%{_sysconfdir}/ppp/ipv6-down.initscripts
+install -p %{SOURCE14} %{buildroot}%{_sysconfdir}/ppp/ipv6-up.initscripts
 
-install -d %{buildroot}%{_sysconfdir}/sysconfig/network-scripts/
-install -p %{SOURCE10} %{buildroot}%{_sysconfdir}/sysconfig/network-scripts/ifup-ppp
-install -p %{SOURCE11} %{buildroot}%{_sysconfdir}/sysconfig/network-scripts/ifdown-ppp
+# ghosts
+mkdir -p %{buildroot}%{_rundir}/pppd/lock
+
+%if "%{_sbindir}" == "%{_bindir}"
+mv %{buildroot}/usr/sbin/ppp-watch %{buildroot}%{_bindir}/
+%endif
 
 %pre
 /usr/bin/getent group dip >/dev/null 2>&1 || /usr/sbin/groupadd -r -g 40 dip >/dev/null 2>&1 || :
@@ -156,7 +138,10 @@ install -p %{SOURCE11} %{buildroot}%{_sysconfdir}/sysconfig/network-scripts/ifdo
 %{_sysconfdir}/ppp/ip-up.ipv6to4
 %{_sysconfdir}/ppp/ip-down.ipv6to4
 %{_sysconfdir}/ppp/ipv6-up
+%{_sysconfdir}/ppp/ipv6-up.initscripts
 %{_sysconfdir}/ppp/ipv6-down
+%{_sysconfdir}/ppp/ipv6-down.initscripts
+%{_sysconfdir}/ppp/openssl.cnf
 %{_mandir}/man8/chat.8*
 %{_mandir}/man8/pppd.8*
 %{_mandir}/man8/pppdump.8*
@@ -166,8 +151,8 @@ install -p %{SOURCE11} %{buildroot}%{_sysconfdir}/sysconfig/network-scripts/ifdo
 %{_mandir}/man8/pppoe-discovery.8*
 %{_mandir}/man8/ppp-watch.8*
 %{_libdir}/pppd
-%ghost %dir /run/ppp
-%ghost %dir /run/lock/ppp
+%ghost %dir %{_rundir}/pppd
+%ghost %dir %{_rundir}/pppd/lock
 %dir %{_sysconfdir}/logrotate.d
 %attr(700, root, root) %dir %{_localstatedir}/log/ppp
 %config(noreplace) %{_sysconfdir}/ppp/eaptls-client
@@ -179,15 +164,16 @@ install -p %{SOURCE11} %{buildroot}%{_sysconfdir}/sysconfig/network-scripts/ifdo
 %config(noreplace) %{_sysconfdir}/logrotate.d/ppp
 %{_tmpfilesdir}/ppp.conf
 
-%files -n network-scripts-%{name}
-%{_sysconfdir}/sysconfig/network-scripts/ifdown-ppp
-%{_sysconfdir}/sysconfig/network-scripts/ifup-ppp
-
 %files devel
 %{_includedir}/pppd
 %doc PLUGINS
+%{_libdir}/pkgconfig/pppd.pc
 
 %changelog
+* Mon Mar 10 2025 Jyoti kanase <v-jykanase@microsoft.com> - 2.5.0-1
+- Upgrade to 2.5.0
+- License verified.
+
 * Thu Mar 25 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.7-36
 - Remove epoch from minimum supported libpcap version
 

@@ -1,13 +1,11 @@
 %define source_name	usb-modeswitch
 
 Name:		usb_modeswitch
-Version:	2.6.0
-Release:	2%{?dist}
+Version:	2.6.1
+Release:	11%{?dist}
 Summary:	USB Modeswitch gets mobile broadband cards in operational mode
 Summary(de):	USB Modeswitch aktiviert UMTS-Karten
-License:	GPLv2+
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:	GPL-2.0-or-later
 URL:		http://www.draisberghof.de/usb_modeswitch/
 
 Source0:	http://www.draisberghof.de/%{name}/%{source_name}-%{version}.tar.bz2
@@ -15,12 +13,12 @@ Source1:	http://www.draisberghof.de/usb_modeswitch/device_reference.txt
 
 # Submitted upstream (2014-11-24)
 Patch0: device_reference-utf8.patch
-# http://www.draisberghof.de/usb_modeswitch/bb/viewtopic.php?f=2&t=2733
-Patch1: 0001-usb_modeswitch-count-the-target-devices-from-zero.patch
 
+BuildRequires: make
 BuildRequires:  gcc
 BuildRequires:	libusbx-devel
-BuildRequires:	jimtcl-devel
+# "tcl" or "jimsh"), use the light-weight installation:
+#BuildRequires:	jimtcl-devel
 BuildRequires:	systemd
 Requires:	usb_modeswitch-data >= 20121109
 Requires:	systemd
@@ -44,18 +42,18 @@ Vodafone, Option, ZTE und Novatell werden unterstützt.
 cp -f %{SOURCE1} device_reference.txt
 
 %patch 0 -p0
-%patch 1 -p1
 
 
 %build
 %{set_build_flags}
-make %{?_smp_mflags}
+# this will require jimtcl-devel
+#make_build all-with-dynlink-dispatcher
+%make_build
 
 
 %install
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
-make install \
-	DESTDIR=$RPM_BUILD_ROOT \
+%make_install \
 	SYSDIR=$RPM_BUILD_ROOT%{_unitdir} \
 	UDEVDIR=$RPM_BUILD_ROOT%{_prefix}/lib/udev
 
@@ -68,12 +66,53 @@ make install \
 %{_prefix}/lib/udev/usb_modeswitch
 %{_unitdir}/usb_modeswitch@.service
 %config(noreplace) %{_sysconfdir}/usb_modeswitch.conf
-%doc COPYING README ChangeLog device_reference.txt 
+%doc README ChangeLog device_reference.txt
+%license COPYING
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.0-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.1-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Nov  2 2023 Íñigo Huguet <ihuguet@redhat.com> - 2.6.1-9
+- Really use SPDX license specifier
+
+* Thu Aug 24 2023 Till Maas <opensource@till.name> - 2.6.1-8
+- Cleanup spec: use %%license, use %%patch 0
+- Use spdx license specifier
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Nov 18 2020 Sérgio Basto <sergio@serjux.com> - 2.6.1-1
+- Update usb_modeswitch to 2.6.1
+- Drop patch1, http://www.draisberghof.de/usb_modeswitch/bb/viewtopic.php?f=2&t=2733
+- Drop BR jimtcl-devel, if we don't install dynlink-dispatcher
+
+* Tue Sep 29 2020 Sérgio Basto <sergio@serjux.com> - 2.6.0-3
+- Use make macros (https://src.fedoraproject.org/rpms/usb_modeswitch/pull-request/1)
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Tue Mar 24 2020 Lubomir Rintel <lkundrak@v3.sk> - 2.6.0-1
 - New 2.6.0 release

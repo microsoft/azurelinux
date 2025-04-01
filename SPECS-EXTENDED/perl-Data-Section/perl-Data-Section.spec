@@ -9,21 +9,21 @@
 %endif
 
 Name:           perl-Data-Section
-Version:        0.200007
-Release:        10%{?dist}
+Version:        0.200008
+Release:        1%{?dist}
 Summary:        Read multiple hunks of data out of your DATA section
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Data-Section
-Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Data-Section-%{version}.tar.gz#/perl-Data-Section-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Data-Section-%{version}.tar.gz
 BuildArch:      noarch
 # Build
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker)
 # Runtime
 BuildRequires:  perl(Encode)
@@ -45,8 +45,6 @@ BuildRequires:  perl(CPAN::Meta) >= 2.120900
 # Extra Tests
 BuildRequires:  perl(Test::Pod) >= 1.41
 %endif
-# Dependencies
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 Data::Section provides an easy way to access multiple named chunks of
@@ -78,6 +76,10 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %{_mandir}/man3/Data::Section.3*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.200008-1
+- Update to version 0.200008
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.200007-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

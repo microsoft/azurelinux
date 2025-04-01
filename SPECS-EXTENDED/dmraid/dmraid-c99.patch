@@ -1,0 +1,24 @@
+diff -ur 1.0.0.rc16/tools/dmevent_tool.c 1.0.0.rc16/tools/dmevent_tool.c
+--- 1.0.0.rc16/tools/dmevent_tool.c	2009-09-16 10:55:23.000000000 +0200
++++ 1.0.0.rc16/tools/dmevent_tool.c	2022-11-27 16:32:50.455904732 +0100
+@@ -123,7 +123,7 @@
+ }
+ 
+ /* Increment option counters. */
+-static _process_opt(int opt, const char *cmd)
++static int _process_opt(int opt, const char *cmd)
+ {
+ 	struct opt_def_struct {
+ 		const char opt;		/* Option character. */
+diff -ur 1.0.0.rc16/tools/dmevent_tool.c 1.0.0.rc16/tools/dmevent_tool.c
+--- 1.0.0.rc16/tools/dmevent_tool.c	2023-11-22 15:07:23.016819298 +0100
++++ 1.0.0.rc16/tools/dmevent_tool.c	2023-11-22 15:08:33.881124945 +0100
+@@ -123,7 +123,7 @@
+ }
+ 
+ /* Increment option counters. */
+-static int _process_opt(int opt, const char *cmd)
++static void _process_opt(int opt, const char *cmd)
+ {
+ 	struct opt_def_struct {
+ 		const char opt;		/* Option character. */

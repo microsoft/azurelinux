@@ -4,8 +4,8 @@ Distribution:   Azure Linux
 %{!?tcl_sitelib: %global tcl_sitelib %{_datadir}/tcl%{tcl_version}}
 
 Name:           bwidget
-Version:        1.9.7
-Release:        15%{?dist}
+Version:        1.10.1
+Release:        1%{?dist}
 Summary:        Extended widget set for Tk
 
 License:        TCL
@@ -15,6 +15,8 @@ Source0:        http://downloads.sourceforge.net/tcllib/bwidget-%{version}.tar.g
 BuildArch:      noarch
 Requires:       tcl(abi) = 8.6 tk
 BuildRequires:  tcl
+BuildRequires:  tk
+
 
 %description
 An extended widget set for Tcl/Tk.
@@ -44,6 +46,10 @@ install -m 0644 -pD images/*.gif images/*.xbm %{buildroot}/%{tcl_sitelib}/%{name
 %doc BWman/*.html
 
 %changelog
+* Tue nov 5 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.10.1-1
+- Upgrade to version 1.10.1
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.7-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

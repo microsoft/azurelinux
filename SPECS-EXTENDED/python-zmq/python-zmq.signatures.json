@@ -1,5 +1,6 @@
 {
  "Signatures": {
-  "pyzmq-18.1.0.tar.gz": "32f7618b8104021bc96cbd60be4330bdf37b929e8061dbce362c9f3478a08e21"
+  "LICENSE.Apache-2.0": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+  "pyzmq-25.1.2.tar.gz": "4df6361aa20dad1572ef83b441d0ef43125e86e139b30e215cad95883166ee4d"
  }
 }

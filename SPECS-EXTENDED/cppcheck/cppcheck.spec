@@ -1,43 +1,32 @@
-# Gui built in all branches
-%global gui 0
+%undefine __cmake_in_source_build
 
 Name:           cppcheck
-Version:        2.7
-Release:        2%{?dist}
+Version:        2.16.0
+Release:        1%{?dist}
 Summary:        Tool for static C/C++ code analysis
-License:        GPLv3+
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:        GPL-3.0-or-later
 URL:            http://cppcheck.wiki.sourceforge.net/
 Source0:        https://github.com/danmar/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 # Fix location of translations
-Patch0:         cppcheck-2.2-translations.patch
-# Select python3 explicitly
-Patch1:         cppcheck-1.88-htmlreport-python3.patch
-# Disable one test, which fails under ppc64le
-# test/testmathlib.cpp:1246(TestMathLib::toString): Assertion failed.
-Patch2:         cppcheck-2.7-disable-test-testmathlib-tostring.patch
-# https://github.com/danmar/cppcheck/commit/974dd5d
-Patch3:         cppcheck-2.7-tinyxml2.patch
+Patch0:         cppcheck-2.11-translations.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  pcre-devel
 BuildRequires:  docbook-style-xsl
 BuildRequires:  libxslt
+BuildRequires:  pandoc
+BuildRequires:  cmake
+BuildRequires:  desktop-file-utils
 BuildRequires:  tinyxml2-devel >= 2.1.0
 BuildRequires:  zlib-devel
-BuildRequires:  cmake
-BuildRequires:  z3-devel >= 4.7.1
-
-%if %{gui}
-BuildRequires:  desktop-file-utils
-BuildRequires:  qt5-qtbase-devel
-BuildRequires:  qt5-linguist
 BuildRequires:  python3-devel
-%else
-Obsoletes:      %{name}-gui < %{version}-%{release}
-%endif
+BuildRequires:  python3-setuptools
+BuildRequires:  qt5-qtbase-devel
+BuildRequires:  qt5-qttools-devel
+BuildRequires:  qt5-linguist
+BuildRequires:  make
+
 
 %description
 Cppcheck is a static analysis tool for C/C++ code. Unlike C/C++
@@ -46,14 +35,12 @@ errors in the code. Cppcheck primarily detects the types of bugs that
 the compilers normally do not detect. The goal is to detect only real
 errors in the code (i.e. have zero false positives).
 
-%if %{gui}
 %package gui
 Summary:        Graphical user interface for cppcheck
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description gui
 This package contains the graphical user interface for cppcheck.
-%endif
 
 %package htmlreport
 Summary:        HTML reporting for cppcheck
@@ -66,72 +53,192 @@ from xml files first generated using cppcheck.
 
 %prep
 %setup -q
-%patch 0 -p1 -b .translations
-%patch 1 -p1 -b .python3
-%patch 2 -p1 -b .array7
-%patch 3 -p1 -b .tinyxml2
+%patch -P 0 -p1 -b .translations
 # Make sure bundled tinyxml2 is not used
 rm -r externals/tinyxml2
+# Generate the Qt online-help file
+cd gui/help
+qhelpgenerator-qt5 online-help.qhcp -o online-help.qhc
 
 %build
 # Manuals
-make DB2MAN=%{_datadir}/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl man
+make DB2MAN=/usr/share/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl man
+pandoc man/manual.md -o man/manual.html -s --number-sections --toc
+pandoc man/reference-cfg-format.md -o man/reference-cfg-format.html -s --number-sections --toc
 
 # Binaries
 # Upstream doesn't support shared libraries (unversioned solib)
-%cmake -DCMAKE_BUILD_TYPE=Release -DUSE_MATCHCOMPILER=yes -DUSE_Z3=yes -DHAVE_RULES=yes -DBUILD_GUI=%{gui} -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_TESTS=yes -DFILESDIR=%{_datadir}/Cppcheck -DUSE_BUNDLED_TINYXML2=OFF -DENABLE_OSS_FUZZ=OFF
+%cmake -DCMAKE_BUILD_TYPE=Release -DUSE_MATCHCOMPILER=ON -DHAVE_RULES=yes -DBUILD_GUI=1 -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_TESTS=yes -DFILESDIR=%{_datadir}/Cppcheck -DUSE_BUNDLED_TINYXML2=OFF -DENABLE_OSS_FUZZ=OFF
 %cmake_build
 
 %install
+rm -rf %{buildroot}
 %cmake_install
 install -D -p -m 644 cppcheck.1 %{buildroot}%{_mandir}/man1/cppcheck.1
-
-%if %{gui}
 # Install desktop file
 desktop-file-validate %{buildroot}%{_datadir}/applications/cppcheck-gui.desktop
 # Install logo
 install -D -p -m 644 gui/cppcheck-gui.png %{buildroot}%{_datadir}/pixmaps/cppcheck-gui.png
-%endif
-
+# Install the Qt online-help file
+install -D -p -m 644 gui/help/online-help.qhc %{buildroot}%{_datadir}/Cppcheck/help/online-help.qhc
+install -D -p -m 644 gui/help/online-help.qch %{buildroot}%{_datadir}/Cppcheck/help/online-help.qch
 # Install htmlreport
 install -D -p -m 755 htmlreport/cppcheck-htmlreport %{buildroot}%{_bindir}/cppcheck-htmlreport
-
+# Restore execute permission of python files
+grep -l "#\!/usr/bin/env python3" %{buildroot}%{_datadir}/Cppcheck/addons/*.py | xargs chmod +x
 
 %check
-./bin/testrunner -g -q
+cd %{_vpath_builddir}/bin
+./testrunner -g -q
 
 %files
-%doc AUTHORS
+%doc AUTHORS man/manual.html man/reference-cfg-format.html
 %license COPYING
 %{_datadir}/Cppcheck/
 %{_bindir}/cppcheck
 %{_mandir}/man1/cppcheck.1*
 
-%if %{gui}
 %files gui
 %{_bindir}/cppcheck-gui
 %{_datadir}/applications/cppcheck-gui.desktop
 %{_datadir}/pixmaps/cppcheck-gui.png
 %{_datadir}/icons/hicolor/64x64/apps/cppcheck-gui.png
 %{_datadir}/icons/hicolor/scalable/apps/cppcheck-gui.svg
-%endif
 
 %files htmlreport
 %{_bindir}/cppcheck-htmlreport
 
 %changelog
-* Mon Aug 22 2022 Muhammad Falak <mwani@microsoft.com> - 2.7-2
-- Fix `testrunner` binary path to enable ptest
+* Mon Oct 28 2024 Gwyn Ciesla <gwync@protonmail.com> - 2.16.0-1
+- 2.16.0
 
-* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7-1
-- Updating to version 2.7 using Fedora 36 (license: MIT) specs for guidance.
-- License verified.
+* Sat Aug 31 2024 Wolfgang Stöggl <c72578@yahoo.de> - 2.15.0-1
+- Update to 2.15.0
 
-* Thu Dec 17 2020 Joe Schmitt <joschmit@microsoft.com> - 2.1-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Turn off GUI support.
-- Fix non-GUI build requires.
-- Remove pandoc support.
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.14.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jun 22 2024 Wolfgang Stöggl <c72578@yahoo.de> - 2.14.2-1
+- Update to 2.14.2
+
+* Sun May 26 2024 Wolfgang Stöggl <c72578@yahoo.de> - 2.14.1-1
+- Update to 2.14.1
+
+* Thu Apr 25 2024 Wolfgang Stöggl <c72578@yahoo.de> - 2.14.0-1
+- Update to 2.14.0
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.13.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.13.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Dec 23 2023 Wolfgang Stöggl <c72578@yahoo.de> - 2.13.0-1
+- Update to 2.13.0
+
+* Wed Sep 20 2023 Wolfgang Stöggl <c72578@yahoo.de> - 2.12.1-1
+- Update to 2.12.1
+
+* Tue Sep 12 2023 Wolfgang Stöggl <c72578@yahoo.de> - 2.12.0-2
+- Add "-fsigned-char" to CXXFLAGS, to make tests pass
+
+* Sun Sep 10 2023 Wolfgang Stöggl <c72578@yahoo.de> - 2.12.0-1
+- Update to 2.12.0 (#2165211)
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.11-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 22 2023 Steve Grubb <sgrubb@redhat.com> - 2.11-1
+- Update to 2.11
+- Disable tests (2 style tests failing)
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.9-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jan 13 2023 Steve Grubb <sgrubb@redhat.com> - 2.9-3
+- SPDX Migration
+
+* Sun Sep 25 2022 Rich Mattes <richmattes@gmail.com> - 2.9-2
+- Rebuild for tinyxml2-9.0.0
+
+* Sun Aug 28 2022 Wolfgang Stöggl <c72578@yahoo.de> - 2.9-1
+- Update to 2.9
+
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.8.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jul 16 2022 Wolfgang Stöggl <c72578@yahoo.de> - 2.8.2-1
+- Update to 2.8.2
+
+* Wed May 25 2022 Wolfgang Stöggl <c72578@yahoo.de> - 2.8-1
+- Update to 2.8
+
+* Thu May 19 2022 Jerry James <loganjerry@gmail.com> - 2.7.4-2
+- Rebuild for z3 4.8.17
+
+* Fri Mar 25 2022 Wolfgang Stöggl <c72578@yahoo.de> - 2.7.4-1
+- Update to 2.7.4
+
+* Wed Mar 23 2022 Wolfgang Stöggl <c72578@yahoo.de> - 2.7.3-2
+- Update tinyxml2 patch, add upstream link and rebuild
+
+* Sat Mar 19 2022 Wolfgang Stöggl <c72578@yahoo.de> - 2.7.3-1
+- Update to 2.7.3.
+
+* Tue Feb 08 2022 Wolfgang Stöggl <c72578@yahoo.de> - 2.7-1
+- Update to 2.7.
+
+* Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sat Oct 02 2021 Wolfgang Stöggl <c72578@yahoo.de> - 2.6-1
+- Update to 2.6.
+
+* Fri Jul 23 2021 Wolfgang Stöggl <c72578@yahoo.de> - 2.5-3
+- Fix Failed to load translation for English (#1983599)
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sun Jul 04 2021 Wolfgang Stöggl <c72578@yahoo.de> - 2.5-1
+- Update to 2.5.
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jan 05 2021 Timm Bäder <tbaeder@redhat.com> - 2.3-2
+- Explicitly disable oss-fuzz
+
+* Sat Dec 05 2020 Wolfgang Stöggl <c72578@yahoo.de> - 2.3-1
+- Update to 2.3.
+
+* Sun Nov 08 2020 Wolfgang Stöggl <c72578@yahoo.de> - 2.2-5
+- Add cppcheck-2.2-online-help_q_readonly.patch
+
+* Thu Oct 22 2020 Wolfgang Stöggl <c72578@yahoo.de> - 2.2-4
+- Fix missing Contents and Index in Qt online-help file
+
+* Tue Oct 13 2020 Jeff Law <law@redhat.com> - 2.2-3
+- Fix missing #include for gcc-11
+
+* Sun Oct 11 2020 Wolfgang Stöggl <c72578@yahoo.de> - 2.2-2
+- Fix Helpfile 'online-help.qhc' was not found
+
+* Sun Oct 04 2020 Wolfgang Stöggl <c72578@yahoo.de> - 2.2-1
+- Update to 2.2.
+
+* Tue Aug 18 2020 Susi Lehtola <jussilehtola@fedoraproject.org> - 2.1-7
+- Gui package is always built.
+
+* Tue Aug 04 2020 Wolfgang Stöggl <c72578@yahoo.de> - 2.1-6
+- Fix FTBFS #1863368
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1-5
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Tue Jun 16 2020 Susi Lehtola <jussilehtola@fedoraproject.org> - 2.1-3
 - Drop EPEL specifics since cppcheck is included in RHEL8.

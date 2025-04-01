@@ -1,31 +1,32 @@
-Summary:        MirBSD enhanced version of the Korn Shell
-Name:           mksh
-Version:        59c
-Release:        3%{?dist}
-# BSD (setmode.c), ISC (strlcpy.c), MirOS (the rest)
-License:        MirOS AND ISC AND BSD
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            http://www.mirbsd.org/mksh.htm
-Source0:        http://www.mirbsd.org/MirOS/dist/mir/%{name}/%{name}-R%{version}.tgz
-Source1:        dot-mkshrc
-Source2:        rtchecks.expected
-BuildRequires:  ed
-BuildRequires:  gcc
-BuildRequires:  perl-interpreter
-BuildRequires:  sed
-BuildRequires:  util-linux
-BuildRequires:  perl(Getopt::Std)
-Requires(post): %{_sbindir}/alternatives
-Requires(post): grep
+Summary:          MirBSD enhanced version of the Korn Shell
+Name:             mksh
+Version:          59c
+Release:          11%{?dist}
+# ISC (strlcpy.c) and MirOS (the rest)
+License:          MirOS AND ISC
+URL:              https://www.mirbsd.org/mksh.htm
+Source0:          https://www.mirbsd.org/MirOS/dist/mir/%{name}/%{name}-R%{version}.tgz
+Source1:          dot-mkshrc
+Source2:          rtchecks.expected
+Conflicts:        filesystem < 3
+Provides:         /bin/ksh
+Provides:         /bin/lksh
+Provides:         /bin/mksh
+%if 0%{?fedora} || 0%{?rhel} > 8
+Provides:         /bin/rksh
+%endif
+Provides:         /bin/rlksh
+Provides:         /bin/rmksh
+Requires(post):   grep
+Requires(post):   alternatives
+Requires(preun):  alternatives
 Requires(postun): sed
-Requires(preun): %{_sbindir}/alternatives
-Conflicts:      filesystem < 3
-Provides:       /bin/ksh
-Provides:       /bin/lksh
-Provides:       /bin/mksh
-Provides:       /bin/rlksh
-Provides:       /bin/rmksh
+BuildRequires:    gcc
+BuildRequires:    util-linux
+BuildRequires:    ed
+BuildRequires:    perl-interpreter
+BuildRequires:    perl(Getopt::Std)
+BuildRequires:    sed
 
 %description
 mksh is the MirBSD enhanced version of the Public Domain Korn shell (pdksh),
@@ -38,7 +39,7 @@ bourne shell replacement, pdksh successor and an alternative to the C shell.
 %setup -q -n %{name}
 
 # we'll need this later
-cat >rtchecks <<'EOF'
+cat > rtchecks <<'EOF'
 typeset -i sari=0
 typeset -Ui uari=0
 typeset -i x=0
@@ -68,37 +69,39 @@ print -r -- $((x++)):$sari=$uari. #9
 EOF
 
 %build
-CFLAGS="%{optflags} -DMKSH_DISABLE_EXPERIMENTAL" LDFLAGS="$RPM_LD_FLAGS" sh Build.sh -r
-cp test.sh test_mksh.sh
-HAVE_PERSISTENT_HISTORY=0; export HAVE_PERSISTENT_HISTORY
-CFLAGS="%{optflags} -DMKSH_DISABLE_EXPERIMENTAL" LDFLAGS="$RPM_LD_FLAGS" sh Build.sh -L -r
+CFLAGS="$RPM_OPT_FLAGS -DMKSH_DISABLE_EXPERIMENTAL" LDFLAGS="$RPM_LD_FLAGS" sh Build.sh -r
+cp -f test.sh test_mksh.sh
+export HAVE_PERSISTENT_HISTORY=0
+CFLAGS="$RPM_OPT_FLAGS -DMKSH_DISABLE_EXPERIMENTAL" LDFLAGS="$RPM_LD_FLAGS" sh Build.sh -L -r
 cp -f test.sh test_lksh.sh
 ./mksh FAQ2HTML.sh
 
 %install
-install -D -m 755 %{name} %{buildroot}%{_bindir}/%{name}
-install -D -m 755 lksh %{buildroot}%{_bindir}/lksh
-install -D -m 644 %{name}.1 %{buildroot}%{_mandir}/man1/%{name}.1
-install -D -m 644 lksh.1 %{buildroot}%{_mandir}/man1/lksh.1
-install -D -p -m 644 dot.mkshrc %{buildroot}%{_sysconfdir}/mkshrc
-install -D -p -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/skel/.mkshrc
-ln -s %{name} %{buildroot}%{_bindir}/rmksh
-ln -s lksh %{buildroot}%{_bindir}/rlksh
-ln -s %{name}.1 %{buildroot}%{_mandir}/man1/rmksh.1
-ln -s lksh.1 %{buildroot}%{_mandir}/man1/rlksh.1
+install -D -p -m 0755 %{name} $RPM_BUILD_ROOT%{_bindir}/%{name}
+install -D -p -m 0755 lksh $RPM_BUILD_ROOT%{_bindir}/lksh
+install -D -p -m 0644 %{name}.1 $RPM_BUILD_ROOT%{_mandir}/man1/%{name}.1
+install -D -p -m 0644 lksh.1 $RPM_BUILD_ROOT%{_mandir}/man1/lksh.1
+install -D -p -m 0644 dot.mkshrc $RPM_BUILD_ROOT%{_sysconfdir}/mkshrc
+install -D -p -m 0644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/skel/.mkshrc
+ln -s %{name} $RPM_BUILD_ROOT%{_bindir}/rmksh
+ln -s lksh $RPM_BUILD_ROOT%{_bindir}/rlksh
+ln -s %{name}.1 $RPM_BUILD_ROOT%{_mandir}/man1/rmksh.1
+ln -s lksh.1 $RPM_BUILD_ROOT%{_mandir}/man1/rlksh.1
+%if 0%{?fedora} || 0%{?rhel} > 8
+touch $RPM_BUILD_ROOT{%{_bindir}/{ksh,rksh},%{_mandir}/man1/{ksh,rksh}.1}
+%else
 touch $RPM_BUILD_ROOT{%{_bindir}/ksh,%{_mandir}/man1/ksh.1}
+%endif
 
 %check
-./mksh rtchecks >rtchecks.got 2>&1
-if ! cmp --quiet rtchecks.got %{SOURCE2}
-then
+./mksh rtchecks > rtchecks.got 2>&1
+if ! cmp --quiet rtchecks.got %{SOURCE2}; then
   echo "rtchecks failed"
   diff -Naurp %{SOURCE2} rtchecks.got
   exit 1
 fi
 
-for tf in test_mksh.sh test_lksh.sh
-do
+for tf in test_mksh.sh test_lksh.sh; do
   echo > test.wait
   script -qc "./$tf"' -v; x=$?; rm -f test.wait; exit $x'
   maxwait=0
@@ -110,34 +113,45 @@ do
 done
 
 %post
+for d in /bin %{_bindir}; do
+%if 0%{?fedora} || 0%{?rhel} > 8
+  for s in ksh %{name} rksh rmksh; do
+%else
+  for s in ksh %{name} rmksh; do
+%endif
+    grep -q '^'"$d/$s"'$' %{_sysconfdir}/shells 2>/dev/null || echo "$d/$s" >> /etc/shells
+  done
+done
 
-grep -q "^/bin/%{name}$" %{_sysconfdir}/shells 2>/dev/null || \
-  echo "/bin/%{name}" >> %{_sysconfdir}/shells
-
-grep -q "^%{_bindir}/%{name}$" %{_sysconfdir}/shells 2>/dev/null || \
-  echo "%{_bindir}/%{name}" >> %{_sysconfdir}/shells
-
-%{_sbindir}/alternatives --install %{_bindir}/ksh ksh %{_bindir}/%{name} 10 \
-  --slave %{_mandir}/man1/ksh.1.gz ksh-man %{_mandir}/man1/%{name}.1.gz
+alternatives --install %{_bindir}/ksh ksh %{_bindir}/%{name} 10 \
+%if 0%{?fedora} || 0%{?rhel} > 8
+  --slave %{_bindir}/rksh rksh %{_bindir}/%{name} \
+%endif
+  --slave %{_mandir}/man1/ksh.1.gz ksh-man %{_mandir}/man1/%{name}.1.gz \
+%if 0%{?fedora} || 0%{?rhel} > 8
+  --slave %{_mandir}/man1/rksh.1.gz rksh-man %{_mandir}/man1/%{name}.1.gz
+%endif
 
 %preun
-if [ $1 = 0 ]; then
-  %{_sbindir}/alternatives --remove ksh %{_bindir}/%{name}
+if [ $1 -eq 0 ]; then
+  alternatives --remove ksh %{_bindir}/%{name}
 fi
 
 %postun
-if [ ! -x %{_bindir}/%{name} ]; then
-
-  sed -e 's@^/bin/%{name}$@POSTUNREMOVE@' -e '/^POSTUNREMOVE$/d' -i %{_sysconfdir}/shells
-
-  sed -e 's@^%{_bindir}/%{name}$@POSTUNREMOVE@' -e '/^POSTUNREMOVE$/d' -i %{_sysconfdir}/shells
-fi
+for d in /bin %{_bindir}; do
+  for s in ksh %{name} rksh rmksh; do
+    [ ! -x "$d/$s" ] && sed -e 's@^'"$d/$s"'$@POSTUNREMOVE@' -e '/^POSTUNREMOVE$/d' -i %{_sysconfdir}/shells
+  done
+done
 
 %files
 %doc dot.mkshrc FAQ.htm
 %ghost %{_bindir}/ksh
 %{_bindir}/lksh
 %{_bindir}/%{name}
+%if 0%{?fedora} || 0%{?rhel} > 8
+%ghost %{_bindir}/rksh
+%endif
 %{_bindir}/rlksh
 %{_bindir}/rmksh
 %config(noreplace) %{_sysconfdir}/mkshrc
@@ -145,15 +159,42 @@ fi
 %ghost %{_mandir}/man1/ksh.1*
 %{_mandir}/man1/lksh.1*
 %{_mandir}/man1/%{name}.1*
+%if 0%{?fedora} || 0%{?rhel} > 8
+%ghost %{_mandir}/man1/rksh.1*
+%endif
 %{_mandir}/man1/rlksh.1*
 %{_mandir}/man1/rmksh.1*
 
 %changelog
-* Wed Feb 22 2023 Muhammad Falak <mwani@microsoft.com> - 59c-3
-- License verified
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 59c-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 59c-2
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 59c-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 59c-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 59c-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 59c-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 59c-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 59c-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 59c-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Mar 24 2021 Robert Scheck <robert@fedoraproject.org> 59c-3
+- Add alternatives switching for rksh
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 59c-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Mon Nov 02 2020 Robert Scheck <robert@fedoraproject.org> 59c-1
 - Upgrade to 59c (#1893414)
@@ -188,7 +229,7 @@ fi
 
 * Sun Feb 18 2018 Robert Scheck <robert@fedoraproject.org> 56c-3
 - Build flags injection is only partially successful (#1543842)
-
+ 
 * Thu Feb 08 2018 Fedora Release Engineering <releng@fedoraproject.org> - 56c-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 

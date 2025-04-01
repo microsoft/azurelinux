@@ -1,24 +1,47 @@
-Summary:        GeoTIFF format library
-Name:           libgeotiff
-Version:        1.7.1
-Release:        5%{?dist}
-License:        MIT
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://trac.osgeo.org/geotiff/
-Source:         https://download.osgeo.org/geotiff/%{name}/%{name}-%{version}.tar.gz
+%if 0%{?rhel} >= 9
+%bcond_with mingw
+%else
+%bcond_without mingw
+%endif
+
+Name:          libgeotiff
+Version:       1.7.3
+Release:       2%{?dist}
+
+Summary:       GeoTIFF format library
+License:       MIT
+URL:           http://trac.osgeo.org/geotiff/
+Source:        http://download.osgeo.org/geotiff/%{name}/%{name}-%{version}.tar.gz
 # Honour LIB_SUFFIX
 # Honour GEOTIFF_INCLUDE_SUBDIR
 # Add version suffix to mingw library
 # Fix cmake module install dir
 # Don't install docs
-Patch0:         libgeotiff_cmake.patch
-BuildRequires:  cmake
-BuildRequires:  gcc-c++
-BuildRequires:  libjpeg-devel
-BuildRequires:  libtiff-devel
-BuildRequires:  proj-devel
-BuildRequires:  zlib-devel
+Patch0:        libgeotiff_cmake.patch
+
+BuildRequires: cmake
+BuildRequires: gcc-c++
+BuildRequires: libtiff-devel
+BuildRequires: libjpeg-devel
+BuildRequires: proj-devel
+BuildRequires: zlib-devel
+
+%if %{with mingw}
+BuildRequires: mingw32-filesystem >= 95
+BuildRequires: mingw32-gcc-c++
+BuildRequires: mingw32-libtiff
+BuildRequires: mingw32-libjpeg
+BuildRequires: mingw32-proj
+BuildRequires: mingw32-zlib
+
+BuildRequires: mingw64-filesystem >= 95
+BuildRequires: mingw64-gcc-c++
+BuildRequires: mingw64-libtiff
+BuildRequires: mingw64-libjpeg
+BuildRequires: mingw64-proj
+BuildRequires: mingw64-zlib
+%endif
+
 
 %description
 GeoTIFF represents an effort by over 160 different remote sensing,
@@ -27,13 +50,54 @@ to establish a TIFF based interchange format for georeferenced
 raster imagery.
 
 %package devel
-Summary:        Development library and header for the GeoTIFF file format library
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       libtiff-devel
-Requires:       pkgconfig
+Summary:	Development library and header for the GeoTIFF file format library
+Requires:	pkgconfig libtiff-devel
+Requires:	%{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 The GeoTIFF library provides support for development of geotiff image format.
+
+
+%if %{with mingw}
+%package -n mingw32-%{name}
+Summary:       MinGW Windows %{name} library
+Obsoletes:     mingw32-%{name}-static
+BuildArch:     noarch
+
+%description -n mingw32-%{name}
+%{summary}.
+
+
+%package -n mingw32-%{name}-tools
+Summary:       Tools for the MinGW Windows %{name} library
+Requires:      mingw32-%{name} = %{version}-%{release}
+BuildArch:     noarch
+
+%description -n mingw32-%{name}-tools
+%{summary}.
+
+
+%package -n mingw64-%{name}
+Summary:       MinGW Windows %{name} library
+Obsoletes:     mingw64-%{name}-static
+BuildArch:     noarch
+
+%description -n mingw64-%{name}
+%{summary}.
+
+
+%package -n mingw64-%{name}-tools
+Summary:       Tools for the MinGW Windows %{name} library
+Requires:      mingw64-%{name} = %{version}-%{release}
+BuildArch:     noarch
+
+%description -n mingw64-%{name}-tools
+%{summary}.
+
+
+%{?mingw_debug_package}
+%endif
+
 
 %prep
 %autosetup -p1 -n %{name}-%{version}
@@ -41,12 +105,23 @@ The GeoTIFF library provides support for development of geotiff image format.
 
 %build
 # Native build
-%cmake -DGEOTIFF_BIN_SUBDIR=bin -DGEOTIFF_INCLUDE_SUBDIR=include/%{name} -DGEOTIFF_LIB_SUBDIR=%{_lib}
+%cmake -DGEOTIFF_BIN_SUBDIR=bin -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir}/%{name}
 %cmake_build
+
+%if %{with mingw}
+# MinGW build
+MINGW32_CMAKE_ARGS=-DCMAKE_INSTALL_INCLUDEDIR=%{mingw32_includedir}/%{name} \
+MINGW64_CMAKE_ARGS=-DCMAKE_INSTALL_INCLUDEDIR=%{mingw64_includedir}/%{name} \
+%mingw_cmake
+%mingw_make_build
+%endif
 
 
 %install
 %cmake_install
+%if %{with mingw}
+%mingw_make_install
+%endif
 
 
 # install pkgconfig file
@@ -59,10 +134,44 @@ includedir=%{_includedir}/%{name}
 
 Name: %{name}
 Description: GeoTIFF file format library
-Version: %{version}
+Version: 1.7.3
 Libs: -L\${libdir} -lgeotiff
 Cflags: -I\${includedir}
 EOF
+
+%if %{with mingw}
+mkdir -p %{buildroot}%{mingw32_libdir}/pkgconfig/
+cat > %{buildroot}%{mingw32_libdir}/pkgconfig/%{name}.pc <<EOF
+prefix=%{mingw32_prefix}
+exec_prefix=%{mingw32_prefix}
+libdir=%{mingw32_libdir}
+includedir=%{mingw32_includedir}/%{name}
+
+Name: %{name}
+Description: GeoTIFF file format library
+Version: 1.7.3
+Libs: -L\${libdir} -lgeotiff
+Cflags: -I\${includedir}
+EOF
+
+mkdir -p %{buildroot}%{mingw64_libdir}/pkgconfig/
+cat > %{buildroot}%{mingw64_libdir}/pkgconfig/%{name}.pc <<EOF
+prefix=%{mingw64_prefix}
+exec_prefix=%{mingw64_prefix}
+libdir=%{mingw64_libdir}
+includedir=%{mingw64_includedir}/%{name}
+
+Name: %{name}
+Description: GeoTIFF file format library
+Version: 1.7.3
+Libs: -L\${libdir} -lgeotiff
+Cflags: -I\${includedir}
+EOF
+
+
+%mingw_debug_install_post
+%endif
+
 
 %check
 %ctest
@@ -84,11 +193,68 @@ EOF
 %{_libdir}/pkgconfig/%{name}.pc
 %{_libdir}/cmake/GeoTIFF/
 
+%if %{with mingw}
+%files -n mingw32-%{name}
+%doc ChangeLog README
+%license COPYING
+%{mingw32_bindir}/libgeotiff-5.dll
+%{mingw32_includedir}/%{name}/
+%{mingw32_datadir}/*
+%{mingw32_libdir}/libgeotiff.dll.a
+%{mingw32_libdir}/pkgconfig/libgeotiff.pc
+%{mingw32_libdir}/cmake/GeoTIFF/
+
+%files -n mingw32-%{name}-tools
+%{mingw32_bindir}/*.exe
+
+%files -n mingw64-%{name}
+%doc ChangeLog README
+%license COPYING
+%{mingw64_bindir}/libgeotiff-5.dll
+%{mingw64_includedir}/%{name}/
+%{mingw64_datadir}/*
+%{mingw64_libdir}/libgeotiff.dll.a
+%{mingw64_libdir}/pkgconfig/libgeotiff.pc
+%{mingw64_libdir}/cmake/GeoTIFF/
+
+%files -n mingw64-%{name}-tools
+%{mingw64_bindir}/*.exe
+%endif
+
+
 %changelog
-* Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 1.7.1-5
-- Initial CBL-Mariner import from Fedora 37 (license: MIT)
-- License verified
-- Remove mingw build conditional execution statements
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat May 25 2024 Sandro Mani <manisandro@gmail.com> - 1.7.3-1
+- Update to 1.7.3
+
+* Tue Mar 05 2024 Sandro Mani <manisandro@gmail.com> - 1.7.1-13
+- Rebuild (proj)
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.1-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.1-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Sep 03 2023 Sandro Mani <manisandro@gmail.com> - 1.7.1-10
+- Rebuild (proj)
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.1-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu May 18 2023 Orion Poplawski <orion@nwra.com> - 1.7.1-8
+- Change BR to mingw*-gcc-c++
+
+* Sat Mar 04 2023 Sandro Mani <manisandro@gmail.com> - 1.7.1-7
+- Rebuild (proj)
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sun Sep 04 2022 Sandro Mani <manisandro@gmail.com> - 1.7.1-5
+- Rebuild (proj)
 
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild

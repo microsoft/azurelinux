@@ -1,7 +1,7 @@
 {
-  "Signatures": {
-    "wsgi-python3.conf": "9c8749d5fe25add0612b3268be1b9c7b6b71dd0324012313ace6d322c1fcaf33",
-    "wsgi.conf": "caffaa755107cf58ebe405b42081172a69ec5c93d96a7fef22c27501812e9043",
-    "mod_wsgi-4.9.3.tar.gz": "09e83e2f687c9c67110f63f5acac914935fa67981ad4d23b2e113d016a446557"
-  }
+ "Signatures": {
+  "mod_wsgi-5.0.2.tar.gz": "9a0fdb61405abc300ec6b100c440dd98cf31cb5f97aeef4207390937298cad20",
+  "wsgi-python3.conf": "9c8749d5fe25add0612b3268be1b9c7b6b71dd0324012313ace6d322c1fcaf33",
+  "wsgi.conf": "caffaa755107cf58ebe405b42081172a69ec5c93d96a7fef22c27501812e9043"
+ }
 }

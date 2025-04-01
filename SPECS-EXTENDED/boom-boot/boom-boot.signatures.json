@@ -1,5 +1,7 @@
 {
- "Signatures": {
-  "boom-1.2.tar.gz": "7e066caad5c91e7dd8475a5034e88bd0e8e6735aec412f904c0e93029b43ae47"
- }
+
+    "Signatures": {
+     "boom-boot-1.6.5.tar.gz": "d13574fdb88c1b82fbfad5657c1f96d4daba50003717377043d55eac3924a91b"
+    }
+
 }

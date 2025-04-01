@@ -1,6 +1,7 @@
 {
  "Signatures": {
-  "hyph_ru_RU.zip": "95b2198f937f1ba1fe2373302c81517ee88a38c237a1ed5557c543a7e2b141df",
-  "hyphen-ru-LICENSE.txt": "20c17d8b8c48a600800dfd14f95d5cb9ff47066a9641ddeab48dc54aec96e331"
+  "hyph-ru.pat.txt": "12fa91c83d56ffefa589cf022d9f24ec5a5f4035b4c09484cf4270128c2c162a",
+  "hyph-ru.tex": "ce988fcc66e5e29d7474df5ab5b489d3f52a50ebccf570997f992d84221b922a"
  }
 }
+

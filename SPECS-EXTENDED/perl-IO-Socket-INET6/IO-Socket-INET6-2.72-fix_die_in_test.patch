@@ -1,0 +1,12 @@
+diff -ru IO-Socket-INET6-2.72.orig/t/io_multihomed6.t IO-Socket-INET6-2.72/t/io_multihomed6.t
+--- IO-Socket-INET6-2.72.orig/t/io_multihomed6.t	2014-01-31 11:18:01.000000000 +0100
++++ IO-Socket-INET6-2.72/t/io_multihomed6.t	2021-05-18 16:56:02.337243627 +0200
+@@ -105,7 +105,7 @@
+             Listen => 2,
+             LocalAddr => $addr,
+             LocalPort => $port,
+-        ) or die "listen on $addr port $port: $!";
++        ) || die "listen on $addr port $port: $!";
+     $port ||= $srv[-1]->sockport;
+ }
+ 

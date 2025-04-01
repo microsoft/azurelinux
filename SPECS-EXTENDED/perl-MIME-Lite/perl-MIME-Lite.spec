@@ -1,13 +1,12 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Name:           perl-MIME-Lite
-Version:        3.031
-Release:        3%{?dist}
+Version:        3.033
+Release:        11%{?dist}
 Summary:        MIME::Lite - low-calorie MIME generator
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/MIME-Lite
-Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/MIME-Lite-%{version}.tar.gz#/perl-MIME-Lite-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/MIME-Lite-%{version}.tar.gz
 BuildArch:      noarch
+BuildRequires: make
 BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
 BuildRequires:  perl(Carp)
@@ -26,7 +25,6 @@ BuildRequires:  perl(Test::Pod)
 BuildRequires:  perl(Test::Pod::Coverage)
 BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
-Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
 # not detected by automated find-requires:
 Requires:       perl(Email::Date::Format)
 Requires:       perl(MIME::Types) >= 1.28
@@ -64,8 +62,50 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.031-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.033-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.033-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.033-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.033-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Apr 27 2023 Michal Josef Špaček <mspacek@redhat.com> - 3.033-7
+- Update license to SPDX format
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.033-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.033-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 3.033-4
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.033-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.033-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jun 14 2021 Jan Pazdziora <jpazdziora@redhat.com> - 3.033-1
+- 1971173 - Rebase to upstream version 3.033.
+
+* Sun May 23 2021 Jitka Plesnikova <jplesnik@redhat.com> - 3.031-6
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.031-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.031-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 3.031-3
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.031-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

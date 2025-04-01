@@ -1,64 +1,88 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-%global commit  93cfe7c8d66ed486001c4f3f55399b7a
+## START: Set by rpmautospec
+## (rpmautospec version 0.7.2)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 3;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
+
 Summary:        Power Management Service
 Name:           upower
-Version:        0.99.11
-Release:        5%{?dist}
-License:        GPLv2+
+Version:        1.90.6
+Release:        %autorelease
+License:        GPL-2.0-or-later
 URL:            http://upower.freedesktop.org/
-Source0:        https://gitlab.freedesktop.org/upower/upower/uploads/%{commit}/%{name}-%{version}.tar.xz
+Source0:        https://gitlab.freedesktop.org/upower/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.bz2
 
-BuildRequires:  %{_bindir}/xsltproc
-BuildRequires:  sqlite-devel
-BuildRequires:  libtool
+BuildRequires:  meson
+BuildRequires:  git
 BuildRequires:  gettext
 BuildRequires:  libgudev1-devel
+%define idevice disabled
 %ifnarch s390 s390x
-BuildRequires:  libusbx-devel
+%if ! 0%{?rhel}
+%define idevice enabled
 BuildRequires:  libimobiledevice-devel
+%endif
 %endif
 BuildRequires:  glib2-devel >= 2.6.0
 BuildRequires:  gobject-introspection-devel
+BuildRequires:  gtk-doc
+BuildRequires:  polkit-devel
 BuildRequires:  systemd
-Requires:       udev
-Requires:       gobject-introspection
 
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       udev
+
+# https://gitlab.freedesktop.org/upower/upower/-/commit/9ee76826bd41a5d3a377dfd6f5835f42ec50be9a.patch
+Patch1001:      0001-Fix-race-condition-in-test_sibling_priority_no_overwrite.patch
+# https://gitlab.freedesktop.org/upower/upower/-/commit/7d7bb84fde91bef9ee7eba924cbdfa74639cc4fe.patch
+Patch1002:      0002-linux-up-enumerator-udev-Find-the.patch
 
 %description
 UPower (formerly DeviceKit-power) provides a daemon, API and command
 line tools for managing power devices attached to the system.
 
+%package libs
+Summary: Client libraries for UPower
+Requires: gobject-introspection
+Recommends: %{name}%{?_isa} = %{version}-%{release}
+Conflicts: %{name} < 0.99.20-4
+
+%description libs
+Client libraries for UPower.
+
 %package devel
 Summary: Headers and libraries for UPower
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description devel
 Headers and libraries for UPower.
 
-%prep
-%autosetup -p1
+%package devel-docs
+Summary: Developer documentation for for libupower-glib
+Requires: %{name}-libs = %{version}-%{release}
+BuildArch: noarch
 
-# Disable docs generation.
-sed -i -E 's/^(SUBDIRS.*) doc(.*)/\1\2/g' Makefile.in
+%description devel-docs
+Developer documentation for for libupower-glib.
+
+%prep
+%autosetup -n %{name}-v%{version} -p1 -S git
 
 %build
-%configure \
-        --disable-gtk-doc \
-        --disable-static \
-        --enable-introspection \
-        --with-udevrulesdir=%{_udevrulesdir} \
-        --with-systemdsystemunitdir=%{_unitdir} \
-%ifarch s390 s390x
-	--with-backend=dummy
-%endif
+%meson \
+  -Didevice=%{idevice} \
+  -Dman=true \
+  -Dgtk-doc=true \
+  -Dintrospection=enabled
 
-# Disable SMP build, fails to build docs
-make
+%meson_build
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
+%meson_install
 
 %find_lang upower
 
@@ -77,19 +101,26 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{!?_licensedir:%global license %%doc}
 %license COPYING
 %doc NEWS AUTHORS HACKING README
-%{_libdir}/libupower-glib.so.*
 %{_datadir}/dbus-1/system.d/*.conf
-%ifnarch s390 s390x
 %{_udevrulesdir}/*.rules
-%endif
+%{_udevhwdbdir}/*.hwdb
 %ghost %dir %{_localstatedir}/lib/upower
 %dir %{_sysconfdir}/UPower
 %config %{_sysconfdir}/UPower/UPower.conf
 %{_bindir}/*
 %{_libexecdir}/*
-%{_libdir}/girepository-1.0/*.typelib
+%{_mandir}/man1/*
+%{_mandir}/man7/*
+%{_mandir}/man8/*
 %{_datadir}/dbus-1/system-services/*.service
 %{_unitdir}/*.service
+%{_datadir}/installed-tests/upower/upower-integration.test
+%{_datadir}/polkit-1/actions/org.freedesktop.upower.policy
+
+%files libs
+%license COPYING
+%{_libdir}/libupower-glib.so.3{,.*}
+%{_libdir}/girepository-1.0/*.typelib
 
 %files devel
 %{_datadir}/dbus-1/interfaces/*.xml
@@ -100,15 +131,126 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_includedir}/libupower-glib/up-*.h
 %{_includedir}/libupower-glib/upower.h
 
-%changelog
-* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.99.11-5
-- Adding BR on '%%{_bindir}/xsltproc'.
-- Disabled gtk doc generation to remove network dependency during build-time.
-- License verified.
+%files devel-docs
+%dir %{_datadir}/gtk-doc
+%dir %{_datadir}/gtk-doc/html/UPower
+%{_datadir}/gtk-doc/html/UPower/*
 
-* Tue Jun 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.99.11-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Specify udev rules directory and systemd system unit dir
+%changelog
+## START: Generated by rpmautospec
+* Fri Oct 04 2024 Kate Hsuan <hpa@redhat.com> - 1.90.6-3
+- Fix device update issue
+
+* Thu Oct 03 2024 Neal Gompa <ngompa@fedoraproject.org> - 1.90.6-2
+- Rebuild for libimobiledevice update
+
+* Tue Sep 24 2024 Kate Hsuan <hpa@redhat.com> - 1.90.6-1
+- Update to upstream release 1.90.6
+
+* Sat Sep 14 2024 Kate Hsuan <hpa@redhat.com> - 1.90.5-2
+- Add polkit dependency and fix intergration test filename
+
+* Sat Sep 14 2024 Kate Hsuan <hpa@redhat.com> - 1.90.5-1
+- Updated to upstream release 1.90.5
+- Support battery charging limit
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.90.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jun 11 2024 Kate Hsuan <hpa@redhat.com> - 1.90.4-2
+- Fix test dependency
+
+* Wed Apr 10 2024 Leigh Scott <leigh123linux@gmail.com> - 1.90.4-1
+- Update to 1.90.4
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.90.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 28 2023 Michel Alexandre Salim <salimma@fedoraproject.org> - 1.90.2-3
+- Rebuilt for libimobiledevice and libplist soname bump
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.90.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jul 06 2023 Bastien Nocera <hadess@hadess.net> - 1.90.2-1
+- Update to 1.90.2
+
+* Tue Jul 04 2023 Bastien Nocera <hadess@hadess.net> - 1.90.1-1
+- Update to 1.90.1
+
+* Wed Feb 22 2023 Richard Hughes <richard@hughsie.com> - 0.99.20-5
+- migrated to SPDX license
+
+* Sun Feb 19 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 0.99.20-4
+- Separate libs package
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.99.20-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.99.20-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jul 15 2022 Benjamin Berg <bberg@redhat.com> - 0.99.20-1
+- Update to 0.99.20
+
+* Thu Jun 09 2022 Benjamin Berg <bberg@redhat.com> - 0.99.19-1
+- Update to 0.99.19
+
+* Thu Jun 09 2022 Benjamin Berg <bberg@redhat.com> - 0.99.14-6
+- Remove sqlite build dependency
+
+* Thu Jun 09 2022 Benjamin Berg <bberg@redhat.com> - 0.99.14-5
+- Remove unused commit global
+
+* Thu Jun 09 2022 Benjamin Berg <bberg@redhat.com> - 0.99.14-4
+- Remove ancient Obsoletes: line
+
+* Thu Jun 09 2022 Benjamin Berg <bberg@redhat.com> - 0.99.14-3
+- Build linux backend on s390
+
+* Mon Feb 07 2022 Bastien Nocera <bnocera@redhat.com> - 0.99.14-1
++ upower-0.99.14-1
+- Update to 0.99.14
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.99.13-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Aug 17 2021 Bastien Nocera <bnocera@redhat.com> - 0.99.13-1
++ upower-0.99.13-1
+- Update to 0.99.13
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.99.12-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 17 2021 Bastien Nocera <bnocera@redhat.com> - 0.99.12-1
++ upower-0.99.12-1
+- Update to 0.99.12
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 0.99.11-10
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.99.11-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jan 19 2021 Bastien Nocera <bnocera@redhat.com> - 0.99.11-8
++ upower-0.99.11-8
+- Remove USB dependency
+
+* Tue Nov 24 2020 Bastien Nocera <bnocera@redhat.com> - 0.99.11-7
++ upower-0.99.11-7
+- Disable libimobiledevice integration on RHEL
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.99.11-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jun 17 2020 Bastien Nocera <bnocera@redhat.com> - 0.99.11-5
++ upower-0.99.11-5
+- Use upstreamed libplist patch
+- Add support for iPhone XS,XR
+
+* Tue Jun 16 2020 Adam Williamson <awilliam@redhat.com> - 0.99.11-4
+- Fix imobiledevice support with new libplist, rebuild for soname bumps
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.99.11-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -350,3 +492,5 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
 * Sun Jul 22 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.9.17-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
+## END: Generated by rpmautospec

@@ -1,0 +1,54 @@
+From 2db4e6319326e584051ebefd565675356ab0a3cc Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Fri, 8 Dec 2023 14:18:18 +0100
+Subject: [PATCH] Remove Pack200 compressor
+
+---
+ .../compress/compressors/CompressorStreamFactory.java  | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java b/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java
+index 16bc88e..f3c7f3f 100644
+--- a/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java
++++ b/src/main/java/org/apache/commons/compress/compressors/CompressorStreamFactory.java
+@@ -44,8 +44,6 @@ import org.apache.commons.compress.compressors.lz4.FramedLZ4CompressorOutputStre
+ import org.apache.commons.compress.compressors.lzma.LZMACompressorInputStream;
+ import org.apache.commons.compress.compressors.lzma.LZMACompressorOutputStream;
+ import org.apache.commons.compress.compressors.lzma.LZMAUtils;
+-import org.apache.commons.compress.compressors.pack200.Pack200CompressorInputStream;
+-import org.apache.commons.compress.compressors.pack200.Pack200CompressorOutputStream;
+ import org.apache.commons.compress.compressors.snappy.FramedSnappyCompressorInputStream;
+ import org.apache.commons.compress.compressors.snappy.FramedSnappyCompressorOutputStream;
+ import org.apache.commons.compress.compressors.snappy.SnappyCompressorInputStream;
+@@ -265,10 +263,6 @@ public class CompressorStreamFactory implements CompressorStreamProvider {
+             return GZIP;
+         }
+ 
+-        if (compressorNames.contains(PACK200) && Pack200CompressorInputStream.matches(signature, signatureLength)) {
+-            return PACK200;
+-        }
+-
+         if (compressorNames.contains(SNAPPY_FRAMED) &&
+                 FramedSnappyCompressorInputStream.matches(signature, signatureLength)) {
+             return SNAPPY_FRAMED;
+@@ -619,7 +613,7 @@ public class CompressorStreamFactory implements CompressorStreamProvider {
+             }
+ 
+             if (PACK200.equalsIgnoreCase(name)) {
+-                return new Pack200CompressorInputStream(in);
++                throw new CompressorException("Pack200 compression is not available in this build.");
+             }
+ 
+             if (SNAPPY_RAW.equalsIgnoreCase(name)) {
+@@ -700,7 +694,7 @@ public class CompressorStreamFactory implements CompressorStreamProvider {
+             }
+ 
+             if (PACK200.equalsIgnoreCase(name)) {
+-                return new Pack200CompressorOutputStream(out);
++                throw new CompressorException("Pack200 compression is not available in this build.");
+             }
+ 
+             if (LZMA.equalsIgnoreCase(name)) {
+-- 
+2.43.0
+

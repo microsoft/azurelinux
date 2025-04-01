@@ -1,79 +1,72 @@
-%global debug_package %{nil}
-%global _binaries_in_noarch_packages_terminate_build   0
-
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global srcname Genshi
-
 Name:           python-genshi
-Version:        0.7.5
-Release:        4%{?dist}
+Version:        0.7.9
+Release:        1%{?dist}
 Summary:        Toolkit for stream-based generation of output for the web
-
-License:        BSD
-URL:            http://genshi.edgewall.org/
-
-Source0:        %pypi_source
-
-BuildArch:      noarch
-
+ 
+License:        BSD-3-Clause
+URL:            https://genshi.edgewall.org/
+ 
+Source0:        %{pypi_source Genshi}
+ 
+BuildRequires:  gcc
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-six
-
+BuildRequires:  python3dist(pytest)
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+ 
 %description
 Genshi is a Python library that provides an integrated set of
 components for parsing, generating, and processing HTML, XML or other
 textual content for output generation on the web. The major feature is
 a template language, which is heavily inspired by Kid.
-
-
+ 
+ 
 %package -n python3-genshi
 Summary:        %{summary}
-
+ 
 %description -n python3-genshi
 Genshi is a Python library that provides an integrated set of
 components for parsing, generating, and processing HTML, XML or other
 textual content for output generation on the web. The major feature is
 a template language, which is heavily inspired by Kid.
-
-
+ 
+ 
 %prep
-%autosetup -p1 -n %{srcname}-%{version}
-
+%autosetup -p1 -n Genshi-%{version}
+ 
 # Remove bundled egg-info in case it exists
 rm -rf %{modname}.egg-info
-
+ 
 find examples -type f | xargs chmod a-x
 
-
+ 
+%generate_buildrequires
+%pyproject_buildrequires -x i18n
+ 
+ 
 %build
-%py3_build
-
-
+%pyproject_wheel
+ 
 %install
-%py3_install
-rm -r %{buildroot}%{python3_sitelib}/genshi/tests
-rm -r %{buildroot}%{python3_sitelib}/genshi/{filters,template}/tests
-rm %{buildroot}%{python3_sitelib}/genshi/*.c
-
-
-%check
-%{python3} setup.py test
-
-
-%files -n python3-genshi
-%license COPYING
-%doc ChangeLog doc examples README.txt
-%{python3_sitelib}/%{srcname}-%{version}-py*.egg-info/
-%{python3_sitelib}/genshi/
+%pyproject_install
+%pyproject_save_files genshi
+ 
+sed -i -e '/\/tests/d' %{pyproject_files}
+sed -i -e '/_speedups.c/d' %{pyproject_files}
 
 
 %changelog
+* Sat Feb 22 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.7.3-1
+- Upgrade to version 1.7.3
+- License verified
+
 * Wed Mar 24 2021 Henry Li <lihl@microsoft.com> - 0.7.5-4
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Disable debuginfo 
 - Disable RPM complaining about shipping *.so binaries as noarch
+
 
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

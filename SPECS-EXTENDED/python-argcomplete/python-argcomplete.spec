@@ -1,98 +1,254 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-%global modname argcomplete
+## START: Set by rpmautospec
+## (rpmautospec version 0.7.3)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 1;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
 
+# Disable check to avoid pulling unwanted package (fish) into RHEL 9
+%if 0%{?rhel} >= 9 && !0%{?epel}
+%bcond_with check
+%else
 %bcond_without check
+%endif
 
-Name:          python-%{modname}
+# Enable all tests (requires check to be true)
+%bcond all_tests 1
+
+Name:          python-argcomplete
 Summary:       Bash tab completion for argparse
-Version:       1.10.0
-Release:       7%{?dist}
-License:       ASL 2.0
+Version:       3.5.2
+Release:       %autorelease
+License:       Apache-2.0
 URL:           https://github.com/kislyuk/argcomplete
 Source0:       %pypi_source argcomplete
 
+BuildRequires: python3-devel
+
 %if %{with check}
 BuildRequires: tcsh
-#BuildRequires: fish
+BuildRequires: fish
+BuildRequires: zsh
 %endif
 
 BuildArch:     noarch
 
-%global _description \
-Argcomplete provides easy, extensible command line tab completion of\
-arguments for your Python script.\
-\
-It makes two assumptions:\
-\
- * You are using bash as your shell\
- * You are using argparse to manage your command line arguments/options\
-\
-Argcomplete is particularly useful if your program has lots of\
-options or subparsers, and if your program can dynamically suggest\
-completions for your argument/option values (for example, if the user\
-is browsing resources over the network).
+%global _description %{expand:
+Tab complete all the things!
 
-%description %{_description}
+Argcomplete provides easy, extensible command line tab completion of
+arguments for your Python application.
 
-%package -n python3-%{modname}
+It makes two assumptions:
+
+ - You're using bash or zsh as your shell
+ - You're using argparse to manage your command line arguments/options
+ 
+Argcomplete is particularly useful if your program has lots of options
+or subparsers, and if your program can dynamically suggest completions
+for your argument/option values (for example, if the user is browsing
+resources over the network).}
+
+%description %_description
+
+%package -n python3-argcomplete
 Summary:        %{summary}
-%{?python_provide:%python_provide python3-%{modname}}
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-%if %{with check}
-BuildRequires:  python3-pexpect
-%endif
-# pkg_resources module is used from python-argcomplete-check-easy-install-script
-Requires:       python3-setuptools
-
-%description -n python3-%{modname} %{_description}
-
-Python 3 version.
+%description -n python3-argcomplete %_description
 
 %prep
-%autosetup -n %{modname}-%{version}
-# Remove useless BRs
-sed -i -r -e '/tests_require = /s/"(coverage|flake8|wheel)"[, ]*//g' setup.py
+%autosetup -p1 -n argcomplete-%{version}
+# Remove useless BRs (aka linters)
+sed -i -r -e '/test = /s/"(coverage|ruff|mypy)"[, ]*//g' pyproject.toml
+
 # https://github.com/kislyuk/argcomplete/issues/255
 # https://github.com/kislyuk/argcomplete/issues/256
-sed -i -e "1s|#!.*python.*|#!%{__python3}|" test/prog scripts/*
+sed -i -e "1s|#!.*python.*|#!%{__python3}|" test/prog argcomplete/scripts/*
 sed -i -e "s|python |python3 |" test/test.py
 
+# Remove shebang from installed scripts
+sed -i '/^#!/d' argcomplete/scripts/*.py
+
+%generate_buildrequires
+%pyproject_buildrequires %{?with_check:-x test}
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
-mkdir -p %{buildroot}%{_sysconfdir}/bash_completion.d/
-install -p -m0644 %{buildroot}%{python3_sitelib}/%{modname}/bash_completion.d/python-argcomplete.sh %{buildroot}%{_sysconfdir}/bash_completion.d/
+%pyproject_install
+%pyproject_save_files argcomplete
+
+
+# do not attempt to install to %%bash_completions_dir, see https://bugzilla.redhat.com/2211862
+install -Dp -m0644 argcomplete/bash_completion.d/_%{name} %{buildroot}%{_sysconfdir}/bash_completion.d/_%{name}
 
 %if %{with check}
 %check
-%{__python3} setup.py test
+%if %{with all_tests}
+%{py3_test_envvars} %{python3} test/test.py -v
+%else
+# Disable zsh tests. They fail for mysterious reasons.
+# https://github.com/kislyuk/argcomplete/issues/447
+%{py3_test_envvars} %{python3} test/test.py -v -k "TestArgcomplete"
+%{py3_test_envvars} %{python3} test/test.py -v -k "TestBash"
+%{py3_test_envvars} %{python3} test/test.py -v -k "TestCheckModule"
+%{py3_test_envvars} %{python3} test/test.py -v -k "TestSplitLine"
+%endif
 %endif
 
-%files -n python3-%{modname}
+%files -n python3-argcomplete -f %{pyproject_files}
 %license LICENSE.rst
 %doc README.rst
-%{python3_sitelib}/%{modname}-*.egg-info/
-%{python3_sitelib}/%{modname}/
 %{_bindir}/activate-global-python-argcomplete
 %{_bindir}/python-argcomplete-check-easy-install-script
-%{_bindir}/python-argcomplete-tcsh
 %{_bindir}/register-python-argcomplete
-%{_sysconfdir}/bash_completion.d/python-argcomplete.sh
+%{_sysconfdir}/bash_completion.d/_%{name}
 
 %changelog
-* Wed Sep 25 2024 Muhammad Falak <mwani@microsoft.com> - 1.10.0-7
-- Drop BR on fish to enable build
+## START: Generated by rpmautospec
+* Fri Dec 06 2024 Packit <hello@packit.dev> - 3.5.2-1
+- Update to 3.5.2 upstream release
+- Resolves: rhbz#2330869
 
-* Mon Jul 05 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.10.0-6
-- Bump release due to bump in fish to 3.5.0.
-- License verified.
+* Mon Oct 07 2024 Packit <hello@packit.dev> - 3.5.1-1
+- Update to 3.5.1 upstream release
+- Resolves: rhbz#2316902
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.0-5
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Aug 06 2024 Packit <hello@packit.dev> - 3.5.0-1
+- Update to 3.5.0 upstream release
+- Resolves: rhbz#2303230
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.4.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sun Jun 16 2024 Packit <hello@packit.dev> - 3.4.0-1
+- Update to 3.4.0 upstream release
+- Resolves: rhbz#2292569
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 3.3.0-3
+- Rebuilt for Python 3.13
+
+* Mon Apr 15 2024 Sandro <devel@penguinpee.nl> - 3.3.0-1
+- Update to 3.3.0 (RHBZ#2275020)
+- Builds with Python 3.13 now (RHBZ#2270950)
+
+* Wed Mar 13 2024 Sandro <devel@penguinpee.nl> - 3.2.3-2
+- Fix Packit config
+
+* Wed Mar 13 2024 Sandro <devel@penguinpee.nl> - 3.2.3-1
+- Update to 3.2.3 (RHBZ#2268528)
+
+* Tue Feb 06 2024 Sandro <devel@penguinpee.nl> - 3.2.2-2
+- Add Packit config
+
+* Tue Feb 06 2024 Sandro <devel@penguinpee.nl> - 3.2.2-1
+- Update to 3.2.2 (RHBZ#2259943)
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Dec 13 2023 Sandro <devel@penguinpee.nl> - 3.2.1-1
+- Update to 3.2.1 (RHBZ#2175448)
+
+* Sun Dec 10 2023 Sandro <devel@penguinpee.nl> - 3.2.0-1
+- Update to 3.2.0 (RHBZ#2175448)
+- Drop patches (merged upstream)
+
+* Sat Nov 25 2023 Sandro <devel@penguinpee.nl> - 3.1.6-2
+- Apply patches from upstream regarding zsh tests
+
+* Mon Nov 13 2023 Sandro <devel@penguinpee.nl> - 3.1.6-1
+- Update to 3.1.6 (RHBZ#2175448)
+
+* Thu Nov 09 2023 Sandro <devel@penguinpee.nl> - 3.1.4-3
+- Add conditional for running all tests
+
+* Thu Nov 09 2023 Sandro <devel@penguinpee.nl> - 3.1.4-2
+- Update description
+
+* Thu Nov 09 2023 Sandro <devel@penguinpee.nl> - 3.1.4-1
+- Update to 3.1.4 (RHBZ#2175448)
+- Drop patches (merged upstream)
+- Disable zsh tests (I will re-open upstream issue #447)
+- Various edits due to upstream changes
+
+* Thu Sep 14 2023 Miro Hrončok <mhroncok@redhat.com> - 2.0.0-12
+- Second attempt to fix KeyError: 'console_scripts'
+- Fixes: rhbz#2231593
+
+* Sun Aug 13 2023 Miro Hrončok <mhroncok@redhat.com> - 2.0.0-11
+- Fix KeyError: 'console_scripts'
+- Fixes: rhbz#2231593
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 2.0.0-9
+- Rebuilt for Python 3.12
+
+* Mon Jun 05 2023 Miro Hrončok <mhroncok@redhat.com> - 2.0.0-8
+- Move the Bash completion files to /etc/bash_completion.d to fix rhbz#2211862
+
+* Mon May 22 2023 Miro Hrončok <mhroncok@redhat.com> - 2.0.0-7
+- Fix build with pip 23.1.2+
+- Fixes: rhbz#2209020
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Nov 12 2022 Todd Zullinger <tmz@pobox.com> - 2.0.0-5
+- Install bash-completion in default location
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 2.0.0-3
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jan 04 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 2.0.0-1
+- Update to 2.0.0
+- Fixes: rhbz#2036728
+- Fixes: rhbz#2034200
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.12.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 1.12.3-2
+- Rebuilt for Python 3.10
+
+* Thu Apr 29 2021 Tomas Hrnciar <thrnciar@redhat.com> - 1.12.3-1
+- Update to 1.12.3
+- Resolves: rhbz#1951096
+
+* Wed Feb 17 2021 Lumír Balhar <lbalhar@redhat.com> - 1.12.2-1
+- Update to 1.12.2
+Resolves: rhbz#1882968
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.12.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.12.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jul 24 2020 Miro Hrončok <mhroncok@redhat.com> - 1.12.0-1
+- Update to 1.12.0
+- Fixes rhbz#1856103
+
+* Sat May 23 2020 Miro Hrončok <mhroncok@redhat.com> - 1.11.1-2
+- Rebuilt for Python 3.9
+
+* Fri Feb 28 2020 Miro Hrončok <mhroncok@redhat.com> - 1.11.1-1
+- Update to 1.11.1 (#1709038)
+- Fix tests with Fish 3.1 (#1808322)
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -229,3 +385,5 @@ install -p -m0644 %{buildroot}%{python3_sitelib}/%{modname}/bash_completion.d/py
 
 * Thu Jan 31 2013 - Marco Neciarini <marco.nenciarini@2ndquadrant.it> 0.3.5-1
 - Initial packaging.
+
+## END: Generated by rpmautospec

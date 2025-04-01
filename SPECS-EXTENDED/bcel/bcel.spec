@@ -1,175 +1,354 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-#
-# spec file for package bcel
-#
-# Copyright (c) 2019 SUSE LINUX GmbH, Nuernberg, Germany.
-#
-# All modifications and additions to the file contributed by third parties
-# remain the property of their copyright owners, unless otherwise agreed
-# upon. The license for this file, and modifications and additions to the
-# file, is the same license as for the pristine package itself (unless the
-# license for the pristine package is not an Open Source License, in which
-# case the license is the MIT License). An "Open Source License" is a
-# license that conforms to the Open Source Definition (Version 1.9)
-# published by the Open Source Initiative.
-
-# Please submit bugfixes or comments via https://bugs.opensuse.org/
-#
-
-
 Name:           bcel
-Version:        5.2
-Release:        37%{?dist}
+Version:        6.8.1
+Release:        3%{?dist}
 Summary:        Byte Code Engineering Library
 License:        Apache-2.0
-Group:          Development/Libraries/Java
 URL:            http://commons.apache.org/proper/commons-bcel/
-Source0:        http://archive.apache.org/dist/commons/bcel/source/%{name}-%{version}-src.tar.gz
-Source1:        http://archive.apache.org/dist/commons/bcel/source/%{name}-%{version}-src.tar.gz.asc
-Source2:        http://repo.maven.apache.org/maven2/org/apache/%{name}/%{name}/%{version}/%{name}-%{version}.pom
-Source3:        bcel.keyring
-Patch0:         bcel-5.2-encoding.patch
-BuildRequires:  ant
-BuildRequires:  java-devel >= 1.8
-BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  regexp
-#!BuildIgnore:  xalan-j2 xerces-j2 xml-apis xml-resolver
-Requires:       regexp
 BuildArch:      noarch
+#ExclusiveArch:  %{java_arches} noarch
+
+Source0:        http://archive.apache.org/dist/commons/bcel/source/bcel-%{version}-src.tar.gz
+
+BuildRequires:  maven-local
+BuildRequires:  mvn(org.apache.commons:commons-lang3)
+BuildRequires:  mvn(org.apache.commons:commons-parent:pom:)
+BuildRequires:  mvn(org.apache.felix:maven-bundle-plugin)
 
 %description
-The Byte Code Engineering Library is intended to give users a
-convenient way to analyze, create, and manipulate (binary) Java class
-files (those ending with .class). Classes are represented by objects
-that contain all the symbolic information of the given class: methods,
-fields, and byte code instructions, in particular.
+The Byte Code Engineering Library (formerly known as JavaClass) is
+intended to give users a convenient possibility to analyze, create, and
+manipulate (binary) Java class files (those ending with .class). Classes
+are represented by objects which contain all the symbolic information of
+the given class: methods, fields and byte code instructions, in
+particular.  Such objects can be read from an existing file, be
+transformed by a program (e.g. a class loader at run-time) and dumped to
+a file again. An even more interesting application is the creation of
+classes from scratch at run-time. The Byte Code Engineering Library
+(BCEL) may be also useful if you want to learn about the Java Virtual
+Machine (JVM) and the format of Java .class files.  BCEL is already
+being used successfully in several projects such as compilers,
+optimizers, obsfuscators and analysis tools, the most popular probably
+being the Xalan XSLT processor at Apache.
 
-Such objects can be read from an existing file, transformed by a
-program (such as a class loader at runtime), and dumped to a file
-again. An even more interesting application is the creation of classes
-from scratch at runtime. The Byte Code Engineering Library (BCEL) may
-also be useful if you want to learn about the Java Virtual Machine
-(JVM) and the format of Java .class files.
+%package javadoc
+Summary:        API documentation for %{name}
 
-BCEL is already being used successfully in several projects, such as
-compilers, optimizers, obfuscators, code generators, and analysis
-tools.
-
-It contains a byte code verifier named JustIce, which usually gives you
-much better information about what is wrong with your code than the
-standard JVM message.
+%description javadoc
+This package provides %{summary}.
 
 %prep
-%setup -q
-%patch 0 -p1
-# remove all binary libs
-find . -name "*.jar" -exec rm -f {} \;
-# very broken build
-perl -p -i -e 's| depends=\"examples\"||g;' build.xml
-touch manifest.txt
+%setup -q -n %{name}-%{version}-src
+
+%pom_remove_plugin :maven-source-plugin
+%pom_remove_plugin :spotbugs-maven-plugin
+%pom_remove_plugin :jacoco-maven-plugin
+
+%mvn_alias : bcel: apache:
+%mvn_file : %{name}
 
 %build
-export CLASSPATH=%(build-classpath regexp)
-export OPT_JAR_LIST="ant/ant-nodeps"
-ant \
-    -Dant.build.javac.target=8 -Dant.build.javac.source=8 \
-    -Dbuild.dest=./build -Dbuild.dir=./build -Dname=%{name} \
-    compile
-ant \
-    -Dant.build.javac.target=8 -Dant.build.javac.source=8 \
-    -Dbuild.dest=./build -Dbuild.dir=./build -Dname=%{name} \
-	jar
+%mvn_build -f
 
 %install
-# jars
-mkdir -p %{buildroot}%{_javadir}
-install -m 644 target/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}-%{version}.jar
-(cd %{buildroot}%{_javadir} && for jar in *-%{version}*; do ln -s ${jar} `echo $jar| sed  "s|-%{version}||g"`; done)
-
-mkdir -p %{buildroot}%{_mavenpomdir}
-install -m 644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/%{name}-%{version}.pom
-
-%add_maven_depmap %{name}-%{version}.pom %{name}-%{version}.jar -a "bcel:bcel"
+%mvn_install
 
 %files -f .mfiles
-%license LICENSE.txt
-%{_javadir}/*
+%doc RELEASE-NOTES.txt
+%license LICENSE.txt NOTICE.txt
+
+%files javadoc -f .mfiles-javadoc
+%license LICENSE.txt NOTICE.txt
 
 %changelog
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2-37
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.8.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Thu Nov 12 2020 Joe Schmitt <joschmit@microsoft.com> - 5.2-36.6
-- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
-- Use javapackages-local-bootstrap to avoid build cycle.
+* Tue Feb 27 2024 Jiri Vanek <jvanek@redhat.com> - 6.8.1-2
+- Rebuilt for java-21-openjdk as system jdk
 
-* Fri Feb  1 2019 Fridrich Strba <fstrba@suse.com>
-- BuildIgnore xalan-j2, xml-apis, xml-resolver, xerces-j2, since
-  those packages are not necessary for the build.
-* Mon Dec 10 2018 Fridrich Strba <fstrba@suse.com>
-- Build against the generic xml-apis provider which allows
-  building against bootstrap and non-bootstrap packages according
-  of their availability.
-* Thu Nov 15 2018 Fridrich Strba <fstrba@suse.com>
-- Add maven pom file and generate mvn(...) dependencies for this
-  package
-* Tue May 15 2018 fstrba@suse.com
-- Build with source and target 8 to prepare for a possible removal
-  of 1.6 compatibility
-* Wed Sep 27 2017 fstrba@suse.com
-- Allow building with any java-devel provider
-- Specify java source and target level 1.6 to fix build with jdk9
-- Added patch:
-  * bcel-5.2-encoding.patch
-    + specify the correct encoding of the files
-* Fri May 19 2017 tchvatal@suse.com
-- Buildignore more java implementations
-* Wed Mar 25 2015 tchvatal@suse.com
-- Drop gpg-offline
-- Drop conditional for manual that is never triggered
-* Tue Jul  8 2014 tchvatal@suse.com
-- Do not depend on ant-nodeps.
-* Tue Sep  3 2013 mvyskocil@suse.com
-- use pristine tarballs
-- fix source url
-- add gpg verification
-- format spec file
-* Thu Aug 22 2013 mvyskocil@suse.com
-- disable javadoc generation
-* Mon Jan  7 2013 mvyskocil@suse.com
-- remove xerces-j2-bootstrap dependency (bnc#789163)
-* Tue May 15 2012 mvyskocil@suse.cz
-- ignore openjdk from build
-* Sat Sep 17 2011 jengelh@medozas.de
-- Remove redundant tags/sections from specfile
-- Use %%_smp_mflags for parallel build
-* Mon Nov  8 2010 mvyskocil@suse.cz
-- build ignore xml-commons-jaxp-1.3-apis
-* Mon Jun  1 2009 mvyskocil@suse.cz
-- fixed archive name (gz -> bz2) in Source
-* Thu May 21 2009 mvyskocil@suse.cz
-- update to 5.2
-- fixed build under gcj44
-- removed javadoc scripplets
-* Sun Jul 27 2008 coolo@suse.de
-- avoid xerces and xml-commons (ant still works)
-* Tue Jul 22 2008 coolo@suse.de
-- build with gcj to avoid build cycle
-* Mon Sep 25 2006 skh@suse.de
-- don't use icecream
-- use source="1.4" and target="1.4" for build with java 1.5
-* Wed Jan 25 2006 mls@suse.de
-- converted neededforbuild to BuildRequires
-* Wed Jul 27 2005 jsmeix@suse.de
-- Adjustments in the spec file.
-* Mon Jul 18 2005 jsmeix@suse.de
-- Current version 5.1 from JPackage.org
-* Thu Sep 16 2004 skh@suse.de
-- Fix prerequires of javadoc subpackage
-* Sat Sep  4 2004 skh@suse.de
-- Switched to JPackage 1.5 version
-- split off subpackages bcel-javadoc and bcel-manual
-* Mon Feb  9 2004 pmladek@suse.cz
-- package created, version 5.1
-- added trigger to create link to the ant lib dir
+* Thu Feb 01 2024 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.8.1-1
+- Update to upstream version 6.8.1
+
+* Tue Jan 23 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.8.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.8.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 11 2023 Marian Koncek <mkoncek@redhat.com> - 6.8.0-1
+- Update to upstream version 6.8.0
+
+* Fri Sep 01 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.7.0-3
+- Convert License tag to SPDX format
+
+* Fri Aug 18 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.7.0-2
+- Add missing build-requires
+
+* Fri Aug 18 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.7.0-1
+- Update to upstream version 6.7.0
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 6.5.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jan 18 2023 Fedora Release Engineering <releng@fedoraproject.org> - 6.5.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Dec 01 2022 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.5.0-3
+- Fix arbitrary bytecode produced via out-of-bounds writing
+- Resolves: CVE-2022-42920
+
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.5.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sun Apr 24 2022 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.5.0-1
+- Update to upstream version 6.5.0
+
+* Sat Feb 05 2022 Jiri Vanek <jvanek@redhat.com> - 6.4.1-9
+- Rebuilt for java-17-openjdk as system jdk
+
+* Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.4.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 6.4.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jun 28 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.4.1-6
+- Remove dependency on jna
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0:6.4.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0:6.4.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jul 10 2020 Jiri Vanek <jvanek@redhat.com> - 0:6.4.1-3
+- Rebuilt for JDK-11, see https://fedoraproject.org/wiki/Changes/Java11
+
+* Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0:6.4.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
+* Tue Nov 05 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.4.1-2
+- Mass rebuild for javapackages-tools 201902
+
+* Wed Oct 16 2019 Marian Koncek <mkoncek@redhat.com> - 6.4.1-1
+- Update to upstream version 6.4.1
+
+* Fri Oct 04 2019 Fabio Valentini <decathorpe@gmail.com> - 0:6.4.1-1
+- Update to version 6.4.1.
+
+* Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0:6.3.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
+* Fri May 24 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 6.3.1-2
+- Mass rebuild for javapackages-tools 201901
+
+* Mon May 06 2019 Marian Koncek <mkoncek@redhat.com> - 0:6.3.1-1
+- Update to upstream version 6.3.1
+- Fixes: RHBZ #1692150
+
+* Tue Feb 05 2019 Marian Koncek <mkoncek@redhat.com> - 0:6.3-1
+- Update to upstream version 6.3
+- Fixes: RHBZ #1670025
+
+* Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0:6.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
+* Thu Jul 12 2018 Fedora Release Engineering <releng@fedoraproject.org> - 0:6.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
+* Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 0:6.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
+* Sun Dec 10 2017 Michael Simacek <msimacek@redhat.com> - 0:6.2-1
+- Update to upstream version 6.2
+
+* Fri Sep 22 2017 Mikolaj Izdebski <mizdebsk@redhat.com> - 0:6.1-2
+- Conditionally build without jna
+
+* Tue Sep 19 2017 Michael Simacek <msimacek@redhat.com> - 0:6.1-1
+- Update to upstream version 6.1
+
+* Wed Jul 26 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0:6.0-0.7.20140406svn1592769
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
+* Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0:6.0-0.6.20140406svn1592769
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
+* Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 0:6.0-0.5.20140406svn1592769
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
+* Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:6.0-0.4.20140406svn1592769
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
+* Mon Aug 11 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 0:6.0-0.3.20140406svn1592769
+- Add alias for apache:bcel
+
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:6.0-0.2.20140406svn1592769
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
+* Tue May 06 2014 Michael Simacek <msimacek@redhat.com> - 0:6.0-0.1.20140406svn1592769
+- Update to upstream snapshot compatible with Java 8
+
+* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:5.2-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
+* Fri Jun 14 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 0:5.2-16
+- Complete spec file rewrite
+- Build with Maven instead of Ant
+- Remove manual subpackage
+
+* Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:5.2-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
+* Tue Nov 13 2012 Tom Callaway <spot@fedoraproject.org> - 0:5.2-14
+- Package NOTICE.txt
+
+* Tue Aug 21 2012 Andy Grimm <agrimm@gmail.com> - 0:5.2-13
+- This package should not own _mavendepmapfragdir (RHBZ#850005)
+- Build with maven, and clean up deprecated spec constructs
+- Fix pom file (See http://jira.codehaus.org/browse/MEV-592)
+
+* Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:5.2-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
+* Sun Jun 24 2012 Gerard Ryan <galileo@fedoraproject.org> - 0:5.2-11
+- Inject OSGI Manifest.
+
+* Wed Jan 11 2012 Ville Skyttä <ville.skytta@iki.fi> - 0:5.2-10
+- Specify explicit source encoding to fix build with Java 7.
+- Install jar and javadocs unversioned.
+- Crosslink with JDK javadocs.
+
+* Mon Feb 07 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:5.2-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
+* Tue Jul 13 2010 Alexander Kurtakov <akurtako@redhat.com> 0:5.2-8
+- Use global.
+- Drop gcj_support.
+- Fix groups.
+- Fix build.
+
+* Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:5.2-7.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
+* Mon Feb 23 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:5.2-6.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+
+* Thu Dec 04 2008 Permaine Cheung <pcheung at redhat.com> 0:5.2-5.1
+- Do not install poms in /usr/share/maven2/default_poms
+
+* Wed Jul  9 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 0:5.2-5
+- drop repotag
+
+* Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 0:5.2-4jpp.2
+- Autorebuild for GCC 4.3
+
+* Tue Jan 22 2008 Permaine Cheung <pcheung at redhat.com> 0:5.2-3jpp.1
+- Merge with upstream
+
+* Mon Jan 07 2008 Permaine Cheung <pcheung at redhat.com> 0:5.2-2jpp.2
+- Fixed unowned directory (Bugzilla 246185)
+
+* Fri Nov 16 2007 Ralph Apel <r.apel@r-apel.de> 0:5.2-3jpp
+- Install poms unconditionally
+- Add pom in ./maven2/default_poms
+- Add org.apache.bcel:bcel depmap frag
+
+* Wed Sep 19 2007 Permaine Cheung <pcheung at redhat.com> 0:5.2-2jpp.1
+- Update to 5.2 in Fedora
+
+* Mon Sep  4 2007 Jason Corley <jason.corley@gmail.com> 0:5.2-2jpp
+- use official 5.2 release tarballs and location
+- change vendor and distribution to macros
+- add missing requires on and maven-plugin-test, maven-plugins-base, and
+  maven-plugin-xdoc 
+- macro bracket fixes
+- remove demo subpackage (examples are not included in the distribution tarball)
+- build in mock
+
+* Wed Jun 27 2007 Ralph Apel <r.apel@r-apel.de> 0:5.2-1jpp
+- Upgrade to 5.2
+- Drop bootstrap option: not necessary any more
+- Add pom and depmap frags
+
+* Fri Feb 09 2007 Ralph Apel <r.apel@r-apel.de> 0:5.1-10jpp
+- Fix empty-%%post and empty-%%postun
+- Fix no-cleaning-of-buildroot
+
+* Fri Feb 09 2007 Ralph Apel <r.apel@r-apel.de> 0:5.1-9jpp
+- Optionally build without maven
+- Add bootstrap option
+
+* Thu Aug 10 2006 Matt Wringe <mwringe at redhat.com> 0:5.1-8jpp
+- Add missing requires for Javadoc task
+
+* Sun Jul 23 2006 Matt Wringe <mwringe at redhat.com> 0:5.1-7jpp
+- Add conditional native compilation
+- Change spec file encoding from ISO-8859-1 to UTF-8
+- Add missing BR werken.xpath and ant-apache-regexp
+
+* Tue Apr 11 2006 Ralph Apel <r.apel@r-apel.de> 0:5.1-6jpp
+- First JPP-1.7 release
+- Use tidyed sources from svn
+- Add resources to build the manual
+- Add examples to -demo subpackage
+- Build with maven by default
+- Add option to build with straight ant
+
+* Fri Nov 19 2004 David Walluck <david@jpackage.org> 0:5.1-5jpp
+- rebuild to fix packager
+
+* Sat Nov 06 2004 David Walluck <david@jpackage.org> 0:5.1-4jpp
+- rebuild with javac 1.4.2
+
+* Sat Oct 16 2004 David Walluck <david@jpackage.org> 0:5.1-3jpp
+- rebuild for JPackage 1.6
+
+* Fri Aug 20 2004 Ralph Apel <r.apel at r-apel.de> 0:5.1-2jpp
+- Build with ant-1.6.2
+
+* Sun May 11 2003 David Walluck <david@anti-microsoft.org> 0:5.1-1jpp
+- 5.1
+- update for JPackage 1.5
+
+* Mon Mar 24 2003 Nicolas Mailhot <Nicolas.Mailhot (at) JPackage.org> - 5.0-6jpp
+- For jpackage-utils 1.5
+
+* Tue Feb 25 2003 Ville Skyttä <ville.skytta@iki.fi> - 5.0-5jpp
+- Rebuild to get docdir right on modern distros.
+- Fix License tag and source file perms.
+- Built with IBM's 1.3.1SR3 (doesn't build with Sun's 1.4.1_01).
+
+* Tue Jun 11 2002 Henri Gomez <hgomez@slib.fr> 5.0-4jpp
+- use sed instead of bash 2.x extension in link area to make spec compatible
+  with distro using bash 1.1x
+
+* Tue May 07 2002 Guillaume Rousse <guillomovitch@users.sourceforge.net> 5.0-3jpp 
+- vendor, distribution, group tags
+
+* Wed Jan 23 2002 Guillaume Rousse <guillomovitch@users.sourceforge.net> 5.0-2jpp 
+- section macro
+- no dependencies for manual and javadoc package
+
+* Tue Jan 22 2002 Henri Gomez <hgomez@slib.fr> 5.0-1jpp
+- bcel is now a jakarta apache project
+- dependency on jakarta-regexp instead of gnu.regexp 
+- created manual package
+
+* Sat Dec 8 2001 Guillaume Rousse <guillomovitch@users.sourceforge.net> 4.4.1-2jpp
+- javadoc into javadoc package
+- Requires: and BuildRequires: gnu.regexp
+
+* Wed Nov 21 2001 Christian Zoffoli <czoffoli@littlepenguin.org> 4.4.1-1jpp
+- removed packager tag
+- new jpp extension
+- 4.4.1
+
+* Thu Oct 11 2001 Guillaume Rousse <guillomovitch@users.sourceforge.net> 4.4.0-2jpp
+- first unified release
+- used lower case for name
+- used original tarball
+- s/jPackage/JPackage
+
+* Mon Aug 27 2001 Guillaume Rousse <guillomovitch@users.sourceforge.net> 4.4.0-1mdk
+- first Mandrake release

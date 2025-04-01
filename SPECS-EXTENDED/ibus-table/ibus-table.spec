@@ -1,46 +1,45 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-# This package depends on automagic byte compilation
-# https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
-%global _python_bytecompile_extra 1
+## START: Set by rpmautospec
+## (rpmautospec version 0.7.3)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 1;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
 
 Name:       ibus-table
-Version:    1.12.4
-Release:    4%{?dist}
+Version:    1.17.9
+Release:    %autorelease
 Summary:    The Table engine for IBus platform
-License:    LGPLv2+
+License:    LGPL-2.1-or-later
 URL:        https://github.com/mike-fabian/ibus-table
-Source0:    https://github.com/mike-fabian/ibus-table/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:    https://github.com/mike-fabian/ibus-table/releases/download/%{version}/%{name}-%{version}.tar.gz
 Requires:       ibus > 1.3.0
-Requires:       python(abi) >= 3.3
 %{?__python3:Requires: %{__python3}}
+# To play a sound on error:
+Recommends: python3-simpleaudio
 BuildRequires:  gcc
 BuildRequires:  ibus-devel > 1.3.0
-BuildRequires:  python3-devel
-
-# Test dependencies break the package build.
-# Disabling until fixed.
-# %if 0%{?with_check}
-# BuildRequires:  libappstream-glib
-# BuildRequires:  desktop-file-utils
-# BuildRequires:  python3-mock
-# BuildRequires:  python3-gobject
-# BuildRequires:  python3-gobject-base
-# BuildRequires:  dbus-x11
-# BuildRequires:  xorg-x11-server-Xvfb
-# BuildRequires:  ibus-table-chinese-wubi-jidian
-# BuildRequires:  ibus-table-chinese-cangjie
-# BuildRequires:  ibus-table-chinese-stroke5
-
-# Missing test dependencies:
-# BuildRequires:  appstream
-# BuildRequires:  ibus-table-code
-# BuildRequires:  ibus-table-latin
-# BuildRequires:  ibus-table-translit
-# BuildRequires:  ibus-table-tv
-# A window manger is needed for the GUI test
-# BuildRequires:  i3
-# %endif
+BuildRequires:  python3-devel >= 3.6.0
+# for the unit tests
+%if 0%{?fedora}
+BuildRequires:  appstream
+%endif
+BuildRequires:  docbook-utils
+BuildRequires:  libappstream-glib
+BuildRequires:  desktop-file-utils
+BuildRequires:  python3-gobject
+BuildRequires:  python3-gobject-base
+BuildRequires:  dbus-x11
+#BuildRequires:  ibus-table-chinese-wubi-jidian
+#BuildRequires:  ibus-table-chinese-cangjie
+#BuildRequires:  ibus-table-chinese-stroke5
+BuildRequires:  ibus-table-code
+BuildRequires:  ibus-table-latin
+BuildRequires:  ibus-table-translit
+BuildRequires:  ibus-table-tv
+BuildRequires: make
 
 Obsoletes:   ibus-table-additional < 1.2.0.20100111-5
 
@@ -70,77 +69,59 @@ the functionality of the installed %{name} package.
 %build
 export PYTHON=%{__python3}
 %configure --disable-static --disable-additional --enable-installed-tests
-%__make %{?_smp_mflags}
+%make_build
 
 %install
 %__rm -rf $RPM_BUILD_ROOT
 export PYTHON=%{__python3}
-%__make DESTDIR=${RPM_BUILD_ROOT} NO_INDEX=true install pkgconfigdir=%{_datadir}/pkgconfig
+%make_install NO_INDEX=true pkgconfigdir=%{_datadir}/pkgconfig
+%py_byte_compile %{python3} %{buildroot}/usr/share/ibus-table/engine
+%py_byte_compile %{python3} %{buildroot}/usr/share/ibus-table/setup
 
 %find_lang %{name}
 
-# Check section disabled as it leaves an unmountable /dev file, which breaks the build environment.
-# %check
-# appstreamcli validate --pedantic --explain --no-net %{buildroot}/%{_datadir}/metainfo/*.appdata.xml
-# appstream-util validate-relax --nonet %{buildroot}/%{_datadir}/metainfo/*.appdata.xml
-# desktop-file-validate \
-#     $RPM_BUILD_ROOT%{_datadir}/applications/ibus-setup-table.desktop
-# pushd engine
-# # run doctests
-#     python3 table.py
-#     python3 it_util.py
-# popd
-# mkdir -p /tmp/glib-2.0/schemas/
-# cp org.freedesktop.ibus.engine.table.gschema.xml \
-#    /tmp/glib-2.0/schemas/org.freedesktop.ibus.engine.table.gschema.xml
-# glib-compile-schemas /tmp/glib-2.0/schemas #&>/dev/null || :
-# export XDG_DATA_DIRS=/tmp
-# eval $(dbus-launch --sh-syntax)
-# dconf dump /
-# dconf write /org/freedesktop/ibus/engine/table/wubi-jidian/chinesemode 1
-# dconf write /org/freedesktop/ibus/engine/table/wubi-jidian/spacekeybehavior false
-# dconf dump /
-# export DISPLAY=:1
-# Xvfb $DISPLAY -screen 0 1024x768x16 &
-# # A window manager and and ibus-daemon are needed to run the GUI
-# # test tests/test_gtk.py, for example i3 can be used.
-# #
-# # To debug what is going on if there is a problem with the GUI test
-# # add BuildRequires: x11vnc and start a vnc server:
-# #
-# #     x11vnc -display $DISPLAY -unixsock /tmp/mysock -bg -nopw -listen localhost -xkb
-# #
-# # Then one can view what is going on outside of the chroot with vncviewer:
-# #
-# #     vncviewer /var/lib/mock/fedora-32-x86_64/root/tmp/mysock
-# #
-# # The GUI test will be skipped if XDG_SESSION_TYPE is not x11 or wayland.
-# #
-# #ibus-daemon -drx
-# #touch /tmp/i3config
-# #i3 -c /tmp/i3config &
-# #export XDG_SESSION_TYPE=x11
+%check
+%if 0%{?fedora}
+appstreamcli validate --pedantic --explain --no-net %{buildroot}/%{_datadir}/metainfo/*.appdata.xml
+%endif
+appstream-util validate-relax --nonet %{buildroot}/%{_datadir}/metainfo/*.appdata.xml
+desktop-file-validate \
+    $RPM_BUILD_ROOT%{_datadir}/applications/ibus-setup-table.desktop
+pushd engine
+# run doctests
+    python3 table.py -v
+    python3 it_util.py -v
+popd
+mkdir -p /tmp/glib-2.0/schemas/
+cp org.freedesktop.ibus.engine.table.gschema.xml \
+   /tmp/glib-2.0/schemas/org.freedesktop.ibus.engine.table.gschema.xml
+glib-compile-schemas /tmp/glib-2.0/schemas #&>/dev/null || :
+export XDG_DATA_DIRS=/tmp
+eval $(dbus-launch --sh-syntax)
+dconf dump /
+dconf write /org/freedesktop/ibus/engine/table/wubi-jidian/chinesemode 1
+dconf write /org/freedesktop/ibus/engine/table/wubi-jidian/spacekeybehavior false
+dconf dump /
 
-# make check && rc=0 || rc=1
-# cat tests/*.log
-# if [ $rc != 0 ] ; then
-#     exit $rc
-# fi
-
-%post
-[ -x %{_bindir}/ibus ] && \
-  %{_bindir}/ibus write-cache --system &>/dev/null || :
-
-%postun
-[ -x %{_bindir}/ibus ] && \
-  %{_bindir}/ibus write-cache --system &>/dev/null || :
-
+make check && rc=0 || rc=1
+cat tests/*.log
+if [ $rc != 0 ] ; then
+    exit $rc
+fi
 
 %files -f %{name}.lang
 %doc AUTHORS COPYING README
 %{_datadir}/%{name}
 %{_datadir}/metainfo/*.appdata.xml
 %{_datadir}/ibus/component/table.xml
+%{_datadir}/icons/hicolor/16x16/apps/ibus-table.png
+%{_datadir}/icons/hicolor/22x22/apps/ibus-table.png
+%{_datadir}/icons/hicolor/32x32/apps/ibus-table.png
+%{_datadir}/icons/hicolor/48x48/apps/ibus-table.png
+%{_datadir}/icons/hicolor/64x64/apps/ibus-table.png
+%{_datadir}/icons/hicolor/128x128/apps/ibus-table.png
+%{_datadir}/icons/hicolor/256x256/apps/ibus-table.png
+%{_datadir}/icons/hicolor/scalable/apps/ibus-table.svg
 %{_datadir}/applications/ibus-setup-table.desktop
 %{_datadir}/glib-2.0/schemas/org.freedesktop.ibus.engine.table.gschema.xml
 %{_bindir}/%{name}-createdb
@@ -158,16 +139,306 @@ export PYTHON=%{__python3}
 %{_datadir}/installed-tests/%{name}
 
 %changelog
-* Fri Sep 01 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.4-4
-- Disabling test dependencies due to build failures.
+## START: Generated by rpmautospec
+* Wed Dec 11 2024 Mike FABIAN <mfabian@redhat.com> - 1.17.9-1
+- Update to 1.17.9
+- Make the setup tool use the wrapper itb_sound.py instead of using
+  simpleaudio unconditionally (Resolves: github-mike-fabian-issue#162)
+- Translation update from Weblate (new language Kabyle: kab 29.3%%)
 
-* Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.4-3
-- Disabling missing test dependency.
-- License verified.
+* Wed Sep 11 2024 Mike FABIAN <mfabian@redhat.com> - 1.17.8-1
+- Update to 1.17.8
+- Update Unihan_Variants.txt and regenerate engine/chinese_variants.py for
+  Unicode 16.0.0 release
+- Translation update from Weblate (new: el 17.3%%)
 
-* Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.12.4-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Gate build-time check requirements behind the %%with_check macro
+* Sun Aug 25 2024 Mike FABIAN <mfabian@redhat.com> - 1.17.7-1
+- Update to 1.17.7
+- Translation update from Weblate (fr 100%%, ru 93.3%%)
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.17.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jun 27 2024 Mike FABIAN <mfabian@redhat.com> - 1.17.6-1
+- Update to 1.17.6
+- Yet another fix to make it possible again to use keys with Unicode
+  keysyms in keybindings and make it work with all known versions of ibus
+  Resolves: https://github.com/kaio/ibus-table/issues/85 See also:
+  https://github.com/mike-fabian/ibus-typing-booster/issues/497 (This makes
+  the new keybinding feature and test cases work with all known versions of
+  ibus)
+
+* Wed Jun 19 2024 Mike FABIAN <mfabian@redhat.com> - 1.17.5-3
+- Remove CI test dependency on weston
+
+* Wed Jun 19 2024 Mike FABIAN <mfabian@redhat.com> - 1.17.5-2
+- Remove dependency on Xvfb from CI tests
+
+* Wed Jun 19 2024 Mike FABIAN <mfabian@redhat.com> - 1.17.5-1
+- Update to 1.17.5
+- Drop Python2 support (using pyupgrade --py3-plus *.py)
+- Make it possible to use keys with Unicode keysyms in keybindings
+  (requires ibus &gt; 1.5.30) (Resolves: https://github.com/mike-
+  fabian/ibus-typing-booster/issues/497, same problem for ibus-table)
+- Use `frames_per_buffer=chunk_size` option in `self._paudio.open()`
+  (Resolves: https://bugzilla.redhat.com/show_bug.cgi?id=2238746#c3)
+- Translation update from Weblate (cs 36.6%%, ja 45.3%%, zh_CN 92.0%%)
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.17.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.17.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Nov 10 2023 Mike FABIAN <mfabian@redhat.com> - 1.17.4-1
+- Update to 1.17.4
+- Fix compose support for ibus >= 1.5.28
+  (Resolves: https://github.com/mike-fabian/ibus-table/issues/145)
+- Translation update from Weblate (New language, Russian, (ru) 80%)
+- Use “<developer><name>…</name></developer>” in ibus-table.appdata.xml instead of “<developer_name>…</developer_name>”
+  Because </developer_name> is deprecated and it makes the build fail on Fedora rawhide.
+
+* Thu Sep 14 2023 Mike FABIAN <mfabian@redhat.com> - 1.17.3-1
+- Update to 1.17.3
+- Support several backends for playing sounds
+  Resolves: rhbz#2237674 https://bugzilla.redhat.com/show_bug.cgi?id=2237674
+- Update Unihan_Variants.txt and regenerate engine/chinese_variants.py to Unicode Version 15.1.0
+
+* Mon Aug 21 2023 Mike FABIAN <mfabian@redhat.com> - 1.17.2-1
+- Update to 1.17.2
+- Translation update from Weblate (de 100%, tr 100%)
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.17.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jul 10 2023 Mike FABIAN <mfabian@redhat.com> - 1.17.1-1
+- Update to 1.17.1
+- Fix mypy warnings
+- Return empty program_name and window_title in get_active_window_xprop()
+  when xprop results are unexpected (Resolves: rhbz#2215466)
+- Translation update from Weblate (si 10.0%)
+
+* Fri Apr 07 2023 Mike FABIAN <mfabian@redhat.com> - 1.17.0-1
+- Update to 1.17.0
+- New option commit_invalid_mode: Choose what happens when a
+  character not in valid input characters is typed
+  (Resolves: github-mike-fabian-issue#133)
+- Translation update from Weblate (de 100%, uk 100%)
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.16.14-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Nov 25 2022 Mike FABIAN <mfabian@redhat.com> - 1.16.14-2
+- Migrate license tag to SPDX
+
+* Thu Nov 10 2022 Mike FABIAN <mfabian@redhat.com> - 1.16.14-1
+- Update to 1.16.14
+- Fix a problem in C/POSIX and invalid locales:
+  Use lower() on LC_MESSAGES only if it is a string and not None
+  Resolves: https://github.com/mike-fabian/ibus-table/issues/130
+  Resolves: rhbz#2131410 https://bugzilla.redhat.com/show_bug.cgi?id=2131410
+
+* Tue Nov 01 2022 Mike FABIAN <mfabian@redhat.com> - 1.16.13-1
+- Update to 1.16.13
+- Get program name of focused window also when ibus cannot get it
+- Use focus id if available (it is available for ibus >= 1.5.27)
+- Use IBus.PreeditFocusMode.COMMIT and make sure the input is
+  cleared and the UI updated when the focus changes
+  (Resolves: https://github.com/mike-fabian/ibus-table/issues/129)
+- Do not reset input purpose on focus out
+  (See: https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/5966#note_1576732)
+- Do not commit by index when OSK is visible
+  (Resolves: https://github.com/mike-fabian/ibus-table/issues/128)
+
+* Mon Sep 05 2022 Mike FABIAN <mfabian@redhat.com> - 1.16.12-1
+- Update to 1.16.12
+- Stop using locale.getdefaultlocale() because it is deprecated in Python
+  3.11 and will be removed in Python 3.13
+  Resolves: https://github.com/mike-fabian/ibus-table/issues/120
+- Add 128x128, 256x256, and svg (remote) icons to ibus-table.appdata.xml
+
+* Sat Aug 06 2022 Mike FABIAN <mfabian@redhat.com> - 1.16.11-1
+- Update to 1.16.11
+- Remove hashbang from chinese_variants.py and tabcreatedb.py
+  (Resolves: https://github.com/mike-fabian/ibus-table/issues/118)
+
+* Tue Aug 02 2022 Mike FABIAN <mfabian@redhat.com> - 1.16.10-1
+- Update to 1.16.10
+- Add png versions of the ibus-table.svg icon
+- Add (remote) icon to ibus-table.appdata.xml
+- Add screenshot to ibus-table.appdata.xml
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.16.9-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Mike FABIAN <mfabian@redhat.com> - 1.16.9-1
+- Update to 1.16.9
+- Require Python >= 3.6 to build
+- Use a less exact type hint to make building tables from
+  sources work with Python 3.6 as well
+- Update home page URLs (code.google.com is not used anymore)
+
+* Thu Apr 28 2022 Mike FABIAN <mfabian@redhat.com> - 1.16.8-1
+- Update to 1.16.8
+- Update Unihan_Variants.txt from “2021-12-01 Unicode 15.0.0
+  draft” to “2022-04-26 Unicode 15.0.0 draft” and regenerate
+  chinese_variants.py. All our fixes to Unihan_Variants.txt
+  are included upstream.
+- Update translations from Weblate (fa, fr updated)
+
+* Fri Jan 28 2022 Mike FABIAN <mfabian@redhat.com> - 1.16.7-1
+- Update to 1.16.7
+- Ignore MOD3_MASK (Scroll Lock) when matching key bindings
+  (Resolves: https://github.com/mike-fabian/ibus-table/issues/102)
+- When a Modifier key release matches a hotkey command, return False not True.
+  (Resolves: https://github.com/mike-fabian/ibus-table/issues/98)
+  (Resolves: rhbz#2038973 https://bugzilla.redhat.com/show_bug.cgi?id=2038973)
+
+* Mon Jan 24 2022 Mike FABIAN <mfabian@redhat.com> - 1.16.4-1
+- Update to 1.16.4
+- Fix more errors in Unihan_Variants.txt by checking against
+  a Traditional Chinese dictionary
+  (Resolves: https://github.com/mike-fabian/ibus-table/issues/100)
+- Fix some errors in Unihan_Variants.txt
+- Update translations from Weblate (es updated to 100%)
+
+* Fri Jan 21 2022 Mike FABIAN <mfabian@redhat.com> - 1.16.3-1
+- Update to 1.16.3
+- Fix a few errors in Unihan_Variants.txt
+  (Resolves: https://github.com/mike-fabian/ibus-table/issues/96)
+- 栗 U+6817 is used in Traditional Chinese as well.
+  (Resolves: https://github.com/mike-fabian/ibus-table/issues/95)
+- Update Unihan_Variants.txt from “2021-08-06 Unicode 14.0.0
+  final” to “2021-12-01 Unicode 1 5.0.0 draft” and regenerate
+  engine/chinese_variants.py
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.16.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jan 18 2022 Mike FABIAN <mfabian@redhat.com> - 1.16.0-1
+- Update to 1.16.0
+- Make true the default for “rememberinputmode”
+- Save “inputmode” to gsettings
+  and add a “rememberinputmode” gsettings. This makes it
+  possible to change the current input mode from the command
+  line. And with “rememberinputmode” one can choose whether
+  the last used input mode should be remembered and be used
+  again when a new session starts or whether a new session
+  should always start in table mode.
+  (Resolves: https://github.com/mike-fabian/ibus-table/issues/85)
+- Skip cangjie5 and erbi-qs test cases if the tables are too old
+- Replace deprecated module “optparse” with “argparse”
+
+* Tue Jan 11 2022 Mike FABIAN <mfabian@redhat.com> - 1.15.0-1
+- Update to 1.15.0
+- Fix problems with goucima for erbi-qs table
+  (Resolves: https://github.com/kaio/ibus-table/issues/77)
+- Update Unihan_Variants.txt to “2021-08-06 Unicode 14.0.0 final”
+  and regenerate engine/chinese_variants.py
+- Fix typo in translatable message, by Rafael Fontenelle
+  (https://github.com/mike-fabian/ibus-table/pull/82)
+
+* Wed Aug 25 2021 Mike FABIAN <mfabian@redhat.com> - 1.14.1-1
+- If an exception happens when trying to play a sound, catch it.
+  I have no idea how to reproduce that bug. But catching the
+  exception should fix it, it should make ibus-table continue
+  working normally if any such serious problem with playing
+  sounds occurs. Without sound of course but it should not
+  stop working.
+  (Resolves: rhbz#1995955 https://bugzilla.redhat.com/show_bug.cgi?id=1995955)
+- When changing the error sound file with the setup tool, play
+  it. To make the user hear immediately what kind of sound
+  was selected.
+- Update translations from Weblate
+- Remove colons after “Auto select:”, “Auto wildcard:”, and “Use dark theme:”
+  (Resolves: https://github.com/mike-fabian/ibus-table/issues/70#issuecomment-884664898)
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.14.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jul 21 2021 Mike FABIAN <mfabian@redhat.com> - 1.14.0-1
+- Update to 1.14.0
+- Add option to set dynamic adjust at runtime
+- Resolves: https://github.com/mike-fabian/ibus-table/issues/70
+- Also add a button to forget all the data learned by typing and selecting candidates.
+- Add options to play sound file on error
+- Resolves: https://github.com/kaio/ibus-table/issues/75
+- Use checkbuttons instead of [Yes/No] comboboxes
+- Hide options which make no sense for certain tables instead of just graying them out
+- Add “Recommends: python3-simpleaudio” (Without that the new sound option is ignored)
+
+* Fri Jun 18 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.13.3-2
+- Delete ibus write-cache in scriptlet
+
+* Wed Jun 09 2021 Mike FABIAN <mfabian@redhat.com> - 1.13.3-1
+- Update to 1.13.3
+- Fix a few more bugs in Unihan_Variants.txt, the characters
+  着枱云裡復采吓尸揾 are used both in simplified and traditional
+  Chinese (some of them in traditional Chinese in Hong Kong only).
+  (Resolves: https://github.com/ibus/ibus/issues/2323)
+
+* Tue Jun 08 2021 Mike FABIAN <mfabian@redhat.com> - 1.13.2-1
+- Update to 1.13.2
+- Fix bug in Unihan_Variants.txt, 只 U+53EA is both simplified
+  and traditional Chinese
+  (Resolves: https://github.com/kaio/ibus-table/issues/74)
+- Update Chinese variant detection by Unihan_Variants.txt to
+  the version “2021-05-18 Unicode 14.0.0” (draft version of Unicode 14)
+- Update translations from Weblate (updates for es (100%), pt_BR (100%))
+
+* Sun May 16 2021 Mike FABIAN <mfabian@redhat.com> - 1.13.1-1
+- Update to 1.13.1
+- Fix reading the source file for the suggestions phrase.txt.bz2
+- Update translations from Weblate (updates for ca, fr)
+
+* Tue May 04 2021 Mike FABIAN <mfabian@redhat.com> - 1.13.0-1
+- Update to 1.13.0
+- Make switch to pinyin mode also happen immediately even
+  when the preedit is not empty (for consistency)
+- Make rolling the mouse wheel in the candidate area of the lookup table work
+- Commit English input and then switch into direct mode
+  (Resolves: https://github.com/kaio/ibus-table/issues/68)
+- Apply a couple modes immediately when changed
+- Add a dark theme option
+  (Resolves: https://github.com/kaio/ibus-table/issues/67)
+- Show all the tabkeys when using wildcards
+- Remove Python2 compatibility stuff
+- Start adding some type hints
+- Update translations from Weblate (update for de, ja, tr, uk, zh_CN)
+
+* Mon May 03 2021 Mike FABIAN <mfabian@redhat.com> - 1.12.6-1
+- Update to 1.12.6
+- In main.py “import factory” only when the --xml option is not used
+- Resolves: rhbz#1955283
+- Make the keybindings treeview sortable by clicking the column headers
+- Update translations from Weblate (update for pt_BR, now 100%)
+
+* Wed Apr 21 2021 Mike FABIAN <mfabian@redhat.com> - 1.12.5-3
+- Resolves: rhbz#1948197 Change post to posttrans
+
+* Mon Apr 19 2021 Mike FABIAN <mfabian@redhat.com> - 1.12.5-2
+- Remove post and postun (Related: rhbz#1948197)
+
+* Fri Mar 05 2021 Mike FABIAN <mfabian@redhat.com> - 1.12.5-1
+- Update to 1.12.5
+- Return False in _execute_command_commit_candidate_number(self, number)
+  if number out of range
+- Resolves: https://github.com/moebiuscurve/ibus-table-others/issues/21
+- remove Use-from-unittest-import-mock-instead-of-just-import.patch
+  (included upstream)
+- Update translations from Weblate (New translation for Sinhala (si) started)
+
+* Wed Feb 17 2021 Mike FABIAN <mfabian@redhat.com> - 1.12.4-5
+- Use “BuildRequires:  appstream” only on Fedora
+
+* Tue Feb 16 2021 Mike FABIAN <mfabian@redhat.com> - 1.12.4-4
+- Remove i3 from BuildRequires
+
+* Tue Feb 02 2021 Mike FABIAN <mfabian@redhat.com> - 1.12.4-3
+- Use standard library mock
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.12.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Sun Jan 24 2021 Mike FABIAN <mfabian@redhat.com> - 1.12.4-1
 - Update to 1.12.4
@@ -217,6 +488,9 @@ export PYTHON=%{__python3}
   to make that possible.
 - Resolves: https://github.com/ibus/ibus/issues/2241
 
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Wed Jul 15 2020 Mike FABIAN <mfabian@redhat.com> - 1.10.1-1
 - Update to 1.10.1
 - Add GUI test
@@ -233,6 +507,13 @@ export PYTHON=%{__python3}
 - Use python logging module with log file rotation instead
   of writing to stdout/stderr
 - Update translations from Weblate (updated de, es, fr, pt_BR, pt_PT, tr, uk)
+
+* Mon Jun 22 2020 Mike FABIAN <mfabian@redhat.com> - 1.9.25-3
+- Byte compile python files namually,
+  see: https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_3
+
+* Thu Jun 04 2020 Miro Hrončok <mhroncok@redhat.com> - 1.9.25-2
+- Don't explicitly require python(abi) >= 3.3
 
 * Wed Feb 12 2020 Mike FABIAN <mfabian@redhat.com> - 1.9.25-1
 - update to 1.9.25
@@ -797,3 +1078,5 @@ export PYTHON=%{__python3}
 
 * Tue Aug 19 2008 Yu Yuwei <acevery@gmail.com> - 0.1.1.20080829-1
 - The first version.
+
+## END: Generated by rpmautospec

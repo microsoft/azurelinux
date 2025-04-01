@@ -1,3 +1,5 @@
+# Default to no static libraries
+%{!?with_static: %global with_static 0}
 %bcond_with bundled_libpfm
 # rdma is not available
 %ifarch %{arm}
@@ -5,16 +7,23 @@
 %else
 %{!?with_rdma: %global with_rdma 1}
 %endif
+%ifarch %{ix86}
+%{!?with_pcp: %global with_pcp (0%{?fedora} < 40 && 0%{?rhel} < 10)}
+%else
+%{!?with_pcp: %global with_pcp 1}
+%endif
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 5.7.0
+Version: 7.1.0
 Release: 5%{?dist}
-License: BSD
+License: BSD-3-Clause
 Requires: papi-libs = %{version}-%{release}
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
+Patch1: papi-python3.patch
+Patch5: papi-nostatic.patch
+Patch6: papi-libsde.patch
+BuildRequires: make
 BuildRequires: autoconf
 BuildRequires: doxygen
 BuildRequires: ncurses-devel
@@ -23,14 +32,20 @@ BuildRequires: kernel-headers >= 2.6.32
 BuildRequires: chrpath
 BuildRequires: lm_sensors-devel
 %if %{without bundled_libpfm}
-BuildRequires: libpfm-devel >= 4.6.0-1
+BuildRequires: libpfm-devel >= 4.13.0-1
+%if %{with_static}
 BuildRequires: libpfm-static >= 4.6.0-1
+%endif
 %endif
 # Following required for net component
 BuildRequires: net-tools
 %if  %{with_rdma}
 # Following required for inifiband component
 BuildRequires: rdma-core-devel
+BuildRequires: infiniband-diags-devel
+%endif
+%if %{with_pcp}
+BuildRequires: pcp-libs-devel
 %endif
 BuildRequires: perl-generators
 #Right now libpfm does not know anything about s390 and will fail
@@ -41,12 +56,14 @@ PAPI provides a programmer interface to monitor the performance of
 running programs.
 
 %package libs
+License: BSD-3-Clause
 Summary: Libraries for PAPI clients
 %description libs
 This package contains the run-time libraries for any application that wishes
 to use PAPI.
 
 %package devel
+License: BSD-3-Clause
 Summary: Header files for the compiling programs with PAPI
 Requires: papi = %{version}-%{release}
 Requires: papi-libs = %{version}-%{release}
@@ -57,6 +74,7 @@ libraries and interfaces. This is required for rebuilding any program
 that uses PAPI.
 
 %package testsuite
+License: BSD-3-Clause
 Summary: Set of tests for checking PAPI functionality
 Requires: papi = %{version}-%{release}
 Requires: papi-libs = %{version}-%{release}
@@ -64,44 +82,59 @@ Requires: papi-libs = %{version}-%{release}
 PAPI-testsuite includes compiled versions of papi tests to ensure
 that PAPI functions on particular hardware.
 
+%if %{with_static}
 %package static
+License: BSD-3-Clause
 Summary: Static libraries for the compiling programs with PAPI
 Requires: papi = %{version}-%{release}
 %description static
 PAPI-static includes the static versions of the library files for
 the PAPI user-space libraries and interfaces.
+%endif
 
 %prep
 %setup -q
+%patch 1 -p1 -b .python3
+%patch 5 -p1
+%patch 6 -p1 -b .flags
 
 %build
+
 %if %{without bundled_libpfm}
 # Build our own copy of libpfm.
 %global libpfm_config --with-pfm-incdir=%{_includedir} --with-pfm-libdir=%{_libdir}
+%endif
+
+%if %{with_static}
+%global static_lib_config --with-static-lib=yes
+%else
+%global static_lib_config --with-static-lib=no
+%endif
+
+# set up environment variable for the various components
+# cuda
+# host_micpower
+%if  %{with_rdma}
+  export PAPI_INFINIBAND_UMAD_ROOT=/usr
+%endif
+# lmsensors
+export PAPI_LMSENSORS_ROOT=/usr
+#pushd vmware; ./configure; popd
+%if %{with_pcp}
+%global pcp_enable pcp
+export PAPI_PCP_ROOT=/usr
 %endif
 
 cd src
 autoconf
 %configure --with-perf-events \
 %{?libpfm_config} \
---with-static-lib=yes --with-shared-lib=yes --with-shlib --with-shlib-tools \
---with-components="appio coretemp example infiniband lmsensors lustre micpower mx net rapl stealtime"
+%{?static_lib_config} \
+--with-shared-lib=yes --with-shlib-tools \
+--with-components="appio coretemp example infiniband lmsensors lustre micpower mx net %{?pcp_enable} rapl stealtime"
 # implicit enabled components: perf_event perf_event_uncore
 #components currently left out because of build configure/build issues
 # --with-components="bgpm coretemp_freebsd cuda host_micpower nvml vmware"
-
-pushd components
-#pushd cuda; ./configure; popd
-#pushd host_micpower; ./configure; popd
-%if  %{with_rdma}
-pushd infiniband_umad; %configure; popd
-%endif
-pushd lmsensors; \
- %configure --with-sensors_incdir=/usr/include/sensors \
- --with-sensors_libdir=%{_libdir}; \
- popd
-#pushd vmware; ./configure; popd
-popd
 
 #DBG workaround to make sure libpfm just uses the normal CFLAGS
 DBG="" make %{?_smp_mflags}
@@ -118,23 +151,25 @@ rm -rf $RPM_BUILD_ROOT
 cd src
 make DESTDIR=$RPM_BUILD_ROOT LDCONFIG=/bin/true install-all
 
-chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
+# Scrub the rpath/runpath from all the binaries.
+find %{buildroot} -type f -executable ! -iname "*.py" ! -iname "*.sh" | xargs chrpath --delete
 
 %files
 %{_bindir}/*
 %dir /usr/share/papi
 /usr/share/papi/papi_events.csv
-%doc INSTALL.txt README LICENSE.txt RELEASENOTES.txt
+%doc INSTALL.txt README.md LICENSE.txt RELEASENOTES.txt
 %doc %{_mandir}/man1/*
 
 %ldconfig_scriptlets libs
 
 %files libs
 %{_libdir}/*.so.*
-%doc INSTALL.txt README LICENSE.txt RELEASENOTES.txt
+%doc INSTALL.txt README.md LICENSE.txt RELEASENOTES.txt
 
 %files devel
 %{_includedir}/*.h
+%{_includedir}/*.hpp
 %if %{with bundled_libpfm}
 %{_includedir}/perfmon/*.h
 %endif
@@ -150,14 +185,92 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 /usr/share/papi/components
 /usr/share/papi/testlib
 
+%if %{with_static}
 %files static
 %{_libdir}/*.a
+%endif
 
 %changelog
-* Tue Mar 23 2021 Henry Li <lihl@microsoft.com> - 5.7.0-5
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove infiniband-diags-devel from build requirement since it's already obsoleted
-  by rdma-core-devel from CBL-Mariner. 
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.1.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Apr 26 2024 William Cohen <wcohen@redhat.com> - 7.1.0-4
+- Ensure sde library built with proper flags. (RHEL-33515)
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.1.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.1.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Dec 21 2023 William Cohen <wcohen@redhat.com> - 7.1.0-1
+- Rebase to official papi-7.1.0.
+
+* Mon Dec 18 2023 William Cohen <wcohen@redhat.com> - 7.0.1-7
+- Fix i686 rawhide FTBFS. (rhbz#2254963)
+
+* Mon Dec 18 2023 Florian Weimer <fweimer@redhat.com> - 7.0.1-6
+- Backport upstream patch, add new patch for autoconf C compatibility
+
+* Wed Aug 9 2023 William Cohen <wcohen@redhat.com> - 7.0.1-5
+- migrated to SPDX license
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 7.0.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Mar 28 2023 William Cohen <wcohen@redhat.com> - 7.0.1-3
+- Rebuild with libpfm-4.13.0.
+
+* Wed Mar 15 2023 William Cohen <wcohen@redhat.com> - 7.0.1-2
+- Bump NVR and rebuild.
+
+* Tue Mar 14 2023 William Cohen <wcohen@redhat.com> - 7.0.1-1
+- Rebase to official papi-7.0.1. (rhbz#2177906)
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 7.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sun Nov 27 2022 Florian Weimer <fweimer@redhat.com> - 7.0.0-2
+- Port configure script to C99 (#2148723)
+
+* Wed Nov 16 2022 William Cohen <wcohen@redhat.com> - 7.0.0-1
+- Rebase to official papi-7.0.0.
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Nov 19 2021 William Cohen <wcohen@redhat.com> - 6.0.0-10
+- Correct initialization for stealtime component.
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jun 2 2021 William Cohen <wcohen@redhat.com> - 6.0.0-8
+- Scrub rpaths from all executables.
+
+* Thu Jan 28 2021 William Cohen <wcohen@redhat.com> - 6.0.0-7
+- By default disable genaration of static libraries.
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Dec 17 2020 William Cohen <wcohen@redhat.com> - 6.0.0-5
+- Remove iozone source code. (#1901077)
+
+* Mon Nov 09 2020 William Cohen <wcohen@redhat.com> - 6.0.0-4
+- Add Fujitsu A64FX presets.
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 01 2020 Jeff Law <law@redhat.com> - 6.0.0-2
+- Disable LTO
+
+* Wed Mar 04 2020 William Cohen <wcohen@redhat.com> - 6.0.0-1
+- Rebase to official papi-6.0.0.
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.7.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

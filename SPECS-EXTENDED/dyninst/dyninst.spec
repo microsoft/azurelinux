@@ -1,37 +1,38 @@
 Summary: An API for Run-time Code Generation
-License: LGPLv2+
+License: LGPL-2.1-or-later AND GPL-3.0-or-later WITH Bison-exception-2.2 AND LicenseRef-Fedora-Public-Domain AND BSD-3-Clause
 Name: dyninst
-Release: 19%{?dist}
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+Group: Development/Libraries
+Release: 7%{?dist}
 URL: http://www.dyninst.org
-Version: 10.1.0
+Version: 12.3.0
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
 
+%define __testsuite_version 12.3.0
 Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
-Source1: https://github.com/dyninst/testsuite/archive/v%{version}/testsuite-%{version}.tar.gz
+Source1: https://github.com/dyninst/testsuite/archive/v%{__testsuite_version}/testsuite-%{__testsuite_version}.tar.gz
 
-Patch1: dyninst-10.1.0-result.patch
-Patch2: testsuite-10.1.0-gettid.patch
-Patch3: testsuite-10.1.0-386.patch
-Patch4: dyninst-10.1.0-aarch-regs.patch
-Patch5: gcc-11-fix.patch
+Patch1: dwarf-error.patch
+Patch2: onetbb.patch
+# Support cmake 3.27 - https://github.com/dyninst/dyninst/pull/1438
+Patch3: dyninst-cmake3.27.patch
 
 %global dyninst_base dyninst-%{version}
-%global testsuite_base testsuite-%{version}
+%global testsuite_base testsuite-%{__testsuite_version}
 
 BuildRequires: gcc-c++
 BuildRequires: elfutils-devel
 BuildRequires: elfutils-libelf-devel
+BuildRequires: elfutils-debuginfod-client-devel
 BuildRequires: boost-devel
 BuildRequires: binutils-devel
 BuildRequires: cmake
 BuildRequires: libtirpc-devel
 BuildRequires: tbb tbb-devel
+BuildRequires: tex-latex
 
 # Extra requires just for the testsuite
-BuildRequires: gcc-gfortran libstdc++-static libxml2-devel
-BuildRequires: glibc-static >= 2.38-9%{?dist}
+BuildRequires: gcc-gfortran libxml2-devel
+BuildRequires: make
 
 # Testsuite files should not provide/require anything
 %{?filter_setup:
@@ -52,33 +53,33 @@ the creation of tools and applications that use run-time code patching.
 
 %package doc
 Summary: Documentation for using the Dyninst API
+Group: Documentation
 %description doc
 dyninst-doc contains API documentation for the Dyninst libraries.
+License: LGPL-2.1-or-later
 
 %package devel
 Summary: Header files for compiling programs with Dyninst
+Group: Development/System
 Requires: dyninst = %{version}-%{release}
 Requires: boost-devel
 Requires: tbb-devel
+License: LGPL-2.1-or-later AND BSD-3-Clause AND MIT
+# FindTBB.cmake: presumed MIT, removed in next version of dyninst
 
 %description devel
 dyninst-devel includes the C header files that specify the Dyninst user-space
 libraries and interfaces. This is required for rebuilding any program
 that uses Dyninst.
 
-%package static
-Summary: Static libraries for the compiling programs with Dyninst
-Requires: dyninst-devel = %{version}-%{release}
-%description static
-dyninst-static includes the static versions of the library files for
-the dyninst user-space libraries and interfaces.
-
 %package testsuite
 Summary: Programs for testing Dyninst
+Group: Development/System
 Requires: dyninst = %{version}-%{release}
 Requires: dyninst-devel = %{version}-%{release}
-Requires: dyninst-static = %{version}-%{release}
-Requires: glibc-static
+License: BSD-3-Clause AND LGPL-2.1-or-later
+
+
 %description testsuite
 dyninst-testsuite includes the test harness and target programs for
 making sure that dyninst works properly.
@@ -87,11 +88,11 @@ making sure that dyninst works properly.
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
 
-%patch 1 -p1 -b.result
-%patch 2 -p1 -b.gettid
-%patch 3 -p1 -b.386
-%patch 4 -p1 -b.aarch
-%patch 5 -p1
+pushd %{dyninst_base}
+%patch -P1 -p1 -b .dwerr
+%patch -P2 -p1 -b .onetbb
+%patch -P3 -p1 -b .cmake3.27
+popd
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
@@ -104,49 +105,56 @@ cd %{dyninst_base}
 
 CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
 LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
+%ifarch %{ix86}
+    CFLAGS="$CFLAGS -fno-lto -march=i686"
+    LDFLAGS="$LDFLAGS -fno-lto"
+%endif    
 CXXFLAGS="$CFLAGS"
 export CFLAGS CXXFLAGS LDFLAGS
 
 %cmake \
- -DENABLE_STATIC_LIBS=1 \
+ -DENABLE_DEBUGINFOD=1 \
  -DINSTALL_LIB_DIR:PATH=%{_libdir}/dyninst \
  -DINSTALL_INCLUDE_DIR:PATH=%{_includedir}/dyninst \
  -DINSTALL_CMAKE_DIR:PATH=%{_libdir}/cmake/Dyninst \
  -DCMAKE_BUILD_TYPE=None \
- -DCMAKE_SKIP_RPATH:BOOL=YES \
- .
-%make_build
+ -DCMAKE_SKIP_RPATH:BOOL=YES
+%cmake_build
 
 # Hack to install dyninst nearby, so the testsuite can use it
-make DESTDIR=../install install
+DESTDIR="../install" %__cmake --install "%{__cmake_builddir}"
 find ../install -name '*.cmake' -execdir \
-     sed -i -e 's!%{_prefix}!../install&!' '{}' '+'
+     sed -i -e "s!%{_prefix}!$PWD/../install&!" '{}' '+'
 # cmake mistakenly looks for libtbb.so in the dyninst install dir
 sed -i '/libtbb.so/ s/".*usr/"\/usr/' $PWD/../install%{_libdir}/cmake/Dyninst/commonTargets.cmake
 
 cd ../%{testsuite_base}
+# testsuite build sometimes encounters dependency issues with -jN
+%define _smp_mflags -j1
 %cmake \
  -DDyninst_DIR:PATH=$PWD/../install%{_libdir}/cmake/Dyninst \
  -DINSTALL_DIR:PATH=%{_libdir}/dyninst/testsuite \
  -DCMAKE_BUILD_TYPE:STRING=Debug \
- -DCMAKE_SKIP_RPATH:BOOL=YES \
- .
-%make_build
+ -DCMAKE_SKIP_RPATH:BOOL=YES
+%cmake_build
 
 %install
 
 cd %{dyninst_base}
-%make_install
-
-# It doesn't install docs the way we want, so remove them.
-# We'll just grab the pdfs later, directly from the build dir.
-rm -v %{buildroot}%{_docdir}/*-%{version}.pdf
+%cmake_install
 
 cd ../%{testsuite_base}
-%make_install
+%cmake_install
 
 mkdir -p %{buildroot}/etc/ld.so.conf.d
 echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
+
+# Ugly hack to mask testsuite files from debuginfo extraction.  Running the
+# testsuite requires debuginfo, so extraction is useless.  However, debuginfo
+# extraction is still nice for the main libraries, so we don't want to disable
+# it package-wide.  The permissions are restored by attr(755,-,-) in files.
+find %{buildroot}%{_libdir}/dyninst/testsuite/ \
+  -type f '!' -name '*.a' -execdir chmod 644 '{}' '+'
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -156,6 +164,7 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %{_libdir}/dyninst/*.so.*
 # dyninst mutators dlopen the runtime library
 %{_libdir}/dyninst/libdyninstAPI_RT.so
+%{_libdir}/dyninst/libdyninstAPI_RT.a
 
 %doc %{dyninst_base}/COPYRIGHT
 %doc %{dyninst_base}/LICENSE.md
@@ -178,71 +187,138 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %{_libdir}/dyninst/*.so
 %{_libdir}/cmake/Dyninst
 
-%files static
-%{_libdir}/dyninst/*.a
-
 %files testsuite
 %{_bindir}/parseThat
-%exclude %{_bindir}/cfg_to_dot
-%exclude /usr/bin/codeCoverage
-%exclude /usr/bin/unstrip
-%exclude /usr/bin/ddb.db
-%exclude /usr/bin/params.db
-%exclude /usr/bin/unistd.db
 %dir %{_libdir}/dyninst/testsuite/
 %attr(755,root,root) %{_libdir}/dyninst/testsuite/*[!a]
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
-* Tue Feb 25 2025 Chris Co <chrco@microsoft.com> - 10.1.0-19
-- Bump to rebuild with updated glibc
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 12.3.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 10.1.0-18
-- Update to build dep latest glibc-static version
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 12.3.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
 
-* Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 10.1.0-17
-- Bump to rebuild with updated glibc
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 12.3.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
 
-* Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 10.1.0-16
-- update to build dep latest glibc-static version
+* Wed Jan 17 2024 Jonathan Wakely <jwakely@redhat.com> - 12.3.0-4
+- Rebuilt for Boost 1.83
 
-* Mon May 13 2024 Chris Co <chrco@microsoft.com> - 10.1.0-15
-- Update to build dep latest glibc-static version
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 12.3.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
 
-* Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 10.1.0-14
-- update to build dep latest glibc-static version
+* Tue Jul 11 2023 Frank Ch. Eigler <fche@redhat.com> - 12.3.0-2
+- side-tag respin
 
-* Tue Feb 27 2024 Dan Streetman <ddstreet@microsoft.com> - 10.1.0-13
-- updated glibc-static buildrequires release
+* Tue Jul 04 2023 Frank Ch. Eigler <fche@redhat.com> - 12.3.0-1
+- migrated to SPDX license
 
-* Tue Nov 07 2023 Andrew Phelps <anphel@microsoft.com> - 10.1.0-12
-- Bump release to rebuild against glibc 2.38-1
+* Tue Jul 04 2023 Orion Poplawski <orion@nwra.com> - 12.3.0-1
+- Update to 12.3.0
+- Add patch for cmake 3.27 support
 
-* Wed Oct 04 2023 Minghe Ren <mingheren@microsoft.com> - 10.1.0-11
-- Bump release to rebuild against glibc 2.35-6
+* Tue Jun 27 2023 Jonathan Wakely <jwakely@fedoraproject.org> - 12.2.0-5
+- Patch for oneTBB (#2036372)
 
-* Tue Oct 03 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 10.1.0-10
-- Bump release to rebuild against glibc 2.35-5
+* Thu Feb 23 2023 Frank Ch. Eigler <fche@redhat.com> - 12.2.0-4
+- rhbz2173030: ftbfs with gcc 13
 
-* Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 10.1.0-9
-- Bump release to rebuild against glibc 2.35-4
+* Mon Feb 20 2023 Jonathan Wakely <jwakely@redhat.com> - 12.2.0-3
+- Rebuilt for Boost 1.81
 
-* Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 10.1.0-8
-- Rebuilt for glibc-static 2.35-3
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 12.2.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
-* Thu Mar 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.1.0-7
-- Adding a patch to enable compilation for GCC 11.
-- License verified.
+* Tue Oct 4 2022 William Cohen <wcohen@redhat.com> - 12.2.0-1
+- Update to 12.2.0
 
-* Thu Sep 02 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.1.0-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Removing unsued BR on 'nasm'.
+* Wed Aug 03 2022 Stan Cox <scox@redhat.com> - 12.1.0-4
+- Explicitly include time.h as <string> no longer pulls it in
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 12.1.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed May 04 2022 Thomas Rodgers <trodgers@redhat.com> - 12.1.0-2
+- Rebuilt for Boost 1.78
+
+* Thu Mar 10 2022 William Cohen <wcohen@redhat.com> - 12.1.0-1
+- Update to 12.1.0
+
+* Sat Mar 05 2022 Orion Poplawski <orion@nwra.com> - 12.0.1-4
+- Fix cmake build dir
+
+* Mon Feb 07 2022 Stan Cox <scox@redhat.com> - 12.0.1-3
+- Quiesce dwarf 5 warnings
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 12.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Jan 10 2022 Stan Cox <scox@redhat.com> - 12.0.1-1
+- Update to 12.0.1
+
+* Tue Nov 09 2021 Stan Cox <scox@redhat.com> - 11.0.1-4
+- Do not create reloc for aarch64 static calls
+
+* Fri Aug 06 2021 Jonathan Wakely <jwakely@redhat.com> - 11.0.1-3
+- Rebuilt for Boost 1.76
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 11.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jul 08 2021 Stan Cox <scox@redhat.com> - 11.0.1
+- Update to 11.0.1
+
+* Fri Apr 30 2021 Stan Cox <scox@redhat.com> - 11.0.0
+- Update to 11.0.0
+
+* Tue Mar 30 2021 Jonathan Wakely <jwakely@redhat.com> - 10.2.1-6
+- Rebuilt for removed libstdc++ symbol (#1937698)
+
+* Fri Jan 29 2021 Frank Ch. Eigler <fche@redhat.com> - 10.2.1-5
+- Rebuilt for Boost 1.75 for sure, via buildrequire version constraints
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 10.2.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Jan 22 2021 Jonathan Wakely <jwakely@redhat.com> - 10.2.1-3
+- Rebuilt for Boost 1.75
+
+* Tue Nov 10 2020 Stan Cox <scox@redhat.com> - 10.2.1-2
+- Enable debuginfod
+
+* Wed Oct 28 2020 Stan Cox <scox@redhat.com> - 10.2.1-1
+- Update to 10.2.1
+
+* Tue Oct 27 2020 Jeff Law <law@redhat.com> - 10.2.0-2
+- Fix C++17 issue caught by gcc-11
+
+* Tue Sep 01 2020 Stan Cox <scox@redhat.com> - 10.2.0-1
+- Update to 10.2.0
+
+* Mon Aug 10 2020 Orion Poplawski <orion@nwra.com> - 10.1.0-10
+- Use new cmake macros (FTBFS bz#1863463)
+- Add BR tex-latex for doc build
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 10.1.0-9
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 10.1.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 15 2020 Stan Cox <scox@redhat.com> - 10.1.0-7
+- Do not build static versions of the dyninst libraries.
+
+* Fri May 29 2020 Jonathan Wakely <jwakely@redhat.com> - 10.1.0-6
+- Rebuilt for Boost 1.73
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 10.1.0-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
 * Fri Nov 15 2019 Stan Cox <scox@redhat.com> - 10.1.0-4
-- Fix rhbz963475 dyninst must be ported to aarch64
+- Fix rhbz963475 dyninst must be ported to aarch64 
 
 * Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 10.1.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild

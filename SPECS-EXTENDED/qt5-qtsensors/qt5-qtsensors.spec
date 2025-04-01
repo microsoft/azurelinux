@@ -1,25 +1,27 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global qt_module qtsensors
 
 Summary: Qt5 - Sensors component
 Name:    qt5-%{qt_module}
-Version: 5.14.2
-Release: 2%{?dist}
+Version: 5.15.15
+Release: 1%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
-License: LGPLv2 with exceptions or GPLv3 with exceptions
+License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
 Url:     http://www.qt.io/
 %global majmin %(echo %{version} | cut -d. -f1-2)
-Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
+Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-opensource-src-%{version}.tar.xz
 
 # filter qml/plugin provides
 %global __provides_exclude_from ^(%{_qt5_archdatadir}/qml/.*\\.so|%{_qt5_plugindir}/.*\\.so)$
 
+BuildRequires: make
 BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 BuildRequires: qt5-qtdeclarative-devel
+
+# provides a plugin that can use iio-sensor-proxy
+Recommends: iio-sensor-proxy
 
 %description
 The Qt Sensors API provides access to sensor hardware via QML and C++
@@ -90,8 +92,93 @@ popd
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.14.2-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Sep 04 2024 Jan Grulich <jgrulich@redhat.com> - 5.15.15-1
+- 5.15.15
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.14-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed May 29 2024 Jan Grulich <jgrulich@redhat.com> - 5.15.14-1
+- 5.15.14
+
+* Thu Mar 14 2024 Jan Grulich <jgrulich@redhat.com> - 5.15.13-1
+- 5.15.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.12-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.12-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Jan 02 2024 Jan Grulich <jgrulich@redhat.com> - 5.15.12-1
+- 5.15.12
+
+* Fri Oct 06 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.11-1
+- 5.15.11
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jun 12 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.10-1
+- 5.15.10
+
+* Tue Apr 11 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.9-1
+- 5.15.9
+
+* Tue Jan 31 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.8-3
+- migrated to SPDX license
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jan 05 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.8-1
+- 5.15.8
+
+* Mon Oct 31 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.7-1
+- 5.15.7
+
+* Tue Sep 20 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.6-1
+- 5.15.6
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jul 13 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.5-1
+- 5.15.5
+
+* Mon May 16 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.4-1
+- 5.15.4
+
+* Fri Mar 04 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.3-1
+- 5.15.3
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jun 08 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-4
+- Recommends: iio-sensor-proxy
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Nov 24 07:54:15 CET 2020 Jan Grulich <jgrulich@redhat.com> - 5.15.2-2
+- Rebuild for qtbase with -no-reduce-relocations option
+
+* Fri Nov 20 09:30:47 CET 2020 Jan Grulich <jgrulich@redhat.com> - 5.15.2-1
+- 5.15.2
+
+* Thu Sep 10 2020 Jan Grulich <jgrulich@redhat.com> - 5.15.1-1
+- 5.15.1
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.14.2-3
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.14.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Sat Apr 04 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.14.2-1
 - 5.14.2

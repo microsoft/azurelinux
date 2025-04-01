@@ -8,8 +8,8 @@
 %bcond_without autoreconf
 Summary:        Library to extract data from within an Excel spreadsheet
 Name:           freexl
-Version:        1.0.6
-Release:        19%{?dist}
+Version:        2.0.0
+Release:        1%{?dist}
 # The entire source is triply-licensed as (MPL-1.1 OR GPL-2.0-or-later OR
 # LGPL-2.1-or-later), except for some build-system files that do not contribute
 # to the license of the binary RPMs:
@@ -29,6 +29,8 @@ Source0:        https://www.gaia-gis.it/gaia-sins/freexl-sources/%{name}-%{versi
 
 BuildRequires:  gcc
 BuildRequires:  make
+BuildRequires:  minizip-devel
+
 %if %{with autoreconf}
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -131,6 +133,10 @@ find '%{buildroot}' -type f -name '*.la' -print -delete
 %endif
 
 %changelog
+* Mon Oct 28 2024 Jyoti kanase <v-jykanase@microsoft.com> - 2.0.0-1
+- Update to version 2.0.0
+- License verified
+
 * Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 1.0.6-19
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - Disable doc_pdf

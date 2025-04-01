@@ -1,0 +1,44 @@
+From bbe8b3ebacee8e7cde750d263ddf64581b447af1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Hrn=C4=8Diar?= <thrnciar@redhat.com>
+Date: Wed, 16 Feb 2022 13:57:57 +0100
+Subject: [PATCH] Unbundle llhttp
+
+---
+ aiohttp/_cparser.pxd | 2 +-
+ setup.py             | 6 +-----
+ 2 files changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/aiohttp/_cparser.pxd b/aiohttp/_cparser.pxd
+index c2cd5a92..1b3be6d4 100644
+--- a/aiohttp/_cparser.pxd
++++ b/aiohttp/_cparser.pxd
+@@ -1,7 +1,7 @@
+ from libc.stdint cimport int32_t, uint8_t, uint16_t, uint64_t
+ 
+ 
+-cdef extern from "../vendor/llhttp/build/llhttp.h":
++cdef extern from "llhttp.h":
+ 
+     struct llhttp__internal_s:
+         int32_t _index
+diff --git a/setup.py b/setup.py
+index 4d59a022..0df68207 100644
+--- a/setup.py
++++ b/setup.py
+@@ -33,12 +33,8 @@ extensions = [
+         [
+             "aiohttp/_http_parser.c",
+             "aiohttp/_find_header.c",
+-            "vendor/llhttp/build/c/llhttp.c",
+-            "vendor/llhttp/src/native/api.c",
+-            "vendor/llhttp/src/native/http.c",
+         ],
+-        define_macros=[("LLHTTP_STRICT_MODE", 0)],
+-        include_dirs=["vendor/llhttp/build"],
++        libraries=["llhttp"],
+     ),
+     Extension("aiohttp._helpers", ["aiohttp/_helpers.c"]),
+     Extension("aiohttp._http_writer", ["aiohttp/_http_writer.c"]),
+-- 
+2.41.0
+

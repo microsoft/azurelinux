@@ -1,51 +1,35 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-%if 0%{?el6}
-%bcond_with gsettings
-%bcond_without gconf2
-%else
-%bcond_without gsettings
-%bcond_with gconf2
-%endif
+## START: Set by rpmautospec
+## (rpmautospec version 0.7.2)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 1;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
 
-%if %{with gsettings}
-%global gsettings_support ON
-%else
-%global gsettings_support OFF
-%endif
+%global public_key RWRzJFnXiLZleAyCIv1talBjyRewelcy9gzYQq9pd3SKSFBPoy57sf5s
 
-%if %{with gconf2}
-%global gconf2_support ON
-%else
-%global gconf2_support OFF
-%endif
 Name:           ibus-chewing
-Version:        1.6.1
-Release:        9%{?dist}
+Version:        2.1.2
+Release:        %autorelease
 Summary:        The Chewing engine for IBus input platform
 Summary(zh_TW): IBus新酷音輸入法
-License:        GPLv2+
-URL:            https://github.com/definite/ibus-chewing
-Source0:        https://github.com/definite/%{name}/releases/download/%{version}/%{name}-%{version}-Source.tar.gz
-Patch1:         %{name}-1799517-no-gob2.patch
+License:        GPL-2.0-or-later
+URL:            https://github.com/chewing/ibus-chewing
+Source0:        %{url}/releases/download/v%{version}/%{name}-%{version_no_tilde}-Source.tar.xz
+Source1:        %{url}/releases/download/v%{version}/%{name}-%{version_no_tilde}-Source.tar.xz.minisig
 
-BuildRequires:  cmake >= 2.6.2
-BuildRequires:  pkgconfig
-BuildRequires:  ibus-devel >= 1.3
-BuildRequires:  libchewing-devel >= 0.3.3
-BuildRequires:  glib2-devel
-BuildRequires:  gtk2-devel
-BuildRequires:  libX11-devel
-BuildRequires:  gettext
-BuildRequires:  findutils
+BuildRequires:  cmake >= 3.21.0
 BuildRequires:  gcc
-BuildRequires:  gcc-c++
-BuildRequires:  git
-Requires:       ibus >= 1.3
-Requires:       libchewing >= 0.3.3
-Requires:       gtk2
-Requires:       gettext
-
+BuildRequires:  pkgconf
+BuildRequires:  minisign
+BuildRequires:  pkgconfig(ibus-1.0)
+BuildRequires:  pkgconfig(chewing) >= 0.9.0
+BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(gtk4)
+BuildRequires:  pkgconfig(libadwaita-1)
+BuildRequires:  gettext-runtime
 
 
 %description
@@ -67,15 +51,15 @@ IBus-chewing 是新酷音輸入法的IBus前端。
 
 
 %prep
-%autosetup -S git -n %{name}-%{version}-Source
+/usr/bin/minisign -V -m %{SOURCE0} -x %{SOURCE1} -P %{public_key}
+%autosetup -n %{name}-%{version_no_tilde}-Source
 
 %build
-# $RPM_OPT_FLAGS should be loaded from cmake macro.
-%cmake -DCMAKE_FEDORA_ENABLE_FEDORA_BUILD=1  -DGSETTINGS_SUPPORT=%{gsettings_support} -DGCONF2_SUPPORT=%{gconf2_support} .
-make VERBOSE=1 %{?_smp_mflags}
+%cmake --preset default
+%cmake_build
 
 %install
-make install DESTDIR=%{buildroot} INSTALL="install -p"
+%cmake_install
 
 # We install document using doc
 rm -fr %{buildroot}%{_docdir}/*
@@ -83,73 +67,96 @@ rm -fr %{buildroot}%{_docdir}/*
 %find_lang %{name}
 
 
-%pre
-%if "%{gconf2_support}" == "ON"
-if [ "$1" -gt 1 ] ; then
-    export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
-    [ -r %{_sysconfdir}/gconf/schemas/%{name}.schemas ] &&
-    gconftool-2 --makefile-uninstall-rule %{_sysconfdir}/gconf/schemas/%{name}.schemas >/dev/null || :
-
-    # Upgrading 1.0.2.20090302-1.fc11 or older?
-    [ -r %{_sysconfdir}/gconf/schemas/%{name}.schema ] &&
-    gconftool-2 --makefile-uninstall-rule %{_sysconfdir}/gconf/schemas/%{name}.schema >/dev/null || :
-fi
-%endif
-    
-
-%preun
-%if "%{gconf2_support}" == "ON"
-if [ "$1" -eq 0 ] ; then
-    export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
-    gconftool-2 --makefile-uninstall-rule %{_sysconfdir}/gconf/schemas/%{name}.schemas > /dev/null || :
-fi
-%endif
-    
-
-%post
-%if "%{gconf2_support}" == "ON"
-if [ $1 -gt 1 ] ; then
-    export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
-    [ -r %{_sysconfdir}/gconf/schemas/%{name}.schemas ] && gconftool-2 --makefile-install-rule %{_sysconfdir}/gconf/schemas/%{name}.schemas >/dev/null || :
-fi
-%endif
-
-[ -x %{_bindir}/ibus ] && %{_bindir}/ibus write-cache --system &>/dev/null || :
-    
-
-%postun
-%if "%{gconf2_support}" == "ON"
-if [ $1 -gt 1 ] ; then
-    export GCONF_CONFIG_SOURCE=`gconftool-2 --get-default-source`
-    [ -r %{_sysconfdir}/gconf/schemas/%{name}.schemas ] &&
-    gconftool-2 --makefile-uninstall-rule %{_sysconfdir}/gconf/schemas/%{name}.schemas >/dev/null || :
-fi
-%endif
-
-[ -x %{_bindir}/ibus ] && %{_bindir}/ibus write-cache --system &>/dev/null || :
-    
-
-
 %files -f %{name}.lang
-%doc AUTHORS README.md ChangeLog USER-GUIDE
+%doc AUTHORS README.md ChangeLog-1.x CHANGELOG.md USER-GUIDE
 %license COPYING
-%{_datadir}/%{name}/icons/%{name}-chi-full.svg
-%{_datadir}/%{name}/icons/%{name}-chi-half.svg
-%{_datadir}/%{name}/icons/%{name}-eng-full.svg
-%{_datadir}/%{name}/icons/%{name}-eng-half.svg
-%{_datadir}/%{name}/icons/%{name}-orig.png
-%{_datadir}/%{name}/icons/%{name}-template.svg
+%dir %{_datadir}/%{name}/
+%dir %{_datadir}/%{name}/icons/
 %{_datadir}/%{name}/icons/%{name}.png
 %{_datadir}/%{name}/icons/ibus-setup-chewing.png
+%{_datadir}/%{name}/icons/org.freedesktop.IBus.Chewing.Setup.svg
 %{_datadir}/applications/ibus-setup-chewing.desktop
+%{_datadir}/icons/hicolor/scalable/apps/org.freedesktop.IBus.Chewing.Setup.svg
 %{_datadir}/glib-2.0/schemas/org.freedesktop.IBus.Chewing.gschema.xml
 %{_datadir}/ibus/component/chewing.xml
 %{_libexecdir}/ibus-engine-chewing
 %{_libexecdir}/ibus-setup-chewing
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-9
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+## START: Generated by rpmautospec
+* Tue Oct 08 2024 Kan-Ru Chen <kanru@kanru.info> - 2.1.2-1
+- Update to 2.1.2
+
+* Tue Aug 20 2024 Kan-Ru Chen <kanru@kanru.info> - 2.1.1-1
+- Update to 2.1.1
+
+* Mon Aug 12 2024 Kan-Ru Chen <kanru@kanru.info> - 2.1.0-1
+- Update to 2.1.0
+
+* Mon Jul 22 2024 Kan-Ru Chen <kanru@kanru.info> - 2.1.0~rc.1-1
+- Update to 2.1.0-rc.1
+
+* Mon Jul 22 2024 Kan-Ru Chen <kanru@kanru.info> - 2.0.0-3
+- Add missing directories. rhbz#2299106
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sun Mar 03 2024 Kan-Ru Chen <kanru@kanru.info> - 2.0.0-1
+- Upstream 2.0.0 release
+
+* Sun Feb 11 2024 Kan-Ru Chen <kanru@kanru.info> - 1.6.1-25
+- backport upstream fix for ignore mod4 key combination
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-24
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Nov 16 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.6.1-20
+- Migrate license tag to SPDX
+
+* Thu Aug 18 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.6.1-19
+- Resolves: #2119019 Not to require gettext
+
+* Wed Aug 03 2022 Takao Fujiwara <tfujiwar@redhat.com> - 1.6.1-18
+- Resolves: #2113448 FTBFS with koji hardware failure
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 18 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.6.1-14
+- Delete ibus write-cache in scriptlet
+
+* Wed Apr 21 2021 Takao Fujiwara <tfujiwar@redhat.com> - 1.6.1-13
+- Resolves: #1948197 Change post to posttrans
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Aug 13 2020 Takao Fujiwara <tfujiwar@redhat.com> - 1.6.1-11
+- Resolves: #1863869 replace make with cmake_build
+- Add ibus-chewing-1863869-cmake-build.patch to replace builddir with srcdir
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-10
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Feb 19 2020 Takao Fujiwara <tfujiwar@redhat.com> - 1.6.1-8
 - Add 1799517-no-gob2.patch to build without gob2
@@ -615,3 +622,4 @@ Fix the errors which Funda Wang as pointing out:
 * Fri Aug 15 2008 Huang Peng <shawn.p.huang@gmail.com> - 0.1.1.20081023-1
 - The first version.
 
+## END: Generated by rpmautospec

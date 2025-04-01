@@ -1,10 +1,8 @@
 %global srcname httplib2
 
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Name:           python-%{srcname}
-Version:        0.20.3
-Release:        3%{?dist}
+Version:        0.21.0
+Release:        8%{?dist}
 Summary:        Comprehensive HTTP client library
 License:        MIT
 URL:            https://pypi.python.org/pypi/httplib2
@@ -27,13 +25,14 @@ Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-pytest
+# This is listed as a test requirement, but doesn't seem to actually be used.
+#BuildRequires:  python3-pytest-forked
+BuildRequires:  python3-pytest-timeout
 BuildRequires:  python3-six
 BuildRequires:  python3-cryptography
-
-%if 0%{?with_check}
-BuildRequires:  python3-pytest
-BuildRequires:  python3-pytest-timeout
-%endif
+# This is a runtime dependency required to run the tests:
+BuildRequires:  python3-pyparsing
 
 %description -n python3-%{srcname} %{_description}
 
@@ -41,6 +40,9 @@ BuildRequires:  python3-pytest-timeout
 %prep
 %autosetup -p1 -n %{srcname}-%{version}
 rm -r python2
+
+# drop python2-only requirement for old pyparsing
+sed -i '/TODO remove after dropping Python2 support/d' requirements.txt
 
 # Drop coverage
 sed -i '/--cov/d' setup.cfg
@@ -55,6 +57,8 @@ sed -i '/--cov/d' setup.cfg
 
 
 %check
+# test_get_301_no_redirect is disabled because it leads to Segfault on Python 3.11
+# the other disabled tests are broken PySocks tests
 PYTHONPATH=%{buildroot}%{python3_sitelib} pytest -k "not test_unknown_server \
 	and not test_socks5_auth and not \
 	test_server_not_found_error_is_raised_for_invalid_hostname and not \
@@ -63,7 +67,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest -k "not test_unknown_server \
 	test_invalid_ca_certs_path and not test_max_tls_version and not \
 	test_get_301_via_https and not test_client_cert_password_verified and not\
 	test_get_via_https and not test_min_tls_version and not\
-	test_client_cert_verified and not test_inject_space"
+	test_client_cert_verified and not test_inject_space and not test_get_301_no_redirect"
 
 
 %files -n python3-%{srcname}
@@ -72,9 +76,53 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest -k "not test_unknown_server \
 %{python3_sitelib}/%{srcname}/
 
 %changelog
-* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 0.20.3-3
-- Initial CBL-Mariner import from Fedora 36 (license: MIT).
-- License verified
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.21.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.21.0-7
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.21.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.21.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.21.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 0.21.0-3
+- Rebuilt for Python 3.12
+
+* Tue Mar 07 2023 Gwyn Ciesla <gwync@protonmail.com> - 0.21.0-2
+- migrated to SPDX license
+
+* Sun Feb 19 2023 Kevin Fenzi <kevin@scrye.com> - 0.21.0-1
+- Update to 0.21.0. rhbz#2138541
+
+* Wed Jan 25 2023 Miro Hrončok <mhroncok@redhat.com> - 0.20.4-8
+- Explicitly BuildRequire runtime dependencies for tests
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.4-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.4-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jul 20 2022 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 0.20.4-5
+- Rebuilt for pyparsing-3.0.9 (2nd attempt)
+
+* Tue Jul 19 2022 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 0.20.4-4
+- Rebuilt for pyparsing-3.0.9
+
+* Wed Jun 15 2022 Tomáš Hrnčiar <thrnciar@redhat.com> - 0.20.4-3
+- Disable broken test for compatibility with Python 3.11
+
+* Tue Jun 14 2022 Python Maint <python-maint@redhat.com> - 0.20.4-2
+- Rebuilt for Python 3.11
+
+* Sun Feb 20 2022 Kevin Fenzi <kevin@scrye.com> - 0.20.4-1
+- Update to 0.20.4. Fixes rhbz#2049986
 
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild

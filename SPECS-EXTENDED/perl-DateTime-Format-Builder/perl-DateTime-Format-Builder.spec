@@ -1,19 +1,23 @@
-%global real_version   0.82
+%if 0%{?rhel} >= 9
+%bcond_with perl_DateTime_Format_Builder_enable_optional_tests
+%else
+%bcond_without perl_DateTime_Format_Builder_enable_optional_tests
+%endif
+
+%global real_version   0.83
 
 Name:           perl-DateTime-Format-Builder
-# 0.82 in reality, but rpm can't get it
-Version:        0.8200
-Release:        6%{?dist}
+# 0.83 in reality, but rpm can't get it
+Version:        0.8300
+Release:        14%{?dist}
 Summary:        Create DateTime parser classes and objects        
-# examples/W3CDTF.pm:               GPL+ or Artistic
-# examples/MySQL.pm:                GPL+ or Artistic
-# lib/DateTime/Format/Builder.pm:   Artistic 2.0
-# LICENSE:                          Artistic 2.0 text
-License:        Artistic 2.0 and (GPL+ or Artistic)
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+# examples/W3CDTF.pm:               GPL-1.0-or-later OR Artistic-1.0-Perl
+# examples/MySQL.pm:                GPL-1.0-or-later OR Artistic-1.0-Perl
+# lib/DateTime/Format/Builder.pm:   Artistic-2.0
+# LICENSE:                          Artistic-2.0 text
+License:        Artistic-2.0 AND (GPL-1.0-or-later OR Artistic-1.0-Perl)
 URL:            https://metacpan.org/release/DateTime-Format-Builder            
-Source0:        https://cpan.metacpan.org/modules/by-module/DateTime/DateTime-Format-Builder-%{real_version}.tar.gz#/perl-DateTime-Format-Builder-%{real_version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/DateTime/DateTime-Format-Builder-%{real_version}.tar.gz
 BuildArch:      noarch
 # Module Build
 BuildRequires:  coreutils
@@ -31,13 +35,13 @@ BuildRequires:  perl(Params::Validate) >= 0.72
 BuildRequires:  perl(parent)
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(strict)
-BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
 # Test Suite
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::More) >= 0.88
 # Optional Tests
+%if %{with perl_DateTime_Format_Builder_enable_optional_tests}
 BuildRequires:  perl(CPAN::Meta) >= 2.120900
 BuildRequires:  perl(DateTime::Format::HTTP)
 BuildRequires:  perl(DateTime::Format::Mail)
@@ -45,8 +49,8 @@ BuildRequires:  perl(DateTime::Format::IBeat)
 BuildRequires:  perl(Devel::Cycle) >= 1.07
 BuildRequires:  perl(Test::Memory::Cycle)
 BuildRequires:  perl(Test::Pod) >= 1.00
+%endif
 # Dependencies
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Provides:       perl(DateTime::Format::Builder) = %{version}
 
 # Avoid doc-file dependencies from tests
@@ -85,11 +89,7 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
-%if 0%{?_licensedir:1}
 %license LICENSE
-%else
-%doc LICENSE
-%endif
 %doc Changes CODE_OF_CONDUCT.md CONTRIBUTING.md README.md examples/ t/
 %{perl_vendorlib}/DateTime/
 %{_mandir}/man3/DateTime::Format::Builder.3*
@@ -102,8 +102,55 @@ make test
 %{_mandir}/man3/DateTime::Format::Builder::Tutorial.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8200-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.8300-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.8300-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.8300-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.8300-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.8300-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sun Jan 15 2023 Paul Howarth <paul@city-fan.org> - 0.8300-9
+- Use SPDX-format license tag
+- Use %%license unconditionally
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.8300-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.8300-7
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.8300-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.8300-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sun May 23 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.8300-4
+- Perl 5.34 rebuild
+
+* Thu Mar 25 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.8300-3
+- Disable optional tests on ELN
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.8300-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Aug 10 2020 Paul Howarth <paul@city-fan.org> - 0.8300-1
+- Update to 0.83
+  - Switched to GitHub issues
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.8200-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.8200-6
+- Perl 5.32 rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.8200-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

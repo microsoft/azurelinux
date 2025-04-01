@@ -1,26 +1,18 @@
-%{!?python3_pkgversion: %global python3_pkgversion 3}
-%{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?__python3: %global __python3 /usr/bin/python3}
-%{!?py3_build: %define py3_build CFLAGS="%{optflags}" %{__python3} setup.py build}
-%{!?py3_install: %define py3_install %{__python3} setup.py install --skip-build --root %{buildroot}}
-
 %global pypi_name pytest-timeout
 
-Summary:        py.test plugin to abort hanging tests
-Name:           python-%{pypi_name}
-Version:        1.4.2
+Name:           python-pytest-timeout
+Version:        2.3.1
 Release:        4%{?dist}
+Summary:        py.test plugin to abort hanging tests
+
+# SPDX
 License:        MIT
 URL:            https://github.com/pytest-dev/pytest-timeout
-Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        %{pypi_source}
+
 BuildArch:      noarch
+
 BuildRequires:  python3-devel
-BuildRequires:  python3-pexpect
-BuildRequires:  python3-setuptools
-%if 0%{?with_check}
-BuildRequires:  python3-pip
-%endif
 
 %global _description %{expand:
 This is a plugin which will terminate tests after a certain timeout. When doing
@@ -30,38 +22,98 @@ know why the test suite hangs.}
 
 %description %_description
 
-%package -n     python3-%{pypi_name}
+%package -n     python3-pytest-timeout
 Summary:        %{summary}
-%{?python_provide:%python_provide python3-%{pypi_name}}
 
-%description -n python3-%{pypi_name} %_description
+%description -n python3-pytest-timeout %_description
 
 %prep
-%autosetup -p1 -n %{pypi_name}-%{version}
+%autosetup -p1 -n pytest-timeout-%{version}
+# python-ipdb FTBFS currently
+sed -i -e '/\s*ipdb$/d' tox.ini
+
+%generate_buildrequires
+%pyproject_buildrequires -t
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files -l pytest_timeout
 
 %check
-pip3 install pytest==7.1.2 pytest-cov==3.0.0
-%pytest
+%tox
 
-%files -n python3-%{pypi_name}
+
+%files -n python3-pytest-timeout -f %{pyproject_files}
 %doc README.rst
-%license LICENSE
-%{python3_sitelib}/pytest_timeout*
-%{python3_sitelib}/__pycache__/pytest_timeout*
 
 %changelog
-* Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 1.4.2-4
-- Drop BR on pytest and install latest deps to enable ptest
-- License verified
+* Tue Aug 06 2024 Scott Talbert <swt@techie.net> - 2.3.1-4
+- Update License tag to use SPDX identifiers
+- Modernize Python packaging
 
-* Wed Dec 09 2020 Steve Laughman <steve.laughman@microsoft.com> - 1.4.2-3
-- Initial CBL-Mariner import from Fedora 33 (license: MIT)
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 2.3.1-2
+- Rebuilt for Python 3.13
+
+* Fri Mar 08 2024 Scott Talbert <swt@techie.net> - 2.3.1-1
+- Update to new upstream release 2.3.1 (#2268509)
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Oct 09 2023 Scott Talbert <swt@techie.net> - 2.2.0-1
+- Update to new upstream release 2.2.0 (#2242718)
+- Modernize Python packaging
+
+* Tue Aug 08 2023 Karolina Surma <ksurma@redhat.com> - 2.1.0-7
+- Declare license as an SPDX expression
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 2.1.0-5
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 2.1.0-2
+- Rebuilt for Python 3.11
+
+* Sat Jan 22 2022 Scott Talbert <swt@techie.net> - 2.1.0-1
+- Update to new upstream release 2.1.0 (#2042161)
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Dec 14 2021 Scott Talbert <swt@techie.net> - 2.0.2-1
+- Update to new upstream release 2.0.2 (#2032002)
+
+* Mon Oct 11 2021 Scott Talbert <swt@techie.net> - 2.0.1-1
+- Update to new upstream release 2.0.1 (#2013023)
+
+* Mon Oct 11 2021 Scott Talbert <swt@techie.net> - 2.0.0-1
+- Update to new upstream release 2.0.0 (#2012634)
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 1.4.2-4
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

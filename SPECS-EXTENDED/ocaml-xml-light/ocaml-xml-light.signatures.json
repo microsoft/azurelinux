@@ -1,6 +1,5 @@
 {
  "Signatures": {
-  "LICENSE.PTR": "f84904cad7e8e037f1c86e5e037d567adb9439bf8f9654be2685d90b6ffc2cf1",
-  "xml-light-234.tar.gz": "223683046b0beb5d0a4e87729a72f4abd4646de7bbbb7a8b3c7b748f6a32eb99"
+  "ocaml-xml-light-2.5.tar.gz": "69b225564f610492c7c414edcab456967210278a519405a62f43f70469535d7f"
  }
 }

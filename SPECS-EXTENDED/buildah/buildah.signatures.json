@@ -1,5 +1,6 @@
 {
- "Signatures": {
-  "buildah-1.18.0.tar.gz": "500c82fb369fd08a9bb9a41f294c5975f17575770dbfaba5cce9a6e09b6a3fb9"
- }
+    "Signatures": {
+     "v1.38.0.tar.gz": "e8ddd23e344c45afae27bf6158304300c77cd738063d99221f7534c37f195f0c"
+    }
 }
+

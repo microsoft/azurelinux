@@ -1,3 +1,78 @@
+Name:          perl-Net-DNS
+Version:       1.47
+Release:       1%{?dist}
+Summary:       DNS resolver modules for Perl
+License:       MIT
+URL:           https://www.net-dns.org
+Source0:       https://www.net-dns.org/download/Net-DNS-%{version}.tar.gz
+Source1:       https://www.net-dns.org/download/Net-DNS-%{version}.tar.gz.sig
+Source2:       http://keys.openpgp.org/pks/lookup?op=get&search=0xE5F8F8212F77A498#/willem.nlnetlabs.nl
+
+BuildArch:     noarch
+
+BuildRequires: gnupg2
+BuildRequires: coreutils
+BuildRequires: findutils
+BuildRequires: make
+
+BuildRequires: perl-generators
+BuildRequires: perl-interpreter
+BuildRequires: perl(Config)
+BuildRequires: perl(constant)
+BuildRequires: perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires: perl(Getopt::Long)
+# IO::Socket::IP or IO::Socket::INET
+BuildRequires: perl(IO::Socket::IP) >= 0.38
+BuildRequires: perl(strict)
+BuildRequires: perl(warnings)
+# Runtime
+BuildRequires: perl(base)
+BuildRequires: perl(Carp)
+BuildRequires: perl(Data::Dumper)
+%if ! (0%{?rhel} >= 7)
+# Digest::BubbleBabble is optional
+BuildRequires: perl(Digest::BubbleBabble)
+%endif
+BuildRequires: perl(Digest::HMAC) >= 1.03
+BuildRequires: perl(Digest::MD5) >= 2.37
+BuildRequires: perl(Digest::SHA) >= 5.23
+BuildRequires: perl(Encode)
+BuildRequires: perl(Exporter)
+BuildRequires: perl(File::Spec)
+BuildRequires: perl(FileHandle)
+BuildRequires: perl(integer)
+BuildRequires: perl(IO::File)
+# IO::Select is not used
+BuildRequires: perl(IO::Socket) >= 1.30
+# Prefer IO::Socket::IP over IO::Socket::INET for IPv6 support
+BuildRequires: perl(MIME::Base64) >= 3.07
+# Prefer Net::LibIDN2 over Net::LibIDN, both are optional
+BuildRequires: perl(Net::LibIDN2) >= 1
+BuildRequires: perl(overload)
+# PerlIO is optional
+# Scalar::Util is optional
+BuildRequires: perl(Socket) >= 1.81
+BuildRequires: perl(Time::Local)
+# Win32::IPHelper is not needed
+# Win32::TieRegistry is not needed
+# Tests only
+BuildRequires: perl(File::Find) >= 1.13
+BuildRequires: perl(Test::Builder)
+BuildRequires: perl(Test::More)
+Suggests:      perl(Config)
+Requires:      perl(Data::Dumper)
+Requires:      perl(Digest::HMAC) >= 1.03
+Requires:      perl(Digest::MD5) >= 2.13
+Requires:      perl(Digest::SHA) >= 5.23
+Requires:      perl(Encode)
+# Prefer IO::Socket::IP over IO::Socket::INET for IPv6 support
+Recommends:    perl(IO::Socket::IP) >= 0.38
+Requires:      perl(MIME::Base64) >= 2.13
+# Net::DNS::Extlang not available
+# Prefer Net::LibIDN2 over Net::LibIDN, both are optional
+Suggests:      perl(Net::LibIDN2) >= 1
+Suggests:      perl(Scalar::Util) >= 1.25
+
 %{?perl_default_filter}
 
 # Do not export under-specified dependencies
@@ -10,97 +85,9 @@
 # Do not export under-specified provides
 %global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^perl\\((Net::DNS::Text)\\)$
 %global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^perl\\((Net::DNS::RR::OPT)\\)$
-
-Summary:       DNS resolver modules for Perl
-Name:          perl-Net-DNS
-Version:       1.21
-Release:       4%{?dist}
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-# Other files:          MIT
-# demo/mresolv:         GPL+ or Artistic
-## Not in a binary package
-# contrib/find_zonecut: GPL+ or Artistic
-# contrib/check_soa:    GPL+ or Artistic
-License:       (GPL+ or Artistic) and MIT
-URL:           https://metacpan.org/release/Net-DNS
-Source0:       https://cpan.metacpan.org/authors/id/N/NL/NLNETLABS/Net-DNS-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-BuildArch:     noarch
-# Build
-BuildRequires: coreutils
-BuildRequires: make
-BuildRequires: sed
-BuildRequires: perl-generators
-BuildRequires: perl-interpreter
-BuildRequires: perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires: perl(Getopt::Long)
-BuildRequires: perl(IO::Socket)
-# Runtime
-BuildRequires: perl(base)
-BuildRequires: perl(Carp)
-# Config not used
-BuildRequires: perl(constant)
-BuildRequires: perl(Data::Dumper)
-BuildRequires: perl(Digest::BubbleBabble)
-# Digest::GOST is optional and intentionally unavailable
-# Digest::GOST::CryptoPro is optional and intentionally unavailable
-BuildRequires: perl(Digest::HMAC) >= 1.03
-BuildRequires: perl(Digest::MD5) >= 2.13
-BuildRequires: perl(Digest::SHA) >= 5.23
-BuildRequires: perl(Encode)
-BuildRequires: perl(Exporter)
-BuildRequires: perl(File::Spec)
-BuildRequires: perl(FileHandle)
-BuildRequires: perl(integer)
-BuildRequires: perl(IO::File)
-# IO::Select is not used
-# Prefer IO::Socket::IP over IO::Socket::INET for IPv6 support
-BuildRequires: perl(IO::Socket::IP) >= 0.32
-BuildRequires: perl(MIME::Base64) >= 2.13
-# Prefer Net::LibIDN2 over Net::LibIDN, both are optional
-BuildRequires: perl(Net::LibIDN2) >= 1
-BuildRequires: perl(overload)
-# PerlIO is optional
-# Scalar::Util is optional
-BuildRequires: perl(Socket)
-BuildRequires: perl(strict)
-BuildRequires: perl(Time::Local)
-BuildRequires: perl(warnings)
-# Win32::IPHelper is not needed
-# Win32::TieRegistry is not needed
-# Tests only
-BuildRequires: perl(File::Find)
-BuildRequires: perl(Test::Builder)
-BuildRequires: perl(Test::More)
-# Optional tests:
-BuildRequires: perl(Test::Pod) >= 1.45
-%if !%{defined perl_bootstrap}
-# Build cycle: perl-Net-DNS-SEC → perl-Net-DNS
-BuildRequires: perl(Net::DNS::SEC)
-BuildRequires: perl(Net::DNS::SEC::RSA)
-%endif
-Requires:      perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
-Suggests:      perl(Config)
-Requires:      perl(Data::Dumper)
-# Digest::GOST not available
-Requires:      perl(Digest::HMAC) >= 1.03
-Requires:      perl(Digest::MD5) >= 2.13
-Requires:      perl(Digest::SHA) >= 5.23
-Requires:      perl(Encode)
-# Prefer IO::Socket::IP over IO::Socket::INET for IPv6 support
-Recommends:    perl(IO::Socket::IP) >= 0.32
-Requires:      perl(MIME::Base64) >= 2.13
-# Net::DNS::Extlang not available
-Suggests:      perl(Net::DNS::SEC::DSA)
-# Net::DNS::SEC::ECCGOST not available
-Suggests:      perl(Net::DNS::SEC::ECDSA)
-Suggests:      perl(Net::DNS::SEC::EdDSA)
-Suggests:      perl(Net::DNS::SEC::Private)
-Suggests:      perl(Net::DNS::SEC::RSA)
-# Prefer Net::LibIDN2 over Net::LibIDN, both are optional
-Suggests:      perl(Net::LibIDN2) >= 1
-Suggests:      perl(Scalar::Util) >= 1.25
-
+# Remove private modules
+%global __provides_exclude %{?__provides_exclude:%__provides_exclude|}^perl\\(TestToolkit\\)$
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(TestToolkit\\)$
 
 %description
 Net::DNS is a collection of Perl modules that act as a Domain Name System
@@ -118,32 +105,65 @@ Recommends:     perl(IO::Socket::IP) >= 0.32
 %description Nameserver
 Instances of the "Net::DNS::Nameserver" class represent DNS server objects.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
-%autosetup -n Net-DNS-%{version} 
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
+
+%setup -q -n Net-DNS-%{version} 
 chmod -x demo/*
-sed -i -e '1 s,^#!/usr/local/bin/perl,#!%{__perl},' demo/*
-for i in Changes; do
-    iconv -f iso8859-1 -t utf-8 "$i" > "${i}.conv"
-    touch -r "$i" "${i}.iconv"
-    mv -f "${i}.conv" "$i"
+perl -MConfig -i -pe 's{^#!/usr/local/bin/perl}{$Config{startperl}}' demo/*
+# Remove author tests
+for F in \
+    t/00-install.t \
+    t/00-pod.t \
+    ; do
+    rm "$F"
+    perl -i -ne 'print $_ unless m{\A\Q'"$F"'\E}' MANIFEST
+done
+# Help generators to recognize Perl scripts
+for F in t/*.t; do
+    chmod +x "$F"
 done
 
 %build
 export PERL_MM_USE_DEFAULT=yes
-perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 --no-online-tests
-%make_build OPTIMIZE="%{optflags}"
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1 --no-online-tests
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
+%{make_install}
 find %{buildroot} -type f -name '*.bs' -a -size 0 -delete
-chmod -R u+w %{buildroot}/*
+%{_fixperms} %{buildroot}/*
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/bash
+set -e
+# Some tests write into temporary files/directories, so they will be copy
+# into a writable directory and execute them from there.
+DIR=$(mktemp -d)
+pushd "$DIR"
+cp -a %{_libexecdir}/%{name}/* ./
+prove -I . -I t -j "$(getconf _NPROCESSORS_ONLN)"
+popd
+rm -rf "$DIR"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 
 %check
 make test
 
 %files
-%license README
-%doc Changes demo
+%doc README Changes demo
 %{perl_vendorlib}/Net/
 %exclude %{perl_vendorlib}/Net/DNS/Resolver/cygwin.pm
 %exclude %{perl_vendorlib}/Net/DNS/Resolver/MSWin32.pm
@@ -158,12 +178,119 @@ make test
 %{perl_vendorlib}/Net/DNS/Nameserver.pm
 %{_mandir}/man3/Net::DNS::Nameserver*
 
-%changelog
-* Tue Mar 07 2023 Muhammad Falak <mwani@microsoft.com> - 1.21-4
-- License verified
+%files tests
+%{_libexecdir}/%{name}
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.21-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+%changelog
+* Mon Sep 23 2024 Michal Josef Špaček <mspacek@redhat.com> - 1.47-1
+- 1.47 bump (rhbz#2313498)
+
+* Thu Sep 05 2024 Michal Josef Špaček <mspacek@redhat.com> - 1.46-1
+- 1.46 bump (rhbz#2306055)
+- Fix run of tests with prove
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.45-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu May 23 2024 Jitka Plesnikova <jplesnik@redhat.com> - 1.45-1
+- 1.45 bump (rhbz#2264428)
+
+* Mon Jan 29 2024 Jitka Plesnikova <jplesnik@redhat.com> - 1.43-1
+- 1.43 bump (rhbz#2251788)
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.40-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.40-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Sep 12 2023 Jitka Plesnikova <jplesnik@redhat.com> - 1.40-1
+- 1.40 bump (rhbz#2236235)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.39-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 01 2023 Paul Wouters <paul.wouters@aiven.io - 1.39-1
+- Updated to 1.39 - minor bugfix release
+
+* Mon May 29 2023 Jitka Plesnikova <jplesnik@redhat.com> - 1.38-2
+- Fix dependencies in *tests package
+
+* Fri May 19 2023 Paul Wouters <paul.wouters@aiven.io - 1.38-1
+- Resolves: rhbz#2177932 perl-Net-DNS-1.38 is available
+
+* Tue May 09 2023 Michal Josef Špaček <mspacek@redhat.com> - 1.36-3
+- Fix license, there is MIT only
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.36-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Jan 03 2023 Paul Wouters <paul.wouters@aiven.io - 1.36-1
+- Resolves: rhbz#2132181 perl-Net-DNS-1.36 is available
+- Add source download gpg verification
+- Update homepage / download URLS from CPAN to net-dns.org
+
+* Wed Dec 07 2022 Michal Josef Špaček <mspacek@redhat.com> - 1.34-3
+- Fix provided packages in *tests package
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.34-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 08 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.34-1
+- 1.34 bump
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.33-4
+- Perl 5.36 rebuild
+
+* Tue Mar 22 2022 Adam Williamson <awilliam@redhat.com> - 1.33-3
+- Rebuild with no changes to fix update mess on F36
+
+* Tue Feb 22 2022 Michal Josef Špaček <mspacek@redhat.com> - 1.33-2
+- Package tests
+- Remove obsolete dependency to Net::DNS::SEC
+  There was dependency until 1.29 version and it was used for tests.
+
+* Tue Feb 15 2022 Paul Wouters <paul.wouters@aiven.io> - 1.33-1
+- 1.33 bump
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.32-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.32-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jul 20 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.32-1
+- 1.32 bump
+
+* Mon May 24 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.29-4
+- Perl 5.34 re-rebuild of bootstrapped packages
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.29-3
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.29-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Dec 04 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.29-1
+- 1.29 bump
+
+* Thu Nov 12 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.28-1
+- 1.28 bump
+
+* Wed Nov  4 2020 Paul Howarth <paul@city-fan.org> - 1.27-2
+- Drop erroneous UTF-8 encoding conversion of Changes file (#1869049)
+
+* Mon Sep 14 2020 Petr Pisar <ppisar@redhat.com> - 1.27-1
+- 1.27 bump
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.21-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.21-4
+- Perl 5.32 re-rebuild of bootstrapped packages
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.21-3
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.21-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

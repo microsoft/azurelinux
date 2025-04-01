@@ -1,14 +1,17 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global _use_internal_dependency_generator 0
 
 %global contentdir       %{_localstatedir}/www/%{name}
 %global libdir           %{_localstatedir}/lib/mrtg
 
+# defining macros needed by SELinux
+%global with_selinux 1
+%global selinuxtype targeted
+%global modulename mrtg
+
 Summary:   Multi Router Traffic Grapher
 Name:      mrtg
-Version:   2.17.7
-Release:   6%{?dist}
+Version:   2.17.10
+Release:   9%{?dist}
 URL:       http://oss.oetiker.ch/mrtg/
 Source0:   http://oss.oetiker.ch/mrtg/pub/mrtg-%{version}.tar.gz
 Source1:   http://oss.oetiker.ch/mrtg/pub/mrtg-%{version}.tar.gz.md5
@@ -26,18 +29,28 @@ Source7:   mrtg.tmpfiles
 Source8:   mrtg.service
 # Source9: systemd timer file
 Source9:   mrtg.timer
+# Source100-102: selinux policy for mrtg, extracted
+# from https://github.com/fedora-selinux/selinux-policy
+Source100: %{modulename}.te
+Source101: %{modulename}.if
+Source102: %{modulename}.fc
 Patch0:    mrtg-2.15.0-lib64.patch
 Patch1:    mrtg-2.17.2-socket6-fix.patch
 # Patch2: some devices return 2**32-2 on ifSpeed (e. g. IBM FibreChannel switches)
 Patch2:    mrtg-2.17.4-cfgmaker-ifhighspeed.patch
-# Patch3: fixes 'man' option in mrtg-traffic-sum, see rhbz#1612188
-Patch3:    mrtg-2.17.7-traffic-sum-man-option.patch
-License:   GPLv2+
+Patch3:    mrtg-configure-c99.patch
+License:   GPL-2.0-or-later
 Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
-Requires:  perl-Socket6 perl-IO-Socket-INET6
+Requires:  perl-Socket6 perl-IO-Socket-INET6 perl-locale
 Requires:  gd
+%if 0%{?with_selinux}
+# This ensures that the *-selinux package and all it’s dependencies are not pulled
+# into containers and other systems that do not use SELinux
+Requires:  (%{name}-selinux if selinux-policy-%{selinuxtype})
+%endif
+BuildRequires: make
 BuildRequires: gd-devel, libpng-devel
 BuildRequires: perl-generators
 BuildRequires: systemd-units
@@ -51,12 +64,26 @@ The Multi Router Traffic Grapher (MRTG) is a tool to monitor the traffic
 load on network-links. MRTG generates HTML pages containing PNG
 images which provide a LIVE visual representation of this traffic.
 
+%if 0%{?with_selinux}
+# SELinux subpackage
+%package selinux
+Summary:   mrtg SELinux policy
+BuildArch: noarch
+Requires:  selinux-policy-%{selinuxtype}
+Requires(post): selinux-policy-%{selinuxtype}
+BuildRequires: selinux-policy-devel
+%{?selinux_requires}
+
+%description selinux
+Custom SELinux policy module
+%endif
+
 %prep
 %setup -q
-%patch 0 -p1 -b .lib64
-%patch 1 -p1 -b .socket6
-%patch 2 -p1 -b .ifhighspeed
-%patch 3 -p1 -b .traffic-sum-man-option
+%patch -P0 -p1 -b .lib64
+%patch -P1 -p1 -b .socket6
+%patch -P2 -p1 -b .ifhighspeed
+%patch -P3 -p1 -b .c99
 
 for i in doc/mrtg-forum.1 doc/mrtg-squid.1 CHANGES; do
     iconv -f iso-8859-1 -t utf-8 < "$i" > "${i}_"
@@ -75,6 +102,15 @@ find contrib -type f -exec \
     %{__perl} -e 's,^#!/\s*\S*perl\S*,#!%{__perl},gi' -p -i \{\} \;
 find contrib -name "*.pl" -exec %{__perl} -e 's;\015;;gi' -p -i \{\} \;
 find contrib -type f | xargs chmod a-x
+
+%if 0%{?with_selinux}
+# SELinux policy (originally from selinux-policy-contrib)
+# this policy module will override the production module
+mkdir selinux
+cp -p %{SOURCE100} %{SOURCE101} %{SOURCE102} selinux/
+make -f %{_datadir}/selinux/devel/Makefile %{modulename}.pp
+bzip2 -9 %{modulename}.pp
+%endif
 
 %install
 rm -rf   $RPM_BUILD_ROOT
@@ -108,6 +144,11 @@ done
 
 sed -i 's;@@lib@@;%{_lib};g' "$RPM_BUILD_ROOT"%{_mandir}/man1/*.1
 
+%if 0%{?with_selinux}
+install -D -m 0644 %{modulename}.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}/%{modulename}.pp.bz2
+install -D -p -m 0644 selinux/%{modulename}.if %{buildroot}%{_datadir}/selinux/devel/include/distributed/%{name}.if
+%endif
+
 %post
 install -d -m 0755 -o root -g root /var/lock/mrtg
 restorecon /var/lock/mrtg
@@ -122,6 +163,28 @@ fi
 
 %postun
 %systemd_postun_with_restart mrtg.service 
+
+%if 0%{?with_selinux}
+# SELinux contexts are saved so that only affected files can be
+# relabeled after the policy module installation
+%pre selinux
+%selinux_relabel_pre -s %{selinuxtype}
+
+%post selinux
+%selinux_modules_install -s %{selinuxtype} %{_datadir}/selinux/packages/%{selinuxtype}/%{modulename}.pp.bz2
+%selinux_relabel_post -s %{selinuxtype}
+
+if [ "$1" -le "1" ]; then # First install
+   # the service needs to be restarted for the custom label to be applied
+   %systemd_postun_with_restart mrtg.service
+fi
+
+%postun selinux
+if [ $1 -eq 0 ]; then
+    %selinux_modules_uninstall -s %{selinuxtype} %{modulename}
+    %selinux_relabel_post -s %{selinuxtype}
+fi
+%endif
 
 %files
 %license COPYING
@@ -142,9 +205,75 @@ fi
 %{_unitdir}/mrtg.service
 %{_unitdir}/mrtg.timer
 
+%if 0%{?with_selinux}
+%files selinux
+%{_datadir}/selinux/packages/%{selinuxtype}/%{modulename}.pp.*
+%{_datadir}/selinux/devel/include/distributed/%{modulename}.if
+%ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/%{modulename}
+%endif
+
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.17.7-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.17.10-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.17.10-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.17.10-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.17.10-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Apr 25 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.17.10-5
+- SPDX migration
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.17.10-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Dec 16 2022 Florian Weimer <fweimer@redhat.com> - 2.17.10-3
+- Port configure script to C99
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.17.10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.17.10-1
+- Update to mrtg-2.17.10
+  Resolves: #2041965
+
+* Thu Sep 23 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.17.8-1
+- Update to mrtg-2.17.8
+  Resolves: #1990765
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.17.7-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jun 08 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.17.7-12
+- Ship interface file within -selinux subpackage
+
+* Tue May 18 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.17.7-11
+- Remove deprecated StandardOutput=syslog
+- Add LogLevelMax=notice to avoid loggin each start/stop of the service
+  when mrtg.timer is used
+  Resolves: #911766
+
+* Mon Apr 12 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.17.7-10
+- Incorporate -selinux subpackage
+  See https://fedoraproject.org/wiki/SELinux/IndependentPolicy
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.17.7-9
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.17.7-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Nov 09 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.17.7-7
+- Add Requires perl-locale
+  Resolves: #1895580
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.17.7-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.17.7-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

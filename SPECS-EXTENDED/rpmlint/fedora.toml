@@ -1,0 +1,362 @@
+# Fedora's configuration for the rpmlint utility.
+
+# When checking that various files that should be compressed are
+# indeed compressed, look for this filename extension
+CompressExtension = "gz"
+
+# simple error is enough; warnings are fine
+BadnessThreshold = -1
+
+# Whether to allow packaging kernel modules in non-kernel packages.
+KernelModuleRPMsOK = false
+
+# Maximum allowed line length for Summary and Description tags
+MaxLineLength = 80
+
+# Assumed default version of Python if one cannot be determined from files
+# FIXME this should be sys.version[:3] but I have no idea how to implement it
+# here without changing it every other release
+PythonDefaultVersion = ""
+
+# Regexp string with expected suffix in Release tags.
+ReleaseExtension = '\.(fc|rhe?l|el)\d+(?=\.|$)'
+
+# Whether to want default start/stop runlevels specified in init scripts
+UseDefaultRunlevels = false
+
+ValidSrcPerms = [
+    "0o644",
+    "0o664",
+]
+
+# List of directories considered to be system default library search paths.
+SystemLibPaths = [
+    "/lib",
+    "/usr/lib",
+    "/lib64",
+    "/usr/lib64",
+]
+
+# Enabled checks for the rpmlint to be run (besides the default set)
+Checks = [
+    "BashismsCheck",
+    "PAMModulesCheck",
+    "TmpFilesCheck",
+    "SysVInitOnSystemdCheck",
+    "SharedLibraryPolicyCheck",
+]
+
+# Interpreters whose scriptlets are allowed to be empty
+ValidEmptyShells = [
+    "/usr/sbin/ldconfig",
+]
+
+# Package scriptlet interpreters
+ValidShells = [
+    "<lua>",
+    "/usr/bin/sh",
+    "/usr/bin/bash",
+    "/usr/sbin/ldconfig",
+    "/usr/bin/perl",
+    "/usr/bin/python",
+    "/usr/bin/python3",
+]
+
+Filters = [
+# FIXME - the commented lines are from openSUSE config
+#         Are they relevant for Fedora too?
+#         PR which enables them or remove them is welcome
+## Stuff autobuild takes care about
+#    '.*invalid-version.*',
+#    '.*invalid-packager.*',
+    '.*not-standard-release-extension.*',
+#    '.*invalid-buildhost.*',
+    '.*executable-in-library-package.*',
+    '.*non-versioned-file-in-library-package.*',
+    '.*shlib-policy-name-error.*',
+#    '.*hardcoded-path-in-buildroot-tag.*',
+    '.*no-buildroot-tag.*',
+#    '.*cross-directory-hard-link.*',
+
+# Do not validate package rpm groups
+    '.*devel-package-with-non-devel-group.*',
+    '.*no-group-tag.*',
+    '.*non-standard-group.*',
+
+# Output filters
+#    '.*spurious-bracket-in-.*',
+#    '.*one-line-command-in-.*',
+#    ' dir-or-file-in-opt ',  # handled by CheckFilelist.py
+#    ' dir-or-file-in-usr-local ',  # handled by CheckFilelist.py
+    ' non-standard-dir-in-usr ',  # handled by CheckFilelist.py
+    ' no-signature',
+#    ' symlink-crontab-file',  #bnc591431
+#    ' without-chkconfig',
+#    'unstripped-binary-or-object.*\.ko',
+#    ' no-chkconfig',
+#    ' subsys-not-used',
+#    ' dangerous-command.*',
+#    ' setuid-binary.*',
+#    'subdir-in-bin /sbin/conf.d/',
+#    '.* nss_db non-standard-dir-in-var db',
+#    'non-standard-dir-in-usr openwin',
+#    'ibcs2 non-standard-dir-in-usr i486-sysv4',
+#    'shlibs5 non-standard-dir-in-usr i486-linux-libc5',
+#    'explicit-lib-dependency libtool',
+#
+## Filesystem package needs special exceptions
+#    '^filesystem\..*: dir-or-file-in-var-run',
+#    '^filesystem\..*: dir-or-file-in-var-lock',
+#    '^filesystem\..*: dir-or-file-in-var-tmp',
+#    '^filesystem\..*: dir-or-file-in-var-run',
+#    '^filesystem\..*: dir-or-file-in-var-lock',
+#    '^filesystem\..*: dir-or-file-in-usr-tmp',
+#    '^filesystem\..*: dir-or-file-in-tmp',
+#    '^filesystem\..*: dir-or-file-in-mnt',
+#    '^filesystem\..*: dir-or-file-in-home',
+#    '^filesystem\..*: hidden-file-or-dir /root/.gnupg',
+#    '^filesystem\..*: hidden-file-or-dir /root/.gnupg',
+#    '^filesystem\..*: hidden-file-or-dir /etc/skel/.config',
+#    '^filesystem\..*: hidden-file-or-dir /etc/skel/.local',
+#    '^filesystem\..*: hidden-file-or-dir /tmp/.X11-unix',
+#    '^filesystem\..*: hidden-file-or-dir /tmp/.ICE-unix',
+#    '^filesystem\..*: hidden-file-or-dir /etc/skel/.fonts',
+#    '^filesystem\..*: filelist-forbidden-fhs23',
+#    '^filesystem\..*: filelist-forbidden-opt',
+#    '^filesystem\..*: non-standard-uid /var/lib/nobody nobody',
+#    '^filesystem\..*: missing-dependency-to-cron',
+## has arch specific dirs in /usr
+#    '^filesystem\..*: no-binary',
+#
+## Suppress any errors about internal packages
+#    '^qa\S+: [EWI]:',
+#    '^\S*(?:INTERNAL|internal)\.\S+: [EWI]:',
+#
+## Exceptions for devel-files
+#    'devel-file-in-non-devel-package.*/boot/vmlinuz-.*autoconf.h',
+#    'devel-file-in-non-devel-package.*/usr/src/linux-',
+#    'devel-file-in-non-devel-package.*/usr/share/systemtap',
+#    '-(?:examples|doc)\.\S+: \w: devel-file-in-non-devel-package',
+#    'java\S+-demo\.\S+: \w: devel-file-in-non-devel-package',
+#    'avr-libc\.\S+: \w: devel-file-in-non-devel-package',
+#    'cross-.*devel-file-in-non-devel-package',
+#    'cmake.*devel-file-in-non-devel-package',
+#    'gcc\d\d.*devel-file-in-non-devel-package',
+#    'OpenOffice_org-sdk\.\S+: \w: devel-file-in-non-devel-package',
+#    'wnn-sdk\.\S+: \w: devel-file-in-non-devel-package',
+#    'ocaml\.\S+: \w: devel-file-in-non-devel-package',
+#    'xorg-x11-server-sdk\.\S+: \w: devel-file-in-non-devel-package',
+#    'linux-kernel-headers\.\S+: \w: devel-file-in-non-devel-package',
+#    ' devel-file-in-non-devel-package.*-config',
+#    'libtool\.\S+: \w: devel-file-in-non-devel-package',
+#    'sdb.* dangling-relative-symlink /usr/share/doc/sdb/.*/gifs ../gifs',
+#    'kernel-modules-not-in-kernel-packages',
+#
+## SUSE kmp's don't need manual depmod (bnc#456048)
+#    'module-without-depmod-postin',
+#    'postin-with-wrong-depmod',
+#    'module-without-depmod-postun',
+#    'postun-with-wrong-depmod',
+#    'configure-without-libdir-spec',
+#    'conffile-without-noreplace-flag /etc/init.d',
+#    'use-of-RPM_SOURCE_DIR',
+#    'use-tmp-in-',
+#    'symlink-contains-up-and-down-segments /var/lib/named',
+#    'no-ldconfig-symlink',
+#    'aaa_base\.\S+: \w: use-of-home-in-%post',
+#    'description-line-too-long',
+    'hardcoded-library-path',
+#
+## Doesn't seem to make sense
+#    'invalid-ldconfig-symlink',
+#    'invalid-soname',
+#    'library-not-linked-against-libc',
+#    'only-non-binary-in-usr-lib',
+    'outside-libdir-files',
+#
+## We want these files
+#    ' perl-temp-file ',
+#    ' hidden-file-or-dir .*/\.packlist',
+#    ' hidden-file-or-dir .*/\.directory',
+#    'perl-.*no-binary',
+    ' no-major-in-name ',
+#
+## We check for that already
+#    'dangling-relative-symlink',
+    ' lib-package-without-%mklibname',
+    ' requires-on-release',
+#    ' non-executable-script /etc/profile.d/',
+#    ' non-executable-script /var/adm/fillup-templates/',
+#    ' init-script-name-with-dot ',
+#    '.* statically-linked-binary /sbin/ldconfig',
+#    '.* statically-linked-binary /sbin/init',
+#    'valgrind.* statically-linked-binary',
+#    'ldconfig-post.*/ddiwrapper/wine/',
+#    'glibc\.\S+: \w: statically-linked-binary /usr/sbin/glibc_post_upgrade',
+    ' symlink-should-be-relative ',
+#    ' binary-or-shlib-defines-rpath .*ORIGIN',
+#    'libzypp.*shlib-policy-name-error.*libzypp',
+#    'libtool.*shlib-policy.*',
+#
+## Stuff that is currently too noisy, but might become relevant in the future
+#    ' prereq-use',
+#    ' file-not-utf8',
+#    ' tag-not-utf8',
+#    ' setup-not-quiet',
+#    ' mixed-use-of-spaces-and-tabs ',
+#    ' prereq-use ',
+#
+## An issue with OBS, works with autobuild
+    ' no-packager-tag',
+#    ' unversioned-explicit-provides ',
+#    ' unversioned-explicit-obsoletes ',
+#    ' service-default-enabled ',
+#    ' non-standard-dir-perm ',
+#    ' conffile-without-noreplace-flag ',
+#    ' non-standard-executable-perm ',
+    ' jar-not-indexed ',
+#    ' uncompressed-zip ',
+#    ' %ifarch-applied-patch ',
+#    ' read-error ',
+#    ' init-script-without-chkconfig-postin ',
+#    ' init-script-without-chkconfig-preun ',
+#    ' postin-without-chkconfig ',
+#    ' preun-without-chkconfig ',
+    ' no-dependency-on locales',
+    ' no-dependency-on perl-base',
+    ' no-dependency-on python-base',
+    ' python-naming-policy-not-applied',
+    # FIXME does this really exists?
+    ' perl-naming-policy-not-applied',
+#    ' shlib-policy-name-error',
+#    ' binary-or-shlib-defines-rpath',
+#    ' executable-marked-as-config-file',
+#    ' log-files-without-logrotate',
+#    ' hardcoded-prefix-tag',
+    '-debug(info|source).* no-documentation',
+    '-debugsource.* no-binary',
+#    ' multiple-specfiles',
+#    ' no-default-runlevel ',
+#    ' setgid-binary ',
+#    ' non-readable ',
+    ' postin-without-ghost-file-creation ',
+#
+## Exceptions for filelist checks
+#    'nfs-client\.\S+: \w: filelist-forbidden-backup-file /var/lib/nfs/sm.bak',
+#    'perl\.\S+: \w: filelist-forbidden-perl-dir ',
+#    'info\.\S+: \w: info-dir-file .*/usr/share/info/dir',
+#
+## These packages are used for CD creation and are not supposed to be
+## installed. It's still a dirty hack to make an exception. The
+## packages should either be built in a separate project with
+## different config or file be put somewhere below /opt/suse/*
+#    '(?:dosutils|skelcd|installation-images|yast2-slide-show|instlux|skelcd-.*|patterns-.*)\.\S+: \w: filelist-forbidden-fhs23 /CD1',
+#
+## Too noisy, and usually not something downstream packagers can fix
+#    ' incorrect-fsf-address ',
+#    ' no-manual-page-for-binary ',
+#    ' static-library-without-debuginfo /usr/lib(?:64)?/ghc-[\d\.]+/',
+#
+## Many places have shorter paths
+#    ' non-coherent-filename ',
+
+# Mandriva specific stuff that Fedora do not want either
+    ' invalid-build-requires ',
+
+# Fedora specific stuff that we don't want
+    ' ghost-files-without-postin',
+    ' no-provides ',
+    '-debuginfo.* /usr/lib/debug/',
+    '-debugsource.* /usr/src/debug/',
+    '-devel.* no-binary',
+    '^gpg-pubkey:',
+    ' doc-file-dependency .* /bin/sh$',
+    'explicit-lib-dependency (liberation-fonts|libertas-.*-firmware|libvirt$|.*-(java|python|utils)$)',
+    'explicit-lib-dependency (python-.*lib.*|python2-.*lib.*|python3-.*lib.*)$',
+    'explicit-lib-dependency libreoffice.*$',
+    'dangling-\S*symlink /usr/share/doc/HTML/\S+/common .+/common$',
+    'hidden-file-or-dir .*/man5/\.k5login\.5[^/]+$',
+    'blender.+ (wrong-script-interpreter|non-executable-script) .+/blender/.+\.py.*BPY.*',
+    # Don't bother with the non-ghost-in-run checks, /var/lock and /var/run are
+    # symlinks to /run/lock and /run respectively, and /run is a tmpfs
+    'non-ghost-in-run',
+    # Someone thought it was a good idea to make .desktop files executable. They were wrong.
+    # Nevertheless, I do not yet control the universe, so we squelch the error here.
+    'script-without-shebang .*\.desktop$',
+    # Some files in /etc/ are not meant to be modified by the sysadmin
+    'non-conffile-in-etc /etc/rpm/.*$',
+    # Files that are intentionally not supposed to be readable
+    # Contains passwords
+    'non-readable /etc/ovirt-engine/isouploader.conf',
+    ## Ignore webservers which are just broken.
+    'invalid-url .*\.googlecode\.com/.*HTTP Error 404',
+    'invalid-url .*\.jboss\.org/.*HTTP Error 403',
+    'invalid-url .*bitbucket\.org/.*HTTP Error 403',
+    'invalid-url .*github\.com/.*HTTP Error 403',
+    # Don't care about long descriptions on debuginfo packages
+    # They automatically include the package name and are always
+    # quite long.
+    '-debuginfo.* description-line-too-long',
+    # ignore "common" jargon words
+    # https://bugzilla.redhat.com/show_bug.cgi?id=1424684#c9
+    'spelling-error.* \b(runtime|Runtime|metadata|cryptographic|multi|linux|filesystem|filesystems|backend|backends|userspace|addon|wayland|Wayland|util|utils|lossless|virtualization|toolkits|libvirtd|crypto|glyphs|GStreamer|http|extensibility|codec|codecs|truetype|scalable|pluggable|pixbuf|Kerberos|customizable|bitstream|tcp|libXss|libs|libc|encodings|GLib|udev|posix|libpng|glapi|gbm|freedesktop|spi|realtime|preprocessor|libaudit|hypervisor|embeddable|distributable|devel|config|cairo|bootloader|adaptors|pragma|passphrase|malloc|libvirt|libmagic|io|datetime|boolean|argparse|py|pinentry|namespace|middleware|lowlevel|libxcb|libudev|libsoup|libgcrypt|libcom|iSCSI|initramfs|GObject|executables|dialogs|checkpolicy|bitmapped|assistive|btrfs|crypttab|defrag|dracut|hostname|luks|mountpoints|netdev|rpmnew|rpmsave|storaged|tss|unlocker|UserAgent|accessors|archiver|async|asyncio|bluetooth|builddep|bytecode|cfg|changelogs|chardev|checksums|debuginfo|dir|durations|dvips|etoolbox|eval|filename|fontspec|frontend|frontends|gcc|geolocation|gettext|gil|github|glibc|globbing|gmtime|gobject|gpu|graphicx|gtk|gtkmm|gzip|https|hyperref|iconv|js|keymap|libsolv|localtime|longtable|lossy|lua|lxml|macOS|makefiles|maths|matplotlib|metapackage|minimalistic|monospaced|namespaces|natively|nftables|opentype|parsers|pdf|pdftex|perl|pre|predeclare|psnfss|pstricks|pyc|pytest|reimplementation|relinking|removeable|rsync|stdlib|stdout|subprocess|theming|tkinter|txt|typesafe|unicode|unittest|unix|untrusted|userspace|venv|virtio|virtualized|wxWidgets|xml|zlib|zstd)\b',
+    # Fedora no longer uses explicit ldconfig %post/%postun as of Fedora 28
+    'postin-without-ldconfig',
+    'postun-without-ldconfig',
+    'library-without-ldconfig-postin',
+    'library-without-ldconfig-postun',
+    # Ignore 700 dir perms here
+    'non-standard-dir-perm /etc/.* 700',
+    'non-standard-dir-perm /var/lib/.* 700',
+    # pip 20.2 generates PEP 376 "REQUESTED" marker (empty)
+    'zero-length .+/site-packages/.+\.dist-info/REQUESTED\b',
+    # py.typed files are empty
+    'zero-length .+/site-packages/.+/py\.typed\b',
+    # https://bugzilla.redhat.com/496737, https://bugzilla.redhat.com/646455
+    'coreutils.* (setuid-binary|non-standard-executable-perm) /bin/su (root )?04',
+    'krb5-workstation.* (setuid-binary|non-standard-executable-perm) /usr/kerberos/bin/ksu (root )?04',
+    'passwd.* (setuid-binary|non-standard-executable-perm) /usr/bin/passwd (root )?04',
+    'sudo.* (setuid-binary|non-standard-executable-perm) /usr/bin/sudo(edit)? (root )?04',
+    'upstart.* (setuid-binary|non-standard-executable-perm) /sbin/initctl (root )?04',
+    'usermode.* (setuid-binary|non-standard-executable-perm) /usr/sbin/userhelper (root )?04',
+    # Only works properly with SUSE packages. See
+    # https://github.com/rpm-software-management/rpmlint/issues/781
+    'no-library-dependency-for',
+    'no-library-dependency-on',
+    # ignore missing .hash section; we still warn if .gnu.hash is missing
+    # https://bugzilla.redhat.com/2132969
+    ' missing-hash-section ',
+    # https://bugzilla.redhat.com/2260169
+    ' python-missing-require ',
+
+## Bash completion files are not scripts, do not require them marked as %config
+#    'W: non-conffile-in-etc /etc/bash_completion.d/',
+#
+
+# Info uses file triggers now (boo#1152169)
+    ' info-files-without-install-info-postin',
+    ' info-files-without-install-info-postun ',
+    ' postin-without-install-info ',
+]
+
+[DanglingSymlinkExceptions."/usr/share/doc/licenses/"]
+path = "/usr/share/doc/licenses/"
+name = "licenses"
+[DanglingSymlinkExceptions."consolehelper$"]
+path = "consolehelper$"
+name = "usermode"
+[DanglingSymlinkExceptions."consolehelper-gtk$"]
+path = "consolehelper-gtk$"
+name = "usermode-gtk"
+
+[Descriptions]
+non-standard-uid = '''A file in this package is owned by an unregistered user id.
+To register the user, please make a pull request to the rpmlint config file
+configs/Fedora/fedora.toml in the rpmlint repository.
+'''
+non-standard-gid = '''A file in this package is owned by an unregistered group id.
+To register the group, please make a pull request to the rpmlint config file
+configs/Fedora/fedora.toml in the rpmlint repository.
+'''
+no-changelogname-tag = '''There is no changelog. Please insert a '%changelog' section heading in your
+spec file and prepare your changelog entry using e.g. the 'rpmdev-bumpspec' command.'''

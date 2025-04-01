@@ -1,0 +1,47 @@
+From e7ff390ef777bd818ccc6e6f8f3a56f36020abfe Mon Sep 17 00:00:00 2001
+From: Mat Booth <mat.booth@gmail.com>
+Date: Wed, 15 Sep 2021 10:21:53 +0100
+Subject: [PATCH 1/2] Always generate bytecode debuginfo
+
+When ecj is used to build RPMs
+---
+ .../jdt/internal/compiler/batch/Main.java     | 23 +++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/org/eclipse/jdt/internal/compiler/batch/Main.java b/org/eclipse/jdt/internal/compiler/batch/Main.java
+index f77372d..73a0d24 100644
+--- a/org/eclipse/jdt/internal/compiler/batch/Main.java
++++ b/org/eclipse/jdt/internal/compiler/batch/Main.java
+@@ -3109,6 +3109,29 @@ public void configure(String[] argv) {
+ 		this.options.put(CompilerOptions.OPTION_Process_Annotations, CompilerOptions.ENABLED);
+ 	}
+ 
++	{
++		// If we're building an RPM, force full debugging info to
++		// be generated, no matter what options have been passed
++		// by Ant.  This is something of a kludge, but it is far
++		// better than the alternative, which is having class
++		// files with debug info mysteriously missing.
++
++		String RpmPackageName = System.getenv("RPM_PACKAGE_NAME");
++		String RpmArch = System.getenv("RPM_ARCH");
++		String RpmBuildRoot = System.getenv("RPM_BUILD_ROOT");
++		if (RpmPackageName != null && RpmArch != null && RpmBuildRoot != null) {
++			this.options.put(
++					CompilerOptions.OPTION_LocalVariableAttribute,
++					CompilerOptions.GENERATE);
++			this.options.put(
++					CompilerOptions.OPTION_LineNumberAttribute,
++					CompilerOptions.GENERATE);
++			this.options.put(
++					CompilerOptions.OPTION_SourceFileAttribute,
++					CompilerOptions.GENERATE);
++		}
++	}
++
+ 	this.logger.logCommandLineArguments(newCommandLineArgs);
+ 	this.logger.logOptions(this.options);
+ 
+-- 
+2.31.1
+

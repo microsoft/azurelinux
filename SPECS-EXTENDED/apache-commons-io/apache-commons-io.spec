@@ -1,163 +1,289 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-#
-# spec file for package apache-commons-io
-#
-# Copyright (c) 2020 SUSE LLC
-#
-# All modifications and additions to the file contributed by third parties
-# remain the property of their copyright owners, unless otherwise agreed
-# upon. The license for this file, and modifications and additions to the
-# file, is the same license as for the pristine package itself (unless the
-# license for the pristine package is not an Open Source License, in which
-# case the license is the MIT License). An "Open Source License" is a
-# license that conforms to the Open Source Definition (Version 1.9)
-# published by the Open Source Initiative.
+%bcond_with bootstrap
 
-# Please submit bugfixes or comments via https://bugs.opensuse.org/
-#
-
-
-%define base_name       io
-%define short_name      commons-%{base_name}
-%bcond_with tests
-Name:           apache-%{short_name}
-Version:        2.14.0
-Release:        1%{?dist}
+Name:           apache-commons-io
+Epoch:          1
+Version:        2.16.1
+Release:        2%{?dist}
 Summary:        Utilities to assist with developing IO functionality
 License:        Apache-2.0
-Group:          Development/Libraries/Java
-URL:            https://commons.apache.org/%{base_name}
-Source0:        https://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
-Source1:        https://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz.asc
-Source2:        %{name}-build.xml
-BuildRequires:  ant >= 1.6
-BuildRequires:  fdupes
-BuildRequires:  java-devel >= 1.8
-BuildRequires:  javapackages-local-bootstrap
-Provides:       %{short_name} = %{version}-%{release}
-Provides:       jakarta-%{short_name} = %{version}-%{release}
-Obsoletes:      jakarta-%{short_name} < %{version}-%{release}
+URL:            https://commons.apache.org/io
 BuildArch:      noarch
-%if %{with tests}
-BuildRequires:  ant-junit
+#ExclusiveArch:  %{java_arches} noarch
+
+Source0:        https://archive.apache.org/dist/commons/io/source/commons-io-%{version}-src.tar.gz
+
+%if %{with bootstrap}
+BuildRequires:  javapackages-bootstrap
+%else
+BuildRequires:  maven-local
+BuildRequires:  mvn(org.apache.commons:commons-lang3)
+BuildRequires:  mvn(org.apache.commons:commons-parent:pom:)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-antrun-plugin)
+BuildRequires:  mvn(org.junit.jupiter:junit-jupiter)
+BuildRequires:  mvn(org.mockito:mockito-core)
 %endif
+BuildRequires:  jurand
 
 %description
 Commons-IO contains utility classes, stream implementations,
 file filters, and endian classes. It is a library of utilities
 to assist with developing IO functionality.
 
-%package        javadoc
-Summary:        API documentation for %{name}
-Group:          Documentation/HTML
-
-%description    javadoc
-This package provides %{summary}.
+%{?javadoc_package}
 
 %prep
-%setup -q -n %{short_name}-%{version}-src
-cp %{SOURCE2} build.xml
+%setup -q -n commons-io-%{version}-src
 
-%pom_remove_parent
+sed -i 's/\r//' *.txt
+
+# Run tests in multiple reusable forks to improve test performance
+sed -i -e /reuseForks/d -e /forkCount/d pom.xml
+sed -i '/<argLine>/d' pom.xml
+
+%mvn_file : commons-io %{name}
+%mvn_alias : org.apache.commons:
+
+%pom_remove_dep org.junit-pioneer:junit-pioneer
+%java_remove_annotations src -s -n DefaultLocale
+
+%pom_remove_dep com.google.jimfs:jimfs
+rm src/test/java/org/apache/commons/io/input/ReversedLinesFileReaderTestParamFile.java
 
 %build
-%{ant} \
-	-Dcompiler.source=1.8 \
-%if %{without tests }
-	-Dtest.skip=true \
-%endif
-    jar javadoc
+# See "-DcommonsIoVersion" in maven-surefire for the tested version
+
+# The following tests fail on tmpfs/nfs:
+#  * PathUtilsDeleteDirectoryTest.testDeleteDirectory1FileSize0OverrideReadOnly:80->testDeleteDirectory1FileSize0:68 » FileSystem
+#  * PathUtilsDeleteFileTest.testDeleteReadOnlyFileDirectory1FileSize1:114 » FileSystem
+#  * PathUtilsDeleteFileTest.testSetReadOnlyFileDirectory1FileSize1:134 » FileSystem
+#  * PathUtilsDeleteTest.testDeleteDirectory1FileSize0OverrideReadonly:97->testDeleteDirectory1FileSize0:69 » FileSystem
+#  * PathUtilsDeleteTest.testDeleteDirectory1FileSize1OverrideReadOnly:145->testDeleteDirectory1FileSize1:117 » FileSystem
+
+# moditect profile generates module-info.class
+%mvn_build -f -- -Dcommons.osgi.symbolicName=org.apache.commons.io
 
 %install
-# jars
-install -d -m 0755 %{buildroot}%{_javadir}
-install -p -m 0644 target/%{short_name}-%{version}.jar \
-  %{buildroot}%{_javadir}/%{short_name}.jar
-ln -sf %{short_name}.jar %{buildroot}%{_javadir}/%{name}.jar
-# pom
-install -d -m 755 %{buildroot}%{_mavenpomdir}
-install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{short_name}.pom
-%add_maven_depmap %{short_name}.pom %{short_name}.jar -a "org.apache.commons:commons-io"
-# javadoc
-install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
-cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
-%fdupes -s %{buildroot}%{_javadocdir}
+%mvn_install
 
 %files -f .mfiles
 %license LICENSE.txt NOTICE.txt
 %doc RELEASE-NOTES.txt
-%{_javadir}/%{name}.jar
-
-%files javadoc
-%doc %{_javadocdir}/%{name}
 
 %changelog
-* Mon Oct 7 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 2.14.0-1
-- Upgrade to 2.14.0 to fix the CVE-2024-47554.
-- License verified
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.16.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.8.0-2
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Fri May 17 2024 Marian Koncek <mkoncek@redhat.com> - 1:2.16.1-1
+- Update to upstream version 2.16.1
 
-* Thu Nov 12 2020 Joe Schmitt <joschmit@microsoft.com> - 2.8.0-1.2
-- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
-- Use javapackages-local-bootstrap to avoid build cycle.
+* Tue Feb 27 2024 Jiri Vanek <jvanek@redhat.com> - 1:2.13.0-8
+- Rebuilt for java-21-openjdk as system jdk
 
-* Tue Oct 27 2020 Pedro Monreal <pmonreal@suse.com>
-- Update to 2.8.0
-  * Lots of added functions, fixes and updates.
-  * https://commons.apache.org/proper/commons-io/changes-report.html#a2.8.0
-* Wed Jun  3 2020 Pedro Monreal Gonzalez <pmonrealgonzalez@suse.com>
+* Fri Feb 23 2024 Jiri Vanek <jvanek@redhat.com> - 1:2.13.0-7
+- bump of release for for java-21-openjdk as system jdk
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.13.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.13.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Sep 20 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.13.0-4
+- Rebuild to regenerate auto-Requires on java
+
+* Fri Sep 01 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.13.0-3
+- Rebuild
+
+* Wed Aug 30 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.13.0-2
+- Build with Jurand instead of deprecated javapackages-extra
+
+* Wed Aug 09 2023 Marian Koncek <mkoncek@redhat.com> - 1:2.13.0-1
+- Update to upstream version 2.13.0
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.11.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jan 18 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.11.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.11.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sun Apr 24 2022 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.11.0-1
+- Update to upstream version 2.11.0
+
+* Sat Feb 05 2022 Jiri Vanek <jvanek@redhat.com> - 1:2.8.0-7
+- Rebuilt for java-17-openjdk as system jdk
+
+* Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.8.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.8.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon May 17 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.8.0-4
+- Bootstrap build
+- Non-bootstrap build
+
+* Wed Feb  3 2021 Mat Booth <mat.booth@redhat.com> - 1:2.8.0-3
+- Add patch to fix Files.size() failing when symlink target is non-existant
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.8.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Oct 16 2020 Fabio Valentini <decathorpe@gmail.com> - 1:2.8.0-1
+- Update to version 2.8.0.
+
+* Fri Sep 18 2020 Marian Koncek <mkoncek@redhat.com> - 1:2.8.0-1
+- Update to upstream version 2.8.0
+
+* Tue Aug 18 2020 Fabio Valentini <decathorpe@gmail.com> - 1:2.7-1
+- Update to version 2.7.
+
+* Wed Jul 29 2020 Marian Koncek <mkoncek@redhat.com> - 1:2.7-1
 - Update to upstream version 2.7
-  * https://commons.apache.org/proper/commons-io/changes-report.html#a2.7
-  * Lots of bugfixes, updates and enhancements
-  * Java 8 or later is required
-* Wed Mar 27 2019 Fridrich Strba <fstrba@suse.com>
-- Remove pom parent, since we don't use it when not building with
-  maven
-* Tue Feb 26 2019 Fridrich Strba <fstrba@suse.com>
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.6-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jul 10 2020 Jiri Vanek <jvanek@redhat.com> - 1:2.6-9
+- Rebuilt for JDK-11, see https://fedoraproject.org/wiki/Changes/Java11
+
+* Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.6-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
+* Sat Jan 25 2020 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.6-6
+- Build with OpenJDK 8
+
+* Tue Nov 05 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.6-5
+- Mass rebuild for javapackages-tools 201902
+
+* Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.6-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
+* Fri May 24 2019 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.6-4
+- Mass rebuild for javapackages-tools 201901
+
+* Thu Feb 07 2019 Mat Booth <mat.booth@redhat.com> - 1:2.6-6
+- Rebuild to regenerate OSGi metadata
+
+* Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.6-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
+* Thu Jul 12 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
+* Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
+* Mon Jan 29 2018 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.6-2
+- Cleanup spec file
+
+* Sun Oct 22 2017 Michael Simacek <msimacek@redhat.com> - 1:2.6-1
 - Update to upstream version 2.6
-  * many bugfixes, features and enhancenments, like
-    Automatic-Module-Name entry in manifest
-  * requires jdk7 or later
-  * see RELEASE-NOTES.txt for details
-- Generated a build.xml to be able to build with ant
-- Build with tests is now optional
-- Removed patch:
-  * commons-io-version-property.patch
-    + not needed anymore in this version
-* Tue May 15 2018 fstrba@suse.com
-- Build with source and target 8 to prepare for a possible removal
-  of 1.6 compatibility
-- Run fdupes on documentation
-* Thu Sep 14 2017 fstrba@suse.com
-- Fix build with jdk9 by specifying source and target level 1.6
-* Sun May 21 2017 tchvatal@suse.com
-- Remove unused depedencies
-* Fri May 19 2017 pcervinka@suse.com
-- New build dependency: javapackages-local
-* Wed Mar 18 2015 tchvatal@suse.com
-- Fix build with new javapackages-tools
-* Mon Jul  7 2014 tchvatal@suse.com
-- Use junit not junit4
-* Mon Sep  9 2013 tchvatal@suse.com
-- Move from jpackage-utils to javapackage-tools
-* Wed Mar 20 2013 mmeister@suse.com
-- Added url as source.
-  Please see http://en.opensuse.org/SourceUrls
-* Thu Oct 25 2012 mvyskocil@suse.com
-- update to the latest upstream version 2.4 (needed by fop 1.1)
-  * many bugfixes, features and enhancenments, like
-  * XmlStreamReader support for UTF-32
-  * requires jdk6 or later
-  * see RELEASE-NOTES.txt for details
-- rename to apache-commons-io to stay compatible with upstream and fedora
-- add commons-io-version-property.patch to fix the version in build.xml
-* Mon Aug 25 2008 mvyskocil@suse.cz
-- target=1.5
-- removed a build gcj support
-- removed a javadoc %%post/postun
-- fixed a wrong end of line encoding
-* Thu Mar 13 2008 mvyskocil@suse.cz
-- Initial package created with version 1.3.2 (JPackage 1.7)
+
+* Wed Jul 26 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
+* Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
+* Thu Jun 23 2016 Michael Simacek <msimacek@redhat.com> - 1:2.5-1
+- Update to upstream version 2.5
+
+* Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.4-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
+* Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:2.4-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
+* Tue Oct 14 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.4-13
+- Remove legacy Obsoletes/Provides for jakarta-commons
+
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:2.4-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
+* Tue Mar 04 2014 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1:2.4-11
+- Use Requires: java-headless rebuild (#1067528)
+
+* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:2.4-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
+* Mon Apr 22 2013 Michal Srb <msrb@redhat.com> - 1:2.4-9
+- Rebuild
+
+* Mon Apr 15 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.4-8
+- Update to current packaging guidelines
+
+* Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:2.4-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
+* Wed Feb 06 2013 Java SIG <java-devel@lists.fedoraproject.org> - 1:2.4-6
+- Update for https://fedoraproject.org/wiki/Fedora_19_Maven_Rebuild
+- Replace maven BuildRequires with maven-local
+
+* Wed Jan  9 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.4-5
+- Bump release tag
+
+* Tue Jan  8 2013 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.4-4
+- Build with xmvn
+
+* Mon Nov 19 2012 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.4-3
+- Add Provides/Obsoletes for jakarta-commons-io
+
+* Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:2.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
+* Tue Jun 19 2012 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.4-1
+- Updae to 2.4
+
+* Mon Apr 16 2012 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.3-1
+- Update to 2.3
+
+* Wed Apr 4 2012 Mikolaj Izdebski <mizdebsk@redhat.com> - 1:2.2-1
+- Update to 2.2
+- Remove rpm bug workaround
+- Finalize renaming from jakarta-comons-io
+
+* Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:2.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
+* Wed Dec 7 2011 Alexander Kurtakov <akurtako@redhat.com> 1:2.1-1
+- Update to latest upstream (2.1).
+
+* Thu Jun 23 2011 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1:2.0.1-3
+- Fix build with maven3
+- Use new add_maven_depmap macro
+
+* Mon Feb 07 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:2.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
+* Tue Jan 18 2011 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1:2.0.1-1
+- Update to 2.0.1
+- Versionless jars & javadocs
+- Use maven 3 to build
+- Use apache-commons-parent for BR
+
+* Fri Oct 22 2010 Chris Spike <chris.spike@arcor.de> 1:2.0-1
+- Updated to 2.0
+- Cleaned up BRs
+
+* Thu Jul  8 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1:1.4-6
+- Add license to javadoc subpackage
+
+* Fri May 21 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1:1.4-5
+- Correct depmap filename for backward compatibility
+
+* Mon May 17 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1:1.4-4
+- Fix maven depmap JPP name to short_name
+
+* Wed May 12 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1:1.4-3
+- Add obsoletes to javadoc sub-package
+
+* Wed May 12 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1:1.4-2
+- Add symlink to short_name.jar
+- Fix mavendepmapfragdir wildcard
+
+* Tue May 11 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1:1.4-1
+- Rename and rebase of jakarta-commons-io
+- Clean up whole spec

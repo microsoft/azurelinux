@@ -1,24 +1,18 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-%{!?_httpd_apxs: %{expand: %%global _httpd_apxs %%{_bindir}/apxs}}
-
 %{!?_httpd_mmn: %{expand: %%global _httpd_mmn %%(cat %{_includedir}/httpd/.mmn 2>/dev/null || echo 0-0)}}
-%{!?_httpd_confdir:    %{expand: %%global _httpd_confdir    %%{_sysconfdir}/httpd/conf.d}}
-# /etc/httpd/conf.d with httpd < 2.4 and defined as /etc/httpd/conf.modules.d with httpd >= 2.4
-%{!?_httpd_modconfdir: %{expand: %%global _httpd_modconfdir %%{_sysconfdir}/httpd/conf.d}}
-%{!?_httpd_moddir:    %{expand: %%global _httpd_moddir    %%{_libdir}/httpd/modules}}
 
-
-%global with_python3 1
-
-%global with_python2 0
-%global debug_package %{nil}
+%if 0%{?fedora} || 0%{?rhel} > 7
+%bcond_without python3
+%bcond_with python2
+%else
+%bcond_with python3
+%bcond_without python2
+%endif
 
 Name:           mod_wsgi
-Version:        4.9.3
-Release:        2%{?dist}
+Version:        5.0.2
+Release:        1%{?dist}
 Summary:        A WSGI interface for Python web applications in Apache
-License:        ASL 2.0
+License:        Apache-2.0 AND CC-BY-3.0
 URL:            https://modwsgi.readthedocs.io/
 Source0:        https://github.com/GrahamDumpleton/mod_wsgi/archive/%{version}.tar.gz#/mod_wsgi-%{version}.tar.gz
 Source1:        wsgi.conf
@@ -27,10 +21,10 @@ Patch1:         mod_wsgi-4.5.20-exports.patch
 
 BuildRequires:  httpd-devel
 BuildRequires:  gcc
+BuildRequires:  make
 
 # Suppress auto-provides for module DSO
-%{?filter_provides_in: %filter_provides_in %{_httpd_moddir}/.*\.so$}
-%{?filter_setup}
+%global __provides_exclude_from %{_httpd_moddir}/.*\\.so$
 
 %global _description\
 The mod_wsgi adapter is an Apache module that provides a WSGI compliant\
@@ -42,27 +36,29 @@ existing WSGI adapters for mod_python or CGI.\
 
 %description %_description
 
-%if 0%{?with_python2} > 0
+%if %{with python2}
 %package -n python2-%{name}
 Summary: %summary
-Requires:       httpd-mmn
+Requires:       httpd-mmn = %{_httpd_mmn}
 BuildRequires:  python2-devel, python2-setuptools
 %{?python_provide:%python_provide python2-%{name}}
-# Remove before F30
+%if 0%{?rhel} && 0%{?rhel} <= 7
 Provides: mod_wsgi = %{version}-%{release}
 Provides: mod_wsgi%{?_isa} = %{version}-%{release}
 Obsoletes: mod_wsgi < %{version}-%{release}
+%endif
 
 %description -n python2-%{name} %_description
 
 %endif
 
-%if 0%{?with_python3} > 0
+%if %{with python3}
 %package -n python3-%{name}
 Summary:        %summary
-Requires:       httpd-mmn
+Requires:       httpd-mmn = %{_httpd_mmn}
 BuildRequires:  python3-devel, python3-sphinx, python3-sphinx_rtd_theme
-%if 0%{?with_python2} == 0
+BuildRequires:  python3-setuptools
+%if !%{with python2}
 Provides: mod_wsgi = %{version}-%{release}
 Provides: mod_wsgi%{?_isa} = %{version}-%{release}
 Obsoletes: mod_wsgi < %{version}-%{release}
@@ -75,39 +71,39 @@ Obsoletes: mod_wsgi < %{version}-%{release}
 %prep
 %autosetup -p1 -n %{name}-%{version}
 
-: Python2=%{with_python2} Python3=%{with_python3}
+: Python2=%{with python2} Python3=%{with python3}
 
 %build
-%if %{with_python3}
-make -C docs html SPHINXBUILD=%{_bindir}/sphinx-build-3
+%if %{with python3}
+%make_build -C docs html
 %endif
 
 export LDFLAGS="$RPM_LD_FLAGS -L%{_libdir}"
 export CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing"
 
-%if 0%{?with_python3} > 0
+%if %{with python3}
 mkdir py3build/
 # this always produces an error (because of trying to copy py3build
 # into itself) but we don't mind, so || :
 cp -R * py3build/ || :
 pushd py3build
-%configure --enable-shared --with-apxs=%{_httpd_apxs} --with-python=python3
-make %{?_smp_mflags}
+%configure --enable-shared --with-apxs=%{_httpd_apxs} --with-python=%{python3}
+%make_build
 %py3_build
 popd
 %endif
 
-%if 0%{?with_python2} > 0
-%configure --enable-shared --with-apxs=%{_httpd_apxs} --with-python=python2
-make %{?_smp_mflags}
+%if %{with python2}
+%configure --enable-shared --with-apxs=%{_httpd_apxs} --with-python=%{python2}
+%make_build
 %py2_build
 %endif
 
 %install
 # first install python3 variant and rename the so file
-%if 0%{?with_python3} > 0
+%if %{with python3}
 pushd py3build
-make install DESTDIR=$RPM_BUILD_ROOT LIBEXECDIR=%{_httpd_moddir}
+%make_install LIBEXECDIR=%{_httpd_moddir}
 mv  $RPM_BUILD_ROOT%{_httpd_moddir}/mod_wsgi{,_python3}.so
 
 install -d -m 755 $RPM_BUILD_ROOT%{_httpd_modconfdir}
@@ -121,8 +117,8 @@ popd
 %endif
 
 # second install python2 variant
-%if 0%{?with_python2} > 0
-make install DESTDIR=$RPM_BUILD_ROOT LIBEXECDIR=%{_httpd_moddir}
+%if %{with python2}
+%make_install LIBEXECDIR=%{_httpd_moddir}
 
 install -d -m 755 $RPM_BUILD_ROOT%{_httpd_modconfdir}
 # httpd >= 2.4.x
@@ -133,7 +129,7 @@ mv $RPM_BUILD_ROOT%{_bindir}/mod_wsgi-express{,-2}
 ln -s %{_bindir}/mod_wsgi-express-2 $RPM_BUILD_ROOT%{_bindir}/mod_wsgi-express
 %endif
 
-%if 0%{?with_python2} > 0
+%if %{with python2}
 %files -n python2-%{name}
 %license LICENSE
 %doc CREDITS.rst README.rst
@@ -145,7 +141,7 @@ ln -s %{_bindir}/mod_wsgi-express-2 $RPM_BUILD_ROOT%{_bindir}/mod_wsgi-express
 %{_bindir}/mod_wsgi-express
 %endif
 
-%if 0%{?with_python3} > 0
+%if %{with python3}
 %files -n python3-%{name}
 %license LICENSE
 %doc CREDITS.rst README.rst
@@ -157,17 +153,107 @@ ln -s %{_bindir}/mod_wsgi-express-2 $RPM_BUILD_ROOT%{_bindir}/mod_wsgi-express
 %endif
 
 %changelog
-* Fri Oct 14 2022 Henry Li <lihl@microsoft.com> - 4.9.3-2
-- License verified
+* Wed Dec  4 2024 Joe Orton <jorton@redhat.com> - 5.0.2-1
+- update to 5.0.2 (#2250905)
 
-* Thu Oct 13 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9.3-1
-- Upgrade to 4.9.3
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Tue Mar 02 2021 Henry Li <lihl@microsoft.com> - 4.6.8-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Fix condition checking to apply for CBL-Mariner
-- Remove version checking on httpd-mmn, which does not apply in Mariner
-- Fix httpd_apxs macro to point to right location of the apxs binary
+* Tue Jul 16 2024 Joe Orton <jorton@redhat.com> - 5.0.0-5
+- fix LD_RUN_PATH handling
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 5.0.0-4
+- Rebuilt for Python 3.13
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 5.0.0-3
+- Rebuilt for Python 3.13
+
+* Wed Apr 24 2024 Karolina Surma <ksurma@redhat.com> - 5.0.0-2
+- Add support for Python 3.13
+
+* Thu Jan 25 2024 Joe Orton <jorton@redhat.com> - 5.0.0-1
+- update to 5.0.0 (#2250905)
+- remove redundant _httpd_ macro definitions
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.4-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.4-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.4-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 15 2023 Tomas Orsava <torsava@redhat.com> - 4.9.4-5
+- Use the modern way of filtering Provides not to interfere with modern Python
+  RPM generators
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 4.9.4-4
+- Rebuilt for Python 3.12
+
+* Thu Jun 01 2023 Luboš Uhliarik <luhliari@redhat.com> - 4.9.4-3
+- SPDX migration
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Sep 14 2022 Luboš Uhliarik <luhliari@redhat.com> - 4.9.4-1
+- new version 4.9.4
+
+* Wed Aug 31 2022 Luboš Uhliarik <luhliari@redhat.com> - 4.9.3-1
+- new version 4.9.3
+
+* Fri Aug 19 2022 Luboš Uhliarik <luhliari@redhat.com> - 4.9.1-4
+- Resolves: #2119280 - Core dumped upon file upload >= 1GB
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 4.9.1-2
+- Rebuilt for Python 3.11
+
+* Mon May 02 2022 Alexander Bokovoy <abokovoy@redhat.com> - 4.9.1-1
+- Update to 4.9.1
+- Fixes: rhbz#2049695
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Aug 04 2021 Miro Hrončok <mhroncok@redhat.com> - 4.9.0-1
+- Update to 4.9.0
+- Enable needlessly disabled debuginfo package
+- Fixes: rhbz#1960695
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.8.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 18 2021 Joe Orton <jorton@redhat.com> - 4.8.0-2
+- adjust to use bconds (lbalhar, PR#6)
+- adjust to use make_install macro (tstellar, PR#8)
+
+* Thu Jun 17 2021 Alexander Bokovoy <abokovoy@redhat.com> - 4.8.0-1
+- update to 4.8.0
+- Add experimental Python 3.10 support (#1898158)
+- Upstream PR: https://github.com/GrahamDumpleton/mod_wsgi/pull/688
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 4.7.1-5
+- Rebuilt for Python 3.10
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.7.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.7.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 4.7.1-2
+- Rebuilt for Python 3.9
+
+* Wed May 13 2020 Joe Orton <jorton@redhat.com> - 4.7.1-1
+- update to 4.7.1 (#1721376)
+
+* Thu Feb 13 2020 Tom Stellard <tstellar@redhat.com> - 4.6.8-3
+- Use make_build macro instead of just make
+- https://docs.fedoraproject.org/en-US/packaging-guidelines/#_parallel_make
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.6.8-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -190,7 +276,7 @@ ln -s %{_bindir}/mod_wsgi-express-2 $RPM_BUILD_ROOT%{_bindir}/mod_wsgi-express
 * Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 4.6.6-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
-* Fri Jun 08 2019 Matthias Runge <mrunge@redhat.com> - 4.6.6-1
+* Fri Jun 07 2019 Matthias Runge <mrunge@redhat.com> - 4.6.6-1
 - update to 4.6.6 (rhbz#1718151)
 
 * Wed May 29 2019 Miro Hrončok <mhroncok@redhat.com> - 4.6.5-1

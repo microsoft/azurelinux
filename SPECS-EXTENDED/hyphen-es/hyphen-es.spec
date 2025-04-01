@@ -2,9 +2,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name: hyphen-es
 Summary: Spanish hyphenation rules
-Version: 2.3
-Release: 8%{?dist}
-Source: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_ANY.oxt
+Version: 2.8
+Release: 1%{?dist}
+Source: https://github.com/sbosio/rla-es/releases/download/v%{version}/es.oxt
 URL: https://github.com/sbosio/rla-es/tree/master/separacion
 License: LGPLv3+ or GPLv3+ or MPLv1.1
 BuildArch: noarch
@@ -21,7 +21,7 @@ Spanish hyphenation rules.
 
 %install
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/hyphen
-cp -p hyph_es_ANY.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen/hyph_es.dic
+cp -p hyph_es.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen/hyph_es.dic
 
 pushd $RPM_BUILD_ROOT/%{_datadir}/hyphen/
 es_aliases="es_AR es_BO es_CL es_CO es_CR es_CU es_DO es_EC es_ES es_GT es_HN es_MX es_NI es_PA es_PE es_PR es_PY es_SV es_US es_UY es_VE"
@@ -32,11 +32,15 @@ done
 popd
 
 %files
-%doc README_hyph_es_ANY.txt
+%doc README_hyph_es.txt
 %license GPLv3.txt LGPLv3.txt MPL-1.1.txt
 %{_datadir}/hyphen/*
 
 %changelog
+* Wed Oct 30 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 2.8-1
+- Update CBL-Mariner to verion 2.8 (License: LGPLv3+ or GPLv3+ or MPLv1.1).
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

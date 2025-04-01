@@ -1,11 +1,8 @@
 %global srcname paramiko
 
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-
 Name:          python-%{srcname}
-Version:       2.12.0
-Release:       2%{?dist}
+Version:       3.5.0
+Release:       1%{?dist}
 Summary:       SSH2 protocol library for python
 
 # No version specified
@@ -17,9 +14,12 @@ Source0:       %{url}/archive/%{version}/%{srcname}-%{version}.tar.gz
 # Can be removed when https://github.com/paramiko/paramiko/pull/1665/ is released
 Patch3:        0003-remove-pytest-relaxed-dep.patch
 
-# Avoid use of deprecated python-mock by using unittest.mock instead
-# Can be removed when https://github.com/paramiko/paramiko/pull/1666/ is released
-Patch4:        0004-remove-mock-dep.patch
+# icecream not packaged in Fedora, nor needed for regular builds
+Patch4:        0004-remove-icecream-dep.patch
+
+# Avoid use of lexicon via invoke since we're avoiding invoke as a dependency;
+# instead, use lexicon directly
+Patch5:        0005-remove-invoke-dep.patch
 
 BuildArch:     noarch
 
@@ -38,14 +38,14 @@ encrypted tunnel (this is how sftp works, for example).
 
 %package -n python%{python3_pkgversion}-%{srcname}
 Summary:       SSH2 protocol library for python
-BuildRequires: python%{python3_pkgversion}-devel
-BuildRequires: %{py3_dist bcrypt} >= 3.1.3
-BuildRequires: %{py3_dist cryptography} >= 2.5
+BuildRequires: python%{python3_pkgversion}-devel >= 3.6
+BuildRequires: %{py3_dist bcrypt} >= 3.2
+BuildRequires: %{py3_dist cryptography} >= 3.3
+BuildRequires: %{py3_dist lexicon} >= 2.0.1
 BuildRequires: %{py3_dist pyasn1} >= 0.1.7
-BuildRequires: %{py3_dist pynacl} >= 1.0.1
+BuildRequires: %{py3_dist pynacl} >= 1.5
 BuildRequires: %{py3_dist pytest}
 BuildRequires: %{py3_dist setuptools}
-BuildRequires: %{py3_dist six}
 Recommends:    %{py3_dist pyasn1} >= 0.1.7
 
 %description -n python%{python3_pkgversion}-%{srcname}
@@ -53,9 +53,21 @@ Recommends:    %{py3_dist pyasn1} >= 0.1.7
 
 Python 3 version.
 
+%package doc
+Summary:       Docs and demo for SSH2 protocol library for python
+BuildRequires: /usr/bin/sphinx-build
+Requires:      %{name} = %{version}-%{release}
+
+%description doc
+%{paramiko_desc}
+
+This is the documentation and demos.
 
 %prep
 %autosetup -p1 -n %{srcname}-%{version}
+
+chmod -c a-x demos/*
+sed -i -e '/^#!/,1d' demos/*
 
 %build
 %py3_build
@@ -63,19 +75,294 @@ Python 3 version.
 %install
 %py3_install
 
+sphinx-build -b html sites/docs/ html/
+rm html/.buildinfo
+rm -r html/.doctrees
+
 %check
 PYTHONPATH=%{buildroot}%{python3_sitelib} pytest-%{python3_version}
 
 %files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE
-%doc NEWS README.rst
+%doc README.rst
 %{python3_sitelib}/%{srcname}-*.egg-info/
 %{python3_sitelib}/%{srcname}/
 
+%files doc
+%doc html/ demos/
+
 %changelog
-* Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 2.12.0-2
-- Initial CBL-Mariner import from Fedora 36 (license: MIT).
-- License verified
+* Mon Sep 16 2024 Paul Howarth <paul@city-fan.org> - 3.5.0-1
+- Update to 3.5.0 (rhbz#2312503)
+  - Add support for AES-GCM encryption ciphers (128 and 256 bit variants)
+    (GH#982, GH#2157, GH#2444, rhbz#2311855); this functionality has been
+    tested in client mode against OpenSSH 9.0, 9.2 and 9.6, as well as against
+    a number of proprietary appliance SSH servers
+  - Check for 'None' transport members inside '~paramiko.channel.Channel' when
+    closing the channel; this likely doesn't come up much in the real world,
+    but was causing warnings in the test suite
+
+* Mon Aug 12 2024 Paul Howarth <paul@city-fan.org> - 3.4.1-1
+- Update to 3.4.1
+  - Massage our import of the TripleDES cipher to support Cryptography ≥ 43;
+    this should prevent 'CryptographyDeprecationWarning' from appearing upon
+    import (GH#2419, GH#2421)
+  - Modify a test-harness skiptest check to work with newer versions of
+    Cryptography (GH#2420)
+  - Fix a 64-bit-ism in the test suite so the tests don't encounter a false
+    negative on 32-bit systems (GH#2353)
+
+* Mon Jul 22 2024 Paul Howarth <paul@city-fan.org> - 3.4.0-6
+- Fix detection of SHA1 signing support
+  https://github.com/paramiko/paramiko/pull/2420
+  https://github.com/pyca/cryptography/issues/11332
+  https://github.com/PyO3/pyo3/issues/3059
+- Remove cache Sphinx build folder ".doctrees"
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.4.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jun 08 2024 Python Maint <python-maint@redhat.com> - 3.4.0-4
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.4.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.4.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Dec 19 2023 Gwyn Ciesla <gwync@protonmail.com> - 3.4.0-1
+- 3.4.0
+  - 'Transport' grew a new 'packetizer_class' kwarg for overriding the
+    packet-handler class used internally (mostly for testing, but advanced
+    users may find this useful when doing deep hacks)
+  - Address CVE 2023-48795 (https://terrapin-attack.com/) a.k.a. the "Terrapin
+    Attack", a vulnerability found in the SSH protocol re: treatment of packet
+    sequence numbers) as follows:
+    - The vulnerability only impacts encrypt-then-MAC digest algorithms in
+      tandem with CBC ciphers, and ChaCha20-poly1305; of these, Paramiko
+      currently only implements 'hmac-sha2-(256|512)-etm' in tandem with
+      'AES-CBC'; if you are unable to upgrade to Paramiko versions containing
+      the below fixes right away, you may instead use the 'disabled_algorithms'
+      connection option to disable the ETM MACs and/or the CBC ciphers (this
+      option is present in Paramiko ≥ 2.6)
+    - As the fix for the vulnerability requires both ends of the connection to
+      cooperate, the below changes will only take effect when the remote end is
+      OpenSSH ≥ 9.6 (or equivalent, such as Paramiko in server mode, as of this
+      patch version) and configured to use the new "strict kex" mode (Paramiko
+      will always attempt to use "strict kex" mode if offered by the server,
+      unless you override this by specifying 'strict_kex=False' in
+      'Transport.__init__')
+    - Paramiko will now raise an 'SSHException' subclass ('MessageOrderError')
+      when protocol messages are received in unexpected order; this includes
+      situations like receiving 'MSG_DEBUG' or 'MSG_IGNORE' during initial key
+      exchange, which are no longer allowed during strict mode
+    - Key (re)negotiation -- i.e. 'MSG_NEWKEYS', whenever it is encountered --
+      now resets packet sequence numbers (this should be invisible to users
+      during normal operation, only causing exceptions if the exploit is
+      encountered, which will usually result in, again, 'MessageOrderError')
+    - Sequence number rollover will now raise 'SSHException' if it occurs
+      during initial key exchange (regardless of strict mode status)
+  - Tweak 'ext-info-(c|s)' detection during KEXINIT protocol phase; the
+    original implementation made assumptions based on an OpenSSH implementation
+    detail
+
+* Sun Jul 30 2023 Paul Howarth <paul@city-fan.org> - 3.3.1-1
+- Update to 3.3.1 (rhbz#2227478)
+  - Cleaned up some very old root level files, mostly just to exercise some of
+    our doc build and release machinery
+
+* Fri Jul 28 2023 Gwyn Ciesla <gwync@protonmail.com> - 3.3.0-1
+- 3.3.0
+  - Add support and tests for 'Match final ..' (frequently used in ProxyJump
+    configurations to exclude the jump host) to our SSH config parser (GH#1907,
+    GH#1992)
+  - Add an explicit 'max_concurrent_prefetch_requests' argument to
+    'paramiko.client.SSHClient.get' and 'paramiko.client.SSHClient.getfo',
+    allowing users to limit the number of concurrent requests used during
+    prefetch (GH#1587, GH#2058)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 3.2.0-2
+- Rebuilt for Python 3.12
+
+* Sat May 27 2023 Paul Howarth <paul@city-fan.org> - 3.2.0-1
+- Update to 3.2.0 (rhbz#2210398)
+  - Fixed a very sneaky bug found at the apparently rarely-traveled
+    intersection of RSA-SHA2 keys, certificates, SSH agents, and
+    stricter-than-OpenSSH server targets, which manifested as yet another
+    "well, if we turn off SHA2 at one end or another, everything works again"
+    problem, for example with version 12 of the Teleport server endpoint
+  - The 'server-sig-algs' and 'RSA-SHA2' features added around Paramiko 2.9 or
+    so, had the annoying side effect of not working with servers that don't
+    support *either* of those feature sets, requiring use of
+    'disabled_algorithms' to forcibly disable the SHA2 algorithms on Paramiko's
+    end (GH#1961, GH#2012 and countless others)
+    - The *experimental* '~paramiko.transport.ServiceRequestingTransport' (noted
+      in its own entry in this changelog) includes a fix for this issue,
+      specifically by falling back to the same algorithm as the in-use pubkey if
+      it's in the algorithm list (leaving the "first algorithm in said list" as
+      an absolute final fallback)
+  - Implement '_fields()' on '~paramiko.agent.AgentKey' so that it may be
+    compared (via '==') with other '~paramiko.pkey.PKey' instances
+  - Since its inception, Paramiko has (for reasons lost to time) implemented
+    authentication as a side effect of handling affirmative replies to
+    'MSG_SERVICE_REQUEST' protocol messages; what this means is Paramiko makes
+    one such request before every 'MSG_USERAUTH_REQUEST', i.e. every auth
+    attempt (GH#23)
+    - OpenSSH doesn't care if clients send multiple service requests, but other
+      server implementations are often stricter in what they accept after an
+      initial service request (due to the RFCs not being clear), which can
+      result in odd behavior when a user doesn't authenticate successfully on
+      the very first try (for example, when the right key for a target host is
+      the third in one's ssh-agent)
+    - This version of Paramiko now contains an opt-in
+      '~paramiko.transport.Transport' subclass,
+      '~paramiko.transport.ServiceRequestingTransport', which more-correctly
+      implements service request handling in the Transport, and uses an
+      auth-handler subclass internally that has been similarly adapted; users
+      wanting to try this new experimental code path may hand this class to
+      'SSHClient.connect` as its 'transport_factory' kwarg
+    - This feature is *EXPERIMENTAL* and its code may be subject to change
+    - Minor backwards incompatible changes exist in the new code paths, most
+      notably the removal of the (inconsistently applied and rarely used)
+      'event' arguments to the 'auth_xxx' methods
+    - GSSAPI support has only been partially implemented, and is untested
+    - Some minor backwards-*compatible* changes were made to the *existing*
+      Transport and AuthHandler classes to facilitate the new code; for
+      example, 'Transport._handler_table' and
+      'AuthHandler._client_handler_table' are now properties instead of raw
+      attributes
+  - Users of '~paramiko.client.SSHClient' can now configure the authentication
+    logic Paramiko uses when connecting to servers; this functionality is
+    intended for advanced users and higher-level libraries such as 'Fabric'
+    (https://fabfile.org/); see '~paramiko.auth_strategy' for details (GH#387)
+    - Fabric's co-temporal release includes a proof-of-concept use of this
+      feature, implementing an auth flow much closer to that of the OpenSSH
+      client (versus Paramiko's legacy behavior); it is *strongly recommended*
+      that if this interests you, investigate replacing any direct use of
+      'SSHClient' with Fabric's 'Connection'
+    - This feature is **EXPERIMENTAL**; please see its docs for details
+  - Enhanced '~paramiko.agent.AgentKey' with new attributes, such as:
+    - Added a 'comment' attribute (and constructor argument);
+      'Agent.get_keys()' now uses this kwarg to store any comment field sent
+      over by the agent; the original version of the agent feature inexplicably
+      did not store the comment anywhere
+    - Agent-derived keys now attempt to instantiate a copy of the appropriate
+      key class for access to other algorithm-specific members (e.g. key size);
+      this is available as the '.inner_key' attribute
+      - This functionality is now in use in Fabric's new '--list-agent-keys'
+        feature, as well as in Paramiko's debug logging
+  - '~paramiko.pkey.PKey' now offers convenience "meta-constructors", static
+    methods that simplify the process of instantiating the correct subclass for
+    a given key input
+    - For example, 'PKey.from_path' can load a file path without knowing
+      *a priori* what type of key it is (thanks to some handy methods within
+      our cryptography dependency); going forwards, we expect this to be the
+      primary method of loading keys by user code that runs on "human time"
+      (i.e. where some minor efficiencies are worth the convenience)
+    - In addition, 'PKey.from_type_string' now exists, and is being used in
+      some internals to load ssh-agent keys
+    - As part of these changes, '~paramiko.pkey.PKey' and friends grew a
+      '~paramiko.pkey.PKey.identifiers' classmethod; this is inspired by the
+      '~paramiko.ecdsakey.ECDSAKey.supported_key_format_identifiers' classmethod
+      (which now refers to the new method); this also includes adding a '.name'
+      attribute to most key classes (which will eventually replace
+      '.get_name()')
+  - '~paramiko.pkey.PKey' grew a new '.algorithm_name' property that displays
+    the key algorithm; this is typically derived from the value of
+    '~paramiko.pkey.PKey.get_name'; for example, ED25519 keys have a 'get_name'
+    of 'ssh-ed25519' (the SSH protocol key type field value), and now have a
+    'algorithm_name' of 'ED25519'
+  - '~paramiko.pkey.PKey' grew a new '.fingerprint' property that emits a
+    fingerprint string matching the SHA256+Base64 values printed by various
+    OpenSSH tooling (e.g. 'ssh-add -l', 'ssh -v'); this is intended to help
+    troubleshoot Paramiko-vs-OpenSSH behavior and will eventually replace the
+    venerable 'get_fingerprint' method
+  - '~paramiko.agent.AgentKey' had a dangling Python 3 incompatible '__str__'
+    method returning bytes; this method has been removed, allowing the
+    superclass' ('~paramiko.pkey.PKey') method to run instead
+
+* Sun Mar 12 2023 Paul Howarth <paul@city-fan.org> - 3.1.0-1
+- Update to 3.1.0 (rhbz#2177436)
+  - Add an explicit 'channel_timeout' keyword argument to
+    'paramiko.client.SSHClient.connect', allowing users to configure the
+     previously-hardcoded default value of 3600 seconds (GH#2009, GH#2013, and
+     others)
+  - Accept single tabs as field separators (in addition to single spaces) in
+    'paramiko.hostkeys.HostKeyEntry.from_line' for parity with OpenSSH's
+    KnownHosts parser (GH#2173)
+  - Apply 'codespell' to the codebase, which found a lot of very old minor
+    spelling mistakes in docstrings; also, modernize many instances of '*largs'
+    vs. '*args' and '**kwarg' vs. '**kwargs' (GH#2178)
+
+* Sun Jan 22 2023 Paul Howarth <paul@city-fan.org> - 3.0.0-1
+- Update to 3.0.0 (rhbz#2162914)
+  - Remove some unnecessary '__repr__' calls when handling bytes-vs-str
+    conversions; this was apparently doing a lot of unintentional data
+    processing, which adds up in some use cases, such as SFTP transfers,
+    which may now be significantly faster (GH#2110)
+  - Streamline some redundant (and costly) byte conversion calls in the
+    packetizer and the core SFTP module; this should lead to some SFTP
+    speedups at the very least (GH#2165)
+  - 'paramiko.util.retry_on_signal' (and any internal uses of same, and also
+    any internal retries of 'EINTR' on e.g. socket operations) has been
+    removed; as of Python 3.5, per PEP 475 (https://peps.python.org/pep-0475/),
+    this functionality (and retrying 'EINTR' generally) is now part of the
+    standard library
+    Note: This change is backwards incompatible if you were explicitly
+    importing/using this particular function; the observable behavior otherwise
+    should not be changing
+  - '~paramiko.config.SSHConfig' used to straight-up delete the 'proxycommand'
+    key from config lookup results when the source config said
+    'ProxyCommand none'; this has been altered to preserve the key and give it
+    the Python value 'None', thus making the Python representation more in line
+    with the source config file
+    Note: This change is backwards incompatible if you were relying on the old
+    (1.x, 2.x) behavior for some reason (e.g. assuming all 'proxycommand'
+    values were valid subcommand strings)
+  - The behavior of private key classes' (i.e. anything inheriting from
+    '~paramiko.pkey.PKey') private key writing methods used to perform a
+    manual, extra 'chmod' call after writing; this hasn't been strictly
+    necessary since the mid 2.x release line (when key writing started giving
+    the 'mode' argument to 'os.open'), and has now been removed entirely; this
+    should only be observable if you were mocking Paramiko's system calls
+    during your own testing, or similar
+  - 'PKey.__cmp__' has been removed - ordering-oriented comparison of key files
+    is unlikely to have ever made sense (the old implementation attempted to
+    order by the hashes of the key material) and so we have not bothered
+    setting up '__lt__' and friends at this time; the class continues to have
+    its original '__eq__' untouched
+    Note: This change is backwards incompatible if you were actually trying to
+    sort public key objects (directly or indirectly); please file bug reports
+    detailing your use case if you have some intractable need for this
+    behavior, and we'll consider adding back the necessary Python 3 magic
+    methods so that it works as before
+  - A handful of lower-level classes (notably 'paramiko.message.Message' and
+    'paramiko.pkey.PKey') previously returned 'bytes' objects from their
+    implementation of '__str__', even under Python 3; and there was never any
+    '__bytes__' method; these issues have been fixed by renaming '__str__' to
+    '__bytes__' and relying on Python's default "stringification returns the
+    output of '__repr__'" behavior re: any real attempts to 'str()' such objects
+  - 'paramiko.common.asbytes' has been moved to 'paramiko.util.asbytes'
+    Note: This change is backwards incompatible if you were directly using this
+    function (which is unlikely)
+  - Remove the now irrelevant 'paramiko.py3compat' module
+    Note: This change is backwards incompatible - such references should be
+    search-and-replaced with their modern Python 3.6+ equivalents; in some
+    cases, still-useful methods or values have been moved to 'paramiko.util'
+    (most) or 'paramiko.common' ('byte_*')
+  - Drop support for Python versions less than 3.6, including Python 2; so long
+    and thanks for all the fish! Our packaging metadata has been updated to
+    include 'python_requires', so this should not cause breakage unless you're
+    on an old installation method that can't read this metadata
+    Note: As part of this change, our dependencies have been updated; e.g. we
+    now require Cryptography>=3.3, up from 2.5
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.12.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
 * Sun Nov  6 2022 Paul Howarth <paul@city-fan.org> - 2.12.0-1
 - Update to 2.12.0 (rhbz#2140281)
