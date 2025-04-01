@@ -1,10 +1,11 @@
 {
  "Signatures": {
-  "Xerces-J-src.2.12.0.tar.gz": "c27b81e139ecfc219202bcad79e77529b082e9ed9797bc1a4c13e1bd8f8e31c9",
+  "ExperimentalTaglet.java": "9d0fe82f5f664cd1d1ddd36033037ef4c40db092ee48575808ceded796700896",
+  "InternalTaglet.java": "46c3f8963075cbdc892555ee5cd62a30f9704e29aaed9b7e1db9f6c199f3a805",
+  "XJavac.java": "33f8091d9f16b01b220b09d7364d8bfc2243d191ccebfaf51b0946c6c10f3dd1",
+  "Xerces-J-src.2.12.2.tar.gz": "6dd1ebd4c88e935c182375346cd7365514bd8dd2ad2f30f0d0b05257bab34ee8",
   "xerces-j2-constants.1": "f7489330cec3ee51c55d87ad7f38add648b04a2fff544e7e43a4bb1dde7e7c21",
-  "xerces-j2-constants.sh": "433dad71f6b6848027e6b79aecbdc02ea06e9e4671c664bb19cf9bcd19699abf",
-  "xerces-j2-version.1": "49bfcc92965a0e2f7caf0ab231df43a328197222c79894911726ecd78032089e",
-  "xerces-j2-version.sh": "0010deebc51ed019ec46b7041e946665a36e0ae679e06db3403ec6eed0260efe",
-  "xercesImpl-2.12.0.pom": "138ebb33cce7080fd5cdb4fb90a0ee550173d7e8d41024da8c0d788b1460a1f3"
+  "xerces-j2-pom.xml": "1e84b0aff097ec90a0d0f7f8840cd1332a6035635ffaeb84bf3438af1d9599b2",
+  "xerces-j2-version.1": "49bfcc92965a0e2f7caf0ab231df43a328197222c79894911726ecd78032089e"
  }
 }

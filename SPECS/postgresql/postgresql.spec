@@ -2,8 +2,8 @@
 %define groupname postgres
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        16.5
-Release:        2%{?dist}
+Version:        16.7
+Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -243,6 +243,9 @@ fi
 %{_unitdir}/%{name}.service
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.7-1
+- Auto-upgrade to 16.7 - to fix CVE-2025-1094
+
 * Mon Jan 15 2025 Uri Smiley <udsmicrosoft@microsoft.com> - 16.5-2
 - Add LZ4 option to enable TOAST compression
 

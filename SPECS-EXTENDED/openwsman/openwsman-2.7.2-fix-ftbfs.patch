@@ -1,0 +1,12 @@
+diff -up openwsman-2.7.2/bindings/openwsman.i.orig openwsman-2.7.2/bindings/openwsman.i
+--- openwsman-2.7.2/bindings/openwsman.i.orig	2024-01-22 09:36:42.764721705 +0100
++++ openwsman-2.7.2/bindings/openwsman.i	2024-01-22 09:37:29.970817151 +0100
+@@ -109,7 +109,7 @@ SWIGINTERNINLINE SV *SWIG_From_double  S
+ 
+ %typemap(in) FILE* {
+ #if RUBY_VERSION > 18
+-  struct rb_io_t *fptr;
++  struct rb_io *fptr;
+ #else
+   struct OpenFile *fptr;
+ #endif

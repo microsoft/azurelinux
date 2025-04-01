@@ -1,0 +1,23 @@
+From 251a40ab42305c412674c7c2d391374d91e91c95 Mon Sep 17 00:00:00 2001
+From: Ole Bertram <git@bertr.am>
+Date: Thu, 23 Mar 2023 17:08:48 +0100
+Subject: [PATCH] Fix uninitialized TOC data file name
+
+This caused spurious garbled TOC files and/or segfaults when not using
+the `--datafile` option.
+---
+ dao/main.cc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/dao/main.cc b/dao/main.cc
+index 8bf4590..d09fc69 100644
+--- a/dao/main.cc
++++ b/dao/main.cc
+@@ -219,6 +219,7 @@ DaoCommandLine::DaoCommandLine() :
+     fullBurn(false), withCddb(false), taoSource(false), keepImage(false), overburn(false),
+     writeSpeedControl(false), keep(false), printQuery(false), no_utf8(false)
+ {
++    dataFilename = NULL;
+     readingSpeed = -1;
+     writingSpeed = -1;
+     command = UNKNOWN;

@@ -1,0 +1,189 @@
+From a0590c5c69ba16c94701c63881e536269ffbe544 Mon Sep 17 00:00:00 2001
+From: Victor Kareh <vkareh@redhat.com>
+Date: Tue, 11 Feb 2020 07:40:47 -0500
+Subject: [PATCH 4/5] icons: Mark GdkPixbuf icons as deprecated
+
+Since we have migrated icons to render as cairo surfaces we can now mark
+GdkPixbuf icons as deprecated without having to break the API.
+---
+ libwnck/application.c | 8 ++++++++
+ libwnck/application.h | 6 ++++++
+ libwnck/class-group.c | 4 ++++
+ libwnck/class-group.h | 4 ++++
+ libwnck/test-wnck.c   | 2 +-
+ libwnck/window.c      | 6 ++++++
+ libwnck/window.h      | 4 ++++
+ 7 files changed, 33 insertions(+), 1 deletion(-)
+
+diff --git a/libwnck/application.c b/libwnck/application.c
+index be1107d..a0c8887 100644
+--- a/libwnck/application.c
++++ b/libwnck/application.c
+@@ -395,6 +395,8 @@ find_icon_window (WnckApplication *app)
+  * Return value: (transfer none): the icon for @app. The caller should
+  * reference the returned <classname>GdkPixbuf</classname> if it needs to keep
+  * the icon around.
++ *
++ * Deprecated:41.0: Use wnck_application_get_icon_surface() instead.
+  **/
+ GdkPixbuf*
+ wnck_application_get_icon (WnckApplication *app)
+@@ -434,10 +436,12 @@ wnck_application_get_icon (WnckApplication *app)
+     }
+   else
+     {
++G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+       WnckWindow *w = find_icon_window (app);
+       if (w)
+         return wnck_window_get_icon (w);
+       else
++G_GNUC_END_IGNORE_DEPRECATIONS
+         return NULL;
+     }
+ }
+@@ -453,6 +457,8 @@ wnck_application_get_icon (WnckApplication *app)
+  * Return value: (transfer none): the mini-icon for @app. The caller should
+  * reference the returned <classname>GdkPixbuf</classname> if it needs to keep
+  * the mini-icon around.
++ *
++ * Deprecated:41.0: Use wnck_application_get_mini_icon_surface() instead.
+  **/
+ GdkPixbuf*
+ wnck_application_get_mini_icon (WnckApplication *app)
+@@ -492,10 +498,12 @@ wnck_application_get_mini_icon (WnckApplication *app)
+     }
+   else
+     {
++G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+       WnckWindow *w = find_icon_window (app);
+       if (w)
+         return wnck_window_get_mini_icon (w);
+       else
++G_GNUC_END_IGNORE_DEPRECATIONS
+         return NULL;
+     }
+ }
+diff --git a/libwnck/application.h b/libwnck/application.h
+index f3ea970..4d9078e 100644
+--- a/libwnck/application.h
++++ b/libwnck/application.h
+@@ -91,10 +91,16 @@ int    wnck_application_get_n_windows (WnckApplication *app);
+ const char* wnck_application_get_name      (WnckApplication *app);
+ const char* wnck_application_get_icon_name (WnckApplication *app);
+ int         wnck_application_get_pid       (WnckApplication *app);
++
++G_DEPRECATED_FOR(wnck_application_get_icon_surface)
+ GdkPixbuf*  wnck_application_get_icon      (WnckApplication *app);
++
++G_DEPRECATED_FOR(wnck_application_get_mini_icon_surface)
+ GdkPixbuf*  wnck_application_get_mini_icon (WnckApplication *app);
++
+ cairo_surface_t* wnck_application_get_icon_surface (WnckApplication *app);
+ cairo_surface_t* wnck_application_get_mini_icon_surface (WnckApplication *app);
++
+ gboolean    wnck_application_get_icon_is_fallback (WnckApplication *app);
+ const char* wnck_application_get_startup_id (WnckApplication *app);
+ 
+diff --git a/libwnck/class-group.c b/libwnck/class-group.c
+index 7899497..026e995 100644
+--- a/libwnck/class-group.c
++++ b/libwnck/class-group.c
+@@ -689,6 +689,8 @@ wnck_class_group_get_name (WnckClassGroup *class_group)
+  * the icon around.
+  *
+  * Since: 2.2
++ *
++ * Deprecated:41.0: Use wnck_class_group_get_icon_surface() instead.
+  **/
+ GdkPixbuf *
+ wnck_class_group_get_icon (WnckClassGroup *class_group)
+@@ -741,6 +743,8 @@ wnck_class_group_get_icon (WnckClassGroup *class_group)
+  * to keep the mini-icon around.
+  *
+  * Since: 2.2
++ *
++ * Deprecated:41.0: Use wnck_class_group_get_mini_icon_surface() instead.
+  **/
+ GdkPixbuf *
+ wnck_class_group_get_mini_icon (WnckClassGroup *class_group)
+diff --git a/libwnck/class-group.h b/libwnck/class-group.h
+index 122e0ed..dee0e7c 100644
+--- a/libwnck/class-group.h
++++ b/libwnck/class-group.h
+@@ -81,8 +81,12 @@ const char * wnck_class_group_get_id (WnckClassGroup *class_group);
+ 
+ const char * wnck_class_group_get_name (WnckClassGroup *class_group);
+ 
++G_DEPRECATED_FOR(wnck_class_group_get_icon_surface)
+ GdkPixbuf *wnck_class_group_get_icon (WnckClassGroup *class_group);
++
++G_DEPRECATED_FOR(wnck_class_group_get_mini_icon_surface)
+ GdkPixbuf *wnck_class_group_get_mini_icon (WnckClassGroup *class_group);
++
+ cairo_surface_t *wnck_class_group_get_icon_surface (WnckClassGroup *class_group);
+ cairo_surface_t *wnck_class_group_get_mini_icon_surface (WnckClassGroup *class_group);
+ 
+diff --git a/libwnck/test-wnck.c b/libwnck/test-wnck.c
+index 77085cd..649c2e6 100644
+--- a/libwnck/test-wnck.c
++++ b/libwnck/test-wnck.c
+@@ -523,7 +523,7 @@ icon_set_func (GtkTreeViewColumn *tree_column,
+     return;
+   
+   g_object_set (GTK_CELL_RENDERER (cell),
+-                "pixbuf", wnck_window_get_mini_icon (window),
++                "surface", wnck_window_get_mini_icon_surface (window),
+                 NULL);
+ }
+ 
+diff --git a/libwnck/window.c b/libwnck/window.c
+index 094dc5a..8723995 100644
+--- a/libwnck/window.c
++++ b/libwnck/window.c
+@@ -21,6 +21,8 @@
+  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+  */
+ 
++#undef WNCK_DISABLE_DEPRECATED
++
+ #include <config.h>
+ 
+ #include <glib/gi18n-lib.h>
+@@ -2172,6 +2174,8 @@ _wnck_window_load_icons (WnckWindow *window)
+  * Return value: (transfer none): the icon for @window. The caller should
+  * reference the returned <classname>GdkPixbuf</classname> if it needs to keep
+  * the icon around.
++ *
++ * Deprecated:41.0: Use wnck_window_get_icon_surface() instead.
+  **/
+ GdkPixbuf*
+ wnck_window_get_icon (WnckWindow *window)
+@@ -2224,6 +2228,8 @@ wnck_window_get_icon (WnckWindow *window)
+  * Return value: (transfer none): the mini-icon for @window. The caller should
+  * reference the returned <classname>GdkPixbuf</classname> if it needs to keep
+  * the icon around.
++ *
++ * Deprecated:41.0: Use wnck_window_get_mini_icon_surface() instead.
+  **/
+ GdkPixbuf*
+ wnck_window_get_mini_icon (WnckWindow *window)
+diff --git a/libwnck/window.h b/libwnck/window.h
+index 2bec086..d7e52f1 100644
+--- a/libwnck/window.h
++++ b/libwnck/window.h
+@@ -381,8 +381,12 @@ void     wnck_window_activate_transient (WnckWindow *window,
+                                          guint32     timestamp);
+ gboolean wnck_window_transient_is_most_recently_activated (WnckWindow *window);
+ 
++G_DEPRECATED_FOR(wnck_window_get_icon_surface)
+ GdkPixbuf* wnck_window_get_icon      (WnckWindow *window);
++
++G_DEPRECATED_FOR(wnck_window_get_mini_icon_surface)
+ GdkPixbuf* wnck_window_get_mini_icon (WnckWindow *window);
++
+ cairo_surface_t* wnck_window_get_icon_surface      (WnckWindow *window);
+ cairo_surface_t* wnck_window_get_mini_icon_surface (WnckWindow *window);
+ 
+-- 
+2.46.1
+

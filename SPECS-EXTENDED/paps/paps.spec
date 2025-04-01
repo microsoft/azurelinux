@@ -1,15 +1,18 @@
+Name:           paps
+Version:        0.8.0
+Release:        12%{?dist}
+
+License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Name:           paps
-Version:        0.6.8
-Release:        46%{?dist}
-
-License:        LGPLv2+
-URL:            http://paps.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+URL:            https://github.com/dov/paps
+Source0:        https://github.com/dov/paps/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        paps.convs
-Source2:	29-paps.conf
-BuildRequires:  pango-devel automake autoconf libtool doxygen cups-devel
+Source2:        29-paps.conf
+Source3:        https://downloads.sourceforge.net/%{name}/%{name}-0.6.8.tar.gz
+BuildRequires:  make
+BuildRequires:  pango-devel automake autoconf libtool doxygen cups-devel intltool
+BuildRequires:  fmt-devel gcc-c++
 ## https://sourceforge.net/tracker/index.php?func=detail&aid=1832897&group_id=153049&atid=786241
 Patch0:         paps-0.6.8-shared.patch
 ## https://sourceforge.net/tracker/index.php?func=detail&aid=1832924&group_id=153049&atid=786241
@@ -42,31 +45,35 @@ Patch59:        %{name}-ft-header.patch
 Patch60:        %{name}-a3.patch
 ## rhbz#1214939
 Patch61:	%{name}-fix-paper-size-truncate.patch
+Patch62:	paps-c99.patch
+Patch63:	paps-0.6.8-glib282.patch
+### For paps
+Patch100:	%{name}-fix-src-to-paps.patch
+Patch101:	%{name}-fix-build.patch
+Patch102:	%{name}-glib282.patch
 
 Summary:        Plain Text to PostScript converter
-Requires:       %{name}-libs = %{version}-%{release}
-Requires:       cups-filesystem fontpackages-filesystem
 %description
 paps is a PostScript converter from plain text file using Pango.
 
-%package libs
-Summary:        Libraries for paps
-%description libs
+%package -n texttopaps
+Summary:        CUPS filter based on paps
+Obsoletes:	%{name}-libs < %{version}
+Obsoletes:	%{name}-devel < %{version}
+Requires:       cups-filesystem fontpackages-filesystem
+%description -n texttopaps
+
 paps is a PostScript converter from plain text file using Pango.
 
-This package contains the library for paps.
+This package contains a CUPS filter based on paps.
 
-%package devel
-Summary:        Development files for paps
-Requires:       %{name}-libs = %{version}-%{release}
-%description devel
-paps is a PostScript converter from plain text file using Pango.
-
-This package contains the development files that is necessary to develop
-applications using paps API.
 
 %prep
-%setup -q
+%setup -q -a 3
+%patch 100 -p1 -b .src-to-paps
+%patch 101 -p1 -b .build
+%patch 102 -p1 -b .glib282
+pushd %{name}-0.6.8
 %patch 0 -p1 -b .shared
 %patch 1 -p1 -b .wordwrap
 %patch 2 -p1 -b .langinfo
@@ -85,16 +92,29 @@ applications using paps API.
 %patch 59 -p1 -b .ft-header
 %patch 60 -p1 -b .a3
 %patch 61 -p1 -b .paper-size
+%patch 62 -p2 -b .configure-c99
+%patch 63 -p1 -b .glib282
 libtoolize -f -c
 autoreconf -f -i
+popd
 
 
 %build
+./autogen.sh
+%set_build_flags
+%if 0%{?rhel}
+CXXFLAGS="$CXXFLAGS -DFMT_HEADER_ONLY"
+%endif
 %configure --disable-static
 make %{?_smp_mflags}
 
+pushd %{name}-0.6.8
+%configure --disable-static
+make %{?_smp_mflags}
+popd
 
 %install
+pushd %{name}-0.6.8
 make install DESTDIR=$RPM_BUILD_ROOT INSTALL="/usr/bin/install -p"
 
 # remove unnecessary files
@@ -102,7 +122,8 @@ rm $RPM_BUILD_ROOT%{_libdir}/libpaps.la
 
 # make a symlink for CUPS filter
 install -d $RPM_BUILD_ROOT%{_cups_serverbin}/filter # Not libdir
-ln -s %{_bindir}/paps $RPM_BUILD_ROOT%{_cups_serverbin}/filter/texttopaps
+mv $RPM_BUILD_ROOT%{_bindir}/paps $RPM_BUILD_ROOT%{_cups_serverbin}/filter/texttopaps
+mv $RPM_BUILD_ROOT%{_mandir}/man1/paps.1 $RPM_BUILD_ROOT%{_mandir}/man1/texttopaps.1
 
 install -d $RPM_BUILD_ROOT%{_datadir}/cups/mime
 install -p -m0644 %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/cups/mime/
@@ -110,29 +131,107 @@ install -p -m0644 %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/cups/mime/
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/fonts/conf.d
 install -p -m0644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/fonts/conf.d/
 
+install -d $RPM_BUILD_ROOT%{_licensedir}
+install COPYING.LIB $RPM_BUILD_ROOT%{_licensedir}/COPYING_1.LIB
+
+rm -rf $RPM_BUILD_ROOT%{_includedir}
+rm $RPM_BUILD_ROOT%{_libdir}/libpaps.so
+popd
+
+make install DESTDIR=$RPM_BUILD_ROOT INSTALL="/usr/bin/install -p"
 
 %ldconfig_scriptlets libs
 
 %files
-%doc AUTHORS COPYING.LIB README TODO
+%license COPYING.LIB
+%doc AUTHORS README
+%dir %{_datadir}/paps
 %{_bindir}/paps
+%{_bindir}/src-to-paps
+%{_datadir}/paps/pango_markup.outlang
 %{_mandir}/man1/paps.1*
+
+%files -n texttopaps
+%license %{_licensedir}/COPYING_1.LIB
+%doc %{name}-0.6.8/AUTHORS %{name}-0.6.8/README
+%{_mandir}/man1/texttopaps.1*
+%{_libdir}/libpaps.so.*
 %{_cups_serverbin}/filter/texttopaps
 %{_datadir}/cups/mime/paps.convs
 %{_sysconfdir}/fonts/conf.d/29-paps.conf
 
-%files libs
-%doc COPYING.LIB
-%{_libdir}/libpaps.so.*
-
-%files devel
-%doc COPYING.LIB
-%{_includedir}/libpaps.h
-%{_libdir}/libpaps.so
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.8-46
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Dec 18 2024 Jyoti kanase <v-jykanase@microsoft.com> -    0.8.0 -12
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Sep 13 2024 Akira TAGOH <tagoh@redhat.com> - 0.8.0-11
+- Fix build with glib 2.82
+  Patch from Yaakov Selkowitz
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun  7 2024 Akira TAGOH <tagoh@redhat.com> - 0.8.0-9
+- Own /usr/share/paps
+  Resolves: rhbz#2283284
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jan 17 2024 Akira TAGOH <tagoh@redhat.com> - 0.8.0-6
+- Fix C type error in paps 0.6.8.
+  Resolves: rhbz#2256906
+
+* Mon Aug 14 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 0.8.0-5
+- Use fmt in header-only mode in RHEL builds
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 28 2023 Vitaly Zaitsev <vitaly@easycoding.org> - 0.8.0-3
+- Rebuilt due to fmt 10 update.
+
+* Thu Apr 13 2023 Florian Weimer <fweimer@redhat.com> - 0.8.0-2
+- C99 compatibility fixes for paps 0.6.8
+
+* Wed Mar  1 2023 Akira TAGOH <tagoh@redhat.com> - 0.8.0-1
+- New upstream release.
+  Resolves: rhbz#2168726
+
+* Tue Feb  7 2023 Akira TAGOH <tagoh@redhat.com> - 0.7.9-1
+- New upstream release.
+  Resolves: rhbz#2164212
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Dec  5 2022 Akira TAGOH <tagoh@redhat.com> - 0.7.1-6
+- Convert License tag to SPDX.
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Oct  8 2020 Akira TAGOH <tagoh@redhat.com> - 0.7.1-1
+- New upstream release.
+  Resolves: rhbz#1254352
+- Sub-package texttopaps with old code.
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.8-46
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.8-45
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

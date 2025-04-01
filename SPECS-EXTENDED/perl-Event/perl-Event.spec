@@ -1,6 +1,6 @@
 Name:		perl-Event
-Version:	1.27
-Release:	6%{?dist}
+Version:	1.28
+Release:	1%{?dist}
 Summary:	Event loop processing
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -29,6 +29,9 @@ BuildRequires:	perl(vars)
 # Test Suite
 BuildRequires:	perl(Symbol)
 BuildRequires:	perl(Test) >= 1
+%if 0%{?with_check}
+BuildRequires:	perl(Test::More)
+%endif
 # Runtime
 Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:	perl(Time::HiRes)
@@ -73,6 +76,10 @@ make test
 %{_mandir}/man3/Event::generic.3*
 
 %changelog
+* Wed Dec 18 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.28-1
+- Update to version 1.28
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.27-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

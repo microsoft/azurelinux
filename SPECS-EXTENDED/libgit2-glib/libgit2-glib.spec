@@ -1,23 +1,20 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global libgit2_version 0.25.0
 %global glib2_version 2.44.0
 
 Name:           libgit2-glib
-Version:        0.99.0.1
-Release:        5%{?dist}
+Version:        1.2.0
+Release:        7%{?dist}
 Summary:        Git library for GLib
 
-License:        LGPLv2+
+# Automatically converted from old format: LGPLv2+ - review is highly recommended.
+License:        LicenseRef-Callaway-LGPLv2+
 URL:            https://wiki.gnome.org/Projects/Libgit2-glib
-Source0:        https://download.gnome.org/sources/libgit2-glib/0.99/libgit2-glib-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/libgit2-glib/1.2/libgit2-glib-%{version}.tar.xz
+# https://gitlab.gnome.org/GNOME/libgit2-glib/-/merge_requests/40
+Patch:          libgit2-1.8.x.patch
 
-# Backported from upstream
-Patch0:         20.patch
-Patch1:         22.patch
-
-BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  gcc
+BuildRequires:  gi-docgen
 BuildRequires:  meson
 BuildRequires:  pkgconfig(glib-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(gobject-2.0) >= %{glib2_version}
@@ -43,7 +40,7 @@ developing applications that use %{name}.
 %autosetup -p1
 
 %build
-%meson -Dgtk_doc=false \
+%meson -Dgtk_doc=true \
        -Dpython=true
 
 %meson_build
@@ -51,16 +48,14 @@ developing applications that use %{name}.
 %install
 %meson_install
 
-%ldconfig_scriptlets
-
 %files
 %license COPYING
 %doc AUTHORS NEWS
-%{_libdir}/libgit2-glib-1.0.so.*
+%{_libdir}/libgit2-glib-1.0.so.0{,.*}
 %{_libdir}/girepository-1.0/Ggit-1.0.typelib
-%dir %{python3_sitelib}/gi
-%dir %{python3_sitelib}/gi/overrides
-%{python3_sitelib}/gi/overrides/*
+%dir %{python3_sitearch}/gi
+%dir %{python3_sitearch}/gi/overrides
+%{python3_sitearch}/gi/overrides/*
 
 %files devel
 %{_includedir}/libgit2-glib-1.0/
@@ -68,15 +63,86 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/libgit2-glib-1.0.pc
 %{_datadir}/gir-1.0/Ggit-1.0.gir
 %{_datadir}/vala/
+%doc %{_datadir}/gtk-doc/
 
 %changelog
-* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.99.0.1-5
-- Adding BR on '%%{_bindir}/xsltproc'.
-- Disabled gtk doc generation to remove network dependency during build-time.
-- License verified.
+* Mon Sep 02 2024 Miroslav Suchý <msuchy@redhat.com> - 1.2.0-7
+- convert license to SPDX
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.99.0.1-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.2.0-5
+- Rebuilt for Python 3.13
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.2.0-4
+- Rebuilt for Python 3.13
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Sep 21 2023 Kalev Lember <klember@redhat.com> - 1.2.0-1
+- Update to 1.2.0
+
+* Wed Aug 16 2023 Pete Walter <pwalter@fedoraproject.org> - 1.1.0-8
+- Rebuild for libgit2 1.7.x
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 1.1.0-6
+- Rebuilt for Python 3.12
+
+* Sun Mar 05 2023 Pete Walter <pwalter@fedoraproject.org> - 1.1.0-5
+- Rebuild for libgit2 1.6.x
+
+* Fri Jan 27 2023 Pete Walter <pwalter@fedoraproject.org> - 1.1.0-4
+- Rebuild for libgit2 1.5.x
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Dec 09 2022 Pete Walter <pwalter@fedoraproject.org> - 1.1.0-2
+- Rebuild for libgit2 1.4.x
+
+* Mon Aug 08 2022 Kalev Lember <klember@redhat.com> - 1.1.0-1
+- Update to 1.1.0
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1.0.0.1-3
+- Rebuilt for Python 3.11
+
+* Sun Feb 20 2022 Igor Raits <igor.raits@gmail.com> - 1.0.0.1-2
+- Rebuild for libgit2 1.4.x
+
+* Thu Jan 20 2022 David King <amigadave@amigadave.com> - 1.0.0.1-1
+- Update to 1.0.0.1
+
+* Sun Nov 28 2021 Igor Raits <ignatenkobrain@fedoraproject.org> - 0.99.0.1-10
+- Rebuild for libgit2 1.3.x
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.99.0.1-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.99.0.1-8
+- Rebuilt for Python 3.10
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.99.0.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Dec 28 19:00:21 CET 2020 Igor Raits <ignatenkobrain@fedoraproject.org> - 0.99.0.1-6
+- Rebuild for libgit2 1.1.x
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.99.0.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sun May 24 2020 Miro Hrončok <mhroncok@redhat.com> - 0.99.0.1-4
+- Rebuilt for Python 3.9
 
 * Wed Apr 15 2020 Igor Raits <ignatenkobrain@fedoraproject.org> - 0.99.0.1-3
 - Rebuild against libgit2 1.0.0

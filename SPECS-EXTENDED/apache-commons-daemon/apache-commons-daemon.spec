@@ -21,7 +21,7 @@ Distribution:   Azure Linux
 %define short_name commons-daemon
 Name:           apache-%{short_name}
 Version:        1.2.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Commons Daemon - Controlling of Java Daemons
 License:        Apache-2.0
 Group:          System/Daemons
@@ -142,6 +142,10 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Thu Feb 27 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.2.3-3
+- Build error fix, bump up the java source version from 1.6 to 1.8.
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.3-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

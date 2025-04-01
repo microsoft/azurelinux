@@ -6,14 +6,15 @@
 %endif
 
 Name:           perl-YAML-LibYAML
-Version:        0.81
-Release:        3%{?dist}
+Epoch:          1
+Version:        0.902.0
+Release:        2%{?dist}
 Summary:        Perl YAML Serialization using XS and libyaml
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/YAML-LibYAML
-Source0:        https://cpan.metacpan.org/modules/by-module/YAML/YAML-LibYAML-%{version}.tar.gz#/perl-YAML-LibYAML-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/YAML/YAML-LibYAML-v%{version}.tar.gz
 Patch0:         YAML-LibYAML-0.79-Unbundled-libyaml.patch
 
 # Build
@@ -21,8 +22,8 @@ BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
 BuildRequires:  make
-BuildRequires:  libyaml >= 0.2.2
-BuildRequires:  libyaml-devel >= 0.2.2
+BuildRequires:  libyaml >= 0.2.4
+BuildRequires:  libyaml-devel >= 0.2.4
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
@@ -51,43 +52,63 @@ BuildRequires:  perl(File::Find)
 BuildRequires:  perl(File::Path)
 BuildRequires:  perl(Filter::Util::Call)
 BuildRequires:  perl(FindBin)
+BuildRequires:  perl(if)
 BuildRequires:  perl(IO::File)
 BuildRequires:  perl(IO::Pipe)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::Builder)
-BuildRequires:  perl(Test::More) >= 0.88
+BuildRequires:  perl(Test::More) >= 0.90
 BuildRequires:  perl(Tie::Array)
 BuildRequires:  perl(Tie::Hash)
 BuildRequires:  perl(utf8)
 
-%if %{with perl_YAML_LibYAML_enables_optional_test}
+# A build cycle: perl-YAML-LibYAML → perl-boolean → perl-JSON-MaybeXS
+# → perl-Cpanel-JSON-XS → perl-YAML-LibYAML
+%if %{with perl_YAML_LibYAML_enables_optional_test} && !%{defined perl_bootstrap}
 # Optional Tests
+BuildRequires:  perl(boolean)
 BuildRequires:  perl(Path::Class)
 %endif
 
 # Dependencies
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(B::Deparse)
-Requires:       libyaml >= 0.2.2
+Requires:       libyaml >= 0.2.4
 
 # Avoid provides for perl shared objects
 %{?perl_default_filter}
+# Filter modules bundled for tests
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libexecdir}
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(TestYAML.*\\)
 
 %description
 Kirill Siminov's "libyaml" is arguably the best YAML implementation. The C
 library is written precisely to the YAML 1.1 specification. It was originally
 bound to Python and was later bound to Ruby.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
-%setup -q -n YAML-LibYAML-%{version}
-# Unbundled libyaml, the source files are the same as in libyaml-0.2.2
+%setup -q -n YAML-LibYAML-v%{version}
+# Unbundled libyaml, the source files are the same as in libyaml-0.2.4
 # It was determined by comparing commits in upstream repo:
 # https://github.com/yaml/libyaml/
-%patch 0 -p1 -b .orig
+%patch -P 0 -p1 -b .orig
 for file in api.c dumper.c emitter.c loader.c parser.c reader.c scanner.c \
     writer.c yaml.h yaml_private.h; do
     rm LibYAML/$file
     sed -i -e "/^LibYAML\/$file/d" MANIFEST
+done
+# Help generators to recognize Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
 done
 
 %build
@@ -99,24 +120,147 @@ perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}" NO_PACKLIST=1 NO_PERL
 find %{buildroot} -type f -name '*.bs' -empty -delete
 %{_fixperms} -c %{buildroot}
 
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+# It needs libraries in lib/ not in system directories
+rm %{buildroot}%{_libexecdir}/%{name}/t/000-require-modules.t
+# Remove author test
+rm %{buildroot}%{_libexecdir}/%{name}/t/author-pod-syntax.t
+# Don't use blib
+perl -i -pe 's{^use blib;}{#use blib;}' %{buildroot}%{_libexecdir}/%{name}/t/TestYAML.pm
+perl -i -pe 's{^use_blib: 1}{use_blib: 0}' %{buildroot}%{_libexecdir}/%{name}/t/yaml_tests.yaml
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/bash
+set -e
+# Some tests write into temporary files/directories. The solution is to
+# copy the tests into a writable directory and execute them from there.
+DIR=$(mktemp -d)
+pushd "$DIR"
+cp -a %{_libexecdir}/%{name}/* ./
+prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+popd
+rm -rf "$DIR"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
+
 %check
+export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 make test
 
 %files
 %license LICENSE
-%doc Changes CONTRIBUTING README
+%doc Changes CONTRIBUTING.md README
 %{perl_vendorarch}/auto/YAML/
 %{perl_vendorarch}/YAML/
 %{_mandir}/man3/YAML::LibYAML.3*
 %{_mandir}/man3/YAML::XS.3*
 %{_mandir}/man3/YAML::XS::LibYAML.3*
 
-%changelog
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.81-3
-- Remove epoch
+%files tests
+%{_libexecdir}/%{name}
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:0.81-2
-- Initial CBL-Mariner import from Fedora 31 (license: MIT).
+%changelog
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.902.0-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Mon Sep 23 2024 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.902.0-1
+- 0.902.0 bump (rhbz#2313873)
+
+* Mon Sep 09 2024 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.901.0-1
+- 0.901.0 bump (rhbz#2310535)
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.89-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jun 12 2024 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.89-4
+- Perl 5.40 re-rebuild of bootstrapped packages
+
+* Mon Jun 10 2024 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.89-3
+- Perl 5.40 rebuild
+
+* Fri Feb 02 2024 Petr Pisar <ppisar@redhat.com> - 1:0.89-2
+- Break a build cycle: perl-YAML-LibYAML → perl-boolean → perl-JSON-MaybeXS
+  → perl-Cpanel-JSON-XS → perl-YAML-LibYAML
+
+* Sat Jan 27 2024 Paul Howarth <paul@city-fan.org> - 1:0.89-1
+- Update to 0.89 (rhbz#2260595)
+  - Recognise core booleans on Perl 5.36+ at dump time (GH#114)
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.88-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.88-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.88-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.88-2
+- Perl 5.38 rebuild
+
+* Fri May 12 2023 Paul Howarth <paul@city-fan.org> - 1:0.88-1
+- Update to 0.88
+  - REVERT "Turn off internal POK flag for number scalars"
+
+* Fri May  5 2023 Paul Howarth <paul@city-fan.org> - 1:0.87-1
+- Update to 0.87
+  - Turn off internal POK flag for number scalars
+- Avoid use of deprecated patch syntax
+
+* Thu Jan 26 2023 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.86-1
+- 0.86 bump
+- Package tests
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.85-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Sep 13 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.85-1
+- Update to 0.85 (rhbz#2126164)
+  - Convert doc from Swim to Markdown
+
+* Mon Sep  5 2022 Paul Howarth <paul@city-fan.org> - 1:0.84-1
+- Update to 0.84 (rhbz#2124002)
+  - Add option ForbidDuplicateKeys (GH#105)
+- Use SPDX-format license tag
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.83-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.83-5
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.83-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.83-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.83-2
+- Perl 5.34 rebuild
+
+* Sun May  9 2021 Paul Howarth <paul@city-fan.org> - 1:0.83-1
+- Update to 0.83
+  - Recognize tied variables (GH#101)
+  - Add license file from included libyaml code (GH#102)
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.82-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.82-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.82-2
+- Perl 5.32 rebuild
+
+* Sun May  3 2020 Paul Howarth <paul@city-fan.org> - 1:0.82-1
+- Update to 0.82
+  - Updated libyaml sources to 0.2.4; changes affecting YAML::XS are:
+    - Output '...' at the stream end after a block scalar with trailing empty
+      lines
+    - Accept '%%YAML 1.2' directives (they are ignored and do not change
+      behaviour though)
 
 * Tue Jan 28 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.81-1
 - Update to 0.81

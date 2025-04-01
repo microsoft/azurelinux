@@ -1,15 +1,13 @@
-%global upstream_commit ee22323218150388abdeb36184ad5861e3669b65
-%global upstreamid 20110620
-
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name: hyphen-tk
 Summary: Turkmen hyphenation rules
+%global upstreamid 20210322
 Version: 0.%{upstreamid}
-Release: 18%{?dist}
-Source: https://github.com/hyphenation/tex-hyphen/blob/%{upstream_commit}/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-tk.tex
+Release: 6%{?dist}
+Source: http://mirror.ctan.org/language/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-tk.tex
 URL: http://tug.org/tex-hyphen
-License: Public Domain
+License: MIT
 BuildArch: noarch
 BuildRequires: hyphen-devel
 Requires: hyphen
@@ -22,31 +20,61 @@ Turkmen hyphenation rules.
 %prep
 %setup -T -q -c -n hyphen-tk
 cp -p %{SOURCE0} .
-%patch 0 -p0 -b .clean
+%patch -P0 -p0 -b .clean
 
 %build
 substrings.pl hyph-tk.tex hyph_tk_TM.dic UTF-8
 echo "Created with substring.pl by substrings.pl hyph-tk.tex hyph_tk_TM.dic UTF-8" > README
 echo "Original in-line credits were:" >> README
 echo "" >> README
-head -n 15 hyph-tk.tex >> README
+head -n 33 hyph-tk.tex >> README
 
 %install
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/hyphen
 cp -p hyph_tk_TM.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen
-
 
 %files
 %license README
 %{_datadir}/hyphen/hyph_tk_TM.dic
 
 %changelog
-* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20110620-18
-- Updating source URLs.
-- License verified.
+* Fri Nov 08 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.20210322-6
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20110620-17
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.20210322-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.20210322-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.20210322-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.20210322-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Mar 28 2023 Caolán McNamara <caolanm@redhat.com> - 0.20210322-1
+- latest version with clarified license
+- migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.20110620-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.20110620-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.20110620-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.20110620-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.20110620-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.20110620-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.20110620-16
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

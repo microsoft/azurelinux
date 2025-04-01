@@ -1,0 +1,27 @@
+From 46abd77157a2a57e81586e4f8765ae8f1a09d167 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mark=C3=A9ta?= <meggy.calabkova@gmail.com>
+Date: Wed, 4 Oct 2023 15:53:59 +0200
+Subject: [PATCH] support Sphinx 7.2
+
+---
+ breathe/project.py     | 2 +-
+ tests/test_renderer.py | 6 +++++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_renderer.py b/tests/test_renderer.py
+index a858c65d..73a29e4e 100644
+--- a/tests/test_renderer.py
++++ b/tests/test_renderer.py
+@@ -35,7 +35,11 @@ def app(test_params, app_params, make_app, shared_result):
+     """
+     args, kwargs = app_params
+     assert "srcdir" in kwargs
+-    kwargs["srcdir"].makedirs(exist_ok=True)
++    try:
++        kwargs["srcdir"].mkdir(parents=True, exist_ok=True)
++    except AttributeError:
++        # old version of Sphinx
++        kwargs["srcdir"].makedirs(exist_ok=True)
+     (kwargs["srcdir"] / "conf.py").write_text("")
+     app_ = make_app(*args, **kwargs)
+     yield app_

@@ -1,139 +1,153 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Summary:       Python module for GNU parted
+Name:          pyparted
+Epoch:         1
+Version:       3.13.0
+Release:       8%{?dist}
+License:       GPL-2.0-or-later
+URL:           https://github.com/dcantrell/pyparted
 
-%bcond_without python3
+Source0:       https://github.com/dcantrell/pyparted/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Source1:       https://github.com/dcantrell/pyparted/releases/download/v%{version}/%{name}-%{version}.tar.gz.asc
+Source2:       keyring.gpg
+Source3:       trustdb.gpg
 
-%bcond_with python2
-
-Summary: Python module for GNU parted
-Name:    pyparted
-Version: 3.11.4
-Release: 4%{?dist}
-License: GPLv2+
-URL:     https://github.com/dcantrell/pyparted
-
-Source0: https://github.com/dcantrell/pyparted/releases/download/v%{version}/%{name}-%{version}.tar.gz
-Source1: https://github.com/dcantrell/pyparted/releases/download/v%{version}/%{name}-%{version}.tar.gz.asc
-Source2: keyring.gpg
-Source3: trustdb.gpg
-
+BuildRequires: make
 BuildRequires: gcc
-BuildRequires: parted-devel >= 3.2-18
+BuildRequires: parted-devel >= 3.4
 BuildRequires: pkgconfig
 BuildRequires: e2fsprogs
 BuildRequires: gnupg2
-
-%if %{with python3}
 BuildRequires: python3-devel
 BuildRequires: python3-six
-%endif
+BuildRequires: python3-setuptools
 
-%if %{with python2}
-BuildRequires: python2-devel
-BuildRequires: python2-six
-%endif
-
-%global _description\
-Python module for the parted library.  It is used for manipulating\
+%description
+Python module for the parted library.  It is used for manipulating
 partition tables.
 
-%description %_description
-
-%if %{with python2}
-%package -n python2-pyparted
-Summary: %summary
-%{?python_provide:%python_provide python2-pyparted}
-# Remove before F30
-Provides: pyparted = %{version}-%{release}
-Provides: pyparted%{?_isa} = %{version}-%{release}
-Obsoletes: pyparted < %{version}-%{release}
-
-%description -n python2-pyparted %_description
-%endif
-
-%if %{with python3}
 %package -n python3-pyparted
 Summary: Python 3 module for GNU parted
 
 %description -n python3-pyparted
 Python module for the parted library.  It is used for manipulating
 partition tables. This package provides Python 3 bindings for parted.
-%endif
 
 %prep
 # Verify source archive signature
-# Remove "use-keyboxd" from gnupg configuration; if present, since it will wait forever if the service is not running
-sed -i '/use-keyboxd/d' ~/.gnupg/common.conf
 gpg --no-default-keyring --keyring %{SOURCE2} --trustdb-name %{SOURCE3} --verify %{SOURCE1} %{SOURCE0} || exit 1
 
-%setup -q
-
-%if %{with python3}
-everything=$(ls)
-mkdir -p py3dir
-cp -a $everything py3dir
-%endif
+%autosetup
 
 %build
-%if %{with python2}
-PYTHON=python2 make %{?_smp_mflags} CFLAGS="%{optflags} -fcommon"
-%endif
-
-%if %{with python3}
-pushd py3dir
-PYTHON=python3 make %{?_smp_mflags} CFLAGS="%{optflags} -fcommon"
-popd
-%endif
+%make_build CFLAGS="%{optflags} -fcommon"
 
 %check
-%if %{with python2}
-PYTHON=python2 make test
-%endif
-
-%if %{with python3}
-pushd py3dir
-PYTHON=python3 make test
-popd
-%endif
+make test
 
 %install
-%if %{with python2}
-PYTHON=python2 make install DESTDIR=%{buildroot}
-%endif
+%make_install
 
-%if %{with python3}
-pushd py3dir
-PYTHON=python3 make install DESTDIR=%{buildroot}
-popd
-%endif
-
-%if %{with python2}
-%files -n python2-pyparted
-%doc AUTHORS COPYING NEWS README TODO
-%{python2_sitearch}/_ped.so
-%{python2_sitearch}/parted
-%{python2_sitearch}/%{name}-%{version}-*.egg-info
-%endif
-
-%if %{with python3}
 %files -n python3-pyparted
-%doc AUTHORS COPYING NEWS README TODO
+%doc AUTHORS HACKING NEWS README.md RELEASE TODO
+%license LICENSE
 %{python3_sitearch}/_ped.*.so
 %{python3_sitearch}/parted
 %{python3_sitearch}/%{name}-%{version}-*.egg-info
-%endif
 
 %changelog
-* Mon Dec 04 2023 Andrew Phelps <anphel@microsoft.com> - 3.11.4-4
-- Fix build issue with gpg keyboxd
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.13.0-8
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsoft.com> - 3.11.4-3
-- Remove epoch
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.13.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Mon Mar 01 2021 Henry Li <lihl@microsoft.com> - 1:3.11.4-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Disable python2 build and enable python3 build only
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1:3.13.0-6
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.13.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.13.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.13.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 22 2023 Python Maint <python-maint@redhat.com> - 1:3.13.0-2
+- Rebuilt for Python 3.12
+
+* Wed Jun 21 2023 David Cantrell <dcantrell@redhat.com> - 1:3.13.0-1
+- Upgrade to pyparted-3.13.0
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 1:3.12.0-11
+- Rebuilt for Python 3.12
+
+* Wed Jun 14 2023 David Cantrell <dcantrell@redhat.com> - 1:3.12.0-10
+- Use non-deprecated syntax for the %%patch macros
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 1:3.12.0-9
+- Rebuilt for Python 3.12
+
+* Thu Mar 02 2023 David Cantrell <dcantrell@redhat.com> - 1:3.12.0-8
+- Fix FTBFS with _ped.disktype test case for gpt (#2171656)
+- Update License tag to SPDX expression
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.12.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.12.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jun 21 2022 David Cantrell <dcantrell@redhat.com> - 1:3.12.0-5
+- Patch pyparted to handle PED_DISK_TYPE_PARTITION_TYPE_ID for the
+  msdos disk type and PED_DISK_TYPE_PARTITION_TYPE_UUID for the gpt
+  label (#2098792)
+
+* Mon Jun 20 2022 Adam Williamson <awilliam@redhat.com> - 1:3.12.0-4
+- Backport PR #92 to fix tests with parted 3.5 (#2098792)
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1:3.12.0-3
+- Rebuilt for Python 3.11
+
+* Mon Mar 07 2022 David Cantrell <dcantrell@redhat.com> - 3.12.0-2
+- BR python3-setuptools
+
+* Mon Mar 07 2022 David Cantrell <dcantrell@redhat.com> - 3.12.0-1
+- Upgrade to pyparted-3.12.0
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.11.7-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.11.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 1:3.11.7-3
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.11.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Oct 23 2020 David Cantrell <dcantrell@redhat.com> - 1:3.11.7-1
+- Upgrade to pyparted-3.11.7 (BZ#1890443)
+- Set PY_SSIZE_T_CLEAN for the build (bcl)
+- add nvme support
+- Update RELEASE file to make last step be "make pypi" (dcantrell)
+
+* Tue Jul 14 2020 Tom Stellard <tstellar@redhat.com> - 1:3.11.5-3
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Sat May 23 2020 Miro Hrončok <mhroncok@redhat.com> - 1:3.11.5-2
+- Rebuilt for Python 3.9
+
+* Mon Mar 09 2020 David Cantrell <dcantrell@redhat.com> - 1:3.11.5-1
+- Require at least libparted 3.3 and python 3.7 (dcantrell)
+- pedmodule.c: Fix partition enum flag handling (bcl)
+- Add support for chromeos_kernel and bls_boot partition flags (bcl)
+- Move exception declarations to _pedmodule.c (dcantrell)
 
 * Tue Feb 11 2020 David Cantrell <dcantrell@redhat.com> - 1:3.11.4-1
 - Use Decimal for Device.getSize() operations, return a

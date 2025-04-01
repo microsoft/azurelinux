@@ -1,0 +1,115 @@
+From b07fb27c0e418fa34ee4976dd6f07007b7a2b8a4 Mon Sep 17 00:00:00 2001
+From: "J. Nick Koston" <nick@koston.org>
+Date: Wed, 13 Nov 2024 08:50:36 -0600
+Subject: [PATCH] Fix incorrect parsing of chunk extensions with the pure
+ Python parser (#9853)
+
+---
+ CHANGES/9851.bugfix.rst   |  1 +
+ aiohttp/http_parser.py    |  7 ++++++
+ tests/test_http_parser.py | 52 ++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 59 insertions(+), 1 deletion(-)
+ create mode 100644 CHANGES/9851.bugfix.rst
+
+diff --git a/CHANGES/9851.bugfix.rst b/CHANGES/9851.bugfix.rst
+new file mode 100644
+index 00000000..02541a92
+--- /dev/null
++++ b/CHANGES/9851.bugfix.rst
+@@ -0,0 +1 @@
++Fixed incorrect parsing of chunk extensions with the pure Python parser -- by :user:`bdraco`.
+diff --git a/aiohttp/http_parser.py b/aiohttp/http_parser.py
+index b992955a..9067ce95 100644
+--- a/aiohttp/http_parser.py
++++ b/aiohttp/http_parser.py
+@@ -830,6 +830,13 @@ class HttpPayloadParser:
+                         i = chunk.find(CHUNK_EXT, 0, pos)
+                         if i >= 0:
+                             size_b = chunk[:i]  # strip chunk-extensions
++                            # Verify no LF in the chunk-extension
++                            if b"\n" in (ext := chunk[i:pos]):
++                                exc = BadHttpMessage(
++                                    f"Unexpected LF in chunk-extension: {ext!r}"
++                                )
++                                set_exception(self.payload, exc)
++                                raise exc
+                         else:
+                             size_b = chunk[:pos]
+ 
+diff --git a/tests/test_http_parser.py b/tests/test_http_parser.py
+index 74700df4..650e693c 100644
+--- a/tests/test_http_parser.py
++++ b/tests/test_http_parser.py
+@@ -13,10 +13,12 @@ from yarl import URL
+ 
+ import aiohttp
+ from aiohttp import http_exceptions, streams
++from aiohttp.base_protocol import BaseProtocol
+ from aiohttp.http_parser import (
+     NO_EXTENSIONS,
+     DeflateBuffer,
+     HttpPayloadParser,
++    HttpRequestParser,
+     HttpRequestParserPy,
+     HttpResponseParserPy,
+     HttpVersion,
+@@ -1433,7 +1435,55 @@ async def test_parse_chunked_payload_split_chunks(response: Any) -> None:
+     assert await reader.read() == b"firstsecond"
+ 
+ 
+-def test_partial_url(parser: Any) -> None:
++@pytest.mark.skipif(NO_EXTENSIONS, reason="Only tests C parser.")
++async def test_parse_chunked_payload_with_lf_in_extensions_c_parser(
++    loop: asyncio.AbstractEventLoop, protocol: BaseProtocol
++) -> None:
++    """Test the C-parser with a chunked payload that has a LF in the chunk extensions."""
++    # The C parser will raise a BadHttpMessage from feed_data
++    parser = HttpRequestParserC(
++        protocol,
++        loop,
++        2**16,
++        max_line_size=8190,
++        max_field_size=8190,
++    )
++    payload = (
++        b"GET / HTTP/1.1\r\nHost: localhost:5001\r\n"
++        b"Transfer-Encoding: chunked\r\n\r\n2;\nxx\r\n4c\r\n0\r\n\r\n"
++        b"GET /admin HTTP/1.1\r\nHost: localhost:5001\r\n"
++        b"Transfer-Encoding: chunked\r\n\r\n0\r\n\r\n"
++    )
++    with pytest.raises(http_exceptions.BadHttpMessage, match="\\\\nxx"):
++        parser.feed_data(payload)
++
++
++async def test_parse_chunked_payload_with_lf_in_extensions_py_parser(
++    loop: asyncio.AbstractEventLoop, protocol: BaseProtocol
++) -> None:
++    """Test the py-parser with a chunked payload that has a LF in the chunk extensions."""
++    # The py parser will not raise the BadHttpMessage directly, but instead
++    # it will set the exception on the StreamReader.
++    parser = HttpRequestParserPy(
++        protocol,
++        loop,
++        2**16,
++        max_line_size=8190,
++        max_field_size=8190,
++    )
++    payload = (
++        b"GET / HTTP/1.1\r\nHost: localhost:5001\r\n"
++        b"Transfer-Encoding: chunked\r\n\r\n2;\nxx\r\n4c\r\n0\r\n\r\n"
++        b"GET /admin HTTP/1.1\r\nHost: localhost:5001\r\n"
++        b"Transfer-Encoding: chunked\r\n\r\n0\r\n\r\n"
++    )
++    messages, _, _ = parser.feed_data(payload)
++    reader = messages[0][1]
++    assert isinstance(reader.exception(), http_exceptions.BadHttpMessage)
++    assert "\\nxx" in str(reader.exception())
++
++
++def test_partial_url(parser: HttpRequestParser) -> None:
+     messages, upgrade, tail = parser.feed_data(b"GET /te")
+     assert len(messages) == 0
+     messages, upgrade, tail = parser.feed_data(b"st HTTP/1.1\r\n\r\n")
+-- 
+2.47.0
+

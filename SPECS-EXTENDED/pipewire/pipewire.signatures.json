@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "media-session-0.4.1.tar.gz": "119c9216070b54018217552c7924f9888da270c3c4647c5e2b85ffa6b1574975",
-  "pipewire-0.3.60.tar.gz": "20e95274393f7dd65b4b51ec06f4f65986112f2bf3c86b1b0467156dd523a35d"
+  "pipewire-1.2.7.tar.gz": "e75568ed18bcbe75e9779af57cb9cc256fd7ebfaadc12bb347a0717055d1d3a9",
+  "pipewire.sysusers": "49d3bbef87c2cf21e49479e044dd7cd4fc7457d551266914e86d9a45c2b3d984"
  }
 }

@@ -1,12 +1,13 @@
-Name:           perl-Moo
-Version:        2.003006
-Release:        3%{?dist}
-Summary:        Minimalist Object Orientation (with Moose compatibility)
-License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name:           perl-Moo
+Version:        2.005005
+Release:        8%{?dist}
+Summary:        Minimalist Object Orientation (with Moose compatibility)
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+
 URL:            https://metacpan.org/release/Moo
-Source0:        https://cpan.metacpan.org/authors/id/H/HA/HAARG/Moo-%{version}.tar.gz#/perl-Moo-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/H/HA/HAARG/Moo-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  make
 BuildRequires:  perl-interpreter
@@ -22,22 +23,22 @@ BuildRequires:  perl(Class::Method::Modifiers) >= 1.10
 BuildRequires:  perl(Config)
 BuildRequires:  perl(constant)
 BuildRequires:  perl(Devel::GlobalDestruction) >= 0.11
-BuildRequires:  perl(Exporter) >= 5.57
+BuildRequires:  perl(Exporter)
 # Filter::Simple not used at test-time
 BuildRequires:  perl(Import::Into) >= 1.002
 BuildRequires:  perl(Module::Runtime) >= 0.014
 BuildRequires:  perl(mro)
 # MRO::Compat not needed with modern perl
 BuildRequires:  perl(overload)
-BuildRequires:  perl(Role::Tiny) >= 2.001004
-BuildRequires:  perl(Scalar::Util)
+BuildRequires:  perl(Role::Tiny) >= 2.002004
+BuildRequires:  perl(Scalar::Util) >= 1.00
 BuildRequires:  perl(strictures) >= 1.004003
-BuildRequires:  perl(Sub::Defer) >= 2.003001
-BuildRequires:  perl(Sub::Quote) >= 2.003001
+BuildRequires:  perl(Sub::Defer) >= 2.006006
+BuildRequires:  perl(Sub::Quote) >= 2.006006
 # Text::Balanced not used at test-time
 # Optional run-time:
 BuildRequires:  perl(Class::XSAccessor) >= 1.18
-BuildRequires:  perl(Sub::Name)
+BuildRequires:  perl(Sub::Util)
 # lib/Moo/HandleMoose.pm requires Moose modules. Moo::HandleMoose is used only
 # if Moose has been loaded. So this is circular optional dependency definitly
 # not suitable for Moo because Moo is reimplementation of Moose:
@@ -52,12 +53,12 @@ BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(lib)
 # MooX::ArrayRef is defined internally via %%INC
-BuildRequires:  perl(Test::Fatal) >= 0.003
 BuildRequires:  perl(Test::More) >= 0.96
 BuildRequires:  perl(threads)
+# Dependencies
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 # Optional tests:
 BuildRequires:  perl(CPAN::Meta::Requirements)
-Requires:       perl(:MODULE_COMPAT_%(eval "`/usr/bin/perl -V:version`"; echo $version))
 Requires:       perl(Carp)
 Requires:       perl(Class::Method::Modifiers) >= 1.10
 Requires:       perl(Devel::GlobalDestruction) >= 0.11
@@ -98,8 +99,69 @@ not quite- two thirds of Moose.
 %{_mandir}/man3/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.003006-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Dec 23 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 2.005005-8
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.005005-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.005005-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.005005-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.005005-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed May 31 2023 Michal Josef Špaček <mspacek@redhat.com> - 2.005005-3
+- Update license to SPDX format
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.005005-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sun Jan 15 2023 Emmanuel Seyman <emmanuel@seyman.fr> - 2.005005-1
+- Update to 2.005005
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.005004-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.005004-5
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.005004-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.005004-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.005004-2
+- Perl 5.34 rebuild
+
+* Sun Apr 04 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 2.005004-1
+- Update to 2.005004
+
+* Sun Mar 21 2021 Emmanuel Seyman <emmanuel@seyman.fr> - 2.005003-1
+- Update to 2.005003
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.004004-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sun Nov 29 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 2.004004-1
+- Update to 2.004004
+
+* Sun Nov 22 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 2.004003-1
+- Update to 2.004003
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.004000-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.004000-2
+- Perl 5.32 rebuild
+
+* Sun Apr 12 2020 Emmanuel Seyman <emmanuel@seyman.fr> - 2.004000-1
+- Update to 2.004000
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.003006-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
