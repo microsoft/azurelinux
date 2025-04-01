@@ -23502,7 +23502,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-menuist",
+          "name": "python-menuinst",
           "version": "2.2.0",
           "downloadUrl": "https://github.com/conda/menuinst/archive/refs/tags/2.2.0.tar.gz"
         }
