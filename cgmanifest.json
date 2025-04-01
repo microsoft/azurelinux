@@ -22262,6 +22262,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-conda-package-streaming",
+          "version": "0.11.0",
+          "downloadUrl": "https://github.com/conda/conda-package-streaming/archive/v0.11.0/conda-package-streaming-0.11.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-configobj",
           "version": "5.0.6",
           "downloadUrl": "https://files.pythonhosted.org/packages/64/61/079eb60459c44929e684fa7d9e2fdca403f67d64dd9dbac27296be2e0fab/configobj-5.0.6.tar.gz"
