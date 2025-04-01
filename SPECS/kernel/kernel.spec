@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.78.1
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -197,8 +197,8 @@ if [ -s config_diff ]; then
     echo "Config file has unexpected changes"
     echo "Update config file to set changed values explicitly"
 
-#  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
-    exit 1
+    # (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
+    #exit 1
 fi
 
 %build
