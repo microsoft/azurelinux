@@ -89,18 +89,18 @@ BuildRequires:  %py3_reqs
 # For tests
 BuildRequires:  python3
 %if 0%{?with_check}
-BuildRequires:  python%{python3_pkgversion}-jsonpatch
 BuildRequires:  python%{python3_pkgversion}-pytest-mock
 BuildRequires:  python%{python3_pkgversion}-responses
 %endif
 
 Requires:       %py3_reqs
-Requires:       python3-boltons
 Requires:       python3-archspec
+Requires:       python3-boltons
+Requires:       python3-conda-libmamba-solver
 Requires:       python3-conda-package-streaming
+Requires:       python3-jsonpatch
 Requires:       python3-menuinst
 Requires:       python3-platformdirs
-Requires:       python3-jsonpatch
 
 # Some versions in conda/_vendor/vendor.txt
 Provides:       bundled(python%{python3_pkgversion}-appdirs) = 1.2.0

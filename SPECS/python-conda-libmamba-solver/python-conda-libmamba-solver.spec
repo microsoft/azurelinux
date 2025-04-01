@@ -39,12 +39,12 @@ sed -i -e '/doctest/d' -e '/reruns/d' pyproject.toml
 
 
 %build
-%{pyproject_wheel}
+%pyproject_wheel
 
 
 %install
-%{pyproject_install}
-%{pyproject_save_files} conda_libmamba_solver
+%pyproject_install
+%pyproject_save_files conda_libmamba_solver
 
 
 %files -n python3-%{srcname} -f %{pyproject_files}
