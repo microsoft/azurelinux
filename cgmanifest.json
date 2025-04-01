@@ -21902,6 +21902,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-archspec",
+          "version": "0.2.5",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/a/archspec/archspec-0.2.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-argcomplete",
           "version": "1.10.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/a/argcomplete/argcomplete-1.10.0.tar.gz"
@@ -23415,6 +23425,16 @@
           "name": "python-memcached",
           "version": "1.59",
           "downloadUrl": "https://github.com/linsomniac/python-memcached/archive/1.59.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-menuist",
+          "version": "2.2.0",
+          "downloadUrl": "https://github.com/conda/menuinst/archive/refs/tags/2.2.0.tar.gz"
         }
       }
     },
@@ -25415,6 +25435,16 @@
           "name": "python-zope-interface",
           "version": "6.1",
           "downloadUrl": "https://pypi.python.org/packages/source/z/zope.interface/zope.interface-6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-zstandard",
+          "version": "0.23.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/z/zstandard/zstandard-0.23.0.tar.gz"
         }
       }
     },
