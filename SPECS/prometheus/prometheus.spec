@@ -22,7 +22,8 @@ Patch1:         CVE-2024-6104.patch
 Patch2:         CVE-2024-24786.patch
 Patch3:         CVE-2023-39325.patch
 Patch4:         CVE-2023-45288.patch
-Patch5:         CVE-2024-51744.patch
+Patch5:         CVE-2025-30204.patch
+Patch6:         CVE-2024-51744.patch
 BuildRequires:  golang
 BuildRequires:  nodejs
 BuildRequires:  systemd-rpm-macros
@@ -136,8 +137,11 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
-* Wed Mar 19 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.37.9-3
+* Thu Apr 03 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.37.9-4
 - Fix CVE-2024-51744 with an upstream patch
+
+* Sun Mar 30 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.37.9-3
+- Patch CVE-2025-30204
 
 * Wed Nov 06 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.37.9-2
 - Patch for CVE-2023-39325 CVE-2023-45288
