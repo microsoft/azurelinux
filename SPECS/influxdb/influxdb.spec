@@ -156,7 +156,7 @@ go test ./...
 
 %changelog
 * Mon Mar 24 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.7.5-3
-- Fix CVE-2025-22870, CVE-2024-51744 with an upstream patch
+- Patch CVE-2025-22870, CVE-2024-51744
 
 * Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.7.5-2
 - Fix CVE-2025-22868, CVE-2025-27144 with an upstream patch
