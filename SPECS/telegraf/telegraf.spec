@@ -88,9 +88,8 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
-<<<<<<< HEAD
 * Wed Apr 02 2025 Mayank Singh <mayansingh@microsoft.com> - 1.31.0-8
-- Fix CVE-2024-35255 and CVE-2025-27144.patch with an upstream patch
+- Fix CVE-2024-35255 and CVE-2025-27144 with an upstream patch
 
 * Mon Mar 31 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.31.0-7
 - Patch CVE-2025-30204
