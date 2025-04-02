@@ -12891,8 +12891,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.6.20",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.20.tar.gz"
+          "version": "10.6.21",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.21.tar.gz"
         }
       }
     },
@@ -13803,8 +13803,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.40",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.40.tar.gz"
+          "version": "8.0.41",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.41.tar.gz"
         }
       }
     },
@@ -21084,8 +21084,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.1.31",
-          "downloadUrl": "https://www.php.net/distributions/php-8.1.31.tar.xz"
+          "version": "8.1.32",
+          "downloadUrl": "https://www.php.net/distributions/php-8.1.32.tar.xz"
         }
       }
     },
