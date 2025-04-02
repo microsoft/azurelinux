@@ -25,6 +25,7 @@ Patch4:         CVE-2023-44487.patch
 Patch5:         CVE-2025-22868.patch
 Patch6:         CVE-2025-22870.patch
 Patch7:         CVE-2024-51744.patch
+Patch8:         CVE-2025-30204.patch
 BuildRequires:  golang
 BuildRequires:  nodejs
 BuildRequires:  nodejs-npm
@@ -141,6 +142,9 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
+* Sun Mar 30 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.45.4-9
+- Patch CVE-2025-30204
+
 * Thu Mar 13 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.45.4-9
 - Patch CVE-2025-22870, CVE-2024-51744
 
