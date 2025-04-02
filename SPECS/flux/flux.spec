@@ -40,7 +40,8 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        cargo_config
 Patch1:         disable-static-library.patch
-Patch2:         0001-libflux-unblock-build-by-allowing-warnings.patch
+# Fixed upstream in 1.195.0, https://github.com/influxdata/flux/pull/5484.
+Patch2:         fix-build-warnings.patch
 BuildRequires:  cargo >= 1.45
 BuildRequires:  kernel-headers
 BuildRequires:  rust >= 1.45
