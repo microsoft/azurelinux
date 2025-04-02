@@ -4,7 +4,7 @@
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
 Version:        2.37.9
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
