@@ -1,7 +1,5 @@
 %global srcname conda-libmamba-solver
 
-%bcond tests 1
-
 Distribution:   Azure Linux
 Name:           python-%{srcname}
 Vendor:         Microsoft Corporation
