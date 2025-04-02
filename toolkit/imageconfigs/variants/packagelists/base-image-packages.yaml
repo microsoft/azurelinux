@@ -1,0 +1,10 @@
+packages:
+  - azurelinux-repos-ms-non-oss
+  - azurelinux-repos-ms-oss
+  - cronie-anacron
+  - chrony
+  - cryptsetup
+  - logrotate
+  - openssh-server
+  - procps-ng
+  - dracut-vrf
