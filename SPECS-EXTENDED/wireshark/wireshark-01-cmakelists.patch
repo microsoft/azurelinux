@@ -4,15 +4,15 @@ index a55086c..0149801 100644
 +++ b/wsutil/CMakeLists.txt
 @@ -80,6 +80,7 @@ set(WSUTIL_PUBLIC_HEADERS
  	ws_roundup.h
- 	ws_return.h
+ 	ws_strptime.h
  	wsgcrypt.h
 +	wstmpdir.h
  	wsjson.h
  	wslog.h
  	xtea.h
 @@ -135,6 +136,7 @@ set(WSUTIL_COMMON_FILES
- 	ws_mempbrk.c
  	ws_pipe.c
+ 	ws_strptime.c
  	wsgcrypt.c
 +	wstmpdir.c
  	wsjson.c
