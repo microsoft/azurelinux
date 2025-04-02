@@ -142,7 +142,7 @@ fi
 
 %changelog
 * Thu Mar 13 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.45.4-9
-- Fix CVE-2025-22870, CVE-2024-51744 with an upstream patch
+- Patch CVE-2025-22870, CVE-2024-51744
 
 * Thu Mar 06 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.45.4-8
 - Fix CVE-2025-22868
