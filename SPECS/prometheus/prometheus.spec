@@ -4,7 +4,7 @@
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
 Version:        2.45.4
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,6 +24,7 @@ Patch3:         CVE-2024-24786.patch
 Patch4:         CVE-2023-44487.patch
 Patch5:         CVE-2025-22868.patch
 Patch6:         CVE-2025-30204.patch
+Patch7:         CVE-2024-35255.patch
 
 BuildRequires:  golang
 BuildRequires:  nodejs
@@ -141,6 +142,9 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
+* Wed Apr 02 2025 Mayank Singh <mayansingh@microsoft.com> - 2.45.4-10
+- Fix CVE-2024-35255 with an upstream patch
+
 * Sun Mar 30 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.45.4-9
 - Patch CVE-2025-30204
 
