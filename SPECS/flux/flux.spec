@@ -32,10 +32,10 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 # Below is a manually created tarball, no download link.
 # Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache and config.toml run:
-#   tar -xf %{name}-%{version}.tar.gz
-#   cd %{name}-%{version}/libflux
+#   tar -xf %%{name}-%%{version}.tar.gz
+#   cd %%{name}-%%{version}/libflux
 #   cargo vendor > config.toml
-#   tar -czf %{name}-%{version}-cargo.tar.gz vendor/
+#   tar -czf %%{name}-%%{version}-cargo.tar.gz vendor/
 #
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        cargo_config
@@ -88,6 +88,8 @@ patch -p2 <<EOF
 +
      Ok(())
  }
+EOF
+
 popd
 
 %build
