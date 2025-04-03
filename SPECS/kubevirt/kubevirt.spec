@@ -42,12 +42,9 @@ Patch09:        CVE-2023-26484.patch
 Patch10:        CVE-2024-45338.patch
 Patch11:        CVE-2023-3978.patch
 Patch12:        CVE-2025-22869.patch
-<<<<<<< HEAD
 Patch13:        CVE-2023-48795.patch
-=======
-Patch13:        CVE-2024-51744.patch
+Patch14:        CVE-2024-51744.patch
 
->>>>>>> 656a1455a (Patch kubevirt to fix CVE-2024-51744)
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
