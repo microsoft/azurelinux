@@ -28,6 +28,7 @@ Source1:        %{name}-%{version}-vendor-1.tar.gz
 Patch0:         initialization-and-configuration-handling.patch
 Patch1:         single-ip-address-for-node.patch
 Patch2:         golang-version-upgrade.patch
+Patch3:         instanceexists-watches-vms-instead-of-vmis.patch
 %global debug_package %{nil}
 BuildRequires:  golang >= 1.22
 
