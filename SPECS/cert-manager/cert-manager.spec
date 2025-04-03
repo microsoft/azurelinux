@@ -129,7 +129,7 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
-* Fri Mar 28 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.11.2-22
+* Mon Mar 31 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.11.2-22
 - Fix CVE-2024-51744
 
 * Fri Mar 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.11.2-21
