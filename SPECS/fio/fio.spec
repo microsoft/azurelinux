@@ -1,42 +1,69 @@
 Summary:        Multithreaded IO generation tool
 Name:           fio
 Version:        3.37
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://git.kernel.dk/?p=fio.git;a=summary
 Source0:        https://brick.kernel.dk/snaps/%{name}-%{version}.tar.bz2
-BuildRequires:  gcc
-BuildRequires:  gnupg2
-BuildRequires:  libaio-devel
-BuildRequires:  libcurl-devel
-BuildRequires:  libnbd-devel
-BuildRequires:  librbd1-devel
-BuildRequires:  librdmacm-devel
-BuildRequires:  numactl-devel
-BuildRequires:  openssl-devel
-BuildRequires:  python3-devel
-BuildRequires:  zlib-devel
+
+%bcond_without nbd
+%bcond_with rbd
+%bcond_with rados
 %ifarch x86_64
-BuildRequires:  libpmem-devel
+%bcond_without pmem
 %endif
+
+BuildRequires:	gcc
+BuildRequires:	gnupg2
+BuildRequires:	libaio-devel
+BuildRequires:	zlib-devel
+BuildRequires:	python3-devel
+%if %{with nbd}
+BuildRequires:	libnbd-devel
+%endif
+BuildRequires:	libcurl-devel
+BuildRequires:	openssl-devel
+%if %{with pmem}
+BuildRequires:	libpmem-devel
+%endif
+%if %{with rbd}
+BuildRequires:	librbd1-devel
+%endif
+%ifnarch %{arm}
+BuildRequires:	numactl-devel
+BuildRequires:	librdmacm-devel
+%endif
+BuildRequires: make
 %if 0%{?with_check}
 BuildRequires:  CUnit-devel
 %endif
+
+# Don't create automated dependencies for the fio engines.
+# https://bugzilla.redhat.com/show_bug.cgi?id=1884954
+%global __provides_exclude_from ^%{_libdir}/fio/
 
 # Main fio package has soft dependencies on all the engine
 # subpackages, but allows the engines to be uninstalled if not needed
 # or if the dependencies are too onerous.
 Recommends:     %{name}-engine-libaio
 Recommends:     %{name}-engine-http
+%if %{with nbd}
 Recommends:     %{name}-engine-nbd
-Recommends:     %{name}-engine-rados
-Recommends:     %{name}-engine-rbd
-Recommends:     %{name}-engine-rdma
-%ifarch x86-64
+%endif
+%if %{with pmem}
 Recommends:     %{name}-engine-dev-dax
 Recommends:     %{name}-engine-libpmem
+%endif
+%if %{with rados}
+Recommends:     %{name}-engine-rados
+%endif
+%if %{with rbd}
+Recommends:     %{name}-engine-rbd
+%endif
+%ifnarch %{arm}
+Recommends:     %{name}-engine-rdma
 %endif
 
 %description
@@ -49,29 +76,31 @@ one wants to simulate.
 
 %package engine-libaio
 Summary:        Linux libaio engine for %{name}.
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description engine-libaio
 Linux libaio engine for %{name}.
 
 %package engine-http
 Summary:        HTTP engine for %{name}.
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description engine-http
 HTTP engine for %{name}.
 
+%if %{with nbd}
 %package engine-nbd
 Summary:        Network Block Device engine for %{name}.
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description engine-nbd
 Network Block Device (NBD) engine for %{name}.
+%endif
 
-%ifarch x86_64
+%if %{with pmem}
 %package engine-dev-dax
 Summary:        PMDK dev-dax engine for %{name}.
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description engine-dev-dax
 dev-dax engine for %{name}.
@@ -79,10 +108,10 @@ Read and write using device DAX to a persistent memory device
 (e.g., /dev/dax0.0) through the PMDK libpmem library.
 %endif
 
-%ifarch x86_64
+%if %{with pmem}
 %package engine-libpmem
 Summary:        PMDK pmemblk engine for %{name}.
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description engine-libpmem
 libpmem engine for %{name}.
@@ -90,26 +119,32 @@ Read and write using mmap I/O to a file on a filesystem mounted with DAX
 on a persistent memory device through the PMDK libpmem library.
 %endif
 
+%if %{with rados}
 %package engine-rados
 Summary:        Rados engine for %{name}.
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description engine-rados
 Rados engine for %{name}.
+%endif
 
+%if %{with rbd}
 %package engine-rbd
 Summary:        Rados Block Device engine for %{name}.
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description engine-rbd
 Rados Block Device (RBD) engine for %{name}.
+%endif
 
+%ifnarch %{arm}
 %package engine-rdma
 Summary:        RDMA engine for %{name}.
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description engine-rdma
 RDMA engine for %{name}.
+%endif
 
 %prep
 %autosetup -p1
@@ -125,11 +160,15 @@ RDMA engine for %{name}.
 sed -e 's,/usr/local/lib/,%{_libdir}/,g' -i os/os-linux.h
 
 %build
+%if %{with nbd}
 ./configure --disable-optimizations --enable-libnbd --dynamic-libengines
+%else
+./configure --disable-optimizations --dynamic-libengines
+%endif
 EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 
 %install
-%make_install prefix=%{_prefix} mandir=%{_mandir} libdir=%{_libdir}/fio INSTALL="install -p"
+%make_install prefix=%{_prefix} mandir=%{_mandir} libdir=%{_libdir}/fio DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
 
 %check
 %make_build test
@@ -144,7 +183,7 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 %{_mandir}/man1/*
 %{_datadir}/%{name}/*
 
-%ifarch x86_64
+%if %{with pmem}
 %files engine-dev-dax
 %{_libdir}/fio/fio-dev-dax.so
 %endif
@@ -155,24 +194,36 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 %files engine-libaio
 %{_libdir}/fio/fio-libaio.so
 
-%ifarch x86_64
+%if %{with pmem}
 %files engine-libpmem
 %{_libdir}/fio/fio-libpmem.so
 %endif
 
+%if %{with nbd}
 %files engine-nbd
 %{_libdir}/fio/fio-nbd.so
+%endif
 
+%if %{with rados}
 %files engine-rados
 %{_libdir}/fio/fio-rados.so
+%endif
 
+%if %{with rbd}
 %files engine-rbd
 %{_libdir}/fio/fio-rbd.so
+%endif
 
+%ifnarch %{arm}
 %files engine-rdma
 %{_libdir}/fio/fio-rdma.so
+%endif
 
 %changelog
+* Thu Jun 06 2024 Andrew Phelps <anphel@microsoft.com> - 3.37-2
+- Update spec based on Fedora 40 package (license: MIT)
+- Disable building rbd and rados subpackages
+
 * Wed Apr 17 2024 Muhammad Falak <mwani@microsoft.com> - 3.37-1
 - Bump version to 3.37
 

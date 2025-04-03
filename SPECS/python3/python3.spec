@@ -5,8 +5,8 @@
 
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.12.0
-Release:        4%{?dist}
+Version:        3.12.9
+Release:        1%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -238,6 +238,32 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.12.9-1
+- Auto-upgrade to 3.12.9 - to fix CVE-2025-0938 & CVE-2024-4032
+- Clean up the earlier patches not needed anymore
+
+* Thu Jan 30 2025 Bala <balakumaran.kannan@microsoft.com> - 3.12.3-6
+- Patch CVE-2023-27043
+
+* Mon Dec 10 2024 Ankita Pareek <ankitapareek@microsoft.com> - 3.12.3-5
+- Patch CVE-2024-12254
+
+* Fri Sep 20 2024 Himaja Kesari <himajakesari@microsoft.com> - 3.12.3-4
+- Patch CVE-2024-6232 and CVE-2024-8088
+
+* Wed Aug 28 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.12.3-3
+- Patch CVE-2024-6923
+
+* Wed Aug 21 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 3.12.3-2
+- Patch CVE-2024-7592
+
+* Mon Jul 15 2024 Suresh Thelkar <sthelkar@microsoft.com> - 3.12.3-1
+- Upgrade to 3.12.3 to patch CVE-2024-0397, CVE-2023-6597
+- Clean up the earlier patches not needed anymore
+
+* Thu Jul 11 2024 Suresh Thelkar <sthelkar@microsoft.com> - 3.12.0-5
+- Patch CVE-2023-6597
+
 * Wed May 22 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.12.0-4
 - Bump release to build with new expat to fix CVE-2024-28757
 

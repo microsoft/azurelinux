@@ -48,7 +48,8 @@
                 "packagelists/core-packages-image.json",
                 "packagelists/core-tools-packages.json",
                 "packagelists/cloud-init-packages.json",
-                "packagelists/selinux.json"
+                "packagelists/selinux.json",
+                "packagelists/virt-guest-packages.json"
             ],
             "KernelOptions": {
                 "default": "kernel"

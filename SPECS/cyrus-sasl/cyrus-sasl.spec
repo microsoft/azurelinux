@@ -4,7 +4,7 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.28
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -251,7 +251,9 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/sysconfig/saslauthd
 /lib/systemd/system/saslauthd.service
 %{_libdir}/systemd/system-preset/50-saslauthd.preset
-%{_sbindir}/*
+%{_sbindir}/pluginviewer
+%{_sbindir}/saslauthd
+%{_sbindir}/testsaslauthd
 %{_mandir}/man8/*
 
 %files devel
@@ -309,6 +311,9 @@ make %{?_smp_mflags} check
 %{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
+* Wed Jul 31 2024 Andrew Phelps <anphel@microsoft.com> - 2.1.28-8
+- Update file listings to remove duplicate files
+
 * Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.1.28-7
 - Sanitize license files
 

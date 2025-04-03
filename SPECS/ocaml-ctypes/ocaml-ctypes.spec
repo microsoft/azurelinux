@@ -1,27 +1,34 @@
 Summary:        Combinators for binding to C libraries without writing any C
 Name:           ocaml-ctypes
-Version:        0.18.0
-Release:        6%{?dist}
+Version:        0.21.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/ocamllabs/ocaml-ctypes
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
-BuildRequires:  libffi-devel
-BuildRequires:  make
-BuildRequires:  ocaml >= 4.02.3
+BuildRequires:  ocaml >= 4.03.0
 BuildRequires:  ocaml-bigarray-compat-devel
-BuildRequires:  ocaml-findlib
-BuildRequires:  ocaml-integers-devel >= 0.3.0
-BuildRequires:  ocaml-ocamldoc
+BuildRequires:  ocaml-dune >= 2.9
+BuildRequires:  ocaml-dune-configurator-devel
+BuildRequires:  ocaml-integers-devel >= 0.2.2
+BuildRequires:  pkgconfig(libffi)
 
 %if 0%{?with_check}
 BuildRequires:  ocaml-bisect-ppx-devel
-BuildRequires:  ocaml-lwt-devel >= 3.2.0
+BuildRequires:  ocaml-lwt-devel >= 2.4.7
 BuildRequires:  ocaml-ounit-devel
+BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(ncurses)
 %endif
+
+# This can be removed when F42 reaches EOL
+Obsoletes:      %{name}-doc < 0.21.0
+Provides:       %{name}-doc = %{version}-%{release}
+
+# Do not require ocaml-compiler-libs at runtime
+%global __ocaml_requires_opts -i Asttypes -i Build_path_prefix_map -i Cmi_format -i Env -i Ident -i Identifiable -i Load_path -i Location -i Longident -i Misc -i Outcometree -i Parsetree -i Path -i Primitive -i Shape -i Subst -i Toploop -i Type_immediacy -i Types -i Warnings
 
 %description
 Ctypes is a library for binding to C libraries using pure OCaml.  The
@@ -44,89 +51,31 @@ Requires:       ocaml-integers-devel%{?_isa}
 The %{name}-devel package contains libraries and signature
 files for developing applications that use %{name}.
 
-%package        doc
-Summary:        Documentation for %{name}
-BuildArch:      noarch
-
-%description    doc
-The %{name}-doc package contains developer documentation for
-%{name}.
-
 %prep
 %autosetup
-
 # Use Mariner flags
-sed -e 's|-fPIC -Wall -g|-fPIC %{build_cflags}|' \
-    -e 's|-link -static-libgcc|%{build_ldflags}|' \
-    -i Makefile.rules
-sed -i 's|=-Wl,--no-as-needed|=%{build_ldflags}|' src/discover/determine_as_needed_flags.sh
-
-# Flags for bigarray-compat are missing
-sed -i 's/(OCAMLFIND_BISECT_FLAGS)/& -package bigarray-compat/' Makefile.rules
-sed -i 's/^DOCFLAGS=/&-I $(shell ocamlfind query bigarray-compat) /' Makefile
-
-# Don't try to update the system ld.conf
-sed -i 's|-add ctypes|& -ldconf %{buildroot}%{_libdir}/ocaml/ld.conf|' Makefile
+sed -i 's/ "-cclib"; "-Wl,--no-as-needed";//' src/ctypes-foreign/config/discover.ml
 
 %build
-# Fixing test build dependencies.
-sed -i -e "s/ounit/ounit2/" ctypes.opam
-sed -i -e "s/oUnit/ounit2/" Makefile.tests
-
-# FIXME: Infrequent build failures with parallel build
-# It looks like the configuration step isn't done before its results are needed
-make all XEN=disable
-%make_build doc XEN=disable
+%dune_build
 
 %install
-export DESTDIR=%{buildroot}%{_libdir}/ocaml
-export OCAMLFIND_DESTDIR=$DESTDIR
-mkdir -p $DESTDIR/stublibs
-touch $DESTDIR/ld.conf
-make install XEN=disable
-rm $DESTDIR/ld.conf
-
-# We install the documentation elsewhere
-rm $DESTDIR/ctypes/*.md
-
-# Install the opam files
-mkdir -p $DESTDIR/ctypes-foreign
-cp -p ctypes-foreign.opam $DESTDIR/ctypes-foreign/opam
-cp -p ctypes.opam $DESTDIR/ctypes/opam
+%dune_install
 
 %check
-make test
+%dune_check
 
-%files
+%files -f .ofiles
 %license LICENSE
 %doc CHANGES.md README.md
-%dir %{_libdir}/ocaml/ctypes/
-%{_libdir}/ocaml/ctypes/META
-%{_libdir}/ocaml/ctypes/*.cma
-%{_libdir}/ocaml/ctypes/*.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/ctypes/*.cmxs
-%endif
-%{_libdir}/ocaml/stublibs/dllctypes*_stubs.so
-%{_libdir}/ocaml/stublibs/dllctypes*_stubs.so.owner
 
-%files devel
-%{_libdir}/ocaml/ctypes/opam
-%{_libdir}/ocaml/ctypes-foreign/
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/ctypes/*.a
-%{_libdir}/ocaml/ctypes/*.cmx
-%{_libdir}/ocaml/ctypes/*.cmxa
-%endif
-%{_libdir}/ocaml/ctypes/*.cmt
-%{_libdir}/ocaml/ctypes/*.cmti
-%{_libdir}/ocaml/ctypes/*.h
-%{_libdir}/ocaml/ctypes/*.mli
-
-%files doc
-%doc *.html *.css
+%files devel -f .ofiles-devel
 
 %changelog
+* Tue Jun 04 2024 Andrew Phelps <anphel@microsoft.com> - 0.21.1-1
+- Upgrade to version 0.21.1 based on Fedora 40 package (license: MIT)
+- Remove doc subpackage
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.18.0-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

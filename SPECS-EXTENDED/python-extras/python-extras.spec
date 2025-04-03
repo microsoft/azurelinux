@@ -11,10 +11,10 @@
 Summary:        Useful extra bits for Python
 Name:           python-extras
 Version:        1.0.0
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        MIT
 URL:            https://github.com/testing-cabal/extras
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://pypi.io/packages/source/e/extras/extras-%{version}.tar.gz
 BuildArch:      noarch
@@ -62,6 +62,10 @@ rm -vrf *.egg-info
 %{python3_sitelib}/extras-*.egg-info/
 
 %changelog
+* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-16
+- Release bump to fix package information.
+- License verified.
+
 * Tue Oct 13 2020 Steve Laughman <steve.laughman@microsoft.com> - 1.6.0-15
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - Disable circular dependency check

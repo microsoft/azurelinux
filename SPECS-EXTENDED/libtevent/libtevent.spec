@@ -3,24 +3,22 @@ Distribution:   Azure Linux
 
 %global with_python3 1
 
-%global talloc_version 2.3.0
+%global talloc_version 2.3.4
 
 Name: libtevent
-Version: 0.10.2
-Release: 4%{?dist}
+Version: 0.14.1
+Release: 1%{?dist}
 Summary: The tevent library
 License: LGPLv3+
-URL: http://tevent.samba.org/
-Source0: http://samba.org/ftp/tevent/tevent-%{version}.tar.gz
-Source1: http://samba.org/ftp/tevent/tevent-%{version}.tar.asc
+URL: https://tevent.samba.org/
+Source0: https://samba.org/ftp/tevent/tevent-%{version}.tar.gz
+Source1: https://samba.org/ftp/tevent/tevent-%{version}.tar.asc
 # gpg2 --no-default-keyring --keyring ./tevent.keyring --recv-keys 9147A339719518EE9011BCB54793916113084025
 Source2: tevent.keyring
 Source3: %{name}-LICENSE.txt
 
-# Patches
-Patch0001: 0003-wafsamba-Fix-few-SyntaxWarnings-caused-by-regular-ex.patch
-
 BuildRequires: gcc
+BuildRequires: libcmocka-devel >= 1.1.3
 BuildRequires: libtalloc-devel >= %{talloc_version}
 BuildRequires: doxygen
 BuildRequires: docbook-style-xsl
@@ -107,6 +105,9 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %ldconfig_scriptlets
 
 %changelog
+* Wed Aug 07 2024 Sindhu Karri <lakarri@microsoft.com> - 0.14.1-1
+- Update to 0.14.1 to build with Python 3.12
+
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.10.2-4
 - License verified
 

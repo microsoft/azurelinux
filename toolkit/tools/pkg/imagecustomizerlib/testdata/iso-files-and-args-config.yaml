@@ -1,0 +1,17 @@
+pxe:
+  isoImageBaseUrl: http://my-pxe-server-1
+iso:
+  additionalFiles:
+  - source: files/a.txt
+    destination: /a.txt
+
+  kernelCommandLine:
+    extraCommandLine: rd.info
+
+os:
+  packages:
+    install:
+    - squashfs-tools
+    - tar
+    - device-mapper
+    - curl

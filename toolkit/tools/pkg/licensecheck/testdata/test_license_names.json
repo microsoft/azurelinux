@@ -1,0 +1,11 @@
+{
+    "FuzzyLicenseNamesRegexList": [
+        "(?i).*fuzzy.*"
+    ],
+    "VerbatimLicenseNamesRegexList": [
+        "^vErBaTiM$"
+    ],
+    "SkipLicenseNamesRegexList": [
+        "(?i).*skip.*"
+    ]
+}

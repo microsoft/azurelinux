@@ -1,0 +1,8 @@
+[Unit]
+Description=A minimalistic network configuration daemon with DHCPv4, rdisc and DHCPv6 support
+Wants=network.target
+Before=network.target
+[Service]
+ExecStart=/usr/sbin/dhcpcd -q --nobackground
+[Install]
+WantedBy=multi-user.target

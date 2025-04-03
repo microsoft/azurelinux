@@ -140,9 +140,11 @@ func ReadFstabFile(fstabPath string) ([]FstabEntry, error) {
 	}
 
 	var output findmntOutput
-	err = json.Unmarshal([]byte(jsonString), &output)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read fstab file (%s): json parse error:\n%w", fstabPath, err)
+	if jsonString != "" {
+		err = json.Unmarshal([]byte(jsonString), &output)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read fstab file (%s): json parse error:\n%w", fstabPath, err)
+		}
 	}
 
 	return output.FileSystems, nil

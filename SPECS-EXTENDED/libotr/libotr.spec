@@ -4,19 +4,24 @@ Distribution:   Azure Linux
 Summary: Off-The-Record Messaging library and toolkit
 Name: libotr
 Version: 4.1.1
-Release: 10%{?dist}
-License: GPLv2 and LGPLv2
+Release: 11%{?dist}
+# Automatically converted from old format: GPLv2 and LGPLv2 - review is highly recommended.
+License: GPL-2.0-only AND LicenseRef-Callaway-LGPLv2
 Source0: http://otr.cypherpunks.ca/%{name}-%{version}.tar.gz
 Url: http://otr.cypherpunks.ca/
 Provides: libotr-toolkit = %{version}
 Obsoletes: libotr-toolkit < %{version}
 Requires: libgcrypt >= 1.2.0
 Requires: pkgconfig
+BuildRequires: make
 BuildRequires:  gcc
 BuildRequires: libgcrypt-devel >= 1.2.0, libgpg-error-devel
 %if %{snapshot}
 Buildrequires: libtool automake autoconf
 %endif
+
+Patch: libotr-4.1.1-versioning.patch
+Patch: libotr-4.1.1-socket-h.patch
 
 %description
 Off-the-Record Messaging Library and Toolkit
@@ -33,7 +38,7 @@ Conflicts: libotr3-devel
 The devel package contains the libotr library and include files.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %if %{snapshot}
 aclocal
@@ -73,6 +78,10 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/*.la
 
 
 %changelog
+* Mon Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 4.1.1-11
+- Added Essential patches from Fedora 41.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1.1-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

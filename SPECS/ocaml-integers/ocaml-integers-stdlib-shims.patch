@@ -1,0 +1,18 @@
+--- a/integers.opam	2022-02-05 11:56:40.000000000 -0700
++++ b/integers.opam	2022-02-17 20:30:13.353325774 -0700
+@@ -18,7 +18,6 @@ build: [
+ depends: [
+   "ocaml" {>= "4.02"}
+   "dune" {>= "1.0"}
+-  "stdlib-shims"
+ ]
+ 
+ synopsis: "Various signed and unsigned integer types for OCaml"
+--- a/src/dune	2022-02-05 11:56:40.000000000 -0700
++++ b/src/dune	2022-02-17 20:30:25.009327803 -0700
+@@ -4,5 +4,4 @@
+  (wrapped false)
+  (install_c_headers ocaml_integers)
+  (c_names unsigned_stubs)
+- (libraries stdlib-shims)
+  (synopsis "Signed and unsigned integers of various sizes"))

@@ -5,7 +5,7 @@
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        %{dist_version}.0
-Release:        13%{?dist}
+Release:        26%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -118,6 +118,45 @@ install -Dm0644 %{SOURCE4} -t %{buildroot}%{_sysctldir}/
 %{_sysctldir}/*.conf
 
 %changelog
+* Mon Mar 31 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-26
+- Bump release for April 2025 Update
+
+* Tue Feb 25 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-25
+- Bump release for March 2025 Update
+
+* Wed Jan 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-24
+- Bump release for January 2025 Update 2
+
+* Sat Dec 21 2024 Jon Slobodzian <joslobo@microsoft.com> - 3.0-23
+- Bump release for January 2025 Update
+
+* Fri Nov 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-22
+- Bump release for December 2024 Update
+
+* Fri Oct 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-21
+- Bump release for November 2024
+
+* Fri Sep 27 2024 Rachel Menge <rachelmenge@microsoft.com> - 3.0-20
+- Enable iptables as default firewall
+
+* Wed Sep 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-19
+- Bump release for October 2024 Update
+
+* Thu Aug 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-18
+- Bump release for August 2024 Update 1
+
+* Fri Jul 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-17
+- Azure Linux 3.0 August Release
+
+* Fri Jul 05 2024 Sam Meluch <sammeluch@microsoft.com> - 3.0-16
+- Azure Linux 3.0 July Preview Release 1
+
+* Thu Jun 21 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-15
+- Azure Linux 3.0 June Preview Release 2
+
+* Wed Jun 12 2024 Sam Meluch <sammeluch@microsoft.com> - 3.0-14
+- Azure Linux 3.0 June Preview Release 1
+
 * Fri May 24 2024 Sam Meluch <sammeluch@microsoft.com> - 3.0-13
 - Azure Linux 3.0 May Preview Release 2
 

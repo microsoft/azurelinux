@@ -5,10 +5,23 @@ package imagecustomizerapi
 
 import (
 	"fmt"
-	"sort"
-	"strconv"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
+)
+
+const (
+	DefaultSectorSize = 512
+
+	// For SSDs, aligning partition's to 1 MiB is beneficial for performance reasons.
+	// In addition, the imager's diskutils works in MiB.
+	DefaultPartitionAlignment = diskutils.MiB
+
+	// The number of sectors (LBA) that the GPT header requires.
+	GptHeaderSectorNum = 34
+
+	// The number of sectors (LBA) that the GPT footer requires.
+	GptFooterSectorNum = 33
 )
 
 type Disk struct {
@@ -16,7 +29,8 @@ type Disk struct {
 	PartitionTableType PartitionTableType `yaml:"partitionTableType"`
 
 	// The virtual size of the disk.
-	MaxSize DiskSize `yaml:"maxSize"`
+	// Note: This value is filled in by IsValid().
+	MaxSize *DiskSize `yaml:"maxSize"`
 
 	// The partitions to allocate on the disk.
 	Partitions []Partition `yaml:"partitions"`
@@ -28,74 +42,119 @@ func (d *Disk) IsValid() error {
 		return err
 	}
 
-	if d.MaxSize <= 0 {
-		return fmt.Errorf("a disk's maxSize value (%d) must be a positive non-zero number", d.MaxSize)
+	if d.MaxSize != nil {
+		if *d.MaxSize <= 0 {
+			return fmt.Errorf("a disk's maxSize value (%d) must be a positive non-zero number", *d.MaxSize)
+		}
 	}
 
-	partitionIDSet := make(map[string]bool)
 	for i, partition := range d.Partitions {
 		err := partition.IsValid()
 		if err != nil {
 			return fmt.Errorf("invalid partition at index %d:\n%w", i, err)
 		}
-
-		if _, existingName := partitionIDSet[partition.Id]; existingName {
-			return fmt.Errorf("duplicate partition id used (%s) at index %d", partition.Id, i)
-		}
-
-		partitionIDSet[partition.Id] = false // dummy value
 	}
 
-	// Check for overlapping partitions.
-	// First, sort partitions by start index.
-	sortedPartitions := append([]Partition(nil), d.Partitions...)
-	sort.Slice(sortedPartitions, func(i, j int) bool {
-		return sortedPartitions[i].Start < sortedPartitions[j].Start
-	})
+	gptHeaderSize := DiskSize(roundUp(GptHeaderSectorNum*DefaultSectorSize, DefaultPartitionAlignment))
+	gptFooterSize := DiskSize(roundUp(GptFooterSectorNum*DefaultSectorSize, DefaultPartitionAlignment))
 
-	// Then, confirm each partition ends before the next starts.
-	for i := 0; i < len(sortedPartitions)-1; i++ {
-		a := &sortedPartitions[i]
-		b := &sortedPartitions[i+1]
+	// Auto-fill the start value from the previous partition's end value.
+	for i := range d.Partitions {
+		partition := &d.Partitions[i]
+
+		if partition.Start == nil {
+			if i == 0 {
+				partition.Start = ptrutils.PtrTo(DiskSize(DefaultPartitionAlignment))
+			} else {
+				prev := d.Partitions[i-1]
+				prevEnd, prevHasEnd := prev.GetEnd()
+				if !prevHasEnd {
+					return fmt.Errorf("partition (%s) omitted start value but previous partition (%s) has no size or end value",
+						partition.Id, prev.Id)
+				}
+				partition.Start = &prevEnd
+			}
+		}
+
+		if partition.Type == PartitionTypeBiosGrub {
+			if *partition.Start != diskutils.MiB {
+				return fmt.Errorf("BIOS boot partition must start at 1 MiB")
+			}
+		}
+	}
+
+	// Confirm each partition ends before the next starts.
+	for i := 0; i < len(d.Partitions)-1; i++ {
+		a := d.Partitions[i]
+		b := d.Partitions[i+1]
 
 		aEnd, aHasEnd := a.GetEnd()
 		if !aHasEnd {
 			return fmt.Errorf("partition (%s) is not last partition but size is set to \"grow\"", a.Id)
 		}
-		if aEnd > b.Start {
+		if aEnd > *b.Start {
 			bEnd, bHasEnd := b.GetEnd()
 			bEndStr := ""
 			if bHasEnd {
-				bEndStr = strconv.FormatUint(uint64(bEnd), 10)
+				bEndStr = bEnd.HumanReadable()
 			}
-			return fmt.Errorf("partition's (%s) range [%d, %d) overlaps partition's (%s) range [%d, %s)",
-				a.Id, a.Start, aEnd, b.Id, b.Start, bEndStr)
+			return fmt.Errorf("partition's (%s) range [%s, %s) overlaps partition's (%s) range [%s, %s)",
+				a.Id, a.Start.HumanReadable(), aEnd.HumanReadable(), b.Id, b.Start.HumanReadable(), bEndStr)
 		}
 	}
 
-	if len(sortedPartitions) > 0 {
+	if d.MaxSize == nil && len(d.Partitions) <= 0 {
+		return fmt.Errorf("either disk must specify maxSize or last partition must have an end or size value")
+	}
+
+	if len(d.Partitions) > 0 {
 		// Make sure the first block isn't used.
-		firstPartition := sortedPartitions[0]
-		if firstPartition.Start < diskutils.MiB {
-			return fmt.Errorf("first 1 MiB must be reserved for the MBR header (%s)", firstPartition.Id)
+		firstPartition := d.Partitions[0]
+		if *firstPartition.Start < gptHeaderSize {
+			return fmt.Errorf("invalid partition (%s) start:\nfirst %s of disk is reserved for the GPT header",
+				firstPartition.Id, gptHeaderSize.HumanReadable())
 		}
 
-		// Check that the disk is big enough for the partition layout.
-		lastPartition := sortedPartitions[len(sortedPartitions)-1]
-
+		// Verify MaxSize value.
+		lastPartition := d.Partitions[len(d.Partitions)-1]
 		lastPartitionEnd, lastPartitionHasEnd := lastPartition.GetEnd()
 
-		var requiredSize DiskSize
-		if !lastPartitionHasEnd {
-			requiredSize = lastPartition.Start + diskutils.MiB
-		} else {
-			requiredSize = lastPartitionEnd
-		}
+		switch {
+		case !lastPartitionHasEnd && d.MaxSize == nil:
+			return fmt.Errorf("either disk must specify maxSize or last partition (%s) must have an end or size value",
+				lastPartition.Id)
 
-		if requiredSize > d.MaxSize {
-			return fmt.Errorf("disk's partitions need %d bytes but maxSize is only %d bytes", requiredSize, d.MaxSize)
+		case d.MaxSize == nil:
+			// Fill in the disk's size.
+			diskSize := lastPartitionEnd + gptFooterSize
+			d.MaxSize = &diskSize
+
+		default:
+			// Check that the disk is big enough for the partition layout.
+			var requiredSize DiskSize
+			if !lastPartitionHasEnd {
+				requiredSize = *lastPartition.Start + DefaultPartitionAlignment
+			} else {
+				requiredSize = lastPartitionEnd
+			}
+
+			requiredSize += gptFooterSize
+
+			if requiredSize > *d.MaxSize {
+				return fmt.Errorf("disk's partitions need %s but maxSize is only %s:\nGPT footer size is %s",
+					requiredSize.HumanReadable(), d.MaxSize.HumanReadable(), gptFooterSize.HumanReadable())
+			}
 		}
 	}
 
 	return nil
+}
+
+func roundUp(size uint64, alignment uint64) uint64 {
+	div := size / alignment
+	mod := size % alignment
+	if mod == 0 {
+		return size
+	}
+	return (div + 1) * alignment
 }

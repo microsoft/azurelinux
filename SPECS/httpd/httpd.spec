@@ -2,8 +2,8 @@
 %define _confdir %{_sysconfdir}
 Summary:        The Apache HTTP Server
 Name:           httpd
-Version:        2.4.58
-Release:        3%{?dist}
+Version:        2.4.62
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,7 +37,6 @@ BuildRequires:  apr
 BuildRequires:  apr-util
 BuildRequires:  apr-util-devel
 BuildRequires:  expat-devel
-BuildRequires:  libdb-devel
 BuildRequires:  lua-devel
 BuildRequires:  openldap
 BuildRequires:  openssl
@@ -46,7 +45,6 @@ BuildRequires:  pcre2-devel
 BuildRequires:  systemd-rpm-macros
 
 Requires:       apr-util
-Requires:       libdb
 Requires:       lua
 Requires:       openldap
 Requires:       openssl
@@ -347,6 +345,15 @@ fi
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %changelog
+* Thu Jul 25 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2.4.62-1
+- Upgrade to 2.4.62 to address CVE-2024-40725
+
+* Thu Jul 11 2024 Tobias Brick <tobiasb@microsoft.com> - 2.4.61-1
+- Upgrade to 2.4.61 to address CVE-2024-38473
+
+* Fri Jun 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.58-4
+- Remove dependency on 'libdb'.
+
 * Thu May 09 2024 Andy Zaugg <azaugg@linkedin.com> - 2.4.58-3
 - Namespace httpd-devel include files into a httpd directory
 

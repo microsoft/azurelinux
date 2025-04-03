@@ -1,0 +1,44 @@
+From 05e4ba7b0d126eea4c04387dcf40596059ee24af Mon Sep 17 00:00:00 2001
+From: Hangbin Liu <liuhangbin@gmail.com>
+Date: Wed, 5 Jun 2024 11:57:43 +0800
+Subject: [PATCH] libndp: valid route information option length
+
+RFC 4191 specifies that the Route Information Option Length should be 1, 2,
+or 3, depending on the Prefix Length. A malicious node could potentially
+trigger a buffer overflow and crash the tool by sending an IPv6 router
+advertisement message containing the "Route Information" option with a
+"Length" field larger than 3.
+
+To address this, add a check on the length field.
+
+Fixes: 8296a5bf0755 ("add support for Route Information Option (rfc4191)")
+Reported-by: Evgeny Vereshchagin <evverx@gmail.com>
+Suggested-by: Felix Maurer <fmaurer@redhat.com>
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+ libndp/libndp.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/libndp/libndp.c b/libndp/libndp.c
+index 6314717..72ec92e 100644
+--- a/libndp/libndp.c
++++ b/libndp/libndp.c
+@@ -1231,6 +1231,17 @@ static bool ndp_msg_opt_route_check_valid(void *opt_data)
+ 	 */
+ 	if (((ri->nd_opt_ri_prf_reserved >> 3) & 3) == 2)
+ 		return false;
++
++	/* The Length field is 1, 2, or 3 depending on the Prefix Length.
++	 * If Prefix Length is greater than 64, then Length must be 3.
++	 * If Prefix Length is greater than 0, then Length must be 2 or 3.
++	 * If Prefix Length is zero, then Length must be 1, 2, or 3.
++	 */
++	if (ri->nd_opt_ri_len > 3 ||
++	    (ri->nd_opt_ri_prefix_len > 64 && ri->nd_opt_ri_len != 3) ||
++	    (ri->nd_opt_ri_prefix_len > 0 && ri->nd_opt_ri_len == 1))
++		return false;
++
+ 	return true;
+ }
+ 

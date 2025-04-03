@@ -1,0 +1,30 @@
+From e2f24e98cd7f495d5cf6ef436625d9dad22785eb Mon Sep 17 00:00:00 2001
+From: Chris Co <chrco@microsoft.com>
+Date: Sat, 3 Aug 2024 22:25:04 -0700
+Subject: [PATCH] fix: bump version to 2.11.8.8
+
+In order to prevent further 2.11 agent upgrades, bump the version to
+2.11.8.8 so any upcoming 2.11 hotfixes are not applied. 2.12 will be
+released soon and the agent will take the 2.12 upgrade correctly.
+
+Signed-off-by: Chris Co <chrco@microsoft.com>
+---
+ azurelinuxagent/common/version.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/azurelinuxagent/common/version.py b/azurelinuxagent/common/version.py
+index c1715ff7..b4e93e81 100644
+--- a/azurelinuxagent/common/version.py
++++ b/azurelinuxagent/common/version.py
+@@ -209,7 +209,7 @@ AGENT_LONG_NAME = "Azure Linux Agent"
+ #
+ #            When doing a release, be sure to use the actual agent version. Current agent version: 2.4.0.0
+ #
+-AGENT_VERSION = '2.11.1.4'
++AGENT_VERSION = '2.11.8.8'
+ AGENT_LONG_VERSION = "{0}-{1}".format(AGENT_NAME, AGENT_VERSION)
+ AGENT_DESCRIPTION = """
+ The Azure Linux Agent supports the provisioning and running of Linux
+-- 
+2.45.1
+

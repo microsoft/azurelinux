@@ -8,7 +8,8 @@
                 "packagelists/virtualization-host-packages.json",
                 "packagelists/core-packages-image-aarch64.json",
                 "packagelists/core-tools-packages.json",
-                "packagelists/selinux-full.json"
+                "packagelists/selinux-full.json",
+                "packagelists/virt-guest-packages.json"
             ],
             "KernelCommandLine": {
                 "SELinux": "permissive"
@@ -24,7 +25,8 @@
             "Name": "Azure Linux Core",
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
-                "packagelists/core-packages-image-aarch64.json"
+                "packagelists/core-packages-image-aarch64.json",
+                "packagelists/virt-guest-packages.json"
             ],
             "KernelOptions": {
                 "default": "kernel"

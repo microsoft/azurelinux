@@ -185,7 +185,7 @@
 Summary:        Library providing a simple virtualization API
 Name:           libvirt
 Version:        10.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND OFL-1.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -195,6 +195,7 @@ URL:            https://libvirt.org/
     %define mainturl stable_updates/
 %endif
 Source:         https://download.libvirt.org/%{?mainturl}libvirt-%{version}.tar.xz
+Patch0:         libvirt-conf.patch
 
 Requires: libvirt-daemon = %{version}-%{release}
 Requires: libvirt-daemon-config-network = %{version}-%{release}
@@ -2185,6 +2186,9 @@ exit 0
 %endif
 
 %changelog
+* Thu May 30 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 10.0.0-3
+- Add patch to libvirt.conf to work with kubevirt.
+
 * Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 10.0.0-2
 - Make systemd dependency explicit to avoid confusion with systemd-bootstrap.
 

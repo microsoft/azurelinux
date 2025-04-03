@@ -1,7 +1,7 @@
 %global major_version 3
 Summary:        Cmake
 Name:           cmake
-Version:        3.28.2
+Version:        3.30.3
 Release:        5%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
@@ -10,7 +10,21 @@ Group:          Development/Tools
 URL:            https://www.cmake.org/
 Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        macros.cmake
-Patch0:         disableUnstableUT.patch
+Patch0:         0001-manually-recreating-patches.patch
+Patch1:         CVE-2024-6197.patch
+Patch2:         CVE-2024-6874.patch
+Patch3:         CVE-2024-8096.patch
+Patch4:         CVE-2024-11053.patch
+Patch5:         CVE-2024-7264.patch
+Patch6:         CVE-2024-9681.patch
+Patch7:         CVE-2023-44487.patch
+# When upgrading cmake, verify by hand that this patch is actually contained
+# within the cmnghttp2 source. The autoupgrader mistakenly removes it. Upstream
+# nghttp2 patched this with v1.55.1 and newer. As of cmake v3.30.3, cmake has
+# nghttp2 v1.52.0 plus some upstream patches. nghttp2 version can be found in
+# Utilities/cmnghttp2/lib/includes/nghttp2/nghttp2ver.h. Manual inspection is
+# required to determine what upstream patches are included.
+Patch8:         CVE-2023-35945.patch  
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -45,6 +59,7 @@ operating system and in a compiler-independent manner.
 %autosetup -p1
 
 %build
+export JAVA_HOME="%{_libdir}/jvm/msopenjdk-17"
 ./bootstrap \
     --prefix=%{_prefix} \
     --system-expat \
@@ -89,6 +104,28 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
+* Thu Mar 06 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 3.30.3-5
+- Patch vendored nghttp2 to fix CVE-2023-44487 and CVE-2023-35945
+
+* Wed Jan 22 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.30.3-4
+- Fix CVE-2024-7264 and CVE-2024-9681
+
+* Wed Jan 15 2025 Henry Beberman <henry.beberman@microsoft.com> - 3.30.3-3
+- Patch vendored curl for CVE-2024-11053
+
+* Thu Sep 26 2024 Jonathan Behrens <jbehrens@microsoft.com> - 3.30.3-2
+- Fix CVE-2024-6197, CVE-2024-6874, and CVE-2024-8096
+
+* Mon Sep 23 2024 Jonathan Behrens <jbehrens@microsoft.com> - 3.30.3-1
+- Upgrade to 3.30.3 to address CVE-2024-24806
+
+* Wed Jun 19 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.29.6-1
+- Auto-upgrade to 3.29.6 to address CVE-2023-28320 and CVE-2024-46218
+- Adding 0001-manually-recreating-patches.patch to patch CVE-2024-28182
+
+* Thu May 30 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.28.2-6
+- fix CVE-2024-24806 (cmake is built using libuv embedded in its code)
+
 * Wed May 22 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.28.2-5
 - Bump release to build with new expat to fix CVE-2024-28757
 

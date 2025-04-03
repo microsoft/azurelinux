@@ -1,8 +1,8 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.0.2190
-Release:        3%{?dist}
+Version:        9.1.1198
+Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,7 @@ Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        macros.vim
+
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
 Requires(post): sed
@@ -144,14 +145,15 @@ fi
 %{_datarootdir}/vim/vim*/scripts.vim
 %{_datarootdir}/vim/vim*/spell/*
 %{_datarootdir}/vim/vim*/syntax/*
-%exclude %{_datarootdir}/vim/vim90/syntax/nosyntax.vim
-%exclude %{_datarootdir}/vim/vim90/syntax/syntax.vim
-%exclude %{_datarootdir}/vim/vim90/autoload/dist/ft.vim
+%exclude %{_datarootdir}/vim/vim*/syntax/nosyntax.vim
+%exclude %{_datarootdir}/vim/vim*/syntax/syntax.vim
+%exclude %{_datarootdir}/vim/vim*/autoload/dist/ft.vim
 %{_datarootdir}/vim/vim*/tools/*
 %{_datarootdir}/vim/vim*/tutor/*
 %{_datarootdir}/vim/vim*/lang/*.vim
 %doc %{_datarootdir}/vim/vim*/lang/*.txt
 %lang(af) %{_datarootdir}/vim/vim*/lang/af/LC_MESSAGES/vim.mo
+%lang(am) %{_datarootdir}/vim/vim*/lang/am/LC_MESSAGES/vim.mo
 %lang(ca) %{_datarootdir}/vim/vim*/lang/ca/LC_MESSAGES/vim.mo
 %lang(cs) %{_datarootdir}/vim/vim*/lang/cs/LC_MESSAGES/vim.mo
 %lang(de) %{_datarootdir}/vim/vim*/lang/de/LC_MESSAGES/vim.mo
@@ -203,8 +205,8 @@ fi
 %{_datarootdir}/vim/vim*/colors/lists/default.vim
 %{_datarootdir}/vim/vim*/defaults.vim
 %{_datarootdir}/vim/vim*/filetype.vim
-%{_datarootdir}/vim/vim90/syntax/nosyntax.vim
-%{_datarootdir}/vim/vim90/autoload/dist/ft.vim
+%{_datarootdir}/vim/vim*/syntax/nosyntax.vim
+%{_datarootdir}/vim/vim*/autoload/dist/ft.vim
 %{_bindir}/ex
 %{_bindir}/vi
 %{_bindir}/view
@@ -212,11 +214,42 @@ fi
 %{_bindir}/rview
 %{_bindir}/vim
 %{_bindir}/vimdiff
+%{_datarootdir}/vim/vim91/LICENSE
+%{_datarootdir}/vim/vim91/README.txt
 
 %files rpm-macros
 %{_rpmconfigdir}/macros.d/macros.vim
 
 %changelog
+* Mon Mar 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.1198-1
+- Auto-upgrade to 9.1.1198 - for CVE-2025-29768
+
+* Wed Mar 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.1164-1
+- Auto-upgrade to 9.1.1164 - for CVE-2025-27423
+- Remove previously applied patches
+
+* Sun Feb 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 9.1.0791-4
+- Patch CVE-2025-26603 & CVE-2025-1215
+
+* Thu Jan 23 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 9.1.0791-3
+- Patch to fix CVE-2025-24014.
+
+* Wed Jan 15 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 9.1.0791-2
+- Add patch to fix CVE-2025-22134
+
+* Tue Oct 29 2024 Nick Samson <nisamson@microsoft.com> - 9.1.0791-1
+- Upgrade to 9.1.0791 to fix CVE-2024-47814, CVE-2024-43802
+- Added language configurations for Amharic
+
+* Tue Oct 08 2024 Sam Meluch <sammeluch@microsoft.com> - 9.0.2190-6
+- Add patch to resolve CVE-2024-43802
+
+* Tue Aug 20 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 9.0.2190-5
+- Add patch to resolve CVE-2024-43374
+
+* Fri Aug 09 2024 Sumedh Sharma <sumsharma@microsoft.com> - 9.0.2190-4
+- Add patch to resolve CVE-2024-41957 & CVE-2024-41965
+
 * Tue May 21 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 9.0.2190-3
 - Added vim-rpm-macros subpackage
 - Add macros.vim to the new subpackage

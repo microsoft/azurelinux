@@ -1,0 +1,42 @@
+From 4a64addb941bf4db53f688a4396702542dc70289 Mon Sep 17 00:00:00 2001
+From: Maxwell Moyer-McKee <mamckee@microsoft.com>
+Date: Tue, 25 Jun 2024 21:12:48 +0000
+Subject: [PATCH] Export RSA private key primes to OpenSSL
+
+---
+ src/tpm2/crypto/openssl/Helpers.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/tpm2/crypto/openssl/Helpers.c b/src/tpm2/crypto/openssl/Helpers.c
+index 896e37d..8344bac 100644
+--- a/src/tpm2/crypto/openssl/Helpers.c
++++ b/src/tpm2/crypto/openssl/Helpers.c
+@@ -527,7 +527,8 @@ InitOpenSSLRSAPrivateKey(OBJECT     *rsaKey,   // IN
+             ERROR_RETURN(TPM_RC_FAILURE);
+         ExpDCacheAdd(P, N, E, Q, D);
+     }
+-    if (RSA_set0_key(key, NULL, NULL, D) != 1)
++    if (RSA_set0_key(key, NULL, NULL, D) != 1 ||
++        RSA_set0_factors(key, P, Q) != 1)
+         ERROR_RETURN(TPM_RC_FAILURE);
+ 
+     DoRSACheckKey(P, Q, N, E, D);
+@@ -548,13 +549,13 @@ InitOpenSSLRSAPrivateKey(OBJECT     *rsaKey,   // IN
+ 
+  Exit:
+     BN_CTX_free(ctx);
+-    BN_clear_free(P);
+-    BN_clear_free(Q);
+     BN_free(Qr);
+     RSA_free(key); // undo reference from EVP_PKEY_get1_RSA()
+ 
+     if (retVal != TPM_RC_SUCCESS) {
+         BN_clear_free(D);
++        BN_clear_free(P);
++        BN_clear_free(Q);
+ #if CRT_FORMAT_RSA == YES
+         BN_clear_free(dP);
+         BN_clear_free(dQ);
+-- 
+2.43.0
+

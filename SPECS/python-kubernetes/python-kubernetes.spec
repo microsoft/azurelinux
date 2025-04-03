@@ -2,10 +2,12 @@
 
 Name:       python-%{library}
 Version:    29.0.0
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    Python client for the kubernetes API.
 License:    ASL 2.0
 URL:        https://github.com/kubernetes-client/python
+Vendor:     Microsoft Corporation
+Distribution: Azure Linux
 Source0:    https://github.com/kubernetes-client/python/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:  noarch
 
@@ -17,7 +19,7 @@ BuildRequires:  python3-setuptools
 Requires:       python3-certifi
 Requires:       python3-six
 Requires:       python3-dateutil
-Requires:       python3-setuptools 
+Requires:       python3-setuptools
 Requires:       python3-urllib3
 Requires:       python3-PyYAML
 Requires:       python3-google-auth
@@ -66,6 +68,9 @@ cp -pr kubernetes/e2e_test %{buildroot}%{python3_sitelib}/%{library}/
 %{python3_sitelib}/%{library}/e2e_test
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 29.0.0-2
+- Add missing Vendor and Distribution tags.
+
 * Tue Mar 05 2024 Henry Li <lihl@microsoft.com> - 29.0.0-1
 - Upgrade to v29.0.0
 

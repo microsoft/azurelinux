@@ -1,12 +1,14 @@
-Name:       rtctl
-Version:    1.13
-Release:    6%{?dist}
-Summary:    Scripts for controlling scheduling priorities of system threads
-Group:      Applications/System
-License:    GPL
-BuildArch:  noarch
-Source0:    %{_distro_sources_url}/rtctl-%{version}.tar.bz2
-BuildRoot:  %{_tmppath}/%{name}-%{version}-build
+Name:          rtctl
+Version:       1.13
+Release:       7%{?dist}
+Summary:       Scripts for controlling scheduling priorities of system threads
+Group:         Applications/System
+License:       GPL
+BuildArch:     noarch
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
+Source0:       %{_distro_sources_url}/rtctl-%{version}.tar.bz2
+BuildRoot:     %{_tmppath}/%{name}-%{version}-build
 
 %description
 rtctl is a set of scripts used to manipulate the scheduling priorities of
@@ -41,6 +43,9 @@ systemctl disable rtctl
 fi
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.13-7
+- Add missing Vendor and Distribution tags.
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.13-6
 - Updating naming for 3.0 version of Azure Linux.
 

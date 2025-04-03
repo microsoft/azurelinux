@@ -26,7 +26,7 @@
 Summary:        Configuration files common to github.com/containers
 Name:           libcontainers-common
 Version:        20240213
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 AND GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,6 +43,19 @@ Source7:        https://github.com/containers/podman/archive/refs/tags/v%{podman
 Source8:        default.yaml
 Source9:        https://github.com/containers/common/archive/refs/tags/v%{commonver}.tar.gz#/%{name}-common-%{commonver}.tar.gz
 Source10:       containers.conf
+#Note (mfrw): The patch for CVE-2022-2879 is to be applied twice as it applies to two vendored projects (podman & common).
+Patch0:         CVE-2022-2879.patch
+#Note (mfrw): The patch for CVE-2023-45288 is to be applied twice as it applies to two vendored projects (podman & common).
+Patch1:         CVE-2023-45288.patch
+#Note (mfrw): The patch for CVE-2024-1753 only applies to podman.
+Patch2:         CVE-2024-1753.patch
+#Note (mfrw): The patch for CVE-2024-3727 is to be applied thrice as it applies to three vendored projects (podman, image & common).
+Patch3:         CVE-2024-3727.patch
+#Note (mfrw): The patch for CVE-2024-37298 only applies to podman.
+Patch4:         CVE-2024-37298.patch
+Patch5:         CVE-2024-6104.patch
+Patch6:         CVE-2024-24786.patch
+
 BuildRequires:  go-go-md2man
 Requires(post): grep
 Requires(post): util-linux
@@ -56,9 +69,27 @@ github.com/containers libraries, such as Buildah, CRI-O, Podman and Skopeo.
 
 %prep
 %setup -q -T -D -b 0 -n image-%{imagever}
+# NOTE: Patch3 has to be applied as -p6
+%patch 3 -p6
+
 %setup -q -T -D -b 1 -n storage-%{storagever}
+%patch 6 -p1
+
 %setup -q -T -D -b 7 -n podman-%{podmanver}
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1
+%patch 5 -p1
+%patch 6 -p1
+
 %setup -q -T -D -b 9 -n common-%{commonver}
+%patch 0 -p1
+%patch 1 -p1
+%patch 3 -p1
+%patch 6 -p1
+
 # copy the LICENSE file in the build root
 cd ..
 cp %{SOURCE2} .
@@ -154,6 +185,16 @@ fi
 %license LICENSE
 
 %changelog
+* Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 20240213-3
+- Fix CVE-2024-24786
+
+* Tue Jul 09 2024 Muhammad Falak <mwani@microsoft.com> - 20240213-2
+- Address CVE-2022-2879 by patching vendored github.com/vbatts/tar-split
+- Address CVE-2023-45288 by patching vendored golang.org/x/net/http2
+- Address CVE-2024-1753 by patching vendored github.com/containers/buildah
+- Address CVE-2024-3727 by patching vendored github.com/containers/image
+- Address CVE-2024-37298 by patching vendored github.com/gorilla/schema
+
 * Wed Feb 14 2024 Amrita Kohli <amritakohli@microsoft.com> - 20240213-1
 - Upgrade versions of all containers.
 - Rearrange variables to be in alphabetical order, similar to signatures file.

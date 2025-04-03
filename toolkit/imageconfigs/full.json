@@ -11,7 +11,8 @@
                 "packagelists/hyperv-packages.json",
                 "packagelists/ssh-server.json",
                 "packagelists/selinux-full.json",
-                "packagelists/drtm.json"
+                "packagelists/drtm.json",
+                "packagelists/virt-guest-packages.json"
             ],
             "KernelCommandLine": {
                 "SELinux": "permissive"
@@ -28,7 +29,8 @@
             "PackageLists": [
                 "packagelists/grub2-mkconfig.json",
                 "packagelists/hyperv-packages.json",
-                "packagelists/core-packages-image.json"
+                "packagelists/core-packages-image.json",
+                "packagelists/virt-guest-packages.json"
             ],
             "KernelOptions": {
                 "default": "kernel"

@@ -1,14 +1,14 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           soundtouch
-Version:        2.1.1
-Release:        5%{?dist}
+Version:        2.3.3
+Release:        2%{?dist}
 Summary:        Audio Processing library for changing Tempo, Pitch and Playback Rates
-License:        LGPLv2+
-URL:            http://www.surina.net/soundtouch/
-Source0:        https://gitlab.com/soundtouch/soundtouch/-/archive/%{version}/%{name}-%{version}.tar.gz
+License:        LGPL-2.1-or-later
+URL:            https://www.surina.net/soundtouch/
+Source0:        https://codeberg.org/soundtouch/soundtouch/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc-c++
-BuildRequires:  autoconf automake libtool
+BuildRequires:  cmake
 
 %description
 SoundTouch is a LGPL-licensed open-source audio processing library for
@@ -32,33 +32,16 @@ Libraries, include files, etc you can use to develop soundtouch applications.
 
 
 %prep
-%autosetup -p1
-# Remove -O3 because we have our default optimizations.
-sed -i 's|-O3||' source/SoundTouch/Makefile.*
-sed -i 's|-O3||' source/SoundStretch/Makefile.*
-autoreconf -iv
-# set correct version for .so build
-%define ltversion %(echo %{version} | tr '.' ':')
-sed -i 's/-rpath $(libdir)/-rpath $(libdir) -version-number %{ltversion}/' \
-  source/SoundTouch/Makefile.in
-# cleanup a bit
-sed -i 's|\r||g' README.html source/SoundTouch/RateTransposer.cpp
+%autosetup -p1 -n %{name}
 
 
 %build
-%configure --disable-dependency-tracking --disable-static --enable-shared
-# Don't use rpath!
-sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
-sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-make V=1 %{?_smp_mflags}
+%cmake
+%cmake_build
 
 
 %install
-%make_install
-rm %{buildroot}%{_libdir}/*.la
-
-# remove redundant installed docs
-rm -rf %{buildroot}%{_docdir}/%{name}
+%cmake_install
 
 # pkgconfig compat links for compat with older (API compatible) releases
 # dunno why upstream keeps changing the pkgconfig name
@@ -73,9 +56,6 @@ ln -s soundtouch.pc %{buildroot}%{_libdir}/pkgconfig/soundtouch-1.0.pc
 #  > %{buildroot}%{_includedir}/soundtouch/soundtouch_config.h
 
 
-%ldconfig_scriptlets
-
-
 %files
 %doc README.html
 %license COPYING.TXT
@@ -86,12 +66,58 @@ ln -s soundtouch.pc %{buildroot}%{_libdir}/pkgconfig/soundtouch-1.0.pc
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*.pc
 %{_includedir}/%{name}
-%{_datadir}/aclocal/%{name}.m4
+%{_libdir}/cmake/SoundTouch
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.1-5
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Jan 21 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.3.3-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License Verified
+
+* Sun Sep 29 2024 Sérgio Basto <sergio@serjux.com> - 2.3.3-1
+- Update soundtouch to 2.3.3 (#2293433)
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Sep 09 2021 Uwe Klotz <uwe.klotz@gmail.com> - 2.3.1-1
+- Update to new upstream version 2.3.1
+  Switch build from autotools to CMake
+
+* Tue Aug 31 2021 Sérgio Basto <sergio@serjux.com> - 2.3.0-2
+- Continuing to use the autotools build instead of new CMake
+  https://gitlab.com/soundtouch/soundtouch/-/issues/45
+
+* Sun Aug 29 2021 Sérgio Basto <sergio@serjux.com> - 2.3.0-1
+- Update to 2.3.0 (#1998849)
+
+* Sun Aug 29 2021 Uwe Klotz <uwe.klotz@gmail.com> - 2.1.2-1
+- Update to new upstream version 2.1.2
+  Bump version to 2.1.2 to correct incorrect version info in configure.ac
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

@@ -1,0 +1,32 @@
+From 643bc9f8107bb4ee85c77a803b7389993254d176 Mon Sep 17 00:00:00 2001
+From: Daniel McIlvaney <damcilva@microsoft.com>
+Date: Fri, 7 Jun 2024 11:38:54 -0700
+Subject: [PATCH] fix(dracut-functions): avoid awk in get_maj_min() The
+ `get_maj_min()` cache lookup is commonly used across many flows. While `awk`
+ should be available, some highly constrained environments may not have it. A
+ second call to `grep` can provide the same behaviour without adding a
+ dependnecy.
+
+Lines in the cache will be of the form "/dev/sda2 8:2".
+`awk '{print $NF}'` returns the last word of a matching line. Since
+the initial matching regex is so specific a second call to grep can
+easily extract the last word.
+---
+ dracut-functions.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dracut-functions.sh b/dracut-functions.sh
+index 4535871b..40fec26a 100755
+--- a/dracut-functions.sh
++++ b/dracut-functions.sh
+@@ -243,7 +243,7 @@ get_maj_min() {
+     local _out
+
+     if [[ $get_maj_min_cache_file ]]; then
+-        _out="$(grep -m1 -oE "^$1 \S+$" "$get_maj_min_cache_file" | awk '{print $NF}')"
++        _out="$(grep -m1 -oE "^$1 \S+$" "$get_maj_min_cache_file" | grep -oE "\S+$")"
+     fi
+
+     if ! [[ "$_out" ]]; then
+--
+2.39.4

@@ -6,7 +6,7 @@
 
 Name:           ocaml-%{srcname}
 Version:        0.16.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Automated S-expression conversion
 # The project as a whole is MIT, but code in the src subdirectory is BSD.
 License:        MIT and BSD
@@ -24,11 +24,6 @@ BuildRequires:  vim-rpm-macros
 
 %if %{with_check}
 BuildRequires:  ocaml-base-devel
-BuildRequires:  ocaml-base-quickcheck-devel
-BuildRequires:  ocaml-core-kernel-devel
-BuildRequires:  ocaml-expect-test-helpers-core-devel
-BuildRequires:  ocaml-ppx-jane-devel
-BuildRequires:  ocaml-sexp-grammar-validation-devel
 %endif
 
 %description
@@ -80,6 +75,9 @@ cp -p vim/syntax/sexplib.vim %{buildroot}%{vimfiles_root}/syntax
 %{vimfiles_root}/syntax/sexplib.vim
 
 %changelog
+* Thu Aug 29 2024 Andrew Phelps <anphel@microsoft.com> - 0.16.0-2
+- Remove unneeded test dependencies
+
 * Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.16.0-1
 - Converted spec file to match with Fedora 41.
 - Upgrade to 0.16.0

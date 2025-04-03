@@ -1,18 +1,24 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+
 Name:           parallel
 Summary:        Shell tool for executing jobs in parallel
-Version:        20190922
+Version:        20240922
 Release:        3%{?dist}
-
-License:        GPLv3+
-URL:            http://www.gnu.org/software/parallel/
-Source0:        http://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.bz2
-
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+# Automatically converted from old format: GFDL and GPLv3+ - review is highly recommended.
+License:        LicenseRef-Callaway-GFDL AND GPL-3.0-or-later
+URL:            https://www.gnu.org/software/parallel/
+Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.bz2
 BuildArch:      noarch
-
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  make
 BuildRequires:  perl-generators
-BuildRequires:  %{_bindir}/pod2man
+BuildRequires:  perl-podlators
+BuildRequires:  perl-FileHandle
+BuildRequires:  sed
+
+%define __requires_exclude sh$
 
 # Due to a naming conflict, both packages cannot be installed in parallel
 # To prevent user confusion, GNU parallel is installed in a compatibility
@@ -40,41 +46,145 @@ additional features.
 
 %prep
 %autosetup
+# Replace shebang by replacing "env" by removing "env ".
+# FIXME: this is quite a hack
+sed -i '1s:/env :/:' src/env_parallel.*
 
 %build
-%configure 
+autoreconf -ivf
+%configure
 %make_build
 
 %install
 %make_install
 rm -vrf %{buildroot}%{_pkgdocdir}
-sed -i -e '1s|!#/usr/bin/env perl|#!%{__perl}|' %{buildroot}%{_bindir}/*
-# FIXME: do it properly
-sed -i -e '1{\@^#!@d}' %{buildroot}%{_bindir}/env_parallel.*
-chmod -x %{buildroot}%{_bindir}/env_parallel.*
 
 %files
-%license COPYING
+%license LICENSES/GPL-3.0-or-later.txt LICENSES/GFDL-1.3-or-later.txt
 %doc README NEWS
 %{_bindir}/parallel
 %{_bindir}/parcat
 %{_bindir}/parset
+%{_bindir}/parsort
 %{_mandir}/man1/parallel.1*
 %{_mandir}/man1/parcat.1*
 %{_mandir}/man1/parset.1*
+%{_mandir}/man1/parsort.1*
 %{_mandir}/man7/parallel*
-%exclude %{_bindir}/env_parallel*
-%exclude %{_mandir}/man1/env_parallel.1*
+%{_bindir}/env_parallel*
+%{_mandir}/man1/env_parallel.1*
 %{_bindir}/sem
 %{_mandir}/man1/sem.1*
 %{_bindir}/sql
 %{_mandir}/man1/sql.1*
 %{_bindir}/niceload
 %{_mandir}/man1/niceload.1*
+%{_datadir}/bash-completion/completions/parallel
+%{_datadir}/zsh/site-functions/_parallel
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20190922-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Dec 18 2024 Jyoti kanase <v-jykanase@microsoft.com> -  20240922 -3
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Mon Sep 23 2024 Filipe Rosset <rosset.filipe@gmail.com> - 20240922-2
+- update parallel to 20240922
+
+* Mon Sep 23 2024 Filipe Rosset <rosset.filipe@gmail.com> - 20240922-1
+- update parallel to 20240922
+
+* Mon Sep 16 2024 Filipe Rosset <rosset.filipe@gmail.com> - 20240822-1
+- update parallel to 20240822
+
+* Mon Sep 02 2024 Miroslav Suchý <msuchy@redhat.com> - 20240722-2
+- convert license to SPDX
+
+* Wed Aug 14 2024 Filipe Rosset <rosset.filipe@gmail.com> - 20240722-1
+- update parallel to 20240722
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20240622-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Jul 15 2024 Filipe Rosset <rosset.filipe@gmail.com> - 20240622-1
+- update to 20240622 fixes rbhz#2267428
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20230822-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20230822-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Sep 09 2023 Filipe Rosset <rosset.filipe@gmail.com> - 20230822-1
+- update to parallel-20230822
+
+* Sun Jul 30 2023 Filipe Rosset <rosset.filipe@gmail.com> - 20230722-1
+- update to 20230722
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20230522-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jun 09 2023 Filipe Rosset <rosset.filipe@gmail.com> - 20230522-1
+- update to 20230522
+
+* Tue May 02 2023 Filipe Rosset <rosset.filipe@gmail.com> - 20230422-2
+- update parallel to 20230422
+
+* Tue May 02 2023 Filipe Rosset <rosset.filipe@gmail.com> - 20230422-1
+- update parallel to 20230422
+
+* Fri Mar 31 2023 Filipe Rosset <rosset.filipe@gmail.com> - 20230322-1
+- update to 20230322
+
+* Sun Feb 19 2023 Filipe Rosset <rosset.filipe@gmail.com> - 20230122-1
+- update to 20230122
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20221122-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Nov 24 2022 Filipe Rosset <rosset.filipe@gmail.com> - 20221122-1
+- updated to latest version
+
+* Mon Oct 24 2022 Filipe Rosset <rosset.filipe@gmail.com> - 20221022-1
+- update to 20221022
+
+* Sat Sep 24 2022 Filipe Rosset <rosset.filipe@gmail.com> - 20220922-1
+- Update to 20220922
+
+* Tue Aug 23 2022 Filipe Rosset <rosset.filipe@gmail.com> - 20220822-1
+- update to 20220822
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20220322-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Mar 30 2022 Filipe Rosset <rosset.filipe@gmail.com> - 20220322-1
+- update to 20220322
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20211222-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jan 05 2022 Jirka Hladky <jhladky@redhat.com> - 20211222-2
+- Remove all shell dependencies
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20201222-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20201222-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Jan 16 2021 Filipe Rosset <rosset.filipe@gmail.com> - 20201222-1
+- Update to 20201222
+
+* Mon Aug 17 2020 Filipe Rosset <rosset.filipe@gmail.com> - 20200722-1
+- Update to 20200722
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 20200522-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Filipe Rosset <rosset.filipe@gmail.com> - 20200522-1
+- Update to 20200522
+
+* Wed Apr 22 2020 Filipe Rosset <rosset.filipe@gmail.com> - 20200322-1
+- Update to 20200322 fixes rhbz#1740919
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 20190922-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -162,3 +272,5 @@ chmod -x %{buildroot}%{_bindir}/env_parallel.*
 - Added a comment to the description, concerning the moreutils compatibility
 * Sun Feb 6 2011 Golo Fuchert <packages@golotop.de> - 20110205-1
 - Initial package. Based on a package by Ole Tange and Markus Ammer.
+
+## END: Generated by rpmautospec

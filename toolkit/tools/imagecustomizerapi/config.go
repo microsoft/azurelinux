@@ -6,27 +6,32 @@ package imagecustomizerapi
 import "fmt"
 
 type Config struct {
-	Storage *Storage `yaml:"storage"`
-	Iso     *Iso     `yaml:"iso"`
-	OS      *OS      `yaml:"os"`
-	Scripts *Scripts `yaml:"scripts"`
+	Storage Storage `yaml:"storage"`
+	Iso     *Iso    `yaml:"iso"`
+	Pxe     *Pxe    `yaml:"pxe"`
+	OS      *OS     `yaml:"os"`
+	Scripts Scripts `yaml:"scripts"`
 }
 
 func (c *Config) IsValid() (err error) {
-
-	hasStorage := false
-	if c.Storage != nil {
-		err = c.Storage.IsValid()
-		if err != nil {
-			return err
-		}
-		hasStorage = true
+	err = c.Storage.IsValid()
+	if err != nil {
+		return err
 	}
+
+	hasResetPartitionsUuids := c.Storage.ResetPartitionsUuidsType != ResetPartitionsUuidsTypeDefault
 
 	if c.Iso != nil {
 		err = c.Iso.IsValid()
 		if err != nil {
-			return err
+			return fmt.Errorf("invalid 'iso' field:\n%w", err)
+		}
+	}
+
+	if c.Pxe != nil {
+		err = c.Pxe.IsValid()
+		if err != nil {
+			return fmt.Errorf("invalid 'pxe' field:\n%w", err)
 		}
 	}
 
@@ -34,21 +39,27 @@ func (c *Config) IsValid() (err error) {
 	if c.OS != nil {
 		err = c.OS.IsValid()
 		if err != nil {
-			return err
+			return fmt.Errorf("invalid 'os' field:\n%w", err)
 		}
 		hasResetBootLoader = c.OS.ResetBootLoaderType != ResetBootLoaderTypeDefault
 	}
 
-	if c.Scripts != nil {
-		err = c.Scripts.IsValid()
-		if err != nil {
-			return err
-		}
+	err = c.Scripts.IsValid()
+	if err != nil {
+		return err
 	}
 
-	if hasStorage != hasResetBootLoader {
-		return fmt.Errorf("os.resetBootLoaderType and storage must be specified together")
+	if c.CustomizePartitions() && !hasResetBootLoader {
+		return fmt.Errorf("'os.resetBootLoaderType' must be specified if 'storage.disks' is specified")
+	}
+
+	if hasResetPartitionsUuids && !hasResetBootLoader {
+		return fmt.Errorf("'os.resetBootLoaderType' must be specified if 'storage.resetPartitionsUuidsType' is specified")
 	}
 
 	return nil
+}
+
+func (c *Config) CustomizePartitions() bool {
+	return c.Storage.CustomizePartitions()
 }

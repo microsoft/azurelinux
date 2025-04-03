@@ -4,7 +4,7 @@
 Summary:        Round Robin Database Tool to store and display time-series data
 Name:           rrdtool
 Version:        1.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 OR GPLv2 WITH FLOSS License Exception
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -130,15 +130,15 @@ rm -rf %{buildroot}%{_libdir}/python2.7
 %defattr(-,root,root)
 %license LICENSE
 %{_bindir}/*
-%{_libdir}/*.so*
+%{_libdir}/*.so.*
 %{_unitdir}/rrdcached.service
 %{_unitdir}/rrdcached.socket
 %exclude %{_datadir}/locale/*
 
 %files devel
 %defattr(-,root,root)
-%{_includedir}/*
-%{_libdir}/*.so
+%{_includedir}/*.h
+%{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*.pc
 
 %files -n python3-rrdtool
@@ -161,6 +161,9 @@ rm -rf %{buildroot}%{_libdir}/python2.7
 %{_libdir}/ruby
 
 %changelog
+* Wed Jul 31 2024 Andrew Phelps <anphel@microsoft.com> - 1.8.0-2
+- Update file listings to remove duplicate files
+
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.0-1
 - Auto-upgrade to 1.8.0 - Azure Linux 3.0 - package upgrades
 

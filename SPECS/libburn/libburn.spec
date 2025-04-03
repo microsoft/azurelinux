@@ -5,10 +5,12 @@
 Summary:         Library for reading, mastering and writing optical discs
 Name:            libburn
 Version:         1.5.6
-Release:         1%{?dist}
+Release:         2%{?dist}
 License:         GPLv2+
 Group:           System Environment/Libraries
 URL:             https://dev.lovelyhq.com/libburnia/libburn
+Vendor:          Microsoft Corporation
+Distribution:    Azure Linux
 Source0:         https://dev.lovelyhq.com/libburnia/libburn/archive/release-%{version}.tar.gz#//%{pkgname}-%{version}.tar.gz
 Patch0:          libburn-0.6.16-multilib.patch
 
@@ -89,6 +91,9 @@ rm -rf $RPM_BUILD_ROOT%{_defaultdocdir}
 %{_mandir}/man1/%{cdrskin}.1*
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.5.6-2
+- Add missing Vendor and Distribution tags.
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.6-1
 - Auto-upgrade to 1.5.6 - Azure Linux 3.0 - package upgrades
 

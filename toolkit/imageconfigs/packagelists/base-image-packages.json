@@ -23,6 +23,8 @@
         "tdnf-plugin-repogpgcheck",
         "util-linux",
         "zlib",
+        "dracut-hostonly",
+        "dracut-vrf",
         "initramfs"
     ]
 }

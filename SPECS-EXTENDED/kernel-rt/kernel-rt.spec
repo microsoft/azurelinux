@@ -1,6 +1,6 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%global rt_version rt18
+%global rt_version rt50
 %define uname_r %{version}-%{rt_version}-%{release}
 %define mariner_version 3
 %define version_upstream %(echo %{version} | rev | cut -d'.' -f2- | rev)
@@ -23,8 +23,8 @@
 
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
-Version:        6.6.7.1
-Release:        3%{?dist}
+Version:        6.6.77.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -414,6 +414,24 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Feb 24 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.77.1-1
+- Auto-upgrade to 6.6.77.1
+
+* Wed Feb 12 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.76.1-1
+- Auto-upgrade to 6.6.76.1
+
+* Wed Aug 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.44.1-1
+- Auto-upgrade to 6.6.44.1
+
+* Tue Jul 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.43.1-1
+- Auto-upgrade to 6.6.43.1
+
+* Wed Jul 17 2024 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.35.1-2
+- Enable CONFIG_RT_GROUP_SCHED
+
+* Tue Jul 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.35.1-1
+- Auto-upgrade to 6.6.35.1
+
 * Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.7.1-3
 - Remove /var/lib/initramfs/kernel files.
 

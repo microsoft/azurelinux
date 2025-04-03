@@ -7,7 +7,7 @@ FROM $BASE_IMAGE
 
 @INCLUDE_MAIN_RUN_INSTRUCTION@
 
-RUN useradd memcache
+RUN tdnf install -y shadow-utils && useradd memcache && tdnf remove -y shadow-utils && tdnf clean all
 
 USER memcache
 

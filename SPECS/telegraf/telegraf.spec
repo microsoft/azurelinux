@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
-Version:        1.29.4
-Release:        1%{?dist}
+Version:        1.31.0
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,14 @@ URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Use the generate_source_tarbbal.sh script to get the vendored sources.
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2024-37298.patch
+Patch1:         CVE-2024-45337.patch
+Patch2:         CVE-2024-45338.patch
+Patch3:         CVE-2025-22868.patch
+Patch4:         CVE-2025-22869.patch
+Patch5:         CVE-2025-22870.patch
+Patch6:         CVE-2024-51744.patch
+Patch7:         CVE-2025-30204.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
 Requires:       logrotate
@@ -29,8 +37,10 @@ the community can easily add support for collecting metrics from well known serv
 Postgres, or Redis) and third party APIs (like Mailchimp, AWS CloudWatch, or Google Analytics).
 
 %prep
-%autosetup -p1
-tar -xf %{SOURCE1}
+%autosetup -N
+# setup vendor before patching
+tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
 
 %build
 go build -mod=vendor ./cmd/telegraf
@@ -74,6 +84,27 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Mon Mar 31 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.31.0-7
+- Patch CVE-2025-30204
+
+* Tue Mar 26 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.31.0-6
+- Fix CVE-2025-22870, CVE-2024-51744 with an upstream patch
+
+* Wed Mar 05 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.31.0-5
+- Patch CVE-2025-22868, CVE-2025-22869
+
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.31.0-4
+- Patch CVE-2024-45338
+
+* Wed Dec 18 2024 Aurelien Bombo <abombo@microsoft.com> - 1.31.0-3
+- Patch CVE-2024-45337
+
+* Thu Jul 11 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.31.0-2
+- Add patch for CVE-2024-37298
+
+* Tue Jun 18 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.31.0-1
+- Auto-upgrade to 1.31.0 - Address CVEs
+
 * Thu Mar 28 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.29.4-1
 - Auto-upgrade to 1.29.4 - Azure Linux 3.0 Package Upgrades
 - Remove additional logging as it has been added upstream

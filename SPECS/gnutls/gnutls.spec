@@ -1,13 +1,17 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
 Version:        3.8.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ AND LGPLv2.1+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://www.gnutls.org
 Source0:        https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/%{name}-%{version}.tar.xz
+# Patch taken from 3.8.4 release
+Patch1:          CVE-2024-28834.patch
+# Patch taken from 3.8.4 release
+Patch2:          CVE-2024-28835.patch
 BuildRequires:  autogen-libopts-devel
 BuildRequires:  gc-devel
 BuildRequires:  libtasn1-devel
@@ -89,6 +93,9 @@ sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 %{_mandir}/man3/*
 
 %changelog
+* Wed Oct 30 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.8.3-2
+- Fix CVE-2024-28834 and CVE-2024-28835 with patches from 3.8.4
+
 * Fri May 24 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.8.3-1
 - Update to version 3.8.3 to fix CVE-2024-0553
 

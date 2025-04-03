@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "isorelax-20030108.pom": "ba0fdbf2abd3fb91d789dfc319f542c1b8b2d5d6f4e362ba0f93dc47bf62f5e6",
-  "isorelax-build.xml": "b8792fd7ff415ee5061533408777933b8727984472f40a10356c6b5c41d34e2c",
-  "isorelax-maven-project.xml": "37d7665d6b2c16ae86d21bdab0fce483e1a6fb33aa2d285657d8b65df0b5a3fb",
-  "isorelax-maven-project.xsd": "376dff22a96bbb949f8479a5dacab45164663c86f57a171601eb44e24c56d076",
-  "isorelax.20041111.zip": "2fce4a64611737ecd52d5a5b816f572722602b62d2851b74279e7ccc2fab1476"
- }
-}

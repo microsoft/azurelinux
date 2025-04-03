@@ -1,9 +1,9 @@
-%global openssh_ver 9.7p1
+%global openssh_ver 9.8p1
 %global pam_ssh_agent_ver 0.10.3
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,6 +32,13 @@ Patch306:       pam_ssh_agent_auth-0.10.2-compat.patch
 # Fix NULL dereference from getpwuid() return value
 # https://sourceforge.net/p/pamsshagentauth/bugs/22/
 Patch307:       pam_ssh_agent_auth-0.10.2-dereference.patch
+#CVE Patches
+#This CVE Patches both CVE-2025-26465 and CVE-2025-26466
+Patch400:       CVE-2025-26465.patch
+# sk-dummy.so built with -fvisibility=hidden does not work
+# The tests fail with the following error:
+#   dlsym(sk_api_version) failed: (...)/sk-dummy.so: undefined symbol: sk_api_version
+Patch965: openssh-8.2p1-visibility.patch
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
 BuildRequires:  e2fsprogs-devel
@@ -104,6 +111,9 @@ pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
 rm -f $(cat %{SOURCE4})
 autoreconf
 popd
+
+%patch -P 400 -p1 -b .CVE-2025-26465.patch
+%patch -P 965 -p1 -b .visibility
 
 %build
 # The -fvisibility=hidden is needed for clean build of the pam_ssh_agent_auth.
@@ -226,6 +236,7 @@ fi
 /lib/systemd/system/sshd-keygen.service
 /lib/systemd/system/sshd.service
 %{_sbindir}/sshd
+%{_libexecdir}/sshd-session
 %{_libexecdir}/sftp-server
 %{_mandir}/man5/sshd_config.5.gz
 %{_mandir}/man8/sshd.8.gz
@@ -261,6 +272,15 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Sun Feb 16 2025 Jon Slobodzian <joslobo@microsoft.com> - 9.8p1-3
+- Patch CVE-2025-26465 and CVE-2025-26466
+
+* Fri Aug 16 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.8p1-2
+- Fixed 'openssh' ptests.
+
+* Mon Jul 01 2024 Jon Slobodzian <joslobo@microsoft.com> - 9.8p1-1
+- Upgrade to version 9.8p1. This fixes CVE-2024-6387 (a regression to CVE-2006-5051) in OpenSSH's server.
+
 * Thu May 02 2024 Tobias Brick <tobiasb@microsoft.com> - 9.7p1-1
 - Upgrade to version 9.7p1
 

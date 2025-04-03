@@ -184,8 +184,8 @@ function create_multi_arch_tags {
     if [[ $architecture_build == *"ARM64"*  ]]; then
         docker manifest create "$full_multiarch_tag" --amend "$original_container-arm64"
         docker manifest annotate "$full_multiarch_tag" "$original_container-arm64" \
-             --os-version "$OS_VERSION_PREFIX$azure_linux_version" \
-             --variant "v8"
+            --os-version "$OS_VERSION_PREFIX$azure_linux_version" \
+            --variant "v8"
     fi
 
     echo "+++ push $full_multiarch_tag tag"
@@ -231,6 +231,7 @@ do
     IS_CORE_IMAGE=$(jq -r '.data_is_core_image' "$TEMP_FILE")
     IS_GOLDEN_IMAGE=$(jq -r '.data_is_golden_image' "$TEMP_FILE")
     IS_HCI_GOLDEN_IMAGE=$(jq -r '.data_is_hci_golden_image' "$TEMP_FILE")
+    IS_NVIDIA_GOLDEN_IMAGE=$(jq -r '.data_is_nvidia_golden_image' "$TEMP_FILE")
     ARCHITECTURE_TO_BUILD=$(jq -r '.data_architecture_to_build' "$TEMP_FILE")
     TARGET_ACR=$(jq -r '.data_target_acr' "$TEMP_FILE")
 
@@ -242,12 +243,13 @@ do
     # Remove the temp file.
     [ -f "$TEMP_FILE" ] && rm "$TEMP_FILE"
 
-    echo "Container Type        -> $container_type"
-    echo "IS_CORE_IMAGE         -> $IS_CORE_IMAGE"
-    echo "IS_GOLDEN_IMAGE       -> $IS_GOLDEN_IMAGE"
-    echo "IS_HCI_GOLDEN_IMAGE   -> $IS_HCI_GOLDEN_IMAGE"
-    echo "ARCHITECTURE_TO_BUILD -> $ARCHITECTURE_TO_BUILD"
-    echo "TARGET_ACR            -> $TARGET_ACR"
+    echo "Container Type            -> $container_type"
+    echo "IS_CORE_IMAGE             -> $IS_CORE_IMAGE"
+    echo "IS_GOLDEN_IMAGE           -> $IS_GOLDEN_IMAGE"
+    echo "IS_HCI_GOLDEN_IMAGE       -> $IS_HCI_GOLDEN_IMAGE"
+    echo "IS_NVIDIA_GOLDEN_IMAGE    -> $IS_NVIDIA_GOLDEN_IMAGE"
+    echo "ARCHITECTURE_TO_BUILD     -> $ARCHITECTURE_TO_BUILD"
+    echo "TARGET_ACR                -> $TARGET_ACR"
 
     while IFS= read -r image_name
     do
@@ -331,6 +333,21 @@ do
                 "$image_name_with_noarch" \
                 "$container_name" \
                 "$major_version" \
+                "$azure_linux_version" \
+                "$ARCHITECTURE_TO_BUILD"
+        elif "$IS_NVIDIA_GOLDEN_IMAGE"; then
+            # For nvidia images, we need to create multi-arch tag for the following format:
+            # E.g. for azurelinuxpreview.azurecr.io/nvidia/cuda/driver:550-5.15.160.1-1.cm2-mariner2.0.2.0.20240626-amd64
+            # the multi-arch tag to create is: azurelinuxpreview.azurecr.io/nvidia/cuda/driver:550-5.15.160.1-1.cm2-mariner2.0
+            multiarch_tag=${container_tag%.*.*.*}
+
+            azure_linux_version=$(awk -F '-' '{print $4}' <<< "$container_tag")              # 550-5.15.160.1-1.cm2-mariner2.0.2.0.20240626 -> mariner2.0.2.0.20240626
+            azure_linux_version=$(awk -F '.' '{print $3"."$4}' <<< "$azure_linux_version")   # [mariner2].[0].[2].[0].[20240626] -> 2.0
+            #                                                                                                  ^   ^
+            create_multi_arch_tags \
+                "$image_name_with_noarch" \
+                "$container_name" \
+                "$multiarch_tag" \
                 "$azure_linux_version" \
                 "$ARCHITECTURE_TO_BUILD"
         elif "$IS_GOLDEN_IMAGE"; then

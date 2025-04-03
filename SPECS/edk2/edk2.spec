@@ -28,16 +28,19 @@ Distribution:   Azure Linux
 ExclusiveArch: x86_64
 
 # edk2-stable202402
-%define GITDATE        20240223
-%define GITCOMMIT      edc6681206c1
+%define GITDATE        20240524
+%define GITCOMMIT      3e722403cd16
 %define TOOLCHAIN      GCC
  
-%define PLATFORMS_COMMIT b5fa396700e7
+%define PLATFORMS_COMMIT a912d9fcf7d1
  
 %define OPENSSL_VER    3.0.7
 %define OPENSSL_COMMIT db0287935122edceb91dcda8dfb53b4090734e22
 
 %define DBXDATE        20230509
+
+%define HVLOADER_VER    1.0.1
+%define HVLOADER_COMMIT 286f1c642ed624af2c7840fbca7923497891fe68
 
 %define build_ovmf 1
 %define build_aarch64 0
@@ -52,7 +55,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    1%{?dist}
+Release:    5%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND MIT AND LicenseRef-Fedora-Public-Domain
 URL:        http://www.tianocore.org
@@ -61,13 +64,15 @@ URL:        http://www.tianocore.org
 # COMMIT=bb1bba3d7767
 # git archive --format=tar --prefix=edk2-$COMMIT/ $COMMIT \
 # | xz -9ev >/tmp/edk2-$COMMIT.tar.xz
-Source0: https://src.fedoraproject.org/repo/pkgs/edk2/edk2-%{GITCOMMIT}.tar.xz/sha512/6d86a0d0d0d929d8c84f8cfb2fc5f919fe66dbcea5e4b5ff1cee2f033245e7760943b50b0de80e22e4cea586c49d060d1212140c2848c7a3e61bea1fe2c110ca/edk2-%{GITCOMMIT}.tar.xz
+Source0: https://src.fedoraproject.org/repo/pkgs/edk2/edk2-%{GITCOMMIT}.tar.xz/sha512/58550636ea26810a0184423765db24e43319a0cc5e38dfd5fbd7f09b5f6e1c2d2b9e1e33112a3b721e05c7f088dbfd8a2ddd4a73d833c3019a16101ef1d0342a/edk2-%{GITCOMMIT}.tar.xz
 Source1: ovmf-whitepaper-c770f8c.txt
 Source2: openssl-rhel-%{OPENSSL_COMMIT}.tar.xz
 Source3: softfloat-%{softfloat_version}.tar.xz
 Source4: edk2-platforms-%{PLATFORMS_COMMIT}.tar.xz
 Source5: jansson-2.13.1.tar.bz2
 Source6: README.experimental
+Source7: hvloader-%{HVLOADER_COMMIT}.tar.gz
+Source8: hvloader-target.txt
 
 # json description files
 Source10: 50-edk2-aarch64-qcow2.json
@@ -90,11 +95,15 @@ Source45: 50-edk2-ovmf-4m-qcow2-x64-nosb.json
 Source46: 51-edk2-ovmf-2m-raw-x64-nosb.json
 Source47: 60-edk2-ovmf-x64-amdsev.json
 Source48: 60-edk2-ovmf-x64-inteltdx.json
+Source50: 50-edk2-riscv-qcow2.json
+
+Source60: 50-edk2-loongarch64.json
 
 # https://gitlab.com/kraxel/edk2-build-config
 Source80: edk2-build.py
 Source81: edk2-build.fedora
 Source82: edk2-build.fedora.platforms
+Source83: edk2-build.rhel-9
 
 Source90: DBXUpdate-%{DBXDATE}.x64.bin
 Source91: DBXUpdate-%{DBXDATE}.ia32.bin
@@ -115,6 +124,16 @@ Patch0013: 0013-UefiCpuPkg-MpInitLib-fix-apic-mode-for-cpu-hotplug.patch
 Patch0014: 0014-CryptoPkg-CrtLib-add-stat.h.patch
 Patch0015: 0015-CryptoPkg-CrtLib-add-access-open-read-write-close-sy.patch
 Patch0016: 0016-OvmfPkg-set-PcdVariableStoreSize-PcdMaxVolatileVaria.patch
+%if (0%{?fedora} >= 38 || 0%{?rhel} >= 10) && !0%{?azl}
+Patch0017: 0017-silence-.-has-a-LOAD-segment-with-RWX-permissions-wa.patch
+%endif
+Patch0018: 0018-NetworkPkg-TcpDxe-Fixed-system-stuck-on-PXE-boot-flo.patch
+Patch0019: 0019-NetworkPkg-DxeNetLib-adjust-PseudoRandom-error-loggi.patch
+
+# Patches for the vendored OpenSSL are in the range from 1000 to 1999 (inclusive).
+Patch1000: CVE-2022-3996.patch
+Patch1001: CVE-2024-6119.patch
+Patch1002: vendored-openssl-1.1.1-Only-free-the-read-buffers-if-we-re-not-using-them.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -295,6 +314,18 @@ This package provides tools that are needed to build EFI executables
 and ROMs using the GNU tools.  You do not need to install this package;
 you probably want to install edk2-tools only.
 
+%package hvloader
+Summary:        Loader binary for loading type 1 hypervisors under Linux.
+Requires:       python3
+
+%description hvloader
+HvLoader.efi is an EFI application for loading an external hypervisor loader.
+
+HvLoader.efi loads a given hypervisor loader binary (DLL, EFI, etc.), and 
+calls it's entry point passing HvLoader.efi ImageHandle. This way the 
+hypervisor loader binary has access to HvLoader.efi's command line options,
+and use those as configuration parameters. The first HvLoader.efi command line
+option is the path to hypervisor loader binary.
 
 
 %prep
@@ -306,20 +337,34 @@ git config core.whitespace cr-at-eol
 git config am.keepcr true
 # -T is passed to %%setup to not re-extract the archive
 # -D is passed to %%setup to not delete the existing archive dir
-%autosetup -T -D -n edk2-%{GITCOMMIT} -S git_am
+%autosetup -T -D -n edk2-%{GITCOMMIT} -S git_am -N
+# -M Apply patches up to 999
+%autopatch -M 999
+
+# Unpack the vendored OpenSSL tarball. This tarball has a '.git' directory
+# which will confuse the git repo we unpack it into, so exclude that.
+# Then add it to the git index so that we can use autopatch, which
+# uses git am since we set it up that way initially.
+# Only apply patches between 1000 and 1999 (inclusive).
+tar -C CryptoPkg/Library/OpensslLib -a -f %{SOURCE2} -x --exclude '.git'
+git add .
+git commit -m 'add vendored openssl'
+%autopatch -p1 -m 1000 -M 1999
 
 cp -a -- %{SOURCE1} .
-tar -C CryptoPkg/Library/OpensslLib -a -f %{SOURCE2} -x
+
 # extract softfloat into place
 tar -xf %{SOURCE3} --strip-components=1 --directory ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3/
 tar -xf %{SOURCE4} --strip-components=1 --wildcards "*/Drivers" "*/Features" "*/Platform" "*/Silicon"
 mkdir -p RedfishPkg/Library/JsonLib/jansson
 tar -xf %{SOURCE5} --strip-components=1 --directory RedfishPkg/Library/JsonLib/jansson
+
 # include paths pointing to unused submodules
 mkdir -p MdePkg/Library/MipiSysTLib/mipisyst/library/include
 mkdir -p CryptoPkg/Library/MbedTlsLib/mbedtls/include
 mkdir -p CryptoPkg/Library/MbedTlsLib/mbedtls/include/mbedtls
 mkdir -p CryptoPkg/Library/MbedTlsLib/mbedtls/library
+mkdir -p SecurityPkg/DeviceSecurity/SpdmLib/libspdm/include
 
 # Done by %setup, but we do not use it for the auxiliary tarballs
 chmod -Rf a+rX,u+w,g-w,o-w .
@@ -331,9 +376,15 @@ cp -a -- \
    %{SOURCE30} %{SOURCE31} %{SOURCE32} \
    %{SOURCE40} %{SOURCE41} %{SOURCE42} %{SOURCE43} %{SOURCE44} \
    %{SOURCE45} %{SOURCE46} %{SOURCE47} %{SOURCE48} \
-   %{SOURCE80} %{SOURCE81} %{SOURCE82} \
+   %{SOURCE50} \
+   %{SOURCE60} \
+   %{SOURCE80} %{SOURCE81} %{SOURCE82} %{SOURCE83} \
    %{SOURCE90} %{SOURCE91} \
    .
+
+# extract hvloader source into place
+tar -xf %{SOURCE7} --directory MdeModulePkg/Application
+sed -i '/MdeModulePkg\/Application\/HelloWorld\/HelloWorld.inf/a \ \ MdeModulePkg\/Application\/HvLoader-%{HVLOADER_VER}/HvLoader.inf' MdeModulePkg/MdeModulePkg.dsc
 
 %build
 
@@ -457,6 +508,11 @@ for raw in */riscv/*.raw; do
 done
 %endif
 
+source ./edksetup.sh
+make -C BaseTools
+cp %{SOURCE8} Conf/target.txt
+build -p MdeModulePkg/MdeModulePkg.dsc -m MdeModulePkg/Application/HvLoader-%{HVLOADER_VER}/HvLoader.inf
+
 %install
 
 cp -a OvmfPkg/License.txt License.OvmfPkg.txt
@@ -554,6 +610,9 @@ done
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/Python_Appendix/#manual-bytecompilation
 %py_byte_compile %{python3} %{buildroot}%{_datadir}/edk2/Python
 %endif
+
+mkdir -p %{buildroot}/boot/efi
+cp ./Build/MdeModule/RELEASE_GCC5/X64/MdeModulePkg/Application/HvLoader-%{HVLOADER_VER}/HvLoader/OUTPUT/HvLoader.efi %{buildroot}/boot/efi
 
 %check
 for file in %{buildroot}%{_datadir}/%{name}/*/*VARS.secboot.fd; do
@@ -731,8 +790,29 @@ done
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/Python
 
+%files hvloader
+%license MdeModulePkg/Application/HvLoader-%{HVLOADER_VER}/LICENSE
+/boot/efi/HvLoader.efi
 
 %changelog
+* Tue Mar 25 2025 Tobias Brick <tobiasb@microsoft.com> - 20240524git3e722403cd16-5
+- Patch vendored openssl to only free read buffers if not in use.
+
+* Wed Sep 25 2024 Cameron Baird <cameronbaird@microsoft.com> - 20240524git3e722403cd16-4
+- Package license for edk2-hvloader
+
+* Thu Sep 19 2024 Minghe Ren <mingheren@microsoft.com> - 20240524git3e722403cd16-3
+- Add patch for CVE-2024-6119
+
+* Wed Aug 21 2024 Cameron Baird <cameronbaird@microsoft.com> - 20240524git3e722403cd16-2
+- Introduce edk2-hvloader subpackage
+
+* Tue Jul 30 2024 Betty Lakes <bettylakes@microsoft.com> - 20240524git3e722403cd16-1
+- Upgrade to 20240524git3e722403cd16 to fix CVE-2023-45236, CVE-2023-45237
+
+* Tue Jul 9 2024 Suresh Thelkar <sthelkar@microsoft.com> - 20240223gitedc6681206c1-2
+- Patch CVE-2022-3996 in bundled OpenSSL
+
 * Fri Mar 8 2024 Elaine Zhao <elainezhao@microsoft.com> - 20240223gitedc6681206c1-1
 - Bump version to edk2-stable202402
 

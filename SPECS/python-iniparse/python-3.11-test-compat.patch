@@ -1,0 +1,93 @@
+From d9a083bafaa2df338a3176ee9f1433718b3a1090 Mon Sep 17 00:00:00 2001
+From: Jiri Hnidek <jhnidek@redhat.com>
+Date: Wed, 11 May 2022 14:29:27 +0200
+Subject: [PATCH] Fix compatibility issues with Python 3.11
+
+* Fixes: https://github.com/candlepin/python-iniparse/issues/23
+* BZ: https://bugzilla.redhat.com/show_bug.cgi?id=2019017
+* Replaced few deprecated methods with new methods
+---
+ tests/test_compat.py | 20 ++++++++++----------
+ tests/test_fuzz.py   |  2 +-
+ 2 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/tests/test_compat.py b/tests/test_compat.py
+index ad36683..c8e6aca 100644
+--- a/tests/test_compat.py
++++ b/tests/test_compat.py
+@@ -96,16 +96,16 @@ def test_basic(self):
+         eq(cf.get('Spaces', 'key with spaces'), 'value')
+         eq(cf.get('Spaces', 'another with spaces'), 'splat!')
+ 
+-        self.failIf('__name__' in cf.options("Foo Bar"),
++        self.assertFalse('__name__' in cf.options("Foo Bar"),
+                     '__name__ "option" should not be exposed by the API!')
+ 
+         # Make sure the right things happen for remove_option();
+         # added to include check for SourceForge bug #123324:
+-        self.failUnless(cf.remove_option('Foo Bar', 'foo'),
++        self.assertTrue(cf.remove_option('Foo Bar', 'foo'),
+                         "remove_option() failed to report existance of option")
+-        self.failIf(cf.has_option('Foo Bar', 'foo'),
++        self.assertFalse(cf.has_option('Foo Bar', 'foo'),
+                     "remove_option() failed to remove option")
+-        self.failIf(cf.remove_option('Foo Bar', 'foo'),
++        self.assertFalse(cf.remove_option('Foo Bar', 'foo'),
+                     "remove_option() failed to report non-existance of option"
+                     " that was removed")
+ 
+@@ -127,10 +127,10 @@ def test_case_sensitivity(self):
+         eq(cf.options("a"), ["b"])
+         eq(cf.get("a", "b"), "value",
+            "could not locate option, expecting case-insensitive option names")
+-        self.failUnless(cf.has_option("a", "b"))
++        self.assertTrue(cf.has_option("a", "b"))
+         cf.set("A", "A-B", "A-B value")
+         for opt in ("a-b", "A-b", "a-B", "A-B"):
+-            self.failUnless(
++            self.assertTrue(
+                 cf.has_option("A", opt),
+                 "has_option() returned false for option which should exist")
+         eq(cf.options("A"), ["a-b"])
+@@ -147,7 +147,7 @@ def test_case_sensitivity(self):
+         # SF bug #561822:
+         cf = self.fromstring("[section]\nnekey=nevalue\n",
+                              defaults={"key":"value"})
+-        self.failUnless(cf.has_option("section", "Key"))
++        self.assertTrue(cf.has_option("section", "Key"))
+ 
+     def test_default_case_sensitivity(self):
+         cf = self.newconfig({"foo": "Bar"})
+@@ -182,7 +182,7 @@ def test_query_errors(self):
+         cf = self.newconfig()
+         self.assertEqual(cf.sections(), [],
+                          "new ConfigParser should have no defined sections")
+-        self.failIf(cf.has_section("Foo"),
++        self.assertFalse(cf.has_section("Foo"),
+                     "new ConfigParser should have no acknowledged sections")
+         self.assertRaises(ConfigParser.NoSectionError,
+                           cf.options, "Foo")
+@@ -221,8 +221,8 @@ def test_boolean(self):
+             "E5=FALSE AND MORE"
+             )
+         for x in range(1, 5):
+-            self.failUnless(cf.getboolean('BOOLTEST', 't%d' % x))
+-            self.failIf(cf.getboolean('BOOLTEST', 'f%d' % x))
++            self.assertTrue(cf.getboolean('BOOLTEST', 't%d' % x))
++            self.assertFalse(cf.getboolean('BOOLTEST', 'f%d' % x))
+             self.assertRaises(ValueError,
+                               cf.getboolean, 'BOOLTEST', 'e%d' % x)
+ 
+diff --git a/tests/test_fuzz.py b/tests/test_fuzz.py
+index df568bb..874ef2e 100644
+--- a/tests/test_fuzz.py
++++ b/tests/test_fuzz.py
+@@ -102,7 +102,7 @@ def test_fuzz(self):
+                 cc = compat.RawConfigParser()
+                 cc.readfp(StringIO(s))
+                 cc_py = configparser.RawConfigParser()
+-                cc_py.readfp(StringIO(s))
++                cc_py.read_file(StringIO(s))
+                 # compare the two configparsers
+                 self.assertEqualConfig(cc_py, cc)
+                 # check that tidy does not change semantics

@@ -2,10 +2,11 @@
 Summary:        Recursively scan Perl code for dependencies
 Name:           perl-Module-ScanDeps
 Version:        1.35
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Module-ScanDeps-%{version}.tar.gz
+Patch0:         CVE-2024-10224.patch
 URL:            http://search.cpan.org/dist/Module-ScanDeps/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,10 +15,14 @@ BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl-generators
 %if 0%{?with_check}
+BuildRequires:  perl(AutoLoader)
+BuildRequires:  perl(blib)
 BuildRequires:  perl(CPAN)
 BuildRequires:  perl(CPAN::Meta)
 BuildRequires:  perl(FindBin)
+BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Test::Pod)
 %endif
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -39,7 +44,7 @@ hash reference.  Its keys are the module names as they appear in %%INC (e.g.
 Test/More.pm).  The values are hash references.
 
 %prep
-%setup -q -n Module-ScanDeps-%{version}
+%autosetup -n Module-ScanDeps-%{version} -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
@@ -54,6 +59,7 @@ find %{buildroot} -type f -name .packlist -exec rm -f {} +
 export PERL_MM_USE_DEFAULT=1
 cpan local::lib
 cpan Test::Requires
+cpan IPC::Run3
 make %{?_smp_mflags} test
 
 %files
@@ -64,10 +70,16 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Nov 25 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35-3
+- Fixing perl-Module-ScanDeps tests.
+
+* Fri Nov 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35-2
+- Patched CVE-2024-10224.
+
 * Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.35-1
 - Auto-upgrade to 1.35 - Azure Linux 3.0 - package upgrades
 
-* Tue Aug 23 2020 Muhammad Falak <mwani@microsoft.com> - 1.31-2
+* Tue Aug 23 2022 Muhammad Falak <mwani@microsoft.com> - 1.31-2
 - Add BR on `perl-{(CPAN::*),(FindBin),(Test::More)}` to enable ptest
 
 * Fri Apr 22 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.31-1

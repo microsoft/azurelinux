@@ -1,0 +1,21 @@
+From 3ef27e733e6c5f129b086e219f92c21d2c68bed4 Mon Sep 17 00:00:00 2001
+From: Sharath Srikanth Chellappa <sharathsr@microsoft.com>
+Date: Thu, 30 May 2024 14:22:29 -0700
+Subject: [PATCH] v1
+
+---
+ src/libvirt.conf | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/libvirt.conf b/src/libvirt.conf
+index da4dfbecb1..11405f450a 100644
+--- a/src/libvirt.conf
++++ b/src/libvirt.conf
+@@ -16,3 +16,4 @@
+ # (@uri_default also prevents probing of the hypervisor driver).
+ #
+ #uri_default = "qemu:///system"
++uri_default = "qemu:///session"
+-- 
+2.45.1
+

@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.2.0
-Release:        3%{?dist}
+Release:        15%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,10 +31,18 @@ Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{versio
 # Nexus team needs these to-be-upstreamed patches for the operator Edge to work
 # correctly.
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
-Patch1:         Hotplug_detach_grace_period.patch
+Patch1:         CVE-2023-48795.patch
+Patch2:         CVE-2024-24786.patch
+Patch3:         CVE-2024-45337.patch
+Patch4:         CVE-2024-45338.patch
+Patch5:         CVE-2023-45288.patch
+Patch6:         CVE-2023-44487.patch
+Patch7:         CVE-2025-22869.patch
+
 %global debug_package %{nil}
+BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-5%{?dist}
+BuildRequires:  glibc-static >= 2.38-9%{?dist}
 BuildRequires:  golang >= 1.21
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -189,7 +197,7 @@ mkdir -p %{buildroot}%{_datadir}/kube-virt/virt-handler
 install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-virt/virt-handler/
 
 # virt-launcher SELinux policy needs to land in virt-handler container
-install -p -m 0644 cmd/virt-handler/virt_launcher.cil %{buildroot}%{_datadir}/kube-virt/virt-handler/
+install -p -m 0644 cmd/virt-handler/virt_launcher.cil %{buildroot}/
 
 # Persistent reservation helper configuration files
 mkdir -p %{buildroot}%{_datadir}/kube-virt/pr-helper
@@ -237,6 +245,7 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_datadir}/kube-virt/virt-handler
 %{_bindir}/virt-handler
 %{_bindir}/virt-chroot
+/virt_launcher.cil
 
 %files virt-launcher
 %license LICENSE
@@ -270,6 +279,45 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Mon Mar 03 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 1.2.0-15
+- Address CVE-2023-44487
+
+* Sun March 02 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-14
+- Address CVE-2025-22869
+
+* Tue Feb 25 2025 Chris Co <chrco@microsoft.com> - 1.2.0-14
+- Bump to rebuild with updated glibc
+
+* Fri Feb 14 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-13
+- Address CVE-2023-45288
+
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.2.0-12
+- Add patch for CVE-2024-45338
+
+* Fri Dec 20 2024 Aurelien Bombo <abombo@microsoft.com> - 1.2.0-11
+- Add patch for CVE-2024-45337
+
+* Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 1.2.0-10
+- Fix for CVE-2024-24786
+
+* Sun Oct 06 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.2.0-9
+- Fix for CVE-2023-48795
+
+* Fri Sep 06 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.2.0-8
+- Adding swtpm tools for building kubevirt RPM.
+
+* Fri Aug 30 2024 Harshit Gupta <guptaharshit@microsoft.com> - 1.2.0-7
+- Update installation path of virt_launcher.cil in virt-handler container.
+
+* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.2.0-6
+- Update to build dep latest glibc-static version
+
+* Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 1.2.0-5
+- Bump to rebuild with updated glibc
+
+* Wed Jun 26 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.2.0-4
+- Deleting Hotplug_Grace_Period.patch since it is no longer required.
+
 * Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.2.0-3
 - update to build dep latest glibc-static version
 
@@ -315,10 +363,10 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 - Bump release to rebuild with go 1.19.10
 
 * Fri May 12 2023 Kanika Nema <kanikanema@microsoft.com> - 0.59.0-2
-- Patch 0.59.0 with Operator Nexus patches 
+- Patch 0.59.0 with Operator Nexus patches
 
 * Fri May 05 2023 Kanika Nema <kanikanema@microsoft.com> - 0.59.0-1
-- Upgrade to v0.59.0 
+- Upgrade to v0.59.0
 
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.58.0-7
 - Bump release to rebuild with go 1.19.8

@@ -12,23 +12,34 @@ import (
 
 func customizePartitions(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	buildImageFile string,
-) (bool, string, error) {
-	if !hasPartitionCustomizations(config) {
+) (bool, string, map[string]string, error) {
+	switch {
+	case config.CustomizePartitions():
+		logger.Log.Infof("Customizing partitions")
+
+		newBuildImageFile := filepath.Join(buildDir, PartitionCustomizedImageName)
+
+		// If there is no known way to create the new partition layout from the old one,
+		// then fallback to creating the new partitions from scratch and doing a file copy.
+		partIdToPartUuid, err := customizePartitionsUsingFileCopy(buildDir, baseConfigPath, config,
+			buildImageFile, newBuildImageFile)
+		if err != nil {
+			return false, "", nil, err
+		}
+
+		return true, newBuildImageFile, partIdToPartUuid, nil
+
+	case config.Storage.ResetPartitionsUuidsType != imagecustomizerapi.ResetPartitionsUuidsTypeDefault:
+		err := resetPartitionsUuids(buildImageFile, buildDir)
+		if err != nil {
+			return false, "", nil, err
+		}
+
+		return true, buildImageFile, nil, nil
+
+	default:
 		// No changes to make to the partitions.
 		// So, just use the original disk.
-		return false, buildImageFile, nil
+		return false, buildImageFile, nil, nil
 	}
-
-	logger.Log.Infof("Customizing partitions")
-
-	newBuildImageFile := filepath.Join(buildDir, PartitionCustomizedImageName)
-
-	// If there is no known way to create the new partition layout from the old one,
-	// then fallback to creating the new partitions from scratch and doing a file copy.
-	err := customizePartitionsUsingFileCopy(buildDir, baseConfigPath, config, buildImageFile, newBuildImageFile)
-	if err != nil {
-		return false, "", err
-	}
-
-	return true, newBuildImageFile, nil
 }

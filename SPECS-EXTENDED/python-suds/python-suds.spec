@@ -4,10 +4,11 @@ Distribution:   Azure Linux
 
 Summary: A python SOAP client
 Name:  python-suds
-Version: 1.0.0
-Release: 2%{?dist}
+Version: 1.1.2
+Release: 11%{?dist}
 Source0: https://github.com/suds-community/suds/archive/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
-License: LGPLv3+
+Patch0: suds-pyname.patch
+License: LGPL-3.0-or-later
 BuildArch: noarch
 URL: https://github.com/suds-community/suds
 
@@ -38,6 +39,8 @@ Summary:        %{summary}
 %build
 %py3_build
 
+%generate_buildrequires
+
 %install
 %py3_install
 
@@ -51,16 +54,83 @@ Summary:        %{summary}
 %license LICENSE.txt
 
 %changelog
-* Fri Aug 26 2022 Muhammad Falak <mwani@microsoft.com> - 1.0.0-2
+* Wed Feb 12 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.1.2-11
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
 - Add BR on `python3-pip` & drop `python3-pytest` to enable ptest
 
-* Fri Feb 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-1
-- Updating to version 1.0.0 using Fedora 36 specs (license: MIT) for guidance.
-- License verified.
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.2-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7-1
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Wed Jul 17 2024 Miroslav Suchý <msuchy@redhat.com> - 1.1.2-9
+- convert license to SPDX
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.1.2-8
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 1.1.2-4
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jul 09 2022 Scott Talbert <swt@techie.net> - 1.1.2-1
+- Update to new upstream release 1.1.2 (#2101636)
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1.1.1-2
+- Rebuilt for Python 3.11
+
+* Sat May 28 2022 Scott Talbert <swt@techie.net> - 1.1.1-1
+- Update to new upstream release 1.1.1 (#2081127)
+- Set python package name to suds (vs suds-community) (#2091107)
+
+* Wed Mar 23 2022 Scott Talbert <swt@techie.net> - 1.1.0-1
+- Update to new upstream release 1.1.0 (#2064493)
+
+* Wed Feb 16 2022 Steve Traylen <steve.traylen@cern.ch> - 1.0.0-3
+- Migrate pyproject_macros
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Oct 29 2021 Scott Talbert <swt@techie.net> - 1.0.0-1
+- Update to new upstream release 1.0.0
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jun 15 2021 Scott Talbert <swt@techie.net> - 0.8.5-1
+- Update to new upstream release 0.8.5
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.8.4-6
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.4-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Scott Talbert <swt@techie.net> - 0.8.4-3
+- Modernize Python packaging; BR setuptools
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.8.4-2
+- Rebuilt for Python 3.9
+
+* Tue Feb 18 2020 Scott Talbert <swt@techie.net> - 0.8.4-1
+- Switch to new upstream https://github.com/suds-community/suds
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.7-0.17.94664ddd46a6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

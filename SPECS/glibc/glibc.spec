@@ -10,7 +10,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        5%{?dist}
+Release:        9%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,6 +30,16 @@ Patch3:         CVE-2020-1751.nopatch
 # Rationale: Exploit requires crafted pattern in regex compiler meant only for trusted content
 Patch4:         CVE-2018-20796.nopatch
 Patch5:         https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.38-memalign_fix-1.patch
+Patch6:         CVE-2023-4911.patch
+Patch7:         CVE-2023-5156.patch
+Patch8:         CVE-2023-6246.patch
+Patch9:         CVE-2023-6779.patch
+Patch10:        CVE-2023-6780.patch
+# Upstream backport for fixing: nscd fails to build with cleanup handler if built with -fexceptions
+Patch11:		nscd-Do-not-rebuild-getaddrinfo-bug-30709.patch
+# Patches for testing
+Patch100:       0001-Remove-Wno-format-cflag-from-tests.patch
+
 BuildRequires:  bison
 BuildRequires:  gawk
 BuildRequires:  gettext
@@ -162,7 +172,6 @@ echo "rootsbindir=/usr/sbin" > configparms
         --disable-werror \
         --enable-kernel=4.14 \
         --enable-bind-now \
-        --disable-build-nscd \
         --enable-static-pie \
 %ifarch x86_64
         --enable-cet \
@@ -242,26 +251,27 @@ ls -1 %{buildroot}%{_libdir}/*.a | grep -v -e "$static_libs_in_devel_pattern" | 
 
 %check
 cd %{_builddir}/glibc-build
+
+# Results have varied based on the environment the tests are being built
+# Summary of test results in local VM:
+#      3 FAIL : nptl/tst-cancel1, io/tst-lchmod, nptl/tst-mutex10
+#   5040 PASS
+#    152 UNSUPPORTED
+#     12 XFAIL
+#      8 XPASS
+# Summary of test results in pipeline (this has shown varying results):
+#       7 FAIL
+#    5110 PASS
+#      79 UNSUPPORTED
+#      12 XFAIL
+#       8 XPASS
 make %{?_smp_mflags} check ||:
-# These 2 persistant false positives are OK
-# XPASS for: elf/tst-protected1a and elf/tst-protected1b
-[ `grep ^XPASS tests.sum | wc -l` -ne 2 -a `grep "^XPASS: elf/tst-protected1[ab]" tests.sum | wc -l` -ne 2 ] && exit 1 ||:
-
-# FAIL (intermittent) in chroot but PASS in container:
-# posix/tst-spawn3 and stdio-common/test-vfprintf
 n=0
-grep "^FAIL: posix/tst-spawn3" tests.sum >/dev/null && n=$((n+1)) ||:
-grep "^FAIL: stdio-common/test-vfprintf" tests.sum >/dev/null && n=$((n+1)) ||:
-# FAIL always on overlayfs/aufs (in container)
-grep "^FAIL: posix/tst-dir" tests.sum >/dev/null && n=$((n+1)) ||:
-
-#https://sourceware.org/glibc/wiki/Testing/Testsuite
-grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
-#This happens because the kernel fails to reap exiting threads fast enough,
-#eventually resulting an EAGAIN when pthread_create is called within the test.
-
-# check for exact 'n' failures
-[ `grep ^FAIL tests.sum | wc -l` -ne $n ] && exit 1 ||:
+# expected failures in local VM
+grep "^FAIL: nptl/tst-cancel1" tests.sum >/dev/null && n=$((n+1)) ||:
+grep "^FAIL: io/tst-lchmod" tests.sum >/dev/null && n=$((n+1)) ||:
+grep "^FAIL: nptl/tst-mutex10" tests.sum >/dev/null && n=$((n+1)) ||:
+[ `grep ^FAIL tests.sum | wc -l` -eq $n ]
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -315,7 +325,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %files nscd
 %defattr(-,root,root)
 %config(noreplace) %{_sysconfdir}/nscd.conf
-#%%{_sbindir}/nscd
+%{_sbindir}/nscd
 %dir %{_localstatedir}/cache/nscd
 
 %files i18n
@@ -348,6 +358,18 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
+* Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 2.38-9
+- Re-enable nscd build and packaging
+
+* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 2.38-8
+- Enable check section for glibc
+
+* Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 2.38-7
+- Fix syslog failing to print issue
+
+* Mon Jun 17 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.38-6
+- Address CVE-2023-4911, CVE-2023-5156, CVE-2023-6246, CVE-2023-6779, CVE-2023-6780
+
 * Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.38-5
 - Generate and provide glibc all locales in a sub-package
 

@@ -1,7 +1,7 @@
 Summary:        Attributes without boilerplate.
 Name:           python-attrs
 Version:        21.4.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-packaging
 %endif
 BuildArch:      noarch
 
@@ -37,7 +38,8 @@ Attributes without boilerplate.
 %py3_install
 
 %check
-pip3 install tox
+# explicitly  install packaging ver to match azl install to avoid pip conflict
+pip3 install tox packaging==23.2
 # Skip mypy tests- effort required in keeping these tests green is not justifiable,
 # as we don't ship mypy and these tests are very sensitive to mypy upstream changes
 
@@ -51,6 +53,9 @@ LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots} -- -k 'not test_mypy and 
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jul 02 2024 Sam Meluch <sammeluch@microsoft.com> - 21.4.0-6
+- add python-packaging requires to fix ptest
+
 * Fri May 03 2024 Sam Meluch <sammeluch@microsoft.com> - 21.4.0-5
 - Add version limit to pytest to fix failing tests
 

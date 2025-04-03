@@ -1,0 +1,4 @@
+os:
+  additionalDirs:
+  - source: dirs/a
+    destination: /

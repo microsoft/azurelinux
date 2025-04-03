@@ -1,4 +1,4 @@
-From 968b2e3084d9e170ab7e236812e93d46b795de03 Mon Sep 17 00:00:00 2001
+From 15df0f549bdf5842c7aef669687dd1d8c11421cf Mon Sep 17 00:00:00 2001
 From: Gerd Hoffmann <kraxel@redhat.com>
 Date: Mon, 28 Aug 2023 13:11:02 +0200
 Subject: [PATCH 14/17] CryptoPkg/CrtLib: add stat.h
@@ -25,5 +25,5 @@ index 000000000000..22247bb2db80
 +
 +#include <CrtLibSupport.h>
 -- 
-2.43.1
+2.45.0
 

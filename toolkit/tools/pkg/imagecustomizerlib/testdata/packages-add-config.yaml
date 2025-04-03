@@ -1,0 +1,7 @@
+os:
+  packages:
+    install:
+    - jq
+
+    installLists:
+    - lists/golang.yaml

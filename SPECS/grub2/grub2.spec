@@ -1,4 +1,5 @@
 %define debug_package %{nil}
+%define efidir BOOT
 %define __os_install_post %{nil}
 # Gnulib does not produce source tarball releases, and grub's bootstrap.conf
 # bakes in a specific commit id to pull (GNULIB_REVISION).
@@ -6,7 +7,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        18%{?dist}
+Release:        22%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,7 +16,6 @@ URL:            https://www.gnu.org/software/grub
 Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-%{version}.tar.gz
 Source1:        https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-%{gnulibversion}.tar.gz
 Source2:        sbat.csv.in
-Source3:        macros.grub2
 # Incorporate relevant patches from Fedora 34
 # EFI Secure Boot / Handover Protocol patches
 Patch0001:      0001-Add-support-for-Linux-EFI-stub-loading.patch
@@ -48,7 +48,7 @@ Patch0157:      0157-linuxefi-fail-kernel-validation-without-shim-protoco.patch
 # Fix to prevent user from overwriting signed grub binary using grub2-install
 Patch0166:      0166-grub-install-disable-support-for-EFI-platforms.patch
 # CVE-2021-3981
-Patch0167:      0167-restore-umask-for-grub-config.patch 
+Patch0167:      0167-restore-umask-for-grub-config.patch
 # Fix to reset the global errno to success upon success.
 Patch0170:      0170-fix-memory-alloc-errno-reset.patch
 Patch0171:      CVE-2022-2601.patch
@@ -103,6 +103,10 @@ Patch:          sbat-4-0003-fs-ntfs-Fix-an-OOB-read-when-parsing-directory-entri
 Patch:          sbat-4-0004-fs-ntfs-Fix-an-OOB-read-when-parsing-bitmaps-for-ind.patch
 Patch:          sbat-4-0005-fs-ntfs-Fix-an-OOB-read-when-parsing-a-volume-label.patch
 Patch:          sbat-4-0006-fs-ntfs-Make-code-more-readable.patch
+# The Azure Linux team created this patch since the gcc version in use at the
+# time optimizes the code incorrectly, leading to network traffic getting
+# dropped in scenarios like PXE booting.
+Patch:          disable-checksum-code-optimization.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
@@ -170,6 +174,8 @@ Unsigned GRUB UEFI image
 Summary:        GRUB UEFI image
 Group:          System Environment/Base
 Requires:       %{name}-tools-minimal = %{version}-%{release}
+Recommends:     shim >= 15.8-3
+Conflicts:      shim < 15.8-3
 
 # Some distros split 'grub2' into more subpackages. For now we're bundling it all together
 # inside the default package and adding these 'Provides' to make installation more user-friendly
@@ -185,17 +191,11 @@ GRUB UEFI bootloader binaries
 Summary:        GRUB UEFI image with no prefix directory set
 Group:          System Environment/Base
 Requires:       %{name}-tools-minimal = %{version}-%{release}
+Recommends:     shim >= 15.8-3
+Conflicts:      shim < 15.8-3
 
 %description efi-binary-noprefix
 GRUB UEFI bootloader binaries with no prefix directory set
-
-%package rpm-macros
-Summary:        GRUB RPM Macros
-Group:          System Environment/Base
-
-%description rpm-macros
-GRUB RPM Macros for enabling package updates supporting
-the grub2-mkconfig flow on AzureLinux
 
 %package configuration
 Summary:        Location for local grub configurations
@@ -325,15 +325,11 @@ install -d %{buildroot}%{_datadir}/grub2-efi
 %endif
 
 # Install to efi directory
-EFI_BOOT_DIR=%{buildroot}/boot/efi/EFI/BOOT
+EFI_BOOT_DIR=%{buildroot}/boot/efi/EFI/%{efidir}
 GRUB_MODULE_NAME=
 GRUB_MODULE_SOURCE=
 
 install -d $EFI_BOOT_DIR
-
-# Install grub2 macros
-mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
-install -m 644 %{SOURCE3} %{buildroot}/%{_rpmconfigdir}/macros.d
 
 %ifarch x86_64
 GRUB_MODULE_NAME=grubx64.efi
@@ -403,27 +399,24 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 
 %files efi-binary
 %ifarch x86_64
-/boot/efi/EFI/BOOT/grubx64.efi
+/boot/efi/EFI/%{efidir}/grubx64.efi
 %endif
 %ifarch aarch64
-/boot/efi/EFI/BOOT/grubaa64.efi
+/boot/efi/EFI/%{efidir}/grubaa64.efi
 %endif
 
 %files efi-binary-noprefix
 %ifarch x86_64
-/boot/efi/EFI/BOOT/grubx64-noprefix.efi
+/boot/efi/EFI/%{efidir}/grubx64-noprefix.efi
 %endif
 %ifarch aarch64
-/boot/efi/EFI/BOOT/grubaa64-noprefix.efi
+/boot/efi/EFI/%{efidir}/grubaa64-noprefix.efi
 %endif
 
 %ifarch aarch64
 %files efi
 %{_libdir}/grub/*
 %endif
-
-%files rpm-macros
-%{_rpmconfigdir}/macros.d/macros.grub2
 
 %files configuration
 %dir %{_sysconfdir}/grub.d
@@ -440,6 +433,19 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
+* Sun Nov 10 2024 Chris Co <chrco@microsoft.com> - 2.06-22
+- Set efidir location to BOOT for eventual use in changing to "azurelinux"
+- Bump release to also force signing with the new Azure Linux secure boot key
+
+* Mon Oct 28 2024 Chris Co <chrco@microsoft.com> - 2.06-21
+- Add Fedora SBAT entries
+
+* Tue Aug 13 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.06-20
+- Move grub2-rpm-macros to the azurelinux-rpm-macros package
+
+* Wed Jun 12 2024 George Mileka <gmileka@microsoft.com> - 2.06-19
+- disable code optimization for ip checksum calculation
+
 * Mon Apr 15 2024 Dan Streetman <ddstreet@microsoft.com> - 2.06-18
 - update grub to sbat 4
 
@@ -466,7 +472,7 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 - Enable support for grub2-mkconfig grub.cfg generation
 - Introduce rpm-macros, configuration subpackage
 - The Mariner /etc/default/grub now sources files from /etc/default/grub.d
-    before the remainder of grub2-mkconfig runs. This allows RPM to 
+    before the remainder of grub2-mkconfig runs. This allows RPM to
     install package-specific configurations that the users can safely
     override.
 

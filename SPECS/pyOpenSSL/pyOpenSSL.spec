@@ -1,13 +1,15 @@
+%global         srcname     pyopenssl
+
 Summary:        Python wrapper module around the OpenSSL library
 Name:           pyOpenSSL
-Version:        23.2.0
+Version:        24.2.1
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/pyca/pyopenssl
-Source0:        https://files.pythonhosted.org/packages/be/df/75a6525d8988a89aed2393347e9db27a56cb38a3e864314fac223e905aef/%{name}-%{version}.tar.gz
+Source0:        %{pypi_source %{srcname} %{version}}
 BuildArch:      noarch
 
 %description
@@ -39,7 +41,7 @@ BuildRequires:  python3-six
 High-level wrapper around a subset of the OpenSSL library.
 
 %prep
-%autosetup
+%autosetup -p1 -n %{srcname}-%{version}
 
 %build
 %py3_build
@@ -48,7 +50,7 @@ High-level wrapper around a subset of the OpenSSL library.
 %py3_install
 
 %check
-pip3 install pretend flaky pytest
+pip3 install pretend pytest-rerunfailures pytest
 PATH=%{buildroot}%{_bindir}:${PATH} \
 LANG=en_US.UTF-8  PYTHONPATH=%{buildroot}%{python3_sitelib} \
     pytest
@@ -59,6 +61,10 @@ LANG=en_US.UTF-8  PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/*
 
 %changelog
+* Fri Aug 16 2023 Daniel McIlvaney <damcilva@microsoft.com> - 24.2.1-1
+- Selectively take upstream changes from F41 to update to 24.2.1 to support our
+    version of python-cryptography.
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 23.2.0-1
 - Auto-upgrade to 23.2.0 - Azure Linux 3.0 - package upgrades
 

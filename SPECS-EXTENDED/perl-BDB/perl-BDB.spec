@@ -1,15 +1,15 @@
 %global cpan_version 1.92
 
-Summary:        Asynchronous Berkeley DB access
 Name:           perl-BDB
 # Extend to 2 digits to get higher RPM package version than 1.88
 Version:        %{cpan_version}
-Release:        16%{?dist}
-License:        GPL+ OR Artistic
+Release:        26%{?dist}
+Summary:        Asynchronous Berkeley DB access
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/BDB
-Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/BDB-%{cpan_version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/BDB-%{cpan_version}.tar.gz#/%{name}-%{cpan_version}.tar.gz
 
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -20,14 +20,14 @@ BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(:VERSION) >= 5.8.8
 BuildRequires:  perl(Config)
-BuildRequires:  perl(Exporter)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(XSLoader)
+# Run-time
 BuildRequires:  perl(base)
 BuildRequires:  perl(common::sense)
-
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(XSLoader)
 Requires:       perl(XSLoader)
+Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 %{?perl_default_filter}
 
 %description
@@ -38,10 +38,10 @@ Asynchronous Berkeley DB access.
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}" NO_PACKLIST=1 NO_PERLLOCAL=1
-%make_build
+%{make_build}
 
 %install
-%make_install
+%{make_install}
 find %{buildroot} -type f -name '*.bs' -a -size 0 -delete
 %{_fixperms} %{buildroot}/*
 
@@ -56,9 +56,39 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
-* Thu Jan 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.92-16
-- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+* Mon Jan 06 2025 Jyoti kanase <v-jykanase@microsoft.com> -  1.92-26
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.92-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Jun 10 2024 Jitka Plesnikova <jplesnik@redhat.com> - 1.92-24
+- Perl 5.40 rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.92-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.92-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.92-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 1.92-20
+- Perl 5.38 rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.92-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.92-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.92-17
+- Perl 5.36 rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.92-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.92-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild

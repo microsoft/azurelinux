@@ -6,6 +6,9 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 1. If partitions were specified in the config, customize the disk partitions.
 
+   Otherwise, if the [resetpartitionsuuidstype](#resetpartitionsuuidstype-string) value
+   is specified, then the partitions' UUIDs are changed.
+
 2. Override the `/etc/resolv.conf` file with the version from the host OS.
 
 3. Update packages:
@@ -23,7 +26,7 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 4. Update hostname. ([hostname](#hostname-string))
 
-5. Copy additional files. ([additionalFiles](#additionalfiles-mapstring-fileconfig))
+5. Copy additional files. ([additionalFiles](#os-additionalfiles))
   
 6. Copy additional directories. ([additionalDirs](#additionaldirs-dirconfig))
 
@@ -33,7 +36,7 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 9. Configure kernel modules. ([modules](#modules-module))
 
-10. Write the `/etc/mariner-customizer-release` file.
+10. Write the `/etc/image-customizer-release` file.
 
 11. If [resetBootLoaderType](#resetbootloadertype-string) is set to `hard-reset`, then
     reset the boot-loader.
@@ -44,40 +47,51 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 12. Update the SELinux mode. [mode](#mode-string)
 
-13. If ([overlays](#overlay-type)) are specified, then add the overlays dracut module
-    and update the grub config.
+13. If ([overlays](#overlay-type)) are specified, then add the overlay driver
+    and update the fstab file with the overlay mount information.
 
-14. If ([verity](#verity-type)) is specified, then add the dm-verity dracut driver
-    and update the grub config.
+14. If a ([verity](#verity-type)) device is specified, then add the dm-verity dracut
+    driver and update the grub config.
 
 15. Regenerate the initramfs file (if needed).
 
 16. Run ([postCustomization](#postcustomization-script)) scripts.
 
-17. If SELinux is enabled, call `setfiles`.
+17. Restore the `/etc/resolv.conf` file.
 
-18. Delete `/etc/resolv.conf` file.
+18. If SELinux is enabled, call `setfiles`.
 
 19. Run finalize image scripts. ([finalizeCustomization](#finalizecustomization-script))
 
 20. If [--shrink-filesystems](./cli.md#shrink-filesystems) is specified, then shrink
     the file systems.
 
-21. If ([verity](#verity-type)) is specified, then create the hash tree and update the
-    grub config.
+21. If a ([verity](#verity-type)) device is specified, then create the hash tree and
+    update the grub config.
 
-22. if the output format is set to `iso`, copy additional iso media files.
-([iso](#iso-type))
+22. If the output format is set to `iso`, copy additional iso media files.
+    ([iso](#iso-type))
+
+23. If [--output-pxe-artifacts-dir](./cli.md#output-pxe-artifacts-dir) is specified,
+    then export the ISO image contents to the specified folder.
 
 ### /etc/resolv.conf
 
-The `/etc/resolv.conf` file is overridden so that the package installation and
-customization scripts can have access to the network.
-It is assumed there is a process that runs on boot that will write the
-`/etc/resolv.conf` file.
-For example, `systemd-resolved`.
-Hence, the `/etc/resolv.conf` file is simply deleted at the end instead of being
-restored to its original contents.
+The `/etc/resolv.conf` file is overridden during customization so that the package
+installation and customization scripts can have access to the network.
+
+Near the end of customization, the `/etc/resolv.conf` file is restored to its original
+state.
+
+However, if the `/etc/resolv.conf` did not exist in the base image and
+`systemd-resolved` service is enabled, then the `/etc/resolv.conf` file is symlinked to
+the `/run/systemd/resolve/stub-resolv.conf` file. (This would happen anyway during
+first-boot. But doing this during customization is useful for verity enabled images
+where the filesystem is readonly.)
+
+If you want to explicitly set the `/etc/resolv.conf` file contents, you can do so within
+a [finalizeCustomization](#finalizecustomization-script) script, since those scripts run
+after the `/etc/resolv.conf` is deleted.
 
 ### Replacing packages
 
@@ -114,8 +128,15 @@ os:
             - [end](#end-uint64)
             - [size](#size-uint64)
             - [type](#partition-type-string)
-    - [fileSystems](#filesystems-filesystem)
-      - [fileSystem type](#filesystem-type)
+    - [verity](#verity-verity)
+      - [verity type](#verity-type)
+        - [id](#verity-id)
+        - [name](#verity-name)
+        - [dataDeviceId](#datadeviceid-string)
+        - [hashDeviceId](#hashdeviceid-string)
+        - [corruptionOption](#corruptionoption-string)
+    - [filesystems](#filesystems-filesystem)
+      - [filesystem type](#filesystem-type)
         - [deviceId](#deviceid-string)
         - [type](#type-string)
         - [mountPoint](#mountpoint-mountpoint)
@@ -123,17 +144,23 @@ os:
             - [idType](#idtype-string)
             - [options](#options-string)
             - [path](#mountpoint-path)
+    - [resetPartitionsUuidsType](#resetpartitionsuuidstype-string)
   - [iso](#iso-type)
-    - [additionalFiles](#additionalfiles-mapstring-fileconfig)
-      - [fileConfig type](#fileconfig-type)
-        - [path](#fileconfig-path)
+    - [additionalFiles](#iso-additionalfiles)
+      - [additionalFile type](#additionalfile-type)
+        - [source](#source-string)
+        - [content](#content-string)
+        - [destination](#destination-string)
         - [permissions](#permissions-string)
-    - [kernelCommandLine](#kernelcommandline-type)
+    - [kernelCommandLine](#iso-kernelcommandline)
       - [extraCommandLine](#extracommandline-string)
+  - [pxe](#pxe-type)
+    - [isoImageBaseUrl](#isoimagebaseurl-string)
+    - [isoImageFileUrl](#isoimagefileurl-string)
   - [os type](#os-type)
     - [resetBootLoaderType](#resetbootloadertype-string)
     - [hostname](#hostname-string)
-    - [kernelCommandLine](#kernelcommandline-type)
+    - [kernelCommandLine](#os-kernelcommandline)
       - [extraCommandLine](#extracommandline-string)
     - [packages](#packages-packages)
       - [packages type](#packages-type)
@@ -148,14 +175,16 @@ os:
         - [remove](#remove-string)
         - [updateLists](#updatelists-string)
         - [update](#update-string)
-    - [additionalFiles](#additionalfiles-mapstring-fileconfig)
-      - [fileConfig type](#fileconfig-type)
-        - [path](#fileconfig-path)
+    - [additionalFiles](#os-additionalfiles)
+      - [additionalFile type](#additionalfile-type)
+        - [source](#source-string)
+        - [content](#content-string)
+        - [destination](#destination-string)
         - [permissions](#permissions-string)
     - [additionalDirs](#additionaldirs-dirconfig)
       - [dirConfig](#dirconfig-type)
-        - [sourcePath](#dirconfig-sourcePath)
-        - [destinationPath](#dirconfig-destinationPath)
+        - [source](#dirconfig-source)
+        - [destination](#dirconfig-destination)
         - [newDirPermissions](#newdirpermissions-string)
         - [mergedDirPermissions](#mergeddirpermissions-string)
         - [childFilePermissions](#childfilepermissions-string)
@@ -182,15 +211,15 @@ os:
         - [name](#module-name)
         - [loadMode](#loadmode-string)
         - [options](#options-mapstring-string)
-    - [overlay type](#overlay-type)
-    - [verity type](#verity-type)
+    - [overlays](#overlays-overlay)
+      - [overlay type](#overlay-type)
   - [scripts type](#scripts-type)
     - [postCustomization](#postcustomization-script)
       - [script type](#script-type)
         - [path](#script-path)
         - [content](#content-string)
         - [interpreter](#interpreter-string)
-        - [args](#args-string)
+        - [arguments](#arguments-string)
         - [environmentVariables](#environmentvariables-mapstring-string)
         - [name](#script-name)
     - [finalizeCustomization](#finalizecustomization-script)
@@ -198,7 +227,7 @@ os:
         - [path](#script-path)
         - [content](#content-string)
         - [interpreter](#interpreter-string)
-        - [args](#args-string)
+        - [arguments](#arguments-string)
         - [environmentVariables](#environmentvariables-mapstring-string)
         - [name](#script-name)
 
@@ -232,8 +261,8 @@ storage:
 
     - id: rootfs
       start: 9M
-      
-  fileSystems:
+
+  filesystems:
   - deviceId: esp
     type: fat32
     mountPoint:
@@ -249,6 +278,14 @@ os:
   resetBootLoaderType: hard-reset
 ```
 
+### iso [[iso](#iso-type)]
+
+Optionally specifies the configuration for the generated ISO media.
+
+### pxe [[pxe](#pxe-type)]
+
+Optionally specifies the PXE-specific configuration for the generated OS artifacts.
+
 ### os [[os](#os-type)]
 
 Contains the configuration options for the OS.
@@ -259,6 +296,10 @@ Example:
 os:
   hostname: example-image
 ```
+
+### scripts [[scripts](#scripts-type)]
+
+Specifies custom scripts to run during the customization process.
 
 ## disk type
 
@@ -285,122 +326,312 @@ Must be a multiple of 1 MiB.
 
 The partitions to provision on the disk.
 
+## pxe type
+
+Specifies the PXE-specific configuration for the generated OS artifacts.
+
+### isoImageBaseUrl [string]
+
+Specifies the base URL for the ISO image to download at boot time. The Azure
+Linux Image Customizer will append the output image name to the specified base
+URL to form the full URL for downloading the image. The output image name is
+specified on the command-line using the `--output-image file` argument (see the
+  [command-line interface](./cli.md) document for more details).
+
+This can be useful if the ISO image name changes with each build and the
+script deploying the artifacts to the PXE server does not update grub.cfg with
+the ISO image name.
+
+For example,
+
+- If the user has the following content in the configuration file:
+
+  ```yaml
+  pxe:
+    isoImageBaseUrl: http://hostname-or-ip/iso-publish-path
+  ```
+
+- and specifies the following on the command line:
+
+  ```bash
+  sudo imagecustomizer \
+    --image-file "./input/azure-linux.vhdx" \
+    --config-file "./input/customization-config.yaml" \
+    --rpm-source "./input/rpms" \
+    --build-dir "./build" \
+    --output-image-format "iso" \
+    --output-image-file "./build/output/output.iso" \
+    --output-pxe-artifacts-dir "./build/output/pxe-artifacts"
+  ```
+
+- then, during PXE booting, the ISO image will be downloaded from:
+
+  ```bash
+  http://hostname-or-ip/iso-publish-path/output.iso
+  ```
+
+This field is mutually exclusive with `isoImageFileUrl`.
+
+For an overview of Azure Linux Image Customizer support for PXE, see the 
+[PXE support page](./pxe.md).
+
+### isoImageFileUrl [string]
+
+Specifies the URL of the ISO image to download at boot time.
+The ISO image must be a LiveOS ISO image generated by the Azure Linux Image
+Customizer. The booting process will pivot to the root file system embedded
+in the ISO image after downloading it.
+
+PXE Configuration Example:
+
+- ```yaml
+  pxe:
+    isoImageFileUrl: http://hostname-or-ip/iso-publish-path/my-liveos.iso
+  ```
+
+The supported download protocols are: nfs, http, https, ftp, torent, tftp.
+
+This field is mutually exclusive with `isoImageBaseUrl`.
+
+For an overview of Azure Linux Image Customizer support for PXE, see the 
+[PXE support page](./pxe.md).
+
 ## iso type
 
 Specifies the configuration for the generated ISO media.
 
-### kernelExtraCommandLine [string]
+<div id="iso-kernelcommandline"></div>
 
-- See [extraCommandLine](#extracommandline-string).
+### kernelCommandLine [[kernelCommandLine](#kernelcommandline-type)]
 
-### additionalFiles
+Specifies extra kernel command line options.
 
-- See [additionalFiles](#additionalfiles-mapstring-fileconfig).
+<div id="iso-additionalfiles"></div>
+
+### additionalFiles [[additionalFile](#additionalfile-type)[]>]
+
+Adds files to the ISO.
 
 ## overlay type
 
 Specifies the configuration for overlay filesystem.
 
-- `lowerDir`: This directory acts as the read-only layer in the overlay
-  filesystem. It contains the base files and directories which will be overlaid
-  by the upperDir. Changes to the overlay filesystem do not affect the contents
-  of lowerDir.
+Overlays Configuration Example:
 
-- `upperDir`: This directory is the writable layer of the overlay filesystem.
-  Any modifications, such as file additions, deletions, or changes, are made in
-  the upperDir. These changes are what make the overlay filesystem appear
-  different from the lowerDir alone.
+```yaml
+storage:
+  disks:
+  bootType: efi
+  - partitionTableType: gpt
+    maxSize: 4G
+    partitions:
+    - id: esp
+      type: esp
+      start: 1M
+      end: 9M
+    - id: boot
+      start: 9M
+      end: 108M
+    - id: rootfs
+      label: rootfs
+      start: 108M
+      end: 2G
+    - id: var
+      start: 2G
 
-- `workDir`: This is a required directory used for preparing files before they
-  are merged into the upperDir. It needs to be on the same filesystem as the
-  upperDir and is used for temporary storage by the overlay filesystem to ensure
-  atomic operations. The workDir is not directly accessible to users.
+  filesystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+  - deviceId: boot
+    type: ext4
+    mountPoint:
+      path: /boot
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
+  - deviceId: var
+    type: ext4
+    mountPoint:
+      path: /var
+      options: defaults,x-initrd.mount
 
-- `partition`: Optional field: If configured, a partition will be attached to
-  the current targeted overlay, making it persistent and ensuring that changes
-  are retained. If not configured, the overlay will be volatile.
+os:
+  resetBootLoaderType: hard-reset
+  overlays:
+    - mountPoint: /etc
+      lowerDirs:
+      - /etc
+      upperDir: /var/overlays/etc/upper
+      workDir: /var/overlays/etc/work
+      isInitrdOverlay: true
+      mountDependencies:
+      - /var
+    - mountPoint: /media
+      lowerDirs:
+      - /media
+      - /home
+      upperDir: /overlays/media/upper
+      workDir: /overlays/media/work
+```
 
-  - `idType`: Specifies the type of id for the partition. The options are
-    `part-label` (partition label), `uuid` (filesystem UUID), and `part-uuid`
-    (partition UUID).
+### `mountPoint` [string]
 
-  - `id`: The unique identifier value of the partition, corresponding to the
-    specified IdType.
+The directory where the combined view of the `upperDir` and `lowerDir` will be
+mounted. This is the location where users will see the merged contents of the
+overlay filesystem. It is common for the `mountPoint` to be the same as the
+`lowerDir`. But this is not required.
+
+Example: `/etc`
+
+### `lowerDirs` [string[]]
+
+These directories act as the read-only layers in the overlay filesystem. They
+contain the base files and directories which will be overlaid by the `upperDir`.
+Multiple lower directories can be specified by providing a list of paths, which
+will be joined using a colon (`:`) as a separator.
 
 Example:
 
 ```yaml
-os:
-  overlays:
-    - lowerDir: /etc
-      upperDir: /upper_etc
-      workDir: /work_etc
-      partition:
-        idType: part-label
-        id: partition-etc
-    - lowerDir: /var/lib
-      upperDir: /upper_var_lib
-      workDir: /work_var_lib
-    - lowerDir: /var/log
-      upperDir: /upper_var_log
-      workDir: /work_var_log
+lowerDirs: 
+- /etc
 ```
+
+### `upperDir` [string]
+
+This directory is the writable layer of the overlay filesystem. Any
+modifications, such as file additions, deletions, or changes, are made in the
+upperDir. These changes are what make the overlay filesystem appear different
+from the lowerDir alone. 
+  
+Example: `/var/overlays/etc/upper`
+
+### `workDir` [string]
+
+This is a required directory used for preparing files before they are merged
+into the upperDir. It needs to be on the same filesystem as the upperDir and
+is used for temporary storage by the overlay filesystem to ensure atomic
+operations. The workDir is not directly accessible to users. 
+  
+Example: `/var/overlays/etc/work`
+
+### `isInitrdOverlay` [bool]
+
+A boolean flag indicating whether this overlay is part of the root filesystem.
+If set to `true`, specific adjustments will be made, such as prefixing certain
+paths with `/sysroot`, and the overlay will be added to the fstab file with the
+`x-initrd.mount` option to ensure it is available during the initrd phase.
+
+This is an optional argument.
+
+Example: `False`
+
+### `mountDependencies` [string[]]
+
+Specifies a list of directories that must be mounted before this overlay. Each
+directory in the list should be mounted and available before the overlay
+filesystem is mounted.
+
+This is an optional argument.
+
+Example:
+
+```yaml
+mountDependencies: 
+- /var
+```
+
+**Important**: If any directory specified in `mountDependencies` needs to be
+available during the initrd phase, you must ensure that this directory's mount
+configuration in the `filesystems` section includes the `x-initrd.mount` option.
+For example:
+
+```yaml
+filesystems:
+  - deviceId: var
+    type: ext4
+    mountPoint:
+      path: /var
+      options: defaults,x-initrd.mount
+```
+
+### `mountOptions` [string]
+
+A string of additional mount options that can be applied to the overlay mount.
+Multiple options should be separated by commas.
+
+This is an optional argument.
+
+Example: `noatime,nodiratime`
 
 ## verity type
 
-Specifies the configuration for dm-verity root integrity verification. Please
-execute `sudo modprobe nbd` before building the image with verity enablement.
+Specifies the configuration for dm-verity integrity verification.
 
-Please enable overlays for the `/var/lib` and `/var/log` directories, along with
-verity enablement, to ensure proper functioning of services. For an example,
-please refer to the [overlay type](#overlay-type) section.
+Note: Currently only root partition (`/`) is supported. Support for other partitions
+(e.g. `/usr`) may be added in the future.
 
-- `dataPartition`: A partition configured with dm-verity, which verifies integrity
-  at each system boot.
+There are multiple ways to configure a verity enabled image. For
+recommendations, see [Verity Image Recommendations](./verity.md).
 
-  - `idType`: Specifies the type of id for the partition. The options are
-    `part-label` (partition label), `uuid` (filesystem UUID), and `part-uuid`
-    (partition UUID).
+<div id="verity-id"></div>
 
-  - `id`: The unique identifier value of the partition, corresponding to the
-    specified IdType.
+### id [string]
 
-- `hashPartition`: A partition used exclusively for storing a calculated hash
-  tree.
+Required.
 
-- `corruptionOption`: Optional. Specifies the behavior in case of detected
-  corruption. This is configurable with the following options:
-  - `io-error`: Default setting. Fails the I/O operation with an I/O error.
-  - `ignore`: ignores the corruption and continues operation.
-  - `panic`: causes the system to panic (print errors) and then try restarting
-    if corruption is detected.
-  - `restart`: attempts to restart the system upon detecting corruption.
+The ID of the verity object.
+This is used to correlate verity objects with [filesystem](#filesystem-type)
+objects.
 
-Example:
+<div id="verity-name"></div>
 
-```yaml
-os:
-  verity:
-    dataPartition:
-      idType: part-uuid
-      id: 00000000-0000-0000-0000-000000000000
-    hashPartition:
-      idType: part-label
-      Id: hash_partition
-    corruptionOption: panic
-```
+### name [string]
 
-## fileConfig type
+Required.
+
+The name of the device mapper block device.
+
+The value must be:
+
+- `root` for root partition (i.e. `/`)
+
+### dataDeviceId [string]
+
+The ID of the [partition](#partition-type) to use as the verity data partition.
+
+### hashDeviceId [string]
+
+The ID of the [partition](#partition-type) to use as the verity hash partition.
+
+### corruptionOption [string]
+
+Optional.
+
+Specifies how a mismatch between the hash and the data partition is handled.
+
+Supported values:
+
+- `io-error`: Fails the I/O operation with an I/O error.
+- `ignore`: Ignores the corruption and continues operation.
+- `panic`: Causes the system to panic (print errors) and then try restarting.
+- `restart`: Attempts to restart the system.
+
+Default value: `io-error`.
+
+## additionalFile type
 
 Specifies options for placing a file in the OS.
 
-Type is used by: [additionalFiles](#additionalfiles-mapstring-fileconfig)
+Type is used by: [additionalFiles](#additionalfiles-additionalfile)
 
-<div id="fileconfig-path"></div>
+### source [string]
 
-### path [string]
-
-The absolute path of the destination file.
+The path of the source file to copy to the destination path.
 
 Example:
 
@@ -409,6 +640,33 @@ os:
   additionalFiles:
     files/a.txt:
     - path: /a.txt
+```
+
+### content [string]
+
+The contents of the file to write to the destination path.
+
+Example:
+
+```yaml
+os:
+  additionalFiles:
+  - content: |
+      abc
+    destination: /a.txt
+```
+
+### destination [string]
+
+The absolute path of the destination file.
+
+Example:
+
+```yaml
+os:
+  additionalFiles:
+  - source: files/a.txt
+    destination: /a.txt
 ```
 
 ### permissions [string]
@@ -424,9 +682,9 @@ Example:
 ```yaml
 os:
   additionalFiles:
-    files/a.txt:
-    - path: /a.txt
-      permissions: "664"
+  - source: files/a.txt
+    destination: /a.txt
+    permissions: "664"
 ```
 
 ## dirConfig type
@@ -435,15 +693,15 @@ Specifies options for placing a directory in the OS.
 
 Type is used by: [additionalDirs](#additionaldirs-dirconfig)
 
-<div id="dirconfig-sourcePath"></div>
+<div id="dirconfig-source"></div>
 
-### sourcePath [string]
+### source [string]
 
 The absolute path to the source directory that will be copied.
 
-<div id="dirconfig-destinationPath"></div>
+<div id="dirconfig-destination"></div>
 
-### destinationPath [string]
+### destination [string]
 
 The absolute path in the target OS that the source directory will be copied to.
 
@@ -452,8 +710,8 @@ Example:
 ```yaml
 os:
   additionalDirs:
-    - sourcePath: "home/files/targetDir"
-      destinationPath: "usr/project/targetDir"
+    - source: "home/files/targetDir"
+      destination: "usr/project/targetDir"
 ```
 
 ### newDirPermissions [string]
@@ -481,14 +739,14 @@ Example:
 ```yaml
 os:
   additionalDirs:
-    - sourcePath: "home/files/targetDir"
-      destinationPath: "usr/project/targetDir"
+    - source: "home/files/targetDir"
+      destination: "usr/project/targetDir"
       newDirPermissions: "644"
       mergedDirPermissions: "777"
       childFilePermissions: "644"
 ```
 
-## fileSystem type
+## filesystem type
 
 Specifies the mount options for a partition.
 
@@ -496,8 +754,7 @@ Specifies the mount options for a partition.
 
 Required.
 
-The ID of the partition.
-This is used correlate [partition](#partition-type) objects with fileSystem objects.
+The ID of the [partition](#partition-type) or [verity](#verity-type) object.
 
 ### type [string]
 
@@ -508,7 +765,8 @@ The filesystem type of the partition.
 Supported options:
 
 - `ext4`
-- `fat32`
+- `fat32` (alias for `vfat`)
+- `vfat` (will select either FAT12, FAT16, or FAT32 based on the size of the partition)
 - `xfs`
 
 ### mountPoint [[mountPoint](#mountpoint-type)]
@@ -726,12 +984,14 @@ os:
 
 ## partition type
 
+<div id="partition-id"></div>
+
 ### id [string]
 
 Required.
 
 The ID of the partition.
-This is used to correlate Partition objects with [fileSystem](#filesystem-type)
+This is used to correlate Partition objects with [filesystem](#filesystem-type)
 objects.
 
 ### label [string]
@@ -787,7 +1047,7 @@ Specifies options for the partition.
 Supported options:
 
 - `esp`: The UEFI System Partition (ESP).
-  The partition must have a `fileSystemType` of `fat32`.
+  The partition must have a `fileSystemType` of `fat32` or `vfat`.
 
 - `bios-grub`: Specifies this partition is the BIOS boot partition.
   This is required for GPT disks that wish to be bootable using legacy BIOS mode.
@@ -850,6 +1110,25 @@ The password's value.
 The meaning of this value depends on the type property.
 
 ## mountPoint type
+
+You can configure `mountPoint` in one of two ways:
+
+1. **Structured Format**: Use `idType`, `options`, and `path` fields for a more detailed configuration.
+   
+   ```yaml
+   mountPoint:
+     path: /boot/efi
+     options: umask=0077
+     idType: part-uuid
+   ```
+
+2. **Shorthand Path Format**: Provide the mount path directly as a string when only `path` is required.
+
+   ```yaml
+   mountPoint: /boot/efi
+   ```
+
+   In this shorthand format, only the `path` is specified, and default values will be applied to any optional fields.
 
 ### idType [string]
 
@@ -941,7 +1220,7 @@ scripts:
     interpreter: python3
 ```
 
-### args [string[]]
+### arguments [string[]]
 
 Additional arguments to pass to the script.
 
@@ -951,7 +1230,7 @@ Example:
 scripts:
   postCustomization:
   - path: scripts/a.sh
-    args:
+    arguments:
     - abc
 ```
 
@@ -991,6 +1270,8 @@ scripts:
 ```
 
 ## scripts type
+
+Specifies custom scripts to run during the customization process.
 
 Note: Script files must be in the same directory or a child directory of the directory
 that contains the config file.
@@ -1032,7 +1313,7 @@ These scripts are run under a chroot of the customized OS.
 Example:
 
 ```yaml
-os:
+scripts:
   finalizeCustomization:
   - path: scripts/b.sh
 ```
@@ -1083,8 +1364,6 @@ Supported options:
   This includes removing any customized kernel command-line arguments that were added to
   base image.
 
-This field can only be specified if [Disks](#disks-disk) is also specified.
-
 ### hostname [string]
 
 Specifies the hostname for the OS.
@@ -1098,45 +1377,32 @@ os:
   hostname: example-image
 ```
 
+<div id="os-kernelcommandline"></div>
+
 ### kernelCommandLine [[kernelCommandLine](#kernelcommandline-type)]
 
-Specifies extra kernel command line options, as well as other configuration values
-relating to the kernel.
+Specifies extra kernel command line options.
 
 ### packages [packages](#packages-type)
 
 Remove, update, and install packages on the system.
 
-### additionalFiles [map\<string, [fileConfig](#fileconfig-type)[]>]
+<div id="os-additionalfiles"></div>
+
+### additionalFiles [[additionalFile](#additionalfile-type)[]>]
 
 Copy files into the OS image.
-
-This property is a dictionary of source file paths to destination files.
-
-The destination files value can be one of:
-
-- The absolute path of a destination file.
-- A [fileConfig](#fileconfig-type) object.
-- A list containing a mixture of paths and [fileConfig](#fileconfig-type) objects.
-
-Example:
 
 ```yaml
 os:
   additionalFiles:
-    # Single destination.
-    files/a.txt: /a.txt
+  - source: files/a.txt
+    destination: /a.txt
 
-    # Single destinations with options.
-    files/b.txt:
-      path: /b.txt
-      permissions: "664"
-
-    # Multiple destinations.
-    files/c.txt:
-    - /c1.txt
-    - path: /c2.txt
-      permissions: "664"
+  - content: |
+      abc
+    destination: /b.txt
+    permissions: "664"
 ```
 
 ### additionalDirs [[dirConfig](#dirconfig-type)[]]
@@ -1151,11 +1417,11 @@ Example:
 os:
   additionalDirs:
     # Copying directory with default permission options.
-    - sourcePath: "path/to/local/directory/"
-      destinationPath: "/path/to/destination/directory/"
+    - source: "path/to/local/directory/"
+      destination: "/path/to/destination/directory/"
     # Copying directory with specific permission options.
-    - sourcePath: "path/to/local/directory/"
-      destinationPath: "/path/to/destination/directory/"
+    - source: "path/to/local/directory/"
+      destination: "/path/to/destination/directory/"
       newDirPermissions: 0644
       mergedDirPermissions: 0777
       childFilePermissions: 0644
@@ -1184,6 +1450,10 @@ os:
   modules:
     - name: vfio
 ```
+
+### overlays [[overlay](#overlay-type)[]]
+
+Used to add filesystem overlays.
 
 ### selinux [[selinux](#selinux-type)]
 
@@ -1250,7 +1520,7 @@ Specifies the user's password.
 
 WARNING: Passwords should not be used in images used in production.
 
-### PasswordExpiresDays [int]
+### passwordExpiresDays [int]
 
 The number of days until the password expires and the user can no longer login.
 
@@ -1269,7 +1539,7 @@ os:
 
 ### sshPublicKeyPaths [string[]]
 
-File paths to SSH public key files.
+A list of file paths to SSH public key files.
 These public keys will be copied into the user's `~/.ssh/authorized_keys` file.
 
 Note: It is preferable to use Microsoft Entra ID for SSH authentication, instead of
@@ -1283,6 +1553,24 @@ os:
   - name: test
     sshPublicKeyPaths:
     - id_ed25519.pub
+```
+
+### sshPublicKeys [string[]]
+
+A list of SSH public keys.
+These public keys will be copied into the user's `~/.ssh/authorized_keys` file.
+
+Note: It is preferable to use Microsoft Entra ID for SSH authentication, instead of
+individual public keys.
+
+Example:
+
+```yaml
+os:
+  users:
+  - name: test
+    sshPublicKeys:
+    - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFyWtgGE06d/uBFQm70tYKvJKwJfRDoh06bWQQwC6Qkm test@test-machine
 ```
 
 ### primaryGroup [string]
@@ -1408,6 +1696,36 @@ Supported options:
 
 Contains the options for provisioning disks and their partitions.
 
-### fileSystems [[fileSystem](#filesystem-type)[]]
+### verity [[verity](#verity-type)[]]
+
+Configure verity block devices.
+
+### filesystems [[filesystem](#filesystem-type)[]]
 
 Specifies the mount options of the partitions.
+
+### resetPartitionsUuidsType [string]
+
+Specifies that the partition UUIDs and filesystem UUIDs should be reset.
+
+Value is optional.
+
+This value cannot be specified if [storage](#storage-storage) is specified (since
+customizing the partition layout resets all the UUIDs anyway).
+
+If this value is specified, then [os.resetBootLoaderType](#resetbootloadertype-string)
+must also be specified.
+
+Supported options:
+
+- `reset-all`: Resets the partition UUIDs and filesystem UUIDs for all the partitions.
+
+Example:
+
+```yaml
+storage:
+  resetPartitionsUuidsType: reset-all
+
+os:
+  resetBootLoaderType: hard-reset
+```

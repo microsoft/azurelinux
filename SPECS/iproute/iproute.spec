@@ -1,7 +1,7 @@
 Summary:        Basic and advanced IPV4-based networking
 Name:           iproute
 Version:        6.7.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 URL:            https://www.kernel.org/pub/linux/utils/net/iproute2
 Group:          Applications/System
@@ -16,7 +16,6 @@ BuildRequires:      gcc
 BuildRequires:      iptables-devel >= 1.4.5
 BuildRequires:      libbpf-devel
 BuildRequires:      libcap-devel
-BuildRequires:      libdb-devel
 BuildRequires:      libmnl-devel
 BuildRequires:      libselinux-devel
 BuildRequires:      make
@@ -126,6 +125,9 @@ rm -rf '%{buildroot}%{_docdir}'
 %{_includedir}/iproute2/bpf_elf.h
  
 %changelog
+* Fri Jun 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.7.0-2
+- Remove dependency on 'libdb'.
+
 * Mon Feb 05 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 6.7.0-1
 - Update libvirt to v6.7.0
 - Use Fedora 39 as basis for new packaging (tc)

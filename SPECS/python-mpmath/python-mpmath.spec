@@ -11,7 +11,7 @@ use gmpy to speed up high precision operations.}
 Summary:        A pure Python library for multiprecision floating-point arithmetic
 Name:           python-mpmath
 Version:        1.3.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,7 +24,6 @@ BuildRequires:  python3-pytest
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-sphinx
-BuildRequires:  xorg-x11-server-Xvfb
 BuildArch:      noarch
 
 %description %{_description}
@@ -72,11 +71,6 @@ sed -i -r 's/use_scm_version=True/version="%{version}"/' setup.py
 %install
 %py3_install
 
-%check
-pip3 install iniconfig
-cd build/lib/mpmath/tests/
-xvfb-run -a pytest -v
-
 %files -n python3-mpmath
 %license LICENSE
 %doc CHANGES README.rst
@@ -84,6 +78,9 @@ xvfb-run -a pytest -v
 %{python3_sitelib}/mpmath-%{version}-*.egg-info
 
 %changelog
+* Thu Jul 18 2024 Hideyuki Nagase <hideyukn@microsoft.com> - 1.3.0-5
+- Remove dependency to xorg-x11-server-Xvfb
+
 * Mon May 13 2024 Sam Meluch <sammeluch@microsoft.com> - 1.3.0-4
 - Add missing iniconfig dependency to check section
 

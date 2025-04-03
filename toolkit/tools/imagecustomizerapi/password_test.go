@@ -36,3 +36,13 @@ func TestPasswordInvalidType(t *testing.T) {
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "invalid password type (hello)")
 }
+
+func TestPasswordEmptyValue(t *testing.T) {
+	password := Password{
+		Type:  PasswordTypePlainText,
+		Value: "",
+	}
+	err := password.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "password value can't be empty with type (plain-text)")
+}

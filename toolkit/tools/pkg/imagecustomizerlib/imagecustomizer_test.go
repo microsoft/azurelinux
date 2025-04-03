@@ -22,58 +22,8 @@ const (
 	testImageRootDirName = "testimageroot"
 )
 
-func TestCustomizeImageEmptyConfig(t *testing.T) {
-	var err error
-
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
-
-	buildDir := filepath.Join(tmpDir, "TestCustomizeImageEmptyConfig")
-	outImageFilePath := filepath.Join(buildDir, "image.vhd")
-
-	// Customize image.
-	err = CustomizeImage(buildDir, buildDir, &imagecustomizerapi.Config{}, baseImage, nil, outImageFilePath,
-		"vhd", "", false, false)
-	if !assert.NoError(t, err) {
-		return
-	}
-
-	// Check output file type.
-	checkFileType(t, outImageFilePath, "vhd")
-}
-
-func TestCustomizeImageCopyFiles(t *testing.T) {
-	var err error
-
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
-
-	buildDir := filepath.Join(tmpDir, "TestCustomizeImageCopyFiles")
-	configFile := filepath.Join(testDir, "addfiles-config.yaml")
-	outImageFilePath := filepath.Join(buildDir, "image.qcow2")
-
-	// Customize image.
-	err = CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "raw", "", false, false)
-	if !assert.NoError(t, err) {
-		return
-	}
-
-	// Check output file type.
-	checkFileType(t, outImageFilePath, "raw")
-
-	// Mount the output disk image so that its contents can be checked.
-	imageConnection, err := connectToCoreEfiImage(buildDir, outImageFilePath)
-	if !assert.NoError(t, err) {
-		return
-	}
-	defer imageConnection.Close()
-
-	// Check the contents of the copied file.
-	file_contents, err := os.ReadFile(filepath.Join(imageConnection.Chroot().RootDir(), "a.txt"))
-	assert.NoError(t, err)
-	assert.Equal(t, "abcdefg\n", string(file_contents))
-}
-
-func connectToCoreEfiImage(buildDir string, imageFilePath string) (*ImageConnection, error) {
-	return connectToImage(buildDir, imageFilePath, []mountPoint{
+var (
+	coreEfiMountPoints = []mountPoint{
 		{
 			PartitionNum:   2,
 			Path:           "/",
@@ -84,16 +34,50 @@ func connectToCoreEfiImage(buildDir string, imageFilePath string) (*ImageConnect
 			Path:           "/boot/efi",
 			FileSystemType: "vfat",
 		},
-	})
+	}
+
+	coreLegacyMountPoints = []mountPoint{
+		{
+			PartitionNum:   2,
+			Path:           "/",
+			FileSystemType: "ext4",
+		},
+	}
+)
+
+func TestCustomizeImageEmptyConfig(t *testing.T) {
+	var err error
+
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
+
+	buildDir := filepath.Join(tmpDir, "TestCustomizeImageEmptyConfig")
+	outImageFilePath := filepath.Join(buildDir, "image.vhd")
+
+	// Customize image.
+	err = CustomizeImage(buildDir, buildDir, &imagecustomizerapi.Config{}, baseImage, nil, outImageFilePath,
+		"vhd", "",
+		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	// Check output file type.
+	checkFileType(t, outImageFilePath, "vhd")
+}
+
+func connectToCoreEfiImage(buildDir string, imageFilePath string) (*ImageConnection, error) {
+	return connectToImage(buildDir, imageFilePath, false /*includeDefaultMounts*/, coreEfiMountPoints)
 }
 
 type mountPoint struct {
 	PartitionNum   int
 	Path           string
 	FileSystemType string
+	Flags          uintptr
 }
 
-func connectToImage(buildDir string, imageFilePath string, mounts []mountPoint) (*ImageConnection, error) {
+func connectToImage(buildDir string, imageFilePath string, includeDefaultMounts bool, mounts []mountPoint,
+) (*ImageConnection, error) {
 	imageConnection := NewImageConnection()
 	err := imageConnection.ConnectLoopback(imageFilePath)
 	if err != nil {
@@ -105,20 +89,20 @@ func connectToImage(buildDir string, imageFilePath string, mounts []mountPoint) 
 
 	mountPoints := []*safechroot.MountPoint(nil)
 	for _, mount := range mounts {
-		devPath := fmt.Sprintf("%sp%d", imageConnection.Loopback().DevicePath(), mount.PartitionNum)
+		devPath := partitionDevPath(imageConnection, mount.PartitionNum)
 
 		var mountPoint *safechroot.MountPoint
 		if mount.Path == "/" {
-			mountPoint = safechroot.NewPreDefaultsMountPoint(devPath, mount.Path, mount.FileSystemType, 0,
+			mountPoint = safechroot.NewPreDefaultsMountPoint(devPath, mount.Path, mount.FileSystemType, mount.Flags,
 				"")
 		} else {
-			mountPoint = safechroot.NewMountPoint(devPath, mount.Path, mount.FileSystemType, 0, "")
+			mountPoint = safechroot.NewMountPoint(devPath, mount.Path, mount.FileSystemType, mount.Flags, "")
 		}
 
 		mountPoints = append(mountPoints, mountPoint)
 	}
 
-	err = imageConnection.ConnectChroot(rootDir, false, []string{}, mountPoints, false)
+	err = imageConnection.ConnectChroot(rootDir, false, []string{}, mountPoints, includeDefaultMounts)
 	if err != nil {
 		imageConnection.Close()
 		return nil, err
@@ -127,11 +111,19 @@ func connectToImage(buildDir string, imageFilePath string, mounts []mountPoint) 
 	return imageConnection, nil
 }
 
+func partitionDevPath(imageConnection *ImageConnection, partitionNum int) string {
+	devPath := fmt.Sprintf("%sp%d", imageConnection.Loopback().DevicePath(), partitionNum)
+	return devPath
+}
+
 func TestValidateConfigValidAdditionalFiles(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
 		OS: &imagecustomizerapi.OS{
-			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
-				"files/a.txt": {{Path: "/a.txt"}},
+			AdditionalFiles: imagecustomizerapi.AdditionalFileList{
+				{
+					Source:      "files/a.txt",
+					Destination: "/a.txt",
+				},
 			},
 		}}, nil, true)
 	assert.NoError(t, err)
@@ -140,8 +132,11 @@ func TestValidateConfigValidAdditionalFiles(t *testing.T) {
 func TestValidateConfigMissingAdditionalFiles(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
 		OS: &imagecustomizerapi.OS{
-			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
-				"files/missing_a.txt": {{Path: "/a.txt"}},
+			AdditionalFiles: imagecustomizerapi.AdditionalFileList{
+				{
+					Source:      "files/missing_a.txt",
+					Destination: "/a.txt",
+				},
 			},
 		}}, nil, true)
 	assert.Error(t, err)
@@ -150,8 +145,11 @@ func TestValidateConfigMissingAdditionalFiles(t *testing.T) {
 func TestValidateConfigdditionalFilesIsDir(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
 		OS: &imagecustomizerapi.OS{
-			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
-				"files": {{Path: "/a.txt"}},
+			AdditionalFiles: imagecustomizerapi.AdditionalFileList{
+				{
+					Source:      "files",
+					Destination: "/a.txt",
+				},
 			},
 		}}, nil, true)
 	assert.Error(t, err)
@@ -187,7 +185,7 @@ func TestValidateConfigScriptNonLocalFile(t *testing.T) {
 func TestCustomizeImageKernelCommandLineAdd(t *testing.T) {
 	var err error
 
-	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi)
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	buildDir := filepath.Join(tmpDir, "TestCustomizeImageKernelCommandLine")
 	outImageFilePath := filepath.Join(buildDir, "image.vhd")
@@ -201,7 +199,8 @@ func TestCustomizeImageKernelCommandLineAdd(t *testing.T) {
 		},
 	}
 
-	err = CustomizeImage(buildDir, buildDir, config, baseImage, nil, outImageFilePath, "raw", "", false, false)
+	err = CustomizeImage(buildDir, buildDir, config, baseImage, nil, outImageFilePath, "raw", "",
+		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
 		return
 	}

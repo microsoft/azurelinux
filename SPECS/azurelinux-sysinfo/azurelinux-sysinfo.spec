@@ -1,7 +1,7 @@
 Summary:        Package to deploy azurelinux-sysinfo service
 Name:           azurelinux-sysinfo
 Version:        %{azl}.0
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,8 @@ Source2:        azurelinux-sysinfo.service
 Source3:        sysinfo-selinuxpolicies.cil
 Requires:       systemd
 Requires:       python3-psutil
+Requires:       libselinux-utils
+Requires:       rpm
 
 %description
 Deploys a systemd service that gathers system information related to the device, operating system, cloud-init, boot 
@@ -61,6 +63,12 @@ if rpm -q selinux-policy &> /dev/null; then
 fi
 
 %changelog
+* Mon Sep 09 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.0-3
+- Add rpm as a requirement.
+
+* Mon June 24 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.0-2
+- Add libselinux-utils as a requirement; needed for `getenforce`.
+
 * Thu Apr 04 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.0-1
 - License verified.
 - Implementation of package that deploys azurelinux-sysinfo service.

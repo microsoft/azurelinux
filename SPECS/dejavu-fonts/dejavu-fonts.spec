@@ -8,8 +8,8 @@
 Summary:        The DejaVu fonts families
 Name:           dejavu-fonts
 Version:        2.37
-Release:        2%{?dist}
-License:        Bistream Vera Font AND Arev Fonts
+Release:        3%{?dist}
+License:        Bistream Vera Font AND Arev Fonts AND AMSFonts AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
@@ -101,6 +101,9 @@ install ttf/DejaVuMathTeXGyre.ttf %{buildroot}%{_serif_fontdir}
 %{_serif_fontdir}/*.ttf
 
 %changelog
+* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.37-3
+- License verified.
+
 * Fri Jul 09 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.37-2
 - Renaming to 'dejavu-fonts'.
 - Adding 'dejavu-sans-mono-fonts' and 'dejavu-serif-fonts' subpackages.

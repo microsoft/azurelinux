@@ -6,7 +6,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.25.4
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,6 +15,8 @@ URL:            https://nginx.org/
 Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        https://github.com/nginx/njs/archive/refs/tags/%{njs_version}.tar.gz#/%{name}-njs-%{njs_version}.tar.gz
+Patch0:         CVE-2024-7347.patch
+Patch1:         CVE-2025-23419.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
@@ -127,6 +129,12 @@ exit 0
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Tue Feb 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.25.4-3
+- Fix CVE-2025-234419
+
+* Tue Aug 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.25.4-2
+- Fix CVE-2024-7347
+
 * Wed Mar 20 2024 Betty Lakes <bettylakes@microsoft.com> - 1.25.4-1
 - Upgrade to 1.25.4, upgrade njs to 0.8.3
 - Move from pcre to pcre2

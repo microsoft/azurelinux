@@ -16,6 +16,12 @@ func TestDiskSizeNum(t *testing.T) {
 	assert.ErrorContains(t, err, "must have a unit suffix (K, M, G, or T)")
 }
 
+func TestDiskSizeNumTooLarge(t *testing.T) {
+	var diskSize DiskSize
+	err := UnmarshalYaml([]byte("18446744073709551616M"), &diskSize)
+	assert.ErrorContains(t, err, "value out of range")
+}
+
 func TestDiskSizeKiB(t *testing.T) {
 	var diskSize DiskSize
 	err := UnmarshalYaml([]byte("1024K"), &diskSize)
@@ -66,4 +72,24 @@ func TestDiskSizeBadFormat(t *testing.T) {
 	var diskSize DiskSize
 	err := UnmarshalYaml([]byte("2M2"), &diskSize)
 	assert.ErrorContains(t, err, "has incorrect format")
+}
+
+func TestDiskSizeHumanReadableTiB(t *testing.T) {
+	assert.Equal(t, DiskSize(diskutils.TiB).HumanReadable(), "1 TiB")
+}
+
+func TestDiskSizeHumanReadableGiB(t *testing.T) {
+	assert.Equal(t, DiskSize(diskutils.GiB).HumanReadable(), "1 GiB")
+}
+
+func TestDiskSizeHumanReadableMiB(t *testing.T) {
+	assert.Equal(t, DiskSize(diskutils.MiB).HumanReadable(), "1 MiB")
+}
+
+func TestDiskSizeHumanReadableKiB(t *testing.T) {
+	assert.Equal(t, DiskSize(diskutils.KiB).HumanReadable(), "1 KiB")
+}
+
+func TestDiskSizeHumanReadableBytes(t *testing.T) {
+	assert.Equal(t, DiskSize(1).HumanReadable(), "1 bytes")
 }

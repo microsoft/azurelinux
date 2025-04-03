@@ -2,7 +2,7 @@
 Summary:        Web-based Network Traffic Monitoring Application
 Name:           ntopng
 Version:        5.2.1
-Release:        2%{?dist}
+Release:        5%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,11 @@ Source0:        %{name}-%{version}.tar.gz
 #Source1:       https://github.com/ntop/nDPI/archive/%{nDPIver}.tar.gz
 Source1:        nDPI-%{nDPIver}.tar.gz
 Patch1:         CVE-2021-45985.patch
+Patch2:         CVE-2022-28805.patch
+Patch3:         CVE-2017-18214.patch
+Patch4:         CVE-2022-33099.patch
+Patch5:         CVE-2021-44647.patch
+Patch6:         CVE-2021-43519.patch
 BuildRequires:  curl-devel
 BuildRequires:  gcc
 BuildRequires:  glib-devel
@@ -62,6 +67,15 @@ mv nDPI-%{nDPIver} nDPI
 %{_datadir}/ntopng/*
 
 %changelog
+* Thu Feb 06 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 5.2.1-5
+- Patch to fix CVE-2021-44647 and CVE-2021-43519.
+
+* Mon Jul 08 2024 Andrew Phelps <anphel@microsoft.com> - 5.2.1-4
+- Add patches for CVE-2017-18214 and CVE-2022-33099
+
+* Wed Jun 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 5.2.1-3
+- Patch CVE-2022-28805 on integrated lua source
+
 * Tue Apr 18 2023 Bala <balakumaran.kannan@microsoft.com> - 5.2.1-2
 - Patch CVE-2021-45985 on integrated lua source
 

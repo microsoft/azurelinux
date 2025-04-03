@@ -1,11 +1,11 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 10.2.3
+%define npm_version 10.7.0
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        20.10.0
-Release:        3%{?dist}
+Version:        20.14.0
+Release:        5%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,9 +13,16 @@ Group:          Applications/System
 URL:            https://github.com/nodejs/node
 # !!!! Nodejs code has a vendored version of OpenSSL code that must be removed from source tarball
 # !!!! because it contains patented algorithms.
-# !!!  => use clean-source-tarball.sh script to create a clean and reproducible source tarball.
+# !!!  => use generate_source_tarball.sh script to create a clean and reproducible source tarball.
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
 Patch0:         disable-tlsv1-tlsv1-1.patch
+Patch1:         CVE-2019-10906.patch
+Patch2:         CVE-2024-21538.patch
+Patch3:         CVE-2025-23083.patch
+Patch4:         CVE-2025-22150.patch
+Patch5:         CVE-2025-23085.patch
+Patch6:         CVE-2024-22020.patch
+Patch7:         CVE-2024-22195.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -127,7 +134,22 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
-* Mon Jun 06 2024 Riken Maharjan <rmaharjan@microsoft.com> - 20.10.0-3
+* Tue Feb 11 2025 Kanishk Bansal <kanbansal@microsoft.com> - 20.14.0-5
+- Patch CVE-2025-22150, CVE-2025-23085, CVE-2024-22020, CVE-2024-22195
+
+* Mon Jan 27 2025 Sumedh Sharma <sumsharma@microsoft.com> - 20.14.0-4
+- Patch CVE-2025-23083
+
+* Tue Nov 19 2024 Bala <balakumaran.kannan@microsoft.com> - 20.14.0-3
+- Patch CVE-2024-21538
+
+* Thu Sep 19 2024 Suresh Thelkar <sthelkar@microsoft.com> - 20.14.0-2
+- Patch CVE-2019-10906
+
+* Fri Jun 07 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 20.14.0-1
+- Upgrade to 20.14.0 to address CVEs
+
+* Thu Jun 06 2024 Riken Maharjan <rmaharjan@microsoft.com> - 20.10.0-3
 - Separate npm from node using Fedora 50 (LICENSE: MIT)
 
 * Tue May 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 20.10.0-2

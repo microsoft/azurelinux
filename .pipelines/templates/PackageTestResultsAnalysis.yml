@@ -281,14 +281,16 @@ steps:
 
   - ${{ if parameters.failOnTestFailures }}:
       - bash: |
-            report_path="${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}"
-            if [[ ! -f "$report_path" ]]; then
-                echo "##[error]Test report not found at '$report_path'."
-                exit 1
-            fi
+          report_path="${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}"
+          if [[ ! -f "$report_path" ]]; then
+              echo "##[error]Test report not found at '$report_path'."
+              exit 1
+          fi
 
-            if ! grep -q '^<testsuites.*failures="0"' "$report_path"; then
-                echo "##[error]Test report has failing tests. See the 'Tests' tab for details."
-                exit 1
-            fi
+          # The "failures" attribute indicates completed tests where at least one of the test cases failed.
+          # The "errors" attribute indicates tests, which failed to complete for whatever reason.
+          if grep -qP '^<testsuites.*(errors|failures)="(?!0)' "$report_path"; then
+              echo "##[error]Test report has failing tests. See the 'Tests' tab for details."
+              exit 1
+          fi
         displayName: "Verify all tests passed"

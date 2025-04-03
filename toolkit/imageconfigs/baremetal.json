@@ -52,7 +52,7 @@
             ],
             "KernelCommandLine": {
                 "ExtraCommandLine": "console=tty0 console=ttyS0 rd.info log_buf_len=1M",
-                "SELinux": "permissive"
+                "SELinux": "enforcing"
             },
             "KernelOptions": {
                 "default": "kernel"

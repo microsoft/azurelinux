@@ -63,10 +63,25 @@ const (
 )
 
 const (
-	installedRPMRegexRPMIndex        = 1
-	installedRPMRegexArchIndex       = 2
-	installedRPMRegexExpectedMatches = 3
+	packageFQNRegexMatchSubString  = iota
+	packageFQNRegexNameIndex       = iota
+	packageFQNRegexEpochIndex      = iota
+	packageFQNRegexVersionIndex    = iota
+	packageFQNRegexReleaseIndex    = iota
+	packageFQNRegexArchIndex       = iota
+	packageFQNRegexExtensionIndex  = iota
+	packageFQNRegexExpectedMatches = iota
+)
 
+const (
+	installedRPMRegexMatchSubString  = iota
+	installedRPMRegexRPMIndex        = iota
+	installedRPMRegexVersionIndex    = iota
+	installedRPMRegexArchIndex       = iota
+	installedRPMRegexExpectedMatches = iota
+)
+
+const (
 	rpmProgram      = "rpm"
 	rpmSpecProgram  = "rpmspec"
 	rpmBuildProgram = "rpmbuild"
@@ -82,14 +97,33 @@ var (
 	// It works multi-line strings containing the whole file content, thus the need for the 'm' flag.
 	checkSectionRegex = regexp.MustCompile(`(?m)^\s*%check`)
 
+	// A full qualified RPM name contains the package name, epoch, version, release, architecture, and extension.
+	// Optional fields:
+	// 	- epoch,
+	// 	- architecture.
+	//	- "rpm" extension.
+	//
+	// Sample match:
+	//
+	//	pkg-name-0:1.2.3-4.azl3.x86_64.rpm
+	//
+	// Groups can be used to split it into:
+	//   - name:			pkg-name
+	//   - epoch:			0
+	//   - version:			1.2.3
+	//   - release:			4.azl3
+	//   - architecture:	x86_64
+	//   - extension:		rpm
+	packageFQNRegex = regexp.MustCompile(`^\s*(\S+[^-])-(?:(\d+):)?(\d[^-:_]*)-(\d+(?:[^-\s]*?))(?:\.(noarch|x86_64|aarch64|src))?(?:\.(rpm))?\s*$`)
+
 	// Output from 'rpm' prints installed RPMs in a line with the following format:
 	//
-	//	D: ========== +++ [name]-[version]-[release].[distribution] [architecture]-linux [hex_value]
+	//	D: ========== +++ [name]-([epoch]:)[version]-[release].[distribution] [architecture]-linux [hex_value]
 	//
 	// Example:
 	//
 	//	D: ========== +++ systemd-devel-239-42.azl3 x86_64-linux 0x0
-	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+) (\S+)-linux.*$`)
+	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+)-([^-]+-[^-]+) (\S+)-linux.*$`)
 
 	// For most use-cases, the distro name abbreviation and major version are set by the exe package. However, if the
 	// module is used outside of the main Azure Linux build system, the caller can override these values with SetDistroMacros().
@@ -186,19 +220,15 @@ func getMacroDirWithFallback(allowDefault bool) (macroDir string, err error) {
 func ExtractNameFromRPMPath(rpmFilePath string) (packageName string, err error) {
 	baseName := filepath.Base(rpmFilePath)
 
+	matches := packageFQNRegex.FindStringSubmatch(baseName)
+
 	// If the path is invalid, return empty string. We consider any string that has at least 1 '-' characters valid.
-	if !strings.Contains(baseName, "-") {
+	if matches == nil {
 		err = fmt.Errorf("invalid RPM file path (%s), can't extract name", rpmFilePath)
 		return
 	}
 
-	rpmFileSplit := strings.Split(baseName, "-")
-	packageName = strings.Join(rpmFileSplit[:len(rpmFileSplit)-2], "-")
-	if packageName == "" {
-		err = fmt.Errorf("invalid RPM file path (%s), can't extract name", rpmFilePath)
-		return
-	}
-	return
+	return matches[packageFQNRegexNameIndex], nil
 }
 
 // getCommonBuildArgs will generate arguments to pass to 'rpmbuild'.
@@ -368,6 +398,50 @@ func QueryPackage(packageFile, queryFormat string, defines map[string]string, ex
 	return executeRpmCommand(rpmProgram, args...)
 }
 
+// QueryPackageFiles queries an RPM for its file contents. The results are split into several categories:
+// - allFilesAndDirectories: all files and directories in the package
+// - files: all files in the package (ie allFilesAndDirectories minus directories)
+// - directories: all directories in the package (ie allFilesAndDirectories minus files, symlinks etc.)
+// - documentFiles: all files marked as documentation (%doc)
+// - licenseFiles: all files marked as license (%license)
+func QueryPackageFiles(packageFile string, defines map[string]string,
+) (allFilesAndDirectories, files, directories, documentFiles, licenseFiles []string, err error) {
+	const allFilesQueryFormat = "[%{FILEMODES:perms} %{FILENAMES}\n]"
+	allFilesWithPerms, err := QueryPackage(packageFile, allFilesQueryFormat, defines)
+	if err != nil {
+		return nil, nil, nil, nil, nil, fmt.Errorf("failed to query package (%s) files:\n%w", packageFile, err)
+	}
+	// Parse the output of the query to separarate directories. Output will be of the form:
+	// 	drwxr-xr-x /a/directory
+	// 	-rw-r--r-- /a/directory/a_file
+	// Any line that starts with a 'd' is a directory, everything else is a file (or symlink etc.).
+	for _, fileLine := range allFilesWithPerms {
+		perms, filePath, found := strings.Cut(fileLine, " ")
+		if !found {
+			return nil, nil, nil, nil, nil, fmt.Errorf("failed to parse package (%s) file contents (%s)", packageFile, fileLine)
+		}
+		if strings.HasPrefix(perms, "d") {
+			directories = append(directories, filePath)
+		} else {
+			files = append(files, filePath)
+		}
+		allFilesAndDirectories = append(allFilesAndDirectories, filePath)
+	}
+
+	// rpm has dedicated tags for documentation and license files, so we can query them directly.
+	documentFiles, err = QueryPackage(packageFile, "", defines, "-d")
+	if err != nil {
+		return nil, nil, nil, nil, nil, fmt.Errorf("failed to query package (%s) documentation files:\n%w", packageFile, err)
+	}
+
+	licenseFiles, err = QueryPackage(packageFile, "", defines, "-L")
+	if err != nil {
+		return nil, nil, nil, nil, nil, fmt.Errorf("failed to query package (%s) license files:\n%w", packageFile, err)
+	}
+
+	return allFilesAndDirectories, files, directories, documentFiles, licenseFiles, nil
+}
+
 // BuildRPMFromSRPM builds an RPM from the given SRPM file but does not run its '%check' section.
 func BuildRPMFromSRPM(srpmFile, outArch string, defines map[string]string) (err error) {
 	const squashErrors = true
@@ -466,15 +540,25 @@ func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs 
 	splitStdout := strings.Split(stderr, "\n")
 	uniqueResolvedRPMs := map[string]bool{}
 	for _, line := range splitStdout {
-		matches := installedRPMRegex.FindStringSubmatch(line)
-		if len(matches) == installedRPMRegexExpectedMatches {
-			rpmName := fmt.Sprintf("%s.%s", matches[installedRPMRegexRPMIndex], matches[installedRPMRegexArchIndex])
+		if match, rpmName := extractCompetingPackageInfoFromLine(line); match {
 			uniqueResolvedRPMs[rpmName] = true
 		}
 	}
 
 	resolvedRPMs = sliceutils.SetToSlice(uniqueResolvedRPMs)
 	return
+}
+
+func extractCompetingPackageInfoFromLine(line string) (match bool, pkgName string) {
+	matches := installedRPMRegex.FindStringSubmatch(line)
+	if len(matches) == installedRPMRegexExpectedMatches {
+		pkgName := matches[installedRPMRegexRPMIndex]
+		version := matches[installedRPMRegexVersionIndex]
+		arch := matches[installedRPMRegexArchIndex]
+
+		return true, fmt.Sprintf("%s-%s.%s", pkgName, version, arch)
+	}
+	return false, ""
 }
 
 // SpecExclusiveArchIsCompatible verifies the "ExclusiveArch" tag is compatible with the current machine's architecture.
@@ -575,6 +659,39 @@ func BuildCompatibleSpecsList(baseDir string, inputSpecPaths []string, defines m
 	}
 
 	return filterCompatibleSpecs(specPaths, defines)
+}
+
+// StripEpochFromPackageFullQualifiedName removes the epoch from a package full qualified name if it is present.
+// Example:
+//
+//	"pkg-name-0:1.2.3-4.azl3.x86_64" -> "pkg-name-1.2.3-4.azl3.x86_64"
+func StripEpochFromPackageFullQualifiedName(packageFQN string) string {
+	var packageFQNBuilder strings.Builder
+
+	matches := packageFQNRegex.FindStringSubmatch(packageFQN)
+	if matches == nil {
+		return packageFQN
+	}
+
+	packageFQNBuilder.WriteString(matches[packageFQNRegexNameIndex])
+	packageFQNBuilder.WriteString("-")
+
+	packageFQNBuilder.WriteString(matches[packageFQNRegexVersionIndex])
+	packageFQNBuilder.WriteString("-")
+
+	packageFQNBuilder.WriteString(matches[packageFQNRegexReleaseIndex])
+
+	if matches[packageFQNRegexArchIndex] != "" {
+		packageFQNBuilder.WriteString(".")
+		packageFQNBuilder.WriteString(matches[packageFQNRegexArchIndex])
+	}
+
+	if matches[packageFQNRegexExtensionIndex] != "" {
+		packageFQNBuilder.WriteString(".")
+		packageFQNBuilder.WriteString(matches[packageFQNRegexExtensionIndex])
+	}
+
+	return packageFQNBuilder.String()
 }
 
 // TestRPMFromSRPM builds an RPM from the given SRPM and runs its '%check' section SRPM file

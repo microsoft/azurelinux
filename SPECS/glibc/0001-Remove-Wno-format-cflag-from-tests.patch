@@ -1,0 +1,52 @@
+From 8768893dbd2b055f71c719e5135d9b8720731d81 Mon Sep 17 00:00:00 2001
+From: Rachel Menge <rachelmenge@microsoft.com>
+Date: Fri, 7 Jun 2024 21:17:37 +0000
+Subject: [PATCH] Remove -Wno-format cflag from tests
+
+This flag prevents the error
+"c1: error: '-Wformat-security' ignored without '-Wformat' [-Werror=format-security]"
+The error occurs when glibc is compiled with -Wformat-security which
+requires -Wformat and thus conflicts with tests which use -Wno-format
+---
+ debug/Makefile | 4 ++--
+ time/Makefile  | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/debug/Makefile b/debug/Makefile
+index 434e52f7..05363c26 100644
+--- a/debug/Makefile
++++ b/debug/Makefile
+@@ -192,7 +192,7 @@ tests-cc-def-chk =
+ tests-c-time64-chk =
+ tests-cc-time64-chk =
+ 
+-CFLAGS-tst-fortify.c += -Wno-format -Wno-deprecated-declarations -Wno-error
++CFLAGS-tst-fortify.c += -Wno-deprecated-declarations
+ 
+ # No additional flags for the default tests.
+ define cflags-default
+@@ -215,7 +215,7 @@ src-chk-nongnu = \#undef _GNU_SOURCE
+ # cannot be disabled via pragmas, so require -Wno-error to be used.
+ define gen-chk-test
+ tests-$(1)-$(4)-chk += tst-fortify-$(1)-$(2)-$(3)-$(4)
+-CFLAGS-tst-fortify-$(1)-$(2)-$(3)-$(4).$(1) += $(no-fortify-source),-D_FORTIFY_SOURCE=$(3) -Wno-format \
++CFLAGS-tst-fortify-$(1)-$(2)-$(3)-$(4).$(1) += $(no-fortify-source),-D_FORTIFY_SOURCE=$(3) \
+ 					  -Wno-deprecated-declarations \
+ 					  -Wno-error
+ $(eval $(call cflags-$(2),$(1),$(3),$(4)))
+diff --git a/time/Makefile b/time/Makefile
+index 1d2e667c..8b878bcc 100644
+--- a/time/Makefile
++++ b/time/Makefile
+@@ -102,7 +102,7 @@ CFLAGS-nanosleep.c += -fexceptions -fasynchronous-unwind-tables
+ CFLAGS-mktime.c += $(config-cflags-wno-ignored-attributes)
+ 
+ # Don't warn about Y2k problem in strftime format string.
+-CFLAGS-test_time.c += -Wno-format
++CFLAGS-test_time.c += -Wformat
+ 
+ test_time-ARGS= EST5EDT CST
+ 
+-- 
+2.34.1
+

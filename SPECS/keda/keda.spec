@@ -1,7 +1,7 @@
 Summary:        Kubernetes-based Event Driven Autoscaling
 Name:           keda
-Version:        2.14.0
-Release:        1%{?dist}
+Version:        2.14.1
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,6 +22,13 @@ Source0:        %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2024-6104.patch
+Patch1:         CVE-2024-45338.patch
+Patch2:         CVE-2025-27144.patch
+Patch3:         CVE-2025-22868.patch
+Patch4:         CVE-2025-29786.patch
+Patch5:         CVE-2025-30204.patch
+Patch6:         CVE-2025-29923.patch
 BuildRequires:  golang >= 1.15
 
 %description
@@ -29,7 +36,7 @@ KEDA is a Kubernetes-based Event Driven Autoscaling component.
 It provides event driven scale for any container running in Kubernetes 
 
 %prep
-%setup -q
+%autosetup -p1 -a 1
 
 %build
 # create vendor folder from the vendor tarball and set vendor mode
@@ -59,6 +66,25 @@ cp ./bin/keda-admission-webhooks %{buildroot}%{_bindir}
 %{_bindir}/%{name}-admission-webhooks
 
 %changelog
+* Sun Mar 30 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.14.1-5
+- Patch CVE-2025-30204, CVE-2025-29923
+
+* Mon Mar 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.14.1-4
+- Fix CVE-2025-29786 with an upstream patch
+
+* Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.14.1-3
+- Fix CVE-2025-27144, CVE-2025-22868 with an upstream patch
+
+* Wed Jan 08 2025 <rohitrawat@microsoft.com> - 2.14.1-2
+- Add patch for CVE-2024-45338
+
+* Fri Sep 27 2024 Archana Choudhary <archana1@microsoft.com> - 2.14.1-1
+- Upgrade to 2.14.1
+- Fix CVE-2024-35255 in github.com/Azure/azure-sdk-for-go/sdk/azidentity 
+
+* Thu Aug 01 2024 Bala <balakumaran.kannan@microsoft.com> - 2.14.0-2
+- Added CVE-2024-6104.patch
+
 * Mon May 06 2024 Sean Dougherty <sdougherty@microsoft.com> - 2.14.0-1
 - Upgrade to 2.14.0 for Azure Linux 3.0
 - Added keda-admission-webhooks binary, added to KEDA in v2.10.0

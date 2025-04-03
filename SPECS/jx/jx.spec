@@ -1,6 +1,6 @@
 Summary:        Command line tool for working with Jenkins X.
 Name:           jx
-Version:        3.10.116
+Version:        3.10.182
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
@@ -36,10 +36,12 @@ BuildRequires:  golang >= 1.17.1
 Command line tool for working with Jenkins X.
 
 %prep
-%autosetup -p1
+%autosetup -N
+# Apply vendor before patching
+tar --no-same-owner -xf %{SOURCE1}
+%autopatch -p1
 
 %build
-tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
 # No download use vednor cache locally
 sed -i 's/go mod download/# go mod download/' ./Makefile
@@ -60,6 +62,12 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./build/jx
 %{_bindir}/jx
 
 %changelog
+* Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.10.182-1
+- Auto-upgrade to 3.10.182 - Fix CVE-2023-39325 and CVE-2023-44487 in jx
+
+* Thu Aug 22 2024 Sumedh Sharma <sumsharma@microsoft.com> - 3.10.116-2
+- Add patch to resolve CVE-2023-45288
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.10.116-1
 - Auto-upgrade to 3.10.116 - Azure Linux 3.0 - package upgrades
 

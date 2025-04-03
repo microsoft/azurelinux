@@ -10,9 +10,11 @@
 Summary:        Module to simplify usage of decorators
 Name:           python-%{pypi_name}
 Version:        5.1.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 URL:            https://github.com/micheles/decorator
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        https://files.pythonhosted.org/packages/source/d/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3-setuptools
@@ -57,6 +59,9 @@ find %{buildroot} -name SOURCES.txt~ -exec rm -f {} \;
 %{python3_sitelib}/__pycache__/*
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 5.1.1-2
+- Add missing Vendor and Distribution tags.
+
 * Mon Feb 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.1.1-1
 - Auto-upgrade to 5.1.1 - Azure Linux 3.0 - package upgrades
 

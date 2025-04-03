@@ -8,6 +8,9 @@
 
 ######## DEFINITIONS ########
 
+# Ubuntu has actual /bin/sh vs Azure Linux having a sym link to /bin/bash. Force the Make scripts to use /bin/bash
+SHELL=/bin/bash
+
 toolkit_root := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 SCRIPTS_DIR  ?= $(toolkit_root)/scripts
 
@@ -45,6 +48,8 @@ RUN_CHECK                            ?= n
 USE_PREVIEW_REPO                     ?= n
 DISABLE_UPSTREAM_REPOS               ?= n
 DISABLE_DEFAULT_REPOS                ?= n
+##help:var:REPO_SNAPSHOT_TIME:<posix_time>=Posix time to be used as a snapshot for remote repositories when fetching packages. Example: REPO_SNAPSHOT_TIME="1724119509".
+REPO_SNAPSHOT_TIME                   ?=
 TOOLCHAIN_CONTAINER_ARCHIVE          ?=
 TOOLCHAIN_ARCHIVE                    ?=
 TOOLCHAIN_SOURCES_ARCHIVE            ?=
@@ -53,8 +58,8 @@ PACKAGE_CACHE_SUMMARY                ?=
 IMAGE_CACHE_SUMMARY                  ?=
 INITRD_CACHE_SUMMARY                 ?=
 PACKAGE_ARCHIVE                      ?=
-PACKAGE_BUILD_RETRIES                ?= 1
-CHECK_BUILD_RETRIES                  ?= 1
+PACKAGE_BUILD_RETRIES                ?= 0
+CHECK_BUILD_RETRIES                  ?= 0
 EXTRA_BUILD_LAYERS                   ?= 0
 REFRESH_WORKER_CHROOT                ?= y
 # Set to 0 to use the number of logical CPUs.
@@ -78,10 +83,17 @@ ENABLE_CPU_PROFILE              ?= n
 ENABLE_MEM_PROFILE              ?= n
 ENABLE_TRACE                    ?= n
 
+# License checking tool
+##help:var:LICENSE_CHECK_DIRS:"<rpm_dir_1> <rpm_dir_2>"=Space separated list of directories to recursively validate with the manual 'license-check' target.
+LICENSE_CHECK_DIRS ?=
+LICENSE_CHECK_EXCEPTION_FILE ?= $(MANIFESTS_DIR)/package/license_file_exceptions.json
+LICENSE_CHECK_NAME_FILE      ?= $(MANIFESTS_DIR)/package/license_file_names.json
+##help:var:LICENSE_CHECK_MODE:{none,warn,fatal,pedantic}=Set the license check mode during package and image builds. 'none' will disable the license check, 'warn' will print warnings, 'fatal' will stop the build on errors, 'pedantic' will stop the build on warnings and errors.
+LICENSE_CHECK_MODE ?= none
+
 # Folder defines
 TOOLS_DIR        ?= $(toolkit_root)/tools
 TOOL_BINS_DIR    ?= $(toolkit_root)/out/tools
-PREVIEW_REPO     ?= $(toolkit_root)/repos/azurelinux-official-preview.repo
 RESOURCES_DIR    ?= $(toolkit_root)/resources
 
 PROJECT_ROOT     ?= $(realpath $(toolkit_root)/..)
@@ -136,6 +148,20 @@ PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_
 REPO_LIST          ?=
 SRPM_URL_LIST      ?= https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/srpms
 
+##help:var:VALIDATE_TOOLCHAIN_GPG={y,n}=Enable or disable GPG validation of the toolchain RPMs. If enabled toolchain RPMs will be validated against the GPG keys in the TOOLCHAIN_GPG_VALIDATION_KEYS variable. On by default when using upstream toolchain RPMs.
+# Based on REBUILD_TOOLCHAIN and DAILY_BUILD_ID. If REBUILD_TOOLCHAIN is set to 'y' or DAILY_BUILD_ID is set to any non-empty value, then GPG validation is disabled by default.
+ifeq ($(REBUILD_TOOLCHAIN),y)
+VALIDATE_TOOLCHAIN_GPG ?= n
+else
+ifneq ($(DAILY_BUILD_ID),)
+VALIDATE_TOOLCHAIN_GPG ?= n
+else
+VALIDATE_TOOLCHAIN_GPG ?= y
+endif
+endif
+
+TOOLCHAIN_GPG_VALIDATION_KEYS ?= $(wildcard $(PROJECT_ROOT)/SPECS/azurelinux-repos/MICROSOFT-*-GPG-KEY) $(wildcard $(toolkit_root)/repos/MICROSOFT-*-GPG-KEY)
+
 ######## COMMON MAKEFILE UTILITIES ########
 
 # Misc function defines
@@ -144,41 +170,8 @@ include $(SCRIPTS_DIR)/utils.mk
 
 ######## REMAINING BUILD FLAGS ########
 
-ifneq ($(DAILY_BUILD_ID),)
-   $(warning Using Daily Build $(DAILY_BUILD_ID))
-   # Ensure build_arch is set
-   ifeq ($(build_arch),)
-      $(error build_arch must be set when using DAILY_BUILD_ID)
-   endif
-   # build_arch cannot be directly used because Azure storage do not support container names with '_' char
-   ifeq ($(build_arch),x86_64)
-      # The actual repo is found at <URL>/, while a duplicate copy of all the rpms can be found at <URL>/built_rpms_all/
-      # Include both so that the tools that expect a valid repo work, while the tools that expect a basic URL also work.
-      override PACKAGE_URL_LIST   := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-x86-64/built_rpms_all \
-                                       https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-x86-64
-      override SRPM_URL_LIST      := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-x86-64/SRPMS
-   else
-      override PACKAGE_URL_LIST   := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64/built_rpms_all \
-                                       https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64
-      override SRPM_URL_LIST      := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64/SRPMS
-   endif
-else
-   ifeq ($(USE_PREVIEW_REPO),y)
-      override PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
-      override PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
-      override PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/ms-oss/$(build_arch)
-      override SRPM_URL_LIST      += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/base/srpms
-      ifneq ($(wildcard $(PREVIEW_REPO)),)
-         override REPO_LIST += $(PREVIEW_REPO)
-      else
-         $(warning )
-         $(warning ######################### WARNING #########################)
-         $(warning 'USE_PREVIEW_REPO=y' set but '$(PREVIEW_REPO)' is missing. Regenerate toolkit's 'repos' directory. Remove 'USE_PREVIEW_REPO' for core builds.)
-         $(warning ######################### WARNING #########################)
-         $(warning )
-      endif
-   endif
-endif
+# Daily build ID and repo configuration
+include $(SCRIPTS_DIR)/daily_build.mk
 
 CA_CERT     ?=
 TLS_CERT    ?=
@@ -213,10 +206,17 @@ include $(SCRIPTS_DIR)/profile.mk
 
 # Set the variables for build number, distro tag, etc
 include $(SCRIPTS_DIR)/build_tag.mk
+include $(SCRIPTS_DIR)/build_tag_imagecustomizer.mk
 
 # go utilities with:
 #   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage
 include $(SCRIPTS_DIR)/tools.mk
+
+# Based on daily build configuration, configure testing repos
+include $(SCRIPTS_DIR)/preview.mk
+
+# Dynamically update toolchain and chroot manifests for some flows with:
+include $(SCRIPTS_DIR)/manifests.mk
 
 # Bootstrap the toolchain's compilers and other tools with:
 #   toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests
@@ -261,11 +261,15 @@ include $(SCRIPTS_DIR)/repoquerywrapper.mk
 include $(SCRIPTS_DIR)/pkggen.mk
 
 # Create images with:
-#   image, iso, clean-imggen
+#   image, iso, clean-imagegen
 include $(SCRIPTS_DIR)/imggen.mk
 
 # Add make targets for sodiff to determine if additional packages are required to be recompiled:
-#  sodiff-check, build-summary, build-package-summary, fake-built-packages-list, sodiff-setup
+#  sodiff-check, sodiff-setup
+# Get build info with:
+#  build-summary, build-package-summary, fake-built-packages-list
+# Validate rpm licenses with:
+#  license-check, license-check-img, clean-license-check
 include $(SCRIPTS_DIR)/analysis.mk
 
 ##help:target:clean=Clean all built files.

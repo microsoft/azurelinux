@@ -1,15 +1,13 @@
-Summary:        Regexp patterns related to Perl
-Name:           perl-Regexp-Pattern-Perl
-Version:        0.006
-Release:        2%{?dist}
-License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name:           perl-Regexp-Pattern-Perl
+Version:        0.007
+Release:        7%{?dist}
+Summary:        Regexp patterns related to Perl
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Regexp-Pattern-Perl/
-Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Regexp-Pattern-Perl-%{version}.tar.gz
-
+Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Regexp-Pattern-Perl-%{version}.tar.gz#/perl-Regexp-Pattern-Perl-%{version}.tar.gz
 BuildArch:      noarch
-
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
@@ -17,16 +15,14 @@ BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
-
-%if 0%{?with_check}
+# Runtime
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Tests
+BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Test::More)
-BuildRequires:  perl(blib)
-%endif
-
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 Regexp::Pattern is a convention for organizing reusable regex patterns.
@@ -36,11 +32,11 @@ Regexp::Pattern is a convention for organizing reusable regex patterns.
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%make_build
+%{make_build}
 
 %install
-%make_install
-%{_fixperms} %{buildroot}/*
+%{make_install}
+%{_fixperms} $RPM_BUILD_ROOT/*
 
 %check
 unset AUTHOR_TESTING RELEASE_TESTING
@@ -53,9 +49,36 @@ make test
 %{_mandir}/man3/*
 
 %changelog
-* Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.006-2
-- Initial CBL-Mariner import from Fedora 36 (license: MIT).
-- License verified.
+* Mon Dec 16 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.007-7
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.007-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.007-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.007-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.007-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.007-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Sep 26 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.007-1
+- 0.007 bump
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.006-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.006-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.006-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
 * Mon Dec 20 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.006-1
 - 0.006 bump

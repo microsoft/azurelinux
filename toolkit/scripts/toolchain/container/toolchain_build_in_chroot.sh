@@ -76,16 +76,16 @@ popd
 rm -rf perl-5.38.0
 touch /logs/status_perl_complete
 
-echo Python-3.12.0
-tar xf Python-3.12.0.tar.xz
-pushd Python-3.12.0
+echo Python-3.12.9
+tar xf Python-3.12.9.tar.xz
+pushd Python-3.12.9
 ./configure --prefix=/usr   \
             --enable-shared \
             --without-ensurepip
 make -j$(nproc)
 make install
 popd
-rm -rf Python-3.12.0
+rm -rf Python-3.12.9
 touch /logs/status_python312_temp_complete
 
 echo Texinfo-7.0.3
@@ -98,14 +98,14 @@ popd
 rm -rf texinfo-7.0.3
 touch /logs/status_texinfo_complete
 
-echo util-linux-2.39.2
-tar xf util-linux-2.39.2.tar.xz
-pushd util-linux-2.39.2
+echo util-linux-2.40.2
+tar xf util-linux-2.40.2.tar.xz
+pushd util-linux-2.40.2
 mkdir -pv /var/lib/hwclock
 ./configure ADJTIME_PATH=/var/lib/hwclock/adjtime \
             --libdir=/usr/lib    \
             --runstatedir=/run   \
-            --docdir=/usr/share/doc/util-linux-2.39.2 \
+            --docdir=/usr/share/doc/util-linux-2.40.2 \
             --disable-chfn-chsh  \
             --disable-login      \
             --disable-nologin    \
@@ -114,11 +114,12 @@ mkdir -pv /var/lib/hwclock
             --disable-runuser    \
             --disable-pylibmount \
             --disable-static     \
+            --disable-liblastlog2 \
             --without-python
 make -j$(nproc)
 make install
 popd
-rm -rf util-linux-2.39.2
+rm -rf util-linux-2.40.2
 touch /logs/status_util-linux_complete
 
 # 7.13. Cleaning up and Saving the Temporary System
@@ -342,15 +343,13 @@ tar xf gcc-13.2.0.tar.xz
 pushd gcc-13.2.0
 case $(uname -m) in
   x86_64)
-    GCC_CONFIG_WITH_ARCH="x86-64-v3"
     sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64
   ;;
   aarch64)
-    GCC_CONFIG_WITH_ARCH="armv8.1-a"
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
-# TODO: patch -Np1 -i /tools/CVE-2023-4039.patch
+patch -Np1 -i /tools/CVE-2023-4039.patch
 mkdir -v build
 cd       build
 LD=ld \
@@ -361,7 +360,6 @@ LD=ld \
              --disable-bootstrap      \
              --disable-fixincludes    \
              --disable-libsanitizer   \
-             --with-arch=$GCC_CONFIG_WITH_ARCH \
              --with-system-zlib       \
              --enable-languages=c,c++,fortran
 make -j$(nproc)
@@ -574,9 +572,9 @@ popd
 rm -rf automake-1.16.5
 touch /logs/status_automake_complete
 
-echo OpenSSL-3.3.0
-tar xf openssl-3.3.0.tar.gz
-pushd openssl-3.3.0
+echo OpenSSL-3.3.3
+tar xf openssl-3.3.3.tar.gz
+pushd openssl-3.3.3
 sslarch=
 ./config --prefix=/usr \
          --openssldir=/etc/pki/tls \
@@ -594,7 +592,7 @@ make all -j$(nproc)
 sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
 make MANSUFFIX=ssl install
 popd
-rm -rf openssl-3.3.0
+rm -rf openssl-3.3.3
 touch /logs/status_openssl_complete
 
 echo Elfutils-0.189
@@ -655,16 +653,16 @@ popd
 rm -rf libffi-3.4.4
 touch /logs/status_libffi_complete
 
-echo Python-3.12.0
-tar xf Python-3.12.0.tar.xz
-pushd Python-3.12.0
+echo Python-3.12.9
+tar xf Python-3.12.9.tar.xz
+pushd Python-3.12.9
 ./configure --prefix=/usr       \
             --enable-shared     \
             --with-system-expat
 make -j$(nproc)
 make install
 popd
-rm -rf Python-3.12.0
+rm -rf Python-3.12.9
 touch /logs/status_python312_complete
 
 echo Flit-Core-3.9.0
@@ -825,9 +823,9 @@ popd
 rm -rf procps-ng-4.0.4
 touch /logs/status_procpsng_complete
 
-echo util-linux-2.39.2
-tar xf util-linux-2.39.2.tar.xz
-pushd util-linux-2.39.2
+echo util-linux-2.40.2
+tar xf util-linux-2.40.2.tar.xz
+pushd util-linux-2.40.2
 ./configure ADJTIME_PATH=/var/lib/hwclock/adjtime \
             --bindir=/usr/bin    \
             --libdir=/usr/lib    \
@@ -844,11 +842,12 @@ pushd util-linux-2.39.2
             --without-python     \
             --without-systemd    \
             --without-systemdsystemunitdir \
-            --docdir=/usr/share/doc/util-linux-2.39.2
+            --disable-liblastlog2 \
+            --docdir=/usr/share/doc/util-linux-2.40.2
 make -j$(nproc)
 make install
 popd
-rm -rf util-linux-2.39.2
+rm -rf util-linux-2.40.2
 touch /logs/status_util-linux_complete
 
 #

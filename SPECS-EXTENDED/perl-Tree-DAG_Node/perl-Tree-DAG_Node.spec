@@ -1,12 +1,12 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Tree-DAG_Node
-Version:        1.31
-Release:        8%{?dist}
+Version:        1.32
+Release:        1%{?dist}
 Summary:        Class for representing nodes in a tree
-License:        (GPL+ or Artistic)
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Tree-DAG_Node
-Source0:        https://cpan.metacpan.org/authors/id/R/RS/RSAVAGE/Tree-DAG_Node-%{version}.tgz
+Source0:        https://cpan.metacpan.org/modules/by-module/Tree/Tree-DAG_Node-%{version}.tgz
 BuildArch:      noarch
 # Module Build ---------------------------------------------------------------
 BuildRequires:  coreutils
@@ -26,8 +26,8 @@ BuildRequires:  perl(File::Temp) >= 0.19
 BuildRequires:  perl(Test::More) >= 1.001002
 BuildRequires:  perl(Test::Pod) >= 1.48
 BuildRequires:  perl(utf8)
-# Runtime --------------------------------------------------------------------
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Dependencies ---------------------------------------------------------------
+# (none)
 
 %description
 This class encapsulates/makes/manipulates objects that represent nodes in a
@@ -58,16 +58,16 @@ make test
 make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 
 %files
-%if 0%{?_licensedir:1}
 %license LICENSE
-%else
-%doc LICENSE
-%endif
 %doc Changes README scripts/
 %{perl_vendorlib}/Tree/
 %{_mandir}/man3/Tree::DAG_Node.3*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.32-1
+- Update to version 1.32
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.31-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

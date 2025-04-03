@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-//
-
 package imagecustomizerapi
 
 import (
@@ -15,10 +13,10 @@ type DirConfigList []DirConfig
 
 type DirConfig struct {
 	// The path to the source directory that will be copied (can be relative or absolute path).
-	SourcePath string `yaml:"sourcePath"`
+	Source string `yaml:"source"`
 
 	// The absolute path in the target OS that the directory will be copied to.
-	DestinationPath string `yaml:"destinationPath"`
+	Destination string `yaml:"destination"`
 
 	// The permissions to set on all of the new directories being created on the target OS (including the top-level directory).
 	// Note: If this value is not specified in the config, the permissions for these directories will be set to 0755.
@@ -46,30 +44,30 @@ func (l *DirConfigList) IsValid() (err error) {
 
 func (d *DirConfig) IsValid() (err error) {
 	// Paths
-	if d.SourcePath == "" {
-		return fmt.Errorf("invalid [sourcePath] value: empty string")
+	if d.Source == "" {
+		return fmt.Errorf("invalid 'source' value: empty string")
 	}
-	if d.DestinationPath == "" {
-		return fmt.Errorf("invalid [destinationPath] value: empty string")
+	if d.Destination == "" {
+		return fmt.Errorf("invalid 'destination' value: empty string")
 	}
 
 	// Permissions
 	if d.NewDirPermissions != nil {
 		err = d.NewDirPermissions.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid [newDirPermissions] value:\n%w", err)
+			return fmt.Errorf("invalid newDirPermissions value:\n%w", err)
 		}
 	}
 	if d.MergedDirPermissions != nil {
 		err = d.MergedDirPermissions.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid [mergedDirPermissions] value:\n%w", err)
+			return fmt.Errorf("invalid mergedDirPermissions value:\n%w", err)
 		}
 	}
 	if d.ChildFilePermissions != nil {
 		err = d.ChildFilePermissions.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid [childFilePermissions] value:\n%w", err)
+			return fmt.Errorf("invalid childFilePermissions value:\n%w", err)
 		}
 	}
 

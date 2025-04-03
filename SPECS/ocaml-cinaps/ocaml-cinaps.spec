@@ -3,7 +3,7 @@
 Summary:        Trivial Metaprogramming tool using the OCaml toplevel
 Name:           ocaml-%{srcname}
 Version:        0.15.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,10 +14,6 @@ BuildRequires:  help2man
 BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-dune >= 2.0.0
 BuildRequires:  ocaml-re-devel >= 1.8.0
-
-%if %{with_check}
-BuildRequires:  ocaml-ppx-jane-devel
-%endif
 
 %description
 Cinaps is a trivial Metaprogramming tool for OCaml using the OCaml
@@ -54,9 +50,6 @@ mkdir -p %{buildroot}%{_mandir}/man1
 help2man -N --version-string=%{version} %{buildroot}%{_bindir}/cinaps > \
   %{buildroot}%{_mandir}/man1/cinaps.1
 
-%check
-%dune_check
-
 %files -f .ofiles
 %doc README.org
 %license LICENSE.md
@@ -65,6 +58,9 @@ help2man -N --version-string=%{version} %{buildroot}%{_bindir}/cinaps > \
 %files devel -f .ofiles-devel
 
 %changelog
+* Thu Aug 29 2024 Andrew Phelps <anphel@microsoft.com> - 0.15.1-5
+- Disable check section until missing dependency is available (ocaml-ppx-jane-devel)
+
 * Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.15.1-4
 - Converted spec file to match with Fedora 41.
 - Rebuild with ocaml >= 5.1.1

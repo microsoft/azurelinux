@@ -1,0 +1,40 @@
+From 3734443b661799b8fa893d4379be62cd1ce96ae0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 12 Apr 2023 12:43:23 +0200
+Subject: [PATCH] Check for setlocale() function
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+After modernizing configure.ac, setlocale() stopped to be checked,
+HAVE_SETLOCALE defined, and setlocale() called from main(). As
+a result indent-2.2.13 stopped printing localized messages.
+
+This patch fixes it.
+
+I checked all HAVE_ macros for their configure-time checks.
+HAVE_SETLOCALE was the only missing.
+
+<https://lists.gnu.org/archive/html/bug-indent/2023-04/msg00001.html>
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 92b612d..85f4383 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -48,7 +48,7 @@ AC_SUBST(localedir)
+ AC_CHECK_INCLUDES_DEFAULT
+ AC_PROG_EGREP
+ 
+-AC_CHECK_FUNCS(strchr memcpy memmove utime)
++AC_CHECK_FUNCS(setlocale strchr memcpy memmove utime)
+ AC_CHECK_HEADERS(unistd.h string.h malloc.h utime.h sys/utime.h)
+ 
+ if test "$ac_cv_func_utime" = yes
+-- 
+2.40.0
+

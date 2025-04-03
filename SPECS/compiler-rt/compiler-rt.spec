@@ -1,11 +1,11 @@
-%global maj_ver %(echo %{version} | cut -d. -f1)
+%global maj_ver 18
 
 %global compiler_rt_srcdir llvm-project-llvmorg-%{version}
 
 Summary:        LLVM compiler support routines
 Name:           compiler-rt
 Version:        18.1.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache 2.0 WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,9 +30,10 @@ BlocksRuntime is an implementation of Apple "blocks" interface.
 %build
 mkdir -p build
 cd build
-%cmake -DCMAKE_BUILD_TYPE=Release  \
-	-DCOMPILER_RT_INSTALL_PATH=%{_prefix}/lib/clang/%{maj_ver} \
-       -Wno-dev ../compiler-rt
+%cmake \
+        -DCMAKE_BUILD_TYPE=Release  \
+        -DCOMPILER_RT_INSTALL_PATH=%{_prefix}/lib/clang/%{maj_ver} \
+        -Wno-dev ../compiler-rt
 
 %make_build
 
@@ -43,13 +44,15 @@ cd build
 %files
 %defattr(-,root,root)
 %license LICENSE.TXT
-
 %{_libdir}/clang/%{maj_ver}/bin/*
 %{_libdir}/clang/%{maj_ver}/include/*
 %{_libdir}/clang/%{maj_ver}/lib/*
 %{_libdir}/clang/%{maj_ver}/share/*
 
 %changelog
+* Thu Jul 25 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-3
+- Fix installation path
+
 * Wed May 29 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 18.1.2-2
 - Bump release to build with new llvm to fix CVE-2024-31852
 

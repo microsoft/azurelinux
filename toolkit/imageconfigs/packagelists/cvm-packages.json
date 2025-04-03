@@ -1,0 +1,12 @@
+{
+    "packages": [
+        "shim",
+        "systemd-boot",
+        "kernel-uki",
+        "tpm2-tools",
+        "ca-certificates",
+        "cronie-anacron",
+        "logrotate",
+        "core-packages-base-image"
+    ]
+}
