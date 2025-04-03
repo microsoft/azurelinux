@@ -796,6 +796,9 @@ done
 /boot/efi/HvLoader.efi
 
 %changelog
+* Thu Apr 03 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 20240524git3e722403cd16-6
+- Fix CVE-2024-38796
+
 * Mon Apr 14 2025 Tobias Brick <tobiasb@microsoft.com> - 20240524git3e722403cd16-6
 - Patch CVE-2024-13176.
 - Rename patch for CVE-2024-4741 to standard name format.
