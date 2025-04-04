@@ -2,7 +2,7 @@
 Summary:        erlang
 Name:           erlang
 Version:        26.2.5.10
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
