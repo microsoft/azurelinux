@@ -10,7 +10,7 @@ Version: 2020.12.07
 Release: 12%{?dist}
 License: MIT and BSD
 URL: http://aspell.net/
-Source: ftp://ftp.gnu.org/gnu/aspell/dict/%{lang}/aspell%{aspellversion}-%{lang}-%{version}-%{langrelease}.tar.bz2
+Source: https://ftp.gnu.org/gnu/aspell/dict/%{lang}/aspell%{aspellversion}-%{lang}-%{version}-%{langrelease}.tar.bz2
 
 # IMPORTANT
 # This package has been deprecated since Fedora 39
