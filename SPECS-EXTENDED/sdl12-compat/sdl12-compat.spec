@@ -5,6 +5,8 @@ Summary:        SDL 1.2 runtime compatibility library using SDL 2.0
 # mp3 decoder code is MIT-0/PD
 # SDL_opengl.h is zlib and MIT
 License:        zlib and (Public Domain or MIT-0) and MIT
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/libsdl-org/sdl12-compat
 Source0:        %{url}/archive/release-%{version}/%{name}-%{version}.tar.gz
 # Multilib aware-header stub
