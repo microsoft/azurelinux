@@ -1,9 +1,5 @@
 # PPI::XSAccessor is experimental
-%if 0%{?rhel:1}
-%bcond_with XSAccessor
-%else
 %bcond_without XSAccessor
-%endif
 
 Name:           perl-PPI
 Version:        1.279
@@ -39,10 +35,6 @@ BuildRequires:  perl(Params::Util) >= 1.00
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(Storable) >= 2.17
 BuildRequires:  perl(strict)
-# =============== Optional Functionality ============
-%if %{with XSAccessor}
-BuildRequires:  perl(Class::XSAccessor)
-%endif
 # =============== Test Suite ========================
 BuildRequires:  perl(B)
 BuildRequires:  perl(Class::Inspector) >= 1.22
