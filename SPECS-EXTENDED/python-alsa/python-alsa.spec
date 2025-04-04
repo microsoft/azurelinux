@@ -5,7 +5,7 @@ Distribution:   Azure Linux
 Summary:	Python binding for the ALSA library
 Name:		python-alsa
 Version:	%{baseversion}
-Release:	1%{?dist}
+Release:	4%{?dist}
 License:	LGPL-2.1-or-later
 Source0:	ftp://ftp.alsa-project.org/pub/pyalsa/pyalsa-%{version}.tar.bz2
 URL:		http://www.alsa-project.org/
@@ -42,7 +42,7 @@ Summary: %summary
 
 %changelog
 * Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.2.12-1
-- Azure Linux import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.12-3
