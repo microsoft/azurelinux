@@ -1,0 +1,13 @@
+diff --git a/siplib/siplib.c b/siplib/siplib.c
+index db52b68..8019e97 100644
+--- a/siplib/siplib.c
++++ b/siplib/siplib.c
+@@ -13747,7 +13747,7 @@ static struct _frame *sip_api_get_frame(int depth)
+ 
+     while (frame != NULL && depth > 0)
+     {
+-        frame = frame->f_back;
++        frame = PyFrame_GetBack(frame);
+         --depth;
+     }
+ 

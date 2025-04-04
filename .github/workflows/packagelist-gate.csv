@@ -1,0 +1,6 @@
+fdk-aac-free,,
+opus,,
+opus-file,,
+packer,>=,1.10.0
+redis,>=,7.4
+terraform,>=,1.6.0

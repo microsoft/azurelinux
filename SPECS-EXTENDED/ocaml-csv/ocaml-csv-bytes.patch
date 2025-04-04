@@ -1,0 +1,51 @@
+--- ocaml-csv-2.4/csv-lwt.opam.orig	2019-12-09 04:56:42.000000000 -0700
++++ ocaml-csv-2.4/csv-lwt.opam	2023-06-23 13:58:41.384729667 -0600
+@@ -17,7 +17,6 @@ depends: [
+   "ocaml" {>= "4.03.0"}
+   "csv"
+   "dune"
+-  "base-bytes"
+   "base-unix"
+   "lwt"
+ ]
+--- ocaml-csv-2.4/csv.opam.orig	2019-12-09 04:56:42.000000000 -0700
++++ ocaml-csv-2.4/csv.opam	2023-06-23 13:58:23.352993247 -0600
+@@ -16,7 +16,6 @@ build: [
+ depends: [
+   "ocaml" {>= "4.03.0"}
+   "dune"
+-  "base-bytes"
+   "base-unix"
+ ]
+ synopsis: "A pure OCaml library to read and write CSV files"
+--- ocaml-csv-2.4/csvtool.opam.orig	2019-12-09 04:56:42.000000000 -0700
++++ ocaml-csv-2.4/csvtool.opam	2023-06-23 13:58:58.456480116 -0600
+@@ -16,7 +16,6 @@ build: [
+ depends: [
+   "ocaml" {>= "4.03.0"}
+   "dune"
+-  "base-bytes"
+   "base-unix"
+   "csv" {= version}
+   "uutf"
+--- ocaml-csv-2.4/lwt/dune.orig	2019-12-09 04:56:42.000000000 -0700
++++ ocaml-csv-2.4/lwt/dune	2023-06-23 13:59:23.192117476 -0600
+@@ -3,7 +3,7 @@
+  (public_name csv-lwt)
+  (modules     Csv_lwt Csv_utils)
+  (flags       :standard -safe-string)
+- (libraries   bytes lwt lwt.unix csv)
++ (libraries   lwt lwt.unix csv)
+  (synopsis "A pure OCaml library to read and write CSV files (LWT version)."))
+ 
+ (rule
+--- ocaml-csv-2.4/src/dune.orig	2019-12-09 04:56:42.000000000 -0700
++++ ocaml-csv-2.4/src/dune	2023-06-23 14:00:03.303529442 -0600
+@@ -3,7 +3,6 @@
+  (public_name csv)
+  (modules     Csv Csv_utils Csv_row)
+  (flags       :standard -safe-string)
+- (libraries bytes)
+  (synopsis "A pure OCaml library to read and write CSV files."))
+ 
+ (rule

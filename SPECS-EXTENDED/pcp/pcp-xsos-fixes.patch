@@ -1,0 +1,269 @@
+commit d2852e19e77e25d628399d51fcf199233547f8c4
+Author: Nathan Scott <nathans@redhat.com>
+Date:   Wed Nov 13 17:17:28 2024 +1100
+
+    libpcp, pcp-xsos: finer grained string output control in pmPrintValue
+    
+    Implement a mechanism in pmPrintValue for producing single-line value
+    output, giving shell scripts a chance to operate sensibly with whacky
+    command lines.
+    
+    Resolves Red Hat bugs RHEL-67164 and RHEL-67148.
+
+diff --git a/man/man3/pmprintvalue.3 b/man/man3/pmprintvalue.3
+index 067b2aee2b..656c05849d 100644
+--- a/man/man3/pmprintvalue.3
++++ b/man/man3/pmprintvalue.3
+@@ -80,6 +80,15 @@ and
+ pairs for each requested metric), based upon the
+ metrics type as returned from
+ .BR pmLookupDesc (3).
++.SH ENVIRONMENT
++Output of string metric values can be further controlled using
++.BR PCP_SQUASH_NEWLINES .
++When set in the environment of the calling process, and the
++.I type
++is set to PM_TYPE_STRING or PM_TYPE_AGGREGATE, then the output
++value is guaranteed to be free of embedded newline characters.
++If the given value contained such characters, they will have been
++replaced by a space before being printed.
+ .SH SEE ALSO
+ .BR PMAPI (3),
+ .BR pmAtomStr (3),
+diff --git a/qa/1564 b/qa/1564
+index cbb976cfe4..714955223e 100755
+--- a/qa/1564
++++ b/qa/1564
+@@ -117,5 +117,33 @@ pcp -a $archive xsos -x -n | _filter_net
+ echo === Archive pcp xsos -N
+ pcp -a $archive xsos -x -N | _filter_netstat
+ 
++echo === Special case: eval command issues | tee -a $seq.full
++test -f /eperm && $sudo rm -f /eperm
++(./src/args \$\(touch /eperm\) )&
++argspid=$!
++$PCP_BINADM_DIR/pmsleep 0.25  # start args
++$sudo pcp xsos -x --ps >> $seq.full
++echo $? exit status
++test -f /eperm && echo file exists && $sudo rm -f /eperm
++$PCP_BINADM_DIR/pmsignal $argspid
++wait $argspid
++
++echo === Special case: multiline ps issues | tee -a $seq.full
++(./src/args '
++multi
++line
++args
++')&
++argspid=$!
++$PCP_BINADM_DIR/pmsleep 0.25  # start args
++pcp xsos -x --ps >> $seq.full
++echo $? exit status
++$PCP_BINADM_DIR/pmsignal $argspid
++wait $argspid
++
++echo === Special case: command line errors | tee -a $seq.full
++pcp xsos unknown_arg >> $seq.full 2>&1
++echo $? exit status
++
+ # success, all done
+ exit
+diff --git a/qa/1564.out b/qa/1564.out
+index 57de00c30a..11321e342a 100644
+--- a/qa/1564.out
++++ b/qa/1564.out
+@@ -111,3 +111,9 @@ NET STATS
+   Ip.InAddrErrors: XXX
+   Ip6.InAddrErrors: XXX
+ 
++=== Special case: eval command issues
++0 exit status
++=== Special case: multiline ps issues
++0 exit status
++=== Special case: command line errors
++1 exit status
+diff --git a/qa/src/.gitignore b/qa/src/.gitignore
+index 7e9b0fe08a..3399d24a4e 100644
+--- a/qa/src/.gitignore
++++ b/qa/src/.gitignore
+@@ -13,6 +13,7 @@ archend
+ archfetch
+ archinst
+ arch_maxfd
++args
+ atomstr
+ badUnitsStr_r
+ badloglabel
+diff --git a/qa/src/GNUlocaldefs b/qa/src/GNUlocaldefs
+index ae647278f2..ac0920d136 100644
+--- a/qa/src/GNUlocaldefs
++++ b/qa/src/GNUlocaldefs
+@@ -48,7 +48,7 @@ CFILES = disk_test.c exercise.c context_test.c chkoptfetch.c \
+ 	archctl_segfault.c debug.c int2pmid.c int2indom.c exectest.c \
+ 	unpickargs.c hanoi.c progname.c countmark.c check_attribute.c \
+ 	indom2int.c pmid2int.c scanmeta.c traverse_return_codes.c \
+-	timeshift.c checkstructs.c bcc_profile.c sha1int2ext.c \
++	timeshift.c checkstructs.c bcc_profile.c args.c sha1int2ext.c \
+ 	getdomainname.c profilecrash.c store_and_fetch.c test_service_notify.c \
+ 	ctx_derive.c pmstrn.c pmfstring.c pmfg-derived.c mmv_help.c sizeof.c \
+ 	stampconv.c time_stamp.c archend.c scandata.c wait_for_values.c \
+diff --git a/qa/src/args.c b/qa/src/args.c
+new file mode 100644
+index 0000000000..06d9b9b6cc
+--- /dev/null
++++ b/qa/src/args.c
+@@ -0,0 +1,18 @@
++/*
++ * Copyright (c) 2024 Red Hat.
++ *
++ * QA helper that waits for stdin input then exits, useful for
++ * shell escape testing as it allows arbitrary args (ignored).
++ */
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++
++int
++main(int argc, char **argv)
++{
++    while (1)
++	sleep(1);
++    exit(EXIT_SUCCESS);
++}
+diff --git a/src/libpcp/src/check-statics b/src/libpcp/src/check-statics
+index 29dcb868ad..b9f21edc32 100755
+--- a/src/libpcp/src/check-statics
++++ b/src/libpcp/src/check-statics
+@@ -581,6 +581,8 @@ util.o
+     msgbuf			# guarded by util_lock mutex
+     msgbuflen			# guarded by util_lock mutex
+     msgsize			# guarded by util_lock mutex
++    squashed			# guarded by __pmLock_extcall mutex when set
++    				# in a one-trip initialization
+     filename			# guarded by __pmLock_extcall mutex when set
+     				# in a one-trip initialization
+     ?base			# no unsafe side-effects, see notes in util.c
+diff --git a/src/libpcp/src/util.c b/src/libpcp/src/util.c
+index d4f79ca40d..84a7df6329 100644
+--- a/src/libpcp/src/util.c
++++ b/src/libpcp/src/util.c
+@@ -984,6 +984,18 @@ print_event_summary(FILE *f, const pmValue *val, int highres)
+     fputc(']', f);
+ }
+ 
++static void
++squash_string(char *s, unsigned int len)
++{
++    unsigned int i;
++
++    /* replace end-of-line characters */
++    for (i = 0; i < len; i++) {
++	if (isspace(s[i]))
++	    s[i] = ' ';
++    }
++}
++
+ /* Print single pmValue. */
+ void
+ pmPrintValue(FILE *f,			/* output stream */
+@@ -997,6 +1009,16 @@ pmPrintValue(FILE *f,			/* output stream */
+     int         n;
+     char        *p;
+     int		sts;
++    static int	squashed = -1;
++
++    if (squashed == -1) {
++	/* one-trip initialization */
++	PM_LOCK(__pmLock_extcall);
++	squashed = 0;
++	if (getenv("PCP_SQUASH_NEWLINES") != NULL)	/* THREADSAFE */
++	    squashed = 1;
++	PM_UNLOCK(__pmLock_extcall);
++    }
+ 
+     if (type != PM_TYPE_UNKNOWN &&
+ 	type != PM_TYPE_EVENT &&
+@@ -1032,7 +1054,10 @@ pmPrintValue(FILE *f,			/* output stream */
+         break;
+ 
+     case PM_TYPE_STRING:
+-	n = (int)strlen(a.cp) + 2;
++	n = (int)strlen(a.cp);
++	if (squashed)
++	    squash_string(a.cp, n);
++	n += 2;
+ 	while (n < minwidth) {
+ 	    fputc(' ', f);
+ 	    n++;
+@@ -1123,6 +1148,8 @@ pmPrintValue(FILE *f,			/* output stream */
+ 			n++;
+ 		    }
+ 		    n = (int)val->value.pval->vlen - PM_VAL_HDR_SIZE;
++		    if (squashed)
++	    	        squash_string(val->value.pval->vbuf, n);
+ 		    fprintf(f, "\"%*.*s\"", n, n, val->value.pval->vbuf);
+ 		    done = 1;
+ 		}
+
+commit a55c5de05836ca0e71b052a4579b34f8e6577c23
+Merge: 3bcaee943a b147af9c8e
+Author: Nathan Scott <nathans@redhat.com>
+Date:   Wed Nov 13 16:49:57 2024 +1100
+
+    Merge commit 'b147af9c8e71423be9bb62699534d3fea4d86b8a' into xsos
+
+
+commit b147af9c8e71423be9bb62699534d3fea4d86b8a
+Author: Nathan Scott <nathans@redhat.com>
+Date:   Wed Nov 13 16:49:57 2024 +1100
+
+    Squashed 'vendor/github.com/performancecopilot/xsos-pcp/' changes from deb8740f2f..de2b314859
+    
+    de2b314859 pcp-xsos: fine-tune error handling on bad command line options
+    35f2cefa3a pcp-xsos: single-line pmPrintValue/pminfo values, escape shell chars
+    
+    git-subtree-dir: vendor/github.com/performancecopilot/xsos-pcp
+    git-subtree-split: de2b314859d01dec9387e06da39af6920018d219
+
+diff --git a/pcp-xsos b/pcp-xsos
+index e8c60f1e0c..388712752d 100755
+--- a/vendor/github.com/performancecopilot/xsos-pcp/pcp-xsos
++++ b/vendor/github.com/performancecopilot/xsos-pcp/pcp-xsos
+@@ -112,7 +112,6 @@ _usage()
+ {
+     [ ! -z "$@" ] && echo $@ 1>&2
+     pmgetopt --progname=$progname --usage --config=$tmp/usage
+-    sts=0
+     exit
+ }
+ 
+@@ -206,9 +205,11 @@ do
+         color=false
+         ;;
+       -\?)
++        sts=0
+         _usage ""
+         ;;
+       --)        # end of options, start of arguments
++        sts=1
+         _usage "Unknown argument: $2"
+         ;;
+     esac
+@@ -304,6 +305,7 @@ fi
+ # kernel_all_load_value[15]=0.06
+ # kernel_cpu_util_user_error="No value(s) available!"
+ 
++export PCP_SQUASH_NEWLINES=1
+ if ! pminfo $batch --fetch ${metrics[*]} > $tmp/metrics 2>$tmp/error
+ then
+     if grep "^pminfo:" $tmp/error > /dev/null 2>&1
+@@ -320,6 +322,8 @@ gawk < $tmp/metrics > $tmp/variables '
+ function filter(string) {
+     gsub(/"/, "\\\"", string) # escape double quotes
+     gsub(/\\u/, "\\\\u", string) # escape backslash-u
++    # replace any characters with special shell meaning
++    gsub("/\\(|\\$|\\*|)|\\{|\\}\\?|`|;|!/", "-", string)
+     gsub(/%/, "%%", string) # percent sign in printf
+     gsub(/^\\"|\\"$/, "\"", string) # except on ends
+     return string

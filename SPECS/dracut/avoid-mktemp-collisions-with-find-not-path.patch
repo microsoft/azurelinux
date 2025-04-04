@@ -1,0 +1,28 @@
+From 192a4908594d0080072dd4aaf3417a926003083b Mon Sep 17 00:00:00 2001
+From: Brian Fjeldstad <bfjelds@microsoft.com>
+Date: Tue, 4 Feb 2025 21:48:52 +0000
+Subject: [PATCH] avoid mktemp collisions with [find -not -path '*.ko*']
+
+---
+ dracut.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/dracut.sh b/dracut.sh
+index cc6d6f28..06e7ce8e 100755
+--- a/dracut.sh
++++ b/dracut.sh
+@@ -1253,9 +1253,9 @@ if findmnt --raw -n --target "$tmpdir" --output=options | grep -q noexec; then
+ fi
+ 
+ # shellcheck disable=SC2155
+-readonly DRACUT_TMPDIR="$(mktemp -p "$TMPDIR/" -d -t dracut.XXXXXX)"
++readonly DRACUT_TMPDIR="$(mktemp -p "$TMPDIR/" -d -t dracut.dXXXXXX)"
+ [ -d "$DRACUT_TMPDIR" ] || {
+-    printf "%s\n" "dracut[F]: mktemp -p '$TMPDIR/' -d -t dracut.XXXXXX failed." >&2
++    printf "%s\n" "dracut[F]: mktemp -p '$TMPDIR/' -d -t dracut.dXXXXXX failed." >&2
+     exit 1
+ }
+ 
+-- 
+2.34.1
+
