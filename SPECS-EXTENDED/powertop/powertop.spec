@@ -7,7 +7,7 @@ License:          gpl-2.0-only AND lgpl-2.1-only AND isc
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:              http://01.org/powertop/
-Source0:          http://github.com/fenrus75/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
+Source0:          https://github.com/fenrus75/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:          powertop.service
 
 # Sent upstream
