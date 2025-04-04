@@ -74,8 +74,10 @@ popd
 /boot/efi/HvLoader.efi
 
 %changelog
-* Tue Apr 15 2025 Tobias Brick <tobiasb@microsoft.com> - 20240524git3e722403cd16-6
+* Thu Apr 03 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 20240524git3e722403cd16-6
 - Bump release for consistency with edk2 spec.
+
+* Tue Apr 15 2025 Tobias Brick <tobiasb@microsoft.com> - 20240524git3e722403cd16-6
 
 * Wed Mar 26 2025 Tobias Brick <tobiasb@microsoft.com> - 20240524git3e722403cd16-5
 - Bump release for consistency with edk2 spec.
