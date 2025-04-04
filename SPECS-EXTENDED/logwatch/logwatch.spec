@@ -3,13 +3,14 @@ Distribution:   Azure Linux
 %global _unitdir /usr/lib/systemd/system
 Summary: Analyzes and Reports on system logs
 Name: logwatch
-Version: 7.11
-Release: 1%{?dist}
+Version: 7.12
+Release: 2%{?dist}
 License: MIT
 URL: https://sourceforge.net/projects/logwatch/
 Source0: https://sourceforge.net/projects/logwatch/files/%{name}-%{version}/%{name}-%{version}.tar.gz
 BuildRequires: perl-generators
 Requires: grep
+Requires: perl(Date::Manip)
 Requires: perl(diagnostics)
 Requires: perl(Errno)
 Requires: perl(File::Basename)
@@ -130,22 +131,109 @@ echo "# Configuration overrides for specific logfiles/services may be placed her
 %{_unitdir}/logwatch.timer
 
 %changelog
-* Mon Nov 18 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 7.11-1
-- Update to version 7.11
-- License verified.
+* Thu Apr 18 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 7.12-2
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+- Replaced crontabs with cronie
 
-* Tue Jan 10 2023 Osama Esmail <osamaesmail@microsoft.com> - 7.5.3-5
-- Replacing crontabs with cronie (removing crontabs rpm because of redundancy)
+* Thu Jan 23 2025 Frank Crawford <frank@crawford.emu.id.au> - 7.12-1
+- Update to 7.12
 
-* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.5.3-4
-- Updating source URLs.
-- License verified.
+* Fri Jan 17 2025 Fedora Release Engineering <releng@fedoraproject.org> - 7.11-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.5.3-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sat Jan 04 2025 Frank Crawford <frank@crawford.emu.id.au> - 7.11-3
+- Correct update to confs to fix BZ2326879
 
-* Mon Nov 23 2020 Frank Crawford <frank@crawford.emu.id.au> - 7.5.3-2
-- Handle changes for DNF 4.4 (#1895839)
+* Sat Dec 28 2024 Frank Crawford <frank@crawford.emu.id.au> - 7.11-2
+- Update confs to fix BZ2326879
+
+* Mon Aug 05 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.11-1
+- Update to 7.11
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sun Jan 28 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.10-1
+- Update to 7.10
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.9-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.9-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Aug 10 2023 Jitka Plesnikova <jplesnik@redhat.com> - 7.9-2
+- Remove unused dependencies perl(Sys::CPU), perl(Sys::MemInfo)
+
+* Sun Jul 23 2023 Frank Crawford <frank@crawford.emu.id.au> - 7.9-1
+- Update to 7.9
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 7.8-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri May 19 2023 Frank Crawford <frank@crawford.emu.id.au> - 7.8-3
+- Add missing dependencies to fix BZ2203367
+- Convert to autosetup macro
+
+* Sun May 07 2023 Frank Crawford <frank@crawford.emu.id.au> - 7.8-2
+- Add patch to mdadm to fix BZ2192995 for F38
+- Fix reports for named
+
+* Sun Jan 22 2023 Frank Crawford <frank@crawford.emu.id.au> - 7.8-1
+- Update to 7.8
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 7.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Nov 21 2022 Frank Crawford <frank@crawford.emu.id.au> - 7.7-3
+- SPDX license update - type MIT:Modern Style with sublicense
+
+* Sun Sep 04 2022 Frank Crawford <frank@crawford.emu.id.au> - 7.7-2
+- Add patches for F36 that missed latest release
+
+* Sun Jul 24 2022 Frank Crawford <frank@crawford.emu.id.au> - 7.7-1
+- Update to 7.7
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 7.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sun Jan 23 2022 Frank Crawford <frank@crawford.emu.id.au> - 7.6-1
+- Update to 7.6 (note new version convention - major.minor)
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 7.5.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sat Aug 28 2021 Frank Crawford <frank@crawford.emu.id.au> - 7.5.6-2
+- Match minor change in systemd
+
+* Sat Jul 24 2021 Frank Crawford <frank@crawford.emu.id.au> - 7.5.6-1
+- Update to 7.5.6
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 7.5.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Apr 06 2021 Frank Crawford <frank@crawford.emu.id.au> - 7.5.5-2
+- Add patch to remove CMDEND from cron service
+
+* Tue Jan 26 2021 Frank Crawford <frank@crawford.emu.id.au> - 7.5.5-1
+- Update to 7.5.5
+
+* Mon Dec 14 2020 Orion Poplawski <orion@nwra.com> - 7.5.4-4
+- Systemd unit files are not executable
+
+* Mon Nov 23 2020 Frank Crawford <frank@crawford.emu.id.au> - 7.5.4-3
+- Handle changes for DNF 4.4
+
+* Mon Nov 09 2020 Frank Crawford <frank@crawford.emu.id.au> - 7.5.4-2
+- Add requires for perl-diagnostics (#1893671) and perl-lib (#1893503)
+- Add other requires as nothing is now automatically supplied
+
+* Mon Aug 03 2020 Jan Synáček <jsynacek@redhat.com> - 7.5.4-1
+- Update to 7.5.4 (#1862935)
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 7.5.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Tue Feb 25 2020 Jan Synáček <jsynacek@redhat.com> - 7.5.3-1
 - Update to 7.5.3 (#1800953)
