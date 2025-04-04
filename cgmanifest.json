@@ -21364,7 +21364,7 @@
         "other": {
           "name": "powertop",
           "version": "2.15",
-          "downloadUrl": "http://github.com/fenrus75/powertop/archive/v2.15/powertop-2.15.tar.gz"
+          "downloadUrl": "https://github.com/fenrus75/powertop/archive/v2.15/powertop-2.15.tar.gz"
         }
       }
     },
