@@ -22,22 +22,23 @@ Version: 2.0.5
 BuildArch: noarch
 
 Name:      fonts-rpm-macros
-Release:   13%{?dist}
+Release:   14%{?dist}
 Summary:   Build-stage rpm automation for fonts packages
 
 License:   GPL-3.0-or-later
 URL:       https://docs.fedoraproject.org/en-US/packaging-guidelines/FontsPolicy/
 Source:    %{forgesource}
 Patch0:    %{name}-omit-foundry-in-family.patch
-Patch1:    update_for_azl.patch
+Patch1:    %{name}-drop-yaml.patch
+Patch2:    %{name}-epoch-in-req.patch
 
-Requires:  fonts-srpm-macros = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:  fonts-filesystem  = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:  fonts-srpm-macros = %{version}-%{release}
+Requires:  fonts-filesystem  = %{version}-%{release}
 
-Provides:  fontpackages-devel = %{?epoch:%{epoch}:}%{version}-%{release}
-Obsoletes: fontpackages-devel < %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:  fontpackages-devel = %{version}-%{release}
+Obsoletes: fontpackages-devel < %{version}-%{release}
 # Tooling dropped for now as no one was willing to maintain it
-Obsoletes: fontpackages-tools < %{?epoch:%{epoch}:}%{version}-%{release}
+Obsoletes: fontpackages-tools < %{version}-%{release}
 
 Requires:  fontconfig
 Requires:  libappstream-glib
@@ -72,8 +73,8 @@ fonts-srpm-macros will pull in for fonts packages only.
 Summary:   Directories used by font packages
 License:   MIT
 
-Provides:  fontpackages-filesystem = %{?epoch:%{epoch}:}%{version}-%{release}
-Obsoletes: fontpackages-filesystem < %{?epoch:%{epoch}:}%{version}-%{release}
+Provides:  fontpackages-filesystem = %{version}-%{release}
+Obsoletes: fontpackages-filesystem < %{version}-%{release}
 
 %description -n fonts-filesystem
 This package contains the basic directory layout used by font packages,
@@ -83,8 +84,8 @@ including the correct permissions for the directories.
 Summary:   Example fonts packages rpm spec templates
 License:   MIT
 
-Requires:    fonts-rpm-macros = %{?epoch:%{epoch}:}%{version}-%{release}
-Supplements: fonts-rpm-macros = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:    fonts-rpm-macros = %{version}-%{release}
+Supplements: fonts-rpm-macros = %{version}-%{release}
 
 %description -n fonts-rpm-templates
 This package contains documented rpm spec templates showcasing how to use the
@@ -98,8 +99,9 @@ for template in templates/rpm/*\.spec ; do
   grep -v '^%%dnl' "${template}" > "${target}"
   touch -r "${template}" "${target}"
 done
-%patch 0 -p1 -b .1-omit-foundry-in-family
-%patch 1 -p1
+%patch -P0 -p1 -b .1-omit-foundry-in-family
+%patch -P1 -p1 -b .1-drop-yaml
+%patch -P2 -p1 -b .2-epoch-in-req
 
 %install
 install -m 0755 -d    %{buildroot}%{_fontbasedir} \
@@ -155,6 +157,10 @@ install -m 0755 -vp   bin/* %{buildroot}%{_bindir}
 %doc %{ftcgtemplatedir}/*txt
 
 %changelog
+* Fri Mar 21 2025 Jyoti kanase <v-jykanase@microsoft.com> - 2.0.5-14
+- Applying patches for Build fix 
+- License verified.
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.5-13
 - Updating file paths for 3.0 version of Azure Linux.
 - Resetting 'Epoch' for 3.0 version of Azure Linux.
