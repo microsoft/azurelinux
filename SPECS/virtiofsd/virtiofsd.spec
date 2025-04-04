@@ -22,7 +22,7 @@ Name:           virtiofsd
 # Version to be kept in sync with the `asset.virtiofsd.version` field from
 # https://github.com/microsoft/kata-containers/blob/msft-main/versions.yaml
 Version:        1.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        vhost-user virtio-fs device backend written in Rust
 Group:          Development/Libraries/Rust
 License:        Apache-2.0
@@ -73,6 +73,9 @@ cargo test --release
 %{_datadir}/qemu/vhost-user/50-qemu-virtiofsd.json
 
 %changelog
+* Tue Apr 01 2025 Kavya Sree Kaitepali <kkaitepalli@microsoft.com> - 1.8.0-2
+- Bump package to rebuild with rust 1.85.0
+
 * Wed Feb 07 2024 Kanika Nema <kanikanema@microsoft.com> - 1.8.0-1
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)
 - License verified
