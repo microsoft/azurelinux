@@ -20,9 +20,9 @@ Source: https://ftp.gnu.org/gnu/aspell/dict/%{lang}/aspell%{aspellversion}-%{lan
 # Change proposal is located here: https://fedoraproject.org/wiki/Changes/AspellDeprecation
 Provides:  deprecated()
 
-Buildrequires: aspell >= 12:0.60
+Buildrequires: aspell >= 0.60
 BuildRequires: make
-Requires: aspell >= 12:0.60
+Requires: aspell >= 0.60
 Obsoletes: aspell-en-gb <= 0.33.7.1
 Obsoletes: aspell-en-ca <= 0.33.7.1
 Supplements: (aspell and langpacks-en)
