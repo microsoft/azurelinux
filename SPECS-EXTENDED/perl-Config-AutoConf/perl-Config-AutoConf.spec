@@ -11,7 +11,7 @@ License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Config-AutoConf
-Source0:        https://cpan.metacpan.org/authors/id/A/AM/AMBS/Config-AutoConf-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/A/AM/AMBS/Config-AutoConf-%{version}.tar.gz#/perl-Config-AutoConf-%{version}.tar.gz
 BuildArch:      noarch
 # Build
 BuildRequires:  gcc
