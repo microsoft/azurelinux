@@ -2,7 +2,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:       Python module for GNU parted
 Name:          pyparted
-Epoch:         1
 Version:       3.13.0
 Release:       8%{?dist}
 License:       GPL-2.0-or-later
