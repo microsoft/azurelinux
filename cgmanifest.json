@@ -855,8 +855,8 @@
         "type": "other",
         "other": {
           "name": "azl-otel-collector",
-          "version": "0.121.0",
-          "downloadUrl": "https://github.com/open-telemetry/opentelemetry-collector/archive/refs/tags/v0.121.0.tar.gz"
+          "version": "0.123.0",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/azl-otel-collector-0.123.0-1.tar.gz"
         }
       }
     },
