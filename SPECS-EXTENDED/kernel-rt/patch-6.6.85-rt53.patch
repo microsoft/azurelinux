@@ -1,7 +1,7 @@
-From c522ccff41c07e47d532b6080865fedb03e61477 Mon Sep 17 00:00:00 2001
+From 0d6dc394ea48f8bc947a0ceb60daf055b2801eec Mon Sep 17 00:00:00 2001
 From: Peter Zijlstra <peterz@infradead.org>
 Date: Fri, 8 Sep 2023 18:22:48 +0200
-Subject: [PATCH 001/211] sched: Constrain locks in sched_submit_work()
+Subject: [PATCH 001/212] sched: Constrain locks in sched_submit_work()
 
 Even though sched_submit_work() is ran from preemptible context,
 it is discouraged to have it use blocking locks due to the recursion
@@ -18,10 +18,10 @@ Link: https://lkml.kernel.org/r/20230908162254.999499-2-bigeasy@linutronix.de
  1 file changed, 9 insertions(+)
 
 diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 86606fb9e6bc..91152906bc1e 100644
+index 8c5f75af07db..9e1ce28a505d 100644
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
-@@ -6720,11 +6720,18 @@ void __noreturn do_task_dead(void)
+@@ -6723,11 +6723,18 @@ void __noreturn do_task_dead(void)
  
  static inline void sched_submit_work(struct task_struct *tsk)
  {
@@ -40,7 +40,7 @@ index 86606fb9e6bc..91152906bc1e 100644
  	task_flags = tsk->flags;
  	/*
  	 * If a worker goes to sleep, notify and ask workqueue whether it
-@@ -6749,6 +6756,8 @@ static inline void sched_submit_work(struct task_struct *tsk)
+@@ -6752,6 +6759,8 @@ static inline void sched_submit_work(struct task_struct *tsk)
  	 * make sure to submit it to avoid deadlocks.
  	 */
  	blk_flush_plug(tsk->plug, true);
@@ -50,12 +50,12 @@ index 86606fb9e6bc..91152906bc1e 100644
  
  static void sched_update_worker(struct task_struct *tsk)
 -- 
-2.48.1
+2.49.0
 
-From b6ef19a26401492eaa4aa28c12803cf1cd813b4f Mon Sep 17 00:00:00 2001
+From fcd25fb9fdbc395145d5e6ee2a16a153b3516fdc Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 8 Sep 2023 18:22:49 +0200
-Subject: [PATCH 002/211] locking/rtmutex: Avoid unconditional slowpath for
+Subject: [PATCH 002/212] locking/rtmutex: Avoid unconditional slowpath for
  DEBUG_RT_MUTEXES
 
 With DEBUG_RT_MUTEXES enabled the fast-path rt_mutex_cmpxchg_acquire()
@@ -136,12 +136,12 @@ index d1473c624105..c7196de838ed 100644
  			ww_mutex_set_context_fastpath(lock, ww_ctx);
  		return 0;
 -- 
-2.48.1
+2.49.0
 
-From 4500b676cf41f94e129ec151e424ffd894feeb86 Mon Sep 17 00:00:00 2001
+From feadaaa1a35ad98126ba6b356915866000c3f4e3 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Fri, 8 Sep 2023 18:22:50 +0200
-Subject: [PATCH 003/211] sched: Extract __schedule_loop()
+Subject: [PATCH 003/212] sched: Extract __schedule_loop()
 
 There are currently two implementations of this basic __schedule()
 loop, and there is soon to be a third.
@@ -155,10 +155,10 @@ Link: https://lkml.kernel.org/r/20230908162254.999499-4-bigeasy@linutronix.de
  1 file changed, 11 insertions(+), 10 deletions(-)
 
 diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 91152906bc1e..7b0ed9994478 100644
+index 9e1ce28a505d..1ad3943cb75e 100644
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
-@@ -6770,16 +6770,21 @@ static void sched_update_worker(struct task_struct *tsk)
+@@ -6773,16 +6773,21 @@ static void sched_update_worker(struct task_struct *tsk)
  	}
  }
  
@@ -185,7 +185,7 @@ index 91152906bc1e..7b0ed9994478 100644
  	sched_update_worker(tsk);
  }
  EXPORT_SYMBOL(schedule);
-@@ -6843,11 +6848,7 @@ void __sched schedule_preempt_disabled(void)
+@@ -6846,11 +6851,7 @@ void __sched schedule_preempt_disabled(void)
  #ifdef CONFIG_PREEMPT_RT
  void __sched notrace schedule_rtlock(void)
  {
@@ -199,12 +199,12 @@ index 91152906bc1e..7b0ed9994478 100644
  NOKPROBE_SYMBOL(schedule_rtlock);
  #endif
 -- 
-2.48.1
+2.49.0
 
-From a98c0d063c0021b157599fe61012e8e0ef31246a Mon Sep 17 00:00:00 2001
+From 0d5e02520b188d51c5abefcf33521434af32247d Mon Sep 17 00:00:00 2001
 From: Peter Zijlstra <peterz@infradead.org>
 Date: Fri, 8 Sep 2023 18:22:51 +0200
-Subject: [PATCH 004/211] sched: Provide rt_mutex specific scheduler helpers
+Subject: [PATCH 004/212] sched: Provide rt_mutex specific scheduler helpers
 
 With PREEMPT_RT there is a rt_mutex recursion problem where
 sched_submit_work() can use an rtlock (aka spinlock_t). More
@@ -246,7 +246,7 @@ Link: https://lkml.kernel.org/r/20230908162254.999499-5-bigeasy@linutronix.de
  3 files changed, 39 insertions(+), 4 deletions(-)
 
 diff --git a/include/linux/sched.h b/include/linux/sched.h
-index 2af0a8859d64..951418d30e0b 100644
+index 393c300347de..4d37ac5776a8 100644
 --- a/include/linux/sched.h
 +++ b/include/linux/sched.h
 @@ -917,6 +917,9 @@ struct task_struct {
@@ -275,10 +275,10 @@ index 994c25640e15..b2b9e6eb9683 100644
   * Must hold either p->pi_lock or task_rq(p)->lock.
   */
 diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 7b0ed9994478..032e5b2ea7ef 100644
+index 1ad3943cb75e..3507ebe41e04 100644
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
-@@ -6723,9 +6723,6 @@ static inline void sched_submit_work(struct task_struct *tsk)
+@@ -6726,9 +6726,6 @@ static inline void sched_submit_work(struct task_struct *tsk)
  	static DEFINE_WAIT_OVERRIDE_MAP(sched_map, LD_WAIT_CONFIG);
  	unsigned int task_flags;
  
@@ -288,7 +288,7 @@ index 7b0ed9994478..032e5b2ea7ef 100644
  	/*
  	 * Establish LD_WAIT_CONFIG context to ensure none of the code called
  	 * will use a blocking primitive -- which would lead to recursion.
-@@ -6783,7 +6780,12 @@ asmlinkage __visible void __sched schedule(void)
+@@ -6786,7 +6783,12 @@ asmlinkage __visible void __sched schedule(void)
  {
  	struct task_struct *tsk = current;
  
@@ -302,7 +302,7 @@ index 7b0ed9994478..032e5b2ea7ef 100644
  	__schedule_loop(SM_NONE);
  	sched_update_worker(tsk);
  }
-@@ -7044,6 +7046,32 @@ static void __setscheduler_prio(struct task_struct *p, int prio)
+@@ -7047,6 +7049,32 @@ static void __setscheduler_prio(struct task_struct *p, int prio)
  
  #ifdef CONFIG_RT_MUTEXES
  
@@ -336,12 +336,12 @@ index 7b0ed9994478..032e5b2ea7ef 100644
  {
  	if (pi_task)
 -- 
-2.48.1
+2.49.0
 
-From 6edf380ef806fd7add31540bc302d4a68b4bde2b Mon Sep 17 00:00:00 2001
+From d87f8bf855ffdeafb557c8898b5a82dabbeb5143 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 8 Sep 2023 18:22:52 +0200
-Subject: [PATCH 005/211] locking/rtmutex: Use rt_mutex specific scheduler
+Subject: [PATCH 005/212] locking/rtmutex: Use rt_mutex specific scheduler
  helpers
 
 Have rt_mutex use the rt_mutex specific scheduler helpers to avoid
@@ -527,12 +527,12 @@ index 48a19ed8486d..842037b2ba54 100644
  /*
   * The common functions which get wrapped into the rwlock API.
 -- 
-2.48.1
+2.49.0
 
-From ff50bf2f7008dc908bed6f299f0c112341d994cf Mon Sep 17 00:00:00 2001
+From 1953af19e41c37b99b1eba415924d1892d641975 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Fri, 8 Sep 2023 18:22:53 +0200
-Subject: [PATCH 006/211] locking/rtmutex: Add a lockdep assert to catch
+Subject: [PATCH 006/212] locking/rtmutex: Add a lockdep assert to catch
  potential nested blocking
 
 There used to be a BUG_ON(current->pi_blocked_on) in the lock acquisition
@@ -593,12 +593,12 @@ index 842037b2ba54..38e292454fcc 100644
  		rtlock_slowlock(rtm);
  }
 -- 
-2.48.1
+2.49.0
 
-From dbfa3c28dc4d880fb91908e617e215bc0ae2a88f Mon Sep 17 00:00:00 2001
+From d17c6df308127b0b5290d00089e3f6234862fd56 Mon Sep 17 00:00:00 2001
 From: Peter Zijlstra <peterz@infradead.org>
 Date: Fri, 15 Sep 2023 17:19:44 +0200
-Subject: [PATCH 007/211] futex/pi: Fix recursive rt_mutex waiter state
+Subject: [PATCH 007/212] futex/pi: Fix recursive rt_mutex waiter state
 
 Some new assertions pointed out that the existing code has nested rt_mutex wait
 state in the futex code.
@@ -797,12 +797,12 @@ index cba8b1a6a4cc..4c73e0b81acc 100644
  		/*
  		 * Fixup the pi_state owner and possibly acquire the lock if we
 -- 
-2.48.1
+2.49.0
 
-From 07f092c672377b63bab16fdfe23878c232618e1b Mon Sep 17 00:00:00 2001
+From ef668632459f0d4eb488bb1ade7970c81e339efa Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 3 Aug 2023 12:09:31 +0200
-Subject: [PATCH 008/211] signal: Add proper comment about the preempt-disable
+Subject: [PATCH 008/212] signal: Add proper comment about the preempt-disable
  in ptrace_stop().
 
 Commit 53da1d9456fe7 ("fix ptrace slowness") added a preempt-disable section
@@ -849,12 +849,12 @@ index 49c8c24b444d..f14b6be19e79 100644
  	preempt_disable();
  	read_unlock(&tasklist_lock);
 -- 
-2.48.1
+2.49.0
 
-From fb78b99f1802ab5f0c764ae2e9ebae670eba26e4 Mon Sep 17 00:00:00 2001
+From 8872ef5784ca45917be9c02424f8156469d2fedc Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 3 Aug 2023 12:09:32 +0200
-Subject: [PATCH 009/211] signal: Don't disable preemption in ptrace_stop() on
+Subject: [PATCH 009/212] signal: Don't disable preemption in ptrace_stop() on
  PREEMPT_RT.
 
 On PREEMPT_RT keeping preemption disabled during the invocation of
@@ -902,12 +902,12 @@ index f14b6be19e79..107953e8a90c 100644
  	cgroup_leave_frozen(true);
  
 -- 
-2.48.1
+2.49.0
 
-From 653a79e080262efd7f6a34bdc447ec8a5c2529a3 Mon Sep 17 00:00:00 2001
+From 13980035404e8ef941675f7ffb28045bcf6d9b73 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 21 Sep 2023 16:15:12 +0200
-Subject: [PATCH 010/211] drm/amd/display: Remove migrate_en/dis from
+Subject: [PATCH 010/212] drm/amd/display: Remove migrate_en/dis from
  dc_fpu_begin().
 
 This is a revert of the commit mentioned below while it is not wrong, as
@@ -993,12 +993,12 @@ index 172aa10a8800..86f4c0e04654 100644
  		if (cpu_has_feature(CPU_FTR_VSX_COMP)) {
  			disable_kernel_vsx();
 -- 
-2.48.1
+2.49.0
 
-From 28dfe2fe716d37f3dd66209747c345f9012be55e Mon Sep 17 00:00:00 2001
+From 06940bb1776814755409e297f3120c1bc63e027e Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 21 Sep 2023 16:15:13 +0200
-Subject: [PATCH 011/211] drm/amd/display: Simplify the per-CPU usage.
+Subject: [PATCH 011/212] drm/amd/display: Simplify the per-CPU usage.
 
 The fpu_recursion_depth counter is used to ensure that dc_fpu_begin()
 can be invoked multiple times while the FPU-disable function itself is
@@ -1125,12 +1125,12 @@ index 86f4c0e04654..8bd5926b47e0 100644
 +	preempt_enable();
  }
 -- 
-2.48.1
+2.49.0
 
-From a783648a4ba0eaf248987539d46f417225e74d98 Mon Sep 17 00:00:00 2001
+From 1dd0ead7a7020d3a9c9be959454a19d88a924ee9 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 21 Sep 2023 16:15:14 +0200
-Subject: [PATCH 012/211] drm/amd/display: Add a warning if the FPU is used
+Subject: [PATCH 012/212] drm/amd/display: Add a warning if the FPU is used
  outside from task context.
 
 Add a warning if the FPU is used from any context other than task
@@ -1156,12 +1156,12 @@ index 8bd5926b47e0..4ae4720535a5 100644
  	depth = __this_cpu_inc_return(fpu_recursion_depth);
  
 -- 
-2.48.1
+2.49.0
 
-From 018fbbb4c161d90e9ea477febf92d1e96de9fbe7 Mon Sep 17 00:00:00 2001
+From 20821cb4733334ecb91120e0203e5c5e7f3ced1b Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 21 Sep 2023 16:15:15 +0200
-Subject: [PATCH 013/211] drm/amd/display: Move the memory allocation out of
+Subject: [PATCH 013/212] drm/amd/display: Move the memory allocation out of
  dcn21_validate_bandwidth_fp().
 
 dcn21_validate_bandwidth_fp() is invoked while FPU access has been
@@ -1181,10 +1181,10 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  3 files changed, 13 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/gpu/drm/amd/display/dc/dcn21/dcn21_resource.c b/drivers/gpu/drm/amd/display/dc/dcn21/dcn21_resource.c
-index 8dffa5b6426e..2cd1742c69d9 100644
+index 24105a5b9f2a..349c22daccf2 100644
 --- a/drivers/gpu/drm/amd/display/dc/dcn21/dcn21_resource.c
 +++ b/drivers/gpu/drm/amd/display/dc/dcn21/dcn21_resource.c
-@@ -953,9 +953,17 @@ static bool dcn21_validate_bandwidth(struct dc *dc, struct dc_state *context,
+@@ -954,9 +954,17 @@ static bool dcn21_validate_bandwidth(struct dc *dc, struct dc_state *context,
  		bool fast_validate)
  {
  	bool voltage_supported;
@@ -1252,12 +1252,12 @@ index c51badf7b68a..a81a0b9e6884 100644
  
  void dcn21_clk_mgr_set_bw_params_wm_table(struct clk_bw_params *bw_params);
 -- 
-2.48.1
+2.49.0
 
-From 6180e47e7bea399e9272f47f42cf333758b2da61 Mon Sep 17 00:00:00 2001
+From 7d374c6a58d8869849239531580e4250cbe57f12 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 21 Sep 2023 16:15:16 +0200
-Subject: [PATCH 014/211] drm/amd/display: Move the memory allocation out of
+Subject: [PATCH 014/212] drm/amd/display: Move the memory allocation out of
  dcn20_validate_bandwidth_fp().
 
 dcn20_validate_bandwidth_fp() is invoked while FPU access has been
@@ -1279,10 +1279,10 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  3 files changed, 18 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/gpu/drm/amd/display/dc/dcn20/dcn20_resource.c b/drivers/gpu/drm/amd/display/dc/dcn20/dcn20_resource.c
-index d587f807dfd7..5036a3e60832 100644
+index 294609557b73..56c42867b20f 100644
 --- a/drivers/gpu/drm/amd/display/dc/dcn20/dcn20_resource.c
 +++ b/drivers/gpu/drm/amd/display/dc/dcn20/dcn20_resource.c
-@@ -2141,9 +2141,17 @@ bool dcn20_validate_bandwidth(struct dc *dc, struct dc_state *context,
+@@ -2142,9 +2142,17 @@ bool dcn20_validate_bandwidth(struct dc *dc, struct dc_state *context,
  		bool fast_validate)
  {
  	bool voltage_supported;
@@ -1382,12 +1382,12 @@ index a81a0b9e6884..b6c34198ddc8 100644
  			     struct pp_smu_wm_range_sets *ranges,
  			     struct _vcs_dpi_soc_bounding_box_st *loaded_bb);
 -- 
-2.48.1
+2.49.0
 
-From fe5520ba5fe1cac640052b72a9c6aa7cbd9e9efb Mon Sep 17 00:00:00 2001
+From f1381a402ed9c50516cc359824799c8386b81bec Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Mon, 15 Aug 2022 17:29:50 +0200
-Subject: [PATCH 015/211] net: Avoid the IPI to free the
+Subject: [PATCH 015/212] net: Avoid the IPI to free the
 
 skb_attempt_defer_free() collects a skbs, which was allocated on a
 remote CPU, on a per-CPU list. These skbs are either freed on that
@@ -1410,10 +1410,10 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  3 files changed, 40 insertions(+), 10 deletions(-)
 
 diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 8b5121eb8757..45521298a602 100644
+index 337a9d1c558f..531428066200 100644
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
-@@ -3258,7 +3258,11 @@ struct softnet_data {
+@@ -3266,7 +3266,11 @@ struct softnet_data {
  	int			defer_count;
  	int			defer_ipi_scheduled;
  	struct sk_buff		*defer_list;
@@ -1426,10 +1426,10 @@ index 8b5121eb8757..45521298a602 100644
  
  static inline void input_queue_head_incr(struct softnet_data *sd)
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 479a3892f98c..d33ca4a3b001 100644
+index c31a7f7bedf3..23e49d9a7715 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -4715,15 +4715,6 @@ static void rps_trigger_softirq(void *data)
+@@ -4746,15 +4746,6 @@ static void rps_trigger_softirq(void *data)
  
  #endif /* CONFIG_RPS */
  
@@ -1445,7 +1445,7 @@ index 479a3892f98c..d33ca4a3b001 100644
  /*
   * After we queued a packet into sd->input_pkt_queue,
   * we need to make sure this queue is serviced soon.
-@@ -6692,6 +6683,32 @@ static void skb_defer_free_flush(struct softnet_data *sd)
+@@ -6723,6 +6714,32 @@ static void skb_defer_free_flush(struct softnet_data *sd)
  	}
  }
  
@@ -1478,7 +1478,7 @@ index 479a3892f98c..d33ca4a3b001 100644
  static int napi_threaded_poll(void *data)
  {
  	struct napi_struct *napi = data;
-@@ -11633,7 +11650,11 @@ static int __init net_dev_init(void)
+@@ -11664,7 +11681,11 @@ static int __init net_dev_init(void)
  		INIT_CSD(&sd->csd, rps_trigger_softirq, sd);
  		sd->cpu = i;
  #endif
@@ -1491,7 +1491,7 @@ index 479a3892f98c..d33ca4a3b001 100644
  
  		init_gro_hash(&sd->backlog);
 diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index f0a9ef1aeaa2..682175af439d 100644
+index 21a83e26f004..4c42f9b7e238 100644
 --- a/net/core/skbuff.c
 +++ b/net/core/skbuff.c
 @@ -6863,8 +6863,13 @@ nodefer:	__kfree_skb(skb);
@@ -1510,12 +1510,12 @@ index f0a9ef1aeaa2..682175af439d 100644
  
  static void skb_splice_csum_page(struct sk_buff *skb, struct page *page,
 -- 
-2.48.1
+2.49.0
 
-From c89a0f05cb4cbba68d5880aa3c9acaa74039c8c2 Mon Sep 17 00:00:00 2001
+From 0ce38d44f36e93dfddd0f14f916746dc500d05d6 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 7 Aug 2019 18:15:38 +0200
-Subject: [PATCH 016/211] x86: Allow to enable RT
+Subject: [PATCH 016/212] x86: Allow to enable RT
 
 Allow to select RT.
 
@@ -1526,7 +1526,7 @@ Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
  1 file changed, 1 insertion(+)
 
 diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 05c82fd5d0f6..4e12735e4a5d 100644
+index a06fab5016fd..3d90e71fbdf9 100644
 --- a/arch/x86/Kconfig
 +++ b/arch/x86/Kconfig
 @@ -28,6 +28,7 @@ config X86_64
@@ -1538,12 +1538,12 @@ index 05c82fd5d0f6..4e12735e4a5d 100644
  	select HAVE_ARCH_SOFT_DIRTY
  	select MODULES_USE_ELF_RELA
 -- 
-2.48.1
+2.49.0
 
-From 5630581488599ca4f4f6903de11337a87100153d Mon Sep 17 00:00:00 2001
+From e9e3a0e000fd5e5f9c3b79d94df5804571129597 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 7 Nov 2019 17:49:20 +0100
-Subject: [PATCH 017/211] x86: Enable RT also on 32bit
+Subject: [PATCH 017/212] x86: Enable RT also on 32bit
 
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
@@ -1552,7 +1552,7 @@ Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 4e12735e4a5d..261188e66e78 100644
+index 3d90e71fbdf9..36dd5498ecbc 100644
 --- a/arch/x86/Kconfig
 +++ b/arch/x86/Kconfig
 @@ -28,7 +28,6 @@ config X86_64
@@ -1572,12 +1572,12 @@ index 4e12735e4a5d..261188e66e78 100644
  	select ARCH_USE_MEMTEST
  	select ARCH_USE_QUEUED_RWLOCKS
 -- 
-2.48.1
+2.49.0
 
-From b2881b3e4f5084ac10565a412a6490ffe2a898a4 Mon Sep 17 00:00:00 2001
+From 0cbf5090506a77adb81eb35dc0f3c4ac5e08c66f Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Tue, 1 Aug 2023 17:26:48 +0200
-Subject: [PATCH 018/211] sched/rt: Don't try push tasks if there are none.
+Subject: [PATCH 018/212] sched/rt: Don't try push tasks if there are none.
 
 I have a RT task X at a high priority and cyclictest on each CPU with
 lower priority than X's. If X is active and each CPU wakes their own
@@ -1635,12 +1635,12 @@ index b89223a97316..ad523419cb90 100644
  		rd->rto_cpu = -1;
  
 -- 
-2.48.1
+2.49.0
 
-From c14a78f2e36c9f702acd6e6c3e378ffab513a944 Mon Sep 17 00:00:00 2001
+From 231bbee23406ee3c7b12982eb403cc4ec4c444a1 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 1 Dec 2021 17:41:09 +0100
-Subject: [PATCH 019/211] softirq: Use a dedicated thread for timer wakeups.
+Subject: [PATCH 019/212] softirq: Use a dedicated thread for timer wakeups.
 
 A timer/hrtimer softirq is raised in-IRQ context. With threaded
 interrupts enabled or on PREEMPT_RT this leads to waking the ksoftirqd
@@ -1833,10 +1833,10 @@ index f24d80cf20bd..307858228485 100644
  }
  early_initcall(spawn_ksoftirqd);
 diff --git a/kernel/time/hrtimer.c b/kernel/time/hrtimer.c
-index e99b1305e1a5..c4ce69da0876 100644
+index 877535b06e73..07cc1b20938d 100644
 --- a/kernel/time/hrtimer.c
 +++ b/kernel/time/hrtimer.c
-@@ -1812,7 +1812,7 @@ void hrtimer_interrupt(struct clock_event_device *dev)
+@@ -1814,7 +1814,7 @@ void hrtimer_interrupt(struct clock_event_device *dev)
  	if (!ktime_before(now, cpu_base->softirq_expires_next)) {
  		cpu_base->softirq_expires_next = KTIME_MAX;
  		cpu_base->softirq_activated = 1;
@@ -1845,7 +1845,7 @@ index e99b1305e1a5..c4ce69da0876 100644
  	}
  
  	__hrtimer_run_queues(cpu_base, now, flags, HRTIMER_ACTIVE_HARD);
-@@ -1925,7 +1925,7 @@ void hrtimer_run_queues(void)
+@@ -1927,7 +1927,7 @@ void hrtimer_run_queues(void)
  	if (!ktime_before(now, cpu_base->softirq_expires_next)) {
  		cpu_base->softirq_expires_next = KTIME_MAX;
  		cpu_base->softirq_activated = 1;
@@ -1868,12 +1868,12 @@ index 63a8ce7177dd..7cad6fe3c035 100644
  
  /*
 -- 
-2.48.1
+2.49.0
 
-From e4aebb751e1228556a9c3ba52450dda68dd3895b Mon Sep 17 00:00:00 2001
+From 4292e6e061638c998126c407b62d76194daa9cd2 Mon Sep 17 00:00:00 2001
 From: Frederic Weisbecker <frederic@kernel.org>
 Date: Tue, 5 Apr 2022 03:07:51 +0200
-Subject: [PATCH 020/211] rcutorture: Also force sched priority to timersd on
+Subject: [PATCH 020/212] rcutorture: Also force sched priority to timersd on
  boosting test.
 
 ksoftirqd is statically boosted to the priority level right above the
@@ -1948,12 +1948,12 @@ index 307858228485..a9b6f8a65d27 100644
  
  static unsigned int local_pending_timers(void)
 -- 
-2.48.1
+2.49.0
 
-From e60d520f5191a4f1ff00e648a6ae70964560b15d Mon Sep 17 00:00:00 2001
+From 32b7e6c8b84b0f5660b706653afb8f20223acb89 Mon Sep 17 00:00:00 2001
 From: Frederic Weisbecker <frederic@kernel.org>
 Date: Tue, 5 Apr 2022 03:07:52 +0200
-Subject: [PATCH 021/211] tick: Fix timer storm since introduction of timersd
+Subject: [PATCH 021/212] tick: Fix timer storm since introduction of timersd
 
 If timers are pending while the tick is reprogrammed on nohz_mode, the
 next expiry is not armed to fire now, it is delayed one jiffy forward
@@ -2063,12 +2063,12 @@ index 55cbc49f70d1..1a0ed106b192 100644
  
  static ktime_t tick_nohz_next_event(struct tick_sched *ts, int cpu)
 -- 
-2.48.1
+2.49.0
 
-From f7239a7adc3c8ecbdd850bf3d8c3eb289a966f29 Mon Sep 17 00:00:00 2001
+From f77a00bf0c17c115d9ad2635c5e4c20e8dbac55e Mon Sep 17 00:00:00 2001
 From: Junxiao Chang <junxiao.chang@intel.com>
 Date: Mon, 20 Feb 2023 09:12:20 +0100
-Subject: [PATCH 022/211] softirq: Wake ktimers thread also in softirq.
+Subject: [PATCH 022/212] softirq: Wake ktimers thread also in softirq.
 
 If the hrtimer is raised while a softirq is processed then it does not
 wake the corresponding ktimers thread. This is due to the optimisation in the
@@ -2112,12 +2112,12 @@ index bc5b81b009cd..d1375a07cbc9 100644
  	tick_irq_exit();
  }
 -- 
-2.48.1
+2.49.0
 
-From 75bae71347fcf9567e7c9a73aedc3795389a2345 Mon Sep 17 00:00:00 2001
+From 1ad4282c84337ebc72308d9448f298a8925ad6a7 Mon Sep 17 00:00:00 2001
 From: Mike Galbraith <umgwanakikbuti@gmail.com>
 Date: Thu, 31 Mar 2016 04:08:28 +0200
-Subject: [PATCH 023/211] zram: Replace bit spinlocks with spinlock_t for
+Subject: [PATCH 023/212] zram: Replace bit spinlocks with spinlock_t for
  PREEMPT_RT.
 
 The bit spinlock disables preemption. The spinlock_t lock becomes a sleeping
@@ -2138,7 +2138,7 @@ Link: https://lore.kernel.org/20230323161830.jFbWCosd@linutronix.de
  2 files changed, 40 insertions(+)
 
 diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index b73038ad86f7..9705d2065658 100644
+index 44cf0e51d7db..adb645de064d 100644
 --- a/drivers/block/zram/zram_drv.c
 +++ b/drivers/block/zram/zram_drv.c
 @@ -57,6 +57,41 @@ static void zram_free_page(struct zram *zram, size_t index);
@@ -2214,12 +2214,12 @@ index 35e322144629..4e0c7c6d4813 100644
  	ktime_t ac_time;
  #endif
 -- 
-2.48.1
+2.49.0
 
-From 26eeb051faa4d3e5633559b252124a582515f92e Mon Sep 17 00:00:00 2001
+From 6af974326a4ffa72b10d33bcb37f5aaeebdded48 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 8 Mar 2023 16:29:38 +0100
-Subject: [PATCH 024/211] preempt: Put preempt_enable() within an
+Subject: [PATCH 024/212] preempt: Put preempt_enable() within an
  instrumentation*() section.
 
 Callers of preempt_enable() can be within an noinstr section leading to:
@@ -2266,12 +2266,12 @@ index 9aa6358a1a16..cd16f0330fba 100644
  
  #define preempt_check_resched() \
 -- 
-2.48.1
+2.49.0
 
-From 315764f12a172da080df2dd315f77b8e09b58154 Mon Sep 17 00:00:00 2001
+From 08e0dc4293a2edf0431301fb2698e89e538acdeb Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 4 Aug 2023 13:30:37 +0200
-Subject: [PATCH 025/211] sched/core: Provide a method to check if a task is
+Subject: [PATCH 025/212] sched/core: Provide a method to check if a task is
  PI-boosted.
 
 Provide a method to check if a task inherited the priority from another
@@ -2289,7 +2289,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  2 files changed, 16 insertions(+)
 
 diff --git a/include/linux/sched.h b/include/linux/sched.h
-index 951418d30e0b..d8ed598f0450 100644
+index 4d37ac5776a8..9ddc0d1c68a5 100644
 --- a/include/linux/sched.h
 +++ b/include/linux/sched.h
 @@ -1912,6 +1912,7 @@ static inline int dl_task_check_affinity(struct task_struct *p, const struct cpu
@@ -2301,10 +2301,10 @@ index 951418d30e0b..d8ed598f0450 100644
  extern void set_user_nice(struct task_struct *p, long nice);
  extern int task_prio(const struct task_struct *p);
 diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 032e5b2ea7ef..79379e386666 100644
+index 3507ebe41e04..75a1d321b3f5 100644
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
-@@ -8922,6 +8922,21 @@ static inline void preempt_dynamic_init(void) { }
+@@ -8933,6 +8933,21 @@ static inline void preempt_dynamic_init(void) { }
  
  #endif /* #ifdef CONFIG_PREEMPT_DYNAMIC */
  
@@ -2327,12 +2327,12 @@ index 032e5b2ea7ef..79379e386666 100644
   * yield - yield the current processor to other threads.
   *
 -- 
-2.48.1
+2.49.0
 
-From 81b3cc1309bff7c4bc9404c3bbaf1c98f2ba9a5d Mon Sep 17 00:00:00 2001
+From 22a7ba07b95251fcb728456400806a3018279df8 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 4 Aug 2023 13:30:38 +0200
-Subject: [PATCH 026/211] softirq: Add function to preempt serving softirqs.
+Subject: [PATCH 026/212] softirq: Add function to preempt serving softirqs.
 
 Add a functionality for the softirq handler to preempt its current work
 if needed. The softirq core has no particular state. It reads and resets
@@ -2394,12 +2394,12 @@ index d1375a07cbc9..e3b9ffd7f3ed 100644
   * Invoked from ksoftirqd_run() outside of the interrupt disabled section
   * to acquire the per CPU local lock for reentrancy protection.
 -- 
-2.48.1
+2.49.0
 
-From 121c33b47e466cabf5c3717233fdc9214025acf3 Mon Sep 17 00:00:00 2001
+From a7dfd1f8000e19285949ad274b5811def60e821a Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 4 Aug 2023 13:30:39 +0200
-Subject: [PATCH 027/211] time: Allow to preempt after a callback.
+Subject: [PATCH 027/212] time: Allow to preempt after a callback.
 
 The TIMER_SOFTIRQ handler invokes timer callbacks of the expired timers.
 Before each invocation the timer_base::lock is dropped. The only lock
@@ -2446,12 +2446,12 @@ index 7cad6fe3c035..b3fbe97d1e34 100644
  		raw_spin_lock_irq(&base->lock);
  	}
 -- 
-2.48.1
+2.49.0
 
-From a26533aad2ceda8d9a02e53d7ea4a4b1dcb1c3f0 Mon Sep 17 00:00:00 2001
+From 554b2673a185d54077de9961fdaca64bad719b99 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:19 +0206
-Subject: [PATCH 028/211] serial: core: Use lock wrappers
+Subject: [PATCH 028/212] serial: core: Use lock wrappers
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -2544,12 +2544,12 @@ index 052df85dfd59..71d925e8a79b 100644
  #endif	/* CONFIG_MAGIC_SYSRQ_SERIAL */
  
 -- 
-2.48.1
+2.49.0
 
-From 82b747afe6c934cfaaa5a924e730ebb0669d1318 Mon Sep 17 00:00:00 2001
+From 70ba7d8e0f650e4f6aca9e636c78fa48882ca4f7 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:20 +0206
-Subject: [PATCH 029/211] serial: 21285: Use port lock wrappers
+Subject: [PATCH 029/212] serial: 21285: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -2624,12 +2624,12 @@ index d756fcc884cb..4de0c975ebdc 100644
  
  static const char *serial21285_type(struct uart_port *port)
 -- 
-2.48.1
+2.49.0
 
-From fe421e3dc5e9bbf890eb42c4db1bd827e68e8d2a Mon Sep 17 00:00:00 2001
+From 22b322b64afaae9b6e15f89144bd595b37ac28d6 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:21 +0206
-Subject: [PATCH 030/211] serial: 8250_aspeed_vuart: Use port lock wrappers
+Subject: [PATCH 030/212] serial: 8250_aspeed_vuart: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -2690,12 +2690,12 @@ index 4a9e71b2dbbc..021949f252f8 100644
  	lsr = serial_port_in(port, UART_LSR);
  
 -- 
-2.48.1
+2.49.0
 
-From 1ccc75d0b9793b6cb31e73ecf06191c2f8a4b6cd Mon Sep 17 00:00:00 2001
+From 1f7f5bcef87f2de004546e5ea3746cdbd036b9eb Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:22 +0206
-Subject: [PATCH 031/211] serial: 8250_bcm7271: Use port lock wrappers
+Subject: [PATCH 031/212] serial: 8250_bcm7271: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -2846,12 +2846,12 @@ index 9afd5979c9e0..db23b3a02aef 100644
  
  	return 0;
 -- 
-2.48.1
+2.49.0
 
-From abe3994f7aab1969ca375fd06817d1a45741f1ff Mon Sep 17 00:00:00 2001
+From 4cf221720663c9da324d2fa7eb02e9f54321f9e1 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:23 +0206
-Subject: [PATCH 032/211] serial: 8250: Use port lock wrappers
+Subject: [PATCH 032/212] serial: 8250: Use port lock wrappers
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -2940,7 +2940,7 @@ index c536028e92dc..677b4aaf1f0c 100644
  
  	uart_remove_one_port(&serial8250_reg, &uart->port);
 diff --git a/drivers/tty/serial/8250/8250_port.c b/drivers/tty/serial/8250/8250_port.c
-index 2b1b2928ef7b..120a74b20d25 100644
+index c2778300e151..242ad0bded0e 100644
 --- a/drivers/tty/serial/8250/8250_port.c
 +++ b/drivers/tty/serial/8250/8250_port.c
 @@ -689,7 +689,7 @@ static void serial8250_set_sleep(struct uart_8250_port *p, int sleep)
@@ -3241,7 +3241,7 @@ index 2b1b2928ef7b..120a74b20d25 100644
  
  	/*
  	 * Disable break condition and FIFOs
-@@ -2749,14 +2749,14 @@ void serial8250_update_uartclk(struct uart_port *port, unsigned int uartclk)
+@@ -2757,14 +2757,14 @@ void serial8250_update_uartclk(struct uart_port *port, unsigned int uartclk)
  	quot = serial8250_get_divisor(port, baud, &frac);
  
  	serial8250_rpm_get(up);
@@ -3258,7 +3258,7 @@ index 2b1b2928ef7b..120a74b20d25 100644
  	serial8250_rpm_put(up);
  
  out_unlock:
-@@ -2793,7 +2793,7 @@ serial8250_do_set_termios(struct uart_port *port, struct ktermios *termios,
+@@ -2801,7 +2801,7 @@ serial8250_do_set_termios(struct uart_port *port, struct ktermios *termios,
  	 * Synchronize UART_IER access against the console.
  	 */
  	serial8250_rpm_get(up);
@@ -3267,7 +3267,7 @@ index 2b1b2928ef7b..120a74b20d25 100644
  
  	up->lcr = cval;					/* Save computed LCR */
  
-@@ -2896,7 +2896,7 @@ serial8250_do_set_termios(struct uart_port *port, struct ktermios *termios,
+@@ -2904,7 +2904,7 @@ serial8250_do_set_termios(struct uart_port *port, struct ktermios *termios,
  		serial_port_out(port, UART_FCR, up->fcr);	/* set fcr */
  	}
  	serial8250_set_mctrl(port, port->mctrl);
@@ -3276,7 +3276,7 @@ index 2b1b2928ef7b..120a74b20d25 100644
  	serial8250_rpm_put(up);
  
  	/* Don't rewrite B0 */
-@@ -2919,15 +2919,15 @@ void serial8250_do_set_ldisc(struct uart_port *port, struct ktermios *termios)
+@@ -2927,15 +2927,15 @@ void serial8250_do_set_ldisc(struct uart_port *port, struct ktermios *termios)
  {
  	if (termios->c_line == N_PPS) {
  		port->flags |= UPF_HARDPPS_CD;
@@ -3296,7 +3296,7 @@ index 2b1b2928ef7b..120a74b20d25 100644
  		}
  	}
  }
-@@ -3420,9 +3420,9 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
+@@ -3429,9 +3429,9 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
  	touch_nmi_watchdog();
  
  	if (oops_in_progress)
@@ -3308,7 +3308,7 @@ index 2b1b2928ef7b..120a74b20d25 100644
  
  	/*
  	 *	First save the IER then disable the interrupts
-@@ -3492,7 +3492,7 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
+@@ -3501,7 +3501,7 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
  		serial8250_modem_status(up);
  
  	if (locked)
@@ -3318,12 +3318,12 @@ index 2b1b2928ef7b..120a74b20d25 100644
  
  static unsigned int probe_baud(struct uart_port *port)
 -- 
-2.48.1
+2.49.0
 
-From 8fdc09411e5db2c5c3cef6e3a23e4f8a96a687f9 Mon Sep 17 00:00:00 2001
+From 9b7a66f53673e34808e18b8d964e61a55edbf0c5 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:24 +0206
-Subject: [PATCH 033/211] serial: 8250_dma: Use port lock wrappers
+Subject: [PATCH 033/212] serial: 8250_dma: Use port lock wrappers
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -3363,7 +3363,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/tty/serial/8250/8250_dma.c b/drivers/tty/serial/8250/8250_dma.c
-index 7fa66501792d..8b30ca8fdd3f 100644
+index 7f23037813bc..cf51976ff445 100644
 --- a/drivers/tty/serial/8250/8250_dma.c
 +++ b/drivers/tty/serial/8250/8250_dma.c
 @@ -22,7 +22,7 @@ static void __dma_tx_complete(void *param)
@@ -3403,12 +3403,12 @@ index 7fa66501792d..8b30ca8fdd3f 100644
  
  int serial8250_tx_dma(struct uart_8250_port *p)
 -- 
-2.48.1
+2.49.0
 
-From c71482df500a18f14e5bd349a833120c15b1a3b0 Mon Sep 17 00:00:00 2001
+From 3883d5aebe304c95124078ca652dda7356adfc19 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:25 +0206
-Subject: [PATCH 034/211] serial: 8250_dw: Use port lock wrappers
+Subject: [PATCH 034/212] serial: 8250_dw: Use port lock wrappers
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -3477,12 +3477,12 @@ index eaf4a907380a..d12f230f1605 100644
  		if (status & (UART_LSR_DR | UART_LSR_BI)) {
  			dw8250_writel_ext(p, RZN1_UART_RDMACR, 0);
 -- 
-2.48.1
+2.49.0
 
-From 1681985d3c092574837e54caa801316de9267b10 Mon Sep 17 00:00:00 2001
+From ba32d95eef4568c64da506a83a80900352653d38 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:26 +0206
-Subject: [PATCH 035/211] serial: 8250_exar: Use port lock wrappers
+Subject: [PATCH 035/212] serial: 8250_exar: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -3534,12 +3534,12 @@ index 27430fdd9e76..17be6ad24a0f 100644
  	return serial8250_do_startup(port);
  }
 -- 
-2.48.1
+2.49.0
 
-From 3b36e3f8067824950ef3fb527176759f37e84e7a Mon Sep 17 00:00:00 2001
+From fcae58dab7343eeb45e51a56692846f3ebc0f0d9 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:27 +0206
-Subject: [PATCH 036/211] serial: 8250_fsl: Use port lock wrappers
+Subject: [PATCH 036/212] serial: 8250_fsl: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -3602,12 +3602,12 @@ index 6af4e1c1210a..f522eb5026c9 100644
  	}
  
 -- 
-2.48.1
+2.49.0
 
-From a9d1add6530f5f2e4364b9ce832a855b33e4af4d Mon Sep 17 00:00:00 2001
+From 5450ae308742aaec8ff2c5a8bbb056945f9eab5b Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:28 +0206
-Subject: [PATCH 037/211] serial: 8250_mtk: Use port lock wrappers
+Subject: [PATCH 037/212] serial: 8250_mtk: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -3684,12 +3684,12 @@ index 28f9a2679a20..33699e86eb52 100644
  	if (tty_termios_baud_rate(termios))
  		tty_termios_encode_baud_rate(termios, baud, baud);
 -- 
-2.48.1
+2.49.0
 
-From 892d6a093b64eab2967ed556acbb4c78f10a6226 Mon Sep 17 00:00:00 2001
+From e58165b9b1bae392fa1f9a347e0002e117cc3ea0 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:29 +0206
-Subject: [PATCH 038/211] serial: 8250_omap: Use port lock wrappers
+Subject: [PATCH 038/212] serial: 8250_omap: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -3925,12 +3925,12 @@ index 9ed62bc7cdd8..e687cd0daa76 100644
  
  	priv->latency = priv->calc_latency;
 -- 
-2.48.1
+2.49.0
 
-From b37200adb77e4aef5c4d6741eb90be77057410da Mon Sep 17 00:00:00 2001
+From 4a4d4797c80a465dd3a4b3fed7ba4e596fd85dfa Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:30 +0206
-Subject: [PATCH 039/211] serial: 8250_pci1xxxx: Use port lock wrappers
+Subject: [PATCH 039/212] serial: 8250_pci1xxxx: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -3996,12 +3996,12 @@ index a3b25779d921..53e238c8cc89 100644
  	mutex_unlock(&tport->mutex);
  }
 -- 
-2.48.1
+2.49.0
 
-From ace92f877e9846d53c2ede946d1271665f1bb6f4 Mon Sep 17 00:00:00 2001
+From cfe98ea1754a00a6f29cf341f25c25531a15023e Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:31 +0206
-Subject: [PATCH 040/211] serial: altera_jtaguart: Use port lock wrappers
+Subject: [PATCH 040/212] serial: altera_jtaguart: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -4134,12 +4134,12 @@ index 5fab4c978891..7090b251dd4d 100644
  #endif
  
 -- 
-2.48.1
+2.49.0
 
-From 5a7477ba848974610ac97d51cf5c9bb0b4d388ee Mon Sep 17 00:00:00 2001
+From 76db91782fff71a80c0231aa6f7fe29d9b6ebda3 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:32 +0206
-Subject: [PATCH 041/211] serial: altera_uart: Use port lock wrappers
+Subject: [PATCH 041/212] serial: altera_uart: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -4255,12 +4255,12 @@ index a9c41942190c..77835ac68df2 100644
  	if (port->irq)
  		free_irq(port->irq, port);
 -- 
-2.48.1
+2.49.0
 
-From a99d7453948a555f70146a27fe518b666db60301 Mon Sep 17 00:00:00 2001
+From da155d8633efad6064ff9a1c31fd9f1ea9a8189e Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:33 +0206
-Subject: [PATCH 042/211] serial: amba-pl010: Use port lock wrappers
+Subject: [PATCH 042/212] serial: amba-pl010: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -4372,12 +4372,12 @@ index b5a7404cbacb..eabbf8afc9b5 100644
  	}
  }
 -- 
-2.48.1
+2.49.0
 
-From 97fbab99203c543f201692f4b4561c62c9df6388 Mon Sep 17 00:00:00 2001
+From 4ec4dd06db63940c696b790665497871a11ef893 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:35 +0206
-Subject: [PATCH 043/211] serial: apb: Use port lock wrappers
+Subject: [PATCH 043/212] serial: apb: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -4453,12 +4453,12 @@ index d3cb341f2c55..364599f256db 100644
  
  static const char *apbuart_type(struct uart_port *port)
 -- 
-2.48.1
+2.49.0
 
-From f6abf89cfa548b29dad3a6978aec967ca4472c61 Mon Sep 17 00:00:00 2001
+From 82768e415b59146b3d4dcd072bbb7f4ae79f2f0f Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:36 +0206
-Subject: [PATCH 044/211] serial: ar933x: Use port lock wrappers
+Subject: [PATCH 044/212] serial: ar933x: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -4602,12 +4602,12 @@ index 924c1a89347c..ffd234673177 100644
  	local_irq_restore(flags);
  }
 -- 
-2.48.1
+2.49.0
 
-From e0934d2361216412246e7ecbebd27a6853a68bdf Mon Sep 17 00:00:00 2001
+From 318c69f5ef4022ee97ced47373975d5b065dce1e Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:37 +0206
-Subject: [PATCH 045/211] serial: arc_uart: Use port lock wrappers
+Subject: [PATCH 045/212] serial: arc_uart: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -4704,12 +4704,12 @@ index ad4ae19b6ce3..1aa5b2b49c26 100644
  
  static struct console arc_console = {
 -- 
-2.48.1
+2.49.0
 
-From 870b2a2990a2aa718f2e307800787800b06829c1 Mon Sep 17 00:00:00 2001
+From e3392c26094fd2951e8e544a390c48f900e7ef9f Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:38 +0206
-Subject: [PATCH 046/211] serial: atmel: Use port lock wrappers
+Subject: [PATCH 046/212] serial: atmel: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -4828,12 +4828,12 @@ index bcca5627afac..5a3f2fc476f9 100644
  	}
  }
 -- 
-2.48.1
+2.49.0
 
-From a946be68f7d48f7ca488fb7dbe630f8a1d7bb384 Mon Sep 17 00:00:00 2001
+From fc3f29eeae00b615a8d62ae1f891765246cf2076 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:39 +0206
-Subject: [PATCH 047/211] serial: bcm63xx-uart: Use port lock wrappers
+Subject: [PATCH 047/212] serial: bcm63xx-uart: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -4961,12 +4961,12 @@ index 44c27e5cefbc..b104c36ce5c0 100644
  }
  
 -- 
-2.48.1
+2.49.0
 
-From 8fd3f58a3d96261e75f6c51c7d44934bdf87d9ce Mon Sep 17 00:00:00 2001
+From b218c4286764dde4795f2b7fa8f277d30c67f5e8 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:40 +0206
-Subject: [PATCH 048/211] serial: cpm_uart: Use port lock wrappers
+Subject: [PATCH 048/212] serial: cpm_uart: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -5036,12 +5036,12 @@ index 626423022d62..be4af6eda4c2 100644
  }
  
 -- 
-2.48.1
+2.49.0
 
-From d29f837acd66ca064e7339117a62d1fb4748637d Mon Sep 17 00:00:00 2001
+From b608e0c559252aeddf6474f6528f26d8e1454306 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:41 +0206
-Subject: [PATCH 049/211] serial: digicolor: Use port lock wrappers
+Subject: [PATCH 049/212] serial: digicolor: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -5154,12 +5154,12 @@ index 128b5479e813..5004125f3045 100644
  	/* Wait for transmitter to become empty */
  	do {
 -- 
-2.48.1
+2.49.0
 
-From 55866184853d471304a10abc900b523ad4090711 Mon Sep 17 00:00:00 2001
+From 5e2ca18dd4ee7268bfba505618644d70c36fb670 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:42 +0206
-Subject: [PATCH 050/211] serial: dz: Use port lock wrappers
+Subject: [PATCH 050/212] serial: dz: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -5320,12 +5320,12 @@ index 667f52e83277..6df7af9edc1c 100644
  	do {
  		trdy = dz_in(dport, DZ_CSR);
 -- 
-2.48.1
+2.49.0
 
-From eae083a423949e8d9e0c060feb9019bf33efb73c Mon Sep 17 00:00:00 2001
+From 5bdd83ad47ca896f992275a7834b49a75c7d3eb2 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:43 +0206
-Subject: [PATCH 051/211] serial: linflexuart: Use port lock wrappers
+Subject: [PATCH 051/212] serial: linflexuart: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -5468,12 +5468,12 @@ index 249cb380c3c6..7fa809a405e8 100644
  
  /*
 -- 
-2.48.1
+2.49.0
 
-From a967a69990d5ea69e87d1a54589431cad28ab508 Mon Sep 17 00:00:00 2001
+From 99ee2262226340ed12a96b8e03866e937091b838 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:44 +0206
-Subject: [PATCH 052/211] serial: fsl_lpuart: Use port lock wrappers
+Subject: [PATCH 052/212] serial: fsl_lpuart: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -5862,12 +5862,12 @@ index 8bd0f8e45b14..58c2c460ccd8 100644
  			dmaengine_terminate_sync(sport->dma_tx_chan);
  		}
 -- 
-2.48.1
+2.49.0
 
-From 50619611c189bbfc315ab313530fe9f59559752d Mon Sep 17 00:00:00 2001
+From d144e2d453ce8982ae71aec53adbf3c20f3da2c7 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:45 +0206
-Subject: [PATCH 053/211] serial: icom: Use port lock wrappers
+Subject: [PATCH 053/212] serial: icom: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -6018,12 +6018,12 @@ index 819f957b6b84..a75eafbcbea3 100644
  
  static const char *icom_type(struct uart_port *port)
 -- 
-2.48.1
+2.49.0
 
-From ab85b85faba2259386dffe139930f59cfb06c206 Mon Sep 17 00:00:00 2001
+From 9bd94ef716ad7f8e15e5641c4cae94263a5d8d2a Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:46 +0206
-Subject: [PATCH 054/211] serial: imx: Use port lock wrappers
+Subject: [PATCH 054/212] serial: imx: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -6377,12 +6377,12 @@ index 349d4849ba5e..3934ab8fef14 100644
  
  static void imx_uart_enable_wakeup(struct imx_port *sport, bool on)
 -- 
-2.48.1
+2.49.0
 
-From eeb246f1512d762ee42060f5901e743576b70c29 Mon Sep 17 00:00:00 2001
+From b8724d47b89ea948c7b53032ba85927ac511a4c5 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:47 +0206
-Subject: [PATCH 055/211] serial: ip22zilog: Use port lock wrappers
+Subject: [PATCH 055/212] serial: ip22zilog: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -6567,12 +6567,12 @@ index 845ff706bc59..320b29cd4683 100644
  	if (options)
  		uart_parse_options(options, &baud, &parity, &bits, &flow);
 -- 
-2.48.1
+2.49.0
 
-From 1baad4c3a648b565ab922ad45f44db994e922fa8 Mon Sep 17 00:00:00 2001
+From 90d734292e73d7badae0f49a35cc478bbde137a0 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:48 +0206
-Subject: [PATCH 056/211] serial: jsm: Use port lock wrappers
+Subject: [PATCH 056/212] serial: jsm: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -6698,12 +6698,12 @@ index 222afc270c88..ce0fef7e2c66 100644
  
  static const char *jsm_tty_type(struct uart_port *port)
 -- 
-2.48.1
+2.49.0
 
-From e0d8f34471d47d2cfc84391e0abec5ef76fb5e79 Mon Sep 17 00:00:00 2001
+From b3e3b4a0968e45e5b2bcc3806244be5ab7ba3a65 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:49 +0206
-Subject: [PATCH 057/211] serial: liteuart: Use port lock wrappers
+Subject: [PATCH 057/212] serial: liteuart: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -6813,12 +6813,12 @@ index d881cdd2a58f..a25ab1efe38f 100644
  
  static int liteuart_console_setup(struct console *co, char *options)
 -- 
-2.48.1
+2.49.0
 
-From fea3360eda273b53f336c1f6fab390ef7289f885 Mon Sep 17 00:00:00 2001
+From 4c6f5cfd32f1726d1cca6cbc07a325c40502bcb3 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:50 +0206
-Subject: [PATCH 058/211] serial: lpc32xx_hs: Use port lock wrappers
+Subject: [PATCH 058/212] serial: lpc32xx_hs: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -6966,12 +6966,12 @@ index b38fe4728c26..5149a947b7fe 100644
  	/* Don't rewrite B0 */
  	if (tty_termios_baud_rate(termios))
 -- 
-2.48.1
+2.49.0
 
-From 6446e14d58e737c2d96b1dcbcb7bd13db7422d89 Mon Sep 17 00:00:00 2001
+From 530a1703aadad451918e485456eb7d79bcd52fa2 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:51 +0206
-Subject: [PATCH 059/211] serial: ma35d1: Use port lock wrappers
+Subject: [PATCH 059/212] serial: ma35d1: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -7088,12 +7088,12 @@ index 99225f1e02ac..faccd772c68c 100644
  
  static int __init ma35d1serial_console_setup(struct console *co, char *options)
 -- 
-2.48.1
+2.49.0
 
-From e23436c8e19de999b2087c36299964b6f5394321 Mon Sep 17 00:00:00 2001
+From 6a06c545879896a629ea4620f4a6e684f662cb74 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:52 +0206
-Subject: [PATCH 060/211] serial: mcf: Use port lock wrappers
+Subject: [PATCH 060/212] serial: mcf: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -7220,12 +7220,12 @@ index aea29b4e6567..ee40af20a08f 100644
  	return ret;
  }
 -- 
-2.48.1
+2.49.0
 
-From 7062a25c1efd98cc77bf6b7b86c3c0f7f0ef19cf Mon Sep 17 00:00:00 2001
+From a8766bb6b0922c80dfc96637b5f3cc0a934d4ded Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:53 +0206
-Subject: [PATCH 061/211] serial: men_z135_uart: Use port lock wrappers
+Subject: [PATCH 061/212] serial: men_z135_uart: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -7301,12 +7301,12 @@ index d2502aaa3e8c..8048fa542fc4 100644
  
  static const char *men_z135_type(struct uart_port *port)
 -- 
-2.48.1
+2.49.0
 
-From 4fa90b74a0da9a8b510f19bab36e146109f518ed Mon Sep 17 00:00:00 2001
+From 7ab13bb554d6b6eacbf3c7d4a431604a51de8eae Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:54 +0206
-Subject: [PATCH 062/211] serial: meson: Use port lock wrappers
+Subject: [PATCH 062/212] serial: meson: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -7474,12 +7474,12 @@ index 9388b9ddea3b..4c1d2089a0bb 100644
  }
  
 -- 
-2.48.1
+2.49.0
 
-From cfd13bd2f7af0582a9280ba0fcfa2377e6fa6302 Mon Sep 17 00:00:00 2001
+From 76d86ab6c4eacc060377454f076580bf9d1fca43 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:55 +0206
-Subject: [PATCH 063/211] serial: milbeaut_usio: Use port lock wrappers
+Subject: [PATCH 063/212] serial: milbeaut_usio: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -7580,12 +7580,12 @@ index 70a910085e93..db3b81f2aa57 100644
  
  static const char *mlb_usio_type(struct uart_port *port)
 -- 
-2.48.1
+2.49.0
 
-From d45ab89cae1b0bbb0c69268ec09e421661107750 Mon Sep 17 00:00:00 2001
+From d6736499e1df7317e50abfb710c7a9d45b10c818 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:56 +0206
-Subject: [PATCH 064/211] serial: mpc52xx: Use port lock wrappers
+Subject: [PATCH 064/212] serial: mpc52xx: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -7674,12 +7674,12 @@ index 916507b8f31d..a252465e745f 100644
  	return ret;
  }
 -- 
-2.48.1
+2.49.0
 
-From 71ea82a6dd981af183dbef4c6a447c320fea6482 Mon Sep 17 00:00:00 2001
+From faef960a5798b37067fdbc50251c99a5096504d8 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:57 +0206
-Subject: [PATCH 065/211] serial: mps2-uart: Use port lock wrappers
+Subject: [PATCH 065/212] serial: mps2-uart: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -7782,12 +7782,12 @@ index ea5a7911cb15..2a4c09f3a834 100644
  	if (tty_termios_baud_rate(termios))
  		tty_termios_encode_baud_rate(termios, baud, baud);
 -- 
-2.48.1
+2.49.0
 
-From bc0e349083cd57cfbd9da418772ce1da30f031db Mon Sep 17 00:00:00 2001
+From 553b8c009ea893baeba65b33bcda00b72ce3c981 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:58 +0206
-Subject: [PATCH 066/211] serial: msm: Use port lock wrappers
+Subject: [PATCH 066/212] serial: msm: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -7972,12 +7972,12 @@ index 90953e679e38..597264b546fd 100644
  	local_irq_restore(flags);
  }
 -- 
-2.48.1
+2.49.0
 
-From 4d93a74d33aef29585a2380de21346c1e0f966fe Mon Sep 17 00:00:00 2001
+From a57b195f98be2992685eedc822329fc2c25567e6 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:43:59 +0206
-Subject: [PATCH 067/211] serial: mvebu-uart: Use port lock wrappers
+Subject: [PATCH 067/212] serial: mvebu-uart: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -8085,12 +8085,12 @@ index ea924e9b913b..0255646bc175 100644
  
  static int mvebu_uart_console_setup(struct console *co, char *options)
 -- 
-2.48.1
+2.49.0
 
-From 13fc24293834385a035602143159a304f2edfd58 Mon Sep 17 00:00:00 2001
+From 3649ce0aabb63b8824ff83433baef494cb5cb912 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:00 +0206
-Subject: [PATCH 068/211] serial: omap: Use port lock wrappers
+Subject: [PATCH 068/212] serial: omap: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -8270,12 +8270,12 @@ index 135a838f517a..f4c6ff806465 100644
  }
  
 -- 
-2.48.1
+2.49.0
 
-From 570c0a40adfa87d8aba2d6b5e9748d48fbf0b6e3 Mon Sep 17 00:00:00 2001
+From 4902f719aa852b0e927fa171c3e1bf97803bc6e1 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:01 +0206
-Subject: [PATCH 069/211] serial: owl: Use port lock wrappers
+Subject: [PATCH 069/212] serial: owl: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -8422,12 +8422,12 @@ index e99970a9437f..919f5e5aa0f1 100644
  	local_irq_restore(flags);
  }
 -- 
-2.48.1
+2.49.0
 
-From 49d2a1e56d7db3e6b9586aa5d08e14b9758bf225 Mon Sep 17 00:00:00 2001
+From e287a124fc0a32036c35b0b0cc8e6a903b55e222 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:02 +0206
-Subject: [PATCH 070/211] serial: pch: Use port lock wrappers
+Subject: [PATCH 070/212] serial: pch: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -8507,12 +8507,12 @@ index cc83b772b7ca..436cc6d52a11 100644
  		spin_unlock(&priv->lock);
  	local_irq_restore(flags);
 -- 
-2.48.1
+2.49.0
 
-From 4318282e42dbd272d9c8342f14d0c308c712516a Mon Sep 17 00:00:00 2001
+From 475c4a6fd7d807dcd58a12e9d99303f3f050423a Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:03 +0206
-Subject: [PATCH 071/211] serial: pic32: Use port lock wrappers
+Subject: [PATCH 071/212] serial: pic32: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -8630,12 +8630,12 @@ index e308d5022b3f..3a95bf5d55d3 100644
  
  /* serial core request to claim uart iomem */
 -- 
-2.48.1
+2.49.0
 
-From 4b4dbc47e5f0cb08846d2b0711ad68b3328bf4d5 Mon Sep 17 00:00:00 2001
+From 07e6de9aa73b438b252bebbe2d5008f4c61b969f Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:04 +0206
-Subject: [PATCH 072/211] serial: pmac_zilog: Use port lock wrappers
+Subject: [PATCH 072/212] serial: pmac_zilog: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -8867,12 +8867,12 @@ index 29bc80d39e8b..77691fbbf779 100644
  
  /*
 -- 
-2.48.1
+2.49.0
 
-From 1ad8d595a43792a48a4e2af0304535c34dee918b Mon Sep 17 00:00:00 2001
+From 390db600064b1b74eca68fdbe32aebf44f68758b Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:05 +0206
-Subject: [PATCH 073/211] serial: pxa: Use port lock wrappers
+Subject: [PATCH 073/212] serial: pxa: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -9022,12 +9022,12 @@ index 73c60f5ea027..46e70e155aab 100644
  	clk_disable(up->clk);
  
 -- 
-2.48.1
+2.49.0
 
-From c28063f74017f3f8dc355db3666436f7a54a93eb Mon Sep 17 00:00:00 2001
+From 9311c915e726ffd447fb29987f6b5ffa2eb871a4 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:06 +0206
-Subject: [PATCH 074/211] serial: qcom-geni: Use port lock wrappers
+Subject: [PATCH 074/212] serial: qcom-geni: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -9098,12 +9098,12 @@ index f820a09cb5c3..a7db08431ef3 100644
  	m_irq_status = readl(uport->membase + SE_GENI_M_IRQ_STATUS);
  	s_irq_status = readl(uport->membase + SE_GENI_S_IRQ_STATUS);
 -- 
-2.48.1
+2.49.0
 
-From 21c17bdccffda69991e43b844a9c23064b1b7425 Mon Sep 17 00:00:00 2001
+From 264ada21cf6fbfc62a928137ae138a6c65eeb230 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:07 +0206
-Subject: [PATCH 075/211] serial: rda: Use port lock wrappers
+Subject: [PATCH 075/212] serial: rda: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -9280,12 +9280,12 @@ index be5c842b5ba9..d824c8318f33 100644
  	local_irq_restore(flags);
  }
 -- 
-2.48.1
+2.49.0
 
-From 6d0c06fded4496c7b47ed4b952a95fde30d68c1a Mon Sep 17 00:00:00 2001
+From 3e930cf69e1a621bc67b87e21e340b5378741982 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:08 +0206
-Subject: [PATCH 076/211] serial: rp2: Use port lock wrappers
+Subject: [PATCH 076/212] serial: rp2: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -9399,12 +9399,12 @@ index 5a1de6044b38..45be2b88168e 100644
  
  static const char *rp2_uart_type(struct uart_port *port)
 -- 
-2.48.1
+2.49.0
 
-From 1a3add19bdcde10b250d6d3742437c4e72a12d1c Mon Sep 17 00:00:00 2001
+From da8ff1af958b2b4ea44d81c0129090352ff75584 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:09 +0206
-Subject: [PATCH 077/211] serial: sa1100: Use port lock wrappers
+Subject: [PATCH 077/212] serial: sa1100: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -9521,12 +9521,12 @@ index ad011f1e2f4d..be7bcd75d9f4 100644
  
  static const char *sa1100_type(struct uart_port *port)
 -- 
-2.48.1
+2.49.0
 
-From ba60411d132154af1271958954bd0084ab6e4c66 Mon Sep 17 00:00:00 2001
+From 7a07a2948f9f79a793e5592f7090869f7c0972bd Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:10 +0206
-Subject: [PATCH 078/211] serial: samsung_tty: Use port lock wrappers
+Subject: [PATCH 078/212] serial: samsung_tty: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -9771,12 +9771,12 @@ index 5a4d88e13471..a82b65155f6e 100644
  
  /* Shouldn't be __init, as it can be instantiated from other module */
 -- 
-2.48.1
+2.49.0
 
-From c1968d62e93bda5f9c1331d6622d975caa3e578a Mon Sep 17 00:00:00 2001
+From dab15f1b255f52735060e92fcd9edbabd9014e1c Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:11 +0206
-Subject: [PATCH 079/211] serial: sb1250-duart: Use port lock wrappers
+Subject: [PATCH 079/212] serial: sb1250-duart: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -9861,12 +9861,12 @@ index f3cd69346482..dbec29d9a6c3 100644
  
  static int __init sbd_console_setup(struct console *co, char *options)
 -- 
-2.48.1
+2.49.0
 
-From 0fb9cb9219154023310a47d64ac0bbcc3530c4c8 Mon Sep 17 00:00:00 2001
+From ac451cca96c2f7bacc543c4fc669cbc23e3284e5 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:12 +0206
-Subject: [PATCH 080/211] serial: sc16is7xx: Use port lock wrappers
+Subject: [PATCH 080/212] serial: sc16is7xx: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -9925,12 +9925,12 @@ index 8a2ce2ca6b39..fd0f03965c11 100644
  
  static void sc16is7xx_reconf_rs485(struct uart_port *port)
 -- 
-2.48.1
+2.49.0
 
-From d8fd19f684b8a0abaf65179d86370bf4f068bff5 Mon Sep 17 00:00:00 2001
+From c452a7ab77b8c38060ca2c13dcac5507b2ba5925 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:13 +0206
-Subject: [PATCH 081/211] serial: tegra: Use port lock wrappers
+Subject: [PATCH 081/212] serial: tegra: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -10106,12 +10106,12 @@ index d4ec943cb8e9..6d4006b41975 100644
  
  static const char *tegra_uart_type(struct uart_port *u)
 -- 
-2.48.1
+2.49.0
 
-From 8ed1d96f9763add75cf1c34a9a47f18c6876a7ca Mon Sep 17 00:00:00 2001
+From 8300e2ad18fedc91ada12ed3575a2ca88034fda4 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:14 +0206
-Subject: [PATCH 082/211] serial: core: Use port lock wrappers
+Subject: [PATCH 082/212] serial: core: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -10462,7 +10462,7 @@ index 8ff0efac6aa0..398104760fbc 100644
  		uart_rs485_config(port);
  
 diff --git a/drivers/tty/serial/serial_port.c b/drivers/tty/serial/serial_port.c
-index 469ad26cde48..66fd117d8aea 100644
+index a21c28707703..a871acc51c70 100644
 --- a/drivers/tty/serial/serial_port.c
 +++ b/drivers/tty/serial/serial_port.c
 @@ -38,14 +38,14 @@ static int serial_port_runtime_resume(struct device *dev)
@@ -10483,12 +10483,12 @@ index 469ad26cde48..66fd117d8aea 100644
  out:
  	pm_runtime_mark_last_busy(dev);
 -- 
-2.48.1
+2.49.0
 
-From 0006bcfe062e429ca11e2e238a7b0f22927d316a Mon Sep 17 00:00:00 2001
+From e12b642485dd965890437578cfc4a3717d82fd78 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:15 +0206
-Subject: [PATCH 083/211] serial: mctrl_gpio: Use port lock wrappers
+Subject: [PATCH 083/212] serial: mctrl_gpio: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -10546,12 +10546,12 @@ index 7d5aaa8d422b..e51ca593ab86 100644
  	return IRQ_HANDLED;
  }
 -- 
-2.48.1
+2.49.0
 
-From cc35569a0f99c848046c8b47343de74700c161f8 Mon Sep 17 00:00:00 2001
+From 1f86c343266d2d4ab8f6db5c2aaf0df86245739c Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:16 +0206
-Subject: [PATCH 084/211] serial: txx9: Use port lock wrappers
+Subject: [PATCH 084/212] serial: txx9: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -10685,12 +10685,12 @@ index be08fb6f749c..eaa980722455 100644
  
  static void
 -- 
-2.48.1
+2.49.0
 
-From e59499a5c15c632651142f1750144bea9f820e49 Mon Sep 17 00:00:00 2001
+From 2a670639051be339da74cbbefb317d4b38024a1c Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:17 +0206
-Subject: [PATCH 085/211] serial: sh-sci: Use port lock wrappers
+Subject: [PATCH 085/212] serial: sh-sci: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -10726,10 +10726,10 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  1 file changed, 34 insertions(+), 34 deletions(-)
 
 diff --git a/drivers/tty/serial/sh-sci.c b/drivers/tty/serial/sh-sci.c
-index f793624fd501..2559c97812fa 100644
+index 4350a69d97d7..9f8e224e1182 100644
 --- a/drivers/tty/serial/sh-sci.c
 +++ b/drivers/tty/serial/sh-sci.c
-@@ -1205,7 +1205,7 @@ static void sci_dma_tx_complete(void *arg)
+@@ -1206,7 +1206,7 @@ static void sci_dma_tx_complete(void *arg)
  
  	dev_dbg(port->dev, "%s(%d)\n", __func__, port->line);
  
@@ -10738,7 +10738,7 @@ index f793624fd501..2559c97812fa 100644
  
  	uart_xmit_advance(port, s->tx_dma_len);
  
-@@ -1229,7 +1229,7 @@ static void sci_dma_tx_complete(void *arg)
+@@ -1230,7 +1230,7 @@ static void sci_dma_tx_complete(void *arg)
  		}
  	}
  
@@ -10747,7 +10747,7 @@ index f793624fd501..2559c97812fa 100644
  }
  
  /* Locking: called with port lock held */
-@@ -1325,7 +1325,7 @@ static void sci_dma_rx_complete(void *arg)
+@@ -1326,7 +1326,7 @@ static void sci_dma_rx_complete(void *arg)
  	dev_dbg(port->dev, "%s(%d) active cookie %d\n", __func__, port->line,
  		s->active_rx);
  
@@ -10756,7 +10756,7 @@ index f793624fd501..2559c97812fa 100644
  
  	active = sci_dma_rx_find_active(s);
  	if (active >= 0)
-@@ -1352,20 +1352,20 @@ static void sci_dma_rx_complete(void *arg)
+@@ -1353,20 +1353,20 @@ static void sci_dma_rx_complete(void *arg)
  
  	dma_async_issue_pending(chan);
  
@@ -10781,7 +10781,7 @@ index f793624fd501..2559c97812fa 100644
  }
  
  static void sci_dma_tx_release(struct sci_port *s)
-@@ -1414,13 +1414,13 @@ static int sci_dma_rx_submit(struct sci_port *s, bool port_lock_held)
+@@ -1415,13 +1415,13 @@ static int sci_dma_rx_submit(struct sci_port *s, bool port_lock_held)
  fail:
  	/* Switch to PIO */
  	if (!port_lock_held)
@@ -10797,7 +10797,7 @@ index f793624fd501..2559c97812fa 100644
  	return -EAGAIN;
  }
  
-@@ -1442,14 +1442,14 @@ static void sci_dma_tx_work_fn(struct work_struct *work)
+@@ -1443,14 +1443,14 @@ static void sci_dma_tx_work_fn(struct work_struct *work)
  	 * transmit till the end, and then the rest. Take the port lock to get a
  	 * consistent xmit buffer state.
  	 */
@@ -10814,7 +10814,7 @@ index f793624fd501..2559c97812fa 100644
  		return;
  	}
  
-@@ -1457,7 +1457,7 @@ static void sci_dma_tx_work_fn(struct work_struct *work)
+@@ -1458,7 +1458,7 @@ static void sci_dma_tx_work_fn(struct work_struct *work)
  					   DMA_MEM_TO_DEV,
  					   DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
  	if (!desc) {
@@ -10823,7 +10823,7 @@ index f793624fd501..2559c97812fa 100644
  		dev_warn(port->dev, "Failed preparing Tx DMA descriptor\n");
  		goto switch_to_pio;
  	}
-@@ -1469,12 +1469,12 @@ static void sci_dma_tx_work_fn(struct work_struct *work)
+@@ -1470,12 +1470,12 @@ static void sci_dma_tx_work_fn(struct work_struct *work)
  	desc->callback_param = s;
  	s->cookie_tx = dmaengine_submit(desc);
  	if (dma_submit_error(s->cookie_tx)) {
@@ -10838,7 +10838,7 @@ index f793624fd501..2559c97812fa 100644
  	dev_dbg(port->dev, "%s: %p: %d...%d, cookie %d\n",
  		__func__, xmit->buf, tail, head, s->cookie_tx);
  
-@@ -1482,10 +1482,10 @@ static void sci_dma_tx_work_fn(struct work_struct *work)
+@@ -1483,10 +1483,10 @@ static void sci_dma_tx_work_fn(struct work_struct *work)
  	return;
  
  switch_to_pio:
@@ -10851,7 +10851,7 @@ index f793624fd501..2559c97812fa 100644
  	return;
  }
  
-@@ -1502,17 +1502,17 @@ static enum hrtimer_restart sci_dma_rx_timer_fn(struct hrtimer *t)
+@@ -1503,17 +1503,17 @@ static enum hrtimer_restart sci_dma_rx_timer_fn(struct hrtimer *t)
  
  	dev_dbg(port->dev, "DMA Rx timed out\n");
  
@@ -10872,7 +10872,7 @@ index f793624fd501..2559c97812fa 100644
  		dev_dbg(port->dev, "Cookie %d #%d has already completed\n",
  			s->active_rx, active);
  
-@@ -1530,7 +1530,7 @@ static enum hrtimer_restart sci_dma_rx_timer_fn(struct hrtimer *t)
+@@ -1531,7 +1531,7 @@ static enum hrtimer_restart sci_dma_rx_timer_fn(struct hrtimer *t)
  	 */
  	status = dmaengine_tx_status(s->chan_rx, s->active_rx, &state);
  	if (status == DMA_COMPLETE) {
@@ -10881,7 +10881,7 @@ index f793624fd501..2559c97812fa 100644
  		dev_dbg(port->dev, "Transaction complete after DMA engine was stopped");
  		return HRTIMER_NORESTART;
  	}
-@@ -1551,7 +1551,7 @@ static enum hrtimer_restart sci_dma_rx_timer_fn(struct hrtimer *t)
+@@ -1552,7 +1552,7 @@ static enum hrtimer_restart sci_dma_rx_timer_fn(struct hrtimer *t)
  
  	sci_dma_rx_reenable_irq(s);
  
@@ -10890,7 +10890,7 @@ index f793624fd501..2559c97812fa 100644
  
  	return HRTIMER_NORESTART;
  }
-@@ -1775,9 +1775,9 @@ static irqreturn_t sci_tx_interrupt(int irq, void *ptr)
+@@ -1776,9 +1776,9 @@ static irqreturn_t sci_tx_interrupt(int irq, void *ptr)
  	struct uart_port *port = ptr;
  	unsigned long flags;
  
@@ -10902,7 +10902,7 @@ index f793624fd501..2559c97812fa 100644
  
  	return IRQ_HANDLED;
  }
-@@ -1791,11 +1791,11 @@ static irqreturn_t sci_tx_end_interrupt(int irq, void *ptr)
+@@ -1792,11 +1792,11 @@ static irqreturn_t sci_tx_end_interrupt(int irq, void *ptr)
  	if (port->type != PORT_SCI)
  		return sci_tx_interrupt(irq, ptr);
  
@@ -10916,7 +10916,7 @@ index f793624fd501..2559c97812fa 100644
  
  	return IRQ_HANDLED;
  }
-@@ -2192,7 +2192,7 @@ static void sci_break_ctl(struct uart_port *port, int break_state)
+@@ -2193,7 +2193,7 @@ static void sci_break_ctl(struct uart_port *port, int break_state)
  		return;
  	}
  
@@ -10925,7 +10925,7 @@ index f793624fd501..2559c97812fa 100644
  	scsptr = serial_port_in(port, SCSPTR);
  	scscr = serial_port_in(port, SCSCR);
  
-@@ -2206,7 +2206,7 @@ static void sci_break_ctl(struct uart_port *port, int break_state)
+@@ -2207,7 +2207,7 @@ static void sci_break_ctl(struct uart_port *port, int break_state)
  
  	serial_port_out(port, SCSPTR, scsptr);
  	serial_port_out(port, SCSCR, scscr);
@@ -10934,7 +10934,7 @@ index f793624fd501..2559c97812fa 100644
  }
  
  static int sci_startup(struct uart_port *port)
-@@ -2238,7 +2238,7 @@ static void sci_shutdown(struct uart_port *port)
+@@ -2239,7 +2239,7 @@ static void sci_shutdown(struct uart_port *port)
  	s->autorts = false;
  	mctrl_gpio_disable_ms(to_sci_port(port)->gpios);
  
@@ -10943,7 +10943,7 @@ index f793624fd501..2559c97812fa 100644
  	sci_stop_rx(port);
  	sci_stop_tx(port);
  	/*
-@@ -2248,7 +2248,7 @@ static void sci_shutdown(struct uart_port *port)
+@@ -2249,7 +2249,7 @@ static void sci_shutdown(struct uart_port *port)
  	scr = serial_port_in(port, SCSCR);
  	serial_port_out(port, SCSCR, scr &
  			(SCSCR_CKE1 | SCSCR_CKE0 | s->hscif_tot));
@@ -10952,7 +10952,7 @@ index f793624fd501..2559c97812fa 100644
  
  #ifdef CONFIG_SERIAL_SH_SCI_DMA
  	if (s->chan_rx_saved) {
-@@ -2550,7 +2550,7 @@ static void sci_set_termios(struct uart_port *port, struct ktermios *termios,
+@@ -2551,7 +2551,7 @@ static void sci_set_termios(struct uart_port *port, struct ktermios *termios,
  		serial_port_out(port, SCCKS, sccks);
  	}
  
@@ -10961,7 +10961,7 @@ index f793624fd501..2559c97812fa 100644
  
  	sci_reset(port);
  
-@@ -2672,7 +2672,7 @@ static void sci_set_termios(struct uart_port *port, struct ktermios *termios,
+@@ -2673,7 +2673,7 @@ static void sci_set_termios(struct uart_port *port, struct ktermios *termios,
  	if ((termios->c_cflag & CREAD) != 0)
  		sci_start_rx(port);
  
@@ -10970,7 +10970,7 @@ index f793624fd501..2559c97812fa 100644
  
  	sci_port_disable(s);
  
-@@ -3057,9 +3057,9 @@ static void serial_console_write(struct console *co, const char *s,
+@@ -3058,9 +3058,9 @@ static void serial_console_write(struct console *co, const char *s,
  	if (port->sysrq)
  		locked = 0;
  	else if (oops_in_progress)
@@ -10982,7 +10982,7 @@ index f793624fd501..2559c97812fa 100644
  
  	/* first save SCSCR then disable interrupts, keep clock source */
  	ctrl = serial_port_in(port, SCSCR);
-@@ -3079,7 +3079,7 @@ static void serial_console_write(struct console *co, const char *s,
+@@ -3080,7 +3080,7 @@ static void serial_console_write(struct console *co, const char *s,
  	serial_port_out(port, SCSCR, ctrl);
  
  	if (locked)
@@ -10992,12 +10992,12 @@ index f793624fd501..2559c97812fa 100644
  
  static int serial_console_setup(struct console *co, char *options)
 -- 
-2.48.1
+2.49.0
 
-From 0473b9c3af080575b69dd34d9d2d83cef62aa8b8 Mon Sep 17 00:00:00 2001
+From f0665719372b9d5a78fd80a375cf4e4ea78bb7a4 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:18 +0206
-Subject: [PATCH 086/211] serial: sifive: Use port lock wrappers
+Subject: [PATCH 086/212] serial: sifive: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -11099,12 +11099,12 @@ index d195c5de52e7..b296e57a9dee 100644
  }
  
 -- 
-2.48.1
+2.49.0
 
-From bededd4c3ae8dcbfb16c5a769019bc539bb639ce Mon Sep 17 00:00:00 2001
+From 21d6fad897c992311e3f19b5e261f15946714f62 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:19 +0206
-Subject: [PATCH 087/211] serial: sprd: Use port lock wrappers
+Subject: [PATCH 087/212] serial: sprd: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -11266,12 +11266,12 @@ index f328fa57231f..f257525f9299 100644
  
  static int sprd_console_setup(struct console *co, char *options)
 -- 
-2.48.1
+2.49.0
 
-From 7a3537766aadedbf7a093a4ded321472c0a4ca25 Mon Sep 17 00:00:00 2001
+From 036b02e5774e807889cc62141d4fda2addc76b6a Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:20 +0206
-Subject: [PATCH 088/211] serial: st-asc: Use port lock wrappers
+Subject: [PATCH 088/212] serial: st-asc: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -11381,12 +11381,12 @@ index 92b9f6894006..a821f5d76a26 100644
  
  static int asc_console_setup(struct console *co, char *options)
 -- 
-2.48.1
+2.49.0
 
-From f1c80f92188b7d7e6f1814e3bf3298b8748bf0e2 Mon Sep 17 00:00:00 2001
+From 6ed884ce2b83f9461d9ed0619e93ea4750540e06 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:21 +0206
-Subject: [PATCH 089/211] serial: stm32: Use port lock wrappers
+Subject: [PATCH 089/212] serial: stm32: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -11571,12 +11571,12 @@ index 9ef90bb30a47..b963f9ccb070 100644
  			if (!stm32_usart_rx_dma_pause(stm32_port))
  				size += stm32_usart_receive_chars(port, true);
 -- 
-2.48.1
+2.49.0
 
-From ec2d703b787940af7a72f40c93b0b703b2f27fa8 Mon Sep 17 00:00:00 2001
+From 2b8102bddff79babc16237fcc8070b43154ba3d7 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:22 +0206
-Subject: [PATCH 090/211] serial: sunhv: Use port lock wrappers
+Subject: [PATCH 090/212] serial: sunhv: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -11725,12 +11725,12 @@ index c671d674bce4..5bfc0040f17b 100644
  
  static struct console sunhv_console = {
 -- 
-2.48.1
+2.49.0
 
-From ca486c39b09f1261595498c8e7bd3c9a364e2488 Mon Sep 17 00:00:00 2001
+From 3f5340bf06d645f93e2d3ab451db0cb7f56b58e3 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:23 +0206
-Subject: [PATCH 091/211] serial: sunplus-uart: Use port lock wrappers
+Subject: [PATCH 091/212] serial: sunplus-uart: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -11876,12 +11876,12 @@ index 3aacd5eb414c..4251f4e1ba99 100644
  	local_irq_restore(flags);
  }
 -- 
-2.48.1
+2.49.0
 
-From abffac48287eff42be1d763977e06efec429c6af Mon Sep 17 00:00:00 2001
+From 8eead7bb49ea7e036a01dbb1c3d0684536b5f4e1 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:24 +0206
-Subject: [PATCH 092/211] serial: sunsab: Use port lock wrappers
+Subject: [PATCH 092/212] serial: sunsab: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -12057,12 +12057,12 @@ index 40eeaf835bba..6aa51a6f8063 100644
  	return 0;
  }
 -- 
-2.48.1
+2.49.0
 
-From 27f7ef2ee373978a725cfeb5f2bb03c21be2dfa6 Mon Sep 17 00:00:00 2001
+From 608db623fd4f3d8abe34a9537f5e4f4a2a1292c1 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:25 +0206
-Subject: [PATCH 093/211] serial: sunsu: Use port lock wrappers
+Subject: [PATCH 093/212] serial: sunsu: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -12281,12 +12281,12 @@ index 58a4342ad0f9..1e051cc2591c 100644
  
  /*
 -- 
-2.48.1
+2.49.0
 
-From 7da9284fba623583f804673d87ecaff8c6c4fd7d Mon Sep 17 00:00:00 2001
+From da5281b24099fc9f3eba51ef6c2c3076728522a5 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:26 +0206
-Subject: [PATCH 094/211] serial: sunzilog: Use port lock wrappers
+Subject: [PATCH 094/212] serial: sunzilog: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -12497,12 +12497,12 @@ index c8c71c56264c..d3b5e864b727 100644
  #ifdef CONFIG_SERIO
  	if (up->flags & (SUNZILOG_FLAG_CONS_KEYB |
 -- 
-2.48.1
+2.49.0
 
-From 65d52ce120bd4184e8a993263ad2ae359ed5037b Mon Sep 17 00:00:00 2001
+From ea1de9ba869385a756ce08237c2cda93dc445c70 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:27 +0206
-Subject: [PATCH 095/211] serial: timbuart: Use port lock wrappers
+Subject: [PATCH 095/212] serial: timbuart: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -12573,12 +12573,12 @@ index 0859394a78cd..0cc6524f5e8b 100644
  
  static const char *timbuart_type(struct uart_port *port)
 -- 
-2.48.1
+2.49.0
 
-From 7c4516a30691a02473ff49eb0c20614572c2521b Mon Sep 17 00:00:00 2001
+From 3f65a597e9160cf32b563746c6b5714467568833 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:28 +0206
-Subject: [PATCH 096/211] serial: uartlite: Use port lock wrappers
+Subject: [PATCH 096/212] serial: uartlite: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -12683,12 +12683,12 @@ index b225a78f6175..404c14acafa5 100644
  
  static int ulite_console_setup(struct console *co, char *options)
 -- 
-2.48.1
+2.49.0
 
-From 15b626289472c5302b6fe5e9e3026877d4da3bca Mon Sep 17 00:00:00 2001
+From 4dee327f7653d1429e7442a7c00378a385b19ec7 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:29 +0206
-Subject: [PATCH 097/211] serial: ucc_uart: Use port lock wrappers
+Subject: [PATCH 097/212] serial: ucc_uart: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -12747,12 +12747,12 @@ index b06661b80f41..ed7a6bb5596a 100644
  
  /*
 -- 
-2.48.1
+2.49.0
 
-From 57838fc95fc95ca0d7438b444b17b7cea2b6888b Mon Sep 17 00:00:00 2001
+From 5ae92dcf5162b1445ad954ee0c3ff9fefcdd3fa7 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:30 +0206
-Subject: [PATCH 098/211] serial: vt8500: Use port lock wrappers
+Subject: [PATCH 098/212] serial: vt8500: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -12828,12 +12828,12 @@ index c5d5c2765119..78a1c1eea11b 100644
  
  static const char *vt8500_type(struct uart_port *port)
 -- 
-2.48.1
+2.49.0
 
-From 092709e62155164ccaac9f41475f84c1cc842f64 Mon Sep 17 00:00:00 2001
+From f4b308482cd7cf17c696061d56f4c49cd764cdb8 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 14 Sep 2023 20:44:31 +0206
-Subject: [PATCH 099/211] serial: xilinx_uartps: Use port lock wrappers
+Subject: [PATCH 099/212] serial: xilinx_uartps: Use port lock wrappers
 
 When a serial port is used for kernel console output, then all
 modifications to the UART registers which are done from other contexts,
@@ -12865,11 +12865,11 @@ Link: https://lore.kernel.org/r/20230914183831.587273-75-john.ogness@linutronix.
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 ---
- drivers/tty/serial/xilinx_uartps.c | 56 +++++++++++++++---------------
- 1 file changed, 28 insertions(+), 28 deletions(-)
+ drivers/tty/serial/xilinx_uartps.c | 52 +++++++++++++++---------------
+ 1 file changed, 26 insertions(+), 26 deletions(-)
 
 diff --git a/drivers/tty/serial/xilinx_uartps.c b/drivers/tty/serial/xilinx_uartps.c
-index 2e5e86a00a77..9c13dac1d4d1 100644
+index 7f83d2780017..84652f530136 100644
 --- a/drivers/tty/serial/xilinx_uartps.c
 +++ b/drivers/tty/serial/xilinx_uartps.c
 @@ -346,7 +346,7 @@ static irqreturn_t cdns_uart_isr(int irq, void *dev_id)
@@ -12881,15 +12881,6 @@ index 2e5e86a00a77..9c13dac1d4d1 100644
  
  	/* Read the interrupt status register to determine which
  	 * interrupt(s) is/are active and clear them.
-@@ -369,7 +369,7 @@ static irqreturn_t cdns_uart_isr(int irq, void *dev_id)
- 	    !(readl(port->membase + CDNS_UART_CR) & CDNS_UART_CR_RX_DIS))
- 		cdns_uart_handle_rx(dev_id, isrstatus);
- 
--	spin_unlock(&port->lock);
-+	uart_port_unlock(port);
- 	return IRQ_HANDLED;
- }
- 
 @@ -506,14 +506,14 @@ static int cdns_uart_clk_notifier_cb(struct notifier_block *nb,
  			return NOTIFY_BAD;
  		}
@@ -13042,19 +13033,16 @@ index 2e5e86a00a77..9c13dac1d4d1 100644
  }
  #endif
  
-@@ -1232,9 +1232,9 @@ static void cdns_uart_console_write(struct console *co, const char *s,
- 	if (port->sysrq)
- 		locked = 0;
- 	else if (oops_in_progress)
--		locked = spin_trylock_irqsave(&port->lock, flags);
-+		locked = uart_port_trylock_irqsave(port, &flags);
+@@ -1232,7 +1232,7 @@ static void cdns_uart_console_write(struct console *co, const char *s,
+ 	if (oops_in_progress)
+ 		locked = uart_port_trylock_irqsave(port, &flags);
  	else
 -		spin_lock_irqsave(&port->lock, flags);
 +		uart_port_lock_irqsave(port, &flags);
  
  	/* save and disable interrupt */
  	imr = readl(port->membase + CDNS_UART_IMR);
-@@ -1257,7 +1257,7 @@ static void cdns_uart_console_write(struct console *co, const char *s,
+@@ -1255,7 +1255,7 @@ static void cdns_uart_console_write(struct console *co, const char *s,
  	writel(imr, port->membase + CDNS_UART_IER);
  
  	if (locked)
@@ -13063,7 +13051,7 @@ index 2e5e86a00a77..9c13dac1d4d1 100644
  }
  
  /**
-@@ -1325,7 +1325,7 @@ static int cdns_uart_suspend(struct device *device)
+@@ -1323,7 +1323,7 @@ static int cdns_uart_suspend(struct device *device)
  	if (console_suspend_enabled && uart_console(port) && may_wake) {
  		unsigned long flags;
  
@@ -13072,7 +13060,7 @@ index 2e5e86a00a77..9c13dac1d4d1 100644
  		/* Empty the receive FIFO 1st before making changes */
  		while (!(readl(port->membase + CDNS_UART_SR) &
  					CDNS_UART_SR_RXEMPTY))
-@@ -1334,7 +1334,7 @@ static int cdns_uart_suspend(struct device *device)
+@@ -1332,7 +1332,7 @@ static int cdns_uart_suspend(struct device *device)
  		writel(1, port->membase + CDNS_UART_RXWM);
  		/* disable RX timeout interrups */
  		writel(CDNS_UART_IXR_TOUT, port->membase + CDNS_UART_IDR);
@@ -13081,7 +13069,7 @@ index 2e5e86a00a77..9c13dac1d4d1 100644
  	}
  
  	/*
-@@ -1372,7 +1372,7 @@ static int cdns_uart_resume(struct device *device)
+@@ -1370,7 +1370,7 @@ static int cdns_uart_resume(struct device *device)
  			return ret;
  		}
  
@@ -13090,7 +13078,7 @@ index 2e5e86a00a77..9c13dac1d4d1 100644
  
  		/* Set TX/RX Reset */
  		ctrl_reg = readl(port->membase + CDNS_UART_CR);
-@@ -1392,14 +1392,14 @@ static int cdns_uart_resume(struct device *device)
+@@ -1390,14 +1390,14 @@ static int cdns_uart_resume(struct device *device)
  
  		clk_disable(cdns_uart->uartclk);
  		clk_disable(cdns_uart->pclk);
@@ -13109,12 +13097,12 @@ index 2e5e86a00a77..9c13dac1d4d1 100644
  
  	return uart_resume_port(cdns_uart->cdns_uart_driver, port);
 -- 
-2.48.1
+2.49.0
 
-From 0661c70feab5e268132d67d4cc1ef41271aae6ed Mon Sep 17 00:00:00 2001
+From e2bab5e1b20ba458522eaf779d396fe4a10453d3 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:00 +0206
-Subject: [PATCH 100/211] printk: Add non-BKL (nbcon) console basic
+Subject: [PATCH 100/212] printk: Add non-BKL (nbcon) console basic
  infrastructure
 
 The current console/printk subsystem is protected by a Big Kernel Lock,
@@ -13345,7 +13333,7 @@ index 000000000000..63d24ca62ac5
 +	nbcon_state_set(con, &state);
 +}
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 0fca282c0a25..b2c65b991e1e 100644
+index dcdf449615bd..9cd4f4a28927 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -3375,9 +3375,10 @@ static void try_enable_default_console(struct console *newcon)
@@ -13383,12 +13371,12 @@ index 0fca282c0a25..b2c65b991e1e 100644
  
  	if (console->exit)
 -- 
-2.48.1
+2.49.0
 
-From 0f6b4adad7903f8a60c7f1faf42b562f1dbb521e Mon Sep 17 00:00:00 2001
+From 11c972e96425e23dd4472b97a82aa3ce86fe961a Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:01 +0206
-Subject: [PATCH 101/211] printk: nbcon: Add acquire/release logic
+Subject: [PATCH 101/212] printk: nbcon: Add acquire/release logic
 
 Add per console acquire/release functionality.
 
@@ -14095,12 +14083,12 @@ index 63d24ca62ac5..a2a354f859f9 100644
   * nbcon_init - Initialize the nbcon console specific data
   * @con:	Console to initialize
 -- 
-2.48.1
+2.49.0
 
-From f8e3a3817c604e91c9f6eb9e82928ed670125aa4 Mon Sep 17 00:00:00 2001
+From 7fdd6bee6cc9ee5aa00fc0ac90a09b0eb7f0ecb3 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:02 +0206
-Subject: [PATCH 102/211] printk: Make static printk buffers available to nbcon
+Subject: [PATCH 102/212] printk: Make static printk buffers available to nbcon
 
 The nbcon boot consoles also need printk buffers that are available
 very early. Since the nbcon boot consoles will also be serialized
@@ -14134,7 +14122,7 @@ index 2ca0ab78802c..7199d60bfc25 100644
   * struct printk_buffers - Buffers to read/format/output printk messages.
   * @outbuf:	After formatting, contains text to output.
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index b2c65b991e1e..dd68135cb371 100644
+index 9cd4f4a28927..1538cf43968f 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -2880,6 +2880,13 @@ static bool printk_get_next_message(struct printk_message *pmsg, u64 seq,
@@ -14167,12 +14155,12 @@ index b2c65b991e1e..dd68135cb371 100644
  	unsigned long flags;
  
 -- 
-2.48.1
+2.49.0
 
-From 7610c70a9f7049b7b7ebd265de577eff6e887a73 Mon Sep 17 00:00:00 2001
+From e5c1d5490751b8a102b4e23b2e92a28147d932f8 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:03 +0206
-Subject: [PATCH 103/211] printk: nbcon: Add buffer management
+Subject: [PATCH 103/212] printk: nbcon: Add buffer management
 
 In case of hostile takeovers it must be ensured that the previous
 owner cannot scribble over the output buffer of the emergency/panic
@@ -14434,7 +14422,7 @@ index a2a354f859f9..ba1febf15db6 100644
 +	con->pbufs = NULL;
  }
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index dd68135cb371..58b57deb0cbe 100644
+index 1538cf43968f..5bae92933fb9 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -3380,12 +3380,6 @@ static void try_enable_default_console(struct console *newcon)
@@ -14489,12 +14477,12 @@ index dd68135cb371..58b57deb0cbe 100644
  	console_sysfs_notify();
  
 -- 
-2.48.1
+2.49.0
 
-From 4dd07c88610b0bdb52083d137acabde253993e54 Mon Sep 17 00:00:00 2001
+From b55f335e32a1293d4fafe9e9447819f54d6e49c6 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:04 +0206
-Subject: [PATCH 104/211] printk: nbcon: Add ownership state functions
+Subject: [PATCH 104/212] printk: nbcon: Add ownership state functions
 
 Provide functions that are related to the safe handover mechanism
 and allow console drivers to dynamically specify unsafe regions:
@@ -14673,12 +14661,12 @@ index ba1febf15db6..98e4be5429f0 100644
   * nbcon_alloc - Allocate buffers needed by the nbcon console
   * @con:	Console to allocate buffers for
 -- 
-2.48.1
+2.49.0
 
-From 6a2e2b2bf4fe6ed93ef61c0100cc63b6e48c4f8a Mon Sep 17 00:00:00 2001
+From e73a2def29a947d666fd0baa21affe20017a2ff6 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:05 +0206
-Subject: [PATCH 105/211] printk: nbcon: Add sequence handling
+Subject: [PATCH 105/212] printk: nbcon: Add sequence handling
 
 Add an atomic_long_t field @nbcon_seq to the console struct to
 store the sequence number for nbcon consoles. For nbcon consoles
@@ -14918,7 +14906,7 @@ index 98e4be5429f0..e076096b31c0 100644
  }
  
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 58b57deb0cbe..a1ab4760f807 100644
+index 5bae92933fb9..1f060438ead8 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -494,7 +494,7 @@ _DEFINE_PRINTKRB(printk_rb_static, CONFIG_LOG_BUF_SHIFT - PRB_AVGBITS,
@@ -14995,12 +14983,12 @@ index 58b57deb0cbe..a1ab4760f807 100644
  				diff += seq - printk_seq;
  		}
 -- 
-2.48.1
+2.49.0
 
-From b16a74d358ea2e52d20864d59e4c186689520dbe Mon Sep 17 00:00:00 2001
+From 066b8eb87270e732d70b7e2d3d5501e671551f2d Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:06 +0206
-Subject: [PATCH 106/211] printk: nbcon: Add emit function and callback
+Subject: [PATCH 106/212] printk: nbcon: Add emit function and callback
  function for atomic printing
 
 Implement an emit function for nbcon consoles to output printk
@@ -15233,7 +15221,7 @@ index e076096b31c0..6e05d263fd22 100644
   * nbcon_alloc - Allocate buffers needed by the nbcon console
   * @con:	Console to allocate buffers for
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index a1ab4760f807..70f793b392e5 100644
+index 1f060438ead8..4696ae965bfc 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -698,9 +698,6 @@ static ssize_t msg_print_ext_body(char *buf, size_t size,
@@ -15267,12 +15255,12 @@ index a1ab4760f807..70f793b392e5 100644
  	static int panic_console_dropped;
  
 -- 
-2.48.1
+2.49.0
 
-From 33cb5eacca500a19fa28819570a9b2defd42c583 Mon Sep 17 00:00:00 2001
+From 1af84937061d92ca9eaf55398d5a17974ed7ebed Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 16 Sep 2023 21:26:07 +0206
-Subject: [PATCH 107/211] printk: nbcon: Allow drivers to mark unsafe regions
+Subject: [PATCH 107/212] printk: nbcon: Allow drivers to mark unsafe regions
  and check state
 
 For the write_atomic callback, the console driver may have unsafe
@@ -15410,12 +15398,12 @@ index 6e05d263fd22..b96077152f49 100644
   * nbcon_emit_next_record - Emit a record in the acquired context
   * @wctxt:	The write context that will be handed to the write function
 -- 
-2.48.1
+2.49.0
 
-From ac278191ddde565d333bd960f5d7f20c72039d34 Mon Sep 17 00:00:00 2001
+From 163edf32b1c8a158fc1132c439a01b7699994d16 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 20 Sep 2023 17:58:38 +0206
-Subject: [PATCH 108/211] printk: fix illegal pbufs access for !CONFIG_PRINTK
+Subject: [PATCH 108/212] printk: fix illegal pbufs access for !CONFIG_PRINTK
 
 When CONFIG_PRINTK is not set, PRINTK_MESSAGE_MAX is 0. This
 leads to a zero-sized array @outbuf in @printk_shared_pbufs. In
@@ -15452,7 +15440,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  1 file changed, 18 insertions(+), 26 deletions(-)
 
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 70f793b392e5..3bf517ae8262 100644
+index 4696ae965bfc..43933c8d29e1 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -102,12 +102,6 @@ DEFINE_STATIC_SRCU(console_srcu);
@@ -15549,12 +15537,12 @@ index 70f793b392e5..3bf517ae8262 100644
   * Print out all remaining records to all consoles.
   *
 -- 
-2.48.1
+2.49.0
 
-From b4f28ffeb4edbe0711ae204b33ed39fc8492687d Mon Sep 17 00:00:00 2001
+From 86f21b19fb4f1a88018bd7c166816571ba25dc77 Mon Sep 17 00:00:00 2001
 From: Petr Mladek <pmladek@suse.com>
 Date: Fri, 6 Oct 2023 10:21:51 +0200
-Subject: [PATCH 109/211] printk: Reduce pr_flush() pooling time
+Subject: [PATCH 109/212] printk: Reduce pr_flush() pooling time
 
 pr_flush() does not guarantee that all messages would really get flushed
 to the console. The best it could do is to wait with a given timeout.[*]
@@ -15599,7 +15587,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  1 file changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 3bf517ae8262..a30338aca084 100644
+index 43933c8d29e1..db3de3670ac9 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -3791,7 +3791,8 @@ late_initcall(printk_late_init);
@@ -15656,12 +15644,12 @@ index 3bf517ae8262..a30338aca084 100644
  		last_diff = diff;
  	}
 -- 
-2.48.1
+2.49.0
 
-From 46d798935cbad378db8fcabe034fc5eef55421d0 Mon Sep 17 00:00:00 2001
+From aa0f6bdeeb1738441f1d89ab6d5134351f8698cf Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 6 Dec 2023 12:01:56 +0000
-Subject: [PATCH 110/211] printk: nbcon: Relocate 32bit seq macros
+Subject: [PATCH 110/212] printk: nbcon: Relocate 32bit seq macros
 
 The macros __seq_to_nbcon_seq() and __nbcon_seq_to_seq() are
 used to provide support for atomic handling of sequence numbers
@@ -15804,12 +15792,12 @@ index 18cd25e489b8..b82a96dc2ea2 100644
 +
  #endif /* _KERNEL_PRINTK_RINGBUFFER_H */
 -- 
-2.48.1
+2.49.0
 
-From 7a835cda91a3ae4dcca8c89f52b21114538d50f0 Mon Sep 17 00:00:00 2001
+From 832cb1462a5cfc77dfabdea2254c1b7256de3ea4 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 7 Dec 2023 14:15:15 +0000
-Subject: [PATCH 111/211] printk: Adjust mapping for 32bit seq macros
+Subject: [PATCH 111/212] printk: Adjust mapping for 32bit seq macros
 
 Note: This change only applies to 32bit architectures. On 64bit
       architectures the macros are NOPs.
@@ -15880,12 +15868,12 @@ index b82a96dc2ea2..12f60c782e46 100644
  	return seq;
  }
 -- 
-2.48.1
+2.49.0
 
-From b5930124ba7d6d7673127603e50d13fc9e15d712 Mon Sep 17 00:00:00 2001
+From 94b47e56c8969836c10bc866adbefdeaefbbe183 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 22 Nov 2023 16:13:37 +0000
-Subject: [PATCH 112/211] printk: Use prb_first_seq() as base for 32bit seq
+Subject: [PATCH 112/212] printk: Use prb_first_seq() as base for 32bit seq
  macros
 
 Note: This change only applies to 32bit architectures. On 64bit
@@ -15958,12 +15946,12 @@ index 12f60c782e46..ee294aaf4aeb 100644
  	return seq;
  }
 -- 
-2.48.1
+2.49.0
 
-From 8d8c86c11c2fabee160b1a6ccc6c53a7723c1003 Mon Sep 17 00:00:00 2001
+From 89197328758db99d12283f8013a6e8d6662bea2d Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Thu, 19 Oct 2023 10:32:05 +0000
-Subject: [PATCH 113/211] printk: ringbuffer: Do not skip non-finalized records
+Subject: [PATCH 113/212] printk: ringbuffer: Do not skip non-finalized records
  with prb_next_seq()
 
 Commit f244b4dc53e5 ("printk: ringbuffer: Improve
@@ -16270,12 +16258,12 @@ index ee294aaf4aeb..2d948cc82b5b 100644
  	.text_data_ring = {									\
  		.size_bits	= (avgtextbits) + (descbits),					\
 -- 
-2.48.1
+2.49.0
 
-From 322e27ac78b0ebe7096a3c98778ec0895204677e Mon Sep 17 00:00:00 2001
+From add468189d1e1b0373b945a00d68722829584727 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 23 Oct 2023 11:11:05 +0000
-Subject: [PATCH 114/211] printk: ringbuffer: Clarify special lpos values
+Subject: [PATCH 114/212] printk: ringbuffer: Clarify special lpos values
 
 For empty line records, no data blocks are created. Instead,
 these valid records are identified by special logical position
@@ -16369,12 +16357,12 @@ index 2d948cc82b5b..d49460f7578e 100644
  #define FAILED_BLK_LPOS	\
  {				\
 -- 
-2.48.1
+2.49.0
 
-From f8d8a93568dd467e54c5fbe6ad85b81034d982bf Mon Sep 17 00:00:00 2001
+From e8cf3e122ca62453862c3ec543749911e24cd711 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 13 Oct 2023 14:30:49 +0000
-Subject: [PATCH 115/211] printk: Add this_cpu_in_panic()
+Subject: [PATCH 115/212] printk: Add this_cpu_in_panic()
 
 There is already panic_in_progress() and other_cpu_in_panic(),
 but checking if the current CPU is the panic CPU must still be
@@ -16403,7 +16391,7 @@ index 6c2afee5ef62..ac2d9750e5f8 100644
  			     bool is_extended, bool may_supress);
  
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index a30338aca084..2bb393009d4e 100644
+index db3de3670ac9..0e8e11c8219d 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -347,6 +347,29 @@ static bool panic_in_progress(void)
@@ -16464,12 +16452,12 @@ index a30338aca084..2bb393009d4e 100644
   * console_lock - block the console subsystem from printing
   *
 -- 
-2.48.1
+2.49.0
 
-From 3f2735a711f3eba54f6328ea634b661ecd323e19 Mon Sep 17 00:00:00 2001
+From 7feb61daade07d894f246cf6620b3cc4818b6648 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 6 Nov 2023 15:01:58 +0000
-Subject: [PATCH 116/211] printk: ringbuffer: Cleanup reader terminology
+Subject: [PATCH 116/212] printk: ringbuffer: Cleanup reader terminology
 
 With the lockless ringbuffer, it is allowed that multiple
 CPUs/contexts write simultaneously into the buffer. This creates
@@ -16536,12 +16524,12 @@ index 244d991ffd73..67ee1c62fcd6 100644
  bool prb_read_valid_info(struct printk_ringbuffer *rb, u64 seq,
  			 struct printk_info *info, unsigned int *line_count)
 -- 
-2.48.1
+2.49.0
 
-From 774c6f6654cbdd1e84dfd7ad8d92829f70bfa39c Mon Sep 17 00:00:00 2001
+From 2fd5e278dfe5fe25614e40f1e6d11d16fe8a853e Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 6 Nov 2023 14:59:55 +0000
-Subject: [PATCH 117/211] printk: Wait for all reserved records with pr_flush()
+Subject: [PATCH 117/212] printk: Wait for all reserved records with pr_flush()
 
 Currently pr_flush() will only wait for records that were
 available to readers at the time of the call (using
@@ -16566,7 +16554,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  3 files changed, 115 insertions(+), 1 deletion(-)
 
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 2bb393009d4e..807692fd386a 100644
+index 0e8e11c8219d..a7209c30ebf9 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -3806,7 +3806,7 @@ static bool __pr_flush(struct console *con, int timeout_ms, bool reset_on_progre
@@ -16715,12 +16703,12 @@ index d49460f7578e..52626d0f1fa3 100644
  #ifdef CONFIG_64BIT
  
 -- 
-2.48.1
+2.49.0
 
-From eebf874db37c8d5682a6636f257cfd719958561a Mon Sep 17 00:00:00 2001
+From c70c828f044a71a28254ee07b39cc4a8e4891bdb Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 13 Oct 2023 10:23:11 +0000
-Subject: [PATCH 118/211] printk: ringbuffer: Skip non-finalized records in
+Subject: [PATCH 118/212] printk: ringbuffer: Skip non-finalized records in
  panic
 
 Normally a reader will stop once reaching a non-finalized
@@ -16788,12 +16776,12 @@ index b7748d7c44c1..d6ed33683b8b 100644
  	}
  
 -- 
-2.48.1
+2.49.0
 
-From adf10af6794b9e43ee591cdde50bb39f8c537df2 Mon Sep 17 00:00:00 2001
+From 99ac9dcedc0f27fed24674068fbbc25b785b4ae5 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 20 Nov 2023 12:46:35 +0100
-Subject: [PATCH 119/211] printk: ringbuffer: Consider committed as finalized
+Subject: [PATCH 119/212] printk: ringbuffer: Consider committed as finalized
  in panic
 
 A descriptor in the committed state means the record does not yet
@@ -16854,12 +16842,12 @@ index d6ed33683b8b..e7b808b829a0 100644
  	 * A descriptor in the reusable state may no longer have its data
  	 * available; report it as existing but with lost data. Or the record
 -- 
-2.48.1
+2.49.0
 
-From 93e7c42965e60b675d2b92105149561212eb79f2 Mon Sep 17 00:00:00 2001
+From 4d326b081c59360245d883d25288046cd635f9ee Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 20 Oct 2023 09:37:05 +0000
-Subject: [PATCH 120/211] printk: Avoid non-panic CPUs writing to ringbuffer
+Subject: [PATCH 120/212] printk: Avoid non-panic CPUs writing to ringbuffer
 
 Commit 13fb0f74d702 ("printk: Avoid livelock with heavy printk
 during panic") introduced a mechanism to silence non-panic CPUs
@@ -16879,7 +16867,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  1 file changed, 6 insertions(+), 20 deletions(-)
 
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 807692fd386a..7c5ab5c01abb 100644
+index a7209c30ebf9..285ad4475db3 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -462,12 +462,6 @@ static int console_msg_format = MSG_FORMAT_DEFAULT;
@@ -16937,12 +16925,12 @@ index 807692fd386a..7c5ab5c01abb 100644
  	if (may_suppress && suppress_message_printing(r.info->level))
  		goto out;
 -- 
-2.48.1
+2.49.0
 
-From 92d4099a0a552455014c9cb5d73eae66cf812fe7 Mon Sep 17 00:00:00 2001
+From b8eff5868fbb9604b6ee1fb96f81242fdaca305a Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 22 Nov 2023 11:23:43 +0000
-Subject: [PATCH 121/211] printk: Consider nbcon boot consoles on seq init
+Subject: [PATCH 121/212] printk: Consider nbcon boot consoles on seq init
 
 If a non-boot console is registering and boot consoles exist, the
 consoles are flushed before being unregistered. This allows the
@@ -16964,7 +16952,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  1 file changed, 13 insertions(+), 4 deletions(-)
 
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 7c5ab5c01abb..ae3bf0cf215a 100644
+index 285ad4475db3..269164781100 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -3413,11 +3413,20 @@ static void console_init_seq(struct console *newcon, bool bootcon_registered)
@@ -16993,12 +16981,12 @@ index 7c5ab5c01abb..ae3bf0cf215a 100644
  			}
  
 -- 
-2.48.1
+2.49.0
 
-From 949a03c62edbc5da085acc47e567980da053404e Mon Sep 17 00:00:00 2001
+From 9d724a19b7e061a7b4f1936e7aa473be28a38c7c Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 9 Oct 2023 13:55:19 +0000
-Subject: [PATCH 122/211] printk: Add sparse notation to console_srcu locking
+Subject: [PATCH 122/212] printk: Add sparse notation to console_srcu locking
 
 kernel/printk/printk.c:284:5: sparse: sparse: context imbalance in
 'console_srcu_read_lock' - wrong count at exit
@@ -17014,7 +17002,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  1 file changed, 2 insertions(+)
 
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index ae3bf0cf215a..ea13c808c282 100644
+index 269164781100..4e939a237208 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -282,6 +282,7 @@ EXPORT_SYMBOL(console_list_unlock);
@@ -17034,12 +17022,12 @@ index ae3bf0cf215a..ea13c808c282 100644
  	srcu_read_unlock_nmisafe(&console_srcu, cookie);
  }
 -- 
-2.48.1
+2.49.0
 
-From 5a53dec0021c7ae013f0dafb2a51b96267eaa608 Mon Sep 17 00:00:00 2001
+From 36c2edf03385e8a1b3b9250436f7aaa998c348fc Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 20 Oct 2023 09:52:59 +0000
-Subject: [PATCH 123/211] printk: nbcon: Ensure ownership release on failed
+Subject: [PATCH 123/212] printk: nbcon: Ensure ownership release on failed
  emit
 
 Until now it was assumed that ownership has been lost when the
@@ -17097,12 +17085,12 @@ index c8093bcc01fe..8ecd76aa22e6 100644
  	/*
  	 * Since any dropped message was successfully output, reset the
 -- 
-2.48.1
+2.49.0
 
-From dda47caad4c9de6a474c18c13b7801f9cee6e315 Mon Sep 17 00:00:00 2001
+From eca9fe2e5abb754d67b24ce1904b09e350eacc5d Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 22 Sep 2023 14:58:18 +0000
-Subject: [PATCH 124/211] printk: Check printk_deferred_enter()/_exit() usage
+Subject: [PATCH 124/212] printk: Check printk_deferred_enter()/_exit() usage
 
 Add validation that printk_deferred_enter()/_exit() are called in
 non-migration contexts.
@@ -17162,12 +17150,12 @@ index 6d10927a07d8..8d9408d653de 100644
  {
  #ifdef CONFIG_KGDB_KDB
 -- 
-2.48.1
+2.49.0
 
-From 6d2371f4ae31e5c6fc466264035bd0d35dff23ef Mon Sep 17 00:00:00 2001
+From 61da890b7a6f98e6541a42505858786be2e95aa9 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 13 Sep 2023 08:35:23 +0000
-Subject: [PATCH 125/211] printk: nbcon: Implement processing in port->lock
+Subject: [PATCH 125/212] printk: nbcon: Implement processing in port->lock
  wrapper
 
 Currently the port->lock wrappers uart_port_lock(),
@@ -17417,12 +17405,12 @@ index 8ecd76aa22e6..a5707fe1e95e 100644
 +}
 +EXPORT_SYMBOL_GPL(nbcon_release);
 -- 
-2.48.1
+2.49.0
 
-From e504fda757e0f4d994342be0ac1998f0c3c7a17d Mon Sep 17 00:00:00 2001
+From f4a370c7af64518e0e4076e405c5d8e3243a1364 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 8 Dec 2023 15:54:27 +0000
-Subject: [PATCH 126/211] printk: nbcon: Add driver_enter/driver_exit console
+Subject: [PATCH 126/212] printk: nbcon: Add driver_enter/driver_exit console
  callbacks
 
 Console drivers need some mechanism to synchronize between "normal
@@ -17464,12 +17452,12 @@ index c27bd5189660..73515c324347 100644
  	atomic_long_t		__private nbcon_seq;
  	struct printk_buffers	*pbufs;
 -- 
-2.48.1
+2.49.0
 
-From 8f0622568b14e0570b6dd6411b972afc5051a0b9 Mon Sep 17 00:00:00 2001
+From b59cff83ad47463acdfb1d92ece986558f3c6530 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 12 Sep 2023 13:25:41 +0000
-Subject: [PATCH 127/211] printk: Make console_is_usable() available to nbcon
+Subject: [PATCH 127/212] printk: Make console_is_usable() available to nbcon
 
 Move console_is_usable() as-is into internal.h so that it can
 be used by nbcon printing functions as well.
@@ -17533,7 +17521,7 @@ index ac2d9750e5f8..378ccca007ca 100644
  
  extern struct printk_buffers printk_shared_pbufs;
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index ea13c808c282..d959be5c4102 100644
+index 4e939a237208..47b656e97151 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -2701,36 +2701,6 @@ int is_console_locked(void)
@@ -17574,12 +17562,12 @@ index ea13c808c282..d959be5c4102 100644
  {
  	console_locked = 0;
 -- 
-2.48.1
+2.49.0
 
-From 2fc275285de075a400db861ed6de70e80d8c6767 Mon Sep 17 00:00:00 2001
+From 55dc796196128eb7e4ead6c6b88d0fc5f0f02998 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 12 Sep 2023 13:53:21 +0000
-Subject: [PATCH 128/211] printk: Let console_is_usable() handle nbcon
+Subject: [PATCH 128/212] printk: Let console_is_usable() handle nbcon
 
 The nbcon consoles use a different printing callback. For nbcon
 consoles, check for the write_atomic() callback instead of
@@ -17622,12 +17610,12 @@ index 378ccca007ca..d741d19bb9db 100644
  	/*
  	 * Console drivers may assume that per-cpu resources have been
 -- 
-2.48.1
+2.49.0
 
-From c974c9e5db960e600f14b82287adcb07ea05256a Mon Sep 17 00:00:00 2001
+From b81fb7cf74970ea9de381aff6e8cfc2293b3c81a Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 12 Sep 2023 13:45:33 +0000
-Subject: [PATCH 129/211] printk: Add @flags argument for console_is_usable()
+Subject: [PATCH 129/212] printk: Add @flags argument for console_is_usable()
 
 The caller of console_is_usable() usually needs @console->flags
 for its own checks. Rather than having console_is_usable() read
@@ -17671,7 +17659,7 @@ index d741d19bb9db..cd1ce0235f01 100644
  #endif /* CONFIG_PRINTK */
  
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index d959be5c4102..bdd3d7e40e63 100644
+index 47b656e97151..5d6bceae9525 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -2946,9 +2946,10 @@ static bool console_flush_all(bool do_cond_resched, u64 *next_seq, bool *handove
@@ -17696,12 +17684,12 @@ index d959be5c4102..bdd3d7e40e63 100644
  
  			if (flags & CON_NBCON) {
 -- 
-2.48.1
+2.49.0
 
-From bbd477321e6154512e6d4d159cacf6d6d3d90b26 Mon Sep 17 00:00:00 2001
+From 4f0156a091f406f17dab5892ca3325704911daf4 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Tue, 12 Sep 2023 12:00:08 +0000
-Subject: [PATCH 130/211] printk: nbcon: Provide function to flush using
+Subject: [PATCH 130/212] printk: nbcon: Provide function to flush using
  write_atomic()
 
 Provide nbcon_atomic_flush_all() to perform flushing of all
@@ -17878,7 +17866,7 @@ index a5707fe1e95e..d0780168e319 100644
   * nbcon_alloc - Allocate buffers needed by the nbcon console
   * @con:	Console to allocate buffers for
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index bdd3d7e40e63..271865952a4d 100644
+index 5d6bceae9525..842e25253f4c 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -3176,6 +3176,8 @@ void console_flush_on_panic(enum con_flush_mode mode)
@@ -17891,12 +17879,12 @@ index bdd3d7e40e63..271865952a4d 100644
  }
  
 -- 
-2.48.1
+2.49.0
 
-From fbc8044b3315405f6700b46d916f3e534ce626c8 Mon Sep 17 00:00:00 2001
+From 21b4edd620a138e7466b2467150396a915a324c5 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 24 Oct 2023 14:13:14 +0000
-Subject: [PATCH 131/211] printk: Track registered boot consoles
+Subject: [PATCH 131/212] printk: Track registered boot consoles
 
 Unfortunately it is not known if a boot console and a regular
 (legacy or nbcon) console use the same hardware. For this reason
@@ -17918,7 +17906,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  1 file changed, 24 insertions(+)
 
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 271865952a4d..4185c58f7915 100644
+index 842e25253f4c..9455ddf3d60b 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -463,6 +463,14 @@ static int console_msg_format = MSG_FORMAT_DEFAULT;
@@ -17974,12 +17962,12 @@ index 271865952a4d..4185c58f7915 100644
  }
  
 -- 
-2.48.1
+2.49.0
 
-From 09960aec62e48d95ef27bda1203a6b903c275f4d Mon Sep 17 00:00:00 2001
+From f4a5c5d4beea0839b9cf1607b67b0ca18fbb9216 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 19 Sep 2023 14:33:27 +0000
-Subject: [PATCH 132/211] printk: nbcon: Use nbcon consoles in
+Subject: [PATCH 132/212] printk: nbcon: Use nbcon consoles in
  console_flush_all()
 
 Allow nbcon consoles to print messages in the printk() caller
@@ -18099,7 +18087,7 @@ index d0780168e319..c17cf3ea6153 100644
   * __nbcon_atomic_flush_all - Flush all nbcon consoles using their
   *					write_atomic() callback
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 4185c58f7915..d6173575ea03 100644
+index 9455ddf3d60b..eb460fd374a3 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -1872,7 +1872,7 @@ static bool console_waiter;
@@ -18156,12 +18144,12 @@ index 4185c58f7915..d6173575ea03 100644
  			if (!progress)
  				continue;
 -- 
-2.48.1
+2.49.0
 
-From 147e5359462936bff5af046b4ece9023e103f51f Mon Sep 17 00:00:00 2001
+From 340135a3420b93ee0274d96efc11be88e77f8346 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Thu, 14 Dec 2023 14:38:42 +0000
-Subject: [PATCH 133/211] printk: nbcon: Assign priority based on CPU state
+Subject: [PATCH 133/212] printk: nbcon: Assign priority based on CPU state
 
 Use the current state of the CPU to determine which priority to
 assign to the printing context.
@@ -18276,12 +18264,12 @@ index c17cf3ea6153..3e999784ba5c 100644
  void nbcon_release(struct uart_port *up)
  {
 -- 
-2.48.1
+2.49.0
 
-From 8aa58ad1a017aff0c98b841883727d4884827f2d Mon Sep 17 00:00:00 2001
+From a7890697318ff2d9a41a9c15ae6e840c02b9d298 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 20 Oct 2023 10:03:42 +0000
-Subject: [PATCH 134/211] printk: nbcon: Add unsafe flushing on panic
+Subject: [PATCH 134/212] printk: nbcon: Add unsafe flushing on panic
 
 Add nbcon_atomic_flush_unsafe() to flush all nbcon consoles
 using the write_atomic() callback and allowing unsafe hostile
@@ -18381,12 +18369,12 @@ index 3e999784ba5c..1c01f88d596d 100644
  
  /**
 -- 
-2.48.1
+2.49.0
 
-From 1d1fe787769f4e8df747650875ea7eb9a8ef0371 Mon Sep 17 00:00:00 2001
+From c1f4dc9881ad2f95f2fc4a19e29db1960a633e0f Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 26 Sep 2023 12:44:07 +0000
-Subject: [PATCH 135/211] printk: Avoid console_lock dance if no legacy or boot
+Subject: [PATCH 135/212] printk: Avoid console_lock dance if no legacy or boot
  consoles
 
 Currently the console lock is used to attempt legacy-type
@@ -18441,7 +18429,7 @@ index c4417fc48b7e..e2675981dfc5 100644
   * In !PRINTK builds we still export console_sem
   * semaphore and some of console functions (console_unlock()/etc.), so
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index d6173575ea03..e92da55b8e9f 100644
+index eb460fd374a3..e6523d656e6d 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -463,6 +463,13 @@ static int console_msg_format = MSG_FORMAT_DEFAULT;
@@ -18599,12 +18587,12 @@ index d6173575ea03..e92da55b8e9f 100644
  
  void printk_trigger_flush(void)
 -- 
-2.48.1
+2.49.0
 
-From 8b4dc045dbccd7305580e65a5dd3ffb382843676 Mon Sep 17 00:00:00 2001
+From 3d814c6f824fe58f4d2806adca873265c1ab8fc3 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 11 Dec 2023 09:36:52 +0000
-Subject: [PATCH 136/211] printk: Track nbcon consoles
+Subject: [PATCH 136/212] printk: Track nbcon consoles
 
 Add a global flag @have_nbcon_console to identify if any nbcon
 consoles are registered. This will be used in follow-up commits
@@ -18617,7 +18605,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  1 file changed, 15 insertions(+), 1 deletion(-)
 
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index e92da55b8e9f..977a97f0396b 100644
+index e6523d656e6d..9f492815b13b 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -470,6 +470,13 @@ static DEFINE_MUTEX(syslog_lock);
@@ -18671,12 +18659,12 @@ index e92da55b8e9f..977a97f0396b 100644
  	return res;
  }
 -- 
-2.48.1
+2.49.0
 
-From 85c2e69bea32255e09722b24e45e719bafdd01f3 Mon Sep 17 00:00:00 2001
+From 9396c4fa4e119a8c00d96b86c84397681c3fd56d Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 22 Nov 2023 11:56:58 +0000
-Subject: [PATCH 137/211] printk: Coordinate direct printing in panic
+Subject: [PATCH 137/212] printk: Coordinate direct printing in panic
 
 Perform printing by nbcon consoles on the panic CPU from the
 printk() caller context in order to get panic messages printed
@@ -18724,7 +18712,7 @@ index 219b69fbe829..f0e91a0c4001 100644
  
  	kmsg_dump(KMSG_DUMP_PANIC);
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 977a97f0396b..e8d60e29c17f 100644
+index 9f492815b13b..b977c95edc08 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -2336,12 +2336,23 @@ int vprintk_store(int facility, int level,
@@ -18814,12 +18802,12 @@ index 977a97f0396b..e8d60e29c17f 100644
  	return printed_len;
  }
 -- 
-2.48.1
+2.49.0
 
-From 7de2a532640eb169a18e0110143daae8ff562bb2 Mon Sep 17 00:00:00 2001
+From 0f5619960cbb2e8d18c98dc73eaf5c86b497ba7c Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Mon, 11 Sep 2023 15:21:57 +0000
-Subject: [PATCH 138/211] printk: nbcon: Implement emergency sections
+Subject: [PATCH 138/212] printk: nbcon: Implement emergency sections
 
 In emergency situations (something has gone wrong but the
 system continues to operate), usually important information
@@ -19017,7 +19005,7 @@ index 1c01f88d596d..c3ee245397f6 100644
   * nbcon_alloc - Allocate buffers needed by the nbcon console
   * @con:	Console to allocate buffers for
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index e8d60e29c17f..4a0df41d32b8 100644
+index b977c95edc08..ee40ecf1a5ff 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -2411,16 +2411,29 @@ asmlinkage int vprintk_emit(int facility, int level,
@@ -19057,12 +19045,12 @@ index e8d60e29c17f..4a0df41d32b8 100644
  	}
  
 -- 
-2.48.1
+2.49.0
 
-From acebdb18fcece93b5f3cffc1d5dd10c2ff92a2d9 Mon Sep 17 00:00:00 2001
+From 2983ee28249194707391b5966c0370d379219023 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Mon, 11 Sep 2023 15:53:04 +0000
-Subject: [PATCH 139/211] panic: Mark emergency section in warn
+Subject: [PATCH 139/212] panic: Mark emergency section in warn
 
 Mark the full contents of __warn() as an emergency section. In
 this section, the CPU will not perform console output for the
@@ -19100,12 +19088,12 @@ index f0e91a0c4001..147803c3a402 100644
  
  #ifdef CONFIG_BUG
 -- 
-2.48.1
+2.49.0
 
-From 42df8eb76def3fdfb9c7fd3c0a07f392a803a698 Mon Sep 17 00:00:00 2001
+From bbb22e77e6a14f835fc59b2e8d01decfe50b600e Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 19 Sep 2023 17:07:34 +0000
-Subject: [PATCH 140/211] panic: Mark emergency section in oops
+Subject: [PATCH 140/212] panic: Mark emergency section in oops
 
 Mark an emergency section beginning with oops_enter() until the
 end of oops_exit(). In this section, the CPU will not perform
@@ -19144,12 +19132,12 @@ index 147803c3a402..9215df21d8c2 100644
  }
  
 -- 
-2.48.1
+2.49.0
 
-From efaff66bf7fd06348348a2c0713e3fc17d527c96 Mon Sep 17 00:00:00 2001
+From 87b4a667235bd20491f69638b4ceaf81cdaf0922 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 11 Sep 2023 15:53:39 +0000
-Subject: [PATCH 141/211] rcu: Mark emergency section in rcu stalls
+Subject: [PATCH 141/212] rcu: Mark emergency section in rcu stalls
 
 Mark an emergency section within print_other_cpu_stall(), where
 RCU stall information is printed. In this section, the CPU will
@@ -19194,12 +19182,12 @@ index 11a1fac3a589..6f085a159fca 100644
  
  static void print_cpu_stall(unsigned long gps)
 -- 
-2.48.1
+2.49.0
 
-From 59d1c1b90c4e77c2cb51a8900035097989b81e87 Mon Sep 17 00:00:00 2001
+From c87c2c6d50714564777b317c01fa11fd049c9d3b Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 18 Sep 2023 20:27:41 +0000
-Subject: [PATCH 142/211] lockdep: Mark emergency section in lockdep splats
+Subject: [PATCH 142/212] lockdep: Mark emergency section in lockdep splats
 
 Mark an emergency section within print_usage_bug(), where
 lockdep bugs are printed. In this section, the CPU will not
@@ -19244,12 +19232,12 @@ index 3468d8230e5f..6eef8527e654 100644
  
  /*
 -- 
-2.48.1
+2.49.0
 
-From d9b021ef82d208258fa80d59389003b1feb59a1f Mon Sep 17 00:00:00 2001
+From d3d793a345550550dbb6307ee51cbf8d71cf02e7 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Fri, 22 Sep 2023 14:12:21 +0000
-Subject: [PATCH 143/211] printk: nbcon: Introduce printing kthreads
+Subject: [PATCH 143/212] printk: nbcon: Introduce printing kthreads
 
 Provide the main implementation for running a printer kthread
 per nbcon console that is takeover/handover aware.
@@ -19630,7 +19618,7 @@ index c3ee245397f6..1becdfc7772c 100644
  
  	/* Boot consoles share global printk buffers. */
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 4a0df41d32b8..3e307d475d23 100644
+index ee40ecf1a5ff..80dd0b98512b 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -2688,6 +2688,8 @@ void suspend_console(void)
@@ -19696,12 +19684,12 @@ index 4a0df41d32b8..3e307d475d23 100644
  }
  EXPORT_SYMBOL(console_start);
 -- 
-2.48.1
+2.49.0
 
-From bcc758fe7fe2401cf3853dabb32efcd8b2ddbc2b Mon Sep 17 00:00:00 2001
+From 06b584a18fd19ac496bf5ab93a5caadf4f7d6317 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 23 Oct 2023 17:43:48 +0000
-Subject: [PATCH 144/211] printk: Atomic print in printk context on shutdown
+Subject: [PATCH 144/212] printk: Atomic print in printk context on shutdown
 
 For nbcon consoles, normally the printing is handled by the
 dedicated console printing threads. However, on shutdown the
@@ -19718,7 +19706,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 3e307d475d23..2a77a4ad5619 100644
+index 80dd0b98512b..c38a40d024a1 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -2395,13 +2395,18 @@ asmlinkage int vprintk_emit(int facility, int level,
@@ -19742,12 +19730,12 @@ index 3e307d475d23..2a77a4ad5619 100644
  
  	if (do_trylock_unlock) {
 -- 
-2.48.1
+2.49.0
 
-From c21caaf8c770ac430393f9c80b68c17d7c249adc Mon Sep 17 00:00:00 2001
+From 2add038062fed0f896812043d72b30e3b8abebd3 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 26 Sep 2023 14:43:30 +0000
-Subject: [PATCH 145/211] printk: nbcon: Add context to console_is_usable()
+Subject: [PATCH 145/212] printk: nbcon: Add context to console_is_usable()
 
 The nbcon consoles have two callbacks to be used for different
 contexts. In order to determine if an nbcon console is usable,
@@ -19837,7 +19825,7 @@ index 1becdfc7772c..bb071193ab6e 100644
  
  			if (nbcon_seq_read(con) >= stop_seq)
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 2a77a4ad5619..3863e3dc3816 100644
+index c38a40d024a1..42891e0dd28e 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -3046,7 +3046,7 @@ static bool console_flush_all(bool do_cond_resched, u64 *next_seq, bool *handove
@@ -19862,12 +19850,12 @@ index 2a77a4ad5619..3863e3dc3816 100644
  			if (flags & CON_NBCON) {
  				printk_seq = nbcon_seq_read(c);
 -- 
-2.48.1
+2.49.0
 
-From 124d2b1af9a06ccd09cc9456f5dc6b110f6f68b4 Mon Sep 17 00:00:00 2001
+From 73858a4a9b3dcc89c2fda909d67c2f2db1bec448 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Tue, 26 Sep 2023 13:03:52 +0000
-Subject: [PATCH 146/211] printk: nbcon: Add printer thread wakeups
+Subject: [PATCH 146/212] printk: nbcon: Add printer thread wakeups
 
 Add a function to wakeup the printer threads. Use the new function
 when:
@@ -20005,7 +19993,7 @@ index bb071193ab6e..337ec7a10095 100644
  	nbcon_state_set(con, &state);
  }
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 3863e3dc3816..3cdda6dd8941 100644
+index 42891e0dd28e..3dd6ca3df2c3 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -2409,6 +2409,8 @@ asmlinkage int vprintk_emit(int facility, int level,
@@ -20037,12 +20025,12 @@ index 3863e3dc3816..3cdda6dd8941 100644
  }
  
 -- 
-2.48.1
+2.49.0
 
-From fc147f880603c27e3a41a0309c525ef6a27ad0fe Mon Sep 17 00:00:00 2001
+From ffa114c8162c1d63d0f1d3050a8cff6aa5d47e60 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 26 Sep 2023 13:04:15 +0000
-Subject: [PATCH 147/211] printk: nbcon: Stop threads on shutdown/reboot
+Subject: [PATCH 147/212] printk: nbcon: Stop threads on shutdown/reboot
 
 Register a syscore_ops shutdown function to stop all threaded
 printers on shutdown/reboot. This allows printk to transition back
@@ -20102,12 +20090,12 @@ index 337ec7a10095..57ed4968a653 100644
 +}
 +device_initcall(printk_init_ops);
 -- 
-2.48.1
+2.49.0
 
-From b704cb65c6caca0a65aaf1c220a254adb761b6a0 Mon Sep 17 00:00:00 2001
+From 82b0d4181c55e3fa61c165e010094ca3b9e83131 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 5 Dec 2023 14:09:31 +0000
-Subject: [PATCH 148/211] printk: nbcon: Start printing threads
+Subject: [PATCH 148/212] printk: nbcon: Start printing threads
 
 If there are no boot consoles, the printing threads are started
 in early_initcall.
@@ -20200,7 +20188,7 @@ index 57ed4968a653..b866d0138fe0 100644
  
  /**
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 3cdda6dd8941..3722f1a66357 100644
+index 3dd6ca3df2c3..8ea80da55107 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -2395,6 +2395,9 @@ asmlinkage int vprintk_emit(int facility, int level,
@@ -20246,12 +20234,12 @@ index 3cdda6dd8941..3722f1a66357 100644
  }
  
 -- 
-2.48.1
+2.49.0
 
-From e1b849d38932ac82750aaff5a63edf9e5468ed3d Mon Sep 17 00:00:00 2001
+From 54b824b3d79e77a86d3503669bfdf731e8ed21bc Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Tue, 26 Sep 2023 13:31:00 +0000
-Subject: [PATCH 149/211] proc: Add nbcon support for /proc/consoles
+Subject: [PATCH 149/212] proc: Add nbcon support for /proc/consoles
 
 Update /proc/consoles output to show 'W' if an nbcon write
 callback is implemented (write_atomic or write_thread).
@@ -20304,12 +20292,12 @@ index e0758fe7936d..2703676549f5 100644
  		seq_printf(m, " %4d:%d", MAJOR(dev), MINOR(dev));
  
 -- 
-2.48.1
+2.49.0
 
-From 131242f794e99a5f131bba50f941f99cab93539f Mon Sep 17 00:00:00 2001
+From 239cbf4bdaaba785d409e813ae720067bb474472 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 22 Sep 2023 14:31:09 +0000
-Subject: [PATCH 150/211] tty: sysfs: Add nbcon support for 'active'
+Subject: [PATCH 150/212] tty: sysfs: Add nbcon support for 'active'
 
 Allow the 'active' attribute to list nbcon consoles.
 
@@ -20342,12 +20330,12 @@ index 117abcf366d9..03e2eaf24fa5 100644
  			continue;
  		cs[i++] = c;
 -- 
-2.48.1
+2.49.0
 
-From 662ff82660d00ccaf578a7c934ba5aa0c3661cb4 Mon Sep 17 00:00:00 2001
+From a3fa1fca2a253ce5c368392f152a3c8a7103d114 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 20 Oct 2023 10:01:58 +0000
-Subject: [PATCH 151/211] printk: nbcon: Provide function to reacquire
+Subject: [PATCH 151/212] printk: nbcon: Provide function to reacquire
  ownership
 
 Contexts may become nbcon owners for various reasons, not just
@@ -20441,12 +20429,12 @@ index b866d0138fe0..f843df54ee82 100644
   * nbcon_emit_next_record - Emit a record in the acquired context
   * @wctxt:	The write context that will be handed to the write function
 -- 
-2.48.1
+2.49.0
 
-From d8ec1f048be2f367e46e85571f2eefff9595df04 Mon Sep 17 00:00:00 2001
+From ca4dc11c34c2d84783a2b9caf24b8709a726f170 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 11 Dec 2023 09:19:18 +0000
-Subject: [PATCH 152/211] serial: core: Provide low-level functions to port
+Subject: [PATCH 152/212] serial: core: Provide low-level functions to port
  lock
 
 The nbcon console's driver_enter() and driver_exit() callbacks need
@@ -20489,12 +20477,12 @@ index 6fc2003767a9..7c861b4606aa 100644
  {
  	return up->serial_in(up, offset);
 -- 
-2.48.1
+2.49.0
 
-From 56561fe2f038b2375914b4e26163c2b7b7f122d5 Mon Sep 17 00:00:00 2001
+From f3770ab0bd3bb1a35acd8cbbba09fe762d321e1d Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Wed, 13 Sep 2023 15:30:36 +0000
-Subject: [PATCH 153/211] serial: 8250: Switch to nbcon console
+Subject: [PATCH 153/212] serial: 8250: Switch to nbcon console
 
 Implement the necessary callbacks to switch the 8250 console driver
 to perform as an nbcon console.
@@ -20586,7 +20574,7 @@ index 677b4aaf1f0c..efb6f1c1926a 100644
  	.data		= &serial8250_reg,
  };
 diff --git a/drivers/tty/serial/8250/8250_port.c b/drivers/tty/serial/8250/8250_port.c
-index 120a74b20d25..441f66ba3918 100644
+index 242ad0bded0e..d40df04752ff 100644
 --- a/drivers/tty/serial/8250/8250_port.c
 +++ b/drivers/tty/serial/8250/8250_port.c
 @@ -557,6 +557,11 @@ static int serial8250_em485_init(struct uart_8250_port *p)
@@ -20629,7 +20617,7 @@ index 120a74b20d25..441f66ba3918 100644
  #ifdef CONFIG_SERIAL_8250_RSA
  /*
   * Attempts to turn on the RSA FIFO.  Returns zero on failure.
-@@ -3323,6 +3340,11 @@ static void serial8250_console_putchar(struct uart_port *port, unsigned char ch)
+@@ -3332,6 +3349,11 @@ static void serial8250_console_putchar(struct uart_port *port, unsigned char ch)
  
  	wait_for_xmitr(up, UART_LSR_THRE);
  	serial_port_out(port, UART_TX, ch);
@@ -20641,7 +20629,7 @@ index 120a74b20d25..441f66ba3918 100644
  }
  
  /*
-@@ -3351,6 +3373,7 @@ static void serial8250_console_restore(struct uart_8250_port *up)
+@@ -3360,6 +3382,7 @@ static void serial8250_console_restore(struct uart_8250_port *up)
  	serial8250_out_MCR(up, up->mcr | UART_MCR_DTR | UART_MCR_RTS);
  }
  
@@ -20649,7 +20637,7 @@ index 120a74b20d25..441f66ba3918 100644
  static void fifo_wait_for_lsr(struct uart_8250_port *up, unsigned int count)
  {
  	unsigned int i;
-@@ -3428,7 +3451,7 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
+@@ -3437,7 +3460,7 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
  	 *	First save the IER then disable the interrupts
  	 */
  	ier = serial_port_in(port, UART_IER);
@@ -20658,7 +20646,7 @@ index 120a74b20d25..441f66ba3918 100644
  
  	/* check scratch reg to see if port powered off during system sleep */
  	if (up->canary && (up->canary != serial_port_in(port, UART_SCR))) {
-@@ -3494,6 +3517,135 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
+@@ -3503,6 +3526,135 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
  	if (locked)
  		uart_port_unlock_irqrestore(port, flags);
  }
@@ -20794,7 +20782,7 @@ index 120a74b20d25..441f66ba3918 100644
  
  static unsigned int probe_baud(struct uart_port *port)
  {
-@@ -3512,6 +3664,7 @@ static unsigned int probe_baud(struct uart_port *port)
+@@ -3521,6 +3673,7 @@ static unsigned int probe_baud(struct uart_port *port)
  
  int serial8250_console_setup(struct uart_port *port, char *options, bool probe)
  {
@@ -20802,7 +20790,7 @@ index 120a74b20d25..441f66ba3918 100644
  	int baud = 9600;
  	int bits = 8;
  	int parity = 'n';
-@@ -3521,6 +3674,8 @@ int serial8250_console_setup(struct uart_port *port, char *options, bool probe)
+@@ -3530,6 +3683,8 @@ int serial8250_console_setup(struct uart_port *port, char *options, bool probe)
  	if (!port->iobase && !port->membase)
  		return -ENODEV;
  
@@ -20836,12 +20824,12 @@ index be65de65fe61..ec46e3b49ee9 100644
  int serial8250_console_exit(struct uart_port *port);
  
 -- 
-2.48.1
+2.49.0
 
-From f3644d3198ed3f97c6cb2c7533f88ad478cab11f Mon Sep 17 00:00:00 2001
+From c730fe72ec4b31bc53cae319f0e9ba67917da1a5 Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Fri, 22 Sep 2023 17:35:04 +0000
-Subject: [PATCH 154/211] printk: Add kthread for all legacy consoles
+Subject: [PATCH 154/212] printk: Add kthread for all legacy consoles
 
 The write callback of legacy consoles make use of spinlocks.
 This is not permitted with PREEMPT_RT in atomic contexts.
@@ -20918,7 +20906,7 @@ index f843df54ee82..1b1b585b1675 100644
  	return 0;
  }
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 3722f1a66357..4f1ca9931ddb 100644
+index 8ea80da55107..1e2fdcef3283 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -487,6 +487,9 @@ bool have_boot_console;
@@ -21267,12 +21255,12 @@ index 3722f1a66357..4f1ca9931ddb 100644
  
  	if (pending & PRINTK_PENDING_WAKEUP)
 -- 
-2.48.1
+2.49.0
 
-From b519de907b24bf41e13b791bd8f221c030368059 Mon Sep 17 00:00:00 2001
+From 3b4ee002b8b6711dd9cdd1765d0130c67ac4e21c Mon Sep 17 00:00:00 2001
 From: John Ogness <john.ogness@linutronix.de>
 Date: Mon, 11 Dec 2023 09:34:16 +0000
-Subject: [PATCH 155/211] printk: Avoid false positive lockdep report for
+Subject: [PATCH 155/212] printk: Avoid false positive lockdep report for
  legacy driver.
 
 printk may invoke the legacy console driver from atomic context. This leads to
@@ -21293,7 +21281,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index 4f1ca9931ddb..249576a8c351 100644
+index 1e2fdcef3283..80ccfbb6be41 100644
 --- a/kernel/printk/printk.c
 +++ b/kernel/printk/printk.c
 @@ -2823,6 +2823,8 @@ static void __console_unlock(void)
@@ -21336,12 +21324,12 @@ index 4f1ca9931ddb..249576a8c351 100644
  				printk_seq = nbcon_seq_read(con);
  			} else {
 -- 
-2.48.1
+2.49.0
 
-From 4851da120bc8d9f9b9c13e2c45d87112297bbd5e Mon Sep 17 00:00:00 2001
+From e455cf02bc601421728fd90f2756257d596ff13e Mon Sep 17 00:00:00 2001
 From: Mike Galbraith <umgwanakikbuti@gmail.com>
 Date: Sat, 27 Feb 2016 08:09:11 +0100
-Subject: [PATCH 156/211] drm/i915: Use preempt_disable/enable_rt() where
+Subject: [PATCH 156/212] drm/i915: Use preempt_disable/enable_rt() where
  recommended
 
 Mario Kleiner suggest in commit
@@ -21397,12 +21385,12 @@ index f5659ebd08eb..5b6d2f55528d 100644
  	spin_unlock_irqrestore(&dev_priv->uncore.lock, irqflags);
  
 -- 
-2.48.1
+2.49.0
 
-From 888807643dec3a2829901b4fdd5ca7bb93ef96df Mon Sep 17 00:00:00 2001
+From a8b38091598e34028ff8f47e5d0ffe6b19adfbda Mon Sep 17 00:00:00 2001
 From: Mike Galbraith <umgwanakikbuti@gmail.com>
 Date: Sat, 27 Feb 2016 09:01:42 +0100
-Subject: [PATCH 157/211] drm/i915: Don't disable interrupts on PREEMPT_RT
+Subject: [PATCH 157/212] drm/i915: Don't disable interrupts on PREEMPT_RT
  during atomic updates
 
 Commit
@@ -21487,12 +21475,12 @@ index cfbfbfed3f5e..da2becfbc86c 100644
  	if (intel_vgpu_active(dev_priv))
  		return;
 -- 
-2.48.1
+2.49.0
 
-From e3e5ed61e35a55ca4e8395a0ced3ffc1cde5bdfc Mon Sep 17 00:00:00 2001
+From 2c625c323a30cab44be0b86c4fae42143ccad827 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Mon, 25 Oct 2021 15:05:18 +0200
-Subject: [PATCH 158/211] drm/i915: Don't check for atomic context on
+Subject: [PATCH 158/212] drm/i915: Don't check for atomic context on
  PREEMPT_RT
 
 The !in_atomic() check in _wait_for_atomic() triggers on PREEMPT_RT
@@ -21523,12 +21511,12 @@ index c61066498bf2..48e19e55d6b0 100644
  #else
  # define _WAIT_FOR_ATOMIC_CHECK(ATOMIC) do { } while (0)
 -- 
-2.48.1
+2.49.0
 
-From 1ae0b0dd0cc857f7da9feb16593036cbe3fbcc67 Mon Sep 17 00:00:00 2001
+From 1489b152b314f165b389871fc6e5b1103a12e07f Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 6 Dec 2018 09:52:20 +0100
-Subject: [PATCH 159/211] drm/i915: Disable tracing points on PREEMPT_RT
+Subject: [PATCH 159/212] drm/i915: Disable tracing points on PREEMPT_RT
 
 Luca Abeni reported this:
 | BUG: scheduling while atomic: kworker/u8:2/15203/0x00000003
@@ -21573,12 +21561,12 @@ index ce1cbee1b39d..c54653cf72c9 100644
  #include <linux/types.h>
  #include <linux/tracepoint.h>
 -- 
-2.48.1
+2.49.0
 
-From 5987eabec915b8d34413a7e08ca0cda91c18fefb Mon Sep 17 00:00:00 2001
+From a58f9676bde9c426750734a9f795fc13400fd000 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 19 Dec 2018 10:47:02 +0100
-Subject: [PATCH 160/211] drm/i915: skip DRM_I915_LOW_LEVEL_TRACEPOINTS with
+Subject: [PATCH 160/212] drm/i915: skip DRM_I915_LOW_LEVEL_TRACEPOINTS with
  NOTRACE
 
 The order of the header files is important. If this header file is
@@ -21607,12 +21595,12 @@ index c54653cf72c9..3c51620d011b 100644
  	     TP_PROTO(struct i915_request *rq),
  	     TP_ARGS(rq)
 -- 
-2.48.1
+2.49.0
 
-From fa2eccf22a0a11dc5e4de88b977c867c0326d2dc Mon Sep 17 00:00:00 2001
+From 34f72d9d4302098e792eab56b5708b5b9827c595 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 8 Sep 2021 17:18:00 +0200
-Subject: [PATCH 161/211] drm/i915/gt: Queue and wait for the irq_work item.
+Subject: [PATCH 161/212] drm/i915/gt: Queue and wait for the irq_work item.
 
 Disabling interrupts and invoking the irq_work function directly breaks
 on PREEMPT_RT.
@@ -21655,12 +21643,12 @@ index f2973cd1a8aa..aa77f8601b8a 100644
  
  void intel_breadcrumbs_free(struct kref *kref)
 -- 
-2.48.1
+2.49.0
 
-From d50027cd5bbc8a1ac185821dca6d56602c647755 Mon Sep 17 00:00:00 2001
+From 2be57ca25aa0d046240ccce3f16d63abe526dff3 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 8 Sep 2021 19:03:41 +0200
-Subject: [PATCH 162/211] drm/i915/gt: Use spin_lock_irq() instead of
+Subject: [PATCH 162/212] drm/i915/gt: Use spin_lock_irq() instead of
  local_irq_disable() + spin_lock()
 
 execlists_dequeue() is invoked from a function which uses
@@ -21749,12 +21737,12 @@ index 2065be5a196b..73d815fc514b 100644
  	}
  
 -- 
-2.48.1
+2.49.0
 
-From c328507a2c1371f91e985f9fd2a481be8d217c38 Mon Sep 17 00:00:00 2001
+From b6df988e6e8a08efbd35fd1ec14fc3cd7c41a30f Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 1 Oct 2021 20:01:03 +0200
-Subject: [PATCH 163/211] drm/i915: Drop the irqs_disabled() check
+Subject: [PATCH 163/212] drm/i915: Drop the irqs_disabled() check
 
 The !irqs_disabled() check triggers on PREEMPT_RT even with
 i915_sched_engine::lock acquired. The reason is the lock is transformed
@@ -21793,12 +21781,12 @@ index f59081066a19..014d02029a41 100644
  
  	/*
 -- 
-2.48.1
+2.49.0
 
-From 5a3ba5b6048f2dd6c24a46de939500974ef5257b Mon Sep 17 00:00:00 2001
+From 382eaecf21b28c3015080a64fdcad266def29538 Mon Sep 17 00:00:00 2001
 From: Tvrtko Ursulin <tvrtko.ursulin@intel.com>
 Date: Wed, 5 Jul 2023 10:30:25 +0100
-Subject: [PATCH 164/211] drm/i915: Do not disable preemption for resets
+Subject: [PATCH 164/212] drm/i915: Do not disable preemption for resets
 
 Commit ade8a0f59844 ("drm/i915: Make all GPU resets atomic") added a
 preempt disable section over the hardware reset callback to prepare the
@@ -21897,12 +21885,12 @@ index 13fb8e5042c5..b51fb0c97772 100644
  		wa_14015076503_end(gt, reset_mask);
  	}
 -- 
-2.48.1
+2.49.0
 
-From 8cd5d1f035c1002396ce59075a355a19d2af907c Mon Sep 17 00:00:00 2001
+From fcd886e6d5d601f02db632d2b1384d00c2933851 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Tue, 3 Oct 2023 21:37:21 +0200
-Subject: [PATCH 165/211] drm/i915/guc: Consider also RCU depth in busy loop.
+Subject: [PATCH 165/212] drm/i915/guc: Consider also RCU depth in busy loop.
 
 intel_guc_send_busy_loop() looks at in_atomic() and irqs_disabled() to
 decide if it should busy-spin while waiting or if it may sleep.
@@ -21931,12 +21919,12 @@ index 8dc291ff0093..5b8d084c9c58 100644
  	/*
  	 * FIXME: Have caller pass in if we are in an atomic context to avoid
 -- 
-2.48.1
+2.49.0
 
-From 76f7b6a95d5c0864f5030add4ce4891a74c624d6 Mon Sep 17 00:00:00 2001
+From bf16f3a5f4814093c5300768b2ffc679ef3e9005 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Mon, 21 Feb 2022 17:59:14 +0100
-Subject: [PATCH 166/211] Revert "drm/i915: Depend on !PREEMPT_RT."
+Subject: [PATCH 166/212] Revert "drm/i915: Depend on !PREEMPT_RT."
 
 Once the known issues are addressed, it should be safe to enable the
 driver.
@@ -21959,12 +21947,12 @@ index ce397a8797f7..98c3f532822d 100644
  	select INTERVAL_TREE
  	# we need shmfs for the swappable backing store, and in particular
 -- 
-2.48.1
+2.49.0
 
-From 7ce283b404d9a748b008cb72ac0cc3deee5b3811 Mon Sep 17 00:00:00 2001
+From 0063fc2b46636d0a5f7b712e2b5f0d43dc631b8b Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Sat, 23 Sep 2023 03:11:05 +0200
-Subject: [PATCH 167/211] sched: define TIF_ALLOW_RESCHED
+Subject: [PATCH 167/212] sched: define TIF_ALLOW_RESCHED
 
 On Fri, Sep 22 2023 at 00:55, Thomas Gleixner wrote:
 > On Thu, Sep 21 2023 at 09:00, Linus Torvalds wrote:
@@ -22084,7 +22072,7 @@ Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  20 files changed, 171 insertions(+), 56 deletions(-)
 
 diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 261188e66e78..a29075276e1e 100644
+index 36dd5498ecbc..4e378ab31ccf 100644
 --- a/arch/x86/Kconfig
 +++ b/arch/x86/Kconfig
 @@ -273,6 +273,7 @@ config X86
@@ -22159,7 +22147,7 @@ index 6813171afccb..674a622c91be 100644
  struct kvm_vcpu;
  
 diff --git a/include/linux/sched.h b/include/linux/sched.h
-index d8ed598f0450..06d4393e26fa 100644
+index 9ddc0d1c68a5..0879ca36a663 100644
 --- a/include/linux/sched.h
 +++ b/include/linux/sched.h
 @@ -2057,17 +2057,17 @@ static inline void update_tsk_thread_flag(struct task_struct *tsk, int flag,
@@ -22400,10 +22388,10 @@ index 2e0f75bcb7fd..d952fa5ee880 100644
  
  		if (ti_work & _TIF_NOTIFY_RESUME)
 diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 79379e386666..6b51c088c3ac 100644
+index 75a1d321b3f5..7deb3d1fe85f 100644
 --- a/kernel/sched/core.c
 +++ b/kernel/sched/core.c
-@@ -897,14 +897,15 @@ static inline void hrtick_rq_init(struct rq *rq)
+@@ -899,14 +899,15 @@ static inline void hrtick_rq_init(struct rq *rq)
  
  #if defined(CONFIG_SMP) && defined(TIF_POLLING_NRFLAG)
  /*
@@ -22422,7 +22410,7 @@ index 79379e386666..6b51c088c3ac 100644
  }
  
  /*
-@@ -921,7 +922,7 @@ static bool set_nr_if_polling(struct task_struct *p)
+@@ -923,7 +924,7 @@ static bool set_nr_if_polling(struct task_struct *p)
  	for (;;) {
  		if (!(val & _TIF_POLLING_NRFLAG))
  			return false;
@@ -22431,7 +22419,7 @@ index 79379e386666..6b51c088c3ac 100644
  			return true;
  		if (try_cmpxchg(&ti->flags, &val, val | _TIF_NEED_RESCHED))
  			break;
-@@ -930,9 +931,9 @@ static bool set_nr_if_polling(struct task_struct *p)
+@@ -932,9 +933,9 @@ static bool set_nr_if_polling(struct task_struct *p)
  }
  
  #else
@@ -22443,7 +22431,7 @@ index 79379e386666..6b51c088c3ac 100644
  	return true;
  }
  
-@@ -1037,28 +1038,47 @@ void wake_up_q(struct wake_q_head *head)
+@@ -1040,28 +1041,47 @@ void wake_up_q(struct wake_q_head *head)
   * might also involve a cross-CPU call to trigger the scheduler on
   * the target CPU.
   */
@@ -22499,7 +22487,7 @@ index 79379e386666..6b51c088c3ac 100644
  }
  
  void resched_cpu(int cpu)
-@@ -1131,7 +1151,7 @@ static void wake_up_idle_cpu(int cpu)
+@@ -1134,7 +1154,7 @@ static void wake_up_idle_cpu(int cpu)
  	if (cpu == smp_processor_id())
  		return;
  
@@ -22509,7 +22497,7 @@ index 79379e386666..6b51c088c3ac 100644
  	else
  		trace_sched_wake_idle_without_ipi(cpu);
 diff --git a/kernel/sched/debug.c b/kernel/sched/debug.c
-index 4c3d0d9f3db6..63e19b89c8c3 100644
+index 115e266db76b..90028c5ba31a 100644
 --- a/kernel/sched/debug.c
 +++ b/kernel/sched/debug.c
 @@ -333,6 +333,23 @@ static const struct file_operations sched_debug_fops = {
@@ -22546,7 +22534,7 @@ index 4c3d0d9f3db6..63e19b89c8c3 100644
  }
  late_initcall(sched_init_debug);
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 726fa69c4d88..e12a1c66cc88 100644
+index 2808dbdd0384..bea994a4285d 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
 @@ -1022,8 +1022,10 @@ static void clear_buddies(struct cfs_rq *cfs_rq, struct sched_entity *se);
@@ -22614,7 +22602,7 @@ index 726fa69c4d88..e12a1c66cc88 100644
  static void update_curr_fair(struct rq *rq)
  {
  	update_curr(cfs_rq_of(&rq->curr->se));
-@@ -5513,7 +5529,7 @@ entity_tick(struct cfs_rq *cfs_rq, struct sched_entity *curr, int queued)
+@@ -5515,7 +5531,7 @@ entity_tick(struct cfs_rq *cfs_rq, struct sched_entity *curr, int queued)
  	/*
  	 * Update run-time statistics of the 'current'.
  	 */
@@ -22623,7 +22611,7 @@ index 726fa69c4d88..e12a1c66cc88 100644
  
  	/*
  	 * Ensure that runnable average is periodically updated.
-@@ -5527,7 +5543,7 @@ entity_tick(struct cfs_rq *cfs_rq, struct sched_entity *curr, int queued)
+@@ -5529,7 +5545,7 @@ entity_tick(struct cfs_rq *cfs_rq, struct sched_entity *curr, int queued)
  	 * validating it and just reschedule.
  	 */
  	if (queued) {
@@ -22632,7 +22620,7 @@ index 726fa69c4d88..e12a1c66cc88 100644
  		return;
  	}
  	/*
-@@ -5673,7 +5689,7 @@ static void __account_cfs_rq_runtime(struct cfs_rq *cfs_rq, u64 delta_exec)
+@@ -5675,7 +5691,7 @@ static void __account_cfs_rq_runtime(struct cfs_rq *cfs_rq, u64 delta_exec)
  	 * hierarchy can be throttled
  	 */
  	if (!assign_cfs_rq_runtime(cfs_rq) && likely(cfs_rq->curr))
@@ -22641,7 +22629,7 @@ index 726fa69c4d88..e12a1c66cc88 100644
  }
  
  static __always_inline
-@@ -5933,7 +5949,7 @@ void unthrottle_cfs_rq(struct cfs_rq *cfs_rq)
+@@ -5935,7 +5951,7 @@ void unthrottle_cfs_rq(struct cfs_rq *cfs_rq)
  
  	/* Determine whether we need to wake up potentially idle CPU: */
  	if (rq->curr == rq->idle && rq->cfs.nr_running)
@@ -22650,7 +22638,7 @@ index 726fa69c4d88..e12a1c66cc88 100644
  }
  
  #ifdef CONFIG_SMP
-@@ -6638,7 +6654,7 @@ static void hrtick_start_fair(struct rq *rq, struct task_struct *p)
+@@ -6640,7 +6656,7 @@ static void hrtick_start_fair(struct rq *rq, struct task_struct *p)
  
  		if (delta < 0) {
  			if (task_current(rq, p))
@@ -22659,7 +22647,7 @@ index 726fa69c4d88..e12a1c66cc88 100644
  			return;
  		}
  		hrtick_start(rq, delta);
-@@ -8316,7 +8332,7 @@ static void check_preempt_wakeup_fair(struct rq *rq, struct task_struct *p, int
+@@ -8318,7 +8334,7 @@ static void check_preempt_wakeup_fair(struct rq *rq, struct task_struct *p, int
  	 * prevents us from potentially nominating it as a false LAST_BUDDY
  	 * below.
  	 */
@@ -22668,7 +22656,7 @@ index 726fa69c4d88..e12a1c66cc88 100644
  		return;
  
  	if (!sched_feat(WAKEUP_PREEMPTION))
-@@ -8354,7 +8370,7 @@ static void check_preempt_wakeup_fair(struct rq *rq, struct task_struct *p, int
+@@ -8356,7 +8372,7 @@ static void check_preempt_wakeup_fair(struct rq *rq, struct task_struct *p, int
  	return;
  
  preempt:
@@ -22677,7 +22665,7 @@ index 726fa69c4d88..e12a1c66cc88 100644
  }
  
  #ifdef CONFIG_SMP
-@@ -12509,7 +12525,7 @@ static inline void task_tick_core(struct rq *rq, struct task_struct *curr)
+@@ -12511,7 +12527,7 @@ static inline void task_tick_core(struct rq *rq, struct task_struct *curr)
  	 */
  	if (rq->core->core_forceidle_count && rq->cfs.nr_running == 1 &&
  	    __entity_slice_used(&curr->se, MIN_NR_TASKS_DURING_FORCEIDLE))
@@ -22686,7 +22674,7 @@ index 726fa69c4d88..e12a1c66cc88 100644
  }
  
  /*
-@@ -12674,7 +12690,7 @@ prio_changed_fair(struct rq *rq, struct task_struct *p, int oldprio)
+@@ -12676,7 +12692,7 @@ prio_changed_fair(struct rq *rq, struct task_struct *p, int oldprio)
  	 */
  	if (task_current(rq, p)) {
  		if (p->prio > oldprio)
@@ -22781,12 +22769,12 @@ index 2b948d35fb59..959f09ab83ab 100644
  		need_resched = 'p';
  		break;
 -- 
-2.48.1
+2.49.0
 
-From 5faa01f312efd66fd185905c8d92e8d45fb0dc6e Mon Sep 17 00:00:00 2001
+From b9185e5acc211cbb06736534769ae26f419b7643 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Wed, 8 Jul 2015 17:14:48 +0200
-Subject: [PATCH 168/211] arm: Disable jump-label on PREEMPT_RT.
+Subject: [PATCH 168/212] arm: Disable jump-label on PREEMPT_RT.
 
 jump-labels are used to efficiently switch between two possible code
 paths. To achieve this, stop_machine() is used to keep the CPU in a
@@ -22822,12 +22810,12 @@ index 57c0448d017a..dea47ba6576b 100644
  	select HAVE_ARCH_KGDB if !CPU_ENDIAN_BE32 && MMU
  	select HAVE_ARCH_KASAN if MMU && !XIP_KERNEL
 -- 
-2.48.1
+2.49.0
 
-From c6c755b32c39044a03a77232862944d69b2a3127 Mon Sep 17 00:00:00 2001
+From c72fddff1f388f423fd9914b342e65db2dc88d88 Mon Sep 17 00:00:00 2001
 From: "Yadi.hu" <yadi.hu@windriver.com>
 Date: Wed, 10 Dec 2014 10:32:09 +0800
-Subject: [PATCH 169/211] ARM: enable irq in translation/section permission
+Subject: [PATCH 169/212] ARM: enable irq in translation/section permission
  fault handlers
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -22918,12 +22906,12 @@ index fef62e4a9edd..622a30243f4a 100644
  	return 0;
  }
 -- 
-2.48.1
+2.49.0
 
-From 250e84e63af26c6688aa3bfa601e52a8980134ae Mon Sep 17 00:00:00 2001
+From 5899a822b8383844a5513f6b9c84e893bee6a577 Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Thu, 28 Jul 2011 13:32:57 +0200
-Subject: [PATCH 170/211] tty/serial/omap: Make the locking RT aware
+Subject: [PATCH 170/212] tty/serial/omap: Make the locking RT aware
 
 The lock is a sleeping lock and local_irq_save() is not the
 optimsation we are looking for. Redo it to make it work on -RT and
@@ -22966,12 +22954,12 @@ index f4c6ff806465..1097fca22307 100644
  
  static int __init
 -- 
-2.48.1
+2.49.0
 
-From 5e7ca9b6e1ab99409b44a5d675aba03c499a730d Mon Sep 17 00:00:00 2001
+From efad548fcf2cf87a739b5ecbc5e83b6a4434ea4b Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Tue, 8 Jan 2013 21:36:51 +0100
-Subject: [PATCH 171/211] tty/serial/pl011: Make the locking work on RT
+Subject: [PATCH 171/212] tty/serial/pl011: Make the locking work on RT
 
 The lock is a sleeping lock and local_irq_save() is not the optimsation
 we are looking for. Redo it to make it work on -RT and non-RT.
@@ -23013,12 +23001,12 @@ index bb31ac9cae8c..8b7cf07e4491 100644
  	clk_disable(uap->clk);
  }
 -- 
-2.48.1
+2.49.0
 
-From 9ba057e58ca0d898c3d69b0c44697f77f1d8da7d Mon Sep 17 00:00:00 2001
+From ed189e5a65b20cf83cf4d626e9ecb3fb651fae44 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 19 May 2023 16:57:29 +0200
-Subject: [PATCH 172/211] ARM: vfp: Provide vfp_lock() for VFP locking.
+Subject: [PATCH 172/212] ARM: vfp: Provide vfp_lock() for VFP locking.
 
 kernel_neon_begin() uses local_bh_disable() to ensure exclusive access
 to the VFP unit. This is broken on PREEMPT_RT because a BH disabled
@@ -23093,12 +23081,12 @@ index 7e8773a2d99d..8d321cdb7ac5 100644
  EXPORT_SYMBOL(kernel_neon_end);
  
 -- 
-2.48.1
+2.49.0
 
-From 162022d0c99d42fb22f3f5e223d72d7afc0f8b57 Mon Sep 17 00:00:00 2001
+From 247c0867c27a68072f72cd4c2d434276d52c116d Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 19 May 2023 16:57:30 +0200
-Subject: [PATCH 173/211] ARM: vfp: Use vfp_lock() in vfp_sync_hwstate().
+Subject: [PATCH 173/212] ARM: vfp: Use vfp_lock() in vfp_sync_hwstate().
 
 vfp_sync_hwstate() uses preempt_disable() followed by local_bh_disable()
 to ensure that it won't get interrupted while checking the VFP state.
@@ -23142,12 +23130,12 @@ index 8d321cdb7ac5..3b9360bfc508 100644
  
  /* Ensure that the thread reloads the hardware VFP state on the next use. */
 -- 
-2.48.1
+2.49.0
 
-From 4dc914a8697fa42f375b2e47c1dbe6c86b18e44d Mon Sep 17 00:00:00 2001
+From 56536d93e898e82eb6246508cbd6eee9086e279e Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 28 Jun 2023 09:36:10 +0200
-Subject: [PATCH 174/211] ARM: vfp: Use vfp_lock() in vfp_support_entry().
+Subject: [PATCH 174/212] ARM: vfp: Use vfp_lock() in vfp_support_entry().
 
 vfp_entry() is invoked from exception handler and is fully preemptible.
 It uses local_bh_disable() to remain uninterrupted while checking the
@@ -23195,12 +23183,12 @@ index 3b9360bfc508..9543f011d0ed 100644
  }
  
 -- 
-2.48.1
+2.49.0
 
-From 99a0d403decbf7d32eb26b747c095263c21a3e15 Mon Sep 17 00:00:00 2001
+From 1f26f837a27399678557894159423b724091ecf4 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Wed, 28 Jun 2023 09:39:33 +0200
-Subject: [PATCH 175/211] ARM: vfp: Move sending signals outside of
+Subject: [PATCH 175/212] ARM: vfp: Move sending signals outside of
  vfp_lock()ed section.
 
 VFP_bounce() is invoked from within vfp_support_entry() and may send a
@@ -23321,12 +23309,12 @@ index 9543f011d0ed..9fde36fcb80c 100644
  }
  
 -- 
-2.48.1
+2.49.0
 
-From 2f95df7f0db2779a68e5164ff65fc99a5ddfe6d3 Mon Sep 17 00:00:00 2001
+From 8c59e29936825d64b84bb7677e6b00652f5762b9 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 11 Oct 2019 13:14:29 +0200
-Subject: [PATCH 176/211] ARM: Allow to enable RT
+Subject: [PATCH 176/212] ARM: Allow to enable RT
 
 Allow to select RT.
 
@@ -23357,12 +23345,12 @@ index dea47ba6576b..a154ecd2d3c3 100644
  	select HAVE_REGS_AND_STACK_ACCESS_API
  	select HAVE_RSEQ
 -- 
-2.48.1
+2.49.0
 
-From bcce8342e1cef31a6cf1cdacfc468e86c602e957 Mon Sep 17 00:00:00 2001
+From 1ef8d02e6d05166e35820fa3291c22702735133d Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 11 Oct 2019 13:14:35 +0200
-Subject: [PATCH 177/211] ARM64: Allow to enable RT
+Subject: [PATCH 177/212] ARM64: Allow to enable RT
 
 Allow to select RT.
 
@@ -23385,12 +23373,12 @@ index 658c6a61ab6f..f5d5c265f438 100644
  	select ARCH_WANT_COMPAT_IPC_PARSE_VERSION if COMPAT
  	select ARCH_WANT_DEFAULT_BPF_JIT
 -- 
-2.48.1
+2.49.0
 
-From e4110cf0785b7c5a3721e2e71d2d63e72b2b044f Mon Sep 17 00:00:00 2001
+From 69b819bed2497860713052438a8df88e5363250d Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 26 Jul 2019 11:30:49 +0200
-Subject: [PATCH 178/211] powerpc: traps: Use PREEMPT_RT
+Subject: [PATCH 178/212] powerpc: traps: Use PREEMPT_RT
 
 Add PREEMPT_RT to the backtrace if enabled.
 
@@ -23424,12 +23412,12 @@ index 2de7f6dcd32b..739f5b179a7f 100644
  	       IS_ENABLED(CONFIG_SMP) ? (" NR_CPUS=" __stringify(NR_CPUS)) : "",
  	       debug_pagealloc_enabled() ? " DEBUG_PAGEALLOC" : "",
 -- 
-2.48.1
+2.49.0
 
-From 0a771e7f14a5f28e5057c9bcee185db604e480e9 Mon Sep 17 00:00:00 2001
+From 9fd8b1789660979467f21020220107f1b788848b Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Tue, 26 Mar 2019 18:31:54 +0100
-Subject: [PATCH 179/211] powerpc/pseries/iommu: Use a locallock instead
+Subject: [PATCH 179/212] powerpc/pseries/iommu: Use a locallock instead
  local_irq_save()
 
 The locallock protects the per-CPU variable tce_page. The function
@@ -23541,12 +23529,12 @@ index b1e6d275cda9..9a8d3970da3c 100644
  }
  
 -- 
-2.48.1
+2.49.0
 
-From 747b1c6d19e582b8aa462f9b03a35cc0708c0a5d Mon Sep 17 00:00:00 2001
+From 14cf238eea922079299951655e47f2fd70fb74eb Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 9 Mar 2023 09:13:52 +0100
-Subject: [PATCH 180/211] powerpc/pseries: Select the generic memory allocator.
+Subject: [PATCH 180/212] powerpc/pseries: Select the generic memory allocator.
 
 The RTAS work area allocator is using the generic memory allocator and
 as such it must select it.
@@ -23573,12 +23561,12 @@ index 4ebf2ef2845d..381c3be3bec1 100644
  	select MPIC
  	select OF_DYNAMIC
 -- 
-2.48.1
+2.49.0
 
-From d7aa932b0fa9ee63b9b994d5b1ab356d071a9659 Mon Sep 17 00:00:00 2001
+From 23768e0f1c842143b409c8dec7a403eaacbfb062 Mon Sep 17 00:00:00 2001
 From: Bogdan Purcareata <bogdan.purcareata@freescale.com>
 Date: Fri, 24 Apr 2015 15:53:13 +0000
-Subject: [PATCH 181/211] powerpc/kvm: Disable in-kernel MPIC emulation for
+Subject: [PATCH 181/212] powerpc/kvm: Disable in-kernel MPIC emulation for
  PREEMPT_RT
 
 While converting the openpic emulation code to use a raw_spinlock_t enables
@@ -23618,12 +23606,12 @@ index 902611954200..2f188137f830 100644
  	select HAVE_KVM_IRQFD
  	select HAVE_KVM_IRQ_ROUTING
 -- 
-2.48.1
+2.49.0
 
-From 06c18506c91385babec4ed354dfbac644d8f5c88 Mon Sep 17 00:00:00 2001
+From 2cbf1f29888315a0c599c4c4e5fef6338631c60c Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Tue, 26 Mar 2019 18:31:29 +0100
-Subject: [PATCH 182/211] powerpc/stackprotector: work around stack-guard init
+Subject: [PATCH 182/212] powerpc/stackprotector: work around stack-guard init
  from atomic
 
 This is invoked from the secondary CPU in atomic context. On x86 we use
@@ -23657,12 +23645,12 @@ index 283c34647856..4727f40052dd 100644
  #ifdef CONFIG_PPC64
  	get_paca()->canary = canary;
 -- 
-2.48.1
+2.49.0
 
-From f95db62c95189063171f7843a55011c5c990225b Mon Sep 17 00:00:00 2001
+From c46780f2547ead89e0234841d813422d99c32654 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 11 Oct 2019 13:14:41 +0200
-Subject: [PATCH 183/211] POWERPC: Allow to enable RT
+Subject: [PATCH 183/212] POWERPC: Allow to enable RT
 
 Allow to select RT.
 
@@ -23693,12 +23681,12 @@ index 6baa8b85601a..cca3f7ca6f10 100644
  	select HAVE_SETUP_PER_CPU_AREA		if PPC64
  	select HAVE_SOFTIRQ_ON_OWN_STACK
 -- 
-2.48.1
+2.49.0
 
-From bed7c69631f910fb936a520c7c949c5c8b3c1c01 Mon Sep 17 00:00:00 2001
+From 403cadd39cdbb306365cb61f3acec679a29fb763 Mon Sep 17 00:00:00 2001
 From: Evan Green <evan@rivosinc.com>
 Date: Mon, 6 Nov 2023 14:58:55 -0800
-Subject: [PATCH 184/211] RISC-V: Probe misaligned access speed in parallel
+Subject: [PATCH 184/212] RISC-V: Probe misaligned access speed in parallel
 
 Probing for misaligned access speed takes about 0.06 seconds. On a
 system with 64 cores, doing this in smp_callin() means it's done
@@ -23723,25 +23711,16 @@ Signed-off-by: Evan Green <evan@rivosinc.com>
 Link: https://lore.kernel.org/r/20231106225855.3121724-1-evan@rivosinc.com
 Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- arch/riscv/include/asm/cpufeature.h |  2 -
- arch/riscv/kernel/cpufeature.c      | 84 ++++++++++++++++++++++++++---
- arch/riscv/kernel/smpboot.c         |  1 -
- 3 files changed, 76 insertions(+), 11 deletions(-)
 
-diff --git a/arch/riscv/include/asm/cpufeature.h b/arch/riscv/include/asm/cpufeature.h
-index d0345bd659c9..23fed53b8815 100644
---- a/arch/riscv/include/asm/cpufeature.h
-+++ b/arch/riscv/include/asm/cpufeature.h
-@@ -30,6 +30,4 @@ DECLARE_PER_CPU(long, misaligned_access_speed);
- /* Per-cpu ISA extensions. */
- extern struct riscv_isainfo hart_isa[NR_CPUS];
- 
--void check_unaligned_access(int cpu);
--
- #endif
+Conflicts:
+	arch/riscv/include/asm/cpufeature.h
+---
+ arch/riscv/kernel/cpufeature.c | 84 ++++++++++++++++++++++++++++++----
+ arch/riscv/kernel/smpboot.c    |  1 -
+ 2 files changed, 76 insertions(+), 9 deletions(-)
+
 diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-index bb5fb2b820a2..01dc099bfcdf 100644
+index 3f0ad09e1650..eccb96c48931 100644
 --- a/arch/riscv/kernel/cpufeature.c
 +++ b/arch/riscv/kernel/cpufeature.c
 @@ -8,6 +8,7 @@
@@ -23874,13 +23853,13 @@ index bb5fb2b820a2..01dc099bfcdf 100644
 -arch_initcall(check_unaligned_access_boot_cpu);
 +arch_initcall(check_unaligned_access_all_cpus);
  
- #ifdef CONFIG_RISCV_ALTERNATIVE
- /*
+ void riscv_user_isa_enable(void)
+ {
 diff --git a/arch/riscv/kernel/smpboot.c b/arch/riscv/kernel/smpboot.c
-index 1b8da4e40a4d..2cb5e651412c 100644
+index d1b0a6fc3adf..d162bf339beb 100644
 --- a/arch/riscv/kernel/smpboot.c
 +++ b/arch/riscv/kernel/smpboot.c
-@@ -246,7 +246,6 @@ asmlinkage __visible void smp_callin(void)
+@@ -248,7 +248,6 @@ asmlinkage __visible void smp_callin(void)
  
  	numa_add_cpu(curr_cpuid);
  	set_cpu_online(curr_cpuid, 1);
@@ -23889,12 +23868,12 @@ index 1b8da4e40a4d..2cb5e651412c 100644
  	if (has_vector()) {
  		if (riscv_v_setup_vsize())
 -- 
-2.48.1
+2.49.0
 
-From d1d80d2d45640141b3329539c1c7d0d1a4f7286c Mon Sep 17 00:00:00 2001
+From bdff32e1ae40af5dc25b34363f727b0818f0f04d Mon Sep 17 00:00:00 2001
 From: Jisheng Zhang <jszhang@kernel.org>
 Date: Tue, 31 Oct 2023 22:35:20 +0800
-Subject: [PATCH 185/211] riscv: add PREEMPT_AUTO support
+Subject: [PATCH 185/212] riscv: add PREEMPT_AUTO support
 
 riscv has switched to GENERIC_ENTRY, so adding PREEMPT_AUTO is as simple
 as adding TIF_ARCH_RESCHED_LAZY related definitions and enabling
@@ -23940,12 +23919,12 @@ index 8c72d1bcdf14..c59ad9b7af11 100644
  #define _TIF_WORK_MASK \
  	(_TIF_NOTIFY_RESUME | _TIF_SIGPENDING | _TIF_NEED_RESCHED | \
 -- 
-2.48.1
+2.49.0
 
-From bec888391a1b14d6b6a0f4c0093e7adbb9a98e9f Mon Sep 17 00:00:00 2001
+From 1864c9be05b1b01282cd1c6f5a827414953e13a5 Mon Sep 17 00:00:00 2001
 From: Jisheng Zhang <jszhang@kernel.org>
 Date: Tue, 31 Oct 2023 22:35:21 +0800
-Subject: [PATCH 186/211] riscv: allow to enable RT
+Subject: [PATCH 186/212] riscv: allow to enable RT
 
 Now, it's ready to enable RT on riscv.
 
@@ -23968,12 +23947,12 @@ index f05883adb5f7..391adf8ffc8d 100644
  	select ARCH_USE_QUEUED_RWLOCKS
  	select ARCH_USES_CFI_TRAPS if CFI_CLANG
 -- 
-2.48.1
+2.49.0
 
-From efc9521ab46d0a1570fb9fb1653007c4640a9b93 Mon Sep 17 00:00:00 2001
+From 4d2a58eaa76d7ddd51634a6ff3d231b9fffea311 Mon Sep 17 00:00:00 2001
 From: Clark Williams <williams@redhat.com>
 Date: Sat, 30 Jul 2011 21:55:53 -0500
-Subject: [PATCH 187/211] sysfs: Add /sys/kernel/realtime entry
+Subject: [PATCH 187/212] sysfs: Add /sys/kernel/realtime entry
 
 Add a /sys/kernel entry to indicate that the kernel is a
 realtime kernel.
@@ -24022,12 +24001,12 @@ index 1d4bc493b2f4..486c68c11bbe 100644
  	NULL
  };
 -- 
-2.48.1
+2.49.0
 
-From c6567f2db40719d14d8b333f5c0ba1fa25ab6224 Mon Sep 17 00:00:00 2001
+From 51dd5f89ebf1ec3ad5af0f33c30f10f7875a22a4 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Mon, 5 Feb 2024 14:04:38 -0600
-Subject: [PATCH 188/211] arch/riscv: check_unaligned_acces(): don't alloc page
+Subject: [PATCH 188/212] arch/riscv: check_unaligned_acces(): don't alloc page
  for check
 
 Drop the alloc_pages() call since the page is passed in as
@@ -24040,7 +24019,7 @@ Signed-off-by: Clark Williams <clark.williams@gmail.com>
  1 file changed, 6 deletions(-)
 
 diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-index 01dc099bfcdf..25b6819b66a3 100644
+index eccb96c48931..c3cdcad4f324 100644
 --- a/arch/riscv/kernel/cpufeature.c
 +++ b/arch/riscv/kernel/cpufeature.c
 @@ -594,12 +594,6 @@ static int check_unaligned_access(void *param)
@@ -24057,12 +24036,12 @@ index 01dc099bfcdf..25b6819b66a3 100644
  	dst = (void *)((unsigned long)page_address(page) | 0x1);
  	/* Unalign src as well, but differently (off by 1 + 2 = 3). */
 -- 
-2.48.1
+2.49.0
 
-From df10477cf4264e0cb0f3c3228c7e6301cfbcf486 Mon Sep 17 00:00:00 2001
+From c8ab6e5499e40206d235676c19098a9758830825 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Tue, 6 Feb 2024 12:17:19 -0600
-Subject: [PATCH 189/211] Revert "preempt: Put preempt_enable() within an
+Subject: [PATCH 189/212] Revert "preempt: Put preempt_enable() within an
  instrumentation*() section."
 
 This reverts commit cc3d27d9fdeddcb82db3ea176a44a5509e70eb1c.
@@ -24104,12 +24083,12 @@ index cd16f0330fba..9aa6358a1a16 100644
  
  #define preempt_check_resched() \
 -- 
-2.48.1
+2.49.0
 
-From 42950500c85ee24df9eb8591082510c738158fe6 Mon Sep 17 00:00:00 2001
+From 88c52bda6c2dfc578bd3bedef57ba962ff1e9c6d Mon Sep 17 00:00:00 2001
 From: Thomas Gleixner <tglx@linutronix.de>
 Date: Fri, 8 Jul 2011 20:25:16 +0200
-Subject: [PATCH 190/211] Add localversion for -RT release
+Subject: [PATCH 190/212] Add localversion for -RT release
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 ---
@@ -24125,12 +24104,12 @@ index 000000000000..483ad771f201
 @@ -0,0 +1 @@
 +-rt19
 -- 
-2.48.1
+2.49.0
 
-From 2aa97a9466fed2907f99abcd282be7f522e058bd Mon Sep 17 00:00:00 2001
+From f5a8a287220b3b8249f5f491437c6519442a76fb Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Tue, 27 Feb 2024 17:13:28 -0600
-Subject: [PATCH 191/211] Linux 6.6.18-rt23 REBASE
+Subject: [PATCH 191/212] Linux 6.6.18-rt23 REBASE
 
 Signed-off-by: Clark Williams <clark.williams@gmail.com>
 ---
@@ -24145,12 +24124,12 @@ index 483ad771f201..9a218ca23053 100644
 --rt19
 +-rt23
 -- 
-2.48.1
+2.49.0
 
-From 00cd0e217c59c7eb473df32ac2ee726b98d2a75c Mon Sep 17 00:00:00 2001
+From a59e10347e8dbf1b7a68fa86bafcbd8eee6312a0 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Tue, 23 Jan 2024 12:56:21 +0100
-Subject: [PATCH 192/211] arm: Disable FAST_GUP on PREEMPT_RT if HIGHPTE is
+Subject: [PATCH 192/212] arm: Disable FAST_GUP on PREEMPT_RT if HIGHPTE is
  also enabled.
 
 gup_pgd_range() is invoked with disabled interrupts and invokes
@@ -24187,12 +24166,12 @@ index a154ecd2d3c3..e5a283851c02 100644
  	select HAVE_FUNCTION_ERROR_INJECTION
  	select HAVE_FUNCTION_GRAPH_TRACER
 -- 
-2.48.1
+2.49.0
 
-From 5d2092b043098c20a032dd2e86065e1ee0037d6f Mon Sep 17 00:00:00 2001
+From 4729cc7b49d2fdfc3329741b1cdbc63f5683fd4a Mon Sep 17 00:00:00 2001
 From: Junxiao Chang <junxiao.chang@intel.com>
 Date: Tue, 23 Jan 2024 13:40:32 +0800
-Subject: [PATCH 193/211] printk: nbcon: move locked_port flag to struct
+Subject: [PATCH 193/212] printk: nbcon: move locked_port flag to struct
  uart_port
 
 Console pointer in uart_port might be shared among multiple uart
@@ -24283,12 +24262,12 @@ index 1b1b585b1675..b53d93585ee7 100644
  EXPORT_SYMBOL_GPL(nbcon_release);
  
 -- 
-2.48.1
+2.49.0
 
-From 6bc331a9dd031d8901dab55ee5b93cbf7acf2db1 Mon Sep 17 00:00:00 2001
+From 2a3da5ae74c7b2b9dea7ea906bd9e551443e4283 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Tue, 25 Jun 2024 17:08:39 -0500
-Subject: [PATCH 194/211] Linux 6.6.35-rt34 REBASE
+Subject: [PATCH 194/212] Linux 6.6.35-rt34 REBASE
 
 Signed-off-by: Clark Williams <clark.williams@gmail.com>
 ---
@@ -24303,12 +24282,12 @@ index 9a218ca23053..21988f9ad53f 100644
 --rt23
 +-rt34
 -- 
-2.48.1
+2.49.0
 
-From 4ea2cbab068c257390685905dea1c072368964a9 Mon Sep 17 00:00:00 2001
+From c61f8625efbba6b1420f7b116df880222180f2d6 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Thu, 20 Jun 2024 11:21:13 +0200
-Subject: [PATCH 195/211] prinkt/nbcon: Add a scheduling point to
+Subject: [PATCH 195/212] prinkt/nbcon: Add a scheduling point to
  nbcon_kthread_func().
 
 Constant printing can lead to a CPU hog in nbcon_kthread_func(). The
@@ -24344,12 +24323,12 @@ index b53d93585ee7..b941039ee7d2 100644
  	} while (backlog);
  
 -- 
-2.48.1
+2.49.0
 
-From 10be961cd4ee4fe27c1bc11f1cfefe72efae94b5 Mon Sep 17 00:00:00 2001
+From 75ddc72c5ddceb3f8358175fc9fd8344ae7408d2 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Sun, 28 Jul 2024 15:53:21 -0500
-Subject: [PATCH 196/211] Linux 6.6.43-rt38 REBASE
+Subject: [PATCH 196/212] Linux 6.6.43-rt38 REBASE
 
 Signed-off-by: Clark Williams <clark.williams@gmail.com>
 ---
@@ -24364,12 +24343,12 @@ index 21988f9ad53f..49bae8d6aa67 100644
 --rt34
 +-rt38
 -- 
-2.48.1
+2.49.0
 
-From 4a5bcd79a1348677a5252252047ed51dcc77f661 Mon Sep 17 00:00:00 2001
+From 05e91c9d7727f3240c72ef9a76cb38e543b4f0e0 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Mon, 5 Aug 2024 09:48:12 -0500
-Subject: [PATCH 197/211] riscv: Add return value to check_unaligned_access().
+Subject: [PATCH 197/212] riscv: Add return value to check_unaligned_access().
 
 The stable backport of commit c20d36cc2a207 ("riscv: don't probe
 unaligned access speed if already done") added a `return' stament to
@@ -24387,7 +24366,7 @@ Signed-off-by: Clark Williams <clark.williams@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-index 25b6819b66a3..3f2767c9b01f 100644
+index c3cdcad4f324..66d2b0455dcc 100644
 --- a/arch/riscv/kernel/cpufeature.c
 +++ b/arch/riscv/kernel/cpufeature.c
 @@ -592,7 +592,7 @@ static int check_unaligned_access(void *param)
@@ -24400,12 +24379,12 @@ index 25b6819b66a3..3f2767c9b01f 100644
  	/* Make an unaligned destination buffer. */
  	dst = (void *)((unsigned long)page_address(page) | 0x1);
 -- 
-2.48.1
+2.49.0
 
-From be28f929723aadb962644679c578763a8a3e9364 Mon Sep 17 00:00:00 2001
+From e1a01f7680f54b26232912e04344314a77e155a8 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Thu, 24 Oct 2024 13:54:42 -0500
-Subject: [PATCH 198/211] Linux 6.6.58-rt45 REBASE
+Subject: [PATCH 198/212] Linux 6.6.58-rt45 REBASE
 
 Signed-off-by: Clark Williams <clark.williams@gmail.com>
 ---
@@ -24420,12 +24399,12 @@ index 49bae8d6aa67..38c40b21a885 100644
 --rt38
 +-rt45
 -- 
-2.48.1
+2.49.0
 
-From 84dd411fc49b72e9add19259ccea3bdbaa22b2e7 Mon Sep 17 00:00:00 2001
+From d86fce76f82c4caf15abf066f301cabc6d95284b Mon Sep 17 00:00:00 2001
 From: Jan Stancek <jstancek@redhat.com>
 Date: Fri, 12 Jul 2024 09:11:14 +0200
-Subject: [PATCH 199/211] sign-file,extract-cert: move common SSL helper
+Subject: [PATCH 199/212] sign-file,extract-cert: move common SSL helper
  functions to a header
 
 Couple error handling helpers are repeated in both tools, so
@@ -24625,12 +24604,12 @@ index 000000000000..e6711c75ed91
 +		}					\
 +	} while (0)
 -- 
-2.48.1
+2.49.0
 
-From 15736a0d12c6521bde04cf162912056bf89bf920 Mon Sep 17 00:00:00 2001
+From 3372129d8c1e531e1c70ea429f225dcba849347d Mon Sep 17 00:00:00 2001
 From: Jan Stancek <jstancek@redhat.com>
 Date: Fri, 12 Jul 2024 09:11:15 +0200
-Subject: [PATCH 200/211] sign-file,extract-cert: avoid using deprecated
+Subject: [PATCH 200/212] sign-file,extract-cert: avoid using deprecated
  ERR_get_error_line()
 
 ERR_get_error_line() is deprecated since OpenSSL 3.0.
@@ -24746,12 +24725,12 @@ index e6711c75ed91..2db0e181143c 100644
  			errx(1, fmt, ## __VA_ARGS__);	\
  		}					\
 -- 
-2.48.1
+2.49.0
 
-From 2d8416e30658739211f5af6f760bf36f9b3e0e1d Mon Sep 17 00:00:00 2001
+From d3cb7f686bd2d03d17cf657d0931931e61e6576f Mon Sep 17 00:00:00 2001
 From: Jan Stancek <jstancek@redhat.com>
 Date: Fri, 20 Sep 2024 19:52:48 +0300
-Subject: [PATCH 201/211] sign-file,extract-cert: use pkcs11 provider for
+Subject: [PATCH 201/212] sign-file,extract-cert: use pkcs11 provider for
  OPENSSL MAJOR >= 3
 
 ENGINE API has been deprecated since OpenSSL version 3.0 [1].
@@ -25034,12 +25013,12 @@ index bb3fdf1a617c..7070245edfc1 100644
  
  static X509 *read_x509(const char *x509_name)
 -- 
-2.48.1
+2.49.0
 
-From 0fcd3d31212fc449a5d3ff80c5953149c53b657a Mon Sep 17 00:00:00 2001
+From 95aa40c5d1bd4a8551add0842f36530991215219 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clrkwllms@kernel.org>
 Date: Tue, 26 Nov 2024 08:37:58 -0600
-Subject: [PATCH 202/211] Linux 6.6.63-rt46 REBASE
+Subject: [PATCH 202/212] Linux 6.6.63-rt46 REBASE
 
 Signed-off-by: Clark Williams <clrkwllms@kernel.org>
 ---
@@ -25054,12 +25033,12 @@ index 38c40b21a885..272158183778 100644
 --rt45
 +-rt46
 -- 
-2.48.1
+2.49.0
 
-From a0f42d547c4d0f4be4fd38f7ec662a804b723fa6 Mon Sep 17 00:00:00 2001
+From bb4a0c63f17e4e135ec9f211860824f6e3232cd6 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Mon, 28 Oct 2024 01:07:26 +0000
-Subject: [PATCH 203/211] Fwd: [PATCH v6.6-RT] kvm: Use the proper mask to
+Subject: [PATCH 203/212] Fwd: [PATCH v6.6-RT] kvm: Use the proper mask to
  check for the LAZY bit.
 
 kvm: Use the proper mask to check for the LAZY bit.
@@ -25092,12 +25071,12 @@ index d952fa5ee880..5253d3d2d013 100644
  
  		if (ti_work & _TIF_NOTIFY_RESUME)
 -- 
-2.48.1
+2.49.0
 
-From eeacb9a74e54a3fbd2f57e98334b7016d8d78396 Mon Sep 17 00:00:00 2001
+From 153be8b78aecfc063d75a5ca65ce89aaa6a9c893 Mon Sep 17 00:00:00 2001
 From: Derek Barbosa <debarbos@redhat.com>
 Date: Mon, 4 Nov 2024 09:29:34 -0500
-Subject: [PATCH 204/211] printk: nbcon: Fix illegal RCU usage on thread wakeup
+Subject: [PATCH 204/212] printk: nbcon: Fix illegal RCU usage on thread wakeup
 
 In debug kernels, printk'ing during the SMP startup of a secondary CPU
 results in a splat on boot that details illegal RCU usage from
@@ -25147,12 +25126,12 @@ index b941039ee7d2..b4278854eeb9 100644
  
  /**
 -- 
-2.48.1
+2.49.0
 
-From 8e2384250a21c79798e60989077b94ecad7a5b59 Mon Sep 17 00:00:00 2001
+From b7f0e7831401c55af83fa5ee92f292aff5ba3569 Mon Sep 17 00:00:00 2001
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Date: Fri, 1 Mar 2024 22:45:25 +0100
-Subject: [PATCH 205/211] serial: sifive: Use uart_prepare_sysrq_char() to
+Subject: [PATCH 205/212] serial: sifive: Use uart_prepare_sysrq_char() to
  handle sysrq.
 
 The port lock is a spinlock_t which is becomes a sleeping lock on PREEMPT_RT.
@@ -25226,12 +25205,12 @@ index b296e57a9dee..d420bed4a3a7 100644
  
  static int sifive_serial_console_setup(struct console *co, char *options)
 -- 
-2.48.1
+2.49.0
 
-From 2ff6668ac4e9747666bd4226266af33d21d16f43 Mon Sep 17 00:00:00 2001
+From dc53036c7524ddffc6063d4fef37707274cdc128 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clrkwllms@kernel.org>
 Date: Tue, 17 Dec 2024 08:04:45 -0600
-Subject: [PATCH 206/211] Linux 6.6.65-rt47 REBASE
+Subject: [PATCH 206/212] Linux 6.6.65-rt47 REBASE
 
 Signed-off-by: Clark Williams <clrkwllms@kernel.org>
 ---
@@ -25246,12 +25225,12 @@ index 272158183778..8a777ac42aab 100644
 --rt46
 +-rt47
 -- 
-2.48.1
+2.49.0
 
-From d163e1e4694ee2a2307d214f893282d204234acf Mon Sep 17 00:00:00 2001
+From c1494d9386a11d6f1736a5f92124fa5953b9ac06 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Mon, 27 Jan 2025 11:25:21 -0600
-Subject: [PATCH 207/211] Revert "sign-file,extract-cert: use pkcs11 provider
+Subject: [PATCH 207/212] Revert "sign-file,extract-cert: use pkcs11 provider
  for OPENSSL MAJOR >= 3"
 
 This reverts commit 3b89983cc22f6c7adf79c922a55738f97b4381df.
@@ -25518,12 +25497,12 @@ index 7070245edfc1..bb3fdf1a617c 100644
  
  static X509 *read_x509(const char *x509_name)
 -- 
-2.48.1
+2.49.0
 
-From 7b71af6372d4bdfb61d26fa4d279acb18f163d06 Mon Sep 17 00:00:00 2001
+From b3af4d80a3336392c533e7b367df9c0c7391dc97 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Mon, 27 Jan 2025 11:25:32 -0600
-Subject: [PATCH 208/211] Revert "sign-file,extract-cert: avoid using
+Subject: [PATCH 208/212] Revert "sign-file,extract-cert: avoid using
  deprecated ERR_get_error_line()"
 
 This reverts commit 2a9206dfd9297ee544de2d240be22466d8dc094b.
@@ -25628,12 +25607,12 @@ index 2db0e181143c..e6711c75ed91 100644
  			errx(1, fmt, ## __VA_ARGS__);	\
  		}					\
 -- 
-2.48.1
+2.49.0
 
-From f000310d77d0e5fe017c6569f45297f213f1d747 Mon Sep 17 00:00:00 2001
+From 9b479b863de417239b83c7479665d550d312ff94 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Mon, 27 Jan 2025 11:25:42 -0600
-Subject: [PATCH 209/211] Revert "sign-file,extract-cert: move common SSL
+Subject: [PATCH 209/212] Revert "sign-file,extract-cert: move common SSL
  helper functions to a header"
 
 This reverts commit 20a60c4db6e2ddd1b2e9a68b9a6291524b75611a.
@@ -25825,12 +25804,12 @@ index e6711c75ed91..000000000000
 -		}					\
 -	} while (0)
 -- 
-2.48.1
+2.49.0
 
-From 3824c3c597f2070e8f0d53fc7e319caf267b6651 Mon Sep 17 00:00:00 2001
+From df85489580f55ec69e27f08608cc3fd03a525b6c Mon Sep 17 00:00:00 2001
 From: Clark Williams <clark.williams@gmail.com>
 Date: Mon, 27 Jan 2025 11:07:03 -0600
-Subject: [PATCH 210/211] misc:  fix missing hunks from previous mis-merge
+Subject: [PATCH 210/212] misc:  fix missing hunks from previous mis-merge
 
 Dropped hunks were discovered by Sebastian during the v6.6.66
 merge conflict resolution. Fix those.
@@ -25888,12 +25867,12 @@ index fd0f03965c11..8a2ce2ca6b39 100644
  
  static void sc16is7xx_reconf_rs485(struct uart_port *port)
 -- 
-2.48.1
+2.49.0
 
-From 74f4025bfb44c659a7aec21b7955697201ec01e8 Mon Sep 17 00:00:00 2001
+From 1c2cd867af24b5a0da533ea1dfbe71c961ff0789 Mon Sep 17 00:00:00 2001
 From: Clark Williams <clrkwllms@kernel.org>
-Date: Sun, 16 Feb 2025 00:52:02 -0600
-Subject: [PATCH 211/211] Linux 6.6.77-rt50 REBASE
+Date: Fri, 28 Feb 2025 11:40:08 -0600
+Subject: [PATCH 211/212] Linux 6.6.78-rt51 REBASE
 
 Signed-off-by: Clark Williams <clrkwllms@kernel.org>
 ---
@@ -25901,12 +25880,32 @@ Signed-off-by: Clark Williams <clrkwllms@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/localversion-rt b/localversion-rt
-index 8a777ac42aab..42c384668389 100644
+index 8a777ac42aab..75493460c41f 100644
 --- a/localversion-rt
 +++ b/localversion-rt
 @@ -1 +1 @@
 --rt47
-+-rt50
++-rt51
 -- 
-2.48.1
+2.49.0
+
+From def2aea261b206f07ee197a460d65e6e4932614f Mon Sep 17 00:00:00 2001
+From: Clark Williams <clrkwllms@kernel.org>
+Date: Fri, 4 Apr 2025 16:29:40 -0500
+Subject: [PATCH 212/212] Linux 6.6.85-rt53 REBASE
+
+Signed-off-by: Clark Williams <clrkwllms@kernel.org>
+---
+ localversion-rt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/localversion-rt b/localversion-rt
+index 75493460c41f..e6c0dc6a54cd 100644
+--- a/localversion-rt
++++ b/localversion-rt
+@@ -1 +1 @@
+--rt51
++-rt53
+-- 
+2.49.0
 
