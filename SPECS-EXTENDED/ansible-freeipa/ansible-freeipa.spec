@@ -19,10 +19,7 @@ Release: 2%{?dist}
 URL: https://github.com/freeipa/ansible-freeipa
 License: GPL-3.0-or-later
 Source: https://github.com/freeipa/ansible-freeipa/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-#Source:  https://github.com/freeipa/ansible-freeipa/archive/refs/tags/v1.13.2.tar.gz
 BuildArch: noarch
-#Requires: ansible-core >= 1.15.0
-#BuildRequires: ansible-core >= 1.15.0
 BuildRequires: ansible
 BuildRequires: python
 BuildRequires: PyYAML
@@ -37,7 +34,6 @@ where the Ansible nodes are reachable and are properly set up to have an IP
 address and a working package manager.
 
 Features
-
 - Server, replica and client deployment
 - Cluster deployments: Server, replicas and clients in one playbook
 - One-time-password (OTP) support for client installation
@@ -117,7 +113,6 @@ is an issue for the processing in a simple playbook.
 Work is planned to have a new method to handle CSR for external signed CAs in
 a separate step before starting the server installation.
 
-
 %package tests
 Summary: ansible-freeipa tests
 Requires: %{name} = %{version}-%{release}
@@ -130,7 +125,6 @@ The tests for the collection are part of the collection sub package.
 Please have a look at %{_datadir}/ansible-freeipa/requirements-tests.txt
 to get the needed requrements to run the tests.
 
-
 %package collection
 Summary: %{collection_namespace}.%{collection_name} collection
 Provides: ansible-collection-%{collection_namespace}-%{collection_name} = %{version}-%{release}
@@ -138,9 +132,10 @@ Provides: ansible-collection-%{collection_namespace}-%{collection_name} = %{vers
 %description collection
 The %{collection_namespace}.%{collection_name} collection, including tests.
 
-
 %prep
-%setup -q
+%autosetup -p1
+sed -i "s/python/python3/g" utils/build-galaxy-release.sh
+
 # Do not create backup files with patches
 
 # Fix python modules and module utils:
@@ -218,7 +213,8 @@ utils/build-galaxy-release.sh -o "%{version}" -p %{buildroot}%{ansible_collectio
 
 %changelog
 * Tue Nov 12 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.13.2-2
-- Update to 1.13.2
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified.
 
 * Mon Jul  1 2024 Thomas Woerner <twoerner@redhat.com> - 1.13.2-1
 - Update to version 1.13.2
