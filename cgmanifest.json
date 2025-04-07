@@ -13663,8 +13663,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.23.6",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.6-2/go1.23.6-20250211.6.src.tar.gz"
+          "version": "1.24.1",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.1-1/go1.24.1-20250304.4.src.tar.gz"
         }
       }
     },
@@ -29017,8 +29017,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2024b",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2024b.tar.gz"
+          "version": "2025a",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2025a.tar.gz"
         }
       }
     },
