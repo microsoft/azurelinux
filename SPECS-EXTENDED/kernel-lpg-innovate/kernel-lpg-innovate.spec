@@ -3,6 +3,7 @@
 %global mstflintver 4.28.0
 %define uname_r %{version}-%{release}
 %define mariner_version 3
+%define short_name lpg-innovate
 
 # find_debuginfo.sh arguments are set by default in rpm's macros.
 # The default arguments regenerate the build-id for vmlinux in the
@@ -165,17 +166,17 @@ BuildArch:      noarch
 %description grub
 This package contains a grub config file to add required LPG-Innovate parameters to the kernel cmdline.
 
-%package -n     python3-perf
+%package -n     python3-perf-%{short_name}
 Summary:        Python 3 extension for perf tools
 Requires:       python3
 
-%description -n python3-perf
+%description -n python3-perf-%{short_name}
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
 
-%package -n     bpftool
+%package -n     bpftool-%{short_name}
 Summary:        Inspection and simple manipulation of eBPF programs and maps
 
-%description -n bpftool
+%description -n bpftool-%{short_name}
 This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
@@ -452,10 +453,10 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %files grub
 /etc/default/grub.d/10-lpg-innovate.cfg
 
-%files -n python3-perf
+%files -n python3-perf-%{short_name}
 %{python3_sitearch}/*
 
-%files -n bpftool
+%files -n bpftool-%{short_name}
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
