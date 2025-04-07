@@ -338,6 +338,22 @@ start_record_timestamp "build packages"
 start_record_timestamp "build packages/build"
 start_record_timestamp "build packages/install"
 
+# Download JDK rpm
+echo "Downloading MsOpenJDK rpm"
+MSOPENJDK_FILENAME="msopenjdk-11-11.0.18-1.$(uname -m).rpm"
+MSOPENJDK_URL="https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/$(uname -m)/$MSOPENJDK_FILENAME"
+case $(uname -m) in
+    x86_64)  MSOPENJDK_EXPECTED_HASH="556ffa796970d913e4dc7ed6b28a0ac6e9dab5b8eae6063f1f060b2819857957" ;;
+    aarch64) MSOPENJDK_EXPECTED_HASH="535bce10952ae9421ee7d9ccdcb6430f683f7448633430e3ff7d6ca8c586f0bc" ;;
+esac
+wget -nv --server-response --no-clobber --timeout=30 --tries=3 --waitretry=10 --retry-connrefused $MSOPENJDK_URL --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+MSOPENJDK_ACTUAL_HASH=$(sha256sum "$CHROOT_RPMS_DIR_ARCH/$MSOPENJDK_FILENAME" | awk '{print $1}')
+if [[ "$MSOPENJDK_EXPECTED_HASH" != "$MSOPENJDK_ACTUAL_HASH" ]]; then
+    echo "Error, incorrect msopenjdk hash: '$MSOPENJDK_ACTUAL_HASH'. Expected hash: '$MSOPENJDK_EXPECTED_HASH'"
+    rm -vf "$CHROOT_RPMS_DIR_ARCH/$MSOPENJDK_FILENAME"
+    exit 1
+fi
+
 echo Building final list of toolchain RPMs
 build_rpm_in_chroot_no_install mariner-rpm-macros
 chroot_and_install_rpms mariner-rpm-macros
@@ -451,17 +467,6 @@ chroot_and_install_rpms python3 python3
 # libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
 chroot_and_install_rpms libxml2
-
-# Download JDK rpms
-echo Download JDK rpms
-case $(uname -m) in
-    x86_64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.18-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
-    ;;
-    aarch64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.18-1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
-    ;;
-esac
 
 # PCRE needs to be installed (above) for grep to build with perl regexp support
 build_rpm_in_chroot_no_install grep
