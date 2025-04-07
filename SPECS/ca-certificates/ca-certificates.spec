@@ -47,7 +47,7 @@ Name:           ca-certificates
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "prebuilt-ca-certificates*" packages as well.
 Epoch:          1
 Version:        %{azl}.0.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -163,7 +163,7 @@ mkdir -p -m 755 %{buildroot}%{pkidir}/java
 mkdir -p -m 755 %{buildroot}%{_sysconfdir}/ssl
 mkdir -p -m 755 %{buildroot}%{catrustdir}/source
 mkdir -p -m 755 %{buildroot}%{catrustdir}/source/anchors
-mkdir -p -m 755 %{buildroot}%{catrustdir}/source/blacklist
+mkdir -p -m 755 %{buildroot}%{catrustdir}/source/blocklist
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/pem
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/openssl
@@ -171,7 +171,7 @@ mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/java
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/edk2
 mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source
 mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/anchors
-mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/blacklist
+mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/blocklist
 mkdir -p -m 755 %{buildroot}%{_bindir}
 mkdir -p -m 755 %{buildroot}%{_mandir}/man8
 
@@ -232,10 +232,6 @@ ln -s %{catrustdir}/extracted/openssl/%{openssl_format_trust_bundle} \
 ln -s %{catrustdir}/extracted/%{java_bundle} \
     %{buildroot}%{pkidir}/%{java_bundle}
 
-# Supporting p11-kit's directory re-name in version 0.24.0.
-ln -s blacklist %{buildroot}%{_datadir}/pki/ca-trust-source/blocklist
-ln -s blacklist %{buildroot}%{catrustdir}/source/blocklist
-
 %post
 %{refresh_bundles}
 
@@ -285,10 +281,8 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{pkidir}/%{java_bundle}
 
 # symlink directory
-%{_datadir}/pki/ca-trust-source/blocklist
 %{_sysconfdir}/ssl/certs
 %{_libdir}/ssl/certs
-%{catrustdir}/source/blocklist
 
 # README files
 %{_datadir}/pki/ca-trust-source/README
@@ -303,7 +297,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %dir %{_datadir}/pki
 %dir %{_datadir}/pki/ca-trust-source
 %dir %{_datadir}/pki/ca-trust-source/anchors
-%dir %{_datadir}/pki/ca-trust-source/blacklist
+%dir %{_datadir}/pki/ca-trust-source/blocklist
 %dir %{_sysconfdir}/ssl
 %dir %{catrustdir}
 %dir %{catrustdir}/extracted
@@ -313,7 +307,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %dir %{catrustdir}/extracted/openssl
 %dir %{catrustdir}/source
 %dir %{catrustdir}/source/anchors
-%dir %{catrustdir}/source/blacklist
+%dir %{catrustdir}/source/blocklist
 %dir %{pkidir}/java
 %dir %{pkidir}/tls
 %dir %{pkidir}/tls/certs
@@ -340,6 +334,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Mon Apr 07 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.0-9
+- Remove outdated 'blacklist' folders.
+
 * Wed Dec 11 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.0-8
 - Update adding Microsoft distrusted CAs.
 - Explicitly set default file ownership to root:root.
