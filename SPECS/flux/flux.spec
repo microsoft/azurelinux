@@ -22,7 +22,7 @@
 Summary:        Influx data language
 Name:           flux
 Version:        0.194.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -142,6 +142,10 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %{_includedir}/influxdata/flux.h
 
 %changelog
+* Mon Apr 07 2025 Tobias Brick <tobiasb@microsoft.com> - 0.194.5-2
+- Add missing EOF for inline patch call.
+- Fix build warnings rather than suppressing them.
+
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.194.5-1
 - Upgrade to version 0.194.5
 
