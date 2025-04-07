@@ -105,7 +105,7 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
-* Mon Apr 07 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.30.3-5
+* Mon Apr 07 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.30.3-6
 - Backport patch to fix CVE-2024-48615
 
 * Thu Mar 06 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 3.30.3-5
