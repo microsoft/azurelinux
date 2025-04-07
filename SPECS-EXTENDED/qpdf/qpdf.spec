@@ -1,78 +1,74 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-Summary: Command-line tools and library for transforming PDF files
-Name:    qpdf
-Version: 10.1.0
-Release: 2%{?dist}
-# MIT: e.g. libqpdf/sha2.c
+%global bash_completions_dir %{_datadir}/bash-completion/completions
+%global zsh_completions_dir %{_datadir}/zsh/site-functions
+
+Summary: 	Command-line tools and library for transforming PDF files
+Name:    	qpdf
+Version: 	11.9.1
+Release: 	4%{?dist}
+# MIT: e.g. libqpdf/sha2.c, but those are not compiled in (GNUTLS is used)
 # upstream uses ASL 2.0 now, but he allowed other to distribute qpdf under
 # old license (see README)
-License: (Artistic 2.0 or ASL 2.0) and MIT
-URL:     http://qpdf.sourceforge.net/
-Source0: http://downloads.sourceforge.net/sourceforge/qpdf/qpdf-%{version}.tar.gz
+License: 	Apache-2.0 OR Artistic-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+URL:     	https://qpdf.sourceforge.io/
+Source0: 	https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Source1: 	https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}-doc.zip
 
-Patch0:  qpdf-doc.patch
-# zlib has optimalization for aarch64 now, which gives different output after
-# compression - patch erases 3 tests with generated object stream which were failing
-Patch2:  qpdf-erase-tests-with-generated-object-stream.patch
 # make qpdf working under FIPS, downstream patch
-Patch3:  qpdf-relax.patch
+Patch1:  	qpdf-relax.patch
 
 # gcc and gcc-c++ are no longer in buildroot by default
 # gcc is needed for qpdf-ctest.c
-BuildRequires: gcc
+BuildRequires: 	gcc
 # gcc-c++ is need for everything except for qpdf-ctest
-BuildRequires: gcc-c++
-# uses make
-BuildRequires: make
+BuildRequires: 	gcc-c++
+# uses cmake
+BuildRequires: 	cmake
 
-BuildRequires: zlib-devel
-BuildRequires: libjpeg-turbo-devel
-BuildRequires: pcre-devel
+BuildRequires: 	zlib-devel
+BuildRequires: 	libjpeg-turbo-devel
 
 # for gnutls crypto
-BuildRequires: gnutls-devel
+BuildRequires: 	gnutls-devel
 
 # for fix-qdf and test suite
-BuildRequires: perl-generators
-BuildRequires: perl-interpreter
-BuildRequires: perl(Carp)
-BuildRequires: perl(Config)
-BuildRequires: perl(constant)
-BuildRequires: perl(Cwd)
-BuildRequires: perl(Digest::MD5)
-BuildRequires: perl(Digest::SHA)
-BuildRequires: perl(File::Basename)
-BuildRequires: perl(File::Copy)
-BuildRequires: perl(File::Find)
-BuildRequires: perl(File::Spec)
-BuildRequires: perl(FileHandle)
-BuildRequires: perl(IO::Handle)
-BuildRequires: perl(IO::Select)
-BuildRequires: perl(IO::Socket)
-BuildRequires: perl(POSIX)
-BuildRequires: perl(strict)
+BuildRequires: 	perl-generators
+BuildRequires: 	perl-interpreter
+BuildRequires: 	perl(Carp)
+BuildRequires: 	perl(Config)
+BuildRequires: 	perl(constant)
+BuildRequires: 	perl(Cwd)
+BuildRequires: 	perl(Digest::MD5)
+BuildRequires: 	perl(Digest::SHA)
+BuildRequires: 	perl(File::Basename)
+BuildRequires: 	perl(File::Compare)
+BuildRequires: 	perl(File::Copy)
+BuildRequires: 	perl(File::Find)
+BuildRequires: 	perl(File::Spec)
+BuildRequires: 	perl(FileHandle)
+BuildRequires: 	perl(IO::Handle)
+BuildRequires: 	perl(IO::Select)
+BuildRequires: 	perl(IO::Socket)
+BuildRequires: 	perl(POSIX)
+BuildRequires: 	perl(strict)
 # perl(Term::ANSIColor) - not needed for tests
 # perl(Term::ReadKey) - not needed for tests
 
-# for autoreconf
-BuildRequires: autoconf
-BuildRequires: automake
-BuildRequires: libtool
-
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+Requires: 	%{name}-libs%{?_isa} = %{version}-%{release}
 
 %package libs
-Summary: QPDF library for transforming PDF files
+Summary: 	QPDF library for transforming PDF files
 
 %package devel
-Summary: Development files for QPDF library
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+Summary: 	Development files for QPDF library
+Requires: 	%{name}-libs%{?_isa} = %{version}-%{release}
 
 %package doc
-Summary: QPDF Manual
-BuildArch: noarch
-Requires: %{name}-libs = %{version}-%{release}
+Summary: 	QPDF Manual
+BuildArch: 	noarch
+BuildRequires: 	unzip
+Requires: 	%{name}-libs = %{version}-%{release}
 
 %description
 QPDF is a command-line program that does structural, content-preserving
@@ -94,36 +90,37 @@ for developing programs using the QPDF library.
 QPDF Manual
 
 %prep
-%setup -q
+%autosetup -p1
 
-# fix 'complete manual location' note in man pages
-%patch 0 -p1 -b .doc
-%ifarch aarch64
-%patch 2 -p1 -b .erase-tests-with-generated-object-stream
-%endif
-%patch 3 -p1 -b .relax
+# unpack zip file with manual
+unzip %{SOURCE1}
 
 %build
-# work-around check-rpaths errors
-autoreconf --verbose --force --install
-# automake files needed to be regenerated in 8.4.0 - check if this can be removed
-# in the next qpdf release
-./autogen.sh
+mkdir -p build
+cd build
+%cmake -DBUILD_STATIC_LIBS=0 \
+       -DREQUIRE_CRYPTO_GNUTLS=1 \
+       -DUSE_IMPLICIT_CRYPTO=0 \
+       -DSHOW_FAILED_TEST_OUTPUT=1 \
+       ..
 
-%configure --disable-static \
-           --enable-crypto-gnutls \
-           --disable-implicit-crypto \
-           --enable-show-failed-test-output
-
-%make_build
+%cmake_build
 
 %install
-%make_install
+cd build
+%cmake_install
+cd ..
 
-rm -f %{buildroot}%{_libdir}/libqpdf.la
+install -m 0644 %{name}-%{version}-doc/%{name}-manual.pdf %{buildroot}/%{_pkgdocdir}/%{name}-manual.pdf
+
+# install bash/zsh completions
+mkdir -p %{buildroot}%{bash_completions_dir}
+mkdir -p %{buildroot}%{zsh_completions_dir}
+install -m 0644 completions/bash/qpdf %{buildroot}%{bash_completions_dir}/qpdf
+install -m 0644 completions/zsh/_qpdf %{buildroot}%{zsh_completions_dir}/_qpdf
 
 %check
-make check
+%ctest
 
 %ldconfig_scriptlets libs
 
@@ -132,26 +129,157 @@ make check
 %{_bindir}/qpdf
 %{_bindir}/zlib-flate
 %{_mandir}/man1/*
+%dir %{bash_completions_dir}
+%{bash_completions_dir}/qpdf
+%dir %{zsh_completions_dir}
+%{zsh_completions_dir}/_qpdf
 
 %files libs
-%doc README.md TODO ChangeLog
-%license Artistic-2.0
-%{_libdir}/libqpdf.so.28
-%{_libdir}/libqpdf.so.28.1.0
+%doc README.md TODO.md ChangeLog
+%license Artistic-2.0 LICENSE.txt NOTICE.md
+%{_libdir}/libqpdf.so.29
+%{_libdir}/libqpdf.so.29.*
 
 %files devel
 %doc examples/*.cc examples/*.c
 %{_includedir}/qpdf/
 %{_libdir}/libqpdf.so
 %{_libdir}/pkgconfig/libqpdf.pc
+%{_libdir}/cmake/qpdf/
 
 %files doc
 %{_pkgdocdir}
 
-
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.1.0-2
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+* Fri Feb 07 2025 Akhila Guruju <v-guakhila@microsoft.com> - 11.9.1-4
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+- Defined `bash_completions_dir` and `zsh_completions_dir`
+
+* Mon Dec 02 2024 Nicolas Fella <nicolas.fella@gmx.de> - 11.9.1-3
+- Don't exclude CMake config files
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 11.9.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jun 18 2024 Zdenek Dohnal <zdohnal@redhat.com> - 11.9.1-1
+- 2290888 - qpdf-11.9.1 is available
+
+* Fri Mar 01 2024 Zdenek Dohnal <zdohnal@redhat.com> - 11.9.0-1
+- 2267205 - TRIAGE CVE-2024-24246 qpdf - Heap Buffer Overflow vulnerability in qpdf [fedora-all]
+- 2265854 - qpdf-11.9.0 is available
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 11.8.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 11.8.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Jan 09 2024 Zdenek Dohnal <zdohnal@redhat.com> - 11.8.0-1
+- 2257313 - qpdf-11.8.0 is available
+
+* Mon Jan 08 2024 Zdenek Dohnal <zdohnal@redhat.com> - 11.7.0-1
+- 2255755 - qpdf-11.7.0 is available
+
+* Tue Dec 19 2023 Zdenek Dohnal <zdohnal@redhat.com> - 11.6.4-2
+- 2254778 - remove the tests which fail with zlib-ng-compat for now
+
+* Mon Dec 18 2023 Zdenek Dohnal <zdohnal@redhat.com> - 11.6.4-1
+- 2253901 - qpdf-11.6.4 is available
+
+* Thu Nov 02 2023 Zdenek Dohnal <zdohnal@redhat.com> - 11.6.3-1
+- 2244319 - qpdf-11.6.3 is available
+
+* Mon Oct 09 2023 Zdenek Dohnal <zdohnal@redhat.com> - 11.6.2-1
+- 2242670 - qpdf-11.6.2 is available
+
+* Tue Sep 12 2023 Zdenek Dohnal <zdohnal@redhat.com> - 11.6.1-1
+- 2237125 - qpdf-11.6.1 is available
+
+* Wed Jul 26 2023 Zdenek Dohnal <zdohnal@redhat.com> - 11.5.0-1
+- 2221506 - qpdf-11.5.0 is available
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 11.4.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon May 22 2023 Zdenek Dohnal <zdohnal@redhat.com> - 11.4.0-1
+- 2208892 - qpdf-11.4.0 is available
+
+* Mon Mar 27 2023 Zdenek Dohnal <zdohnal@redhat.com> - 11.3.0-2
+- 2181519 - qpdf bash and zsh completion files are missing
+
+* Thu Mar 02 2023 Zdenek Dohnal <zdohnal@redhat.com> - 11.3.0-1
+- 2173354 - qpdf-11.3.0 is available
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 11.2.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Nov 22 2022 Zdenek Dohnal <zdohnal@redhat.com> - 11.2.0-1
+- 2144359 - qpdf-11.2.0 is available
+
+* Thu Oct 13 2022 Zdenek Dohnal <zdohnal@redhat.com> - 11.1.1-1
+- 2125823 - qpdf-11.1.1 is available
+
+* Thu Sep 22 2022 Zdenek Dohnal <zdohnal@redhat.com> - 11.1.0-1
+- 2125823 - qpdf-11.1.0 is available, move to cmake
+
+* Thu Sep 22 2022 Zdenek Dohnal <zdohnal@redhat.com> - 10.6.3-5
+- use `grep -E` in test suite (bz2127957)
+
+* Mon Jul 25 2022 Zdenek Dohnal <zdohnal@redhat.com> - 10.6.3-4
+- qpdf doesn't depend on pcre since 7.0b1
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 10.6.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jul 14 2022 Zdenek Dohnal <zdohnal@redhat.com> - 10.6.3-2
+- 2107240 - FIPS breaks pdftopdf and bannertopdf
+
+* Fri Mar 18 2022 Zdenek Dohnal <zdohnal@redhat.com> - 10.6.3-1
+- 2063429 - qpdf-10.6.3 is available
+
+* Thu Feb 17 2022 Zdenek Dohnal <zdohnal@redhat.com> - 10.6.2-1
+- 2053647 - qpdf-10.6.2 is available
+
+* Mon Feb 14 2022 Zdenek Dohnal <zdohnal@redhat.com> - 10.6.1-1
+- 2053647 - qpdf-10.6.1 is available
+
+* Thu Feb 10 2022 Zdenek Dohnal <zdohnal@redhat.com> - 10.6.0-1
+- 2052569 - qpdf-10.6.0 is available
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 10.5.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jan 05 2022 Zdenek Dohnal <zdohnal@redhat.com> - 10.5.0-2
+- add qpdf-manual - now it is in a different archive
+
+* Mon Jan 03 2022 Zdenek Dohnal <zdohnal@redhat.com> - 10.5.0-1
+- 2034671 - qpdf-10.5.0 is available
+
+* Mon Dec 06 2021 Zdenek Dohnal <zdohnal@redhat.com> - 10.4.0-1
+- 2023979 - qpdf-10.4.0 is available
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 10.3.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu May 20 2021 Zdenek Dohnal <zdohnal@redhat.com> - 10.3.2-1
+- 1958536 - qpdf-10.3.2 is available
+
+* Mon Apr 19 2021 Zdenek Dohnal <zdohnal@redhat.com> - 10.3.1-2
+- aarch64 specific patches were removed from zlib, so no need for ours
+- zlib got downstream patches on s390x, we need to patch qpdf test suite for it
+
+* Fri Mar 12 2021 Zdenek Dohnal <zdohnal@redhat.com> - 10.3.1-1
+- 1937988 - qpdf-10.3.1 is available
+
+* Thu Mar 11 2021 Zdenek Dohnal <zdohnal@redhat.com> - 10.3.0-1
+- 1935799 - qpdf-10.3.0 is available
+
+* Wed Feb 24 2021 Zdenek Dohnal <zdohnal@redhat.com> - 10.2.0-1
+- 1932052 - qpdf-10.2.0 is available
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 10.1.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Mon Jan 11 2021 Zdenek Dohnal <zdohnal@redhat.com> - 10.1.0-1
 - 1912951 - qpdf-10.1.0 is available
