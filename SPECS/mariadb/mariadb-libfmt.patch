@@ -1,0 +1,31 @@
+MariaDB upstream uses an old version (8.0) of the FMT library, unlike Fedora which packs a current one (10.2)
+  https://src.fedoraproject.org/rpms/fmt
+  https://github.com/MariaDB/server/blob/10.11/cmake/libfmt.cmake#L18
+
+There is a breaking change between the FMT library version 8 and 10.
+Sergei Golubchik from MariaDB upstream noticed that and  decided to not rebase to the newer version for now. In the same commit:
+  https://github.com/MariaDB/server/commit/b5c367cd88e37091ab5f8dab0396c01c97d037e2
+He also fixed the CMake file controlling the FMT library.
+It now correctly detects, whether the system version is able to compile a given code in an expected way.
+
+The incompatibility between FMT library version has been reported both agains Fedora and FMT upstream
+  https://bugzilla.redhat.com/show_bug.cgi?id=2266807
+The upstream created a patch and Fedora backported it
+  https://src.fedoraproject.org/rpms/fmt/c/7d6d6e2c33e845b3cbf3fcaf83f14dfeddfa8a70?branch=rawhide
+but only in F40 and later.
+
+To avoid potential issues on systems with FMT library between 8.0 and the one with the fix backported,
+introduce a bundling mechanism for use on such distributions.
+We pre-download the sources archive and supply the CMake with it, instead of the web URL.
+
+--- mariadb-10.11.10/cmake/libfmt.cmake	2024-10-29 15:32:31.000000000 +0100
++++ mariadb-10.11.10/cmake/libfmt.cmake_patched	2024-11-14 12:06:35.961435488 +0100
+@@ -15,7 +15,7 @@ MACRO(BUNDLE_LIBFMT)
+   ExternalProject_Add(
+     libfmt
+     PREFIX   "${dir}"
+-    URL      "https://github.com/fmtlib/fmt/releases/download/11.0.2/fmt-11.0.2.zip"
++    URL      "file:///${dir}/fmt-11.0.2.zip"
+     URL_MD5 c622dca45ec3fc95254c48370a9f7a1d
+     INSTALL_COMMAND ""
+     CONFIGURE_COMMAND ""
