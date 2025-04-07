@@ -114,6 +114,7 @@ popd
 pushd $tmp_local_dir/n/versions/node/14.18.0/lib/node_modules/
 %autopatch -p1 15
 popd
+%autopatch -p1 16
 
 rsync -azvhr $tmp_local_dir/ "%{_prefix}/local"
 rm -rf $tmp_local_dir
