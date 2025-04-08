@@ -55,7 +55,9 @@ BuildRequires:  elfutils-libelf-devel
 BuildRequires:  flex
 BuildRequires:  gettext
 BuildRequires:  glib-devel
+BuildRequires:  glibc-iconv
 BuildRequires:  grub2-rpm-macros
+BuildRequires:  java-devel
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  libcap-devel
