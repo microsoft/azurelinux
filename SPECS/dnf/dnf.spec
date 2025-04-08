@@ -3,13 +3,14 @@
 Summary:        Python 3 version of the DNF package manager.
 Name:           dnf
 Version:        4.19.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ OR GPL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/rpm-software-management/dnf
 #Source0:       %{url}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         dnf-add-installonlypkgs-config.patch
 BuildRequires:  bash-completion
 BuildRequires:  cmake
 BuildRequires:  gettext
@@ -151,6 +152,9 @@ popd
 %{python3_sitelib}/%{name}/automatic
 
 %changelog
+* Tue Apr 08 2025 Dan Streetman <ddstreet@ieee.org> - 4.19.0-2
+- Add installonlypkgs parameter to dnf.conf
+
 * Mon Feb 26 2024 Sam Meluch <sammeluch@microsoft.com> - 4.19.0-1
 - Upgrade to version 4.19.0 for Azure Linux 3.0
 
