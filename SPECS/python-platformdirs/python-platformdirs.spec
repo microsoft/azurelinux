@@ -7,7 +7,7 @@ a "user data dir".}
 Summary:        Python module for determining appropriate platform-specific dirs
 Name:           python-%{srcname}
 Version:        4.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -29,6 +29,7 @@ BuildRequires:  python3-trove-classifiers
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytest-mock
 BuildRequires:  python3-appdirs
+BuildRequires:  python3-iniconfig
 %endif
 BuildArch:      noarch
 
@@ -56,7 +57,6 @@ BuildRequires:  python3-devel
 
 %check
 %if %{with tests}
-pip install iniconfig==2.0.0
 %pytest
 %else
 %pyproject_check_import
@@ -68,6 +68,9 @@ pip install iniconfig==2.0.0
 %doc README.rst
 
 %changelog
+* Tue Apr 09 2025 Riken Maharjan <rmaharjan@microsoft.com> - 4.2.0-3
+- Fix Ptest by using mariner's iniconfig package  
+
 * Thu Oct 03 2024 Bala <balakumaran.kannan@microsoft.com> - 4.2.0-2
 - Fixing the missing dependency in the test section and enable it
 
