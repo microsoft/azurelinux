@@ -1,0 +1,98 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+  smartdata:
+    interval: 60m
+  filelog:
+    include: [/var/lib/trident/*.log]
+    start_at: beginning
+    operators:
+      - type: json_parser
+        parse_from: body
+  hostmetrics:
+    collection_interval: 1h
+    scrapers:
+      cpu:
+        metrics:
+          system.cpu.time:
+            enabled: false
+          system.cpu.utilization:
+            enabled: true
+          system.cpu.physical.count:
+            enabled: true
+      memory:
+        metrics:
+          system.memory.usage:
+            enabled: false
+          system.memory.utilization:
+            enabled: true
+      filesystem:
+        metrics:
+          system.filesystem.usage:
+            enabled: false
+          system.filesystem.utilization:
+            enabled: true
+
+processors:
+  memory_limiter:
+    check_interval: 5s
+    limit_mib: 200
+    spike_limit_mib: 100
+  filter:
+    error_mode: ignore
+    metrics:
+      datapoint:
+        - metric.name == "system.memory.utilization" and attributes["state"] == "buffered"
+    logs:
+      log_record:
+        - 'IsMatch(body, ".*Host Configuration:.*")'
+  resourcedetection:
+    detectors: [system]
+    system:
+      resource_attributes:
+        os.type:
+          enabled: true
+        host.arch:
+          enabled: true
+        host.cpu.model.name:
+          enabled: true
+        os.description:
+          enabled: true
+  attributes:
+    actions:
+      - key: "machine_type"
+        value: "bareMetal"
+        action: insert
+  batch:
+
+exporters:
+  debug:
+    verbosity: normal
+  azuredataexplorer:
+    cluster_uri: "https://bmpperformancepoc.eastus.kusto.windows.net"
+    use_azure_auth: true
+    db_name: "OTELPoc"
+    metrics_table_name: "metrics"
+    logs_table_name: "logs"
+    traces_table_name: "traces"
+    ingestion_type: "managed"
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp, smartdata]
+      processors: [memory_limiter, filter, resourcedetection, attributes, batch]
+      exporters: [debug, azuredataexplorer]
+    metrics:
+      receivers: [otlp, hostmetrics]
+      processors: [memory_limiter, filter, resourcedetection, attributes, batch]
+      exporters: [debug, azuredataexplorer]
+    logs:
+      receivers: [otlp, filelog]
+      processors: [memory_limiter, filter, resourcedetection, attributes, batch]
+      exporters: [debug, azuredataexplorer]
+  telemetry:
+    logs:
+      level: info

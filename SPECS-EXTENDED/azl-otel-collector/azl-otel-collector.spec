@@ -7,10 +7,18 @@ Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://github.com/open-telemetry/opentelemetry-collector # Upstream repository
+URL:            https://github.com/open-telemetry/opentelemetry-collector
+# NOTE: The URL above currently points to upstream base collector codebase, it will later point to the Azl Collector repo.
 Source0:        https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/azl-otel-collector-0.123.0-1.tar.gz
 Source1:        %{name}-%{version}-vendor-1.tar.gz
+Source2:        azl-otel-collector.service
+Source3:        config.yml
 BuildRequires:  golang
+BuildRequires:  systemd-rpm-macros
+Requires(post): systemd
+Conflicts:      azl-otel-collector
+%{?systemd_requires}
+
 
 %description
 Azure Linux OpenTelemetry Collector is a custom distribution of the
@@ -27,11 +35,25 @@ make azl-otelcol BUILDTAGS="netgo osusergo static_build" LDFLAGS="-s -w" TRIMPAT
 
 %install
 mkdir -p "%{buildroot}/%{_bindir}"
-install -D -m0755 bin/azl-otelcol %{buildroot}/%{_bindir}
+install -D -m0755 azl-otelcol %{buildroot}/%{_bindir}
+install -D -m 0644 %{SOURCE2} %{buildroot}%{_unitdir}/azl-otel-collector.service
+install -D -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/azl-otel-collector/config.yml
+
+%preun
+%systemd_preun azl-otel-collector.service
+
+%post
+%systemd_post azl-otel-collector.service
+
+%postun
+%systemd_postun_with_restart azl-otel-collector.service
 
 %files
 %{_bindir}/azl-otelcol
-%license LICENSE
+%dir %{_sysconfdir}/azl-otel-collector
+%config(noreplace) %{_sysconfdir}/azl-otel-collector/config.yml
+%{_unitdir}/azl-otel-collector.service
+
 
 
 %changelog
