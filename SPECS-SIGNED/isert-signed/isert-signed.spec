@@ -39,7 +39,7 @@
 %{!?_name: %define _name isert}
 
 Summary:	 %{_name} Driver
-Name:		 %{_name}
+Name:		 %{_name}-signed
 Version:	 24.10
 Release:	 14%{?dist}
 License:	 GPLv2
@@ -53,20 +53,25 @@ Group:		 System Environment/Base
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 
-Source0:	 %{name}-%{version}-%{release}.%{_arch}.rpm
+Source0:	 %{_name}-%{version}-%{release}.%{_arch}.rpm
 Source1:         ib_isert.ko
 
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 ExclusiveArch:   x86_64
 
+%description
+isert signed kernel modules
+
+%package -n %{_name}
+Summary:        %{summary}
 Requires:       mlnx-ofa_kernel = %{version}
 Requires:       mlnx-ofa_kernel-modules  = %{version}
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
-%description
-isert signed kernel modules
+%description -n %{_name}
+%{description}
 
 %prep
 
@@ -95,11 +100,11 @@ fi # 1 : closed
 %postun
 /sbin/depmod %{KVERSION}
 
-%files
+%files -n %{_name}
 %defattr(-,root,root,-)
-%license %{_datadir}/licenses/%{name}/copyright
+%license %{_datadir}/licenses/%{_name}/copyright
 /lib/modules/%{KVERSION}/updates/
-%config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{name}-*.conf
+%config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{_name}-*.conf
 
 %changelog
 * Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-14

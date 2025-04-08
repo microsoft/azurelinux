@@ -36,13 +36,13 @@
 
 %global KVERSION %{target_kernel_version_full}
 
-%{!?_name: %global _name mlnx-ofa_kernel}
+%{!?_name: %global _name mlnx-ofa_kernel-modules}
 
 # mlnx-ofa_kernel-modules is a sub-package in SPECS/mlnx-ofa_kernel.
 # We are making that into a main package for signing.
 
 Summary:	 Infiniband HCA Driver
-Name:		 %{_name}-modules
+Name:		 %{_name}-signed
 Version:	 24.10
 Release:	 14%{?dist}
 License:	 GPLv2
@@ -56,7 +56,7 @@ Group:		 System Environment/Base
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 
-Source0:        %{name}-%{version}-%{release}.%{_arch}.rpm
+Source0:        %{_name}-%{version}-%{release}.%{_arch}.rpm
 Source1:        mlx_compat.ko
 Source2:        ib_cm.ko
 Source3:        ib_core.ko
@@ -91,6 +91,14 @@ Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 ExclusiveArch:   x86_64
 
+
+%description 
+Mellanox infiniband kernel modules.
+The driver sources are located at: http://www.mellanox.com/downloads/
+
+%package -n %{_name}
+Summary:        %{summary}
+
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
 Obsoletes: mlnx_en
@@ -117,10 +125,8 @@ Requires: module-init-tools
 Requires: lsof
 Requires: ofed-scripts
 
-
-%description 
-Mellanox infiniband kernel modules.
-The driver sources are located at: http://www.mellanox.com/downloads/
+%description -n %{_name}
+%{description}
 
 %prep
 
@@ -180,9 +186,9 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 	/sbin/depmod %{KVERSION}
 fi
 
-%files
+%files -n %{_name}
 /lib/modules/%{KVERSION}/updates/
-%license %{_datadir}/licenses/%{name}/copyright
+%license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
 * Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-14

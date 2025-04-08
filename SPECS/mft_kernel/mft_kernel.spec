@@ -59,7 +59,7 @@ Requires:       kmod
 Provides:       kernel-mft = %{version}-%{release}
 
 %description
-mft kernel module(s)
+This package provides a %{name} kernel module for kernel.
 
 %global debug_package %{nil}
 
@@ -83,9 +83,6 @@ EOF)
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
 %endif
-
-%description
-This package provides a %{name} kernel module for kernel.
 
 %if "%{KMP}" == "1"
 %package utils
