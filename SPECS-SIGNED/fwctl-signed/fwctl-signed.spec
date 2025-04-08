@@ -45,7 +45,7 @@
 Summary:	 %{_name} Driver
 Name:		 %{_name}-signed
 Version:	 24.10
-Release:	 14%{?dist}
+Release:	 15%{?dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
@@ -117,6 +117,9 @@ fi # 1 : closed
 
 
 %changelog
+* Tue Apr 08 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-15
+- Re-naming the package to de-duplicate the SRPM name.
+
 * Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-14
 - Bump release to rebuild for new kernel release
 
