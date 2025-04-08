@@ -61,7 +61,7 @@ BuildRequires:  python%{python3_pkgversion}-pytest
 %py3_install
 
 %check
-pytest-%{python3_version} -v -k 'not test_shakespeare'
+PYTHONPATH=%{buildroot}%{python3_sitelib} pytest-%{python3_version} -v -k 'not test_shakespeare'
 
 %files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE.txt
