@@ -12,10 +12,10 @@ Distribution:   Azure Linux
 %define semodule_version 0.0.4
 
 Name:           usbguard
-Version:        1.1.0
+Version:        1.1.3
 Release:        1%{?dist}
 Summary:        A tool for implementing USB device usage policy
-License:        GPLv2+
+License:        GPL-2.0-or-later
 ## Not installed
 # src/ThirdParty/Catch: Boost Software License - Version 1.0
 URL:            https://usbguard.github.io/
@@ -24,6 +24,7 @@ Source0:        https://github.com/USBGuard/usbguard/releases/download/%{name}-%
 Source1:        https://github.com/USBGuard/usbguard/releases/download/%{name}-selinux-%{semodule_version}/%{name}-selinux-%{semodule_version}.tar.gz
 %endif
 Source2:        usbguard-daemon.conf
+Patch: 		usbguard-revert-catch.patch
 
 %if %{with systemd}
 Requires: systemd
@@ -38,22 +39,25 @@ Recommends: %{name}-selinux
 %endif
 Obsoletes: %{name}-applet-qt < 0.7.6
 
+BuildRequires: make
 BuildRequires: gcc
 BuildRequires: gcc-c++
 BuildRequires: libqb-devel
 BuildRequires: libgcrypt-devel
 BuildRequires: libstdc++-devel
 BuildRequires: protobuf-devel
+BuildRequires: protobuf-static
+BuildRequires: protobuf-compiler
 BuildRequires: PEGTL-static
-BuildRequires: catch-devel
-BuildRequires: autoconf automake libtool
+BuildRequires: catch1-devel
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: libtool
 BuildRequires: bash-completion
 BuildRequires: asciidoc
 BuildRequires: audit-libs-devel
 # For `pkg-config systemd` only
 BuildRequires: systemd
-
-Patch1: usbguard-0.7.6-libqb.patch
 
 %description
 The USBGuard software framework helps to protect your computer against rogue USB
@@ -114,14 +118,13 @@ daemon.
 
 # usbguard
 %prep
-%setup -q
+%autosetup -p1
 
 %if %{with selinux}
 # selinux
 %setup -q -D -T -a 1
 %endif
 
-%patch 1 -p1 -b .libqb
 
 # Remove bundled library sources before build
 rm -rf src/ThirdParty/{Catch,PEGTL}
@@ -167,6 +170,7 @@ make install INSTALL='install -p' DESTDIR=%{buildroot}
 
 # Overwrite configuration with distribution defaults
 mkdir -p %{buildroot}%{_sysconfdir}/usbguard
+mkdir -p %{buildroot}%{_sysconfdir}/usbguard/rules.d
 mkdir -p %{buildroot}%{_sysconfdir}/usbguard/IPCAccessControl.d
 install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/usbguard/usbguard-daemon.conf
 
@@ -206,6 +210,7 @@ find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
 %{_bindir}/usbguard
 %dir %{_localstatedir}/log/usbguard
 %dir %{_sysconfdir}/usbguard
+%dir %{_sysconfdir}/usbguard/rules.d/
 %dir %{_sysconfdir}/usbguard/IPCAccessControl.d
 %config(noreplace) %attr(0600,-,-) %{_sysconfdir}/usbguard/usbguard-daemon.conf
 %config(noreplace) %attr(0600,-,-) %{_sysconfdir}/usbguard/rules.conf
@@ -251,7 +256,7 @@ find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
 %if %{with selinux}
 %files selinux
 %{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
-%ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/%{name}
+%ghost %verify(not md5 size mode mtime) %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/%{name}
 %{_datadir}/selinux/devel/include/%{moduletype}/ipp-%{name}.if
 
 %post selinux
@@ -267,6 +272,10 @@ fi
 %endif
 
 %changelog
+* Tue Apr 08 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.1.3-1
+- Upgrade to 1.1.3 by taking reference from Fedora 41 (license: MIT).
+- License verified.
+
 * Tue Sep 05 2023 Archana Choudhary <archana1@microsoft.com> - 1.1.0-1
 - Upgrade to 1.1.0 - CVE-2019-25058
 - Update build requirement catch1 -> catch
