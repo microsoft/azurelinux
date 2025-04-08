@@ -9211,8 +9211,8 @@
         "type": "other",
         "other": {
           "name": "libdwarf",
-          "version": "0.9.0",
-          "downloadUrl": "https://www.prevanders.net/libdwarf-0.9.0.tar.xz"
+          "version": "0.9.2",
+          "downloadUrl": "https://www.prevanders.net/libdwarf-0.9.2.tar.xz"
         }
       }
     },
@@ -10881,8 +10881,8 @@
         "type": "other",
         "other": {
           "name": "libreswan",
-          "version": "4.7",
-          "downloadUrl": "https://github.com/libreswan/libreswan/archive/refs/tags/v4.7.tar.gz"
+          "version": "4.15",
+          "downloadUrl": "https://github.com/libreswan/libreswan/archive/refs/tags/v4.15.tar.gz"
         }
       }
     },
@@ -12041,8 +12041,8 @@
         "type": "other",
         "other": {
           "name": "libxslt",
-          "version": "1.1.39",
-          "downloadUrl": "https://download.gnome.org/sources/libxslt/1.1/libxslt-1.1.39.tar.xz"
+          "version": "1.1.43",
+          "downloadUrl": "https://download.gnome.org/sources/libxslt/1.1/libxslt-1.1.43.tar.xz"
         }
       }
     },
@@ -12861,8 +12861,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.11.10",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.11.10.tar.gz"
+          "version": "10.11.11",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.11.11.tar.gz"
         }
       }
     },
@@ -21043,8 +21043,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.3.14",
-          "downloadUrl": "https://www.php.net/distributions/php-8.3.14.tar.xz"
+          "version": "8.3.19",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.19.tar.xz"
         }
       }
     },
