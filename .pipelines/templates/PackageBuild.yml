@@ -237,6 +237,7 @@ steps:
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
         SRPM_PACK_LIST="${{ parameters.srpmPackList }}" \
         TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
+        PRECACHE_CONCURRENCY_PROCS=5 \
         $allow_toolchain_rebuilds_arg \
         $check_build_retries_arg \
         $delta_fetch_arg \
