@@ -78,7 +78,7 @@
             },
             "KernelCommandLine": {
                 "EnableFIPS": true,
-                "ExtraCommandLine": "console=ttyS0"
+                "ExtraCommandLine": "console=ttyS0 nvme_core.io_timeout=240"
             },
             "Hostname": "azurelinux"
         }

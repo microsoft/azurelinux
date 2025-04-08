@@ -78,7 +78,7 @@
             },
             "KernelCommandLine": {
                 "EnableFIPS": true,
-                "ExtraCommandLine": "console=tty1 console=ttyAMA0 earlycon=pl011,0xeffec000 initcall_blacklist=arm_pmu_acpi_init"
+                "ExtraCommandLine": "console=tty1 console=ttyAMA0 earlycon=pl011,0xeffec000 initcall_blacklist=arm_pmu_acpi_init nvme_core.io_timeout=240"
             },
             "Hostname": "azurelinux"
         }
