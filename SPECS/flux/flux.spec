@@ -42,6 +42,7 @@ Source2:        cargo_config
 Patch1:         disable-static-library.patch
 # Fixed upstream in 1.195.0, https://github.com/influxdata/flux/pull/5484.
 Patch2:         fix-build-warnings.patch
+Patch3:         fix-unsigned-char.patch
 BuildRequires:  cargo >= 1.45
 BuildRequires:  kernel-headers
 BuildRequires:  rust >= 1.45
@@ -73,6 +74,7 @@ programs using Influx data language.
 %prep
 %setup -q
 %patch 2 -p1
+%patch 3 -p1
 pushd libflux
 tar -xf %{SOURCE1}
 install -D %{SOURCE2} .cargo/config
@@ -145,6 +147,7 @@ RUSTFLAGS=%{rustflags} cargo test --release
 * Mon Apr 07 2025 Tobias Brick <tobiasb@microsoft.com> - 0.194.5-2
 - Add missing EOF for inline patch call.
 - Fix build warnings rather than suppressing them.
+- Fix test build error on arm64.
 
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.194.5-1
 - Upgrade to version 0.194.5
