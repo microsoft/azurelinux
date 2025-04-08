@@ -60,6 +60,8 @@ processors:
           enabled: true
         os.description:
           enabled: true
+        os.version:
+          enabled: true
   attributes:
     actions:
       - key: "machine_type"

@@ -15,6 +15,7 @@ Source2:        azl-otel-collector.service
 Source3:        config.yml
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
+Requires:       smartmontools
 Requires(post): systemd
 Conflicts:      azl-otel-collector
 %{?systemd_requires}
