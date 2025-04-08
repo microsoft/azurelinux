@@ -48,7 +48,6 @@ install -D -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/azl-otel-collector/conf
 
 %postun
 %systemd_postun_with_restart azl-otel-collector.service
-systemctl start azl-otel-collector.service || true
 
 %files
 %{_bindir}/azl-otelcol
