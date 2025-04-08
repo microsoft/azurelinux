@@ -67,10 +67,15 @@ chmod a+x $RPM_BUILD_ROOT%{python3_sitelib}/future/backports/test/pystone.py
 ## This packages ships PEM certificates in future/backports/test directory.
 ## It's for testing purpose, i guess. Ignore them.
 %check
-# test_ftp and test_subclass_recursion_limit and test_isinstance_recursion_limit tests are broken for python3.12
-# skipping them for now
+# various tests are broken for python-3.12.9 and pytest-7.4.0
+# skipping them for now. see below for issues tracking these:
+# https://github.com/PythonCharmers/python-future/issues/647
+# https://github.com/PythonCharmers/python-future/issues/608
+# https://github.com/PythonCharmers/python-future/issues/593
+# https://github.com/PythonCharmers/python-future/issues/530
+
 %if 0%{?python3_version_nodots} > 37
-PYTHONPATH=$PWD/build/lib py.test%{python3_version} -k "not test_urllibnet and not test_single_exception_stacktrace and not test_ftp and not test_subclass_recursion_limit and not test_isinstance_recursion_limit" -q
+PYTHONPATH=$PWD/build/lib py.test%{python3_version} -k "not test_urllibnet and not test_single_exception_stacktrace and not test_ftp and not test_subclass_recursion_limit and not test_isinstance_recursion_limit and not test_urllib_toplevel" -q
 %endif
 
 %files -n python%{python3_pkgversion}-%{name}
