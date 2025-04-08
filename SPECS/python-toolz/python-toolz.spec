@@ -27,13 +27,13 @@ associated with functional programming, within a natural Pythonic style\
 suitable for most developers.
 Summary:        A functional standard library for Python
 Name:           python-%{srcname}
-Version:        0.12.1
+Version:        0.12.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/pytoolz/toolz/
-Source0:        https://github.com/pytoolz/toolz/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
+Source0:	https://github.com/pytoolz/toolz/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -46,7 +46,6 @@ BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 %if 0%{?with_check}
 BuildRequires:  python%{python3_pkgversion}-pip
-BuildRequires:  python%{python3_pkgversion}-pytest
 %endif
 
 %description -n python%{python3_pkgversion}-%{srcname}
@@ -62,7 +61,8 @@ BuildRequires:  python%{python3_pkgversion}-pytest
 %py3_install
 
 %check
-pytest-%{python3_version} -v -k 'not test_shakespeare'
+pip3 install nose
+nosetests
 
 %files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE.txt
@@ -70,10 +70,6 @@ pytest-%{python3_version} -v -k 'not test_shakespeare'
 %{python3_sitelib}/tlz/
 
 %changelog
-* Tue Apr 08 2025 Sam Meluch <sammeluch@microsoft.com> - 0.12.1-1
-- Upgrade to 0.12.1 for python 3.12 support
-- fix check section
-
 * Wed Dec 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.12.0-1
 - Auto-upgrade to 0.12.0 - none
 
