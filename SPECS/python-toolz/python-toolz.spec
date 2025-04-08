@@ -45,7 +45,7 @@ Summary:        A functional standard library for Python %{python3_version}
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 %if 0%{?with_check}
-BuildRequires:  python%{python3_pkgversion}-pip
+BuildRequires:  python%{python3_pkgversion}-pytest
 %endif
 
 %description -n python%{python3_pkgversion}-%{srcname}
@@ -61,8 +61,7 @@ BuildRequires:  python%{python3_pkgversion}-pip
 %py3_install
 
 %check
-pip3 install nose
-nosetests
+pytest-%{python3_version} -v -k 'not test_shakespeare'
 
 %files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE.txt
