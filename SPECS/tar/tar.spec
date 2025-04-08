@@ -11,8 +11,8 @@ Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 
 # libcap changed the output in newer version. tar test still expects libcap's getcap output to be same
 # https://web.git.kernel.org/pub/scm/libs/libcap/libcap.git/commit/?id=177cd418031b1acfcf73fe3b1af9f3279828681c
-Patch1: tar-1.33-fix-capabilities-test.patch
-Patch2: tar-1.35-add-forgotten-tests-from-upstream.patch
+Patch1:         tar-1.33-fix-capabilities-test.patch
+Patch2:         tar-1.35-add-forgotten-tests-from-upstream.patch
 
 %description
 Contains GNU archiving program
