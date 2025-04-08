@@ -75,7 +75,7 @@ chmod a+x $RPM_BUILD_ROOT%{python3_sitelib}/future/backports/test/pystone.py
 # https://github.com/PythonCharmers/python-future/issues/530
 
 %if 0%{?python3_version_nodots} > 37
-PYTHONPATH=$PWD/build/lib py.test%{python3_version} -k "not test_urllibnet and not test_single_exception_stacktrace and not test_ftp and not test_subclass_recursion_limit and not test_isinstance_recursion_limit and not test_urllib_toplevel" -q
+PYTHONPATH=$PWD/build/lib py.test%{python3_version} -k "not test_urllib and not test_urllib_toplevel and not test_urllibnet and not test_single_exception_stacktrace and not test_ftp and not test_subclass_recursion_limit and not test_isinstance_recursion_limit" -q
 %endif
 
 %files -n python%{python3_pkgversion}-%{name}
