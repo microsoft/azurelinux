@@ -439,6 +439,7 @@ Source0: https://download.qemu.org/%{name}-%{version}%{?rcstr}.tar.xz
 Patch: 0001-pc-bios-optionrom-Fix-pvh.img-ld-build-failure-on-fe.patch
 Patch2: 0002-Disable-failing-tests-on-azl.patch
 Patch3: CVE-2023-6683.patch
+Patch4: CVE-2023-6693.patch
 
 Source10: qemu-guest-agent.service
 Source11: 99-qemu-guest-agent.rules
@@ -3424,6 +3425,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %changelog
 * Thu Mar 20 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 8.2.0-13
 - Add patch for CVE-2023-6683
+- Add patch for CVE-2023-6693
 
 * Tue Feb 25 2025 Chris Co <chrco@microsoft.com> - 8.2.0-12
 - Bump to rebuild with updated glibc
