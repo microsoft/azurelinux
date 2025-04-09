@@ -64,6 +64,7 @@ BuildRequires:  python%{python3_pkgversion}-pytest
 %py3_install
 
 %check
+# skip test_shakespeare due to missing directory/files in source tar (Fedora also skips this test for a similar reason)
 PYTHONPATH=%{buildroot}%{python3_sitelib} pytest -v -k 'not test_shakespeare'
 
 %files -n python%{python3_pkgversion}-%{srcname}
@@ -74,6 +75,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest -v -k 'not test_shakespeare'
 %changelog
 * Thu May 16 2024 Sam Meluch <sammeluch@microsoft.com> - 0.12.1-2
 - Upgrade to 0.12.1 for python 3.12 support
+- Update %check to use pytest with test wrapped patch
 
 * Wed Dec 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.12.0-1
 - Auto-upgrade to 0.12.0 - none
