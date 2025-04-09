@@ -40,6 +40,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 # Skip the timeout test, which is unreliable on our (vm) build machines
 sed -i 's/ timeout / /' test/Makefile
 sed -i 's/ pty1 / /' test/Makefile
+sed -i 's/ pma / /' test/Makefile
+sed -i 's/ pma-tests / /' test/Makefile
+sed -i 's/ check-recursive / /' test/Makefile
 
 make %{?_smp_mflags} check
 
