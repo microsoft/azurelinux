@@ -33,7 +33,10 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/pytoolz/toolz/
-Source0:	https://github.com/pytoolz/toolz/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
+Source0:        https://github.com/pytoolz/toolz/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
+# This is a test patch found here: https://github.com/pytoolz/toolz/commit/0c2b43a926a3543817240c878c6ded1180c81b71.patch
+# it can be removed when upgrading to 1.0.0 or later picking up the fix
+Patch0:         python-3.12.9-test_wrapped-fix.patch
 BuildArch:      noarch
 
 %description
@@ -52,7 +55,7 @@ BuildRequires:  python%{python3_pkgversion}-pytest
 %{desc}
 
 %prep
-%setup -q -n %{srcname}-%{version}
+%autosetup -p1 -n %{srcname}-%{version}
 
 %build
 %py3_build
@@ -61,7 +64,7 @@ BuildRequires:  python%{python3_pkgversion}-pytest
 %py3_install
 
 %check
-PYTHONPATH=%{buildroot}%{python3_sitelib} pytest-%{python3_version} -v -k 'not test_shakespeare'
+PYTHONPATH=%{buildroot}%{python3_sitelib} pytest -v -k 'not test_shakespeare'
 
 %files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE.txt
