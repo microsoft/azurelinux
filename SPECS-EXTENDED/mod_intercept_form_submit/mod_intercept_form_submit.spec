@@ -17,8 +17,8 @@ Source0: https://www.adelton.com/apache/mod_intercept_form_submit/%{name}-%{vers
 BuildRequires: gcc
 BuildRequires: httpd-devel
 BuildRequires: pkgconfig
-Provides: httpd-mmn = %{_httpd_mmn}
-Provides: mod_authnz_pam >= 0.7
+Requires: httpd-mmn
+Requires: mod_authnz_pam >= 0.7
 
 # Suppres auto-provides for module DSO per
 # https://fedoraproject.org/wiki/Packaging:AutoProvidesAndRequiresFiltering#Summary
