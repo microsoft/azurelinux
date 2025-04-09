@@ -7,14 +7,14 @@ Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://github.com/open-telemetry/opentelemetry-collector
-# NOTE: The URL above currently points to upstream base collector codebase, it will later point to the Azl Collector repo.
-Source0:        https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/azl-otel-collector-0.123.0-1.tar.gz
+# NOTE: The URL below currently points to internal repo codebase, it will later point to the github for the Azure Linux Collector.
+URL:            https://dev.azure.com/mariner-org/ECF/_git/project-runes?path=/azl-otel-collector
+Source0:        https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/azl-otel-collector-0.123.0-3.tar.gz
 Source1:        %{name}-%{version}-vendor-1.tar.gz
 Source2:        azl-otel-collector.service
-Source3:        config.yml
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
+# Include the smartmontools package needed by the smartdata receiver in the collector
 Requires:       smartmontools
 Requires(post): systemd
 Conflicts:      azl-otel-collector
@@ -38,7 +38,7 @@ make azl-otelcol BUILDTAGS="netgo osusergo static_build" LDFLAGS="-s -w" TRIMPAT
 mkdir -p "%{buildroot}/%{_bindir}"
 install -D -m0755 azl-otelcol %{buildroot}/%{_bindir}
 install -D -m 0644 %{SOURCE2} %{buildroot}%{_unitdir}/azl-otel-collector.service
-install -D -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/azl-otel-collector/config.yml
+install -D -m 0644 config/default-config.yaml %{buildroot}%{_sysconfdir}/azl-otel-collector/config.yaml
 
 %preun
 %systemd_preun azl-otel-collector.service
@@ -52,7 +52,7 @@ install -D -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/azl-otel-collector/conf
 %files
 %{_bindir}/azl-otelcol
 %dir %{_sysconfdir}/azl-otel-collector
-%config(noreplace) %{_sysconfdir}/azl-otel-collector/config.yml
+%{_sysconfdir}/azl-otel-collector/config.yaml
 %{_unitdir}/azl-otel-collector.service
 
 

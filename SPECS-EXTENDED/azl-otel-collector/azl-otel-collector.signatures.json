@@ -1,8 +1,7 @@
 {
     "Signatures": {
-        "azl-otel-collector-0.123.0-1.tar.gz": "2462db7dce10d73e511c84a5ede8a4b5a8c80d7ac452e83dd461b9856beb2791",
+        "azl-otel-collector-0.123.0-3.tar.gz": "9655deca58eae1aaf22a06737a6e885598ea7da55cd1eee707d1e6a21c7a1261",
         "azl-otel-collector-0.123.0-vendor-1.tar.gz": "737613d1d0c5e9ec03f9532836cb14691f5e55c6190c20042593aa266b9578ff",
-        "azl-otel-collector.service": "a589131f43d13a5722fdd37420f1564d99047a1795b34282dad083fb32d99cce",
-        "config.yml": "7f2a6b8bca25570ccad54e4f21e570faeb41aff467403015a04ac46b1a5057c4"
+        "azl-otel-collector.service": "130b1ae8d842c7fb124dd19ca474544ff13a73d0f62607c3b0656c72d888384b"
     }
 }
