@@ -1,6 +1,6 @@
 Name:           perl-File-Slurp
-Version:        9999.29
-Release:        3%{?dist}
+Version:        9999.32
+Release:        1%{?dist}
 Summary:        Efficient Reading/Writing of Complete Files
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -70,6 +70,10 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 %{_mandir}/man3/*
 
 %changelog
+* Mon Dec 23 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 9999.32-1
+- Update to version 9999.32
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 9999.29-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
