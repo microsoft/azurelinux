@@ -15,7 +15,7 @@ Source1:        krb5.conf
 Patch0:         CVE-2024-26461.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  openssl-devel
-BuildRequires:  openldap
+BuildRequires:  openldap-devel
 Requires:       e2fsprogs-libs
 Requires:       openssl
 Provides:       %{name}-libs = %{version}-%{release}
