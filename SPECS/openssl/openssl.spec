@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
@@ -62,6 +62,14 @@ Patch52:  0052-Allow-SHA1-in-seclevel-1-if-rh-allow-sha1-signatures.patch
 # # See notes in the patch for details, but this patch will not be needed if
 # # the openssl issue https://github.com/openssl/openssl/issues/7048 is ever implemented and released.
 Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
+# Fix crashes in openssl speed with providers that don't refcount keys.
+# Upstream: https://github.com/openssl/openssl/pull/26976 has been merged into 3.3, so if we
+# upgrade to 3.3.4 when it comes out, we can remove this patch.
+Patch81:  Keep-the-provided-peer-EVP_PKEY-in-the-EVP_PKEY_CTX-too.patch
+# The Symcrypt provider, which is our default, doesn't support some of the
+# algorithms that are used in the speed tests. This patch skips those tests.
+# If SymCrypt adds support, we should change and eventually remove this patch.
+Patch82:  prevent-unsupported-calls-into-symcrypt-in-speed.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -357,6 +365,9 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Mon Mar 17 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.3-2
+- Patch to fix segfaults and errors in openssl speed.
+
 * Wed Feb 26 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.3-1
 - Auto-upgrade to 3.3.3 - none
 - Initially run through autoupgrader (CBL-Mariner Servicing Account <cblmargh@microsoft.com>)
