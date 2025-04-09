@@ -1271,6 +1271,7 @@
                 "perl-File-Slurp",
                 "perl-File-Slurp-Tiny",
                 "perl-File-Slurper",
+                "perl-File-TreeCreate",
                 "perl-File-Type",
                 "perl-Font-TTF",
                 "perl-FreezeThaw",
