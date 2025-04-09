@@ -8,7 +8,6 @@ Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/bpftrace/bpftrace
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         bpftrace-0.20-llvm18.patch
 BuildRequires:  bcc-devel
 BuildRequires:  binutils-devel
 BuildRequires:  bison
