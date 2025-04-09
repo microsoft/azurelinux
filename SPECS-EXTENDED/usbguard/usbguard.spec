@@ -12,7 +12,7 @@ Distribution:   Azure Linux
 %define semodule_version 0.0.4
 
 Name:           usbguard
-Version:        1.1.0
+Version:        1.1.3
 Release:        1%{?dist}
 Summary:        A tool for implementing USB device usage policy
 License:        GPLv2+
@@ -267,6 +267,9 @@ fi
 %endif
 
 %changelog
+* Mon Apr 07 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.3-1
+- Auto-upgrade to 1.1.3 - Upgrade extended package
+
 * Tue Sep 05 2023 Archana Choudhary <archana1@microsoft.com> - 1.1.0-1
 - Upgrade to 1.1.0 - CVE-2019-25058
 - Update build requirement catch1 -> catch
