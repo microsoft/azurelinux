@@ -22,7 +22,7 @@
 Summary:        Influx data language
 Name:           flux
 Version:        0.194.5
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
