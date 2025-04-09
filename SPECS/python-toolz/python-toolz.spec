@@ -75,7 +75,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest -v -k 'not test_shakespeare'
 %changelog
 * Thu May 16 2024 Sam Meluch <sammeluch@microsoft.com> - 0.12.1-2
 - Upgrade to 0.12.1 for python 3.12 support
-- Update %check to use pytest with test wrapped patch
+- Update %check to use pytest with test wrapped patch (referencing Fedora 41 for test skip)
 
 * Wed Dec 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.12.0-1
 - Auto-upgrade to 0.12.0 - none
