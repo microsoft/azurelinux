@@ -44,8 +44,8 @@ jobs:
             echo "Generating specs.json for spec folder '$spec_folder'."
 
             sudo make -C toolkit -j$(nproc) parse-specs REBUILD_TOOLS=y DAILY_BUILD_ID=lkg SPECS_DIR=../$spec_folder
-            cp -v build/pkg_artifacts/specs.json $spec_folder_specs.json
+            cp -v build/pkg_artifacts/specs.json ${spec_folder}_specs.json
           done
 
       - name: Check for duplicate SRPMs
-        run: python3 toolkit/scripts/check_srpms_duplicates.py *_specs.json
+        run: python3 toolkit/scripts/check_srpm_duplicates.py *_specs.json
