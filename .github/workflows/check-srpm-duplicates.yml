@@ -32,9 +32,6 @@ jobs:
         with:
           python-version: 3.12
 
-      # - name: Get Python dependencies
-      #   run: python3 -m pip install -r toolkit/scripts/requirements.txt
-
       # Generate the specs.json files. They are the input for the duplicates check script.
       - name: Generate specs.json
         run: |
