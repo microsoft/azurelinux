@@ -27,10 +27,10 @@ jobs:
         uses: actions/checkout@v4
 
       # For consistency, we use the same major/minor version of Python that Azure Linux ships
-      - name: Setup Python 3.12
+      - name: Setup Python 3.9
         uses: actions/setup-python@v5
         with:
-          python-version: 3.12
+          python-version: 3.9
 
       - name: Switch to stable toolkit
         run: git fetch --all && git checkout 2.0-stable -- toolkit
