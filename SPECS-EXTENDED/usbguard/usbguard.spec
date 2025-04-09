@@ -9,7 +9,7 @@ Distribution:   Azure Linux
 %endif
 
 %global moduletype contrib
-%define semodule_version 0.0.4
+%define semodule_version 0.0.5
 
 Name:           usbguard
 Version:        1.1.3
@@ -21,7 +21,7 @@ License:        GPL-2.0-or-later
 URL:            https://usbguard.github.io/
 Source0:        https://github.com/USBGuard/usbguard/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 %if %{with selinux}
-Source1:        https://github.com/USBGuard/usbguard/releases/download/%{name}-selinux-%{semodule_version}/%{name}-selinux-%{semodule_version}.tar.gz
+Source1: 	https://github.com/USBGuard/usbguard-selinux/archive/refs/tags/v%{semodule_version}.tar.gz#/%{name}-selinux-%{semodule_version}.tar.gz
 %endif
 Source2:        usbguard-daemon.conf
 Patch: 		usbguard-revert-catch.patch
@@ -58,6 +58,9 @@ BuildRequires: asciidoc
 BuildRequires: audit-libs-devel
 # For `pkg-config systemd` only
 BuildRequires: systemd
+
+Requires: 	libqb
+Requires: 	pkgconfig(libqb)
 
 %description
 The USBGuard software framework helps to protect your computer against rogue USB
@@ -106,7 +109,8 @@ a D-Bus interface to the USBGuard daemon component.
 Summary:        USBGuard selinux
 Group:          Applications/System
 Requires:       %{name} = %{version}-%{release}
-BuildRequires:  selinux-policy
+Requires:       selinux-policy-%{selinuxtype}
+Requires(post): selinux-policy-%{selinuxtype}
 BuildRequires:  selinux-policy-devel
 BuildArch: noarch
 %{?selinux_requires}
