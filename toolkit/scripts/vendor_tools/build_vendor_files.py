@@ -192,7 +192,7 @@ class VendorProcessor:
         PipelineLogging.output_success(
             f"Successfully processed vendor type: '{vendor_type.value}'")
 
-        PipelineLogging.output_debug(f"Script output: \n{stdout}")
+        PipelineLogging.output_debug(f"Script output: \n{stdout if stderr == '' else stderr}")
 
 
 # parse arguments
