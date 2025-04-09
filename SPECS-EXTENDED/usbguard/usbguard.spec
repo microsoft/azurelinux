@@ -59,9 +59,6 @@ BuildRequires: audit-libs-devel
 # For `pkg-config systemd` only
 BuildRequires: systemd
 
-Requires: 	libqb
-Requires: 	pkgconfig(libqb)
-
 %description
 The USBGuard software framework helps to protect your computer against rogue USB
 devices by implementing basic whitelisting/blacklisting capabilities based on
