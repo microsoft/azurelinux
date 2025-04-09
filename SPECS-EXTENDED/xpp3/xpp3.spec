@@ -1,18 +1,16 @@
-%global oversion 1.1.4c
-
 Summary:        XML Pull Parser
 Name:           xpp3
-Version:        1.1.4
+Version:        1.1.4c
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Release:        28.c%{?dist}
+Release:        28%{?dist}
 License:        ASL 1.1
-URL:            https://www.extreme.indiana.edu/xgws/xsoap/xpp/mxp1/index.html
-Source0:        https://www.extreme.indiana.edu/dist/java-repository/xpp3/distributions/xpp3-%{oversion}_src.tgz#/xpp3-%{version}c.tgz
-Source1:        https://repo1.maven.org/maven2/xpp3/xpp3/%{oversion}/xpp3-%{oversion}.pom
-Source2:        https://repo1.maven.org/maven2/xpp3/xpp3_xpath/%{oversion}/xpp3_xpath-%{oversion}.pom
-Source3:        https://repo1.maven.org/maven2/xpp3/xpp3_min/%{oversion}/xpp3_min-%{oversion}.pom
-Source4:        %{name}-%{oversion}-OSGI-MANIFEST.MF
+URL:            http://www.extreme.indiana.edu/xgws/xsoap/xpp/mxp1/index.html
+Source0:        http://www.extreme.indiana.edu/dist/java-repository/xpp3/distributions/xpp3-%{version}_src.tgz
+Source1:        https://repo1.maven.org/maven2/xpp3/xpp3/%{version}/xpp3-%{version}.pom
+Source2:        https://repo1.maven.org/maven2/xpp3/xpp3_xpath/%{version}/xpp3_xpath-%{version}.pom
+Source3:        https://repo1.maven.org/maven2/xpp3/xpp3_min/%{version}/xpp3_min-%{version}.pom
+Source4:        %{name}-%{version}-OSGI-MANIFEST.MF
 Patch0:         %{name}-link-docs-locally.patch
 
 BuildRequires:  ant
@@ -40,7 +38,7 @@ Summary:        Minimal XML Pull Parser
 Minimal XML pull parser implementation.
 
 %prep
-%setup -q -n %{name}-%{oversion}
+%setup -q -n %{name}-%{version}
 # remove all binary libs
 find -name \*.jar -delete
 # Remove class bundled from Axis (now it's bundled in JRE)
@@ -60,18 +58,18 @@ export ANT_OPTS="-Dfile.encoding=iso-8859-1"
 ant xpp3 junit apidoc
 
 # Add OSGi metadata
-jar ufm build/%{name}-%{oversion}.jar %{SOURCE4}
+jar ufm build/%{name}-%{version}.jar %{SOURCE4}
 
 %install
 # jars
 mkdir -p %{buildroot}%{_javadir}
-cp -p build/%{name}-%{version}c.jar \
-  %{buildroot}%{_javadir}/%{name}-%{version}c.jar
-cp -p build/%{name}_min-%{version}c.jar \
-  %{buildroot}%{_javadir}/%{name}-minimal-%{version}c.jar
-cp -p build/%{name}_xpath-%{version}c.jar \
-  %{buildroot}%{_javadir}/%{name}-xpath-%{version}c.jar
-(cd %{buildroot}%{_javadir} && for jar in *-%{version}c.jar; do ln -sf ${jar} `echo $jar| sed "s|-%{version}c||g"`; done)
+cp -p build/%{name}-%{version}.jar \
+  %{buildroot}%{_javadir}/%{name}-%{version}.jar
+cp -p build/%{name}_min-%{version}.jar \
+  %{buildroot}%{_javadir}/%{name}-minimal-%{version}.jar
+cp -p build/%{name}_xpath-%{version}.jar \
+  %{buildroot}%{_javadir}/%{name}-xpath-%{version}.jar
+(cd %{buildroot}%{_javadir} && for jar in *-%{version}.jar; do ln -sf ${jar} `echo $jar| sed "s|-%{version}||g"`; done)
 # javadoc
 mkdir -p %{buildroot}%{_javadocdir}/%{name}
 cp -pr doc/api/* %{buildroot}%{_javadocdir}/%{name}
@@ -89,9 +87,9 @@ install -p -m 644 %{SOURCE3} %{buildroot}%{_mavenpomdir}/%{name}-xpath.pom
 %doc README.html LICENSE.txt doc/*
 %{_datadir}/java/xpp3.jar
 %{_datadir}/javadoc/xpp3/*
-%{_javadir}/%{name}-%{version}c.jar
+%{_javadir}/%{name}-%{version}.jar
 %{_javadir}/%{name}-xpath.jar
-%{_javadir}/%{name}-xpath-%{version}c.jar
+%{_javadir}/%{name}-xpath-%{version}.jar
 %{_mavenpomdir}/%{name}.pom
 %{_mavenpomdir}/%{name}-xpath.pom
 %if %{defined _maven_repository}
@@ -102,14 +100,14 @@ install -p -m 644 %{SOURCE3} %{buildroot}%{_mavenpomdir}/%{name}-xpath.pom
 %files minimal
 %defattr(0644,root,root,0755)
 %{_javadir}/%{name}-minimal.jar
-%{_javadir}/%{name}-minimal-%{version}c.jar
+%{_javadir}/%{name}-minimal-%{version}.jar
 %{_mavenpomdir}/%{name}-minimal.pom
 %if %{defined _maven_repository}
 %{_mavendepmapfragdir}/%{name}-minimal
 %endif
 
 %changelog
-* Thu Mar 27 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.1.4-28.c
+* Thu Mar 27 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.1.4c-28
 - Initial Azure Linux import from Fedora 34 (license: MIT)
 - License verified
 
