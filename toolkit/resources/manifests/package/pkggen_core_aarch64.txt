@@ -74,10 +74,10 @@ util-linux-2.40.2-1.azl3.aarch64.rpm
 util-linux-devel-2.40.2-1.azl3.aarch64.rpm
 util-linux-libs-2.40.2-1.azl3.aarch64.rpm
 tar-1.35-2.azl3.aarch64.rpm
-xz-5.4.4-1.azl3.aarch64.rpm
-xz-devel-5.4.4-1.azl3.aarch64.rpm
-xz-lang-5.4.4-1.azl3.aarch64.rpm
-xz-libs-5.4.4-1.azl3.aarch64.rpm
+xz-5.4.4-2.azl3.aarch64.rpm
+xz-devel-5.4.4-2.azl3.aarch64.rpm
+xz-lang-5.4.4-2.azl3.aarch64.rpm
+xz-libs-5.4.4-2.azl3.aarch64.rpm
 zstd-1.5.5-2.azl3.aarch64.rpm
 zstd-devel-1.5.5-2.azl3.aarch64.rpm
 zstd-libs-1.5.5-2.azl3.aarch64.rpm
