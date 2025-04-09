@@ -3,7 +3,7 @@ Name:           xpp3
 Version:        1.1.4c
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Release:        28.c%{?dist}
+Release:        28%{?dist}
 License:        ASL 1.1
 URL:            http://www.extreme.indiana.edu/xgws/xsoap/xpp/mxp1/index.html
 Source0:        http://www.extreme.indiana.edu/dist/java-repository/xpp3/distributions/xpp3-%{version}_src.tgz
@@ -107,7 +107,7 @@ install -p -m 644 %{SOURCE3} %{buildroot}%{_mavenpomdir}/%{name}-xpath.pom
 %endif
 
 %changelog
-* Thu Mar 27 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.1.4-28.c
+* Thu Mar 27 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.1.4c-28
 - Initial Azure Linux import from Fedora 34 (license: MIT)
 - License verified
 
