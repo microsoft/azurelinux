@@ -24,13 +24,14 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 
+BuildRequires:  python3-tox
+BuildRequires:  python3-toml
+
 # for tests
 %if 0%{?with_check}
-BuildRequires:  python3-tox
 BuildRequires:  python3-pluggy
 BuildRequires:  python3-py
 BuildRequires:  python3-filelock
-BuildRequires:  python3-toml
 BuildRequires:  python3-six
 BuildRequires:  python3-tox-current-env
 %endif
