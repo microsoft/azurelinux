@@ -52,19 +52,19 @@ perl -pi -e "s,_DATADIR = '(.*)',_DATADIR = '%{_datadir}/langtable'," langtable/
 (cd $RPM_BUILD_DIR/%{name}-%{version}; %{__python3} test_cases.py)
 xmllint --noout --relaxng \
         $RPM_BUILD_DIR/%{name}-%{version}/langtable/schemas/keyboards.rng \
-        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/keyboards.xml.gz
+        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/keyboards.xml
 xmllint --noout --relaxng \
         $RPM_BUILD_DIR/%{name}-%{version}/langtable/schemas/languages.rng \
-        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/languages.xml.gz
+        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/languages.xml
 xmllint --noout --relaxng \
         $RPM_BUILD_DIR/%{name}-%{version}/langtable/schemas/territories.rng \
-        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/territories.xml.gz
+        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/territories.xml
 xmllint --noout --relaxng \
         $RPM_BUILD_DIR/%{name}-%{version}/langtable/schemas/timezoneidparts.rng \
-        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/timezoneidparts.xml.gz
+        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/timezoneidparts.xml
 xmllint --noout --relaxng \
         $RPM_BUILD_DIR/%{name}-%{version}/langtable/schemas/timezones.rng \
-        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/timezones.xml.gz
+        $RPM_BUILD_DIR/%{name}-%{version}/langtable/data/timezones.xml
 
 %files
 %license COPYING unicode-license.txt
