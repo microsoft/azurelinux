@@ -1,16 +1,16 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global cpan_version 1.40
+%global cpan_version 1.42
 
 Name:           perl-Crypt-PasswdMD5
 # Keep 1-digit version because of history
 Version:        %(echo '%{cpan_version}' | sed 's/\.\(.\)/.\1./')
-Release:        19%{?dist}
+Release:        1%{?dist}
 Summary:        Provides interoperable MD5-based crypt() functions
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Crypt-PasswdMD5
-Source0:        https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-PasswdMD5-%{cpan_version}.tgz
-Patch0:         Crypt-PasswdMD5-1.40-d-md5-version.patch
+Source0:        https://cpan.metacpan.org/authors/id/R/RS/RSAVAGE/Crypt-PasswdMD5-%{cpan_version}.tgz
+Patch0:         Crypt-PasswdMD5-1.42-d-md5-version.patch
 BuildArch:      noarch
 # Build:
 BuildRequires:  coreutils
@@ -21,13 +21,13 @@ BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker)
 # Run-time:
 BuildRequires:  perl(Digest::MD5) >= 2.53
+BuildRequires:  perl(Encode)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 # Tests:
-BuildRequires:  perl(Test::More) >= 0.94
+BuildRequires:  perl(Test::More) >= 1.001002
 # Dependencies:
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 This package provides MD5-based crypt() functions.
@@ -38,7 +38,7 @@ This package provides MD5-based crypt() functions.
 # Specify version requirement for Digest::MD5
 # This avoids the need to add an explicit dependency in the spec file
 # and the need to filter the underspecified auto-generated dependency
-%patch 0
+%patch -P0
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor
@@ -53,11 +53,16 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
+%license LICENSE
 %doc Changes README
 %{perl_vendorlib}/Crypt/
 %{_mandir}/man3/Crypt::PasswdMD5.3*
 
 %changelog
+* Tue Dec 10 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.4.2-1
+- Update Azure-Linux import from Fedora 41 (license: GPL-1.0-or-later OR Artistic-1.0-Perl).
+- License verified.
+
 * Wed Apr 28 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.0-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove colons from patchnames
