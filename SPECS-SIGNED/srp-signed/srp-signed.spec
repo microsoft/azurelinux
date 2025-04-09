@@ -38,12 +38,10 @@
 
 %global KVERSION %{target_kernel_version_full}
 
-%define _name srp
-
 Summary:	 srp driver
-Name:		 %{_name}-signed
+Name:		 srp
 Version:	 24.10
-Release:	 15%{?dist}
+Release:	 14%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -55,7 +53,7 @@ Group:		 System Environment/Base
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 
-Source0:         %{_name}-%{version}-%{release}.%{_arch}.rpm
+Source0:         %{name}-%{version}-%{release}.%{_arch}.rpm
 Source1:         ib_srp.ko
 Source2:         scsi_transport_srp.ko
 
@@ -63,18 +61,13 @@ Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 ExclusiveArch:   x86_64
 
-%description
-srp kernel modules
-
-%package -n %{_name}
-Summary:        %{summary}
 Requires:       mlnx-ofa_kernel = %{version}
 Requires:       mlnx-ofa_kernel-modules  = %{version}
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
-%description -n %{_name}
-%{description}
+%description
+srp kernel modules
 
 %prep
 
@@ -98,17 +91,14 @@ cp -rp ./. %{buildroot}/
 
 popd
 
-%files -n %{_name}
+%files
 %defattr(-,root,root,-)
 /lib/modules/%{KVERSION}/updates/srp/ib_srp.ko
 /lib/modules/%{KVERSION}/updates/srp/scsi/scsi_transport_srp.ko
-%config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{_name}-*.conf
-%license %{_datadir}/licenses/%{_name}/copyright
+%config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{name}-*.conf
+%license %{_datadir}/licenses/%{name}/copyright
 
 %changelog
-* Tue Apr 08 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-15
-- Re-naming the package to de-duplicate the SRPM name.
-
 * Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-14
 - Bump release to rebuild for new kernel release
 
