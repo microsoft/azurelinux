@@ -73,11 +73,19 @@ libcap-ng-devel-0.8.4-1.azl3.x86_64.rpm
 util-linux-2.40.2-1.azl3.x86_64.rpm
 util-linux-devel-2.40.2-1.azl3.x86_64.rpm
 util-linux-libs-2.40.2-1.azl3.x86_64.rpm
+<<<<<<< HEAD
 tar-1.35-2.azl3.x86_64.rpm
 xz-5.4.4-1.azl3.x86_64.rpm
 xz-devel-5.4.4-1.azl3.x86_64.rpm
 xz-lang-5.4.4-1.azl3.x86_64.rpm
 xz-libs-5.4.4-1.azl3.x86_64.rpm
+=======
+tar-1.35-1.azl3.x86_64.rpm
+xz-5.4.4-2.azl3.x86_64.rpm
+xz-devel-5.4.4-2.azl3.x86_64.rpm
+xz-lang-5.4.4-2.azl3.x86_64.rpm
+xz-libs-5.4.4-2.azl3.x86_64.rpm
+>>>>>>> 7c4ff759d ([AUTO-PR] azure-core/azurelinux:joslobo/CVE-2025-31115 (#13322))
 zstd-1.5.5-2.azl3.x86_64.rpm
 zstd-devel-1.5.5-2.azl3.x86_64.rpm
 zstd-libs-1.5.5-2.azl3.x86_64.rpm
