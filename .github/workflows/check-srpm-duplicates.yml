@@ -43,7 +43,7 @@ jobs:
           for spec_folder in ${{ matrix.specs-dirs-groups }}; do
             echo "Generating specs.json for spec folder '$spec_folder'."
 
-            sudo make -C toolkit -j$(nproc) parse-specs REBUILD_TOOLS=y DAILY_BUILD_ID=lkg SPECS_DIR=../$spec_folder
+            sudo make -C toolkit -j$(nproc) parse-specs REBUILD_TOOLS=y SPECS_DIR=../$spec_folder
             cp -v build/pkg_artifacts/specs.json ${spec_folder}_specs.json
           done
 
