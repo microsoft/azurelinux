@@ -33,7 +33,7 @@ jobs:
           python-version: 3.12
 
       - name: Switch to stable toolkit
-        run: git checkout 2.0-stable -- toolkit
+        run: git fetch --all && git checkout 2.0-stable -- toolkit
 
       # Generate the specs.json files. They are the input for the duplicates check script.
       - name: Generate specs.json
