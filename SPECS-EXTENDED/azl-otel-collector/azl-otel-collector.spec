@@ -4,11 +4,10 @@ Summary:        Azure Linux OpenTelemetry Collector Distribution
 Name:           azl-otel-collector
 Version:        0.123.0
 Release:        1%{?dist}
-License:        Apache 2.0
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-# NOTE: The URL below currently points to internal repo codebase, it will later point to the github for the Azure Linux Collector.
-URL:            https://dev.azure.com/mariner-org/ECF/_git/project-runes?path=/azl-otel-collector
+URL:            https://github.com/microsoft/azl-otel-collector
 Source0:        https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/azl-otel-collector-0.123.0-3.tar.gz
 Source1:        %{name}-%{version}-vendor-1.tar.gz
 Source2:        azl-otel-collector.service
@@ -36,7 +35,7 @@ make azl-otelcol BUILDTAGS="netgo osusergo static_build" LDFLAGS="-s -w" TRIMPAT
 
 %install
 mkdir -p "%{buildroot}/%{_bindir}"
-install -D -m0755 azl-otelcol %{buildroot}/%{_bindir}
+install -D -m0755 bin/azl-otelcol %{buildroot}/%{_bindir}
 install -D -m 0644 %{SOURCE2} %{buildroot}%{_unitdir}/azl-otel-collector.service
 install -D -m 0644 config/default-config.yaml %{buildroot}%{_sysconfdir}/azl-otel-collector/config.yaml
 
@@ -54,10 +53,11 @@ install -D -m 0644 config/default-config.yaml %{buildroot}%{_sysconfdir}/azl-ote
 %dir %{_sysconfdir}/azl-otel-collector
 %{_sysconfdir}/azl-otel-collector/config.yaml
 %{_unitdir}/azl-otel-collector.service
+%license LICENSE
 
 
 
 %changelog
-* Thu Mar 27 2025 Adit Jha <aditjha@microsoft.com> - 0.123.0-1
+* Thu Apr 10 2025 Adit Jha <aditjha@microsoft.com> - 0.123.0-1
 - Original version for Azure Linux
 - License Verified
