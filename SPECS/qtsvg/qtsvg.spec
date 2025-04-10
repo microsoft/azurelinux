@@ -4,7 +4,7 @@
 Summary:        Qt6 - Support for rendering and displaying SVG
 Name:           qtsvg
 Version:        6.6.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:        GFDL AND GPLv2+ WITH exceptions AND LGPLv2.1+
 Vendor:         Microsoft Corporation
@@ -89,6 +89,9 @@ popd
 
 
 %changelog
+* Mon Apr 07 2025 Andrew Phelps <anphel@microsoft.com> - 6.6.1-2
+- Bump release to recompile with qtbase-devel-6.6.3
+
 * Tue Jan 02 2024 Sam Meluch <sammeluch@microsoft.com> - 6.6.1-1
 - Upgrade to version 6.6.1
 
