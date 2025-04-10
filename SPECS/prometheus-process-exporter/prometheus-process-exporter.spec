@@ -46,11 +46,7 @@ instrument with Prometheus. This exporter solves that issue by mining
 process metrics from procfs.
 
 %prep
-%autosetup -N -n process-exporter-%{version}
-
-rm -rf vendor
-tar -xf %{SOURCE1} --no-same-owner
-%autopatch -p1 
+%autosetup -n process-exporter-%{version} -p1 -a1
 
 %build
 LDFLAGS="-X github.com/ncabatoff/process-exporter/version.Version=%{version}      \
