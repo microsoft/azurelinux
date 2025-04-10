@@ -3,8 +3,14 @@ Distribution:   Azure Linux
 %global with_java 0
 %global with_php 0
 %global with_perl 1
+%global with_python2 0
+%global with_python3 0
 %global with_wsf 0
 %global obsolete_old_lang_subpackages 0
+%global default_sign_algo "rsa-sha1"
+%global min_hash_algo "sha1"
+%global default_sign_algo "rsa-sha256"
+%global min_hash_algo "sha256"
 
 %if %{with_php}
 %if "%{php_version}" < "5.6"
@@ -14,8 +20,18 @@ Distribution:   Azure Linux
 %endif
 %endif
 
+%global with_python3 1
+
 %global configure_args %{nil}
 %global configure_args %{configure_args}
+
+%if %{default_sign_algo}
+  %global configure_args %{configure_args} --with-default-sign-algo=%{default_sign_algo}
+%endif
+
+%if %{min_hash_algo}
+  %global configure_args %{configure_args} --with-min-hash-algo=%{min_hash_algo}
+%endif
 
 %if !%{with_java}
   %global configure_args %{configure_args} --disable-java
@@ -26,66 +42,68 @@ Distribution:   Azure Linux
 %endif
 
 %if %{with_php}
-  %global configure_args %{configure_args} --enable-php5=yes --with-php5-config-dir=%{php_inidir}
+  %global configure_args %{configure_args} --enable-php5=no --enable-php7=yes --with-php7-config-dir=%{php_inidir}
 %else
-  %global configure_args %{configure_args} --enable-php5=no
+  %global configure_args %{configure_args} --enable-php5=no --enable-php7=no
 %endif
 
 %if %{with_wsf}
   %global configure_args %{configure_args} --enable-wsf --with-sasl2=%{_prefix}/sasl2
 %endif
 
+%if !%{with_python2} && !%{with_python3}
+  %global configure_args %{configure_args} --disable-python
+%endif
+
 
 Summary: Liberty Alliance Single Sign On
 Name: lasso
-Version: 2.8.0
-Release: 1%{?dist}
-License: GPLv2+
-URL: http://lasso.entrouvert.org/
-Source: http://dev.entrouvert.org/lasso/lasso-%{version}.tar.gz
+Version: 2.8.2
+Release: 15%{?dist}
+License: GPL-2.0-or-later
+URL: https://lasso.entrouvert.org/
+Source: https://dev.entrouvert.org/lasso/lasso-%{version}.tar.gz
+
+Patch01: fix-removed-xmlsec-deprecations.patch
+Patch02: fix-openssl-implicit-declarations.patch
+Patch3: lasso-libxml2.patch
+# https://git.entrouvert.org/entrouvert/lasso/commit/253e8abe7b83d4d8f3d8dd5f886a54f4e173cc28
+Patch4: 253e8abe7b83d4d8f3d8dd5f886a54f4e173cc28.patch
+# https://git.entrouvert.org/entrouvert/lasso/commit/625bf7d9c11ec366c45514d5ec12ab1cdd8ce094
+Patch5: 625bf7d9c11ec366c45514d5ec12ab1cdd8ce094.patch
+# https://git.entrouvert.org/entrouvert/lasso/commit/3e6f9076e19368b29a932373955a5dccd2f3cc46
+Patch6: 3e6f9076e19368b29a932373955a5dccd2f3cc46.patch
+# https://dev.entrouvert.org/issues/92106
+Patch7: lasso-2.8.2-python_313.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
 BuildRequires: check-devel
+BuildRequires: gcc
 BuildRequires: glib2-devel
 BuildRequires: gtk-doc
 BuildRequires: libtool
 BuildRequires: libtool-ltdl-devel
 BuildRequires: libxml2-devel
-BuildRequires: libxslt-devel
+BuildRequires: make
 BuildRequires: openssl-devel
-BuildRequires: swig
-BuildRequires: xmlsec1-devel >= 1.2.25-4
-BuildRequires: xmlsec1-openssl-devel >= 1.2.25-4
-BuildRequires: zlib-devel
-%if %{with_java}
-BuildRequires: java-devel
-BuildRequires: jpackage-utils
-%endif
-%if %{with_perl}
-BuildRequires: perl-devel
-BuildRequires: perl-generators
-BuildRequires: perl(Error)
-BuildRequires: perl(ExtUtils::MakeMaker)
-BuildRequires: perl(strict)
-BuildRequires: perl(Test::More)
-BuildRequires: perl(warnings)
-BuildRequires: perl(XSLoader)
-%endif
-%if %{with_php}
-BuildRequires: expat-devel
-BuildRequires: php-devel
-%endif
-# The Lasso build system requires python, especially the binding generators
 BuildRequires: python3
-BuildRequires: python3-devel
-BuildRequires: python3-lxml
 BuildRequires: python3-six
+BuildRequires: (python3-setuptools if python3 >= 3.12)
+BuildRequires: swig
+BuildRequires: xmlsec1-devel
+BuildRequires: xmlsec1-openssl-devel
+BuildRequires: zlib-devel
 %if %{with_wsf}
 BuildRequires: cyrus-sasl-devel
 %endif
 
-Requires: xmlsec1 >= 1.2.25-4
+Requires: xmlsec1
+
+# lasso upstream no longer supports java bindings
+# see https://dev.entrouvert.org/issues/45876#change-289747
+# and https://dev.entrouvert.org/issues/51418
+Obsoletes: java-lasso < %{version}-%{release}
 
 %description
 Lasso is a library that implements the Liberty Alliance Single Sign On
@@ -104,7 +122,15 @@ documentation for Lasso.
 %if %{with_perl}
 %package -n perl-%{name}
 Summary: Liberty Alliance Single Sign On (lasso) Perl bindings
-Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+BuildRequires: perl-devel
+BuildRequires: perl-generators
+BuildRequires: perl-interpreter
+BuildRequires: perl(Error)
+BuildRequires: perl(ExtUtils::MakeMaker)
+BuildRequires: perl(strict)
+BuildRequires: perl(Test::More)
+BuildRequires: perl(warnings)
+BuildRequires: perl(XSLoader)
 Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description -n perl-%{name}
@@ -114,7 +140,9 @@ Perl language bindings for the lasso (Liberty Alliance Single Sign On) library.
 %if %{with_java}
 %package -n java-%{name}
 Summary: Liberty Alliance Single Sign On (lasso) Java bindings
-Requires: java
+Buildrequires: java-1.8.0-openjdk-devel
+BuildRequires: jpackage-utils
+Requires: java-headless
 Requires: jpackage-utils
 Requires: %{name}%{?_isa} = %{version}-%{release}
 %if %{obsolete_old_lang_subpackages}
@@ -130,6 +158,8 @@ Java language bindings for the lasso (Liberty Alliance Single Sign On) library.
 %if %{with_php}
 %package -n php-%{name}
 Summary: Liberty Alliance Single Sign On (lasso) PHP bindings
+BuildRequires: expat-devel
+BuildRequires: php-devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: php(zend-abi) = %{php_zend_api}
 Requires: php(api) = %{php_core_api}
@@ -139,51 +169,95 @@ PHP language bindings for the lasso (Liberty Alliance Single Sign On) library.
 
 %endif
 
+%if %{with_python2}
+%package -n python2-%{name}
+%{?python_provide:%python_provide python2-%{name}}
+Summary: Liberty Alliance Single Sign On (lasso) Python bindings
+BuildRequires: python2-devel
+
+Requires: python2
+Requires: %{name}%{?_isa} = %{version}-%{release}
+%if %{obsolete_old_lang_subpackages}
+Provides: %{name}-python = %{version}-%{release}
+Provides: %{name}-python%{?_isa} = %{version}-%{release}
+Obsoletes: %{name}-python < %{version}-%{release}
+%endif
+
+%description -n python2-%{name}
+Python language bindings for the lasso (Liberty Alliance Single Sign On)
+library.
+%endif
+
+%if %{with_python3}
 %package -n python3-%{name}
 %{?python_provide:%python_provide python3-%{name}}
 Summary: Liberty Alliance Single Sign On (lasso) Python bindings
+BuildRequires: python3-devel
+BuildRequires: python3-lxml
 Requires: python3
 Requires: %{name}%{?_isa} = %{version}-%{release}
-Provides: lasso-python = %{version}-%{release}
 
 %description -n python3-%{name}
 Python language bindings for the lasso (Liberty Alliance Single Sign On)
 library.
+%endif
 
 %prep
-%autosetup -p1
+%setup -q
+%{!?el7:%patch -P 01 -p1}
+%patch -P 02 -p1
+%patch -P 3 -p1
+%patch -P 4 -p1
+%patch -P 5 -p1
+%patch -P 6 -p1
+%patch -P 7 -p1
 
 # Remove any python script shebang lines (unless they refer to python3)
 sed -i -E -e '/^#![[:blank:]]*(\/usr\/bin\/env[[:blank:]]+python[^3]?\>)|(\/usr\/bin\/python[^3]?\>)/d' \
   `grep -r -l -E '^#![[:blank:]]*(/usr/bin/python[^3]?)|(/usr/bin/env[[:blank:]]+python[^3]?)' *`
 
 %build
-export JAVA_HOME=%{java_home}
+%{?with_java:export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk}
 ./autogen.sh
+%if 0%{?with_python2}
+  %configure %{configure_args} --with-python=%{__python2}
+  pushd lasso
+  %make_build CFLAGS="%{optflags}"
+  popd
+  pushd bindings/python
+  %make_build CFLAGS="%{optflags}"
+  make check CK_TIMEOUT_MULTIPLIER=5
+  mkdir py2
+  mv lasso.py .libs/_lasso.so py2
+  popd
+  make clean
+%endif
 
-%configure %{configure_args} --with-python=%{__python3}
+%if 0%{?with_python3}
+  %configure %{configure_args} --with-python=%{__python3}
+%else
+  %configure %{configure_args}
+%endif
 %make_build CFLAGS="%{optflags}"
 
 %check
-make check CK_TIMEOUT_MULTIPLIER=5
+make check CK_TIMEOUT_MULTIPLIER=10
 
 %install
-#install -m 755 -d %{buildroot}%{_datadir}/gtk-doc/html
-
-make install exec_prefix=%{_prefix} DESTDIR=%{buildroot}
+%make_install exec_prefix=%{_prefix}
 find %{buildroot} -type f -name '*.la' -exec rm -f {} \;
 find %{buildroot} -type f -name '*.a' -exec rm -f {} \;
+
+%if 0%{?with_python2}
+  # Install Python 2 files saved from first build
+  install -d -m 0755 %{buildroot}/%{python2_sitearch}
+  install -m 0644 bindings/python/py2/lasso.py %{buildroot}/%{python2_sitearch}
+  install -m 0755 bindings/python/py2/_lasso.so %{buildroot}/%{python2_sitearch}
+%endif
 
 # Perl subpackage
 %if %{with_perl}
 find %{buildroot} \( -name perllocal.pod -o -name .packlist \) -exec rm -v {} \;
-
-find %{buildroot}/usr/lib*/perl5 -type f -print |
-        sed "s@^%{buildroot}@@g" > %{name}-perl-filelist
-if [ "$(cat %{name}-perl-filelist)X" = "X" ] ; then
-    echo "ERROR: EMPTY FILE LIST"
-    exit -1
-fi
 %endif
 
 # PHP subpackage
@@ -199,7 +273,7 @@ fi
 %endif
 
 # Remove bogus doc files
-rm -fr %{buildroot}%{_defaultdocdir}/%{name}
+rm -fr %{buildroot}%{_docdir}/%{name}
 
 %ldconfig_scriptlets
 
@@ -214,7 +288,9 @@ rm -fr %{buildroot}%{_defaultdocdir}/%{name}
 %{_includedir}/%{name}
 
 %if %{with_perl}
-%files -n perl-%{name} -f %{name}-perl-filelist
+%files -n perl-%{name}
+%{perl_vendorarch}/Lasso.pm
+%{perl_vendorarch}/auto/Lasso/
 %endif
 
 %if %{with_java}
@@ -231,32 +307,160 @@ rm -fr %{buildroot}%{_defaultdocdir}/%{name}
 %{_datadir}/php/%{name}/lasso.php
 %endif
 
+%if %{with_python2}
+%files -n python2-%{name}
+%{python2_sitearch}/lasso.py*
+%{python2_sitearch}/_lasso.so
+%endif
+
+%if %{with_python3}
 %files -n python3-%{name}
 %{python3_sitearch}/lasso.py*
 %{python3_sitearch}/_lasso.so
 %{python3_sitearch}/__pycache__/*
+%endif
 
 %changelog
-* Mon Sep 12 2022 Muhammad Falak <mwani@microsoft.com> - 2.8.0-1
-- Bump version to 2.8.0
-- Drop un-needed patches
-- License verfied
+* Wed Feb 05 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.8.2-14
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
 
-* Wed Mar 02 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.0-25
-- Removed Python 2 bits.
-- Disabling Java subpackage as it's no needed.
-- Adding a missing BR on 'libsxlt-devel'.
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.8.2-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 2.6.0-24
-- Rename java-headless dependency to java
-- License verified
+* Thu Jun 20 2024 Xavier Bachelot <xavier@bachelot.org> - 2.8.2-13
+- Spec file cleanup:
+  - Fix changelog entry date to restore chronological order
+  - Convert License to SPDX
+  - Don't set JAVA_HOME when not building java bindings
+  - Explicitely list perl sub-package files
+  - make is always needed
+  - Simplify conditionals
+  - fix-removed-xmlsec-deprecations.patch is not suitable for EL7
+  - python interpreter is always needed to build
+  - BuildRequires gcc
+  - BuildRequires perl-interpreter for perl bindings
+  - Use %%make_build
+  - Use %%make_install
+  - Drop spurious comment
+  - Use %%_docdir instead of %%_defaultdocdir
+- Make use of --with-min-hash-algo
+- Add several upstream patches to fix build with GCC 14
+- Add patch to fix python binding tests with python 3.13 (RHBZ#2256949)
 
-* Wed Jul 14 2021 Muhammad Falak Wani <mwani@microsoft.com> - 2.6.0-23
-- Add explict provides 'lasso-python'
+* Tue Jun 18 2024 Python Maint <python-maint@redhat.com> - 2.8.2-12
+- Rebuilt for Python 3.13
 
-* Thu Mar 18 2021 Henry Li <lihl@microsoft.com> - 2.6.0-22
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Fix condition check to enable python3 build
+* Wed Jun 12 2024 Jitka Plesnikova <jplesnik@redhat.com> - 2.8.2-11
+- Perl 5.40 rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 2.8.2-10
+- Rebuilt for Python 3.13
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.8.2-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Florian Weimer <fweimer@redhat.com> - 2.8.2-8
+- libxml2 2.12 fix for incompatible-pointer-types errors
+- Add conditional BuildRequires: on python3-setuptools for unbundled distutils
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.8.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.8.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 2.8.2-5
+- Perl 5.38 rebuild
+
+* Wed Jun 28 2023 Python Maint <python-maint@redhat.com> - 2.8.2-4
+- Rebuilt for Python 3.12
+
+* Tue Jun 27 2023 Francois Andrieu <darknao@fedoraproject.org> - 2.8.2-3
+- Set default signing algorithm to RSA-SHA256
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 2.8.2-2
+- Rebuilt for Python 3.12
+
+* Thu Mar 30 2023 Xavier Bachelot <xavier@bachelot.org> - 2.8.2-1
+- Update to 2.8.2
+- Disable PHP bindings for PHP8, which is not supported yet
+
+* Thu Mar 09 2023 Xavier Bachelot <xavier@bachelot.org> - 2.8.1-1
+- Update to 2.8.1 (fixes RHBZ#2142849)
+- Enable php bindings
+- Update URL: and Source: tags to https
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.0-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 2.7.0-8
+- Rebuilt for Python 3.11
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.7.0-7
+- Perl 5.36 rebuild
+
+* Sat Feb 05 2022 Jiri Vanek <jvanek@redhat.com> - 2.7.0-6
+- Rebuilt for java-17-openjdk as system jdk
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 2.7.0-4
+- Rebuilt with OpenSSL 3.0.0
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.7.0-2
+- Rebuilt for Python 3.10
+
+* Wed Jun  2 2021 Jakub Hrozek <jhrozek@redhat.com> - 2.7.0
+- Lasso 2.7.0
+- https://listes.entrouvert.com/arc/lasso/2021-06/msg00000.html
+- don't package java bindings as they are not maintained upstream
+  anymore and there seem to be no users
+- Resolves: rhbz#1966607 - CVE-2021-28091 lasso: XML signature wrapping
+                           vulnerability when parsing SAML responses
+
+* Sun May 23 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.6.1-9
+- Perl 5.34 rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Aug 13 2020 Jakub Hrozek <jhrozek@redhat.com> - 2.6.1-7
+- Temporarily build with OpenJDK 8
+- upstream ticket for OpenJDK11 support: https://dev.entrouvert.org/issues/45876
+
+* Fri Aug 07 2020 Jeff Law <law@redhat.com> - 2.6.1-6
+- Revert last change.  I lost the patchfile and I can't reproduce the gcc-11
+  problem which almost certainly prompted it
+
+* Fri Aug 07 2020 Jeff Law <law@redhat.com> - 2.6.1-5
+- Fix format string problem
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.1-4
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jul 10 2020 Jiri Vanek <jvanek@redhat.com> - 2.6.1-2
+- Rebuilt for JDK-11, see https://fedoraproject.org/wiki/Changes/Java11
+
+* Fri Jul 03 2020 Xavier Bachelot <xavier@bachelot.org> - 2.6.1-1
+- Update to 2.6.1
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.6.0-23
+- Perl 5.32 rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 2.6.0-22
+- Rebuilt for Python 3.9
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.0-21
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
