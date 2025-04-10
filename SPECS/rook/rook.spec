@@ -19,7 +19,7 @@
 Summary:        Orchestrator for distributed storage systems in cloud-native environments
 Name:           rook
 Version:        1.6.2
-Release:        23%{?dist}
+Release:        25%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -59,6 +59,8 @@ Patch2:         CVE-2023-44487.patch
 Patch3:         CVE-2021-44716.patch
 Patch4:         CVE-2024-6104.patch
 Patch5:         CVE-2024-28180.patch
+Patch6:         CVE-2022-3162.patch
+Patch7:         CVE-2025-27144.patch
 # Ceph version is needed to set correct container tag in manifests
 BuildRequires:  ceph
 # Rook requirements
@@ -257,6 +259,12 @@ sed -i -e "s|\(.*tag: \)VERSION|\1%{helm_appVersion}|" %{values_yaml}
 # bother adding docs or changelog or anything
 
 %changelog
+* Sun Mar 16 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.6.2-25
+- Fix CVE-2025-27144 with an upstream patch
+
+* Fri Feb 28 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.6.2-24
+- Add patch for CVE-2022-3162
+
 * Wed Jan 29 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.6.2-23
 - Fix CVE-2024-28180 with an upstream patch
 
