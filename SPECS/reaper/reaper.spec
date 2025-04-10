@@ -6,7 +6,7 @@
 Summary:        Reaper for cassandra is a tool for running Apache Cassandra repairs against single or multi-site clusters.
 Name:           reaper
 Version:        3.1.1
-Release:        16%{?dist}
+Release:        18%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,8 @@ Patch11:        CVE-2024-21538.patch
 Patch12:        CVE-2020-28458.patch
 Patch13:        CVE-2024-52798.patch
 Patch14:        CVE-2020-24025.patch
+Patch15:        CVE-2024-28863.patch
+Patch16:        CVE-2024-12905.patch
 
 BuildRequires:  git
 BuildRequires:  javapackages-tools
@@ -102,11 +104,17 @@ ln -sf ../lib/node_modules/npm/bin/npm-cli.js bin/npm
 ln -sf ../lib/node_modules/npm/bin/npx-cli.js bin/npx
 
 cp n/versions/node/14.18.0/bin/node bin
-
-ls -al
 popd
 
-%autopatch -p1
+%autopatch -p1 -M 14
+
+pushd $tmp_local_dir/lib/node_modules/
+%autopatch -p1 15
+popd
+pushd $tmp_local_dir/n/versions/node/14.18.0/lib/node_modules/
+%autopatch -p1 15
+popd
+%autopatch -p1 16
 
 rsync -azvhr $tmp_local_dir/ "%{_prefix}/local"
 rm -rf $tmp_local_dir
@@ -184,6 +192,12 @@ fi
 %{_unitdir}/cassandra-%{name}.service
 
 %changelog
+* Fri Apr 04 2025 Sandeep Karambelkar (skarambelkar@microsoft.com> - 3.1.1-18
+- Add patch to fix CVE-2024-12905
+
+* Thu Mar 13 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.1.1-17
+- Patch CVE-2024-28863
+
 * Mon Feb 17 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.1.1-16
 - Patch CVE-2020-24025 and CVE-2024-52798 
 
@@ -194,7 +208,7 @@ fi
 * Fri Oct 18 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.1.1-14
 - Patch CVE-2024-45590 in body-parser module
 
-* Thu Oct 15 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.1.1-13
+* Thu Oct 17 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.1.1-13
 - CVE-2024-45296: upgrade path-to-regexp from 0.1.7 to 1.1.11 in reaper-srcui-node-modules
 - CVE-2024-43799: patch send in reaper-srcui-node-modules
 - CVE-2024-43800: patch serve-static in reaper-srcui-node-modules
