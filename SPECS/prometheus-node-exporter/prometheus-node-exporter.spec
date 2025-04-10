@@ -46,12 +46,7 @@ Prometheus exporter for hardware and OS metrics exposed by *NIX kernels, written
 in Go with pluggable metric collectors.
 
 %prep
-%autosetup -N -n node_exporter-%{version}
-%patch 0 -p1
-
-rm -rf vendor
-tar -xf %{SOURCE1} --no-same-owner
-%autopatch -p1 -m1
+%autosetup -n node_exporter-%{version} -p1 -a1
 
 %build
 export BUILDTAGS="netgo osusergo static_build"
