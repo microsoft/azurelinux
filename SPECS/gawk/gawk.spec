@@ -46,9 +46,6 @@ sed -i 's/ pty1 / /' test/Makefile
 %{_sbindir}/locale-gen.sh
 make %{?_smp_mflags} check
 
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
-
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license COPYING
