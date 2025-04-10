@@ -12,11 +12,8 @@ ExclusiveArch:  x86_64
 
 Requires:       ca-certificates
 Requires:       chrony
-# Required for confidential storage functionality
 Requires:       cryptsetup
 Requires:       dbus
-# Required for confidential storage functionality
-Requires:       e2fsprogs
 Requires:       elfutils-libelf
 Requires:       filesystem
 Requires:       iptables
