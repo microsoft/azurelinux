@@ -1,0 +1,30 @@
+From 3051162fefef9af9f274266a2ad9d5d612d50ccc Mon Sep 17 00:00:00 2001
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+Date: Fri, 14 Feb 2025 14:24:07 +0800
+Subject: [PATCH 7/7] erofs-utils: lib: shorten EROFS_FRAGMENT_INMEM_SZ_MAX
+
+EROFS_CONFIG_COMPR_MAX_SZ (currently 4MiB) is too large and could
+cause OOM kills on small setups.
+
+Signed-off-by: Gao Xiang <hsiangkao@linux.alibaba.com>
+Link: https://lore.kernel.org/r/20250214062407.3281416-3-hsiangkao@linux.alibaba.com
+---
+ lib/fragments.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/fragments.c b/lib/fragments.c
+index a4311b1..e22b773 100644
+--- a/lib/fragments.c
++++ b/lib/fragments.c
+@@ -31,7 +31,7 @@ struct erofs_fragment_dedupe_item {
+ 	u8			data[];
+ };
+ 
+-#define EROFS_FRAGMENT_INMEM_SZ_MAX	EROFS_CONFIG_COMPR_MAX_SZ
++#define EROFS_FRAGMENT_INMEM_SZ_MAX	(256 * 1024)
+ #define EROFS_TOF_HASHLEN		16
+ 
+ #define FRAGMENT_HASHSIZE		65536
+-- 
+2.48.1
+
