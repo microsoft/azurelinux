@@ -49,7 +49,8 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %files
 %defattr(-,root,root,-)
 %license LICENSE
-%doc NOTICE README.md
+%license NOTICE
+%doc README.md
 %{_bindir}/blobfuse2
 %{_bindir}/%{blobfuse2_health_monitor}
 %{_datadir}/blobfuse2/baseConfig.yaml
