@@ -3,7 +3,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.21
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -60,8 +60,8 @@ The etcd-tools package contains the etcd-dump-db and etcd-dump-logs diagnostic
 tools.
 
 %prep
-%autosetup -N -p1
-tar --no-same-owner -xf %{SOURCE2}
+# -N option tells %autosetup not to apply patches automatically
+%autosetup -N -a2
 
 %build
 %define ETCD_OUT_DIR %{_builddir}/%{name}-%{version}/bin
@@ -145,6 +145,9 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Thu Apr 10 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.5.21-2
+- Fix extraction command in prep
+
 * Sun Mar 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.21-1
 - Auto-upgrade to 3.5.21 - for CVE-2025-30204 [High]
 
