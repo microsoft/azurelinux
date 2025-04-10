@@ -3338,8 +3338,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "26.2.5.9",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.9/otp-OTP-26.2.5.9.tar.gz"
+          "version": "26.2.5.10",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.10/otp-OTP-26.2.5.10.tar.gz"
         }
       }
     },
@@ -3378,8 +3378,8 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.5.18",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.18.tar.gz"
+          "version": "3.5.21",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.21.tar.gz"
         }
       }
     },
