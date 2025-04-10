@@ -54,6 +54,7 @@ Patch15:        CVE-2021-28361.patch
 %bcond_with make_check
 %bcond_with mgr_diskprediction
 %bcond_with ocf
+# WITH_SEASTAR is explicitly disabled to prevent numerous vendored CVEs
 %bcond_with seastar
 %bcond_with selinux
 %bcond_without tcmalloc
@@ -973,7 +974,6 @@ env | sort
 mkdir build
 cd build
 CMAKE=cmake
-# WITH_SEASTAR is explicitly disabled to prevent numerous vendored CVEs
 ${CMAKE} .. \
     -DCMAKE_INSTALL_PREFIX=%{_prefix} \
     -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
