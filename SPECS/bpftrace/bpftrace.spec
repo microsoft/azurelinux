@@ -23,7 +23,6 @@ BuildRequires:  libbpf-devel
 BuildRequires:  libpcap-devel
 BuildRequires:  llvm-devel >= 18
 BuildRequires:  make
-BuildRequires:  systemtap-sdt-devel
 BuildRequires:  vim-extra
 BuildRequires:  zlib-devel
 Requires:       bcc
