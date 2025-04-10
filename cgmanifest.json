@@ -8732,7 +8732,7 @@
         "other": {
           "name": "ledmon",
           "version": "1.0.0",
-          "downloadUrl": "https://github.com/intel/ledmon/archive/v1.0.0/ledmon-1.0.0.tar.gz"
+          "downloadUrl": "https://github.com/intel/ledmon/archive/v1.1.0/ledmon-1.1.0.tar.gz"
         }
       }
     },
