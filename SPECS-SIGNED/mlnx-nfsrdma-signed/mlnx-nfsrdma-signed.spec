@@ -43,7 +43,7 @@
 Summary:	 %{_name} Driver
 Name:		 %{_name}
 Version:	 24.10
-Release:	 14%{?dist}
+Release:	 15%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -111,6 +111,9 @@ fi
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{name}-*.conf
 
 %changelog
+* Thu Apr 10 2025 Muhammad Falak R Wani <mwani@microsoft.com> - 24.10-15
+- Bump release to rebuild for new kernel release
+
 * Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-14
 - Bump release to rebuild for new kernel release
 
