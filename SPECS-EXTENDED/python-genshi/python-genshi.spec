@@ -55,10 +55,19 @@ find examples -type f | xargs chmod a-x
 sed -i -e '/\/tests/d' %{pyproject_files}
 sed -i -e '/_speedups.c/d' %{pyproject_files}
 
+%check
+%pytest
+ 
+%files -n python3-genshi -f %{pyproject_files}
+%{python3_sitearch}/genshi/_speedups.*.so
+%exclude %{python3_sitearch}/genshi/{_speedups.c,tests}
+%exclude %{python3_sitearch}/genshi/{filters,template}/tests
+# COPYING file already listed in {pyproject_files}
+%doc ChangeLog doc examples README.md
 
 %changelog
-* Sat Feb 22 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.7.3-1
-- Upgrade to version 1.7.3
+* Sat Feb 22 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.7.9-1
+- Upgrade to version 0.7.9
 - License verified
 
 * Wed Mar 24 2021 Henry Li <lihl@microsoft.com> - 0.7.5-4
