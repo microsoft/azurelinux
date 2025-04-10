@@ -1,7 +1,7 @@
 Summary:        Contains programs for manipulating text files
 Name:           gawk
 Version:        5.2.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
