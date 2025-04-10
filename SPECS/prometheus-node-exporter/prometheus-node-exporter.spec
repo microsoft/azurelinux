@@ -51,7 +51,7 @@ in Go with pluggable metric collectors.
 
 rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
-%patch 1 -p1
+%autopatch -p1 -m1
 
 %build
 export BUILDTAGS="netgo osusergo static_build"
