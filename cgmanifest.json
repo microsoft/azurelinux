@@ -27154,8 +27154,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-puppet-resource_api",
-          "version": "1.8.14",
-          "downloadUrl": "https://github.com/puppetlabs/puppet-resource_api/archive/refs/tags/v1.8.14.tar.gz"
+          "version": "1.8.18",
+          "downloadUrl": "https://rubygems.org/gems/puppet-resource_api-1.8.18.gem"
         }
       }
     },
