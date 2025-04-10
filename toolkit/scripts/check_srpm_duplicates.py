@@ -58,10 +58,10 @@ if __name__ == "__main__":
     if srpm_duplicates:
         print("Error: detected specs building the same SRPM.", file=sys.stderr)
         for srpm, specs_paths in srpm_duplicates:
-            print(f"{srpm}:")
+            print(f"{srpm}:", file=sys.stderr)
             for spec_path in specs_paths:
-                print(f"  - {spec_path}")
-            print()
+                print(f"  - {spec_path}", file=sys.stderr)
+            print(file=sys.stderr)
         sys.exit(1)
 
     print("No SRPM duplicates found.")
