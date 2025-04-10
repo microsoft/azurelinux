@@ -1,16 +1,16 @@
 # The function of bootstrap is that it disables the wheel subpackage
 %bcond_with bootstrap
-%bcond main_python 1
+%bcond_without main_python
+%global pypi_name wheel
 Summary:        Built-package format for Python
 Name:           python-%{pypi_name}
 Version:        0.43.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/pypa/wheel
 Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
-%global pypi_name wheel
 %global python_wheel_name %{pypi_name}-%{version}-py3-none-any.whl
 %global python_wheeldir %{_datadir}/python-wheels
 %global _description \
@@ -115,6 +115,9 @@ pip3 install iniconfig
 %endif
 
 %changelog
+* Thu Jan 16 2025 Sam Meluch <sammeluch@microsoft.com> - 0.43.0-2
+- Change bcond to bcond_without for ubuntu build compat
+
 * Fri May 10 2024 Betty Lakes <bettylakes@microsoft.com> - 0.43.0-1
 - Updated to 0.43.0
 
