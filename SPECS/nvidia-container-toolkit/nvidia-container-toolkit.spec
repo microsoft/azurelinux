@@ -2,7 +2,7 @@
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
 Version:        1.17.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -52,8 +52,7 @@ Conflicts: nvidia-container-toolkit <= 1.10.0-1
 Provides tools such as the NVIDIA Container Runtime and NVIDIA Container Toolkit CLI to enable GPU support in containers.
 
 %prep
-%autosetup -p1
-tar -xvf %{SOURCE1}
+%autosetup -p1 -a1
 
 %build
 go build -ldflags "-s -w " -o "nvidia-container-runtime-hook" ./cmd/nvidia-container-runtime-hook
@@ -88,6 +87,9 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %{_bindir}/nvidia-cdi-hook
 
 %changelog
+* Thu Apr 10 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.17.4-3
+- Removed extraction command from prep
+
 * Fri Mar 07 2025 Jon Slobodzian <joslobo@microsoft.com> - 1.17.4-2
 - Changing nvidia-container-toolkit to use latest golang before 1.24 as this will not compile without it.
 
