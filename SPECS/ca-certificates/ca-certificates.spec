@@ -255,7 +255,7 @@ local old_to_new_dir = {
   ["/etc/pki/ca-trust/source/blacklist"] = "%{high_pri_source_dir}/blocklist",
 }
 
-for old_dir, link_path in ipairs(old_paths) do
+for old_dir, link_path in pairs(old_paths) do
   st = posix.stat(link_path)
   if st and st.type == "link" then
     os.remove(link_path)
