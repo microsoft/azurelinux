@@ -1,7 +1,7 @@
 Summary:        Cross-platform, Python-agnostic binary package manager
 Name:           conda
 Version:        24.3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause AND Apache-2.0
 # The conda code is BSD-3-Clause
 # adapters/ftp.py is Apache-2.0
@@ -108,6 +108,7 @@ Requires:       python3-conda-package-streaming
 Requires:       python3-jsonpatch
 Requires:       python3-menuinst
 Requires:       python3-platformdirs
+Requires:       python3-pluggy
 
 # Some versions in conda/_vendor/vendor.txt
 Provides:       bundled(python%{python3_pkgversion}-appdirs) = 1.2.0
@@ -444,6 +445,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 %{_datadir}/conda/condarc.d/
 
 %changelog
+* Fri April 11 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-2
+- Add missing python3-pluggy package 
+- Add libmambapy package
+
 * Wed Feb 26 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-1
 - Auto-upgrade to 24.3.0 - fixes subprocess_call when stdin is bytes
 - Add missing runtime dependencies archspec, boltons, menuinst, and conda-package-streaming 
