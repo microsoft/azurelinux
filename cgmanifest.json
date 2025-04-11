@@ -12051,8 +12051,8 @@
         "type": "other",
         "other": {
           "name": "libXScrnSaver",
-          "version": "1.2.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXScrnSaver-1.2.3.tar.bz2"
+          "version": "1.2.4",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXScrnSaver-1.2.4.tar.xz"
         }
       }
     },
