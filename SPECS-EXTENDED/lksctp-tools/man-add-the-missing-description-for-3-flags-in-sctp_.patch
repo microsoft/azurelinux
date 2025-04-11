@@ -1,0 +1,52 @@
+From d680721b59b5533f776705ad10f1265302f70103 Mon Sep 17 00:00:00 2001
+From: Xin Long <lucien.xin@gmail.com>
+Date: Mon, 27 Feb 2023 12:57:49 -0500
+Subject: [PATCH 1/6] man: add the missing description for 3 flags in
+ sctp_sendmsg.3
+
+This patch is to add the missing description for 3 flags:
+SCTP_SENDALL, SCTP_SACK_IMMEDIATELY and SCTP_PR_SCTP_{TTL|RTX|PRIO}.
+which have been supported in kernel for a long time.
+
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ man/sctp_sendmsg.3 | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/man/sctp_sendmsg.3 b/man/sctp_sendmsg.3
+index 51828fb..3e57131 100644
+--- a/man/sctp_sendmsg.3
++++ b/man/sctp_sendmsg.3
+@@ -57,11 +57,28 @@ information of this error cause is provided in
+ .B SCTP_EOF
+ Setting this flag invokes the SCTP graceful shutdown procedure on the specific
+ association(one-to-many style only).
++.TP
++.B SCTP_SENDALL
++This flag, if set, will cause a one-to-many style socket to send the message
++to all associations that are currently established on this socket. For the
++one-to-one style socket, this flag has no effect.
++.TP
++.B SCTP_SACK_IMMEDIATELY
++This flag allows the application to set the I bit of the last DATA chunk when
++sending each user message to make sure the corresponding SACK can be sent by
++peer without delay.
++.TP
++.B SCTP_PR_SCTP_{TTL|RTX|PRIO}
++One of these 3 pr_policies can be used through this flag with its pr_value
++set in timetolive parameter for this message. Note that
++.B sctp_sendv(3)
++with infotype SCTP_SENDV_PRINFO also works for PR-SCTP.
+ .PP
+ .I timetolive
+ specifies the time duration in milliseconds. The sending side will expire the
+ message if the message has not been sent to the peer within this time period.
+-A value of 0 indicates that no timeout should occur on this message. 
++A value of 0 indicates that no timeout should occur on this message. It also
++works as the pr_value if flags parameter is set to pr_policy.
+ .I ppid
+ is an opaque unsigned value that is passed to the remote end along with the
+ message.
+-- 
+2.39.1
+
