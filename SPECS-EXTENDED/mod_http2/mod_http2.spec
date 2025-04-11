@@ -54,7 +54,7 @@ echo "LoadModule proxy_http2_module modules/mod_proxy_http2.so" > %{buildroot}%{
 %{_httpd_moddir}/mod_proxy_http2.so
 
 %changelog
-* Wed Mar 12 2025 <v-guakhila@microsoft.com> - 2.0.29-3
+* Wed Mar 12 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.0.29-3
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
