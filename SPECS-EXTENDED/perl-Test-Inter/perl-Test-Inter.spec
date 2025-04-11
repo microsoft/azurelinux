@@ -1,15 +1,12 @@
-Name:           perl-Test-Inter
-Version:        1.09
-Release:        5%{?dist}
-Summary:        Framework for more readable interactive test scripts
-License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name:           perl-Test-Inter
+Version:        1.11
+Release:        3%{?dist}
+Summary:        Framework for more readable interactive test scripts
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Inter
 Source0:        https://cpan.metacpan.org/authors/id/S/SB/SBECK/Test-Inter-%{version}.tar.gz#/perl-Test-Inter-%{version}.tar.gz
-# Remove dependencies on release tests that are skipped, proposed to upstream,
-# <https://github.com/SBECK-github/Test-Inter/pull/3>
-Patch0:         Test-Inter-1.09-Do-not-require-release-test-dependencies.patch
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
@@ -39,10 +36,23 @@ This is another framework for writing test scripts. It is loosely inspired
 by Test::More, and has most of it's functionality, but it is not a drop-in
 replacement.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{version}-%{release}
+Requires:       perl-Test-Harness
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n Test-Inter-%{version}
-%patch 0 -p1
 chmod -x examples/*
+# Help generators to recognize Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!\s*perl}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
@@ -50,7 +60,18 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 
 %install
 %{make_install}
-%{_fixperms} $RPM_BUILD_ROOT/*
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+rm -f %{buildroot}%{_libexecdir}/%{name}/t/_*
+# Directory for libraries used in tests
+mkdir %{buildroot}%{_libexecdir}/%{name}/lib
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+cd %{_libexecdir}/%{name} && exec prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
+%{_fixperms} %{buildroot}/*
 
 %check
 unset RELEASE_TESTING TI_END TI_MODE TI_NOCLEAN TI_QUIET TI_START TI_TESTNUM \
@@ -63,9 +84,63 @@ make test
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
+%files tests
+%{_libexecdir}/%{name}
+
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.09-5
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Dec 19 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.11-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.11-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Feb 29 2024 Michal Josef Špaček <mspacek@redhat.com> - 1.11-1
+- 1.11 bump
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.10-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.10-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Mar 09 2023 Michal Josef Špaček <mspacek@redhat.com> - 1.10-1
+- 1.10 bump
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.09-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Dec 07 2022 Michal Josef Špaček <mspacek@redhat.com> - 1.09-13
+- Package tests
+- Update license to SPDX format
+- Use macros instead of variables
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.09-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.09-11
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.09-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.09-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.09-8
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.09-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.09-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.09-5
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.09-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
