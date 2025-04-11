@@ -141,6 +141,7 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} ./botan-test
 %changelog
 * wed nov 5 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 2.19.5-1
 - Upgrade to version 2.19.5
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.14.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
