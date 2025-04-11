@@ -1,11 +1,11 @@
 diff --git a/src/container/cstring_view.h b/src/container/cstring_view.h
-index 2e1c46020320..15eb6112be37 100644
+index 5731d817..5ff68c17 100644
 --- a/src/container/cstring_view.h
 +++ b/src/container/cstring_view.h
-@@ -24,7 +24,7 @@ class cstring_view : public std::string_view {
-       : std::string_view{ str }
+@@ -27,7 +27,7 @@ public:
    {
    }
+
 -  constexpr const char *c_str() const noexcept
 +  constexpr const_pointer c_str() const noexcept
    {
