@@ -13,7 +13,7 @@ _SPEC_PATH_KEY = "SpecPath"
 _SRPM_PATH_KEY = "SrpmPath"
 
 
-def find_srpm_duplicates(specs_file_paths: list[str]) -> bool:
+def find_srpm_duplicates(specs_file_paths: list[str]) -> list[tuple[str, set[str]]]:
     """
     Analyze multiple specs JSON files to find specs producing the same SRPM.
     """
