@@ -27363,6 +27363,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-sys-filesystem",
+          "version": "1.4.3",
+          "downloadUrl": "https://github.com/djberg96/sys-filesystem/archive/refs/tags/sys-filesystem-1.4.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-systemd-journal",
           "version": "1.4.2",
           "downloadUrl": "https://github.com/ledbettj/systemd-journal/archive/refs/tags/v1.4.2.tar.gz"
