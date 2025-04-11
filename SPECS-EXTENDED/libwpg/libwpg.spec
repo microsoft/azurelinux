@@ -8,7 +8,7 @@ License:        LGPL-2.1-or-later OR MPL-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://libwpg.sourceforge.net/
-Source0:        https://download.sourceforge.net/libwpg/%{name}-%{version}.tar.xz
+Source0:        https://downloads.sourceforge.net/libwpg/%{name}-%{version}.tar.xz
 BuildRequires:  boost-devel
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
