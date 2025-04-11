@@ -1,0 +1,13 @@
+diff --git a/tests/semantic_analyser.cpp b/tests/semantic_analyser.cpp
+index c62cca67..e25554dd 100644
+--- a/tests/semantic_analyser.cpp
++++ b/tests/semantic_analyser.cpp
+@@ -2603,7 +2603,7 @@ TEST(semantic_analyser, signal)
+   BPFtrace bpftrace;
+   bpftrace.add_param("1");
+   bpftrace.add_param("hello");
+-  test(bpftrace, "k:f { signal($1) }", false);
++  test(bpftrace, "k:f { signal($1) }", 0, false);
+   test(bpftrace, "k:f { signal($2) }", 1, false);
+ }
+ 
