@@ -1,7 +1,7 @@
 Summary:        TIFF libraries and associated utilities.
 Name:           libtiff
 Version:        4.6.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        libtiff
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
