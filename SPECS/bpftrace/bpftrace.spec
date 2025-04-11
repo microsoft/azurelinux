@@ -9,6 +9,7 @@ Group:          Applications/System
 URL:            https://github.com/bpftrace/bpftrace
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         fix-cstring-null-termination-check.patch
+Patch1:         fix-semantic-analyser-signal-test.patch
 BuildRequires:  bcc-devel
 BuildRequires:  binutils-devel
 BuildRequires:  bison
