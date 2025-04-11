@@ -24,14 +24,14 @@ def find_srpm_duplicates(specs_file_paths: list[str]) -> list[tuple[str, set[str
             data = json.load(f)
 
         if _REPO_KEY not in data:
-            raise Exception(
+            raise ValueError(
                 f"Invalid JSON format in {specs_file_path}. Expected '{_REPO_KEY}' key."
             )
 
         # Process each item in the repo
         for item in data["Repo"]:
             if _SRPM_PATH_KEY not in item or _SPEC_PATH_KEY not in item:
-                raise Exception(
+                raise ValueError(
                     f"Invalid JSON format in {specs_file_path}. Expected '{_SPEC_PATH_KEY}' and '{_SRPM_PATH_KEY}' keys in each element of '{_REPO_KEY}'."
                 )
 
