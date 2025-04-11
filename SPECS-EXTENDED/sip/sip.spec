@@ -11,7 +11,6 @@ Distribution:   Azure Linux
 
 %global PYINCLUDE %{_includedir}/python%{python3_version}
 
-
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 # trim changelog included in binary rpms
@@ -20,14 +19,22 @@ Distribution:   Azure Linux
 # see also https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/JQQ66XJSIT2FGTK2YQY7AXMEH5IXMPUX/
 %undefine _strict_symbol_defs_build
 
+# provide non-namespace python modules
+# needed by at least some legacy/non-qt consumers, e.g. pykde4
+
+# Stop building siplib for wx on F34+
+%global wx_siplib 0
+
+%global pyqt5_sip 0
+
 Summary: SIP - Python/C++ Bindings Generator
 Name: sip
-Version: 4.19.21
-Release: 2%{?dist}
+Version: 4.19.25
+Release: 13%{?dist}
 
 # sipgen/parser.{c.h} is GPLv3+ with exceptions (bison)
-License: GPLv2 or GPLv3 and (GPLv3+ with exceptions)
-Url: http://www.riverbankcomputing.com/software/sip/intro 
+License: GPL-2.0-or-later OR GPL-3.0-or-later AND (GPL-3.0-or-later with exceptions)
+Url: https://www.riverbankcomputing.com/software
 Source0: https://www.riverbankcomputing.com/static/Downloads/sip/%{version}/sip-%{version}%{?snap:.%{snap}}.tar.gz
 
 Source10: sip-wrapper.sh
@@ -44,6 +51,10 @@ Patch51: sip-4.18-no_rpath.patch
 #Patch52: sip-4.19.3-python3_sip_bin.patch
 # Avoid hardcoding sip.so (needed for wxpython's siplib.so)
 Patch53: sip-4.19.18-no_hardcode_sip_so.patch
+# Recognize the py_ssize_t_clean directive to avoid FTBFS with PyQt 5.15.6
+Patch54: sip-4.19.25-py_ssize_t_clean.patch
+# Fix error: invalid use of undefined type 'struct _frame' 
+Patch55: sip-4.19.25-pyframe_getback.patch
 
 # extracted from sip.h, SIP_API_MAJOR_NR SIP_API_MINOR_NR defines
 Source1: macros.sip
@@ -51,8 +62,13 @@ Source1: macros.sip
 %global _sip_api_minor 7
 %global _sip_api %{_sip_api_major}.%{_sip_api_minor}
 
+BuildRequires: make
 BuildRequires: gcc-c++
 BuildRequires: sed
+BuildRequires: bison
+BuildRequires: flex
+
+BuildRequires: python-setuptools
 
 Obsoletes: sip-macros < %{version}-%{release}
 Provides:  sip-macros = %{version}-%{release}
@@ -75,6 +91,13 @@ libraries. However, SIP can be used to generate Python bindings for any C++\
 class library.
 
 %description %_description
+
+%package doc
+Summary: Documentation for %summary
+BuildArch: noarch
+%description doc
+This package contains HTML documentation for SIP.
+%_description
 
 %if %{with python2}
 %if 0%{?no_namespace}
@@ -152,6 +175,7 @@ Provides: python%{python3_pkgversion}-pyqt4-sip-api(%{_sip_api_major})%{?_isa} =
 %description -n python%{python3_pkgversion}-pyqt4-sip
 This is the Python 3 build of pyqt4-SIP.
 
+%if %{?pyqt5_sip}
 %package -n python%{python3_pkgversion}-pyqt5-sip
 Summary: SIP - Python 3/C++ Bindings Generator for pyqt5
 BuildRequires: python%{python3_pkgversion}-devel
@@ -159,7 +183,9 @@ Provides: python%{python3_pkgversion}-pyqt5-sip-api(%{_sip_api_major}) = %{_sip_
 Provides: python%{python3_pkgversion}-pyqt5-sip-api(%{_sip_api_major})%{?_isa} = %{_sip_api}
 %description -n python%{python3_pkgversion}-pyqt5-sip
 This is the Python 3 build of pyqt5-SIP.
+%endif
 
+%if %{?wx_siplib}
 %package -n python%{python3_pkgversion}-wx-siplib
 Summary: SIP - Python 3/C++ Bindings Generator for wx
 BuildRequires: python%{python3_pkgversion}-devel
@@ -167,6 +193,7 @@ Provides: python%{python3_pkgversion}-wx-siplib-api(%{_sip_api_major}) = %{_sip_
 Provides: python%{python3_pkgversion}-wx-siplib-api(%{_sip_api_major})%{?_isa} = %{_sip_api}
 %description -n python%{python3_pkgversion}-wx-siplib
 This is the Python 3 build of wx-siplib.
+%endif
 
 %_description
 
@@ -177,12 +204,16 @@ This is the Python 3 build of wx-siplib.
 
 %setup -q -n %{name}-%{version}%{?snap:.%{snap}}
 
-%patch 50 -p1 -b .no_strip
-%patch 51 -p1 -b .no_rpath
-%patch 53 -p1 -b .no_sip_so
+%patch -P50 -p1 -b .no_strip
+%patch -P51 -p1 -b .no_rpath
+%patch -P53 -p1 -b .no_sip_so
+%patch -P54 -p1 -b .py_ssize_t_clean
+%patch -P55 -p1 -b .pyframe_getback
 
 
 %build
+flex --outfile=sipgen/lexer.c sipgen/metasrc/lexer.l
+bison --yacc --defines=sipgen/parser.h --output=sipgen/parser.c sipgen/metasrc/parser.y
 %if %{with python2}
 %if 0%{?no_namespace}
 mkdir %{_target_platform}-python2
@@ -250,6 +281,7 @@ pushd %{_target_platform}-python3-pyqt4
 %make_build
 popd
 
+%if %{?pyqt5_sip}
 mkdir %{_target_platform}-python3-pyqt5
 pushd %{_target_platform}-python3-pyqt5
 %{__python3} ../configure.py \
@@ -259,7 +291,9 @@ pushd %{_target_platform}-python3-pyqt5
 
 %make_build
 popd
+%endif
 
+%if %{?wx_siplib}
 sed -i -e 's|target = sip|target = siplib|g' siplib/siplib.sbf
 mkdir %{_target_platform}-python3-wx
 pushd %{_target_platform}-python3-wx
@@ -271,6 +305,7 @@ pushd %{_target_platform}-python3-wx
 %make_build
 popd
 sed -i -e 's|target = siplib|target = sip|g' siplib/siplib.sbf
+%endif
 
 %endif
 
@@ -283,9 +318,13 @@ sed -i -e 's|target = siplib|target = sip|g' siplib/siplib.sbf
 %make_install -C %{_target_platform}-python3
 %endif
 %make_install -C %{_target_platform}-python3-pyqt4
+%if %{?pyqt5_sip}
 %make_install -C %{_target_platform}-python3-pyqt5
+%endif
+%if %{?wx_siplib}
 %make_install -C %{_target_platform}-python3-wx
 mv %{buildroot}%{python3_sitearch}/wx/sip.pyi %{buildroot}%{python3_sitearch}/wx/siplib.pyi
+%endif
 ln -s sip %{buildroot}%{_bindir}/python3-sip
 
 ## toplevel __pycache__ creation is ... inconsistent
@@ -307,15 +346,24 @@ mv %{buildroot}%{python2_sitearch}/wx/sip.pyi %{buildroot}%{python2_sitearch}/wx
 # sip-wrapper
 install %{SOURCE10} %{buildroot}%{_bindir}/sip-pyqt4
 install %{SOURCE10} %{buildroot}%{_bindir}/sip-pyqt5
+%if %{?wx_siplib}
 install %{SOURCE10} %{buildroot}%{_bindir}/sip-wx
+%endif
 sed -i -e 's|@SIP_MODULE@|PyQt4.sip|g' %{buildroot}%{_bindir}/sip-pyqt4
 sed -i -e 's|@SIP_MODULE@|PyQt5.sip|g' %{buildroot}%{_bindir}/sip-pyqt5
+%if %{?wx_siplib}
 sed -i -e 's|@SIP_MODULE@|wx.siplib|g' %{buildroot}%{_bindir}/sip-wx
+%endif
 
 mkdir -p %{buildroot}%{_datadir}/sip
 
 # Macros used by -devel subpackages:
 install -D -p -m644 %{SOURCE1} %{buildroot}%{rpm_macros_dir}/macros.sip
+
+# Copy documentation from source dir
+pushd doc
+find html/ -type f -exec install -m0644 -D {} %{buildroot}%{_pkgdocdir}/{} \;
+popd
 
 
 %files
@@ -325,11 +373,16 @@ install -D -p -m644 %{SOURCE1} %{buildroot}%{rpm_macros_dir}/macros.sip
 # sip-wrappers
 %{_bindir}/sip-pyqt4
 %{_bindir}/sip-pyqt5
+%if %{?wx_siplib}
 %{_bindir}/sip-wx
+%endif
 # compat symlink
 %{_bindir}/python3-sip
 %dir %{_datadir}/sip/
 %{rpm_macros_dir}/macros.sip
+
+%files doc
+%{_pkgdocdir}/html
 
 %if %{with python2}
 %files -n python2-sip-devel
@@ -389,13 +442,16 @@ install -D -p -m644 %{SOURCE1} %{buildroot}%{rpm_macros_dir}/macros.sip
 %{python3_sitearch}/PyQt4/sip.*
 %{python3_sitearch}/PyQt4_sip-%{version}.dist-info/
 
+%if %{?pyqt5_sip}
 %files -n python%{python3_pkgversion}-pyqt5-sip
 %doc NEWS README
 %license LICENSE LICENSE-GPL2 LICENSE-GPL3
 %dir %{python3_sitearch}/PyQt5/
 %{python3_sitearch}/PyQt5/sip.*
 %{python3_sitearch}/PyQt5_sip-%{version}.dist-info/
+%endif
 
+%if %{?wx_siplib}
 %files -n python%{python3_pkgversion}-wx-siplib
 %doc NEWS README
 %license LICENSE LICENSE-GPL2 LICENSE-GPL3
@@ -403,12 +459,85 @@ install -D -p -m644 %{SOURCE1} %{buildroot}%{rpm_macros_dir}/macros.sip
 %{python3_sitearch}/wx/siplib.*
 %{python3_sitearch}/wx_siplib-%{version}.dist-info/
 %endif
+%endif
 
 
 %changelog
-* Tue Feb 23 2021 Henry Li <lihl@microsoft.com> - 4.19.21-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove conditions that do not apply
+* Thu Jan 09 2025 <v-shettigara@microsoft.com> - 4.19.25-13
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.19.25-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 4.19.25-11
+- Rebuilt for Python 3.13
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.19.25-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.19.25-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 4.19.25-8
+- Rebuilt for Python 3.12
+
+* Tue Mar 07 2023 Than Ngo <than@redhat.com> - 4.19.25-7
+- fixed bz#2154988, fails to build with Python 3.12: ModuleNotFoundError: No module named 'distutils'  
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.19.25-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.19.25-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 4.19.25-4
+- Rebuilt for Python 3.11
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.19.25-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Nov 08 2021 Scott Talbert <swt@techie.net> - 4.19.25-2
+- Recognize the py_ssize_t_clean directive to avoid FTBFS with PyQt 5.15.6
+
+* Thu Oct 21 2021 Sandro Mani <manisandro@gmail.com> - 4.19.25-1
+- Update to 4.19.25
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.19.24-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jun 14 2021 Scott Talbert <swt@techie.net> - 4.19.24-5
+- Stop building python3-pyqt5-sip package on F35+ - replaced by separate pkg
+
+* Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 4.19.24-4
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.19.24-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sun Jan 17 2021 Scott Talbert <swt@techie.net> - 4.19.24-2
+- Stop building wx.siplib on F34+ as wx has switched to sip 5
+
+* Mon Aug 17 2020 Rex Dieter <rdieter@fedoraproject.org> - 4.19.24-1
+- 4.19.24
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.19.23-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 20 2020 Merlin Mathesius <mmathesi@redhat.com> - 4.19.23-1
+- Minor conditional fixes for ELN
+
+* Mon Jun 08 2020 Rex Dieter <rdieter@fedoraproject.org> - 4.19.23-1
+- 4.19.23
+
+* Sat May 23 2020 Miro Hrončok <mhroncok@redhat.com> - 4.19.22-3
+- Rebuilt for Python 3.9
+
+* Mon Apr 20 2020 FeRD (Frank Dana) <ferdnyc@gmail.com> - 4.19.22-2
+- Add documentation subpackage
+
+* Sat Apr 04 2020 Rex Dieter <rdieter@fedoraproject.org> - 4.19.22-1
+- 4.19.22
 
 * Fri Jan 31 2020 Rex Dieter <rdieter@fedoraproject.org> - 4.19.21-1
 - 4.19.21

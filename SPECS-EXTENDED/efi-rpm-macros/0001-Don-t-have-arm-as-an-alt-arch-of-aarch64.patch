@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 31 Aug 2021 16:33:07 -0400
+Subject: [PATCH] Don't have arm as an alt arch of aarch64
+
+The compiler isn't actually set up in a way that lets us do this without
+a cross compiler, so we shouldn't do this this way.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ macros.efi-srpm.in | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/macros.efi-srpm.in b/macros.efi-srpm.in
+index 4d7b019..00503f1 100644
+--- a/macros.efi-srpm.in
++++ b/macros.efi-srpm.in
+@@ -45,8 +45,6 @@
+   local function getaltarch()
+     if arch("x86_64") then
+       return("ia32")
+-    elseif arch("aarch64") then
+-      return("arm")
+     else
+       return("none")
+     end

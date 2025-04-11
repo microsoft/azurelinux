@@ -2,72 +2,68 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary: Tool for controlling tape drives
 Name: mt-st
-Version: 1.1
-Release: 27%{?dist}
-License: GPL+
+Version: 1.7
+Release: 1%{?dist}
+License: GPL-1.0-or-later
 URL: https://github.com/iustin/mt-st
-Source0: https://github.com/iustin/mt-st/archive/refs/tags/mt-st-%{version}.tar.gz
+Source0: https://github.com/iustin/mt-st/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1: stinit.service
-Patch0: mt-st-1.1-redhat.patch
-Patch1: mt-st-1.1-SDLT.patch
-Patch2: mt-st-0.7-config-files.patch
-Patch3: mt-st-0.9b-manfix.patch
-Patch4: mt-st-1.1-include.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=948457
-Patch5: mt-st-1.1-options.patch
-Patch6: mt-st-1.1-man.patch
 BuildRequires: gcc
+BuildRequires: make
 BuildRequires: systemd
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
-
+ 
 %description
 The mt-st package contains the mt and st tape drive management
 programs. Mt (for magnetic tape drives) and st (for SCSI tape devices)
 can control rewinding, ejecting, skipping files and blocks and more.
-
+ 
 Install mt-st if you need a tool to  manage tape drives.
-
-
+ 
+ 
 %prep
-%autosetup -p1
-
-# fix encoding
-f=README.stinit
-iconv -f ISO8859-1 -t UTF-8 -o $f.new $f
-touch -r $f $f.new
-mv $f.new $f
-
-
+%autosetup
+ 
 %build
-make CFLAGS="%{build_cflags} %{build_ldflags}"
-
-
+make CFLAGS="%{build_cflags}" LDFLAGS="%{build_ldflags}"
+ 
+ 
 %install
-make install
-install -D -p -m 0644 %{SOURCE1} $RPM_BUILD_ROOT%{_unitdir}/stinit.service
-
-
+COMPLETIONDIR=%{buildroot}%{_datadir}/bash-completion/completions
+ls -al
+%make_install EXEC_PREFIX=/usr COMPLETIONINSTALLDIR=$COMPLETIONDIR
+install -D -p -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/stinit.service
+cd $COMPLETIONDIR
+mv mt-st mt
+ 
+ 
 %post
 %systemd_post stinit.service
-
+ 
 %preun
 %systemd_preun stinit.service
-
+ 
 %postun
 %systemd_postun_with_restart stinit.service
-
-
+ 
+ 
 %files
-%doc COPYING README README.stinit mt-st-1.1.lsm stinit.def.examples
+%doc COPYING README.md stinit.def.examples
 %{_bindir}/mt
 %{_sbindir}/stinit
-%{_mandir}/man[18]/*
+%{_mandir}/man1/mt.1*
+%{_mandir}/man8/stinit.8*
 %{_unitdir}/stinit.service
-
+%{_datadir}/bash-completion/
+ 
 
 %changelog
+* Wed Feb 12 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.7-1
+- Upgrade to version 1.7
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-27
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

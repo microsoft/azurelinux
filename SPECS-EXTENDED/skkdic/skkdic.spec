@@ -1,7 +1,7 @@
-%global         githash     1ca80982c5a32c82bfc5e98e1fe9d8751ab44946
+%global         githash     b798a46b886f71c0c25ad2a9e78b1c3e8933970c
 %global         shorthash   %(TMP=%githash ; echo ${TMP:0:10})
-%global         gitdate     Wed, 17 Feb 2021 00:09:15 +0900
-%global         gitdate_num 20210217
+%global         gitdate     Wed Jan 31 21:19:24 2024 +0900
+%global         gitdate_num 20240131
 
 %global         githash_tools     0fe2106fbc052445c611e6c5b2a79899d740edcb
 
@@ -10,7 +10,9 @@
 Summary:	Dictionaries for SKK (Simple Kana-Kanji conversion program)
 Name:		skkdic
 Version:	%{gitdate_num}
-Release:	1%{?dist}
+Release:	3%{?dist}
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 # See Source2
 License:	GPLv2+ and CC-BY-SA and Unicode and Public Domain and MIT
 
@@ -79,12 +81,37 @@ popd
 %{_datadir}/skk/
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 20210217-1
-- Upgrade using Fedora 35 version of spec (license: MIT) 
+* Thu Jan 09 2025 Archana Shettigar <v-shettigara@microsoft.com> - 20240131-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- Converting the 'Release' tag to the '[number].[distribution]' format
+- License verified
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200128-2
-- Initial CBL-Mariner import from Fedora 31 (license: MIT).
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20240131-2.gitb798a46b88
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Apr 12 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 20240131-1.gitb798a46b88
+- Update to 20240131 data
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20210919-5.gitc6e6a8822b
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20210919-4.gitc6e6a8822b
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20210919-3.gitc6e6a8822b
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20210919-2.gitc6e6a8822b
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Mar 11 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 20210919-1.gitc6e6a8822b
+- Update to 20210919 data
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20210217-3.git1ca80982c5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20210217-2.git1ca80982c5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
 * Sat May  8 2021 Mamoru TASAKA <mtasaka@fedoraproject.org> - 20210217-1.git1ca80982c5
 - Source switched to github
