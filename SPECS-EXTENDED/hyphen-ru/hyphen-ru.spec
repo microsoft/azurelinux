@@ -5,8 +5,8 @@ Summary: Russian hyphenation rules
 %global upstreamid 20200325
 Version: 0.%{upstreamid}
 Release: 13%{?dist}
-Source1: http://mirrors.ctan.org/language/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-ru.tex
-Source2: http://mirrors.ctan.org/language/hyph-utf8/tex/generic/hyph-utf8/patterns/txt/hyph-ru.pat.txt
+Source0: https://ctan.org/tex-archive/language/hyph-utf8/tex/patterns/tex/hyph-ru.tex
+Source1: https://ctan.org/tex-archive/language/hyph-utf8/tex/patterns/txt/hyph-ru.pat.txt
 URL: https://ctan.org/tex-archive/language/hyph-utf8
 License: LPPL-1.3a
 BuildArch: noarch
