@@ -15,25 +15,14 @@ clean Py3-style codebase, module by module.
 
 Name: future
 Summary: Easy, clean, reliable Python 2/3 compatibility
-Version: 0.18.3
-Release: 6%{?dist}
+Version: 1.0.0
+Release: 1%{?dist}
 License: MIT
 URL: http://python-future.org/
 Source0: https://github.com/PythonCharmers/python-future/archive/refs/tags/v%{version}/python-%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch: noarch
 
-# https://github.com/PythonCharmers/python-future/issues/165
-Patch0: %{name}-skip_tests_with_connection_errors.patch
-
-Patch1: %{name}-fix_tests.patch
-
-%if 0%{?python3_version_nodots} >= 311
-# https://docs.python.org/3.11/whatsnew/3.11.html
-Patch2: %{name}-python311.patch
-
-# https://github.com/PythonCharmers/python-future/pull/619
-Patch3: %{name}-python312.patch
-%endif
+Patch0:  future-fix-test_ftp.patch
 
 %description
 %{_description}
@@ -57,14 +46,7 @@ Obsoletes: python34-%{name} < 0:%{version}-%{release}
 %{_description}
 
 %prep
-%setup -q -n python-future-%{version}
-
-%patch 0 -p1 -b .backup
-%patch 1 -p1 -b .backup
-%if 0%{?python3_version_nodots} >= 311
-%patch 2 -p1 -b .backup
-%patch 3 -p1 -b .backup
-%endif
+%autosetup -p1 -n python-future-%{version}
 
 find . -name '*.py' | xargs %{_pathfix} -pn -i "%{__python3}"
 
@@ -85,14 +67,15 @@ chmod a+x $RPM_BUILD_ROOT%{python3_sitelib}/future/backports/test/pystone.py
 ## This packages ships PEM certificates in future/backports/test directory.
 ## It's for testing purpose, i guess. Ignore them.
 %check
+# various tests are broken for python-3.12.9 and pytest-7.4.0
+# skipping them for now. see below for issues tracking these:
+# https://github.com/PythonCharmers/python-future/issues/647
+# https://github.com/PythonCharmers/python-future/issues/608
+# https://github.com/PythonCharmers/python-future/issues/593
+# https://github.com/PythonCharmers/python-future/issues/530
 
-# Bugs
-# https://github.com/PythonCharmers/python-future/issues/508
 %if 0%{?python3_version_nodots} > 37
-PYTHONPATH=$PWD/build/lib py.test-%{python3_version} -k "not test_urllibnet and not test_single_exception_stacktrace" -q
-%endif
-%if 0%{?python3_version_nodots} <= 37
-PYTHONPATH=$PWD/build/lib py.test-%{python3_version}
+PYTHONPATH=$PWD/build/lib py.test%{python3_version} -k "not test_urllib and not test_urllib_toplevel and not test_urllibnet and not test_single_exception_stacktrace and not test_ftp and not test_subclass_recursion_limit and not test_isinstance_recursion_limit" -q
 %endif
 
 %files -n python%{python3_pkgversion}-%{name}
@@ -111,7 +94,10 @@ PYTHONPATH=$PWD/build/lib py.test-%{python3_version}
 %{python3_sitelib}/*.egg-info
 
 %changelog
-* Tue May 30 2023 Vince Perri <viperri@microsoft.com> - 0.18.2-6
+* Fri Jan 31 2025 Sam Meluch <sammeluch@microsoft.com> - 1.0.0-1
+- Upgrade future to latest for python 3.12 support and ptest fixes
+
+* Tue May 30 2023 Vince Perri <viperri@microsoft.com> - 0.18.3-6
 - License verified.
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 
