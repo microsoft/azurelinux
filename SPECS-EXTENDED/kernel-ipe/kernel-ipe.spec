@@ -83,6 +83,9 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+Conflicts:      kernel
+Conflicts:      kernel-64k
+Conflicts:      kernel-rt
 %{?grub2_configuration_requires}
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
@@ -164,6 +167,7 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 
 %package -n     python3-perf-%{short_name}
 Summary:        Python 3 extension for perf tools
+Provides:       python3-perf
 Requires:       %{name} = %{version}-%{release}
 Requires:       python3
 
@@ -172,6 +176,7 @@ This package contains the Python 3 extension for the 'perf' performance analysis
 
 %package -n     bpftool-%{short_name}
 Summary:        Inspection and simple manipulation of eBPF programs and maps
+Provides:       bpftool
 Requires:       %{name} = %{version}-%{release}
 
 %description -n bpftool-%{short_name}
