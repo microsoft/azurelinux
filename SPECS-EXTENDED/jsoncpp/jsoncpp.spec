@@ -140,6 +140,7 @@ hardlink -cfv %{buildroot}%{_docdir}/%{name}
 %changelog
 * Wed Nov 13 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> -1.9.5-1
 - Upgrade to version 1.9.5
+-License Verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
