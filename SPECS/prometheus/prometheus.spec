@@ -27,7 +27,7 @@ Patch6:         CVE-2025-30204.patch
 Patch7:         0001-Fix-exit-condition-of-TestQuerierIndexQueriesRace.patch
 Patch8:         0002-Improve-sensitivity-of-TestQuerierIndexQueriesRace.patch
 Patch9:         CVE-2025-22870.patch
-Patch10:         CVE-2024-51744.patch
+Patch10:        CVE-2024-51744.patch
 
 BuildRequires:  golang
 BuildRequires:  nodejs
