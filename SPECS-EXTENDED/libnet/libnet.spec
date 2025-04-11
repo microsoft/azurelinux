@@ -100,6 +100,7 @@ done
 %changelog
 * Mon Nov 18 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> -1.3-1
 - upgrade to version 1.3
+-License Verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
