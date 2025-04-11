@@ -11,6 +11,19 @@ Distribution:   Azure Linux
 # published by the Open Source Initiative.
 #
 
+# Below is the script used to generate a new source file
+# from the resource-agent upstream git repo.
+#
+# TAG=$(git log --pretty="format:%h" -n 1)
+# distdir="ClusterLabs-resource-agents-${TAG}"
+# TARFILE="${distdir}.tar.gz"
+# rm -rf $TARFILE $distdir
+# git archive --prefix=$distdir/ HEAD | gzip > $TARFILE
+#
+
+%global upstream_prefix ClusterLabs-resource-agents
+%global upstream_version 56e76b01
+
 # Whether this platform defaults to using systemd as an init system
 # (needs to be evaluated prior to BuildRequires being enumerated and
 # installed as it's intended to conditionally select some of these, and
@@ -36,11 +49,11 @@ Distribution:   Azure Linux
 
 Name:		resource-agents
 Summary:	Open Source HA Reusable Cluster Resource Scripts
-Version:	4.10.0
-Release:	1%{?dist}
-License:	GPLv2+ and LGPLv2+
+Version:	4.16.0
+Release:	2%{?dist}
+License:	GPL-2.0-or-later AND LGPL-2.1-or-later
 URL:		https://github.com/ClusterLabs/resource-agents
-Source0:	https://github.com/ClusterLabs/resource-agents/archive/refs/tags/v4.10.0.tar.gz#/%{name}-%{version}.tar.gz
+Source0:	https://github.com/ClusterLabs/resource-agents/archive/refs/tags/v4.16.0.tar.gz#/%{name}-%{version}.tar.gz
 Obsoletes:	heartbeat-resources <= %{version}
 Provides:	heartbeat-resources = %{version}
 
@@ -48,10 +61,15 @@ Provides:	heartbeat-resources = %{version}
 BuildRequires: make
 BuildRequires: automake autoconf pkgconfig gcc
 BuildRequires: perl
-BuildRequires: python3-devel
-BuildRequires: libxslt glib2-devel
-BuildRequires: systemd-devel
+BuildRequires: libxslt glib2-devel libqb-devel
+BuildRequires: systemd
 BuildRequires: which
+
+BuildRequires: python3-devel
+
+%ifarch x86_64
+BuildRequires: python3-pyroute2
+%endif
 
 BuildRequires: docbook-style-xsl docbook-dtds
 BuildRequires: libnet-devel
@@ -59,14 +77,15 @@ BuildRequires: libnet-devel
 ## Runtime deps
 # system tools shared by several agents
 Requires: /bin/bash /bin/grep /bin/sed /bin/gawk
-Requires: /bin/ps /bin/netstat /bin/hostname /usr/sbin/rpc.statd
-Requires: /usr/sbin/rpc.statd /bin/mount
+Requires: /bin/ps /bin/pkill /bin/hostname /bin/netstat
+Requires: /bin/mount
 
 # Filesystem / fs.sh / netfs.sh
 Requires: /sbin/fsck
 Requires: /usr/sbin/fsck.ext2 /usr/sbin/fsck.ext3 /usr/sbin/fsck.ext4
 Requires: /sbin/fsck.xfs
 Requires: /sbin/mount.nfs /sbin/mount.nfs4
+Recommends: /usr/sbin/mount.cifs
 
 # IPaddr2
 Requires: /sbin/ip
@@ -75,21 +94,16 @@ Requires: /sbin/ip
 Requires: /usr/sbin/lvm
 
 # nfsserver / netfs.sh
-Requires: /usr/sbin/rpc.nfsd /usr/sbin/rpc.statd /usr/sbin/rpc.mountd
-
-# ocf-distro
-Requires: /usr/bin/lsb_release
+Requires: /usr/sbin/rpc.statd
+Requires: /usr/sbin/rpc.nfsd /usr/sbin/rpc.mountd
 
 # rgmanager
-%if %{with rgmanager}
-# ip.sh
 Requires: /usr/sbin/ethtool
-Requires: /sbin/rdisc /usr/sbin/arping /bin/ping /bin/ping6
+Requires: /usr/bin/arping /usr/bin/ping /usr/bin/ping6
 
 # nfsexport.sh
 Requires: /sbin/findfs
-Requires: /sbin/quotaon /sbin/quotacheck
-%endif
+Requires: /usr/sbin/quotaon /usr/sbin/quotacheck
 
 %description
 A set of scripts to interface with several services to operate in a
@@ -98,7 +112,7 @@ service managers.
 
 %if %{with linuxha}
 %package -n ldirectord
-License:	GPLv2+
+License:	GPL-2.0-or-later
 Summary:	A Monitoring Daemon for Maintaining High Availability Resources
 Obsoletes:	heartbeat-ldirectord <= %{version}
 Provides:	heartbeat-ldirectord = %{version}
@@ -124,7 +138,7 @@ See 'ldirectord -h' and linux-ha/doc/ldirectord for more information.
 %endif
 
 %prep
-%autosetup -p1
+%autosetup
 
 %build
 if [ ! -f configure ]; then
@@ -146,7 +160,8 @@ CFLAGS="$(echo '%{optflags}')"
 
 export CFLAGS
 
-%configure PYTHON="%{__python3}" \
+%configure \
+	PYTHON="%{__python3}" \
 	%{conf_opt_fatal} \
 %if %{defined _unitdir}
     SYSTEMD_UNIT_DIR=%{_unitdir} \
@@ -161,6 +176,7 @@ export CFLAGS
 make %{_smp_mflags}
 
 %install
+rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
 
 ## tree fixup
@@ -178,8 +194,7 @@ test -d %{buildroot}/sbin || mkdir %{buildroot}/sbin
 %endif
 
 %files
-%license COPYING COPYING.GPLv3 COPYING.LGPL
-%doc AUTHORS ChangeLog
+%doc AUTHORS COPYING COPYING.GPLv3 COPYING.LGPL ChangeLog
 %if %{with linuxha}
 %doc heartbeat/README.galera
 %doc doc/README.webapps
@@ -301,21 +316,117 @@ ccs_update_schema > /dev/null 2>&1 ||:
 %endif
 
 %changelog
-* Fri Mar 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.10.0-1
-- Updating to version 4.10.0 using Fedora 36 spec (license: MIT) for guidance.
+* Fri Feb 21 2025 Archana Shettigar <v-shettigara@microsoft.com> - 4.16.0-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.6.1-5
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Wed Nov  6 2024 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.16.0-1
+- Rebase to resource-agents 4.16.0 upstream release.
 
-* Thu Jun 17 2021 Muhammad Falak Wani <mwani@microsoft.com> - 4.6.1-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- resolve build failure by removing `JFLAGS` to make
+* Mon Jul 29 2024 Yaakov Selkowitz <yselkowi@redhat.com> - 4.15.1-2
+- Fix sbin dependencies for ELN
+
+* Fri Jul 26 2024 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.15.1-1
+- Rebase to resource-agents 4.15.1 upstream release.
+
+* Wed Jul 24 2024 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.15.0-1
+- Rebase to resource-agents 4.15.0 upstream release.
+
+* Tue Jul 23 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.14.0-2
+- Update dependencies to /usr/sbin
+
+  Resolves: rhbz#2299381
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.14.0-1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Apr 26 2024 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.14.0-1
+- Rebase to resource-agents 4.14.0 upstream release.
+
+* Tue Jan 30 2024 Zbigniew Jedrzejewski-Szmek <zbyszek@in.waw.pl> - 4.13.0-2.3
+- Replace /sbin by /usr/sbin in some paths so that the package remains
+  installable without full filepath metadata (rhbz#2229951)
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.13.0-2.2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.13.0-2.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jan 10 2024 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.13.0-2
+- configure: fix "C preprocessor "gcc -E" fails sanity check" error
+  with autoconf 2.72+
+
+  Resolves: rhbz#2256836
+
+* Wed Oct 11 2023 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.13.0-1
+- Rebase to resource-agents 4.13.0 upstream release.
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.12.0-3.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jun 12 2023 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.12.0-3
+- spec: remove JFLAGS logic and use %{_smp_mflags} like we do in other projects
+
+* Tue Jun 06 2023 Jan Friesse <jfriesse@redhat.com> - 4.12.0-2
+- migrated to SPDX license
+
+* Wed Jan 25 2023 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.12.0-1
+- Rebase to resource-agents 4.12.0 upstream release.
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.11.0-2.2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.11.0-2.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Apr 27 2022 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.11.0-2
+- Remove redhat-lsb-core dependency (lsb_release)
+
+* Wed Apr  6 2022 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.11.0-1
+- Rebase to resource-agents 4.11.0 upstream release.
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.10.0-2.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Nov  3 2021 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.10.0-2
+- Rebase to resource-agents 4.10.0 upstream release.
+
+* Fri Aug 20 2021 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.9.0-1
+- Rebase to resource-agents 4.9.0 upstream release.
+
+* Fri Jul 23 2021 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.8.0-2
+- Remove chkconfig dependency
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.8.0-1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Mar 25 2021 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.8.0-1
+- Rebase to resource-agents 4.8.0 upstream release.
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 4.7.0-2.1
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Fri Feb 12 2021 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.7.0-2
+- add BuildRequires for google lib
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.7.0-1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Dec  9 2020 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.7.0-1
+- Rebase to resource-agents 4.7.0 upstream release.
+
+* Mon Aug 24 2020 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.6.1-4
+- spec: improvements from upstream project
 
 * Mon Aug 24 2020 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.6.1-3
 - ldirectord: add dependency for perl-IO-Socket-INET6
 
   Resolves: rhbz#1868063
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.6.1-2.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jul 24 2020 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.6.1-2
 - Make Samba/CIFS dependency weak for Fedora 32 and remove the
