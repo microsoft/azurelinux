@@ -1,7 +1,7 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
 Version:        2024.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,7 +9,8 @@ URL:            https://github.com/coreos/rpm-ostree
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Patch0:         0001-Revert-compose-Inject-our-static-tmpfiles.d-dropins-.patch
 Patch1:         rpm-ostree-libdnf-build.patch
-
+# Re-ordering println commands so that relevant symbols can be referenced, see https://github.com/rust-lang/rust/issues/132023
+Patch2:		0001-patch-for-failing-test-with-rust-1.85.patch
 BuildRequires:  attr-devel
 BuildRequires:  autoconf
 BuildRequires:  autogen
@@ -177,6 +178,9 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Thu Mar 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2024.4-2
+- Add patch for failing test to buid with rust 1.85
+
 * Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 2024.4-1
 - Upgrade to 2024.4 and remove libgsystem dependency
 
