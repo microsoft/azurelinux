@@ -2,14 +2,13 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:        A straightforward implementation of DBM
 Name:           kyotocabinet
-Version:        1.2.78
-Release:        2%{?dist}
-License:        GPLv3
+Version:        1.2.80
+Release:        7%{?dist}
+License:        GPL-3.0-only
 URL:            https://dbmx.net/%{name}/
 Source:         https://dbmx.net/%{name}/pkg/%{name}-%{version}.tar.gz
 Patch0:         kyotocabinet-1.2.76-cflags.patch
 Patch1:         kyotocabinet-1.2.76-8-byte-atomics.patch
-Patch2:         kyotocabinet-1.2.78-random-failures.patch
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 BuildRequires:  gcc-c++, zlib-devel, lzo-devel, xz-devel
 
@@ -51,10 +50,7 @@ The kyotocabinet-apidocs package contains API documentation for developing
 applications that use Kyoto Cabinet.
 
 %prep
-%setup -q
-%patch 0 -p1 -b .cflags
-%patch 1 -p1 -b .8-byte-atomics
-%patch 2 -p1 -b .random-failures
+%autosetup -p1
 
 %build
 %configure --disable-opt --enable-lzo --enable-lzma
@@ -144,8 +140,37 @@ make check
 %doc COPYING doc/api/* kyotocabinet.idl
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.78-2
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+* Mon Apr 07 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.2.80-7
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.80-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.80-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.80-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.80-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu May 18 2023 Peng Wu <pwu@redhat.com> - 1.2.80-2
+- Migrate to SPDX license
+
+* Mon Apr 17 2023 Peng Wu <pwu@redhat.com> - 1.2.80-1
+- Update to 1.2.80
+- Resolves: RHBZ#2186606
+
+* Wed Apr 12 2023 Florian Weimer <fweimer@redhat.com> - 1.2.79-3
+- Port configure script to C99 (#2186199)
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.79-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Nov 22 2022 Peng Wu <pwu@redhat.com> - 1.2.79-1
+- Update to 1.2.79
 
 * Wed Sep 23 2020 Robert Scheck <robert@fedoraproject.org> 1.2.78-1
 - Update to 1.2.78 (#1858682)
@@ -273,3 +298,4 @@ make check
 
 * Wed Dec 8 2010 Casey Dahlin <cdahlin@redhat.com> - 1.2.27-1
 - Initial packaging
+
