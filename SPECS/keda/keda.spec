@@ -1,7 +1,7 @@
 Summary:        Kubernetes-based Event Driven Autoscaling
 Name:           keda
 Version:        2.14.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,7 +28,8 @@ Patch2:         CVE-2025-27144.patch
 Patch3:         CVE-2025-22868.patch
 Patch4:         CVE-2025-29786.patch
 Patch5:         CVE-2025-30204.patch
-Patch6:         CVE-2025-29923.patch
+Patch6:         CVE-2025-22870.patch
+Patch7:         CVE-2024-51744.patch
 BuildRequires:  golang >= 1.15
 
 %description
@@ -39,8 +40,6 @@ It provides event driven scale for any container running in Kubernetes
 %autosetup -p1 -a 1
 
 %build
-# create vendor folder from the vendor tarball and set vendor mode
-tar -xf %{SOURCE1} --no-same-owner
 export LDFLAGS="-X=github.com/kedacore/keda/v2/version.GitCommit= -X=github.com/kedacore/keda/v2/version.Version=main"
 
 go build -ldflags "$LDFLAGS" -mod=vendor -v -o bin/keda cmd/operator/main.go
@@ -66,6 +65,11 @@ cp ./bin/keda-admission-webhooks %{buildroot}%{_bindir}
 %{_bindir}/%{name}-admission-webhooks
 
 %changelog
+* Fri Apr 11 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.14.1-6
+- Patch CVE-2025-22870 and CVE-2024-51744.
+- Remove redundant untarring from %build section
+- Remove the patch for CVE-2025-29923 as it was causing build failures.
+
 * Sun Mar 30 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.14.1-5
 - Patch CVE-2025-30204, CVE-2025-29923
 
