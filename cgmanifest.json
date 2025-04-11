@@ -21814,7 +21814,7 @@
         "other": {
           "name": "publicsuffix-list",
           "version": "20250116",
-          "downloadUrl": " https://publicsuffix.org/list/public_suffix_list.dat"
+          "downloadUrl": "https://publicsuffix.org/list/public_suffix_list.dat"
         }
       }
     },
