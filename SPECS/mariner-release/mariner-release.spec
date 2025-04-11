@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner release files
 Name:           mariner-release
 Version:        2.0
-Release:        72%{?dist}
+Release:        73%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -62,6 +62,9 @@ EOF
 %config(noreplace) %{_sysconfdir}/issue.net
 
 %changelog
+* Mon Mar 31 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0-73
+- Bump release for April 2025 Update
+
 * Tue Feb 25 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0-72
 - Bump release for March 2025 Update
 
