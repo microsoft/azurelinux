@@ -26014,7 +26014,7 @@
         "other": {
           "name": "regexp",
           "version": "1.5",
-          "downloadUrl": "http://www.apache.org/dist/jakarta/regexp/jakarta-regexp-1.5.tar.gz"
+          "downloadUrl": "https://archive.apache.org/dist/jakarta/regexp/source/jakarta-regexp-1.5.tar.gz"
         }
       }
     },
