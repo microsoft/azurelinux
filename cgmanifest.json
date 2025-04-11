@@ -21984,7 +21984,7 @@
         "other": {
           "name": "python-blinker",
           "version": "1.7.0",
-          "downloadUrl": "https://github.com/pallets-eco/blinker/archive/1.7.0/blinker-1.7.0.tar.gz"
+          "downloadUrl": "https://github.com/pallets-eco/blinker/releases/download/1.7.0/blinker-1.7.0.tar.gz"
         }
       }
     },

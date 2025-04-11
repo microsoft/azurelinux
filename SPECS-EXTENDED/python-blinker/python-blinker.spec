@@ -9,7 +9,7 @@ Summary:        Fast, simple object-to-object and broadcast signaling
 
 License:        MIT
 URL:            https://github.com/pallets-eco/blinker
-Source0:        %{url}/archive/%{version}/%{mod_name}-%{version}.tar.gz
+Source0:        %{url}/releases/download/%{version}/%{mod_name}-%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  python3-devel
