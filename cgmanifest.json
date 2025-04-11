@@ -13071,8 +13071,8 @@
         "type": "other",
         "other": {
           "name": "mdds",
-          "version": "1.5.0",
-          "downloadUrl": "http://kohei.us/files/mdds/src/mdds-1.5.0.tar.bz2"
+          "version": "2.1.1",
+          "downloadUrl": "https://kohei.us/files/mdds/src/mdds-2.1.1.tar.bz2"
         }
       }
     },
