@@ -7,7 +7,7 @@ Release:        1%{?dist}
 License:        BSD-3-Clause
 URL:            http://www.xiph.org/
 
-Source:         http://downloads.xiph.org/releases/ogg/%{name}-%{version}.tar.xz
+Source:         https://downloads.xiph.org/releases/ogg/%{name}-%{version}.tar.xz
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -81,6 +81,7 @@ mv $RPM_BUILD_ROOT%{_docdir}/%{name} __installed_docs
 
 %changelog
 * Wed Nov 20 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.3.5-1
+-License Verified
 - Upgrade to version 1.3.5
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.3.4-4
