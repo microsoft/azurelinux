@@ -1,14 +1,14 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-Name:		libeasyfc
-Version:	0.14.1
-Release:	1%{?dist}
-Summary:	Easy configuration generator interface for fontconfig
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
+Name:	       libeasyfc
+Version:       0.14.1
+Release:       1%{?dist}
+Summary:       Easy configuration generator interface for fontconfig
 
-License:	LGPLv3+
-URL:		https://tagoh.bitbucket.org/libeasyfc/
-Source0:        https://bitbucket.org/tagoh/libeasyfc/downloads/%{name}-%{version}.tar.bz2
-Patch0:		%{name}-freetype.patch
+License:       LGPLv3+
+URL:	       https://tagoh.bitbucket.org/libeasyfc/
+Source0:       https://bitbucket.org/tagoh/libeasyfc/downloads/%{name}-%{version}.tar.bz2
+Patch0:	       %{name}-freetype.patch
 
 BuildRequires:	glib2-devel gobject-introspection-devel libxml2-devel fontconfig-devel >= 2.12.93 harfbuzz-devel
 BuildRequires:	gettext
@@ -57,7 +57,6 @@ applications with libeasyfc-gobject.
 
 %prep
 %autosetup -p1
-
 
 %build
 %configure --disable-static
