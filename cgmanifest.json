@@ -19304,7 +19304,7 @@
         "other": {
           "name": "perl-Perl-MinimumVersion",
           "version": "1.40",
-          "downloadUrl": " https://cpan.metacpan.org/authors/id/D/DB/DBOOK/Perl-MinimumVersion-1.40.tar.gz"
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DB/DBOOK/Perl-MinimumVersion-1.40.tar.gz"
         }
       }
     },
