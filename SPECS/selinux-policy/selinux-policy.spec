@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -57,6 +57,7 @@ Patch35:        0035-rpm-Run-systemd-sysctl-from-post.patch
 Patch36:        0036-fstools-Add-additional-perms-for-cloud-utils-growpar.patch
 Patch37:        0037-docker-Fix-dockerc-typo-in-container_engine_executab.patch
 Patch38:        0038-enable-liveos-iso-flow.patch
+Patch41:        0041-rpm-Allow-gpg-agent-run-in-rpm-scripts-to-watch-secr.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -328,6 +329,9 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Fri Apr 04 2025 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-11
+- Add fix for gpg-agent use in rpm scripts for watching root's secrets dir.
+
 * Thu Mar 06 2025 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-10
 - Add tmpfs fix for cloud-utils-growpart.
 
