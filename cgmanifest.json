@@ -2178,7 +2178,7 @@
         "other": {
           "name": "cpuid",
           "version": "20241023",
-          "downloadUrl": "http://www.etallen.com/cpuid/cpuid-20241023.src.tar.gz"
+          "downloadUrl": "https://www.etallen.com/cpuid/cpuid-20241023.src.tar.gz"
         }
       }
     },

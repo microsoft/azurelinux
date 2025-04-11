@@ -7,8 +7,8 @@ Summary:        Dumps information about the CPU(s)
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:        GPL-2.0-or-later
-URL:            http://www.etallen.com/cpuid.html
-Source0:        http://www.etallen.com/%{name}/%{name}-%{version}.src.tar.gz
+URL:            https://www.etallen.com/cpuid.html
+Source0:        https://www.etallen.com/%{name}/%{name}-%{version}.src.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  make
