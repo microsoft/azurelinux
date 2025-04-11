@@ -3,6 +3,8 @@
 %define classic_tls_bundle ca-bundle.crt
 %define openssl_format_trust_bundle ca-bundle.trust.crt
 %define java_bundle java/cacerts
+%define low_pri_source_dir %{_datadir}/pki/ca-trust-source
+%define high_pri_source_dir %{catrustdir}/source
 
 %define p11_format_base_bundle ca-bundle.trust.base.p11-kit
 
@@ -38,8 +40,8 @@ popd \
 # %2 - output p11-kit format bundle name;
 %define install_bundles() \
 WORKDIR=$(basename %{1}.d) \
-install -p -m 644 $WORKDIR/%{openssl_format_trust_bundle} %{buildroot}%{_datadir}/pki/ca-trust-source/%{2} \
-touch -r %{SOURCE23} %{buildroot}%{_datadir}/pki/ca-trust-source/%{2}
+install -p -m 644 $WORKDIR/%{openssl_format_trust_bundle} %{buildroot}%{low_pri_source_dir}/%{2} \
+touch -r %{SOURCE23} %{buildroot}%{low_pri_source_dir}/%{2}
 
 Summary:        Certificate Authority certificates
 Name:           ca-certificates
@@ -95,7 +97,7 @@ Provides:       ca-certificates-mozilla = %{version}-%{release}
 BuildArch:      noarch
 
 %description
-The Public Key Inrastructure is used for many security issues in
+The Public Key Infrastructure is used for many security issues in
 a Linux system. In order for a certificate to be trusted, it must be
 signed by a trusted agent called a Certificate Authority (CA).
 The certificates loaded by this section are from the list of CAs trusted
@@ -161,29 +163,29 @@ xsltproc --nonet -o %{name}/update-ca-trust.8 %{python3_sitelib}/asciidoc/resour
 mkdir -p -m 755 %{buildroot}%{pkidir}/tls/certs
 mkdir -p -m 755 %{buildroot}%{pkidir}/java
 mkdir -p -m 755 %{buildroot}%{_sysconfdir}/ssl
-mkdir -p -m 755 %{buildroot}%{catrustdir}/source
-mkdir -p -m 755 %{buildroot}%{catrustdir}/source/anchors
-mkdir -p -m 755 %{buildroot}%{catrustdir}/source/blocklist
+mkdir -p -m 755 %{buildroot}%{high_pri_source_dir}
+mkdir -p -m 755 %{buildroot}%{high_pri_source_dir}/anchors
+mkdir -p -m 755 %{buildroot}%{high_pri_source_dir}/blocklist
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/pem
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/openssl
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/java
 mkdir -p -m 755 %{buildroot}%{catrustdir}/extracted/edk2
-mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source
-mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/anchors
-mkdir -p -m 755 %{buildroot}%{_datadir}/pki/ca-trust-source/blocklist
+mkdir -p -m 755 %{buildroot}%{low_pri_source_dir}
+mkdir -p -m 755 %{buildroot}%{low_pri_source_dir}/anchors
+mkdir -p -m 755 %{buildroot}%{low_pri_source_dir}/blocklist
 mkdir -p -m 755 %{buildroot}%{_bindir}
 mkdir -p -m 755 %{buildroot}%{_mandir}/man8
 
 install -p -m 644 %{name}/update-ca-trust.8 %{buildroot}%{_mandir}/man8
-install -p -m 644 %{SOURCE11} %{buildroot}%{_datadir}/pki/ca-trust-source/README
+install -p -m 644 %{SOURCE11} %{buildroot}%{low_pri_source_dir}/README
 install -p -m 644 %{SOURCE12} %{buildroot}%{catrustdir}/README
 install -p -m 644 %{SOURCE13} %{buildroot}%{catrustdir}/extracted/README
 install -p -m 644 %{SOURCE14} %{buildroot}%{catrustdir}/extracted/java/README
 install -p -m 644 %{SOURCE15} %{buildroot}%{catrustdir}/extracted/openssl/README
 install -p -m 644 %{SOURCE16} %{buildroot}%{catrustdir}/extracted/pem/README
 install -p -m 644 %{SOURCE17} %{buildroot}%{catrustdir}/extracted/edk2/README
-install -p -m 644 %{SOURCE18} %{buildroot}%{catrustdir}/source/README
+install -p -m 644 %{SOURCE18} %{buildroot}%{high_pri_source_dir}/README
 
 # Base certs
 %install_bundles %{SOURCE21} %{p11_format_base_bundle}
@@ -232,6 +234,35 @@ ln -s %{catrustdir}/extracted/openssl/%{openssl_format_trust_bundle} \
 ln -s %{catrustdir}/extracted/%{java_bundle} \
     %{buildroot}%{pkidir}/%{java_bundle}
 
+# Version 3.0.0-9.azl3 replaced two symbolic links with actual directories.
+# It also removed the old 'blacklist' directories.
+# For upgrades from older versions, we need to thus:
+#   1. Remove the symbolic link to avoid conflicts during installation.
+#   2. Move the old blocked certificates to the new location.
+#
+# For more info, see: https://docs.fedoraproject.org/en-US/packaging-guidelines/Directory_Replacement/
+%pretrans shared -p <lua>
+-- Not using macros in paths on purpose in case they changed since version 3.0.0-8.azl3 was built.
+local old_paths = {
+  ["/usr/share/pki/ca-trust-source/blacklist"] = "/usr/share/pki/ca-trust-source/blocklist",
+  ["/etc/pki/ca-trust/source/blacklist"] = "/etc/pki/ca-trust/source/blocklist",
+}
+
+-- Mapping to move old directory with blocked certificates to the new location.
+-- This is needed to avoid breaking the user's configuration.
+local old_to_new_dir = {
+  ["/usr/share/pki/ca-trust-source/blacklist"] = "%{low_pri_source_dir}/blocklist",
+  ["/etc/pki/ca-trust/source/blacklist"] = "%{high_pri_source_dir}/blocklist",
+}
+
+for old_dir, link_path in ipairs(old_paths) do
+  st = posix.stat(link_path)
+  if st and st.type == "link" then
+    os.remove(link_path)
+    os.rename(old_dir, old_to_new_dir[old_dir])
+  end
+end
+
 %post
 %{refresh_bundles}
 
@@ -263,11 +294,11 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %files
 %defattr(-,root,root)
 # Microsoft certs bundle file with trust
-%{_datadir}/pki/ca-trust-source/%{p11_format_microsoft_bundle}
+%{low_pri_source_dir}/%{p11_format_microsoft_bundle}
 
 %files base
 %defattr(-,root,root)
-%{_datadir}/pki/ca-trust-source/%{p11_format_base_bundle}
+%{low_pri_source_dir}/%{p11_format_base_bundle}
 
 %files shared
 %defattr(-,root,root)
@@ -285,19 +316,19 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_libdir}/ssl/certs
 
 # README files
-%{_datadir}/pki/ca-trust-source/README
+%{low_pri_source_dir}/README
 %{catrustdir}/README
 %{catrustdir}/extracted/README
 %{catrustdir}/extracted/edk2/README
 %{catrustdir}/extracted/java/README
 %{catrustdir}/extracted/openssl/README
 %{catrustdir}/extracted/pem/README
-%{catrustdir}/source/README
+%{high_pri_source_dir}/README
 
 %dir %{_datadir}/pki
-%dir %{_datadir}/pki/ca-trust-source
-%dir %{_datadir}/pki/ca-trust-source/anchors
-%dir %{_datadir}/pki/ca-trust-source/blocklist
+%dir %{low_pri_source_dir}
+%dir %{low_pri_source_dir}/anchors
+%dir %{low_pri_source_dir}/blocklist
 %dir %{_sysconfdir}/ssl
 %dir %{catrustdir}
 %dir %{catrustdir}/extracted
@@ -305,15 +336,15 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %dir %{catrustdir}/extracted/java
 %dir %{catrustdir}/extracted/pem
 %dir %{catrustdir}/extracted/openssl
-%dir %{catrustdir}/source
-%dir %{catrustdir}/source/anchors
-%dir %{catrustdir}/source/blocklist
+%dir %{high_pri_source_dir}
+%dir %{high_pri_source_dir}/anchors
+%dir %{high_pri_source_dir}/blocklist
 %dir %{pkidir}/java
 %dir %{pkidir}/tls
 %dir %{pkidir}/tls/certs
 
 # Distrusted CAs
-%{_datadir}/pki/ca-trust-source/%{p11_format_distrusted_bundle}
+%{low_pri_source_dir}/%{p11_format_distrusted_bundle}
 
 %ghost %{catrustdir}/extracted/pem/tls-ca-bundle.pem
 %ghost %{catrustdir}/extracted/pem/email-ca-bundle.pem
