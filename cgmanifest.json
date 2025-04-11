@@ -10162,7 +10162,7 @@
         "other": {
           "name": "libmwaw",
           "version": "0.3.22",
-          "downloadUrl": "http://downloads.sourceforge.net/libmwaw/libmwaw-0.3.22.tar.xz"
+          "downloadUrl": "https://downloads.sourceforge.net/libmwaw/libmwaw-0.3.22.tar.xz"
         }
       }
     },

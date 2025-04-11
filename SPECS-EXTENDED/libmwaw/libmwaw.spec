@@ -9,7 +9,7 @@ Summary: A library for import of many old Mac document formats
 
 License: LGPL-2.1-or-later OR MPL-2.0
 URL: http://sourceforge.net/projects/libmwaw/
-Source: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
+Source: https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires: doxygen
 BuildRequires: gcc-c++
@@ -111,6 +111,7 @@ install -m 0644 mwaw2*.1 %{buildroot}/%{_mandir}/man1
 %changelog
 * Mon nov 18 2024 Akarsh Chaudhary  <v-akarshc@microsoft.com> - 0.3.22-1
 - upgrade to version 0.3.22
+-License Verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.17-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
