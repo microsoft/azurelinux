@@ -9,13 +9,13 @@ Group:          System Environment/Libraries
 URL:            https://www.gnutls.org
 Source0:        https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/%{name}-%{version}.tar.xz
 # Patch taken from 3.8.4 release
-Patch1:          CVE-2024-28834.patch
+Patch1:         CVE-2024-28834.patch
 # Patch taken from 3.8.4 release
-Patch2:          CVE-2024-28835.patch
-Patch3:          CVE-2024-12243.patch
-Patch4:         CVE-2024-12133.patch
+Patch2:         CVE-2024-28835.patch
+Patch3:         CVE-2024-12133.patch
+Patch4:         CVE-2024-12243.patch
 BuildRequires:  autogen-libopts-devel
-BuildRequires:  gc-devel
+BuildRequires:  gcc-devel
 BuildRequires:  libtasn1-devel
 BuildRequires:  nettle-devel >= 3.7.2
 BuildRequires:  openssl-devel
