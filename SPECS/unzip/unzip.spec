@@ -60,7 +60,7 @@ ln -sf unzip %{buildroot}%{_bindir}/zipinfo
 
 %changelog
 * Tue Mar 25 2025 Archana Shettigar <v-shettigara@microsoft.com> - 6.0.22
-- Fix CVE-2021-4217
+- Fix CVE-2021-4217 with an upstream patch
 
 * Mon Nov 25 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 6.0-21
 - Fix CVE-2022-0529 and CVE-2022-0530
