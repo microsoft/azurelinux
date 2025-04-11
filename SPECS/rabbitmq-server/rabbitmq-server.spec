@@ -2,7 +2,7 @@
 Summary:        rabbitmq-server
 Name:           rabbitmq-server
 Version:        3.11.24
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache-2.0 and MPL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +30,7 @@ Source3:        rabbitmq-server-hex-cache-%{version}.tar.gz
 # 8. Run `tar -czf rabbitmq-server-hex-cache-<version>.tar.gz cache.erl`
 # --------
 Patch0:			CVE-2023-50966.patch
+Patch1:			CVE-2025-30219.patch
 BuildRequires:  erlang
 BuildRequires:  elixir
 BuildRequires:  libxslt
@@ -115,6 +116,9 @@ done
 %{_libdir}/rabbitmq/lib/rabbitmq_server-%{version}/*
 
 %changelog
+* Mon Mar 31 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.11.24-3
+- Add patch for CVE-2025-30219
+
 * Thu Feb 13 2024 Kanishk Bansal <kanbansal@microsoft.com> - 3.11.24-2
 - Add patch for CVE-2023-50966
 
