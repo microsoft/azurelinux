@@ -1,9 +1,5 @@
 %global with_mingw 0
 
-%if 0%{?fedora} && !0%{?flatpak}
-%global with_mingw 1
-%endif
-
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           libgsf
@@ -176,7 +172,8 @@ find %{buildroot} -name '*.la' -delete -print
 
 %changelog
 * Wed Nov 27 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.14.53-3
-- Update to 1.14.53.
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified.
 
 * Wed Nov 06 2024 Gwyn Ciesla <gwync@protonmail.com> - 1.14.53-2
 - Fix find_lang order for 2280661
