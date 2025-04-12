@@ -2,7 +2,7 @@ Name:		netsniff-ng
 Version:	0.6.9
 Release:	2%{?dist}
 Summary:	Packet sniffing beast
-Vendor:         Microsoft Corporations
+Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 License:	GPL-2.0-only
 URL:		https://netsniff-ng.org/
@@ -10,10 +10,9 @@ Source0:	https://github.com/netsniff-ng/netsniff-ng/archive/refs/tags/v0.6.9.tar
 BuildRequires:	make
 BuildRequires:	gcc
 BuildRequires:	ncurses-devel
-# GeoIP not in RHEL-9+
-%if 0%{?rhel} < 9
+
 BuildRequires:	GeoIP-devel
-%endif
+
 BuildRequires:	libnetfilter_conntrack-devel
 BuildRequires:	userspace-rcu-devel
 BuildRequires:	libnl3-devel
@@ -59,7 +58,8 @@ make %{?_smp_mflags} ETCDIR=%{_sysconfdir} Q= STRIP=: \
 make install PREFIX=%{_prefix} ETCDIR=%{_sysconfdir} DESTDIR="%{buildroot}"
 
 %files
-%doc AUTHORS COPYING README
+%license COPYING
+%doc AUTHORS README
 %{_sbindir}/*
 %dir %{_sysconfdir}/%{name}
 %config(noreplace) %{_sysconfdir}/%{name}/*
