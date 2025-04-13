@@ -1,7 +1,7 @@
 Summary:        Contains programs for manipulating text files
 Name:           gawk
 Version:        5.2.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,9 +45,6 @@ sed -i 's/ pty1 / /' test/Makefile
 # Ideally it should have been present. Investigate if its a `chroot` only issue
 %{_sbindir}/locale-gen.sh
 make %{?_smp_mflags} check
-
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
 
 %files -f %{name}.lang
 %defattr(-,root,root)
