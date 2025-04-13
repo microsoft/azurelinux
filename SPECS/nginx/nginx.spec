@@ -15,6 +15,7 @@ URL:            https://nginx.org/
 Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        https://github.com/nginx/njs/archive/refs/tags/%{njs_version}.tar.gz#/%{name}-njs-%{njs_version}.tar.gz
+Source3:        nginx-tests.tgz
 Patch0:         CVE-2024-7347.patch
 Patch1:         CVE-2025-23419.patch
 BuildRequires:  libxml2-devel
@@ -54,7 +55,7 @@ The OpenTelemetry module for Nginx
 %prep
 %autosetup -p1
 pushd ../
-mkdir nginx-njs
+mkdir -p nginx-njs
 tar -C nginx-njs -xf %{SOURCE2}
 
 %build
@@ -128,6 +129,18 @@ exit 0
 
 %files filesystem
 %dir %{_sysconfdir}/%{name}
+
+%check
+cat /etc/tdnf/tdnf.conf
+ls -l /etc/yum.repos.d/*
+cat /etc/yum.repos.d/*
+tdnf repolist --releasever=3.0
+tdnf install azurelinux-repos-extended --releasever=3.0
+tdnf install perl-Test-Harness --releasever=3.0
+which prove
+tar -xvf %{SOURCE3}
+cd nginx-tests
+TEST_NGINX_BINARY=%{_sbindir}/nginx prove .
 
 %changelog
 * Tue Mar 11 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.25.4-4
