@@ -17,7 +17,7 @@ Summary:        Create barcode image with GD
 # see Barcode.pm
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/GD-Barcode
-Source0:        https://cpan.metacpan.org/modules/by-module/GD/GD-Barcode-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/GD/GD-Barcode-%{version}.tar.gz#/perl-GD-Barcode-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  findutils
