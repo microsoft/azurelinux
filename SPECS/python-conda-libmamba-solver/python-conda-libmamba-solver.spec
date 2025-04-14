@@ -28,7 +28,7 @@ BuildArch:      noarch
 
 %package -n python3-%{srcname}
 Summary:        %{summary}
-Requires:       python3-libmamba
+Requires:       python3-libmambapy
 Requires:       python3-boltons
 
 %description -n python3-%{srcname} %{_description}

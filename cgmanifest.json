@@ -26052,6 +26052,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "reproc",
+          "version": "14.2.4",
+          "downloadUrl": "https://github.com/DaanDeMeyer/reproc/archive/1c07bdbec3f2ecba7125b9499b9a8a77bf9aa8c7/reproc-14.2.4-1c07bdb.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "resource-agents",
           "version": "4.10.0",
           "downloadUrl": "https://github.com/ClusterLabs/resource-agents/archive/refs/tags/v4.10.0.tar.gz"
