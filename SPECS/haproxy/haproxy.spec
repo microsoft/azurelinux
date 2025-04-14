@@ -1,13 +1,14 @@
 Summary:        A fast, reliable HA, load balancing, and proxy solution.
 Name:           haproxy
 Version:        2.9.11
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.haproxy.org
 Source0:        https://www.haproxy.org/download/2.9/src/%{name}-%{version}.tar.gz
+Patch0:         CVE-2025-32464.patch
 BuildRequires:  lua-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pcre2-devel
@@ -30,6 +31,7 @@ Requires:       %{name} = %{version}-%{release}
 
 %prep
 %setup -q
+%patch 0 -p1
 
 %build
 make %{?_smp_mflags} TARGET="linux-glibc" USE_PCRE2=1 USE_OPENSSL=1 \
@@ -59,6 +61,9 @@ install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/hapr
 %{_mandir}/*
 
 %changelog
+* Mon Apr 14 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.9.11-3
+- Patch CVE-2025-32464
+
 * Thu Jan 23 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.9.11-2
 - Support for Prometheus exporter in HAProxy
 
