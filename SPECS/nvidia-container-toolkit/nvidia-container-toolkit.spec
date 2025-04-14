@@ -2,7 +2,7 @@
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
 Version:        1.17.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,6 +28,7 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         0001-Test-patch.patch
 BuildRequires:  golang < 1.24.0
 Obsoletes: nvidia-container-runtime <= 3.5.0-1, nvidia-container-runtime-hook <= 1.4.0-2
 Provides: nvidia-container-runtime
@@ -87,6 +88,9 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %{_bindir}/nvidia-cdi-hook
 
 %changelog
+* Mon Apr 14 2025 Chris Co <chrco@microsoft.com> - 1.17.4-4
+- rebuilt
+
 * Thu Apr 10 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.17.4-3
 - Removed extraction command from prep
 
