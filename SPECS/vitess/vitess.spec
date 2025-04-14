@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        19.0.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -29,6 +29,7 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2017-14623.patch 
 Patch1:         CVE-2024-45339.patch
 Patch2:         CVE-2025-22868.patch
+Patch3:         CVE-2025-22870.patch
 BuildRequires: golang < 1.23
 
 %description
@@ -106,6 +107,9 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
+* Thu Mar 13 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 19.0.4-6
+- Patch to fix CVE-2025-22870
+
 * Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> -19.0.4-5
 - Fix CVE-2025-22868 with an upstream patch
 

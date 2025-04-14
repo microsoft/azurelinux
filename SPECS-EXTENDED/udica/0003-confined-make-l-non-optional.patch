@@ -1,0 +1,57 @@
+From f411c146986fabe7375724528b2d4ba8cf78b904 Mon Sep 17 00:00:00 2001
+From: Vit Mojzis <vmojzis@redhat.com>
+Date: Mon, 12 Feb 2024 19:38:14 +0100
+Subject: [PATCH] confined: make "-l" non optional
+
+The confinedom_user_login_macro is needed for all custom users.
+
+Also, allow the new user type to be accessed via remote login.
+
+Signed-off-by: Vit Mojzis <vmojzis@redhat.com>
+---
+ udica/__main__.py                     | 2 +-
+ udica/macros/confined_user_macros.cil | 8 +++++++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/udica/__main__.py b/udica/__main__.py
+index 1ba8515..801499c 100644
+--- a/udica/__main__.py
++++ b/udica/__main__.py
+@@ -92,7 +92,7 @@ def get_args():
+             "-l",
+             "--user_login",
+             action="store_true",
+-            default=False,
++            default=True,
+             dest="user_login",
+             help="Basic rules common to all users (tty, pty, ...)",
+         )
+diff --git a/udica/macros/confined_user_macros.cil b/udica/macros/confined_user_macros.cil
+index ddb5689..06c4c56 100644
+--- a/udica/macros/confined_user_macros.cil
++++ b/udica/macros/confined_user_macros.cil
+@@ -2411,7 +2411,7 @@
+         (typetransition utype sudo_exec_t process sudo_type)
+         (allow sudo_type utype (fd (use)))
+         (allow sudo_type utype (fifo_file (ioctl read write getattr lock append)))
+-        (allow sudo_type utype (process (sigchld)))
++        (allow sudo_type utype (process (getpgid sigchld)))
+         (allow sudo_type bin_t (dir (getattr open search)))
+         (allow sudo_type bin_t (dir (ioctl read getattr lock open search)))
+         (allow sudo_type bin_t (dir (getattr open search)))
+@@ -4006,6 +4006,12 @@
+             )
+         )
+     )
++    ; Telnet login
++    (optional  confinedom_user_login_optional_3
++      (typeattributeset cil_gen_require remote_login_t)
++      (allow remote_login_t utype (process (signal transition)))
++      (allow utype self (bpf (prog_load)))
++    )
+ )
+ 
+ (macro confined_ssh_connect_macro ((type utype) (role urole) (type ssh_agent_type))
+-- 
+2.43.0
+
