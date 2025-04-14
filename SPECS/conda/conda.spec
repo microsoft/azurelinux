@@ -446,8 +446,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 
 %changelog
 * Fri April 11 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-2
-- Add missing python3-pluggy package 
-- Add libmambapy package
+- Add missing python3-pluggy package
 
 * Wed Feb 26 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-1
 - Auto-upgrade to 24.3.0 - fixes subprocess_call when stdin is bytes
