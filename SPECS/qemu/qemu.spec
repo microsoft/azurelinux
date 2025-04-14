@@ -290,6 +290,8 @@ Patch1022:      CVE-2023-1544.patch
 Patch1023:      CVE-2023-3019.patch
 # CVE-2023-3180 will be fixed in 8.1.0 by https://gitlab.com/qemu-project/qemu/-/commit/9d38a8434721a6479fe03fb5afb150ca793d3980
 Patch1024:      CVE-2023-3180.patch
+# CVE-2023-3255 will be fixed in 8.1.0 by https://gitlab.com/qemu-project/qemu/-/commit/d921fea3
+Patch1025:      CVE-2023-3255.patch
 
 # alsa audio output
 BuildRequires:  alsa-lib-devel
@@ -2324,8 +2326,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
-* Fri Apr 11 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 6.2.0-24
+* Mon Apr 14 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 6.2.0-24
 - Add patch for CVE-2023-3180
+- Add patch for CVE-2023-3255
 
 * Thu Apr 10 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 6.2.0-23
 - Add patch for CVE-2023-3019
