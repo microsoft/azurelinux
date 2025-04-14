@@ -58,7 +58,7 @@ Version:    %{GITDATE}git%{GITCOMMIT}
 Release:    6%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND MIT AND LicenseRef-Fedora-Public-Domain
-URL:        https://www.tianocore.org/
+URL:        https://www.tianocore.org
 
 # The source tarball is created using following commands:
 # COMMIT=bb1bba3d7767
@@ -129,6 +129,7 @@ Patch0017: 0017-silence-.-has-a-LOAD-segment-with-RWX-permissions-wa.patch
 %endif
 Patch0018: 0018-NetworkPkg-TcpDxe-Fixed-system-stuck-on-PXE-boot-flo.patch
 Patch0019: 0019-NetworkPkg-DxeNetLib-adjust-PseudoRandom-error-loggi.patch
+Patch0020: CVE-2024-38796.patch
 
 # Patches for the vendored OpenSSL are in the range from 1000 to 1999 (inclusive).
 Patch1000: CVE-2022-3996.patch
