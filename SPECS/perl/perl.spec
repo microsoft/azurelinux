@@ -4086,8 +4086,8 @@ you're not running VMS, this module does nothing.
 echo "Remove encrypted test sources"
 rm -vf /usr/src/azl/BUILD/perl-%{perl_version}/cpan/IO-Compress/t/files/encrypt-aes.zip
 rm -vf /usr/src/azl/BUILD/perl-%{perl_version}/cpan/IO-Compress/t/files/encrypt-standard.zip
-sed -i '\|cpan/IO-Compress/t/files/encrypt-aes.zip|d' /usr/src/azl/BUILD/perl-%{perl_version}/MANIFEST
-sed -i '\|cpan/IO-Compress/t/files/encrypt-standard.zip|d' /usr/src/azl/BUILD/perl-%{perl_version}/MANIFEST
+sed -i '\|cpan/IO-Compress/t/files/encrypt-aes.zip|d' /usr/src/mariner/BUILD/perl-%{perl_version}/MANIFEST
+sed -i '\|cpan/IO-Compress/t/files/encrypt-standard.zip|d' /usr/src/mariner/BUILD/perl-%{perl_version}/MANIFEST
 
 #copy Pod-Html license clarification
 cp %{SOURCE6} .
