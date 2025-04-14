@@ -10140,6 +10140,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libmamba",
+          "version": "1.5.12",
+          "downloadUrl": "https://github.com/mamba-org/mamba/archive/libmamba-1.5.12/libmamba-1.5.12.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libmaxminddb",
           "version": "1.7.1",
           "downloadUrl": "https://github.com/maxmind/libmaxminddb/releases/download/1.7.1/libmaxminddb-1.7.1.tar.gz"
@@ -28108,6 +28118,16 @@
           "name": "shim-unsigned-x64",
           "version": "15.8",
           "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.8/shim-15.8.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "simdjson",
+          "version": "3.11.6",
+          "downloadUrl": "https://github.com/simdjson/simdjson/archive/v3.11.6/simdjson-3.11.6.tar.gz"
         }
       }
     },
