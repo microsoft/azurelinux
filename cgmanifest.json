@@ -3467,6 +3467,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "expected",
+          "version": "1.1.0",
+          "downloadUrl": "https://github.com/TartanLlama/expected/archive/v1.1.0/expected-1.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "extra-cmake-modules",
           "version": "5.249.0",
           "downloadUrl": "https://invent.kde.org/frameworks/extra-cmake-modules/-/archive/v5.249.0/extra-cmake-modules-v5.249.0.tar.gz"
@@ -28358,6 +28368,16 @@
           "name": "spausedd",
           "version": "20210719",
           "downloadUrl": "https://github.com/jfriesse/spausedd/releases/download/20210719/spausedd-20210719.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "spdlog",
+          "version": "1.15.2",
+          "downloadUrl": "https://github.com/gabime/spdlog/archive/v1.15.2/spdlog-1.15.2.tar.gz"
         }
       }
     },
