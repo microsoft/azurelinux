@@ -31196,12 +31196,13 @@
     },
     {
       "component": {                                                              
-      "type": "other",
-       "other": {
-         "name": "zix",                                                           
-	 "version": "0.6.2",
-         "downloadUrl": "https://download.drobilla.net/zix-0.6.2.tar.xz"
-        }                                                                                       }
+        "type": "other",
+        "other": {
+          "name": "zix",                                                           
+	  "version": "0.6.2",
+          "downloadUrl": "https://download.drobilla.net/zix-0.6.2.tar.xz"
+        }                                                                 
+      }
     },
     {
       "component": {
