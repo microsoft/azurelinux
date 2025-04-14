@@ -1,15 +1,6 @@
-%bcond_with selinux
-%bcond_with systemd
 
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-
-%if %{with selinux}
-%global selinuxtype targeted
-%endif
-
-%global moduletype contrib
-%define semodule_version 0.0.5
 
 Name:           usbguard
 Version:        1.1.3
@@ -20,23 +11,12 @@ License:        GPL-2.0-or-later
 # src/ThirdParty/Catch: Boost Software License - Version 1.0
 URL:            https://usbguard.github.io/
 Source0:        https://github.com/USBGuard/usbguard/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-%if %{with selinux}
-Source1: 	https://github.com/USBGuard/usbguard-selinux/archive/refs/tags/v%{semodule_version}.tar.gz#/%{name}-selinux-%{semodule_version}.tar.gz
-%endif
 Source2:        usbguard-daemon.conf
-Patch: 		usbguard-revert-catch.patch
+Patch0: 	usbguard-revert-catch.patch
 
-%if %{with systemd}
-Requires: systemd
-Requires(post): systemd
-Requires(preun): systemd
-Requires(postun): systemd
-%endif
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-%if %{with selinux}
-Recommends: %{name}-selinux
-%endif
+
 Obsoletes: %{name}-applet-qt < 0.7.6
 
 BuildRequires: make
@@ -101,35 +81,12 @@ Requires:       polkit
 The %{name}-dbus package contains an optional component that provides
 a D-Bus interface to the USBGuard daemon component.
 
-%if %{with selinux}
-%package        selinux
-Summary:        USBGuard selinux
-Group:          Applications/System
-Requires:       %{name} = %{version}-%{release}
-Requires:       selinux-policy-%{selinuxtype}
-Requires(post): selinux-policy-%{selinuxtype}
-BuildRequires:  selinux-policy-devel
-BuildArch: noarch
-%{?selinux_requires}
-
-%description    selinux
-The %{name}-selinux package contains selinux policy for the USBGuard
-daemon.
-%endif
-
 # usbguard
 %prep
 %autosetup -p1
 
-%if %{with selinux}
-# selinux
-%setup -q -D -T -a 1
-%endif
-
-
 # Remove bundled library sources before build
 rm -rf src/ThirdParty/{Catch,PEGTL}
-
 
 %build
 mkdir -p ./m4
@@ -138,33 +95,15 @@ autoreconf -i -v --no-recursive ./
     --disable-silent-rules \
     --without-bundled-catch \
     --without-bundled-pegtl \
-%if %{with systemd}
-    --enable-systemd \
-%else
     --disable-systemd \
-%endif
     --with-dbus \
     --with-polkit \
     --with-crypto-library=gcrypt
 
 make %{?_smp_mflags}
 
-%if %{with selinux}
-# selinux
-pushd %{name}-selinux-%{semodule_version}
-make
-popd
-%endif
-
 %check
 make check
-
-
-%if %{with selinux}
-# selinux
-%pre selinux
-%selinux_relabel_pre -s %{selinuxtype}
-%endif
 
 %install
 make install INSTALL='install -p' DESTDIR=%{buildroot}
@@ -175,33 +114,14 @@ mkdir -p %{buildroot}%{_sysconfdir}/usbguard/rules.d
 mkdir -p %{buildroot}%{_sysconfdir}/usbguard/IPCAccessControl.d
 install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/usbguard/usbguard-daemon.conf
 
-%if %{with selinux}
-# selinux
-install -d %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
-install -m 0644 %{name}-selinux-%{semodule_version}/%{name}.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
-install -d -p %{buildroot}%{_datadir}/selinux/devel/include/%{moduletype}
-install -p -m 644 %{name}-selinux-%{semodule_version}/%{name}.if %{buildroot}%{_datadir}/selinux/devel/include/%{moduletype}/ipp-%{name}.if
-%endif
-
 # Cleanup
 find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
 
-%if %{with systemd}
-%preun
-%systemd_preun usbguard.service
-%endif
-
 %post
 %{?ldconfig}
-%if %{with systemd}
-%systemd_post usbguard.service
-%endif
 
 %postun
 %{?ldconfig}
-%if %{with systemd}
-%systemd_postun usbguard.service
-%endif
 
 %files
 %doc README.adoc CHANGELOG.md
@@ -220,9 +140,6 @@ find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
 %{_datadir}/man/man5/usbguard-rules.conf.5.gz
 %{_datadir}/man/man1/usbguard.1.gz
 %{_datadir}/bash-completion/completions/usbguard
-%if %{with systemd}
-%{_unitdir}/usbguard.service
-%endif
 
 %files devel
 %{_includedir}/*
@@ -239,38 +156,6 @@ find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
 %{_datadir}/dbus-1/system.d/org.usbguard1.conf
 %{_datadir}/polkit-1/actions/org.usbguard1.policy
 %{_mandir}/man8/usbguard-dbus.8.gz
-%if %{with systemd}
-%{_unitdir}/usbguard-dbus.service
-%endif
-
-%if %{with systemd}
-%preun dbus
-%systemd_preun usbguard-dbus.service
-
-%post dbus
-%systemd_post usbguard-dbus.service
-
-%postun dbus
-%systemd_postun_with_restart usbguard-dbus.service
-%endif
-
-%if %{with selinux}
-%files selinux
-%{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
-%ghost %verify(not md5 size mode mtime) %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/%{name}
-%{_datadir}/selinux/devel/include/%{moduletype}/ipp-%{name}.if
-
-%post selinux
-%selinux_modules_install -s %{selinuxtype} %{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
-
-%postun selinux
-if [ $1 -eq 0 ]; then
-    %selinux_modules_uninstall -s %{selinuxtype} %{name}
-fi
-
-%posttrans selinux
-%selinux_relabel_post -s %{selinuxtype}
-%endif
 
 %changelog
 * Tue Apr 08 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.1.3-1
