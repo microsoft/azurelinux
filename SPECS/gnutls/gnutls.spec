@@ -15,7 +15,7 @@ Patch2:         CVE-2024-28835.patch
 Patch3:         CVE-2024-12133.patch
 Patch4:         CVE-2024-12243.patch
 BuildRequires:  autogen-libopts-devel
-BuildRequires:  gcc-devel
+BuildRequires:  gc-devel
 BuildRequires:  libtasn1-devel
 BuildRequires:  nettle-devel >= 3.7.2
 BuildRequires:  openssl-devel
