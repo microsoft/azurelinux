@@ -1,3 +1,5 @@
+%define majmin %(echo %{version} | cut -d. -f1-2)
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
@@ -16,7 +18,7 @@ Summary:        A library for bits of crypto UI and parsing
 # docs/COPYING is GCR-docs
 License:        LGPL-2.1-or-later AND LicenseRef-Fedora-Public-Domain AND FSFULLRWD AND (LGPL-3.0-or-later OR CC-BY-SA-3.0) AND (MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.1-or-later) AND GCR-docs
 URL:            https://wiki.gnome.org/Projects/CryptoGlue
-Source0:        https://download.gnome.org/sources/gcr/3.41/gcr-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/%{majmin}/%{name}-%{version}.tar.xz
 BuildRequires:  gettext
 BuildRequires:  gi-docgen
 BuildRequires:  meson
