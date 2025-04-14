@@ -101,8 +101,8 @@ rm -rf $RPM_BUILD_ROOT%{_userunitdir}/gcr-ssh-agent.socket
 %{_datadir}/GConf/gsettings/org.gnome.crypto.pgp.convert
 %{_datadir}/GConf/gsettings/org.gnome.crypto.pgp_keyservers.convert
 %{_datadir}/glib-2.0/schemas/org.gnome.crypto.pgp.gschema.xml
-%{_libdir}/girepository-1.0/
-%{_libdir}/libgcr-ui-3.so.1*
+%{_libdir}/girepository-1.0
+%{_libdir}/libgcr-ui-3.so.*
 %{_datadir}/icons/hicolor/*/apps/*
 %{_datadir}/mime/packages/gcr-crypto-types.xml
 %{_libexecdir}/gcr-prompter
@@ -128,8 +128,8 @@ rm -rf $RPM_BUILD_ROOT%{_userunitdir}/gcr-ssh-agent.socket
 %doc %{_datadir}/doc/gcr-ui-3/
  
 %files base
-%{_libdir}/libgck-1.so.0*
-%{_libdir}/libgcr-base-3.so.1*
+%{_libdir}/libgck-1.so.*
+%{_libdir}/libgcr-base-3.so.*
 
 %changelog
 * Wed Mar 19 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.41.1-10
