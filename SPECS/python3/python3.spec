@@ -244,10 +244,10 @@ patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/setuptools/packag
 # Manually patch CVE-2024-3651 which is a bundled wheel for pip. We can only update the source code after install
 echo 'Patching CVE-2024-3651 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_vendor/idna/core.py'
 patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/idna/core.py < %{PATCH1002}
-echo 'Patching CVE-2023-43804 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py b/pip/_vendor/urllib3/util/retry.py'
-patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py b/pip/_vendor/urllib3/util/retry.py < %{PATCH1003}
-echo 'Patching CVE-2024-37891 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py b/pip/_vendor/urllib3/util/retry.py'
-patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py b/pip/_vendor/urllib3/util/retry.py < %{PATCH1004}
+echo 'Patching CVE-2023-43804 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py'
+patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py < %{PATCH1003}
+echo 'Patching CVE-2024-37891 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py'
+patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py < %{PATCH1004}
 
 
 # Windows executables get installed by pip and setuptools- we don't need these.
