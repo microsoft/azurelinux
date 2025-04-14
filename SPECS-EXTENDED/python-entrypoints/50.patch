@@ -1,0 +1,20 @@
+From c2ced73f8e3032d39c4b41fcc2d9a5b5f3689f9d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Lum=C3=ADr=20=27Frenzy=27=20Balhar?=
+ <frenzy.madness@gmail.com>
+Date: Tue, 3 Dec 2024 07:57:36 +0100
+Subject: [PATCH] Fix compatibility with Sphinx 8
+
+---
+ doc/conf.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/conf.py b/doc/conf.py
+index 2257274..d266c44 100644
+--- a/doc/conf.py
++++ b/doc/conf.py
+@@ -290,4 +290,4 @@
+ 
+ 
+ # Example configuration for intersphinx: refer to the Python standard library.
+-intersphinx_mapping = {'https://docs.python.org/': None}
++intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
