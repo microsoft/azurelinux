@@ -1,7 +1,7 @@
 Summary:        C debugger
 Name:           gdb
 Version:        13.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -47,7 +47,8 @@ another program was doing at the moment it crashed.
     --with-system-zlib \
     --disable-sim \
     --with-python=%{python3} \
-    --enable-unit-tests
+    --enable-unit-tests \
+    --enable-targets=all
 %make_build
 
 %install
@@ -103,6 +104,9 @@ make check TESTS='gdb.base/default.exp'
 %{_mandir}/*/*
 
 %changelog
+* Mon Feb 03 2025 Andrew Phelps <anphel@microsoft.com> - 13.2-4
+- Enable cross-debugging on all supported targets
+
 * Wed Oct 09 2024 Mitch Zhu <mitchzhu@microsoft.com> - 13.2-3
 - Fix CVE-2023-39128, CVE-2023-39129, CVE-2023-39130
 
