@@ -19,8 +19,8 @@
   <property name="build.outputDir" value="${build.dir}/classes"/>
   <property name="build.srcDir.0" value="src/main/java"/>
 
-  <property name="compiler.source" value="1.6"/>
-  <property name="compiler.target" value="1.6"/>
+  <property name="compiler.source" value="1.8"/>
+  <property name="compiler.target" value="1.8"/>
 
   <property name="reporting.outputDirectory" value="${build.dir}/site"/>
 

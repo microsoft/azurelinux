@@ -1,0 +1,24 @@
+diff -up flite-2.2/lang/cmu_grapheme_lex/cmu_grapheme_lex.h.lto flite-2.2/lang/cmu_grapheme_lex/cmu_grapheme_lex.h
+--- flite-2.2/lang/cmu_grapheme_lex/cmu_grapheme_lex.h.lto	2020-08-13 02:17:09.000000000 +0200
++++ flite-2.2/lang/cmu_grapheme_lex/cmu_grapheme_lex.h	2021-10-06 00:06:41.891126362 +0200
+@@ -44,7 +44,7 @@ extern "C" {
+ cst_lexicon *cmu_grapheme_lex_init(void);
+ 
+ extern const int num_unicode_sampa_mapping;
+-extern const char * const unicode_sampa_mapping[16663][5];
++extern const char * const unicode_sampa_mapping[16798][5];
+ 
+ #ifdef __cplusplus
+ } /* extern "C" */
+diff -up flite-2.2/lang/cmulex/cmu_lex.c.lto flite-2.2/lang/cmulex/cmu_lex.c
+--- flite-2.2/lang/cmulex/cmu_lex.c.lto	2020-08-13 02:17:09.000000000 +0200
++++ flite-2.2/lang/cmulex/cmu_lex.c	2021-10-06 00:05:48.817719935 +0200
+@@ -46,7 +46,7 @@ extern const int cmu_lex_entry[];
+ extern const unsigned char cmu_lex_data[];
+ extern const int cmu_lex_num_entries;
+ extern const int cmu_lex_num_bytes;
+-extern const char * const cmu_lex_phone_table[54];
++extern const char * const cmu_lex_phone_table[57];
+ extern const char * const cmu_lex_phones_huff_table[];
+ extern const char * const cmu_lex_entries_huff_table[];
+ 
