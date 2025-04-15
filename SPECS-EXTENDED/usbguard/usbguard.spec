@@ -11,7 +11,7 @@ License:        GPL-2.0-or-later
 # src/ThirdParty/Catch: Boost Software License - Version 1.0
 URL:            https://usbguard.github.io/
 Source0:        https://github.com/USBGuard/usbguard/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-Source2:        usbguard-daemon.conf
+Source1:        usbguard-daemon.conf
 Patch0: 	usbguard-revert-catch.patch
 
 Requires(post): /sbin/ldconfig
