@@ -54,7 +54,7 @@ make test
 
 %changelog
 * Tue Apr 15 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.40-2
-- Add missing check dependenciesL
+- Add missing check dependencies.
 
 * Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.40-1
 - Auto-upgrade to 1.40 - Azure Linux 3.0 - package upgrades
