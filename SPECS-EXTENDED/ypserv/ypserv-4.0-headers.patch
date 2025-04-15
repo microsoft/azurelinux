@@ -1,5 +1,5 @@
---- makedbm/makedbm.c.headers	2017-02-21 13:57:23.933293831 +0100
-+++ makedbm/makedbm.c	2017-02-21 13:57:48.141286207 +0100
+--- ypserv-4.2/makedbm/makedbm.c.headers	2017-02-21 13:57:23.933293831 +0100
++++ ypserv-4.2/makedbm/makedbm.c	2017-02-21 13:57:48.141286207 +0100
 @@ -30,6 +30,7 @@
  #include <netdb.h>
  #include <rpc/rpc.h>
