@@ -414,7 +414,6 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
-
 * Tue Mar 15 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.3.5-3
 - Patch CVE-2025-27219, CVE-2025-27220, CVE-2025-27221
 
