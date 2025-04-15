@@ -6,7 +6,7 @@ Release:        3%{?dist}
 Summary:        A next generation web framework for Perl
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/Mojolicious
-Source0:        http://cpan.metacpan.org/authors/id/S/SR/SRI/Mojolicious-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/S/SR/SRI/Mojolicious-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
