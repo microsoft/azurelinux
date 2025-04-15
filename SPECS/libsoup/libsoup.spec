@@ -10,10 +10,10 @@ Group:          System Environment/Development
 URL:            https://wiki.gnome.org/LibSoup
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/libsoup/%{BaseVersion}/%{name}-%{version}.tar.xz
 
-Patch:          CVE-2024-52530.patch
-Patch:          CVE-2024-52531.patch
-Patch:          CVE-2024-52532.patch
-Patch:          CVE-2025-32053.patch
+Patch0:          CVE-2024-52530.patch
+Patch1:          CVE-2024-52531.patch
+Patch2:          CVE-2024-52532.patch
+Patch3:          CVE-2025-32053.patch
 
 BuildRequires:  meson
 BuildRequires:  autogen
