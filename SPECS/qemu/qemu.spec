@@ -2332,7 +2332,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 - Add patch for CVE-2023-3180
 - Add patch for CVE-2023-3255
 - Add patch for CVE-2023-3301
-
 - Add patch for CVE-2023-3019
 
 * Wed Apr 09 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 6.2.0-22
