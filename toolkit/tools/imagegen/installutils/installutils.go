@@ -1237,7 +1237,9 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 	encryptedUUID := fmt.Sprintf("%v%v", uuidPrefix, uuid)
 	encryptionPassword := diskutils.DefaultKeyFilePath
 
-	// Construct crypttab entry and append crypttab file
+        // Add x-systemd.device-timeout=480s to options to avoid systemd timeouts when booting using qemu
+        // https://microsoft.visualstudio.com/OS/_workitems/edit/56076960/
+	Options = fmt.Sprintf("%v,x-systemd.device-timeout=480s", Options)
 	newEntry := fmt.Sprintf("%v %v %v %v\n", blockDevice, encryptedUUID, encryptionPassword, Options)
 	err = file.Append(newEntry, fullCryptTabPath)
 	if err != nil {
