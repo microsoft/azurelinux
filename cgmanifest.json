@@ -25112,6 +25112,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-toml",
+          "version": "0.10.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/toml/toml-0.10.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-tomli",
           "version": "2.0.1",
           "downloadUrl": "https://github.com/hukkin/tomli/archive/refs/tags/2.0.1.tar.gz"
