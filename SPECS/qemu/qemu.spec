@@ -2328,12 +2328,11 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
-* Mon Apr 14 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 6.2.0-24
+* Mon Apr 14 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 6.2.0-23
 - Add patch for CVE-2023-3180
 - Add patch for CVE-2023-3255
 - Add patch for CVE-2023-3301
 
-* Thu Apr 10 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 6.2.0-23
 - Add patch for CVE-2023-3019
 
 * Wed Apr 09 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 6.2.0-22
