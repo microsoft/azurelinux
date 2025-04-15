@@ -59,8 +59,6 @@ export VERBOSE=y
 export RUBYLIB=$(pwd)/lib
 ruby ./exe/rake test
 
-popd
-
 %files
 %dir %{gem_instdir}
 %license %{gem_instdir}/MIT-LICENSE
