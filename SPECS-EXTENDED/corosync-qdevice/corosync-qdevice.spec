@@ -8,20 +8,20 @@
 %global gitver %{?numcomm:.%{numcomm}}%{?alphatag:.%{alphatag}}%{?dirty:.%{dirty}}
 %global gittarver %{?numcomm:.%{numcomm}}%{?alphatag:-%{alphatag}}%{?dirty:-%{dirty}}
 
-Name: 		corosync-qdevice
-Summary: 	The Corosync Cluster Engine Qdevice
-Version: 	3.0.3
-Release: 	7%{?gitver}%{?dist}
-License: 	BSD-3-Clause
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:		https://github.com/corosync/corosync-qdevice
-Source0: 	https://github.com/corosync/corosync-qdevice/releases/download/v%{version}%{?gittarver}/%{name}-%{version}%{?gittarver}.tar.gz#/%{name}-%{version}.tar.gz
+Name: 	corosync-qdevice
+Summary: The Corosync Cluster Engine Qdevice
+Version: 3.0.3
+Release: 7%{?dist}
+License: BSD-3-Clause
+Vendor: Microsoft Corporation
+Distribution: Azure Linux
+URL: https://github.com/corosync/corosync-qdevice
+Source0: https://github.com/corosync/corosync-qdevice/releases/download/v%{version}%{?gittarver}/%{name}-%{version}%{?gittarver}.tar.gz#/%{name}-%{version}.tar.gz
 
 # Runtime bits
-Requires: 	corosync >= 2.4.0
-Requires: 	corosynclib >= 2.4.0
-Requires: 	nss-tools
+Requires: corosync >= 2.4.0
+Requires: corosynclib >= 2.4.0
+Requires: nss-tools
 
 %if %{with systemd}
 %{?systemd_requires}
