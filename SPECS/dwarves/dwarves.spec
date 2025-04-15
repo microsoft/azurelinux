@@ -3,12 +3,13 @@
 Summary:        Debugging Information Manipulation Tools (pahole & friends)
 Name:           dwarves
 Version:        1.25
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://acmel.wordpress.com
 Source:         https://fedorapeople.org/~acme/dwarves/%{name}-%{version}.tar.xz
+Patch0:         CVE-2025-29481.patch
 BuildRequires:  cmake >= 2.8.12
 BuildRequires:  elfutils-devel >= 0.130
 BuildRequires:  gcc
@@ -132,6 +133,9 @@ rm -Rf %{buildroot}
 %{_libdir}/%{libname}_reorganize.so
 
 %changelog
+* Mon Apr 14 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.25-2
+- Patch for CVE-2025-29481
+
 * Thu Nov 16 2023 Rachel Menge <rachelmenge@microsoft.com> - 1.25-1
 - Update to version 1.25
 - License verified
