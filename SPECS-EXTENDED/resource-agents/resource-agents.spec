@@ -98,7 +98,7 @@ Requires: /usr/sbin/rpc.statd
 Requires: /usr/sbin/rpc.nfsd /usr/sbin/rpc.mountd
 
 # rgmanager
-Requires: /usr/sbin/ethtool
+Requires: /sbin/ethtool
 Requires: /usr/bin/arping /usr/bin/ping /usr/bin/ping6
 
 # nfsexport.sh
