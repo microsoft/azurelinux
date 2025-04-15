@@ -15,7 +15,7 @@
 Summary:        Go
 Name:           msft-golang
 Version:        1.24.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +31,7 @@ Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.
 # bootstrap 03
 Source4:        https://github.com/microsoft/go/releases/download/v1.22.12-2/go1.22.12-20250211.4.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
+Patch1:         CVE-2025-22871.patch
 Conflicts:      go
 Conflicts:      golang
 
@@ -41,19 +42,31 @@ Go is an open source programming language that makes it easy to build simple, re
 # Setup go 1.4 bootstrap source
 tar xf %{SOURCE1} --no-same-owner
 patch -Np1 --ignore-whitespace < %{PATCH0}
+cd go
+patch -Np1 --ignore-whitespace < %{PATCH1}
+cd ../
 mv -v go go-bootstrap-00
 
 tar xf %{SOURCE2} --no-same-owner
+cd go
+patch -Np1 --ignore-whitespace < %{PATCH1}
+cd ../
 mv -v go go-bootstrap-01
 
 tar xf %{SOURCE3} --no-same-owner
+cd go
+patch -Np1 --ignore-whitespace < %{PATCH1}
+cd ../
 mv -v go go-bootstrap-02
 
 tar xf %{SOURCE4} --no-same-owner
+cd go
+patch -Np1 --ignore-whitespace < %{PATCH1}
+cd ../
 mv -v go go-bootstrap-03
 
 %setup -q -n go
-
+patch -p1 --fuzz=1 < %{PATCH1}
 %build
 # go 1.4 bootstraps with C.
 # go 1.20 bootstraps with go >= 1.17.13
@@ -159,6 +172,9 @@ fi
 %{_bindir}/*
 
 %changelog
+Mon Apr 14 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.24.1-2
+- Patch to address CVE-2025-22871
+
 * Mon Mar 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.24.1-1
 - Bump version to 1.24.1 to address CVE-2025-22870, CVE-2024-45341, CVE-2024-45336, CVE-2024-34158
 
