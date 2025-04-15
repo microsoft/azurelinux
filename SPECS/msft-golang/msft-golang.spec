@@ -66,7 +66,7 @@ cd ../
 mv -v go go-bootstrap-03
 
 %setup -q -n go
-patch -p1 --fuzz=1 < %{PATCH1}
+patch -Np1 --ignore-whitespace < %{PATCH1}
 %build
 # go 1.4 bootstraps with C.
 # go 1.20 bootstraps with go >= 1.17.13
