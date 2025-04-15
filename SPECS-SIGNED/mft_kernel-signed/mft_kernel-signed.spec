@@ -68,10 +68,10 @@ cp -rp ./. %{buildroot}/
 
 popd
 
-%post
+%post -n %{_name}
 /sbin/depmod %{KVERSION}
 
-%postun
+%postun -n %{_name}
 /sbin/depmod %{KVERSION}
 
 %files -n %{_name}

@@ -178,10 +178,10 @@ cp -rp ./. %{buildroot}/
 popd
 
 
-%post
+%post -n %{_name}
 /sbin/depmod %{KVERSION}
 
-%postun
+%postun -n %{_name}
 if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 	/sbin/depmod %{KVERSION}
 fi

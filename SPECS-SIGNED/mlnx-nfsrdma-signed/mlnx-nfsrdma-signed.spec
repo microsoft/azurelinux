@@ -100,13 +100,13 @@ cp -rp ./. %{buildroot}/
 popd
 
 
-%post
+%post -n %{_name}
 if [ $1 -ge 1 ]; then # This package is being installed or reinstalled
   /sbin/depmod %{KVERSION}
 fi
 # END of post
 
-%postun
+%postun -n %{_name}
 /sbin/depmod %{KVERSION}
 
 %files -n %{_name}
