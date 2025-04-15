@@ -30,18 +30,20 @@ Source0: 	https://build.clusterlabs.org/corosync/releases/%{name}-%{version}%{?g
 Requires: corosynclib%{?_isa} = %{version}-%{release}
 
 # Support crypto reload
-Requires: 	libknet1 >= 1.18
+Requires: libknet1 >= 1.18
 # NSS crypto plugin should be always installed
-Requires: 	libknet1-crypto-nss-plugin >= 1.18
+Requires: libknet1-crypto-nss-plugin >= 1.18
 
 # Build bits
-BuildRequires: 	gcc
-BuildRequires: 	groff
-BuildRequires: 	libqb-devel
-BuildRequires: 	libknet1-devel >= 1.18
-BuildRequires: 	zlib-devel
+BuildRequires: gcc
+BuildRequires: groff
+BuildRequires: libqb-devel
+BuildRequires: libknet1-devel >= 1.18
+BuildRequires: zlib-devel
 %if %{with runautogen}
-BuildRequires: autoconf automake libtool
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: libtool
 %endif
 %if %{with monitoring}
 BuildRequires: libstatgrab-devel
