@@ -49,10 +49,10 @@ createrepo_c-debuginfo-0.17.5-1.cm2.x86_64.rpm
 createrepo_c-devel-0.17.5-1.cm2.x86_64.rpm
 cross-binutils-common-2.37-14.cm2.noarch.rpm
 cross-gcc-common-11.2.0-8.cm2.noarch.rpm
-curl-8.8.0-5.cm2.x86_64.rpm
-curl-debuginfo-8.8.0-5.cm2.x86_64.rpm
-curl-devel-8.8.0-5.cm2.x86_64.rpm
-curl-libs-8.8.0-5.cm2.x86_64.rpm
+curl-8.8.0-6.cm2.x86_64.rpm
+curl-debuginfo-8.8.0-6.cm2.x86_64.rpm
+curl-devel-8.8.0-6.cm2.x86_64.rpm
+curl-libs-8.8.0-6.cm2.x86_64.rpm
 Cython-debuginfo-0.29.33-2.cm2.x86_64.rpm
 debugedit-5.0-2.cm2.x86_64.rpm
 debugedit-debuginfo-5.0-2.cm2.x86_64.rpm
@@ -576,8 +576,8 @@ tdnf-plugin-repogpgcheck-3.5.2-4.cm2.x86_64.rpm
 tdnf-python-3.5.2-4.cm2.x86_64.rpm
 texinfo-6.8-1.cm2.x86_64.rpm
 texinfo-debuginfo-6.8-1.cm2.x86_64.rpm
-unzip-6.0-21.cm2.x86_64.rpm
-unzip-debuginfo-6.0-21.cm2.x86_64.rpm
+unzip-6.0-22.cm2.x86_64.rpm
+unzip-debuginfo-6.0-22.cm2.x86_64.rpm
 util-linux-2.37.4-9.cm2.x86_64.rpm
 util-linux-debuginfo-2.37.4-9.cm2.x86_64.rpm
 util-linux-devel-2.37.4-9.cm2.x86_64.rpm
