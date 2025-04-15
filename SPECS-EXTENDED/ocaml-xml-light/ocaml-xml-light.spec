@@ -1,3 +1,5 @@
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
