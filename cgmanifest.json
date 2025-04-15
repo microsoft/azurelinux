@@ -3438,8 +3438,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.6.3",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_6_3/expat-2.6.3.tar.bz2"
+          "version": "2.6.4",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_6_4/expat-2.6.4.tar.bz2"
         }
       }
     },
@@ -4640,8 +4640,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.23.7",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.7-1/go1.23.7-20250304.2.src.tar.gz"
+          "version": "1.23.8",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.8-1/go1.23.8-20250401.2.src.tar.gz"
         }
       }
     },
@@ -4650,8 +4650,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.24.1",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.1-1/go1.24.1-20250304.4.src.tar.gz"
+          "version": "1.24.2",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.2-1/go1.24.2-20250401.4.src.tar.gz"
         }
       }
     },
@@ -4890,8 +4890,8 @@
         "type": "other",
         "other": {
           "name": "grpc",
-          "version": "1.62.0",
-          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.62.0/grpc-1.62.0.tar.gz"
+          "version": "1.62.3",
+          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.62.3/grpc-1.62.3.tar.gz"
         }
       }
     },
@@ -11181,8 +11181,8 @@
         "type": "other",
         "other": {
           "name": "libssh2",
-          "version": "1.11.0",
-          "downloadUrl": "https://www.libssh2.org/download/libssh2-1.11.0.tar.gz"
+          "version": "1.11.1",
+          "downloadUrl": "https://www.libssh2.org/download/libssh2-1.11.1.tar.gz"
         }
       }
     },
@@ -13742,8 +13742,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.40",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.40.tar.gz"
+          "version": "8.0.41",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.41.tar.gz"
         }
       }
     },
