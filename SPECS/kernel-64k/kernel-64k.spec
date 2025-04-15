@@ -24,8 +24,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-64k
-Version:        6.6.78.1
-Release:        3%{?dist}
+Version:        6.6.82.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -39,8 +39,7 @@ Source4:        cpupower
 Source5:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 Patch1:         0002-Increase-EFI_MMAP_NR_SLACK_SLOTS-for-GB200.patch
-Patch2:         jent-init-fix.patch
-Patch3:         Revert-serial-8250-Adjust-the-timeout-for-FIFO-mode.patch
+Patch2:         Revert-serial-8250-Adjust-the-timeout-for-FIFO-mode.patch
 ExclusiveArch:  aarch64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -373,6 +372,13 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.82.1-1
+- Auto-upgrade to 6.6.82.1
+
+* Tue Mar 11 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.79.1-1
+- Auto-upgrade to 6.6.79.1
+- Remove jitterentropy patch as it is included in the source
+
 * Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 6.6.78.1-3
 - Add patch to revert UART change that breaks IPMI SEL panic message
 
