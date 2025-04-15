@@ -16,15 +16,15 @@ Source0: 	https://github.com/%{name}/%{name}/releases/download/v%{version}/%{nam
 Source1: 	https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}-doc.zip
 
 # make qpdf working under FIPS, downstream patch
-Patch1:  	qpdf-relax.patch
+Patch1:  qpdf-relax.patch
 
 # gcc and gcc-c++ are no longer in buildroot by default
 # gcc is needed for qpdf-ctest.c
-BuildRequires: 	gcc
+BuildRequires: gcc
 # gcc-c++ is need for everything except for qpdf-ctest
-BuildRequires: 	gcc-c++
+BuildRequires: gcc-c++
 # uses cmake
-BuildRequires: 	cmake
+BuildRequires: cmake
 
 BuildRequires: 	zlib-devel
 BuildRequires: 	libjpeg-turbo-devel
@@ -58,11 +58,11 @@ BuildRequires: 	perl(strict)
 Requires: 	%{name}-libs%{?_isa} = %{version}-%{release}
 
 %package libs
-Summary: 	QPDF library for transforming PDF files
+Summary: QPDF library for transforming PDF files
 
 %package devel
-Summary: 	Development files for QPDF library
-Requires: 	%{name}-libs%{?_isa} = %{version}-%{release}
+Summary: Development files for QPDF library
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 %package doc
 Summary: 	QPDF Manual
