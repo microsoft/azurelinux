@@ -4080,12 +4080,6 @@ you're not running VMS, this module does nothing.
 %prep
 %autosetup -p1 -n perl-%{perl_version}
 
-echo "Remove encrypted test sources"
-rm -vf /usr/src/azl/BUILD/perl-%{perl_version}/cpan/IO-Compress/t/files/encrypt-aes.zip
-rm -vf /usr/src/azl/BUILD/perl-%{perl_version}/cpan/IO-Compress/t/files/encrypt-standard.zip
-sed -i '\|cpan/IO-Compress/t/files/encrypt-aes.zip|d' /usr/src/azl/BUILD/perl-%{perl_version}/MANIFEST
-sed -i '\|cpan/IO-Compress/t/files/encrypt-standard.zip|d' /usr/src/azl/BUILD/perl-%{perl_version}/MANIFEST
-
 #copy Pod-Html license clarification
 cp %{SOURCE6} .
 
@@ -6848,7 +6842,6 @@ popd
 %changelog
 * Tue Apr 08 2025 Andrew Phelps <anphel@microsoft.com> - 4:5.38.2-507
 - Patch CVE-2024-56406
-- Remove encrypted test files "encrypt-aes.zip" and "encrypt-standard.zip"
 
 * Fri May 24 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.38.2-506
 - Release bump to regenerate package's requires and provides.
