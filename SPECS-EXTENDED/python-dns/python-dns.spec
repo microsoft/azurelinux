@@ -1,13 +1,8 @@
 %global pypi_name dnspython
 %global rctag %{nil}
 
-%if 0%{?rhel}
-%bcond_with trio
-%bcond_with doh
-%else
 %bcond_without trio
 %bcond_without doh
-%endif
 
 Name:           python-dns
 Version:        2.6.1
@@ -50,9 +45,6 @@ manipulation of DNS zones, messages, names, and records.
 %description %_description
 %package -n python3-dns
 Summary:        %{summary}
-%if ! 0%{?rhel}
-Obsoletes:      python3-dns+curio < 2.3.0-6
-%endif
 
 %description -n python3-dns %_description
 
