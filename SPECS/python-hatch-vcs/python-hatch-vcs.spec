@@ -32,7 +32,9 @@ BuildRequires:  python3-packaging
 BuildRequires:  python3-trove-classifiers
 
 %if %{with tests}
-BuildRequires:  python3dist(pytest)
+#To break the cycle created by new iniconfig -> hatch-vcs -> pytest -> iniconfig
+# using pip pytest
+# BuildRequires:  python3dist(pytest)
 BuildRequires:  git-core
 BuildRequires:  python3-setuptools_scm
 %endif
@@ -69,7 +71,7 @@ Summary:        %{summary}
 
 %check
 %if %{with tests}
-pip3 install iniconfig
+pip3 install iniconfig pytest
 %pytest
 %else
 %pyproject_check_import
