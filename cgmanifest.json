@@ -23353,8 +23353,8 @@
         "type": "other",
         "other": {
           "name": "python-lazy-object-proxy",
-          "version": "1.4.3",
-          "downloadUrl": "https://github.com/ionelmc/python-lazy-object-proxy/archive/v1.4.3/lazy-object-proxy-1.4.3.tar.gz"
+          "version": "1.10.0",
+          "downloadUrl": "https://github.com/ionelmc/python-lazy-object-proxy/archive/v1.10.0/lazy-object-proxy-1.10.0.tar.gz"
         }
       }
     },
