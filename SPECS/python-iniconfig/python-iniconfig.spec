@@ -64,9 +64,6 @@ Summary:        %{summary}
 
 %prep
 %autosetup -n %{base_name}-%{version}
-# Remove undeclared dependency on python-py
-# Merged upstream https://github.com/pytest-dev/iniconfig/pull/47
-sed -i "s/py\.test/pytest/" testing/test_iniconfig.py
 
 %generate_buildrequires
 %pyproject_buildrequires
