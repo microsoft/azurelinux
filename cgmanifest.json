@@ -12762,7 +12762,7 @@
         "other": {
           "name": "m17n-lib",
           "version": "1.8.5",
-          "downloadUrl": "http://download.savannah.gnu.org/releases/m17n/m17n-lib-1.8.5.tar.gz"
+          "downloadUrl": "https://download.savannah.gnu.org/releases/m17n/m17n-lib-1.8.5.tar.gz"
         }
       }
     },
