@@ -13,8 +13,8 @@ having a unique set of features:
 * iniconfig raises an Error if two sections have the same name.}
 
 Name:           python-%{base_name}
-Version:        1.1.1
-Release:        17%{?dist}
+Version:        2.1.0
+Release:        1%{?dist}
 Summary:        Brain-dead simple parsing of ini files
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -93,6 +93,9 @@ sed -i "s/py\.test/pytest/" testing/test_iniconfig.py
 
 
 %changelog
+* Wed Apr 16 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.0-1
+- Auto-upgrade to 2.1.0 - fix bug 56661311
+
 * Mon Oct 07 2024 Devin Anderson <danderson@microsoft.com> - 1.1.1-17
 - Initial Azure Linux import from Fedora 40 (license: MIT).
 - License verified.
