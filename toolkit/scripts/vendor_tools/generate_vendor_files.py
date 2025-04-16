@@ -175,6 +175,10 @@ class VendorProcessor:
             script_args.extend(["--vendorVersion", self.vendor_version])
 
         if vendor_type == VendorType.GIT_SUBMODULES:
+            if self.source_url is None or self.source_url == "":
+                PipelineLogging.output_log_error(
+                    "Source URL is required for git submodules")
+                return
             script_args.extend(["--gitUrl", self.source_url])
 
         # run the script
