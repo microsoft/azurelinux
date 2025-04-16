@@ -18,6 +18,9 @@ Patch1:         CVE-2025-27144.patch
 Patch2:         CVE-2025-22868.patch
 Patch3:         CVE-2025-22869.patch
 Patch4:         CVE-2025-30204.patch
+# CVE-2025-32386 and CVE-2025-32387 are fixed in 3.17.3 by https://github.com/helm/helm/commit/d8ca55fc669645c10c0681d49723f4bb8c0b1ce7
+Patch5:         CVE-2025-32386.patch
+
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
 Requires:       %{name}-cainjector
@@ -108,6 +111,10 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+* Wed Apr 16 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.12.15-4
+- Patch CVE-2025-32386
+- Patch CVE-2025-32387
+
 * Fri Mar 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.12.15-3
 - Patch CVE-2025-30204
 
