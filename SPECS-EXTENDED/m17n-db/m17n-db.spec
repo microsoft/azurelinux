@@ -5,9 +5,9 @@ Summary:    Multilingualization datafiles for m17n-lib
 Version:    1.8.9
 Release:    2%{?dist}
 License:    LGPL-2.1-or-later
-URL:        http://www.nongnu.org/m17n
+URL:        https://www.nongnu.org/m17n
 
-Source0:    http://download-mirror.savannah.gnu.org/releases/m17n/%{name}-%{version}.tar.gz
+Source0:    https://download-mirror.savannah.gnu.org/releases/m17n/%{name}-%{version}.tar.gz
 # Following is awaiting for upstream commit
 Source1:    https://raw.githubusercontent.com/gnuman/m17n-inglish-mims/master/minglish/minglish.mim
 
