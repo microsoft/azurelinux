@@ -6,7 +6,7 @@ License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/varlink/%{name}
-Source0:        https://github.com/varlink/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
+Source0: 	https://files.pythonhosted.org/packages/e6/90/172069117da79f1b62a29417dac7c7e544dda82bfb28af18167d1fb3aaaf/varlink-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-rpm-macros
@@ -28,7 +28,7 @@ Obsoletes:     python-varlink <= 3-1.git.61.1bc637d.fc27
 %description -n python3-varlink %_description
 
 %prep
-%autosetup -n python-%{version}
+%autosetup -n varlink-%{version}
 # varlink also supports python-2.7 but python3 is required here
 sed -i -e 's#env python#env python3#' varlink/tests/test_certification.py
 # varlink also supports python-2.7 but python3 is required here

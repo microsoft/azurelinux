@@ -25294,7 +25294,7 @@
         "other": {
           "name": "python-varlink",
           "version": "31.0.0",
-          "downloadUrl": "https://github.com/varlink/python-varlink/archive/31.0.0/python-varlink-31.0.0.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/e6/90/172069117da79f1b62a29417dac7c7e544dda82bfb28af18167d1fb3aaaf/varlink-31.0.0.tar.gz"
         }
       }
     },
