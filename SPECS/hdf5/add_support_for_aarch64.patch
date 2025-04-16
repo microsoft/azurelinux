@@ -1,0 +1,33 @@
+From 3d5e8ee45793ce34c60c68c5a5f923f887193545 Mon Sep 17 00:00:00 2001
+From: Kanishk-Bansal <kbkanishk975@gmail.com>
+Date: Wed, 16 Apr 2025 09:38:55 +0000
+Subject: [PATCH] add_support_for_aarch64
+
+Upstream Patch Reference : https://github.com/HDFGroup/hdf5/pull/4639/commits/435ab8f3f20dce4d3ebf761c9987201c83da7731
+---
+ src/H5private.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/H5private.h b/src/H5private.h
+index 904aa9f..62f4e9b 100644
+--- a/src/H5private.h
++++ b/src/H5private.h
+@@ -599,8 +599,14 @@
+  * _Float16 type to avoid issues when compiling the library
+  * with the -pedantic flag or similar where we get warnings
+  * about _Float16 not being an ISO C type.
++ *
++ * Due to the inclusion of H5private.h from the C++ wrappers,
++ * this typedef creation must be avoided when __cplusplus is
++ * defined to avoid build failures on ARM64 Macs. GCC and
++ * Clang either do not currently provide a _Float16 type for
++ * C++ on ARM64, or may need an additional compile-time flag.
+  */
+-#ifdef H5_HAVE__FLOAT16
++#if defined(H5_HAVE__FLOAT16) && !defined(__cplusplus)
+ #if defined(__GNUC__)
+ __extension__ typedef _Float16 H5__Float16;
+ #else
+-- 
+2.45.2
+

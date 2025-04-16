@@ -13,7 +13,7 @@
 Summary:        A general purpose library and file format for storing scientific data
 Name:           hdf5
 Version:        1.14.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,7 @@ Source0:        https://github.com/hdfgroup/hdf5/releases/download/%{name}_%{ver
 Source1:        h5comp
 Patch0:         hdf5-build.patch
 Patch1:         hdf5-wrappers.patch
+Patch2:         add_support_for_aarch64.patch
 
 # For patches/rpath
 BuildRequires:  automake
@@ -150,16 +151,6 @@ sed -e 's|-O -finline-functions|-O3 -finline-functions|g' -i config/gnu-flags
 # --with-mpe=DIR Use MPE instrumentation [default=no]
 # --enable-cxx/fortran/parallel and --enable-threadsafe flags are incompatible
 
-# temporarily disable _FLOAT16 for ARM64 until a fix is checked-in.
-# See:
-# - https://github.com/HDFGroup/hdf5/pull/4495
-# - https://github.com/HDFGroup/hdf5/pull/4507
-%ifarch aarch64
-%global disable_float16 \\\
-  --disable-nonstandard-feature-float16 \\\
-%{nil}
-%endif
-
 #Serial build
 export CC=gcc
 export CXX=g++
@@ -172,7 +163,6 @@ ln -s ../configure .
   %{configure_opts} \
   --enable-cxx \
   --enable-hlgiftools \
-  %{disable_float16} \
   --with-default-plugindir=%{_libdir}/hdf5/plugin
 sed -i -e 's| -shared | -Wl,--as-needed\0|g' libtool
 sed -r -i 's|^prefix=/usr|prefix=%{buildroot}/usr|' java/test/junit.sh
@@ -420,6 +410,10 @@ done
 
 
 %changelog
+* Wed Apr 16 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.14.4-2
+- Remove the _FLOAT16 temporary work-around for hdf5 arm64 builds
+- Add Patch to add support for aarch64 _Float16 16-bit floating point type
+
 * Mon May 20 2024 George Mileka <gmileka@microsoft.com> - 1.14.4-1
 - Upgrade to 1.14.4 - Fix critical CVEs
 
