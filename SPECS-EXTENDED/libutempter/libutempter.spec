@@ -9,7 +9,7 @@ Release: 16%{?dist}
 License: LGPL-2.1-or-later AND LGPL-2.1-only
 URL: ftp://ftp.altlinux.org/pub/people/ldv/utempter
 
-Source0: ftp://ftp.altlinux.org/pub/people/ldv/utempter/%{name}-%{version}.tar.gz
+Source0: https://ftp.altlinux.org/pub/people/ldv/libutempter/libutempter-1.2.1.tar.gz
 
 BuildRequires: gcc
 BuildRequires: make

@@ -11352,7 +11352,7 @@
         "other": {
           "name": "libutempter",
           "version": "1.2.1",
-          "downloadUrl": "ftp://ftp.altlinux.org/pub/people/ldv/utempter/libutempter-1.2.1.tar.gz"
+          "downloadUrl": "https://ftp.altlinux.org/pub/people/ldv/libutempter/libutempter-1.2.1.tar.gz"
         }
       }
     },
