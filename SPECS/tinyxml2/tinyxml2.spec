@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/leethomason/tinyxml2/
 Source0:        https://github.com/leethomason/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch1:         CVE-2024-50614.patch
+Patch1:         CVE-2024-50614.nopatch
 Patch2:         CVE-2024-50615.patch
 BuildRequires:  build-essential
 BuildRequires:  cmake
@@ -24,7 +24,7 @@ Development files for %{name}
 
 %prep
 %setup -q
-sed -i 's/\r//g' tinyxml2.cpp xmltest.cpp 
+sed -i 's/\r//g' *.cpp
 %autopatch -p1
 
 %build
