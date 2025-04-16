@@ -35,6 +35,7 @@ BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-hatch-vcs
 BuildRequires:  python3-hatchling
 BuildRequires:  python3-pathspec
+BuildRequires:  python3-pluggy
 BuildRequires:  python3-wheel
 
 # pytest 6+ needs this and this uses pytest for tests
