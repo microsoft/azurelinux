@@ -67,7 +67,6 @@ vendor_script_mapping = {
     VendorType.GO: "generate_go_vendor.sh",
     VendorType.CARGO: "generate_cargo_vendor.sh",
     VendorType.GIT_SUBMODULES: "generate_git_submodules_vendor.sh",
-    VendorType.CUSTOM: "generate_source_tarball.sh",
     VendorType.LEGACY: "generate_source_tarball.sh" #TODO: remove this once all scripts have been converted
 }
 
@@ -135,12 +134,18 @@ class VendorProcessor:
         vendor_types: list = package_data['vendors']['vendor_types']
 
         for vendor_type in vendor_types:
-            vendor_type = VendorType(vendor_type)
-            self.process_vendor_type(vendor_type)
+            if isinstance(vendor_type, dict):
+                # if vendor type is a dict, get the first key
+                vendor_type = VendorType.CUSTOM
+                vendor_script_name = vendor_type["custom"]
+            else:
+                vendor_type = VendorType(vendor_type)
+                vendor_script_name = vendor_script_mapping.get(vendor_type)
 
-    def process_vendor_type(self, vendor_type: VendorType):
+            self.process_vendor_type(vendor_type, vendor_script_name)
+
+    def process_vendor_type(self, vendor_type: VendorType, vendor_script_name: str = None):
         '''Process the vendor type and run the vendor script'''
-        vendor_script_name = vendor_script_mapping.get(vendor_type)
 
         PipelineLogging.output_debug(
             f"Processing vendor type: '{vendor_type.value}', script name mapped to '{vendor_script_name}'")
