@@ -112,7 +112,7 @@ make install INSTALL='install -p' DESTDIR=%{buildroot}
 mkdir -p %{buildroot}%{_sysconfdir}/usbguard
 mkdir -p %{buildroot}%{_sysconfdir}/usbguard/rules.d
 mkdir -p %{buildroot}%{_sysconfdir}/usbguard/IPCAccessControl.d
-install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/usbguard/usbguard-daemon.conf
+install -p -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/usbguard/usbguard-daemon.conf
 
 # Cleanup
 find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
