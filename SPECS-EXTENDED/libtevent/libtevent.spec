@@ -8,7 +8,7 @@ Version: 0.16.1
 Release: 5%{?dist}
 Summary: The tevent library
 License: LGPL-3.0-or-later
-URL: http://tevent.samba.org/
+URL: https://tevent.samba.org/
 Source0: https://samba.org/ftp/tevent/tevent-%{version}.tar.gz
 Source1: https://samba.org/ftp/tevent/tevent-%{version}.tar.asc
 # gpg2 --no-default-keyring --keyring ./tevent.keyring --recv-keys 9147A339719518EE9011BCB54793916113084025
