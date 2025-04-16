@@ -6941,7 +6941,7 @@
         "other": {
           "name": "hyphen-tk",
           "version": "0.20210322",
-          "downloadUrl": "http://mirror.ctan.org/language/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-tk.tex"
+          "downloadUrl": "https://mirrors.ctan.org/language/hyph-utf8/tex/patterns/tex/hyph-tk.tex"
         }
       }
     },

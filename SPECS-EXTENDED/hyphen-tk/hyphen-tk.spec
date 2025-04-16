@@ -5,8 +5,8 @@ Summary: Turkmen hyphenation rules
 %global upstreamid 20210322
 Version: 0.%{upstreamid}
 Release: 6%{?dist}
-Source: http://mirror.ctan.org/language/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-tk.tex
-URL: http://tug.org/tex-hyphen
+Source0: https://mirrors.ctan.org/language/hyph-utf8/tex/patterns/tex/hyph-tk.tex
+URL: https://ctan.org
 License: MIT
 BuildArch: noarch
 BuildRequires: hyphen-devel
