@@ -8,8 +8,8 @@ Summary:	A library for import of Microsoft Works documents
 License:	LGPL-2.1-or-later OR MPL-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:		http://libwps.sourceforge.net/
-Source0:	http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
+URL:		https://libwps.sourceforge.net/
+Source0:	https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires:	doxygen
 BuildRequires:	gcc-c++
