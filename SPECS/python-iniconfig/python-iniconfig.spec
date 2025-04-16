@@ -88,7 +88,7 @@ Summary:        %{summary}
 
 %files -n python3-%{base_name} -f %{pyproject_files}
 %doc README.rst
-%license LICENSE
+%license %{python3_sitelib}/iniconfig-%{version}.dist-info/licenses/LICENSE
 
 
 %changelog
