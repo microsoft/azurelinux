@@ -12,8 +12,6 @@ URL:            https://commons.apache.org/proper/commons-digester
 Source0:        https://dlcdn.apache.org/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
 Source1:        %{name}-build.xml
 
-Patch1:         apache-commons-digester-2.1-build-java-error-fix1.patch
-
 BuildRequires:  ant
 BuildRequires:  commons-beanutils
 BuildRequires:  commons-collections
@@ -47,9 +45,9 @@ This package contains the javadoc documentation for the Jakarta Commons
 Digester Package.
 
 %prep
-%setup -q -n %{short_name}-%{version}-src
+%autosetup -n %{short_name}-%{version}-src
 cp %{SOURCE1} build.xml
-%patch 1 -p1
+sed -i s/1.6/1.8/g build.xml
 
 mkdir -p lib
 build-jar-repository -s lib commons-beanutils commons-logging
