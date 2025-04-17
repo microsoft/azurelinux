@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/leethomason/tinyxml2/
 Source0:        https://github.com/leethomason/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch1:         CVE-2024-50614.nopatch
+# CVE-2024-50614 fixed along with CVE-2024-50615
 Patch2:         CVE-2024-50615.patch
 BuildRequires:  build-essential
 BuildRequires:  cmake
