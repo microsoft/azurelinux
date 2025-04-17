@@ -5269,16 +5269,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "helm",
-          "version": "3.15.2",
-          "downloadUrl": "https://github.com/helm/helm/archive/refs/tags/v3.15.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "help2man",
           "version": "1.49.3",
           "downloadUrl": "ftp://ftp.gnu.org/gnu/help2man/help2man-1.49.3.tar.xz"
