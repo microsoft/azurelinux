@@ -1,7 +1,6 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 %define version_main %(echo %{version} | cut -d. -f-2)
-%global so_version_1 310
-%global so_version_2 311
+%global so_version 310
 %global with_mpich 0
 %global with_openmpi 0
 %if %{with_mpich}
@@ -12,17 +11,21 @@
 %endif
 Summary:        A general purpose library and file format for storing scientific data
 Name:           hdf5
-Version:        1.14.4
-Release:        1%{?dist}
+Version:        1.14.4.3
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://portal.hdfgroup.org/display/HDF5/HDF5
-Source0:        https://github.com/hdfgroup/hdf5/releases/download/%{name}_%{version}.2/%{name}-%{version}-2.tar.gz
+Source0:        https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.14/hdf5-1.14.4/src/hdf5-1.14.4-3.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        h5comp
-Patch0:         hdf5-build.patch
-Patch1:         hdf5-wrappers.patch
 
+Patch3:         hdf5-build.patch
+# Remove Fedora build flags from h5cc/h5c++/h5fc
+# https://bugzilla.redhat.com/show_bug.cgi?id=1794625
+Patch5:         hdf5-wrappers.patch
+
+# For patches/rpath
 # For patches/rpath
 BuildRequires:  automake
 # Needed for mpi tests
@@ -127,7 +130,7 @@ HDF5 parallel openmpi static libraries
 
 
 %prep
-%autosetup -p1 -n %{name}-%{version}-2
+%autosetup -n %{name}-1.14.4-3 -p1
 
 # Force shared by default for compiler wrappers (bug #1266645)
 sed -i -e '/^STATIC_AVAILABLE=/s/=.*/=no/' */*/h5[cf]*.in
@@ -144,21 +147,10 @@ sed -e 's|-O -finline-functions|-O3 -finline-functions|g' -i config/gnu-flags
   --enable-hl \\\
   --enable-shared \\\
   --with-szlib \\\
-  --enable-mirror-vfd \\\
 %{nil}
 # --enable-cxx and --enable-parallel flags are incompatible
 # --with-mpe=DIR Use MPE instrumentation [default=no]
 # --enable-cxx/fortran/parallel and --enable-threadsafe flags are incompatible
-
-# temporarily disable _FLOAT16 for ARM64 until a fix is checked-in.
-# See:
-# - https://github.com/HDFGroup/hdf5/pull/4495
-# - https://github.com/HDFGroup/hdf5/pull/4507
-%ifarch aarch64
-%global disable_float16 \\\
-  --disable-nonstandard-feature-float16 \\\
-%{nil}
-%endif
 
 #Serial build
 export CC=gcc
@@ -171,8 +163,6 @@ ln -s ../configure .
 %configure \
   %{configure_opts} \
   --enable-cxx \
-  --enable-hlgiftools \
-  %{disable_float16} \
   --with-default-plugindir=%{_libdir}/hdf5/plugin
 sed -i -e 's| -shared | -Wl,--as-needed\0|g' libtool
 sed -r -i 's|^prefix=/usr|prefix=%{buildroot}/usr|' java/test/junit.sh
@@ -282,8 +272,6 @@ done
 %license COPYING
 %doc README.md release_docs/RELEASE.txt
 %doc release_docs/HISTORY*.txt
-%{_bindir}/gif2h5
-%{_bindir}/h52gif
 %{_bindir}/h5clear
 %{_bindir}/h5copy
 %{_bindir}/h5debug
@@ -302,15 +290,13 @@ done
 %{_bindir}/h5stat
 %{_bindir}/h5unjam
 %{_bindir}/h5watch
-%{_bindir}/mirror_server
-%{_bindir}/mirror_server_stop
 %{_libdir}/hdf5/
-%{_libdir}/libhdf5.so.%{so_version_2}*
-%{_libdir}/libhdf5_cpp.so.%{so_version_1}*
-%{_libdir}/libhdf5_fortran.so.%{so_version_2}*
-%{_libdir}/libhdf5hl_fortran.so.%{so_version_1}*
-%{_libdir}/libhdf5_hl.so.%{so_version_1}*
-%{_libdir}/libhdf5_hl_cpp.so.%{so_version_1}*
+%{_libdir}/libhdf5.so.%{so_version}*
+%{_libdir}/libhdf5_cpp.so.%{so_version}*
+%{_libdir}/libhdf5_fortran.so.%{so_version}*
+%{_libdir}/libhdf5hl_fortran.so.%{so_version}*
+%{_libdir}/libhdf5_hl.so.%{so_version}*
+%{_libdir}/libhdf5_hl_cpp.so.%{so_version}*
 
 %files devel
 %{macrosdir}/macros.hdf5
@@ -319,7 +305,7 @@ done
 %{_bindir}/h5fc*
 %{_bindir}/h5redeploy
 %{_includedir}/*.h
-%{_includedir}/*.inc
+%{_includedir}/H5config_f.inc
 %{_libdir}/*.so
 %{_libdir}/*.settings
 %{_fmoddir}/*.mod
@@ -331,10 +317,8 @@ done
 %if %{with_mpich}
 %files mpich
 %license COPYING
-%doc MANIFEST README.txt release_docs/RELEASE.txt
+%doc README.md release_docs/RELEASE.txt
 %doc release_docs/HISTORY*.txt
-%{_libdir}/mpich/bin/gif2h5
-%{_libdir}/mpich/bin/h52gif
 %{_libdir}/mpich/bin/h5clear
 %{_libdir}/mpich/bin/h5copy
 %{_libdir}/mpich/bin/h5debug
@@ -353,11 +337,9 @@ done
 %{_libdir}/mpich/bin/h5stat
 %{_libdir}/mpich/bin/h5unjam
 %{_libdir}/mpich/bin/h5watch
-%{_libdir}/mpich/bin/mirror_server
-%{_libdir}/mpich/bin/mirror_server_stop
 %{_libdir}/mpich/bin/ph5diff
 %{_libdir}/mpich/hdf5/
-%{_libdir}/mpich/lib/*.so.%{so_version_1}*
+%{_libdir}/mpich/lib/*.so.%{so_version}*
 
 %files mpich-devel
 %{_includedir}/mpich-%{_arch}
@@ -375,10 +357,8 @@ done
 %if %{with_openmpi}
 %files openmpi
 %license COPYING
-%doc MANIFEST README.txt release_docs/RELEASE.txt
+%doc README.md release_docs/RELEASE.txt
 %doc release_docs/HISTORY*.txt
-%{_libdir}/openmpi/bin/gif2h5
-%{_libdir}/openmpi/bin/h52gif
 %{_libdir}/openmpi/bin/h5clear
 %{_libdir}/openmpi/bin/h5copy
 %{_libdir}/openmpi/bin/h5debug
@@ -397,11 +377,9 @@ done
 %{_libdir}/openmpi/bin/h5stat
 %{_libdir}/openmpi/bin/h5unjam
 %{_libdir}/openmpi/bin/h5watch
-%{_libdir}/openmpi/bin/mirror_server
-%{_libdir}/openmpi/bin/mirror_server_stop
 %{_libdir}/openmpi/bin/ph5diff
 %{_libdir}/openmpi/hdf5/
-%{_libdir}/openmpi/lib/*.so.%{so_version_1}*
+%{_libdir}/openmpi/lib/*.so.%{so_version}*
 
 %files openmpi-devel
 %{_includedir}/openmpi-%{_arch}
@@ -420,8 +398,17 @@ done
 
 
 %changelog
-* Mon May 20 2024 George Mileka <gmileka@microsoft.com> - 1.14.4-1
-- Upgrade to 1.14.4 - Fix critical CVEs
+* Tue Jun 04 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.14.4.3-1
+- Upgrade to v1.14.4.3 to fix CVEs 2024-29157, 2024-29158, 2024-29159, 2024-29160,
+  2024-29161, 2024-29162, 2024-29163, 2024-29164, 2024-29165, 2024-29166, 2024-32605,
+  2024-32606, 2024-32607, 2024-32608, 2024-32609, 2024-32610, 2024-32611, 2024-32612,
+  2024-32613, 2024-32614, 2024-32615, 2024-32616, 2024-32617, 2024-32618, 2024-32619,
+  2024-32620, 2024-32621, 2024-32622, 2024-32623, 2024-32624, 2024-33873, 2024-33877,
+  2024-33874, 2024-33875, 2024-33876
+
+* Tue Mar 26 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 1.14.3-1
+- Update to 1.14.3
+- Add patch to fix build with autoconf 2.71
 
 * Thu Oct 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.12.1-13
 - Patch hdf5 for CVE-2021-37501.
