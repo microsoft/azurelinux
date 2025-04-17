@@ -1,13 +1,14 @@
 Summary:        cifs client utils
 Name:           cifs-utils
 Version:        7.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Nfs-utils-client
 URL:            https://wiki.samba.org/index.php/LinuxCIFS_utils
 Source0:        https://download.samba.org/pub/linux-cifs/%{name}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2025-2312.patch
 BuildRequires:  keyutils-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libtalloc-devel
@@ -81,6 +82,9 @@ make %{?_smp_mflags} check
 %{_includedir}/cifsidmap.h
 
 %changelog
+* Mon Mar 31 2025 Ankita Pareek <ankitapareek@microsoft.com> - 7.3-2
+- Add patch for CVE-2025-2312
+
 * Wed Mar 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.3-1
 - Auto-upgrade to 7.3 - Bugfix: 56213770, 56248605
 
