@@ -9,7 +9,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/espeak-ng/espeak-ng
 Source0:        https://github.com/%{name}/%{name}/archive/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tgz
-Patch0:         espeak-ng-1.51-CVE-2023-49990-4.patch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -93,6 +92,7 @@ rm -vrf %{buildroot}%{_datadir}/vim/registry
 %changelog
 * Thu Apr 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.52.0-1
 - Auto-upgrade to 1.52.0 - remove chrome extension which used unverified function
+- Removing patch file for CVE-2023-49990 as it is fixed in newest version.
 
 * Wed Jan 31 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.51.1-1
 - Bump package version to 1.51.1
