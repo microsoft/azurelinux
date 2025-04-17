@@ -1,0 +1,31 @@
+From: Antonio Torres <antorres@redhat.com>
+Date: Fri, 28 Jan 2022
+Subject: Use infinite timeout when using LDAP+start-TLS
+
+This will ensure that the TLS connection to the LDAP server will complete
+before starting FreeRADIUS, as it forces libldap to use a blocking socket during 
+the process. Infinite timeout is the OpenLDAP default.
+Avoids this: https://git.openldap.org/openldap/openldap/-/blob/87ffc60006298069a5a044b8e63dab27a61d3fdf/libraries/libldap/tls2.c#L1134
+
+Resolves: https://bugzilla.redhat.com/show_bug.cgi?id=1992551
+Signed-off-by: Antonio Torres <antorres@redhat.com>
+---
+ src/modules/rlm_ldap/ldap.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/modules/rlm_ldap/ldap.c b/src/modules/rlm_ldap/ldap.c
+index cf7a84e069..841bf888a1 100644
+--- a/src/modules/rlm_ldap/ldap.c
++++ b/src/modules/rlm_ldap/ldap.c
+@@ -1472,7 +1472,10 @@ void *mod_conn_create(TALLOC_CTX *ctx, void *instance)
+ 	}
+ 
+ #ifdef LDAP_OPT_NETWORK_TIMEOUT
+-	if (inst->net_timeout) {
++	bool using_tls = inst->start_tls ||
++					 inst->port == 636 ||
++					 strncmp(inst->server, "ldaps://", strlen("ldaps://")) == 0;
++	if (inst->net_timeout && !using_tls) {
+ 		memset(&tv, 0, sizeof(tv));
+ 		tv.tv_sec = inst->net_timeout;
+ 
