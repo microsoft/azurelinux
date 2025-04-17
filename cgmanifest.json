@@ -14311,16 +14311,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "node-problem-detector",
-          "version": "0.8.20",
-          "downloadUrl": "https://github.com/kubernetes/node-problem-detector/archive/refs/tags/v0.8.20.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "nodejs",
           "version": "20.14.0",
           "downloadUrl": "https://nodejs.org/download/release/v20.14.0/node-v20.14.0.tar.xz"
