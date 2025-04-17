@@ -26,7 +26,6 @@ Source0:       https://github.com/helm/helm/archive/refs/tags/v%{version}.tar.gz
 Source1:       %{name}-%{version}-vendor.tar.gz
 Patch0:        CVE-2023-45288.patch
 Patch1:        CVE-2024-45338.patch
-# CVE-2025-32387 is part of CVE-2025-32386
 Patch2:        CVE-2025-32386.patch
 BuildRequires: golang
 
@@ -58,7 +57,7 @@ go test -v ./cmd/helm
 
 %changelog
 * Thu Apr 17 2025 Archana Shettigar <v-shettigara@microsoft.com> - 3.14.2-6
-- Patch CVE-2025-32386 & CVE-2025-32387
+- Patch CVE-2025-32386
 
 * Fri Jan 03 2025 Sumedh Sharma <sumsharma@microsoft.com> - 3.14.2-5
 - Add patch for CVE-2024-45338
