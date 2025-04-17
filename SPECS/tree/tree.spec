@@ -1,7 +1,7 @@
 Summary:        Recursive directory listing command.
 Name:           tree
 Version:        1.8.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 URL:            http://mama.indstate.edu/users/ice/tree/
 Group:          Applications
@@ -30,6 +30,9 @@ make install BINDIR=%{buildroot}%{_bindir} \
 %{_mandir}/man1/*
 
 %changelog
+* Wed Apr 16 2025 Andrew Phelps <anphel@microsoft.com> - 1.8.0-3
+- Bump release
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.8.0-2
 - Remove unused `%%define sha1` lines
 
