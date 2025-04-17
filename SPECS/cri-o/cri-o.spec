@@ -37,6 +37,7 @@ Source0:        %{name}-%{version}.tar.gz
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
 #   1. wget https://github.com/cri-o/cri-o/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   ???
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #   4. go mod vendor
@@ -44,7 +45,7 @@ Source0:        %{name}-%{version}.tar.gz
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#           -cf %%{name}-%%{version}-%%{release}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
 Source2:        crio.service
@@ -52,30 +53,30 @@ Source3:        sysconfig.crio
 Source4:        crio.conf
 Source5:        cri-o-rpmlintrc
 Source6:        kubelet.env
-Patch0:         CVE-2022-1708.patch
-Patch1:         CVE-2021-3602.patch
-Patch2:         CVE-2022-27651.patch
-Patch3:         CVE-2022-2995.patch
-Patch4:         CVE-2023-42821.patch
-Patch5:         CVE-2022-29526.patch
-Patch6:         CVE-2021-44716.patch
-Patch7:         CVE-2022-21698.patch
-Patch8:         CVE-2023-44487.patch
-Patch9:         CVE-2024-28180.patch
-Patch10:        CVE-2024-21626.patch
-Patch11:        CVE-2024-3154.patch
-Patch12:        CVE-2024-3727.patch
-Patch13:        CVE-2021-43565.patch
-Patch14:        CVE-2024-6104.patch
-Patch15:        CVE-2022-32149.patch
-Patch16:        CVE-2022-4318.patch
-Patch17:        CVE-2024-9341.patch
-Patch18:        CVE-2024-45338.patch
-Patch19:        CVE-2023-0778.patch
-Patch20:        CVE-2023-6476.patch
-Patch21:        CVE-2024-44337.patch
-Patch22:        CVE-2025-27144.patch
-Patch23:        CVE-2024-9676.patch
+Patch100:       CVE-2022-1708.patch
+Patch101:       CVE-2021-3602.patch
+Patch102:       CVE-2022-27651.patch
+Patch103:       CVE-2022-2995.patch
+Patch104:       CVE-2023-42821.patch
+Patch105:       CVE-2022-29526.patch
+Patch106:       CVE-2021-44716.patch
+Patch107:       CVE-2022-21698.patch
+Patch108:       CVE-2023-44487.patch
+Patch109:       CVE-2024-28180.patch
+Patch110:       CVE-2024-21626.patch
+Patch111:       CVE-2024-3154.patch
+Patch112:       CVE-2024-3727.patch
+Patch113:       CVE-2021-43565.patch
+Patch114:       CVE-2024-6104.patch
+Patch115:       CVE-2022-32149.patch
+Patch116:       CVE-2022-4318.patch
+Patch117:       CVE-2024-9341.patch
+Patch118:       CVE-2024-45338.patch
+Patch119:       CVE-2023-0778.patch
+Patch120:       CVE-2023-6476.patch
+Patch121:       CVE-2024-44337.patch
+Patch122:       CVE-2025-27144.patch
+# Patch123:       CVE-2024-9676.patch
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  fdupes
@@ -135,6 +136,8 @@ mkdir -pv $HOME/go/src/%{project}
 rm -rf $HOME/go/src/%{project}/*
 cp -avr * $HOME/go/src/%{project}
 cd $HOME/go/src/%{project}
+# cp % {SOURCE7} .
+# cp % {SOURCE8} .
 
 # Build crio
 GO_BUILD="go build -mod vendor" make
