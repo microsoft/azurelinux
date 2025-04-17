@@ -25,7 +25,7 @@
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
 Version:        1.52.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -850,8 +850,9 @@ extra=--with-supermin-packager-config=$(pwd)/yum.conf
 %if %{without appliances}
   --enable-appliance=no \
 %endif
-  --disable-erlang
-  $extra
+  --disable-erlang \
+  $extra \
+  --with-extra-packages="sqlite sqlite-libs sqlite-devel"
 
 # 'INSTALLDIRS' ensures that Perl and Ruby libs are installed in the
 # vendor dir, not the site dir.
@@ -1147,6 +1148,9 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+* Mon Apr 07 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.52.0-12
+- Adding support for guestfs dependencies for supermin images
+
 * Tue Feb 25 2025 Chris Co <chrco@microsoft.com> - 1.52.0-11
 - Bump to rebuild with updated glibc
 
