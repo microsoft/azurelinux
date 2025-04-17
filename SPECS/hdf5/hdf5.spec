@@ -152,6 +152,12 @@ sed -e 's|-O -finline-functions|-O3 -finline-functions|g' -i config/gnu-flags
 # --with-mpe=DIR Use MPE instrumentation [default=no]
 # --enable-cxx/fortran/parallel and --enable-threadsafe flags are incompatible
 
+%ifarch aarch64
+%global disable_float16 \\\
+  --disable-nonstandard-feature-float16 \\\
+%{nil}
+%endif
+
 #Serial build
 export CC=gcc
 export CXX=g++
