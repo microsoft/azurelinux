@@ -5231,7 +5231,7 @@
         "other": {
           "name": "helm",
           "version": "3.14.2",
-          "downloadUrl": "https://github.com/helm/helm/archive/v3.14.2.tar.gz"
+          "downloadUrl": "https://github.com/helm/helm/archive/refs/tags/v3.14.2.tar.gz"
         }
       }
     },
