@@ -37,6 +37,14 @@ Requires:       %{name} = %{version}-%{release}
 %description vim
 %{summary}.
 
+%package doc
+Summary: Documentation for espeak-ng
+BuildArch: noarch
+Requires: %{name} = %{version}-%{release}
+
+%description doc
+Documentation for eSpeak NG, a software speech synthesizer.
+
 %prep
 %autosetup -p1
 # Remove unused files to make sure we've got the License tag right
@@ -46,7 +54,9 @@ rm -rf src/include/compat/endian.h src/compat/getopt.c android/
 ./autogen.sh
 %configure --without-sonic
 %make_build src/espeak-ng src/speak-ng
-%make_build
+make
+# Force utf8 for docs building
+LC_ALL=C.UTF-8 make docs
 
 %install
 %make_install
@@ -60,10 +70,9 @@ mv %{buildroot}%{_datadir}/vim/addons %{buildroot}%{_datadir}/vim/vimfiles
 rm -vrf %{buildroot}%{_datadir}/vim/registry
 
 %check
-%make_build check
+ESPEAK_DATA_PATH=`pwd` LD_LIBRARY_PATH=src:${LD_LIBRARY_PATH} src/espeak-ng ...
 
-%post	-p /sbin/ldconfig
-%postun	-p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %license COPYING
@@ -71,7 +80,7 @@ rm -vrf %{buildroot}%{_datadir}/vim/registry
 %license COPYING.BSD2
 %license COPYING.UCD
 %doc README.md
-%doc CHANGELOG.md
+%doc ChangeLog.md
 %{_bindir}/speak-ng
 %{_bindir}/espeak-ng
 %{_libdir}/libespeak-ng.so.1
@@ -88,10 +97,14 @@ rm -vrf %{buildroot}%{_datadir}/vim/registry
 %{_datadir}/vim/vimfiles/syntax/espeaklist.vim
 %{_datadir}/vim/vimfiles/syntax/espeakrules.vim
 
+%files doc
+%doc docs/*.html
+
 %changelog
 * Thu Apr 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.52.0-1
 - Auto-upgrade to 1.52.0 - remove chrome extension which used unverified function
 - Removing patch file for CVE-2023-49990 as it is fixed in newest version.
+- Adding docs subpackage
 
 * Wed Jan 31 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.51.1-1
 - Bump package version to 1.51.1
