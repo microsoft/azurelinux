@@ -8,8 +8,7 @@ License:        GPLv3 AND Unicode
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/espeak-ng/espeak-ng
-Source0:        https://github.com/%{name}/%{name}/archive/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tgz
-BuildRequires:  alsa-lib-devel
+Source0:        https://github.com/%{name}/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tgz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
