@@ -7,7 +7,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/leethomason/tinyxml2/
 Source0:        https://github.com/leethomason/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch1:         CVE-2024-50614.nopatch
 Patch2:         CVE-2024-50615.patch
 BuildRequires:  build-essential
 BuildRequires:  cmake
@@ -53,7 +52,7 @@ make install DESTDIR=%{buildroot}
 
 %changelog
 * Fri Apr 11 2025 Archana Shettigar <v-shettigara@microsoft.com> - 9.0.0-2
-- Patch CVE-2024-50614 & CVE-2024-50615.
+- Patch CVE-2024-50615.
 
 * Wed Jan 05 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 9.0.0-1
 - Update to version 9.0.0.
