@@ -1,6 +1,6 @@
 Summary:        Compact text-to-speech synthesizer
 Name:           espeak-ng
-Version:        1.51.1
+Version:        1.52.0
 Release:        1%{?dist}
 # Apache2 license applies only to Android APK code- does not apply here
 # BSD license applies only to Windows code- does not apply here
@@ -91,6 +91,9 @@ rm -vrf %{buildroot}%{_datadir}/vim/registry
 %{_datadir}/vim/vimfiles/syntax/espeakrules.vim
 
 %changelog
+* Thu Apr 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.52.0-1
+- Auto-upgrade to 1.52.0 - remove chrome extension which used unverified function
+
 * Wed Jan 31 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.51.1-1
 - Bump package version to 1.51.1
 - move vim specific builds to sub-package 'vim'
