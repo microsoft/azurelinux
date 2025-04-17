@@ -1136,16 +1136,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "blobfuse2",
-          "version": "2.3.2",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.3.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "blosc",
           "version": "1.21.6",
           "downloadUrl": "https://github.com/Blosc/c-blosc/archive/v1.21.6/blosc-1.21.6.tar.gz"
