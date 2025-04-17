@@ -53,7 +53,7 @@ make install DESTDIR=%{buildroot}
 
 %changelog
 * Wed Apr 16 2025 Archana Shettigar <v-shettigara@microsoft.com> - 9.0.0-2
-- Patch for CVE-2024-50614 & CVE-2024-50615.patch.
+- Patch CVE-2024-50615
 
 * Wed Jan 05 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 9.0.0-1
 - Update to version 9.0.0.
