@@ -29,6 +29,8 @@ Patch3:         CVE-2025-22868.patch
 Patch4:         CVE-2025-29786.patch
 Patch5:         CVE-2025-30204.patch
 Patch6:         CVE-2025-29923.patch
+Patch7:         CVE-2025-22870.patch
+Patch8:         CVE-2024-51744.patch
 BuildRequires:  golang >= 1.15
 
 %description
@@ -67,6 +69,7 @@ cp ./bin/keda-admission-webhooks %{buildroot}%{_bindir}
 * Thu Apr 17 2025 Sudipta Pandit <sudpandit@microsoft.com> - 2.14.1-6
 - Fixes an incorrect patch introduced with the patch for CVE-2025-29923
 - Fixes patches being overridden during the build step
+- Fixes CVE-2025-22870 and CVE-2024-51744
 
 * Sun Mar 30 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.14.1-5
 - Patch CVE-2025-30204, CVE-2025-29923
