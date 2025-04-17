@@ -21542,16 +21542,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "prometheus",
-          "version": "2.45.4",
-          "downloadUrl": "https://github.com/prometheus/prometheus/archive/refs/tags/v2.45.4.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "prometheus-adapter",
           "version": "0.12.0",
           "downloadUrl": "https://github.com/kubernetes-sigs/prometheus-adapter/archive/refs/tags/v0.12.0.tar.gz"

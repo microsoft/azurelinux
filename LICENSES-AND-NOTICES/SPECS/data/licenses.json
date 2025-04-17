@@ -1617,7 +1617,6 @@
                 "pptp",
                 "priv_wrapper",
                 "procmail",
-                "prometheus",
                 "prometheus-node-exporter",
                 "ps_mem",
                 "psacct",
