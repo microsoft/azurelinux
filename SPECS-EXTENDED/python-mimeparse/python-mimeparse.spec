@@ -30,18 +30,6 @@ BuildRequires:  python3-setuptools_scm
 %description %{common_description}
 
 
-%if %{with python2}
-%package -n python2-%{pkgname}
-Summary:        %{summary}
-BuildRequires:  python2-devel
-BuildRequires:  python2-setuptools
-%{?python_provide:%python_provide python2-%{pkgname}}
-
-
-%description -n python2-%{pkgname} %{common_description}
-%endif
-
-
 %package -n python%{python3_pkgversion}-%{pkgname}
 Summary:        %{summary}
 BuildRequires:  python%{python3_pkgversion}-devel
@@ -59,34 +47,16 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 %pyproject_buildrequires
 
 %build
-%if %{with python2}
-%py2_build
-%endif
 %pyproject_wheel
 
 
 %install
-%if %{with python2}
-%py2_install
-%endif
 %pyproject_install
 %pyproject_save_files %{libname}
 
 
 %check
-%if %{with python2}
-%{__python2} -m unittest -v mimeparse_test
-%endif
 %pytest
-
-
-%if %{with python2}
-%files -n python2-%{pkgname}
-%license LICENSE
-%doc README.rst
-%{python2_sitelib}/%{libname}.py*
-%{python2_sitelib}/python_mimeparse-%{version}-py%{python2_version}.egg-info
-%endif
 
 
 %files -n python%{python3_pkgversion}-%{pkgname} -f %{pyproject_files}
@@ -97,6 +67,7 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 %changelog
 * Mon Mar 24 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 2.0.0-1
 - Update to 2.0.0
+- Remove unneeded python2 conditionals
 - License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.0-13
