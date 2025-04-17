@@ -9,6 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/espeak-ng/espeak-ng
 Source0:        https://github.com/%{name}/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tgz
+BuildRequires:  alsa-lib-devel
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  gcc
