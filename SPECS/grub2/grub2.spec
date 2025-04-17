@@ -7,7 +7,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -85,6 +85,7 @@ Patch0199:      0199-fs-f2fs-Do-not-copy-file-names-that-are-too-long.patch
 Patch0200:      0200-fs-btrfs-Fix-several-fuzz-issues-with-invalid-dir-it.patch
 Patch0201:      0201-fs-btrfs-Fix-more-ASAN-and-SEGV-issues-found-with-fu.patch
 Patch0202:      0202-fs-btrfs-Fix-more-fuzz-issues-related-to-chunks.patch
+Patch0203:      0203-replace-fgrep-with-grep.patch
 # Required to reach SBAT 3
 Patch:          sbat-3-0001-font-Reject-glyphs-exceeds-font-max_glyph_width-or-f.patch
 Patch:          sbat-3-0004-font-Remove-grub_font_dup_glyph.patch
@@ -433,6 +434,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
+* Wed Apr 16 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.06-23
+- Add patch to replace fgrep with grep -F
+
 * Sun Nov 10 2024 Chris Co <chrco@microsoft.com> - 2.06-22
 - Set efidir location to BOOT for eventual use in changing to "azurelinux"
 - Bump release to also force signing with the new Azure Linux secure boot key
