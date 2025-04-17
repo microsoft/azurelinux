@@ -41,10 +41,10 @@ Requires:       glib-networking
 Requires:       libpsl
 Requires:       libxml2
 
-Patch:          CVE-2024-52530.patch
-Patch:          CVE-2024-52531.patch
-Patch:          CVE-2024-52532.patch
-Patch:          CVE-2025-32053.patch
+Patch0:          CVE-2024-52530.patch
+Patch1:          CVE-2024-52531.patch
+Patch2:          CVE-2024-52532.patch
+Patch3:          CVE-2025-32053.patch
 
 %description
 libsoup is HTTP client/server library for GNOME
