@@ -85,7 +85,7 @@ Patch0199:      0199-fs-f2fs-Do-not-copy-file-names-that-are-too-long.patch
 Patch0200:      0200-fs-btrfs-Fix-several-fuzz-issues-with-invalid-dir-it.patch
 Patch0201:      0201-fs-btrfs-Fix-more-ASAN-and-SEGV-issues-found-with-fu.patch
 Patch0202:      0202-fs-btrfs-Fix-more-fuzz-issues-related-to-chunks.patch
-Patch0203:      0203-fgrep-with-grep.patch
+Patch0203:      0203-replace-fgrep-with-grep.patch
 # Required to reach SBAT 3
 Patch:          sbat-3-0001-font-Reject-glyphs-exceeds-font-max_glyph_width-or-f.patch
 Patch:          sbat-3-0004-font-Remove-grub_font_dup_glyph.patch
