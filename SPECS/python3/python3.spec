@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.19
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -36,6 +36,9 @@ Patch12:        CVE-2025-1795.patch
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
 Patch1001:      CVE-2024-6345.patch
+Patch1002:      CVE-2024-3651.patch
+Patch1003:      CVE-2023-43804.patch
+Patch1004:      CVE-2024-37891.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -238,6 +241,15 @@ patch %{buildroot}%{_libdir}/python%{majmin}/site-packages/setuptools/package_in
 echo 'Patching CVE-2024-6345 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/setuptools/package_index.py'
 patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/setuptools/package_index.py < %{PATCH1001}
 
+# Manually patch CVE-2024-3651 which is a bundled wheel for pip. We can only update the source code after install
+echo 'Patching CVE-2024-3651 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_vendor/idna/core.py'
+patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/idna/core.py < %{PATCH1002}
+echo 'Patching CVE-2023-43804 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py'
+patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py < %{PATCH1003}
+echo 'Patching CVE-2024-37891 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py'
+patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py < %{PATCH1004}
+
+
 # Windows executables get installed by pip and setuptools- we don't need these.
 find %{buildroot}%{_libdir}/python%{majmin}/site-packages -name '*.exe' -delete -print
 
@@ -338,6 +350,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Fri Apr 11 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.9.19-13
+- Add patch for CVE-2024-3651, CVE-2023-43804 and CVE-2024-37891 in the bundled pip wheel
+
 * Fri Mar 07 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 3.9.19-12
 - Add patch for CVE-2025-1795
 
