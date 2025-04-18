@@ -46,7 +46,7 @@
 Summary:	 %{_name} Driver
 Name:		 %{_name}
 Version:	 24.10
-Release:	 15_%{release_suffix}%{?dist}
+Release:	 15%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
