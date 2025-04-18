@@ -30,14 +30,20 @@
 # SOFTWARE.
 #
 
+<<<<<<< HEAD
 %global last-known-kernel 6.6.90.1-1
 
+=======
+>>>>>>> 9e9c5812d (dev work)
 %{!?_name: %define _name fwctl}
 %{!?_version: %define _version 24.10}
 %{!?_release: %define _release OFED.24.10.0.6.7.1}
 
 %if 0%{azl}
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
+%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
 %global target_kernel_version_full f.a.k.e
 %endif
@@ -52,6 +58,7 @@
 %{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
 %global kernel_version %{KVERSION}
 %global krelver %(echo -n %{KVERSION} | sed -e 's/-/_/g')
+
 # take path to kernel sources if provided, otherwise look in default location (for non KMP rpms).
 %{!?K_SRC: %global K_SRC /lib/modules/%{KVERSION}/build}
 
@@ -67,7 +74,7 @@
 Summary:	 %{_name} Driver
 Name:		 fwctl
 Version:	 24.10
-Release:	 19%{?dist}
+Release:	 20?dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
@@ -250,6 +257,9 @@ fi # 1 : closed
 %endif
 
 %changelog
+* Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-20
+- Add kernel version and release nb into release nb
+
 * Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-19
 - Bump release to rebuild for new kernel release
 
