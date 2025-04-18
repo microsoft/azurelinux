@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        18.2.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -25,7 +25,9 @@ Patch10:        CVE-2020-10722.patch
 Patch11:        CVE-2024-25629.patch
 Patch12:        CVE-2021-24032.patch
 Patch13:        CVE-2020-10724.patch
-Patch14:	CVE-2025-1744.patch
+Patch14:        CVE-2025-1744.patch
+Patch15:        CVE-2021-28361.patch
+
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
 # at the top-level directory of this distribution and at
@@ -52,6 +54,7 @@ Patch14:	CVE-2025-1744.patch
 %bcond_with make_check
 %bcond_with mgr_diskprediction
 %bcond_with ocf
+# WITH_SEASTAR is explicitly disabled to prevent numerous vendored CVEs
 %bcond_with seastar
 %bcond_with selinux
 %bcond_without tcmalloc
@@ -989,6 +992,7 @@ ${CMAKE} .. \
     -DWITH_FMT_HEADER_ONLY=ON \
     -Dthrift_HOME=%{_includedir} \
     -DSYSTEM_BOOST=OFF \
+    -DWITH_SEASTAR=OFF \
 %if 0%{without mgr_diskprediction}
     -DMGR_DISABLED_MODULES=diskprediction_local\
 %endif
@@ -1234,7 +1238,7 @@ exit 0
 %files common
 %dir %{_docdir}/ceph
 %doc %{_docdir}/ceph/sample.ceph.conf
-%license %{_docdir}/ceph/COPYING
+%license COPYING
 %{_bindir}/ceph
 %{_bindir}/ceph-authtool
 %{_bindir}/ceph-conf
@@ -2014,6 +2018,10 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Thu Apr 10 2025 Kanishk Bansal <kanbansal@microsoft.com> - 18.2.2-7
+- Patch CVE-2021-28361
+- Explicitly disable seastar to ensure disputed uncompiled CVEs don't get enabled.
+
 * Tue 11 Mar 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 18.2.2-6
 - Patch CVE-2025-1744
 
