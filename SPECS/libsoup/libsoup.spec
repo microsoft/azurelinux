@@ -17,6 +17,8 @@ Patch:          CVE-2024-52532.patch
 Patch:          CVE-2025-32909.patch
 # CVE-2025-32910 will be fixed in 3.6.2 by https://gitlab.gnome.org/GNOME/libsoup/-/merge_requests/417
 Patch:          CVE-2025-32910.patch
+# CVE-2025-32912 will be fixed in 3.6.5 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/cd077513f267e43ce4b659eb18a1734d8a369992
+Patch:          CVE-2025-32912.patch
 
 BuildRequires:  meson
 BuildRequires:  autogen
@@ -131,6 +133,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Fri Apr 18 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.0.4-3
 - Add patch for CVE-2025-32909
 - Add patch for CVE-2025-32910
+- Add patch for CVE-2025-32912
 
 * Fri Nov 15 2024 Thien Trung Vuong <tvuong@microsoft.com> - 3.0.4-2
 - Add patches for CVE-2024-52530, CVE-2024-52531, CVE-2024-52532
