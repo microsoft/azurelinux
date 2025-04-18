@@ -7,7 +7,7 @@
 
 Name:           perl-File-DesktopEntry
 Version:        0.22
-Release:        14%{?dist}
+Release:        15%{?dist}
 Summary:        Object to handle .desktop files
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -35,7 +35,6 @@ BuildRequires:  perl(Test::More)
 BuildRequires:  perl(utf8)
 %if %{with perl_File_DesktopEntry_enables_optional_test}
 # Optional tests
-BuildRequires:  perl(Test::CPAN::Changes)
 BuildRequires:  perl(Test::Pod) >= 1.00
 BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
 %endif
@@ -70,6 +69,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Fri Apr 18 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.22-15
+- removed perl(Test::CPAN::Changes) from BR
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.22-14
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
