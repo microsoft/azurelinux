@@ -127,7 +127,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        506%{?dist}
+Release:        507%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -182,6 +182,9 @@ Patch201:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-MM-on-Linux.pa
 
 # If optimizing -O is used, add the definition to .ph files, bug #2152012
 Patch202:       perl-5.36.0-Add-definition-of-OPTIMIZE-to-.ph-files.patch
+
+# CVE patches
+Patch300:       CVE-2024-56406.patch
 
 # Update some of the bundled modules
 # see http://fedoraproject.org/wiki/Perl/perl.spec for instructions
@@ -6838,6 +6841,9 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Fri Apr 18 2025 Sudipta Pandit <sudpandit@microsoft.com> - 4:5.38.2-507
+- Patch CVE-2024-56406
+
 * Fri May 24 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.38.2-506
 - Release bump to regenerate package's requires and provides.
 
