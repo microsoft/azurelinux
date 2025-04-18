@@ -6,7 +6,7 @@ Release:        1%{?dist}
 Summary:        Perl interface to the GD graphics library
 License:        GPL-1.0-or-later OR Artistic-2.0
 URL:            https://metacpan.org/release/GD
-Source0:        https://cpan.metacpan.org/modules/by-module/GD/GD-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/GD/GD-%{version}.tar.gz#/perl-GD-%{version}.tar.gz
 Patch1:         GD-2.77-cflags.patch
 # Module Build
 BuildRequires:  coreutils
