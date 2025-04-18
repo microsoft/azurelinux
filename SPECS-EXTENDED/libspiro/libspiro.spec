@@ -6,6 +6,7 @@ Release:        1%{?dist}
 # https://github.com/fontforge/libspiro/issues/8
 License:        GPL-3.0-or-later
 Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/fontforge/libspiro/
 # Let's use libspiro-dist tarball from upstream as it does not require autoreconf
 Source0:        https://github.com/fontforge/libspiro/releases/download/%{version}/libspiro-dist-%{version}.tar.gz
