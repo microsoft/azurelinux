@@ -3348,8 +3348,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "26.2.5.10",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.10/otp-OTP-26.2.5.10.tar.gz"
+          "version": "26.2.5.11",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.11/otp-OTP-26.2.5.11.tar.gz"
         }
       }
     },
