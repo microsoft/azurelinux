@@ -1,19 +1,9 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%if 0%{?fedora} || 0%{?rhel} > 7
-# Enable python3 build by default
-%bcond_without python3
-%else
 %bcond_with python3
-%endif
- 
-%if 0%{?suse_version}
-  %define libdw_devel libdw-devel
-  %define libelf_devel libelf-devel
-%else
-  %define libdw_devel elfutils-devel
-  %define libelf_devel elfutils-libelf-devel
-%endif
+
+%define libdw_devel elfutils-devel
+%define libelf_devel elfutils-libelf-devel
  
 %define glib_ver 2.43.4
  
@@ -100,13 +90,9 @@ make check|| {
     find tests/testsuite.dir -name "testsuite.log" -print -exec cat '{}' \;
     exit 1
 }
- 
-%if 0%{?fedora} > 27
-# ldconfig is not needed
-%else
+
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
-%endif
  
 %files
 %doc README.md NEWS
@@ -131,6 +117,7 @@ make check|| {
 %changelog
 * Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.43-1
 - Update to version 0.43
+- License verified.
 
 * Tue Jan 12 2021 Joe Schmitt <joschmit@microsoft.com> - 0.30-3
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
