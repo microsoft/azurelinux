@@ -10762,7 +10762,7 @@
         "other": {
           "name": "librevenge",
           "version": "0.0.5",
-          "downloadUrl": "http://downloads.sourceforge.net/libwpd/librevenge-0.0.5.tar.xz"
+          "downloadUrl": "https://downloads.sourceforge.net/libwpd/librevenge-0.0.5.tar.xz"
         }
       }
     },
