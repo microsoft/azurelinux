@@ -1,9 +1,5 @@
 # Run extra test
-%if ! (0%{?rhel})
-%bcond_without perl_Cpanel_JSON_XS_enables_extra_test
-%else
 %bcond_with perl_Cpanel_JSON_XS_enables_extra_test
-%endif
 
 Name:		perl-Cpanel-JSON-XS
 Summary:	JSON::XS for Cpanel, fast and correct serializing
@@ -77,9 +73,6 @@ BuildRequires:	perl(JSON::PP) >= 2.09
 BuildRequires:	perl(JSON::XS)
 BuildRequires:	perl(Math::BigFloat) >= 1.16
 BuildRequires:	perl(Math::BigInt)
-%if 0%{?fedora:1}
-BuildRequires:	perl(Mojo::JSON) >= 6.11
-%endif
 BuildRequires:	perl(Test::LeakTrace)
 BuildRequires:	perl(Tie::IxHash)
 BuildRequires:	perl(Time::Piece)
