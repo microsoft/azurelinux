@@ -9,8 +9,8 @@ License: Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 # https://github.com/SELinuxProject/selinux/wiki/Releases
-Source0: https://github.com/SELinuxProject/selinux/releases/download/3.7/libselinux-3.7.tar.gz
-Source1: https://github.com/SELinuxProject/selinux/releases/download/3.7/libselinux-3.7.tar.gz.asc
+Source0: https://github.com/SELinuxProject/selinux/releases/download/%{version}/%{name}-%{version}.tar.gz
+Source1: https://github.com/SELinuxProject/selinux/releases/download/%{version}/%{name}-%{version}.tar.gz.asc
 Source2: https://github.com/bachradsusi.gpg
 Source3: selinuxconlist.8
 Source4: selinuxdefcon.8
