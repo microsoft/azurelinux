@@ -13,7 +13,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.18.8
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,7 @@ Patch1:         CVE-2022-41717.patch
 # CVE-2024-24790 is fixed in 1.18.8
 Patch2:         CVE-2024-24790.patch
 Patch3:         CVE-2024-45341.patch
+Patch4:         CVE-2024-34158.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -46,6 +47,8 @@ mv -v go go-bootstrap
 patch -Np1 --ignore-whitespace < %{PATCH1}
 patch -Np1 --ignore-whitespace < %{PATCH2}
 patch -Np1 --ignore-whitespace < %{PATCH3}
+patch -Np1 --ignore-whitespace < %{PATCH4}
+
 %build
 # Build go 1.4 bootstrap
 pushd %{_topdir}/BUILD/go-bootstrap/src
@@ -125,6 +128,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Apr 18 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.18.8-6
+- Address CVE-2024-34158 using an upstream patch.
+
 * Tue Feb 04 2025 Kanishk bansal <kanbansal@microsoft.com> - 1.18.8-5
 - Address CVE-2024-45341 using an upstream patch.
 
