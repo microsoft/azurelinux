@@ -4,7 +4,7 @@
 Summary: Industry-standard container runtime
 Name: containerd
 Version: 1.7.13
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -22,6 +22,7 @@ Patch4:  CVE-2024-24786.patch
 Patch5:  CVE-2024-28180.patch
 Patch6:  CVE-2023-45288.patch
 Patch7:  CVE-2025-27144.patch
+Patch8:  CVE-2024-40635.patch
 
 %{?systemd_requires}
 
@@ -91,6 +92,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Wed Apr 09 2025 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.7.13-8
+- Fix CVE-2024-40635
+
 * Fri Mar 21 2025 Dallas Delaney <dadelan@microsoft.com> - 1.7.13-7
 - Fix CVE-2025-27144
 
