@@ -1,0 +1,27 @@
+# HG changeset patch
+# User Timo Sirainen <tss@iki.fi>
+# Date 1334041779 -10800
+# Node ID 20e1aa322b1e3b7d47c7cb1b6ff68a8d07fe6c9d
+# Parent  0b59dbb1a288153d2eb26d47cd9f7a953335c66f
+lib-storage: mail_user_try_home_expand() now looks up home only when needed.
+Before a recent code cleanup the lookup was always done, but if the home
+didn't exist it still just happened to return success. The cleanup changed
+it to return failure, which broke the original behavior.
+
+diff -r 0b59dbb1a288 -r 20e1aa322b1e src/lib-storage/mail-user.c
+--- a/src/lib-storage/mail-user.c	Tue Apr 10 09:52:35 2012 +0300
++++ b/src/lib-storage/mail-user.c	Tue Apr 10 10:09:39 2012 +0300
+@@ -343,6 +343,11 @@
+ {
+ 	const char *home, *path = *pathp;
+ 
++	if (strncmp(path, "~/", 2) != 0) {
++		/* no need to expand home */
++		return 0;
++	}
++
+ 	if (mail_user_get_home(user, &home) <= 0)
+ 		return -1;
+ 
+
+
