@@ -12,8 +12,8 @@ Summary:	Read and write lzma compressed data
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:		https://metacpan.org/release/IO-Compress-Lzma
-Source0:	https://cpan.metacpan.org/modules/by-module/IO/IO-Compress-Lzma-%{version}.tar.gz
+URL:            https://metacpan.org/release/IO-Compress-Lzma
+Source0:        https://cpan.metacpan.org/modules/by-module/IO/IO-Compress-Lzma-%{version}.tar.gz
 Source1:        LICENSE.PTR
 BuildArch:	noarch
 # Module Build
@@ -109,7 +109,7 @@ make test COMPRESS_ZLIB_RUN_MOST=1
 %{_mandir}/man3/IO::Uncompress::UnXz.3*
 
 %changelog
-* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 2.213-1
+* Thu Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 2.213-1
 - Update to version 2.213
 - License verified
 
