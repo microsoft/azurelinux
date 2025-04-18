@@ -10,8 +10,7 @@ License:        MIT AND BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://rouge.jneen.net/
-Source0:        https://github.com/rouge-ruby/rouge/archive/refs/tags/v4.4.0.tar.gz#/%{name}-%{version}.tar.gz
-
+Source0:        https://github.com/rouge-ruby/%{gem_name}/archive/refs/tags/v4.4.0.tar.gz#/%{name}-%{version}.tar.gz
 Source10:       spec_helper_assert.rb
 Source11:       bundler.rb
 BuildRequires:  ruby(release)
