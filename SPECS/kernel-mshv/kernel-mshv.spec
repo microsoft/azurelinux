@@ -11,7 +11,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.157.mshv1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -76,6 +76,14 @@ Requires:       audit
 
 %description tools
 This package contains the 'perf' performance analysis tools for MSHV kernel.
+
+%package headers
+Summary:        Linux API header files
+Group:          System Environment/Kernel
+
+%description headers
+The Linux API Headers expose the kernel's API for use by Glibc. This version
+also includes mshv specific headers
 
 %prep
 %autosetup -p1
@@ -178,6 +186,12 @@ rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
 rm -rf /boot/efi/initramfs-%{uname_r}.img
 echo "initrd of kernel %{uname_r} removed" >&2
 
+make headers
+find usr/include -name '.*' -delete
+rm usr/include/Makefile
+mkdir -p /%{buildroot}%{_includedir}
+cp -rv usr/include/* /%{buildroot}%{_includedir}
+
 %postun
 %grub2_postun
 
@@ -223,7 +237,14 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_libdir}/perf/include/bpf/*
 %{_includedir}/perf/perf_dlfilter.h
 
+%files headers
+%defattr(-,root,root)
+%{_includedir}/*
+
 %changelog
+* Fri Sep 8 2023 Anatol Belski <anbelski@linux.microsoft.com> 5.15.126.mshv1-4
+- Introduce kernel-mshv-headers package to provide kernel headers for MSHV
+
 * Fri Oct 25 2024 Saul Paredes <saulparedes@microsoft.com> - 5.15.157.mshv1-3
 - Increase build verbosity
 
