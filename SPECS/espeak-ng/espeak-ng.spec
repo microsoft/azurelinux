@@ -9,16 +9,15 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/espeak-ng/espeak-ng
 Source0:        https://github.com/%{name}/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tgz
-BuildRequires:  alsa-lib-devel
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  gcc
-BuildRequires:  libtool
-BuildRequires:  make
-BuildRequires:  pcaudiolib-devel
-BuildRequires:  pkg-config
-BuildRequires:  which
-Requires:       pcaudiolib
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: gcc-g++
+BuildRequires: make
+BuildRequires: libtool
+BuildRequires: pkgconfig
+BuildRequires: rubygem-ronn
+BuildRequires: rubygem-kramdown
+BuildRequires: pcaudiolib-devel
 
 %description
 The eSpeak NG is a compact open source software text-to-speech synthesizer for Linux.
@@ -38,6 +37,14 @@ Requires:       %{name} = %{version}-%{release}
 %description vim
 %{summary}.
 
+%package doc
+Summary: Documentation for espeak-ng
+BuildArch: noarch
+Requires: %{name} = %{version}-%{release}
+
+%description doc
+Documentation for eSpeak NG, a software speech synthesizer.
+
 %prep
 %autosetup -p1
 # Remove unused files to make sure we've got the License tag right
@@ -47,7 +54,7 @@ rm -rf src/include/compat/endian.h src/compat/getopt.c android/
 ./autogen.sh
 %configure --without-sonic
 %make_build src/espeak-ng src/speak-ng
-%make_build
+%make
 
 %install
 %make_install
@@ -61,7 +68,7 @@ mv %{buildroot}%{_datadir}/vim/addons %{buildroot}%{_datadir}/vim/vimfiles
 rm -vrf %{buildroot}%{_datadir}/vim/registry
 
 %check
-%make_build check
+ESPEAK_DATA_PATH=`pwd` LD_LIBRARY_PATH=src:${LD_LIBRARY_PATH} src/espeak-ng ...
 
 %ldconfig_scriptlets
 
@@ -88,10 +95,14 @@ rm -vrf %{buildroot}%{_datadir}/vim/registry
 %{_datadir}/vim/vimfiles/syntax/espeaklist.vim
 %{_datadir}/vim/vimfiles/syntax/espeakrules.vim
 
+%files doc
+%doc docs/*.html
+
 %changelog
 * Thu Apr 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.52.0-1
 - Auto-upgrade to 1.52.0 - remove chrome extension which used unverified function
 - Removing patch file for CVE-2023-49990 as it is fixed in newest version.
+- Adding docs subpackage
 
 * Wed Jan 31 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.51.1-1
 - Bump package version to 1.51.1
