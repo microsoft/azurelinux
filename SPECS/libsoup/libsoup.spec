@@ -48,6 +48,8 @@ Patch:          CVE-2024-52532.patch
 Patch:          CVE-2025-32913.patch
 # CVE-2025-32906 will be fixed in 3.6.5 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/af5b9a4a3945c52b940d5ac181ef51bb12011f1f
 Patch:          CVE-2025-32906.patch
+# CVE-2025-32909 will be fixed in 3.6.2 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/ba4c3a6f988beff59e45801ab36067293d24ce92
+Patch:          CVE-2025-32909.patch
 
 %description
 libsoup is HTTP client/server library for GNOME
@@ -118,6 +120,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Wed Apr 16 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.4.4-3
 - Add patch for CVE-2025-32913
 - Add patch for CVE-2025-32906
+- Add patch for CVE-2025-32909
 
 * Fri Nov 15 2024 Thien Trung Vuong <tvuong@microsoft.com> - 3.4.4-2
 - Add patches for CVE-2024-52530, CVE-2024-52531, CVE-2024-52532
