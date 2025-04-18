@@ -87,7 +87,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        %{ruby_version}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -107,6 +107,9 @@ Patch0:         CVE-2024-49761.patch
 Patch1:         Avoid-another-race-condition-of-open-mode.patch
 Patch2:         Remove-the-lock-file-for-binstubs.patch
 Patch3:         CVE-2025-25186.patch
+Patch4:         CVE-2025-27219.patch
+Patch5:         CVE-2025-27220.patch
+Patch6:         CVE-2025-27221.patch
 BuildRequires:  openssl-devel
 # Pkgconfig(yaml-0.1) is needed to build the 'psych' gem.
 BuildRequires:  pkgconfig(yaml-0.1)
@@ -411,6 +414,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Tue Mar 15 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.3.5-3
+- Patch CVE-2025-27219, CVE-2025-27220, CVE-2025-27221
+
 * Mon Feb 17 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 3.3.5-2
 - Patch to fix CVE-2025-25186
 
