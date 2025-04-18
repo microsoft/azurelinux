@@ -1,0 +1,35 @@
+From cd6546ed0e90f9c21e6212d7613592dd345b6ef8 Mon Sep 17 00:00:00 2001
+From: Daniel Xu <dxu@dxuuu.xyz>
+Date: Sat, 10 Feb 2024 15:12:37 -0700
+Subject: [PATCH] Silence uninitialized variable compiler warning
+
+Fixes the following warning:
+
+/home/dxu/dev/bpftrace/src/ast/irbuilderbpf.cpp: In member function 'llvm::CallInst* bpftrace::ast::IRBuilderBPF::CreateGetNs(bpftrace::TimestampMode, const bpftrace::location&)':
+/home/dxu/dev/bpftrace/src/ast/irbuilderbpf.cpp:1025:26: warning: 'fn' may be used uninitialized [-Wmaybe-uninitialized]
+ 1025 |   return CreateHelperCall(fn, gettime_func_type, {}, "get_ns", &loc);
+      |          ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/dxu/dev/bpftrace/src/ast/irbuilderbpf.cpp:1003:23: note: 'fn' was declared here
+ 1003 |   libbpf::bpf_func_id fn;
+      |                       ^~
+---
+ src/ast/irbuilderbpf.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/ast/irbuilderbpf.cpp b/src/ast/irbuilderbpf.cpp
+index bb8952e6..7b42d5bf 100644
+--- a/src/ast/irbuilderbpf.cpp
++++ b/src/ast/irbuilderbpf.cpp
+@@ -1605,7 +1605,8 @@ Value *IRBuilderBPF::CreateStrcontains(Value *val1,
+ 
+ CallInst *IRBuilderBPF::CreateGetNs(TimestampMode ts, const location &loc)
+ {
+-  libbpf::bpf_func_id fn;
++  // Random default value to silence compiler warning
++  libbpf::bpf_func_id fn = libbpf::BPF_FUNC_ktime_get_ns;
+   switch (ts) {
+     case TimestampMode::monotonic:
+       fn = libbpf::BPF_FUNC_ktime_get_ns;
+-- 
+2.48.1
+
