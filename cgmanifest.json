@@ -27185,7 +27185,7 @@
         "other": {
           "name": "rubygem-rouge",
           "version": "4.4.0",
-          "downloadUrl": "https://rubygems.org/downloads/rouge-4.4.0.gem"
+          "downloadUrl": "https://github.com/rouge-ruby/rouge/archive/refs/tags/v4.4.0.tar.gz"
         }
       }
     },
