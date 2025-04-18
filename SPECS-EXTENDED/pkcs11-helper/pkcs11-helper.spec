@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           pkcs11-helper
 Version:        1.30.0
-Release:        1%{?dist}
+Release:        3%{?dist}
 Summary:        A library for using PKCS#11 providers
 
 License:        GPL-2 or BSD-3-Clause
@@ -73,8 +73,8 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.30.0-1
-- Azure Linux import from Fedora 41 (license: MIT).
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.30.0-3
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.30.0-2
