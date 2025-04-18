@@ -34,16 +34,15 @@
 %global KVERSION %{target_kernel_version_full}
 
 # set package name
-%{!?_name: %global _name knem}
-%global non_kmp_pname %{_name}-modules
+%{!?_name: %global _name knem-modules}
 
 # knem-modules is a sub-package in SPECS/knem. We are making that into a
 # main package for signing.
 
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
-Name:		 %{_name}-modules
+Name:		 %{_name}-signed
 Version:	 1.1.4.90mlnx3
-Release:	 14%{?dist}
+Release:	 15%{?dist}
 Provides:	 knem-mlnx = %{version}-%{release}
 Obsoletes:	 knem-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
@@ -59,16 +58,21 @@ ExclusiveArch:   x86_64
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 
-Source0:         %{name}-%{version}-%{release}.%{_arch}.rpm
+Source0:         %{_name}-%{version}-%{release}.%{_arch}.rpm
 Source1:         knem.ko
-BuildRoot:       /var/tmp/%{name}-%{version}-build
-
-Requires:       kernel = %{target_kernel_version_full}
-Requires:       kmod
+BuildRoot:       /var/tmp/%{_name}-%{version}-build
 
 %description
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as offloading memory copies on to Intel I/OAT hardware.
 See http://knem.gitlabpages.inria.fr for details.
+
+%package -n %{_name}
+Summary:        KNEM: High-Performance Intra-Node MPI Communication
+Requires:       kernel = %{target_kernel_version_full}
+Requires:       kmod
+
+%description -n %{_name}
+%{description}
 
 %prep
 
@@ -90,19 +94,23 @@ cp -rp ./. %{buildroot}/
 popd
 
 
-%post
+%post -n %{_name}
 depmod %{KVERSION} -a
 
-%postun
+%postun -n %{_name}
 if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
     depmod %{KVERSION} -a
 fi
 
-%files
+%files -n %{_name}
 %{_datadir}/licenses
 /lib/modules/
 
 %changelog
+* Wed Apr 09 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.4.90mlnx3-15
+- Bump release to match updates from 'unsigned' spec
+- Re-name the package to knem-modules-signed.
+
 * Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.4.90mlnx3-14
 - Bump release to rebuild for new kernel release
 

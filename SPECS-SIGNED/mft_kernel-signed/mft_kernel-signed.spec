@@ -8,11 +8,12 @@
 %global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
 
 %global KVERSION %{target_kernel_version_full}
+%define _name mft_kernel
 
-Name:            mft_kernel
-Summary:         %{name} Kernel Module for the %{KVERSION} kernel
+Name:            %{_name}-signed
+Summary:         %{_name} Kernel Module for the %{KVERSION} kernel
 Version:         4.30.0
-Release:         14%{?dist}
+Release:         15%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
 
@@ -23,15 +24,12 @@ Group:           System Environment/Kernel
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 
-Source0:        %{name}-%{version}-%{release}.%{_arch}.rpm
+Source0:        %{_name}-%{version}-%{release}.%{_arch}.rpm
 Source1:        mst_pci.ko
 Source2:        mst_pciconf.ko
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 ExclusiveArch:  x86_64
-
-Requires:       kernel = %{target_kernel_version_full}
-Requires:       kmod
 
 # Azure Linux attempts to match the spec file name and the "Name" tag.
 # Upstream's mft_kernel spec set rpm name as kernel-mft. To comply, we
@@ -40,6 +38,14 @@ Provides:       kernel-mft = %{version}-%{release}
 
 %description
 mft kernel module(s)
+
+%package -n %{_name}
+Summary:        %{summary}
+Requires:       kernel = %{target_kernel_version_full}
+Requires:       kmod
+
+%description -n %{_name}
+%{description}
 
 %prep
 
@@ -62,18 +68,21 @@ cp -rp ./. %{buildroot}/
 
 popd
 
-%post
+%post -n %{_name}
 /sbin/depmod %{KVERSION}
 
-%postun
+%postun -n %{_name}
 /sbin/depmod %{KVERSION}
 
-%files
+%files -n %{_name}
 %defattr(-,root,root,-)
-%license %{_defaultlicensedir}/%{name}/COPYING
+%license %{_defaultlicensedir}/%{_name}/COPYING
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
+* Tue Apr 08 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.30.0-15
+- Bump release to rebuild for new kernel release
+
 * Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.30.0-14
 - Bump release to rebuild for new kernel release
 
