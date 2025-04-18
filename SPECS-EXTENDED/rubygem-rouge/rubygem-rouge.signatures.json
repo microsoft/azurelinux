@@ -1,9 +1,7 @@
 {
  "Signatures": {
   "bundler.rb": "5568b03c72652879f7d07b9bdd27a41fc8d3fc3e2f60ae8b40ff71a2b0f2023f",
-  "rouge-4.4.0-test-missing-files.tar.gz": "812398e04d6518dd90a50befb3e4efedd24dac31921e0189ff464f2668685df2",
-  "rouge-4.4.0.gem": "7a6d6d951e3202e4ce3926838625fa6edeb35680e6d1e3817f53c14212220b64",
-  "rouge-create-missing-test-files.sh": "13bf81dccdf5a36c7d1159004e3aeecbae54520faf24a151667e8871e2a21c3c",
+  "rubygem-rouge-4.4.0.tar.gz": "f4cb2b74fa0db748b1f31a51f1f77cb5e0c1aa5552f6d1632a08743e1eaa1aef",
   "spec_helper_assert.rb": "4a510a7d0ba8cd0df97b19854a8fcba3659ea8b5f3de7c8abd5879b7e5bc137c"
  }
 }

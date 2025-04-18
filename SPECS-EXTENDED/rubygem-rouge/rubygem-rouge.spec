@@ -10,10 +10,8 @@ License:        MIT AND BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://rouge.jneen.net/
-Source0:        https://rubygems.org/gems/%{gem_name}-%{version}.gem
-Source1:        %{gem_name}-%{version}-test-missing-files.tar.gz
-# SOURCE1 is created by $ bash %%SOURCE2 %%version
-Source2:        rouge-create-missing-test-files.sh
+Source0:        https://github.com/rouge-ruby/rouge/archive/refs/tags/v4.4.0.tar.gz#/%{name}-%{version}.tar.gz
+
 Source10:       spec_helper_assert.rb
 Source11:       bundler.rb
 BuildRequires:  ruby(release)
@@ -36,16 +34,15 @@ BuildArch:      noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -n %{gem_name}-%{version} -a 1
-mv ../%{gem_name}-%{version}.gemspec .
+%autosetup -n %{gem_name}-%{version}
 
-cp -a %{gem_name}-%{version}/spec .
+cp -a spec ..
 mkdir FAKE
 cp -a %{SOURCE11} FAKE/
 cp -pa %{SOURCE10} spec/
 
 %build
-gem build %{gem_name}-%{version}.gemspec
+gem build %{gem_name}.gemspec
 %gem_install
 
 %install
@@ -98,6 +95,7 @@ find spec -name \*_spec.rb -print0 | \
 %changelog
 * Tue Dec 24 2024 Akhila Guruju <v-guakhila@microsoft.com> - 4.4.0-2
 - Initial Azure Linux import from Fedora 41 (license: MIT).
+- Build with .tar.gz
 - License verified.
 
 * Fri Sep 20 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 4.4.0-1
