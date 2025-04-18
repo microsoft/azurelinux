@@ -105,7 +105,7 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
-* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.87-1
+* Thu Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.87-1
 - Update to version 1.87
 - License verified
 
