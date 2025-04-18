@@ -297,7 +297,7 @@ pcre-8.45-2.cm2.x86_64.rpm
 pcre-debuginfo-8.45-2.cm2.x86_64.rpm
 pcre-devel-8.45-2.cm2.x86_64.rpm
 pcre-libs-8.45-2.cm2.x86_64.rpm
-perl-5.34.1-489.cm2.x86_64.rpm
+perl-5.34.1-490.cm2.x86_64.rpm
 perl-Archive-Tar-2.38-489.cm2.noarch.rpm
 perl-Attribute-Handlers-1.01-489.cm2.noarch.rpm
 perl-autodie-2.34-489.cm2.noarch.rpm
