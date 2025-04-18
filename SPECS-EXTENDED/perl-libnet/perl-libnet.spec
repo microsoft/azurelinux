@@ -19,7 +19,7 @@ License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/libnet
-Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHAY/libnet-%{base_version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHAY/libnet-%{base_version}.tar.gz#%{name}-%{version}.tar.gz
 # Convert Changes to UTF-8
 Patch0:         libnet-3.09-Normalize-Changes-encoding.patch
 # Do not create Net/libnet.cfg, bug #1238689
