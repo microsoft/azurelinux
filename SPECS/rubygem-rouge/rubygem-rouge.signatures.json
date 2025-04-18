@@ -1,0 +1,8 @@
+{
+    "Signatures": {
+        "rouge-4.5.1.gem": "2ac81c6dee7019bbc6600d4c2d641d730d65c165941400ebd924259067e690dd",
+        "rubygem-rouge-4.5.1-test-missing-files-v1.tar.gz": "681231b8205765c96ba5223f83d112df84e070a50f857cef78f6b36225ea53d8",
+        "bundler.rb": "5568b03c72652879f7d07b9bdd27a41fc8d3fc3e2f60ae8b40ff71a2b0f2023f",
+        "spec_helper_assert.rb": "a0aa8c74ada7430bd94a5a0ea8a12fb09701a168fca25c17f73c5136a178dee5"
+    }
+}
