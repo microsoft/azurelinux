@@ -2,7 +2,7 @@
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
 Version:        %{BaseVersion}.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,10 @@ Source0:        https://ftp.gnome.org/pub/GNOME/sources/libsoup/%{BaseVersion}/%
 Patch:          CVE-2024-52530.patch
 Patch:          CVE-2024-52531.patch
 Patch:          CVE-2024-52532.patch
+# CVE-2025-32913 will be fixed in 3.6.2 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/f4a761fb66512fff59798765e8ac5b9e57dceef0
+Patch:          CVE-2025-32913.patch
+# CVE-2025-32906 will be fixed in 3.6.5 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/af5b9a4a3945c52b940d5ac181ef51bb12011f1f
+Patch:          CVE-2025-32906.patch
 
 BuildRequires:  meson
 BuildRequires:  autogen
@@ -124,6 +128,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 
 %changelog
+* Wed Apr 16 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.0.4-3
+- Add patch for CVE-2025-32913
+- Add patch for CVE-2025-32906
+
 * Fri Nov 15 2024 Thien Trung Vuong <tvuong@microsoft.com> - 3.0.4-2
 - Add patches for CVE-2024-52530, CVE-2024-52531, CVE-2024-52532
 
