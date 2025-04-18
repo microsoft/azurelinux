@@ -26693,16 +26693,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-fluentd",
-          "version": "1.16.2",
-          "downloadUrl": "https://github.com/fluent/fluentd/archive/refs/tags/v1.16.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rubygem-hirb",
           "version": "0.7.3",
           "downloadUrl": "https://github.com/cldwalker/hirb/archive/refs/tags/v0.7.3.tar.gz"
