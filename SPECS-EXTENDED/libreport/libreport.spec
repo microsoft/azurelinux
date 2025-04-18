@@ -1,14 +1,7 @@
-%if 0%{?suse_version}
-  %bcond_with bugzilla
+%bcond_without bugzilla
 
-  %define dbus_devel dbus-1-devel
-  %define libjson_devel libjson-devel
-%else
-  %bcond_without bugzilla
-
-  %define dbus_devel dbus-devel
-  %define libjson_devel json-c-devel
-%endif
+%define dbus_devel dbus-devel
+%define libjson_devel json-c-devel
 
 %define glib_ver 2.43.4
 
@@ -38,11 +31,6 @@ BuildRequires: newt-devel
 BuildRequires: satyr-devel >= 0.38
 BuildRequires: glib2-devel >= %{glib_ver}
 BuildRequires: git-core
-
-%if 0%{?fedora} >= 24 || 0%{?rhel} > 7
-# A test case uses zh_CN locale to verify XML event translations
-BuildRequires: glibc-all-langpacks
-%endif
 
 %if %{with bugzilla}
 BuildRequires: xmlrpc-c-devel
@@ -193,13 +181,6 @@ Summary: %{name}'s bugzilla plugin
 Requires: %{name} = %{version}-%{release}
 Requires: libreport-web = %{version}-%{release}
 Requires: python3-libreport = %{version}-%{release}
-%if 0%{?fedora} >= 38
-Requires: python3-satyr
-Suggests: python3-pytest
-Suggests: python3-vcrpy
-%endif
-
-
 
 %description plugin-bugzilla
 Plugin to report bugs into the bugzilla.
@@ -238,40 +219,6 @@ Requires: libreport-web = %{version}-%{release}
 
 %description plugin-reportuploader
 Plugin to report bugs into anonymous FTP site associated with ticketing system.
-
-%if 0%{?fedora} || 0%{?eln}
-%package fedora
-Summary: Default configuration for reporting bugs via Fedora infrastructure
-Requires: %{name} = %{version}-%{release}
-
-%description fedora
-Default configuration for reporting bugs via Fedora infrastructure
-used to easily configure the reporting process for Fedora systems. Just
-install this package and you're done.
-%endif
-
-%if 0%{?rhel} && ! 0%{?eln}
-%package rhel-bugzilla
-Summary: Default configuration for reporting bugs to Red Hat Bugzilla
-Requires: %{name} = %{version}-%{release}
-Requires: libreport-plugin-bugzilla = %{version}-%{release}
-Requires: libreport-plugin-ureport = %{version}-%{release}
-
-%description rhel-bugzilla
-Default configuration for reporting bugs to Red Hat Bugzilla used to easily
-configure the reporting process for Red Hat systems. Just install this package
-and you're done.
-
-%package rhel-anaconda-bugzilla
-Summary: Default configuration for reporting anaconda bugs to Red Hat Bugzilla
-Requires: %{name} = %{version}-%{release}
-Requires: libreport-plugin-bugzilla = %{version}-%{release}
-
-%description rhel-anaconda-bugzilla
-Default configuration for reporting Anaconda problems to Red Hat Bugzilla used
-to easily configure the reporting process for Red Hat systems. Just install this
-package and you're done.
-%endif
 
 %if %{with bugzilla}
 %package anaconda
@@ -329,52 +276,6 @@ mkdir -p %{buildroot}/%{_datadir}/%{name}/workflows/
 
 # After everything is installed, remove info dir
 rm -f %{buildroot}/%{_infodir}/dir
-
-# Remove unwanted Fedora specific workflow configuration files
-%if ! 0%{?fedora} && ! 0%{?eln}
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraCCpp.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraKerneloops.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraPython.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraPython3.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraVmcore.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraXorg.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraLibreport.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraJava.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraJavaScript.xml
-rm -f %{buildroot}/%{_sysconfdir}/libreport/workflows.d/report_fedora.conf
-rm -f %{buildroot}%{_mandir}/man5/report_fedora.conf.5
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_AnacondaFedora.xml
-%endif
-
-# Remove unwanted RHEL specific workflow configuration files
-%if ! 0%{?rhel} || 0%{?eln}
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_uReport.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_AnacondaRHELBugzilla.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELBugzillaCCpp.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELBugzillaKerneloops.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELBugzillaPython.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELBugzillaVmcore.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELBugzillaXorg.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELBugzillaLibreport.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELBugzillaJava.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELBugzillaJavaScript.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELAddDataCCpp.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELAddDataKerneloops.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELAddDataPython.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELAddDatavmcore.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELAddDataxorg.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELAddDataLibreport.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELAddDataJava.xml
-rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELAddDataJavaScript.xml
-rm -f %{buildroot}/%{_sysconfdir}/libreport/workflows.d/report_uReport.conf
-rm -f %{buildroot}/%{_sysconfdir}/libreport/workflows.d/report_rhel_bugzilla.conf
-rm -f %{buildroot}%{_mandir}/man5/report_uReport.conf.5
-rm -f %{buildroot}%{_mandir}/man5/report_rhel_bugzilla.conf.5
-%endif
-
-%if 0%{?fedora} >= 38
-    mv %{buildroot}/%{_bindir}/reporter-bugzilla-python %{buildroot}/%{_bindir}/reporter-bugzilla
-%endif
 
 %check
 make check|| {
@@ -566,9 +467,6 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_mandir}/man5/bugzilla_formatdup_analyzer_libreport.conf.5.*
 %{_mandir}/man5/bugzilla_format_kernel.conf.5.*
 %{_bindir}/reporter-bugzilla
-%if 0%{?fedora} < 38
-%{_bindir}/reporter-bugzilla-python
-%endif
 
 %endif
 
@@ -622,43 +520,10 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %config(noreplace) %{_sysconfdir}/libreport/events/report_Uploader.conf
 %{_mandir}/man5/report_Uploader.conf.5.*
 
-%if 0%{?fedora} || 0%{?eln}
-%files fedora
-%{_datadir}/%{name}/workflows/workflow_FedoraCCpp.xml
-%{_datadir}/%{name}/workflows/workflow_FedoraKerneloops.xml
-%{_datadir}/%{name}/workflows/workflow_FedoraPython.xml
-%{_datadir}/%{name}/workflows/workflow_FedoraPython3.xml
-%{_datadir}/%{name}/workflows/workflow_FedoraVmcore.xml
-%{_datadir}/%{name}/workflows/workflow_FedoraXorg.xml
-%{_datadir}/%{name}/workflows/workflow_FedoraLibreport.xml
-%{_datadir}/%{name}/workflows/workflow_FedoraJava.xml
-%{_datadir}/%{name}/workflows/workflow_FedoraJavaScript.xml
-%config(noreplace) %{_sysconfdir}/libreport/workflows.d/report_fedora.conf
-%{_mandir}/man5/report_fedora.conf.5.*
-%endif
 
 %if %{with bugzilla}
-%if 0%{?rhel} && ! 0%{?eln}
-%files rhel-bugzilla
-%{_datadir}/%{name}/workflows/workflow_RHELBugzillaCCpp.xml
-%{_datadir}/%{name}/workflows/workflow_RHELBugzillaKerneloops.xml
-%{_datadir}/%{name}/workflows/workflow_RHELBugzillaPython.xml
-%{_datadir}/%{name}/workflows/workflow_RHELBugzillaVmcore.xml
-%{_datadir}/%{name}/workflows/workflow_RHELBugzillaXorg.xml
-%{_datadir}/%{name}/workflows/workflow_RHELBugzillaLibreport.xml
-%{_datadir}/%{name}/workflows/workflow_RHELBugzillaJava.xml
-%{_datadir}/%{name}/workflows/workflow_RHELBugzillaJavaScript.xml
-%config(noreplace) %{_sysconfdir}/libreport/workflows.d/report_rhel_bugzilla.conf
-%{_mandir}/man5/report_rhel_bugzilla.conf.5.*
-
-%files rhel-anaconda-bugzilla
-%{_datadir}/%{name}/workflows/workflow_AnacondaRHELBugzilla.xml
-%endif
 
 %files anaconda
-%if 0%{?fedora} || 0%{?eln}
-%{_datadir}/%{name}/workflows/workflow_AnacondaFedora.xml
-%endif
 %{_datadir}/%{name}/workflows/workflow_AnacondaUpload.xml
 %config(noreplace) %{_sysconfdir}/libreport/workflows.d/anaconda_event.conf
 %config(noreplace) %{_sysconfdir}/libreport/events.d/bugzilla_anaconda_event.conf
