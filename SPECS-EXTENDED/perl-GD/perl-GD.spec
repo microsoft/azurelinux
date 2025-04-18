@@ -95,7 +95,7 @@ make test TEST_VERBOSE=1
 %{_mandir}/man3/GD::Simple.3*
 
 %changelog
-* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.16-1
+* Thu Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.16-1
 - Update to version 1.16
 - License verified
 
