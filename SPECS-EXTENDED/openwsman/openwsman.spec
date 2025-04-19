@@ -2,12 +2,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
 Name:		openwsman
-Version:	2.6.8
-Release:	13%{?dist}
+Version:	2.7.2
+Release:	11%{?dist}
 Summary:	Open source Implementation of WS-Management
 
-License:	BSD
-URL:		http://www.openwsman.org/
+License:	BSD-3-Clause AND MIT
+URL:		https://www.openwsman.org/
 Source0:	https://github.com/Openwsman/openwsman/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # help2man generated manpage for openwsmand binary
 Source1:	openwsmand.8.gz
@@ -15,17 +15,22 @@ Source1:	openwsmand.8.gz
 Source2:	openwsmand.service
 # script for testing presence of the certificates in ExecStartPre
 Source3:	owsmantestcert.sh
+# Source100-102: selinux policy for openwsman, extracted
+
 Patch1:		openwsman-2.4.0-pamsetup.patch
 Patch2:		openwsman-2.4.12-ruby-binding-build.patch
 Patch3:		openwsman-2.6.2-openssl-1.1-fix.patch
 Patch4:		openwsman-2.6.5-http-status-line.patch
-Patch5:		openwsman-2.6.5-libcurl-error-codes-update.patch
-Patch6:		openwsman-2.6.8-CVE-2019-3816.patch
-Patch7:		openwsman-2.6.8-CVE-2019-3833.patch
+Patch5:		openwsman-2.6.8-update-ssleay-conf.patch
+Patch6:		openwsman-2.7.2-fix-ftbfs.patch
+BuildRequires:	make
 BuildRequires:	swig
 BuildRequires:	libcurl-devel libxml2-devel pam-devel sblim-sfcc-devel
-BuildRequires:	python3 python3-devel perl-interpreter
-BuildRequires:	perl-devel perl-generators pkgconfig openssl-devel
+BuildRequires:	python3 python3-devel
+
+BuildRequires:	perl-interpreter perl-devel perl-generators
+
+BuildRequires:	pkgconfig openssl-devel
 BuildRequires:	cmake
 BuildRequires:	systemd-units
 BuildRequires:	gcc gcc-c++
@@ -33,14 +38,14 @@ BuildRequires:	gcc gcc-c++
 %description
 Openwsman is a project intended to provide an open-source
 implementation of the Web Services Management specification
-(WS-Management) and to expose system management information on the
+ (WS-Management) and to expose system management information on the
 Linux operating system using the WS-Management protocol. WS-Management
 is based on a suite of web services specifications and usage
 requirements that exposes a set of operations focused on and covers
 all system management aspects.
 
 %package -n libwsman1
-License:	BSD
+License:	BSD-3-Clause AND MIT
 Summary:	Open source Implementation of WS-Management
 Provides:	%{name} = %{version}-%{release}
 Obsoletes:	%{name} < %{version}-%{release}
@@ -49,7 +54,7 @@ Obsoletes:	%{name} < %{version}-%{release}
 Openwsman library for packages dependent on openwsman.
 
 %package -n libwsman-devel
-License:	BSD
+License:	BSD-3-Clause AND MIT
 Summary:	Open source Implementation of WS-Management
 Provides:	%{name}-devel = %{version}-%{release}
 Obsoletes:	%{name}-devel < %{version}-%{release}
@@ -63,22 +68,23 @@ Requires:	libcurl-devel
 Development files for openwsman.
 
 %package client
-License:	BSD
+License:	BSD-3-Clause AND MIT
 Summary:	Openwsman Client libraries
 
 %description client
 Openwsman Client libraries.
 
 %package server
-License:	BSD
+License:	BSD-3-Clause AND MIT
 Summary:	Openwsman Server and service libraries
 Requires:	libwsman1 = %{version}-%{release}
+
 
 %description server
 Openwsman Server and service libraries.
 
 %package python3
-License:	BSD
+License:	BSD-3-Clause AND MIT
 Summary:	Python bindings for openwsman client API
 Requires:	%{__python3}
 Requires:	libwsman1 = %{version}-%{release}
@@ -89,8 +95,7 @@ This package provides Python3 bindings to access the openwsman client API.
 
 
 %package perl
-License:	BSD
-Requires:	perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+License:	BSD-3-Clause AND MIT
 Summary:	Perl bindings for openwsman client API
 Requires:	libwsman1 = %{version}-%{release}
 
@@ -98,16 +103,11 @@ Requires:	libwsman1 = %{version}-%{release}
 This package provides Perl bindings to access the openwsman client API.
 
 
+
 %prep
 %setup -q
 
-%patch 1 -p1 -b .pamsetup
-%patch 2 -p1 -b .ruby-binding-build
-%patch 3 -p1 -b .openssl-1.1-fix
-%patch 4 -p1 -b .http-status-line
-%patch 5 -p1 -b .libcurl-error-codes-update
-%patch 6 -p1 -b .CVE-2019-3816
-%patch 7 -p1 -b .CVE-2019-3833
+%autopatch -p1
 
 %build
 # Removing executable permissions on .c and .h files to fix rpmlint warnings. 
@@ -117,11 +117,11 @@ rm -rf build
 mkdir build
 
 export RPM_OPT_FLAGS="$RPM_OPT_FLAGS -DFEDORA -DNO_SSL_CALLBACK"
-export CFLAGS="-D_GNU_SOURCE -fPIE -DPIE"
-export LDFLAGS="$LDFLAGS -Wl,-z,now -pie"
+export CFLAGS="$RPM_OPT_FLAGS -fPIC -pie -Wl,-z,relro -Wl,-z,now"
+export CXXFLAGS="$RPM_OPT_FLAGS -fPIC -pie -Wl,-z,relro -Wl,-z,now"
 cd build
 cmake \
-	-DCMAKE_INSTALL_PREFIX=/usr \
+	-DCMAKE_INSTALL_PREFIX=%{_prefix} \
 	-DCMAKE_VERBOSE_MAKEFILE=TRUE \
 	-DCMAKE_BUILD_TYPE=Release \
 	-DCMAKE_C_FLAGS_RELEASE:STRING="$RPM_OPT_FLAGS -fno-strict-aliasing" \
@@ -130,7 +130,7 @@ cmake \
 	-DPACKAGE_ARCHITECTURE=`uname -m` \
 	-DLIB=%{_lib} \
 	-DBUILD_JAVA=no \
-	-DBUILD_PYTHON=no \
+        -DBUILD_PYTHON=no \
 	..
 
 make
@@ -146,7 +146,7 @@ export LD_LIBRARY_PATH=%{_builddir}/%{name}-%{version}/build/src/lib/
 cd build
 
 
-make DESTDIR=%{buildroot} install
+%make_install
 cd ..
 rm -f %{buildroot}/%{_libdir}/*.la
 rm -f %{buildroot}/%{_libdir}/openwsman/plugins/*.la
@@ -232,13 +232,140 @@ rm -f /var/log/wsmand.log
 %doc AUTHORS COPYING ChangeLog README.md
 %{_libdir}/libwsman_clientpp.so.*
 %config(noreplace) %{_sysconfdir}/openwsman/openwsman_client.conf
+
 %{_bindir}/winrs
 
 
 %changelog
-* Thu Jun 10 2021 Muhammad Falak Wani <mwani@microsoft.com> - 2.6.8-13
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove support for building ruby-gem
+* Sat Apr 19 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.7.2-12
+- Upgrade to v2.7.2, taken reference from Fedora 41 (license: MIT)
+- License verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.2-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jun 25 2024 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.2-10
+- Rebuild
+  Resolves: #2290726
+
+* Tue Jun 18 2024 Python Maint <python-maint@redhat.com> - 2.7.2-9
+- Rebuilt for Python 3.13
+
+* Wed Jun 12 2024 Jitka Plesnikova <jplesnik@redhat.com> - 2.7.2-8
+- Perl 5.40 rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 2.7.2-7
+- Rebuilt for Python 3.13
+
+* Fri May 10 2024 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.2-6
+- Update license tags in subpackages to SPDX format
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.2-4
+- Fix FTBFS
+  Resolves: #2259165
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jan 03 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.7.2-2
+- Rebuild for https://fedoraproject.org/wiki/Changes/Ruby_3.3
+
+* Thu Aug 31 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.2-1
+- Update to openwsman-2.7.2
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 2.7.1-13
+- Perl 5.38 rebuild
+
+* Wed Jun 14 2023 Python Maint <python-maint@redhat.com> - 2.7.1-12
+- Rebuilt for Python 3.12
+
+* Tue Feb 14 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.1-11
+- SPDX migration
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Jan 04 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.7.1-9
+- Rebuild for https://fedoraproject.org/wiki/Changes/Ruby_3.2
+
+* Fri Oct 21 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.1-8
+- Fix Ruby bindings for swig 4.1 (backported from upstream)
+  Resolves: #2136510
+- Remove mixed use of spaces and tabs from spec file
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jul 20 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.1-6
+- Improve handling of HTTP 401 Unauthorized
+
+* Wed Jun 15 2022 Python Maint <python-maint@redhat.com> - 2.7.1-5
+- Rebuilt for Python 3.11
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.7.1-4
+- Perl 5.36 rebuild
+
+* Thu Jan 27 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.7.1-3
+- F-36: rebuild against ruby31
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Nov 11 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.1-1
+- Update to openwsman-2.7.1
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 2.7.0-6
+- Rebuilt with OpenSSL 3.0.0
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jun 08 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.0-4
+- Incorporate -selinux subpackage
+  See https://fedoraproject.org/wiki/SELinux/IndependentPolicy
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.7.0-3
+- Rebuilt for Python 3.10
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.7.0-2
+- Perl 5.34 rebuild
+
+* Tue Mar 09 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.7.0-1
+- Update to openwsman-2.7.0 (thanks for a patch to Bastian Germann)
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.6.8-20
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.8-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jan 06 2021 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.6.8-18
+- F-34: rebuild against ruby 3.0
+
+* Tue Sep 22 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.6.8-17
+- Use make macros, patch by Tom Stellard <tstellar@redhat.com>
+  (https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro)
+- Update flags, enable LTO
+- Remove RANDFILE and increase default bits in ssleay.conf
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.8-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 08 2020 Jeff Law <law@redhat.com> - 2.6.8-15
+- Disable LTO
+
+* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.6.8-14
+- Perl 5.32 rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 2.6.8-13
+- Rebuilt for Python 3.9
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.8-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

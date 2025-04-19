@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "openwsman-2.6.8.tar.gz": "cd9df2830b0a12b090e06443e90f7513fa869f58275db0693e0e0bfcfb67c81d",
+  "openwsman-2.7.2.tar.gz": "f916b20956a64426c60a34fa2eaf2c8a13c7047ea2d2585329a6f33e00113be1",
   "openwsmand.8.gz": "9fd2fdef84c2f85e47d301c4f3d4fd8603bb663a14590cf1aaba1268fbf071f5",
   "openwsmand.service": "e1ebc81b48aa9bbf7afed903d5833fe9c3cfe62fe177b9fe7dae303acdcc6609",
   "owsmantestcert.sh": "1ffd5a1662873b7e645475e470f7be329406a39e0b5043c27d51a872bdc806fb"
