@@ -1,0 +1,12 @@
+diff -up openwsman-2.7.1/etc/ssleay.cnf.orig openwsman-2.7.1/etc/ssleay.cnf
+--- openwsman-2.7.1/etc/ssleay.cnf.orig	2021-11-09 08:27:48.577749509 +0100
++++ openwsman-2.7.1/etc/ssleay.cnf	2021-11-09 08:28:10.499967010 +0100
+@@ -3,7 +3,7 @@
+ #
+ 
+ [ req ]
+-default_bits            = 1024
++default_bits            = 2048
+ default_keyfile         = privkey.pem
+ distinguished_name      = req_distinguished_name
+ 

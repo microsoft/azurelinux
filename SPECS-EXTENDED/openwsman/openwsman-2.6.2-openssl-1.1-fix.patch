@@ -1,6 +1,6 @@
-diff -up openwsman-2.6.8/src/server/shttpd/compat_unix.h.orig openwsman-2.6.8/src/server/shttpd/compat_unix.h
---- openwsman-2.6.8/src/server/shttpd/compat_unix.h.orig	2018-10-12 12:06:26.000000000 +0200
-+++ openwsman-2.6.8/src/server/shttpd/compat_unix.h	2018-11-22 13:30:10.756423510 +0100
+diff -up openwsman-2.7.0/src/server/shttpd/compat_unix.h.orig openwsman-2.7.0/src/server/shttpd/compat_unix.h
+--- openwsman-2.7.0/src/server/shttpd/compat_unix.h.orig	2020-05-25 15:16:28.000000000 +0200
++++ openwsman-2.7.0/src/server/shttpd/compat_unix.h	2021-03-09 09:15:26.750942006 +0100
 @@ -27,10 +27,6 @@
  	pthread_create(&tid, NULL, (void *(*)(void *))a, c); } while (0)
  #endif /* !NO_THREADS */
@@ -12,10 +12,10 @@ diff -up openwsman-2.6.8/src/server/shttpd/compat_unix.h.orig openwsman-2.6.8/sr
  #define	DIRSEP				'/'
  #define	IS_DIRSEP_CHAR(c)		((c) == '/')
  #define	O_BINARY			0
-diff -up openwsman-2.6.8/src/server/shttpd/io_ssl.c.orig openwsman-2.6.8/src/server/shttpd/io_ssl.c
---- openwsman-2.6.8/src/server/shttpd/io_ssl.c.orig	2018-10-12 12:06:26.000000000 +0200
-+++ openwsman-2.6.8/src/server/shttpd/io_ssl.c	2018-11-22 13:30:10.757423510 +0100
-@@ -11,23 +11,6 @@
+diff -up openwsman-2.7.0/src/server/shttpd/io_ssl.c.orig openwsman-2.7.0/src/server/shttpd/io_ssl.c
+--- openwsman-2.7.0/src/server/shttpd/io_ssl.c.orig	2020-05-25 15:16:28.000000000 +0200
++++ openwsman-2.7.0/src/server/shttpd/io_ssl.c	2021-03-09 09:15:26.750942006 +0100
+@@ -11,28 +11,6 @@
  #include "defs.h"
  
  #if !defined(NO_SSL)
@@ -29,8 +29,13 @@ diff -up openwsman-2.6.8/src/server/shttpd/io_ssl.c.orig openwsman-2.6.8/src/ser
 -	{"SSL_set_fd",			{0}},
 -	{"SSL_new",			{0}},
 -	{"SSL_CTX_new",			{0}},
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
 -	{"SSLv23_server_method",	{0}},
 -	{"SSL_library_init",		{0}},
+-#else
+-	{"TLS_server_method",	{0}},
+-	{"OPENSSL_init_ssl",		{0}},
+-#endif
 -	{"SSL_CTX_use_PrivateKey_file",	{0}},
 -	{"SSL_CTX_use_certificate_file",{0}},
 -	{NULL,				{0}}
@@ -39,10 +44,10 @@ diff -up openwsman-2.6.8/src/server/shttpd/io_ssl.c.orig openwsman-2.6.8/src/ser
  void
  _shttpd_ssl_handshake(struct stream *stream)
  {
-diff -up openwsman-2.6.8/src/server/shttpd/shttpd.c.orig openwsman-2.6.8/src/server/shttpd/shttpd.c
---- openwsman-2.6.8/src/server/shttpd/shttpd.c.orig	2018-10-12 12:06:26.000000000 +0200
-+++ openwsman-2.6.8/src/server/shttpd/shttpd.c	2018-11-22 13:30:41.314416695 +0100
-@@ -1476,20 +1476,14 @@ set_ssl(struct shttpd_ctx *ctx, const ch
+diff -up openwsman-2.7.0/src/server/shttpd/shttpd.c.orig openwsman-2.7.0/src/server/shttpd/shttpd.c
+--- openwsman-2.7.0/src/server/shttpd/shttpd.c.orig	2020-05-25 15:16:28.000000000 +0200
++++ openwsman-2.7.0/src/server/shttpd/shttpd.c	2021-03-09 09:16:58.843241510 +0100
+@@ -1489,25 +1489,13 @@ set_ssl(struct shttpd_ctx *ctx, const ch
  	int		retval = FALSE;
  	EC_KEY*		key;
  
@@ -59,20 +64,20 @@ diff -up openwsman-2.6.8/src/server/shttpd/shttpd.c.orig openwsman-2.6.8/src/ser
 -		}
 -
  	/* Initialize SSL crap */
-+	debug("Initialize SSL");
-+	SSL_load_error_strings();
-+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
-+	OPENSSL_init_ssl(0, NULL);
-+#else
- 	SSL_library_init();
-+#endif
  
+ #if OPENSSL_VERSION_NUMBER < 0x10100000L
+ 	SSL_library_init();
  	if ((CTX = SSL_CTX_new(SSLv23_server_method())) == NULL)
+ #else
+-        OPENSSL_init_ssl();
++        OPENSSL_init_ssl(0, NULL);
+ 	if ((CTX = SSL_CTX_new(TLS_server_method())) == NULL)
+ #endif
  		_shttpd_elog(E_LOG, NULL, "SSL_CTX_new error");
-diff -up openwsman-2.6.8/src/server/shttpd/ssl.h.orig openwsman-2.6.8/src/server/shttpd/ssl.h
---- openwsman-2.6.8/src/server/shttpd/ssl.h.orig	2018-10-12 12:06:26.000000000 +0200
-+++ openwsman-2.6.8/src/server/shttpd/ssl.h	2018-11-22 13:30:10.757423510 +0100
-@@ -12,52 +12,4 @@
+diff -up openwsman-2.7.0/src/server/shttpd/ssl.h.orig openwsman-2.7.0/src/server/shttpd/ssl.h
+--- openwsman-2.7.0/src/server/shttpd/ssl.h.orig	2020-05-25 15:16:28.000000000 +0200
++++ openwsman-2.7.0/src/server/shttpd/ssl.h	2021-03-09 09:15:26.750942006 +0100
+@@ -12,55 +12,4 @@
  
  #include <openssl/ssl.h>
  
@@ -120,6 +125,9 @@ diff -up openwsman-2.6.8/src/server/shttpd/ssl.h.orig openwsman-2.6.8/src/server
 -#if OPENSSL_VERSION_NUMBER < 0x10100000L
 -#define	SSLv23_server_method()	(* (SSL_METHOD * (*)(void)) FUNC(9))()
 -#define	SSL_library_init() (* (int (*)(void)) FUNC(10))()
+-#else
+-#define	TLS_server_method()	(* (SSL_METHOD * (*)(void)) FUNC(9))()
+-#define	OPENSSL_init_ssl() (* (int (*)(void)) FUNC(10))()
  #endif
 -#define	SSL_CTX_use_PrivateKey_file(x,y,z)	(* (int (*)(SSL_CTX *, \
 -		const char *, int)) FUNC(11))((x), (y), (z))
