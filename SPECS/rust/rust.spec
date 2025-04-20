@@ -43,7 +43,7 @@ Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 # These ci tests are expecting rust source to be git repository, since we are using a tarball
 # we are missing git metadata so these tests are failing, hence ignoring these tests
-Patch0:		Ignore_failing_ci_tests.patch
+#Patch0:		Ignore_failing_ci_tests.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
