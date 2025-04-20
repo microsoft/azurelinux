@@ -131,17 +131,24 @@ exit 0
 %dir %{_sysconfdir}/%{name}
 
 %check
-cat /etc/tdnf/tdnf.conf
-ls -l /etc/yum.repos.d/*
-cat /etc/yum.repos.d/*
+cd %{buildroot}
+cp -r usr/sbin/* /usr/sbin/
+cp -r var/opt/* /var/opt/
+cp -r var/log/* /var/log/
+cp -r usr/lib/debug/usr/sbin/* /usr/lib/debug/sbin/
+cp -r usr/lib/systemd/* /usr/lib/systemd/
+cp -r etc/* /etc/
+cp /etc/nginx/mime.types.default /etc/nginx/mime.types
+useradd -s /usr/bin/sh nginx
 tdnf repolist --releasever=3.0
-tdnf install azurelinux-repos-extended --releasever=3.0
-tdnf install perl-Test-Harness --releasever=3.0
-which prove
+tdnf install -y azurelinux-repos-extended --releasever=3.0
+tdnf install -y perl-Test-Harness perl-Test-Simple perl-FindBin perl-lib --releasever=3.0
 tar -xvf %{SOURCE3}
 cd nginx-tests
-TEST_NGINX_BINARY=%{_sbindir}/nginx prove .
-
+su nginx -s /bin/sh -c 'TEST_NGINX_BINARY=%{_sbindir}/nginx prove ./*.t'
+TEST_NGINX_BINARY=%{_sbindir}/nginx prove ./root_user_tests/
+cd ..
+rm -rf nginx-tests
 %changelog
 * Tue Mar 11 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.25.4-4
 - Enable webdav module
