@@ -3,12 +3,12 @@
 
 # Release date and version of stage 0 compiler can be found in "src/stage0" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2025-02-20
-%define stage0_version 1.85.0
+%define release_date 2025-01-09
+%define stage0_version 1.84.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.86.0
+Version:        1.85.0
 Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
@@ -43,7 +43,8 @@ Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 # These ci tests are expecting rust source to be git repository, since we are using a tarball
 # we are missing git metadata so these tests are failing, hence ignoring these tests
-#Patch0:		Ignore_failing_ci_tests.patch
+Patch0:         Ignore_failing_ci_tests.patch
+Patch100:       CVE-2024-9681.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -178,8 +179,8 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
-* Sun Apr 20 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.86.0-1
-- Upgrade to 1.86.0
+* Sun Apr 20 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.85.0-1
+- Upgrade to 1.85.0
 - Drop patches
 - Remove expand-yaml-anchors tool in %check
 - Remove rust-demangler tool 
