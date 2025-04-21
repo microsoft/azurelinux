@@ -119,7 +119,8 @@ install -m0644 mlogc/mlogc-default.conf %{buildroot}%{_sysconfdir}/mlogc.conf
 
 
 %files
-%doc CHANGES LICENSE README.* NOTICE
+%license LICENSE
+%doc CHANGES README.* NOTICE
 %{_httpd_moddir}/mod_security2.so
 %config(noreplace) %{_httpd_confdir}/*.conf
 %if "%{_httpd_modconfdir}" != "%{_httpd_confdir}"
