@@ -5,8 +5,9 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azurelinux_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
 %global KVERSION %{target_kernel_version_full}
 
@@ -18,7 +19,11 @@
 Summary:	 Cross-partition memory
 Name:		 %{_name}-signed
 Version:	 2.7.4
+<<<<<<< HEAD
 Release:	 19%{?dist}
+=======
+Release:	 17%{release_suffix}%{?dist}
+>>>>>>> 9b3a4cb81 (dev work)
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -83,6 +88,7 @@ popd
 
 
 %changelog
+<<<<<<< HEAD
 * Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.4-19
 - Bump release to rebuild for new kernel release
 
@@ -91,6 +97,10 @@ popd
 
 * Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-17
 - Bump release to rebuild for new kernel release
+=======
+* Mon Apr 30 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 2.7.4-17
+- Add kernel version and release nb into release nb
+>>>>>>> 9b3a4cb81 (dev work)
 
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 2.7.4-16
 - Bump release to rebuild for new kernel release

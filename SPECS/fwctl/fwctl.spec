@@ -30,11 +30,6 @@
 # SOFTWARE.
 #
 
-<<<<<<< HEAD
-%global last-known-kernel 6.6.90.1-1
-
-=======
->>>>>>> 9e9c5812d (dev work)
 %{!?_name: %define _name fwctl}
 %{!?_version: %define _version 24.10}
 %{!?_release: %define _release OFED.24.10.0.6.7.1}
@@ -74,7 +69,7 @@
 Summary:	 %{_name} Driver
 Name:		 fwctl
 Version:	 24.10
-Release:	 20?dist}
+Release:	 20%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
