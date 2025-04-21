@@ -31,7 +31,10 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 %if 0%{azl}
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
+%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
 %global target_kernel_version_full f.a.k.e
 %endif
@@ -43,7 +46,7 @@
 Summary:	 srp driver
 Name:		 %{_name}-signed
 Version:	 24.10
-Release:	 16%{?dist}
+Release:	 17%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -106,6 +109,9 @@ popd
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Mon Apr 30 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-17
+- Add kernel version and release nb into release nb
+
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 24.10-16
 - Bump release to rebuild for new kernel release
 
