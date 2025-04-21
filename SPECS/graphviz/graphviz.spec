@@ -411,6 +411,7 @@ php --no-php-ini \
 
 %files
 %license LICENSE
+%license %{_docdir}/%{name}/COPYING
 %doc %{_docdir}/%{name}
 %{_bindir}/*
 %dir %{_libdir}/graphviz
@@ -422,6 +423,7 @@ php --no-php-ini \
 %exclude %{_docdir}/%{name}/html
 %exclude %{_docdir}/%{name}/pdf
 %exclude %{_docdir}/%{name}/demo
+%exclude %{_docdir}/%{name}/COPYING
 %{_datadir}/graphviz/gvpr
 %ghost %{_libdir}/graphviz/config%{pluginsver}
 
