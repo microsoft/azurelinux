@@ -4,7 +4,7 @@
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
 Version:        3.4.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,9 +41,10 @@ Requires:       glib-networking
 Requires:       libpsl
 Requires:       libxml2
 
-Patch:          CVE-2024-52530.patch
-Patch:          CVE-2024-52531.patch
-Patch:          CVE-2024-52532.patch
+Patch0:          CVE-2024-52530.patch
+Patch1:          CVE-2024-52531.patch
+Patch2:          CVE-2024-52532.patch
+Patch3:          CVE-2025-32911.patch
 
 %description
 libsoup is HTTP client/server library for GNOME
@@ -111,6 +112,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 
 %changelog
+* Mon Apr 21 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.4.4-3
+- Add patch for CVE-2025-32911
+
 * Fri Nov 15 2024 Thien Trung Vuong <tvuong@microsoft.com> - 3.4.4-2
 - Add patches for CVE-2024-52530, CVE-2024-52531, CVE-2024-52532
 
