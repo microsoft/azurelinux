@@ -3,7 +3,7 @@ storage:
 
   disks:
   - partitionTableType: gpt
-    maxSize: 595M
+    maxSize: 604M
     partitions:
     - id: esp
       type: esp
