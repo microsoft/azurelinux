@@ -17,7 +17,7 @@
   <property name="project.description" value="The ${project.name} classes from JSR 318."/>
   <property name="project.organization.name" value="JBoss by Red Hat"/>
   
-  <property name="compiler.source" value="1.6"/>
+  <property name="compiler.source" value="1.7"/>
   <property name="compiler.target" value="${compiler.source}"/>
 
   <property name="build.finalName" value="${project.artifactId}-${project.version}"/>
