@@ -1,7 +1,7 @@
 Summary:       A dictionary of English words for the /usr/share/dict directory
 Name:          words
 Version:       3.0
-Release:       38%{?dist}
+Release:       39%{?dist}
 License:       Public Domain
 # Note that Moby Project officially does not exist any more. The most complete
 # information about the project is in Wikipedia.
