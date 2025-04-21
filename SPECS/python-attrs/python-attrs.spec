@@ -39,7 +39,7 @@ Attributes without boilerplate.
 
 %check
 # explicitly  install packaging ver to match azl install to avoid pip conflict
-pip3 install tox 
+pip3 install tox==4.23.2
 # Skip mypy tests- effort required in keeping these tests green is not justifiable,
 # as we don't ship mypy and these tests are very sensitive to mypy upstream changes
 
