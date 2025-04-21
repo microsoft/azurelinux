@@ -59,7 +59,7 @@ perform the simplest of tasks.
 %py3_install
 
 %check
-pip3 install tox==4.23.2
+pip3 install tox==4.23.2 --ignore-installed
 # 2.1.0+ versions of "markupsafe" make test fail.
 # No fix from upstream in version 2.28.1: https://github.com/psf/requests/commit/3ed60078e2376c847ba0b0c9d564af522623c5ba
 sed -i "/wheel/amarkupsafe==2.0.1" requirements-dev.txt

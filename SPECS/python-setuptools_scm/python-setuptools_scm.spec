@@ -63,7 +63,7 @@ It also handles file finders for the supported scm’s.
 %pyproject_install
 
 %check
-pip3 install tox==4.23.2 tox-current-env
+pip3 install tox==4.23.2 tox-current-env --ignore-installed
 tox -e py%{python3_version_nodots}
 
 %files -n python3-%{srcname}

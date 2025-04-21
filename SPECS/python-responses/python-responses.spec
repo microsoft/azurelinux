@@ -45,7 +45,7 @@ sed -i 's/^include test_responses\.py test_matchers\.py test_registries\.py$/rec
 %py3_install
 
 %check
-pip3 install tox==4.23.2
+pip3 install tox==4.23.2 --ignore-installed
 tox -e py%{python3_version_nodots} --sitepackages
 
 %files -n python3-%{srcname}
