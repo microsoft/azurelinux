@@ -45,7 +45,7 @@
 Summary:        Graph Visualization Tools
 Name:           graphviz
 Version:        2.42.4
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -55,6 +55,7 @@ Source0:        https://gitlab.com/%{name}/%{name}/-/archive/%{version}/%{name}-
 Patch0:         graphviz-2.42.2-dotty-menu-fix.patch
 Patch1:         graphviz-2.42.2-coverity-scan-fixes.patch
 Patch2:         CVE-2020-18032.patch
+Patch3:         CVE-2023-46045.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -517,6 +518,9 @@ php --no-php-ini \
 %{_mandir}/man3/*.3tcl*
 
 %changelog
+* Mon Apr 21 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.42.4-12
+- Patch CVE-2023-46045 using an upstream patch
+
 * Wed May 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.42.4-11
 - Rebuild with ocaml 5.1.1
 
