@@ -1,7 +1,7 @@
 Name:           giflib
 Summary:        A library and utilities for processing GIFs
 Version:        5.2.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ Patch0:         giflib_quantize.patch
 Patch1:         CVE-2023-48161.patch
 Patch2:         CVE-2022-28506.patch
 Patch3:         CVE-2023-39742.patch
+Patch4:         CVE-2025-31344.patch
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  xmlto
@@ -62,6 +63,9 @@ find %{buildroot} -name '*.a' -print -delete
 %{_mandir}/man1/*.1*
 
 %changelog
+* Tue Apr 15 2025 Sudipta Pandit <sudpandit@microsoft.com> - 5.2.1-9
+- Patch CVE-2025-31344
+
 * Fri Feb 14 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 5.2.1-8
 - Patch CVE-2023-39742
 
