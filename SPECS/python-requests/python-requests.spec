@@ -59,7 +59,7 @@ perform the simplest of tasks.
 %py3_install
 
 %check
-pip3 install tox
+pip3 install tox==4.23.2
 # 2.1.0+ versions of "markupsafe" make test fail.
 # No fix from upstream in version 2.28.1: https://github.com/psf/requests/commit/3ed60078e2376c847ba0b0c9d564af522623c5ba
 sed -i "/wheel/amarkupsafe==2.0.1" requirements-dev.txt
@@ -74,6 +74,7 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %changelog
 * Thu Sep 12 2024 Jon Slobodzian <joslobo@microsoft.com> - 2.31.0-2
 - bump package to use latest python3-packaging in ptest
+- also use tox version 4.23.2
 
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.31.0-1
 - Auto-upgrade to 2.31.0 - Azure Linux 3.0 - package upgrades

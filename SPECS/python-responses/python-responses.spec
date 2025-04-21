@@ -45,7 +45,7 @@ sed -i 's/^include test_responses\.py test_matchers\.py test_registries\.py$/rec
 %py3_install
 
 %check
-pip3 install tox
+pip3 install tox==4.23.2
 tox -e py%{python3_version_nodots} --sitepackages
 
 %files -n python3-%{srcname}
@@ -57,6 +57,7 @@ tox -e py%{python3_version_nodots} --sitepackages
 %changelog
 * Thu Sep 12 2024 Jon Slobodzian <joslobo@microsoft.com> - 0.20.0-2
 - bump package to use latest python3-packaging in ptest
+- also use tox version 4.23.2
 
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.23.3-1
 - Auto-upgrade to 0.23.3 - Azure Linux 3.0 - package upgrades

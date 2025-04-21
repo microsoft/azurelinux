@@ -80,6 +80,7 @@ tox -e py%{python3_version_nodots}
 %changelog
 * Thu Sep 12 2024 Jon Slobodzian <joslobo@microsoft.com> - 8.0.3-2
 - bump package to use latest python3-packaging in ptest
+- also use tox version 4.23.2
 
 * Wed Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.3-1
 - Auto-upgrade to 8.0.3 - 3.0 package upgrade

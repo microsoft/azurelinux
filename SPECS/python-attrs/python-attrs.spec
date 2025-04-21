@@ -55,6 +55,7 @@ LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots} -- -k 'not test_mypy and 
 %changelog
 * Thu Sep 12 2024 Jon Slobodzian <joslobo@microsoft.com> - 21.4.0-7
 - Remove explicit python-packaging version to support new python-packaging upgrade.
+- also use tox version 4.23.2
 
 * Tue Jul 02 2024 Sam Meluch <sammeluch@microsoft.com> - 21.4.0-6
 - add python-packaging requires to fix ptest
