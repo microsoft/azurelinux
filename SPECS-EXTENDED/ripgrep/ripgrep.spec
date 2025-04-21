@@ -20,7 +20,7 @@
 
 Name:           ripgrep
 Version:        13.0.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        A search tool that combines ag with grep
 License:        MIT AND Unlicense
 Vendor:         Microsoft Corporation
@@ -30,8 +30,8 @@ URL:            https://github.com/BurntSushi/ripgrep
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.xz
 Source2:        cargo_config
-BuildRequires:  cargo
-BuildRequires:  rust >= 1.31
+BuildRequires:  cargo < 1.85.0
+BuildRequires:  rust < 1.85.0
 BuildRequires:  rubygem(asciidoctor)
 
 %description
@@ -104,6 +104,9 @@ install -Dm 644 complete/_rg %{buildroot}%{_datadir}/zsh/site-functions/_rg
 %{_datadir}/zsh
 
 %changelog
+* Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 13.0.0-6
+- Pin rust version
+
 * Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 13.0.0-5
 - Bump package to rebuild with rust 1.72.0
 
