@@ -56,7 +56,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        11.2.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +64,7 @@ Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
 Patch0:         CVE-2023-4039.patch
+Patch1:         CVE-2021-32256.patch
 
 BuildRequires:  gmp-devel
 BuildRequires:  mpfr-devel
@@ -520,6 +521,9 @@ $tests_ok
 %do_files aarch64-linux-gnu %{build_cross}
 
 %changelog
+* Fri Apr 18 2025 Archana Shettigar <v-shettigara@microsoft.com> - 11.2.0-9
+- Patch CVE-2021-32256
+
 * Mon Dec 11 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.0-8
 - Added cross-compilation support for aarch64.
 - Used Fedora 36 spec (license: MIT) for guidance.
