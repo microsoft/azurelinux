@@ -41,19 +41,19 @@ Requires:       glib-networking
 Requires:       libpsl
 Requires:       libxml2
 
-Patch:          CVE-2024-52530.patch
-Patch:          CVE-2024-52531.patch
-Patch:          CVE-2024-52532.patch
+Patch0:          CVE-2024-52530.patch
+Patch1:          CVE-2024-52531.patch
+Patch2:          CVE-2024-52532.patch
 # CVE-2025-32913 will be fixed in 3.6.2 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/f4a761fb66512fff59798765e8ac5b9e57dceef0
-Patch:          CVE-2025-32913.patch
+Patch3:          CVE-2025-32913.patch
 # CVE-2025-32906 will be fixed in 3.6.5 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/af5b9a4a3945c52b940d5ac181ef51bb12011f1f
-Patch:          CVE-2025-32906.patch
+Patch4:          CVE-2025-32906.patch
 # CVE-2025-32909 will be fixed in 3.6.2 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/ba4c3a6f988beff59e45801ab36067293d24ce92
-Patch:          CVE-2025-32909.patch
+Patch5:          CVE-2025-32909.patch
 # CVE-2025-32910 will be fixed in 3.6.2 by https://gitlab.gnome.org/GNOME/libsoup/-/merge_requests/417
-Patch:          CVE-2025-32910.patch
+Patch6:          CVE-2025-32910.patch
 # CVE-2025-32912 will be fixed in 3.6.5 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/cd077513f267e43ce4b659eb18a1734d8a369992
-Patch:          CVE-2025-32912.patch
+Patch7:          CVE-2025-32912.patch
 
 %description
 libsoup is HTTP client/server library for GNOME
