@@ -25,15 +25,15 @@ also includes receivers developed by the Azure Linux team.
 
 %prep
 %autosetup -n azl-otel-collector
-tar -xf %{SOURCE1} --no-same-owner
+tar -xf %{SOURCE1} --no-same-owner -C cmd/azl-otelcol
 
 %build
 export CGO_ENABLED=0
-make build BUILDTAGS="netgo osusergo static_build" LDFLAGS="-s -w" TRIMPATH=1
+%make_build MODFLAGS="-mod=vendor" BUILDTAGS="netgo osusergo static_build" LDFLAGS="-s -w" TRIMPATH=1
 
 %install
 mkdir -p "%{buildroot}/%{_bindir}"
-install -D -m0755 azl-otelcol %{buildroot}/%{_bindir}
+install -D -m0755 bin/azl-otelcol %{buildroot}/%{_bindir}
 mkdir -p "%{buildroot}%{_unitdir}"
 install -D -m0644 %{SOURCE2} %{buildroot}%{_unitdir}/azl-otel-collector.service
 mkdir -p "%{buildroot}%{_sysconfdir}/azl-otel-collector"
@@ -68,6 +68,6 @@ for the Azure Linux OpenTelemetry Collector.
 %{_unitdir}/azl-otel-collector.service
 
 %changelog
-* Fri Apr 18 2025 Adit Jha <aditjha@microsoft.com> - 0.123.0-1
+* Tue Apr 22 2025 Adit Jha <aditjha@microsoft.com> - 0.124.0-1
 - Original version for Azure Linux
 - License Verified
