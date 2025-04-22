@@ -7,7 +7,7 @@ Name:		python-alsa
 Version:	%{baseversion}
 Release:	4%{?dist}
 License:	LGPL-2.1-or-later
-Source0:	ftp://ftp.alsa-project.org/pub/pyalsa/pyalsa-%{version}.tar.bz2
+Source0:	https://www.alsa-project.org/files/pub/pyalsa/pyalsa-%{version}.tar.bz2
 URL:		http://www.alsa-project.org/
 BuildRequires:	alsa-lib-devel >= %{version}
 BuildRequires:	python3-devel
