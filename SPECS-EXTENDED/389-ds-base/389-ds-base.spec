@@ -129,8 +129,8 @@ BuildRequires:    systemd-units
 BuildRequires:    systemd-devel
 BuildRequires:    systemd-rpm-macros
 %{?sysusers_requires_compat}
-BuildRequires:    cargo < 1.85.0
-BuildRequires:    rust < 1.85.0
+BuildRequires:    cargo
+BuildRequires:    rust
 BuildRequires:    pkgconfig
 BuildRequires:    pkgconfig(krb5)
 BuildRequires:    pkgconfig(libpcre2-8)
@@ -733,7 +733,7 @@ exit 0
 
 %changelog
 * Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> 3.1.1-3
-- Pin rust version
+- Bump release to build with rust 1.85.0
 
 * Fri Sep 20 2024 Muhammad Falak <mwani@microsoft.com> 3.1.0-2
 - Initial Azure Linux import from Fedora 42 (license: MIT)
