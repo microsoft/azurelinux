@@ -69,11 +69,7 @@ Requires:       %{name}-subid = %{version}-%{release}
 Libraries and headers for libsubid
 
 %prep
-%setup -q -n shadow-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%autosetup -n shadow-%{version} -p1
 
 autoreconf -fiv
 
