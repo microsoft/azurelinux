@@ -7,7 +7,7 @@ Summary:          Python code checking using pyflakes, pycodestyle, and mccabe
  
 License:          MIT
 URL:              https://github.com/PyCQA/flake8
-Source:           %{url}/archive/%{version}/flake8-%{version}.tar.gz
+Source:           https://github.com/PyCQA/flake8/archive/6.1.0/flake8-6.1.0.tar.gz
  
 BuildArch:        noarch
  
