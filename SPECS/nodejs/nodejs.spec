@@ -119,7 +119,7 @@ make cctest
 %files
 %defattr(-,root,root)
 %license LICENSE
-%doc CHANGELOG.md LICENSE README.md
+%doc CHANGELOG.md README.md
 %{_bindir}/node
 %dir %{_prefix}/lib/node_modules
 %{_mandir}/man*/*
