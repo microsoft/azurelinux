@@ -15,7 +15,7 @@ func TestOverlayValidConfiguration(t *testing.T) {
 		UpperDir:          "/upper",
 		WorkDir:           "/work",
 		MountPoint:        "/mnt",
-		IsRootfsOverlay:   false,
+		IsInitrdOverlay:   false,
 		MountDependencies: []string{"/var"},
 		MountOptions:      "noatime",
 	}
@@ -30,7 +30,7 @@ func TestOverlayInvalidEmptyLowerDir(t *testing.T) {
 		UpperDir:          "/upper",
 		WorkDir:           "/work",
 		MountPoint:        "/mnt",
-		IsRootfsOverlay:   false,
+		IsInitrdOverlay:   false,
 		MountDependencies: []string{"/var"},
 		MountOptions:      "noatime",
 	}
@@ -46,7 +46,7 @@ func TestOverlayInvalidInvalidWorkDir(t *testing.T) {
 		UpperDir:          "/upper",
 		WorkDir:           " ",
 		MountPoint:        "/mnt",
-		IsRootfsOverlay:   false,
+		IsInitrdOverlay:   false,
 		MountDependencies: []string{"/var"},
 		MountOptions:      "noatime",
 	}
@@ -61,7 +61,7 @@ func TestOverlayInvalidSameUpperAndWorkDir(t *testing.T) {
 		UpperDir:          "/invalid/same",
 		WorkDir:           "/invalid/same",
 		MountPoint:        "/mnt",
-		IsRootfsOverlay:   false,
+		IsInitrdOverlay:   false,
 		MountDependencies: []string{"/var"},
 		MountOptions:      "noatime",
 	}
@@ -77,7 +77,7 @@ func TestOverlayInvalidWorkDirSubsUpperDir(t *testing.T) {
 		UpperDir:          "/invalid",
 		WorkDir:           "/invalid/same",
 		MountPoint:        "/mnt",
-		IsRootfsOverlay:   false,
+		IsInitrdOverlay:   false,
 		MountDependencies: []string{"/var"},
 		MountOptions:      "noatime",
 	}
@@ -93,7 +93,7 @@ func TestOverlayInvalidUpperDirSubsWorkDir(t *testing.T) {
 		UpperDir:          "/invalid/same",
 		WorkDir:           "/invalid",
 		MountPoint:        "/mnt",
-		IsRootfsOverlay:   false,
+		IsInitrdOverlay:   false,
 		MountDependencies: []string{"/var"},
 		MountOptions:      "noatime",
 	}
@@ -109,7 +109,7 @@ func TestOverlayInvalidMountDependencyPath(t *testing.T) {
 		UpperDir:          "/upper",
 		WorkDir:           "/work",
 		MountPoint:        "/mnt",
-		IsRootfsOverlay:   false,
+		IsInitrdOverlay:   false,
 		MountDependencies: []string{"invalid/path"},
 		MountOptions:      "noatime",
 	}
@@ -125,7 +125,7 @@ func TestOverlayValidEmptyMountDependencies(t *testing.T) {
 		UpperDir:          "/upper",
 		WorkDir:           "/work",
 		MountPoint:        "/mnt",
-		IsRootfsOverlay:   false,
+		IsInitrdOverlay:   false,
 		MountDependencies: []string{},
 		MountOptions:      "noatime",
 	}
@@ -140,7 +140,7 @@ func TestOverlayInvalidMountOptions(t *testing.T) {
 		UpperDir:          "/upper",
 		WorkDir:           "/work",
 		MountPoint:        "/mnt",
-		IsRootfsOverlay:   false,
+		IsInitrdOverlay:   false,
 		MountDependencies: []string{"/var"},
 		MountOptions:      "invalid option with spaces",
 	}

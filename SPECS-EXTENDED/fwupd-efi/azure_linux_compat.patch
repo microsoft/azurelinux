@@ -1,0 +1,13 @@
+diff --git a/meson.build b/meson.build
+index 9ee9652..f4b62b9 100644
+--- a/meson.build
++++ b/meson.build
+@@ -12,7 +12,7 @@ cc = meson.get_compiler('c')
+ objcopy = find_program('objcopy')
+ objcopy_version = run_command(objcopy, '--version', check: true).stdout().split('\n')[0].split(' ')[-1]
+ 
+-gnuefi = dependency('gnu-efi', version: '>= 3.0.18')
++gnuefi = dependency('gnu-efi', version: '>= 3.0.17')
+ prefix = get_option('prefix')
+ libdir = join_paths(prefix, get_option('libdir'))
+ libexecdir = join_paths(prefix, get_option('libexecdir'))

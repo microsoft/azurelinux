@@ -76,7 +76,7 @@ func (d *Disk) IsValid() error {
 			}
 		}
 
-		if partition.IsBiosBoot() {
+		if partition.Type == PartitionTypeBiosGrub {
 			if *partition.Start != diskutils.MiB {
 				return fmt.Errorf("BIOS boot partition must start at 1 MiB")
 			}

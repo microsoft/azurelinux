@@ -30,7 +30,13 @@ const BindMountPointFlags = unix.MS_BIND | unix.MS_MGC_VAL
 
 // FileToCopy represents a file to copy into a chroot using AddFiles. Dest is relative to the chroot directory.
 type FileToCopy struct {
-	Src         string
+	// The source file path.
+	// Mutually exclusive with 'Content'.
+	Src string
+	// The contents of the file to write.
+	// Mutually exclusive with 'Src'.
+	Content *string
+	// The destination path to write/copy the file to.
 	Dest        string
 	Permissions *os.FileMode
 	// Set to true to copy symlinks as symlinks.
@@ -318,7 +324,8 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 
 // AddDirs copies each directory 'Src' to the relative path chrootRootDir/'Dest' in the chroot.
 func (c *Chroot) AddDirs(dirToCopy DirToCopy) (err error) {
-	return file.CopyDir(dirToCopy.Src, filepath.Join(c.rootDir, dirToCopy.Dest), dirToCopy.NewDirPermissions, dirToCopy.ChildFilePermissions, dirToCopy.MergedDirPermissions)
+	return file.CopyDir(dirToCopy.Src, filepath.Join(c.rootDir, dirToCopy.Dest), dirToCopy.NewDirPermissions,
+		dirToCopy.ChildFilePermissions, dirToCopy.MergedDirPermissions)
 }
 
 // AddFiles copies each file 'Src' to the relative path chrootRootDir/'Dest' in the chroot.
@@ -328,20 +335,66 @@ func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
 
 func AddFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 	for _, f := range filesToCopy {
-		dest := filepath.Join(destDir, f.Dest)
-		fileCopyOp := file.NewFileCopyBuilder(f.Src, dest)
-		if f.NoDereference {
-			fileCopyOp = fileCopyOp.SetNoDereference()
-		}
-		if f.Permissions != nil {
-			fileCopyOp = fileCopyOp.SetFileMode(*f.Permissions)
-		}
+		switch {
+		case f.Src != "" && f.Content != nil:
+			return fmt.Errorf("cannot specify both 'Src' and 'Content' for 'FileToCopy'")
 
-		err := fileCopyOp.Run()
-		if err != nil {
-			return fmt.Errorf("failed to copy (%s):\n%w", f.Src, err)
+		case f.Src != "":
+			err := copyFile(destDir, f)
+			if err != nil {
+				return err
+			}
+
+		case f.Content != nil:
+			err := writeFile(destDir, f)
+			if err != nil {
+				return err
+			}
+
+		default:
+			return fmt.Errorf("must specify either 'Src' and 'Content' for 'FileToCopy'")
 		}
 	}
+
+	return nil
+}
+
+func copyFile(destDir string, f FileToCopy) error {
+	dest := filepath.Join(destDir, f.Dest)
+	fileCopyOp := file.NewFileCopyBuilder(f.Src, dest)
+	if f.NoDereference {
+		fileCopyOp = fileCopyOp.SetNoDereference()
+	}
+	if f.Permissions != nil {
+		fileCopyOp = fileCopyOp.SetFileMode(*f.Permissions)
+	}
+
+	err := fileCopyOp.Run()
+	if err != nil {
+		return fmt.Errorf("failed to copy (%s) to (%s):\n%w", f.Src, f.Dest, err)
+	}
+
+	return nil
+}
+
+func writeFile(destDir string, f FileToCopy) error {
+	dest := filepath.Join(destDir, f.Dest)
+	err := file.Write(*f.Content, dest)
+	if err != nil {
+		return fmt.Errorf("failed to write file (%s):\n%w", f.Dest, err)
+	}
+
+	if f.Permissions != nil {
+		err = os.Chmod(dest, *f.Permissions)
+		if err != nil {
+			return fmt.Errorf("failed to set file permissions (%s):\n%w", f.Dest, err)
+		}
+	}
+
+	return nil
+}
+
+func (c *Chroot) WriteFiles() error {
 	return nil
 }
 

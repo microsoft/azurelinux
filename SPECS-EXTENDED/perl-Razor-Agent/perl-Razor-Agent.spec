@@ -1,92 +1,160 @@
-Summary:        Use a Razor catalogue server to filter spam messages
-Name:           perl-Razor-Agent
-Version:        2.85
-Release:        37%{?dist}
-License:        Artistic 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://razor.sourceforge.net/
-Source:         https://downloads.sourceforge.net/project/razor/razor-agents/%{version}/razor-agents-%{version}.tar.bz2#/%{name}-%{version}.tar.bz2
-Patch0:         razor-agents-2.85-use-sha-not-sha1.patch
-Patch1:         perl-Razor-Agent-2.85-mandir.patch
-Patch2:         perl-Razor-Agent-2.85-parallel-make.patch
-BuildRequires:  gcc
-BuildRequires:  perl-devel
-BuildRequires:  perl-generators
-BuildRequires:  perl(Digest::SHA1)
-BuildRequires:  perl(ExtUtils::MakeMaker)
-BuildRequires:  perl(Net::DNS)
-BuildRequires:  perl(Time::HiRes)
-BuildRequires:  perl(URI)
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:       perl(Net::DNS)
 # Filter the Perl extension module
 %{?perl_default_filter}
+
+%global pkgname Razor2-Client-Agent
+
+Summary:        Collaborative, content-based spam filtering network agent
+Name:           perl-Razor-Agent
+Version:        2.86
+Release:        13%{?dist}
+License:        Artistic-2.0
+URL:            https://metacpan.org/release/%{pkgname}
+Source0:        https://cpan.metacpan.org/authors/id/T/TO/TODDR/%{pkgname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         https://github.com/toddr/Razor2-Client-Agent/commit/033b00e94741550ef3ef087d9903742ac881a7ba.patch#/perl-Razor-Agent-2.86-parallel-make.patch
+Patch1:         https://github.com/toddr/Razor2-Client-Agent/commit/1a8dc0ea64c6bbe187babdb1079bc0cf05926e59.patch#/perl-Razor-Agent-2.86-digest-sha.patch
+Requires:       perl(Digest::SHA)
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  gcc
+BuildRequires:  make
+BuildRequires:  perl-devel
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+BuildRequires:  perl(AutoLoader)
+BuildRequires:  perl(Config)
+BuildRequires:  perl(Digest::SHA)
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Time::HiRes)
+BuildRequires:  perl(URI::Escape)
+BuildRequires:  perl(vars)
+Provides:       perl-%{pkgname} = %{version}-%{release}
+Provides:       perl-%{pkgname}%{?_isa} = %{version}-%{release}
 
 %description
 Vipul's Razor is a distributed, collaborative, spam detection and
 filtering network. Razor establishes a distributed and constantly
 updating catalogue of spam in propagation. This catalogue is used
 by clients to filter out known spam. On receiving a spam, a Razor
-Reporting Agent (run by an end-user or a troll box) calculates and
-submits a 20-character unique identification of the spam (a SHA
-Digest) to its closest Razor Catalogue Server. The Catalogue Server
-echos this signature to other trusted servers after storing it in its
-database. Prior to manual processing or transport-level reception,
-Razor Filtering Agents (end-users and MTAs) check their incoming mail
-against a Catalogue Server and filter out or deny transport in case of
-a signature match. Catalogued spam, once identified and reported by
-a Reporting Agent, can be blocked out by the rest of the Filtering
-Agents on the network.
+Reporting Agent (run by an end-user or a troll box) calculates
+and submits a 20-character unique identification of the spam (a
+SHA Digest) to its closest Razor Catalogue Server. The Catalogue
+Server echos this signature to other trusted servers after storing
+it in its database. Prior to manual processing or transport-level
+reception, Razor Filtering Agents (end-users and MTAs) check their
+incoming mail against a Catalogue Server and filter out or deny
+transport in case of a signature match. Catalogued spam, once
+identified and reported by a Reporting Agent, can be blocked out
+by the rest of the Filtering Agents on the network.
 
 %prep
-%setup -q -n razor-agents-%{version}
-%patch 0 -p1
-%patch 1 -p1
-%patch 2
+%setup -q -n %{pkgname}-%{version}
+%patch -P0 -p1
+%patch -P1 -p1
 
 %build
-export CFLAGS="%{optflags}"
-perl Makefile.PL INSTALLDIRS=vendor
-cd Razor2-Preproc-deHTMLxs
-perl Makefile.PL INSTALLDIRS=vendor
-cd ..
-%make_build OPTIMIZE="%{optflags}"
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1 OPTIMIZE="$RPM_OPT_FLAGS"
+%make_build
 
 %install
-make install -C Razor2-Preproc-deHTMLxs \
-  PERL_INSTALL_ROOT=%{buildroot} \
-  INSTALLARCHLIB=%{buildroot}%{perl_archlib}
-make install PERL_INSTALL_ROOT=%{buildroot} \
-  PERL_INSTALL_ROOT=%{buildroot} \
-  INSTALLARCHLIB=%{buildroot}%{perl_archlib} \
-  INSTALLMAN5DIR=%{_mandir}/man5 \
-  PERL5LIB=%{buildroot}%{perl_vendorarch}
-
-find %{buildroot} -type f -a \( -name perllocal.pod -o -name .packlist \
-  -o \( -name '*.bs' -a -empty \) \) -exec rm -f {} ';'
-find %{buildroot} -type d -depth -exec rmdir {} 2>/dev/null ';'
-chmod -R u+w %{buildroot}/*
+%make_install
+%if 0%{?rhel} && 0%{?rhel} <= 7
+find $RPM_BUILD_ROOT \( -name perllocal.pod -o -name .packlist \) -exec rm -f {} \;
+find $RPM_BUILD_ROOT -type f -name '*.bs' -empty -exec rm -f {} ';'
+%endif
+chmod -R u+w $RPM_BUILD_ROOT/*
 
 %check
 make test
 
 %files
 %license LICENSE
-%doc BUGS Changes CREDITS FAQ README SERVICE_POLICY
-%{_bindir}/*
-%{perl_vendorlib}/Razor2
-%{perl_vendorlib}/auto/Razor2
-%{perl_vendorarch}/Razor2
-%{perl_vendorarch}/auto/Razor2
-%{_mandir}/man*/*
+%doc BUGS Changes CREDITS FAQ README.md SERVICE_POLICY
+%{_bindir}/razor-admin
+%{_bindir}/razor-check
+%{_bindir}/razor-client
+%{_bindir}/razor-report
+%{_bindir}/razor-revoke
+%{perl_vendorarch}/Razor2/
+%{perl_vendorarch}/auto/Razor2/
+%{_mandir}/man1/razor-admin.1*
+%{_mandir}/man1/razor-check.1*
+%{_mandir}/man1/razor-report.1*
+%{_mandir}/man1/razor-revoke.1*
+%{_mandir}/man3/Razor2::Errorhandler.3pm*
+%{_mandir}/man3/Razor2::Preproc::deHTMLxs.3pm*
+%{_mandir}/man3/Razor2::Syslog.3pm*
+%{_mandir}/man5/razor-agent.conf.5*
+%{_mandir}/man5/razor-agents.5*
+%{_mandir}/man5/razor-whitelist.5*
 
 %changelog
-* Tue Mar 07 2023 Muhammad Falak <mwani@microsoft.com> - 2.85-37
+* Fri Dec 20 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 2.86-13
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.85-36
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.86-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Jun 10 2024 Jitka Plesnikova <jplesnik@redhat.com> - 2.86-11
+- Perl 5.40 rebuild
+
+* Sat Apr 20 2024 Miroslav Suchý <msuchy@redhat.com> - 2.86-10
+- convert license to SPDX
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.86-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.86-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.86-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 2.86-6
+- Perl 5.38 rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.86-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.86-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.86-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.86-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Dec 10 2021 Robert Scheck <robert@fedoraproject.org> 2.86-1
+- Upgrade to 2.86 (#1584474, #2030889)
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.85-42
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sat May 22 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.85-41
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.85-40
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.85-39
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 14 2020 Tom Stellard <tstellar@redhat.com> - 2.85-38
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.85-37
+- Perl 5.32 rebuild
+
+* Tue Mar 17 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.85-36
+- Specify all build dependencies
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.85-35
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

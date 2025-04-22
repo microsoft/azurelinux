@@ -14,10 +14,10 @@ import (
 
 func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	buildImageFile string, newBuildImageFile string,
-) error {
+) (map[string]string, error) {
 	existingImageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot", false)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer existingImageConnection.Close()
 
@@ -27,18 +27,18 @@ func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, co
 		return copyFilesIntoNewDisk(existingImageConnection.Chroot(), imageChroot)
 	}
 
-	err = createNewImage(newBuildImageFile, diskConfig, config.Storage.FileSystems,
+	partIdToPartUuid, err := createNewImage(newBuildImageFile, diskConfig, config.Storage.FileSystems,
 		buildDir, "newimageroot", installOSFunc)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = existingImageConnection.CleanClose()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return partIdToPartUuid, nil
 }
 
 func copyFilesIntoNewDisk(existingImageChroot *safechroot.Chroot, newImageChroot *safechroot.Chroot) error {

@@ -3,8 +3,8 @@
 %define mod_probe_dir deps/src/nvidia-modprobe-%{modprobe_version}
 Summary:        NVIDIA container runtime library
 Name:           libnvidia-container
-Version:        1.15.0
-Release:        1%{?dist}
+Version:        1.17.4
+Release:        2%{?dist}
 License:        BSD AND ASL2.0 AND GPLv3+ AND LGPLv3+ AND MIT AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,7 +21,7 @@ BuildRequires:  libtirpc-devel
 BuildRequires:  make
 BuildRequires:  rpcsvc-proto
 BuildRequires:  which
-BuildRequires:  golang
+BuildRequires:  golang < 1.24.0
 
 %description
 The nvidia-container library provides an interface to configure GNU/Linux
@@ -40,8 +40,8 @@ touch %{mod_probe_dir}/.download_stamp
 
 %build
 sed -i 's/^MAJOR[[:space:]]*:=.*$/MAJOR := 1/' versions.mk
-sed -i 's/^MINOR[[:space:]]*:=.*$/MINOR := 15/' versions.mk
-sed -i 's/^PATCH[[:space:]]*:=.*$/PATCH := 0/' versions.mk
+sed -i 's/^MINOR[[:space:]]*:=.*$/MINOR := 16/' versions.mk
+sed -i 's/^PATCH[[:space:]]*:=.*$/PATCH := 2/' versions.mk
 %make_build WITH_LIBELF=yes
 
 %install
@@ -135,6 +135,21 @@ This package contains command-line tools that facilitate using the library.
 %{_bindir}/*
 
 %changelog
+* Mon Mar 10 2025 Jon Slobodzian <joslobo@microsoft.com> - 1.17.4-2
+- The Golang 1.24 breaks this build.  Changed BuildRequires to specify a lower version.
+
+* Fri Feb 14 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.17.4-1
+- Upgrade to version 1.17.4 to stay in sync with nvidia-container-toolkit.
+
+* Thu Dec 05 2024 Henry Li <lihl@microsoft.com> - 1.17.3-1
+- Upgrade to v1.17.3
+
+* Mon Nov 11 2024 Henry Li <lihl@microsoft.com> - 1.17.1-1
+- Upgrade to v1.17.1
+
+* Mon Oct 07 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.16.2-1
+- Upgrade to version 1.16.2 to stay in sync with nvidia-container-toolkit.
+
 * Fri Jun 07 2024 Henry Li <lihl@microsoft.com> - 1.15.0-1
 - Upgrade to version 1.15.0
 

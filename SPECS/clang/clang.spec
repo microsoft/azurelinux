@@ -5,13 +5,14 @@
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
 Name:           clang
 Version:        18.1.2
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://clang.llvm.org
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
+Patch1:         CVE-2024-7883.patch
 BuildRequires:  cmake
 BuildRequires:  libxml2-devel
 BuildRequires:  llvm-devel = %{version}
@@ -89,7 +90,7 @@ Requires: %{name}-tools-extra = %{version}-%{release}
 Development header files for clang tools.
 
 %prep
-%setup -q -n %{clang_srcdir}
+%autosetup -p1 -n %{clang_srcdir}
 
 %py3_shebang_fix \
     clang-tools-extra/clang-tidy/tool/ \
@@ -112,7 +113,9 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 
 mkdir -p build
 cd build
-cmake  -DCMAKE_INSTALL_PREFIX=%{_prefix}       \
+cmake  \
+       -DCMAKE_INSTALL_PREFIX=%{_prefix}       \
+       -DLLVM_DIR=%{_libdir}/cmake/llvm        \
        -DLLVM_PARALLEL_LINK_JOBS=1             \
        -DCLANG_ENABLE_STATIC_ANALYZER:BOOL=ON  \
        -DCMAKE_BUILD_TYPE=Release              \
@@ -242,6 +245,12 @@ make clang-check
 %{_includedir}/clang-tidy/
 
 %changelog
+* Thu Apr 10 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 18.1.2-4
+- Fix CVE-2024-7883
+
+* Tue Sep 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-3
+- Define LLVM_DIR
+
 * Wed May 29 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 18.1.2-2
 - Bump release to build with new llvm to fix CVE-2024-31852
 

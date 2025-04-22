@@ -1,0 +1,45 @@
+From 2daad257bee7a500e18ebe553e79487b267fb140 Mon Sep 17 00:00:00 2001
+From: Nobuyoshi Nakada <nobu@ruby-lang.org>
+Date: Mon, 12 Aug 2024 20:18:34 +0900
+Subject: [PATCH] Avoid another race condition of open mode
+
+Instead, just open in CREATE and APPEND mode.
+Also, move the workaround for old Solaris as fallback to retry.
+---
+ lib/rubygems.rb | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
+
+diff --git a/lib/rubygems.rb b/lib/rubygems.rb
+index 2b52cde0a749..c51ba69203cb 100644
+--- a/lib/rubygems.rb
++++ b/lib/rubygems.rb
+@@ -798,24 +798,20 @@ def self.open_file(path, flags, &block)
+     File.open(path, flags, &block)
+   end
+ 
++  MODE_TO_FLOCK = IO::RDONLY | IO::APPEND | IO::CREAT # :nodoc:
++
+   ##
+   # Open a file with given flags, and protect access with flock
+ 
+   def self.open_file_with_flock(path, &block)
+-    flags = File.exist?(path) ? "r+" : "a+"
+-
+-    File.open(path, flags) do |io|
++    File.open(path, MODE_TO_FLOCK) do |io|
+       begin
+         io.flock(File::LOCK_EX)
+       rescue Errno::ENOSYS, Errno::ENOTSUP
++      rescue Errno::ENOLCK # NFS
++        raise unless Thread.main == Thread.current
+       end
+       yield io
+-    rescue Errno::ENOLCK # NFS
+-      if Thread.main != Thread.current
+-        raise
+-      else
+-        open_file(path, flags, &block)
+-      end
+     end
+   end
+ 

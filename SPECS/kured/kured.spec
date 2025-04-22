@@ -25,7 +25,7 @@
 Summary:        Kubernetes daemonset to perform safe automatic node reboots
 Name:           kured
 Version:        1.15.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -48,6 +48,7 @@ Source0:        %{name}-%{version}.tar.gz
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         kured-imagePullPolicy.patch
+Patch1:         CVE-2023-45288.patch
 BuildRequires:  fdupes
 BuildRequires:  go-go-md2man
 BuildRequires:  golang
@@ -79,9 +80,11 @@ kured container in a kubernetes cluster.
 %setup -q
 %patch 0 -p1
 
-%build
 # create vendor folder from the vendor tarball and set vendor mode
 tar -xf %{SOURCE1} --no-same-owner
+%patch 1 -p1
+
+%build
 
 # Build the binary.
 export VERSION=%{version}
@@ -122,7 +125,10 @@ sed -i -e 's|image: .*|image: registry.opensuse.org/kubic/kured:%{version}|g' %{
 %{_datarootdir}/k8s-yaml/kured/kured.yaml
 
 %changelog
-* Mon Jan 29 2024 Sean Dougherty <sdougherty@microsoft.com> 1.15.0-1
+* Fri Feb 14 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.15.0-2
+- Address CVE-2023-45288
+
+* Mon Jan 29 2024 Sean Dougherty <sdougherty@microsoft.com> - 1.15.0-1
 - Upgrade to 1.15.0 for Mariner 3.0
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.1-15

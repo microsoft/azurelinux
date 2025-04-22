@@ -1,7 +1,7 @@
 Summary:        initramfs
 Name:           initramfs
 Version:        3.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,7 +19,7 @@ mkdir -p %{buildroot}%{_sysconfdir}/dracut.conf.d
 install -D -m644 %{SOURCE0} %{buildroot}%{_sysconfdir}/dracut.conf.d/
 
 %define watched_path %{_sbindir} %{_libdir}/udev/rules.d %{_libdir}/systemd/system /lib/modules %{_sysconfdir}/dracut.conf.d
-%define watched_pkgs e2fsprogs, systemd, kpartx, device-mapper-multipath, verity-read-only-root, dracut-fips, dracut-megaraid, dracut-hostonly, dracut-hyperv, dracut-overlayfs, dracut-virtio, dracut-vrf, dracut-xen
+%define watched_pkgs e2fsprogs, systemd, kpartx, device-mapper-multipath, dracut-fips, dracut-megaraid, dracut-hostonly, dracut-hyperv, dracut-overlayfs, dracut-virtio, dracut-vrf, dracut-xen
 
 %define removal_action() rm -rf %{_localstatedir}/lib/rpm-state/initramfs
 
@@ -112,6 +112,9 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %{_sysconfdir}/dracut.conf.d/fscks.conf
 
 %changelog
+* Tue Jul 02 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.0-5
+- Remove old dm-verity boot support
+
 * Thu Mar 23 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.0-4
 - Flag all dracut driver list configs as watched pkgs for initramfs regen
 
@@ -130,11 +133,11 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 
 * Fri Oct 06 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0-14
 - Ensure grub2-mkconfig is called after the initramfs generation
-- Deprecate old linuxloader; no longer copy initrd image to efi partition 
+- Deprecate old linuxloader; no longer copy initrd image to efi partition
 
 * Wed Jun 28 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0-13
 - Copy the initrd image to /boot/efi to maintain backwards compatibility
-    with the old linuxloader. Let the initrd remain in /boot as well. 
+    with the old linuxloader. Let the initrd remain in /boot as well.
 
 * Fri Apr 07 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0-12
 - Added fsck.xfs into initrd

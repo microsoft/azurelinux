@@ -1,7 +1,7 @@
 Summary:        pytest is a mature full-featured Python testing tool that helps you write better programs
 Name:           pytest
 Version:        7.4.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,6 +27,7 @@ Requires:       python3-setuptools
 Requires:       python3-py
 Requires:       python3-attrs
 Requires:       python3-atomicwrites
+Requires:       python3-iniconfig
 Requires:       python3-pluggy
 Requires:       python3-more-itertools
 Requires:       python3-six
@@ -65,6 +66,9 @@ ln -snf py.test%{python3_version} %{buildroot}%{_bindir}/py.test3
 %{python3_sitelib}/*
 
 %changelog
+* Mon Oct 07 2024 Devin Anderson <danderson@microsoft.com> - 7.4.0-2
+- Add missing runtime dependency on 'iniconfig' package.
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.4.0-1
 - Auto-upgrade to 7.4.0 - Azure Linux 3.0 - package upgrades
 

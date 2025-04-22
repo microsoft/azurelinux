@@ -9,7 +9,7 @@ import (
 )
 
 type Partition struct {
-	// ID is used to correlate `Partition` objects with `PartitionSetting` objects.
+	// ID is used to correlate `Partition` objects with `FileSystem` objects.
 	Id string `yaml:"id"`
 	// Name is the label to assign to the partition.
 	Label string `yaml:"label"`
@@ -56,14 +56,6 @@ func (p *Partition) GetEnd() (DiskSize, bool) {
 	}
 
 	return 0, false
-}
-
-func (p *Partition) IsESP() bool {
-	return p.Type == PartitionTypeESP
-}
-
-func (p *Partition) IsBiosBoot() bool {
-	return p.Type == PartitionTypeBiosGrub
 }
 
 // isGPTNameValid checks if a GPT partition name is valid.

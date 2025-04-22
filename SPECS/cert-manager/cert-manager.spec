@@ -1,6 +1,6 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
-Version:        1.12.12
+Version:        1.12.15
 Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -13,8 +13,11 @@ Source0:        https://github.com/jetstack/%{name}/archive/refs/tags/v%{version
 # 1. wget https://github.com/jetstack/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 # 2. <repo-root>/SPECS/cert-manager/generate_source_tarball.sh --srcTarball %%{name}-%%{version}.tar.gz --pkgVersion %%{version}
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2024-25620.patch
-Patch1:         CVE-2024-6104.patch
+Patch0:         CVE-2024-45338.patch
+Patch1:         CVE-2025-27144.patch
+Patch2:         CVE-2025-22868.patch
+Patch3:         CVE-2025-22869.patch
+Patch4:         CVE-2025-30204.patch
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
 Requires:       %{name}-cainjector
@@ -59,9 +62,7 @@ Summary:        cert-manager's webhook binary
 Webhook component providing API validation, mutation and conversion functionality for cert-manager.
 
 %prep
-%setup -q -a 1
-%autopatch -p1
-
+%autosetup -a 1 -p1
 
 %build
 
@@ -107,8 +108,24 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
-* Thu Aug 01 2024 Bala <balakumaran.kannan@microsoft.com> - 1.12.12-3
-- Patch for CVE-2024-6104
+* Fri Mar 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.12.15-3
+- Patch CVE-2025-30204
+
+* Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.12.15-2
+- Fix CVE-2025-22868, CVE-2025-22869 & CVE-2025-27144 with an upstream patch
+
+* Mon Jan 27 2025 Rohit Rawat <rohitrawat@microsoft.com> - 1.12.15-1
+- Upgrade to 1.12.15 - to fix CVE-2024-12401
+- Remove CVE-2024-45337.patch as it is fixed in 1.12.15
+
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.12.13-3
+- Add patch for CVE-2024-45338
+
+* Wed Jan 08 2025 Muhammad Falak <mwani@microsoft.com> - 1.12.13-2
+- Patch CVE-2024-45337
+
+* Mon Sep 16 2024 Jiri Appl <jiria@microsoft.com> - 1.12.13-1
+- Upgrade to 1.12.13 which carries helm 3.14.2 to fix CVE-2024-26147 and CVE-2024-25620
 
 * Wed Aug 07 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.12.12-2
 - Patch for CVE-2024-25620

@@ -1,0 +1,21 @@
+commit 3f50e35d239059823162cbfba3c7adfe8e5f1907
+Author: Pierre Joye <pierre.php@gmail.com>
+Date:   Sat Feb 12 15:27:06 2022 +0700
+
+    strdup is a posix extension, to be used correctly that has to be defined (only used here, no need to pass as -D
+
+diff --git a/tests/raqm-test.c b/tests/raqm-test.c
+index 1d42c7c..1137fff 100644
+--- a/tests/raqm-test.c
++++ b/tests/raqm-test.c
+@@ -21,7 +21,9 @@
+  * SOFTWARE.
+  *
+  */
+-
++#ifdef __GNUC__ 
++#define  _DEFAULT_SOURCE
++#endif
+ #include <assert.h>
+ #include <errno.h>
+ #include <locale.h>

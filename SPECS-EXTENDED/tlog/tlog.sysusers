@@ -1,0 +1,2 @@
+u   tlog	-	"Tlog terminal I/O logger"	/run/tlog	/sbin/nologin
+g   tlog 	-

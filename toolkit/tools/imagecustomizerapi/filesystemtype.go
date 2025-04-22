@@ -11,6 +11,7 @@ import (
 type FileSystemType string
 
 const (
+	FileSystemTypeNone  FileSystemType = ""
 	FileSystemTypeExt4  FileSystemType = "ext4"
 	FileSystemTypeXfs   FileSystemType = "xfs"
 	FileSystemTypeFat32 FileSystemType = "fat32"
@@ -19,7 +20,7 @@ const (
 
 func (t FileSystemType) IsValid() error {
 	switch t {
-	case FileSystemTypeExt4, FileSystemTypeXfs, FileSystemTypeFat32, FileSystemTypeVfat:
+	case FileSystemTypeNone, FileSystemTypeExt4, FileSystemTypeXfs, FileSystemTypeFat32, FileSystemTypeVfat:
 		// All good.
 		return nil
 
