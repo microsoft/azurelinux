@@ -13,9 +13,6 @@ Source1:        azl-otel-collector-0.124.0-test-vendor.tar.gz
 Source2:        azl-otel-collector.service
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
-# Include the smartmontools package needed by the smartdata receiver in the collector
-Requires:       smartmontools
-Conflicts:      azl-otel-collector
 
 %description
 Azure Linux OpenTelemetry Collector is a custom distribution of the
@@ -47,6 +44,8 @@ install -D -m0644 config/default-config.yaml %{buildroot}%{_sysconfdir}/azl-otel
 %package -n azl-otel-collector-service
 Summary: Systemd service and configuration for azl-otel-collector
 Requires: azl-otel-collector = %{version}-%{release}
+# Include the smartmontools package needed by the smartdata receiver in the collector
+Requires:       smartmontools
 Requires(post): systemd
 
 %description -n azl-otel-collector-service
