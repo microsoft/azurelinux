@@ -2258,7 +2258,6 @@
                 "cloud-hypervisor-cvm",
                 "cloud-provider-kubevirt",
                 "cmake-fedora",
-                "containerd",
                 "containerd2",
                 "coredns",
                 "dcos-cli",
