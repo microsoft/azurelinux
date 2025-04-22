@@ -8,7 +8,7 @@ Distribution:   Mariner
 URL:            https://github.com/leethomason/tinyxml2/
 Source0:        https://github.com/leethomason/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # CVE-2024-50614 fixed along with CVE-2024-50615
-Patch2:         CVE-2024-50615.patch
+Patch1:         CVE-2024-50615.patch
 BuildRequires:  build-essential
 BuildRequires:  cmake
 
@@ -24,7 +24,7 @@ Development files for %{name}
 
 %prep
 %setup -q
-sed -i 's/\r//g' *.cpp
+sed -i 's/\r$//' *.cpp
 %autopatch -p1
 
 %build
@@ -53,7 +53,7 @@ make install DESTDIR=%{buildroot}
 
 %changelog
 * Wed Apr 16 2025 Archana Shettigar <v-shettigara@microsoft.com> - 9.0.0-2
-- Patch for CVE-2024-50614 & CVE-2024-50615.patch.
+- Patch for CVE-2024-50615.
 
 * Wed Jan 05 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 9.0.0-1
 - Update to version 9.0.0.
