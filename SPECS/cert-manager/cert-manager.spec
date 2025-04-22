@@ -112,8 +112,7 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 
 %changelog
 * Wed Apr 16 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.12.15-4
-- Patch CVE-2025-32386
-- Patch CVE-2025-32387
+- Patch CVE-2025-32386 (also fixes CVE-2025-32387)
 
 * Fri Mar 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.12.15-3
 - Patch CVE-2025-30204
