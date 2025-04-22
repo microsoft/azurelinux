@@ -7,7 +7,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -85,6 +85,7 @@ Patch0199:      0199-fs-f2fs-Do-not-copy-file-names-that-are-too-long.patch
 Patch0200:      0200-fs-btrfs-Fix-several-fuzz-issues-with-invalid-dir-it.patch
 Patch0201:      0201-fs-btrfs-Fix-more-ASAN-and-SEGV-issues-found-with-fu.patch
 Patch0202:      0202-fs-btrfs-Fix-more-fuzz-issues-related-to-chunks.patch
+Patch0203:      0203-fs-xfs-Fix-nrext64-support.patch
 # Required to reach SBAT 3
 Patch:          sbat-3-0001-font-Reject-glyphs-exceeds-font-max_glyph_width-or-f.patch
 Patch:          sbat-3-0004-font-Remove-grub_font_dup_glyph.patch
@@ -566,6 +567,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 - Fix CVE-2020-14311
 - Fix CVE-2020-15706
 - Fix CVE-2020-15707
+
+* Mon Mar 17 2025 Andy Zaugg <azaugg@linkedin.com> - 2.02-23
+- Backport grub patch from 2.12 allowing support for nrext64(large extent counts)
 
 * Wed Jul 22 2020 Joe Schmitt <joschmit@microsoft.com> - 2.02-22
 - Always include Patch100, but conditionally apply it.
