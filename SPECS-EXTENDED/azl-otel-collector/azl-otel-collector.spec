@@ -9,8 +9,8 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/microsoft/azl-otel-collector
-Source0:        https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/azl-otel-collector-0.124.0-test.tar.gz
-Source1:        azl-otel-collector-0.124.0-test-vendor.tar.gz
+Source0:        https://github.com/microsoft/azl-otel-collector/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        %{name}-%{version}-govendor-v1.tar.gz
 Source2:        azl-otel-collector.service
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
@@ -22,7 +22,7 @@ https://github.com/open-telemetry/opentelemetry-collector-contrib repository and
 also includes receivers developed by the Azure Linux team.
 
 %prep
-%autosetup -n azl-otel-collector
+%autosetup -n azl-otel-collector-%{version}
 tar -xf %{SOURCE1} --no-same-owner -C cmd/azl-otelcol
 
 %build
@@ -68,6 +68,6 @@ for the Azure Linux OpenTelemetry Collector.
 %{_unitdir}/azl-otel-collector.service
 
 %changelog
-* Tue Apr 22 2025 Adit Jha <aditjha@microsoft.com> - 0.124.0-1
+* Wed Apr 23 2025 Adit Jha <aditjha@microsoft.com> - 0.124.0-1
 - Original version for Azure Linux
 - License Verified

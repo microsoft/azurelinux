@@ -856,7 +856,7 @@
         "other": {
           "name": "azl-otel-collector",
           "version": "0.124.0",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/azl-otel-collector-0.124.0-test.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/azl-otel-collector/archive/refs/tags/v0.124.0.tar.gz"
         }
       }
     },

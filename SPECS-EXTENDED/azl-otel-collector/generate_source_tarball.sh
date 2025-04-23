@@ -101,7 +101,7 @@ echo "Unpacking source tarball..."
 tar -xf $SRC_TARBALL
 
 echo "Vendor go modules..."
-cd azl-otel-collector/cmd/azl-otelcol
+cd azl-otel-collector-"$PKG_VERSION"/cmd/azl-otelcol
 go mod vendor
 
 echo ""
