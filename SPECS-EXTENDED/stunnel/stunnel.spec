@@ -43,6 +43,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  pkgconfig
 BuildRequires:  systemd
 BuildRequires:  util-linux
+BuildRequires:  python-cryptography
 %{?systemd_requires}
 %if %{with libwrap}
 BuildRequires:  tcp_wrappers-devel
