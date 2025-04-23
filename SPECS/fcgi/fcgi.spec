@@ -48,11 +48,11 @@ make check
 %license LICENSE
 %{_bindir}/*
 %{_libdir}/libfcgi*.so*
-%{_mandir}/man1/cgi-fcgi.1*
-%{_mandir}/man3/FCGI_Accept.3*
-%{_mandir}/man3/FCGI_Finish.3*
-%{_mandir}/man3/FCGI_SetExitStatus.3*
-%{_mandir}/man3/FCGI_StartFilterData.3*
+%doc %{_mandir}/man1/cgi-fcgi.1*
+%doc %{_mandir}/man3/FCGI_Accept.3*
+%doc %{_mandir}/man3/FCGI_Finish.3*
+%doc %{_mandir}/man3/FCGI_SetExitStatus.3*
+%doc %{_mandir}/man3/FCGI_StartFilterData.3*
 
 %files devel
 %defattr(-,root,root)
