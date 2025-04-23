@@ -25,6 +25,8 @@ BuildRequires:  pcre2-devel
 BuildRequires:  readline-devel
 BuildRequires:  which
 BuildRequires:  zlib-devel
+BuildRequires:  perl-lib
+BuildRequires:  perl-FindBin
 Requires:       %{name}-filesystem = %{version}-%{release}
 Requires:       %{name}-mimetypes
 
@@ -140,9 +142,9 @@ cp -r usr/lib/systemd/* /usr/lib/systemd/
 cp -r etc/* /etc/
 cp /etc/nginx/mime.types.default /etc/nginx/mime.types
 useradd -s /usr/bin/sh nginx
-tdnf repolist --releasever=3.0
-tdnf install -y azurelinux-repos-extended --releasever=3.0
-tdnf install -y perl-Test-Harness perl-Test-Simple perl-FindBin perl-lib --releasever=3.0
+#tdnf repolist --releasever=3.0
+#tdnf install -y azurelinux-repos-extended --releasever=3.0
+tdnf install -y perl-Test-Harness perl-Test-Simple --releasever=3.0
 tar -xvf %{SOURCE3}
 cd nginx-tests
 su nginx -s /bin/sh -c 'TEST_NGINX_BINARY=%{_sbindir}/nginx prove ./*.t'
