@@ -28,8 +28,6 @@ Patch1:         stunnel-5.61-systemd-service.patch
 Patch3:         stunnel-5.69-system-ciphers.patch
 Patch5:         stunnel-5.69-default-tls-version.patch
 Patch6:         stunnel-5.56-curves-doc-update.patch
-# Limit curves defaults in FIPS mode
-Patch8:         stunnel-5.62-disabled-curves.patch
 # build test requirements
 BuildRequires:  %{_bindir}/nc
 BuildRequires:  %{_bindir}/pod2html
