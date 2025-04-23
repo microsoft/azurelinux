@@ -22573,8 +22573,8 @@
         "type": "other",
         "other": {
           "name": "python-dmidecode",
-          "version": "3.12.2",
-          "downloadUrl": "https://github.com/nima/python-dmidecode/archive/refs/tags/python-dmidecode-3.12.2.tar.gz"
+          "version": "3.12.3",
+          "downloadUrl": "https://github.com/nima/python-dmidecode/archive/refs/tags/v3.12.3.tar.gz"
         }
       }
     },
