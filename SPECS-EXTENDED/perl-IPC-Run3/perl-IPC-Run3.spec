@@ -1,6 +1,6 @@
 Name:           perl-IPC-Run3
-Version:        0.048
-Release:        19%{?dist}
+Version:        0.049
+Release:        1%{?dist}
 Summary:        Run a subprocess in batch mode
 License:        GPL+ or Artistic or BSD
 Vendor:         Microsoft Corporation
@@ -27,11 +27,6 @@ BuildRequires:  perl(Test::Pod::Coverage)
 BuildRequires:  perl(Test::Pod)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
-# RHBZ #1062267 / https://rt.cpan.org/Public/Bug/Display.html?id=52317
-# Patch from
-# https://github.com/rschupp/IPC-Run3/commit/8ebe48760cfdc78fbf4fc46413dde9470121b99e
-Patch0:         0001-test-and-fix-for-RT-52317-Calling-run3-garbles-STDIN.patch
-
 %description
 This module allows you to run a subprocess and redirect stdin, stdout,
 and/or stderr to files and perl data structures. It aims to satisfy 99% of
@@ -39,10 +34,9 @@ the need for using system, qx, and open3 with a simple, extremely Perlish
 API and none of the bloat and rarely used features of IPC::Run.
 
 %prep
-%setup -q -n IPC-Run3-%{version}
-%patch 0 -p1
+%autosetup -n IPC-Run3-%{version}
 
-# Perms in tarballs are broken 
+# Perms in tarballs are broken
 find -type f -exec chmod -x {} \;
 
 %build
@@ -63,6 +57,11 @@ make test RELEASE_TESTING=1
 %{_mandir}/man3/*
 
 %changelog
+* Mon Dec 23 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.049-1
+- Update to 0.049
+- License verified
+- No longer apply 0001-test-and-fix-for-RT-52317-Calling-run3-garbles-STDIN.patch
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.048-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

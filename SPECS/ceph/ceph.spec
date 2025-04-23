@@ -1,11 +1,11 @@
 #disable debuginfo because ceph-debuginfo rpm is too large
 %define debug_package %{nil}
-%define _unpackaged_files_terminate_build 0 
- 
+%define _unpackaged_files_terminate_build 0
+
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        18.2.2
-Release:        2%{?dist}
+Release:        8%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -14,6 +14,20 @@ Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
 Patch0:         0034-src-pybind-rbd-rbd.pyx.patch
 Patch1:         0032-cmake-modules-BuildBoost.cmake.patch
 Patch2:         CVE-2024-52338.patch
+Patch3:         CVE-2014-5461.patch
+Patch4:         CVE-2020-22217.patch
+Patch5:         CVE-2015-9251.patch
+Patch6:         CVE-2012-6708.patch
+Patch7:         CVE-2012-2677.patch
+Patch8:         CVE-2020-10723.patch
+Patch9:         CVE-2021-3672.patch
+Patch10:        CVE-2020-10722.patch
+Patch11:        CVE-2024-25629.patch
+Patch12:        CVE-2021-24032.patch
+Patch13:        CVE-2020-10724.patch
+Patch14:        CVE-2025-1744.patch
+Patch15:        CVE-2021-28361.patch
+Patch16:        CVE-2020-14378.patch
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
 # at the top-level directory of this distribution and at
@@ -40,6 +54,7 @@ Patch2:         CVE-2024-52338.patch
 %bcond_with make_check
 %bcond_with mgr_diskprediction
 %bcond_with ocf
+# WITH_SEASTAR is explicitly disabled to prevent numerous vendored CVEs
 %bcond_with seastar
 %bcond_with selinux
 %bcond_without tcmalloc
@@ -895,9 +910,13 @@ This package provides a Ceph hardware monitoring agent.
 # common
 #################################################################################
 %prep
-%autosetup -p1 
+%autosetup -p1
 
 %build
+pwd
+# CVE-2022-24736 and CVE-2022-24735 Remove opentelemetry-cpp which uses LUA
+# This subsystem is not getting built in ceph
+rm -rf src/jaegertracing/opentelemetry-cpp/*
 # LTO can be enabled as soon as the following GCC bug is fixed:
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=48200
 %define _lto_cflags %{nil}
@@ -973,6 +992,7 @@ ${CMAKE} .. \
     -DWITH_FMT_HEADER_ONLY=ON \
     -Dthrift_HOME=%{_includedir} \
     -DSYSTEM_BOOST=OFF \
+    -DWITH_SEASTAR=OFF \
 %if 0%{without mgr_diskprediction}
     -DMGR_DISABLED_MODULES=diskprediction_local\
 %endif
@@ -1218,7 +1238,7 @@ exit 0
 %files common
 %dir %{_docdir}/ceph
 %doc %{_docdir}/ceph/sample.ceph.conf
-%license %{_docdir}/ceph/COPYING
+%license COPYING
 %{_bindir}/ceph
 %{_bindir}/ceph-authtool
 %{_bindir}/ceph-conf
@@ -1997,9 +2017,44 @@ exit 0
 %attr(0755,root,root) %dir %{_sysconfdir}/prometheus/ceph
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
-
-
 %changelog
+* Wed 16 Apr 2025 Archana Shettigar <v-shettigara@microsoft.com> - 18.2.2-8
+- Patch CVE-2020-14378
+
+* Thu Apr 10 2025 Kanishk Bansal <kanbansal@microsoft.com> - 18.2.2-7
+- Patch CVE-2021-28361
+- Explicitly disable seastar to ensure disputed uncompiled CVEs don't get enabled.
+
+* Tue 11 Mar 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 18.2.2-6
+- Patch CVE-2025-1744
+
+* Wed Feb 05 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 18.2.2-5
+- Fix for CVE-2012-2677
+- Fix for CVE-2020-10723
+- Fix for CVE-2021-3672
+- Fix for CVE-2020-10722
+- Fix for CVE-2024-25629
+- Fix for CVE-2021-24032
+- Fix for CVE-2020-10724
+
+* Tue Jan 28 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 18.2.2-4
+- Fix for CVE-2014-5461
+- Fix for CVE-2020-22217
+- Fix for CVE-2015-9251
+- Fix for CVE-2012-6708
+
+* Wed Jan 01 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 18.2.2-3
+- Based on the package build logs, opentelemetry-cpp submodule is not being built
+- Removing opentelemetry-cpp to address below CVEs as this submodule is not relevant
+- CVE-2022-24735
+- CVE-2022-24736
+- CVE-2021-44647
+- CVE-2020-24371
+- CVE-2014-5461
+- CVE-2021-43519
+- CVE-2021-44964
+- CVE-2024-31755
+
 * Wed Dec 4 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 18.2.2-2
 - Fix for CVE-2024-52338
 

@@ -1,0 +1,19 @@
+diff --git a/pywbem/_cim_xml.py b/pywbem/_cim_xml.py
+index 133b070d..c0ad603e 100644
+--- a/pywbem/_cim_xml.py
++++ b/pywbem/_cim_xml.py
+@@ -1829,12 +1829,12 @@ class RESPONSEDESTINATION(CIMElement):
+ 
+       ::
+ 
+-        <!ELEMENT RESPONSEDESTINATON (INSTANCE)>
++        <!ELEMENT RESPONSEDESTINATION (INSTANCE)>
+     """
+ 
+     def __init__(self, data):
+         # We use call by class name because it is an old-style class.
+-        CIMElement.__init__(self, 'RESPONSEDESTINATON')
++        CIMElement.__init__(self, 'RESPONSEDESTINATION')
+         self.appendChild(data)
+ 
+ 

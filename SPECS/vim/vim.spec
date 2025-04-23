@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.1.0791
+Version:        9.1.1198
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -10,6 +10,7 @@ Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        macros.vim
+
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
 Requires(post): sed
@@ -213,11 +214,29 @@ fi
 %{_bindir}/rview
 %{_bindir}/vim
 %{_bindir}/vimdiff
+%{_datarootdir}/vim/vim91/LICENSE
+%{_datarootdir}/vim/vim91/README.txt
 
 %files rpm-macros
 %{_rpmconfigdir}/macros.d/macros.vim
 
 %changelog
+* Mon Mar 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.1198-1
+- Auto-upgrade to 9.1.1198 - for CVE-2025-29768
+
+* Wed Mar 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.1164-1
+- Auto-upgrade to 9.1.1164 - for CVE-2025-27423
+- Remove previously applied patches
+
+* Sun Feb 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 9.1.0791-4
+- Patch CVE-2025-26603 & CVE-2025-1215
+
+* Thu Jan 23 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 9.1.0791-3
+- Patch to fix CVE-2025-24014.
+
+* Wed Jan 15 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 9.1.0791-2
+- Add patch to fix CVE-2025-22134
+
 * Tue Oct 29 2024 Nick Samson <nisamson@microsoft.com> - 9.1.0791-1
 - Upgrade to 9.1.0791 to fix CVE-2024-47814, CVE-2024-43802
 - Added language configurations for Amharic

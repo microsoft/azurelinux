@@ -8,6 +8,9 @@
 
 ######## DEFINITIONS ########
 
+# Ubuntu has actual /bin/sh vs Azure Linux having a sym link to /bin/bash. Force the Make scripts to use /bin/bash
+SHELL=/bin/bash
+
 toolkit_root := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 SCRIPTS_DIR  ?= $(toolkit_root)/scripts
 

@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# firmware.prov - Automatically extract any and all firmware dependencies from
+#                 kernel object (.ko) files and add to RPM deps.
+
+IFS=$'\n'
+
+for module in $(grep -E '/lib/modules/.+\.ko(\.gz|\.bz2|\.xz|\.zst)?$') $*;
+do
+    for firmware in `/sbin/modinfo -F firmware $module`;
+    do
+        echo "firmware($firmware)"
+    done
+done

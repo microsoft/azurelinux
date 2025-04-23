@@ -24,8 +24,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-64k
-Version:        6.6.57.1
-Release:        7%{?dist}
+Version:        6.6.85.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -64,6 +64,7 @@ BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  sed
+BuildRequires:  slang-devel
 BuildRequires:  systemd-bootstrap-rpm-macros
 Requires:       filesystem
 Requires:       kmod
@@ -370,6 +371,63 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.85.1-1
+- Auto-upgrade to 6.6.85.1
+
+* Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.82.1-1
+- Auto-upgrade to 6.6.82.1
+
+* Tue Mar 11 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.79.1-1
+- Auto-upgrade to 6.6.79.1
+- Remove jitterentropy patch as it is included in the source
+
+* Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 6.6.78.1-3
+- Add patch to revert UART change that breaks IPMI SEL panic message
+
+* Wed Mar 05 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.78.1-2
+- Add slang as BuildRequires, enabling tui on perf
+
+* Mon Mar 03 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.78.1-1
+- Auto-upgrade to 6.6.78.1
+
+* Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 6.6.76.1-2
+- Enable Tegra IVC protocol
+
+* Mon Feb 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.76.1-1
+- Auto-upgrade to 6.6.76.1
+
+* Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.64.2-9
+- Apply upstream patches to fix kernel panic in jitterentropy initialization on
+  ARM64 FIPS boot
+
+* Tue Feb 04 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 6.6.64.2-8
+- Bump release to match kernel
+
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 6.6.64.2-7
+- Bump release to match kernel
+
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 6.6.64.2-6
+- Bump release to match kernel
+
+* Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-5
+- Enable ipmitool for kernel-64k
+
+* Sat Jan 18 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-4
+- Build PCI_HYPERV as builtin
+
+* Thu Jan 16 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-3
+- Bump release to match kernel
+
+* Fri Jan 10 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-2
+- Bump release to match kernel
+
+* Thu Jan 09 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.64.2-1
+- Auto-upgrade to 6.6.64.2
+
+* Wed Jan 08 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.57.1-8
+- Enable dh kernel module (CONFIG_CRYPTO_DH) in aarch64
+- Bump release to match kernel
+
 * Sun Dec 22 2024 Ankita Pareek <ankitapareek@microsoft.com> - 6.6.57.1-7
 - Bump release to match kernel
 

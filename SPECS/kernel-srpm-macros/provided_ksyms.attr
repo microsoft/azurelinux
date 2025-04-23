@@ -1,0 +1,2 @@
+%__provided_ksyms_provides	/usr/lib/rpm/redhat/find-provides.ksyms
+%__provided_ksyms_path		.*\.(ko|ko\.gz|ko\.bz2|ko\.xz|ko\.zst)$

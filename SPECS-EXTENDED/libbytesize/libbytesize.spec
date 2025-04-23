@@ -2,24 +2,24 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 %define realname bytesize
 %define with_python3 1
-%define with_gtk_doc 0
+%define with_gtk_doc 1
 %define with_tools 1
 
 %if %{with_tools} != 1
 %define tools_opts --without-tools
 %endif
 
-%define configure_opts %{?python3_opts} %{?tools_opts} --without-gtk-doc
+%define configure_opts %{?python3_opts} %{?tools_opts} 
 
 Name:        libbytesize
-Version:     2.5
-Release:     3%{?dist}
+Version:     2.11
+Release:     1%{?dist}
 Summary:     A library for working with sizes in bytes
 License:     LGPLv2+
 URL:         https://github.com/storaged-project/libbytesize
 Source0:     https://github.com/storaged-project/libbytesize/releases/download/%{version}/%{name}-%{version}.tar.gz
 
-BuildRequires:  %{_bindir}/xsltproc
+BuildRequires: make
 BuildRequires: gcc
 BuildRequires: gmp-devel
 BuildRequires: mpfr-devel
@@ -50,7 +50,6 @@ with the libbytesize library.
 %package -n python3-%{realname}
 Summary: Python 3 bindings for libbytesize
 Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: python3-six
 
 %description -n python3-%{realname}
 This package contains Python 3 bindings for libbytesize making the use of
@@ -68,11 +67,11 @@ for doing calculations with storage sizes.
 %endif
 
 %prep
-%setup -q -n %{name}-%{version}
+%autosetup -n %{name}-%{version}
 
 %build
 %configure %{?configure_opts}
-%{__make} %{?_smp_mflags}
+%make_build
 
 %install
 %{make_install}
@@ -111,6 +110,10 @@ find %{buildroot} -type f -name "*.la" | xargs %{__rm}
 %endif
 
 %changelog
+* Thu Nov 07 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 2.11-1
+- update to version 2.11
+- License verified.
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5-3
 - Adding BR on '%%{_bindir}/xsltproc'.
 - Disabled gtk doc generation to remove network dependency during build-time.

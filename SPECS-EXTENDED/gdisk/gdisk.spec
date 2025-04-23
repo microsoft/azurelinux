@@ -1,18 +1,17 @@
-Summary:        An fdisk-like partitioning tool for GPT disks
-Name:           gdisk
-Version:        1.0.9
-Release:        3%{?dist}
-License:        GPLv2
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://www.rodsbooks.com/gdisk/
-Source0:        https://downloads.sourceforge.net/gptfdisk/gptfdisk-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         gdisk-libuuid.patch
-BuildRequires:  gcc-c++
-BuildRequires:  libuuid-devel
-BuildRequires:  make
-BuildRequires:  ncurses-devel
-BuildRequires:  popt-devel
+Summary:       An fdisk-like partitioning tool for GPT disks
+Name:          gdisk
+Version:       1.0.10
+Release:       3%{?dist}
+License:       GPL-2.0-only
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
+URL:           https://www.rodsbooks.com/gdisk/
+Source0:       https://downloads.sourceforge.net/gptfdisk/gptfdisk-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires: gcc-c++
+BuildRequires: libuuid-devel
+BuildRequires: make
+BuildRequires: ncurses-devel
+BuildRequires: popt-devel
 
 %description
 An fdisk-like partitioning tool for GPT disks. GPT fdisk features a
@@ -21,14 +20,13 @@ structures, recovery tools to help you deal with corrupt partition
 tables, and the ability to convert MBR disks to GPT format.
 
 %prep
-%setup -q -n gptfdisk-%{version}
-%patch 0 -p1 -b .orig
+%autosetup -p1 -n gptfdisk-%{version}
 
 %build
 make CXXFLAGS="%{optflags} -D_FILE_OFFSET_BITS=64" LDFLAGS="%{build_ldflags}"
 
 %install
-for f in gdisk sgdisk cgdisk fixparts ; do
+for f in gdisk sgdisk cgdisk fixparts ; do 
     install -D -p -m 0755 $f %{buildroot}%{_sbindir}/$f
     install -D -p -m 0644 $f.8 %{buildroot}%{_mandir}/man8/$f.8
 done
@@ -49,9 +47,36 @@ make test
 %{_mandir}/man8/fixparts.8*
 
 %changelog
-* Wed Mar 08 2023 Suresh Thelkar <sthelkar@microsoft.com> - 1.0.9-3
-- Initial CBL-Mariner import from Fedora 36 (license: MIT)
+* Wed Nov 06 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0.10-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.10-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Feb 20 2024 Terje Rosten <terje.rosten@ntnu.no> - 1.0.10-1
+- 1.0.10
+
+* Mon Feb 12 2024 Tomas Bzatek <tbzatek@redhat.com> - 1.0.9-9
+- Use a SPDX license tag
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.9-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.9-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.9-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.9-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Aug 24 2022 Panu Matilainen <pmatilai@redhat.com> - 1.0.9-4
+- Fix popt API misuse (#2100391)
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.9-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
 * Sat May 07 2022 Dominik Mierzejewski <dominik@greysector.net> - 1.0.9-2
 - backport upstream fix for UUID issue with latest popt

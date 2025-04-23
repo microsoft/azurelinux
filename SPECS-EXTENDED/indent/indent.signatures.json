@@ -1,5 +1,7 @@
 {
  "Signatures": {
-  "indent-2.2.12.tar.xz": "b745a5dfc68f86a483d7f96dc1cda7aafd1e78ecba3c7d8ad304709e91e1defb"
+  "indent-2.2.13.tar.xz": "1b81ba4e9a006ca8e6eb5cbbe4cf4f75dfc1fc9301b459aa0d40393e85590a0b",
+  "indent-2.2.13.tar.xz.sig": "8de306e28ab46c303abea86d8f06b42aa3c6d4a08bab6752236f29e5642da177",
+  "key.pgp": "299b653792d45251e175d00edc726a38e91b7275c038a3dd6379d058ed0fe28a"
  }
 }

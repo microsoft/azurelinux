@@ -453,6 +453,29 @@ func orderPackageInstallList(packageList []string) []string {
 	return orderedPackageList
 }
 
+// PackagelistContainsPackage checks if the given package is in the list of packages to install. It will do
+// a fuzzy search for the package name and try to ignore version info.
+//
+// The installer tools have an undocumented feature which can support both "pkg-name" and "pkg-name=version" formats.
+// This is in use, so we need to handle pinned versions in this check. Technically, 'tdnf' also supports "pkg-name-version" format,
+// but it is not easily distinguishable from "long-package-name" format so it will not be supported here.
+func PackagelistContainsPackage(packageList []string, packageName string) (found bool, err error) {
+	if packageName == "" {
+		return false, fmt.Errorf("can't search for an empty package name")
+	}
+
+	for _, pkg := range packageList {
+		pkgVer, err := pkgjson.PackageStringToPackageVer(pkg)
+		if err != nil {
+			return false, err
+		}
+		if pkgVer.Name == packageName {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 // PopulateInstallRoot fills the installroot with packages and configures the image for boot
 // - installChroot is a pointer to the install Chroot object
 // - packagesToInstall is a slice of packages to install
@@ -532,7 +555,13 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 	// imageconfigvalidator should have ensured that we intend to install shadow-utils, so we can go ahead and do that here.
 	if len(config.Users) > 0 || len(config.Groups) > 0 {
-		if !sliceutils.ContainsValue(packagesToInstall, "shadow-utils") {
+		var hasShadowUtils bool
+		hasShadowUtils, err = PackagelistContainsPackage(packagesToInstall, "shadow-utils")
+		if err != nil {
+			err = fmt.Errorf("failed to check for shadow-utils package in package list:\n%w", err)
+			return
+		}
+		if !hasShadowUtils {
 			err = fmt.Errorf("shadow-utils package must be added to the image's package lists when setting users or groups")
 			return
 		}

@@ -1,12 +1,14 @@
 Summary:        A library for changing configuration files
 Name:           augeas
 Version:        1.12.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://augeas.net/
 Source0:        http://download.augeas.net/%{name}-%{version}.tar.gz
+
+Patch0:         CVE-2025-2588.patch
 
 BuildRequires:  gcc
 BuildRequires:  libselinux-devel
@@ -50,6 +52,7 @@ read files.
 
 %prep
 %setup -q
+%autopatch -p1
 
 %build
 %configure \
@@ -106,6 +109,9 @@ rm -f %{buildroot}%{_bindir}/dump
 %{_libdir}/pkgconfig/augeas.pc
 
 %changelog
+* Sun Mar 30 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.12.0-6
+- Fix CVE-2025-2588 with an upstream patch
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.12.0-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

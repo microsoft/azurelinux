@@ -1,11 +1,11 @@
 # work around upstream versioning being decimal rather than v-string
-%global upstream_version 4.76
+%global upstream_version 4.81
 %global extraversion %{nil}
 
 Summary:        Asynchronous Input/Output
 Name:           perl-IO-AIO
 Version:        %{upstream_version}%{extraversion}
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -102,6 +102,10 @@ make test
 %{_mandir}/man1/treescan.1*
 
 %changelog
+* Mon Dec 23 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 4.81-1
+- Update to version 4.81
+- License verified.
+
 * Thu Jan 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.76-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

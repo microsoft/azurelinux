@@ -1,0 +1,23 @@
+diff -Naur libdc1394-2.2.6.old/configure.ac libdc1394-2.2.6/configure.ac
+--- libdc1394-2.2.6.old/configure.ac	2022-05-31 18:11:17.320426983 +0200
++++ libdc1394-2.2.6/configure.ac	2022-05-31 18:11:32.882714398 +0200
+@@ -45,12 +45,6 @@
+     [AC_DEFINE(HAVE_LIBUSB,[],[Defined if libusb is present])],
+     [AC_MSG_WARN([libusb-1.0 not found])])
+ 
+-MIN_SDL_VERSION=1.2.4
+-AH_TEMPLATE(HAVE_LIBSDL, [SDL library])
+-AM_PATH_SDL($MIN_SDL_VERSION, [AC_DEFINE(HAVE_LIBSDL) HAVE_LIBSDL="yes"])
+-AC_SUBST(SDL_CFLAGS)
+-AC_SUBST(SDL_LIBS)
+-
+ case "$host" in
+ *-*-linux*)
+     have_linux=true
+@@ -233,4 +227,4 @@
+       Build V4L examples:               ${VIDEXAMPLESMSG}"
+ fi
+ dnl extra newline:
+-echo ""
+\ No newline at end of file
++echo ""
