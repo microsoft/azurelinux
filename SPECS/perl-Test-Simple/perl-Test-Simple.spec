@@ -86,7 +86,6 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PERLLOCAL=1 NO_PACKLIST=1
 
 %check
 make test %{!?perl_bootstrap:AUTHOR_TESTING=1}
-exit 1
 
 %files
 %license LICENSE
