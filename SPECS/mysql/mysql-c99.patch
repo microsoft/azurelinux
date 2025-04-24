@@ -1,0 +1,12 @@
+diff -ur mysql-8.0.35.orig/plugin/innodb_memcached/daemon_memcached/daemon/memcached.c mysql-8.0.35/plugin/innodb_memcached/daemon_memcached/daemon/memcached.c
+--- mysql-8.0.35.orig/plugin/innodb_memcached/daemon_memcached/daemon/memcached.c	2023-10-12 13:45:01.000000000 +0200
++++ mysql-8.0.35/plugin/innodb_memcached/daemon_memcached/daemon/memcached.c	2023-12-19 10:48:46.718006624 +0100
+@@ -4070,7 +4070,7 @@
+     do {
+         while(key_token->length != 0) {
+             /* whether there are more keys to fetch */
+-            bool next_get = (key_token + 1)->value;
++            bool next_get = (key_token + 1)->value != NULL;
+ 
+             key = key_token->value;
+             nkey = key_token->length;

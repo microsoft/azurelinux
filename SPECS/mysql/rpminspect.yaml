@@ -1,0 +1,13 @@
+# Set up global ignore list
+ignore:
+    # mysql-test/ directory contains an extensive test-suite of about 20.000 files;
+    # It is very time consuming to be fully analysed and the results aren't useful anyway
+    # It is expected the tests change during rebases, as the underlying functionality the test evolve
+    # Some of the tests contain broken or problematic code, however that is on purpose
+    - /usr/share/mysql-test/
+
+badfuncs:
+  ignore:
+    # udf_example.so can be ignored, as it is an example of how to write loadable functions
+    # Loadable functions were formerly know as UDF (User Defined Functions).
+    - /usr/lib64/mysql/plugin/udf_example.so
