@@ -13,7 +13,7 @@ Distribution:   Azure Linux
 
 Name:           lua-%{lua_pkg_name}
 Version:        1.1.0
-Release:        3%{?dist}
+Release:        2%{?dist}
 Summary:        Parsing Expression Grammars for Lua
 
 License:        MIT
@@ -82,7 +82,7 @@ lua test.lua
 
 
 %changelog
-* Thu Feb 27 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.1.0-3
+* Thu Feb 27 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.1.0-2
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified.
 
