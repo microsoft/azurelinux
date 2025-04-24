@@ -29336,8 +29336,8 @@
         "type": "other",
         "other": {
           "name": "uglify-js",
-          "version": "2.8.22",
-          "downloadUrl": "https://github.com/mishoo/UglifyJS2/archive/v2.8.22/uglify-js-2.8.22.tar.gz"
+          "version": "3.19.3",
+          "downloadUrl": "https://registry.npmjs.org/uglify-js/-/uglify-js-3.19.3.tgz"
         }
       }
     },
