@@ -14,7 +14,6 @@ Source0:    https://releases.pagure.org/%{name}/%{name}-%{version}.tar.bz2
 License:    GPLv2 and LGPLv2+
 BuildArch:  noarch
 
-Obsoletes:  redhat-logos
 Obsoletes:  generic-logos < 17.0.0-5
 Provides:   redhat-logos = %{version}-%{release}
 Provides:   system-logos = %{version}-%{release}
