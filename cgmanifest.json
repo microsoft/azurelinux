@@ -3528,8 +3528,8 @@
         "type": "other",
         "other": {
           "name": "fcgi",
-          "version": "2.4.0",
-          "downloadUrl": "https://src.fedoraproject.org/lookaside/extras/fcgi/fcgi-2.4.0.tar.gz/d15060a813b91383a9f3c66faf84867e/fcgi-2.4.0.tar.gz"
+          "version": "2.4.5",
+          "downloadUrl": "https://github.com/FastCGI-Archives/fcgi2/archive/refs/tags/2.4.5.tar.gz"
         }
       }
     },
