@@ -21083,8 +21083,8 @@
         "type": "other",
         "other": {
           "name": "pgbouncer",
-          "version": "1.20.1",
-          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.20.1/pgbouncer-1.20.1.tar.gz"
+          "version": "1.24.1",
+          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.24.1/pgbouncer-1.24.1.tar.gz"
         }
       }
     },
