@@ -1,12 +1,13 @@
+Summary:        The NIS (Network Information Service) server
+Name:           ypserv
+Version:        4.2
+Release:        12%{?dist}
+License:        GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Summary: The NIS (Network Information Service) server
-Url: https://github.com/thkukuk/ypserv
-Name: ypserv
-Version: 4.1
-Release: 4%{?dist}
-License: GPLv2
-Source0: https://github.com/thkukuk/%{name}/archive/v%{version}.tar.gz#!/%{name}-%{version}.tar.gz
+URL:            https://www.thkukuk.de/nis/nis/ypserv/
+
+Source0: https://github.com/thkukuk/ypserv/archive/refs/tags/v4.2.tar.gz#/%{name}-%{version}.tar.gz
 Source1: ypserv.service
 Source2: yppasswdd.service
 Source3: ypxfrd.service
@@ -32,7 +33,9 @@ Patch8: ypserv-2.27-confpost.patch
 Patch10: ypserv-2.31-netgrprecur.patch
 Patch12: ypserv-4.0-headers.patch
 Patch14: ypserv-4.0-selinux-context.patch
+Patch15: ypserv-4.2-implicit-int.patch
 
+BuildRequires: make
 BuildRequires:  gcc
 BuildRequires: tokyocabinet-devel
 BuildRequires: systemd
@@ -61,20 +64,7 @@ need to install the yp-tools and ypbind packages on any NIS client
 machines.
 
 %prep
-
-%setup -q
-
-%patch 0 -p1 -b .redhat
-%patch 2 -p1 -b .nfsnobody
-%patch 3 -p1 -b .respzero
-%patch 4 -p1 -b .nonedomain
-%patch 5 -p1 -b .slp-warning
-%patch 6 -p1 -b .manfix
-%patch 7 -p1 -b .aliases
-%patch 8 -p1 -b .confpost
-%patch 10 -p1 -b .netgrprecur
-%patch 12  -b .headers
-%patch 14 -p1 -b .selinux-context
+%autosetup -n %{name}-%{version} -p1
 
 # Delete generated man pages. They will be generated later from source.
 rm makedbm/makedbm.8
@@ -92,6 +82,8 @@ export CFLAGS="$RPM_OPT_FLAGS -fPIC"
 export CFLAGS="$RPM_OPT_FLAGS -fpic"
 %endif
 
+# Fix gcc12 issues (#2047138)
+export CFLAGS="$CFLAGS -Wno-format-overflow"
 
 %configure \
     --enable-checkroot \
@@ -174,8 +166,58 @@ install -m 755 %{SOURCE4} $RPM_BUILD_ROOT%{_libexecdir}/rpc.yppasswdd.env
 %{_includedir}/rpcsvc
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Mar 14 2025 Jyoti kanase <v-jykanase@microsoft.com> - 4.2-12
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.2-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jan 30 2024 Ondrej Sloup <osloup@redhat.com> - 4.2-10
+- Don't hard code _FORTIFY_SOURCE=2
+- Update license tag to the SPDX format (GPL-2.0-only)
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.2-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Dec 01 2022 Timm Bäder <tbaeder@redhat.com> - 4.2-6
+- Get rid of an implicit int during configure time
+- See https://fedoraproject.org/wiki/Changes/PortingToModernC
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Feb 01 2022 Marek Kulik <mkulik@redhat.com> - 4.2-4
+- Fix gcc12 compilation issues
+- Resolves: #2047138
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Nov 12 2021 Björn Esser <besser82@fedoraproject.org> - 4.2-2
+- Rebuild(libnsl2)
+
+* Tue Sep 28 2021 Marek Kulik <mkulik@redhat.com> - 4.2-1
+- Update to new upstream version 4.2
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 4.1-6
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Thu Jan 28 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
