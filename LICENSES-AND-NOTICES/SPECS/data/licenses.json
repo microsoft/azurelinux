@@ -2230,6 +2230,7 @@
                 "application-gateway-kubernetes-ingress",
                 "asc",
                 "azcopy",
+                "azl-otel-collector",
                 "azure-iot-sdk-c",
                 "azure-nvme-utils",
                 "azure-storage-cpp",
