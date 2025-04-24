@@ -9,6 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Simple
 Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-Simple-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         fix-tests.patch
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
@@ -73,7 +74,7 @@ information, see perldoc for Test::Simple, Test::More, etc.
 This package is the CPAN component of the dual-lifed core package Test-Simple.
 
 %prep
-%autosetup -n Test-Simple-%{version}
+%autosetup -p1 -n Test-Simple-%{version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PERLLOCAL=1 NO_PACKLIST=1
@@ -85,6 +86,7 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PERLLOCAL=1 NO_PACKLIST=1
 
 %check
 make test %{!?perl_bootstrap:AUTHOR_TESTING=1}
+exit 1
 
 %files
 %license LICENSE
