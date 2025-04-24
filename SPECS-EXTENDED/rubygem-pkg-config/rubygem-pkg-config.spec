@@ -1,31 +1,32 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+# Generated from pkg-config-1.0.3.gem by gem2rpm -*- rpm-spec -*-
 %global	gem_name	pkg-config
 
-%undefine        _changelog_trimtime
-%undefine __brp_mangle_shebangs
+%undefine	__brp_mangle_shebangs
 
-Summary:  A pkg-config implementation by Ruby
-Name:     rubygem-%{gem_name}
-Version:  1.4.5
-Release:  4%{?dist}
-License:  LGPLv2+
-URL:      https://github.com/rcairo/pkg-config
-Source0:  https://github.com/ruby-gnome/pkg-config/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Summary:	A pkg-config implementation by Ruby
+Name:		rubygem-%{gem_name}
+Version:	1.5.7
+Release:	2%{?dist}
+# SPDX confirmed
+License:	LGPL-2.0-or-later
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+URL:		https://github.com/rcairo/pkg-config
+
+Source0:	https://github.com/ruby-gnome/%{gem_name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Observe test failure on test_cflags test_cflags_only_I
 # with pkgconf 1.4.2
-Patch0:   rubygem-pkg-config-1.4.4-cflags-result-sort.patch
+Patch0:		rubygem-pkg-config-1.4.4-cflags-result-sort.patch
 
 Requires:	ruby(release)
 BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
-%if 0%{?with_check}
+# For %%check
 BuildRequires:	rubygem(test-unit)
+# mkmf.rb requires ruby-devel
 BuildRequires:	ruby-devel
 BuildRequires:	cairo-devel
-%endif
 Requires:	rubygems
-
 BuildArch:	noarch
 Provides:	rubygem(%{gem_name}) = %{version}-%{release}
 
@@ -40,60 +41,97 @@ Requires:	%{name} = %{version}-%{release}
 This package contains documentation for %{name}.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}
 %gem_install
 
 %install
-gem install %{gem_name}-%{version}.gem
+rm -rf %{buildroot}
 
 mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* \
 	%{buildroot}/%{gem_dir}/
 
-# Kill unneeded file
-rm -f %{buildroot}%{gem_instdir}/extconf.rb
+pushd %{buildroot}%{gem_instdir}
+rm -rf \
+	Gemfile \
+	Rakefile \
+	test/ \
+	%{nil}
+popd
+rm -f %{buildroot}%{gem_cache}
 
 %check
 pushd .%{gem_instdir}
-#rake test --verbose --trace
-#ruby -Ilib -rubygems test/run-test.rb
-cat > test.rb <<EOF
-require "rubygems"
-gem "test-unit"
-require "test/unit"
-
-Dir.glob("test/**/test-*.rb") do |file|
-  require file
-end
-EOF
-ruby -Ilib:test:. ./test.rb
+ruby test/run-test.rb
+popd
 
 %files
-%license LGPL-2.1
-%dir %{gem_instdir}
-%doc %{gem_instdir}/[A-Z]*
-%exclude %{gem_instdir}/Rakefile
-%exclude %{gem_instdir}/setup.rb
+%dir	%{gem_instdir}
+%doc	%{gem_instdir}/NEWS.md
+%license	%{gem_instdir}/README.rdoc
+%license	%{gem_instdir}/LGPL-2.1
 %{gem_libdir}/
-%{gem_cache}
+
 %{gem_spec}
 
-%files doc
-%{gem_instdir}/test/
+%files	doc
 %{gem_docdir}
 
 %changelog
-* Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.4.5-4
-- Build from .tar.gz source.
-
-* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.5-3
+* Fri Dec 20 2024 Akhila Guruju <v-guakhila@microsoft.com> - 1.5.7-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.5-2
-- Initial CBL-Mariner import from Fedora 34 (license: MIT).
+* Fri Oct 25 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.5.7-1
+- 1.5.7
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Nov 19 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.5.6-1
+- 1.5.6
+
+* Tue Sep  5 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.5.5-1
+- 1.5.5
+
+* Thu Aug 31 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.5.3-1
+- 1.5.3
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jun 16 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.5.2-1
+- 1.5.2
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Nov 30 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.5.1-1
+- 1.5.1
+
+* Sun Jul 31 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.4.9-1
+- 1.4.9
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.7-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Jan 17 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.4.7-1
+- 1.4.7
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Apr 19 2021 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.4.6-1
+- 1.4.6
 
 * Fri Feb  5 2021 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.4.5-1
 - 1.4.5
