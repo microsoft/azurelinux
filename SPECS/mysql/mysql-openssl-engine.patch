@@ -1,0 +1,15 @@
+https://fedoraproject.org/wiki/Changes/OpensslDeprecateEngine
+https://fedoraproject.org/wiki/Changes/OpensslNoEngine
+
+--- mysql-8.0.37/plugin/group_replication/libmysqlgcs/src/bindings/xcom/xcom/network/xcom_network_provider_ssl_native_lib.cc	2024-03-27 20:22:56.000000000 +0100
++++ mysql-8.0.37/plugin/group_replication/libmysqlgcs/src/bindings/xcom/xcom/network/xcom_network_provider_ssl_native_lib.cc_patched	2024-07-18 17:01:59.488433958 +0200
+@@ -41,7 +41,9 @@
+ #include "my_compiler.h"
+ #endif
+ 
++#if !defined(OPENSSL_NO_ENGINE)
+ #include "openssl/engine.h"
++#endif
+ 
+ #include "xcom/task_debug.h"
+ #include "xcom/x_platform.h"

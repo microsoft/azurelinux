@@ -1,0 +1,104 @@
+Avoid errors like:
+
+|  Path length (109) is longer than maximum supported length (108) and will be truncated at /usr/lib64/perl5/vendor_perl/Socket.pm line 880, <GEN16094> line 1.
+|  worker[2] mysql-test-run: *** ERROR: Socket path '/builddir/build/BUILDROOT/community-mysql-8.0.24-1.fc35.s390x/usr/share/mysql-test/var/tmp/2' too long,
+|  it would be  truncated and thus not possible to use for connection to  MySQL Server. Set a shorter with --tmpdir=<path> option
+
+===
+
+On Fedora 32:
+
+|  $ grep -e "PATH" /usr/include/linux/limits.h
+|  #define PATH_MAX        4096	/* # chars in a path name including nul */
+
+===
+
+Thus setting the maximum path length on Fedora to 108 characters is just too short.
+
+BTW on the modern filesystems you can easily create path longer than PATH_MAX.
+The PATH_MAX constant is unsafe.
+Interesting article: https://insanecoding.blogspot.com/2007/11/pathmax-simply-isnt.html
+
+===
+
+The question is why haven't I encountered this issue until recently ?
+
+After the recent tweaks to the testsuite (between 8.0.24 and 8.0.25 release), the generated --tmpdir path changed from
+|  --tmpdir=/builddir/build/BUILD/mysql-8.0.24/x86_64-redhat-linux-gnu/mysql-test/var/tmp/
+to
+|  --tmpdir=/builddir/build/BUILDROOT/community-mysql-8.0.24-1.fc35.x86_64/usr/share/mysql-test/var/tmp/
+
+===
+
+The whole setup changed as follows:
+BEFORE:
+
+|  Installing system database
+|  ### safe_path: /builddir/build/BUILD/mysql-8.0.24/x86_64-redhat-linux-gnu/runtime_output_directory///mysqltest_safe_process --verbose -- /builddir/build/BUILD/mysql-8.0.24/x86_64-redhat-linux-gnu/runtime_output_directory/mysqld --no-defaults --initialize-insecure --loose-skip-ndbcluster --tmpdir=/builddir/build/BUILD/mysql-8.0.24/x86_64-redhat-linux-gnu/mysql-test/var/tmp/ --core-file --datadir=/builddir/build/BUILD/mysql-8.0.24/x86_64-redhat-linux-gnu/mysql-test/var/data/ --secure-file-priv=/builddir/build/BUILD/mysql-8.0.24/x86_64-redhat-linux-gnu/mysql-test/var --innodb_buffer_pool_size=24M --innodb-log-file-size=5M --innodb_autoextend_increment=8 --character-sets-dir=/builddir/build/BUILD/mysql-8.0.24/share/charsets --loose-auto_generate_certs=OFF --loose-sha256_password_auto_generate_rsa_keys=OFF --loose-caching_sha2_password_auto_generate_rsa_keys=OFF --init-file=/builddir/build/BUILD/mysql-8.0.24/x86_64-redhat-linux-gnu/mysql-test/var/tmp/bootstrap.sql
+
+AFTER:
+
+|  Installing system database
+|  ### safe_path: /builddir/build/BUILDROOT/community-mysql-8.0.24-1.fc35.x86_64/usr/bin//mysqltest_safe_process --verbose -- /builddir/build/BUILDROOT/community-mysql-8.0.24-1.fc35.x86_64/usr/libexec/mysqld --no-defaults --initialize-insecure --loose-skip-ndbcluster --tmpdir=/builddir/build/BUILDROOT/community-mysql-8.0.24-1.fc35.x86_64/usr/share/mysql-test/var/tmp/ --core-file --datadir=/builddir/build/BUILDROOT/community-mysql-8.0.24-1.fc35.x86_64/usr/share/mysql-test/var/data/ --secure-file-priv=/builddir/build/BUILDROOT/community-mysql-8.0.24-1.fc35.x86_64/usr/share/mysql-test/var --innodb_buffer_pool_size=24M --innodb-log-file-size=5M --innodb_autoextend_increment=8 --character-sets-dir=/builddir/build/BUILDROOT/community-mysql-8.0.24-1.fc35.x86_64/usr/share/community-mysql/charsets --loose-auto_generate_certs=OFF --loose-sha256_password_auto_generate_rsa_keys=OFF --loose-caching_sha2_password_auto_generate_rsa_keys=OFF --init-file=/builddir/build/BUILDROOT/community-mysql-8.0.24-1.fc35.x86_64/usr/share/mysql-test/var/tmp/bootstrap.sql
+
+===
+
+The likely cause is the added
+
+|  cd %{buildroot}%{_datadir}/mysql-test
+
+which was not originally present in the SPECfile.
+
+However the MariaDB implementation does not have this issue, even though it has the same SPECfile %check phase code.
+
+
+===
+
+In the extended log, you can see '/tmp/XfTFAis2Jl' being created and deleted short after.
+Even though the script warns about the path length, tries to workaround it; it destroyes that workaround short after and use the too-long path instead.
+
+I'm not sure whether the output is synchronous, but even if it wasn'tit still looks weird.
+
+| + cd /builddir/build/BUILDROOT/community-mysql-8.0.24-1.fc35.x86_64/usr/share/mysql-test
+| Logging: ./mysql-test-run.pl  --verbose --parallel=auto --force --retry=2 --suite-timeout=900 --testcase-timeout=30 --mysqld=--binlog-format=mixed --max-test-fail=5 --report-unstable-tests --clean-vardir --suite=main --mem --skip-test-list=platform-specific-tests.list
+| Path length (109) is longer than maximum supported length (108) and will be truncated at /usr/lib64/perl5/vendor_perl/Socket.pm line 880.
+| Too long tmpdir path '/builddir/build/BUILDROOT/community-mysql-8.0.24-1.fc35.x86_64/usr/share/mysql-test/var/tmp'  creating a shorter one
+|  - Using tmpdir: '/tmp/XfTFAis2Jl'
+| > Collecting: main
+| > testdir: /builddir/build/BUILDROOT/community-mysql-8.0.24-1.fc35.x86_64/usr/share/mysql-test/t
+| > resdir: /builddir/build/BUILDROOT/community-mysql-8.0.24-1.fc35.x86_64/usr/share/mysql-test/r
+| > Collecting: i_main
+| Removing old var directory
+| > opt_vardir: /builddir/build/BUILDROOT/community-mysql-8.0.24-1.fc35.x86_64/usr/share/mysql-test/var
+| > Removing /builddir/build/BUILDROOT/community-mysql-8.0.24-1.fc35.x86_64/usr/share/mysql-test/var/
+| > Removing /dev/shm/var_933_jfTb
+| > Removing /tmp/XfTFAis2Jl/
+| Creating var directory '/builddir/build/BUILDROOT/community-mysql-8.0.24-1.fc35.x86_64/usr/share/mysql-test/var'
+| > Creating /dev/shm/var_933_jfTb
+|  - symlinking 'var' to '/dev/shm/var_933_jfTb'
+
+
+
+
+diff --git a/mysql-test/mysql-test-run.pl b/mysql-test/mysql-test-run.pl
+index 26e6c92c..9d85c6d6 100755
+--- mysql-8.0.39/mysql-test/mysql-test-run.pl	2024-08-11 01:20:12.207260860 +0200
++++ mysql-8.0.39/mysql-test/mysql-test-run.pl_patched	2024-08-11 20:44:42.230145160 +0200
+@@ -3560,17 +3560,6 @@ sub setup_vardir() {
+   mkpath("$opt_vardir/tmp");
+   mkpath($opt_tmpdir) if ($opt_tmpdir ne "$opt_vardir/tmp");
+ 
+-  # On some operating systems, there is a limit to the length of a
+-  # UNIX domain socket's path far below PATH_MAX. Don't allow that
+-  # to happen.
+-  my $res =
+-    check_socket_path_length("$opt_tmpdir/mysqld.NN.sock", $opt_parallel, $tmpdir_path_updated);
+-  if ($res) {
+-    mtr_error("Socket path '$opt_tmpdir' too long, it would be ",
+-              "truncated and thus not possible to use for connection to ",
+-              "MySQL Server. Set a shorter with --tmpdir=<path> option");
+-  }
+-
+   # Copy all files from std_data into var/std_data
+   # and make them world readable
+   copytree("$glob_mysql_test_dir/std_data", "$opt_vardir/std_data", "0022")

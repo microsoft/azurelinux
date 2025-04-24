@@ -1,0 +1,49 @@
+# Fails since 8.0.30
+federated.federated_server                      : BUG#0
+rpl.rpl_innodb_bug28430                         : BUG#0
+
+# Fails since 8.0.31
+main.lock_multi_bug38691                        : BUG#0
+
+# Fails since 8.0.34
+rpl_gtid.rpl_gtid_row_event_max_size            : BUG#0
+rpl.rpl_channel_creation_under_replica_load     : BUG#0
+
+# Fails since 8.0.37
+clone.local_dml                                 : BUG#0
+clone.remote_dml_no_binlog                      : BUG#0
+clone.remote_dml_replace                        : BUG#0
+
+innodb.create_index_with_disable_sort_file_cache  : BUG#0
+innodb_fts.bug_34846823                         : BUG#0
+innodb_gis.rtree_search                         : BUG#0
+innodb.innodb_autoextend_import_export          : BUG#0
+innodb.instant_ddl_upgrade_rollback             : BUG#0
+innodb.lob_recovery                             : BUG#0
+innodb.multi_value_basic                        : BUG#0
+innodb_undo.undo_settings                       : BUG#0
+
+main.mysql_client_test                          : BUG#0
+main.mysqlslap                                  : BUG#0
+
+parts.partition_reverse_scan_icp                : BUG#0
+
+rpl_gtid.rpl_perfschema_applier_status_by_worker_gtid_skipped_transaction_mts  : BUG#0
+rpl_nogtid.rpl_loaddatalocal                    : BUG#0
+rpl_nogtid.rpl_row_event_max_size               : BUG#0
+rpl_nogtid.rpl_typeconv                         : BUG#0
+rpl.rpl_mysql_upgrade                           : BUG#0
+rpl.rpl_parallel                                : BUG#0
+rpl.rpl_priv_checks_user_start_info             : BUG#0
+
+sys_vars.myisam_data_pointer_size_func          : BUG#0
+x.upgrade                                       : BUG#0
+
+# Unstable in 8.0.37
+main.component-upgrade                          : BUG#0
+main.count_distinct2                            : BUG#0
+main.dd_upgrade_non_debug                       : BUG#0
+main.dd_upgrade_partition                       : BUG#0
+main.disabled_storage_engines                   : BUG#0
+main.partition                                  : BUG#0
+main.multi_update                               : BUG#0

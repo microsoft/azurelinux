@@ -1,5 +1,22 @@
 {
-  "Signatures": {
-    "mysql-boost-8.0.41.tar.gz": "719589993b1a6769edb82b59f28e0dab8d47df94fa53ac4e9340b7c5eaba937c"
-  }
+ "Signatures": {
+  "README.mysql-docs": "d745d7abda5233c472fd9e32063eed34eb0a91593001b843e17376f9cd6fb547",
+  "README.mysql-license": "f7f5c530abedf018f56c6f1f791eae194d49abc6cf789c25a554ee3a1ff4c580",
+  "my.cnf.in": "e8888b9ff4879c5fc79bc406a97d3df436efc76c99809700d44eb7e88b5a49f8",
+  "mysql-boost-8.0.41.tar.gz": "719589993b1a6769edb82b59f28e0dab8d47df94fa53ac4e9340b7c5eaba937c",
+  "mysql-check-socket.sh": "69ba021af20ca43cb8099829d9bdd39424c45b43c07e264402722d775157343b",
+  "mysql-prepare-db-dir.sh": "93b2a900c74dd9b65085bfa557c131ac007e8ae91fe5384e79ace80f160e8a0e",
+  "mysql-scripts-common.sh": "6378c47200a902dd59995acdb9f8bec7f2b8b4584360bd6b0862b25191bebf18",
+  "mysql-wait-stop.sh": "54fe77e3371e62f98fd39e6e800d09bb70eb4b210fc93cb3bae8134362399c09",
+  "mysql.rpmlintrc": "f5a8ee0def160f262585e301caec97b85a3935a1ef0779ae4bd596d5949a0e11",
+  "mysql.service.in": "f6e1c1dae2b782112e0252ed5299e6f04fe0f6d9706b34613b6bfe376a4bfba7",
+  "mysql.tmpfiles.d.in": "f0f0125d9aaee60c9ba60deebfab113409b93e0c6140019cbf3dfcb0720d36b9",
+  "mysql@.service.in": "b1e09df4d20b095cb36bcb80ce819c35118da6f1ab1c343357909f5b56e42f80",
+  "mysql_config_multilib.sh": "56737ac556128fe5bd4df9209e41a7e0808333872c812b11457c4c0c17ab9529",
+  "rh-skipped-tests-list-arm.list": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "rh-skipped-tests-list-base.list": "d7e89a44335a87ca2a13bf9770c44a7133df8cd734ce2efb47880087aa5294fc",
+  "rh-skipped-tests-list-ppc.list": "cff1792bff1f8923965dddfc205b44ca8550040a9d6bcdfe4e38e65b2b186408",
+  "rh-skipped-tests-list-s390.list": "1a302c346d3c417dad40af3a24d1c937850ce11bcecd038b07a40835b284c520",
+  "server.cnf.in": "11bfadc458222440dd04c4b4734b5c430869f850fcd4d1074719592d20c65cb2"
+ }
 }

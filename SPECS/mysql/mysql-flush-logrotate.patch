@@ -1,0 +1,35 @@
+--- mysql-8.0.40/packaging/rpm-common/mysql.logrotate.in	2024-09-18 12:08:24.000000000 +0200
++++ mysql-8.0.40/packaging/rpm-common/mysql.logrotate.in_patched	2025-02-13 16:00:32.325677977 +0100
+@@ -5,18 +5,6 @@
+ # [mysqld]
+ # log-error=@LOGFILE_RPM@
+ #
+-# For the mysqladmin commands below to work, root account
+-# password is required. Use mysql_config_editor(1) to store
+-# authentication credentials in the encrypted login path file
+-# ~/.mylogin.cnf
+-#
+-# Example usage:
+-#
+-#  mysql_config_editor set --login-path=client --user=root --host=localhost --password
+-#
+-# When these actions has been done, un-comment the following to
+-# enable rotation of mysqld's log error.
+-#
+ 
+ #@LOGFILE_RPM@ {
+ #        create 640 mysql mysql
+@@ -26,11 +14,7 @@
+ #        missingok
+ #        compress
+ #    postrotate
+-#       # just if mysqld is really running
+-#       if test -x @bindir@/mysqladmin && \
+-#          @bindir@/mysqladmin ping &>/dev/null
+-#       then
+-#          @bindir@/mysqladmin flush-logs
+-#       fi
++#       # SIGUSR1 makes the daemon to flush the logs, no need to connect through mysqladmin
++#       @bindir@/kill -USR1 $(systemctl show --property MainPID --value mysqld)
+ #    endscript
+ #}
