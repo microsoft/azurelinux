@@ -12231,8 +12231,8 @@
         "type": "other",
         "other": {
           "name": "lksctp-tools",
-          "version": "1.0.18",
-          "downloadUrl": "https://github.com/sctp/lksctp-tools/archive/lksctp-tools-1.0.18.tar.gz"
+          "version": "1.0.19",
+          "downloadUrl": "https://github.com/sctp/lksctp-tools/archive/lksctp-tools-1.0.19.tar.gz"
         }
       }
     },
