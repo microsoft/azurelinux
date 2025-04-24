@@ -15,16 +15,24 @@ URL:            https://nginx.org/
 Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        https://github.com/nginx/njs/archive/refs/tags/%{njs_version}.tar.gz#/%{name}-njs-%{njs_version}.tar.gz
+
+%if 0%{?with_check}
 Source3:        nginx-tests.tgz
+%endif
+
 Patch0:         CVE-2024-7347.patch
 Patch1:         CVE-2025-23419.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
+
+%if 0%{?with_check}
 BuildRequires:  perl-FindBin
 BuildRequires:  perl-Test-Harness
 BuildRequires:  perl-Test-Simple
 BuildRequires:  perl-lib
+%endif
+
 BuildRequires:  pcre2-devel
 BuildRequires:  readline-devel
 BuildRequires:  which
@@ -108,6 +116,25 @@ getent passwd %{nginx_user} > /dev/null || \
     -s /sbin/nologin -c "Nginx web server" %{nginx_user}
 exit 0
 
+%if 0%{?with_check}
+%check
+cd %{buildroot}
+cp -r usr/sbin/* /usr/sbin/
+cp -r var/opt/* /var/opt/
+cp -r var/log/* /var/log/
+cp -r usr/lib/debug/usr/sbin/* /usr/lib/debug/sbin/
+cp -r usr/lib/systemd/* /usr/lib/systemd/
+cp -r etc/* /etc/
+cp /etc/nginx/mime.types.default /etc/nginx/mime.types
+useradd -s /usr/bin/sh %{nginx_user}
+tar -xvf %{SOURCE3}
+cd nginx-tests
+su nginx -s /bin/sh -c 'TEST_NGINX_BINARY=%{_sbindir}/nginx prove ./*.t'
+TEST_NGINX_BINARY=%{_sbindir}/nginx prove ./root_user_tests/
+cd ..
+rm -rf nginx-tests
+%endif
+
 %files
 %defattr(-,root,root)
 %license LICENSE
@@ -134,25 +161,10 @@ exit 0
 %files filesystem
 %dir %{_sysconfdir}/%{name}
 
-%check
-cd %{buildroot}
-cp -r usr/sbin/* /usr/sbin/
-cp -r var/opt/* /var/opt/
-cp -r var/log/* /var/log/
-cp -r usr/lib/debug/usr/sbin/* /usr/lib/debug/sbin/
-cp -r usr/lib/systemd/* /usr/lib/systemd/
-cp -r etc/* /etc/
-cp /etc/nginx/mime.types.default /etc/nginx/mime.types
-useradd -s /usr/bin/sh nginx
-tar -xvf %{SOURCE3}
-cd nginx-tests
-su nginx -s /bin/sh -c 'TEST_NGINX_BINARY=%{_sbindir}/nginx prove ./*.t'
-TEST_NGINX_BINARY=%{_sbindir}/nginx prove ./root_user_tests/
-cd ..
-rm -rf nginx-tests
 %changelog
 * Tue Mar 11 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.25.4-4
 - Enable webdav module
+- Added tests to verify nginx server and its supported modules
 
 * Tue Feb 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.25.4-3
 - Fix CVE-2025-234419
