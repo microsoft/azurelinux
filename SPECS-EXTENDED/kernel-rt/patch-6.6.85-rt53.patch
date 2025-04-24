@@ -20629,14 +20629,6 @@ index 242ad0bded0e..d40df04752ff 100644
  }
  
  /*
-@@ -3360,6 +3382,7 @@ static void serial8250_console_restore(struct uart_8250_port *up)
- 	serial8250_out_MCR(up, up->mcr | UART_MCR_DTR | UART_MCR_RTS);
- }
- 
-+#ifdef CONFIG_SERIAL_8250_LEGACY_CONSOLE
- static void fifo_wait_for_lsr(struct uart_8250_port *up, unsigned int count)
- {
- 	unsigned int i;
 @@ -3437,7 +3460,7 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
  	 *	First save the IER then disable the interrupts
  	 */
