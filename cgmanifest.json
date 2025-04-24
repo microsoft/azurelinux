@@ -22423,8 +22423,8 @@
         "type": "other",
         "other": {
           "name": "python-curio",
-          "version": "1.4",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/curio/curio-1.4.tar.gz"
+          "version": "1.6^1.1484546",
+          "downloadUrl": "https://github.com/dabeaz/curio/archive/148454621f9bd8dd843f591e87715415431f6979/curio-1484546.tar.gz"
         }
       }
     },
