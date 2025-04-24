@@ -3081,6 +3081,7 @@
                 "rsyslog",
                 "ruby",
                 "rust",
+                "rust-1.75",
                 "scons",
                 "sed",
                 "sg3_utils",

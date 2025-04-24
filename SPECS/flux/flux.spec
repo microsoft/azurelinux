@@ -22,7 +22,7 @@
 Summary:        Influx data language
 Name:           flux
 Version:        0.194.5
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,10 +40,12 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        cargo_config
 Patch1:         disable-static-library.patch
-Patch2:         0001-libflux-unblock-build-by-allowing-warnings.patch
-BuildRequires:  cargo >= 1.45
+# Fixed upstream in 1.195.0, https://github.com/influxdata/flux/pull/5484.
+Patch2:         fix-build-warnings.patch
+Patch3:         fix-unsigned-char.patch
+BuildRequires:  cargo < 1.85.0
 BuildRequires:  kernel-headers
-BuildRequires:  rust >= 1.45
+BuildRequires:  rust < 1.85.0
 
 %description
 Flux is a lightweight scripting language for querying databases (like InfluxDB)
@@ -139,6 +141,14 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %{_includedir}/influxdata/flux.h
 
 %changelog
+* Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 0.194.5-3
+- Pin rust version
+
+* Mon Apr 14 2025 Tobias Brick <tobiasb@microsoft.com> - 0.194.5-2
+- Add missing EOF for inline patch call.
+- Fix build warnings rather than suppressing them.
+- Fix test build error on arm64.
+
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.194.5-1
 - Upgrade to version 0.194.5
 
