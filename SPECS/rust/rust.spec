@@ -58,6 +58,8 @@ BuildRequires:  ninja-build
 # make sure rust relies on openssl from CBL-Mariner (instead of using its vendored flavor)
 BuildRequires:  openssl-devel
 BuildRequires:  python3
+# make sure rust depends on system zlib
+BuildRequires:  zlib-devel
 %if 0%{?with_check}
 BuildRequires:  glibc-static >= 2.38-9%{?dist}
 BuildRequires:	sudo
@@ -185,6 +187,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 - Remove rust-demangler tool 
 - Update generate_source_tarball script
 - Run %check as test user
+- Add explicit build dependency on zlib
 
 * Thu Feb 27 2025 Chris Co <chrco@microsoft.com> - 1.75.0-12
 - Bump to rebuild with updated glibc
