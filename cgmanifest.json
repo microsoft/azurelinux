@@ -3328,8 +3328,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "25.2",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-25.2/otp-OTP-25.2.tar.gz"
+          "version": "25.3.2.20",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-25.3.2.20/otp-OTP-25.3.2.20.tar.gz"
         }
       }
     },
@@ -3358,8 +3358,8 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.5.12",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.12.tar.gz"
+          "version": "3.5.21",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.21.tar.gz"
         }
       }
     },
@@ -6530,8 +6530,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.176.3",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.176.3.tar.gz"
+          "version": "5.15.180.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.180.1.tar.gz"
         }
       }
     },
@@ -8111,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.176.3",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.176.3.tar.gz"
+          "version": "5.15.180.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.180.1.tar.gz"
         }
       }
     },
@@ -8121,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.176.3",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.176.3.tar.gz"
+          "version": "5.15.180.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.180.1.tar.gz"
         }
       }
     },
@@ -8131,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.176.3",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.176.3.tar.gz"
+          "version": "5.15.180.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.180.1.tar.gz"
         }
       }
     },
@@ -8141,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.176.3",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.176.3.tar.gz"
+          "version": "5.15.180.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.180.1.tar.gz"
         }
       }
     },
@@ -21434,8 +21434,8 @@
         "type": "other",
         "other": {
           "name": "postfix",
-          "version": "3.7.0",
-          "downloadUrl": "ftp://ftp.porcupine.org/mirrors/postfix-release/official/postfix-3.7.0.tar.gz"
+          "version": "3.7.4",
+          "downloadUrl": "http://ftp.porcupine.org/mirrors/postfix-release/official/postfix-3.7.4.tar.gz"
         }
       }
     },

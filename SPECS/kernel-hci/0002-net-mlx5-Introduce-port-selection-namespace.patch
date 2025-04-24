@@ -189,10 +189,10 @@ diff --git a/include/linux/mlx5/fs.h b/include/linux/mlx5/fs.h
 index 0106c67e8ccb..259fcc168340 100644
 --- a/include/linux/mlx5/fs.h
 +++ b/include/linux/mlx5/fs.h
-@@ -83,6 +83,7 @@ enum mlx5_flow_namespace_type {
- 	MLX5_FLOW_NAMESPACE_RDMA_RX,
- 	MLX5_FLOW_NAMESPACE_RDMA_RX_KERNEL,
+@@ -85,6 +85,7 @@ enum mlx5_flow_namespace_type {
  	MLX5_FLOW_NAMESPACE_RDMA_TX,
+ 	MLX5_FLOW_NAMESPACE_RDMA_RX_COUNTERS,
+ 	MLX5_FLOW_NAMESPACE_RDMA_TX_COUNTERS,
 +	MLX5_FLOW_NAMESPACE_PORT_SEL,
  };
  
