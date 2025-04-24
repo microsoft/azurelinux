@@ -1,0 +1,45 @@
+From 8016287e3948765bbcbaee422d77f601faffa5d3 Mon Sep 17 00:00:00 2001
+From: Kavya Sree Kaitepalli <kkaitepalli@microsoft.com>
+Date: Thu, 17 Apr 2025 08:21:32 +0000
+Subject: [PATCH] replace fgrep with grep
+
+---
+ util/grub.d/10_linux.in     | 2 +-
+ util/grub.d/20_linux_xen.in | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index e8b01c0..ecdf723 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -290,7 +290,7 @@ while [ "x$list" != "x" ] ; do
+                 "single ${GRUB_CMDLINE_LINUX}"
+   fi
+ 
+-  list=`echo $list | tr ' ' '\n' | fgrep -vx "$linux" | tr '\n' ' '`
++  list=`echo $list | tr ' ' '\n' | grep -F -vx "$linux" | tr '\n' ' '`
+ done
+ 
+ # If at least one kernel was found, then we need to
+diff --git a/util/grub.d/20_linux_xen.in b/util/grub.d/20_linux_xen.in
+index 3b1f470..d1483ed 100644
+--- a/util/grub.d/20_linux_xen.in
++++ b/util/grub.d/20_linux_xen.in
+@@ -346,12 +346,12 @@ while [ "x${xen_list}" != "x" ] ; do
+ 		"single ${GRUB_CMDLINE_LINUX}" "${GRUB_CMDLINE_XEN}"
+ 	fi
+ 
+-	list=`echo $list | tr ' ' '\n' | fgrep -vx "$linux" | tr '\n' ' '`
++	list=`echo $list | tr ' ' '\n' | grep -F -vx "$linux" | tr '\n' ' '`
+     done
+     if [ x"$is_top_level" != xtrue ]; then
+ 	echo '	}'
+     fi
+-    xen_list=`echo $xen_list | tr ' ' '\n' | fgrep -vx "$current_xen" | tr '\n' ' '`
++    xen_list=`echo $xen_list | tr ' ' '\n' | grep -F -vx "$current_xen" | tr '\n' ' '`
+ done
+ 
+ # If at least one kernel was found, then we need to
+-- 
+2.45.3
+

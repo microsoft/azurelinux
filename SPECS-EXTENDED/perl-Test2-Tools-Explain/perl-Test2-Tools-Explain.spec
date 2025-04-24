@@ -1,6 +1,6 @@
 Name:		perl-Test2-Tools-Explain
 Version:	0.02
-Release:	4%{?dist}
+Release:	5%{?dist}
 Summary:	Explain tools for the Perl Test2 framework
 License:	Artistic 2.0
 Vendor:         Microsoft Corporation
@@ -23,7 +23,6 @@ BuildRequires:	perl(strict)
 BuildRequires:	perl(warnings)
 # Test Suite
 BuildRequires:	perl(Test2::Bundle::Extended)
-BuildRequires:	perl(Test::More)
 # Dependencies
 Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:	perl(Data::Dumper)
@@ -52,6 +51,10 @@ make test
 %{_mandir}/man3/Test2::Tools::Explain.3*
 
 %changelog
+* Tue Mar 25 2025 Akhila Guruju <v-guakhila@microsoft.com> - 0.02-5
+- Removed `BuildRequires: perl(Test::More)` to fix build.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.02-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
