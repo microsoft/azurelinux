@@ -21434,8 +21434,8 @@
         "type": "other",
         "other": {
           "name": "postfix",
-          "version": "3.7.0",
-          "downloadUrl": "ftp://ftp.porcupine.org/mirrors/postfix-release/official/postfix-3.7.0.tar.gz"
+          "version": "3.7.4",
+          "downloadUrl": "http://ftp.porcupine.org/mirrors/postfix-release/official/postfix-3.7.4.tar.gz"
         }
       }
     },
