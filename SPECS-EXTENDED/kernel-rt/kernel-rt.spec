@@ -77,8 +77,9 @@ Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
 Conflicts:      kernel
-Conflicts:      kernel-ipe
 Conflicts:      kernel-64k
+Conflicts:      kernel-ipe
+Conflicts:      kernel-lpg-innovate
 ExclusiveArch:  x86_64
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
