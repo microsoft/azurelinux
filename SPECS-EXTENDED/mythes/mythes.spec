@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 Name:      mythes
 Summary:   A thesaurus library
 Version:   1.2.5
-Release:   8%{?dist}
+Release:   7%{?dist}
 Source:    https://github.com/hunspell/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 URL:       https://github.com/hunspell/mythes
 License:   BSD-3-Clause-Modification AND MIT
@@ -56,7 +56,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_datadir}/mythes
 %{_bindir}/th_gen_idx.pl
 
 %changelog
-* Mon Dec 30 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.2.5-8
+* Mon Dec 30 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.2.5-7
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
