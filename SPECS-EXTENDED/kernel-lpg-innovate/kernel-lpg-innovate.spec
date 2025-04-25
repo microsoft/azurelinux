@@ -76,6 +76,10 @@ Requires:       kmod
 Requires:       %{name}-grub
 Requires(post): coreutils
 Requires(postun): coreutils
+Conflicts:      kernel
+Conflicts:      kernel-64k
+Conflicts:      kernel-ipe
+Conflicts:      kernel-rt
 %{?grub2_configuration_requires}
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
