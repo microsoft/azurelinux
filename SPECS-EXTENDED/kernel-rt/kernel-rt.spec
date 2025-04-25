@@ -24,7 +24,7 @@
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
 Version:        6.6.85.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,10 +37,11 @@ Source3:        cbl-mariner-ca-20211013.pem
 Source4:        cpupower
 Source5:        cpupower.service
 
+Patch0:         revert-to-upstream-8250_port.c.patch
 # When updating, make sure to grab the matching patch from
 # https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/
 # Also, remember to bump the global rt_version macro above ^
-Patch0:         patch-%{version_upstream}-%{rt_version}.patch
+Patch1:         patch-%{version_upstream}-%{rt_version}.patch
 
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -414,6 +415,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Apr 25 2025 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.85.1-2
+- Add revert-to-upstream-8250_port.c.patch
+
 * Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.85.1-1
 - Auto-upgrade to 6.6.85.1
 
