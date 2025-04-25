@@ -321,7 +321,7 @@ rm -fr %{buildroot}%{_docdir}/%{name}
 %endif
 
 %changelog
-* Wed Feb 05 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.8.2-14
+* Wed Feb 05 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.8.2-15
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License Verified
 
