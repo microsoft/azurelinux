@@ -13502,8 +13502,8 @@
         "type": "other",
         "other": {
           "name": "mod_http2",
-          "version": "1.15.14",
-          "downloadUrl": "https://github.com/icing/mod_h2/releases/download/v1.15.14/mod_http2-1.15.14.tar.gz"
+          "version": "2.0.29",
+          "downloadUrl": "https://github.com/icing/mod_h2/releases/download/v2.0.29/mod_http2-2.0.29.tar.gz"
         }
       }
     },
