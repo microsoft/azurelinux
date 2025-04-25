@@ -30,7 +30,7 @@
 # SOFTWARE.
 #
 
-%global last-known-kernel 6.6.85.1-1
+%global last-known-kernel 6.6.85.1-2
 
 %{!?_name: %define _name fwctl}
 %{!?_version: %define _version 24.10}
@@ -67,7 +67,7 @@
 Summary:	 %{_name} Driver
 Name:		 fwctl
 Version:	 24.10
-Release:	 15%{?dist}
+Release:	 16%{?dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
@@ -250,6 +250,9 @@ fi # 1 : closed
 %endif
 
 %changelog
+* Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 24.10-16
+- Bump release to rebuild for new kernel release
+
 * Tue Apr 08 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-15
 - Bump release to match "signed" spec changes.
 

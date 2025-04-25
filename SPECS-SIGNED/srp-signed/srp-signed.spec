@@ -43,7 +43,7 @@
 Summary:	 srp driver
 Name:		 %{_name}-signed
 Version:	 24.10
-Release:	 15%{?dist}
+Release:	 16%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -106,6 +106,9 @@ popd
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 24.10-16
+- Bump release to rebuild for new kernel release
+
 * Tue Apr 08 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-15
 - Re-naming the package to de-duplicate the SRPM name.
 
