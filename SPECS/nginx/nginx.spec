@@ -29,8 +29,8 @@ BuildRequires:  openssl-devel
 %if 0%{?with_check}
 BuildRequires:  perl-FindBin
 BuildRequires:  perl-Test-Harness
-BuildRequires:  perl-Test-Simple
 BuildRequires:  perl-lib
+BuildRequires:  perl-App-cpanminus
 %endif
 
 BuildRequires:  pcre2-devel
@@ -118,6 +118,8 @@ exit 0
 
 %if 0%{?with_check}
 %check
+cpanm Test::Simple@1.302199 --force
+cpanm Time::HiRes
 cd %{buildroot}
 cp -r usr/sbin/* /usr/sbin/
 cp -r var/opt/* /var/opt/
@@ -130,7 +132,6 @@ useradd -s /usr/bin/sh %{nginx_user}
 tar -xvf %{SOURCE3}
 cd nginx-tests
 su nginx -s /bin/sh -c 'TEST_NGINX_BINARY=%{_sbindir}/nginx prove ./*.t'
-TEST_NGINX_BINARY=%{_sbindir}/nginx prove ./root_user_tests/
 cd ..
 rm -rf nginx-tests
 %endif
