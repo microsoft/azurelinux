@@ -23,7 +23,11 @@ Summary:        Influx data language
 Name:           flux
 Version:        0.194.5
 <<<<<<< HEAD
+<<<<<<< HEAD
 Release:        4%{?dist}
+=======
+Release:        2%{?dist}
+>>>>>>> 952c63336 (flux: patch CVE-2024-43806 (#11979))
 =======
 Release:        2%{?dist}
 >>>>>>> 952c63336 (flux: patch CVE-2024-43806 (#11979))
@@ -92,7 +96,11 @@ install -D %{SOURCE2} .cargo/config
 
 patch -p2 < %{PATCH1}
 <<<<<<< HEAD
+<<<<<<< HEAD
 patch -p2 < %{PATCH4}
+=======
+patch -p2 < %{PATCH3}
+>>>>>>> 952c63336 (flux: patch CVE-2024-43806 (#11979))
 =======
 patch -p2 < %{PATCH3}
 >>>>>>> 952c63336 (flux: patch CVE-2024-43806 (#11979))
@@ -161,6 +169,7 @@ RUSTFLAGS=%{rustflags} cargo test --release
 
 %changelog
 <<<<<<< HEAD
+<<<<<<< HEAD
 * Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 0.194.5-4
 - Pin rust version
 
@@ -169,6 +178,8 @@ RUSTFLAGS=%{rustflags} cargo test --release
 - Fix build warnings rather than suppressing them.
 - Fix test build error on arm64.
 
+=======
+>>>>>>> 952c63336 (flux: patch CVE-2024-43806 (#11979))
 =======
 >>>>>>> 952c63336 (flux: patch CVE-2024-43806 (#11979))
 * Fri Jan 17 2025 Archana Choudhary <archana1@microsoft.com> - 0.194.5-2
