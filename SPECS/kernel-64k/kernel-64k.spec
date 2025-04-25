@@ -74,6 +74,7 @@ Requires(post): coreutils
 Requires(postun): coreutils
 Conflicts:      kernel
 Conflicts:      kernel-ipe
+Conflicts:      kernel-lpg-innovate
 Conflicts:      kernel-rt
 %{?grub2_configuration_requires}
 # When updating the config files it is important to sanitize them.
