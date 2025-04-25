@@ -22,7 +22,11 @@
 Summary:        Influx data language
 Name:           flux
 Version:        0.194.5
+<<<<<<< HEAD
 Release:        4%{?dist}
+=======
+Release:        2%{?dist}
+>>>>>>> 952c63336 (flux: patch CVE-2024-43806 (#11979))
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,11 +44,17 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        cargo_config
 Patch1:         disable-static-library.patch
+<<<<<<< HEAD
 # Fixed upstream in 1.195.0, https://github.com/influxdata/flux/pull/5484.
 Patch2:         fix-build-warnings.patch
 Patch3:         fix-unsigned-char.patch
 Patch4:         CVE-2024-43806.patch
 BuildRequires:  cargo < 1.85.0
+=======
+Patch2:         0001-libflux-unblock-build-by-allowing-warnings.patch
+Patch3:         CVE-2024-43806.patch
+BuildRequires:  cargo >= 1.45
+>>>>>>> 952c63336 (flux: patch CVE-2024-43806 (#11979))
 BuildRequires:  kernel-headers
 BuildRequires:  rust < 1.85.0
 
@@ -81,7 +91,11 @@ tar -xf %{SOURCE1}
 install -D %{SOURCE2} .cargo/config
 
 patch -p2 < %{PATCH1}
+<<<<<<< HEAD
 patch -p2 < %{PATCH4}
+=======
+patch -p2 < %{PATCH3}
+>>>>>>> 952c63336 (flux: patch CVE-2024-43806 (#11979))
 patch -p2 <<EOF
 --- a/libflux/flux/build.rs
 +++ b/libflux/flux/build.rs
@@ -146,6 +160,7 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %{_includedir}/influxdata/flux.h
 
 %changelog
+<<<<<<< HEAD
 * Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 0.194.5-4
 - Pin rust version
 
@@ -154,6 +169,8 @@ RUSTFLAGS=%{rustflags} cargo test --release
 - Fix build warnings rather than suppressing them.
 - Fix test build error on arm64.
 
+=======
+>>>>>>> 952c63336 (flux: patch CVE-2024-43806 (#11979))
 * Fri Jan 17 2025 Archana Choudhary <archana1@microsoft.com> - 0.194.5-2
 - Patch for CVE-2024-43806
 
