@@ -9,8 +9,6 @@ URL:            https://github.com/mikefarah/yq
 Source:         https://github.com/mikefarah/yq/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
 BuildRequires:  golang
-BuildRequires:  git
-Requires:       git
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
  
@@ -42,5 +40,5 @@ bash ./scripts/acceptance.sh
 
 %changelog
 * Mon Mar 17 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 4.45.1-1
-- Initial Azure Linux import from Fedora 42 (license: MIT).
+- Latest version imported
 - License verified
