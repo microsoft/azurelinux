@@ -1,6 +1,6 @@
 Name:           perl-Test-Without-Module
 Version:        0.23
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Test fallback behavior in absence of modules
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -23,6 +23,7 @@ BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(File::Find)
 BuildRequires:  perl(Symbol)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Module::Load::Conditional)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %{?perl_default_filter}
@@ -54,6 +55,9 @@ make test
 %{_mandir}/man3/Test*
 
 %changelog
+* Tue Apr 22 2025 Riken Maharjan <rmaharjan@microsoft.com> - 0.23-2
+- Add missing check dependencies.
+
 * Wed Aug 28 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.23-1
 - Promote package to Core repository.
 - License verified.
