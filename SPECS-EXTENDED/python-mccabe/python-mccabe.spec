@@ -1,63 +1,65 @@
-%global modname mccabe
-
 Summary:        McCabe complexity checker
-Name:           python-%{modname}
-Version:        0.6.1
-Release:        18%{?dist}
+Name:           python-mccabe
+Version:        0.7.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://pypi.python.org/pypi/mccabe
-Source0:        https://files.pythonhosted.org/packages/source/m/%{modname}/%{modname}-%{version}.tar.gz#/python-%{modname}-%{version}.tar.gz
+Source:         %{pypi_source mccabe}
+BuildArch:          noarch
+BuildRequires:      python3-pip
+BuildRequires:      python3-wheel
+BuildRequires:      python3-devel
+BuildRequires:      python3-hypothesmith
+BuildRequires:      python3-pytest
+BuildRequires:      python3-pytest-runner
+BuildRequires:      python3-hypothesis
+BuildRequires:      python3-sortedcontainers
+BuildRequires:      python3-setuptools
 
-BuildArch:      noarch
-
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-pytest
-BuildRequires:  python%{python3_pkgversion}-pytest-runner
-BuildRequires:  python%{python3_pkgversion}-setuptools
-
-%if 0%{?with_check}
-BuildRequires:  python3-pip
-%endif
-
-%description
+%global _description %{expand:
 Ned's script to check McCabe complexity.
 
 This module provides a plugin for flake8, the Python code
-checker.
+checker.}
 
-%package -n python%{python3_pkgversion}-%{modname}
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{modname}}
-Summary:        McCabe checker, plugin for flake8
+%description %_description
 
-%description -n python%{python3_pkgversion}-%{modname}
-Ned's script to check McCabe complexity.
 
-This module provides a plugin for flake8, the Python code
-checker.
+%package -n python%{python3_pkgversion}-mccabe
+Summary:            %{summary}
+
+%description -n python%{python3_pkgversion}-mccabe %_description
+
 
 %prep
-%autosetup -n %{modname}-%{version}
+%autosetup -p1 -n mccabe-%{version}
+
+
+%generate_buildrequires
+%pyproject_buildrequires
+
 
 %build
-%py3_build
+%pyproject_wheel
+
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files mccabe
 
 %check
-pip3 install pytest
-python3 -m pytest -v
+%pytest -v
 
-%files -n python%{python3_pkgversion}-%{modname}
-%license LICENSE
+%files -n python%{python3_pkgversion}-mccabe -f %{pyproject_files}
 %doc README.rst
-%{python3_sitelib}/%{modname}.py*
-%{python3_sitelib}/%{modname}-%{version}-*
-%{python3_sitelib}/__pycache__/%{modname}.*
 
 %changelog
+* Mon Apr 28 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.7.0-1
+- Update to version 0.7.0
+- License verified
+
 * Wed May 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.1-18
 - Bringing back removed BRs to fix package build.
 
