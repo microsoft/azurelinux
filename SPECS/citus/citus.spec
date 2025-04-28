@@ -2,7 +2,7 @@ Summary:	PostgreSQL-based distributed RDBMS
 Name:		citus
 Conflicts:	%{name}
 Version:	13.0.3
-Release:	1%{dist}
+Release:	1%{?dist}
 License:	AGPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -64,3 +64,4 @@ make %{?_smp_mflags}
 * Mon Apr 29 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 13.0.3-1
 - Original version for Azure Linux
 - Based on the spec file of citus packaging
+- License verified
