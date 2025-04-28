@@ -40,5 +40,5 @@ bash ./scripts/acceptance.sh
 
 %changelog
 * Mon Mar 17 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 4.45.1-1
-- Initial Azure Linux import from Azure license: MIT
+- Original version for Azure Linux
 - License verified
