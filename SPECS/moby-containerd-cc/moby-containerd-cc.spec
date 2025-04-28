@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.7
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -23,6 +23,7 @@ Patch4: CVE-2023-45288.patch
 Patch5: CVE-2024-24786.patch
 Patch6: CVE-2024-28180.patch
 Patch7: CVE-2025-27144.patch
+Patch8: CVE-2024-40635.patch
 
 %{?systemd_requires}
 
@@ -83,6 +84,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Wed Apr 16 2025 Manuel Huber <mahuber@microsoft.com> - 1.7.7-11
+- Fix CVE-2024-40635
+
 * Tue Apr 08 2025 Manuel Huber <mahuber@microsoft.com> - 1.7.7-10
 - Fix CVE-2025-27144 with an upstream patch
 
