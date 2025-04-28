@@ -39,7 +39,7 @@
 Summary:	 Cross-partition memory
 Name:		 xpmem
 Version:	 2.7.4
-Release:	 16%{?dist}
+Release:	 17%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -246,6 +246,9 @@ fi
 %endif
 
 %changelog
+* Mon Apr 28 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com>
+- Bump release to rebuild for new kernel release
+
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 2.7.4-16
 - Bump release to rebuild for new kernel release
 
