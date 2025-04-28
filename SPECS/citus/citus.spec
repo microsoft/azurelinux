@@ -6,7 +6,7 @@ Release:	1%{dist}
 License:	AGPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:	https://github.com/citusdata/%{name}/archive/v%{version}.tar.gz
+Source0:	https://github.com/citusdata/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 URL:		https://github.com/citusdata/%{name}
 BuildRequires:	postgresql-devel
 BuildRequires:	libcurl-devel
