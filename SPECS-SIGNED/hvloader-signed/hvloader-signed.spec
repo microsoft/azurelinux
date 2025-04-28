@@ -6,7 +6,7 @@
 Summary:        Signed HvLoader.efi for %{buildarch} systems
 Name:           hvloader-signed-%{buildarch}
 Version:        1.0.1
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -69,6 +69,9 @@ popd
 /boot/efi/HvLoader.efi
 
 %changelog
+* Fri Apr 25 2025 Mayank Singh <mayansingh@microsoft.com> - 1.0.1-11
+- Bump release for consistency with hvloader spec.
+
 * Wed Mar 26 2025 Tobias Brick <tobiasb@microsoft.com> - 1.0.1-10
 - Bump release for consistency with hvloader spec.
 
