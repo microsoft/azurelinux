@@ -61,6 +61,6 @@ make %{?_smp_mflags}
 %doc %{_docdir}/postgresql/extension/NOTICE-%{name}
 
 %changelog
-* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.7-1
-- Initial import for Azure Linux from Azure
+* Mon Apr 29 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 13.0.3-1
+- Original version for Azure Linux
 - Based on the spec file of citus packaging

@@ -2246,6 +2246,7 @@
                 "cert-manager",
                 "cf-cli",
                 "check-restart",
+                "citus",
                 "clamav",
                 "cloud-hypervisor-cvm",
                 "cloud-provider-kubevirt",
