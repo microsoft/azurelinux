@@ -1,6 +1,6 @@
 %global project_version_major 5
 %global project_version_minor 1
-%global project_version_patch 11
+%global project_version_patch 17
 # ========== versions of dependencies ==========
 %global libmodulemd_version 2.5.0
 %global librepo_version 1.15.0
@@ -177,6 +177,7 @@ It supports RPM packages, modulemd modules, and comps groups & environments.
 
 %files
 %{_bindir}/dnf5
+%{_bindir}/dnf-automatic
 
 %dir %{_sysconfdir}/dnf/dnf5-aliases.d
 %doc %{_sysconfdir}/dnf/dnf5-aliases.d/README
@@ -190,6 +191,14 @@ It supports RPM packages, modulemd modules, and comps groups & environments.
 %dir %{_datadir}/bash-completion/
 %dir %{_datadir}/bash-completion/completions/
 %{_datadir}/bash-completion/completions/dnf5
+
+# Add the systemd service and timer files
+%{_unitdir}/dnf-automatic.service
+%{_unitdir}/dnf-automatic.timer
+%{_unitdir}/dnf5-automatic.service
+%{_unitdir}/dnf5-automatic.timer
+%{_unitdir}/dnf5-offline-transaction-cleanup.service
+%{_unitdir}/dnf5-offline-transaction.service
 %dir %{_libdir}/sysimage/dnf
 %verify(not md5 size mtime) %ghost %{_libdir}/sysimage/dnf/*
 %license COPYING.md
@@ -674,6 +683,9 @@ done
 
 
 %changelog
+* Mon Apr 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 5.1.17-1
+- Update to 5.1.17 for CVE-2024-1929, CVE-2024-1930, CVE-2024-2746
+
 * Wed Jan 31 2024 Sam Meluch <sammeluch@microsoft.com> - 5.1.11-1
 - Update to version 5.1.11
 - Merge spec from upstream dnf5 repo
