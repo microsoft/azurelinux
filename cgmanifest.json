@@ -14581,16 +14581,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "nvmetcli",
-          "version": "0.4",
-          "downloadUrl": "ftp://ftp.infradead.org/pub/nvmetcli/nvmetcli-0.4.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "nvml",
           "version": "2.0.1",
           "downloadUrl": "https://github.com/pmem/pmdk/releases/download/2.0.1/pmdk-2.0.1.tar.gz"
