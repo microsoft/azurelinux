@@ -1,4 +1,4 @@
-From 22f8732d1891a257964359408d35b818080269b6 Mon Sep 17 00:00:00 2001
+From 90fc635807dd23c2015358cc6cf3126e12bdacdc Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Tue, 29 Oct 2024 14:08:32 -0700
 Subject: [PATCH] dnf5 repo snapshot
@@ -12,9 +12,9 @@ Subject: [PATCH] dnf5 repo snapshot
  libdnf5/CMakeLists.txt                        |   2 +-
  libdnf5/conf/config_main.cpp                  |  13 +
  libdnf5/repo/config_repo.cpp                  |  13 +
- libdnf5/repo/solv_repo.cpp                    | 399 +++++++++++++++++-
+ libdnf5/repo/solv_repo.cpp                    | 387 +++++++++++++++++-
  libdnf5/repo/solv_repo.hpp                    |  23 +-
- 10 files changed, 496 insertions(+), 9 deletions(-)
+ 10 files changed, 484 insertions(+), 9 deletions(-)
 
 diff --git a/dnf5/config/usr/share/dnf5/aliases.d/compatibility.conf b/dnf5/config/usr/share/dnf5/aliases.d/compatibility.conf
 index e0776f29..e746efb8 100644
@@ -216,7 +216,7 @@ index 94c1b8c4..5f1396eb 100644
  std::string ConfigRepo::get_unique_id() const {
      std::string tmp;
 diff --git a/libdnf5/repo/solv_repo.cpp b/libdnf5/repo/solv_repo.cpp
-index 54dba3eb..90db4a0e 100644
+index 54dba3eb..20daac3c 100644
 --- a/libdnf5/repo/solv_repo.cpp
 +++ b/libdnf5/repo/solv_repo.cpp
 @@ -30,6 +30,7 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
@@ -235,16 +235,14 @@ index 54dba3eb..90db4a0e 100644
  }
  
  
-@@ -167,6 +169,366 @@ void checksum_calc(unsigned char * out, fs::File & file) {
+@@ -167,6 +169,354 @@ void checksum_calc(unsigned char * out, fs::File & file) {
  }
  
  
 +//#### XML FILTER CODE ####
-+/***
-+* Copy the nonXmlFormattedString to a formatted xmlString
-+* all '&', '<', and '>' characters will be replaced with the xml escape
-+* character versions of each in line.
-+***/
++// Copy the nonXmlFormattedString to a formatted xmlString
++// all '&', '<', and '>' characters will be replaced with the xml escape
++// character versions of each in line.
 +std::string escapeForXml(const std::string_view& nonXmlString) {
 +    const char * amp = "&amp;";
 +    const char * gt = "&gt;";
@@ -252,7 +250,7 @@ index 54dba3eb..90db4a0e 100644
 +
 +    std::string xmlString;
 +
-+    // Loop through string to lint looking for chars in need of escaping    
++    // Loop through string to lint looking for chars in need of escaping
 +    for(auto it=nonXmlString.cbegin(); it!=nonXmlString.cend(); ++it) {
 +        // check current char for escape character
 +        switch (*it) {
@@ -268,17 +266,14 @@ index 54dba3eb..90db4a0e 100644
 +            default:
 +                xmlString+=*it;
 +
-+        }        
++        }
 +    }
 +    return xmlString;
 +}
 +
-+/***
-+* allocate a new buffer to location pszElementBuffer of the size
-+* nElementBufferMax or greater (in the case resizing is needed).
-+* a formatted start element with the name and attrs specified will be
-+* placed in the newly allocated buffer.
-+***/
++// Function to recompose start elements of snapshot repo xml files
++// Adds name and all attributes to the start element being constructed, returns a string
++// containing the xml element
 +std::string composeStartElement(const std::string_view& name, const XML_Char **ppAttrs) {
 +    std::string element;
 +
@@ -295,21 +290,21 @@ index 54dba3eb..90db4a0e 100644
 +        element+="=\"";
 +        element+=escapeForXml( *pCurrAttr );
 +        element+="\"";
-+        ++pCurrAttr;        
++        ++pCurrAttr;
 +    }
 +
-+    element+=">";  
++    element+=">";
 +
-+    return element;  
++    return element;
 +}
 +
-+/***
-+ * 
-+ ***/
++// Function to recompose end elements of snapshot repo xml files
++// Adds name to the end element being constructed, returns a string
++// containing the xml element
 +std::string composeEndElement(const std::string_view& name) {
 +
 +    std::string element;
-+    
++
 +    element+="</";
 +    element+=name;
 +    element+=">";
@@ -317,33 +312,31 @@ index 54dba3eb..90db4a0e 100644
 +    return element;
 +}
 +
-+/***
-+ * 
-+ ***/
++// Function to compose and write start elements (with attributes) out to a file directly
 +void printElementStartToFile(std::ofstream& outStream, const std::string_view& name, const XML_Char **ppAttrs) {
 +
 +    std::string startElement = composeStartElement(name, ppAttrs);
 +    outStream.write(startElement.c_str(), startElement.length());
 +}
 +
-+/***
-+ * 
-+ ***/
++// Function to compose and write end elements out to a file directly
 +void printElementEndToFile(std::ofstream& outStream, const std::string_view& name) {
-+    
++
 +    std::string endElement = composeEndElement(name);
 +    outStream.write(endElement.c_str(), endElement.length());
 +}
 +
-+/***
-+ * 
-+ ***/
++// expat callback to process new start elements in reop xmls
++// On a new start element, the time element being used to keep or remove a given
++// package needs to be found and determined if it is within the snapshot. If already found
++// the determinatation is cached on userData, and otherwise the previous elements will be
++// added to a temporary cache until the time element is found.
 +void FilterStartCallback(void * userData, const XML_Char *name, const XML_Char **ppAttrs){
 +    XMLFilterData * pTracking = static_cast<XMLFilterData*>(userData);
 +
 +    try
-+    {               
-+        std::string newLine; 
++    {
++        std::string newLine;
 +        if (pTracking->nPrevElement != 0) {
 +            newLine += "\n";
 +        }
@@ -360,7 +353,6 @@ index 54dba3eb..90db4a0e 100644
 +
 +            // already found/checked time
 +            if (pTracking->nTimeFound && pTracking->nPrintPackage) {
-+                //outStream.write(newLine.c_str(), newLine.length());
 +                printElementStartToFile(outStream, name_sv, ppAttrs);
 +
 +            } else {  // still checking for time
@@ -389,7 +381,6 @@ index 54dba3eb..90db4a0e 100644
 +                    if (pTracking->nPrintPackage) {
 +                        // print buffer when time is found
 +                        outStream.write(pTracking->elementBuffer.c_str(), pTracking->elementBuffer.length());
-+                        //outStream.write(newLine.c_str(), newLine.length());
 +                        printElementStartToFile(outStream, name_sv, ppAttrs);
 +                    }
 +                } else if (!pTracking->nTimeFound) {
@@ -397,12 +388,10 @@ index 54dba3eb..90db4a0e 100644
 +                    // add to file buffer
 +                    std::string startElement;
 +                    startElement = composeStartElement(name_sv, ppAttrs);
-+                    //startElement += "\n";
 +                    pTracking->elementBuffer += startElement;
 +                }
 +            }
 +        } else {  // not in a package or parsing a new package
-+            //outStream.write(newLine.c_str(), newLine.length());
 +            printElementStartToFile(outStream, name_sv, ppAttrs);
 +        }
 +    }
@@ -413,9 +402,9 @@ index 54dba3eb..90db4a0e 100644
 +    }
 +}
 +
-+/***
-+ * 
-+ ***/
++// expat end element callback function for repo snapshot parsing
++// userData contains information about the current package. On the end of
++// a package we need to clean up and reset the current package data to blank
 +void FilterEndCallback(void * userData, const XML_Char *name) {
 +
 +    // load tracking data
@@ -454,9 +443,10 @@ index 54dba3eb..90db4a0e 100644
 +    }
 +}
 +
-+/***
-+ * 
-+ ***/
++// expat character data handler for parsing desciptions and other element content
++// Some elements have data inbetween the start and end such as descriptions. The
++// data needs to have escape characters handled and be cached, output, or discarded
++// depending on the snapshot being applied.
 +void FilterCharDataHandler(void * userData, const XML_Char *pContent, int len) {
 +    // load tracking data
 +    XMLFilterData * pTracking = static_cast<XMLFilterData*>(userData);
@@ -484,9 +474,7 @@ index 54dba3eb..90db4a0e 100644
 +    }
 +}
 +
-+/***
-+ * 
-+ ***/
++// setup function for repo snapshot logic
 +bool SolvFilterFile(const std::string& inFilePath, const std::string& snapshotTime, std::string& outFilePath) {
 +    // vars
 +    const int XML_BUFSIZ=16*1024;
@@ -509,7 +497,7 @@ index 54dba3eb..90db4a0e 100644
 +    }
 +
 +    std::filesystem::path path(inFilePath);
-+    
++
 +    outFilePath = path.parent_path();
 +    outFilePath += "/";
 +    while (path.has_extension()) {
@@ -558,7 +546,7 @@ index 54dba3eb..90db4a0e 100644
 +        if (!pXMLParseBuffer) {
 +            std::cerr << "Couldn't allocate memory for buffer\n";
 +            filterContext.bParseError = true;
-+            break;       
++            break;
 +        }
 +
 +        // Read content into the buffer
@@ -571,7 +559,7 @@ index 54dba3eb..90db4a0e 100644
 +
 +        // Direct expat to process the buffer
 +        if (XML_ParseBuffer(pParser, static_cast<int>(bytes_read), bytes_read == 0) == XML_STATUS_ERROR) {
-+            std::cerr   << "Parse error at line " 
++            std::cerr   << "Parse error at line "
 +                        << XML_GetCurrentLineNumber(pParser)
 +                        << "\n"
 +                        << XML_ErrorString(XML_GetErrorCode(pParser));
@@ -602,7 +590,7 @@ index 54dba3eb..90db4a0e 100644
  static const char * repodata_type_to_name(RepodataType type) {
      switch (type) {
          case RepodataType::FILELISTS:
-@@ -236,6 +598,11 @@ SolvRepo::~SolvRepo() {
+@@ -236,6 +586,11 @@ SolvRepo::~SolvRepo() {
  void SolvRepo::load_repo_main(const std::string & repomd_fn, const std::string & primary_fn) {
      auto & logger = *base->get_logger();
      auto & pool = get_rpm_pool(base);
@@ -614,7 +602,7 @@ index 54dba3eb..90db4a0e 100644
  
      fs::File repomd_file(repomd_fn, "r");
  
-@@ -243,14 +610,25 @@ void SolvRepo::load_repo_main(const std::string & repomd_fn, const std::string &
+@@ -243,14 +598,25 @@ void SolvRepo::load_repo_main(const std::string & repomd_fn, const std::string &
  
      int solvables_start = pool->nsolvables;
  
@@ -627,7 +615,7 @@ index 54dba3eb..90db4a0e 100644
 +        if (SolvFilterFile(primary_fn, snapshot_time, primary_snapshot_fn)) {
 +            printf("snapshot filter failure\n");
 +        }
-+        
++
 +    } else {
 +        if (load_solv_cache(pool, nullptr, 0)) {
 +            main_solvables_start = solvables_start;
@@ -645,7 +633,7 @@ index 54dba3eb..90db4a0e 100644
  
      logger.debug("Loading repomd and primary for repo \"{}\"", config.get_id());
      if (repo_add_repomdxml(repo, repomd_file.get(), 0) != 0) {
-@@ -265,14 +643,14 @@ void SolvRepo::load_repo_main(const std::string & repomd_fn, const std::string &
+@@ -265,14 +631,14 @@ void SolvRepo::load_repo_main(const std::string & repomd_fn, const std::string &
          throw SolvError(
              M_("Failed to load primary for repo \"{}\" from \"{}\": {}."),
              config.get_id(),
@@ -662,7 +650,7 @@ index 54dba3eb..90db4a0e 100644
          write_main(true);
      }
  }
-@@ -533,6 +911,13 @@ void SolvRepo::write_main(bool load_after_write) {
+@@ -533,6 +899,13 @@ void SolvRepo::write_main(bool load_after_write) {
      auto & logger = *base->get_logger();
      auto & pool = get_rpm_pool(base);
  
