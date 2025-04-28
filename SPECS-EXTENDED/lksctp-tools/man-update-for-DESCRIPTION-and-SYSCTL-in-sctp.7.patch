@@ -1,0 +1,53 @@
+From 90ef63cd633388b0b0487fee11885f4d2a6bcc8f Mon Sep 17 00:00:00 2001
+From: Xin Long <lucien.xin@gmail.com>
+Date: Wed, 22 Feb 2023 20:24:59 -0500
+Subject: [PATCH 2/6] man: update for DESCRIPTION and SYSCTL in sctp.7
+
+Update some out-of-date infomation in DESCRIPTION and SYSCTL
+parts in sctp.7.
+
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ man/sctp.7 | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/man/sctp.7 b/man/sctp.7
+index 50b551e..c19c2b7 100644
+--- a/man/sctp.7
++++ b/man/sctp.7
+@@ -18,9 +18,9 @@ sctp \- SCTP protocol.
+ .B sctp_socket = socket(PF_INET, SOCK_SEQPACKET, IPPROTO_SCTP);
+ .fi
+ .SH DESCRIPTION
+-This is an implementation of the SCTP protocol as defined in RFC2960 and
+-RFC3309. It is a message oriented, reliable transport protocol with direct
+-support for multihoming that runs on top of 
++This is an implementation of the SCTP protocol as defined in RFC4960. It is
++a message oriented, reliable transport protocol with direct support for
++multihoming that runs on top of
+ .BR ip (7),
+ and supports both v4 and v6 versions.
+ .PP
+@@ -32,8 +32,8 @@ data is achieved by using checksums and sequence numbers. A selective
+ retransmission mechanism is applied to correct loss or corruption of data.
+ .PP
+ This implementation supports a mapping of SCTP into sockets API as defined
+-in the draft-ietf-tsvwg-sctpsocket-10.txt(Sockets API extensions for SCTP).
+-Two styles of interfaces are supported.
++in the RFC6458(Sockets API extensions for SCTP). Two styles of interfaces
++are supported.
+ .PP
+ A 
+ .B one-to-many
+@@ -111,7 +111,7 @@ files or with the
+ interface.  In addition, most IP sysctls also apply to SCTP. See
+ .BR ip (7). 
+ .TP
+-Please check kernel documentation for this, at Documentation/networking/ip-sysctl.txt.
++Please check kernel documentation for this, at Documentation/networking/ip-sysctl.rst.
+ .SH "STATISTICS"
+ These variables can be accessed by the 
+ .B /proc/net/sctp/* 
+-- 
+2.39.1
+

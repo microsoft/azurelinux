@@ -5,7 +5,7 @@
 Name:           cloud-hypervisor-cvm
 Summary:        Cloud Hypervisor CVM is an open source Virtual Machine Monitor (VMM) that enables running SEV SNP enabled VMs on top of MSHV using the IGVM file format as payload.
 Version:        38.0.72.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,8 +40,8 @@ BuildRequires:  glibc-devel
 BuildRequires:  openssl-devel
 
 %if ! 0%{?using_rustup}
-BuildRequires:  rust >= 1.62.0
-BuildRequires:  cargo >= 1.62.0
+BuildRequires:  rust < 1.85.0
+BuildRequires:  cargo < 1.85.0
 %endif
 
 Requires: bash
@@ -148,6 +148,9 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 %license LICENSE-BSD-3-Clause
 
 %changelog
+* Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 38.0.72.2-4
+- Pin rust version
+
 * Sun Feb 16 2025 Kanishk Bansal <kanbansal@microsoft.com> - 38.0.72.2-3
 - Patch CVE-2024-12797
 

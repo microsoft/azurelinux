@@ -4,16 +4,14 @@
 %bcond_without perl_Term_Table_enables_unicode
 
 Name:           perl-Term-Table
-Version:        0.015
-Release:        4%{?dist}
+Version:        0.024
+Release:        1%{?dist}
 Summary:        Format a header and rows into a table
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Term-Table
 Source0:        https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Term-Table-%{version}.tar.gz#/perl-Term-Table-%{version}.tar.gz
-# Unbundle Object::HashBase
-Patch0:         Term-Table-0.015-Use-system-Object-HashBase.patch
 BuildArch:      noarch
 BuildRequires:  make
 BuildRequires:  perl-generators
@@ -25,9 +23,7 @@ BuildRequires:  perl(warnings)
 # Run-time:
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Config)
-BuildRequires:  perl(Importer) >= 0.024
 BuildRequires:  perl(List::Util)
-BuildRequires:  perl(Object::HashBase) >= 0.008
 BuildRequires:  perl(Scalar::Util)
 # Optional run-time:
 %if %{with perl_Term_Table_enables_terminal}
@@ -42,10 +38,7 @@ BuildRequires:  perl(Unicode::GCString) >= 2013.10
 BuildRequires:  perl(base)
 BuildRequires:  perl(Test2::API)
 BuildRequires:  perl(Test2::Tools::Tiny) >= 1.302097
-BuildRequires:  perl(Test::More)
 BuildRequires:  perl(utf8)
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:       perl(Importer) >= 0.024
 %if %{with perl_Term_Table_enables_terminal}
 Suggests:       perl(Term::ReadKey) >= 2.32
 # Prefer Term::Size::Any over Term::ReadKey
@@ -55,19 +48,28 @@ Recommends:     perl(Term::Size::Any) >= 0.002
 Recommends:     perl(Unicode::GCString) >= 2013.10
 %endif
 
-# Remove under-specified dependencies
-%global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}^perl\\(Importer\\)$
+# Remove private test modules
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(main::HBase|main::HBase::Wrapped\\)$
 
 %description
 This Perl module is able to format rows of data into tables.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n Term-Table-%{version}
-%patch 0 -p1
-# Delete bundled Object::HashBase
-for F in lib/Term/Table/HashBase.pm t/HashBase.t; do
-    perl -e 'unlink $ARGV[0] or die $!' "$F"
-    perl -i -s -ne 'print $_ unless m{\A\Q$file\E\b}' -- -file="$F" MANIFEST
+# XXX Don't unbundle Term::Table::HashBase, the module is in Perl Core.
+# Help generators to recognize Perl scripts
+for F in t/*.t t/Table/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!\s*perl}{$Config{startperl}}' "$F"
+    chmod +x "$F"
 done
 
 %build
@@ -76,7 +78,15 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 
 %install
 %{make_install}
-%{_fixperms} $RPM_BUILD_ROOT/*
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+cd %{_libexecdir}/%{name} && exec prove -r -I . -j "$(getconf _NPROCESSORS_ONLN)"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
+%{_fixperms} %{buildroot}/*
 
 %check
 unset TABLE_TERM_SIZE
@@ -88,7 +98,14 @@ make test
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
+%files tests
+%{_libexecdir}/%{name}
+
 %changelog
+* Mon Mar 17 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.024-1
+- Update to version 0.024
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.015-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
