@@ -1,0 +1,535 @@
+From df0cd18b5d81a7f8c661e6e565e5e35e00fbb9d8 Mon Sep 17 00:00:00 2001
+From: Xin Long <lucien.xin@gmail.com>
+Date: Mon, 27 Feb 2023 17:57:20 -0500
+Subject: [PATCH 5/6] man: add the missing options in SOCKET OPTIONS in sctp.7
+
+There are a lot of options missing in in SOCKET OPTIONS in sctp.7,
+and this patch adds them all.
+
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ man/sctp.7 | 508 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 508 insertions(+)
+
+diff --git a/man/sctp.7 b/man/sctp.7
+index 7756dda..01bff6f 100644
+--- a/man/sctp.7
++++ b/man/sctp.7
+@@ -431,6 +431,514 @@ SACKs sent and received, SCTP packets sent and received.
+ 
+ The parameter type is struct sctp_assoc_stats, for reading only.
+ sas_assoc_id is a specified assoc_id.
++.TP
++.B SCTP_DELAYED_ACK, SCTP_DELAYED_ACK_TIME, SCTP_DELAYED_SACK
++These options will affect the way delayed SACKs are performed. They allow
++the application to get or set the delayed SACK time, in milliseconds, and
++also allow changing the delayed SACK frequency. Changing the frequency
++to 1 disables the delayed SACK algorithm. Note that if sack_delay or
++sack_freq is 0 when setting this option, the current values will remain
++unchanged.
++
++The parameter type is struct sctp_sack_info. For reading, sack_assoc_id is
++a specified assoc_id or SCTP_FUTURE_ASSOC. For writing, sack_assoc_id is a
++specified assoc_id or SCTP_{FUTURE|CURRENT|ALL}_ASSOC.
++
++Default: sackdelay=sysctl_net.sctp.sack_timeout,sackfreq=2.
++.TP
++.B SCTP_CONTEXT
++This option allows the setting, on an association basis, of a default
++context that will be received on reading messages from the peer.
++This is especially helpful for an application when using one-to-many
++style sockets to keep some reference to an internal state machine that
++is processing messages on the association.  Note that the setting of
++this value only affects received messages from the peer and does not
++affect the value that is saved with outbound messages.
++
++The parameter type is struct sctp_assoc_value. For reading, assoc_id
++is a specified assoc_id or SCTP_FUTURE_ASSOC. For writing, assoc_id
++is a specified assoc_id or SCTP_{FUTURE|CURRENT|ALL}_ASSOC.
++
++Default: 0.
++.TP
++.B SCTP_FRAGMENT_INTERLEAVE
++Fragmented interleave controls how the presentation of messages
++occurs for the message receiver. There are three levels of fragment
++interleave defined: level 0: SCTP_FRAGMENT_INTERLEAVE = 0; level 1:
++SCTP_FRAGMENT_INTERLEAVE = 1; level 2: SCTP_FRAGMENT_INTERLEAVE = 1
++& SCTP_INTERLEAVING_SUPPORTED = 1.
++
++The parameter type is int boolean, for reading and writing.
++
++Default: 0.
++.TP
++.B SCTP_PARTIAL_DELIVERY_POINT
++This option will set or get the SCTP partial delivery point.  This
++point is the size of a message where the partial delivery API will be
++invoked to help free up rwnd space for the peer.  Setting this to a
++lower value will cause partial deliveries to happen more often.  This
++option expects an integer that sets or gets the partial delivery
++point in bytes.  Note also that the call will fail if the user
++attempts to set this value larger than the socket receive buffer
++size. Note that any single message having a length smaller than or equal
++to the SCTP partial delivery point will be delivered in a single read
++call as long as the user-provided buffer is large enough to hold the
++message.
++
++The parameter type is uint32_t, for reading and writing.
++
++Default: 0.
++.TP
++.B SCTP_MAX_BURST
++This option will allow a user to change the maximum burst of packets
++that can be emitted by this association.
++
++The parameter type is struct sctp_assoc_value. For reading, assoc_id
++is a specified assoc_id or SCTP_FUTURE_ASSOC. For writing, assoc_id
++is a specified assoc_id or SCTP_{FUTURE|CURRENT|ALL}_ASSOC.
++
++Default: sysctl_net.sctp.max_burst.
++.TP
++.B SCTP_AUTH_CHUNK
++This option adds a chunk type that the user is requesting to be received
++only in an authenticated way, and it only affects the future associations.
++
++The parameter type is struct sauth_chunk, for writing only.
++
++Default: no chunks.
++Require: SCTP_AUTH_SUPPORTED.
++RFC: RFC4895.
++.TP
++.B SCTP_HMAC_IDENT
++This option gets or sets the list of Hashed Message Authentication
++Code (HMAC) algorithms that the local endpoint requires the peer
++to use.
++
++The parameter type is struct sctp_hmacalgo, for reading and writing.
++shmac_idents can include SCTP_AUTH_HMAC_ID_{SHA1|SHA256}.
++
++Default: SCTP_AUTH_HMAC_ID_SHA1.
++Require: SCTP_AUTH_SUPPORTED.
++.TP
++.B SCTP_AUTH_KEY
++This option will set a shared secret key that is used to build an
++association shared key.
++
++The parameter type is struct sctp_authkey, for writing only. sca_assoc_id
++is a specified assoc_id or SCTP_{FUTURE|CURRENT|ALL}_ASSOC.
++
++Default: null_key.
++Require: SCTP_AUTH_SUPPORTED.
++.TP
++.B SCTP_AUTH_ACTIVE_KEY
++This option will get or set the active shared key to be used to build
++the association shared key.
++
++The parameter type is struct sctp_authkeyid, for writing only.
++scact_assoc_id is a specified assoc_id or
++SCTP_{FUTURE|CURRENT|ALL}_ASSOC.
++
++Default: 0.
++Require: SCTP_AUTH_SUPPORTED.
++.TP
++.B SCTP_AUTH_DEACTIVATE_KEY
++This set option indicates that the application will no longer send
++user messages using the indicated key identifier.
++
++The parameter type is struct sctp_authkeyid, for writing only.
++scact_assoc_id is a specified assoc_id or
++SCTP_{FUTURE|CURRENT|ALL}_ASSOC.
++
++Require: SCTP_AUTH_SUPPORTED.
++.TP
++.B SCTP_AUTH_DELETE_KEY
++This set option will delete an SCTP association's shared secret key
++that has been deactivated.
++
++The parameter type is struct sctp_authkeyid, for writing only.
++scact_assoc_id is a specified assoc_id or
++SCTP_{FUTURE|CURRENT|ALL}_ASSOC.
++
++Require: SCTP_AUTH_SUPPORTED.
++.TP
++.B SCTP_PEER_AUTH_CHUNKS
++This option gets a list of chunk types for a specified association
++that the peer requires to be received authenticated only.
++
++The parameter type is struct sctp_authchunks, for reading only.
++gauth_assoc_id is a specified assoc_id.
++
++Require: SCTP_AUTH_SUPPORTED.
++.TP
++.B SCTP_LOCAL_AUTH_CHUNKS
++This option gets a list of chunk types for a specified association that
++the local endpoint requires to be received authenticated only.
++
++The parameter type is struct sctp_authchunks, for reading only.
++gauth_assoc_id is a specified assoc_id or SCTP_FUTURE_ASSOC.
++
++Require: SCTP_AUTH_SUPPORTED.
++.TP
++.B SCTP_GET_ASSOC_NUMBER
++This option gets the current number of associations that are attached
++to a one-to-many style socket. Note that this number is only a snapshot.
++This means that the number of associations may have changed when the
++caller gets back the option result.
++
++The parameter type is uint32_t, for reading only.
++.TP
++.B SCTP_GET_ASSOC_ID_LIST
++This option gets the current list of SCTP association identifiers of
++the SCTP associations handled by a one-to-many style socket. It uses
++struct sctp_assoc_ids and must provide a large enough buffer to hold
++all association identifiers. If the buffer is too small, an error must
++be returned. The user can use the SCTP_GET_ASSOC_NUMBER socket option
++to get an idea of how large the buffer has to be.
++
++The parameter type is struct sctp_assoc_ids, for reading only.
++.TP
++.B SCTP_EXPOSE_POTENTIALLY_FAILED_STATE, SCTP_EXPOSE_PF_STATE
++Applications can control the exposure of the PF path state in the
++SCTP_PEER_ADDR_CHANGE event, and if pf_expose is not 'enabled', no
++notification will be sent for a transport state change to SCTP_PF.
++It also affects the SCTP_GET_PEER_ADDR_INFO socket option, and if
++pf_expose is 'disabled', users can not access the transport info via
++SCTP_GET_PEER_ADDR_INFO option.
++
++The parameter type is struct sctp_assoc_value, for reading and writing.
++assoc_id is a specified assoc_id or SCTP_FUTURE_ASSOC.
++
++Default: sysctl_net.sctp.pf_expose.
++.TP
++.B SCTP_PEER_ADDR_THLDS
++Applications can control the SCTP-PF behavior by getting or setting
++the number of consecutive timeouts before a peer address is
++considered PF or unreachable..
++
++The parameter type is struct sctp_paddrthlds, for reading and writing.
++spt_address is a specified transport address or 0, spt_assoc_id
++is a specified assoc_id or SCTP_FUTURE_ASSOC.
++
++Default: pathmaxrxt=sysctl_net.sctp.path_max_retrans,
++ps_retrans=sysctl_net.sctp.ps_retrans.
++.TP
++.B SCTP_PEER_ADDR_THLDS_V2
++Similar to SCTP_PEER_ADDR_THLDS, but it can also be used by applications
++to set and get the number of timeouts before the primary path is changed
++automatically by the Primary Path Switchover function.
++
++The parameter type is struct sctp_paddrthlds_v2, for reading and writing.
++spt_address is a specified transport address or 0, spt_assoc_id is a
++specified assoc_id or SCTP_FUTURE_ASSOC.
++
++Default: pathmaxrxt=sysctl_net.sctp.path_max_retrans,
++ps_retrans=sysctl_net.sctp.ps_retrans, pf_retrans=sysctl_net.sctp.pf_retrans.
++.TP
++.B SCTP_RECVRCVINFO
++Setting this option specifies that SCTP_RCVINFO (SCTP receive information
++about a received message) is returned as ancillary data by recvmsg(). See
++.B CONTROL MSGS
++for more details.
++
++The parameter type is int, for reading and writing.
++
++Default: 0.
++.TP
++.B SCTP_RECVNXTINFO
++Setting this option specifies that SCTP_NXTINFO (SCTP receive information
++of the next message) is returned as ancillary data by recvmsg(). See
++.B CONTROL MSGS
++for details.
++
++The parameter type is int, for reading and writing.
++
++Default: 0.
++.TP
++.B SCTP_DEFAULT_SNDINFO
++This option obsoletes SCTP_DEFAULT_SEND_PARAM.
++
++The parameter type is struct sctp_sndinfo. For reading, snd_assoc_id is
++a specified assoc_id or SCTP_FUTURE_ASSOC. For writing, snd_assoc_id is
++a specified assoc_id or SCTP_{FUTURE|CURRENT|ALL}_ASSOC.
++
++Default: default_stream=0, default_flags=0, default_ppid=0, default_context=0.
++.TP
++.B SCTP_REUSE_PORT
++This option is similar to the socket level option SO_REUSEADDR, besides
++only supports one-to-one style SCTP sockets and must not be used after
++calling bind() or sctp_bindx().
++
++The parameter type is int, for reading and writing.
++
++Default: 0.
++.TP
++.B SCTP_SOCKOPT_BINDX_ADD
++This option allows the user to bind a specific subset of addresses or,
++if the SCTP extension ASCONF is supported (see SCTP_ASCONF_SUPPORTED),
++add specific addresses. The API sctp_bindx() is based on this.
++
++The parameter type is struct sockaddr[], for writing only.
++.TP
++.B SCTP_SOCKOPT_BINDX_REM
++Similar to SCTP_SOCKOPT_BINDX_ADD, but delete specific addresses. The API
++sctp_bindx() is based on this.
++
++The parameter type is struct sockaddr[], for writing only.
++.TP
++.B SCTP_SOCKOPT_PEELOFF
++This option branches off an UDP type association into a separate socket
++returned back to users. The API sctp_peeloff() is based on this option.
++
++The parameter type is sctp_peeloff_arg_t, for reading only. associd is a
++specified assoc_id.
++.TP
++.B SCTP_SOCKOPT_PEELOFF_FLAGS
++Peel off an UDP type association from a socket similar to SCTP_SOCKOPT_PEELOFF
++option, but it allows the flags like O_CLOEXEC and O_NONBLOCK to be used when
++creating the new socket. The API sctp_peeloff_flags() is based on this option.
++
++The parameter type is sctp_peeloff_flags_arg_t, for reading only. associd
++is a specified assoc_id.
++.TP
++.B SCTP_SOCKOPT_CONNECTX_OLD
++This option allows a user to specify multiple addresses at which a peer can
++be reached, and the kernel stack will use the list of addresses to set up
++the association. The API sctp_connectx() is based on this option.
++
++The parameter type is struct sockaddr[], for writing only.
++.TP
++.B SCTP_SOCKOPT_CONNECTX
++Similar to SCTP_SOCKOPT_CONNECTX_OLD, but it returns the new assoc's id.
++The API sctp_connectx2() is based on this option.
++
++The parameter type is struct sockaddr[], for writing only. The new assoc's
++id is passed to users by the return value.
++.TP
++.B SCTP_SOCKOPT_CONNECTX3
++Similar to SCTP_SOCKOPT_CONNECTX, but it uses different type parameter. The
++API sctp_connectx3() is based on this option.
++
++The parameter type is struct sctp_getaddrs_old, for reading only. assoc_id
++is set to the new assoc's id by kernel and passed to users.
++.TP
++.B SCTP_GET_PEER_ADDRS
++This option is used to gets all peer addresses in an association. The API
++sctp_getpaddrs() is based on this option.
++
++The parameter type is struct sctp_getaddrs, for reading only. assoc_id
++is a specified assoc_id.
++.TP
++.B SCTP_GET_LOCAL_ADDRS
++This option is used to get all local addresses in an association. The API
++sctp_getladdrs() is based on this option.
++
++The parameter type is struct sctp_getaddrs, for reading only. assoc_id
++is a specified assoc_id or SCTP_FUTURE_ASSOC.
++.TP
++.B SCTP_ADAPTATION_LAYER
++This option requests that the local endpoint set the specified
++Adaptation Layer Indication parameter for all future INIT and
++INIT-ACK exchanges.
++
++The parameter type is struct sctp_setadaptation, for reading and writing.
++
++Default: 0.
++.TP
++.B SCTP_EVENT
++This option obsoletes SCTP_EVENTS socket option, and it can set or get
++one specific type of event for a specified association.
++
++The parameter type is struct sctp_event. For reading, se_assoc_id is
++a specified assoc_id or SCTP_FUTURE_ASSOC. For writing, se_assoc_id
++is a specified assoc_id or SCTP_{FUTURE|CURRENT|ALL}_ASSOC. se_type
++can be one of enum sctp_sn_type.
++
++Default: 0.
++.TP
++.B SCTP_PR_SUPPORTED
++This socket option allows the enabling or disabling of the negotiation of
++PR-SCTP support for future associations.
++
++The parameter type is struct sctp_assoc_value. For reading, assoc_id
++is a specified assoc_id or SCTP_FUTURE_ASSOC. For writing, assoc_id
++is SCTP_FUTURE_ASSOC.
++
++Default: sysctl_net.sctp.prsctp_enable.
++RFC: RFC7496.
++.TP
++.B SCTP_DEFAULT_PRINFO
++This option sets and gets the default parameters for PR-SCTP.
++
++The parameter type is struct sctp_default_prinfo. For reading, pr_assoc_id
++is a specified assoc_id or SCTP_FUTURE_ASSOC. For writing, pr_assoc_id is
++a specified assoc_id or SCTP_{FUTURE|CURRENT|ALL}_ASSOC. pr_policy can be
++SCTP_PR_SCTP_{NONE|TTL|RTX|PRIO}.
++
++Default: SCTP_PR_SCTP_NONE.
++Require: SCTP_DEFAULT_PRINFO.
++.TP
++.B SCTP_PR_ASSOC_STATUS
++This option is used to get Association-Specific PR-SCTP Status.
++
++The parameter type is struct sctp_prstatus, for reading only.
++sprstat_assoc_id is a specified assoc_id, sprstat_policy
++can be SCTP_PR_SCTP_{TTL|RTX|PRIO|ALL}.
++.TP
++.B SCTP_PR_STREAM_STATUS
++This option is used to get Stream-Specific PR-SCTP Status.
++
++The parameter type is struct sctp_prstatus, for reading only.
++sprstat_assoc_id is a specified assoc_id, sprstat_policy
++can be SCTP_PR_SCTP_{TTL|RTX|PRIO|ALL}.
++.TP
++.B SCTP_RECONFIG_SUPPORTED
++Enable the Stream Reconfiguration(RECONF) for the future associations.
++For different type of requests enabling, see SCTP_ENABLE_STREAM_RESET
++option.
++
++The parameter type is struct sctp_assoc_value. For reading, assoc_id
++is a specified assoc_id or SCTP_FUTURE_ASSOC. For writing, assoc_id
++is SCTP_FUTURE_ASSOC.
++
++Default: sysctl_net.sctp.reconf_enable.
++RFC: RFC6525.
++.TP
++.B SCTP_ENABLE_STREAM_RESET
++This option allows a user to control whether the kernel processes or denies
++incoming requests in RECONF chunks.
++
++The parameter type is struct sctp_assoc_value. For reading, assoc_id is
++a specified assoc_id or SCTP_FUTURE_ASSOC. For writing, assoc_id is
++a specified assoc_id or SCTP_{FUTURE|CURRENT|ALL}_ASSOC. assoc_value
++can be SCTP_ENABLE_{RESET_STREAM_REQ|RESET_ASSOC_REQ|CHANGE_ASSOC_REQ}.
++
++Default: 0.
++Require: SCTP_RECONFIG_SUPPORTED.
++.TP
++.B SCTP_RESET_STREAMS
++This option allows the user to request the reset of incoming and/or
++outgoing streams.
++
++The parameter type is struct sctp_reset_streams, for writing only.
++srs_assoc_id is a specified assoc_id.
++
++Require: SCTP_ENABLE_STREAM_RESET.
++.TP
++.B SCTP_RESET_ASSOC
++This option allows a user to request the reset of the SSN/TSN.
++
++The parameter type is sctp_assoc_t, for writing only. It is a specified
++assoc_id.
++
++Require: SCTP_ENABLE_STREAM_RESET.
++.TP
++.B SCTP_ADD_STREAMS
++This option allows a user to request the addition of a number of incoming
++and/or outgoing streams.
++
++The parameter type is struct sctp_add_streams, for writing only.
++sas_assoc_id is a specified assoc_id.
++
++Require: SCTP_ENABLE_STREAM_RESET.
++.TP
++.B SCTP_STREAM_SCHEDULER
++This option is used to select a stream scheduler for data sending.
++
++The parameter type is struct sctp_assoc_value. For reading, assoc_id is
++a specified assoc_id or SCTP_FUTURE_ASSOC. For writing, assoc_id is a
++specified assoc_id or SCTP_{FUTURE|CURRENT|ALL}_ASSOC. assoc_value can
++be SCTP_SS_{FCFS|PRIO|RR|FC|WFQ}.
++
++Default: SCTP_SS_FCFS.
++RFC: RFC8260.
++.TP
++.B SCTP_STREAM_SCHEDULER_VALUE
++Some stream schedulers require additional information to be set for
++individual streams.
++
++The parameter type is struct sctp_assoc_value. For reading, assoc_id is
++a specified assoc_id. For writing, assoc_id is a specified assoc_id or
++SCTP_CURRENT_ASSOC.
++
++Require: SCTP_STREAM_SCHEDULER.
++.TP
++.B SCTP_INTERLEAVING_SUPPORTED
++This socket option allows the enabling or disabling of the negotiation of
++user message interleaving support for future associations.
++
++The parameter type is struct sctp_assoc_value. For reading, assoc_id
++is a specified assoc_id or SCTP_FUTURE_ASSOC. For writing, assoc_id
++is SCTP_FUTURE_ASSOC.
++
++Default: sysctl_net.sctp.intl_enable.
++Require: SCTP_FRAGMENT_INTERLEAVE.
++RFC: RFC8260.
++.TP
++.B SCTP_ASCONF_SUPPORTED
++Enable the Dynamic Address Reconfiguration(ASCONF) for the future
++associations.
++
++The parameter type is struct sctp_assoc_value. For reading, assoc_id
++is a specified assoc_id or SCTP_FUTURE_ASSOC. For writing, assoc_id
++is SCTP_FUTURE_ASSOC.
++
++Default: sysctl_net.sctp.addip_enable.
++RFC: RFC5061.
++.TP
++.B SCTP_AUTO_ASCONF
++This option will enable or disable the use of the automatic generation of
++ASCONF chunks to add and delete addresses to an existing association.
++Note that this option has two caveats, namely a) it only affects sockets
++that are bound to all addresses available to the SCTP stack, and b) the
++system administrator may have an overriding control that turns the ASCONF
++feature off no matter what setting the socket option may have.
++
++The parameter type is int boolean, for reading and writing.
++
++Default: sysctl_net.sctp.default_auto_asconf.
++.TP
++.B SCTP_AUTH_SUPPORTED
++Enable AUTH for the future associations.
++
++The parameter type is struct sctp_assoc_value. For reading, assoc_id
++is a specified assoc_id or SCTP_FUTURE_ASSOC. For writing, ssoc_id
++is SCTP_FUTURE_ASSOC.
++
++Default: sysctl_net.sctp.auth_enable.
++RFC: RFC4895.
++.TP
++.B SCTP_ECN_SUPPORTED
++Enable ECN for the future associations.
++
++The parameter type is struct sctp_assoc_value. For reading, assoc_id
++is a specified assoc_id or SCTP_FUTURE_ASSOC. For writing, assoc_id
++is SCTP_FUTURE_ASSOC.
++
++Default: sysctl_net.sctp.ecn_enable.
++.TP
++.B SCTP_REMOTE_UDP_ENCAPS_PORT
++This option is used to set the encapsulation port(a remote listening or
++dest port) for SCTP over UDP, which allows SCTP traffic to pass through
++legacy NATs that do not provide native SCTP support.
++
++The parameter type is struct sctp_udpencaps, for reading and writing.
++sue_address is a specified transport address or 0, sue_assoc_id
++is a specified assoc_id or SCTP_FUTURE_ASSOC.
++
++Default: sysctl_net.sctp.encap_port.
++RFC: RFC6951.
++.TP
++.B SCTP_PLPMTUD_PROBE_INTERVAL
++This option is used to configure the PROBE_INTERVAL for the Packetization
++Layer Path MTU Discovery(PLPMTUD). It can be set to a value >= 5000 or
++0(disabled).
++
++The parameter type is struct sctp_probeinterval, for reading and writing.
++spi_address is a specified transport address or 0, spi_assoc_id is
++a specified assoc_id or SCTP_FUTURE_ASSOC.
++
++Default: 0(disabled).
++RFC: RFC8899.
+ .SH AUTHORS
+ Sridhar Samudrala <sri@us.ibm.com>
+ .SH "SEE ALSO"
+-- 
+2.39.1
+

@@ -39,9 +39,9 @@
 %{!?_name: %define _name iser}
 
 Summary:	 %{_name} Driver
-Name:		 %{_name}
+Name:		 %{_name}-signed
 Version:	 24.10
-Release:	 13%{?dist}
+Release:	 16%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -53,20 +53,25 @@ Group:		 System Environment/Base
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 
-Source0:	 %{name}-%{version}-%{release}.%{_arch}.rpm
+Source0:	 %{_name}-%{version}-%{release}.%{_arch}.rpm
 Source1:         ib_iser.ko
 
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 ExclusiveArch:   x86_64
 
+%description
+iser signed kernel modules
+
+%package -n %{_name}
+Summary:        %{summary}
 Requires:       mlnx-ofa_kernel = %{version}
 Requires:       mlnx-ofa_kernel-modules  = %{version}
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
-%description
-iser signed kernel modules
+%description -n %{_name}
+%{description}
 
 %prep
 
@@ -87,22 +92,31 @@ cp -rp ./. %{buildroot}/
 popd
 
 
-%post
+%post -n %{_name}
 if [ $1 -ge 1 ]; then # 1 : This package is being installed or reinstalled
   /sbin/depmod %{KVERSION}
 fi # 1 : closed
 # END of post
 
-%postun
+%postun -n %{_name}
 /sbin/depmod %{KVERSION}
 
-%files
+%files -n %{_name}
 %defattr(-,root,root,-)
-%license %{_datadir}/licenses/%{name}/copyright
+%license %{_datadir}/licenses/%{_name}/copyright
 /lib/modules/%{KVERSION}/updates/
-%config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{name}-*.conf
+%config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{_name}-*.conf
 
 %changelog
+* Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 24.10-16
+- Bump release to rebuild for new kernel release
+
+* Tue Apr 08 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-15
+- Re-naming the package to de-duplicate the SRPM name.
+
+* Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-14
+- Bump release to rebuild for new kernel release
+
 * Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-13
 - Bump release to rebuild for new kernel release
 
