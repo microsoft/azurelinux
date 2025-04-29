@@ -32,6 +32,12 @@
             ]
         },
         {
+            "PackageName": "citus",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/doc/postgresql/extension/NOTICE-.*"
+            ]
+        },
+        {
             "_comment1": "OpenSSL has multiple structs, constants and procedures that have the word 'NOTICE' in them, like 'NOTICEREF_free'.",
             "_comment2": "These man pages are for those items, not actual license notices.",
             "PackageName": "openssl-devel",
