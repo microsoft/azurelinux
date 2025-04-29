@@ -58,7 +58,7 @@ go test -v ./cmd/helm
 
 %changelog
 * Thu Apr 17 2025 Archana Shettigar <v-shettigara@microsoft.com> - 3.14.2-6
-- Patch CVE-2025-32386 & CVE-2025-22872.patch
+- Patch CVE-2025-32386 & CVE-2025-22872
 
 * Fri Jan 03 2025 Sumedh Sharma <sumsharma@microsoft.com> - 3.14.2-5
 - Add patch for CVE-2024-45338
