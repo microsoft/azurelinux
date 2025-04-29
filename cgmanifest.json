@@ -12570,9 +12570,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "lua-lunit",
-          "version": "0.5",
-          "downloadUrl": "https://github.com/mrothNET/lunit/archive/refs/tags/lunit-0.5.tar.gz"
+          "name": "lua-lunitx",
+          "version": "0.8.1",
+          "downloadUrl": "https://github.com/dcurrie/lunit/archive/0.8.1.tar.gz"
         }
       }
     },
