@@ -12961,8 +12961,8 @@
         "type": "other",
         "other": {
           "name": "marisa",
-          "version": "0.2.4",
-          "downloadUrl": "https://marisa-trie.googlecode.com/files/marisa-0.2.4.tar.gz"
+          "version": "0.2.6",
+          "downloadUrl": "https://github.com/s-yata/marisa-trie/archive/refs/tags/v0.2.6.tar.gz"
         }
       }
     },
