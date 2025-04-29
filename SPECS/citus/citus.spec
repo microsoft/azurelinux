@@ -50,6 +50,17 @@ make %{?_smp_mflags}
 %{__cp} README.md %{buildroot}%{_docdir}/postgresql/extension/README-%{name}.md
 %{__cp} NOTICE %{buildroot}%{_docdir}/postgresql/extension/NOTICE-%{name}
 
+%check
+mkdir -p /run/postgresql
+useradd -s /usr/bin/sh test
+usermod -a -G root test
+chmod -R g+w %{_includedir}/postgresql
+chmod -R g+w %{_libdir}/postgresql
+chmod -R g+w %{_datadir}/postgresql
+chmod -R g+w /run/postgresql
+chown -R test .
+su test -s /bin/sh -c 'make check'
+
 %files
 %defattr(-,root,root,-)
 %doc CHANGELOG.md
