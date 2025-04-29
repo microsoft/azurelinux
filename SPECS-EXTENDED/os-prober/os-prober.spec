@@ -1,14 +1,15 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Name:           os-prober
-Version:        1.77
-Release:        7%{?dist}
+Version:        1.81
+Release:        9%{?dist}
 Summary:        Probes disks on the system for installed operating systems
 
 # For more information about licensing, see copyright file.
-License:        GPLv2+ and GPL+
-URL:            http://kitenet.net/~joey/code/os-prober/
-Source0:        http://ftp.us.debian.org/debian/pool/main/o/os-prober/%{name}_%{version}.tar.xz
+License:        GPL-2.0-or-later AND GPL-1.0-or-later
+Vendor:         Microsoft Corporation                                    
+Distribution:   Azure Linux
+URL:            https://kitenet.net/~joey/code/os-prober/
+Source0:        https://deb.debian.org/debian/pool/main/o/os-prober/%{name}_%{version}.tar.xz
+
 Patch0:         os-prober-no-dummy-mach-kernel.patch
 # Sent upstream
 Patch1:         os-prober-mdraidfix.patch
@@ -21,13 +22,16 @@ Patch6:         os-prober-factored-logger-efi-fix.patch
 Patch7:         os-prober-umount-fix.patch
 Patch8:         os-prober-grub2-parsefix.patch
 Patch9:         os-prober-grepfix.patch
-Patch10:        os-prober-gentoo-fix.patch
-Patch11:        os-prober-grub2-mount-workaround.patch
+Patch10:        os-prober-grub2-mount-workaround.patch
+Patch11:        os-prober-arm64-win11.patch
+Patch12:        os-prober-efi-shell.patch
+Patch13:        os-prober-trap_unmount.patch
 
 Requires:       udev coreutils util-linux
 Requires:       grep /bin/sed /sbin/modprobe
 Requires:       grub2-tools-minimal
 
+BuildRequires: make
 BuildRequires:  gcc git
 
 %description
@@ -46,7 +50,7 @@ sed -i -e 's|grub-mount|grub2-mount|g' os-probes/common/50mounted-tests \
 
 %build
 %set_build_flags
-%make_build LDFLAGS="$LDFLAGS -fPIC"
+%make_build LDFLAGS="$LDFLAGS -fPIC" CFLAGS="$CFLAGS" CPPFLAGS="$CPPFLAGS"
 
 %install
 install -m 0755 -d %{buildroot}%{_bindir}
@@ -91,8 +95,54 @@ fi
 %{_var}/lib/%{name}
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.77-7
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+* Tue Dec 17 2024 Jyoti kanase <v-jykanase@microsoft.com> - 1.81-9
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.81-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jun 20 2024 Leo Sandoval <lsandova@redhat.com> - 1.81-7
+- 50mounted-tests: trap do_unmount function on errors
+- Related: RHEL-36343
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.81-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.81-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Dec 21 2023 Nicolas Frayer <nfrayer@redhat.com>
+- Migrate to SPDX license
+- Please refer to https://fedoraproject.org/wiki/Changes/SPDX_Licenses_Phase_2
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.81-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.81-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Jan 10 2023 Robbie Harwood <rharwood@redhat.com> - 1.81-2
+- Fix inheritance of environment build flags
+
+* Sat Aug 06 2022 Hedayat Vatankhah <hedayat.fwd+rpmchlog@gmail.com> - 1.81-1
+- Update to latest upstream version with better support for latest OSes,
+  closes rhbz#2090942
+- Remove 'which' dependency, closes rhbz#2111531
+- Add support for detecting EFI shell binary (shell.efi), closes rhbz#2101953
+- Add support for Win 11 on ARM 64 systems
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.77-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.77-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.77-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.77-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Sat Oct 10 2020 Hedayat Vatankhah <hedayat.fwd+rpmchlog@gmail.com> - 1.77-6
 - Workaround for grub2-mount slow wildcard file matching, fixes #1770599
