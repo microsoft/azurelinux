@@ -1,7 +1,7 @@
 Summary:        Utilities for loading kernel modules
 Name:           kmod
 Version:        30
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2.1+ AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -34,7 +34,6 @@ It contains the libraries and header files to create applications.
     --sysconfdir=%{_sysconfdir} \
     --with-rootlibdir=%{_libdir} \
     --disable-manpages \
-    --with-xz \
     --with-zlib \
     --disable-silent-rules
 make VERBOSE=1 %{?_smp_mflags}
