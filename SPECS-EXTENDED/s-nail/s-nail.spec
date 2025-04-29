@@ -121,7 +121,7 @@ make test
 
 
 %changelog
-* Tue Apr 29 2025 <v-shettigara@microsoft.com> - 14.9.25-2
+* Tue Apr 29 2025 Archana Shettigar <v-shettigara@microsoft.com> - 14.9.25-2
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
