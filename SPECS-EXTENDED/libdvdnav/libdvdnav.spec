@@ -1,18 +1,21 @@
+%global abi 4
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           libdvdnav
-Version:        6.0.1
-Release:        4%{?dist}
+Version:        6.1.1
+Release:        1%{?dist}
 Summary:        A library for reading DVD video discs based on Ogle code
 License:        GPLv2+
-URL:            http://dvdnav.mplayerhq.hu/
+URL:            https://dvdnav.mplayerhq.hu/
 Source0:        https://download.videolan.org/pub/videolan/libdvdnav/%{version}/libdvdnav-%{version}.tar.bz2
 Source1:        https://download.videolan.org/pub/videolan/libdvdnav/%{version}/libdvdnav-%{version}.tar.bz2.asc
 Source2:        https://download.videolan.org/pub/keys/7180713BE58D1ADC.asc
 BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  gnupg2
-BuildRequires:  libdvdread-devel >= 5.0.2
+BuildRequires:  make
+BuildRequires:  libdvdread-devel >= 6.0.0
 
 %description
 libdvdnav provides a simple library for reading DVD video discs.
@@ -30,7 +33,7 @@ libdvdnav library.
 
 %prep
 %{gpgverify} --keyring='%{S:2}' --signature='%{S:1}' --data='%{S:0}'
-%setup -q
+%autosetup
 
 %build
 %configure --disable-static
@@ -50,7 +53,7 @@ rm %{buildroot}%{_pkgdocdir}/{COPYING,TODO}
 %files
 %license COPYING
 %doc AUTHORS ChangeLog README
-%{_libdir}/libdvdnav.so.*
+%{_libdir}/libdvdnav.so.%{abi}*
 
 %files devel
 %doc TODO doc/html/*
@@ -59,6 +62,10 @@ rm %{buildroot}%{_pkgdocdir}/{COPYING,TODO}
 %{_libdir}/pkgconfig/dvdnav.pc
 
 %changelog
+* Thu Nov 14 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 6.1.1-1
+- Update to 6.1.1
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.0.1-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

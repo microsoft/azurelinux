@@ -4,7 +4,7 @@
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
 Version:        2.45.4
-Release:        9%{?dist}
+Release:        12%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,6 +24,11 @@ Patch3:         CVE-2024-24786.patch
 Patch4:         CVE-2023-44487.patch
 Patch5:         CVE-2025-22868.patch
 Patch6:         CVE-2025-30204.patch
+Patch7:         0001-Fix-exit-condition-of-TestQuerierIndexQueriesRace.patch
+Patch8:         0002-Improve-sensitivity-of-TestQuerierIndexQueriesRace.patch
+Patch9:         CVE-2024-35255.patch
+Patch10:        CVE-2025-22870.patch
+Patch11:        CVE-2024-51744.patch
 
 BuildRequires:  golang
 BuildRequires:  nodejs
@@ -141,6 +146,15 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
+* Mon Apr 21 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.45.4-12
+- Patch CVE-2025-22870, CVE-2024-51744
+
+* Mon Apr 14 2025 Mayank Singh <mayansingh@microsoft.com> - 2.45.4-11
+- Fix CVE-2024-35255 with an upstream patch
+
+* Mon Mar 31 2025 Andrew Phelps <anphel@microsoft.com> - 2.45.4-10
+- Add patches to fix test reliability issues with TestQuerierIndexQueriesRace
+
 * Sun Mar 30 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.45.4-9
 - Patch CVE-2025-30204
 
