@@ -179,7 +179,7 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 * Fri Oct 06 2023 Manuel Huber <mahuber@microsoft.com> - 6.1.0.mshv11-2
 - Enable dm-crypt and dm-integrity for encfs sidecar functionality
 
-* Thu Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv11-1
+* Fri Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv11-1
 - Update to v6.1.0.mshv11
 
 * Fri Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv10-1
