@@ -225,10 +225,10 @@ libselinux-utils-3.6-3.azl3.aarch64.rpm
 libsepol-3.6-2.azl3.aarch64.rpm
 libsepol-debuginfo-3.6-2.azl3.aarch64.rpm
 libsepol-devel-3.6-2.azl3.aarch64.rpm
-libsolv-0.7.28-2.azl3.aarch64.rpm
-libsolv-debuginfo-0.7.28-2.azl3.aarch64.rpm
-libsolv-devel-0.7.28-2.azl3.aarch64.rpm
-libsolv-tools-0.7.28-2.azl3.aarch64.rpm
+libsolv-0.7.28-3.azl3.aarch64.rpm
+libsolv-debuginfo-0.7.28-3.azl3.aarch64.rpm
+libsolv-devel-0.7.28-3.azl3.aarch64.rpm
+libsolv-tools-0.7.28-3.azl3.aarch64.rpm
 libssh2-1.11.1-1.azl3.aarch64.rpm
 libssh2-debuginfo-1.11.1-1.azl3.aarch64.rpm
 libssh2-devel-1.11.1-1.azl3.aarch64.rpm
