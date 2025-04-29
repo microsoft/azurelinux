@@ -3477,6 +3477,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "expected",
+          "version": "1.1.0",
+          "downloadUrl": "https://github.com/TartanLlama/expected/archive/v1.1.0/expected-1.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "extra-cmake-modules",
           "version": "5.249.0",
           "downloadUrl": "https://invent.kde.org/frameworks/extra-cmake-modules/-/archive/v5.249.0/extra-cmake-modules-v5.249.0.tar.gz"
@@ -10143,6 +10153,16 @@
           "name": "libmad",
           "version": "0.16.4",
           "downloadUrl": "https://codeberg.org/tenacityteam/libmad/releases/download/0.16.4/libmad-0.16.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libmamba",
+          "version": "1.5.12",
+          "downloadUrl": "https://github.com/mamba-org/mamba/archive/libmamba-1.5.12/libmamba-1.5.12.tar.gz"
         }
       }
     },
@@ -26052,6 +26072,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "reproc",
+          "version": "14.2.4",
+          "downloadUrl": "https://github.com/DaanDeMeyer/reproc/archive/1c07bdbec3f2ecba7125b9499b9a8a77bf9aa8c7/reproc-14.2.4-1c07bdb.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "resource-agents",
           "version": "4.10.0",
           "downloadUrl": "https://github.com/ClusterLabs/resource-agents/archive/refs/tags/v4.10.0.tar.gz"
@@ -28015,6 +28045,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "simdjson",
+          "version": "3.11.6",
+          "downloadUrl": "https://github.com/simdjson/simdjson/archive/v3.11.6/simdjson-3.11.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sip",
           "version": "4.19.25",
           "downloadUrl": "https://www.riverbankcomputing.com/static/Downloads/sip/4.19.25/sip-4.19.25.tar.gz"
@@ -28268,6 +28308,16 @@
           "name": "spausedd",
           "version": "20210719",
           "downloadUrl": "https://github.com/jfriesse/spausedd/releases/download/20210719/spausedd-20210719.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "spdlog",
+          "version": "1.15.2",
+          "downloadUrl": "https://github.com/gabime/spdlog/archive/v1.15.2/spdlog-1.15.2.tar.gz"
         }
       }
     },
