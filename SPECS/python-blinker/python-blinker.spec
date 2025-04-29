@@ -53,6 +53,7 @@ pip3 install iniconfig==2.0.0 pluggy==1.5.0 pytest==8.3.3 pytest-asyncio==0.24.0
 %changelog
 * Tue Apr 29 2025 Riken Maharjan <rmaharjan@microsoft.com> -  1.9.0-1
 - Promote to Specs from Extended and update to 1.9.0 using Fedora 42 (License MIT)
+- License Verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
