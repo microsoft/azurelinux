@@ -12,7 +12,7 @@ apt install -y \
     gawk \
     genisoimage \
     git \
-    golang-1.21-go \
+    golang-1.23-go \
     jq \
     make \
     openssl \
