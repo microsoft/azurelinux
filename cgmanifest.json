@@ -1728,7 +1728,7 @@
         "other": {
           "name": "citus",
           "version": "13.0.3",
-          "downloadUrl": "https://github.com/citusdata/citus/archive/v13.0.1.tar.gz"
+          "downloadUrl": "https://github.com/citusdata/citus/archive/v13.0.3.tar.gz"
         }
       }
     },
