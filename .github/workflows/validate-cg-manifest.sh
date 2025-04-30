@@ -9,7 +9,10 @@
 #     - OR that a #source0 comment is a substring of the cgmanifest URL
 #   - The URL listed in the cgmanifets is valid (can be downloaded)
 
-# $@ - Paths to spec files to check
+# $1 - Path to worker chroot's archive
+# $2+ - Paths to spec files to check
+
+set -euo pipefail
 
 # shellcheck source=../../toolkit/scripts/rpmops.sh
 source "$(git rev-parse --show-toplevel)"/toolkit/scripts/rpmops.sh
@@ -63,84 +66,85 @@ ignore_known_issues=" \
 
 alt_source_tag="Source9999"
 
-function prepare_lua {
-  local azl_lua_dir
-  local azl_srpm_lua_dir
-  local lua_common_path
-  local lua_forge_path
-  local lua_python_path
-  local rpm_lua_dir
-  local rpm_macros_dir
+prepare_chroot_environment() {
+  local chroot_archive="$1"
+  local chroot_dir_path="$2"
 
-  rpm_macros_dir="$1"
+  echo "Creating worker chroot under '$chroot_dir_path'."
+  sudo tar -xf "$chroot_archive" -C "$chroot_dir_path"
 
-  lua_common_path="common.lua"
-  lua_forge_path="srpm/forge.lua"
-  lua_python_path="srpm/python.lua"
-  rpm_lua_dir="$(rpm --eval "%_rpmluadir")"
-  azl_lua_dir="$rpm_lua_dir/azl"
-  azl_srpm_lua_dir="$azl_lua_dir/srpm"
+  rpm_macros_dir_path="$(sudo chroot "$chroot_dir_path" rpm --eval '%{_rpmmacrodir}')"
+  chroot_rpm_macros_dir_path="$chroot_dir_path/$rpm_macros_dir_path"
+  echo "Creating the RPM macros directory '$rpm_macros_dir_path' in the chroot."
+  sudo mkdir -vp "$chroot_rpm_macros_dir_path"
+  sudo chown -R "$(id -u):$(id -g)" "$chroot_rpm_macros_dir_path"
 
-  if [[ -z "$rpm_lua_dir" ]]
-  then
-    echo "ERROR: no RPM LUA directory set, can't update with Azure Linux's LUA modules!" >&2
-    exit 1
-  fi
+  dist_tag=$(make -sC toolkit get-dist-tag)
+  # Dist name is extracted from the dist tag by removing the leading dot and the number suffix.
+  # Example: ".azl3" -> "azl"
+  dist_name="$(sed -E 's/^\.(.*)[0-9]+$/\1/' <<<"$dist_tag")"
+  # Dist number is the number suffix of the dist tag.
+  # Example: ".azl3" -> "3"
+  dist_number="$(grep -oP "\d+$" <<<"$dist_tag")"
+  echo "Setting RPM's macros for the RPM queries inside the new chroot:"
+  echo "%dist $dist_tag" | tee "$chroot_rpm_macros_dir_path/macros.dist"
+  echo "%$dist_name $dist_number" | tee -a "$chroot_rpm_macros_dir_path/macros.dist"
 
-  # We only want to clean-up directories, which were absent from the system.
-  for dir_path in "$rpm_lua_dir" "$azl_lua_dir" "$azl_srpm_lua_dir"
-  do
-    if [[ ! -d "$dir_path" ]]
-    then
-      FILES_TO_CLEAN_UP+=("$dir_path")
-      break
-    fi
-  done
-  sudo mkdir -p "$azl_srpm_lua_dir"
+  # echo "Mounting the project's specs folders in the chroot:"
+  # for spec_dir in SPECS*; do
+  #   if [[ ! -d "$spec_dir" ]]
+  #   then
+  #     echo "Error: '$spec_dir' is not a directory. The script is expecting to run from the root of the project where all 'SPECS*' files are directories."
+  #     exit 1
+  #   fi
 
-  for file_path in "$lua_common_path" "$lua_forge_path" "$lua_python_path"
-  do
-    system_lua_path="$azl_lua_dir/$file_path"
-    if [[ ! -f "$system_lua_path" ]]
-    then
-      sudo cp "$rpm_macros_dir/$(basename "$file_path")" "$system_lua_path"
-      FILES_TO_CLEAN_UP+=("$system_lua_path")
-    fi
-  done
+  #   # Mounting the spec directory in the chroot.
+  #   chroot_spec_dir_path="$chroot_dir_path/$spec_dir"
+  #   echo "Mounting '$spec_dir' in '$chroot_spec_dir_path'."
+  #   mkdir -vp "$chroot_spec_dir_path"
+  #   mount -v --bind "$(pwd)/$spec_dir" "$chroot_spec_dir_path"
+  # done
+
+  sudo chown -R "$(id -u):$(id -g)" "$chroot_dir_path"
 }
 
-function specs_dir_from_spec_path {
-  # Assuming we always check specs inside Azure Linux's core GitHub repository.
-  # If that's the case, the spec paths will always have the following form:
-  #     [repo_directory_path]/[specs_directory]/[package_name]/[package_spec_files]
-  echo "$(realpath "$(dirname "$1")/../../SPECS")/azurelinux-rpm-macros"
-}
-
-rm -f bad_registrations.txt
-rm -rf ./cgmanifest_test_dir/
-
-if [[ $# -eq 0 ]]
+if [[ $# -lt 2 ]]
 then
   echo "No specs passed to validate."
-  exit
+  exit 1
 fi
 
+if [[ ! -f "$1" ]]
+then
+  echo "First argument is not a valid file. Please pass the path to the worker chroot's archive."
+  exit 1
+fi
+
+rm -f bad_registrations.txt
+
 WORK_DIR=$(mktemp -d -t)
-FILES_TO_CLEAN_UP=("$WORK_DIR")
 function clean_up {
     echo "Cleaning up..."
-    for file_path in "${FILES_TO_CLEAN_UP[@]}"
-    do
-      echo "   Removing ($file_path)."
-      sudo rm -rf "$file_path"
-    done
+
+    # Unmounting the spec directories from the chroot.
+    # for spec_dir in "$WORK_DIR"/SPECS*; do
+    #   if ! mountpoint -q "$spec_dir"
+    #   then
+    #     echo "Unexpected: '$spec_dir' is not a mount point. Continuing with the clean-up anyway." >&2
+    #     continue
+    #   fi
+
+    #   echo "Unmounting '$spec_dir'."
+    #   umount -v "$spec_dir"
+    # done
+
+    sudo rm -rf "$WORK_DIR"
 }
 trap clean_up EXIT SIGINT SIGTERM
 
+prepare_chroot_environment "$1" "$WORK_DIR"
 
-azl_macros_dir="$(specs_dir_from_spec_path "$1")"
-prepare_lua "$azl_macros_dir"
-
+shift # Remove the first argument (the chroot archive) from the list of specs to check.
 echo "Checking $# specs."
 
 i=0
@@ -154,29 +158,30 @@ do
   cp -r "$original_spec_dir_path" "$WORK_DIR"
 
   original_spec_dir_name="$(basename "$original_spec_dir_path")"
-  spec="$WORK_DIR/$original_spec_dir_name/$(basename "$original_spec")"
+  chroot_spec="$original_spec_dir_name/$(basename "$original_spec")"
+  host_spec="$WORK_DIR/$chroot_spec"
 
   # Skipping specs for signed packages. Their unsigned versions should already be included in the manifest.
   if echo "$original_spec" | grep -q "SPECS-SIGNED"
   then
-    echo "    $spec is being ignored (reason: signed package), skipping"
+    echo "    $host_spec is being ignored (reason: signed package), skipping"
     continue
   fi
 
   # Pre-processing alternate sources (commented-out "Source" lines with full URLs), if present. Currently we only care about the first source.
   # First, we replace "%%" with "%" in the alternate source's line.
-  sed -Ei "/^#\s*Source0?:.*%%.*/s/%%/%/g" "$spec"
+  sed -Ei "/^#\s*Source0?:.*%%.*/s/%%/%/g" "$host_spec"
   # Then we uncomment it.
-  sed -Ei "s/^#\s*Source0?:/$alt_source_tag:/" "$spec"
+  sed -Ei "s/^#\s*Source0?:/$alt_source_tag:/" "$host_spec"
 
   # Removing trailing comments from "Source" tags.
-  sed -Ei "s/^(\s*Source[0-9]*:.*)#.*/\1/" "$spec"
+  sed -Ei "s/^(\s*Source[0-9]*:.*)#.*/\1/" "$host_spec"
 
-  name=$(mariner_rpmspec --srpm --qf "%{NAME}" -q "$spec" 2>/dev/null)
+  name=$(sudo chroot "$WORK_DIR" rpmspec --srpm --qf "%{NAME}" -q "$chroot_spec" 2>/dev/null)
   if [[ -z $name ]]
   then
     echo "Failed to get name from '$original_spec'. Please update the spec or the macros from the 'defines' variable in this script. Error:" >> bad_registrations.txt
-    mariner_rpmspec --srpm --qf "%{NAME}" -q "$spec" &>> bad_registrations.txt
+    sudo chroot "$WORK_DIR" rpmspec --srpm --qf "%{NAME}" -q "$chroot_spec" &>> bad_registrations.txt
     continue
   fi
 
@@ -187,49 +192,57 @@ do
     continue
   fi
 
-  version=$(mariner_rpmspec --srpm --qf "%{VERSION}" -q "$spec" 2>/dev/null )
+  version=$(sudo chroot "$WORK_DIR" rpmspec --srpm --qf "%{VERSION}" -q "$chroot_spec" 2>/dev/null )
   if [[ -z $version ]]
   then
     echo "Failed to get version from '$original_spec'. Please update the spec or the macros from the 'defines' variable in this script. Error:" >> bad_registrations.txt
-    mariner_rpmspec --srpm --qf "%{VERSION}" -q "$spec" &>> bad_registrations.txt
+    sudo chroot "$WORK_DIR" rpmspec --srpm --qf "%{VERSION}" -q "$chroot_spec" &>> bad_registrations.txt
     continue
   fi
 
-  parsed_spec="$(mariner_rpmspec --parse "$spec" 2>/dev/null)"
+  parsed_spec="$(sudo chroot "$WORK_DIR" rpmspec --parse "$chroot_spec" 2>/dev/null)"
 
   # Reading the source0 file/URL.
-  source0=$(echo "$parsed_spec" | grep -P "^\s*Source0?:" | cut -d: -f2- | xargs)
-  if [[ -z $source0 ]]
+  if ! echo "$parsed_spec" | grep -qP "^\s*Source0?:"
   then
     echo "    No source file listed for $name:$version, skipping"
     continue
   fi
 
+  source0=$(echo "$parsed_spec" | grep -P "^\s*Source0?:" | cut -d: -f2- | xargs)
+  echo "    Source0: $source0"
+
   # Reading the alternate source URL.
-  source0alt=$(echo "$parsed_spec" | grep -P "^\s*$alt_source_tag:" | cut -d: -f2- | xargs)
+  source0_alt=""
+  if echo "$parsed_spec" | grep -qP "^\s*$alt_source_tag:"
+  then
+    source0_alt=$(echo "$parsed_spec" | grep -P "^\s*$alt_source_tag:" | cut -d: -f2- | xargs)
+    echo "    Source0Alt: $source0_alt"
+  fi
 
   # Pull the current registration from the cgmanifest file. Every registration should have a URL, so if we don't find one
   # that implies the registration is missing.
-  manifesturl=$(jq --raw-output ".Registrations[].component.other | select(.name==\"$name\" and .version==\"$version\") | .downloadUrl" cgmanifest.json)
-  if [[ -z $manifesturl ]]
+  manifest_url=$(jq --raw-output ".Registrations[].component.other | select(.name==\"$name\" and .version==\"$version\") | .downloadUrl" cgmanifest.json)
+  if [[ -z $manifest_url ]]
   then
     echo "Registration for $name:$version is missing" >> bad_registrations.txt
   else
-    if [[ "$manifesturl" != "$source0" && "$manifesturl" != "$source0alt" ]]
+    echo "    Registration URL for $name:$version: $manifest_url"
+    if [[ "$manifest_url" != "$source0" && "$manifest_url" != "$source0_alt" ]]
     then
       {
-        echo "Registration URL for $name:$version ($manifesturl) matches neither the first \"Source\" tag nor the alternate source URL."
+        echo "Registration URL for $name:$version ($manifest_url) matches neither the first \"Source\" tag nor the alternate source URL."
         printf '\tFirst "Source" tag:\t%s\n' "$source0"
-        printf '\tAlternate source URL:\t%s\n' "$source0alt"
+        printf '\tAlternate source URL:\t%s\n' "$source0_alt"
       } >> bad_registrations.txt
     else
       # Try a few times to download the source listed in the manifest
       # Parsing output instead of using error codes because 'wget' returns code 8 for FTP, even if the file exists.
       # Sample HTTP(S) output:  Remote file exists.
       # Sample FTP output:      File ‘time-1.9.tar.gz’ exists.
-      if ! wget --secure-protocol=TLSv1_2 --spider --timeout=30 --tries=10 "${manifesturl}" 2>&1 | grep -qP "^(Remote file|File ‘.*’) exists.*"
+      if ! wget --secure-protocol=TLSv1_2 --spider --timeout=30 --tries=10 "${manifest_url}" 2>&1 | grep -qP "^(Remote file|File ‘.*’) exists.*"
       then
-        echo "Registration for $name:$version has invalid URL '$manifesturl' (could not download)"  >> bad_registrations.txt
+        echo "Registration for $name:$version has invalid URL '$manifest_url' (could not download)"  >> bad_registrations.txt
       fi
     fi
   fi
