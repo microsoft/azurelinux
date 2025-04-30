@@ -14,9 +14,6 @@
 
 set -euo pipefail
 
-# shellcheck source=../../toolkit/scripts/rpmops.sh
-source "$(git rev-parse --show-toplevel)"/toolkit/scripts/rpmops.sh
-
 # Specs, which contain multiple source files and are split into many entries inside 'cgmanifest.json'.
 ignore_multiple_sources=" \
   xorg-x11-apps \
@@ -130,7 +127,7 @@ i=0
 for original_spec in "$@"
 do
   i=$((i+1))
-  echo "[$i/$#] Checking $original_spec"
+  echo "[$i/$#] Checking $original_spec."
 
   # Using a copy of the spec file, because parsing requires some pre-processing.
   original_spec_dir_path="$(dirname "$original_spec")"
@@ -143,7 +140,7 @@ do
   # Skipping specs for signed packages. Their unsigned versions should already be included in the manifest.
   if echo "$original_spec" | grep -q "SPECS-SIGNED"
   then
-    echo "    $host_spec is being ignored (reason: signed package), skipping"
+    echo "    $host_spec is being ignored (reason: signed package), skipping."
     continue
   fi
 
@@ -167,7 +164,7 @@ do
   # Skipping specs from the ignore lists.
   if echo "$ignore_multiple_sources $ignore_no_source_tarball $ignore_known_issues" | grep -qP "(^|\s)$name($|\s)"
   then
-    echo "    $name is being ignored (reason: explicitly ignored package), skipping"
+    echo "    $name is being ignored (reason: explicitly ignored package), skipping."
     continue
   fi
 
@@ -184,19 +181,19 @@ do
   # Reading the source0 file/URL.
   if ! echo "$parsed_spec" | grep -qP "^\s*Source0?:"
   then
-    echo "    No source file listed for $name:$version, skipping"
+    echo "    No source file listed for $name:$version, skipping."
     continue
   fi
 
   source0=$(echo "$parsed_spec" | grep -P "^\s*Source0?:" | cut -d: -f2- | xargs)
-  echo "    Source0: $source0"
+  echo "    Source0: $source0."
 
   # Reading the alternate source URL.
   source0_alt=""
   if echo "$parsed_spec" | grep -qP "^\s*$alt_source_tag:"
   then
     source0_alt=$(echo "$parsed_spec" | grep -P "^\s*$alt_source_tag:" | cut -d: -f2- | xargs)
-    echo "    Source0Alt: $source0_alt"
+    echo "    Source0Alt: $source0_alt."
   fi
 
   # Pull the current registration from the cgmanifest file. Every registration should have a URL, so if we don't find one
@@ -206,7 +203,8 @@ do
   then
     echo "Registration for $name:$version is missing" >> bad_registrations.txt
   else
-    echo "    Registration URL for $name:$version: $manifest_url"
+    echo "    Registration URL: $manifest_url."
+
     if [[ "$manifest_url" != "$source0" && "$manifest_url" != "$source0_alt" ]]
     then
       {
