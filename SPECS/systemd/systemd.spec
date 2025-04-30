@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        21%{?dist}
+Release:        22%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -725,8 +725,6 @@ CONFIGURE_OPTS=(
         # https://bugzilla.redhat.com/show_bug.cgi?id=2028169
         -Dstatus-unit-format-default=combined
         # https://fedoraproject.org/wiki/Changes/Shorter_Shutdown_Timer
-        -Ddefault-timeout-sec=45
-        -Ddefault-user-timeout-sec=45
         -Doomd=true
         -Dadm-gid=4
         -Daudio-gid=63
@@ -1217,6 +1215,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Wed Apr 30 2025 Sindhu Karri <lakarri@microsoft.com> - 255-22
+- Remove custom timeouts
+
 * Mon Apr 14 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 255-21
 - Bumping 'Release' tag to match the 'signed' version of the spec.
 
