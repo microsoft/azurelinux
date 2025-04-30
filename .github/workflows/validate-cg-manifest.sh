@@ -76,14 +76,16 @@ prepare_chroot_environment() {
   chroot_dir_path="$2"
 
   echo "Creating worker chroot under '$chroot_dir_path'."
+
   sudo tar -xf "$chroot_archive" -C "$chroot_dir_path"
   sudo chown -R "$(id -u):$(id -g)" "$chroot_dir_path"
 
   rpm_macros_dir_path="$(sudo chroot "$chroot_dir_path" rpm --eval '%{_rpmmacrodir}')"
-  chroot_rpm_macros_dir_path="$chroot_dir_path/$rpm_macros_dir_path"
   echo "Creating the RPM macros directory '$rpm_macros_dir_path' in the chroot."
+  chroot_rpm_macros_dir_path="$chroot_dir_path/$rpm_macros_dir_path"
   mkdir -vp "$chroot_rpm_macros_dir_path"
 
+  echo "Setting RPM's macros for the RPM queries inside the new chroot:"
   dist_tag=$(make -sC toolkit get-dist-tag)
   # Dist name is extracted from the dist tag by removing the leading dot and the number suffix.
   # Example: ".azl3" -> "azl"
@@ -91,9 +93,15 @@ prepare_chroot_environment() {
   # Dist number is the number suffix of the dist tag.
   # Example: ".azl3" -> "3"
   dist_number="$(grep -oP "\d+$" <<<"$dist_tag")"
-  echo "Setting RPM's macros for the RPM queries inside the new chroot:"
   echo "%dist $dist_tag" | tee "$chroot_rpm_macros_dir_path/macros.dist"
   echo "%$dist_name $dist_number" | tee -a "$chroot_rpm_macros_dir_path/macros.dist"
+  echo "%with_check 1" | tee -a "$chroot_rpm_macros_dir_path/macros.dist"
+  for macro_file in SPECS/azurelinux-rpm-macros/macros* SPECS/pyproject-rpm-macros/macros.pyproject SPECS/perl/macros.perl
+  do
+    sudo cp -v "$macro_file" "$chroot_rpm_macros_dir_path"
+  done
+
+  echo
 }
 
 if [[ $# -lt 2 ]]
@@ -112,9 +120,8 @@ rm -f bad_registrations.txt
 
 WORK_DIR=$(mktemp -d -t)
 function clean_up {
-    echo "Cleaning up..."
-
-    sudo rm -rf "$WORK_DIR"
+    echo "Removing the temporary directory '$WORK_DIR'."
+    rm -rf "$WORK_DIR"
 }
 trap clean_up EXIT SIGINT SIGTERM
 
