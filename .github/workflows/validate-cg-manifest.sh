@@ -67,17 +67,25 @@ ignore_known_issues=" \
 alt_source_tag="Source9999"
 
 prepare_chroot_environment() {
-  local chroot_archive="$1"
-  local chroot_dir_path="$2"
+  local chroot_archive
+  local chroot_dir_path
+  local chroot_rpm_macros_dir_path
+  local dist_name
+  local dist_number
+  local dist_tag
+  local rpm_macros_dir_path
+
+  chroot_archive="$1"
+  chroot_dir_path="$2"
 
   echo "Creating worker chroot under '$chroot_dir_path'."
   sudo tar -xf "$chroot_archive" -C "$chroot_dir_path"
+  sudo chown -R "$(id -u):$(id -g)" "$chroot_dir_path"
 
   rpm_macros_dir_path="$(sudo chroot "$chroot_dir_path" rpm --eval '%{_rpmmacrodir}')"
   chroot_rpm_macros_dir_path="$chroot_dir_path/$rpm_macros_dir_path"
   echo "Creating the RPM macros directory '$rpm_macros_dir_path' in the chroot."
-  sudo mkdir -vp "$chroot_rpm_macros_dir_path"
-  sudo chown -R "$(id -u):$(id -g)" "$chroot_rpm_macros_dir_path"
+  mkdir -vp "$chroot_rpm_macros_dir_path"
 
   dist_tag=$(make -sC toolkit get-dist-tag)
   # Dist name is extracted from the dist tag by removing the leading dot and the number suffix.
@@ -89,23 +97,6 @@ prepare_chroot_environment() {
   echo "Setting RPM's macros for the RPM queries inside the new chroot:"
   echo "%dist $dist_tag" | tee "$chroot_rpm_macros_dir_path/macros.dist"
   echo "%$dist_name $dist_number" | tee -a "$chroot_rpm_macros_dir_path/macros.dist"
-
-  # echo "Mounting the project's specs folders in the chroot:"
-  # for spec_dir in SPECS*; do
-  #   if [[ ! -d "$spec_dir" ]]
-  #   then
-  #     echo "Error: '$spec_dir' is not a directory. The script is expecting to run from the root of the project where all 'SPECS*' files are directories."
-  #     exit 1
-  #   fi
-
-  #   # Mounting the spec directory in the chroot.
-  #   chroot_spec_dir_path="$chroot_dir_path/$spec_dir"
-  #   echo "Mounting '$spec_dir' in '$chroot_spec_dir_path'."
-  #   mkdir -vp "$chroot_spec_dir_path"
-  #   mount -v --bind "$(pwd)/$spec_dir" "$chroot_spec_dir_path"
-  # done
-
-  sudo chown -R "$(id -u):$(id -g)" "$chroot_dir_path"
 }
 
 if [[ $# -lt 2 ]]
@@ -125,18 +116,6 @@ rm -f bad_registrations.txt
 WORK_DIR=$(mktemp -d -t)
 function clean_up {
     echo "Cleaning up..."
-
-    # Unmounting the spec directories from the chroot.
-    # for spec_dir in "$WORK_DIR"/SPECS*; do
-    #   if ! mountpoint -q "$spec_dir"
-    #   then
-    #     echo "Unexpected: '$spec_dir' is not a mount point. Continuing with the clean-up anyway." >&2
-    #     continue
-    #   fi
-
-    #   echo "Unmounting '$spec_dir'."
-    #   umount -v "$spec_dir"
-    # done
 
     sudo rm -rf "$WORK_DIR"
 }
