@@ -1,15 +1,16 @@
 %global oname targetcli-fb
 
 Name:           targetcli
-License:        ASL 2.0
+License:        Apache-2.0
 Summary:        An administration shell for storage targets
-Version:        2.1.53
-Release:        2%{?dist}
+Version:        2.1.58
+Release:        4%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/open-iscsi/%{oname}
 Source:         %{url}/archive/v%{version}/%{oname}-%{version}.tar.gz
-Patch0:         Do-not-install-systemd-files-in-setup.py.patch
+# Proposed upstream
+## From: https://github.com/open-iscsi/targetcli-fb/pull/176
 BuildArch:      noarch
 BuildRequires:  python3-devel, python3-setuptools, systemd-rpm-macros
 Requires:       python3-rtslib, target-restore, python3-configshell, python3-six, python3-dbus
@@ -24,7 +25,6 @@ users will also need to install and use fcoe-utils.
 
 %prep
 %setup -q -n %{oname}-%{version}
-%patch 0 -p1
 
 %build
 %py3_build
@@ -49,11 +49,73 @@ install -m 644 systemd/* %{buildroot}%{_unitdir}/
 %dir %{_sysconfdir}/target/backup
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.53-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Jan 13 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.1.58-4
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License Verified
 
-* Fri Jul 10 2020 Maurizio Lombardi <mlombard@redhat.com> - 2.1.53-1
-- Update to new version
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.58-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 2.1.58-2
+- Rebuilt for Python 3.13
+
+* Mon Feb 12 2024 Maurizio Lombardi <mlombard@redhat.com> - 2.1.58-1
+- migrated to SPDX license
+- Update to version v2.1.58
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.57-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+
+* Thu Oct 26 2023 Maurizio Lombardi <mlombard@redhat.com> - 2.1.57-1
+- Update to version v2.1.57
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.56-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 2.1.56-2
+- Rebuilt for Python 3.12
+
+
+* Tue Jun 06 2023 Maurizio Lombardi <mlombard@redhat.com> - 2.1.56-1
+- Rebase to version 2.1.56
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.54-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.54-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 2.1.54-5
+- Rebuilt for Python 3.11
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.54-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.54-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.1.54-2
+- Rebuilt for Python 3.10
+
+* Mon May 17 2021 Maurizio Lombardi <mlombard@redhat.com> - 2.1.54-1
+- Update to version 2.1.54
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.53-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.53-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Thu Jun 25 2020 Matt Coleman <matt@datto.com> - 2.1.53-1
+- New upstream version
+- Add the upstream project's targetclid systemd unit files
+- Add proposed upstream patch:
+  + Do not install systemd files in setup.py
+  + https://github.com/open-iscsi/targetcli-fb/pull/176
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 2.1.fb49-9
+- Rebuilt for Python 3.9
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.fb49-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

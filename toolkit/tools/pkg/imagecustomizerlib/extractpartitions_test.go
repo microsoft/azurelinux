@@ -154,7 +154,7 @@ func TestCustomizeImageNopShrink(t *testing.T) {
 
 	// Customize image.
 	err = CustomizeImageWithConfigFile(buildDir, configFile, baseImage, nil, outImageFilePath, "", "raw-zst",
-		false /*useBaseImageRpmRepos*/, true /*enableShrinkFilesystems*/)
+		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, true /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
 		return
 	}

@@ -1,18 +1,19 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global abi 7
+%global abi 8
 
 Name:           libdvdread
-Version:        6.0.2
-Release:        4%{?dist}
+Version:        6.1.3
+Release:        1%{?dist}
 Summary:        A library for reading DVD video discs based on Ogle code
 License:        GPLv2+
-URL:            http://dvdnav.mplayerhq.hu/
+URL:            https://dvdnav.mplayerhq.hu/
 Source0:        https://download.videolan.org/pub/videolan/libdvdread/%{version}/libdvdread-%{version}.tar.bz2
 Source1:        https://download.videolan.org/pub/videolan/libdvdread/%{version}/libdvdread-%{version}.tar.bz2.asc
 Source2:        https://download.videolan.org/pub/keys/7180713BE58D1ADC.asc
 BuildRequires:  gcc
 BuildRequires:  gnupg2
+BuildRequires:  make
 Provides:       bundled(md5-gcc)
 
 %description
@@ -32,7 +33,7 @@ This package contains development files for libdvdread.
 
 %prep
 %{gpgverify} --keyring='%{S:2}' --signature='%{S:1}' --data='%{S:0}'
-%setup -q
+%autosetup
 
 %build
 %configure --disable-static
@@ -47,7 +48,7 @@ rm %{buildroot}%{_libdir}/libdvdread.la %{buildroot}%{_pkgdocdir}/COPYING
 
 %files
 %license COPYING
-%doc AUTHORS NEWS README
+%doc AUTHORS NEWS README.md
 %{_libdir}/libdvdread.so.%{abi}*
 
 %files devel
@@ -58,6 +59,10 @@ rm %{buildroot}%{_libdir}/libdvdread.la %{buildroot}%{_pkgdocdir}/COPYING
 %{_libdir}/pkgconfig/dvdread.pc
 
 %changelog
+* Thu Nov 14 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 6.1.3-1
+- Update to 6.1.3
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.0.2-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

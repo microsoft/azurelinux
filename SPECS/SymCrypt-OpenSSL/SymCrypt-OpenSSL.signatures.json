@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "SymCrypt-OpenSSL-1.5.1.tar.gz": "946ac1bdd4d3e0d0381bca0df1b7281f9f7735430dfb6fce56344c7f2f3a7ecb"
- }
+  "Signatures": {
+    "SymCrypt-OpenSSL-1.8.0.tar.gz": "b7ed88e797ea9b589f4b97b1d62961ee90db9c3be1d9acb7f12480cc3d198545"
+  }
 }

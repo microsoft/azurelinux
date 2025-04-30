@@ -94,8 +94,10 @@ clean-toolchain-rpms:
 # We leave the directory structure in place since docker based builds using re-usable chroots will have mounted the
 # toolchain subdirectories into the chroots. Removing the directories would break the mounts.
 $(STATUS_FLAGS_DIR)/toolchain_auto_cleanup.flag: $(STATUS_FLAGS_DIR)/daily_build_id.flag $(depend_VALIDATE_TOOLCHAIN_GPG)
+ifeq ($(SKIP_TOOLCHAIN_AUTO_CLEANUP),n)
 	@echo "Daily build ID or validation mode changed, sanitizing toolchain"
 	find $(TOOLCHAIN_RPMS_DIR) -type f -name '*.rpm' -exec rm -f {} +
+endif
 	touch $@
 
 copy-toolchain-rpms:
@@ -196,6 +198,7 @@ $(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST) $(go-downloader) $(SCRIPTS_D
 		--log-base "$$log_file" \
 		--hydrate \
 		--url-list "$(PACKAGE_URL_LIST)" \
+		--allowable-gpg-keys "$(TOOLCHAIN_GPG_VALIDATION_KEYS)" \
 		$(if $(TLS_CERT),--certificate $(TLS_CERT)) \
 		$(if $(TLS_KEY),--private-key $(TLS_KEY)) || { \
 		echo "Could not find toolchain package in package repo to rehydrate with: $(notdir $@)." >> "$$log_file" && \

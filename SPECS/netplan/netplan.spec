@@ -12,7 +12,7 @@
 
 
 Name:           netplan
-Version:        1.0
+Version:        1.0.1
 Release:        1%{?dist}
 Summary:        Network configuration tool using YAML
 Group:          System Environment/Base
@@ -22,11 +22,7 @@ License:        GPLv3
 URL:            https://netplan.io/
 Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-# Fix bug in netplan when python3-rich is not present.
-Patch2:         rich-import-failure-no-log.patch
-
-# Temporarily disabling broken test suite due to version mismatches between
-# pytest-cov and python3-coverage in 3.0.
+# Temporarily disabling broken test suite due to version mismatches between pytest-cov and python3-coverage in 3.0.
 Patch3:         disable-broken-tests.patch
 
 BuildRequires:  bash-completion-devel
@@ -228,6 +224,10 @@ chmod 600 %{buildroot}%{_prefix}/lib/%{name}/00-netplan-default-renderer-network
 %meson_test
 
 %changelog
+* Mon Nov 04 2024 Sean Dougherty <sdougherty@microsoft.com> - 1.0.1-1
+- Upgrade to 1.0.1, which addresses CVE-2022-4968
+- Removed patch whose fix is now merged
+
 * Fri Mar 29 2024 Francisco Huelsz prince <frhuelsz@microsoft.com> - 1.0-1
 - Upgrade to 1.0
 

@@ -2,13 +2,16 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary: Mobile broadband provider database
 Name: mobile-broadband-provider-info
-Version: 20190618
-Release: 4%{?dist}
+Version: 20240407
+Release: 3%{?dist}
 URL: https://wiki.gnome.org/Projects/NetworkManager/MobileBroadband/ServiceProviders
-License: Public Domain
+License: CC-PDDC
 Source: https://download.gnome.org/sources/%{name}/%{version}/%{name}-%{version}.tar.xz
 
 BuildArch: noarch
+
+BuildRequires: gcc
+BuildRequires: meson
 BuildRequires: /usr/bin/xmllint
 BuildRequires: /usr/bin/xsltproc
 
@@ -31,16 +34,16 @@ developing developing applications that use %{name}.
 
 
 %build
-%configure
-%make_build
+%meson
+%meson_build
 
 
 %check
-make check
+%meson_test
 
 
 %install
-%make_install
+%meson_install
 
 
 %files
@@ -48,14 +51,72 @@ make check
 %doc README
 %license COPYING
 
-	
+
 %files devel
 %{_datadir}/pkgconfig/%{name}.pc
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20190618-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Dec 31 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 20240407-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20240407-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri May 17 2024 Davide Cavalca <dcavalca@fedoraproject.org> - 20240407-1
+- Update to upstream release 20240407
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20230416-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20230416-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Sep 06 2023 Till Maas <opensource@till.name> - 20230416-3
+- migrate to spdx license
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20230416-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sun Apr 16 2023 Lubomir Rintel <lkundrak@v3.sk> - 20230416-1
+- Update to upstream release 20230416
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20221107-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Nov 07 2022 Lubomir Rintel <lkundrak@v3.sk> - 20221107-1
+- Update to upstream release 20221107
+
+* Mon Jul 25 2022 Lubomir Rintel <lkundrak@v3.sk> - 20220725-1
+- Update to upstream release 20220725
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20220511-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed May 11 2022 Lubomir Rintel <lkundrak@v3.sk> - 20220511-1
+- Update to upstream release 20220511
+
+* Tue Mar 15 2022 Lubomir Rintel <lkundrak@v3.sk> - 20220315-1
+- Update to upstream release 20220315
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20210805-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Aug  5 2021 Thomas Haller <thaller@redhat.com> - 20210805-1
+- Update to upstream release 20210805
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20201225-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20201225-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Dec 25 2020 Thomas Haller <thaller@redhat.com> - 20201225-1
+- Update to upstream release 20201225
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 20190618-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 20190618-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -178,4 +239,3 @@ make check
 
 * Tue Jun 2 2009 Dan Williams <dcbw@redhat.com> 0.20090602-1
 - Initial version
-

@@ -88,11 +88,11 @@ func TestShouldFailForUntaggedEncryptionDeviceMapperRoot(t *testing.T) {
 
 	err := testConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured:\n[Partition] (MyRootfs) must include 'dmroot' device mapper root flag in [Flags] for [SystemConfig] (SmallerDisk)'s root partition since it uses [ReadOnlyVerityRoot] or [Encryption]", err.Error())
+	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption), but partitions are miss-configured:\n[Partition] (MyRootfs) must include 'dmroot' device mapper root flag in [Flags] for [SystemConfig] (SmallerDisk)'s root partition since it uses [Encryption]", err.Error())
 
 	err = remarshalJSON(testConfig, &checkedConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Config]:\na config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured:\n[Partition] (MyRootfs) must include 'dmroot' device mapper root flag in [Flags] for [SystemConfig] (SmallerDisk)'s root partition since it uses [ReadOnlyVerityRoot] or [Encryption]", err.Error())
+	assert.Equal(t, "failed to parse [Config]:\na config in [SystemConfigs] enables a device mapper based root (Encryption), but partitions are miss-configured:\n[Partition] (MyRootfs) must include 'dmroot' device mapper root flag in [Flags] for [SystemConfig] (SmallerDisk)'s root partition since it uses [Encryption]", err.Error())
 }
 
 func TestShouldFailDeviceMapperWithNoRootPartitions(t *testing.T) {
@@ -117,11 +117,11 @@ func TestShouldFailDeviceMapperWithNoRootPartitions(t *testing.T) {
 
 	err := testConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured:\ncan't find a root ('/') [PartitionSetting] to work with either [ReadOnlyVerityRoot] or [Encryption]", err.Error())
+	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption), but partitions are miss-configured:\ncan't find a root ('/') [PartitionSetting] to work with [Encryption]", err.Error())
 
 	err = remarshalJSON(testConfig, &checkedConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Config]:\nfailed to parse [SystemConfig]: invalid [ReadOnlyVerityRoot] or [Encryption]: must have a partition mounted at '/'", err.Error())
+	assert.Equal(t, "failed to parse [Config]:\nfailed to parse [SystemConfig]: invalid [Encryption]: must have a partition mounted at '/'", err.Error())
 
 }
 
@@ -170,12 +170,12 @@ func TestShouldFailDeviceMapperWithMultipleRoots(t *testing.T) {
 
 	err := testConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured:\n[SystemConfig] (SmallerDisk) includes two (or more) device mapper root [PartitionSettings] (MyRootfs) and (MySecondRootfs), include only one", err.Error())
+	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption), but partitions are miss-configured:\n[SystemConfig] (SmallerDisk) includes two (or more) device mapper root [PartitionSettings] (MyRootfs) and (MySecondRootfs), include only one", err.Error())
 
 	// remarshal runs IsValid() on [SystemConfig] prior to running it on [Config], so we get a different error message here.
 	err = remarshalJSON(testConfig, &checkedConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Config]:\na config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured:\n[SystemConfig] (SmallerDisk) includes two (or more) device mapper root [PartitionSettings] (MyRootfs) and (MySecondRootfs), include only one", err.Error())
+	assert.Equal(t, "failed to parse [Config]:\na config in [SystemConfigs] enables a device mapper based root (Encryption), but partitions are miss-configured:\n[SystemConfig] (SmallerDisk) includes two (or more) device mapper root [PartitionSettings] (MyRootfs) and (MySecondRootfs), include only one", err.Error())
 
 }
 
@@ -522,17 +522,7 @@ var expectedConfiguration Config = Config{
 				Enable:   true,
 				Password: "EncryptPassphrase123",
 			},
-			RemoveRpmDb: false,
-			ReadOnlyVerityRoot: ReadOnlyVerityRoot{
-				Enable:                       false,
-				Name:                         "verity_root_fs",
-				ErrorCorrectionEnable:        true,
-				ErrorCorrectionEncodingRoots: 2,
-				RootHashSignatureEnable:      false,
-				VerityErrorBehavior:          "",
-				TmpfsOverlays:                nil,
-				TmpfsOverlaySize:             "20%",
-			},
+			RemoveRpmDb:   false,
 			EnableHidepid: true,
 		},
 		{

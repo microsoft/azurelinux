@@ -1,0 +1,13 @@
+--- sphinxygen-v1.0.2/src/sphinxygen/sphinxygen.py	2023-02-27 19:09:40.000000000 +0300
++++ sphinxygen-v1.0.2.mod/src/sphinxygen/sphinxygen.py	2023-08-08 13:12:26.568657487 +0300
+@@ -330,7 +330,9 @@
+                 child_record["name"] = child.find("name").text
+ 
+             elif child.get("kind") == "variable":
+-                if child_record["name"][0] == "@":
++                if child_record["name"] is None:
++                    child_record["name"] = ""
++                elif child_record["name"][0] == "@":
+                     # Remove placeholder name from anonymous struct or union
+                     child_record["name"] = ""
+                 else:

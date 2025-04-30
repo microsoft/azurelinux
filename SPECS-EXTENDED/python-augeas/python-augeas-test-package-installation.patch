@@ -1,0 +1,22 @@
+From f74c4a8206c5a7f28836cbe3cd043bc481c5e518 Mon Sep 17 00:00:00 2001
+From: Nehal J Wani <nehaljw.kkd1@gmail.com>
+Date: Sun, 23 May 2021 09:54:53 -0400
+Subject: [PATCH] Ensure exclude is a tuple (#53)
+
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 6c4265e..13b1a38 100755
+--- a/setup.py
++++ b/setup.py
+@@ -18,7 +18,7 @@
+       author="Harald Hoyer",
+       author_email="augeas-devel@redhat.com",
+       description="""Python bindings for Augeas""",
+-      packages=find_packages(exclude=('test')),
++      packages=find_packages(exclude=('test',)),
+       setup_requires=["cffi>=1.0.0"],
+       cffi_modules=["augeas/ffi.py:ffi"],
+       install_requires=["cffi>=1.0.0"],

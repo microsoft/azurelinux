@@ -79,7 +79,7 @@ func TestCustomizeImageUsers(t *testing.T) {
 
 	// Customize image.
 	err := CustomizeImage(buildDir, testDir, &config, baseImage, nil, outImageFilePath, "raw", "",
-		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -163,7 +163,7 @@ func TestCustomizeImageUsersExitingUserHomeDir(t *testing.T) {
 
 	// Customize image.
 	err := CustomizeImage(buildDir, testDir, &config, baseImage, nil, outImageFilePath, "raw", "",
-		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	assert.ErrorContains(t, err, "cannot set home directory (/home/root) on a user (root) that already exists")
 }
 
@@ -187,7 +187,7 @@ func TestCustomizeImageUsersExitingUserUid(t *testing.T) {
 
 	// Customize image.
 	err := CustomizeImage(buildDir, testDir, &config, baseImage, nil, outImageFilePath, "raw", "",
-		false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
+		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	assert.ErrorContains(t, err, "cannot set UID (1) on a user (root) that already exists")
 }
 

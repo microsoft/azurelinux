@@ -20,9 +20,14 @@ no_repo_acl = $(STATUS_FLAGS_DIR)/no_repo_acl.flag
 # Creates a folder if it doesn't exist. Also sets the timestamp to 0 if it is
 # created.
 #
+# To allow output to be printed, we use the $(eval) function to create a new
+# variable _out which will contain the output of the shell command. If the output
+# is not empty, we print it to the console.
+#
 # $1 - Folder path
 define create_folder
-$(call shell_real_build_only, if [ ! -d $1 ]; then mkdir -p $1 && touch -d @0 $1 ; fi )
+$(eval _out := $(call shell_real_build_only, if [ ! -d $1 ]; then mkdir -p $1 2>&1 && touch -d @0 $1 ; fi ))
+$(if $(strip $(_out)),$(warning $(_out)))
 endef
 
 # Runs a shell commannd only if we are actually doing a build rather than parsing the makefile for tab-completion etc
@@ -55,10 +60,10 @@ endef
 ######## VARIABLE DEPENDENCY TRACKING ########
 
 # List of variables to watch for changes.
-watch_vars=PACKAGE_BUILD_LIST PACKAGE_REBUILD_LIST PACKAGE_IGNORE_LIST REPO_LIST CONFIG_FILE STOP_ON_PKG_FAIL TOOLCHAIN_ARCHIVE REBUILD_TOOLCHAIN SRPM_PACK_LIST SPECS_DIR MAX_CASCADING_REBUILDS RUN_CHECK TEST_RUN_LIST TEST_RERUN_LIST TEST_IGNORE_LIST EXTRA_BUILD_LAYERS LICENSE_CHECK_MODE VALIDATE_TOOLCHAIN_GPG REPO_SNAPSHOT_TIME
+watch_vars=PACKAGE_BUILD_LIST PACKAGE_REBUILD_LIST PACKAGE_IGNORE_LIST REPO_LIST CONFIG_FILE STOP_ON_PKG_FAIL TOOLCHAIN_ARCHIVE REBUILD_TOOLCHAIN SRPM_PACK_LIST SPECS_DIR MAX_CASCADING_REBUILDS RUN_CHECK TEST_RUN_LIST TEST_RERUN_LIST TEST_IGNORE_LIST EXTRA_BUILD_LAYERS LICENSE_CHECK_MODE VALIDATE_TOOLCHAIN_GPG REPO_SNAPSHOT_TIME PACKAGE_CACHE_SUMMARY
 # Current list: $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_REPO_LIST) $(depend_CONFIG_FILE) $(depend_STOP_ON_PKG_FAIL)
 #					$(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN) $(depend_SRPM_PACK_LIST) $(depend_SPECS_DIR) $(depend_EXTRA_BUILD_LAYERS) $(depend_MAX_CASCADING_REBUILDS) $(depend_RUN_CHECK) $(depend_TEST_RUN_LIST)
-#					$(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(depend_LICENSE_CHECK_MODE) $(depend_VALIDATE_TOOLCHAIN_GPG) $(depend_REPO_SNAPSHOT_TIME)
+#					$(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(depend_LICENSE_CHECK_MODE) $(depend_VALIDATE_TOOLCHAIN_GPG) $(depend_REPO_SNAPSHOT_TIME) $(depend_PACKAGE_CACHE_SUMMARY)
 
 .PHONY: variable_depends_on_phony clean-variable_depends_on_phony setfacl_always_run_phony
 clean: clean-variable_depends_on_phony

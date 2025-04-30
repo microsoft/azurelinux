@@ -26,7 +26,6 @@ BuildRequires:  libXv-devel
 BuildRequires:  orc-devel >= 0.4.18
 BuildRequires:  pango-devel
 BuildRequires:  pkgconfig
-BuildRequires:  opus-devel
 BuildRequires:  gdk-pixbuf2-devel
 BuildRequires:  gtk3-devel
 BuildRequires:  libjpeg-turbo-devel
@@ -93,7 +92,8 @@ for developing applications that use %{name}.
   -D orc=enabled \
   -D tremor=disabled \
   -D tests=disabled \
-  -D examples=disabled
+  -D examples=disabled \
+  -D opus=disabled
 %meson_build
 
 %install
@@ -425,9 +425,12 @@ rm %{_libexecdir}/gstreamer-%{majorminor}/gst-plugin-scanner
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Wed Oct 23 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.24.8-1
+* Wed Apr 30 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.24.8-1
 - Upgrade to 1.24.8
 - License Verified
+
+* Wed Jan 22 2025 Andrew Phelps <anphel@microsoft.com> - 1.20.4-3
+- Remove dependency on opus
 
 * Wed Nov 23 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.20.4-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)

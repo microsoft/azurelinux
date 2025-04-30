@@ -1,7 +1,7 @@
 {
   "Signatures": {
     "etcd.service": "4550a4967ba35670051cbfd9b4edf1fc57c0f1d7a07e51f88351ac44c76d8066",
-    "etcd-3.5.12-vendor.tar.gz": "2427523101fa0c5ec75f8c65224cddac89de86ae2f5d6b07f14ae7ea1b195064",
-    "etcd-3.5.12.tar.gz": "90b56a7f2f43a993d420954322e607a6e6a0ca5549f1f7c7dc3567d2f56678d9"
+    "etcd-3.5.21.tar.gz": "76d7fcafe4fcc957fcd45671226b992c16e5f5e724935dea9df0190ac2b13481",
+    "etcd-3.5.21-vendor.tar.gz": "b4c072080f0ca47c1d447b6547165b943206cb5cb71dbd35a9e68079fdeac5a7"
   }
 }

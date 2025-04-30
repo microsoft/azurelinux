@@ -4,7 +4,7 @@ Distribution:   Azure Linux
 Summary: RDF Parser Toolkit for Redland
 Name:    raptor2
 Version: 2.0.15
-Release: 28%{?dist}
+Release: 29%{?dist}
 
 License: GPLv2+ or LGPLv2+ or ASL 2.0
 Source:  http://download.librdf.org/source/raptor2-%{version}.tar.gz
@@ -17,6 +17,10 @@ Patch1: 0001-Calcualte-max-nspace-declarations-correctly-for-XML-.patch
 Patch2: 0001-CVE-2020-25713-raptor2-malformed-input-file-can-lead.patch
 
 ## upstreamable patches
+Patch3: raptor2-configure-c99.patch
+Patch4: raptor2-c99.patch
+Patch5: raptor2-libxml2.patch
+
 
 BuildRequires: make
 BuildRequires: gcc-c++
@@ -103,6 +107,10 @@ make check
 
 
 %changelog
+* Fri Mar 07 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.0.15-29
+- added patch to fix build
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.15-28
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 

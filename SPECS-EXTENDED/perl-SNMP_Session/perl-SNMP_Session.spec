@@ -1,16 +1,20 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-SNMP_Session
-Version:        1.13
-Release:        24%{?dist}
+Version:        1.16
+Release:        6%{?dist}
 Summary:        SNMP support for Perl 5
 
-License:        Artistic 2.0
-URL:            http://code.google.com/p/snmp-session/
-Source0:        http://snmp-session.googlecode.com/files/SNMP_Session-%{version}.tar.gz
+License:        Artistic-2.0
+URL:            https://github.com/sleinen/snmp-session/
+Source0:        https://cpan.metacpan.org/authors/id/S/SK/SKIM/SNMP_Session-%{version}.tar.gz#/perl-SNMP_Session-%{version}.tar.gz
+Patch0:         SNMP_Session-1.13-fix_ivp6.patch
 BuildArch:      noarch
+BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(Test::More)
+# Runtime
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description
@@ -19,37 +23,87 @@ Pure Perl SNMP v1 and SNMP v2 support for Perl 5.
 The SNMP operations currently supported are "get", "get-next", "get-bulk"
 and "set", as well as trap generation and reception. 
 
-
 %prep
 %setup -q -n SNMP_Session-%{version}
+%patch -P 0 -p1
 %{__perl} -pi -e 's{^#!/usr/local/bin/perl\b}{#!%{__perl}}' test/*
 chmod -c 644 test/*
 
-
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
-
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} ';'
-find $RPM_BUILD_ROOT -type d -depth -exec rmdir {} 2>/dev/null ';'
-chmod -R u+w $RPM_BUILD_ROOT/*
-
+%{make_install}
+%{_fixperms} %{buildroot}/*
 
 %check
 make test
 
-
 %files
-%doc Artistic README README.SNMP_util index.html test/
+%license Artistic
+%doc README README.SNMP_util index.html test/
 %{perl_vendorlib}/*
-
+%{_mandir}/man3/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.13-24
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Dec 20 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.16-6
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.16-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.16-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.16-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.16-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 21 2023 Tom Callaway <spot@fedoraproject.org> - 1.16-1
+- update to 1.16
+
+* Mon Jun  5 2023 Tom Callaway <spot@fedoraproject.org> - 1.15-1
+- update to 1.15
+
+* Mon Jun 05 2023 Michal Josef Špaček <mspacek@redhat.com> - 1.13-34
+- Fix IPv6 functionality of SNMP_Session
+
+* Tue Apr 04 2023 Michal Josef Špaček <mspacek@redhat.com> - 1.13-33
+- Fix ipv6
+- Modernize spec file
+- Use %license macro
+- Update license to SPDX format
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.13-32
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.13-31
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.13-30
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.13-29
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.13-28
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.13-27
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.13-26
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.13-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.13-24
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.13-23
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

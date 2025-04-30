@@ -1,30 +1,24 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-Summary: Basic desktop integration functions 
+Summary: Basic desktop integration functions
 Name:    xdg-utils
-Version: 1.1.3
-Release: 7%{?dist}
+Version: 1.2.1
+Release: 3%{?dist}
 
-URL:     http://portland.freedesktop.org/ 
+URL:     https://www.freedesktop.org/wiki/Software/xdg-utils/
 %if 0%{?snap:1}
 Source0: xdg-utils-%{version}-%{snap}.tar.gz
 %else
-# at least until freedesktop folks move over to release dir
-Source0:  https://people.freedesktop.org/~rdieter/xdg-utils/xdg-utils-%{version}.tar.gz
-#Source0: http://portland.freedesktop.org/download/xdg-utils-%{version}%{?prerelease:-%{prerelease}}.tar.gz
+Source0:  https://gitlab.freedesktop.org/xdg/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
 %endif
-Source1: xdg-utils-git_checkout.sh
-License: MIT 
-
-## upstream patches (treat as sources in lookaside cache)
-Patch1: 0001-open-for-post-1.1.3-development.patch
-Patch2: 0002-xdg-open-better-pcmanfm-check-BR106636-BR106161.patch
+License: MIT
 
 # make sure BuildArch comes *after* patches, to ensure %%autosetup works right
 # http://bugzilla.redhat.com/1084309
 BuildArch: noarch
 
+BuildRequires: make
 BuildRequires: gawk
 BuildRequires: xmlto lynx
 
@@ -35,7 +29,7 @@ Requires: which
 %description
 The %{name} package is a set of simple scripts that provide basic
 desktop integration functions for any Free Desktop, such as Linux.
-They are intended to provide a set of defacto standards.  
+They are intended to provide a set of defacto standards.
 This means that:
 *  Third party software developers can rely on these xdg-utils
    for all of their simple integration needs.
@@ -56,25 +50,25 @@ The following scripts are provided at this time:
 
 
 %prep
-%autosetup -n %{name}-%{version}%{?pre:-%{pre}} -p1
+%autosetup -n %{name}-v%{version} -p1
 
 
 %build
 %configure
 
 %if 0%{?snap:1}
-make scripts-clean -C scripts 
+make scripts-clean -C scripts
 make man scripts %{?_smp_mflags} -C scripts
 %endif
-make %{?_smp_mflags}
-
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 
 
 %files
-%doc ChangeLog LICENSE README TODO
+%doc ChangeLog README.md TODO
+%license LICENSE
 %{_bindir}/xdg-desktop-icon
 %{_bindir}/xdg-desktop-menu
 %{_bindir}/xdg-email
@@ -94,8 +88,57 @@ make install DESTDIR=%{buildroot}
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.3-7
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Dec 26 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.2.1-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sun Feb 11 2024 Zbigniew Jedrzejewski-Szmek <zbyszek@in.waw.pl> - 1.2.1-1
+- Update to 1.2.1 (rhbz#2241305)
+
+* Tue Jan 30 2024 Steve Cossette <farchord@gmail.com> - 1.2.0-1
+- Release to 1.2.0 final
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0~git20231511.21fb316-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Nov 18 2023 Alessandro Astone <ales.astone@gmail.com> - 1.2.0~git20231511.21fb316-1
+- Update to 1.2.0~ git snapshot
+
+* Tue Jul 25 2023 Rafael Guterres Jeffman <rjeffman@redhat.com> - 1.1.3-15
+- Use "grep -E" instead of the obsoleted "egrep"
+  Resolves: BZ#2140197
+- mark LICENSE as %%license
+- Spec cleanup
+- Small patches, as a rule, are in git dist, to be more easy to read.
+- Migrated to SPDX license (noop)
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.3-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.3-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.3-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.3-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.3-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Apr 23 2021 Rex Dieter <rdieter@fedoraproject.org> - 1.1.3-9
+- pull in upstream fixes
+- xdg-open run indefinetly (#1881372)
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.3-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.3-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -393,4 +436,3 @@ make install DESTDIR=%{buildroot}
 
 * Mon Jul 24 2006 Rex Dieter <rexdieter[AT]users.sf.net> 1.0-0.1.beta1
 - 1.0beta1
-
