@@ -30351,8 +30351,8 @@
         "type": "other",
         "other": {
           "name": "xdg-dbus-proxy",
-          "version": "0.1.2",
-          "downloadUrl": "https://github.com/flatpak/xdg-dbus-proxy/releases/download/0.1.2/xdg-dbus-proxy-0.1.2.tar.xz"
+          "version": "0.1.6",
+          "downloadUrl": "https://github.com/flatpak/xdg-dbus-proxy/releases/download/0.1.6/xdg-dbus-proxy-0.1.6.tar.xz"
         }
       }
     },
