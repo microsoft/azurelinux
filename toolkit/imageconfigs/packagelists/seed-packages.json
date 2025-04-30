@@ -7,8 +7,8 @@
         "azurelinux-rpm-macros",
         "ca-certificates",
         "ca-certificates-base",
-        "grub2",
         "grub2-efi-binary",
+        "grub2",
         "iana-etc",
         "initramfs",
         "iproute",
@@ -17,10 +17,11 @@
         "shim",
         "sudo",
         "SymCrypt-OpenSSL",
-        "systemd",
+        "SymCrypt",
         "systemd-networkd",
         "systemd-resolved",
-        "tdnf",
-        "tdnf-plugin-repogpgcheck"
+        "systemd",
+        "tdnf-plugin-repogpgcheck",
+        "tdnf"
     ]
 }
