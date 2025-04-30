@@ -13,10 +13,10 @@ Source0:        https://ftp.gnome.org/pub/GNOME/sources/libsoup/%{BaseVersion}/%
 Patch0:          CVE-2024-52530.patch
 Patch1:          CVE-2024-52531.patch
 Patch2:          CVE-2024-52532.patch
-# CVE-2025-32906 will be fixed in 3.6.5 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/af5b9a4a3945c52b940d5ac181ef51bb12011f1f
-Patch3:          CVE-2025-32906.patch
 # CVE-2025-32913 will be fixed in 3.6.2 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/f4a761fb66512fff59798765e8ac5b9e57dceef0
-Patch4:          CVE-2025-32913.patch
+Patch3:          CVE-2025-32913.patch
+# CVE-2025-32906 will be fixed in 3.6.5 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/af5b9a4a3945c52b940d5ac181ef51bb12011f1f
+Patch4:          CVE-2025-32906.patch
 Patch5:          CVE-2025-32914.patch
 # CVE-2025-32909 will be fixed in 3.6.2 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/ba4c3a6f988beff59e45801ab36067293d24ce92
 Patch6:          CVE-2025-32909.patch
