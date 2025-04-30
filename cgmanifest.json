@@ -5021,7 +5021,7 @@
         "other": {
           "name": "gstreamer1",
           "version": "1.24.8",
-          "downloadUrl": "http://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.24.8.tar.xz"
+          "downloadUrl": "https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.24.8.tar.xz"
         }
       }
     },

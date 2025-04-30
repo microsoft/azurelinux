@@ -224,7 +224,6 @@ rm %{_libexecdir}/gstreamer-%{majorminor}/gst-plugin-scanner
 %{_libdir}/gstreamer-%{majorminor}/libgstlibvisual.so
 %{_libdir}/gstreamer-%{majorminor}/libgstogg.so
 %{_libdir}/gstreamer-%{majorminor}/libgstopengl.so
-%{_libdir}/gstreamer-%{majorminor}/libgstopus.so
 %{_libdir}/gstreamer-%{majorminor}/libgstpango.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttheora.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvorbis.so
