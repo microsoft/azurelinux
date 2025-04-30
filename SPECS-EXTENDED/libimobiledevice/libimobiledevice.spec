@@ -83,7 +83,7 @@ find %{buildroot} -type f -name "*.la" -delete
 %{_includedir}/libimobiledevice/
 
 %changelog
-* Wed Apr 23 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.3.1-1
+* Wed Apr 23 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.3.0-1
 - Update to version 1.3.0
 - License verified
 
