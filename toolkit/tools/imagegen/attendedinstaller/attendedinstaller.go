@@ -18,6 +18,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/diskview"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/encryptview"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/eulaview"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/finalconfigview"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/finishview"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/hostnameview"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/installationview"
@@ -392,6 +393,7 @@ func (ai *AttendedInstaller) initializeViews() (err error) {
 	ai.allViews = append(ai.allViews, encryptview.New())
 	ai.allViews = append(ai.allViews, hostnameview.New())
 	ai.allViews = append(ai.allViews, userview.New())
+	ai.allViews = append(ai.allViews, finalconfigview.New())
 	ai.allViews = append(ai.allViews, confirmview.New())
 	ai.allViews = append(ai.allViews, progressview.New(ai.installationWrapper))
 	ai.allViews = append(ai.allViews, finishview.New(ai.recordedInstallationTime))
