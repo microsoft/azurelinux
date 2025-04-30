@@ -56,11 +56,6 @@ ignore_no_source_tarball=" \
   web-assets \
   "
 
-# Specs where cgmanifest validation has known issues checking URLs.
-ignore_known_issues=" \
-  virglrenderer \
-  libesmtp"
-
 alt_source_tag="Source9999"
 
 prepare_chroot_environment() {
@@ -169,7 +164,7 @@ do
   fi
 
   # Skipping specs from the ignore lists.
-  if echo "$ignore_multiple_sources $ignore_no_source_tarball $ignore_known_issues" | grep -qP "(^|\s)$name($|\s)"
+  if echo "$ignore_multiple_sources $ignore_no_source_tarball" | grep -qP "(^|\s)$name($|\s)"
   then
     echo "    $name is being ignored (reason: explicitly ignored package), skipping."
     continue
