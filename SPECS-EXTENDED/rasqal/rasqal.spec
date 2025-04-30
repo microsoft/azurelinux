@@ -35,9 +35,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 Libraries, includes etc to develop with the Rasqal RDF query language library.
 
 %prep
-%setup -q
-%patch -P1 -p1 -b .printf
-%patch -P2 -p1
+%autosetup -p1
 
 # hack to nuke rpaths
 %if "%{_libdir}" != "/usr/lib"
