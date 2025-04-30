@@ -2,7 +2,7 @@
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
 Version:        %{BaseVersion}.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -135,14 +135,13 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 
 %changelog
-* Fri Apr 28 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.0.4-4
+* Fri Apr 28 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.0.4-5
 - Add patch for CVE-2025-32909
 - Add patch for CVE-2025-32910
 - Add patch for CVE-2025-32912
 
 * Fri Apr 25 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.0.4-4
 - Add patch for CVE-2025-32914
-
 
 * Wed Apr 16 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.0.4-3
 - Add patch for CVE-2025-32913
