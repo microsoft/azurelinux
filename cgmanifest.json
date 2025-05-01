@@ -5061,7 +5061,7 @@
         "other": {
           "name": "gupnp-av",
           "version": "0.14.1",
-          "downloadUrl": "http://download.gnome.org/sources/gupnp-av/0.14/gupnp-av-0.14.1.tar.xz"
+          "downloadUrl": "https://download.gnome.org/sources/gupnp-av/0.14/gupnp-av-0.14.1.tar.xz"
         }
       }
     },

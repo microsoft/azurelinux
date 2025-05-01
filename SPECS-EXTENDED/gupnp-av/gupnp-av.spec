@@ -6,8 +6,8 @@ Release:       1%{?dist}
 Summary:       A collection of helpers for building UPnP AV applications
 
 License:       LGPLv2.1+
-URL:           http://www.gupnp.org/
-Source0:       http://download.gnome.org/sources/gupnp-av/0.14/%{name}-%{version}.tar.xz
+URL:           https://www.gupnp.org/
+Source0:       https://download.gnome.org/sources/gupnp-av/0.14/%{name}-%{version}.tar.xz
 Patch0:        fix-xmlRecoverMemory-deprecation.patch
 
 BuildRequires: glib2-devel
