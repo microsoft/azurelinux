@@ -12,8 +12,8 @@ Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://gstreamer.freedesktop.org/
-Source0:        http://gstreamer.freedesktop.org/src/gstreamer/gstreamer-%{version}.tar.xz
+URL:            https://gstreamer.freedesktop.org/
+Source0:        https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-%{version}.tar.xz
 ## For GStreamer RPM provides
 Source1:        gstreamer1.prov
 Source2:        gstreamer1.attr
