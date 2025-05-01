@@ -14,6 +14,9 @@ BuildRequires:	lz4-devel
 BuildRequires:  pkgconfig(icu-i18n)
 BuildRequires:  pkgconfig(icu-uc)
 Requires:	postgresql
+%if 0%{?with_check}
+Requires:       shadow-utils
+%endif
 Provides:	%{name}
 
 %description
@@ -51,6 +54,7 @@ make %{?_smp_mflags}
 %{__cp} NOTICE %{buildroot}%{_docdir}/postgresql/extension/NOTICE-%{name}
 
 %check
+%if 0%{?with_check}
 mkdir -p /run/postgresql
 useradd -s /usr/bin/sh test
 usermod -a -G root test
@@ -60,6 +64,7 @@ chmod -R g+w %{_datadir}/postgresql
 chmod -R g+w /run/postgresql
 chown -R test .
 su test -s /bin/sh -c 'make check'
+%endif
 
 %files
 %defattr(-,root,root,-)
