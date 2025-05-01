@@ -67,7 +67,6 @@ chmod -R g+w %{_datadir}/postgresql
 chmod -R g+w /run/postgresql
 chown -R test .
 su test -s /bin/sh -c 'make check'
-exit 1
 %endif
 
 %files
