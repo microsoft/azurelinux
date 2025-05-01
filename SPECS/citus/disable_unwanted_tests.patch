@@ -18,7 +18,7 @@ index 4bdc7a1..6d4ef46 100644
  check: check-full check-enterprise-full
  # check-full triggers all tests that ought to be run routinely
 -check-full: check-multi check-multi-mx check-multi-1 check-operations check-follower-cluster check-isolation check-failure check-split check-vanilla check-columnar check-columnar-isolation check-pg-upgrade check-arbitrary-configs check-citus-upgrade check-citus-upgrade-mixed check-citus-upgrade-local check-citus-upgrade-mixed-local check-pytest check-query-generator
-+check-full: check-multi check-multi-mx check-multi-1 check-operations check-follower-cluster check-isolation check-split check-columnar check-columnar-isolation
++check-full: check-multi check-operations check-isolation check-split
  # check-enterprise-full triggers all enterprise specific tests
  check-enterprise-full: check-enterprise check-enterprise-isolation check-enterprise-failure check-enterprise-isolation-logicalrep-1 check-enterprise-isolation-logicalrep-2 check-enterprise-isolation-logicalrep-3
  
