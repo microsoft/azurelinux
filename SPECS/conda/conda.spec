@@ -402,7 +402,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 %{_datadir}/conda/condarc.d/
 
 %changelog
-* Fri Oct 13 2023 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-3
+* Thu May 01 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-3
 - Skip some test cases that are failing in the current version of conda using Fedora (License: MIT)
 
 * Fri April 11 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-2
