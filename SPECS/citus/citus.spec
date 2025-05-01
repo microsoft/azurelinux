@@ -13,10 +13,10 @@ BuildRequires:	libcurl-devel
 BuildRequires:	lz4-devel
 BuildRequires:  pkgconfig(icu-i18n)
 BuildRequires:  pkgconfig(icu-uc)
-Requires:	postgresql
 %if 0%{?with_check}
-Requires:       shadow-utils
+BuildRequires:  shadow-utils
 %endif
+Requires:	postgresql
 Provides:	%{name}
 
 %description
