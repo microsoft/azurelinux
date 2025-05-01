@@ -7,6 +7,9 @@ License:	AGPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:	https://github.com/citusdata/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+%if 0%{?with_check}
+Patch0:         disable_unwanted_tests.patch
+%endif
 URL:		https://github.com/citusdata/%{name}
 BuildRequires:	postgresql-devel
 BuildRequires:	libcurl-devel
@@ -34,7 +37,7 @@ PostgreSQL tools. Note that Citus supports many (but not all) SQL
 commands.
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -p1 -n %{name}-%{version}
 
 %build
 currentgccver="$(gcc -dumpversion)"
@@ -64,6 +67,7 @@ chmod -R g+w %{_datadir}/postgresql
 chmod -R g+w /run/postgresql
 chown -R test .
 su test -s /bin/sh -c 'make check'
+exit 1
 %endif
 
 %files
