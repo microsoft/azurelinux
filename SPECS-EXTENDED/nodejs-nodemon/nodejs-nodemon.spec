@@ -62,6 +62,7 @@ npm run test
 %endif
 
 %files
+%license LICENSE
 %doc CODE_OF_CONDUCT.md doc faq.md README.md
 %{nodejs_sitelib}/%{npm_name}
 %{_bindir}/nodemon
