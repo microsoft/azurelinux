@@ -110,7 +110,6 @@ Patch0016: 0016-OvmfPkg-Clarify-invariants-for-NestedInterruptTplLib.patch
 Patch0017: 0017-OvmfPkg-Relax-assertion-that-interrupts-do-not-occur.patch
 Patch0018: CVE-2024-1298.patch
 Patch0019: CVE-2022-36763.patch
-Patch0020: CVE-2024-38796.patch
 # This patch is need for CVE-2022-36763 to resolve the tpm1 and tpm2 build conflicts
 # See https://edk2.groups.io/g/devel/topic/patch_0_6_security_patches/103675434
 Patch0020: fix-tpm-build-issue-from-CVE-2022-36763.patch
@@ -121,6 +120,7 @@ Patch0024: CVE-2023-45234.patch
 Patch0025: CVE-2023-45235.patch
 Patch0026: CVE-2023-45237.patch
 Patch0027: CVE-2023-45236.patch
+Patch0028: CVE-2024-38796.patch
 
 # Patches for the vendored OpenSSL are in the range from 1000 to 1999 (inclusive).
 Patch1000: CVE-2023-0464.patch
