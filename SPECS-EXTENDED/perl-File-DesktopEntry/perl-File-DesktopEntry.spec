@@ -72,6 +72,7 @@ make test
 %changelog
 * Fri Apr 18 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.22-15
 - removed perl(Test::CPAN::Changes) from BR
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.22-14
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
