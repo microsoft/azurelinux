@@ -121,6 +121,7 @@ Patch0025: CVE-2023-45235.patch
 Patch0026: CVE-2023-45237.patch
 Patch0027: CVE-2023-45236.patch
 Patch0028: CVE-2024-38796.patch
+Patch0029: CVE-2023-45231.patch
 
 # Patches for the vendored OpenSSL are in the range from 1000 to 1999 (inclusive).
 Patch1000: CVE-2023-0464.patch
@@ -713,7 +714,7 @@ $tests_ok
 
 %changelog
 * Fri May 02 2025 Ankita Pareek <ankitapareek@microsoft.com> - 20230301gitf80f052277c8-42
-- Add patch for CVE-2024-38796
+- Add patch for CVE-2024-38796 and CVE-2023-45231
 
 * Mon Mar 24 2025 Tobias Brick <tobiasb@microsoft.com> - 20230301gitf80f052277c8-41
 - Patch vendored openssl to only free read buffers if not in use.
