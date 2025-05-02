@@ -26,7 +26,7 @@
 #
 #
 
-%global last-known-kernel 6.6.85.1-2
+%global last-known-kernel 6.6.88.1-1
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -64,7 +64,7 @@
 Summary:	 %{_name} Driver
 Name:		 isert
 Version:	 24.10
-Release:	 16%{?dist}
+Release:	 17%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -247,6 +247,9 @@ fi # 1 : closed
 %endif
 
 %changelog
+* Fri May 02 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-17
+- Bump release to rebuild for new kernel release
+
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 24.10-16
 - Bump release to rebuild for new kernel release
 
