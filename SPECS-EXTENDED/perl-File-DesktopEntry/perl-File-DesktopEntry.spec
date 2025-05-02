@@ -64,6 +64,7 @@ make pure_install DESTDIR=$RPM_BUILD_ROOT
 make test
 
 %files
+%license README.md
 %doc Changes
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
