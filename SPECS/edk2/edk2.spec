@@ -45,7 +45,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    41%{?dist}
+Release:    42%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    BSD-2-Clause-Patent and OpenSSL and MIT
 URL:        http://www.tianocore.org
@@ -110,6 +110,7 @@ Patch0016: 0016-OvmfPkg-Clarify-invariants-for-NestedInterruptTplLib.patch
 Patch0017: 0017-OvmfPkg-Relax-assertion-that-interrupts-do-not-occur.patch
 Patch0018: CVE-2024-1298.patch
 Patch0019: CVE-2022-36763.patch
+Patch0020: CVE-2024-38796.patch
 # This patch is need for CVE-2022-36763 to resolve the tpm1 and tpm2 build conflicts
 # See https://edk2.groups.io/g/devel/topic/patch_0_6_security_patches/103675434
 Patch0020: fix-tpm-build-issue-from-CVE-2022-36763.patch
@@ -711,6 +712,9 @@ $tests_ok
 
 
 %changelog
+* Fri May 02 2025 Ankita Pareek <ankitapareek@microsoft.com> - 20230301gitf80f052277c8-42
+- Add patch for CVE-2024-38796
+
 * Mon Mar 24 2025 Tobias Brick <tobiasb@microsoft.com> - 20230301gitf80f052277c8-41
 - Patch vendored openssl to only free read buffers if not in use.
 
