@@ -8301,8 +8301,8 @@
         "type": "other",
         "other": {
           "name": "kernel-rt",
-          "version": "6.6.77.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.77.1.tar.gz"
+          "version": "6.6.87.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.87.1.tar.gz"
         }
       }
     },
@@ -27451,11 +27451,11 @@
     },
     {
       "component": {
-	"type": "other",
-	"other": {
+        "type": "other",
+        "other": {
           "name": "rust",
-	  "version": "1.85.0",
-	  "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.85.0-src.tar.xz"
+          "version": "1.85.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.85.0-src.tar.xz"
         }
       }
     },
