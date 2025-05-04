@@ -142,7 +142,7 @@ make test || (for i in tests/logs/*.log ; do echo "$i": ; cat "$i" ; done)
 
 %changelog
 * Mon Apr 21 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 5.74-1
-- Upgrade to 5.74
+- Upgrade to 5.74 and remove unwanted patches
 - Verified License
 
 * Mon Sep 04 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 5.70-1
