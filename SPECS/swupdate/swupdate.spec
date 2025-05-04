@@ -1,7 +1,7 @@
 Summary:        Software Update for Embedded Systems
 Name:           swupdate
 Version:        2021.04
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,7 @@ Group:          System Environment/Base
 URL:            https://sbabic.github.io/swupdate/
 Source0:        https://github.com/sbabic/swupdate/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        .config
+Patch0:         CVE-2023-39810.patch
 BuildRequires:  curl-devel
 BuildRequires:  json-c-devel
 BuildRequires:  libarchive-devel
@@ -43,7 +44,7 @@ This package contains symbolic links, header files,
 and related items necessary for software development.
 
 %prep
-%setup -q
+%autosetup -p1
 cp %{SOURCE1} .
 
 %build
@@ -134,6 +135,9 @@ fi
 %{_libdir}/libswupdate.so.*
 
 %changelog
+* Sun May 04 2025 Kshitiz Godara <kgodara@microsoft.com> - 2021.04-2
+- Added patch for CVE-2023-39810
+
 * Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2021.04-1
 - Update to version 2021.04.
 
