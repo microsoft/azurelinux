@@ -50,6 +50,7 @@ patch -Np1 --ignore-whitespace < %{PATCH2}
 patch -Np1 --ignore-whitespace < %{PATCH3}
 patch -Np1 --ignore-whitespace < %{PATCH4}
 patch -Np1 --ignore-whitespace < %{PATCH5}
+
 %build
 # Build go 1.4 bootstrap
 pushd %{_topdir}/BUILD/go-bootstrap/src
