@@ -16,7 +16,7 @@ BuildRequires:  lua-devel >= 5.2
 BuildArch:      noarch
 
 Provides:       lua-lunit = %{version}-%{release}
-Obsoletes:      lua-lunit <= 0.5-18
+Obsoletes:      lua-lunit < %{version}-%{release}
 
 %description
 This is lunitx Version 0.8.1, an extended version of Lunit
