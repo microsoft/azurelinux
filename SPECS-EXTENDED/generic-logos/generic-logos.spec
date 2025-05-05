@@ -162,7 +162,7 @@ fi
 
 %changelog
 * Thu Apr 24 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 18.0.0-12
-- Fix the build error.
+- Fix build error by correcting file paths: _kde4_appsdir and _kde4_iconsdir must start with "/".
 - License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 18.0.0-11
