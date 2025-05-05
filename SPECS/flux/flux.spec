@@ -22,7 +22,7 @@
 Summary:        Influx data language
 Name:           flux
 Version:        0.191.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,10 +32,10 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 # Below is a manually created tarball, no download link.
 # Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache and config.toml run:
-#   tar -xf %{name}-%{version}.tar.gz
-#   cd %{name}-%{version}/libflux
+#   tar -xf %%{name}-%%{version}.tar.gz
+#   cd %%{name}-%%{version}/libflux
 #   cargo vendor > config.toml
-#   tar -czf %{name}-%{version}-cargo.tar.gz vendor/
+#   tar -czf %%{name}-%%{version}-cargo.tar.gz vendor/
 #
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        cargo_config
@@ -88,6 +88,8 @@ patch -p2 <<EOF
 +
      Ok(())
  }
+EOF
+
 popd
 
 %build
@@ -139,6 +141,9 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %{_includedir}/influxdata/flux.h
 
 %changelog
+* Mon Apr 14 2025 Tobias Brick <tobiasb@microsoft.com> - 0.191.0-4
+- Add missing EOF for inline patch call.
+
 * Thu Sep 14 2023 Muhammad Falak <mwani@microsoft.com> - 0.191.0-3
 - Introduce patch to drop warnings as build blocker
 
