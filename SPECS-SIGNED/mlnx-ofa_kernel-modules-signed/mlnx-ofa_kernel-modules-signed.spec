@@ -36,15 +36,15 @@
 
 %global KVERSION %{target_kernel_version_full}
 
-%{!?_name: %global _name mlnx-ofa_kernel}
+%{!?_name: %global _name mlnx-ofa_kernel-modules}
 
 # mlnx-ofa_kernel-modules is a sub-package in SPECS/mlnx-ofa_kernel.
 # We are making that into a main package for signing.
 
 Summary:	 Infiniband HCA Driver
-Name:		 %{_name}-modules
+Name:		 %{_name}-signed
 Version:	 24.10
-Release:	 13%{?dist}
+Release:	 16%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -56,7 +56,7 @@ Group:		 System Environment/Base
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 
-Source0:        %{name}-%{version}-%{release}.%{_arch}.rpm
+Source0:        %{_name}-%{version}-%{release}.%{_arch}.rpm
 Source1:        mlx_compat.ko
 Source2:        ib_cm.ko
 Source3:        ib_core.ko
@@ -91,6 +91,14 @@ Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 ExclusiveArch:   x86_64
 
+
+%description 
+Mellanox infiniband kernel modules.
+The driver sources are located at: http://www.mellanox.com/downloads/
+
+%package -n %{_name}
+Summary:        %{summary}
+
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
 Obsoletes: mlnx_en
@@ -117,10 +125,8 @@ Requires: module-init-tools
 Requires: lsof
 Requires: ofed-scripts
 
-
-%description 
-Mellanox infiniband kernel modules.
-The driver sources are located at: http://www.mellanox.com/downloads/
+%description -n %{_name}
+%{description}
 
 %prep
 
@@ -172,19 +178,28 @@ cp -rp ./. %{buildroot}/
 popd
 
 
-%post
+%post -n %{_name}
 /sbin/depmod %{KVERSION}
 
-%postun
+%postun -n %{_name}
 if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 	/sbin/depmod %{KVERSION}
 fi
 
-%files
+%files -n %{_name}
 /lib/modules/%{KVERSION}/updates/
-%license %{_datadir}/licenses/%{name}/copyright
+%license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 24.10-16
+- Bump release to rebuild for new kernel release
+
+* Tue Apr 08 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-15
+- Re-naming the package to de-duplicate the SRPM name.
+
+* Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-14
+- Bump release to rebuild for new kernel release
+
 * Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-13
 - Bump release to rebuild for new kernel release
 

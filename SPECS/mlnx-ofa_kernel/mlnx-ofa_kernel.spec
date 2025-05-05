@@ -25,7 +25,7 @@
 # and/or other materials provided with the distribution.
 #
 #
-%global last-known-kernel 6.6.82.1-1
+%global last-known-kernel 6.6.85.1-2
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -99,7 +99,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel
 Version:	 24.10
-Release:	 13%{?dist}
+Release:	 16%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -190,8 +190,6 @@ Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
 Obsoletes: mlnx-rdma-rxe
-Version: %{_version}
-Release: 13%{?dist}
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries
 %description -n %{non_kmp_pname}
@@ -201,9 +199,6 @@ The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-o
 %endif #end if "%{KMP}" == "1"
 
 %package -n %{devel_pname}
-Version: %{_version}
-# build KMP rpms?
-Release: 13%{?dist}
 Obsoletes: kernel-ib-devel
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -739,6 +734,16 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
+* Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 24.10-16
+- Bump release to rebuild for new kernel release
+
+* Tue Apr 08 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-15
+- Bump release to match "signed" spec changes.
+- Removed extra 'Release' tag from the spec file.
+
+* Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-14
+- Bump release to rebuild for new kernel release
+
 * Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-13
 - Bump release to rebuild for new kernel release
 
