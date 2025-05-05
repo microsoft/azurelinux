@@ -1,7 +1,7 @@
 Summary:        TIFF libraries and associated utilities.
 Name:           libtiff
 Version:        4.6.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        libtiff
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ Patch0:         CVE-2023-52356.patch
 Patch1:         CVE-2023-6277.patch
 Patch2:         CVE-2024-7006.patch
 Patch3:         CVE-2023-3164.patch
+Patch4:         CVE-2023-6228.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -65,6 +66,9 @@ make %{?_smp_mflags} -k check
 %{_docdir}/*
 
 %changelog
+* Mon Feb 03 2025 Ankita Pareek <ankitapareek@microsoft.com> - 4.6.0-6
+- Address CVE-2023-6228 with a patch
+
 * Fri Jan 17 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 4.6.0-5
 - Add patch for CVE-2023-3164.patch
 

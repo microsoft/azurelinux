@@ -1,12 +1,13 @@
 Summary:        Lightweight library to easily extract data from zip files
 Name:           zziplib
-Version:        0.13.72
-Release:        3%{?dist}
+Version:        0.13.74
+Release:        1%{?dist}
 License:        LGPLv2+ OR MPLv1.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://zziplib.sourceforge.net/
-Source:         https://github.com/gdraheim/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source:         https://github.com/gdraheim/zziplib/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
 BuildRequires:  SDL-devel
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -14,6 +15,7 @@ BuildRequires:  make
 BuildRequires:  perl-interpreter
 BuildRequires:  pkgconfig
 BuildRequires:  python3
+BuildRequires:  SDL-devel
 BuildRequires:  python3-rpm-macros
 BuildRequires:  xmlto
 BuildRequires:  zip
@@ -76,6 +78,7 @@ make test -C "%{_vpath_builddir}"
 %license docs/COPYING*
 %doc ChangeLog README TODO
 %{_libdir}/*.so.*
+%exclude %{_datadir}/zziplib/*.cmake
 
 %files utils
 %{_bindir}/*
@@ -90,6 +93,10 @@ make test -C "%{_vpath_builddir}"
 %{_mandir}/man3/*
 
 %changelog
+* Tue Mar 04 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.13.74
+- Upgrade to 0.13.74
+- License Verified
+
 * Wed Dec 14 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.13.72-3
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License Verified

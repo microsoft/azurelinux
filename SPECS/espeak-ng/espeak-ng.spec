@@ -1,6 +1,6 @@
 Summary:        Compact text-to-speech synthesizer
 Name:           espeak-ng
-Version:        1.51.1
+Version:        1.52.0
 Release:        1%{?dist}
 # Apache2 license applies only to Android APK code- does not apply here
 # BSD license applies only to Windows code- does not apply here
@@ -8,8 +8,7 @@ License:        GPLv3 AND Unicode
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/espeak-ng/espeak-ng
-Source0:        https://github.com/%{name}/%{name}/archive/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tgz
-Patch0:         espeak-ng-1.51-CVE-2023-49990-4.patch
+Source0:        https://github.com/%{name}/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tgz
 BuildRequires:  alsa-lib-devel
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -64,8 +63,7 @@ rm -vrf %{buildroot}%{_datadir}/vim/registry
 %check
 %make_build check
 
-%post	-p /sbin/ldconfig
-%postun	-p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %license COPYING
@@ -73,7 +71,7 @@ rm -vrf %{buildroot}%{_datadir}/vim/registry
 %license COPYING.BSD2
 %license COPYING.UCD
 %doc README.md
-%doc CHANGELOG.md
+%doc ChangeLog.md
 %{_bindir}/speak-ng
 %{_bindir}/espeak-ng
 %{_libdir}/libespeak-ng.so.1
@@ -91,6 +89,10 @@ rm -vrf %{buildroot}%{_datadir}/vim/registry
 %{_datadir}/vim/vimfiles/syntax/espeakrules.vim
 
 %changelog
+* Thu Apr 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.52.0-1
+- Auto-upgrade to 1.52.0 - remove chrome extension which used unverified function
+- Removing patch file for CVE-2023-49990 as it is fixed in newest version.
+
 * Wed Jan 31 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.51.1-1
 - Bump package version to 1.51.1
 - move vim specific builds to sub-package 'vim'
