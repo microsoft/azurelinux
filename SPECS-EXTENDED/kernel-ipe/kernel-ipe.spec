@@ -30,7 +30,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel-ipe
-Version:        6.6.82.1
+Version:        6.6.85.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -48,7 +48,6 @@ Source7:        azl-ipe-boot-policy.pol
 Source8:        Makefile
 Source9:        tarfs.c
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
-Patch1:         Revert-serial-8250-Adjust-the-timeout-for-FIFO-mode.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -452,6 +451,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.85.1-1
+- Auto-upgrade to 6.6.85.1
+
 * Fri Mar 21 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 6.6.82.1-1
 - Create kernel-ipe variant with IPE boot policy
 - Build tarfs kernel module
