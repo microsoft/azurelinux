@@ -225,7 +225,7 @@ func main() {
 
 	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, licenseCheckerConfig, *workers, *buildAttempts, *checkAttempts, *extraLayers, *maxCascadingRebuilds, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, finalTestsToRun, testsToRerun, ignoredTests, toolchainPackages, *optimizeWithCachedImplicit, *allowToolchainRebuilds)
 	if err != nil {
-		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s.", err)
+		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above and the build log '%s'.\nError: %s.", *logFlags.LogFile, err)
 	}
 
 	if *useCcache {
