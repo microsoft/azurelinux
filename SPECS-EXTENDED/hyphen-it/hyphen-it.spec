@@ -1,28 +1,28 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Name: hyphen-it
-Summary: Italian hyphenation rules
-%global upstreamid 20071127
-Version: 0.%{upstreamid}
-Release: 23%{?dist}
-Source0: http://download.services.openoffice.org/contrib/dictionaries/hyph_it_IT.zip
-Source1: hyphen-it-LICENSE.txt
-URL: http://wiki.services.openoffice.org/wiki/Dictionaries
-License: LGPLv2+
-BuildArch: noarch
-Requires: hyphen
-Supplements: (hyphen and langpacks-it)
-Provides: hyphen-la = 0.%{upstreamid}-3%{?dist}
+Name:           hyphen-it
+Summary:        Italian hyphenation rules
+Version:        5.1.1
+Release:        7%{?dist}
+# The license text is embedded within the README files
+# Here we specify the thesaurus license only as other files are not packaged 
+License:        LGPL-2.1-only
+URL:            https://pagure.io/dizionario_italiano
+Source:         %{url}/archive/%{version}/dizionario_italiano-%{version}.tar.gz
+
+BuildArch:      noarch
+Requires:       hyphen
+Supplements:    (hyphen and langpacks-it)
+Provides:       hyphen-la = %{version}
 
 %description
 Italian hyphenation rules.
 
 %prep
-%autosetup -c -n hyphen-it
-cp %{SOURCE1} ./LICENSE.txt
-chmod -x *
+%autosetup -n dizionario_italiano-%{version}
 
 %build
+# Nothing to do
 
 %install
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/hyphen
@@ -35,15 +35,56 @@ for lang in $it_IT_aliases; do
         ln -s hyph_it_IT.dic "hyph_"$lang".dic"
 done
 
-
 %files
-%license LICENSE.txt
-%doc README_hyph_it_IT.txt
-%{_datadir}/hyphen/*
+%license LICENSES/lgpl-2.1.txt
+%doc CHANGELOG.txt README.md README_hyph_it_IT.txt
+%{_datadir}/hyphen/hyph_it_IT.dic
+%{_datadir}/hyphen/hyph_it_CH.dic
+%{_datadir}/hyphen/hyph_la_VA.dic
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20071127-23
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Nov 06 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 5.1.1-7
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sun Jun 04 2023 Mattia Verga <mattia.verga@proton.me> - 5.1.1-2
+- Use sources from pagure.io project
+
+* Sun Jun 04 2023 Mattia Verga <mattia.verga@proton.me> - 5.1.1-1
+- Switch to libreoffice dictionaries from libreitalia.org
+
+* Thu Feb 23 2023 Caolán McNamara <caolanm@redhat.com> - 0.20071127-29
+- migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.20071127-28
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.20071127-27
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.20071127-26
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.20071127-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.20071127-24
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.20071127-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.20071127-22
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -103,14 +144,14 @@ done
 * Tue Feb 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.20071127-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
-* Sun Nov 02 2008 Caolan McNamara <caolanm@redhat.com> - 0.20071127-3
+* Sun Nov 02 2008 Caolán McNamara <caolanm@redhat.com> - 0.20071127-3
 - add Latin alias
 
-* Thu Nov 29 2007 Caolan McNamara <caolanm@redhat.com> - 0.20071127-2
+* Thu Nov 29 2007 Caolán McNamara <caolanm@redhat.com> - 0.20071127-2
 - add switz italian alias
 
-* Tue Nov 27 2007 Caolan McNamara <caolanm@redhat.com> - 0.20071127-1
+* Tue Nov 27 2007 Caolán McNamara <caolanm@redhat.com> - 0.20071127-1
 - latest version
 
-* Fri Nov 23 2007 Caolan McNamara <caolanm@redhat.com> - 0.20030809-1
+* Fri Nov 23 2007 Caolán McNamara <caolanm@redhat.com> - 0.20030809-1
 - initial version

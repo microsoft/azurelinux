@@ -1,12 +1,13 @@
 Summary:        Simple, small, efficient, C++ XML parser that can be easily integrated into other programs.
 Name:           tinyxml2
 Version:        9.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        zlib
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/leethomason/tinyxml2/
 Source0:        https://github.com/leethomason/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch1:         CVE-2024-50615.patch
 BuildRequires:  build-essential
 BuildRequires:  cmake
 
@@ -22,6 +23,8 @@ Development files for %{name}
 
 %prep
 %setup -q
+sed -i 's/\r$//' *.cpp
+%autopatch -p1
 
 %build
 mkdir build
@@ -48,6 +51,9 @@ make install DESTDIR=%{buildroot}
 %{_lib64dir}/pkgconfig/tinyxml2.pc
 
 %changelog
+* Fri Apr 11 2025 Archana Shettigar <v-shettigara@microsoft.com> - 9.0.0-2
+- Patch CVE-2024-50615.
+
 * Wed Jan 05 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 9.0.0-1
 - Update to version 9.0.0.
 

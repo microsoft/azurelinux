@@ -1,17 +1,18 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Summary:        X Resource Monitor
 Name:           xrestop
-Version:        0.4
-Release:        27%{?dist}
-License:        GPLv2+
-URL:            http://www.freedesktop.org/Software/xrestop
-Source0:        http://downloads.yoctoproject.org/releases/%{name}/%{name}-%{version}.tar.gz
+Version:        0.6
+Release:        5%{?dist}
+License:        GPL-2.0-or-later
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+URL:            https://www.freedesktop.org/Software/xrestop
+Source0:        https://xorg.freedesktop.org/archive/individual/app/%{name}-%{version}.tar.gz
 
-BuildRequires: gcc
-BuildRequires: ncurses-devel
-BuildRequires: libXres-devel
-BuildRequires: libXext-devel
+BuildRequires: make
+BuildRequires:  gcc
+BuildRequires: ncurses-devel 
+BuildRequires: libXres-devel 
+BuildRequires: libXext-devel 
 BuildRequires: libX11-devel
 BuildRequires: libXau-devel
 
@@ -26,25 +27,56 @@ for tracking down application X resource usage leaks.
 %build
 %configure
 make
+# SUBDIRS=
 
 %install
 rm -rf "$RPM_BUILD_ROOT"
 make DESTDIR="$RPM_BUILD_ROOT" install
+#SUBDIRS=
 
 %files
 %license COPYING
-%doc AUTHORS NEWS README
+%doc AUTHORS NEWS README.md
 %{_bindir}/xrestop
 %{_mandir}/man1/xrestop.1*
 
 %changelog
-* Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.4-27
-- Update Source0
-- Improve formatting
+* Fri Mar 14 2025 Jyoti kanase <v-jykanase@microsoft.com> - 0.6-5
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4-26
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Sep 11 2023 Olivier Fourdan <ofourdan@redhat.com> - 0.6-2
+- migrated to SPDX license
+
+* Mon Sep 11 2023 Olivier Fourdan <ofourdan@redhat.com> - 0.6-1
+- xrestop 0.6
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.4-32
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.4-31
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.4-30
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.4-29
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.4-28
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jan 28 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.4-27
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.4-26
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.4-25
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -151,3 +183,5 @@ make DESTDIR="$RPM_BUILD_ROOT" install
 
 * Tue Mar  9 2004 Mike A. Harris <mharris@redhat.com> 0.2-1
 - Initial Red Hat RPM package.
+
+
