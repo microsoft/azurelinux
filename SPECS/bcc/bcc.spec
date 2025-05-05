@@ -2,7 +2,7 @@
 Summary:        BPF Compiler Collection (BCC)
 Name:           bcc
 Version:        0.29.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,7 @@ URL:            https://github.com/iovisor/bcc
 # Upstream now provides a release with the git submodule embedded in it
 Source0:        https://github.com/iovisor/bcc/releases/download/v%{version}/%{name}-src-with-submodule.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2024-2314.patch
+Patch1:         CVE-2025-29481.patch
 BuildRequires:  bison
 BuildRequires:  clang-devel
 BuildRequires:  cmake >= 2.8.7
@@ -123,6 +124,9 @@ find %{buildroot}%{_lib64dir} -name '*.a' -delete
 %{_datadir}/%{name}/man/*
 
 %changelog
+* Mon Apr 14 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.29.1-3
+- Patch CVE-2025-29481
+
 * Tue Mar 18 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.29.1-2
 - Fix CVE-2024-2314
 

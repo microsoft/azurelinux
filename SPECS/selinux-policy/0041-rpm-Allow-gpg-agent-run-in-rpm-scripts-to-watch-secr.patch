@@ -1,0 +1,31 @@
+From 7cbf9bac360e62fb7bc75d43f62cceab5786eb4f Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Fri, 4 Apr 2025 14:17:34 -0400
+Subject: [PATCH 41/41] rpm: Allow gpg-agent run in rpm scripts to watch
+ secrets dirs.
+
+This a parallel change to the existing permission for rpm_t.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/admin/rpm.te | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/policy/modules/admin/rpm.te b/policy/modules/admin/rpm.te
+index 809e8c573..d0bad2d1b 100644
+--- a/policy/modules/admin/rpm.te
++++ b/policy/modules/admin/rpm.te
+@@ -408,6 +408,10 @@ optional_policy(`
+ 	')
+ ')
+ 
++optional_policy(`
++	gpg_watch_user_secrets_dirs(rpm_script_t)
++')
++
+ optional_policy(`
+ 	lvm_run(rpm_script_t, rpm_roles)
+ ')
+-- 
+2.49.0
+

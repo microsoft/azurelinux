@@ -10,13 +10,15 @@
 
 %global KVERSION %{target_kernel_version_full}
 
+%define _name xpmem-modules
+
 # xpmem-modules is a sub-package in SPECS/xpmem.
 # We are making that into a main package for signing.
 
 Summary:	 Cross-partition memory
-Name:		 xpmem-modules
+Name:		 %{_name}-signed
 Version:	 2.7.4
-Release:	 13%{?dist}
+Release:	 16%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -32,13 +34,8 @@ ExclusiveArch:   x86_64
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 
-Source0:        %{name}-%{version}-%{release}.%{_arch}.rpm
+Source0:        %{_name}-%{version}-%{release}.%{_arch}.rpm
 Source1:        xpmem.ko
-
-Requires:       mlnx-ofa_kernel
-Requires:       mlnx-ofa_kernel-modules
-Requires:       kernel = %{target_kernel_version_full}
-Requires:       kmod
 
 %description
 XPMEM is a Linux kernel module that enables a process to map the
@@ -47,6 +44,16 @@ can be obtained by cloning the Git repository, original Mercurial
 repository or by downloading a tarball from the link above.
 
 This package includes the kernel module.
+
+%package -n %{_name}
+Summary:        %{summary}
+Requires:       mlnx-ofa_kernel
+Requires:       mlnx-ofa_kernel-modules
+Requires:       kernel = %{target_kernel_version_full}
+Requires:       kmod
+
+%description -n %{_name}
+%{description}
 
 %prep
 
@@ -70,12 +77,22 @@ cp -rp ./. %{buildroot}/
 
 popd
 
-%files
+%files -n %{_name}
 /lib/modules/%{KVERSION}/updates/xpmem.ko
 %{_datadir}/licenses
 
 
 %changelog
+* Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 2.7.4-16
+- Bump release to rebuild for new kernel release
+
+* Wed Apr 09 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-15
+- Bump release to match updates from 'unsigned' spec
+- Re-name the package to xpmem-modules-signed.
+
+* Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.4-14
+- Bump release to rebuild for new kernel release
+
 * Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.4-13
 - Bump release to rebuild for new kernel release
 

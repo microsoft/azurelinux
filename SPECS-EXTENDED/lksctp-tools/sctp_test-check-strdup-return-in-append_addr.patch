@@ -1,0 +1,31 @@
+From 97970af0e414f480afca2914279f51616ff688bb Mon Sep 17 00:00:00 2001
+From: Xin Long <lucien.xin@gmail.com>
+Date: Wed, 24 Nov 2021 10:55:24 -0500
+Subject: [PATCH] sctp_test: check strdup return in append_addr
+
+strdup() may return NULL in append_addr(), and we should do the
+check for its return value before operating it.
+
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+Signed-off-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+---
+ src/apps/sctp_test.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/apps/sctp_test.c b/src/apps/sctp_test.c
+index e382804..59fd4ad 100644
+--- a/src/apps/sctp_test.c
++++ b/src/apps/sctp_test.c
+@@ -499,6 +499,9 @@ append_addr(const char *parm, struct sockaddr *addrs, int *ret_count)
+ 	char *ifname;
+ 	int ifindex = 0;
+ 
++	if (!ipaddr)
++		return NULL;
++
+ 	/* check the interface. */
+ 	ifname = strchr(ipaddr,'%');
+ 	if (ifname) {
+-- 
+2.39.1
+

@@ -1,4 +1,4 @@
-%global last-known-kernel 6.6.82.1-1
+%global last-known-kernel 6.6.85.1-2
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -33,7 +33,7 @@
 Name:		 mft_kernel
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 4.30.0
-Release:	 13%{?dist}
+Release:	 16%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -59,7 +59,7 @@ Requires:       kmod
 Provides:       kernel-mft = %{version}-%{release}
 
 %description
-mft kernel module(s)
+This package provides a %{name} kernel module for kernel.
 
 %global debug_package %{nil}
 
@@ -83,9 +83,6 @@ EOF)
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
 %endif
-
-%description
-This package provides a %{name} kernel module for kernel.
 
 %if "%{KMP}" == "1"
 %package utils
@@ -228,6 +225,15 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
+* Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 4.30.0-16
+- Bump release to rebuild for new kernel release
+
+Tue Apr 08 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.30.0-15
+- Removing duplicate description.
+
+* Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.30.0-14
+- Bump release to rebuild for new kernel release
+
 * Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.30.0-13
 - Bump release to rebuild for new kernel release
 
