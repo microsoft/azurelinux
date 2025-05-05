@@ -1,0 +1,117 @@
+From 87a1596b93f45f5b2ee484ca12a075365e67815a Mon Sep 17 00:00:00 2001
+From: Hubert Kario <hkario@redhat.com>
+Date: Mon, 24 Oct 2022 20:27:50 +0200
+Subject: [PATCH] tighter bounds for hypothesis parameters
+
+---
+ src/ecdsa/test_ecdsa.py         |  4 ++--
+ src/ecdsa/test_ellipticcurve.py |  2 +-
+ src/ecdsa/test_jacobi.py        | 20 ++++++++++----------
+ 3 files changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/src/ecdsa/test_ecdsa.py b/src/ecdsa/test_ecdsa.py
+index dbc4a6eb..2af527b6 100644
+--- a/src/ecdsa/test_ecdsa.py
++++ b/src/ecdsa/test_ecdsa.py
+@@ -622,12 +622,12 @@ def st_random_gen_key_msg_nonce(draw):
+     name = draw(st.sampled_from(sorted(name_gen.keys())))
+     note("Generator used: {0}".format(name))
+     generator = name_gen[name]
+-    order = int(generator.order())
++    order = int(generator.order()) - 1
+ 
+     key = draw(st.integers(min_value=1, max_value=order))
+     msg = draw(st.integers(min_value=1, max_value=order))
+     nonce = draw(
+-        st.integers(min_value=1, max_value=order + 1)
++        st.integers(min_value=1, max_value=order)
+         | st.integers(min_value=order >> 1, max_value=order)
+     )
+     return generator, key, msg, nonce
+diff --git a/src/ecdsa/test_ellipticcurve.py b/src/ecdsa/test_ellipticcurve.py
+index 85faef4d..f46fd9ea 100644
+--- a/src/ecdsa/test_ellipticcurve.py
++++ b/src/ecdsa/test_ellipticcurve.py
+@@ -44,7 +44,7 @@
+ 
+ 
+ @settings(**HYP_SLOW_SETTINGS)
+-@given(st.integers(min_value=1, max_value=r + 1))
++@given(st.integers(min_value=1, max_value=r - 1))
+ def test_p192_mult_tests(multiple):
+     inv_m = inverse_mod(multiple, r)
+ 
+diff --git a/src/ecdsa/test_jacobi.py b/src/ecdsa/test_jacobi.py
+index 1f528048..71fb33e5 100644
+--- a/src/ecdsa/test_jacobi.py
++++ b/src/ecdsa/test_jacobi.py
+@@ -202,7 +202,7 @@ def test_compare_double_with_multiply(self):
+     @settings(max_examples=10)
+     @given(
+         st.integers(
+-            min_value=0, max_value=int(generator_brainpoolp160r1.order())
++            min_value=0, max_value=int(generator_brainpoolp160r1.order() - 1)
+         )
+     )
+     def test_multiplications(self, mul):
+@@ -217,7 +217,7 @@ def test_multiplications(self, mul):
+     @settings(max_examples=10)
+     @given(
+         st.integers(
+-            min_value=0, max_value=int(generator_brainpoolp160r1.order())
++            min_value=0, max_value=int(generator_brainpoolp160r1.order() - 1)
+         )
+     )
+     @example(0)
+@@ -235,10 +235,10 @@ def test_precompute(self, mul):
+     @settings(max_examples=10)
+     @given(
+         st.integers(
+-            min_value=1, max_value=int(generator_brainpoolp160r1.order())
++            min_value=1, max_value=int(generator_brainpoolp160r1.order() - 1)
+         ),
+         st.integers(
+-            min_value=1, max_value=int(generator_brainpoolp160r1.order())
++            min_value=1, max_value=int(generator_brainpoolp160r1.order() - 1)
+         ),
+     )
+     @example(3, 3)
+@@ -254,10 +254,10 @@ def test_add_scaled_points(self, a_mul, b_mul):
+     @settings(max_examples=10)
+     @given(
+         st.integers(
+-            min_value=1, max_value=int(generator_brainpoolp160r1.order())
++            min_value=1, max_value=int(generator_brainpoolp160r1.order() - 1)
+         ),
+         st.integers(
+-            min_value=1, max_value=int(generator_brainpoolp160r1.order())
++            min_value=1, max_value=int(generator_brainpoolp160r1.order() - 1)
+         ),
+         st.integers(min_value=1, max_value=int(curve_brainpoolp160r1.p() - 1)),
+     )
+@@ -286,10 +286,10 @@ def test_add_one_scaled_point(self, a_mul, b_mul, new_z):
+     @settings(max_examples=10)
+     @given(
+         st.integers(
+-            min_value=1, max_value=int(generator_brainpoolp160r1.order())
++            min_value=1, max_value=int(generator_brainpoolp160r1.order() - 1)
+         ),
+         st.integers(
+-            min_value=1, max_value=int(generator_brainpoolp160r1.order())
++            min_value=1, max_value=int(generator_brainpoolp160r1.order() - 1)
+         ),
+         st.integers(min_value=1, max_value=int(curve_brainpoolp160r1.p() - 1)),
+     )
+@@ -351,10 +351,10 @@ def test_add_same_scale_points_static(self):
+     @settings(max_examples=14)
+     @given(
+         st.integers(
+-            min_value=1, max_value=int(generator_brainpoolp160r1.order())
++            min_value=1, max_value=int(generator_brainpoolp160r1.order() - 1)
+         ),
+         st.integers(
+-            min_value=1, max_value=int(generator_brainpoolp160r1.order())
++            min_value=1, max_value=int(generator_brainpoolp160r1.order() - 1)
+         ),
+         st.lists(
+             st.integers(

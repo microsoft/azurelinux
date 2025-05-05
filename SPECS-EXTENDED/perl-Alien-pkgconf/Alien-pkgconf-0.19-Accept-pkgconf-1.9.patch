@@ -1,0 +1,31 @@
+From 07715ec6cab4e23498bbe1acd852b2f92ce696a8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 3 Mar 2023 13:26:32 +0100
+Subject: [PATCH] Accept pkgconf-1.9
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+https://github.com/PerlAlien/PkgConfig-LibPkgConf/issues/15
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ t/xs.t | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/t/xs.t b/t/xs.t
+index 372e802..8439b35 100644
+--- a/t/xs.t
++++ b/t/xs.t
+@@ -15,9 +15,6 @@ xs_ok $xs, with_subtest {
+ 
+   cmp_ok( Foo::pkgconf_version(), ">", 10502, "pkgconf is at least 1.5.2" );
+   note "version = @{[ Foo::pkgconf_version() ]}";
+-
+-  # For now 1.9.x is unfortunately not supported 
+-  cmp_ok( Foo::pkgconf_version(), "<", 10900, "pkgconf is not 1.9.x or 2.x" );
+ };
+ 
+ done_testing;
+-- 
+2.39.2
+
