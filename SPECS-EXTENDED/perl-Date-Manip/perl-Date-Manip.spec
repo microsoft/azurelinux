@@ -1,40 +1,46 @@
 Name:           perl-Date-Manip
-Version:        6.82
-Release:        2%{?dist}
+Version:        6.95
+Release:        3%{?dist}
 Summary:        Date manipulation routines
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Date-Manip
 Source0:        https://cpan.metacpan.org/authors/id/S/SB/SBECK/Date-Manip-%{version}.tar.gz#/perl-Date-Manip-%{version}.tar.gz
+
 BuildArch:      noarch
 # Build
+BuildRequires:  coreutils
 BuildRequires:  make
-BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+BuildRequires:  perl(Config)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 # Runtime
+BuildRequires:  perl(:VERSION) >= 5.10.0
 BuildRequires:  perl(Carp)
-# XXX: BuildRequires:  perl(Cwd)
-# XXX: BuildRequires:  perl(Data::Dumper)
+# Cwd not used at tests
+BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Encode)
 BuildRequires:  perl(Exporter)
-# XXX: BuildRequires:  perl(File::Find)
-# XXX: BuildRequires:  perl(File::Spec)
-BuildRequires:  perl(File::Basename)
-BuildRequires:  perl(File::Find::Rule)
+# File::Find not used at tests
+# File::Spec not used at tests
 BuildRequires:  perl(integer)
 BuildRequires:  perl(IO::File)
 BuildRequires:  perl(Storable)
 BuildRequires:  perl(utf8)
+# Win32::TieRegistry not used
 # Tests only
+# File::Basename not used
+# File::Find::Rule not used
+# lib not used
 BuildRequires:  perl(Test::Inter) >= 1.09
-BuildRequires:  perl(Test::Pod) >= 1.00
-BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
 BuildRequires:  perl(Test::More)
 Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
+# Test::Pod 1.00 not used
+# Test::Pod::Coverage 1.00 not used
 Requires:       perl(Cwd)
 Requires:       perl(File::Find)
 Requires:       perl(File::Spec)
@@ -45,38 +51,179 @@ Obsoletes: perl-DateManip < 5.48-1
 
 %{?perl_default_filter}
 
+# Filter modules bundled for tests
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(tests.pl\\)
+
 %description
 Date::Manip is a series of modules designed to make any common date/time
-operation easy to do. Operations such as comparing two times, determining a
-data a given amount of time from another, or parsing international times
+operation easy to do. Operations such as comparing two times, determining
+a data a given amount of time from another, or parsing international times
 are all easily done. It deals with time as it is used in the Gregorian
 calendar (the one currently in use) with full support for time changes due
 to daylight saving time.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n Date-Manip-%{version}
 
+# Help generators to recognize Perl scripts
+for F in t/*.t t/*.pl; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
+
 %build
-perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
+%{make_install}
 %{_fixperms} %{buildroot}/*
 
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+# Remove release tests
+rm -f %{buildroot}%{_libexecdir}/%{name}/t/_pod*
+rm -f %{buildroot}%{_libexecdir}/%{name}/t/_version.t
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+unset DATE_MANIP DATE_MANIP_DEBUG DATE_MANIP_DEBUG_ABBREVS \
+    DATE_MANIP_DEBUG_ZONES Date_Manip_RELEASE_TESTING DATE_MANIP_TEST_DM5 \
+    OS MULTINET_TIMEZONE 'SYS$TIMEZONE_DIFFERENTIAL' 'SYS$TIMEZONE_NAME' \
+    'SYS$TIMEZONE_RULE' 'TCPIP$TZ' 'UCX$TZ'
+cd %{_libexecdir}/%{name} && exec prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
+
 %check
+unset DATE_MANIP DATE_MANIP_DEBUG DATE_MANIP_DEBUG_ABBREVS \
+    DATE_MANIP_DEBUG_ZONES Date_Manip_RELEASE_TESTING DATE_MANIP_TEST_DM5 \
+    OS MULTINET_TIMEZONE 'SYS$TIMEZONE_DIFFERENTIAL' 'SYS$TIMEZONE_NAME' \
+    'SYS$TIMEZONE_RULE' 'TCPIP$TZ' 'UCX$TZ'
+export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 make test
 
 %files
 %license LICENSE
 %doc README README.first
-%{perl_vendorlib}/Date/
-%{_mandir}/man[13]/*.[13]*
+%dir %{perl_vendorlib}/Date
+%{perl_vendorlib}/Date/Manip
+%{perl_vendorlib}/Date/Manip.{pm,pod}
+%{_mandir}/man1/dm_*.1*
+%{_mandir}/man3/Date::Manip.3*
+%{_mandir}/man3/Date::Manip::*.3*
 %{_bindir}/dm_*
 
+%files tests
+%{_libexecdir}/%{name}
+
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.82-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Dec 18 2024 Jyoti kanase <v-jykanase@microsoft.com> -  6.95 -3
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.95-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Mar 01 2024 Packit <hello@packit.dev> - 6.95-1
+- Release: v6.95 (Sullivan Beck)
+- Checkpoint: v6.95 (Sullivan Beck)
+- Added POSIX handling (Sullivan Beck)
+- Initial checkin of next release cycle: 6.95 (Sullivan Beck)
+- Resolves rhbz#2267329
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.94-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.94-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jan 10 2024 Jitka Plesnikova <jplesnik@redhat.com> - 6.94-1
+- 6.94 bump (rhbz#2257491)
+- Package tests
+
+* Wed Jan 03 2024 Petr Pisar <ppisar@redhat.com> - 6.93-2
+- Adapt test envinronment guard to changes in 6.93
+- List files explicitly
+- Run tests in parallel
+
+* Sun Dec 03 2023 Packit <hello@packit.dev> - 6.93-1
+- Release: v6.93 (Sullivan Beck)
+- Checkpoint: v6.93 (Sullivan Beck)
+- Remove Travis (Sullivan Beck)
+- Initial checkin of next release cycle: 6.93 (Sullivan Beck)
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 6.92-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 14 2023 Jan Pazdziora <jpazdziora@redhat.com> - 6.92-1
+- 2213282 - Rebase to upstream version 6.92.
+
+* Wed Mar 08 2023 Jan Pazdziora <jpazdziora@redhat.com> - 6.91-1
+- 2174484 - Rebase to upstream version 6.91.
+
+* Fri Mar 03 2023 Michal Josef Špaček <mspacek@redhat.com> - 6.90-3
+- Update license to SPDX format
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 6.90-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Dec 10 2022 Jan Pazdziora <jpazdziora@redhat.com> - 6.90-1
+- 2150409 - Rebase to upstream version 6.90.
+
+* Wed Sep 21 2022 Jan Pazdziora <jpazdziora@redhat.com> - 6.89-1
+- 2123418 - Rebase to upstream version 6.89.
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.88-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 06 2022 Jitka Plesnikova <jplesnik@redhat.com> - 6.88-2
+- Perl 5.36 re-rebuild updated packages
+
+* Mon Jun 06 2022 Jan Pazdziora <jpazdziora@redhat.com> - 6.88-1
+- 2093024 - Rebase to upstream version 6.88.
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 6.86-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 6.86-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Nov 23 2021 Jan Pazdziora <jpazdziora@redhat.com> - 6.86-1
+- 2023516 - Rebase to upstream version 6.86.
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 6.85-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 6.85-2
+- Perl 5.34 rebuild
+
+* Wed Mar 03 2021 Jan Pazdziora <jpazdziora@redhat.com> - 6.85-1
+- 1933868 - Rebase to upstream version 6.85.
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 6.83-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Jan 15 2021 Petr Pisar <ppisar@redhat.com> - 6.83-2
+- Specify all dependendencies
+
+* Tue Dec 15 2020 Jan Pazdziora <jpazdziora@redhat.com> - 6.83-1
+- 1902872 - Rebase to upstream version 6.83.
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 6.82-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 6.82-2
+- Perl 5.32 rebuild
 
 * Mon Jun 08 2020 Jan Pazdziora <jpazdziora@redhat.com> - 6.82-1
 - 1842524 - Rebase to upstream version 6.82.

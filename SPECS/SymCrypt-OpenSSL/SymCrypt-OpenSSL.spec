@@ -1,6 +1,6 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
-Version:        1.7.0
+Version:        1.8.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -57,6 +57,15 @@ install bin/SymCryptProvider/symcryptprovider.so %{buildroot}%{_libdir}/ossl-mod
 install SymCryptEngine/inc/e_scossl.h %{buildroot}%{_includedir}/e_scossl.h
 install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/symcrypt_prov.cnf
 
+%post
+mkdir -p -m 1733 /var/log/keysinuse
+
+%preun
+# Remove the logging directory on uninstall, leaving it there on upgrade.
+if [ "${1}" = "0" ]; then
+    rm -rf /var/log/keysinuse
+fi
+
 %check
 ./bin/SslPlay/SslPlay
 
@@ -68,6 +77,9 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 %{_sysconfdir}/pki/tls/symcrypt_prov.cnf
 
 %changelog
+* Thu Mar 27 2025 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.8.0-1
+- Upgrade to SymCrypt-OpenSSL 1.8.0 with PBKDF2 and minor bugfixes
+
 * Fri Jan 31 2025 Tobias Brick <tobiasb@microsoft.com> - 1.7.0-1
 - Add optional debug logging instead of writing some errors to stderr
 - Add optional KeysInUse feature, which can be turned on by config

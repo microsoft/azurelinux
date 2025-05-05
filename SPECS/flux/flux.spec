@@ -22,7 +22,7 @@
 Summary:        Influx data language
 Name:           flux
 Version:        0.194.5
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,19 +32,21 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 # Below is a manually created tarball, no download link.
 # Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache and config.toml run:
-#   tar -xf %{name}-%{version}.tar.gz
-#   cd %{name}-%{version}/libflux
+#   tar -xf %%{name}-%%{version}.tar.gz
+#   cd %%{name}-%%{version}/libflux
 #   cargo vendor > config.toml
-#   tar -czf %{name}-%{version}-cargo.tar.gz vendor/
+#   tar -czf %%{name}-%%{version}-cargo.tar.gz vendor/
 #
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        cargo_config
 Patch1:         disable-static-library.patch
-Patch2:         0001-libflux-unblock-build-by-allowing-warnings.patch
-Patch3:         CVE-2024-43806.patch
-BuildRequires:  cargo >= 1.45
+# Fixed upstream in 1.195.0, https://github.com/influxdata/flux/pull/5484.
+Patch2:         fix-build-warnings.patch
+Patch3:         fix-unsigned-char.patch
+Patch4:         CVE-2024-43806.patch
+BuildRequires:  cargo < 1.85.0
 BuildRequires:  kernel-headers
-BuildRequires:  rust >= 1.45
+BuildRequires:  rust < 1.85.0
 
 %description
 Flux is a lightweight scripting language for querying databases (like InfluxDB)
@@ -73,12 +75,13 @@ programs using Influx data language.
 %prep
 %setup -q
 %patch 2 -p1
+%patch 3 -p1
 pushd libflux
 tar -xf %{SOURCE1}
 install -D %{SOURCE2} .cargo/config
 
 patch -p2 < %{PATCH1}
-patch -p2 < %{PATCH3}
+patch -p2 < %{PATCH4}
 patch -p2 <<EOF
 --- a/libflux/flux/build.rs
 +++ b/libflux/flux/build.rs
@@ -90,6 +93,8 @@ patch -p2 <<EOF
 +
      Ok(())
  }
+EOF
+
 popd
 
 %build
@@ -141,6 +146,14 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %{_includedir}/influxdata/flux.h
 
 %changelog
+* Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 0.194.5-4
+- Pin rust version
+
+* Mon Apr 14 2025 Tobias Brick <tobiasb@microsoft.com> - 0.194.5-3
+- Add missing EOF for inline patch call.
+- Fix build warnings rather than suppressing them.
+- Fix test build error on arm64.
+
 * Fri Jan 17 2025 Archana Choudhary <archana1@microsoft.com> - 0.194.5-2
 - Patch for CVE-2024-43806
 
