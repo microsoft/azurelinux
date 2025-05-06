@@ -555,6 +555,11 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	builtGraph = pkgGraph
 	schedulerutils.RecordLicenseSummary(licenseChecker)
 	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState, allowToolchainRebuilds, licenseChecker)
+	blockedNodesGraph := schedulerutils.BuildBlockedNodesGraph(builtGraph, graphMutex, buildState, goalNode)
+	if blockedNodesGraph.HasNode(goalNode) {
+		graphPrinter := pkggraph.NewGraphPrinter(" ", 2)
+		graphPrinter.PrintDebug(blockedNodesGraph, goalNode)
+	}
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
 	if !allowToolchainRebuilds && (len(buildState.ConflictingRPMs()) > 0 || len(buildState.ConflictingSRPMs()) > 0) {
 		err = fmt.Errorf("toolchain packages rebuilt. See build summary for details. Use 'ALLOW_TOOLCHAIN_REBUILDS=y' to suppress this error if rebuilds were expected")
