@@ -557,7 +557,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState, allowToolchainRebuilds, licenseChecker)
 	blockedNodesGraph := schedulerutils.BuildBlockedNodesGraph(builtGraph, graphMutex, buildState, goalNode)
 	if blockedNodesGraph.HasNode(goalNode) {
-		graphPrinter := pkggraph.NewGraphPrinter(" ", 2)
+		graphPrinter := pkggraph.NewGraphPrinter()
 		graphPrinter.PrintDebug(blockedNodesGraph, goalNode)
 	}
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)

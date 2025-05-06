@@ -11,25 +11,55 @@ import (
 )
 
 type GraphPrinter struct {
-	indentChar  string
+	config
+}
+
+type config struct {
+	indentChar  rune
 	indentShift int
 }
 
-// NewDefaultGraphPrinter creates a new GraphPrinter with default settings.
+type configModifier func(*config)
+
+// defaultConfig creates GraphPrinter's default settings.
 // The default settings are:
 // - Indent character: " " (space)
 // - Indent shift: 2
-func NewDefaultGraphPrinter() *GraphPrinter {
-	return NewGraphPrinter(" ", 2)
+func defaultConfig() *config {
+	return &config{
+		indentChar:  ' ',
+		indentShift: 2,
+	}
 }
 
-// NewGraphPrinter creates a new GraphPrinter with custom settings.
-// The 'indentChar' parameter specifies the character used for indentation.
-// The 'indentShift' parameter specifies the number of times the indent character is repeated for each level of indentation.
-func NewGraphPrinter(indentChar string, indentShift int) *GraphPrinter {
+// NewGraphPrinter creates a new GraphPrinter.
+// It accepts a variadic number of 'With*' modifiers to customize the printer's behavior.
+// The default settings are:
+// - Indent character: " " (space)
+// - Indent shift: 2
+func NewGraphPrinter(configModifiers ...configModifier) *GraphPrinter {
+	config := defaultConfig()
+	for _, modifier := range configModifiers {
+		modifier(config)
+	}
 	return &GraphPrinter{
-		indentChar:  indentChar,
-		indentShift: indentShift,
+		config: *config,
+	}
+}
+
+// WithIndentChar is a config modifier passed to the graph printer's constructor
+// to define the character used for indentation in the graph printer.
+func WithIndentChar(indentChar rune) configModifier {
+	return func(c *config) {
+		c.indentChar = indentChar
+	}
+}
+
+// WithIndentShift is a config modifier passed to the graph printer's constructor
+// to define the number of times the indent character is repeated for each level of indentation.
+func WithIndentShift(indentShift int) configModifier {
+	return func(c *config) {
+		c.indentShift = indentShift
 	}
 }
 
@@ -51,7 +81,7 @@ func (g GraphPrinter) Print(graph *PkgGraph, rootNode *PkgNode, logLevel logrus.
 			return
 		}
 
-		logger.Log.Logf(logLevel, "%s%s\n", strings.Repeat(g.indentChar, indent), node.FriendlyName())
+		logger.Log.Logf(logLevel, "%s%s\n", strings.Repeat(string(g.indentChar), indent), node.FriendlyName())
 
 		seenNodes[node.ID()] = true
 		indent += g.indentShift
