@@ -1,6 +1,5 @@
-# azure-pipelines.yml
-# Only run on PRs against fasttrack/abadawi/test/3.0,
-# and only when a .spec or .patch file changes.
+# prchecks/CveSpecFilePRCheck/CveSpecFilePRCheck.yml
+# Trigger on PRs to fasttrack/abadawi/test/3.0 when .spec or .patch files change
 trigger: none
 
 pr:
@@ -18,10 +17,10 @@ pool:
   name: mariner-dev-build-1es-mariner2-amd64
 
 steps:
-  # 1) Pull down your GitHub code
+  # 1) Clone the repo
   - checkout: self
 
-  # 2) Debug: show exactly what files we have (optional)
+  # 2) Debug workspace (optional — remove once paths are correct)
   - task: Bash@3
     displayName: '🔍 Debug: list workspace contents'
     inputs:
@@ -30,27 +29,37 @@ steps:
         echo "Working directory: $(pwd)"
         ls -R .
 
-  # 3) Apply OpenAI config via your UMI login script
+  # 3) Apply OpenAI config via your UMI-login script
   - task: Bash@3
     displayName: '⚙️  Apply OpenAI Config'
     inputs:
-      targetType: filePath
-      filePath: 'prchecks/CveSpecFilePRCheck/apply-security-config.sh'
-      arguments: '--openaiModel=o3-mini'
+      targetType: inline
+      script: |
+        # make sure we’re in the folder containing the scripts
+        cd prchecks/CveSpecFilePRCheck
 
-  # 4) Bring in a Python runtime
+        # fail fast if the script is missing
+        if [ ! -f apply-security-config.sh ]; then
+          echo "❌ Cannot find apply-security-config.sh in $(pwd)"
+          exit 1
+        fi
+
+        # run the UMI-login + var-export script
+        bash apply-security-config.sh --openaiModel=o3-mini
+
+  # 4) Bring in Python (you can pin to e.g. '3.11.x' if you prefer)
   - task: UsePythonVersion@0
     displayName: '🐍 Select Python 3.x'
     inputs:
       versionSpec: '3.x'
       addToPath: true
 
-  # 5) Run your PR-check entrypoint (which installs deps & calls Azure OpenAI)
+  # 5) Run your PR‐check entrypoint (installs deps & invokes Azure OpenAI)
   - task: Bash@3
     displayName: '🔍 Run PR Check'
     inputs:
       targetType: inline
       script: |
         cd prchecks/CveSpecFilePRCheck
-        chmod +x ./run-pr-check.sh
+        chmod +x run-pr-check.sh
         ./run-pr-check.sh
