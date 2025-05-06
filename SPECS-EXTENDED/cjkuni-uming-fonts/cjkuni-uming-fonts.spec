@@ -22,7 +22,7 @@ Summary:        Chinese Unicode TrueType font in Ming face
 
 License:  Arphic
 Source0:  https://deb.debian.org/debian/pool/main/f/fonts-arphic-uming/fonts-arphic-uming_%{version}.orig.tar.bz2#/%{name}-%{version}.tar.bz2
-Source10: 65-%{name}.conf
+Source10: %{fontconf}
 Source11: %{fontconf3}
 
 %global foundry           CJKUni
@@ -33,6 +33,8 @@ Source11: %{fontconf3}
 BuildArch:      noarch
 BuildRequires:  fontpackages-devel
 Requires:       fontpackages-filesystem
+Obsoletes:      cjkuni-fonts-common < 0.2.20080216.2-6
+Provides:       cjkuni-fonts-common = 0.2.20080216.2-6
 
 %description
 %common_desc
