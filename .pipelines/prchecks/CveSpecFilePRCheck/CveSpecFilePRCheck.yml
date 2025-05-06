@@ -1,10 +1,16 @@
 # azure-pipelines.yml
+# Only run on PRs against fasttrack/abadawi/test/3.0,
+# and only when a .spec or .patch file changes.
 trigger: none
 
 pr:
   branches:
     include:
       - fasttrack/abadawi/test/3.0
+  paths:
+    include:
+      - '**/*.spec'
+      - '**/*.patch'
 
 name: Automaton-OpenAI-PR-Check
 
@@ -12,30 +18,39 @@ pool:
   name: mariner-dev-build-1es-mariner2-amd64
 
 steps:
-  # 1) Get the code
+  # 1) Pull down your GitHub code
   - checkout: self
 
-  # 2) Login via UMI and export OpenAI vars (we assume az & jq already present)
-  - bash: |
-      bash apply-security-config.sh --openaiModel=o3-mini
-    displayName: Apply OpenAI Config
-
-  # 3) Pull in a Python runtime (here, any 3.x)
-  - task: UsePythonVersion@0
+  # 2) Debug: show exactly what files we have (optional)
+  - task: Bash@3
+    displayName: '🔍 Debug: list workspace contents'
     inputs:
-      versionSpec: '3.x'    # grab the latest available 3.x
-      addToPath: true       # make `python` & `pip` available on PATH
+      targetType: inline
+      script: |
+        echo "Working directory: $(pwd)"
+        ls -R .
 
-  # 4) Create a venv and install your dependencies
-  - bash: |
-      python -m venv .venv          # carve out an isolated env
-      source .venv/bin/activate     # activate it
-      pip install --upgrade pip     # ensure latest pip
-      pip install -r requirements.txt
-    displayName: Setup Python & Install Requirements
+  # 3) Apply OpenAI config via your UMI login script
+  - task: Bash@3
+    displayName: '⚙️  Apply OpenAI Config'
+    inputs:
+      targetType: filePath
+      filePath: 'prchecks/CveSpecFilePRCheck/apply-security-config.sh'
+      arguments: '--openaiModel=o3-mini'
 
-  # 5) Run your PR‐check (inside the same venv)
-  - bash: |
-      source .venv/bin/activate
-      python scripts/run-pr-check.py
-    displayName: Run PR Check
+  # 4) Bring in a Python runtime
+  - task: UsePythonVersion@0
+    displayName: '🐍 Select Python 3.x'
+    inputs:
+      versionSpec: '3.x'
+      addToPath: true
+
+  # 5) Run your PR-check entrypoint (which installs deps & calls Azure OpenAI)
+  - task: Bash@3
+    displayName: '🔍 Run PR Check'
+    inputs:
+      targetType: inline
+      script: |
+        cd prchecks/CveSpecFilePRCheck
+        chmod +x ./run-pr-check.sh
+        ./run-pr-check.sh
