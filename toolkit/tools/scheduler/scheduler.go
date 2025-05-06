@@ -558,7 +558,10 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	blockedNodesGraph := schedulerutils.BuildBlockedNodesGraph(builtGraph, graphMutex, buildState, goalNode)
 	if blockedNodesGraph.HasNode(goalNode) {
 		graphPrinter := pkggraph.NewGraphPrinter()
-		graphPrinter.PrintDebug(blockedNodesGraph, goalNode)
+		err = graphPrinter.Print(blockedNodesGraph, goalNode)
+		if err != nil {
+			logger.Log.Errorf("Failed to print blocked nodes graph, error: %s", err)
+		}
 	}
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
 	if !allowToolchainRebuilds && (len(buildState.ConflictingRPMs()) > 0 || len(buildState.ConflictingSRPMs()) > 0) {

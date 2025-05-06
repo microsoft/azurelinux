@@ -4,6 +4,8 @@
 package pkggraph
 
 import (
+	"fmt"
+	"io"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -15,20 +17,32 @@ type GraphPrinter struct {
 }
 
 type config struct {
-	indentChar  rune
-	indentShift int
+	indentString string
+	output       io.Writer
 }
 
 type configModifier func(*config)
 
+type loggerOutputWrapper struct {
+	logLevel logrus.Level
+}
+
+// Write implements the io.Writer interface.
+func (d *loggerOutputWrapper) Write(p []byte) (n int, err error) {
+	logger.Log.Log(d.logLevel, string(p))
+	return len(p), nil
+}
+
 // defaultConfig creates GraphPrinter's default settings.
 // The default settings are:
-// - Indent character: " " (space)
-// - Indent shift: 2
+// - Indent string: "  " (2 spaces)
+// - Output: 		logger on debug level
 func defaultConfig() *config {
 	return &config{
-		indentChar:  ' ',
-		indentShift: 2,
+		indentString: "  ",
+		output: &loggerOutputWrapper{
+			logLevel: logrus.DebugLevel,
+		},
 	}
 }
 
@@ -47,44 +61,56 @@ func NewGraphPrinter(configModifiers ...configModifier) *GraphPrinter {
 	}
 }
 
-// WithIndentChar is a config modifier passed to the graph printer's constructor
-// to define the character used for indentation in the graph printer.
-func WithIndentChar(indentChar rune) configModifier {
+// WithIndentString is a config modifier passed to the graph printer's constructor
+// to define the string used for indentation in the graph printer.
+func WithIndentString(indentString string) configModifier {
 	return func(c *config) {
-		c.indentChar = indentChar
+		c.indentString = indentString
 	}
 }
 
-// WithIndentShift is a config modifier passed to the graph printer's constructor
-// to define the number of times the indent character is repeated for each level of indentation.
-func WithIndentShift(indentShift int) configModifier {
+// WithOutput is a config modifier passed to the graph printer's constructor
+// to define the output writer for the graph printer.
+func WithOutput(output io.Writer) configModifier {
 	return func(c *config) {
-		c.indentShift = indentShift
+		c.output = output
+	}
+}
+
+// WithLogOutput is a config modifier passed to the graph printer's constructor
+// making the printer's output be logged at the specified log level.
+func WithLogOutput(logLevel logrus.Level) configModifier {
+	return func(c *config) {
+		c.output = &loggerOutputWrapper{
+			logLevel: logLevel,
+		}
 	}
 }
 
 // Print prints the graph in the following manner:
 // - Each line represents a node in the graph.
-// - Each node is represented by its ID.
-// - Children of each node have an indentation level based on their depth in the graph.+
-//
-// The 'logLevel' parameter controls the logging level of the output.
-func (g GraphPrinter) Print(graph *PkgGraph, rootNode *PkgNode, logLevel logrus.Level) {
-	var dfsPrint func(*PkgNode)
+// - Each node is represented by its friendly name.
+// - Children of each node have an indentation level based on their depth in the graph.
+func (g GraphPrinter) Print(graph *PkgGraph, rootNode *PkgNode) error {
+	var dfsPrint func(*PkgNode) error
 
-	indent := 0
+	level := 0
 	// Use a set to keep track of seen nodes to avoid infinite loops.
-	seenNodes := make(map[int64]bool)
+	seenNodes := make(map[*PkgNode]bool)
 
-	dfsPrint = func(node *PkgNode) {
-		if node == nil || seenNodes[node.ID()] {
-			return
+	dfsPrint = func(node *PkgNode) error {
+		if node == nil || seenNodes[node] {
+			return nil
 		}
 
-		logger.Log.Logf(logLevel, "%s%s\n", strings.Repeat(string(g.indentChar), indent), node.FriendlyName())
+		line := fmt.Sprintf("%s%s\n", strings.Repeat(string(g.indentString), level), node.FriendlyName())
+		_, err := g.output.Write([]byte(line))
+		if err != nil {
+			return fmt.Errorf("failed to write to output: %w", err)
+		}
 
-		seenNodes[node.ID()] = true
-		indent += g.indentShift
+		seenNodes[node] = true
+		level += 1
 
 		children := graph.From(node.ID())
 		for children.Next() {
@@ -92,17 +118,17 @@ func (g GraphPrinter) Print(graph *PkgGraph, rootNode *PkgNode, logLevel logrus.
 			if child == nil {
 				continue
 			}
-			dfsPrint(child)
+			err := dfsPrint(child)
+			if err != nil {
+				return err
+			}
 		}
 
-		indent += -g.indentShift
-		seenNodes[node.ID()] = false
+		level -= 1
+		seenNodes[node] = false
+
+		return nil
 	}
 
-	dfsPrint(rootNode)
-}
-
-// PrintDebug prints the graph at the debug level.
-func (g GraphPrinter) PrintDebug(graph *PkgGraph, rootNode *PkgNode) {
-	g.Print(graph, rootNode, logrus.DebugLevel)
+	return dfsPrint(rootNode)
 }
