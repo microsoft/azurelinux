@@ -2,7 +2,7 @@
 Summary:        Python cryptography library
 Name:           python-cryptography
 Version:        42.0.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -103,7 +103,7 @@ openssl req \
     -out mariner.cert
 openssl rsa -in mariner.key -out mariner.pem
 mv mariner.pem %{_sysconfdir}/ssl/certs
-pip3 install pretend pytest hypothesis iso8601 cryptography_vectors pytz iniconfig
+pip3 install pretend pytest hypothesis iso8601 cryptography_vectors==%{version} pytz iniconfig
 PYTHONPATH=%{buildroot}%{python3_sitearch} \
     %{__python3} -m pytest -v tests
 
@@ -111,6 +111,9 @@ PYTHONPATH=%{buildroot}%{python3_sitearch} \
 %license LICENSE
 
 %changelog
+* Tue May 06 2025 Riken Maharjan <rmaharjan@microsoft.com> - 42.0.5-3
+- Fix Ptest for python-cryptography
+
 * Mon Mar 18 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 42.0.5-2
 - Build rust backings
 
