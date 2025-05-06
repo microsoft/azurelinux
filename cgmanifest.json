@@ -27483,6 +27483,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "s-nail",
+          "version": "14.9.25",
+          "downloadUrl": "https://www.sdaoden.eu/downloads/s-nail-14.9.25.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "samba",
           "version": "4.18.3",
           "downloadUrl": "https://ftp.samba.org/pub/samba/stable/samba-4.18.3.tar.gz"
