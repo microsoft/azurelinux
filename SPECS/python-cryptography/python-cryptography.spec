@@ -111,7 +111,7 @@ PYTHONPATH=%{buildroot}%{python3_sitearch} \
 %license LICENSE
 
 %changelog
-* Tue May 06 2024 Riken Maharjan <rmaharjan@microsoft.com> - 42.0.5-3
+* Tue May 06 2025 Riken Maharjan <rmaharjan@microsoft.com> - 42.0.5-3
 - Fix Ptest for python-cryptography
 
 * Mon Mar 18 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 42.0.5-2
