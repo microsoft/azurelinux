@@ -1,7 +1,7 @@
 Summary:        Configuration-management, application deployment, cloud provisioning system
 Name:           ansible
 Version:        2.14.12
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,8 @@ Group:          Development/Libraries
 URL:            https://www.ansible.com
 Source0:        https://github.com/ansible/ansible/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2024-0690.patch
+Patch1:         CVE-2024-8775.patch
+Patch2:         CVE-2024-9902.patch
 BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
@@ -48,6 +50,9 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Tue May 06 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.14.12-3
+- Patch CVE-2024-8775 & CVE-2024-9902
+
 * Mon May 06 2024 Henry Li <lihl@microsoft.com> - 2.14.12-2
 - Revert version from 2.14.4 to 2.14.12
 - Add patch for CVE-2024-0690
