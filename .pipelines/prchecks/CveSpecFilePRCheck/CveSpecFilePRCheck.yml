@@ -1,3 +1,4 @@
+# azure-pipelines.yml
 trigger: none
 
 pr:
@@ -10,59 +11,31 @@ name: Automaton-OpenAI-PR-Check
 pool:
   name: mariner-dev-build-1es-mariner2-amd64
 
-variables:
-  AZURE_SUBSCRIPTION_ID: '<YOUR_SUBSCRIPTION_ID>'            # in ADO UI
-  YOUR_USER_ASSIGNED_IDENTITY_CLIENT_ID: '<YOUR_UMI_CLIENT_ID>'  # in ADO UI
-  PYTHON_VERSION: '3.9'
-
 steps:
-- checkout: self
+  # 1) Get the code
+  - checkout: self
 
-# install jq so our script can parse JSON
-- task: Bash@3
-  displayName: 'Install jq'
-  inputs:
-    targetType: inline
-    script: |
-      apt-get update && apt-get install -y jq
+  # 2) Login via UMI and export OpenAI vars (we assume az & jq already present)
+  - bash: |
+      bash scripts/apply-security-config.sh --openaiModel=o3-mini
+    displayName: Apply OpenAI Config
 
-# render the JSON template (inject only the UMI)
-- task: Bash@3
-  displayName: 'Render security-config'
-  inputs:
-    targetType: inline
-    script: |
-      envsubst < scripts/security-config-dev.template.json \
-        > scripts/security-config-dev.json
-  env:
-    umiId: $(YOUR_USER_ASSIGNED_IDENTITY_CLIENT_ID)
+  # 3) Pull in a Python runtime (here, any 3.x)
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.x'    # grab the latest available 3.x
+      addToPath: true       # make `python` & `pip` available on PATH
 
-# now call the script—which will do the UMI login + extract OpenAI vars
-- task: Bash@3
-  displayName: 'Apply OpenAI Config'
-  inputs:
-    targetType: inline
-    script: |
-      bash scripts/apply-security-config.sh \
-        --aiCvePatching \
-        --openaiModel=o3-mini
-
-- task: UsePythonVersion@0
-  displayName: 'Select Python $(PYTHON_VERSION)'
-  inputs:
-    versionSpec: '$(PYTHON_VERSION)'
-
-- task: Bash@3
-  displayName: 'Install Python Dependencies'
-  inputs:
-    targetType: inline
-    script: |
-      pip install --upgrade pip
+  # 4) Create a venv and install your dependencies
+  - bash: |
+      python -m venv .venv          # carve out an isolated env
+      source .venv/bin/activate     # activate it
+      pip install --upgrade pip     # ensure latest pip
       pip install -r requirements.txt
+    displayName: Setup Python & Install Requirements
 
-- task: Bash@3
-  displayName: 'Full PR Check (bash wrapper)'
-  inputs:
-    targetType: 'inline'
-    script: |
-      bash scripts/run-pr-check.sh
+  # 5) Run your PR‐check (inside the same venv)
+  - bash: |
+      source .venv/bin/activate
+      python scripts/run-pr-check.py
+    displayName: Run PR Check
