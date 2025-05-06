@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.29.4
-Release:        14%{?dist}
+Release:        16%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,8 @@ Patch11:        CVE-2025-27144.patch
 Patch12:        CVE-2025-30204.patch
 Patch13:        CVE-2025-22870.patch
 Patch14:        CVE-2024-51744.patch
+Patch15:        CVE-2025-30215.patch
+Patch16:        CVE-2025-22872.patch
 BuildRequires:  golang
 BuildRequires:  iana-etc
 BuildRequires:  systemd-devel
@@ -48,7 +50,7 @@ the community can easily add support for collecting metrics from well known serv
 Postgres, or Redis) and third party APIs (like Mailchimp, AWS CloudWatch, or Google Analytics).
 
 %prep
-%autosetup -a 1 -p1
+%autosetup -a1 -p1
 
 %build
 go build -buildvcs=false -mod=vendor ./cmd/telegraf
@@ -95,6 +97,12 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Tue Apr 22 2025 Mayank Singh <mayansingh@microsoft.com> - 1.29.4-16
+- Fix CVE-2025-22872 with an upstream patch
+
+* Thu Apr 17 2025 Sudipta Pandit <sudpandit@microsoft.com> - 1.29.4-15
+- Patch CVE-2025-30215
+
 * Mon Mar 31 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.29.4-14
 - Patch to fix CVE-2025-22870, CVE-2024-51744 with an upstream patch
 

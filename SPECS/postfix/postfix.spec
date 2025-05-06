@@ -52,13 +52,13 @@
 
 Summary:        Postfix Mail Transport Agent
 Name:           postfix
-Version:        3.7.0
-Release:        3%{?dist}
+Version:        3.7.4
+Release:        1%{?dist}
 License:        (IBM AND GPLv2+) OR (EPL-2.0 AND GPLv2+)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.postfix.org
-Source0:        ftp://ftp.porcupine.org/mirrors/postfix-release/official/%{name}-%{version}.tar.gz
+Source0:        http://ftp.porcupine.org/mirrors/postfix-release/official/%{name}-%{version}.tar.gz
 Source1:        postfix-etc-init.d-postfix
 Source2:        postfix.service
 Source3:        README-Postfix-SASL-RedHat.txt
@@ -764,6 +764,9 @@ exit 0
 %endif
 
 %changelog
+* Wed Apr 23 2025 Andrew Phelps <anphel@microsoft.com> - 3.7.4-1
+- Upgrade to 3.7.4 to get support for building with 6.x kernel
+
 * Wed Jan 10 2024 Henry Li <lihl@microsoft.com> - 3.7.0-3
 - Fix CVE-2023-51764
 
