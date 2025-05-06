@@ -18253,8 +18253,8 @@
         "type": "other",
         "other": {
           "name": "perl-JSON-MaybeXS",
-          "version": "1.004003",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/JSON/JSON-MaybeXS-1.004003.tar.gz"
+          "version": "1.004008",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/JSON/JSON-MaybeXS-1.004008.tar.gz"
         }
       }
     },
