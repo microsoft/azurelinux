@@ -12,7 +12,8 @@ set -euo pipefail
 
 # 1) Source the config script to login and export OPENAI_* variables
 echo "⚙️  Applying OpenAI config…"
-source scripts/apply-security-config.sh --openaiModel=o3-mini
+# Use path relative to current directory instead of 'scripts/'
+source ./apply-security-config.sh --openaiModel=o3-mini
 
 # 2) Install Python dependencies into your active environment
 echo "📦 Installing Python dependencies…"

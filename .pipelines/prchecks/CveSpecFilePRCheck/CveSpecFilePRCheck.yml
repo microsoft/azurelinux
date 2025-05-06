@@ -27,7 +27,8 @@ steps:
       targetType: inline
       script: |
         echo "Working directory: $(pwd)"
-        ls -R .
+        ls -la .
+        ls -la .pipelines/prchecks/CveSpecFilePRCheck || echo "Directory not found"
 
   # 3) Apply OpenAI config via your UMI-login script
   - task: Bash@3
@@ -35,8 +36,8 @@ steps:
     inputs:
       targetType: inline
       script: |
-        # make sure we’re in the folder containing the scripts
-        cd prchecks/CveSpecFilePRCheck
+        # make sure we're in the folder containing the scripts
+        cd .pipelines/prchecks/CveSpecFilePRCheck
 
         # fail fast if the script is missing
         if [ ! -f apply-security-config.sh ]; then
@@ -60,6 +61,6 @@ steps:
     inputs:
       targetType: inline
       script: |
-        cd prchecks/CveSpecFilePRCheck
+        cd .pipelines/prchecks/CveSpecFilePRCheck
         chmod +x run-pr-check.sh
         ./run-pr-check.sh
