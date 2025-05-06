@@ -1,13 +1,15 @@
 Summary:        Configuration-management, application deployment, cloud provisioning system
 Name:           ansible
 Version:        2.17.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://www.ansible.com
 Source0:        https://github.com/ansible/ansible/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch1:         CVE-2024-8775.patch
+Patch2:         CVE-2024-9902.patch
 BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
@@ -28,7 +30,7 @@ BuildArch:      noarch
 Ansible is a radically simple IT automation system. It handles configuration-management, application deployment, cloud provisioning, ad-hoc task-execution, and multinode orchestration - including trivializing things like zero downtime rolling updates with load balancers.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 python3 setup.py build
@@ -47,6 +49,9 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Tue May 06 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.17.0-2
+- Patch CVE-2024-8775 & CVE-2024-9902
+
 * Mon May 20 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.17.0-1
 - Auto-upgrade to 2.17.0 - none
 
