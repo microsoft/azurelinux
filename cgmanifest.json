@@ -14392,8 +14392,8 @@
         "type": "other",
         "other": {
           "name": "nodejs-nodemon",
-          "version": "2.0.3",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/nodemon-v2.0.3-bundled.tar.gz"
+          "version": "3.1.4",
+          "downloadUrl": "https://github.com/remy/nodemon/archive/refs/tags/v3.1.4.tar.gz"
         }
       }
     },
