@@ -17,7 +17,7 @@ steps:
 
   # 2) Login via UMI and export OpenAI vars (we assume az & jq already present)
   - bash: |
-      bash scripts/apply-security-config.sh --openaiModel=o3-mini
+      bash apply-security-config.sh --openaiModel=o3-mini
     displayName: Apply OpenAI Config
 
   # 3) Pull in a Python runtime (here, any 3.x)
