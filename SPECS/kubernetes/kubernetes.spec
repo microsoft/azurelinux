@@ -31,8 +31,8 @@ Patch9:         CVE-2025-22868.patch
 Patch10:        CVE-2025-22869.patch
 Patch11:        CVE-2025-30204.patch
 Patch12:        CVE-2024-51744.patch
-Patch13:        CVE-2024-45310.patch
-Patch14:        CVE-2025-22872.patch
+Patch13:        CVE-2025-22872.patch
+Patch14:        CVE-2024-45310.patch
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
 BuildRequires:  golang
@@ -278,11 +278,11 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
-* Thu Apr 24 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.28.4-19
-- Patch CVE-2025-22872
-
-* Thu Apr 17 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.28.4-18
+* Thu May 06 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.28.4-19
 - Patch CVE-2024-45310
+
+* Thu Apr 24 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.28.4-18
+- Patch CVE-2025-22872
 
 * Tue Apr 01 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.28.4-17
 - Fix CVE-2024-51744 with an upstream patch
