@@ -46,3 +46,7 @@ scripts:
     - hyperv-guest
     - --name
     - Hyper-V Guest Image
+
+output:
+  image:
+    format: vhdx

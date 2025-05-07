@@ -51,3 +51,7 @@ scripts:
     - qemu-guest
     - --name
     - QEMU Guest Image
+
+output:
+  image:
+    format: vhdx
