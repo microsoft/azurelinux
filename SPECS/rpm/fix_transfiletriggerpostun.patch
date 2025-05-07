@@ -1,0 +1,67 @@
+From 734f8c131518a9dc940ee375d5dcbdd9caa26d52 Mon Sep 17 00:00:00 2001
+From: Mayank Singh <mayansingh@microsoft.com>
+Date: Wed, 7 May 2025 12:51:07 +0000
+Subject: [PATCH] Fix %transfiletriggerpostun execution over multiple prefixes
+Upstream Reference Link: https://github.com/pmatilai/rpm/commit/8fdc8da0683f676e930077163110dd02f3c3222f
+
+---
+ lib/rpmtriggers.c | 35 ++++++++++++++++++++++-------------
+ 1 file changed, 22 insertions(+), 13 deletions(-)
+
+diff --git a/lib/rpmtriggers.c b/lib/rpmtriggers.c
+index 3f8fa22..57b3082 100644
+--- a/lib/rpmtriggers.c
++++ b/lib/rpmtriggers.c
+@@ -97,27 +97,36 @@ static void rpmtriggersSortAndUniq(rpmtriggers trigs)
+     }
+ }
+ 
++static unsigned int getTrigPriority(Header h, rpmTagVal prioTag, int tix)
++{
++    unsigned int priority = 1000000;
++    struct rpmtd_s priorities;
++
++    if (headerGet(h, prioTag, &priorities, HEADERGET_MINMEM)) {
++	if (rpmtdSetIndex(&priorities, tix) >= 0)
++	    priority = rpmtdGetNumber(&priorities);
++    }
++    return priority;
++}
++
+ static void addTriggers(rpmts ts, Header trigH, rpmsenseFlags filter,
+ 			const char *prefix)
+ {
+     int tix = 0;
+     rpmds ds;
+     rpmds triggers = rpmdsNew(trigH, RPMTAG_TRANSFILETRIGGERNAME, 0);
++	rpmTagVal prioTag = RPMTAG_TRANSFILETRIGGERPRIORITIES;
+ 
+     while ((ds = rpmdsFilterTi(triggers, tix))) {
+-	if ((rpmdsNext(ds) >= 0) && (rpmdsFlags(ds) & filter) &&
+-		strcmp(prefix, rpmdsN(ds)) == 0) {
+-	    struct rpmtd_s priorities;
+-
+-	    if (headerGet(trigH, RPMTAG_TRANSFILETRIGGERPRIORITIES,
+-			&priorities, HEADERGET_MINMEM)) {
+-		rpmtdSetIndex(&priorities, tix);
+-		rpmtriggersAdd(ts->trigs2run, headerGetInstance(trigH),
+-				tix, *rpmtdGetUint32(&priorities));
+-	    }
+-	}
+-	rpmdsFree(ds);
+-	tix++;
++		while (rpmdsNext(ds) >= 0) {
++			if ((rpmdsFlags(ds) & filter) && strcmp(prefix, rpmdsN(ds)) == 0) {
++				unsigned int priority = getTrigPriority(trigH, prioTag, tix);
++				rpmtriggersAdd(ts->trigs2run, headerGetInstance(trigH),
++						    tix, priority);
++			}
++		}
++		rpmdsFree(ds);
++		tix++;
+     }
+     rpmdsFree(triggers);
+ }
+-- 
+2.45.3
+
