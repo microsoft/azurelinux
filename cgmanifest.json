@@ -4670,8 +4670,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.23.8",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.8-1/go1.23.8-20250401.2.src.tar.gz"
+          "version": "1.23.9",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.9-1/go1.23.9-20250506.5.src.tar.gz"
         }
       }
     },
@@ -27451,11 +27451,11 @@
     },
     {
       "component": {
-	"type": "other",
-	"other": {
+        "type": "other",
+        "other": {
           "name": "rust",
-	  "version": "1.85.0",
-	  "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.85.0-src.tar.xz"
+          "version": "1.85.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.85.0-src.tar.xz"
         }
       }
     },
