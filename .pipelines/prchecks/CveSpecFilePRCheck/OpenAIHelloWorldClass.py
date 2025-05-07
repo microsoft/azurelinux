@@ -47,7 +47,7 @@ def main():
         # Send a test chat request
         response = client.get_chat_completion(
             system_msg="You are a helpful assistant.",
-            user_msg="Say hello world, and tell me the name and version of the model you're running on."
+            user_msg=f"Say hello world! I'm currently testing the {model_name} model. Please confirm which model you're running and share some of your capabilities."
         )
         
         # Display results
