@@ -679,8 +679,9 @@ done
 
 
 %changelog
-* Tue Oct 29 2024 Sam Meluch <sammeluch@microsoft.com> - 5.1.11-3
+* Tue May 06 2025 Sam Meluch <sammeluch@microsoft.com> - 5.1.11-3
 - Add repo snapshot to dnf5
+- fixup merge conflict
 
 * Wed Apr 30 2025 Kanishk Bansal <kanbansal@microsoft.com> - 5.1.11-2
 - Patch CVE-2024-1929, CVE-2024-1930, CVE-2024-2746
