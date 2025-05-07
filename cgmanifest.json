@@ -9581,8 +9581,8 @@
         "type": "other",
         "other": {
           "name": "libgeotiff",
-          "version": "1.7.1",
-          "downloadUrl": "https://download.osgeo.org/geotiff/libgeotiff/libgeotiff-1.7.1.tar.gz"
+          "version": "1.7.3",
+          "downloadUrl": "https://download.osgeo.org/geotiff/libgeotiff/libgeotiff-1.7.3.tar.gz"
         }
       }
     },
