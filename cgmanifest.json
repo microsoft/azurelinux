@@ -14642,8 +14642,8 @@
         "type": "other",
         "other": {
           "name": "objenesis",
-          "version": "3.1",
-          "downloadUrl": "https://github.com/easymock/objenesis/archive/3.1.tar.gz"
+          "version": "3.3",
+          "downloadUrl": "https://github.com/easymock/objenesis/archive/refs/tags/3.3.tar.gz"
         }
       }
     },
