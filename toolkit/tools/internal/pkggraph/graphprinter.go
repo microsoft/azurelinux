@@ -23,6 +23,7 @@ type graphPrinterConfig struct {
 
 type graphPrinterConfigModifier func(*graphPrinterConfig)
 
+// loggerOutputWrapper is a wrapper around logrus.Logger to implement the io.StringWriter interface.
 type loggerOutputWrapper struct {
 	logLevel logrus.Level
 }
@@ -36,8 +37,8 @@ func (d *loggerOutputWrapper) WriteString(s string) (int, error) {
 // NewGraphPrinter creates a new GraphPrinter.
 // It accepts a variadic number of 'GraphPrinter*' modifiers to customize the printer's behavior.
 // The default settings are:
-// - Indent character: " " (space)
-// - Indent shift: 2
+// - Indent character: " " (2 spaces)
+// - Output: logrus logger on debug level
 func NewGraphPrinter(configModifiers ...graphPrinterConfigModifier) *GraphPrinter {
 	config := &graphPrinterConfig{
 		indentString: "  ",
