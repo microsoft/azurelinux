@@ -61,25 +61,25 @@ func NewGraphPrinter(configModifiers ...configModifier) *GraphPrinter {
 	}
 }
 
-// WithIndentString is a config modifier passed to the graph printer's constructor
+// GraphPrinterIndentString is a config modifier passed to the graph printer's constructor
 // to define the string used for indentation in the graph printer.
-func WithIndentString(indentString string) configModifier {
+func GraphPrinterIndentString(indentString string) configModifier {
 	return func(c *config) {
 		c.indentString = indentString
 	}
 }
 
-// WithOutput is a config modifier passed to the graph printer's constructor
+// GraphPrinterOutput is a config modifier passed to the graph printer's constructor
 // to define the output writer for the graph printer.
-func WithOutput(output io.Writer) configModifier {
+func GraphPrinterOutput(output io.Writer) configModifier {
 	return func(c *config) {
 		c.output = output
 	}
 }
 
-// WithLogOutput is a config modifier passed to the graph printer's constructor
+// GraphPrinterLogOutput is a config modifier passed to the graph printer's constructor
 // making the printer's output be logged at the specified log level.
-func WithLogOutput(logLevel logrus.Level) configModifier {
+func GraphPrinterLogOutput(logLevel logrus.Level) configModifier {
 	return func(c *config) {
 		c.output = &loggerOutputWrapper{
 			logLevel: logLevel,

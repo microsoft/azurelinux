@@ -30,13 +30,14 @@ func BuildBlockedNodesGraph(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 		fromNode := e.From().(*pkggraph.PkgNode)
 		toNode := e.To().(*pkggraph.PkgNode)
 
-		// We're only interested in edges starting from nodes, which never turned available.
-		if buildState.IsNodeAvailable(fromNode) {
+		// We're only interested in edges where both nodes are not marked as available.
+		// If only the 'toNode' is available, we can ignore the edge as it doesn't represent a block.
+		if buildState.IsNodeAvailable(fromNode) || buildState.IsNodeAvailable(toNode) {
 			return false
 		}
 
 		// Ignoring "SetEdge" panic as it only occurs when adding a self-loop.
-		// There are no such loops, since we're traversing a valid graph already.
+		// There are no such loops, since we're traversing an already valid graph.
 		blockedGraph.SetEdge(blockedGraph.NewEdge(fromNode, toNode))
 
 		return true

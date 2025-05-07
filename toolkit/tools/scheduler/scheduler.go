@@ -555,20 +555,21 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	builtGraph = pkgGraph
 	schedulerutils.RecordLicenseSummary(licenseChecker)
 	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState, allowToolchainRebuilds, licenseChecker)
-	blockedNodesGraph := schedulerutils.BuildBlockedNodesGraph(builtGraph, graphMutex, buildState, goalNode)
-	if blockedNodesGraph.HasNode(goalNode) {
-		graphPrinter := pkggraph.NewGraphPrinter()
-		err = graphPrinter.Print(blockedNodesGraph, goalNode)
-		if err != nil {
-			logger.Log.Errorf("Failed to print blocked nodes graph, error: %s", err)
-		}
-	}
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
+
 	if !allowToolchainRebuilds && (len(buildState.ConflictingRPMs()) > 0 || len(buildState.ConflictingSRPMs()) > 0) {
 		err = fmt.Errorf("toolchain packages rebuilt. See build summary for details. Use 'ALLOW_TOOLCHAIN_REBUILDS=y' to suppress this error if rebuilds were expected")
+		return
 	}
+
 	if len(buildState.LicenseFailureSRPMs()) > 0 {
 		err = fmt.Errorf("license check failed for some packages. See build summary for details")
+		return
+	}
+
+	err = schedulerutils.PrintHiddenBuildBlockers(builtGraph, graphMutex, buildState, goalNode)
+	if err != nil {
+		err = fmt.Errorf("failed to print hidden goal blockers:\n%w", err)
 	}
 	return
 }
