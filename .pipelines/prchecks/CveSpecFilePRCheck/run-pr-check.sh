@@ -22,4 +22,4 @@ pip install -r requirements.txt
 
 # 3) Run the PR-check Python script
 echo "🔍 Running run_pr_checks.py…"
-python run_pr_checks.py
+python OpenAIHelloWorldClass.py
