@@ -136,7 +136,7 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
-* Fri Apr 18 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.35-3
+* Wed May 07 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.35-3
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License Verified
 
