@@ -76,3 +76,7 @@ scripts:
     -  marketplace-gen2
     - --name
     - Marketplace (Gen2) Image
+
+output:
+  image:
+    format: vhd
