@@ -15,6 +15,20 @@ echo "⚙️  Applying OpenAI config…"
 # Use path relative to current directory instead of 'scripts/'
 source ./apply-security-config.sh --openaiModel=o3-mini
 
+# Map environment variables to the camelCase format expected by the Python script
+echo "🔄 Mapping environment variables to expected format..."
+export openAiApiVersion="$OPENAI_API_VERSION"
+export openAiApiBase="$OPENAI_API_BASE"
+export openAiDeploymentName="$OPENAI_DEPLOYMENT_NAME"
+export openAiModelName="$OPENAI_MODEL_NAME"
+
+# Verify the environment variables are set
+echo "✅ Verifying environment variables:"
+echo "  - openAiApiVersion: ${openAiApiVersion:-NOT SET}"
+echo "  - openAiApiBase: ${openAiApiBase:-NOT SET}"
+echo "  - openAiDeploymentName: ${openAiDeploymentName:-NOT SET}"
+echo "  - openAiModelName: ${openAiModelName:-NOT SET}"
+
 # 2) Install Python dependencies into your active environment
 echo "📦 Installing Python dependencies…"
 pip install --upgrade pip
