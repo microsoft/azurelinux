@@ -124,7 +124,7 @@ fi
 %{_mandir}/man1/pages2text.1*
 
 %changelog
-* Mon Apr 28 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.1.12-2
+* Wed May 07 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.1.12-2
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License Verified
 
