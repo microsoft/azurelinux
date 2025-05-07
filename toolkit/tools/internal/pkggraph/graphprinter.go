@@ -37,7 +37,7 @@ func (d *loggerOutputWrapper) WriteString(s string) (int, error) {
 // NewGraphPrinter creates a new GraphPrinter.
 // It accepts a variadic number of 'GraphPrinter*' modifiers to customize the printer's behavior.
 // The default settings are:
-// - Indent character: " " (2 spaces)
+// - Indent string: "  " (2 spaces)
 // - Output: logrus logger on debug level
 func NewGraphPrinter(configModifiers ...graphPrinterConfigModifier) *GraphPrinter {
 	config := &graphPrinterConfig{
