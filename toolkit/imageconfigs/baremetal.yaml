@@ -57,3 +57,7 @@ scripts:
     - baremetal
     - --name
     - Bare Metal Image
+
+output:
+  image:
+    format: vhdx
