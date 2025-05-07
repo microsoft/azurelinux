@@ -94,6 +94,18 @@ func GraphPrinterLogOutput(logLevel logrus.Level) configModifier {
 func (g GraphPrinter) Print(graph *PkgGraph, rootNode *PkgNode) error {
 	var dfsPrint func(*PkgNode) error
 
+	if graph == nil {
+		return fmt.Errorf("graph is nil")
+	}
+
+	if rootNode == nil {
+		return fmt.Errorf("root node is nil")
+	}
+
+	if !graph.HasNode(rootNode) {
+		return fmt.Errorf("root node '%s' not found in the graph", rootNode.FriendlyName())
+	}
+
 	level := 0
 	// Use a set to keep track of seen nodes to avoid infinite loops.
 	seenNodes := make(map[*PkgNode]bool)
