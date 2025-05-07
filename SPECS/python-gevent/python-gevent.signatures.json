@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "gevent-23.9.1.tar.gz": "6d38bb2a80d2cb08becdf52ebb007770107adbf2f2a66bc8eaa750501b0ca006"
- }
+  "Signatures": {
+    "gevent-24.10.1.tar.gz": "08e53a2cb83fe038f37c0aab18a9561632745ab6a6d1b1a231cb89cbceb49fc8"
+  }
 }

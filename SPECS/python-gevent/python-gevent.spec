@@ -1,16 +1,14 @@
 Summary:        Coroutine-based network library
 Name:           python-gevent
-Version:        23.9.1
-Release:        4%{?dist}
+Version:        24.10.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://www.gevent.org
 Source0:        https://github.com/gevent/gevent/archive/%{version}.tar.gz#/gevent-%{version}.tar.gz
-Patch0:         CVE-2024-24806.patch
 Patch1:         skip-irrelevant-tests.patch
-Patch2:         CVE-2024-25629.patch
 
 %description
 gevent is a coroutine-based Python networking library.
@@ -72,6 +70,9 @@ pip3 install packaging==23.2 tox tox-current-env
 %license LICENSE
 
 %changelog
+* Wed May 07 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10.1-1
+- Auto-upgrade to 24.10.1 - Fix PTest
+
 * Mon Oct 14 2024 Sumedh Sharma <sumsharma@microsoft.com> - 23.9.1-4
 - Add patch to resolve CVE-2024-25629
 
