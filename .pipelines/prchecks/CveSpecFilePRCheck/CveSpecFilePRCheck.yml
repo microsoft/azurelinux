@@ -48,12 +48,15 @@ steps:
         # run the UMI-login + var-export script
         bash apply-security-config.sh --openaiModel=o3-mini
 
-  # 4) Bring in Python (you can pin to e.g. '3.11.x' if you prefer)
-  - task: UsePythonVersion@0
-    displayName: '🐍 Select Python 3.x'
+  # 4) Verify and use system Python
+  - task: Bash@3
+    displayName: '🐍 Verify System Python'
     inputs:
-      versionSpec: '3.x'
-      addToPath: true
+      targetType: inline
+      script: |
+        python3 --version
+        which python3
+        echo "Using system Python instead of downloading version"
 
   # 5) Run your PR‐check entrypoint (installs deps & invokes Azure OpenAI)
   - task: Bash@3
