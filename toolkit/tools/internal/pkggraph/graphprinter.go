@@ -13,74 +13,68 @@ import (
 )
 
 type GraphPrinter struct {
-	config
+	graphPrinterConfig
 }
 
-type config struct {
+type graphPrinterConfig struct {
 	indentString string
-	output       io.Writer
+	output       io.StringWriter
 }
 
-type configModifier func(*config)
+type graphPrinterConfigModifier func(*graphPrinterConfig)
 
 type loggerOutputWrapper struct {
 	logLevel logrus.Level
 }
 
-// Write implements the io.Writer interface.
-func (d *loggerOutputWrapper) Write(p []byte) (n int, err error) {
-	logger.Log.Log(d.logLevel, string(p))
-	return len(p), nil
+// Write implements the io.StringWriter interface.
+func (d *loggerOutputWrapper) WriteString(s string) (int, error) {
+	logger.Log.Log(d.logLevel, s)
+	return len(s), nil
 }
 
-// defaultConfig creates GraphPrinter's default settings.
+// NewGraphPrinter creates a new GraphPrinter.
+// It accepts a variadic number of 'GraphPrinter*' modifiers to customize the printer's behavior.
 // The default settings are:
-// - Indent string: "  " (2 spaces)
-// - Output: 		logger on debug level
-func defaultConfig() *config {
-	return &config{
+// - Indent character: " " (space)
+// - Indent shift: 2
+func NewGraphPrinter(configModifiers ...graphPrinterConfigModifier) *GraphPrinter {
+	config := &graphPrinterConfig{
 		indentString: "  ",
 		output: &loggerOutputWrapper{
 			logLevel: logrus.DebugLevel,
 		},
 	}
-}
 
-// NewGraphPrinter creates a new GraphPrinter.
-// It accepts a variadic number of 'With*' modifiers to customize the printer's behavior.
-// The default settings are:
-// - Indent character: " " (space)
-// - Indent shift: 2
-func NewGraphPrinter(configModifiers ...configModifier) *GraphPrinter {
-	config := defaultConfig()
 	for _, modifier := range configModifiers {
 		modifier(config)
 	}
+
 	return &GraphPrinter{
-		config: *config,
+		graphPrinterConfig: *config,
 	}
 }
 
 // GraphPrinterIndentString is a config modifier passed to the graph printer's constructor
 // to define the string used for indentation in the graph printer.
-func GraphPrinterIndentString(indentString string) configModifier {
-	return func(c *config) {
+func GraphPrinterIndentString(indentString string) graphPrinterConfigModifier {
+	return func(c *graphPrinterConfig) {
 		c.indentString = indentString
 	}
 }
 
 // GraphPrinterOutput is a config modifier passed to the graph printer's constructor
 // to define the output writer for the graph printer.
-func GraphPrinterOutput(output io.Writer) configModifier {
-	return func(c *config) {
+func GraphPrinterOutput(output io.StringWriter) graphPrinterConfigModifier {
+	return func(c *graphPrinterConfig) {
 		c.output = output
 	}
 }
 
 // GraphPrinterLogOutput is a config modifier passed to the graph printer's constructor
 // making the printer's output be logged at the specified log level.
-func GraphPrinterLogOutput(logLevel logrus.Level) configModifier {
-	return func(c *config) {
+func GraphPrinterLogOutput(logLevel logrus.Level) graphPrinterConfigModifier {
+	return func(c *graphPrinterConfig) {
 		c.output = &loggerOutputWrapper{
 			logLevel: logLevel,
 		}
@@ -110,13 +104,14 @@ func (g GraphPrinter) Print(graph *PkgGraph, rootNode *PkgNode) error {
 	// Use a set to keep track of seen nodes to avoid infinite loops.
 	seenNodes := make(map[*PkgNode]bool)
 
+	// Walking the graph manually to be able to track the depth level.
 	dfsPrint = func(node *PkgNode) error {
 		if node == nil || seenNodes[node] {
 			return nil
 		}
 
 		line := fmt.Sprintf("%s%s\n", strings.Repeat(string(g.indentString), level), node.FriendlyName())
-		_, err := g.output.Write([]byte(line))
+		_, err := g.output.WriteString(line)
 		if err != nil {
 			return fmt.Errorf("failed to write to output: %w", err)
 		}

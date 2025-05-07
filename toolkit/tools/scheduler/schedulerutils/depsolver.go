@@ -18,35 +18,6 @@ import (
 	"gonum.org/v1/gonum/graph/traverse"
 )
 
-// BuildBlockedNodesGraph creates a subgraph of blocked nodes starting from the start node.
-// This is useful for debugging the build process.
-func BuildBlockedNodesGraph(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState, startNode *pkggraph.PkgNode) *pkggraph.PkgGraph {
-	graphMutex.RLock()
-	defer graphMutex.RUnlock()
-
-	blockedGraph := pkggraph.NewPkgGraph()
-	search := traverse.BreadthFirst{}
-	search.Traverse = func(e graph.Edge) bool {
-		fromNode := e.From().(*pkggraph.PkgNode)
-		toNode := e.To().(*pkggraph.PkgNode)
-
-		// We're only interested in edges where both nodes are not marked as available.
-		// If only the 'toNode' is available, we can ignore the edge as it doesn't represent a block.
-		if buildState.IsNodeAvailable(fromNode) || buildState.IsNodeAvailable(toNode) {
-			return false
-		}
-
-		// Ignoring "SetEdge" panic as it only occurs when adding a self-loop.
-		// There are no such loops, since we're traversing an already valid graph.
-		blockedGraph.SetEdge(blockedGraph.NewEdge(fromNode, toNode))
-
-		return true
-	}
-	search.Walk(pkgGraph, startNode, nil)
-
-	return blockedGraph
-}
-
 // CanSubGraph returns true if a node can be subgraphed without any unresolved dynamic dependencies.
 // Used to optimize graph solving.
 func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedImplicit bool) bool {
@@ -192,6 +163,35 @@ func findUnblockedNodesFromNode(pkgGraph *pkggraph.PkgGraph, buildState *GraphBu
 			unblockedNodes[dependent] = true
 		}
 	}
+}
+
+// buildBlockedNodesGraph creates a subgraph of blocked nodes starting from the start node.
+// This is useful for debugging the build process.
+func buildBlockedNodesGraph(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState, startNode *pkggraph.PkgNode) *pkggraph.PkgGraph {
+	graphMutex.RLock()
+	defer graphMutex.RUnlock()
+
+	blockedGraph := pkggraph.NewPkgGraph()
+	search := traverse.BreadthFirst{}
+	search.Traverse = func(e graph.Edge) bool {
+		fromNode := e.From().(*pkggraph.PkgNode)
+		toNode := e.To().(*pkggraph.PkgNode)
+
+		// We're only interested in edges where both nodes are not marked as available.
+		// If only the 'toNode' is available, we can ignore the edge as it doesn't represent a block.
+		if buildState.IsNodeAvailable(fromNode) || buildState.IsNodeAvailable(toNode) {
+			return false
+		}
+
+		// Ignoring "SetEdge" panic as it only occurs when adding a self-loop.
+		// There are no such loops, since we're traversing an already valid graph.
+		blockedGraph.SetEdge(blockedGraph.NewEdge(fromNode, toNode))
+
+		return true
+	}
+	search.Walk(pkgGraph, startNode, nil)
+
+	return blockedGraph
 }
 
 // isNodeUnblocked returns true if all nodes required to build `node` are UpToDate and do not need to be built.

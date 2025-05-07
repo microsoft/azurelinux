@@ -4,7 +4,6 @@
 package pkggraph
 
 import (
-	"bytes"
 	"strings"
 	"testing"
 
@@ -19,7 +18,7 @@ func TestDefaultGraphPrinterCreatedOK(t *testing.T) {
 func TestCustomOutputAppliesOK(t *testing.T) {
 	const testName = "test"
 
-	var buffer bytes.Buffer
+	var buffer strings.Builder
 
 	printer := NewGraphPrinter(
 		GraphPrinterOutput(&buffer),
@@ -47,7 +46,7 @@ func TestCustomIndentStringAppliesOK(t *testing.T) {
 		child1Name   = "child1"
 	)
 
-	var buffer bytes.Buffer
+	var buffer strings.Builder
 
 	printer := NewGraphPrinter(
 		GraphPrinterIndentString(customIndent),
@@ -85,7 +84,7 @@ func TestPrintingLargerGraphOK(t *testing.T) {
 		grandchildName = "grandchild"
 	)
 
-	var buf bytes.Buffer
+	var buf strings.Builder
 	printer := NewGraphPrinter(
 		GraphPrinterOutput(&buf),
 	)
@@ -136,7 +135,7 @@ func TestPrintGraphWithCyclesOK(t *testing.T) {
 		node2Name = "node2"
 	)
 
-	var buf bytes.Buffer
+	var buf strings.Builder
 
 	printer := NewGraphPrinter(
 		GraphPrinterOutput(&buf),
@@ -181,7 +180,7 @@ func TestPrintGraphWithCyclesOK(t *testing.T) {
 }
 
 func TestPrintNilGraphReturnsError(t *testing.T) {
-	var buf bytes.Buffer
+	var buf strings.Builder
 
 	printer := NewGraphPrinter(
 		GraphPrinterOutput(&buf),
@@ -195,7 +194,7 @@ func TestPrintNilGraphReturnsError(t *testing.T) {
 }
 
 func TestPrintNilRootReturnsError(t *testing.T) {
-	var buf bytes.Buffer
+	var buf strings.Builder
 
 	printer := NewGraphPrinter(
 		GraphPrinterOutput(&buf),
@@ -211,7 +210,7 @@ func TestPrintNilRootReturnsError(t *testing.T) {
 }
 
 func TestPrintNodeNotInGraphReturnsError(t *testing.T) {
-	var buf bytes.Buffer
+	var buf strings.Builder
 
 	printer := NewGraphPrinter(
 		GraphPrinterOutput(&buf),

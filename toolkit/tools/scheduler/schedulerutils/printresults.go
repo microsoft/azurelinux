@@ -142,7 +142,7 @@ func PrintHiddenBuildBlockers(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMu
 	rpmConflicts := buildState.ConflictingRPMs()
 	srpmConflicts := buildState.ConflictingSRPMs()
 
-	blockedNodesGraph := BuildBlockedNodesGraph(pkgGraph, graphMutex, buildState, goalNode)
+	blockedNodesGraph := buildBlockedNodesGraph(pkgGraph, graphMutex, buildState, goalNode)
 
 	// Skip printing if either:
 	// - the goal node is not blocked or
