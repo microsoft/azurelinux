@@ -17,7 +17,8 @@ func TestDefaultGraphPrinterCreatedOK(t *testing.T) {
 }
 
 func TestCustomOutputAppliesOK(t *testing.T) {
-	const nodeName = "test"
+	const testName = "test"
+
 	var buffer bytes.Buffer
 
 	printer := NewGraphPrinter(
@@ -29,18 +30,23 @@ func TestCustomOutputAppliesOK(t *testing.T) {
 	graph := NewPkgGraph()
 	assert.NotNil(t, graph)
 
-	rootNode, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: nodeName}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
+	rootNode, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: testName}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
 	assert.NoError(t, err)
 
 	printer.Print(graph, rootNode)
 
 	output := buffer.String()
-	assert.Contains(t, output, nodeName)
+	assert.Contains(t, output, testName)
 }
 
 // TestGraphPrinterIndentString tests the GraphPrinterIndentString config modifier
 func TestCustomIndentStringAppliesOK(t *testing.T) {
-	const customIndent = "----"
+	const (
+		customIndent = "----"
+		rootName     = "root"
+		child1Name   = "child1"
+	)
+
 	var buffer bytes.Buffer
 
 	printer := NewGraphPrinter(
@@ -52,10 +58,10 @@ func TestCustomIndentStringAppliesOK(t *testing.T) {
 	graph := NewPkgGraph()
 	assert.NotNil(t, graph)
 
-	rootNode, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: "root"}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
+	rootNode, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: rootName}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
 	assert.NoError(t, err)
 
-	childNode, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: "child"}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
+	childNode, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: child1Name}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
 	assert.NoError(t, err)
 
 	// Add edge from root to child
@@ -72,6 +78,13 @@ func TestCustomIndentStringAppliesOK(t *testing.T) {
 }
 
 func TestPrintingLargerGraphOK(t *testing.T) {
+	const (
+		rootName       = "root"
+		child1Name     = "child1"
+		child2Name     = "child2"
+		grandchildName = "grandchild"
+	)
+
 	var buf bytes.Buffer
 	printer := NewGraphPrinter(
 		GraphPrinterOutput(&buf),
@@ -82,18 +95,18 @@ func TestPrintingLargerGraphOK(t *testing.T) {
 	assert.NotNil(t, graph)
 
 	// Add root node
-	rootNode, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: "root"}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
+	rootNode, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: rootName}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
 	assert.NoError(t, err)
 
 	// Add children
-	child1, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: "child1"}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
+	child1, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: child1Name}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
 	assert.NoError(t, err)
 
-	child2, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: "child2"}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
+	child2, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: child2Name}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
 	assert.NoError(t, err)
 
 	// Add grandchild
-	grandchild, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: "grandchild"}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
+	grandchild, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: grandchildName}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
 	assert.NoError(t, err)
 
 	// Add edges
@@ -111,13 +124,18 @@ func TestPrintingLargerGraphOK(t *testing.T) {
 
 	// Check output contains all nodes
 	output := buf.String()
-	assert.Contains(t, output, strings.Repeat(printer.indentString, 0)+"root")
-	assert.Contains(t, output, strings.Repeat(printer.indentString, 1)+"child1")
-	assert.Contains(t, output, strings.Repeat(printer.indentString, 1)+"child2")
-	assert.Contains(t, output, strings.Repeat(printer.indentString, 2)+"grandchild")
+	assert.Contains(t, output, strings.Repeat(printer.indentString, 0)+rootName)
+	assert.Contains(t, output, strings.Repeat(printer.indentString, 1)+child1Name)
+	assert.Contains(t, output, strings.Repeat(printer.indentString, 1)+child2Name)
+	assert.Contains(t, output, strings.Repeat(printer.indentString, 2)+grandchildName)
 }
 
 func TestPrintGraphWithCyclesOK(t *testing.T) {
+	const (
+		node1Name = "node1"
+		node2Name = "node2"
+	)
+
 	var buf bytes.Buffer
 
 	printer := NewGraphPrinter(
@@ -128,10 +146,10 @@ func TestPrintGraphWithCyclesOK(t *testing.T) {
 	graph := NewPkgGraph()
 
 	// Add nodes
-	node1, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: "node1"}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
+	node1, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: node1Name}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
 	assert.NoError(t, err)
 
-	node2, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: "node2"}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
+	node2, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: node2Name}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
 	assert.NoError(t, err)
 
 	// Create a cycle
@@ -147,8 +165,8 @@ func TestPrintGraphWithCyclesOK(t *testing.T) {
 
 	// Check output contains both nodes with 'node1' at the root level
 	output := buf.String()
-	assert.Contains(t, output, strings.Repeat(printer.indentString, 0)+"node1")
-	assert.Contains(t, output, strings.Repeat(printer.indentString, 1)+"node2")
+	assert.Contains(t, output, strings.Repeat(printer.indentString, 0)+node1Name)
+	assert.Contains(t, output, strings.Repeat(printer.indentString, 1)+node2Name)
 
 	buf.Reset()
 
@@ -158,8 +176,8 @@ func TestPrintGraphWithCyclesOK(t *testing.T) {
 
 	// Check output contains both nodes with 'node2' at the root level
 	output = buf.String()
-	assert.Contains(t, output, strings.Repeat(printer.indentString, 0)+"node2")
-	assert.Contains(t, output, strings.Repeat(printer.indentString, 1)+"node1")
+	assert.Contains(t, output, strings.Repeat(printer.indentString, 0)+node2Name)
+	assert.Contains(t, output, strings.Repeat(printer.indentString, 1)+node1Name)
 }
 
 func TestPrintNilGraphReturnsError(t *testing.T) {
