@@ -31,6 +31,7 @@ Patch4:         CVE-2024-34158.patch
 Patch5:         CVE-2025-22871.patch
 Patch6:         CVE-2024-24789.patch
 Patch7:         CVE-2025-22870.patch
+Patch8:         CVE-2024-34155.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -54,6 +55,7 @@ patch -Np1 --ignore-whitespace < %{PATCH4}
 patch -Np1 --ignore-whitespace < %{PATCH5}
 patch -Np1 --ignore-whitespace < %{PATCH6}
 patch -Np1 --ignore-whitespace < %{PATCH7}
+patch -Np1 --ignore-whitespace < %{PATCH8}
 
 %build
 # Build go 1.4 bootstrap
@@ -135,7 +137,7 @@ fi
 
 %changelog
 * Fri Apr 25 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.18.8-8
-- Patch CVE-2024-24789 & CVE-2025-22870
+- Patch CVE-2024-24789, CVE-2024-34155 & CVE-2025-22870
 
 * Mon Apr 21 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.18.8-7
 - Address CVE-2025-22871 using an upstream patch.
