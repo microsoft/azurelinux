@@ -21,9 +21,15 @@ BuildRequires:  python3-py
 BuildRequires:  python3-filelock
 BuildRequires:  python3-six
 BuildRequires:  python3-toml
-BuildRequires:  python3-testtools
+#BuildRequires:  python3-testtools
 BuildRequires:  python3-extras
- 
+BuildRequires:  python3-colorama
+BuildRequires:  python3-chardet
+BuildRequires:  python3-platformdirs
+BuildRequires:  python3-cachetools
+BuildRequires:  python3-pyproject-api
+BuildRequires:  python3-virtualenv
+
 BuildArch:      noarch
 
 %global _description %{expand:
