@@ -111,7 +111,7 @@ func ValidateRpmPaths(repoDir string) (err error) {
 			errorBuilder.WriteString(", ")
 		}
 
-		err = fmt.Errorf(errorBuilder.String())
+		err = fmt.Errorf("%s", errorBuilder.String())
 	}
 
 	return
