@@ -31229,8 +31229,8 @@
         "type": "other",
         "other": {
           "name": "zenity",
-          "version": "3.32.0",
-          "downloadUrl": "https://download.gnome.org/sources/zenity/3.32/zenity-3.32.0.tar.xz"
+          "version": "3.44.1",
+          "downloadUrl": "https://download.gnome.org/sources/zenity/3.44/zenity-3.44.1.tar.xz"
         }
       }
     },
