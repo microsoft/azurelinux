@@ -67,14 +67,18 @@ def gather_diff() -> str:
         
         # First try to ensure we have the refs - a depth of 1 is sufficient
         try:
-            logger.info("Fetching necessary git references with depth=1...")
+            logger.info("Fetching source+target commits with depth=1…")
             subprocess.check_call(
-                ["git", "fetch", "--depth=1", "--no-tags", "origin", tgt_commit],
+                [
+                  "git", "fetch",
+                  "--depth=1", "--no-tags", "origin",
+                  src_commit, tgt_commit
+                ],
                 cwd=repo_path,
-                stderr=subprocess.PIPE  # Capture stderr to avoid polluting the logs
+                stderr=subprocess.PIPE
             )
         except subprocess.CalledProcessError:
-            logger.warning("Failed to fetch target commit, continuing with local refs")
+            logger.warning("Could not fetch one or both commits; proceeding anyway")
             
         # Try to get the diff directly using commit IDs (most reliable)
         logger.info("Generating diff between commits...")

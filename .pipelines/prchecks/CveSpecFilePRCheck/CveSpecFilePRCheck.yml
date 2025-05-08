@@ -33,7 +33,8 @@ variables:
 steps:
   # 1) Clone the repo
   - checkout: self
-    fetchDepth: 2  # Need at least 2 commits for diff
+    fetchDepth: 2           # still just pull the last 2 commits
+    persistCredentials: true # ← allow further git fetches
 
   # 2) Debug workspace (optional — remove once paths are correct)
   - task: Bash@3
