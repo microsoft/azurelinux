@@ -191,16 +191,14 @@ $(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST) $(go-downloader)
 	echo "Attempting to download toolchain RPM: $$rpm_filename" | tee -a "$$log_file" && \
 	mkdir -p $$rpm_dir && \
 	cd $$rpm_dir && \
-	for url in $(PACKAGE_URL_LIST); do \
-		$(go-downloader) --no-verbose --no-clobber $$url/$$rpm_filename \
-			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
-			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
-			--log-file $$log_file 2>/dev/null && \
-		echo "Downloaded toolchain RPM: $$rpm_filename" >> $$log_file && \
-		echo "$$rpm_filename" >> $(toolchain_downloads_manifest) | tee -a "$$log_file" && \
-		touch $@ && \
-		break; \
-	done || { \
+	$(go-downloader) --no-verbose --no-clobber \
+		$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
+		$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
+		--log-file $$log_file \
+		$$rpm_filename $(PACKAGE_URL_LIST) 2>/dev/null && \
+	echo "Downloaded toolchain RPM: $$rpm_filename" >> $$log_file && \
+	echo "$$rpm_filename" >> $(toolchain_downloads_manifest) | tee -a "$$log_file" && \
+	touch $@ || { \
 		echo "Could not find toolchain package in package repo: $$rpm_filename." | tee -a "$$log_file" && \
 		touch $@; \
 	}
