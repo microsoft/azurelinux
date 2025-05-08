@@ -91,10 +91,11 @@ if [ -z "${SYSTEM_PULLREQUEST_SOURCECOMMITID:-}" ] || [ -z "${SYSTEM_PULLREQUEST
   
   # Try to find the target branch more robustly
   if [ -n "${SYSTEM_PULLREQUEST_TARGETBRANCH:-}" ]; then
-    # Try to fetch the target branch if it exists
+    # Try to fetch the target branch if it exists - quote branch name to handle slashes properly
     echo "🔄 Trying to fetch target branch: ${SYSTEM_PULLREQUEST_TARGETBRANCH}"
-    git fetch origin "${SYSTEM_PULLREQUEST_TARGETBRANCH}" --depth=1 || true
+    git fetch --depth=1 origin "${SYSTEM_PULLREQUEST_TARGETBRANCH}" || true
     
+    # Double-quote branch names to handle branches with slashes
     if git rev-parse "origin/${SYSTEM_PULLREQUEST_TARGETBRANCH}" >/dev/null 2>&1; then
       export SYSTEM_PULLREQUEST_TARGETCOMMITID=$(git rev-parse "origin/${SYSTEM_PULLREQUEST_TARGETBRANCH}")
       echo "✅ Found target commit from branch: ${SYSTEM_PULLREQUEST_TARGETBRANCH}"
