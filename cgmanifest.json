@@ -215,8 +215,8 @@
         "type": "other",
         "other": {
           "name": "ansible",
-          "version": "2.17.0",
-          "downloadUrl": "https://github.com/ansible/ansible/archive/refs/tags/v2.17.0.tar.gz"
+          "version": "2.17.11",
+          "downloadUrl": "https://github.com/ansible/ansible/archive/refs/tags/v2.17.11.tar.gz"
         }
       }
     },
@@ -27451,11 +27451,11 @@
     },
     {
       "component": {
-	"type": "other",
-	"other": {
+        "type": "other",
+        "other": {
           "name": "rust",
-	  "version": "1.85.0",
-	  "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.85.0-src.tar.xz"
+          "version": "1.85.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.85.0-src.tar.xz"
         }
       }
     },
