@@ -6,15 +6,34 @@ pr:
   branches:
     include:
       - fasttrack/abadawi/test/3.0
+  paths:
+    include:
+      - '**/*.spec'
+      - '**/*.patch'
 
 name: Automaton-OpenAI-PR-Check
 
 pool:
   name: mariner-dev-build-1es-mariner2-amd64
 
+parameters:
+  - name: failOnWarnings
+    displayName: Fail pipeline on warnings
+    type: boolean
+    default: false
+  - name: useExitCodeSeverity
+    displayName: Use different exit codes based on severity
+    type: boolean
+    default: true
+
+variables:
+  FAIL_ON_WARNINGS: ${{ parameters.failOnWarnings }}
+  USE_EXIT_CODE_SEVERITY: ${{ parameters.useExitCodeSeverity }}
+
 steps:
   # 1) Clone the repo
   - checkout: self
+    fetchDepth: 2  # Need at least 2 commits for diff
 
   # 2) Debug workspace (optional — remove once paths are correct)
   - task: Bash@3
@@ -66,4 +85,15 @@ steps:
       script: |
         cd .pipelines/prchecks/CveSpecFilePRCheck
         chmod +x run-pr-check.sh
-        ./run-pr-check.sh
+        
+        # Pass parameters to the script
+        CMD="./run-pr-check.sh"
+        if [ "$FAIL_ON_WARNINGS" = "True" ]; then
+          CMD="$CMD --fail-on-warnings"
+        fi
+        if [ "$USE_EXIT_CODE_SEVERITY" = "True" ]; then
+          CMD="$CMD --exit-code-severity"
+        fi
+        
+        echo "Running command: $CMD"
+        $CMD
