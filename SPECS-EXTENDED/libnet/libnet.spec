@@ -46,8 +46,7 @@ developing applications that use libnet.
 %endif
 
 %prep
-%setup -q
-%patch -P 0 -p1
+%autosetup -p1
 # Avoid library soname bump (https://github.com/libnet/libnet/issues/115)
 sed -e 's/-version-info 9:0:0/-version-info 9:0:8/' -i src/Makefile.{am,in}
 
