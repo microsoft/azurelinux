@@ -8,8 +8,8 @@ pr:
       - fasttrack/abadawi/test/3.0
   paths:
     include:
-      - '**/*.spec'
-      - '**/*.patch'
+    - 'SPECS/**/*.spec'
+    - 'SPECS/**/*.patch'
 
 name: Automaton-OpenAI-PR-Check
 
