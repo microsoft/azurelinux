@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,8 +25,6 @@ func TestCustomOutputAppliesOK(t *testing.T) {
 		GraphPrinterOutput(&buffer),
 	)
 
-	assert.NotNil(t, printer)
-
 	graph := NewPkgGraph()
 	assert.NotNil(t, graph)
 
@@ -36,43 +35,6 @@ func TestCustomOutputAppliesOK(t *testing.T) {
 
 	output := buffer.String()
 	assert.Contains(t, output, nodeName)
-}
-
-func TestCustomIndentStringAppliesOK(t *testing.T) {
-	const (
-		customIndent = "----"
-		rootName     = "root"
-		child1Name   = "child1"
-	)
-
-	var buffer strings.Builder
-
-	printer := NewGraphPrinter(
-		GraphPrinterIndentString(customIndent),
-		GraphPrinterOutput(&buffer),
-	)
-
-	// Create a simple graph to print.
-	graph := NewPkgGraph()
-	assert.NotNil(t, graph)
-
-	rootNode, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: rootName}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
-	assert.NoError(t, err)
-
-	childNode, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: child1Name}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
-	assert.NoError(t, err)
-
-	// Add edge from root to child.
-	err = graph.AddEdge(rootNode, childNode)
-	assert.NoError(t, err)
-
-	// Print the graph.
-	err = printer.Print(graph, rootNode)
-	assert.NoError(t, err)
-
-	// Check output contains our custom indent.
-	output := buffer.String()
-	assert.Contains(t, output, customIndent)
 }
 
 func TestPrintingLargerGraphOK(t *testing.T) {
@@ -122,10 +84,10 @@ func TestPrintingLargerGraphOK(t *testing.T) {
 
 	// Check output contains all nodes.
 	output := buf.String()
-	assert.Contains(t, output, strings.Repeat(printer.indentString, 0)+rootName)
-	assert.Contains(t, output, strings.Repeat(printer.indentString, 1)+child1Name)
-	assert.Contains(t, output, strings.Repeat(printer.indentString, 1)+child2Name)
-	assert.Contains(t, output, strings.Repeat(printer.indentString, 2)+grandchildName)
+	assert.Contains(t, output, rootName)
+	assert.Contains(t, output, "├── "+child1Name)
+	assert.Contains(t, output, "└── "+child2Name)
+	assert.Contains(t, output, "│   └── "+grandchildName)
 }
 
 func TestPrintGraphWithCyclesOK(t *testing.T) {
@@ -163,8 +125,8 @@ func TestPrintGraphWithCyclesOK(t *testing.T) {
 
 	// Check output contains both nodes with 'node1' at the root level.
 	output := buf.String()
-	assert.Contains(t, output, strings.Repeat(printer.indentString, 0)+node1Name)
-	assert.Contains(t, output, strings.Repeat(printer.indentString, 1)+node2Name)
+	assert.Contains(t, output, node1Name)
+	assert.Contains(t, output, "└── "+node2Name)
 
 	buf.Reset()
 
@@ -174,8 +136,8 @@ func TestPrintGraphWithCyclesOK(t *testing.T) {
 
 	// Check output contains both nodes with 'node2' at the root level.
 	output = buf.String()
-	assert.Contains(t, output, strings.Repeat(printer.indentString, 0)+node2Name)
-	assert.Contains(t, output, strings.Repeat(printer.indentString, 1)+node1Name)
+	assert.Contains(t, output, node2Name)
+	assert.Contains(t, output, "└── "+node1Name)
 }
 
 func TestPrintNilGraphReturnsError(t *testing.T) {
@@ -222,4 +184,39 @@ func TestPrintNodeNotInGraphReturnsError(t *testing.T) {
 
 	// Output should be empty since error occurred.
 	assert.Empty(t, buf.String())
+}
+func TestAllNilModifiersHandledCorrectly(t *testing.T) {
+	assert.NotPanics(t, func() {
+		NewGraphPrinter(nil, nil, nil)
+	})
+}
+
+func TestMixedNilAndValidModifiersHandledCorrectly(t *testing.T) {
+	var (
+		buf     strings.Builder
+		printer GraphPrinter
+	)
+
+	assert.NotPanics(t, func() {
+		printer = NewGraphPrinter(
+			nil,
+			GraphPrinterOutput(&buf),
+			nil,
+		)
+	})
+
+	// Verify that valid modifiers were applied
+	assert.Equal(t, &buf, printer.output)
+}
+
+func TestLogOutputModifierAppliedCorrectly(t *testing.T) {
+	// Test with GraphPrinterLogOutput
+	printer := NewGraphPrinter(
+		GraphPrinterLogOutput(logrus.InfoLevel),
+	)
+
+	// Verify the output is a loggerOutputWrapper with the correct log level
+	logOutput, isLoggerOutput := printer.output.(loggerOutputWrapper)
+	assert.True(t, isLoggerOutput)
+	assert.Equal(t, logrus.InfoLevel, logOutput.logLevel)
 }

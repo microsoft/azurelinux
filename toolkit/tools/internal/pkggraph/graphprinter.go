@@ -8,12 +8,15 @@ import (
 	"io"
 	"strings"
 
+	"github.com/ddddddO/gtree"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/sirupsen/logrus"
 )
 
 // GraphPrinter is a type meant to print a graph in a human-readable format.
 // It uses a depth-first search (DFS) algorithm to traverse the graph and print each node.
+// The printer ignores any cycles in the graph and thus turns the graph into a tree.
+// We use the gtree package to print the tree structure.
 // See NewGraphPrinter for more details on how to customize the printer.
 //
 // Example:
@@ -26,30 +29,18 @@ import (
 //	B -> D
 //	D -> A (loop)
 //
-//	Output starting from 'A' with default indent string (2 spaces):
-//
+//	Output starting from 'A':
 //	A
-//	  B
-//	    C
-//	    D
-//	  E
-//
-//	Note: the loop (D -> A) is not printed to avoid infinite recursion.
-//
-//	Output starting from 'A' with custom indent string (2 hyphens):
-//
-//	A
-//	--B
-//	----C
-//	----D
-//	--E
+//	├── B
+//	│   ├── C
+//	│   └── D
+//	└── E
 type GraphPrinter struct {
 	graphPrinterConfig
 }
 
 type graphPrinterConfig struct {
-	indentString string
-	output       io.StringWriter
+	output io.Writer
 }
 
 type graphPrinterConfigModifier func(*graphPrinterConfig)
@@ -60,25 +51,27 @@ type loggerOutputWrapper struct {
 }
 
 // Write implements the io.StringWriter interface.
-func (d loggerOutputWrapper) WriteString(s string) (int, error) {
-	logger.Log.Log(d.logLevel, s)
-	return len(s), nil
+func (d loggerOutputWrapper) Write(bytes []byte) (int, error) {
+	line := strings.TrimSuffix(string(bytes), "\n")
+	logger.Log.Log(d.logLevel, line)
+	return len(bytes), nil
 }
 
 // NewGraphPrinter creates a new GraphPrinter.
 // It accepts a variadic number of 'GraphPrinter*' modifiers to customize the printer's behavior.
 // The default settings are:
-// - Indent string: "  " (2 spaces)
 // - Output: logrus logger on debug level
 func NewGraphPrinter(configModifiers ...graphPrinterConfigModifier) GraphPrinter {
 	config := graphPrinterConfig{
-		indentString: "  ",
 		output: loggerOutputWrapper{
 			logLevel: logrus.DebugLevel,
 		},
 	}
 
 	for _, modifier := range configModifiers {
+		if modifier == nil {
+			continue
+		}
 		modifier(&config)
 	}
 
@@ -87,17 +80,9 @@ func NewGraphPrinter(configModifiers ...graphPrinterConfigModifier) GraphPrinter
 	}
 }
 
-// GraphPrinterIndentString is a config modifier passed to the graph printer's constructor
-// to define the string used for indentation in the graph printer.
-func GraphPrinterIndentString(indentString string) graphPrinterConfigModifier {
-	return func(c *graphPrinterConfig) {
-		c.indentString = indentString
-	}
-}
-
 // GraphPrinterOutput is a config modifier passed to the graph printer's constructor
 // to define the output writer for the graph printer.
-func GraphPrinterOutput(output io.StringWriter) graphPrinterConfigModifier {
+func GraphPrinterOutput(output io.Writer) graphPrinterConfigModifier {
 	return func(c *graphPrinterConfig) {
 		c.output = output
 	}
@@ -107,7 +92,7 @@ func GraphPrinterOutput(output io.StringWriter) graphPrinterConfigModifier {
 // making the printer's output be logged at the specified log level.
 func GraphPrinterLogOutput(logLevel logrus.Level) graphPrinterConfigModifier {
 	return func(c *graphPrinterConfig) {
-		c.output = &loggerOutputWrapper{
+		c.output = loggerOutputWrapper{
 			logLevel: logLevel,
 		}
 	}
@@ -118,7 +103,7 @@ func GraphPrinterLogOutput(logLevel logrus.Level) graphPrinterConfigModifier {
 // - Each node is represented by its friendly name.
 // - Children of each node have an indentation level based on their depth in the graph.
 func (g GraphPrinter) Print(graph *PkgGraph, rootNode *PkgNode) error {
-	var dfsPrint func(*PkgNode) error
+	var dfsPrint func(*gtree.Node, *PkgNode)
 
 	if graph == nil {
 		return fmt.Errorf("graph is nil")
@@ -132,42 +117,37 @@ func (g GraphPrinter) Print(graph *PkgGraph, rootNode *PkgNode) error {
 		return fmt.Errorf("root node '%s' not found in the graph", rootNode.FriendlyName())
 	}
 
-	level := 0
+	treeRoot := gtree.NewRoot(rootNode.FriendlyName())
+
 	// Use a set to keep track of seen nodes to avoid infinite loops.
 	seenNodes := make(map[*PkgNode]bool)
 
 	// Walking the graph manually to be able to track the depth level.
-	dfsPrint = func(node *PkgNode) error {
-		if node == nil || seenNodes[node] {
-			return nil
+	dfsPrint = func(treeParent *gtree.Node, pkgNode *PkgNode) {
+		if pkgNode == nil || seenNodes[pkgNode] {
+			return
 		}
 
-		line := fmt.Sprintf("%s%s\n", strings.Repeat(string(g.indentString), level), node.FriendlyName())
-		_, err := g.output.WriteString(line)
-		if err != nil {
-			return fmt.Errorf("failed to write to output: %w", err)
+		treeNode := treeRoot
+		if treeParent != nil {
+			treeNode = treeParent.Add(pkgNode.FriendlyName())
 		}
 
-		seenNodes[node] = true
-		level += 1
+		seenNodes[pkgNode] = true
 
-		children := graph.From(node.ID())
+		children := graph.From(pkgNode.ID())
 		for children.Next() {
 			child := children.Node().(*PkgNode)
 			if child == nil {
 				continue
 			}
-			err := dfsPrint(child)
-			if err != nil {
-				return err
-			}
+			dfsPrint(treeNode, child)
 		}
 
-		level -= 1
-		seenNodes[node] = false
-
-		return nil
+		seenNodes[pkgNode] = false
 	}
 
-	return dfsPrint(rootNode)
+	dfsPrint(nil, rootNode)
+
+	return gtree.OutputFromRoot(g.output, treeRoot)
 }

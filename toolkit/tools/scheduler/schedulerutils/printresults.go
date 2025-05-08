@@ -457,11 +457,11 @@ func printSummary(srpmBuildData srpmBuildDataContainer, srpmTestData srpmTestDat
 	logger.Log.Info("--------- Summary ---------")
 	logger.Log.Info("---------------------------")
 
-	logger.Log.Infof(color.GreenString(summaryLine("Number of prebuilt SRPMs:", len(srpmBuildData.prebuiltSRPMs))))
-	logger.Log.Infof(color.GreenString(summaryLine("Number of prebuilt delta SRPMs:", len(srpmBuildData.prebuiltDeltaSRPMs))))
-	logger.Log.Infof(color.GreenString(summaryLine("Number of skipped SRPMs tests:", len(srpmTestData.skippedSRPMsTests))))
-	logger.Log.Infof(color.GreenString(summaryLine("Number of built SRPMs:", len(srpmBuildData.builtSRPMs))))
-	logger.Log.Infof(color.GreenString(summaryLine("Number of passed SRPMs tests:", len(srpmTestData.passedSRPMsTests))))
+	logger.Log.Info(color.GreenString(summaryLine("Number of prebuilt SRPMs:", len(srpmBuildData.prebuiltSRPMs))))
+	logger.Log.Info(color.GreenString(summaryLine("Number of prebuilt delta SRPMs:", len(srpmBuildData.prebuiltDeltaSRPMs))))
+	logger.Log.Info(color.GreenString(summaryLine("Number of skipped SRPMs tests:", len(srpmTestData.skippedSRPMsTests))))
+	logger.Log.Info(color.GreenString(summaryLine("Number of built SRPMs:", len(srpmBuildData.builtSRPMs))))
+	logger.Log.Info(color.GreenString(summaryLine("Number of passed SRPMs tests:", len(srpmTestData.passedSRPMsTests))))
 	printErrorInfoByCondition(len(unresolvedDependencies) > 0, summaryLine("Number of unresolved dependencies:", len(unresolvedDependencies)))
 	printErrorInfoByCondition(len(srpmBuildData.blockedSRPMs) > 0, summaryLine("Number of blocked SRPMs:", len(srpmBuildData.blockedSRPMs)))
 	printErrorInfoByCondition(len(srpmTestData.blockedSRPMsTests) > 0, summaryLine("Number of blocked SRPMs tests:", len(srpmTestData.blockedSRPMsTests)))
@@ -481,9 +481,9 @@ func printSummary(srpmBuildData srpmBuildDataContainer, srpmTestData srpmTestDat
 // If the condition is true, it prints an error level log and an info level one otherwise.
 func printErrorInfoByCondition(condition bool, format string, arg ...any) {
 	if condition {
-		logger.Log.Errorf(color.RedString(format, arg...))
+		logger.Log.Error(color.RedString(format, arg...))
 	} else {
-		logger.Log.Infof(color.GreenString(format, arg...))
+		logger.Log.Info(color.GreenString(format, arg...))
 	}
 }
 
@@ -491,9 +491,9 @@ func printErrorInfoByCondition(condition bool, format string, arg ...any) {
 // If the condition is true, it prints a warning level log and an info level one otherwise.
 func printWarningInfoByCondition(condition bool, format string, arg ...any) {
 	if condition {
-		logger.Log.Warnf(color.YellowString(format, arg...))
+		logger.Log.Warn(color.YellowString(format, arg...))
 	} else {
-		logger.Log.Infof(color.GreenString(format, arg...))
+		logger.Log.Info(color.GreenString(format, arg...))
 	}
 }
 
