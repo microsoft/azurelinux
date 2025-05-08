@@ -1,14 +1,19 @@
-Summary:        Encrypt Data with Cipher Block Chaining Mode
-Name:           perl-Crypt-CBC
-Version:        2.33
-Release:        27%{?dist}
-# Upstream confirms that they're under the same license as perl.
-# Wording in CBC.pm is less than clear, but still.
-License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+# SPDX-License-Identifier: GPL-1.0-or-later OR Artistic-1.0-Perl
+Summary:        Encrypt Data with Cipher Block Chaining Mode
+Name:           perl-Crypt-CBC
+Version:        3.04
+Release:        17%{?dist}
+# Upstream confirms that they're under the same license as perl.
+# Wording in CBC.pm is less than clear, but still.
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Crypt-CBC
-Source0:        https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-CBC-%{version}.tar.gz#/perl-Crypt-CBC-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/L/LD/LDS/Crypt-CBC-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        cbctest1.pl
+Source2:        Crypt-CBC-GH6.pl
+Patch0:         Crypt-CBC-3.04-3.05.patch
+Patch1:         randomiv.patch
 BuildArch:      noarch
 # Build:
 BuildRequires:  coreutils
@@ -18,15 +23,23 @@ BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker)
 # Runtime
+BuildRequires:  perl(base)
 BuildRequires:  perl(bytes)
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(constant)
 BuildRequires:  perl(Digest::MD5) >= 2.00
+BuildRequires:  perl(Digest::SHA)
+BuildRequires:  perl(File::Basename)
+# Not available on 32-bit platforms (#1948957)
+#BuildRequires:  perl(Math::Int128)
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(vars)
 # Test Suite
+BuildRequires:  perl(Encode)
 BuildRequires:  perl(lib)
+BuildRequires:  perl(Test)
+BuildRequires:  perl(warnings)
 # Optional Tests
 # Modules used for test suite, skipped when bootstrapping as
 # some of these modules use Crypt::CBC themselves
@@ -37,11 +50,16 @@ BuildRequires:  perl(Crypt::Blowfish)
 BuildRequires:  perl(Crypt::Blowfish_PP)
 BuildRequires:  perl(Crypt::Rijndael)
 %endif
+%if 0%{?with_check}
+BuildRequires: perl(CPAN)
+%endif
 # Crypt::IDEA doesn't need bootstrapping and we get extra test coverage by including it
 BuildRequires:  perl(Crypt::IDEA)
 # Dependencies
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Scalar::Util)
+# Optional module needed for CTR mode
+Recommends:     perl(Math::Int128)
 
 %description
 This is Crypt::CBC, a Perl-only implementation of the cryptographic
@@ -52,6 +70,20 @@ compatible with the encryption format used by SSLeay.
 
 %prep
 %setup -q -n Crypt-CBC-%{version}
+
+# Upstream tagged a 3.05 release but didn't upload it to PAUSE
+# This fixes an issue around the -literal_key option
+# https://github.com/lstein/Lib-Crypt-CBC/issues/4
+%patch -P 0 -p1
+
+# Fix decryption of ciphertext created with 'header' => 'randomiv'
+# https://bugzilla.redhat.com/show_bug.cgi?id=2235322
+# https://github.com/lstein/Lib-Crypt-CBC/issues/6
+# https://github.com/lstein/Lib-Crypt-CBC/pull/7
+cd lib/Crypt
+%patch -P 1
+cd -
+
 chmod -c 644 eg/*.pl
 
 %build
@@ -64,7 +96,15 @@ find %{buildroot} -type f -name .packlist -delete
 %{_fixperms} -c %{buildroot}
 
 %check
-make test
+#cpan Crypt::Meta
+#cpan Crypt::PBKDF2
+#make test
+
+# Tests for #2235322, GH#6 (both require Crypt::Blowfish)
+%if 0%{!?perl_bootstrap:1} && ! (0%{?rhel} >= 7)
+PERL5LIB=%{buildroot}%{perl_vendorlib} perl %{SOURCE1}
+PERL5LIB=%{buildroot}%{perl_vendorlib} perl %{SOURCE2}
+%endif
 
 %files
 %doc Changes README eg/
@@ -72,8 +112,111 @@ make test
 %{_mandir}/man3/Crypt::CBC.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.33-27
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu May 08 2025 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 3.04-17
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.04-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.04-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.04-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Sep  5 2023 Paul Howarth <paul@city-fan.org> - 3.04-13
+- Fix decryption of ciphertext created with 'header' => 'randomiv'
+  https://bugzilla.redhat.com/show_bug.cgi?id=2235322
+  https://github.com/lstein/Lib-Crypt-CBC/issues/6
+  https://github.com/lstein/Lib-Crypt-CBC/pull/7
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.04-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue May 30 2023 Michal Josef Špaček <mspacek@redhat.com> - 3.04-11
+- Fix %%patch macro
+- Update license to SPDX format
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.04-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.04-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jun 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 3.04-8
+- Perl 5.36 re-rebuild of bootstrapped packages
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 3.04-7
+- Perl 5.36 rebuild
+
+* Wed Mar  2 2022 Paul Howarth <paul@city-fan.org> - 3.04-6
+- Fix an issue around the -literal_key option (GH#4)
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.04-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.04-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon May 24 2021 Jitka Plesnikova <jplesnik@redhat.com> - 3.04-3
+- Perl 5.34 re-rebuild of bootstrapped packages
+
+* Sat May 22 2021 Jitka Plesnikova <jplesnik@redhat.com> - 3.04-2
+- Perl 5.34 rebuild
+
+* Tue May 18 2021 Paul Howarth <paul@city-fan.org> - 3.04-1
+- Update to 3.04
+  - Fixed bug involving manually-specified IV not being used in some
+    circumstances
+
+* Mon May  3 2021 Paul Howarth <paul@city-fan.org> - 3.03-2
+- Crypt::Cipher::AES is used in the absence of any explicitly-specified cipher,
+  so make it a hard dependency (#1956206)
+
+* Mon Apr 19 2021 Paul Howarth <paul@city-fan.org> - 3.03-1
+- Update to 3.03
+  - Fixed bug that caused an extraneous block of garbage data to be appended to
+    encrypted string when "nopadding" specified and plaintext is even multiple
+    of blocksize
+
+* Thu Apr 15 2021 Paul Howarth <paul@city-fan.org> - 3.02-2
+- Soften dependency on perl(Math::Int128) (needed for CTR mode) as it's not
+  available on 32-bit platforms (#1948957)
+
+* Mon Apr 12 2021 Paul Howarth <paul@city-fan.org> - 3.02-1
+- Update to 3.02
+  - CTR mode now requires the Math::Int128 module, which gives a ~5x
+    performance boost over Math::BigInt
+
+* Fri Feb 12 2021 Paul Howarth <paul@city-fan.org> - 3.01-1
+- Update to 3.01
+  - Support for openssl SHA-256 key derivation algorithm
+  - Add support for PBKDF2 key derivation algorithm
+    - New dependencies: Digest::SHA, Crypt::PBKDF2, Crypt::Cipher::AES
+  - Add support for OFB, CFB and CTR chain modes
+    - New dependency: Math::BigInt
+  - Added better argument checking
+  - Fixed long-standing standard padding bug: plaintext ending with bytes
+    between 0x00 and 0x0A would be truncated in some conditions
+  - Fixed Rijndael_compat padding
+  - Warn when the deprecated opensslv1 PBKDF (key derivation function) is used
+    for encryption; turn off with -nodeprecate=>1 or by choosing a different
+    PBKDF, such as -pbkdf=>'pbkdf2'
+  - Fix a regression when passing the legacy -salt=>1 argument
+  - Released version 3.01 in recognition of multiple new features and clean-ups
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.33-30
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.33-29
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.33-28
+- Perl 5.32 re-rebuild of bootstrapped packages
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.33-27
+- Perl 5.32 rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.33-26
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

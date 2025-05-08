@@ -1,5 +1,8 @@
 {
  "Signatures": {
-  "perl-Crypt-CBC-2.33.tar.gz": "6a70de21b6cc7f2b100067e8e188db966e9a8001b5db6fa976e7cb5b294ae645"
+  "Crypt-CBC-GH6.pl": "ba7ec66cf429e5ee6b46e1a6c43e2aa594e827ed29bf03b0740512c73667ca59",
+  "cbctest1.pl": "d130c431ca29528f8579e92be718c5b7a494bd5305e21c0ac1475befdb274bcc",
+  "perl-Crypt-CBC-3.04.tar.gz": "4026c57d0dbf6496c0d561a26f161b763d3b8edf351139c073492e21b5fbce07"
  }
 }
+
