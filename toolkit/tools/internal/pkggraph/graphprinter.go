@@ -12,6 +12,37 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// GraphPrinter is a type meant to print a graph in a human-readable format.
+// It uses a depth-first search (DFS) algorithm to traverse the graph and print each node.
+// See NewGraphPrinter for more details on how to customize the printer.
+//
+// Example:
+//
+//	Graph structure:
+//
+//	A -> B
+//	A -> E
+//	B -> C
+//	B -> D
+//	D -> A (loop)
+//
+//	Output starting from 'A' with default indent string (2 spaces):
+//
+//	A
+//	  B
+//	    C
+//	    D
+//	  E
+//
+//	Note: the loop (D -> A) is not printed to avoid infinite recursion.
+//
+//	Output starting from 'A' with custom indent string (2 hyphens):
+//
+//	A
+//	--B
+//	----C
+//	----D
+//	--E
 type GraphPrinter struct {
 	graphPrinterConfig
 }
@@ -29,7 +60,7 @@ type loggerOutputWrapper struct {
 }
 
 // Write implements the io.StringWriter interface.
-func (d *loggerOutputWrapper) WriteString(s string) (int, error) {
+func (d loggerOutputWrapper) WriteString(s string) (int, error) {
 	logger.Log.Log(d.logLevel, s)
 	return len(s), nil
 }
@@ -39,20 +70,20 @@ func (d *loggerOutputWrapper) WriteString(s string) (int, error) {
 // The default settings are:
 // - Indent string: "  " (2 spaces)
 // - Output: logrus logger on debug level
-func NewGraphPrinter(configModifiers ...graphPrinterConfigModifier) *GraphPrinter {
-	config := &graphPrinterConfig{
+func NewGraphPrinter(configModifiers ...graphPrinterConfigModifier) GraphPrinter {
+	config := graphPrinterConfig{
 		indentString: "  ",
-		output: &loggerOutputWrapper{
+		output: loggerOutputWrapper{
 			logLevel: logrus.DebugLevel,
 		},
 	}
 
 	for _, modifier := range configModifiers {
-		modifier(config)
+		modifier(&config)
 	}
 
-	return &GraphPrinter{
-		graphPrinterConfig: *config,
+	return GraphPrinter{
+		graphPrinterConfig: config,
 	}
 }
 
