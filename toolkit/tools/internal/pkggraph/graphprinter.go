@@ -149,5 +149,5 @@ func (g GraphPrinter) Print(graph *PkgGraph, rootNode *PkgNode) error {
 
 	dfsPrint(nil, rootNode)
 
-	return gtree.OutputFromRoot(g.output, treeRoot)
+	return gtree.OutputProgrammably(g.output, treeRoot)
 }
