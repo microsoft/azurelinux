@@ -29,7 +29,7 @@ steps:
         echo "PR Target Branch: $(System.PullRequest.TargetBranch)"
         echo "Modified files in PR:"
         git diff --name-only origin/$(System.PullRequest.TargetBranch) HEAD
-        
+
   # 3) Apply OpenAI config via your UMI-login script
   - task: Bash@3
     displayName: '⚙️  Apply OpenAI Config'
