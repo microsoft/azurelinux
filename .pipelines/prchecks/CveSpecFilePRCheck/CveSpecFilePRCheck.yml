@@ -8,8 +8,12 @@ pr:
       - fasttrack/abadawi/test/3.0
   paths:
     include:
-      - '**/*.spec'
-      - '**/*.patch'
+      - '/SPECS/**/*.spec'
+      - '/SPECS/**/*.patch'
+      - '/SPECS-EXTENDED/**/*.spec'
+      - '/SPECS-EXTENDED/**/*.patch'
+      - '/SPECS-SIGNED/**/*.spec'
+      - '/SPECS-SIGNED/**/*.patch'
 
 name: Automaton-OpenAI-PR-Check
 
@@ -29,6 +33,10 @@ steps:
         echo "Working directory: $(pwd)"
         ls -la .
         ls -la .pipelines/prchecks/CveSpecFilePRCheck || echo "Directory not found"
+        echo "PR Source Branch: $(System.PullRequest.SourceBranch)"
+        echo "PR Target Branch: $(System.PullRequest.TargetBranch)"
+        echo "Modified files in PR:"
+        git diff --name-only origin/$(System.PullRequest.TargetBranch) HEAD
 
   # 3) Apply OpenAI config via your UMI-login script
   - task: Bash@3
