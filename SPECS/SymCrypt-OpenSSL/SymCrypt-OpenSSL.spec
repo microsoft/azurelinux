@@ -49,6 +49,7 @@ mkdir -p %{buildroot}%{_libdir}/engines-3/
 mkdir -p %{buildroot}%{_libdir}/ossl-modules/
 mkdir -p %{buildroot}%{_includedir}
 mkdir -p %{buildroot}%{_sysconfdir}/pki/tls/
+mkdir -p %{buildroot}%{_localstatedir}/log/keysinuse/
 
 # We still install the engine for backwards compatibility with legacy applications. Callers must
 # explicitly load the engine to use it. It will be removed in a future release.
@@ -56,15 +57,6 @@ install bin/SymCryptEngine/dynamic/symcryptengine.so %{buildroot}%{_libdir}/engi
 install bin/SymCryptProvider/symcryptprovider.so %{buildroot}%{_libdir}/ossl-modules/symcryptprovider.so
 install SymCryptEngine/inc/e_scossl.h %{buildroot}%{_includedir}/e_scossl.h
 install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/symcrypt_prov.cnf
-
-%post
-mkdir -p -m 1733 /var/log/keysinuse
-
-%preun
-# Remove the logging directory on uninstall, leaving it there on upgrade.
-if [ "${1}" = "0" ]; then
-    rm -rf /var/log/keysinuse
-fi
 
 %check
 ./bin/SslPlay/SslPlay
@@ -75,6 +67,17 @@ fi
 %{_libdir}/ossl-modules/symcryptprovider.so
 %{_includedir}/e_scossl.h
 %{_sysconfdir}/pki/tls/symcrypt_prov.cnf
+
+# The log directory for certsinuse logging has permissions set to 1733.
+# These permissions are a result of a security review to mitigate potential risks:
+# - Group and others are denied read access to prevent user-level code from inferring
+#   details about other running applications and their certsinuse usage.
+# - All users have write and execute permissions to create new log files and to 
+#   check file attributes (e.g., to ensure a log file hasn't been tampered with or 
+#   replaced by a symlink).
+# - The sticky bit is set to prevent malicious users from deleting the log files
+#   and interfering with certsinuse alerting mechanisms.
+%dir %attr(1733, root, root) %{_localstatedir}/log/keysinuse/
 
 %changelog
 * Thu Mar 27 2025 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.8.0-1
