@@ -2,7 +2,7 @@
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
 Version:        %{BaseVersion}.4
-Release:        5%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,12 +18,19 @@ Patch3:          CVE-2025-32913.patch
 # CVE-2025-32906 will be fixed in 3.6.5 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/af5b9a4a3945c52b940d5ac181ef51bb12011f1f
 Patch4:          CVE-2025-32906.patch
 Patch5:          CVE-2025-32914.patch
+Patch6:          CVE-2025-2784.patch
+Patch7:          CVE-2025-32052.patch
+Patch8:          CVE-2025-32050.patch
+Patch9:          CVE-2025-32051.patch
+Patch10:         CVE-2025-46420.patch
+Patch11:         CVE-2025-46421.patch
+Patch12:         CVE-2025-32053.patch
 # CVE-2025-32909 will be fixed in 3.6.2 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/ba4c3a6f988beff59e45801ab36067293d24ce92
-Patch6:          CVE-2025-32909.patch
+Patch13:          CVE-2025-32909.patch
 # CVE-2025-32910 will be fixed in 3.6.2 by https://gitlab.gnome.org/GNOME/libsoup/-/merge_requests/417
-Patch7:          CVE-2025-32910.patch
+Patch14:          CVE-2025-32910.patch
 # CVE-2025-32912 will be fixed in 3.6.5 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/cd077513f267e43ce4b659eb18a1734d8a369992
-Patch8:          CVE-2025-32912.patch
+Patch15:          CVE-2025-32912.patch
 
 BuildRequires:  meson
 BuildRequires:  autogen
@@ -135,10 +142,16 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 
 %changelog
-* Fri Apr 28 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.0.4-5
+* Fri May 08 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.0.4-7
 - Add patch for CVE-2025-32909
 - Add patch for CVE-2025-32910
 - Add patch for CVE-2025-32912
+
+* Wed 07 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 3.0.4-6
+- Patche for CVE-2025-32053
+
+* Sun May 04 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.0.4-5
+- Added patch for CVE-2025-2784 CVE-2025-32052 CVE-2025-32050 CVE-2025-32051 CVE-2025-46420 CVE-2025-46421
 
 * Fri Apr 25 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.0.4-4
 - Add patch for CVE-2025-32914

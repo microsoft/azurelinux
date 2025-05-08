@@ -1,6 +1,6 @@
 Summary:        advanced key-value store
 Name:           redis
-Version:        6.2.17
+Version:        6.2.18
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -84,6 +84,9 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/redis.conf
 
 %changelog
+* Wed Apr 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.2.18-1
+- Auto-upgrade to 6.2.18 - for CVE-2025-21605
+
 * Mon Jan 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.2.17-1
 - Auto-upgrade to 6.2.17 - Upgrade redis to fix CVE-2024-46981
 
