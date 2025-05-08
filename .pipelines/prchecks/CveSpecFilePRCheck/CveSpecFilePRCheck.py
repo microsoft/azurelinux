@@ -53,18 +53,74 @@ def gather_diff() -> str:
     logger.info("Gathering git diff between source and target commits...")
     
     try:
-        src = os.environ["SYSTEM_PULLREQUEST_SOURCECOMMITID"]
-        tgt = os.environ["SYSTEM_PULLREQUEST_TARGETCOMMITID"]
-        repo_path = os.environ["BUILD_SOURCESDIRECTORY"]
+        # Get commit IDs from environment variables
+        src_commit = os.environ.get("SYSTEM_PULLREQUEST_SOURCECOMMITID")
+        tgt_commit = os.environ.get("SYSTEM_PULLREQUEST_TARGETCOMMITID")
+        repo_path = os.environ.get("BUILD_SOURCESDIRECTORY")
         
-        logger.info(f"Source commit: {src}")
-        logger.info(f"Target commit: {tgt}")
+        # Log the commit IDs we're using
+        logger.info(f"Source commit: {src_commit}")
+        logger.info(f"Target commit: {tgt_commit}")
         
-        diff = subprocess.check_output(
-            ["git", "diff", "--unified=3", tgt, src],
-            cwd=repo_path
-        )
-        return diff.decode()
+        if not src_commit or not tgt_commit:
+            raise ValueError("Source or target commit ID not found in environment variables")
+        
+        # First try to ensure we have the refs - a depth of 1 is sufficient
+        try:
+            logger.info("Fetching necessary git references with depth=1...")
+            subprocess.check_call(
+                ["git", "fetch", "--depth=1", "--no-tags", "origin", tgt_commit],
+                cwd=repo_path,
+                stderr=subprocess.PIPE  # Capture stderr to avoid polluting the logs
+            )
+        except subprocess.CalledProcessError:
+            logger.warning("Failed to fetch target commit, continuing with local refs")
+            
+        # Try to get the diff directly using commit IDs (most reliable)
+        logger.info("Generating diff between commits...")
+        try:
+            diff = subprocess.check_output(
+                ["git", "diff", "--unified=3", tgt_commit, src_commit],
+                cwd=repo_path,
+                stderr=subprocess.PIPE  # Capture stderr to avoid polluting the logs
+            )
+            return diff.decode()
+        except subprocess.CalledProcessError as e:
+            logger.warning(f"Direct diff failed: {str(e)}")
+            
+            # Try alternative: find the merge base and diff from there
+            logger.info("Trying alternative diff method using merge-base...")
+            try:
+                # Find the best common ancestor for the diff
+                merge_base = subprocess.check_output(
+                    ["git", "merge-base", src_commit, tgt_commit], 
+                    cwd=repo_path
+                ).decode().strip()
+                
+                logger.info(f"Found merge base: {merge_base}")
+                
+                # Get the diff from the merge base to our source commit
+                diff = subprocess.check_output(
+                    ["git", "diff", "--unified=3", merge_base, src_commit],
+                    cwd=repo_path
+                )
+                return diff.decode()
+            except subprocess.CalledProcessError as e:
+                logger.error(f"Alternative diff method failed: {str(e)}")
+                
+                # Last resort: check if this is a new branch with just one commit
+                logger.info("Checking if this is a new branch with a single commit...")
+                try:
+                    # If this is a new branch with just one commit, get that commit's changes
+                    diff = subprocess.check_output(
+                        ["git", "show", "--unified=3", src_commit],
+                        cwd=repo_path
+                    )
+                    return diff.decode()
+                except subprocess.CalledProcessError as e:
+                    logger.error(f"All diff methods failed: {str(e)}")
+                    raise ValueError("Could not generate a diff between the source and target commits")
+                    
     except KeyError as e:
         logger.error(f"Missing required environment variable: {e}")
         raise

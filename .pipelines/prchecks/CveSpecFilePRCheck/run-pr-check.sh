@@ -86,9 +86,28 @@ echo "  - USE_GITHUB_CHECKS: ${USE_GITHUB_CHECKS}"
 
 # For local testing - if PR commit IDs are not set, use HEAD and HEAD~1
 if [ -z "${SYSTEM_PULLREQUEST_SOURCECOMMITID:-}" ] || [ -z "${SYSTEM_PULLREQUEST_TARGETCOMMITID:-}" ]; then
-  echo "⚠️ PR commit IDs not found, using local git commits for testing"
+  echo "⚠️ PR commit IDs not found, trying to determine from git..."
   export SYSTEM_PULLREQUEST_SOURCECOMMITID=$(git rev-parse HEAD)
-  export SYSTEM_PULLREQUEST_TARGETCOMMITID=$(git rev-parse HEAD~1)
+  
+  # Try to find the target branch more robustly
+  if [ -n "${SYSTEM_PULLREQUEST_TARGETBRANCH:-}" ]; then
+    # Try to fetch the target branch if it exists
+    echo "🔄 Trying to fetch target branch: ${SYSTEM_PULLREQUEST_TARGETBRANCH}"
+    git fetch origin "${SYSTEM_PULLREQUEST_TARGETBRANCH}" --depth=1 || true
+    
+    if git rev-parse "origin/${SYSTEM_PULLREQUEST_TARGETBRANCH}" >/dev/null 2>&1; then
+      export SYSTEM_PULLREQUEST_TARGETCOMMITID=$(git rev-parse "origin/${SYSTEM_PULLREQUEST_TARGETBRANCH}")
+      echo "✅ Found target commit from branch: ${SYSTEM_PULLREQUEST_TARGETBRANCH}"
+    else
+      # If we can't find the branch, use HEAD~1 as fallback
+      export SYSTEM_PULLREQUEST_TARGETCOMMITID=$(git rev-parse HEAD~1)
+      echo "⚠️ Could not find target branch, using previous commit as fallback"
+    fi
+  else
+    # No target branch info, use HEAD~1
+    export SYSTEM_PULLREQUEST_TARGETCOMMITID=$(git rev-parse HEAD~1)
+    echo "⚠️ No target branch specified, using previous commit as fallback"
+  fi
 fi
 
 # For GitHub integration
