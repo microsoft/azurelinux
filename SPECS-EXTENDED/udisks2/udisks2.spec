@@ -59,7 +59,6 @@ BuildRequires: libblockdev-mdraid-devel >= %{libblockdev_version}
 BuildRequires: libblockdev-fs-devel     >= %{libblockdev_version}
 BuildRequires: libblockdev-crypto-devel >= %{libblockdev_version}
 BuildRequires: libblockdev-nvme-devel   >= %{libblockdev_version}
-BuildRequires: libmount-devel
 BuildRequires: libuuid-devel
 
 Requires: libblockdev        >= %{libblockdev_version}
@@ -93,8 +92,6 @@ Recommends: exfatprogs
 Recommends: udftools
 # For ejecting removable disks
 Recommends: eject
-# For utab monitor
-Requires: libmount
 # The actual polkit agent
 Requires: polkit >= %{polkit_version}
 
@@ -607,3 +604,4 @@ fi
 
 * Sun Jan 12 2014 Patrick Uiterwijk <puiterwijk@redhat.com> - 0.1.0-1
 - Rename from udisks2-lvm
+
