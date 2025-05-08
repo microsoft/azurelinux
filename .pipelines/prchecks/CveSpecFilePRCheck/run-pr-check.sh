@@ -19,6 +19,8 @@ source ./apply-security-config.sh --openaiModel=o3-mini
 echo "🔄 Mapping environment variables to expected format..."
 export AZURE_OPENAI_ENDPOINT="$OPENAI_API_BASE"
 export AZURE_OPENAI_DEPLOYMENT_NAME="$OPENAI_DEPLOYMENT_NAME"
+export AZURE_OPENAI_MODEL_NAME="$OPENAI_MODEL_NAME"
+export AZURE_OPENAI_API_VERSION="$OPENAI_API_VERSION"
 
 # Set BUILD_SOURCESDIRECTORY if not already set
 if [ -z "${BUILD_SOURCESDIRECTORY:-}" ]; then
@@ -30,6 +32,8 @@ fi
 echo "✅ Verifying environment variables:"
 echo "  - AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT:-NOT SET}"
 echo "  - AZURE_OPENAI_DEPLOYMENT_NAME: ${AZURE_OPENAI_DEPLOYMENT_NAME:-NOT SET}"
+echo "  - AZURE_OPENAI_MODEL_NAME: ${AZURE_OPENAI_MODEL_NAME:-NOT SET}"
+echo "  - AZURE_OPENAI_API_VERSION: ${AZURE_OPENAI_API_VERSION:-NOT SET}"
 echo "  - BUILD_SOURCESDIRECTORY: ${BUILD_SOURCESDIRECTORY:-NOT SET}"
 
 # For local testing - if PR commit IDs are not set, use HEAD and HEAD~1
