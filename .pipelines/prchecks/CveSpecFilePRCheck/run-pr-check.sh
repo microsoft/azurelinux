@@ -126,22 +126,26 @@ if [ -z "${GITHUB_REPOSITORY:-}" ] || [ -z "${GITHUB_PR_NUMBER:-}" ]; then
   fi
 fi
 
-echo "🔍 Using commits for diff:"
-echo "  - Source: ${SYSTEM_PULLREQUEST_SOURCECOMMITID}"
-echo "  - Target: ${SYSTEM_PULLREQUEST_TARGETCOMMITID}"
-
+# Check if GitHub PAT is available - needed for posting comments
 if [ "$POST_GITHUB_COMMENTS" = "true" ] || [ "$USE_GITHUB_CHECKS" = "true" ]; then
   echo "🔍 GitHub Integration Details:"
   echo "  - Repository: ${GITHUB_REPOSITORY:-NOT SET}"
   echo "  - PR Number: ${GITHUB_PR_NUMBER:-NOT SET}"
-  echo "  - GitHub Token: ${GITHUB_ACCESS_TOKEN:+SET}"
   
-  if [ -z "${GITHUB_ACCESS_TOKEN:-}" ]; then
+  # Mask token output but show if it's set
+  if [ -n "${GITHUB_ACCESS_TOKEN:-}" ]; then
+    echo "  - GitHub Token: SET"
+  else
+    echo "  - GitHub Token: NOT SET"
     echo "⚠️ GITHUB_ACCESS_TOKEN not set, GitHub integration will be disabled"
     POST_GITHUB_COMMENTS=false
     USE_GITHUB_CHECKS=false
   fi
 fi
+
+echo "🔍 Using commits for diff:"
+echo "  - Source: ${SYSTEM_PULLREQUEST_SOURCECOMMITID}"
+echo "  - Target: ${SYSTEM_PULLREQUEST_TARGETCOMMITID}"
 
 # 2) Install Python dependencies into your active environment
 echo "📦 Installing Python dependencies…"

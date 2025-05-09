@@ -225,6 +225,23 @@ class GitHubClient:
         # Add the marker as a hidden HTML comment
         marked_body = f"<!-- {marker} -->\n{body}"
         
+        # Check if required environment variables are set
+        if not self.token:
+            logger.warning("GITHUB_ACCESS_TOKEN not set, skipping comment posting")
+            return {}
+            
+        if not self.repo_name:
+            logger.warning("GITHUB_REPOSITORY not set, skipping comment posting")
+            return {}
+            
+        if not self.pr_number:
+            logger.warning("GITHUB_PR_NUMBER not set, skipping comment posting")
+            return {}
+            
+        logger.info(f"Attempting to post or update comment with marker: {marker}")
+        logger.info(f"Repository: {self.repo_name}")
+        logger.info(f"PR number: {self.pr_number}")
+        
         # Get existing comments
         comments = self.get_pr_comments()
         
@@ -232,9 +249,11 @@ class GitHubClient:
         for comment in comments:
             if f"<!-- {marker} -->" in comment.get("body", ""):
                 # Found our comment, update it
+                logger.info(f"Found existing comment with ID {comment['id']}, updating it")
                 return self.update_pr_comment(comment["id"], marked_body)
         
         # Didn't find a comment with our marker, create a new one
+        logger.info("No existing comment found with marker, creating new comment")
         return self.post_pr_comment(marked_body)
     
     def create_severity_status(self, severity: Severity, commit_sha: str) -> Dict[str, Any]:

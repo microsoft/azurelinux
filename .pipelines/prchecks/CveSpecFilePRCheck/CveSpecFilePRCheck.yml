@@ -25,10 +25,20 @@ parameters:
     displayName: Use different exit codes based on severity
     type: boolean
     default: true
+  - name: postGitHubComments
+    displayName: Post analysis results as GitHub PR comments
+    type: boolean
+    default: true
+  - name: useGitHubChecks
+    displayName: Use GitHub Checks API for status updates
+    type: boolean
+    default: true
 
 variables:
   FAIL_ON_WARNINGS: ${{ parameters.failOnWarnings }}
   USE_EXIT_CODE_SEVERITY: ${{ parameters.useExitCodeSeverity }}
+  POST_GITHUB_COMMENTS: ${{ parameters.postGitHubComments }}
+  USE_GITHUB_CHECKS: ${{ parameters.useGitHubChecks }}
 
 steps:
   # 1) Clone the repo
