@@ -219,10 +219,36 @@ class ResultAnalyzer:
         Returns:
             JSON string with analysis results
         """
+        # Create a serializable dictionary for each AntiPattern
+        anti_pattern_dicts = []
+        for pattern in self.anti_patterns:
+            # Convert AntiPattern to a dictionary with all serializable attributes
+            pattern_dict = {
+                "name": pattern.name,
+                "description": pattern.description,
+                "severity": pattern.severity.name,
+                "recommendation": pattern.recommendation
+            }
+            
+            # Add optional attributes if they exist
+            if hasattr(pattern, 'file_path') and pattern.file_path:
+                pattern_dict["file_path"] = pattern.file_path
+            
+            if hasattr(pattern, 'line_number') and pattern.line_number:
+                pattern_dict["line_number"] = pattern.line_number
+                
+            if hasattr(pattern, 'details') and pattern.details:
+                pattern_dict["details"] = pattern.details
+                
+            if hasattr(pattern, 'id') and pattern.id:
+                pattern_dict["id"] = pattern.id
+                
+            anti_pattern_dicts.append(pattern_dict)
+        
         result = {
             "failed": self.should_fail_pipeline(),
             "highest_severity": self.get_highest_severity().name,
-            "anti_patterns": [pattern.to_dict() for pattern in self.anti_patterns],
+            "anti_patterns": anti_pattern_dicts,
             "ai_analysis": self.ai_analysis
         }
         
