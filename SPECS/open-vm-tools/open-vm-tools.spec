@@ -123,7 +123,7 @@ useful for verifying the functioning of %{name} in VMware virtual
 machines.
 
 %prep
-%autosetup -n %{name}-%{version}-%{toolsbuild} -p2
+%autosetup -n %{name}-%{version}-%{toolsbuild} -p1
 
 %build
 # Required for regenerating configure script when
