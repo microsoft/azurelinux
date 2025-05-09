@@ -1,0 +1,7 @@
+{
+    "Signatures": {
+        "azl-otel-collector-0.124.0.tar.gz": "2c11273db7045c693143cd2869e98b2a125362ff5f7adbade54af6f3e3a7f364",
+        "azl-otel-collector-0.124.0-govendor-v1.tar.gz": "171aac80bf3965b647f13d6cb41d72365d7870d2672133148149b34086368147",
+        "azl-otel-collector.service": "16d0fb39947318ca4912adc20613a79b88ec8ffae1bdb214001ac65a086d293c"
+    }
+}
