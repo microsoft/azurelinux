@@ -1,4 +1,4 @@
-%global last-known-kernel 6.6.85.1-2
+%global last-known-kernel 6.6.85.1-3
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -225,7 +225,7 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
-* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com>
+* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 4.30.0-17
 - Bump release to rebuild for new kernel release
 
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 4.30.0-16

@@ -30,7 +30,7 @@
 # SOFTWARE.
 #
 
-%global last-known-kernel 6.6.85.1-2
+%global last-known-kernel 6.6.85.1-3
 
 %{!?_name: %define _name fwctl}
 %{!?_version: %define _version 24.10}
@@ -250,7 +250,7 @@ fi # 1 : closed
 %endif
 
 %changelog
-* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com>
+* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-17
 - Bump release to rebuild for new kernel release
 
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 24.10-16

@@ -1,6 +1,6 @@
 %{!?KMP: %global KMP 0}
 
-%global last-known-kernel 6.6.85.1-2
+%global last-known-kernel 6.6.85.1-3
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -246,7 +246,7 @@ fi
 %endif
 
 %changelog
-* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com>
+* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-17
 - Bump release to rebuild for new kernel release
 
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 2.7.4-16

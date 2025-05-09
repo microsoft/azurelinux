@@ -116,7 +116,7 @@ fi
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{_name}-*.conf
 
 %changelog
-* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com>
+* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-17
 - Bump release to rebuild for new kernel release
 
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 24.10-16
