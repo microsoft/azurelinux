@@ -52,7 +52,8 @@ class ResultAnalyzer:
         """Get the highest severity level among all detected anti-patterns"""
         if not self.anti_patterns:
             return Severity.INFO
-        return max(pattern.severity for pattern in self.anti_patterns)
+        # Use the severity.value for comparison instead of comparing the enum objects directly
+        return max((pattern.severity for pattern in self.anti_patterns), key=lambda x: x.value)
     
     def should_fail_pipeline(self) -> bool:
         """
@@ -62,7 +63,8 @@ class ResultAnalyzer:
             True if issues with ERROR or CRITICAL severity are found
         """
         highest_severity = self.get_highest_severity()
-        return highest_severity >= Severity.ERROR
+        # Convert to values for comparison
+        return highest_severity.value >= Severity.ERROR.value
     
     def generate_console_summary(self) -> str:
         """
@@ -91,7 +93,8 @@ class ResultAnalyzer:
             Severity.CRITICAL: "🚨"
         }
         
-        for severity in sorted(counts.keys(), reverse=True):
+        # Sort by severity value, not the enum object itself
+        for severity in sorted(counts.keys(), key=lambda x: x.value, reverse=True):
             lines.append(f"{emoji_map[severity]} {severity.name}: {counts[severity]} issue(s)")
         
         return "\n".join(lines)
@@ -120,7 +123,8 @@ class ResultAnalyzer:
             lines.append("\n🔍 DETECTED ANTI-PATTERNS:\n")
             
             # Group by severity for display
-            for severity in sorted([s for s in self.grouped_patterns.keys()], reverse=True):
+            # Sort by severity value, not the enum object itself
+            for severity in sorted([s for s in self.grouped_patterns.keys()], key=lambda x: x.value, reverse=True):
                 patterns = self.grouped_patterns[severity]
                 
                 severity_emojis = {
