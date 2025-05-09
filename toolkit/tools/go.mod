@@ -1,8 +1,8 @@
 module github.com/microsoft/azurelinux/toolkit/tools
 
-go 1.22
+go 1.21
 
-toolchain go1.22.1
+toolchain go1.21.6
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.6.0
@@ -10,8 +10,8 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/bendahl/uinput v1.4.0
 	github.com/cavaliercoder/go-cpio v0.0.0-20180626203310-925f9528c45e
-	github.com/ddddddO/gtree v1.10.13
-	github.com/fatih/color v1.18.0
+	github.com/ddddddO/gtree v1.10.7
+	github.com/fatih/color v1.16.0
 	github.com/gdamore/tcell v1.4.0
 	github.com/google/uuid v1.6.0
 	github.com/jinzhu/copier v0.3.2
@@ -45,11 +45,11 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.7 // indirect
-	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
+	github.com/pelletier/go-toml/v2 v2.1.1 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.1.0 // indirect
-	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
+	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa // indirect
 	golang.org/x/net v0.33.0 // indirect
