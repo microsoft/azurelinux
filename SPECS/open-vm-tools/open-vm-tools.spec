@@ -25,7 +25,7 @@
 Summary:        Open Virtual Machine Tools for virtual machines hosted on VMware
 Name:           open-vm-tools
 Version:        11.3.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,6 +38,7 @@ Source4:        open-vm-tools.conf
 Source5:        vmtoolsd.pam
 Patch0:         CVE-2023-34058.patch
 Patch1:         CVE-2023-34059.patch
+Patch2:         CVE-2025-22247.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 #BuildRequires:    doxygen
@@ -334,6 +335,9 @@ fi
 %{_bindir}/vmware-vgauth-smoketest
 
 %changelog
+* Fri May 09 2025 Andrew Phelps <anphel@microsoft.com> - 11.3.0-4
+- Add CVE-2025-22247.patch
+
 * Fri Mar 28 2024 Adit Jha <aditjha@microsoft.com> - 11.3.0-3
 - Address CVE-2023-34058 and CVE-2023-34059
 
