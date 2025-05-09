@@ -140,9 +140,8 @@ class ResultAnalyzer:
                 for pattern in patterns:
                     lines.append(f"{pattern.name}: {pattern.description}")
                     
-                    if pattern.affected_files:
-                        file_list = ", ".join(pattern.affected_files)
-                        lines.append(f"  Files: {file_list}")
+                    if hasattr(pattern, 'file_path') and pattern.file_path:
+                        lines.append(f"  File: {pattern.file_path}")
                     
                     if pattern.recommendation:
                         lines.append(f"  Recommendation: {pattern.recommendation}")
