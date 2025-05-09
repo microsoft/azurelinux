@@ -462,15 +462,15 @@ def update_github_status(severity: Severity, anti_patterns: List[AntiPattern], a
         if post_comments:
             logger.info("Posting GitHub PR comment with analysis results...")
             comment_body = github_client.format_severity_comment(severity, issues_dict, ai_analysis)
-            github_client.post_or_update_comment(comment_body, "azure-linux-spec-check")
             
-            # Extract and post conclusion as a separate comment
-            logger.info("Posting conclusion as a separate comment...")
+            # Include conclusion in the main comment instead of separate comment
             conclusion = analyzer.extract_conclusion()
             if conclusion:
-                github_client.post_or_update_comment(conclusion, "azure-linux-spec-check-conclusion")
+                comment_body += "\n\n" + conclusion
             else:
-                logger.warning("No conclusion section found to post as a separate comment")
+                logger.warning("No conclusion section found to include in comment")
+            
+            github_client.post_or_update_comment(comment_body, "azure-linux-spec-check")
         
         # Create or update status using the Checks API if enabled
         if use_checks_api:
