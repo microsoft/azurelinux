@@ -1,6 +1,6 @@
 %{!?KMP: %global KMP 0}
 
-%global last-known-kernel 6.6.85.1-2
+%global last-known-kernel 6.6.88.1-1
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -39,7 +39,7 @@
 Summary:	 Cross-partition memory
 Name:		 xpmem
 Version:	 2.7.4
-Release:	 16%{?dist}
+Release:	 17%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -246,6 +246,9 @@ fi
 %endif
 
 %changelog
+* Fri May 02 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.4-17
+- Bump release to rebuild for new kernel release
+
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 2.7.4-16
 - Bump release to rebuild for new kernel release
 

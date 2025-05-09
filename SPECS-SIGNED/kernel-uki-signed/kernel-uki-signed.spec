@@ -5,8 +5,8 @@
 %define kernelver %{version}-%{release}
 Summary:        Signed Unified Kernel Image for %{buildarch} systems
 Name:           kernel-uki-signed-%{buildarch}
-Version:        6.6.85.1
-Release:        2%{?dist}
+Version:        6.6.88.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -68,6 +68,9 @@ popd
 /boot/efi/EFI/Linux/vmlinuz-uki-%{kernelver}.efi
 
 %changelog
+* Fri May 02 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.88.1-1
+- Auto-upgrade to 6.6.88.1
+
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 6.6.85.1-2
 - Bump release to rebuild for new kernel release
 
