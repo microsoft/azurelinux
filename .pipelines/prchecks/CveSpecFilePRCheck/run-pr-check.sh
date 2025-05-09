@@ -160,16 +160,17 @@ echo "🔍 Running CveSpecFilePRCheck.py…"
 
 # Build command with arguments
 CMD="python CveSpecFilePRCheck.py"
-if [ "$FAIL_ON_WARNINGS" = "true" ]; then
+if [[ "$FAIL_ON_WARNINGS" =~ ^[Tt][Rr][Uu][Ee]$ ]]; then
   CMD="$CMD --fail-on-warnings"
 fi
-if [ "$USE_EXIT_CODE_SEVERITY" = "true" ]; then
+if [[ "$USE_EXIT_CODE_SEVERITY" =~ ^[Tt][Rr][Uu][Ee]$ ]]; then
   CMD="$CMD --exit-code-severity" 
 fi
-if [ "$POST_GITHUB_COMMENTS" = "true" ]; then
+if [[ "$POST_GITHUB_COMMENTS" =~ ^[Tt][Rr][Uu][Ee]$ ]]; then
+  echo "📝 GitHub comments enabled, adding flag..."
   CMD="$CMD --post-github-comments"
 fi
-if [ "$USE_GITHUB_CHECKS" = "true" ]; then
+if [[ "$USE_GITHUB_CHECKS" =~ ^[Tt][Rr][Uu][Ee]$ ]]; then
   CMD="$CMD --use-github-checks"
 fi
 
