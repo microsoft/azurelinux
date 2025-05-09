@@ -55,7 +55,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    9%{?dist}
+Release:    8%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND MIT AND LicenseRef-Fedora-Public-Domain
 URL:        https://www.tianocore.org
@@ -799,14 +799,11 @@ done
 /boot/efi/HvLoader.efi
 
 %changelog
-* Thu May 08 2025 Archana Shettigar <v-shettigara@microsoft.com> - 20240524git3e722403cd16-9
-- Removed CVE-2023-6129 since it applies to powerpc
-
 * Thu Apr 24 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 20240524git3e722403cd16-8
 - Fix CVE-2024-38796
 
 * Wed Apr 23 2025 Archana Choudhary <archana1@microsoft.com> - 20240524git3e722403cd16-7
-- Add patch for CVE-2023-6129, CVE-2024-2511, CVE-2024-4603
+- Add patch for CVE-2024-2511, CVE-2024-4603
 
 * Mon Apr 14 2025 Tobias Brick <tobiasb@microsoft.com> - 20240524git3e722403cd16-6
 - Patch CVE-2024-13176.
