@@ -225,7 +225,7 @@ func main() {
 
 	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, licenseCheckerConfig, *workers, *buildAttempts, *checkAttempts, *extraLayers, *maxCascadingRebuilds, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, finalTestsToRun, testsToRerun, ignoredTests, toolchainPackages, *optimizeWithCachedImplicit, *allowToolchainRebuilds)
 	if err != nil {
-		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s.", err)
+		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above and the build log '%s'.\nError: %s.", *logFlags.LogFile, err)
 	}
 
 	if *useCcache {
@@ -556,11 +556,20 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	schedulerutils.RecordLicenseSummary(licenseChecker)
 	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState, allowToolchainRebuilds, licenseChecker)
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
+
 	if !allowToolchainRebuilds && (len(buildState.ConflictingRPMs()) > 0 || len(buildState.ConflictingSRPMs()) > 0) {
 		err = fmt.Errorf("toolchain packages rebuilt. See build summary for details. Use 'ALLOW_TOOLCHAIN_REBUILDS=y' to suppress this error if rebuilds were expected")
+		return
 	}
+
 	if len(buildState.LicenseFailureSRPMs()) > 0 {
 		err = fmt.Errorf("license check failed for some packages. See build summary for details")
+		return
+	}
+
+	err = schedulerutils.PrintHiddenBuildBlockers(builtGraph, graphMutex, buildState, goalNode)
+	if err != nil {
+		err = fmt.Errorf("failed to print hidden build blockers:\n%w", err)
 	}
 	return
 }
