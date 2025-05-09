@@ -11,6 +11,7 @@ used to determine whether to fail the pipeline.
 """
 
 import json
+import re
 from typing import Dict, List, Any, Optional, Tuple
 from AntiPatternDetector import AntiPattern, Severity
 
@@ -120,7 +121,7 @@ class ResultAnalyzer:
         
         # Add anti-pattern section if any were detected
         if self.anti_patterns:
-            lines.append("\n🔍 DETECTED ANTI-PATTERNS:\n")
+            lines.append("\n## 🔍 DETECTED ANTI-PATTERNS\n")
             
             # Group by severity for display
             # Sort by severity value, not the enum object itself
@@ -134,53 +135,83 @@ class ResultAnalyzer:
                     Severity.CRITICAL: "🚨"
                 }
                 
-                lines.append(f"{severity_emojis[severity]} {severity.name} ISSUES ({len(patterns)})")
+                lines.append(f"### {severity_emojis[severity]} {severity.name} ISSUES ({len(patterns)})")
                 lines.append("-" * 80)
                 
-                for pattern in patterns:
-                    lines.append(f"{pattern.name}: {pattern.description}")
+                # Number the patterns for easier reference
+                for i, pattern in enumerate(patterns, 1):
+                    lines.append(f"**{i}. {pattern.name}**: {pattern.description}")
                     
                     if hasattr(pattern, 'file_path') and pattern.file_path:
-                        lines.append(f"  File: {pattern.file_path}")
+                        lines.append(f"   📄 **File**: `{pattern.file_path}`")
                     
                     if pattern.recommendation:
-                        lines.append(f"  Recommendation: {pattern.recommendation}")
+                        lines.append(f"   💡 **Recommendation**: {pattern.recommendation}")
                     
                     # Add specific details based on pattern type
                     if pattern.name == "MISSING_PATCH_FILES" and "missing_patches" in pattern.details:
-                        lines.append("  Missing patch files:")
-                        for patch in pattern.details["missing_patches"]:
-                            lines.append(f"    - {patch}")
+                        lines.append("   🔍 **Missing patch files**:")
+                        for j, patch in enumerate(pattern.details["missing_patches"], 1):
+                            lines.append(f"     {j}. `{patch}`")
                     
                     elif pattern.name == "UNREFERENCED_PATCH_FILES" and "unreferenced_patches" in pattern.details:
-                        lines.append("  Unreferenced patch files:")
-                        for patch in pattern.details["unreferenced_patches"]:
-                            lines.append(f"    - {patch}")
+                        lines.append("   🔍 **Unreferenced patch files**:")
+                        for j, patch in enumerate(pattern.details["unreferenced_patches"], 1):
+                            lines.append(f"     {j}. `{patch}`")
                     
                     elif pattern.name == "MISSING_PATCH_APPLICATION" and "missing_applications" in pattern.details:
-                        lines.append("  Patches not applied:")
-                        for app in pattern.details["missing_applications"]:
-                            lines.append(f"    - Patch{app['patch_num']}: {app['filename']}")
+                        lines.append("   🔍 **Patches not applied**:")
+                        for j, app in enumerate(pattern.details["missing_applications"], 1):
+                            lines.append(f"     {j}. Patch{app['patch_num']}: `{app['filename']}`")
                     
                     elif pattern.name == "DUPLICATE_PATCH_REFERENCES" and "duplicates" in pattern.details:
-                        lines.append("  Duplicate patch references:")
-                        for patch_num, line_nums in pattern.details["duplicates"].items():
-                            lines.append(f"    - Patch{patch_num} defined at lines: {', '.join(map(str, line_nums))}")
+                        lines.append("   🔍 **Duplicate patch references**:")
+                        for j, (patch_num, line_nums) in enumerate(pattern.details["duplicates"].items(), 1):
+                            lines.append(f"     {j}. Patch{patch_num} defined at lines: {', '.join(map(str, line_nums))}")
                     
                     elif pattern.name == "MISSING_CVE_CHANGELOG_ENTRIES" and "missing_entries" in pattern.details:
-                        lines.append("  CVEs missing from changelog:")
-                        for cve in pattern.details["missing_entries"]:
-                            lines.append(f"    - {cve}")
+                        lines.append("   🔍 **CVEs missing from changelog**:")
+                        for j, cve in enumerate(pattern.details["missing_entries"], 1):
+                            lines.append(f"     {j}. `{cve}`")
                     
                     lines.append("")
         
-        # Add AI analysis section
+        # Add AI analysis section with better formatting
         lines.extend([
-            "\n💬 OPENAI ANALYSIS RESULTS:",
-            "=" * 80,
-            self.ai_analysis,
+            "\n## 💬 OPENAI ANALYSIS RESULTS\n",
             "=" * 80
         ])
+        
+        # Format AI analysis for better readability
+        formatted_analysis = []
+        for line in self.ai_analysis.split('\n'):
+            # Preserve existing markdown headers
+            if line.startswith('##'):
+                formatted_analysis.append(f"\n{line}")
+            # Format section headers that look like headers but aren't properly marked
+            elif re.match(r'^(Summary|Conclusion|Analysis|Recommendations?)(\s*:)?$', line, re.IGNORECASE):
+                formatted_analysis.append(f"\n### 📊 {line}")
+            # Enhance bullet points
+            elif line.strip().startswith('•'):
+                formatted_analysis.append(line.replace('•', '🔹'))
+            # Enhance numbered lists
+            elif re.match(r'^\d+\.', line.strip()):
+                formatted_analysis.append(line)
+            # Highlight CVE IDs
+            elif 'CVE-' in line:
+                formatted_line = re.sub(r'(CVE-\d{4}-\d{4,})', r'`\1`', line)
+                formatted_analysis.append(formatted_line)
+            # Highlight recommendations
+            elif 'recommend' in line.lower():
+                if not line.strip().startswith('🔸'):
+                    formatted_analysis.append(f"🔸 {line}")
+                else:
+                    formatted_analysis.append(line)
+            else:
+                formatted_analysis.append(line)
+        
+        lines.append('\n'.join(formatted_analysis))
+        lines.append("\n" + "=" * 80)
         
         return "\n".join(lines)
     
@@ -253,3 +284,77 @@ class ResultAnalyzer:
         }
         
         return json.dumps(result, indent=2)
+    
+    def extract_conclusion(self) -> str:
+        """
+        Extract the conclusion section from the AI analysis.
+        
+        Returns:
+            The conclusion section as a formatted string with emojis
+        """
+        conclusion = ""
+        in_conclusion = False
+        conclusion_header = False
+        
+        # Try to find a conclusion section in the AI analysis
+        for line in self.ai_analysis.splitlines():
+            # Check for various ways "Conclusion" might be formatted in the text
+            if re.match(r'^#{1,3}\s+Conclusion', line, re.IGNORECASE) or line.strip() == "Conclusion:" or line.strip() == "CONCLUSION":
+                in_conclusion = True
+                conclusion_header = True
+                conclusion = "## 📝 CONCLUSION\n\n"
+                continue
+            
+            # If we're past the conclusion and hit another section header, stop collecting
+            if in_conclusion and line.startswith('#') and not conclusion_header:
+                break
+                
+            # Reset conclusion_header flag after processing the header
+            conclusion_header = False
+            
+            # Add the line to our conclusion if we're in the conclusion section
+            if in_conclusion:
+                # Enhance bullet points with emojis
+                if line.strip().startswith('•'):
+                    line = line.replace('•', '🔹')
+                elif line.strip().startswith('-'):
+                    line = line.replace('-', '🔸')
+                    
+                # Highlight CVE IDs
+                if 'CVE-' in line:
+                    line = re.sub(r'(CVE-\d{4}-\d{4,})', r'`\1`', line)
+                
+                conclusion += line + "\n"
+        
+        # If no formal conclusion section was found, try to extract recommendations
+        if not conclusion:
+            recommendations = []
+            in_recommendations = False
+            
+            for line in self.ai_analysis.splitlines():
+                if "recommendation" in line.lower() or "summary" in line.lower():
+                    in_recommendations = True
+                    recommendations.append("## 📝 CONCLUSION (extracted from recommendations)\n")
+                    continue
+                
+                if in_recommendations and line.strip():
+                    recommendations.append(line)
+            
+            if recommendations:
+                conclusion = "\n".join(recommendations)
+        
+        # If we still don't have a conclusion, create a generic one
+        if not conclusion:
+            conclusion = "## 📝 CONCLUSION\n\nPlease review the detailed analysis above for information about the CVE patches and spec file."
+            
+            # Try to identify the most important issues from anti-patterns
+            critical_issues = [p for p in self.anti_patterns if p.severity >= Severity.ERROR]
+            if critical_issues:
+                conclusion += "\n\n### ❌ Critical Issues Detected:\n\n"
+                for i, issue in enumerate(critical_issues, 1):
+                    conclusion += f"**{i}. {issue.name}**: {issue.description}\n"
+                    if issue.recommendation:
+                        conclusion += f"   💡 **Recommendation**: {issue.recommendation}\n"
+                    conclusion += "\n"
+        
+        return conclusion

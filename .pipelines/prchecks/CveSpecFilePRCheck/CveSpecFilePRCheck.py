@@ -418,7 +418,7 @@ def get_severity_exit_code(severity: Severity) -> int:
         return EXIT_SUCCESS
 
 def update_github_status(severity: Severity, anti_patterns: List[AntiPattern], ai_analysis: str, 
-                        post_comments: bool = True, use_checks_api: bool = True) -> None:
+                        analyzer: ResultAnalyzer, post_comments: bool = True, use_checks_api: bool = True) -> None:
     """
     Updates GitHub with PR check status and optionally posts comments.
     
@@ -426,6 +426,7 @@ def update_github_status(severity: Severity, anti_patterns: List[AntiPattern], a
         severity: Highest severity level detected
         anti_patterns: List of anti-patterns detected
         ai_analysis: AI-generated analysis text
+        analyzer: ResultAnalyzer instance for generating reports
         post_comments: Whether to post comments on GitHub PR
         use_checks_api: Whether to use GitHub Checks API
     """
@@ -448,13 +449,13 @@ def update_github_status(severity: Severity, anti_patterns: List[AntiPattern], a
         issues_dict = []
         for pattern in anti_patterns:
             issues_dict.append({
-                "id": pattern.id,
+                "id": pattern.id if hasattr(pattern, 'id') else "",
                 "name": pattern.name,
                 "description": pattern.description,
                 "severity": pattern.severity.name,
                 "recommendation": pattern.recommendation,
-                "file_path": pattern.file_path,
-                "line_number": pattern.line_number
+                "file_path": pattern.file_path if hasattr(pattern, 'file_path') else "",
+                "line_number": pattern.line_number if hasattr(pattern, 'line_number') else ""
             })
         
         # Post or update comment if enabled
@@ -462,6 +463,14 @@ def update_github_status(severity: Severity, anti_patterns: List[AntiPattern], a
             logger.info("Posting GitHub PR comment with analysis results...")
             comment_body = github_client.format_severity_comment(severity, issues_dict, ai_analysis)
             github_client.post_or_update_comment(comment_body, "azure-linux-spec-check")
+            
+            # Extract and post conclusion as a separate comment
+            logger.info("Posting conclusion as a separate comment...")
+            conclusion = analyzer.extract_conclusion()
+            if conclusion:
+                github_client.post_or_update_comment(conclusion, "azure-linux-spec-check-conclusion")
+            else:
+                logger.warning("No conclusion section found to post as a separate comment")
         
         # Create or update status using the Checks API if enabled
         if use_checks_api:
@@ -539,6 +548,7 @@ def main():
             highest_severity, 
             anti_patterns, 
             ai_analysis,
+            analyzer,
             post_comments=args.post_github_comments,
             use_checks_api=args.use_github_checks
         )
