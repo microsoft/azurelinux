@@ -45,13 +45,15 @@ type graphPrinterConfig struct {
 
 type graphPrinterConfigModifier func(*graphPrinterConfig)
 
-// loggerOutputWrapper is a wrapper around logrus.Logger to implement the io.StringWriter interface.
+// loggerOutputWrapper is a wrapper around logrus.Logger to implement the io.Writer interface.
 type loggerOutputWrapper struct {
 	logLevel logrus.Level
 }
 
-// Write implements the io.StringWriter interface.
+// Write implements the io.Writer interface.
 func (d loggerOutputWrapper) Write(bytes []byte) (int, error) {
+	// Remove the trailing newline character from the log message,
+	// as it's unnecessary when logging.
 	line := strings.TrimSuffix(string(bytes), "\n")
 	logger.Log.Log(d.logLevel, line)
 	return len(bytes), nil
@@ -60,7 +62,7 @@ func (d loggerOutputWrapper) Write(bytes []byte) (int, error) {
 // NewGraphPrinter creates a new GraphPrinter.
 // It accepts a variadic number of 'GraphPrinter*' modifiers to customize the printer's behavior.
 // The default settings are:
-// - Output: logrus logger on debug level
+// - output: logrus logger on debug level
 func NewGraphPrinter(configModifiers ...graphPrinterConfigModifier) GraphPrinter {
 	config := graphPrinterConfig{
 		output: loggerOutputWrapper{
@@ -98,12 +100,10 @@ func GraphPrinterLogOutput(logLevel logrus.Level) graphPrinterConfigModifier {
 	}
 }
 
-// Print prints the graph in the following manner:
-// - Each line represents a node in the graph.
-// - Each node is represented by its friendly name.
-// - Children of each node have an indentation level based on their depth in the graph.
+// Print prints the graph. It ignores any cycles in the graph turning the graph into a tree.
+// It then uses the 'gtree' package to print the tree structure.
 func (g GraphPrinter) Print(graph *PkgGraph, rootNode *PkgNode) error {
-	var dfsPrint func(*gtree.Node, *PkgNode)
+	var buildTreeWithDFS func(*gtree.Node, *PkgNode)
 
 	if graph == nil {
 		return fmt.Errorf("graph is nil")
@@ -122,8 +122,9 @@ func (g GraphPrinter) Print(graph *PkgGraph, rootNode *PkgNode) error {
 	// Use a set to keep track of seen nodes to avoid infinite loops.
 	seenNodes := make(map[*PkgNode]bool)
 
-	// Walking the graph manually to be able to track the depth level.
-	dfsPrint = func(treeParent *gtree.Node, pkgNode *PkgNode) {
+	// Walking the graph manually to keep track of 'gtree' nodes
+	// and the parent-child relationships between them.
+	buildTreeWithDFS = func(treeParent *gtree.Node, pkgNode *PkgNode) {
 		if pkgNode == nil || seenNodes[pkgNode] {
 			return
 		}
@@ -141,13 +142,13 @@ func (g GraphPrinter) Print(graph *PkgGraph, rootNode *PkgNode) error {
 			if child == nil {
 				continue
 			}
-			dfsPrint(treeNode, child)
+			buildTreeWithDFS(treeNode, child)
 		}
 
 		seenNodes[pkgNode] = false
 	}
 
-	dfsPrint(nil, rootNode)
+	buildTreeWithDFS(nil, rootNode)
 
 	return gtree.OutputProgrammably(g.output, treeRoot)
 }

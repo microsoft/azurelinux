@@ -656,7 +656,7 @@ func (g *PkgGraph) AllRunNodes() []*PkgNode {
 	})
 }
 
-// AllUnresolvedNodes returns a list of all unresolved nodes in the graph
+// AllUnresolvedNodes returns a list of all unresolved nodes in the graph.
 // It traverses the graph and returns all nodes of type StateUnresolved.
 func (g *PkgGraph) AllUnresolvedNodes() []*PkgNode {
 	return g.NodesMatchingFilter(func(n *PkgNode) bool {

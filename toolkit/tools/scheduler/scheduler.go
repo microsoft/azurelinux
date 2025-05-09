@@ -569,7 +569,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 
 	err = schedulerutils.PrintHiddenBuildBlockers(builtGraph, graphMutex, buildState, goalNode)
 	if err != nil {
-		err = fmt.Errorf("failed to print hidden goal blockers:\n%w", err)
+		err = fmt.Errorf("failed to print hidden build blockers:\n%w", err)
 	}
 	return
 }
