@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.19
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,6 +39,10 @@ Patch1001:      CVE-2024-6345.patch
 Patch1002:      CVE-2024-3651.patch
 Patch1003:      CVE-2023-43804.patch
 Patch1004:      CVE-2024-37891.patch
+Patch1005:      CVE-2023-5752.patch
+Patch1006:      CVE-2023-45803_1.patch
+Patch1007:      CVE-2023-45803_2.patch
+Patch1008:      CVE-2023-45803_3.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -248,7 +252,14 @@ echo 'Patching CVE-2023-43804 in bundled wheel file %{_libdir}/python%{majmin}/s
 patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py < %{PATCH1003}
 echo 'Patching CVE-2024-37891 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py'
 patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py < %{PATCH1004}
-
+echo 'Patching CVE-2023-5752 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_internal/vcs/mercurial.py'
+patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_internal/vcs/mercurial.py < %{PATCH1005}
+echo 'Patching CVE-2023-45803_1 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/_collections.py'
+patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/_collections.py < %{PATCH1006}
+echo 'Patching CVE-2023-45803_2 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/connectionpool.py'
+patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/connectionpool.py < %{PATCH1007}
+echo 'Patching CVE-2023-45803_3 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/poolmanager.py'
+patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/poolmanager.py < %{PATCH1008}
 
 # Windows executables get installed by pip and setuptools- we don't need these.
 find %{buildroot}%{_libdir}/python%{majmin}/site-packages -name '*.exe' -delete -print
@@ -350,6 +361,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Fri May 09 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 3.9.19-14
+- Patch CVE-2023-5752 and CVE-2023-45803 in the bundled setuptools wheel
+
 * Fri Apr 11 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.9.19-13
 - Add patch for CVE-2024-3651, CVE-2023-43804 and CVE-2024-37891 in the bundled pip wheel
 
