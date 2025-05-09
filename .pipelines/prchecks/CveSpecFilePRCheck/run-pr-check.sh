@@ -114,31 +114,8 @@ fi
 # Enhanced GitHub integration settings
 echo "🔍 Setting up GitHub API access..."
 
-# For GitHub integration - This is a critical part that needs to be fixed!
-if [ -z "${GITHUB_REPOSITORY:-}" ] || [ -z "${GITHUB_PR_NUMBER:-}" ]; then
-  # Extract from ADO variables if possible
-  if [ -n "${SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI:-}" ]; then
-    # Extract repo from URI (e.g. https://github.com/owner/repo.git -> owner/repo)
-    export GITHUB_REPOSITORY=$(echo $SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI | sed -E 's/.*github.com\/([^.]+)(\.git)?/\1/')
-    echo "📂 Setting GITHUB_REPOSITORY to $GITHUB_REPOSITORY"
-  else
-    # For local testing or missing URI, set to repo where code actually lives
-    export GITHUB_REPOSITORY="microsoft/azurelinux"
-    echo "📂 Setting default GITHUB_REPOSITORY to $GITHUB_REPOSITORY"
-  fi
-  
-  if [ -n "${SYSTEM_PULLREQUEST_PULLREQUESTID:-}" ]; then
-    export GITHUB_PR_NUMBER=$SYSTEM_PULLREQUEST_PULLREQUESTID
-    echo "📊 Setting GITHUB_PR_NUMBER to $GITHUB_PR_NUMBER"
-  else
-    # For local testing - this won't work but at least code won't crash
-    export GITHUB_PR_NUMBER="1"
-    echo "📊 Setting placeholder GITHUB_PR_NUMBER to $GITHUB_PR_NUMBER (for testing)"
-  fi
-fi
-
+# Ensure GITHUB_ACCESS_TOKEN picks up Azure DevOps System.AccessToken
 # CRITICAL FIX: Manually setting GitHub access token if not already set
-# This allows using the GITHUB_TOKEN or AZDO_GITHUB_TOKEN which are common environment variables
 if [ -z "${GITHUB_ACCESS_TOKEN:-}" ]; then
   if [ -n "${GITHUB_TOKEN:-}" ]; then
     export GITHUB_ACCESS_TOKEN="$GITHUB_TOKEN"
@@ -146,38 +123,25 @@ if [ -z "${GITHUB_ACCESS_TOKEN:-}" ]; then
   elif [ -n "${AZDO_GITHUB_TOKEN:-}" ]; then
     export GITHUB_ACCESS_TOKEN="$AZDO_GITHUB_TOKEN"
     echo "🔑 Using AZDO_GITHUB_TOKEN as GITHUB_ACCESS_TOKEN"
-  elif [ -n "${SYSTEM_ACCESSTOKEN:-}" ]; then
-    # In Azure DevOps, we can use the system access token if available and configured with GitHub access
-    export GITHUB_ACCESS_TOKEN="$SYSTEM_ACCESSTOKEN"
-    echo "🔑 Using SYSTEM_ACCESSTOKEN as GITHUB_ACCESS_TOKEN"
   fi
 fi
 
+# Also pick up Azure DevOps OAuth token if available
+if [ -n "${SYSTEM_ACCESSTOKEN:-}" ]; then
+  export GITHUB_ACCESS_TOKEN="$SYSTEM_ACCESSTOKEN"
+  echo "🔑 Using SYSTEM_ACCESSTOKEN as GITHUB_ACCESS_TOKEN"
+fi
+
+# Simplify GitHub integration: enable comments if token present
 # Check if GitHub PAT is available - needed for posting comments
 if [ "$POST_GITHUB_COMMENTS" = "true" ] || [ "$USE_GITHUB_CHECKS" = "true" ]; then
-  echo "🔍 GitHub Integration Details:"
+  echo "🔍 GitHub Integration Enabled"
   echo "  - Repository: ${GITHUB_REPOSITORY:-NOT SET}"
   echo "  - PR Number: ${GITHUB_PR_NUMBER:-NOT SET}"
-  
-  # Mask token output but show if it's set
   if [ -n "${GITHUB_ACCESS_TOKEN:-}" ]; then
-    echo "  - GitHub Token: SET"
-    # Test the token using a simple API call
-    echo "  - Testing GitHub API access..."
-    # Make a request to verify the token works (only showing HTTP status, not content)
-    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token ${GITHUB_ACCESS_TOKEN}" https://api.github.com/repos/${GITHUB_REPOSITORY} 2>/dev/null || echo "failed")
-    if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "304" ]; then
-      echo "  ✅ GitHub API access successful (HTTP status: $HTTP_STATUS)"
-      echo "  ✅ GitHub comments will be posted"
-    else
-      echo "  ❌ GitHub API access failed (HTTP status: $HTTP_STATUS)"
-      echo "⚠️ GitHub token validation failed, GitHub integration will be disabled"
-      POST_GITHUB_COMMENTS=false
-      USE_GITHUB_CHECKS=false
-    fi
+    echo "  ✅ GITHUB_ACCESS_TOKEN is set, comments/checks will be posted"
   else
-    echo "  - GitHub Token: NOT SET"
-    echo "⚠️ GITHUB_ACCESS_TOKEN not set, GitHub integration will be disabled"
+    echo "  ⚠️ GITHUB_ACCESS_TOKEN not set, GitHub integration will be disabled"
     POST_GITHUB_COMMENTS=false
     USE_GITHUB_CHECKS=false
   fi

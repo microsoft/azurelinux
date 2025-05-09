@@ -92,6 +92,9 @@ steps:
   # 5) Run your PR‐check entrypoint (installs deps & invokes Azure OpenAI)
   - task: Bash@3
     displayName: '🔍 Run PR Check'
+    env:
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      GITHUB_ACCESS_TOKEN: $(System.AccessToken)
     inputs:
       targetType: inline
       script: |
