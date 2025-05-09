@@ -19,7 +19,7 @@
 Summary:        CNI plugin providing multiple interfaces in containers
 Name:           multus
 Version:        4.0.2
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +30,8 @@ Source0:        https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/
 Patch0:         CVE-2023-45288.patch
 Patch1:         CVE-2023-3978.patch
 Patch2:         CVE-2024-45338.patch
+# CVE-2025-22872 is fixed in go net v0.38 by https://github.com/golang/net/commit/e1fcd82abba34df74614020343be8eb1fe85f0d9
+Patch3:         CVE-2025-22872.patch
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 
@@ -75,6 +77,9 @@ install -D -m0644 deployments/multus-daemonset.yml %{buildroot}%{_datadir}/k8s-y
 %{_datarootdir}/k8s-yaml/multus/multus.yaml
 
 %changelog
+* Fri Apr 25 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 4.0.2-8
+- Add patch for CVE-2025-22872
+
 * Thu Jan 02 2025 Sumedh Sharma <sumsharma@microsoft.com> - 4.0.2-7
 - Add patch for CVE-2024-45338.
 
