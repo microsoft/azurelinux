@@ -1,59 +1,43 @@
-%bcond_with selinux
-%bcond_with systemd
 
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-%if %{with selinux}
-%global selinuxtype targeted
-%endif
-
-%global moduletype contrib
-%define semodule_version 0.0.4
-
 Name:           usbguard
-Version:        1.1.0
+Version:        1.1.3
 Release:        1%{?dist}
 Summary:        A tool for implementing USB device usage policy
-License:        GPLv2+
+License:        GPL-2.0-or-later
 ## Not installed
 # src/ThirdParty/Catch: Boost Software License - Version 1.0
 URL:            https://usbguard.github.io/
 Source0:        https://github.com/USBGuard/usbguard/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-%if %{with selinux}
-Source1:        https://github.com/USBGuard/usbguard/releases/download/%{name}-selinux-%{semodule_version}/%{name}-selinux-%{semodule_version}.tar.gz
-%endif
-Source2:        usbguard-daemon.conf
+Source1:        usbguard-daemon.conf
+Patch0: 	usbguard-revert-catch.patch
 
-%if %{with systemd}
-Requires: systemd
-Requires(post): systemd
-Requires(preun): systemd
-Requires(postun): systemd
-%endif
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-%if %{with selinux}
-Recommends: %{name}-selinux
-%endif
+
 Obsoletes: %{name}-applet-qt < 0.7.6
 
+BuildRequires: make
 BuildRequires: gcc
 BuildRequires: gcc-c++
 BuildRequires: libqb-devel
 BuildRequires: libgcrypt-devel
 BuildRequires: libstdc++-devel
 BuildRequires: protobuf-devel
+BuildRequires: protobuf-static
+BuildRequires: protobuf-compiler
 BuildRequires: PEGTL-static
-BuildRequires: catch-devel
-BuildRequires: autoconf automake libtool
+BuildRequires: catch1-devel
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: libtool
 BuildRequires: bash-completion
 BuildRequires: asciidoc
 BuildRequires: audit-libs-devel
 # For `pkg-config systemd` only
 BuildRequires: systemd
-
-Patch1: usbguard-0.7.6-libqb.patch
 
 %description
 The USBGuard software framework helps to protect your computer against rogue USB
@@ -97,35 +81,12 @@ Requires:       polkit
 The %{name}-dbus package contains an optional component that provides
 a D-Bus interface to the USBGuard daemon component.
 
-%if %{with selinux}
-%package        selinux
-Summary:        USBGuard selinux
-Group:          Applications/System
-Requires:       %{name} = %{version}-%{release}
-BuildRequires:  selinux-policy
-BuildRequires:  selinux-policy-devel
-BuildArch: noarch
-%{?selinux_requires}
-
-%description    selinux
-The %{name}-selinux package contains selinux policy for the USBGuard
-daemon.
-%endif
-
 # usbguard
 %prep
-%setup -q
-
-%if %{with selinux}
-# selinux
-%setup -q -D -T -a 1
-%endif
-
-%patch 1 -p1 -b .libqb
+%autosetup -p1
 
 # Remove bundled library sources before build
 rm -rf src/ThirdParty/{Catch,PEGTL}
-
 
 %build
 mkdir -p ./m4
@@ -134,69 +95,33 @@ autoreconf -i -v --no-recursive ./
     --disable-silent-rules \
     --without-bundled-catch \
     --without-bundled-pegtl \
-%if %{with systemd}
-    --enable-systemd \
-%else
     --disable-systemd \
-%endif
     --with-dbus \
     --with-polkit \
     --with-crypto-library=gcrypt
 
 make %{?_smp_mflags}
 
-%if %{with selinux}
-# selinux
-pushd %{name}-selinux-%{semodule_version}
-make
-popd
-%endif
-
 %check
 make check
-
-
-%if %{with selinux}
-# selinux
-%pre selinux
-%selinux_relabel_pre -s %{selinuxtype}
-%endif
 
 %install
 make install INSTALL='install -p' DESTDIR=%{buildroot}
 
 # Overwrite configuration with distribution defaults
 mkdir -p %{buildroot}%{_sysconfdir}/usbguard
+mkdir -p %{buildroot}%{_sysconfdir}/usbguard/rules.d
 mkdir -p %{buildroot}%{_sysconfdir}/usbguard/IPCAccessControl.d
-install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/usbguard/usbguard-daemon.conf
-
-%if %{with selinux}
-# selinux
-install -d %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
-install -m 0644 %{name}-selinux-%{semodule_version}/%{name}.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
-install -d -p %{buildroot}%{_datadir}/selinux/devel/include/%{moduletype}
-install -p -m 644 %{name}-selinux-%{semodule_version}/%{name}.if %{buildroot}%{_datadir}/selinux/devel/include/%{moduletype}/ipp-%{name}.if
-%endif
+install -p -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/usbguard/usbguard-daemon.conf
 
 # Cleanup
 find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
 
-%if %{with systemd}
-%preun
-%systemd_preun usbguard.service
-%endif
-
 %post
 %{?ldconfig}
-%if %{with systemd}
-%systemd_post usbguard.service
-%endif
 
 %postun
 %{?ldconfig}
-%if %{with systemd}
-%systemd_postun usbguard.service
-%endif
 
 %files
 %doc README.adoc CHANGELOG.md
@@ -206,6 +131,7 @@ find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
 %{_bindir}/usbguard
 %dir %{_localstatedir}/log/usbguard
 %dir %{_sysconfdir}/usbguard
+%dir %{_sysconfdir}/usbguard/rules.d/
 %dir %{_sysconfdir}/usbguard/IPCAccessControl.d
 %config(noreplace) %attr(0600,-,-) %{_sysconfdir}/usbguard/usbguard-daemon.conf
 %config(noreplace) %attr(0600,-,-) %{_sysconfdir}/usbguard/rules.conf
@@ -214,9 +140,6 @@ find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
 %{_datadir}/man/man5/usbguard-rules.conf.5.gz
 %{_datadir}/man/man1/usbguard.1.gz
 %{_datadir}/bash-completion/completions/usbguard
-%if %{with systemd}
-%{_unitdir}/usbguard.service
-%endif
 
 %files devel
 %{_includedir}/*
@@ -233,40 +156,12 @@ find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
 %{_datadir}/dbus-1/system.d/org.usbguard1.conf
 %{_datadir}/polkit-1/actions/org.usbguard1.policy
 %{_mandir}/man8/usbguard-dbus.8.gz
-%if %{with systemd}
-%{_unitdir}/usbguard-dbus.service
-%endif
-
-%if %{with systemd}
-%preun dbus
-%systemd_preun usbguard-dbus.service
-
-%post dbus
-%systemd_post usbguard-dbus.service
-
-%postun dbus
-%systemd_postun_with_restart usbguard-dbus.service
-%endif
-
-%if %{with selinux}
-%files selinux
-%{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
-%ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/%{name}
-%{_datadir}/selinux/devel/include/%{moduletype}/ipp-%{name}.if
-
-%post selinux
-%selinux_modules_install -s %{selinuxtype} %{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
-
-%postun selinux
-if [ $1 -eq 0 ]; then
-    %selinux_modules_uninstall -s %{selinuxtype} %{name}
-fi
-
-%posttrans selinux
-%selinux_relabel_post -s %{selinuxtype}
-%endif
 
 %changelog
+* Tue Apr 08 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.1.3-1
+- Upgrade to 1.1.3 by taking reference from Fedora 41 (license: MIT).
+- License verified.
+
 * Tue Sep 05 2023 Archana Choudhary <archana1@microsoft.com> - 1.1.0-1
 - Upgrade to 1.1.0 - CVE-2019-25058
 - Update build requirement catch1 -> catch
