@@ -109,6 +109,12 @@ steps:
         if [ "$USE_EXIT_CODE_SEVERITY" = "True" ]; then
           CMD="$CMD --exit-code-severity"
         fi
+        if [ "$POST_GITHUB_COMMENTS" = "True" ]; then
+          CMD="$CMD --post-github-comments"
+        fi
+        if [ "$USE_GITHUB_CHECKS" = "True" ]; then
+          CMD="$CMD --use-github-checks"
+        fi
         
         echo "Running command: $CMD"
         $CMD

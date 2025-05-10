@@ -162,68 +162,9 @@ pip install -r requirements.txt
 # 3) Run the CVE spec file checker
 echo "🔍 Running CveSpecFilePRCheck.py…"
 
-# Build command with arguments
-CMD="python CveSpecFilePRCheck.py"
-if [[ "$FAIL_ON_WARNINGS" =~ ^[Tt][Rr][Uu][Ee]$ ]]; then
-  CMD="$CMD --fail-on-warnings"
-fi
-if [[ "$USE_EXIT_CODE_SEVERITY" =~ ^[Tt][Rr][Uu][Ee]$ ]]; then
-  CMD="$CMD --exit-code-severity" 
-fi
-if [[ "$POST_GITHUB_COMMENTS" =~ ^[Tt][Rr][Uu][Ee]$ ]]; then
-  echo "📝 GitHub comments enabled, adding flag..."
-  CMD="$CMD --post-github-comments"
-fi
-if [[ "$USE_GITHUB_CHECKS" =~ ^[Tt][Rr][Uu][Ee]$ ]]; then
-  CMD="$CMD --use-github-checks"
-fi
-
-# Run the command and capture exit code
+# Build and run Python command
 echo "🚀 Running command: $CMD"
 eval $CMD
-PR_CHECK_EXIT_CODE=$?
 
-# Process the exit code appropriately 
-if [ $PR_CHECK_EXIT_CODE -eq $EXIT_SUCCESS ]; then
-  echo "✅ PR check completed successfully"
-  echo "=================================================="
-  echo "No critical issues found in spec files"
-  echo "=================================================="
-elif [ $PR_CHECK_EXIT_CODE -eq $EXIT_WARNING ]; then
-  if [ "$FAIL_ON_WARNINGS" = "true" ]; then
-    echo "❌ PR check failed with warnings (exit code $PR_CHECK_EXIT_CODE)"
-    echo "=================================================="
-    echo "⚠️  WARNINGS DETECTED - PLEASE REVIEW THE ISSUES"
-    echo "=================================================="
-    # Only propagate failure if FAIL_ON_WARNINGS is true
-    exit $EXIT_CRITICAL
-  else
-    echo "⚠️ PR check completed with warnings (exit code $PR_CHECK_EXIT_CODE)"
-    echo "=================================================="
-    echo "⚠️  WARNINGS DETECTED BUT PIPELINE CONTINUES"
-    echo "=================================================="
-    # Don't fail the pipeline for warnings by default
-    exit $EXIT_SUCCESS
-  fi
-elif [ $PR_CHECK_EXIT_CODE -eq $EXIT_ERROR ]; then
-  echo "❌ PR check failed with errors (exit code $PR_CHECK_EXIT_CODE)"
-  echo "=================================================="
-  echo "❌  ERRORS DETECTED - PLEASE FIX THE ISSUES"
-  echo "=================================================="
-  # Propagate the exit code to fail the pipeline
-  exit $EXIT_CRITICAL
-elif [ $PR_CHECK_EXIT_CODE -eq $EXIT_CRITICAL ]; then
-  echo "❌ PR check failed with critical issues (exit code $PR_CHECK_EXIT_CODE)"
-  echo "=================================================="
-  echo "🚨  CRITICAL ISSUES DETECTED - PLEASE FIX IMMEDIATELY"
-  echo "=================================================="
-  # Propagate the exit code to fail the pipeline
-  exit $EXIT_CRITICAL
-else
-  echo "❌ PR check encountered an unexpected error (exit code $PR_CHECK_EXIT_CODE)"
-  echo "=================================================="
-  echo "⚠️  UNEXPECTED ERROR - CHECK THE LOGS"
-  echo "=================================================="
-  # Propagate the exit code to fail the pipeline
-  exit $PR_CHECK_EXIT_CODE
-fi
+# Exit with the same code as the Python script
+exit $?

@@ -28,7 +28,6 @@ from OpenAIClientClass import OpenAIClient
 from PromptTemplatesClass import PromptTemplates
 from AntiPatternDetector import AntiPatternDetector, AntiPattern, Severity
 from ResultAnalyzer import ResultAnalyzer
-from FixRecommender import FixRecommender
 from GitHubClient import GitHubClient, CheckStatus
 
 # Configure logging
@@ -217,8 +216,7 @@ def analyze_spec_files(diff_text: str, changed_spec_files: List[str]) -> Tuple[L
         # Call OpenAI for analysis
         ai_analysis = call_openai(openai_client, diff_text, changed_spec_files)
         
-        # Initialize FixRecommender with the OpenAI client for dynamic recommendations
-        fix_recommender = FixRecommender(openai_client)
+        # Dynamic recommendations have been consolidated into AI analysis; deprecated FixRecommender
         
         # Early exit if no spec files changed
         if not changed_spec_files:
@@ -237,11 +235,6 @@ def analyze_spec_files(diff_text: str, changed_spec_files: List[str]) -> Tuple[L
             
             # Detect anti-patterns
             anti_patterns = detector.detect_all(spec_path, spec_content, file_list)
-            
-            # Enhance recommendations with the FixRecommender
-            if anti_patterns:
-                logger.info(f"Enhancing recommendations for {len(anti_patterns)} anti-patterns")
-                anti_patterns = fix_recommender.enhance_recommendations(anti_patterns, spec_content, file_list)
             
             all_anti_patterns.extend(anti_patterns)
             
@@ -554,12 +547,17 @@ def main():
         )
         
         if args.exit_code_severity:
-            # Return different exit codes based on severity
-            exit_code = get_severity_exit_code(highest_severity)
+            # Return exit codes based on severity, but do not fail on warnings unless requested
+            if highest_severity.value >= Severity.ERROR.value:
+                exit_code = get_severity_exit_code(highest_severity)
+            elif highest_severity == Severity.WARNING:
+                exit_code = EXIT_WARNING if args.fail_on_warnings else EXIT_SUCCESS
+            else:
+                exit_code = EXIT_SUCCESS
             
             # Log exit details
             if exit_code == EXIT_SUCCESS:
-                logger.info("Analysis completed successfully - no issues detected")
+                logger.info("Analysis completed successfully - no issues detected or warnings only.")
             else:
                 severity_name = highest_severity.name
                 logger.warning(f"Analysis completed with highest severity: {severity_name} (exit code {exit_code})")
