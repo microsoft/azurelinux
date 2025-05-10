@@ -1,0 +1,32 @@
+Adjust the 'mariadb.logrotate.sh' script in several ways:
+
+* Use the correct log file pathname for Red Hat installations.
+
+* Remove Debian specific code
+  for the very unlikely, but possible scenario
+  in which the debian config file would exist.
+
+--- mariadb-10.11.6/support-files/mariadb.logrotate.sh	2023-11-08 16:51:43.000000000 +0100
++++ mariadb-10.11.6/support-files/mariadb.logrotate.sh_patched	2023-12-17 18:03:36.955861025 +0100
+@@ -6,7 +6,7 @@
+ # Read https://mariadb.com/kb/en/error-log/ to learn more about logging and
+ # https://mariadb.com/kb/en/rotating-logs-on-unix-and-linux/ about rotating logs.
+ 
+-@localstatedir@/mysqld.log @localstatedir@/mariadb.log @logdir@/*.log {
++@LOG_LOCATION@ {
+ 
+   # Depends on a mysql@localhost unix_socket authenticated user with RELOAD privilege
+   @su_user@
+@@ -45,11 +45,6 @@
+   # has thanks to the default use of Unix socket authentication for the 'mysql'
+   # (or root on Debian) account used everywhere since MariaDB 10.4.
+   postrotate
+-    if test -r /etc/mysql/debian.cnf
+-    then
+-      EXTRAPARAM='--defaults-file=/etc/mysql/debian.cnf'
+-    fi
+-
+     if test -x @bindir@/mariadb-admin
+     then
+       @bindir@/mariadb-admin $EXTRAPARAM --local flush-error-log \
+
