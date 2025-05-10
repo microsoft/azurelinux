@@ -1,0 +1,28 @@
+--- virt-top-1.1.1/configure.orig	2021-11-03 14:18:26.000000000 -0600
++++ virt-top-1.1.1/configure	2023-07-10 12:31:15.525435684 -0600
+@@ -5357,7 +5357,7 @@ else
+   OCAMLOPT="$ac_cv_prog_OCAMLOPT"
+ fi
+ 
+-     OCAMLBEST=byte
++     OCAMLBEST=ocamlc
+      if test "$OCAMLOPT" = "no"; then
+ 	{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot find ocamlopt; bytecode compilation only." >&5
+ $as_echo "$as_me: WARNING: Cannot find ocamlopt; bytecode compilation only." >&2;}
+--- virt-top-1.1.1/ocaml-link.sh.in.orig	2021-11-03 06:00:07.000000000 -0600
++++ virt-top-1.1.1/ocaml-link.sh.in	2023-07-10 12:31:41.012064849 -0600
+@@ -49,10 +49,12 @@ if [ x"${V:-@AM_DEFAULT_VERBOSITY@}" = x
+   echo "$@" \
+      @OCAML_RUNTIME_VARIANT_PIC_OPTION@ \
+      -linkpkg \
+-     -cclib "'@LDFLAGS@ $cclib'"
++     -cclib "'@LDFLAGS@ $cclib'" \
++     -output-complete-exe
+ fi
+ # NB -cclib must come last.
+ exec "$@" \
+      @OCAML_RUNTIME_VARIANT_PIC_OPTION@ \
+      -linkpkg \
+-     -cclib "@LDFLAGS@ $cclib"
++     -cclib "@LDFLAGS@ $cclib" \
++     -output-complete-exe
