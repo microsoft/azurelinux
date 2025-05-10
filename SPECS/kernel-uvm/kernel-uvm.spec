@@ -11,7 +11,7 @@
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        6.1.58.mshv4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -38,6 +38,7 @@ BuildRequires:  python3-devel
 BuildRequires:  sed
 Requires:       filesystem
 Requires:       kmod
+Requires:       erofs-utils
 Requires(post): coreutils
 Requires(postun): coreutils
 ExclusiveArch:  x86_64
@@ -154,6 +155,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Fri May 09 2025 Mitch Zhu <mitchzhu@microsoft.com> - 6.1.58.mshv4-3
+- Add erofs utils
+
 * Fri May 09 2025 Mitch Zhu <mitchzhu@microsoft.com> - 6.1.58.mshv4-2
 - Enable EROFS driver
 
