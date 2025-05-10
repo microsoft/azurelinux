@@ -90,7 +90,8 @@ iso:
     cloud-init-data/meta-data: /cloud-init-data/meta-data
 
   kernelCommandLine:
-    extraCommandLine: "ds=nocloud"
+    extraCommandLine:
+    - "ds=nocloud"
 ```
 
 Note: It is tempting to specify
@@ -106,7 +107,8 @@ If cloud-init data is to be placed within the LiveOS root file system:
 ```yaml
 os:
   kernelCommandLine:
-    extraCommandLine: "ds=nocloud"
+    extraCommandLine:
+    - "ds=nocloud"
 
   additionalFiles:
     cloud-init-data/user-data: /var/lib/cloud/seed/nocloud/user-data
