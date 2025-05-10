@@ -1,16 +1,20 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+%if 0%{?fedora} > 35
+%global dict_dirname hunspell 
+%else
+%global dict_dirname myspell
+%endif
 Name: hunspell-pt
 Summary: Portuguese hunspell dictionaries
-%global upstreamid 20130125
+%global upstreamid 20131030
 Version: 0.%{upstreamid}
-Release: 15%{?dist}
+Release: 14%{?dist}
 Source0: http://natura.di.uminho.pt/download/sources/Dictionaries/hunspell/hunspell-pt_PT-20130125.tar.gz
-# Mark following Source1 as dead link
-Source1: http://pt-br.libreoffice.org/assets/ptBR20130317AOC.zip
-URL: http://www.broffice.org/verortografico/baixar
+Source1: https://pt-br.libreoffice.org/assets/Uploads/PT-BR-Documents/VERO/ptBR-2013-10-30AOC-2.zip
+URL: https://pt-br.libreoffice.org/projetos/vero
 # pt_BR dicts are under LGPLv3 or MPL, pt_PT under GPLv2 or LGPLv2 or MPLv1.1
-License: ((LGPLv3 or MPL) and LGPLv2) and (GPLv2 or LGPLv2 or MPLv1.1)
+License: ( ( LGPL-3.0-only OR MPL-1.1 ) AND LGPL-2.1-only ) AND ( GPL-2.0-only OR LGPL-2.1-only OR MPL-1.1 )
 BuildArch: noarch
 
 Requires: hunspell
@@ -19,10 +23,18 @@ Supplements: (hunspell and langpacks-pt)
 %description
 Portuguese hunspell dictionaries.
 
+%package BR
+Summary: Brazilian Portuguese hunspell dictionaries
+Requires: hunspell
+Supplements: (hunspell and langpacks-pt_BR)
+
+%description BR
+Brazilian Portuguese hunspell dictionaries
+
 %prep
 %setup -q -n hunspell-pt_PT-20130125
 unzip -q -o %{SOURCE1}
-for i in README_pt_BR.txt README_pt_PT.txt; do
+for i in README_pt_BR.TXT README_pt_PT.txt; do
   if ! iconv -f utf-8 -t utf-8 -o /dev/null $i > /dev/null 2>&1; then
     iconv -f ISO-8859-1 -t UTF-8 $i > $i.new
     touch -r $i $i.new
@@ -36,10 +48,10 @@ done
 %build
 
 %install
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/myspell
-cp -p pt*.dic pt*.aff $RPM_BUILD_ROOT/%{_datadir}/myspell
+mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
+cp -p pt*.dic pt*.aff $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
 
-pushd $RPM_BUILD_ROOT/%{_datadir}/myspell/
+pushd $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}/
 pt_PT_aliases="pt_AO"
 for lang in $pt_PT_aliases; do
         ln -s pt_PT.aff $lang.aff
@@ -49,13 +61,68 @@ popd
 
 
 %files
-%doc README_pt_BR.txt README_pt_PT.txt
+%doc README_pt_PT.txt
 %license COPYING
-%{_datadir}/myspell/*
+%{_datadir}/%{dict_dirname}/*
+%exclude %{_datadir}/%{dict_dirname}/pt_BR.*
+
+%files BR
+%doc README_pt_BR.TXT README_en.TXT
+%{_datadir}/%{dict_dirname}/pt_BR.*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20130125-15
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Dec 20 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.20131030-14
+- AzureLinux import from Fedora 41 .
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.20131030-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.20131030-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.20131030-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.20131030-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Feb 22 2023 Caolán McNamara <caolanm@redhat.com> - 0.20131030-9
+- migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.20131030-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.20131030-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 16 2022 Caolán McNamara <caolanm@redhat.com> - 0.20131030-6
+- Related: rhbz#2084587 provide a pt-BR subpackage
+
+* Fri May 13 2022 Caolán McNamara <caolanm@redhat.com> - 0.20131030-5
+- Related: rhbz#2084587 try (pt or pt-BR)
+
+* Thu May 12 2022 Caolán McNamara <caolanm@redhat.com> - 0.20131030-4
+- Resolves: rhbz#2084587 add Supplements: langpacks-pt_BR
+
+* Fri Feb 11 2022 Vishal Vijayraghavan <vishalvvr@fedoraproject.org> - 0.20131030-3
+- rename install directory name from myspell to hunspell
+- https://fedoraproject.org/wiki/Changes/Hunspell_dictionary_dir_change
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.20131030-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Oct 12 2021 Caolán McNamara <caolanm@redhat.com> - 0.20131030-1
+- Related: rhbz#2013265 upgrade to the latest pt_BR version and update URL
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.20130125-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.20130125-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.20130125-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.20130125-14
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
