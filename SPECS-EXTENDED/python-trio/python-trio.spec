@@ -1,16 +1,5 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-%{!?__python3: %global __python3 /usr/bin/python3}
-
-# what it's called on pypi
-%global srcname trio
-# what it's imported as
-%global libname %{srcname}
-# name of egg info directory
-%global eggname %{srcname}
-# package name fragment
-%global pkgname %{srcname}
-
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 %global common_description %{expand:
 The Trio project's goal is to produce a production-quality, permissively
 licensed, async/await-native I/O library for Python.  Like all async libraries,
@@ -22,61 +11,65 @@ multiple subprocesses... that sort of thing.  Compared to other libraries, Trio
 attempts to distinguish itself with an obsessive focus on usability and
 correctness.  Concurrency is complicated; we try to make it easy to get things
 right.}
-
-%bcond_with  tests
-
-Name:           python-%{pkgname}
-Version:        0.16.0
-Release:        3%{?dist}
+ 
+ 
+Name:           python-trio
+Version:        0.23.1
+Release:        1%{?dist}
 Summary:        A friendly Python library for async concurrency and I/O
-License:        MIT or ASL 2.0
+License:        Apache-2.0 OR MIT
 URL:            https://github.com/python-trio/trio
-Source0:        https://files.pythonhosted.org/packages/source/t/%{pkgname}/%{pkgname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source:         %pypi_source trio
+ 
+# Python 3.13 support
+# Manually rebased from https://github.com/python-trio/trio/pull/2959
+Patch:          python3.13-PR-2959.patch
+# Manually rebased from https://github.com/python-trio/trio/pull/3005
+Patch:          python3.13-PR-3005.patch
+ 
 BuildArch:      noarch
-
+ 
+ 
 %description %{common_description}
-
-%package -n python3-%{pkgname}
+ 
+ 
+%package -n python3-trio
 Summary:        %{summary}
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-%if %{with tests}
 BuildRequires:  python3-pytest
-BuildRequires:  python3-pyOpenSSL
-BuildRequires:  python3-trustme
-BuildRequires:  python3-attrs
-BuildRequires:  python3-sortedcontainers
-BuildRequires:  python3-async-generator
-BuildRequires:  python3-idna
-BuildRequires:  python3-outcome
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
 BuildRequires:  python3-sniffio
-%endif
-%{?python_provide:%python_provide python3-%{pkgname}}
-
-%description -n python3-%{pkgname} %{common_description}
+ 
+%description -n python3-trio %{common_description}
 
 %prep
-%autosetup -n %{srcname}-%{version}
-rm -rf %{eggname}.egg-info
+%autosetup -p 1 -n trio-%{version}
+
+%generate_buildrequires
+%pyproject_buildrequires
 
 %build
-%py3_build
-
+%pyproject_wheel
+ 
 %install
-%py3_install
-
-%if %{with tests}
+%pyproject_install
+%pyproject_save_files trio
+ 
 %check
-%pytest --verbose trio/_core/tests
-%endif
-
-%files -n python3-%{pkgname}
-%license LICENSE LICENSE.MIT LICENSE.APACHE2
+# https://github.com/python-trio/trio/issues/2863
+# https://github.com/python-trio/trio/pull/2870
+# https://docs.pytest.org/en/stable/explanation/goodpractices.html#tests-as-part-of-application-code
+%pytest --pyargs trio -p trio._tests.pytest_plugin --verbose --skip-optional-imports
+ 
+%files -n python3-trio -f %{pyproject_files}
 %doc README.rst
-%{python3_sitelib}/%{libname}
-%{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Mon Apr 21 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.23.1-1
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.16.0-3
 - Updated source URL.
 - License verified.
