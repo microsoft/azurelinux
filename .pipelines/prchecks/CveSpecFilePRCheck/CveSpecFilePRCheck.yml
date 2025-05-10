@@ -36,11 +36,11 @@ variables:
   # Secret variable group containing GITHUB_APP_ID & GITHUB_APP_INSTALLATION_ID
   - group: SpecGuard App Config
 
-  # Map parameters into shell-visible env vars
-  FAIL_ON_WARNINGS: ${{ parameters.failOnWarnings }}
-  USE_EXIT_CODE_SEVERITY: ${{ parameters.useExitCodeSeverity }}
-  POST_GITHUB_COMMENTS: ${{ parameters.postGitHubComments }}
-  USE_GITHUB_CHECKS: ${{ parameters.useGitHubChecks }}
+    # Map parameters into shell-visible env vars
+    FAIL_ON_WARNINGS: ${{ parameters.failOnWarnings }}
+    USE_EXIT_CODE_SEVERITY: ${{ parameters.useExitCodeSeverity }}
+    POST_GITHUB_COMMENTS: ${{ parameters.postGitHubComments }}
+    USE_GITHUB_CHECKS: ${{ parameters.useGitHubChecks }}
 
 steps:
   # 1) Checkout the repo
@@ -102,13 +102,13 @@ steps:
   - task: Bash@3
     displayName: '🔍 Run PR Check as SpecGuard'
     env:
-      GITHUB_ACCESS_TOKEN:   $(GITHUB_ACCESS_TOKEN)    # from GetAppToken
-      GITHUB_REPOSITORY:     $(Build.Repository.Name)
-      BUILD_SOURCEBRANCH:    $(Build.SourceBranch)
-      FAIL_ON_WARNINGS:      $(FAIL_ON_WARNINGS)
+      GITHUB_ACCESS_TOKEN:    $(GITHUB_ACCESS_TOKEN)     # from GetAppToken
+      GITHUB_REPOSITORY:      $(Build.Repository.Name)
+      BUILD_SOURCEBRANCH:     $(Build.SourceBranch)
+      FAIL_ON_WARNINGS:       $(FAIL_ON_WARNINGS)
       USE_EXIT_CODE_SEVERITY: $(USE_EXIT_CODE_SEVERITY)
-      POST_GITHUB_COMMENTS:  $(POST_GITHUB_COMMENTS)
-      USE_GITHUB_CHECKS:     $(USE_GITHUB_CHECKS)
+      POST_GITHUB_COMMENTS:   $(POST_GITHUB_COMMENTS)
+      USE_GITHUB_CHECKS:      $(USE_GITHUB_CHECKS)
     inputs:
       targetType: inline
       script: |
