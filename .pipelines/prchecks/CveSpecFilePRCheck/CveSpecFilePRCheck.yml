@@ -95,6 +95,8 @@ steps:
     env:
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
       GITHUB_ACCESS_TOKEN: $(System.AccessToken)
+      GITHUB_REPOSITORY: $(Build.Repository.Name)
+      BUILD_SOURCEBRANCH: $(Build.SourceBranch)
     inputs:
       targetType: inline
       script: |

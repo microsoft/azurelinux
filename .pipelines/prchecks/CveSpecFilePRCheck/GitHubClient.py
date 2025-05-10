@@ -13,6 +13,8 @@ import os
 import requests
 import logging
 import json
+import subprocess
+import re
 from enum import Enum
 from typing import Dict, List, Any, Optional
 from AntiPatternDetector import Severity
@@ -37,8 +39,28 @@ class GitHubClient:
         """Initialize the GitHub client using environment variables for auth"""
         # Get required environment variables
         self.token = os.environ.get("GITHUB_ACCESS_TOKEN")
-        self.repo_name = os.environ.get("GITHUB_REPOSITORY", "")  # Format: owner/repo
+        original_repo = os.environ.get("GITHUB_REPOSITORY", "")
         self.pr_number = os.environ.get("GITHUB_PR_NUMBER", "")
+        
+        # Normalize repository name to owner/repo
+        repo = original_repo
+        # Try parsing a GitHub URL or owner/repo string
+        match = re.search(r"github\.com[:/]+([^/]+/[^/]+)(?:\.git)?$", repo)
+        if match:
+            repo = match.group(1)
+        else:
+            # Fallback to BUILD_REPOSITORY_URI
+            build_uri = os.environ.get("BUILD_REPOSITORY_URI", "")
+            match2 = re.search(r"github\.com[:/]+([^/]+/[^/]+)(?:\.git)?$", build_uri)
+            if match2:
+                repo = match2.group(1)
+        self.repo_name = repo
+        
+        # Fallback for PR number if not provided
+        if not self.pr_number:
+            self.pr_number = (os.environ.get("SYSTEM_PULLREQUEST_PULLREQUESTNUMBER")
+                              or os.environ.get("SYSTEM_PULLREQUEST_PULLREQUESTID")
+                              or "")
         
         # Validate required environment variables
         if not self.token:

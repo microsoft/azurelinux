@@ -151,14 +151,21 @@ if [ "$POST_GITHUB_COMMENTS" = "true" ] || [ "$USE_GITHUB_CHECKS" = "true" ]; th
 fi
 
 echo "🔍 Ensuring GitHub repo and PR context..."
-# Derive repository in 'owner/repo' format if missing
+# Derive repository in 'owner/repo' format if missing, via git remote or BUILD_REPOSITORY_URI
 if [ -z "${GITHUB_REPOSITORY:-}" ]; then
+  # Try git remote origin first
   remote_url=$(git config --get remote.origin.url || echo "")
-  if [[ $remote_url =~ github\.com[:/](.+)\.git ]]; then
+  if [[ $remote_url =~ github\.com[:/]+([^/]+/[^/]+)(\.git)?$ ]]; then
     export GITHUB_REPOSITORY="${BASH_REMATCH[1]}"
-    echo "🔎 Derived GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
+    echo "🔎 Derived GITHUB_REPOSITORY=$GITHUB_REPOSITORY from git remote"
   else
-    echo "⚠️ Could not derive GITHUB_REPOSITORY from git remote URL"
+    # Fallback to BUILD_REPOSITORY_URI if remote origin not matching
+    if [[ "${BUILD_REPOSITORY_URI:-}" =~ github\.com[:/]+([^/]+/[^/]+)(\.git)?$ ]]; then
+      export GITHUB_REPOSITORY="${BASH_REMATCH[1]}"
+      echo "🔎 Derived GITHUB_REPOSITORY=$GITHUB_REPOSITORY from BUILD_REPOSITORY_URI"
+    else
+      echo "⚠️ Could not derive GITHUB_REPOSITORY from remote or BUILD_REPOSITORY_URI"
+    fi
   fi
 fi
 
@@ -174,6 +181,9 @@ if [ -z "${GITHUB_PR_NUMBER:-}" ]; then
     echo "⚠️ SYSTEM_PULLREQUEST_PULLREQUESTNUMBER or ID not set, comments may not post"
   fi
 fi
+
+export GITHUB_REPOSITORY
+export GITHUB_PR_NUMBER
 
 echo "🔍 Using commits for diff:"
 echo "  - Source: ${SYSTEM_PULLREQUEST_SOURCECOMMITID}"

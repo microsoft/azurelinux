@@ -44,6 +44,33 @@ EXIT_ERROR = 2
 EXIT_WARNING = 3
 EXIT_FATAL = 10
 
+# -----------------------------------------------------------------------------
+# Derive GitHub context if environment variables are not explicitly set
+# -----------------------------------------------------------------------------
+def _derive_github_context():
+    repo = os.getenv("GITHUB_REPOSITORY", "").strip()
+    if not repo:
+        # Try BUILD_REPOSITORY_NAME (owner/repo)
+        repo = os.getenv("BUILD_REPOSITORY_NAME", "").strip()
+    
+    pr_num = os.getenv("GITHUB_PR_NUMBER", "").strip()
+    if not pr_num:
+        # Try BUILD_SOURCEBRANCH (refs/pull/<n>/merge)
+        branch = os.getenv("BUILD_SOURCEBRANCH", "") or os.getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH", "")
+        m = re.match(r"refs/pull/(\d+)", branch)
+        if m:
+            pr_num = m.group(1)
+    
+    if repo:
+        os.environ["GITHUB_REPOSITORY"] = repo
+        logger.info(f"Derived GITHUB_REPOSITORY={repo}")
+    if pr_num:
+        os.environ["GITHUB_PR_NUMBER"] = pr_num
+        logger.info(f"Derived GITHUB_PR_NUMBER={pr_num}")
+
+# Run derivation before any GitHubClient usage
+_derive_github_context()
+
 def gather_diff() -> str:
     """
     Extracts the diff between source and target commits for a PR.
