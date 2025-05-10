@@ -1726,6 +1726,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "citus",
+          "version": "13.0.3",
+          "downloadUrl": "https://github.com/citusdata/citus/archive/v13.0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cjkuni-uming-fonts",
           "version": "0.2.20080216.1",
           "downloadUrl": "http://ftp.debian.org/debian/pool/main/t/ttf-arphic-uming/ttf-arphic-uming_0.2.20080216.1.orig.tar.gz"
