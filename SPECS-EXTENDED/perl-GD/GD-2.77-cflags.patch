@@ -1,6 +1,6 @@
 --- Makefile.PL
 +++ Makefile.PL
-@@ -259,7 +259,7 @@ print F $DEFINES,"\n";
+@@ -339,7 +339,7 @@ print F $DEFINES,"\n";
  close F;
  
  my $CCFLAGS = $Config{ccflags};
@@ -8,4 +8,4 @@
 +$CCFLAGS .= " -Wall -Wextra" if $Config{gccversion} and $] > 5.020;
  # hardened CFLAGS for testing
  #$CCFLAGS .= ' -D_GNU_SOURCE -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches';
- 
+ my $LDDLFLAGS = $Config{lddlflags};
