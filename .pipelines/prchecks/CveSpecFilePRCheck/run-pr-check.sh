@@ -27,6 +27,9 @@ USE_EXIT_CODE_SEVERITY=${USE_EXIT_CODE_SEVERITY:-false}
 POST_GITHUB_COMMENTS=${POST_GITHUB_COMMENTS:-false}
 USE_GITHUB_CHECKS=${USE_GITHUB_CHECKS:-false}
 
+# Initialize CMD to avoid unbound variable errors
+CMD=""
+
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
   key="$1"
@@ -154,17 +157,26 @@ echo "  - Target: ${SYSTEM_PULLREQUEST_TARGETCOMMITID}"
 # 2) Install Python dependencies into your active environment
 echo "📦 Installing Python dependencies…"
 pip install --upgrade pip
-
-# Install all dependencies from requirements.txt (including azure-identity and azure-ai-openai)
 echo "📦 Installing dependencies from requirements.txt..."
 pip install -r requirements.txt
 
-# 3) Run the CVE spec file checker
-echo "🔍 Running CveSpecFilePRCheck.py…"
+# 3) Build the Python invocation command with flags
+echo "⚙️  Building Python command for CveSpecFilePRCheck.py"
+CMD="python3 CveSpecFilePRCheck.py"
+if [[ "${FAIL_ON_WARNINGS,,}" = "true" ]]; then
+  CMD="$CMD --fail-on-warnings"
+fi
+if [[ "${USE_EXIT_CODE_SEVERITY,,}" = "true" ]]; then
+  CMD="$CMD --exit-code-severity"
+fi
+if [[ "${POST_GITHUB_COMMENTS,,}" = "true" ]]; then
+  CMD="$CMD --post-github-comments"
+fi
+if [[ "${USE_GITHUB_CHECKS,,}" = "true" ]]; then
+  CMD="$CMD --use-github-checks"
+fi
 
-# Build and run Python command
-echo "🚀 Running command: $CMD"
+# 4) Execute the analysis
+echo "🔍 Running CveSpecFilePRCheck with: $CMD"
 eval $CMD
-
-# Exit with the same code as the Python script
 exit $?
