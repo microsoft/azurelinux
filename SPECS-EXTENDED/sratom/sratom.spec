@@ -1,27 +1,30 @@
-%global maj 0
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
+%global maj 0
 %bcond_with docs
+
 Summary:        A C library for serializing LV2 plugins
 Name:           sratom
-Version:        0.6.10
-Release:        3%{?dist}
+Version:        0.6.16
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://drobilla.net/software/%{name}/
-Source0:        https://download.drobilla.net/%{name}-%{version}.tar.bz2
+Source0:    https://download.drobilla.net/%{name}-%{version}.tar.xz
+Source1:    https://download.drobilla.net/%{name}-%{version}.tar.xz.sig
+Source2:    https://drobilla.net/drobilla.gpg
+
 BuildRequires:  doxygen
 BuildRequires:  gcc
+BuildRequires:  gnupg2
 BuildRequires:  graphviz
-BuildRequires:  lv2-devel >= 1.16.0
-BuildRequires:  python3
-BuildRequires:  sord-devel >= 0.14.0
+BuildRequires:  pkgconfig(sord-0) >= 0.16.16
+BuildRequires:  pkgconfig(serd-0) >= 0.30.10
+BuildRequires:  meson
+BuildRequires:  pkgconfig(lv2) >= 1.18.4
 %if %{with docs}
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_lv2_theme
-%endif
-%if %{with check}
-BuildRequires:  lcov
 %endif
 
 %description
@@ -45,35 +48,28 @@ control with network transparency.
 This package contains the headers and development libraries for %{name}.
 
 %prep
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %autosetup -p1
 
-# for packagers sake, build the tests with debug symbols
-sed -i -e "s| '-ftest-coverage'\]|\
- '-ftest-coverage'\] + '%{optflags}'.split(' ')|" wscript
-
 %build
-%{set_build_flags}
-%{python3} waf configure -v \
-    --prefix=%{_prefix} \
-    --libdir=%{_libdir} \
-    --mandir=%{_mandir} \
-    --datadir=%{_datadir} \
-    --docdir=%{_pkgdocdir} \
 %if %{with docs}
-    --docs \
+%meson
+%meson_build
 %endif
-    --test
-%{python3} waf build -v %{?_smp_mflags}
+
+%meson -Ddocs=disabled
+%meson_build
+
 
 %install
-DESTDIR=%{buildroot} %{python3} waf install
-chmod +x %{buildroot}%{_libdir}/lib%{name}-0.so.*
+%meson_install
+
 %if %{with docs}
-install -pm 644 NEWS README.md %{buildroot}%{_pkgdocdir}
+mv %{buildroot}%{_docdir}/%{name}-%{maj} %{buildroot}%{_pkgdocdir}
 %endif
 
 %check
-%{python3} waf test -v
+%meson_test
 
 %files
 %if %{with docs}
@@ -93,6 +89,10 @@ install -pm 644 NEWS README.md %{buildroot}%{_pkgdocdir}
 %{_includedir}/%{name}-%{maj}/
 
 %changelog
+* Tue Feb 25 2025 Jyoti kanase <v-jykanase@microsoft.com> -  0.6.16-1
+- Upgrade to 0.6.16
+- License verified.
+
 * Thu Nov 24 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.6.10-3
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Make building 'docs' conditional, disabled by default
