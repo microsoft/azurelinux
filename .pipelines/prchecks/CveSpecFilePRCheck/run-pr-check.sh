@@ -150,6 +150,31 @@ if [ "$POST_GITHUB_COMMENTS" = "true" ] || [ "$USE_GITHUB_CHECKS" = "true" ]; th
   fi
 fi
 
+echo "🔍 Ensuring GitHub repo and PR context..."
+# Derive repository in 'owner/repo' format if missing
+if [ -z "${GITHUB_REPOSITORY:-}" ]; then
+  remote_url=$(git config --get remote.origin.url || echo "")
+  if [[ $remote_url =~ github\.com[:/](.+)\.git ]]; then
+    export GITHUB_REPOSITORY="${BASH_REMATCH[1]}"
+    echo "🔎 Derived GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
+  else
+    echo "⚠️ Could not derive GITHUB_REPOSITORY from git remote URL"
+  fi
+fi
+
+# Derive PR number if missing
+if [ -z "${GITHUB_PR_NUMBER:-}" ]; then
+  if [ -n "${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER:-}" ]; then
+    export GITHUB_PR_NUMBER="${SYSTEM_PULLREQUEST_PULLREQUESTNUMBER}"
+    echo "🔎 Derived GITHUB_PR_NUMBER=$GITHUB_PR_NUMBER from SYSTEM_PULLREQUEST_PULLREQUESTNUMBER"
+  elif [ -n "${SYSTEM_PULLREQUEST_PULLREQUESTID:-}" ]; then
+    export GITHUB_PR_NUMBER="${SYSTEM_PULLREQUEST_PULLREQUESTID}"
+    echo "🔎 Derived GITHUB_PR_NUMBER=$GITHUB_PR_NUMBER from SYSTEM_PULLREQUEST_PULLREQUESTID"
+  else
+    echo "⚠️ SYSTEM_PULLREQUEST_PULLREQUESTNUMBER or ID not set, comments may not post"
+  fi
+fi
+
 echo "🔍 Using commits for diff:"
 echo "  - Source: ${SYSTEM_PULLREQUEST_SOURCECOMMITID}"
 echo "  - Target: ${SYSTEM_PULLREQUEST_TARGETCOMMITID}"
