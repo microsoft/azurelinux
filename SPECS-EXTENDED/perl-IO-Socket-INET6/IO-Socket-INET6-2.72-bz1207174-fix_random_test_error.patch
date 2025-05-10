@@ -1,0 +1,11 @@
+diff -ru IO-Socket-INET6-2.72.orig/t/io_multihomed6.t IO-Socket-INET6-2.72/t/io_multihomed6.t
+--- IO-Socket-INET6-2.72.orig/t/io_multihomed6.t	2021-05-19 13:13:17.967244890 +0200
++++ IO-Socket-INET6-2.72/t/io_multihomed6.t	2021-05-19 13:14:36.633223816 +0200
+@@ -103,6 +103,7 @@
+     push @srv,
+         IO::Socket::INET6->new(
+             Listen => 2,
++            ReuseAddr => 1,
+             LocalAddr => $addr,
+             LocalPort => $port,
+         ) || die "listen on $addr port $port: $!";
