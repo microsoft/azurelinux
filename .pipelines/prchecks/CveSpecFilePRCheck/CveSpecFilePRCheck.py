@@ -506,6 +506,9 @@ def main():
                       help='Use GitHub Checks API for multi-level notifications')
     args = parser.parse_args()
     
+    # Derive GitHub context from environment variables
+    _derive_github_context()
+    
     try:
         # Gather git diff
         diff = gather_diff()

@@ -95,7 +95,20 @@ steps:
         which python3
         echo "Using system Python instead of downloading version"
 
-  # 5) Run your PR‐check entrypoint (installs deps & invokes Azure OpenAI)
+  # 5) Debug GitHub Integration Settings
+  - task: Bash@3
+    displayName: 'Debug GitHub Integration Settings'
+    inputs:
+      targetType: inline
+      script: |
+        echo "System.AccessToken: ${SYSTEM_ACCESSTOKEN:0:4}..."
+        echo "GitHub Access Token: ${GITHUB_ACCESS_TOKEN:0:4}..."
+        echo "ENDPOINT_AUTH_MICROSOFT_PARAMETER_ACCESSTOKEN: ${ENDPOINT_AUTH_MICROSOFT_PARAMETER_ACCESSTOKEN:0:4}..."
+        echo "Build.Repository.Name: $(Build.Repository.Name)"
+        echo "System.PullRequest.PullRequestId: $(System.PullRequest.PullRequestId)"
+        echo "System.PullRequest.SourceBranch: $(System.PullRequest.SourceBranch)"
+
+  # 6) Run your PR‐check entrypoint (installs deps & invokes Azure OpenAI)
   - task: Bash@3
     displayName: '🔍 Run PR Check'
     env:
