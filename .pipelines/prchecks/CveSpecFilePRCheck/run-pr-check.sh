@@ -117,36 +117,32 @@ fi
 # Enhanced GitHub integration settings
 echo "🔍 Setting up GitHub API access..."
 
-# Ensure GITHUB_ACCESS_TOKEN picks up Azure DevOps System.AccessToken
-# CRITICAL FIX: Manually setting GitHub access token if not already set
-if [ -z "${GITHUB_ACCESS_TOKEN:-}" ]; then
-  if [ -n "${GITHUB_TOKEN:-}" ]; then
-    export GITHUB_ACCESS_TOKEN="$GITHUB_TOKEN"
-    echo "🔑 Using GITHUB_TOKEN as GITHUB_ACCESS_TOKEN"
-  elif [ -n "${AZDO_GITHUB_TOKEN:-}" ]; then
-    export GITHUB_ACCESS_TOKEN="$AZDO_GITHUB_TOKEN"
-    echo "🔑 Using AZDO_GITHUB_TOKEN as GITHUB_ACCESS_TOKEN"
-  fi
-fi
-
-# Also pick up Azure DevOps OAuth token if available
+# IMPORTANT: We're using SYSTEM_ACCESSTOKEN as our single source of GitHub auth
+# Do NOT explicitly set GITHUB_ACCESS_TOKEN since the GitHubClient will directly use SYSTEM_ACCESSTOKEN
 if [ -n "${SYSTEM_ACCESSTOKEN:-}" ]; then
-  export GITHUB_ACCESS_TOKEN="$SYSTEM_ACCESSTOKEN"
-  echo "🔑 Using SYSTEM_ACCESSTOKEN as GITHUB_ACCESS_TOKEN"
+  echo "✅ SYSTEM_ACCESSTOKEN is available for GitHub OAuth authentication"
+  # Log the token prefix (first few chars) for debugging
+  echo "🔑 Token prefix: ${SYSTEM_ACCESSTOKEN:0:4}..."
+else
+  echo "❌ SYSTEM_ACCESSTOKEN is not set - GitHub integration will be disabled"
+  # Disable GitHub integration features if no token is available
+  POST_GITHUB_COMMENTS=false
+  USE_GITHUB_CHECKS=false
 fi
 
-# Simplify GitHub integration: enable comments if token present
-# Check if GitHub PAT is available - needed for posting comments
+# Verify GitHub integration settings
 if [ "$POST_GITHUB_COMMENTS" = "true" ] || [ "$USE_GITHUB_CHECKS" = "true" ]; then
   echo "🔍 GitHub Integration Enabled"
   echo "  - Repository: ${GITHUB_REPOSITORY:-NOT SET}"
   echo "  - PR Number: ${GITHUB_PR_NUMBER:-NOT SET}"
-  if [ -n "${GITHUB_ACCESS_TOKEN:-}" ]; then
-    echo "  ✅ GITHUB_ACCESS_TOKEN is set, comments/checks will be posted"
-  else
-    echo "  ⚠️ GITHUB_ACCESS_TOKEN not set, GitHub integration will be disabled"
-    POST_GITHUB_COMMENTS=false
-    USE_GITHUB_CHECKS=false
+  
+  # Verify required variables
+  if [ -z "${GITHUB_REPOSITORY:-}" ]; then
+    echo "⚠️ GITHUB_REPOSITORY not set, GitHub integration may fail"
+  fi
+  
+  if [ -z "${GITHUB_PR_NUMBER:-}" ]; then
+    echo "⚠️ GITHUB_PR_NUMBER not set, GitHub integration may fail"
   fi
 fi
 

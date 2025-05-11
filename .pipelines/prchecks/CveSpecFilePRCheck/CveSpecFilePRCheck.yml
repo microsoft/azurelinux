@@ -50,29 +50,32 @@ variables:
   USE_EXIT_CODE_SEVERITY: ${{ parameters.useExitCodeSeverity }}
   POST_GITHUB_COMMENTS:  ${{ parameters.postGitHubComments }}
   USE_GITHUB_CHECKS:     ${{ parameters.useGitHubChecks }}
+  # Explicitly set the GitHub PR number from Azure DevOps variables
+  GITHUB_PR_NUMBER:      $(System.PullRequest.PullRequestNumber)
+  GITHUB_REPOSITORY:     $(Build.Repository.Name)
 
 steps:
-  # 1) Clone the repo
+  # 1) Clone the repo with OAuth token access
   - checkout: self
     fetchDepth: 2
     persistCredentials: true
 
-  # 2) Debug workspace (optional)
+  # 2) Debug GitHub Integration Settings
   - task: Bash@3
-    displayName: '🔍 Debug: list workspace contents'
+    displayName: 'Debug GitHub Integration Settings'
     inputs:
       targetType: inline
       script: |
-        echo "Working directory: $(pwd)"
-        ls -la .
-        ls -la .pipelines/prchecks/CveSpecFilePRCheck || echo "Directory not found"
-        echo "PR Source Branch: $(System.PullRequest.SourceBranch)"
-        echo "PR Target Branch: $(System.PullRequest.TargetBranch)"
-        echo "Modified files in PR:"
-        git fetch origin "+refs/heads/${SYSTEM_PULLREQUEST_TARGETBRANCH}:refs/remotes/origin/${SYSTEM_PULLREQUEST_TARGETBRANCH}"
-        git diff --name-only "origin/$(System.PullRequest.TargetBranch)" HEAD
+        echo "Build.Repository.Name: $(Build.Repository.Name)"
+        echo "System.PullRequest.PullRequestNumber: $(System.PullRequest.PullRequestNumber)"
+        echo "System.AccessToken exists: $([[ ! -z "${SYSTEM_ACCESSTOKEN}" ]] && echo 'Yes' || echo 'No')"
+        echo "SYSTEM_ACCESSTOKEN prefix: ${SYSTEM_ACCESSTOKEN:0:4}..."
+        echo "Build.SourceBranch: $(Build.SourceBranch)"
+        echo "Build.SourceVersion: $(Build.SourceVersion)"
+        echo "System.TeamFoundationCollectionUri: $(System.TeamFoundationCollectionUri)"
+        echo "System.TeamProject: $(System.TeamProject)"
 
-  # 3) Apply OpenAI config via your UMI-login script
+  # 3) Apply OpenAI config via UMI-login script
   - task: Bash@3
     displayName: '⚙️  Apply OpenAI Config'
     inputs:
@@ -95,35 +98,29 @@ steps:
         which python3
         echo "Using system Python instead of downloading version"
 
-  # 5) Debug GitHub Integration Settings
-  - task: Bash@3
-    displayName: 'Debug GitHub Integration Settings'
-    inputs:
-      targetType: inline
-      script: |
-        echo "System.AccessToken: ${SYSTEM_ACCESSTOKEN:0:4}..."
-        echo "GitHub Access Token: ${GITHUB_ACCESS_TOKEN:0:4}..."
-        echo "ENDPOINT_AUTH_MICROSOFT_PARAMETER_ACCESSTOKEN: ${ENDPOINT_AUTH_MICROSOFT_PARAMETER_ACCESSTOKEN:0:4}..."
-        echo "Build.Repository.Name: $(Build.Repository.Name)"
-        echo "System.PullRequest.PullRequestId: $(System.PullRequest.PullRequestId)"
-        echo "System.PullRequest.SourceBranch: $(System.PullRequest.SourceBranch)"
-
-  # 6) Run your PR‐check entrypoint (installs deps & invokes Azure OpenAI)
+  # 5) Run PR‐check entrypoint with SYSTEM_ACCESSTOKEN 
   - task: Bash@3
     displayName: '🔍 Run PR Check'
     env:
+      # Use System.AccessToken for GitHub authentication
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-      GITHUB_REPOSITORY:   $(Build.Repository.Name)   # "owner/repo"
-      BUILD_SOURCEBRANCH:  $(Build.SourceBranch)       # "refs/pull/<PR>/merge"
+      # Explicitly set GitHub repo name from Azure DevOps variables
+      GITHUB_REPOSITORY: $(Build.Repository.Name)
+      # Set PR number explicitly
+      GITHUB_PR_NUMBER: $(System.PullRequest.PullRequestNumber)
+      # Set the source branch and version
+      BUILD_SOURCEBRANCH: $(Build.SourceBranch)
+      SYSTEM_PULLREQUEST_SOURCECOMMITID: $(Build.SourceVersion)
     inputs:
       targetType: inline
       script: |
-        # ───────────────────────────────────────────────────────
-        # Pull the GitHub App token from your service connection
-        # ───────────────────────────────────────────────────────
-        export GITHUB_ACCESS_TOKEN="${ENDPOINT_AUTH_MICROSOFT_PARAMETER_ACCESSTOKEN}"
-        echo "🔑 GitHub token prefix: ${GITHUB_ACCESS_TOKEN:0:4}…"
-
+        # We're using SYSTEM_ACCESSTOKEN as our GitHub token (OAuth token)
+        # DO NOT set GITHUB_ACCESS_TOKEN here
+        
+        echo "🔑 Using SYSTEM_ACCESSTOKEN for GitHub authentication"
+        echo "Repository: ${GITHUB_REPOSITORY}"
+        echo "PR Number: ${GITHUB_PR_NUMBER}"
+        
         cd .pipelines/prchecks/CveSpecFilePRCheck
         chmod +x run-pr-check.sh
 

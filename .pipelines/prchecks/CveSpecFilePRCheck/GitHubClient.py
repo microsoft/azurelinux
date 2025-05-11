@@ -13,11 +13,13 @@ import os
 import requests
 import logging
 import json
+import re
 from enum import Enum
 from typing import Dict, List, Any, Optional
 from AntiPatternDetector import Severity
 
 # Configure logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("github-client")
 
 class CheckStatus(Enum):
@@ -35,25 +37,88 @@ class GitHubClient:
     
     def __init__(self):
         """Initialize the GitHub client using environment variables for auth"""
-        # Get required environment variables
-        self.token = os.environ.get("GITHUB_ACCESS_TOKEN")
+        # Try multiple token environment variables in order of preference
+        token_vars = [
+            "SYSTEM_ACCESSTOKEN",  # Prioritize Azure DevOps OAuth token first
+            "GITHUB_ACCESS_TOKEN", 
+            "GITHUB_TOKEN", 
+            "AZDO_GITHUB_TOKEN"
+        ]
+        
+        self.token = None
+        for var in token_vars:
+            if os.environ.get(var):
+                self.token = os.environ.get(var)
+                logger.info(f"Using {var} for GitHub authentication")
+                break
+                
+        # Get repository details from environment variables
         self.repo_name = os.environ.get("GITHUB_REPOSITORY", "")  # Format: owner/repo
-        self.pr_number = os.environ.get("GITHUB_PR_NUMBER", "")
         
-        # Validate required environment variables
+        # If GITHUB_REPOSITORY not set or empty, try to construct from BUILD_REPOSITORY_NAME
+        if not self.repo_name or self.repo_name == "":
+            self.repo_name = os.environ.get("BUILD_REPOSITORY_NAME", "")
+            logger.info(f"Using BUILD_REPOSITORY_NAME: {self.repo_name}")
+            
+        # For Azure DevOps hosted repos, convert to GitHub format if needed
+        if self.repo_name and "/" not in self.repo_name:
+            if "microsoft" in self.repo_name.lower():
+                self.repo_name = f"microsoft/{self.repo_name}"
+                logger.info(f"Converted repo name to GitHub format: {self.repo_name}")
+        
+        # Get PR number from multiple possible environment variables
+        pr_vars = [
+            "GITHUB_PR_NUMBER",
+            "SYSTEM_PULLREQUEST_PULLREQUESTNUMBER", 
+            "SYSTEM_PULLREQUEST_PULLREQUESTID"
+        ]
+        
+        self.pr_number = ""
+        for var in pr_vars:
+            if os.environ.get(var):
+                self.pr_number = os.environ.get(var)
+                logger.info(f"Using {var} for PR number: {self.pr_number}")
+                break
+                
+        # If PR number still not found, try to extract from the source branch
+        if not self.pr_number:
+            source_branch = os.environ.get("BUILD_SOURCEBRANCH", "") or os.environ.get("SYSTEM_PULLREQUEST_SOURCEBRANCH", "")
+            logger.info(f"Trying to extract PR number from branch: {source_branch}")
+            
+            match = re.match(r"refs/pull/(\d+)", source_branch)
+            if match:
+                self.pr_number = match.group(1)
+                logger.info(f"Extracted PR number from branch: {self.pr_number}")
+        
+        # Validate and log configuration state
         if not self.token:
-            logger.warning("GITHUB_ACCESS_TOKEN not set, GitHub API interactions will be disabled")
+            logger.error("No GitHub token found in environment variables")
+        else:
+            # Safely log token prefix (first few chars only)
+            token_prefix = self.token[:4] if self.token else ""
+            logger.info(f"GitHub token prefix: {token_prefix}...")
+            
+        logger.info(f"GitHub repository: {self.repo_name}")
+        logger.info(f"GitHub PR number: {self.pr_number}")
         
-        if not self.repo_name or not self.pr_number:
-            logger.warning("GITHUB_REPOSITORY or GITHUB_PR_NUMBER not set, GitHub API interactions will be limited")
-        
-        # Set up base API URL and headers
+        # Set up base API URL and headers for GitHub API
         self.api_base_url = "https://api.github.com"
         self.headers = {
-            "Authorization": f"token {self.token}",
-            "Accept": "application/vnd.github.v3+json"
+            "Accept": "application/vnd.github.v3+json",
+            "User-Agent": "Azure-Linux-PR-Check"
         }
         
+        # Add authorization header if token is available
+        if self.token:
+            # For Azure DevOps System.AccessToken, use Bearer format
+            if os.environ.get("SYSTEM_ACCESSTOKEN") == self.token:
+                self.headers["Authorization"] = f"Bearer {self.token}"
+                logger.info("Using Bearer authentication format for Azure DevOps token")
+            else:
+                # GitHub PATs use the token format
+                self.headers["Authorization"] = f"token {self.token}"
+                logger.info("Using token authentication format for GitHub PAT")
+    
     def create_check_run(self, name: str, head_sha: str, status: CheckStatus, 
                          conclusion: Optional[CheckStatus] = None,
                          output_title: Optional[str] = None, 
