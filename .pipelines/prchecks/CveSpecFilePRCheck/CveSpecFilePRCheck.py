@@ -476,6 +476,23 @@ def update_github_status(severity: Severity, anti_patterns: List[AntiPattern], a
         logger.error(f"Failed to update GitHub status: {str(e)}")
         # Continue execution - GitHub updates shouldn't cause pipeline failure
 
+def _derive_github_context():
+    repo = os.getenv("GITHUB_REPOSITORY", "").strip()
+    if not repo:
+        repo = os.getenv("BUILD_REPOSITORY_NAME", "").strip()
+    
+    pr_num = os.getenv("GITHUB_PR_NUMBER", "").strip()
+    if not pr_num:
+        branch = os.getenv("BUILD_SOURCEBRANCH", "") or os.getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH", "")
+        match = re.match(r"refs/pull/(\d+)", branch)
+        if match:
+            pr_num = match.group(1)
+    
+    if repo:
+        os.environ["GITHUB_REPOSITORY"] = repo
+    if pr_num:
+        os.environ["GITHUB_PR_NUMBER"] = pr_num
+
 def main():
     """Main entry point for the script"""
     parser = argparse.ArgumentParser(description="CVE Spec File PR Check")

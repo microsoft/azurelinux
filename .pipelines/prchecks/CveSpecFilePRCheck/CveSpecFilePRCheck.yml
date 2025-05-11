@@ -1,5 +1,16 @@
 # prchecks/CveSpecFilePRCheck/CveSpecFilePRCheck.yml
 # Trigger on PRs to fasttrack/abadawi/test/3.0 when .spec or .patch files change
+
+# ──────────────────────────────────────────────────────────────────────────────
+# 1) Reference your GitHub service connection here
+# ──────────────────────────────────────────────────────────────────────────────
+resources:
+  repositories:
+    - repository: self
+      type: github
+      name: microsoft/azurelinux   # <org>/<repo>
+      endpoint: microsoft          # <your service-connection name>
+
 trigger: none
 
 pr:
@@ -35,18 +46,18 @@ parameters:
     default: true
 
 variables:
-  FAIL_ON_WARNINGS: ${{ parameters.failOnWarnings }}
+  FAIL_ON_WARNINGS:      ${{ parameters.failOnWarnings }}
   USE_EXIT_CODE_SEVERITY: ${{ parameters.useExitCodeSeverity }}
-  POST_GITHUB_COMMENTS: ${{ parameters.postGitHubComments }}
-  USE_GITHUB_CHECKS: ${{ parameters.useGitHubChecks }}
+  POST_GITHUB_COMMENTS:  ${{ parameters.postGitHubComments }}
+  USE_GITHUB_CHECKS:     ${{ parameters.useGitHubChecks }}
 
 steps:
   # 1) Clone the repo
   - checkout: self
-    fetchDepth: 2           # still just pull the last 2 commits
-    persistCredentials: true # ← allow further git fetches
+    fetchDepth: 2
+    persistCredentials: true
 
-  # 2) Debug workspace (optional — remove once paths are correct)
+  # 2) Debug workspace (optional)
   - task: Bash@3
     displayName: '🔍 Debug: list workspace contents'
     inputs:
@@ -60,23 +71,18 @@ steps:
         echo "Modified files in PR:"
         git fetch origin "+refs/heads/${SYSTEM_PULLREQUEST_TARGETBRANCH}:refs/remotes/origin/${SYSTEM_PULLREQUEST_TARGETBRANCH}"
         git diff --name-only "origin/$(System.PullRequest.TargetBranch)" HEAD
-        
+
   # 3) Apply OpenAI config via your UMI-login script
   - task: Bash@3
     displayName: '⚙️  Apply OpenAI Config'
     inputs:
       targetType: inline
       script: |
-        # make sure we're in the folder containing the scripts
         cd .pipelines/prchecks/CveSpecFilePRCheck
-
-        # fail fast if the script is missing
         if [ ! -f apply-security-config.sh ]; then
           echo "❌ Cannot find apply-security-config.sh in $(pwd)"
           exit 1
         fi
-
-        # run the UMI-login + var-export script
         bash apply-security-config.sh --openaiModel=o3-mini
 
   # 4) Verify and use system Python
@@ -94,27 +100,26 @@ steps:
     displayName: '🔍 Run PR Check'
     env:
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-      GITHUB_ACCESS_TOKEN: $(System.AccessToken)
+      GITHUB_REPOSITORY:   $(Build.Repository.Name)   # "owner/repo"
+      BUILD_SOURCEBRANCH:  $(Build.SourceBranch)       # "refs/pull/<PR>/merge"
     inputs:
       targetType: inline
       script: |
+        # ───────────────────────────────────────────────────────
+        # Pull the GitHub App token from your service connection
+        # ───────────────────────────────────────────────────────
+        export GITHUB_ACCESS_TOKEN="${ENDPOINT_AUTH_MICROSOFT_PARAMETER_ACCESSTOKEN}"
+        echo "🔑 GitHub token prefix: ${GITHUB_ACCESS_TOKEN:0:4}…"
+
         cd .pipelines/prchecks/CveSpecFilePRCheck
         chmod +x run-pr-check.sh
-        
-        # Pass parameters to the script
+
+        # Build command with your flags
         CMD="./run-pr-check.sh"
-        if [ "$FAIL_ON_WARNINGS" = "True" ]; then
-          CMD="$CMD --fail-on-warnings"
-        fi
-        if [ "$USE_EXIT_CODE_SEVERITY" = "True" ]; then
-          CMD="$CMD --exit-code-severity"
-        fi
-        if [ "$POST_GITHUB_COMMENTS" = "True" ]; then
-          CMD="$CMD --post-github-comments"
-        fi
-        if [ "$USE_GITHUB_CHECKS" = "True" ]; then
-          CMD="$CMD --use-github-checks"
-        fi
-        
+        if [ "$FAIL_ON_WARNINGS"       = "True" ]; then CMD="$CMD --fail-on-warnings";      fi
+        if [ "$USE_EXIT_CODE_SEVERITY" = "True" ]; then CMD="$CMD --exit-code-severity";   fi
+        if [ "$POST_GITHUB_COMMENTS"   = "True" ]; then CMD="$CMD --post-github-comments"; fi
+        if [ "$USE_GITHUB_CHECKS"      = "True" ]; then CMD="$CMD --use-github-checks";    fi
+
         echo "Running command: $CMD"
         $CMD
