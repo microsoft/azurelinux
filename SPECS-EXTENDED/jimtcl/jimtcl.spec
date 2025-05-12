@@ -1,67 +1,100 @@
+%bcond_without tests
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           jimtcl
-Version:        0.78
-Release:        5%{?dist}
+Version:        0.81
+Release:        6%{?dist}
 Summary:        A small embeddable Tcl interpreter
 
 License:        BSD
 URL:            http://jim.tcl.tk
 Source0:        https://github.com/msteveb/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
-Patch0:         jimtcl-fix_doc_paths.patch
+# support using lib64 instead of lib
+Patch0:         %{name}-lib64.patch
 
-BuildRequires:  gcc
+BuildRequires:  gcc-c++
 BuildRequires:  asciidoc
+BuildRequires:  make
+# Extension dependencies
+BuildRequires:  pkgconfig(openssl)
+%ifnarch s390x
+# zlib test fails on s390x
+BuildRequires:  pkgconfig(zlib)
+%endif
+%if %{with tests}
+BuildRequires:  hostname
+%endif
 
-%description
-Jim is an opensource small-footprint implementation of the Tcl programming 
+%global _description %{expand:
+Jim is an opensource small-footprint implementation of the Tcl programming
 language. It implements a large subset of Tcl and adds new features like 
 references with garbage collection, closures, built-in Object Oriented 
 Programming system, Functional Programming commands, first-class arrays and 
-UTF-8 support.
+UTF-8 support.}
+
+%description %{_description}
+
 
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-%description    devel
+%description    devel %{_description}
+
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-%prep
-%setup -q
-%patch 0
 
+%prep
+%autosetup -p1
 rm -rf sqlite3
 
 %build
 #configure is not able to locate the needed binaries, so specify it manualy
-export CC=gcc
-export LD=ld
+# export CC=gcc
+# export LD=ld
 export AR=ar
 export RANLIB=ranlib
 export STRIP=strip
 
-%configure --full --shared --disable-option-checking
-make %{?_smp_mflags}
+# compile extensions that are disabled by default
+# as modules
+# see ./configure --extinfo for list
+%configure --shared --disable-option-checking \
+  --allextmod \
+  --docdir=%{_datadir}/doc/%{name} \
+# make %{?_smp_mflags}
+%make_build
 
-%check
-make test
 
 %install
-%make_install
-rm -rf %{buildroot}/%{_datadir}/doc/%{name}
-rm -rf %{buildroot}/%{_libdir}/jim/tcltest.tcl
+%make_install INSTALL_DOCS=nodocs
+rm %{buildroot}/%{_libdir}/jim/README.extensions
 pushd %{buildroot}/%{_libdir}/
 ln -s libjim.so.* libjim.so
 popd
 
-%ldconfig_scriptlets
+
+%if %{with tests}
+%check
+# remove tests that require network access
+rm tests/ssl.test
+make test
+%endif
+
 
 %files
-%doc LICENSE AUTHORS README Tcl.html
+%license LICENSE
+%doc AUTHORS README
+%doc %{_datadir}/doc/%{name}/Tcl.html
+%{_bindir}/jimdb
 %{_bindir}/jimsh
+%dir %{_libdir}/jim
+%{_libdir}/jim/*.tcl
+%{_libdir}/jim/*.so
 %{_libdir}/libjim.so.*
+
 
 %files devel
 %doc DEVELOPING README.extensions README.metakit README.namespaces README.oo README.utf-8 STYLE
@@ -71,8 +104,42 @@ popd
 %{_libdir}/pkgconfig/jimtcl.pc
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.78-5
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon May 12 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.81-6
+- Initial Azure Linux import from Fedora 38 (license: MIT).
+- License verified
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.81-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.81-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.81-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jan 07 2022 Michel Alexandre Salim <salimma@fedoraproject.org> - 0.81-2
+- Disable zlib module on s390x (tests fail)
+
+* Fri Jan 07 2022 Michel Alexandre Salim <salimma@fedoraproject.org> - 0.81-1
+- Update to 0.81
+- Ship extensions that are disabled by default as modules
+- Opt in to rpmautospec
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.78-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.78-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Aug 06 2020 Jeff Law <law@redhat.com> - 0.78-6
+- Depend on g++
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.78-6
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.78-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.78-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -153,4 +220,5 @@ popd
 
 * Sun May 05 2013 Markus Mayer <lotharlutz@gmx.de> - 0.73-1
 - inital prm release
+
 
