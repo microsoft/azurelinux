@@ -17,8 +17,6 @@ BuildRequires:  json-c-devel
 BuildRequires:  json-glib-devel
 BuildRequires:  python3-devel
 BuildRequires:  systemd-devel
-BuildRequires:  automake
-BuildRequires:  autoconf
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  python3-pip
