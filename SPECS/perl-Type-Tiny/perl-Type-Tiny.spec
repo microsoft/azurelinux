@@ -46,7 +46,7 @@ BuildRequires:  perl(lib)
 BuildRequires:  perl(Math::BigFloat)
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(Test::Fatal)
-BuildRequires:  perl(Test::Moose)
+#BuildRequires:  perl(Test::Moose)
 BuildRequires:  perl(Test::More) >= 0.96
 BuildRequires:  perl(Test::Requires)
 BuildRequires:  perl(Test::Tester) >= 0.109
@@ -62,88 +62,6 @@ BuildRequires:  perl(Tie::Hash)
 BuildRequires:  perl(Tie::Scalar)
 BuildRequires:  perl(utf8)
 BuildRequires:  perl(warnings)
- 
-# optional
-BuildRequires:  perl(boolean)
-# N/A in Fedora: BuildRequires:  perl(Class::InsideOut)
-BuildRequires:  perl(Class::ISA)
-%if "%{version}" >= "2.000001"
-# N/A in Fedora: BuildRequires:  perl(Class::Plain)
-%endif
-BuildRequires:  perl(Data::Constraint)
-BuildRequires:  perl(Devel::Hide)
-BuildRequires:  perl(Devel::LexAlias) >= 0.05
-BuildRequires:  perl(Devel::Refcount)
-BuildRequires:  perl(Devel::StackTrace)
-BuildRequires:  perl(Exporter) >= 5.59
-BuildRequires:  perl(Function::Parameters)
-BuildRequires:  perl(IO::String)
-BuildRequires:  perl(JSON::PP) >= 2.27105
-# N/A in Fedora: BuildRequires:  perl(Kavorka)
-BuildRequires:  perl(match::simple)
-BuildRequires:  perl(Method::Generate::Accessor)
-BuildRequires:  perl(Moo)
-BuildRequires:  perl(Moo::Role)
-%if !%{defined perl_bootstrap}
-# Build cycle perl-MooX-TypeTiny <-> perl-Type-Tiny
-BuildRequires:  perl(MooX::TypeTiny)
-%endif
-# N/A in Fedora: BuildRequires:  perl(Moops)
-BuildRequires:  perl(Moose) >= 2.0400
-BuildRequires:  perl(Moose::Meta::TypeCoercion)
-BuildRequires:  perl(Moose::Meta::TypeCoercion::Union)
-BuildRequires:  perl(Moose::Meta::TypeConstraint)
-BuildRequires:  perl(Moose::Meta::TypeConstraint::Class)
-BuildRequires:  perl(Moose::Meta::TypeConstraint::DuckType)
-BuildRequires:  perl(Moose::Meta::TypeConstraint::Enum)
-BuildRequires:  perl(Moose::Meta::TypeConstraint::Union)
-BuildRequires:  perl(Moose::Util::TypeConstraints)
-BuildRequires:  perl(MooseX::Getopt) >= 0.63
-BuildRequires:  perl(MooseX::Types)
-BuildRequires:  perl(MooseX::Types::Common)
-# N/A in Fedora: BuildRequires:  perl(MooseX::Types::DBIx::Class)
-BuildRequires:  perl(MooseX::Types::Moose)
-BuildRequires:  perl(Mouse)
-BuildRequires:  perl(Mouse::Meta::TypeConstraint)
-BuildRequires:  perl(Mouse::Util)
-BuildRequires:  perl(Mouse::Util::TypeConstraints)
-BuildRequires:  perl(MouseX::Types)
-BuildRequires:  perl(MouseX::Types::Common)
-BuildRequires:  perl(MouseX::Types::Moose)
-BuildRequires:  perl(mro)
-BuildRequires:  perl(Object::Accessor)
-BuildRequires:  perl(re)
-BuildRequires:  perl(Ref::Util::XS) > 0.100
-%{?with_reply_plugin:BuildRequires:  perl(Reply::Plugin)}
-%if !%{defined perl_bootstrap}
-# Build-cycle: perl-Return-Type → perl-Type-Tiny
-BuildRequires:  perl(Return::Type) >= 0.004
-%endif
-BuildRequires:  perl(Role::Tiny)
-BuildRequires:  perl(Role::Tiny::With)
-BuildRequires:  perl(Sub::Exporter::Lexical) >= 0.092291
-BuildRequires:  perl(Specio)
-BuildRequires:  perl(Specio::Library::Builtins)
-BuildRequires:  perl(Sub::Name)
-BuildRequires:  perl(Sub::Quote)
-# N/A in Fedora: BuildRequires:  perl(Switcheroo)
-%{?with_reply_plugin:BuildRequires:  perl(Term::ANSIColor)}
-BuildRequires:  perl(Test::Memory::Cycle)
-BuildRequires:  perl(Test::Warnings)
-%if "%{version}" < "2.000001"
-BuildRequires:  perl(Type::Tie)
-%endif
-# N/A in Fedora: BuildRequires:  perl(Types::ReadOnly)
-%if !%{defined perl_bootstrap}
-# Build-cycle: perl-Type-Tiny-XS → perl-Type-Tiny
-BuildRequires:  perl(Type::Tiny::XS)
-# Build-cycle: perl-Types-Path-Tiny → perl-Type-Tiny
-BuildRequires:  perl(Types::Path::Tiny)
-# Build-cycle: perl-Validation-Class → perl-Hash-Flatten → perl-Log-Trace
-# → perl-Data-Serializer → perl-Crypt-CBC → perl-Crypt-PBKDF2 → perl-Type-Tiny
-BuildRequires:  perl(Validation::Class) >= 7.900017
-BuildRequires:  perl(Validation::Class::Simple)
-%endif
  
 Requires:       perl(B::Deparse)
 Requires:       perl(Carp)
