@@ -112,7 +112,6 @@ sed -i -e '/^inc\//d' MANIFEST
 %changelog
 * Mon May 12 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.008002-2
 - Initial Azure Linux import from Fedora 43 (license: MIT)
-- Source license verified to be GPL
 - License verified
 
 * Mon May 05 2025 Jitka Plesnikova <jplesnik@redhat.com> - 2.008002-1
