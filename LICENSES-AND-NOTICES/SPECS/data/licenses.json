@@ -2974,6 +2974,7 @@
                 "perl-Object-Accessor",
                 "perl-Path-Class",
                 "perl-Try-Tiny",
+                "perl-Type-Tiny",
                 "perl-Types-Serialiser",
                 "perl-WWW-Curl",
                 "perl-XML-Parser",
