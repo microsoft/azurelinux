@@ -17,6 +17,8 @@ BuildRequires:  json-c-devel
 BuildRequires:  json-glib-devel
 BuildRequires:  python3-devel
 BuildRequires:  systemd-devel
+BuildRequires:  automake
+BuildRequires:  autoconf
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  python3-pip
@@ -55,6 +57,7 @@ Requires:       %{name} = %{version}-%{release}
 %autosetup -p1
 rm -rf ../p3dir
 cp -a . ../p3dir
+autoreconf -fiv
 
 %build
 %configure \
