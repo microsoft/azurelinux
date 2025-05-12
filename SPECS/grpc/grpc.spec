@@ -14,6 +14,7 @@ Patch0:         CVE-2023-32067.patch
 Patch1:         CVE-2024-25629.patch
 Patch2:         CVE-2023-31147.patch
 Patch3:         CVE-2023-31130.patch
+Patch4:         CVE-2023-44487.patch
 BuildRequires:  abseil-cpp-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
