@@ -1,8 +1,8 @@
 Name:           perl-Type-Tiny
 Version:        2.008002
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Tiny, yet Moo(se)-compatible type constraint
-License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Type-Tiny
@@ -110,6 +110,11 @@ sed -i -e '/^inc\//d' MANIFEST
 %{_mandir}/man3/Test::TypeTiny.3pm*
  
 %changelog
+* Mon May 12 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.008002-2
+- Initial Azure Linux import from Fedora 43 (license: MIT)
+- Source license verified to be GPL
+- License verified
+
 * Mon May 05 2025 Jitka Plesnikova <jplesnik@redhat.com> - 2.008002-1
 - 2.008002 bump (rhbz#2357958)
  
