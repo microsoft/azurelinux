@@ -2190,6 +2190,7 @@
                 "xorg-x11-xinit",
                 "xorg-x11-xkb-utils",
                 "xorg-x11-xtrans-devel",
+                "xpp3",
                 "xrestop",
                 "xterm",
                 "xxhash",
@@ -2656,7 +2657,6 @@
                 "xmlrpc-c",
                 "xmlunit",
                 "xpp2",
-                "xpp3",
                 "xz-java"
             ]
         },
