@@ -31,7 +31,6 @@ BuildRequires:  perl(Text::Wrap)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(version) >= 0.99.06
 BuildRequires:  perl(warnings)
-BuildRequires:  perl(Module::Runtime)
 BuildRequires:  perl(Moo) >= 1.006000
 BuildRequires:  perl(Sub::Quote) >= 1.005000
 BuildRequires:  perl(Types::Standard)

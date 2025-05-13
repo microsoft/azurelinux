@@ -16114,7 +16114,7 @@
         "other": {
           "name": "perl-App-FatPacker",
           "version": "0.010008",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MS/MSperlTROUT/App-FatPacker-0.010008.tar.gz"
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MS/MSTROUT/App-FatPacker-0.010008.tar.gz"
         }
       }
     },
@@ -20638,7 +20638,7 @@
         }
       }
     },
-        {
+    {
       "component": {
         "type": "other",
         "other": {
