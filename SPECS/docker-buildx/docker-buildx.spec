@@ -14,6 +14,7 @@ Source0:        https://github.com/docker/buildx/archive/refs/tags/v%{version}.t
 Patch0:         CVE-2024-45337.patch
 Patch1:         CVE-2024-45338.patch
 Patch2:         CVE-2025-22869.patch
+Patch3:         CVE-2025-0495.patch
 
 BuildRequires: bash
 BuildRequires: golang
