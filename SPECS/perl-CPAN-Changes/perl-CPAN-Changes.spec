@@ -36,7 +36,10 @@ BuildRequires:  perl(Test::More) >= 0.96
 
 # Extra Tests
 BuildRequires:  perl(Test::Pod) >= 1.00
-BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
+BuildRequires:  perl(Test::Pod::Coverage) >= 1.
+BuildRequires:	perl(Moo)
+
+
 
 # Optional Tests, currently not supported in Mariner.
 %if 0

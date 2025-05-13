@@ -14,6 +14,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-Cython
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 
 %description
@@ -37,9 +38,7 @@ MessagePack is a fast, compact binary serialization format, suitable for similar
 
 %check
 # v1.0.3 does not have a tox env for newer versions of python, so we add it ourselves
-sed -i 's/    {py35,py36,py37,py38}-{c,pure},/    {py35,py36,py37,py38,py%{python3_version_nodots}}-{c,pure},/g' tox.ini
-pip3 install tox
-tox -e py%{python3_version_nodots}-c,py%{python3_version_nodots}-pure
+%pytest
 
 %files -n python3-msgpack
 %defattr(-,root,root)

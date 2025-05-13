@@ -12,10 +12,13 @@ BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(CPAN)
 %if 0%{?with_check}
 BuildRequires:  perl(CPAN)
 BuildRequires:  perl(CPAN::Meta)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Test::Needs)
+BuildRequires:  perl(open)
 %endif
 
 Requires:       perl(Carp)

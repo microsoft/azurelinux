@@ -14,8 +14,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.sphinx-doc.org/
 Source0:        https://github.com/sphinx-doc/sphinx/archive/refs/tags/v%{version}.tar.gz#/Sphinx-%{version}.tar.gz
-
 BuildArch:      noarch
+
+Patch0:         Fix-autodoc-tests-with-Python-3.12.3.patch
+Patch1:         11774.patch
 
 BuildRequires:  dos2unix
 BuildRequires:  make
@@ -54,6 +56,8 @@ BuildRequires:  python3-test
 BuildRequires:  python3-pytest
 BuildRequires:  python3-Cython
 BuildRequires:  python3-six
+BuildRequires:  python3-html5lib
+BuildRequires:  python3-filelock
 %endif
 
 %description
@@ -196,8 +200,7 @@ pip install --upgrade \
   filelock \
   html5lib \
   iniconfig \
-  tomli \
-  "pygments>=2.14"
+  tomli
 
 # ignoring some tests due to incompatible dependencies
 # html5lib: test_build_html, test_build_latex

@@ -52,7 +52,7 @@ via JavaScript.
 %py3_install
 
 %check
-pip3 install more-itertools sphinx exceptiongroup iniconfig tomli
+pip3 install more-itertools sphinx==7.2.6 exceptiongroup iniconfig tomli
 python3 -m pytest
 
 %files -n python%{python3_pkgversion}-%{pypi_name}

@@ -74,7 +74,7 @@ popd
 %find_lang sphinxcontrib.htmlhelp
 
 %check
-pip3 install sphinx webencodings exceptiongroup iniconfig tomli
+pip3 install sphinx==7.2.6 webencodings exceptiongroup iniconfig tomli
 %py3_check_import sphinxcontrib.htmlhelp
 %{__python3} -m pytest
 

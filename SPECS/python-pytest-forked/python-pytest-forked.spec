@@ -18,8 +18,10 @@ BuildRequires:  python3-py
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 BuildArch:      noarch
+Patch0:         Pytest-Output-Fix.patch  
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 
 %description %{_description}
@@ -45,7 +47,6 @@ pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
-    pytest==7.1.2 \
     pytest-cov>=2.7.1
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \

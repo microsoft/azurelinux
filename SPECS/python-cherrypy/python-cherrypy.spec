@@ -14,6 +14,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://pypi.io/packages/source/C/%{pypiname}/%{pypiname}-%{version}.tar.gz
 BuildArch:      noarch
+Patch0:         test-session-py3.8above.patch
 
 %global _description %{expand:
 CherryPy allows developers to build web applications in much the same way they would
@@ -42,6 +43,7 @@ BuildRequires:  python3-pip
 
 %prep
 %setup -q -n %{pypiname}-%{version}
+%autopatch -p1
 # suppress depracation warning in the pytest.ini 
 # Feb 2023 setuptools added deprecation warning for pkg_resources.declare_namespace causing all the test to fail for python-cherrypy 
 # https://setuptools.pypa.io/en/latest/history.html#v67-3-0
@@ -58,7 +60,7 @@ python3 setup.py install --root=%{buildroot}
 
 %if 0%{with check}
 %check
-pip3 install tox
+pip3 install tox==4.25.0 --ignore-installed
 tox -e py%{python3_version_nodots}
 %endif
 

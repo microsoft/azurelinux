@@ -103,7 +103,7 @@ openssl req \
     -out mariner.cert
 openssl rsa -in mariner.key -out mariner.pem
 mv mariner.pem %{_sysconfdir}/ssl/certs
-pip3 install pretend pytest hypothesis iso8601 cryptography_vectors pytz iniconfig
+pip3 install pretend pytest hypothesis iso8601 cryptography_vectors==%{version} pytz iniconfig
 PYTHONPATH=%{buildroot}%{python3_sitearch} \
     %{__python3} -m pytest -v tests
 

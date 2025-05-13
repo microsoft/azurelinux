@@ -19,7 +19,13 @@ Distribution:   Azure Linux
 URL:            https://github.com/python-greenlet/greenlet
 Source0:        %{url}/archive/%{version}/%{modname}-%{version}.tar.gz
 
+# Skip leak checking to avoid a missing dependency, `objgraph`
+Patch0:          skip-leak-checks.patch
+
 BuildRequires:  gcc-c++
+%if 0%{?with_check}
+BuildRequires:  python3-psutil
+%endif
 
 %description %{_description}
 
@@ -55,7 +61,9 @@ Python 3 version.
 %py3_install
 
 %check
-PYTHONPATH="%{buildroot}%{python3_sitearch}" %{python3} -m unittest discover greenlet.tests
+PYTHONPATH="%{buildroot}%{python3_sitearch}" %{python3} -m unittest discover -v \
+              -s "%{buildroot}%{python3_sitearch}/greenlet/tests" \
+              -t "%{buildroot}%{python3_sitearch}"
 
 %files -n python3-%{modname}
 %license LICENSE LICENSE.PSF

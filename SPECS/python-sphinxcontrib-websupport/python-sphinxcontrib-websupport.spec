@@ -25,6 +25,7 @@ BuildRequires:  python-flit-core
 BuildRequires:  python3-pip
 BuildRequires:  python3-packaging
 BuildRequires:  python3-sphinx
+BuildRequires:  python3-pytest
 %endif
 
 Requires:       python3
@@ -48,8 +49,7 @@ The python-sphinxcontrib-websupport package provides a Python API to easily inte
 %pyproject_save_files %{pypi_name_prefix}
 
 %check
-pip3 install tox tox-current-env pytest
-%tox
+%pytest
 %files -n python3-%{pypi_name} -f %{pyproject_files}
 %license LICENSE
 %doc README.rst

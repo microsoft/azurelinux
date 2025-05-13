@@ -1,0 +1,51 @@
+From 22caeb2631922c3f5e3f4bb45d8c1610edb6ef74 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Thu, 22 Aug 2024 12:33:34 +0200
+Subject: [PATCH] Fix autodoc tests with Python 3.12.3+
+
+---
+ tests/test_ext_autodoc.py         | 5 ++++-
+ tests/test_ext_autodoc_configs.py | 4 ++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/tests/test_ext_autodoc.py b/tests/test_ext_autodoc.py
+index 7062763..5f63214 100644
+--- a/tests/test_ext_autodoc.py
++++ b/tests/test_ext_autodoc.py
+@@ -1407,7 +1407,10 @@ def test_enum_class(app):
+     options = {"members": None}
+     actual = do_autodoc(app, 'class', 'target.enums.EnumCls', options)
+ 
+-    if sys.version_info[:2] >= (3, 12):
++    if sys.version_info[:3] >= (3, 12, 3):
++        args = ('(value, names=<not given>, *values, module=None, '
++                'qualname=None, type=None, start=1, boundary=None)')
++    elif sys.version_info[:2] >= (3, 12):
+         args = ('(value, names=None, *values, module=None, '
+                 'qualname=None, type=None, start=1, boundary=None)')
+     elif sys.version_info[:2] >= (3, 11):
+diff --git a/tests/test_ext_autodoc_configs.py b/tests/test_ext_autodoc_configs.py
+index 0994c08..a240c4b 100644
+--- a/tests/test_ext_autodoc_configs.py
++++ b/tests/test_ext_autodoc_configs.py
+@@ -1273,7 +1273,7 @@ def test_autodoc_type_aliases(app):
+         '      docstring',
+         '',
+         '',
+-        '.. py:function:: mult(x: int, y: int) -> int',
++        '.. py:function:: mult(x: myint, y: myint) -> myint',
+         '                 mult(x: float, y: float) -> float',
+         '   :module: target.autodoc_type_aliases',
+         '',
+@@ -1344,7 +1344,7 @@ def test_autodoc_type_aliases(app):
+         '      docstring',
+         '',
+         '',
+-        '.. py:function:: mult(x: myint, y: myint) -> myint',
++        '.. py:function:: mult(x: myint, y: myint) -> myint',
+         '                 mult(x: float, y: float) -> float',
+         '   :module: target.autodoc_type_aliases',
+         '',
+-- 
+2.46.0
+

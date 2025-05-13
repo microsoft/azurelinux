@@ -8,6 +8,8 @@ Distribution:   Azure Linux
 URL:            https://github.com/ocamllabs/ocaml-ctypes
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
+Patch0:          %{name}-stdlib-shims.patch
+
 BuildRequires:  ocaml >= 4.03.0
 BuildRequires:  ocaml-bigarray-compat-devel
 BuildRequires:  ocaml-dune >= 2.9
@@ -52,7 +54,7 @@ The %{name}-devel package contains libraries and signature
 files for developing applications that use %{name}.
 
 %prep
-%autosetup
+%autosetup -p1
 # Use Mariner flags
 sed -i 's/ "-cclib"; "-Wl,--no-as-needed";//' src/ctypes-foreign/config/discover.ml
 

@@ -73,7 +73,7 @@ popd
 %find_lang sphinxcontrib.qthelp
 
 %check
-pip3 install sphinx exceptiongroup iniconfig tomli
+pip3 install sphinx==7.2.6 exceptiongroup iniconfig tomli
 %pytest
 
 %files -n python%{python3_pkgversion}-%{pypi_name} -f sphinxcontrib.qthelp.lang

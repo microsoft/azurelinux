@@ -49,7 +49,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
   LICENSE.md > LICENSE.html
 
 %check
-%{__python3} ./setup.py test
+python3 -m unittest discover -v
 
 
 %files -n python%{python3_pkgversion}-%{pkgname}

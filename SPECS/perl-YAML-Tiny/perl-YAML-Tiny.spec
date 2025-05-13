@@ -16,6 +16,7 @@ BuildRequires:  perl(ExtUtils::MakeMaker)
 %if 0%{?with_check}
 BuildRequires:  perl(JSON::PP)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(open)
 %endif
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))

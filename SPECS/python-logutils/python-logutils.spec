@@ -14,6 +14,10 @@ Distribution:   Azure Linux
 Source0:        https://pypi.io/packages/source/l/%{pkgname}/%{pkgname}-%{version}.tar.gz
 
 BuildArch:      noarch
+%if 0%{?with_check}
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pip
+%endif
 
 %global _description %{expand:
 The logutils package provides a set of handlers for the Python standard library’s logging package.
@@ -45,10 +49,11 @@ python3 setup.py build
 %install
 python3 setup.py install --root=%{buildroot}
 
-%if %{with check}
+
 %check
-python3 setup.py test
-%endif
+pip3 install redis
+%pytest
+
 
 %files -n python3-%{pkgname}
 %license LICENSE.txt

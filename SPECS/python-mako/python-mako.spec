@@ -13,6 +13,8 @@ BuildArch:      noarch
 
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-markupsafe
 %endif
 
 %description
@@ -47,8 +49,7 @@ many others, including Django templates, Cheetah, Myghty, and Genshi.
 ln -s mako-render %{buildroot}/%{_bindir}/mako-render3
 
 %check
-pip3 install tox
-tox -e py%{python3_version_nodots}
+%pytest
 
 %files -n python3-mako
 %defattr(-,root,root,-)

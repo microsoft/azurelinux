@@ -29,6 +29,7 @@ BuildRequires:  perl(Env)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::Deep)
 BuildRequires:  perl(Test::More) >= 0.88
+BuildRequires:  perl(blib)
 %endif
 
 # Runtime

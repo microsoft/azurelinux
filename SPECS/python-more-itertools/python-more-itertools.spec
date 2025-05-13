@@ -12,11 +12,14 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/erikrose/more-itertools
 Source0:        %{pypi_source more-itertools}
+BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
-BuildArch:      noarch
+%if 0%{?with_check}
+BuildRequires:  python3-pytest
+%endif
 
 %description %{_description}
 
@@ -36,8 +39,7 @@ Summary:        %{summary}
 %pyproject_save_files more_itertools
 
 %check
-pip3 install tox
-tox -e py%{python3_version_nodots}
+%pytest
 
 %files -n python3-more-itertools -f %{pyproject_files}
 %doc README.rst

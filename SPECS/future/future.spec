@@ -89,10 +89,10 @@ chmod a+x $RPM_BUILD_ROOT%{python3_sitelib}/future/backports/test/pystone.py
 # Bugs
 # https://github.com/PythonCharmers/python-future/issues/508
 %if 0%{?python3_version_nodots} > 37
-PYTHONPATH=$PWD/build/lib py.test-%{python3_version} -k "not test_urllibnet and not test_single_exception_stacktrace" -q
+PYTHONPATH=$PWD/build/lib pytest -k "not test_urllibnet and not test_single_exception_stacktrace" -q
 %endif
 %if 0%{?python3_version_nodots} <= 37
-PYTHONPATH=$PWD/build/lib py.test-%{python3_version}
+PYTHONPATH=$PWD/build/lib pytest
 %endif
 
 %files -n python%{python3_pkgversion}-%{name}

@@ -14,6 +14,10 @@ Distribution:   Azure Linux
 URL:            https://erratique.ch/software/astring
 Source0:        https://github.com/dbuenzli/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
+# Adapt to changed behavior of Char.compare in OCaml 5.
+# This affects x86_64, but not bytecode-only architectures.
+Patch0:          %{name}-ocaml5.patch
+
 BuildRequires:  ocaml >= 4.05.0
 BuildRequires:  ocaml-findlib
 BuildRequires:  ocaml-ocamlbuild
@@ -41,7 +45,7 @@ The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -n %{srcname}-%{version}
+%autosetup -p1 -n %{srcname}-%{version}
 
 # Topkg does watermark replacements only if run inside a git checkout.  Github
 # tarballs do not come with a .git directory.  Therefore, we do the watermark

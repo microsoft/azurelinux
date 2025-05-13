@@ -17,6 +17,9 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-packaging
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
+%if 0%{?with_check}
+BuildRequires:  python3-pytest
+%endif
 BuildArch:      noarch
 
 %description %{_description}
@@ -43,8 +46,7 @@ Summary:        %{summary}
 
 
 %check
-pip3 install tox tox-current-env pytest==7.1.3
-%tox
+%pytest
 
 
 %files -n python3-gast -f %{pyproject_files}

@@ -34,6 +34,9 @@ BuildRequires:  python3-rsa
 BuildRequires:  python3-six
 BuildRequires:  python3-urllib3
 BuildRequires:  python3-websocket-client
+#test
+BuildRequires:  criterion
+
 Requires:       glib
 Requires:       json-c
 Requires:       json-glib
@@ -100,6 +103,10 @@ sed -i 's/eventlog//g'  %{buildroot}%{_libdir}/pkgconfig/syslog-ng.pc
 
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable syslog-ng.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-syslog-ng.preset
+
+%check
+pip3 install unittest2 nose ply pep8
+make %{?_smp_mflags} ENABLE_TESTING=true check
 
 %post
 if [ $1 -eq 1 ] ; then

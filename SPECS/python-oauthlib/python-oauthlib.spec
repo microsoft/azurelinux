@@ -11,6 +11,9 @@ Source0:        https://github.com/oauthlib/oauthlib/archive/refs/tags/v%{versio
 BuildArch:      noarch
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-cryptography
+BuildRequires:  python3-jwt
+BuildRequires:  python3-blinker
 %endif
 
 %description
@@ -23,6 +26,9 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
+Requires:       python3-cryptography
+Requires:       python3-jwt
+Requires:       python3-blinker
 
 %description -n python3-oauthlib
 OAuthLib is a generic utility which implements the logic of OAuth without assuming a specific HTTP request object or web framework
@@ -37,7 +43,7 @@ OAuthLib is a generic utility which implements the logic of OAuth without assumi
 %py3_install
 
 %check
-pip3 install mock wheel
+pip3 install mock wheel 
 %python3 setup.py test
 
 %files -n python3-oauthlib

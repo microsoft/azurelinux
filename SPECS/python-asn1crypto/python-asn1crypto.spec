@@ -8,10 +8,13 @@ Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/wbond/asn1crypto
 Source0:        https://github.com/wbond/asn1crypto/archive/refs/tags/%{version}.tar.gz#/asn1crypto-%{version}.tar.gz
+Patch0:         remove-imp.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+
 %endif
 BuildArch:      noarch
 
@@ -26,7 +29,7 @@ Requires:       python3
 A fast, pure Python library for parsing and serializing ASN.1 structures.
 
 %prep
-%autosetup -n asn1crypto-%{version}
+%autosetup -p1 -n asn1crypto-%{version}
 
 %build
 %py3_build
@@ -35,8 +38,7 @@ A fast, pure Python library for parsing and serializing ASN.1 structures.
 %py3_install
 
 %check
-pip3 install tox
-tox -e py%{python3_version_nodots}
+%pytest
 
 %files -n python3-asn1crypto
 %defattr(-,root,root,-)
