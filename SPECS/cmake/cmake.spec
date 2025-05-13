@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.21.4
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,7 @@ Patch20:        CVE-2024-7264.patch
 Patch21:        CVE-2024-11053.patch
 Patch22:        CVE-2024-9681.patch
 Patch23:	CVE-2024-48615.patch
+Patch24:	CVE-2024-8096.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -100,6 +101,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Mon May 12 2025 Archana Shettigar <v-shettigara@microsoft.com> - 3.21.4-18
+- Fix CVE-2024-8096 by backporting
+
 * Mon Apr 07 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.21.4-17
 - Fix CVE-2024-48615 by backporting
 
