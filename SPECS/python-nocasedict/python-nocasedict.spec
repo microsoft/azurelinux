@@ -50,6 +50,9 @@ rm -rf *.egg-info
 %{python3_sitelib}/*.egg-info
 
 %changelog
+* Tue May 13 2025 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.3-2
+- Fix Ptest by using pytest instead of tox.
+
 * Thu Jul 11 2024 Sam Meluch <sammeluch@microsoft.com> - 2.0.3-1
 - Upgrade to 2.0.3
 
