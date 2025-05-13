@@ -3,7 +3,7 @@
 Summary:        Case-insensitive ordered dictionary library for Python
 Name:           python-%{pkgname}
 Version:        2.0.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,6 +15,7 @@ BuildRequires:  python3-six >= %{six_version}
 BuildRequires:  python3-wheel
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 BuildArch:      noarch
 
@@ -40,8 +41,7 @@ rm -rf *.egg-info
 %py3_install
 
 %check
-pip3 install 'tox>=3.27.1,<4.0.0'
-PYTHONPATH=%{buildroot}%{python3_sitelib} tox -e py%{python3_version_nodots}
+%pytest
 
 %files -n python3-%{pkgname}
 %license LICENSE
