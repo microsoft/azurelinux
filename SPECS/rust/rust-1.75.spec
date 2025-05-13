@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.75.0
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -62,7 +62,7 @@ BuildRequires:  python3
 # make sure rust depends on system zlib
 BuildRequires:  zlib-devel
 %if 0%{?with_check}
-BuildRequires:  glibc-static >= 2.38-9%{?dist}
+BuildRequires:  glibc-static >= 2.38-10%{?dist}
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
@@ -174,6 +174,9 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Mon May 12 2025 Mayank Singh <mayansingh@microsoft.com> - 1.75.0-14
+- Bump to rebuild with updated glibc
+
 * Sun Apr 20 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.75.0-13
 - Support rust 1.75 version
 - Add explicit build dependency on zlib

@@ -10,7 +10,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -57,6 +57,15 @@ This library provides the basic routines for allocating memory,
 searching directories, opening and closing files, reading and
 writing files, string handling, pattern matching, arithmetic,
 and so on.
+
+# File triggers for when libraries are added or removed in standard paths
+%transfiletriggerin -p <lua> -P 2000000 -- /lib /usr/lib /lib64 /usr/lib64
+os.execute("/sbin/ldconfig")
+%end
+ 
+%transfiletriggerpostun -p <lua> -P 2000000 -- /lib /usr/lib /lib64 /usr/lib64
+os.execute("/sbin/ldconfig")
+%end
 
 %package devel
 Summary:        Header files for glibc
@@ -358,6 +367,9 @@ grep "^FAIL: nptl/tst-mutex10" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
+* Mon May 12 2025 Mayank Singh <mayansingh@microsoft.com> - 2.38-10
+- Add file triggers to do ldconfig calls automatically
+
 * Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 2.38-9
 - Re-enable nscd build and packaging
 
