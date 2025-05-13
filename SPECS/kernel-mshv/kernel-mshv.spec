@@ -11,7 +11,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.157.mshv1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -42,6 +42,7 @@ BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  sed
 Requires:       filesystem
+Requires:       erofs-utils
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
@@ -224,6 +225,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Mon May 12 2025 Mitch Zhu <mitchzhu@microsoft.com> - 5.15.157.mshv1-4
+- Add erofs support
+
 * Fri Oct 25 2024 Saul Paredes <saulparedes@microsoft.com> - 5.15.157.mshv1-3
 - Increase build verbosity
 
