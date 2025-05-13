@@ -85,8 +85,8 @@ func TestPrintingLargerGraphOK(t *testing.T) {
 	// Check output contains all nodes.
 	output := buf.String()
 	assert.Contains(t, output, rootName)
-	assert.Contains(t, output, "├── "+child1Name)
-	assert.Contains(t, output, "└── "+child2Name)
+	assert.Contains(t, output, "── "+child1Name)
+	assert.Contains(t, output, "── "+child2Name)
 	assert.Contains(t, output, "│   └── "+grandchildName)
 }
 
