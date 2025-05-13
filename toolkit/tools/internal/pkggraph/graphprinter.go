@@ -71,10 +71,9 @@ func NewGraphPrinter(configModifiers ...graphPrinterConfigModifier) GraphPrinter
 	}
 
 	for _, modifier := range configModifiers {
-		if modifier == nil {
-			continue
+		if modifier != nil {
+			modifier(&config)
 		}
-		modifier(&config)
 	}
 
 	return GraphPrinter{
