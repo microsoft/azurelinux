@@ -4670,8 +4670,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.23.8",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.8-1/go1.23.8-20250401.2.src.tar.gz"
+          "version": "1.23.9",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.9-1/go1.23.9-20250506.5.src.tar.gz"
         }
       }
     },
@@ -4680,8 +4680,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.24.2",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.2-1/go1.24.2-20250401.4.src.tar.gz"
+          "version": "1.24.3",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.3-1/go1.24.3-20250506.3.src.tar.gz"
         }
       }
     },
@@ -8281,8 +8281,8 @@
         "type": "other",
         "other": {
           "name": "kernel-lpg-innovate",
-          "version": "6.6.82.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/lpg-innovate/6.6.82.1.tar.gz"
+          "version": "6.6.85.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/lpg-innovate/6.6.85.1.tar.gz"
         }
       }
     },
@@ -12961,8 +12961,8 @@
         "type": "other",
         "other": {
           "name": "marisa",
-          "version": "0.2.4",
-          "downloadUrl": "https://marisa-trie.googlecode.com/files/marisa-0.2.4.tar.gz"
+          "version": "0.2.6",
+          "downloadUrl": "https://github.com/s-yata/marisa-trie/archive/refs/tags/v0.2.6.tar.gz"
         }
       }
     },
@@ -22123,8 +22123,8 @@
         "type": "other",
         "other": {
           "name": "python-beautifulsoup4",
-          "version": "4.11.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-4.11.2.tar.gz"
+          "version": "4.12.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-4.12.3.tar.gz"
         }
       }
     },
@@ -22143,8 +22143,8 @@
         "type": "other",
         "other": {
           "name": "python-blinker",
-          "version": "1.7.0",
-          "downloadUrl": "https://github.com/pallets-eco/blinker/releases/download/1.7.0/blinker-1.7.0.tar.gz"
+          "version": "1.9.0",
+          "downloadUrl": "https://github.com/pallets-eco/blinker/releases/download/1.9.0/blinker-1.9.0.tar.gz"
         }
       }
     },
@@ -26184,8 +26184,8 @@
         "type": "other",
         "other": {
           "name": "rp-pppoe",
-          "version": "3.12",
-          "downloadUrl": "https://dianne.skoll.ca/projects/rp-pppoe/download/OLD/rp-pppoe-3.12.tar.gz"
+          "version": "4.0",
+          "downloadUrl": "https://downloads.uls.co.za/rp-pppoe/rp-pppoe-4.0.tar.gz"
         }
       }
     },
@@ -27451,11 +27451,11 @@
     },
     {
       "component": {
-	"type": "other",
-	"other": {
+        "type": "other",
+        "other": {
           "name": "rust",
-	  "version": "1.85.0",
-	  "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.85.0-src.tar.xz"
+          "version": "1.85.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.85.0-src.tar.xz"
         }
       }
     },
@@ -27476,6 +27476,16 @@
           "name": "rust-packaging",
           "version": "14",
           "downloadUrl": "https://releases.pagure.org/fedora-rust/rust2rpm/rust2rpm-14.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "s-nail",
+          "version": "14.9.25",
+          "downloadUrl": "https://www.sdaoden.eu/downloads/s-nail-14.9.25.tar.xz"
         }
       }
     },
@@ -28536,8 +28546,8 @@
         "type": "other",
         "other": {
           "name": "stunnel",
-          "version": "5.70",
-          "downloadUrl": "https://www.stunnel.org/downloads/stunnel-5.70.tar.gz"
+          "version": "5.74",
+          "downloadUrl": "https://www.stunnel.org/downloads/stunnel-5.74.tar.gz"
         }
       }
     },
@@ -31219,8 +31229,8 @@
         "type": "other",
         "other": {
           "name": "zenity",
-          "version": "3.32.0",
-          "downloadUrl": "https://download.gnome.org/sources/zenity/3.32/zenity-3.32.0.tar.xz"
+          "version": "3.44.1",
+          "downloadUrl": "https://download.gnome.org/sources/zenity/3.44/zenity-3.44.1.tar.xz"
         }
       }
     },

@@ -1,12 +1,10 @@
+%global mod_name blinker
+Summary:        Fast, simple object-to-object and broadcast signaling
+Name:           python-blinker
+Version:        1.9.0
+Release:        1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global mod_name blinker
-
-Name:           python-blinker
-Version:        1.7.0
-Release:        4%{?dist}
-Summary:        Fast, simple object-to-object and broadcast signaling
-
 License:        MIT
 URL:            https://github.com/pallets-eco/blinker
 Source0:        %{url}/releases/download/%{version}/%{mod_name}-%{version}.tar.gz
@@ -15,14 +13,6 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-flit-core
-
-# Tests
-BuildRequires:  python3dist(pytest)
-BuildRequires:  python3-pytest-asyncio
-BuildRequires:  python-tox
-BuildRequires:  python3dist(tox-current-env)
-BuildRequires:  python-filelock
-BuildRequires:  python-toml
 
 %global _description\
 Blinker provides a fast dispatching system that allows any number\
@@ -40,10 +30,8 @@ of interested parties to subscribe to events, or "signals".
 
 %prep
 %autosetup -n %{mod_name}-%{version}
-
-%generate_buildrequires
 # requirements in tests.txt are way too tight
-%pyproject_buildrequires requirements/tests.in
+mv requirements/tests.in requirements/tests.txt
 
 %build
 %pyproject_wheel
@@ -53,13 +41,20 @@ of interested parties to subscribe to events, or "signals".
 %pyproject_save_files %{mod_name}
 
 %check
-%tox
+# from blinker/requirements/test.txt
+# need higer pytest than the one we have in azl3.0
+pip3 install iniconfig==2.0.0 pluggy==1.5.0 pytest==8.3.3 pytest-asyncio==0.24.0
+%pytest
 
 %files -n python3-blinker -f %{pyproject_files}
-%doc CHANGES.rst LICENSE.rst README.rst
+%doc CHANGES.rst LICENSE.txt README.md
 
 
 %changelog
+* Tue Apr 29 2025 Riken Maharjan <rmaharjan@microsoft.com> -  1.9.0-1
+- Promote to Specs from Extended and update to 1.9.0 using Fedora 42 (License MIT)
+- License Verified.
+
 * Wed Feb 12 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.7.0-4
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License Verified

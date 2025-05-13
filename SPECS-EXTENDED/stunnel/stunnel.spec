@@ -4,7 +4,7 @@
 
 Summary:        A TLS-encrypting socket wrapper
 Name:           stunnel
-Version:        5.70
+Version:        5.74
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -26,11 +26,8 @@ Patch1:         stunnel-5.61-systemd-service.patch
 # platforms, OpenSSL supports the PROFILE=SYSTEM setting to use those
 # policies. Change stunnel to default to this setting.
 Patch3:         stunnel-5.69-system-ciphers.patch
-Patch4:         stunnel-5.56-coverity.patch
 Patch5:         stunnel-5.69-default-tls-version.patch
 Patch6:         stunnel-5.56-curves-doc-update.patch
-# Limit curves defaults in FIPS mode
-Patch8:         stunnel-5.62-disabled-curves.patch
 # build test requirements
 BuildRequires:  %{_bindir}/nc
 BuildRequires:  %{_bindir}/pod2html
@@ -46,6 +43,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  pkgconfig
 BuildRequires:  systemd
 BuildRequires:  util-linux
+BuildRequires:  python-cryptography
 %{?systemd_requires}
 %if %{with libwrap}
 BuildRequires:  tcp_wrappers-devel
@@ -143,6 +141,10 @@ make test || (for i in tests/logs/*.log ; do echo "$i": ; cat "$i" ; done)
 %systemd_postun_with_restart %{name}.service
 
 %changelog
+* Mon Apr 21 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 5.74-1
+- Upgrade to 5.74 and remove unwanted patches
+- Verified License
+
 * Mon Sep 04 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 5.70-1
 - Upgrade version to address CVE-2021-20230
 - Lint spec
