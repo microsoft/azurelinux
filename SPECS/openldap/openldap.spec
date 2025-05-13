@@ -1,9 +1,10 @@
 %global _default_patch_fuzz 2
 %define debug_package %{nil}
+
 Summary:        OpenLDAP (Lightweight Directory Access Protocol)
 Name:           openldap
 Version:        2.6.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        OpenLDAP
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,7 +18,6 @@ BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  openssl-devel >= 1.1.1
 Requires:       openssl >= 1.1.1
-Provides:       %{name}-clients = %{version}-%{release}
 Provides:       %{name}-compat = %{version}-%{release}
 Provides:       %{name}-devel = %{version}-%{release}
 
@@ -29,6 +29,20 @@ information, but other information is possible) over the Internet,
 similar to the way DNS (Domain Name System) information is propagated
 over the Internet. The openldap package contains configuration files,
 libraries, and documentation for OpenLDAP.
+
+%package clients
+Summary:        OpenLDAP client utilities
+Requires:       %{name} = %{version}-%{release}
+
+%description clients
+This package contains the command-line utilities for LDAP client operations
+
+%package servers
+Summary:        OpenLDAP server components
+Requires:       %{name} = %{version}-%{release}
+
+%description servers
+This package contains the OpenLDAP server daemons and associated tools.
 
 %prep
 %autosetup -p1
@@ -58,20 +72,37 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files
 %defattr(-,root,root)
 %license LICENSE
-%{_bindir}/*
-%{_sbindir}/*
-%{_libexecdir}/*
+%{_sbindir}/*[!s]*
 %{_libdir}/*.so*
 %{_includedir}/*
 %{_libdir}/pkgconfig/lber.pc
 %{_libdir}/pkgconfig/ldap.pc
-%{_mandir}/man1/*
 %{_mandir}/man3/*
-%{_mandir}/man5/*
+%{_mandir}/man5/ldif.5*
+%{_mandir}/man5/ldap.conf.5*
 %{_mandir}/man8/*
-%{_sysconfdir}/openldap/*
+%{_sysconfdir}/openldap/ldap*
+
+%files clients
+%{_bindir}/ldap*
+%{_mandir}/man1/ldap*.1*
+
+%files servers
+%{_sbindir}/slap*
+%{_libexecdir}/*
+%{_sysconfdir}/openldap/schema/*
+%{_sysconfdir}/openldap/slapd*
+%{_mandir}/man5/lloadd.conf.5*
+%{_mandir}/man5/slapd*.5*
+%{_mandir}/man5/slapo-*.5*
+%{_mandir}/man5/slappw-argon2.5*
+%{_mandir}/man8/lloadd.8*
+%{_mandir}/man8/slap*.8*
 
 %changelog
+* Tue May 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.6.7-3
+- Seperate clients and servers sub-packages
+
 * Wed Sep 25 2024 Muhammad Falak <mwani@microsoft.com> - 2.6.7-2
 - Configure with `--enable-slapd` to enable slapd
 
@@ -164,3 +195,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Wed Oct 08 2014 Divya Thaluru <dthaluru@vmware.com> 2.4.40-1
 - Initial build. First version
+
