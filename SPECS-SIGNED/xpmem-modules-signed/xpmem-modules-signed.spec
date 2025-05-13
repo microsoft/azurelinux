@@ -18,7 +18,7 @@
 Summary:	 Cross-partition memory
 Name:		 %{_name}-signed
 Version:	 2.7.4
-Release:	 16%{?dist}
+Release:	 17%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -83,6 +83,9 @@ popd
 
 
 %changelog
+* Tue May 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.4-17
+- Bump release to rebuild for new kernel release
+
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 2.7.4-16
 - Bump release to rebuild for new kernel release
 
