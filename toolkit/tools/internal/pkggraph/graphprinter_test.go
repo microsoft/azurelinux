@@ -87,7 +87,7 @@ func TestPrintingLargerGraphOK(t *testing.T) {
 	assert.Contains(t, output, rootName)
 	assert.Contains(t, output, "── "+child1Name)
 	assert.Contains(t, output, "── "+child2Name)
-	assert.Contains(t, output, "│   └── "+grandchildName)
+	assert.Contains(t, output, "   └── "+grandchildName)
 }
 
 func TestPrintGraphWithCyclesOK(t *testing.T) {
