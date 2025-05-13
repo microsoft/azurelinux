@@ -27,7 +27,7 @@ Patch5:         CVE-2024-51744.patch
 Patch6:         CVE-2025-30204.patch
 Patch7:         CVE-2025-22872.patch
 BuildRequires:  flex-devel
-BuildRequires:  glibc-static >= 2.38-9%{?dist}
+BuildRequires:  glibc-static >= 2.38-10%{?dist}
 BuildRequires:  golang
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
@@ -277,8 +277,13 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+<<<<<<< HEAD
 * Wed Apr 23 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.30-10-6
 - Patch CVE-2025-22872
+=======
+* Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 1.30-10-6
+- Bump to rebuild with updated glibc
+>>>>>>> 649b28c55 ([3.0 fasttrack] glibc: add pthread_cond_wait patch  (#13763))
 
 * Wed Apr 16 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.30.10-5
 - Fix CVE-2024-51744 with an upstream patch

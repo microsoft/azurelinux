@@ -651,7 +651,7 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %endif
 
 %if %{user_static}
-BuildRequires: glibc-static >= 2.38-9
+BuildRequires: glibc-static >= 2.38-10
 BuildRequires: glib2-static zlib-static
 BuildRequires: pcre2-static
 %endif
@@ -3432,8 +3432,13 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
+<<<<<<< HEAD
 * Thu May 08 2025 Kshitiz Godara <kgodara@microsoft.com> - 8.2.0-15
 - Added patch for CVE-2024-26327 CVE-2024-26328
+=======
+* Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 8.2.0-15
+- Bump to rebuild with updated glibc
+>>>>>>> 649b28c55 ([3.0 fasttrack] glibc: add pthread_cond_wait patch  (#13763))
 
 * Mon May 05 2025 Kshitiz Godara <kgodara@microsoft.com> - 8.2.0-14
 - Added patch for CVE-2024-6505 CVE-2024-4467 CVE-2024-4693 CVE-2024-7730 CVE-2024-3447 CVE-2024-3567

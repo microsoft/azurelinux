@@ -43,7 +43,7 @@ Patch8:         CVE-2025-22872.patch
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-9%{?dist}
+BuildRequires:  glibc-static >= 2.38-10%{?dist}
 BuildRequires:  golang >= 1.21
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -280,8 +280,13 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+<<<<<<< HEAD
 * Thu Apr 24 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.2.0-16
 - Patch CVE-2025-22872
+=======
+* Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 1.2.0-16
+- Bump to rebuild with updated glibc
+>>>>>>> 649b28c55 ([3.0 fasttrack] glibc: add pthread_cond_wait patch  (#13763))
 
 * Mon Mar 03 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 1.2.0-15
 - Address CVE-2023-44487
