@@ -15,7 +15,7 @@ BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:	perl(ExtUtils::MakeMaker)
+
 # Module Runtime
 BuildRequires:  perl(Encode)
 BuildRequires:  perl(Module::Runtime)
