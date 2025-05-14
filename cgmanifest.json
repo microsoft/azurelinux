@@ -3329,7 +3329,7 @@
         "other": {
           "name": "erlang",
           "version": "25.3.2.21",
-          "downloadUrl": "https://github.com/erlang/otp/archive/refs/tags/OTP-25.3.2.21.tar.gz"
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-25.3.2.21/otp-OTP-25.3.2.21.tar.gz"
         }
       }
     },
