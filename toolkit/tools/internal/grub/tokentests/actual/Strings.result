@@ -1,0 +1,14 @@
+Error:
+<nil>
+
+Tokens:
+WORD[1:1-3:10][0-30]
+  KEYWORD_STRING[1:1-1:2][0-1]("a")
+  STRING[1:2-1:6][1-5]("$ ")
+  STRING[1:6-1:13][5-12]("b\"\\c")
+  STRING[1:13-1:16][12-15]("e")
+  STRING[1:16-2:2][15-18]("f")
+  STRING[2:2-3:3][18-23]("g;")
+  QUOTED_VAR_EXPANSION[3:3-3:5][23-25]("H")
+  QUOTED_VAR_EXPANSION[3:5-3:9][25-29]("I")
+  STRING[3:9-3:10][29-30]("")

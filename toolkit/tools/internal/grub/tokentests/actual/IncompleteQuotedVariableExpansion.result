@@ -1,0 +1,7 @@
+Error:
+failed to parse (tokenize) grub config file:
+missing } in variable expansion (1:6)
+
+Tokens:
+WORD[1:1-1:6][0-5]
+  STRING[1:1-1:3][0-2]("a")
