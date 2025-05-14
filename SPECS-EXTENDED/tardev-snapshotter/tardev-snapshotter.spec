@@ -2,8 +2,8 @@
 
 Summary: Tardev Snapshotter for containerd
 Name: tardev-snapshotter
-Version: 0.0.13
-Release: 2%{?dist}
+Version: 3.2.0.tardev1
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 # URL: https://www.containerd.io
@@ -16,6 +16,7 @@ Source0: %{_distro_sources_url}/%{name}-%{version}.tar.gz
 # To update the cache run:
 #   [repo_root]/toolkit/scripts/build_cargo_cache.sh %%{name}-%%{version}.tar.gz %%{name}-%%{name}-%%{version}
 Source1:  %{_distro_sources_url}/%{name}-%{version}-cargo.tar.gz
+Source2:  regenerate-archives.sh
 
 %{?systemd_requires}
 
@@ -70,7 +71,7 @@ fi
 %config(noreplace) %{_unitdir}/%{name}.service
 
 %changelog
-* Fri Mar 28 2025 Dallas Delaney <dadelan@microsoft.com> - 0.0.13-2
+* Fri Mar 28 2025 Dallas Delaney <dadelan@microsoft.com> - 3.2.0.tardev1-1
 - Add package to specs-extended
 - License verified
 - Original version for Azure Linux
