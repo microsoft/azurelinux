@@ -40,7 +40,8 @@ type GraphPrinter struct {
 }
 
 type graphPrinterConfig struct {
-	output io.Writer
+	output         io.Writer
+	printNodesOnce bool
 }
 
 type graphPrinterConfigModifier func(*graphPrinterConfig)
@@ -68,6 +69,7 @@ func NewGraphPrinter(configModifiers ...graphPrinterConfigModifier) GraphPrinter
 		output: loggerOutputWrapper{
 			logLevel: logrus.DebugLevel,
 		},
+		printNodesOnce: false,
 	}
 
 	for _, modifier := range configModifiers {
@@ -124,30 +126,43 @@ func (g GraphPrinter) Print(graph *PkgGraph, rootNode *PkgNode) error {
 	// Walking the graph manually to keep track of 'gtree' nodes
 	// and the parent-child relationships between them.
 	buildTreeWithDFS = func(treeParent *gtree.Node, pkgNode *PkgNode) {
-		if pkgNode == nil || seenNodes[pkgNode] {
+		if (pkgNode == nil) || (g.printNodesOnce && seenNodes[pkgNode]) {
 			return
 		}
 
-		treeNode := treeRoot
-		if treeParent != nil {
-			treeNode = treeParent.Add(pkgNode.FriendlyName())
+		treeNode := buildTreeNode(treeRoot, treeParent, pkgNode, seenNodes)
+
+		if seenNodes[pkgNode] {
+			return
 		}
 
 		seenNodes[pkgNode] = true
 
 		children := graph.From(pkgNode.ID())
 		for children.Next() {
-			child := children.Node().(*PkgNode)
-			if child == nil {
-				continue
-			}
-			buildTreeWithDFS(treeNode, child)
+			buildTreeWithDFS(treeNode, children.Node().(*PkgNode))
 		}
 
-		seenNodes[pkgNode] = false
+		if !g.printNodesOnce {
+			seenNodes[pkgNode] = false
+		}
 	}
 
 	buildTreeWithDFS(nil, rootNode)
 
 	return gtree.OutputProgrammably(g.output, treeRoot)
+}
+
+func buildTreeNode(treeRoot *gtree.Node, treeParent *gtree.Node, pkgNode *PkgNode, seenNodes map[*PkgNode]bool) *gtree.Node {
+	if treeParent == nil {
+		return treeRoot
+	}
+	return treeParent.Add(buildNodeText(pkgNode, seenNodes[pkgNode]))
+}
+
+func buildNodeText(pkgNode *PkgNode, nodeSeen bool) string {
+	if nodeSeen {
+		return fmt.Sprintf("%s... [SEEN]", pkgNode.FriendlyName())
+	}
+	return pkgNode.FriendlyName()
 }
