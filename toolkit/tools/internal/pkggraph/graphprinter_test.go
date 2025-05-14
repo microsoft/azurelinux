@@ -7,13 +7,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestDefaultGraphPrinterCreatedOK(t *testing.T) {
-	assert.NotNil(t, NewGraphPrinter())
+	printer := NewGraphPrinter()
+	assert.NotNil(t, printer)
+	assert.False(t, printer.printNodesOnce)
 }
 
 func TestCustomOutputAppliesOK(t *testing.T) {
@@ -28,7 +29,7 @@ func TestCustomOutputAppliesOK(t *testing.T) {
 	graph := NewPkgGraph()
 	assert.NotNil(t, graph)
 
-	rootNode, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: nodeName}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
+	rootNode, err := addNodeToGraph(graph, nodeName)
 	assert.NoError(t, err)
 
 	printer.Print(graph, rootNode)
@@ -55,18 +56,18 @@ func TestPrintingLargerGraphOK(t *testing.T) {
 	assert.NotNil(t, graph)
 
 	// Add root node.
-	rootNode, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: rootName}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
+	rootNode, err := addNodeToGraph(graph, rootName)
 	assert.NoError(t, err)
 
 	// Add children.
-	child1, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: child1Name}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
+	child1, err := addNodeToGraph(graph, child1Name)
 	assert.NoError(t, err)
 
-	child2, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: child2Name}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
+	child2, err := addNodeToGraph(graph, child2Name)
 	assert.NoError(t, err)
 
 	// Add grandchild.
-	grandchild, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: grandchildName}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
+	grandchild, err := addNodeToGraph(graph, grandchildName)
 	assert.NoError(t, err)
 
 	// Add edges.
@@ -106,10 +107,10 @@ func TestPrintGraphWithCyclesOK(t *testing.T) {
 	graph := NewPkgGraph()
 
 	// Add nodes.
-	node1, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: node1Name}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
+	node1, err := addNodeToGraph(graph, node1Name)
 	assert.NoError(t, err)
 
-	node2, err := graph.AddPkgNode(&pkgjson.PackageVer{Name: node2Name}, StateMeta, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath, NoSourceDir, NoArchitecture, NoSourceRepo)
+	node2, err := addNodeToGraph(graph, node2Name)
 	assert.NoError(t, err)
 
 	// Create a cycle.
@@ -219,4 +220,94 @@ func TestLogOutputModifierAppliedCorrectly(t *testing.T) {
 	logOutput, isLoggerOutput := printer.output.(loggerOutputWrapper)
 	assert.True(t, isLoggerOutput)
 	assert.Equal(t, logrus.InfoLevel, logOutput.logLevel)
+}
+
+func TestPrintNodesOnceModifierAppliedCorrectly(t *testing.T) {
+	printer := NewGraphPrinter(
+		GraphPrinterPrintNodesOnce(),
+	)
+
+	assert.True(t, printer.printNodesOnce)
+}
+
+func TestPrintNodesOnceFunctionalityWorks(t *testing.T) {
+	const (
+		rootName   = "root"
+		child1Name = "child1"
+		child2Name = "child2"
+		sharedName = "shared"
+	)
+
+	// Create a graph where both child1 and child2 depend on the same shared node:
+	// root -> child1 -> shared
+	//      -> child2 -> shared
+	graph := NewPkgGraph()
+	assert.NotNil(t, graph)
+
+	rootNode, err := addNodeToGraph(graph, rootName)
+	assert.NoError(t, err)
+
+	child1, err := addNodeToGraph(graph, child1Name)
+	assert.NoError(t, err)
+
+	child2, err := addNodeToGraph(graph, child2Name)
+	assert.NoError(t, err)
+
+	sharedNode, err := addNodeToGraph(graph, sharedName)
+	assert.NoError(t, err)
+
+	err = graph.AddEdge(rootNode, child1)
+	assert.NoError(t, err)
+
+	err = graph.AddEdge(rootNode, child2)
+	assert.NoError(t, err)
+
+	err = graph.AddEdge(child1, sharedNode)
+	assert.NoError(t, err)
+
+	err = graph.AddEdge(child2, sharedNode)
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		name              string
+		printNodesConfig  graphPrinterConfigModifier
+		outputContains    []string
+		outputNotContains []string
+	}{
+		{
+			name:              "print repeated nodes",
+			printNodesConfig:  nil,
+			outputContains:    []string{rootName, child1Name, child2Name, sharedName},
+			outputNotContains: []string{seenNodeSuffix},
+		},
+		{
+			name:              "don't print repeated nodes",
+			printNodesConfig:  GraphPrinterPrintNodesOnce(),
+			outputContains:    []string{rootName, child1Name, child2Name, seenNodeSuffix, seenNodeSuffix},
+			outputNotContains: []string{},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			var buf strings.Builder
+			printer := NewGraphPrinter(
+				GraphPrinterOutput(&buf),
+				testCase.printNodesConfig,
+			)
+
+			err = printer.Print(graph, rootNode)
+			assert.NoError(t, err)
+			output := buf.String()
+
+			// Check tree structure
+			for _, contains := range testCase.outputContains {
+				assert.Contains(t, output, contains)
+			}
+
+			for _, notContains := range testCase.outputNotContains {
+				assert.NotContains(t, output, notContains)
+			}
+		})
+	}
 }

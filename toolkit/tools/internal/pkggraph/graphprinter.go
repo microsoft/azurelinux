@@ -13,6 +13,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const seenNodeSuffix = "... [SEEN]"
+
 // GraphPrinter is a type meant to print a graph in a human-readable format.
 // It uses a depth-first search (DFS) algorithm to traverse the graph and print each node.
 // The printer ignores any cycles in the graph and thus turns the graph into a tree.
@@ -174,11 +176,16 @@ func (tb *gTreeBuilder) resetState() {
 }
 
 // buildTreeWithDFS builds the tree using depth-first search.
+// It converts a general graph into a tree structure.
+// It uses a map to keep track of seen nodes to avoid cycles.
 func (tb *gTreeBuilder) buildTreeWithDFS(treeParent *gtree.Node, pkgNode *PkgNode, graph *PkgGraph) {
 	if pkgNode == nil {
 		return
 	}
 
+	// We add a node before the "seen" check because we always
+	// want to add the node to the tree. If it's been seen before,
+	// we just mark it as seen as part of the text displayed for the node.
 	treeNode := tb.buildTreeNode(treeParent, pkgNode)
 
 	if tb.seenNodes[pkgNode] {
@@ -192,6 +199,9 @@ func (tb *gTreeBuilder) buildTreeWithDFS(treeParent *gtree.Node, pkgNode *PkgNod
 		tb.buildTreeWithDFS(treeNode, children.Node().(*PkgNode), graph)
 	}
 
+	// As we traverse the graph back up, setting the node as unseen
+	// allows us to print it again if we encounter it later
+	// in a DIFFERENT branch of the tree.
 	if !tb.printNodesOnce {
 		tb.seenNodes[pkgNode] = false
 	}
@@ -211,7 +221,7 @@ func (tb *gTreeBuilder) buildTreeNode(treeParent *gtree.Node, pkgNode *PkgNode) 
 // buildNodeText formats the node text based on whether it's been seen before.
 func (tb *gTreeBuilder) buildNodeText(pkgNode *PkgNode) string {
 	if tb.seenNodes[pkgNode] {
-		return fmt.Sprintf("%s... [SEEN]", pkgNode.FriendlyName())
+		return pkgNode.FriendlyName() + seenNodeSuffix
 	}
 	return pkgNode.FriendlyName()
 }
