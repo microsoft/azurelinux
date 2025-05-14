@@ -10,13 +10,11 @@ Group: Tools/Container
 Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
-# Source0: https://github.com/microsoft/kata-containers/tree/jiria/solar
-Source0: %{_distro_sources_url}/%{name}-%{version}.tar.gz
+Source0:https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Note: the %%{name}-%%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache run:
 #   [repo_root]/toolkit/scripts/build_cargo_cache.sh %%{name}-%%{version}.tar.gz %%{name}-%%{name}-%%{version}
 Source1:  %{_distro_sources_url}/%{name}-%{version}-cargo.tar.gz
-Source2:  regenerate-archives.sh
 
 %{?systemd_requires}
 
