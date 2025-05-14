@@ -60,7 +60,7 @@ make test
 %{_mandir}/man3/Crypt::PasswdMD5.3*
 
 %changelog
-* Tue Dec 10 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.4.2-9
+* Tue May 13 2025 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.4.2-9
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
