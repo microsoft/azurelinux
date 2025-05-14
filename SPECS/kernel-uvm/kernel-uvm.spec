@@ -11,7 +11,7 @@
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        6.1.58.mshv4
-Release:        4%{?dist}
+Release:        10%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -117,9 +117,6 @@ KCFLAGS="%{kcflags}" make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="
 install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
 
-# Install kernel modules (for erofs prototype, might need polishing later)
-make INSTALL_MOD_PATH=%{buildroot} modules_install
-
 D=%{buildroot}%{_datadir}/cloud-hypervisor
 install -D -m 644 %{image} $D/%{image_fname}
 install -D -m 644 arch/%{arch}/boot/bzImage $D/bzImage
@@ -151,13 +148,6 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %ifarch x86_64
 /lib/modules/%{name}/vmlinux
 %endif
-# Include the kernel modules
-/lib/modules/%{version}/*
-# Exclude the build directory (it's in the devel package)
-%exclude /lib/modules/%{version}/build
-
-%post
-/sbin/depmod -a %{version}
 
 %files devel
 %defattr(-,root,root)
@@ -165,14 +155,8 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
-* Tue May 13 2025 Mitch Zhu <mitchzhu@microsoft.com> - 6.1.58.mshv4-4
-- Install kernel modules
-
-* Fri May 09 2025 Mitch Zhu <mitchzhu@microsoft.com> - 6.1.58.mshv4-3
-- Add erofs utils
-
-* Fri May 09 2025 Mitch Zhu <mitchzhu@microsoft.com> - 6.1.58.mshv4-2
-- Enable EROFS driver
+* Tue May 13 2025 Mitch Zhu <mitchzhu@microsoft.com> - 6.1.58.mshv4-10
+- Install erofs as builtin
 
 * Tue May 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.1.58.mshv4-1
 - Auto-upgrade to 6.1.58.mshv4
