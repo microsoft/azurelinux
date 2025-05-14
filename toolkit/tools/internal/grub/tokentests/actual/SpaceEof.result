@@ -1,0 +1,6 @@
+Error:
+<nil>
+
+Tokens:
+WORD[1:1-1:2][0-1]
+  KEYWORD_STRING[1:1-1:2][0-1]("a")
