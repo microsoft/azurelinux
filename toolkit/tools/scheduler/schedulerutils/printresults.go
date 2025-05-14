@@ -148,6 +148,7 @@ func PrintHiddenBuildBlockers(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMu
 	// - the goal node is not blocked or
 	// - there are obvious blockers, which would already be visible to the user.
 	if !blockedNodesGraph.HasNode(goalNode) ||
+		len(buildState.LicenseFailureSRPMs()) > 0 ||
 		len(rpmConflicts) > 0 ||
 		len(srpmBuildData.blockedSRPMs) > 0 ||
 		len(srpmBuildData.failedLicenseSRPMs) > 0 ||
