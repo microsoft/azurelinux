@@ -7931,8 +7931,8 @@
         "type": "other",
         "other": {
           "name": "jimtcl",
-          "version": "0.81",
-          "downloadUrl": "https://github.com/msteveb/jimtcl/archive/0.81/jimtcl-0.81.tar.gz"
+          "version": "0.83",
+          "downloadUrl": "https://github.com/msteveb/jimtcl/archive/0.83/jimtcl-0.83.tar.gz"
         }
       }
     },

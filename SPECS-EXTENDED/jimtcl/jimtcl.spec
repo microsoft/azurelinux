@@ -3,25 +3,22 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           jimtcl
-Version:        0.81
-Release:        6%{?dist}
+Version:        0.83
+Release:        3%{?dist}
 Summary:        A small embeddable Tcl interpreter
 
-License:        BSD
+License:        BSD-2-Clause-Views
 URL:            http://jim.tcl.tk
-Source0:        https://github.com/msteveb/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
-# support using lib64 instead of lib
-Patch0:         %{name}-lib64.patch
+Source:         https://github.com/msteveb/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
+# readline expects applications to include stdio.h, jimtcl was not
+Patch:          https://github.com/msteveb/jimtcl/commit/35e0e1f9b1f018666e5170a35366c5fc3b97309c.patch#/jimtcl-stdio-for-readline.diff
 
 BuildRequires:  gcc-c++
 BuildRequires:  asciidoc
 BuildRequires:  make
 # Extension dependencies
 BuildRequires:  pkgconfig(openssl)
-%ifnarch s390x
-# zlib test fails on s390x
 BuildRequires:  pkgconfig(zlib)
-%endif
 %if %{with tests}
 BuildRequires:  hostname
 %endif
@@ -47,7 +44,7 @@ developing applications that use %{name}.
 
 
 %prep
-%autosetup -p1
+%autosetup
 rm -rf sqlite3
 
 %build
@@ -63,17 +60,16 @@ export STRIP=strip
 # see ./configure --extinfo for list
 %configure --shared --disable-option-checking \
   --allextmod \
-  --docdir=%{_datadir}/doc/%{name} \
-# make %{?_smp_mflags}
+%ifarch s390x # zlib test fails on s390x
+  --without-ext=zlib \
+%endif
+  --docdir=%{_datadir}/doc/%{name}
 %make_build
 
 
 %install
 %make_install INSTALL_DOCS=nodocs
 rm %{buildroot}/%{_libdir}/jim/README.extensions
-pushd %{buildroot}/%{_libdir}/
-ln -s libjim.so.* libjim.so
-popd
 
 
 %if %{with tests}
@@ -86,7 +82,8 @@ make test
 
 %files
 %license LICENSE
-%doc AUTHORS README
+%doc AUTHORS README README.*
+%doc EastAsianWidth.txt
 %doc %{_datadir}/doc/%{name}/Tcl.html
 %{_bindir}/jimdb
 %{_bindir}/jimsh
@@ -97,16 +94,43 @@ make test
 
 
 %files devel
-%doc DEVELOPING README.extensions README.metakit README.namespaces README.oo README.utf-8 STYLE
+%doc CONTRIBUTING.md STYLE
 %{_includedir}/*
 %{_bindir}/build-jim-ext
 %{_libdir}/libjim.so
 %{_libdir}/pkgconfig/jimtcl.pc
 
 %changelog
-* Mon May 12 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.81-6
-- Initial Azure Linux import from Fedora 38 (license: MIT).
+* Mon May 12 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.83-3
+- Initial Azure Linux import from Fedora 42 (license: MIT).
 - License verified
+
+* Fri Jan 17 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.83-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Fri Sep 20 2024 Michel Lind <salimma@fedoraproject.org> - 0.83-1
+- Update to version 0.83; Fixes: RHBZ#2309077
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.82-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.82-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.82-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.82-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Feb 28 2023 Michel Alexandre Salim <salimma@fedoraproject.org> - 0.82-2
+- Properly disable zlib extension on s390x
+- move README files meant for programming with jimtcl to main package
+
+* Tue Feb 28 2023 Michel Alexandre Salim <salimma@fedoraproject.org> - 0.82-1
+- Update to 0.82
+- enable more extensions
+- update license to use SPDX
 
 * Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.81-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
@@ -220,5 +244,3 @@ make test
 
 * Sun May 05 2013 Markus Mayer <lotharlutz@gmx.de> - 0.73-1
 - inital prm release
-
-
