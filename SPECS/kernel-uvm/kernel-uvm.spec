@@ -156,6 +156,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 # Exclude the build directory (it's in the devel package)
 %exclude /lib/modules/%{version}/build
 
+%post
+/sbin/depmod -a %{version}
+
 %files devel
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/build
