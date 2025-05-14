@@ -30,6 +30,8 @@ Version:        9.2.1
 %global so_version 9.2
 Release:        3%{?dist}
 Summary:        Port of http_parser to llparse
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 
 # License of llhttp is (SPDX) MIT; nothing from the NodeJS dependency bundle is
 # installed, so its contents do not contribute to the license of the binary
