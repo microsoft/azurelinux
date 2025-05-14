@@ -1,9 +1,7 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 #
-# spec file for package apache-commons-collections4
+# spec file
 #
-# Copyright (c) 2019 SUSE LINUX GmbH, Nuernberg, Germany.
+# Copyright (c) 2023 SUSE LLC
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -22,24 +20,19 @@ Distribution:   Azure Linux
 %define short_name      commons-%{base_name}
 %bcond_with tests
 Name:           apache-%{short_name}
-Version:        4.1
-Release:        2%{?dist}
+Version:        4.4
+Release:        1
 Summary:        Extension of the Java Collections Framework
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-URL:            http://commons.apache.org/proper/commons-collections/
+URL:            https://commons.apache.org/proper/commons-collections/
 Source0:        http://archive.apache.org/dist/commons/collections/source/commons-collections4-%{version}-src.tar.gz
-Patch0:         commons-collections4-4.1-jdk11.patch
-Patch1:         commons-collections4-4.1-bundle.patch
-Patch2:         commons-collections4-4.1-javadoc.patch
+Source1:        %{name}-build.xml
 BuildRequires:  ant
 BuildRequires:  fdupes
-BuildRequires:  javapackages-local-bootstrap
+BuildRequires:  java-devel >= 1.8
+BuildRequires:  javapackages-local-bootstrap >= 6
 BuildArch:      noarch
-%if %{with tests}
-BuildRequires:  ant-junit
-BuildRequires:  easymock
-%endif
 
 %description
 Commons-Collections seek to build upon the JDK classes by providing
@@ -54,21 +47,10 @@ This package provides %{summary}.
 
 %prep
 %setup -q -n commons-collections4-%{version}-src
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
-
-%pom_remove_parent
+cp %{SOURCE1} build.xml
 
 %build
-%{ant} \
-%if %{with tests}
-  -Djunit.jar=$(build-classpath junit) \
-  -Dhamcrest.jar=$(build-classpath hamcrest/core) \
-  -Deasymock.jar=$(build-classpath easymock) \
-  test \
-%endif
-  jar javadoc
+%{ant} jar javadoc
 
 %install
 # jar
@@ -77,11 +59,11 @@ install -pm 0644 target/%{short_name}-%{version}.jar %{buildroot}%{_javadir}/%{n
 ln -sf %{name}.jar %{buildroot}%{_javadir}/%{short_name}.jar
 # pom
 install -dm 0755 %{buildroot}%{_mavenpomdir}
-install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
+install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 %add_maven_depmap %{name}.pom %{name}.jar
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
-cp -pr target/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
+cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
@@ -94,19 +76,6 @@ cp -pr target/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1-2
-- Converting the 'Release' tag to the '[number].[distribution]' format.
-
-* Tue Nov 17 2020 Ruying Chen <v-ruyche@microsoft.com> - 4.1-1.7
+* Thu May 15 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 4.4-1
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
-- Use javapackages-local-bootstrap to avoid build cycle.
-
-* Mon Mar  4 2019 Fridrich Strba <fstrba@suse.com>
-- Initial packaging of apache-commons-collections4 4.1
-- Added patches:
-  * commons-collections4-4.1-bundle.patch
-    + Add to the manifest OSGi bundle information
-  * commons-collections4-4.1-javadoc.patch
-    + Do not try to download web-based resources during the build.
-  * commons-collections4-4.1-jdk11.patch
-    + Resolve type ambiguity in a toArray(null) call
+- License verified
