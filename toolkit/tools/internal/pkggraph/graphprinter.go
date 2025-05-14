@@ -51,19 +51,18 @@ type loggerOutputWrapper struct {
 	logLevel logrus.Level
 }
 
-// Write implements the io.Writer interface.
-func (d loggerOutputWrapper) Write(bytes []byte) (int, error) {
-	// Remove the trailing newline character from the log message,
-	// as it's unnecessary when logging.
-	line := strings.TrimSuffix(string(bytes), "\n")
-	logger.Log.Log(d.logLevel, line)
-	return len(bytes), nil
+// gTreeBuilder helps build a 'gtree' package's tree from a graph.
+type gTreeBuilder struct {
+	treeRoot       *gtree.Node
+	seenNodes      map[*PkgNode]bool
+	printNodesOnce bool
 }
 
 // NewGraphPrinter creates a new GraphPrinter.
 // It accepts a variadic number of 'GraphPrinter*' modifiers to customize the printer's behavior.
 // The default settings are:
 // - output: logrus logger on debug level
+// - printNodesOnce: false
 func NewGraphPrinter(configModifiers ...graphPrinterConfigModifier) GraphPrinter {
 	config := graphPrinterConfig{
 		output: loggerOutputWrapper{
@@ -101,11 +100,17 @@ func GraphPrinterLogOutput(logLevel logrus.Level) graphPrinterConfigModifier {
 	}
 }
 
+// GraphPrinterPrintOnce is a config modifier passed to the graph printer's constructor
+// to define whether the printer should print each node only once.
+func GraphPrinterPrintNodesOnce() graphPrinterConfigModifier {
+	return func(c *graphPrinterConfig) {
+		c.printNodesOnce = true
+	}
+}
+
 // Print prints the graph. It ignores any cycles in the graph turning the graph into a tree.
 // It then uses the 'gtree' package to print the tree structure.
 func (g GraphPrinter) Print(graph *PkgGraph, rootNode *PkgNode) error {
-	var buildTreeWithDFS func(*gtree.Node, *PkgNode)
-
 	if graph == nil {
 		return fmt.Errorf("graph is nil")
 	}
@@ -118,50 +123,94 @@ func (g GraphPrinter) Print(graph *PkgGraph, rootNode *PkgNode) error {
 		return fmt.Errorf("root node '%s' not found in the graph", rootNode.FriendlyName())
 	}
 
-	treeRoot := gtree.NewRoot(rootNode.FriendlyName())
-
-	// Use a set to keep track of seen nodes to avoid infinite loops.
-	seenNodes := make(map[*PkgNode]bool)
-
-	// Walking the graph manually to keep track of 'gtree' nodes
-	// and the parent-child relationships between them.
-	buildTreeWithDFS = func(treeParent *gtree.Node, pkgNode *PkgNode) {
-		if (pkgNode == nil) || (g.printNodesOnce && seenNodes[pkgNode]) {
-			return
-		}
-
-		treeNode := buildTreeNode(treeRoot, treeParent, pkgNode, seenNodes)
-
-		if seenNodes[pkgNode] {
-			return
-		}
-
-		seenNodes[pkgNode] = true
-
-		children := graph.From(pkgNode.ID())
-		for children.Next() {
-			buildTreeWithDFS(treeNode, children.Node().(*PkgNode))
-		}
-
-		if !g.printNodesOnce {
-			seenNodes[pkgNode] = false
-		}
+	treeBuilder := newGTreeBuilder(g.printNodesOnce)
+	treeRoot, err := treeBuilder.buildTree(graph, rootNode)
+	if err != nil {
+		return fmt.Errorf("failed to build tree:\n%w", err)
 	}
 
-	buildTreeWithDFS(nil, rootNode)
+	err = gtree.OutputProgrammably(g.output, treeRoot)
+	if err != nil {
+		return fmt.Errorf("failed to print tree:\n%w", err)
+	}
 
-	return gtree.OutputProgrammably(g.output, treeRoot)
+	return nil
 }
 
-func buildTreeNode(treeRoot *gtree.Node, treeParent *gtree.Node, pkgNode *PkgNode, seenNodes map[*PkgNode]bool) *gtree.Node {
+// Write implements the io.Writer interface.
+func (d loggerOutputWrapper) Write(bytes []byte) (int, error) {
+	// Remove the trailing newline character from the log message,
+	// as it's unnecessary when logging.
+	line := strings.TrimSuffix(string(bytes), "\n")
+	logger.Log.Log(d.logLevel, line)
+	return len(bytes), nil
+}
+
+// newGTreeBuilder creates a new gTreeBuilder instance with the specified
+// configuration for printing nodes once.
+func newGTreeBuilder(printNodesOnce bool) *gTreeBuilder {
+	result := &gTreeBuilder{
+		printNodesOnce: printNodesOnce,
+	}
+	result.resetState()
+	return result
+}
+
+// buildTree traverses the graph and constructs a tree representation.
+func (tb *gTreeBuilder) buildTree(graph *PkgGraph, rootNode *PkgNode) (*gtree.Node, error) {
+	if rootNode == nil {
+		return nil, fmt.Errorf("root node is nil")
+	}
+
+	tb.resetState()
+	tb.buildTreeWithDFS(nil, rootNode, graph)
+
+	return tb.treeRoot, nil
+}
+
+func (tb *gTreeBuilder) resetState() {
+	tb.seenNodes = make(map[*PkgNode]bool)
+	tb.treeRoot = nil
+}
+
+// buildTreeWithDFS builds the tree using depth-first search.
+func (tb *gTreeBuilder) buildTreeWithDFS(treeParent *gtree.Node, pkgNode *PkgNode, graph *PkgGraph) {
+	if pkgNode == nil {
+		return
+	}
+
+	treeNode := tb.buildTreeNode(treeParent, pkgNode)
+
+	if tb.seenNodes[pkgNode] {
+		return
+	}
+
+	tb.seenNodes[pkgNode] = true
+
+	children := graph.From(pkgNode.ID())
+	for children.Next() {
+		tb.buildTreeWithDFS(treeNode, children.Node().(*PkgNode), graph)
+	}
+
+	if !tb.printNodesOnce {
+		tb.seenNodes[pkgNode] = false
+	}
+}
+
+// buildTreeNode creates a new tree node and adds it to the parent
+// or sets it as the root if the parent is nil.
+func (tb *gTreeBuilder) buildTreeNode(treeParent *gtree.Node, pkgNode *PkgNode) *gtree.Node {
+	nodeText := tb.buildNodeText(pkgNode)
 	if treeParent == nil {
-		return treeRoot
+		tb.treeRoot = gtree.NewRoot(nodeText)
+		return tb.treeRoot
 	}
-	return treeParent.Add(buildNodeText(pkgNode, seenNodes[pkgNode]))
+	return treeParent.Add(nodeText)
 }
 
-func buildNodeText(pkgNode *PkgNode, nodeSeen bool) string {
-	if nodeSeen {
+// buildNodeText formats the node text based on whether it's been seen before.
+func (tb *gTreeBuilder) buildNodeText(pkgNode *PkgNode) string {
+	if tb.seenNodes[pkgNode] {
 		return fmt.Sprintf("%s... [SEEN]", pkgNode.FriendlyName())
 	}
 	return pkgNode.FriendlyName()
