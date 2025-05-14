@@ -28786,8 +28786,8 @@
         "type": "other",
         "other": {
           "name": "tardev-snapshotter",
-          "version": "0.0.13",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/tardev-snapshotter-0.0.13.tar.gz"
+          "version": "3.2.0.tardev1",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.tardev1.tar.gz"
         }
       }
     },
