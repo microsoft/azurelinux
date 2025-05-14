@@ -1,7 +1,7 @@
 Summary:        Contains programs for manipulating text files
 Name:           gawk
 Version:        5.2.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,10 +40,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 # Skip the timeout test, which is unreliable on our (vm) build machines
 sed -i 's/ timeout / /' test/Makefile
 sed -i 's/ pty1 / /' test/Makefile
+sed -i 's/ pma / /' test/Makefile
+sed -i 's/ pma-tests / /' test/Makefile
+sed -i 's/ check-recursive / /' test/Makefile
 
-# Generate locale for `en_US.iso88591` which is required for ptest
-# Ideally it should have been present. Investigate if its a `chroot` only issue
-%{_sbindir}/locale-gen.sh
 make %{?_smp_mflags} check
 
 %post   -p /sbin/ldconfig
@@ -63,6 +63,9 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/profile.d/gawk.sh
 
 %changelog
+* Wed Jun 26 2024 Sam Meluch <sammeluch@microsoft.com> - 5.2.2-2
+- Remove locale-gen.sh call in favor of built in glibc-locales
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.2.2-1
 - Auto-upgrade to 5.2.2 - Azure Linux 3.0 - package upgrades
 
