@@ -1,7 +1,7 @@
 Summary:        Next generation system logger facilty
 Name:           syslog-ng
 Version:        4.3.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,7 @@ Source0:        https://github.com/balabit/%{name}/releases/download/%{name}-%{v
 Source1:        60-syslog-ng-journald.conf
 Source2:        syslog-ng.service
 Patch0:         remove-hardcoded-python-module-versioning.patch
+Patch1:         CVE-2024-47619.patch
 BuildRequires:  glib-devel
 BuildRequires:  json-c-devel
 BuildRequires:  json-glib-devel
@@ -159,6 +160,9 @@ fi
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Fri May 09 2025 Kanishk Bansal <kanbansal@microsoft.com> - 4.3.1-3
+- Patch CVE-2024-47619
+
 * Thu Mar 01 2024 Henry Li <lihl@microsoft.com> - 4.3.1-2
 - Remove check section as unit testing is disabled in source
 

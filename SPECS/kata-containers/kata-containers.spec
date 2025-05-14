@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           kata-containers
-Version:        3.2.0.azl5
+Version:        3.15.0.aks0
 Release:        1%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
@@ -16,7 +16,7 @@ ExclusiveArch: x86_64
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
-BuildRequires:  rust
+BuildRequires:  rust >= 1.85.0
 BuildRequires:  libseccomp-devel
 BuildRequires:  openssl-devel
 BuildRequires:  clang
@@ -112,13 +112,19 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.15.0.aks0-1
+- Auto-upgrade to 3.15.0.aks0
+
+* Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.2.0.azl5-2
+- Pin rust version
+
 * Fri Mar 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl5-1
 - Auto-upgrade to 3.2.0.azl5
 
 * Wed Jan 22 2025 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl4-1
 - Upgrade to 3.2.0.azl4 release
 
-* Thu Oct 25 2024 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl3-2
+* Fri Oct 25 2024 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl3-2
 - Only build for x86_64
 
 * Fri Sep 20 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl3-1
