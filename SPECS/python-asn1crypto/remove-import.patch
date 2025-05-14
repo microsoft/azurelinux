@@ -1,0 +1,36 @@
+diff -urN asn1crypto-1.5.1/tests/__init__.py asn1crypto-1.5.1/tests/__init__.py
+--- asn1crypto-1.5.1/tests/__init__.py	2022-03-15 14:45:23.000000000 +0000
++++ asn1crypto-1.5.1/tests/__init__.py	2025-05-07 19:00:39.694821504 +0000
+@@ -1,8 +1,9 @@
+ # coding: utf-8
+ from __future__ import unicode_literals, division, absolute_import, print_function
+ 
+-import imp
+ import os
++import sys
++import importlib.util
+ import unittest
+ 
+ 
+@@ -38,8 +39,19 @@
+         return None
+ 
+     try:
+-        mod_info = imp.find_module(mod_dir, [path])
+-        return imp.load_module(mod, *mod_info)
++        full_mod_path = os.path.join(path, mod_dir, '__init__.py')
++        if not os.path.isfile(full_mod_path):
++            full_mod_path = os.path.join(path, mod_dir + '.py')
++            if not os.path.isfile(full_mod_path):
++                return None
++
++        spec = importlib.util.spec_from_file_location(mod, full_mod_path)
++        if spec is None:
++            return None
++
++        module = importlib.util.module_from_spec(spec)
++        spec.loader.exec_module(module)
++        return module
+     except ImportError:
+         return None
+ 
