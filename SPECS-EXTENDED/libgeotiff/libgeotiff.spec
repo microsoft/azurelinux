@@ -1,24 +1,27 @@
-Summary:        GeoTIFF format library
-Name:           libgeotiff
-Version:        1.7.1
-Release:        5%{?dist}
-License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://trac.osgeo.org/geotiff/
-Source:         https://download.osgeo.org/geotiff/%{name}/%{name}-%{version}.tar.gz
+
+Name:          libgeotiff
+Version:       1.7.3
+Release:       4%{?dist}
+
+Summary:       GeoTIFF format library
+License:       MIT
+URL:           https://trac.osgeo.org/geotiff/
+Source:        https://download.osgeo.org/geotiff/%{name}/%{name}-%{version}.tar.gz
 # Honour LIB_SUFFIX
 # Honour GEOTIFF_INCLUDE_SUBDIR
 # Add version suffix to mingw library
 # Fix cmake module install dir
 # Don't install docs
-Patch0:         libgeotiff_cmake.patch
-BuildRequires:  cmake
-BuildRequires:  gcc-c++
-BuildRequires:  libjpeg-devel
-BuildRequires:  libtiff-devel
-BuildRequires:  proj-devel
-BuildRequires:  zlib-devel
+Patch0:        libgeotiff_cmake.patch
+
+BuildRequires: cmake
+BuildRequires: gcc-c++
+BuildRequires: libtiff-devel
+BuildRequires: libjpeg-devel
+BuildRequires: proj-devel
+BuildRequires: zlib-devel
 
 %description
 GeoTIFF represents an effort by over 160 different remote sensing,
@@ -27,10 +30,9 @@ to establish a TIFF based interchange format for georeferenced
 raster imagery.
 
 %package devel
-Summary:        Development library and header for the GeoTIFF file format library
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       libtiff-devel
-Requires:       pkgconfig
+Summary:	Development library and header for the GeoTIFF file format library
+Requires:	pkgconfig libtiff-devel
+Requires:	%{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 The GeoTIFF library provides support for development of geotiff image format.
@@ -38,16 +40,14 @@ The GeoTIFF library provides support for development of geotiff image format.
 %prep
 %autosetup -p1 -n %{name}-%{version}
 
-
 %build
 # Native build
-%cmake -DGEOTIFF_BIN_SUBDIR=bin -DGEOTIFF_INCLUDE_SUBDIR=include/%{name} -DGEOTIFF_LIB_SUBDIR=%{_lib}
+%cmake -DGEOTIFF_BIN_SUBDIR=bin -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir}/%{name}
 %cmake_build
 
 
 %install
 %cmake_install
-
 
 # install pkgconfig file
 mkdir -p %{buildroot}%{_libdir}/pkgconfig/
@@ -59,14 +59,13 @@ includedir=%{_includedir}/%{name}
 
 Name: %{name}
 Description: GeoTIFF file format library
-Version: %{version}
+Version: 1.7.3
 Libs: -L\${libdir} -lgeotiff
 Cflags: -I\${includedir}
 EOF
 
 %check
 %ctest
-
 
 %files
 %license LICENSE
@@ -85,10 +84,45 @@ EOF
 %{_libdir}/cmake/GeoTIFF/
 
 %changelog
-* Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 1.7.1-5
-- Initial CBL-Mariner import from Fedora 37 (license: MIT)
+* Wed May 07 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.7.3-4
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
-- Remove mingw build conditional execution statements
+
+* Thu Apr 17 2025 Sandro Mani <manisandro@gmail.com> - 1.7.3-3
+- Rebuild against correct crt
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat May 25 2024 Sandro Mani <manisandro@gmail.com> - 1.7.3-1
+- Update to 1.7.3
+
+* Tue Mar 05 2024 Sandro Mani <manisandro@gmail.com> - 1.7.1-13
+- Rebuild (proj)
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.1-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.1-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Sep 03 2023 Sandro Mani <manisandro@gmail.com> - 1.7.1-10
+- Rebuild (proj)
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.1-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu May 18 2023 Orion Poplawski <orion@nwra.com> - 1.7.1-8
+- Change BR to mingw*-gcc-c++
+
+* Sat Mar 04 2023 Sandro Mani <manisandro@gmail.com> - 1.7.1-7
+- Rebuild (proj)
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sun Sep 04 2022 Sandro Mani <manisandro@gmail.com> - 1.7.1-5
+- Rebuild (proj)
 
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild

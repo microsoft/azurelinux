@@ -1,6 +1,6 @@
-diff -rupN --no-dereference libgeotiff-1.7.1/cmake/CMakeLists.txt libgeotiff-1.7.1-new/cmake/CMakeLists.txt
---- libgeotiff-1.7.1/cmake/CMakeLists.txt	2022-02-18 16:07:34.000000000 +0100
-+++ libgeotiff-1.7.1-new/cmake/CMakeLists.txt	2022-03-14 23:38:20.294077484 +0100
+diff -rupN libgeotiff-1.7.3/cmake/CMakeLists.txt libgeotiff-1.7.3-new/cmake/CMakeLists.txt
+--- libgeotiff-1.7.3/cmake/CMakeLists.txt	2022-02-18 16:07:34.000000000 +0100
++++ libgeotiff-1.7.3-new/cmake/CMakeLists.txt	2024-05-25 11:33:17.823041296 +0200
 @@ -6,13 +6,8 @@
  # ${INSTALL_CMAKE_DIR} and @PROJECT_ROOT_DIR@ is the relative
  # path to the root from there.  (Note that the whole install tree can
@@ -17,23 +17,23 @@ diff -rupN --no-dereference libgeotiff-1.7.1/cmake/CMakeLists.txt libgeotiff-1.7
  
  configure_file (project-config.cmake.in project-config.cmake @ONLY)
  configure_file (project-config-version.cmake.in
-diff -rupN --no-dereference libgeotiff-1.7.1/CMakeLists.txt libgeotiff-1.7.1-new/CMakeLists.txt
---- libgeotiff-1.7.1/CMakeLists.txt	2022-03-10 09:32:14.000000000 +0100
-+++ libgeotiff-1.7.1-new/CMakeLists.txt	2022-03-14 23:38:20.295077481 +0100
-@@ -261,9 +261,9 @@ SET(GEOTIFF_LIB_DIR ${GEOTIFF_LIB_SUBDIR
- SET(GEOTIFF_INCLUDE_DIR ${GEOTIFF_INCLUDE_SUBDIR})
+diff -rupN libgeotiff-1.7.3/CMakeLists.txt libgeotiff-1.7.3-new/CMakeLists.txt
+--- libgeotiff-1.7.3/CMakeLists.txt	2024-05-24 15:38:59.000000000 +0200
++++ libgeotiff-1.7.3-new/CMakeLists.txt	2024-05-25 11:35:20.294177785 +0200
+@@ -244,9 +244,9 @@ SET(GEOTIFF_MAN_PAGES
+ #    ${PROJECT_BINARY_DIR}/geotiff_version.h
  
  # Install doc files
 -INSTALL(FILES
--    AUTHORS ChangeLog COPYING INSTALL LICENSE README README_BIN README.WIN
--    DESTINATION doc)
-+#INSTALL(FILES
-+    #AUTHORS ChangeLog COPYING INSTALL LICENSE README README_BIN README.WIN
-+    #DESTINATION doc)
+-    AUTHORS ChangeLog COPYING LICENSE README README_BIN README.WIN
+-    DESTINATION ${CMAKE_INSTALL_DOCDIR})
++# INSTALL(FILES
++    # AUTHORS ChangeLog COPYING LICENSE README README_BIN README.WIN
++    # DESTINATION ${CMAKE_INSTALL_DOCDIR})
  
  # Install man pages
- INSTALL(FILES ${GEOTIFF_MAN_PAGES} DESTINATION share/man/man1)
-@@ -329,6 +329,9 @@ endif()
+ INSTALL(FILES ${GEOTIFF_MAN_PAGES} DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+@@ -312,6 +312,9 @@ endif()
  
  SET_TARGET_PROPERTIES(${GEOTIFF_LIBRARY_TARGET} PROPERTIES
     OUTPUT_NAME ${GEOTIFF_LIB_NAME})
@@ -41,5 +41,5 @@ diff -rupN --no-dereference libgeotiff-1.7.1/CMakeLists.txt libgeotiff-1.7.1-new
 +    SET_TARGET_PROPERTIES(${GEOTIFF_LIBRARY_TARGET} PROPERTIES SUFFIX "-${LINK_SOVERSION}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 +ENDIF(MINGW)
  
- set(CONFIG_DEPENDENCIES "")
- if(TARGET TIFF::TIFF)
+ set(CONFIG_PUBLIC_DEPENDENCIES "")
+ set(CONFIG_PRIVATE_DEPENDENCIES "")
