@@ -11,7 +11,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.157.mshv1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -126,8 +126,6 @@ install -Dm 755 %{SOURCE4} %{buildroot}%{_sysconfdir}/grub.d/50_mariner_mshv_men
 
 %ifarch x86_64
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
-mkdir -p %{buildroot}/boot/efi
-install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/efi/vmlinuz-%{uname_r}
 %endif
 
 # Restrict the permission on System.map-X file
@@ -192,7 +190,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
-/boot/efi/vmlinuz-%{uname_r}
 %config(noreplace) %{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
 %config %{_sysconfdir}/grub.d/50_mariner_mshv_menuentry
 %defattr(0644,root,root)
@@ -224,6 +221,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Fri Apr 04 2025 Cameron Baird <cameronbaird@microsoft.com> - 5.15.157.mshv1-4
+- Remove vmlinuz copy in /boot/efi; no longer needed for current mshv loader implementation
+
 * Fri Oct 25 2024 Saul Paredes <saulparedes@microsoft.com> - 5.15.157.mshv1-3
 - Increase build verbosity
 
