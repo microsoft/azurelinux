@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.0.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -19,6 +19,7 @@ Source2: containerd.toml
 Patch0:	CVE-2024-45338.patch
 Patch1:	CVE-2025-27144.patch
 Patch2:	CVE-2024-40635.patch
+Patch3: add-tardev-support.patch
 %{?systemd_requires}
 
 BuildRequires: golang
@@ -90,6 +91,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Fri May 02 2025 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-9
+- Added updated patch to support tardev-snapshotter for Kata CC.
+
 * Wed Apr 09 2025 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.0.0-8
 - Fix CVE-2024-40635
 
