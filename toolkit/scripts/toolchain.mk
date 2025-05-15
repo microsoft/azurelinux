@@ -200,7 +200,8 @@ $(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST) $(go-downloader) $(SCRIPTS_D
 		--url-list "$(PACKAGE_URL_LIST)" \
 		--allowable-gpg-keys "$(TOOLCHAIN_GPG_VALIDATION_KEYS)" \
 		$(if $(TLS_CERT),--certificate $(TLS_CERT)) \
-		$(if $(TLS_KEY),--private-key $(TLS_KEY)) || { \
+		$(if $(TLS_KEY),--private-key $(TLS_KEY)) && \
+		echo "$(notdir $@)" >> $(toolchain_downloads_manifest) || { \
 		echo "Could not find toolchain package in package repo to rehydrate with: $(notdir $@)." >> "$$log_file" && \
 		touch $@; \
 	}
