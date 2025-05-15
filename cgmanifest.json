@@ -20743,8 +20743,8 @@
         "type": "other",
         "other": {
           "name": "perl-Variable-Magic",
-          "version": "0.62",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/V/VP/VPIT/Variable-Magic-0.62.tar.gz"
+          "version": "0.64",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/V/VP/VPIT/Variable-Magic-0.64.tar.gz"
         }
       }
     },
