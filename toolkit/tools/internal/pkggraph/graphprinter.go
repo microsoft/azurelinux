@@ -81,16 +81,16 @@ func NewGraphPrinter(modifiers ...graphPrinterModifier) GraphPrinter {
 // GraphPrinterOutput is a config modifier passed to the graph printer's constructor
 // to define the output writer for the graph printer.
 func GraphPrinterOutput(output io.Writer) graphPrinterModifier {
-	return func(c *GraphPrinter) {
-		c.output = output
+	return func(g *GraphPrinter) {
+		g.output = output
 	}
 }
 
 // GraphPrinterLogOutput is a config modifier passed to the graph printer's constructor
 // making the printer's output be logged at the specified log level.
 func GraphPrinterLogOutput(logLevel logrus.Level) graphPrinterModifier {
-	return func(c *GraphPrinter) {
-		c.output = loggerOutputWrapper{
+	return func(g *GraphPrinter) {
+		g.output = loggerOutputWrapper{
 			logLevel: logLevel,
 		}
 	}
@@ -99,8 +99,8 @@ func GraphPrinterLogOutput(logLevel logrus.Level) graphPrinterModifier {
 // GraphPrinterPrintOnce is a config modifier passed to the graph printer's constructor
 // to define whether the printer should print each node only once.
 func GraphPrinterPrintNodesOnce() graphPrinterModifier {
-	return func(c *GraphPrinter) {
-		c.printNodesOnce = true
+	return func(g *GraphPrinter) {
+		g.printNodesOnce = true
 	}
 }
 
@@ -134,11 +134,11 @@ func (g GraphPrinter) Print(graph *PkgGraph, rootNode *PkgNode) error {
 }
 
 // Write implements the io.Writer interface.
-func (d loggerOutputWrapper) Write(bytes []byte) (int, error) {
+func (l loggerOutputWrapper) Write(bytes []byte) (int, error) {
 	// Remove the trailing newline character from the log message,
 	// as it's unnecessary when logging.
 	line := strings.TrimSuffix(string(bytes), "\n")
-	logger.Log.Log(d.logLevel, line)
+	logger.Log.Log(l.logLevel, line)
 	return len(bytes), nil
 }
 
@@ -153,7 +153,7 @@ func newGTreeBuilder(printNodesOnce bool) *gTreeBuilder {
 }
 
 // buildTree traverses the graph and constructs a tree representation.
-func (tb *gTreeBuilder) buildTree(graph *PkgGraph, rootNode *PkgNode) (*gtree.Node, error) {
+func (t *gTreeBuilder) buildTree(graph *PkgGraph, rootNode *PkgNode) (*gtree.Node, error) {
 	if graph == nil {
 		return nil, fmt.Errorf("graph is nil")
 	}
@@ -162,10 +162,10 @@ func (tb *gTreeBuilder) buildTree(graph *PkgGraph, rootNode *PkgNode) (*gtree.No
 		return nil, fmt.Errorf("root node is nil")
 	}
 
-	tb.resetState()
-	tb.buildTreeWithDFS(nil, rootNode, graph)
+	t.resetState()
+	t.buildTreeWithDFS(nil, rootNode, graph)
 
-	return tb.treeRoot, nil
+	return t.treeRoot, nil
 }
 
 func (tb *gTreeBuilder) resetState() {
@@ -176,7 +176,7 @@ func (tb *gTreeBuilder) resetState() {
 // buildTreeWithDFS builds the tree using depth-first search.
 // It converts a general graph into a tree structure.
 // It uses a map to keep track of seen nodes to avoid cycles.
-func (tb *gTreeBuilder) buildTreeWithDFS(treeParent *gtree.Node, pkgNode *PkgNode, graph *PkgGraph) {
+func (t *gTreeBuilder) buildTreeWithDFS(treeParent *gtree.Node, pkgNode *PkgNode, graph *PkgGraph) {
 	if pkgNode == nil {
 		return
 	}
@@ -184,41 +184,41 @@ func (tb *gTreeBuilder) buildTreeWithDFS(treeParent *gtree.Node, pkgNode *PkgNod
 	// We add a node before the "seen" check because we always
 	// want to add the node to the tree. If it's been seen before,
 	// we just mark it as seen as part of the text displayed for the node.
-	treeNode := tb.buildTreeNode(treeParent, pkgNode)
+	treeNode := t.buildTreeNode(treeParent, pkgNode)
 
-	if tb.seenNodes[pkgNode] {
+	if t.seenNodes[pkgNode] {
 		return
 	}
 
-	tb.seenNodes[pkgNode] = true
+	t.seenNodes[pkgNode] = true
 
 	children := graph.From(pkgNode.ID())
 	for children.Next() {
-		tb.buildTreeWithDFS(treeNode, children.Node().(*PkgNode), graph)
+		t.buildTreeWithDFS(treeNode, children.Node().(*PkgNode), graph)
 	}
 
 	// As we traverse the graph back up, setting the node as unseen
 	// allows us to print it again if we encounter it later
 	// in a DIFFERENT branch of the tree.
-	if !tb.printNodesOnce {
-		tb.seenNodes[pkgNode] = false
+	if !t.printNodesOnce {
+		t.seenNodes[pkgNode] = false
 	}
 }
 
 // buildTreeNode creates a new tree node and adds it to the parent
 // or sets it as the root if the parent is nil.
-func (tb *gTreeBuilder) buildTreeNode(treeParent *gtree.Node, pkgNode *PkgNode) *gtree.Node {
-	nodeText := tb.buildNodeText(pkgNode)
+func (t *gTreeBuilder) buildTreeNode(treeParent *gtree.Node, pkgNode *PkgNode) *gtree.Node {
+	nodeText := t.buildNodeText(pkgNode)
 	if treeParent == nil {
-		tb.treeRoot = gtree.NewRoot(nodeText)
-		return tb.treeRoot
+		t.treeRoot = gtree.NewRoot(nodeText)
+		return t.treeRoot
 	}
 	return treeParent.Add(nodeText)
 }
 
 // buildNodeText formats the node text based on whether it's been seen before.
-func (tb *gTreeBuilder) buildNodeText(pkgNode *PkgNode) string {
-	if tb.seenNodes[pkgNode] {
+func (t *gTreeBuilder) buildNodeText(pkgNode *PkgNode) string {
+	if t.seenNodes[pkgNode] {
 		return pkgNode.FriendlyName() + seenNodeSuffix
 	}
 	return pkgNode.FriendlyName()
