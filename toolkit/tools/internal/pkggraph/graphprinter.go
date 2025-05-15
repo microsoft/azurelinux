@@ -160,6 +160,10 @@ func newGTreeBuilder(printNodesOnce bool) *gTreeBuilder {
 
 // buildTree traverses the graph and constructs a tree representation.
 func (tb *gTreeBuilder) buildTree(graph *PkgGraph, rootNode *PkgNode) (*gtree.Node, error) {
+	if graph == nil {
+		return nil, fmt.Errorf("graph is nil")
+	}
+
 	if rootNode == nil {
 		return nil, fmt.Errorf("root node is nil")
 	}

@@ -30,9 +30,15 @@ func TestNewGTreeBuilderSetPrintNodesOnceWorks(t *testing.T) {
 	assert.Nil(t, builder.treeRoot)
 }
 
-func TestBuildTreeWithNilRootNodeErorrsOut(t *testing.T) {
+func TestBuildTreeWithNilRootNodeErrorsOut(t *testing.T) {
 	builder := newGTreeBuilder(false)
 	_, err := builder.buildTree(NewPkgGraph(), nil)
+	assert.Error(t, err)
+}
+
+func TestBuildTreeWithNilGraphErrorsOut(t *testing.T) {
+	builder := newGTreeBuilder(false)
+	_, err := builder.buildTree(nil, createTestNode("test-node"))
 	assert.Error(t, err)
 }
 
