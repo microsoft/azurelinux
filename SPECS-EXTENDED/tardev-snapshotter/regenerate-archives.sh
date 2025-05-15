@@ -18,8 +18,9 @@ tar -czf $NAME-$VERSION.tar.gz $NAME-$VERSION
 mv $NAME-$VERSION.tar.gz $WORK_DIR
 popd
 
-~/source/steamboat/SPECS/tardev-snapshotter/build_cargo_cache.sh $NAME-$VERSION.tar.gz $NAME-$VERSION
-# /tmp/mariner/uki/build/azurelinux/toolkit/scripts/build_cargo_cache.sh $NAME-$VERSION.tar.gz $NAME-$VERSION
+wget https://raw.githubusercontent.com/microsoft/azurelinux/3.0/toolkit/scripts/build_cargo_cache.sh
+chmod +x ./build_cargo_cache.sh
+./build_cargo_cache.sh $NAME-$VERSION.tar.gz $NAME-$VERSION
 
 mv $NAME-$VERSION.tar.gz $SOURCE_DIR/
 mv $NAME-$VERSION-cargo.tar.gz $SOURCE_DIR/
