@@ -2,3 +2,5 @@ util-linux
 ca-certificates
 kernel
 kernel-drivers-gpu
+mlnx-ofa_kernel
+mlnx-ofa_kernel-modules
