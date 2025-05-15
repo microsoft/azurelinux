@@ -1,7 +1,7 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
-Version:        1.8.0
-Release:        2%{?dist}
+Version:        1.8.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -80,6 +80,9 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 %dir %attr(1733, root, root) %{_localstatedir}/log/keysinuse/
 
 %changelog
+* Tue May 13 2025 Tobias Brick <tobiasb@microsoft.com> - 1.8.1-1
+- Upgrade to SymCrypt-OpenSSL 1.8.1 with minor bugfixes.
+
 * Thu May 08 2025 Tobias Brick <tobiasb@microsoft.com> - 1.8.0-2
 - Update mechanism for creating keysinuse logging directory.
 
