@@ -270,7 +270,7 @@ func TestPrintNodesOnceFunctionalityWorks(t *testing.T) {
 
 	testCases := []struct {
 		name              string
-		printNodesConfig  graphPrinterConfigModifier
+		printNodesConfig  graphPrinterModifier
 		outputContains    []string
 		outputNotContains []string
 	}{

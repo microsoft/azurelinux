@@ -38,15 +38,11 @@ const seenNodeSuffix = "... [SEEN]"
 //	│   └── D
 //	└── E
 type GraphPrinter struct {
-	graphPrinterConfig
-}
-
-type graphPrinterConfig struct {
 	output         io.Writer
 	printNodesOnce bool
 }
 
-type graphPrinterConfigModifier func(*graphPrinterConfig)
+type graphPrinterModifier func(*GraphPrinter)
 
 // loggerOutputWrapper is a wrapper around logrus.Logger to implement the io.Writer interface.
 type loggerOutputWrapper struct {
@@ -65,37 +61,35 @@ type gTreeBuilder struct {
 // The default settings are:
 // - output: logrus logger on debug level
 // - printNodesOnce: false
-func NewGraphPrinter(configModifiers ...graphPrinterConfigModifier) GraphPrinter {
-	config := graphPrinterConfig{
+func NewGraphPrinter(modifiers ...graphPrinterModifier) GraphPrinter {
+	printer := GraphPrinter{
 		output: loggerOutputWrapper{
 			logLevel: logrus.DebugLevel,
 		},
 		printNodesOnce: false,
 	}
 
-	for _, modifier := range configModifiers {
+	for _, modifier := range modifiers {
 		if modifier != nil {
-			modifier(&config)
+			modifier(&printer)
 		}
 	}
 
-	return GraphPrinter{
-		graphPrinterConfig: config,
-	}
+	return printer
 }
 
 // GraphPrinterOutput is a config modifier passed to the graph printer's constructor
 // to define the output writer for the graph printer.
-func GraphPrinterOutput(output io.Writer) graphPrinterConfigModifier {
-	return func(c *graphPrinterConfig) {
+func GraphPrinterOutput(output io.Writer) graphPrinterModifier {
+	return func(c *GraphPrinter) {
 		c.output = output
 	}
 }
 
 // GraphPrinterLogOutput is a config modifier passed to the graph printer's constructor
 // making the printer's output be logged at the specified log level.
-func GraphPrinterLogOutput(logLevel logrus.Level) graphPrinterConfigModifier {
-	return func(c *graphPrinterConfig) {
+func GraphPrinterLogOutput(logLevel logrus.Level) graphPrinterModifier {
+	return func(c *GraphPrinter) {
 		c.output = loggerOutputWrapper{
 			logLevel: logLevel,
 		}
@@ -104,8 +98,8 @@ func GraphPrinterLogOutput(logLevel logrus.Level) graphPrinterConfigModifier {
 
 // GraphPrinterPrintOnce is a config modifier passed to the graph printer's constructor
 // to define whether the printer should print each node only once.
-func GraphPrinterPrintNodesOnce() graphPrinterConfigModifier {
-	return func(c *graphPrinterConfig) {
+func GraphPrinterPrintNodesOnce() graphPrinterModifier {
+	return func(c *GraphPrinter) {
 		c.printNodesOnce = true
 	}
 }
