@@ -1,7 +1,7 @@
 Summary:        C debugger
 Name:           gdb
 Version:        11.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,7 @@ Patch5:         CVE-2022-48064.patch
 Patch6:         CVE-2022-48065.patch
 Patch7:         CVE-2022-47673.patch
 Patch8:         CVE-2022-47696.patch
+Patch9:         CVE-2021-32256.patch
 BuildRequires:  expat-devel
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
@@ -26,7 +27,7 @@ BuildRequires:  python3-libs
 BuildRequires:  readline-devel
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
-%if %{with_check}
+%if  0%{?with_check}
 BuildRequires:  dejagnu
 BuildRequires:  systemtap-sdt-devel
 %endif
@@ -97,6 +98,9 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 %{_mandir}/*/*
 
 %changelog
+* Fri May 16 2025 Archana Shettigar <v-shettigara@microsoft.com> - 11.2-7
+- Patch CVE-2021-32256 using an upstream patch
+
 * Mon Apr 21 2025 Kanishk Bansal <kanbansal@microsoft.com> - 11.2-6
 - Patch CVE-2022-47673, CVE-2022-47696 using an upstream patch
 
