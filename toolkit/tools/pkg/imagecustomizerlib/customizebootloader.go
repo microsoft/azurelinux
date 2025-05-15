@@ -15,7 +15,7 @@ import (
 func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, imageConnection *ImageConnection,
 ) error {
 
-	switch config.OS.ResetBootLoaderType {
+	switch config.OS.BootLoader.Reset {
 	case imagecustomizerapi.ResetBootLoaderTypeHard:
 		err := hardResetBootLoader(baseConfigPath, config, imageConnection)
 		if err != nil {
