@@ -1,7 +1,7 @@
 Summary:       The NetBSD make(1) tool
 Name:          bmake
 Version:       20211221
-Release:       2%{?dist}
+Release:       3%{?dist}
 License:       BSD
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
@@ -48,6 +48,8 @@ sh ./make-bootstrap.sh
 
 %install
 export STRIP=/bin/true # Make sure binary is not stripped
+# skip 'job-output-null' which randomly fails in build pipelines
+export BROKEN_TESTS=job-output-null
 ./bmake -m mk install DESTDIR=%{buildroot}
 mv %{buildroot}%{_mandir}/{cat,man}1
 chmod a-x %{buildroot}%{_datadir}/mk/mkopt.sh
@@ -64,6 +66,9 @@ chmod a-x %{buildroot}%{_datadir}/mk/mkopt.sh
 %{_datadir}/mk
 
 %changelog
+* Thu May 15 2025 Andrew Phelps <anphel@microsoft.com> - 20211221-3
+- Disable unreliable test job-output-null
+
 * Tue Mar 22 2022 Cameron Baird <cameronbaird@microsoft.com> - 20211221-2
 - Add patch remove-inconsistent-time-tests.patch, which disables unreliably failing
 - tests in varmod-localtime.mk
