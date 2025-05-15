@@ -5760,8 +5760,8 @@
         "type": "other",
         "other": {
           "name": "hunspell-ga",
-          "version": "5.0",
-          "downloadUrl": "https://github.com/kscanne/gaelspell/releases/download/v5.0/ispell-gaeilge-5.0.tar.gz"
+          "version": "5.1",
+          "downloadUrl": "https://github.com/kscanne/gaelspell/releases/download/v5.1/hunspell-ga-5.1.zip"
         }
       }
     },
