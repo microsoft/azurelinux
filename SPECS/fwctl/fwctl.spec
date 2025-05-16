@@ -30,10 +30,6 @@
 # SOFTWARE.
 #
 
-%{!?_name: %define _name fwctl}
-%{!?_version: %define _version 24.10}
-%{!?_release: %define _release OFED.24.10.0.6.7.1}
-
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
@@ -45,6 +41,11 @@
 
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
+
+%{!?_name: %define _name fwctl}
+%{!?_version: %define _version 24.10}
+%{!?_mofed_full_version: %define _mofed_full_version %{_version}-17%{release_suffix}}
+%{!?_release: %define _release OFED.24.10.0.6.7.1}
 
 # KMP is disabled by default
 %{!?KMP: %global KMP 0}
@@ -86,11 +87,11 @@ BuildRequires:  kernel-headers = %{target_kernel_version_full}
 BuildRequires:  binutils
 BuildRequires:  systemd
 BuildRequires:  kmod
-BuildRequires:  mlnx-ofa_kernel-devel = %{_version}
-BuildRequires:  mlnx-ofa_kernel-source = %{_version}
+BuildRequires:  mlnx-ofa_kernel-devel = %{_mofed_full_version}
+BuildRequires:  mlnx-ofa_kernel-source = %{_mofed_full_version}
 
-Requires:       mlnx-ofa_kernel = %{_version}
-Requires:       mlnx-ofa_kernel-modules  = %{_version}
+Requires:       mlnx-ofa_kernel = %{_mofed_full_version}
+Requires:       mlnx-ofa_kernel-modules  = %{_mofed_full_version}
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 

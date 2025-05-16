@@ -40,6 +40,7 @@
 
 %{!?_name: %define _name isert}
 %{!?_version: %define _version 24.10}
+%{!?_mofed_full_version: %define _mofed_full_version %{_version}-17%{release_suffix}}
 %{!?_release: %define _release OFED.24.10.0.6.7.1}
 
 # KMP is disabled by default
@@ -82,11 +83,11 @@ BuildRequires:  kernel-headers = %{target_kernel_version_full}
 BuildRequires:  binutils
 BuildRequires:  systemd
 BuildRequires:  kmod
-BuildRequires:  mlnx-ofa_kernel-devel = %{_version}
-BuildRequires:  mlnx-ofa_kernel-source = %{_version}
+BuildRequires:  mlnx-ofa_kernel-devel = %{_mofed_full_version}
+BuildRequires:  mlnx-ofa_kernel-source = %{_mofed_full_version}
 
-Requires:       mlnx-ofa_kernel = %{_version}
-Requires:       mlnx-ofa_kernel-modules  = %{_version}
+Requires:       mlnx-ofa_kernel = %{_mofed_full_version}
+Requires:       mlnx-ofa_kernel-modules  = %{_mofed_full_version}
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
