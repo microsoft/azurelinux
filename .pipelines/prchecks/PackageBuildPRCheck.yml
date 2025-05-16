@@ -24,6 +24,10 @@ parameters:
     type: boolean
     default: false
     displayName: "Run in debug mode"
+  - name: useDailyBuild
+    type: boolean
+    default: $(useDailyBuild)
+    displayName: "Use daily build"
 
 resources:
   repositories:
