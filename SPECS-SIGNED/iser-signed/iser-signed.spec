@@ -38,6 +38,7 @@
 %global KVERSION %{target_kernel_version_full}
 
 %{!?_name: %define _name iser}
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-17%{release_suffix}}
 
 Summary:	 %{_name} Driver
 Name:		 %{_name}-signed
@@ -66,8 +67,8 @@ iser signed kernel modules
 
 %package -n %{_name}
 Summary:        %{summary}
-Requires:       mlnx-ofa_kernel = %{version}
-Requires:       mlnx-ofa_kernel-modules  = %{version}
+Requires:       mlnx-ofa_kernel = %{_mofed_full_version}
+Requires:       mlnx-ofa_kernel-modules  = %{_mofed_full_version}
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
