@@ -12,6 +12,7 @@
 %global KVERSION %{target_kernel_version_full}
 
 %define _name xpmem-modules
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-17%{release_suffix}}
 
 # xpmem-modules is a sub-package in SPECS/xpmem.
 # We are making that into a main package for signing.
@@ -52,8 +53,8 @@ This package includes the kernel module.
 
 %package -n %{_name}
 Summary:        %{summary}
-Requires:       mlnx-ofa_kernel
-Requires:       mlnx-ofa_kernel-modules
+Requires:       mlnx-ofa_kernel = %{_mofed_full_version}
+Requires:       mlnx-ofa_kernel-modules = %{_mofed_full_version}
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
