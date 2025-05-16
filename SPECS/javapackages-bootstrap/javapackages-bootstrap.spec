@@ -319,7 +319,7 @@ do
 done
 
 pushd "downstream/commons-compress"
-%patch0 -p1
+%patch -P 0 -p1
 popd
 
 for patch_path in patches/*/*
