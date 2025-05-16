@@ -216,7 +216,7 @@ make -C tools/bpf/bpftool
 for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
     ./scripts/sign-file sha512 certs/signing_key.pem certs/signing_key.x509 $MODULE \
     rm -f $MODULE.{sig,dig} \
-    xz $MODULE \
+    # xz $MODULE \
     done \
 %{nil}
 
