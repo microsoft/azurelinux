@@ -11,6 +11,7 @@ Source0:       %{url}/bmake-%{version}.tar.gz
 # on pipeline machines. Disabling with this patch for now, and
 # tracking this bug in workitem 38644519
 Patch0:        remove-inconsistent-time-tests.patch
+Patch1:        do-not-run-tests-on-install.patch
 Requires:      mk-files
 
 BuildRequires: gcc
@@ -48,11 +49,14 @@ sh ./make-bootstrap.sh
 
 %install
 export STRIP=/bin/true # Make sure binary is not stripped
-# skip 'job-output-null' which randomly fails in build pipelines
-export BROKEN_TESTS=job-output-null
 ./bmake -m mk install DESTDIR=%{buildroot}
 mv %{buildroot}%{_mandir}/{cat,man}1
 chmod a-x %{buildroot}%{_datadir}/mk/mkopt.sh
+
+%check
+# skip 'job-output-null' which randomly fails in build pipelines
+export BROKEN_TESTS=job-output-null
+./bmake -m mk test
 
 %files
 %doc ChangeLog README
@@ -67,6 +71,7 @@ chmod a-x %{buildroot}%{_datadir}/mk/mkopt.sh
 
 %changelog
 * Thu May 15 2025 Andrew Phelps <anphel@microsoft.com> - 20211221-3
+- Move unit tests to check section
 - Disable unreliable test job-output-null
 
 * Tue Mar 22 2022 Cameron Baird <cameronbaird@microsoft.com> - 20211221-2
