@@ -99,18 +99,6 @@ Source6:        rubygems.req
 Source7:        macros.rubygems
 # Updates default ruby-uri to 0.12.2 and vendored one to 0.10.3. Remove once ruby gets updated to a version that comes with both lib/uri/version.rb and lib/bundler/vendor/uri/lib/uri/version.rb versions >= 0.12.2 or == 0.10.3
 Patch0:         CVE-2023-36617.patch
-#Patch1:         CVE-2024-27280.patch
-#Patch2:         CVE-2024-27281.patch
-#Patch3:         CVE-2024-27282.patch
-# Patch no longer needed if REXML gem is 3.2.7 or later. Now is 3.2.5
-#Patch4:         CVE-2024-35176.patch
-# Patch no longer needed if REXML gem is 3.3.3 or later. Now is 3.2.5
-#Patch5:         CVE-2024-41946.patch
-# Patch no longer needed if REXML gem is 3.3.9 or later. Now is 3.2.5
-#Patch6:         CVE-2024-49761.patch
-#Patch7:         CVE-2025-27219.patch
-#Patch8:         CVE-2025-27220.patch
-#Patch9:         CVE-2025-27221.patch
 BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel
