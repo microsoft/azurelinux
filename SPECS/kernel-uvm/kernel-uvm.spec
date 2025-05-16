@@ -10,13 +10,13 @@
 
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
-Version:        6.1.58.mshv4
-Release:        4%{?dist}
+Version:        6.6
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
-Source0:        %{_distro_sources_url}/kernel-uvm-%{version}.tar.gz
+Source0:        kernel-uvm-%{version}.tar.gz
 Source1:        config
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -165,6 +165,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Fri May 16 2025 Mitch Zhu <mitchzhu@microsoft.com> - 6.6-1
+- Upgarde to 6.6
+
 * Tue May 13 2025 Mitch Zhu <mitchzhu@microsoft.com> - 6.1.58.mshv4-4
 - Install kernel modules
 
