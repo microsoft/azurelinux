@@ -345,8 +345,11 @@ sed  -i "/<excludeSourceMatching>/a\ \t<excludeSourceMatching>/org/apache/common
 %build
 export LC_ALL=en_US.UTF-8 
 export JAVA_HOME=$(find /usr/lib/jvm -name "*openjdk*")
-./mbi.sh build -incremental ||:
-./mbi.sh build -incremental
+# The build tends to randomly fail and we couldn't understand why. Re-trying the build as a workaround.
+if ! ./mbi.sh build -incremental; then
+    echo "First build attempt failed. Re-trying."
+    ./mbi.sh build -incremental
+fi
 
 %install
 export JAVA_HOME=$(find /usr/lib/jvm -name "*openjdk*")
