@@ -142,12 +142,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 
 %changelog
-* Fri May 08 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.0.4-7
+* Fri May 09 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.0.4-7
 - Add patch for CVE-2025-32909
 - Add patch for CVE-2025-32910
 - Add patch for CVE-2025-32912
 
-* Wed 07 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 3.0.4-6
+* Wed May 07 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 3.0.4-6
 - Patche for CVE-2025-32053
 
 * Sun May 04 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.0.4-5
