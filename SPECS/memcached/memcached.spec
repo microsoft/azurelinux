@@ -7,7 +7,7 @@
 Summary:        High Performance, Distributed Memory Object Cache
 Name:           memcached
 Version:        1.6.22
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,7 @@ Source0:        https://www.memcached.org/files/%{name}-%{version}.tar.gz
 Source1:        memcached.sysconfig
 Patch0:         memcached-unit.patch
 Patch1:         CVE-2021-45985.patch
+Patch2:         CVE-2021-44964.patch
 BuildRequires:  gcc
 BuildRequires:  libevent-devel
 BuildRequires:  systemd-devel
@@ -120,6 +121,9 @@ exit 0
 %{_includedir}/memcached/*
 
 %changelog
+* Thu Apr 17 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.6.22-2
+- Patch CVE-2021-44964
+
 * Thu Nov 09 2023 Harshit Gupta <guptaharshit@microsoft.com> - 1.6.22-1
 - Upgrade to 1.6.22 for CVEs 2023-46852 and 2023-46853
 
