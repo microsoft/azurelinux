@@ -345,7 +345,8 @@ sed  -i "/<excludeSourceMatching>/a\ \t<excludeSourceMatching>/org/apache/common
 %build
 export LC_ALL=en_US.UTF-8 
 export JAVA_HOME=$(find /usr/lib/jvm -name "*openjdk*")
-./mbi.sh build
+./mbi.sh build -incremental ||:
+./mbi.sh build -incremental
 
 %install
 export JAVA_HOME=$(find /usr/lib/jvm -name "*openjdk*")
@@ -390,7 +391,7 @@ sed -i 's|/usr/lib/jvm/java-11-openjdk|%{java_home}|' %{buildroot}%{launchersPat
 
 %changelog
 * Thu May 15 2025 Andrew Phelps <anphel@microsoft.com> - 1.5.0-7
-- Remove parallel build flag to avoid random dependency cycle errors.
+- Attempt incremental build twice to avoid random Dependency cycle errors
 
 * Wed Feb 26 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.5.0-6
 - Patch CVE-2021-36373 and CVE-2021-36374.
