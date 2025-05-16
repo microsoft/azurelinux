@@ -15,7 +15,7 @@
          <attribute name="Export-Package" value='com.jcraft.jsch;version="${version}",com.jcraft.jsch.jce;version="${version}";x-internal:=true,com.jcraft.jsch.jcraft;version="${version}";x-internal:=true,com.jcraft.jsch.jgss;version="${version}";x-internal:=true'/>
 -        <attribute name="Import-Package" value="javax.crypto,javax.crypto.spec,javax.crypto.interfaces,org.ietf.jgss,com.jcraft.jzlib"/>
 +        <attribute name="Import-Package" value="javax.crypto,javax.crypto.spec,javax.crypto.interfaces,org.ietf.jgss,com.jcraft.jzlib;resolution:=optional"/>
-+        <attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=1.6))&quot;"/>
++        <attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=1.8))&quot;"/>
        </manifest>
 -      -->
      </jar>
