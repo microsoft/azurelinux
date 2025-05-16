@@ -9,50 +9,59 @@
 %endif
 %global sover 19
 
-Summary:        Libraries for the Unidata network Common Data Form
 Name:           netcdf
-Version:        4.9.0
-Release:        4%{?dist}
-License:        NetCDF
+Version:        4.9.2
+Release:        14%{?dist}
+Summary:        Libraries for the Unidata network Common Data Form
+
+License:        BSD-3-Clause
+URL:            https://www.unidata.ucar.edu/software/netcdf/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://www.unidata.ucar.edu/software/netcdf/
 Source0:        https://github.com/Unidata/netcdf-c/archive/v%{version}/%{name}-%{version}.tar.gz
-# Fix plugins - https://github.com/Unidata/netcdf-c/pull/2431
-Patch0:         netcdf-plugin.patch
+# Remove sonames from plugins
+Patch0:         https://patch-diff.githubusercontent.com/raw/Unidata/netcdf-c/pull/2431.patch
+# Fix blosc test - https://github.com/Unidata/netcdf-c/issues/2572
+Patch1:         netcdf-tst-blosc.patch
+# Fix segfault in octave-netcdf on exit
+Patch2:         https://github.com/Unidata/netcdf-c/pull/2827.patch
+# Fix incompatible types
+Patch3:         https://github.com/Unidata/netcdf-c/pull/2850.patch
 
-BuildRequires:  blosc-devel
-BuildRequires:  chrpath
-BuildRequires:  curl-devel
+BuildRequires:  libtool
+BuildRequires:  make
 BuildRequires:  doxygen
-BuildRequires:  gawk
+BuildRequires:  blosc-devel
+BuildRequires:  bzip2-devel
 BuildRequires:  hdf-static
 BuildRequires:  hdf5-devel
-BuildRequires:  libtool
+BuildRequires:  gawk
+BuildRequires:  curl-devel
 BuildRequires:  libxml2-devel
+BuildRequires:  libzip-devel
 BuildRequires:  libzstd-devel
 BuildRequires:  m4
-BuildRequires:  make
-#mpiexec segfaults if ssh is not present
-#https://trac.mcs.anl.gov/projects/mpich2/ticket/1576
-BuildRequires:  openssh-clients
 BuildRequires:  zlib-devel
-Requires:       hdf5%{?_isa} = %{_hdf5_version}
 %ifarch %{valgrind_arches}
 BuildRequires:  valgrind
 %endif
+#mpiexec segfaults if ssh is not present
+#https://trac.mcs.anl.gov/projects/mpich2/ticket/1576
+BuildRequires:  openssh-clients
+Requires:       hdf5%{?_isa} = %{_hdf5_version}
+
 
 %description
-NetCDF (network Common Data Form) is an interface for array-oriented
-data access and a freely-distributed collection of software libraries
-for C, Fortran, C++, and perl that provides an implementation of the
-interface.  The NetCDF library also defines a machine-independent
-format for representing scientific data.  Together, the interface,
-library, and format support the creation, access, and sharing of
-scientific data. The NetCDF software was developed at the Unidata
+NetCDF (network Common Data Form) is an interface for array-oriented 
+data access and a freely-distributed collection of software libraries 
+for C, Fortran, C++, and perl that provides an implementation of the 
+interface.  The NetCDF library also defines a machine-independent 
+format for representing scientific data.  Together, the interface, 
+library, and format support the creation, access, and sharing of 
+scientific data. The NetCDF software was developed at the Unidata 
 Program Center in Boulder, Colorado.
 
-NetCDF data is:
+NetCDF data is: 
 
    o Self-Describing: A NetCDF file includes information about the
      data it contains.
@@ -73,6 +82,7 @@ NetCDF data is:
    o Sharable:  One writer and multiple readers may simultaneously
      access the same NetCDF file.
 
+
 %package devel
 Summary:        Development files for netcdf
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -81,8 +91,9 @@ Requires:       hdf5-devel%{?_isa}
 Requires:       pkgconfig%{?_isa}
 
 %description devel
-This package contains the netCDF C header files, shared devel libs, and
+This package contains the netCDF C header files, shared devel libs, and 
 man pages.
+
 
 %package static
 Summary:        Static libs for netcdf
@@ -91,35 +102,37 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description static
 This package contains the netCDF C static libs.
 
+
 %if %{with mpich}
 %package mpich
-Summary:        NetCDF mpich libraries
-BuildRequires:  hdf5-mpich-devel >= 1.8.4
-BuildRequires:  mpich-devel
-Requires:       hdf5-mpich%{?_isa} = %{_hdf5_version}
-Provides:       %{name}-mpich2 = %{version}-%{release}
-Obsoletes:      %{name}-mpich2 < 4.3.0-4
+Summary: NetCDF mpich libraries
+BuildRequires: hdf5-mpich-devel >= 1.8.4
+BuildRequires: mpich-devel
+Requires: hdf5-mpich%{?_isa} = %{_hdf5_version}
+Provides: %{name}-mpich2 = %{version}-%{release}
+Obsoletes: %{name}-mpich2 < 4.3.0-4
 
 %description mpich
 NetCDF parallel mpich libraries
 
+
 %package mpich-devel
-Summary:        NetCDF mpich development files
-Requires:       %{name}-mpich%{?_isa} = %{version}-%{release}
-Requires:       curl-devel%{?_isa}
-Requires:       hdf5-mpich-devel%{?_isa}
-Requires:       pkgconfig%{?_isa}
-Provides:       %{name}-mpich2-devel = %{version}-%{release}
-Obsoletes:      %{name}-mpich2-devel < 4.3.0-4
+Summary: NetCDF mpich development files
+Requires: %{name}-mpich%{?_isa} = %{version}-%{release}
+Requires: curl-devel%{?_isa}
+Requires: hdf5-mpich-devel%{?_isa}
+Requires: pkgconfig%{?_isa}
+Provides: %{name}-mpich2-devel = %{version}-%{release}
+Obsoletes: %{name}-mpich2-devel < 4.3.0-4
 
 %description mpich-devel
 NetCDF parallel mpich development files
 
 %package mpich-static
-Summary:        NetCDF mpich static libraries
-Requires:       %{name}-mpich-devel%{?_isa} = %{version}-%{release}
-Provides:       %{name}-mpich2-static = %{version}-%{release}
-Obsoletes:      %{name}-mpich2-static < 4.3.0-4
+Summary: NetCDF mpich static libraries
+Requires: %{name}-mpich-devel%{?_isa} = %{version}-%{release}
+Provides: %{name}-mpich2-static = %{version}-%{release}
+Obsoletes: %{name}-mpich2-static < 4.3.0-4
 
 %description mpich-static
 NetCDF parallel mpich static libraries
@@ -128,28 +141,30 @@ NetCDF parallel mpich static libraries
 
 %if %{with openmpi}
 %package openmpi
-Summary:        NetCDF openmpi libraries
-BuildRequires:  hdf5-openmpi-devel >= 1.8.4
-BuildRequires:  openmpi-devel
-Requires:       hdf5-openmpi%{?_isa} = %{_hdf5_version}
+Summary: NetCDF openmpi libraries
+BuildRequires: hdf5-openmpi-devel >= 1.8.4
+BuildRequires: openmpi-devel
+Requires: hdf5-openmpi%{?_isa} = %{_hdf5_version}
 
 %description openmpi
 NetCDF parallel openmpi libraries
 
+
 %package openmpi-devel
-Summary:        NetCDF openmpi development files
-Requires:       %{name}-openmpi%{_isa} = %{version}-%{release}
-Requires:       curl-devel%{?_isa}
-Requires:       hdf5-openmpi-devel%{?_isa}
-Requires:       openmpi-devel%{?_isa}
-Requires:       pkgconfig%{?_isa}
+Summary: NetCDF openmpi development files
+Requires: %{name}-openmpi%{_isa} = %{version}-%{release}
+Requires: curl-devel%{?_isa}
+Requires: hdf5-openmpi-devel%{?_isa}
+Requires: openmpi-devel%{?_isa}
+Requires: pkgconfig%{?_isa}
 
 %description openmpi-devel
 NetCDF parallel openmpi development files
 
+
 %package openmpi-static
-Summary:        NetCDF openmpi static libraries
-Requires:       %{name}-openmpi-devel%{?_isa} = %{version}-%{release}
+Summary: NetCDF openmpi static libraries
+Requires: %{name}-openmpi-devel%{?_isa} = %{version}-%{release}
 
 %description openmpi-static
 NetCDF parallel openmpi static libraries
@@ -173,7 +188,7 @@ export CFLAGS="%{optflags} -fno-strict-aliasing"
            --enable-netcdf-4 \\\
            --enable-dap \\\
            --enable-extra-example-tests \\\
-           CPPFLAGS="-I%{_includedir}/hdf -DH5_USE_110_API" \\\
+           CPPFLAGS="-I%{_includedir}/hdf" \\\
            LIBS="-ltirpc" \\\
            --enable-hdf4 \\\
            --disable-dap-remote-tests \\\
@@ -185,18 +200,13 @@ pushd build
 ln -s ../configure .
 %configure %{configure_opts} \
   --with-plugin-dir=%{_libdir}/hdf5/plugin
-# Get rid of undesirable hardcoded rpaths; workaround libtool reordering
-# -Wl,--as-needed after all the libraries.
-sed -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
-    -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
-    -e 's|CC="\(.*g..\)"|CC="\1 -Wl,--as-needed"|' \
-    -i libtool
+# Workaround libtool reordering -Wl,--as-needed after all the libraries.
+sed -e 's|CC="\(.*g..\)"|CC="\1 -Wl,--as-needed"|' -i libtool
 %make_build
 popd
 
 # MPI builds
-%if %{with mpich} || %{with openmpi}
-for mpi in %{mpi_list}
+for mpi in %{?mpi_list}
 do
   mkdir $mpi
   pushd $mpi
@@ -212,38 +222,25 @@ do
     --datarootdir=%{_libdir}/$mpi/share \
     --mandir=%{_libdir}/$mpi/share/man \
     --with-plugin-dir=%{_libdir}/$mpi/hdf5/plugin \
-    --enable-parallel-tests
-  # Get rid of undesirable hardcoded rpaths; workaround libtool reordering
-  # -Wl,--as-needed after all the libraries.
-  sed -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
-      -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
-      -e 's|CC="\(.*g..\)"|CC="\1 -Wl,--as-needed"|' \
-      -i libtool
+    %{?with_parallel_tests:--enable-parallel-tests}
+  # Workaround libtool reordering -Wl,--as-needed after all the libraries.
+  sed -e 's|CC="\(.*g..\)"|CC="\1 -Wl,--as-needed"|' -i libtool
   %make_build
   module purge
   popd
 done
-%endif
+
 
 %install
-make -C build install DESTDIR=%{buildroot}
-pushd %{buildroot}%{_libdir}
-/bin/rm -f *.la
-popd
-chrpath --delete %{buildroot}/%{_bindir}/nc{copy,dump,gen,gen3}
-/bin/rm -f %{buildroot}%{_infodir}/dir
-%if %{with mpich} || %{with openmpi}
-for mpi in %{mpi_list}
+make -C build install DESTDIR=${RPM_BUILD_ROOT}
+/bin/rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
+for mpi in %{?mpi_list}
 do
   module load mpi/$mpi-%{_arch}
-  make -C $mpi install DESTDIR=%{buildroot}
-  pushd %{buildroot}%{_libdir}/%{_libdir}/$mpi/lib
-  rm *.la
-  popd
-  chrpath --delete %{buildroot}/%{_libdir}/$mpi/bin/nc{copy,dump,gen,gen3}
+  make -C $mpi install DESTDIR=${RPM_BUILD_ROOT}
   module purge
 done
-%endif
+find $RPM_BUILD_ROOT/%{_libdir} -name \*.la -delete
 
 
 %check
@@ -260,16 +257,16 @@ fail=1
 make -C build check || ( cat build/*/test-suite.log && exit $fail )
 # Allow openmpi to run with more processes than cores
 export OMPI_MCA_rmaps_base_oversubscribe=1
+# openmpi 5+
+export PRTE_MCA_rmaps_default_mapping_policy=:oversubscribe
 # openmpi test hangs on armv7hl in h5_test after tst_h_rename
 %ifnarch armv7hl
-%if %{with mpich} || %{with openmpi}
-for mpi in %{mpi_list}
+for mpi in %{?mpi_list}
 do
   module load mpi/$mpi-%{_arch}
   make -C $mpi check || ( cat $mpi/*/test-suite.log && exit $fail )
   module purge
 done
-%endif
 %endif
 
 
@@ -294,15 +291,6 @@ done
 %{_libdir}/hdf5/plugin/lib__nczstdfilters.so
 %{_libdir}/hdf5/plugin/lib__nch5fletcher32.so
 %{_libdir}/hdf5/plugin/lib__nch5blosc.so
-%{_libdir}/hdf5/plugin/lib__nch5blosc.la
-%{_libdir}/hdf5/plugin/lib__nch5bzip2.la
-%{_libdir}/hdf5/plugin/lib__nch5deflate.la
-%{_libdir}/hdf5/plugin/lib__nch5fletcher32.la
-%{_libdir}/hdf5/plugin/lib__nch5shuffle.la
-%{_libdir}/hdf5/plugin/lib__nch5szip.la
-%{_libdir}/hdf5/plugin/lib__nch5zstd.la
-%{_libdir}/hdf5/plugin/lib__nczhdf5filters.la
-%{_libdir}/hdf5/plugin/lib__nczstdfilters.la
 %{_libdir}/*.so.%{sover}*
 %{_mandir}/man1/*
 
@@ -398,9 +386,51 @@ done
 
 
 %changelog
-* Thu Aug 10 2023 Archana Choudhary <archana1@microsoft.com> - 4.9.0-4
-- Initial CBL-Mariner import from Fedora 37 (license: MIT).
+* Mon May 12 2025 Archana Shettigar <v-shettigara@microsoft.com> - 4.9.2-14
+- Initial Azure Linux import from Fedora 42 (license: MIT).
 - License verified.
+
+* Thu Feb 13 2025 Orion Poplawski <orion@nwra.com> - 4.9.2-13
+- Rebuild with hdf5 1.14.6
+
+* Fri Jan 17 2025 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Fri Oct 25 2024 Orion Poplawski <orion@nwra.com> - 4.9.2-7
+- Rebuild for hdf5 1.14.5
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jan 30 2024 Orion Poplawski <orion@nwra.com> - 4.9.2-5
+- Add patch to fix compilation on i668 (FTBFS bz#2261400)
+- Update license to BSD-3-Clause (SPDX)
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Dec 20 2023 Orion Poplawski <orion@nwra.com> - 4.9.2-2
+- Add upstream patch to fix octave-netcdf segfault on exit
+
+* Wed Nov 08 2023 Orion Poplawski <orion@nwra.com> - 4.9.2-1
+- Update to 4.9.2
+- Drop -DH5_USE_110_API
+
+* Wed Nov 08 2023 Orion Poplawski <orion@nwra.com> - 4.9.0-7
+- Rebuild with openmpi 5.0.0 - drops i686
+- Disable parallel tests on s390x - mpich test is hanging
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Dec 19 2022 Orion Poplawski <orion@nwra.com> - 4.9.0-4
+- Apply upstream patch to fix infinite loop in file inferencing
 
 * Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
@@ -720,7 +750,7 @@ done
 - Explicitly link libnetcdf to the hdf libraries, don't link with -lcurl
 
 * Wed Nov 11 2009 Orion Poplawski <orion@cora.nwra.com> - 4.1.0-0.4.2009111008
-- Add Requires: curl-devel to devel package
+- Add Requires: libcurl-devel to devel package
 
 * Wed Nov 11 2009 Orion Poplawski <orion@cora.nwra.com> - 4.1.0-0.3.2009111008
 - Drop hdf4 support - too problematic with linking all required libraries
@@ -809,7 +839,7 @@ done
 - rebuild for gcc4.1
 
 * Sun Oct 16 2005 Ed Hill <ed@eh3.com> - 3.6.0-8.p1
-- building the library twice (once each for g77 and gfortran) 
+- building the library twice (once each for g77 and gfortran)
   fixes an annoying problem for people who need both compilers
 
 * Fri Sep 30 2005 Ed Hill <ed@eh3.com> - 3.6.0-7.p1
@@ -846,8 +876,8 @@ done
 
 * Sat Dec  4 2004 Ed Hill <eh3@mit.edu> - 0:3.6.0beta6-0.fdr.0
 - upgrade to 3.6.0beta6
-- create separate devel package that does *not* depend upon 
-  the non-devel package and put the headers/libs in "netcdf-3" 
+- create separate devel package that does *not* depend upon
+  the non-devel package and put the headers/libs in "netcdf-3"
   subdirs for easy co-existance with upcoming netcdf-4
 
 * Thu Dec  2 2004 Ed Hill <eh3@mit.edu> - 0:3.5.1-0.fdr.12
@@ -857,7 +887,7 @@ done
 - headers in /usr/include/netcdf, libs in /usr/lib/netcdf
 
 * Mon Oct  4 2004 Ed Hill <eh3@mit.edu> - 0:3.5.1-0.fdr.10
-- Put headers in their own directory but leave the libraries in the 
+- Put headers in their own directory but leave the libraries in the
   %%{_libdir} -- there are only two libs and the majority of other
   "*-devel" packages follow this pattern
 
