@@ -149,6 +149,10 @@ parameters:
     type: string
     default: "Package test"
 
+  - name: useDailyBuild
+    type: boolean
+    default: false
+
 steps:
   - template: ToolkitCheck.yml@${{ parameters.selfRepoName }}
     parameters:
@@ -226,6 +230,25 @@ steps:
         max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}"
       fi
 
+      daily_build_id=${{ parameters.useDailyBuild }}
+
+      full_version=$(make --quiet get-version CONFIG_FILE=)
+      additional_build_options=""
+      if [[ $full_version == *"2.0-"* ]]; then
+          # daily build repo are only available for 3.0
+          echo "daily build RPMS repo is not available for 2.0"
+      else
+          if [[ $daily_build_id =~ [Tt]rue ]]; then
+              # Determine LKG daily_build_id
+              wget -nv https://mariner3dailydevrepo.blob.core.windows.net/lkg/lkg-3.0-dev.json
+              daily_build_id=$(cat lkg-3.0-dev.json | jq -r .dailybuildid | tr . -)
+              echo "Found LKG daily_build_id is '$daily_build_id'"
+          fi
+          additional_build_options+="DAILY_BUILD_ID=\"$daily_build_id\" "
+      fi
+
+      echo "Set DAILY_BUILD_ID to '$daily_build_id'"
+
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
@@ -244,7 +267,8 @@ steps:
         $quick_rebuild_packages_arg \
         $run_check_arg \
         $toolchain_archive_arg \
-        $use_ccache_arg
+        $use_ccache_arg \
+        $additional_build_options
     displayName: "Build packages"
 
   - ${{ if parameters.outputArtifactsFolder }}:

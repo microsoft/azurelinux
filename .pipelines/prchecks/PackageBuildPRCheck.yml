@@ -213,6 +213,7 @@ extends:
                       srpmPackList: "$(testListFromToolchain)"
                       testRerunList: "$(testListFromToolchain)"
                       testSuiteName: "[${{ configuration.name }}] Toolchain test"
+                      useDailyBuild: ${{ parameters.useDailyBuild }}
 
                   - task: PublishPipelineArtifact@1
                     inputs:
