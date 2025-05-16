@@ -1327,8 +1327,8 @@
         "type": "other",
         "other": {
           "name": "bwidget",
-          "version": "1.9.7",
-          "downloadUrl": "http://downloads.sourceforge.net/tcllib/bwidget-1.9.7.tar.gz"
+          "version": "1.10.1",
+          "downloadUrl": "https://downloads.sourceforge.net/tcllib/bwidget-1.10.1.tar.gz"
         }
       }
     },
