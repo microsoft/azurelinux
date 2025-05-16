@@ -18,7 +18,7 @@
 Summary:	 Cross-partition memory
 Name:		 %{_name}-signed
 Version:	 2.7.4
-Release:	 15%{?dist}
+Release:	 16%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -83,6 +83,9 @@ popd
 
 
 %changelog
+* Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 2.7.4-16
+- Bump release to rebuild for new kernel release
+
 * Wed Apr 09 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-15
 - Bump release to match updates from 'unsigned' spec
 - Re-name the package to xpmem-modules-signed.
