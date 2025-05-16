@@ -4,8 +4,9 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azurelinux_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
 %global KVERSION %{target_kernel_version_full}
 %define _name mft_kernel
@@ -13,7 +14,7 @@
 Name:            %{_name}-signed
 Summary:         %{_name} Kernel Module for the %{KVERSION} kernel
 Version:         4.30.0
-Release:         16%{?dist}
+Release:	     17%{release_suffix}%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
 
@@ -80,6 +81,9 @@ popd
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
+* Mon Apr 30 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 4.30.0-17
+- Add kernel version and release nb into release nb
+
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 4.30.0-16
 - Bump release to rebuild for new kernel release
 

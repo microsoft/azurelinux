@@ -30,20 +30,22 @@
 # SOFTWARE.
 #
 
-%global last-known-kernel 6.6.85.1-2
-
-%{!?_name: %define _name fwctl}
-%{!?_version: %define _version 24.10}
-%{!?_release: %define _release OFED.24.10.0.6.7.1}
-
 %if 0%{azl}
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
+%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
 %global target_kernel_version_full f.a.k.e
 %endif
 
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
+
+%{!?_name: %define _name fwctl}
+%{!?_version: %define _version 24.10}
+%{!?_mofed_full_version: %define _mofed_full_version %{_version}-17%{release_suffix}}
+%{!?_release: %define _release OFED.24.10.0.6.7.1}
 
 # KMP is disabled by default
 %{!?KMP: %global KMP 0}
@@ -52,6 +54,7 @@
 %{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
 %global kernel_version %{KVERSION}
 %global krelver %(echo -n %{KVERSION} | sed -e 's/-/_/g')
+
 # take path to kernel sources if provided, otherwise look in default location (for non KMP rpms).
 %{!?K_SRC: %global K_SRC /lib/modules/%{KVERSION}/build}
 
@@ -67,7 +70,7 @@
 Summary:	 %{_name} Driver
 Name:		 fwctl
 Version:	 24.10
-Release:	 16%{?dist}
+Release:	 17%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
@@ -84,11 +87,11 @@ BuildRequires:  kernel-headers = %{target_kernel_version_full}
 BuildRequires:  binutils
 BuildRequires:  systemd
 BuildRequires:  kmod
-BuildRequires:  mlnx-ofa_kernel-devel = %{_version}
-BuildRequires:  mlnx-ofa_kernel-source = %{_version}
+BuildRequires:  mlnx-ofa_kernel-devel = %{_mofed_full_version}
+BuildRequires:  mlnx-ofa_kernel-source = %{_mofed_full_version}
 
-Requires:       mlnx-ofa_kernel = %{_version}
-Requires:       mlnx-ofa_kernel-modules  = %{_version}
+Requires:       mlnx-ofa_kernel = %{_mofed_full_version}
+Requires:       mlnx-ofa_kernel-modules  = %{_mofed_full_version}
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
@@ -250,6 +253,9 @@ fi # 1 : closed
 %endif
 
 %changelog
+* Mon Apr 30 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-17
+- Add kernel version and release nb into release nb
+
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 24.10-16
 - Bump release to rebuild for new kernel release
 
