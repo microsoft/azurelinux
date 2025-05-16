@@ -151,10 +151,6 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %ifarch x86_64
 /lib/modules/%{name}/vmlinux
 %endif
-# Include the kernel modules
-/lib/modules/%{version}/*
-# Exclude the build directory (it's in the devel package)
-%exclude /lib/modules/%{version}/build
 
 %post
 /sbin/depmod -a %{version}
