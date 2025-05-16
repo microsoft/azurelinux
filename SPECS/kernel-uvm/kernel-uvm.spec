@@ -10,7 +10,7 @@
 
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
-Version:        6.6
+Version:        6.6.82.mshv2
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -151,6 +151,10 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %ifarch x86_64
 /lib/modules/%{name}/vmlinux
 %endif
+# Include the kernel modules
+/lib/modules/%{version}/*
+# Exclude the build directory (it's in the devel package)
+%exclude /lib/modules/%{version}/build
 
 %post
 /sbin/depmod -a %{version}
@@ -161,7 +165,7 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
-* Fri May 16 2025 Mitch Zhu <mitchzhu@microsoft.com> - 6.6-1
+* Fri May 16 2025 Mitch Zhu <mitchzhu@microsoft.com> - 6.6.82.mshv2-1
 - Upgarde to 6.6
 
 * Tue May 13 2025 Mitch Zhu <mitchzhu@microsoft.com> - 6.1.58.mshv4-4
