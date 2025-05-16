@@ -17,6 +17,8 @@
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-17%{release_suffix}}
+
 # %{!?KVERSION: %global KVERSION %(uname -r)}
 %{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
 %global kernel_version %{KVERSION}
@@ -82,11 +84,11 @@ BuildRequires:  kernel-headers = %{target_kernel_version_full}
 BuildRequires:  binutils
 BuildRequires:  systemd
 BuildRequires:  kmod
-BuildRequires:  mlnx-ofa_kernel-devel
-BuildRequires:  mlnx-ofa_kernel-source
+BuildRequires:  mlnx-ofa_kernel-devel = %{_mofed_full_version}
+BuildRequires:  mlnx-ofa_kernel-source = %{_mofed_full_version}
 
-Requires:       mlnx-ofa_kernel
-Requires:       mlnx-ofa_kernel-modules
+Requires:       mlnx-ofa_kernel = %{_mofed_full_version}
+Requires:       mlnx-ofa_kernel-modules = %{_mofed_full_version}
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
