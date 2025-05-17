@@ -44,7 +44,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 %{_name}-signed
 Version:	 24.10
-Release:	 17%{?dist}
+Release:	 18%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -191,6 +191,9 @@ fi
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-18
+- Bump release to rebuild for new kernel release
+
 * Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-17
 - Bump release to rebuild for new kernel release
 
