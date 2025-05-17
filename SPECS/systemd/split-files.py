@@ -122,7 +122,11 @@ for file in files(buildroot):
         o = outputs['main']
     elif re.search(r'/libcryptsetup-token-systemd-.*\.so$', n):
         o = outputs['udev']
-    elif re.search(r'/lib.*\.pc|/man3/|/usr/include|\.so$', n):
+    elif re.search(r'''/lib.*\.pc$|
+                       /man3/|
+                       /usr/include|
+                       \.so$
+    ''', n):
         o = outputs['devel']
     elif re.search(r'''journal-(remote|gateway|upload)|
                        systemd-remote\.conf|
@@ -201,6 +205,7 @@ for file in files(buildroot):
                        integritytab|
                        remount-fs|
                        /initrd|
+                       /usr/lib/pcrlock.d/|
                        systemd-pcr|
                        systemd-measure|
                        /boot$|
