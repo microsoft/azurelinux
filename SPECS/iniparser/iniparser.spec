@@ -5,13 +5,14 @@ Distribution:   Azure Linux
 
 Name:		iniparser
 Version:	4.1
-Release:	8%{?dist}
+Release:	9%{?dist}
 Summary:	C library for parsing "INI-style" files
 
 License:	MIT
 URL:		https://github.com/ndevilla/%{name}
 Source0:	https://github.com/ndevilla/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2025-0633.patch
+Patch1:         CVE-2023-33461.patch
 
 BuildRequires:	gcc
 
@@ -72,6 +73,9 @@ make check
 %{_includedir}/*.h
 
 %changelog
+* Wed May 14 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 4.1.9
+- Patch CVE-2023-33461
+
 * Tue Feb 25 2025 Mayank Singh <mayansingh@microsoft.com> - 4.1.8
 - Fix CVE-2025-0633 with an upstream patch
 
