@@ -1,7 +1,7 @@
 %define  debug_package %{nil}
 Summary:        erlang
 Name:           erlang
-Version:        26.2.5.11
+Version:        26.2.5.12
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
@@ -53,6 +53,9 @@ export ERL_TOP=`pwd`
 %{_libdir}/erlang/*
 
 %changelog
+* Wed May 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 26.2.5.12-1
+- Auto-upgrade to 26.2.5.12 - for CVE-2025-46712
+
 * Thu Apr 17 2025 Kshitiz Godara <kgodara@microsoft.com> - 26.2.5.11-1
 - Upgrade to 26.2.5.11 - fix cve CVE-2025-32433.
 
