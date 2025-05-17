@@ -26,7 +26,7 @@
 # KMP is disabled by default
 %{!?KMP: %global KMP 0}
 
-%global last-known-kernel 6.6.85.1-2
+%global last-known-kernel 6.6.85.1-3
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -53,7 +53,7 @@
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
 Name:		 knem
 Version:	 1.1.4.90mlnx3
-Release:	 16%{?dist}
+Release:	 17%{?dist}
 Provides:	 knem-mlnx = %{version}-%{release}
 Obsoletes:	 knem-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
@@ -281,6 +281,9 @@ fi
 %endif
 
 %changelog
+* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 1.1.4.90mlnx3-17
+- Bump release to rebuild for new kernel release
+
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 1.1.4.90mlnx3-16
 - Bump release to rebuild for new kernel release
 
