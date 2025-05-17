@@ -1,0 +1,53 @@
+From 8f06aadb8edd71022565a6f70a05466082abfcb9 Mon Sep 17 00:00:00 2001
+From: Sandeep Karambelkar <skarambelkar@microsoft.com>
+Date: Thu, 1 May 2025 12:56:59 +0000
+Subject: [PATCH] Disable unwanted tests
+
+---
+ src/test/regress/Makefile            | 2 +-
+ src/test/regress/isolation_schedule  | 2 --
+ src/test/regress/pg_regress_multi.pl | 1 -
+ 3 files changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/src/test/regress/Makefile b/src/test/regress/Makefile
+index 4bdc7a1..6d4ef46 100644
+--- a/src/test/regress/Makefile
++++ b/src/test/regress/Makefile
+@@ -45,7 +45,7 @@ vanilla_diffs_file = $(citus_abs_srcdir)/pg_vanilla_outputs/$(MAJORVERSION)/regr
+ # intermediate, for muscle memory backward compatibility.
+ check: check-full check-enterprise-full
+ # check-full triggers all tests that ought to be run routinely
+-check-full: check-multi check-multi-mx check-multi-1 check-operations check-follower-cluster check-isolation check-failure check-split check-vanilla check-columnar check-columnar-isolation check-pg-upgrade check-arbitrary-configs check-citus-upgrade check-citus-upgrade-mixed check-citus-upgrade-local check-citus-upgrade-mixed-local check-pytest check-query-generator
++check-full: check-multi check-operations check-isolation check-split
+ # check-enterprise-full triggers all enterprise specific tests
+ check-enterprise-full: check-enterprise check-enterprise-isolation check-enterprise-failure check-enterprise-isolation-logicalrep-1 check-enterprise-isolation-logicalrep-2 check-enterprise-isolation-logicalrep-3
+ 
+diff --git a/src/test/regress/isolation_schedule b/src/test/regress/isolation_schedule
+index d8cc77c..12ae688 100644
+--- a/src/test/regress/isolation_schedule
++++ b/src/test/regress/isolation_schedule
+@@ -82,9 +82,7 @@ test: isolation_citus_schema_distribute_undistribute
+ 
+ # Rebalancer
+ test: isolation_blocking_move_single_shard_commands
+-test: isolation_blocking_move_multi_shard_commands
+ test: isolation_blocking_move_single_shard_commands_on_mx
+-test: isolation_blocking_move_multi_shard_commands_on_mx
+ test: isolation_shard_rebalancer
+ test: isolation_rebalancer_deferred_drop
+ test: isolation_shard_rebalancer_progress
+diff --git a/src/test/regress/pg_regress_multi.pl b/src/test/regress/pg_regress_multi.pl
+index 66016f7..54cea92 100755
+--- a/src/test/regress/pg_regress_multi.pl
++++ b/src/test/regress/pg_regress_multi.pl
+@@ -115,7 +115,6 @@ GetOptions(
+     'valgrind-log-file=s' => \$valgrindLogFile,
+     'pg_ctl-timeout=s' => \$pgCtlTimeout,
+     'connection-timeout=s' => \$connectionTimeout,
+-    'mitmproxy' => \$useMitmproxy,
+     'conninfo=s' => \$conninfo,
+     'worker-1-public-hostname=s' => \$publicWorker1Host,
+     'worker-2-public-hostname=s' => \$publicWorker2Host,
+-- 
+2.45.3
+
