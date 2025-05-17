@@ -28816,8 +28816,8 @@
         "type": "other",
         "other": {
           "name": "tang",
-          "version": "14",
-          "downloadUrl": "https://github.com/latchset/tang/archive/refs/tags/v14.tar.gz"
+          "version": "15",
+          "downloadUrl": "https://github.com/latchset/tang/releases/download/v15/tang-15.tar.xz"
         }
       }
     },
