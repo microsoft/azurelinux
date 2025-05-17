@@ -1,6 +1,6 @@
 Name:           opensc
 Version:        0.25.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Smart card library and applications
 
 License:        LGPL-2.1-or-later AND BSD-3-Clause
@@ -12,6 +12,7 @@ Source1:        opensc.module
 Patch1:         opensc-0.19.0-pinpad.patch
 # File caching by default (#2000626)
 Patch8:         %{name}-0.22.0-file-cache.patch
+Patch9:         CVE-2024-45619.patch
 
 BuildRequires:  make
 BuildRequires:  pcsc-lite-devel
@@ -48,9 +49,7 @@ every software/card that does so, too.
 
 
 %prep
-%setup -q
-%patch 1 -p1 -b .pinpad
-%patch 8 -p1 -b .file-cache
+%autosetup -p1
 
 # The test-pkcs11-tool-allowed-mechanisms already works in Fedora
 sed -i -e '/XFAIL_TESTS/,$ {
@@ -203,6 +202,9 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 
 
 %changelog
+* Fri May 16 2025 Akhila Guruju <v-guakhila@microsoft.com> - 0.25.1-5
+- Patch CVE-2024-45619
+
 * Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.25.1-4
 - Add missing Distribution tag.
 
