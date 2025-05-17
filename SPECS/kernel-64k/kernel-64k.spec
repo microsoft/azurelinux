@@ -14,6 +14,8 @@
 %undefine _unique_debug_names
 %global _missing_build_ids_terminate_build 1
 %global _no_recompute_build_ids 1
+# Prevent find_debuginfo.sh from removing the BTF section from modules
+%define _find_debuginfo_opts --keep-section '.BTF'
 
 %ifarch aarch64
 %global __provides_exclude_from %{_libdir}/debug/.build-id/
@@ -25,7 +27,7 @@
 Summary:        Linux Kernel
 Name:           kernel-64k
 Version:        6.6.85.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -371,6 +373,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri May 16 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.85.1-3
+- Prevent debuginfo from stripping BTF data
+
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 6.6.85.1-2
 - Bump release to rebuild for new kernel release
 
