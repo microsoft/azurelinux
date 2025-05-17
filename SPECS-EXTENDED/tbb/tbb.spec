@@ -1,41 +1,46 @@
+# If docs should point to local python3-docs rather than website.
+# python3-docs is not shipped in RHEL 9+
+%bcond py3docs %{undefined rhel}
+
+%global giturl https://github.com/oneapi-src/oneTBB
+%undefine __cmake_in_source_build
+
 Name:    tbb
 Summary: The Threading Building Blocks library abstracts low-level threading details
-Version: 2020.2
+Version: 2021.13.0
 Release: 2%{?dist}
-License: ASL 2.0
+License: Apache-2.0 AND BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:     http://threadingbuildingblocks.org/
+VCS:     git:%{giturl}.git
 
 Source0: https://github.com/intel/tbb/archive/v%{version}/%{name}-%{version}.tar.gz
-# These three are downstream sources.
-Source6: tbb.pc
+
+# These two are downstream sources.
 Source7: tbbmalloc.pc
 Source8: tbbmalloc_proxy.pc
 
-# Don't snip -Wall from C++ flags.  Add -fno-strict-aliasing, as that
-# uncovers some static-aliasing warnings.
-# Related: https://bugzilla.redhat.com/show_bug.cgi?id=1037347
-Patch0: tbb-2019-dont-snip-Wall.patch
+# TBB tries to remove -Werror from the compiler flags, which turns
+# -Werror=format-security into =format-security
+Patch0: tbb-2021-Werror.patch
 
-# Make attributes of aliases match those on the aliased function.
-Patch1: tbb-2020-attributes.patch
-
-# Fix test-thread-monitor, which had multiple bugs that could (and did, on
-# ppc64le) result in a hang.
-Patch2: tbb-2019-test-thread-monitor.patch
-
-# Fix a test that builds a 4-thread barrier, but cannot guarantee that more
-# than 2 threads will be available to use it.
-Patch3: tbb-2019-test-task-scheduler-init.patch
-
-# Fix compilation on aarch64 and s390x.  See
-# https://github.com/intel/tbb/issues/186
-Patch4: tbb-2019-fetchadd4.patch
-
-BuildRequires: doxygen
+BuildRequires: cmake
 BuildRequires: gcc-c++
+BuildRequires: hwloc
+BuildRequires: hwloc-devel
+BuildRequires: make
 BuildRequires: python3-devel
+BuildRequires: python3-pip
+BuildRequires: python3-wheel
+BuildRequires: python3-sphinxcontrib-jquery
+
+%if %{with py3docs}
+BuildRequires: python3-docs
+%endif
+BuildRequires: %{py3_dist setuptools}
+BuildRequires: %{py3_dist sphinx}
+BuildRequires: %{py3_dist sphinx-rtd-theme}
 BuildRequires: swig
 
 %description
@@ -50,10 +55,19 @@ platforms.  Since the library is also inherently scalable, no code
 maintenance is required as more processor cores become available.
 
 
+%package bind
+Summary: NUMA support library for TBB
+Requires: %{name}%{?_isa} = %{version}-%{release}
+
+%description bind
+NUMA support library for TBB, allowing the binding of tasks to selected
+CPU cores.
+
+
 %package devel
 Summary: The Threading Building Blocks C++ headers and shared development libraries
 Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: cmake-filesystem%{?_isa}
+Requires: %{name}-bind%{?_isa} = %{version}-%{release}
 
 %description devel
 Header files and shared object symlinks for the Threading Building
@@ -62,7 +76,10 @@ Blocks (TBB) C++ libraries.
 
 %package doc
 Summary: The Threading Building Blocks documentation
-Provides: bundled(jquery)
+%ifarch %{ix86}
+# https://bugzilla.redhat.com/show_bug.cgi?id=2174300
+Conflicts: %{name}-doc.x86_64
+%endif
 
 %description doc
 PDF documentation for the user of the Threading Building Block (TBB)
@@ -71,7 +88,7 @@ C++ library.
 
 %package -n python3-%{name}
 Summary: Python 3 TBB module
-%{?python_provide:%python_provide python3-%{name}}
+Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description -n python3-%{name}
 Python 3 TBB module.
@@ -80,125 +97,214 @@ Python 3 TBB module.
 %prep
 %autosetup -p1 -n oneTBB-%{version}
 
-# For repeatable builds, don't query the hostname or architecture
-sed -i 's/"`hostname -s`" ("`uname -m`"/fedorabuild (%{_arch}/' \
-    build/version_info_linux.sh
-
-# Do not assume the RTM instructions are available.
-# Insert --as-needed before the libraries to be linked.
-sed -e 's/-mrtm//' \
-    -e "s/-fPIC/& -Wl,--as-needed/" \
-    -i build/linux.gcc.inc
-
 # Invoke the right python binary directly
-sed -i 's,env python,python3,' python/TBB.py python/tbb/__*.py
+for fil in $(grep -Frl %{_bindir}/env python); do
+    sed -i.orig 's,env python3,python3,' $fil
+    touch -r $fil.orig $fil
+    rm $fil.orig
+done
 
-# Remove shebang from files that don't need it
-sed -i '/^#!/d' python/tbb/{pool,test}.py
+%if %{with py3docs}
+# Use local objects.inv for intersphinx
+sed -e "s|\('https://docs\.python\.org/': \)None|\1'%{_docdir}/python3-docs/html/objects.inv'|" \
+    -i doc/GSG/conf.py doc/main/conf.py
+%endif
+
+%generate_buildrequires
+cd python
+%pyproject_buildrequires
 
 %build
-make %{?_smp_mflags} tbb_build_prefix=obj stdver=c++14 \
-    CXXFLAGS="%{optflags} -DDO_ITT_NOTIFY -DUSE_PTHREAD" \
-    LDFLAGS="$RPM_LD_FLAGS -lpthread"
-for file in %{SOURCE6} %{SOURCE7} %{SOURCE8}; do
-    base=$(basename ${file})
-    sed 's/_FEDORA_VERSION/%{version}/' ${file} > ${base}
-    touch -r ${file} ${base}
-done
+export TBBROOT=$PWD
+export PYTHONPATH=$(sed "s,%{_prefix},$PWD/%{_vpath_builddir}/python/build," <<< %{python3_sitearch})
+%cmake \
+    -DCMAKE_CXX_STANDARD=17 \
+    -DTBB4PY_BUILD:BOOL=ON \
+    -DTBB_STRICT:BOOL=OFF \
+    -DCMAKE_HWLOC_2_4_LIBRARY_PATH=%{_libdir}/libhwloc.so \
+    -DCMAKE_HWLOC_2_4_INCLUDE_PATH=%{_includedir}/hwloc \
+%cmake_build
 
-# Build for python 3
-. build/obj_release/tbbvars.sh
-pushd python
-make %{?_smp_mflags} -C rml stdver=c++14 \
-    CPLUS_FLAGS="%{optflags} -DDO_ITT_NOTIFY -DUSE_PTHREAD" \
-    LDFLAGS="$RPM_LD_FLAGS -lpthread"
-cp -p rml/libirml.so* .
-%py3_build
-popd
+# The python package is not built the Fedora way.  Do it over.
+unset PYTHONPATH
+export LD_LIBRARY_PATH=$(ls -1d $PWD/%{_vpath_builddir}/*relwithdebinfo)
+export LDFLAGS="-L $LD_LIBRARY_PATH %{build_ldflags}"
+cd python
+%pyproject_wheel
+cd -
 
-# Build the documentation
-make doxygen
-
-%check
-# This test assumes it can create thread barriers for arbitrary numbers of
-# threads, but tbb limits the number of threads spawned to a function of the
-# number of CPUs available.  Some of the koji builders have a small number of
-# CPUs, so the test hangs waiting for threads that have not been created to
-# arrive at the barrier.  Skip this test until upstream fixes it.
-sed -i '/test_task_scheduler_observer/d' build/Makefile.test
-
-make test tbb_build_prefix=obj stdver=c++14 CXXFLAGS="%{optflags}"
+# Build documentation
+export BUILD_TYPE=oneapi
+sphinx-build doc/GSG getting-started
+sphinx-build doc/main html
 
 %install
-mkdir -p $RPM_BUILD_ROOT/%{_libdir}
-mkdir -p $RPM_BUILD_ROOT/%{_includedir}
+%cmake_install
 
-pushd build/obj_release
-    for file in libtbb{,malloc{,_proxy}}; do
-        install -p -D -m 755 ${file}.so.2 $RPM_BUILD_ROOT/%{_libdir}
-        ln -s $file.so.2 $RPM_BUILD_ROOT/%{_libdir}/$file.so
-    done
-popd
+# The python package is not installed the Fedora way.  Do it over.
+rm -fr %{buildroot}%{python3_sitearch}
+cd python
+%pyproject_install
+cd -
 
-pushd include
-    find tbb -type f ! -name \*.htm\* -exec \
-        install -p -D -m 644 {} $RPM_BUILD_ROOT/%{_includedir}/{} \
-    \;
-popd
-
-for file in %{SOURCE6} %{SOURCE7} %{SOURCE8}; do
-    install -p -D -m 644 $(basename ${file}) \
-        $RPM_BUILD_ROOT/%{_libdir}/pkgconfig/$(basename ${file})
+mkdir -p %{buildroot}/%{_libdir}/pkgconfig
+for file in %{SOURCE7} %{SOURCE8}; do
+    target=%{buildroot}/%{_libdir}/pkgconfig/$(basename ${file})
+    sed 's/_FEDORA_VERSION/%{version}/' $file > $target
+    touch -r $file $target
 done
 
-# Install the rml headers
-mkdir -p $RPM_BUILD_ROOT%{_includedir}/rml
-cp -p src/rml/include/*.h $RPM_BUILD_ROOT%{_includedir}/rml
+# Upstream installs tbb32.pc on 32-bit but it's already in a separate directory
+# because %_libdir is different for 32-bit and 64-bit, so rename it to tbb.pc.
+if [ -f %{buildroot}/%{_libdir}/pkgconfig/%{name}32.pc ]; then
+    mv %{buildroot}/%{_libdir}/pkgconfig/%{name}32.pc %{buildroot}/%{_libdir}/pkgconfig/%{name}.pc
+fi
 
-# Python 3 install
-. build/obj_release/tbbvars.sh
-pushd python
-%py3_install
-chmod a+x $RPM_BUILD_ROOT%{python3_sitearch}/TBB.py
-chmod a+x $RPM_BUILD_ROOT%{python3_sitearch}/tbb/__*.py
-cp -p libirml.so.1 $RPM_BUILD_ROOT%{_libdir}
-ln -s libirml.so.1 $RPM_BUILD_ROOT%{_libdir}/libirml.so
-popd
+rm -fr %{buildroot}%{_datadir}/doc
 
-# Install the cmake files
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/cmake
-cp -a cmake $RPM_BUILD_ROOT%{_libdir}/cmake/%{name}
-rm $RPM_BUILD_ROOT%{_libdir}/cmake/%{name}/README.rst
+%check
+# Running the tests in parallel often leads to resource exhaustion.
+ctest --output-on-failure --force-new-ctest-process
 
 %files
-%doc doc/Release_Notes.txt README.md
-%license LICENSE
-%{_libdir}/libtbb.so.2
-%{_libdir}/libtbbmalloc.so.2
-%{_libdir}/libtbbmalloc_proxy.so.2
+%doc README.md
+%license LICENSE.txt
+%{_libdir}/libtbb.so.12*
+%{_libdir}/libtbbmalloc.so.2*
+%{_libdir}/libtbbmalloc_proxy.so.2*
 %{_libdir}/libirml.so.1
 
+%files bind
+%{_libdir}/libtbbbind_2_5.so.3*
+
 %files devel
-%doc CHANGES cmake/README.rst
-%{_includedir}/rml/
+%doc cmake/README.md
+%{_includedir}/oneapi/
 %{_includedir}/tbb/
 %{_libdir}/*.so
-%{_libdir}/cmake/tbb/
+%{_libdir}/cmake/TBB/
 %{_libdir}/pkgconfig/*.pc
 
 %files doc
-%doc doc/Release_Notes.txt
-%doc html
+%doc getting-started html
 
 %files -n python3-%{name}
-%doc python/index.html
+%doc python/README.md
 %{python3_sitearch}/TBB*
 %{python3_sitearch}/tbb/
 %{python3_sitearch}/__pycache__/TBB*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2020.2-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Feb 24 2025 Mayank Singh <mayansingh@microsoft.com> - 2021.13.0-3
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2021.13.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jul  9 2024 Jerry James <loganjerry@gmail.com> - 2021.13.0-1
+- Version 2021.13.0
+- Add VCS tag
+- Drop upstreamed strict aliasing patch
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 2021.11.0-6
+- Rebuilt for Python 3.13
+
+* Thu Jan 25 2024 Jonathan Wakely <jwakely@fedoraproject.org> - 2021.11.0-5
+- Remove Requires:python3-docs for tbb-doc subpackage
+
+* Mon Jan 22 2024 Jonathan Wakely <jwakely@fedoraproject.org> - 2021.11.0-4
+- Rename 32-bit arch /usr/lib/pkgconfig/tbb32.pc to tbb.pc
+
+* Fri Jan 19 2024 Yaakov Selkowitz <yselkowi@redhat.com> - 2021.11.0-3
+- Avoid python3-docs dependency on RHEL
+
+* Wed Jan 17 2024 Jonathan Wakely <jwakely@fedoraproject.org> - 2021.11.0-2
+- Add patch for strict aliasing violation
+
+* Thu Dec 28 2023 Jerry James <loganjerry@gmail.com> - 2021.11.0-1
+- Rebase to version 2021.11.0
+- New -bind subpackage for the NUMA support library
+- Build with cmake
+- Minor spec file cleanups
+
+* Thu Aug 10 2023 Jonathan Wakely <jwakely@fedoraproject.org> - 2020.3-21
+- SPDX migration
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2020.3-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 28 2023 Python Maint <python-maint@redhat.com> - 2020.3-19
+- Rebuilt for Python 3.12
+
+* Tue Jun 27 2023 Jonathan Wakely <jwakely@fedoraproject.org> - 2020.3-18
+- Add conflicts tag for tbb-doc (#2174300)
+- Remove outdated provides for bundled(jquery)
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 2020.3-17
+- Rebuilt for Python 3.12
+
+* Tue Feb 21 2023 Jonathan Wakely <jwakely@redhat.com> - 2020.3-16
+- Add versioned Requires: to python module
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2020.3-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Jan 16 2023 Thomas Rodgers <trodgers@redhat.com> - 2020.3-14
+- Fix build failure with GCC13 (bz 2161412)
+
+* Wed Jan 11 2023 Thomas Rodgers <trodgers@redhat.com> - 2020.3-13
+- Fix build failure with Python 3.12.0 (bz 2154975)
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2020.3-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 2020.3-11
+- Rebuilt for Python 3.11
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2020.3-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2020.3-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jun 09 2021 Thomas Rodgers <trodgers@redhat.com> - 2020.3-8
+- Merge change to remove baseos-qe.koji-build.scratch-build.validation ahajkova
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2020.3-7
+- Rebuilt for Python 3.10
+
+* Thu Jun  3 2021 Thomas Rodgers <trodgers@redhat.com> - 2020.3-6
+- Fix ABI regression in tbb::empty_task caused by switch to LTO
+
+* Mon Feb 22 2021 Jerry James <loganjerry@gmail.com> - 2020.3-5
+- Fix cmake file installation some more (bz 1930389)
+
+* Thu Feb 18 2021 Jerry James <loganjerry@gmail.com> - 2020.3-4
+- Fix cmake file installation (bz 1930389)
+- Allow use of RTM instructions when available
+- At upstream's suggestion, do not force ITT_NOTIFY support
+- Drop -fetchadd64 patch, only needed for forced ITT_NOTIFY support
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2020.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2020.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 27 2020 Jerry James <loganjerry@gmail.com> - 2020.3-1
+- Rebase to version 2020.3
+
+* Tue Jul 14 2020 Tom Stellard <tstellar@redhat.com> - 2020.2-4
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 2020.2-3
+- Rebuilt for Python 3.9
+
+* Mon Apr 27 2020 Timm Baeder <tbaeder@redhat.com> - 2020.2-2
+- Pass the compiler to when building
+- Update the tbb-2019-test-thread-monitor.patch to use std::atomic
 
 * Tue Mar 31 2020 Jerry James <loganjerry@gmail.com> - 2020.2-1
 - Rebase to version 2020.2
