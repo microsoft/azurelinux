@@ -225,7 +225,7 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
-* Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com>
+* Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 4.30.0-18
 - Bump release to rebuild for new kernel release
 
 * Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 4.30.0-17

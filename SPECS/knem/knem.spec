@@ -281,7 +281,7 @@ fi
 %endif
 
 %changelog
-* Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com>
+* Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 1.1.4.90mlnx3-18
 - Bump release to rebuild for new kernel release
 
 * Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 1.1.4.90mlnx3-17
