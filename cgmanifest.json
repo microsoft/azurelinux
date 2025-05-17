@@ -6930,8 +6930,8 @@
         "type": "other",
         "other": {
           "name": "hyphen-pt",
-          "version": "0.20021021",
-          "downloadUrl": "http://download.services.openoffice.org/contrib/dictionaries/hyph_pt_PT.zip"
+          "version": "0.20140727",
+          "downloadUrl": "https://pt-br.libreoffice.org/assets/Uploads/PT-BR-Documents/VERO/hyphptBR-213.zip"
         }
       }
     },
