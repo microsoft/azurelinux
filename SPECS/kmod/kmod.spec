@@ -10,9 +10,17 @@ URL:            https://www.kernel.org/pub/linux/utils/kernel/kmod
 Source0:        http://www.kernel.org/pub/linux/utils/kernel/kmod/%{name}-%{version}.tar.xz
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
+BuildRequires:  make
+BuildRequires:  automake
+BuildRequires:  libtool
 Requires:       xz
 Provides:       module-init-tools
 Provides:       /sbin/modprobe
+Provides:       /usr/sbin/modinfo
+Provides:       /usr/sbin/insmod
+Provides:       /usr/sbin/rmmod
+Provides:       /usr/sbin/lsmod
+Provides:       /usr/sbin/depmod
 
 %description
 The Kmod package contains libraries and utilities for loading kernel modules
@@ -28,7 +36,8 @@ It contains the libraries and header files to create applications.
 %setup -q
 
 %build
-./configure \
+autoreconf --install
+%configure \
     --prefix=%{_prefix} \
     --bindir=/bin \
     --sysconfdir=%{_sysconfdir} \
@@ -37,14 +46,29 @@ It contains the libraries and header files to create applications.
     --with-zlib \
     --with-xz \
     --disable-silent-rules
-make VERBOSE=1 %{?_smp_mflags}
+    
+%{make_build} V=1
+    
+# ./configure \
+#     --prefix=%{_prefix} \
+#     --bindir=/bin \
+#     --sysconfdir=%{_sysconfdir} \
+#     --with-rootlibdir=%{_libdir} \
+#     --disable-manpages \
+#     --with-zlib \
+#     --with-xz \
+#     --disable-silent-rules
+# make VERBOSE=1 %{?_smp_mflags}
 
 %install
-make DESTDIR=%{buildroot} pkgconfigdir=%{_libdir}/pkgconfig install
-install -vdm 755 %{buildroot}/sbin
-for target in depmod insmod lsmod modinfo modprobe rmmod; do
-    ln -sv /bin/kmod %{buildroot}/sbin/$target
-done
+%{make_install}
+
+# make DESTDIR=%{buildroot} pkgconfigdir=%{_libdir}/pkgconfig install
+# install -vdm 755 %{buildroot}/sbin
+# symlinks now done by makefile
+# for target in depmod insmod lsmod modinfo modprobe rmmod; do
+#     ln -sv /bin/kmod %{buildroot}/sbin/$target
+# done
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %post   -p /sbin/ldconfig
@@ -54,16 +78,33 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 %license COPYING
 /bin/*
+	
+# %{_bindir}/kmod
+%{_sbindir}/modprobe
+%{_sbindir}/modinfo
+%{_sbindir}/insmod
+%{_sbindir}/rmmod
+%{_sbindir}/lsmod
+%{_sbindir}/depmod
+
 %{_libdir}/*.so.*
-/sbin/*
-%{_datadir}/bash-completion/completions/kmod
+# /sbin/*
+%{_datadir}/bash-completion/completions/*
+# %{_datadir}/bash-completion/completions/kmod
+%{_datadir}/fish/vendor_functions.d/*
+%{_datadir}/zsh/site-functions/*
+
+%{_datadir}/pkgconfig/kmod.pc
 
 %files devel
-%{_libdir}/pkgconfig/*.pc
-%{_includedir}/*
-%{_libdir}/pkgconfig/*.pc
-%{_includedir}/*
-%{_libdir}/*.so
+
+# %{_libdir}/pkgconfig/*.pc
+# %{_includedir}/*
+# %{_libdir}/*.so
+
+%{_includedir}/libkmod.h
+%{_libdir}/pkgconfig/libkmod.pc
+%{_libdir}/libkmod.so
 
 %changelog
 * Tue Nov 21 2023 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 34.2-1
