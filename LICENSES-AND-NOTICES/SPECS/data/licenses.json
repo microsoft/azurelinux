@@ -1280,6 +1280,7 @@
                 "perl-GD-Barcode",
                 "perl-generators",
                 "perl-Getopt-ArgvFile",
+                "perl-Getopt-Long",
                 "perl-gettext",
                 "perl-Graphics-ColorNamesLite-WWW",
                 "perl-GSSAPI",
