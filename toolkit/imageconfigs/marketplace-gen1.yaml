@@ -63,9 +63,9 @@ scripts:
   - path: additionalconfigs/configure-systemd-networkd.sh
   - path: scripts/set_os_release_variant_entries.sh
     arguments:
-    - --id
+    - --variant-id
     -  marketplace-gen1
-    - --name
+    - --variant
     - Marketplace (Gen1) Image
 
 output:
