@@ -47,6 +47,7 @@ Source6:        cpupower.service
 Source7:        azl-ipe-boot-policy.pol
 Source8:        Makefile
 Source9:        tarfs.c
+Source10:       ipe_cert.pem
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -183,7 +184,7 @@ make mrproper
 cp %{config_source} .config
 
 # Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE4} certs/mariner.pem
+cp %{SOURCE10} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
 # Add IPE Boot Policy into kernel config
