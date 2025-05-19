@@ -13,6 +13,7 @@ BuildRequires:  zlib-devel
 BuildRequires:  make
 BuildRequires:  automake
 BuildRequires:  libtool
+BuildRequires:  gtk-doc
 Requires:       xz
 Provides:       module-init-tools
 Provides:       /sbin/modprobe
