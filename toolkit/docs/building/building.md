@@ -7,8 +7,8 @@
 |Add or build your own packages    | **[Azure Linux Tutorials](https://github.com/microsoft/AzureLinux-Tutorials)** |
 |Add or build your own images      | **[Azure Linux Tutorials](https://github.com/microsoft/AzureLinux-Tutorials)** |
 |Optimize build performance        | [Quick Build Optimization Guide](./dedicated_guides/quick_build_optimization.md) |
-|Quickly build core packages       | [Building in Stages](#building-in-stages)                                     |
-|Quickly build core images         | [Building in Stages](#building-in-stages)                                     |
+|Quickly build core packages       | [Package Building Guide](./dedicated_guides/build_packages.md)                  |
+|Quickly build core images         | [Image Building Guide](./dedicated_guides/build_images.md)                      |
 |Learn how the tools work in depth | [Continue Reading](#overview)                                                 |
 |Add/Update a core Azure Linux package | [Continue Reading](#overview)                                             |
 |Improve Azure Linux tools         | [Continue Reading](#overview)                                                 |
@@ -123,13 +123,21 @@ For more detailed information, refer to the [Quick Build Optimization Guide](./d
 
 The Azure Linux build system consists of several phases and tools, but at a high level it can be viewed simply as 3 distinct build stages:
 
-- **Toolchain** This stage builds a bootstrap toolchain and then builds the official toolchain.  The official toolchain is used in the subsequent package build stage.  Building is highly scripted and serialized in this stage.
+- **Toolchain** This stage builds a bootstrap toolchain and then builds the official toolchain. The official toolchain is used in the subsequent package build stage. Building is highly scripted and serialized in this stage.
 
-- **Package** This stage uses outputs from the toolchain stage to build any package not built in toolchain stage.  Packages are built in parallel during this stage.
+- **Package** This stage uses outputs from the toolchain stage to build any package not built in toolchain stage. Packages are built in parallel during this stage.
 
 - **Image** This stage generates the resulting ISO, VHD, VHDX, and/or container images from the rpm packages built in the package stage.
 
 Each stage can be built completely from scratch, or in many cases may be seeded from pre-built packages and then partially built.
+
+### Dedicated Build Guides
+
+For more focused instructions on specific build tasks, see our dedicated guides:
+
+- [Quick Build Optimization Guide](./dedicated_guides/quick_build_optimization.md) - Learn how to use optimization flags
+- [Package Building Guide](./dedicated_guides/build_packages.md) - Focused guide on building packages
+- [Image Building Guide](./dedicated_guides/build_images.md) - Focused guide on building images
 
 
 ## **Building in Stages**
@@ -163,13 +171,13 @@ Alternate branches are not generally buildable because community builds require 
 
 ## **Toolchain Stage**
 
-The toolchain builds in two sub-phases.  The first phase builds an initial _bootstrap_ toolchain which is then used to build the _final_ toolchain used in package building.  In the first phase, the bootstrap toolchain downloads a series of source packages from upstream sources.  The second phase downloads SRPMS from packages.microsoft.com.
+The toolchain builds in two sub-phases. The first phase builds an initial _bootstrap_ toolchain which is then used to build the _final_ toolchain used in package building. In the first phase, the bootstrap toolchain downloads a series of source packages from upstream sources. The second phase downloads SRPMS from packages.microsoft.com.
 
 For expediency, the toolchain may be populated from upstream binaries, or may be completely rebuilt.
 
 ### **Populate Toolchain**
 
-A set of bootstrapped toolchain packages (gcc etc.) are used to build Azure Linux packages and images.  Rather than build the toolchain, the prebuilt binaries can be downloaded to your local machine.  This happens automatically when the `REBUILD_TOOLCHAIN=` parameter is set to `n` (the default).
+A set of bootstrapped toolchain packages (gcc etc.) are used to build Azure Linux packages and images. Rather than build the toolchain, the prebuilt binaries can be downloaded to your local machine. This happens automatically when the `REBUILD_TOOLCHAIN=` parameter is set to `n` (the default).
 
 ```bash
 # Populate Toolchain from pre-existing binaries
@@ -199,9 +207,9 @@ sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y
 
 ## **Package Stage**
 
-After the toolchain is built or populated, package building is possible.  The Azure Linux ecosystem provides a significant number of packages, but most of those packages are not used in an image.  When rebuilding packages, you can choose to build everything, or you can choose to build just what you need for a specific image.  This can save significant time because only the subset of the Azure Linux packages needed for an image are built.
+After the toolchain is built or populated, package building is possible. The Azure Linux ecosystem provides a significant number of packages, but most of those packages are not used in an image. When rebuilding packages, you can choose to build everything, or you can choose to build just what you need for a specific image. This can save significant time because only the subset of the Azure Linux packages needed for an image are built.
 
-The CONFIG_FILE argument provides a quick way to declare what to build. To manually build **all** packages you can use the default configuration (`CONFIG_FILE=""`) and invoke the package build target.  To build packages needed for a specific image, you must set the CONFIG_FILE= parameter to an image configuration file of your choice.  The standard image configuration files are in the toolkit/imageconfigs folder.
+The CONFIG_FILE argument provides a quick way to declare what to build. To manually build **all** packages you can use the default configuration (`CONFIG_FILE=""`) and invoke the package build target. To build packages needed for a specific image, you must set the CONFIG_FILE= parameter to an image configuration file of your choice. The standard image configuration files are in the toolkit/imageconfigs folder.
 
 Large parts of the package build stage are parallelized. Enable this by setting the `-j` flag for `make` to the number of parallel jobs to allow. (Recommend setting this value to the number of logical cores available on your system, or less)
 
@@ -212,7 +220,7 @@ For optimal performance when building packages, use the `QUICK_REBUILD_PACKAGES=
 - Set `MAX_CASCADING_REBUILDS=1` to limit unnecessary rebuilds of dependent packages
 - Set `REBUILD_TOOLS=y` to rebuild the go tools
 
-There are several more package build options.  For example it's possible to build a single package with all of its prerequisites.  For more details on package building options see [Packages](#packages).
+There are several more package build options. For example it's possible to build a single package with all of its prerequisites. For more details on package building options see [Packages](#packages).
 
 ### **Rebuild All Packages**
 
@@ -237,10 +245,10 @@ The following command rebuilds packages for the basic VHD with optimal settings.
 sudo make build-packages -j$(nproc) QUICK_REBUILD_PACKAGES=y CONFIG_FILE=./imageconfigs/core-legacy.json
 ```
 
-Note that the image config file passed to the CONFIG_FILE option _only_ builds the packages included in the image plus all packages needed to build those packages.  That is, more will be built than needed by the image, but only a subset of packages will be built.
+Note that the image config file passed to the CONFIG_FILE option _only_ builds the packages included in the image plus all packages needed to build those packages. That is, more will be built than needed by the image, but only a subset of packages will be built.
 
 ### **Targeted Package Building**
-Beginning with the Azure Linux 3.0 it is possible to rapidly build one or more packages "in-tree".  This technique can be helpful for modifying an existing SPEC file or adding a new one to Azure Linux.
+Beginning with the Azure Linux 3.0 it is possible to rapidly build one or more packages "in-tree". This technique can be helpful for modifying an existing SPEC file or adding a new one to Azure Linux.
 
 ```bash
 # Build targeted packages with optimal performance settings
@@ -248,7 +256,7 @@ sudo make build-packages -j$(nproc) QUICK_REBUILD_PACKAGES=y SRPM_PACK_LIST="ope
 ```
 Note that this process will download dependencies from packages.microsoft.com and rebuild just the SPEC files indicated by the SRPM_PACK_LIST
 
-After building a package you may choose to rebuild it or build additional packages.  The optional `REFRESH_WORKER_CHROOT=n` option (default is `y`) will avoid rebuilding the worker chroot saving some additional build overhead
+After building a package you may choose to rebuild it or build additional packages. The optional `REFRESH_WORKER_CHROOT=n` option (default is `y`) will avoid rebuilding the worker chroot saving some additional build overhead
 
 ```bash
 # Clean and rebuild targeted packages with optimal performance settings
@@ -261,9 +269,9 @@ sudo make build-packages -j$(nproc) QUICK_REBUILD_PACKAGES=y SRPM_PACK_LIST="at"
 
 ## **Image Stage**
 
-Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/AzureLinux-Tutorials#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/azurelinux/tree/3.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
+Different images and image formats can be produced from the build system. Images are assembled from a combination of _Image Configuration_ files and _Package list_ files. Each [Package List](https://github.com/microsoft/AzureLinux-Tutorials#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/azurelinux/tree/3.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image. Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
 
-By default, the `make image` and `make iso` commands (discussed below) build missing packages before starting the image build sequence.  By adding the `REBUILD_PACKAGES=n` argument, the image build phase will supplement missing packages with those on packages.microsoft.com.  This can accelerate the image build process, especially when performing targeted package builds ([targeted Package Building](#targeted-package-building))
+By default, the `make image` and `make iso` commands (discussed below) build missing packages before starting the image build sequence. By adding the `REBUILD_PACKAGES=n` argument, the image build phase will supplement missing packages with those on packages.microsoft.com. This can accelerate the image build process, especially when performing targeted package builds ([targeted Package Building](#targeted-package-building))
 
 For optimal performance when building images, use the `QUICK_REBUILD=y` flag which sets both `QUICK_REBUILD_PACKAGES=y` and `QUICK_REBUILD_TOOLCHAIN=y` as described in the previous sections.
 
@@ -283,9 +291,9 @@ sudo make image CONFIG_FILE=./imageconfigs/core-container.json QUICK_REBUILD=y
 ```
 
 ### ISO Images
-ISOs are bootable images that install Azure Linux to either a physical or virtual machine.  The installation process can be manually guided through user prompting, or automated through unattended installation.
+ISOs are bootable images that install Azure Linux to either a physical or virtual machine. The installation process can be manually guided through user prompting, or automated through unattended installation.
 
-NOTE: ISOs require additional packaging and build steps (such as the creation of a separate `initrd` installer image used to install the final image to disk).  These additional resources are stored in the toolkit/resources/imagesconfigs folder.
+NOTE: ISOs require additional packaging and build steps (such as the creation of a separate `initrd` installer image used to install the final image to disk). These additional resources are stored in the toolkit/resources/imagesconfigs folder.
 
 
 The following builds an ISO with an interactive UI and selectable image configurations using optimal performance settings:
