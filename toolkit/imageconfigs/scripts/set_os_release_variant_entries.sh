@@ -6,18 +6,40 @@ set -euo pipefail
 
 DEFAULT_OS_RELEASE_FILE="/etc/os-release"
 
-FLAG_ID=""
-FLAG_NAME=""
+FLAG_VARIANT=""
+FLAG_VARIANT_ID=""
 FLAG_OS_RELEASE_FILE="$DEFAULT_OS_RELEASE_FILE"
 
-print_help() {
+exit_help() {
+    local error_message="$1"
+
     echo "Usage: $0 [flags]"
     echo ""
+    echo "This script sets the VARIANT and VARIANT_ID entries in the os-release file."
+    echo ""
+    echo "See https://www.freedesktop.org/software/systemd/man/latest/os-release.html for more information and the"
+    echo "latest details on these entries."
+    echo ""
     echo "Flags:"
-    echo "  -h, --help                              Show this help message and exit"
-    echo "  -i ID, --id ID                          Value of VARIANT_ID to set in the os-release file"
-    echo "  -n NAME, --name NAME                    Value of VARIANT to set in the os-release file"
+    echo "  -h, --help"
+    echo "    Show this help message and exit."
+    echo ""
+    echo "  -n VARIANT, --variant VARIANT"
+    echo "    Value of VARIANT to set in the os-release file. It will be enclosed in double quotes if it contains"
+    echo "    anything outside of A-Z, a-z, 0-9."
+    echo ""
+    echo "  -i VARIANT_ID, --variant-id VARIANT_ID"
+    echo "    Value of VARIANT_ID to set in the os-release file. It must be a lower-case string (no spaces or other"
+    echo "    characters outside of 0-9, a-z, '.', '_' and '-')."
+    echo ""
     echo "  -o OS_RELEASE, --os-release OS_RELEASE  Path to the os-release file (default: '$DEFAULT_OS_RELEASE_FILE')"
+
+    if [[ -n "$error_message" ]]; then
+        echo ""
+        echo "Error: $error_message"
+    fi
+
+    exit 1
 }
 
 parse_flags() {
@@ -25,30 +47,38 @@ parse_flags() {
         local flag="$1"
         shift
         case "$flag" in
-            -h|--help) print_help; exit 2;;
-            -i|--id) FLAG_ID="$1"; shift;;
-            -n|--name) FLAG_NAME="$1"; shift;;
+            -h|--help) exit_help;;
+            -n|--variant) FLAG_VARIANT="$1"; shift;;
+            -i|--variant-id) FLAG_VARIANT_ID="$1"; shift;;
             -o|--os-release) FLAG_OS_RELEASE_FILE="$1"; shift;;
-            -*) echo "Error: Unknown flag: $flag" >&2; print_help; exit 1;;
-            *) echo "Error: Unknown argument: $flag" >&2; print_help; exit 1;;
+            -*) echo "Error: Unknown flag: $flag" >&2; exit_help;;
+            *) echo "Error: Unknown argument: $flag" >&2; exit_help;;
         esac
     done
 
-    if [[ -z "$FLAG_ID" ]]; then
-        echo "Error: Variant ID is required." >&2
-        print_help
-        exit 1
+    if [[ -z "$FLAG_VARIANT" ]]; then
+        exit_help "--variant is required"
     fi
 
-    if [[ -z "$FLAG_NAME" ]]; then
-        echo "Error: Variant name is required." >&2
-        print_help
-        exit 1
+    if [[ "$FLAG_VARIANT" =~ \" ]]; then
+        exit_help "Value of VARIANT cannot contain double quotes"
+    fi
+
+    # This script only double-quotes, even though systemd also specifies that values may be single-quoted.
+    if [[ "$FLAG_VARIANT" =~ [^A-Za-z0-9] ]]; then
+        FLAG_VARIANT="\"$FLAG_VARIANT\""
+    fi
+
+    if [[ -z "$FLAG_VARIANT_ID" ]]; then
+        exit_help "--variant-id is required"
+    fi
+
+    if [[ "$FLAG_VARIANT_ID" =~ [^a-z0-9._-] ]]; then
+        exit_help "Value of VARIANT_ID must be a lower-case string (no spaces or other characters outside of 0-9, a-z, '.', '_' and '-')."
     fi
 
     if [[ ! -e "$FLAG_OS_RELEASE_FILE" ]]; then
-        echo "Error: OS release file '$FLAG_OS_RELEASE_FILE' does not exist." >&2
-        exit 1
+        exit_help "OS release file '$FLAG_OS_RELEASE_FILE' does not exist"
     fi
 }
 
@@ -66,8 +96,8 @@ set_os_release_entry() {
 main() {
     parse_flags "$@"
 
-    set_os_release_entry "VARIANT_ID" "$FLAG_ID"
-    set_os_release_entry "VARIANT" "$FLAG_NAME"
+    set_os_release_entry "VARIANT" "$FLAG_VARIANT"
+    set_os_release_entry "VARIANT_ID" "$FLAG_VARIANT_ID"
 }
 
 main "$@"
