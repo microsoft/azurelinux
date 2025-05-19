@@ -36,12 +36,11 @@ It contains the libraries and header files to create applications.
 %setup -q
 
 %build
-autoreconf --install
+autoreconf --install --force
 %configure \
     --prefix=%{_prefix} \
     --bindir=/bin \
     --sysconfdir=%{_sysconfdir} \
-    --with-rootlibdir=%{_libdir} \
     --disable-manpages \
     --with-zlib \
     --with-xz \
@@ -79,7 +78,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %license COPYING
 /bin/*
 	
-# %{_bindir}/kmod
+# %%{_bindir}/kmod
 %{_sbindir}/modprobe
 %{_sbindir}/modinfo
 %{_sbindir}/insmod
@@ -90,7 +89,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.so.*
 # /sbin/*
 %{_datadir}/bash-completion/completions/*
-# %{_datadir}/bash-completion/completions/kmod
+# %%{_datadir}/bash-completion/completions/kmod
 %{_datadir}/fish/vendor_functions.d/*
 %{_datadir}/zsh/site-functions/*
 
@@ -98,9 +97,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files devel
 
-# %{_libdir}/pkgconfig/*.pc
-# %{_includedir}/*
-# %{_libdir}/*.so
+# %%{_libdir}/pkgconfig/*.pc
+# %%{_includedir}/*
+# %%{_libdir}/*.so
 
 %{_includedir}/libkmod.h
 %{_libdir}/pkgconfig/libkmod.pc
