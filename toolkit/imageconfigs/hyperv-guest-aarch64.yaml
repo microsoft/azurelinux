@@ -41,9 +41,9 @@ scripts:
   finalizeCustomization:
   - path: scripts/set_os_release_variant_entries.sh
     arguments:
-    - --id
+    - --variant-id
     - hyperv-guest
-    - --name
+    - --variant
     - Hyper-V Guest Image
 
 output:

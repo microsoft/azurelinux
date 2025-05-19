@@ -47,9 +47,9 @@ scripts:
   - path: scripts/cleanup.sh
   - path: scripts/set_os_release_variant_entries.sh
     arguments:
-    - --id
+    - --variant-id
     - qemu-guest
-    - --name
+    - --variant
     - QEMU Guest Image
 
 output:
