@@ -53,9 +53,9 @@ scripts:
   - path: scripts/cleanup.sh
   - path: scripts/set_os_release_variant_entries.sh
     arguments:
-    - --id
+    - --variant-id
     - baremetal
-    - --name
+    - --variant
     - Bare Metal Image
 
 output:
