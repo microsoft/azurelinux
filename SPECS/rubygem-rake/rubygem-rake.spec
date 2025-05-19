@@ -2,7 +2,7 @@
 Summary:        Rake is a Make-like program implemented in Ruby
 Name:           rubygem-%{gem_name}
 Version:        13.0.6
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -51,15 +51,13 @@ mkdir -p %{buildroot}%{_mandir}/man1
 mv %{buildroot}%{gem_instdir}/doc/rake.1 %{buildroot}%{_mandir}/man1
 
 %check
-pushd /%{gem_instdir}
-# symlink tests here
-ln -s %{_builddir}/test .
-
 # Get rid of Bundler.
 sed -i '/bundler/ s/^/#/' Rakefile
 
-ruby -Ilib:. -e 'Dir.glob "test/**/test_*.rb", &method(:require)'
-popd
+export TESTOPTS=--verbose
+export VERBOSE=y
+export RUBYLIB=$(pwd)/lib
+ruby ./exe/rake test
 
 %files
 %dir %{gem_instdir}
@@ -79,6 +77,9 @@ popd
 %doc %{gem_instdir}/*.rdoc
 
 %changelog
+* Tue Apr 15 2024 Riken Maharjan <rmaharjan@microsoft.com> - 13.0.6-7
+- Fix Ptest by importing the fix from Fedora (License:MIT)
+
 * Mon Oct 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 13.0.6-6
 - Adding 'Obsoletes: ruby <= 3.1.2-2'.
 

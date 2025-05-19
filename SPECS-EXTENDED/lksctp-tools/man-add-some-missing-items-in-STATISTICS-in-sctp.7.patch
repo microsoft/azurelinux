@@ -1,0 +1,85 @@
+From f128c927f7d4f5eb0fc80b857ff74660fb61d0d6 Mon Sep 17 00:00:00 2001
+From: Xin Long <lucien.xin@gmail.com>
+Date: Mon, 27 Feb 2023 17:18:10 -0500
+Subject: [PATCH 3/6] man: add some missing items in STATISTICS in sctp.7
+
+Many items have been added in /proc/net/sctp/assocs and
+/proc/net/sctp/snmp, and this patch adds the missing
+description for them.
+
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ man/sctp.7 | 50 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 49 insertions(+), 1 deletion(-)
+
+diff --git a/man/sctp.7 b/man/sctp.7
+index c19c2b7..730e1a8 100644
+--- a/man/sctp.7
++++ b/man/sctp.7
+@@ -121,7 +121,10 @@ files.
+ Displays the following information about the active associations.
+ assoc ptr, sock ptr, socket style, sock state, association state, hash bucket,
+ association id, bytes in transmit queue, bytes in receive queue, user id, 
+-inode, local port, remote port, local addresses and remote addresses.
++inode, local port, remote port, local addresses, remote addresses,
++heartbeat interval, in streams, out streams, max retransmissions, init retries,
++shutdown retries, retransmitted chunks, sock transmit queue committed bytes,
++sock transmit queue bytes, and sock send and receive buffer bytes.
+ .TP
+ .B eps
+ Displays the following information about the active endpoints.
+@@ -196,6 +199,51 @@ The number of SCTP packets sent. Retransmitted DATA chunks are included.
+ .TP
+ .B SctpInSCTPPacks
+ The number of SCTP packets received. Duplicates are included.
++.TP
++.B SctpT1InitExpireds
++The number of timer T1 INIT expired.
++.TP
++.B SctpT1CookieExpireds
++The number of timer T1 COOKIE-ECHO expired.
++.TP
++.B SctpT2ShutdownExpireds
++The number of timer T2 SHUTDOWN expired.
++.TP
++.B SctpT3RtxExpireds
++The number of timer T3 RTX expired.
++.TP
++.B SctpT4RtoExpireds
++The number of timer T4 RTO expired.
++.TP
++.B SctpT5ShutdownGuardExpireds
++The number of timer T5 SHUTDOWN GUARD expired.
++.TP
++.B SctpDelaySackExpireds
++The number of timer DELAY_SACK expired.
++.TP
++.B SctpAutocloseExpireds
++The number of timer AUTOCLOSE expired.
++.TP
++.B SctpT3Retransmits
++The number of T3 timer retransmission.
++.TP
++.B SctpPmtudRetransmits
++The number of PMTUD retransmission.
++.TP
++.B SctpFastRetransmits
++The number of FAST retransmission.
++.TP
++.B SctpInPktSoftirq
++The number of SCTP packets received in Softirq.
++.TP
++.B SctpInPktBacklog
++The number of SCTP packets received in Backlog.
++.TP
++.B SctpInPktDiscards
++The number of SCTP packets discarded in receiving.
++.TP
++.B SctpInDataChunkDiscards
++The number of SCTP data chunks discarded in receiving.
+ .SH "SOCKET OPTIONS"
+ To set or get a SCTP socket option, call
+ .BR getsockopt (2)
+-- 
+2.39.1
+

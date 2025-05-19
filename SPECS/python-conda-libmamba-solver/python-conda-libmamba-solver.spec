@@ -7,7 +7,7 @@ library used by mamba to do the heavy-lifting is called libsolv.}
 Summary:        The libmamba based solver for conda
 Name:           python-%{srcname}
 Version:        24.9.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,6 +28,8 @@ BuildArch:      noarch
 
 %package -n python3-%{srcname}
 Summary:        %{summary}
+Requires:       python3-libmambapy
+Requires:       python3-boltons
 
 %description -n python3-%{srcname} %{_description}
 
@@ -53,6 +55,9 @@ sed -i -e '/doctest/d' -e '/reruns/d' pyproject.toml
 %license %{python3_sitelib}/conda_libmamba_solver-%{version}.dist-info/licenses/AUTHORS.md
 
 %changelog
+* Mon Apr 14 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.9.0-4
+- Add missing runtime dependencies libmambapy and boltons
+
 * Tue Apr 01 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.9.0-3
 - Initial Azure Linux import from Fedora 42 (license: MIT)
 - License Verified

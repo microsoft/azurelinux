@@ -365,8 +365,8 @@ func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 
 	requests := make(chan string, len(specFiles))
 	results := make(chan *specState, len(specFiles))
-	ctx, cancelFunc := context.WithCancel(context.Background())
-	defer cancelFunc()
+	ctx, closeCtX := context.WithCancel(context.Background())
+	defer closeCtX()
 
 	logger.Log.Infof("Calculating SPECs to repack")
 
@@ -399,15 +399,14 @@ func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 	// Currently all functions that employ workers pool of size `workers` are serialized,
 	// resulting in `workers` being the upper capacity at any given time.
 	totalToRepack := 0
-	states = make([]*specState, len(specFiles))
 	for i := 0; i < len(specFiles); i++ {
 		result := <-results
-		states[i] = result
+		states = append(states, result)
 
 		if result.err != nil {
 			logger.Log.Errorf("Failed to check (%s). Error: %s", result.specFile, result.err)
 			err = result.err
-			cancelFunc()
+			closeCtX()
 			break
 		}
 
@@ -543,8 +542,8 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 	allSpecStates := make(chan *specState, len(specStates))
 	results := make(chan *packResult, len(specStates))
 	netOpsSemaphore := make(chan struct{}, concurrentNetOps)
-	ctx, cancelFunc := context.WithCancel(context.Background())
-	defer cancelFunc()
+	ctx, closeCtx := context.WithCancel(context.Background())
+	defer closeCtx()
 
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; uint(i) < workers; i++ {
@@ -565,7 +564,7 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 		if result.err != nil {
 			logger.Log.Errorf("Failed to pack (%s). Cancelling outstanding workers. Error: %s", result.specFile, result.err)
 			err = result.err
-			cancelFunc()
+			closeCtx()
 			break
 		}
 
