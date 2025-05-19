@@ -1,0 +1,28 @@
+From 6ef1e872fecc849bd4d34bcf16dc659b5f2d2891 Mon Sep 17 00:00:00 2001
+From: Mitch Zhu <mitchzhu@microsoft.com>
+Date: Mon, 19 May 2025 18:38:52 +0000
+Subject: [PATCH] Rename i_ctime to __i_ctime in tarfs after kernel 6.6 upgrade
+
+---
+ src/tarfs/tarfs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/tarfs/tarfs.c b/src/tarfs/tarfs.c
+index 92de8bcc77..52eb85e109 100644
+--- a/src/tarfs/tarfs.c
++++ b/src/tarfs/tarfs.c
+@@ -319,9 +319,9 @@ static struct inode *tarfs_iget(struct super_block *sb, u64 ino)
+ 
+ 	set_nlink(inode, 1);
+ 
+-	inode->i_mtime.tv_sec = inode->i_atime.tv_sec = inode->i_ctime.tv_sec =
++	inode->i_mtime.tv_sec = inode->i_atime.tv_sec = inode->__i_ctime.tv_sec =
+ 		(((u64)disk_inode.hmtime & 0xf) << 32) | le32_to_cpu(disk_inode.lmtime);
+-	inode->i_mtime.tv_nsec = inode->i_atime.tv_nsec = inode->i_ctime.tv_nsec = 0;
++	inode->i_mtime.tv_nsec = inode->i_atime.tv_nsec = inode->__i_ctime.tv_nsec = 0;
+ 
+ 	inode->i_mode = mode;
+ 	inode->i_size = le64_to_cpu(disk_inode.size);
+-- 
+2.34.1
+
