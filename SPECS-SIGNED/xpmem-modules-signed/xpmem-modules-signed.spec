@@ -12,7 +12,7 @@
 %global KVERSION %{target_kernel_version_full}
 
 %define _name xpmem-modules
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-17%{release_suffix}}
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-17%{release_suffix}%{?dist}}
 
 # xpmem-modules is a sub-package in SPECS/xpmem.
 # We are making that into a main package for signing.

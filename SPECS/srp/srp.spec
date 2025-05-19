@@ -45,7 +45,7 @@
 
 %{!?_name: %define _name srp}
 %{!?_version: %define _version 24.10}
-%{!?_mofed_full_version: %define _mofed_full_version %{_version}-17%{release_suffix}}
+%{!?_mofed_full_version: %define _mofed_full_version %{_version}-17%{release_suffix}%{?dist}}
 %{!?_release: %define _release OFED.24.10.0.6.7.1}
 
 # KMP is disabled by default
