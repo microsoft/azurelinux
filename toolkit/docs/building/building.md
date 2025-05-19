@@ -84,9 +84,11 @@
 
 ## Overview
 
-The following documentation describes how to fully build Azure Linux end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of Azure Linux _**is not**_ generally needed.  All Azure Linux packages are built signed and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/3.0/prod/)
+The following documentation describes how to fully build Azure Linux end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of Azure Linux _**are not**_ generally needed.  All Azure Linux packages are built signed and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/3.0/prod/)
 
 If you simply want to test-drive Azure Linux you may download and install the ISO (see: [readme.md](../../README.md)).  If you want to experiment with Azure Linux and build custom images or add packages in a more focused environment, refer to the tutorial in the [AzureLinux-Tutorials](https://github.com/microsoft/AzureLinux-Tutorials) repository.
+
+For optimal build performance across all build stages, consider using the `QUICK_REBUILD=y` flag which enables several optimizations documented throughout this guide.
 
 The Azure Linux build system consists of several phases and tools, but at a high level it can be viewed simply as 3 distinct build stages:
 
@@ -438,21 +440,27 @@ sudo make go-tools REBUILD_TOOLS=y
 
 # Bootstrap just the toolchain using publicly available sources via wget (or from SOURCE_URL if set),
 #  then rebuild the toolchain properly using the provided sources
-# NOTE: Source files must made available via one of:
+# NOTE: Source files must be made available via one of:
 # - `SOURCE_URL=<YOUR_SOURCE_SERVER>`
 # - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL_LIST=...)
 # - manually placing the correct sources in each /SPECS/* package folder
-#     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files to not match the existing hashes)
+#     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files do not match the existing hashes)
 sudo make toolchain PACKAGE_URL_LIST="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_TOOLS=y
 ```
 
 ```bash
-# Complete rebuild of all tool, package, and image files from source.
-# NOTE: Source files must made available via one of:
+# Build with optimal performance settings using QUICK_REBUILD flags where possible
+# This approach attempts to download components when available, speeding up the build process
+sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" QUICK_REBUILD=y
+```
+
+```bash
+# Complete rebuild of all tool, package, and image files from source
+# NOTE: Source files must be made available via one of:
 # - `SOURCE_URL=<YOUR_SOURCE_SERVER>`
 # - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL_LIST=...)
 # - manually placing the correct sources in each /SPECS/* package folder
-#     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files to not match the existing hashes)
+#     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files do not match the existing hashes)
 sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" PACKAGE_URL_LIST="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_PACKAGES=y REBUILD_TOOLS=y
 ```
 
@@ -480,17 +488,17 @@ Quickrebuild flags will set some flags to try and optimize builds for speed. Thi
 
 ##### `QUICK_REBUILD_TOOLCHAIN=`**`y`**
 
-> Set `REBUILD_TOOLCHAIN = y`, `INCREMENTAL_TOOLCHAIN = y`, `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL = y`, `REBUILD_TOOLS ?= y`.
+> Set `REBUILD_TOOLCHAIN = y` to build the toolchain from source, `DELTA_BUILD = y` to enable delta builds (which sets the deprecated `INCREMENTAL_TOOLCHAIN = y`), `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL = y` to attempt to download existing components where possible, `REBUILD_TOOLS ?= y` to rebuild the go tools if not already set.
 
 #### `QUICK_REBUILD_PACKAGES=...`
 
 ##### `QUICK_REBUILD_PACKAGES=`**`n`** _(default)_
 
-> Do not set toolchain specific quick rebuild flags
+> Do not set package build specific quick rebuild flags
 
 ##### `QUICK_REBUILD_PACKAGES=`**`y`**
 
-> Set `DELTA_BUILD = y`, `REBUILD_TOOLS ?= y`, `REBUILD_TOOLS ?= y`.
+> Set `DELTA_BUILD = y`, `DELTA_FETCH = y`, `PRECACHE = y`, `MAX_CASCADING_REBUILDS = 1`, `REBUILD_TOOLS ?= y`.
 
 #### URLS and Repos
 
