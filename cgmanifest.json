@@ -1787,8 +1787,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor-cvm",
-          "version": "38.0.72.2",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v38.0.72.2.tar.gz"
+          "version": "41.0.79",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v41.0.79.tar.gz"
         }
       }
     },
@@ -8161,8 +8161,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.2.0.azl5",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl5.tar.gz"
+          "version": "3.15.0.aks0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.15.0.aks0.tar.gz"
         }
       }
     },
@@ -8171,8 +8171,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "3.2.0.azl5",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl5.tar.gz"
+          "version": "3.15.0.aks0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.15.0.aks0.tar.gz"
         }
       }
     },
@@ -8291,8 +8291,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.157.mshv1",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.157.mshv1.tar.gz"
+          "version": "6.6.57.mshv4",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mshv-6.6.57.mshv4.tar.gz"
         }
       }
     },
@@ -8321,8 +8321,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.1.58.mshv4",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.58.mshv4.tar.gz"
+          "version": "6.1.58.mshv8",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.58.mshv8.tar.gz"
         }
       }
     },
@@ -8541,8 +8541,8 @@
         "type": "other",
         "other": {
           "name": "kyotocabinet",
-          "version": "1.2.78",
-          "downloadUrl": "https://dbmx.net/kyotocabinet/pkg/kyotocabinet-1.2.78.tar.gz"
+          "version": "1.2.80",
+          "downloadUrl": "https://dbmx.net/kyotocabinet/pkg/kyotocabinet-1.2.80.tar.gz"
         }
       }
     },
@@ -9581,8 +9581,8 @@
         "type": "other",
         "other": {
           "name": "libgeotiff",
-          "version": "1.7.1",
-          "downloadUrl": "https://download.osgeo.org/geotiff/libgeotiff/libgeotiff-1.7.1.tar.gz"
+          "version": "1.7.3",
+          "downloadUrl": "https://download.osgeo.org/geotiff/libgeotiff/libgeotiff-1.7.3.tar.gz"
         }
       }
     },
@@ -12551,8 +12551,8 @@
         "type": "other",
         "other": {
           "name": "lua-json",
-          "version": "1.3.2",
-          "downloadUrl": "https://github.com/harningt/luajson/archive/7a86bc22066858afeb23845a191a6ab680b46233/luajson-1.3.2-7a86bc2.tar.gz"
+          "version": "1.3.4",
+          "downloadUrl": "https://github.com/harningt/luajson/archive/1.3.4/luajson-1.3.4.tar.gz"
         }
       }
     },
@@ -12570,9 +12570,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "lua-lunit",
-          "version": "0.5",
-          "downloadUrl": "https://github.com/mrothNET/lunit/archive/refs/tags/lunit-0.5.tar.gz"
+          "name": "lua-lunitx",
+          "version": "0.8.1",
+          "downloadUrl": "https://github.com/dcurrie/lunit/archive/0.8.1.tar.gz"
         }
       }
     },
@@ -14642,8 +14642,8 @@
         "type": "other",
         "other": {
           "name": "objenesis",
-          "version": "3.1",
-          "downloadUrl": "https://github.com/easymock/objenesis/archive/3.1.tar.gz"
+          "version": "3.3",
+          "downloadUrl": "https://github.com/easymock/objenesis/archive/refs/tags/3.3.tar.gz"
         }
       }
     },
@@ -18253,8 +18253,8 @@
         "type": "other",
         "other": {
           "name": "perl-JSON-MaybeXS",
-          "version": "1.004003",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/JSON/JSON-MaybeXS-1.004003.tar.gz"
+          "version": "1.004008",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/JSON/JSON-MaybeXS-1.004008.tar.gz"
         }
       }
     },
@@ -28666,8 +28666,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.8.0",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.8.0.tar.gz"
+          "version": "1.8.1",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.8.1.tar.gz"
         }
       }
     },

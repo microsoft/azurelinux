@@ -10,8 +10,8 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        5.15.157.mshv1
-Release:        4%{?dist}
+Version:        6.6.57.mshv4
+Release:        1%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -21,7 +21,6 @@ Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
 Source4:        50_mariner_mshv_menuentry
-Patch0:         fix_python_3.12_build_errors.patch
 ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -35,6 +34,8 @@ BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  libdnet-devel
 BuildRequires:  libmspack-devel
+BuildRequires:  libtraceevent-devel
+BuildRequires:  libtracefs-devel
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
@@ -93,6 +94,8 @@ make LC_ALL=  ARCH=%{arch} olddefconfig
 
 %build
 make VERBOSE=1 V=1 KBUILD_VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
+
+make -C tools/perf PYTHON=%{python3} LIBTRACEEVENT_DYNAMIC=1 NO_LIBUNWIND=1 NO_GTK2=1 NO_STRLCPY=1 NO_BIONIC=1 all
 
 %define __modules_install_post \
 for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
@@ -169,6 +172,12 @@ make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} perf_install
 # Remove trace (symlink to perf). This file causes duplicate identical debug symbols
 rm -vf %{buildroot}%{_bindir}/trace
 
+# There is a bundled libtraceevent and the plugins will still be installed. When present, they'll cause
+# conflicts with the system libtracevent pulled by trace-cmd. Removing this ensures any programs linking
+# libtraceevent have no conflicts and that there's only one copy of libtraceevent shipped on the system.
+rm -rf %{buildroot}%{_libdir}/traceevent
+rm -rf %{buildroot}%{_lib64dir}/traceevent
+
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
 touch %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
@@ -213,20 +222,17 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %defattr(-,root,root)
 %{_libexecdir}
 %exclude %dir %{_libdir}/debug
-%{_lib64dir}/traceevent
 %{_lib64dir}/libperf-jvmti.so
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
 %{_datadir}/perf-core/strace/groups/file
 %{_datadir}/perf-core/strace/groups/string
 %{_docdir}/*
-%{_libdir}/perf/examples/bpf/*
-%{_libdir}/perf/include/bpf/*
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
-* Mon May 12 2025 Mitch Zhu <mitchzhu@microsoft.com> - 5.15.157.mshv1-4
-- Add erofs support
+* Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.57.mshv4-1
+- Auto-upgrade to 6.6.57.mshv4
 
 * Fri Oct 25 2024 Saul Paredes <saulparedes@microsoft.com> - 5.15.157.mshv1-3
 - Increase build verbosity
