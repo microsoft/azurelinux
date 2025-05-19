@@ -1,4 +1,20 @@
-# Building
+# Building Azure Linux
+
+## Is this document for you?
+
+|Task                              | Where to go                                                                   |
+|:---------------------------------|:------------------------------------------------------------------------------|
+|Add or build your own packages    | **[Azure Linux Tutorials](https://github.com/microsoft/AzureLinux-Tutorials)** |
+|Add or build your own images      | **[Azure Linux Tutorials](https://github.com/microsoft/AzureLinux-Tutorials)** |
+|Optimize build performance        | [Quick Build Optimization Guide](./dedicated_guides/quick_build_optimization.md) |
+|Quickly build core packages       | [Building in Stages](#building-in-stages)                                     |
+|Quickly build core images         | [Building in Stages](#building-in-stages)                                     |
+|Learn how the tools work in depth | [Continue Reading](#overview)                                                 |
+|Add/Update a core Azure Linux package | [Continue Reading](#overview)                                             |
+|Improve Azure Linux tools         | [Continue Reading](#overview)                                                 |
+
+## Table of Contents
+
 - [Overview](#overview)
 - [Building in Stages](#building-in-stages)
    - [Install Prerequisites](#install-prerequisites)
@@ -84,11 +100,26 @@
 
 ## Overview
 
-The following documentation describes how to fully build Azure Linux end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of Azure Linux _**are not**_ generally needed.  All Azure Linux packages are built signed and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/3.0/prod/)
+The following documentation describes how to fully build Azure Linux end-to-end as well as advanced techniques for performing toolchain, or package builds. Full builds of Azure Linux _**are not**_ generally needed. All Azure Linux packages are built, signed, and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/3.0/prod/)
 
-If you simply want to test-drive Azure Linux you may download and install the ISO (see: [readme.md](../../README.md)).  If you want to experiment with Azure Linux and build custom images or add packages in a more focused environment, refer to the tutorial in the [AzureLinux-Tutorials](https://github.com/microsoft/AzureLinux-Tutorials) repository.
+If you simply want to test-drive Azure Linux, you may download and install the ISO (see: [readme.md](../../README.md)). If you want to experiment with Azure Linux and build custom images or add packages in a more focused environment, refer to the tutorial in the [AzureLinux-Tutorials](https://github.com/microsoft/AzureLinux-Tutorials) repository.
 
-For optimal build performance across all build stages, consider using the `QUICK_REBUILD=y` flag which enables several optimizations documented throughout this guide.
+### Build Optimization
+
+For optimal build performance across all build stages, consider using the `QUICK_REBUILD=y` flag which enables several optimizations documented throughout this guide. This includes:
+
+- `QUICK_REBUILD_TOOLCHAIN=y` - For optimizing toolchain builds
+- `QUICK_REBUILD_PACKAGES=y` - For optimizing package builds
+
+These optimization flags significantly improve build performance by:
+- Using existing published components where possible
+- Enabling delta builds to avoid unnecessary rebuilds
+- Pre-fetching and caching dependencies
+- Limiting cascading rebuilds when a dependency changes
+
+For more detailed information, refer to the [Quick Build Optimization Guide](./dedicated_guides/quick_build_optimization.md).
+
+### Build System Structure
 
 The Azure Linux build system consists of several phases and tools, but at a high level it can be viewed simply as 3 distinct build stages:
 
