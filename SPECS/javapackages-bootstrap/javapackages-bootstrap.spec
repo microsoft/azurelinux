@@ -345,7 +345,7 @@ sed  -i "/<excludeSourceMatching>/a\ \t<excludeSourceMatching>/org/apache/common
 %build
 export LC_ALL=en_US.UTF-8 
 export JAVA_HOME=$(find /usr/lib/jvm -name "*openjdk*")
-# The build tends to randomly fail and we couldn't understand why. Re-trying the build as a workaround.
+# Since the build is known to randomly fail with a dependency cycle error, detect failure and retry the build.
 if ! ./mbi.sh build -incremental; then
     echo "First build attempt failed. Re-trying."
     ./mbi.sh build -incremental
