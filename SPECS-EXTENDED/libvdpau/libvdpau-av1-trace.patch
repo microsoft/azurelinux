@@ -1,0 +1,376 @@
+diff --git a/trace/vdpau_trace.cpp b/trace/vdpau_trace.cpp
+index 1940aa521d4a73135267659ef7bccc6630c2a631..4052017392d2dbd1849694aad2b16f0c9cc467c2 100644
+--- a/trace/vdpau_trace.cpp
++++ b/trace/vdpau_trace.cpp
+@@ -1154,6 +1154,371 @@ static void _vdp_cap_dump_picture_info(
+             fputs("}", _vdp_cap_data.fp);
+         }
+         break;
++    case VDP_DECODER_PROFILE_AV1_MAIN:
++    case VDP_DECODER_PROFILE_AV1_HIGH:
++    case VDP_DECODER_PROFILE_AV1_PROFESSIONAL:
++        {
++            VdpPictureInfoAV1 const * picture_info_av1 =
++                (VdpPictureInfoAV1 const *)picture_info;
++
++            fprintf(
++                _vdp_cap_data.fp,
++                "{%u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, {",
++                (uint32_t)picture_info_av1->width,
++                (uint32_t)picture_info_av1->height,
++                (uint32_t)picture_info_av1->frame_offset,
++                (uint32_t)picture_info_av1->profile,
++                (uint32_t)picture_info_av1->use_128x128_superblock,
++                (uint32_t)picture_info_av1->subsampling_x,
++                (uint32_t)picture_info_av1->subsampling_y,
++                (uint32_t)picture_info_av1->mono_chrome,
++                (uint32_t)picture_info_av1->bit_depth_minus8,
++                (uint32_t)picture_info_av1->enable_filter_intra,
++                (uint32_t)picture_info_av1->enable_intra_edge_filter,
++                (uint32_t)picture_info_av1->enable_interintra_compound,
++                (uint32_t)picture_info_av1->enable_masked_compound,
++
++                (uint32_t)picture_info_av1->enable_dual_filter,
++                (uint32_t)picture_info_av1->enable_order_hint,
++                (uint32_t)picture_info_av1->order_hint_bits_minus1,
++                (uint32_t)picture_info_av1->enable_jnt_comp,
++                (uint32_t)picture_info_av1->enable_superres,
++                (uint32_t)picture_info_av1->enable_cdef,
++                (uint32_t)picture_info_av1->enable_restoration,
++                (uint32_t)picture_info_av1->enable_fgs,
++                (uint32_t)picture_info_av1->frame_type,
++                (uint32_t)picture_info_av1->show_frame,
++                (uint32_t)picture_info_av1->disable_cdf_update,
++                (uint32_t)picture_info_av1->allow_screen_content_tools,
++                (uint32_t)picture_info_av1->force_integer_mv,
++                (uint32_t)picture_info_av1->coded_denom,
++                (uint32_t)picture_info_av1->allow_intrabc,
++                (uint32_t)picture_info_av1->allow_high_precision_mv,
++                (uint32_t)picture_info_av1->interp_filter,
++                (uint32_t)picture_info_av1->switchable_motion_mode,
++                (uint32_t)picture_info_av1->use_ref_frame_mvs,
++                (uint32_t)picture_info_av1->disable_frame_end_update_cdf,
++                (uint32_t)picture_info_av1->delta_q_present,
++                (uint32_t)picture_info_av1->delta_q_res,
++                (uint32_t)picture_info_av1->using_qmatrix,
++                (uint32_t)picture_info_av1->coded_lossless,
++                (uint32_t)picture_info_av1->use_superres,
++                (uint32_t)picture_info_av1->tx_mode,
++                (uint32_t)picture_info_av1->reference_mode,
++                (uint32_t)picture_info_av1->allow_warped_motion,
++                (uint32_t)picture_info_av1->reduced_tx_set,
++                (uint32_t)picture_info_av1->skip_mode,
++                (uint32_t)picture_info_av1->num_tile_cols,
++                (uint32_t)picture_info_av1->num_tile_rows,
++                (uint32_t)picture_info_av1->context_update_tile_id
++            );
++            for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->tile_widths); ++i) {
++                fprintf(
++                    _vdp_cap_data.fp,
++                    "%s%u",
++                    (i == 0) ? "" : ", ",
++                    (uint32_t)picture_info_av1->tile_widths[i]
++                );
++            }
++            fputs("}, {", _vdp_cap_data.fp);
++            for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->tile_heights); ++i) {
++                fprintf(
++                    _vdp_cap_data.fp,
++                    "%s%d",
++                    (i == 0) ? "" : ", ",
++                    (uint32_t)picture_info_av1->tile_heights[i]
++                );
++            }
++            fputs("}, {", _vdp_cap_data.fp);
++            for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->tile_info); ++i) {
++                fprintf(
++                    _vdp_cap_data.fp,
++                    "%s%d",
++                    (i == 0) ? "" : ", ",
++                    (uint32_t)picture_info_av1->tile_info[i]
++                );
++            }
++            fputs("}, ", _vdp_cap_data.fp);
++            fprintf(
++                _vdp_cap_data.fp,
++                "%u, %u, {",
++                (uint32_t)picture_info_av1->cdef_damping_minus_3,
++                (uint32_t)picture_info_av1->cdef_bits
++            );
++            for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->cdef_y_strength); ++i) {
++                fprintf(
++                    _vdp_cap_data.fp,
++                    "%s%u",
++                    (i == 0) ? "" : ", ",
++                    (uint32_t)picture_info_av1->cdef_y_strength[i]
++                );
++            }
++            fputs("}, {", _vdp_cap_data.fp);
++            for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->cdef_uv_strength); ++i) {
++                fprintf(
++                    _vdp_cap_data.fp,
++                    "%s%u",
++                    (i == 0) ? "" : ", ",
++                    (uint32_t)picture_info_av1->cdef_uv_strength[i]
++                );
++            }
++            fputs("}, ", _vdp_cap_data.fp);
++            fprintf(
++                _vdp_cap_data.fp,
++                "%u, %u, %u, %d, %d, %d, %d, %d, %u, %u, %u, %u, %u, %u, %u, {",
++                (uint32_t)picture_info_av1->SkipModeFrame0,
++                (uint32_t)picture_info_av1->SkipModeFrame1,
++                (uint32_t)picture_info_av1->base_qindex,
++                (int32_t)picture_info_av1->qp_y_dc_delta_q,
++                (int32_t)picture_info_av1->qp_u_dc_delta_q,
++                (int32_t)picture_info_av1->qp_v_dc_delta_q,
++                (int32_t)picture_info_av1->qp_u_ac_delta_q,
++                (int32_t)picture_info_av1->qp_v_ac_delta_q,
++                (uint32_t)picture_info_av1->qm_y,
++                (uint32_t)picture_info_av1->qm_u,
++                (uint32_t)picture_info_av1->qm_v,
++                (uint32_t)picture_info_av1->segmentation_enabled,
++                (uint32_t)picture_info_av1->segmentation_update_map,
++                (uint32_t)picture_info_av1->segmentation_update_data,
++                (uint32_t)picture_info_av1->segmentation_temporal_update
++            );
++            for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->segmentation_feature_data); ++i) {
++                 fputs((i == 0) ? "{" : "}, {", _vdp_cap_data.fp);
++                 for (uint32_t j = 0; j < _VDP_TRACE_ARSIZE(picture_info_av1->segmentation_feature_data[0]); ++j) {
++                     fprintf(
++                         _vdp_cap_data.fp,
++                         "%s%d",
++                         (j == 0) ? "" : ", ",
++                         (int32_t)picture_info_av1->segmentation_feature_data[i][j]
++                     );
++                 }
++             }
++             fputs("}}, {", _vdp_cap_data.fp);
++            for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->segmentation_feature_mask); ++i) {
++                fprintf(
++                    _vdp_cap_data.fp,
++                    "%s%d",
++                    (i == 0) ? "" : ", ",
++                    (uint32_t)picture_info_av1->segmentation_feature_mask[i]
++                );
++            }
++            fputs("}, {", _vdp_cap_data.fp);
++            for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->loop_filter_level); ++i) {
++                fprintf(
++                    _vdp_cap_data.fp,
++                    "%s%d",
++                    (i == 0) ? "" : ", ",
++                    (uint32_t)picture_info_av1->loop_filter_level[i]
++                );
++            }
++            fputs("}, ", _vdp_cap_data.fp);
++            fprintf(
++                _vdp_cap_data.fp,
++                "%u, %u, %u, {",
++                (uint32_t)picture_info_av1->loop_filter_level_u,
++                (uint32_t)picture_info_av1->loop_filter_level_v,
++                (uint32_t)picture_info_av1->loop_filter_sharpness
++            );
++            for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->loop_filter_ref_deltas); ++i) {
++                fprintf(
++                    _vdp_cap_data.fp,
++                    "%s%d",
++                    (i == 0) ? "" : ", ",
++                    (int32_t)picture_info_av1->loop_filter_ref_deltas[i]
++                );
++            }
++            fputs("}, {", _vdp_cap_data.fp);
++            for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->loop_filter_mode_deltas); ++i) {
++                fprintf(
++                    _vdp_cap_data.fp,
++                    "%s%d",
++                    (i == 0) ? "" : ", ",
++                    (int32_t)picture_info_av1->loop_filter_mode_deltas[i]
++                );
++            }
++            fputs("}, ", _vdp_cap_data.fp);
++            fprintf(
++                _vdp_cap_data.fp,
++                "%u, %u, %u, %u, %u, %u, {",
++                (uint32_t)picture_info_av1->loop_filter_delta_enabled,
++                (uint32_t)picture_info_av1->loop_filter_delta_update,
++                (uint32_t)picture_info_av1->delta_lf_present,
++                (uint32_t)picture_info_av1->delta_lf_res,
++                (uint32_t)picture_info_av1->delta_lf_multi,
++                (uint32_t)picture_info_av1->reserved4_2bits
++            );
++            for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->lr_unit_size); ++i) {
++                fprintf(
++                    _vdp_cap_data.fp,
++                    "%s%u",
++                    (i == 0) ? "" : ", ",
++                    (uint32_t)picture_info_av1->lr_unit_size[i]
++                );
++            }
++            fputs("}, {", _vdp_cap_data.fp);
++            for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->lr_type); ++i) {
++                fprintf(
++                    _vdp_cap_data.fp,
++                    "%s%u",
++                    (i == 0) ? "" : ", ",
++                    (uint32_t)picture_info_av1->lr_type[i]
++                );
++            }
++            fputs("}, ", _vdp_cap_data.fp);
++            fprintf(
++                _vdp_cap_data.fp,
++                "%u, {",
++                (uint32_t)picture_info_av1->primary_ref_frame
++            );
++            for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->ref_frame_map); ++i) {
++                fprintf(
++                    _vdp_cap_data.fp,
++                    "%s%u",
++                    (i == 0) ? "" : ", ",
++                    (uint32_t)picture_info_av1->ref_frame_map[i]
++                );
++            }
++            fputs("}, ", _vdp_cap_data.fp);
++            fprintf(
++                _vdp_cap_data.fp,
++                "%u, %u, {",
++                (uint32_t)picture_info_av1->temporal_layer_id,
++                (uint32_t)picture_info_av1->spatial_layer_id
++            );
++            for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->ref_frame); ++i) {
++                fprintf(
++                    _vdp_cap_data.fp,
++                    "%s{%u, %u, %u }",
++                    (i == 0) ? "" : ", ",
++                    (uint32_t)picture_info_av1->ref_frame->width,
++                    (uint32_t)picture_info_av1->ref_frame->height,
++                    (uint32_t)picture_info_av1->ref_frame->index
++                );
++            }
++            fputs("} , {", _vdp_cap_data.fp);
++            for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->global_motion); ++i) {
++                fprintf(
++                    _vdp_cap_data.fp,
++                    "%s{%u, %u, {",
++                    (i == 0) ? "" : ", ",
++                    (uint32_t)picture_info_av1->global_motion->invalid,
++                    (uint32_t)picture_info_av1->global_motion->wmtype
++                );
++                for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->global_motion->wmmat); ++i) {
++                    fprintf(
++                        _vdp_cap_data.fp,
++                        "%s%d",
++                        (i == 0) ? "" : ", ",
++                        (int32_t)picture_info_av1->global_motion->wmmat[i]
++                    );
++                }
++                fputs("}} ", _vdp_cap_data.fp);
++            }
++            fputs("}, ", _vdp_cap_data.fp);
++            fprintf(
++                _vdp_cap_data.fp,
++                "%u, %u, %u, %u, %u, %u, %u, %u, %u, {",
++                (uint32_t)picture_info_av1->apply_grain,
++                (uint32_t)picture_info_av1->overlap_flag,
++                (uint32_t)picture_info_av1->scaling_shift_minus8,
++                (uint32_t)picture_info_av1->chroma_scaling_from_luma,
++                (uint32_t)picture_info_av1->ar_coeff_lag,
++                (uint32_t)picture_info_av1->ar_coeff_shift_minus6,
++                (uint32_t)picture_info_av1->grain_scale_shift,
++                (uint32_t)picture_info_av1->clip_to_restricted_range,
++                (uint32_t)picture_info_av1->num_y_points
++            );
++            for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->scaling_points_y); ++i) {
++                 fputs((i == 0) ? "{" : "}, {", _vdp_cap_data.fp);
++                 for (uint32_t j = 0; j < _VDP_TRACE_ARSIZE(picture_info_av1->scaling_points_y[0]); ++j) {
++                     fprintf(
++                         _vdp_cap_data.fp,
++                         "%s%u",
++                         (j == 0) ? "" : ", ",
++                         (uint32_t)picture_info_av1->scaling_points_y[i][j]
++                     );
++                 }
++             }
++             fputs("}}, ", _vdp_cap_data.fp);
++             fprintf(
++                 _vdp_cap_data.fp,
++                 "%u, {",
++                 (uint32_t)picture_info_av1->num_cb_points
++             );
++             for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->scaling_points_cb); ++i) {
++                  fputs((i == 0) ? "{" : "}, {", _vdp_cap_data.fp);
++                  for (uint32_t j = 0; j < _VDP_TRACE_ARSIZE(picture_info_av1->scaling_points_cb[0]); ++j) {
++                      fprintf(
++                          _vdp_cap_data.fp,
++                          "%s%u",
++                          (j == 0) ? "" : ", ",
++                          (uint32_t)picture_info_av1->scaling_points_cb[i][j]
++                      );
++                  }
++              }
++              fputs("}}, ", _vdp_cap_data.fp);
++              fprintf(
++                  _vdp_cap_data.fp,
++                  "%u, {",
++                  (uint32_t)picture_info_av1->num_cr_points
++              );
++              for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->scaling_points_cr); ++i) {
++                   fputs((i == 0) ? "{" : "}, {", _vdp_cap_data.fp);
++                   for (uint32_t j = 0; j < _VDP_TRACE_ARSIZE(picture_info_av1->scaling_points_cr[0]); ++j) {
++                       fprintf(
++                           _vdp_cap_data.fp,
++                           "%s%u",
++                           (j == 0) ? "" : ", ",
++                           (uint32_t)picture_info_av1->scaling_points_cr[i][j]
++                       );
++                   }
++               }
++               fputs("}}, ", _vdp_cap_data.fp);
++               fprintf(
++                   _vdp_cap_data.fp,
++                   "%u, {",
++                   (uint32_t)picture_info_av1->random_seed
++               );
++               for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->ar_coeffs_y); ++i) {
++                   fprintf(
++                       _vdp_cap_data.fp,
++                       "%s%d",
++                       (i == 0) ? "" : ", ",
++                       (int32_t)picture_info_av1->ar_coeffs_y[i]
++                   );
++               }
++               fputs("}, {", _vdp_cap_data.fp);
++               for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->ar_coeffs_cb); ++i) {
++                   fprintf(
++                       _vdp_cap_data.fp,
++                       "%s%d",
++                       (i == 0) ? "" : ", ",
++                       (int32_t)picture_info_av1->ar_coeffs_cb[i]
++                   );
++               }
++               fputs("}, {", _vdp_cap_data.fp);
++               for (uint32_t i = 0; i < _VDP_TRACE_ARSIZE(picture_info_av1->ar_coeffs_cr); ++i) {
++                   fprintf(
++                       _vdp_cap_data.fp,
++                       "%s%d",
++                       (i == 0) ? "" : ", ",
++                       (int32_t)picture_info_av1->ar_coeffs_cr[i]
++                   );
++               }
++               fputs("},", _vdp_cap_data.fp);
++               fprintf(
++                   _vdp_cap_data.fp,
++                   "%u, %u, %u, %u, %u, %u",
++                   (uint32_t)picture_info_av1->cb_mult,
++                   (uint32_t)picture_info_av1->cb_luma_mult,
++                   (uint32_t)picture_info_av1->cb_offset,
++                   (uint32_t)picture_info_av1->cr_mult,
++                   (uint32_t)picture_info_av1->cr_luma_mult,
++                   (uint32_t)picture_info_av1->cr_offset
++               );
++               fputs("}", _vdp_cap_data.fp);
++        }
++        break;
+     default:
+         fputs("{...}", _vdp_cap_data.fp);
+         break;
