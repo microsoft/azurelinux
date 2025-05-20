@@ -234,7 +234,7 @@ stages:
                   onlyAddExtraIndex: false
                   artifactFeeds: "MarinerFeed"
 
-              - template: .pipelines/templatesWithCheckout/SodiffCheck.yml@self
+              - template: /.pipelines/templatesWithCheckout/SodiffCheck.yml@self
                 parameters:
                   inputArtifactsFolder: $(inputArtifactsLocation)
                   inputRPMsTarballName: $(rpmsTarballName)
