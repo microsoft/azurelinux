@@ -30,7 +30,6 @@ Source0:        https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/
 Patch0:         CVE-2023-45288.patch
 Patch1:         CVE-2023-3978.patch
 Patch2:         CVE-2024-45338.patch
-# CVE-2025-22872 is fixed in go net v0.38 by https://github.com/golang/net/commit/e1fcd82abba34df74614020343be8eb1fe85f0d9
 Patch3:         CVE-2025-22872.patch
 BuildRequires:  golang
 BuildRequires:  golang-packaging
