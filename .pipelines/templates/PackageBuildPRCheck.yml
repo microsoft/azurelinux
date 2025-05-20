@@ -59,7 +59,6 @@ stages:
 
               - template: RawToolchainDownload.yml@self
                 parameters:
-                  dailyBuildID: "${{ parameters.dailyBuildID }}"
                   rawToolchainCacheURL: ${{ configuration.rawToolchainCacheURL }}
                   rawToolchainExpectedHash: ${{ configuration.rawToolchainExpectedHash }}
 
