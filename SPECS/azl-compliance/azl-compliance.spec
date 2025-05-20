@@ -1,13 +1,14 @@
 Summary:        Azure Linux compliance package to meet all sorts of compliance rules
 Name:           azl-compliance
 Version:        1.0.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2025-4574.patch
 Requires:       dnf
 Requires:       gnutls
 Requires:       grub2
@@ -21,7 +22,7 @@ BuildRequires:  rust
 Azure Linux compliance package to configure systems to meet FIPS and FedRAMP compliance.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 cd azl-compliance
@@ -53,6 +54,9 @@ cd azl-compliance
 cargo test --release --offline
 
 %changelog
+* Mon May 19 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.0.2-2
+- Patch CVE-2025-4574
+
 * Thu Jun 06 2024 Tobias Brick <tobiasb@microsoft.com> 1.0.2-1
 - Update to version 1.0.2
 
