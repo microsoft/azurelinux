@@ -1,4 +1,5 @@
 cronie
+ca-certificates
 golang
 influx-cli
 influxdb
