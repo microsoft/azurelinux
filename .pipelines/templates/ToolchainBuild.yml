@@ -32,7 +32,7 @@ steps:
     parameters:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
-  - bash: sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" toolchain DAILY_BUILD_ID="${{ parameters.dailyBuildID }}" QUICK_REBUILD=y
+  - bash: sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" toolchain DAILY_BUILD_ID="${{ parameters.dailyBuildID }}" DAILY_BUILD_ID_UPDATE_MANIFESTS=n QUICK_REBUILD=y
     displayName: "Build toolchain"
 
   - bash: |
