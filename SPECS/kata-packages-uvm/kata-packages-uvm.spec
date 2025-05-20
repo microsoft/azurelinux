@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -52,6 +52,7 @@ Metapackage to install the set of packages inside a Kata containers UVM, include
 Summary:        Metapackage to install the set of packages inside a Kata confidential containers UVM.
 Requires:       %{name} = %{version}-%{release}
 Requires:       cifs-utils
+Requires:       erofs-utils
 Requires:       device-mapper
 # Note: This assumes we are using systemd which may not always be the case when we support AGENT_INIT=yes
 Requires:       systemd-udev
@@ -110,6 +111,9 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Mon May 19 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.0.0-9
+- Add erofs-utils for kata-packages-uvm-coco
+
 * Tue Feb 11 2025 Cameron Baird <cameronbaird@microsoft.com> - 1.0.0-8
 - Introduce debug metapackage
 - Move curl, cpio, gzip, iputils, lvm2, tar, procps-ng to debug metapackage
