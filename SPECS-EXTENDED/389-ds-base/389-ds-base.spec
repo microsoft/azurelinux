@@ -733,7 +733,7 @@ exit 0
 
 %changelog
 * Wed May 14 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.1.1-4
-- Bump release to rebuild wiyj rust 1.86.0
+- Bump release to rebuild with rust 1.86.0
 
 * Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.1.1-3
 - Bump release to build with rust 1.85.0
