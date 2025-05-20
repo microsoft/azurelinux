@@ -1,0 +1,71 @@
+diff -up rp-pppoe-3.12/man/pppoe.8.than rp-pppoe-3.12/man/pppoe.8
+--- rp-pppoe-3.12/man/pppoe.8.than	2015-11-11 16:10:01.000000000 +0100
++++ rp-pppoe-3.12/man/pppoe.8	2016-06-03 17:24:49.649336285 +0200
+@@ -32,6 +32,10 @@ triggered.  The best way to do this is t
+ PPPoE timeout to be about four times the LCP echo interval.
+ 
+ .TP
++.B \-t \fItimeout\fR
++The \fB\-t\fR option sets the initial timeout for discovery packets in seconds.
++
++.TP
+ .B \-D \fIfile_name\fR
+ The \fB\-D\fR option causes every packet to be dumped to the specified
+ \fIfile_name\fR.  This is intended for debugging only; it produces huge
+@@ -147,6 +151,10 @@ the peer you are dealing with uses non-s
+ ISP uses non-standard frame types, complain!
+ 
+ .TP
++.B \-F numfloods
++The \fB\-F\fR option sets the discovery flood, only used for stress-testing.
++
++.TP
+ .B \-h
+ The \fB\-h\fR option causes \fBpppoe\fR to print usage information and
+ exit.
+diff -up rp-pppoe-3.12/man/pppoe-server.8.than rp-pppoe-3.12/man/pppoe-server.8
+--- rp-pppoe-3.12/man/pppoe-server.8.than	2016-06-03 17:24:49.641336586 +0200
++++ rp-pppoe-3.12/man/pppoe-server.8	2016-06-03 17:24:49.650336248 +0200
+@@ -77,12 +77,20 @@ PADI and PADR packets are ignored.  If y
+ then no limit is imposed on the number of sessions per peer MAC address.
+ 
+ .TP
++.B \-P
++Check pool file for correctness and exit.
++
++.TP
+ .B \-s
+ This option is passed directly to \fBpppoe\fR; see \fBpppoe\fR(8) for
+ details.  In addition, it causes \fBpppd\fR to be invoked with the
+ \fIsync\fR option.
+ 
+ .TP
++.B \-l
++Increment local IP address for each session.
++
++.TP
+ .B \-L \fIip\fR
+ Sets the local IP address.  This is passed to spawned \fBpppd\fR processes.
+ If not specified, the default is 10.0.0.1.
+@@ -147,6 +155,10 @@ handing out sessions in order, the sessi
+ unpredictable order.
+ 
+ .TP
++.B \-d
++Debug session creation.
++
++.TP
+ .B \-u
+ Tells the server to invoke \fBpppd\fR with the \fIunit\fR option.  Note
+ that this option only works for \fBpppd\fR version 2.4.0 or newer.
+diff -up rp-pppoe-3.12/src/pppoe.c.than rp-pppoe-3.12/src/pppoe.c
+--- rp-pppoe-3.12/src/pppoe.c.than	2016-06-03 17:24:49.650336248 +0200
++++ rp-pppoe-3.12/src/pppoe.c	2016-06-03 17:27:40.888903213 +0200
+@@ -380,6 +380,7 @@ usage(char const *argv0)
+ 	    "   -k             -- Kill a session with PADT (requires -e)\n"
+ 	    "   -d             -- Perform discovery, print session info and exit.\n"
+ 	    "   -f disc:sess   -- Set Ethernet frame types (hex).\n"
++       "   -F numfloods   -- Set the discovery flood, only used for stress-testing.\n"
+ 	    "   -h             -- Print usage information.\n\n"
+ 	    "PPPoE Version %s, Copyright (C) 2001-2015 Roaring Penguin Software Inc.\n"
+ 	    "PPPoE comes with ABSOLUTELY NO WARRANTY.\n"

@@ -1,0 +1,18 @@
+diff -up rp-pppoe-3.12/src/Makefile.in.than rp-pppoe-3.12/src/Makefile.in
+--- rp-pppoe-3.12/src/Makefile.in.than	2015-11-16 17:25:40.566618656 +0100
++++ rp-pppoe-3.12/src/Makefile.in	2015-11-16 17:25:57.749517019 +0100
+@@ -165,14 +165,6 @@ install: all
+ 	$(install) -m 755 ../scripts/pppoe-status $(DESTDIR)$(sbindir)
+ 	$(install) -m 755 ../scripts/pppoe-stop $(DESTDIR)$(sbindir)
+ 	$(install) -m 755 ../scripts/pppoe-setup $(DESTDIR)$(sbindir)
+-	-mkdir -p $(DESTDIR)$(docdir)
+-	$(install) -m 644 ../doc/CHANGES $(DESTDIR)$(docdir)
+-	$(install) -m 644 ../doc/KERNEL-MODE-PPPOE $(DESTDIR)$(docdir)
+-	$(install) -m 644 ../doc/HOW-TO-CONNECT $(DESTDIR)$(docdir)
+-	$(install) -m 644 ../doc/LICENSE $(DESTDIR)$(docdir)
+-	$(install) -m 644 ../README $(DESTDIR)$(docdir)
+-	$(install) -m 644 ../SERVPOET $(DESTDIR)$(docdir)
+-	$(install) -m 644 ../configs/pap-secrets $(DESTDIR)$(docdir)
+ 	-mkdir -p $(DESTDIR)$(mandir)/man8
+ 	for i in $(TARGETS) ; do \
+ 		if test -f ../man/$$i.8 ; then \

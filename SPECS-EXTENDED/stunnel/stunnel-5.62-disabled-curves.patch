@@ -1,0 +1,71 @@
+From 2043ed7c27e14310bec49e1df6348af3882db7bb Mon Sep 17 00:00:00 2001
+From: Clemens Lang <cllang@redhat.com>
+Date: Mon, 12 Sep 2022 11:07:38 +0200
+Subject: [PATCH 8/8] Limit curves defaults in FIPS mode
+
+Our copy of OpenSSL disables the X25519 and X448 curves in FIPS mode,
+but stunnel defaults to enabling them and then fails to do so.
+
+Patch-name: stunnel-5.62-disabled-curves.patch
+Patch-status: Limit curves defaults in FIPS mode
+Patch-id: 8
+From-dist-git-commit: 70b3076eb09912b3a11f371b8c523303114fffa3
+---
+ src/options.c | 23 +++++++++++++++++++++--
+ 1 file changed, 21 insertions(+), 2 deletions(-)
+
+diff --git a/src/options.c b/src/options.c
+index 09d02bd..fe4e776 100644
+--- a/src/options.c
++++ b/src/options.c
+@@ -39,8 +39,10 @@
+ 
+ #if OPENSSL_VERSION_NUMBER >= 0x10101000L
+ #define DEFAULT_CURVES "X25519:P-256:X448:P-521:P-384"
++#define DEFAULT_CURVES_FIPS "P-256:P-521:P-384"
+ #else /* OpenSSL version < 1.1.1 */
+ #define DEFAULT_CURVES "prime256v1"
++#define DEFAULT_CURVES_FIPS "prime256v1"
+ #endif /* OpenSSL version >= 1.1.1 */
+ 
+ #if defined(_WIN32_WCE) && !defined(CONFDIR)
+@@ -1847,7 +1849,7 @@ NOEXPORT const char *parse_service_option(CMD cmd, SERVICE_OPTIONS **section_ptr
+     /* curves */
+     switch(cmd) {
+     case CMD_SET_DEFAULTS:
+-        section->curves=str_dup_detached(DEFAULT_CURVES);
++        section->curves = NULL;
+         break;
+     case CMD_SET_COPY:
+         section->curves=str_dup_detached(new_service_options.curves);
+@@ -1862,9 +1864,26 @@ NOEXPORT const char *parse_service_option(CMD cmd, SERVICE_OPTIONS **section_ptr
+         section->curves=str_dup_detached(arg);
+         return NULL; /* OK */
+     case CMD_INITIALIZE:
++        if(!section->curves) {
++            /* this is only executed for global options, because
++             * section->curves is no longer NULL in sections */
++#ifdef USE_FIPS
++            if(new_global_options.option.fips)
++                section->curves=str_dup_detached(DEFAULT_CURVES_FIPS);
++            else
++#endif /* USE_FIPS */
++                section->curves=str_dup_detached(DEFAULT_CURVES);
++        }
+         break;
+     case CMD_PRINT_DEFAULTS:
+-        s_log(LOG_NOTICE, "%-22s = %s", "curves", DEFAULT_CURVES);
++        if(fips_available()) {
++            s_log(LOG_NOTICE, "%-22s = %s %s", "curves",
++                DEFAULT_CURVES_FIPS, "(with \"fips = yes\")");
++            s_log(LOG_NOTICE, "%-22s = %s %s", "curves",
++                DEFAULT_CURVES, "(with \"fips = no\")");
++        } else {
++            s_log(LOG_NOTICE, "%-22s = %s", "curves", DEFAULT_CURVES);
++        }
+         break;
+     case CMD_PRINT_HELP:
+         s_log(LOG_NOTICE, "%-22s = ECDH curve names", "curves");
+-- 
+2.37.3
+

@@ -1,0 +1,12 @@
+diff -up rp-pppoe-3.12/src/pppoe-server.c.than rp-pppoe-3.12/src/pppoe-server.c
+--- rp-pppoe-3.12/src/pppoe-server.c.than	2015-12-17 11:17:30.257775608 +0100
++++ rp-pppoe-3.12/src/pppoe-server.c	2015-12-17 11:18:44.276951643 +0100
+@@ -2014,7 +2014,7 @@ startPPPDLinuxKernelMode(ClientSession *
+ 
+     argv[c++] = "pppd";
+     argv[c++] = "plugin";
+-    argv[c++] = PLUGIN_PATH;
++    argv[c++] = "rp-pppoe.so";
+ 
+     /* Add "nic-" to interface name */
+     snprintf(buffer, SMALLBUF, "nic-%s", session->ethif->name);

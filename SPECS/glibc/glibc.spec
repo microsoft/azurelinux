@@ -10,7 +10,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        10%{?dist}
+Release:        9%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,7 +37,6 @@ Patch9:         CVE-2023-6779.patch
 Patch10:        CVE-2023-6780.patch
 # Upstream backport for fixing: nscd fails to build with cleanup handler if built with -fexceptions
 Patch11:		nscd-Do-not-rebuild-getaddrinfo-bug-30709.patch
-Patch12:        glibc-2.34_pthread_cond_wait.patch
 # Patches for testing
 Patch100:       0001-Remove-Wno-format-cflag-from-tests.patch
 
@@ -359,9 +358,6 @@ grep "^FAIL: nptl/tst-mutex10" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
-* Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 2.38-10
-- Add glibc-2.34_pthread_cond_wait.patch
-
 * Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 2.38-9
 - Re-enable nscd build and packaging
 

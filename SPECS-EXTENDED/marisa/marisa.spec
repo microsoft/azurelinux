@@ -1,21 +1,22 @@
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+
 # disable python2 by default
 %bcond_with python2
 
 Name:          marisa
-Version:       0.2.6
-Release:       12%{?dist}
-Vendor:        Microsoft Corporation
-Distribution:  Azure Linux
+Version:       0.2.4
+Release:       45%{?dist}
 Summary:       Static and spece-efficient trie data structure library
 
-License:       BSD-2-Clause OR LGPL-2.1-or-later
-URL:  https://github.com/s-yata/marisa-trie
-Source0: https://github.com/s-yata/marisa-trie/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+License:       BSD or LGPLv2+
+URL:  https://code.google.com/p/marisa-trie
+# Currently the working URL is
+# https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/marisa-trie/%%{name}-%%{version}.tar.gz
+Source0: https://marisa-trie.googlecode.com/files/%{name}-%{version}.tar.gz
 
-BuildRequires: autoconf, automake, libtool
-BuildRequires: make
-BuildRequires: gcc
-BuildRequires: gcc-c++
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
 BuildRequires: swig
 BuildRequires: perl-devel
 BuildRequires: perl-generators
@@ -23,7 +24,6 @@ BuildRequires: perl-generators
 BuildRequires: python2-devel
 %endif
 BuildRequires: python3-devel
-BuildRequires: python3-setuptools
 BuildRequires: ruby-devel
 
 %description
@@ -97,47 +97,46 @@ Ruby language binding for groonga
 
 
 %prep
-%autosetup -n %{name}-trie-%{version}
+%autosetup
 
 
 %build
 %set_build_flags
 
-autoreconf -i
 %configure --disable-static
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-%{make_build}
+make %{?_smp_mflags}
 
 # build Perl bindings
 pushd bindings/perl
-%{__perl} Makefile.PL INC="-I%{_builddir}/%{name}-trie-%{version}/include" LIBS="-L%{_builddir}/%{name}-trie-%{version}/lib/%{name}/.libs -lmarisa" INSTALLDIRS=vendor
-%{make_build}
+%{__perl} Makefile.PL INC="-I%{_builddir}/%{name}-%{version}/lib" LIBS="-L%{_builddir}/%{name}-%{version}/lib/.libs -lmarisa" INSTALLDIRS=vendor
+make %{?_smp_mflags}
 popd
 
 # build Python bindings
 # Regenerate Python bindings
-%{make_build} --directory=bindings swig-python
+make --directory=bindings swig-python
 
 pushd bindings/python
 %if %{with python2}
-%{__python2} setup.py build_ext --include-dirs="%{_builddir}/%{name}-trie-%{version}/include" --library-dirs="%{_builddir}/%{name}-trie-%{version}/lib/%{name}/.libs"
+%{__python2} setup.py build_ext --include-dirs="%{_builddir}/%{name}-%{version}/lib" --library-dirs="%{_builddir}/%{name}-%{version}/lib/.libs"
 %py2_build
 %endif
 
-%{__python3} setup.py build_ext --include-dirs="%{_builddir}/%{name}-trie-%{version}/include" --library-dirs="%{_builddir}/%{name}-trie-%{version}/lib/%{name}/.libs"
+%{__python3} setup.py build_ext --include-dirs="%{_builddir}/%{name}-%{version}/lib" --library-dirs="%{_builddir}/%{name}-%{version}/lib/.libs"
 %py3_build
 popd
 
 # build Ruby bindings
 # Regenerate ruby bindings
 pushd bindings
-%{make_build} swig-ruby
+make swig-ruby
 popd
 
 pushd bindings/ruby
-ruby extconf.rb --with-opt-include="%{_builddir}/%{name}-trie-%{version}/include" --with-opt-lib="%{_builddir}/%{name}-trie-%{version}/lib/%{name}/.libs" --vendor
-%{make_build}
+ruby extconf.rb --with-opt-include="%{_builddir}/%{name}-%{version}/lib" --with-opt-lib="%{_builddir}/%{name}-%{version}/lib/.libs" --vendor
+make
 popd
 
 %install
@@ -157,7 +156,6 @@ pushd bindings/python
 %py2_install
 %endif
 %py3_install
-rm -rf %{buildroot}/%{python3_sitearch}/marisa-0.0.0-py%{python3_version}.egg-info
 popd
 
 # install Ruby bindings
@@ -174,9 +172,9 @@ rm -f $RPM_BUILD_ROOT%{perl_vendorarch}/sample.pl
 
 
 %files
-%doc docs/style.css AUTHORS README.md docs/readme.en.html
+%doc docs/style.css AUTHORS README docs/readme.en.html
 %lang(ja) %doc docs/readme.ja.html
-%license COPYING.md
+%license COPYING
 %{_libdir}/libmarisa.so.*
 
 %files devel
@@ -196,7 +194,6 @@ rm -f $RPM_BUILD_ROOT%{perl_vendorarch}/sample.pl
 %files perl
 %{perl_vendorarch}/marisa.pm
 %{perl_vendorarch}/auto/marisa
-%{perl_vendorarch}/benchmark.pl
 
 %if %{with python2}
 %files -n python2-%{name}
@@ -209,101 +206,15 @@ rm -f $RPM_BUILD_ROOT%{perl_vendorarch}/sample.pl
 %{python3_sitearch}/__pycache__/marisa*
 %{python3_sitearch}/_marisa*.so
 %{python3_sitearch}/marisa.py
+%{python3_sitearch}/marisa-0.0.0-py3.?.egg-info
 
 %files ruby
 %{ruby_vendorarchdir}/marisa.so
 
 %changelog
-* Mon Apr 28 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.2.6-12
-- Initial Azure Linux import from Fedora 41 (license: MIT).
-- License verified
-
-* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.6-11
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
-
-* Wed Jun 12 2024 Jitka Plesnikova <jplesnik@redhat.com> - 0.2.6-10
-- Perl 5.40 rebuild
-
-* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.2.6-9
-- Rebuilt for Python 3.13
-
-* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.6-8
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.6-7
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Wed Jan 03 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 0.2.6-6
-- Rebuild for https://fedoraproject.org/wiki/Changes/Ruby_3.3
-
-* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.6-5
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
-
-* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 0.2.6-4
-- Perl 5.38 rebuild
-
-* Mon Jun 26 2023 Python Maint <python-maint@redhat.com> - 0.2.6-3
-- Rebuilt for Python 3.12
-
-* Tue Jun 20 2023 Peng Wu <pwu@redhat.com> - 0.2.6-2
-- Migrate to SPDX license
-
-* Mon Jun 19 2023 Peng Wu <pwu@redhat.com> - 0.2.6-1
-- Update to 0.2.6
-- Resolves: RHBZ#2215688
-
-* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.2.4-61
-- Rebuilt for Python 3.12
-
-* Thu Jun  8 2023 Peng Wu <pwu@redhat.com> - 0.2.4-60
-- Add BuildRequires python3-setuptools
-- Use make_build macro instead of just make
-- Resolves: RHBZ#2048094, RHBZ#2155002
-
-* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.4-59
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
-
-* Wed Jan 04 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 0.2.4-58
-- Rebuild for https://fedoraproject.org/wiki/Changes/Ruby_3.2
-
-* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.4-57
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
-
-* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.2.4-56
-- Rebuilt for Python 3.11
-
-* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.2.4-55
-- Perl 5.36 rebuild
-
-* Thu Jan 27 2022 Mamoru TASAKA <mtasaka@fedoraproject.org> - 0.2.4-54
-- F-36: rebuild against ruby31
-
-* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.4-53
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
-
-* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.4-52
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
-
-* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.2.4-51
-- Rebuilt for Python 3.10
-
-* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.2.4-50
-- Perl 5.34 rebuild
-
-* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.4-49
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
-
-* Wed Jan 06 2021 Mamoru TASAKA <mtasaka@fedoraproject.org> - 0.2.4-48
-- F-34: rebuild against ruby 3.0
-
-* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.4-47
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
-
-* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.2.4-46
-- Perl 5.32 rebuild
-
-* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.2.4-45
-- Rebuilt for Python 3.9
+* Mon Mar 15 2021 Henry Li <lihl@microsoft.com> - 0.2.4-45
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- Fix distro condition checking
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.4-44
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

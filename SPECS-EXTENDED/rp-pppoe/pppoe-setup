@@ -1,0 +1,492 @@
+#! /bin/bash
+#***********************************************************************
+#
+# pppoe-setup
+#
+# All-purpose slicing/dicing shell script to configure rp-pppoe.
+#
+# Copyright (C) 2000 Roaring Penguin Software Inc.
+#
+# $Id$
+#***********************************************************************
+
+# Paths to programs and config files
+IP=/usr/sbin/ip
+PPPD=/usr/sbin/pppd
+PPPOE=/sbin/pppoe
+ECHO=/usr/bin/echo
+LS=/usr/bin/ls
+ID=/usr/bin/id
+NETWORKDIR=/etc/sysconfig/network-scripts
+PAPFILE=/etc/ppp/chap-secrets
+CHAPFILE=/etc/ppp/pap-secrets
+RESOLVFILE=/etc/resolv.conf
+
+# Set to "C" locale so we can parse messages from commands
+LANG=C
+export LANG
+
+# Protect created files
+umask 077
+
+copy() {
+    cp $1 $2
+    if [ "$?" != 0 ] ; then
+	$ECHO "*** Error copying $1 to $2"
+	$ECHO "*** Quitting."
+	exit 1
+    fi
+}
+
+get_device() {
+    if [ ! -d $NETWORKDIR ] ; then
+        $ECHO "** $NETWORKDIR not found"
+        $ECHO "** Quitting"
+        exit 1
+    fi
+
+    cd $NETWORKDIR
+    interfaces=$($LS ifcfg-ppp* 2>/dev/null | egrep -v '(~|\.bak)$' | \
+                 egrep -v '(rpmsave|rpmorig|rpmnew)' | sed 's/^ifcfg-//g')
+
+    for i in $interfaces ; do
+        test -f ifcfg-$i && . ifcfg-$i 2>/dev/null
+        if [ "$TYPE" = "xDSL" ] ; then
+            device_count=$[$device_count+1]
+            devices="$devices $DEVICE"
+        fi
+    done
+}
+
+clear_env() {
+    unset USERCTL BOOTPROTO NAME DEVICE TYPE ONBOOT FIREWALL PING \
+          PPPOE_TIMEOUT LCP_FAILURE LCP_INTERVAL CLAMPMSS CONNECT_POLL \
+	  CONNECT_TIMEOUT DEFROUTE SYNCHRONOUS ETH PROVIDER USER PEERDNS \
+	  DNS1 DNS2
+}
+
+
+clear
+
+$ECHO "Welcome to the PPPoE client setup.  First, I will run some checks on"
+$ECHO "your system to make sure the PPPoE client is installed properly..."
+$ECHO ""
+
+# Must be root
+if [ "`$ID -u`" != 0 ] ; then
+    $ECHO "$0: Sorry, you must be root to run this script"
+    exit 1
+fi
+
+# Must have pppd
+if [ ! -x $PPPD ] ; then
+    $ECHO "Oops, I can't execute the program '$PPPD'.  You"
+    $ECHO "must install the PPP software suite, version 2.3.10 or later."
+    exit 1
+fi
+
+# get the DSL config files in /etc/sysconfig/network-scripts
+devices=""
+device_count=0
+get_device
+
+if [ $device_count -gt 0 ] ; then
+    $ECHO "The following DSL config was found on your system:"
+    $ECHO ""
+    $ECHO "  Device:      Name:"
+
+    for i in $devices ; do
+	. $NETWORKDIR/ifcfg-$i
+	$ECHO "  $i         $NAME"
+    done
+
+    $ECHO ""
+
+    for i in $devices ; do
+	default_device=$i
+	break
+    done
+
+    clear_env
+
+    while [ true ] ; do
+	$ECHO "Please enter the device if you want to configure the present DSL config"
+	$ECHO -n "(default $default_device) or enter 'n' if you want to create a new one: "
+
+	read dev
+
+	if [ "$dev" = "n" ] ; then
+	    i=0
+	    while true; do
+		found=0
+		for j in $interfaces ; do
+		    if [ "$j" = "ppp$i" ] ; then
+			found=1
+			break
+		    fi
+		done
+		if [ $found -eq 0 ] ; then
+		    dsl_device="ppp$i"
+		    break
+		fi
+		i=$[$i+1]
+	    done
+            if [ -z "$dsl_device" ]; then
+                dev=0
+                while [ -e $NETWORKDIR/ifcfg-ppp$dev ]; do
+                    dev=`expr $dev + 1`
+                done
+                dsl_device="ppp$dev"
+            fi
+	    break
+	else
+	    if [ -n "$default_device" ] ; then
+		if [ -n "$dev" ] ; then
+		    dsl_device="$dev"
+		else
+		    dsl_device="$default_device"
+		fi
+	    fi
+	    for i in $devices ; do
+		[ "$dsl_device" = "$i" ] && break
+	    done
+	    if [ "$dsl_device" = "$i" ] ; then
+		break
+	    fi
+	    $ECHO "Device '$dsl_device' is not found in the list, please choose the correct one"
+	fi
+    done
+else
+    dev=0
+    while [ -e $NETWORKDIR/ifcfg-ppp$dev ]; do
+        dev=`expr $dev + 1`
+    done
+    dsl_device="ppp$dev"
+fi
+
+CONFIG="$NETWORKDIR/ifcfg-$dsl_device"
+DEVICE=$dsl_device
+export CONFIG
+
+[ "$dev" = "n" ] || . $CONFIG 2>/dev/null
+[ "$DEMAND" = "" ] &&  DEMAND=no
+
+while [ true ] ; do
+    $ECHO ""
+    $ECHO "LOGIN NAME"
+    $ECHO ""
+    if [ -z "$USER" ] ; then
+	$ECHO -n "Enter your Login Name: "
+    else
+	$ECHO -n "Enter your Login Name (default $USER): "
+    fi
+
+    read U
+
+    if [ -z "$U" ] ; then
+	if [ -z "$USER" ] ; then
+	    continue
+	fi
+    else
+	USER="$U"
+    fi
+
+
+    # Under Linux, "fix" the default interface if eth1 is not available
+    [ -n "$ETH" ] || ETH=eth0
+    if test `uname -s` = "Linux" ; then
+       $IP link show $ETH > /dev/null 2>&1 || ETH=eth0
+    fi
+    $ECHO ""
+    $ECHO "INTERFACE"
+    $ECHO ""
+    $ECHO "Enter the Ethernet interface connected to the PPPoE modem"
+    $ECHO "For Solaris, this is likely to be something like /dev/hme0."
+    $ECHO "For Linux, it will be ethX, where 'X' is a number."
+    $ECHO -n "(default $ETH): "
+    read E
+
+    if [ -n "$E" ] ; then
+	ETH="$E"
+    fi
+
+    $ECHO ""
+    $ECHO "Do you want the link to come up on demand, or stay up continuously?"
+    $ECHO "If you want it to come up on demand, enter the idle time in seconds"
+    $ECHO "after which the link should be dropped.  If you want the link to"
+    $ECHO "stay up permanently, enter 'no' (two letters, lower-case.)"
+    $ECHO "NOTE: Demand-activated links do not interact well with dynamic IP"
+    $ECHO "addresses.  You may have some problems with demand-activated links."
+    $ECHO -n "Enter the demand value (default $DEMAND): "
+    read D
+    if [ -n "$D" ] ; then
+	DEMAND="$D"
+    fi
+
+    $ECHO ""
+    $ECHO "DNS"
+    $ECHO ""
+    $ECHO "Please enter the IP address of your ISP's primary DNS server."
+    $ECHO "If your ISP claims that 'the server will provide dynamic DNS addresses',"
+    $ECHO "enter 'server' (all lower-case) here."
+    $ECHO "If you just press enter, I will assume you know what you are"
+    $ECHO "doing and not modify your DNS setup."
+    $ECHO -n "Enter the DNS information here: "
+
+    read DNS1
+
+
+    if [ -n "$DNS1" ] ; then
+        if [ "$DNS1" != "server" ] ; then
+	    $ECHO "Please enter the IP address of your ISP's secondary DNS server."
+	    $ECHO "If you just press enter, I will assume there is only one DNS server."
+	    $ECHO -n "Enter the secondary DNS server address here: "
+	    read DNS2
+	fi
+    fi
+
+    while [ true ] ; do
+	$ECHO ""
+	$ECHO "PASSWORD"
+	$ECHO ""
+	stty -echo
+	$ECHO -n "Please enter your Password: "
+	read PWD1
+	$ECHO ""
+	$ECHO -n "Please re-enter your Password: "
+	read PWD2
+	$ECHO ""
+	stty echo
+	if [ "$PWD1" = "$PWD2" ] ; then
+	    break
+	fi
+
+	$ECHO -n "Sorry, the passwords do not match.  Try again? (y/n)"
+	read ANS
+	case "$ANS" in
+	    N|No|NO|Non|n|no|non)
+		$ECHO "OK, quitting.  Bye."
+		exit 1
+	esac
+    done
+
+    # Usercontrol
+    $ECHO ""
+    $ECHO "USERCTRL"
+    $ECHO
+    $ECHO "Please enter 'yes' (three letters, lower-case.) if you want to allow"
+    $ECHO -n "normal user to start or stop DSL connection (default yes): "
+
+    read USERCTL
+
+    if [ -z "$USERCTL" ] ; then
+	USERCTL="yes"
+    fi
+
+    # Firewalling
+    $ECHO ""
+    $ECHO "FIREWALLING"
+    $ECHO ""
+    if test `uname -s` != "Linux" ; then
+	$ECHO "Sorry, firewalling is only supported under Linux.  Consult"
+	$ECHO "your operating system manuals for details on setting up"
+	$ECHO "packet filters for your system."
+	FIREWALL=NONE
+    else
+	$ECHO "Please choose the firewall rules to use.  Note that these rules are"
+	$ECHO "very basic.  You are strongly encouraged to use a more sophisticated"
+	$ECHO "firewall setup; however, these will provide basic security.  If you"
+	$ECHO "are running any servers on your machine, you must choose 'NONE' and"
+	$ECHO "set up firewalling yourself.  Otherwise, the firewall rules will deny"
+	$ECHO "access to all standard servers like Web, e-mail, ftp, etc.  If you"
+	$ECHO "are using SSH, the rules will block outgoing SSH connections which"
+	$ECHO "allocate a privileged source port."
+	$ECHO ""
+	while [ true ] ; do
+	    $ECHO "The firewall choices are:"
+	    $ECHO "0 - NONE: This script will not set any firewall rules.  You are responsible"
+	    $ECHO "          for ensuring the security of your machine.  You are STRONGLY"
+	    $ECHO "          recommended to use some kind of firewall rules."
+	    $ECHO "1 - STANDALONE: Appropriate for a basic stand-alone web-surfing workstation"
+	    $ECHO "2 - MASQUERADE: Appropriate for a machine acting as an Internet gateway"
+	    $ECHO "                for a LAN"
+	    $ECHO -n "Choose a type of firewall (0-2): "
+	    read a
+	    if [ "$a" = 0 -o "$a" = 1 -o "$a" = 2 ] ; then
+		break
+	    fi
+	    $ECHO "Please enter a number from 0 to 2"
+	done
+
+	case "$a" in
+	    0)
+		FIREWALL=NONE
+		;;
+	    1)
+		FIREWALL=STANDALONE
+		;;
+	    2)
+		FIREWALL=MASQUERADE
+		;;
+	esac
+    fi
+
+    $ECHO ""
+    $ECHO "Start this connection at boot time"
+    $ECHO ""
+    $ECHO "Do you want to start this connection at boot time?"
+    $ECHO -n "Please enter no or yes (default no):"
+    read boot
+    case "$boot" in
+      yes|YES) ONBOOT="yes";;
+      *) ONBOOT="no";;
+    esac
+
+    $ECHO ""
+    $ECHO "** Summary of what you entered **"
+    $ECHO ""
+    $ECHO "Ethernet Interface: $ETH"
+    $ECHO "User name:          $USER"
+    if [ "$DEMAND" = "no" ] ; then
+	$ECHO "Activate-on-demand: No"
+    else
+	$ECHO "Activate-on-demand: Yes; idle timeout = $DEMAND seconds"
+    fi
+
+    if [ -n "$DNS1" ] ; then
+        if [ "$DNS1" = "server" ] ; then
+	    $ECHO "DNS addresses:      Supplied by ISP's server"
+        else
+	    $ECHO "Primary DNS:        $DNS1"
+	    if [ -n "$DNS2" ] ; then
+		$ECHO "Secondary DNS:      $DNS2"
+	    fi
+        fi
+    else
+	$ECHO "DNS:                Do not adjust"
+    fi
+    $ECHO "Firewalling:        $FIREWALL"
+    $ECHO "User Control:       $USERCTL"
+    while [ true ] ; do
+        $ECHO -n 'Accept these settings and adjust configuration files (y/n)? '
+        read ANS
+	case "ANS" in
+	    Y|y|yes|Yes|oui|Oui)
+		ANS=y
+		;;
+            N|n|no|No|non|Non)
+		ANS=n
+		;;
+	esac
+	if [ "$ANS" = "y" -o "$ANS" = "n" ] ; then
+	    break
+        fi
+    done
+    if [ "$ANS" = "y" ] ; then
+	break
+    fi
+done
+
+# Adjust configuration files.  First to $CONFIG
+
+$ECHO "Adjusting $CONFIG"
+
+test -f $CONFIG && copy $CONFIG $CONFIG.bak
+if [ "$DNS1" = "server" ] ; then
+    DNS1=""
+    DNS2=""
+    PEERDNS=yes
+else
+    PEERDNS=no
+fi
+
+# Where is pppd likely to put its pid?
+if [ -d /var/run ] ; then
+    VARRUN=/var/run
+else
+    VARRUN=/etc/ppp
+fi
+
+$ECHO "USERCTL=$USERCTL" >$CONFIG
+$ECHO "BOOTPROTO=dialup" >>$CONFIG
+[ -z "$NAME" ] && NAME="DSL$DEVICE"
+$ECHO "NAME=DSL$DEVICE" >>$CONFIG
+$ECHO "DEVICE=$DEVICE" >>$CONFIG
+$ECHO "TYPE=xDSL" >>$CONFIG
+$ECHO "ONBOOT=$ONBOOT" >>$CONFIG
+$ECHO "PIDFILE=/var/run/pppoe-adsl.pid" >>$CONFIG
+$ECHO "FIREWALL=$FIREWALL" >>$CONFIG
+[ -z "$PING" ] && PING="."
+$ECHO "PING=$PING" >>$CONFIG
+[ -z "$PPPOE_TIMEOUT" ] && PPPOE_TIMEOUT=80
+$ECHO "PPPOE_TIMEOUT=$PPPOE_TIMEOUT" >>$CONFIG
+[ -z "$LCP_FAILURE" ] && LCP_FAILURE=3
+$ECHO "LCP_FAILURE=$LCP_FAILURE" >>$CONFIG
+[ -z "$LCP_INTERVAL" ] && LCP_INTERVAL=20
+$ECHO "LCP_INTERVAL=$LCP_INTERVAL" >>$CONFIG
+[ -z "$CLAMPMSS" ] && CLAMPMSS=1412
+$ECHO "CLAMPMSS=$CLAMPMSS" >>$CONFIG
+[ -z "$CONNECT_POLL" ] && CONNECT_POLL=6
+$ECHO "CONNECT_POLL=$CONNECT_POLL" >>$CONFIG
+[ -z "$CONNECT_TIMEOUT" ] && CONNECT_TIMEOUT=60
+$ECHO "CONNECT_TIMEOUT=$CONNECT_TIMEOUT" >>$CONFIG
+[ -z "$DEFROUTE" ] && DEFROUTE=yes
+$ECHO "DEFROUTE=$DEFROUTE" >>$CONFIG
+[ -z "$SYNCHRONOUS" ] && SYNCHRONOUS=no
+$ECHO "SYNCHRONOUS=$SYNCHRONOUS" >>$CONFIG
+$ECHO "ETH=$ETH" >> $CONFIG
+[ -z "$PROVIDER" ] && PROVIDER="$NAME"
+$ECHO "PROVIDER=$PROVIDER" >>$CONFIG
+$ECHO "USER=$USER" >>$CONFIG
+$ECHO "PEERDNS=$PEERDNS" >>$CONFIG
+$ECHO "DEMAND=$DEMAND" >>$CONFIG
+
+if [ -n "$DNS1" ] ; then
+    if [ "$DNS1" != "server" ] ; then
+	$ECHO "Adjusting $RESOLVFILE"
+	if [ -r $RESOLVFILE ] ; then
+	    grep -s "MADE-BY-RP-PPPOE" $RESOLVFILE > /dev/null 2>&1
+	    if [ "$?" != 0 ] ; then
+		$ECHO "  (But first backing it up to $RESOLVFILE.bak)"
+		test -f $$RESOLVFILE && copy $RESOLVFILE $RESOLVFILE.bak
+	    fi
+	fi
+	$ECHO "# MADE-BY-RP-PPPOE" > $RESOLVFILE
+	$ECHO "nameserver $DNS1" >> $RESOLVFILE
+	if [ -n "$DNS2" ] ; then
+	    $ECHO "nameserver $DNS2" >> $RESOLVFILE
+	fi
+    fi
+fi
+
+$ECHO "Adjusting $PAPFILE and $CHAPFILE"
+if [ -r $PAPFILE ] ; then
+    $ECHO "  (But first backing it up to $PAPFILE.bak)"
+    test -f $PAPFILE && copy $PAPFILE $PAPFILE.bak
+else
+    cp /dev/null $PAPFILE.bak
+fi
+if [ -r $CHAPFILE ] ; then
+    $ECHO "  (But first backing it up to $CHAPFILE.bak)"
+    test -f $CHAPFILE && copy $CHAPFILE $CHAPFILE.bak
+else
+    cp /dev/null $CHAPFILE.bak
+fi
+
+egrep -v "^$USER|^\"$USER\"" $PAPFILE.bak > $PAPFILE
+$ECHO "\"$USER\"	*	\"$PWD1\"" >> $PAPFILE
+egrep -v "^$USER|^\"$USER\"" $CHAPFILE.bak > $CHAPFILE
+$ECHO "\"$USER\"	*	\"$PWD1\"" >> $CHAPFILE
+
+$ECHO ""
+$ECHO ""
+$ECHO ""
+$ECHO "Congratulations, it should be all set up!"
+$ECHO ""
+$ECHO "Type '/sbin/ifup $dsl_device' to bring up your xDSL link and '/sbin/ifdown $dsl_device'"
+$ECHO "to bring it down."
+$ECHO "Type '/sbin/pppoe-status $NETWORKDIR/ifcfg-$dsl_device'"
+$ECHO "to see the link status."
+$ECHO ""
+
+exit 0
