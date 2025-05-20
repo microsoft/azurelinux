@@ -135,7 +135,7 @@ fi
 %ghost %{_sysconfdir}/sysconfig/ebtables
 
 %changelog
-* Mon Oct 21 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2.0.11-9
+* Tue Nov 12 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2.0.11-9
 - introduce alternatives for legacy
 
 * Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.11-8

@@ -29,8 +29,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.56.1
-Release:        5%{?dist}
+Version:        6.6.85.1
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,7 +40,7 @@ Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/ro
 Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
-Source4:        cbl-mariner-ca-20211013.pem
+Source4:        azurelinux-ca-20230216.pem
 Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
@@ -68,6 +68,7 @@ BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  sed
+BuildRequires:  slang-devel
 BuildRequires:  systemd-bootstrap-rpm-macros
 %ifarch x86_64
 BuildRequires:  pciutils-devel
@@ -121,6 +122,15 @@ Requires:       %{name} = %{version}-%{release}
 %description drivers-gpu
 This package contains the Linux kernel gpu support
 
+%package drivers-intree-amdgpu
+Summary:        Kernel amdgpu modules
+Group:          System Environment/Kernel
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-drivers-gpu = %{version}-%{release}
+
+%description drivers-intree-amdgpu
+This package contains the Linux kernel in-tree AMD gpu support
+
 %package drivers-sound
 Summary:        Kernel Sound modules
 Group:          System Environment/Kernel
@@ -161,8 +171,7 @@ This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
 %prep
-%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
-%patch 0 -p1
+%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
 make mrproper
 
 cp %{config_source} .config
@@ -327,6 +336,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %post drivers-gpu
 /sbin/depmod -a %{uname_r}
 
+%post drivers-intree-amdgpu
+/sbin/depmod -a %{uname_r}
+
 %post drivers-sound
 /sbin/depmod -a %{uname_r}
 
@@ -347,6 +359,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
+%exclude /lib/modules/%{uname_r}/kernel/drivers/accel
 %exclude /lib/modules/%{uname_r}/kernel/sound
 
 %files docs
@@ -365,6 +378,14 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %files drivers-gpu
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/drivers/gpu
+%ifarch x86_64
+/lib/modules/%{uname_r}/kernel/drivers/accel
+%endif
+%exclude /lib/modules/%{uname_r}/kernel/drivers/gpu/drm/amd
+
+%files drivers-intree-amdgpu
+%defattr(-,root,root)
+/lib/modules/%{uname_r}/kernel/drivers/gpu/drm/amd
 
 %files drivers-sound
 %defattr(-,root,root)
@@ -407,6 +428,94 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.6.85.1-4
+- Bump release to match kernel-64k
+
+* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.6.85.1-3
+- Bump release to match kernel-64k
+
+* Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 6.6.85.1-2
+- Re-enable DXGKRNL module
+
+* Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.85.1-1
+- Auto-upgrade to 6.6.85.1
+
+* Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.82.1-1
+- Auto-upgrade to 6.6.82.1
+
+* Tue Mar 11 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.79.1-1
+- Auto-upgrade to 6.6.79.1
+- Remove jitterentropy patch as it is included in the source
+
+* Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 6.6.78.1-3
+- Add patch to revert UART change that breaks IPMI SEL panic message
+
+* Mon Mar 03 2025 Andy Zaugg <azaugg@linkedin.com> - 6.6.78.1-2
+- Add slang as BuildRequires, enabling tui on perf
+
+* Mon Mar 03 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.78.1-1
+- Auto-upgrade to 6.6.78.1
+
+* Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 6.6.76.1-2
+- Bump release to match kernel-64k
+
+* Mon Feb 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.76.1-1
+- Auto-upgrade to 6.6.76.1
+
+* Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.64.2-9
+- Apply upstream patches to fix kernel panic in jitterentropy initialization on
+  ARM64 FIPS boot
+
+* Tue Feb 04 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 6.6.64.2-8
+- Revert ZONE_DMA option to avoid memory ussage overuse
+
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 6.6.64.2-7
+- Enable NUMA Balancing and UCLAMP task
+
+* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 6.6.64.2-6
+- Performance improvements enabled via kernel configuration options
+
+* Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-5
+- Bump to match kernel-64k
+
+* Sat Jan 18 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-4
+- Build PCI_HYPERV as builtin
+
+* Thu Jan 16 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-3
+- Disable DEBUG_PREEMPT
+
+* Fri Jan 10 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-2
+- Enable Intel VPU
+
+* Thu Jan 09 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.64.2-1
+- Auto-upgrade to 6.6.64.2
+
+* Wed Jan 08 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.57.1-8
+- Enable dh kernel module (CONFIG_CRYPTO_DH) in aarch64
+
+* Sun Dec 22 2024 Ankita Pareek <ankitapareek@microsoft.com> - 6.6.57.1-7
+- Enable CONFIG_INTEL_TDX_GUEST and CONFIG_TDX_GUEST_DRIVER
+
+* Wed Dec 18 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.57.1-6
+- Bump release to match kernel-64k
+
+* Mon Nov 25 2024 Chris Co <chrco@microsoft.com> - 6.6.57.1-5
+- Enable ICE ethernet driver
+
+* Wed Nov 06 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.6.57.1-4
+- Make CONFIG_DRM and its dependency KConfigs as loadable modules
+- Create sub-package for AMD GPU in-tree modules to avoid conflicts with out-of-tree modules
+
+* Tue Nov 05 2024 Chris Co <chrco@microsoft.com> - 6.6.57.1-3
+- Enable kexec signature verification
+- Introduce new azurelinux-ca-20230216.pem
+
+* Wed Oct 30 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.57.1-2
+- UKI: remove noxsaves parameter from cmdline
+
+* Tue Oct 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.57.1-1
+- Auto-upgrade to 6.6.57.1
+
 * Thu Oct 24 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.56.1-5
 - Enable Arm FF-A Support
 

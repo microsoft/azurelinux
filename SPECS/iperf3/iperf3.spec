@@ -1,7 +1,7 @@
 Summary:        A network performance benchmark tool.
 Name:           iperf3
 Version:        3.17.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and MIT and Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,7 @@ Group:          Applications/System
 URL:            https://github.com/esnet/iperf
 Source0:        https://github.com/esnet/iperf/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch1:         disablepg.patch
+Patch2:         CVE-2024-53580.patch
 BuildRequires:  autoconf >= 2.71
 BuildRequires:  automake
 
@@ -66,6 +67,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/libiperf.3.gz
 
 %changelog
+* Tue Dec 31 2024 Kanishk Bansal <kanbansal@microsoft.com> - 3.17.1-2
+- Address CVE-2024-53580 using an upstream patch.
+
 * Fri Aug 09 2024 Muhammad Falak <mwani@microsoft.com> - 3.17.1-1
 - Update version to 3.17.1 to address CVE-2024-26306
 

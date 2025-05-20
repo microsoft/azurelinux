@@ -3,19 +3,20 @@ Distribution:   Azure Linux
 %global snapshot 0
 
 Name:           libpinyin
-Version:        2.3.0
-Release:        4%{?dist}
+Version:        2.9.92
+Release:        1%{?dist}
 Summary:        Library to deal with pinyin
 
-License:        GPLv3+
+License:        GPL-3.0-or-later
 URL:            https://github.com/libpinyin/libpinyin
-Source0:        http://downloads.sourceforge.net/libpinyin/libpinyin/%{name}-%{version}.tar.gz
+Source0:        https://downloads.sourceforge.net/libpinyin/libpinyin/%{name}-%{version}.tar.gz
 %if %snapshot
-Patch0:         libpinyin-2.3.x-head.patch
+Patch0:         libpinyin-2.8.x-head.patch
 %endif
 
 BuildRequires:  gcc-c++
 BuildRequires:  kyotocabinet-devel, glib2-devel
+BuildRequires:  make
 Requires:       %{name}-data%{?_isa} = %{version}-%{release}
 
 %description
@@ -61,20 +62,19 @@ The libzhuyin package contains libzhuyin compatibility library.
 %setup -q
 
 %if %snapshot
-%patch 0 -p1 -b .head
+%patch -P0 -p1 -b .head
 %endif
 
 %build
 %configure --disable-static \
            --with-dbm=KyotoCabinet \
            --enable-libzhuyin
-make %{?_smp_mflags}
-
+%make_build
 %check
 make check
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
+%make_install
 find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
@@ -109,6 +109,10 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_libdir}/libzhuyin*.so.*
 
 %changelog
+* Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.9.92-1
+- Update to version 2.9.92
+- License verified
+
 * Mon Jun 28 2021 Thomas Crain <thcrain@microsoft.com> - 2.3.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Require libzhuyin subpackage from libpinyin-devel

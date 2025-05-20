@@ -1,0 +1,32 @@
+From 79c4cbbdfb603cf52f2b1416d2e1048074eb5a2f Mon Sep 17 00:00:00 2001
+From: Dridi Boukelmoune <dridi.boukelmoune@gmail.com>
+Date: Mon, 4 Mar 2024 23:02:15 +0100
+Subject: [PATCH 3/9] common: Remove unnecessary temp buffer
+
+---
+ common/win.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/common/win.c b/common/win.c
+index d0a8f3b..cdc5817 100644
+--- a/common/win.c
++++ b/common/win.c
+@@ -484,14 +484,11 @@ topnproc_data_show(dyn_win_t *win)
+ static void
+ load_msg_show(void)
+ {
+-	char content[64];
+ 	win_reg_t r;
+ 
+-	(void) snprintf(content, sizeof (content), "Loading ...");
+-
+ 	(void) reg_init(&r, 0, 1, g_scr_width, g_scr_height - 1, A_BOLD);
+ 	reg_erase(&r);
+-	reg_line_write(&r, 1, ALIGN_LEFT, content);
++	reg_line_write(&r, 1, ALIGN_LEFT, "Loading ...");
+ 	reg_refresh(&r);
+ 	reg_win_destroy(&r);
+ }
+-- 
+2.44.0
+

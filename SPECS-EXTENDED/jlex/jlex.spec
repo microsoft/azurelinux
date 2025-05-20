@@ -1,70 +1,107 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+# Copyright (c) 2000-2005, JPackage Project
+# All rights reserved.
 #
-# spec file for package jlex
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
 #
-# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the
+#    distribution.
+# 3. Neither the name of the JPackage Project nor the names of its
+#    contributors may be used to endorse or promote products derived
+#    from this software without specific prior written permission.
 #
-# All modifications and additions to the file contributed by third parties
-# remain the property of their copyright owners, unless otherwise agreed
-# upon. The license for this file, and modifications and additions to the
-# file, is the same license as for the pristine package itself (unless the
-# license for the pristine package is not an Open Source License, in which
-# case the license is the MIT License). An "Open Source License" is a
-# license that conforms to the Open Source Definition (Version 1.9)
-# published by the Open Source Initiative.
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
-#
-
-
-%define section		free
 Name:           jlex
 Version:        1.2.6
-Release:        285%{?dist}
+Release:        286%{?dist}
 Summary:        A Lexical Analyzer Generator for Java
-License:        MIT
-Group:          Development/Libraries/Java
-Url:            http://www.cs.princeton.edu/~appel/modern/java/JLex/
-Source0:        http://www.cs.princeton.edu/~appel/modern/java/JLex/Archive/1.2.5/Main.java
+License:        BSD
+Group:          Development/Libraries
+URL:            http://www.cs.princeton.edu/~appel/modern/java/JLex
+Source0:        %{url}/Archive/%{version}/Main.java
 Source1:        %{name}-%{version}.build.xml
+Source2:        %{url}/Archive/%{version}/manual.html
+Source3:        %{url}/Archive/%{version}/sample.lex
 Patch0:         %{name}-%{version}.static.patch
-BuildRequires:  ant
-BuildRequires:  java-devel
-BuildRequires:  javapackages-tools
-BuildRequires:  xml-commons-apis-bootstrap
-#!BuildIgnore:  xerces-j2
-#!BuildIgnore:  xml-commons
-#!BuildIgnore:  xml-commons-apis
-#!BuildIgnore:  xml-commons-jaxp-1.3-apis
-#!BuildIgnore:  xml-commons-resolver
-#!BuildIgnore:  xml-commons-resolver12
-BuildArch:      noarch
+
+BuildRequires: ant
+BuildRequires: java-devel
+BuildRequires: jpackage-utils
+
+Requires:      java
+Requires:      jpackage-utils
+
+BuildArch:     noarch
 
 %description
-JLex is a lexical analyzer generator for Java.
+JLex is a Lexical Analyzer Generator for Java.
+
+%package javadoc
+Group:          Documentation
+Summary:        Javadoc for %{name}
+Requires:       jpackage-utils
+
+%description javadoc
+Javadoc for %{name}.
 
 %prep
-%setup -q -c -T
+%setup -c -T
 cp %{SOURCE0} .
+cp %{SOURCE2} .
+cp %{SOURCE3} .
 %patch 0
 cp %{SOURCE1} build.xml
 
 %build
-unset CLASSPATH
-ant -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6
+ant
 
 %install
 # jar
-install -d -m 755 %{buildroot}%{_javadir}
-install -m 644 dist/lib/%{name}.jar %{buildroot}%{_javadir}/%{name}-%{version}.jar
-(cd %{buildroot}%{_javadir} && for jar in *-%{version}*; do ln -sf ${jar} `echo $jar| sed  "s|-%{version}||g"`; done)
+install -pD -T dist/lib/%{name}.jar \
+  %{buildroot}%{_javadir}/%{name}.jar
+
+# javadoc
+install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
+cp -pr dist/docs/api/* %{buildroot}%{_javadocdir}/%{name}
+
+%pre javadoc
+# workaround for rpm bug, can be removed in F-17
+[ $1 -gt 1 ] && [ -L %{_javadocdir}/%{name} ] && \
+rm -rf $(readlink -f %{_javadocdir}/%{name}) %{_javadocdir}/%{name} || :
 
 %files
-%license Main.java
-%{_javadir}/*
+%defattr(-,root,root,-)
+%{_javadir}/%{name}.jar
+%doc manual.html sample.lex
+
+%files javadoc
+%defattr(-,root,root,-)
+%{_javadocdir}/%{name}
 
 %changelog
+* Mon Feb 24 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.2.6-286
+- Build fix for 1.2.6
+- License verified
+
 * Tue Apr 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.6-285
 - Adding missing BR on 'javapackages-tools'.
 

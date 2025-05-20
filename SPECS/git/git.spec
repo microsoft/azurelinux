@@ -6,20 +6,20 @@
 
 Summary:        Fast distributed version control system
 Name:           git
-Version:        2.45.2
-Release:        1%{?dist}
+Version:        2.45.3
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Programming
 URL:            https://git-scm.com/
-Source0:        https://www.kernel.org/pub/software/scm/git/%{name}-%{version}.tar.xz
+Source0:        https://github.com/git/git/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  curl-devel
 BuildRequires:  python3-devel
 Requires:       curl
 Requires:       expat
 Requires:       less
-Requires:       openssh
+Requires:       openssh-clients
 Requires:       openssl
 Requires:       perl-CGI
 Requires:       perl-DBI
@@ -110,6 +110,7 @@ BuildArch:      noarch
 %{py3_shebang_fix} git-p4.py
 
 %build
+make configure
 %configure \
     CFLAGS="%{optflags}" \
     CXXFLAGS="%{optflags}" \
@@ -172,6 +173,12 @@ fi
 %endif
 
 %changelog
+* Thu Apr 17 2025 Muhammad Falak <mwani@microsoft.com> - 2.45.3-2
+- Add dependency only for openssh-clients instead of openssh
+
+* Tue Jan 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.45.3-1
+- Auto-upgrade to 2.45.3 - CVE-2024-50349 and CVE-2024-52006
+
 * Fri Jul 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.45.2-1
 - Auto-upgrade to 2.45.2 - none
 

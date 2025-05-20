@@ -1,7 +1,7 @@
 Summary:        TensorFlow is an open source machine learning framework for everyone.
 Name:           tensorflow
 Version:        2.16.1
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,9 @@ Patch0:         CVE-2024-7592.patch
 Patch1:         CVE-2024-6232.patch
 Patch2:         CVE-2024-8088.patch
 Patch3:         CVE-2024-3651.patch
+Patch4:         CVE-2024-35195.patch
+Patch5:		CVE-2024-5569.patch
+Patch6:		CVE-2024-6923.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -89,6 +92,17 @@ pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/python_x86_64-unknown-l
 patch -p1 < %{PATCH3}
 popd
 
+# Need to patch CVE-2024-35195 in the bundled python for applicable archs: `ExclusiveArch:  x86_64`
+pushd /root/.cache/bazel/_bazel_$USER/$MD5_HASH/external/
+patch -p1 < %{PATCH4}
+patch -p1 < %{PATCH5}
+
+pushd python_x86_64-unknown-linux-gnu/lib/python3.12/email/
+patch -p1 < %{PATCH6}
+popd
+
+popd
+
 export TF_PYTHON_VERSION=3.12
 ln -s %{_bindir}/python3 %{_bindir}/python
 
@@ -118,6 +132,12 @@ bazel --batch build  //tensorflow/tools/pip_package:build_pip_package
 %{_bindir}/toco_from_protos
 
 %changelog
+* Tue Jan 28 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.16.1-9
+- Patch CVE-2024-5569 , CVE-2023-45803 and CVE-2024-6923
+
+* Wed Jan 15 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.16.1-8
+- Address CVE-2024-35195 with an upstream patch
+
 * Wed Sep 25 2024 Archana Choudhary <archana1@microsoft.com> - 2.16.1-7
 - Bump release to build with new python3 to fix CVE-2024-6232, CVE-2024-8088, CVE-2024-3651
 

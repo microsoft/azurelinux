@@ -1,8 +1,6 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Name:       recode
-Version:    3.7.7
-Release:    2%{?dist}
+Version:    3.7.14
+Release:    7%{?dist}
 Summary:    Conversion between character sets and surfaces
 # COPYING:              GPLv3 text
 # COPYING-LIB:          LGPLv3 text
@@ -52,11 +50,15 @@ Summary:    Conversion between character sets and surfaces
 # tests/Makefile.am:    GPLv3+
 # tests/Makefile.in:    FSFULLR and GPLv3+
 # tests/Recode.pyx:     GPLv3+
-License:    GPLv3+ and LGPLv3+ and BSD and OFSFDL
-URL:        https://github.com/rrthomas/recode
-Source:     %{url}/releases/download/v%{version}/recode-%{version}.tar.gz
-# Make internal hash function identifiers unique
-Patch0:     recode-3.7.1-Rename-coliding-hash-functions.patch
+License:    	GPL-3.0-or-later AND LGPL-3.0-or-later AND BSD-2-Clause AND LicenseRef-OFSFDL
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+URL:        	https://github.com/rrthomas/recode
+Source:     	%{url}/releases/download/v%{version}/recode-%{version}.tar.gz
+Patch0:      	recode-3.7.13-Rename-coliding-hash-functions.patch
+# https://github.com/rrthomas/recode/issues/48
+Patch1:      	0001-src-task.c-only-close-input-stream-when-we-opened-it.patch
+
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  coreutils
@@ -70,6 +72,7 @@ BuildRequires:  texinfo
 # Tests:
 BuildRequires:  python3-Cython
 BuildRequires:  python3-devel >= 3.7.5
+BuildRequires:  python3-setuptools
 
 %description
 The recode tool and library convert files between character sets and surfaces.
@@ -81,15 +84,14 @@ character or falls back on an approximations.
 %package devel
 Summary:    Header files for development using recode library
 # Header files are LGPLv3+
-License:    LGPLv3+
+License:    LGPL-3.0-or-later
 Requires:   %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 This package provides the header files for a recode library.
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1 -n %{name}-%{version}
 autoreconf -fi
 
 %build
@@ -132,14 +134,73 @@ rm $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_includedir}/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.7-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Dec 17 2024 Akhila Guruju <v-guakhila@microsoft.com> - 3.7.14-7
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.14-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jul 17 2024 Miroslav Suchý <msuchy@redhat.com> - 3.7.14-5
+- convert license to SPDX
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.14-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.14-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.14-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Feb 22 2023 Ondrej Pohorelsky <opohorel@redhat.com> - 3.7.14-1
+- 3.7.14 bump
+- Adds upstream patch to prevent double free
+- Require python3-setuptools unconditionaly
+- Resolves: rhbz#2170818, rhbz#2166136
+
+* Tue Jan 17 2023 Ondrej Pohorelsky <opohorel@redhat.com> - 3.7.13-1
+- 3.7.13 bump
+- Resolves: rhbz#2158811
+
+* Thu Oct 27 2022 Ondrej Pohorelsky <opohorel@redhat.com> - 3.7.12-3
+- Adds BuildRequire for Python 3.12
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.12-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Feb 21 2022 Ondrej Pohorelsky <opohorel@redhat.com> - 3.7.12-1
+- 3.7.12 bump
+- Resolves: rhbz#2055897
+
+* Tue Feb 08 2022 Ondrej Pohorelsky <opohorel@redhat.com> - 3.7.11-1
+- 3.7.11 bump
+- Resolves: rhbz#2043834
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.9-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.9-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jun 08 2021 Ondrej Pohorelsky <opohorel@redhat.com> - 3.7.9-1
+- 3.7.9 bump
+- Resolves: rhbz#1967383
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Nov 12 2020 Ondrej Pohorelsky <opohorel@redhat.com> - 3.7.8-1
+- 3.7.8 bump
 
 * Thu Jul 30 2020 Petr Pisar <ppisar@redhat.com> - 3.7.7-1
 - 3.7.7 bump
 
-* Wed Jul 29 2020 Petr Pisar <ppisar@redhat.com> - 3.7.6-3
+* Wed Jul 29 2020 Petr Pisar <ppisar@redhat.com> - 3.7.6-4
 - Correct a description
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.6-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -327,3 +388,4 @@ rm $RPM_BUILD_ROOT%{_libdir}/*.la
 
 * Tue Nov 13 2001 Than Ngo <than@redhat.com> 3.6-1
 - initial RPM for 8.0
+

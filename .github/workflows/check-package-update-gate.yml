@@ -1,0 +1,89 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: Check Package Update Gate
+
+on:
+  push:
+    branches: [main, 2.0*, 3.0*, fasttrack/*]
+  pull_request:
+    branches: [main, 2.0*, 3.0*, fasttrack/*]
+
+jobs:
+
+  build:
+    name: Check Package Update Gate
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Get base commit for PRs
+      if: ${{ github.event_name == 'pull_request' }}
+      run: |
+        git fetch origin ${{ github.base_ref }}
+        echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV
+        echo "Merging ${{ github.sha }} into ${{ github.base_ref }}"
+
+    - name: Get base commit for Pushes
+      if: ${{ github.event_name == 'push' }}
+      run: |
+        git fetch origin ${{ github.event.before }}
+        echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV
+        echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
+
+    - name: Get the changed files
+      run: |
+        echo "Files changed: '$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }})'"
+        changed_specs=$(git diff-tree --diff-filter=d  --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS.*/.*\.spec$" || test $? = 1; })
+        echo "Files to validate: '${changed_specs}'"
+        echo "updated-specs=$(echo ${changed_specs})" >> $GITHUB_ENV
+
+    - name: Check each spec
+      run: |
+
+        if [[ -z "${{ env.updated-specs }}" ]]; then
+          echo "No spec files to validate. Exiting."
+          exit 0
+        fi
+
+        for spec in ${{ env.updated-specs }}
+          do
+            echo "Checking '$spec'."
+            # Expand macros if present
+            name=$(rpmspec --parse "$spec" | grep -E "^Name:\s*(.*)" | awk '{print $2}')
+            version=$(rpmspec --parse "$spec" | grep -E "^Version:\s*(.*)" | awk '{print $2}')
+
+            # Read from packagelist-gate.csv and iterate each row
+            # 1st column: package name
+            # 2nd column: condition (>=, =,'')
+            # 3rd column: version number
+            
+            while IFS=, read -r package_name condition version_number; do
+              if [[ "$name" == "$package_name" ]]; then
+                  case "$condition" in
+                      ">=" | "=" )
+                          if [[ ("$condition" == ">=" && "$(printf '%s\n' "$version" "$version_number" | sort -V | head -n1)" == "$version_number") ||
+                                ("$condition" == "=" && "$version" == "$version_number") ]]; then
+                              1>&2 echo "**** ERROR ****"
+                              1>&2 echo "Spec '$spec' version '$version' is not allowed in Azure Linux. Error:'$spec $condition $version_number'."
+                              1>&2 echo "**** ERROR ****"
+                              error_found=1
+                          fi
+                          ;;
+                      *)
+                          1>&2 echo "**** ERROR ****"
+                          1>&2 echo "Spec $spec is not allowed in Azure Linux"
+                          1>&2 echo "**** ERROR ****"
+                          error_found=1
+                          ;;
+                  esac
+              fi
+            done < .github/workflows/packagelist-gate.csv  
+          done
+
+        if [[ -n $error_found ]]
+        then
+          exit 1
+        fi

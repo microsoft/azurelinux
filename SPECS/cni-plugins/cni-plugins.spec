@@ -1,7 +1,7 @@
 Summary:        Container Network Interface (CNI) plugins
 Name:           cni-plugins
 Version:        1.4.0
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,9 @@ Group:          Development/Tools
 URL:            https://github.com/containernetworking/plugins
 #Source0:       https://github.com/containernetworking/plugins/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         CVE-2024-45338.patch
+Patch1:         CVE-2025-22872.patch
+
 %define _default_cni_plugins_dir /opt/cni/bin
 BuildRequires:  golang >= 1.5
 Provides:       kubernetes-cni
@@ -18,7 +21,7 @@ Provides:       kubernetes-cni
 The CNI (Container Network Interface) project consists of a specification and libraries for writing plugins to configure network interfaces in Linux containers, along with a number of supported plugins.
 
 %prep
-%setup -q -n plugins-%{version}
+%autosetup -p1 -n plugins-%{version}
 
 %build
 ./build_linux.sh -ldflags "-X github.com/containernetworking/plugins/pkg/utils/buildversion.BuildVersion=v%{version}"
@@ -39,6 +42,12 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_default_cni_plugins_dir}/*
 
 %changelog
+* Mon Apr 28 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.4.0-3
+- Patch CVE-2025-22872
+
+* Thu Jan 23 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.4.0-2
+- Patch CVE-2024-45338
+
 * Mon Feb 12 2024 Betty Lakes <bettylakes@microsoft.com> - 1.4.0-1
 - Upgrade to version 1.4.0
 

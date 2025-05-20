@@ -1,70 +1,64 @@
-%bcond_with missing_dependencies
 
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global pkgname qrcode
 
 Name:           python-%{pkgname}
-Version:        6.1
-Release:        6%{?dist}
+Version:        7.4.2
+Release:        16%{?dist}
 Summary:        Python QR Code image generator
 
-License:        BSD
+License:        BSD-3-Clause
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/lincolnloop/python-qrcode
-Source0:        https://pypi.python.org/packages/source/q/qrcode/qrcode-%{version}.tar.gz#/python-qrcode-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/q/qrcode/qrcode-7.4.2.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-six
+BuildRequires:  python3-pytest
+BuildRequires: 	python3-pip
+BuildRequires: 	python3-wheel
+BuildRequires: 	python3-pluggy
+BuildRequires:  python3-typing-extensions
 
-%if %{with missing_dependencies}
-BuildRequires:  python3-imaging
-%endif
+# Explicit requires (#2271500)
+Requires:       python3-pypng
 
-%global _description\
+# Comment out failing test
+Patch0:         qrcode_test.patch
+# Fix failure with Python3.12
+Patch1:         qrcode_assert-has-calls.patch
+# Make pypng requirement optional
+# https://github.com/lincolnloop/python-qrcode/pull/338
+Patch2:         qrcode-optional-pypng.patch
+
+%description
 This module uses the Python Imaging Library (PIL) to allow for the\
 generation of QR Codes.
 
-%description %_description
-
 %package -n python3-%{pkgname}
 Summary:        Python QR Code image generator
-%if %{with missing_dependencies}
-Requires:       python3-imaging
-%endif
-# For entry point:
-Requires:       python3-setuptools
-Requires:       python3-%{pkgname}-core = %{version}-%{release}
+Obsoletes:      python3-qrcode-core < 7.4.2-2
+Provides:       python3-qrcode-core = %{version}-%{release}
 
 %description -n python3-%{pkgname}
 This module uses the Python Imaging Library (PIL) to allow for the
 generation of QR Codes. Python 3 version.
 
-%package -n python3-%{pkgname}-core
-Requires:       python3-six
-Summary:        Python 3 QR Code image generator (core library)
-
-%description -n python3-%{pkgname}-core
-Core Python 3 module for QR code generation. Does not contain image rendering.
+%generate_buildrequires
+# RHEL does not include the extra test dependencies (coverage, pillow)
+%pyproject_buildrequires %{?!rhel:-x test -x pil -x png}
 
 %prep
-%autosetup -n qrcode-%{version}
-
-# The pure plugin requires pymaging which is not packaged in Fedora.
-rm qrcode/image/pure.py*
-
+%autosetup -n qrcode-%{version} -p1
 # Remove shebang
 sed -i '1d' qrcode/console_scripts.py
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
-
-# Do not install tests
-rm -r %{buildroot}%{python3_sitelib}/%{pkgname}/tests
+%pyproject_install
+%pyproject_save_files qrcode
 
 #
 # In previous iterations of the package, the qr script had been
@@ -75,46 +69,90 @@ rm -r %{buildroot}%{python3_sitelib}/%{pkgname}/tests
 ln -s qr %{buildroot}%{_bindir}/qrcode
 
 %check
-# in lieue of a real test suite
-modules=$(find qrcode -name '*.py' \
-          | grep -v __init__ \
-          | sort \
-          | sed -e 's|/|.|g' \
-          | sed -e 's|.py$||g');
+%pytest -v
 
-
-for m in $modules;
-do
-    %{__python3} -c "import $m"
-done
-
-%files -n python3-%{pkgname}
+%files -n python3-%{pkgname} -f %{pyproject_files}
+%doc README.rst CHANGES.rst
+%license LICENSE
 %{_bindir}/qr
 %{_bindir}/qrcode
 %{_mandir}/man1/qr.1*
-%{python3_sitelib}/%{pkgname}/image/svg.py*
-%{python3_sitelib}/%{pkgname}/image/pil.py*
-%{python3_sitelib}/%{pkgname}/image/__pycache__/svg.*
-%{python3_sitelib}/%{pkgname}/image/__pycache__/pil.*
-
-%files -n python3-%{pkgname}-core
-%doc README.rst CHANGES.rst
-%license LICENSE
-%dir %{python3_sitelib}/%{pkgname}/
-%dir %{python3_sitelib}/%{pkgname}/image
-%dir %{python3_sitelib}/%{pkgname}/image/__pycache__
-%{python3_sitelib}/%{pkgname}*.egg-info
-%{python3_sitelib}/%{pkgname}/*.py*
-%{python3_sitelib}/%{pkgname}/__pycache__
-%{python3_sitelib}/%{pkgname}/image/__init__.py*
-%{python3_sitelib}/%{pkgname}/image/base.py*
-%{python3_sitelib}/%{pkgname}/image/__pycache__/__init__.*
-%{python3_sitelib}/%{pkgname}/image/__pycache__/base.*
 
 %changelog
-* Tue Aug 31 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Disabling optional dependency on "python-pillow".
+* Thu Feb 20 2025 Akhila Guruju <v-guakhila@microsoft.com> - 7.4.2-16
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+- Added `BuildRequires: python3-pluggy python3-typing-extensions` to fix build.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.4.2-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jun 08 2024 Python Maint <python-maint@redhat.com> - 7.4.2-14
+- Rebuilt for Python 3.13
+
+* Thu Apr 25 2024 Yaakov Selkowitz <yselkowi@redhat.com> - 7.4.2-13
+- Skip more sys.stdout mock tests
+
+* Tue Mar 26 2024 Sandro Mani <manisandro@gmail.com> - 7.4.2-12
+- Fix requires
+
+* Tue Mar 26 2024 Sandro Mani <manisandro@gmail.com> - 7.4.2-11
+- Requires: python-pypng (#2271500)
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.4.2-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 7.4.2-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Aug 23 2023 Florence Blanc-Renaud <frenaud@redhat.com> - 7.4.2-8
+- migrated to SPDX license
+
+* Tue Jul 25 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 7.4.2-7
+- Make pypng requirement optional
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 7.4.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jun 16 2023 Python Maint <python-maint@redhat.com> - 7.4.2-5
+- Rebuilt for Python 3.12
+
+* Tue May 23 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 7.4.2-4
+- Migrate from tox to pytest, avoid unwanted deps in RHEL builds
+
+* Fri May 12 2023 Sandro Mani <manisandro@gmail.com> - 7.4.2-3
+- Add patch to fix test failures with py3.12
+
+* Mon May 01 2023 Sandro Mani <manisandro@gmail.com> - 7.4.2-2
+- Switch to pyproject macros
+
+* Mon May 01 2023 Sandro Mani <manisandro@gmail.com> - 7.4.2-1
+- Update to 7.4.2
+
+* Tue Jan 04 2022 Michel Alexandre Salim <salimma@fedoraproject.org> - 7.3.1-3
+- Opt in to rpmautospec
+
+* Tue Jan 04 2022 Christian Heimes <cheimes@redhat.com> - 7.3.1-2
+- Remove python-imaging build requirements for RHEL (#1935839)
+- Run unit tests during build
+
+* Thu Dec 09 2021 Sandro Mani <manisandro@gmail.com> - 7.3.1-1
+- Update to 7.3.1
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 6.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 6.1-9
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 6.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 6.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 6.1-6
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 6.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -211,3 +249,4 @@ done
 
 * Sat Jun  2 2012 Michel Salim <salimma@fedoraproject.org> - 2.4.1-1
 - Initial package
+

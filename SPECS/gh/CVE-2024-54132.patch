@@ -1,0 +1,1349 @@
+From 8da27d2c8ac8b781cf34a5e04ed57cfe4b68fa55 Mon Sep 17 00:00:00 2001
+From: Andy Feller <andyfeller@github.com>
+Date: Tue, 19 Nov 2024 17:55:18 -0500
+Subject: [PATCH 1/5] Second attempt to address exploit
+
+This builds off suggestion to reuse logic used already within `gh run download` for detecting path traversals.
+
+This largely works but runs into an issue where detection logic doesn't handle non-separated traversal.
+---
+ pkg/cmd/run/download/download.go      |   5 ++
+ pkg/cmd/run/download/download_test.go | 102 ++++++++++++++++++++++++++
+ pkg/cmd/run/download/zip.go           |   3 +
+ 3 files changed, 110 insertions(+)
+
+diff --git a/pkg/cmd/run/download/download.go b/pkg/cmd/run/download/download.go
+index 99ec45bbeec..168cb6fcc8c 100644
+--- a/pkg/cmd/run/download/download.go
++++ b/pkg/cmd/run/download/download.go
+@@ -169,6 +169,11 @@ func runDownload(opts *DownloadOptions) error {
+ 		if len(wantPatterns) != 0 || len(wantNames) != 1 {
+ 			destDir = filepath.Join(destDir, a.Name)
+ 		}
++
++		if !filepathDescendsFrom(destDir, opts.DestinationDir) {
++			return fmt.Errorf("error downloading %s: would result in path traversal", a.Name)
++		}
++
+ 		err := opts.Platform.Download(a.DownloadURL, destDir)
+ 		if err != nil {
+ 			return fmt.Errorf("error downloading %s: %w", a.Name, err)
+diff --git a/pkg/cmd/run/download/download_test.go b/pkg/cmd/run/download/download_test.go
+index 3c1c8f2d862..f07d661289f 100644
+--- a/pkg/cmd/run/download/download_test.go
++++ b/pkg/cmd/run/download/download_test.go
+@@ -289,6 +289,108 @@ func Test_runDownload(t *testing.T) {
+ 					})
+ 			},
+ 		},
++		{
++			name: "given artifact name contains `..`, verify an error about path traversal is returned",
++			opts: DownloadOptions{
++				RunID:          "2345",
++				DestinationDir: ".",
++			},
++			mockAPI: func(p *mockPlatform) {
++				p.On("List", "2345").Return([]shared.Artifact{
++					{
++						Name:        "..",
++						DownloadURL: "http://download.com/artifact1.zip",
++						Expired:     false,
++					},
++				}, nil)
++			},
++			wantErr: "error downloading ..: would result in path traversal",
++		},
++		{
++			name: "given artifact name contains `..`, verify an error about path traversal is returned",
++			opts: DownloadOptions{
++				RunID:          "2345",
++				DestinationDir: "imaginary-dir",
++			},
++			mockAPI: func(p *mockPlatform) {
++				p.On("List", "2345").Return([]shared.Artifact{
++					{
++						Name:        "..",
++						DownloadURL: "http://download.com/artifact1.zip",
++						Expired:     false,
++					},
++				}, nil)
++			},
++			wantErr: "error downloading ..: would result in path traversal",
++		},
++		{
++			name: "given artifact name contains `../etc/passwd`, verify an error about path traversal is returned",
++			opts: DownloadOptions{
++				RunID:          "2345",
++				DestinationDir: ".",
++			},
++			mockAPI: func(p *mockPlatform) {
++				p.On("List", "2345").Return([]shared.Artifact{
++					{
++						Name:        "../etc/passwd",
++						DownloadURL: "http://download.com/artifact1.zip",
++						Expired:     false,
++					},
++				}, nil)
++			},
++			wantErr: "error downloading ../etc/passwd: would result in path traversal",
++		},
++		{
++			name: "given artifact name contains `../etc/passwd`, verify an error about path traversal is returned",
++			opts: DownloadOptions{
++				RunID:          "2345",
++				DestinationDir: "imaginary-dir",
++			},
++			mockAPI: func(p *mockPlatform) {
++				p.On("List", "2345").Return([]shared.Artifact{
++					{
++						Name:        "../etc/passwd",
++						DownloadURL: "http://download.com/artifact1.zip",
++						Expired:     false,
++					},
++				}, nil)
++			},
++			wantErr: "error downloading ../etc/passwd: would result in path traversal",
++		},
++		{
++			name: "given artifact name contains `../../etc/passwd`, verify an error about path traversal is returned",
++			opts: DownloadOptions{
++				RunID:          "2345",
++				DestinationDir: ".",
++			},
++			mockAPI: func(p *mockPlatform) {
++				p.On("List", "2345").Return([]shared.Artifact{
++					{
++						Name:        "../../etc/passwd",
++						DownloadURL: "http://download.com/artifact1.zip",
++						Expired:     false,
++					},
++				}, nil)
++			},
++			wantErr: "error downloading ../../etc/passwd: would result in path traversal",
++		},
++		{
++			name: "given artifact name contains `../../etc/passwd`, verify an error about path traversal is returned",
++			opts: DownloadOptions{
++				RunID:          "2345",
++				DestinationDir: "imaginary-dir",
++			},
++			mockAPI: func(p *mockPlatform) {
++				p.On("List", "2345").Return([]shared.Artifact{
++					{
++						Name:        "../../etc/passwd",
++						DownloadURL: "http://download.com/artifact1.zip",
++						Expired:     false,
++					},
++				}, nil)
++			},
++			wantErr: "error downloading ../../etc/passwd: would result in path traversal",
++		},
+ 	}
+ 	for _, tt := range tests {
+ 		t.Run(tt.name, func(t *testing.T) {
+diff --git a/pkg/cmd/run/download/zip.go b/pkg/cmd/run/download/zip.go
+index ab5723e9468..f6a27afdd66 100644
+--- a/pkg/cmd/run/download/zip.go
++++ b/pkg/cmd/run/download/zip.go
+@@ -73,6 +73,9 @@ func getPerm(m os.FileMode) os.FileMode {
+ func filepathDescendsFrom(p, dir string) bool {
+ 	p = filepath.Clean(p)
+ 	dir = filepath.Clean(dir)
++	if dir == "." && p == ".." {
++		return false
++	}
+ 	if dir == "." && !filepath.IsAbs(p) {
+ 		return !strings.HasPrefix(p, ".."+string(filepath.Separator))
+ 	}
+
+From 83cf41155646380d3df4037d3f2ac683147f194a Mon Sep 17 00:00:00 2001
+From: Tyler McGoffin <jtmcg@github.com>
+Date: Tue, 19 Nov 2024 16:08:31 -0800
+Subject: [PATCH 2/5] Improve test names so there is no repetition
+
+---
+ pkg/cmd/run/download/download_test.go | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/pkg/cmd/run/download/download_test.go b/pkg/cmd/run/download/download_test.go
+index f07d661289f..fb445ccd4e9 100644
+--- a/pkg/cmd/run/download/download_test.go
++++ b/pkg/cmd/run/download/download_test.go
+@@ -290,7 +290,7 @@ func Test_runDownload(t *testing.T) {
+ 			},
+ 		},
+ 		{
+-			name: "given artifact name contains `..`, verify an error about path traversal is returned",
++			name: "given artifact name contains `..` and the DestinationDir is `.`, verify an error about path traversal is returned",
+ 			opts: DownloadOptions{
+ 				RunID:          "2345",
+ 				DestinationDir: ".",
+@@ -307,7 +307,7 @@ func Test_runDownload(t *testing.T) {
+ 			wantErr: "error downloading ..: would result in path traversal",
+ 		},
+ 		{
+-			name: "given artifact name contains `..`, verify an error about path traversal is returned",
++			name: "given artifact name contains `..` and the DestinationDir is `imaginary-dir`, verify an error about path traversal is returned",
+ 			opts: DownloadOptions{
+ 				RunID:          "2345",
+ 				DestinationDir: "imaginary-dir",
+@@ -324,7 +324,7 @@ func Test_runDownload(t *testing.T) {
+ 			wantErr: "error downloading ..: would result in path traversal",
+ 		},
+ 		{
+-			name: "given artifact name contains `../etc/passwd`, verify an error about path traversal is returned",
++			name: "given artifact name contains `../etc/passwd` and the DestinationDir is `.`, verify an error about path traversal is returned",
+ 			opts: DownloadOptions{
+ 				RunID:          "2345",
+ 				DestinationDir: ".",
+@@ -341,7 +341,7 @@ func Test_runDownload(t *testing.T) {
+ 			wantErr: "error downloading ../etc/passwd: would result in path traversal",
+ 		},
+ 		{
+-			name: "given artifact name contains `../etc/passwd`, verify an error about path traversal is returned",
++			name: "given artifact name contains `../etc/passwd` and the DestinationDir is `imaginary-dir`, verify an error about path traversal is returned",
+ 			opts: DownloadOptions{
+ 				RunID:          "2345",
+ 				DestinationDir: "imaginary-dir",
+@@ -358,7 +358,7 @@ func Test_runDownload(t *testing.T) {
+ 			wantErr: "error downloading ../etc/passwd: would result in path traversal",
+ 		},
+ 		{
+-			name: "given artifact name contains `../../etc/passwd`, verify an error about path traversal is returned",
++			name: "given artifact name contains `../../etc/passwd` and the DestinationDir is `.`, verify an error about path traversal is returned",
+ 			opts: DownloadOptions{
+ 				RunID:          "2345",
+ 				DestinationDir: ".",
+@@ -375,7 +375,7 @@ func Test_runDownload(t *testing.T) {
+ 			wantErr: "error downloading ../../etc/passwd: would result in path traversal",
+ 		},
+ 		{
+-			name: "given artifact name contains `../../etc/passwd`, verify an error about path traversal is returned",
++			name: "given artifact name contains `../../etc/passwd` and the DestinationDir is `imaginary-dir`, verify an error about path traversal is returned",
+ 			opts: DownloadOptions{
+ 				RunID:          "2345",
+ 				DestinationDir: "imaginary-dir",
+
+From e7c5706336d851b39930c7315132f89b25e77d4d Mon Sep 17 00:00:00 2001
+From: Andy Feller <andyfeller@github.com>
+Date: Thu, 21 Nov 2024 17:02:20 -0500
+Subject: [PATCH 3/5] Refactor download testing, simpler file descends
+
+This incorporates the work done by @williammartin to improve reasoning about `gh run download` behavior through testing while verifying a simpler solution to checking if a path is contained within a directory.
+---
+ pkg/cmd/run/download/download.go      |   1 +
+ pkg/cmd/run/download/download_test.go | 524 +++++++++++++++-----------
+ pkg/cmd/run/download/zip.go           |  14 +-
+ 3 files changed, 309 insertions(+), 230 deletions(-)
+
+diff --git a/pkg/cmd/run/download/download.go b/pkg/cmd/run/download/download.go
+index 168cb6fcc8c..5bda2ba3da0 100644
+--- a/pkg/cmd/run/download/download.go
++++ b/pkg/cmd/run/download/download.go
+@@ -166,6 +166,7 @@ func runDownload(opts *DownloadOptions) error {
+ 			}
+ 		}
+ 		destDir := opts.DestinationDir
++		// Why do we only include the artifact name in the destination directory if there are multiple?
+ 		if len(wantPatterns) != 0 || len(wantNames) != 1 {
+ 			destDir = filepath.Join(destDir, a.Name)
+ 		}
+diff --git a/pkg/cmd/run/download/download_test.go b/pkg/cmd/run/download/download_test.go
+index fb445ccd4e9..0df94ccf498 100644
+--- a/pkg/cmd/run/download/download_test.go
++++ b/pkg/cmd/run/download/download_test.go
+@@ -2,8 +2,11 @@ package download
+ 
+ import (
+ 	"bytes"
++	"errors"
++	"fmt"
+ 	"io"
+ 	"net/http"
++	"os"
+ 	"path/filepath"
+ 	"testing"
+ 
+@@ -14,7 +17,6 @@ import (
+ 	"github.com/cli/cli/v2/pkg/iostreams"
+ 	"github.com/google/shlex"
+ 	"github.com/stretchr/testify/assert"
+-	"github.com/stretchr/testify/mock"
+ 	"github.com/stretchr/testify/require"
+ )
+ 
+@@ -143,261 +145,350 @@ func Test_NewCmdDownload(t *testing.T) {
+ 	}
+ }
+ 
++type testArtifact struct {
++	artifact shared.Artifact
++	files    []string
++}
++
++type fakePlatform struct {
++	runArtifacts map[string][]testArtifact
++}
++
++func (f *fakePlatform) List(runID string) ([]shared.Artifact, error) {
++	var runIds []string
++	if runID != "" {
++		runIds = []string{runID}
++	} else {
++		for k := range f.runArtifacts {
++			runIds = append(runIds, k)
++		}
++	}
++
++	var artifacts []shared.Artifact
++	for _, id := range runIds {
++		for _, a := range f.runArtifacts[id] {
++			artifacts = append(artifacts, a.artifact)
++		}
++	}
++
++	return artifacts, nil
++}
++
++func (f *fakePlatform) Download(url string, dir string) error {
++	if err := os.MkdirAll(dir, 0755); err != nil {
++		return err
++	}
++	// Now to be consistent, we find the artifact with the provided URL.
++	// It's a bit janky to iterate the runs, to find the right artifact
++	// rather than keying directly to it, but it allows the setup of the
++	// fake platform to be declarative rather than imperative.
++	// Think fakePlatform { artifacts: ... } rather than fakePlatform.makeArtifactAvailable()
++	for _, testArtifacts := range f.runArtifacts {
++		for _, testArtifact := range testArtifacts {
++			if testArtifact.artifact.DownloadURL == url {
++				for _, file := range testArtifact.files {
++					path := filepath.Join(dir, file)
++					return os.WriteFile(path, []byte{}, 0600)
++				}
++			}
++		}
++	}
++
++	return errors.New("no artifact matches the provided URL")
++}
++
+ func Test_runDownload(t *testing.T) {
+ 	tests := []struct {
+-		name        string
+-		opts        DownloadOptions
+-		mockAPI     func(*mockPlatform)
+-		promptStubs func(*prompter.MockPrompter)
+-		wantErr     string
++		name          string
++		opts          DownloadOptions
++		platform      *fakePlatform
++		promptStubs   func(*prompter.MockPrompter)
++		expectedFiles []string
++		wantErr       string
+ 	}{
+ 		{
+ 			name: "download non-expired",
+ 			opts: DownloadOptions{
+ 				RunID:          "2345",
+ 				DestinationDir: "./tmp",
+-				Names:          []string(nil),
+ 			},
+-			mockAPI: func(p *mockPlatform) {
+-				p.On("List", "2345").Return([]shared.Artifact{
+-					{
+-						Name:        "artifact-1",
+-						DownloadURL: "http://download.com/artifact1.zip",
+-						Expired:     false,
+-					},
+-					{
+-						Name:        "expired-artifact",
+-						DownloadURL: "http://download.com/expired.zip",
+-						Expired:     true,
++			platform: &fakePlatform{
++				runArtifacts: map[string][]testArtifact{
++					"2345": {
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-1",
++								DownloadURL: "http://download.com/artifact1.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-1-file",
++							},
++						},
++						{
++							artifact: shared.Artifact{
++								Name:        "expired-artifact",
++								DownloadURL: "http://download.com/expired.zip",
++								Expired:     true,
++							},
++							files: []string{
++								"expired",
++							},
++						},
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-2",
++								DownloadURL: "http://download.com/artifact2.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-2-file",
++							},
++						},
+ 					},
+-					{
+-						Name:        "artifact-2",
+-						DownloadURL: "http://download.com/artifact2.zip",
+-						Expired:     false,
+-					},
+-				}, nil)
+-				p.On("Download", "http://download.com/artifact1.zip", filepath.FromSlash("tmp/artifact-1")).Return(nil)
+-				p.On("Download", "http://download.com/artifact2.zip", filepath.FromSlash("tmp/artifact-2")).Return(nil)
++				},
++			},
++			expectedFiles: []string{
++				filepath.Join("artifact-1", "artifact-1-file"),
++				filepath.Join("artifact-2", "artifact-2-file"),
+ 			},
+ 		},
+ 		{
+-			name: "no valid artifacts",
++			name: "all artifacts are expired",
+ 			opts: DownloadOptions{
+-				RunID:          "2345",
+-				DestinationDir: ".",
+-				Names:          []string(nil),
++				RunID: "2345",
+ 			},
+-			mockAPI: func(p *mockPlatform) {
+-				p.On("List", "2345").Return([]shared.Artifact{
+-					{
+-						Name:        "artifact-1",
+-						DownloadURL: "http://download.com/artifact1.zip",
+-						Expired:     true,
++			platform: &fakePlatform{
++				runArtifacts: map[string][]testArtifact{
++					"2345": {
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-1",
++								DownloadURL: "http://download.com/artifact1.zip",
++								Expired:     true,
++							},
++							files: []string{
++								"artifact-1-file",
++							},
++						},
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-2",
++								DownloadURL: "http://download.com/artifact2.zip",
++								Expired:     true,
++							},
++							files: []string{
++								"artifact-2-file",
++							},
++						},
+ 					},
+-					{
+-						Name:        "artifact-2",
+-						DownloadURL: "http://download.com/artifact2.zip",
+-						Expired:     true,
+-					},
+-				}, nil)
++				},
+ 			},
+-			wantErr: "no valid artifacts found to download",
++			expectedFiles: []string{},
++			wantErr:       "no valid artifacts found to download",
+ 		},
+ 		{
+ 			name: "no name matches",
+ 			opts: DownloadOptions{
+-				RunID:          "2345",
+-				DestinationDir: ".",
+-				Names:          []string{"artifact-3"},
++				RunID: "2345",
++				Names: []string{"artifact-3"},
+ 			},
+-			mockAPI: func(p *mockPlatform) {
+-				p.On("List", "2345").Return([]shared.Artifact{
+-					{
+-						Name:        "artifact-1",
+-						DownloadURL: "http://download.com/artifact1.zip",
+-						Expired:     false,
+-					},
+-					{
+-						Name:        "artifact-2",
+-						DownloadURL: "http://download.com/artifact2.zip",
+-						Expired:     false,
++			platform: &fakePlatform{
++				runArtifacts: map[string][]testArtifact{
++					"2345": {
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-1",
++								DownloadURL: "http://download.com/artifact1.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-1-file",
++							},
++						},
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-2",
++								DownloadURL: "http://download.com/artifact2.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-2-file",
++							},
++						},
+ 					},
+-				}, nil)
++				},
+ 			},
+-			wantErr: "no artifact matches any of the names or patterns provided",
++			expectedFiles: []string{},
++			wantErr:       "no artifact matches any of the names or patterns provided",
+ 		},
+ 		{
+ 			name: "no pattern matches",
+ 			opts: DownloadOptions{
+-				RunID:          "2345",
+-				DestinationDir: ".",
+-				FilePatterns:   []string{"artifiction-*"},
+-			},
+-			mockAPI: func(p *mockPlatform) {
+-				p.On("List", "2345").Return([]shared.Artifact{
+-					{
+-						Name:        "artifact-1",
+-						DownloadURL: "http://download.com/artifact1.zip",
+-						Expired:     false,
+-					},
+-					{
+-						Name:        "artifact-2",
+-						DownloadURL: "http://download.com/artifact2.zip",
+-						Expired:     false,
+-					},
+-				}, nil)
+-			},
+-			wantErr: "no artifact matches any of the names or patterns provided",
+-		},
+-		{
+-			name: "prompt to select artifact",
+-			opts: DownloadOptions{
+-				RunID:          "",
+-				DoPrompt:       true,
+-				DestinationDir: ".",
+-				Names:          []string(nil),
++				RunID:        "2345",
++				FilePatterns: []string{"artifiction-*"},
+ 			},
+-			mockAPI: func(p *mockPlatform) {
+-				p.On("List", "").Return([]shared.Artifact{
+-					{
+-						Name:        "artifact-1",
+-						DownloadURL: "http://download.com/artifact1.zip",
+-						Expired:     false,
+-					},
+-					{
+-						Name:        "expired-artifact",
+-						DownloadURL: "http://download.com/expired.zip",
+-						Expired:     true,
++			platform: &fakePlatform{
++				runArtifacts: map[string][]testArtifact{
++					"2345": {
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-1",
++								DownloadURL: "http://download.com/artifact1.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-1-file",
++							},
++						},
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-2",
++								DownloadURL: "http://download.com/artifact2.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-2-file",
++							},
++						},
+ 					},
+-					{
+-						Name:        "artifact-2",
+-						DownloadURL: "http://download.com/artifact2.zip",
+-						Expired:     false,
+-					},
+-					{
+-						Name:        "artifact-2",
+-						DownloadURL: "http://download.com/artifact2.also.zip",
+-						Expired:     false,
+-					},
+-				}, nil)
+-				p.On("Download", "http://download.com/artifact2.zip", ".").Return(nil)
+-			},
+-			promptStubs: func(pm *prompter.MockPrompter) {
+-				pm.RegisterMultiSelect("Select artifacts to download:", nil, []string{"artifact-1", "artifact-2"},
+-					func(_ string, _, opts []string) ([]int, error) {
+-						return []int{1}, nil
+-					})
++				},
+ 			},
++			expectedFiles: []string{},
++			wantErr:       "no artifact matches any of the names or patterns provided",
+ 		},
+ 		{
+-			name: "given artifact name contains `..` and the DestinationDir is `.`, verify an error about path traversal is returned",
++			name: "avoid redownloading files of the same name",
+ 			opts: DownloadOptions{
+-				RunID:          "2345",
+-				DestinationDir: ".",
++				RunID: "2345",
+ 			},
+-			mockAPI: func(p *mockPlatform) {
+-				p.On("List", "2345").Return([]shared.Artifact{
+-					{
+-						Name:        "..",
+-						DownloadURL: "http://download.com/artifact1.zip",
+-						Expired:     false,
++			platform: &fakePlatform{
++				runArtifacts: map[string][]testArtifact{
++					"2345": {
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-1",
++								DownloadURL: "http://download.com/artifact1.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-1-file",
++							},
++						},
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-1",
++								DownloadURL: "http://download.com/artifact2.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-2-file",
++							},
++						},
+ 					},
+-				}, nil)
+-			},
+-			wantErr: "error downloading ..: would result in path traversal",
+-		},
+-		{
+-			name: "given artifact name contains `..` and the DestinationDir is `imaginary-dir`, verify an error about path traversal is returned",
+-			opts: DownloadOptions{
+-				RunID:          "2345",
+-				DestinationDir: "imaginary-dir",
++				},
+ 			},
+-			mockAPI: func(p *mockPlatform) {
+-				p.On("List", "2345").Return([]shared.Artifact{
+-					{
+-						Name:        "..",
+-						DownloadURL: "http://download.com/artifact1.zip",
+-						Expired:     false,
+-					},
+-				}, nil)
++			expectedFiles: []string{
++				filepath.Join("artifact-1", "artifact-1-file"),
+ 			},
+-			wantErr: "error downloading ..: would result in path traversal",
+ 		},
+ 		{
+-			name: "given artifact name contains `../etc/passwd` and the DestinationDir is `.`, verify an error about path traversal is returned",
++			name: "prompt to select artifact",
+ 			opts: DownloadOptions{
+-				RunID:          "2345",
+-				DestinationDir: ".",
++				RunID:    "",
++				DoPrompt: true,
++				Names:    []string(nil),
+ 			},
+-			mockAPI: func(p *mockPlatform) {
+-				p.On("List", "2345").Return([]shared.Artifact{
+-					{
+-						Name:        "../etc/passwd",
+-						DownloadURL: "http://download.com/artifact1.zip",
+-						Expired:     false,
++			platform: &fakePlatform{
++				runArtifacts: map[string][]testArtifact{
++					"2345": {
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-1",
++								DownloadURL: "http://download.com/artifact1.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-1-file",
++							},
++						},
++						{
++							artifact: shared.Artifact{
++								Name:        "expired-artifact",
++								DownloadURL: "http://download.com/expired.zip",
++								Expired:     true,
++							},
++							files: []string{
++								"expired",
++							},
++						},
+ 					},
+-				}, nil)
+-			},
+-			wantErr: "error downloading ../etc/passwd: would result in path traversal",
+-		},
+-		{
+-			name: "given artifact name contains `../etc/passwd` and the DestinationDir is `imaginary-dir`, verify an error about path traversal is returned",
+-			opts: DownloadOptions{
+-				RunID:          "2345",
+-				DestinationDir: "imaginary-dir",
+-			},
+-			mockAPI: func(p *mockPlatform) {
+-				p.On("List", "2345").Return([]shared.Artifact{
+-					{
+-						Name:        "../etc/passwd",
+-						DownloadURL: "http://download.com/artifact1.zip",
+-						Expired:     false,
++					"6789": {
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-2",
++								DownloadURL: "http://download.com/artifact2.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-2-file",
++							},
++						},
+ 					},
+-				}, nil)
++				},
+ 			},
+-			wantErr: "error downloading ../etc/passwd: would result in path traversal",
+-		},
+-		{
+-			name: "given artifact name contains `../../etc/passwd` and the DestinationDir is `.`, verify an error about path traversal is returned",
+-			opts: DownloadOptions{
+-				RunID:          "2345",
+-				DestinationDir: ".",
++			promptStubs: func(pm *prompter.MockPrompter) {
++				pm.RegisterMultiSelect("Select artifacts to download:", nil, []string{"artifact-1", "artifact-2"},
++					func(_ string, _, opts []string) ([]int, error) {
++						for i, o := range opts {
++							if o == "artifact-2" {
++								return []int{i}, nil
++							}
++						}
++						return nil, fmt.Errorf("no artifact-2 found in %v", opts)
++					})
+ 			},
+-			mockAPI: func(p *mockPlatform) {
+-				p.On("List", "2345").Return([]shared.Artifact{
+-					{
+-						Name:        "../../etc/passwd",
+-						DownloadURL: "http://download.com/artifact1.zip",
+-						Expired:     false,
+-					},
+-				}, nil)
++			expectedFiles: []string{
++				filepath.Join("artifact-2-file"),
+ 			},
+-			wantErr: "error downloading ../../etc/passwd: would result in path traversal",
+ 		},
+ 		{
+-			name: "given artifact name contains `../../etc/passwd` and the DestinationDir is `imaginary-dir`, verify an error about path traversal is returned",
++			name: "handling artifact name with path traversal exploit",
+ 			opts: DownloadOptions{
+-				RunID:          "2345",
+-				DestinationDir: "imaginary-dir",
++				RunID: "2345",
+ 			},
+-			mockAPI: func(p *mockPlatform) {
+-				p.On("List", "2345").Return([]shared.Artifact{
+-					{
+-						Name:        "../../etc/passwd",
+-						DownloadURL: "http://download.com/artifact1.zip",
+-						Expired:     false,
++			platform: &fakePlatform{
++				runArtifacts: map[string][]testArtifact{
++					"2345": {
++						{
++							artifact: shared.Artifact{
++								Name:        "..",
++								DownloadURL: "http://download.com/artifact1.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"etc/passwd",
++							},
++						},
+ 					},
+-				}, nil)
++				},
+ 			},
+-			wantErr: "error downloading ../../etc/passwd: would result in path traversal",
++			expectedFiles: []string{},
++			wantErr:       "error downloading ..: would result in path traversal",
+ 		},
+ 	}
+ 	for _, tt := range tests {
+ 		t.Run(tt.name, func(t *testing.T) {
+ 			opts := &tt.opts
++			if opts.DestinationDir == "" {
++				opts.DestinationDir = t.TempDir()
++			} else {
++				opts.DestinationDir = filepath.Join(t.TempDir(), opts.DestinationDir)
++			}
++
+ 			ios, _, stdout, stderr := iostreams.Test()
+ 			opts.IO = ios
+-			opts.Platform = newMockPlatform(t, tt.mockAPI)
++			opts.Platform = tt.platform
+ 
+ 			pm := prompter.NewMockPrompter(t)
+ 			opts.Prompter = pm
+@@ -412,34 +503,31 @@ func Test_runDownload(t *testing.T) {
+ 				require.NoError(t, err)
+ 			}
+ 
++			// Check that the exact number of files exist
++			require.Equal(t, len(tt.expectedFiles), countFilesInDirRecursively(t, opts.DestinationDir))
++
++			// Then check that the exact files are correct
++			for _, name := range tt.expectedFiles {
++				require.FileExists(t, filepath.Join(opts.DestinationDir, name))
++			}
++
+ 			assert.Equal(t, "", stdout.String())
+ 			assert.Equal(t, "", stderr.String())
+ 		})
+ 	}
+ }
+ 
+-type mockPlatform struct {
+-	mock.Mock
+-}
++func countFilesInDirRecursively(t *testing.T, dir string) int {
++	t.Helper()
+ 
+-func newMockPlatform(t *testing.T, config func(*mockPlatform)) *mockPlatform {
+-	m := &mockPlatform{}
+-	m.Test(t)
+-	t.Cleanup(func() {
+-		m.AssertExpectations(t)
+-	})
+-	if config != nil {
+-		config(m)
+-	}
+-	return m
+-}
+-
+-func (p *mockPlatform) List(runID string) ([]shared.Artifact, error) {
+-	args := p.Called(runID)
+-	return args.Get(0).([]shared.Artifact), args.Error(1)
+-}
++	count := 0
++	require.NoError(t, filepath.Walk(dir, func(_ string, info os.FileInfo, err error) error {
++		require.NoError(t, err)
++		if !info.IsDir() {
++			count++
++		}
++		return nil
++	}))
+ 
+-func (p *mockPlatform) Download(url string, dir string) error {
+-	args := p.Called(url, dir)
+-	return args.Error(0)
++	return count
+ }
+diff --git a/pkg/cmd/run/download/zip.go b/pkg/cmd/run/download/zip.go
+index f6a27afdd66..52994199a9b 100644
+--- a/pkg/cmd/run/download/zip.go
++++ b/pkg/cmd/run/download/zip.go
+@@ -71,16 +71,6 @@ func getPerm(m os.FileMode) os.FileMode {
+ }
+ 
+ func filepathDescendsFrom(p, dir string) bool {
+-	p = filepath.Clean(p)
+-	dir = filepath.Clean(dir)
+-	if dir == "." && p == ".." {
+-		return false
+-	}
+-	if dir == "." && !filepath.IsAbs(p) {
+-		return !strings.HasPrefix(p, ".."+string(filepath.Separator))
+-	}
+-	if !strings.HasSuffix(dir, string(filepath.Separator)) {
+-		dir += string(filepath.Separator)
+-	}
+-	return strings.HasPrefix(p, dir)
++	relativePath, _ := filepath.Rel(dir, p)
++	return !strings.HasPrefix(relativePath, "..")
+ }
+
+From cdfc12caf52754ea4026d5338a56ad4e6f822105 Mon Sep 17 00:00:00 2001
+From: Andy Feller <andyfeller@github.com>
+Date: Fri, 22 Nov 2024 15:26:11 -0500
+Subject: [PATCH 4/5] Expand logic and tests to handle edge cases
+
+This commit expands filepathDescendsFrom(string, string) to handle edge cases such as mixing absolute and relative paths or artifact name edge cases.
+
+Additionally, tests for filepathDescendsFrom() and downloadrun() have been expanded to verify additional use cases.
+---
+ pkg/cmd/run/download/download.go      |  11 +-
+ pkg/cmd/run/download/download_test.go | 189 +++++++++++++++++++++++++-
+ pkg/cmd/run/download/zip.go           |  21 ++-
+ pkg/cmd/run/download/zip_test.go      |  80 +++++++++++
+ 4 files changed, 297 insertions(+), 4 deletions(-)
+
+diff --git a/pkg/cmd/run/download/download.go b/pkg/cmd/run/download/download.go
+index 5bda2ba3da0..04ce7434051 100644
+--- a/pkg/cmd/run/download/download.go
++++ b/pkg/cmd/run/download/download.go
+@@ -166,8 +166,15 @@ func runDownload(opts *DownloadOptions) error {
+ 			}
+ 		}
+ 		destDir := opts.DestinationDir
+-		// Why do we only include the artifact name in the destination directory if there are multiple?
+-		if len(wantPatterns) != 0 || len(wantNames) != 1 {
++
++		// Isolate the downloaded artifact file to avoid potential conflicts from other downloaded artifacts when:
++		//
++		// 1. len(wantPatterns) > 0: Any pattern can result in 2+ artifacts
++		// 2. len(wantNames) == 0: User wants all artifacts regardless what they are named
++		// 3. len(wantNames) > 1: User wants multiple, specific artifacts
++		//
++		// Otherwise if a single artifact is wanted, then the protective subdirectory is an unnecessary inconvenience.
++		if len(wantPatterns) > 0 || len(wantNames) != 1 {
+ 			destDir = filepath.Join(destDir, a.Name)
+ 		}
+ 
+diff --git a/pkg/cmd/run/download/download_test.go b/pkg/cmd/run/download/download_test.go
+index 0df94ccf498..aeab2027893 100644
+--- a/pkg/cmd/run/download/download_test.go
++++ b/pkg/cmd/run/download/download_test.go
+@@ -207,7 +207,7 @@ func Test_runDownload(t *testing.T) {
+ 		wantErr       string
+ 	}{
+ 		{
+-			name: "download non-expired",
++			name: "download non-expired to relative directory",
+ 			opts: DownloadOptions{
+ 				RunID:          "2345",
+ 				DestinationDir: "./tmp",
+@@ -253,6 +253,53 @@ func Test_runDownload(t *testing.T) {
+ 				filepath.Join("artifact-2", "artifact-2-file"),
+ 			},
+ 		},
++		{
++			name: "download non-expired to absolute directory",
++			opts: DownloadOptions{
++				RunID:          "2345",
++				DestinationDir: "/tmp",
++			},
++			platform: &fakePlatform{
++				runArtifacts: map[string][]testArtifact{
++					"2345": {
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-1",
++								DownloadURL: "http://download.com/artifact1.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-1-file",
++							},
++						},
++						{
++							artifact: shared.Artifact{
++								Name:        "expired-artifact",
++								DownloadURL: "http://download.com/expired.zip",
++								Expired:     true,
++							},
++							files: []string{
++								"expired",
++							},
++						},
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-2",
++								DownloadURL: "http://download.com/artifact2.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-2-file",
++							},
++						},
++					},
++				},
++			},
++			expectedFiles: []string{
++				filepath.Join("artifact-1", "artifact-1-file"),
++				filepath.Join("artifact-2", "artifact-2-file"),
++			},
++		},
+ 		{
+ 			name: "all artifacts are expired",
+ 			opts: DownloadOptions{
+@@ -322,6 +369,53 @@ func Test_runDownload(t *testing.T) {
+ 			expectedFiles: []string{},
+ 			wantErr:       "no artifact matches any of the names or patterns provided",
+ 		},
++		{
++			name: "pattern matches",
++			opts: DownloadOptions{
++				RunID:        "2345",
++				FilePatterns: []string{"artifact-*"},
++			},
++			platform: &fakePlatform{
++				runArtifacts: map[string][]testArtifact{
++					"2345": {
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-1",
++								DownloadURL: "http://download.com/artifact1.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-1-file",
++							},
++						},
++						{
++							artifact: shared.Artifact{
++								Name:        "non-artifact-2",
++								DownloadURL: "http://download.com/non-artifact-2.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"non-artifact-2-file",
++							},
++						},
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-3",
++								DownloadURL: "http://download.com/artifact3.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-3-file",
++							},
++						},
++					},
++				},
++			},
++			expectedFiles: []string{
++				filepath.Join("artifact-1", "artifact-1-file"),
++				filepath.Join("artifact-3", "artifact-3-file"),
++			},
++		},
+ 		{
+ 			name: "no pattern matches",
+ 			opts: DownloadOptions{
+@@ -357,6 +451,99 @@ func Test_runDownload(t *testing.T) {
+ 			expectedFiles: []string{},
+ 			wantErr:       "no artifact matches any of the names or patterns provided",
+ 		},
++		{
++			name: "want specific single artifact",
++			opts: DownloadOptions{
++				RunID: "2345",
++				Names: []string{"non-artifact-2"},
++			},
++			platform: &fakePlatform{
++				runArtifacts: map[string][]testArtifact{
++					"2345": {
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-1",
++								DownloadURL: "http://download.com/artifact1.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-1-file",
++							},
++						},
++						{
++							artifact: shared.Artifact{
++								Name:        "non-artifact-2",
++								DownloadURL: "http://download.com/non-artifact-2.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"non-artifact-2-file",
++							},
++						},
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-3",
++								DownloadURL: "http://download.com/artifact3.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-3-file",
++							},
++						},
++					},
++				},
++			},
++			expectedFiles: []string{
++				filepath.Join("non-artifact-2-file"),
++			},
++		},
++		{
++			name: "want specific multiple artifacts",
++			opts: DownloadOptions{
++				RunID: "2345",
++				Names: []string{"artifact-1", "artifact-3"},
++			},
++			platform: &fakePlatform{
++				runArtifacts: map[string][]testArtifact{
++					"2345": {
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-1",
++								DownloadURL: "http://download.com/artifact1.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-1-file",
++							},
++						},
++						{
++							artifact: shared.Artifact{
++								Name:        "non-artifact-2",
++								DownloadURL: "http://download.com/non-artifact-2.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"non-artifact-2-file",
++							},
++						},
++						{
++							artifact: shared.Artifact{
++								Name:        "artifact-3",
++								DownloadURL: "http://download.com/artifact3.zip",
++								Expired:     false,
++							},
++							files: []string{
++								"artifact-3-file",
++							},
++						},
++					},
++				},
++			},
++			expectedFiles: []string{
++				filepath.Join("artifact-1", "artifact-1-file"),
++				filepath.Join("artifact-3", "artifact-3-file"),
++			},
++		},
+ 		{
+ 			name: "avoid redownloading files of the same name",
+ 			opts: DownloadOptions{
+diff --git a/pkg/cmd/run/download/zip.go b/pkg/cmd/run/download/zip.go
+index 52994199a9b..a68b75fd6b7 100644
+--- a/pkg/cmd/run/download/zip.go
++++ b/pkg/cmd/run/download/zip.go
+@@ -71,6 +71,25 @@ func getPerm(m os.FileMode) os.FileMode {
+ }
+ 
+ func filepathDescendsFrom(p, dir string) bool {
+-	relativePath, _ := filepath.Rel(dir, p)
++	// Regardless of the logic below, `p` is never allowed to be current directory `.` or parent directory `..`
++	// however we check explicitly here before filepath.Rel() which doesn't cover all cases.
++	p = filepath.Clean(p)
++
++	if p == "." || p == ".." {
++		return false
++	}
++
++	// filepathDescendsFrom() takes advantage of filepath.Rel() to determine if `p` is descended from `dir`:
++	//
++	// 1. filepath.Rel() calculates a path to traversal from fictious `dir` to `p`.
++	// 2. filepath.Rel() errors in a handful of cases where absolute and relative paths are compared as well as certain traversal edge cases
++	//    For more information, https://github.com/golang/go/blob/00709919d09904b17cfe3bfeb35521cbd3fb04f8/src/path/filepath/path_test.go#L1510-L1515
++	// 3. If the path to traverse `dir` to `p` requires `..`, then we know it is not descend from / contained in `dir`
++	//
++	// As-is, this function requires the caller to ensure `p` and `dir` are either 1) both relative or 2) both absolute.
++	relativePath, err := filepath.Rel(dir, p)
++	if err != nil {
++		return false
++	}
+ 	return !strings.HasPrefix(relativePath, "..")
+ }
+diff --git a/pkg/cmd/run/download/zip_test.go b/pkg/cmd/run/download/zip_test.go
+index ca401cdb9ed..b85122ec57a 100644
+--- a/pkg/cmd/run/download/zip_test.go
++++ b/pkg/cmd/run/download/zip_test.go
+@@ -130,6 +130,86 @@ func Test_filepathDescendsFrom(t *testing.T) {
+ 			},
+ 			want: false,
+ 		},
++		{
++			name: "deny parent directory filename (`..`) escaping absolute directory",
++			args: args{
++				p:   filepath.FromSlash(".."),
++				dir: filepath.FromSlash("/var/logs/"),
++			},
++			want: false,
++		},
++		{
++			name: "deny parent directory filename (`..`) escaping current directory",
++			args: args{
++				p:   filepath.FromSlash(".."),
++				dir: filepath.FromSlash("."),
++			},
++			want: false,
++		},
++		{
++			name: "deny parent directory filename (`..`) escaping parent directory",
++			args: args{
++				p:   filepath.FromSlash(".."),
++				dir: filepath.FromSlash(".."),
++			},
++			want: false,
++		},
++		{
++			name: "deny parent directory filename (`..`) escaping relative directory",
++			args: args{
++				p:   filepath.FromSlash(".."),
++				dir: filepath.FromSlash("relative-dir"),
++			},
++			want: false,
++		},
++		{
++			name: "deny current directory filename (`.`) in absolute directory",
++			args: args{
++				p:   filepath.FromSlash("."),
++				dir: filepath.FromSlash("/var/logs/"),
++			},
++			want: false,
++		},
++		{
++			name: "deny current directory filename (`.`) in current directory",
++			args: args{
++				p:   filepath.FromSlash("."),
++				dir: filepath.FromSlash("."),
++			},
++			want: false,
++		},
++		{
++			name: "deny current directory filename (`.`) in parent directory",
++			args: args{
++				p:   filepath.FromSlash("."),
++				dir: filepath.FromSlash(".."),
++			},
++			want: false,
++		},
++		{
++			name: "deny current directory filename (`.`) in relative directory",
++			args: args{
++				p:   filepath.FromSlash("."),
++				dir: filepath.FromSlash("relative-dir"),
++			},
++			want: false,
++		},
++		{
++			name: "relative path, absolute dir",
++			args: args{
++				p:   filepath.FromSlash("whatever"),
++				dir: filepath.FromSlash("/a/b/c"),
++			},
++			want: false,
++		},
++		{
++			name: "absolute path, relative dir",
++			args: args{
++				p:   filepath.FromSlash("/a/b/c"),
++				dir: filepath.FromSlash("whatever"),
++			},
++			want: false,
++		},
+ 	}
+ 	for _, tt := range tests {
+ 		t.Run(tt.name, func(t *testing.T) {
+
+From 8720479b0bfc95450abb2ba88489f2893e4838a9 Mon Sep 17 00:00:00 2001
+From: Andy Feller <andyfeller@github.com>
+Date: Tue, 3 Dec 2024 13:33:00 -0500
+Subject: [PATCH 5/5] Consolidate logic for isolating artifacts
+
+---
+ pkg/cmd/run/download/download.go | 34 ++++++++++++++++++++++----------
+ 1 file changed, 24 insertions(+), 10 deletions(-)
+
+diff --git a/pkg/cmd/run/download/download.go b/pkg/cmd/run/download/download.go
+index 04ce7434051..8f25e84a228 100644
+--- a/pkg/cmd/run/download/download.go
++++ b/pkg/cmd/run/download/download.go
+@@ -151,8 +151,10 @@ func runDownload(opts *DownloadOptions) error {
+ 	opts.IO.StartProgressIndicator()
+ 	defer opts.IO.StopProgressIndicator()
+ 
+-	// track downloaded artifacts and avoid re-downloading any of the same name
++	// track downloaded artifacts and avoid re-downloading any of the same name, isolate if multiple artifacts
+ 	downloaded := set.NewStringSet()
++	isolateArtifacts := isolateArtifacts(wantNames, wantPatterns)
++
+ 	for _, a := range artifacts {
+ 		if a.Expired {
+ 			continue
+@@ -165,16 +167,9 @@ func runDownload(opts *DownloadOptions) error {
+ 				continue
+ 			}
+ 		}
+-		destDir := opts.DestinationDir
+ 
+-		// Isolate the downloaded artifact file to avoid potential conflicts from other downloaded artifacts when:
+-		//
+-		// 1. len(wantPatterns) > 0: Any pattern can result in 2+ artifacts
+-		// 2. len(wantNames) == 0: User wants all artifacts regardless what they are named
+-		// 3. len(wantNames) > 1: User wants multiple, specific artifacts
+-		//
+-		// Otherwise if a single artifact is wanted, then the protective subdirectory is an unnecessary inconvenience.
+-		if len(wantPatterns) > 0 || len(wantNames) != 1 {
++		destDir := opts.DestinationDir
++		if isolateArtifacts {
+ 			destDir = filepath.Join(destDir, a.Name)
+ 		}
+ 
+@@ -196,6 +191,25 @@ func runDownload(opts *DownloadOptions) error {
+ 	return nil
+ }
+ 
++func isolateArtifacts(wantNames []string, wantPatterns []string) bool {
++	if len(wantPatterns) > 0 {
++		// Patterns can match multiple artifacts
++		return true
++	}
++
++	if len(wantNames) == 0 {
++		// All artifacts wanted regardless what they are named
++		return true
++	}
++
++	if len(wantNames) > 1 {
++		// Multiple, specific artifacts wanted
++		return true
++	}
++
++	return false
++}
++
+ func matchAnyName(names []string, name string) bool {
+ 	for _, n := range names {
+ 		if name == n {

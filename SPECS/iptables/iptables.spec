@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.10
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,11 +13,15 @@ Source2:        iptables
 Source3:        iptables.stop
 Source4:        ip4save
 Source5:        ip6save
+Source6:        iptables.conf
 BuildRequires:  jansson-devel
 BuildRequires:  libmnl-devel
 BuildRequires:  libnftnl-devel
 BuildRequires:  systemd-bootstrap-rpm-macros
 Requires:       iana-etc
+Requires:       libnftnl
+Requires(post):   %{_sbindir}/update-alternatives
+Requires(postun): %{_sbindir}/update-alternatives
 # Our build tooling cannot handle this
 #Requires:       systemd
 Provides:       %{name}-services = %{version}-%{release}
@@ -51,6 +55,9 @@ It contains the libraries and header files to create applications.
 %install
 %make_install
 
+# Create the /etc/modules-load.d directory if it doesn't exist
+install -vdm755 %{buildroot}/etc/modules-load.d
+
 #   Install daemon scripts
 install -vdm755 %{buildroot}%{_unitdir}
 install -m 644 %{SOURCE1} %{buildroot}%{_unitdir}
@@ -59,6 +66,7 @@ install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/scripts
 install -m 755 %{SOURCE3} %{buildroot}%{_sysconfdir}/systemd/scripts
 install -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/systemd/scripts
 install -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/systemd/scripts
+install -m 644 %{SOURCE6} %{buildroot}/etc/modules-load.d
 
 find %{buildroot} -name '*.a'  -delete
 find %{buildroot} -type f -name "*.la" -delete -print
@@ -71,14 +79,14 @@ for target in %{name} \
               ip6tables \
               ebtables \
               arptables; do
-  alternatives --install %{_sbindir}/${target} ${target} %{_sbindir}/${target}-nft 30000 \
+  %{_sbindir}/update-alternatives --install %{_sbindir}/${target} ${target} %{_sbindir}/${target}-nft 30000 \
     --slave %{_sbindir}/${target}-save ${target}-save %{_sbindir}/${target}-nft-save \
     --slave %{_sbindir}/${target}-restore ${target}-restore %{_sbindir}/${target}-nft-restore
 done
 
 for target in %{name} \
               ip6tables; do
-  alternatives --install %{_sbindir}/${target} ${target} %{_sbindir}/${target}-legacy 10000 \
+  %{_sbindir}/update-alternatives --install %{_sbindir}/${target} ${target} %{_sbindir}/${target}-legacy 10000 \
     --slave %{_sbindir}/${target}-save ${target}-save %{_sbindir}/${target}-legacy-save \
     --slave %{_sbindir}/${target}-restore ${target}-restore %{_sbindir}/${target}-legacy-restore
 done
@@ -91,14 +99,12 @@ done
 
 %postun
 if [ $1 -eq 0 ]; then
-  for target in %{name} \
-              ip6tables \
-              ebtables \
-              arptables; do
-  alternatives --remove ${target} %{_sbindir}/${target}-nft
-  done
-  alternatives --remove %{name} %{_sbindir}/%{name}-legacy
-  alternatives --remove ip6tables %{_sbindir}/ip6tables-legacy
+	%{_sbindir}/update-alternatives --remove %{name} %{_sbindir}/%{name}-nft
+	%{_sbindir}/update-alternatives --remove ip6tables %{_sbindir}/ip6tables-nft
+	%{_sbindir}/update-alternatives --remove ebtables %{_sbindir}/ebtables-nft
+	%{_sbindir}/update-alternatives --remove arptables %{_sbindir}/arptables-nft
+	%{_sbindir}/update-alternatives --remove %{name} %{_sbindir}/%{name}-legacy
+	%{_sbindir}/update-alternatives --remove ip6tables %{_sbindir}/ip6tables-legacy
 fi
 /sbin/ldconfig
 %systemd_postun_with_restart iptables.service
@@ -122,6 +128,7 @@ fi
 /usr/share/xtables/iptables.xslt
 %ghost %{_sbindir}/ip{,6}tables{,-save,-restore}
 %ghost %{_sbindir}/{eb,arp}tables{,-save,-restore}
+/etc/modules-load.d/iptables.conf
 
 %files devel
 %{_libdir}/*.so
@@ -130,7 +137,10 @@ fi
 %{_mandir}/man3/*
 
 %changelog
-* Fri Oct 18 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.8.10-3
+* Thu Jan 16 2025 Dallas Delaney <dadelan@microsoft.com> - 1.8.10-4
+- Add back kernel modules that were removed by enabling nftables
+
+* Tue Nov 12 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.8.10-3
 - Enable nftables and use alternatives.
 
 * Mon Mar 18 2024 Andy Zaugg <azaugg@linkedin.com> - 1.8.10-2

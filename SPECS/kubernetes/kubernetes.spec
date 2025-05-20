@@ -9,8 +9,8 @@
 %define container_image_components 'kube-proxy kube-apiserver kube-controller-manager kube-scheduler'
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
-Version:        1.30.1
-Release:        4%{?dist}
+Version:        1.30.10
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,8 +19,15 @@ URL:            https://kubernetes.io/
 Source0:        https://dl.k8s.io/v%{version}/kubernetes-src.tar.gz#/%{name}-v%{version}.tar.gz
 Source1:        kubelet.service
 Patch0:         CVE-2024-28180.patch
+Patch1:         CVE-2024-45338.patch
+Patch2:         CVE-2025-27144.patch
+Patch3:         CVE-2025-22868.patch
+Patch4:         CVE-2025-22869.patch
+Patch5:         CVE-2024-51744.patch
+Patch6:         CVE-2025-30204.patch
+Patch7:         CVE-2025-22872.patch
 BuildRequires:  flex-devel
-BuildRequires:  glibc-static >= 2.38-8%{?dist}
+BuildRequires:  glibc-static >= 2.38-10%{?dist}
 BuildRequires:  golang
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
@@ -91,8 +98,7 @@ Summary:        Kubernetes pause
 Pause component for Microsoft Kubernetes %{version}.
 
 %prep
-%setup -q -c -n %{name}
-%autopatch -p1
+%autosetup -p1 -c -n %{name}
 
 %build
 # set version information
@@ -271,6 +277,33 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Tue May 13 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.30-10-7
+- Patch CVE-2025-22872
+
+* Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 1.30-10-6
+- Bump to rebuild with updated glibc
+
+* Wed Apr 16 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.30.10-5
+- Fix CVE-2024-51744 with an upstream patch
+
+* Sat Mar 29 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.30.10-4
+- Patch CVE-2025-30204
+
+* Fri Feb 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.30.10-3
+- Fix CVE-2025-27144, CVE-2025-22868, CVE-2025-22869 with an upstream patch
+
+* Tue Feb 25 2025 Chris Co <chrco@microsoft.com> - 1.30.10-2
+- Bump to rebuild with updated glibc
+
+* Fri Feb 21 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.10-1
+- Auto-upgrade to 1.30.10 - fix CVE-2025-0426
+
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.30.3-2
+- Add patch for CVE-2024-45338
+
+* Wed Dec 11 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.3-1
+- Auto-upgrade to 1.30.3 - Fix CVE-2024-10220
+
 * Tue Oct 01 2024 Henry Li <lihl@microsoft.com> - 1.30.1-4
 - Add patch to resolve CVE-2024-28180
 
@@ -316,7 +349,7 @@ fi
 * Fri Oct 06 2023 Henry Beberman <henry.beberman@microsoft.com> - 1.28.2-2
 - Bump release to rebuild against glibc 2.35-6
 
-* Wdd Sep 20 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.28.2-1
+* Wed Sep 20 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.28.2-1
 - Upgrade to 1.28.2
 - License verified.
 

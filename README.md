@@ -21,7 +21,7 @@ Instructions for building Azure Linux 3.0 may be found here: [Toolkit Documentat
 
 ### ISO
 
-To try Azure Linux Download the ISO here: [Azure Linux 3.0 x86_64 ISO](https://aka.ms/azurelinux-3.0-x86_64.iso)
+To try Azure Linux Download the ISO here: [Azure Linux 3.0 x86_64 ISO](https://aka.ms/azurelinux-3.0-x86_64.iso) / [Azure Linux 3.0 aarch64 ISO](https://aka.ms/azurelinux-3.0-aarch64.iso)
 
 Before using a downloaded ISO, [verify the checksum and signature of the image](toolkit/docs/security/iso-image-verification.md).
 
