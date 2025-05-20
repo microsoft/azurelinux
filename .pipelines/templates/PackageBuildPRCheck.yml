@@ -5,6 +5,12 @@
 # The "rawToolchain*" parameters are defined in the "Raw toolchain info" variable group.
 
 parameters:
+  - name: dailyBuildID
+    type: string
+    default: ""
+    displayName: "Daily build ID"
+
+  # Parameters acting as local constants since we can't use global variables in templates.
   - name: buildConfiguration
     type: object
     default:
@@ -19,21 +25,17 @@ parameters:
         rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64_3.0)"
         rawToolchainExpectedHash: "$(rawToolchainCacheHash_ARM64_3.0)"
 
-# Parameters acting as local constants since we can't use global variables in templates.
   - name: rpmsArtifactNameBase
     type: string
     default: "RPMs"
+
   - name: toolchainArtifactNameBase
     type: string
     default: "Toolchain"
+
   - name: toolchainTestsArtifactNameBase
     type: string
     default: "Toolchain_tests"
-
-  - name: dailyBuildID
-    type: string
-    default: ""
-    displayName: "Daily build ID"
 
 stages:
   - ${{ each configuration in parameters.buildConfiguration }}:
