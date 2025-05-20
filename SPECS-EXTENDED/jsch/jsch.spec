@@ -20,7 +20,7 @@ Distribution:   Azure Linux
 
 Name:           jsch
 Version:        0.1.55
-Release:        3%{?dist}
+Release:        2%{?dist}
 Summary:        Pure Java implementation of SSH2
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
@@ -64,7 +64,9 @@ X11 forwarding, file transfer, etc., and you can integrate its
 functionality into your own Java programs.
 
 %prep
-%autosetup -p1
+%setup -q
+%patch 0 -p1
+%patch 1 -p1
 cp %{SOURCE1} pom.xml
 %pom_remove_parent
 
@@ -105,10 +107,6 @@ cp -pr examples/* %{buildroot}%{_datadir}/%{name}
 %{_datadir}/%{name}
 
 %changelog
-* Thu May 08 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.1.55-3
-- Build fix
-- License verified
-
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.55-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
@@ -124,7 +122,6 @@ cp -pr examples/* %{buildroot}%{_datadir}/%{name}
     + create the osgi manifest during the ant build
     + replaces the MANIFEST.MF file
 - Miscellaneous clean-up
-
 * Fri Sep 20 2019 Fridrich Strba <fstrba@suse.com>
 - Remove reference to the parent from pom file, since we are not
   building with maven

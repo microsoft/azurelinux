@@ -28,7 +28,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel-lpg-innovate
-Version:        6.6.85.1
+Version:        6.6.82.1
 Release:        1001%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -244,8 +244,8 @@ for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
 %{nil}
 
 make O=build_secure VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags} vmlinux
-objcopy -R .note -R .comment -S build_secure/vmlinux
-build_normal/scripts/sign-file -dp sha512 build_normal/certs/signing_key.pem build_normal/certs/signing_key.x509 build_secure/vmlinux
+objcopy -O binary -R .note -R .comment -S build_secure/vmlinux build_secure/vmlinux.bin
+build_normal/scripts/sign-file -dp sha512 build_normal/certs/signing_key.pem build_normal/certs/signing_key.x509 build_secure/vmlinux.bin
 
 %install
 export KBUILD_OUTPUT=build_normal
@@ -328,10 +328,10 @@ make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}
 rm -vf %{buildroot}%{_bindir}/trace
 
 install -vdm 755 %{buildroot}/lib/modules/%{uname_r}/secure
-install -vm 755 build_secure/vmlinux build_secure/vmlinux.p7s %{buildroot}/lib/modules/%{uname_r}/secure
+install -vm 755 build_secure/vmlinux.bin build_secure/vmlinux.bin.p7s %{buildroot}/lib/modules/%{uname_r}/secure
 
 install -vdm 755 %{buildroot}/etc/dracut.conf.d
-echo 'install_optional_items+=" /lib/modules/%{uname_r}/secure/vmlinux /lib/modules/%{uname_r}/secure/vmlinux.p7s "' > %{buildroot}/etc/dracut.conf.d/10-lpg-innovate-%{uname_r}.conf
+echo 'install_optional_items+=" /lib/modules/%{uname_r}/secure/vmlinux.bin /lib/modules/%{uname_r}/secure/vmlinux.bin.p7s "' > %{buildroot}/etc/dracut.conf.d/10-lpg-innovate-%{uname_r}.conf
 
 install -vdm 755 %{buildroot}/etc/default/grub.d
 echo 'GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX securekernel=128M"' > %{buildroot}/etc/default/grub.d/10-lpg-innovate.cfg
@@ -461,9 +461,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Thu Apr 17 2025 Dan Streetman <ddstreet@ieee.org> - 6.6.85.1-1001
-- update to 6.6.85.1
-
 * Tue Mar 18 2025 Dan Streetman <ddstreet@ieee.org> - 6.6.82.1-1001
 - adjust release to 1000 + release number to avoid conflicting with
   real kernel package content

@@ -1,0 +1,117 @@
+From 1d3349209f339e6a68312fce076e355bc767d76c Mon Sep 17 00:00:00 2001
+From: Clemens Lang <cllang@redhat.com>
+Date: Mon, 12 Sep 2022 11:07:38 +0200
+Subject: [PATCH 5/7] Apply patch stunnel-5.69-default-tls-version.patch
+
+Patch-name: stunnel-5.69-default-tls-version.patch
+Patch-id: 5
+From-dist-git-commit: 70b3076eb09912b3a11f371b8c523303114fffa3
+---
+ src/ctx.c        | 34 ++++++++++++++++++++++------------
+ src/options.c    | 15 +++++++++++----
+ src/prototypes.h |  3 +++
+ 3 files changed, 36 insertions(+), 16 deletions(-)
+
+diff --git a/src/ctx.c b/src/ctx.c
+index 6a42a6b..cba24d9 100644
+--- a/src/ctx.c
++++ b/src/ctx.c
+@@ -152,19 +152,29 @@ int context_init(SERVICE_OPTIONS *section) { /* init TLS context */
+     section->ctx=SSL_CTX_new(section->option.client ?
+         TLS_client_method() : TLS_server_method());
+ #endif /* OPENSSL_VERSION_NUMBER>=0x30000000L */
+-    if(section->min_proto_version &&
+-            !SSL_CTX_set_min_proto_version(section->ctx,
+-            section->min_proto_version)) {
+-        s_log(LOG_ERR, "Failed to set the minimum protocol version 0x%X",
+-            section->min_proto_version);
+-        return 1; /* FAILED */
++    if (section->min_proto_version == USE_DEFAULT_TLS_VERSION) {
++        s_log(LOG_INFO, "Using the default TLS minimum version as specified in"
++                " crypto policies. Not setting explicitly.");
++    } else {
++        if(section->min_proto_version &&
++                !SSL_CTX_set_min_proto_version(section->ctx,
++                section->min_proto_version)) {
++            s_log(LOG_ERR, "Failed to set the minimum protocol version 0x%X",
++                section->min_proto_version);
++            return 1; /* FAILED */
++        }
+     }
+-    if(section->max_proto_version &&
+-            !SSL_CTX_set_max_proto_version(section->ctx,
+-            section->max_proto_version)) {
+-        s_log(LOG_ERR, "Failed to set the maximum protocol version 0x%X",
+-            section->max_proto_version);
+-        return 1; /* FAILED */
++    if (section->max_proto_version == USE_DEFAULT_TLS_VERSION) {
++        s_log(LOG_INFO, "Using the default TLS maximum version as specified in"
++                " crypto policies. Not setting explicitly");
++    } else {
++        if(section->max_proto_version &&
++                !SSL_CTX_set_max_proto_version(section->ctx,
++                section->max_proto_version)) {
++            s_log(LOG_ERR, "Failed to set the maximum protocol version 0x%X",
++                section->max_proto_version);
++            return 1; /* FAILED */
++        }
+     }
+ #else /* OPENSSL_VERSION_NUMBER<0x10100000L */
+     if(section->option.client)
+diff --git a/src/options.c b/src/options.c
+index 4d31815..2ec5934 100644
+--- a/src/options.c
++++ b/src/options.c
+@@ -3371,8 +3371,9 @@ NOEXPORT const char *parse_service_option(CMD cmd, SERVICE_OPTIONS **section_ptr
+             return "Invalid protocol version";
+         return NULL; /* OK */
+     case CMD_INITIALIZE:
+-        if(section->max_proto_version && section->min_proto_version &&
+-                section->max_proto_version<section->min_proto_version)
++        if(section->max_proto_version != USE_DEFAULT_TLS_VERSION
++                && section->min_proto_version != USE_DEFAULT_TLS_VERSION
++                && section->max_proto_version<section->min_proto_version)
+             return "Invalid protocol version range";
+         break;
+     case CMD_PRINT_DEFAULTS:
+@@ -3390,7 +3391,10 @@ NOEXPORT const char *parse_service_option(CMD cmd, SERVICE_OPTIONS **section_ptr
+     /* sslVersionMax */
+     switch(cmd) {
+     case CMD_SET_DEFAULTS:
+-        section->max_proto_version=0; /* highest supported */
++        section->max_proto_version=USE_DEFAULT_TLS_VERSION; /* use defaults in
++                                                               OpenSSL crypto
++                                                               policies.Do not
++                                                               override it */
+         break;
+     case CMD_SET_COPY:
+         section->max_proto_version=new_service_options.max_proto_version;
+@@ -3421,7 +3425,10 @@ NOEXPORT const char *parse_service_option(CMD cmd, SERVICE_OPTIONS **section_ptr
+     /* sslVersionMin */
+     switch(cmd) {
+     case CMD_SET_DEFAULTS:
+-        section->min_proto_version=0; /* lowest supported */
++        section->min_proto_version=USE_DEFAULT_TLS_VERSION; /* use defaults in
++                                                               OpenSSL crypto
++                                                               policies. Do not
++                                                               override it */
+         break;
+     case CMD_SET_COPY:
+         section->min_proto_version=new_service_options.min_proto_version;
+diff --git a/src/prototypes.h b/src/prototypes.h
+index 0ecd719..a126c9e 100644
+--- a/src/prototypes.h
++++ b/src/prototypes.h
+@@ -940,6 +940,9 @@ ICON_IMAGE load_icon_default(ICON_TYPE);
+ ICON_IMAGE load_icon_file(const char *);
+ #endif
+ 
++#define USE_DEFAULT_TLS_VERSION ((int)-2) /* Use defaults in OpenSSL
++                                             crypto policies */
++
+ #endif /* defined PROTOTYPES_H */
+ 
+ /* end of prototypes.h */
+-- 
+2.39.2
+

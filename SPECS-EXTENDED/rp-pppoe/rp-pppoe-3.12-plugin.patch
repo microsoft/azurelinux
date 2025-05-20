@@ -1,0 +1,12 @@
+diff -up rp-pppoe-3.12/src/configure.in.than rp-pppoe-3.12/src/configure.in
+--- rp-pppoe-3.12/src/configure.in.than	2015-12-11 16:19:38.700092797 +0100
++++ rp-pppoe-3.12/src/configure.in	2015-12-11 16:20:15.670875690 +0100
+@@ -26,6 +26,7 @@ AC_CHECK_HEADERS(linux/if_pppox.h, [], [
+ #include<net/ethernet.h>
+ #include<linux/if.h>
+ #include<linux/in.h>
++#include<linux/in6.h>
+ ])
+ 
+ dnl Checks for typedefs, structures, and compiler characteristics.
+diff -up rp-pppoe-3.12/src/configure.than rp-pppoe-3.12/src/configure

@@ -1,0 +1,143 @@
+#! /bin/bash
+# Generated automatically from pppoe-stop.in by configure.
+#***********************************************************************
+#
+# pppoe-stop
+#
+# Shell script to bring down an PPPoE connection
+#
+# Copyright (C) 2000 Roaring Penguin Software Inc.
+#
+# $Id$
+#
+# This file may be distributed under the terms of the GNU General
+# Public License.
+#
+# LIC: GPL
+#
+# Usage: pppoe-stop [config_file]
+# If config_file is omitted, defaults to /etc/ppp/pppoe.conf
+#
+#***********************************************************************
+
+export PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+IP=/usr/sbin/ip
+LS=/bin/ls
+NETWORKDIR=/etc/sysconfig/network-scripts
+
+# Set to "C" locale so we can parse messages from commands
+LANG=C
+export LANG
+
+get_device() {
+    if [ ! -d $NETWORKDIR ] ; then
+        $ECHO "** $NETWORKDIR not found"
+        $ECHO "** Quitting"
+        exit 1
+    fi
+
+    cd $NETWORKDIR
+    interfaces=$($LS ifcfg-ppp* 2>/dev/null | egrep -v '(~|\.bak)$' | \
+                 egrep -v '(rpmsave|rpmorig|rpmnew)' | sed 's/^ifcfg-//g')
+
+    for i in $interfaces ; do
+        test -f ifcfg-$i && . ifcfg-$i 2>/dev/null
+        if [ "$TYPE" = "xDSL" ] ; then
+            CONFIG=$NETWORKDIR/ifcfg-$i
+            break
+        fi
+    done
+}
+
+ME="`basename $0`"
+LOGGER="/usr/bin/logger -t $ME"
+CONFIG="$1"
+if [ -z "$CONFIG" ] ; then
+    get_device
+    [ -z "$CONFIG" ] && CONFIG=/etc/ppp/pppoe.conf
+fi
+
+if [ ! -f "$CONFIG" -o ! -r "$CONFIG" ] ; then
+    [ "$DEBUG" = "1" ] && echo "$ME: Cannot read configuration file '$CONFIG'" >& 2
+    exit 1
+fi
+
+export CONFIG
+. $CONFIG
+
+PPPOE_PIDFILE="$PIDFILE.pppoe"
+PPPD_PIDFILE="$PIDFILE.pppd"
+STARTPID="$PIDFILE.start"
+
+# Backward config file compatibility
+if test "$DEMAND" = "" ; then
+	DEMAND=no
+fi
+
+# Ignore SIGTERM
+trap "" 15
+
+# Check for pidfile
+if [ -r "$PIDFILE" ] ; then
+    PID=`cat $PIDFILE`
+
+    # Check if still running
+    kill -0 $PID > /dev/null 2>&1
+    if [ $? != 0 ] ; then
+        [ "$DEBUG" = "1" ] && echo "$ME: The pppoe-connect script (PID $PID) appears to have died" >& 2
+    fi
+
+    # Kill pppd, which should in turn kill pppoe
+    if [ -r "$PPPD_PIDFILE" ] ; then
+        PPPD_PID=`cat "$PPPD_PIDFILE"`
+        $LOGGER -p daemon.notice "Killing pppd"
+        [ "$DEBUG" = "1" ] && echo "Killing pppd ($PPPD_PID)"
+        kill $PPPD_PID > /dev/null 2>&1
+    fi
+
+    # Kill pppoe-start
+    PIDS=`cat $STARTPID`
+    kill -0 $PIDS > /dev/null 2>&1
+    if [ $? = 0 ] ; then
+        $LOGGER -p daemon.notice "Killing pppoe-connect"
+        kill $PIDS > /dev/null 2>&1
+    fi
+
+    # Kill pppoe-connect
+    $LOGGER -p daemon.notice "Killing pppoe-connect"
+    [ "$DEBUG" = "1" ] && echo "Killing pppoe-connect ($PID)"
+    kill $PID > /dev/null 2>&1
+
+    # Kill pppd again, in case it's still hanging around
+    if [ -r "$PPPD_PIDFILE" ] ; then
+       PPPD_PID=`cat "$PPPD_PIDFILE"`
+       kill -9 $PPPD_PID > /dev/null 2>&1 || exit 1
+    fi
+
+    # Kill br2684ctl if necessary
+    if [ -n "$BR2684DEV" -a -r /var/run/nas$BR2684DEV.pid ]; then
+	PIDS=`cat /var/run/nas$BR2684DEV.pid`
+	kill -0 $PIDS > /dev/null 2>&1
+	if [ $? = 0 ]; then
+	    $LOGGER -p daemon.notice "Killing br2684ctl for nas$BR2684DEV"
+	    kill $PIDS > /dev/null 2>&1
+	fi
+	rm -f /var/run/nas$BR2684DEV.pid
+    fi
+
+    rm -f "$PIDFILE" "$PPPD_PIDFILE" "$PPPOE_PIDFILE" "$STARTPID"
+else
+    [ "$DEBUG" = "1" ] && echo "$ME: No PPPoE connection appears to be running" >&2
+    exit 1
+fi
+
+# add old default gw back
+if [ -s /etc/default-routes ] ; then
+    while read spec; do
+        $IP route add $spec
+    done < /etc/default-routes
+    rm -f /etc/default-routes
+fi
+
+exit 0
