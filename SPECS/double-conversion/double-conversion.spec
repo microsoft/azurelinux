@@ -82,7 +82,7 @@ CXXFLAGS="%{optflags} -fPIC" %cmake -DBUILD_SHARED_LIBS=NO
 
 %changelog
 * Wed Nov 22 2023 Sindhu Karri <lakarri@microsoft.com> - 3.1.5-9
-- Initial CBL-Mariner import from Fedora 38 (license: MIT)
+- Initial Azure Linux import from Fedora 38 (license: MIT)
 - Source license verified: BSD
 
 * Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.5-8
