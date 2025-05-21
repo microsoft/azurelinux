@@ -20642,6 +20642,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Type-Tiny",
+          "version": "2.008002",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-2.008002.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Types-Serialiser",
           "version": "1.01",
           "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Types-Serialiser-1.01.tar.gz"

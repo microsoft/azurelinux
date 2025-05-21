@@ -1543,6 +1543,7 @@
                 "perl-Tie-IxHash",
                 "perl-TimeDate",
                 "perl-Tree-DAG_Node",
+                "perl-Type-Tiny",
                 "perl-Unicode-EastAsianWidth",
                 "perl-Unicode-LineBreak",
                 "perl-Unicode-Map8",
