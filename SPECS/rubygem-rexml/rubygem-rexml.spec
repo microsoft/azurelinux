@@ -3,7 +3,7 @@
 Summary:        REXML is an XML toolkit for Ruby
 Name:           rubygem-%{gem_name}
 Version:        3.2.7
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ Source0:        https://github.com/ruby/rexml/archive/refs/tags/v%{version}.tar.
 Patch0:         CVE-2024-41946.patch
 Patch1:         CVE-2024-49761.patch
 Patch2:         CVE-2024-39908.patch
+Patch3:         CVE-2024-43398.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
@@ -37,6 +38,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Wed May 21 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.2.7-5
+- Patch CVE-2024-43398
+
 * Tue Feb 18 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.2.7-4
 - Add patch for CVE-2024-39908
 
