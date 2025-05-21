@@ -2,7 +2,7 @@
 
 Name:           kata-containers
 Version:        3.15.0.aks0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
@@ -10,6 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
+Patch0:         CVE-2025-4574.patch
 
 ExclusiveArch: x86_64
 
@@ -39,7 +40,7 @@ Summary:        Kata Containers tools package for building the UVM
 This package contains the scripts and files required to build the UVM
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
+%autosetup -p1 -a1 -n %{name}-%{version}
 pushd %{_builddir}/%{name}-%{version}
 tar -xf %{SOURCE1}
 popd
@@ -112,6 +113,9 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Tue May 20 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 3.15.0.aks0-2
+- Patch CVE-2025-4574
+
 * Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.15.0.aks0-1
 - Auto-upgrade to 3.15.0.aks0
 
