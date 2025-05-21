@@ -18,9 +18,7 @@ Patch1:         CVE-2025-27144.patch
 Patch2:         CVE-2025-22868.patch
 Patch3:         CVE-2025-22869.patch
 Patch4:         CVE-2025-30204.patch
-# CVE-2025-32386 and CVE-2025-32387 are fixed in 3.17.3 by https://github.com/helm/helm/commit/d8ca55fc669645c10c0681d49723f4bb8c0b1ce7
 Patch5:         CVE-2025-32386.patch
-# CVE-2025-22872 is fixed in go net v0.38 by https://github.com/golang/net/commit/e1fcd82abba34df74614020343be8eb1fe85f0d9
 Patch6:         CVE-2025-22872.patch
 
 BuildRequires:  golang
