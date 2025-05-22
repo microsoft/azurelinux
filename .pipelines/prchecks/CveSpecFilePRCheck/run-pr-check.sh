@@ -117,14 +117,21 @@ fi
 # Enhanced GitHub integration settings
 echo "🔍 Setting up GitHub API access..."
 
-# IMPORTANT: We're using SYSTEM_ACCESSTOKEN as our single source of GitHub auth
-# Do NOT explicitly set GITHUB_ACCESS_TOKEN since the GitHubClient will directly use SYSTEM_ACCESSTOKEN
-if [ -n "${SYSTEM_ACCESSTOKEN:-}" ]; then
+# IMPORTANT: Prefer CBL-Mariner bot token from keyvault over SYSTEM_ACCESSTOKEN
+# Check if the GITHUB_TOKEN is available (from apply-security-config.sh)
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+  echo "✅ CBL-Mariner bot token is available for GitHub authentication (from keyvault)"
+  # Log the token prefix (first few chars) for debugging
+  echo "🔑 CBL-Mariner bot token prefix: ${GITHUB_TOKEN:0:4}..."
+# Fall back to SYSTEM_ACCESSTOKEN if no CBL-Mariner bot token is available
+elif [ -n "${SYSTEM_ACCESSTOKEN:-}" ]; then
   echo "✅ SYSTEM_ACCESSTOKEN is available for GitHub OAuth authentication"
+  echo "🔄 Setting GITHUB_TOKEN to SYSTEM_ACCESSTOKEN for compatibility"
+  export GITHUB_TOKEN="${SYSTEM_ACCESSTOKEN}"
   # Log the token prefix (first few chars) for debugging
   echo "🔑 Token prefix: ${SYSTEM_ACCESSTOKEN:0:4}..."
 else
-  echo "❌ SYSTEM_ACCESSTOKEN is not set - GitHub integration will be disabled"
+  echo "❌ No GitHub token found - GitHub integration will be disabled"
   # Disable GitHub integration features if no token is available
   POST_GITHUB_COMMENTS=false
   USE_GITHUB_CHECKS=false

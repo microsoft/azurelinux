@@ -411,7 +411,7 @@ def get_severity_exit_code(severity: Severity) -> int:
         return EXIT_SUCCESS
 
 def update_github_status(severity: Severity, anti_patterns: List[AntiPattern], ai_analysis: str, 
-                        analyzer: ResultAnalyzer, post_comments: bool = True, use_checks_api: bool = True) -> None:
+                         analyzer: ResultAnalyzer, post_comments: bool = True, use_checks_api: bool = True) -> None:
     """
     Updates GitHub with PR check status and optionally posts comments.
     
@@ -423,9 +423,10 @@ def update_github_status(severity: Severity, anti_patterns: List[AntiPattern], a
         post_comments: Whether to post comments on GitHub PR
         use_checks_api: Whether to use GitHub Checks API
     """
-    # Skip GitHub updates if environment variables aren't set
-    if not os.environ.get("GITHUB_ACCESS_TOKEN"):
-        logger.warning("GITHUB_ACCESS_TOKEN not set, skipping GitHub updates")
+    # Skip GitHub updates if no GitHub token is available
+    # Will use GITHUB_TOKEN (set from cbl-mariner bot PAT in key vault) or SYSTEM_ACCESSTOKEN
+    if not (os.environ.get("GITHUB_TOKEN") or os.environ.get("SYSTEM_ACCESSTOKEN")):
+        logger.warning("No GitHub token available (GITHUB_TOKEN or SYSTEM_ACCESSTOKEN), skipping GitHub updates")
         return
     
     # Get commit SHA from environment
@@ -435,8 +436,10 @@ def update_github_status(severity: Severity, anti_patterns: List[AntiPattern], a
         return
     
     try:
-        # Initialize GitHub client
-        github_client = GitHubClient()
+        # Use GitHub client passed from main() or create a new one if not provided
+        if 'github_client' not in locals():
+            logger.info("Initializing GitHub client")
+            github_client = GitHubClient()
         
         # Convert anti-patterns to dictionaries for the comment formatter
         issues_dict = []
@@ -557,6 +560,7 @@ def main():
         highest_severity = analyzer.get_highest_severity()
         
         # Update GitHub status if requested
+        github_client = GitHubClient()
         update_github_status(
             highest_severity, 
             anti_patterns, 

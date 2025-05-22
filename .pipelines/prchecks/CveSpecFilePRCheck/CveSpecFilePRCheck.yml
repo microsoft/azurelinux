@@ -1,5 +1,7 @@
 # prchecks/CveSpecFilePRCheck/CveSpecFilePRCheck.yml
 # Trigger on PRs to fasttrack/abadawi/test/3.0 when .spec or .patch files change
+# Uses the CBL-Mariner bot PAT from key vault to post PR comments on GitHub
+# Also performs anti-pattern detection and AI analysis of spec file changes
 
 # ──────────────────────────────────────────────────────────────────────────────
 # 1) Reference your GitHub service connection here
@@ -98,12 +100,14 @@ steps:
         which python3
         echo "Using system Python instead of downloading version"
 
-  # 5) Run PR‐check entrypoint with SYSTEM_ACCESSTOKEN 
+  # 5) Run PR‐check entrypoint with GitHub authentication
   - task: Bash@3
     displayName: '🔍 Run PR Check'
     env:
-      # Use System.AccessToken for GitHub authentication
+      # Use System.AccessToken as fallback for GitHub authentication
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      # Use the CBL-Mariner bot PAT from key vault (primary auth method)
+      GITHUB_TOKEN: $(githubPrPat)
       # Explicitly set GitHub repo name from Azure DevOps variables
       GITHUB_REPOSITORY: $(Build.Repository.Name)
       # Set PR number explicitly

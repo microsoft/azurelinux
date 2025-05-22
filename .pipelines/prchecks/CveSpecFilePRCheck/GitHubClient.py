@@ -39,9 +39,9 @@ class GitHubClient:
         """Initialize the GitHub client using environment variables for auth"""
         # Try multiple token environment variables in order of preference
         token_vars = [
-            "SYSTEM_ACCESSTOKEN",  # Prioritize Azure DevOps OAuth token first
-            "GITHUB_ACCESS_TOKEN", 
-            "GITHUB_TOKEN", 
+            "GITHUB_TOKEN",  # Prioritize CBL-Mariner bot PAT from key vault
+            "SYSTEM_ACCESSTOKEN",  # Fall back to Azure DevOps OAuth token
+            "GITHUB_ACCESS_TOKEN",
             "AZDO_GITHUB_TOKEN"
         ]
         

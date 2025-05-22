@@ -1,4 +1,35 @@
-# scripts/apply-security-config.sh
+# scripts/app# Locate this script's directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_FILE="$SCRIPT_DIR/security-config-dev.json"
+
+# Function to get a secret from Azure Key Vault
+get_azure_secret_value_from_keyvault() {
+  local vault_name="$1"
+  local secret_name="$2"
+  local env_var_name="$3"
+  
+  echo "Retrieving secret $secret_name from key vault $vault_name"
+  local secret_value
+  secret_value=$(az keyvault secret show --vault-name "$vault_name" --name "$secret_name" --query "value" -o tsv)
+  
+  if [ -z "$secret_value" ]; then
+    echo "Error: Failed to retrieve secret $secret_name from key vault $vault_name"
+    return 1
+  fi
+  
+  # Set the environment variable with the secret value
+  declare -g "$env_var_name=$secret_value"
+  echo "Successfully retrieved secret and set to environment variable $env_var_name"
+}
+
+# Parse the --openaiModel argument
+CONFIG_OPENAI_MODEL=""
+for arg in "$@"; do
+  case $arg in
+    --openaiModel=*) CONFIG_OPENAI_MODEL="${arg#*=}" ;;  # e.g. o3-mini
+    *) ;;
+  esac
+doneconfig.sh
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -24,6 +55,9 @@ for arg in "$@"; do
   esac
 done
 
+# OPENAI settings
+#---------------------------
+
 # 1) Login via the user-assigned managed identity
 UMI_ID=$(jq -r '.umiId' "$CONFIG_FILE")   # Extract umiId
 # Emit pipeline var for UMI (for other tasks if needed)
@@ -48,3 +82,21 @@ export OPENAI_API_VERSION
 export OPENAI_API_BASE
 export OPENAI_DEPLOYMENT_NAME
 export OPENAI_MODEL_NAME
+
+
+# CBL-Mariner repo on github
+#---------------------------
+KV_NAME=$(jq -r '.cblMarinerRepo.keyvaultName' $CONFIG_FILE)
+PRPAT_NAME=$(jq -r '.cblMarinerRepo.secretNames.prPatName' $CONFIG_FILE)
+
+echo "Get CBL-Mariner github config"
+echo "  - KV_NAME:        $KV_NAME"
+echo "  - PRPAT_NAME:     $PRPAT_NAME"
+
+# set PR config
+get_azure_secret_value_from_keyvault "$KV_NAME" "$PRPAT_NAME" GITHUB_PRPAT
+echo "##vso[task.setvariable variable=githubPrPat;issecret=true]$GITHUB_PRPAT"
+
+# Also export the PAT so it's available to child processes
+export GITHUB_TOKEN="$GITHUB_PRPAT"
+echo "GitHub Token has been exported as GITHUB_TOKEN environment variable"

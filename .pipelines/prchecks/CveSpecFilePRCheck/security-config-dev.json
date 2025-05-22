@@ -26,6 +26,13 @@
         "openaiDeploymentName":  "o3-mini",
         "openaiModelName":       "o3-mini"
       }
+    },
+    
+    "cblMarinerRepo": {
+        "keyvaultName": "mariner-pipelines-kv",
+        "secretNames": {
+            "prPatName": "cblmarghGithubPRPat"
+        }
     }
   }
 }
