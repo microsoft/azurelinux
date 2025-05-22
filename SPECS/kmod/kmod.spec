@@ -1,7 +1,7 @@
 Summary:        Utilities for loading kernel modules
 Name:           kmod
-Version:        30
-Release:        2%{?dist}
+Version:        31
+Release:        1%{?dist}
 License:        LGPLv2.1+ AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -58,8 +58,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/bash-completion/completions/kmod
 
 %files devel
-%{_libdir}/pkgconfig/*.pc
-%{_includedir}/*
 %{_libdir}/pkgconfig/*.pc
 %{_includedir}/*
 %{_libdir}/*.so
