@@ -11,12 +11,12 @@ parameters:
     type: object
     default:
       - name: "AMD64"
-        agentPool: "$(DEV_AMD64_Managed)"
+        agentPool: "$(DEV_AMD64_Managed_NoUMI_AZL3)"
         maxCPUs: "$(($(nproc) / 2))"
         rawToolchainCacheURL: "$(rawToolchainCacheURL_AMD64_3.0)"
         rawToolchainExpectedHash: "$(rawToolchainCacheHash_AMD64_3.0)"
       - name: "ARM64"
-        agentPool: "$(DEV_ARM64_Managed)"
+        agentPool: "$(DEV_ARM64_Managed_NoUMI_AZL3)"
         maxCPUs: "$(($(nproc) / 3))"
         rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64_3.0)"
         rawToolchainExpectedHash: "$(rawToolchainCacheHash_ARM64_3.0)"
@@ -63,6 +63,13 @@ extends:
                   ob_artifactBaseName: $(toolchainArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
                 steps:
+                  # Making sure all pip installations are using the authorized feed.
+                  - task: PipAuthenticate@1
+                    displayName: Enable internal pip feed
+                    inputs:
+                      onlyAddExtraIndex: false
+                      artifactFeeds: "MarinerFeed"
+
                   - template: .pipelines/templates/RawToolchainDownload.yml@self
                     parameters:
                       rawToolchainCacheURL: ${{ configuration.rawToolchainCacheURL }}
@@ -120,6 +127,13 @@ extends:
                       patterns: "**/$(toolchainTarballName)"
                       targetPath: $(inputArtifactsLocation)
 
+                  # Making sure all pip installations are using the authorized feed.
+                  - task: PipAuthenticate@1
+                    displayName: Enable internal pip feed
+                    inputs:
+                      onlyAddExtraIndex: false
+                      artifactFeeds: "MarinerFeed"
+
                   - template: .pipelines/templates/PackageBuild.yml@self
                     parameters:
                       checkBuildRetries: "1"
@@ -172,6 +186,13 @@ extends:
                       patterns: "**/$(toolchainTarballName)"
                       targetPath: $(inputArtifactsLocation)
 
+                  # Making sure all pip installations are using the authorized feed.
+                  - task: PipAuthenticate@1
+                    displayName: Enable internal pip feed
+                    inputs:
+                      onlyAddExtraIndex: false
+                      artifactFeeds: "MarinerFeed"
+
                   - template: .pipelines/templates/PackageBuild.yml@self
                     parameters:
                       checkBuildRetries: "1"
@@ -215,6 +236,13 @@ extends:
                       artifact: $(rpmsArtifactName)
                       patterns: "**/$(rpmsTarballName)"
                       targetPath: $(inputArtifactsLocation)
+
+                  # Making sure all pip installations are using the authorized feed.
+                  - task: PipAuthenticate@1
+                    displayName: Enable internal pip feed
+                    inputs:
+                      onlyAddExtraIndex: false
+                      artifactFeeds: "MarinerFeed"
 
                   - template: .pipelines/templatesWithCheckout/SodiffCheck.yml@self
                     parameters:

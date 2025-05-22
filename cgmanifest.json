@@ -1787,8 +1787,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor-cvm",
-          "version": "38.0.72.2",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v38.0.72.2.tar.gz"
+          "version": "41.0.79",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v41.0.79.tar.gz"
         }
       }
     },
@@ -3358,8 +3358,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "26.2.5.11",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.11/otp-OTP-26.2.5.11.tar.gz"
+          "version": "26.2.5.12",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.12/otp-OTP-26.2.5.12.tar.gz"
         }
       }
     },
@@ -4670,8 +4670,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.23.8",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.8-1/go1.23.8-20250401.2.src.tar.gz"
+          "version": "1.23.9",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.9-1/go1.23.9-20250506.5.src.tar.gz"
         }
       }
     },
@@ -4680,8 +4680,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.24.2",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.2-1/go1.24.2-20250401.4.src.tar.gz"
+          "version": "1.24.3",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.3-1/go1.24.3-20250506.3.src.tar.gz"
         }
       }
     },
@@ -8161,8 +8161,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.2.0.azl5",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl5.tar.gz"
+          "version": "3.15.0.aks0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.15.0.aks0.tar.gz"
         }
       }
     },
@@ -8171,8 +8171,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "3.2.0.azl5",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl5.tar.gz"
+          "version": "3.15.0.aks0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.15.0.aks0.tar.gz"
         }
       }
     },
@@ -8281,8 +8281,8 @@
         "type": "other",
         "other": {
           "name": "kernel-lpg-innovate",
-          "version": "6.6.82.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/lpg-innovate/6.6.82.1.tar.gz"
+          "version": "6.6.89.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/lpg-innovate/6.6.89.2.tar.gz"
         }
       }
     },
@@ -8291,8 +8291,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.157.mshv1",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.157.mshv1.tar.gz"
+          "version": "6.6.57.mshv4",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mshv-6.6.57.mshv4.tar.gz"
         }
       }
     },
@@ -8321,8 +8321,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.1.58.mshv4",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.58.mshv4.tar.gz"
+          "version": "6.1.58.mshv8",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.58.mshv8.tar.gz"
         }
       }
     },
@@ -8541,8 +8541,8 @@
         "type": "other",
         "other": {
           "name": "kyotocabinet",
-          "version": "1.2.78",
-          "downloadUrl": "https://dbmx.net/kyotocabinet/pkg/kyotocabinet-1.2.78.tar.gz"
+          "version": "1.2.80",
+          "downloadUrl": "https://dbmx.net/kyotocabinet/pkg/kyotocabinet-1.2.80.tar.gz"
         }
       }
     },
@@ -9581,8 +9581,8 @@
         "type": "other",
         "other": {
           "name": "libgeotiff",
-          "version": "1.7.1",
-          "downloadUrl": "https://download.osgeo.org/geotiff/libgeotiff/libgeotiff-1.7.1.tar.gz"
+          "version": "1.7.3",
+          "downloadUrl": "https://download.osgeo.org/geotiff/libgeotiff/libgeotiff-1.7.3.tar.gz"
         }
       }
     },
@@ -12551,8 +12551,8 @@
         "type": "other",
         "other": {
           "name": "lua-json",
-          "version": "1.3.2",
-          "downloadUrl": "https://github.com/harningt/luajson/archive/7a86bc22066858afeb23845a191a6ab680b46233/luajson-1.3.2-7a86bc2.tar.gz"
+          "version": "1.3.4",
+          "downloadUrl": "https://github.com/harningt/luajson/archive/1.3.4/luajson-1.3.4.tar.gz"
         }
       }
     },
@@ -12570,9 +12570,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "lua-lunit",
-          "version": "0.5",
-          "downloadUrl": "https://github.com/mrothNET/lunit/archive/refs/tags/lunit-0.5.tar.gz"
+          "name": "lua-lunitx",
+          "version": "0.8.1",
+          "downloadUrl": "https://github.com/dcurrie/lunit/archive/0.8.1.tar.gz"
         }
       }
     },
@@ -12961,8 +12961,8 @@
         "type": "other",
         "other": {
           "name": "marisa",
-          "version": "0.2.4",
-          "downloadUrl": "https://marisa-trie.googlecode.com/files/marisa-0.2.4.tar.gz"
+          "version": "0.2.6",
+          "downloadUrl": "https://github.com/s-yata/marisa-trie/archive/refs/tags/v0.2.6.tar.gz"
         }
       }
     },
@@ -14642,8 +14642,8 @@
         "type": "other",
         "other": {
           "name": "objenesis",
-          "version": "3.1",
-          "downloadUrl": "https://github.com/easymock/objenesis/archive/3.1.tar.gz"
+          "version": "3.3",
+          "downloadUrl": "https://github.com/easymock/objenesis/archive/refs/tags/3.3.tar.gz"
         }
       }
     },
@@ -18253,8 +18253,8 @@
         "type": "other",
         "other": {
           "name": "perl-JSON-MaybeXS",
-          "version": "1.004003",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/JSON/JSON-MaybeXS-1.004003.tar.gz"
+          "version": "1.004008",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/JSON/JSON-MaybeXS-1.004008.tar.gz"
         }
       }
     },
@@ -20642,6 +20642,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Type-Tiny",
+          "version": "2.008002",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-2.008002.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Types-Serialiser",
           "version": "1.01",
           "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Types-Serialiser-1.01.tar.gz"
@@ -22123,8 +22133,8 @@
         "type": "other",
         "other": {
           "name": "python-beautifulsoup4",
-          "version": "4.11.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-4.11.2.tar.gz"
+          "version": "4.12.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-4.12.3.tar.gz"
         }
       }
     },
@@ -22143,8 +22153,8 @@
         "type": "other",
         "other": {
           "name": "python-blinker",
-          "version": "1.7.0",
-          "downloadUrl": "https://github.com/pallets-eco/blinker/releases/download/1.7.0/blinker-1.7.0.tar.gz"
+          "version": "1.9.0",
+          "downloadUrl": "https://github.com/pallets-eco/blinker/releases/download/1.9.0/blinker-1.9.0.tar.gz"
         }
       }
     },
@@ -22603,8 +22613,8 @@
         "type": "other",
         "other": {
           "name": "python-dmidecode",
-          "version": "3.12.2",
-          "downloadUrl": "https://github.com/nima/python-dmidecode/archive/refs/tags/python-dmidecode-3.12.2.tar.gz"
+          "version": "3.12.3",
+          "downloadUrl": "https://github.com/nima/python-dmidecode/archive/refs/tags/v3.12.3.tar.gz"
         }
       }
     },
@@ -26184,8 +26194,8 @@
         "type": "other",
         "other": {
           "name": "rp-pppoe",
-          "version": "3.12",
-          "downloadUrl": "https://dianne.skoll.ca/projects/rp-pppoe/download/OLD/rp-pppoe-3.12.tar.gz"
+          "version": "4.0",
+          "downloadUrl": "https://downloads.uls.co.za/rp-pppoe/rp-pppoe-4.0.tar.gz"
         }
       }
     },
@@ -27451,11 +27461,11 @@
     },
     {
       "component": {
-	"type": "other",
-	"other": {
+        "type": "other",
+        "other": {
           "name": "rust",
-	  "version": "1.85.0",
-	  "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.85.0-src.tar.xz"
+          "version": "1.85.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.85.0-src.tar.xz"
         }
       }
     },
@@ -27476,6 +27486,16 @@
           "name": "rust-packaging",
           "version": "14",
           "downloadUrl": "https://releases.pagure.org/fedora-rust/rust2rpm/rust2rpm-14.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "s-nail",
+          "version": "14.9.25",
+          "downloadUrl": "https://www.sdaoden.eu/downloads/s-nail-14.9.25.tar.xz"
         }
       }
     },
@@ -28536,8 +28556,8 @@
         "type": "other",
         "other": {
           "name": "stunnel",
-          "version": "5.70",
-          "downloadUrl": "https://www.stunnel.org/downloads/stunnel-5.70.tar.gz"
+          "version": "5.74",
+          "downloadUrl": "https://www.stunnel.org/downloads/stunnel-5.74.tar.gz"
         }
       }
     },
@@ -28656,8 +28676,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.8.0",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.8.0.tar.gz"
+          "version": "1.8.1",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.8.1.tar.gz"
         }
       }
     },
@@ -30257,8 +30277,8 @@
         "type": "other",
         "other": {
           "name": "xcb-util-wm",
-          "version": "0.4.1",
-          "downloadUrl": "http://xcb.freedesktop.org/dist/xcb-util-wm-0.4.1.tar.bz2"
+          "version": "0.4.2",
+          "downloadUrl": "https://xcb.freedesktop.org/dist/xcb-util-wm-0.4.2.tar.xz"
         }
       }
     },
@@ -30341,8 +30361,8 @@
         "type": "other",
         "other": {
           "name": "xdg-dbus-proxy",
-          "version": "0.1.2",
-          "downloadUrl": "https://github.com/flatpak/xdg-dbus-proxy/releases/download/0.1.2/xdg-dbus-proxy-0.1.2.tar.xz"
+          "version": "0.1.6",
+          "downloadUrl": "https://github.com/flatpak/xdg-dbus-proxy/releases/download/0.1.6/xdg-dbus-proxy-0.1.6.tar.xz"
         }
       }
     },
@@ -31219,8 +31239,8 @@
         "type": "other",
         "other": {
           "name": "zenity",
-          "version": "3.32.0",
-          "downloadUrl": "https://download.gnome.org/sources/zenity/3.32/zenity-3.32.0.tar.xz"
+          "version": "3.44.1",
+          "downloadUrl": "https://download.gnome.org/sources/zenity/3.44/zenity-3.44.1.tar.xz"
         }
       }
     },

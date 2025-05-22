@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.31.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,6 +22,7 @@ Patch7:         CVE-2024-51744.patch
 Patch8:         CVE-2025-30204.patch
 Patch9:         CVE-2025-27144.patch
 Patch10:        CVE-2025-30215.patch
+Patch11:        CVE-2025-22872.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
@@ -42,10 +43,7 @@ the community can easily add support for collecting metrics from well known serv
 Postgres, or Redis) and third party APIs (like Mailchimp, AWS CloudWatch, or Google Analytics).
 
 %prep
-%autosetup -N
-# setup vendor before patching
-tar -xf %{SOURCE1} --no-same-owner
-%autopatch -p1
+%autosetup -a1 -p1
 
 %build
 go build -mod=vendor ./cmd/telegraf
@@ -89,6 +87,9 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Tue Apr 22 2025 Mayank Singh <mayansingh@microsoft.com> - 1.31.0-10
+- Fix CVE-2025-22872 with an upstream patch
+
 * Thu Apr 17 2025 Sudipta Pandit <sudpandit@microsoft.com> - 1.31.0-9
 - Patch CVE-2025-30215
 
