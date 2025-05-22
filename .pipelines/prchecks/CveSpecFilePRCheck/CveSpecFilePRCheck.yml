@@ -157,7 +157,8 @@ steps:
   # 6) Post GitHub PR comments as a separate task
   - task: Bash@3
     displayName: '💬 Post GitHub PR Comments'
-    condition: and(succeeded(), eq('${{ parameters.postGitHubComments }}', 'true'))
+    # Always post comments, even when PR check fails (but only if enabled)
+    condition: and(always(), eq('${{ parameters.postGitHubComments }}', 'true'))
     env:
       # Use System.AccessToken as fallback for GitHub authentication
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
