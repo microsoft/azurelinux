@@ -59,7 +59,14 @@ install SymCryptEngine/inc/e_scossl.h %{buildroot}%{_includedir}/e_scossl.h
 install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/symcrypt_prov.cnf
 
 %check
-./bin/SslPlay/SslPlay
+# Run in a subshell so the exit code of the test does not affect the main shell's exit code.
+# This is important because the entire section is wrapped in a script by rpmbuild itself.
+# The test is run twice: once with the default provider and once with the SymCrypt provider.
+(
+        set -e
+        ./bin/SslPlay/SslPlay
+        ./bin/SslPlay/SslPlay --provider-path ./bin/SymCryptProvider/ --provider symcryptprovider --no-engine
+)
 
 %files
 %license LICENSE
@@ -82,6 +89,7 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 %changelog
 * Thu May 22 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.0-1
 - Auto-upgrade to 1.9.0 - Support digest state exports.
+- Added second test run that forces the use of the SymCrypt provider.
 
 * Tue May 13 2025 Tobias Brick <tobiasb@microsoft.com> - 1.8.1-1
 - Upgrade to SymCrypt-OpenSSL 1.8.1 with minor bugfixes.
