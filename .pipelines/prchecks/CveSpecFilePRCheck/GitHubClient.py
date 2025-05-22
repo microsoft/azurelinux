@@ -345,14 +345,16 @@ class GitHubClient:
         url = f"{self.api_base_url}/repos/{self.repo_name}/statuses/{commit_sha}"
         
         # Map severity levels to status states and descriptions
+        # CRITICAL and ERROR result in failure status
+        # WARNING and INFO result in success status (PR can still be merged)
         if severity == Severity.CRITICAL:
-            state = "failure"
+            state = "failure" 
             description = "Critical issues found - must be fixed"
         elif severity == Severity.ERROR:
             state = "failure"
             description = "Errors found - must be fixed"
         elif severity == Severity.WARNING:
-            state = "success"
+            state = "success"  # WARNING allows PR to pass
             description = "Warnings found - review recommended"
         else:  # INFO or None
             state = "success"
@@ -377,6 +379,7 @@ class GitHubClient:
                                ai_analysis: str = "") -> str:
         """
         Format a comment based on the severity of issues.
+        This uses a more concise approach since the new implementation is in post_github_comment.py
         
         Args:
             severity: Highest severity level of detected issues
@@ -386,7 +389,11 @@ class GitHubClient:
         Returns:
             Formatted markdown for a GitHub comment
         """
-        # Start with a header based on severity level
+        # This method is now only used by the external post_github_comment.py
+        # which has its own implementation for creating concise comments.
+        # However, we'll keep a basic implementation here for backward compatibility.
+        
+        # Just return the header and issues list
         if severity == Severity.CRITICAL:
             header = "## 🚨 CRITICAL ISSUES DETECTED\n\n"
             header += "These issues **must be fixed** before the PR can be merged.\n\n"

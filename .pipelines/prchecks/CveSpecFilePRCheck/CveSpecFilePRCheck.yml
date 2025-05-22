@@ -120,17 +120,17 @@ steps:
         cd .pipelines/prchecks/CveSpecFilePRCheck
         chmod +x run-pr-check.sh
 
-        # Build command with analysis-only flags
-        CMD="./run-pr-check.sh"
-        if [ "$FAIL_ON_WARNINGS"       = "True" ]; then CMD="$CMD --fail-on-warnings"; fi
-        if [ "$USE_EXIT_CODE_SEVERITY" = "True" ]; then CMD="$CMD --exit-code-severity"; fi
+        # Build command with analysis-only flags and explicitly pass exit-code-severity
+        CMD="./run-pr-check.sh --exit-code-severity"
+        if [ "$FAIL_ON_WARNINGS" = "True" ]; then CMD="$CMD --fail-on-warnings"; fi
         # Explicitly omit GitHub integration flags
         
         echo "Running analysis command: $CMD"
         $CMD
+        ANALYSIS_EXIT_CODE=$?
         
         # Save exit code to publish as pipeline variable
-        echo "##vso[task.setvariable variable=AnalysisExitCode]$?"
+        echo "##vso[task.setvariable variable=AnalysisExitCode]$ANALYSIS_EXIT_CODE"
         
         # Verify report file was created
         if [ -f "spec_analysis_report.json" ]; then
@@ -138,6 +138,20 @@ steps:
         else
           echo "❌ Analysis report file not found"
           exit 1
+        fi
+        
+        # Interpret exit code and fail the pipeline for ERROR or CRITICAL issues
+        # EXIT_SUCCESS=0, EXIT_CRITICAL=1, EXIT_ERROR=2, EXIT_WARNING=3, EXIT_FATAL=10
+        if [ $ANALYSIS_EXIT_CODE -eq 1 ] || [ $ANALYSIS_EXIT_CODE -eq 2 ] || [ $ANALYSIS_EXIT_CODE -eq 10 ]; then
+          echo "❌ Analysis found critical or error-level issues (exit code: $ANALYSIS_EXIT_CODE)"
+          exit $ANALYSIS_EXIT_CODE
+        elif [ $ANALYSIS_EXIT_CODE -eq 3 ] && [ "$FAIL_ON_WARNINGS" = "True" ]; then
+          echo "⚠️ Analysis found warnings and fail-on-warnings is enabled (exit code: $ANALYSIS_EXIT_CODE)"
+          exit $ANALYSIS_EXIT_CODE
+        elif [ $ANALYSIS_EXIT_CODE -eq 3 ]; then
+          echo "⚠️ Analysis found warnings but pipeline allowed to continue (exit code: $ANALYSIS_EXIT_CODE)"
+        else
+          echo "✅ Analysis completed successfully (exit code: $ANALYSIS_EXIT_CODE)"
         fi
         
   # 6) Post GitHub PR comments as a separate task
