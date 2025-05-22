@@ -21,7 +21,7 @@ Distribution:   Azure Linux
 %define cvs_version 2_7_2
 Name:           xalan-j2
 Version:        2.7.2
-Release:        10%{?dist}
+Release:        11%{?dist}
 Summary:        Java XSLT processor
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -165,7 +165,7 @@ ln -sf $(build-classpath stylebook) stylebook-1.0-b3_xalan-2.jar
 popd
 ant \
   -Dservlet-api.jar=$(build-classpath servletapi5) \
-  -Dcompiler.source=1.6 -Dcompiler.target=1.6 \
+  -Dcompiler.source=1.8 -Dcompiler.target=1.8 \
   -Djava.awt.headless=true \
   -Dapi.j2se=%{_javadocdir}/java \
   -Dbuild.xalan-interpretive.jar=build/xalan-interpretive.jar \
@@ -280,6 +280,9 @@ update-alternatives --install %{_javadir}/jaxp_transform_impl.jar \
 %{_datadir}/%{name}
 
 %changelog
+* Thu May 22 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.7.2-11
+- Fixed the build for 2.7.2
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.2-10
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
