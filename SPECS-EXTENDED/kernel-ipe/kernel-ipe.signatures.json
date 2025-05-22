@@ -9,6 +9,7 @@
     "azl-ipe-boot-policy.pol": "f2b7941bd3b721aadc8e937d0472c36fe5e140221f7bb54af6ef905884e0372c",
     "Makefile": "1c2e740407215ed9b9cbbc09f9102bc99c08b370bbe2cbb0490aefdc9eb70455",
     "tarfs.c": "066084e1ca2c1e7ba83e76a6696cf17928e7efb46a2b1670a7a1f597c2d9bc51",
-    "kernel-6.6.85.1.tar.gz": "4dab471d68ce07dd31e925788c128ff1c7d9a6d2c7e0a073bd8e6701514cfee6"
+    "kernel-6.6.85.1.tar.gz": "4dab471d68ce07dd31e925788c128ff1c7d9a6d2c7e0a073bd8e6701514cfee6",
+    "ipe_cert.pem": "9ac404e858b14f806a8bd7424e3946c30a776858a28c544df46052c732adc7a7"
   }
 }
