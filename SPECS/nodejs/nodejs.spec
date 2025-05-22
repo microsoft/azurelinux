@@ -138,7 +138,7 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
-* Wed May 11 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 20.14.0-8
+* Wed May 21 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 20.14.0-8
 - Patch CVE-2025-47279
 
 * Mon Mar 10 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 20.14.0-7
