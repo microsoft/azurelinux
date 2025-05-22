@@ -411,73 +411,32 @@ def get_severity_exit_code(severity: Severity) -> int:
         return EXIT_SUCCESS
 
 def update_github_status(severity: Severity, anti_patterns: List[AntiPattern], ai_analysis: str, 
-                         analyzer: ResultAnalyzer, post_comments: bool = True, use_checks_api: bool = True) -> None:
+                         analyzer: ResultAnalyzer, post_comments: bool = False, use_checks_api: bool = False) -> None:
     """
     Updates GitHub with PR check status and optionally posts comments.
+    NOTE: This function is now deprecated. GitHub integration has been moved to a separate task.
     
     Args:
         severity: Highest severity level detected
         anti_patterns: List of anti-patterns detected
         ai_analysis: AI-generated analysis text
         analyzer: ResultAnalyzer instance for generating reports
-        post_comments: Whether to post comments on GitHub PR
-        use_checks_api: Whether to use GitHub Checks API
+        post_comments: Whether to post comments on GitHub PR (deprecated)
+        use_checks_api: Whether to use GitHub Checks API (deprecated)
     """
-    # Skip GitHub updates if no GitHub token is available
-    # Will use GITHUB_TOKEN (set from cbl-mariner bot PAT in key vault) or SYSTEM_ACCESSTOKEN
-    if not (os.environ.get("GITHUB_TOKEN") or os.environ.get("SYSTEM_ACCESSTOKEN")):
-        logger.warning("No GitHub token available (GITHUB_TOKEN or SYSTEM_ACCESSTOKEN), skipping GitHub updates")
-        return
+    # This function is kept for backwards compatibility but no longer performs GitHub updates
+    # GitHub updates are now handled by the separate post_github_comment.py script
     
-    # Get commit SHA from environment
-    commit_sha = os.environ.get("SYSTEM_PULLREQUEST_SOURCECOMMITID")
-    if not commit_sha:
-        logger.warning("SYSTEM_PULLREQUEST_SOURCECOMMITID not set, skipping GitHub updates")
-        return
+    logger.info("GitHub integration is now handled by a separate task. Skipping GitHub updates in the analysis phase.")
     
-    try:
-        # Use GitHub client passed from main() or create a new one if not provided
-        if 'github_client' not in locals():
-            logger.info("Initializing GitHub client")
-            github_client = GitHubClient()
+    # For backwards compatibility, log what would have happened
+    if post_comments:
+        logger.info("GitHub PR comments would have been posted (now handled by separate task)")
         
-        # Convert anti-patterns to dictionaries for the comment formatter
-        issues_dict = []
-        for pattern in anti_patterns:
-            issues_dict.append({
-                "id": pattern.id if hasattr(pattern, 'id') else "",
-                "name": pattern.name,
-                "description": pattern.description,
-                "severity": pattern.severity.name,
-                "recommendation": pattern.recommendation,
-                "file_path": pattern.file_path if hasattr(pattern, 'file_path') else "",
-                "line_number": pattern.line_number if hasattr(pattern, 'line_number') else ""
-            })
-        
-        # Post or update comment if enabled
-        if post_comments:
-            logger.info("Posting GitHub PR comment with analysis results...")
-            comment_body = github_client.format_severity_comment(severity, issues_dict, ai_analysis)
-            
-            # Include conclusion in the main comment instead of separate comment
-            conclusion = analyzer.extract_conclusion()
-            if conclusion:
-                comment_body += "\n\n" + conclusion
-            else:
-                logger.warning("No conclusion section found to include in comment")
-            
-            github_client.post_or_update_comment(comment_body, "azure-linux-spec-check")
-        
-        # Create or update status using the Checks API if enabled
-        if use_checks_api:
-            logger.info("Updating GitHub PR status based on severity...")
-            github_client.create_severity_status(severity, commit_sha)
-        
-        logger.info("GitHub updates completed successfully")
+    if use_checks_api:
+        logger.info("GitHub PR status would have been updated (now handled by separate task)")
     
-    except Exception as e:
-        logger.error(f"Failed to update GitHub status: {str(e)}")
-        # Continue execution - GitHub updates shouldn't cause pipeline failure
+    # No actual GitHub operations are performed in this function anymore
 
 def _derive_github_context():
     repo = os.getenv("GITHUB_REPOSITORY", "").strip()
@@ -512,6 +471,15 @@ def main():
     # Derive GitHub context from environment variables
     _derive_github_context()
     
+    # Debug environment variables related to GitHub authentication and context
+    logger.info("GitHub Environment Variables:")
+    logger.info(f"  - GITHUB_TOKEN: {'Set' if os.environ.get('GITHUB_TOKEN') else 'Not Set'}")
+    logger.info(f"  - SYSTEM_ACCESSTOKEN: {'Set' if os.environ.get('SYSTEM_ACCESSTOKEN') else 'Not Set'}")
+    logger.info(f"  - GITHUB_REPOSITORY: {os.environ.get('GITHUB_REPOSITORY', 'Not Set')}")
+    logger.info(f"  - GITHUB_PR_NUMBER: {os.environ.get('GITHUB_PR_NUMBER', 'Not Set')}")
+    logger.info(f"  - BUILD_REPOSITORY_NAME: {os.environ.get('BUILD_REPOSITORY_NAME', 'Not Set')}")
+    logger.info(f"  - SYSTEM_PULLREQUEST_PULLREQUESTNUMBER: {os.environ.get('SYSTEM_PULLREQUEST_PULLREQUESTNUMBER', 'Not Set')}")
+    
     try:
         # Gather git diff
         diff = gather_diff()
@@ -545,11 +513,20 @@ def main():
             f.write(detailed_report)
         logger.info(f"Detailed analysis report saved to {report_file}")
         
-        # Save JSON report
+        # Save JSON report with additional data for GitHub comment posting
         json_file = os.path.join(os.getcwd(), "spec_analysis_report.json")
+        
+        # Extract the conclusion for the GitHub comment
+        conclusion = analyzer.extract_conclusion()
+        
+        # Create a comprehensive report that includes everything needed for GitHub commenting
+        report_data = json.loads(analyzer.to_json())
+        report_data["conclusion"] = conclusion
+        
+        # Write the enhanced JSON report
         with open(json_file, "w") as f:
-            f.write(analyzer.to_json())
-        logger.info(f"JSON analysis report saved to {json_file}")
+            json.dump(report_data, f, indent=2)
+        logger.info(f"Enhanced JSON analysis report saved to {json_file}")
         
         # Determine exit code
         if fatal_error:

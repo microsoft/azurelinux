@@ -292,20 +292,26 @@ class GitHubClient:
         
         # Check if required environment variables are set
         if not self.token:
-            logger.warning("GITHUB_ACCESS_TOKEN not set, skipping comment posting")
-            return {}
+            logger.error("GitHub token not set - cannot post comments. Check GITHUB_TOKEN environment variable.")
+            return {"error": "No GitHub token available"}
             
         if not self.repo_name:
-            logger.warning("GITHUB_REPOSITORY not set, skipping comment posting")
-            return {}
+            logger.error("GitHub repository not set - cannot post comments. Check GITHUB_REPOSITORY environment variable.")
+            return {"error": "No GitHub repository specified"}
             
         if not self.pr_number:
-            logger.warning("GITHUB_PR_NUMBER not set, skipping comment posting")
-            return {}
+            logger.error("GitHub PR number not set - cannot post comments. Check GITHUB_PR_NUMBER environment variable.")
+            return {"error": "No GitHub PR number specified"}
             
+        # Log authentication details (safely)
+        auth_header = self.headers.get("Authorization", "None")
+        auth_type = "Bearer" if auth_header.startswith("Bearer ") else "token" if auth_header.startswith("token ") else "Unknown"
+        token_prefix = self.token[:4] if self.token else "None"
+        
         logger.info(f"Attempting to post or update comment with marker: {marker}")
         logger.info(f"Repository: {self.repo_name}")
         logger.info(f"PR number: {self.pr_number}")
+        logger.info(f"Auth type: {auth_type}, Token prefix: {token_prefix}...")
         
         # Get existing comments
         comments = self.get_pr_comments()

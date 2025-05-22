@@ -100,9 +100,50 @@ steps:
         which python3
         echo "Using system Python instead of downloading version"
 
-  # 5) Run PR‐check entrypoint with GitHub authentication
+  # 5) Run PR‐check analysis without GitHub commenting
   - task: Bash@3
-    displayName: '🔍 Run PR Check'
+    displayName: '🔍 Run PR Check Analysis'
+    env:
+      # Set the source branch and version
+      BUILD_SOURCEBRANCH: $(Build.SourceBranch)
+      SYSTEM_PULLREQUEST_SOURCECOMMITID: $(Build.SourceVersion)
+      # Set OpenAI environment variables explicitly
+      AZURE_OPENAI_ENDPOINT: $(AZURE_OPENAI_ENDPOINT)
+      AZURE_OPENAI_DEPLOYMENT_NAME: $(AZURE_OPENAI_DEPLOYMENT_NAME)
+      AZURE_OPENAI_MODEL_NAME: $(AZURE_OPENAI_MODEL_NAME)
+      AZURE_OPENAI_API_VERSION: $(AZURE_OPENAI_API_VERSION)
+    inputs:
+      targetType: inline
+      script: |
+        echo "🔍 Running analysis of spec files without GitHub commenting"
+        
+        cd .pipelines/prchecks/CveSpecFilePRCheck
+        chmod +x run-pr-check.sh
+
+        # Build command with analysis-only flags
+        CMD="./run-pr-check.sh"
+        if [ "$FAIL_ON_WARNINGS"       = "True" ]; then CMD="$CMD --fail-on-warnings"; fi
+        if [ "$USE_EXIT_CODE_SEVERITY" = "True" ]; then CMD="$CMD --exit-code-severity"; fi
+        # Explicitly omit GitHub integration flags
+        
+        echo "Running analysis command: $CMD"
+        $CMD
+        
+        # Save exit code to publish as pipeline variable
+        echo "##vso[task.setvariable variable=AnalysisExitCode]$?"
+        
+        # Verify report file was created
+        if [ -f "spec_analysis_report.json" ]; then
+          echo "✅ Analysis report generated successfully"
+        else
+          echo "❌ Analysis report file not found"
+          exit 1
+        fi
+        
+  # 6) Post GitHub PR comments as a separate task
+  - task: Bash@3
+    displayName: '💬 Post GitHub PR Comments'
+    condition: and(succeeded(), eq('${{ parameters.postGitHubComments }}', 'true'))
     env:
       # Use System.AccessToken as fallback for GitHub authentication
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
@@ -112,28 +153,26 @@ steps:
       GITHUB_REPOSITORY: $(Build.Repository.Name)
       # Set PR number explicitly
       GITHUB_PR_NUMBER: $(System.PullRequest.PullRequestNumber)
-      # Set the source branch and version
-      BUILD_SOURCEBRANCH: $(Build.SourceBranch)
+      # Set the source commit for status updates
       SYSTEM_PULLREQUEST_SOURCECOMMITID: $(Build.SourceVersion)
     inputs:
       targetType: inline
       script: |
-        # We're using SYSTEM_ACCESSTOKEN as our GitHub token (OAuth token)
-        # DO NOT set GITHUB_ACCESS_TOKEN here
-        
-        echo "🔑 Using SYSTEM_ACCESSTOKEN for GitHub authentication"
+        echo "💬 Posting analysis results as GitHub PR comments"
         echo "Repository: ${GITHUB_REPOSITORY}"
         echo "PR Number: ${GITHUB_PR_NUMBER}"
         
         cd .pipelines/prchecks/CveSpecFilePRCheck
-        chmod +x run-pr-check.sh
-
-        # Build command with your flags
-        CMD="./run-pr-check.sh"
-        if [ "$FAIL_ON_WARNINGS"       = "True" ]; then CMD="$CMD --fail-on-warnings";      fi
-        if [ "$USE_EXIT_CODE_SEVERITY" = "True" ]; then CMD="$CMD --exit-code-severity";   fi
-        if [ "$POST_GITHUB_COMMENTS"   = "True" ]; then CMD="$CMD --post-github-comments"; fi
-        if [ "$USE_GITHUB_CHECKS"      = "True" ]; then CMD="$CMD --use-github-checks";    fi
-
-        echo "Running command: $CMD"
+        
+        # Ensure the GitHub comment poster script is executable
+        chmod +x post_github_comment.py
+        
+        # Set up flags for the GitHub comment poster
+        CMD="python3 post_github_comment.py --report-file spec_analysis_report.json"
+        if [ "$USE_GITHUB_CHECKS" = "True" ]; then CMD="$CMD --use-github-checks"; fi
+        
+        echo "Running GitHub comment poster: $CMD"
         $CMD
+        
+        # Let the pipeline continue even if commenting fails
+        # The main analysis task already determined the success/failure

@@ -137,6 +137,15 @@ else
   USE_GITHUB_CHECKS=false
 fi
 
+# Double-check token availability and export explicitly
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+  echo "✅ Final validation: GITHUB_TOKEN is set (prefix: ${GITHUB_TOKEN:0:4}...)"
+  # Make sure we pass and expose this to the Python script
+  export GITHUB_TOKEN
+else
+  echo "❌ GITHUB_TOKEN is not set after authentication setup - will not be able to post comments!"
+fi
+
 # Verify GitHub integration settings
 if [ "$POST_GITHUB_COMMENTS" = "true" ] || [ "$USE_GITHUB_CHECKS" = "true" ]; then
   echo "🔍 GitHub Integration Enabled"
@@ -166,20 +175,49 @@ pip install -r requirements.txt
 # 3) Build the Python invocation command with flags
 echo "⚙️  Building Python command for CveSpecFilePRCheck.py"
 CMD="python3 CveSpecFilePRCheck.py"
+
+# Explicitly set flags based on environment variables
+echo "🔧 Configuring PR check settings:"
 if [[ "${FAIL_ON_WARNINGS,,}" = "true" ]]; then
   CMD="$CMD --fail-on-warnings"
+  echo "  - Will fail on warnings: YES"
+else
+  echo "  - Will fail on warnings: NO"
 fi
+
 if [[ "${USE_EXIT_CODE_SEVERITY,,}" = "true" ]]; then
   CMD="$CMD --exit-code-severity"
+  echo "  - Using exit code severity: YES"
+else
+  echo "  - Using exit code severity: NO"
 fi
+
+# Skip GitHub integration when running as analysis-only task
+# These flags are now handled by the separate GitHub comment posting task
 if [[ "${POST_GITHUB_COMMENTS,,}" = "true" ]]; then
-  CMD="$CMD --post-github-comments"
+  echo "  - GitHub comments: Will be handled by separate task"
+else
+  echo "  - GitHub comments: DISABLED (not requested)"
 fi
+
 if [[ "${USE_GITHUB_CHECKS,,}" = "true" ]]; then
-  CMD="$CMD --use-github-checks"
+  echo "  - GitHub checks: Will be handled by separate task"
+else
+  echo "  - GitHub checks: DISABLED"
 fi
 
 # 4) Execute the analysis
 echo "🔍 Running CveSpecFilePRCheck with: $CMD"
+echo ""
+echo "============================================================"
+echo "ENVIRONMENT VARIABLES FOR GITHUB INTEGRATION:"
+echo "  - GITHUB_REPOSITORY: ${GITHUB_REPOSITORY:-NOT SET}"
+echo "  - GITHUB_PR_NUMBER: ${GITHUB_PR_NUMBER:-NOT SET}"
+echo "  - GITHUB_TOKEN: ${GITHUB_TOKEN:+SET (not showing value)}"
+echo "  - POST_GITHUB_COMMENTS: $POST_GITHUB_COMMENTS"
+echo "============================================================"
+echo ""
+
+# Run the command with all environment variables visible
 eval $CMD
 exit $?
