@@ -231,6 +231,11 @@ steps:
         max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}"
       fi
 
+      if [[ ${{ parameters.dailyBuildID }} == "lkg" ]]; then
+        sed -E -i 's/(.*)-(.*-.*azl.*\.rpm)/\1/g' "${{ parameters.buildRepoRoot }}/toolkit/resources/manifests/package/toolchain_x86_64.txt"
+        sed -E -i 's/(.*)-(.*-.*azl.*\.rpm)/\1/g' "${{ parameters.buildRepoRoot }}/toolkit/resources/manifests/package/toolchain_aarch64.txt"
+      fi
+
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
