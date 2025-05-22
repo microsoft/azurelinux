@@ -231,9 +231,11 @@ steps:
         max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}"
       fi
 
+      additional_args=""
       if [[ ${{ parameters.dailyBuildID }} == "lkg" ]]; then
         sed -E -i 's/(.*)-(.*-.*azl.*\.rpm)/\1/g' "${{ parameters.buildRepoRoot }}/toolkit/resources/manifests/package/toolchain_x86_64.txt"
         sed -E -i 's/(.*)-(.*-.*azl.*\.rpm)/\1/g' "${{ parameters.buildRepoRoot }}/toolkit/resources/manifests/package/toolchain_aarch64.txt"
+        additional_args="DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
       fi
 
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
@@ -255,7 +257,8 @@ steps:
         $quick_rebuild_packages_arg \
         $run_check_arg \
         $toolchain_archive_arg \
-        $use_ccache_arg
+        $use_ccache_arg \
+        $additional_args
     displayName: "Build packages"
 
   - ${{ if parameters.outputArtifactsFolder }}:
