@@ -3006,6 +3006,7 @@
                 "python-configobj",
                 "python-constantly",
                 "python-coverage",
+                "python-cqlsh",
                 "python-cryptography",
                 "python-daemon",
                 "python-dateutil",
