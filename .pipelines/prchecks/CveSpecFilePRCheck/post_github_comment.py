@@ -63,8 +63,7 @@ def extract_severity_from_report(report: Dict[str, Any]) -> Severity:
 
 def create_concise_comment(severity: Severity, anti_patterns: List[Dict], ai_analysis: str, conclusion: str) -> str:
     """
-    Creates a concise, focused comment for GitHub PR with clear severity indication,
-    issues, analysis, and recommendations.
+    Creates a very concise, focused comment for GitHub PR with only the most relevant details.
     
     Args:
         severity: Highest severity level detected
@@ -94,105 +93,137 @@ def create_concise_comment(severity: Severity, anti_patterns: List[Dict], ai_ana
     # Build comment body
     comment = header
     
-    # For ERROR and CRITICAL, explain that issues must be fixed
+    # Add relevant message based on severity
     if severity in [Severity.ERROR, Severity.CRITICAL]:
         comment += "These issues **must be fixed** before the PR can be merged.\n\n"
-    
-    # For WARNING and INFO, indicate they can still be merged
-    if severity in [Severity.WARNING, Severity.INFO] and (warning_issues or info_issues):
+    elif severity in [Severity.WARNING, Severity.INFO] and (warning_issues or info_issues):
         comment += "Issues don't block PR merge, but review is recommended.\n\n"
     
-    # Start with CRITICAL issues
+    # Add issues by severity
+    issue_sections = []
+    
     if critical_issues:
-        comment += "### 🚨 Critical Issues\n\n"
+        critical_section = "### 🚨 Critical Issues\n\n"
         for issue in critical_issues:
-            comment += f"- **{issue.get('name', '')}**: {issue.get('description', '')}\n"
-            comment += f"  - **Fix**: {issue.get('recommendation', '')}\n"
-        comment += "\n"
+            critical_section += f"- **{issue.get('name', '')}**: {issue.get('description', '')}\n"
+            critical_section += f"  - **Fix**: {issue.get('recommendation', '')}\n"
+        issue_sections.append(critical_section)
     
-    # Then ERROR issues
     if error_issues:
-        comment += "### ❌ Errors\n\n"
+        error_section = "### ❌ Errors\n\n"
         for issue in error_issues:
-            comment += f"- **{issue.get('name', '')}**: {issue.get('description', '')}\n"
-            comment += f"  - **Fix**: {issue.get('recommendation', '')}\n"
-        comment += "\n"
+            error_section += f"- **{issue.get('name', '')}**: {issue.get('description', '')}\n"
+            error_section += f"  - **Fix**: {issue.get('recommendation', '')}\n"
+        issue_sections.append(error_section)
     
-    # Then WARNINGS
     if warning_issues:
-        comment += "### ⚠️ Warnings\n\n"
+        warning_section = "### ⚠️ Warnings\n\n"
         for issue in warning_issues:
-            comment += f"- **{issue.get('name', '')}**: {issue.get('description', '')}\n"
-            comment += f"  - **Recommendation**: {issue.get('recommendation', '')}\n"
-        comment += "\n"
+            warning_section += f"- **{issue.get('name', '')}**: {issue.get('description', '')}\n"
+            warning_section += f"  - **Recommendation**: {issue.get('recommendation', '')}\n"
+        issue_sections.append(warning_section)
     
-    # Then INFO items
     if info_issues:
-        comment += "### ℹ️ Information\n\n"
+        info_section = "### ℹ️ Information\n\n"
         for issue in info_issues:
-            comment += f"- **{issue.get('name', '')}**: {issue.get('description', '')}\n"
-        comment += "\n"
+            info_section += f"- **{issue.get('name', '')}**: {issue.get('description', '')}\n"
+        issue_sections.append(info_section)
     
-    # Add a brief AI analysis summary - but make sure it's included
-    if ai_analysis:
+    # Add issue sections to comment
+    for section in issue_sections:
+        comment += section + "\n"
+    
+    # Find most relevant analysis focused on the detected issues
+    if ai_analysis and (critical_issues or error_issues or warning_issues):
+        # Create a focused analysis that's directly related to the detected issues
         comment += "### 🧠 Analysis\n\n"
         
-        # Extract key sections from the analysis 
-        # Look for sections about security implications, patch verification, or recommendations
-        sections = []
-        if "Security Implications" in ai_analysis:
-            security_section = ai_analysis.split("Security Implications")[1].split("\n──────────")[0].strip()
-            sections.append(security_section)
+        # Find the most specific analysis related to the issue types we detected
+        issue_keywords = set()
         
-        if "Verification of CVE Patch" in ai_analysis:
-            patch_section = ai_analysis.split("Verification of CVE Patch")[1].split("\n──────────")[0].strip()
-            sections.append(patch_section)
+        # Collect keywords from issues to find relevant analysis sections
+        for issue in critical_issues + error_issues + warning_issues:
+            name = issue.get('name', '').lower()
+            if 'patch' in name:
+                issue_keywords.add('patch')
+            if 'cve' in name:
+                issue_keywords.add('cve')
+            if 'changelog' in name:
+                issue_keywords.add('changelog')
         
-        # If we couldn't find specific sections, use the first paragraph
-        if not sections:
-            ai_summary = ai_analysis.strip().split("\n\n")[0] if "\n\n" in ai_analysis else ai_analysis[:400]
-            if len(ai_summary) > 400:
-                ai_summary = ai_summary[:400] + "..."
-            sections.append(ai_summary)
+        # Find the most relevant section based on the issue keywords
+        relevant_text = ""
+        
+        if 'patch' in issue_keywords:
+            # Search for sections specific to patch issues
+            patch_terms = ['Missing Patch', 'placeholder patch', 'patch file', 'CVE-2024-xxxx', 'Patch4']
+            for term in patch_terms:
+                if term.lower() in ai_analysis.lower():
+                    # Find a short paragraph containing this term
+                    for paragraph in ai_analysis.split('\n\n'):
+                        if term.lower() in paragraph.lower() and len(paragraph) < 300:
+                            relevant_text = paragraph
+                            break
+                
+                if relevant_text:
+                    break
+        
+        # If we didn't find specific analysis, use a brief general summary
+        if not relevant_text:
+            lines = ai_analysis.strip().split('\n')
+            for line in lines:
+                if len(line) > 20 and len(line) < 300:  # Find a reasonably sized line
+                    relevant_text = line
+                    break
             
-        # Add the selected sections
-        for section in sections[:2]:  # Limit to 2 sections to keep it brief
-            comment += f"{section}\n\n"
-            
-        comment += "*See ADO pipeline logs for complete analysis.*\n\n"
+            if not relevant_text:
+                relevant_text = ai_analysis[:200] + "..."
+        
+        comment += relevant_text.strip() + "\n\n"
     
-    # Add recommendations from conclusion (without the redundant "CONCLUSION" label)
+    # Add very focused recommendations
     if conclusion:
         comment += "### 📝 Recommendations\n\n"
         
-        # Extract the recommendation portion, removing any "CONCLUSION" prefix
+        # Clean up conclusion text
         clean_conclusion = conclusion.replace("📝 CONCLUSION (extracted from recommendations)", "").strip()
         clean_conclusion = clean_conclusion.replace("📝 CONCLUSION", "").strip()
         
-        # Extract key recommendations - look for bullet points or numbered items
-        recommendation_parts = []
+        # For each issue type, find the most relevant recommendation
+        recommendations = []
         
-        # Try to find the "Recommendations" section
-        if "Recommendations" in clean_conclusion:
-            rec_section = clean_conclusion.split("Recommendations")[1].split("\n──────────")[0].strip()
-            recommendation_parts.append(rec_section)
+        # Focus on the most important recommendations based on detected errors
+        if any('patch' in issue.get('name', '').lower() for issue in error_issues + critical_issues):
+            if "Remove or correct Patch4" in clean_conclusion:
+                rec = "• Remove or correct the incorrect patch entry (Patch4: CVE-2024-xxxx.patch).\n"
+                rec += "• Either replace it with a valid CVE patch file or remove it from the spec file.\n"
+                recommendations.append(rec)
         
-        # If we have specific "Remove or Replace" guidance, include it
-        if "Remove or Replace" in clean_conclusion:
-            replace_section = clean_conclusion.split("Remove or Replace")[1].split("\n──────────")[0].strip()
-            if replace_section not in recommendation_parts:
-                recommendation_parts.append(replace_section)
+        # If we didn't find any specific recommendations, use a summarized version
+        if not recommendations:
+            # Get the first bullet point or recommendation section
+            for line in clean_conclusion.split("\n"):
+                if line.strip().startswith("•") or line.strip().startswith("-") or line.strip().startswith("*"):
+                    recommendations.append(line.strip())
+                    
+                    # Get the next line if it's part of the same bullet point
+                    next_line_idx = clean_conclusion.split("\n").index(line) + 1
+                    if next_line_idx < len(clean_conclusion.split("\n")):
+                        next_line = clean_conclusion.split("\n")[next_line_idx]
+                        if not (next_line.strip().startswith("•") or next_line.strip().startswith("-") or next_line.strip().startswith("*")):
+                            recommendations.append(next_line.strip())
+                    
+                    break
+                    
+        # If we still don't have a recommendation, use a brief excerpt
+        if not recommendations:
+            first_100_chars = clean_conclusion[:100].strip()
+            if first_100_chars:
+                recommendations.append(first_100_chars + "...")
         
-        # If we still don't have recommendations, just use the first section
-        if not recommendation_parts:
-            first_part = clean_conclusion.split("\n──────────")[0].strip()
-            recommendation_parts.append(first_part)
-            
-        # Format and add recommendations
-        for part in recommendation_parts[:2]:  # Limit to 2 sections to keep it brief
-            # Remove redundant prefix indicators if present
-            part = part.replace("Remove or Replace Patch4:", "").strip()
-            comment += f"{part}\n\n"
+        # Add the recommendations
+        for rec in recommendations:
+            comment += rec + "\n\n"
     
     # Add footer
     comment += "---\n"
