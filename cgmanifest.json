@@ -9902,7 +9902,7 @@
         "other": {
           "name": "liblockfile",
           "version": "1.17",
-          "downloadUrl": "http://ftp.de.debian.org/debian/pool/main/libl/liblockfile/liblockfile_1.17.orig.tar.gz"
+          "downloadUrl": "https://github.com/miquels/liblockfile/archive/refs/tags/v1.17.tar.gz"
         }
       }
     },
