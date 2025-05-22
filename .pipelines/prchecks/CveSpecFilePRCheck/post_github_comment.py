@@ -64,7 +64,7 @@ def extract_severity_from_report(report: Dict[str, Any]) -> Severity:
 def create_concise_comment(severity: Severity, anti_patterns: List[Dict], ai_analysis: str, conclusion: str) -> str:
     """
     Creates a concise, focused comment for GitHub PR with clear severity indication,
-    issues, and brief summary.
+    issues, analysis, and recommendations.
     
     Args:
         severity: Highest severity level detected
@@ -133,27 +133,66 @@ def create_concise_comment(severity: Severity, anti_patterns: List[Dict], ai_ana
             comment += f"- **{issue.get('name', '')}**: {issue.get('description', '')}\n"
         comment += "\n"
     
-    # Add a brief AI analysis summary (limited to key points)
+    # Add a brief AI analysis summary - but make sure it's included
     if ai_analysis:
-        comment += "### 🧠 Brief Analysis Summary\n\n"
+        comment += "### 🧠 Analysis\n\n"
         
-        # Extract the most important parts of the analysis (first paragraph or so)
-        ai_summary = ai_analysis.strip().split("\n\n")[0] if "\n\n" in ai_analysis else ai_analysis[:300]
-        if len(ai_summary) > 300:
-            ai_summary = ai_summary[:300] + "..."
+        # Extract key sections from the analysis 
+        # Look for sections about security implications, patch verification, or recommendations
+        sections = []
+        if "Security Implications" in ai_analysis:
+            security_section = ai_analysis.split("Security Implications")[1].split("\n──────────")[0].strip()
+            sections.append(security_section)
+        
+        if "Verification of CVE Patch" in ai_analysis:
+            patch_section = ai_analysis.split("Verification of CVE Patch")[1].split("\n──────────")[0].strip()
+            sections.append(patch_section)
+        
+        # If we couldn't find specific sections, use the first paragraph
+        if not sections:
+            ai_summary = ai_analysis.strip().split("\n\n")[0] if "\n\n" in ai_analysis else ai_analysis[:400]
+            if len(ai_summary) > 400:
+                ai_summary = ai_summary[:400] + "..."
+            sections.append(ai_summary)
             
-        comment += f"{ai_summary}\n\n"
+        # Add the selected sections
+        for section in sections[:2]:  # Limit to 2 sections to keep it brief
+            comment += f"{section}\n\n"
+            
         comment += "*See ADO pipeline logs for complete analysis.*\n\n"
     
-    # Add a focused conclusion if available
+    # Add recommendations from conclusion (without the redundant "CONCLUSION" label)
     if conclusion:
-        # Extract first paragraph or limited length to avoid repetition
-        concise_conclusion = conclusion.strip().split("\n\n")[0] if "\n\n" in conclusion else conclusion[:300]
-        if len(concise_conclusion) > 300:
-            concise_conclusion = concise_conclusion[:300] + "..."
+        comment += "### 📝 Recommendations\n\n"
         
-        comment += "### 📝 Key Recommendation\n\n"
-        comment += f"{concise_conclusion}\n\n"
+        # Extract the recommendation portion, removing any "CONCLUSION" prefix
+        clean_conclusion = conclusion.replace("📝 CONCLUSION (extracted from recommendations)", "").strip()
+        clean_conclusion = clean_conclusion.replace("📝 CONCLUSION", "").strip()
+        
+        # Extract key recommendations - look for bullet points or numbered items
+        recommendation_parts = []
+        
+        # Try to find the "Recommendations" section
+        if "Recommendations" in clean_conclusion:
+            rec_section = clean_conclusion.split("Recommendations")[1].split("\n──────────")[0].strip()
+            recommendation_parts.append(rec_section)
+        
+        # If we have specific "Remove or Replace" guidance, include it
+        if "Remove or Replace" in clean_conclusion:
+            replace_section = clean_conclusion.split("Remove or Replace")[1].split("\n──────────")[0].strip()
+            if replace_section not in recommendation_parts:
+                recommendation_parts.append(replace_section)
+        
+        # If we still don't have recommendations, just use the first section
+        if not recommendation_parts:
+            first_part = clean_conclusion.split("\n──────────")[0].strip()
+            recommendation_parts.append(first_part)
+            
+        # Format and add recommendations
+        for part in recommendation_parts[:2]:  # Limit to 2 sections to keep it brief
+            # Remove redundant prefix indicators if present
+            part = part.replace("Remove or Replace Patch4:", "").strip()
+            comment += f"{part}\n\n"
     
     # Add footer
     comment += "---\n"

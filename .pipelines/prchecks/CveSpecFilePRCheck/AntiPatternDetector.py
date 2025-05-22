@@ -233,24 +233,26 @@ class AntiPatternDetector:
         if changelog_match:
             changelog_text = changelog_match.group(1)
             
-            # Check most recent changelog entry for CVE mentions
-            entries = re.split(r'\*\s+\w+\s+\w+\s+\d+\s+\d{4}', changelog_text)
-            if len(entries) > 1:
-                latest_entry = entries[1]  # First entry after the split
-                
-                # Check if each CVE is in the latest changelog entry
-                for cve_id in seen_cves:
-                    if cve_id not in latest_entry:
-                        patterns.append(AntiPattern(
-                            id='missing-cve-in-changelog',
-                            name="Missing CVE in Changelog",
-                            description=f"{cve_id} is referenced in the spec file but not in the latest changelog entry",
-                            severity=self.severity_map.get('missing-cve-in-changelog', Severity.ERROR),
-                            file_path=file_path,
-                            line_number=None,
-                            context=None,
-                            recommendation=f"Add {cve_id} to the most recent changelog entry"
-                        ))
+            # Check entire changelog for CVE mentions, not just latest entry
+            # We consider any CVE mentioned anywhere in the changelog to be properly documented
+            missing_cves = set()
+            for cve_id in seen_cves:
+                if cve_id not in changelog_text:
+                    # This CVE is not mentioned in any changelog entry
+                    missing_cves.add(cve_id)
+            
+            # Report only CVEs that are truly missing from the entire changelog
+            for cve_id in missing_cves:
+                patterns.append(AntiPattern(
+                    id='missing-cve-in-changelog',
+                    name="Missing CVE in Changelog",
+                    description=f"{cve_id} is referenced in the spec file but not mentioned in any changelog entry",
+                    severity=self.severity_map.get('missing-cve-in-changelog', Severity.ERROR),
+                    file_path=file_path,
+                    line_number=None,
+                    context=None,
+                    recommendation=f"Add {cve_id} to a changelog entry"
+                ))
         
         return patterns
     
