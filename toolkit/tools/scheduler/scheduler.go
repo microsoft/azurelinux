@@ -557,21 +557,44 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState, allowToolchainRebuilds, licenseChecker)
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
 
+	printErr := schedulerutils.PrintHiddenBuildBlockers(builtGraph, graphMutex, buildState, goalNode)
+	if printErr != nil {
+		logger.Log.Warnf("Failed to print hidden build blockers:\n%s", printErr)
+	}
+
+	err = compileBuildFailureErrors(err, allowToolchainRebuilds, buildState)
+
+	return
+}
+
+// compileBuildFailureErrors checks all errors, which are considered fatal
+// and turns them into a single build error.
+func compileBuildFailureErrors(err error, allowToolchainRebuilds bool, buildState *schedulerutils.GraphBuildState) error {
+	var fatalErr error
+
+	fatalErrors := []error{}
+	if err != nil {
+		fatalErrors = append(fatalErrors, err)
+	}
+
 	if !allowToolchainRebuilds && (len(buildState.ConflictingRPMs()) > 0 || len(buildState.ConflictingSRPMs()) > 0) {
-		err = fmt.Errorf("toolchain packages rebuilt. See build summary for details. Use 'ALLOW_TOOLCHAIN_REBUILDS=y' to suppress this error if rebuilds were expected")
-		return
+		toolchainErr := fmt.Errorf("toolchain packages rebuilt. See build summary for details. Use 'ALLOW_TOOLCHAIN_REBUILDS=y' to suppress this error if rebuilds were expected")
+		fatalErrors = append(fatalErrors, toolchainErr)
 	}
 
 	if len(buildState.LicenseFailureSRPMs()) > 0 {
-		err = fmt.Errorf("license check failed for some packages. See build summary for details")
-		return
+		licenseErr := fmt.Errorf("license check failed for some packages. See build summary for details")
+		fatalErrors = append(fatalErrors, licenseErr)
 	}
 
-	err = schedulerutils.PrintHiddenBuildBlockers(builtGraph, graphMutex, buildState, goalNode)
-	if err != nil {
-		err = fmt.Errorf("failed to print hidden build blockers:\n%w", err)
+	if len(fatalErrors) > 0 {
+		fatalErr = fmt.Errorf("encountered fatal errors building packages. See below for details")
+		for _, fatalErr = range fatalErrors {
+			fatalErr = fmt.Errorf("%w\n%w", fatalErr, fatalErr)
+		}
 	}
-	return
+
+	return fatalErr
 }
 
 // updateGraphWithImplicitProvides will update the graph with new implicit provides if available.
