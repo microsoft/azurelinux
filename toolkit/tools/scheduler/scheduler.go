@@ -4,6 +4,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -569,27 +570,17 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 
 // compileBuildFailureErrors checks all errors, which are considered fatal
 // and turns them into a single build error.
-func compileBuildFailureErrors(buildErr error, allowToolchainRebuilds bool, buildState *schedulerutils.GraphBuildState) (fatalErr error) {
-	fatalErrors := []error{}
-	if buildErr != nil {
-		fatalErrors = append(fatalErrors, buildErr)
-	}
+func compileBuildFailureErrors(buildErr error, allowToolchainRebuilds bool, buildState *schedulerutils.GraphBuildState) (err error) {
+	err = buildErr
 
 	if !allowToolchainRebuilds && (len(buildState.ConflictingRPMs()) > 0 || len(buildState.ConflictingSRPMs()) > 0) {
 		toolchainErr := fmt.Errorf("toolchain packages rebuilt. See build summary for details. Use 'ALLOW_TOOLCHAIN_REBUILDS=y' to suppress this error if rebuilds were expected")
-		fatalErrors = append(fatalErrors, toolchainErr)
+		err = errors.Join(err, toolchainErr)
 	}
 
 	if len(buildState.LicenseFailureSRPMs()) > 0 {
 		licenseErr := fmt.Errorf("license check failed for some packages. See build summary for details")
-		fatalErrors = append(fatalErrors, licenseErr)
-	}
-
-	if len(fatalErrors) > 0 {
-		fatalErr = fmt.Errorf("encountered fatal errors building packages. See below for details")
-		for _, err := range fatalErrors {
-			fatalErr = fmt.Errorf("%w\n%w", fatalErr, err)
-		}
+		err = errors.Join(err, licenseErr)
 	}
 
 	return
