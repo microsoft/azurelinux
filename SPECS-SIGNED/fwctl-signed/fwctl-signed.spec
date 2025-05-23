@@ -45,7 +45,7 @@
 Summary:	 %{_name} Driver
 Name:		 %{_name}-signed
 Version:	 24.10
-Release:	 18%{?dist}
+Release:	 19%{?dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
@@ -117,6 +117,9 @@ fi # 1 : closed
 
 
 %changelog
+* Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-19
+- Bump release to rebuild for new kernel release
+
 * Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-18
 - Bump release to rebuild for new kernel release
 
