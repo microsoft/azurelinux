@@ -2327,6 +2327,7 @@
                 "node-problem-detector",
                 "ntopng",
                 "opentelemetry-cpp",
+                "openvmm",
                 "packer",
                 "pcaudiolib",
                 "pcre2",
