@@ -569,9 +569,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 
 // compileBuildFailureErrors checks all errors, which are considered fatal
 // and turns them into a single build error.
-func compileBuildFailureErrors(err error, allowToolchainRebuilds bool, buildState *schedulerutils.GraphBuildState) error {
-	var fatalErr error
-
+func compileBuildFailureErrors(err error, allowToolchainRebuilds bool, buildState *schedulerutils.GraphBuildState) (fatalErr error) {
 	fatalErrors := []error{}
 	if err != nil {
 		fatalErrors = append(fatalErrors, err)
@@ -594,7 +592,7 @@ func compileBuildFailureErrors(err error, allowToolchainRebuilds bool, buildStat
 		}
 	}
 
-	return fatalErr
+	return
 }
 
 // updateGraphWithImplicitProvides will update the graph with new implicit provides if available.
