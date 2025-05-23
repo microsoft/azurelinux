@@ -591,7 +591,7 @@ systemd-bootstrap-250.3-18.azl3.x86_64.rpm
 systemd-bootstrap-debuginfo-250.3-18.azl3.x86_64.rpm
 systemd-bootstrap-devel-250.3-18.azl3.x86_64.rpm
 systemd-bootstrap-libs-250.3-18.azl3.x86_64.rpm
-systemd-bootstrap-rpm-macros-250.3-18.azl3.x86_64.rpm
+systemd-bootstrap-rpm-macros-250.3-18.azl3.noarch.rpm
 tar-1.35-2.azl3.x86_64.rpm
 tar-debuginfo-1.35-2.azl3.x86_64.rpm
 tdnf-3.5.8-7.azl3.x86_64.rpm
