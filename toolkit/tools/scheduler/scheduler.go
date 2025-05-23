@@ -569,10 +569,10 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 
 // compileBuildFailureErrors checks all errors, which are considered fatal
 // and turns them into a single build error.
-func compileBuildFailureErrors(err error, allowToolchainRebuilds bool, buildState *schedulerutils.GraphBuildState) (fatalErr error) {
+func compileBuildFailureErrors(buildErr error, allowToolchainRebuilds bool, buildState *schedulerutils.GraphBuildState) (fatalErr error) {
 	fatalErrors := []error{}
-	if err != nil {
-		fatalErrors = append(fatalErrors, err)
+	if buildErr != nil {
+		fatalErrors = append(fatalErrors, buildErr)
 	}
 
 	if !allowToolchainRebuilds && (len(buildState.ConflictingRPMs()) > 0 || len(buildState.ConflictingSRPMs()) > 0) {
