@@ -587,8 +587,8 @@ func compileBuildFailureErrors(buildErr error, allowToolchainRebuilds bool, buil
 
 	if len(fatalErrors) > 0 {
 		fatalErr = fmt.Errorf("encountered fatal errors building packages. See below for details")
-		for _, fatalErr = range fatalErrors {
-			fatalErr = fmt.Errorf("%w\n%w", fatalErr, fatalErr)
+		for _, err := range fatalErrors {
+			fatalErr = fmt.Errorf("%w\n%w", fatalErr, err)
 		}
 	}
 
