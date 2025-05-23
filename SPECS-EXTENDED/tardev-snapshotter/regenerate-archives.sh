@@ -12,8 +12,9 @@ pushd $WORK_DIR
 trap "popd && rm -rf $WORK_DIR" EXIT
 
 git clone -b "3.2.0.tardev1" https://github.com/microsoft/kata-containers
-pushd kata-containers/src
-mv tardev-snapshotter $NAME-$VERSION
+pushd kata-containers
+cp LICENSE src/tardev-snapshotter
+mv src/tardev-snapshotter $NAME-$VERSION
 tar -czf $NAME-$VERSION.tar.gz $NAME-$VERSION
 mv $NAME-$VERSION.tar.gz $WORK_DIR
 popd

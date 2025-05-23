@@ -62,8 +62,8 @@ fi
 %systemd_postun_with_restart %{name}.service
 
 %files
-# %license LICENSE NOTICE
-%{_bindir}/*
+%license LICENSE
+%{_bindir}/%{name}
 %config(noreplace) %{_unitdir}/%{name}.service
 
 %changelog
