@@ -563,16 +563,14 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 		logger.Log.Warnf("Failed to print hidden build blockers:\n%s", printErr)
 	}
 
-	err = compileBuildFailureErrors(err, allowToolchainRebuilds, buildState)
+	err = errors.Join(err, performPostBuildChecks(allowToolchainRebuilds, buildState))
 
 	return
 }
 
-// compileBuildFailureErrors checks all errors, which are considered fatal
-// and turns them into a single build error.
-func compileBuildFailureErrors(buildErr error, allowToolchainRebuilds bool, buildState *schedulerutils.GraphBuildState) (err error) {
-	err = buildErr
-
+// performPostBuildChecks checks for any fatal post-build errors
+// and turns them into as a single error.
+func performPostBuildChecks(allowToolchainRebuilds bool, buildState *schedulerutils.GraphBuildState) (err error) {
 	if !allowToolchainRebuilds && (len(buildState.ConflictingRPMs()) > 0 || len(buildState.ConflictingSRPMs()) > 0) {
 		toolchainErr := fmt.Errorf("toolchain packages rebuilt. See build summary for details. Use 'ALLOW_TOOLCHAIN_REBUILDS=y' to suppress this error if rebuilds were expected")
 		err = errors.Join(err, toolchainErr)
