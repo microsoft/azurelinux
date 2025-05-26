@@ -83,6 +83,11 @@ rm -f %{{buildroot}}%{{_javadocdir}}/%{{name}}/legal/ADDITIONAL_LICENSE_INFO
 %{_javadir}/xz.jar
 
 %files javadoc
+
+%exclude %{_javadocdir}/%{name}/legal/LICENSE
+%exclude %{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO
+%{_javadocdir}/%{name}
+
 %{_javadocdir}/%{name}
 
 %changelog
