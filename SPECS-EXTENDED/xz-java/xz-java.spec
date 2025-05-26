@@ -59,34 +59,26 @@ sed -i 's/linkoffline="[^"]*"//;/extdoc_/d' build.xml
 ant  -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 clean jar doc maven
 
 %install
-# Install JAR
+# jar
 install -dm 0755 %{buildroot}%{_javadir}
-install -pm 0644 build/jar/xz.jar %{buildroot}%{_javadir}/%{name}.jar
+install -pm 0644 build/maven/xz-%{version}.jar  %{buildroot}%{_javadir}/%{name}.jar
 (cd %{buildroot}%{_javadir} && ln -s %{name}.jar xz.jar)
-
+# pom
 install -dm 0755 %{buildroot}%{_mavenpomdir}
 install -pm 0644 build/maven/xz-%{version}.pom %{buildroot}%{_mavenpomdir}/%{name}.pom
 %add_maven_depmap %{name}.pom %{name}.jar
-
-# Install Javadoc
+# javadoc
 mkdir -p %{buildroot}%{_javadocdir}/%{name}
 cp -pr build/doc/* %{buildroot}%{_javadocdir}/%{name}
-
-# Install license files
-install -Dm 0644 COPYING %{buildroot}%{_licensedir}/%{name}/COPYING
-
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
 %license COPYING
-
 %doc AUTHORS.md NEWS.md README.md THANKS.md REUSE.toml
-%{_javadir}/xz-java.jar
 %{_javadir}/xz.jar
 
 %files javadoc
 %{_javadocdir}/%{name}
-
 
 %changelog
 * Tue May 20 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.10-1
