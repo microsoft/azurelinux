@@ -78,6 +78,8 @@ cp -pr build/doc/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadir}/xz.jar
 
 %files javadoc
+%license %{_javadocdir}/%{name}/legal/LICENSE
+%license %{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO
 %{_javadocdir}/%{name}
 
 %changelog
