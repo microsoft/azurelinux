@@ -17,6 +17,7 @@ Patch3:         CVE-2024-43398.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
+Requires:       rubygem(strscan)
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
