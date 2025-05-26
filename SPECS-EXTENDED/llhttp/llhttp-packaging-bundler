@@ -1,0 +1,110 @@
+#!/bin/bash
+set -o nounset
+set -o errexit
+
+OUTPUT_DIR="$(rpm -E '%{_sourcedir}')"
+SPEC_FILE="${PWD}/llhttp.spec"
+
+usage() {
+  cat 1>&2 <<EOF
+Usage: $(basename "$0")
+
+Given llhttp.spec in the working directory, download the source and the prod
+and dev dependencies, each in their own tarball.
+
+Also finds licenses for prod dependencies.
+
+All three tarballs and the license list are copied to
+${OUTPUT_DIR}.
+EOF
+  exit 1
+}
+
+if ! [[ -f /usr/bin/npm ]]
+then 
+  cat 1>&2 <<EOF
+$(basename "${0}") requires npm to run
+
+Run the following to fix this:
+  sudo dnf install npm
+
+EOF
+  exit 2
+fi 
+
+if [[ $# -gt 0 ]]; then 
+  usage
+fi 
+
+TMP_DIR="$(mktemp -d -t ci-XXXXXXXXXX)"
+trap "cd /; rm -rf '${TMP_DIR}'" INT TERM EXIT
+cd "${TMP_DIR}"
+
+echo "Reading ${SPEC_FILE}; downloading source archive" 1>&2
+VERSION="$(awk '$1 == "Version:" { print $2; exit }' "${SPEC_FILE}")"
+echo "Version is ${VERSION}" 1>&2
+echo "Downloading source archive" 1>&2
+spectool -g "${SPEC_FILE}"
+
+ARCHIVE="$(
+  find . -mindepth 1 -maxdepth 1 -type f -name '*.tar.gz' -print -quit
+)"
+echo "Downloaded $(basename "${ARCHIVE}")" 1>&2
+
+tar -xzf "${ARCHIVE}"
+XDIR="$(find . -mindepth 1 -maxdepth 1 -type d -print -quit)"
+echo "Extracted to $(basename "${XDIR}")" 1>&2
+
+cd "${XDIR}"
+
+echo "Downloading prod dependencies" 1>&2
+# Compared to nodejs-packaging-bundler, we must add --ignore-scripts or npm
+# unsuccessfully attempts to build the package.
+npm install --no-optional --only=prod --ignore-scripts
+echo "Successful prod dependencies download" 1>&2
+mv node_modules/ node_modules_prod
+
+echo "LICENSES IN BUNDLE:"
+LICENSE_FILE="${TMP_DIR}/llhttp-${VERSION}-bundled-licenses.txt"
+find . -name 'package.json' -exec jq '.license | strings' '{}' ';' \
+    >> "${LICENSE_FILE}"
+for what in '.license | objects | .type' '.licenses[] .type'
+do
+  find . -name 'package.json' -exec jq "${what}" '{}' ';' \
+      >> "${LICENSE_FILE}" 2>/dev/null
+done
+sort -u -o "${LICENSE_FILE}" "${LICENSE_FILE}"
+
+# Locate any dependencies without a provided license
+find . -type f -name 'package.json' -execdir jq \
+    'if .license==null and .licenses==null then .name else null end' '{}' '+' |
+  grep -vE '^null$' |
+  sort -u > "${TMP_DIR}/nolicense.txt"
+
+if [[ -s "${TMP_DIR}/nolicense.txt" ]]
+then
+  echo -e "\e[5m\e[41mSome dependencies do not list a license. Manual verification required!\e[0m"
+  cat "${TMP_DIR}/nolicense.txt"
+  echo -e "\e[5m\e[41m======================================================================\e[0m"
+fi
+
+echo "Downloading dev dependencies" 1>&2
+# Compared to nodejs-packaging-bundler, we must add --ignore-scripts or npm
+# unsuccessfully attempts to build the package.
+npm install --no-optional --only=dev --ignore-scripts
+echo "Successful dev dependencies download" 1>&2
+mv node_modules/ node_modules_dev
+
+if [[ -d node_modules_prod ]]
+then
+  tar -cf "../llhttp-${VERSION}-nm-prod.tar" node_modules_prod
+fi
+if [[ -d node_modules_dev ]]
+then
+  tar -cf "../llhttp-${VERSION}-nm-dev.tar" node_modules_dev
+fi
+zstdmt --ultra -22 "../llhttp-${VERSION}-nm-prod.tar" "../llhttp-${VERSION}-nm-dev.tar"
+
+cd ..
+find . -mindepth 1 -maxdepth 1 -type f \( -name "$(basename "${ARCHIVE}")" \
+    -o -name "llhttp-${VERSION}*" \) -exec cp -vp '{}' "${OUTPUT_DIR}" ';'
