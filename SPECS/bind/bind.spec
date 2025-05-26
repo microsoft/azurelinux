@@ -9,8 +9,8 @@
 
 Summary:        Domain Name System software
 Name:           bind
-Version:        9.20.5
-Release:        4%{?dist}
+Version:        9.20.9
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -536,6 +536,9 @@ fi;
 %{_mandir}/man1/named-nzd2nzf.1*
 
 %changelog
+* Mon May 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.20.9-1
+- Auto-upgrade to 9.20.9 - for CVE-2025-40775
+
 * Tue Feb 11 2025 Andrew Phelps <anphel@microsoft.com> - 9.20.5-4
 - Remove duplicate shared object files in base and devel packages
 - Remove duplicate files from utils package
