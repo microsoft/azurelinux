@@ -22913,8 +22913,8 @@
         "type": "other",
         "other": {
           "name": "python-gevent",
-          "version": "23.9.1",
-          "downloadUrl": "https://github.com/gevent/gevent/archive/23.9.1.tar.gz"
+          "version": "24.10.1",
+          "downloadUrl": "https://github.com/gevent/gevent/archive/24.10.1.tar.gz"
         }
       }
     },
