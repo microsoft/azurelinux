@@ -533,7 +533,7 @@ fi;
 %{_mandir}/man1/named-nzd2nzf.1*
 
 %changelog
-* Mon May 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.20.9-1
+* Tue May 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.20.9-1
 - Auto-upgrade to 9.20.9 - for CVE-2025-40775
 - Remove nongit-fix.patch and fix-maybe-uninitialized-warning-in-dlz_mysqldyn_mod.patch
 
