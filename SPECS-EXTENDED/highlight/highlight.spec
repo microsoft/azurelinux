@@ -1,14 +1,20 @@
+# Gui disabled as it depends on qt5-qtbase-devel which we do not have
+%global gui 0
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           highlight
 Summary:        Universal source code to formatted text converter
-Version:        3.54
-Release:        3%{?dist}
+Version:        4.14
+Release:        1%{?dist}
 License:        GPLv3
 URL:            http://www.andre-simon.de/
 Source0:        http://www.andre-simon.de/zip/%{name}-%{version}.tar.bz2
 BuildRequires:  gcc-c++
+%if %{gui}
 BuildRequires:  qt5-qtbase-devel
+%endif
+
 BuildRequires:  lua-devel, boost-devel
 BuildRequires:  desktop-file-utils
 
@@ -27,12 +33,14 @@ Language descriptions are configurable and support regular expressions.
 The utility offers indentation and reformatting capabilities.
 It is easily possible to create new language definitions and colour themes.
 
+%if %{gui}
 %package gui
 Summary:        GUI for the hihghlight source code formatter
 Requires:       %{name} = %{version}-%{release}
 
 %description gui
 A Qt-based GUI for the highlight source code formatter source.
+%endif
 
 %prep
 %autosetup
@@ -42,9 +50,11 @@ CFLAGS="$CFLAGS -fPIC %{optflags}"; export CFLAGS
 CXXFLAGS="$CXXFLAGS -fPIC %{optflags}"; export CXXFLAGS
 LDFLAGS="$LDFLAGS %{?__global_ldflags}"; export LDFLAGS
 
-# disabled paralell builds to fix FTBFS on rawhide & highlight 3.52+
-#make_build all gui           CFLAGS="${CFLAGS}"          \
-      make all gui            CFLAGS="${CFLAGS}"          \
+%if %{gui}
+%make_build all gui           CFLAGS="${CFLAGS}"          \
+%else
+%make_build all               CFLAGS="${CFLAGS}"          \
+%endif
                               CXXFLAGS="${CXXFLAGS}"      \
                               LDFLAGS="${LDFLAGS}"        \
                               LFLAGS="-Wl,-O1 ${LDFLAGS}" \
@@ -58,31 +68,46 @@ LDFLAGS="$LDFLAGS %{?__global_ldflags}"; export LDFLAGS
 
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/applications
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/pixmaps
+%if %{gui}
 make install-gui DESTDIR=$RPM_BUILD_ROOT PREFIX="%{_prefix}" conf_dir="%{_sysconfdir}/highlight/"
+%endif
 
 rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}/
 
+%if %{gui}
 desktop-file-install \
     --dir $RPM_BUILD_ROOT%{_datadir}/applications \
    highlight.desktop
+%endif
 
 %files
+%doc %{_mandir}/man1/highlight.1*
+%doc %{_mandir}/man5/filetypes.conf.5*
+
 %{_bindir}/highlight
 %{_datadir}/highlight/
-%{_mandir}/man1/highlight.1*
-%{_mandir}/man5/filetypes.conf.5*
+%{_datadir}/bash-completion/completions/highlight
+%{_datadir}/fish/vendor_completions.d/highlight.fish
+%{_datadir}/zsh/site-functions/_highlight
+
 %config(noreplace) %{_sysconfdir}/highlight/
 
-%doc ChangeLog* AUTHORS README* extras/
 %license COPYING
 
+%if %{gui}
 %files gui
 %{_bindir}/highlight-gui
 %{_datadir}/applications/highlight.desktop
 %{_datadir}/pixmaps/highlight.xpm
+%endif
 
 
 %changelog
+* Wed Dec 04 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 4.14-1
+- Update to 4.14
+- Disable gui build.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.54-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
