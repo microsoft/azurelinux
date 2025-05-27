@@ -1,0 +1,6 @@
+[Match]
+Name=eth0
+
+[Network]
+DHCP=yes
+IPv6AcceptRA=no
