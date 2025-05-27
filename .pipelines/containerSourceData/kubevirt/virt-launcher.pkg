@@ -8,6 +8,7 @@ libcap
 libvirt-client
 libvirt-daemon-driver-qemu
 nftables
+openvmm
 procps
 qemu-device-usb-redirect
 qemu-system-x86
