@@ -15723,8 +15723,8 @@
         "type": "other",
         "other": {
           "name": "osgi-annotation",
-          "version": "7.0.0",
-          "downloadUrl": "https://repo1.maven.org/maven2/org/osgi/osgi.annotation/7.0.0/osgi.annotation-7.0.0-sources.jar"
+          "version": "8.1.0",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/osgi/osgi.annotation/8.1.0/osgi.annotation-8.1.0-sources.jar"
         }
       }
     },
