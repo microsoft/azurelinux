@@ -21,7 +21,7 @@ Source0:       https://download.osgeo.org/shapelib/%{name}-%{version}%{?pre:%pre
 # tar --strip-components=2 -xvf shapelib-master.tar.gz shapelib-master/debian/man
 # tar -czf shapelib-man.tar.gz man/
 # rm -r man
-Source1:       %{name}-man.tar.gz
+Source1:       %{name}-man-1.tar.gz
 
 BuildRequires: automake autoconf libtool
 BuildRequires: gcc-c++
