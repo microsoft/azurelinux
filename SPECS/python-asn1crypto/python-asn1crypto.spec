@@ -1,17 +1,19 @@
 Summary:        A fast, pure Python library for parsing and serializing ASN.1 structures.
 Name:           python-asn1crypto
 Version:        1.5.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/wbond/asn1crypto
 Source0:        https://github.com/wbond/asn1crypto/archive/refs/tags/%{version}.tar.gz#/asn1crypto-%{version}.tar.gz
+Patch0:         remove-import.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 BuildArch:      noarch
 
@@ -26,7 +28,7 @@ Requires:       python3
 A fast, pure Python library for parsing and serializing ASN.1 structures.
 
 %prep
-%autosetup -n asn1crypto-%{version}
+%autosetup -p1 -n asn1crypto-%{version}
 
 %build
 %py3_build
@@ -35,8 +37,7 @@ A fast, pure Python library for parsing and serializing ASN.1 structures.
 %py3_install
 
 %check
-pip3 install tox
-tox -e py%{python3_version_nodots}
+%pytest
 
 %files -n python3-asn1crypto
 %defattr(-,root,root,-)
@@ -44,6 +45,9 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Tue May 13 2025 Riken Maharjan <rmaharjan@microsoft.com> - 1.5.1-2
+- Fix Ptest and add a patch to replace imp with importlib.util in test
+
 * Wed Apr 13 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.5.1-1
 - Upgrade to latest upstream version
 - Add tests using tox-based runner
