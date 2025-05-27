@@ -4,6 +4,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -557,20 +558,29 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState, allowToolchainRebuilds, licenseChecker)
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
 
+	printErr := schedulerutils.PrintHiddenBuildBlockers(builtGraph, graphMutex, buildState, goalNode)
+	if printErr != nil {
+		logger.Log.Warnf("Failed to print hidden build blockers:\n%s", printErr)
+	}
+
+	err = errors.Join(err, performPostBuildChecks(allowToolchainRebuilds, buildState))
+
+	return
+}
+
+// performPostBuildChecks checks for any fatal post-build errors
+// and turns them into as a single error.
+func performPostBuildChecks(allowToolchainRebuilds bool, buildState *schedulerutils.GraphBuildState) (err error) {
 	if !allowToolchainRebuilds && (len(buildState.ConflictingRPMs()) > 0 || len(buildState.ConflictingSRPMs()) > 0) {
-		err = fmt.Errorf("toolchain packages rebuilt. See build summary for details. Use 'ALLOW_TOOLCHAIN_REBUILDS=y' to suppress this error if rebuilds were expected")
-		return
+		toolchainErr := fmt.Errorf("toolchain packages rebuilt. See build summary for details. Use 'ALLOW_TOOLCHAIN_REBUILDS=y' to suppress this error if rebuilds were expected")
+		err = errors.Join(err, toolchainErr)
 	}
 
 	if len(buildState.LicenseFailureSRPMs()) > 0 {
-		err = fmt.Errorf("license check failed for some packages. See build summary for details")
-		return
+		licenseErr := fmt.Errorf("license check failed for some packages. See build summary for details")
+		err = errors.Join(err, licenseErr)
 	}
 
-	err = schedulerutils.PrintHiddenBuildBlockers(builtGraph, graphMutex, buildState, goalNode)
-	if err != nil {
-		err = fmt.Errorf("failed to print hidden build blockers:\n%w", err)
-	}
 	return
 }
 
