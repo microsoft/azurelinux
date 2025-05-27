@@ -294,12 +294,11 @@ Patch1024:      CVE-2023-3180.patch
 Patch1025:      CVE-2023-3255.patch
 # CVE-2023-3301 will be fixed in 8.1.0 by https://gitlab.com/qemu-project/qemu/-/commit/a0d7215e339b61c7d7a7b3fcf754954d80d93eb8
 Patch1026:      CVE-2023-3301.patch
-# CVE-2021-3611 will be fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/79fa99831debc9782087e834382c577215f2f511 (other patches linked in patchfile)
-Patch1027:      CVE-2021-3611.patch
-
 Patch1027:      CVE-2024-3447.patch
 Patch1028:      CVE-2024-4467.patch
 Patch1029:      CVE-2024-6505.patch
+# CVE-2021-3611 will be fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/79fa99831debc9782087e834382c577215f2f511 (other patches linked in patchfile)
+Patch1030:      CVE-2021-3611.patch
 
 # alsa audio output
 BuildRequires:  alsa-lib-devel
