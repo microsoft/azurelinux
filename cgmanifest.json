@@ -6230,8 +6230,8 @@
         "type": "other",
         "other": {
           "name": "hunspell-pl",
-          "version": "0.20180707",
-          "downloadUrl": "http://sjp.pl/slownik/ort/sjp-myspell-pl-20180707.zip"
+          "version": "0.20240901",
+          "downloadUrl": "http://sjp.pl/slownik/ort/sjp-myspell-pl-20240901.zip"
         }
       }
     },
