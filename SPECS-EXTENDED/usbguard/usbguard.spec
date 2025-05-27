@@ -95,7 +95,7 @@ autoreconf -i -v --no-recursive ./
     --disable-silent-rules \
     --without-bundled-catch \
     --without-bundled-pegtl \
-    --disable-systemd \
+    --enable-systemd \
     --with-dbus \
     --with-polkit \
     --with-crypto-library=gcrypt
@@ -140,6 +140,8 @@ find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
 %{_datadir}/man/man5/usbguard-rules.conf.5.gz
 %{_datadir}/man/man1/usbguard.1.gz
 %{_datadir}/bash-completion/completions/usbguard
+%{_unitdir}/usbguard.service
+%{_unitdir}/usbguard-dbus.service
 
 %files devel
 %{_includedir}/*
