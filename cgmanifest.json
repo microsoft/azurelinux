@@ -215,8 +215,8 @@
         "type": "other",
         "other": {
           "name": "ansible",
-          "version": "2.17.0",
-          "downloadUrl": "https://github.com/ansible/ansible/archive/refs/tags/v2.17.0.tar.gz"
+          "version": "2.17.11",
+          "downloadUrl": "https://github.com/ansible/ansible/archive/refs/tags/v2.17.11.tar.gz"
         }
       }
     },
