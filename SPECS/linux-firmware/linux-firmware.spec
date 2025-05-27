@@ -11,7 +11,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://www.kernel.org/
-Source0:        https://www.kernel.org/pub/linux/kernel/firmware/%{name}-%{version}.tar.gz
+Source0:        https://www.kernel.org/pub/linux/kernel/firmware/%{name}-%{version}.tar.gz#/%{name}-%{version}-scrubbed.tar.gz
 BuildArch:      noarch
 
 Requires:       %{name}-broadcom = %{version}-%{release}

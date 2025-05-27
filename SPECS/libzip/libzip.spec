@@ -6,7 +6,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://libzip.org/
-Source0:        https://libzip.org/download/libzip-%{version}.tar.xz
+Source0:        https://libzip.org/download/libzip-%{version}.tar.xz#/libzip-%{version}-scrubbed.tar.xz
 BuildRequires:  bzip2-devel
 BuildRequires:  cmake >= 3.0.2
 BuildRequires:  gcc
