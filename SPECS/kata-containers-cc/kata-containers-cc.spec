@@ -46,9 +46,6 @@ This package contains the scripts and files required to build the UVM
 
 %prep
 %autosetup -p1 -a1 -n %{sourceName}-%{version}
-pushd %{_builddir}/%{sourceName}-%{version}
-tar -xf %{SOURCE1}
-popd
 
 %build
 pushd %{_builddir}/%{sourceName}-%{version}/tools/osbuilder/node-builder/azure-linux
@@ -151,7 +148,7 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Wed May 21 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 3.15.0.ask0-2
+* Tue May 27 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 3.15.0.ask0-2
 - Patch CVE-2025-4574
 
 * Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.15.0.aks0-1
