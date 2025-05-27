@@ -35,6 +35,7 @@ steps:
   - bash: |
       additional_args=""
       if [[ ${{ parameters.dailyBuildID }} == "lkg" ]]; then
+        echo "Building toolchain for latest daily build"
         additional_args="DAILY_BUILD_ID=${{ parameters.dailyBuildID }} DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
       fi
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" QUICK_REBUILD=y $additional_args
