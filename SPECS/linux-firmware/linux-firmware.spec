@@ -97,7 +97,7 @@ cp iwlwifi-8000C-*.ucode %{buildroot}%{_firmwarepath}
 
 %changelog
 * Tue May 27 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 0230804-2
-- Remove password protected zip files from upstream src tarball
+- Remove password protected compressed files from upstream src tarball
 
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20230804-1
 - Auto-upgrade to 20230804 - Azure Linux 3.0 - package upgrades
