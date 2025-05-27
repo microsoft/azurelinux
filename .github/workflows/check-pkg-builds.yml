@@ -1,0 +1,280 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: Package build checks
+
+env:
+  REGULAR_PKG: words
+  REGULAR_PKG_SPEC_PATH: SPECS/$REGULAR_PKG/$REGULAR_PKG.spec
+  TOOLCHAIN_PKG: xz
+  TOOLCHAIN_PKG_SPEC_PATH: SPECS/$TOOLCHAIN_PKG/$TOOLCHAIN_PKG.spec
+
+on:
+  push:
+    branches: [3.0*, fasttrack/3.0]
+    paths:
+      - ".github/workflows/check-package-build.yml"
+      - "toolkit/Makefile"
+      - "toolkit/scripts/*"
+      - "toolkit/tools/*"
+  pull_request:
+    branches: [3.0*, fasttrack/3.0]
+    paths:
+      - ".github/workflows/check-package-build.yml"
+      - "toolkit/Makefile"
+      - "toolkit/scripts/*"
+      - "toolkit/tools/*"
+
+jobs:
+  pkg-build-success-ok:
+    name: Simple package build succeeds
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout a stable version of the specs
+        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
+
+      - name: Check if package build succeeds
+        run: |
+          sudo make -C toolkit -j$(nproc) build-packages \
+            PACKAGE_REBUILD_LIST="$REGULAR_PKG" \
+            REBUILD_TOOLS=y \
+            SRPM_PACK_LIST="$REGULAR_PKG"
+
+  pkg-build-failure-ok:
+    name: Simple package build fails
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout a stable version of the specs
+        run: git checkout 3.0-stable -- SPECS/
+
+      # Adding an invalid command to the '%prep' section will cause the build to fail.
+      - name: Break the tested spec
+        run: sed -i '/%prep/a this-command-should-fail-because-its-not-a-command-at-all' "$REGULAR_PKG_SPEC_PATH"
+
+      - name: Check if a package build fails
+        run: |
+          if sudo make -C toolkit -j$(nproc) build-packages \
+            PACKAGE_REBUILD_LIST="$REGULAR_PKG" \
+            REBUILD_TOOLS=y \
+            SRPM_PACK_LIST="$REGULAR_PKG"
+          then
+            echo "Package build should have failed, but it succeeded."
+            exit 1
+          else
+            echo "Package build failed as expected."
+          fi
+
+  toolchain-pkg-rebuild-success-ok:
+    name: Toolchain package rebuild succeeds
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout a stable version of the specs
+        run: git checkout 3.0-stable -- SPECS/
+
+      - name: Check if a toolchain package rebuild succeeds
+        run: |
+          # The important argument is 'ALLOW_TOOLCHAIN_REBUILDS=y'.
+          sudo make -C toolkit -j$(nproc) build-packages \
+            PACKAGE_REBUILD_LIST="$TOOLCHAIN_PKG" \
+            REBUILD_TOOLS=y \
+            SRPM_PACK_LIST="$TOOLCHAIN_PKG" \
+            ALLOW_TOOLCHAIN_REBUILDS=y
+
+  toolchain-pkg-rebuild-failure-ok:
+    name: Toolchain package rebuild fails
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout a stable version of the specs
+        run: git checkout 3.0-stable -- SPECS/
+
+      - name: Check if a toolchain package rebuild fails
+        run: |
+          # The important argument is 'ALLOW_TOOLCHAIN_REBUILDS=n'.
+          if sudo make -C toolkit -j$(nproc) build-packages \
+            PACKAGE_REBUILD_LIST="$TOOLCHAIN_PKG" \
+            REBUILD_TOOLS=y \
+            SRPM_PACK_LIST="$TOOLCHAIN_PKG" \
+            ALLOW_TOOLCHAIN_REBUILDS=n
+          then
+            echo "Toolchain package rebuild should have failed, but it succeeded."
+            exit 1
+          else
+            echo "Toolchain package rebuild failed as expected."
+          fi
+
+  none-license-check-no-break-ok:
+    name: None license check does not break the build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout a stable version of the specs
+        run: git checkout 3.0-stable -- SPECS/
+
+      - name: Break the tested spec
+        run: |
+          license_file_name=$(grep -oP '^%license\s+\K\S+' "$REGULAR_PKG_SPEC_PATH")
+          if [[ -z "$license_file_name" ]]; then
+            echo "ERROR: no license file found in the spec $REGULAR_PKG_SPEC_PATH"
+            exit 1
+          fi
+
+          sed -i "/^%license/a %doc $license_file_name" "$REGULAR_PKG_SPEC_PATH"
+
+      - name: Check if license check does not break the build
+        run: |
+          # The important argument is 'LICENSE_CHECK_MODE=none'.
+          sudo make -C toolkit -j$(nproc) build-packages \
+            PACKAGE_REBUILD_LIST="$REGULAR_PKG" \
+            REBUILD_TOOLS=y \
+            SRPM_PACK_LIST="$REGULAR_PKG" \
+            LICENSE_CHECK_MODE=none
+
+  warning-license-check-no-break-ok:
+    name: Warning-only license check does not break the build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout a stable version of the specs
+        run: git checkout 3.0-stable -- SPECS/
+
+      - name: Break the tested spec
+        run: |
+          license_file_name=$(grep -oP '^%license\s+\K\S+' "$REGULAR_PKG_SPEC_PATH")
+          if [[ -z "$license_file_name" ]]; then
+            echo "ERROR: no license file found in the spec $REGULAR_PKG_SPEC_PATH"
+            exit 1
+          fi
+
+          sed -i "/^%license/a %doc $license_file_name" "$REGULAR_PKG_SPEC_PATH"
+
+      - name: Check if license check does not break the build
+        run: |
+          # The important argument is 'LICENSE_CHECK_MODE=warn'.
+          sudo make -C toolkit -j$(nproc) build-packages \
+            PACKAGE_REBUILD_LIST="$REGULAR_PKG" \
+            REBUILD_TOOLS=y \
+            SRPM_PACK_LIST="$REGULAR_PKG" \
+            LICENSE_CHECK_MODE=warn
+
+  fatal-license-check-failure-ok:
+    name: Fatal license check fails
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout a stable version of the specs
+        run: git checkout 3.0-stable -- SPECS/
+
+      - name: Break the tested spec
+        run: |
+          if ! grep -q '^%license' "$REGULAR_PKG_SPEC_PATH"; then
+            echo "ERROR: no '%license' macro found in the spec $REGULAR_PKG_SPEC_PATH"
+            exit 1
+          fi
+
+          # Tagging a license file as a documentation file will cause the license check to fail.
+          sed -i "s/^%license/%doc/" "$REGULAR_PKG_SPEC_PATH"
+
+      - name: Check if license check fails
+        run: |
+          # The important argument is 'LICENSE_CHECK_MODE=fatal'.
+          if sudo make -C toolkit -j$(nproc) build-packages \
+            PACKAGE_REBUILD_LIST="$REGULAR_PKG" \
+            REBUILD_TOOLS=y \
+            SRPM_PACK_LIST="$REGULAR_PKG" \
+            LICENSE_CHECK_MODE=fatal
+          then
+            echo "License check should have failed, but it succeeded."
+            exit 1
+          else
+            echo "License check failed as expected."
+          fi
+
+  fatal-license-check-success-ok:
+    name: Fatal license check succeeds on duplicated license as documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout a stable version of the specs
+        run: git checkout 3.0-stable -- SPECS/
+
+      - name: Break the tested spec
+        run: |
+          license_file_name=$(grep -oP '^%license\s+\K\S+' "$REGULAR_PKG_SPEC_PATH")
+          if [[ -z "$license_file_name" ]]; then
+            echo "ERROR: no license file found in the spec $REGULAR_PKG_SPEC_PATH"
+            exit 1
+          fi
+
+          # Tagging a license file as a documentation file will not fail the license check on the 'fatal' level.
+          sed -i "/^%license/a %doc $license_file_name" "$REGULAR_PKG_SPEC_PATH"
+
+      - name: Check if license check fails
+        run: |
+          # The important argument is 'LICENSE_CHECK_MODE=fatal'.
+          sudo make -C toolkit -j$(nproc) build-packages \
+            PACKAGE_REBUILD_LIST="$REGULAR_PKG" \
+            REBUILD_TOOLS=y \
+            SRPM_PACK_LIST="$REGULAR_PKG" \
+            LICENSE_CHECK_MODE=fatal
+
+  pedantic-license-check-failure-ok:
+    name: Pedantic license check fails
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout a stable version of the specs
+        run: git checkout 3.0-stable -- SPECS/
+
+      - name: Break the tested spec
+        run: |
+          license_file_name=$(grep -oP '^%license\s+\K\S+' "$REGULAR_PKG_SPEC_PATH")
+          if [[ -z "$license_file_name" ]]; then
+            echo "ERROR: no license file found in the spec $REGULAR_PKG_SPEC_PATH"
+            exit 1
+          fi
+
+          sed -i "/^%license/a %doc $license_file_name" "$REGULAR_PKG_SPEC_PATH"
+
+      - name: Check if license check fails
+        run: |
+          # The important argument is 'LICENSE_CHECK_MODE=pedantic'.
+          if sudo make -C toolkit -j$(nproc) build-packages \
+            PACKAGE_REBUILD_LIST="$REGULAR_PKG" \
+            REBUILD_TOOLS=y \
+            SRPM_PACK_LIST="$REGULAR_PKG" \
+            LICENSE_CHECK_MODE=pedantic
+          then
+            echo "License check should have failed, but it succeeded."
+            exit 1
+          else
+            echo "License check failed as expected."
+          fi
