@@ -28,7 +28,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel-lpg-innovate
-Version:        6.6.85.1
+Version:        6.6.89.2
 Release:        1001%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -461,6 +461,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon May 19 2025 Dan Streetman <ddstreet@ieee.org> - 6.6.89.2-1001
+- update to 6.6.89.2
+
 * Thu Apr 17 2025 Dan Streetman <ddstreet@ieee.org> - 6.6.85.1-1001
 - update to 6.6.85.1
 
