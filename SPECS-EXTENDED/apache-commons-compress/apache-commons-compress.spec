@@ -1,3 +1,6 @@
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+
 #
 # spec file for package apache-commons-compress
 #
@@ -20,7 +23,7 @@
 %global short_name      commons-%{base_name}
 Name:           apache-%{short_name}
 Version:        1.26.1
-Release:        1
+Release:        1%{?dist}
 Summary:        Java API for working with compressed files and archivers
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -123,7 +126,7 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 
 %changelog
 * Tue May 20 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.26.1-1
-- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
+- Initial Azure Linux import from openSUSE Tumbleweed (license: same as "License" tag).
 - License verified
 
 -------------------------------------------------------------------
