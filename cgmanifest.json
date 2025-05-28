@@ -4550,8 +4550,8 @@
         "type": "other",
         "other": {
           "name": "gnome-keyring",
-          "version": "3.36.0",
-          "downloadUrl": "https://download.gnome.org/sources/gnome-keyring/3.36/gnome-keyring-3.36.0.tar.xz"
+          "version": "46.2",
+          "downloadUrl": "https://download.gnome.org/sources/gnome-keyring/46/gnome-keyring-46.2.tar.xz"
         }
       }
     },
