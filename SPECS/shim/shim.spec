@@ -37,7 +37,7 @@
 Summary:        First stage UEFI bootloader
 Name:           shim
 Version:        15.8
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -187,6 +187,9 @@ fi
 /boot/efi/EFI/%{efidir}/*
 
 %changelog
+* Mon Jun 09 2025 Mayank Singh <mayansingh@microsoft.com> - 15.8-6
+- Bump to match shim-unsigned-aarch64 release
+
 * Thu Nov 28 2024 Chris Co <chrco@microsoft.com> - 15.8-5
 - Add Provides for shim-unsigned
 
