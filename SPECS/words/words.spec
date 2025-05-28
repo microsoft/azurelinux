@@ -50,7 +50,6 @@ ln -sf linux.words $RPM_BUILD_ROOT%{_datadir}/dict/words
 %files
 %license LICENSE
 %doc mwords/readme.txt
-%{_datadir}/dict/linux.words
 %{_datadir}/dict/words
 
 %changelog
