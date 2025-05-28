@@ -65,6 +65,10 @@
         "words",
         "xfsprogs",
         "xz",
-        "zlib"
+        "zlib",
+        "trident",
+        "trident-provisioning",
+        "trident-service",
+        "trident-update-poll"
     ]
 }
