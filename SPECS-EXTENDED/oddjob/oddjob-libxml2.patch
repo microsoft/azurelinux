@@ -1,0 +1,28 @@
+From 3d30f6fec556f2eb53671832ae47687ace1fc655 Mon Sep 17 00:00:00 2001
+From: Yaakov Selkowitz <yselkowi@redhat.com>
+Date: Wed, 13 Dec 2023 15:12:32 -0500
+Subject: [PATCH] Fix build with libxml2-2.12.0
+
+https://gitlab.gnome.org/GNOME/libxml2/-/releases/v2.12.0
+
+"Several cyclic dependencies in public header files were fixed. As a
+result, certain headers won't include other headers as before."
+---
+ src/oddjobd.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/oddjobd.c b/src/oddjobd.c
+index 44de748..fb63c02 100644
+--- a/src/oddjobd.c
++++ b/src/oddjobd.c
+@@ -47,6 +47,7 @@
+ #include <string.h>
+ #include <unistd.h>
+ #include <dbus/dbus.h>
++#include <libxml/globals.h>
+ #include <libxml/xmlreader.h>
+ #ifdef SELINUX_ACLS
+ #include <selinux/selinux.h>
+-- 
+2.43.0
+
