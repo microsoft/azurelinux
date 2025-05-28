@@ -87,7 +87,7 @@ e2fsprogs-lang-1.47.0-2.azl3.aarch64.rpm
 e2fsprogs-libs-1.47.0-2.azl3.aarch64.rpm
 elfutils-0.189-5.azl3.aarch64.rpm
 elfutils-debuginfo-0.189-5.azl3.aarch64.rpm
-elfutils-default-yama-scope-0.189-5.azl3.aarch64.rpm
+elfutils-default-yama-scope-0.189-5.azl3.noarch.rpm
 elfutils-devel-0.189-5.azl3.aarch64.rpm
 elfutils-devel-static-0.189-5.azl3.aarch64.rpm
 elfutils-libelf-0.189-5.azl3.aarch64.rpm
