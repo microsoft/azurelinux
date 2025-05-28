@@ -1,0 +1,26 @@
+diff -ur virt-top-1.0.9.old/src/virt-top.pod virt-top-1.0.9.new/src/virt-top.pod
+--- virt-top-1.0.9.old/src/virt-top.pod	2020-05-05 12:01:25.069799212 +0100
++++ virt-top-1.0.9.new/src/virt-top.pod	2020-05-05 12:02:05.234337666 +0100
+@@ -129,6 +129,22 @@
+ 
+  virt-top --csv >(split -d -l 1000 - output.csv.)
+ 
++RHEL provides a short Python script called C<processcsv.py> which
++can be used to post-process the CSV output.  Run it like this:
++
++ virt-top --csv data.csv
++ processcsv.py < data.csv
++
++This creates or I<overwrites> the following files in the current
++directory:
++
++ global.csv
++ domain<NNN>.csv
++
++C<global.csv> will contain the global data.  One
++C<domainE<lt>NNNE<gt>.csv> file will also be created for each domain
++with ID C<NNN>, containing the per-domain data.
++
+ =item B<--no-csv-cpu>
+ 
+ Disable domain CPU stats in CSV output.

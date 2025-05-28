@@ -1,0 +1,39 @@
+From 4b15ee2440b0e70e3c1eb5e164ded493e2d8f0c8 Mon Sep 17 00:00:00 2001
+From: Yuya Higashi <higashi.yuya@fujitsu.com>
+Date: Tue, 15 Nov 2022 13:56:21 +0900
+Subject: [PATCH 1/3] virt-top: fix to explicitly disconnect from libvirtd
+
+To prevent libvirtd from printing virNetSocketReadWire I/O errors when
+the virt-top command exits, explicitly disconnect from libvirtd.
+
+Signed-off-by: Yuya Higashi <higashi.yuya@fujitsu.com>
+---
+ src/top.ml | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/top.ml b/src/top.ml
+index 75fbcb9..cbe655a 100644
+--- a/src/top.ml
++++ b/src/top.ml
+@@ -306,7 +306,7 @@ let get_string maxlen =
+   )
+ 
+ (* Main loop. *)
+-let rec main_loop ((_, batch_mode, script_mode, csv_enabled, stream_mode, _, _, _)
++let rec main_loop ((conn, batch_mode, script_mode, csv_enabled, stream_mode, _, _, _)
+ 		     as setup) =
+   let csv_flags = !csv_cpu, !csv_mem, !csv_block, !csv_net in
+ 
+@@ -372,7 +372,8 @@ let rec main_loop ((_, batch_mode, script_mode, csv_enabled, stream_mode, _, _,
+       if not !quit || !end_time <> None then
+ 	millisleep delay
+     )
+-  done
++  done;
++  C.close conn
+ 
+ and get_key_press setup delay =
+   (* Read the next key, waiting up to 'delay' milliseconds. *)
+-- 
+2.42.0
+
