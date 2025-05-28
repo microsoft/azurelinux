@@ -336,7 +336,7 @@
         "other": {
           "name": "apache-commons-compress",
           "version": "1.26.1",
-          "downloadUrl": " https://archive.apache.org/dist/commons/compress/source/commons-compress-1.26.1-src.tar.gz"
+          "downloadUrl": "https://archive.apache.org/dist/commons/compress/source/commons-compress-1.26.1-src.tar.gz"
         }
       }
     },
