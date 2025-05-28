@@ -1,12 +1,12 @@
 Name:           perl-Pod-Eventual
-Version:        0.094001
-Release:        17%{?dist}
+Version:        0.094003
+Release:        1%{?dist}
 Summary:        Read a POD document as a series of trivial events
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Pod-Eventual
-Source0:        https://cpan.metacpan.org/modules/by-module/Pod/Pod-Eventual-%{version}.tar.gz#/perl-Pod-Eventual-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/Pod/Pod-Eventual-%{version}.tar.gz
 BuildArch:      noarch
 # Build:
 BuildRequires:  coreutils
@@ -14,17 +14,20 @@ BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.30
+BuildRequires:  perl(:VERSION) >= 5.12
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.78
 # Run-time:
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(Mixin::Linewise::Readers) >= 0.102
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 # Tests:
+BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(Test::Deep)
-BuildRequires:  perl(Test::More) >= 0.88
+BuildRequires:  perl(Test::More) >= 0.96
+# Optional Tests:
+BuildRequires:  perl(CPAN::Meta) >= 2.120900
 # Explicit dependencies:
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 POD is a pretty simple format to write, but it can be a big pain to deal with
@@ -57,17 +60,17 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
-%if 0%{?_licensedir:1}
 %license LICENSE
-%else
-%doc LICENSE
-%endif
 %doc Changes README
 %{perl_vendorlib}/Pod/
 %{_mandir}/man3/Pod::Eventual.3*
 %{_mandir}/man3/Pod::Eventual::Simple.3*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.094003-1
+- Update to version 0.094003
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.094001-17
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
