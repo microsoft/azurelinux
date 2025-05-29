@@ -2,14 +2,14 @@
 Summary:        Memory Management Debugger.
 Name:           valgrind
 Version:        3.22.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Debuggers
 URL:            https://valgrind.org
 Source0:        https://sourceware.org/pub/%{name}/%{name}-%{version}.tar.bz2
-Requires:       glibc-debuginfo
+BuildRequires:  glibc-devel
 BuildRequires:  pkg-config
 %if 0%{?with_check}
 BuildRequires:  docbook-dtd-xml
@@ -50,6 +50,9 @@ make %{?_smp_mflags} -k check
 %{_libexecdir}/valgrind/*
 
 %changelog
+* Thu May 29 2025 Sam Meluch <sammeluch@microsoft.com> - 3.22.0-2
+- change glibc-debuginfo to glibc-devel
+
 * Tue Aug 06 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.22.0-1
 - Bump version to 3.22.0.
 
