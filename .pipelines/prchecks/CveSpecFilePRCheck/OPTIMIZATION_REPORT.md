@@ -39,8 +39,8 @@
 
 ### 5. Redundancy Removal
 - **Deprecated `FixRecommender.py`**: AI analysis now provides dynamic recommendations
-- **Identified `post_github_comment.py` as redundant**: Functionality integrated into main script
-- **Consolidated workflow**: Single execution path with integrated GitHub functionality
+- **Restored `post_github_comment.py`**: Maintained for backward compatibility with existing pipelines while integrated functionality is tested
+- **Consolidated workflow**: Single execution path with integrated GitHub functionality (legacy script available as fallback)
 
 ### 6. Comprehensive Documentation
 - **Updated README.md**: Complete system overview with new flow documentation
