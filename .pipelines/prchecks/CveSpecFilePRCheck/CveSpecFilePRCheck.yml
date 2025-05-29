@@ -112,18 +112,24 @@ steps:
       AZURE_OPENAI_DEPLOYMENT_NAME: $(AZURE_OPENAI_DEPLOYMENT_NAME)
       AZURE_OPENAI_MODEL_NAME: $(AZURE_OPENAI_MODEL_NAME)
       AZURE_OPENAI_API_VERSION: $(AZURE_OPENAI_API_VERSION)
+      # GitHub integration environment variables
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      GITHUB_TOKEN: $(githubPrPat)
+      GITHUB_REPOSITORY: $(Build.Repository.Name)
+      GITHUB_PR_NUMBER: $(System.PullRequest.PullRequestNumber)
     inputs:
       targetType: inline
       script: |
-        echo "🔍 Running analysis of spec files without GitHub commenting"
+        echo "🔍 Running analysis of spec files with integrated GitHub posting"
         
         cd .pipelines/prchecks/CveSpecFilePRCheck
         chmod +x run-pr-check.sh
 
-        # Build command with analysis-only flags and explicitly pass exit-code-severity
+        # Build command with integrated GitHub functionality
         CMD="./run-pr-check.sh --exit-code-severity"
         if [ "$FAIL_ON_WARNINGS" = "True" ]; then CMD="$CMD --fail-on-warnings"; fi
-        # Explicitly omit GitHub integration flags
+        if [ "$POST_GITHUB_COMMENTS" = "True" ]; then CMD="$CMD --post-github-comments"; fi
+        if [ "$USE_GITHUB_CHECKS" = "True" ]; then CMD="$CMD --use-github-checks"; fi
         
         echo "Running analysis command: $CMD"
         $CMD
@@ -153,41 +159,4 @@ steps:
         else
           echo "✅ Analysis completed successfully (exit code: $ANALYSIS_EXIT_CODE)"
         fi
-        
-  # 6) Post GitHub PR comments as a separate task
-  - task: Bash@3
-    displayName: '💬 Post GitHub PR Comments'
-    # Always post comments, even when PR check fails (but only if enabled)
-    condition: and(always(), eq('${{ parameters.postGitHubComments }}', 'true'))
-    env:
-      # Use System.AccessToken as fallback for GitHub authentication
-      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-      # Use the CBL-Mariner bot PAT from key vault (primary auth method)
-      GITHUB_TOKEN: $(githubPrPat)
-      # Explicitly set GitHub repo name from Azure DevOps variables
-      GITHUB_REPOSITORY: $(Build.Repository.Name)
-      # Set PR number explicitly
-      GITHUB_PR_NUMBER: $(System.PullRequest.PullRequestNumber)
-      # Set the source commit for status updates
-      SYSTEM_PULLREQUEST_SOURCECOMMITID: $(Build.SourceVersion)
-    inputs:
-      targetType: inline
-      script: |
-        echo "💬 Posting analysis results as GitHub PR comments"
-        echo "Repository: ${GITHUB_REPOSITORY}"
-        echo "PR Number: ${GITHUB_PR_NUMBER}"
-        
-        cd .pipelines/prchecks/CveSpecFilePRCheck
-        
-        # Ensure the GitHub comment poster script is executable
-        chmod +x post_github_comment.py
-        
-        # Set up flags for the GitHub comment poster
-        CMD="python3 post_github_comment.py --report-file spec_analysis_report.json"
-        if [ "$USE_GITHUB_CHECKS" = "True" ]; then CMD="$CMD --use-github-checks"; fi
-        
-        echo "Running GitHub comment poster: $CMD"
-        $CMD
-        
-        # Let the pipeline continue even if commenting fails
-        # The main analysis task already determined the success/failure
+

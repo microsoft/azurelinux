@@ -379,7 +379,7 @@ class GitHubClient:
                                ai_analysis: str = "") -> str:
         """
         Format a comment based on the severity of issues.
-        This uses a more concise approach since the new implementation is in post_github_comment.py
+        This provides a basic implementation for GitHub comment formatting.
         
         Args:
             severity: Highest severity level of detected issues
@@ -389,9 +389,9 @@ class GitHubClient:
         Returns:
             Formatted markdown for a GitHub comment
         """
-        # This method is now only used by the external post_github_comment.py
-        # which has its own implementation for creating concise comments.
-        # However, we'll keep a basic implementation here for backward compatibility.
+        # Basic implementation for GitHub comment formatting.
+        # The main comment generation logic is now in ResultAnalyzer.generate_pr_comment_content()
+        # which provides more sophisticated structured output handling.
         
         # Just return the header and issues list
         if severity == Severity.CRITICAL:
