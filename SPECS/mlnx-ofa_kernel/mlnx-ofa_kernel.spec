@@ -25,7 +25,7 @@
 # and/or other materials provided with the distribution.
 #
 #
-%global last-known-kernel 6.6.90.1-1
+%global last-known-kernel 6.6.92.1-1
 
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
@@ -99,7 +99,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel
 Version:	 24.10
-Release:	 19%{?dist}
+Release:	 20%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -734,6 +734,9 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
+* Thu May 29 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-20
+- Bump release to rebuild for new kernel release
+
 * Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-19
 - Bump release to rebuild for new kernel release
 
