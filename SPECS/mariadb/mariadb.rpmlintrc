@@ -1,0 +1,79 @@
+# THIS FILE SERVES FOR WHITELISTING RPMLINT ERRORS AND WARNINGS IN TASKOTRON
+# https://fedoraproject.org/wiki/Taskotron/Tasks/dist.rpmlint#Whitelisting_errors
+
+# (same file in python3 package served as a great example)
+
+
+
+# Spelling errors
+addFilter(r'spelling-error .* en_US (cnf|mysqld|benchmarking|pam|passwordless|subpackage|libmariadb|mariadbd) ')
+
+# Debugsource
+addFilter(r'^mariadb.*debugsource\.[^:]+: (E|W): no-documentation')
+# Debuginfo
+addFilter(r'^mariadb.*debuginfo\.[^:]+: (E|W): useless-provides debuginfo\(build-id\)')
+# Debug symlinks
+addFilter(r'dangling-relative-symlink /usr/lib/.build-id')
+
+# Testsuite
+#   Some expected tests results are zero-length files
+addFilter(r'(zero-length|pem-certificate) /usr/share/mysql-test/*')
+
+# Chroot function
+#   False positive; checked by upstream
+addFilter(r'missing-call-to-chdir-with-chroot')
+
+# Missing documentation
+#   I don't think that's on the upstream priority list
+addFilter(r'no-documentation')
+addFilter(r'no-manual-page-for-binary')
+
+# Obsoleted not provided
+#   Obsoleting upstream packages, not providing them is expected to not mix them up
+addFilter(r'obsolete-not-provided MySQL')
+#   Provided by mariadb-connector-c
+addFilter(r'obsolete-not-provided mariadb-libs')
+#   Upstream dropped support
+addFilter(r'obsolete-not-provided mariadb-bench')
+addFilter(r'obsolete-not-provided mariadb-tokudb-engine')
+
+# Config file without noreplace flag
+#   Don't replace logs that may contain old entries
+addFilter(r'conffile-without-noreplace-flag /var/log/mariadb/mariadb.log')
+
+# Log rotation
+#   MariaDB log rotation script is commented out, because it is still not ready for big industry usage.
+#   Let the user decide, if they want to enable it (uncomment it)
+addFilter(r'incoherent-logrotate-file /etc/logrotate.d/mariadb')
+
+# Permissions
+# wsrep_sst_common
+#   It contains a parser of arguments for other sst scripts.
+#   It is meant to be sourced, not to be executed alone.
+#   So it correctly does not have shebang nor executable bit.
+addFilter(r'non-executable-in-bin /usr/bin/wsrep_sst_common 644')
+addFilter(r'script-without-shebang /usr/bin/wsrep_sst_common')
+addFilter(r'non-executable-script /usr/bin/wsrep_sst_common 644 None')
+# mariadb-scripts-common has a similar issue
+addFilter(r'non-executable-script /usr/libexec/mariadb-scripts-common 644 /bin/sh')
+# Seems pretty standard to me ...
+addFilter(r'non-standard-dir-perm /var/log/mariadb 750')
+# 640 is IMO also prety OK
+addFilter(r'non-readable /etc/sysconfig/clustercheck 640')
+
+# Unversioned bundles
+#  RocksDB has so rapid developement, it it not compatible through versions.
+#  That means we need to stick to the exact verison upstream use.
+addFilter(r'unversioned-explicit-provides bundled\(rocksdb\)')
+
+# Testsuite errors
+addFilter(r'non-executable-script /usr/share/mysql-test')
+addFilter(r'arch-dependent-file-in-usr-share /usr/share/mysql-test')
+
+# Comments at the end of RPM %endif tags
+addFilter(r'extra tokens at the end of %endif directive')
+
+# PAM plugin specialities - all expected
+addFilter(r'non-conffile-in-etc /etc/security/user_map.conf')
+addFilter(r'setuid-binary /usr/lib64/mariadb/plugin/auth_pam_tool_dir/auth_pam_tool')
+addFilter(r'non-standard-executable-perm /usr/lib64/mariadb/plugin/auth_pam_tool_dir/auth_pam_tool')
