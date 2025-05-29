@@ -6600,8 +6600,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.85.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.85.1.tar.gz"
+          "version": "6.6.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.90.1.tar.gz"
         }
       }
     },
@@ -7931,8 +7931,8 @@
         "type": "other",
         "other": {
           "name": "jimtcl",
-          "version": "0.78",
-          "downloadUrl": "https://github.com/msteveb/jimtcl/archive/0.78/jimtcl-0.78.tar.gz"
+          "version": "0.83",
+          "downloadUrl": "https://github.com/msteveb/jimtcl/archive/0.83/jimtcl-0.83.tar.gz"
         }
       }
     },
@@ -7981,8 +7981,8 @@
         "type": "other",
         "other": {
           "name": "jose",
-          "version": "10",
-          "downloadUrl": "https://github.com/latchset/jose/releases/download/v10/jose-10.tar.bz2"
+          "version": "14",
+          "downloadUrl": "https://github.com/latchset/jose/releases/download/v14/jose-14.tar.xz"
         }
       }
     },
@@ -8241,8 +8241,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.85.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.85.1.tar.gz"
+          "version": "6.6.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.90.1.tar.gz"
         }
       }
     },
@@ -8251,8 +8251,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.85.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.85.1.tar.gz"
+          "version": "6.6.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.90.1.tar.gz"
         }
       }
     },
@@ -8261,8 +8261,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.85.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.85.1.tar.gz"
+          "version": "6.6.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.90.1.tar.gz"
         }
       }
     },
@@ -8271,8 +8271,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.85.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.85.1.tar.gz"
+          "version": "6.6.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.90.1.tar.gz"
         }
       }
     },
@@ -27464,8 +27464,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.85.0",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.85.0-src.tar.xz"
+          "version": "1.86.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.86.0-src.tar.xz"
         }
       }
     },
@@ -28826,8 +28826,8 @@
         "type": "other",
         "other": {
           "name": "tang",
-          "version": "14",
-          "downloadUrl": "https://github.com/latchset/tang/archive/refs/tags/v14.tar.gz"
+          "version": "15",
+          "downloadUrl": "https://github.com/latchset/tang/releases/download/v15/tang-15.tar.xz"
         }
       }
     },
@@ -28838,6 +28838,16 @@
           "name": "tar",
           "version": "1.35",
           "downloadUrl": "https://ftp.gnu.org/gnu/tar/tar-1.35.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "tardev-snapshotter",
+          "version": "3.2.0.tardev1",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.tardev1.tar.gz"
         }
       }
     },

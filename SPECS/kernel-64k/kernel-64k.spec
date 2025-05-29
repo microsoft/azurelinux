@@ -24,8 +24,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-64k
-Version:        6.6.85.1
-Release:        4%{?dist}
+Version:        6.6.90.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -371,6 +371,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.90.1-1
+- Auto-upgrade to 6.6.90.1
+
 * Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.6.85.1-4
 - Added a new patch to EFI slack slots issue
 
