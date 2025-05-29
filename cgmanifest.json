@@ -1447,8 +1447,8 @@
         "type": "other",
         "other": {
           "name": "cassandra",
-          "version": "4.0.10",
-          "downloadUrl": "https://archive.apache.org/dist/cassandra/4.0.10/apache-cassandra-4.0.10-src.tar.gz"
+          "version": "5.0.0",
+          "downloadUrl": "https://archive.apache.org/dist/cassandra/5.0.0/apache-cassandra-5.0.0-src.tar.gz"
         }
       }
     },
