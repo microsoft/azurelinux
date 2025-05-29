@@ -15563,7 +15563,7 @@
         "type": "other",
         "other": {
           "name": "openvmm",
-          "version": "0.0.1",
+          "version": "0.0.2",
           "downloadUrl": "https://github.com/microsoft/openvmm/archive/6eb4734.tar.gz"
         }
       }
