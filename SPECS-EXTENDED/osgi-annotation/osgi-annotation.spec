@@ -21,7 +21,7 @@ Distribution:   Azure Linux
 
 Name:           osgi-annotation
 Version:        8.1.0
-Release:        8%{?dist}
+Release:        1%{?dist}
 Summary:        Annotations for use in compiling OSGi bundles
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -100,7 +100,7 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
-* Tue May 27 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 8.1.0-8
+* Tue May 27 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 8.1.0-1
 - Initial Azure Linux import from openSUSE Tumbleweed (license: same as "License" tag).
 - License verified
 
