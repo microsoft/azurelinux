@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.6.1
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -152,6 +152,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Wed May 28 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.6.1-23
+- Updated config.yaml file to include boltpath, engine path and nats port
+
 * Tue Mar 18 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.6.1-22
 - Fix CVE-2025-22870, CVE-2024-51744 with an upstream patch
 

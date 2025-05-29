@@ -185,10 +185,6 @@ function create_directories () {
     local user
     user=$(id -u)
 
-    if [ "$(id -u)" != 0 ]; then
-        log warn "cannot create folders as non-root"
-        return
-    fi
 
     mkdir -p "${bolt_dir}" "${ENGINE_PATH}"
     chmod 700 "${bolt_dir}" "${ENGINE_PATH}" || :
@@ -354,7 +350,7 @@ function user_scripts_present () {
 function run_user_scripts () {
     if [ -d ${USER_SCRIPT_DIR} ]; then
         log info "Executing user-provided scripts" script_dir ${USER_SCRIPT_DIR}
-        run-parts --regex ".*sh$" --report --exit-on-error ${USER_SCRIPT_DIR}
+        run-parts ${USER_SCRIPT_DIR}
     fi
 }
 
@@ -501,11 +497,11 @@ function main () {
     fi
 
     if [ "$(id -u)" = 0 ]; then
-        exec setpriv --reuid=influxdb --regid=influxdb --init-groups --inh-caps=-all "$BASH_SOURCE" "$@"
+        exec setpriv --reuid=influxdb --regid=influxdb --init-groups --inh-caps=-all "$BASH_SOURCE" "${@}"
     fi
 
     # Run influxd.
-    exec influxd "$@"
+    exec influxd "${@}"
 }
 
-main "$@"
+main "${@}"
