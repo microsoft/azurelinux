@@ -2,7 +2,7 @@
 
 Name:           kata-containers
 Version:        3.15.0.aks0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
@@ -59,6 +59,11 @@ popd
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 START_SERVICES=no PREFIX=%{buildroot} %make_build deploy-package
 PREFIX=%{buildroot} %make_build deploy-package-tools
+
+# Add a debug config
+cp %{buildroot}/%{defaults_kata}/configuration.toml %{buildroot}/%{defaults_kata}/configuration-debug.toml
+sed -i '/^#enable_debug =/s|^#||g' %{buildroot}/%{defaults_kata}/configuration-debug.toml
+sed -i '/^#debug_console_enabled =/s|^#||g' %{buildroot}/%{defaults_kata}/configuration-debug.toml
 popd
 
 %files
@@ -67,6 +72,7 @@ popd
 %{kata_bin}/kata-runtime
 
 %{defaults_kata}/configuration.toml
+%{defaults_kata}/configuration-debug.toml
 
 %{kata_shim_bin}/containerd-shim-kata-v2
 
@@ -112,6 +118,9 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Thu May 29 2025 Cameron Baird <cameronbaird@microsoft.com> - 3.15.0.aks0-2
+- Introduce debug configuration
+
 * Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.15.0.aks0-1
 - Auto-upgrade to 3.15.0.aks0
 
