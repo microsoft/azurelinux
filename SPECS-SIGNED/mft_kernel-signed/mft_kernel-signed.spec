@@ -13,7 +13,7 @@
 Name:            %{_name}-signed
 Summary:         %{_name} Kernel Module for the %{KVERSION} kernel
 Version:         4.30.0
-Release:         19%{?dist}
+Release:         20%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
 
@@ -80,6 +80,9 @@ popd
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
+* Thu May 29 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.30.0-20
+- Bump release to rebuild for new kernel release
+
 * Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.30.0-19
 - Bump release to rebuild for new kernel release
 
