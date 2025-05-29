@@ -9,8 +9,8 @@
 
 Summary:        Domain Name System software
 Name:           bind
-Version:        9.20.5
-Release:        4%{?dist}
+Version:        9.20.9
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,9 +31,6 @@ Source12:       generate-rndc-key.sh
 Source13:       named.rwtab
 Source14:       named-chroot.files
 Source15:       https://gitlab.isc.org/isc-projects/dlz-modules/-/archive/main/dlz-modules-main.tar.gz
-
-Patch0:         nongit-fix.patch
-Patch1:         fix-maybe-uninitialized-warning-in-dlz_mysqldyn_mod.patch
 
 BuildRequires:  gcc
 BuildRequires:  git
@@ -536,7 +533,11 @@ fi;
 %{_mandir}/man1/named-nzd2nzf.1*
 
 %changelog
-* Tue Feb 11 2025 Andrew Phelps <anphel@microsoft.com> - 9.20.5-4
+* Mon May 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.20.9-1
+- Auto-upgrade to 9.20.9 - for CVE-2025-40775
+- Remove nongit-fix.patch and fix-maybe-uninitialized-warning-in-dlz_mysqldyn_mod.patch
+
+* Tue Mar 11 2025 Andrew Phelps <anphel@microsoft.com> - 9.20.5-4
 - Remove duplicate shared object files in base and devel packages
 - Remove duplicate files from utils package
 - Add requires for bind-libs from base package
