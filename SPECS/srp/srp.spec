@@ -26,11 +26,6 @@
 #
 #
 
-<<<<<<< HEAD
-%global last-known-kernel 6.6.90.1-1
-
-=======
->>>>>>> 9b3a4cb81 (dev work)
 %if 0%{azl}
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
@@ -71,11 +66,7 @@
 Summary:	 srp driver
 Name:		 srp
 Version:	 24.10
-<<<<<<< HEAD
-Release:	 19%{?dist}
-=======
-Release:	 17%{release_suffix}%{?dist}
->>>>>>> 9b3a4cb81 (dev work)
+Release:	 20%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -264,7 +255,9 @@ fi
 %endif
 
 %changelog
-<<<<<<< HEAD
+* Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-20
+- Add kernel version and release nb into release nb
+
 * Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-19
 - Bump release to rebuild for new kernel release
 
@@ -273,10 +266,6 @@ fi
 
 * Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-17
 - Bump release to rebuild for new kernel release
-=======
-* Mon Apr 30 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-17
-- Add kernel version and release nb into release nb
->>>>>>> 9b3a4cb81 (dev work)
 
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 24.10-16
 - Bump release to rebuild for new kernel release
