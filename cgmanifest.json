@@ -2968,8 +2968,8 @@
         "type": "other",
         "other": {
           "name": "double-conversion",
-          "version": "3.1.5",
-          "downloadUrl": "https://github.com/google/double-conversion/archive/v3.1.5/double-conversion-3.1.5.tar.gz"
+          "version": "3.3.1",
+          "downloadUrl": "https://github.com/google/double-conversion/archive/v3.3.1/double-conversion-3.3.1.tar.gz"
         }
       }
     },

@@ -1,17 +1,16 @@
-%bcond_without static_libs # don't build static libraries
 Summary:        Library providing binary-decimal and decimal-binary routines for IEEE doubles
 Name:           double-conversion
-Version:        3.1.5
-Release:        9%{?dist}
-License:        BSD
+Version:        3.3.1
+Release:        2%{?dist}
+
+License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/google/double-conversion
-Source0:        https://github.com/google/double-conversion/archive/v%{version}/%{name}-%{version}.tar.gz
-BuildRequires:  cmake
+Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
-%undefine __cmake_in_source_build
+BuildRequires:  cmake
 
 %description
 Provides binary-decimal and decimal-binary routines for IEEE doubles.
@@ -20,8 +19,9 @@ extracted from the V8 JavaScript engine. The code has been re-factored
 and improved so that it can be used more easily in other projects.
 
 %package devel
-Summary:        Library providing binary-decimal and decimal-binary routines for IEEE doubles
+Summary:        %{summary}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+Obsoletes:      %{name}-static < 3.1.5-10
 
 %description devel
 Contains header files for developing applications that use the %{name}
@@ -30,60 +30,58 @@ library.
 There is extensive documentation in src/double-conversion.h. Other
 examples can be found in test/cctest/test-conversions.cc.
 
-%package static
-Summary:        Library providing binary-decimal and decimal-binary routines for IEEE doubles
-Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
-
-%description static
-Static %{name} library.
-
 %prep
 %setup -q
 
 %build
-%global _vpath_builddir build-shared
 %cmake -DBUILD_TESTING=ON
 %cmake_build
 
-%if %{with static_libs}
-%global _vpath_builddir build-static
-CXXFLAGS="%{optflags} -fPIC" %cmake -DBUILD_SHARED_LIBS=NO
-%cmake_build
-%endif
-
 %install
-%if %{with static_libs}
-%global _vpath_builddir build-static
-%cmake_install
-%endif
-
-%global _vpath_builddir build-shared
 %cmake_install
 
 %check
 %ctest
 
-%ldconfig_scriptlets
-
 %files
 %license LICENSE
 %doc README.md AUTHORS Changelog
-%{_libdir}/libdouble-conversion.so.3*
+%{_libdir}/libdouble-conversion.so.3{,.*}
 
 %files devel
 %{_libdir}/libdouble-conversion.so
-%{_libdir}/cmake/%{name}
-%{_includedir}/%{name}
-
-%if %{with static_libs}
-%files static
-%{_libdir}/libdouble-conversion.a
-%endif
+%{_libdir}/cmake/%{name}/
+%{_includedir}/%{name}/
 
 %changelog
-* Wed Nov 22 2023 Sindhu Karri <lakarri@microsoft.com> - 3.1.5-9
-- Initial Azure Linux import from Fedora 38 (license: MIT)
-- Source license verified: BSD
+* Thu May 29 2025 Chris Co <chrco@microsoft.com> - 3.3.1-2
+- Initial Azure Linux import from Fedora 42 (license: MIT)
+- License verified
+
+* Fri Feb 14 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 3.3.1-1
+- Update to 3.3.1 (close RHBZ#2345728)
+
+* Thu Jan 16 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 07 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 3.3.0-1
+- Update to 3.3.0 (close RHBZ#1684966)
+- Drop obsolete ldconfig_scriptlets macro
+- Drop and Obsolete the static library (-static subpackage)
+- Properly mark the LICENSE file
+- Update License to SPDX
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.5-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
 
 * Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.5-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
