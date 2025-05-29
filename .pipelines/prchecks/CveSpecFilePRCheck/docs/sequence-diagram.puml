@@ -1,0 +1,130 @@
+@startuml CVE Spec File PR Check - Sequence Diagram
+
+!define AZURE_COLOR #0078D4
+!define AI_COLOR #FF6B35
+!define DETECTOR_COLOR #28A745
+!define GITHUB_COLOR #24292E
+!define ANALYZER_COLOR #6F42C1
+
+actor "PR Author" as author
+participant "Azure DevOps\nPipeline" as ado <<AZURE_COLOR>>
+participant "run-pr-check.sh" as script
+participant "CveSpecFilePRCheck" as main <<AZURE_COLOR>>
+participant "AntiPatternDetector" as detector <<DETECTOR_COLOR>>
+participant "OpenAIClient" as ai <<AI_COLOR>>
+participant "PromptTemplates" as prompts <<AI_COLOR>>
+participant "ResultAnalyzer" as analyzer <<ANALYZER_COLOR>>
+participant "GitHubClient" as github <<GITHUB_COLOR>>
+
+== PR Submission and Pipeline Trigger ==
+author -> ado : Submit PR with spec file changes
+ado -> script : Trigger pipeline execution
+
+== Setup and Authentication ==
+script -> script : Apply Azure authentication\n(apply-security-config.sh)
+script -> script : Map OpenAI environment variables
+script -> script : Install Python dependencies
+script -> main : Execute CveSpecFilePRCheck.py
+
+== Analysis Phase ==
+main -> main : gather_diff()
+note right : Extract git diff between\nsource and target commits
+
+main -> main : get_changed_spec_files(diff)
+note right : Parse diff to find\nchanged .spec files
+
+loop For each changed spec file
+    main -> main : get_spec_file_content(spec_path)
+    main -> main : get_package_directory_files(spec_path)
+    
+    == Anti-Pattern Detection ==
+    main -> detector : detect_all(spec_path, content, files)
+    detector -> detector : detect_missing_patch_files()
+    detector -> detector : detect_unreferenced_patch_files()
+    detector -> detector : detect_missing_patch_application()
+    detector -> detector : detect_duplicate_patch_references()
+    detector -> detector : detect_missing_cve_changelog_entries()
+    detector -> main : Return List[AntiPattern]
+    
+    == AI Analysis ==
+    main -> main : _initialize_openai_client()
+    main -> prompts : get_system_prompt()
+    main -> prompts : get_spec_analysis_prompt(diff, files, content)
+    prompts -> main : Return structured prompt requesting\n"SECTION 1: BRIEF PR COMMENT SUMMARY"\n"SECTION 2: DETAILED ANALYSIS FOR LOGS"
+    
+    main -> ai : get_chat_completion(system_msg, user_msg)
+    ai -> ai : Make Azure OpenAI API call
+    ai -> main : Return structured AI analysis
+    
+    opt If patch references exist
+        main -> prompts : get_patch_verification_prompt()
+        main -> ai : get_chat_completion() for patch analysis
+    end
+    
+    opt If CVE IDs found
+        main -> prompts : get_cve_validation_prompt()
+        main -> ai : get_chat_completion() for CVE analysis
+    end
+end
+
+== Result Processing ==
+main -> analyzer : new ResultAnalyzer(anti_patterns, ai_analysis)
+analyzer -> analyzer : _group_by_severity()
+
+main -> analyzer : generate_console_summary()
+analyzer -> main : Return brief console output
+
+main -> analyzer : extract_detailed_analysis_for_logs()
+analyzer -> analyzer : Parse "SECTION 2" from AI response
+analyzer -> main : Return detailed content for logs
+
+main -> analyzer : extract_brief_summary_for_pr()
+analyzer -> analyzer : Parse "SECTION 1" from AI response
+analyzer -> main : Return brief content for PR comments
+
+main -> analyzer : to_json()
+analyzer -> main : Return comprehensive JSON report
+
+== GitHub Integration ==
+opt If GitHub integration enabled
+    main -> github : Initialize GitHubClient
+    main -> analyzer : generate_pr_comment_content()
+    analyzer -> main : Return formatted PR comment
+    
+    main -> github : get_pr_comments()
+    github -> main : Return existing comments
+    
+    alt Existing bot comment found
+        main -> github : update_pr_comment(comment_id, content)
+    else No existing comment
+        main -> github : post_pr_comment(content)
+    end
+    
+    opt If GitHub Checks API enabled
+        main -> github : create_check_run(name, sha, status, summary)
+    end
+end
+
+== Pipeline Completion ==
+main -> analyzer : get_highest_severity()
+main -> analyzer : should_fail_pipeline()
+
+alt Critical/Error issues found
+    main -> ado : Exit with error code (1-3)
+    ado -> author : Pipeline failed notification
+else No critical issues
+    main -> ado : Exit with success code (0)
+    ado -> author : Pipeline passed notification
+end
+
+== Output Artifacts ==
+note over main
+  Generated artifacts:
+  • spec_analysis_report.txt (detailed)
+  • spec_analysis_report.json (machine-readable)
+  • Console output (brief summary)
+  • Azure DevOps logs (detailed analysis)
+  • GitHub PR comment (brief critical issues)
+end note
+
+@enduml

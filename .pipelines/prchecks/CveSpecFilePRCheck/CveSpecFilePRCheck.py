@@ -411,32 +411,97 @@ def get_severity_exit_code(severity: Severity) -> int:
         return EXIT_SUCCESS
 
 def update_github_status(severity: Severity, anti_patterns: List[AntiPattern], ai_analysis: str, 
-                         analyzer: ResultAnalyzer, post_comments: bool = False, use_checks_api: bool = False) -> None:
+                        analyzer: ResultAnalyzer, post_comments: bool = False, use_checks_api: bool = False) -> None:
     """
-    Updates GitHub with PR check status and optionally posts comments.
-    NOTE: This function is now deprecated. GitHub integration has been moved to a separate task.
+    Posts GitHub PR comments with brief analysis and updates status checks.
+    
+    This replaces the deprecated separate GitHub comment posting approach with
+    integrated functionality that uses structured AI output for concise PR comments.
     
     Args:
         severity: Highest severity level detected
         anti_patterns: List of anti-patterns detected
-        ai_analysis: AI-generated analysis text
+        ai_analysis: AI-generated analysis text (contains structured sections)
         analyzer: ResultAnalyzer instance for generating reports
-        post_comments: Whether to post comments on GitHub PR (deprecated)
-        use_checks_api: Whether to use GitHub Checks API (deprecated)
+        post_comments: Whether to post comments on GitHub PR
+        use_checks_api: Whether to use GitHub Checks API for status updates
     """
-    # This function is kept for backwards compatibility but no longer performs GitHub updates
-    # GitHub updates are now handled by the separate post_github_comment.py script
+    if not (post_comments or use_checks_api):
+        logger.info("GitHub integration disabled. Skipping GitHub updates.")
+        return
     
-    logger.info("GitHub integration is now handled by a separate task. Skipping GitHub updates in the analysis phase.")
-    
-    # For backwards compatibility, log what would have happened
-    if post_comments:
-        logger.info("GitHub PR comments would have been posted (now handled by separate task)")
+    try:
+        github_client = GitHubClient()
         
-    if use_checks_api:
-        logger.info("GitHub PR status would have been updated (now handled by separate task)")
-    
-    # No actual GitHub operations are performed in this function anymore
+        # Determine status based on severity
+        if severity >= Severity.ERROR:
+            status = CheckStatus.FAILURE
+            status_title = "CVE Spec File Check Failed"
+        elif severity == Severity.WARNING:
+            status = CheckStatus.NEUTRAL  # Warnings don't block merging
+            status_title = "CVE Spec File Check Passed with Warnings"
+        else:
+            status = CheckStatus.SUCCESS
+            status_title = "CVE Spec File Check Passed"
+        
+        # Post PR comment with brief analysis if requested
+        if post_comments:
+            logger.info("Posting brief analysis as GitHub PR comment...")
+            comment_content = analyzer.generate_pr_comment_content()
+            
+            try:
+                # Check if we've already posted a comment from this check
+                existing_comments = github_client.get_pr_comments()
+                bot_comment_id = None
+                
+                # Look for existing comment from this bot/check
+                for comment in existing_comments:
+                    if "🚨 PR Check Failed" in comment.get("body", "") or "✅ PR Check Passed" in comment.get("body", ""):
+                        bot_comment_id = comment.get("id")
+                        break
+                
+                if bot_comment_id:
+                    # Update existing comment
+                    logger.info(f"Updating existing PR comment (ID: {bot_comment_id})")
+                    github_client.update_pr_comment(bot_comment_id, comment_content)
+                else:
+                    # Post new comment
+                    logger.info("Posting new PR comment")
+                    github_client.post_pr_comment(comment_content)
+                    
+            except Exception as e:
+                logger.error(f"Failed to post/update GitHub PR comment: {e}")
+        
+        # Update GitHub Checks API if requested
+        if use_checks_api:
+            logger.info("Updating GitHub PR status via Checks API...")
+            try:
+                # Get commit SHA for the check
+                head_sha = os.environ.get("SYSTEM_PULLREQUEST_SOURCECOMMITID", "")
+                if not head_sha:
+                    logger.warning("Could not determine HEAD SHA for GitHub check")
+                    return
+                
+                # Create check run summary using structured content
+                summary = analyzer.generate_console_summary()
+                detailed_output = analyzer.extract_brief_summary_for_pr()  # Use brief summary for check output
+                
+                github_client.create_check_run(
+                    name="CVE Spec File Analysis",
+                    head_sha=head_sha,
+                    status=CheckStatus.IN_PROGRESS,  # First set to in_progress
+                    conclusion=status,  # Then set conclusion
+                    output_title=status_title,
+                    output_summary=summary,
+                    output_text=detailed_output
+                )
+                
+            except Exception as e:
+                logger.error(f"Failed to update GitHub check status: {e}")
+                
+    except Exception as e:
+        logger.error(f"Failed to initialize GitHub client: {e}")
+        logger.info("Continuing without GitHub integration...")
 
 def _derive_github_context():
     repo = os.getenv("GITHUB_REPOSITORY", "").strip()
@@ -497,36 +562,42 @@ def main():
         # Run analysis on spec files
         anti_patterns, ai_analysis, fatal_error = analyze_spec_files(diff, changed_spec_files)
         
-        # Process results
+        # Process results with structured analysis
         analyzer = ResultAnalyzer(anti_patterns, ai_analysis)
         
-        # Print summary to console
-        print("\n" + analyzer.generate_console_summary())
+        # Print console summary (contains brief overview)
+        console_summary = analyzer.generate_console_summary()
+        print(f"\n{console_summary}")
         
-        # Print detailed report
+        # Log detailed analysis to Azure DevOps pipeline logs
+        detailed_analysis = analyzer.extract_detailed_analysis_for_logs()
+        if detailed_analysis:
+            logger.info("=== DETAILED ANALYSIS FOR PIPELINE LOGS ===")
+            for line in detailed_analysis.split('\n'):
+                if line.strip():
+                    logger.info(line)
+            logger.info("=== END DETAILED ANALYSIS ===")
+        
+        # Generate and save comprehensive report files
         detailed_report = analyzer.generate_detailed_report()
-        print("\n" + detailed_report)
-        
-        # Save detailed report to file
         report_file = os.path.join(os.getcwd(), "spec_analysis_report.txt")
         with open(report_file, "w") as f:
             f.write(detailed_report)
         logger.info(f"Detailed analysis report saved to {report_file}")
         
-        # Save JSON report with additional data for GitHub comment posting
+        # Save enhanced JSON report with structured content for pipeline and GitHub integration
         json_file = os.path.join(os.getcwd(), "spec_analysis_report.json")
-        
-        # Extract the conclusion for the GitHub comment
-        conclusion = analyzer.extract_conclusion()
-        
-        # Create a comprehensive report that includes everything needed for GitHub commenting
-        report_data = json.loads(analyzer.to_json())
-        report_data["conclusion"] = conclusion
-        
-        # Write the enhanced JSON report
+        json_report = analyzer.to_json()
         with open(json_file, "w") as f:
-            json.dump(report_data, f, indent=2)
+            f.write(json_report)
         logger.info(f"Enhanced JSON analysis report saved to {json_file}")
+        
+        # Log brief summary for quick reference
+        brief_summary = analyzer.extract_brief_summary_for_pr()
+        if brief_summary:
+            logger.info("=== BRIEF SUMMARY FOR PR ===")
+            logger.info(brief_summary)
+            logger.info("=== END BRIEF SUMMARY ===")
         
         # Determine exit code
         if fatal_error:
@@ -536,8 +607,7 @@ def main():
         # Get highest severity
         highest_severity = analyzer.get_highest_severity()
         
-        # Update GitHub status if requested
-        github_client = GitHubClient()
+        # Update GitHub status with integrated comment posting using structured content
         update_github_status(
             highest_severity, 
             anti_patterns, 
@@ -577,8 +647,9 @@ def main():
                 should_fail = True
                 
             if should_fail:
+                # Generate structured error message for failure case
                 error_message = analyzer.generate_error_message()
-                print("\n" + error_message)
+                print(f"\n{error_message}")
                 return EXIT_CRITICAL  # Traditional error exit code
             else:
                 logger.info("Analysis completed - no critical issues detected")

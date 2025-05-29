@@ -192,16 +192,17 @@ else
   echo "  - Using exit code severity: NO"
 fi
 
-# Skip GitHub integration when running as analysis-only task
-# These flags are now handled by the separate GitHub comment posting task
+# Add GitHub integration flags to the command based on settings
 if [[ "${POST_GITHUB_COMMENTS,,}" = "true" ]]; then
-  echo "  - GitHub comments: Will be handled by separate task"
+  CMD="$CMD --post-github-comments"
+  echo "  - GitHub comments: ENABLED (integrated)"
 else
   echo "  - GitHub comments: DISABLED (not requested)"
 fi
 
 if [[ "${USE_GITHUB_CHECKS,,}" = "true" ]]; then
-  echo "  - GitHub checks: Will be handled by separate task"
+  CMD="$CMD --use-github-checks"
+  echo "  - GitHub checks: ENABLED (integrated)"
 else
   echo "  - GitHub checks: DISABLED"
 fi

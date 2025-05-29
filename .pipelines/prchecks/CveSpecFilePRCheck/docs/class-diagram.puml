@@ -1,0 +1,147 @@
+@startuml CVE Spec File PR Check - Class Diagram
+
+!define AZURE_COLOR #0078D4
+!define AI_COLOR #FF6B35
+!define DETECTOR_COLOR #28A745
+!define GITHUB_COLOR #24292E
+!define ANALYZER_COLOR #6F42C1
+
+package "Main Orchestration" {
+    class CveSpecFilePRCheck <<AZURE_COLOR>> {
+        +main()
+        +gather_diff(): str
+        +get_changed_spec_files(diff: str): List[str]
+        +analyze_spec_files(diff: str, files: List[str]): Tuple
+        +update_github_status(severity: Severity, patterns: List, analysis: str, analyzer: ResultAnalyzer): void
+        -_initialize_openai_client(): OpenAIClient
+        -_derive_github_context(): void
+    }
+}
+
+package "Anti-Pattern Detection" <<DETECTOR_COLOR>> {
+    class AntiPatternDetector {
+        +detect_all(spec_path: str, content: str, files: List[str]): List[AntiPattern]
+        +detect_missing_patch_files(): List[AntiPattern]
+        +detect_unreferenced_patch_files(): List[AntiPattern]
+        +detect_missing_patch_application(): List[AntiPattern]
+        +detect_duplicate_patch_references(): List[AntiPattern]
+        +detect_missing_cve_changelog_entries(): List[AntiPattern]
+        -_parse_patch_references(): Dict
+        -_parse_cve_ids(): List[str]
+    }
+    
+    class AntiPattern {
+        +name: str
+        +description: str
+        +severity: Severity
+        +recommendation: str
+        +file_path: str
+        +details: Dict
+    }
+    
+    enum Severity {
+        INFO = 1
+        WARNING = 2
+        ERROR = 3
+        CRITICAL = 4
+    }
+}
+
+package "AI Analysis" <<AI_COLOR>> {
+    class OpenAIClient {
+        +get_chat_completion(system_msg: str, user_msg: str): Dict
+        -_make_request(): Dict
+        -_handle_response(): Dict
+    }
+    
+    class GptModelConfig {
+        +model_name: str
+        +api_version: str
+        +api_base: str
+        +deployment_name: str
+    }
+    
+    class PromptTemplates {
+        +get_system_prompt(): str
+        +get_spec_analysis_prompt(diff: str, files: str, content: str): str
+        +get_patch_verification_prompt(content: str, files: str, refs: str): str
+        +get_cve_validation_prompt(diff: str, content: str, cves: str, patches: str): str
+        -_format_structured_request(): str
+    }
+}
+
+package "Result Processing" <<ANALYZER_COLOR>> {
+    class ResultAnalyzer {
+        +anti_patterns: List[AntiPattern]
+        +ai_analysis: str
+        +grouped_patterns: Dict[Severity, List[AntiPattern]]
+        
+        +get_highest_severity(): Severity
+        +should_fail_pipeline(): bool
+        +generate_console_summary(): str
+        +generate_detailed_report(): str
+        +generate_error_message(): str
+        +extract_brief_summary_for_pr(): str
+        +extract_detailed_analysis_for_logs(): str
+        +generate_pr_comment_content(): str
+        +to_json(): str
+        -_group_by_severity(): Dict
+        -_generate_fallback_brief_summary(): str
+    }
+}
+
+package "GitHub Integration" <<GITHUB_COLOR>> {
+    class GitHubClient {
+        +post_pr_comment(content: str): Dict
+        +update_pr_comment(comment_id: int, content: str): Dict
+        +get_pr_comments(): List[Dict]
+        +create_check_run(name: str, head_sha: str, status: CheckStatus, ...): Dict
+        -_make_github_request(): Dict
+        -_get_auth_headers(): Dict
+    }
+    
+    enum CheckStatus {
+        IN_PROGRESS
+        SUCCESS
+        FAILURE
+        NEUTRAL
+    }
+}
+
+' Relationships
+CveSpecFilePRCheck --> AntiPatternDetector : uses
+CveSpecFilePRCheck --> OpenAIClient : uses
+CveSpecFilePRCheck --> ResultAnalyzer : creates
+CveSpecFilePRCheck --> GitHubClient : uses
+CveSpecFilePRCheck --> PromptTemplates : uses
+
+AntiPatternDetector --> AntiPattern : creates
+AntiPattern --> Severity : has
+
+OpenAIClient --> GptModelConfig : uses
+OpenAIClient --> PromptTemplates : receives prompts from
+
+ResultAnalyzer --> AntiPattern : processes
+ResultAnalyzer --> Severity : evaluates
+
+GitHubClient --> CheckStatus : uses
+
+' Notes
+note right of PromptTemplates
+  All prompts now request structured output:
+  "SECTION 1: BRIEF PR COMMENT SUMMARY"
+  "SECTION 2: DETAILED ANALYSIS FOR LOGS"
+end note
+
+note right of ResultAnalyzer
+  Parses structured AI responses and
+  generates appropriate content for
+  different audiences (PR vs logs)
+end note
+
+note bottom of CveSpecFilePRCheck
+  Main orchestrator that integrates all components
+  and handles the complete analysis pipeline
+end note
+
+@enduml

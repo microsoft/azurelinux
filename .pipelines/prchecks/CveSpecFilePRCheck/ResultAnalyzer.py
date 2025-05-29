@@ -8,12 +8,22 @@ ResultAnalyzer processes detection results and formats outputs for the pipeline.
 This module analyzes results from both the programmatic anti-pattern detection
 and AI-powered analysis, combining them into a comprehensive report that can be
 used to determine whether to fail the pipeline.
+
+Key Features:
+- Parses structured AI output (brief summary vs detailed analysis)
+- Generates concise PR comments focusing on critical issues
+- Creates comprehensive logs for Azure DevOps pipeline
+- Handles anti-pattern detection results with severity-based reporting
 """
 
 import json
 import re
+import logging
 from typing import Dict, List, Any, Optional, Tuple
 from AntiPatternDetector import AntiPattern, Severity
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 
 class ResultAnalyzer:
@@ -178,13 +188,16 @@ class ResultAnalyzer:
         
         # Add AI analysis section with better formatting
         lines.extend([
-            "\n## 💬 OPENAI ANALYSIS RESULTS\n",
+            "\n## 💬 COMPREHENSIVE AI ANALYSIS RESULTS\n",
             "=" * 80
         ])
         
+        # Use the detailed analysis section from structured AI output
+        detailed_ai_analysis = self.extract_detailed_analysis_for_logs()
+        
         # Format AI analysis for better readability
         formatted_analysis = []
-        for line in self.ai_analysis.split('\n'):
+        for line in detailed_ai_analysis.split('\n'):
             # Preserve existing markdown headers
             if line.startswith('##'):
                 formatted_analysis.append(f"\n{line}")
@@ -245,10 +258,10 @@ class ResultAnalyzer:
     
     def to_json(self) -> str:
         """
-        Convert analysis results to JSON format.
+        Convert analysis results to JSON format with structured content.
         
         Returns:
-            JSON string with analysis results
+            JSON string with analysis results, including separated brief and detailed content
         """
         # Create a serializable dictionary for each AntiPattern
         anti_pattern_dicts = []
@@ -277,10 +290,24 @@ class ResultAnalyzer:
             anti_pattern_dicts.append(pattern_dict)
         
         result = {
-            "failed": self.should_fail_pipeline(),
-            "highest_severity": self.get_highest_severity().name,
+            "pipeline_status": {
+                "failed": self.should_fail_pipeline(),
+                "highest_severity": self.get_highest_severity().name,
+                "total_issues": len(self.anti_patterns),
+                "critical_errors": len([p for p in self.anti_patterns if p.severity in (Severity.CRITICAL, Severity.ERROR)]),
+                "warnings": len([p for p in self.anti_patterns if p.severity == Severity.WARNING])
+            },
             "anti_patterns": anti_pattern_dicts,
-            "ai_analysis": self.ai_analysis
+            "ai_analysis": {
+                "raw_response": self.ai_analysis,
+                "brief_summary": self.extract_brief_summary_for_pr(),
+                "detailed_analysis": self.extract_detailed_analysis_for_logs()
+            },
+            "reports": {
+                "console_summary": self.generate_console_summary(),
+                "detailed_report": self.generate_detailed_report(),
+                "pr_comment_content": self.generate_pr_comment_content()
+            }
         }
         
         return json.dumps(result, indent=2)
@@ -288,73 +315,156 @@ class ResultAnalyzer:
     def extract_conclusion(self) -> str:
         """
         Extract the conclusion section from the AI analysis.
+        DEPRECATED: Use extract_brief_summary_for_pr() for PR comments instead.
         
         Returns:
             The conclusion section as a formatted string with emojis
         """
-        conclusion = ""
-        in_conclusion = False
-        conclusion_header = False
+        logger.warning("extract_conclusion() is deprecated. Use extract_brief_summary_for_pr() for PR comments.")
+        return self.extract_brief_summary_for_pr()
+
+    def extract_brief_summary_for_pr(self) -> str:
+        """
+        Extracts the brief summary section from structured AI analysis for GitHub PR comments.
         
-        # Try to find a conclusion section in the AI analysis
-        for line in self.ai_analysis.splitlines():
-            # Check for various ways "Conclusion" might be formatted in the text
-            if re.match(r'^#{1,3}\s+Conclusion', line, re.IGNORECASE) or line.strip() == "Conclusion:" or line.strip() == "CONCLUSION":
-                in_conclusion = True
-                conclusion_header = True
-                conclusion = "## 📝 CONCLUSION\n\n"
-                continue
-            
-            # If we're past the conclusion and hit another section header, stop collecting
-            if in_conclusion and line.startswith('#') and not conclusion_header:
-                break
+        Returns:
+            Brief summary formatted for PR comments, or fallback content if parsing fails
+        """
+        if "SECTION 1: BRIEF PR COMMENT SUMMARY" in self.ai_analysis:
+            try:
+                # Extract Section 1 content
+                section1_start = self.ai_analysis.find("SECTION 1: BRIEF PR COMMENT SUMMARY")
+                section2_start = self.ai_analysis.find("SECTION 2: DETAILED ANALYSIS FOR LOGS")
                 
-            # Reset conclusion_header flag after processing the header
-            conclusion_header = False
-            
-            # Add the line to our conclusion if we're in the conclusion section
-            if in_conclusion:
-                # Enhance bullet points with emojis
-                if line.strip().startswith('•'):
-                    line = line.replace('•', '🔹')
-                elif line.strip().startswith('-'):
-                    line = line.replace('-', '🔸')
-                    
-                # Highlight CVE IDs
-                if 'CVE-' in line:
-                    line = re.sub(r'(CVE-\d{4}-\d{4,})', r'`\1`', line)
+                if section2_start == -1:
+                    # If no Section 2 found, take everything after Section 1
+                    brief_content = self.ai_analysis[section1_start:]
+                else:
+                    brief_content = self.ai_analysis[section1_start:section2_start]
                 
-                conclusion += line + "\n"
-        
-        # If no formal conclusion section was found, try to extract recommendations
-        if not conclusion:
-            recommendations = []
-            in_recommendations = False
-            
-            for line in self.ai_analysis.splitlines():
-                if "recommendation" in line.lower() or "summary" in line.lower():
-                    in_recommendations = True
-                    recommendations.append("## 📝 CONCLUSION (extracted from recommendations)\n")
-                    continue
+                # Clean up the content
+                brief_content = brief_content.replace("SECTION 1: BRIEF PR COMMENT SUMMARY", "").strip()
+                brief_content = brief_content.replace("---", "").strip()
                 
-                if in_recommendations and line.strip():
-                    recommendations.append(line)
-            
-            if recommendations:
-                conclusion = "\n".join(recommendations)
+                return brief_content
+                
+            except Exception as e:
+                logger.warning(f"Failed to parse brief summary from AI response: {e}")
+                return self._generate_fallback_brief_summary()
+        else:
+            logger.info("AI response does not contain structured sections. Generating fallback summary.")
+            return self._generate_fallback_brief_summary()
+
+    def extract_detailed_analysis_for_logs(self) -> str:
+        """
+        Extracts the detailed analysis section from structured AI analysis for pipeline logs.
         
-        # If we still don't have a conclusion, create a generic one
-        if not conclusion:
-            conclusion = "## 📝 CONCLUSION\n\nPlease review the detailed analysis above for information about the CVE patches and spec file."
-            
-            # Try to identify the most important issues from anti-patterns
-            critical_issues = [p for p in self.anti_patterns if p.severity >= Severity.ERROR]
-            if critical_issues:
-                conclusion += "\n\n### ❌ Critical Issues Detected:\n\n"
-                for i, issue in enumerate(critical_issues, 1):
-                    conclusion += f"**{i}. {issue.name}**: {issue.description}\n"
-                    if issue.recommendation:
-                        conclusion += f"   💡 **Recommendation**: {issue.recommendation}\n"
-                    conclusion += "\n"
+        Returns:
+            Detailed analysis content, or full AI analysis if parsing fails
+        """
+        if "SECTION 2: DETAILED ANALYSIS FOR LOGS" in self.ai_analysis:
+            try:
+                section2_start = self.ai_analysis.find("SECTION 2: DETAILED ANALYSIS FOR LOGS")
+                detailed_content = self.ai_analysis[section2_start:]
+                
+                # Clean up the content
+                detailed_content = detailed_content.replace("SECTION 2: DETAILED ANALYSIS FOR LOGS", "").strip()
+                
+                return detailed_content
+                
+            except Exception as e:
+                logger.warning(f"Failed to parse detailed analysis from AI response: {e}")
+                return self.ai_analysis
+        else:
+            logger.info("AI response does not contain structured sections. Using full AI analysis.")
+            return self.ai_analysis
+
+    def _generate_fallback_brief_summary(self) -> str:
+        """
+        Generates a fallback brief summary when structured parsing fails.
         
-        return conclusion
+        Returns:
+            Brief summary based on anti-patterns and available AI content
+        """
+        summary_parts = []
+        
+        # Count critical issues from anti-patterns
+        critical_patterns = [p for p in self.anti_patterns if p.severity in (Severity.CRITICAL, Severity.ERROR)]
+        warning_patterns = [p for p in self.anti_patterns if p.severity == Severity.WARNING]
+        
+        if critical_patterns:
+            summary_parts.append(f"**🚨 {len(critical_patterns)} Critical/Error Issue(s) Detected**")
+            for pattern in critical_patterns[:3]:  # Show max 3 critical issues
+                summary_parts.append(f"- **{pattern.name}**: {pattern.description}")
+            if len(critical_patterns) > 3:
+                summary_parts.append(f"- ...and {len(critical_patterns) - 3} more critical issue(s)")
+        
+        elif warning_patterns:
+            summary_parts.append(f"**⚠️ {len(warning_patterns)} Warning(s) Found**")
+            for pattern in warning_patterns[:2]:  # Show max 2 warnings
+                summary_parts.append(f"- **{pattern.name}**: {pattern.description}")
+        
+        else:
+            summary_parts.append("**✅ No Critical Issues Detected**")
+        
+        # Try to extract key points from AI analysis
+        if self.ai_analysis:
+            # Look for lines that seem like recommendations or important points
+            ai_lines = self.ai_analysis.split('\n')
+            important_lines = []
+            for line in ai_lines[:10]:  # Check first 10 lines for key points
+                if any(keyword in line.lower() for keyword in ['recommend', 'critical', 'error', 'missing', 'issue']):
+                    important_lines.append(line.strip())
+                    if len(important_lines) >= 2:  # Max 2 AI points
+                        break
+            
+            if important_lines:
+                summary_parts.append("\n**AI Key Points:**")
+                summary_parts.extend(important_lines)
+        
+        return "\n".join(summary_parts) if summary_parts else "Analysis completed. See detailed logs for full results."
+
+    def generate_pr_comment_content(self) -> str:
+        """
+        Generates content specifically formatted for GitHub PR comments.
+        Focuses on critical issues and brief recommendations.
+        
+        Returns:
+            Formatted content suitable for posting as a GitHub PR comment
+        """
+        content_parts = []
+        
+        # Header with overall status
+        critical_errors = [p for p in self.anti_patterns if p.severity in (Severity.CRITICAL, Severity.ERROR)]
+        warnings = [p for p in self.anti_patterns if p.severity == Severity.WARNING]
+        
+        if critical_errors:
+            content_parts.append("## 🚨 PR Check Failed - Critical Issues Found")
+            content_parts.append(f"Found {len(critical_errors)} critical/error issue(s) that must be fixed.")
+        elif warnings:
+            content_parts.append("## ⚠️ PR Check Passed with Warnings")
+            content_parts.append(f"Found {len(warnings)} warning(s) that should be reviewed.")
+        else:
+            content_parts.append("## ✅ PR Check Passed")
+            content_parts.append("No critical issues detected in spec file changes.")
+        
+        # Add critical anti-pattern issues
+        if critical_errors:
+            content_parts.append("\n### 🔍 Critical Issues Detected:")
+            for i, pattern in enumerate(critical_errors, 1):
+                content_parts.append(f"{i}. **{pattern.name}** ({pattern.severity.name})")
+                content_parts.append(f"   - {pattern.description}")
+                if pattern.recommendation:
+                    content_parts.append(f"   - 💡 **Fix:** {pattern.recommendation}")
+        
+        # Add brief AI analysis
+        brief_ai_summary = self.extract_brief_summary_for_pr()
+        if brief_ai_summary and brief_ai_summary != "Analysis completed. See detailed logs for full results.":
+            content_parts.append("\n### 🤖 AI Analysis Summary:")
+            content_parts.append(brief_ai_summary)
+        
+        # Add footer
+        content_parts.append("\n---")
+        content_parts.append("📋 **For detailed analysis and recommendations, check the Azure DevOps pipeline logs.**")
+        
+        return "\n".join(content_parts)

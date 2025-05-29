@@ -1,0 +1,167 @@
+@startuml CVE Spec File PR Check - System Architecture
+
+!define AZURE_COLOR #0078D4
+!define AI_COLOR #FF6B35
+!define DETECTOR_COLOR #28A745
+!define GITHUB_COLOR #24292E
+!define ANALYZER_COLOR #6F42C1
+!define PIPELINE_COLOR #FF9800
+
+title CVE Spec File PR Check - Optimized System Architecture
+
+' External Systems
+cloud "GitHub" as github <<GITHUB_COLOR>> {
+    rectangle "Pull Request" as pr
+    rectangle "Comments API" as comments_api
+    rectangle "Checks API" as checks_api
+}
+
+cloud "Azure" as azure <<AZURE_COLOR>> {
+    rectangle "DevOps Pipeline" as ado_pipeline
+    rectangle "OpenAI Service" as openai_service
+    rectangle "Key Vault" as keyvault
+}
+
+' Main System Components
+package "CVE Spec File PR Check System" {
+    
+    ' Entry Point
+    rectangle "Entry Layer" <<PIPELINE_COLOR>> {
+        component "run-pr-check.sh" as bash_entry
+        component "apply-security-config.sh" as auth_config
+    }
+    
+    ' Core Processing
+    rectangle "Analysis Engine" <<AZURE_COLOR>> {
+        component "CveSpecFilePRCheck.py" as main_controller
+        component "Git Diff Processor" as git_processor
+        component "Spec File Parser" as spec_parser
+    }
+    
+    ' Detection Components
+    rectangle "Detection Layer" <<DETECTOR_COLOR>> {
+        component "AntiPatternDetector" as anti_pattern_detector
+        component "Rule Engine" as rule_engine
+        component "Severity Classifier" as severity_classifier
+    }
+    
+    ' AI Analysis
+    rectangle "AI Layer" <<AI_COLOR>> {
+        component "OpenAIClient" as openai_client
+        component "PromptTemplates" as prompt_templates
+        component "Response Parser" as response_parser
+    }
+    
+    ' Result Processing
+    rectangle "Processing Layer" <<ANALYZER_COLOR>> {
+        component "ResultAnalyzer" as result_analyzer
+        component "Output Formatter" as output_formatter
+        component "Report Generator" as report_generator
+    }
+    
+    ' Integration Layer
+    rectangle "Integration Layer" <<GITHUB_COLOR>> {
+        component "GitHubClient" as github_client
+        component "Comment Manager" as comment_manager
+        component "Status Updater" as status_updater
+    }
+}
+
+' Data Storage
+database "Outputs" as outputs {
+    file "Pipeline Logs" as pipeline_logs
+    file "JSON Reports" as json_reports
+    file "Text Reports" as text_reports
+}
+
+' Flow Connections
+pr --> ado_pipeline : "Webhook Trigger"
+ado_pipeline --> bash_entry : "Execute"
+
+bash_entry --> auth_config : "Source"
+auth_config --> keyvault : "Authenticate"
+keyvault --> auth_config : "Tokens & Config"
+
+bash_entry --> main_controller : "Execute"
+
+main_controller --> git_processor : "Extract Diff"
+git_processor --> spec_parser : "Parse Files"
+
+spec_parser --> anti_pattern_detector : "Spec Content"
+anti_pattern_detector --> rule_engine : "Apply Rules"
+rule_engine --> severity_classifier : "Classify Issues"
+
+spec_parser --> prompt_templates : "Context Data"
+prompt_templates --> openai_client : "Structured Prompts"
+openai_client --> openai_service : "API Calls"
+openai_service --> openai_client : "Structured Responses"
+openai_client --> response_parser : "Parse Sections"
+
+severity_classifier --> result_analyzer : "Anti-Patterns"
+response_parser --> result_analyzer : "AI Analysis"
+
+result_analyzer --> output_formatter : "Process Results"
+output_formatter --> report_generator : "Format Outputs"
+
+result_analyzer --> github_client : "Brief Analysis"
+github_client --> comment_manager : "Manage Comments"
+comment_manager --> comments_api : "Post/Update"
+
+github_client --> status_updater : "Status Info"
+status_updater --> checks_api : "Update Status"
+
+report_generator --> pipeline_logs : "Detailed Analysis"
+report_generator --> json_reports : "Structured Data"
+report_generator --> text_reports : "Human-Readable"
+
+' Key Optimizations
+note top of result_analyzer
+**Key Optimizations**
+✅ Single AI call with structured output
+✅ Integrated GitHub comment posting
+✅ Separated brief vs detailed content
+✅ Eliminated redundant components
+❌ Removed FixRecommender (AI handles this)
+❌ Removed post_github_comment.py
+end note
+
+note bottom of openai_client
+**Structured AI Output**
+Request Format:
+"Please provide analysis in two sections:
+SECTION 1: BRIEF PR COMMENT SUMMARY
+SECTION 2: DETAILED ANALYSIS FOR LOGS"
+
+Parsed by ResultAnalyzer for
+appropriate audience targeting
+end note
+
+note right of github_client
+**Smart GitHub Integration**
+• Updates existing comments (no spam)
+• Brief content only in PR comments
+• Detailed analysis stays in pipeline logs
+• Supports both Comments API and Checks API
+end note
+
+' Styling
+skinparam package {
+    BackgroundColor white
+    BorderColor black
+}
+
+skinparam rectangle {
+    BackgroundColor<<PIPELINE_COLOR>> #FFF3E0
+    BackgroundColor<<AZURE_COLOR>> #E3F2FD
+    BackgroundColor<<DETECTOR_COLOR>> #E8F5E8
+    BackgroundColor<<AI_COLOR>> #FFF2E6
+    BackgroundColor<<ANALYZER_COLOR>> #F3E5F5
+    BackgroundColor<<GITHUB_COLOR>> #F6F8FA
+}
+
+skinparam component {
+    BackgroundColor white
+    BorderColor gray
+}
+
+@enduml

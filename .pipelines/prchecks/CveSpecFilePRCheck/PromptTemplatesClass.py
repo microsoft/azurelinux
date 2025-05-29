@@ -38,14 +38,24 @@ Provide clear, actionable feedback with specific recommendations."""
     @staticmethod
     def get_spec_analysis_prompt(diff_text, file_list, spec_content=None):
         """
-        Returns a prompt for analyzing spec file changes with context.
+        Returns a prompt for analyzing spec file changes with structured output for both 
+        brief PR comments and detailed logging.
         
         Args:
             diff_text: The git diff showing changes
             file_list: List of files in the package directory
             spec_content: Full content of the spec file (if available)
         """
-        prompt = f"""## Task: Analyze the following .spec file changes and verify patch references
+        spec_section = ""
+        if spec_content:
+            spec_section = f"""
+### Full Spec File Content:
+```
+{spec_content}
+```
+"""
+
+        return f"""## Task: Analyze the following .spec file changes and verify patch references
 
 ### Diff of Changes:
 ```diff
@@ -54,19 +64,27 @@ Provide clear, actionable feedback with specific recommendations."""
 
 ### Files present in the package directory:
 ```
-{file_list}
+{", ".join(file_list) if isinstance(file_list, list) else file_list}
 ```
-"""
-        if spec_content:
-            prompt += f"""
-### Full Spec File Content:
-```
-{spec_content}
-```
-"""
+{spec_section}
 
-        prompt += """
-## Analysis Questions:
+**IMPORTANT: Structure your response into TWO distinct sections:**
+
+## SECTION 1: BRIEF PR COMMENT SUMMARY
+Provide a concise summary suitable for GitHub PR comments (keep under 200 words):
+
+**Brief Analysis:** (1-2 sentences summarizing key findings)
+
+**Critical Issues Found:** (List only ERROR/CRITICAL severity issues, if any)
+
+**Recommended Actions:** (2-3 brief actionable bullet points for the most important fixes)
+
+---
+
+## SECTION 2: DETAILED ANALYSIS FOR LOGS
+Provide comprehensive analysis for pipeline logs:
+
+### Security Analysis:
 1. What security implications do these changes have?
 2. Are all CVE patch files referenced in the spec (Patch<N>: CVE-YYYY-XXXXX.patch) actually present in the file list?
 3. Are there any version updates that should be flagged for security review?
@@ -74,7 +92,8 @@ Provide clear, actionable feedback with specific recommendations."""
 5. Are patches being properly applied with %patch or %autopatch directives?
 6. Is there proper changelog documentation for all CVE fixes?
 
-## Common Azure Linux Spec File Anti-Patterns to Check:
+### Anti-Pattern Detection:
+Check for these common Azure Linux spec file issues:
 - CVE patches referenced in spec but missing from the directory
 - CVE fixes mentioned in changelog but without corresponding patch files
 - Patches applied but not listed in Patch<N> directives
@@ -86,13 +105,19 @@ Provide clear, actionable feedback with specific recommendations."""
 - Patches not properly named according to CVE-YYYY-XXXXX.patch format
 - Fix for a CVE without proper attribution or upstream reference
 
-Provide a comprehensive analysis with specific recommendations for improvement. Focus particularly on security implications and whether all referenced CVE patches are actually present in the directory."""
-        return prompt
+### Detailed Recommendations:
+Provide specific, actionable recommendations for each issue found, including:
+- Exact file names and line numbers where possible
+- Specific commands or changes needed
+- Security implications of not fixing the issues
+- Best practices for Azure Linux packaging
+
+Focus particularly on security implications and whether all referenced CVE patches are actually present in the directory."""
 
     @staticmethod
     def get_cve_validation_prompt(diff_text, spec_content, cve_ids, patch_files):
         """
-        Returns a prompt specifically focused on validating CVE patches.
+        Returns a prompt specifically focused on validating CVE patches with structured output.
         
         Args:
             diff_text: The git diff showing changes
@@ -122,7 +147,19 @@ Provide a comprehensive analysis with specific recommendations for improvement. 
 {patch_files}
 ```
 
-## Analysis Questions:
+**IMPORTANT: Structure your response into TWO distinct sections:**
+
+## SECTION 1: BRIEF PR COMMENT SUMMARY
+**CVE Validation Summary:** (1-2 sentences on CVE patch status)
+
+**Critical CVE Issues:** (List missing or mismatched CVE patches)
+
+**Recommended CVE Actions:** (2-3 actionable fixes for CVE issues)
+
+---
+
+## SECTION 2: DETAILED CVE VALIDATION FOR LOGS
+### Comprehensive CVE Analysis:
 1. Are all the CVE IDs mentioned in the spec covered by actual patch files in the format CVE-YYYY-XXXXX.patch?
 2. Are all CVEs mentioned in the changelog matched with corresponding patch files?
 3. Are the patches properly referenced with Patch<N> directives and applied with %patch or %autopatch directives?
@@ -130,7 +167,7 @@ Provide a comprehensive analysis with specific recommendations for improvement. 
 5. Does the changelog properly document all CVE fixes with adequate descriptions?
 6. Are the patches correctly numbered and sequenced (Patch0, Patch1, etc.)?
 
-## Common Issues to Check For:
+### Detailed CVE Issues Check:
 - Missing patch files for referenced CVEs
 - Inconsistent naming between CVE references and patch filenames
 - Incomplete changelog entries for CVE fixes
@@ -138,13 +175,14 @@ Provide a comprehensive analysis with specific recommendations for improvement. 
 - Duplicate CVE patches or references
 - Outdated CVE patches that have been superseded
 
-Provide a detailed validation report highlighting any mismatches or concerns, with specific recommendations for fixing any issues."""
+### Specific CVE Recommendations:
+Provide detailed validation report highlighting any mismatches or concerns, with specific recommendations for fixing any issues including exact file names and required changes."""
 
     @staticmethod
     def get_patch_verification_prompt(spec_content, file_list, patch_references):
         """
         Returns a prompt for verifying if all patches referenced in the spec
-        are present in the package directory.
+        are present in the package directory, with structured output.
         
         Args:
             spec_content: Full content of the spec file
@@ -168,12 +206,26 @@ Provide a detailed validation report highlighting any mismatches or concerns, wi
 {patch_references}
 ```
 
-## Analysis Questions:
+**IMPORTANT: Structure your response into TWO distinct sections:**
+
+## SECTION 1: BRIEF PR COMMENT SUMMARY
+**Patch Verification Summary:** (1-2 sentences on patch status)
+
+**Critical Patch Issues:** (List missing or unreferenced patches)
+
+**Recommended Patch Actions:** (2-3 actionable fixes)
+
+---
+
+## SECTION 2: DETAILED PATCH VERIFICATION FOR LOGS
+### Comprehensive Patch Analysis:
 1. Are all patches referenced in the spec file (via Patch<N>) actually present in the directory?
 2. Are there any patch files in the directory that aren't referenced in the spec?
 3. Are the patch numbers sequential and properly ordered?
 4. For CVE patches, do the filenames match the CVE IDs referenced in the spec?
 
+### Detailed Verification Report:
 Check each Patch<N> reference against the actual files in the directory and identify any missing or incorrectly referenced patches. Pay special attention to CVE patches, which should follow the naming convention CVE-YYYY-XXXXX.patch.
 
-Provide a detailed verification report with specific issues and recommendations."""
+### Specific Patch Recommendations:
+Provide detailed verification report with specific issues and recommendations including exact file names and required changes."""

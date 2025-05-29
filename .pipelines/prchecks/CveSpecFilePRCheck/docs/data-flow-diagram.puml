@@ -1,0 +1,159 @@
+@startuml CVE Spec File PR Check - Data Flow Diagram
+
+!define AZURE_COLOR #0078D4
+!define AI_COLOR #FF6B35
+!define DETECTOR_COLOR #28A745
+!define GITHUB_COLOR #24292E
+!define ANALYZER_COLOR #6F42C1
+!define DATA_COLOR #FFC107
+
+' Input Sources
+cloud "GitHub PR" as github_pr <<GITHUB_COLOR>>
+cloud "Azure OpenAI\nAPI" as openai_api <<AI_COLOR>>
+database "Git Repository" as git_repo <<DATA_COLOR>>
+
+' Processing Components
+rectangle "Data Extraction" {
+    process "gather_diff()" as diff_extract
+    process "get_changed_spec_files()" as file_extract
+    process "get_spec_file_content()" as content_extract
+}
+
+rectangle "Analysis Components" <<DETECTOR_COLOR>> {
+    process "AntiPatternDetector" as anti_patterns {
+        - Missing patch files
+        - Unreferenced patches
+        - Missing patch applications
+        - Duplicate references
+        - CVE changelog validation
+    }
+}
+
+rectangle "AI Analysis" <<AI_COLOR>> {
+    process "PromptTemplates" as prompts {
+        - System prompts
+        - Spec analysis prompts
+        - Patch verification prompts
+        - CVE validation prompts
+    }
+    process "OpenAIClient" as ai_client
+}
+
+rectangle "Result Processing" <<ANALYZER_COLOR>> {
+    process "ResultAnalyzer" as analyzer {
+        - Parse structured AI output
+        - Group anti-patterns by severity
+        - Generate different output formats
+        - Determine pipeline status
+    }
+}
+
+rectangle "Output Generation" {
+    process "Console Output" as console
+    process "Pipeline Logs" as logs
+    process "GitHub Comments" as github_comments
+    process "JSON Reports" as json_reports
+    process "Text Reports" as text_reports
+}
+
+rectangle "GitHub Integration" <<GITHUB_COLOR>> {
+    process "GitHubClient" as github_client
+    process "Status Updates" as status_updates
+}
+
+' Data Stores
+database "Environment\nVariables" as env_vars <<DATA_COLOR>>
+file "Report Files" as report_files <<DATA_COLOR>>
+
+' Data Flow
+github_pr --> diff_extract : PR commit IDs
+git_repo --> diff_extract : Git diff data
+diff_extract --> file_extract : Diff text
+file_extract --> content_extract : Spec file paths
+
+content_extract --> anti_patterns : Spec content\n+ File lists
+content_extract --> prompts : Spec content\n+ Context
+
+prompts --> ai_client : Structured prompts\nrequesting two sections
+ai_client --> openai_api : API requests
+openai_api --> ai_client : Structured responses\n(Brief + Detailed)
+
+anti_patterns --> analyzer : List[AntiPattern]\nwith severity levels
+ai_client --> analyzer : Structured AI analysis\n(SECTION 1 + SECTION 2)
+
+analyzer --> console : Brief summary
+analyzer --> logs : Detailed analysis\n(SECTION 2 content)
+analyzer --> github_comments : Brief summary\n(SECTION 1 content)
+analyzer --> json_reports : Complete structured data
+analyzer --> text_reports : Formatted detailed report
+
+analyzer --> github_client : Comment content\n+ Status information
+github_client --> status_updates : PR comments\n+ Check status
+
+env_vars --> diff_extract : Commit IDs
+env_vars --> ai_client : Azure OpenAI config
+env_vars --> github_client : GitHub authentication
+
+json_reports --> report_files : spec_analysis_report.json
+text_reports --> report_files : spec_analysis_report.txt
+
+' Key Data Transformations
+note top of analyzer
+**Key Data Transformation**
+Raw AI Response:
+```
+SECTION 1: BRIEF PR COMMENT SUMMARY
+[Critical issues for PR authors]
+
+SECTION 2: DETAILED ANALYSIS FOR LOGS  
+[Comprehensive technical analysis]
+```
+
+Parsed into:
+• Brief content → GitHub PR comments
+• Detailed content → Pipeline logs
+• Combined → Report files
+end note
+
+note bottom of anti_patterns
+**Anti-Pattern Data Structure**
+```
+AntiPattern {
+  name: str
+  description: str
+  severity: Severity (INFO|WARNING|ERROR|CRITICAL)
+  recommendation: str
+  file_path: str
+  details: Dict[str, Any]
+}
+```
+end note
+
+note right of github_comments
+**GitHub Comment Strategy**
+• Update existing comments (no spam)
+• Focus on critical/error issues only
+• Brief, actionable recommendations
+• Link to pipeline for full details
+end note
+
+' Styling
+skinparam rectangle {
+    BackgroundColor<<DETECTOR_COLOR>> #E8F5E8
+    BackgroundColor<<AI_COLOR>> #FFF2E6
+    BackgroundColor<<ANALYZER_COLOR>> #F3E5F5
+    BackgroundColor<<GITHUB_COLOR>> #F6F8FA
+}
+
+skinparam process {
+    BackgroundColor<<DETECTOR_COLOR>> #28A745
+    FontColor<<DETECTOR_COLOR>> white
+    BackgroundColor<<AI_COLOR>> #FF6B35
+    FontColor<<AI_COLOR>> white
+    BackgroundColor<<ANALYZER_COLOR>> #6F42C1
+    FontColor<<ANALYZER_COLOR>> white
+    BackgroundColor<<GITHUB_COLOR>> #24292E
+    FontColor<<GITHUB_COLOR>> white
+}
+
+@enduml
