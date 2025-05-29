@@ -98,6 +98,12 @@
 %global devel_pname %{_name}-devel
 %global non_kmp_pname %{_name}-modules
 
+# !!!! some OOT spec depends on this the exact version and release nb of this component
+# !!!! do not forget to upgrade those spec when upgrading version or release nb
+# !!!! e.g.: when going from version 24.10 to 24.11 or going from release 20%{release_suffix}%{?dist}
+# !!!!       to 21%{release_suffix}%{?dist}
+# !!!! to identify the depend spec look for "%{!?_mofed_full_version: %define _mofed_full_version"
+
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel
 Version:	 24.10
