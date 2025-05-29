@@ -35,6 +35,7 @@ It contains the libraries and header files to create applications.
     --with-rootlibdir=%{_libdir} \
     --disable-manpages \
     --with-zlib \
+    --with-xz \
     --disable-silent-rules
 make VERBOSE=1 %{?_smp_mflags}
 
