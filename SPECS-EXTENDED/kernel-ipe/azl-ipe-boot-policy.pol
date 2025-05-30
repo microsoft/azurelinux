@@ -5,3 +5,7 @@ DEFAULT action=ALLOW
 DEFAULT op=EXECUTE action=DENY
 op=EXECUTE boot_verified=TRUE action=ALLOW
 op=EXECUTE dmverity_signature=TRUE action=ALLOW
+
+DEFAULT op=KMODULE action=DENY
+op=KMODULE boot_verified=TRUE action=ALLOW
+op=KMODULE dmverity_signature=TRUE action=ALLOW
