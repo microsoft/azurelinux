@@ -1,6 +1,10 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+# This check verifies basic package build success and failure cases.
+# It should only be dependent on toolkit changes, not on the specs.
+# This is why each build uses the 3.0-stable version of the specs and manifests.
+
 name: Package build checks
 
 env:
