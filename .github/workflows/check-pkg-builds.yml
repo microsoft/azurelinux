@@ -76,7 +76,7 @@ jobs:
             echo "Package build should have failed, but it succeeded."
             exit 1
           else
-            if grep -qP 'Number of failed SRPMs:\s+1$' build.log; then
+            if grep -qP 'Number of failed SRPMs:\s+1\s*$' build.log; then
               echo "Package build failed as expected."
             else
               echo "Package build failed but not as expected."
@@ -135,7 +135,7 @@ jobs:
             echo "Toolchain package rebuild should have failed, but it succeeded."
             exit 1
           else
-            if grep -qP 'Number of toolchain SRPM conflicts:\s+1$' build.log; then
+            if grep -qP 'Number of toolchain SRPM conflicts:\s+1\s*$' build.log; then
               echo "Toolchain package rebuild failed as expected."
             else
               echo "Toolchain package rebuild failed but not as expected."
@@ -251,7 +251,7 @@ jobs:
             echo "License check should have failed, but it succeeded."
             exit 1
           else
-            if grep -qP 'Number of SRPMs with license errors:\s+1$' build.log; then
+            if grep -qP 'Number of SRPMs with license errors:\s+1\s*$' build.log; then
               echo "License check failed as expected."
             else
               echo "License check failed but not as expected."
@@ -335,7 +335,7 @@ jobs:
             echo "License check should have failed, but it succeeded."
             exit 1
           else
-            if grep -qP 'Number of SRPMs with license errors:\s+1$' build.log; then
+            if grep -qP 'Number of SRPMs with license errors:\s+1\s*$' build.log; then
               echo "License check failed as expected."
             else
               echo "License check failed but not as expected."
