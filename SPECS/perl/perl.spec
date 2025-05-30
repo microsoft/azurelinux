@@ -132,6 +132,7 @@ Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+# Note that scrubbed version of the source tarball contains upstream source minus password protected files which password is not known
 Source0:        https://www.cpan.org/src/5.0/perl-%{perl_version}.tar.xz#/perl-%{perl_version}-scrubbed.tar.xz
 Source3:        macros.perl
 # Tom Christiansen confirms Pod::Html uses the same license as perl

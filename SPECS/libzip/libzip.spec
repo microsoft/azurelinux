@@ -6,6 +6,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://libzip.org/
+# Note that scrubbed version of the source tarball contains upstream source minus password protected files which password is not known
 Source0:        https://libzip.org/download/libzip-%{version}.tar.xz#/libzip-%{version}-scrubbed.tar.xz
 BuildRequires:  bzip2-devel
 BuildRequires:  cmake >= 3.0.2

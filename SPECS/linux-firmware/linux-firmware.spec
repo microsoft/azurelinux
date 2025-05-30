@@ -11,6 +11,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://www.kernel.org/
+# Note that scrubbed version of the source tarball contains upstream source minus password protected files which password is not known
 Source0:        https://www.kernel.org/pub/linux/kernel/firmware/%{name}-%{version}.tar.gz#/%{name}-%{version}-scrubbed.tar.gz
 BuildArch:      noarch
 
