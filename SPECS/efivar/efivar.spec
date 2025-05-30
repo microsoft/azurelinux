@@ -94,4 +94,3 @@ It contains the libraries and header files to create applications
 
 * Mon Jul 6 2015 Sharath George <sharathg@vmware.com> - 0.20-1
 - Initial build. First version
-

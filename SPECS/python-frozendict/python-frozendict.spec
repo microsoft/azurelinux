@@ -121,4 +121,3 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} python3 -m pytest
 
 * Mon Dec 19 2016 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 1.2-1
 - Initial package
-

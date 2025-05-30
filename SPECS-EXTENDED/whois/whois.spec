@@ -413,4 +413,3 @@ fi
 
 * Wed Sep 29 2010 Petr Pisar <ppisar@redhat.com> - 5.0.7-1
 - 5.0.7 imported
-

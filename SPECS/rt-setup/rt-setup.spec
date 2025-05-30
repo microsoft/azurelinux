@@ -366,4 +366,3 @@ Resolves: rhbz#1341783
 - Initial packaging
 - Requires all the basic packages for RT
 - Requires support for limits.d and no realtime.conf present in PAM package
-

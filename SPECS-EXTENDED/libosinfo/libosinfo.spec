@@ -321,4 +321,3 @@ Libraries, includes, etc. to compile with the libosinfo library
 
 * Thu Nov 24 2011 Daniel P. Berrange <berrange@redhat.com> - 0.0.2-1
 - Initial package
-

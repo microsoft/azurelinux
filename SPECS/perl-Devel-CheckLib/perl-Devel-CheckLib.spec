@@ -187,4 +187,3 @@ make test
 
 * Wed Oct 19 2011 Jose Pedro Oliveira <jpo at di.uminho.pt> - 0.94-1
 - First build.
-

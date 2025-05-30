@@ -99,4 +99,3 @@ sed -i "s/py\.test/pytest/" testing/test_iniconfig.py
 - Use explicit name macro to reduce potential of naming errors.
 - Add explicit build dependencies on 'python3-setuptools',
   'python3-setuptools_scm', and 'python3-wheel'.
-

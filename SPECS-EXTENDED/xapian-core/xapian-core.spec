@@ -361,4 +361,3 @@ make check %{?_smp_mflags}
 
 * Sat May  1 2010 Peter Robinson <pbrobinson@fedoraproject.org> - 1.2.0-1
 - Update to 1.2.0
-

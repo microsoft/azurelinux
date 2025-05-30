@@ -215,4 +215,3 @@ rm doc/conf.py
 * Thu Apr 26 2018 Marian Csontos <mcsontos@redhat.com> 0.8.5-6
 - Package upstream version 0.8-5.6
 
-

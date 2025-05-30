@@ -214,4 +214,3 @@ tox
 
 * Wed Feb 18 2015 Ralph Bean <rbean@redhat.com> - 0.4.2-1
 - initial package for Fedora.
-

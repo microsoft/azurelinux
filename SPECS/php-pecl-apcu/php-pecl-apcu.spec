@@ -454,4 +454,3 @@ REPORT_EXIT_STATUS=1 \
 
 * Sat Mar 23 2013 Remi Collet <remi@fedoraproject.org> - 4.0.0-0.1.git44e8dd4
 - initial package, version 4.0.0
-

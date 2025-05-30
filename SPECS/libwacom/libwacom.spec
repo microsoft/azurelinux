@@ -394,4 +394,3 @@ install -d %{buildroot}/%{_udevrulesdir}
 
 * Mon Dec 19 2011 Peter Hutterer <peter.hutterer@redhat.com> 0.1-1
 - Initial import (#768800)
-

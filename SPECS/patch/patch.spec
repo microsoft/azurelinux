@@ -76,4 +76,3 @@ make  %{?_smp_mflags} check
 -   Updating to 2.7.5 version.
 *   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 2.7.1-1
 -   Initial build First version.
-

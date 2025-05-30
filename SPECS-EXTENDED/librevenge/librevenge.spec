@@ -219,4 +219,3 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}${LD_LIBRARY_PATH:+:${LD_LIBRARY_PA
 
 * Fri May 23 2014 David Tardon <dtardon@redhat.com> - 0.0.0-1
 - initial import
-

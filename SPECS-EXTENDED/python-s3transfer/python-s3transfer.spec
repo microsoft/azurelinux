@@ -90,4 +90,3 @@ rm -vrf *.egg-info
 
 * Thu Dec 27 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 0.1.13-1
 - Initial package
-

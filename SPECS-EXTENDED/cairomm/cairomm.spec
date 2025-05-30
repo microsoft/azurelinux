@@ -289,4 +289,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Fri Jan 27 2006 Rick L Vinyard Jr <rvinyard@cs.nmsu.edu> - 0.4.0-1
 - Initial creation from papyrus.spec.in
-

@@ -99,4 +99,3 @@ echo "disable dkms.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-dk
 
 * Thu Aug 6 2015 Divya Thaluru <dthaluru@vmware.com> 2.2.0.3-1
 - Initial version
-

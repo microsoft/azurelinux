@@ -476,4 +476,3 @@ chmod 755 %{buildroot}%{_bindir}/f{,un}pack
 
 * Sat Oct 29 2005 Matthew Truch <matt at truch.net> - 3.004-0.1.b
 - Initial spec file for Fedora Extras.
-

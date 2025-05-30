@@ -1170,4 +1170,3 @@ hardlink -t %{buildroot}%{_libdir}/ocaml/stublibs
 
 * Tue Nov 26 2002 Axel Thimm <Axel.Thimm@physik.fu-berlin.de>
 - Added _mandir/mano/* entry
-

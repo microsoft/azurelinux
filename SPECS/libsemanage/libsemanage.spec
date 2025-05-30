@@ -1466,4 +1466,3 @@ invoking the appropriate config tool (or by hardcoding the old value for
   * Merged key extract patch from Ivan Gyurdiev.
 - Initial version
 - Created by Stephen Smalley <sds@epoch.ncsc.mil>
-

@@ -341,4 +341,3 @@ rm -rf %{buildroot}/%{_docdir}/umockdev
 
 * Mon Apr 27 2015 Bastien Nocera <bnocera@redhat.com> 0.8.8-1
 - Initial package for Fedora
-

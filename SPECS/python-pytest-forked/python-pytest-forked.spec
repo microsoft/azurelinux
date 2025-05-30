@@ -133,4 +133,3 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 * Thu Aug 10 2017 Scott Talbert <swt@techie.net> - 0.2-1
 - Initial package.
-

@@ -1241,4 +1241,3 @@ fi
 
 * Fri Mar 30 2012 Jan Vcelak <jvcelak@redhat.com> 2.0-1
 - first stable release
-

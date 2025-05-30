@@ -271,4 +271,3 @@ make install DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir}/cs
 
 * Sun Jun 11 2000 Trond Eivind Glomsrød <teg@redhat.com>
 - first build
-

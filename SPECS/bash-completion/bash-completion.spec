@@ -155,4 +155,3 @@ rm -f %{buildroot}%{_datadir}/bash-completion/completions/influx
 
 * Tue Sep 23 2008 Ercole 'ercolinux' Carpanetto <ercole69@gmail.com> - 20060301-1mamba
 - package created by autospec
-

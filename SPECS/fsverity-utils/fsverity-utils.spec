@@ -116,4 +116,3 @@ make check
 
 * Wed Dec 04 2019 Colin Walters <walters@verbum.org> - 1.0-1
 - Initial version
-

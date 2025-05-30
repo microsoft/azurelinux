@@ -163,4 +163,3 @@ rm -f $RPM_BUILD_ROOT%{python_sitearch}/_rawcode.la
 
 * Tue Mar 03 2009 Pravin Satpute <pravin.d.s@gmail.com> - 1.0.0.20090303-1
 - The first version.
-

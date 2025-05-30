@@ -855,4 +855,3 @@ Sebastian Andrzej Siewior (1):
 
 * Thu Jan 03 2008 Clark Williams <williams@redhat.com> - 0.18-1
 - Initial build.
-

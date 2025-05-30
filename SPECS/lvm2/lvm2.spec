@@ -429,4 +429,3 @@ echo "disable lvm2-monitor.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 
 *   Thu Feb 26 2015 Divya Thaluru <dthaluru@vmware.com> 2.02.116-1
 -   Initial version
-

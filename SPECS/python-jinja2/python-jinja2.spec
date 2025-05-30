@@ -118,4 +118,3 @@ tox -v -e py%{python3_version_nodots} --
 
 * Tue Dec 13 2016 Dheeraj Shetty <dheerajs@vmware.com> - 2.8-1
 - Initial packaging for Photon
-

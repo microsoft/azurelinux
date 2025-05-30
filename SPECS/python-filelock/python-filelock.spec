@@ -153,4 +153,3 @@ pip3 install iniconfig
 
 * Sun May 01 2016 Scott K Logan <logans@cottsay.net> - 2.0.6-1
 - Initial package
-

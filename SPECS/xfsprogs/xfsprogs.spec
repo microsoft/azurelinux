@@ -116,4 +116,3 @@ find %{buildroot}/%{_lib64dir} -name '*.a' -delete
 -   Updated to version 4.10.0.
 *   Fri Jan 6 2017 Dheeraj Shetty <dheerajs@vmware.com> 4.9.0-1
 -   Initial build.  First version
-

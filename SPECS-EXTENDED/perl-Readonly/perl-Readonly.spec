@@ -291,4 +291,3 @@ perl Build.PL --installdirs=vendor
 
 * Mon Nov 7 2005 Michael A. Peters <mpeters@mac.com> - 1.03-1
 - Initial spec file
-

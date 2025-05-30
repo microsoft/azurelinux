@@ -311,4 +311,3 @@ fi # 1 : closed
 - License verified
 * Thu Feb 20 2014 Alaa Hleihel <alaa@mellanox.com>
 - Initial packaging
-

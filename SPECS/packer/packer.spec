@@ -152,4 +152,3 @@ go test -mod=vendor
 * Tue Jun 07 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.8.1-1
 - Original version for CBL-Mariner.
 - License verified.
-

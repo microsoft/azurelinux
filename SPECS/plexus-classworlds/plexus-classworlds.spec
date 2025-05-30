@@ -160,4 +160,3 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 
 * Wed Jun  3 2009 mvyskocil@suse.cz
 - Initial SUSE packaging from jpackage.org 5.0
-

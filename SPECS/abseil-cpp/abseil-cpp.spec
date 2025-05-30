@@ -143,4 +143,3 @@ Development headers for %{name}
 
 * Sun May 24 2020 Rich Mattes <richmattes@gmail.com> - 20200225.2-1
 - Initial package.
-

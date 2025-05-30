@@ -62,4 +62,3 @@ make %{?_smp_mflags} -k test
 
 *   Wed Jul 27 2016 Divya Thaluru <dthaluru@vmware.com> 2.12.02-1
 -   Initial version
-

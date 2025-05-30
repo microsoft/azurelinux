@@ -114,4 +114,3 @@ cp -p th_hu_HU_v2.* $RPM_BUILD_ROOT/%{_datadir}/mythes
 
 * Tue Jul 14 2009 Caolán McNamara <caolanm@redhat.com> - 0.20090203-1
 - initial version
-

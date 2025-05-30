@@ -228,4 +228,3 @@ find %{buildroot}%{_datadir}/%{name} -name '*.build' -delete
   - rhino-build patch is not necessary for java 5+
 * Tue Sep  2 2008 mvyskocil@suse.cz
 - Initial packaging of rhino 1.6 (based on Jpackage 1.7)
-

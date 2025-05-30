@@ -266,4 +266,3 @@ ln -s soundtouch.pc %{buildroot}%{_libdir}/pkgconfig/soundtouch-1.0.pc
 
 * Thu Aug 26 2004 Fernando Lopez-Lezcano <nando@ccrma.stanford.edu> 1.2.1-1
 - initial build.
-

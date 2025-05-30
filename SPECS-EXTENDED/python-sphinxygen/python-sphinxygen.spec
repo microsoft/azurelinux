@@ -100,4 +100,3 @@ install -Dpm 0644 doc/sphinxygen.1 -t %{buildroot}%{_mandir}/man1/
 
 * Thu Feb 09 2023 Benson Muite <benson_muite@emailplus.org> - 1.0.0-1
 - Initial packaging
-

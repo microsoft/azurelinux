@@ -288,4 +288,3 @@ fi
 
 * Mon Aug 11 2003 <Dave.Beckett@bristol.ac.uk>
 - Initial packaging
-

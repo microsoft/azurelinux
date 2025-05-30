@@ -112,4 +112,3 @@ make DESTDIR=%{buildroot} install
 * Mon Oct 05 2009 Peter Jones <pjones@redhat.com> - 1.0-1
 - First release.
 
-

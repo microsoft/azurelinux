@@ -216,4 +216,3 @@ fi
 - Drop redundant explicit dependencies.
 - BR Test::More and Test::Pod.
 - Include the spfd and spfquery scripts as %%doc
-

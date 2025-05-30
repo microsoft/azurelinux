@@ -695,4 +695,3 @@ done
 - c-client 2002e is based on imap-2002d
 - Build shared version, build logic is copied from FreeBSD net/cclient
 
-

@@ -88,4 +88,3 @@ It contains the libraries and header files for libqmi
 
 * Mon Dec 10 2018 Alexey Makhalov <amakhalov@vmware.com> - 1.20.2-1
 - Initial build. First version
-

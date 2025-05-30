@@ -248,4 +248,3 @@ make test TEST_FILES="xt/*.t"
 - Specfile by Fedora::App::MaintainerTools 0.006
 
 
-

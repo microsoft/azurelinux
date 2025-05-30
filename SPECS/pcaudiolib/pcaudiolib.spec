@@ -70,4 +70,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Fri Feb 05 2021 Thomas Crain <thcrain@microsoft.com> - 1.1-1
 - Original version for CBL-Mariner (license: MIT)
 - License verified
-

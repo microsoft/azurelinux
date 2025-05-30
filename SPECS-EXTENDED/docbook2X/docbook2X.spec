@@ -196,4 +196,3 @@ Rebuild for new perl
 
 * Fri Feb  3 2006 Patrice Dumas <pertusus@free.fr> - 0.8.5-1
 - FE submission
-

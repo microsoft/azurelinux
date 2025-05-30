@@ -247,4 +247,3 @@ make install DESTDIR=%{buildroot}
 * Fri Apr 29 2005 Ralf Corsepius <ralf[AT]links2linux.de> - 1.35.1-1
 - Update to 1.35.1
 - Minor spec fixes.
-

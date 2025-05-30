@@ -828,4 +828,3 @@ update-alternatives --remove \
 - Added %build macro
 * Sun Jan 28 2007 Vladimir Sokolovsky <vlad@mellanox.co.il>
 - Created spec file for kernel-ib
-

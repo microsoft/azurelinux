@@ -148,4 +148,3 @@ rm -vf tests/multi_option_constants_test.py tests/ftp_test.py tests/option_const
 
 * Sat Jan 24 2015 Touseef Liaqat <tliaqat@vmware.com> 7.19.5.1
 - Initial build.  First version
-

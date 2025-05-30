@@ -401,4 +401,3 @@ cp -a Fonts/fontsets Fonts/*.equivalents Fonts/*.set \
 
 * Wed Jun 20 2012 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.76-1
 - Initial support
-

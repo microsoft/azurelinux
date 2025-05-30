@@ -205,4 +205,3 @@ fi
 
 * Fri Apr 16 2021 Chris Co <chrco@microsoft.com> - 15.4-1
 - Original version for CBL-Mariner.
-

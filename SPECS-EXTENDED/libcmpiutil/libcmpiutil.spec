@@ -178,4 +178,3 @@ rm -f %{buildroot}%{_libdir}/*.a
 
 * Fri Oct 26 2007 Daniel Veillard <veillard@redhat.com> - 0.1-1
 - created
-

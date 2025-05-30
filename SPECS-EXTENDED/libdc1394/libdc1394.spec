@@ -256,4 +256,3 @@ find %{buildroot} -name "*.la" -delete
 
 * Thu Aug 25 2005 Dries Verachtert <dries@ulyssis.org> - 1.1.0-1
 - Initial package.
-

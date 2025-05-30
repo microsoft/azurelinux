@@ -100,4 +100,3 @@ sed -i 's/ "-cclib"; "-Wl,--no-as-needed";//' src/ctypes-foreign/config/discover
 
 * Tue Feb 09 2021 Jerry James <loganjerry@gmail.com> - 0.18.0-1
 - Initial package
-

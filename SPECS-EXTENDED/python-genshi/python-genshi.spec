@@ -309,4 +309,3 @@ rm %{buildroot}%{python3_sitelib}/genshi/*.c
 * Thu Apr 12 2007 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.3.6-1
 - First version for Fedora Extras
 
-

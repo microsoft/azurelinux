@@ -282,4 +282,3 @@ ocaml pkg/pkg.ml test
 * Thu Oct  8 2009 Richard W.M. Jones <rjones@redhat.com> - 0.9.0-2
 - Initial RPM release.
 - Use global instead of define (Till Maas).
-

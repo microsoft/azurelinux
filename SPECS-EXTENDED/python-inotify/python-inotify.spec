@@ -211,4 +211,3 @@ sed -i '1c#! %{__python3}' python3/pyinotify.py
 * Tue Mar  6 2007 Terje Rosten <terjeros@phys.ntnu.no> - 0.7.0-1
 - Initial build
 
-

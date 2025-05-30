@@ -184,4 +184,3 @@ popd
 
 * Thu Jul 31 2008 Caolan McNamara <caolanm@redhat.com> - 0.20080731-1
 - latest version
-

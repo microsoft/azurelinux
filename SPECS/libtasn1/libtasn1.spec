@@ -118,4 +118,3 @@ make %{?_smp_mflags} check
 
 * Fri Jun 19 2015 Divya Thaluru <dthaluru@vmware.com> 4.5-1
 - Initial build. First version
-

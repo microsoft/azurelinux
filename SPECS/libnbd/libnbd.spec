@@ -519,4 +519,3 @@ skip_test tests/connect-tcp6
 - Filter Python provides.
 - Remove executable permission on the tar.gz.sig file.
 - Initial release.
-

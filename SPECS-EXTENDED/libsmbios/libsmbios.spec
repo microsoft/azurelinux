@@ -450,4 +450,3 @@ rename %{pot_file}.mo %{lang_dom}.mo $(find %{buildroot}/%{_datadir} -name %{pot
 - Changes per Fedora Packaging Guidelines to prepare to submit to Extras.
 - Add in a changelog entry per Fedora Packaging Guidelines...
 
-

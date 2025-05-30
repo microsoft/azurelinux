@@ -754,4 +754,3 @@ install -m 644 -p -D public_suffix_list.dafsa \
 * Sun Nov 15 2015 astieger@suse.com
 - initial package for openSUSE / SLE based on Fedora spec
 - update to 20151112
-

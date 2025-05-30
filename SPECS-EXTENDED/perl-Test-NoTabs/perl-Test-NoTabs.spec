@@ -211,4 +211,3 @@ make test
 
 * Mon Feb  1 2010 Paul Howarth <paul@city-fan.org> 0.9-1
 - Initial RPM version
-

@@ -186,4 +186,3 @@ make %{?_smp_mflags} test I_PROMISE_TO_TEST_SINGLE_THREADED=1
 
 * Sat Jun 19 2010 Jeroen van Meeuwen <vanmeeuwen@kolabsys.com> - 1.1916-1
 - First package
-

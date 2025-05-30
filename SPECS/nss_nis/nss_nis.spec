@@ -134,4 +134,3 @@ make check
 
 * Tue Jan 30 2018 Matej Mužila <mmuzila@redthat.com> - 3.0-3
 - Inital release
-

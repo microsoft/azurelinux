@@ -625,4 +625,3 @@ fi
 
 * Sun Jan 12 2014 Patrick Uiterwijk <puiterwijk@redhat.com> - 0.1.0-1
 - Rename from udisks2-lvm
-

@@ -832,4 +832,3 @@ and dpkg-dev (and dpkg-devel for headers of dpkg).
 
 * Thu Jul 19 2007 Patrice Dumas <pertusus@free.fr> - 1.14.5-1
 - initial packaging
-

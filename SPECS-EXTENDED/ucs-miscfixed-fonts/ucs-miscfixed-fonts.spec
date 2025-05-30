@@ -142,4 +142,3 @@ ln -s %{_fontconfig_templatedir}/%{fontconf} \
 * Thu Sep 29 2009 Pravin Satpute <psatpute@redhat.com> - 0.3-1
 - initial packaging
 - these fonts was there in bitmap-fonts package previously, packaging it separate as per merger review suggetion.
-

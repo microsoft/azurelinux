@@ -304,4 +304,3 @@ popd
 
 * Thu Jun 11 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 0.5.0-1
 - Initial package
-

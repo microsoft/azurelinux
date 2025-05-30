@@ -370,4 +370,3 @@ exit 0
 * Thu Dec 22 2016 Miro Hrončok <mhroncok@redhat.com> - 0.2.0-2
 - Rebuild for Python 3.6
 
-

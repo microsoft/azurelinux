@@ -211,4 +211,3 @@ export GRPC_PYTHON_CFLAGS="%{optflags} -std=c++$CXX_VERSION"
 
 * Mon Mar 08 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.35.0-1
 - Original version for CBL-Mariner. License Verified.
-

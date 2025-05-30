@@ -146,4 +146,3 @@ make DESTDIR=%{buildroot} install
 
 * Tue Sep 30 2008  <srinivas_ramanatha@dell.com> - 2.1.0-1%{?dist}
 - Modified the spec file to adhere to fedora packaging guidelines.
-

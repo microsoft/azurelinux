@@ -102,4 +102,3 @@ find %{buildroot} -name '*.a'  -delete
 
 * Fri Dec 16 2016 Dheeraj Shetty <Dheerajs@vmware.com> - 1.5.9-1
 - Initial build. First version
-

@@ -84,4 +84,3 @@ xmlcatalog --noout --del 'file://%{_sysconfdir}/xml/mallard/catalog' %{_sysconfd
 
 * Thu Apr 21 2016 David King <amigadave@amigadave.com> - 1.0.2-1
 - Initial Fedora packaging (#1264945)
-

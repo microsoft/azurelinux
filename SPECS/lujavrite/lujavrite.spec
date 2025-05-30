@@ -59,4 +59,3 @@ lua test.lua
 
 * Wed Mar 01 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.0.1-1
 - Initial packaging
-

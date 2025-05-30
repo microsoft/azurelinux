@@ -415,4 +415,3 @@ cat .ofiles-gettext-stub-devel >> .ofiles-gettext-devel
 
 * Fri Mar 21 2008 Richard W.M. Jones <rjones@redhat.com> - 0.2.0-1rwmj20080321
 - Initial RPM release.
-

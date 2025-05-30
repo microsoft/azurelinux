@@ -512,4 +512,3 @@ chmod +x %{buildroot}%{_bindir}/opj2_jpip_viewer
  
 * Thu Apr 03 2014 Sandro Mani <manisandro@gmail.com> - 2.0.0-1.svn20140403
 - Initial package
-

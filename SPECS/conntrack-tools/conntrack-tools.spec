@@ -289,4 +289,3 @@ echo "disable conntrackd.service" > %{buildroot}%{_libdir}/systemd/system-preset
 
 * Sun Jul 22 2007 Paul P. Komkoff Jr <i@stingr.net> - 0.9.4-1
 - replace conntrack with conntrack-tools
-

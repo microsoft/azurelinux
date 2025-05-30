@@ -249,4 +249,3 @@ PERL_CANARY_STABILITY_NOPROMPT=1 %{_bindir}/perl Makefile.PL INSTALLDIRS=vendor 
 * Mon Jan 24 2011 Mathieu Bridon <bochecha@fedoraproject.org> - 4.03-1
 - Update to 4.03.
 - Use the system libev instead of the bundled one.
-

@@ -385,4 +385,3 @@ install -m0644 macros.go %{buildroot}%{_sysconfdir}/rpm/
 - initial version 1
   * implemented provides
   * implemented requires
-

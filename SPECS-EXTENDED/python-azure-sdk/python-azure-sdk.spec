@@ -224,4 +224,3 @@ done
 
 * Mon Aug 06 2018 Mohamed El Morabity <melmorabity@fedoraproject.org> - 4.0.0-1
 - Update to 4.0.0
-

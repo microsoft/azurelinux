@@ -218,4 +218,3 @@ popd
 
 * Wed Dec 16 2015 Jakub Hrozek <jakub.hrozek@posteo.se> - 1.0.0-1
 - Initial packaging
-

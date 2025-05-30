@@ -200,4 +200,3 @@ LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 
 * Tue Oct 27 2015 Mahmoud Bassiouny <mbassiouny@vmware.com>
 - Initial packaging for Photon
-

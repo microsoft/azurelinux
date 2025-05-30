@@ -103,4 +103,3 @@ python3 tests/testasciidoc.py run
 
 *   Fri Jun 5 2015 Touseef Liaqat <tliaqat@vmware.com> 8.6.9-1
 -   Initial build.  First version
-

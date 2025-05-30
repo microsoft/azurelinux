@@ -106,4 +106,3 @@ pip3 install iniconfig
 
 * Fri Sep 02 2022 Parag Nemade <pnemade AT redhat DOT com> - 22.3.0-1
 - Initial release
-

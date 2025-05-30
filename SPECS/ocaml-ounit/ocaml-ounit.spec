@@ -350,4 +350,3 @@ files for developing applications that use %{name}-lwt.
 
 * Sat May  3 2008 Richard W.M. Jones <rjones@redhat.com> - 1.0.2-1
 - Initial RPM release.
-

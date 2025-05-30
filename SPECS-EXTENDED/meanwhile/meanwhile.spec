@@ -115,4 +115,3 @@ rm -rf %{buildroot}%{_datadir}/doc/%{name}-doc-%{version}/
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-28
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
-

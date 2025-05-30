@@ -263,4 +263,3 @@ make test
 
 * Sat Feb 14 2009 Allisson Azevedo <allisson@gmail.com> 0.30-1
 - Initial rpm release.
-

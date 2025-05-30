@@ -240,4 +240,3 @@ BuildRequires: python%{python3_pkgversion}-setuptools
 
 * Wed Jun 05 2013 Peter V. Saveliev <peet@redhat.com> 0.1.8-1
 - initial RH build
-

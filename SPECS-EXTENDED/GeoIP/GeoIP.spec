@@ -386,4 +386,3 @@ rm -f %{buildroot}%{_libdir}/*.la
 
 * Sun Feb 5 2006 Michael Fleming <mfleming+rpm@enlartenment.com> 1.3.14-1
 - Initial review package for Extras
-

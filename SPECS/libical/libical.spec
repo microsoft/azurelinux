@@ -428,4 +428,3 @@ make test ARGS="-V" -C %{_target_platform}
 
 * Mon Dec 24 2007 Jakub 'Livio' Rusinek <jakub.rusinek@gmail.com> - 0.27-1
 - Initial release
-

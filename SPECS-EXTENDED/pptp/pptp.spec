@@ -294,4 +294,3 @@ install -p -m 644 %{SOURCE1} %{buildroot}%{_prefix}/lib/tmpfiles.d/pptp.conf
 
 * Fri May  6 2005 Paul Howarth <paul@city-fan.org> 1.6.0-1
 - First build for Fedora Extras, based on upstream spec file
-

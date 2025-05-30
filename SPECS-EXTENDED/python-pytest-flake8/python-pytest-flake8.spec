@@ -83,4 +83,3 @@ rm -rf %{pypi_name}.egg-info
 
 * Wed Jul 11 2018 Neal Gompa <ngompa13@gmail.com> - 1.0.1-1
 - Initial package
-

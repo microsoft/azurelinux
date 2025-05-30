@@ -85,4 +85,3 @@ ln -s jsonpointer %{buildroot}%{_bindir}/jsonpointer3
 
 * Wed Mar 04 2015 Mahmoud Bassiouny <mbassiouny@vmware.com>
 - Initial packaging for Photon
-

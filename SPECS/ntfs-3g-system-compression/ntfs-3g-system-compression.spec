@@ -61,4 +61,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Tue Feb 26 2019 Kamil Páral <kparal@redhat.com> - 1.0-1
 - initial package
-

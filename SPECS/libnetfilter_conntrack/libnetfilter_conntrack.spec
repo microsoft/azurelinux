@@ -76,4 +76,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 *   Wed Apr 05 2017 Anish Swaminathan <anishs@vmware.com> 1.0.6-1
 -   Initial packaging
-

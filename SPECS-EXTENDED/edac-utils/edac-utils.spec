@@ -313,4 +313,3 @@ install -d -m 0755 '%{buildroot}%{_sysconfdir}/edac/labels.d' \
 * Thu Mar 12 2007 Aristeu Rozanski <arozansk@redhat.com> 20061222-1
 - Package created
 
-

@@ -312,4 +312,3 @@ make test
 
 * Sun Apr 04 2010 Chris Weyl <cweyl@alumni.drew.edu> - 0.10-1
 - Specfile by Fedora::App::MaintainerTools 0.006
-

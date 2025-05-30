@@ -591,4 +591,3 @@ rm -rf %{buildroot}%{python3_sitelib}/tests
 * Sun Nov 06 2005 Konstantin Ryabitsev <icon@fedoraproject.org> - 0.13.0-0.1
 - Initial packaging.
 
-

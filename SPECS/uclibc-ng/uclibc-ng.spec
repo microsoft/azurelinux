@@ -213,4 +213,3 @@ rm -rf  %{buildroot}/include/
 
 * Fri Jun  5 2009 Ivana Varekova <varekova@redhat.com> - 0.9.30.1-2
 - initial build for Red Hat
-

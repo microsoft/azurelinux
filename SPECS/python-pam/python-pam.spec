@@ -66,4 +66,3 @@ Python PAM module using ctypes
 
 * Thu Mar 09 2017 Xiaolin Li <xiaolinl@vmware.com> - 1.8.2-1
 - Initial packaging for Photon
-

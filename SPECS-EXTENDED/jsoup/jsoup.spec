@@ -112,4 +112,3 @@ install -pdm 0755 target/site/apidocs %{buildroot}%{_javadocdir}/%{name}
 * Fri Feb  1 2019 Fridrich Strba <fstrba@suse.com>
 - Initial packaging of jsoup version 1.11.3
 - Added jsoup-build.xml file to build with ant
-

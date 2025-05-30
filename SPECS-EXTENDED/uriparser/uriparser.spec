@@ -267,4 +267,3 @@ sed -i 's/GENERATE_QHP\ =\ yes/GENERATE_QHP\ =\ no/g' doc/Doxyfile.in
 
 * Sat Aug 9 2008 Rakesh Pandit <rakesh@fedoraproject.org> 0.7.1-1
 - Initial build
-

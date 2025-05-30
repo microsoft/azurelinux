@@ -109,4 +109,3 @@ Representation (CBOR) (RFC 7049) serialization format.
 
 * Thu Sep 10 2020 Fabian Affolter <mail@fabian-affolter.ch> - 5.1.2-1
 - Initial package
-

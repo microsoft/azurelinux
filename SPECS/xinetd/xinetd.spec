@@ -105,4 +105,3 @@ echo "disable xinetd.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-
 -   Add xinetd library to photon
 *   Sun Sep 07 2003 Steve Grubb <linux_4ever@yahoo.com>
 -   Refined installation and added services.
-

@@ -864,4 +864,3 @@ rm $RPM_BUILD_ROOT%{_libdir}/gnome-keyring/devel/*.la
 
 * Fri Jan 23 2004 Alexander Larsson <alexl@redhat.com> 0.1.2-1
 - First version
-

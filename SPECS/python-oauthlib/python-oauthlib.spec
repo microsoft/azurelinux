@@ -90,4 +90,3 @@ pip3 install mock wheel
 
 * Thu Apr 13 2017 Anish Swaminathan <anishs@vmware.com> - 2.0.2-1
 - Initial packaging for Photon
-

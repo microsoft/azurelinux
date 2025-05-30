@@ -1091,4 +1091,3 @@ mkfontdir %{_x11fontdir}/cyrillic
 
 * Fri Mar 05 2010 Matěj Cepl <mcepl@redhat.com> - 7.2-10
 - Fixed bad directory ownership of /etc//X11/fontpath.d
-

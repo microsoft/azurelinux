@@ -310,4 +310,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Fri Dec 03 2010 Adam Williamson <awilliam@redhat.com> - 0.3.15-1
 - initial package
-

@@ -130,4 +130,3 @@ rm -rf %{buildroot}%{_docdir}
 
 * Fri May 31 2013 Peter Hutterer <peter.hutterer@redhat.com> 1.2.2-1
 - libXtst 1.2.2
-

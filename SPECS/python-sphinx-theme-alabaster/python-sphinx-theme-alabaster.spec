@@ -76,4 +76,3 @@ Alabaster is a visually (c)lean, responsive, configurable theme for the Sphinx d
 
 * Tue Apr 25 2017 Dheeraj Shetty <dheerajs@vmware.com> - 0.7.10-1
 - Initial
-

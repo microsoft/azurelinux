@@ -85,4 +85,3 @@ make %{?_smp_mflags} -k check
 
 * Thu Apr 28 2016 Kumar Kaushik <kaushikk@vmware.com> - 2.0.22-1
 - Initial Version.
-

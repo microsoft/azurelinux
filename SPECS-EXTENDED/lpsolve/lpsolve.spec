@@ -172,4 +172,3 @@ install -p -m 644 \
 
 * Wed Feb 20 2008 Caolán McNamara <caolanm@redhat.com> - 5.5.0.11-1
 - initial version
-

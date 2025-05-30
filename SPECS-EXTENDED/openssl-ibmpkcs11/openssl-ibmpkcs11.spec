@@ -72,4 +72,3 @@ rm -f $RPM_BUILD_ROOT%{enginesdir}/*.la
 
 * Fri Jan 19 2018 Dan Horák <dan@danny.cz> - 1.0.1-1
 - initial Fedora version
-

@@ -197,4 +197,3 @@ popd
 
 * Tue May 12 2009 Tom "spot" Callaway <tcallawa@redhat.com> 1.19-1
 - initial Fedora package
-

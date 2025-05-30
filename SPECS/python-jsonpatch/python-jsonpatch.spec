@@ -93,4 +93,3 @@ ln -s jsonpatch %{buildroot}%{_bindir}/jsonpatch3
 
 * Wed Mar 04 2015 Mahmoud Bassiouny <mbassiouny@vmware.com>
 - Initial packaging for Photon
-

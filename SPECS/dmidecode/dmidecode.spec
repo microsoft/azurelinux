@@ -48,4 +48,3 @@ make DESTDIR=%{buildroot} prefix=%{_prefix} install
 -	GA - Bump release of all rpms
 *	Mon Nov 02 2015 Divya Thaluru <dthaluru@vmware.com> 3.0-1
 -	Initial build.	First version
-

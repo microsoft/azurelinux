@@ -514,4 +514,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Wed Jan 10 2018 Björn Esser <besser82@fedoraproject.org> - 1.0.2-0.1
 - Initial rpm release (rhbz#1533929)
-

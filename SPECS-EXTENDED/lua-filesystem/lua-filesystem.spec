@@ -177,4 +177,3 @@ LUA_CPATH=$RPM_BUILD_ROOT%{lualibdir}/\?.so lua tests/test.lua
 * Fri Apr 04 2008 Tim Niemueller <tim@niemueller.de> - 1.4.0-1
 - Initial package
 
-

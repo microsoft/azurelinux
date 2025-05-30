@@ -107,4 +107,3 @@ cp -p mi.idx $RPM_BUILD_ROOT/%{_datadir}/mythes/th_mi_NZ_v2.idx
 
 * Fri Jan 16 2009 Caolan McNamara <caolanm@redhat.com> - 0.20080630-1
 - initial version
-

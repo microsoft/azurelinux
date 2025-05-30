@@ -81,4 +81,3 @@ LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make check
 
 * Tue Sep 18 2018 Ankit Jain <ankitja@vmware.com> 2.2.0-1
 - Initial Version.
-

@@ -193,4 +193,3 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 
 * Sat Mar 17 2007 Paul P Komkoff Jr <i@stingr.net> - 0.0.13-1
 - Preparing for submission to fedora extras
-

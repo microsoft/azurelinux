@@ -440,4 +440,3 @@ sed -i s/_xmvngen_/_jpbgen_/ %{buildroot}%{_fileattrsdir}/jpbgen.attr
 
 * Wed Nov 25 2020 Marian Koncek <mkoncek@redhat.com> - 1.0.0-1
 - Initial commit
-

@@ -260,4 +260,3 @@ iconv -f latin1 -t utf-8 < README > README.utf8; cp README.utf8 README
 
 * Mon Dec 22 2003 Matt Wilson <msw@redhat.com> 
 - Initial build.
-

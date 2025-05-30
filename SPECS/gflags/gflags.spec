@@ -63,4 +63,3 @@ rm %{buildroot}/root/.cmake/packages/gflags/*
 -   Exclude extra files
 *   Thu Apr 09 2020 Jonathan Chiu <jochi@microsoft.com> 2.2.2-1
 -   Original version for CBL-Mariner.
-

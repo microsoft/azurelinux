@@ -239,4 +239,3 @@ developing developing applications that use %{name}.
 
 * Tue Jun 2 2009 Dan Williams <dcbw@redhat.com> 0.20090602-1
 - Initial version
-

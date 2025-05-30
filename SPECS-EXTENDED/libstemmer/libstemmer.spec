@@ -136,4 +136,3 @@ cp %{SOURCE1} %{SOURCE2} .
 
 * Tue Dec 2 2014 Marek Skalicky <mskalick@redhat.com> - 0-1.585svn
 - Initial packaging
-

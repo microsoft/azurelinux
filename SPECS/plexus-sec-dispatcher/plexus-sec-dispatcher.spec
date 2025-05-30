@@ -181,4 +181,3 @@ cp %{SOURCE1} .
  
 * Fri May 21 2010 Hui Wang <huwang@redhat.com> - 1.4-1
 - Initial version of the package
-

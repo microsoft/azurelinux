@@ -210,4 +210,3 @@ popd
 
 * Fri Nov 04 2016 Richard W.M. Jones <rjones@redhat.com> - 0.9.3-5
 - New package, ocamlbuild used to be part of ocaml.
-

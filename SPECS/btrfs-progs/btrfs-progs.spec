@@ -119,4 +119,3 @@ rm -v %{buildroot}%{_libdir}/*.a
 
 *   Thu Feb 26 2015 Divya Thaluru <dthaluru@vmware.com> 3.18.2-1
 -   Initial version
-

@@ -153,4 +153,3 @@ rm -f $RPM_BUILD_ROOT/%{provider_dir}/*.la
 
 * Mon Jun  1 2009 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.2.6-1
 - Initial support
-

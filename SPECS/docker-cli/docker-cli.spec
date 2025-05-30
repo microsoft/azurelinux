@@ -184,4 +184,3 @@ install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}%{_datadir}/fi
 
 * Mon Mar 12 2018 Xing Wu <xingwu@microsoft.com>
 - First draft
-

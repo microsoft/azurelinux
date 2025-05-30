@@ -689,4 +689,3 @@ update-mime-database -n %{_datadir}/mime &> /dev/null ||:
 
 * Fri Jan 16 2004 Alexander Larsson <alexl@redhat.com> mime-info
 - Initial build.
-

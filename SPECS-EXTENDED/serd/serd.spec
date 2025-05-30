@@ -176,4 +176,3 @@ mv %{buildroot}%{_docdir}/%{name}-%{maj}/html %{buildroot}%{_docdir}/%{name}/%{n
 
 * Fri Dec 23 2011 Brendan Jones <brendan.jones.it@gmail.com> - 0.5.0-1
 - Initial build
-

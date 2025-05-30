@@ -51,4 +51,3 @@ make %{?_smp_mflags} -k check
 
 *	Fri Apr 08 2016 Kumar Kaushik <kaushikk@vmware.com> 0.28-1
 -	Initial build. First version
-

@@ -241,4 +241,3 @@ make check || : # TODO: failures as of 1.5.2 :(
 
 * Tue Nov 29 2005 Terje Bless <link@pobox.com> 1.5.2-0.pre1
 - New package OpenSP.
-

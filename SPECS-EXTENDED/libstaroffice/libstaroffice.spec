@@ -154,4 +154,3 @@ install -m 0644 sd2*.1 sd?2*.1 %{buildroot}/%{_mandir}/man1
 
 * Thu Feb 11 2016 David Tardon <dtardon@redhat.com> - 0.0.1-1
 - initial import
-

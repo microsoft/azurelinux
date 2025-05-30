@@ -400,4 +400,3 @@ make test
 
 * Sat Jan 20 2007 Jose Pedro Oliveira <jpo at di.uminho.pt> - 1.05-1
 - First build.
-

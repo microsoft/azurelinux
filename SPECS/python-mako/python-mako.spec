@@ -113,4 +113,3 @@ ln -s mako-render %{buildroot}/%{_bindir}/mako-render3
 
 * Fri Feb 03 2017 Vinay Kulkarni <kulkarniv@vmware.com> - 1.0.6-1
 - Initial version of python-mako package for Photon.
-

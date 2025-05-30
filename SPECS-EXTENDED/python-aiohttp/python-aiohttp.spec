@@ -339,4 +339,3 @@ with middlewares and pluggable routing.
 
 * Wed Feb 26 2014 Fabian Affolter <mail@fabian-affolter.ch> - 0.9.1-1
 - Initial package for Fedora
-

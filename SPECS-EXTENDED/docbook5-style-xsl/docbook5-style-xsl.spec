@@ -212,4 +212,3 @@ fi
 
 * Mon Nov 10 2008 Ondrej Vasik <ovasik@redhat.com> 1.74.0-1
 - Initial Fedora release
-

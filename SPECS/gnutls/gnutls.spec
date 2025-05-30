@@ -206,4 +206,3 @@ sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 
 * Thu Jun 18 2015 Divya Thaluru <dthaluru@vmware.com> - 3.4.2-1
 - Initial build. First version
-

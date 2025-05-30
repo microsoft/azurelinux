@@ -182,4 +182,3 @@ pip3 install pytest==7.1.3 freezegun
 
 * Fri Feb 20 2015 Pete Travis <me@petetravis.com> 1.0.0-1
 - Initial packaging. 
-

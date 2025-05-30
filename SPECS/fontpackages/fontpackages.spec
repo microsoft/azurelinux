@@ -378,4 +378,3 @@ EOF
 * Mon Nov 10 2008 Nicolas Mailhot <nim at fedoraproject dot org>
 - 1.0-1
 ☺ initial release
-

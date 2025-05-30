@@ -171,4 +171,3 @@ sed -i -e s/distutils.core/setuptools/ setup.py
 
 * Sun May 17 2015 Orion Poplawski <orion@cora.nwra.com> - 1.1.0-1
 - Initial package
-

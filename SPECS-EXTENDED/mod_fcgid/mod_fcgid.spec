@@ -433,4 +433,3 @@ install -p -m 644 %{SOURCE4} %{buildroot}%{_tmpfilesdir}/mod_fcgid.conf
 
 * Wed May 10 2006 Thomas Antony <thomas@antony.eu> 1.09-3
 - Initial release
-

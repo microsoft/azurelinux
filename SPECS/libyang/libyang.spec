@@ -103,4 +103,3 @@ cp -a doc/html %{buildroot}/%{_docdir}/libyang/html
 * Thu Oct 06 2022 Tom Fay <tomfay@microsoft.com> - 2.0.231-1
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 - License verified
-

@@ -75,4 +75,3 @@ make %{?_smp_mflags} test
 
 * Wed Jan 11 2017 Xiaolin Li <xiaolinl@vmware.com>  1.7.3.1-1
 - Initial build.
-

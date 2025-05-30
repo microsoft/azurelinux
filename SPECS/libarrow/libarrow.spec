@@ -384,4 +384,3 @@ popd
  
 * Thu Jan 13 2022  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 7.0.0-1
 - New upstream release.
-

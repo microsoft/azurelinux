@@ -366,4 +366,3 @@ sed -i -e 's|image: .*|image: registry.opensuse.org/kubic/kured:%{version}|g' %{
   * go1.11 currently in review status supports option -buildmode=pie
 - rpmlint warning: statically-linked-binary
   * Go binaries are generally statically linked
-

@@ -838,4 +838,3 @@ find %{buildroot}/%{_mandir}/man1 -type f -regextype posix-egrep -regex "$UTILS_
 
 * Fri Feb 28 2014 Kalev Lember <kalevlember@gmail.com> - 0.1.0-1
 - Initial Fedora packaging
-

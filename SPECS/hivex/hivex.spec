@@ -758,4 +758,3 @@ fi
 
 * Mon Feb 22 2010 Richard W.M. Jones <rjones@redhat.com> - 1.1.2-1
 - Initial Fedora RPM.
-

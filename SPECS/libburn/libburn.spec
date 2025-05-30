@@ -305,4 +305,3 @@ rm -rf $RPM_BUILD_ROOT%{_defaultdocdir}
 
 * Wed Aug 23 2006 Jesse Keating <jkeating@redhat.com> - 0.2-1.20060823svn
 - Initial package for review
-

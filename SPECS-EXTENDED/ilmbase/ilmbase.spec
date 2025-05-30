@@ -258,4 +258,3 @@ test "$(pkg-config --modversion IlmBase)" = "%{version}"
 * Thu Aug 09 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.0-1
 - ilmbase-1.0.0 (first try)
 
-

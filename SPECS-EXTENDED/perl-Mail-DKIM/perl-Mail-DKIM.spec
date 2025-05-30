@@ -227,4 +227,3 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 
 * Tue Jun 17 2008 Kyle VanderBeek <kylev@kylev.com> - 0.32-1
 - Initial version.
-

@@ -220,4 +220,3 @@ find %{buildroot} -name "*.la" -exec rm -f {} \;
 
 * Mon Feb 28 2005 David Moore <dcm@acm.org>
 - Initial version
-

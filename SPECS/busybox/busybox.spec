@@ -655,4 +655,3 @@ SKIP_KNOWN_BUGS=1 ./runtest
 
 * Thu Jun 28 2001 Erik Troan <ewt@redhat.com>
 - initial build for Red Hat
-

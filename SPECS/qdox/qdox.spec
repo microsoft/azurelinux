@@ -172,4 +172,3 @@ cp -aL target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 - disabled tests as they tends to randomly fails
 * Tue May  5 2009 mvyskocil@suse.cz
 - Initial build in SUSE. Version 1.6.1 from jpp 5.0
-

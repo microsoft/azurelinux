@@ -110,4 +110,3 @@ make %{?_smp_mflags} check
 
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 2.16-1
 - Initial build. First version
-

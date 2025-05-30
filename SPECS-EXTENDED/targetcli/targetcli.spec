@@ -390,4 +390,3 @@ install -m 644 systemd/* %{buildroot}%{_unitdir}/
 
 * Fri Oct 7 2011 Andy Grover <agrover@redhat.com> - 1.99.2.gitb03ec79-1
 - Initial Fedora packaging
-

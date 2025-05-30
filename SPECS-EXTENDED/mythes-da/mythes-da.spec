@@ -120,4 +120,3 @@ cp -p th_da_DK.idx $RPM_BUILD_ROOT/%{_datadir}/mythes/th_da_DK_v2.idx
 
 * Mon Feb 16 2009 Caolán McNamara <caolanm@redhat.com> - 0.1.9-0.1.beta
 - initial version
-

@@ -244,4 +244,3 @@ make test
 
 * Sun May 05 2013 Markus Mayer <lotharlutz@gmx.de> - 0.73-1
 - inital prm release
-

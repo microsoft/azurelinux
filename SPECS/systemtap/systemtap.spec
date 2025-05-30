@@ -456,4 +456,3 @@ fi
 
 * Wed Nov 18 2015 Anish Swaminathan <anishs@vmware.com> 2.7-1
 - Initial build. First version
-

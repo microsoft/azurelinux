@@ -310,4 +310,3 @@ popd
 
 * Thu Jan 02 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-1
 - first try
-

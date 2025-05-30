@@ -405,4 +405,3 @@ fi
 
 * Tue Apr 27 2004 Dag Wieers <dag@wieers.com> - 2.0.6-1
 - Initial package. (using DAR)
-

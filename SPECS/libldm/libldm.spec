@@ -141,4 +141,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Mon Sep 24 2012 Matthew Booth <mbooth@redhat.com> - 0.2.3-1
 - Initial packaging
-

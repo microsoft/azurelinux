@@ -61,4 +61,3 @@ cp -p dictionaries/th_eo.idx $RPM_BUILD_ROOT/%{_datadir}/mythes/th_eo.idx
 * Wed Oct 31 2018 Carmen Bianca Bakker <carmen@carmenbianca.eu> - 0.20180330-1
 - Initial package
 
-

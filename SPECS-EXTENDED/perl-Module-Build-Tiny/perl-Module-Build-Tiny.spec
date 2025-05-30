@@ -285,4 +285,3 @@ perl Build.PL --installdirs=vendor
 
 * Mon Apr  1 2013 Paul Howarth <paul@city-fan.org> - 0.013-1
 - Initial RPM version
-

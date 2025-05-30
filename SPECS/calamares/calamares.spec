@@ -787,4 +787,3 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/azl-eula
 
 * Mon Oct 20 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> - 0-0.1.20141017git8a623cc1181e9
 - Initial package
-

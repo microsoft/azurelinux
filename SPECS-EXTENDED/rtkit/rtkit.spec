@@ -198,4 +198,3 @@ dbus-send --system --type=method_call --dest=org.freedesktop.DBus / org.freedesk
 
 * Wed Jun 17 2009 Lennart Poettering <lpoetter@redhat.com> - 0.2-1
 - Initial packaging
-

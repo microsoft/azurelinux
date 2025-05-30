@@ -294,4 +294,3 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 
 * Wed Apr 20 2011 Paul Howarth <paul@city-fan.org> - 0.16-1
 - Initial RPM version
-

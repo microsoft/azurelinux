@@ -106,4 +106,3 @@ rm -fv %{buildroot}%{_docdir}/babeltrace2/*
 
 * Mon Feb 10 2020 Michael Jeanson <mjeanson@efficios.com> - 2.0.1-1
 - New upstream release
-

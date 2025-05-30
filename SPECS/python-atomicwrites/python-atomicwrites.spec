@@ -81,4 +81,3 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} %python3 tests/test_atomicwrites.py
 
 * Fri Jul 07 2017 Dheeraj Shetty <dheerajs@vmware.com> - 1.1.5-1
 - Initial packaging for Photon
-

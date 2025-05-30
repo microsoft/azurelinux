@@ -182,4 +182,3 @@ echo "d /run/setrans 0755 root root" > %{buildroot}/%{_libdir}/tmpfiles.d/libsel
 
 * Wed Feb 25 2015 Divya Thaluru <dthaluru@vmware.com> - 2.4-1
 - Initial build.  First version
-

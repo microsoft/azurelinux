@@ -581,4 +581,3 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/libcriu.a
 
 * Tue Aug 21 2012 Adrian Reber <adrian@lisas.de> - 0.2-1
 - initial release
-

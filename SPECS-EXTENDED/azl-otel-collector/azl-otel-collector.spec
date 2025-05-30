@@ -71,4 +71,3 @@ for the Azure Linux OpenTelemetry Collector.
 * Wed Apr 23 2025 Adit Jha <aditjha@microsoft.com> - 0.124.0-1
 - Original version for Azure Linux
 - License Verified
-

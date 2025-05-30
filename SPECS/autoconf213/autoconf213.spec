@@ -266,4 +266,3 @@ fi
 -   uses install-info
 *   Thu Jul 17 1997 Erik Troan <ewt@redhat.com>
 -   built with glibc
-

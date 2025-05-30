@@ -101,4 +101,3 @@ python3 ./run_tests.py
 
 * Wed Dec 27 2017 Anish Swaminathan <anishs@vmware.com> 0.44.0-1
 - Initial packaging
-

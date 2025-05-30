@@ -97,4 +97,3 @@ cp -p hyph_sl_SI.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen
 
 * Fri Nov 23 2007 Caolan McNamara <caolanm@redhat.com> - 0.20070127-1
 - initial version
-

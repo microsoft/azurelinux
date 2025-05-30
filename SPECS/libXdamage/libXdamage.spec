@@ -246,4 +246,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Mon Aug 22 2005 Mike A. Harris <mharris@redhat.com> 1.0.1-1
 - Initial build.
-

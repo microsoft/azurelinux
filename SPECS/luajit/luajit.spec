@@ -289,4 +289,3 @@ make check
 
 * Sun Jul 03 2011 Andrei Lapshin <alapshin@gmx.com> - 2.0.0-0.1.beta8
 - Initial build
-

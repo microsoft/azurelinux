@@ -320,4 +320,3 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -delete
 
 * Sat Jan 10 2004 Francois-Xavier Kowalski <francois-xavier.kowalski@hp.com> 2.6.0_test7_0.7.4-1
 - Creation
-

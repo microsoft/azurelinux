@@ -195,4 +195,3 @@ find %{buildroot} -name '*.a' -delete
 
 * Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 0.42.0-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
-

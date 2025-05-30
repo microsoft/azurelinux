@@ -470,4 +470,3 @@ http://git.gnome.org/browse/libpeas/commit/?id=1031aaeeef282ab2bb65cb6ae48fa4abf
 * Mon Jun 14 2010 Bastien Nocera <bnocera@redhat.com> 0.5.0-1
 - First package
 
-

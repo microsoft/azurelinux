@@ -207,4 +207,3 @@ cp %{SOURCE1} .
 
 * Fri Feb 10 2012 Bill Burns <bburns@redhat.com> 0.5-1
 - initial version
-

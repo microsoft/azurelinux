@@ -497,4 +497,3 @@ find examples/ -name '*.py[co]' -print -delete
 
 * Sun Oct 12 2008 Conrad Meyer <konrad@tylerc.org> - 0.6.2-1
 - Initial package.
-

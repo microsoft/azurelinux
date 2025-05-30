@@ -1356,4 +1356,3 @@ exit 0
 
 * Sun Oct 18 2009 Nalin Dahyabhai <nalin@redhat.com> 0.0-1
 - initial package
-

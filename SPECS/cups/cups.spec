@@ -3824,4 +3824,3 @@ rm -f %{cups_serverbin}/backend/smb
 - fixed init.d script location
 - changed script in init.d quite a bit and made more like the rest of our
   startup scripts 
-

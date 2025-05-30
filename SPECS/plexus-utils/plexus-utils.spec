@@ -100,4 +100,3 @@ cp %{SOURCE1} .
 * Sat Mar  2 2019 Fridrich Strba <fstrba@suse.com>
 - Initial package for plexus-utils 3.1.1
 - Generate and customize ant build file
-

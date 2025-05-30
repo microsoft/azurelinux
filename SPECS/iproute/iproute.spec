@@ -181,4 +181,3 @@ rm -rf '%{buildroot}%{_docdir}'
 
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 3.12.0-1
 - Initial build. First version
-

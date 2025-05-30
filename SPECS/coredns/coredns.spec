@@ -185,4 +185,3 @@ go install github.com/fatih/faillint@latest && \
 - Increment release to force republishing using golang 1.15.11.
 * Wed Jan 20 2021 Nicolas Guibourge <nicolasg@microsoft.com> 1.7.0-1
 - Original version for CBL-Mariner.
-

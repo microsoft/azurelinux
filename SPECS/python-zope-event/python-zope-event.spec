@@ -57,4 +57,3 @@ pip3 install 'tox>=3.18,<4.0.0' zope.testrunner tox-current-env
 - zope.event package added for Azure Linux 3.0
 - Modified from Azure Linux spec for python-zope-interface.
 - Initial Azure Linux import from Photon (license: Apache2). 
-

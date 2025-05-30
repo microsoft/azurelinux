@@ -118,4 +118,3 @@ cp -p dictionaries/gd_GB.dic dictionaries/gd_GB.aff $RPM_BUILD_ROOT/%{_datadir}/
 
 * Thu Mar 27 2008 Caolán McNamara <caolanm@redhat.com> - 0.1.1-1
 - initial version
-

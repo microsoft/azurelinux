@@ -186,4 +186,3 @@ install -D -m0644 deployments/multus-daemonset-crio.yml %{buildroot}%{_datadir}/
   * Add logging message for debug/error
   * Enable hairpin in the multus config
   * adding error checking in network status creation as well
-

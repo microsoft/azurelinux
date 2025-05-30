@@ -195,4 +195,3 @@ time timeout -k $TIMEOUT_KILL $TIMEOUT \
 
 * Sat Feb 04 2017 Honza Horak <hhorak@redhat.com> - 0.5.2-1
 - Initial packaging
-

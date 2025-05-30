@@ -237,4 +237,3 @@ cd %{_vpath_builddir}
 
 * Fri Oct 28 2005 Thorsten Leemhuis <fedora[AT]leemhuis[DOT]info> - 1.2-1
 - Initial RPM release.
-

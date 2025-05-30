@@ -566,4 +566,3 @@ fi
 
 *   Wed Apr 05 2017 Xiaolin Li <xiaolinl@vmware.com> 10.1.24-1
 -   Initial packaging for Photon
-

@@ -103,4 +103,3 @@ rm -f %{buildroot}/%{_libdir}/*.la
 
 * Wed Dec 04 2013 David Tardon <dtardon@redhat.com> - 0.01-1
 - initial import
-

@@ -391,4 +391,3 @@ TEST_PHP_EXECUTABLE=%{_bindir}/zts-php \
 
 * Thu Aug 08 2013 Remi Collet <rcollet@redhat.com> 1.12.1-1
 - New spec for version 1.12.1 (beta)
-

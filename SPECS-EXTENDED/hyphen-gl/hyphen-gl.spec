@@ -90,4 +90,3 @@ cp -p hyph_gl_ANY.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen/hyph_gl_ES.dic
 
 * Sat Jun 13 2009 Caolan McNamara <caolanm@redhat.com> - 0.99-1
 - initial version
-

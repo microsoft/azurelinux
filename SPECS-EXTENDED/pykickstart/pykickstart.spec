@@ -792,4 +792,3 @@ make PYTHON=python3 test
 - Convert options.py to use argparse instead of optparse. (clumens)
 - Remove the custom map and map_extend actions. (clumens)
 - Try harder to test translations. (dshea)
-

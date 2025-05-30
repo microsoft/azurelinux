@@ -561,4 +561,3 @@ systemctl --no-reload preset iscsi.service iscsi-starter.service &>/dev/null || 
 
 * Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 6.2.0.872-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
-

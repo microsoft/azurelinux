@@ -250,4 +250,3 @@ chmod 0755 %{buildroot}%{_libdir}/libmalaga.so*
 
 * Mon Oct 22 2007 Ville-Pekka Vainio <vpivaini AT cs.helsinki.fi> 7.11-0.1
 - Initial package
-

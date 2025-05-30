@@ -137,4 +137,3 @@ install -m 0644 -pD images/*.gif images/*.xbm %{buildroot}/%{tcl_sitelib}/%{name
 
 * Sat Dec 10 2005 Wart <wart at kobold.org> 1.7.0-1
 - Initial spec file.
-

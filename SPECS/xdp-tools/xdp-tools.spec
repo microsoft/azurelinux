@@ -242,4 +242,3 @@ make install V=1
 
 * Fri Nov 8 2019 Toke Høiland-Jørgensen <toke@redhat.com> 0.0.1-1
 - Initial release
-

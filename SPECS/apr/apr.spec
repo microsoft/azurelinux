@@ -121,4 +121,3 @@ make -j1 check
 
 * Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> - 1.5.2-1
 - Initial build. First version
-

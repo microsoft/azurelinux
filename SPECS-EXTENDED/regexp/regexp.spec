@@ -124,4 +124,3 @@ install -p -m 0644 %{SOURCE1} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
 - Fix prerequires of javadoc subpackage
 * Thu Sep  2 2004 skh@suse.de
 - Initial package created with version 1.3 (JPackage 1.5)
-

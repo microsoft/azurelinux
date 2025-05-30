@@ -344,4 +344,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Fri Apr 13 2007 Allisson Azevedo <allisson@gmail.com> 0.1.0-1
 - Initial RPM release
-

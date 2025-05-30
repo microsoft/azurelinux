@@ -89,4 +89,3 @@ install -p -D -m 0644 %{SOURCE0} %{buildroot}/%{macros_dir}/macros.ghc-srpm
 
 * Fri May  2 2014 Jens Petersen <petersen@redhat.com> - 1.3-1
 - separate from ghc-rpm-macros
-

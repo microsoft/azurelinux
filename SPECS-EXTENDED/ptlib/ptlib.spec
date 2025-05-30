@@ -299,4 +299,3 @@ chmod -R u+w %{buildroot}/*
 
 * Sun Jun 8 2008 Peter Robinson <pbrobinson@fedoraproject.org> - 2.3.1-1
 - Initial version of ptlib
-

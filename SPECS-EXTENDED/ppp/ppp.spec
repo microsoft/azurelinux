@@ -739,4 +739,3 @@ install -p %{SOURCE11} %{buildroot}%{_sysconfdir}/sysconfig/network-scripts/ifdo
 * Tue Mar 25 1997 Erik Troan <ewt@redhat.com>
 - Integrated new patch from David Mosberger
 - Improved description
-

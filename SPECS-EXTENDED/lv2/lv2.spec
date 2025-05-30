@@ -317,4 +317,3 @@ rm -fr %{buildroot}%{_docdir}/%{name}
 
 * Fri Apr 20 2012 Brendan Jones <brendan.jones.it@gmail.com> - 1.0.0-1
 - Created
-

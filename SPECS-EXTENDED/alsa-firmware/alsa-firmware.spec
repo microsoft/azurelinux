@@ -354,4 +354,3 @@ make install DESTDIR=%{buildroot}
 
 * Thu Dec 04 2003 Thorsten Leemhuis <fedora[AT]leemhuis.info> 1.0.0-0.fdr.0.1.rc1
 - Initial build.
-

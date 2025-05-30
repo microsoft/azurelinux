@@ -110,4 +110,3 @@ sed -i -e 's/jakarta\./javax./g' $(find api/src/main/java/javax -name *.java)
 
 * Thu Aug 13 2020 Fabio Valentini <decathorpe@gmail.com> - 5.0.0-1
 - Initial package renamed from glassfish-servlet-api.
-

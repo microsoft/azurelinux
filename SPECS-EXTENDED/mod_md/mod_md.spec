@@ -94,4 +94,3 @@ echo "LoadModule md_module modules/mod_md.so" > %{buildroot}%{_httpd_modconfdir}
 
 * Tue Jun 11 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.0.3-1
 - Initial import (#1719248).
-

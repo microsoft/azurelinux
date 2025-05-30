@@ -397,4 +397,3 @@ mv %{buildroot}%{_prefix}/lib/lib%{name}java.so %{buildroot}%{_libdir}/%{name}
 
 * Sat Mar 28 2015 Jerry James <loganjerry@gmail.com> - 4.3.2-1.20150327git.ac21ffe
 - Initial RPM
-

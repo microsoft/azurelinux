@@ -164,4 +164,3 @@ ruby -Ilib:test -e 'Dir.glob "./test/**/*_test.rb", &method(:require)'
 
 * Mon Oct 03 2011 Vít Ondruch <vondruch@redhat.com> - 0.0.2-1
 - Initial package
-

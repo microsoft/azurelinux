@@ -149,4 +149,3 @@ fi
 
 * Thu Apr 06 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.3.5-1
 - Initial build.  First version
-

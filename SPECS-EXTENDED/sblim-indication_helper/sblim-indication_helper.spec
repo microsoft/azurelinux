@@ -153,4 +153,3 @@ rm $RPM_BUILD_ROOT/%{_libdir}/libind_helper.la
 
 * Wed Jan 25 2006 mls@suse.de
 - created the package
-

@@ -75,4 +75,3 @@ files for developing applications that use %{name}.
 
 * Wed Nov 22 2023 Jerry James <loganjerry@gmail.com> - 1.1.0-1
 - Initial RPM (rhbz#2242905)
-

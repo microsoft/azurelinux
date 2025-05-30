@@ -149,4 +149,3 @@ Development files for %{name}
 
 * Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> - 1.4.1-1
 - Original version for CBL-Mariner.
-

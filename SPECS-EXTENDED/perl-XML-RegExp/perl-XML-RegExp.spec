@@ -161,4 +161,3 @@ make test
 
 * Thu Oct 27 2005 Ville Skyttä <ville.skytta at iki.fi> - 0.03-0.1
 - First build (#128879).
-

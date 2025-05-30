@@ -267,4 +267,3 @@ rm -rf $RPM_BUILD_ROOT%{_defaultdocdir}
 * Tue Jan 02 2007 Jesse Keating <jkeating@redhat.com> - 0.2.3-1
 - Initial release split off of libburn package.
 - Disable docs for now, will be fixed in future upstream release
-

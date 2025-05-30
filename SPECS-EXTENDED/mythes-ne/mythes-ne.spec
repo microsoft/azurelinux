@@ -93,4 +93,3 @@ cp -p th_ne_NP_v2.* $RPM_BUILD_ROOT/%{_datadir}/mythes/
 
 * Tue Mar 16 2010 Caolan McNamara <caolanm@redhat.com> - 1.1-1
 - initial version
-

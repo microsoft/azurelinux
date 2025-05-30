@@ -191,4 +191,3 @@ ln -s latencytop.8 %{buildroot}%{_mandir}/man8/latencytop-tui.8
 
 * Thu Jan 31 2008 Michal Schmidt <mschmidt@redhat.com> - 0.3-1
 - Initial package for Fedora.
-

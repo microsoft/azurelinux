@@ -115,4 +115,3 @@ cp -p uk_UA/uk_UA.dic $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Mon Sep 15 2008 Caolán McNamara <caolanm@redhat.com> - 1.5.0-1
 - initial version
-

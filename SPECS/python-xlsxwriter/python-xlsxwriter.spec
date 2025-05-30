@@ -273,4 +273,3 @@ rm -rf %{src_name}.egg-info
 
 * Mon Mar 11 2019 Rajeesh KV <rajeeshknambiar@fedoraproject.org> 1.1.5-1
 - Release 1.1.5, initial packaging for Fedora
-

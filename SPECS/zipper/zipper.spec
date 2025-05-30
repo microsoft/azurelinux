@@ -120,4 +120,3 @@ make test -C build
 
 * Thu Apr 19 2018 Antonio Trande <sagitter@fedoraproject.org> - 0.9.1-1.20170831giteee877a
 - First package
-

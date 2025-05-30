@@ -136,4 +136,3 @@ rm %{buildroot}%{_libdir}/libucpp.la
 
 * Thu Oct 17 2013 Dominik Mierzejewski <rpm@greysector.net> 1.3.2-1
 - initial build
-

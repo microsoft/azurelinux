@@ -173,4 +173,3 @@ rm $RPM_BUILD_ROOT%{_mandir}/man1/p2v-release-notes.1*
 
 * Tue Sep 10 2019 Pino Toscano <ptoscano@redhat.com> - 1:1.41.0-1
 - Initial build, split off src:libguestfs.
-

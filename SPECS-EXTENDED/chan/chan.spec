@@ -69,4 +69,3 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 * Wed Aug 14 2019 Lukáš Zapletal 0.0.4-1
 - Initial package version
-

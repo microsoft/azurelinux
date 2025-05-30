@@ -109,4 +109,3 @@ as supported in Python 3.6.
 
 * Sun Jun 11 2017 Gwyn Ciesla <limburgher@gmail.com> - 1.0.3-1
 - Initial package.
-

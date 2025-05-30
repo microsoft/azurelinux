@@ -1074,4 +1074,3 @@ systemctl --no-reload preset --global pulseaudio.socket >/dev/null 2>&1 || :
 
 * Thu Nov  3 2011 Lennart Poettering <lpoetter@redhat.com> - 1.1-1
 - New upstream release
-

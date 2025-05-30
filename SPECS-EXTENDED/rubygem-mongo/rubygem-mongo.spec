@@ -240,4 +240,3 @@ popd
 
 * Tue Nov 15 2011  <tdawson@redhat.com> - 1.4.0-1
 - Initial package
-

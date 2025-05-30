@@ -1375,4 +1375,3 @@ popd
 - updated to version 1.6.2
 - split off optional tasks into separate package to solve build
   dependency loop in JPackage
-

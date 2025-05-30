@@ -1151,4 +1151,3 @@ install -Dm644 %{SOURCE5} %{buildroot}%{_sysconfdir}/libreport/events.d/%{name}_
 
 * Tue Aug 07 2001 Danilo Godec <danci@agenda.si>
 - initial RPM build
-

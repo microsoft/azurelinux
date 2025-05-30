@@ -377,4 +377,3 @@ make docs -C %{__cmake_builddir}
 
 * Fri Dec 30 2005 Shawn McCann <smccann@canasoft.ca> - 2.2.1-1
 - Initial release
-

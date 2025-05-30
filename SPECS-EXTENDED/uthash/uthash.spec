@@ -243,4 +243,3 @@ rm -f %{buildroot}%{_pkgdocdir}/html/google*.html
 
 * Sat Jun 01 2013 Christopher Meng <rpm@cicku.me> - 1.9.8-1
 - Initial Package.
-

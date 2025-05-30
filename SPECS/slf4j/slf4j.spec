@@ -333,4 +333,3 @@ cp -pr .xmvn/* %{buildroot}%{_docdir}/%{name}-%{version}/
 
 * Mon Jul  4 2011 dmacvicar@suse.de
 - add BuildRoot tag
-

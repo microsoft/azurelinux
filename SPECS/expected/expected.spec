@@ -99,4 +99,3 @@ coding with expected cleaner.
 
 * Mon Jan 06 2020 Vitaly Zaitsev <vitaly@easycoding.org> - 1.0.0-1
 - Initial SPEC release.
-

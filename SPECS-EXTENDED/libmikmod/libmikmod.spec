@@ -273,4 +273,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Thu Oct 18 2007 Jindrich Novy <jnovy@redhat.com> 3.1.11-1
 - package libmikmod
-

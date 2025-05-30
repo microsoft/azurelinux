@@ -206,4 +206,3 @@ make check ||:
 * Fri Apr  7 2006 Jose Pedro Oliveira <jpo at di.uminho.pt> - 0.4.3-1
 - First build.
 # vim:set ai ts=4 sw=4 sts=4 et:
-

@@ -80,4 +80,3 @@ to be suitable for a wide range of protocols based on ASN.1 specification.
 
 * Fri Mar 13 2015 Mahmoud Bassiouny <mbassiouny@vmware.com>
 - Initial packaging for Photon
-

@@ -113,4 +113,3 @@ ln -snf py.test%{python3_version} %{buildroot}%{_bindir}/py.test3
 
 * Tue Apr 25 2017 Dheeraj Shetty <dheerajs@vmware.com> 3.0.7-1
 - Initial
-

@@ -1121,4 +1121,3 @@ exit 0
 
 * Fri Oct 21 2005 Alexander Larsson <alexl@redhat.com> - 0.5.2-1
 - Initial package
-

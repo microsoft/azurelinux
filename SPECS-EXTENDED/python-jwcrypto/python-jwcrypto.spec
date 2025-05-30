@@ -227,4 +227,3 @@ rm -rf %{buildroot}%{python3_sitelib}/%{srcname}/__pycache__/tests{,-cookbook}.*
 
 * Tue Jun 16 2015 Patrick Uiterwijk <puiterwijk@redhat.com> - 0.2.0-1
 - Initial packaging
-

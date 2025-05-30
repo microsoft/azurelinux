@@ -124,4 +124,3 @@ tox -e py%{python3_version_nodots}
 
 * Wed Jul 24 2019 Miro Hrončok <mhroncok@redhat.com> - 0.0.1-1
 - Initial package
-

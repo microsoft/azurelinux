@@ -134,4 +134,3 @@ fi # 1 : closed
 
 * Fri Sep 1 2017 Vladimir Sokolovsky <vlad@mellanox.com>
 - Initial packaging
-

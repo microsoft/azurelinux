@@ -241,4 +241,3 @@ make test
 
 * Fri Aug 04 2006 Chris Weyl <cweyl@alumni.drew.edu> 0.7807-1
 - Initial spec file for F-E
-

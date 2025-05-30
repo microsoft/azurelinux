@@ -88,4 +88,3 @@ python3 pip_build.py --install
 * Mon Dec 12 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-1
 - License verified
 - Original version for CBL-Mariner
-

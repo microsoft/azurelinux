@@ -70,4 +70,3 @@ make check
 * Wed Feb 23 2022 Pat Riehecky <riehecky@fnal.gov> 4.11-1
 - Initial fedora package
 - Replaces the deprecated Red Hat pam_krb5 module
-

@@ -104,4 +104,3 @@ make check
 
 * Tue May  7 2013 Miloslav Trmač <mitr@redhat.com> - 0.1-1
 - Initial package
-

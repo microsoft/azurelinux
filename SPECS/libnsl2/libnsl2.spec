@@ -79,4 +79,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Fri Sep 21 2018 Alexey Makhalov <amakhalov@vmware.com> 1.2.0-1
 - Initial version
-

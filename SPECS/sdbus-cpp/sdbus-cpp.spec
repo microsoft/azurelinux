@@ -72,4 +72,3 @@ rm -rf %{buildroot}%{_docdir}
 * Mon May 16 2022 Sriram Nambakam <snambakam@microsoft.com> - 1.1.0-1
 - Original version for CBL-Mariner.
 - Verified license
-

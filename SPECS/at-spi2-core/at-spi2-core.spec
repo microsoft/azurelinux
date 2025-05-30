@@ -588,4 +588,3 @@ API documentation for libatspi.
 
 * Fri Dec  4 2009 Matthias Clasen <mlasen@redhat.com> - 0.1.3-1
 - Initial packaging
-

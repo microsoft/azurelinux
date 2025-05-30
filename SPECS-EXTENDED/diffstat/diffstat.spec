@@ -321,4 +321,3 @@ make check
 
 * Thu Jul 10 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
-

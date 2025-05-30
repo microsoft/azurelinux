@@ -210,4 +210,3 @@ fi
 
 * Thu Oct 09 2014 Divya Thaluru <dthaluru@vmware.com> 1.8.11p1-1
 - Initial build.  First version
-

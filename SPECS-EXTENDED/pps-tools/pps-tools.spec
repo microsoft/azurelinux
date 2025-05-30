@@ -151,4 +151,3 @@ install -p -m644 -t $RPM_BUILD_ROOT%{_includedir}/sys timepps.h
 
 * Wed Mar 30 2011 Miroslav Lichvar <mlichvar@redhat.com> 0-0.1.20100413git74c32c
 - initial release
-

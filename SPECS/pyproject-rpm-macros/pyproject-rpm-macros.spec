@@ -370,4 +370,3 @@ export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856
 
 * Fri Jun 28 2019 Patrik Kopkan <pkopkan@redhat.com> - 0-1
 - created package
-

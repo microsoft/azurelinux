@@ -143,4 +143,3 @@ rm -f %{manDest}/man1/newgrp.1
 * Wed Dec 08 2010 Ding-Yi Chen <dchen at redhat dot com> - 0:1.5.1-2
 - Initial Fedora package.
 
-

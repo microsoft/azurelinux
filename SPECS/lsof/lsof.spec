@@ -63,4 +63,3 @@ install -v -m 0644 Lsof.8 %{buildroot}%{_mandir}/man8/lsof.8
 
 *   Thu Jul 23 2015 Divya Thaluru <dthaluru@vmware.com> 4.89-1
 -   Initial build.
-

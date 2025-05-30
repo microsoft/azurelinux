@@ -191,4 +191,3 @@ make tests
 * Thu May 03 2007 Dag Wieers <dag@wieers.com> - 0.12.0-1
 - Initial version.
 
-

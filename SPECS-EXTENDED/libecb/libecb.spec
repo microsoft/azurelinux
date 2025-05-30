@@ -177,4 +177,3 @@ install -m 0644 -t %{buildroot}%{_mandir}/man3 *.3
 * Mon Oct 08 2012 Petr Pisar <ppisar@redhat.com> - 0.20121008-1
 - CVS snapshot taken on 2012-10-08
 - Fix for building on big-endian systems (bug #863991)
-

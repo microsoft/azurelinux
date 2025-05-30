@@ -185,4 +185,3 @@ rm -rf %{buildroot}%{_docdir}/%{name}
 
 * Tue Jun  8 2010 Jeremy Sanders <jeremy@jeremysanders.net> - 0.5-1
 - Initial package
-

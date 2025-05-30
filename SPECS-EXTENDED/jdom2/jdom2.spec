@@ -201,4 +201,3 @@ cp -pr build/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 
 * Thu Sep 12 2013 gil cattaneo <puntogil@libero.it> 2.0.5-1
 - initial rpm
-

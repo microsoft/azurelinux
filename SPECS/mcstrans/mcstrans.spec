@@ -301,4 +301,3 @@ Resolves: #218173
 * Mon May 8 2006 Dan Walsh <dwalsh@redhat.com> 0.1.1-1
 - Initial Version
 - This daemon reuses the code from libsetrans
-

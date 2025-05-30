@@ -435,4 +435,3 @@ GEM_HOME="%{buildroot}%{gem_dir}" %{buildroot}%{_bindir}/facter
 
 * Wed Jul 12 2006 David Lutterkort <lutter@fedoraproject.org> 1.3.3-1
 - auto-import facter-1.3.3-1 on branch devel from facter-1.3.3-1.src.rpm
-

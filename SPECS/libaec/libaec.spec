@@ -123,4 +123,3 @@ make -C build test CTEST_OUTPUT_ON_FAILURE=1
 
 * Sat Jun 17 2017 Christoph Junghans <junghans@votca.org> - 1.0.0-1
 - initial import
-

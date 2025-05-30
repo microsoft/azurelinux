@@ -216,4 +216,3 @@ developing applications that use %{name}.
 * Fri Jul 16 2010 BYVoid <byvoid.kcp@gmail.com> - 0.0.4-1
 - Initial release of RPM.
 
-

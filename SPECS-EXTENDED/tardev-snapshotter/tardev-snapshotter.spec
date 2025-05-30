@@ -74,4 +74,3 @@ fi
 
 * Tue Dec 31 2024 Jiri Appl <jiria@microsoft.com> - 0.0.13-1
 - Initial version
-

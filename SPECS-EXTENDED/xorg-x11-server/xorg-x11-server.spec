@@ -661,4 +661,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Add some extra fixes which are pending upstream
 - This also adds PointerWarping emulation to Xwayland, which should improve
   compatiblity with many games
-

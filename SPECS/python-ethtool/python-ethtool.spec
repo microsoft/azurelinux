@@ -249,4 +249,3 @@ export PYTHONPATH=%{buildroot}%{python3_sitearch}
 
 * Tue Dec 18 2007 Arnaldo Carvalho de Melo <acme@redhat.com> - 0.1-1
 - Get ethtool code from rhpl 0.212
-

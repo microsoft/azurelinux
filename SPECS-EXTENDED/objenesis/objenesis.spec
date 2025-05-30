@@ -190,4 +190,3 @@ cp -aL build/apidoc/* %{buildroot}%{_javadocdir}/%{name}
 - Generate OSGi manifest so that the jar can be resolved by eclipse
 * Fri Oct 26 2018 Fridrich Strba <fstrba@suse.com>
 - Initial packaging of objenesis inspired from Fedora package
-

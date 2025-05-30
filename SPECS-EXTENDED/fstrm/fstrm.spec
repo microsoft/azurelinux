@@ -115,4 +115,3 @@ make check
 
 * Mon Dec 15 2014 Jan Vcelak <jvcelak@fedoraproject.org> 0.2.0-1
 - initial package
-

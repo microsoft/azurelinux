@@ -198,4 +198,3 @@ rm %{buildroot}%{htmldir}/{objects.inv,.buildinfo}
 
 * Wed Aug  1 2012 Milan Bartos <mbartos@redhat.com> - 0.3.4-1
 - initial port
-

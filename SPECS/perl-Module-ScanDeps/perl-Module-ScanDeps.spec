@@ -113,4 +113,3 @@ make %{?_smp_mflags} test
 
 * Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 1.18-1
 - Initial version.
-

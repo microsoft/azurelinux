@@ -60,4 +60,3 @@ mkdir -p %{buildroot}/%{_sysconfdir}/OpenCL/vendors/
 
 * Wed Aug 28 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 1.0-1
 - Initial package
-

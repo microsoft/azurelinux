@@ -113,4 +113,3 @@ cp -p dictionaries/is_IS.* $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Sun Sep 03 2006 Caolan McNamara <caolanm@redhat.com> - 0.20060928-1
 - initial version
-

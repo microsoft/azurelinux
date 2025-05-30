@@ -347,4 +347,3 @@ rm %{buildroot}/%{_sysconfdir}/ha.d/resource.d/iprha
 
 * Tue Nov 25 2003 Brian King <brking@us.ibm.com> 1.0.3-2
 - Fixed segmentation fault in iprupdate
-

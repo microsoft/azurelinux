@@ -361,4 +361,3 @@ popd
 + Revision: 228769
 - Added missing buildrequires
 - import lensfun
-

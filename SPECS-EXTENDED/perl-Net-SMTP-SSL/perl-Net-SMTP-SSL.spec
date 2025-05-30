@@ -155,4 +155,3 @@ make test
 
 * Wed Oct 15 2008 Dan Nicholson <dbn.lists@gmail.com> 1.01-1
 - Initial release
-

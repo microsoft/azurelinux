@@ -298,4 +298,3 @@ cp -a %{SOURCE2} $RPM_BUILD_ROOT/%{_docdir}/%{name}
 - Updated to 2.8 final
 * Thu Nov 27 2003 nashif@suse.de
 - Initial Release
-

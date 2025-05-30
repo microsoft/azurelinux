@@ -538,4 +538,3 @@ rm -f */doc/html/installdox
 
 * Thu Sep 23 2010 Stephen Gallagher <sgallagh@redhat.com> - 0.1.1-1
 - Initial release of ding-libs
-

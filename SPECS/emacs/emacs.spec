@@ -190,4 +190,3 @@ rm -f *-filelist {common,el}-*-files
 
 * Tue Oct 06 2020 Susant Sahani <ssahani@vmware.com>  - 27.1-1
 - Initial rpm release.
-

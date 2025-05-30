@@ -158,4 +158,3 @@ rm -rf %{pypi_name}.egg-info
 * Tue Sep 13 2016 Devrim Gündüz <devrim@gunduz.org> 0.11.13-1
 - Initial packaging for PostgreSQL YUM repository, to satisfy
   pgadmin4 dependency.
-

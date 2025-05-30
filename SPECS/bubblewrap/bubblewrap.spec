@@ -74,4 +74,3 @@ The original bubblewrap code existed before user namespaces - it inherits code f
 
 * Thu Aug 03 2017 Xiaolin Li <xiaolinl@vmware.com> - 0.1.8-1
 - Initial build.  First version
-

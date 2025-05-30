@@ -274,4 +274,3 @@ Rebuild for new perl
 * Sat Feb 4 2006 Nicolas Mailhot <nicolas.mailhot (at) laposte.net>
 - 0.37-1
 - Initial release
-

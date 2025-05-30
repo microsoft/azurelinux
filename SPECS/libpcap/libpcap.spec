@@ -116,4 +116,3 @@ make DESTDIR=%{buildroot} install
 
 *   Wed Jan 21 2015 Divya Thaluru <dthaluru@vmware.com> 1.6.2-1
 -   Initial build. First version
-

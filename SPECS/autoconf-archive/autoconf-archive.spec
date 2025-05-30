@@ -48,4 +48,3 @@ rm -frv %{buildroot}%{_datadir}/%{name}
 
 * Mon Sep 10 2018 Anish Swaminathan <anishs@vmware.com> - 2018.03.13-1
 - Initial build
-

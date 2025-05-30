@@ -170,4 +170,3 @@ Pure-python library for interacting with Yubikeys. For Python 3.
 
 * Thu Jun 19 2014 Nathaniel McCallum <npmccallum@redhat.com> - 1.2.1-1
 - Initial release.
-

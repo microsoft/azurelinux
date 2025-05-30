@@ -70,4 +70,3 @@ make %{?_smp_mflags} -k check
 -   Added obsoletes for libmnl-static package which is deprecated
 *   Wed Aug 3 2016 Xiaolin Li <xiaolinl@vmware.com> 1.0.4-1
 -   Initial build.	First version
-

@@ -123,4 +123,3 @@ cp -rv README INSTALL doc/* \
 
 * Thu Jun 20 2019 Tapas Kundu <tkundu@vmware.com> - 3.5.0-1
 - Initial packaging with Photon OS.
-

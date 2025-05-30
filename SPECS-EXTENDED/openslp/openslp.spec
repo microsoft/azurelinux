@@ -393,4 +393,3 @@ rm -f  $RPM_BUILD_ROOT%{_libdir}/lib*.la
 * Mon Feb 03 2003 Rex Dieter <rexdieter at sf.net> 0:1.0.10-1.0
 - sanitize specfile
 - -devel,-server subpkgs.
-

@@ -310,4 +310,3 @@ cd Release/build.release/Binaries
 
 * Wed Apr 05 2017 Wolfgang Stöggl <c72578@yahoo.de> - 2.9.1-1
 - Initial packaging
-

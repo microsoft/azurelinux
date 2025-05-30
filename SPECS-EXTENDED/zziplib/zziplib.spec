@@ -297,4 +297,3 @@ Related: rhbz#1915747
 
 * Tue Jun  8 2004 Matthias Saou <http://freshrpms.net/> 0.13.36-1
 - Initial RPM release.
-

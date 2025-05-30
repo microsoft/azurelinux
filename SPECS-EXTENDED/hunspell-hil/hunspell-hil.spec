@@ -116,4 +116,3 @@ cp -p dictionaries/hil.aff $RPM_BUILD_ROOT/%{_datadir}/myspell/hil_PH.aff
 
 * Fri Nov 07 2008 Caolán McNamara <caolanm@redhat.com> - 0.20050406-1
 - initial version
-

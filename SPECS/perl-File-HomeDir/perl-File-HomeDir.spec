@@ -115,4 +115,3 @@ find %{buildroot} -name 'perllocal.pod' -delete
 
 * Thu Mar 3 2016 Xiaolin Li <xiaolinl@vmware.com> 1.00-1
 - Initial version.
-

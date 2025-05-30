@@ -204,4 +204,3 @@ popd
 
 * Mon Oct 18 2010 Jozef Zigmund <jzigmund@redhat.com> - 0.11.2-1
 - Initial package
-

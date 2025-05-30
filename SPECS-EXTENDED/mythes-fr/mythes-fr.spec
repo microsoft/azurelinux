@@ -124,4 +124,3 @@ cp -p thes_fr.idx $RPM_BUILD_ROOT/%{_datadir}/mythes/th_fr_FR_v2.idx
 
 * Thu Jan 15 2009 Caolán McNamara <caolanm@redhat.com> - 2.1-1
 - initial version
-

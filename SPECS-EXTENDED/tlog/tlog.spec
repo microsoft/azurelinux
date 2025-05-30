@@ -411,4 +411,3 @@ systemd-tmpfiles --create %{name}.conf >/dev/null 2>&1 || :
 - Tlog-rec configuration through system-wide configuration file
   /etc/tlog/tlog-rec.conf, environment variables and command line.
 - Very basic playback directly from ElasticSearch.
-

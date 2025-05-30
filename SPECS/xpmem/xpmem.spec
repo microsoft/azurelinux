@@ -309,4 +309,3 @@ fi
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 2.7.4-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
-

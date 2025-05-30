@@ -162,4 +162,3 @@ rm -f %{buildroot}/%{_docdir}/%{name}/COPYING
 
 * Wed Aug 20 2014 Peter Jones <pjones@redhat.com> - 0.4-1
 - First packaging attempt.
-

@@ -98,4 +98,3 @@ popd
 
 * Fri Oct 3 2008 Caolan McNamara <caolanm@redhat.com> - 0.1-1
 - initial version
-

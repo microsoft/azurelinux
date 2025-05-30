@@ -45,4 +45,3 @@ make install BINDIR=%{buildroot}%{_bindir} \
 
 * Thu Dec 01 2016 Xiaolin Li <xiaolinl@vmware.com> 1.7.0-1
 - Add tree package.
-

@@ -818,4 +818,3 @@ fi
 
 * Mon Jan 28 2013 Sankar Tanguturi <stanguturi@vmware.com> - 9.2.2-1
 - Initial SPEC file to build open-vm-tools for Fedora 17.
-

@@ -343,4 +343,3 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 * Wed Nov 05 1997 Michael K. Johnson <johnsonm@redhat.com>
 - initial version
-

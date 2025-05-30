@@ -165,4 +165,3 @@ ctest -V %{?_smp_mflags} -E concurrent_hash_map_rehash_0_helgrind -E concurrent_
 
 * Fri Dec 14 2018 Marcin Ślusarz <marcin.slusarz@intel.com> - 1.5-1
 - Initial RPM release
-

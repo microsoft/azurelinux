@@ -339,4 +339,3 @@ fi
 - converted neededforbuild to BuildRequires
 * Mon Dec 19 2005 dbornkessel@suse.de
 - Current version 1.3 from JPackage.org
-

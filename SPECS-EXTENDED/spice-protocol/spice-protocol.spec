@@ -201,4 +201,3 @@ gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 * Fri Jul 9 2010 Gerd Hoffmann <kraxel@redhat.com> - 0.5.2-1
 - initial package.
 
-

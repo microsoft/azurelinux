@@ -245,4 +245,3 @@ fi
 
 * Tue Oct 19 2010 Richard W.M. Jones <rjones@redhat.com> - 1.3-1
 - Initial release.
-

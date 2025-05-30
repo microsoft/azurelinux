@@ -448,4 +448,3 @@ make check -C %{_target_platform}
 
 * Fri Feb 06 2004 Rex Dieter <rexdieter at sf.net> 0:1.0-0.fdr.0
 - first try
-

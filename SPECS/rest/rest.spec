@@ -244,4 +244,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Wed Jun 17 2009 Peter Robinson <pbrobinson@fedoraproject.org> 0.3-1
 - Initial packaging
-

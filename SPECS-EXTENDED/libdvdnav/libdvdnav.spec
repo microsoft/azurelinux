@@ -257,4 +257,3 @@ rm %{buildroot}%{_pkgdocdir}/{COPYING,TODO}
 
 * Thu May 29 2003 Thomas Vander Stichele <thomas at apestaart dot org>
 - 0:0.1.9-0.fdr.1: initial RPM release
-

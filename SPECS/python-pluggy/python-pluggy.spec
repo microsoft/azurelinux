@@ -189,4 +189,3 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} python3 -m pytest testing -k "not test
 
 * Fri Aug 14 2015 Matthias Runge <mrunge@redhat.com> - 0.3.0-1
 - version based on the inital proposal of Adam Young
-

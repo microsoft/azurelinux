@@ -61,4 +61,3 @@ make DESTDIR=%{buildroot} install
 
 * Tue Apr 11 2017 Vinay Kulkarni <kulkarniv@vmware.com> B.02.18-1
 - Initial version of lshw package for Photon.
-

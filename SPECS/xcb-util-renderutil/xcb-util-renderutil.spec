@@ -133,4 +133,3 @@ rm %{buildroot}%{_libdir}/*.la
 
 * Thu May 17 2012 Thomas Moschny <thomas.moschny@gmx.de> - 0.3.8-1
 - New package.
-

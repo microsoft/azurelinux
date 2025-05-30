@@ -111,4 +111,3 @@ make test
 
 * Fri Oct 09 2015 Petr Pisar <ppisar@redhat.com> 0.001-1
 - First package
-

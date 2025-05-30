@@ -326,4 +326,3 @@ rm -f %{buildroot}%{_bindir}/dump
 
 * Mon Feb 25 2008 David Lutterkort <dlutter@redhat.com> - 0.0.4-1
 - Initial specfile
-

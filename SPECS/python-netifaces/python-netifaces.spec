@@ -61,4 +61,3 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} %python3 test.py
 
 * Wed Jul 23 2019 Tapas Kundu <tkundu@vmware.com> - 0.10.9-1
 - Initial packaging for photon OS
-

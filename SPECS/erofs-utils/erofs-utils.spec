@@ -216,4 +216,3 @@ autoreconf -fi
 
 * Mon Nov 25 2019 David Michael <fedora.dm0@gmail.com> - 1.0-1
 - Initial package.
-

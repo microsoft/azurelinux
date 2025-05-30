@@ -431,4 +431,3 @@ install -p -m 644 %{SOURCE2} %{buildroot}%{_includedir}/SDL2/SDL_revision.h
 
 * Mon Jul 29 2013 Jon Ciesla <limburgher@gmail.com> - 2.0.0-1
 - Ported from SDL 1.2.15-10
-

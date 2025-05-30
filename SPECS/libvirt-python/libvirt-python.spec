@@ -162,4 +162,3 @@ pip3 install iniconfig
 
 * Wed Jan 15 2020 Cole Robinson <crobinso@redhat.com> - 6.0.0-1
 - Update to version 6.0.0
-

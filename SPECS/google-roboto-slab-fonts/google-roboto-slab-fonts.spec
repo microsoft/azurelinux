@@ -99,4 +99,3 @@ install -m 0644 -p %{SOURCE6} %{buildroot}%{_datadir}/appdata
 
 * Wed Sep 23 2015 Parag Nemade <pnemade AT redhat DOT com> - 1.100263-0.1.20150923
 - Initial package
-

@@ -174,4 +174,3 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
 * Tue Jun 23 2009 Kalev Lember <kalev@smartlink.ee> - 1.07-1
 - Initial RPM release.
-

@@ -134,4 +134,3 @@ developing applications that use %{name}.
 
 * Mon Aug 25 2014 Kalev Lember <kalevlember@gmail.com> - 0.2.1-1
 - Initial Fedora packaging
-

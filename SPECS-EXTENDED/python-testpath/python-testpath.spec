@@ -187,4 +187,3 @@ rm -rf html/.{doctrees,buildinfo}
 
 * Wed Mar 08 2017 Miro Hrončok <mhroncok@redhat.com> - 0.3-1
 - initial package
-

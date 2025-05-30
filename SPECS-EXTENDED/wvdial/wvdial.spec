@@ -358,4 +358,3 @@ touch %{buildroot}%{_sysconfdir}/wvdial.conf
 
 * Wed Jul 28 1999 Michael K. Johnson <johnsonm@redhat.com>
 - Initial Red Hat package
-

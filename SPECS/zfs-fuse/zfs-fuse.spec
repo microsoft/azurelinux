@@ -380,4 +380,3 @@ rm -rf %{_var}/lock/zfs
 
 * Sat Oct  4 2008 Terje Rosten <terje.rosten@ntnu.no> - 0.5.0-1 
 - initial build
-

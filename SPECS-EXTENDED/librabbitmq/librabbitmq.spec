@@ -278,4 +278,3 @@ make test
 * Sat Mar 10 2012 Remi Collet <remi@fedoraproject.org> - 0.1-0.1.hgfb6fca832fd2
 - Initial RPM
 
-

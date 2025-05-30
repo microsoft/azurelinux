@@ -215,4 +215,3 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/*.a
 
 * Fri Aug 19 2005 Tom "spot" Callaway <tcallawa@redhat.com> 1.0.1-1
 - initial package for Fedora Extras
-

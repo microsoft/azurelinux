@@ -76,4 +76,3 @@ version=%version %py3_install
 
 * Wed Nov 18 2020 Miroslav Suchý <msuchy@redhat.com> 1.0-1
 - new package
-

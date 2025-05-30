@@ -158,4 +158,3 @@ for more information about the goals and features on the CIL language.
 
 * Tue Jul 21 2015 Petr Lautrbach <plautrba@redhat.com> 2.4-1
 - initial build based on libsepol-2.4 sources
-

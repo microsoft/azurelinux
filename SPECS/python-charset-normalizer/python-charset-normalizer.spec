@@ -98,4 +98,3 @@ Resolves: rhbz#1988575
 
 * Wed Jul 21 2021 Lumír Balhar <lbalhar@redhat.com> - 2.0.3-1
 - Initial package
-

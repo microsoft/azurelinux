@@ -83,4 +83,3 @@ install -p -m 0644 eglexternalplatform.pc %{buildroot}%{_datadir}/pkgconfig/
 * Thu Jan 19 2017 Leigh Scott <leigh123linux@googlemail.com> - 1.0-0.1.git53bf47c
 - First build
 
-

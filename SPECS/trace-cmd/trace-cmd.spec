@@ -109,4 +109,3 @@ rm -rf %{buildroot}/%{_mandir}/man3/*
 * Mon Feb 12 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.2-1
 - Initial Azure Linux import from Fedora 40 (license: MIT)
 - License Verified
-

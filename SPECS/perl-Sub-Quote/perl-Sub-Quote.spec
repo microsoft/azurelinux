@@ -111,4 +111,3 @@ make test
 
 * Mon Dec 12 2016 Jitka Plesnikova <jplesnik@redhat.com> - 2.003001-1
 - Initial release
-

@@ -213,4 +213,3 @@ documents using the %{name} library.
 
 * Fri Nov  4 2011 Tom Hughes <tom@compton.nu> - 0.1.0-1
 - Initial build.
-

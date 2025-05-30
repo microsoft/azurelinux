@@ -418,4 +418,3 @@ rm -f $RPM_BUILD_ROOT%{_bindir}/gdialog
 
 * Tue Apr 11 2006 Matthias Clasen <mclasen@redhat.com> 2.14.1-2
 - Initial revision
-

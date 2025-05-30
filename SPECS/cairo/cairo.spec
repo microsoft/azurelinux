@@ -223,4 +223,3 @@ This package contains tools for working with the cairo graphics library.
 
 *  Wed Apr 05 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.14.8-1
 -  Initial version
-

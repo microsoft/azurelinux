@@ -465,4 +465,3 @@ rm -f $RPM_BUILD_ROOT%{perl_vendorarch}/sample.pl
 
 * Thu Jan 24 2013 Daiki Ueno <dueno@redhat.com> - 0.2.1-1
 - initial packaging
-

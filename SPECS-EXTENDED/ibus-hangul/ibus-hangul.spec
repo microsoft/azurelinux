@@ -402,4 +402,3 @@ desktop-file-validate ${RPM_BUILD_ROOT}%{_datadir}/applications/ibus-setup-hangu
 
 * Fri Aug 08 2008 Peng Huang <shawn.p.huang@gmail.com> - 0.1.1.20080823-1
 - The first version.
-

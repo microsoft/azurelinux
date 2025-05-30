@@ -272,4 +272,3 @@ rm -f $RPM_BUILD_ROOT/%{_mandir}/it/man1/hman.1*
 
 * Mon May 15 2000 Trond Eivind Glomsrød <teg@redhat.com>
 - first build
-

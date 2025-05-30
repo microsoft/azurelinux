@@ -345,4 +345,3 @@ modprobe fuse > /dev/null 2>&1 || :
 
 * Sun Jul 29 2018 Lokesh Mandvekar <lsm5@fedoraproject.org> - 0.1-1.dev.git13575b6
 - First package for Fedora
-

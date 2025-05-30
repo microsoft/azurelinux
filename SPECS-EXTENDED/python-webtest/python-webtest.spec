@@ -288,4 +288,3 @@ cp -a CHANGELOG.rst docs/
 
 * Sat Jun 14 2008 Ricky Zhou <ricky@fedoraproject.org> - 1.0-1
 - Initial RPM Package.
-

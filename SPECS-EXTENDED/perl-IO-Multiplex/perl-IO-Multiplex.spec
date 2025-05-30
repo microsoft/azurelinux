@@ -224,4 +224,3 @@ make test
 
 * Mon Jul 14 2003 Dag Wieers <dag@wieers.com> - 1.04-0
 - Initial package (using DAR)
-

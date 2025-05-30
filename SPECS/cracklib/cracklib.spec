@@ -227,4 +227,3 @@ rm -f %{_datadir}/cracklib/pw_dict.pwi
 -   Updated to version 2.9.6
 *   Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> 2.9.2-2
 -   Updated group.
-

@@ -139,4 +139,3 @@ fi
 - Fix prerequires
 * Thu Sep  2 2004 skh@suse.de
 - Initial package created with version 4.0.4 (JPackage 1.5)
-

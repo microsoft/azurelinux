@@ -70,4 +70,3 @@ install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 
 * Tue Oct 23 2018 Fridrich Strba <fstrba@suse.com>
 - Initial packaging of apache-parent
-

@@ -290,4 +290,3 @@ cp -a libsecret/mock-service*.py %{buildroot}%{_datadir}/libsecret/
 
 * Thu Mar 29 2012 Kalev Lember <kalevlember@gmail.com> - 0.1-1
 - Initial RPM release
-

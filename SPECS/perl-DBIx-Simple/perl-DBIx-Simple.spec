@@ -82,4 +82,3 @@ make test
 -   GA - Bump release of all rpms
 *   Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 1.35-1
 -   Initial version.
-

@@ -195,4 +195,3 @@ cp -a %{legacy_distinfo} %{buildroot}%{python3_sitelib}
 
 * Mon Sep 24 2018 Thomas Andrejak <thomas.andrejak@gmail.com> - 0.6.4-1
 - Initial package
-

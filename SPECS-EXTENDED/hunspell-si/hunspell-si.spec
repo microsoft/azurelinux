@@ -98,4 +98,3 @@ cp -p dictionaries/si-LK.dic $RPM_BUILD_ROOT/%{_datadir}/myspell/si_LK.dic
 
 * Wed Nov 25 2009 Caolan McNamara <caolanm@redhat.com> - 0.2-1
 - initial version
-

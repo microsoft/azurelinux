@@ -285,4 +285,3 @@ Executable and data files for installed tests.
 
 * Thu Oct 04 2018 Richard Hughes <richard@hughsie.com> - 0.1.0-1
 - Initial import (1636169)
-

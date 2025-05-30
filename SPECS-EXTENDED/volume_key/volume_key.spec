@@ -367,4 +367,3 @@ exit 1; \
 
 * Tue Jun 30 2009 Miloslav Trmač <mitr@redhat.com> - 0.2-1
 - Initial build.
-

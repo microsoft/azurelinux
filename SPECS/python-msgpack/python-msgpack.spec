@@ -77,4 +77,3 @@ MessagePack is a fast, compact binary serialization format, suitable for similar
 
 * Thu May 25 2017 Xiaolin Li <xiaolinl@vmware.com> - 0.4.8-1
 - Initial version
-

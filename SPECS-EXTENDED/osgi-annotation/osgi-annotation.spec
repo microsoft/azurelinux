@@ -110,4 +110,3 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 - Upgrade to the upstream version 7.0.0
 * Mon Feb 11 2019 Fridrich Strba <fstrba@suse.com>
 - Initial packaging of osgi-annotations 6.0.0
-

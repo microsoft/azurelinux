@@ -241,4 +241,3 @@ RUSTFLAGS=%{rustflags} cargo test --release
 
 * Mon Jan 01 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 0.3.3-1
 - Initial package
-

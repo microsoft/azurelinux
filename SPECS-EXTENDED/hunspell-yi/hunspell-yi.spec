@@ -92,4 +92,3 @@ cp -p dictionaries/yi.dic $RPM_BUILD_ROOT/%{_datadir}/myspell/yi_US.dic
 
 * Sat May 01 2010 Caolán McNamara <caolanm@redhat.com> - 1.1-1
 - initial version
-

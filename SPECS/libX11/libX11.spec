@@ -256,4 +256,3 @@ make %{?_smp_mflags} check
 
 * Tue Jun 04 2013 Peter Hutterer <peter.hutterer@redhat.com> 1.6.0-1
 - libX11 1.6.0
-

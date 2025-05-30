@@ -470,4 +470,3 @@ make test
 
 * Thu Oct 25 2007 Robin Norwood <rnorwood@redhat.com> - 1.15-1
 - Initial build
-

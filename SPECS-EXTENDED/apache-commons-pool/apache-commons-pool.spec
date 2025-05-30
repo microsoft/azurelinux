@@ -164,4 +164,3 @@ ant -Djava.io.tmpdir=. test
 
 * Thu Sep  2 2004 skh@suse.de
 - Initial package created with version 1.2 (JPackage 1.5)
-

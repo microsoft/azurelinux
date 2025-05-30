@@ -233,4 +233,3 @@ make check
 
 * Wed Aug 13 2003 Jonathan Blandford <jrb@redhat.com> 0.3.0-1
 - initial import into the tree.  Based on the spec file in the package
-

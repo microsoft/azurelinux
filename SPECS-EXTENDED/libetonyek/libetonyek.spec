@@ -265,4 +265,3 @@ fi
 
 * Wed Oct 30 2013 David Tardon <dtardon@redhat.com> 0.0.0-1
 - initial import
-

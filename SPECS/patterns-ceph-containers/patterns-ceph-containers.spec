@@ -94,4 +94,3 @@ This provides the base for the Ceph, Rook, Ceph CSI driver packages and containe
 
 * Wed Jul 17 2019 Denis Kondratenko <denis.kondratenko@suse.com>
 - Initial version
-

@@ -491,4 +491,3 @@ exit 0
 
 * Fri May  4 2007 Paul Lindner <lindner@inuus.com> - 1.2.2-1
 - Initial spec file created via rpmdev-newspec
-

@@ -74,4 +74,3 @@ Good password hashing for your software and your servers.
 
 * Wed Mar 06 2019 Tapas Kundu <tkundu@vmware.com> - 3.1.6-1
 - Initial packaging for Photon
-

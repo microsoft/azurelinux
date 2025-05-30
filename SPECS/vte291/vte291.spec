@@ -537,4 +537,3 @@ sed -i -e "/^vte_systemduserunitdir =/s|vte_prefix|'/usr'|" meson.build
 
 * Tue May 06 2014 Kalev Lember <kalevlember@gmail.com> - 0.37.0-1
 - Initial Fedora package, based on previous vte3 0.36 packaging
-

@@ -615,4 +615,3 @@ Fix the errors which Funda Wang as pointing out:
 * Fri Aug 15 2008 Huang Peng <shawn.p.huang@gmail.com> - 0.1.1.20081023-1
 - The first version.
 
-

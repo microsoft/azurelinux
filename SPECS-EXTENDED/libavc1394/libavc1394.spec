@@ -245,4 +245,3 @@ chrpath -d $RPM_BUILD_ROOT%{_bindir}/*
 * Sun Jun 09 2002 Michael Fulbright <msf@redhat.com>
 - First RPM build
 
-

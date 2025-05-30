@@ -107,4 +107,3 @@ make test
 -   GA - Bump release of all rpms
 *   Mon Mar 28 2016 Mahmoud Bassiouny <mbassiounu@vmware.com> 2.024-1
 -   Initial version.
-

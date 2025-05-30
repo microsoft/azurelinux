@@ -134,4 +134,3 @@ pip3 install sphinx exceptiongroup iniconfig tomli
 
 * Fri Mar 01 2019 Miro Hrončok <mhroncok@redhat.com> - 1.0.1-1
 - Initial package
-

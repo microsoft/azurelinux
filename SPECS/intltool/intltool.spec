@@ -56,4 +56,3 @@ make %{?_smp_mflags} check
 -   Upgrade to 0.51.0
 *   Thu Oct 23 2014 Divya Thaluru <dthaluru@vmware.com> 0.50.2-1
 -   Initial version
-

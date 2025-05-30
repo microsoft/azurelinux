@@ -189,4 +189,3 @@ Rebuild for new perl
 
 * Sat Jun 18 2005 Michael A. Peters <mpeters@mac.com> 0.09-1
 - initial Fedora Extras CVS Checkin
-

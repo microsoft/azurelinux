@@ -120,4 +120,3 @@ popd
 
 * Sun Nov 02 2008 Caolan McNamara <caolanm@redhat.com> - 0.20050819-1
 - initial version
-

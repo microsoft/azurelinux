@@ -283,4 +283,3 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 
 * Thu Nov 10 2005 Dawid Gajownik <gajownik[AT]gmail.com> - 0.5.4-1
 - Initial RPM release.
-

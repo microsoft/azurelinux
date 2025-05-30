@@ -95,4 +95,3 @@ make check
 
 * Mon May 15 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.5-1
 - Initial version
-

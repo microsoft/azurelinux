@@ -320,4 +320,3 @@ fi
 * Tue Sep 11 2007 Bill Nottinghan <notting@redhat.com> - 7.92.0-1
 - initial packaging. Forked from fedora-logos, adapted from the Fedora
   Art project's Infinity theme
-

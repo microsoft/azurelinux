@@ -117,4 +117,3 @@ install -p -m 644 tools/*.txt %{buildroot}%{_datadir}/bpftrace/tools/doc
 - Add bpftrace spec.
 - License verified
 - Original version for CBL-Mariner
-

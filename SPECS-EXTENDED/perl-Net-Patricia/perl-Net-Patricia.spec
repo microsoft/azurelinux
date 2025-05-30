@@ -261,4 +261,3 @@ Rebuild for new perl
 
 * Tue Oct 11 2005 Orion Poplawski 1.010-1
 - Initial Fedora Extras release
-

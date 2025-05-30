@@ -194,4 +194,3 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 
 * Wed Aug  9 2006 Denis Leroy <denis@poolshark.org> - 2.5-1
 - Initial version
-

@@ -302,4 +302,3 @@ fi
 
 * Wed Jun 17 2015 Divya Thaluru <dthaluru@vmware.com> - 8.10.0-1
 - Initial build. First version
-

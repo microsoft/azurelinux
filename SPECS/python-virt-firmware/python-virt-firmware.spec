@@ -176,4 +176,3 @@ cp -ar tests %{buildroot}%{_datadir}/%{name}
 * Mon Apr 11 2022 Gerd Hoffmann <kraxel@redhat.com> - 0.95-1
 - Initial package.
 
-

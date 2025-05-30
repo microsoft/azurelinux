@@ -797,4 +797,3 @@ fi
 
 * Wed Nov 23 2005 Joe Orton <jorton@redhat.com> 1.4.5-1
 - initial build (Epoch: 1 to allow upgrade from php-pear-5.x)
-

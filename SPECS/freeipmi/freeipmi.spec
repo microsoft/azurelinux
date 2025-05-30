@@ -800,4 +800,3 @@ rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
   files for backwards compatibility.
 - More detailed release information can be found in the NEWS file.
 
-

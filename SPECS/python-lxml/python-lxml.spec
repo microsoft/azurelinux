@@ -118,4 +118,3 @@ make test
 
 * Wed Oct 28 2015 Divya Thaluru <dthaluru@vmware.com> - 3.5.0b1-1
 - Initial build.
-

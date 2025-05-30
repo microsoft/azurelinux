@@ -248,4 +248,3 @@ mv -f %{buildroot}%{_sysconfdir}/udev/rules.d/50-euvccam.rules %{buildroot}%{_ud
 * Mon Feb 04 2008 Robert Scheck <robert@fedoraproject.org> 0.2.19-1
 - Upgrade to 0.2.19
 - Initial spec file for Fedora and Red Hat Enterprise Linux
-

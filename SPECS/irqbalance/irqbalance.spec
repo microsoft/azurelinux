@@ -109,4 +109,3 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 * Fri Jan 15 2016 Alexey Makhalov <amakhalov@vmware.com> 1.1.0-1
 - Initial version
-

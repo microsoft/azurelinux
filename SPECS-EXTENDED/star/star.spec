@@ -514,4 +514,3 @@ fi
 
 * Wed Jun 26 2002 Trond Eivind Glomsrød <teg@redhat.com> 1.5a04
 - Initial build. Alpha version - it's needed for ACLs.
-

@@ -45,4 +45,3 @@ install -m644 %{SOURCE1} %{buildroot}%{_bindir}/%{name}.sh
 
 * Mon Aug 02 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.0-1
 - Original version for CBL-Mariner.
-

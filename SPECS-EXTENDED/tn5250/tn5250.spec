@@ -335,4 +335,3 @@ cp -pf linux/README README.Linux
 - fix Group:
 - fix URLs
 - remove obsolete patch
-

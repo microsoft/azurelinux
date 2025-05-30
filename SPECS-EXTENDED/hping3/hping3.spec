@@ -185,4 +185,3 @@ ln -sf hping3 %{buildroot}%{_sbindir}/hping2
 
 * Sun May 07 2006 Paul Wouters <paul@xelerance.com> 0.0.20051105-1
 - Initial Release based on hping2 package
-

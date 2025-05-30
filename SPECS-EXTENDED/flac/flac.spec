@@ -353,4 +353,3 @@ sudo -u test make check && userdel test
 
 * Wed Aug  6 2003 Bill Nottingham <notting@redhat.com> 1.1.0-1
 - initial build
-

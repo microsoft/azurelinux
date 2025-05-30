@@ -351,4 +351,3 @@ cp -p %{SOURCE2} telsas_procmailrc
 
 * Thu Jun 19 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
-

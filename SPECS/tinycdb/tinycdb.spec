@@ -130,4 +130,3 @@ cp -p debian/libcdb.pc %{buildroot}%{_libdir}/pkgconfig/libcdb.pc
 
 * Wed Jul 07 2010 Chen Lei <supercyper@163.com> - 0.77-1
 - initial rpm build
-

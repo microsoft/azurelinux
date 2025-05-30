@@ -164,4 +164,3 @@ mentioned tasks.
 
 * Thu Dec 14 2017 Christian Kellner <ckellner@redhat.com> - 0.1-1
 - Initial upstream release
-

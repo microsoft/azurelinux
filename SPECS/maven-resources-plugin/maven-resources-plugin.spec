@@ -207,4 +207,3 @@ fg: no job control
 
 * Thu May 13 2010 Hui Wang <huwang@redhat.com> - 2.2-1
 - Initial version of the package
-

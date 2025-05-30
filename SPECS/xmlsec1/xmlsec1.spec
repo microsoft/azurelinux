@@ -139,4 +139,3 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 * Mon Jul 02 2018 Ankit Jain <ankitja@vmware.com> 1.2.26-1
 - Initial version
-

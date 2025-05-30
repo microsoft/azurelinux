@@ -261,4 +261,3 @@ kill "$(cat "${MYSQL_TEST_PID_FILE}")"
 
 * Wed Sep 11 2013 Alexander Chernyakhovsky <achernya@mit.edu> - 0.3.13-1
 - Initial package
-

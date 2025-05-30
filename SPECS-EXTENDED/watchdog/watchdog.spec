@@ -299,4 +299,3 @@ rm %{name}.sysconfig
 
 * Mon Apr 16  2007 Konrad Rzeszutek <konradr@redhat.com> - 5.3.1-1
 - Initial copy. 
-

@@ -197,4 +197,3 @@ popd
 
 * Mon Feb 27 2017 Elliott Sales de Andrade <quantum.analyst@gmail.com> - 1.5.7-1
 - Initial package release.
-

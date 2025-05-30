@@ -159,4 +159,3 @@ install -vd %{buildroot}%{_sysconfdir}/multipath
 
 * Mon Jun 22 2015 Divya Thaluru <dthaluru@vmware.com> 0.5.0-1
 - Initial build. First version
-

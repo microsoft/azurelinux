@@ -145,4 +145,3 @@ find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python3
 
 * Wed Apr 05 2017 Dheeraj Shetty <dheerajs@vmware.com> - 1.4.5-1
 - Initial version
-

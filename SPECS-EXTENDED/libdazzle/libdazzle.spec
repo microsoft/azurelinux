@@ -248,4 +248,3 @@ xvfb-run -w 10 ninja test %{__ninja_common_opts} -C %{_vpath_builddir}
 
 * Mon Jun 19 2017 Yanko Kaneti <yaneti@declera.com> - 3.25.3-1
 - Initial spec
-

@@ -222,4 +222,3 @@ make test
 
 * Fri Aug 26 2005 Jose Pedro Oliveira <jpo at di.uminho.pt> - 0.20-1
 - First build.
-

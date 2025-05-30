@@ -168,4 +168,3 @@ Rebuild for new perl
 - Source0 fix
 * Sat Dec 22 2007 Rafał Psota <rafalzaq@gmail.com> 4.59-1
 - Initial release
-

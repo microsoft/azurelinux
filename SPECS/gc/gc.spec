@@ -83,4 +83,3 @@ make %{?_smp_mflags} check
 -   GA - Bump release of all rpms
 *   Thu Jun 18 2015 Divya Thaluru <dthaluru@vmware.com> 7.4.2-1
 -   Initial build. First version
-

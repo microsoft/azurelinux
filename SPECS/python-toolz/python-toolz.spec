@@ -152,4 +152,3 @@ nosetests
 
 * Tue Apr 5 2016 Orion Poplawski <orion@cora.nwra.com> - 0.7.4-1
 - Initial package
-

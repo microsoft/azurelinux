@@ -185,4 +185,3 @@ rm -rf %{eggname}.egg-info
 
 * Wed Nov 02 2011 Jan Kaluza <jkaluza@redhat.com> - 0.1.3-1
 - Initial version
-

@@ -339,4 +339,3 @@ TZ=:America/Los_Angeles %__make check
 * Wed Mar 25 2009 - Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 - 20090324-1
 - Initial Revision
-

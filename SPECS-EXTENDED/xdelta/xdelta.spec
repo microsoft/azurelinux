@@ -369,4 +369,3 @@ sudo -u test ./xdelta3 test && userdel test
 
 * Sat Apr 04 1998 Arne Coucheron <arneco@online.no>
   [0.15-1]
-

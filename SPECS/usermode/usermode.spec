@@ -1040,4 +1040,3 @@ done
 
 * Mon Oct 6 1997 Otto Hammersmith <otto@redhat.com>
 - Created the spec file.
-

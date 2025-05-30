@@ -343,4 +343,3 @@ install -p -m 644 doc/man/*.3 $RPM_BUILD_ROOT/%{_mandir}/man3
   
 * Fri May 30 2003 Mike A. Harris <mharris@www.linux.org.uk> 1.3-0.20020125.0
 - Initial build.
-

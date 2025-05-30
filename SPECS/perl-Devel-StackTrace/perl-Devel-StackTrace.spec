@@ -258,4 +258,3 @@ make test
 
 * Sun Oct 02 2005 Ralf Corsepius <rc040203@freenet.de> - 1.12-1
 - Upstream update.
-

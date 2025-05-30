@@ -132,4 +132,3 @@ cp -a build/api/* %{buildroot}%{_javadocdir}/%{name}
 - Rename to gnu-getopt to not confuse autobuild
 * Thu Sep  2 2004 skh@suse.de
 - Initial package created with version 1.0.9 (JPackage 1.5)
-

@@ -197,4 +197,3 @@ cp -r lib/ %{buildroot}%{gem_instdir}/
 
 * Wed May 14 2008 Michael Stahnke <stahnma@fedoraproject.org> - 1.1.3-1
 - Initial package
-

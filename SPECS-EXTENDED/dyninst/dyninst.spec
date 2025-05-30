@@ -544,4 +544,3 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 
 * Mon Mar 12 2012 William Cohen <wcohen@redhat.com> - 7.0.1-0.4
 - Initial submission of dyninst spec file.
-

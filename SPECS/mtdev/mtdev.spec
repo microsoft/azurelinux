@@ -174,4 +174,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Tue Jul 06 2010 Peter Hutterer <peter.hutterer@redhat.com> 1.0.1-1.20100706
 - Initial package
-

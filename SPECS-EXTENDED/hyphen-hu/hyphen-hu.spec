@@ -125,4 +125,3 @@ cp -p hyph_hu.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen/hyph_hu_HU.dic
 
 * Fri Nov 23 2007 Caolan McNamara <caolanm@redhat.com> - 0.20070907-1
 - initial version
-

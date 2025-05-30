@@ -556,4 +556,3 @@ rm -f %{buildroot}%{_libdir}/libdmraid.a
 
 * Thu Jun 17 2004 Heinz Mauelshagen <heinzm@redhat.com> 1.0.0-pre1
 - Created
-

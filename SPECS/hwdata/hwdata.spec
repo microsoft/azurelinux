@@ -1137,4 +1137,3 @@ make install DESTDIR=%{buildroot} libdir=%{_libdir}
 
 * Wed Jan 30 2002 Bill Nottingham <notting@redhat.com> 0.1-1
 - initial build
-

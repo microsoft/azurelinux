@@ -354,4 +354,3 @@ done
 
 * Sun Feb 17 2013 Eduardo Echeverria <echevemaster@gmail.com> - 12.10.2-1
 - initial packaging
-

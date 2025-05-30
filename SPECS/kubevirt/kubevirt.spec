@@ -1874,4 +1874,3 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 
 * Wed May  6 2020 James Fehlig <jfehlig@suse.com>
 - Initial attempt to package kubevirt 0.29.0
-

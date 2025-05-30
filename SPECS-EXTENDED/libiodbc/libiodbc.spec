@@ -201,4 +201,3 @@ rm -rfv %{buildroot}%{_datadir}/libiodbc/samples
 * Wed Jun 03 2009 Rex Dieter <rdieter@fedoraproject.org> 3.52.6-1
 - first try, based on upstream src.rpm
 
-

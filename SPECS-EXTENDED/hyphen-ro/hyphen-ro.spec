@@ -93,4 +93,3 @@ cp -p *.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen/
 
 * Wed Jan 09 2008 Caolán McNamara <caolanm@redhat.com> - 3.3-0.1.test3
 - initial version
-

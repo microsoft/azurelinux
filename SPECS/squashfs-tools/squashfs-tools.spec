@@ -368,4 +368,3 @@ install -m 644 %{SOURCE2} %{buildroot}%{_mandir}/man1/unsquashfs.1
 
 * Thu Dec  1 2005 Jeremy Katz <katzj@redhat.com> - 2.2r2-1
 - Initial build
-

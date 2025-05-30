@@ -339,4 +339,3 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 * Sat Nov 06 2010 Dave Airlie <airlied@redhat.com> 0.1.0-1.20101110
 - inital import
-

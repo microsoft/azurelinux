@@ -463,4 +463,3 @@ make test
 
 * Wed May 19 2010 Tom "spot" Callaway <tcallawa@redhat.com> 0.9.0-1
 - Initial package for Fedora
-

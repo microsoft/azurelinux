@@ -208,4 +208,3 @@ install -p -m 0644 %{SOURCE3} %{buildroot}%{_includedir}/bsd/sys/cdefs.h
 
 * Thu Jan 28 2010 Eric Smith <eric@brouhaha.com> - 0.2.0-1
 - initial version
-

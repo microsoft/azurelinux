@@ -124,4 +124,3 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 * Thu Feb 14 2019 Scott K Logan <logans@cottsay.net> - 5.0.0-1
 - Initial package
-

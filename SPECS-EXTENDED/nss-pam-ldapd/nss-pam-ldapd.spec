@@ -421,4 +421,3 @@ getent passwd nslcd > /dev/null || \
 
 * Wed Mar 18 2009 Nalin Dahyabhai <nalin@redhat.com> 0.6.7-0.0
 - initial package (#445965)
-

@@ -369,4 +369,3 @@ exit 0
 - rebasing to 0.2
 * Mon Jul 31 2017 Jakub Hrozek <jakub.hrozek@posteo.se> - 0.1-1
 - initial packaging
-

@@ -189,4 +189,3 @@ make test
 
 * Mon Sep  2 2013 Paul Howarth <paul@city-fan.org> - 0.59-1
 - Initial RPM build
-

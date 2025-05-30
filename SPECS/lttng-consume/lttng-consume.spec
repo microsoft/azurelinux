@@ -74,4 +74,3 @@ mkdir build && cd build
 
 * Wed Feb 12 2020 Nick Bopp <nichbop@microsoft.com> - 0.2-1
 - Original version for CBL-Mariner.
-

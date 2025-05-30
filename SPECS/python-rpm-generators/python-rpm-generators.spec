@@ -144,4 +144,3 @@ install -Dpm0755 -t %{buildroot}%{_rpmconfigdir} *.py
 
 * Tue May 02 2017 Tomas Orsava <torsava@redhat.com> - 4.13.0.1-1
 - Splitting Python RPM generators from the `rpm` package to standalone one
-

@@ -156,4 +156,3 @@ rm -rf docs/_build/html/.{doctrees,buildinfo}
 
 * Mon Mar 30 2015 Haïkel Guémar <hguemar@fedoraproject.org> - 2.3.1-1
 - Initial package.
-

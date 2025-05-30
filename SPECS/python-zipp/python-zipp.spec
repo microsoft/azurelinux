@@ -108,4 +108,3 @@ Resolves: rhbz#1978839
 
 * Wed Jun 26 2019 Miro Hrončok <mhroncok@redhat.com> - 0.5.1-1
 - Initial package
-

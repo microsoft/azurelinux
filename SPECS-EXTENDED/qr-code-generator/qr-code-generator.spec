@@ -153,4 +153,3 @@ popd
 
 * Mon Jan 06 2020 Vitaly Zaitsev <vitaly@easycoding.org> - 1.5.0-1.20191014git67c6246
 - Initial SPEC release.
-

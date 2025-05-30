@@ -401,4 +401,3 @@ make DESTDIR=%{buildroot} INSTALL_PROGRAM=install install
 - pulled from contrib into distribution (got fresh sources).  Thanks
   to Thorsten Kukuk <kukuk@vt.uni-paderborn.de> for the original.
 - used fresh sources
-

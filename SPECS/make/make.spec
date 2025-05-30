@@ -96,4 +96,3 @@ sudo -u testuser -s /bin/bash -c "PATH=$PATH make check"
 
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 4.0-1
 - Initial build. First version
-

@@ -96,4 +96,3 @@ done
 
 * Fri Jun 12 2009 Caolan McNamara <caolanm@redhat.com> - 1.0-0.1.beta7
 - initial version
-

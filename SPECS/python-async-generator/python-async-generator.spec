@@ -91,4 +91,3 @@ python%{python3_version} -m pytest -v
 
 * Fri Sep 07 2018 Carl George <carl@george.computer> - 1.10-1
 - Initial package
-

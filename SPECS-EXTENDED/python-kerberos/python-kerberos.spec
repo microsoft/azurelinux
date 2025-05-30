@@ -202,4 +202,3 @@ install -m 644 $RPM_SOURCE_DIR/LICENSE LICENSE
 
 * Tue Jul 31 2007 Rob Crittenden <rcritten@redhat.com> - 0.1735-1
 - Initial rpm version
-

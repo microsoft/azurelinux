@@ -149,4 +149,3 @@ cp -p *.dic *.aff $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Thu Mar 27 2008 Caolán McNamara <caolanm@redhat.com> - 0.2.32-1
 - initial version
-

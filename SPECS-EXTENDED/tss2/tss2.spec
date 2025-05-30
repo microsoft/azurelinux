@@ -199,4 +199,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Fri Mar 20 2015 George Wilson <gcwilson@us.ibm.com>
 - Initial implementation
-

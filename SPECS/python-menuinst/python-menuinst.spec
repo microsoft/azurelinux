@@ -91,4 +91,3 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 
 * Tue Dec 05 2023 Orion Poplawski <orion@nwra.com> - 2.0.0-1
 - Initial import
-

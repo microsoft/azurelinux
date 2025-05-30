@@ -260,4 +260,3 @@ make install \
 
 * Mon Jul 20 1998 Michael Maher <mike@redhat.com> 
 - built package
-

@@ -47,4 +47,3 @@ applications, the overall memory consumption is reduced as well.
 * Fri May 21 2021 Thomas Crain <thcrain@microsoft.com> - 3.24.26-1
 - Original version for CBL-Mariner
 - License verified
-

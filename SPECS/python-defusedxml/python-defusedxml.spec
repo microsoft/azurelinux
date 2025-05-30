@@ -68,4 +68,3 @@ XML bomb protection for Python stdlib modules
 
 * Thu Mar 09 2017 Xiaolin Li <xiaolinl@vmware.com> - 0.5.0-1
 - Initial packaging for Photon
-

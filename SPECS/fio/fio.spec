@@ -646,4 +646,3 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 
 * Wed Feb 13 2008 Eric Sandeen <sandeen@redhat.com> 1.18-1
 - Initial build
-

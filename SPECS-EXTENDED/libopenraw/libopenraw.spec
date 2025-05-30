@@ -309,4 +309,3 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -delete
 
 * Sun Apr 29 2007 Trond Danielsen <trond.danielsen@gmail.com> - 0.0.2-1
 - Inital version.
-

@@ -285,4 +285,3 @@ PYTHONPATH=$PWD %{__python3} test/test_IPy.py
 
 * Sat Sep 16 2006 David Walluck <walluck@mandriva.com> 0:0.42-1mdv2007.0
 - release
-

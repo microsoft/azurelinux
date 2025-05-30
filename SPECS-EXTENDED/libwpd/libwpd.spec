@@ -353,4 +353,3 @@ install -m 0644 wpd2*.1 %{buildroot}/%{_mandir}/man1
 
 * Sat Apr 26 2003 Rui M. Seabra <rms@1407.org>
 - Create rpm spec
-

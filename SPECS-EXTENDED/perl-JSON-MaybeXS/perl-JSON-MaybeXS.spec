@@ -315,4 +315,3 @@ make test
 
 * Wed Apr 23 2014 Paul Howarth <paul@city-fan.org> - 1.002000-1
 - Initial RPM version
-

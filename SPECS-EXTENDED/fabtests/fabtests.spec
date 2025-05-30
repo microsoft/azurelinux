@@ -168,4 +168,3 @@ rm -f %{buildroot}%{_libdir}/*.la
 
 * Thu Apr 14 2016 Honggang Li <honli@redhat.com> - 1.3.0-1
 - Import fabtests for Fedora.
-

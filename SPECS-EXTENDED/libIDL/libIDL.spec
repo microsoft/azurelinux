@@ -292,4 +292,3 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*a
 - initial build of standalone libIDL
 - fix braindamage
 
-

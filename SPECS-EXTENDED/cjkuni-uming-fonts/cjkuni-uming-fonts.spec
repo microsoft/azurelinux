@@ -147,4 +147,3 @@ ln -s %{_fontdir}/ %{buildroot}%{catalogue}/%{name}
 * Mon Jul 12 2010  Peng Wu <pwu@redhat.com> - 0.2.20080216.1-43
 - The Initial Version.
   Split from cjkuni-fonts.
-

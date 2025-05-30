@@ -177,4 +177,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Mon Jun 04 2012 Adam Jackson <ajax@redhat.com> 1.0.11-1
 - libXaw 1.0.11
-

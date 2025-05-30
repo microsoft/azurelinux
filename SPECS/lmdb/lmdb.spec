@@ -96,4 +96,3 @@ install -m0755 %{SOURCE1} %{buildroot}%{_libdir}/pkgconfig
 
 *  Wed Dec 13 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 0.9.21-1
 -  Initial
-

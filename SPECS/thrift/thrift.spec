@@ -689,4 +689,3 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
 * Mon Jul 1 2013 willb <willb@redhat> - 0.9.0-1
 - Initial package
 
-

@@ -138,4 +138,3 @@ echo '.so man1/urlview.1' > $RPM_BUILD_ROOT%{_mandir}/man1/url_handler.sh.1
 
 * Wed Jun 27 2007 Miroslav Lichvar <mlichvar@redhat.com> 0.9-1
 - split from mutt package
-

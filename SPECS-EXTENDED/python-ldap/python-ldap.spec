@@ -339,4 +339,3 @@ PYTHONPATH=%{buildroot}%{python3_sitearch} %{__python3} -m unittest -v \
 
 * Wed Dec 03 2003 Panu Matilainen <pmatilai@welho.com> 0:2.0.0-0.fdr.0.pre16.1
 - Initial Fedora packaging.
-

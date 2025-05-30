@@ -211,4 +211,3 @@ ant test
 
 * Sun Sep  5 2004 skh@suse.de
 - Initial package created with version 1.5 (JPackage version 1.5)
-

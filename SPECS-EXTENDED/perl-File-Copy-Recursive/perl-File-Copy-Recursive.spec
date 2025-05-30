@@ -205,4 +205,3 @@ chmod -R u+w %{buildroot}/*
 
 * Wed Jan 17 2007 Ralf Corsépius <rc040203@freenet.de> - 0.30-1
 - Initial Fedora submission.
-

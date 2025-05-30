@@ -353,4 +353,3 @@ rm -f %{buildroot}%{_docdir}/*/*.{html,svg}
 
 * Sun Jul 22 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.6-23
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
-

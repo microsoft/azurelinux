@@ -190,4 +190,3 @@ PYTHONPATH=%{buildroot}%{python3_sitearch} \
 
 * Wed Nov 18 2015 Divya Thaluru <dthaluru@vmware.com> - 1.1-1
 - Initial packaging for Photon
-

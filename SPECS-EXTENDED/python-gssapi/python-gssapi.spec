@@ -173,4 +173,3 @@ find %{buildroot}%{python3_sitearch}/gssapi -name '*.so' \
 
 * Thu Feb 19 2015 Solly Ross <sross@redhat.com> - 1.1.0-1
 - Initial Packaging
-

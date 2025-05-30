@@ -276,4 +276,3 @@ documentation.
 
 * Wed Aug 15 2012 Stef Walter <stefw@redhat.com> - 0.1-1
 - Initial 0.1 package
-

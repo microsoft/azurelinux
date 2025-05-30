@@ -401,4 +401,3 @@ rm -f %{buildroot}/%{_infodir}/dir
 
 * Thu Oct 7 2004 rabit <rabit@ipserv.org> 0.2.3-fc2
 - Initial build.
-

@@ -294,4 +294,3 @@ Contains developer documentation for %{name}.
 
 * Fri Jun 25 2010 Peter Robinson <pbrobinson@fedoraproject.org> 0.2.1-1
 - Initial release
-

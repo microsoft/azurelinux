@@ -573,4 +573,3 @@ fi
 
 * Sat May 24 2003 Ville Skyttä <ville.skytta at iki.fi> - 0:1.1.2-0.fdr.0.1.beta4
 - First build, based on PLD's 1.1.1-2.
-

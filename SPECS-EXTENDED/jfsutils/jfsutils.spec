@@ -222,4 +222,3 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 * Tue Jan 29 2002 Michael K. Johnson <johnsonm@redhat.com>
 - Initial packaging
-

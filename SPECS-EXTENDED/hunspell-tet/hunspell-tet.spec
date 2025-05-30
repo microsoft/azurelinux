@@ -117,4 +117,3 @@ popd
 
 * Wed Nov 05 2008 Caolan McNamara <caolanm@redhat.com> - 0.20050108-1
 - initial version
-

@@ -85,4 +85,3 @@ sed -i -e '/doctest/d' -e '/reruns/d' pyproject.toml
 
 * Sat Dec 02 2023 Orion Poplawski <orion@nwra.com> - 23.11.1-1
 - Initial Fedora package
-

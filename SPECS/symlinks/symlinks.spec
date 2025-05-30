@@ -255,4 +255,3 @@ install -m 644 symlinks.1 %{buildroot}%{_mandir}/man1
 * Wed Jul 09 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
 - build-rooted
-

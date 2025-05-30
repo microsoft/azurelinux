@@ -61,4 +61,3 @@ Python 3 version.
 
 * Mon Mar 06 2017 Xiaolin Li <xiaolinl@vmware.com> - 0.3.3-1
 - Initial packaging for Photon.
-

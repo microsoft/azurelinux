@@ -108,4 +108,3 @@ done
 
 * Thu Sep 10 2009 Caolan McNamara <caolanm@redhat.com> - 0.20090414-1
 - initial version
-

@@ -110,4 +110,3 @@ cp -p dictionaries/br_FR.* $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Mon Oct 13 2008 Caolan McNamara <caolanm@redhat.com> - 0.20030417-1
 - initial version
-

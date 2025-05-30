@@ -62,4 +62,3 @@ docopt helps easily create most beautiful command-line interfaces.
 
 * Fri Aug 25 2017 Vinay Kulkarni <kulkarniv@vmware.com> - 0.6.2-1
 - Initial version of python-docopt package for Photon.
-

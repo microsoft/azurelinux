@@ -90,4 +90,3 @@ pip3 install pytest pathlib2 pluggy
 
 * Tue Apr 25 2017 Dheeraj Shetty <dheerajs@vmware.com> - 0.7.1-1
 - Initial
-

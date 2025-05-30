@@ -197,4 +197,3 @@ Linux kernel modules, using libkmod.
 
 * Thu Apr 12 2012 Andy Grover <agrover@redhat.com> - 0.1-1
 - Initial packaging
-

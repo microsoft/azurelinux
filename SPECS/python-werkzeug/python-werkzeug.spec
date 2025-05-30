@@ -136,4 +136,3 @@ pip3 install markupsafe
 
 * Mon Mar 06 2017 Xiaolin Li <xiaolinl@vmware.com> - 0.11.15-1
 - Initial packaging for Photon.
-

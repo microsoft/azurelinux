@@ -161,4 +161,3 @@ cp -pr examples/* %{buildroot}%{_datadir}/%{name}
   * and many bugfixes
 * Tue Apr 28 2009 mvyskocil@suse.cz
 - Initial SUSE packaging of version 0.1.40 (from jpp5)
-

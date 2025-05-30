@@ -382,4 +382,3 @@ rm -fv %{buildroot}%{_libdir}/libtidy.a
 
 * Mon Jul 21 2003 Ville Skyttä <ville.skytta at iki.fi> - 0:0.99.0-0.fdr.1.20030716
 - First build.
-

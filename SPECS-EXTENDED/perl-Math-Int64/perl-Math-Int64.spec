@@ -205,4 +205,3 @@ make test
 
 * Thu Feb 19 2015 David Dick <ddick@cpan.org> - 0.34-1
 - Initial release
-

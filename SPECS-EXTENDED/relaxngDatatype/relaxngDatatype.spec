@@ -105,4 +105,3 @@ install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 - Move from jpackage-utils to javapackage-tools
 * Thu Aug  7 2008 mvyskocil@suse.cz
 - First release of version 1.0 in Suse (based on spec from jpackage.org 1.7)
-

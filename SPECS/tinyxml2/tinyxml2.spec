@@ -67,4 +67,3 @@ make install DESTDIR=%{buildroot}
 
 * Thu Apr 09 2020 Jonathan Chiu <jochi@microsoft.com> 7.0.1-1
 - Original version for CBL-Mariner.
-

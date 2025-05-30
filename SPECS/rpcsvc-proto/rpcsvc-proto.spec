@@ -58,4 +58,3 @@ make install DESTDIR=%{buildroot}
 
 * Fri Sep 21 2018 Alexey Makhalov <amakhalov@vmware.com> 1.4-1
 - Initial version
-

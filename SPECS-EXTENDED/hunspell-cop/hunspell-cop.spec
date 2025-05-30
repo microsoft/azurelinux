@@ -102,4 +102,3 @@ cp -p cop_EG-Bohairic/cop_EG.* $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Thu Oct 30 2008 Caolán McNamara <caolanm@redhat.com> - 0.2.0-1
 - initial version
-

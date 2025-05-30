@@ -226,4 +226,3 @@ PYTHON=%{__python3} %{__python3} setup.py tests || :
 * Mon Feb 02 2015 Parag Nemade <pnemade AT redhat DOT com> - 0.3.1-1
 - Initial packaging
 
-

@@ -48,4 +48,3 @@ pip3 install mock wheel
 * Fri May 10 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 2.3.0-1
 - Original version for Azure Linux.
 - license verified.
-

@@ -193,4 +193,3 @@ ant test
 
 * Tue Jun 24 2008 Daniel Veillard <veillard@redhat.com> - 0.1.0-1
 - created
-

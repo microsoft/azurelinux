@@ -388,4 +388,3 @@ rm $RPM_BUILD_ROOT%{_mandir}/man3/_*3
 
 * Sat Jan 22 2011 Hans de Goede <hdegoede@redhat.com> 0.8.2-1
 - Initial Fedora package
-

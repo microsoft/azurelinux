@@ -309,4 +309,3 @@ rm -r %{buildroot}%{_mandir}/man3
 
 * Mon Aug 22 2005 Mike A. Harris <mharris@redhat.com> 1.1.3-1
 - Initial build.
-

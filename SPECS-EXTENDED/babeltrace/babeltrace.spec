@@ -275,4 +275,3 @@ rm -f %{buildroot}/%{_pkgdocdir}/std-ext-lib.txt
 * Thu Jul 05 2012 Yannick Brosseau <yannick.brosseau@gmail.com> - 1.0.0-0.1.rc4
 - New package, inspired by the one from OpenSuse 
 
-

@@ -185,4 +185,3 @@ rm $RPM_BUILD_ROOT%{_docdir}/libatasmart/README
 
 * Fri Jul 25 2008 Lennart Poettering <lpoetter@redhat.com> 0.1-1
 - Initial version
-

@@ -129,4 +129,3 @@ done
 
 * Thu Jan 15 2009 Caolan McNamara <caolanm@redhat.com> - 0.20070412-1
 - initial version
-

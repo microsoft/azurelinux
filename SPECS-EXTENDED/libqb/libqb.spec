@@ -749,4 +749,3 @@ Wed Mar 7 2012  Angus Salkeld <asalkeld@redhat.com> - 0.11.0-1
 
 * Sun Jan 09 2011 Angus Salkeld <asalkeld@redhat.com> - 0.4.0-1
 - Initial release
-

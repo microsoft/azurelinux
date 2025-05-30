@@ -66,4 +66,3 @@ as a demonstration of the possibilities it provides than as production-quality c
 
 * Fri Apr 14 2017 Dheeraj Shetty <dheerajs@vmware.com> - 0.12.2-1
 - Initial packaging for Photon
-

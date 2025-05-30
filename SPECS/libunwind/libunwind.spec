@@ -62,4 +62,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 *   Mon Feb 06 2017 Vinay Kulkarni <kulkarniv@vmware.com> 1.2-1
 -   Initial version of libunwind package for Photon.
-

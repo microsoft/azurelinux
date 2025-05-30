@@ -249,4 +249,3 @@ cargo test
 - 42ba1670288f ("Merge pull request #1 from cohuck/improve_cmdline")
 - d27ba583f77b ("mdevctl: improve commandline handling")
 - 5114f9eb8268 ("mdevctl: Initial commit")
-

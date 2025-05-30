@@ -218,4 +218,3 @@ cp -pr dist/docs/api/* %{buildroot}%{_javadocdir}/%{name}
 
 * Sun Sep  5 2004 skh@suse.de
 - Initial package created with version 1.6.1 (JPackage 1.5)
-

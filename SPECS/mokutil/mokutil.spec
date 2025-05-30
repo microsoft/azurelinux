@@ -120,4 +120,3 @@ make PREFIX=%{_prefix} LIBDIR=%{_libdir} DESTDIR=%{buildroot} install
 
 * Mon Oct 06 2014 Peter Jones <pjones@redhat.com> - 0.2.0-1
 - First independent package.
-

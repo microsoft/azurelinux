@@ -272,4 +272,3 @@ rm -rf doc/{html,ps,pdf}/Makefile*
 
 * Sat Nov 29 2008 Steven Fernandez <steve@lonetwin.net> - 3.0-1
 - First build for Fedora 10
-

@@ -139,4 +139,3 @@ fi
 -   Add systemd to Requires and BuildRequires.
 *   Tue Dec 8 2015 Divya Thaluru <dthaluru@vmware.com> 0.2.3-1
 -   Initial build.  First version
-

@@ -156,4 +156,3 @@ python3 setup.py install --single-version-externally-managed --skip-build --root
 
 * Fri Oct 14 2016 Chandan Kumar <chkumar@redhat.com> - 0.12.14-1
 - Initial package.
-

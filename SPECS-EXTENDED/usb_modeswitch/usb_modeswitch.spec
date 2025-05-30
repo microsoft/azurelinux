@@ -221,4 +221,3 @@ make install \
 
 * Thu Dec 30 2010 Dan Williams <dcbw@redhat.com> 1.1.6-1
 - New upstream version
-

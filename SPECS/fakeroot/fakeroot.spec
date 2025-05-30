@@ -388,4 +388,3 @@ fi
 
 * Wed Oct  8 2003 Axel Thimm <Axel.Thimm@ATrpms.net>
 - Initial build.
-

@@ -507,4 +507,3 @@ chmod ogu-x scripts/conf.mingw.sh scripts/config.djgpp.sh
 
 * Thu Jan  2 1997 florian@suse.de
 - Update auf neue Version 2-6. /usr/etc/mailcap sollte nun in aaa_base sein.
-

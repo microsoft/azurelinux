@@ -182,4 +182,3 @@ popd  # Leave buildroot bindir
 
 * Fri Dec 4 2015 Julien Enselme <jujens@jujens.eu> - 0.2.0-1
 - Inital package
-

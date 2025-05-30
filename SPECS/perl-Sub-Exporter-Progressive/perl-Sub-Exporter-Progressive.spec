@@ -211,4 +211,3 @@ make test
 
 * Wed Aug  1 2012 Paul Howarth <paul@city-fan.org> - 0.001002-1
 - Initial RPM build
-

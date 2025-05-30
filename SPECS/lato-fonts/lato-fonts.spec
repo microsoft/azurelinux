@@ -143,4 +143,3 @@ install -Dm 0644 -p %{SOURCE2} \
 
 * Sun Sep 23 2012 Mohamed El Morabity <melmorabity@fedoraproject.org> - 1.014-1
 - Initial release, to replace google-lato-fonts package
-

@@ -68,4 +68,3 @@ ln -s  genisoimage  %{buildroot}%{_prefix}/bin/mkisofs
 -   GA - Bump release of all rpms
 *   Sat Feb 14 2015 Sharath George <sharathg@vmware.com>
 -   first packaging
-

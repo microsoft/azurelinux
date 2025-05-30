@@ -277,4 +277,3 @@ rm -rf %{buildroot}%{_libdir}/*.a
 
 * Tue Jul 10 2007 Deji Akingunola <dakingun@gmail.com> - 1.99.3-1
 - Initial packaging for Fedora
-

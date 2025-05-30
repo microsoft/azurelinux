@@ -284,4 +284,3 @@ chmod 0755 $RPM_BUILD_ROOT%{_libdir}/*.so*
 
 * Thu May 11 2006 Ian Chapman <packages@amiga-hardware.com> 1.3.4-1.iss
 - Initial Release
-

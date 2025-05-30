@@ -264,4 +264,3 @@ install -pm 644 bash-completion/%{name} \
 
 * Fri Apr 29 2016 Sascha Spreitzer <sspreitz@redhat.com> - 0.05.25-1
 - initial spec file
-

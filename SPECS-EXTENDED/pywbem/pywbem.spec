@@ -361,4 +361,3 @@ mv -v %{buildroot}/%{_bindir}/wbemcli.py %{buildroot}/%{_bindir}/pywbemcli.py
 * Thu Jun 25 2009 David Nalley <david@gnsa.us> 0.7.0-1
 - Initial packaging
 
-

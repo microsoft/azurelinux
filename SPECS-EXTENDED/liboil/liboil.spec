@@ -286,4 +286,3 @@ rm -f %{buildroot}%{_libdir}/*.a
 * Thu Nov  4 2004 Matthias Saou <http://freshrpms.net/> 0.2.0-1
 - Initial RPM release.
 
-

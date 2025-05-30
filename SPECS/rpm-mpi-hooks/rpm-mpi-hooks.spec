@@ -129,4 +129,3 @@ install -Dpm 0755 %{SOURCE3} %{buildroot}%{_rpmconfigdir}/mpi.req
 
 * Thu Jul 09 2015 Sandro Mani <manisandro@gmail.com> 1.0-1
 - Initial package
-

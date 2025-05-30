@@ -162,4 +162,3 @@ make PREFIX=%{_prefix} DESTDIR=%{buildroot} install
 * Sat Feb 07 2004 Nils Philippsen <nphilipp@redhat.com>
 - version 1.07
 - initial build
-

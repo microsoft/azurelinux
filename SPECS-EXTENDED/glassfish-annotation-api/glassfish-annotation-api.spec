@@ -92,4 +92,3 @@ install -pdm 0755 target/site/apidocs %{buildroot}%{_javadocdir}/%{name}
   with maven.
 * Tue Jan 29 2019 Fridrich Strba <fstrba@suse.com>
 - Initial package of glassfish-annotation-api 1.3.2
-

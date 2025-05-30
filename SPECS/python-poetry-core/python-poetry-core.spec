@@ -167,4 +167,3 @@ rm -r src/poetry/core/_vendor
 
 * Mon Nov 02 2020 Miro Hrončok <mhroncok@redhat.com> - 1.0.0-1
 - Initial package
-

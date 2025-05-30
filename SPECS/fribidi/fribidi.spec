@@ -290,4 +290,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Fri May 16 2003 Jeremy Katz <katzj@redhat.com> 0.10.4-2
 - Initial build in Red Hat Linux
-

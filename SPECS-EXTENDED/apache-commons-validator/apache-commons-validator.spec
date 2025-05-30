@@ -208,4 +208,3 @@ ant \
 
 * Sun Sep  5 2004 skh@suse.de
 - Initial package created with version 1.0.2 (Jakarta 1.5)
-

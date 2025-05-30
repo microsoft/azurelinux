@@ -128,4 +128,3 @@ Python 3 version.
 
 * Sat Aug 06 2016 Vadim Rutkovsky <vrutkovs@redhat.com> - 2.9-1
 - Initial package
-

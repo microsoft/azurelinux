@@ -672,4 +672,3 @@ rm %{buildroot}/%{_libdir}/libflashrom.a
 
 * Sun Aug  5 2007 Peter Lemenkov <lemenkov@gmail.com> 0.0-1.2742svn
 - Initial build for FC-Extras
-

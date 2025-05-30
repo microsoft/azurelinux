@@ -163,4 +163,3 @@ PYTHONPATH=$(pwd) %{__python3} setup.py test
 
 * Fri Dec 4 2015 Julien Enselme <jujens@jujens.eu> - 0.5.4-1
 - Inital package
-

@@ -229,4 +229,3 @@ rm -f tests/catch.hpp
 
 * Fri Apr 10 2015 Daniel Kopecek <dkopecek@redhat.com> - 0-1.20150410git.211ce99
 - Initial package
-

@@ -183,4 +183,3 @@ make test
 
 * Fri Jul 01 2005 Ralf Corsepius <ralf@links2linux.de> - 1.5-1
 - FE submission.
-

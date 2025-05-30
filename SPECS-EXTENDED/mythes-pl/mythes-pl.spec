@@ -125,4 +125,3 @@ cp -p th_pl_PL_v2.* $RPM_BUILD_ROOT/%{_datadir}/mythes
 
 * Wed Nov 28 2007 Caolán McNamara <caolanm@redhat.com> - 1.4-1
 - initial version
-

@@ -189,4 +189,3 @@ rm -rf *.egg-info
 
 * Tue Feb 25 2014 Orion Poplawski <orion@cora.nwra.com> - 0.2-1
 - Initial package
-

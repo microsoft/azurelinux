@@ -80,4 +80,3 @@ make test
 -   GA - Bump release of all rpms
 *   Wed Jan 13 2016 Anish Swaminathan <anishs@vmware.com> 0.48-1
 -   Initial version.
-

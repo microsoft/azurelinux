@@ -200,4 +200,3 @@ rm commons-vfs2/src/test/java/org/apache/commons/vfs2/provider/http/test/HttpPro
 * Mon Mar  4 2019 Fridrich Strba <fstrba@suse.com>
 - Intial packaging of apache-commons-vfs2 2.2
 - Generate and customize ant build system
-

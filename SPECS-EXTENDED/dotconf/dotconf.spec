@@ -183,4 +183,3 @@ mv ${RPM_BUILD_ROOT}%{_docdir}/%{name}/* __tmp_doc
 
 * Sun Feb 17 2008 Assim Deodia<assim.deodia@gmail.com> 1.0.13-1
 - Initial Commit
-

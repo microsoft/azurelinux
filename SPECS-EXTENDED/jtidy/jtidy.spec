@@ -183,4 +183,3 @@ EOF
 - 'fixed bnc#501764: removed clover.license from source tarball'
 * Thu May  7 2009 mvyskocil@suse.cz
 - Initial packaging of 8.0 in SUSE (from jpp 5.0)
-

@@ -61,4 +61,3 @@ find %{buildroot}/%{_libdir} -name '*.la' -delete
 
 * Mon Jan 22 2018 Xiaolin Li <xiaolinl@vmware.com> - 0.4-1
 - Initial build. First version
-

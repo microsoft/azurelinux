@@ -254,4 +254,3 @@ make check
 
 * Tue May 14 2019 Ankit Jain <ankitja@vmware.com> - 2019.3-1
 - Initial version of rpm-ostree
-

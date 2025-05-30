@@ -116,4 +116,3 @@ PYTHONPATH='%{buildroot}/%{python3_sitelib}'; export PYTHONPATH
 
 * Wed Nov 25 2020 Benjamin A. Beasley <code@musicinmybrain.net> - 1.1.0-1
 - Initial package
-

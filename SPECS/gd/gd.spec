@@ -591,4 +591,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - update to 1.3
 * Thu Feb  5 1998 ro@suse.de
 - ready for autobuild
-

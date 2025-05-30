@@ -86,4 +86,3 @@ make check
 
 * Fri Dec 16 2016 Dheeraj Shetty <dheerajs@vmware.com> 2.4.0-1
 - Initial build. First version
-

@@ -61,4 +61,3 @@ rm -rf %{buildroot}%{_infodir}
 
 * Wed Jan 23 2019 Dweep Advani <dadvani@vmware.com> 4.1-1
 - Added fping package to Photon 2.0
-

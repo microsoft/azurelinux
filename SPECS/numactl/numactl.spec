@@ -102,4 +102,3 @@ mv %{buildroot}%{_mandir}/man2/move_pages.2 %{buildroot}%{_mandir}/man2/numa-mov
 
 *  Mon Nov 18 2019 Alexey Makhalov <amakhalov@vmware.com> 2.0.13-1
 -  Initial build. First version
-

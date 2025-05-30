@@ -155,4 +155,3 @@ Related: #452321
 * Fri Jun 20 2008 Tom Lane <tgl@redhat.com> 1.6.2-1
 - Created package by stripping down postgresql specfile and adjusting
   to meet current packaging guidelines for Tcl extensions.
-

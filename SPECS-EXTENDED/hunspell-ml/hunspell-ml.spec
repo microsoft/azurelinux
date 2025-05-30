@@ -100,4 +100,3 @@ cp -p *.dic *.aff $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Thu May 15 2008 Rajeesh K Nambiar <rajeeshknambiar@gmail.com> - 0.1-1
 - Initial version
-

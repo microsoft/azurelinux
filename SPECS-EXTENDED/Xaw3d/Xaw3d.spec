@@ -388,4 +388,3 @@ rm -r $RPM_BUILD_ROOT%{_docdir}
 
 * Mon Jun 16 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
-

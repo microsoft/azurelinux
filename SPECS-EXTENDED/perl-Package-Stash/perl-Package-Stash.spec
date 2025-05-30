@@ -359,4 +359,3 @@ make test
 
 * Mon Jun  7 2010 Paul Howarth <paul@city-fan.org> - 0.03-1
 - Initial RPM version
-

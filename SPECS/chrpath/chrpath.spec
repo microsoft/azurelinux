@@ -44,4 +44,3 @@ rm -rf %{buildroot}/usr/doc
 -   Initial CBL-Mariner import from Photon (license: Apache2).
 *   Wed Apr 05 2017 Anish Swaminathan <anishs@vmware.com> 0.16-1
 -   Initial packaging
-

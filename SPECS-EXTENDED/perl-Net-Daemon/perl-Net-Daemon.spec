@@ -278,4 +278,3 @@ inheriting will safe you a lot of work anyways.
 - disabled tests which fail under mock
 * Fri Sep 26 2008 Petr Lautrbach <lautrba@redhat.com>
 - initial rpm release
-

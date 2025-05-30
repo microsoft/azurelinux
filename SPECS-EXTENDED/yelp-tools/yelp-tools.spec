@@ -218,4 +218,3 @@ make %{?_smp_mflags}
 
 * Thu Jun 16 2011 Zeeshan Ali <zeenix@redhat.com> 3.1.4-1
 - Initial release.
-

@@ -197,4 +197,3 @@ mv %{SOURCE1} ./LICENSE.txt
 
 * Wed Oct 10 2007 Andy Shevchenko <andy@smile.org.ua> 1.0.15-0.1.rc2
 - initial build
-

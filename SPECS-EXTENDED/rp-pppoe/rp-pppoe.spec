@@ -525,4 +525,3 @@ rm -rf %{buildroot}/etc/ppp/plugins
 
 * Wed May 31 2000 Than Ngo <than@redhat.de> 
 - adopted for Winston.
-

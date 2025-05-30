@@ -548,4 +548,3 @@ rm -f %{buildroot}/%{_libdir}/Tix%{tixmajor}/license.terms
 
 * Tue Jun 17 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
-

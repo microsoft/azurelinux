@@ -210,4 +210,3 @@ find $RPM_BUILD_ROOT -name '*.la' -delete
 
 * Thu Oct 15 2015 Kalev Lember <klember@redhat.com> - 0.1.0-1
 - Initial Fedora packaging (#1271944)
-

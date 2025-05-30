@@ -739,4 +739,3 @@ install -m 755 %{SOURCE5} %{buildroot}%{_libexecdir}/ypbind-post-waitbind
 
 * Mon Jul  3 2000 Florian La Roche <Florian.LaRoche@redhat.com>
 - switch from ypbind to ypbind-mt
-

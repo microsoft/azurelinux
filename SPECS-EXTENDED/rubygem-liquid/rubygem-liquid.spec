@@ -138,4 +138,3 @@ popd
 * Wed Dec 04 2013 Ken Dreyer <ktdreyer@ktdreyer.com> - 2.6.0-1
 - Initial package
 
-

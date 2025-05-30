@@ -110,4 +110,3 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
   String.join() which does not exist before java 8
 * Wed Oct 24 2018 Fridrich Strba <fstrba@suse.com>
 - Initial packaging built without maven, adapted from Fedora rpm
-

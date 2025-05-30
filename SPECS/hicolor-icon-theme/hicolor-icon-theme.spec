@@ -215,4 +215,3 @@ gtk-update-icon-cache --force %{_datadir}/icons/hicolor &>/dev/null || :
 
 * Fri Jan 16 2004 Alexander Larsson <alexl@redhat.com> 0.2-1
 - Initial build.
-

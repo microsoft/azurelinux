@@ -422,4 +422,3 @@ install -p -m0644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/fonts/conf.d/
 * Tue Oct 18 2005 Akira TAGOH <tagoh@redhat.com> - 0.3-1
 - Initial package.
 
-

@@ -350,4 +350,3 @@ rm -rf %{buildroot}/%{_libdir}/orc
 * Fri Oct 02 2009 Fabian Deutsch <fabian.deutsch@gmx.de> - 0.4.2-1
 - Initial release
 
-

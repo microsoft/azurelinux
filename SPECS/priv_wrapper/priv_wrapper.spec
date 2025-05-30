@@ -106,4 +106,3 @@ popd
 
 * Mon Oct 24 2022 Pavel Filipenský <pfilipen@redhat.com> -  1.0.0-1
 - Initial package
-

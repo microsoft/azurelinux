@@ -297,4 +297,3 @@ pip3 install pytest
 
 * Wed Nov 24 2004  <jrb@redhat.com> - 
 - Initial build.
-

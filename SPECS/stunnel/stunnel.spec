@@ -746,4 +746,3 @@ make test || (for i in tests/logs/*.log ; do echo "$i": ; cat "$i" ; done)
 
 * Sat Nov 28 1998 Damien Miller <dmiller@ilogic.com.au>
 - Initial RPMification
-

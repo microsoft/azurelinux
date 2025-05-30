@@ -190,4 +190,3 @@ rm -rf %{buildroot}/%{_docdir}/%{name}-%{version}
 
 * Tue Dec 2 2008 John A. Khvatov <ivaxer@fedoraproject.org> 0.1.2-4
 - Initial release
-

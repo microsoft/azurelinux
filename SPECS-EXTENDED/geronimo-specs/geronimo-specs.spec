@@ -884,4 +884,3 @@ install -m 0644 geronimo-ws-metadata_2.0_spec-1.1.1/pom.xml \
   - build dependency for log4j update [bnc#355798]
   - added a build support using ant
   - FIXME: the corba-3.0 package is not currently included
-

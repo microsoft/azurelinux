@@ -110,4 +110,3 @@ done
 
 * Thu Dec 07 2006 Caolan McNamara <caolanm@redhat.com> - 0.20050117-1
 - initial version
-

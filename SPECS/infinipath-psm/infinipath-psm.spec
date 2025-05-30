@@ -170,4 +170,3 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_udevrulesdir}/60-ipath.rules
 
 * Mon Apr 18 2016 Honggang Li <honli@redhat.com> - 3.3-22_g4abbc60_open.1
 - Import infinipath-psm for Fedora.
-

@@ -133,4 +133,3 @@ install -m 755 buildx "%{buildroot}%{_libexecdir}/docker/cli-plugins/docker-buil
 - Initial CBL-Mariner import from Azure.
 * Tue Mar 24 2020 Brian Goff <brgoff@microsoft.com>
 - Initial version
-

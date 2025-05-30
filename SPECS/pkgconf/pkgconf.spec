@@ -358,4 +358,3 @@ rm -rf %{buildroot}%{_datadir}/aclocal
 
 * Wed Aug 24 2016 Neal Gompa <ngompa13@gmail.com> - 1-1
 - Initial packaging
-

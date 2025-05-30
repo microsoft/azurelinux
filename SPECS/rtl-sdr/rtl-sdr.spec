@@ -177,4 +177,3 @@ exit 0
 
 * Wed Apr  3 2013 Jaroslav Škarvada <jskarvad@redhat.com> - 0-0.1.20130403git4a068f56
 - Initial version
-

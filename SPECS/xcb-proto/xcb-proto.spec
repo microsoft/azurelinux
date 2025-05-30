@@ -141,4 +141,3 @@ the protocol.
 
 * Fri Feb 15 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.8-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
-

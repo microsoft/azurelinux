@@ -268,4 +268,3 @@ rm -f $RPM_BUILD_ROOT/%{_libdir}/enchant/*.la
 
 * Sun Jul 13 2003 Dom Lachowicz <cinamod@hotmail.com>
 - Initial version
-

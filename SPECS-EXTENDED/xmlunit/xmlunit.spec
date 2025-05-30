@@ -176,4 +176,3 @@ install -m 644 %{SOURCE1} \
 - fix license to be in spdx.org format
 * Thu Nov  4 2010 mvyskocil@suse.cz
 - Initial SUSE packaging of xmlunit (xmlunit-1.0-6.jpp5.src.rpm)
-

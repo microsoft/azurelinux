@@ -144,4 +144,3 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 * Tue May 17 2011 Xavier Bachelot <xavier@bachelot.org> 2.0.5-1
 - Initial Fedora release.
-

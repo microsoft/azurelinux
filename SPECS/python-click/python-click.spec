@@ -210,4 +210,3 @@ pytest -v tests
 
 * Wed May 07 2014 Robert Kuska <rkuska@redhat.com> - 0.6-1
 - Initial package.
-

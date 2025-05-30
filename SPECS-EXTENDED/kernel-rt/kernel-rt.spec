@@ -1400,4 +1400,3 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 3.13.3-1
 - Initial build. First version
-

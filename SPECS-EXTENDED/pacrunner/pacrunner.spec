@@ -109,4 +109,3 @@ make install DESTDIR=$RPM_BUILD_ROOT testdir=%{_libexecdir}/pacrunner
 
 * Fri Jun 07 2013 David Woodhouse <David.Woodhouse@intel.com> - 0.6-1
 - Initial package
-

@@ -1768,4 +1768,3 @@ fi
 - first build against glibc
 - patched out the use of setresuid(), which is available only on kernels
   2.1.44 and later
-

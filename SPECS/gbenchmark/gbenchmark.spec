@@ -155,4 +155,3 @@ sed -e '/get_git_version/d' -e '/-Werror/d' -i CMakeLists.txt
 
 * Thu Oct 25 2018 Vitaly Zaitsev <vitaly@easycoding.org> - 1.4.1-1
 - Initial SPEC release.
-

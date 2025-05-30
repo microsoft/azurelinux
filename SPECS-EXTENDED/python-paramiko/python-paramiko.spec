@@ -736,4 +736,3 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest-%{python3_version}
 
 * Wed Apr 12 2006 Shahms E. King <shahms@shahms.com> 1.5.3-1
   - Initial package
-

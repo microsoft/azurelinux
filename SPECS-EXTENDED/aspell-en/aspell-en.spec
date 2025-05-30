@@ -188,4 +188,3 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 * Fri Jun 20 2003 Adrian Havill <havill@redhat.com> 0.51-5
 - first build for new aspell (0.50)
-

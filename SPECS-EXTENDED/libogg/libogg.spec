@@ -325,4 +325,3 @@ mv $RPM_BUILD_ROOT%{_docdir}/%{name} __installed_docs
 
 * Sat Sep 02 2000 Jack Moffitt <jack@icecast.org>
 - initial spec file created
-

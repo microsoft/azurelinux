@@ -1130,4 +1130,3 @@ make check
 
 * Fri Nov 18 2005 Ed Hill <ed@eh3.com> - 1.0-1
 - initial specfile created
-

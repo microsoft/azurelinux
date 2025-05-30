@@ -2187,4 +2187,3 @@ gtk-query-immodules-2.0-%{__isa_bits} --update-cache
   Trond Eivind Glomsrod <teg@pvv.ntnu.no>
   Michael K. Johnson <johnsonm@redhat.com>
   Otto Hammersmith <otto@redhat.com>
-

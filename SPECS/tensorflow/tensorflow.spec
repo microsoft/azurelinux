@@ -177,4 +177,3 @@ bazel --batch build  //tensorflow/tools/pip_package:build_pip_package
 * Thu Sep 22 2022 Riken Maharjan <rmaharjan@microsoft> - 2.8.3-1
 - License verified
 - Original version for CBL-Mariner
-

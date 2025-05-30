@@ -127,4 +127,3 @@ fi
 
 * Fri Oct 21 2016 Kalev Lember <klember@redhat.com> - 1.0-1
 - Initial Fedora packaging
-

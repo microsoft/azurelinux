@@ -66,4 +66,3 @@ make DESTDIR=%{buildroot} PREFIX=%{_prefix} install
 
 * Wed Feb 27 2019 Ankit Jain <ankitja@vmware.com> - 4.1-1
 - Initial version
-

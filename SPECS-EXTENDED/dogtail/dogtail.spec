@@ -318,4 +318,3 @@ desktop-file-install $RPM_BUILD_ROOT/%{_datadir}/applications/sniff.desktop \
 
 * Sat Oct  8 2005 Jeremy Katz <katzj@redhat.com> - 0.4.2-1
 - Initial build.
-

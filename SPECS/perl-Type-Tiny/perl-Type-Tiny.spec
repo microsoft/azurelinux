@@ -394,4 +394,3 @@ sed -i -e '/^inc\//d' MANIFEST
  
 * Fri Mar 21 2014 Ralf Corsépius <corsepiu@fedoraproject.org> - 0.040-1
 - Initial Fedora package.
-

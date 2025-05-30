@@ -176,4 +176,3 @@ mkdir -p %{buildroot}%{_sharedstatedir}/hiera
 
 * Thu May 03 2012 Matthaus Litteken <matthaus@puppetlabs.com> - 0.3.0.28-1
 - Initial Hiera Packaging. Upstream version 0.3.0.28
-

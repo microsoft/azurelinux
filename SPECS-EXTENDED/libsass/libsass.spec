@@ -127,4 +127,3 @@ find $RPM_BUILD_ROOT -name '*.la' -print -delete
 
 * Wed Sep 30 2015 Aurelien Bompard <abompard@fedoraproject.org> - 3.3.6-1
 - initial package
-

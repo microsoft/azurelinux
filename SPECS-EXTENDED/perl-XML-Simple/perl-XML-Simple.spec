@@ -271,4 +271,3 @@ make test
 
 * Wed Sep  3 2003 Ville Skyttä <ville.skytta at iki.fi> - 0:2.08-0.fdr.1
 - First build.
-

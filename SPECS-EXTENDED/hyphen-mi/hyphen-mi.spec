@@ -105,4 +105,3 @@ cp -p mi.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen/hyph_mi_NZ.dic
 
 * Wed Jan 09 2008 Caolan McNamara <caolanm@redhat.com> - 0.20080630-1
 - initial version
-

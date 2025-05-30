@@ -251,4 +251,3 @@ popd
 * Tue Jun 25 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.35.1-2
 - Original version for Azure Linux.
 - License verified.
-

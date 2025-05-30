@@ -153,4 +153,3 @@ rm %{buildroot}%{_sharedstatedir}/passim/data/*
 * Thu Aug 24 2023 Richard Hughes <richard@hughsie.com> - 0.1.0-1
 - Initial release
 
-

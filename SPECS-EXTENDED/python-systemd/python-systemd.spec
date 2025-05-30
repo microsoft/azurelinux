@@ -146,4 +146,3 @@ make PYTHON=%{__python3} check
 
 * Mon Jul  6 2015 Zbigniew Jędrzejewski-Szmek <zbyszek@laptop> - 230-1
 - Initial packaging
-

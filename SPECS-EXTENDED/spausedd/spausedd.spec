@@ -171,4 +171,3 @@ install -m 644 -p init/%{name}.service %{buildroot}/%{_unitdir}
 
 * Fri Feb 9 2018 Jan Friesse <jfriesse@redhat.com> - 20180209-1
 - Initial version
-

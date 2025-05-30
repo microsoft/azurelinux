@@ -274,4 +274,3 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/info/dir
 * Sat May 07 2011 Robert Scheck <robert@fedoraproject.org> 0.3-1
 - Upgrade to 0.3
 - Initial spec file for Fedora and Red Hat Enterprise Linux
-

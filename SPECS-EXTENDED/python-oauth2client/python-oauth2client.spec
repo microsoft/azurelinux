@@ -202,4 +202,3 @@ rm oauth2client/contrib/keyring_storage.py tests/contrib/test_keyring_storage.py
 - Remove the extra fonts from the -doc package
 * Thu Jun 04 2015 Michele Baldessari <michele@acksyn.org> - 1.4.11-1
 - Initial packaging
-

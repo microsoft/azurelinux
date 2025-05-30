@@ -245,4 +245,3 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}:MATGEN
 
 * Fri Jan 06 2012 Shakthi Kannan <shakthimaan [AT] fedoraproject dot org> 4.3-1
 - First release.
-

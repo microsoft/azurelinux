@@ -251,4 +251,3 @@ fi
 * Tue Sep 07 2004 Mark Johnson <mjohnson@redhat.com> 1.0-1
 - Initial release
 
-

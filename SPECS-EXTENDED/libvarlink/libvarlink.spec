@@ -193,4 +193,3 @@ Disable LTO
 * Fri Feb  2 2018 <kay@redhat.com>
 - libvarlink 1
 
-

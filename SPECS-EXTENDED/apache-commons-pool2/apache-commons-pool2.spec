@@ -165,4 +165,3 @@ export CLASSPATH=%(build-classpath cglib objectweb-asm/asm objectweb-asm/asm-tre
 
 * Thu Sep  2 2004 skh@suse.de
 - Initial package created with version 1.2 (JPackage 1.5)
-

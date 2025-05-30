@@ -57,4 +57,3 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 - License verified
 - Included descriptions from Fedora 36 spec (license: MIT).
 - Original version for CBL-Mariner
-

@@ -143,4 +143,3 @@ make %{?_smp_mflags} check
 
 *   Fri Jun 5 2015 Touseef Liaqat <tliaqat@vmware.com> 3.1.2-1
 -   Initial build.  First version
-

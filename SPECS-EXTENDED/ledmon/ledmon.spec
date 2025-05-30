@@ -155,4 +155,3 @@ make install INSTALL="%{__install} -p" DESTDIR=$RPM_BUILD_ROOT SBIN_DIR=$RPM_BUI
 
 * Fri Jan 07 2011 Jiri Moskovcak <jmoskovc@redhat.com> 0.1-1
 - initial release
-

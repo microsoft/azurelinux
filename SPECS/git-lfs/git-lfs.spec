@@ -148,4 +148,3 @@ git lfs uninstall
 
 *   Fri Sep 18 2020 Him Kalyan Bordoloi <bordoloih@vmware.com>  2.12.0-1
 -   Initial release.
-

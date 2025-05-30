@@ -166,4 +166,3 @@ rm -vrf *.egg-info
 
 * Wed May  1 2013 Michel Salim <salimma@fedoraproject.org> - 0.0.3-1
 - Initial package
-

@@ -128,4 +128,3 @@ chmod a-x include/spirv/1.2/spirv.py
 * Thu Jul 13 2017 Leigh Scott <leigh123linux@googlemail.com> - 1.2-0.1.20171015.git0610978
 - First build
 
-

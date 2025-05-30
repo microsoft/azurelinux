@@ -227,4 +227,3 @@ cp -pr %{archive_folder}/doc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 
 * Tue Oct  6 2009 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.0.9.2-1
 - Initial support
-

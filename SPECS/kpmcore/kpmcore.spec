@@ -188,4 +188,3 @@ developing applications that use %{name}
 
 * Sun Nov 22 2015 Mattia Verga <mattia.verga@tiscali.it> - 1.9.50-1
 - Initial release
-

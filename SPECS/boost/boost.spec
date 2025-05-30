@@ -168,4 +168,3 @@ rm -rf %{buildroot}%{_libdir}/cmake
 
 * Tue Feb 10 2015 Divya Thaluru <dthaluru@vmware.com> - 1.56.0-1
 - Initial build. First version
-

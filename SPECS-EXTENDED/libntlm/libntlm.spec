@@ -166,4 +166,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Wed Jun 20 2007 Nikolay Vladimirov <nikolay@vladimiroff.com> - 0.3.13-1
 - initial release
-

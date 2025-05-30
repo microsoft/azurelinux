@@ -111,4 +111,3 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 * Mon Jul 12 2021 Henry Li <lihl@microsoft.com> - 1.4.0-1
 - Original version for CBL-Mariner.
 - License Verified.
-

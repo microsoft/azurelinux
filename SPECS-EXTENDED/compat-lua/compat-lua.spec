@@ -164,4 +164,3 @@ mv $RPM_BUILD_ROOT%{_libdir}/pkgconfig/lua.pc \
   ported to 5.2
 - Release fields start at 5 to be newer the compat-lua-libs from the
   non-compat lua package
-

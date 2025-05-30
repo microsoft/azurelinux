@@ -161,4 +161,3 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 - fixed a wrong end of line encoding
 * Thu Mar 13 2008 mvyskocil@suse.cz
 - Initial package created with version 1.3.2 (JPackage 1.7)
-

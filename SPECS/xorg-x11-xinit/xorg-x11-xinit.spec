@@ -256,4 +256,3 @@ install -p -m 755 %{SOURCE19} %{buildroot}%{_libexecdir}
 
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.9-20
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
-

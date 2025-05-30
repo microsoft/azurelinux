@@ -144,4 +144,3 @@ make test
 
 * Tue Sep 08 2015 Petr Šabata <contyk@redhat.com> 0.008-1
 - Initial packaging
-

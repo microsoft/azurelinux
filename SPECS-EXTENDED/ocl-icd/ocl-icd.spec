@@ -168,4 +168,3 @@ make check
 
 * Fri Mar 08 2013 Rob Clark <rclark@redhat.com> 2.0.2-1
 - ocl-icd 2.0.2
-

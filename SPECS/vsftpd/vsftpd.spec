@@ -113,4 +113,3 @@ fi
 -   Fix for upgrade issues
 *   Mon Jul 6 2015 Alexey Makhalov <amakhalov@vmware.com> 3.0.2-1
 -   initial version
-

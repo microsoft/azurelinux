@@ -189,4 +189,3 @@ Fixes: rhbz#2033200
 
 * Thu Jun 05 2014 Matej Stuchlik <mstuchli@redhat.com> - 0.1.9-1
 - Initial spec
-

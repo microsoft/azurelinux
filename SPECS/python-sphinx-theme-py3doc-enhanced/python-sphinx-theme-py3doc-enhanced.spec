@@ -110,4 +110,3 @@ BuildArch:      noarch
 
 * Wed Aug 17 2016 Julien Enselme <jujens@jujens.eu> - 2.3.2-1
 - Initial packaging
-

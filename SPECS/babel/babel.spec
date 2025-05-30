@@ -107,4 +107,3 @@ pip3 install freezegun funcsigs pathlib2 utils iniconfig
 
 * Tue Apr 25 2017 Dheeraj Shetty <dheerajs@vmware.com> - 2.4.0-1
 - Initial
-

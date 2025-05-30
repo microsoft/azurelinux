@@ -245,4 +245,3 @@ make test
 * Thu Jul 14 2005 Andreas Thienemann <andreas@bawue.net> - 2.14-1
 - Initial package
 
-

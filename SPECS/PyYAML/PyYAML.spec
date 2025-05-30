@@ -109,4 +109,3 @@ chmod a-x examples/yaml-highlight/yaml_hl.py
 
 * Wed Mar 04 2015 Mahmoud Bassiouny <mbassiouny@vmware.com>
 - Initial packaging for Photon
-

@@ -184,4 +184,3 @@ needed for developing Hyperscan applications.
 
 * Fri Jul 1 2016 Jason Ish <ish@unx.ca> - 4.2.0-1
 - Initial package of Hyperscan.
-

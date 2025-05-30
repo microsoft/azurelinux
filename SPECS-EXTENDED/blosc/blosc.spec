@@ -267,4 +267,3 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
 
 * Fri Mar 22 2013 Thibault North <tnorth@fedoraproject.org> - 1.1.6-1
 - Initial package
-

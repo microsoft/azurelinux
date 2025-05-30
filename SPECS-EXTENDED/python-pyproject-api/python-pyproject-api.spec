@@ -122,4 +122,3 @@ Resolves: rhbz#2125780
 * Mon Feb 07 2022 Lumír Balhar <lbalhar@redhat.com> - 0.1.1-1
 - Initial package
 
-

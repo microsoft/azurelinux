@@ -177,4 +177,3 @@ rm -rf requests_ftp.egg-info
 
 * Thu Mar 12 2015 David Shea <dshea@redhat.com> - 0.2.0-1
 - Initial package
-

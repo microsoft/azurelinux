@@ -213,4 +213,3 @@ chmod -x %{buildroot}%{_libdir}/ocaml/%{libname}/opam
 
 * Tue Aug  1 2017 Ben Rosser <rosser.bjr@gmail.com> 1.0.0-1.20170801git8c4bc23
 - Initial package.
-

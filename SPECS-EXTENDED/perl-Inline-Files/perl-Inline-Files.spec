@@ -190,4 +190,3 @@ make test
 
 * Wed Oct 24 2007 Robin Norwood <rnorwood@redhat.com> - 0.62-1
 - Initial build
-

@@ -147,4 +147,3 @@ make test
 
 * Sun Mar 31 2013 Paul Howarth <paul@city-fan.org> - 0.007-1
 - Initial RPM version
-

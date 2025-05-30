@@ -69,4 +69,3 @@ make check
 -       Updated to version 0.99.8
 *       Mon Apr 17 2017 Siju Maliakkal <smaliakkal@vmware.com>  0.99.4-1
 -       Initial version
-

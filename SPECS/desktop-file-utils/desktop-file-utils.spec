@@ -393,4 +393,3 @@ update-desktop-database &> /dev/null || :
 
 * Thu May  9 2002 Havoc Pennington <hp@redhat.com>
 - initial build
-

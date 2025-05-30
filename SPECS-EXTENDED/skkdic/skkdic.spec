@@ -280,4 +280,3 @@ popd
 
 * Tue Sep  5 2000 SATO Satoru <ssato@redhat.com>
 - Initial release
-

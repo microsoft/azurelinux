@@ -108,4 +108,3 @@ rm -vrf %{buildroot}%{_datadir}/vim/registry
 * Fri Feb 05 2021 Thomas Crain <thcrain@microsoft.com> - 1.50-1
 - Original version for CBL-Mariner (license: MIT)
 - License verified
-

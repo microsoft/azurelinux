@@ -110,4 +110,3 @@ cp -p hyph_grc_GR.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen
 
 * Wed Oct 14 2009 Caolán McNamara <caolanm@redhat.com> - 0.20080616-1
 - initial version
-

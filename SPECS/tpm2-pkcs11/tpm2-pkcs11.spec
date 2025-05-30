@@ -120,4 +120,3 @@ python3 setup.py test
 - openssl 3.0.0 compatibility
 * Sun Aug 8 2021 Vamsi Krishna Brahmajosyula <vbrahmajosyula@vmware.com> 1.6.0-1
 - Initial build. First version
-

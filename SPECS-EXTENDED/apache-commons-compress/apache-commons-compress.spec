@@ -182,4 +182,3 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 - use saxon and saxon-scripts only when using maven
 * Thu May 14 2009 mvyskocil@suse.cz
 - 'Initial SUSE packaging from jpackage.org 5.0'
-

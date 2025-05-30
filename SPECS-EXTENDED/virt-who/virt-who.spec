@@ -724,4 +724,3 @@ fi
 
 * Wed Aug 10 2011 Radek Novacek <rnovacek@redhat.com> - 0.1-1
 - initial import
-

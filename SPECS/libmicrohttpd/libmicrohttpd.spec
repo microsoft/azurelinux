@@ -410,4 +410,3 @@ fi
 
 * Tue Aug 5 2008 Erik van Pienbroek <info@nntpgrab.nl> - 0.3.1-1
 - Initial release
-

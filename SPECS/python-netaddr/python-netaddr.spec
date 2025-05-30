@@ -127,4 +127,3 @@ pip3 install iniconfig
 
 * Fri Feb 03 2017 Vinay Kulkarni <kulkarniv@vmware.com> - 0.7.19-1
 - Initial version of python-netaddr package for Photon.
-

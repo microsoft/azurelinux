@@ -332,4 +332,3 @@ development of programs using %{name}.
 
 * Tue Nov 15 2005 John (J5) Palmieri <johnp@redhat.com> - 0.0.2-1
 - inital build
-

@@ -199,4 +199,3 @@ make test -C %{_target_platform}
 
 * Mon Mar 17 2014 prusnak@opensuse.org
 - created package (based on a Fedora package by Thomas Sailer)
-

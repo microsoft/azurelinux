@@ -299,4 +299,3 @@ rm -f %{buildroot}%{_libdir}/*.la
 
 * Thu Jun 21 2007 David Walluck <walluck@mandriva.org> 0:2.2.1-1mdv2008.0
 - release
-

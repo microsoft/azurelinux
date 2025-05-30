@@ -60,4 +60,3 @@ cd build
 - Initial SPEC
 - Initial CBL-Mariner import from Azure (license: MIT).
 - License verified.
-

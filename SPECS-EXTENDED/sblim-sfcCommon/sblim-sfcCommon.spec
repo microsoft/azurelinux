@@ -107,4 +107,3 @@ rm -f %{buildroot}/%{_libdir}/libsfcUtil.la
 - Initial support
 - Fix -devel requires
 - Fix Summary and URL
-

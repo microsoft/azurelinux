@@ -92,4 +92,3 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest -v tests
 
 * Sun May 17 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.4.1-1
 - Initial package for Fedora
-

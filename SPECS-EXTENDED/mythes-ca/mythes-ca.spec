@@ -114,4 +114,3 @@ popd
 
 * Fri Feb 06 2009 Caolán McNamara <caolanm@redhat.com> - 0.5.1-0.1.beta
 - initial version
-

@@ -161,4 +161,3 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/pkgconfig/icon-naming-utils-uninstalled.pc
 
 * Tue Jan 17 2006 Matthias Clasen <mclasen@redhat.com> - 0.6.5-1
 - Initial import
-

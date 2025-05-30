@@ -207,4 +207,3 @@ make test
 * Sat Apr 18 2009 Chris Weyl <cweyl@alumni.drew.edu> 0.15-0
 - initial RPM packaging
 - generated with cpan2dist (CPANPLUS::Dist::RPM version 0.0.8)
-

@@ -386,4 +386,3 @@ find %{buildroot} -type f -name '*.bs' -size 0 -delete
 * Tue Jan 04 2011 Petr Pisar <ppisar@redhat.com> 5.25-1
 - 5.25 import
 - Disable perl(EV) support as it's not packaged yet
-

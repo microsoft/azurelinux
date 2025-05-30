@@ -410,4 +410,3 @@ chmod 644 AUTHORS ChangeLog COPYING NEWS README THANKS TODO
 
 * Fri Jul 18 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
-

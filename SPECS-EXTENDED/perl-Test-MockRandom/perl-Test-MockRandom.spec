@@ -91,4 +91,3 @@ make test
 
 * Fri Aug 12 2016 Jitka Plesnikova <jplesnik@redhat.com> - 1.01-1
 - Initial release
-

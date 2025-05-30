@@ -64,4 +64,3 @@ PATH=%{buildroot}%{_bindir}:${PATH} \
 
 * Mon Apr 03 2017 Sarah Choi <sarahc@vmware.com> - 1.4.3-1
 - Create appdirs 1.4.3
-

@@ -109,4 +109,3 @@ DESTDIR=%{buildroot}/ ninja install
 
 * Mon Jul 16 2018 Chris King <bunnyapocalypse@fedoraproject.org> - 0.1-1
 - Initial RPM package
-

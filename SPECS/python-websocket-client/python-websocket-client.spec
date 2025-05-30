@@ -95,4 +95,3 @@ pytest3 -vv websocket/tests -k "not echo-server"
 
 * Sun Jun 04 2017 Vinay Kulkarni <kulkarniv@vmware.com> - 0.7.0-1
 - Initial version of python WebSocket for PhotonOS.
-

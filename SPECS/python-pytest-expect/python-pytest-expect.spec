@@ -77,4 +77,3 @@ cp -p %{SOURCE1} .
 
 * Mon Aug 20 2018 Miro Hrončok <mhroncok@redhat.com> - 1.1.0-1
 - Initial package
-

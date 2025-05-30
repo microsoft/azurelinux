@@ -104,4 +104,3 @@ developing applications that use %{name}.
 
 * Thu Jan  2 2020 Jerry James <loganjerry@gmail.com> - 0.13.0-1
 - Initial RPM
-

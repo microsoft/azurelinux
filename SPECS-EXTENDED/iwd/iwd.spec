@@ -184,4 +184,3 @@ mkdir -p %{buildroot}%{_sharedstatedir}/ead
 
 * Sun Oct 22 2017 Lubomir Rintel <lkundrak@v3.sk> - 0.0-0.1.20171022git2c56501
 - Initial packaging
-

@@ -1219,4 +1219,3 @@ fi
 
 * Fri Jun  9 2006 Radek Vokal <rvokal@redhat.com> 0.99.1pre1-1
 - initial build for Fedora Core
-

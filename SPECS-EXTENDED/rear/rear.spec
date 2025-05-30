@@ -142,4 +142,3 @@ echo "30 1 * * * root /usr/sbin/rear checklayout || /usr/sbin/rear mkrescue" >re
 * Thu Jul 30 2015 Johannes Meixner <jsmeix@suse.de>
 - For a changelog see the rear-release-notes.txt file.
 
-

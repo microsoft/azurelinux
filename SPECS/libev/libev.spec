@@ -289,4 +289,3 @@ install -p -m 0644 Changes ev.pod LICENSE README %{inst_srcdir}
 
 * Mon Aug 04 2008 Michal Nowak <mnowak@redhat.com> - 3.43-1
 - initial package
-

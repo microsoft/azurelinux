@@ -101,4 +101,3 @@ rm -rf %{buildroot}%{_sysconfdir}/{init.d,rc.d}
 
 * Thu Jul 06 2017 Xiaolin Li <xiaolinl@vmware.com> - 5.1.3-1
 - Initial build. First version
-

@@ -228,4 +228,3 @@ install -m 0644 wpg2*.1 %{buildroot}/%{_mandir}/man1
 
 * Tue Jan 6 2009 Lubomir Rintel <lkundrak@v3.sk> - 0.1.3-1
 - Initial packaging
-

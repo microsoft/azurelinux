@@ -97,4 +97,3 @@ python3 setup.py test
 
 *   Wed Sep 21 2016 Xiaolin Li <xiaolinl@vmware.com> 2.1.1.0-1
 -   Initial build. First version
-

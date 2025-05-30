@@ -232,4 +232,3 @@ fi
 
 * Mon May 08 2017 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 3.10-1
 - Initial build. First version
-

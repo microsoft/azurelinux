@@ -198,4 +198,3 @@ rm -rf %{buildroot}/%{_libdir}/lib%{name}.la
 
 * Wed Sep 21 2016 Nathaniel McCallum <npmccallum@redhat.com> - 3-1
 - Initial package
-

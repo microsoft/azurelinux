@@ -141,4 +141,3 @@ pip3 install iniconfig==2.0.0
 
 * Tue Jul 26 2022 Jerry James <loganjerry@gmail.com> - 0.6.1-1
 - Initial RPM, obsoleting python-pep621
-

@@ -185,4 +185,3 @@ make DESTDIR="$RPM_BUILD_ROOT" install
 - Initial Red Hat RPM package.
 
 
-

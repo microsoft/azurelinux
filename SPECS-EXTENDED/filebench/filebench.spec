@@ -132,4 +132,3 @@ install -m 644 -p %{SOURCE2} $RPM_BUILD_ROOT%{_mandir}/man1
 
 * Sun Apr 10 2011 Hushan Jia <hjia@redhat.com> 0.8-1
 - initial package
-

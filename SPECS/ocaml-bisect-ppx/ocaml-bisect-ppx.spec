@@ -209,4 +209,3 @@ find %{buildroot}%{_libdir}/ocaml -name \*.ml -delete
 
 * Wed Jan  8 2020 Jerry James <loganjerry@gmail.com> - 1.4.1-1.20200106.b2661bf
 - Initial RPM
-

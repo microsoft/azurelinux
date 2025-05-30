@@ -110,4 +110,3 @@ cp -pr build/javadoc/* %{buildroot}%{_javadocdir}/%{name}/
 - Actually say what's included.
 * Fri Oct 26 2018 Fridrich Strba <fstrba@suse.com>
 - Initial packaging of aopalliance adapted from Fedora package
-

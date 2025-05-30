@@ -104,4 +104,3 @@ cp -p kk_KZ.* $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Mon Apr 20 2009 Caolan McNamara <caolanm@redhat.com> - 1.0-1
 - initial version
-

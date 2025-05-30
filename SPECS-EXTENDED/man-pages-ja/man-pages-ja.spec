@@ -755,4 +755,3 @@ done
 
 * Sun Jun 11 2000 Trond Eivind Glomsrød <teg@redhat.com>
 - first build
-

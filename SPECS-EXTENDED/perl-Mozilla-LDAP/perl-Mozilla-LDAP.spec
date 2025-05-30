@@ -248,4 +248,3 @@ make test
 * Tue Feb  7 2006 Rich Megginson <richm@stanfordalumni.org> - 1.5-1
 - Based on the perl-LDAP.spec file
 
-

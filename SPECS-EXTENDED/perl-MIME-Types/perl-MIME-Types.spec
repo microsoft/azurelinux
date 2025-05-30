@@ -431,4 +431,3 @@ make test TEST_FILES="xt/*.t"
 
 * Tue Jun 24 2003 Ville Skyttä <ville.skytta at iki.fi> - 0:1.06-0.fdr.1
 - First build.
-

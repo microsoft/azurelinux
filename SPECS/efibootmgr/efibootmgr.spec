@@ -56,4 +56,3 @@ gzip -9 %{buildroot}%{_mandir}/man8/efibootdump.8
 -   GA - Bump release of all rpms
 *   Mon Jul 6 2015 Sharath George <sharathg@vmware.com> 0.12-1
 -   Initial build. First version. Install steps from spec file in source.
-

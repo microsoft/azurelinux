@@ -210,4 +210,3 @@ LD_LIBRARY_PATH=../../src/.libs make -C bindings/perl test
 
 * Tue Mar 09 2010 Lubomir Rintel <lkundrak@v3.sk> - 1.3.4-1
 - Initial packaging
-

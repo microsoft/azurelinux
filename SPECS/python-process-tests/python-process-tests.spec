@@ -113,4 +113,3 @@ Tools for testing processes for Python 3.
 
 * Wed Jul 29 2015 Orion Poplawski <orion@cora.nwra.com> - 1.0.0-1
 - Initial package
-

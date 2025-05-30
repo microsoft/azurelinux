@@ -192,4 +192,3 @@ Summary:        Documentation for %{name}
 
 * Fri Oct 23 2015 Juan Orti Alcaine <jorti@fedoraproject.org> - 0.5.3-1
 - Initial package
-

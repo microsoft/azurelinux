@@ -93,4 +93,3 @@ cp -p dictionaries/ht_HT.* $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Mon Nov 16 2009 Caolan McNamara <caolanm@redhat.com> - 0.02-1
 - initial version
-

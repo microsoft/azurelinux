@@ -99,4 +99,3 @@ of the X.Org software distribution.
 
 * Fri Apr 13 2012 vuntz@opensuse.org
 - Split xcursor-themes from xorg-x11. Initial version: 1.0.3.
-

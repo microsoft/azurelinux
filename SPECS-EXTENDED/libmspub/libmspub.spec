@@ -261,4 +261,3 @@ install -m 0644 pub2*.1 %{buildroot}/%{_mandir}/man1
 
 * Thu Jun 07 2012 David Tardon <dtardon@redhat.com> 0.0.0-1
 - initial import
-

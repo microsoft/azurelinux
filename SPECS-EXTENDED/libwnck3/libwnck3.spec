@@ -271,4 +271,3 @@ developing applications that use %{name}.
 
 * Wed Feb 02 2011 Ray Strode <rstrode@redhat.com> 2.91.6-1
 - Initial import.
-

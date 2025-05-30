@@ -108,4 +108,3 @@ export LC_CTYPE=C.utf8
 
 *   Wed May 15 2019 Ankit Jain <ankitja@vmware.com> 2.4.0-1
 -   Initial build. First version
-

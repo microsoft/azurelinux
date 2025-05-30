@@ -834,4 +834,3 @@ fi
 
 * Wed Jun  4 2008 Akira TAGOH <tagoh@redhat.com> - 0.100.0-1
 - Initial package.
-

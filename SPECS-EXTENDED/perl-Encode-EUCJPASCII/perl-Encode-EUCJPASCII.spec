@@ -144,4 +144,3 @@ make test
 
 * Tue Nov 29 2011 Xavier Bachelot <xavier@bachelot.org> 0.03-1
 - Initial Fedora release.
-

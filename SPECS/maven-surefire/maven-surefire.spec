@@ -515,4 +515,3 @@ find -name *.java -exec sed -i -e s/org.apache.maven.surefire.shared.utils/org.a
 
 * Mon Jun 19 2006 Deepak Bhole <dbhole@redhat.com> - 0:1.5.3-1jpp
 - Initial build
-

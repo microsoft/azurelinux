@@ -213,4 +213,3 @@ rm -rf __docs_staging/latex
 
 * Fri Jun 03 2005 Thomas Vander Stichele <thomas at apestaart dot org>
 - 0.9.1-1: initial package
-

@@ -254,4 +254,3 @@ make test
 - Add BuildRequires covered by perl package
 - Distribute examples
 - Install into perl core (i.e. do not use vendor paths)
-

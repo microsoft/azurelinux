@@ -295,4 +295,3 @@ PERL5LIB=%{buildroot}%{perl_vendorlib} ./iptab
 
 * Wed Jul 16 2003 Ville Skyttä <ville.skytta at iki.fi> - 0:1.20-0.fdr.1
 - First build.
-

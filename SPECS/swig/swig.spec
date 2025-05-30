@@ -108,4 +108,3 @@ ln -fs ../../bin/ccache-swig %{buildroot}%{_libdir}/ccache/swig
 
 * Thu Feb 26 2015 Divya Thaluru <dthaluru@vmware.com> 3.0.5-1
 - Initial version
-

@@ -337,4 +337,3 @@ make test
 - Substitute literal "©" for E<169> in pod documentation.  (The result
   should be the same, but apparently the man page conversion is generating
   something that rpmlint doesn't like.)
-

@@ -182,4 +182,3 @@ popd
 
 * Mon Nov 10 2014 Slavek Kabrda <bkabrda@redhat.com> - 0.8.0-1
 - Unretire the package, create a fresh specfile
-

@@ -371,4 +371,3 @@ find docdir -type f -print0 | xargs -0 chmod -x
 
 * Fri Jun 13 2003 Dag Wieers <dag@wieers.com> - 0.61-0
 - Initial package. (using DAR)
-

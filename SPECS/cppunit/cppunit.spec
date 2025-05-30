@@ -80,4 +80,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Sun Mar 26 2017 Vinay Kulkarni <kulkarniv@vmware.com> - 1.12.1-1
 - Initial version of cppunit for Photon.
-

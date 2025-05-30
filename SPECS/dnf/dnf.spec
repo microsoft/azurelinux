@@ -2268,4 +2268,3 @@ popd
 - refactor: Move MockBase methods to BaseStubMixin. (Radek Holy)
 - refactor: Move repo-pkgs info to a standalone class instead of reusing the InfoCommand. (Radek Holy)
 - refactor: Move InfoCommand._print_packages to BaseCli.output_packages. (Radek Holy)
-

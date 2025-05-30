@@ -171,4 +171,3 @@ python3 -m pytest -v
 
 * Sun Apr 14 2013 Matěj Cepl <mcepl@redhat.com> 0.2.1-1
 - initial package for Fedora
-

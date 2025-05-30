@@ -145,4 +145,3 @@ install -D -p -m 755 sparsify %{buildroot}%{_sbindir}/sparsify
 
 * Wed May 13 2009 R P Herrold <info@owlriver.com> - 1.0.1-1
 - initial packaging
-

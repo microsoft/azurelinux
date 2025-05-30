@@ -105,4 +105,3 @@ install -p -m 644 examples/{b,w}tmp %{buildroot}%{_sysconfdir}/logrotate.d/
 
 * Wed Jun 24 2015 Divya Thaluru <dthaluru@vmware.com> 3.9.1-1
 - Initial build. First version
-

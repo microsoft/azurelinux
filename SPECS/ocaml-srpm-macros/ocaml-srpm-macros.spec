@@ -132,4 +132,3 @@ install -m 0644 %{SOURCE0} %{buildroot}%{_rpmmacrodir}/macros.ocaml-srpm
 
 * Tue Apr 22 2014 Richard W.M. Jones <rjones@redhat.com> - 1-1
 - New package.
-

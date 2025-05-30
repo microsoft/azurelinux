@@ -249,4 +249,3 @@ Resolves: rhbz#1983151
 
 * Tue May  9 2006 Paul P Komkoff Jr <i@stingr.net> - 2.2-1
 - Fedora Extras submission
-

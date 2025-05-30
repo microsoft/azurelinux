@@ -2057,4 +2057,3 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 
 * Fri Apr 14 2017 Dan Walsh <dwalsh@redhat.com> 0.0.1-1.git7a0a5333
 - First package for Fedora
-

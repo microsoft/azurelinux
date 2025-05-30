@@ -189,4 +189,3 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 * Sat Dec 13 2008 Andrea Musuruane <musuruan@gmail.com> - 0.6.0-1
 - First release for Fedora
 
-

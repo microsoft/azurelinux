@@ -305,4 +305,3 @@ fi
 
 * Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> - 2.1.2-1
 - Initial build. First version
-

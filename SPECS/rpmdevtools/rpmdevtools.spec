@@ -711,4 +711,3 @@ $check_ok
 - Install check-* to %%{_prefix}/lib/rpm instead of %%{_libdir}/rpm (bug 2351).
 - Check both %%{_prefix}/lib and %%{_prefix}/lib64 in the xemacs trigger.
 - Update rpminfo to 2004-07-07-01 and include it in the tarball.
-

@@ -281,4 +281,3 @@ applications that use the ATF POSIX shell bindings.
 
 * Thu May 3 2012 Julio Merino <jmmv@julipedia.org> 0.15-1
 - Initial release for Fedora.
-

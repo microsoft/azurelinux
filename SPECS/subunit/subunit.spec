@@ -518,4 +518,3 @@ Resolves: rhbz#1233581
 
 * Fri Feb 14 2014 Jerry James <loganjerry@gmail.com> - 0.0.18-1
 - Initial RPM
-

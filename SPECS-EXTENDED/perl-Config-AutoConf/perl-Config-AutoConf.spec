@@ -159,4 +159,3 @@ a command, a library and similar.
 
 * Thu Nov 06 2014 Petr Šabata <contyk@redhat.com> 0.305-1
 - Initial packaging
-

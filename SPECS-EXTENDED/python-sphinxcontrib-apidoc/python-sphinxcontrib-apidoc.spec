@@ -164,4 +164,3 @@ rm -rf %{pypi_name}.egg-info
 
 * Tue Apr 10 2018 Chandan Kumar <chkumar246@gmail.com> - 0.2.1-1
 - Initial package.
-

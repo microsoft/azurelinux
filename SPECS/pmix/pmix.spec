@@ -233,4 +233,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Tue Sep  1 2015 Orion Poplawski <orion@cora.nwra.com> - 1.0.0-1
 - Initial version
-

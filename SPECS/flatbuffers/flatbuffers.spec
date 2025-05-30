@@ -162,4 +162,3 @@ popd
 
 * Mon Mar 30 2015 Daniel Vrátil <dvratil@redhat.com> - 1.0.3-1
 - Initial version (abandoned at #1207208)
-

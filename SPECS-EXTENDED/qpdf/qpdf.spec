@@ -365,4 +365,3 @@ make check
 
 * Wed Aug 15 2012 Jiri Popelka <jpopelka@redhat.com> 3.0.1-1
 - initial spec file
-

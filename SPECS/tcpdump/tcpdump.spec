@@ -108,4 +108,3 @@ make %{?_smp_mflags} check
 
 * Mon Apr 6  2015 Mahmoud Bassiouny <mbassiouny@vmware.com> - 4.7.3-1
 - Updating version to 4.7.3
-

@@ -148,4 +148,3 @@ make test
 
 * Wed Dec 19 2007 Tom "spot" Callaway <tcallawa@redhat.com> - 1.002-1
 - Initial package for Fedora
-

@@ -469,4 +469,3 @@ ln -s mtools.5.gz %{buildroot}%{_mandir}/man5/mtools.conf.5.gz
 
 * Mon Apr 14 1997 Michael Fulbright <msf@redhat.com>
 - Updated to 3.6
-

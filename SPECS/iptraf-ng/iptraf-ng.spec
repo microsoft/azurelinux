@@ -188,4 +188,3 @@ install -d -m 0755 %{buildroot}/run/%{name}/
 
 * Tue Jan 11 2011 Nikola Pajkovsky <npajkovs@redhat.com> - 1.1.0-1
 - Initialization build
-

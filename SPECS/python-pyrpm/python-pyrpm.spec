@@ -41,4 +41,3 @@ cp -r pyrpm %{buildroot}/%{python3_sitelib}/
 * Tue Aug 15 2023 Andy Zaugg <azaugg@linkedin.com> - 0.14.1-1
 - Original version for CBL-Mariner
 - License verified
-

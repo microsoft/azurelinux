@@ -182,4 +182,3 @@ ln -s %{_bindir}/javacc %{buildroot}%{_bindir}/javacc.sh
 - add norootforbuild
 * Fri Feb 18 2005 skh@suse.de
 - initial package
-

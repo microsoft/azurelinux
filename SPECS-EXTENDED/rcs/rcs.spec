@@ -289,4 +289,3 @@ make check XFAIL_TESTS="`tests/known-failures %{version}`"
 
 * Fri Jul 18 1997 Erik Troan <ewt@redhat.com>
 -built against glibc
-

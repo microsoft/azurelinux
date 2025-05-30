@@ -1117,4 +1117,3 @@ popd
 
 * Fri Sep 24 2004 Than Ngo <than@redhat.com> 4.1-1
 - update to 4.1
-

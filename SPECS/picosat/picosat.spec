@@ -235,4 +235,3 @@ cp -p %{SOURCE1} %{SOURCE2} %{SOURCE3}  %{buildroot}%{_mandir}/man1
 
 * Wed Sep  2 2009 Jerry James <loganjerry@gmail.com> - 913-1
 - Initial RPM
-

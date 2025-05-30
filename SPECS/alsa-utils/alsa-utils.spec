@@ -66,4 +66,3 @@ alsactl -L store
 - Initial CBL-Mariner import from Photon (license: Apache2).
 * Mon Dec 10 2018 Alexey Makhalov <amakhalov@vmware.com> 1.1.7-1
 - initial version, moved from Vivace
-

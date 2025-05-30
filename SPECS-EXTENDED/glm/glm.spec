@@ -335,4 +335,3 @@ rm -rf $RPM_BUILD_ROOT%{_includedir}/%{name}/{CMakeFiles,libglm_shared.so}
 
 * Sun Feb 05 2012 Joonas Sarajärvi <muep@iki.fi> - 0.9.3.1-1
 - Initial RPM packaging
-

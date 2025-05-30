@@ -172,4 +172,3 @@ ruby ./test/unit/suite.rb
 
 * Sun Jun 14 2009 Jan Klepek <jan.klepekat, gmail.com> - 0.8.312-1
 - Initial package
-

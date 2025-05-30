@@ -167,4 +167,3 @@ cp -r %{name}-tools/target/site/apidocs %{buildroot}%{_javadocdir}/%{name}/%{nam
 - Cleanup a bit. Use MIT license as rh does.
 * Thu Jul 14 2011 bmaryniuk@novell.com
 - Packaged for the SUSE Linux.
-

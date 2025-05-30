@@ -247,4 +247,3 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 
 * Tue Nov 25 2014 Divya Thaluru <dthaluru@vmware.com> - 3.0.2-1
 - Initial build. First version
-

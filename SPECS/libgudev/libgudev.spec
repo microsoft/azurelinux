@@ -101,4 +101,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Tue Aug 11 2015 Vinay Kulkarni <kulkarniv@vmware.com> - 230-1
 - Add libgudev v230
-

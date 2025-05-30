@@ -418,4 +418,3 @@ fi
 
 * Fri Feb 27 2009 David Lutterkort <lutter@redhat.com> - 0.0.1-1
 - Initial specfile
-

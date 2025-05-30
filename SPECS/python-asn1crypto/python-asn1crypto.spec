@@ -75,4 +75,3 @@ A fast, pure Python library for parsing and serializing ASN.1 structures.
 
 * Fri May 05 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 0.22.0-1
 - Initial
-

@@ -199,4 +199,3 @@ rm %{buildroot}/%{_docdir}/libdaemon/style.css
 
 * Wed Mar 31 2004 Aaron Bennett <abennett@olin.edu>
 - Initial build.
-

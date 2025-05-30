@@ -115,4 +115,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Fri May 31 2013 Peter Hutterer <peter.hutterer@redhat.com> 1.1.3-1
 - libXinerama 1.1.3
-

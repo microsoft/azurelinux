@@ -229,4 +229,3 @@ install -p -m0644 %{buildroot}%{python3_sitelib}/%{modname}/bash_completion.d/py
 
 * Thu Jan 31 2013 - Marco Neciarini <marco.nenciarini@2ndquadrant.it> 0.3.5-1
 - Initial packaging.
-

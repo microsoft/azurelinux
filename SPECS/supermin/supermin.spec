@@ -741,4 +741,3 @@ make check || {
 
 * Tue Apr 14 2009 Richard Jones <rjones@redhat.com> - 1.5-2
 - Initial build for Fedora.
-

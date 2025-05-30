@@ -163,4 +163,3 @@ toml-test $(pwd)/tests/decoding_test3.sh
 
 * Mon Jun 15 2015 Julien Enselme <jujens@jujens.eu> - 0.9.0-1
 - Initial packaging
-

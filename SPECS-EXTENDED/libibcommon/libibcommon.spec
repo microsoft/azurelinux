@@ -133,4 +133,3 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
 * Sun Jun 08 2008 Doug Ledford <dledford@redhat.com> - 1.1.0-1
 - Initial package for Fedora review process
-

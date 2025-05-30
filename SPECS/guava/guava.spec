@@ -178,4 +178,3 @@ done
 
 * Fri Apr 12 2019 Fridrich Strba <fstrba@suse.com>
 - Initial packaging of guava 25.0
-

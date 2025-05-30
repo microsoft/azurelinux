@@ -264,4 +264,3 @@ Resolves: #330681
 
 * Sat Aug 4 2001 David Parker <david@neongoat.com>
 - initial spec file created
-

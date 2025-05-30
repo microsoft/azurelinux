@@ -128,4 +128,3 @@ pip3 install pytest
 
 * Mon Oct 24 2016 James Hogarth <james.hogarth@gmail.com> - 0.2.1-1
 - Initial package
-

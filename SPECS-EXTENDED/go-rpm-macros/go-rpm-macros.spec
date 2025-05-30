@@ -187,4 +187,3 @@ install -m 0644 -vp   rpm/macros.d/macros.go-compilers-gcc \
 * Wed Jun 05 2019 Nicolas Mailhot <nim@fedoraproject.org>
 - 3.0.8-3
 - initial Fedora import, for golist 0.10.0 and redhat-rpm-config 130
-

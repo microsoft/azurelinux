@@ -187,4 +187,3 @@ make test
 - Add Mariner to OSVersion detection and disable exe builds in makefile.
 - License verified
 - Original version for CBL-Mariner
-

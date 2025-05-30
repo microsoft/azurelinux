@@ -956,4 +956,3 @@ done
 
 * Sun Apr 3 2005 Tom "spot" Callaway <tcallawa@redhat.com> 1.6.4-1
 - inital package for Fedora Extras
-

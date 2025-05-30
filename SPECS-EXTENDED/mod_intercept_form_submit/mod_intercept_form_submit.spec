@@ -131,4 +131,3 @@ install -Dp -m 0644 intercept_form_submit.confx $RPM_BUILD_ROOT%{_httpd_confdir}
 * Thu Jan 30 2014 Jan Pazdziora <jpazdziora@redhat.com> - 0.9.5-1
 - 1058809 - .spec changes for Fedora package review.
 
-

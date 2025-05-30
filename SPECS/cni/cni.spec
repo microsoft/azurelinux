@@ -394,4 +394,3 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
 
 * Thu Feb 23 2017 alvaro.saurin@suse.com
 - Initial version
-

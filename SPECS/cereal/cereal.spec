@@ -126,4 +126,3 @@ This package contains development headers and libraries for the cereal library
 
 * Thu Sep 01 2016 Christoph Junghans <junghans@votca.org> - 1.2.1-1
 - First release.
-

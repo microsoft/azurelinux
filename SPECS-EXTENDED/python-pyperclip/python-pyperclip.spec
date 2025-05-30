@@ -104,4 +104,3 @@ rm -rf html/.{doctrees,buildinfo}
 
 * Wed Jul 25 2018 Haïkel Guémar <hguemar@fedoraproject.org> - 1.6.4-1
 - Initial package.
-

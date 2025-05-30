@@ -223,4 +223,3 @@ make install DESTDIR=${RPM_BUILD_ROOT} INSTALL="install -p"
 
 * Fri Jun 01 2012  Peng Wu <pwu@redhat.com> - 1.6.99.20140626-1
 - The first version.
-

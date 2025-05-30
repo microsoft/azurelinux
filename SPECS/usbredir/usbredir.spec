@@ -208,4 +208,3 @@ in another (virtual) machine
 
 * Thu Jul 14 2011 Hans de Goede <hdegoede@redhat.com> 0.3-1
 - Initial Fedora package
-

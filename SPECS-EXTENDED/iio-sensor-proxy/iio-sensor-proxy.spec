@@ -173,4 +173,3 @@ This package contains the documentation for %{name}.
 
 * Sat May 23 2015 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 1.0-1
 - Initial package
-

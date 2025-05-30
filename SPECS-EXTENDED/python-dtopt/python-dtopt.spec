@@ -176,4 +176,3 @@ rm dtopt/tests.py*
 
 * Sat Mar 15 2008 Tom "spot" Callaway <tcallawa@redhat.com> 0.1-1
 - Initial package for Fedora
-

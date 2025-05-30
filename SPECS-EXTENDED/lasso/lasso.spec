@@ -462,4 +462,3 @@ rm -fr %{buildroot}%{_defaultdocdir}/%{name}
   to build on Fedora 20
 - Perl bindings are disabled as they fail to build
 - Disable doc building as it doesn't ork correctly for now
-

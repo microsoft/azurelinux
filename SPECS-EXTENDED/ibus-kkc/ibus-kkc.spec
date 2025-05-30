@@ -234,4 +234,3 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/ibus-setup-kkc.deskt
 * Thu Jan 24 2013 Daiki Ueno <dueno@redhat.com> - 1.5.0-1
 - initial packaging
 
-

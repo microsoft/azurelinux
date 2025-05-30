@@ -85,4 +85,3 @@ install -Dpm 0644 lua.attr %{buildroot}/%{_fileattrsdir}/lua.attr
 
 * Fri Aug 28 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 1-1
 - Initial package
-

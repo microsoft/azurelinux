@@ -158,4 +158,3 @@ pip install pyspnego
 
 * Tue May 14 2013 Dan Callaghan <dcallagh@redhat.com> - 0.2-1
 - initial version
-

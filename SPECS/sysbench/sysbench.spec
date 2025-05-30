@@ -181,4 +181,3 @@ rm -f %{buildroot}%{_docdir}/sysbench/manual.html
 
 * Thu Mar 05 2009 Xavier Bachelot <xavier@bachelot.org> 0.4.10-1
 - Adapt original spec file taken from PLD.
-

@@ -418,4 +418,3 @@ fi;
 
 * Wed Aug 31 2005  <mihajlov@dyn-9-152-143-45.boeblingen.de.ibm.com> - 0.9.0b-0
 - Support for man pages added
-

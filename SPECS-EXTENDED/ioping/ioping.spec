@@ -90,4 +90,3 @@ export LDFLAGS="%{?__global_ldflags}"
 
 * Fri Nov 09 2012 Christopher Meng <rpm@cicku.me> - 0.6-1
 - Initial Package.
-

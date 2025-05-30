@@ -233,4 +233,3 @@ $RPM_BUILD_ROOT/%{_datadir}/sblim-testsuite/system/linux/messagelog.sh
 
 * Fri Oct 23 2009 Vitezslav Crhonek <vcrhonek@redhat.com> - 0.7.11-1
 - Initial support
-

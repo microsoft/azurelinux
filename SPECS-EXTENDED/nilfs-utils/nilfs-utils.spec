@@ -276,4 +276,3 @@ rm -f $RPM_BUILD_ROOT/%{_libdir}/libnilfs*.la
 * Wed Jun 10 2009 Eric Sandeen <sandeen@redhat.com> 2.0.12-1
 - Initial fedora package
 
-

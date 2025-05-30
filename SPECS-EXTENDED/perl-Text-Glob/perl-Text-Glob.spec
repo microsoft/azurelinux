@@ -185,4 +185,3 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 
 * Fri Jul 01 2005 Ralf Corsepius <ralf@links2linux.de> - 0.06-1
 - FE submission.
-

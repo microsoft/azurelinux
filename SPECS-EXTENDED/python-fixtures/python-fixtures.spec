@@ -176,4 +176,3 @@ contract in unit test compatible test cases easy and straight forward.
 
 * Wed Nov 14 2012 Pádraig Brady <P@draigBrady.com> - 0.3.9-1
 - Initial package
-

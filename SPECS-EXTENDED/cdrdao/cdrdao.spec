@@ -438,4 +438,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Tue Apr 13 1999 Michael Maher <mike@redhat.com>
 - built package 
-

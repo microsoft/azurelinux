@@ -343,4 +343,3 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 
 * Sat Jan 15 2005 UTUMI Hirosi <utuhiro78@yahoo.co.jp>
 - modify spec for fedora
-

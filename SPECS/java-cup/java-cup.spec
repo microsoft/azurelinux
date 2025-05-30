@@ -175,4 +175,3 @@ install -p -m 755 %{SOURCE1} %{buildroot}%{_bindir}/%{real_name}
 - Build using gcj (for proper bootstrap of openjdk)
 * Wed Apr 29 2009 mvyskocil@suse.cz
 - Initial packaging of java-cup-bootstrap 0.11 in SUSE (from jpp5)
-

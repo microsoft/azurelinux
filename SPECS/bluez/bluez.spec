@@ -1150,4 +1150,3 @@ Resolves: rhbz#1490911
 
 * Mon Aug 11 2008 - Bastien Nocera <bnocera@redhat.com> - 4.1-1
 - Initial build
-

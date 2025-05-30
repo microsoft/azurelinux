@@ -136,4 +136,3 @@ cp -p hyph_tk_TM.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen
 
 * Tue Mar 16 2010 Caolán McNamara <caolanm@redhat.com> - 0.20100315-1
 - initial version
-

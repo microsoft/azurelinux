@@ -193,4 +193,3 @@ make test
 
 * Sun Jan 29 2006 Patrice Dumas <pertusus at free.fr> - 0.04-1
 - fedora extras submission
-

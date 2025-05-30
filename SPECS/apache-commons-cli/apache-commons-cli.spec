@@ -165,4 +165,3 @@ This package contains the API documentation for %{name}.
 
 * Sun Oct  3 2010 chris.spike@arcor.de
 - Rename and rebase from jakarta-commons-cli
-

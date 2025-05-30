@@ -543,4 +543,3 @@ make -j1 -C build-static check
 
 * Fri Jul 15 2005 Orion Poplawski <orion@cora.nwra.com> 4.2r1-1
 - inital package for Fedora Extras
-

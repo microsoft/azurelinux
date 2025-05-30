@@ -135,4 +135,3 @@ it will fall back to an equivalent platform specific implementation.
 
 * Thu Jun 18 2015 Haïkel Guémar <hguemar@fedoraproject.org> - 0.1-1
 - Initial package
-

@@ -93,4 +93,3 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 * Sat Mar  2 2019 Fridrich Strba <fstrba@suse.com>
 - Initial packaging of jboss-interceptors-1.2-api
 - Generate and customize the ant build file
-

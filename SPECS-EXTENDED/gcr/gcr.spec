@@ -387,4 +387,3 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/gcr-viewer.desktop
 * Thu Nov 10 2011 Matthias Clasen <mclasen@redhat.com> 3.3.1-1
 - Initial packaging
 
-

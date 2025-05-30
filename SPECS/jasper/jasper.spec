@@ -454,4 +454,3 @@ make test -C builder
 
 * Thu Jan 22 2004 Rex Dieter <rexdieter at sf.net> 1.700.5-0.fdr.0
 - first try
-

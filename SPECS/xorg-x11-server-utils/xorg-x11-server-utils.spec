@@ -376,4 +376,3 @@ rm -f %{buildroot}%{_bindir}/xkeystone
 * Mon Oct 10 2011 Matěj Cepl <mcepl@redhat.com> - 7.5-7
 - Fix BuildRequires ... xbitmaps-devel does not exist anymore (RHBZ #744751)
 - Upgrade to the latest upstream iceauth, rgb, sessreg, and xrandr
-

@@ -222,4 +222,3 @@ make test TEST_FILES="xt/*.t"
 
 * Fri Nov 25 2005 Paul Howarth <paul@city-fan.org> 0.01-1
 - Initial build
-

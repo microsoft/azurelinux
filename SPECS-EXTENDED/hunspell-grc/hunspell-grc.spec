@@ -98,4 +98,3 @@ cp -p dictionaries/grc_GR.dic $RPM_BUILD_ROOT/%{_datadir}/myspell/grc.dic
 
 * Wed Oct 14 2009 Caolán McNamara <caolanm@redhat.com> - 2.1.4-0.1.alpha
 - initial version
-

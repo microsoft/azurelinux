@@ -697,4 +697,3 @@ rm -rf %{buildroot}%{_libdir}/*.def*
   - cleaned up building of shared libs
   - now uses a BuildRoot
   - cleaned up the specfile
-

@@ -340,4 +340,3 @@ fi
 
 * Thu Feb 17 2011 Hedayat Vatankhah <hedayat.fwd+rpmchlog@gmail.com> - 1.42-1
 - Initial version
-

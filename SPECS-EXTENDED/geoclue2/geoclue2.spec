@@ -371,4 +371,3 @@ exit 0
 
 * Tue Aug 20 2013 Kalev Lember <kalevlember@gmail.com> - 1.99.1-1
 - Initial Fedora packaging
-

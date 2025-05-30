@@ -351,4 +351,3 @@ TRAVIS=true python3 -m pytest -v -k "not spawn_uses_env"
 
 * Sat Jul 26 2003 Panu Matilainen <pmatilai@welho.com>
 - Initial Fedora packaging
-

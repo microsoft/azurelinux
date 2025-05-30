@@ -212,4 +212,3 @@ Requires:       zlib
 
 * Tue Oct 30 2018 Anish Swaminathan <anishs@vmware.com> 0.1-1
 - Initial packaging
-

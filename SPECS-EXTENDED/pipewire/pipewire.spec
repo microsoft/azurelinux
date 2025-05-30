@@ -1039,4 +1039,3 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 
 * Tue Sep 1 2015 Wim Taymans <wtaymans@redhat.com> - 0.1.0-1
 - First version
-

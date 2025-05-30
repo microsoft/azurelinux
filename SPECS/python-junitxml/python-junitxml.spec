@@ -172,4 +172,3 @@ ln -s ./pyjunitxml-%{python3_version} %{buildroot}%{_bindir}/pyjunitxml-3
 
 * Tue Apr 29 2014 Steve Linabery <slinaber@redhat.com> - 0.7-1
 - Initial package.
-

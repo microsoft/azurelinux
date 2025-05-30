@@ -138,4 +138,3 @@ rm -f %{buildroot}%{_libdir}/liblzf.la
 
 * Mon Feb 7 2011 Steve Traylen <steve.traylen@cern.ch> - 3.6-1
 - First version of package.
-

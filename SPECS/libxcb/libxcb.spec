@@ -247,4 +247,3 @@ rm -r %{buildroot}/usr/share/doc/libxcb/tutorial
 
 * Wed Jan 11 2012 Adam Jackson <ajax@redhat.com> 1.8-1
 - libxcb 1.8
-

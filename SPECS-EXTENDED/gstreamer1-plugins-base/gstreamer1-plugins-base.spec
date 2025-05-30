@@ -833,4 +833,3 @@ rm %{_libexecdir}/gstreamer-%{majorminor}/gst-plugin-scanner
 
 * Tue Jul 17 2012 Brian Pepple <bpepple@fedoraproject.org> - 0.11.92-1
 - Initial Fedora spec file.
-

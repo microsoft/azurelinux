@@ -166,4 +166,3 @@ cp -pr src/java/samples/* %{buildroot}%{_datadir}/%{name}
 - remove file conflict between xpp2 and xpp2-manual
 * Tue May 12 2009 mvyskocil@suse.cz
 - Initial packaging of xpp2 2.1.10 (from jpackage.org)
-

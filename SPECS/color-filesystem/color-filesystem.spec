@@ -127,4 +127,3 @@ EOF
 
 * Sat Feb  2 2008 kwizart < kwizart at gmail.com > - 1-1
 - Initial package.
-

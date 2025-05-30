@@ -276,4 +276,3 @@ make cctest
 
 * Mon Mar 20 2017 Xiaolin Li <xiaolinl@vmware.com> 7.7.4-1
 - Initial packaging for Photon
-

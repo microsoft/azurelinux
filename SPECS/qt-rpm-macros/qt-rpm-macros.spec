@@ -178,4 +178,3 @@ sed -i \
 
 * Thu Jun 09 2016 Helio Chissini de Castro <helio@kde.org> - 5.7.0-1
 - Decouple macros from main qtbase package
-

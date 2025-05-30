@@ -71,4 +71,3 @@ make  %{?_smp_mflags} check
 
 *   Mon Dec 10 2018 Alexey Makhalov <amakhalov@vmware.com> 1.16.2-1
 -   Initial build. First version
-

@@ -528,4 +528,3 @@ install -Dpm 0644 %{SOURCE1} %{buildroot}/%{_mandir}/man1/proxy.1
 * Tue Jun 3 2008 - dominique-rpm@leuenberger.net
 - Initial spec file for Version 0.2.2
 
-

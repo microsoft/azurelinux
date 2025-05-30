@@ -494,4 +494,3 @@ popd
 
 * Thu Sep 29 2016 Igor Gnatenko <ignatenko@redhat.com> - 0.7.0-0.1git179c0a6
 - Initial package
-

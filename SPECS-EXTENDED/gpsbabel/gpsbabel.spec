@@ -341,4 +341,3 @@ make check
 
 * Thu Apr 19 2007 Roozbeh Pournader <roozbeh@farsiweb.info> - 1.3.3-1
 - Make first Fedora spec based on the one provided upstream
-

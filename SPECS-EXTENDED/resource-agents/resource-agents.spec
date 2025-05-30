@@ -803,4 +803,3 @@ ccs_update_schema > /dev/null 2>&1 ||:
 
 * Tue Jan 27 2009 Fabio M. Di Nitto <fdinitto@redhat.com> - 3.0.0-1.alpha3
   - Initial packaging
-

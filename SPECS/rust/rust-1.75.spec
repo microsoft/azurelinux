@@ -331,4 +331,3 @@ rm %{buildroot}%{_bindir}/*.old
 
 * Wed May 15 2019 Ankit Jain <ankitja@vmware.com> - 1.34.2-1
 - Initial build. First version
-

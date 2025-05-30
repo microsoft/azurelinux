@@ -177,4 +177,3 @@ X.Org X11 application bitmaps
 
 * Fri Aug 26 2005 Mike A. Harris <mharris@redhat.com> 0.99.0-1
 - Initial build.
-

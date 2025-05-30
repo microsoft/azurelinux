@@ -94,4 +94,3 @@ install -t '%{buildroot}%{_mandir}/man1' -D -p -m 0644 '%{SOURCE1}'
 
 * Thu Sep 27 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> - 3.0.4-1
 - Initial packaging.
-

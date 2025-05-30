@@ -242,4 +242,3 @@ make test
 
 * Wed May  7 2003 Ville Skyttä <ville.skytta at iki.fi> - 0:1.2-0.fdr.1
 - First Fedora release.
-

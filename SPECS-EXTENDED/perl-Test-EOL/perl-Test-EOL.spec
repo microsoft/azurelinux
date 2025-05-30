@@ -272,4 +272,3 @@ make test
 
 * Wed Jun 16 2010 Paul Howarth <paul@city-fan.org> - 0.8-1
 - Initial RPM version
-

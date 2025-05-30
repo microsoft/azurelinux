@@ -348,4 +348,3 @@ cd -
 
 * Sat Jul  4 2009 Joseph Smidt <josephsmidt@gmail.com> - 1.2.0-1
 - initial RPM release
-

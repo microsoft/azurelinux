@@ -606,4 +606,3 @@ find %{buildroot} -type f -name '*.bs' -empty -delete
 
 * Sat Nov 05 2005 Jose Pedro Oliveira <jpo at di.uminho.pt> - 0.23-1
 - First build.
-

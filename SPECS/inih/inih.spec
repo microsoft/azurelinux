@@ -132,4 +132,3 @@ embedded systems.
 
 * Mon Aug 29 2016 Jan F. Chadima <jfch@jagda.eu> - 36-1
 - initial version
-

@@ -232,4 +232,3 @@ find $RPM_BUILD_ROOT -name '*.la' -print -delete
 
 * Wed Jul 16 2008 Adel Gadllah <adel.gadllah@gmail.com> - 0.5.0-0.1.20080716git
 - Initial package
-

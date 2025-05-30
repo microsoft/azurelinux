@@ -266,4 +266,3 @@ python3 -m unittest %{modname}.test
 * Tue Jul 08 2008 Jan Hutar <jhutar@redhat.com> - 0.1-1
 - Initial version
 - spec-file based on python-html2text.spec
-

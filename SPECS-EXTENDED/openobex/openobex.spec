@@ -329,4 +329,3 @@ rm -f $RPM_BUILD_ROOT%{_mandir}/man1/obex_test.1*
 - Initial RPM
 
 
-

@@ -199,4 +199,3 @@ mkdir -p $RPM_BUILD_ROOT%{_datadir}/ladspa/rdf
 
 * Thu May 29 2003 Thomas Vander Stichele <thomas at apestaart dot org>
 - 0:1.12-0.fdr.1: initial RPM release
-

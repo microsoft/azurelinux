@@ -133,4 +133,3 @@ cp iwlwifi-8000C-*.ucode %{buildroot}%{_firmwarepath}
 
 * Thu Aug 23 2018 Alexey Makhalov <amakhalov@vmware.com> 20180823-1
 - Initial version. RPi3 and Dell Edge Gateway 3001 support.
-

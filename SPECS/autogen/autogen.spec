@@ -126,4 +126,3 @@ make -k check
 - Create a seperate libopts package.
 * Thu Jun 18 2015 Divya Thaluru <dthaluru@vmware.com> 5.18.5-1
 - Initial build. First version
-

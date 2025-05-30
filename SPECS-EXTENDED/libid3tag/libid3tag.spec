@@ -244,4 +244,3 @@ ID3 tag library development files.
 * Mon Jan 28 2002 Bill Nottingham <notting@redhat.com>
 - split libmad off into a separate package
 
-

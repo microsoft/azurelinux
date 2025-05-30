@@ -260,4 +260,3 @@ install -p  -m 755 bcache-status %{buildroot}%{_sbindir}/bcache-status
 
 * Tue Aug 20 2013 Rolf Fokkens <rolf@rolffokkens.nl> - 0-0.1.20130820git
 - Initial build
-

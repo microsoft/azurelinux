@@ -229,4 +229,3 @@ export CXXFLAGS="${CXXFLAGS} -std=c++17"
 
 * Wed Mar 21 2012 Alexander Chernyakhovsky <achernya@mit.edu> - 1.1-1
 - Initial packaging for mosh.
-

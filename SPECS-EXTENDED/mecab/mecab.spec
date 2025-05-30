@@ -250,4 +250,3 @@ cd ..
 
 * Fri Feb 23 2007 Minokichi Sato <m-sato@rc.kyushu-u.ac.jp>
 - Initial build.
-

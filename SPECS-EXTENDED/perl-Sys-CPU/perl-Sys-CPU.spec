@@ -181,4 +181,3 @@ find %{buildroot} -type f -name CPU.bs -exec rm -f {} ';'
 
 * Fri Apr 23 2010 Shakthi Kannan <shakthimaan [AT] gmail dot com> 0.51-1
 - Initial Fedora RPM version
-

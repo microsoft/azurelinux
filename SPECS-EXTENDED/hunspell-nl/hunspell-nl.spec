@@ -185,4 +185,3 @@ done
 
 * Thu Dec 07 2006 Caolán McNamara <caolanm@redhat.com> - 0.20050617-1
 - initial version
-

@@ -170,4 +170,3 @@ make test
 * Thu Dec 28 2006 Axel Thimm <Axel.Thimm@ATrpms.net> - 0.04-1
 - Initial build.
 
-

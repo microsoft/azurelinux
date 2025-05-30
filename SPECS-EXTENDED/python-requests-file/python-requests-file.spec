@@ -194,4 +194,3 @@ Summary:        %{summary}
 
 * Tue Mar 10 2015 David Shea <dshea@redhat.com> - 1.0-1
 - Initial package
-

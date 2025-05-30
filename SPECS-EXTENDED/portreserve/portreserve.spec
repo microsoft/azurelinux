@@ -214,4 +214,3 @@ EOF
 
 * Wed Sep  3 2003 Tim Waugh <twaugh@redhat.com>
 - Initial spec file.
-

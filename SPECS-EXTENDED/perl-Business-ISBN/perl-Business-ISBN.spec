@@ -216,4 +216,3 @@ make test
 
 * Thu Oct 25 2007 Robin Norwood <rnorwood@redhat.com> - 2.03-1
 - Initial build
-

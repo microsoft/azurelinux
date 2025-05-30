@@ -331,4 +331,3 @@ perl Build.PL installdirs=vendor
 * Thu May 20 2004 Jose Pedro Oliveira <jpo at di.uminho.pt> - 0:2.38-0.fdr.1
 - Patch: http://rt.cpan.org/NoAuth/Bug.html?id=2584
 - First build.
-

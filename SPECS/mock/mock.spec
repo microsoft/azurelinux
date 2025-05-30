@@ -752,4 +752,3 @@ pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
 - Fix keeping the LVM volume mounted
 - suggest dnf-utils
 - Always create /dev/loop nodes
-

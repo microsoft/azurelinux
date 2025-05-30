@@ -420,4 +420,3 @@ make check
 
 * Mon Jul 21 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
-

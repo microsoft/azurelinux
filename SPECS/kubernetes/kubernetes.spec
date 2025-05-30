@@ -506,4 +506,3 @@ fi
 
 * Wed Dec 02 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-1
 - Original version for CBL-Mariner
-

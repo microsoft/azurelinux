@@ -117,4 +117,3 @@ Fixes: rhbz#2187710
 
 * Tue Feb 21 2023 Tomáš Hrnčiar <thrnciar@redhat.com> - 2023.2.20-1
 Initial package
-

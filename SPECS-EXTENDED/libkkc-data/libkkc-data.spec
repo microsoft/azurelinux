@@ -102,4 +102,3 @@ make %{?_smp_mflags}
 * Tue Sep 17 2013 Daiki Ueno <dueno@redhat.com> - 0.2.7-1
 - initial packaging for Fedora, splitting from libkkc
 
-

@@ -279,4 +279,3 @@ rm -r %{buildroot}%{_libdir}/*.a
 - separate static libraries to -static subpackage
 - fix gsl-config script - thanks Patrice Dumas
 
-

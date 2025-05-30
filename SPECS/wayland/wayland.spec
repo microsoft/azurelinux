@@ -429,4 +429,3 @@ Wayland server library
 
 * Mon Nov 15 2010 Adam Jackson <ajax@redhat.com> 0.1-0.1.20101111
 - Initial packaging
-

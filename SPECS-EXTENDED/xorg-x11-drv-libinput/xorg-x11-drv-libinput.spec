@@ -319,4 +319,3 @@ cp %{SOURCE1} %{buildroot}%{_datadir}/X11/xorg.conf.d/
 
 * Thu Jun 26 2014 Peter Hutterer <peter.hutterer@redhat.com> 0.1.1-1
 - Initial release (#1113392)
-

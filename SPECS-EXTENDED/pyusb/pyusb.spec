@@ -158,4 +158,3 @@ sed -i -e 's/\r//g' README.rst
 * Mon Jun 16 2008 Jeremy Katz <katzj@redhat.com> - 0.4.1-1
 - Initial packaging
 
-

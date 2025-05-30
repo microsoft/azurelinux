@@ -242,4 +242,3 @@ fi
 
 * Tue Apr 04 2017 James Hogarth <james.hogarth@gmail.com> - 0.9.7-1
 - Initial package
-

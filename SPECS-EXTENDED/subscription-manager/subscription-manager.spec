@@ -6003,4 +6003,3 @@ rm -f %{_sharedstatedir}/rhsm/cache/rhsm_icon.json
   (bkearney@redhat.com)
 - 754821: Default org of "Unknown" was not marked for gettext
   (alikins@redhat.com)
-

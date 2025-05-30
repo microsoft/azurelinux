@@ -67,4 +67,3 @@ make test -C build
 
 * Tue Feb 11 2020 Nick Bopp <nichbop@microsoft.com> - 3.6.1-1
 - Original version for CBL-Mariner.
-

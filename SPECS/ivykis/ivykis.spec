@@ -56,4 +56,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 -   Added 'URL', 'Vendor', and 'Distribution' tags.
 *   Mon Apr 13 2020 Jonathan Chiu <jochi@microsoft.com> 0.42.4-1
 -   Original version for CBL-Mariner.
-

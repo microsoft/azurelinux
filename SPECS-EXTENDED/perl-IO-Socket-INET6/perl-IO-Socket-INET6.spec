@@ -225,4 +225,3 @@ make test
 
 * Thu Jul 06 2006 Warren Togami <wtogami@redhat.com> 2.51-1
 - initial Fedora package
-

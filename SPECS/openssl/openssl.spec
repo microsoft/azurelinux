@@ -556,4 +556,3 @@ install -m644 %{SOURCE9} \
 
 * Thu Sep 09 2021 Sahana Prasad <sahana@redhat.com> - 1:3.0.0-1
 - Rebase to upstream version 3.0.0
-

@@ -168,4 +168,3 @@ rm -rf %{buildroot}%{_docdir}
 
 * Tue Mar 06 2012 Adam Jackson <ajax@redhat.com> 1.1.1-1
 - libXmu 1.1.1
-

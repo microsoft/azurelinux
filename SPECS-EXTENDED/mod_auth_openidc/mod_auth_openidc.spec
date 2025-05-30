@@ -192,4 +192,3 @@ install -m 700 -d %{buildroot}%{httpd_pkg_cache_dir}/cache
 
 * Sat Nov 07 2015 Jan Pazdziora <jpazdziora@redhat.com> 1.8.6-1
 - Initial packaging for Fedora 23.
-

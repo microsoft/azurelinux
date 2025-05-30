@@ -156,4 +156,3 @@ install -D -p -m 0644 man/*             %{buildroot}%{_mandir}/man1/
  
 * Tue Apr 07 08:15:00 CEST 2020 Olivier Lemasle <o.lemasle@gmail.com> - 0.18.0-1
 - Initial package
-

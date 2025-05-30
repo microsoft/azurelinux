@@ -865,4 +865,3 @@ rm -vrf %{buildroot}%{_docdir}
 
 * Wed Apr 26 2000 Ramiro Estrugo <ramiro@eazel.com>
 - created this thing
-

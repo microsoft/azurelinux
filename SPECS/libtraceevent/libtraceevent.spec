@@ -113,4 +113,3 @@ rm -rf %{buildroot}/%{_libdir}/libtraceevent.a
 
 * Fri Oct 09 2020 Zamir SUN <sztsian@gmail.com> - 0-0.1.20201009git5dd505f
 - Initial libtraceevent
-

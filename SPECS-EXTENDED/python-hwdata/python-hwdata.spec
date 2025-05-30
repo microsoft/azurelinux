@@ -194,4 +194,3 @@ pylint-3 hwdata.py example.py || :
 
 * Fri Apr 23 2010 Miroslav Suchý <msuchy@redhat.com> 1.1-1
 - initial release
-

@@ -109,4 +109,3 @@ popd
 - converted neededforbuild to BuildRequires
 * Mon Oct 17 2005 jsmeix@suse.de
 - Current version 1.2 from JPackage.org
-

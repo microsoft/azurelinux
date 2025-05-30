@@ -271,4 +271,3 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 - added sanity check for RPM_BUILD_ROOT
 - setserial is now installed into /bin, where util-linux puts it and all
   startup scripts expect it.
-

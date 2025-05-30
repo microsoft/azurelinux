@@ -412,4 +412,3 @@ find %{buildroot} -type f -name *.la -exec rm -f {} \;
 
 * Sun Dec 21 2008 Kevin Fenzi <kevin@tummy.com> - 4.5.92-1
 - Initial version for Fedora
-

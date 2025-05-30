@@ -751,4 +751,3 @@ done
 
 * Fri Sep 16 2022 Nicola Sella - <nsella@redhat.com> - 5.0.0-0~pre
 - New upstream pre release 5.0.0
-

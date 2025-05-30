@@ -150,4 +150,3 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 * Wed Aug 30 2017 Juan Orti Alcaine <jorti@fedoraproject.org> - 3.1.1-1
 - Initial RPM release
-

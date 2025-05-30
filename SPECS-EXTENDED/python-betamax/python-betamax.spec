@@ -138,4 +138,3 @@ py.test-%{python3_version} -vk "$TEST_SELECTOR"
 
 * Mon Dec 21 2015 Parag Nemade <pnemade AT redhat DOT com> - 0.5.1-1
 - Initial packaging
-

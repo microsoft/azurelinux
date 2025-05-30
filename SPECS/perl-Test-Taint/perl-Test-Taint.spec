@@ -214,4 +214,3 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 
 * Sun Mar 20 2005 Ralf Corsepius <ralf@links2linux.de> - 1.04-0.pm.2
 - Initial version.
-

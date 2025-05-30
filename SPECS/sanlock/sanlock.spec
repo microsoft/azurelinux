@@ -326,4 +326,3 @@ common sanlock lockspace.
 
 * Wed Jul 24 2013 David Teigland <teigland@redhat.com> - 3.0.0-1
 - Update to sanlock-3.0.0
-

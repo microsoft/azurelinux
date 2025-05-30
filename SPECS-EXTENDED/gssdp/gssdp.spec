@@ -444,4 +444,3 @@ This package contains developer documentation for %{name}.
 
 * Mon May 19 2008 Peter Robinson <pbrobinson@fedoraproject.org> 0.6.1-1
 - Initial package 
-

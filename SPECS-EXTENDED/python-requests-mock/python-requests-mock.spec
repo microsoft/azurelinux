@@ -282,4 +282,3 @@ tox -e py%{python3_version_nodots}
 
 * Thu Aug 28 2014 Jamie Lennox <jamielennox@redhat.com> - 0.5.1-1
 - Initial Package.
-

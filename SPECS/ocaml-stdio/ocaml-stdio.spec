@@ -151,4 +151,3 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 
 * Thu May  7 2020 Jerry James <loganjerry@gmail.com> - 0.13.0-1
 - Initial RPM
-

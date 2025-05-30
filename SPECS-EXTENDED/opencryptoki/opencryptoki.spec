@@ -771,4 +771,3 @@ fi
 
 * Tue Jul 21 2009 Michal Schmidt <mschmidt@redhat.com> - 2.2.8-2
 - Fedora package based on RHEL-5 package.
-

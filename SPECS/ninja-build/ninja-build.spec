@@ -65,4 +65,3 @@ install -Dpm0644 %{SOURCE1} %{buildroot}%{_libdir}/rpm/macros.d/macros.ninja
 
 * Wed Dec 27 2017 Anish Swaminathan <anishs@vmware.com> - 1.8.2-1
 - Initial packaging
-

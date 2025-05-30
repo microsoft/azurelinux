@@ -113,4 +113,3 @@ EOF
 
 * Mon Dec 14 2015 Xiaolin Li < xiaolinl@vmware.com> 3.1.1-1
 - Initial build. First version
-

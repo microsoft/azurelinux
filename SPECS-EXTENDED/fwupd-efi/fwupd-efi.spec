@@ -125,4 +125,3 @@ rm -vf %{fwup_efi_fn}.tmp
 
 * Wed Apr 28 2021 Richard Hughes <richard@hughsie.com> - 1.0-1
 - Initial import (#1953508).
-

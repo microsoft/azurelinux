@@ -395,4 +395,3 @@ make check
 * Mon Mar 29 2004 Marius L. Jøhndal <mariuslj at ifi.uio.no> - 0:0.68-0.fdr.1
 - Initial RPM release.
 
-

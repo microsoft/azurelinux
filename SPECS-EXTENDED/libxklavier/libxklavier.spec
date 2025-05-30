@@ -307,4 +307,3 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.{a,la}
 
 * Tue Jan 27 2004 Alexander Larsson <alexl@redhat.com> 0.97-1
 - First version
-

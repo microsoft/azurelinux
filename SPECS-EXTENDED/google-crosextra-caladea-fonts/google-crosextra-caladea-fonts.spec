@@ -108,4 +108,3 @@ install -Dm 0644 -p %{SOURCE3} \
 * Thu Oct 10 2013 Parag Nemade <pnemade AT redhat DOT com> - 1.002-0.1.20130214
 - Initial Fedora release.
 
-

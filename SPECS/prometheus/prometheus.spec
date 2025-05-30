@@ -366,4 +366,3 @@ fi
 * Sat Feb 07 2015 jchaloup <jchaloup@redhat.com> - 0-0.1.git4e6a807
 - First package for Fedora
   resolves: #1190426
-

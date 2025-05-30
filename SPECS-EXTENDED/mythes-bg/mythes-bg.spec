@@ -116,4 +116,3 @@ cp -p th_bg_BG.idx $RPM_BUILD_ROOT/%{_datadir}/mythes/th_bg_BG_v2.idx
 
 * Tue Feb 03 2009 Caolán McNamara <caolanm@redhat.com> - 4.1-1
 - initial version
-

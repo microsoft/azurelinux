@@ -297,4 +297,3 @@ make DESTDIR=%{buildroot} install
 
 * Tue Nov 27 2001 Tim Waugh <twaugh@redhat.com>
 - Initial spec file.
-

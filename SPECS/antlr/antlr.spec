@@ -362,4 +362,3 @@ find doc -type f | xargs chmod 0644
 - conflict with pccts
 * Thu Sep  2 2004 skh@suse.de
 - Initial package created with version 2.7.4 (JPackage 1.5)
-

@@ -160,4 +160,3 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 
 * Wed Mar 04 2015 Mahmoud Bassiouny <mbassiouny@vmware.com>
 - Initial packaging for Photon
-

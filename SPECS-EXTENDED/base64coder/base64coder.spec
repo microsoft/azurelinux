@@ -109,4 +109,3 @@ cp -pr target/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 - Trim bias from description.
 * Tue Feb  5 2019 Fridrich Strba <fstrba@suse.com>
 - Initial package of base64coder 20101219
-

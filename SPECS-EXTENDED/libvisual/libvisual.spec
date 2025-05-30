@@ -199,4 +199,3 @@ find %{buildroot} -type f -name "*.la" -exec rm -f {} ';'
 
 * Tue Sep 28 2004 Aurelien Bompard <gauret[AT]free.fr> 0:0.1.6-0.fdr.1
 - Initial RPM release.
-

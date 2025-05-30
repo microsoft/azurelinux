@@ -193,4 +193,3 @@ rm -rf %{buildroot}%{_libdir}/python2.7
 
 * Wed Apr 5 2017 Dheeraj Shetty <dheerajs@vmware.com> 1.6.0-1
 - Initial version
-

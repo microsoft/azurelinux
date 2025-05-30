@@ -208,4 +208,3 @@ install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/isnsd.service
 
 * Wed Jan 16 2008 Mike Christie <mchristie@redhat.com> - 0.91-0.0
 - first build
-

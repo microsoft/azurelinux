@@ -143,4 +143,3 @@ make check
 
 * Wed Jan 24 2018 Nicolas Chauvet <kwizart@gmail.com> - 1.3.0-1
 - Initial spec file
-

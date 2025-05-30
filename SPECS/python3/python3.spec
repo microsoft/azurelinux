@@ -518,4 +518,3 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 
 * Wed Jul 1 2015 Vinay Kulkarni <kulkarniv@vmware.com> 3.4.3
 - Add Python3 package to Photon.
-

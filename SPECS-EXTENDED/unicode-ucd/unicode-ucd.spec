@@ -166,4 +166,3 @@ cp -p %{SOURCE1} .
 * Sat Nov 26 2011 Jens Petersen <petersen@redhat.com> - 6.0.0-1
 - package Unicode 6.0 UCD
 - MIT license
-

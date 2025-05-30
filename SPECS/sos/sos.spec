@@ -667,4 +667,3 @@ rm -rf %{buildroot}%{_prefix}/config/
 - more sanitizing options for log files
 - rhbz fixes from RHEL version merged into trunk
 - progressbar update
-

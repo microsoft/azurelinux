@@ -135,4 +135,3 @@ Python 3 version.
 
 * Mon Jan 08 2018 Ilya Gradina <ilya.gradina@gmail.com> - 0.06-1
 - Initial package
-

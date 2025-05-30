@@ -178,4 +178,3 @@ make check
 
 * Wed Nov 26 2008 Till Maas <opensource@till.name> - 1.1-1
 - Initial spec for Fedora
-

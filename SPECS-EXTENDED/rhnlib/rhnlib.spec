@@ -396,4 +396,3 @@ make -f Makefile.rhnlib
 - Cleaning up, preparing for automatization
 - 575259 - properly set protocol type
 
-

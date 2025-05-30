@@ -146,4 +146,3 @@ cp -pr standard/dist/standard/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 - Fix prerequires of javadoc subpackage
 * Sun Sep  5 2004 skh@suse.de
 - Initial package created with version 1.1.1 (JPackage 1.5)
-

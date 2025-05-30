@@ -207,4 +207,3 @@ make test
 
 * Tue Sep 12 2006 David Woodhouse <dwmw2@infradead.org> 1.6-1
 - Initial version
-

@@ -215,4 +215,3 @@ developing applications that use %{name}-ppx.
 
 * Fri Jan 10 2020 Jerry James <loganjerry@gmail.com> - 4.3.0-1
 - Initial RPM
-

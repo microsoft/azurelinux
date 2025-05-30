@@ -54,4 +54,3 @@ rm -rf %{buildroot}%{_infodir}
 
 * Wed Oct 21 2014 Divya Thaluru <dthaluru@vmware.com> - 2.20-1
 - Initial build. First version
-

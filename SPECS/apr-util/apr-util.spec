@@ -256,4 +256,3 @@ autoheader && autoconf
 
 * Wed May 20 2015 Touseef Liaqat <tliaqat@vmware.com> - 1.5.4-1
 - Initial build. First version
-

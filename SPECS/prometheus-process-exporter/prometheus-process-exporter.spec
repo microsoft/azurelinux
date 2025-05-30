@@ -146,4 +146,3 @@ getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_share
 * Tue Feb 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.10-1
 - Initial CBL-Mariner import from Debian source package (license: MIT).
 - License verified.
-

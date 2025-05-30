@@ -176,4 +176,3 @@ rm -rf %{buildroot}%{_docdir}
 
 * Thu Jan  5 2012 Volker Fröhlich <volker27@gmx.at> 1.0.1-1
 - Initial package for Fedora
-

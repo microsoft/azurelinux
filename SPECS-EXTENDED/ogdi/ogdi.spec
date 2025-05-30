@@ -209,4 +209,3 @@ touch -r ogdi-config.in %{buildroot}%{_bindir}/%{name}-config
 * Tue Sep 3 2019 Devrim Gündüz <devrim@gunduz.org> - 4.1.0-1
 - Initial packaging for EPEL 8
 - Update to 4.1.0
-

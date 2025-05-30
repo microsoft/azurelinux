@@ -98,4 +98,3 @@ cp -p dictionaries/ts-ZA.dic $RPM_BUILD_ROOT/%{_datadir}/myspell/ts_ZA.dic
 
 * Fri Sep 12 2008 Caolán McNamara <caolanm@redhat.com> - 0.20060123-1
 - initial version
-

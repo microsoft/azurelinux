@@ -295,4 +295,3 @@ install -m 0644 wks2*.1 wps2*.1 %{buildroot}/%{_mandir}/man1
 
 * Tue Feb 10 2009 Simon Wesp <cassmodiah@fedoraproject.org> - 0.1.2-1
 - Initial Package build 
-

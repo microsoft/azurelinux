@@ -186,4 +186,3 @@ cp -r %{name}/target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 - Fixed package descriptions
 * Thu Apr 23 2009 mvyskocil@suse.cz
 - Initial packaging of cglib-nohooks in SUSE (2.1.3 from jpp5)
-

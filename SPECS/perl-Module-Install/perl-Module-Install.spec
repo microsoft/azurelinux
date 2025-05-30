@@ -127,4 +127,3 @@ make %{?_smp_mflags} test AUTOMATED_TESTING=1
 
 * Fri Apr 3 2015 Divya Thaluru <dthaluru@vmware.com> 1.14-1
 - Initial version.
-

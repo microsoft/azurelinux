@@ -232,4 +232,3 @@ the Spice virtio channel.
 
 * Mon Jan 27 2014 Marc-André Lureau <marcandre.lureau@redhat.com> - 0.4-1
 - Initial packaging. rhbz#1059708
-

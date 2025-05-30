@@ -201,4 +201,3 @@ cp -p th_sk_SK_v2.* $RPM_BUILD_ROOT/%{_datadir}/mythes
 
 * Wed Nov 28 2007 Caolán McNamara <caolanm@redhat.com> - 0.20050503-1
 - initial version
-

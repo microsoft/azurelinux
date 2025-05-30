@@ -82,4 +82,3 @@ pycparser is a complete parser of the C language, written in pure Python using t
 
 * Wed Nov 18 2015 Divya Thaluru <dthaluru@vmware.com> - 0.14-1
 - Initial packaging for Photon
-

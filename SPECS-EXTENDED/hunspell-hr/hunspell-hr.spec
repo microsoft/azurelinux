@@ -123,4 +123,3 @@ cp -p hyph_hr.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen/hyph_hr_HR.dic
 
 * Thu Dec 07 2006 Caolán McNamara <caolanm@redhat.com> - 0.20060607-1
 - initial version
-

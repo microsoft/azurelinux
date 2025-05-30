@@ -244,4 +244,3 @@ make install DESTDIR=%{buildroot} INSTALL="install -p"
 
 * Wed Jul 13 2005 Mike A. Harris <mharris@redhat.com> 0.0.1-1
 - Initial build
-

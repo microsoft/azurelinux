@@ -189,4 +189,3 @@ cp -aL build/apidoc/* %{buildroot}/%{_javadocdir}/%{name}
 * Thu Oct 25 2018 Fridrich Strba <fstrba@suse.com>
 - Initial packaging of xbean version 4.5
 - Spec file inspired by Fedora rpm package
-

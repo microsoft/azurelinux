@@ -260,4 +260,3 @@ chmod -c 755 $RPM_BUILD_ROOT%{_bindir}/optipng
 
 * Tue Jul 04 2006 Till Maas <opensource till name> - 0.5.2-1
 - Created from scratch for fedora extras
-

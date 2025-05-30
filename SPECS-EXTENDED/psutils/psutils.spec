@@ -309,4 +309,3 @@ sed -i -e 's,/usr/bin/env perl,%{__perl},' \
     - Piped input works in Linux
     - spec file rewrited for using Buildroot,
     - man pages gziped.
-

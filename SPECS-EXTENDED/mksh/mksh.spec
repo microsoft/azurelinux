@@ -410,4 +410,3 @@ fi
 * Sun Jun 03 2007 Robert Scheck <robert@fedoraproject.org> 29f-1
 - Upgrade to 29f
 - Initial spec file for Fedora and Red Hat Enterprise Linux
-

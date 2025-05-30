@@ -284,4 +284,3 @@ cp -a man? $RPM_BUILD_ROOT%{_mandir}/ko/
 * Tue Apr  4 2000 Bae, Sunghoon <plodder@kldp.org>
 - First Release
 
-

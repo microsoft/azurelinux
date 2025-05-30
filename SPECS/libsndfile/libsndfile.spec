@@ -382,4 +382,3 @@ LD_LIBRARY_PATH=$PWD/src/.libs make check
 
 * Sat Apr 12 2003 Dams <anvil[AT]livna.org>
 - Initial build.
-

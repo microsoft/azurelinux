@@ -99,4 +99,3 @@ rm -rf %{buildroot}%{_infodir}
 
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 1.22.2-1
 - Initial build. First version
-

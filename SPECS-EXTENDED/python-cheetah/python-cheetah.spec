@@ -336,4 +336,3 @@ sed -e 's|{envsitepackagesdir}|%{buildroot}%{python3_sitearch}|' -i tox.ini
 
 * Wed Dec  7 2005 Mike Bonnet <mikeb@redhat.com> - 1.0-1
 - Initial version
-

@@ -218,4 +218,3 @@ make %{?_smp_mflags} test    OPTISPLUS="%{optflags}"
 
 * Mon Aug 12 2002 ro@suse.de
 - split off aaa_base
-

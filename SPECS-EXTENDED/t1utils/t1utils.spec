@@ -167,4 +167,3 @@ and Macintosh resource forks.
 
 * Sat Aug 30 2003 Marius L. Jøhndal <mariuslj at ifi.uio.no> - 0:1.28-0.fdr.1
 - Initial Fedora RPM release.
-

@@ -53,4 +53,3 @@ python3 setup.py install --skip-build --root=%{buildroot}
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 4.6-1
 - Original version for CBL-Mariner
 - License verified
-

@@ -164,4 +164,3 @@ make test
 
 * Sun Jan 18 2015 David Dick <ddick@cpan.org> - 0.28-1
 - Initial release
-

@@ -76,4 +76,3 @@ LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots}
 
 * Tue Oct 23 2018 Sujay G <gsujay@vmware.com> - 2.6.0-1
 - Initial version
-

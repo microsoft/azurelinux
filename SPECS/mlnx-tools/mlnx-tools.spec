@@ -125,4 +125,3 @@ rm -rf %{buildroot}
 
 * Wed Nov 01 2017 Vladimir Sokolovsky <vlad@mellanox.com> - 4.6.0-1
 - Initial packaging
-

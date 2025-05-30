@@ -134,4 +134,3 @@ Summary:       %{summary}
 
 * Thu Mar 08 2018 Randy Barlow <bowlofeggs@fedoraproject.org> - 1.4.3-1
 - Initial release (#1553447).
-

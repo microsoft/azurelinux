@@ -186,4 +186,3 @@ ninja -C %{_vpath_builddir} test || \
 
 * Thu Mar 27 2014 Dave Airlie <airlied@redhat.com> 1.2-0.1.20140307gitd4ad80f
 - initial git snapshot
-

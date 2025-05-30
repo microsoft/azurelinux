@@ -186,4 +186,3 @@ rm -rf docs/html/.doctrees
 * Fri Apr 05 2013 Robert Kuska <rkuska@redhat.com> - 2.4.1-1
 - Initial package
 
-

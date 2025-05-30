@@ -215,4 +215,3 @@ make voikko-install DESTDIR=%{buildroot}%{_libdir}/voikko
 
 * Tue Oct 23 2007 - Ville-Pekka Vainio <vpivaini AT cs.helsinki.fi> 0.7.6-0.1
 - Initial package
-

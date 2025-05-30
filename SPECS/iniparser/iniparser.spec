@@ -167,4 +167,3 @@ make check
 
 * Tue Jan 13 2009 Alex Hudson <fedora@alexhudson.com> - 3.0b-1
 - Initial packaging attempt
-

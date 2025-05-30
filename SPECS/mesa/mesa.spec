@@ -1850,4 +1850,3 @@ popd
 * Sun Jan 19 2014 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 10.0.2-3.20140118
 - Enable OpenCL (RHBZ #887628)
 - Enable r600 llvm compiler (RHBZ #1055098)
-

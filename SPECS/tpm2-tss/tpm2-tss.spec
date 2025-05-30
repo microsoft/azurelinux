@@ -126,4 +126,3 @@ fi
 
 * Thu Feb 21 2019 Alexey Makhalov <amakhalov@vmware.com> 2.2.0-1
 - Initial build. First version
-

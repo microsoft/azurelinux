@@ -189,4 +189,3 @@ done
   * a lot of bugfixes
 * Tue Jun  2 2009 mvyskocil@suse.cz
 - Initial SUSE packaging of objectweb-asm (from jpp 5.0)
-

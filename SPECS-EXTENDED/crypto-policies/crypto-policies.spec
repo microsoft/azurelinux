@@ -562,4 +562,3 @@ end
 
 * Mon May 19 2014 Nikos Mavrogiannopoulos <nmav@redhat.com> - 0.9-1-20140519gitf15621a
 - Initial package build
-

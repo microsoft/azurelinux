@@ -186,4 +186,3 @@ install -Dp -m 0644 lookup_identity.confx $RPM_BUILD_ROOT%{_httpd_confdir}/looku
 
 * Mon Oct 28 2013 Jan Pazdziora <jpazdziora@redhat.com> - 0.5-1
 - Initial release.
-

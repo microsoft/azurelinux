@@ -227,4 +227,3 @@ Resolves: rhbz#926671
 - Exclude .la file.
 - Remove unneeded /sbin/ldconfig calls (only a static lib for now).
 
-

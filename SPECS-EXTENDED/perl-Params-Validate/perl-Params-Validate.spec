@@ -407,4 +407,3 @@ find $RPM_BUILD_ROOT -type d -depth -exec rmdir {} 2>/dev/null ';'
 
 * Wed Aug 10 2005 Ralf Corsepius <ralf@links2linux.de> - 0.78-1
 - FE submission.
-

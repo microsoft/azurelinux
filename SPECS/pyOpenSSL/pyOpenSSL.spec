@@ -115,4 +115,3 @@ LANG=en_US.UTF-8  PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 * Tue Feb 14 2017 Xiaolin Li <xiaolinl@vmware.com> 16.2.0-1
 - Initial packaging for Photon
-

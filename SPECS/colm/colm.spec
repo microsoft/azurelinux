@@ -122,4 +122,3 @@ install -p -m 0644 -D ./src/cgil/*.lm %{buildroot}%{_datadir}
 
 * Thu Dec 01 2016 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 0.13.0.4-1
 - Initial package
-

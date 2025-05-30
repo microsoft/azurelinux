@@ -108,4 +108,3 @@ cp -p hyph_hsb_DE.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen
 
 * Mon Mar 23 2009 Caolan McNamara <caolanm@redhat.com> - 0.20080619-1
 - initial version
-

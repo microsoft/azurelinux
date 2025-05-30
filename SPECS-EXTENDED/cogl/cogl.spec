@@ -446,4 +446,3 @@ chrpath --delete %{buildroot}/%{_libdir}/libcogl-pango.so
 
 * Wed Jun 15 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 1.7.0-1
 - Initial Package
-

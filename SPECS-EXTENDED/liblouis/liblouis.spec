@@ -406,4 +406,3 @@ done
 
 * Sat May 29 2010 Lars Bjørndal <lars.bjorndal@broadpark.no> 1.8.0-1
 - Create the RPM for Fedora.
-

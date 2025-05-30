@@ -171,4 +171,3 @@ pip3 install freezegun
 * Thu Apr 17 2014 Steve Traylen <steve.traylen@cern.ch> 0.5-1
 - First release
 
-

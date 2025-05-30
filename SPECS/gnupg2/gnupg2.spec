@@ -161,4 +161,3 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 
 * Wed Jul 27 2016 Kumar Kaushik <kaushikk@vmware.com> - 2.0.30-1
 - Initial Build.
-

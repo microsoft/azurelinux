@@ -80,4 +80,3 @@ rm -rf %{pypi_name}.egg-info
 
 * Sat Apr 10 2021 Kevin Fenzi <kevin@scrye.com> - 0.5.5-1
 - Initial package.
-

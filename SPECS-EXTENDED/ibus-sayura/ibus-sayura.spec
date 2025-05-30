@@ -207,4 +207,3 @@ EOF
 
 * Fri Mar 20 2009 Pravin Satpute <pravin.d.s@gmail.com> - 1.0.0.20090326-1
 - The first version.
-

@@ -115,4 +115,3 @@ popd
 
 * Wed Oct 04 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 0.10.0-1
 - Initial
-

@@ -158,4 +158,3 @@ make test
 
 * Mon Jun 15 2009 Caolán McNamara <caolanm@redhat.com> - 0.2.4-1
 - initial version
-

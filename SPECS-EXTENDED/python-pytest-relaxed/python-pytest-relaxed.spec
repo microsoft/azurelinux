@@ -157,4 +157,3 @@ Summary:        %{summary}
 * Thu Nov 16 2017 Athmane Madjoudj <athmane@fedoraproject.org> - 1.0.0-1
 - Initial spec
 
-

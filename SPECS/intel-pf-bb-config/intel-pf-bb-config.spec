@@ -58,4 +58,3 @@ install -p -m 755 pf_bb_config %{buildroot}%{_bindir}/pf_bb_config
 * Thu Feb 17 2022 Vince Perri <viperri@microsoft.com> - 21.11-1
 - Original version for CBL-Mariner.
 - License verified
-

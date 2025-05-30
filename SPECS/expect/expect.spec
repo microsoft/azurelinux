@@ -79,4 +79,3 @@ make %{?_smp_mflags} test
 
 * Wed Jul 12 2017 Alexey Makhalov <amakhalov@vmware.com> - 5.45-1
 - Initial build. First version
-

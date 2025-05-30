@@ -187,4 +187,3 @@ pip3 install iniconfig
 
 * Wed Jun 28 2017 Adrien Vergé <adrienverge@gmail.com> - 0.5.2-1
 - Initial package.
-

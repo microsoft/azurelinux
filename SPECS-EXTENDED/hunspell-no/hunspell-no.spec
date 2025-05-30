@@ -219,4 +219,3 @@ cp -p th_nb_NO_v2.dat th_nb_NO_v2.idx th_nn_NO_v2.dat th_nn_NO_v2.idx $RPM_BUILD
 
 * Thu Nov 20 2008 Caolán McNamara <caolanm@redhat.com> - 2.0.10-1
 - initial version
-

@@ -159,4 +159,3 @@ rm -rf %{distname}.egg-info
 
 * Thu Oct 31 2013 Ralph Bean <rbean@redhat.com> - 0.4.0-1
 - Initial package for Fedora
-

@@ -444,4 +444,3 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/fluid.desktop
 
 * Sat Aug 16 2003 Dams <anvil[AT]livna.org>
 - Initial build.
-

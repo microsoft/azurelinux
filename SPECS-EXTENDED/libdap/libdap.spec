@@ -404,4 +404,3 @@ make check || :
 
 * Fri May  6 2005 James Gallagher <jimg@zoey.opendap.org> 
 - Initial build.
-

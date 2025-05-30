@@ -265,4 +265,3 @@ grep 'format("woff2\?")' \
 
 * Thu Jul  3 2014 Jerry James <loganjerry@gmail.com> - 0.1.6-1
 - Initial RPM
-

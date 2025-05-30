@@ -140,4 +140,3 @@ make test
 
 * Fri May 04 2012 jsynacek@redhat.com 0.91-1
 - Initial release
-

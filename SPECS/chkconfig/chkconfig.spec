@@ -659,4 +659,3 @@ mkdir -p %{buildroot}%{_sysconfdir}/chkconfig.d
 
 * Sun Mar 22 1998 Erik Troan <ewt@redhat.com>
 - added --back
-

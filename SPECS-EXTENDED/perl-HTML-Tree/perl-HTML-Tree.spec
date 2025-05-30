@@ -271,4 +271,3 @@ perl Build.PL installdirs=vendor
 
 * Sat Dec  4 2004 Ville Skyttä <ville.skytta at iki.fi> - 0:3.18-0.fdr.1
 - First build.
-

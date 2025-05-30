@@ -354,4 +354,3 @@ rm -fr %{buildroot}/%{_sbindir}/
 
 * Thu Jun 29 2006 Steve Fox <drfickle@k-lug.org> - 0.20060628-1
 - First Fedora package
-

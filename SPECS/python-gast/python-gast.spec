@@ -117,4 +117,3 @@ Summary:        %{summary}
 
 * Sat Jan 19 2019 Miro Hrončok <mhroncok@redhat.com> - 0.2.2-1
 - Initial package
-

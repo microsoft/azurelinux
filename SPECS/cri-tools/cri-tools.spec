@@ -140,4 +140,3 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 
 *   Thu Jul 26 2018 Tapas Kundu <tkundu@vmware.com> 1.11.1-1
 -   Initial build added for Photon.
-

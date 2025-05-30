@@ -220,4 +220,3 @@ A fast and thorough lazy object proxy.
 * Tue Dec 01 2015 Brian C. Lane <bcl@redhat.com> 1.2.1-1
 - Initial creation
 
-

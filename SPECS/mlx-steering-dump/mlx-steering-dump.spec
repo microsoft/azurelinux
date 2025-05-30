@@ -78,4 +78,3 @@ install -m 755 hws/mlx_hw_steering_dump %{buildroot}/usr/bin/
 - License verified
 * Wed Oct 6 2021 Mohammad Kabat <mohammadkab@nvidia.com>
 - Add rpm support
-

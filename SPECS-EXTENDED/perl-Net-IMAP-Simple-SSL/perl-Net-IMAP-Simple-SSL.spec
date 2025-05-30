@@ -136,4 +136,3 @@ make %{?_smp_mflags} test
 
 * Sat Jun 19 2010 Jeroen van Meeuwen <vanmeeuwen@kolabsys.com> - 1.3-1
 - First package
-

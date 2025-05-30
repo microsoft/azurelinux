@@ -162,4 +162,3 @@ Resolves: #6
 
 * Sun Sep 16 2018 Lukas Vrabec <lvrabec@redhat.com> - 0.0.1-1
 - Initial build
-

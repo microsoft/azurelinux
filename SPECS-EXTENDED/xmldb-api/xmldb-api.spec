@@ -168,4 +168,3 @@ cp -pr src/build/javadoc/full/* %{buildroot}%{_javadocdir}/%{name}
   SPDX
 * Tue May 12 2009 mvyskocil@suse.cz
 - Initial packaging of xmldb-api 0.1 in SUSE (from jpp 5.0)
-

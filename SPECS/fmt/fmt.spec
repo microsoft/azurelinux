@@ -188,4 +188,3 @@ sed -i "s/'--clean-css',//" doc/build.py
 
 * Wed Aug 24 2016 Dave Johansen <davejohansen@gmail.com> - 3.0.0-1
 - Initial RPM release
-

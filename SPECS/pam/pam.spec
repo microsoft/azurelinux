@@ -169,4 +169,3 @@ EOF
 -   Update according to UsrMove.
 *   Thu Oct 09 2014 Divya Thaluru <dthaluru@vmware.com> 1.1.8-1
 -   Initial build.  First version
-

@@ -162,4 +162,3 @@ install -pm 0644 *.png $RPM_BUILD_ROOT%{_datadir}/pixmaps
 
 * Fri Aug 28 2010 - Kai-Uwe Behrmann <ku.b at gmx.de>
 - new package naming scheme for Oyranos independent installations
-

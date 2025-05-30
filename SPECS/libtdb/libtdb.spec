@@ -354,4 +354,3 @@ zcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
 
 * Wed May 6 2009 Simo Sorce <ssorce@redhat.com> - 1.1.3-15
 - First public independent release from upstream
-

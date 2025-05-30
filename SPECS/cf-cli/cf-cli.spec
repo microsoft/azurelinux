@@ -140,4 +140,3 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 * Fri Jun 24 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.4.0-1
 - Original version for CBL-Mariner.
 - License verified.
-

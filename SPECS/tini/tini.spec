@@ -127,4 +127,3 @@ ln -s %{_bindir}/tini-static %{buildroot}%{_bindir}/docker-init
 
 * Sun Jun 13 2021 Davide Cavalca <dcavalca@fedoraproject.org> - 0.19.0-1
 - Initial package
-

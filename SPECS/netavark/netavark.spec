@@ -267,4 +267,3 @@ popd
 
 * Tue Feb 01 2022 Lokesh Mandvekar <lsm5@fedoraproject.org> 1.0.0~rc1-1
 - Resolves: #2048794 - initial build
-

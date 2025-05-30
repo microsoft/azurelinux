@@ -163,4 +163,3 @@ CFLAGS="%{optflags}" %{__python3} %{py_setup} %{?py_setup_args} check
 
 * Tue Aug 29 2017 <info@varlink.org> 1-1
 - python-varlink 1
-

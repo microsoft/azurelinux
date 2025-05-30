@@ -312,4 +312,3 @@ fi
 - License verified
 * Mon Aug 15 2016 Alaa Hleihel <alaa@mellanox.com>
 - Initial packaging
-

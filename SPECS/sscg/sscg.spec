@@ -249,4 +249,3 @@ false signatures from the service certificate.
 
 * Mon Mar 16 2015 Stephen Gallagher <sgallagh@redhat.com> 0.1-1
 - First packaging
-

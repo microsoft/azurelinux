@@ -211,4 +211,3 @@ The libiscsi-devel package includes the header files for libiscsi.
 
 * Fri Feb 22 2013 Paolo Bonzini <pbonzini@redhat.com> - 1.7.0-1
 - Initial version (bug 914752)
-

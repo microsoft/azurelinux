@@ -169,4 +169,3 @@ rm -rf justbases.egg-info
 
 * Wed Mar 16 2016 mulhern <amulhern@redhat.com> - 0.6
 - Initial release
-

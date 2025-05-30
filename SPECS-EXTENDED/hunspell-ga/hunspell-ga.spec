@@ -140,4 +140,3 @@ cp -p ga_IE.dic ga_IE.aff $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Thu Dec 07 2006 Caolán McNamara <caolanm@redhat.com> - 0.20060731-1
 - initial version
-

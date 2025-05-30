@@ -105,4 +105,3 @@ into other protocols.
 
 * Tue Jan 5 2016 Xiaolin Li <xiaolinl@vmware.com> - 0.13-1
 - Initial build.  First version
-

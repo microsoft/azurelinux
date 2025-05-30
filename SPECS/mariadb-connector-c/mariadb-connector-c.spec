@@ -478,4 +478,3 @@ popd
 
 * Tue Aug 26 2014 Matej Mužila <mmuzila@redhat.com> - 2.0.0-2
 - Initial version for 2.0.0
-

@@ -122,4 +122,3 @@ rm -fr doc/build/html/.buildinfo
 * Fri Mar 08 2019 RDO <dev@lists.rdoproject.org> 1.21.0-1
 - Update to 1.21.0
 
-

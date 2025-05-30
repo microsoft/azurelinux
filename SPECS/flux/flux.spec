@@ -217,4 +217,3 @@ RUSTFLAGS=%{rustflags} cargo test --release
 
 * Fri Mar  5 2021 Matwey Kornilov <matwey.kornilov@gmail.com>
 - Initial version
-

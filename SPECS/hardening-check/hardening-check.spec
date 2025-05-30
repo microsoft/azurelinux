@@ -101,4 +101,3 @@ make
 
 * Fri Jun 07 2013 Björn Esser <bjoern.esser@gmail.com> - 2.3-1
 - Initial rpm release (#971836)
-

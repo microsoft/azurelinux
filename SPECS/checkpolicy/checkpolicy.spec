@@ -941,4 +941,3 @@ such a rule is added to a conditional.
 
 * Mon Jun 2 2003 Dan Walsh <dwalsh@redhat.com> 1.0-1
 - Initial version
-

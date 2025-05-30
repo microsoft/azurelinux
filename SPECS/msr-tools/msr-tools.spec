@@ -49,4 +49,3 @@ install -D cpuid %{buildroot}%{_sbindir}/msr-cpuid
 -   GA - Bump release of all rpms
 *   Tue Nov 24 2015 Xiaolin Li <xiaolinl@vmware.com> 2.3-1
 -   Initial build.  First version
-

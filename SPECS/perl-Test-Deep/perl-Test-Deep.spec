@@ -334,4 +334,3 @@ make test
 - Improve description.
 - Fix License.
 - Remove explicit dependency on Test::Tester and Test::NoWarnings.
-

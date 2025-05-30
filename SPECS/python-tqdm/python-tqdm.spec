@@ -215,4 +215,3 @@ pip3 install iniconfig \
 
 * Thu Jun 23 2016 Igor Gnatenko <ignatenko@redhat.com> - 4.7.4-1
 - Initial package
-

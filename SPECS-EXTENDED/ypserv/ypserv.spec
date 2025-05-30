@@ -853,4 +853,3 @@ install -m 755 %{SOURCE4} $RPM_BUILD_ROOT%{_libexecdir}/rpc.yppasswdd.env
 
 * Fri Mar 07 1997 Erik Troan <ewt@redhat.com>
 - Removed -pedantic which confuses the SPARC :-(
-

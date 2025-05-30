@@ -320,4 +320,3 @@ done
 * Wed Dec 01 2004 Nils Philippsen <nphilipp@redhat.com>
 - version of 2004-11-28
 - initial build
-

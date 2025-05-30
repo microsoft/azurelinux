@@ -161,4 +161,3 @@ find %{buildroot} -type f -name "*.la" -delete
 
 * Fri Dec 12 2014 David King <amigadave@amigadave.com> - 1.2-0.1.rc2
 - New package, split from speex (#1172829)
-

@@ -161,4 +161,3 @@ cp -r target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
   * removed misc/mindtermsrc-v121-compression.patch in %%%%prep
 * Tue Apr 28 2009 mvyskocil@suse.cz
 - Initial SUSE packaging (version 1.0.7 from jpp5)
-

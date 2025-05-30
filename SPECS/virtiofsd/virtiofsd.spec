@@ -113,4 +113,3 @@ cargo test --release
   older versions of the qemu-tools package (qemu-tools < 8)
 * Tue May 23 2023 Caleb Crane <caleb.crane@suse.com>
 - Initial release of virtiofsd v1.6.1
-

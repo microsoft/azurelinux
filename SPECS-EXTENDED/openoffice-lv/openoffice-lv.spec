@@ -223,4 +223,3 @@ cp -p th_lv_LV_v2.* $RPM_BUILD_ROOT/%{_datadir}/mythes
 
 * Sat Sep 20 2008 Caolán McNamara <caolanm@redhat.com> - 0.7.3-1
 - initial version
-

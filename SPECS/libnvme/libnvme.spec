@@ -175,4 +175,3 @@ This package contains Python bindings for libnvme.
 
 * Wed Oct 20 2021 Tomas Bzatek <tbzatek@redhat.com> - 0.0.1-1.git1fe38d6
 - Initial packaging
-

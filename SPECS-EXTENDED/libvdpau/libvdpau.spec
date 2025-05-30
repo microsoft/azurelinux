@@ -335,4 +335,3 @@ cp %{_sourcedir}/README .
 - also build and package documentation
 * Wed Apr 21 2010 sndirsch@suse.de
 - created package (bnc #596481)
-

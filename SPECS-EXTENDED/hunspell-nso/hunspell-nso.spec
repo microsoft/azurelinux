@@ -111,4 +111,3 @@ cp -p ns_ZA.aff $RPM_BUILD_ROOT/%{_datadir}/myspell/nso_ZA.aff
 
 * Fri Sep 12 2008 Caolan McNamara <caolanm@redhat.com> - 0.20060120-1
 - initial version
-

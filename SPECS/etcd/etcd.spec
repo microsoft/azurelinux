@@ -314,4 +314,3 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 
 *   Tue Mar 10 2015 Divya Thaluru <dthaluru@vmware.com> 2.0.4-1
 -   Initial build.  First version
-

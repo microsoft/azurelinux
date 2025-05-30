@@ -890,4 +890,3 @@ done
 
 * Wed Jul 14 2004 Ed Hill <eh3@mit.edu> - 0:3.5.1-0.fdr.0
 - Initial RPM release.
-

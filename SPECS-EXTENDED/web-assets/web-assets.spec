@@ -153,4 +153,3 @@ systemctl reload-or-try-restart httpd.service || :
 
 * Thu Jul 11 2013 T.C. Hollingsworth <tchollingsworth@gmail.com> - 1-1
 - initial package
-

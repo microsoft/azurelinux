@@ -334,4 +334,3 @@ make install PREFIX=%{_prefix} ETCDIR=%{_sysconfdir} DESTDIR=%{buildroot}
 
 * Fri Nov 27 2009 James Findley	<sixy@gmx.com> - 0.5.2-1
 - Initial Release
-

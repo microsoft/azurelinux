@@ -66,4 +66,3 @@ The Less package contains a text file viewer
 
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 458-1
 - Initial build. First version
-

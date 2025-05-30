@@ -748,4 +748,3 @@ Resolves: #1098109
 
 * Thu Mar 27 2008 Michel Salim <michel.sylvan@gmail.com> 0.1.61950-1
 - Initial package
-

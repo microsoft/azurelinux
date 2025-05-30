@@ -256,4 +256,3 @@ PYTHON=%{__python3} make DESTDIR=$RPM_BUILD_ROOT install-bin install-devel insta
 * Fri Dec  7 2007 Jeremy Katz <katzj@redhat.com> - 1.0-1
 - Initial build.
 
-

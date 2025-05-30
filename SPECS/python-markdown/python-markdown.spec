@@ -300,4 +300,3 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 * Mon Aug  4 2008 Thomas Moschny <thomas.moschny@gmx.de> - 1.7-1
 - New package.
-

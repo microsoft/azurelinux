@@ -137,4 +137,3 @@ information about operating systems for use with virtualization.
 
 * Fri Jul 29 2016 Daniel P. Berrange <berrange@redhat.com> - 1.0.0-1
 - Initial package after split from libosinfo (rhbz #1361594)
-

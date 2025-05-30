@@ -150,4 +150,3 @@ tox -e py%{python3_version_nodots} --sitepackages
 
 * Sat Jan 23 2016 Germano Massullo <germano.massullo@gmail.com> - 0.5.0-1
 - Package review submission
-

@@ -98,4 +98,3 @@ chmod o-rw %{_sysconfdir}/ident.key
 - New release (v1.4.4)
 - New upstream URL
 
-

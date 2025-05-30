@@ -292,4 +292,3 @@ rm -rf %{buildroot}/%{_docdir}/
 * Sun Nov 13 2005 Peter Lemenkov <lemenkov@newmail.ru> 4.3-1
 - Initial build for FC-Extras
 - Version 4.3
-

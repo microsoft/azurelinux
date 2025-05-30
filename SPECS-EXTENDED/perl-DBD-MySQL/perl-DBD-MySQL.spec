@@ -478,4 +478,3 @@ find %{buildroot} -type f -name '*.bs' -empty -delete
 
 * Thu Nov 30 2000 Trond Eivind GlomsrÃ¸d <teg@redhat.com>
 - First cut
-

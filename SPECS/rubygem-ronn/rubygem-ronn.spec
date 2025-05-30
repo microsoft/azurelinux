@@ -133,4 +133,3 @@ rm -rf %{buildroot}%{gem_instdir}/{INSTALLING,Rakefile,test,man,ronn.gemspec,con
 
 * Wed Apr 3 2013 Ricky Elrod <codeblock@fedoraproject.org> - 0.7.3-1
 - Initial build.
-

@@ -428,4 +428,3 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 
 * Tue May 13 2014 - Neil Horman <nhorman@tuxdriver.com> - 1.7.0-0.6.20140603git5ebbb1728
 - Initial Build
-

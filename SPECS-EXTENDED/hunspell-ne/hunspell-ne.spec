@@ -130,4 +130,3 @@ popd
 
 * Thu Jan 03 2008 Parag <pnemade@redhat.com> - 20061217-1
 - Initial Fedora release
-

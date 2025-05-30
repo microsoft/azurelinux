@@ -515,4 +515,3 @@ Requires: libknet1%{_isa} = %{version}-%{release}
 
 * Wed Apr 03 2019 Madison Kelly <mkelly@alteeve.ca> - 1.8-1
 - Updated to upstream release v1.8.
-

@@ -117,4 +117,3 @@ done
 
 * Thu Dec 07 2006 Caolán McNamara <caolanm@redhat.com> - 0.20040406-1
 - initial version
-

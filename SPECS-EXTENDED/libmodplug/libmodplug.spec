@@ -203,4 +203,3 @@ make check
 * Fri Oct 17 2003 Ville Skyttä <ville.skytta@iki.fi> - 1:0.7-0.fdr.1
 - First build, separated from xmms-modplug.
 - Bump Epoch.
-

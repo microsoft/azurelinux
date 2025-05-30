@@ -129,4 +129,3 @@ Python 3 version.
 
 * Mon Oct 10 2016 James Hogarth <james.hogarth@gmail.com> - 0.3.0-1
 - Initial package.
-

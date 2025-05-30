@@ -94,4 +94,3 @@ pip3 install iniconfig
 
 * Mon Mar 13 2017 Xiaolin Li <xiaolinl@vmware.com> - 2.5-1
 - Initial packaging for Photon
-

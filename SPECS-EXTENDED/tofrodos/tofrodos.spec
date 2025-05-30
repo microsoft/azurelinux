@@ -86,4 +86,3 @@ make -C src/ install INSTALL="install -p" BINDIR="%{buildroot}%{_bindir}" MANDIR
 
 * Mon Feb 10 2014 Christopher Meng <rpm@cicku.me> - 1.7.13-1
 - Initial Package.
-

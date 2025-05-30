@@ -196,4 +196,3 @@ make check LD_LIBRARY_PATH=$RPM_BUILD_ROOT/%{_libdir}
 * Mon Nov 28 2005 Dmitry Butskoy <Dmitry@Butskoy.name> - 1.8-1
 - upgrade to 1.8
 - update description
-

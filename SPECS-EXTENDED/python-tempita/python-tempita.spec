@@ -198,4 +198,3 @@ sed -i '/use_2to3/d' setup.py
 
 * Sat Jun 14 2008 Ricky Zhou <ricky@fedoraproject.org> - 0.2-1
 - Initial RPM Package.
-

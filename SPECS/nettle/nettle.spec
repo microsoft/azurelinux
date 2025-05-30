@@ -94,4 +94,3 @@ make %{?_smp_mflags} check
 - Moving static lib files to devel package.
 * Thu Jun 18 2015 Divya Thaluru <dthaluru@vmware.com> 3.1.1-1
 - Initial build. First version
-

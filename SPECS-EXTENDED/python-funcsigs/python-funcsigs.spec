@@ -159,4 +159,3 @@ rm -rf html/.{doctrees,buildinfo}
 
 * Wed Dec 02 2015 Haïkel Guémar <hguemar@fedoraproject.org> - 0.4-1
 - Initial package.
-

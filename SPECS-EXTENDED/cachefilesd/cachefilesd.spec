@@ -225,4 +225,3 @@ install -m 644 cachefilesd.service %{buildroot}%{_unitdir}/cachefilesd.service
 
 * Sat Apr 22 2006 Steve Dickson <steved@redhat.com> 0.1-1
 - Initial commit
-

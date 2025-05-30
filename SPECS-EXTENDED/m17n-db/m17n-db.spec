@@ -596,4 +596,3 @@ cp -p m17n-db-sayura-1.0.0/icons/si-sayura.png %{buildroot}%{_datadir}/m17n/icon
 
 * Sat Jan 15 2005 UTUMI Hirosi <utuhiro78@yahoo.co.jp>
 - modify spec for fedora
-

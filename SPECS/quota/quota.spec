@@ -991,4 +991,3 @@ make check
 
 * Tue Mar 25 1997 Erik Troan <ewt@redhat.com>
 - Moved /usr/sbin/quota to /usr/bin/quota
-

@@ -120,4 +120,3 @@ make test-unit-local
 * Tue Jul 26 2022 Tom Fay <tomfay@microsoft.com> - 1.9.1-1
 - Original version for CBL-Mariner.
 - License verified.
-

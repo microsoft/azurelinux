@@ -350,4 +350,3 @@ This package contains the python3 bindings for %{name}
 
 * Wed Jun 02 2010 Ankur Sinha <ankursinha AT fedoraproject DOT org> - 0.0.90-1
 - initial rpmbuild
-

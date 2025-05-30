@@ -77,4 +77,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Mon Sep 10 2018 Ankit Jain <ankitja@vmware.com> 1.1.1-1
 - Initial version
-

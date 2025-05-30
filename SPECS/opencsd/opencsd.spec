@@ -102,4 +102,3 @@ PREFIX=%{buildroot}%{_prefix} LIB_PATH=%{_lib} make install DISABLE_STATIC=1 DEF
 
 * Wed Jul 08 2020 Jeremy Linton <jeremy.linton@arm.com> - 0.14.1-1
 - First opencsd package
-

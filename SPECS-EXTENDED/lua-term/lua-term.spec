@@ -132,4 +132,3 @@ cp -p core.so %{buildroot}%{lualibdir}/term/
 * Wed Oct 09 2013 Jiri Machala <george.machala@gmail.com> - 0.02-1
 - Initial version
 
-

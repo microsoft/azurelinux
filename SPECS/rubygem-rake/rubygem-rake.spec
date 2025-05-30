@@ -257,4 +257,3 @@ ruby ./exe/rake test
 
 * Mon Jun 18 2007 David Lutterkort <dlutter@redhat.com> - 0.7.3-1
 - Initial package
-

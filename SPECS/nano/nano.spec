@@ -96,4 +96,3 @@ make %{?_smp_mflags} check
 
 *   Tue Dec 30 2014 Mahmoud Bassiouny <mbassiouny@vmware.com> 2.2.6-1
 -   Initial build.	First version
-

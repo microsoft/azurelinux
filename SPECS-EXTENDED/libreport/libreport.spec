@@ -833,4 +833,3 @@ fi
 - Update to 2.10.0
 - Bump GLib dependency
 - Add patch to work around issue with test
-

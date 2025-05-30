@@ -101,4 +101,3 @@ make %{?_smp_mflags} check
 
 * Thu Sep 26 2019 Henry Beberman <hebeberm@microsoft.com> - 1.5.1-1
 - Original version for CBL-Mariner.
-

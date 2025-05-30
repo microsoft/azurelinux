@@ -181,4 +181,3 @@ rm -rf %{buildroot}%{_docdir}/%{name}
 
 * Mon Aug 03 2009 Jussi Lehtola <jussilehtola@fedoraproject.org> - 1.8-1
 - First release.
-

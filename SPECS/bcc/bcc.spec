@@ -164,4 +164,3 @@ find %{buildroot}%{_lib64dir} -name '*.a' -delete
 
 * Wed Jun 26 2019  Keerthana K <keerthanak@vmware.com> 0.10.0-1
 - Initial bcc package for PhotonOS.
-

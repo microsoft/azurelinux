@@ -243,4 +243,3 @@ echo ".so man1/%{name}.1" > %{buildroot}%{_mandir}/man1/wget.1
 
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 1.15-1
 - Initial build.  First version
-

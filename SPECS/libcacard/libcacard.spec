@@ -141,4 +141,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Wed Sep 23 2015 Marc-André Lureau <marcandre.lureau@redhat.com> - 3:2.5.0-1
 - Initial standalone libcacard package.
-

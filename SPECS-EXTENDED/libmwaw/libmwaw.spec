@@ -272,4 +272,3 @@ install -m 0644 mwaw2*.1 %{buildroot}/%{_mandir}/man1
 
 * Tue Mar 19 2013 David Tardon <dtardon@redhat.com> 0.1.7-1
 - initial import
-

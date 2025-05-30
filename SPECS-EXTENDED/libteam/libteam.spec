@@ -621,4 +621,3 @@ teamd: fix possible race in master ifname callback
 
 * Wed Jan 18 2012 Jiri Pirko <jpirko@redhat.com> - 0.1-1.20120113git302672e
 - Initial build.
-

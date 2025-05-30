@@ -100,4 +100,3 @@ cp -p mt.aff $RPM_BUILD_ROOT/%{_datadir}/myspell/mt_MT.aff
 
 * Mon Oct 13 2008 Caolan McNamara <caolanm@redhat.com> - 0.20020708-1
 - initial version
-

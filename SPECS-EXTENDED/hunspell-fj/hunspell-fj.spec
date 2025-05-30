@@ -115,4 +115,3 @@ cp -p dictionaries/fj_FJ.dic $RPM_BUILD_ROOT/%{_datadir}/myspell/fj.dic
 
 * Sat Nov 01 2008 Caolán McNamara <caolanm@redhat.com> - 0.20050811-1
 - initial version
-

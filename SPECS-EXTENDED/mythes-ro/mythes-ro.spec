@@ -96,4 +96,3 @@ cp -p th_ro_RO.idx $RPM_BUILD_ROOT/%{_datadir}/mythes/th_ro_RO_v2.idx
 
 * Tue Jan 20 2009 Caolan McNamara <caolanm@redhat.com> - 3.3-0.1.test3
 - initial version
-

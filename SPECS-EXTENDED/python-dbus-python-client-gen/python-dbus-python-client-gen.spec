@@ -154,4 +154,3 @@ Python 3 version.
 
 * Mon Jan 08 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 0.5-1
 - Initial import
-

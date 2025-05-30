@@ -306,4 +306,3 @@ VERBOSE=1 make check
 
 * Thu Apr 28 2016 Jan Pokorný <jpokorny+rpm-booth@fedoraproject.org> - 1.0-1.eb4256a.git
 - initial build
-

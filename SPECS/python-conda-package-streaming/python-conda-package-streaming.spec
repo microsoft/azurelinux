@@ -120,4 +120,3 @@ pip3 install pytest-cov==6.1.0 boto3==1.37.24 boto3-stubs[essential]==1.37.24 bo
 
 * Sat Dec 03 2022 Orion Poplawski <orion@nwra.com> - 0.7.0-1
 - Initial Fedora package
-

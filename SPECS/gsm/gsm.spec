@@ -302,4 +302,3 @@ make addtst
 
 * Thu May 29 2003 Thomas Vander Stichele <thomas at apestaart dot org>
 - 0:1.0.10-0.fdr.1: initial RPM release
-

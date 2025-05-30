@@ -328,4 +328,3 @@ cp -p vim/syntax/sexplib.vim %{buildroot}%{vimfiles_root}/syntax
 
 * Sun Feb 24 2008 Richard W.M. Jones <rjones@redhat.com> - 3.5.0-1
 - Initial RPM release.
-

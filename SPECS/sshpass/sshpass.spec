@@ -61,4 +61,3 @@ make prefix=%{_prefix}	DESTDIR=%{buildroot} install
 
 * Fri Sep 11 2015 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.05-1
 - Initial version
-

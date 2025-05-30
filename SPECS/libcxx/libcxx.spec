@@ -570,4 +570,3 @@ popd
 * Tue May 3 2016 Tom Callaway <spot@fedoraproject.org> - 3.8.0-1
 - initial package
 - bootstrap on
-

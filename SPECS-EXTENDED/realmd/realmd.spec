@@ -403,4 +403,3 @@ make install DESTDIR=%{buildroot}
 
 * Mon Jun 18 2012 Stef Walter <stefw@redhat.com> - 0.2
 - Initial RPM
-

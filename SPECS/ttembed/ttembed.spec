@@ -88,4 +88,3 @@ rm test
 
 * Mon Dec 2 2013 Petr Vobornik <pvoborni@redhat.com> - 1.1-1
 - initial package
-

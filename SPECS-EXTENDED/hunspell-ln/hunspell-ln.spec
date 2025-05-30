@@ -86,4 +86,3 @@ cp -p ln_CD.* $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Sun Apr 26 2009 Caolan McNamara <caolanm@redhat.com> - 0.02-1
 - initial version
-

@@ -201,4 +201,3 @@ Wikipedia.
 
 * Fri Jan 04 2013 Ralph Bean <rbean@redhat.com> - 0.4.1-1
 - Initial packaging for Fedora
-

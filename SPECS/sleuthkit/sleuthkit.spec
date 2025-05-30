@@ -322,4 +322,3 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Mon Oct 29 2007 kwizart < kwizart at gmail.com > - 2.09-1
 - Initial package for Fedora
   (inspired from Oden Eriksson mdk spec).
-

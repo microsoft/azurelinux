@@ -473,4 +473,3 @@ and above. This package provides Bill of Materials module for Guice.
 
 * Thu Oct  7 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 2.0-1.1219svn
 - Initial version of the package
-

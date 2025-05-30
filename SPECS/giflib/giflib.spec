@@ -229,4 +229,3 @@ find %{buildroot} -name '*.a' -print -delete
   
 * Mon Sep 19 2005 Toshio Kuratomi <toshio@tiki-lounge.com> 4.1.3-1
 - Port package from libungif to giflib.
-

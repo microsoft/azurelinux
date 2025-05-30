@@ -174,4 +174,3 @@ install -m 644 10-auth_gssapi.conf %{buildroot}%{_httpd_modconfdir}
 
 * Mon Aug  4 2014 Simo Sorce <simo@redhat.com> 1.0.0-1
 - First release
-

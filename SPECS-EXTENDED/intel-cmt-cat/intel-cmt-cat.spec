@@ -182,4 +182,3 @@ Development files.
 
 * Thu Apr 7 2016 Tomasz Kantecki <tomasz.kantecki@intel.com> 0.1.4-1
 - initial version of the package
-

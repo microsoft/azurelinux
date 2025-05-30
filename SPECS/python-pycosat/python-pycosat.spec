@@ -147,4 +147,3 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 * Mon Sep 21 2015 Orion Poplawski <orion@cora.nwra.com> - 0.6.1-1
 - Initial package
-

@@ -146,4 +146,3 @@ install -Dpm644 %{name}.1 %{buildroot}%{_mandir}/man1/%{name}.1
 
 * Wed May 29 2013 Jaromir Capik <jcapik@redhat.com> - 3.1-1
 - Initial package
-

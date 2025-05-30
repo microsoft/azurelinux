@@ -238,4 +238,3 @@ ruby -rrubygems -Ilib/ -S rspec spec/ || \
 
 * Mon Feb 03 2014 Mamoru TASAKA <mtasaka@tbz.t-com.ne.jp> - 3.0.0-0.1.beta1
 - Initial package
-

@@ -296,4 +296,3 @@ make check
 
 * Sun May 10 2009 Peter Robinson <pbrobinson@fedoraproject.org> 0.12.0-0.1
 - Initial package
-

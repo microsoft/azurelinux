@@ -601,4 +601,3 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/sox/*.a
 
 * Thu Nov 06 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
-

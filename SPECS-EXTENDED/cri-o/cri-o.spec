@@ -1749,4 +1749,3 @@ mkdir -p /opt/cni/bin
   conformant runtimes and the kubelet. Specifically, it implements the Kubelet
   Container Runtime Interface (CRI) using OCI conformant runtimes. The scope of
   CRI-O is tied to the scope of the CRI.
-

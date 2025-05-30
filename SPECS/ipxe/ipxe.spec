@@ -78,4 +78,3 @@ install -vDm 644 src/bin/*.{rom,mrom} %{buildroot}/usr/share/ipxe/
 -   GA - Bump release of all rpms
 *   Thu Nov 12 2015 Vinay Kulkarni <kulkarniv@vmware.com> ed0d7c4-1
 -   Initial build. First version
-

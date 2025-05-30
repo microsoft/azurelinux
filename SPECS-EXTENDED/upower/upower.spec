@@ -350,4 +350,3 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
 * Sun Jul 22 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.9.17-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
-
