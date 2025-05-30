@@ -187,6 +187,7 @@
                 "dogtail",
                 "dos2unix",
                 "dotconf",
+		"double-conversion",
                 "dovecot",
                 "dpdk",
                 "dpkg",
