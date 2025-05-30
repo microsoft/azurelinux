@@ -5,9 +5,9 @@ name: Package build checks
 
 env:
   REGULAR_PKG: words
-  REGULAR_PKG_SPEC_PATH: SPECS/$REGULAR_PKG/$REGULAR_PKG.spec
+  REGULAR_PKG_SPEC_PATH: SPECS/words/words.spec
   TOOLCHAIN_PKG: xz
-  TOOLCHAIN_PKG_SPEC_PATH: SPECS/$TOOLCHAIN_PKG/$TOOLCHAIN_PKG.spec
+  TOOLCHAIN_PKG_SPEC_PATH: SPECS/xz/xz.spec
 
 on:
   push:
