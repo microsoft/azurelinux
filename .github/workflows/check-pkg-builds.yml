@@ -71,7 +71,7 @@ jobs:
           if sudo make -C toolkit -j$(nproc) build-packages \
             PACKAGE_REBUILD_LIST="$REGULAR_PKG" \
             REBUILD_TOOLS=y \
-            SRPM_PACK_LIST="$REGULAR_PKG" | tee build.log
+            SRPM_PACK_LIST="$REGULAR_PKG" 2>&1 | tee build.log
           then
             echo "Package build should have failed, but it succeeded."
             exit 1
@@ -130,7 +130,7 @@ jobs:
             PACKAGE_REBUILD_LIST="$TOOLCHAIN_PKG" \
             REBUILD_TOOLS=y \
             SRPM_PACK_LIST="$TOOLCHAIN_PKG" \
-            ALLOW_TOOLCHAIN_REBUILDS=n | tee build.log
+            ALLOW_TOOLCHAIN_REBUILDS=n 2>&1 | tee build.log
           then
             echo "Toolchain package rebuild should have failed, but it succeeded."
             exit 1
@@ -246,7 +246,7 @@ jobs:
             PACKAGE_REBUILD_LIST="$REGULAR_PKG" \
             REBUILD_TOOLS=y \
             SRPM_PACK_LIST="$REGULAR_PKG" \
-            LICENSE_CHECK_MODE=fatal | tee build.log
+            LICENSE_CHECK_MODE=fatal 2>&1 | tee build.log
           then
             echo "License check should have failed, but it succeeded."
             exit 1
@@ -330,7 +330,7 @@ jobs:
             PACKAGE_REBUILD_LIST="$REGULAR_PKG" \
             REBUILD_TOOLS=y \
             SRPM_PACK_LIST="$REGULAR_PKG" \
-            LICENSE_CHECK_MODE=pedantic | tee build.log
+            LICENSE_CHECK_MODE=pedantic 2>&1 | tee build.log
           then
             echo "License check should have failed, but it succeeded."
             exit 1
