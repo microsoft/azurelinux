@@ -93,7 +93,7 @@ fi
 
 %changelog
 * Fri May 30 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.0.0-10
-- Patch CVE-2025-47291.patch
+- Patch CVE-2025-47291
 
 * Thu May 22 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.0.0-9
 - Patch CVE-2025-22872
