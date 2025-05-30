@@ -560,8 +560,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 
 	printErr := schedulerutils.PrintHiddenBuildBlockers(builtGraph, graphMutex, buildState, goalNode)
 	if printErr != nil {
-		err = printErr
-		return
+		logger.Log.Warnf("Failed to print hidden build blockers:\n%s", printErr)
 	}
 
 	err = errors.Join(err, performPostBuildChecks(allowToolchainRebuilds, buildState))
