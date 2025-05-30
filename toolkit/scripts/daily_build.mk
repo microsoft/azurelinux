@@ -22,6 +22,8 @@
 DAILY_BUILD_ID ?=
 ##help:var:DAILY_BUILD_ID_UPDATE_MANIFESTS={y,n}=Update the toolchain manifests when using DAILY_BUILD_ID to match the daily build repo.
 DAILY_BUILD_ID_UPDATE_MANIFESTS ?= y
+##help:var:DAILY_BUILD_MERGE_MANIFESTS={y,n}=If DAILY_BUILD_ID is set and DAILY_BUILD_ID_UPDATE_MANIFESTS=y, will merge manifests with daily repo by choosing the highest versions.
+DAILY_BUILD_MERGE_MANIFESTS ?= n
 ##help:var:DAILY_BUILD_REPO={path to daily.repo}=Path to the daily build repo file to use.
 DAILY_BUILD_REPO ?=
 ##help:var:DAILY_BUILD_SKIP_TOOLCHAIN_AUTO_CLEANUP={y,n}=Skip Deleting all downloaded toolchain RPMs when using a daily build.

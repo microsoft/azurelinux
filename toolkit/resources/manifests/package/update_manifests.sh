@@ -31,14 +31,98 @@ else
     print_usage
 fi
 
+MERGE_MANIFESTS=$3
+
 echo Updating files...
 
 generate_toolchain () {
-    # First generate toolchain_*.txt from TOOLCHAIN_ARCHIVE (toolchain_built_rpms_all.tar.gz)
-    # This file is a sorted list of all toolchain packages in the tarball.
-    tar -tf "$TOOLCHAIN_ARCHIVE" | sed 's+built_rpms_all/++g' | sed '/^$/d' > "$ToolchainManifest"
+    local toolchain_package_list
+    local manifest_package_info
+    local manifest_version
+    local manifest_release_version
+    local new_version
+    local new_release_version
+
+    if [[ $MERGE_MANIFESTS == "y" ]]; then
+        # Generate toolchain_*.txt from TOOLCHAIN_ARCHIVE (toolchain_built_rpms_all.tar.gz)
+        # This file is a sorted list of all toolchain packages in the tarball.
+        toolchain_package_list=($(tar -tf "$TOOLCHAIN_ARCHIVE" | sed 's+built_rpms_all/++g' | sed '/^$/d'))
+
+        for package_rpm_name in "${toolchain_package_list[@]}"; do
+            
+            if [[ "$package_rpm_name" =~ ^(.*)-.*-.*(\.azl3|cm2).*\.rpm$ ]]; then
+                package_name="${BASH_REMATCH[1]}"
+            fi
+
+            # If MERGE_MANIFESTS is set to 'y', merge the toolchain manifest with the built rpms
+            manifest_package_info=$(sed -nE "s/^$package_name-(.*)-(.*)(\.azl3|cm2).*\.rpm/\1 \2 \3 /p" "$ToolchainManifest")
+
+            manifest_version="${manifest_package_info[1]}"
+            manifest_release_version="${manifest_package_info[2]}"
+
+            if [[ "$package_rpm_name" =~ ^$package_name-(.*)-(.*)(\.azl3|cm2).*\.rpm$ ]]; then
+                new_version="${BASH_REMATCH[1]}"
+                new_release_version="${BASH_REMATCH[2]}"
+            fi
+
+            highest_version=$(get_highest_version "$manifest_version" "$new_version" "$manifest_release_version" "$new_release_version")
+            sed -i "s/^$package_name-[0-9].*\.rpm/$package_name-$highest_version/" "$ToolchainManifest"
+        done
+    else
+        # Generate toolchain_*.txt from TOOLCHAIN_ARCHIVE (toolchain_built_rpms_all.tar.gz)
+        # This file is a sorted list of all toolchain packages in the tarball.
+        tar -tf "$TOOLCHAIN_ARCHIVE" | sed 's+built_rpms_all/++g' | sed '/^$/d' | sort -u > "$ToolchainManifest"
+    fi
+
     # Now sort the file in place
     LC_COLLATE=C sort -f -o "$ToolchainManifest" "$ToolchainManifest"
+}
+
+get_highest_version() {
+    # $1 = version1 (e.g., 1.2.3)
+    # $2 = version2 (e.g., 1.3.0)
+    local v1_version
+    local v2_version
+    local v1_release_version
+    local v2_release_version
+    local IFS=.
+    v1_version="$1"
+    v2_version="$2"
+    v1_release_version="$3"
+    v2_release_version="$4"
+
+    # Check if the versions are equal and compare release versions
+    if [[ "$v1_version" == "$v2_version" ]]; then
+        if (( v1_release_version > v2_release_version )); then
+            echo "$1"
+        elif (( v1_release_version < v2_release_version )); then
+            echo "$2"
+        else
+            echo "$1"
+        fi
+        return
+    fi
+
+    read -r v1_major v1_minor v1_micro <<< "$v1_version"
+    read -r v2_major v2_minor v2_micro <<< "$v2_version"
+    v1_minor=${v1_minor:-0}
+    v1_micro=${v1_micro:-0}
+    v2_minor=${v2_minor:-0}
+    v2_micro=${v2_micro:-0}
+
+    if (( v1_major > v2_major )); then
+        echo "$1"
+    elif (( v1_major < v2_major )); then
+        echo "$2"
+    elif (( v1_minor > v2_minor )); then
+        echo "$1"
+    elif (( v1_minor < v2_minor )); then
+        echo "$2"
+    elif (( v1_micro > v2_micro )); then
+        echo "$1"
+    else
+        echo "$2"
+    fi
 }
 
 # Remove specific packages that are not needed in pkggen_core
