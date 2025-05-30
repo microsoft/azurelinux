@@ -12232,7 +12232,7 @@
         "other": {
           "name": "linux-firmware",
           "version": "20230804",
-          "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/snapshot/linux-firmware-20230804.tar.gz"
+          "downloadUrl": "https://www.kernel.org/pub/linux/kernel/firmware/linux-firmware-20230804.tar.gz"
         }
       }
     },
