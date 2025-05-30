@@ -67,15 +67,21 @@ jobs:
 
       - name: Check if a package build fails
         run: |
+          set -euo pipefail
           if sudo make -C toolkit -j$(nproc) build-packages \
             PACKAGE_REBUILD_LIST="$REGULAR_PKG" \
             REBUILD_TOOLS=y \
-            SRPM_PACK_LIST="$REGULAR_PKG"
+            SRPM_PACK_LIST="$REGULAR_PKG" | tee build.log
           then
             echo "Package build should have failed, but it succeeded."
             exit 1
           else
-            echo "Package build failed as expected."
+            if grep -qP 'Number of failed SRPMs:\s+1$' build.log; then
+              echo "Package build failed as expected."
+            else
+              echo "Package build failed but not as expected."
+              exit 1
+            fi
           fi
 
   toolchain-pkg-rebuild-success-ok:
@@ -117,17 +123,24 @@ jobs:
 
       - name: Check if a toolchain package rebuild fails
         run: |
+          set -euo pipefail
+
           # The important argument is 'ALLOW_TOOLCHAIN_REBUILDS=n'.
           if sudo make -C toolkit -j$(nproc) build-packages \
             PACKAGE_REBUILD_LIST="$TOOLCHAIN_PKG" \
             REBUILD_TOOLS=y \
             SRPM_PACK_LIST="$TOOLCHAIN_PKG" \
-            ALLOW_TOOLCHAIN_REBUILDS=n
+            ALLOW_TOOLCHAIN_REBUILDS=n | tee build.log
           then
             echo "Toolchain package rebuild should have failed, but it succeeded."
             exit 1
           else
-            echo "Toolchain package rebuild failed as expected."
+            if grep -qP 'Number of toolchain SRPM conflicts:\s+1$' build.log; then
+              echo "Toolchain package rebuild failed as expected."
+            else
+              echo "Toolchain package rebuild failed but not as expected."
+              exit 1
+            fi
           fi
 
   none-license-check-no-break-ok:
@@ -145,6 +158,8 @@ jobs:
 
       - name: Break the tested spec
         run: |
+          set -euo pipefail
+
           license_file_name=$(grep -oP '^%license\s+\K\S+' "$REGULAR_PKG_SPEC_PATH")
           if [[ -z "$license_file_name" ]]; then
             echo "ERROR: no license file found in the spec $REGULAR_PKG_SPEC_PATH"
@@ -177,6 +192,8 @@ jobs:
 
       - name: Break the tested spec
         run: |
+          set -euo pipefail
+
           license_file_name=$(grep -oP '^%license\s+\K\S+' "$REGULAR_PKG_SPEC_PATH")
           if [[ -z "$license_file_name" ]]; then
             echo "ERROR: no license file found in the spec $REGULAR_PKG_SPEC_PATH"
@@ -210,6 +227,8 @@ jobs:
 
       - name: Break the tested spec
         run: |
+          set -euo pipefail
+
           if ! grep -q '^%license' "$REGULAR_PKG_SPEC_PATH"; then
             echo "ERROR: no '%license' macro found in the spec $REGULAR_PKG_SPEC_PATH"
             exit 1
@@ -220,17 +239,24 @@ jobs:
 
       - name: Check if license check fails
         run: |
+          set -euo pipefail
+
           # The important argument is 'LICENSE_CHECK_MODE=fatal'.
           if sudo make -C toolkit -j$(nproc) build-packages \
             PACKAGE_REBUILD_LIST="$REGULAR_PKG" \
             REBUILD_TOOLS=y \
             SRPM_PACK_LIST="$REGULAR_PKG" \
-            LICENSE_CHECK_MODE=fatal
+            LICENSE_CHECK_MODE=fatal | tee build.log
           then
             echo "License check should have failed, but it succeeded."
             exit 1
           else
-            echo "License check failed as expected."
+            if grep -qP 'Number of SRPMs with license errors:\s+1$' build.log; then
+              echo "License check failed as expected."
+            else
+              echo "License check failed but not as expected."
+              exit 1
+            fi
           fi
 
   fatal-license-check-success-ok:
@@ -249,6 +275,8 @@ jobs:
 
       - name: Break the tested spec
         run: |
+          set -euo pipefail
+
           license_file_name=$(grep -oP '^%license\s+\K\S+' "$REGULAR_PKG_SPEC_PATH")
           if [[ -z "$license_file_name" ]]; then
             echo "ERROR: no license file found in the spec $REGULAR_PKG_SPEC_PATH"
@@ -283,6 +311,8 @@ jobs:
 
       - name: Break the tested spec
         run: |
+          set -euo pipefail
+
           license_file_name=$(grep -oP '^%license\s+\K\S+' "$REGULAR_PKG_SPEC_PATH")
           if [[ -z "$license_file_name" ]]; then
             echo "ERROR: no license file found in the spec $REGULAR_PKG_SPEC_PATH"
@@ -293,15 +323,22 @@ jobs:
 
       - name: Check if license check fails
         run: |
+          set -euo pipefail
+
           # The important argument is 'LICENSE_CHECK_MODE=pedantic'.
           if sudo make -C toolkit -j$(nproc) build-packages \
             PACKAGE_REBUILD_LIST="$REGULAR_PKG" \
             REBUILD_TOOLS=y \
             SRPM_PACK_LIST="$REGULAR_PKG" \
-            LICENSE_CHECK_MODE=pedantic
+            LICENSE_CHECK_MODE=pedantic | tee build.log
           then
             echo "License check should have failed, but it succeeded."
             exit 1
           else
-            echo "License check failed as expected."
+            if grep -qP 'Number of SRPMs with license errors:\s+1$' build.log; then
+              echo "License check failed as expected."
+            else
+              echo "License check failed but not as expected."
+              exit 1
+            fi
           fi
