@@ -1,0 +1,597 @@
+From a7b5de569082398a14b7e571498e55d005903aaf Mon Sep 17 00:00:00 2001
+From: Tobias Brunner <tobias@strongswan.org>
+Date: Fri, 21 Feb 2025 17:18:35 +0100
+Subject: [PATCH] pki: Fix signature of help() to match that of a callback in
+ command_t
+
+---
+ src/pki/command.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/pki/command.c b/src/pki/command.c
+index accec5fe51b..6e6bf041e18 100644
+--- a/src/pki/command.c
++++ b/src/pki/command.c
+@@ -265,7 +265,7 @@ int command_usage(char *error)
+ /**
+  * Show usage information
+  */
+-static int help(int c, char *v[])
++static int help()
+ {
+ 	return command_usage(NULL);
+ }
+---
+
+From 38d89f57f0771d3cc7b2ab70849584685ada2bc0 Mon Sep 17 00:00:00 2001
+From: Tobias Brunner <tobias@strongswan.org>
+Date: Fri, 21 Feb 2025 16:47:34 +0100
+Subject: [PATCH] charon-nm: Use CALLBACK macro for callback job's cancel
+ implementation
+
+Casting to this specific function type doesn't work anymore if C23 is
+used as the types mismatch.
+---
+ src/charon-nm/nm/nm_backend.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/charon-nm/nm/nm_backend.c b/src/charon-nm/nm/nm_backend.c
+index aefd3f95688..8ee1785212e 100644
+--- a/src/charon-nm/nm/nm_backend.c
++++ b/src/charon-nm/nm/nm_backend.c
+@@ -78,7 +78,8 @@ static job_requeue_t run(nm_backend_t *this)
+ /**
+  * Cancel the GLib Main Event Loop
+  */
+-static bool cancel(nm_backend_t *this)
++CALLBACK(cancel, bool,
++	nm_backend_t *this)
+ {
+ 	if (this->loop)
+ 	{
+@@ -152,7 +153,7 @@ static bool nm_backend_init()
+ 
+ 	lib->processor->queue_job(lib->processor,
+ 		(job_t*)callback_job_create_with_prio((callback_job_cb_t)run, this,
+-				NULL, (callback_job_cancel_t)cancel, JOB_PRIO_CRITICAL));
++				NULL, cancel, JOB_PRIO_CRITICAL));
+ 	return TRUE;
+ }
+ 
+---
+
+From d5d2568ff0e88d364dadf50b67bf17050763cf98 Mon Sep 17 00:00:00 2001
+From: Tobias Brunner <tobias@strongswan.org>
+Date: Fri, 21 Feb 2025 16:45:57 +0100
+Subject: [PATCH] callback-job: Replace return_false() in constructors with
+ dedicated function
+
+Besides being clearer, this fixes issues with GCC 15.  The latter uses
+C23 by default, which changes the meaning of function declarations
+without parameters such as
+
+	bool return false();
+
+Instead of "this function takes an unknown number of arguments", this
+now equals (void), that is, "this function takes no arguments".  So we
+run into incompatible pointer type warnings all over when using such
+functions.  They could be cast to (void*) but this seems the cleaner
+solution for this use case.
+---
+ src/charon-cmd/cmd/cmd_connection.c                   |  2 +-
+ .../jni/libandroidbridge/backend/android_dns_proxy.c  |  2 +-
+ .../jni/libandroidbridge/backend/android_service.c    |  6 +++---
+ src/libcharon/network/receiver.c                      |  2 +-
+ src/libcharon/network/sender.c                        |  2 +-
+ .../plugins/bypass_lan/bypass_lan_listener.c          |  4 ++--
+ .../plugins/eap_radius/eap_radius_accounting.c        |  2 +-
+ src/libcharon/plugins/eap_radius/eap_radius_plugin.c  |  2 +-
+ src/libcharon/plugins/ha/ha_ctl.c                     |  2 +-
+ src/libcharon/plugins/ha/ha_dispatcher.c              |  2 +-
+ src/libcharon/plugins/ha/ha_segments.c                |  6 +++---
+ .../kernel_libipsec/kernel_libipsec_esp_handler.c     |  2 +-
+ .../plugins/kernel_libipsec/kernel_libipsec_router.c  |  2 +-
+ src/libcharon/plugins/smp/smp.c                       |  4 ++--
+ src/libcharon/plugins/tnc_pdp/tnc_pdp_connections.c   |  2 +-
+ src/libcharon/plugins/uci/uci_control.c               |  2 +-
+ src/libipsec/ipsec_event_relay.c                      |  2 +-
+ src/libipsec/ipsec_processor.c                        |  4 ++--
+ src/libpttls/pt_tls_dispatcher.c                      |  2 +-
+ src/libstrongswan/networking/streams/stream_service.c |  2 +-
+ src/libstrongswan/processing/jobs/callback_job.c      | 10 +++++++++-
+ src/libstrongswan/processing/jobs/callback_job.h      | 11 ++++++++++-
+ src/libstrongswan/processing/scheduler.c              |  3 ++-
+ src/libstrongswan/processing/watcher.c                |  4 ++--
+ src/libtls/tests/suites/test_socket.c                 |  2 +-
+ 25 files changed, 51 insertions(+), 33 deletions(-)
+
+diff --git a/src/charon-cmd/cmd/cmd_connection.c b/src/charon-cmd/cmd/cmd_connection.c
+index 8e8d8236e52..e220e33a62a 100644
+--- a/src/charon-cmd/cmd/cmd_connection.c
++++ b/src/charon-cmd/cmd/cmd_connection.c
+@@ -585,7 +585,7 @@ cmd_connection_t *cmd_connection_create()
+ 	lib->processor->queue_job(lib->processor,
+ 		(job_t*)callback_job_create_with_prio(
+ 			(callback_job_cb_t)initiate, this, NULL,
+-			(callback_job_cancel_t)return_false, JOB_PRIO_CRITICAL));
++			callback_job_cancel_thread, JOB_PRIO_CRITICAL));
+ 
+ 	return &this->public;
+ }
+diff --git a/src/libcharon/network/receiver.c b/src/libcharon/network/receiver.c
+index e79d5974409..480d1d622d5 100644
+--- a/src/libcharon/network/receiver.c
++++ b/src/libcharon/network/receiver.c
+@@ -737,7 +737,7 @@ receiver_t *receiver_create()
+ 
+ 	lib->processor->queue_job(lib->processor,
+ 		(job_t*)callback_job_create_with_prio((callback_job_cb_t)receive_packets,
+-			this, NULL, (callback_job_cancel_t)return_false, JOB_PRIO_CRITICAL));
++			this, NULL, callback_job_cancel_thread, JOB_PRIO_CRITICAL));
+ 
+ 	return &this->public;
+ }
+diff --git a/src/libcharon/network/sender.c b/src/libcharon/network/sender.c
+index 4543766d62e..3fcd17f1b63 100644
+--- a/src/libcharon/network/sender.c
++++ b/src/libcharon/network/sender.c
+@@ -216,7 +216,7 @@ sender_t * sender_create()
+ 
+ 	lib->processor->queue_job(lib->processor,
+ 		(job_t*)callback_job_create_with_prio((callback_job_cb_t)send_packets,
+-			this, NULL, (callback_job_cancel_t)return_false, JOB_PRIO_CRITICAL));
++			this, NULL, callback_job_cancel_thread, JOB_PRIO_CRITICAL));
+ 
+ 	return &this->public;
+ }
+diff --git a/src/libcharon/plugins/bypass_lan/bypass_lan_listener.c b/src/libcharon/plugins/bypass_lan/bypass_lan_listener.c
+index db7abd8146b..c9aed3666fc 100644
+--- a/src/libcharon/plugins/bypass_lan/bypass_lan_listener.c
++++ b/src/libcharon/plugins/bypass_lan/bypass_lan_listener.c
+@@ -227,7 +227,7 @@ METHOD(kernel_listener_t, roam, bool,
+ {
+ 	lib->processor->queue_job(lib->processor,
+ 			(job_t*)callback_job_create((callback_job_cb_t)update_bypass, this,
+-									NULL, (callback_job_cancel_t)return_false));
++									NULL, callback_job_cancel_thread));
+ 	return TRUE;
+ }
+ 
+@@ -269,7 +269,7 @@ METHOD(bypass_lan_listener_t, reload_interfaces, void,
+ 	this->mutex->unlock(this->mutex);
+ 	lib->processor->queue_job(lib->processor,
+ 			(job_t*)callback_job_create((callback_job_cb_t)update_bypass, this,
+-									NULL, (callback_job_cancel_t)return_false));
++									NULL, callback_job_cancel_thread));
+ }
+ 
+ METHOD(bypass_lan_listener_t, destroy, void,
+diff --git a/src/libcharon/plugins/eap_radius/eap_radius_accounting.c b/src/libcharon/plugins/eap_radius/eap_radius_accounting.c
+index f833dc3c0b4..2f29d080764 100644
+--- a/src/libcharon/plugins/eap_radius/eap_radius_accounting.c
++++ b/src/libcharon/plugins/eap_radius/eap_radius_accounting.c
+@@ -706,7 +706,7 @@ static void schedule_interim(private_eap_radius_accounting_t *this,
+ 			(job_t*)callback_job_create_with_prio(
+ 				(callback_job_cb_t)send_interim,
+ 				data, (void*)destroy_interim_data,
+-				(callback_job_cancel_t)return_false, JOB_PRIO_CRITICAL), tv);
++				callback_job_cancel_thread, JOB_PRIO_CRITICAL), tv);
+ 	}
+ }
+ 
+diff --git a/src/libcharon/plugins/eap_radius/eap_radius_plugin.c b/src/libcharon/plugins/eap_radius/eap_radius_plugin.c
+index 5051542615a..55d5e032cea 100644
+--- a/src/libcharon/plugins/eap_radius/eap_radius_plugin.c
++++ b/src/libcharon/plugins/eap_radius/eap_radius_plugin.c
+@@ -445,7 +445,7 @@ void eap_radius_handle_timeout(ike_sa_id_t *id)
+ 		lib->processor->queue_job(lib->processor,
+ 				(job_t*)callback_job_create_with_prio(
+ 						(callback_job_cb_t)delete_all_async, NULL, NULL,
+-						(callback_job_cancel_t)return_false, JOB_PRIO_CRITICAL));
++						callback_job_cancel_thread, JOB_PRIO_CRITICAL));
+ 	}
+ 	else if (id)
+ 	{
+diff --git a/src/libcharon/plugins/ha/ha_ctl.c b/src/libcharon/plugins/ha/ha_ctl.c
+index 8859bae166b..3d2ac7de84d 100644
+--- a/src/libcharon/plugins/ha/ha_ctl.c
++++ b/src/libcharon/plugins/ha/ha_ctl.c
+@@ -199,6 +199,6 @@ ha_ctl_t *ha_ctl_create(ha_segments_t *segments, ha_cache_t *cache)
+ 
+ 	lib->processor->queue_job(lib->processor,
+ 		(job_t*)callback_job_create_with_prio((callback_job_cb_t)dispatch_fifo,
+-			this, NULL, (callback_job_cancel_t)return_false, JOB_PRIO_CRITICAL));
++			this, NULL, callback_job_cancel_thread, JOB_PRIO_CRITICAL));
+ 	return &this->public;
+ }
+diff --git a/src/libcharon/plugins/ha/ha_dispatcher.c b/src/libcharon/plugins/ha/ha_dispatcher.c
+index 5de26a65a27..83be91ab159 100644
+--- a/src/libcharon/plugins/ha/ha_dispatcher.c
++++ b/src/libcharon/plugins/ha/ha_dispatcher.c
+@@ -1184,7 +1184,7 @@ ha_dispatcher_t *ha_dispatcher_create(ha_socket_t *socket,
+ 	);
+ 	lib->processor->queue_job(lib->processor,
+ 		(job_t*)callback_job_create_with_prio((callback_job_cb_t)dispatch, this,
+-				NULL, (callback_job_cancel_t)return_false, JOB_PRIO_CRITICAL));
++				NULL, callback_job_cancel_thread, JOB_PRIO_CRITICAL));
+ 
+ 	return &this->public;
+ }
+diff --git a/src/libcharon/plugins/ha/ha_segments.c b/src/libcharon/plugins/ha/ha_segments.c
+index afb76b39ea2..32d9ee40717 100644
+--- a/src/libcharon/plugins/ha/ha_segments.c
++++ b/src/libcharon/plugins/ha/ha_segments.c
+@@ -316,7 +316,7 @@ static void start_watchdog(private_ha_segments_t *this)
+ 	this->heartbeat_active = TRUE;
+ 	lib->processor->queue_job(lib->processor,
+ 		(job_t*)callback_job_create_with_prio((callback_job_cb_t)watchdog, this,
+-				NULL, (callback_job_cancel_t)return_false, JOB_PRIO_CRITICAL));
++				NULL, callback_job_cancel_thread, JOB_PRIO_CRITICAL));
+ }
+ 
+ METHOD(ha_segments_t, handle_status, void,
+@@ -404,7 +404,7 @@ static void start_heartbeat(private_ha_segments_t *this)
+ {
+ 	lib->processor->queue_job(lib->processor,
+ 		(job_t*)callback_job_create_with_prio((callback_job_cb_t)send_status,
+-			this, NULL, (callback_job_cancel_t)return_false, JOB_PRIO_CRITICAL));
++			this, NULL, callback_job_cancel_thread, JOB_PRIO_CRITICAL));
+ }
+ 
+ /**
+@@ -451,7 +451,7 @@ static void start_autobalance(private_ha_segments_t *this)
+ 	DBG1(DBG_CFG, "scheduling HA autobalance every %ds", this->autobalance);
+ 	lib->scheduler->schedule_job(lib->scheduler,
+ 		(job_t*)callback_job_create_with_prio((callback_job_cb_t)autobalance,
+-			this, NULL, (callback_job_cancel_t)return_false, JOB_PRIO_CRITICAL),
++			this, NULL, callback_job_cancel_thread, JOB_PRIO_CRITICAL),
+ 		this->autobalance);
+ }
+ 
+diff --git a/src/libcharon/plugins/kernel_libipsec/kernel_libipsec_esp_handler.c b/src/libcharon/plugins/kernel_libipsec/kernel_libipsec_esp_handler.c
+index 095ad67b4b0..c18e266e4d1 100644
+--- a/src/libcharon/plugins/kernel_libipsec/kernel_libipsec_esp_handler.c
++++ b/src/libcharon/plugins/kernel_libipsec/kernel_libipsec_esp_handler.c
+@@ -337,7 +337,7 @@ kernel_libipsec_esp_handler_t *kernel_libipsec_esp_handler_create()
+ 	}
+ 	lib->processor->queue_job(lib->processor,
+ 			(job_t*)callback_job_create(send_esp, this, NULL,
+-										(callback_job_cancel_t)return_false));
++										callback_job_cancel_thread));
+ 	return &this->public;
+ }
+ 
+diff --git a/src/libcharon/plugins/kernel_libipsec/kernel_libipsec_router.c b/src/libcharon/plugins/kernel_libipsec/kernel_libipsec_router.c
+index 74746e251de..07adc70be3e 100644
+--- a/src/libcharon/plugins/kernel_libipsec/kernel_libipsec_router.c
++++ b/src/libcharon/plugins/kernel_libipsec/kernel_libipsec_router.c
+@@ -364,7 +364,7 @@ kernel_libipsec_router_t *kernel_libipsec_router_create()
+ 	charon->receiver->add_esp_cb(charon->receiver, receiver_esp_cb, NULL);
+ 	lib->processor->queue_job(lib->processor,
+ 			(job_t*)callback_job_create((callback_job_cb_t)handle_plain, this,
+-									NULL, (callback_job_cancel_t)return_false));
++										NULL, callback_job_cancel_thread));
+ 
+ 	router = &this->public;
+ 	return &this->public;
+diff --git a/src/libcharon/plugins/smp/smp.c b/src/libcharon/plugins/smp/smp.c
+index 6ca9f13997e..85ff5830bc5 100644
+--- a/src/libcharon/plugins/smp/smp.c
++++ b/src/libcharon/plugins/smp/smp.c
+@@ -710,7 +710,7 @@ static job_requeue_t dispatch(private_smp_t *this)
+ 	fdp = malloc_thing(int);
+ 	*fdp = fd;
+ 	job = callback_job_create((callback_job_cb_t)process, fdp, free,
+-							  (callback_job_cancel_t)return_false);
++							  callback_job_cancel_thread);
+ 	lib->processor->queue_job(lib->processor, (job_t*)job);
+ 
+ 	return JOB_REQUEUE_DIRECT;
+@@ -800,7 +800,7 @@ plugin_t *smp_plugin_create()
+ 
+ 	lib->processor->queue_job(lib->processor,
+ 		(job_t*)callback_job_create_with_prio((callback_job_cb_t)dispatch, this,
+-				NULL, (callback_job_cancel_t)return_false, JOB_PRIO_CRITICAL));
++				NULL, callback_job_cancel_thread, JOB_PRIO_CRITICAL));
+ 
+ 	return &this->public.plugin;
+ }
+diff --git a/src/libcharon/plugins/tnc_pdp/tnc_pdp_connections.c b/src/libcharon/plugins/tnc_pdp/tnc_pdp_connections.c
+index 30aeb116dec..da317a894d9 100644
+--- a/src/libcharon/plugins/tnc_pdp/tnc_pdp_connections.c
++++ b/src/libcharon/plugins/tnc_pdp/tnc_pdp_connections.c
+@@ -210,7 +210,7 @@ METHOD(tnc_pdp_connections_t, add, void,
+ 	/* schedule timeout checking */
+ 	lib->scheduler->schedule_job_ms(lib->scheduler,
+ 				(job_t*)callback_job_create((callback_job_cb_t)check_timeouts,
+-					this, NULL, (callback_job_cancel_t)return_false),
++					this, NULL, callback_job_cancel_thread),
+ 				this->timeout * 1000);
+ 
+ 	dbg_nas_user(nas_id, user_name, FALSE, "created");
+diff --git a/src/libcharon/plugins/uci/uci_control.c b/src/libcharon/plugins/uci/uci_control.c
+index b033c832c8c..8074005ee57 100644
+--- a/src/libcharon/plugins/uci/uci_control.c
++++ b/src/libcharon/plugins/uci/uci_control.c
+@@ -296,7 +296,7 @@ uci_control_t *uci_control_create()
+ 	{
+ 		lib->processor->queue_job(lib->processor,
+ 			(job_t*)callback_job_create_with_prio((callback_job_cb_t)receive,
+-							this, NULL, (callback_job_cancel_t)return_false,
++							this, NULL, callback_job_cancel_thread,
+ 							JOB_PRIO_CRITICAL));
+ 	}
+ 	return &this->public;
+diff --git a/src/libipsec/ipsec_event_relay.c b/src/libipsec/ipsec_event_relay.c
+index 0f10795d168..802146eef21 100644
+--- a/src/libipsec/ipsec_event_relay.c
++++ b/src/libipsec/ipsec_event_relay.c
+@@ -230,7 +230,7 @@ ipsec_event_relay_t *ipsec_event_relay_create()
+ 
+ 	lib->processor->queue_job(lib->processor,
+ 		(job_t*)callback_job_create((callback_job_cb_t)handle_events, this,
+-			NULL, (callback_job_cancel_t)return_false));
++			NULL, callback_job_cancel_thread));
+ 
+ 	return &this->public;
+ }
+diff --git a/src/libipsec/ipsec_processor.c b/src/libipsec/ipsec_processor.c
+index 2572b088089..8549fefe261 100644
+--- a/src/libipsec/ipsec_processor.c
++++ b/src/libipsec/ipsec_processor.c
+@@ -336,9 +336,9 @@ ipsec_processor_t *ipsec_processor_create()
+ 
+ 	lib->processor->queue_job(lib->processor,
+ 		(job_t*)callback_job_create((callback_job_cb_t)process_inbound, this,
+-									NULL, (callback_job_cancel_t)return_false));
++									NULL, callback_job_cancel_thread));
+ 	lib->processor->queue_job(lib->processor,
+ 		(job_t*)callback_job_create((callback_job_cb_t)process_outbound, this,
+-									NULL, (callback_job_cancel_t)return_false));
++									NULL, callback_job_cancel_thread));
+ 	return &this->public;
+ }
+diff --git a/src/libpttls/pt_tls_dispatcher.c b/src/libpttls/pt_tls_dispatcher.c
+index a134bee238f..c7e42b277e1 100644
+--- a/src/libpttls/pt_tls_dispatcher.c
++++ b/src/libpttls/pt_tls_dispatcher.c
+@@ -156,7 +156,7 @@ METHOD(pt_tls_dispatcher_t, dispatch, void,
+ 		lib->processor->queue_job(lib->processor,
+ 				(job_t*)callback_job_create_with_prio((callback_job_cb_t)handle,
+ 										connection, (void*)cleanup,
+-										(callback_job_cancel_t)return_false,
++										callback_job_cancel_thread,
+ 										JOB_PRIO_CRITICAL));
+ 	}
+ }
+diff --git a/src/libstrongswan/networking/streams/stream_service.c b/src/libstrongswan/networking/streams/stream_service.c
+index 5b709a2247d..c85a0664351 100644
+--- a/src/libstrongswan/networking/streams/stream_service.c
++++ b/src/libstrongswan/networking/streams/stream_service.c
+@@ -221,7 +221,7 @@ static bool watch(private_stream_service_t *this, int fd, watcher_event_t event)
+ 
+ 		lib->processor->queue_job(lib->processor,
+ 			(job_t*)callback_job_create_with_prio((void*)accept_async, data,
+-				(void*)destroy_async_data, (callback_job_cancel_t)return_false,
++				(void*)destroy_async_data, callback_job_cancel_thread,
+ 				this->prio));
+ 	}
+ 	else
+diff --git a/src/libstrongswan/processing/jobs/callback_job.c b/src/libstrongswan/processing/jobs/callback_job.c
+index cb2a0aba5b9..3ab40b947c9 100644
+--- a/src/libstrongswan/processing/jobs/callback_job.c
++++ b/src/libstrongswan/processing/jobs/callback_job.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2009-2012 Tobias Brunner
++ * Copyright (C) 2009-2025 Tobias Brunner
+  * Copyright (C) 2007-2011 Martin Willi
+  *
+  * Copyright (C) secunet Security Networks AG
+@@ -131,3 +131,11 @@ callback_job_t *callback_job_create(callback_job_cb_t cb, void *data,
+ 	return callback_job_create_with_prio(cb, data, cleanup, cancel,
+ 										 JOB_PRIO_MEDIUM);
+ }
++
++/*
++ * Described in header
++ */
++bool callback_job_cancel_thread(void *data)
++{
++	return FALSE;
++}
+diff --git a/src/libstrongswan/processing/jobs/callback_job.h b/src/libstrongswan/processing/jobs/callback_job.h
+index 0f1ae212d87..fda86887944 100644
+--- a/src/libstrongswan/processing/jobs/callback_job.h
++++ b/src/libstrongswan/processing/jobs/callback_job.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2012 Tobias Brunner
++ * Copyright (C) 2012-2025 Tobias Brunner
+  * Copyright (C) 2007-2011 Martin Willi
+  *
+  * Copyright (C) secunet Security Networks AG
+@@ -62,6 +62,15 @@ typedef void (*callback_job_cleanup_t)(void *data);
+  */
+ typedef bool (*callback_job_cancel_t)(void *data);
+ 
++/**
++ * Default implementation of callback_job_cancel_t that simply returns FALSE
++ * to force cancellation of the thread by the processor.
++ *
++ * @param data			ignored argument
++ * @return				always returns FALSE
++ */
++bool callback_job_cancel_thread(void *data);
++
+ /**
+  * Class representing an callback Job.
+  *
+diff --git a/src/libstrongswan/processing/scheduler.c b/src/libstrongswan/processing/scheduler.c
+index c5e5dd83e70..76d98ddff51 100644
+--- a/src/libstrongswan/processing/scheduler.c
++++ b/src/libstrongswan/processing/scheduler.c
+@@ -329,7 +329,8 @@ scheduler_t * scheduler_create()
+ 	this->heap = (event_t**)calloc(this->heap_size + 1, sizeof(event_t*));
+ 
+ 	job = callback_job_create_with_prio((callback_job_cb_t)schedule, this,
+-										NULL, return_false, JOB_PRIO_CRITICAL);
++										NULL, callback_job_cancel_thread,
++										JOB_PRIO_CRITICAL);
+ 	lib->processor->queue_job(lib->processor, (job_t*)job);
+ 
+ 	return &this->public;
+diff --git a/src/libstrongswan/processing/watcher.c b/src/libstrongswan/processing/watcher.c
+index 1200d670959..a86ec0910d1 100644
+--- a/src/libstrongswan/processing/watcher.c
++++ b/src/libstrongswan/processing/watcher.c
+@@ -291,7 +291,7 @@ static void notify(private_watcher_t *this, entry_t *entry,
+ 
+ 	this->jobs->insert_last(this->jobs,
+ 					callback_job_create_with_prio((void*)notify_async, data,
+-						(void*)notify_end, (callback_job_cancel_t)return_false,
++						(void*)notify_end, callback_job_cancel_thread,
+ 						JOB_PRIO_CRITICAL));
+ }
+ 
+@@ -559,7 +559,7 @@ METHOD(watcher_t, add, void,
+ 
+ 		lib->processor->queue_job(lib->processor,
+ 			(job_t*)callback_job_create_with_prio((void*)watch, this,
+-				NULL, (callback_job_cancel_t)return_false, JOB_PRIO_CRITICAL));
++				NULL, callback_job_cancel_thread, JOB_PRIO_CRITICAL));
+ 	}
+ 	else
+ 	{
+diff --git a/src/libtls/tests/suites/test_socket.c b/src/libtls/tests/suites/test_socket.c
+index 91ee58b975f..c17d0a8873e 100644
+--- a/src/libtls/tests/suites/test_socket.c
++++ b/src/libtls/tests/suites/test_socket.c
+@@ -587,7 +587,7 @@ static void start_echo_server(echo_server_config_t *config)
+ 
+ 	lib->processor->queue_job(lib->processor, (job_t*)
+ 				callback_job_create((void*)serve_echo, config, NULL,
+-									(callback_job_cancel_t)return_false));
++									callback_job_cancel_thread));
+ }
+ 
+ /**
+---
+
+From 11978ddd39e800b5f35f721d726e8a4cb7e4ec0f Mon Sep 17 00:00:00 2001
+From: Tobias Brunner <tobias@strongswan.org>
+Date: Fri, 21 Feb 2025 17:00:44 +0100
+Subject: [PATCH] Cast uses of return_*(), nop() and enumerator_create_empty()
+
+As described in the previous commit, GCC 15 uses C23 by default and that
+changes the meaning of such argument-less function declarations.  So
+whenever we assign such a function to a pointer that expects a function
+with arguments it causes an incompatible pointer type warning.  We
+could define dedicated functions/callbacks whenever necessary, but this
+seems like the simpler approach for now (especially since most uses of
+these functions have already been cast).
+---
+ src/charon-nm/nm/nm_handler.c                           | 2 +-
+ src/libcharon/encoding/payloads/encrypted_payload.c     | 2 +-
+ src/libcharon/plugins/android_dns/android_dns_handler.c | 2 +-
+ src/libcharon/plugins/ha/ha_attribute.c                 | 2 +-
+ src/libcharon/plugins/updown/updown_handler.c           | 2 +-
+ src/libstrongswan/utils/identification.c                | 6 +++---
+ 6 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/src/charon-nm/nm/nm_handler.c b/src/charon-nm/nm/nm_handler.c
+index d7331ad72f6..39d0190ac9e 100644
+--- a/src/charon-nm/nm/nm_handler.c
++++ b/src/charon-nm/nm/nm_handler.c
+@@ -195,7 +195,7 @@ nm_handler_t *nm_handler_create()
+ 		.public = {
+ 			.handler = {
+ 				.handle = _handle,
+-				.release = nop,
++				.release = (void*)nop,
+ 				.create_attribute_enumerator = _create_attribute_enumerator,
+ 			},
+ 			.create_enumerator = _create_enumerator,
+diff --git a/src/libcharon/encoding/payloads/encrypted_payload.c b/src/libcharon/encoding/payloads/encrypted_payload.c
+index 676d00b7a29..4821c6108ed 100644
+--- a/src/libcharon/encoding/payloads/encrypted_payload.c
++++ b/src/libcharon/encoding/payloads/encrypted_payload.c
+@@ -1023,7 +1023,7 @@ encrypted_fragment_payload_t *encrypted_fragment_payload_create()
+ 				.get_length = _frag_get_length,
+ 				.add_payload = _frag_add_payload,
+ 				.remove_payload = (void*)return_null,
+-				.generate_payloads = nop,
++				.generate_payloads = (void*)nop,
+ 				.set_transform = _frag_set_transform,
+ 				.get_transform = _frag_get_transform,
+ 				.encrypt = _frag_encrypt,
+diff --git a/src/libcharon/plugins/android_dns/android_dns_handler.c b/src/libcharon/plugins/android_dns/android_dns_handler.c
+index 78f4f702aec..14d2ff99aa3 100644
+--- a/src/libcharon/plugins/android_dns/android_dns_handler.c
++++ b/src/libcharon/plugins/android_dns/android_dns_handler.c
+@@ -191,7 +191,7 @@ METHOD(enumerator_t, enumerate_dns, bool,
+ 	VA_ARGS_VGET(args, type, data);
+ 	*type = INTERNAL_IP4_DNS;
+ 	*data = chunk_empty;
+-	this->venumerate = return_false;
++	this->venumerate = (void*)return_false;
+ 	return TRUE;
+ }
+ 
+diff --git a/src/libcharon/plugins/ha/ha_attribute.c b/src/libcharon/plugins/ha/ha_attribute.c
+index b865a4b829b..103d1a93784 100644
+--- a/src/libcharon/plugins/ha/ha_attribute.c
++++ b/src/libcharon/plugins/ha/ha_attribute.c
+@@ -381,7 +381,7 @@ ha_attribute_t *ha_attribute_create(ha_kernel_t *kernel, ha_segments_t *segments
+ 			.provider = {
+ 				.acquire_address = _acquire_address,
+ 				.release_address = _release_address,
+-				.create_attribute_enumerator = enumerator_create_empty,
++				.create_attribute_enumerator = (void*)enumerator_create_empty,
+ 			},
+ 			.reserve = _reserve,
+ 			.destroy = _destroy,
+diff --git a/src/libcharon/plugins/updown/updown_handler.c b/src/libcharon/plugins/updown/updown_handler.c
+index 36eb15615a4..3707e1e658c 100644
+--- a/src/libcharon/plugins/updown/updown_handler.c
++++ b/src/libcharon/plugins/updown/updown_handler.c
+@@ -220,7 +220,7 @@ updown_handler_t *updown_handler_create()
+ 			.handler = {
+ 				.handle = _handle,
+ 				.release = _release,
+-				.create_attribute_enumerator = enumerator_create_empty,
++				.create_attribute_enumerator = (void*)enumerator_create_empty,
+ 			},
+ 			.create_dns_enumerator = _create_dns_enumerator,
+ 			.destroy = _destroy,
+diff --git a/src/libstrongswan/utils/identification.c b/src/libstrongswan/utils/identifi100  5229  100  5229    0     0  26091      0 --:--:-- --:--:-- --:--:-- 26145
+cation.c
+index d31955b3806..58a05052dc1 100644
+--- a/src/libstrongswan/utils/identification.c
++++ b/src/libstrongswan/utils/identification.c
+@@ -1625,7 +1625,7 @@ static private_identification_t *identification_create(id_type_t type)
+ 			this->public.hash = _hash_binary;
+ 			this->public.equals = _equals_binary;
+ 			this->public.matches = _matches_any;
+-			this->public.contains_wildcards = return_true;
++			this->public.contains_wildcards = (void*)return_true;
+ 			break;
+ 		case ID_FQDN:
+ 		case ID_RFC822_ADDR:
+@@ -1660,13 +1660,13 @@ static private_identification_t *identification_create(id_type_t type)
+ 			this->public.hash = _hash_binary;
+ 			this->public.equals = _equals_binary;
+ 			this->public.matches = _matches_range;
+-			this->public.contains_wildcards = return_false;
++			this->public.contains_wildcards = (void*)return_false;
+ 			break;
+ 		default:
+ 			this->public.hash = _hash_binary;
+ 			this->public.equals = _equals_binary;
+ 			this->public.matches = _matches_binary;
+-			this->public.contains_wildcards = return_false;
++			this->public.contains_wildcards = (void*)return_false;
+ 			break;
+ 	}
+ 	return this;
+---
