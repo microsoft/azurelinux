@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
+        run: git checkout refs/tags/3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
 
       - name: Check if package build succeeds
         run: |
@@ -53,7 +53,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/
+        run: git checkout refs/tags/3.0-stable -- SPECS/
 
       # Adding an invalid command to the '%prep' section will cause the build to fail.
       - name: Break the tested spec
@@ -81,7 +81,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/
+        run: git checkout refs/tags/3.0-stable -- SPECS/
 
       - name: Check if a toolchain package rebuild succeeds
         run: |
@@ -101,7 +101,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/
+        run: git checkout refs/tags/3.0-stable -- SPECS/
 
       - name: Check if a toolchain package rebuild fails
         run: |
@@ -126,7 +126,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/
+        run: git checkout refs/tags/3.0-stable -- SPECS/
 
       - name: Break the tested spec
         run: |
@@ -155,7 +155,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/
+        run: git checkout refs/tags/3.0-stable -- SPECS/
 
       - name: Break the tested spec
         run: |
@@ -185,7 +185,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/
+        run: git checkout refs/tags/3.0-stable -- SPECS/
 
       - name: Break the tested spec
         run: |
@@ -221,7 +221,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/
+        run: git checkout refs/tags/3.0-stable -- SPECS/
 
       - name: Break the tested spec
         run: |
@@ -252,7 +252,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/
+        run: git checkout refs/tags/3.0-stable -- SPECS/
 
       - name: Break the tested spec
         run: |
