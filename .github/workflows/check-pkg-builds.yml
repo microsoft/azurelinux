@@ -52,6 +52,7 @@ jobs:
       - name: Workflow trigger checkout
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           fetch-tags: true
 
       - name: Checkout a stable version of the specs
