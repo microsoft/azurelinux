@@ -35,7 +35,7 @@ steps:
   - bash: |
       additional_args=""
       if [[ ${{ parameters.dailyBuildID }} == "lkg" ]]; then
-        echo "##[debug]Building toolchain for latest daily build"
+        echo "##[debug]Building toolchain for latest daily build without using daily build manifests"
         additional_args="DAILY_BUILD_ID=${{ parameters.dailyBuildID }} DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
       fi
 
