@@ -39,9 +39,9 @@ steps:
         additional_args="DAILY_BUILD_ID=${{ parameters.dailyBuildID }} DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
       fi
 
-      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" \
+      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" toolchain "-j$(nproc)" \
         QUICK_REBUILD=y \
-        DAILY_BUILD_ID=${{ parameters.dailyBuildID }}
+        $additional_args \
     displayName: "Build toolchain"
 
   - bash: |
