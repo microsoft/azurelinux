@@ -53,7 +53,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Checkout a stable version of the specs
-        run: git checkout refs/tags/3.0-stable -- SPECS/
+        uses: actions/checkout@v4
+        with:
+          ref: refs/tags/3.0-stable
+          sparse-checkout: SPECS/
 
       # Adding an invalid command to the '%prep' section will cause the build to fail.
       - name: Break the tested spec
