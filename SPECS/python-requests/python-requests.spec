@@ -1,7 +1,7 @@
 Summary:        Awesome Python HTTP Library That's Actually Usable
 Name:           python-requests
 Version:        2.31.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,6 +37,7 @@ BuildRequires:  python3-idna
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 BuildRequires:  python3-urllib3
+BuildRequires:  python3-packaging >= 24.1
 %endif
 
 %description -n python3-requests
@@ -59,7 +60,7 @@ perform the simplest of tasks.
 %py3_install
 
 %check
-pip3 install tox
+pip3 install tox==4.23.2 --ignore-installed
 # 2.1.0+ versions of "markupsafe" make test fail.
 # No fix from upstream in version 2.28.1: https://github.com/psf/requests/commit/3ed60078e2376c847ba0b0c9d564af522623c5ba
 sed -i "/wheel/amarkupsafe==2.0.1" requirements-dev.txt
@@ -72,6 +73,11 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+
+* Tue Apr 22 2025 Jon Slobodzian <joslobo@microsoft.com> - 2.31.0-3
+- bump package to use latest python3-packaging in ptest
+- also use tox version 4.23.2
+
 * Fri Dec 27 2024 Archana Choudhary <archana1@microsoft.com> - 2.31.0-2
 - Add patch for CVE-2024-35195
 
