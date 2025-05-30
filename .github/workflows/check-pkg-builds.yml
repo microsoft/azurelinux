@@ -33,6 +33,9 @@ jobs:
     steps:
       - name: Workflow trigger checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Checkout a stable version of the specs
         run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
@@ -56,7 +59,7 @@ jobs:
           fetch-tags: true
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/
+        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
 
       # Adding an invalid command to the '%prep' section will cause the build to fail.
       - name: Break the tested spec
@@ -83,10 +86,11 @@ jobs:
       - name: Workflow trigger checkout
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           fetch-tags: true
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/
+        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
 
       - name: Check if a toolchain package rebuild succeeds
         run: |
@@ -104,9 +108,12 @@ jobs:
     steps:
       - name: Workflow trigger checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/
+        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
 
       - name: Check if a toolchain package rebuild fails
         run: |
@@ -129,9 +136,12 @@ jobs:
     steps:
       - name: Workflow trigger checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/
+        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
 
       - name: Break the tested spec
         run: |
@@ -158,9 +168,12 @@ jobs:
     steps:
       - name: Workflow trigger checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/
+        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
 
       - name: Break the tested spec
         run: |
@@ -188,9 +201,12 @@ jobs:
     steps:
       - name: Workflow trigger checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/
+        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
 
       - name: Break the tested spec
         run: |
@@ -224,9 +240,12 @@ jobs:
     steps:
       - name: Workflow trigger checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/
+        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
 
       - name: Break the tested spec
         run: |
@@ -255,9 +274,12 @@ jobs:
     steps:
       - name: Workflow trigger checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/
+        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
 
       - name: Break the tested spec
         run: |
