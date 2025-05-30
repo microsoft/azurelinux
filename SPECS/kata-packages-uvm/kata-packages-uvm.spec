@@ -8,8 +8,6 @@ Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
 
-ExclusiveArch:  x86_64
-
 Requires:       ca-certificates
 Requires:       chrony
 Requires:       cryptsetup

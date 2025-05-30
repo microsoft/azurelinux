@@ -7,6 +7,13 @@
 %define archdir x86
 %define config_source %{SOURCE1}
 %endif
+# Attention: This file needs work below.
+#   - Also, using the x86 config is not the right option (add ARM config to SPEC file, or use from source tree, temporarily)
+%ifarch aarch64
+%define arch arm64
+%define archdir arm64
+%define config_source %{SOURCE1}
+%endif
 
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
@@ -40,7 +47,6 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
-ExclusiveArch:  x86_64
 
 # Config file is only an inmutable copy from default config in lsg dom0 sources (arch/x86/configs/mshv_default_config)
 # to make permanent changes to config, make a PR for mshv_default_config in https://microsoft.visualstudio.com/DefaultCollection/LSG/_git/linux-dom0

@@ -39,8 +39,6 @@ Requires: glibc
 Requires: libgcc
 Requires: libcap
 
-ExclusiveArch:  x86_64
-
 %ifarch x86_64
 %define rust_def_target x86_64-unknown-linux-gnu
 %define cargo_pkg_feature_opts --no-default-features --features "mshv,kvm,sev_snp,igvm"
