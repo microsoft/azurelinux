@@ -120,3 +120,4 @@ popd
 
 * Sun Aug 09 2015 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.1.0-1
 - Initial package
+

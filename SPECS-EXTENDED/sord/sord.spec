@@ -214,3 +214,4 @@ install -pm 644 AUTHORS NEWS README.md COPYING %{buildroot}%{_pkgdocdir}
 
 * Fri Dec 23 2011 Brendan Jones <brendan.jones.it@gmail.com> - 0.5.0-1
 - Initial build
+

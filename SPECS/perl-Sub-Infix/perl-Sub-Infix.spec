@@ -129,3 +129,4 @@ source filters, or Devel::Declare, or any of that magic.
 
 * Fri Feb 03 2017 Ralf Cors├ępius <corsepiu@fedoraproject.org> 0.004-1
 - Initial Fedora package.
+

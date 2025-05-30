@@ -162,3 +162,4 @@ install -m 644 fxload.8 %{buildroot}/%{_mandir}/man8/
 
 * Wed Apr 12 2006 Bart Vanbrabant <bart.vanbrabant@zoeloelip.be> - 2002_04_11-1
 - First version of fxload spec based on hotplug spec
+

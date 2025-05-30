@@ -202,3 +202,4 @@ make install DESTDIR=%{buildroot}
 
 * Fri Apr 17 2009 - Eric Moret <eric.moret@gmail.com> - 0.26.0-1
 - Initial spec
+

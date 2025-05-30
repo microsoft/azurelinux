@@ -333,3 +333,4 @@ rm -rf python-%{modname}.egg-info
 
 * Tue Oct 02 2012 Matěj Cepl <mcepl@redhat.com> 0.0.3-1
 - initial package for Fedora
+

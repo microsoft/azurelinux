@@ -348,3 +348,4 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest -k "not test_unknown_server \
 
 * Thu Dec 27 2007 Andreas Bierfert <andreas.bierfert[AT]lowlatency.de> - 0.4.0-1
 - initial version
+

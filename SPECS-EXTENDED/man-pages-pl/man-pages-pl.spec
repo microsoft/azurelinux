@@ -239,3 +239,4 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
 - fixed typo in description
 * Sun Jun 11 2000 Trond Eivind Glomsrød <teg@redhat.com>
 - first build
+

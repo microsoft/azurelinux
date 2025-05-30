@@ -227,3 +227,4 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest-3 -v -k "not test_send_from_dir
 
 * Tue Feb 22 2011 Dan Young <dyoung@mesd.k12.or.us> - 0.6.1-1
 - Initial package
+

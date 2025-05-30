@@ -291,3 +291,4 @@ install -m644 cdparanoia.1.jp $JAPN_MANDIR/cdparanoia.1
 
 * Fri Apr 24 1998 ro@suse.de
 - build initial package version 03alpha6
+

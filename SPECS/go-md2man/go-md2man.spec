@@ -117,3 +117,4 @@ cp go-md2man-%{version}/LICENSE.md %{buildroot}%{_docdir}/%{name}-%{version}/LIC
 
 * Fri Apr 03 2020 Mohan Datla <mdatla@microsoft.com> 2.0.0-1
 - Original version for CBL-Mariner.
+

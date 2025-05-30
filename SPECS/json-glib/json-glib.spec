@@ -123,3 +123,4 @@ export LDFLAGS="-Wl,-z,relro,-z,now"
 
 * Fri Jun 26 2015 Alexey Makhalov <amakhalov@vmware.com> 1.0.2-2
 - Added Provides: pkgconfig(json-glib-1.0)
+

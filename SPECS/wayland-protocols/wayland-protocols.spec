@@ -180,3 +180,4 @@ wayland-protocols.
 
 * Sun Nov 22 2015 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 0.1.0-0.gitf828a43
 - Initial package
+

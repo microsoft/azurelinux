@@ -508,3 +508,4 @@ certutil -N -d sql:$tmpdir --empty-password
 
 * Sat Apr 13 2013 Paul Wouters <pwouters@redhat.com> - 3.2-1
 - Initial package for Fedora
+

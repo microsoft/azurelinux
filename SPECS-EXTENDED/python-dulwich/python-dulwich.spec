@@ -235,3 +235,4 @@ rm -rf %{buildroot}%{python3_sitearch}/docs/tutorial/
 * Fri Feb 28 2020 Fabian Affolter <mail@fabian-affolter.ch> - 0.19.15-3
 - RPMAUTOSPEC: unresolvable merge
 
+

@@ -318,3 +318,4 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 
 * Wed Oct 12 2005 Ralf Corsepius <rc040203@freenet.de> - 0.07-1
 - Upstream update.
+

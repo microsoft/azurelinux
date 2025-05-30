@@ -249,3 +249,4 @@ fi
 
 * Mon Jul 30 2007 Matthew Barnes <mbarnes@redhat.com> - 0.5.4-1
 - Initial packaging.
+

@@ -100,3 +100,4 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 * Fri Jun 21 2013 Matthias Clasen <mclasen@redhat.com> - 2013.1-1
 - Initial packaging (#976919)
+

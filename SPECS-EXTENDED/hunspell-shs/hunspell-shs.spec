@@ -89,3 +89,4 @@ cp -p hunspell/shs_CA.* $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Thu Aug 27 2009 Caolan McNamara <caolanm@redhat.com> - 0.20081107-1
 - initial version
+

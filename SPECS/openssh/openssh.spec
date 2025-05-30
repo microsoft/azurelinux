@@ -484,3 +484,4 @@ fi
 
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 6.6p1-1
 - Initial build. First version
+

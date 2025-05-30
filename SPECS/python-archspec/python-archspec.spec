@@ -87,3 +87,4 @@ rm -rf archspec/json/.git*
 
 * Sat Dec 02 2023 Orion Poplawski <orion@nwra.com> - 0.2.2-1
 - Initial Fedora package
+

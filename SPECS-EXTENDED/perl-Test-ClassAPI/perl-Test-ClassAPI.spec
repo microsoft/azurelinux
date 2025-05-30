@@ -247,3 +247,4 @@ make test AUTOMATED_TESTING=1
 
 * Wed Jun 22 2005 Ralf Corsepius <ralf@links2linux.de> - 1.02-0.pm.0
 - Initial packman version.
+

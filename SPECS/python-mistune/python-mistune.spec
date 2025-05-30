@@ -71,3 +71,4 @@ The fastest markdown parser in pure Python with renderer features, inspired by m
 
 * Mon Mar 20 2017 Xiaolin Li <xiaolinl@vmware.com> - 0.7.4-1
 - Initial packaging for Photon
+

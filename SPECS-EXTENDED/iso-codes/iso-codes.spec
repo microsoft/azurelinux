@@ -465,3 +465,4 @@ when building programs that use %{name}.
 
 * Fri Jun 10 2005 Christopher Aillon <caillon@redhat.com> 0.46-1
 - Initial RPM
+

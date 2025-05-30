@@ -84,3 +84,4 @@ done
 
 * Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> - 3.6-1
 - Original version for CBL-Mariner.
+

@@ -91,3 +91,4 @@ Resolves rhbz#2178260
 
 * Mon Feb 27 2023 Karolina Surma <ksurma@redhat.com> - 3.0.0-1
 - Initial package
+

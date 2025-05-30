@@ -87,3 +87,4 @@ cp -p mos_BF.* $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Fri Aug 07 2009 Caolán McNamara <caolanm@redhat.com> - 0.20090806-1
 - initial version
+

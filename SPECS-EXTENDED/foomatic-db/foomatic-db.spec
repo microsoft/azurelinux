@@ -425,3 +425,4 @@ ln -sf ../../foomatic/db/source/PPD %{buildroot}%{_datadir}/cups/model/foomatic-
 
 * Mon Aug  3 2009 Tim Waugh <twaugh@redhat.com> 4.0-1.20090702
 - Split database out from main foomatic package.
+

@@ -67,3 +67,4 @@ cd build
 
 * Tue Dec 06 2022 Adam Schwab <adschwab@microsoft.com> - 12.0.1-1
 - Initial CBL-Mariner import from Fedora 35 (license: MIT). License verified.
+

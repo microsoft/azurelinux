@@ -257,3 +257,4 @@ make PREFIX=$RPM_BUILD_ROOT/%{_prefix} BINDIR=$RPM_BUILD_ROOT/%{_bindir} \
 
 * Mon Jul 21 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
+

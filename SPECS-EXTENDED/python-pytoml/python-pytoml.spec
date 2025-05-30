@@ -196,3 +196,4 @@ Obsoletes:      python2-%{github_name} < %{version}-%{release}
 
 * Thu Jul 07 2016 Julien Enselme <jujens@jujens.eu> - 0.1.10-1.gitd883c7c
 - Inital package
+

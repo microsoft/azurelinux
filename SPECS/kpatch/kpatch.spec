@@ -102,3 +102,4 @@ rm -rf %{buildroot}%{_mandir}
 * Wed Jun 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.6-1
 - Original version for CBL-Mariner.
 - License verified.
+

@@ -175,3 +175,4 @@ ldconfig -N -n %{buildroot}/%{_libdir}
 
 * Sat May 22 2010 Matthias Runge <mrunge@matthias-runge.de> 1.08-1
 - initial build
+

@@ -133,3 +133,4 @@ sed -e 's/MODE="664", GROUP="plugdev"/TAG+="uaccess"/g' contrib/99-libjaylink.ru
 
 * Tue Jan  3 2017 Jiri Kastner <jkastner@redhat.com> - 0.1.0-1
 - initial version
+

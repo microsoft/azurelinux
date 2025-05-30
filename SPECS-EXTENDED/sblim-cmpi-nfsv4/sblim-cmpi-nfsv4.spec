@@ -178,3 +178,4 @@ mv $RPM_BUILD_ROOT/%{_libdir}/libLinux_NFSv4SystemConfigurationUtil.so $RPM_BUIL
 
 * Wed Oct 14 2009 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.0.12-1
 - Initial support
+

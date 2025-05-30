@@ -223,3 +223,4 @@ chmod a-x %{buildroot}%{_datadir}/mk/mkopt.sh
 
 * Wed Jul 02 2008 Julio M. Merino Vidal <jmmv@NetBSD.org> - 20080515-1
 - Initial release for Fedora.
+

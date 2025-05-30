@@ -110,3 +110,4 @@ cp -pr target/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
     + Do not try to download web-based resources during the build.
   * commons-collections4-4.1-jdk11.patch
     + Resolve type ambiguity in a toArray(null) call
+

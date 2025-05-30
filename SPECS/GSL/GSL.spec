@@ -63,3 +63,4 @@ rm -rf %{buildroot}/usr/cmake
 -   License verified.
 *   Thu Dec 5 2019 Emre Girgin <mrgirgin@microsoft.com> 2.0.0-1
 -   Original version for CBL-Mariner.
+

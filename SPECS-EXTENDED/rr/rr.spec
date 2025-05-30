@@ -234,3 +234,4 @@ patchelf --set-rpath '%{_libdir}/rr/' %{buildroot}%{_libdir}/rr/testsuite/obj/bi
 - Sync with upstream branch master,
   commit 70ba28f7ab2923d4e36ffc9d5d2e32357353b25c.
 - SRPM buildable on Fedora koji or other rpm build systems.
+

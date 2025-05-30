@@ -184,3 +184,4 @@ done
   * httpcomponents-core-java8compat.patch
     + fix code so that it produces binaries compatible with
     Java 8
+

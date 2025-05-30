@@ -64,3 +64,4 @@ They utilize the Assuan protocol as specified in the Libassuan manual.
 
 * Wed Jun 07 2017 Danut Moraru <dmoraru@vmware.com> - 1.0.0-1
 - Initial Build.
+

@@ -405,3 +405,4 @@ make PREFIX=%{buildroot}%{_prefix} install install.crio
 
 * Fri May 31 2019 Lokesh Mandvekar <lsm5@fedoraproject.org> - 2:0.2.0-1
 - initial package
+

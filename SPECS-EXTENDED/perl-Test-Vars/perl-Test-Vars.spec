@@ -262,3 +262,4 @@ prove -Ilib $(echo $(find xt/ -name '*.t'))
 
 * Mon Aug  8 2011 Paul Howarth <paul@city-fan.org> - 0.001-1
 - Initial RPM version
+

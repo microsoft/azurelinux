@@ -186,3 +186,4 @@ rm -rf %{buildroot}%{_libdir}/libhavege.*a
 
 * Wed Sep 07 2011  Jirka Hladky <hladky.jiri@gmail.com> - 1.2-0
 - Initial build
+

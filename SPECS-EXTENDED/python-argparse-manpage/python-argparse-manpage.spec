@@ -120,3 +120,4 @@ pip3 install pytest==7.1.2 six==1.16.0
 
 * Mon Feb 19 2018 Pavel Raiskup <praiskup@redhat.com> - 1.0.0-1
 - initial RPM packaging
+

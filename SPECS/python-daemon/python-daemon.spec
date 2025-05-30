@@ -92,3 +92,4 @@ pip3 install mock testscenarios testtools
 
 * Fri Mar 24 2017 Xiaolin Li <xiaolinl@vmware.com> - 2.1.2-1
 - Initial packaging for Photon
+

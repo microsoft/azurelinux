@@ -98,3 +98,4 @@ cp -p cv_RU.* $RPM_BUILD_ROOT/%{_datadir}/myspell/
 
 * Tue May 05 2009 Caolan McNamara <caolanm@redhat.com> - 1.01-1
 - initial version
+

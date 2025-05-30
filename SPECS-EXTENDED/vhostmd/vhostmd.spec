@@ -322,3 +322,4 @@ exit 0
 
 * Fri Aug 14 2009 Richard W.M. Jones <rjones@redhat.com> - 0.2-1
 - Initial packaging for Fedora, based on SuSE package.
+

@@ -455,3 +455,4 @@ install -m 644 doc/saveconfig.json.5 %{buildroot}%{_mandir}/man5/
 
 * Tue May 10 2011 Andy Grover <agrover@redhat.com> - 1.99-1
 - Initial packaging
+

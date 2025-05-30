@@ -185,3 +185,4 @@ sed -i 's/120/600/' test/meson.build
 
 * Wed May 8 2013 Soren Sandmann <ssp@redhat.com> 0.30.0-1
 - pixman 0.30.0
+

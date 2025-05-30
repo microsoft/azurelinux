@@ -142,3 +142,4 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} %{__python3} tests.py
 
 * Wed Nov 16 2011 Dan Callaghan <dcallagh@redhat.com> - 0.11-1
 - initial version
+

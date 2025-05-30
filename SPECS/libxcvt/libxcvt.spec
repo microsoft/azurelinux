@@ -94,3 +94,4 @@ provided by the Xorg server.
  
 * Thu Jul 8 2021 Olivier Fourdan <ofourdan@redhat.com> - 0.1.0-1
 - Initial import (#1980342)
+

@@ -408,3 +408,4 @@ install -p -m 0644 debootstrap.8 %{buildroot}%{_mandir}/man8
 
 * Fri Oct 12 2007 Lubomir Kundrak <lkundrak@redhat.com> 0.3.3.2etch1-1
 - Initial package
+

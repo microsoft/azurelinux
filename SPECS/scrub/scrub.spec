@@ -136,3 +136,4 @@ make DESTDIR=%{buildroot} install
 
 * Thu May 19 2005 Tom "spot" Callaway <tcallawa@redhat.com> 1.6-1
 - initial package for Fedora Extras
+

@@ -104,3 +104,4 @@ find %{buildroot} -type f -name "libprotobuf-c.a" -delete -print
 
 * Sat Mar 18 2017 Vinay Kulkarni <kulkarniv@vmware.com> - 1.2.1-1
 - Initial packaging for Photon
+

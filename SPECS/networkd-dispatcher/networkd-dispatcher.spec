@@ -59,3 +59,4 @@ install -Dm644 %{name}.8 %{buildroot}%{_mandir}/man8/%{name}.8
 * Fri Jun 2 2023 Aditya Dubey <adityadubey@microsoft.com> - 2.2.4-1
 - Original version for CBL-Mariner
 - License Verified
+

@@ -394,3 +394,4 @@ done
 
 * Mon Nov 09 1998 Preston Brown <pbrown@redhat.com>
 - initial build of GNU enscript to replace nenscript.
+

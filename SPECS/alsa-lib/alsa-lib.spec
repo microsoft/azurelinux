@@ -73,3 +73,4 @@ make DESTDIR=%{buildroot} install
 
 * Mon Dec 10 2018 Alexey Makhalov <amakhalov@vmware.com> - 1.1.7-1
 - initial version, moved from Vivace
+

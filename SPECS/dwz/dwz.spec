@@ -145,3 +145,4 @@ make DESTDIR=%{buildroot} prefix=%{_prefix} mandir=%{_mandir} bindir=%{_bindir} 
 
 * Mon Jun 11 2012 Jakub Jelinek <jakub@redhat.com> 0.2-1
 - new package
+

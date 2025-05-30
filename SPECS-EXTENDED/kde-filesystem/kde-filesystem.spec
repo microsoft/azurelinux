@@ -494,3 +494,4 @@ mkdir -p $RPM_BUILD_ROOT%{_datadir}/solid/{actions,devices}
 
 * Wed Oct 11 2006 Rex Dieter <rexdieter[AT]users.sf.net> 3.5-1
 - first try
+

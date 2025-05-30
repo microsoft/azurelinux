@@ -270,3 +270,4 @@ gtk-update-icon-cache --force %{_datadir}/icons/Adwaita &>/dev/null || :
 
 * Mon Apr 28 2014 Kalev Lember <kalevlember@gmail.com> - 3.13.1-1
 - Initial Fedora packaging
+

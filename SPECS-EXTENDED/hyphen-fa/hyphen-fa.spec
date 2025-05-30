@@ -98,3 +98,4 @@ cp -p hyph_fa_IR.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen
 
 * Wed Mar 18 2009 Caolan McNamara <caolanm@redhat.com> - 0.20081119-1
 - initial version
+

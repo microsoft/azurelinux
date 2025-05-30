@@ -501,3 +501,4 @@ mkdir -p $RPM_BUILD_ROOT%{_sharedstatedir}/%{name}
 * Sat Dec 18 2004 Dave Jones <davej@redhat.com>
 - Initial packaging, based upon kernel-utils.
 
+

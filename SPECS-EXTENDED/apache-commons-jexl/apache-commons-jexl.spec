@@ -156,3 +156,4 @@ cp -pr jexl2-compat/target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/jex
 * Thu Feb 28 2019 Fridrich Strba <fstrba@suse.com>
 - Initial package based on Fedora rpm
 - Generate and sanitize ant build files
+

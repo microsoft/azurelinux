@@ -205,3 +205,4 @@ FCFLAGS="$FCFLAGS   -O0 -g"; export FCFLAGS
 
 * Wed Oct 19 2016 Michal Schorm <mschorm@redhat.com> - 2.0.12-1
 - Initial version for 2.0.12
+

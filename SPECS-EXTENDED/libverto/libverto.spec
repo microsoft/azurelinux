@@ -308,3 +308,4 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 * Mon Aug 15 2011 Nathaniel McCallum <npmccallum@redhat.com> - 0.1-1
 - Initial release
 
+

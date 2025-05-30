@@ -112,3 +112,4 @@ LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots} -- -k 'not test_mypy and 
 
 * Mon Mar 13 2017 Xiaolin Li <xiaolinl@vmware.com> - 16.3.0-1
 - Initial packaging for Photon
+

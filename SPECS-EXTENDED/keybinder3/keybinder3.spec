@@ -123,3 +123,4 @@ rm -rf %{buildroot}/%{_libdir}/libkeybinder-3.0.la
 * Thu Aug 1 2013 TingPing <tingping@tingping.se> - 0.3.0-1
 - Initial Package
 
+

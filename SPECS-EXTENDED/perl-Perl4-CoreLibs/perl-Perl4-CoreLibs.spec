@@ -162,3 +162,4 @@ perl Build.PL installdirs=vendor
 - Do not build-require File::Find, Socket, and warnings::register which are
   not exercised by tests
 - Sort provides by English rules
+

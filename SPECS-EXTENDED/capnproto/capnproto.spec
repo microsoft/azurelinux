@@ -203,3 +203,4 @@ find %{buildroot} -name '*.la' -delete
 
 * Tue Apr 26 2016 Neal Gompa <ngompa13@gmail.com> - 0.5.3-1
 - Initial packaging
+

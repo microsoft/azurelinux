@@ -274,3 +274,4 @@ fi
 
 * Fri Sep  3 2004 skh@suse.de
 - Initial package created with version 1.2.1 (JPackage 1.5)
+

@@ -197,3 +197,4 @@ mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{name}
 
 * Thu Jul 28 2005 Viktor Mihajlovski <mihajlov@de.ibm.com> - 1.5.0-0
 - Updates for rpmlint complaints
+

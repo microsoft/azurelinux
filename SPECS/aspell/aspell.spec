@@ -597,3 +597,4 @@ rm -f %{buildroot}%{_infodir}/dir
 - Removed some old documentation files from the distribution.
 - Minor changes on to the section on using Aspell with egcs.
 - Minor changes to remove -Wall warnings.
+

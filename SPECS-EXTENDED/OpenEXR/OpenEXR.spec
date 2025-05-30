@@ -327,3 +327,4 @@ make %{?_smp_mflags} check || { cat IlmImfTest/test-suite.log; /bin/true; }
 
 * Wed Mar 30 2005 Ignacio Vazquez-Abrams <ivazquez@ivazquez.net> 1.2.2-1
 - Initial RPM release
+

@@ -146,3 +146,4 @@ sed -i -e '1{\@^#!/usr/bin/env python@d}' %{buildroot}%{python3_sitelib}/%{srcna
 
 * Thu Mar 09 2017 Tom Stellard <tstellar@redhat.com> - 0.5.0-1
 - Initial version
+

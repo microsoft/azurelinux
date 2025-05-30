@@ -196,3 +196,4 @@ docbook2man %{name}.sgml
 
 * Mon Jul 07 2008 - Patrick Steiner <patrick.steiner@a1.net> - 1.6.7-1
 - Initial package.
+

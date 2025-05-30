@@ -104,3 +104,4 @@ HOME=$(pwd)/check %make_build check %{_make_args} || :
 
 * Thu Feb 08 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 0.13-1
 - Initial package
+

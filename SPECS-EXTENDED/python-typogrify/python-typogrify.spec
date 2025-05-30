@@ -128,3 +128,4 @@ done
 
 * Sat Sep  1 2018 José Matos <jamatos@fedoraproject.org> - 2.0.7-1
 - initial package.
+

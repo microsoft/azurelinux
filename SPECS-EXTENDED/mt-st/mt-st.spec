@@ -292,3 +292,4 @@ mv mt-st mt
 
 * Thu Jun 19 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
+

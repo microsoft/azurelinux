@@ -148,3 +148,4 @@ rm -f %{buildroot}%{_libdir}/*.{la,a}
 
 * Sat Apr 23 2016 Mosaab Alzoubi <moceap@hotmail.com> - 0.1.0-1
 - Initial build
+

@@ -200,3 +200,4 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 
 * Thu Mar 24 2016 Xiaolin Li <xiaolinl@vmware.com> 1.0-1
 - Initial version.
+

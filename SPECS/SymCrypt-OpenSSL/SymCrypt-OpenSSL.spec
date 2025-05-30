@@ -138,3 +138,4 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 * Mon Feb 14 2022 Samuel Lee <saml@microsoft.com> - 1.0.0-1
 - Original version for CBL-Mariner
 - Verified license
+

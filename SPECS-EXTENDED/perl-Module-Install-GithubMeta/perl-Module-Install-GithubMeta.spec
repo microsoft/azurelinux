@@ -188,3 +188,4 @@ make test
 - initial RPM packaging
 - generated with cpan2dist (CPANPLUS::Dist::RPM version 0.0.8)
 
+

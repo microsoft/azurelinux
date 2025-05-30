@@ -769,3 +769,4 @@ done
 * Wed Feb  1 2006 Quentin Spencer <qspencer@users.sf.net> 3.1-1
 - Upgrade to the 3.x branch, incorporating changes from the fftw3 spec file.
 - Add dist tag.
+

@@ -155,3 +155,4 @@ go test -v ./cmd/helm
 
 * Thu Oct 17 2019 Andrew Phelps <anphel@microsoft.com> 2.14.3-1
 - Original version for CBL-Mariner
+

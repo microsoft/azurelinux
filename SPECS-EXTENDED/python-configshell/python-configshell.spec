@@ -301,3 +301,4 @@ sed -r -i "s/'pyparsing.*'/'pyparsing'/" setup.py
 
 * Tue May 10 2011 Andy Grover <agrover@redhat.com> - 1.99.1.git987b63b-1
 - Initial packaging
+

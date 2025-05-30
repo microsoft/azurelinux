@@ -386,3 +386,4 @@ install -m755 %{SOURCE1} %{buildroot}%{_libdir}/modules-load.d/%{name}.conf
 * Mon Aug 15 2016 Joe Doss <joe@solidadmin.com> - 0.0.20160808-1
 - Initial WireGuard Tools RPM
 - Version 0.0.20160808
+

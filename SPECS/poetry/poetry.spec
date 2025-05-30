@@ -168,3 +168,4 @@ pip3 install build==1.2.1 \
 
 * Wed Dec 12 2018 Fabio Valentini <decathorpe@gmail.com> - 0.12.10-1
 - Initial package.
+

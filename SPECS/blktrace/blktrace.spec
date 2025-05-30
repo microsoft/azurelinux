@@ -63,3 +63,4 @@ make install DESTDIR=%{buildroot} prefix=%{_prefix} mandir=%{_mandir}
 
 * Mon Nov 30 2015 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 1.0.5-1
 - Initial build.	First version
+

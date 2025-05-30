@@ -527,3 +527,4 @@ popd
 
 * Mon Jun 01 2009 Jan F. Chadima <jchadima@redhat.com> - 0.2-1
 - Initial build
+

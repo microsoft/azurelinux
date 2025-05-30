@@ -65,3 +65,4 @@ cp man/growpart.* $RPM_BUILD_ROOT/%{_mandir}/man1/
 
 * Wed Mar 29 2017 Kumar Kaushik <kaushikk@vmware.com> - 0.30-1
 - Initial build.  First version
+

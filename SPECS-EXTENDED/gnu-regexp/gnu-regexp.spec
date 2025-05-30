@@ -132,3 +132,4 @@ cp -a build/api/* %{buildroot}%{_javadocdir}/gnu.regexp
 - fix demo package requires
 * Mon Oct 17 2005 jsmeix@suse.de
 - Current version 1.1.4 from JPackage.org
+

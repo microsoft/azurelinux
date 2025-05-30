@@ -180,3 +180,4 @@ echo "/etc/ld.so.conf.d/ofed.conf" >> ofed-files
 
 * Tue Jun  13 2006 Vladimir Sokolovsky <vlad@mellanox.co.il>
 - Initial packaging
+

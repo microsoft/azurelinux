@@ -187,3 +187,4 @@ touch -c -r configure.ac{.ncursesw,}
 
 * Sat May 22 2004 Aurelien Bompard <gauret[AT]free.fr> 0:0.16-0.fdr.1
 - Initial RPM release.
+

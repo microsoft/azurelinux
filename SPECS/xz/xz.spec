@@ -140,3 +140,4 @@ make  %{?_smp_mflags}  check
 -   Update according to UsrMove.
 *   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 5.0.5-1
 -   Initial build. First version
+

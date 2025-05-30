@@ -157,3 +157,4 @@ Resolves: rhbz#2082756
 
 * Sun Oct 02 2016 aarem AT fedoraproject DOT org - 2.2-1
 - initial packaging of 2.2 version
+

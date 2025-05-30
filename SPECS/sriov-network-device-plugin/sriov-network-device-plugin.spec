@@ -97,3 +97,4 @@ install -D -m0755 images/ddptool-1.0.1.12.tar.gz %{buildroot}%{_datadir}/%{name}
 * Fri Sep 23 2022 Aditya Dubey <adityadubey@microsoft.com> - 3.4.0-1
 - Original version for CBL-Mariner
 - License Verified
+

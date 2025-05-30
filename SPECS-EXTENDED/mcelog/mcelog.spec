@@ -258,3 +258,4 @@ install -p -m644 mcelog*.5 $RPM_BUILD_ROOT/%{_mandir}/man5/
 
 * Thu Jan 27 2005 Dave Jones <davej@redhat.com>
 - Initial packaging.
+

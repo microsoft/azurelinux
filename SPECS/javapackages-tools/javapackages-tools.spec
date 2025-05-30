@@ -846,3 +846,4 @@ pip3 install -r test-requirements.txt
 
 * Wed Feb 15 2012 Stanislav Ochotnicky <sochotnicky@redhat.com> - 0.3.0-1
 - Initial version split from jpackage-utils
+

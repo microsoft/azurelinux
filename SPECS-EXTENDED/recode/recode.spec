@@ -389,3 +389,4 @@ rm $RPM_BUILD_ROOT%{_libdir}/*.la
 * Tue Nov 13 2001 Than Ngo <than@redhat.com> 3.6-1
 - initial RPM for 8.0
 
+

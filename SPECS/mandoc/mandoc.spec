@@ -305,3 +305,4 @@ fi
 
 * Thu Feb  7 2019 David Shea <dshea@redhat.com> - 1.14.4-1
 - Initial package
+

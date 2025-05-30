@@ -99,3 +99,4 @@ rm -rf %{buildroot}%{_infodir}/dir
 
 *  Wed Nov 12 2014 Mahmoud Bassiouny <mbassiouny@vmware.com> 3.2-1
 -  Initial version.
+

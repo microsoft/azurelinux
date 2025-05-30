@@ -280,3 +280,4 @@ popd
 
 * Tue Jun 25 2013 Jindrich Luza <jluza@redhat.com> 0.1.1-1
 - Automatic commit of package [libcomps] release [0.1.1-1].
+

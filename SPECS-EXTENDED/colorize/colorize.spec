@@ -116,3 +116,4 @@ install colorizerc %{buildroot}%{_sysconfdir}/colorizerc
 - BuildRequires: perl-base replaced bu simple BuildRequires:	perl
 - Delete Requires: perl-Term-ANSIColor because: 1) It is incorrect, 2) Such dependencies should be automatically handled by rpm.
 - Licence changed to GPLv2+ from GPL
+

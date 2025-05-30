@@ -546,3 +546,4 @@ package is installed, fixing #251943.
 
 * Wed Jan 10 2007 Eric Moret <eric.moret@epita.fr> 1.0.14-0.1.rc2
 - Initial package for Fedora
+

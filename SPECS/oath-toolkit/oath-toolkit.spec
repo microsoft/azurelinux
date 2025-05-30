@@ -308,3 +308,4 @@ mkdir -p -m 0600 %{buildroot}%{_sysconfdir}/liboath
 
 * Sun Apr 07 2013 Jaroslav Škarvada <jskarvad@redhat.com> - 2.0.2-1
 - Initial version
+

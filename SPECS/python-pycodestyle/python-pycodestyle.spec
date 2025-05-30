@@ -70,3 +70,4 @@ tox -e py%{python3_version_nodots}
 
 * Tue Jun 04 2019 Ankit Jain <ankitja@vmware.com> - 2.5.0-1
 - Initial packaging for Photon
+

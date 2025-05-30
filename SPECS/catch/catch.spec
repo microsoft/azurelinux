@@ -234,3 +234,4 @@ ctest -V %{?_smp_mflags}
 
 * Fri Sep 18 2015 Tom Hughes <tom@compton.nu> - 1.2.1-1
 - Initial build
+

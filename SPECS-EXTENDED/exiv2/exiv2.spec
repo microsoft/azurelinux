@@ -380,3 +380,4 @@ test -x %{buildroot}%{_libdir}/libexiv2.so
 
 * Tue May 16 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.1-1
 - first try
+

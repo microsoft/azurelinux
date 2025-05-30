@@ -320,3 +320,4 @@ ln -s %{_fontconfig_templatedir}/%{fontconf2} \
 
 * Mon Oct 26 2015 Peng Wu <pwu@redhat.com> - 1.004-1
 - Initial Version
+

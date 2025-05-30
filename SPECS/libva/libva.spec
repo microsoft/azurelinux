@@ -774,3 +774,4 @@ rm -rf `find %{buildroot}%{_libdir}/pkgconfig/libva*.pc | grep -v "glx"`
   package as per policy: they are kept in sync with their soNUM.
 * Mon Jun  7 2010 dominique-vlc.suse@leuenberger.net
 - Initial package for VideoLAN repository, libva 1.0.1
+

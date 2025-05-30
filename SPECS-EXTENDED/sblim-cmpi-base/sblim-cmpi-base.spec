@@ -295,3 +295,4 @@ rm -f $RPM_BUILD_ROOT/%{_libdir}/cmpi/*a
 
 * Wed Jul 20 2005 Mark Hamzy <hamzy@us.ibm.com> - 1.5.3-1
 - initial support
+

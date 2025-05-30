@@ -40,3 +40,4 @@ cp readme.md %{buildroot}%{gem_instdir}/
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.7-1
 - License verified
 - Original version for CBL-Mariner
+

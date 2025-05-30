@@ -359,3 +359,4 @@ make DESTDIR=%{buildroot} MANDIR=%{_mandir} install
 
 * Wed Dec 21 2011 Milan Broz <mbroz@redhat.com> - 0.0.1-1
 - Initial version
+

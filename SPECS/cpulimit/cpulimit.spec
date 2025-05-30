@@ -160,3 +160,4 @@ which can be found at http://cpulimit.sourceforge.net
 
 * Tue May 17 2011 pascal.bleser@opensuse.org
 - initial version (1.3)
+

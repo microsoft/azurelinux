@@ -149,3 +149,4 @@ find $RPM_BUILD_ROOT -name \*.la -exec %{__rm} -f {} \;
 
 * Mon Dec 10 2007 Alexandru Ciobanu <alex@tvtransilvania.ro> - 0.1.0-0
 - Initial RPM release.
+

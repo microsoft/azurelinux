@@ -39,3 +39,4 @@ mv *.ttf %{buildroot}%{_fontdir}/
 
 * Wed Apr 29 2020 Mateusz Malisz <mamalisz@microsoft.com> 20120503-1
 - Original version for CBL-Mariner.
+

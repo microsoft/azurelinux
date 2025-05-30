@@ -95,3 +95,4 @@ cp -aL build/docs/* %{buildroot}%{_javadocdir}/%{name}
 * Wed Oct 24 2018 Fridrich Strba <fstrba@suse.com>
 - Initial packaging built manually without maven. Spec file adapted
   from Fedora rpm.
+

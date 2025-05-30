@@ -172,3 +172,4 @@ find %{buildroot} -type f -name "*.la" -delete
 
 * Sat Dec  1 2012 Peter Robinson <pbrobinson@fedoraproject.org> 1.0-1
 - Initial package
+

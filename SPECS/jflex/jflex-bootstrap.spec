@@ -146,3 +146,4 @@ install -p -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/jflex
 - Recreated jflex-lex-scan.patch
 * Wed Apr 29 2009 mvyskocil@suse.cz
 - Initial packaging of jflex-bootstrap 1.4.2 in SUSE (from jpp5)
+

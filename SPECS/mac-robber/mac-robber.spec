@@ -109,3 +109,4 @@ install -pm 0755 mac-robber %{buildroot}%{_bindir}
 
 * Tue Mar 18 2008 kwizart < kwizart at gmail.com > - 1.00-1
 - Initial package.
+

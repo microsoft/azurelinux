@@ -438,3 +438,4 @@ install -D -p -m 755 htmlreport/cppcheck-htmlreport %{buildroot}%{_bindir}/cppch
 
 * Mon Apr 27 2009 Jussi Lehtola <jussilehtola@fedoraproject.org> - 1.31-1
 - First release.
+

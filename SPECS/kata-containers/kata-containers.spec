@@ -320,3 +320,4 @@ popd
 
 * Thu Nov 26 2020 Fabiano FidĂȘncio <fabiano@fidencio.org> - 2.0.0-0
 - Initial packaging
+

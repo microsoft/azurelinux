@@ -104,3 +104,4 @@ install -m 644 src/psl-make-dafsa.1 %{buildroot}%{_mandir}/man1
 - package psl-make-dafsa, for converting the PSL list into the
   DAFSA binary format
 - split from libpsl package to break build cycle
+

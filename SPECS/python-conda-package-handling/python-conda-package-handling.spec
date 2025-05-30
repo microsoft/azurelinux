@@ -130,3 +130,4 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 * Sat May 18 2019 Orion Poplawski <orion@nwra.com> - 1.1.1-1
 - Initial Fedora package
+

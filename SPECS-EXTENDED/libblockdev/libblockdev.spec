@@ -2263,3 +2263,4 @@ find %{buildroot} -type f -name "*.la" | xargs %{__rm}
 
 * Wed Dec 10 2014 Vratislav Podzimek <vpodzime@redhat.com> - 0.1-1
 - Initial release
+

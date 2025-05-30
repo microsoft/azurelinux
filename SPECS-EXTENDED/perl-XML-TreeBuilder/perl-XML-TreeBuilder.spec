@@ -189,3 +189,4 @@ find $RPM_BUILD_ROOT -type d -depth -exec rmdir {} 2>/dev/null ';'
 
 * Fri May 04 2007 Dag Wieers <dag@wieers.com> - 3.09-1
 - Initial package. (using DAR)
+

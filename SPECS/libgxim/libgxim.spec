@@ -190,3 +190,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Mon Aug 25 2008 Akira TAGOH <tagoh@redhat.com> - 0.1.0-1
 - Initial package.
+

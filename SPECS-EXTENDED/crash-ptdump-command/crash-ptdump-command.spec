@@ -86,3 +86,4 @@ cp %{_builddir}/ptdump-%{version}/ptdump.so %{buildroot}%{_libdir}/crash/extensi
 
 * Tue Jan 26 2016 MUNEDA Takahiro <muneda.takahiro@jp.fujitsu.com> - 1.0.1-1
 - Initial crash-ptdump-command package
+

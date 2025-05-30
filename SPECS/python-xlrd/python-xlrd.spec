@@ -233,3 +233,4 @@ rm -rf $RPM_BUILD_ROOT%{_bindir}/runxlrd.py* \
 
 * Tue Jun 12 2007 Sean Reifschneider <jafo@tummy.com> - 0.6.1-1
 - Initial RPM spec file.
+

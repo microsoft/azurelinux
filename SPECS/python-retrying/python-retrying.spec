@@ -150,3 +150,4 @@ cp -p %{SOURCE1} .
 
 * Mon Aug 25 2014 Alan Pevec <apevec@redhat.com> - 1.2.3-1
 - Initial package.
+

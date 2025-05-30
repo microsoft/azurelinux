@@ -288,3 +288,4 @@ HASH=$(cat %{buildroot}%{shimdir}/shim%{efiarch}.hash | cut -d ' ' -f 1)
 - Make a new shim-unsigned-x64 package like the shim-unsigned-aarch64 one.
 - This will (eventually) supersede what's in the "shim" package so we can
   make "shim" hold the signed one, which will confuse fewer people.
+

@@ -131,3 +131,4 @@ make test
 - modified as Petr Šabata's advice
 * Fri Mar 02 2012 xning <xning AT redhat DOT com> - 1.03-1
 - create for support LSB 4.1
+

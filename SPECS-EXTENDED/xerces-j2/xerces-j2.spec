@@ -345,3 +345,4 @@ ln -sf %{name}.jar %{_javadir}/jaxp_parser_impl.jar
 - Fix prerequires
 * Thu Sep  2 2004 skh@suse.de
 - Initial package created with version 2.6.2 (JPackage 1.5)
+

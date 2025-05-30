@@ -143,3 +143,4 @@ cp ./bin/keda-admission-webhooks %{buildroot}%{_bindir}
 
 * Wed Aug 25 2021 Henry Li <lihl@microsoft.com> - 2.4.0-1
 - Original version for CBL-Mariner
+

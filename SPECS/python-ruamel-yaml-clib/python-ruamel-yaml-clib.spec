@@ -73,3 +73,4 @@ python3 setup.py install --single-version-externally-managed --skip-build --root
 
 * Fri Aug 30 2019 Chandan Kumar <raukadah@gmail.com> - 0.1.2-1
 - Initial package
+

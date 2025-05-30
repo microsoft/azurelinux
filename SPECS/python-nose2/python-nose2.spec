@@ -143,3 +143,4 @@ PYTHONPATH=`pwd` python3 -m nose2.__main__ -v
 
 * Tue Sep 13 2016 Aurelien Bompard <abompard@fedoraproject.org> - 0.6.5-1
 - Initial package.
+

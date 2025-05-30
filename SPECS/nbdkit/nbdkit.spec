@@ -2499,3 +2499,4 @@ export LIBGUESTFS_TRACE=1
 
 * Mon Jun 24 2013 Richard W.M. Jones <rjones@redhat.com> - 1.0.0-4
 - Initial release.
+

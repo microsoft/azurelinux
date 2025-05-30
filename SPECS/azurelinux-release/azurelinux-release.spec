@@ -419,3 +419,4 @@ install -Dm0644 %{SOURCE4} -t %{buildroot}%{_sysctldir}/
 
 * Wed Sep 04 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.0-1
 - Original version for CBL-Mariner.
+

@@ -99,3 +99,4 @@ test -f %{buildroot}%{python3_sitelib}/tomli-%{version}.dist-info/METADATA
 
 * Thu Jul 22 2021 Petr Viktorin <pviktori@redhat.com> - 1.0.4-1
 - Initial package
+

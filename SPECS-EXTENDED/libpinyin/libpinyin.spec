@@ -389,3 +389,4 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 * Wed Aug 31 2011  Peng Wu <alexepico@gmail.com> - 0.2.99-1
 - Initial version
+

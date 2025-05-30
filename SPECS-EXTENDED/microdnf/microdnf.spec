@@ -139,3 +139,4 @@ capabilities are intentionally not implemented in Micro DNF.
 
 * Mon Dec 12 2016 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 1-1
 - Initial package
+

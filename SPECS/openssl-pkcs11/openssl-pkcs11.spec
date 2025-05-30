@@ -187,3 +187,4 @@ make check %{?_smp_mflags} || if [ $? -ne 0 ]; then cat tests/*.log; exit 1; fi;
 
 * Thu Mar 01 2018 Anderson Sasaki <ansasaki@redhat.com> - 0.4.7-4
 - Package renamed from libp11 to openssl-pkcs11
+

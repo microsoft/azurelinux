@@ -223,3 +223,4 @@ libcxl is a library for enumerating and communicating with CXL devices.
 -   Removing the Requires section
 *   Thu Apr 06 2017 Dheeraj Shetty <dheerajs@vmware.com> 56-1
 -   Initial build.  First version
+

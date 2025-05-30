@@ -188,3 +188,4 @@ ocaml pkg/pkg.ml test
 
 * Thu Jan  9 2020 Jerry James <loganjerry@gmail.com> - 1.0.1-1
 - Initial RPM
+

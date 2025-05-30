@@ -1262,3 +1262,4 @@ gtk-query-immodules-3.0-%{__isa_bits} --update-cache &>/dev/null || :
 
 * Mon May 10 2010 Richard Hughes <richard@hughsie.com> 2.90.0-0.0.20100510git
 - Update from git
+

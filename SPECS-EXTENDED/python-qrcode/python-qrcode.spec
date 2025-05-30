@@ -250,3 +250,4 @@ ln -s qr %{buildroot}%{_bindir}/qrcode
 * Sat Jun  2 2012 Michel Salim <salimma@fedoraproject.org> - 2.4.1-1
 - Initial package
 
+

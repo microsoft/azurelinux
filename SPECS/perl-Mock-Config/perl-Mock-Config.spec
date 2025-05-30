@@ -82,3 +82,4 @@ make test
 
 * Tue Apr 11 2017 Jitka Plesnikova <jplesnik@redhat.com> - 0.03-1
 - Initial release
+

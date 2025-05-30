@@ -93,3 +93,4 @@ find %{buildroot} -name '*.la' -delete
 
 *   Tue Nov 24 2015 Xiaolin Li <xiaolinl@vmware.com> 2.7.0-1
 -   Initial build.  First version
+

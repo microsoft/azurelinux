@@ -192,3 +192,4 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python3} setup.py build
 
 * Fri May 31 2013 Jiri Moskovcak <jmoskovc@redhat.com> 1.0-1
 - initial rpm
+

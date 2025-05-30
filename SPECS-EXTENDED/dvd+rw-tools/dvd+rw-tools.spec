@@ -215,3 +215,4 @@ make WARN="-DDEFAULT_BUF_SIZE_MB=16 -DRLIMIT_MEMLOCK" %{?_smp_mflags}
 
 * Thu Oct 26 2006 Harald Hoyer <harald@redhat.com> - 7.0-0.1
 - new version 7.0
+

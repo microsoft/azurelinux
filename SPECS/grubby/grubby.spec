@@ -669,3 +669,4 @@ current boot environment.
 
 * Tue Jun  2 2009 Jeremy Katz <katzj@redhat.com> - 6.0.86-1
 - initial build after splitting out from mkinitrd
+

@@ -226,3 +226,4 @@ rm -rf examples/.deps examples/Makefile examples/*.gcc43
 
 * Tue Aug 29 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.3-1
 - first try
+

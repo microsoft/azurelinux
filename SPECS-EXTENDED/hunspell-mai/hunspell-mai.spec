@@ -90,3 +90,4 @@ cp -p mai_IN.* $RPM_BUILD_ROOT/%{_datadir}/myspell/
 
 * Mon Jan 04 2010 Parag Nemade <pnemade AT redhat.com> - 1.0.1-1
 - initial version
+

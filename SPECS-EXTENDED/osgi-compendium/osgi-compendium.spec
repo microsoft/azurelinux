@@ -133,3 +133,4 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
   the jta_api symlink
 * Mon Feb 11 2019 Fridrich Strba <fstrba@suse.com>
 - Initial packaging of osgi-compendium 6.0.0
+

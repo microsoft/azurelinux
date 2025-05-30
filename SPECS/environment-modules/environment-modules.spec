@@ -472,3 +472,4 @@ fi
 
 * Tue Jan 24 2006 - Orion Poplawski <orion@cora.nwra.com> - 3.2.0-1
 - Fedora Extras packaging
+

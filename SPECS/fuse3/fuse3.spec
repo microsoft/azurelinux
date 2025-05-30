@@ -207,3 +207,4 @@ rm -f %{buildroot}%{_libdir}/udev/rules.d/99-fuse3.rules
 
 * Mon Apr 08 2019 Dave Dykstra <dwd@fedoraproject.org> - 3.4.2-3
 - Separate out from fuse package
+

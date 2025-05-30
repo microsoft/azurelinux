@@ -198,3 +198,4 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 
 * Sat Sep 10 2005 Ralf Corsepius <rc040203@freenet.de> - 1.00-1
 - FE submission.
+

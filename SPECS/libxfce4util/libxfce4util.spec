@@ -352,3 +352,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Tue Dec 16 2003 Than Ngo <than@redhat.com> 4.0.1-1
 - initial build
+

@@ -136,3 +136,4 @@ ln -s	%{_fontconfig_templatedir}/%{fontconf}	\
 * Tue Apr 21 2009 Akira TAGOH <tagoh@redhat.com> - 003.01-1
 - Initial package.
 
+

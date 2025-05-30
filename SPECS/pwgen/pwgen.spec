@@ -136,3 +136,4 @@ digits are placed in a way that eases memorizing the password.
 
 * Sun Mar 12 2006 James Bowes <jbowes@redhat.com> - 2.05-1
 - Initial Fedora packaging.
+

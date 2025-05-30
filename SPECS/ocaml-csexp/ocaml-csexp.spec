@@ -168,3 +168,4 @@ EOF
 
 * Thu Sep 10 2020 Jerry James <loganjerry@gmail.com> - 1.3.1-1
 - Initial RPM
+

@@ -162,3 +162,4 @@ useradd -r -g unbound -d %{_sysconfdir}/unbound -s /sbin/nologin \
 
 *  Fri Jan 06 2017 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 1.6.0-1
 -  Initial
+

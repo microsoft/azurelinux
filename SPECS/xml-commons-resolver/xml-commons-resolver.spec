@@ -167,3 +167,4 @@ install -m 0644 %{SOURCE5} %{buildroot}%{resolverdir}/CatalogManager.properties
 * Thu Dec  6 2018 Fridrich Strba <fstrba@suse.com>
 - Initial package of xml-commons-resolver
 - Add compatibility symlinks as well as provides
+

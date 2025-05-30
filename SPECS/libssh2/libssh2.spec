@@ -87,3 +87,4 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 
 * Wed Nov 30 2016 Xiaolin Li <xiaolinl@vmware.com> - 1.8.0-1
 - Add libssh2 1.8.0 package.
+

@@ -234,3 +234,4 @@ rmdir %{buildroot}%{_libdir}/genwqe/
 
 * Wed Apr 22 2015 Frank Haverkamp <haverkam@de.ibm.com>
 - Initial release.
+

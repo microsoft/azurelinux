@@ -148,3 +148,4 @@ developing applications that use %{name}.
 
 * Fri Sep 07 2018 Pete Walter <pwalter@fedoraproject.org> - 5.0.0-1
 - Initial Fedora package
+

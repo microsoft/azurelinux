@@ -404,3 +404,4 @@ install -pm 0644 python/libvoikko.py %{buildroot}%{python3_sitelib}/
 
 * Wed Oct 24 2007 - Ville-Pekka Vainio <vpivaini AT cs.helsinki.fi> 1.5-0.1
 - Initial package
+

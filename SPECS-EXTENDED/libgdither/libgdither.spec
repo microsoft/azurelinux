@@ -153,3 +153,4 @@ make test CFLAGS="%{optflags} -Werror --std=c99 -I%{_builddir}/%{?buildsubdir}"
 
 * Mon Jun 16 2008 kwizart < kwizart at gmail.com > - 0.6-0
 - Initial package
+

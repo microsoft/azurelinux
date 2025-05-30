@@ -183,3 +183,4 @@ cp -p dictionaries/*.dic dictionaries/*.aff $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Thu Dec 07 2006 Caolán McNamara <caolanm@redhat.com> - 1.3.8.6-1
 - initial version
+

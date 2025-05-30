@@ -406,3 +406,4 @@ rm %{buildroot}%{_docdir}/libcanberra/README
 
 * Fri Jun 13 2008 Lennart Poettering <lpoetter@redhat.com> 0.3-1
 - Initial package, based on Colin Guthrie's Mandriva package
+

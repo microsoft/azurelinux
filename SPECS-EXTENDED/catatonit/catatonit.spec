@@ -123,3 +123,4 @@ ln -s %{_libexecdir}/%{name}/%{name} %{buildroot}%{_libexecdir}/podman/%{name}
 * Wed Feb 19 2020 Lokesh Mandvekar <lsm5@fedoraproject.org> - 0.1.4-1
 - first build for review
 - source copied from openSUSE @ https://build.opensuse.org/package/show/openSUSE:Factory/catatonit
+

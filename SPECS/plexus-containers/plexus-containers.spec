@@ -359,3 +359,4 @@ rm plexus-component-metadata/src/test/java/org/codehaus/plexus/metadata/DefaultC
 
 * Tue Apr 08 2008 Deepak Bhole <dbhole@redhat.com> 1.0-0.1.a34.0jpp.1
 - Initial build with original base spec from JPackage
+

@@ -218,3 +218,4 @@ cp -pr build/javadocs/* %{buildroot}%{_javadocdir}/%{name}
 
 * Sat Sep  4 2004 skh@suse.de
 - Initial package created with version 2.3.0 (JPackage 1.5)
+

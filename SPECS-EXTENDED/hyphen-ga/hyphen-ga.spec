@@ -96,3 +96,4 @@ cp -p hyph_ga_IE.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen
 
 * Tue Aug 05 2008 Caolán McNamara <caolanm@redhat.com> - 0.20040220-1
 - initial version
+

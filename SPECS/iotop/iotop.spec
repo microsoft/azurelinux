@@ -90,3 +90,4 @@ V=1 STRIP=: %make_install
 
 * Mon Nov 30 2015 Harish Udaiya Kumar <hudaiyakumar@vmware.com> 0.6-1
 - Initial build. First version
+

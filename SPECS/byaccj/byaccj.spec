@@ -84,3 +84,4 @@ cp -p src/yacc.linux \
 - Remove redundant tags/sections from specfile
 * Sat Apr 25 2009 mvyskocil@suse.cz
 - created package
+

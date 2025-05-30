@@ -148,3 +148,4 @@ Summary:        %{summary}
 
 * Sun Aug 05 2018 Mohamed El Morabity <melmorabity@fedoraproject.org> 0.6.0-2
 - RPMAUTOSPEC: unresolvable merge
+

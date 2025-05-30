@@ -379,3 +379,4 @@ find $RPM_BUILD_ROOT -name '*.la' -delete
 * Sun Oct 25 1998 James Henstridge <james@daa.com.au>
 
 - Initial release 0.0.1
+

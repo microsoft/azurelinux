@@ -188,3 +188,4 @@ rm -fv %{buildroot}%{_libdir}/libre2.a
 
 * Sat Oct 20 2012 Denis Arnaud <denis.arnaud_fedora@m4x.org> 0.0.0-1
 - RPM release for Fedora 18
+

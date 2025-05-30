@@ -115,3 +115,4 @@ cp -p *.1 %{buildroot}%{_mandir}/man1
 
 * Sun Mar 09 2008 Lubomir Kundrak <lkundrak@redhat.com> - 0.3-1
 - Initial packaging attempt
+

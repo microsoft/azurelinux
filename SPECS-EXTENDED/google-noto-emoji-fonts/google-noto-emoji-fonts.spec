@@ -227,3 +227,4 @@ install -m 0644 -p %{SOURCE3} %{buildroot}%{_datadir}/appdata
 
 * Wed Apr 20 2016 Peng Wu <pwu@redhat.com> - 20160406-1
 - Initial packaging
+

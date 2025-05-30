@@ -109,3 +109,4 @@ ctest -V
 
 * Fri Dec 14 2018 Marcin Ślusarz <marcin.slusarz@intel.com> - 1.5-1
 - Initial RPM release
+

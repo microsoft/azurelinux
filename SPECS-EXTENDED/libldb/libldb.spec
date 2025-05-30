@@ -590,3 +590,4 @@ rm -f $RPM_BUILD_ROOT/%{_mandir}/man3/_*
 * Mon Jan 17 2011 Stephen Gallagher <sgallagh@redhat.com> - 0.9.22-7
 - Update to 0.9.22 (first independent release of libldb upstream)
 
+

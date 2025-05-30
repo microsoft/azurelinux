@@ -679,3 +679,4 @@ gtk-update-icon-cache --force %{_datadir}/icons/gnome &>/dev/null || :
 
 * Wed Dec  4 2002 Alexander Larsson <alexl@redhat.com> 0.1.3-1
 - Initial build.
+

@@ -205,3 +205,4 @@ find %{buildroot} -name bdftruncate\* -print0 | xargs -0 rm -f
 * Mon Nov 10 2014 Simone Caronni <negativo17@gmail.com> - 1:7.5-25
 - Restore font-utils provider, required by some packages for building.
  examine all platform=3 encodings (fixes #578460)
+

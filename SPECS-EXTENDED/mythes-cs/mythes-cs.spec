@@ -104,3 +104,4 @@ cp -p th_cs_CZ_v2.* $RPM_BUILD_ROOT/%{_datadir}/mythes
 
 * Wed Nov 28 2007 Caolán McNamara <caolanm@redhat.com> - 0.20070926-1
 - initial version
+

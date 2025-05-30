@@ -62,3 +62,4 @@ rm -vf %{buildroot}%{_mandir}/man5/passwd.5
 -   Upgrade to 4.04
 *   Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 3.59-1
 -   Initial build. First version
+

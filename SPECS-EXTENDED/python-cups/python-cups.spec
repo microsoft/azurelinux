@@ -272,3 +272,4 @@ export PYTHONPATH=%{buildroot}%{python3_sitearch}
 
 * Mon Nov 01 2010 Jiri Popelka <jpopelka@redhat.com> - 1.9.52-1
 - Initial RPM spec file
+

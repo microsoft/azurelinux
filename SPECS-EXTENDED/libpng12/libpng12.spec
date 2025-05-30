@@ -163,3 +163,4 @@ Related: #850628
 
 * Wed Aug  1 2012 Tom Lane <tgl@redhat.com> 1.2.49-1
 - Created from libpng
+

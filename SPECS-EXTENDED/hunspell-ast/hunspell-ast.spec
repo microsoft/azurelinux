@@ -104,3 +104,4 @@ cp -p dictionaries/ast.dic $RPM_BUILD_ROOT/%{_datadir}/myspell/ast_ES.dic
 
 * Mon Apr 12 2010 Caolán McNamara <caolanm@redhat.com> - 0.20100331-1
 - initial version
+

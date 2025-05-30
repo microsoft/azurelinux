@@ -192,3 +192,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - added fixing of libshp.la file ("installed=no" -> "installed=yes")
   Wed Jan 11 00:00:00 UTC 2006 Pascal Bleser
 - new package
+

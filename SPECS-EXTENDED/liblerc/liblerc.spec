@@ -78,3 +78,4 @@ g++ -o test src/LercTest/main.cpp -L. -lLerc
 
 * Fri May 06 2022 Sandro Mani <manisandro@gmail.com> - 3.1-0.1.gitb1de4cd
 - Initial package b1de4cd
+

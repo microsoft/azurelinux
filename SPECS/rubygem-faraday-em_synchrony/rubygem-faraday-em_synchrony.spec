@@ -34,3 +34,4 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 * Wed Jan 06 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.0-1
 - License verified
 - Original version for CBL-Mariner
+

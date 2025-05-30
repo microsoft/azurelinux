@@ -109,3 +109,4 @@ by default.
 
 * Fri Sep 2 2016 Panu Matilainen <pmatilai@redhat.com> - 0.74-1
 - Initial package
+

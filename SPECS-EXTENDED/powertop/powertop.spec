@@ -504,3 +504,4 @@ touch %{_localstatedir}/cache/powertop/{saved_parameters.powertop,saved_results.
 
 * Fri May 11 2007 Adam Jackson <ajax@redhat.com> 1.0-1
 - Initial revision.
+

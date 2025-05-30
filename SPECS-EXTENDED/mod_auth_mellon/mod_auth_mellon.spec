@@ -245,3 +245,4 @@ In addition this release contains the following new features and fixes:
 * Wed Nov 27 2013 Simo Sorce <simo@redhat.com> 0.7.0-0
 - Initial Fedora release based on version 0.7.0
 - Based on an old spec file by Jean-Marc Liger <jmliger@siris.sorbonne.fr>
+

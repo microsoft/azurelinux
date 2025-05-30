@@ -420,3 +420,4 @@ install -m 0644 binaries/vgabios*.bin %{buildroot}%{_datadir}/seavgabios
 
 * Thu Jan 07 2010 Justin M. Forbes <jforbes@redhat.com> 0.5.1-0.1.20100108git669c991
 - Created initial package
+

@@ -255,3 +255,4 @@ rm -rf %{buildroot}%{_docdir}/%{name}
 
 * Mon Feb 6 2006 Giulio Urlini
 - First build attempt
+

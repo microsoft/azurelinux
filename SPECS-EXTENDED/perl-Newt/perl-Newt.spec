@@ -250,3 +250,4 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 
 * Mon Jun 11 2001 Joe Orton <jorton@redhat.com>
 - Initial revision.
+

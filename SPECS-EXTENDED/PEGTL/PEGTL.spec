@@ -99,3 +99,4 @@ Resolves: rhbz#1742557
 
 * Thu Jul 14 2016 Daniel Kopecek <dkopecek@redhat.com> - 1.3.1-1
 - Initial package
+

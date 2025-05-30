@@ -257,3 +257,4 @@ X.Org X11 xkb gadgets.
 
 * Thu Jul 08 2010 Adam Jackson <ajax@redhat.com> 7.4-8
 - xkbcomp-speed.patch: Backport performance changes from git master.
+

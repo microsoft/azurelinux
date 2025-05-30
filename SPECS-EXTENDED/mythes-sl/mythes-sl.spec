@@ -189,3 +189,4 @@ cp -p th_sl_SI_v2.* $RPM_BUILD_ROOT/%{_datadir}/mythes
 
 * Wed Jan 21 2009 Caolán McNamara <caolanm@redhat.com> - 0.20090121-1
 - initial version
+

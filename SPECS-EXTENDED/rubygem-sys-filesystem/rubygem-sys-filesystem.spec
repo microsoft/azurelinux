@@ -71,3 +71,4 @@ rm -v %{buildroot}%{gem_cache}
 
 * Fri Mar 03 2023 Igor Raits <igor.raits@gmail.com> - 1.4.3-1
 - Initial import
+

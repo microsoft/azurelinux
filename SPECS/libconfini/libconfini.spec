@@ -62,3 +62,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 *  Fri Dec 11 2020 Jonathan Chiu <jochi@microsoft.com> 1.16.0-1
 -  Original version for CBL-Mariner.
+

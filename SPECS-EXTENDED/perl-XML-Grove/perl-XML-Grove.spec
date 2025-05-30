@@ -258,3 +258,4 @@ make test
 
 * Mon Jun 18 2001 Till Kamppeter <till@mandrakesoft.com> 0.46alpha-1mdk
 - Newly introduced for Foomatic.
+

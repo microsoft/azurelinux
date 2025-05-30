@@ -115,3 +115,4 @@ developing applications that use %{name}.
 
 * Thu May 16 2019 Andy Li <andy@onthewings.net> - 1.2.1-1
 - Initial RPM release.
+

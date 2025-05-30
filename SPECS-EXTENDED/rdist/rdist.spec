@@ -349,3 +349,4 @@ install -m644 doc/rdistd.man ${RPM_BUILD_ROOT}%{_mandir}/man8/rdistd.8
 
 * Mon Jul 21 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
+

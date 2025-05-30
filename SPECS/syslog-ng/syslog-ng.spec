@@ -256,3 +256,4 @@ fi
 
 * Thu Jun 4 2015 Vinay Kulkarni <kulkarniv@vmware.com> 3.6.2-1
 - Add syslog-ng support to photon.
+

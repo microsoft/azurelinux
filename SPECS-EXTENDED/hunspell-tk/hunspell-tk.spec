@@ -105,3 +105,4 @@ cp -p dictionaries/tk-TM.dic $RPM_BUILD_ROOT/%{_datadir}/myspell/tk.dic
 
 * Tue Oct 07 2008 Caolán McNamara <caolanm@redhat.com> - 0.20080213-1
 - initial version
+

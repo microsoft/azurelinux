@@ -153,3 +153,4 @@ popd
 
 * Sat Jul 2 2016 Elliott Sales de Andrade <quantum.analyst@gmail.com> 0.2.2-1
 - Initial RPM release
+

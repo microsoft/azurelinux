@@ -172,3 +172,4 @@ rm -f archivemount.1
 
 * Tue Jun 01 2010 Niels de Vos <ndevos@redhat.com> 0.6.0-1
 - Initial package
+

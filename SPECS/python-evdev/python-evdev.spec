@@ -122,3 +122,4 @@ Summary:        %{summary}
 
 * Sun Jun 05 2016 Georgi Valkov <georgi.t.valkov@gmail.com> - 0.6.1-1
 - Initial RPM Release
+

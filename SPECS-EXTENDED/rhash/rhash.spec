@@ -158,3 +158,4 @@ make test-shared
 
 * Thu Mar 9 2017 Orion Poplawski <orion@cora.nwra.com> - 1.3.4-1
 - Initial Fedora package
+

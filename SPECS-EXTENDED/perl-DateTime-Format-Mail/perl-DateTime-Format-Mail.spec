@@ -212,3 +212,4 @@ make test %{?with_perl_DateTime_Format_Mail_enables_extra_test:\
 
 * Fri Aug 04 2006 Chris Weyl <cweyl@alumni.drew.edu> 0.30-1
 - Initial spec file for F-E
+

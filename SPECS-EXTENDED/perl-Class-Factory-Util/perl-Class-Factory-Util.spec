@@ -165,3 +165,4 @@ find %{buildroot} -depth -type d -exec rmdir {} 2>/dev/null \;
 
 * Fri Aug 04 2006 Chris Weyl <cweyl@alumni.drew.edu> 1.6-1
 Initial spec file for F-E
+

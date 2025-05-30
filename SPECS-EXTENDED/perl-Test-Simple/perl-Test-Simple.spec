@@ -1187,3 +1187,4 @@ make test %{!?perl_bootstrap:AUTHOR_TESTING=1}
 
 * Tue Mar 16 2010 Chris Weyl <cweyl@alumni.drew.edu> - 0.94-1
 - Specfile by Fedora::App::MaintainerTools 0.006
+

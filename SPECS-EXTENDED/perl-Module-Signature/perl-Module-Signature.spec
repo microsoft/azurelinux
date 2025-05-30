@@ -380,3 +380,4 @@ rm -rf %{buildroot} %{gnupghome}
 
 * Sat Mar 27 2004 Ville Skyttä <ville.skytta@iki.fi> - 0:0.38-0.fdr.1
 - First build
+

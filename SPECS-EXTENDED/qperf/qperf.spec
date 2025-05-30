@@ -148,3 +148,4 @@ make DESTDIR=%{buildroot} install
 
 * Sat Oct 20 2007 - johann@georgex.org
 - Initial package
+

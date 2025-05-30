@@ -109,3 +109,4 @@ Provides:       python3-ntlm3 = %{version}-%{release}
 * Upstream update to 1.1.0
 * Mon Oct 10 2016 James Hogarth <james.hogarth@gmail.com> - 1.0.2-1
 - Initial package.
+

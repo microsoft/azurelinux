@@ -236,3 +236,4 @@ modern C++ approach.
 
 * Wed Nov 21 2007 Marc Maurer <uwog@uwog.net> 0.3.8-1
 - Initial spec file
+

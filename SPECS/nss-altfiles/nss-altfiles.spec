@@ -50,3 +50,4 @@ rm -rf %{buildroot}%{_infodir}
 -	GA - Bump release of all rpms
 *   Sat Jul 11 2015 Touseef Liaqat <tliaqat@vmware.com> 2.19.1-2
 -   Initial version
+

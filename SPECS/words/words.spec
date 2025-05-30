@@ -229,3 +229,4 @@ ln -sf linux.words $RPM_BUILD_ROOT%{_datadir}/dict/words
 
 * Tue Sep 23 1997 Erik Troan <ewt@redhat.com>
 - made a noarch package
+

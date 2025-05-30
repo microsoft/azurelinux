@@ -203,3 +203,4 @@ find %{buildroot} -name SOURCES.txt~ -exec rm -f {} \;
 - Enable tests via nose
 * Sat Nov 29 2008 Ignacio Vazquez-Abrams <ivazqueznet+rpm@gmail.com> - 2.2.0-2
 - Rebuild for Python 2.6
+

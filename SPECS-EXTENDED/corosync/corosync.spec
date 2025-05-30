@@ -730,3 +730,4 @@ network splits)
 
 * Thu Aug 14 2008 Steven Dake <sdake@redhat.com> - 0.91-1
 - First upstream packaged version of corosync for rawhide review.
+

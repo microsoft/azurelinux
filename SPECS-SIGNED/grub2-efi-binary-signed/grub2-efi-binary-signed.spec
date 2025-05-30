@@ -190,3 +190,4 @@ cp %{SOURCE3} %{buildroot}/boot/efi/EFI/%{efidir}/%{grubpxeefiname}
 
 * Thu Aug 13 2020 Chris Co <chrco@microsoft.com> 2.02-24
 - Original version for CBL-Mariner.
+

@@ -68,3 +68,4 @@ make test
 
 * Mon Nov 25 2019 Paul Howarth <paul@city-fan.org> - 0.02-1
 - Initial RPM version
+

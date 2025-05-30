@@ -278,3 +278,4 @@ find '%{buildroot}' -type f -name '*.la' -print -delete
 
 * Fri Nov 26 2010 Peter Hopfgartber <peter.hopfgartner@r3-gis.com> 1.0.0a-0.1
 - Initial packaging
+

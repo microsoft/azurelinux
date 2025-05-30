@@ -1871,3 +1871,4 @@ rm -f $RPM_BUILD_ROOT%{es_man_dir}/man8/vigr.8
 
 * Mon May 15 2000 Trond Eivind Glomsrø <teg@redhat.com>
 - first build
+

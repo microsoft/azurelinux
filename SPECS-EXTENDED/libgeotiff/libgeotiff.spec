@@ -332,3 +332,4 @@ EOF
 - initial pack for fedora
 - add pkgconfig file
 - add soname versioning patch
+

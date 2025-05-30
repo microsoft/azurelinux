@@ -339,3 +339,4 @@ cp -a keys/* %{buildroot}%{_datadir}/%{name}/
 
 * Thu Oct 15 2015 Miroslav Suchý <msuchy@redhat.com> 1.1-1
 - initial package
+

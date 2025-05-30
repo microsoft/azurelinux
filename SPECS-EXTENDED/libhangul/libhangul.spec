@@ -183,3 +183,4 @@ rm $RPM_BUILD_ROOT%{_libdir}/%{name}.la
 * Wed Nov 29 2006 Akira TAGOH <tagoh@redhat.com> - 0.0.3-1
 - Initial package.
 
+

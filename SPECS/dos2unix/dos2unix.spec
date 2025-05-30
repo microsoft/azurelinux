@@ -359,3 +359,4 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}
 - Added Hungarian "Summary:" and "%%description" 
 - Corrected the file and directory attributes to rebuild the package 
   under RedHat Linux 6.0
+

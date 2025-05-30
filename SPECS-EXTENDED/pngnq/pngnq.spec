@@ -134,3 +134,4 @@ on many types of images.
 
 * Mon Jul 26 2008 - Patrick Steiner <patrick.steiner@a1.net> - 0.5-1
 - Initial package.
+

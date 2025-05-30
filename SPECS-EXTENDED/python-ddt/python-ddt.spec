@@ -190,3 +190,4 @@ rm -rf %{eggname}.egg-info
 
 * Thu Jul 16 2015 Carl George <carl.george@rackspace.com> - 1.0.0-1
 - Initial spec file
+

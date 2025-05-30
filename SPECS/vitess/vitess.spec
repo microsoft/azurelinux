@@ -218,3 +218,4 @@ go check -t go/cmd \
 
 * Thu May 16 00:30:49 CEST 2019 Robert-André Mauchin <zebob.m@gmail.com> - 3.0-1.20190701git948c251
 - Initial package
+

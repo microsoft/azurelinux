@@ -79,3 +79,4 @@ install -d %{buildroot}%{_sharedstatedir}/%{_name}
 - Initial build
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
+

@@ -188,3 +188,4 @@ done
 
 * Fri Jul 10 2009 Arnaldo Carvalho de Melo <acme@redhat.com> - 0.9-1
 - Fedora package reviewing changes: introduce ChangeLog file
+

@@ -818,3 +818,4 @@ make test
 
 * Mon Nov  1 1999 Chmouel Boudjnah <chmouel@mandrakesoft.com>
 - First spec file for Mandrake distribution.
+

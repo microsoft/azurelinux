@@ -312,3 +312,4 @@ make check
 - remove unpackaged files from the buildroot
 - tell configure where ogg libs are
 - lib64'ize
+

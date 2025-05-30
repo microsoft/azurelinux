@@ -178,3 +178,4 @@ ruby tests/tc_augeas.rb
 
 * Mon Mar 3 2008 Bryan Kearney <bkearney@redhat.com> - 0.0.1-1
 - Initial specfile
+

@@ -165,3 +165,4 @@ sed -i '/^catch = 1$/d' setup.cfg
 
 * Fri May 17 2013 Matthias Runge <mrunge@redhat.com> - 0.4-1
 - Initial package.
+

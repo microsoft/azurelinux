@@ -729,3 +729,4 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 
 * Fri May 23 2003 Ville Skyttä <ville.skytta at iki.fi> - 0:0.8.0-0.fdr.0.1.rc1
 - First build.
+

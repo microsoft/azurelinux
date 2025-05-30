@@ -137,3 +137,4 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 - fix bnc#749895 - ant FTP action fails on the date with leap year
 * Tue Apr 28 2009 mvyskocil@suse.cz
 - Initial SUSE packaging (version 1.4.1 from jpp5)
+

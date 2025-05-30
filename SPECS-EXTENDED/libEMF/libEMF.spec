@@ -207,3 +207,4 @@ make check
 * Sun Nov 19 2006 Dominik 'Rathann' Mierzejewski <rpm@greysector.net> 1.0.3-1
 - adapted PLD spec
 - enhanced amd64 patch
+

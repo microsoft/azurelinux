@@ -362,3 +362,4 @@ This package contains command-line tools that facilitate using the library.
 
 * Tue Sep 05 2017 NVIDIA CORPORATION <cudatools@nvidia.com> 1.0.0-0.1.alpha.1
 - Initial release
+

@@ -178,3 +178,4 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 
 * Wed Nov 18 2015 Anish Swaminathan <anishs@vmware.com> 7.1.3-1
 - Initial build. First version
+

@@ -345,3 +345,4 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 
 * Wed May 15 2019 Ankit Jain <ankitja@vmware.com> - 1.34.2-1
 - Initial build. First version
+

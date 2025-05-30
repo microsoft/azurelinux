@@ -351,3 +351,4 @@ cp %{SOURCE102} sisu-plexus/pom.xml
 
 * Thu Oct 14 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 1.4.2-1
 - Initial version of the package
+

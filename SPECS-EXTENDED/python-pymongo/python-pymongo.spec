@@ -213,3 +213,4 @@ chmod 755 %{buildroot}%{python3_sitearch}/pymongo/*.so
 
 * Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 3.5.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+

@@ -109,3 +109,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Tue Apr 04 2017 Dheeraj Shetty <dheerajs@vmware.com> - 1.40.4-1
 - Initial version
+

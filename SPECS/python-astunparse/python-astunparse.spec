@@ -103,3 +103,4 @@ python3 setup.py test
 
 * Sat Jan 19 2019 Miro Hrončok <mhroncok@redhat.com> - 1.6.2-1
 - Initial package
+

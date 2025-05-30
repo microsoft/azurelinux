@@ -102,3 +102,4 @@ install -Dm0644 doc/execstack.8 %{buildroot}%{_mandir}/man8/execstack.8
 
 * Mon Jul 27 2015 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 0.5.0-8
 - Kill off most of prelink package
+

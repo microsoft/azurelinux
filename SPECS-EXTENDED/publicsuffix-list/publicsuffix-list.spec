@@ -213,3 +213,4 @@ ln -s public_suffix_list.dat $RPM_BUILD_ROOT/%{_datadir}/publicsuffix/effective_
 - Today's revision. Add license file - 20141218-1
 - Today's revision - 20141223-1
 - Today's revision - 20141230-1
+

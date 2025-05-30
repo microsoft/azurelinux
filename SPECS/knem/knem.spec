@@ -346,3 +346,4 @@ fi
 - Use one spec for KMP and non-KMP OS's.
 * Thu Apr 18 2013 Alaa Hleihel <alaa@mellanox.com>
 - Added KMP support
+

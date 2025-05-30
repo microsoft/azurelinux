@@ -256,3 +256,4 @@ fi
 
 * Tue Jan 23 2018 Jan Friesse <jfriesse@redhat.com> - 2.90.0-1
 - First upstream packaged version of corosync for rawhide review.
+

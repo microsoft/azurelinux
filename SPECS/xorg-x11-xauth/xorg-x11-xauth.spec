@@ -207,3 +207,4 @@ rm -r %{buildroot}%{_mandir}/man1/xauth.1*
 
 * Wed Aug 24 2005 Mike A. Harris <mharris@redhat.com> 6.99.99.0-1
 - Initial build.
+

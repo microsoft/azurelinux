@@ -699,3 +699,4 @@ rm -rf doc/man
 
 * Sun Sep 25 2005 Paul Wouters <paul@xelerance.com> - 0.70
 - Initial version
+

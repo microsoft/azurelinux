@@ -143,3 +143,4 @@ echo "initrd of kernel %{uname_r} removed" >&2
 - Original version for Azure Linux.
 - license: MIT
 - License verified
+

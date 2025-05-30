@@ -170,3 +170,4 @@ make test
 - Spec file provided by Ville Skyttä
 - BuildRoot stuff removed
 - Dependencies adjusted
+

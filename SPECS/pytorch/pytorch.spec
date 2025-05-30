@@ -137,3 +137,4 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 
 * Sun Sep 27 2020 Zhipeng Xie<xiezhipeng1@huawei.com> - 1.6.0-1
 - Package init
+

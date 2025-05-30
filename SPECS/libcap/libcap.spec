@@ -119,3 +119,4 @@ sed -i '/echo "attempt to exploit kernel bug"/,/^fi$/d' quicktest.sh
 
 * Thu Oct 23 2014 Divya Thaluru <dthaluru@vmware.com> - 2.24-1
 - Initial version
+

@@ -150,3 +150,4 @@ find $RPM_BUILD_ROOT%{_mandir}/man3/ -type f -size -100b | xargs sed -i -e 's/\.
 
 * Wed Sep  5 2012 Yanko Kaneti <yaneti@declera.com> - 1.0.1-1
 - Initial split from mesa
+

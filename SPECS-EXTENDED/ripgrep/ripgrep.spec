@@ -269,3 +269,4 @@ install -Dm 644 complete/_rg %{buildroot}%{_datadir}/zsh/site-functions/_rg
   - Remove empty post and postun
 * Sun Oct  8 2017 viktor.saevars@gmail.com
 - Inital packaging @ 0.6.0
+

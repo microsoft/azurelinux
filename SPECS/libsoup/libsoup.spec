@@ -221,3 +221,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Fri Jun 5 2015 Touseef Liaqat <tliaqat@vmware.com> 2.50.0-1
 - Initial build.  First version
+

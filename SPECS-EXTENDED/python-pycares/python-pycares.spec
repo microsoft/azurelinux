@@ -148,3 +148,4 @@ chmod 755 %{buildroot}%{python3_sitearch}/%{srcname}/_cares.cpython-*.so
 
 * Mon Apr  2 2018 Matthieu Saulnier <fantom@fedoraproject.org> - 2.3.0-1
 - Initial package
+

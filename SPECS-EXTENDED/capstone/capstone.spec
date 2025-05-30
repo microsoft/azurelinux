@@ -356,3 +356,4 @@ install -D -p -m 0644 bindings/java/%{name}.jar  %{buildroot}/%{_javadir}/%{name
 
 * Mon May 19 2014 Adel Gadllah <adel.gadllah@gmail.com> - 2.1.2-1
 - Initial package
+

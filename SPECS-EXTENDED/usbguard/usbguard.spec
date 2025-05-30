@@ -492,3 +492,4 @@ Resolves: rhbz#1808527
 
 * Tue Mar 17 2015 Daniel Kopecek <dkopecek@redhat.com> 0.1-1
 - Initial package
+

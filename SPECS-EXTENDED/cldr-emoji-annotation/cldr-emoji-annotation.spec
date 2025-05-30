@@ -113,3 +113,4 @@ make DESTDIR=$RPM_BUILD_ROOT install INSTALL="install -p"
 
 * Mon Mar 06 2017 Takao Fujiwara <tfujiwar@gmail.com> - 30.0.3_2-1
 - Initial implementation
+

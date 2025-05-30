@@ -268,3 +268,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Sat Aug 20 2005 Che
 - initial rpm release
+

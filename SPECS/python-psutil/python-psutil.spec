@@ -99,3 +99,4 @@ LANG=en_US.UTF-8 PYTHONPATH=%{buildroot}%{python3_sitelib} make test PYTHON=pyth
 
 * Wed Apr 26 2017 Xialin Li <xiaolinl@vmware.com> - 5.2.2-1
 - Initial packaging for Photon
+

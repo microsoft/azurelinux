@@ -489,3 +489,4 @@ rm -rf %{buildroot}%{_datadir}/libgphoto2_port/*/vcamera/
 
 * Thu Mar 13 2008 Jindrich Novy <jnovy@redhat.com> 2.4.0-0.1
 - initial libgphoto2 packaging
+

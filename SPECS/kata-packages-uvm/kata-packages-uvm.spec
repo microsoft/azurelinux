@@ -139,3 +139,4 @@ Requires:       golang
 - Introduce kata meta-package for the UVM components.
 - License verified
 - Original version for CBL-Mariner
+

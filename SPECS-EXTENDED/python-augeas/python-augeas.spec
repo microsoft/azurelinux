@@ -244,3 +244,4 @@ Resolves: rhbz#661452
 
 * Wed Apr 16 2008 Harald Hoyer <harald@redhat.com> - 0.0.8-1
 - initial version
+

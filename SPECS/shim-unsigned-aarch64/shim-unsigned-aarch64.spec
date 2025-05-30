@@ -226,3 +226,4 @@ HASH=$(cat %{buildroot}%{shimdir}/shim%{efiarch}.hash | cut -d ' ' -f 1)
 
 * Thu May 12 2016 Peter Jones <pjones@redhat.com> - - 0.9-1
 - Initial split up of -aarch64
+

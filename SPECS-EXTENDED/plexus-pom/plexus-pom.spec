@@ -226,3 +226,4 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}/plexus.pom
 
 * Wed Feb 08 2012 gil cattaneo <puntogil@libero.it> 3.0.1-1
 - initial rpm
+

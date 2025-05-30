@@ -354,3 +354,4 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.a
 
 * Fri Nov 20 1998 Michael Fulbright <drmike@redhat.com>
 - First try at a spec file
+

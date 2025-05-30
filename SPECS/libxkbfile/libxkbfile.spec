@@ -123,3 +123,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Fri May 01 2015 Adam Jackson <ajax@redhat.com> 1.0.9-1
 - libxkbfile 1.0.9
+

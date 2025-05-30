@@ -110,3 +110,4 @@ make check
 * Wed Jun 08 2022 Robert Scheck <robert@fedoraproject.org> 1.0.4-1
 - Upgrade to 1.0.4 (#2094582)
 - Initial spec file for Fedora and Red Hat Enterprise Linux
+

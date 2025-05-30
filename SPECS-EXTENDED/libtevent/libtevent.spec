@@ -367,3 +367,4 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 
 * Tue Sep 8 2009 Simo Sorce <ssorce@redhat.com> - 0.9.8-1
 - First independent release for tevent 0.9.8
+

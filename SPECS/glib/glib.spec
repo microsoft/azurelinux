@@ -244,3 +244,4 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 
 * Thu Nov 06 2014 Sharath George <sharathg@vmware.com> - 2.42.0-1
 - Initial version
+

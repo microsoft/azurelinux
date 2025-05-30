@@ -163,3 +163,4 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 - Increment release to force republishing using golang 1.15.11.
 * Wed Jan 20 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 0.12.0-1
 - Original version for CBL-Mariner.
+

@@ -153,3 +153,4 @@ cp -pr src/tests/ %{buildroot}%{_datadir}/%{name}/
 * Tue Jun 03 2014 Robert Scheck <robert@fedoraproject.org> 20140528-1
 - Upgrade to 20140528
 - Initial spec file for Fedora and Red Hat Enterprise Linux
+

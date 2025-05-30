@@ -146,3 +146,4 @@ pip3 install iniconfig
 
 * Fri Apr 22 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 0.2.0-1
 - Initial package (close RHBZ#2077832)
+

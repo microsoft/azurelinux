@@ -146,3 +146,4 @@ find . -name '*.py' | xargs sed -i '1s|^#!python|#!%{__python3}|'
 * Thu Sep 22 2011 Sergio Pascual <sergiopr at fedoraproject.org> - 0.2.5-1
 - Initial spec file
 
+

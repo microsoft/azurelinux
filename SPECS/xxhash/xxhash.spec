@@ -185,3 +185,4 @@ rm %{buildroot}/%{_libdir}/libxxhash.a
 
 * Wed Oct 18 2017 Mattias Ellert <mattias.ellert@physics.uu.se> - 0.6.3-1
 - Initial packaging
+

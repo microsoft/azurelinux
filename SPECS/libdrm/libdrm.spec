@@ -718,3 +718,4 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 
 * Mon Jun 06 2011 Adam Jackson <ajax@redhat.com> 2.4.26-1
 - libdrm 2.4.26 (#711038)
+

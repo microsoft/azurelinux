@@ -240,3 +240,4 @@ cp -pr build/docs/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 - Fix prerequires of javadoc subpackage
 * Thu Sep  2 2004 skh@suse.de
 - Initial package created with version 2.1.1 (JPackage 1.5)
+

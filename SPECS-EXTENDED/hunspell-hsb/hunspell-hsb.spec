@@ -94,3 +94,4 @@ cp -p dictionaries/hsb.dic $RPM_BUILD_ROOT/%{_datadir}/myspell/hsb_DE.dic
 
 * Fri Oct 3 2008 Caolán McNamara <caolanm@redhat.com> - 0.20060327.2-1
 - initial version
+

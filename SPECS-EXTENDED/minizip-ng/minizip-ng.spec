@@ -359,3 +359,4 @@ _EOF_
 
 * Thu Aug  9 2018 Patrik Novotný <panovotn@redhat.com> 2.3.9-1
 - Initial build
+

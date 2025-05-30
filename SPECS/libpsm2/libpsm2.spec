@@ -226,3 +226,4 @@ rm -f %{buildroot}%{_lib64dir}/*.a
 
 * Tue Apr 05 2016 Paul Reger <paul.j.reger@intel.com> - 10.2.1-1
 - Upstream PSM2 source code for Fedora.
+

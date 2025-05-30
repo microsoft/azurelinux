@@ -319,3 +319,4 @@ rm -f %{buildroot}%{_datadir}/X11/xkb/compiled
 
 * Thu Jan 27 2011 Peter Hutterer <peter.hutterer@redhat.com> 2.1-1
 - xkeyboard-config 2.1
+

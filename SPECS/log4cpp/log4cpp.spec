@@ -80,3 +80,4 @@ make DESTDIR=%{buildroot} install
 -   Upgrade to latest version
 *   Mon Oct 23 2017 Benson Kwok <bkwok@vmware.com> 1.1.1-1
 -   Initial build. First version
+

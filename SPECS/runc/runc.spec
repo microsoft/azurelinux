@@ -143,3 +143,4 @@ make install-man DESTDIR=%{buildroot} PREFIX=%{_prefix}
 
 * Thu Jan 23 2020 Brian Goff <brgoff@microsoft.com>
 - Initial version
+

@@ -55,3 +55,4 @@ ports, without any changes to the application.
 
 * Tue Jul 12 2022 Davide Cavalca <dcavalca@fedoraproject.org> - 2.1.2-1
 - Initial import; Fixes: RHBZ#2058364
+

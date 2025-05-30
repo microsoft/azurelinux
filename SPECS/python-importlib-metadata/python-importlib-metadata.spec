@@ -151,3 +151,4 @@ Resolves: rhbz#1979098
 
 * Wed Jun 26 2019 Miro Hrončok <mhroncok@redhat.com> - 0.18-1
 - Initial package
+

@@ -172,3 +172,4 @@ sed -i -e "s/\s*-Werror\s*//g" cmake/cflags.cmake
 * Thu Oct 27 2016 Haïkel Guémar <hguemar@fedoraproject.org> - 0.9.2-1
 - Initial package on EL7
 
+

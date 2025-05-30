@@ -391,3 +391,4 @@ mv %{buildroot}/%{_libdir}/*.lds %{buildroot}/%{_libdir}/*.o %{buildroot}/%{_lib
 
 * Thu Aug 17 2000 Bill Nottingham <notting@redhat.com>
 - update to 0.9
+

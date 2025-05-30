@@ -3768,3 +3768,4 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 * Mon Jan 11 2021 Paolo Bonzini <pbonzini@redhat.com> - 2:5.2.0-5
 - Use symlink for qemu-kvm.
 - Fix make check on bash 5.1.
+

@@ -247,3 +247,4 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 * Sat Jan 26 2008 Michel Salim <michel.sylvan@gmail.com> - 0.1.1-1
 - Initial Fedora package
+

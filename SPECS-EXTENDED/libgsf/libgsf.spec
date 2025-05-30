@@ -455,3 +455,4 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 
 * Thu May 23 2002 Jody Goldberg <jody@gnome.org>
 - Initial version
+

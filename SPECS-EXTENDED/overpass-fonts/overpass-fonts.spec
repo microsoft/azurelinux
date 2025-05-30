@@ -164,3 +164,4 @@ install -Dm 0644 -p %{SOURCE4} \
 
 * Mon Aug 27 2012 Tom Callaway <spot@fedoraproject.org> - 1.01-1
 - initial package
+

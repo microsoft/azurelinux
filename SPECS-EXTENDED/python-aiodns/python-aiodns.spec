@@ -101,3 +101,4 @@ with a synchronous looking interface by using pycares.
 
 * Wed Apr  4 2018 Matthieu Saulnier <fantom@fedoraproject.org> - 1.1.1-1
 - Initial package
+

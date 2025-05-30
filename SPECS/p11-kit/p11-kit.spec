@@ -414,3 +414,4 @@ fi
 
 * Tue Jul 12 2011 Kalev Lember <kalevlember@gmail.com> - 0.2-1
 - Initial RPM release
+

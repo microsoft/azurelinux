@@ -90,3 +90,4 @@ cp -p kn_IN.* $RPM_BUILD_ROOT/%{_datadir}/myspell/
 
 * Thu Jul 09 2009 Ramakrishna Reddy Yekulla <ramkrsna@fedoraproject.org> - 1.0.3-1
 - initial version
+

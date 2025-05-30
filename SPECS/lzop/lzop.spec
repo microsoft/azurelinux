@@ -176,3 +176,4 @@ rm -rf %{buildroot}%{_docdir}/%{name}
 * Tue Mar 09 2004 Dag Wieers <dag@wieers.com>
 - 1.01-1
 - Initial package. (using DAR)
+

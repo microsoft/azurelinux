@@ -128,3 +128,4 @@ LD_LIBRARY_PATH=../datrie/.libs %make_build check
 
 * Tue Jan 07 2014 Christopher Meng <rpm@cicku.me> - 0.2.8-1
 - Initial Package.
+

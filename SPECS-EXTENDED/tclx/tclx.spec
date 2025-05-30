@@ -369,3 +369,4 @@ echo '%{_libdir}/tcl%{tcl_version}/%{name}%{major_ver}' > %{buildroot}%{_sysconf
 * Tue Jun 17 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
 - fixed dangling tclx/tkx symlinks
+

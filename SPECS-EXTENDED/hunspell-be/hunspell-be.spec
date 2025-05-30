@@ -124,3 +124,4 @@ cp -p hyph_be_BY.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen/hyph_be_BY.dic
 
 * Sun Sep 28 2008 Caolán McNamara <caolanm@redhat.com> - 0.1-1
 - initial version
+

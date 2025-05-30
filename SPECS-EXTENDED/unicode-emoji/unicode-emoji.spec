@@ -95,3 +95,4 @@ cp -p %{SOURCE6} %{buildroot}%{emojidir}
 * Tue Apr 25 2017 Mike FABIAN <mfabian@redhat.com> - 4.0-1
 - package Unicode Emoji Data 4.0
 - MIT license
+

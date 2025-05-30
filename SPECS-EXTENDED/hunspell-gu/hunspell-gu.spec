@@ -111,3 +111,4 @@ cp -p gu_IN/gu_IN.dic gu_IN/gu_IN.aff $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Thu Sep 04 2008 Parag <pnemade@redhat.com> - 20061015-1
 - Initial Fedora release
+

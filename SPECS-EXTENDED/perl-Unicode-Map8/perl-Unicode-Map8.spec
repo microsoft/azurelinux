@@ -240,3 +240,4 @@ make test
 
 * Tue Feb 21 2006 Aurelien Bompard <gauret[AT]free.fr> 0.12-6
 - rebuild for FC5
+

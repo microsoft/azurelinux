@@ -75,3 +75,4 @@ tox
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.4.0-1
 - Original version for CBL-Mariner
 - License verified
+

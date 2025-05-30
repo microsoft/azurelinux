@@ -271,3 +271,4 @@ make install DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir}
 
 * Thu Jul 3 2008 Adel Gadllah <adel.gadllah@gmail.com> 0.0-0.1.20080703git
 - Initial build
+

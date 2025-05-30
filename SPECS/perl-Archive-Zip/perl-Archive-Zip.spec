@@ -371,3 +371,4 @@ make pure_install DESTDIR=$RPM_BUILD_ROOT
 
 * Sun Jun  8 2003 Ville Skyttä <ville.skytta at iki.fi> - 0:1.05-0.fdr.1
 - First build.
+

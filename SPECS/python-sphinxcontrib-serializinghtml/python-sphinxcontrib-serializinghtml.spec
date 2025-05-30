@@ -140,3 +140,4 @@ Resolves: rhbz#1963359
 
 * Mon Mar 04 2019 Miro Hrončok <mhroncok@redhat.com> - 1.1.1-1
 - Initial package.
+

@@ -929,3 +929,4 @@ make check || ( cat tests/test-suite.log; false )
 
 * Thu May 11 2017 Nick Clifton <nickc@redhat.com> - 1.0-1
 - Initial submission.
+

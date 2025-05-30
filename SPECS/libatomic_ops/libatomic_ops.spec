@@ -88,3 +88,4 @@ rm -rf %{buildroot}%{_docdir}/%{name}/{COPYING,LICENSE}
 
 * Tue Jul 26 2016 Xiaolin Li <xiaolinl@vmware.com> - 7.4.4-1
 - Initial build. First version
+

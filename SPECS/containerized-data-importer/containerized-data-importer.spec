@@ -571,3 +571,4 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 
 * Fri Oct 23 2020 James Fehlig <jfehlig@suse.com>
 - Initial attempt at packaging CDI
+

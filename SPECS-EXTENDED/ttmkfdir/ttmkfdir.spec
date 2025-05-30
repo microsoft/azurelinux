@@ -311,3 +311,4 @@ cp -p %{SOURCE10} %{buildroot}%{_mandir}/man1/
 - Initial build.  Basically just renamed our existing ttmkfdir to version
   3.0.0 to differentiate it.  It's the same old thing as before, but is
   likely going to move to CVS for easier development.
+

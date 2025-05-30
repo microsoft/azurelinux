@@ -333,3 +333,4 @@ find %{buildroot} -type f -name "*.la" -delete
 
 * Sat Nov 29 2008 Peter Robinson <pbrobinson@gmail.com> 0.1.0-1
 - Initial package
+

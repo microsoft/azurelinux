@@ -149,3 +149,4 @@ install -pm644 %{SOURCE1} %{buildroot}%{_includedir}/%{name}/common/autoconf.h
 
 * Wed Apr 27 2011 Chris Spike <spike@fedoraproject.org> 0.0.3-1
 - Initial version of the package
+

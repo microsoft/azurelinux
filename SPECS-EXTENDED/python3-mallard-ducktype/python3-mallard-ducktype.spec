@@ -112,3 +112,4 @@ Parse Ducktype files and convert them to Mallard.
 
 * Fri Sep 04 2015 David King <amigadave@amigadave.com> - 0.1-1
 - Initial Fedora packaging (#1260219)
+

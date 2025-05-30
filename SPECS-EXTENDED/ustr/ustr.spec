@@ -295,3 +295,4 @@ make $@ %{ustr_make_install} prefix=%{_prefix} \
 * Mon May 14 2007 James Antill <james@and.org> - 0.98.1-0
 - Initial spec
 
+

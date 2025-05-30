@@ -145,3 +145,4 @@ python3 -m pytest -v
 
 * Tue Nov 25 2014 Thomas Spura <tomspur@fedoraproject.org> - 0.3.1-1
 - initial spec for ptyprocess (#1167830)
+

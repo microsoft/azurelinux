@@ -677,3 +677,4 @@ sed -i -e "s|$PWD/unix|%{_libdir}|; s|$PWD|%{_includedir}/%{name}-private|" %{bu
 
 * Tue Jun 17 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
+

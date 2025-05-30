@@ -690,3 +690,4 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/vino-server.desktop
 
 * Tue Jul 13 2004 Mark McLoughlin <markmc@redhat.com> 2.7.3.1-1
 - Initial build.
+

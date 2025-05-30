@@ -152,3 +152,4 @@ popd
 
 * Mon Feb 08 2010 Mohammed Morsi <mmorsi@redhat.com> - 0.6.0-1
 - Initial package
+

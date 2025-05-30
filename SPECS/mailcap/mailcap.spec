@@ -351,3 +351,4 @@ make check
 
 * Tue Sep 09 1997 Erik Troan <ewt@redhat.com>
 - made a noarch package
+

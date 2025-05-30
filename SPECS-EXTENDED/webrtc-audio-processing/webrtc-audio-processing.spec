@@ -170,3 +170,4 @@ find %{buildroot} -type f -name "*.la" -delete
 
 * Fri Oct 5 2012 Christian Schaller <christian.schaller@gmail.com> 0.1-1
 - Initial Fedora spec.
+

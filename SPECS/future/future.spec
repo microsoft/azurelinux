@@ -294,3 +294,4 @@ PYTHONPATH=$PWD/build/lib py.test-%{python3_version}
 
 * Tue Jul 28 2015 Antonio Trande <sagitter@fedoraproject.org> 0.15.0-1
 - Initial build
+

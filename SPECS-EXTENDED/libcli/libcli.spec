@@ -139,3 +139,4 @@ ln -s %{_libdir}/libcli.so.1.10 %{buildroot}%{_libdir}/libcli.so
 
 * Mon Oct 17 2011 Jon Ciesla <limb@jcomserv.net> - 1.9.5-1
 - create.
+

@@ -99,3 +99,4 @@ Python 3 version.
 
 * Wed Feb 15 2017 Martin Kolman <mkolman@redhat.com> - 0.6.0-1
 - Initial package
+

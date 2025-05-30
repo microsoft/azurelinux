@@ -145,3 +145,4 @@ rm -fr %{buildroot}%{_prefix}/doc
 
 * Thu Aug  1 2019 Richard W.M. Jones <rjones@redhat.com> - 0.1-1
 - Initial version.
+

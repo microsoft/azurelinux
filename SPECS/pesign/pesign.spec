@@ -568,3 +568,4 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 
 * Fri Jun 15 2012 Peter Jones <pjones@redhat.com> - 0.1-1
 - First version of SRPM.
+

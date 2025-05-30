@@ -44,3 +44,4 @@ Dstat gives you detailed selective information in columns and clearly indicates 
 -   GA - Bump release of all rpms
 *   Mon Nov 30 2015 Xiaolin Li <xiaolinl@vmware.com> 0.7.2-1
 -   Initial build.  First version
+

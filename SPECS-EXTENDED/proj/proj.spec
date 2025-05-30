@@ -936,3 +936,4 @@ rm -rf %{buildroot}%{_datadir}/doc/${name}
 - upgraded to Mandriva 2006
   Fri Aug  5 00:00:00 UTC 2005 - Otto Dassau 4.4.9
 - Applied for Mandrake 10.1 RPM
+

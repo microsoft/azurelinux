@@ -212,3 +212,4 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 
 * Fri May 03 2013 David Tardon <dtardon@redhat.com> - 0.0.0-1
 - initial import
+

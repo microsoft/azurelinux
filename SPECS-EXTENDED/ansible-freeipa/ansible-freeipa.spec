@@ -538,3 +538,4 @@ utils/build-galaxy-release.sh -o "%{version}" -p %{buildroot}%{ansible_collectio
 
 * Mon May  6 2019 Thomas Woerner <twoerner@redhat.com> - 0.1.1-1
 - Initial package
+

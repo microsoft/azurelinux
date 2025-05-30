@@ -259,3 +259,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Fri Jun 18 2010 Richard Hughes <richard@hughsie.com> 2.0a-1
 - Initial package for Fedora review
+

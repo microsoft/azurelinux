@@ -148,3 +148,4 @@ rm -rf *.egg-info
 
 * Mon Nov 9 2015 Julien Enselme <jujens@jujens.eu> - 2.3.0-1
 - Inital package
+

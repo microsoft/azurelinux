@@ -91,3 +91,4 @@ sed -i -e '/^#!\//, 1d' %{srcname}/*.py
 
 * Sat Feb 04 2023 Richard Hughes <richard@hughsie.com> - 0.4.1-1
 - Initial import (fedora#2167067).
+

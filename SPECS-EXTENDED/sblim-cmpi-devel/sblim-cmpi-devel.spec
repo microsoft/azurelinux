@@ -176,3 +176,4 @@ cp %{SOURCE1} $RPM_BUILD_ROOT%{_rpmconfigdir}/macros.d
 
 * Thu Feb 09 2006 Viktor Mihajlovski <mihajlov@de.ibm.com> - 1.0.4-1
 - Initial RH/Fedora version
+

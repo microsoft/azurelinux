@@ -45,3 +45,4 @@ make prefix=%{buildroot}/%{_prefix} MANDIR=%{buildroot}/usr/share/man/man1 -f un
 -   GA - Bump release of all rpms
 *   Fri May 29 2015 Alexey Makhalov <amakhalov@vmware.com> 3.0-1
 -   Initial build. First version
+

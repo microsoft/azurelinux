@@ -325,3 +325,4 @@ sed -i -e 's/\(sofile=\)".*"/\1"'$sofile'"/' \
 
 * Sat Nov 30 2013 Kevin Fenzi <kevin@scrye.com> 0-0.1
 - initial version for Fedora review
+

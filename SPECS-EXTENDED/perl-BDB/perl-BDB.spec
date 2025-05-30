@@ -250,3 +250,4 @@ make test
 
 * Wed Apr 30 2008 kwizart < kwizart at gmail.com > - 1.45-1
 - Initial package for Fedora
+

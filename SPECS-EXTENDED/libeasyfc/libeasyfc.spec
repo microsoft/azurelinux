@@ -206,3 +206,4 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 * Wed Dec  7 2011 Akira TAGOH <tagoh@redhat.com> - 0.1-1
 - Initial packaging.
 
+

@@ -146,3 +146,4 @@ cp -p th_lb_LU_v2.* $RPM_BUILD_ROOT/%{_datadir}/mythes
 
 * Wed Jan 27 2010 Caolán McNamara <caolanm@redhat.com> - 0.20100120-1
 - initial version
+

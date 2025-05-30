@@ -359,3 +359,4 @@ sed -i 's/\(numpydoc>=1.\)5/\14/' requirements/doc.txt
 
 * Sat Dec 13 2008 Conrad Meyer <konrad@tylerc.org> - 0.99-1
 - Initial package.
+

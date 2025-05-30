@@ -121,3 +121,4 @@ install -pm 0644 target/%{base_name}-%{version}.jar %{buildroot}%{_javadir}/%{ba
 - add norootforbuild
 * Fri Feb 18 2005 skh@suse.de
 - initial package
+

@@ -112,3 +112,4 @@ files for developing applications that use %{name}.
 
 * Tue Jul  5 2022 Jerry James <loganjerry@gmail.com> - 5.0.1-1
 - Initial RPM (rhbz#2104283)
+

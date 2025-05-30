@@ -84,3 +84,4 @@ find %{buildroot} -type f -name "*.pc" -delete -print
 * Wed Apr 20 2022 Andy Caldwell <andycaldwell@microsoft.com> - 3.7.1-1
 - Original version for CBL-Mariner (license: MIT).
 - License verified
+

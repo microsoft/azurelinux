@@ -333,3 +333,4 @@ rm -f %{buildroot}%{_libdir}/libraw1394.la
 * Sun Jun 09 2002 Michael Fulbright <msf@redhat.com>
 - First RPM build
 
+

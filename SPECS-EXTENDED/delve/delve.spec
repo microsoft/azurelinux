@@ -150,3 +150,4 @@ done
 * Wed Nov 27 2019 Alejandro Sáez <asm@redhat.com> - 1.3.2-1
 - First package for RHEL
 - Related: rhbz#1758612
+

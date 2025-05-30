@@ -487,3 +487,4 @@ install -D -p -m 0755 mtr %{buildroot}%{_sbindir}/mtr
 - v0.30
 - Fixed a typo in the changelog (NEWS) entry for 0.27. :-)
 - added use of "MTR_OPTIONS" environment variable for defaults.
+

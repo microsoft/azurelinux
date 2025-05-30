@@ -89,3 +89,4 @@ Resolves: rhbz#2074703
 
 * Mon Jan 31 2022 Karolina Surma <ksurma@redhat.com> - 0.1.0-1
 - Initial package
+

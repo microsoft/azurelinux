@@ -185,3 +185,4 @@ Libraries, includes, etc. to compile with the libgovirt library
 
 * Wed Feb 20 2013 Christophe Fergeau <cfergeau@redhat.com> 0.0.3-1
 - Initial import of libgovirt 0.0.3
+

@@ -161,3 +161,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Sun Oct 22 2017 Lubomir Rintel <lkundrak@v3.sk> - 0.2-1
 - Initial packaging
+

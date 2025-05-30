@@ -103,3 +103,4 @@ Summary:        Documents for %{name}
 
 * Tue Aug 09 2022 aekoroglu <ali.erdinc.koroglu@intel.com> - 2.2.2-1
 - initial package
+

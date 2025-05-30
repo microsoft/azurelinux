@@ -303,3 +303,4 @@ hardlink -cfv %{buildroot}%{_docdir}/%{name}
 
 * Tue Nov 27 2012 Sébastien Willmann <sebastien.willmann@gmail.com> 0.6.0-0.1.rc2
 - Creation of the spec file
+

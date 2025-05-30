@@ -288,3 +288,4 @@ fi
 
 * Thu Mar  3 2011 Paul Wouters <paul@xelerance.com> - 1.2.0-1
 - Initial package for Fedora 
+

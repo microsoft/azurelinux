@@ -170,3 +170,4 @@ install -p -m 644 %{SOURCE3} %{buildroot}%{_mavenpomdir}/%{name}-xpath.pom
 - Move from jpackage-utils to javapackage-tools
 * Tue May 12 2009 mvyskocil@suse.cz
 - Initial SUSE packaging of xpp3 1.1.3.8 (from jpp 5.0)
+

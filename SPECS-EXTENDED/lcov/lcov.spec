@@ -138,3 +138,4 @@ make install DESTDIR=$RPM_BUILD_ROOT BIN_DIR=%{_bindir} MAN_DIR=%{_mandir} CFG_D
 
 * Mon Feb 13 2006 Roland McGrath <roland@redhat.com> - 1.4-1
 - Initial build, some spec bits snarfed from upstream.
+

@@ -104,3 +104,4 @@ sockets in Linux.
 
 * Mon Jan  8 2018 Dan Horák <dan@danny.cz> - 1.0.0-1
 - initial Fedora version
+

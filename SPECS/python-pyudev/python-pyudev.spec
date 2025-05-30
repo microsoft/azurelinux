@@ -242,3 +242,4 @@ rm -rf pyudev.egg-info
 
 * Mon Jun 18 2012 Chris Lockfort <clockfort@redhat.com> 0.15-1
 - initial package
+

@@ -230,3 +230,4 @@ make test
 
 * Wed Aug 09 2000 Jean-Michel Dault <jmdault@mandrakesoft.com> 0.07-1mdk
 - Macroize package
+

@@ -264,3 +264,4 @@ PYTHONPATH="%{buildroot}%{python3_sitearch}" %{python3} -m unittest discover -v 
 
 * Fri Apr 09 2010 Lev Shamardin <shamardin@gmail.com> - 0.3.1-1
 - Initial package version.
+

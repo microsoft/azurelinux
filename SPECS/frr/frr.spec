@@ -436,3 +436,4 @@ rm tests/lib/*grpc*
 
 * Wed Jun 19 2019 Michal Ruprich <mruprich@redhat.com> - 7.0-2
 - Initial build
+

@@ -101,3 +101,4 @@ make -k check %{?_smp_mflags}
 
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> - 2.69-1
 - Initial build. First version
+

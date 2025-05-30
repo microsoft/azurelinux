@@ -134,3 +134,4 @@ make %{?_smp_mflags} check
 
 * Thu Aug 25 2016 Nathaniel McCallum <npmccallum@redhat.com> - 2-1
 - First release
+

@@ -165,3 +165,4 @@ make test
 - Remove BuildRoot stuff
 - Install into perl core directory
 - Hack %%check for rpmbuild bug #672538
+

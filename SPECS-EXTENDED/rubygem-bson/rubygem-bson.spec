@@ -206,3 +206,4 @@ popd
 
 * Wed May 25 2011 Vít Ondruch <vondruch@redhat.com> - 1.3.1-1
 - Initial package
+

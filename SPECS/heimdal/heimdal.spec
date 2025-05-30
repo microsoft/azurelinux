@@ -896,3 +896,4 @@ fi
   - New specs for Heimdel 1.2.1, suggestions taken from both PDC and Mandrake specs file.
   - Need to be compatible with MIT Kerberos 5 installation.
   - Let MIT have priority
+

@@ -532,3 +532,4 @@ make check PYTHON=%{python} PYTEST=%{pytest} FLAKE8=%{flake8}
 
 * Mon Mar  3 2008 Ville Skyttä <ville.skytta@iki.fi> - 0.82-3
 - Sync Fedora license list with Revision 0.69 (Wiki rev 110) (#434690).
+

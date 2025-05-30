@@ -261,3 +261,4 @@ Resolves: rhbz#1940399
 
 * Sat Jul 2 2016 Elliott Sales de Andrade <quantum.analyst@gmail.com> 0.9-1
 - Initial RPM release
+

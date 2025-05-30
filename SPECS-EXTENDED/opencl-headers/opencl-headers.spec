@@ -115,3 +115,4 @@ rm -vf %{buildroot}%{_includedir}/CL/cl_{dx9,d3d}*
 * Wed Feb 27 2013 Dave Airlie <airlied@redhat.com> 1.2-1
 - OpenCL header files from Khronos for OpenCL 1.2
 
+

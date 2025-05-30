@@ -357,3 +357,4 @@ rm -f %{buildroot}%{_docdir}/libftdipp1/example.conf
 
 * Wed Sep 03 2008 Lucian Langa <cooly@gnome.eu.org> - 0.13-1
 - initial specfile
+

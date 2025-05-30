@@ -710,3 +710,4 @@ PYTHONPATH=.:%{buildroot}%{python3_sitelib} python3 -m pytest test --numprocesse
 
 * Wed May 31 2006 Shahms E. King <shahms@shahms.com> 0.2.1-1
 - Update to new upstream version
+

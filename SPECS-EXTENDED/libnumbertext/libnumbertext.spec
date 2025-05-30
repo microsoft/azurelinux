@@ -87,3 +87,4 @@ rm -f $RPM_BUILD_ROOT/%{_libdir}/*.la
 
 * Mon Jun 11 2018 Caolán McNamara <caolanm@redhat.com> - 1.0.2-1
 - initial version
+

@@ -1202,3 +1202,4 @@ python3 -m unittest discover -t . -s tests/
 
 * Fri Dec 20 2013 Aleš Kozumplík <ales@redhat.com> - 0.0.1-1
 - The initial package version.
+

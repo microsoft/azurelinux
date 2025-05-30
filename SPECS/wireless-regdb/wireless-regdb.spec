@@ -106,3 +106,4 @@ rm -rf %{buildroot}/usr/lib/crda
 
 * Fri Jul 06 2018 John W. Linville <linville@redhat.com> - 2018.05.31-1
 - Initial build
+

@@ -201,3 +201,4 @@ rm %{buildroot}%{_libdir}/*.la
 * Mon Aug 04 2008 Michal Nowak <mnowak@redhat.com> - 0.2.1-1
 - initial package
 
+

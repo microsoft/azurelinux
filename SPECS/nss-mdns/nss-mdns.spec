@@ -229,3 +229,4 @@ authselect disable-feature with-mdns4 &> /dev/null || :
 
 * Tue Dec 07 2004 - Bastien Nocera <hadess@hadess.net> 0.1-1
 - Initial package, automatically adds and remove mdns4 as a hosts service
+

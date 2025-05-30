@@ -191,3 +191,4 @@ ln -sf ./%{name} %{buildroot}%{_bindir}/pbzcat
 
 * Thu Oct 28 2004 Bryan Stillwell <bryan@bokeoa.com> - 0.8-1
 - Initial packaging
+

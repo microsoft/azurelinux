@@ -193,3 +193,4 @@ install -m 0644 abw2*.1 %{buildroot}/%{_mandir}/man1
 
 * Mon Jan 13 2014 David Tardon <dtardon@redhat.com> - 0.0.0-1
 - initial import
+

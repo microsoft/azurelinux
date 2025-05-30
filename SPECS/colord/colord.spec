@@ -847,3 +847,4 @@ exit 0
 
 * Thu Jan 13 2011 Richard Hughes <richard@hughsie.com> 0.1.0-1
 - Initial version for Fedora package review.
+

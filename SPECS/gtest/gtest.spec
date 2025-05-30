@@ -119,3 +119,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Mon Apr 10 2017 Vinay Kulkarni <kulkarniv@vmware.com> - 1.8.0-1
 - Initial version of libgtest package for Photon.
+

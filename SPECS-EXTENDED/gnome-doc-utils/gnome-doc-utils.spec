@@ -402,3 +402,4 @@ sed -i -e '/^Requires:/d' %{buildroot}%{_datadir}/pkgconfig/xml2po.pc
 
 * Fri Jan 28 2005 Matthias Clasen <mclasen@redhat.com> - 0.1.2-1
 - Initial build.
+

@@ -245,3 +245,4 @@ find %{buildroot} -type f -name "*.la" -exec rm -f {} ';'
 
 * Fri Nov 21 2003 Panu Matilainen <pmatilai@welho.com> 0:1.0.1-0.lvn.1
 - Initial RPM release.
+

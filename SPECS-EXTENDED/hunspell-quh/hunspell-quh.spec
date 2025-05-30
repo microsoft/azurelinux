@@ -98,3 +98,4 @@ cp -p quh_BO/quh_BO.* $RPM_BUILD_ROOT/%{_datadir}/myspell/
 
 * Tue Jun 16 2009 Caolan McNamara <caolanm@redhat.com> - 0.20081017-1
 - initial version
+

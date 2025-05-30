@@ -127,3 +127,4 @@ cp -p la/la.aff $RPM_BUILD_ROOT/%{_datadir}/myspell/la.aff
 
 * Sun Nov 02 2008 Caolán McNamara <caolanm@redhat.com> - 0.20080903-1
 - initial version
+

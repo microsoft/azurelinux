@@ -1720,3 +1720,4 @@ fi
 
 * Mon Dec 20 2010 Thomas Woerner <twoerner@redhat.com> 0.1-1
 - initial package (proof of concept implementation)
+

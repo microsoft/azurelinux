@@ -910,3 +910,4 @@ install -m644 -p xterm.appdata.xml $RPM_BUILD_ROOT%{_datadir}/appdata
 - Call configure with "--enable-luit --enable-warnings --enable-wide-chars
   --with-utempter"
 - Initial build.
+

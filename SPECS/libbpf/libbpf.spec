@@ -126,3 +126,4 @@ find %{buildroot} -type f -name "*.a" -delete -print
 
 * Fri Sep 13 2019 Jiri Olsa <jolsa@redhat.com> - 0.0.3-1
 - Initial release
+

@@ -234,3 +234,4 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 
 * Mon Sep 11 2017 Xiaolin Li <xiaolinl@vmware.com> 2.0.24-1
 - Initial build.  First version
+

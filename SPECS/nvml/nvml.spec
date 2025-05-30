@@ -714,3 +714,4 @@ Disable LTO
 
 * Tue May 24 2016 Krzysztof Czurylo <krzysztof.czurylo@intel.com> - 1.0-1
 - Initial RPM release
+

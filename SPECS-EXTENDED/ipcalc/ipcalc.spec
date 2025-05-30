@@ -149,3 +149,4 @@ or check the validity of an address.
 
 * Mon May 18 2015 Nikos Mavrogiannopoulos <nmav@redhat.com> - 0.1.0-1
 - First independent release outside initscripts
+

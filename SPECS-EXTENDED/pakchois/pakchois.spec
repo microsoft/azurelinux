@@ -125,3 +125,4 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/lib*.la
 
 * Wed Feb 13 2008 Joe Orton <jorton@redhat.com> 0.4-1
 - initial packaging.
+

@@ -120,3 +120,4 @@ cp -p bn_IN/*.dic bn_IN/*.aff $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Thu Jan 03 2008 Parag <pnemade@redhat.com> - 20050726-1
 - Initial Fedora release
+

@@ -293,3 +293,4 @@ install -c -m 644 %{SOURCE1} %{buildroot}/etc/logrotate.d/efax
 
 * Tue Mar 25 1997 Erik Troan <ewt@redhat.com>
 - Added efax-08a-64bit.patch from David Mosberger
+

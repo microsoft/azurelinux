@@ -206,3 +206,4 @@ make test
 
 * Fri Feb  7 2003 Ville Skyttä <ville.skytta at iki.fi> - 1.00-1.fedora.1
 - First Fedora release.
+

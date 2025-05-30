@@ -303,3 +303,4 @@ rm -rf %{buildroot}/%{python3_sitelib}/%{srcname}/share
 
 * Mon Jan 09 2006 Roozbeh Pournader <roozbeh@farsiweb.info> - 1.1.3-1
 - Initial packaging
+

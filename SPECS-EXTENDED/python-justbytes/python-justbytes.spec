@@ -170,3 +170,4 @@ rm -rf justbytes.egg-info
 
 * Wed Mar 23 2016 mulhern <amulhern@redhat.com> - 0.6
 - Initial release
+

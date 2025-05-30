@@ -189,3 +189,4 @@ mv $RPM_BUILD_ROOT/%{_libdir}/libLinux_SysfsDeviceUtil.so $RPM_BUILD_ROOT/%{prov
 
 * Wed Oct 14 2009 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.1.9-1
 - Initial support
+

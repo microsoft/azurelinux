@@ -504,3 +504,4 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} make -C src/check
 
 * Fri Sep 19 2008 Deji Akingunola <dakingun@gmail.com> - 5.1.1-1
 - initial package creation
+

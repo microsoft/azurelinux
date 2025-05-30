@@ -209,3 +209,4 @@ sed -i -e '/coverage/d' -e '/pytest-cov/d' requirements/tests.txt
 
 * Mon Jun 10 2019 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 1.9.2-1
 - Initial packaging
+

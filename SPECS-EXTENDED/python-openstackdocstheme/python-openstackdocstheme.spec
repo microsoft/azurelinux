@@ -239,3 +239,4 @@ rm -rf html/.{doctrees,buildinfo}
 
 * Thu Mar 03 2016 jpena <jpena@redhat.com> - 1.2.7-1
 - Initial package.
+

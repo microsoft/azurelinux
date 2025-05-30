@@ -86,3 +86,4 @@ perl Build.PL --installdirs=vendor
 
 * Fri Aug 27 2021 Paul Howarth <paul@city-fan.org> - 0.0.1-1
 - Initial RPM version
+

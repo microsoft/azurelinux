@@ -282,3 +282,4 @@ rm -f %{vim_plugin_path}/cctree.vim
 
 * Fri Jun 18 2004 Neil Horman <nhorman@redhat.com>
 - built the package
+

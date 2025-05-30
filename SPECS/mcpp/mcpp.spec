@@ -214,3 +214,4 @@ rm -f %{buildroot}%{_libdir}/libmcpp.la
 
 * Sat Apr 07 2007 Kiyoshi Matsui <kmatsui@t3.rim.or.jp> 2.6.3-1
 - First release for V.2.6.3 on sourceforge.
+

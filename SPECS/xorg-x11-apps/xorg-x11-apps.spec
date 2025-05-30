@@ -318,3 +318,4 @@ rm -r %{buildroot}%{_mandir}/man1
 
 * Thu Jan 06 2011 Adam Jackson <ajax@redhat.com> 7.6-1
 - x11perf 1.5.3
+

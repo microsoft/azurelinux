@@ -254,3 +254,4 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 * Fri Oct 23 1998  Ian Macdonald <ianmacd@xs4all.nl>
 - first RPM release
+

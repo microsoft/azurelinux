@@ -184,3 +184,4 @@ fi
 
 * Thu Mar  8 2007 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.7.0.20060707-1
 - Initial packaging, based on mecab-jumandic spec file
+

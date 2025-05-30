@@ -297,3 +297,4 @@ Utilities to handle and/or debug evdev devices.
 
 * Thu Jul 25 2013 Peter Hutterer <peter.hutterer@redhat.com> 0.2.1-1
 - Initial package (#987204)
+

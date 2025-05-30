@@ -188,3 +188,4 @@ rm -r %{buildroot}%{_docdir}/%{name}/
 * Thu Jun 24 2021 Remi Collet <remi@remirepo.net> - 1.1.0-1
 - Initial RPM from libmemcached-awesome
   from old libmemcached spec file
+

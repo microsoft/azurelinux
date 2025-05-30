@@ -242,3 +242,4 @@ kill $(cat $pidfile)
 
 * Sat Jun 09 2007 Sean Reifschneider <jafo@tummy.com> 1.36-1
 - Initial RPM spec file.
+

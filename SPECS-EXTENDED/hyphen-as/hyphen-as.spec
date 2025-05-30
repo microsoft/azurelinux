@@ -100,3 +100,4 @@ install -m644 -p *.dic %{buildroot}/%{_datadir}/hyphen
 
 * Thu Aug 20 2009 Parag <pnemade@redhat.com> - 0.20090820-1
 - initial version
+

@@ -509,3 +509,4 @@ gdk-pixbuf-query-loaders-%{__isa_bits} --update-cache
 
 * Sat Jun 26 2010 Matthias Clasen <mclasen@redhat.com> 2.21.3-1
 - Initial packaging
+

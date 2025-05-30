@@ -748,3 +748,4 @@ fi
   to services)
 - Trimmed changelog.  See the upstream .spec file for previous
   changelog entries.
+

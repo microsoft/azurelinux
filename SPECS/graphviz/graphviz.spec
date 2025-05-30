@@ -1267,3 +1267,4 @@ php --no-php-ini \
 
 * Wed Jul 20 2005 John Ellson <ellson@research.att.com>
 - release 2.4
+

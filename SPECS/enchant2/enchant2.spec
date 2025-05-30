@@ -173,3 +173,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Wed Dec 13 2017 Sandro Mani <manisandro@gmail.com> - 2.2.0-1
 - Initial package
+

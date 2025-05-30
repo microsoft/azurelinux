@@ -53,3 +53,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Fri Dec 10 2021 Mateusz Malisz <mamalisz@microsoft.com> 0.1.3-1
 - Original version for CBL-Mariner
 - License verified
+

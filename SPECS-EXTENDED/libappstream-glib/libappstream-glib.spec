@@ -881,3 +881,4 @@ from a directory of packages.
 
 * Tue Mar 18 2014 Richard Hughes <richard@hughsie.com> 0.1.0-1
 - First upstream release
+

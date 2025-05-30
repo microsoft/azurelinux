@@ -164,3 +164,4 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
 * Thu Jul  1 2010 Matthias Clasen <mclasen@redhat.com> - 2.90.1-1
 - Initial packaging
+

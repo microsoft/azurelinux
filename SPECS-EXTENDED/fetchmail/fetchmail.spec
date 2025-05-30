@@ -863,3 +863,4 @@ rm -f %{buildroot}%{python3_sitelib}/__pycache__/fetchmailconf*
 
 * Thu Jul 10 1997 Erik Troan <ewt@redhat.com>
 - built against glibc
+

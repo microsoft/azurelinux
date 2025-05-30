@@ -80,3 +80,4 @@ make %{?_smp_mflags} check
 
 * Thu Feb 21 2019 Alexey Makhalov <amakhalov@vmware.com> 3.1.3-1
 - Initial build. First version
+

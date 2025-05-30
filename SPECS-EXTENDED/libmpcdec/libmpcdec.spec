@@ -169,3 +169,4 @@ rm -fv $RPM_BUILD_ROOT%{_libdir}/lib*.la
 - Initial RPM release.
 - Include the mandatory copy of the LGPL (there is none in the sources...).
 
+

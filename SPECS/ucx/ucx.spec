@@ -383,3 +383,4 @@ library internals, protocol objects, transports status, and more.
 - Spec file now complies with Fedora guidelines
 * Mon Jul 3 2017 Andrey Maslennikov <andreyma@mellanox.com> 1.2.0-1
 - Fedora package created
+

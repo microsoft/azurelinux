@@ -407,3 +407,4 @@ LD_LIBRARY_PATH=$PWD/hwloc/.libs make check
 
 * Fri Jun 18 2010 Jirka Hladky <jhladky@redhat.com> - 1.0.1-17
 - Initial build
+

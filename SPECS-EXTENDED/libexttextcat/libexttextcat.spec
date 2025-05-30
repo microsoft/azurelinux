@@ -140,3 +140,4 @@ make check
 
 * Tue Jan 24 2012 David Tardon <dtardon@redhat.com> 3.2.0-1
 - initial import
+

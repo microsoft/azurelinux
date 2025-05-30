@@ -134,3 +134,4 @@ rm %{buildroot}/usr/libhsakmt/LICENSE.md
 * Sat Oct 24 2015 Oded Gabbay <oded.gabbay@gmail.com> 1.0.0-1
 - Initial release of hsakmt, ver. 1.0.0
 
+

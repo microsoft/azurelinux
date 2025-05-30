@@ -125,3 +125,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Fri May 31 2013 Peter Hutterer <peter.hutterer@redhat.com> 1.1.3-1
 - libXxf86vm 1.1.3
  Initial build.
+

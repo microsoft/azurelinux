@@ -149,3 +149,4 @@ touch --no-create %{_datadir}/sounds/freedesktop %{_datadir}/sounds
 
 * Sun Jun 15 2008 Lennart Poettering <lpoetter@redhat.com> 0.1-1
 - Initial package
+

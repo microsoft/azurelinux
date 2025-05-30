@@ -256,3 +256,4 @@ java -cp %{buildroot}/%{_javadir}/%{name}.jar: test 2>&1 | \
 
 * Thu Sep  2 2004 skh@suse.de
 - Initial package created with version 3.8.1 (JPackage 1.5)
+

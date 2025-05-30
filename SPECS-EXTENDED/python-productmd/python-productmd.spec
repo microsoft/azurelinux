@@ -364,3 +364,4 @@ Requires:       python%{python3_pkgversion}-six
 
 * Tue Mar 10 2015 Dennis Gilmore <dennis@ausil.us> - 1.0-1
 - Initial packaging
+

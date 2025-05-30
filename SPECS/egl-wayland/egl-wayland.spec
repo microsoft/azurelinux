@@ -187,3 +187,4 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 * Fri Jan 20 2017 Leigh Scott <leigh123linux@googlemail.com> - 1.0.0-0.1.git743d702
 - First build
 
+

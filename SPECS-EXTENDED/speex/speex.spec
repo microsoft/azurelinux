@@ -252,3 +252,4 @@ rm -f $RPM_BUILD_ROOT%{_docdir}/speex/manual.pdf
 
 * Sat Aug 16 2003 Dams <anvil[AT]livna.org> 
 - Initial build.
+

@@ -159,3 +159,4 @@ bin/influx completion zsh > %{buildroot}/%{_datadir}/zsh/site-functions/_influx
 
 * Wed Nov 17 2021 Matwey Kornilov <matwey.kornilov@gmail.com>
 - Initial version
+

@@ -259,3 +259,4 @@ make install install-data DESTDIR=%{buildroot}
 
 * Mon Aug 20 2007 Matt Domsch <Matt_Domsch@dell.com> 0.2.1-1
 - initial release
+

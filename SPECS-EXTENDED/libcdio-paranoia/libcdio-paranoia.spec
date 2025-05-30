@@ -191,3 +191,4 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so.*
 
 * Mon Oct 29 2012 Adrian Reber <adrian@lisas.de> - 10.2+0.90-1
 - initial release
+

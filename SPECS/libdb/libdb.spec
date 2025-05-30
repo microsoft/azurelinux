@@ -122,3 +122,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Thu Oct 27 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 5.3.28-1
 - Initial build. First version
+

@@ -479,3 +479,4 @@ mkdir %{buildroot}/%{_datadir}/myspell
 
 * Wed Oct 25 2006 Caolán McNamara <caolanm@redhat.com> - 1.1.4-1
 - initial version
+

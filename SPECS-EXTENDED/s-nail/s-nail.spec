@@ -218,3 +218,4 @@ make test
 
 * Thu Apr 09 2020 Nikola Forró <nforro@redhat.com> - 14.9.17-1
 - Initial package
+

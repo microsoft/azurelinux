@@ -224,3 +224,4 @@ make check|| {
 - New upstream version
   - Introduce 'serial' field in uReport
   - normalization: actualize list of functions
+

@@ -115,3 +115,4 @@ make install DESTDIR="%{buildroot}" INSTALL="install -p"
 
 * Sun Dec 21 2008 Itamar Reis Peixoto <itamar@ispbrasil.com.br> - 0.7.2-1
 - Initial Release
+

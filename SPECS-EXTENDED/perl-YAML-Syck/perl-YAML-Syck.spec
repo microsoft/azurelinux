@@ -336,3 +336,4 @@ make test
 - Remove explicit build dependency on perl.
 - Include JSON module.
 - BR Devel::Leak (for tests).
+

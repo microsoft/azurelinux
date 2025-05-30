@@ -234,3 +234,4 @@ for m in sb sx; do ln -s sz.1 %{buildroot}%{_mandir}/man1/$m.1; done
 
 * Wed Mar 5 1997 msf@redhat.com <Michael Fulbright>
 - Upgraded to 0.12.14 and changed makefiles so gettext isnt built.
+

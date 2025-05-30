@@ -3809,3 +3809,4 @@ fi
 * Fri Oct 09 2009 Mark Goodwin <mgoodwin@redhat.com> - 3.0.0-9
 - This is the initial import for Fedora
 - See 3.0.0 details in CHANGELOG
+

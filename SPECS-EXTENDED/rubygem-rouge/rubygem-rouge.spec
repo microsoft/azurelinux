@@ -178,3 +178,4 @@ help2man -N -s1 -o %{buildroot}%{_mandir}/man1/rougify.1 \
 * Sun Aug 21 2016 Björn Esser <fedora@besser82.io> - 1.11.1-0.1
 - initial rpm-release (#1368850)
 
+

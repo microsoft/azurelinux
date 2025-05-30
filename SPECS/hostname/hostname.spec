@@ -231,3 +231,4 @@ fi
 - This package is based on Debian's hostname because Debian has had hostname
   as separate package since 1997 and the code is much better then the old one
   contained in net-tools.
+

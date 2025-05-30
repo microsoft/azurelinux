@@ -292,3 +292,4 @@ rm -rf %{buildroot}/lib/systemd/system
 
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 2.24.1-1
 - Initial build. First version
+

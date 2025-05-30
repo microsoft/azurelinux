@@ -122,3 +122,4 @@ install -p -m 755 provisioning_client/tools/tpm_device_provision/tpm_device_prov
 
 *   Mon Apr 27 2020 Emre Girgin <mrgirgin@microsoft.com> 2020.02.04.1-1
 -   Original version for CBL-Mariner.
+

@@ -76,3 +76,4 @@ rm -rf %{buildroot}/%{_libdir}/pkgconfig/usbutils.pc
 
 * Fri May 06 2016 Nick Shi <nshi@vmware.com> - 008-1
 - Initial version
+

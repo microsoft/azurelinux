@@ -94,3 +94,4 @@ install -p -m644 src/systemd/run-media-iDRAC_NATOSC.mount %{buildroot}%{_unitdir
 
 * Mon Aug 28 2017 Charles Rose <charles_rose@dell.com> - 0.7.0-1
 - first RPM release
+

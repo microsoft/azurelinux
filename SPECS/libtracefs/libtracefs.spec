@@ -70,3 +70,4 @@ rm -rf %{buildroot}/%{_libdir}/libtracefs.a
 * Thu Feb 15 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.8.0-1
 - Initial Azure Linux import from Fedora 40 (license: MIT)
 - License Verified
+

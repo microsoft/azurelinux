@@ -114,3 +114,4 @@ sed -i 's|man/man7|share/man/man7|g' lib/cmake/unix.cmake
 
 * Fri Aug 11 2017 Tomasz Kantecki <tomasz.kantecki@intel.com> 0.46-1
 - initial version of the package
+

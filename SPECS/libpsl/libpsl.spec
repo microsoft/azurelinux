@@ -123,3 +123,4 @@ make check
 
 * Mon Sep 17 2018 Bo Gan <ganb@vmware.com> 0.20.2-1
 - Initial packaging of libpsl
+

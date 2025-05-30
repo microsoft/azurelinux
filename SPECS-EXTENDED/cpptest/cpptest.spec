@@ -151,3 +151,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Fri Mar 06 2009 Rakesh Pandit <rakesh@fedoraproject.org> 1.1.0-1
 - Initial package
+

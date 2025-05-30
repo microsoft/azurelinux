@@ -195,3 +195,4 @@ make test AUTOMATED_TESTING=1
 
 * Wed Aug 10 2011 Paul Howarth <paul@city-fan.org> - 0.10-1
 - Initial RPM version
+

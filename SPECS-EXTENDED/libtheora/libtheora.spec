@@ -319,3 +319,4 @@ make check
 * Fri Jan 30 2004 adrian@suse.de
 - initial package of current snapshot (post alpha2)
 - internal package only atm
+

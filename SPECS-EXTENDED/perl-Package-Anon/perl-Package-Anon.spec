@@ -148,3 +148,4 @@ make test RELEASE_TESTING=1
 
 * Fri Jan  4 2013 Paul Howarth <paul@city-fan.org> - 0.05-1
 - Initial RPM build
+

@@ -71,3 +71,4 @@ Incremental is a small library that versions your Python projects.
 
 * Mon Mar 06 2017 Xiaolin Li <xiaolinl@vmware.com> - 16.10.1-1
 - Initial packaging for Photon.
+

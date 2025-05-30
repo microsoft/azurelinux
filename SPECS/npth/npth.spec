@@ -70,3 +70,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Tue Apr 11 2017 Danut Moraru <dmoraru@vmware.com> 1.3-1
 - Initial Build.
+

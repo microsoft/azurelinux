@@ -494,3 +494,4 @@ make check V=1 || \
 
 * Fri Feb  6 2015 Nicolas Chauvet <kwizart@gmail.com> - 0.0.0-1
 - Initial spec file
+

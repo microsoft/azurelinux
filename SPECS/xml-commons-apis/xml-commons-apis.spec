@@ -156,3 +156,4 @@ rm -rf build/docs/javadoc
 * Thu Dec  6 2018 Fridrich Strba <fstrba@suse.com>
 - Initial package of xml-commons-apis
 - Provide different api versions to simplify upgrades
+

@@ -221,3 +221,4 @@ See docs at http://packages.python.org/cmd2/
 
 * Thu Jun 28 2012 Ralph Bean <rbean@redhat.com> - 0.6.4-1
 - initial package for Fedora
+

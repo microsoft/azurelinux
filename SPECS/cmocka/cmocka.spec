@@ -247,3 +247,4 @@ popd
 
 * Tue Jan 15 2013 - Andreas Schneider <asn@redhat.com> - 0.2.0-1
 - Initial version 0.2.0
+

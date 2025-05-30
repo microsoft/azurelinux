@@ -178,3 +178,4 @@ echo "%{_libdir}/cmpi" > $RPM_BUILD_ROOT/%{_sysconfdir}/ld.so.conf.d/%{name}-%{_
 
 * Tue Sep 29 2009 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.0.14-1
 - Initial support
+

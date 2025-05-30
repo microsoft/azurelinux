@@ -126,3 +126,4 @@ cp -p hyph_et.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen/hyph_et_EE.dic
 
 * Thu Dec 07 2006 Caolán McNamara <caolanm@redhat.com> - 0.20030602-1
 - initial version
+

@@ -493,3 +493,4 @@ make %{?_smp_mflags} check
 
 * Sat Nov  9 2002 Jeff Johnson <jbj@redhat.com> 0.23.5-1
 - Create.
+

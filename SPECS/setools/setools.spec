@@ -203,3 +203,4 @@ rm -rf %{buildroot}%{_mandir}/{,ru/}man1/apol*
 
 * Wed Feb 15 2017 Petr Lautrbach <plautrba@redhat.com> - 4.1.0-1
 - New upstream release.
+

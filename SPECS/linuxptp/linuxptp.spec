@@ -272,3 +272,4 @@ PATH=..:$PATH ./run
 
 * Thu Sep 20 2012 Miroslav Lichvar <mlichvar@redhat.com> 0-0.1.20120920git6ce135
 - initial release
+

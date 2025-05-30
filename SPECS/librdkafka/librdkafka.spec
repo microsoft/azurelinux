@@ -135,3 +135,4 @@ rm %{buildroot}%{_docdir}/librdkafka/LICENSE %{buildroot}%{_docdir}/librdkafka/L
 
 * Mon Mar 17 2014 Magnus Edenhill <vk@edenhill.se> 0.8.3-0
 - Initial RPM package
+

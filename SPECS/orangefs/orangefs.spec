@@ -341,3 +341,4 @@ install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}
 
 * Fri Sep 15 2017 Martin Brandenburg <martin@martinbrandenburg.com> - 2.9.6-0.1.20170904svn
 - Initial Packaging
+

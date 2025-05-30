@@ -122,3 +122,4 @@ cp -p dsb_DE.* $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Wed Oct 14 2009 Caolán McNamara <caolanm@redhat.com> - 1.1.1-1
 - initial version
+

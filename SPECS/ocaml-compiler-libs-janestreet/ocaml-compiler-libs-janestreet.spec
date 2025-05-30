@@ -83,3 +83,4 @@ signature files for developing applications that use
 
 * Thu May  7 2020 Jerry James <loganjerry@gmail.com> - 0.12.1-1
 - Initial RPM
+

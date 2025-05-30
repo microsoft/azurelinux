@@ -328,3 +328,4 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
  
 * Mon Feb  1 2021 Olivier Fourdan <ofourdan@redhat.com> - 1.20.99.1-0.1.20210201git5429791
 - Initial import (#1912335).
+

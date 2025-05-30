@@ -410,3 +410,4 @@ rm -r %{buildroot}%{ocamldir}/csvtool
 
 * Tue May 29 2007 Richard W.M. Jones <rjones@redhat.com> - 1.1.6-1
 - Initial RPM release.
+

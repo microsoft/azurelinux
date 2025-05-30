@@ -422,3 +422,4 @@ sed -i '1s|^#!/usr/bin/python|#!%{__python3}|' examples/magFocusTracker.py
 
 * Sat Dec  5 2009 Matthias Clasen <mclasen@redhat.com> - 0.1.3-1
 - Initial packaging
+

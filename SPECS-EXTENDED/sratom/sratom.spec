@@ -221,3 +221,4 @@ install -pm 644 NEWS README.md %{buildroot}%{_pkgdocdir}
 
 * Fri Apr 20 2012 Brendan Jones <brendan.jones.it@gmail.com> - 0.2.0-1
 - Initial build 
+

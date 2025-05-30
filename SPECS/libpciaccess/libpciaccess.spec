@@ -276,3 +276,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Thu May 24 2007 Adam Jackson <ajax@redhat.com> 0.8-0.1.20070524git
 - Initial revision.
+

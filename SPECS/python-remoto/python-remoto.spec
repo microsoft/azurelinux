@@ -64,3 +64,4 @@ python3 -m pytest -v remoto/tests
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.2.0-1
 - Original version for CBL-Mariner
 - License verified
+

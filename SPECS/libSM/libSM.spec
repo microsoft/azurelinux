@@ -273,3 +273,4 @@ rm -rf %{buildroot}%{_docdir}
 
 * Mon Aug 22 2005 Mike A. Harris <mharris@redhat.com> 0.99.0-1
 - Initial build.
+

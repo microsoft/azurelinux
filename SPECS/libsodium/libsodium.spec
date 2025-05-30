@@ -210,3 +210,4 @@ find %{buildroot} -type f -name "*.a" -delete -print
 
 * Wed Jul 10 2013 Christopher Meng <rpm@cicku.me> - 0.4.2-1
 - Initial Package.
+

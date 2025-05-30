@@ -719,3 +719,4 @@ rm -fv %{buildroot}%{_datadir}/plasma/look-and-feel/org.fedoraproject.fedora.des
 
 * Sun Nov 29 2009 Rex Dieter <rdieter@fedoraproject.org> 4.4-1
 - -pulseaudio: drop xine-lib-pulseaudio (subpkg no longer exists)
+

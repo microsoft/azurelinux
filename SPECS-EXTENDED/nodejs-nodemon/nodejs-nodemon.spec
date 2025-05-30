@@ -116,3 +116,4 @@ npm run test
 
 * Wed Dec 16 2015 Troy Dawson <tdawson@redhat.com> - 1.8.1-1
 - Initial package
+

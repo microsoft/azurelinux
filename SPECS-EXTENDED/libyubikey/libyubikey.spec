@@ -171,3 +171,4 @@ make check
 
 * Wed Jan 20 2010 - Maxim Burgerhout <maxim@wzzrd.com> - 1.5-1
 - First packaged release
+

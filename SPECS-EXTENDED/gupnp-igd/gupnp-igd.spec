@@ -244,3 +244,4 @@ sed -i 's/\(.*\)gupnp-1.2\(.*\)/\1gupnp-1.6\2/' meson.build
 
 * Wed Dec 31 2008 Brian Pepple <bpepple@fedoraproject.org> - 0.1.1-1
 - Initial Fedora spec.
+

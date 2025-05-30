@@ -171,3 +171,4 @@ find $RPM_BUILD_ROOT -name '*.la' -delete -print
 
 * Fri Feb  7 2014 Yanko Kaneti <yaneti@declera.com> - 0.2.0-1
 - Initial attempt
+

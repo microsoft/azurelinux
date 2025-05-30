@@ -218,3 +218,4 @@ find %{buildroot}%{_libdir} -name '*.la' -delete -print
 
 * Sun Jan 25 2004 Axel Thimm <Axel.Thimm@ATrpms.net>
 - Initial build.
+

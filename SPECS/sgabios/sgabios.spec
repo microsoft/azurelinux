@@ -155,3 +155,4 @@ install -m 0644 sgabios.bin %{buildroot}%{_datadir}/sgabios
 
 * Tue Jun 21 2011 Justin M. Forbes <jforbes@redhat.com> 0.1-0.20110621SVN
 - Created initial package
+

@@ -511,3 +511,4 @@ rm -rf %{buildroot}%{_mandir}/*/docbook2ps.*
 
 * Mon Jan 08 2001 Tim Waugh <twaugh@redhat.com>
 - Based on Eric Bischoff's new-trials packages.
+

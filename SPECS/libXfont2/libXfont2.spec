@@ -115,3 +115,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Wed Jun 08 2016 Adam Jackson <ajax@redhat.com> - 2.0.2-1
 - Initial packaging forked from libXfont
+

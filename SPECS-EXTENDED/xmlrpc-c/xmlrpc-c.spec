@@ -566,3 +566,4 @@ make -C examples/cpp clean
 
 * Tue Mar 16 2004 kkaempf@suse.de
 - initial package version 0.9.10
+

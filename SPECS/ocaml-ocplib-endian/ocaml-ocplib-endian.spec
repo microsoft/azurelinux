@@ -136,3 +136,4 @@ signature files for developing applications that use %{name}.
 
 * Mon Oct 14 2019 Ben Rosser <rosser.bjr@gmail.com> - 1.0-1
 - Initial package.
+

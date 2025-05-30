@@ -256,3 +256,4 @@ chmod 600 %{buildroot}%{_prefix}/lib/%{name}/00-netplan-default-renderer-network
 
 * Sun Jul  2 2017 Neal Gompa <ngompa13@gmail.com> - 0.23~17.04.1-1
 - Initial packaging
+

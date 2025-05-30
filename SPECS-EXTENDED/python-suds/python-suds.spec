@@ -365,3 +365,4 @@ Summary:        %{summary}
   See section 'MULTI-DOCUMENT Docuemnt/Literal:'
 - Add support for (xs:group, xs:attributeGroup) tags.
 - Add Client.last_sent() and Client.last_received().
+

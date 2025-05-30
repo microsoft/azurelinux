@@ -94,3 +94,4 @@ pip3 install pytest six
 
 * Fri May 29 2020 Mohamed El Morabity <melmorabity@fedoraproject.org> - 1.2.8-1
 - Initial RPM release
+

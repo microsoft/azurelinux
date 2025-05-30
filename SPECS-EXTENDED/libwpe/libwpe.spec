@@ -123,3 +123,4 @@ files for developing applications that use %{name}.
 * Mon Aug 27 2018 Chris King <bunnyapocalypse@protonmail.org> - 1.0.0-1
 - Initial RPM package
 
+

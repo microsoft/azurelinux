@@ -242,3 +242,4 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 * Wed Feb 01 2006 Ralf Corsépius <rc040203@freenet.de> - 9999.11-1
 - Upstream update.
 - BR perl(Test::Pod), perl(Test::Pod::Coverage).
+

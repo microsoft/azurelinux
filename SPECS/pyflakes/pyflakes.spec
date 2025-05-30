@@ -319,3 +319,4 @@ ln -s pyflakes-3.1 %{buildroot}%{_mandir}/man1/pyflakes.1
 
 * Tue Dec  5 2006 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.0-0.1.10526
 - First version for Fedora Extras
+

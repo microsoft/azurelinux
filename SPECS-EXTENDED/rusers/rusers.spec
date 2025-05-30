@@ -569,3 +569,4 @@ install -m 0644 %SOURCE3 ${RPM_BUILD_ROOT}%{_unitdir}/rstatd.service
 
 * Tue Jul 15 1997 Erik Troan <ewt@redhat.com>
 - initial build
+

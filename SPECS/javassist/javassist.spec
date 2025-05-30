@@ -215,3 +215,4 @@ cp -p License.html %{buildroot}/%{_docdir}/%{name}-%{version}
 
 * Thu Dec  9 2010 mc@suse.de
 - initial release
+

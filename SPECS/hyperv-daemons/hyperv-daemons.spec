@@ -623,3 +623,4 @@ fi
 
 * Mon Aug 26 2013 Tomas Hozza <thozza@redhat.com> - 0-0.1.20130826git
 - Initial package
+

@@ -420,3 +420,4 @@ install -Dm 755 contrib/bmc-snmp-proxy         %{buildroot}%{_libexecdir}/bmc-sn
 
 * Mon Oct 13 2008 Jan Safranek <jsafrane@redhat.com> 1.8.10-1
 - package created, based on upstream .spec file
+

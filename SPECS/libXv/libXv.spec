@@ -131,3 +131,4 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
 * Wed Jun 26 2013 Peter Hutterer <peter.hutterer@redhat.com> 1.0.9-1
 - libXv 1.0.9
+

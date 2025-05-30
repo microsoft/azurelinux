@@ -184,3 +184,4 @@ install -Dp -m 0644 %{name}.man.gz %{buildroot}%{_mandir}/man1/%{name}.1.gz
 
 * Sun Nov 02 2008 Fabian Affolter <mail@fabian-affolter.ch> - 20060917-1
 - Initial package for Fedora
+

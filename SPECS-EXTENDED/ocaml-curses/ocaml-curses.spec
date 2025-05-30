@@ -352,3 +352,4 @@ developing applications that use %{name}.
 
 * Mon Aug  6 2007 Richard W.M. Jones <rjones@redhat.com> - 0.1-1.20020319
 - Initial RPM release.
+

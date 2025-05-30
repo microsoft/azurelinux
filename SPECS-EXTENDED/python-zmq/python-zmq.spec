@@ -364,3 +364,4 @@ pathfix.py -pn -i %{__python3} %{buildroot}%{python3_sitearch}
 
 * Sat Jun 12 2010 Thomas Spura <tomspur@fedoraproject.org - 2.0.7-1
 - initial package (based on upstreams example one)
+

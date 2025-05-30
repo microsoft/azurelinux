@@ -150,3 +150,4 @@ mv zstandard{.src,}
 * Fri May 29 2020 Dominik Mierzejewski <dominik@greysector.net> 0.13.0-1
 - initial build
 - skip some tests on s390x (https://github.com/indygreg/python-zstandard/issues/105)
+

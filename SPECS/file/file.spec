@@ -137,3 +137,4 @@ python3 setup.py install -O1 --skip-build --root %{buildroot}
 
 * Mon Apr 6 2015 Divya Thaluru <dthaluru@vmware.com> - 5.22-1
 - Initial build. First version
+

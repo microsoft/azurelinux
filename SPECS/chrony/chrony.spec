@@ -612,3 +612,4 @@ systemctl start chronyd.service
 
 * Tue Nov 11 2008 Miroslav Lichvar <mlichvar@redhat.com> 1.23-1.20081106gitbe42b4
 - initial release
+

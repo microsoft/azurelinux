@@ -104,3 +104,4 @@ cp -p hyph_da_DK.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen
 
 * Fri Nov 23 2007 Caolan McNamara <caolanm@redhat.com> - 0.20040402-1
 - initial version
+

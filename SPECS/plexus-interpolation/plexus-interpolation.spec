@@ -90,3 +90,4 @@ API documentation for %{name}.
 - Initial packaging of plexus-interpolation 1.22
 - Generate and customize ant build.xml file to be able to build
   outside maven
+

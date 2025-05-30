@@ -68,3 +68,4 @@ make check
 
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.44-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+

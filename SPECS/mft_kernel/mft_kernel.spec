@@ -287,3 +287,4 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 4.30.0-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
+

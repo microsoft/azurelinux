@@ -483,3 +483,4 @@ rm $RPM_BUILD_ROOT%{_libdir}/cmake/%{name}/README.rst
 * Mon Dec 17 2007 Petr Machata <pmachata@redhat.com> - 2.0-1.20070927
 - Initial package.
 - Using SONAME patch from Debian.
+

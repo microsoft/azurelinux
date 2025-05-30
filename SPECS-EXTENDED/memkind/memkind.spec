@@ -262,3 +262,4 @@ rm -f %{buildroot}/%{_docdir}/%{name}/VERSION
 * Mon May 18 2015 Rafael Aquini <aquini@linux.com> - 0.2.2-1.20150518git
 - Initial RPM packaging for Fedora
 
+

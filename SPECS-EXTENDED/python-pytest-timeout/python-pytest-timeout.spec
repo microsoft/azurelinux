@@ -148,3 +148,4 @@ pip3 install pytest==7.1.2 pytest-cov==3.0.0
 
 * Thu Aug 11 2016 Scott Talbert <swt@techie.net> - 1.0.0-1
 - Initial package.
+

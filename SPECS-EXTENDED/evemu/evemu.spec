@@ -247,3 +247,4 @@ rm -f %{buildroot}%{_libdir}/*.la
 
 * Tue Feb 07 2012 Peter Hutterer <peter.hutterer@redhat.com> 1.0.8-1
 - Initial package
+

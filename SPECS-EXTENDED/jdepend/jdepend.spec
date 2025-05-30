@@ -140,3 +140,4 @@ cp -pr sample %{buildroot}%{_datadir}/%{name}
 - Current version 2.6 from JPackage.org
 * Thu Sep  2 2004 skh@suse.de
 - Initial package created with version 2.6 (JPackage 1.5)
+

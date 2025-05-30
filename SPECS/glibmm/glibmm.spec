@@ -163,3 +163,4 @@ export GIO_EXTRA_MODULES=/usr/lib/gio/modules
 
 * Wed Nov 12 2014 Mahmoud Bassiouny <mbassiouny@vmware.com> 2.42.0-1
 - Initial version
+

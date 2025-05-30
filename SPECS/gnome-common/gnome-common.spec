@@ -55,3 +55,4 @@ make %{?_smp_mflags} check
 -   Upgrade to 3.18.0
 *   Tue Aug 11 2015 Vinay Kulkarni <kulkarniv@vmware.com> 3.14.0-1
 -   Add gnome-common v3.14.0
+

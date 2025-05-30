@@ -117,3 +117,4 @@ sed -i -e '/test_version/d' tests/__init__.py
 
 * Sun Aug 23 2020 Neal Gompa <ngompa13@gmail.com> - 1.4.5.1-1
 - Initial package (#1870571)
+

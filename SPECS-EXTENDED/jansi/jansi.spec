@@ -145,3 +145,4 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 * Mon Feb  4 2019 Fridrich Strba <fstrba@suse.com>
 - Initial package of jansi 1.17.1
 - Add build.xml file for building with ant
+

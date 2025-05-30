@@ -104,3 +104,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Fri Mar 03 2017 Xiaolin Li <xiaolinl@vmware.com> 1.2.20-1
 - Initial packaging for Photon
+

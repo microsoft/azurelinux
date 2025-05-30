@@ -477,3 +477,4 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.so $RPM_BUILD_ROOT%{_libdir}/*.la
 
 * Thu Apr 23 1999 Owen Taylor <otaylor@redhat.com>
 - Made requires for sgml-common into prereq
+

@@ -40,3 +40,4 @@ make install DESTDIR=%{buildroot}
 - Original version for Azure Linux.
 - License verified.
 - Initial package.
+

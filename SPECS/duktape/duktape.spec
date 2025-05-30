@@ -92,3 +92,4 @@ application that use %{name}.
 
 * Mon Mar 19 2018 jk@lutty.net
 - Initial package for fedora derived from Suse
+

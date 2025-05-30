@@ -117,3 +117,4 @@ make DESTDIR="%{buildroot}" PREFIX="%{_prefix}" install
 
 * Fri Nov 19 2010 Jan Friesse <jfriesse@redhat.com> - 0.0.1-1
 - Initial package for Fedora
+

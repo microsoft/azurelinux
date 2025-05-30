@@ -529,3 +529,4 @@ rm -rf %{buildroot}%{_datadir}/applications/im-chooser-panel.desktop
 
 * Wed Jun  7 2006 Akira TAGOH <tagoh@redhat.com> - 0.1.1-1
 - Initial package.
+

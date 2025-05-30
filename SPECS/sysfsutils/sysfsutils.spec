@@ -220,3 +220,4 @@ find %{buildroot} -type f -name "*.la" -delete
 
 * Fri Aug 13 2004 AJ Lewis <alewis@redhat.com> 1.1.0-1
 - Initial package for FC3
+

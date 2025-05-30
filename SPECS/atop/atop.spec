@@ -310,3 +310,4 @@ install -Dp -m 0644 atop-rotate.* %{buildroot}%{_unitdir}/
 
 * Sat Jan 26 2008 Kairo Araujo <kairoaraujo@gmail.com> - 1.22-1
 - Initial RPM release
+

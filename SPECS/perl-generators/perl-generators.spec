@@ -186,3 +186,4 @@ make test
 
 * Mon Jun 16 2014 Jitka Plesnikova <jplesnik@redhat.com> - 1.00-1
 - Introduce Perl generators as a standalone package
+

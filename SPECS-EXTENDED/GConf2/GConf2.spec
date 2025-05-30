@@ -978,3 +978,4 @@ fi
 * Sun Jun 11 2000  Eskil Heyn Olsen <deity@eazel.com>
 
 - Created the .spec file
+

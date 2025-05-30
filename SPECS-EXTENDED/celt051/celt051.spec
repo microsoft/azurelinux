@@ -125,3 +125,4 @@ rm $RPM_BUILD_ROOT%{_libdir}/libcelt051.la
 
 * Fri Jul  9 2010 Alexander Larsson <alexl@redhat.com> - 0.5.1.3-1
 - First fedora package, based on RHEL package version 0.5.1.3-0
+

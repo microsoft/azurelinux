@@ -241,3 +241,4 @@ install -m 0755 -vp   bin/* %{buildroot}%{_bindir}
 * Mon Nov 10 2008 Nicolas Mailhot <nim@fedoraproject.org>
 - 1.0-1
 ✅ initial release
+

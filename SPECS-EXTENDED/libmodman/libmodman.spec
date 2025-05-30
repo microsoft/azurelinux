@@ -144,3 +144,4 @@ make test
 
 * Sun Jun 13 2010 Nathaniel McCallum <nathaniel@natemccallum.com> - 1.0.1-1
 - First release
+

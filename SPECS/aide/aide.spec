@@ -312,3 +312,4 @@ mkdir -p -m0700 %{buildroot}%{_localstatedir}/lib/aide
 
 * Sun Sep 07 2003 Michael Schwendt <mschwendt[AT]users.sf.net> - 0:0.9-0.fdr.0.1.20030902
 - Initial package version.
+

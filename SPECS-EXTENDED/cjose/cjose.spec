@@ -91,3 +91,4 @@ make check || (cat test/test-suite.log; exit 1)
 
 * Fri Jan 26 2018 Patrick Uiterwijk <patrick@puiterwijk.org> - 0.5.1-1
 - Initial packaging
+

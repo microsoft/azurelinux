@@ -311,3 +311,4 @@ fi
 
 * Sun Jun 08 2008 Doug Ledford <dledford@redhat.com> - 3.2.1-1
 - Initial package for Fedora review process
+

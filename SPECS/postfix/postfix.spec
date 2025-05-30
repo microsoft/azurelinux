@@ -1830,3 +1830,4 @@ exit 0
   - Remove some hacks to support building on all sorts of distributions at
     the cost of specfile readability
   - Remove postdrop group on deletion
+

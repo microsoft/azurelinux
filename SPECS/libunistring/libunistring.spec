@@ -80,3 +80,4 @@ make %{?_smp_mflags} check
 - Updated to version 0.9.6
 * Thu Jun 18 2015 Divya Thaluru <dthaluru@vmware.com> 0.9.5-1
 - Initial build. First version
+

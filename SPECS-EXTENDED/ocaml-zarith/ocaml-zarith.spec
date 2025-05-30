@@ -404,3 +404,4 @@ make tests
 
 * Fri Oct 26 2012 Jerry James <loganjerry@gmail.com> - 1.1-1
 - Initial RPM
+

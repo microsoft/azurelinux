@@ -502,3 +502,4 @@ EOF
 
 * Thu Sep 19 2013 Björn Esser <bjoern.esser@gmail.com> - 2.4-1.git20130903.35e6377
 - Initial rpm release (#1004209)
+

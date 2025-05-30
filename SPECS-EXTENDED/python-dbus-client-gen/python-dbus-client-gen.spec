@@ -146,3 +146,4 @@ Python 3 version.
 
 * Mon Jan 08 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 0.2-1
 - Initial package
+

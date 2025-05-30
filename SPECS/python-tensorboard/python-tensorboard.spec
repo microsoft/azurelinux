@@ -128,3 +128,4 @@ mv %{pypi_name}-*.whl pyproject-wheeldir/
 
 * Mon Dec 19 2022 Riken Maharjan <rmaharjan@microsoft.com> - 2.11.0-1
 - Original version for CBL-Mariner. License Verified.
+

@@ -230,3 +230,4 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 
 *   Wed Jul 22 2020 Muminul Islam <muislam@microsoft.com> 0.8.0-0
 -   Initial version
+

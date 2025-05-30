@@ -390,3 +390,4 @@ ln -s $(echo %{_bindir} |sed 's,/[^/]\+,/..,g; s,^/,,')%{_sbindir}/tmpwatch \
 * Sun Mar 09 1997 Erik Troan <ewt@redhat.com>
 - Rebuilt to get right permissions on the Alpha (though I have no idea
   how they ended up wrong).
+

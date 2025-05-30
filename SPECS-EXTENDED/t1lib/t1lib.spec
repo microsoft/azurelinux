@@ -324,3 +324,4 @@ touch $RPM_BUILD_ROOT%{_datadir}/t1lib/{FontDatabase,t1lib.config}
 
 * Sun Oct 26 2003 Marius L. Jøhndal <mariuslj at ifi.uio.no> 0:5.0.0-0.fdr.1
 - Initial RPM release.
+

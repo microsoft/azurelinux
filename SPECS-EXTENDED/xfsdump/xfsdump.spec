@@ -269,3 +269,4 @@ mkdir -p $RPM_BUILD_ROOT/%{_sharedstatedir}/xfsdump/inventory
  
 * Wed Aug  9 2006 Russell Cattelan <cattelan@thebarn.com> - 2.2.38-1
 - Add xfsdump to Fedora
+

@@ -54,3 +54,4 @@ cp -r lib/ %{buildroot}%{gem_instdir}/
 - License verified
 - Included descriptions from Fedora 36 spec (license: MIT).
 - Original version for CBL-Mariner
+

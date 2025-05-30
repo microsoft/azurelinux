@@ -130,3 +130,4 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 *   Thu Feb 16 2017 Vinay Kulkarni <kulkarniv@vmware.com> 0.4.0-1
 -   Add CNI plugins package to PhotonOS.
+

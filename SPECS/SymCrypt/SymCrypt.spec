@@ -143,3 +143,4 @@ chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 * Mon Feb 14 2022 Samuel Lee <saml@microsoft.com> - 101.0.0-1
 - Original version for CBL-Mariner
 - Verified license
+

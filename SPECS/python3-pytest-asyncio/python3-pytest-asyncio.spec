@@ -181,3 +181,4 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 * Sat Aug 1 2015 Julien Enselme <jujens@jujens.eu> - 0.1.3-1.git2a4c7e6
 - Initial package
+

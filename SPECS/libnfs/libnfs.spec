@@ -134,3 +134,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Sun Mar 01 2015 Ross Lagerwall <rosslagerwall@gmail.com> 1.9.7-1
 - Initial packaging
+

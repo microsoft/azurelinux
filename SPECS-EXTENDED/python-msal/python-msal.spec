@@ -149,3 +149,4 @@ Summary:        %{summary}
 
 * Fri May 29 2020 Mohamed El Morabity <melmorabity@fedoraproject.org> 1.3.0-1
 - First import
+

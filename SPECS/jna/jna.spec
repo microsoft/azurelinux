@@ -412,3 +412,4 @@ ant
 
 * Tue May 19 2009 mvyskocil@suse.cz
 - 'Initial SUSE packaging from jpackage.org 5.0'
+

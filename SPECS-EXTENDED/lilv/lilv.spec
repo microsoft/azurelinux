@@ -325,3 +325,4 @@ chmod +x %{buildroot}%{_libdir}/lib%{name}-0.so.*
 
 * Fri Dec 23 2011 Brendan Jones <brendan.jones.it@gmail.com> - 0.5.0-1
 - Initial build
+

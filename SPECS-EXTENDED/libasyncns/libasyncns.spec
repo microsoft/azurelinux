@@ -120,3 +120,4 @@ rm -rf $RPM_BUILD_ROOT/usr/share/doc/libasyncns/
 
 * Sun Jul 27 2008 Lennart Poettering <lpoetter@redhat.com> 0.4-1
 - Initial packaging
+

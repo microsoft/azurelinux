@@ -187,3 +187,4 @@ dune runtest -j 1 -p alcotest
 
 * Thu Jan  9 2020 Jerry James <loganjerry@gmail.com> - 0.8.5-1
 - Initial RPM
+

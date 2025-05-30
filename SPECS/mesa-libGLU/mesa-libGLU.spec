@@ -126,3 +126,4 @@ find $RPM_BUILD_ROOT -name '*.a' -delete
 
 * Tue Sep 04 2012 Adam Jackson <ajax@redhat.com> 9.0-0.1
 - Initial packaging for split libGLU
+

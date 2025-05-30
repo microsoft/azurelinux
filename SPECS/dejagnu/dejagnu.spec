@@ -80,3 +80,4 @@ make DESTDIR=%{buildroot} install
 
 * Thu Jul 13 2017 Alexey Makhalov <amakhalov@vmware.com> - 1.5.3-1
 - Initial build. First version
+

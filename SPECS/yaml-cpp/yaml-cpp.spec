@@ -236,3 +236,4 @@ pushd build_static
 
 * Wed Oct 14 2009 Guido Grazioli <guido.grazioli@gmail.com> - 0.2.2-1
 - Initial packaging
+

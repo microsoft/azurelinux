@@ -388,3 +388,4 @@ mkdir -p $RPM_BUILD_ROOT%{_datadir}/accountsservice/interfaces/
 
 * Fri Jan 29 2010 Matthias Clasen <mclasen@redhat.com> 0.4-1
 - Initial packaging, based on work by Richard Hughes
+

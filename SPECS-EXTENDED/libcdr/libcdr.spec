@@ -312,3 +312,4 @@ make %{?_smp_mflags} check
 
 * Thu Mar 01 2012 David Tardon <dtardon@redhat.com> 0.0.3-1
 - initial import
+

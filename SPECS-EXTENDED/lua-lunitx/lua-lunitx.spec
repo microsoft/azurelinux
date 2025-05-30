@@ -82,3 +82,4 @@ LUA_PATH='%{buildroot}%{lua_pkgdir}/?.lua;;' %{buildroot}%{_bindir}/lunit --dont
 * Tue Aug 25 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 0.8.1-1
 - Initial Fedora package (replacing lua-lunit)
 
+

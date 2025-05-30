@@ -98,3 +98,4 @@ pytest -v tests
 
 * Mon Jan 08 2018 Ilya Gradina <ilya.gradina@gmail.com> - 0.05-1
 - Initial package
+

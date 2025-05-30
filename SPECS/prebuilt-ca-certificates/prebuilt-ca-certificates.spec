@@ -118,3 +118,4 @@ find %{buildroot} -name README -delete
 
 * Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-19
 - Original version for CBL-Mariner.
+

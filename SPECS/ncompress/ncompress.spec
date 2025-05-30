@@ -51,3 +51,4 @@ make PREFIX=%{_prefix} DESTDIR=%{buildroot} install_core
 
 * Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 5.0-1
 - Original version for CBL-Mariner
+

@@ -311,3 +311,4 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 
 * Fri May 22 2020 Ruying Chen <v-ruyche@microsoft.com> - 1.0-1
 - Original version for CBL-Mariner
+

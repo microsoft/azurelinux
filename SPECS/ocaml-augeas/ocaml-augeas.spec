@@ -88,3 +88,4 @@ ocamlfind install augeas META *.mli *.cma *.a augeas.cmi *.so
 
 * Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.6-31
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+

@@ -238,3 +238,4 @@ sed -i '/uchar/d' markup.opam
 
 * Fri Jan 10 2020 Jerry James <loganjerry@gmail.com> - 0.8.2-1
 - Initial RPM
+

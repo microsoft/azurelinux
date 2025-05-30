@@ -120,3 +120,4 @@ help2man -N --version-string=%{version} %{buildroot}%{_bindir}/cinaps > \
 
 * Thu Jan  2 2020 Jerry James <loganjerry@gmail.com> - 0.13.0-1
 - Initial RPM
+

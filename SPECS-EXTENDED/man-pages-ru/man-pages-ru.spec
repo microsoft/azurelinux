@@ -267,3 +267,4 @@ cp -pr ./man? $RPM_BUILD_ROOT%{_mandir}/ru
 
 * Sun Jun 11 2000 Trond Eivind Glomsrød <teg@redhat.com>
 - first build
+

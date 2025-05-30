@@ -192,3 +192,4 @@ pip3 install iniconfig
 
 * Wed Mar 23 2022 Parag Nemade <pnemade@fedoraproject.org> - 12.0.1-1
 - local build
+

@@ -305,3 +305,4 @@ rm -rf %{buildroot}%{_bindir}/*.bat
 
 * Thu Jun 25 2009 David Nalley <david@gnsa.us> 0.7.0-1
 - Initial packaging
+

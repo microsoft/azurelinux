@@ -111,3 +111,4 @@ install ttf/DejaVuMathTeXGyre.ttf %{buildroot}%{_serif_fontdir}
 
 * Fri May 21 2021 Jon Slobodzian <joslobo@microsoft.com> 2.37-1
 - Original version for CBL-Mariner.
+

@@ -369,3 +369,4 @@ sed -i '\@%{_datadir}@d' .ofiles
 
 * Wed Aug 08 2007 Richard W.M. Jones <rjones@redhat.com> - 0.7.1-1
 - Initial RPM release.
+

@@ -146,3 +146,4 @@ cp -pr target/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 
 * Sun Jan 24 2016 p.drouand@gmail.com
 - Initial release (version 3.4)
+

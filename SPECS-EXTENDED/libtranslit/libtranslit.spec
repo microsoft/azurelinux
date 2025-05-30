@@ -183,3 +183,4 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f '{}' ';'
 
 * Mon Mar  5 2012 Daiki Ueno <dueno@redhat.com> - 0.0.2-1
 - initial packaging for Fedora
+

@@ -126,3 +126,4 @@ cp -pr docs/api/* %{buildroot}%{_javadocdir}/%{name}/
 - Current version 2.0.8 from JPackage.org
 * Thu Sep  2 2004 skh@suse.de
 - Initial package created with version 2.08 (JPackage 1.5)
+

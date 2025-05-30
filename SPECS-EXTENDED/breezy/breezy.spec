@@ -188,3 +188,4 @@ echo ".so man1/git-remote-brz.1" > %{buildroot}%{_mandir}/man1/git-remote-bzr.1
 
 * Wed Sep 04 2019 Miro Hrončok <mhroncok@redhat.com> - 3.0.1-1
 - Package breezy
+

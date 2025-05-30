@@ -155,3 +155,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Wed Jun 26 2013 Debarshi Ray <rishi@fedoraproject.org> - 0.1.0-1
 - Initial spec.
+

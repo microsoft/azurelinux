@@ -244,3 +244,4 @@ internationalize software.
 
 * Thu Aug 04 2005 Ralf Corsepius <ralf@links2linux.de> - 1.05-0
 - Initial rpm.
+

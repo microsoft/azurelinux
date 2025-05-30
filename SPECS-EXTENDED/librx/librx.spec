@@ -195,3 +195,4 @@ chmod -x ${RPM_BUILD_ROOT}%{_includedir}/rxposix.h
 
 * Sat Apr 23 2005 Tom "spot" Callaway <tcallawa@redhat.com> 1.5-1
 - new package, based on Alexey Voinov's package from AltLinux
+

@@ -170,3 +170,4 @@ mv %{SOURCE1} ./LICENSE.txt
 
 * Wed Sep 28 2011 James Laska <jlaska@redhat.com> - 0.4.4-1
 - Initial package build
+

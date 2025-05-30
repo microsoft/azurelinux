@@ -361,3 +361,4 @@ are located on corosync cluster nodes.
 
 * Thu Sep 17 2009 Lon Hohberger <lhh@redhat.com> 0.1-1
 - Initial build for rawhide
+

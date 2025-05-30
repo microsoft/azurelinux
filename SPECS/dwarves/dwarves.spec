@@ -507,3 +507,4 @@ rm -Rf %{buildroot}
 
 * Thu Jan 11 2007 Arnaldo Carvalho de Melo <acme@ghostprotocols.net>
 - package created
+

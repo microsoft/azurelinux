@@ -135,3 +135,4 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 * Thu Jul 28 2005 Viktor Mihajlovski <mihajlov@de.ibm.com> - 1.2.3-0
 - Updates for rpmlint complaints
+

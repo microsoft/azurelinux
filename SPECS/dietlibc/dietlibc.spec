@@ -372,3 +372,4 @@ ulimit -m $[ 128*1024 ] -v $[ 256*1024 ] -d $[ 128*1024 ] -s 512
 * Sat Feb 18 2006 Enrico Scholz <enrico.scholz@informatik.tu-chemnitz.de> - 0.29-6
 - added '-Os' to the CFLAGS
 - exclude PPC arch due to strange compilation errors
+

@@ -587,3 +587,4 @@ exit 0
   for better behavior on multilib boxes
 - if we're not building a sample subpackage, include the sample files in
   the right locations as %%doc files
+

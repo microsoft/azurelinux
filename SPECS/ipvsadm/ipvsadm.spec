@@ -57,3 +57,4 @@ make install BUILD_ROOT=%{buildroot} MANDIR=%{_mandir}
 
 * Fri Nov 11 2016 Alexey Makhalov <amakhalov@vmware.com> 1.28-1
 - Initial build. First version
+

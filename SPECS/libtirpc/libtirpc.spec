@@ -107,3 +107,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 -   Updated to version 1.0.1
 *   Thu Jul 23 2015 Divya Thaluru <dthaluru@vmware.com> 0.3.2-1
 -   Initial version
+

@@ -180,3 +180,4 @@ done
 
 * Wed Jul 27 2011 dmacvicar@suse.de
 - Un-mavenize. Build with ant
+

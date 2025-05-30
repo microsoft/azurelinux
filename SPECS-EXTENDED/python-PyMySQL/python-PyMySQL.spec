@@ -248,3 +248,4 @@ and Jython.
 
 * Wed Nov 26 2014 Julien Enselme <jujens@jujens.eu> - 0.6.2-1
 - Initial packaging
+

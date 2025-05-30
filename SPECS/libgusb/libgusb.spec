@@ -236,3 +236,4 @@ GLib headers and libraries for gusb.
 
 * Thu Sep 15 2011 Richard Hughes <richard@hughsie.com> 0.1.0-1
 - Initial version for Fedora package review
+

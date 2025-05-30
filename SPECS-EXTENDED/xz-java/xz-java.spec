@@ -125,3 +125,4 @@ cp -pr build/doc/* %{buildroot}%{_javadocdir}/%{name}
 - Disabled download_files service - upstream server hangs
 * Thu Mar 28 2013 conrad@quisquis.de
 - Initial project creation
+

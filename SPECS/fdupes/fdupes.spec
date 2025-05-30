@@ -224,3 +224,4 @@ install -Dpm 0644 %{SOURCE1} %{buildroot}%{macrosdir}/macros.%{name}
 - Initial build. Imported SPEC from Rawhide.
 - Fixed Makefile to use DESTDIR correctly.
 - Fixed sources to include string.h.
+

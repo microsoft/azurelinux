@@ -466,3 +466,4 @@ chrpath --delete $RPM_BUILD_ROOT{%{_bindir},/usr/lib/udev}/mtp*
 
 * Wed Aug 23 2006 Linus Walleij <triad@df.lth.se> 0.0.13-1
 - First RPM'ed
+

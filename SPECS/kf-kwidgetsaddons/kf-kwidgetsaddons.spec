@@ -331,3 +331,4 @@ developing applications that use %{name}.
 
 * Sat Jan  4 2014 Daniel Vrátil <dvratil@redhat.com>
 - initial version
+

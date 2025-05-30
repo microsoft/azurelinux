@@ -505,3 +505,4 @@ The %{name}-devel package includes the header files for the %{name} library.
 
 * Sat Dec  5 2009 Matthias Clasen <mclasen@redhat.com> - 0.1.3-1
 - Initial packaging
+

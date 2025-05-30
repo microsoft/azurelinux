@@ -63,3 +63,4 @@ make PREFIX="%{_prefix}" DESTDIR="%{buildroot}" install
 
 *  Wed Jul 05 2017 Vinay Kulkarni <kulkarniv@vmware.com> 2.7.1-1
 -  Initial version of http-parser package for Photon.
+

@@ -106,3 +106,4 @@ are displayed separately.
 
 * Tue Sep 20 2016 Fabio Alessandro Locati <fale@fedoraproject.org> - 231-1
 - Initial packaging
+

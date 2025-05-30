@@ -467,3 +467,4 @@ export PYTHONPATH=%{buildroot}%{python3_sitelib}
 
 * Fri Apr 22 2005 Konstantin Ryabitsev <icon@linux.duke.edu> - 0.6.4-1
 - Initial packaging.
+

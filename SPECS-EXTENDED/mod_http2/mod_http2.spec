@@ -226,3 +226,4 @@ echo "LoadModule proxy_http2_module modules/mod_proxy_http2.so" > %{buildroot}%{
 
 * Mon Apr 10 2017 Luboš Uhliarik <luhliari@redhat.com> - 1.10.1-1
 - Initial import (#1440780).
+

@@ -153,3 +153,4 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 
 * Thu May  7 2009 mvyskocil@suse.cz
 - Initial SUSE packaging 0.9.94 from jpp 5.0
+

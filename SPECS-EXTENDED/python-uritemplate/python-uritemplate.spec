@@ -157,3 +157,4 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test -v
 
 * Wed Jun 29 2016 Igor Gnatenko <ignatenko@redhat.com> - 0.3.0-1
 - Initial package
+

@@ -133,3 +133,4 @@ fi
 - Fix prerequires of javadoc subpackage
 * Thu Sep  2 2004 skh@suse.de
 - Initial package created with version 5.0.18 (JPackage 1.5)
+

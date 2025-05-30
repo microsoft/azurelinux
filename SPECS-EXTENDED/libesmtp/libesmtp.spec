@@ -259,3 +259,4 @@ install -p -m644 -D libesmtp.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/libesmtp.pc
 
 * Tue Jul 23 2002 Bill Nottingham <notting@redhat.com> 0.8.12-2
 - fix broken lib (no pthread dependency)
+

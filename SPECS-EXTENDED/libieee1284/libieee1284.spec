@@ -241,3 +241,4 @@ rm -f %{buildroot}%{_libdir}/*.la
 
 * Thu Nov 15 2001 Tim Waugh <twaugh@redhat.com>
 - Initial specfile.
+

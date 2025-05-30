@@ -431,3 +431,4 @@ cd pyaff
 
 * Fri Nov  2 2007 kwizart < kwizart at gmail.com > - 2.4.0-1
 - Initial package for Fedora
+

@@ -4095,3 +4095,4 @@ Resolves: rhbz#974132
 
 * Tue Jun 01 2010 Rahul Sundaram <sundaram@fedoraproject.org> - 0-0.0.git2010-06-02
 - Initial spec (adopted from Kay Sievers)
+

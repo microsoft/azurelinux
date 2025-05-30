@@ -104,3 +104,4 @@ rm %{buildroot}/%{_bindir}/sha1pass
 - Remove md5pass and sha1pass tools
 * Tue Oct 17 2017 Alexey Makhalov <amakhalov@vmware.com> 6.04-1
 - Initial version
+

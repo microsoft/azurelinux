@@ -152,3 +152,4 @@ cp -pr  hawtjni-runtime/build/apidoc/* %{buildroot}%{_javadocdir}/hawtjni/
   using Maven.
 * Wed Jan 23 2019 Fridrich Strba <fstrba@suse.com>
 - Initial package for hawtjni version 1.16
+

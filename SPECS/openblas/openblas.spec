@@ -877,3 +877,4 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 
 * Sun Sep 18 2011 Jussi Lehtola <jussilehtola@fedoraproject.org> - 0.1-1.alpha2.4
 - First release.
+

@@ -118,3 +118,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Wed Nov 06 2013 Adam Jackson <ajax@redhat.com> 1.0-1
 - Initial packaging
+

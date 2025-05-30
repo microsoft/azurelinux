@@ -108,3 +108,4 @@ developing applications that use %{name}.
 
 * Wed May 22 2019 Marc-André Lureau <marcandre.lureau@redhat.com> - 4.0.0-1
 - Initial package, rhbz#1712980
+

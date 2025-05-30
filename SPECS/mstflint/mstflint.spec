@@ -299,3 +299,4 @@ find %{buildroot} -type f -name '*.a' -delete
 
 * Thu Jul 19 2007 - Vladimir Sokolovsky vlad@mellanox.co.il
 - Initial Package, Version 1.2
+

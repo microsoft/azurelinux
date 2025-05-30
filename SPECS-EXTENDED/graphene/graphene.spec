@@ -153,3 +153,4 @@ the functionality of the installed %{name} package.
 
 * Tue Nov 22 2016 Kalev Lember <klember@redhat.com> - 1.5.1-0.1.git8a7a4a3
 - Initial Fedora packaging
+

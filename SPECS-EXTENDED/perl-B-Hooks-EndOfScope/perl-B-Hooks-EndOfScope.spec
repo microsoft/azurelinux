@@ -424,3 +424,4 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 * Sat Nov 08 2008 Chris Weyl <cweyl@alumni.drew.edu> 0.04-0.1
 - initial RPM packaging
 - generated with cpan2dist (CPANPLUS::Dist::RPM version 0.0.5)
+

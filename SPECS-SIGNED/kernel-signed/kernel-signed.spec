@@ -920,3 +920,4 @@ echo "initrd of kernel %{uname_r} removed" >&2
 
 * Tue Aug 18 2020 Chris Co <chrco@microsoft.com> - 5.4.42-11
 - Original version for CBL-Mariner.
+

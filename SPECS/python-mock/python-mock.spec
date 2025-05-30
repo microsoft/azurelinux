@@ -197,3 +197,4 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 * Fri Jul 22 2011 Praveen Kumar <kumarpraveen.nitdgp@gmail.com> - 0.7.2-1
 - Initial RPM release
+

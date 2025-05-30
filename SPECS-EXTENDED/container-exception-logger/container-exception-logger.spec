@@ -81,3 +81,4 @@ cp man/container-exception-logger.1 %{buildroot}/%{_mandir}/man1/container-excep
 
 * Thu Mar 08 2018 Matej Habrnal <mhabrnal@redhat.com> 1.0.0-1
 - init
+

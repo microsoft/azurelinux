@@ -78,3 +78,4 @@ MC (Midnight Commander) is a text-mode full-screen file manager and visual shell
 
 * Tue Jul 12 2016 Alexey Makhalov <amakhalov@vmware.com> - 4.8.17-1
 - Initial build. First version
+

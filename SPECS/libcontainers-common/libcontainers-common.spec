@@ -710,3 +710,4 @@ fi
 
 * Thu Feb  8 2018 vrothberg@suse.com
 - Add libcontainers-common package.
+

@@ -637,3 +637,4 @@ make check-TESTS
 * Mon Nov 23 1998 Pablo Saratxaga <srtxg@chanae.alphanet.ch>
 - improved %%files section, and added use of %%{prefix} and install-info
   (well,... no. The info file has not dir info inside, commented out)
+

@@ -217,3 +217,4 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 * Mon Sep 22 2014 Parag Nemade <pnemade AT redhat DOT com> - 0.1.0-1
 - Initial packaging
+

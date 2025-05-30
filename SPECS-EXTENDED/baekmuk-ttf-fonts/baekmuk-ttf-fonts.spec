@@ -333,3 +333,4 @@ install -Dm 0644 -p %{SOURCE11} \
 
 * Sat Sep 22 2007 Jens Petersen <petersen@redhat.com> - 2.2-1
 - new package separated from fonts-korean (#253155)
+

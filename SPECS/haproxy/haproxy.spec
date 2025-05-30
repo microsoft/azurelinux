@@ -137,3 +137,4 @@ install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/hapr
 
 * Thu Oct 01 2015 Vinay Kulkarni <kulkarniv@vmware.com> - 1.5.14-1
 - Add haproxy v1.5 package.
+

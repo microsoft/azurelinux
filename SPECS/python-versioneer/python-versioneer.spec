@@ -127,3 +127,4 @@ sed -r -i '1{/^#!/d}' %{buildroot}%{python3_sitelib}/versioneer.py
 
 * Sun Dec 22 2019 Mukundan Ragavan <nonamedotc@gmail.com> - 0.18-1
 - Initial package.
+

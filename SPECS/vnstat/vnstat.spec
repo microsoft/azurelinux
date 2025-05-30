@@ -59,3 +59,4 @@ mkdir -p %{buildroot}%{_unitdir}/
 - Add vnstat spec
 - License verified
 - Original version for CBL-Mariner
+

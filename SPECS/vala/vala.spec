@@ -178,3 +178,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 *	Mon Apr 06 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.34.6-1
 -	Original version for CBL-Mariner.
+

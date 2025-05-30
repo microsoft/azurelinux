@@ -246,3 +246,4 @@ Python 3 version.
 - Remove files rpmlint doesn't like
 * Mon Nov 19 2012 Lorenzo Gil Sanchez <lorenzo.gil.sanchez@gmail.com> - 0.8.2-1
 - New package.
+

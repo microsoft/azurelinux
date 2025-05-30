@@ -174,3 +174,4 @@ install -p -m 0644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/%{name}-api-%{version}
 * Mon Mar 10 2008 anosek@suse.cz
 - new package needed to build saxon8, initial version 1.2.0,
   based on the JPackage project
+

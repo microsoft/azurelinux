@@ -204,3 +204,4 @@ make install DRV_ONLY=1 CUPSDRV=%{_datadir}/cups/drv/splix DESTDIR=%{buildroot}
 
 * Fri Nov 18 2011 Jiri Popelka <jpopelka@redhat.com> - 2.0.1-0.1.20111118svn
 - Initial spec file.
+

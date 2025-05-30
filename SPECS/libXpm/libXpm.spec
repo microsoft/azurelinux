@@ -143,3 +143,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Thu Mar 08 2012 Adam Jackson <ajax@redhat.com> 3.5.10-1
 - libXpm 3.5.10
+

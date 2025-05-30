@@ -240,3 +240,4 @@ done
 
 * Sat May 08 2004 Marcin Garski <garski@poczta.onet.pl> 1.1.2.1-1
 - Initial specfile
+

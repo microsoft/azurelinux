@@ -89,3 +89,4 @@ chmod -x runme
 
 * Fri Jun 22 2007 - hvogel@suse.de
 - Initial Package, Version 1.1
+

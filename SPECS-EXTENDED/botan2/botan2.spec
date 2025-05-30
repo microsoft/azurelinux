@@ -246,3 +246,4 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} ./botan-test
 
 * Sat Aug 12 2017 Benjamin Kircher <benjamin.kircher@gmail.com> - 2.2.0-1
 - New package. No need for compat-openssl10-devel anymore with 2.2.0 release
+

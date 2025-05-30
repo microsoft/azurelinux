@@ -158,3 +158,4 @@ mv oslo_i18n/locale %{buildroot}%{_datadir}/locale
 
 * Fri Mar 08 2019 RDO <dev@lists.rdoproject.org> 3.23.1-1
 - Update to 3.23.1
+

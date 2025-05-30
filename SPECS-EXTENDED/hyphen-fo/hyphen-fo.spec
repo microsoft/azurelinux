@@ -97,3 +97,4 @@ cp -p hyph_fo_FO.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen
 
 * Mon Aug 10 2009 Caolan McNamara <caolanm@redhat.com> - 0.20040420-1
 - initial version
+

@@ -178,3 +178,4 @@ rm -rf %{buildroot}%{_libdir}/gstreamer-1.0/
 
 * Sun Feb 22 2015 David King <amigadave@amigadave.com> - 3.0.4-1
 - Initial packaging (#1190361)
+

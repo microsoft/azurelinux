@@ -71,3 +71,4 @@ find %{buildroot} -type f -name '*.la' -exec rm -f {} ';'
 
 * Wed Apr 05 2017 Anish Swaminathan <anishs@vmware.com> - 1.0.1-1
 - Initial packaging
+

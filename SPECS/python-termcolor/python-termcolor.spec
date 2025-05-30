@@ -138,3 +138,4 @@ A Python 3 version of ANSI Color formatting for output in terminal.
 
 * Tue Sep 11 2012 Matthias Runge <mrunge@matthias-runge.de> - 1.1.0-1
 - Initial package.
+

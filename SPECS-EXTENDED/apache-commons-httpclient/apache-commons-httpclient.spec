@@ -258,3 +258,4 @@ ln -s %{_javadocdir}/%{name} dist/docs/apidocs
 - add jakarta- compat symlinks
 * Sun Feb  3 2013 p.drouand@gmail.com
 - Initial release
+

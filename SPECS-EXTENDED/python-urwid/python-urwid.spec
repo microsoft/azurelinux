@@ -230,3 +230,4 @@ PYTHON=%{__python3} %{__python3} setup.py test || :
 
 * Wed May 19 2010 David Cantrell <dcantrell@redhat.com> - 0.9.9.1-1
 - Initial package
+

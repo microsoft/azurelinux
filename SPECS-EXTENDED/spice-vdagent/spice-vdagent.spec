@@ -236,3 +236,4 @@ autoreconf -fi
 
 * Sat Oct 30 2010 Hans de Goede <hdegoede@redhat.com> 0.6.3-1
 - Initial Fedora package
+

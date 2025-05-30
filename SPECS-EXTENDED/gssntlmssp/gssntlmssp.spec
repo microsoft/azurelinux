@@ -195,3 +195,4 @@ make test_gssntlmssp
 * Thu Oct 17 2013 Simo Sorce <simo@samba.org> - 0.1.0-1
 - Initial import of 0.1.0
 
+

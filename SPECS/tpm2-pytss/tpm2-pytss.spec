@@ -87,3 +87,4 @@ fi
 - Update release to compile with python 3.11
 * Wed Oct 05 2022 Shreenidhi Shedi <sshedi@vmware.com> 1.2.0-1
 - First build. Needed for tpm2-pkcs11.
+

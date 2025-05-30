@@ -111,3 +111,4 @@ cp -p wa.aff $RPM_BUILD_ROOT/%{_datadir}/myspell/wa_BE.aff
 
 * Mon Sep 22 2008 Caolan McNamara <caolanm@redhat.com> - 0.4.15-1
 - initial version
+

@@ -109,3 +109,4 @@ rm -rf %{buildroot}%{_infodir}
 - Removing perl-libintl package from run-time required packages
 * Wed Nov 5 2014 Divya Thaluru <dthaluru@vmware.com> 5.2-1
 - Upgrade version
+

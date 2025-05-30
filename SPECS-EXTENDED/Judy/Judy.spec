@@ -198,3 +198,4 @@ cd -
 
 * Sun Oct 05 2008 Charles R. Anderson <cra@wpi.edu> - 1.0.4-1
 - Initial package for Fedora
+

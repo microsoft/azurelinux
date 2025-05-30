@@ -340,3 +340,4 @@ chmod -x NEWS
 
 * Tue Jun  1 1999 Dmitry V. Levin <ldv@fandra.org>
 - initial revision
+

@@ -67,3 +67,4 @@ BuildRequires:  python3-wheel
 * Tue Feb 13 2024 Andrew Phelps <anphel@microsoft.com> - 24.0-1
 - License verified
 - Original version for Azure Linux.
+

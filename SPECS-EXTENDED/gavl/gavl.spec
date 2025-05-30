@@ -189,3 +189,4 @@ touch -r include/gavl/gavl.h $RPM_BUILD_ROOT%{_includedir}/gavl/gavl_version.h
 
 * Mon May 19 2008 kwizart < kwizart at gmail.com > - 0.2.7-4
 - Initial package for Fedora
+

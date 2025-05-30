@@ -242,3 +242,4 @@ rm $RPM_BUILD_ROOT%{_libdir}/*.la
 * Sun Jan 14 2007 Behdad Esfahbod <besfahbo@redhat.com> 0.1.7-1
 - Initial package based on package by Supphachoke Suntiwichaya
   and Kamthorn Krairaksa for the OLPC.
+

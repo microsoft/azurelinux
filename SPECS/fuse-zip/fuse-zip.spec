@@ -208,3 +208,4 @@ sed -i "s|prefix=/usr/local|prefix=%{_prefix}|" Makefile
 * Tue Nov 04 2008 Rakesh Pandit <rakesh@fedoraproject.org> 0.2.6-1
 - initial package
 
+

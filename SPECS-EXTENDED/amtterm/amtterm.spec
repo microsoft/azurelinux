@@ -162,3 +162,4 @@ rm -f %{buildroot}%{_mandir}/man1/gamt.1
   * some protocol fixups.
 * Thu Aug 09 2007 Gerd Hoffmann <kraxel@redhat.com> - 0.1-1
 - initial release
+

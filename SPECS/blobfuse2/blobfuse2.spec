@@ -136,3 +136,4 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 - Add blobfuse2 spec
 - License verified
 - Original version for CBL-Mariner
+

@@ -299,3 +299,4 @@ fi
 
 *   Tue Oct 25 2022 Dallas Delaney <dadelan@microsoft.com> 0.1.0-1
 -   Initial rpm data and spec added
+

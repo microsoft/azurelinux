@@ -363,3 +363,4 @@ ln -s %{modname}-3 %{buildroot}%{_bindir}/%{modname}
 
 * Fri Jul 29 2016 Jon Ciesla <limburgher@gmail.com> - 4.2.5-1
 - Initial package.
+

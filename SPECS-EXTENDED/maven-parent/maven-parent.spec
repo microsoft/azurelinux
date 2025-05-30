@@ -204,3 +204,4 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}/%{name}.pom
 
 * Thu Jun 23 2011 Stanislav Ochotnicky <sochotnicky@redhat.com> - 20-1
 - Initial version of the package
+

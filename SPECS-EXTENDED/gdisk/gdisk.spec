@@ -273,3 +273,4 @@ make test
 
 * Fri Jan 15 2010 R Smith <rodsmith@rodsbooks.com> - 0.6.0
 - created spec file for 0.6.0 release
+

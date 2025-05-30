@@ -300,3 +300,4 @@ ruby -rrubygems -Ilib/ -S rspec spec/
 
 * Fri Nov 05 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.1-1
 - Initial package
+

@@ -577,3 +577,4 @@ rm -rf %{buildroot}%{_defaultdocdir}/%{name}/README
 
 * Sun Oct 15 2006 Tom "spot" Callaway <tcallawa@redhat.com> 0.1.20070920-1
 - Initial package for Fedora Extras
+

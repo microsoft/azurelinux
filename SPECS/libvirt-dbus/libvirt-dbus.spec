@@ -106,3 +106,4 @@ exit 0
 
 * Tue Mar 27 2018 Pavel Hrdina <phrdina@redhat.com> - 0.0.1-1
 - Initial RPM build
+

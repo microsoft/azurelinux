@@ -108,3 +108,4 @@ make install DESTDIR=%{buildroot}
 
 * Mon May 27 2013 Honza Horak <hhorak@redhat.com> - 1.2-1
 - Initial packaging
+

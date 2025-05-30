@@ -112,3 +112,4 @@ cp -p src/thesaurus/th_uk_UA_v2.* $RPM_BUILD_ROOT/%{_datadir}/mythes
 
 * Fri Feb 06 2009 Caolán McNamara <caolanm@redhat.com> - 1.5.7-1
 - initial version
+

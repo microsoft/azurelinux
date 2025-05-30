@@ -45,3 +45,4 @@ mkdir -p pyproject-wheeldir/ && cp ./dist/*.whl pyproject-wheeldir/
 %changelog
 * Mon Dec 19 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.8.1-1
 - Original version for CBL-Mariner. License Verified.
+

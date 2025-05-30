@@ -858,3 +858,4 @@ python3 runtests.py --no-build -- -ra -k 'not test_ppc64_ibm_double_double128'
 * Thu Feb  2 2006 Ignacio Vazquez-Abrams <ivazquez@ivazquez.net> 0.9.4-1
 - Initial RPM release
 - Added gfortran patch from Neal Becker
+

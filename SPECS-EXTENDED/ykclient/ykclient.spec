@@ -131,3 +131,4 @@ chrpath -d $RPM_BUILD_ROOT%{_bindir}/ykclient
 
 * Wed Apr 29 2009 Dennis Gilmore <dennis@ausil.us> - 2.2-1
 - initial packaging
+

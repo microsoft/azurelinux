@@ -369,3 +369,4 @@ export LDFLAGS="-lzopfli ${LDFLAGS-}"
 
 * Thu May 22 2003 Matthias Saou <http://freshrpms.net/>
 - Initial RPM release.
+

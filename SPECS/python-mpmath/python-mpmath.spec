@@ -241,3 +241,4 @@ sed -i -r 's/use_scm_version=True/version="%{version}"/' setup.py
 
 * Wed Sep 23 2009 Jussi Lehtola <jussilehtola@fedoraproject.org> - 0.13-1
 - First release.
+

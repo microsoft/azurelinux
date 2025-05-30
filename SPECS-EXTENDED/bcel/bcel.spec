@@ -173,3 +173,4 @@ install -m 644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/%{name}-%{version}.pom
 * Mon Feb  9 2004 pmladek@suse.cz
 - package created, version 5.1
 - added trigger to create link to the ant lib dir
+

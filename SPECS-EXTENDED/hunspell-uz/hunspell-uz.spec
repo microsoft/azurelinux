@@ -100,3 +100,4 @@ cp -p hunspell/uz_UZ* $RPM_BUILD_ROOT/%{_datadir}/myspell/
 
 * Wed Sep 20 2006 Caolan McNamara <caolanm@redhat.com> - 0.6-1
 - initial version
+

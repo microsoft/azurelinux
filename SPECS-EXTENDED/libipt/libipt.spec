@@ -146,3 +146,4 @@ ctest -V %{?_smp_mflags}
 
 * Mon Aug 31 2015 Jan Kratochvil <jan.kratochvil@redhat.com> - 1.4.2-1
 - Initial Fedora packaging.
+

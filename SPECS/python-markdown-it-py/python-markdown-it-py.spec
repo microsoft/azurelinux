@@ -128,3 +128,4 @@ Resolves: rhbz#2028769
 
 * Thu May 13 2021 Karolina Surma <ksurma@redhat.com> - 1.1.0-1
 - Initial package.
+

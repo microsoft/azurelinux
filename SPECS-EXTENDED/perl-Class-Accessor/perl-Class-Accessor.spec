@@ -202,3 +202,4 @@ make test
 
 * Wed Jul  6 2005 Tom "spot" Callaway <tcallawa@redhat.com> 0.19-1
 - Initial package for Fedora Extras
+

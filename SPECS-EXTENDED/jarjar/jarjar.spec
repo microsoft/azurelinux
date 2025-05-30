@@ -168,3 +168,4 @@ cp -pr dist/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 - Move from jpackage-utils to javapackage-tools
 * Thu Apr 23 2009 mvyskocil@suse.cz
 - Initial packaging for SUSE. Version 0.9 (jpp5)
+

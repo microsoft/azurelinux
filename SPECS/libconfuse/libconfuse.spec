@@ -67,3 +67,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Add libconfuse spec
 - License verified
 - Original version for CBL-Mariner
+

@@ -318,3 +318,4 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 
 * Sun Aug 8 1999 Tim Powers <timp@redhat.com>
 - rebuilt to be included in Powertools
+

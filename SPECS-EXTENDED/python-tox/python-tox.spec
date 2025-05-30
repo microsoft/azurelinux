@@ -351,3 +351,4 @@ rm -rf .path
 
 * Tue Oct 09 2012 Matthias Runge <mrunge@redhat.com> - 1.4.2-1
 - initial packaging
+

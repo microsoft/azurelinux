@@ -87,3 +87,4 @@ cp -p dictionaries/tpi_PG.* $RPM_BUILD_ROOT/%{_datadir}/myspell
 
 * Sun Mar 20 2011 Caolán McNamara <caolanm@redhat.com> - 0.05-1
 - initial version
+

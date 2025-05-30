@@ -490,3 +490,4 @@ rm -rf %{buildroot}%{ocamldir}/lwt_ppx_let
 
 * Mon Sep  1 2008 Richard W.M. Jones <rjones@redhat.com> - 1.1.0-1
 - Initial RPM release.
+

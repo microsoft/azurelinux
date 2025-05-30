@@ -145,3 +145,4 @@ make check
 
 * Thu Jul 01 2010 Kalev Lember <kalev@smartlink.ee> - 1.7-1
 - Initial RPM release
+

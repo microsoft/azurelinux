@@ -112,3 +112,4 @@ install -D -p -m 0644 %{SOURCE1} $RPM_BUILD_ROOT%{_unitdir}/cgdcbxd.service
 
 * Mon Jun 25 2012 Neil Horman <nhorman@tuxdriver.com> 1.0.1-1 
 - Initial build
+

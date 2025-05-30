@@ -177,3 +177,4 @@ BuildRequires:  python3-pip
 
 * Mon Sep 15 2014 Alan Pevec <apevec@redhat.com> - 0.2.0-1
 - Initial package.
+

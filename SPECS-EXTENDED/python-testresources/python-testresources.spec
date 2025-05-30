@@ -140,3 +140,4 @@ rm -rf lib/%{pypi_name}.egg-info
 
 * Wed May 29 2013 Matthias Runge <mrunge@redhat.com> - 0.2.7-1
 - Initial package.
+

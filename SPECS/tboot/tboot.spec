@@ -94,3 +94,4 @@ install -m 755 %{SOURCE2} %{buildroot}%{_docdir}/README.md
 -   Ensure non empty debuginfo
 *   Thu Mar 2 2017 Alexey Makhalov <amakhalov@vmware.com> 1.9.5-1
 -   Initial build. First version
+

@@ -196,3 +196,4 @@ python3 test/run_readelf_tests.py || :
 
 * Wed Jun 06 2012 Kushal Das <kushal@fedoraproject.org> 0.20-1
 - Intial package (#829676)
+

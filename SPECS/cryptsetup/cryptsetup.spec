@@ -684,3 +684,4 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Fri Apr 16 2004 Bill Nottingham <notting@redhat.com> 0.1-1
 - initial packaging
+

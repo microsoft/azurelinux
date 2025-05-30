@@ -204,3 +204,4 @@ The drpm-devel package provides a C interface (drpm.h) for the drpm library.
 
 * Wed Nov 5 2014 Matej Chalk <mchalk@redhat.com> 0.1.0-1
 - Initial RPM release
+

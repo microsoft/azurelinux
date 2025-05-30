@@ -87,3 +87,4 @@ install -m644 *.8 %{buildroot}%{_mandir}/man8
 
 * Thu Oct 30 2014 Divya Thaluru <dthaluru@vmware.com> - 0.8.10-1
 - Initial build.	First version
+

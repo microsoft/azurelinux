@@ -136,3 +136,4 @@ mkdir -p $RPM_BUILD_ROOT/%{_datadir}/mythes
 
 * Thu Mar 11 2010 Caolán McNamara <caolanm@redhat.com> - 1.2.0-1
 - initial version
+

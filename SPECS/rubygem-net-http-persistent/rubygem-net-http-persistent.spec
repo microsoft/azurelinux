@@ -40,3 +40,4 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 - .gemspec file taken from upstream master branch (License MIT)
 - License verified
 - Original version for CBL-Mariner
+

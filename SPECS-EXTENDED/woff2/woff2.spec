@@ -107,3 +107,4 @@ popd
 
 * Mon Oct 09 2017 Tomas Popela <tpopela@redhat.com> 1.0.1-1
 - Initial import (rhbz#1499676)
+

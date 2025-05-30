@@ -87,3 +87,4 @@ cp -p dictionaries/haw-US.dic $RPM_BUILD_ROOT/%{_datadir}/myspell/haw.dic
 
 * Tue Jun 28 2011 Caolán McNamara <caolanm@redhat.com> - 0.01-1
 - initial version
+

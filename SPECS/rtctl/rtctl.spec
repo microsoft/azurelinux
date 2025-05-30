@@ -69,3 +69,4 @@ fi
 
 * Fri Sep 12 2014 Luis Claudio R. Goncalves <lgoncalv@redhat.com> - 1.12-4
 - rtctl for RHEL-RT
+

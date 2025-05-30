@@ -94,3 +94,4 @@ install -D -m755 contrib/pzstd/pzstd %{buildroot}%{_bindir}/pzstd
 
 * Sat May 2 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.4.4-1
 - Original version for CBL-Mariner.
+

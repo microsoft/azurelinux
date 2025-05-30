@@ -277,3 +277,4 @@ developing applications that use %{name}.
 
 * Sun Jun 16 2013 Kalev Lember <kalevlember@gmail.com> - 0.0.2-1
 - Initial Fedora build
+

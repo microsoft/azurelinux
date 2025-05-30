@@ -156,3 +156,4 @@ make test AUTHOR_TEST=1 AUTHOR_TEST_CDOLAN=1
 
 * Fri Mar 18 2011 Paul Howarth <paul@city-fan.org> - 0.50-1
 - Initial RPM version
+

@@ -252,3 +252,4 @@ make install DESTDIR=%{buildroot} INSTALL="%{__install} -p"
 * Mon Apr 18 2005 Douglas Gilbert <dgilbert at interlog dot com> - 0.90
 - initial version
 - sdparm-0.90
+

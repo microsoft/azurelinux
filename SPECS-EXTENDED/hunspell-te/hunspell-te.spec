@@ -113,3 +113,4 @@ cp -p te_IN/*.dic te_IN/*.aff $RPM_BUILD_ROOT/%{_datadir}/myspell
 - initial version
 
 
+

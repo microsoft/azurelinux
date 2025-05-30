@@ -105,3 +105,4 @@ cp -p fur_IT.* $RPM_BUILD_ROOT/%{_datadir}/myspell/
 
 * Mon Sep 29 2008 Caolan McNamara <caolanm@redhat.com> - 0.20050912-1
 - initial version
+

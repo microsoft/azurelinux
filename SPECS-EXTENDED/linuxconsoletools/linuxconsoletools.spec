@@ -180,3 +180,4 @@ chmod -x %{buildroot}%{_mandir}/man1/*
 
 * Wed Jan 02 2013 Jaromir Capik <jcapik@redhat.com> - 1.4.4-1
 - Initial package
+

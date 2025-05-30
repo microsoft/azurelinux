@@ -3291,3 +3291,4 @@ containernetworking-cni
 
 * Wed Jan 10 2018 Frantisek Kluknavsky <fkluknav@redhat.com> - 0-0.1.gitc1b2278
 - First package for Fedora
+

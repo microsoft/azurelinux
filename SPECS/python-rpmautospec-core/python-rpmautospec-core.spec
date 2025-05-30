@@ -99,3 +99,4 @@ echo '%{python3_sitelib}/%{srcname}*' > %{pyproject_files}
 * Wed Aug 28 2028 Reuben Olinsky <reubeno@microsoft.com> - 0.1.5-1
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
+

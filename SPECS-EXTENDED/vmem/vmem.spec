@@ -223,3 +223,4 @@ make install DESTDIR=%{buildroot} \
 
 * Fri Jan 24 2020 Adam Borowski <kilobyte@angband.pl> - 1.8~rc1-1
 - Initial RPM release
+

@@ -249,3 +249,4 @@ pip3 install iniconfig
 
 * Thu Nov 28 2013 Bohuslav Kabrda <bkabrda@redhat.com> - 0.22.0-1
 - Initial package.
+

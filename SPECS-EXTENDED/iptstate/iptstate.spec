@@ -202,3 +202,4 @@ make install PREFIX=%{buildroot}%{_prefix} INSTALL="install -p"
 
 * Mon Jan 26 2004 Thomas Woerner <twoerner@redhat.com> 1.3-1
 - initial package
+

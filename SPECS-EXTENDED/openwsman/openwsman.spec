@@ -600,3 +600,4 @@ rm -f /var/log/wsmand.log
 
 * Tue Aug 19 2008  <srinivas_ramanatha@dell.com> - 2.0.0-1
 - Modified the spec file to adhere to fedora packaging guidelines.
+

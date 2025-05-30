@@ -212,3 +212,4 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} make -C testsuite do_thread_test
 
 * Fri Sep 22 2006 Francois Aucamp <faucamp@csir.co.za> - 1.3-1
 - Initial RPM build
+

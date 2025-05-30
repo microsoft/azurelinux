@@ -316,3 +316,4 @@ make check -k || (cat test-suite.log && false)
 
 * Mon Jul 17 2006 John (J5) Palmieri <johnp@redhat.com> - 0.70-1
 - Initial package import
+

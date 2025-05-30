@@ -231,3 +231,4 @@ ctest -V %{?_smp_mflags}
 
 * Thu May 17 2012 Peter Lemenkov <lemenkov@gmail.com> - 1.4.0-1
 - Initial package
+

@@ -474,3 +474,4 @@ install -m0644 mlogc/mlogc-default.conf %{buildroot}%{_sysconfdir}/mlogc.conf
 
 * Thu May 19 2005 Michael Fleming <mfleming+rpm@enlartenment.com> 1.8.7-1
 - Initial spin for Extras
+

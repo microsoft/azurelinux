@@ -391,3 +391,4 @@ rm -fv %{buildroot}%{_libdir}/lib*.la
 * Fri Jun 04 2010 Siddhesh Poyarekar <siddhesh.poyarekar@gmail.com> 0.9.1-1
 - New package
 
+

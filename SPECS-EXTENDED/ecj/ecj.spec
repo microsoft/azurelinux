@@ -211,3 +211,4 @@ install -m 644 -p ecj.1 %{buildroot}%{_mandir}/man1/ecj.1
   (cf. packaging guidelines)
 * Thu Nov 22 2007 anosek@suse.cz
 - new package, initial version 3.3
+

@@ -125,3 +125,4 @@ sed -e 's|test/misc.test||' -i test/Makemodule.am Makefile.in Makefile
 
 * Thu Feb 26 2015 Divya Thaluru <dthaluru@vmware.com> - 2.2.52-1
 - Initial version
+

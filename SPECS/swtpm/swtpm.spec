@@ -364,3 +364,4 @@ fi
 - Created initial version of rpm spec files
 - Version is now 0.1.0
 - Bugzilla for this spec: https://bugzilla.redhat.com/show_bug.cgi?id=1611829
+

@@ -132,3 +132,4 @@ cp -pr samples $RPM_BUILD_ROOT%{_datadir}/%{name}
   many virtual machinses
 * Tue May 12 2009 mvyskocil@suse.cz
 - Initial packaging of junitperf 1.9.1 from jpp 5.0
+

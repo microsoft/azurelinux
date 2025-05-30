@@ -331,3 +331,4 @@ make test
 * Sat Sep 06 2008 Chris Weyl <cweyl@alumni.drew.edu> 1.01-1
 - initial Fedora packaging
 - generated with cpan2dist (CPANPLUS::Dist::Fedora version 0.0.1)
+

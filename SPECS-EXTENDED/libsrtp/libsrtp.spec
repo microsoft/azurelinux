@@ -159,3 +159,4 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 
 * Mon Oct  4 2010 Tom "spot" Callaway <tcallawa@redhat.com> - 1.4.4-1.20101004cvs
 - initial package
+

@@ -137,3 +137,4 @@ cp -pr  build/javadoc/* %{buildroot}%{_javadocdir}/%{name}/
 
 * Wed Oct 24 2018 Fridrich Strba <fstrba@suse.com>
 - Initial packaging of atinject adapted from Fedora rpm
+

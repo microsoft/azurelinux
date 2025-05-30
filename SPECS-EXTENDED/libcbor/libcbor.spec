@@ -154,3 +154,4 @@ Resolves: rhbz#1863978
 
 * Wed Jul 19 2017 Marek Tamaskovic <mtamasko@redhat.com> 0.5.0-1
 - Init package.
+

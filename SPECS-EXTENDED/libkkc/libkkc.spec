@@ -279,3 +279,4 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 * Thu Jan 24 2013 Daiki Ueno <dueno@redhat.com> - 0.0.1-1
 - initial packaging
 
+

@@ -622,3 +622,4 @@ done
 
 * Tue Nov 20 2018 Björn Esser <besser82@fedoraproject.org> - 4.4.0-1
 - New upstream release
+

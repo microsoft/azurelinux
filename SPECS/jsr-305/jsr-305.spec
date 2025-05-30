@@ -174,3 +174,4 @@ cp -pr ri/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 
 * Wed Jun  3 2009 mvyskocil@suse.cz
 - Initial SUSE packaging based on jpp 5.0
+
