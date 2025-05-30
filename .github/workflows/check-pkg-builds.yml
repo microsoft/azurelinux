@@ -13,14 +13,14 @@ on:
   push:
     branches: [3.0*, fasttrack/3.0]
     paths:
-      - ".github/workflows/check-pkg-build.yml"
+      - ".github/workflows/check-pkg-builds.yml"
       - "toolkit/Makefile"
       - "toolkit/scripts/*"
       - "toolkit/tools/*"
   pull_request:
     branches: [3.0*, fasttrack/3.0]
     paths:
-      - ".github/workflows/check-pkg-build.yml"
+      - ".github/workflows/check-pkg-builds.yml"
       - "toolkit/Makefile"
       - "toolkit/scripts/*"
       - "toolkit/tools/*"
