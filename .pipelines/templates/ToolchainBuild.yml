@@ -41,7 +41,7 @@ steps:
 
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" toolchain "-j$(nproc)" \
         QUICK_REBUILD=y \
-        $additional_args \
+        $additional_args
     displayName: "Build toolchain"
 
   - bash: |
