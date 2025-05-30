@@ -84,7 +84,7 @@ script_dir=$(realpath $(dirname "${BASH_SOURCE[0]}"))
 topdir=/usr/src/azl
 enable_local_repo=false
 keep_container="--rm"
-packages_to_install="azurelinux-release vim git jq"
+packages_to_install="azurelinux-release vim git jq azurelinux-release"
 
 while (( "$#")); do
   case "$1" in
