@@ -1,0 +1,41 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: Dummy action check
+
+env:
+  REGULAR_PKG: words
+  REGULAR_PKG_SPEC_PATH: SPECS/$REGULAR_PKG/$REGULAR_PKG.spec
+  TOOLCHAIN_PKG: xz
+  TOOLCHAIN_PKG_SPEC_PATH: SPECS/$TOOLCHAIN_PKG/$TOOLCHAIN_PKG.spec
+
+on:
+  push:
+    branches: [3.0*, fasttrack/3.0]
+    paths:
+      - ".github/workflows/check-package-build.yml"
+      - "toolkit/Makefile"
+      - "toolkit/scripts/*"
+      - "toolkit/tools/*"
+  pull_request:
+    branches: [3.0*, fasttrack/3.0]
+    paths:
+      - ".github/workflows/check-dummy-action.yml"
+      - ".github/workflows/check-package-build.yml"
+      - "toolkit/Makefile"
+      - "toolkit/scripts/*"
+      - "toolkit/tools/*"
+
+jobs:
+  pkg-build-success-ok:
+    name: Simple package build succeeds
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v4
+
+      - name: Print env
+        run: |
+          echo "REGULAR_PKG: $REGULAR_PKG, TOOLCHAIN_PKG: $TOOLCHAIN_PKG"
+          echo "REGULAR_PKG_SPEC_PATH: $REGULAR_PKG_SPEC_PATH, TOOLCHAIN_PKG_SPEC_PATH: $TOOLCHAIN_PKG_SPEC_PATH"
