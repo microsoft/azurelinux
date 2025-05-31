@@ -18,6 +18,11 @@ parameters:
     type: string
     default: ""
 
+  - name: dailyBuildID
+    type: string
+    default: ""
+    displayName: "Daily build ID"
+
   - name: extraPackageRepos
     type: string
     default: ""
@@ -226,6 +231,12 @@ steps:
         max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}"
       fi
 
+      additional_args=""
+      if [[ ${{ parameters.dailyBuildID }} == "lkg" ]]; then
+        echo "##[debug]Building toolchain for latest daily build without using daily build manifests"
+        additional_args="DAILY_BUILD_ID=${{ parameters.dailyBuildID }} DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
+      fi
+
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
@@ -244,7 +255,8 @@ steps:
         $quick_rebuild_packages_arg \
         $run_check_arg \
         $toolchain_archive_arg \
-        $use_ccache_arg
+        $use_ccache_arg \
+        $additional_args
     displayName: "Build packages"
 
   - ${{ if parameters.outputArtifactsFolder }}:
