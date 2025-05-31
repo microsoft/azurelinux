@@ -22902,6 +22902,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-geomet",
+          "version": "0.3.0",
+	  "downloadUrl": "https://github.com/geomet/geomet/archive/refs/tags/0.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-gevent",
           "version": "23.9.1",
           "downloadUrl": "https://github.com/gevent/gevent/archive/23.9.1.tar.gz"
