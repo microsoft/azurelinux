@@ -15,9 +15,10 @@ runs:
   steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        fetch-tags: true
 
     - name: Checkout stable specs and manifests
       shell: bash
-      run: |
-        git fetch --depth 1 origin ${{ inputs.stable-ref }}
-        git checkout ${{ inputs.stable-ref }} -- SPECS toolkit/resources/manifests
+      run: git checkout ${{ inputs.stable-ref }} -- SPECS/ toolkit/resources/manifests/package/*.txt
