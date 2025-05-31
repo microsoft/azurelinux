@@ -1,0 +1,22 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: "Stable specs and manifests checkout"
+description: "Checks out the repo, and a stable version of both specs and manifests."
+inputs:
+  stable-ref:
+    description: "Stable tag for specs and manifests to checkout."
+    required: true
+    values:
+      - "3.0-stable"
+    default: "3.0-stable"
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Checkout stable specs and manifests
+      run: |
+        git fetch --depth 1 origin ${{ inputs.stable-ref }}
+        git checkout ${{ inputs.stable-ref }} -- SPECS toolkit/resources/manifests

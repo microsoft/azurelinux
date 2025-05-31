@@ -35,14 +35,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Workflow trigger checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
+        uses: ./.github/actions/checkout-with-stable-pkgs
 
       - name: Check if package build succeeds
         run: |
@@ -56,14 +50,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Workflow trigger checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
+        uses: ./.github/actions/checkout-with-stable-pkgs
 
       # Adding an invalid command to the '%prep' section will cause the build to fail.
       - name: Break the tested spec
@@ -93,14 +81,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Workflow trigger checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
+        uses: ./.github/actions/checkout-with-stable-pkgs
 
       - name: Check if a toolchain package rebuild succeeds
         run: |
@@ -116,14 +98,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Workflow trigger checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
+        uses: ./.github/actions/checkout-with-stable-pkgs
 
       - name: Check if a toolchain package rebuild fails
         run: |
@@ -151,14 +127,8 @@ jobs:
     name: None license check does not break the build
     runs-on: ubuntu-latest
     steps:
-      - name: Workflow trigger checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
+        uses: ./.github/actions/checkout-with-stable-pkgs
 
       - name: Break the tested spec
         run: |
@@ -185,14 +155,8 @@ jobs:
     name: Warning-only license check does not break the build
     runs-on: ubuntu-latest
     steps:
-      - name: Workflow trigger checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
+        uses: ./.github/actions/checkout-with-stable-pkgs
 
       - name: Break the tested spec
         run: |
@@ -220,14 +184,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Workflow trigger checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
+        uses: ./.github/actions/checkout-with-stable-pkgs
 
       - name: Break the tested spec
         run: |
@@ -268,14 +226,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Workflow trigger checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
+        uses: ./.github/actions/checkout-with-stable-pkgs
 
       - name: Break the tested spec
         run: |
@@ -304,14 +256,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Workflow trigger checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
       - name: Checkout a stable version of the specs
-        run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
+        uses: ./.github/actions/checkout-with-stable-pkgs
 
       - name: Break the tested spec
         run: |
