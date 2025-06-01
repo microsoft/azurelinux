@@ -2036,6 +2036,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "containerd",
+          "version": "1.7.13",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.7.13.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "containerd2",
           "version": "2.0.0",
           "downloadUrl": "https://github.com/containerd/containerd/archive/v2.0.0.tar.gz"
@@ -2950,6 +2960,16 @@
           "name": "dotnet-sdk-3.1",
           "version": "3.1.115",
           "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/cc86b0c8-9e72-4410-b3b0-2c5a8f90d8a4/426913359d4c524560e42c4f2ee18fa1/dotnet-sdk-3.1.115-linux-x64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "double-conversion",
+          "version": "3.3.1",
+          "downloadUrl": "https://github.com/google/double-conversion/archive/v3.3.1/double-conversion-3.3.1.tar.gz"
         }
       }
     },
@@ -6590,8 +6610,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.92.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.92.2.tar.gz"
+          "version": "6.6.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.90.1.tar.gz"
         }
       }
     },
@@ -8231,8 +8251,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.92.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.92.2.tar.gz"
+          "version": "6.6.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.90.1.tar.gz"
         }
       }
     },
@@ -8241,8 +8261,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.92.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.92.2.tar.gz"
+          "version": "6.6.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.90.1.tar.gz"
         }
       }
     },
@@ -8251,8 +8271,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.92.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.92.2.tar.gz"
+          "version": "6.6.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.90.1.tar.gz"
         }
       }
     },
@@ -8261,8 +8281,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.92.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.92.2.tar.gz"
+          "version": "6.6.90.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.90.1.tar.gz"
         }
       }
     },
@@ -12222,7 +12242,7 @@
         "other": {
           "name": "linux-firmware",
           "version": "20230804",
-          "downloadUrl": "https://www.kernel.org/pub/linux/kernel/firmware/linux-firmware-20230804.tar.gz"
+          "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/snapshot/linux-firmware-20230804.tar.gz"
         }
       }
     },
@@ -27144,8 +27164,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rexml",
-          "version": "3.3.9",
-          "downloadUrl": "https://github.com/ruby/rexml/archive/refs/tags/v3.3.9.tar.gz"
+          "version": "3.3.4",
+          "downloadUrl": "https://github.com/ruby/rexml/archive/refs/tags/v3.3.4.tar.gz"
         }
       }
     },
@@ -28746,8 +28766,8 @@
         "type": "other",
         "other": {
           "name": "systemd",
-          "version": "255",
-          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v255/systemd-255.tar.gz"
+          "version": "255.21",
+          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v255.21/systemd-255.21.tar.gz"
         }
       }
     },

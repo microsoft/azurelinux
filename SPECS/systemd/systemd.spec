@@ -45,12 +45,12 @@
 Name:           systemd
 Url:            https://systemd.io
 %if %{without inplace}
-Version:        255
+Version:        255.21
 %else
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        21%{?dist}
+Release:        1%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -142,7 +142,6 @@ Patch0491:      azurelinux-use-system-auth-in-pam-systemd-user.patch
 # Patches for Azure Linux
 Patch0900:      do-not-test-openssl-sm3.patch
 Patch0901:      networkd-default-use-domains.patch
-Patch0902:      CVE-2023-7008.patch
 
 %ifarch %{ix86} x86_64
 %global want_bootloader 1
@@ -1217,6 +1216,10 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Sun Jun 01 2025 Chris Co <chrco@microsoft.com> - 255.21-1
+- Update to stable version 255.21
+- Remove patch for CVE-2023-7008. stable release included it starting in 255.2
+
 * Mon Apr 14 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 255-21
 - Bumping 'Release' tag to match the 'signed' version of the spec.
 
