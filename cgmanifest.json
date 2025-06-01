@@ -1146,16 +1146,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "blobfuse2",
-          "version": "2.3.2",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.3.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "blosc",
           "version": "1.21.6",
           "downloadUrl": "https://github.com/Blosc/c-blosc/archive/v1.21.6/blosc-1.21.6.tar.gz"
@@ -2049,16 +2039,6 @@
           "name": "containerized-data-importer",
           "version": "1.57.0",
           "downloadUrl": "https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v1.57.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "containernetworking-plugins",
-          "version": "1.6.1",
-          "downloadUrl": "https://github.com/containernetworking/plugins/archive/v1.6.1.tar.gz"
         }
       }
     },
@@ -5279,16 +5259,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "helm",
-          "version": "3.15.2",
-          "downloadUrl": "https://github.com/helm/helm/archive/refs/tags/v3.15.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "help2man",
           "version": "1.49.3",
           "downloadUrl": "ftp://ftp.gnu.org/gnu/help2man/help2man-1.49.3.tar.xz"
@@ -7223,16 +7193,6 @@
           "name": "iftop",
           "version": "1.0",
           "downloadUrl": "http://www.ex-parrot.com/~pdw/iftop/download/iftop-1.0pre4.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "ig",
-          "version": "0.37.0",
-          "downloadUrl": "https://github.com/inspektor-gadget/inspektor-gadget/archive/refs/tags/v0.37.0.tar.gz"
         }
       }
     },
@@ -12330,16 +12290,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "local-path-provisioner",
-          "version": "0.0.24",
-          "downloadUrl": "https://github.com/rancher/local-path-provisioner/archive/refs/tags/v0.0.24.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "lockdev",
           "version": "1.0.4",
           "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/lockdev-1.0.4.20111007git.tar.gz"
@@ -14354,16 +14304,6 @@
           "name": "nmap",
           "version": "7.95",
           "downloadUrl": "https://nmap.org/dist/nmap-7.95.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "node-problem-detector",
-          "version": "0.8.20",
-          "downloadUrl": "https://github.com/kubernetes/node-problem-detector/archive/refs/tags/v0.8.20.tar.gz"
         }
       }
     },
@@ -21585,16 +21525,6 @@
           "name": "proj",
           "version": "9.2.1",
           "downloadUrl": "https://download.osgeo.org/proj/proj-9.2.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "prometheus",
-          "version": "2.45.4",
-          "downloadUrl": "https://github.com/prometheus/prometheus/archive/refs/tags/v2.45.4.tar.gz"
         }
       }
     },
