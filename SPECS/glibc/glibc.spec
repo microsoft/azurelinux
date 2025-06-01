@@ -10,7 +10,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -359,6 +359,9 @@ grep "^FAIL: nptl/tst-mutex10" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
+* Sun Jun  1 22:26:31 UTC 2025 Chris Co <chrco@microsoft.com> - 2.38-11
+- rebuilt
+
 * Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 2.38-10
 - Add glibc-2.34_pthread_cond_wait.patch
 
