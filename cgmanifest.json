@@ -2056,16 +2056,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "containernetworking-plugins",
-          "version": "1.6.1",
-          "downloadUrl": "https://github.com/containernetworking/plugins/archive/v1.6.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "convmv",
           "version": "2.05",
           "downloadUrl": "http://j3e.de/linux/convmv/convmv-2.05.tar.gz"
