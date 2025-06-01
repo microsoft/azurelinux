@@ -2957,6 +2957,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "double-conversion",
+          "version": "3.3.1",
+          "downloadUrl": "https://github.com/google/double-conversion/archive/v3.3.1/double-conversion-3.3.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dovecot",
           "version": "2.3.20",
           "downloadUrl": "https://www.dovecot.org/releases/2.3/dovecot-2.3.20.tar.gz"
