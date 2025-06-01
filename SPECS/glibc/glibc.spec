@@ -368,7 +368,7 @@ grep "^FAIL: nptl/tst-mutex10" tests.sum >/dev/null && n=$((n+1)) ||:
 
 %changelog
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.38-11
-- Patch CVE-2023-4527, CVE-2023-4806, CVE-2024-33599, CVE-2024-33600, CVE-2024-33601, CVE-2025-0395
+- Patch CVE-2023-4527, CVE-2023-4806, CVE-2024-33599, CVE-2024-33600, CVE-2024-33601, CVE-2025-0395, CVE-2025-4802
 - Fix CVE-2023-5156
 
 * Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 2.38-10
