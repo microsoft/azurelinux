@@ -10,11 +10,13 @@ bisecting, commit:
   351dad24a26f lan: Add processing of get/set specific CCs
 
 is identified to be the source of the problem, where the function
-get_lan_param_select is expected to consider severial error codes it
+get_lan_param_select is expected to consider several error codes it
 receives as empty response. It then constructs an empty response in `p`
 and assigns `p` to `rc` and the control flow falls through to the
 default case, which prints the error code in verbose mode and should
 return `rc` instead of `NULL`.
+
+Upstream Patch Reference: https://codeberg.org/IPMITool/ipmitool/commit/137aeb64cbb493d61d6945cac156aba5f0510780
 
 Signed-off-by: Miao Wang <shankerwangmiao@gmail.com>
 ---
