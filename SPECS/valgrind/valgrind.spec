@@ -9,7 +9,7 @@ Distribution:   Azure Linux
 Group:          Development/Debuggers
 URL:            https://valgrind.org
 Source0:        https://sourceware.org/pub/%{name}/%{name}-%{version}.tar.bz2
-BuildRequires:  glibc-devel
+#BuildRequires:  glibc-devel
 BuildRequires:  pkg-config
 %if 0%{?with_check}
 BuildRequires:  docbook-dtd-xml
