@@ -205,8 +205,8 @@
         "type": "other",
         "other": {
           "name": "ansible",
-          "version": "2.14.12",
-          "downloadUrl": "https://github.com/ansible/ansible/archive/refs/tags/v2.14.12.tar.gz"
+          "version": "2.14.18",
+          "downloadUrl": "https://github.com/ansible/ansible/archive/refs/tags/v2.14.18.tar.gz"
         }
       }
     },
@@ -3328,8 +3328,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "25.3.2.20",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-25.3.2.20/otp-OTP-25.3.2.20.tar.gz"
+          "version": "25.3.2.21",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-25.3.2.21/otp-OTP-25.3.2.21.tar.gz"
         }
       }
     },
@@ -5231,7 +5231,7 @@
         "other": {
           "name": "helm",
           "version": "3.14.2",
-          "downloadUrl": "https://github.com/helm/helm/archive/v3.14.2.tar.gz"
+          "downloadUrl": "https://github.com/helm/helm/archive/refs/tags/v3.14.2.tar.gz"
         }
       }
     },
@@ -6530,8 +6530,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.180.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.180.1.tar.gz"
+          "version": "5.15.182.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.182.1.tar.gz"
         }
       }
     },
@@ -8111,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.180.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.180.1.tar.gz"
+          "version": "5.15.182.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.182.1.tar.gz"
         }
       }
     },
@@ -8121,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.180.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.180.1.tar.gz"
+          "version": "5.15.182.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.182.1.tar.gz"
         }
       }
     },
@@ -8131,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.180.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.180.1.tar.gz"
+          "version": "5.15.182.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.182.1.tar.gz"
         }
       }
     },
@@ -8141,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.180.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.180.1.tar.gz"
+          "version": "5.15.182.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.182.1.tar.gz"
         }
       }
     },
@@ -21444,8 +21444,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.16",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.16/postgresql-14.16.tar.bz2"
+          "version": "14.18",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.18/postgresql-14.18.tar.bz2"
         }
       }
     },
@@ -25574,8 +25574,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.17",
-          "downloadUrl": "https://download.redis.io/releases/redis-6.2.17.tar.gz"
+          "version": "6.2.18",
+          "downloadUrl": "https://download.redis.io/releases/redis-6.2.18.tar.gz"
         }
       }
     },
