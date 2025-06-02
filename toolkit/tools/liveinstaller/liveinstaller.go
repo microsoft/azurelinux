@@ -316,11 +316,11 @@ func generateCalamaresLaunchScript(launchScriptPath string, args imagerArguments
 	defer scriptFile.Close()
 
 	logger.Log.Infof("Generating install script (%s)", launchScriptPath)
-	program, commandArgs := formatImagerCommand(args)
+	// program, commandArgs := formatImagerCommand(args)
 
-	scriptFile.WriteString("#!/bin/bash\n")
-	scriptFile.WriteString(fmt.Sprintf("%s %s", program, strings.Join(commandArgs, " ")))
-	scriptFile.WriteString("\n")
+	// scriptFile.WriteString("#!/bin/bash\n")
+	// scriptFile.WriteString(fmt.Sprintf("%s %s", program, strings.Join(commandArgs, " ")))
+	// scriptFile.WriteString("\n")
 
 	return
 }
