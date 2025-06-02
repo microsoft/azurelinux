@@ -1,0 +1,7 @@
+{
+  "Signatures": {
+    "hotfix.te": "c9178618a70f764bccbf54d24cd89e37120fb57a2d78f3ca1f6b2833585dd0c8",
+    "azureci.te": "a414acea9c8bed07fa2f71bc2fc39797cefa4d5090b44dc591184c065c679f2a",
+    "ci_unconfined_u": "7e5c83b5fbad2590b0ace05e5d21b64e82dddbd69ef7bf6577a3c31edb85dd3b"
+  }
+}

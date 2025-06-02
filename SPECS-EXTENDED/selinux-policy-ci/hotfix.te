@@ -1,0 +1,82 @@
+policy_module(hotfix)
+
+gen_require(`
+    attribute domain;
+    type bootloader_t, cloud_init_t, cloud_init_tmp_t, container_var_lib_t, dockerd_t;
+    type system_dbusd_var_lib_t;
+    type dhcpc_t;
+    type etc_t, etc_runtime_t, fsadm_t, modules_conf_t;
+    type getty_t, kernel_t, init_t, initrc_t, lvm_t, mount_t;
+    type semanage_t, sysfs_t, syslogd_t, systemd_locale_t;
+    type udev_t, udevadm_t, unlabeled_t;
+')
+
+fs_image_file(container_var_lib_t)
+
+# revalidating as dontaudit
+dev_dontaudit_read_rand(dhcpc_t)
+
+# docker connection to img-authz-plugin, which doesn't yet have its own domain
+allow dockerd_t initrc_t:unix_stream_socket connectto;
+# temporary until tardev-snapshotter gets its own domain, it is
+# labeled as dockerd_exec_t because of its block device access (image layers)
+allow dockerd_t self:sem create_sem_perms;
+allow lvm_t dockerd_t:sem rw_sem_perms;
+allow dockerd_t init_t:key write;
+dev_rw_lvm_control(dockerd_t)
+dev_rw_loop_control(dockerd_t)
+kernel_get_sysvipc_info(dockerd_t)
+kernel_search_key(dockerd_t)
+kernel_search_debugfs(dockerd_t)
+kernel_read_vm_overcommit_sysctl(dockerd_t)
+init_search_keys(dockerd_t)
+
+# handle ro /run/modprobe.d
+#systemd[1]: Unable to fix SELinux security context of /run/modprobe.d: Permission denied
+allow init_t modules_conf_t:dir relabelto;
+
+allow udev_t container_var_lib_t:file getattr;
+# chmod /sys/devices/virtual/dmi/id/product_uuid
+allow udev_t sysfs_t:file setattr;
+
+# seems to be from initramfs but causes breakage to dontaudit
+kernel_use_fds(domain)
+
+########################################
+#
+# These require additional inspection, as they occur
+# on the Azure VM validation, but not qemu
+#
+require{ type cloud_init_state_t, var_lib_t, dhcpc_t; }
+allow cloud_init_t cloud_init_state_t:file relabelfrom;
+allow cloud_init_t self:capability kill;
+allow cloud_init_t var_lib_t:file relabelto;
+allow dhcpc_t self:unix_stream_socket connectto;
+# this is /dev/mem access by systemd/pid 1:
+dev_read_raw_memory(init_t)
+
+
+########################################
+#
+# Required access due to overlays
+#
+kernel_unconfined(kernel_t)
+files_unconfined(kernel_t)
+domain_obj_id_change_exemption(kernel_t)
+
+files_unconfined(mount_t)
+domain_obj_id_change_exemption(mount_t)
+
+domain_obj_id_change_exemption(init_t)
+
+allow init_t unlabeled_t:dir mounton;
+
+require { type ci_unconfined_t, unlabeled_t, mount_t, dockerd_t; }
+allow bootloader_t unlabeled_t:dir search;
+allow ci_unconfined_t unlabeled_t:chr_file unlink;
+allow ci_unconfined_t unlabeled_t:dir mounton;
+allow dockerd_t unlabeled_t:dir { create mounton rename reparent setattr };
+allow dockerd_t unlabeled_t:file { create execute execute_no_trans getattr map mounton open read };
+allow dockerd_t unlabeled_t:filesystem { getattr mount };
+allow dockerd_t unlabeled_t:lnk_file { getattr read };
+allow mount_t unlabeled_t:filesystem unmount;

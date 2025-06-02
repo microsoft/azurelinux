@@ -1,0 +1,10 @@
+system_r:crond_t:s0         ci_unconfined_r:ci_unconfined_t:s0 ci_unconfined_r:ci_unconfined_cronjob_t:s0
+system_r:initrc_t:s0        ci_unconfined_r:ci_unconfined_t:s0
+system_r:local_login_t:s0   ci_unconfined_r:ci_unconfined_t:s0
+system_r:remote_login_t:s0  ci_unconfined_r:ci_unconfined_t:s0
+system_r:rshd_t:s0		      ci_unconfined_r:ci_unconfined_t:s0
+system_r:sshd_t:s0		      ci_unconfined_r:ci_unconfined_t:s0
+system_r:sysadm_su_t:s0     ci_unconfined_r:ci_unconfined_t:s0
+system_r:ci_unconfined_t:s0	ci_unconfined_r:ci_unconfined_t:s0
+system_r:xdm_t:s0           ci_unconfined_r:ci_unconfined_t:s0
+system_r:init_t:s0          ci_unconfined_r:ci_unconfined_t:s0
