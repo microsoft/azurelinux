@@ -33,15 +33,18 @@ steps:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
   - bash: |
-      additional_args=""
       if [[ ${{ parameters.dailyBuildID }} == "lkg" ]]; then
-        echo "##[debug]Building toolchain for latest daily build without using daily build manifests"
-        additional_args="DAILY_BUILD_ID=${{ parameters.dailyBuildID }} DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
+        daily_build_id_arg="DAILY_BUILD_ID=${{ parameters.dailyBuildID }}"
+        daily_build_update_manifests_arg=DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
+      elif [[ -n "${{ parameters.dailyBuildID }}" ]]; then
+        daily_build_id_arg=""
+        daily_build_update_manifests_arg=""
       fi
 
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" toolchain "-j$(nproc)" \
         QUICK_REBUILD=y \
-        $additional_args
+        $daily_build_id_arg \
+        $daily_build_update_manifests_arg
     displayName: "Build toolchain"
 
   - bash: |

@@ -231,10 +231,12 @@ steps:
         max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}"
       fi
 
-      additional_args=""
       if [[ ${{ parameters.dailyBuildID }} == "lkg" ]]; then
-        echo "##[debug]Building toolchain for latest daily build without using daily build manifests"
-        additional_args="DAILY_BUILD_ID=${{ parameters.dailyBuildID }} DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
+        daily_build_id_arg="DAILY_BUILD_ID=${{ parameters.dailyBuildID }}"
+        daily_build_update_manifests_arg="DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
+      elif [[ -n "${{ parameters.dailyBuildID }}" ]]; then
+        daily_build_id_arg=""
+        daily_build_update_manifests_arg=""
       fi
 
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
@@ -250,13 +252,14 @@ steps:
         TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
         $allow_toolchain_rebuilds_arg \
         $check_build_retries_arg \
+        $daily_build_id_arg \
+        $daily_build_update_manifests_arg \
         $delta_fetch_arg \
         $max_cascading_rebuilds_arg \
         $quick_rebuild_packages_arg \
         $run_check_arg \
         $toolchain_archive_arg \
-        $use_ccache_arg \
-        $additional_args
+        $use_ccache_arg
     displayName: "Build packages"
 
   - ${{ if parameters.outputArtifactsFolder }}:
