@@ -1,7 +1,7 @@
 # Where the binaries aimed at gcc will live (ie. /usr/<target>/bin/).
 %global auxbin_prefix %{_exec_prefix}
 
-%global srcdir %{name}-%{version}
+%global srcdir %{name}-with-gold-%{version}
 
 %ifarch x86_64
     %global build_cross 1
@@ -20,14 +20,14 @@
 
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
-Version:        2.41
-Release:        6%{?dist}
+Version:        2.44
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://www.gnu.org/software/binutils
-Source0:        https://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnu.org/gnu/binutils/%{name}-with-gold-%{version}.tar.xz#/%{name}-%{version}.tar.xz
 # Patch was derived from source: https://src.fedoraproject.org/rpms/binutils/blob/f34/f/binutils-export-demangle.h.patch
 Patch0:         export-demangle-header.patch
 # The gold linker doesn't understand the 'module_info.ld' script passed to all linkers and the tests fail to correctly link.
@@ -36,10 +36,9 @@ Patch2:         CVE-2025-1176.patch
 Patch3:         CVE-2025-1178.patch
 Patch4:         CVE-2025-1181.patch
 Patch5:         CVE-2025-1182.patch
-Patch6:         CVE-2025-0840.patch
-Patch7:		CVE-2025-1744.patch
-Patch8:         CVE-2025-5245.patch
-Patch9:         CVE-2025-5244.patch
+Patch6:		CVE-2025-1744.patch
+Patch7:         CVE-2025-5245.patch
+Patch8:         CVE-2025-5244.patch
 Provides:       bundled(libiberty)
 
 # Moving macro before the "SourceX" tags breaks PR checks parsing the specs.
@@ -76,7 +75,7 @@ Documentation for the cross-compilation binutils package.
 %do_package aarch64-linux-gnu %{build_aarch64}
 
 %prep
-%setup -q -c
+%setup -q -c -n %{name}-with-gold-%{version}
 
 function prep_target () {
     local target=$1
@@ -246,7 +245,13 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_bindir}/gp-display-html
 %{_bindir}/gp-display-src
 %{_bindir}/gp-display-text
+%{_bindir}/gprofng-archive
+%{_bindir}/gprofng-collect-app
+%{_bindir}/gprofng-display-html
+%{_bindir}/gprofng-display-src
+%{_bindir}/gprofng-display-text
 %{_bindir}/gprofng
+%{_docdir}/gprofng/examples.tar.gz
 %{_libdir}/ldscripts/*
 %{_libdir}/libbfd-%{version}.so
 %{_libdir}/libopcodes-%{version}.so
@@ -268,11 +273,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/windres.1.gz
 %{_mandir}/man1/size.1.gz
 %{_mandir}/man1/objdump.1.gz
-%{_mandir}/man1/gp-archive.1.gz
-%{_mandir}/man1/gp-collect-app.1.gz
-%{_mandir}/man1/gp-display-html.1.gz
-%{_mandir}/man1/gp-display-src.1.gz
-%{_mandir}/man1/gp-display-text.1.gz
+%{_mandir}/man1/gprofng-archive.1.gz
+%{_mandir}/man1/gprofng-collect-app.1.gz
+%{_mandir}/man1/gprofng-display-html.1.gz
+%{_mandir}/man1/gprofng-display-src.1.gz
+%{_mandir}/man1/gprofng-display-text.1.gz
 %{_mandir}/man1/gprofng.1.gz
 
 %files devel
@@ -329,6 +334,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %do_files aarch64-linux-gnu %{build_aarch64}
 
 %changelog
+* Thu May 29 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 2.44-1
+- Fix CVE-2025-1179 by upgrading to 2.44
+
 * Wed May 28 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 2.41-6
 - Patch CVE-2025-5245 , CVE-2025-5244
 
