@@ -32,6 +32,9 @@ Source13:       named.rwtab
 Source14:       named-chroot.files
 Source15:       https://gitlab.isc.org/isc-projects/dlz-modules/-/archive/main/dlz-modules-main.tar.gz
 
+Patch0:         nongit-fix.patch
+Patch1:         fix-maybe-uninitialized-warning-in-dlz_mysqldyn_mod.patch
+
 BuildRequires:  gcc
 BuildRequires:  git
 BuildRequires:  json-c-devel
@@ -535,7 +538,6 @@ fi;
 %changelog
 * Mon May 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.20.9-1
 - Auto-upgrade to 9.20.9 - for CVE-2025-40775
-- Remove nongit-fix.patch and fix-maybe-uninitialized-warning-in-dlz_mysqldyn_mod.patch
 
 * Tue Mar 11 2025 Andrew Phelps <anphel@microsoft.com> - 9.20.5-4
 - Remove duplicate shared object files in base and devel packages
