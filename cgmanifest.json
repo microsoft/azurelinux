@@ -30118,7 +30118,7 @@
         "other": {
           "name": "xalan-j2",
           "version": "2.7.2",
-          "downloadUrl": "http://www.apache.org/dist/xalan/xalan-j/source/xalan-j_2_7_2-src.tar.gz"
+          "downloadUrl": "https://archive.apache.org/dist/xalan/xalan-j/source/xalan-j_2_7_2-src.tar.gz"
         }
       }
     },
