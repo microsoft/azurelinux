@@ -8,8 +8,8 @@
 
 Summary:        C++ standard library targeting C++11
 Name:           libcxx
-Version:        %{maj_ver}.1.2
-Release:        3%{?dist}
+Version:        %{maj_ver}.1.8
+Release:        1%{?dist}
 License:        Apache-2.0 WITH LLVM-exception OR MIT OR NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -180,6 +180,9 @@ popd
 %{_libdir}/libunwind.a
 
 %changelog
+* Tue Jun 03 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 18.1.8-1
+- Updated to version 18.1.8.
+
 * Wed Oct 03 2024 Henry Li <lihl@microsoft.com> - 18.1.2-3
 - Add patch to resolve CVE-2024-31852
 
