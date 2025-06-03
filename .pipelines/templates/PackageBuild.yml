@@ -23,6 +23,13 @@ parameters:
     default: ""
     displayName: "Daily build ID"
 
+  - name: isDailyBuildUpdateManifests
+    type: string
+    default: "true"
+    values:
+      - "true"
+      - "false"
+
   - name: extraPackageRepos
     type: string
     default: ""
@@ -233,10 +240,14 @@ steps:
 
       if [[ ${{ parameters.dailyBuildID }} == "lkg" ]]; then
         daily_build_id_arg="DAILY_BUILD_ID=${{ parameters.dailyBuildID }}"
-        daily_build_update_manifests_arg="DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
       elif [[ -n "${{ parameters.dailyBuildID }}" ]]; then
         daily_build_id_arg=""
-        daily_build_update_manifests_arg=""
+      fi
+
+      if [[ ${{ parameters.isDailyBuildUpdateManifests }} == "true" ]]; then
+        daily_build_update_manifests_arg="DAILY_BUILD_ID_UPDATE_MANIFESTS=y"
+      elif [[ ${{ parameters.isDailyBuildUpdateManifests }} == "false" ]]; then
+        daily_build_update_manifests_arg="DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
       fi
 
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
