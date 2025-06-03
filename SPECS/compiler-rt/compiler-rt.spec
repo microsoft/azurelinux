@@ -51,7 +51,7 @@ cd build
 
 %changelog
 * Tue Jun 03 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 18.1.8-1
-- Updated to version 18.1.18.
+- Updated to version 18.1.8.
 
 * Thu Jul 25 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-3
 - Fix installation path

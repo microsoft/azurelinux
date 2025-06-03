@@ -123,7 +123,7 @@ ninja check-all
 
 %changelog
 * Tue Jun 03 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 18.1.8-1
-- Updated to version 18.1.18.
+- Updated to version 18.1.8.
 - Removed the patch for CVE-2024-31852 - already fixed in 18.1.3.
 
 * Tue Sep 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-4

@@ -107,7 +107,7 @@ rm -f %{buildroot}%{python3_sitelib}/six.*
 
 %changelog
 * Tue Jun 03 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 18.1.8-1
-- Updated to version 18.1.18.
+- Updated to version 18.1.8.
 
 * Wed May 29 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 18.1.2-2
 - Bump release to build with new llvm to fix CVE-2024-31852
