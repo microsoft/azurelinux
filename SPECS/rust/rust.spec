@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.86.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,6 +43,7 @@ Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 # These ci tests are expecting rust source to be git repository, since we are using a tarball
 # we are missing git metadata so these tests are failing, hence ignoring these tests
+Patch0:		CVE-2025-4574.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -180,6 +181,9 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
+* Tue Jun 03 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.86.0-2
+- Patch CVE-2025-4574
+
 * Tue May 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.86.0-1
 - Upgrade to 1.86.0
 
