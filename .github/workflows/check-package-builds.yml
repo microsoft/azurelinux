@@ -17,14 +17,14 @@ on:
   push:
     branches: [3.0*, fasttrack/3.0]
     paths:
-      - ".github/workflows/check-package-builds_matrix.yml"
+      - ".github/workflows/check-package-builds.yml"
       - "toolkit/Makefile"
       - "toolkit/scripts/*"
       - "toolkit/tools/*"
   pull_request:
     branches: [3.0*, fasttrack/3.0]
     paths:
-      - ".github/workflows/check-package-builds_matrix.yml"
+      - ".github/workflows/check-package-builds.yml"
       - "toolkit/Makefile"
       - "toolkit/scripts/*"
       - "toolkit/tools/*"
@@ -63,10 +63,26 @@ jobs:
           - check-name: "None license check does not break the build"
             package-type: "REGULAR_PKG"
             extra-args: "LICENSE_CHECK_MODE=none"
+            build-prep: |
+              license_file_name=$(grep -oP '^%license\s+\K\S+' "$REGULAR_PKG_SPEC_PATH")
+              if [[ -z "$license_file_name" ]]; then
+                  echo "ERROR: no license file found in the spec $REGULAR_PKG_SPEC_PATH"
+                  exit 1
+              fi
+              # Tagging a license file as a documentation file will not fail the license check on the 'none' level.
+              sed -i "/^%license/a %doc $license_file_name" "$REGULAR_PKG_SPEC_PATH"
 
           - check-name: "Warning-only license check does not break the build"
             package-type: "REGULAR_PKG"
             extra-args: "LICENSE_CHECK_MODE=warn"
+            build-prep: |
+              license_file_name=$(grep -oP '^%license\s+\K\S+' "$REGULAR_PKG_SPEC_PATH")
+              if [[ -z "$license_file_name" ]]; then
+                echo "ERROR: no license file found in the spec $REGULAR_PKG_SPEC_PATH"
+                exit 1
+              fi
+              # Tagging a license file as a documentation file will not fail the license check on the 'warn' level.
+              sed -i "/^%license/a %doc $license_file_name" "$REGULAR_PKG_SPEC_PATH"
 
           - check-name: "Fatal license check succeeds on duplicated license as documentation"
             package-type: "REGULAR_PKG"
