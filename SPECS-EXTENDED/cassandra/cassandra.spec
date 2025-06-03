@@ -5,7 +5,7 @@ Summary:        Cassandra is a highly scalable, eventually consistent, distribut
 Name:           cassandra
 Version:        5.0.0
 Release:        1%{?dist}
-URL:            http://cassandra.apache.org/
+URL:            https://cassandra.apache.org/
 License:        Apache License, Version 2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -15,7 +15,7 @@ Source1:        cassandra.service
 # Refer to Readme file for detailed
 # instructions to regenerate cassandra-build-cache
 # whenever updating to newer version.
-Source2:        cassandra-build-cache-%{version}.tar.gz
+Source2:        cassandra-build-cache-1-%{version}.tar.gz
 ExclusiveArch:  x86_64
 
 BuildRequires:  ant
