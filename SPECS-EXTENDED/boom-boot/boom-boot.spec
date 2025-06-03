@@ -4,26 +4,32 @@ Distribution:   Azure Linux
 %global sphinx_docs 1
 
 Name:		boom-boot
-Version:	1.2
-Release:	2%{?dist}
+Version:	1.6.5
+Release:	1%{?dist}
 Summary:	%{summary}
 
-License:	GPLv2
+License:	GPL-2.0-only
 URL:		https://github.com/snapshotmanager/boom
-Source0:	https://github.com/snapshotmanager/boom/archive/%{version}/boom-%{version}.tar.gz
-Patch1:		0001-etc-Remove-executable-permission-from-etc-default-bo.patch
-Patch2:		0002-man-Fix-line-starting-with.patch
+Source0:	https://github.com/snapshotmanager/boom/archive/%{version}/boom-boot-%{version}.tar.gz
 
 BuildArch:	noarch
-
+BuildRequires:	make
 BuildRequires:	python3-setuptools
 BuildRequires:	python3-devel
 %if 0%{?sphinx_docs}
+BuildRequires:	python3-dbus
 BuildRequires:	python3-sphinx
 %endif
+BuildRequires: make
 
 Requires: python3-boom = %{version}-%{release}
 Requires: %{name}-conf = %{version}-%{release}
+Requires: python3-dbus
+Requires: systemd >= 254
+
+Obsoletes: boom-boot-grub2 <= 1.3
+# boom-grub2 was not an official name of subpackage in fedora, but was used upstream:
+Obsoletes: boom-grub2 <= 1.3
 
 %package -n python3-boom
 Summary: %{summary}
@@ -40,9 +46,7 @@ Conflicts: boom
 %package conf
 Summary: %{summary}
 
-%package grub2
-Summary: %{summary}
-Supplements: (grub2 and boom-boot = %{version}-%{release})
+
 
 %description
 Boom is a boot manager for Linux systems using boot loaders that support
@@ -72,25 +76,14 @@ include this support in both Red Hat Enterprise Linux 7 and Fedora).
 
 This package provides configuration files for boom.
 
-%description grub2
-Boom is a boot manager for Linux systems using boot loaders that support
-the BootLoader Specification for boot entry configuration.
 
-Boom requires a BLS compatible boot loader to function: either the
-systemd-boot project, or Grub2 with the BLS patch (Red Hat Grub2 builds
-include this support in both Red Hat Enterprise Linux 7 and Fedora).
-
-This package provides integration scripts for grub2 bootloader.
 
 %prep
-%setup -n boom-%{version}
-# NOTE: Do not use backup extension - MANIFEST.in is picking them
-%patch 1 -p1
-%patch 2 -p1
+%autosetup -p1 -n %{name}-%{version}
 
 %build
 %if 0%{?sphinx_docs}
-make -C doc html
+make %{?_smp_mflags} -C doc html
 rm doc/_build/html/.buildinfo
 mv doc/_build/html doc/html
 rm -r doc/_build
@@ -101,11 +94,7 @@ rm -r doc/_build
 %install
 %py3_install
 
-# Install Grub2 integration scripts
-mkdir -p ${RPM_BUILD_ROOT}/etc/grub.d
-mkdir -p ${RPM_BUILD_ROOT}/etc/default
-install -m 755 etc/grub.d/42_boom ${RPM_BUILD_ROOT}/etc/grub.d
-install -m 644 etc/default/boom ${RPM_BUILD_ROOT}/etc/default
+
 
 # Make configuration directories
 # mode 0700 - in line with /boot/grub2 directory:
@@ -136,7 +125,8 @@ rm doc/conf.py
 %files -n python3-boom
 %license COPYING
 %doc README.md
-%{python3_sitelib}/*
+%{python3_sitelib}/boom/*
+%{python3_sitelib}/boom_boot-*.egg-info/
 %doc doc
 %doc examples
 %doc tests
@@ -151,14 +141,11 @@ rm doc/conf.py
 %dir /boot/boom/cache
 %dir /boot/loader/entries
 
-%files grub2
-%license COPYING
-%doc README.md
-%{_sysconfdir}/grub.d/42_boom
-%config(noreplace) %{_sysconfdir}/default/boom
-
 
 %changelog
+* Mon nov 4 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> -1.6.5-1
+- Update to new Version-1.6.5 
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
