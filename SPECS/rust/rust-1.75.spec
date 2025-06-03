@@ -44,7 +44,7 @@ Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Patch0:         CVE-2023-45853.patch
 Patch1:         CVE-2024-32884.patch
 Patch2:         CVE-2024-31852.patch
-Patch3:         CVE-2025-4574-1.75.patch
+Patch3:         CVE-2025-4574_1.75.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
