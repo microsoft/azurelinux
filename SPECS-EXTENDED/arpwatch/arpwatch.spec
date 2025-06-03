@@ -1,50 +1,51 @@
+Summary:        Network monitoring tools for tracking IP addresses on a network
+Name:           arpwatch
+Version:        2.1a15
+Release:        52%{?dist}
+License:        BSD WITH advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global _vararpwatch %{_localstatedir}/lib/arpwatch
-%global _hardened_build 1
-
-Name: arpwatch
-Version: 2.1a15
-Release: 51%{?dist}
-Summary: Network monitoring tools for tracking IP addresses on a network
-License: BSD with advertising
-URL: http://ee.lbl.gov/
-Requires(pre): shadow-utils
-Requires(post): systemd
-Requires(preun): systemd
-Requires(postun): systemd
-Requires: /usr/sbin/sendmail
-BuildRequires:  gcc
-BuildRequires: /usr/sbin/sendmail libpcap-devel perl-interpreter systemd
-
-Source0: ftp://ftp.ee.lbl.gov/arpwatch-%{version}.tar.gz
-Source1: arpwatch.service
-Source2: %{name}-LICENSE.txt
+URL:            https://ee.lbl.gov/
+Source0:        https://ee.lbl.gov/downloads/arpwatch/arpwatch-%{version}.tar.gz
+Source1:        arpwatch.service
+Source2:        %{name}-LICENSE.txt
 # created by:
 # wget -O- http://standards.ieee.org/regauth/oui/oui.txt | \
 # iconv -f iso8859-1 -t utf8 | massagevendor | bzip2
-Source3: ethercodes-20110707.dat.bz2
-Patch1: arpwatch-2.1a4-fhs.patch
-Patch2: arpwatch-2.1a10-man.patch
-Patch3: arpwatch-drop.patch
-Patch4: arpwatch-drop-man.patch
-Patch5: arpwatch-addr.patch
-Patch6: arpwatch-dir-man.patch
-Patch7: arpwatch-scripts.patch
-Patch8: arpwatch-2.1a15-nolocalpcap.patch
-Patch9: arpwatch-2.1a15-bogon.patch
-Patch10: arpwatch-2.1a15-extraman.patch
-Patch11: arpwatch-exitcode.patch
-Patch12: arpwatch-2.1a15-dropgroup.patch
-Patch13: arpwatch-2.1a15-devlookup.patch
-Patch14: arpwatch-2.1a15-lookupiselect.patch
-Patch16: arpwatch-201301-ethcodes.patch
-Patch17: arpwatch-pie.patch
-Patch18: arpwatch-aarch64.patch
-Patch19: arpwatch-promisc.patch
+Source3:        ethercodes-20110707.dat.bz2
+Patch1:         arpwatch-2.1a4-fhs.patch
+Patch2:         arpwatch-2.1a10-man.patch
+Patch3:         arpwatch-drop.patch
+Patch4:         arpwatch-drop-man.patch
+Patch5:         arpwatch-addr.patch
+Patch6:         arpwatch-dir-man.patch
+Patch7:         arpwatch-scripts.patch
+Patch8:         arpwatch-2.1a15-nolocalpcap.patch
+Patch9:         arpwatch-2.1a15-bogon.patch
+Patch10:        arpwatch-2.1a15-extraman.patch
+Patch11:        arpwatch-exitcode.patch
+Patch12:        arpwatch-2.1a15-dropgroup.patch
+Patch13:        arpwatch-2.1a15-devlookup.patch
+Patch14:        arpwatch-2.1a15-lookupiselect.patch
+Patch16:        arpwatch-201301-ethcodes.patch
+Patch17:        arpwatch-pie.patch
+Patch18:        arpwatch-aarch64.patch
+Patch19:        arpwatch-promisc.patch
 # From arpwatch 3.1, backport the fix for the potentially-exploitable buffer
 # overflow reported in https://bugzilla.redhat.com/show_bug.cgi?id=1563939.
-Patch20: arpwatch-2.1a15-buffer-overflow-bz1563939.patch
+Patch20:        arpwatch-2.1a15-buffer-overflow-bz1563939.patch
+%global _vararpwatch %{_localstatedir}/lib/arpwatch
+%global _hardened_build 1
+BuildRequires:  %{_sbindir}/sendmail
+BuildRequires:  gcc
+BuildRequires:  libpcap-devel
+BuildRequires:  perl-interpreter
+BuildRequires:  systemd
+Requires:       %{_sbindir}/sendmail
+Requires(post): systemd
+Requires(postun): systemd
+Requires(pre):  shadow-utils
+Requires(preun): systemd
 
 %description
 The arpwatch package contains arpwatch and arpsnmp.  Arpwatch and
@@ -62,7 +63,7 @@ network.
 %patch1 -p1 -b .fhs
 %patch2 -p1 -b .arpsnmpman
 %patch3 -p1 -b .droproot
-%patch4 -p0 -b .droprootman
+%patch4  -b .droprootman
 %patch5 -p1 -b .mailuser
 %patch6 -p1 -b .dirman
 %patch7 -p1 -b .scripts
@@ -87,56 +88,56 @@ make ARPDIR=%{_vararpwatch}
 
 %install
 
-mkdir -p $RPM_BUILD_ROOT%{_mandir}/man8
-mkdir -p $RPM_BUILD_ROOT%{_sbindir}
-mkdir -p $RPM_BUILD_ROOT%{_vararpwatch}
-mkdir -p $RPM_BUILD_ROOT%{_unitdir}
-touch $RPM_BUILD_ROOT%{_vararpwatch}/arp.dat-
-make DESTDIR=$RPM_BUILD_ROOT install install-man
+mkdir -p %{buildroot}%{_mandir}/man8
+mkdir -p %{buildroot}%{_sbindir}
+mkdir -p %{buildroot}%{_vararpwatch}
+mkdir -p %{buildroot}%{_unitdir}
+touch %{buildroot}%{_vararpwatch}/arp.dat-
+make DESTDIR=%{buildroot} install install-man
 
 # prepare awk scripts
 perl -pi -e "s/\'/\'\\\'\'/g" *.awk
 
 # and embed them
 for i in arp2ethers massagevendor massagevendor-old; do
-	cp -f $i $RPM_BUILD_ROOT%{_sbindir}
+	cp -f $i %{buildroot}%{_sbindir}
 	for j in *.awk; do
 		sed "s/-f\ *\(\<$j\>\)/\'\1\n\' /g" \
-			< $RPM_BUILD_ROOT%{_sbindir}/$i \
+			< %{buildroot}%{_sbindir}/$i \
 			| sed "s/$j\$//;tx;b;:x;r$j" \
-			> $RPM_BUILD_ROOT%{_sbindir}/$i.x
-		mv -f $RPM_BUILD_ROOT%{_sbindir}/$i{.x,}
+			> %{buildroot}%{_sbindir}/$i.x
+		mv -f %{buildroot}%{_sbindir}/$i{.x,}
 	done
-	chmod 755 $RPM_BUILD_ROOT%{_sbindir}/$i
+	chmod 755 %{buildroot}%{_sbindir}/$i
 done
 
-install -p -m644 *.dat $RPM_BUILD_ROOT%{_vararpwatch}
-install -p -m644 %{SOURCE1} $RPM_BUILD_ROOT%{_unitdir}/arpwatch.service
-install -p -m644 %{SOURCE3} $RPM_BUILD_ROOT%{_vararpwatch}/ethercodes.dat.bz2
-bzip2 -df $RPM_BUILD_ROOT%{_vararpwatch}/ethercodes.dat.bz2
+install -p -m644 *.dat %{buildroot}%{_vararpwatch}
+install -p -m644 %{SOURCE1} %{buildroot}%{_unitdir}/arpwatch.service
+install -p -m644 %{SOURCE3} %{buildroot}%{_vararpwatch}/ethercodes.dat.bz2
+bzip2 -df %{buildroot}%{_vararpwatch}/ethercodes.dat.bz2
 
-rm -f $RPM_BUILD_ROOT%{_sbindir}/massagevendor-old
+rm -f %{buildroot}%{_sbindir}/massagevendor-old
 
 %post
-%systemd_post arpwatch.service
+%{systemd_post} arpwatch.service
 
 %pre
 if ! getent group arpwatch &> /dev/null; then
 	getent group pcap 2> /dev/null | grep -q 77 &&
-		/usr/sbin/groupmod -n arpwatch pcap 2> /dev/null ||
-		/usr/sbin/groupadd -g 77 arpwatch 2> /dev/null
+		%{_sbindir}/groupmod -n arpwatch pcap 2> /dev/null ||
+		%{_sbindir}/groupadd -g 77 arpwatch 2> /dev/null
 fi
 if ! getent passwd arpwatch &> /dev/null; then
 	getent passwd pcap 2> /dev/null | grep -q 77 &&
-		/usr/sbin/usermod -l arpwatch -g 77 \
+		%{_sbindir}/usermod -l arpwatch -g 77 \
 			-d %{_vararpwatch} pcap 2> /dev/null ||
-		/usr/sbin/useradd -u 77 -g 77 -s /usr/sbin/nologin \
+		%{_sbindir}/useradd -u 77 -g 77 -s %{_sbindir}/nologin \
 			-M -r -d %{_vararpwatch} arpwatch 2> /dev/null
 fi
 :
 
 %postun
-%systemd_postun_with_restart arpwatch.service
+%{systemd_postun_with_restart} arpwatch.service
 
 %preun
 %systemd_preun arpwatch.service
@@ -157,6 +158,9 @@ fi
 %attr(0644,-,arpwatch) %verify(not md5 size mtime) %config(noreplace) %{_vararpwatch}/ethercodes.dat
 
 %changelog
+* Mon Jun 13 2022 Jamie Magee <jamagee@microsoft.com> - 2.1a15-52
+- Switch from FTP to HTTPS source
+
 * Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.1a15-51
 - License verified
 
