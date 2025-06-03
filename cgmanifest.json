@@ -855,8 +855,8 @@
         "type": "other",
         "other": {
           "name": "azl-otel-collector",
-          "version": "0.124.0",
-          "downloadUrl": "https://github.com/microsoft/azl-otel-collector/archive/refs/tags/v0.124.0.tar.gz"
+          "version": "0.127.0",
+          "downloadUrl": "https://github.com/microsoft/azl-otel-collector/archive/refs/tags/v0.127.0.tar.gz"
         }
       }
     },
