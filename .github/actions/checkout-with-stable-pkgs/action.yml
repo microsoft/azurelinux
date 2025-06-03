@@ -3,13 +3,6 @@
 
 name: "Stable specs and manifests checkout"
 description: "Checks out the repo, and a stable version of both specs and manifests."
-inputs:
-  stable-ref:
-    description: "Stable tag for specs and manifests to checkout."
-    required: true
-    values:
-      - "3.0-stable"
-    default: "3.0-stable"
 runs:
   using: "composite"
   steps:
@@ -21,4 +14,4 @@ runs:
 
     - name: Checkout stable specs and manifests
       shell: bash
-      run: git checkout ${{ inputs.stable-ref }} -- SPECS/ toolkit/resources/manifests/package/*.txt
+      run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt
