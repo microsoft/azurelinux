@@ -32,6 +32,26 @@ make -f %{_datadir}/selinux/devel/Makefile hotfix.pp azureci.pp
 semodule -c -X 100 -E cloudinit
 sed -i '/(booleanif (cloudinit_manage_non_security)/,/^)/d' cloudinit.cil
 
+# remove CI-breaking rules for containers.
+#semodule -c -X 100 -E container
+#sed -r -i -e '/(cifs_t|nfs_t|fusefs_t)/s/execute(_no_trans)?//g' container.cil
+#sed -r -i -e '/container_engine_user_domain container_data_home_t/s/execute(_no_trans)?//g' container.cil
+#sed -r -i -e '/container_engine_domain container_engine_tmpfs_t/s/execute(_no_trans)?//g' container.cil
+#sed -r -i -e '/container_domain container_file_t/s/execute(_no_trans)?//g' container.cil
+#sed -r -i -e '/container_engine_domain container_file_t/s/execute(_no_trans)?//g' container.cil
+#sed -r -i -e '/container_engine_system_domain container_file_t/s/execute(_no_trans)?//g' container.cil
+#sed -r -i -e '/container_engine_user_domain container_file_t/s/execute(_no_trans)?//g' container.cil
+#sed -r -i -e '/spc_t container_plugin_t \(file/s/(write|append)//g' container.cil
+#sed -r -i -e '/container_domain container_ro_file_t \(file/s/(write|append)//g' container.cil
+#sed -r -i -e '/container_engine_domain container_ro_file_t \(file/s/(write|append)//g' container.cil
+#sed -r -i -e '/container_engine_system_domain container_ro_file_t \(file/s/(write|append)//g' container.cil
+#sed -r -i -e '/container_engine_user_domain container_ro_file_t \(file/s/(write|append)//g' container.cil
+#sed -r -i -e '/container_engine_system_domain container_var_lib_t/s/execute(_no_trans)?//g' container.cil
+#sed -r -i -e '/container_engine_user_domain container_var_lib_t/s/execute(_no_trans)?//g' container.cil
+# remove CI-breaking rules from container_compat.
+#semodule -c -X 100 -E container_compat
+#sed -r -i -e '/virtd_lxc_t non_security_file_type:file \(file/s/mounton//g' container_compat.cil
+
 # remove CI-breaking rules for cron.
 semodule -c -X 100 -E cron
 sed -r -i -e '/(cifs_t|nfs_t|fusefs_t|user_home_t)/s/execute(_no_trans)?//g' cron.cil
