@@ -120,11 +120,13 @@ make configure
     --libexec=%{_libexecdir} \
     --with-gitconfig=%{_sysconfdir}/gitconfig
 make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}"
+%make_build -C contrib/subtree/ all
 
 %install
 %make_install
 install -vdm 755 %{buildroot}%{_datadir}/bash-completion/completions
 install -m 0644 contrib/completion/git-completion.bash %{buildroot}%{_datadir}/bash-completion/completions/git
+%make_install -C contrib/subtree
 %find_lang %{name}
 %{_fixperms} %{buildroot}/*
 
