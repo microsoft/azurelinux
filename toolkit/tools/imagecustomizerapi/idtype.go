@@ -10,9 +10,9 @@ import (
 type IdType string
 
 const (
-	IdTypePartLabel IdType = "PartLabel"
-	IdTypeUuid      IdType = "Uuid"
-	IdTypePartUuid  IdType = "PartUuid"
+	IdTypePartLabel IdType = "partLabel"
+	IdTypeUuid      IdType = "uuid"
+	IdTypePartUuid  IdType = "partUuid"
 )
 
 func (i IdType) IsValid() error {
@@ -22,6 +22,6 @@ func (i IdType) IsValid() error {
 		return nil
 
 	default:
-		return fmt.Errorf("invalid IdType value (%v)", i)
+		return fmt.Errorf("invalid idType value (%v)", i)
 	}
 }
