@@ -11,7 +11,6 @@ env:
   REGULAR_PKG: words
   REGULAR_PKG_SPEC_PATH: SPECS/words/words.spec
   TOOLCHAIN_PKG: xz
-  TOOLCHAIN_PKG_SPEC_PATH: SPECS/xz/xz.spec
 
 on:
   push:
