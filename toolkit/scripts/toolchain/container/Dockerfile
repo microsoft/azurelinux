@@ -3,7 +3,7 @@
 #
 # Dockerfile to build Azure Linux toolchain from scratch
 #
-FROM mcr.microsoft.com/cbl-mariner/base/core:2.0.20240123
+FROM mcr.microsoft.com/azurelinux/base/core:3.0.20241005
 
 # Tag the layers so we can clean up all the containers associated with a build directory
 ARG MARINER_BUILD_DIR
@@ -51,7 +51,6 @@ RUN tdnf install -y \
 
 COPY [ "./toolchain-sha256sums", \
        "./toolchain-remote-wget-list", \
-       "./toolchain-local-wget-list", \
        "$LFS/tools/" ]
 
 # Download source, then create lfs user and group.
@@ -59,7 +58,7 @@ COPY [ "./toolchain-sha256sums", \
 # Note: Fetch the kernel sources differently to ensure we rename the source tarball appropriately. The rename is needed to comply with
 # the naming convention of the source cache (convention used to prevent naming collisions).
 WORKDIR $LFS/sources
-RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-local-wget-list --directory-prefix=$LFS/sources; exit 0
+RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
 # Disable downloading from remote sources by default. The 'toolchain-local-wget-list' generated for the above line will download from $(SOURCE_URL)
 # The 'toolchain-remote-wget-list' is still available and can be used as an alternate to $(SOURCE_URL) if desired.
 #RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
@@ -67,9 +66,9 @@ RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/C
 USER root
 
 RUN mkdir -pv $LFS/{etc,var} $LFS/usr/{bin,lib,sbin} && \
-    ln -sv usr/bin $LFS/bin && \
-    ln -sv usr/lib $LFS/lib && \
-    ln -sv usr/sbin $LFS/sbin && \
+    ln -sv /usr/bin $LFS/bin && \
+    ln -sv /usr/lib $LFS/lib && \
+    ln -sv /usr/sbin $LFS/sbin && \
     mkdir -pv $LFS/lib64 && \
     mkdir -pv $LFS/usr/share
 
@@ -86,15 +85,14 @@ RUN sha256sum -c $LFS/tools/toolchain-sha256sums && \
     echo "lfs ALL = NOPASSWD : ALL" >> /etc/sudoers && \
     echo 'Defaults env_keep += "LFS LC_ALL LFS_TGT PATH MAKEFLAGS FETCH_TOOLCHAIN_MODE LFS_TEST LFS_DOCS JOB_COUNT LOOP IMAGE_SIZE INITRD_TREE IMAGE"' >> /etc/sudoers
 
-RUN echo "exec env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash" >> /home/lfs/.bash_profile
-COPY [ "./.bashrc", \
-       "/home/lfs/" ]
+RUN echo "exec env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash" >> /home/lfs/.bash_profile && \
+    cp -f /home/nonroot/.bashrc /home/lfs/
 
 USER lfs
 COPY [ "./toolchain_build_temp_tools.sh", \
        "./sanity_check.sh", \
        "./CVE-2023-4039.patch", \
-       "./rpm-define-RPM-LD-FLAGS.patch", \
+       "./define-RPM_LD_FLAGS.patch", \
        "$LFS/tools/" ]
 
 USER root
@@ -103,7 +101,7 @@ RUN  chown -Rv lfs $LFS/tools && \
      chown -Rv lfs:lfs /home/lfs/
 
 USER lfs
-RUN /tools/toolchain_build_temp_tools.sh
+RUN $LFS/tools/toolchain_build_temp_tools.sh
 
 COPY [ "./toolchain_initial_chroot_setup.sh", \
        "./toolchain_build_in_chroot.sh", \
