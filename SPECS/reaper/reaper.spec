@@ -49,7 +49,6 @@ Patch13:        CVE-2024-52798.patch
 Patch14:        CVE-2020-24025.patch
 Patch15:        CVE-2024-28863.patch
 Patch16:        CVE-2024-12905.patch
-# CVE-2024-6484 is fixed in bootstrap version 3.4.2 by https://github.com/odinserj/bootstrap/commit/0ea568be7ff0c1f72a693f5d782277a9e9872077
 Patch17:        CVE-2024-6484.patch
 
 BuildRequires:  git
