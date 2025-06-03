@@ -2,7 +2,7 @@
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
 %define hwe_version 1
-%define short_name 64k
+%define short_name 64k-hwe
 
 # find_debuginfo.sh arguments are set by default in rpm's macros.
 # The default arguments regenerate the build-id for vmlinux in the
@@ -22,7 +22,7 @@
 %endif
 
 Summary:        Linux Kernel
-Name:           kernel-64k
+Name:           kernel-64k-hwe
 Version:        6.12.30.1
 Release:        1%{?dist}
 License:        GPLv2
