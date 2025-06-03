@@ -16,7 +16,6 @@ Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            http://libcxx.llvm.org/
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
-Patch0:         CVE-2024-31852.patch
 
 BuildRequires:  clang
 BuildRequires:  cmake
@@ -182,6 +181,7 @@ popd
 %changelog
 * Tue Jun 03 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 18.1.8-1
 - Updated to version 18.1.8.
+- Removed the patch for CVE-2024-31852 - already fixed in 18.1.3.
 
 * Wed Oct 03 2024 Henry Li <lihl@microsoft.com> - 18.1.2-3
 - Add patch to resolve CVE-2024-31852
