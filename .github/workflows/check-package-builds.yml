@@ -5,7 +5,7 @@
 # It should only be dependent on toolkit changes, not on the specs.
 # This is why each build uses the 3.0-stable version of the specs and manifests.
 
-name: Package build checks (matrix)
+name: Package build checks
 
 env:
   REGULAR_PKG: words
