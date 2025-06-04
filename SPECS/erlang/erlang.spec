@@ -2,11 +2,7 @@
 Summary:        erlang
 Name:           erlang
 Version:        26.2.5.12
-<<<<<<< HEAD
-Release:        1%{?dist}
-=======
 Release:        2%{?dist}
->>>>>>> edd4ed37c (Updated `clang`, `compiler-rt`, `libcxx`, `lld`, `lldb`, and `llvm` to version 18.1.8. (#13950))
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -57,12 +53,9 @@ export ERL_TOP=`pwd`
 %{_libdir}/erlang/*
 
 %changelog
-<<<<<<< HEAD
-=======
 * Wed Jun 04 2025 Muhammad Falak <mwani@microsoft.com> - 26.2.5.11-2
 - Skip format-check in tests
 
->>>>>>> edd4ed37c (Updated `clang`, `compiler-rt`, `libcxx`, `lld`, `lldb`, and `llvm` to version 18.1.8. (#13950))
 * Wed May 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 26.2.5.12-1
 - Auto-upgrade to 26.2.5.12 - for CVE-2025-46712
 
