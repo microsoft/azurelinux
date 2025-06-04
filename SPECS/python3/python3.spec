@@ -6,7 +6,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -170,6 +170,9 @@ find %{buildroot}%{_libdir} -name '*.o' -delete
 rm %{buildroot}%{_bindir}/2to3
 rm -rf %{buildroot}%{_bindir}/__pycache__
 
+# Create /usr/bin/python symlink pointing to python3
+ln -s python%{majmin} %{buildroot}%{_bindir}/python
+
 %check
 %{buildroot}%{_bindir}/python3 -m test
 
@@ -180,6 +183,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %license LICENSE
 %doc README.rst
 %{_bindir}/pydoc*
+%{_bindir}/python
 %{_bindir}/python3
 %{_bindir}/python%{majmin}
 %{_mandir}/*/*
@@ -240,6 +244,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Wed Jun 18 2025 Sudipta Pandit <sudpandit@microsoft.com> - 3.12.9-3
+- Add python symlink pointing to python3 binary
+
 * Tue Jun 10 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.12.9-2
 - Patch CVE-2025-4516, CVE-2025-4517, CVE-2024-12718, CVE-2025-4138, CVE-2025-4330, CVE-2025-4330
 
