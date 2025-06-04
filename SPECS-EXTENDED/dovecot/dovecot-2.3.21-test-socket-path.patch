@@ -1,0 +1,22 @@
+From 9a3e0d099044d3a7478c3a24ccb8990181767f7c Mon Sep 17 00:00:00 2001
+From: Duncan Bellamy <dunk@denkimushi.com>
+Date: Sat, 6 Mar 2021 14:25:29 +0000
+Subject: [PATCH] imap: Shorten test-imap-client-hibernate socket path length
+
+---
+ src/imap/test-imap-client-hibernate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/imap/test-imap-client-hibernate.c b/src/imap/test-imap-client-hibernate.c
+index 9b90e1bd9a..c5392fa3fc 100644
+--- a/src/imap/test-imap-client-hibernate.c
++++ b/src/imap/test-imap-client-hibernate.c
+@@ -19,7 +19,7 @@
+ 
+ #include <sys/stat.h>
+ 
+-#define TEMP_DIRNAME ".test-imap-client-hibernate"
++#define TEMP_DIRNAME ".test-ich"
+ 
+ #define EVILSTR "\t\r\n\001"
+ 
