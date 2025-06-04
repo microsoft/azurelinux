@@ -57,3 +57,5 @@ stages:
         productionBuild: false
         releaseId: ""
         isDevelopment: true
+        testNames:
+          - bvt
