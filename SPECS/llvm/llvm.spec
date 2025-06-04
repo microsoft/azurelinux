@@ -1,18 +1,17 @@
 %global maj_ver 18
 %global min_ver 1
-%global patch_ver 2
+%global patch_ver 8
 
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        %{maj_ver}.%{min_ver}.%{patch_ver}
-Release:        4%{?dist}
+Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://llvm.org/
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
-Patch0:         CVE-2024-31852.patch
 BuildRequires:  binutils-devel
 BuildRequires:  cmake
 BuildRequires:  libffi-devel
@@ -123,6 +122,10 @@ ninja check-all
 %{_includedir}/llvm-c
 
 %changelog
+* Tue Jun 03 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 18.1.8-1
+- Updated to version 18.1.8.
+- Removed the patch for CVE-2024-31852 - already fixed in 18.1.3.
+
 * Tue Sep 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-4
 - Update file listing with explicit filenames
 
