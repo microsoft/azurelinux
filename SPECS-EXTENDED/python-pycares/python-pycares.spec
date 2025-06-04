@@ -5,8 +5,8 @@ Distribution:   Azure Linux
 
 
 Name:           python-pycares
-Version:        3.1.1
-Release:        3%{?dist}
+Version:        4.3.0
+Release:        1%{?dist}
 Summary:        Python interface for c-ares
 
 License:        MIT
@@ -101,6 +101,9 @@ chmod 755 %{buildroot}%{python3_sitearch}/%{srcname}/_cares.cpython-*.so
 
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.3.0-1
+- Auto-upgrade to 4.3.0 - Extended package upgrade to IDC
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.1-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
