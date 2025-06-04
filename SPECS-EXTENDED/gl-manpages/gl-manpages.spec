@@ -7,15 +7,15 @@ Distribution:   Azure Linux
 
 Name:           gl-manpages
 Version:        1.1
-Release:        21%{?dist}
+Release:        22%{?dist}
 Summary:        OpenGL manpages
 
 License:        MIT and Open Publication
 URL:            https://github.com/KhronosGroup/OpenGL-Refpages
 Source0:        https://github.com/KhronosGroup/OpenGL-Refpages/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
 # FIXME: Bundle mathml and the Oasis dbmathl until they are packaged
-Source2:        http://www.oasis-open.org/docbook/xml/mathml/1.1CR1/dbmathml.dtd
-Source3:        http://www.w3.org/Math/DTD/mathml2.tgz
+Source2:        https://www.oasis-open.org/docbook/xml/mathml/1.1CR1/dbmathml.dtd
+Source3:        https://www.w3.org/Math/DTD/mathml2.tgz
 # FIXME  These are the old gl-manpages source which 
 # still have some manpages that khronos doesn't. 
 # Ship until somebody in the know helps figuring whats what.
@@ -62,7 +62,7 @@ cp -n gl4/*.3G $RPM_BUILD_ROOT%{_mandir}/man3/
 # when matchin don't clobber the khronos version
 for MANP in `find gl-manpages-1.0.1 -name *.3gl` ; do
 	FN=${MANP//*\//}
-	cp -a -n $MANP $RPM_BUILD_ROOT%{_mandir}/man3/${FN/.3gl/.3G}
+	cp -a $MANP $RPM_BUILD_ROOT%{_mandir}/man3/${FN/.3gl/.3G}
 done
 find $RPM_BUILD_ROOT%{_mandir}/man3/ -type f -size -100b | xargs sed -i -e 's/\.3gl/\.3G/' -e 's,^\.so man3G/,.so man3/,'
 
@@ -72,6 +72,10 @@ find $RPM_BUILD_ROOT%{_mandir}/man3/ -type f -size -100b | xargs sed -i -e 's/\.
 
 
 %changelog
+* Wed Mar 26 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.1-22
+- Build error fix
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-21
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
