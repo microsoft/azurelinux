@@ -1,16 +1,16 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Perl4-CoreLibs
-Version:        0.004
-Release:        11%{?dist}
+Version:        0.005
+Release:        6%{?dist}
 Summary:        Libraries historically supplied with Perl 4
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Perl4-CoreLibs
-Source0:        https://cpan.metacpan.org/authors/id/Z/ZE/ZEFRAM/Perl4-CoreLibs-%{version}.tar.gz#/perl-Perl4-CoreLibs-%{version}.tar.gz
-# Adjust tests to pass 4-digit years to Time::Local, CPAN RT#131341
-Patch0:         Perl4-CoreLibs-0.004-y2k20.patch
+Source0:        https://cpan.metacpan.org/authors/id/Z/ZE/ZEFRAM/Perl4-CoreLibs-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
+# Call in chat2.pl
+BuildRequires:  hostname
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(:VERSION) >= 5.6
@@ -24,22 +24,26 @@ BuildRequires:  perl(IPC::Open2)
 BuildRequires:  perl(IPC::Open3)
 # Prefer Socket over socket.ph
 # Socket not used at tests
+BuildRequires:  perl(Sys::Syslog) => 0.19
 BuildRequires:  perl(Text::ParseWords) >= 3.25
 BuildRequires:  perl(Time::Local)
 # warnings::register not used at tests
 # Tests:
 BuildRequires:  perl(Config)
 BuildRequires:  perl(IO::Handle)
+BuildRequires:  perl(newgetopt.pl)
 BuildRequires:  perl(Test::More)
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       hostname
 Requires:       perl(File::Find)
 Requires:       perl(IPC::Open2)
 Requires:       perl(IPC::Open3)
 Requires:       perl(Socket)
+Requires:       perl(Sys::Syslog) => 0.19
 Requires:       perl(Text::ParseWords) >= 3.25
 Requires:       perl(Time::Local)
 Requires:       perl(warnings::register)
 # Dependencies on these Perl 4 files are generated as perl(foo.pl):
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Provides:       perl(abbrev.pl) = %{version}
 Provides:       perl(assert.pl) = %{version}
 Provides:       perl(bigfloat.pl) = %{version}
@@ -62,6 +66,7 @@ Provides:       perl(getopts.pl) = %{version}
 Provides:       perl(hostname.pl) = %{version}
 Provides:       perl(importenv.pl) = %{version}
 Provides:       perl(look.pl) = %{version}
+# newgetopt.pl is distributed by Getopt-Long, CPAN RT#102212
 Provides:       perl(open2.pl) = %{version}
 Provides:       perl(open3.pl) = %{version}
 Provides:       perl(pwd.pl) = %{version}
@@ -80,17 +85,42 @@ new code.  Functionally, most have been directly superseded by modules in the
 Perl 5 style. This collection exists to support old Perl programs that
 predates satisfactory replacements.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n Perl4-CoreLibs-%{version}
-%patch 0 -p1
-
+# newgetopt.pl is distributed by Getopt-Long, CPAN RT#102212
+rm lib/newgetopt.pl
+sed -i -e '/^lib\/newgetopt\.pl/d' MANIFEST
 %build
 perl Build.PL installdirs=vendor
 ./Build
+# Help generators to recognize Perl scripts
+for F in $(find t/ -name '*.t'); do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!\s*perl}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
 
 %install
-./Build install destdir=$RPM_BUILD_ROOT create_packlist=0
-%{_fixperms} $RPM_BUILD_ROOT/*
+./Build install destdir=%{buildroot} create_packlist=0
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+# Remove author tests
+rm -f %{buildroot}%{_libexecdir}/%{name}/t/pod*
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+cd %{_libexecdir}/%{name} && exec prove -I . -j "$(getconf _NPROCESSORS_ONLN)" -r
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
+%{_fixperms} %{buildroot}/*
 
 %check
 ./Build test
@@ -100,11 +130,59 @@ perl Build.PL installdirs=vendor
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
+%files tests
+%{_libexecdir}/%{name}
+
 %changelog
-* Wed Oct 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.004-11
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Using built-in "newgetopt.pl".
-  CBL-Mariner's version of "perl-Getopt-Long" doesn't provide it.
+* Tue May 13 2025 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.005-6
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.005-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.005-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.005-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.005-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Mar 14 2023 Michal Josef Špaček <mspacek@redhat.com> - 0.005-1
+- 0.005 bump
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.004-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Dec 15 2022 Michal Josef Špaček <mspacek@redhat.com> - 0.004-19
+- Package tests
+- Update license to SPDX format
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.004-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.004-17
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.004-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.004-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.004-14
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.004-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.004-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.004-11
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.004-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
