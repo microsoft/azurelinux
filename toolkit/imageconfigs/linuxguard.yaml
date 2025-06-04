@@ -19,27 +19,27 @@ storage:
 
         - id: root-a
           type: root
-          size: 2G
+          size: 4G
 
         - id: root-b
           type: root
-          size: 2G
+          size: 4G
 
-        - id: root-hash-a
-          type: root-verity
+        - id: usr-a
+          type: linux-generic
+          size: 1G
+
+        - id: usr-b
+          type: linux-generic
+          size: 1G
+
+        - id: usr-hash-a
+          type: usr-verity
           size: 128M
 
-        - id: root-hash-b
-          type: root-verity
+        - id: usr-hash-b
+          type: usr-verity
           size: 128M
-
-        - id: var-a
-          type: linux-generic
-          size: 3G
-
-        - id: var-b
-          type: linux-generic
-          size: 3G
 
         - id: trident
           type: linux-generic
@@ -52,10 +52,10 @@ storage:
           size: 128M
 
   verity:
-    - id: rootverity
-      name: root
-      dataDeviceId: root-a
-      hashDeviceId: root-hash-a
+    - id: usrverity
+      name: usr
+      dataDeviceId: usr-a
+      hashDeviceId: usr-hash-a
       dataDeviceMountIdType: uuid
       hashDeviceMountIdType: uuid
 
@@ -65,38 +65,41 @@ storage:
       mountPoint:
         idType: part-label
         path: /boot/efi
-        options: umask=0077
+        options: umask=0077,noexec,nodev
 
     - deviceId: boot-a
       type: ext4
       mountPoint:
         idType: uuid
         path: /boot
+        options: noexec,nodev
 
-    - deviceId: rootverity
+    - deviceId: root-a
       type: ext4
       mountPoint:
         path: /
-        options: ro
+        options: nodev,nosuid
+        # Add noexec after https://dev.azure.com/mariner-org/ECF/_workitems/edit/12366
 
-    - deviceId: var-a
+    - deviceId: usrverity
       type: ext4
       mountPoint:
-        idType: uuid
-        path: /var
-        options: defaults,x-initrd.mount
+        path: /usr
+        options: ro,nodev
 
     - deviceId: trident
       type: ext4
       mountPoint:
         idType: part-label
         path: /var/lib/trident
+        options: noexec,nodev
 
     - deviceId: home
       type: ext4
       mountPoint:
         idType: part-label
         path: /home
+        options: noexec,nodev
 
 os:
   bootloader:
@@ -123,8 +126,7 @@ os:
     install:
       - kernel-ipe
       - openssh-server
-      - curl
-      - lvm2
+      - device-mapper
       # selinux
       - policycoreutils-python-utils
       - selinux-policy
@@ -135,6 +137,7 @@ os:
       - veritysetup
       - vim
       - WALinuxAgent
+      # - containerd-2.0.0-5.azl3
       - containerd2
       - ca-certificates
       - wget
@@ -148,7 +151,6 @@ os:
       - netplan
       # UKI
       - systemd-boot
-      - efibootmgr # added after removing trident
       # hyperv
       - dracut-hyperv
       - hyperv-daemons
@@ -201,17 +203,20 @@ scripts:
     # Config AzureLinuxagent
     - path: scripts/azlinuxagentconfig.sh
     - path: scripts/duid-type-to-link-layer.sh
+    # Setup notation cli for OCI signature verification
     - path: scripts/cleanup-machineid.sh
+    - path: scripts/prepare_trusted_cni_plugins.sh
+    - path: scripts/tmp-no-exec.sh
 
 previewFeatures:
   - uki
-  # - output-artifacts
+  - output-artifacts
 
 output:
-  # artifacts:
-  #   items:
-  #     - verity-hash
-  #     - ukis
-  #   path: ./output
+  artifacts:
+    items:
+      - verity-hash
+      - ukis
+    path: ./output
   image:
     format: vhd
