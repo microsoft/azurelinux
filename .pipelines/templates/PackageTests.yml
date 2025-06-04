@@ -16,6 +16,10 @@ parameters:
     type: string
     default: "CBL-Mariner"
 
+  - name: marinerParallelTestSystemRepoName
+    type: string
+    default: "mariner-parallel-test-system"
+
   - name: rpmsArtifactNameBase
     type: string
     default: "RPMs"
@@ -46,6 +50,7 @@ stages:
         dependsOnStages: RPMs_${{ configuration.name }}
         embargoedBuild: false
         marinerGitHubBranchName: $(Build.SourceBranch)
+        thisRepoName: ${{ parameters.marinerParallelTestSystemRepoName }}
         marinerGithubRepoName: ${{ parameters.selfRepoName }}
         marinerVersion: $[ stageDependencies.Init.SetGlobals.outputs['Vars.azlVersion'] ]
         toolchainArtifactName: ${{ parameters.toolchainArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
