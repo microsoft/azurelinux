@@ -8,8 +8,8 @@ Fixes #108556.
 
 ---
  clang/test/Format/dry-run-warning.cpp    | 22 ++++++++++++++++++++++
- clang/tools/clang-format/ClangFormat.cpp | 15 ++++++++-------
- 2 files changed, 30 insertions(+), 7 deletions(-)
+ clang/tools/clang-format/ClangFormat.cpp | 18 +++++++++---------
+ 2 files changed, 31 insertions(+), 9 deletions(-)
  create mode 100644 clang/test/Format/dry-run-warning.cpp
 
 diff --git a/clang/test/Format/dry-run-warning.cpp b/clang/test/Format/dry-run-warning.cpp
@@ -41,7 +41,7 @@ index 000000000..4b85de40b
 +// CHECK-NOT: warning
 +// CHECK2: warning: code should be clang-formatted
 diff --git a/clang/tools/clang-format/ClangFormat.cpp b/clang/tools/clang-format/ClangFormat.cpp
-index e122cea50..d10973599 100644
+index e122cea50..d40d8f5d1 100644
 --- a/clang/tools/clang-format/ClangFormat.cpp
 +++ b/clang/tools/clang-format/ClangFormat.cpp
 @@ -341,9 +341,6 @@ static void outputReplacementsXML(const Replacements &Replaces) {
@@ -67,21 +67,24 @@ index e122cea50..d10973599 100644
      auto Err = Replaces.add(tooling::Replacement(
          tooling::Replacement(AssumedFileName, 0, 0, "x = ")));
      if (Err)
-@@ -499,9 +498,11 @@ static bool format(StringRef FileName) {
+@@ -499,11 +498,12 @@ static bool format(StringRef FileName) {
    Replacements FormatChanges =
        reformat(*FormatStyle, *ChangedCode, Ranges, AssumedFileName, &Status);
    Replaces = Replaces.merge(FormatChanges);
 -  if (OutputXML || DryRun) {
 -    if (DryRun)
 -      return emitReplacementWarnings(Replaces, AssumedFileName, Code);
+-    else
+-      outputXML(Replaces, FormatChanges, Status, Cursor, CursorPosition);
 +  if (DryRun) {
 +    return Replaces.size() > (IsJson ? 1 : 0) &&
 +           emitReplacementWarnings(Replaces, AssumedFileName, Code);
 +  }
 +  if (OutputXML) {
-     else
-       outputXML(Replaces, FormatChanges, Status, Cursor, CursorPosition);
++    outputXML(Replaces, FormatChanges, Status, Cursor, CursorPosition);
    } else {
+     IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem(
+         new llvm::vfs::InMemoryFileSystem);
 -- 
 2.34.1
 
