@@ -12260,6 +12260,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "llhttp",
+          "version": "9.2.1",
+          "downloadUrl": "https://github.com/nodejs/llhttp/archive/v9.2.1/llhttp-9.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "llvm",
           "version": "18.1.2",
           "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
