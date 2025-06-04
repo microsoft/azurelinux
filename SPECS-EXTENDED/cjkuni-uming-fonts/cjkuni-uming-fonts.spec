@@ -1,8 +1,9 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+
 %global fontname cjkuni-uming
-%global fontconf 65-ttf-arphic-uming.conf
-%global fontconf3 90-ttf-arphic-uming-embolden.conf
+%global fontconf 65-cjkuni-uming-fonts.conf
+%global fontconf3 90-cjkuni-uming-fonts-embolden.conf
 
 %global catalogue        %{_sysconfdir}/X11/fontpath.d
 
@@ -14,29 +15,47 @@ the CJK Unifonts project.
 %global umingbuilddir %{name}-%{version}
 
 Name:           %{fontname}-fonts
-Version:        0.2.20080216.1
-Release:        65%{?dist}
+Version:        0.2.20080216.2
+Release:        7%{?dist}
+URL:            https://www.freedesktop.org/wiki/Software/CJKUnifonts
 Summary:        Chinese Unicode TrueType font in Ming face
 
-License:        Arphic
-URL:            http://www.freedesktop.org/wiki/Software/CJKUnifonts
-Source0:        http://ftp.debian.org/debian/pool/main/t/ttf-arphic-uming/ttf-arphic-uming_%{version}.orig.tar.gz
-Source1:        %{name}-fontconfig.conf
-Source3:        %{fontconf3}
+License:  Arphic
+Source0:  https://deb.debian.org/debian/pool/main/f/fonts-arphic-uming/fonts-arphic-uming_%{version}.orig.tar.bz2#/%{name}-%{version}.tar.bz2
+Source10: %{fontconf}
+Source11: %{fontconf3}
+
+%global foundry           CJKUni
+%global fontlicense       Arphic-1999
+%global fontlicenses      license
+%global fontdocs          CONTRIBUTERS FONTLOG KNOWN_ISSUES NEWS README
 
 BuildArch:      noarch
 BuildRequires:  fontpackages-devel
 Requires:       fontpackages-filesystem
-Obsoletes:      cjkuni-fonts-common < 0.2.20080216.1-42
-Provides:       cjkuni-fonts-common = 0.2.20080216.1-42
+Obsoletes:      cjkuni-fonts-common < 0.2.20080216.2-6
+Provides:       cjkuni-fonts-common = 0.2.20080216.2-6
 
 %description
 %common_desc
 
-CJK Unifonts in Ming face.
+%global fontfamily        UMing
+%global fontsummary       Chinese Unicode TrueType font in Ming face
+%global fonts             uming.ttc
+
+%global fontconfs         %{SOURCE10} %{SOURCE11}
+%global fontdescription   %{expand:
+CJK Unifonts are Unicode TrueType fonts derived from original fonts made \
+available by Arphic Technology under "Arphic Public License" and extended by \
+the CJK Unifonts project.
+
+CJK Unifonts in Ming face.}
+
+
 
 %prep
-%setup -q -c -n %{name}-%{version}
+%autosetup -n ttf-arphic-uming-%{version}
+rm -rf license/.svn license/*/.svn
 
 
 %build
@@ -49,13 +68,13 @@ install -m 0644 -p *.ttc %{buildroot}%{_fontdir}
 install -m 0755 -d %{buildroot}%{_fontconfig_templatedir} \
                    %{buildroot}%{_fontconfig_confdir}
 
-install -m 0644 -p %{SOURCE1} \
+install -m 0644 -p %{SOURCE10} \
         %{buildroot}%{_fontconfig_templatedir}/%{fontconf}
 ln -s %{_fontconfig_templatedir}/%{fontconf} \
       %{buildroot}%{_fontconfig_confdir}/%{fontconf}
 
 
-install -m 0644 -p %{SOURCE3} \
+install -m 0644 -p %{SOURCE11} \
         %{buildroot}%{_fontconfig_templatedir}/%{fontconf3}
 ln -s %{_fontconfig_templatedir}/%{fontconf3} \
       %{buildroot}%{_fontconfig_confdir}/%{fontconf3}
@@ -68,17 +87,57 @@ ln -s %{_fontdir}/ %{buildroot}%{catalogue}/%{name}
 %_font_pkg -f *.conf *.ttc
 
 %defattr(-,root,root,-)
-%doc ../%{umingbuilddir}/license
-%doc ../%{umingbuilddir}/CONTRIBUTERS
-%doc ../%{umingbuilddir}/FONTLOG
-%doc ../%{umingbuilddir}/KNOWN_ISSUES
-%doc ../%{umingbuilddir}/NEWS
-%doc ../%{umingbuilddir}/README
+%doc README NEWS FONTLOG KNOWN_ISSUES CONTRIBUTERS
+%license license
 %{catalogue}/%{name}
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2.20080216.1-65
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Apr 29 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.2.20080216.2-7
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.20080216.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jan 23 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.20080216.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.20080216.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Oct  7 2023 Peng Wu <pwu@redhat.com> - 0.2.20080216.2-3
+- Fix the spec file
+- Resolves: RHBZ#2241231
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.20080216.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Apr  6 2023 Peng Wu <pwu@redhat.com> - 0.2.20080216.2-1
+- Update to 0.2.20080216.2
+- Resolves: RHBZ#2184838
+
+* Tue Feb 28 2023 Peng Wu <pwu@redhat.com> - 0.2.20080216.1-71
+- Drop Obsoletes and Provides for cjkuni-fonts-common
+- Update to follow New Fonts Packaging Guidelines
+- Migrate to SPDX license
+
+* Wed Jan 18 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.20080216.1-70
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.20080216.1-69
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.20080216.1-68
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.20080216.1-67
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.20080216.1-66
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.20080216.1-65
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.20080216.1-64
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
