@@ -117,6 +117,9 @@ rm %{buildroot}%{_datadir}/%{name}/hwloc-dump-hwdata.service
 
 %check
 LD_LIBRARY_PATH=$PWD/hwloc/.libs make check
+RET_CODE=$?
+cat /usr/src/azl/BUILD/hwloc-2.9.2/tests/hwloc/linux/gather/test-suite.log ||:
+return $RET_CODE
 
 %ifarch %{ix86} x86_64
 %post
