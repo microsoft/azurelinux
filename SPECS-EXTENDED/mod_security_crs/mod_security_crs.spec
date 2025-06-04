@@ -2,20 +2,20 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary: ModSecurity Rules
 Name: mod_security_crs
-Version: 3.0.0
-Release: 11%{?dist}
-License: ASL 2.0
-URL: https://www.owasp.org/index.php/Category:OWASP_ModSecurity_Core_Rule_Set_Project
-Source: https://github.com/SpiderLabs/owasp-modsecurity-crs/archive/v%{version}/owasp-modsecurity-crs-%{version}.tar.gz
+Version: 4.2.0
+Release: 3%{?dist}
+License: Apache-2.0
+URL: https://coreruleset.org/
+Source: https://github.com/coreruleset/coreruleset/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch: noarch
-Requires: mod_security >= 2.8.0
+Provides: mod_security >= 2.9.6
 Obsoletes: mod_security_crs-extras < 3.0.0
 
 %description
 This package provides the base rules for mod_security.
 
 %prep
-%setup -q -n owasp-modsecurity-crs-%{version}
+%autosetup -p1 -S gendiff -n coreruleset-%{version}
 
 %build
 
@@ -29,7 +29,8 @@ install -d %{buildroot}%{_datarootdir}/mod_modsecurity_crs/rules
 mv rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example %{buildroot}%{_sysconfdir}/httpd/modsecurity.d/activated_rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
 mv rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf.example %{buildroot}%{_sysconfdir}/httpd/modsecurity.d/activated_rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
 
-install -m0644 rules/* %{buildroot}%{_datarootdir}/mod_modsecurity_crs/rules/
+install -m0644 rules/*.conf %{buildroot}%{_datarootdir}/mod_modsecurity_crs/rules/
+install -m0644 rules/*.data %{buildroot}%{_datarootdir}/mod_modsecurity_crs/rules/
 mv crs-setup.conf.example %{buildroot}%{_sysconfdir}/httpd/modsecurity.d/crs-setup.conf
 
 # activate base_rules
@@ -40,14 +41,70 @@ done
 
 %files
 %license LICENSE
-%doc CHANGES README.md
+%doc CHANGES.md README.md
 %config(noreplace) %{_sysconfdir}/httpd/modsecurity.d/activated_rules/*
 %config(noreplace) %{_sysconfdir}/httpd/modsecurity.d/crs-setup.conf
 %{_datarootdir}/mod_modsecurity_crs
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.0-11
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Dec 30 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 4.2.0-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu May 02 2024 Luboš Uhliarik <luhliari@redhat.com> - 4.2.0-1
+- new version 4.2.0
+- switch to autosetup
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.4-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.4-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.4-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 06 2023 Luboš Uhliarik <luhliari@redhat.com> - 3.3.4-5
+- SPDX migration
+
+* Mon Mar 20 2023 Mikel Olasagasti Uranga <mikel@olasagasti.info> - 3.3.4-4
+- Change URL to new official homepage
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Dec 05 2022 Luboš Uhliarik <luhliari@redhat.com> - 3.3.4-2
+- Add Early blocking feature patch again
+
+* Fri Sep 30 2022 Luboš Uhliarik <luhliari@redhat.com> - 3.3.4-1
+- new version 3.3.4
+
+* Wed Sep 07 2022 Luboš Uhliarik <luhliari@redhat.com> - 3.3.0-6
+- Fix application of early blocking patch
+
+* Wed Aug 31 2022 Luboš Uhliarik <luhliari@redhat.com> - 3.3.0-5
+- Backport early blocking feature
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Mar 05 2021 Lubos Uhliarik <luhliari@redhat.com> - 3.2.0-1
+- new version 3.2.0
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -151,5 +208,3 @@ done
 
 * Thu Apr 19 2012 Peter Vrabec <pvrabec@redhat.com> 2.2.4-1
 - initial package
-
-
