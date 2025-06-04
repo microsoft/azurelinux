@@ -29,8 +29,7 @@ on:
       - "toolkit/tools/*"
 
 jobs:
-  # Matrix job for the success cases where builds are expected to succeed
-  success-checks:
+  package-checks:
     name: ${{ matrix.check-name }}
     runs-on: ubuntu-latest
     strategy:
