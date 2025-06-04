@@ -1,0 +1,59 @@
+parameters:
+  - name: buildConfiguration
+    type: object
+    default:
+      - name: "AMD64"
+        agentPool: "$(DEV_AMD64_Managed_NoUMI_AZL3)"
+        maxCPUs: "$(($(nproc) / 2))"
+        rawToolchainCacheURL: "$(rawToolchainCacheURL_AMD64_3.0)"
+        rawToolchainExpectedHash: "$(rawToolchainCacheHash_AMD64_3.0)"
+      - name: "ARM64"
+        agentPool: "$(DEV_ARM64_Managed_NoUMI_AZL3)"
+        maxCPUs: "$(($(nproc) / 3))"
+        rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64_3.0)"
+        rawToolchainExpectedHash: "$(rawToolchainCacheHash_ARM64_3.0)"
+  - name: selfRepoName
+    type: string
+    default: "CBL-Mariner"
+
+  - name: rpmsArtifactNameBase
+    type: string
+    default: "RPMs"
+
+  - name: toolchainArtifactNameBase
+    type: string
+    default: "Toolchain"
+
+  - name: toolchainTestsArtifactNameBase
+    type: string
+    default: "Toolchain_tests"
+
+  - name: baseRpmsTarballName
+    type: string
+    default: "rpms.tar.gz"
+
+  - name: toolchainRPMsTarballName
+    type: string
+    default: "toolchain_built_rpms_all.tar.gz"
+
+stages:
+  - ${{ each configuration in parameters.buildConfiguration }}:
+    - template: Test-System.yml@$mariner-parallel-test-system
+      parameters:
+        architecture: ${{ configuration.name }}
+        buildNumber: ""
+        continueOnDashboardAPIError: true
+        dependsOnStages: RPMs_${{ configuration.name }}
+        embargoedBuild: false
+        marinerGitHubBranchName: $(Build.SourceBranch)
+        marinerGithubRepoName: ${{ parameters.selfRepoName }}
+        marinerVersion: $[ stageDependencies.Init.SetGlobals.outputs['Vars.azlVersion'] ]
+        toolchainArtifactName: ${{ parameters.toolchainArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
+        toolchainArtifactNestedDirectoryName: ARTIFACTS
+        baseRpmsArtifactName: ${{ parameters.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
+        baseRpmsArtifactNestedDirectoryName: ARTIFACTS
+        baseRpmsTarballName: ${{ parameters.baseRpmsTarballName }}
+        toolchainTarballName: ${{ parameters.toolchainRPMsTarballName }}
+        productionBuild: false
+        releaseId: ""
+        isDevelopment: true

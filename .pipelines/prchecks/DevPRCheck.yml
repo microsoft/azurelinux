@@ -16,11 +16,26 @@ resources:
       name: OneBranch.Pipelines/GovernedTemplates
       ref: refs/heads/main
 
+    - repository: mariner-parallel-test-system
+      type: git
+      name: mariner-parallel-test-system
+      ref: refs/heads/main
+
 variables:
   - group: "Agent pools (DEV)"
   - group: "Raw toolchain info"
   - name: system.debug
     value: "${{ parameters.debug }}"
+  - name: rpmsArtifactNameBase
+    value: "RPMs"
+  - name: toolchainArtifactNameBase
+    value: "Toolchain"
+  - name: toolchainTestsArtifactNameBase
+    value: "Toolchain_tests"
+  - name: baseRpmsTarballName
+    value: "rpms.tar.gz"
+  - name: toolchainRPMsTarballName
+    value: "toolchain_built_rpms_all.tar.gz"
 
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
@@ -33,3 +48,16 @@ extends:
         parameters:
           dailyBuildID: "lkg"
           isDailyBuildUpdateManifests: "false"
+          rpmsArtifactNameBase: "$(rpmsArtifactNameBase)"
+          toolchainArtifactNameBase: "$(toolchainArtifactNameBase)"
+          toolchainTestsArtifactNameBase: "$(toolchainTestsArtifactNameBase)"
+          toolchainRPMsTarballName: "$(toolchainRPMsTarballName)"
+          baseRpmsTarballName: "$(baseRpmsTarballName)"
+
+      - template: ../templates/PackageTests.yml@self
+        parameters:
+          rpmsArtifactNameBase: "$(rpmsArtifactNameBase)"
+          toolchainArtifactNameBase: "$(toolchainArtifactNameBase)"
+          toolchainTestsArtifactNameBase: "$(toolchainTestsArtifactNameBase)"
+          toolchainRPMsTarballName: "$(toolchainRPMsTarballName)"
+          baseRpmsTarballName: "$(baseRpmsTarballName)"
