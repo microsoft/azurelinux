@@ -13,6 +13,7 @@ Group:          Development/Tools
 URL:            https://clang.llvm.org
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
 Patch1:         CVE-2024-7883.patch
+Patch2:         clang-format-fix.patch
 BuildRequires:  cmake
 BuildRequires:  libxml2-devel
 BuildRequires:  llvm-devel = %{version}
