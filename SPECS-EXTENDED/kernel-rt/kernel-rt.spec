@@ -37,7 +37,7 @@ Source3:        cbl-mariner-ca-20211013.pem
 Source4:        cpupower
 Source5:        cpupower.service
 
-Patch0:         revert-to-upstream-8250_port.c.patch
+Patch0:         reapply-serial-8250-adjust-fifo-mode-timeout.patch
 # When updating, make sure to grab the matching patch from
 # https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/
 # Also, remember to bump the global rt_version macro above ^
