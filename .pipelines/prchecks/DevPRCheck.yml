@@ -61,3 +61,4 @@ extends:
           toolchainTestsArtifactNameBase: "$(toolchainTestsArtifactNameBase)"
           toolchainRPMsTarballName: "$(toolchainRPMsTarballName)"
           baseRpmsTarballName: "$(baseRpmsTarballName)"
+          selfRepoName: self
