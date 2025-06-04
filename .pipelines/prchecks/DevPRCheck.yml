@@ -18,7 +18,7 @@ resources:
 
     - repository: mariner-parallel-test-system
       type: git
-      name: mariner-parallel-test-system
+      name: mariner/mariner-parallel-test-system
       ref: refs/heads/main
 
 variables:
