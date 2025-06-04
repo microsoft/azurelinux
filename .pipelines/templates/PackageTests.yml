@@ -38,7 +38,7 @@ parameters:
 
 stages:
   - ${{ each configuration in parameters.buildConfiguration }}:
-    - template: Test-System.yml@$mariner-parallel-test-system
+    - template: Test-System.yml@mariner-parallel-test-system
       parameters:
         architecture: ${{ configuration.name }}
         buildNumber: ""
