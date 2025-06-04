@@ -293,7 +293,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
-* Mon May 05 2025 Ankita Pareek <ankitapareek@microsoft.com> - 32.0-7
+* Mon May 05 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.2.0.azl2-7
 - Add patch for CVE-2024-43806
 
 * Mon Mar 10 2025 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl2-6
