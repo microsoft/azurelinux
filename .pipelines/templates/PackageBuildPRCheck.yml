@@ -215,6 +215,7 @@ stages:
                   checkBuildRetries: "1"
                   customToolchainTarballName: $(toolchainTarballName)
                   dailyBuildID: "${{ parameters.dailyBuildID }}"
+                  isDailyBuildUpdateManifests: "${{ parameters.isDailyBuildUpdateManifests }}"
                   inputArtifactsFolder: $(inputArtifactsLocation)
                   isAllowToolchainRebuilds: true
                   isCheckBuild: true
