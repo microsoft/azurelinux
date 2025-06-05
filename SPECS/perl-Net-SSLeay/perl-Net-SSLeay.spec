@@ -1,12 +1,14 @@
 Summary:        Perl extension for using OpenSSL
 Name:           perl-Net-SSLeay
 Version:        1.92
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            https://metacpan.org/pod/distribution/Net-SSLeay/lib/Net/SSLeay.pod
 Source:         https://cpan.metacpan.org/modules/by-module/Net/Net-SSLeay-%{version}.tar.gz
 Patch0:         0001-local-tests-skip-2-failing-tests.patch
+Patch1:         compatible-openssl.patch
+
 %if 0%{?with_fips:1}
 Source100:      openssl-fips-2.0.9-lin64.tar.gz
 %endif
@@ -49,7 +51,7 @@ Net::SSLeay module basically comprise of:
 
 %prep
 %setup -q -n Net-SSLeay-%{version}
-%patch 0 -p1
+%autopatch -p1
 
 %build
 %if 0%{?with_fips:1}
@@ -81,6 +83,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Wed May 21 2025 Riken Maharjan <rmaharjan@microsoft.com> -  1.92-6
+- Fix ptest by adding upstream fix to the test.
+
 * Mon Aug 05 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.92-5
 - Fix bad capitalization of perl(AutoLoader)
 
