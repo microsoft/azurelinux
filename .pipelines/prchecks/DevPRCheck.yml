@@ -19,7 +19,7 @@ resources:
     - repository: CBL-Mariner-Pipelines
       type: git
       name: mariner/CBL-Mariner-Pipelines
-      ref: refs/heads/main
+      ref: refs/heads/master
 
     - repository: mariner-parallel-test-system
       type: git
