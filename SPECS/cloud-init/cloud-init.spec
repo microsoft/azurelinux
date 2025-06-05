@@ -1,6 +1,6 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
-Version:        24.3.1
+Version:        24.4.1
 Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
@@ -10,7 +10,7 @@ URL:            https://launchpad.net/cloud-init
 Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
 Patch0:         Add-Network-Interface-Renaming-Support-for-CAPM3-Met.patch
-Patch1:         no-single-process.patch
+Patch1:         no-single-process-updated.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -142,6 +142,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Wed Jun 04 2025 Aadhar Agarwal <mingheren@microsoft.com> - 24.4.1-1
+- Upgrade cloud-init to 24.4.1 for testing purposes
+
 * Tue Oct 01 2024 Minghe Ren <mingheren@microsoft.com> - 24.3.1-1
 - Upgrade cloud-init to 24.3.1 to support azure-proxy-agent
 - Add upstream patch no-single-process.patch to revert a behavior change on cloud-init systemd
