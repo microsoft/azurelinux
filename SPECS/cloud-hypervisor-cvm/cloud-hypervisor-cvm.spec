@@ -136,6 +136,9 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 %license LICENSES/CC-BY-4.0.txt
 
 %changelog
+* Thu Jun 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 41.0.79-1
+- Auto-upgrade to 41.0.79
+
 * Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 41.0.79-1
 - Auto-upgrade to 41.0.79
 

@@ -230,6 +230,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Thu Jun 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.57.mshv4-1
+- Auto-upgrade to 6.6.57.mshv4
+
 * Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.57.mshv4-1
 - Auto-upgrade to 6.6.57.mshv4
 

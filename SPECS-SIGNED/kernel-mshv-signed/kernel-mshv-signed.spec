@@ -136,6 +136,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 
 %changelog
+* Thu Jun 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.57.mshv4-1
+- Auto-upgrade to 6.6.57.mshv4
+
 * Tue May 06 2025 Manuel Huber <mahuber@microsoft.com> - 6.6.57.mshv4-1
 - Upgrade to 6.6.57.mshv4
 
