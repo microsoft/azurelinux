@@ -88,7 +88,7 @@ steps:
       mkdir -p "$published_artifacts_dir"
       cp "${{ parameters.buildRepoRoot }}"/build/toolchain/toolchain_built_rpms_all.tar.gz "$published_artifacts_dir"/${{ parameters.outputToolchainRPMsTarballName }}
       cp "${{ parameters.buildRepoRoot }}"/build/toolchain/toolchain_built_srpms_all.tar.gz "$published_artifacts_dir"/${{ parameters.outputToolchainSRPMsTarballName }}
-      cp "${{ parameters.buildRepoRoot }}"/build/toolchain/toolchain_built_rpms_delta.tar.xz "$published_artifacts_dir"/${{ parameters.outputToolchainDeltaRPMsTarballName }}
+      cp "${{ parameters.buildRepoRoot }}"/build/toolchain/toolchain_built_rpms_delta.tar.gz "$published_artifacts_dir"/${{ parameters.outputToolchainDeltaRPMsTarballName }}
     displayName: "Copy artifacts for publishing"
 
   - bash: |
