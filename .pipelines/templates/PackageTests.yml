@@ -20,6 +20,10 @@ parameters:
     type: string
     default: "mariner-parallel-test-system"
 
+  - name: marinerPipelinesRepoName
+    type: string
+    default: "CBL-Mariner-Pipelines"
+
   - name: rpmsArtifactNameBase
     type: string
     default: "RPMs"
@@ -40,6 +44,15 @@ parameters:
     type: string
     default: "toolchain_built_rpms_all.tar.gz"
 
+variables:
+  - name: marinerVersion
+  - ${{ if eq(variables['System.PullRequest.TargetBranch'], '3.0-dev') }}:
+    value: "3.0"
+  - ${{ if eq(variables['System.PullRequest.TargetBranch'], 'main') }}:
+    value: "2.0"
+  - ${{ else }}:
+    value: "3.0"
+
 stages:
   - ${{ each configuration in parameters.buildConfiguration }}:
     - template: Test-System.yml@mariner-parallel-test-system
@@ -52,7 +65,8 @@ stages:
         marinerGitHubBranchName: $(Build.SourceBranch)
         thisRepoName: ${{ parameters.marinerParallelTestSystemRepoName }}
         marinerGithubRepoName: ${{ parameters.selfRepoName }}
-        marinerVersion: $[ stageDependencies.Init.SetGlobals.outputs['Vars.azlVersion'] ]
+        marinerVersion: $(marinerVersion)
+        marinerPipelinesRepoName: ${{ parameters.marinerPipelinesRepoName }}
         toolchainArtifactName: ${{ parameters.toolchainArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
         toolchainArtifactNestedDirectoryName: ARTIFACTS
         baseRpmsArtifactName: ${{ parameters.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
