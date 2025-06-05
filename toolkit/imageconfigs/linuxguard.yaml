@@ -146,7 +146,7 @@ os:
       - keyutils
       - cri-tools
       - cni
-      # - tardev-snapshotter
+      - tardev-snapshotter
       - erofs-utils
       - netplan
       # UKI
