@@ -16,6 +16,11 @@ resources:
       name: OneBranch.Pipelines/GovernedTemplates
       ref: refs/heads/main
 
+    - repository: CBL-Mariner-Pipelines
+      type: git
+      name: mariner/CBL-Mariner-Pipelines
+      ref: refs/heads/main
+
     - repository: mariner-parallel-test-system
       type: git
       name: mariner/mariner-parallel-test-system
@@ -63,3 +68,4 @@ extends:
           baseRpmsTarballName: "$(baseRpmsTarballName)"
           selfRepoName: self
           marinerParallelTestSystemRepoName: mariner-parallel-test-system
+          marinerPipelinesRepoName: CBL-Mariner-Pipelines
