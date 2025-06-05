@@ -225,6 +225,9 @@ popd
 %{_unitdir}/%{name}-firewalld-reload.service
 
 %changelog
+* Wed Jun 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.10.3-3
+- Bump release to rebuild with rust
+
 * Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.10.3-2
 - Pin rust version
 

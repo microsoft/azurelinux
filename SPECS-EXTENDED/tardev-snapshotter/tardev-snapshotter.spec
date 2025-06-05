@@ -3,7 +3,7 @@
 Summary: Tardev Snapshotter for containerd
 Name: tardev-snapshotter
 Version: 3.2.0.tardev1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 Vendor: Microsoft Corporation
@@ -67,6 +67,9 @@ fi
 %config(noreplace) %{_unitdir}/%{name}.service
 
 %changelog
+* Wed Jun 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.2.0.tardev1-2
+- Bump release to rebuild with rust
+
 * Fri Mar 28 2025 Dallas Delaney <dadelan@microsoft.com> - 3.2.0.tardev1-1
 - Add package to specs-extended
 - License verified
