@@ -19332,7 +19332,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "perl-Pod-Coverage-TPod",
+          "name": "perl-Pod-Coverage-TrustPod",
           "version": "0.100005",
           "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Pod/Pod-Coverage-TrustPod-0.100005.tar.gz"
         }
@@ -27375,7 +27375,7 @@
         "other": {
           "name": "rust",
           "version": "1.75.0",
-          "downloadUrl": "https://static.lang.org/dist/rustc-1.75.0-src.tar.xz"
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.75.0-src.tar.xz"
         }
       }
     },
