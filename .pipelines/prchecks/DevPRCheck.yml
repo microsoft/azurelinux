@@ -42,12 +42,7 @@ variables:
   - name: toolchainRPMsTarballName
     value: "toolchain_built_rpms_all.tar.gz"
   - name: marinerVersion
-  - ${{ if eq(variables['System.PullRequest.TargetBranch'], '3.0-dev') }}:
-    value: "3.0"
-  - ${{ elseif eq(variables['System.PullRequest.TargetBranch'], 'main') }}:
-    value: "2.0"
-  - ${{ else }}:
-    value: "3.0"
+    value: $[ iif(eq(variables['System.PullRequest.TargetBranch'], 'main'), "2.0", "3.0") ]
 
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
