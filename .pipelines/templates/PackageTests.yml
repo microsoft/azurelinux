@@ -48,7 +48,7 @@ variables:
   - name: marinerVersion
   - ${{ if eq(variables['System.PullRequest.TargetBranch'], '3.0-dev') }}:
     value: "3.0"
-  - ${{ if eq(variables['System.PullRequest.TargetBranch'], 'main') }}:
+  - ${{ elseif eq(variables['System.PullRequest.TargetBranch'], 'main') }}:
     value: "2.0"
   - ${{ else }}:
     value: "3.0"
