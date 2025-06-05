@@ -1,0 +1,16 @@
+diff -ruN -p1 a/cloudinit/cmd/status.py b/cloudinit/cmd/status.py
+--- a/cloudinit/cmd/status.py	2024-09-04 19:01:58.000000000 +0000
++++ b/cloudinit/cmd/status.py	2025-06-05 18:38:27.968254134 +0000
+@@ -253,3 +253,3 @@ def handle_status_args(name, args) -> in
+     elif details.condition_status == ConditionStatus.DEGRADED:
+-        return 2
++        return 0
+     return 0
+diff -ruN -p1 a/tests/unittests/cmd/test_status.py b/tests/unittests/cmd/test_status.py
+--- a/tests/unittests/cmd/test_status.py	2024-09-04 19:01:58.000000000 +0000
++++ b/tests/unittests/cmd/test_status.py	2025-06-05 18:38:28.192255529 +0000
+@@ -666,3 +666,3 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr
+                 MyArgs(long=False, wait=False, format="json"),
+-                2,
++                0,
+                 {
