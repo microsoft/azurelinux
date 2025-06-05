@@ -27,9 +27,6 @@ Patch7:         CVE-2023-44487.patch
 Patch8:         CVE-2023-35945.patch
 Patch9:		CVE-2024-48615.patch
 Patch10:	CVE-2025-4947.patch
-
-
-
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
