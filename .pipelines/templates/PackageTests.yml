@@ -44,14 +44,9 @@ parameters:
     type: string
     default: "toolchain_built_rpms_all.tar.gz"
 
-variables:
   - name: marinerVersion
-  - ${{ if eq(variables['System.PullRequest.TargetBranch'], '3.0-dev') }}:
-    value: "3.0"
-  - ${{ elseif eq(variables['System.PullRequest.TargetBranch'], 'main') }}:
-    value: "2.0"
-  - ${{ else }}:
-    value: "3.0"
+    type: string
+    default: "3.0"
 
 stages:
   - ${{ each configuration in parameters.buildConfiguration }}:
@@ -65,7 +60,7 @@ stages:
         marinerGitHubBranchName: $(Build.SourceBranch)
         thisRepoName: ${{ parameters.marinerParallelTestSystemRepoName }}
         marinerGithubRepoName: ${{ parameters.selfRepoName }}
-        marinerVersion: $(marinerVersion)
+        marinerVersion: ${{ parameters.marinerVersion }}
         marinerPipelinesRepoName: ${{ parameters.marinerPipelinesRepoName }}
         toolchainArtifactName: ${{ parameters.toolchainArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
         toolchainArtifactNestedDirectoryName: ARTIFACTS
