@@ -6,6 +6,18 @@ parameters:
     type: string
     default: "$(Build.SourcesDirectory)"
 
+  - name: dailyBuildID
+    type: string
+    default: ""
+    displayName: "Daily build ID"
+
+  - name: isDailyBuildUpdateManifests
+    type: string
+    default: "true"
+    values:
+      - "true"
+      - "false"
+
   - name: outputArtifactsFolder
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
@@ -13,6 +25,18 @@ parameters:
   - name: outputArtifactsLogsSubfolder
     type: string
     default: "LOGS"
+
+  - name: outputToolchainRPMsTarballName
+    type: string
+    default: "toolchain_built_rpms_all.tar.gz"
+
+  - name: outputToolchainSRPMsTarballName
+    type: string
+    default: "toolchain_built_srpms_all.tar.gz"
+
+  - name: outputToolchainDeltaRPMsTarballName
+    type: string
+    default: "toolchain_built_rpms_delta.tar.gz"
 
   - name: outputArtifactsPackagesSubfolder
     type: string
@@ -27,7 +51,24 @@ steps:
     parameters:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
-  - bash: sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" toolchain QUICK_REBUILD=y
+  - bash: |
+      if [[ ${{ parameters.dailyBuildID }} == "lkg" ]]; then
+        daily_build_id_arg="DAILY_BUILD_ID=${{ parameters.dailyBuildID }}"
+      elif [[ -n "${{ parameters.dailyBuildID }}" ]]; then
+        daily_build_id_arg=""
+      fi
+
+      if [[ ${{ parameters.isDailyBuildUpdateManifests }} == "true" ]]; then
+        daily_build_update_manifests_arg="DAILY_BUILD_ID_UPDATE_MANIFESTS=y"
+      elif [[ ${{ parameters.isDailyBuildUpdateManifests }} == "false" ]]; then
+        daily_build_update_manifests_arg="DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
+      fi
+
+
+      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" toolchain "-j$(nproc)" \
+        QUICK_REBUILD=y \
+        $daily_build_id_arg \
+        $daily_build_update_manifests_arg
     displayName: "Build toolchain"
 
   - bash: |
@@ -45,7 +86,9 @@ steps:
   - bash: |
       published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsPackagesSubfolder }}"
       mkdir -p "$published_artifacts_dir"
-      cp "${{ parameters.buildRepoRoot }}"/build/toolchain/toolchain_built_{,s}rpms_*.tar.gz "$published_artifacts_dir"
+      cp "${{ parameters.buildRepoRoot }}"/build/toolchain/toolchain_built_rpms_all.tar.gz "$published_artifacts_dir"/${{ parameters.outputToolchainRPMsTarballName }}
+      cp "${{ parameters.buildRepoRoot }}"/build/toolchain/toolchain_built_srpms_all.tar.gz "$published_artifacts_dir"/${{ parameters.outputToolchainSRPMsTarballName }}
+      cp "${{ parameters.buildRepoRoot }}"/build/toolchain/toolchain_built_rpms_delta.tar.gz "$published_artifacts_dir"/${{ parameters.outputToolchainDeltaRPMsTarballName }}
     displayName: "Copy artifacts for publishing"
 
   - bash: |
