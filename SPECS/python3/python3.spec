@@ -33,6 +33,7 @@ Patch9:         CVE-2023-27043.patch
 Patch10:        CVE-2025-0938.patch
 Patch11:        CVE-2024-9287.patch
 Patch12:        CVE-2025-1795.patch
+Patch13:        CVE-2025-4516.patch
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
 Patch1001:      CVE-2024-6345.patch
@@ -190,6 +191,7 @@ The test package contains all regression tests for Python as well as the modules
 %patch10 -p1
 %patch11 -p1
 %patch12 -p1
+%patch13 -p1
 
 %build
 # Remove GCC specs and build environment linker scripts
@@ -361,8 +363,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
-* Fri May 09 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 3.9.19-14
+* Fri Jun 06 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 3.9.19-14
 - Patch CVE-2023-5752 and CVE-2023-45803 in the bundled setuptools wheel
+- Add patch for CVE-2025-4516
 
 * Fri Apr 11 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.9.19-13
 - Add patch for CVE-2024-3651, CVE-2023-43804 and CVE-2024-37891 in the bundled pip wheel
