@@ -2,7 +2,7 @@
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
 Version:        %{BaseVersion}.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,6 +24,7 @@ Patch8:          CVE-2025-32050.patch
 Patch9:          CVE-2025-32051.patch
 Patch10:         CVE-2025-46420.patch
 Patch11:         CVE-2025-46421.patch
+Patch12:         CVE-2025-32053.patch
 
 BuildRequires:  meson
 BuildRequires:  autogen
@@ -135,6 +136,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 
 %changelog
+* Wed 07 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 3.0.4-6
+- Patche for CVE-2025-32053
+
 * Sun May 04 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.0.4-5
 - Added patch for CVE-2025-2784 CVE-2025-32052 CVE-2025-32050 CVE-2025-32051 CVE-2025-46420 CVE-2025-46421
 
