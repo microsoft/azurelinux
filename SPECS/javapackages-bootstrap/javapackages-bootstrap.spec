@@ -19,7 +19,7 @@
 
 Name:           javapackages-bootstrap
 Version:        1.14.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A means of bootstrapping Java Packages Tools
 # For detailed info see the file javapackages-bootstrap-PACKAGE-LICENSING
 License:        ASL 2.0 and ASL 1.1 and (ASL 2.0 or EPL-2.0) and (EPL-2.0 or GPLv2 with exceptions) and MIT and (BSD with advertising) and BSD-3-Clause and EPL-1.0 and EPL-2.0 and CDDL-1.0 and xpp and CC0 and Public Domain
@@ -51,7 +51,7 @@ Source1014:     commons-cli-1.5.0.tar.xz
 Source1015:     commons-codec-1.16.0.tar.xz
 Source1016:     commons-collections-3.2.2.tar.xz
 Source1017:     commons-compress-jpb-1.23.0.tar.xz
-Source1018:     commons-io-2.13.0.tar.xz
+Source1018:     commons-io-2.14.0.tar.gz
 Source1019:     commons-jxpath-jpb2-1.3.tar.xz
 Source1020:     commons-lang-3.13.0.tar.xz
 Source1021:     commons-logging-1.2.tar.xz
@@ -153,6 +153,7 @@ Source1116:     xmlunit-2.9.1.tar.xz
 Source1118:     xmvn-jpb-4.2.0.tar.xz
 Source1119:     xmvn-generator-1.2.1.tar.xz
 Source1120:     xz-java-1.9.tar.xz
+Patch1:         CVE-2023-2976.patch
 
 Provides:     bundled(ant) = 1.10.14
 Provides:     bundled(aopalliance) = 1.0
@@ -171,7 +172,7 @@ Provides:     bundled(commons-cli) = 1.5.0
 Provides:     bundled(commons-codec) = 1.16.0
 Provides:     bundled(commons-collections) = 3.2.2
 Provides:     bundled(commons-compress) = 1.23.0
-Provides:     bundled(commons-io) = 2.13.0
+Provides:     bundled(commons-io) = 2.14.0
 Provides:     bundled(commons-jxpath) = 1.3
 Provides:     bundled(commons-lang) = 3.13.0
 Provides:     bundled(commons-logging) = 1.2
@@ -305,6 +306,8 @@ XMvn, allowing JPT to be used before one builds XMvn package.
 
 %prep
 %setup -q
+tar -xf %{SOURCE1030}
+patch -p1 < %{PATCH1}
 
 # leave out the first source as it has already been extracted
 # leave out licensing breakdown file
@@ -402,6 +405,10 @@ sed -i s/_xmvngen_/_jpbgen_/ %{buildroot}%{_fileattrsdir}/jpbgen.attr
 %doc AUTHORS
 
 %changelog
+* Thu May 15 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.14.0-3
+- Patch guava to fix CVE-2023-2976
+- Upgrade commons-io version to 2.14.0 to fix CVE-2024-47554
+
 * Thu Mar 21 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.14.0-2
 - Change JAVA_HOME for xmvn to be msopenjdk location.
 - Upgrade to 1.14.0 - azl 3.0
