@@ -32,10 +32,6 @@ parameters:
     type: string
     default: "Toolchain"
 
-  - name: toolchainTestsArtifactNameBase
-    type: string
-    default: "Toolchain_tests"
-
   - name: baseRpmsTarballName
     type: string
     default: "rpms.tar.gz"
