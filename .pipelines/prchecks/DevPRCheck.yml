@@ -35,8 +35,6 @@ variables:
     value: "RPMs"
   - name: toolchainArtifactNameBase
     value: "Toolchain"
-  - name: toolchainTestsArtifactNameBase
-    value: "Toolchain_tests"
   - name: baseRpmsTarballName
     value: "rpms.tar.gz"
   - name: toolchainRPMsTarballName
@@ -57,7 +55,6 @@ extends:
           isDailyBuildUpdateManifests: "false"
           rpmsArtifactNameBase: "$(rpmsArtifactNameBase)"
           toolchainArtifactNameBase: "$(toolchainArtifactNameBase)"
-          toolchainTestsArtifactNameBase: "$(toolchainTestsArtifactNameBase)"
           toolchainRPMsTarballName: "$(toolchainRPMsTarballName)"
           baseRpmsTarballName: "$(baseRpmsTarballName)"
 
@@ -65,7 +62,6 @@ extends:
         parameters:
           rpmsArtifactNameBase: "$(rpmsArtifactNameBase)"
           toolchainArtifactNameBase: "$(toolchainArtifactNameBase)"
-          toolchainTestsArtifactNameBase: "$(toolchainTestsArtifactNameBase)"
           toolchainRPMsTarballName: "$(toolchainRPMsTarballName)"
           baseRpmsTarballName: "$(baseRpmsTarballName)"
           selfRepoName: self
