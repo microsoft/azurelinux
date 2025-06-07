@@ -14,16 +14,16 @@ diff --git a/tests/hwloc/linux/gather/test-gather-topology.sh.in b/tests/hwloc/l
 index dbd6d5372..6d6e3033d 100644
 --- a/tests/hwloc/linux/gather/test-gather-topology.sh.in
 +++ b/tests/hwloc/linux/gather/test-gather-topology.sh.in
-@@ -59,7 +59,7 @@ export HWLOC_FSROOT=//
+@@ -58,7 +58,7 @@
+ export HWLOC_FSROOT=//
  
  echo "Saving current system topology to XML..."
- # ignore DAXDevice info attr because it won't appear in save2.xml unless we pass --io to gather below
--if ! "$lstopo" --no-io -.xml | grep -v DAXDevice > "$tmpdir/save1.xml" ; then
-+if ! "$lstopo" --no-io --ignore misc -.xml | grep -v DAXDevice > "$tmpdir/save1.xml" ; then
+-if ! "$lstopo" --no-io "$tmpdir/save1.xml" ; then
++if ! "$lstopo" --no-io --ignore misc "$tmpdir/save1.xml" ; then
      error "Failed"
      exit 1
  fi
-@@ -82,7 +82,7 @@ export HWLOC_FSROOT="$tmpdir/save"
+@@ -81,7 +81,7 @@
  rm -f "$tmpdir/save/proc/hwloc-nofile-info"
  
  echo "Saving tarball topology to XML..."
@@ -32,5 +32,6 @@ index dbd6d5372..6d6e3033d 100644
      error "Failed"
      exit 1
  fi
+
 -- 
 2.45.3
