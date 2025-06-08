@@ -476,7 +476,7 @@ $tests_ok
 %files -n libgcc-devel
 %defattr(-,root,root)
 %{_lib64dir}/libgcc_s.so
-%{_libdir}/libcc1.*
+#%{_libdir}/libcc1.*
 
 %files c++
 %defattr(-,root,root)
