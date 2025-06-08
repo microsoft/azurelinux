@@ -30,7 +30,7 @@ Patch3:         CVE-2024-45341.patch
 Patch4:         CVE-2024-34158.patch
 Patch5:         CVE-2025-22871.patch
 Patch6:         CVE-2024-24789.patch
-Patch7:         CVE-2025-22870.patch
+Patch7:         CVE-2025-22870-1.18.patch
 Patch8:         CVE-2024-34155.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
@@ -148,7 +148,7 @@ fi
 * Tue Feb 04 2025 Kanishk bansal <kanbansal@microsoft.com> - 1.18.8-5
 - Address CVE-2024-45341 using an upstream patch.
 
-* Mon July 29 2024 Bhagyashri Pathak bhapathak@microsoft.com - 1.18.8-4
+* Mon Jul 29 2024 Bhagyashri Pathak bhapathak@microsoft.com - 1.18.8-4
 - Patch CVE-2024-24790
 
 * Mon Jan 23 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.8-3
