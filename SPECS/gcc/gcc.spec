@@ -65,6 +65,7 @@ URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
 Patch0:         CVE-2023-4039.patch
 Patch1:         CVE-2021-32256.patch
+Patch2:         fix-infinite-recursion.patch
 
 BuildRequires:  gmp-devel
 BuildRequires:  mpfr-devel
@@ -522,7 +523,7 @@ $tests_ok
 
 %changelog
 * Fri Apr 18 2025 Archana Shettigar <v-shettigara@microsoft.com> - 11.2.0-9
-- Patch CVE-2021-32256
+- Patch CVE-2021-32256 along with supporting patch
 
 * Mon Dec 11 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.0-8
 - Added cross-compilation support for aarch64.
