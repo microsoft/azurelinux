@@ -11,7 +11,7 @@ parameters:
 
 resources:
   repositories:
-    - repository: templates
+    - repository: obTemplates
       type: git
       name: OneBranch.Pipelines/GovernedTemplates
       ref: refs/heads/main
