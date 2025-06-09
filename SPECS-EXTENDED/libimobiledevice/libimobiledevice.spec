@@ -6,7 +6,7 @@ Release:       1%{?dist}
 Summary:       Library for connecting to mobile devices
 
 License:       LGPLv2+
-URL:           http://www.libimobiledevice.org/
+URL:           https://www.libimobiledevice.org/
 Source0:       https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}.tar.bz2
 # Patch to fix 1.3.0 redefining enum from libplist
 Patch0:        upgrade-fixes-1.3.0.patch
