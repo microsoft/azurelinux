@@ -5,6 +5,6 @@
     "cpupower": "d7518767bf2b1110d146a49c7d42e76b803f45eb8bd14d931aa6d0d346fae985",
     "cpupower.service": "b057fe9e5d0e8c36f485818286b80e3eba8ff66ff44797940e99b1fd5361bb98",
     "sha512hmac-openssl.sh": "02ab91329c4be09ee66d759e4d23ac875037c3b56e5a598e32fd1206da06a27f",
-    "kernel-6.6.90.1.tar.gz": "6a7e4c7f399b136cdd8461bf6f83b52936fba6b39a798803708d0a8f0a601a88"
+    "kernel-6.12.32.1.tar.gz": "f036babcd4fe93edef8fa98a9085b663995ce13bea6d2d64b6550c6f7cc3704d"
   }
 }
