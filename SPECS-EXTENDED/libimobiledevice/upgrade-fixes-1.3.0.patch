@@ -1,12 +1,12 @@
-From c3504add741dc8ccebc3129016b7d37a6a45520f Mon Sep 17 00:00:00 2001
+From 0e1a8d973c105a1bbc9d60b2e71f49268d9a8617 Mon Sep 17 00:00:00 2001
 From: Kevin Lockwood <v-klockwood@microsoft.com>
 Date: Wed, 23 Apr 2025 16:15:46 -0700
 Subject: [PATCH] Patch out plist.h redefinitions
 
 ---
  common/utils.c | 4 ++++
- common/utils.h | 8 +++++++-
- 2 files changed, 11 insertions(+), 1 deletion(-)
+ common/utils.h | 6 ++++++
+ 2 files changed, 10 insertions(+)
 
 diff --git a/common/utils.c b/common/utils.c
 index 7f66ec2..e06debf 100644
@@ -25,16 +25,15 @@ index 7f66ec2..e06debf 100644
  	char *buffer = NULL;
  	uint32_t length;
 diff --git a/common/utils.h b/common/utils.h
-index 2c3acec..0276dab 100644
+index 2c3acec..661f170 100644
 --- a/common/utils.h
 +++ b/common/utils.h
 @@ -51,13 +51,19 @@ char *generate_uuid(void);
  void buffer_read_from_filename(const char *filename, char **buffer, uint64_t *length);
  void buffer_write_to_filename(const char *filename, const char *buffer, uint64_t length);
  
--enum plist_format_t {
 +#ifndef LIBPLIST_H
-+enum lid_plist_format_t {
+ enum plist_format_t {
  	PLIST_FORMAT_XML,
  	PLIST_FORMAT_BINARY
  };
