@@ -1,5 +1,8 @@
 /#!/usr/bin/env bash
 
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 sha_keys_dir="/etc/ssh"
 echo "Updating AzureLinuxAgent config"
 sed -i "/OS.SshDir/c\OS.SshDir=${sha_keys_dir}" /etc/waagent.conf
