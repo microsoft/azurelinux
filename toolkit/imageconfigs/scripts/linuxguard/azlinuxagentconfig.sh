@@ -1,6 +1,5 @@
-#!/usr/bin/env bash
+/#!/usr/bin/env bash
 
-# TODO do we need the first part at all?
 sha_keys_dir="/etc/ssh"
 echo "Updating AzureLinuxAgent config"
 sed -i "/OS.SshDir/c\OS.SshDir=${sha_keys_dir}" /etc/waagent.conf
