@@ -73,8 +73,6 @@ semaphorefile=/run/boot-parition-mount-complete.sem
 
 mkdir -p $systemdScriptsDir
 
-# ToDo: we should generate this boot mounting logic only when it is needed -
-#       i.e. by reading kernel command line parameters.
 createBootPartitionMonitorScript $bootPartitionMonitorCmd $semaphorefile
 createBootPartitionMonitorUnit $bootPartitionMonitorCmd
 
