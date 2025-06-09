@@ -66,6 +66,5 @@ stages:
         toolchainTarballName: ${{ parameters.toolchainRPMsTarballName }}
         productionBuild: false
         releaseId: ""
-        isDevelopment: true
         testNames:
           - bvt
