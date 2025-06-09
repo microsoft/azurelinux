@@ -6,7 +6,7 @@ Release:        1%{?dist}
 Summary:        Library used by the libimobiledevice tools and libraries.
 
 License:        LGPLv2.1+
-URL:            http://www.libimobiledevice.org/
+URL:            https://www.libimobiledevice.org/
 Source0:        https://github.com/libimobiledevice/%{name}/releases/download/%{version}/%{name}-%{version}.tar.bz2
 
 BuildRequires:  gcc
