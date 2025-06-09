@@ -1,0 +1,6 @@
+{
+    "Signatures": {
+     "cloud-provider-kubevirt-0.5.1.tar.gz": "5dc721b8f0fd663dd70bf8848ce7cb38fd5a4dea514307859a5b92edafaee04d",
+     "cloud-provider-kubevirt-0.5.1-vendor.tar.gz": "1a72812fb8cc3044c55eacf165ab039865fe29b1eaa4426ff47c721994ca9947"
+    }
+}

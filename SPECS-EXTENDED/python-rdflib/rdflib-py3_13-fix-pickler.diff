@@ -1,0 +1,64 @@
+--- a/rdflib/store.py
++++ b/rdflib/store.py
+@@ -113,27 +113,39 @@ class TripleRemovedEvent(Event):
+     """
+ 
+ 
++class _Pickler(Pickler):
++    def __init__(self, file, node):
++        super(_Pickler, self).__init__(file)
++        self._node = node
++
++    def persistent_id(self, key: Any) -> Optional[str]:
++        try:
++            return self._node._ids.get(key)
++        except TypeError:
++            return None
++
++
++class _Unpickler(Unpickler):
++    def __init__(self, file, node):
++        super(_Unpickler, self).__init__(file)
++        self._node = node
++
++    def persistent_load(self, pid):
++        return self._node._get_object(pid)
++
++
+ class NodePickler:
+     def __init__(self) -> None:
+         self._objects: Dict[str, Any] = {}
+         self._ids: Dict[Any, str] = {}
+         self._get_object = self._objects.__getitem__
+ 
+-    def _get_ids(self, key: Any) -> Optional[str]:
+-        try:
+-            return self._ids.get(key)
+-        except TypeError:
+-            return None
+-
+     def register(self, object: Any, id: str) -> None:
+         self._objects[id] = object
+         self._ids[object] = id
+ 
+     def loads(self, s: bytes) -> "Node":
+-        up = Unpickler(BytesIO(s))
+-        # NOTE on type error: https://github.com/python/mypy/issues/2427
+-        # type error: Cannot assign to a method
+-        up.persistent_load = self._get_object  # type: ignore[assignment]
++        up = _Unpickler(BytesIO(s), self)
+         try:
+             return up.load()
+         except KeyError as e:
+@@ -143,10 +155,7 @@ class NodePickler:
+         self, obj: "Node", protocol: Optional[Any] = None, bin: Optional[Any] = None
+     ):
+         src = BytesIO()
+-        p = Pickler(src)
+-        # NOTE on type error: https://github.com/python/mypy/issues/2427
+-        # type error: Cannot assign to a method
+-        p.persistent_id = self._get_ids  # type: ignore[assignment]
++        p = _Pickler(src, self)
+         p.dump(obj)
+         return src.getvalue()
+ 

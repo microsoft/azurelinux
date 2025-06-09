@@ -67,7 +67,7 @@
 Name:           mesa
 Summary:        Mesa graphics libraries
 Version:        24.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -144,7 +144,7 @@ BuildRequires:  llvm-devel >= 7.0.0
 %if 0%{?with_opencl} || 0%{?with_nvk}
 BuildRequires:  clang-devel
 BuildRequires:  bindgen
-BuildRequires:  rust
+BuildRequires:  rust < 1.85.0
 BuildRequires:  pkgconfig(libclc)
 BuildRequires:  pkgconfig(SPIRV-Tools)
 BuildRequires:  pkgconfig(LLVMSPIRVLib)
@@ -741,6 +741,9 @@ popd
 %endif
 
 %changelog
+* Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 24.0.1-2
+- Pin rust version
+
 * Thu Feb 29 2024 Vince Perri <viperri@microsoft.com> - 24.0.1-1
 - Upgrade to 24.0.1 based on Fedora 40.
 - License verified.

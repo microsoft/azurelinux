@@ -1,7 +1,7 @@
 Summary:        NFS client utils
 Name:           nfs-utils
 Version:        2.6.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT and GPLv2 and GPLv2+ and BSD
 URL:            https://linux-nfs.org/
 Group:          Applications/Nfs-utils-client
@@ -100,6 +100,7 @@ mkdir -p %{buildroot}/lib/systemd/system/
 mkdir -p %{buildroot}/etc/default
 mkdir -p %{buildroot}/etc/export.d
 mkdir -p %{buildroot}/var/lib/nfs/v4recovery
+mkdir -p %{buildroot}/etc/request-key.d
 touch %{buildroot}/etc/exports
 
 install -m644 %{SOURCE1} %{buildroot}/lib/systemd/system/
@@ -115,6 +116,8 @@ install -m644 systemd/rpc_pipefs.target  %{buildroot}/lib/systemd/system/
 install -m644 systemd/var-lib-nfs-rpc_pipefs.mount  %{buildroot}/lib/systemd/system/
 install -m644 systemd/rpc-svcgssd.service %{buildroot}/lib/systemd/system/
 install -m644 systemd/rpc-gssd.service %{buildroot}/lib/systemd/system/
+install -m644 support/nfsidmap/idmapd.conf %{buildroot}/etc/
+install -m644 utils/nfsidmap/id_resolver.conf %{buildroot}/etc/request-key.d/
 
 find %{buildroot}/%{_libdir} -name '*.la' -delete
 
@@ -156,12 +159,14 @@ fi
 %{_sharedstatedir}/*
 %config(noreplace) /etc/default/nfs-utils
 %config(noreplace) /etc/exports
+%config(noreplace) /etc/request-key.d/id_resolver.conf
 /lib/systemd/system/*
 %{_libdir}/systemd/system-preset/50-nfs-server.preset
 %{_libexecdir}/nfsrahead
 %{_udevrulesdir}/99-nfs.rules
 
 %files -n libnfsidmap
+%config(noreplace) /etc/idmapd.conf
 %{_libdir}/libnfsidmap.so.*
 %{_libdir}/libnfsidmap/*.so
 
@@ -173,6 +178,9 @@ fi
 %{_libdir}/libnfsidmap.so
 
 %changelog
+* Tue Apr 1 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 2.6.4-4
+- Build nfs-utils to include idmapd.conf and id_resolver.conf
+
 * Mon Aug 26 2024 Suresh Thelkar <sthelkar@microsoft.com> - 2.6.4-3
 - Build nfs-utils to provide rsc.svcgssd service
 - Add rsc-gssd.service file to nfs-utils package

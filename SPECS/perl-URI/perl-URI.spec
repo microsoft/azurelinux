@@ -3,7 +3,7 @@
 
 Name:           perl-URI
 Version:        5.21
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A Perl module implementing URI parsing and manipulation
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -42,6 +42,8 @@ BuildRequires:  perl(Storable)
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::More) >= 0.96
 BuildRequires:  perl(Test::Needs)
+BuildRequires:  perl(Test::Fatal)
+BuildRequires:  perl(Test::Warnings)
 # Runtime
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Cwd)
@@ -90,6 +92,9 @@ make test
 %{_mandir}/man3/URI::*.3*
 
 %changelog
+* Wed May 21 2025 Riken Maharjan <rmaharjan@microsoft.com> - 5.21-2
+- Fix ptest by adding missing runtime dep
+
 * Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.21-1
 - Auto-upgrade to 5.21 - Azure Linux 3.0 - package upgrades
 

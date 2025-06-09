@@ -1,30 +1,34 @@
-Summary:        Tools for managing the osinfo database
-Name:           osinfo-db-tools
-Version:        1.10.0
-Release:        2%{?dist}
-License:        GPL-2.0-or-later
+Summary:       Tools for managing the osinfo database
+Name:          osinfo-db-tools
+Version:       1.12.0
+Release:       1%{?dist}
+License:       GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://libosinfo.org/
-Source:         https://releases.pagure.org/libosinfo/%{name}-1.10.0.tar.xz
-BuildRequires:  %{_bindir}/pod2man
-BuildRequires:  gcc
-BuildRequires:  gettext-devel
-BuildRequires:  git
-BuildRequires:  glib2-devel
-BuildRequires:  json-glib-devel
-BuildRequires:  libarchive-devel
-BuildRequires:  libsoup-devel
-BuildRequires:  libxml2-devel >= 2.6.0
-BuildRequires:  libxslt-devel >= 1.0.0
-BuildRequires:  meson
-BuildRequires:  python3
-BuildRequires:  python3-pytest
-BuildRequires:  python3-requests
+URL:		https://libosinfo.org
+Source: 	https://releases.pagure.org/libosinfo/%{name}-%{version}.tar.xz
+
+BuildRequires: meson
+BuildRequires: gcc
+BuildRequires: gettext-devel
+BuildRequires: git
+BuildRequires: glib2-devel
+BuildRequires: libxml2-devel >= 2.6.0
+BuildRequires: libxslt-devel >= 1.0.0
+BuildRequires: libsoup-devel
+BuildRequires: libarchive-devel
+BuildRequires: json-glib-devel
+BuildRequires: perl-podlators
+
+#Required for testing purposes
+BuildRequires: python3
+BuildRequires: python3-pytest
+BuildRequires: python3-requests
 
 %description
 This package provides tools for managing the osinfo database of
-information about operating systems for use with virtualization
+information about operating systems for use with virtualization.
+
 
 %prep
 %autosetup -S git
@@ -54,6 +58,10 @@ information about operating systems for use with virtualization
 %{_mandir}/man1/osinfo-db-validate.1*
 
 %changelog
+* Tue Dec 17 2024 Jyoti kanase <v-jykanase@microsoft.com> -  1.12.0-1
+- Upgrade version to 1.12.0
+- License verified.
+
 * Wed Dec 28 2022 Muhammad Falak <mwani@microsoft.com> - 1.10.0-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified

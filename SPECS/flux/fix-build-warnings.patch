@@ -1,0 +1,26 @@
+From bb42bf67b2f146bf362edb02f3c7150bc3d9af46 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Wed, 2 Apr 2025 19:34:02 +0000
+Subject: [PATCH] Correctly drop pkg in test. Fixes warning unused_must_use.
+ Taken from upstream https://github.com/influxdata/flux/pull/5484.
+
+---
+ libflux/flux/src/cffi.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libflux/flux/src/cffi.rs b/libflux/flux/src/cffi.rs
+index ba18e3d..2e686ec 100644
+--- a/libflux/flux/src/cffi.rs
++++ b/libflux/flux/src/cffi.rs
+@@ -1159,7 +1159,7 @@ from(bucket: v.bucket)
+         // Safety: both parameters are valid
+         let err = unsafe { flux_ast_get_error(pkg, options) }.unwrap();
+         // Safety: pkg is a valid pointer allocated just above
+-        unsafe { Box::from_raw(pkg) }; // Free the AST
++        unsafe { drop(Box::from_raw(pkg)) }; // Free the AST
+         let msg = err.message.to_string_lossy();
+         assert!(
+             msg.contains("incomplete utf-8 byte sequence from index 0"),
+-- 
+2.45.3
+

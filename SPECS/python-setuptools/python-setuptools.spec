@@ -6,7 +6,7 @@ Setuptools is a fully-featured, actively-maintained, and stable library designed
 Summary:        Easily build and distribute Python packages
 Name:           python-setuptools
 Version:        69.0.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,7 @@ Group:          Development/Tools
 URL:            https://pypi.python.org/pypi/setuptools
 Source0:        https://pypi.org/packages/source/s/setuptools/setuptools-%{version}.tar.gz
 Patch0:         CVE-2024-6345.patch
+Patch1:         CVE-2025-47273.patch
 
 %description    %{_description}
 
@@ -58,6 +59,9 @@ EOF
 %{python3_sitelib}/setuptools-%{version}.dist-info/*
 
 %changelog
+* Mon May 26 2025 <mayansingh@microsoft.com> - 69.0.3-5
+- Fix CVE-2025-47273 with an upstream patch
+
 * Tue Sep 10 2024 <lakarri@microsoft.com> - 69.0.3-4
 - Fix CVE-2024-6345 with a patch
 

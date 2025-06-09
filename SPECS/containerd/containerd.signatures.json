@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "containerd.service": "a07bfcf412669b06673190b0779f48e652c9adcf1758289e849a00802804eec8",
-  "containerd.toml": "793d4f11a4e69bdb3b1903da2cdf76b7f32dbc97197b12d295a05ecc284e230e",
-  "containerd-1.7.13.tar.gz": "ae2b914bff0ddbb9b29d5fc689a51e1ce89ea4edfc4df9ae10517c6f5d2d5aaf"
- }
-}

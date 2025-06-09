@@ -7,14 +7,15 @@
 Summary:        A pythonic, object-oriented HTTP framework
 Name:           python-%{pkgname}
 Version:        18.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Url:            https://cherrypy.dev/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://pypi.io/packages/source/C/%{pypiname}/%{pypiname}-%{version}.tar.gz
 BuildArch:      noarch
-
+#Backport a patch from upstream
+Patch0:         test-session-py3.8above.patch
 %global _description %{expand:
 CherryPy allows developers to build web applications in much the same way they would
 build any other object-oriented Python program. This results in smaller source code 
@@ -42,6 +43,7 @@ BuildRequires:  python3-pip
 
 %prep
 %setup -q -n %{pypiname}-%{version}
+%autopatch -p1
 # suppress depracation warning in the pytest.ini 
 # Feb 2023 setuptools added deprecation warning for pkg_resources.declare_namespace causing all the test to fail for python-cherrypy 
 # https://setuptools.pypa.io/en/latest/history.html#v67-3-0
@@ -58,7 +60,7 @@ python3 setup.py install --root=%{buildroot}
 
 %if 0%{with check}
 %check
-pip3 install tox
+pip3 install tox==4.25.0 --ignore-installed
 tox -e py%{python3_version_nodots}
 %endif
 
@@ -69,6 +71,9 @@ tox -e py%{python3_version_nodots}
 %{_bindir}/cherryd
 
 %changelog
+* Tue Apr 22 2025 Riken Maharjan <rmaharjan@microsoft.com> - 18.9.0-2
+- Add a patch to fix test_session test
+
 * Tue Jan 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 18.9.0-1
 - Auto-upgrade to 18.9.0 - Azure Linux 3.0 - package upgrades
 

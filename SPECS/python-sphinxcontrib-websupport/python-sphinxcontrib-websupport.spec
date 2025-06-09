@@ -6,7 +6,7 @@
 Summary:        Python API to integrate Sphinx into a web application
 Name:           python-%{pypi_name}
 Version:        1.2.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,6 +25,7 @@ BuildRequires:  python-flit-core
 BuildRequires:  python3-pip
 BuildRequires:  python3-packaging
 BuildRequires:  python3-sphinx
+BuildRequires:  python3-pytest
 %endif
 
 Requires:       python3
@@ -48,13 +49,15 @@ The python-sphinxcontrib-websupport package provides a Python API to easily inte
 %pyproject_save_files %{pypi_name_prefix}
 
 %check
-pip3 install tox tox-current-env pytest
-%tox
+%pytest
 %files -n python3-%{pypi_name} -f %{pyproject_files}
 %license LICENSE
 %doc README.rst
 
 %changelog
+* Tue Apr 22 2025 Riken Maharjan <rmaharjan@microsoft.com> -  1.2.7-3
+- Fix ptest by using pytest isntead of tox.
+
 * Mon Mar 06 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 1.2.7-2
 - Fix bug in macro usage
 

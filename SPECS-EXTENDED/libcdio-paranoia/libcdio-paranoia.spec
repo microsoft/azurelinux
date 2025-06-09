@@ -1,18 +1,21 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name: libcdio-paranoia
-Version: 10.2+2.0.0
-Release: 5%{?dist}
+Version: 10.2+2.0.1
+Release: 1%{?dist}
 Summary: CD paranoia on top of libcdio
 License: GPLv3+
-URL: http://www.gnu.org/software/libcdio/
-Source0: http://ftp.gnu.org/gnu/libcdio/libcdio-paranoia-%{version}.tar.bz2
+URL: https://www.gnu.org/software/libcdio/
+Source0: https://ftp.gnu.org/gnu/libcdio/libcdio-paranoia-%{version}.tar.bz2
 Patch0: libcdio-paranoia-manpage.patch
+Patch1: 38.patch
+
 BuildRequires: gcc
 BuildRequires: pkgconfig
 BuildRequires: gettext-devel
 BuildRequires: chrpath
 BuildRequires: libcdio-devel
+BuildRequires: make
 
 %description
 This CDDA reader distribution ('libcdio-cdparanoia') reads audio from the
@@ -32,7 +35,8 @@ This package contains header files and libraries for %{name}.
 
 %prep
 %setup -q
-%patch 0 -p1
+%patch -P0 -p1
+%patch -P1 -p1
 
 # fix pkgconfig files
 sed -i -e 's,-I${includedir},-I${includedir}/cdio,g' libcdio_paranoia.pc.in
@@ -47,10 +51,10 @@ iconv -f ISO88591 -t utf-8 -o THANKS.utf8 THANKS && mv THANKS.utf8 THANKS
 	--disable-dependency-tracking \
 	--disable-static \
 	--disable-rpath
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
+%make_install
 
 find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 
@@ -65,11 +69,11 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/*
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so.*
 
 %check
-make %{?_smp_mflags} check
+%make_build check
 
 %files
 %license COPYING
-%doc AUTHORS NEWS README.md THANKS
+%doc AUTHORS NEWS.md README.md THANKS
 %{_bindir}/*
 %{_libdir}/*.so.*
 %{_mandir}/man1/*
@@ -84,6 +88,10 @@ make %{?_smp_mflags} check
 
 
 %changelog
+* Mon Nov 11 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 10.2+2.0.1 - 1
+- Update to 10.2+2.0.1
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.2+2.0.0-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

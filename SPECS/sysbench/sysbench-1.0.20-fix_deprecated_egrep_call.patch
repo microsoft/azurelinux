@@ -1,0 +1,26 @@
+From 01666bc16992fd8aef9edc2f8cf1f30a272b2a70 Mon Sep 17 00:00:00 2001
+From: Kanishk-Bansal <kbkanishk975@gmail.com>
+Date: Wed, 2 Apr 2025 20:21:46 +0000
+Subject: [PATCH] Fix failing test due to egrep
+Upstream Patch Reference : https://github.com/akopytov/sysbench/commit/604c3c9f2ba4bb54b9f4d1e6f13886e323afeb5c
+
+---
+ tests/t/opt_report_checkpoints.t | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/t/opt_report_checkpoints.t b/tests/t/opt_report_checkpoints.t
+index 1086701..a209c4a 100644
+--- a/tests/t/opt_report_checkpoints.t
++++ b/tests/t/opt_report_checkpoints.t
+@@ -7,7 +7,7 @@
+   >   exit 80
+   > fi
+ 
+-  $ sysbench ${SBTEST_SCRIPTDIR}/oltp_read_write.lua --db-driver=mysql --mysql-dry-run --time=3 --events=0 --report-checkpoints=1,2 run | egrep '(Checkpoint report|SQL statistics)'
++  $ sysbench ${SBTEST_SCRIPTDIR}/oltp_read_write.lua --db-driver=mysql --mysql-dry-run --time=3 --events=0 --report-checkpoints=1,2 run | grep -E '(Checkpoint report|SQL statistics)'
+   [ 1s ] Checkpoint report:
+   SQL statistics:
+   [ 2s ] Checkpoint report:
+-- 
+2.45.2
+

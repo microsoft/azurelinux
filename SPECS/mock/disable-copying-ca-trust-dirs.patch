@@ -1,0 +1,88 @@
+From f40ef246bcaa479eed39bbe1657c9952bb431211 Mon Sep 17 00:00:00 2001
+From: reuben olinsky <reubeno@users.noreply.github.com>
+Date: Mon, 28 Apr 2025 09:49:16 -0700
+Subject: [PATCH] fix: disable copying ca-trust dirs with Azure Linux 3
+
+Makes ca-trust dir copying in copy_certs() a configurable behavior
+via new config option 'ssl_copied_ca_trust_dirs'. Disables this option
+in Azure Linux 3 configurations to avoid clashes between files copied
+from the host and a symlink installed by the ca-certificates-shared
+package in that distro.
+
+Fixes #1572
+---
+ mock/docs/site-defaults.cfg                           | 11 +++++++++++
+ mock/py/mockbuild/config.py                           |  5 +++++
+ mock/py/mockbuild/package_manager.py                  | 10 ++++++----
+ releng/release-notes-next/azure-linux-ca-trust.bugfix |  5 +++++
+
+diff --git a/mock/docs/site-defaults.cfg b/mock/docs/site-defaults.cfg
+index 61d890f20..622eae3a8 100644
+--- a/mock/docs/site-defaults.cfg
++++ b/mock/docs/site-defaults.cfg
+@@ -661,6 +661,17 @@
+ # if 0 is set, then no time limit is used
+ # config_opts['opstimeout'] = 0
+ 
++# Copy host's ca-trust directories into the specified locations inside the
++# chroot. Each item in the list is a pair of (host, chroot) paths for the
++# directories to be copied, since some hosts and some destination chroots
++# may use different paths. The directories are copied recursively.
++#config_opts['ssl_copied_ca_trust_dirs'] = None
++# Example:
++#config_opts['ssl_copied_ca_trust_dirs'] = [
++#    ('/etc/pki/ca-trust', '/etc/pki/ca-trust'),
++#    ('/usr/share/pki/ca-trust-source', '/usr/share/pki/ca-trust-source')
++#]
++
+ # Copy host's SSL certificate bundle ('/etc/pki/tls/certs/ca-bundle.crt') into
+ # specified location inside chroot.  This usually isn't needed because we copy
+ # the whole /etc/pki/ca-trust/extracted directory recursively by default, and
+diff --git a/mock/py/mockbuild/config.py b/mock/py/mockbuild/config.py
+index d69a11d36..f6c11fc9c 100644
+--- a/mock/py/mockbuild/config.py
++++ b/mock/py/mockbuild/config.py
+@@ -136,6 +136,11 @@ def setup_default_config_opts():
+ 
+     config_opts['ssl_ca_bundle_path'] = None
+ 
++    config_opts['ssl_copied_ca_trust_dirs'] = [
++        ('/etc/pki/ca-trust', '/etc/pki/ca-trust'),
++        ('/usr/share/pki/ca-trust-source', '/usr/share/pki/ca-trust-source')
++    ]
++
+     config_opts['ssl_extra_certs'] = None
+ 
+     # (global) plugins and plugin configs.
+diff --git a/mock/py/mockbuild/package_manager.py b/mock/py/mockbuild/package_manager.py
+index f88b3e6a5..8a8848079 100644
+--- a/mock/py/mockbuild/package_manager.py
++++ b/mock/py/mockbuild/package_manager.py
+@@ -398,10 +398,12 @@ def copy_gpg_keys(self):
+ 
+     @traceLog()
+     def copy_certs(self):
+-        cert_paths = ["/etc/pki/ca-trust", "/usr/share/pki/ca-trust-source"]
+-        for cert_path in cert_paths:
+-            pki_dir = self.buildroot.make_chroot_path(cert_path)
+-            file_util.update_tree(pki_dir, cert_path)
++        copied_ca_cert_paths = self.config['ssl_copied_ca_trust_dirs']
++        if copied_ca_cert_paths:
++            for host_path, root_path in copied_ca_cert_paths:
++                self.buildroot.root_log.debug('copying CA trust dir into chroot: %s => %s', host_path, root_path)
++                dest_dir = self.buildroot.make_chroot_path(root_path)
++                file_util.update_tree(dest_dir, host_path)
+ 
+         bundle_path = self.config['ssl_ca_bundle_path']
+         if bundle_path:
+diff --git a/releng/release-notes-next/azure-linux-ca-trust.bugfix b/releng/release-notes-next/azure-linux-ca-trust.bugfix
+new file mode 100644
+index 000000000..3937d3ca1
+--- /dev/null
++++ b/releng/release-notes-next/azure-linux-ca-trust.bugfix
+@@ -0,0 +1,5 @@
++Disables copying /etc/pki/ca-trust and /usr/share/pki/ca-trust-source on
++Azure Linux 3.0 via a new config options ('ssl_copied_ca_trust_dirs').
++This avoids file ownership conflicts with a symlink installed by the
++ca-certificates-shared packages on that distro. Behavior should be unchanged
++for other configurations.

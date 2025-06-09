@@ -1,16 +1,17 @@
 Name:           perl-File-Find-Rule-Perl
-Version:        1.15
-Release:        17%{?dist}
+Version:        1.16
+Release:        1%{?dist}
 Summary:        Common rules for searching for Perl things
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-Find-Rule-Perl
-Source0:        https://cpan.metacpan.org/authors/id/E/ET/ETHER/File-Find-Rule-Perl-%{version}.tar.gz#/perl-File-Find-Rule-Perl-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/E/ET/ETHER/File-Find-Rule-Perl-%{version}.tar.gz
 # Filter out the files rpm generates in sourcedir.
-Patch0:         File-Find-Rule-Perl-1.15-fedora.patch
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+Patch0:         0001-File-Find-Rule-Perl-1.16-fedora.patch
 BuildArch:      noarch
+
+BuildRequires:  %{__make}
 BuildRequires:  perl-generators
 BuildRequires:  perl(constant)
 BuildRequires:  perl(lib)
@@ -29,18 +30,18 @@ Common rules for searching for Perl things.
 
 %prep
 %setup -q -n File-Find-Rule-Perl-%{version}
-%patch 0 -p1
+%patch -P0 -p1
 
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
-make %{?_smp_mflags}
+%{__perl} Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
-chmod -R u+w $RPM_BUILD_ROOT/*
+%{make_install} DESTDIR="$RPM_BUILD_ROOT"
+%{_fixperms} "$RPM_BUILD_ROOT"/*
 
 %check
-make test
+%{__make} test
 
 %files
 %doc Changes
@@ -48,6 +49,10 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.16-1
+- Update to version 1.16
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.15-17
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

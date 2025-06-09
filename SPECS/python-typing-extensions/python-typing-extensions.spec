@@ -23,12 +23,14 @@ reaches end of life.}
 Summary:        Python Typing Extensions
 Name:           python-typing-extensions
 Version:        4.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PSF-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://pypi.org/project/typing-extensions/
 Source0:        %{pypi_source typing_extensions}#/typing-extensions-%{version}.tar.gz
+# fix test_generic_protocols_special_from_protocol with latest Python            
+Patch0:         test_generic_protocols_special_from_protocol.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-test
 BuildRequires:  python3-packaging
@@ -47,7 +49,7 @@ Summary:        %{summary}
 %description -n python3-typing-extensions %{_description}
 
 %prep
-%autosetup -n typing_extensions-%{version}
+%autosetup -n typing_extensions-%{version} -p1
 
 %generate_buildrequires
 %pyproject_buildrequires
@@ -69,6 +71,9 @@ pip3 install pytest==7.1.3
 %doc README.md
 
 %changelog
+* Tue Apr 08 2025 RIken Maharjan <rmaharjan@microsoft.com> - 4.9.0-2
+- Fix ptest by import patches from fedora (LICENSE:MIT). 
+
 * Tue Feb 13 2024 Rohit Rawat <rohitrawat@microsoft.com> - 4.9.0-1
 - Upgrade to 4.9.0
 

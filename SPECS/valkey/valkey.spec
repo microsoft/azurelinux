@@ -1,6 +1,6 @@
 Summary:        advanced key-value store
 Name:           valkey
-Version:        8.0.2
+Version:        8.0.3
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -84,6 +84,9 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/valkey.conf
 
 %changelog
+* Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.3-1
+- Auto-upgrade to 8.0.3 - for CVE-2025-21605
+
 * Mon Jan 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.2-1
 - Auto-upgrade to 8.0.2 - Upgrade valkey to fix CVE-2024-51741 and CVE-2024-46981
 

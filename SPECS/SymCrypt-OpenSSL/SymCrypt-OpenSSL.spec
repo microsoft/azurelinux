@@ -1,6 +1,6 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
-Version:        1.7.0
+Version:        1.8.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -49,6 +49,7 @@ mkdir -p %{buildroot}%{_libdir}/engines-3/
 mkdir -p %{buildroot}%{_libdir}/ossl-modules/
 mkdir -p %{buildroot}%{_includedir}
 mkdir -p %{buildroot}%{_sysconfdir}/pki/tls/
+mkdir -p %{buildroot}%{_localstatedir}/log/keysinuse/
 
 # We still install the engine for backwards compatibility with legacy applications. Callers must
 # explicitly load the engine to use it. It will be removed in a future release.
@@ -67,7 +68,27 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 %{_includedir}/e_scossl.h
 %{_sysconfdir}/pki/tls/symcrypt_prov.cnf
 
+# The log directory for certsinuse logging has permissions set to 1733.
+# These permissions are a result of a security review to mitigate potential risks:
+# - Group and others are denied read access to prevent user-level code from inferring
+#   details about other running applications and their certsinuse usage.
+# - All users have write and execute permissions to create new log files and to 
+#   check file attributes (e.g., to ensure a log file hasn't been tampered with or 
+#   replaced by a symlink).
+# - The sticky bit is set to prevent malicious users from deleting the log files
+#   and interfering with certsinuse alerting mechanisms.
+%dir %attr(1733, root, root) %{_localstatedir}/log/keysinuse/
+
 %changelog
+* Tue May 13 2025 Tobias Brick <tobiasb@microsoft.com> - 1.8.1-1
+- Upgrade to SymCrypt-OpenSSL 1.8.1 with minor bugfixes.
+
+* Thu May 08 2025 Tobias Brick <tobiasb@microsoft.com> - 1.8.0-2
+- Update mechanism for creating keysinuse logging directory.
+
+* Thu Mar 27 2025 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.8.0-1
+- Upgrade to SymCrypt-OpenSSL 1.8.0 with PBKDF2 and minor bugfixes
+
 * Fri Jan 31 2025 Tobias Brick <tobiasb@microsoft.com> - 1.7.0-1
 - Add optional debug logging instead of writing some errors to stderr
 - Add optional KeysInUse feature, which can be turned on by config

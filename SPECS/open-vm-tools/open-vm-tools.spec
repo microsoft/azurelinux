@@ -25,7 +25,7 @@
 Summary:        Open Virtual Machine Tools for virtual machines hosted on VMware
 Name:           open-vm-tools
 Version:        12.3.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,6 +36,7 @@ Source2:        %{vgauthdaemon}.service
 Source3:        vmblock.mount
 Source4:        open-vm-tools.conf
 Source5:        vmtoolsd.pam
+Patch0:         CVE-2025-22247.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 #BuildRequires:    doxygen
@@ -122,7 +123,7 @@ useful for verifying the functioning of %{name} in VMware virtual
 machines.
 
 %prep
-%autosetup -n %{name}-%{version}-%{toolsbuild}
+%autosetup -n %{name}-%{version}-%{toolsbuild} -p1
 
 %build
 # Required for regenerating configure script when
@@ -333,6 +334,9 @@ fi
 %{_bindir}/vmware-vgauth-smoketest
 
 %changelog
+* Fri May 09 2025 Andrew Phelps <anphel@microsoft.com> - 12.3.5-2
+- Add CVE-2025-22247.patch
+
 * Wed Jan 31 2024 Bala <balakumaran.kannan@microsoft.com> - 12.3.5-1
 - Upgrade to version 12.3.5
 

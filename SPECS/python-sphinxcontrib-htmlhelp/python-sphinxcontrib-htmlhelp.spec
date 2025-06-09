@@ -6,7 +6,7 @@
 Summary:        Sphinx extension for HTML help files
 Name:           python-%{pypi_name}
 Version:        2.0.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -74,7 +74,7 @@ popd
 %find_lang sphinxcontrib.htmlhelp
 
 %check
-pip3 install sphinx webencodings exceptiongroup iniconfig tomli
+pip3 install sphinx==7.2.6 webencodings exceptiongroup iniconfig tomli
 %py3_check_import sphinxcontrib.htmlhelp
 %{__python3} -m pytest
 
@@ -85,6 +85,9 @@ pip3 install sphinx webencodings exceptiongroup iniconfig tomli
 %{python3_sitelib}/%{pypi_name_underscore}*.dist-info
 
 %changelog
+* Tue Apr 22 2025 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.5-2
+- Fix ptest using compatible sphinx version.
+
 * Fri Feb 16 2024 Amrita Kohli <amritakohli@microsoft.com> - 2.0.5-1
 - Upgrade to latest version.
 

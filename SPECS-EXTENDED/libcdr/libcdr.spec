@@ -3,20 +3,20 @@ Distribution:   Azure Linux
 %global apiversion 0.1
 
 Name: libcdr
-Version: 0.1.6
-Release: 2%{?dist}
+Version: 0.1.7
+Release: 1%{?dist}
 Summary: A library for import of CorelDRAW drawings
 
 # the only Public Domain source is src/lib/CDRColorProfiles.h
 License: MPLv2.0 and Public Domain
-URL: http://wiki.documentfoundation.org/DLP/Libraries/libcdr
-Source: http://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
-Patch0: icu-68-1-build-fix.patch
+URL: https://wiki.documentfoundation.org/DLP/Libraries/libcdr
+Source: https://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires: boost-devel
 BuildRequires: doxygen
 BuildRequires: gcc-c++
 BuildRequires: help2man
+BuildRequires: make
 BuildRequires: pkgconfig(cppunit)
 BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: pkgconfig(lcms2)
@@ -54,7 +54,7 @@ Tools to transform CorelDRAW drawings into other formats.
 Currently supported: XHTML, text, raw.
 
 %prep
-%autosetup -p1
+%autosetup
 
 %build
 %configure --disable-silent-rules --disable-static --disable-werror
@@ -62,10 +62,10 @@ sed -i \
     -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
     -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' \
     libtool
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 rm -f %{buildroot}/%{_libdir}/*.la
 # rhbz#1001251 we install API docs directly from build
 rm -rf %{buildroot}/%{_docdir}/%{name}
@@ -114,6 +114,10 @@ make %{?_smp_mflags} check
 %{_mandir}/man1/cmx2xhtml.1*
 
 %changelog
+* Mon Nov 11 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 0.1.7-1
+- Update to 0.1.7
+- License verified
+
 * Wed May 19 2021 Thomas Crain <thcrain@microsoft.com> - 0.1.6-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Apply build fix for break caused by icu package upgrade

@@ -2,7 +2,7 @@
 Summary:        Boost
 Name:           boost
 Version:        1.83.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Boost
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,11 @@ URL:            https://www.boost.org/
 Source0:        https://downloads.sourceforge.net/boost/%{name}_%{underscore_version}.tar.bz2
 BuildRequires:  bzip2-devel
 BuildRequires:  libbacktrace-static
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=2178210
+# https://github.com/boostorg/phoenix/issues/111
+# https://github.com/boostorg/phoenix/issues/115
+Patch0: boost-1.81-phoenix-multiple-defn.patch
 
 %global sonamever %{version}
 
@@ -67,7 +72,7 @@ developers to obtain (name, value) pairs from the user, via
 conventional methods such as command-line and configuration file.
 
 %prep
-%autosetup -n %{name}_%{underscore_version}
+%autosetup -n %{name}_%{underscore_version} -p1
 
 %build
 ./bootstrap.sh --prefix=%{buildroot}%{_prefix}
@@ -110,6 +115,9 @@ rm -rf %{buildroot}%{_libdir}/cmake
 %{_libdir}/libboost_system.so.%{sonamever}
 
 %changelog
+* Mon Apr 28 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.83.0-2
+- Adds boost-1.81-phoenix-multiple-defn.patch
+
 * Wed Mar 13 2024 Himaja Kesari <himajakesari@microsoft.com> 
 - Add filesystem, random, system, program-options packages 
 

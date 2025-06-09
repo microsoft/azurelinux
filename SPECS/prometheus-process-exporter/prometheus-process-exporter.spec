@@ -5,7 +5,7 @@
 Summary:        Prometheus exporter exposing process metrics from procfs
 Name:           prometheus-process-exporter
 Version:        0.8.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,6 +30,7 @@ Source3:        %{name}.logrotate
 Source4:        %{name}.conf
 Patch0:         01-fix-RSS-test-on-non4K-pagesize-systems.patch
 Patch1:         03-disable-fakescraper.patch
+Patch2:         CVE-2025-22870.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
@@ -45,10 +46,7 @@ instrument with Prometheus. This exporter solves that issue by mining
 process metrics from procfs.
 
 %prep
-%autosetup -p1 -n process-exporter-%{version}
-
-rm -rf vendor
-tar -xf %{SOURCE1} --no-same-owner
+%autosetup -n process-exporter-%{version} -p1 -a1
 
 %build
 LDFLAGS="-X github.com/ncabatoff/process-exporter/version.Version=%{version}      \
@@ -97,6 +95,9 @@ getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_share
 %dir %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 
 %changelog
+* Tue Apr 08 2025 Rohit Rawat <rohitrawat@microsoft.com> - 0.8.2-2
+- Patch CVE-2025-22870
+
 * Fri Jul 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.2-1
 - Auto-upgrade to 0.8.2 - CVE-2022-46146, CVE-2022-21698, CVE-2021-44716
 

@@ -1,7 +1,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
 Version:        1.0.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,7 +31,7 @@ BuildRequires:  pcre2-devel
 BuildRequires:  python3
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
-BuildRequires:  rust
+BuildRequires:  rust < 1.85.0
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
 BuildRequires:  systemd-rpm-macros
@@ -136,6 +136,9 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.0.7-2
+- Pin rust version
+
 * Fri Oct 18 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.7-1
 - Upgrade to version 1.0.7
 - Fixes CVE-2024-20506, CVE-2024-20505

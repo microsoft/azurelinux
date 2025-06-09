@@ -1,13 +1,14 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Term-UI
-Version:        0.46
-Release:        16%{?dist}
+Version:        0.50
+Release:        1%{?dist}
 Summary:        Term::ReadLine user interface made easy
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Term-UI
-Source0:        https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Term-UI-%{version}.tar.gz#/perl-Term-UI-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Term-UI-%{version}.tar.gz
 BuildArch:      noarch
+BuildRequires:  make
 BuildRequires:  perl-interpreter
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
@@ -15,9 +16,7 @@ BuildRequires:  perl(strict)
 # Run-time:
 BuildRequires:  perl(base)
 BuildRequires:  perl(Carp)
-%if 0%(perl -e 'print $] > 5.017')
 BuildRequires:  perl(deprecate)
-%endif
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(if)
 BuildRequires:  perl(Locale::Maketext::Simple)
@@ -30,10 +29,9 @@ BuildRequires:  perl(vars)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::More) >= 0.31
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-%if 0%(perl -e 'print $] > 5.017')
 Requires:       perl(deprecate)
-%endif
+Requires:       perl(Exporter)
+Requires:       perl(Log::Message::Simple)
 
 %description
 Term::UI is a transparent way of eliminating the overhead of having to
@@ -44,13 +42,12 @@ answer was not proper and re-issuing the question.
 %setup -q -n Term-UI-%{version}
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 make %{?_smp_mflags}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} \;
-%{_fixperms} $RPM_BUILD_ROOT/*
+%{make_install}
+%{_fixperms} %{buildroot}/*
 
 %check
 make test
@@ -61,6 +58,10 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.50-1
+- Update to version 0.50
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.46-16
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

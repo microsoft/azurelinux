@@ -1,22 +1,23 @@
-Name:           pyxattr
-Summary:        Extended attributes library wrapper for Python
-Version:        0.7.1
-Release:        5%{?dist}
-License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name:           pyxattr
+Summary:        Extended attributes library wrapper for Python
+Version:        0.7.2
+Release:        15%{?dist}
+License:        LGPLv2+
 URL:            https://pyxattr.k1024.org/
-Source0:        %{URL}/downloads/%{name}-%{version}.tar.gz
-Source1:        %{URL}/downloads/%{name}-%{version}.tar.gz.asc
+Source0:        %{url}/downloads/%{name}-%{version}.tar.gz
+Source1:        %{url}/downloads/%{name}-%{version}.tar.gz.asc
 Source2:        https://k1024.org/files/key.asc
 
 BuildRequires:  gcc
 BuildRequires:  libattr-devel
 BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 BuildRequires:  gnupg2
-%if 0%{?with_check}
-BuildRequires:  python3-pip
-%endif
+BuildRequires:  %{py3_dist pytest}
+# Dependencies
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %global _description %{expand:
 Python extension module wrapper for libattr. It allows to query, list,
@@ -46,22 +47,71 @@ export TEST_IGNORE_XATTRS=security.selinux
 # the module is just a C extension => need to add the installed destination to
 # PYTHONPATH, otherwise it won't be found
 export PYTHONPATH=%{buildroot}%{python3_sitearch}:$PYTHONPATH
-pip3 install pytest six
-python3 -m pytest test
+# in Copr, skip tests that fail with OSError: [Errno 95] Operation not supported
+python3 -m pytest tests %{?copr_projectname:-k 'not (binary_payload or create_on_existing or empty_value or large_value or many_ops or mixed_access or set_get_remove)'}
 
 %files -n python3-%{name}
-%{python3_sitearch}/xattr.cpython-??*
+%{python3_sitearch}/xattr.cpython-%{python3_version_nodots}*
 %{python3_sitearch}/*egg-info
 %license COPYING
 %doc NEWS README.md
 
 %changelog
-* Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 0.7.1-5
-- Drop BR on `pytest` & pip install latest deps to enable ptest
+* Fri Feb 28 2025 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.7.2-15
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.1-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.2-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.7.2-13
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.2-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.2-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.2-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.7.2-9
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.7.2-6
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jun 02 2021 Python Maint <python-maint@redhat.com> - 0.7.2-3
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Dec  1 2020 Dan Čermák <dan.cermak@cgc-instruments.com> - 0.7.2-1
+- New upstream release 0.7.2
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Dan Čermák <dan.cermak@cgc-instruments.com> - 0.7.1-5
+- BuildRequire python3-setuptools besides python3-devel
+  (see https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/GCPGM34ZGEOVUHSBGZTRYR5XKHTIJ3T7/)
+
+* Fri May 22 2020 Miro Hrončok <mhroncok@redhat.com> - 0.7.1-4
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

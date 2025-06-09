@@ -7,12 +7,16 @@
 Summary:        Alternative String module for OCaml
 Name:           ocaml-%{srcname}
 Version:        0.8.5
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://erratique.ch/software/astring
 Source0:        https://github.com/dbuenzli/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
+
+# Adapt to changed behavior of Char.compare in OCaml 5.
+# This affects x86_64, but not bytecode-only architectures.
+Patch0:          %{name}-ocaml5.patch
 
 BuildRequires:  ocaml >= 4.05.0
 BuildRequires:  ocaml-findlib
@@ -41,7 +45,7 @@ The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -n %{srcname}-%{version}
+%autosetup -p1 -n %{srcname}-%{version}
 
 # Topkg does watermark replacements only if run inside a git checkout.  Github
 # tarballs do not come with a .git directory.  Therefore, we do the watermark
@@ -103,6 +107,9 @@ ocaml pkg/pkg.ml test
 %{_libdir}/ocaml/%{srcname}/%{srcname}*.mli
 
 %changelog
+* Tue Apr 15 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.8.5-7
+- Fix ptest by importing ocam-astring-ocaml5 patch from Fedora (LICENSE: MIT).
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.5-6
 - Cleaning-up spec. License verified.
 

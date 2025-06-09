@@ -1,21 +1,21 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:          zenity
-Version:       3.32.0
-Release:       4%{?dist}
+Version:       3.44.1
+Release:       2%{?dist}
 Summary:       Display dialog boxes from shell scripts
 
 License:       LGPLv2+
 URL:           https://wiki.gnome.org/Projects/Zenity
-Source:        https://download.gnome.org/sources/%{name}/3.32/%{name}-%{version}.tar.xz
+Source:        https://download.gnome.org/sources/%{name}/3.44/%{name}-%{version}.tar.xz
 
-BuildRequires:  gcc
-BuildRequires: pkgconfig(gtk+-3.0) >= 3.0.0
+BuildRequires: pkgconfig(gtk+-3.0) >= 3.16.0
 BuildRequires: pkgconfig(libnotify) >= 0.6.1
-BuildRequires: which
+BuildRequires: gcc
 BuildRequires: gettext
-BuildRequires: intltool
 BuildRequires: itstool
+BuildRequires: meson
+BuildRequires: which
 
 %description
 Zenity lets you display Gtk+ dialog boxes from the command line and through
@@ -23,34 +23,79 @@ shell scripts. It is similar to gdialog, but is intended to be saner. It comes
 from the same family as dialog, Xdialog, and cdialog.
 
 %prep
-%setup -q
+%autosetup -p1
 
 
 %build
-%configure --disable-webkitgtk
-make V=1 %{?_smp_mflags}
+%meson -Dlibnotify=true
+%meson_build
 
 
 %install
-%make_install
+%meson_install
 
 # we don't want a perl dependency just for this
-rm $RPM_BUILD_ROOT%{_bindir}/gdialog
+rm -f $RPM_BUILD_ROOT%{_bindir}/gdialog
 
 %find_lang zenity --with-gnome
 
 
 %files -f zenity.lang
 %license COPYING
-%doc AUTHORS NEWS THANKS README
+%doc AUTHORS NEWS THANKS README.md
 %{_bindir}/zenity
-%{_datadir}/zenity
+%{_datadir}/zenity/
 %{_mandir}/man1/zenity.1*
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.32.0-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed May 07 2025 Archana Shettigar <v-shettigara@microsoft.com> - 3.44.1-2
+- Initial Azure Linux import from Fedora 37 (license: MIT).
+- License verified
+
+* Wed May 03 2023 David King <amigadave@amigadave.com> - 3.44.1-1
+- Update to 3.44.1
+
+* Thu Mar 16 2023 David King <amigadave@amigadave.com> - 3.44.0-1
+- Update to 3.44.0
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.43.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sun Jul 17 2022 Honore Doktorr <hdfssk@gmail.com> - 3.43.0-2
+- Add missing BuildRequires for pkgconfig(libnotify)
+- enable libnotify option for meson build
+
+* Thu Jul 07 2022 David King <amigadave@amigadave.com> - 3.43.0-1
+- Update to 3.43.0
+
+* Wed Apr 27 2022 David King <amigadave@amigadave.com> - 3.42.1-1
+- Update to 3.42.1
+
+* Fri Apr 01 2022 David King <amigadave@amigadave.com> - 3.42.0-1
+- Update to 3.42.0
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.41.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Oct 06 2021 Kalev Lember <klember@redhat.com> - 3.41.0-2
+- Fix eln build
+
+* Mon Aug 23 2021 Kalev Lember <klember@redhat.com> - 3.41.0-1
+- Update to 3.41.0
+- Switch to meson build system
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.32.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Mar 04 2021 David King <amigadave@amigadave.com> - 3.32.0-6
+- Use make macros
+
+* Thu Jan 28 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.32.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.32.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.32.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
