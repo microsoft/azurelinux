@@ -169,6 +169,8 @@ rm %{buildroot}%{_bindir}/2to3
 rm -rf %{buildroot}%{_bindir}/__pycache__
 
 %check
+# Load vsock loopback module required for VSOCK loopback tests to pass
+sudo modprobe vsock_loopback
 %{buildroot}%{_bindir}/python3 -m test
 
 %ldconfig_scriptlets
