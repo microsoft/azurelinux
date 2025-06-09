@@ -1,1 +1,0 @@
-sed -i 's/#DUIDType=vendor/DUIDType=link-layer/' /etc/systemd/networkd.conf
