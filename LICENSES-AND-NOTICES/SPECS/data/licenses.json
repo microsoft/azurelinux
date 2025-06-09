@@ -3006,6 +3006,7 @@
                 "python-docopt",
                 "python-docutils",
                 "python-ecdsa",
+                "python-geomet",
                 "python-gevent",
                 "python-hyperlink",
                 "python-hypothesis",
