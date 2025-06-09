@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 set -euxo pipefail
 
 # Remove the dracut-cmdline-ask service because it isn't used and slows down
