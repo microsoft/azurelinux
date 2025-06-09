@@ -12,7 +12,7 @@
 
 Name:           strongswan
 Version:        5.9.14
-Release:        1%{?dist}
+Release:        7%{?dist}
 Summary:        An OpenSource IPsec-based VPN and TNC solution
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:        GPL-2.0-or-later
@@ -21,8 +21,6 @@ Distribution:   Azure Linux
 URL:            https://www.strongswan.org/
 VCS:            git:%{forgeurl0}
 Source0:        https://download.strongswan.org/strongswan-%{version}%{?prerelease}.tar.bz2
-#Source1:        https://download.strongswan.org/strongswan-%{version}%{?prerelease}.tar.bz2.sig
-#Source2:        https://download.strongswan.org/STRONGSWAN-RELEASE-PGP-KEY
 Source3:        tmpfiles-strongswan.conf
 Patch0:         strongswan-5.6.0-uintptr_t.patch
 # https://github.com/strongswan/strongswan/issues/1198
@@ -156,7 +154,6 @@ for Strongswan runtime configuration from perl applications.
 
 
 %prep
-#%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %autosetup -n %{name}-%{version}%{?prerelease} -p1
 
 %build
@@ -378,7 +375,6 @@ install -D -m 0644 %{SOURCE3} %{buildroot}/%{_tmpfilesdir}/strongswan-starter.co
 %{_libexecdir}/strongswan/*
 %exclude %{_libexecdir}/strongswan/attest
 %exclude %{_libexecdir}/strongswan/pt-tls-client
-#%exclude %{_libexecdir}/strongswan/charon-nm
 %exclude %dir %{_datadir}/strongswan/swidtag
 %{_mandir}/man?/*.gz
 %{_datadir}/strongswan/templates/config/
@@ -429,7 +425,7 @@ install -D -m 0644 %{SOURCE3} %{buildroot}/%{_tmpfilesdir}/strongswan-starter.co
 %endif
 
 %changelog
-* Fri May 23 2025 Mayank Singh <mayansingh@microsoft.com> - 5.9.14-1
+* Fri May 23 2025 Mayank Singh <mayansingh@microsoft.com> - 5.9.14-7
 - Initial Azure Linux import from Fedora 42 (license: MIT).
 - License verified
 
