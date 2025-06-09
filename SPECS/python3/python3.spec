@@ -242,7 +242,7 @@ ln -s python%{majmin} %{buildroot}%{_bindir}/python
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
-* Wed Jun 05 2025 Sudipta Pandit <sudpandit@microsoft.com> - 3.12.9-2
+* Thu Jun 05 2025 Sudipta Pandit <sudpandit@microsoft.com> - 3.12.9-2
 - Add python symlink pointing to python3 binary
 
 * Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.12.9-1
