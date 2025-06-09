@@ -43,7 +43,7 @@ variables:
     value: $[ iif(eq(variables['System.PullRequest.TargetBranch'], 'main'), '2.0', '3.0') ]
 
 extends:
-  template: v2/OneBranch.Official.CrossPlat.yml@obTemplates
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@obTemplates
   parameters:
     featureFlags:
       runOnHost: true
