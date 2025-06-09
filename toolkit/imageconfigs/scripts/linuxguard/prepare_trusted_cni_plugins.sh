@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 set -eux
 
 CNI_BIN_DIR="/opt/cni/bin"
