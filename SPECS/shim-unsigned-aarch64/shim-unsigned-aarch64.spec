@@ -2,7 +2,7 @@
 Summary:        First stage UEFI bootloader
 Name:           shim-unsigned-aarch64
 Version:        15
-Release:        5%{?dist}
+Release:        6%{?dist}
 URL:            https://github.com/rhboot/shim
 License:        BSD
 Vendor:         Microsoft
@@ -77,6 +77,7 @@ Patch0060: 0060-Improve-debug-output-some.patch
 Patch0061: 0061-Also-use-a-config-table-to-mirror-mok-variables.patch
 Patch0062: 0062-Implement-lennysz-s-suggestions-for-MokListRT.patch
 Patch0063: 0063-hexdump.h-fix-arithmetic-error.patch
+Patch0064: CVE-2024-13176.patch
 
 %description
 shim is a trivial EFI application that, when run, attempts to open and
@@ -102,6 +103,10 @@ install -vm 644 shimaa64.efi %{buildroot}/usr/share/%{name}/shimaa64.efi
 /usr/share/%{name}/shimaa64.efi
 
 %changelog
+* Mon Jun 09 2025 Mayank Singh <mayansingh@microsoft.com> 15-6
+- Fix CVE-2024-13176 with an upstream patch
+- License verified
+
 * Fri Apr 23 2021 Chris Co <chrco@microsoft.com> 15-5
 - Update cert
 * Tue Aug 25 2020 Chris Co <chrco@microsoft.com> 15-4
