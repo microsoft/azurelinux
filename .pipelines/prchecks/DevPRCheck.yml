@@ -43,11 +43,21 @@ variables:
     value: $[ iif(eq(variables['System.PullRequest.TargetBranch'], 'main'), '2.0', '3.0') ]
 
 extends:
-  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
+  template: v2/OneBranch.Official.CrossPlat.yml@obTemplates
   parameters:
+    featureFlags:
+      runOnHost: true
+      EnableCDPxPAT: false
+    git:
+      lfs: false
     globalSdl:
-      credscan:
-        suppressionsFile: .config/CredScanSuppressions.json
+      disableLegacyManifest: true
+      policheck:
+        break: true
+      sbom:
+        enabled: false # OB doesn't support Mariner artifacts, so we handle SBOM generation manually.
+      tsa:
+        enabled: false
     stages:
       - template: ../templates/PackageBuildPRCheck.yml@self
         parameters:
