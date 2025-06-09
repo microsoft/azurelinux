@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.75.0
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -63,6 +63,7 @@ BuildRequires:  python3
 BuildRequires:  zlib-devel
 %if 0%{?with_check}
 BuildRequires:  glibc-static >= 2.38-10%{?dist}
+BuildRequires:  sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
@@ -133,7 +134,10 @@ ln -s %{_topdir}/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage
 ln -s %{_topdir}/BUILD/rustc-%{version}-src/vendor/ /root/vendor
 # remove rustdoc ui flaky test issue-98690.rs (which is tagged with 'unstable-options')
 rm -v ./tests/rustdoc-ui/issue-98690.*
-%make_build check
+useradd -m -d /home/test test
+chown -R test:test .
+sudo -u test %make_build check
+userdel -r test
 
 %install
 USER=root SUDO_USER=root %make_install
