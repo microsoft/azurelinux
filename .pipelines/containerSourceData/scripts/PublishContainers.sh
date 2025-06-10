@@ -106,7 +106,7 @@ function oras_attach {
 # $1: image name
 function oras_detach {
     local image_name=$1
-    lifecycle_manifests=$(oras discover -o json  --artifact-type "application/vnd.microsoft.artifact.lifecycle" "$full_image_name")
+    lifecycle_manifests=$(oras discover -o json  --artifact-type "application/vnd.microsoft.artifact.lifecycle" "$image_name")
     manifests=$(echo "$lifecycle_manifests" | jq -r '.manifests')
 
     if [[ -z $manifests ]]; then
