@@ -106,7 +106,7 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
-* Wed Jun 03 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.30.3-7
+* Tue Jun 03 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.30.3-7
 - Patch CVE-2025-4947
 
 * Mon Apr 07 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.30.3-6
