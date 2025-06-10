@@ -6,20 +6,29 @@
 This page lists host machine requirements for building with the Azure Linux toolkit. They cover building the toolchain, packages, and images on an Ubuntu 22.04 host.
 
 ```bash
-# Install required dependencies.
+# Install required dependencies
 sudo ./toolkit/docs/building/prerequisites-ubuntu.sh
+
+# Alternatively, install dependencies and fix Go links
+sudo ./toolkit/docs/building/prerequisites-ubuntu.sh --fix-go-links
+
+# Or install dependencies, fix Go links, and set up Docker
+sudo ./toolkit/docs/building/prerequisites-ubuntu.sh --fix-go-links --configure-docker
+
+# To see all available options
+sudo ./toolkit/docs/building/prerequisites-ubuntu.sh --help
 
 # Also supported is:
 #    make -C toolkit install-prereqs
-
-# Fix go 1.23 link
-sudo ln -vsf /usr/lib/go-1.23/bin/go /usr/bin/go
-sudo ln -vsf /usr/lib/go-1.23/bin/gofmt /usr/bin/gofmt
-
-# Install and configure Docker.
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
-sudo usermod -aG docker $USER
 ```
 
-**You will need to log out and log back in** for user changes to take effect.
+If you chose to configure Docker with `--configure-docker`, **you will need to log out and log back in** for the user changes to take effect.
+
+### Script Options
+
+The `prerequisites-ubuntu.sh` script supports the following options:
+
+- `--fix-go-links`: Creates symbolic links for Go binaries to make them available in your PATH
+- `--configure-docker`: Installs Docker and adds your user to the docker group
+- `--no-install-prereqs`: Skips installation of prerequisite packages
+- `--help`: Displays usage information
