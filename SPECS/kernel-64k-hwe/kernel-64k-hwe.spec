@@ -23,7 +23,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel-64k-hwe
-Version:        6.12.30.1
+Version:        6.12.30.2
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
