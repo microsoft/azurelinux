@@ -418,7 +418,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Sat May 22 2025 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.85.1-1
 - Auto-upgrade to 6.6.85.1
-- Add revert-to-upstream-8250_port.c.patch
+- Add reapply-serial-8250-adjust-fifo-mode-timeout.patch
 
 * Mon Feb 24 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.77.1-1
 - Auto-upgrade to 6.6.77.1
