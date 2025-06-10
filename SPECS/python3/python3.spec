@@ -170,7 +170,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 
 %check
 # Load vsock loopback module required for VSOCK loopback tests to pass
-sudo modprobe vsock_loopback
+modprobe vsock_loopback || lsmod | grep vsock || echo "No vsock support"
 %{buildroot}%{_bindir}/python3 -m test
 
 %ldconfig_scriptlets
