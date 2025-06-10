@@ -278,7 +278,7 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
-* Thu May 06 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.28.4-19
+* Tue Jun 10 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.28.4-19
 - Patch CVE-2024-45310
 
 * Thu Apr 24 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.28.4-18
