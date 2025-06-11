@@ -25,10 +25,12 @@
 # and/or other materials provided with the distribution.
 #
 #
-%global last-known-kernel 6.6.85.1-4
 
 %if 0%{azl}
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
+%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
 %global target_kernel_version_full f.a.k.e
 %endif
@@ -96,10 +98,15 @@
 %global devel_pname %{_name}-devel
 %global non_kmp_pname %{_name}-modules
 
+# !!!! some OOT spec depends on this the exact version and release nb of this component
+# !!!! do not forget to upgrade those spec when upgrading version or release nb
+# !!!! e.g.: when going from version 24.10 to 24.11 or going from release 20 to 21
+# !!!! to identify the depend spec look for "_mofed_full_version"
+
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel
 Version:	 24.10
-Release:	 18%{?dist}
+Release:	 20%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -734,6 +741,12 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
+* Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-20
+- Add kernel version and release nb into release nb
+
+* Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-19
+- Bump release to rebuild for new kernel release
+
 * Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-18
 - Bump release to rebuild for new kernel release
 
