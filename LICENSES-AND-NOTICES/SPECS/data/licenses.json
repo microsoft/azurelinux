@@ -2300,6 +2300,7 @@
                 "libconfini",
                 "libconfuse",
                 "libgdiplus",
+                "libimobiledevice-glue",
                 "libmaxminddb",
                 "libmetalink",
                 "libsafec",
