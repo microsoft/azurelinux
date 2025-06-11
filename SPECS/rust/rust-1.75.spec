@@ -179,7 +179,7 @@ rm %{buildroot}%{_bindir}/*.old
 
 %changelog
 * Tue Jun 10 2025 Kavya Sree Kaitepalli kkaitepalli@microsoft.com - 1.75.0-15
-- Bump release to rebuild with rust
+- Run %check as non root user to fix ptests
 
 * Mon May 12 2025 Andrew Phelps anphel@microsoft.com - 1.75.0-14
 - Bump to rebuild with updated glibc
