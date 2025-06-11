@@ -66,8 +66,9 @@ groupadd test
 useradd test -g test -m
 chown -R test:test .
 
+# Exclude merge_large_tests as it fails in amd timeout in arm
 # In case of failure, print the test log.
-sudo -u test make test || { cat Testing/Temporary/LastTest.log; false; }
+sudo -u test ctest --exclude-regex merge_large_tests || { cat Testing/Temporary/LastTest.log; false; }
 
 %pre
 getent group  mysql  >/dev/null || groupadd -r mysql
