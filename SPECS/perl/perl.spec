@@ -127,12 +127,13 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        507%{?dist}
+Release:        508%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://www.cpan.org/src/5.0/perl-%{perl_version}.tar.xz
+# Note that scrubbed version of the source tarball contains upstream source minus password protected files which password is not known
+Source0:        https://www.cpan.org/src/5.0/perl-%{perl_version}.tar.xz#/perl-%{perl_version}-scrubbed.tar.xz
 Source3:        macros.perl
 # Tom Christiansen confirms Pod::Html uses the same license as perl
 Source6:        Pod-Html-license-clarification
@@ -173,6 +174,9 @@ Patch13:        perl-5.28.0-Pass-CFLAGS-to-dtrace.patch
 # Backported perl5 commit 7af2d20
 # Fixed in perl 5.39.3, in locale.c was more changes
 Patch14:         perl-5.38.0-Revert-Do-uselocale-earlier-in-init-process.patch
+
+# remove password protected zip file which password is not known
+Patch15:         perl-remove-psw-protected-zip.patch
 
 # Link XS modules to libperl.so with EU::CBuilder on Linux, bug #960048
 Patch200:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-CBuilder-on-Li.patch
@@ -6840,6 +6844,9 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Tue May 27 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 4:5.38.2-508
+- Remove password protected zip files from upstream src tarball
+
 * Tue Apr 08 2025 Andrew Phelps <anphel@microsoft.com> - 4:5.38.2-507
 - Patch CVE-2024-56406
 

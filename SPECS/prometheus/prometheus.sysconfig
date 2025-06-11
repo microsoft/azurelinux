@@ -1,5 +1,0 @@
-CONFIG_FILE=/etc/prometheus/prometheus.yml
-STORAGE_TSDB_PATH=/var/lib/prometheus
-WEB_CONSOLE_LIBRARIES_PATH=/etc/prometheus/console_libraries
-WEB_CONSOLE_TEMPLATES_PATH=/etc/prometheus/consoles
-WEB_LISTEN_ADDRESS=127.0.0.1:9090

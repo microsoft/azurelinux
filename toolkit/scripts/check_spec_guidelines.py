@@ -40,7 +40,7 @@ INVALID_TOOLCHAIN_PATCH_MACRO = re.compile(r"^\s*%patch((?!-P\s+\d+).)*$", re.MU
 
 LICENSE_REGEX = re.compile(r"\b(license verified|verified license)\b", re.IGNORECASE)
 
-VALID_RELEASE_TAG_REGEX = re.compile(r"^[1-9]\d*%\{\?dist\}$")
+VALID_RELEASE_TAG_REGEX = re.compile(r"^(%\{release_prefix\})?[1-9]\d*(%\{release_suffix\})?%\{\?dist\}$")
 
 VALID_SOURCE_ATTRIBUTIONS_ONE_PER_LINE = "\n".join(
     f"- {key}: '{value}'" for key, value in VALID_SOURCE_ATTRIBUTIONS.items()
@@ -104,11 +104,17 @@ def check_release_tag(spec_path: str):
 
     if VALID_RELEASE_TAG_REGEX.match(spec.release) is None:
         print(f"""
-ERROR: invalid 'Release' tag.
+ERROR: invalid 'Release' tag '{spec.release}'.
 
     Accepted format is:
 
-        '[number]%{{?dist}}' (example: 10%{{?dist}})
+        '(%{{release_prefix}})?[number](%{{release_suffix}})?%{{?dist}}'
+
+    Examples:
+
+        - 10%{{?dist}}
+        - %{{release_prefix}}10%{{?dist}}
+        - 10%{{release_suffix}}%{{?dist}}
 """)
         return False
 

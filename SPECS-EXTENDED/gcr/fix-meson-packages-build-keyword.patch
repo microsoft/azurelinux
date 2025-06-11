@@ -1,0 +1,36 @@
+diff --git a/gck/meson.build b/gck/meson.build
+index 756b486..a21a1e9 100644
+--- a/gck/meson.build
++++ b/gck/meson.build
+@@ -131,7 +131,6 @@ if get_option('introspection')
+     sources: gck_gir_sources,
+     namespace: 'Gck',
+     nsversion: '@0@'.format(gck_major_version),
+-    packages: gck_deps,
+     export_packages: 'gck-@0@'.format(gck_major_version),
+     includes: [ 'GObject-2.0', 'Gio-2.0' ],
+     header: 'gck/gck.h',
+diff --git a/gcr/meson.build b/gcr/meson.build
+index 06c3a63..f998336 100644
+--- a/gcr/meson.build
++++ b/gcr/meson.build
+@@ -189,7 +189,6 @@ if get_option('introspection')
+     sources: [ gcr_base_public_sources, gcr_base_headers ],
+     namespace: 'Gcr',
+     nsversion: '@0@'.format(gcr_major_version),
+-    packages: gcr_base_deps,
+     export_packages: 'gcr-base-@0@'.format(gcr_major_version),
+     includes: [
+       'GObject-2.0',
+diff --git a/ui/meson.build b/ui/meson.build
+index 477412d..d93c0ef 100644
+--- a/ui/meson.build
++++ b/ui/meson.build
+@@ -153,7 +153,6 @@ if get_option('introspection')
+     export_packages: 'gcr-ui-@0@'.format(gcr_major_version),
+     identifier_prefix: 'Gcr',
+     symbol_prefix: 'gcr',
+-    packages: gcr_ui_deps,
+     includes: [
+       'GObject-2.0',
+       'Gio-2.0',
