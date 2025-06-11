@@ -54,7 +54,7 @@ if [ "$INSTALL_PREREQS" = true ]; then
     genisoimage \
     git \
     glibc-devel \
-    golang \
+    golang-1.24.3 \
     jq \
     kernel-headers \
     make \
