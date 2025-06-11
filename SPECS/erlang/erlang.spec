@@ -2,7 +2,7 @@
 Summary:        erlang
 Name:           erlang
 Version:        26.2.5.12
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -53,9 +53,6 @@ export ERL_TOP=`pwd`
 %{_libdir}/erlang/*
 
 %changelog
-* Wed Jun 04 2025 Muhammad Falak <mwani@microsoft.com> - 26.2.5.11-2
-- Skip format-check in tests
-
 * Wed May 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 26.2.5.12-1
 - Auto-upgrade to 26.2.5.12 - for CVE-2025-46712
 
