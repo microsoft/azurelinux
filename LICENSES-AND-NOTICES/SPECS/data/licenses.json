@@ -2270,6 +2270,7 @@
                 "nlohmann-json",
                 "nmap",
                 "node-problem-detector",
+                "notation",
                 "ntopng",
                 "opentelemetry-cpp",
                 "packer",
