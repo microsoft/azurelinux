@@ -13,7 +13,7 @@
 
 Name:           javapackages-bootstrap
 Version:        1.5.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        A means of bootstrapping Java Packages Tools
 # For detailed info see the file javapackages-bootstrap-PACKAGE-LICENSING
 License:        ASL 2.0 and ASL 1.1 and (ASL 2.0 or EPL-2.0) and (EPL-2.0 or GPLv2 with exceptions) and MIT and (BSD with advertising) and BSD-3-Clause and EPL-1.0 and EPL-2.0 and CDDL-1.0 and xpp and CC0 and Public Domain
@@ -345,7 +345,11 @@ sed  -i "/<excludeSourceMatching>/a\ \t<excludeSourceMatching>/org/apache/common
 %build
 export LC_ALL=en_US.UTF-8 
 export JAVA_HOME=$(find /usr/lib/jvm -name "*openjdk*")
-./mbi.sh build -parallel
+# Since the build is known to randomly fail with a dependency cycle error, detect failure and retry the build.
+if ! ./mbi.sh build -incremental; then
+    echo "First build attempt failed. Re-trying."
+    ./mbi.sh build -incremental
+fi
 
 %install
 export JAVA_HOME=$(find /usr/lib/jvm -name "*openjdk*")
@@ -389,6 +393,9 @@ sed -i 's|/usr/lib/jvm/java-11-openjdk|%{java_home}|' %{buildroot}%{launchersPat
 %doc AUTHORS
 
 %changelog
+* Thu May 15 2025 Andrew Phelps <anphel@microsoft.com> - 1.5.0-7
+- Attempt incremental build twice to avoid random Dependency cycle errors
+
 * Wed Feb 26 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.5.0-6
 - Patch CVE-2021-36373 and CVE-2021-36374.
 

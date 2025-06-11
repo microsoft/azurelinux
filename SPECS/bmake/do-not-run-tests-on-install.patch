@@ -1,0 +1,11 @@
+diff -urN a/boot-strap b/boot-strap
+--- a/boot-strap	2025-05-16 03:40:30.989548051 +0000
++++ b/boot-strap	2025-05-16 03:40:51.653715837 +0000
+@@ -434,7 +434,6 @@
+ }
+ 
+ op_install() {
+-	op_test
+ 	case "$INSTALL_PREFIX,$INSTALL_BIN,$prefix" in
+ 	,$HOST_TARGET/bin,*/$HOST_TARGET)
+ 		INSTALL_PREFIX=`dirname $prefix`
