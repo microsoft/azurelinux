@@ -76,9 +76,10 @@ Requires:       kernel-uvm
 This package contains the the tooling and files required to build the UVM
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
+%autosetup -N -n %{name}-%{version}
 pushd %{_builddir}/%{name}-%{version}
 tar -xf %{SOURCE1}
+&autopatch -p1
 popd
 
 %build
