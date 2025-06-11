@@ -10,13 +10,6 @@ parameters:
     default: ""
     displayName: "Daily build ID"
 
-  - name: isDailyBuildUpdateManifests
-    type: string
-    default: "true"
-    values:
-      - "true"
-      - "false"
-
   # Parameters acting as local constants since we can't use global variables in templates.
   - name: buildConfiguration
     type: object
@@ -72,7 +65,7 @@ stages:
               - template: ToolchainBuild.yml@self
                 parameters:
                   dailyBuildID: "${{ parameters.dailyBuildID }}"
-                  isDailyBuildUpdateManifests: "${{ parameters.isDailyBuildUpdateManifests }}"
+                  isDailyBuildUpdateManifests: ${{ iif eq(parameters.dailyBuildID, 'lkg'), false, true }}
                   outputArtifactsFolder: $(ob_outputDirectory)
                   selfRepoName: self
 
@@ -196,7 +189,7 @@ stages:
                   checkBuildRetries: "1"
                   customToolchainTarballName: $(toolchainTarballName)
                   dailyBuildID: "${{ parameters.dailyBuildID }}"
-                  isDailyBuildUpdateManifests: "${{ parameters.isDailyBuildUpdateManifests }}"
+                  isDailyBuildUpdateManifests: ${{ iif eq(parameters.dailyBuildID, 'lkg'), false, true }}
                   inputArtifactsFolder: $(inputArtifactsLocation)
                   isAllowToolchainRebuilds: true
                   isCheckBuild: true

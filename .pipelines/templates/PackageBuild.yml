@@ -23,13 +23,6 @@ parameters:
     default: ""
     displayName: "Daily build ID"
 
-  - name: isDailyBuildUpdateManifests
-    type: string
-    default: "true"
-    values:
-      - "true"
-      - "false"
-
   - name: extraPackageRepos
     type: string
     default: ""
@@ -58,6 +51,14 @@ parameters:
       - "true"
 
   - name: isCheckBuild
+    type: string
+    default: "default"
+    values:
+      - "default"
+      - "false"
+      - "true"
+
+  - name: isDailyBuildUpdateManifests
     type: string
     default: "default"
     values:
@@ -238,10 +239,8 @@ steps:
         max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}"
       fi
 
-      if [[ ${{ parameters.dailyBuildID }} == "lkg" ]]; then
+      if [[ -n "${{ parameters.dailyBuildID }}" ]]; then
         daily_build_id_arg="DAILY_BUILD_ID=${{ parameters.dailyBuildID }}"
-      elif [[ -n "${{ parameters.dailyBuildID }}" ]]; then
-        daily_build_id_arg=""
       fi
 
       if [[ ${{ parameters.isDailyBuildUpdateManifests }} == "true" ]]; then

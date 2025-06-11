@@ -13,10 +13,11 @@ parameters:
 
   - name: isDailyBuildUpdateManifests
     type: string
-    default: "true"
+    default: "default"
     values:
-      - "true"
+      - "default"
       - "false"
+      - "true"
 
   - name: outputArtifactsFolder
     type: string
@@ -40,10 +41,8 @@ steps:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
   - bash: |
-      if [[ ${{ parameters.dailyBuildID }} == "lkg" ]]; then
+      if [[ -n ${{ parameters.dailyBuildID }} ]]; then
         daily_build_id_arg="DAILY_BUILD_ID=${{ parameters.dailyBuildID }}"
-      elif [[ -n "${{ parameters.dailyBuildID }}" ]]; then
-        daily_build_id_arg=""
       fi
 
       if [[ ${{ parameters.isDailyBuildUpdateManifests }} == "true" ]]; then
