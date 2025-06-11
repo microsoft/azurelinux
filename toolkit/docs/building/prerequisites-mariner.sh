@@ -41,6 +41,8 @@ while [ $# -gt 0 ]; do
 done
 
 # Install prerequisites if not disabled
+# golang version pinned for stability to avoid breaking changes. As of 11-Jun-2025 we are using golang-1.24.3.
+# When making a breaking change to the toolkit which requires a newer golang version, update this version.
 if [ "$INSTALL_PREREQS" = true ]; then
     echo "Installing required packages..."
     tdnf -y install \

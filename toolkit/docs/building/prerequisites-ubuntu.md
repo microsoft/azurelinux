@@ -19,7 +19,8 @@ sudo ./toolkit/docs/building/prerequisites-ubuntu.sh --fix-go-links --configure-
 sudo ./toolkit/docs/building/prerequisites-ubuntu.sh --help
 
 # Also supported is:
-#    make -C toolkit install-prereqs
+#    sudo make -C toolkit install-prereqs
+#    sudo make -C toolkit install-prereqs-and-configure
 ```
 
 If you chose to configure Docker with `--configure-docker`, **you will need to log out and log back in** for the user changes to take effect.
