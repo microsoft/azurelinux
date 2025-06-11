@@ -32,6 +32,9 @@ os:
   hostname: azurelinux
 
   packages:
+    remove:
+    - dracut-hostonly
+
     installLists:
     - packagelists/hyperv-packages.yaml
     - packagelists/core-packages-image-arm64.yaml
