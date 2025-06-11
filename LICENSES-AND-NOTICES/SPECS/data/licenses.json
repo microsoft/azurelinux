@@ -2317,6 +2317,7 @@
                 "networkd-dispatcher",
                 "nlohmann-json",
                 "nmap",
+                "notation",
                 "ntopng",
                 "opentelemetry-cpp",
                 "packer",

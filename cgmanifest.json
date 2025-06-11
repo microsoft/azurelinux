@@ -14341,6 +14341,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "notation",
+          "version": "1.3.2",
+          "downloadUrl": "https://github.com/notaryproject/notation/archive/refs/tags/v1.3.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "npth",
           "version": "1.6",
           "downloadUrl": "https://gnupg.org/ftp/gcrypt/npth/npth-1.6.tar.bz2"
