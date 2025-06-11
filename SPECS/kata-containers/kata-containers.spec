@@ -93,6 +93,7 @@ popd
 
 %dir %{tools_pkg}/tools/osbuilder/image-builder
 %{tools_pkg}/tools/osbuilder/image-builder/image_builder.sh
+%{tools_pkg}/tools/osbuilder/image-builder/nsdax.gpl.c
 
 %dir %{tools_pkg}/tools/osbuilder/node-builder
 %dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux
