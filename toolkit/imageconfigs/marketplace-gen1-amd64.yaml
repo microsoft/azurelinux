@@ -39,9 +39,6 @@ os:
     - console=ttyS0
 
   packages:
-    remove:
-    - dracut-hostonly
-
     installLists:
     - packagelists/azurevm-packages.yaml
     - packagelists/core-packages-image.yaml

@@ -48,9 +48,6 @@ os:
     - initcall_blacklist=arm_pmu_acpi_init
 
   packages:
-    remove:
-    - dracut-hostonly
-
     installLists:
     - packagelists/azurevm-packages.yaml
     - packagelists/core-packages-image.yaml

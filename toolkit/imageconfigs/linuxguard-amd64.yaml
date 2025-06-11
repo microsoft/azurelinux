@@ -120,7 +120,6 @@ os:
 
   packages:
     remove:
-      - dracut-hostonly
       - grub2-efi-binary
       - kernel
 
