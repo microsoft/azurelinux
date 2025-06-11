@@ -42,9 +42,6 @@ os:
     mode: enforcing
 
   packages:
-    remove:
-    - dracut-hostonly
-
     installLists:
     - packagelists/baremetal-packages.yaml
     - packagelists/base-image-packages.yaml
