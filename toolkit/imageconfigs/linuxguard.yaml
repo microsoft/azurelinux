@@ -120,8 +120,10 @@ os:
 
   packages:
     remove:
-      - kernel
+      - dracut-hostonly
       - grub2-efi-binary
+      - kernel
+
     install:
       - kernel-ipe
       - openssh-server
