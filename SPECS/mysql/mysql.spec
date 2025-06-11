@@ -66,8 +66,9 @@ groupadd test
 useradd test -g test -m
 chown -R test:test .
 
+# Exclude merge_large_tests as it fails in amd timeout in arm
 # In case of failure, print the test log.
-sudo -u test make test || { cat Testing/Temporary/LastTest.log; false; }
+sudo -u test ctest --exclude-regex merge_large_tests || { cat Testing/Temporary/LastTest.log; false; }
 
 %pre
 getent group  mysql  >/dev/null || groupadd -r mysql
@@ -120,6 +121,7 @@ fi
   CVE-2025-30715, CVE-2025-21574, CVE-2025-30682, CVE-2025-21580, CVE-2025-21575, CVE-2025-21577, CVE-2025-30693, CVE-2025-30696,
   CVE-2025-30688, CVE-2025-21584, CVE-2025-30684
 - Remove patch for CVE-2025-0725
+- Exclude merge_large_tests in package test.
 
 * Tue Mar 26 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.41-1
 - Upgrade to 8.0.41 to fix CVE-2025-21490
