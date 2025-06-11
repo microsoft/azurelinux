@@ -92,10 +92,12 @@ Requires:       curl
 This package contains the UVM osbuilder files
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
+%autosetup -N -n %{name}-%{version}
 
 cd %{_builddir}/%{name}-%{version}
 tar -xf %{SOURCE1}
+
+%autopatch -p1
 
 # Not using gobuild here in order to stick to how upstream builds
 # (This builds multiple binaries)
