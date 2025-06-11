@@ -87,7 +87,7 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 %dir %attr(1733, root, root) %{_localstatedir}/log/keysinuse/
 
 %changelog
-* Thu May 22 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.0-1
+* Wed Jun 11 2025 Tobias Brick <tobiasb@microsoft.com> - 1.9.0-1
 - Auto-upgrade to 1.9.0 - Support digest state exports.
 - Added second test run that forces the use of the SymCrypt provider.
 
