@@ -46,7 +46,7 @@ while [ $# -gt 0 ]; do
 done
 
 # Install prerequisites if not disabled
-# golang version pinned for stability to avoid breaking changes. As of 11-Jun-2025 we are using golang-1.23.1 on Ubuntu 22.04 since it is the most recent release availble.
+# golang version pinned for stability to avoid breaking changes. As of 11-Jun-2025 we are using golang-1.23.1 on Ubuntu 22.04 since it is the most recent release available.
 # When making a breaking change to the toolkit which requires a newer golang version, update this version if needed. 
 # If no newer version is available, suggest moving to a newer Ubuntu LTS version
 if [ "$INSTALL_PREREQS" = true ]; then
