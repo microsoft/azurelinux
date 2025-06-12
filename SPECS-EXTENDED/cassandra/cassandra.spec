@@ -4,7 +4,7 @@
 Summary:        Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store
 Name:           cassandra
 Version:        4.0.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 URL:            http://cassandra.apache.org/
 License:        Apache License, Version 2.0
 Group:          Applications/System
@@ -61,7 +61,7 @@ tar -xvf  %{SOURCE2}
 mkdir -p ~/.m2
 mv repository ~/.m2/
 
-export JAVA_HOME="%{java_home}"
+export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk-11")
 export ANT_OPTS="-Xmx1024m -XX:MaxPermSize=512m"
 ant -v clean jar javadoc -Drelease=true -Duse.jdk11=true
 
@@ -141,6 +141,9 @@ fi
 %exclude %{_var}/opt/cassandra/build/lib
 
 %changelog
+* Thu May 22 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 4.0.10-2
+- Update path for JAVA_HOME
+
 * Tue May 30 2023 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.0.10-1
 - Upgrade version to 4.0.10 to address CVE-2023-30601.
 
