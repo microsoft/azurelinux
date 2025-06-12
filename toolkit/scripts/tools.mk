@@ -23,14 +23,14 @@ ifeq ($(REBUILD_TOOLS),y)
 go_current_version = $(shell go version | awk '{print $$3}')
 go_version_check = $(shell printf '%s\n%s\n' "$(go_min_version)" "$(go_current_version)" | sort -V | head -n1)
 ifneq ($(go_version_check),$(go_min_version))
-$(error Go version '$(go_current_version)' is less than minimum required version '$(go_min_version)' \n \
------------------------------------------------------------------------\n \
-| If this is a personal machine,                                      |\n \
-|     use 'sudo make install-prereqs' to get the latest dependencies. |\n \
-| If this is an automated system,                                     |\n \
-|     consider 'sudo make install-prereqs-and-configure' to get the   |\n \
-|     latest dependencies and configure go symlinks and docker user.  |\n \
------------------------------------------------------------------------\n)
+$(error Go version '$(go_current_version)' is less than minimum required version '$(go_min_version)' $(newline) \
+-----------------------------------------------------------------------$(newline) \
+| If this is a personal machine,                                      |$(newline) \
+|     use 'sudo make install-prereqs' to get the latest dependencies. |$(newline) \
+| If this is an automated system,                                     |$(newline) \
+|     consider 'sudo make install-prereqs-and-configure' to get the   |$(newline) \
+|     latest dependencies and configure go symlinks and docker user.  |$(newline) \
+-----------------------------------------------------------------------$(newline))
 endif
 endif
 
