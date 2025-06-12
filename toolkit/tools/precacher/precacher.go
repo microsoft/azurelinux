@@ -96,7 +96,11 @@ func main() {
 
 	downloadedPackages, err := downloadMissingPackages(rpmSnapshot, packagesAvailableFromRepos, *outDir, *concurrentNetOps)
 	if err != nil {
-		logger.PanicOnError(err)
+		logger.Log.Warnf("Package download failed")
+		logger.Log.Warnf("Missing package download failed: %s", err)
+		// reset the error to nil so we can still write the summary file
+		// packages which are not able to be downloaded are not considered a failure of the tool, just a failure to download some packages
+		err = nil
 	}
 
 	logger.Log.Infof("Downloaded %d packages into the cache", len(downloadedPackages))
