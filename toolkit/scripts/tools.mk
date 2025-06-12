@@ -24,6 +24,11 @@ go_current_version = $(shell go version | awk '{print $$3}')
 go_version_check = $(shell printf '%s\n%s\n' "$(go_min_version)" "$(go_current_version)" | sort -V | head -n1)
 ifneq ($(go_version_check),$(go_min_version))
 $(error Go version '$(go_current_version)' is less than minimum required version '$(go_min_version)')
+$(error --------------------------------------------------------------------------------------------------)
+$(error | If this is a personal machine, use 'sudo make install-prereqs' to get the latest dependencies. |)
+$(error | If this is an automated system, consider 'sudo make install-prereqs-and-configure'             |)
+$(error |     to get the latest dependencies and configure go symlinks and docker user.                  |)
+$(error --------------------------------------------------------------------------------------------------)
 endif
 endif
 

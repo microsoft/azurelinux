@@ -12,6 +12,7 @@ usage() {
     echo "Options:"
     echo "  --configure-docker    Enable Docker service and add current user to docker group"
     echo "  --no-install-prereqs  Skip installation of prerequisite packages"
+    echo "  --use-msft-golang     Use msft-golang-1.24.1 instead of golang-1.24.3"
     echo "  --help                Display this help message"
     exit 1
 }
@@ -19,6 +20,7 @@ usage() {
 # Initialize option flags
 CONFIGURE_DOCKER=false
 INSTALL_PREREQS=true
+USE_MSFT_GOLANG=false
 
 # Parse command line arguments
 while [ $# -gt 0 ]; do
@@ -28,6 +30,9 @@ while [ $# -gt 0 ]; do
             ;;
         --no-install-prereqs)
             INSTALL_PREREQS=false
+            ;;
+        --use-msft-golang)
+            USE_MSFT_GOLANG=true
             ;;
         --help)
             usage
@@ -45,6 +50,16 @@ done
 # When making a breaking change to the toolkit which requires a newer golang version, update this version.
 if [ "$INSTALL_PREREQS" = true ]; then
     echo "Installing required packages..."
+    
+    # Determine which golang package to use based on the option
+    if [ "$USE_MSFT_GOLANG" = true ]; then
+        GOLANG_PKG="msft-golang-1.24.1"
+        echo "Using Microsoft Go version: $GOLANG_PKG"
+    else
+        GOLANG_PKG="golang-1.24.3"
+        echo "Using standard Go version: $GOLANG_PKG"
+    fi
+    
     tdnf -y install \
     acl \
     binutils \
@@ -56,7 +71,7 @@ if [ "$INSTALL_PREREQS" = true ]; then
     genisoimage \
     git \
     glibc-devel \
-    golang-1.24.3 \
+    $GOLANG_PKG \
     jq \
     kernel-headers \
     make \

@@ -1,31 +1,71 @@
 
-# Build Requirements on `Ubuntu`
+# Build Requirements for Azure Linux Toolkit on Ubuntu
 
-## Requirements were validated on `Ubuntu 22.04`
+This page outlines the requirements for building with the Azure Linux toolkit on Ubuntu.
 
-This page lists host machine requirements for building with the Azure Linux toolkit. They cover building the toolchain, packages, and images on an Ubuntu 22.04 host.
+## System-Specific Requirements
+
+### Golang Package Requirements
+
+The Azure Linux toolkit on Ubuntu has been validated with the following:
+
+- **Ubuntu 22.04**: Uses `golang-1.23.1` (available as `golang-1.23-go` package)
+
+## Installation Methods
+
+### Method 1: Using Make Targets (Recommended)
+
+The make targets automatically install the appropriate packages:
 
 ```bash
-# Install required dependencies
-sudo ./toolkit/docs/building/prerequisites-ubuntu.sh
+# For interactive development environments (local machines)
+# Installs prerequisites but doesn't modify system configuration
+sudo make -C toolkit install-prereqs
 
-# Alternatively, install dependencies and fix Go links
-sudo ./toolkit/docs/building/prerequisites-ubuntu.sh --fix-go-links
+# Manually create Go symlinks for proper PATH integration
+sudo ln -sf /usr/lib/go-1.23/bin/go /usr/bin/go
+sudo ln -sf /usr/lib/go-1.23/bin/gofmt /usr/bin/gofmt
 
-# Or install dependencies, fix Go links, and set up Docker
-sudo ./toolkit/docs/building/prerequisites-ubuntu.sh --fix-go-links --configure-docker
+# Manually configure Docker if needed
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER
+# Note: You will need to log out and log back in for user changes to take effect
 
-# To see all available options
-sudo ./toolkit/docs/building/prerequisites-ubuntu.sh --help
+# the above 2 steps can alternatively be done using the following command if preferred:
+# sudo ./toolkit/docs/building/prerequisites-ubuntu.sh --no-install-prereqs --fix-go-links --configure-docker
 
-# Also supported is:
-#    sudo make -C toolkit install-prereqs
-#    sudo make -C toolkit install-prereqs-and-configure
+----------------------
+
+# For automated environments (CI/CD pipelines) or complete setup
+# Installs prerequisites AND configures Docker and Go links
+sudo make -C toolkit install-prereqs-and-configure
 ```
 
-If you chose to configure Docker with `--configure-docker`, **you will need to log out and log back in** for the user changes to take effect.
+**Recommendation**: 
+- Use `install-prereqs` on your local development machine
+- Use `install-prereqs-and-configure` in CI/CD pipelines or when you need a complete environment setup
 
-### Script Options
+### Method 2: Direct Script Execution
+
+If you prefer running the script directly, you have several options:
+
+```bash
+# Basic installation with Go
+sudo ./toolkit/docs/building/prerequisites-ubuntu.sh
+
+# Manually create Go symlinks for proper PATH integration
+sudo ln -sf /usr/lib/go-1.23/bin/go /usr/bin/go
+sudo ln -sf /usr/lib/go-1.23/bin/gofmt /usr/bin/gofmt
+
+# Manually configure Docker if needed
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER
+# Note: You will need to log out and log back in for user changes to take effect
+```
+
+## Script Options
 
 The `prerequisites-ubuntu.sh` script supports the following options:
 
@@ -33,3 +73,5 @@ The `prerequisites-ubuntu.sh` script supports the following options:
 - `--configure-docker`: Installs Docker and adds your user to the docker group
 - `--no-install-prereqs`: Skips installation of prerequisite packages
 - `--help`: Displays usage information
+
+> **Note**: If you use `--configure-docker`, you will need to log out and log back in for the user changes to take effect.

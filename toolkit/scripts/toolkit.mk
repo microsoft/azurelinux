@@ -133,7 +133,10 @@ install-prereqs:
 	@echo "Installing build prerequisites for AzureLinux..." && \
 	current_os=$$(grep '^ID=' /etc/os-release | cut -d'=' -f2-) && \
 	echo "Current OS: $$current_os" && \
-	if [ "$$current_os" = "mariner" ] || [ "$$current_os" = "azurelinux" ]; then \
+	if [ "$$current_os" = "mariner" ]; then \
+		"$(toolkit_root)/docs/building/prerequisites-mariner.sh" --use-msft-golang || \
+		$(call print_error,Install failed) ; \
+	elif [ "$$current_os" = "azurelinux" ]; then \
 		"$(toolkit_root)/docs/building/prerequisites-mariner.sh" || \
 		$(call print_error,Install failed) ; \
 	elif [ "$$current_os" = "ubuntu" ]; then \
@@ -148,7 +151,10 @@ install-prereqs-and-configure:
 	@echo "Installing prerequisites and configuring system to build AzureLinux..." && \
 	current_os=$$(grep '^ID=' /etc/os-release | cut -d'=' -f2-) && \
 	echo "Current OS: $$current_os" && \
-	if [ "$$current_os" = "mariner" ] || [ "$$current_os" = "azurelinux" ]; then \
+	if [ "$$current_os" = "mariner" ]; then \
+		"$(toolkit_root)/docs/building/prerequisites-mariner.sh" --use-msft-golang --configure-docker || \
+		$(call print_error,Install failed) ; \
+	elif [ "$$current_os" = "azurelinux" ]; then \
 		"$(toolkit_root)/docs/building/prerequisites-mariner.sh" --configure-docker || \
 		$(call print_error,Install failed) ; \
 	elif [ "$$current_os" = "ubuntu" ]; then \
