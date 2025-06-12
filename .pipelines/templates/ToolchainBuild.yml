@@ -13,10 +13,10 @@ parameters:
 
   - name: isDailyBuildUpdateManifests
     type: string
-    default: "true"
+    default: "default"
     values:
-      - "true"
       - "false"
+      - "true"
 
   - name: outputArtifactsFolder
     type: string
