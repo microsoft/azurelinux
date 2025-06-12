@@ -53,6 +53,12 @@ if [ "$INSTALL_PREREQS" = true ]; then
     
     # Determine which golang package to use based on the option
     if [ "$USE_MSFT_GOLANG" = true ]; then
+        # golang will conflict with msft-golang, so we need to remove it if it exists
+        if rpm -q golang >/dev/null 2>&1; then
+            echo "Removing existing golang package..."
+            tdnf -y remove golang
+        fi
+
         GOLANG_PKG="msft-golang-1.24.1"
         echo "Using Microsoft Go version: $GOLANG_PKG"
     else
