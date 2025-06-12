@@ -46,7 +46,9 @@ while [ $# -gt 0 ]; do
 done
 
 # Install prerequisites if not disabled
-# golang version pinned for stability to avoid breaking changes. As of 11-Jun-2025 we are using golang-1.24.3.
+# golang version pinned for stability to avoid breaking changes. As of 11-Jun-2025 we are using the following golang versions:
+# - msft-golang-1.24.1 for Mariner 2.0
+# - golang-1.24.3 for Mariner 3.0
 # When making a breaking change to the toolkit which requires a newer golang version, update this version.
 if [ "$INSTALL_PREREQS" = true ]; then
     echo "Installing required packages..."
@@ -55,7 +57,7 @@ if [ "$INSTALL_PREREQS" = true ]; then
     if [ "$USE_MSFT_GOLANG" = true ]; then
         # golang will conflict with msft-golang, so we need to remove it if it exists
         if rpm -q golang >/dev/null 2>&1; then
-            echo "Removing existing golang package..."
+            echo "Installed golang conflicts with required msft-golang. Removing existing golang package..."
             tdnf -y remove golang
         fi
 
