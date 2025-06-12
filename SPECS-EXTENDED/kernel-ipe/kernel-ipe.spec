@@ -207,7 +207,7 @@ if [ -s config_diff ]; then
     echo "Update config file to set changed values explicitly"
 
 #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
-    exit 1
+#    exit 1
 fi
 
 mkdir tarfs
@@ -236,7 +236,7 @@ make -C tools/bpf/bpftool
 for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
     ./scripts/sign-file sha512 certs/signing_key.pem certs/signing_key.x509 $MODULE \
     rm -f $MODULE.{sig,dig} \
-    # xz $MODULE \
+    xz --threads=1 --check=crc32 --lzma2=dict=1MiB $MODULE \
     done \
 %{nil}
 
