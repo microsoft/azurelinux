@@ -9,7 +9,7 @@ This page outlines the requirements for building with the Azure Linux toolkit on
 
 The Azure Linux toolkit on Ubuntu has been validated with the following:
 
-- **Ubuntu 22.04**: Uses `golang-1.23.1` (available as `golang-1.23-go` package)
+- **Ubuntu 22.04**: Validated with `golang-1.23.1` (available as `golang-1.23-go` package)
 
 ## Installation Methods
 
@@ -63,6 +63,9 @@ curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 sudo usermod -aG docker $USER
 # Note: You will need to log out and log back in for user changes to take effect
+
+# the above 2 steps can alternatively be done using the following command if preferred:
+# sudo ./toolkit/docs/building/prerequisites-ubuntu.sh --no-install-prereqs --fix-go-links --configure-docker
 ```
 
 ## Script Options

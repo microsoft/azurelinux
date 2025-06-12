@@ -28,7 +28,7 @@ sudo systemctl enable --now docker.service
 sudo usermod -aG docker $USER
 # Note: You will need to log out and log back in for user changes to take effect
 
-# the above 2 steps can alternatively be done using the following command if preferred:
+# the above step can alternatively be done using the following command if preferred:
 # sudo ./toolkit/docs/building/prerequisites-mariner.sh --no-install-prereqs --configure-docker
 
 --------------
@@ -55,6 +55,9 @@ sudo ./toolkit/docs/building/prerequisites-mariner.sh --use-msft-golang
 sudo systemctl enable --now docker.service
 sudo usermod -aG docker $USER
 # Note: You will need to log out and log back in for user changes to take effect
+
+# the above step can alternatively be done using the following command if preferred:
+# sudo ./toolkit/docs/building/prerequisites-mariner.sh --no-install-prereqs --configure-docker
 ```
 
 #### For Azure Linux 3.0:
@@ -66,6 +69,9 @@ sudo ./toolkit/docs/building/prerequisites-mariner.sh
 sudo systemctl enable --now docker.service
 sudo usermod -aG docker $USER
 # Note: You will need to log out and log back in for user changes to take effect
+
+# the above step can alternatively be done using the following command if preferred:
+# sudo ./toolkit/docs/building/prerequisites-mariner.sh --no-install-prereqs --configure-docker
 ```
 
 ## Script Options
