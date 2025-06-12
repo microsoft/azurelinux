@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.85.1
-Release:        100%{?dist}
+Release:        101%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -428,6 +428,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Jun 12 2025 Sindhu Karri <lakarri@microsoft.com> - 6.6.85.1-101
+- Change config CONFIG_SECURITY_LOCKDOWN_LSM_EARLY to n
+
 * Wed Jun 11 2025 Sindhu Karri <lakarri@microsoft.com> - 6.6.85.1-100
 - Change config CONFIG_LSM to put selinux first instead of lockdown
 
