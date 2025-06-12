@@ -21,6 +21,7 @@ The make targets automatically detect your OS version and install the appropriat
 ```bash
 # For interactive development environments (local machines)
 # Installs prerequisites but doesn't modify system configuration
+# Note: On Azure Linux 2.0, this will remove golang if installed in favor of msft-golang due to the golang version requirement
 sudo make -C toolkit install-prereqs
 
 # Manually configure Docker if needed
@@ -49,6 +50,7 @@ If you prefer running the script directly, use the appropriate options for your 
 #### For Azure Linux 2.0 (CBL-Mariner):
 ```bash
 # Install prerequisites with msft-golang
+# Note: This will remove golang if installed in favor of msft-golang due to the golang version requirement
 sudo ./toolkit/docs/building/prerequisites-mariner.sh --use-msft-golang
 
 # Manually configure Docker if needed
