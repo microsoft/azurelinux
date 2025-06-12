@@ -428,7 +428,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Wed June 11 2025 Sindhu Karri <lakarri@microsoft.com> - 6.6.85.1-100
+* Wed Jun 11 2025 Sindhu Karri <lakarri@microsoft.com> - 6.6.85.1-100
 - Change config CONFIG_LSM to put selinux first instead of lockdown
 
 * Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.6.85.1-4
