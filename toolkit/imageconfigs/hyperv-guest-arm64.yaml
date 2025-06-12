@@ -34,7 +34,7 @@ os:
   packages:
     installLists:
     - packagelists/hyperv-packages.yaml
-    - packagelists/core-packages-image-aarch64.yaml
+    - packagelists/core-packages-image-arm64.yaml
     - packagelists/cloud-init-packages.yaml
 
 scripts:
