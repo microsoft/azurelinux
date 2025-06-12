@@ -62,6 +62,7 @@ var (
 	buildDir          = app.Flag("worker-dir", "Directory to store chroot while running repo query.").Required().String()
 
 	concurrentNetOps = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultNetOpsCount).Uint()
+	nonFatalMode     = app.Flag("non-fatal-mode", "Run in non-fatal mode, where errors are logged but do not cause the program to exit with a non-zero code.").Bool()
 )
 
 func main() {
@@ -80,11 +81,22 @@ func main() {
 
 	rpmSnapshot, err := rpmSnapshotFromFile(*snapshot)
 	if err != nil {
-		logger.PanicOnError(err)
+		if *nonFatalMode {
+			logger.Log.Errorf("%s", err)
+			return
+		} else {
+			logger.FatalOnError(err)
+		}
+
 	}
 	packagesAvailableFromRepos, err := repoutils.GetAllRepoData(*repoUrls, *repoFiles, *workerTar, *buildDir, *repoUrlsFile)
 	if err != nil {
-		logger.PanicOnError(err)
+		if *nonFatalMode {
+			logger.Log.Errorf("%s", err)
+			return
+		} else {
+			logger.FatalOnError(err)
+		}
 	}
 
 	logger.Log.Infof("Found %d available packages", len(packagesAvailableFromRepos))
@@ -96,13 +108,22 @@ func main() {
 
 	downloadedPackages, err := downloadMissingPackages(rpmSnapshot, packagesAvailableFromRepos, *outDir, *concurrentNetOps)
 	if err != nil {
-		logger.PanicOnError(err)
+		logger.Log.Warnf("Package download failed")
+		logger.Log.Warnf("Missing package download failed: %s", err)
+		// reset the error to nil so we can still write the summary file
+		// packages which are not able to be downloaded are not considered a failure of the tool, just a failure to download some packages
+		err = nil
 	}
 
 	logger.Log.Infof("Downloaded %d packages into the cache", len(downloadedPackages))
 	err = writeSummaryFile(*outputSummaryFile, downloadedPackages)
 	if err != nil {
-		logger.PanicOnError(err)
+		if *nonFatalMode {
+			logger.Log.Errorf("%s", err)
+			return
+		} else {
+			logger.FatalOnError(err)
+		}
 	}
 }
 
