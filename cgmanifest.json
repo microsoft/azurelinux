@@ -1097,8 +1097,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.20.5",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.20.5/bind-9.20.5.tar.xz"
+          "version": "9.20.9",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.20.9/bind-9.20.9.tar.xz"
         }
       }
     },
@@ -13732,8 +13732,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.41",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.41.tar.gz"
+          "version": "8.0.42",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.42.tar.gz"
         }
       }
     },
