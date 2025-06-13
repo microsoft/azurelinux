@@ -44,6 +44,7 @@ Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Patch0:         CVE-2023-45853.patch
 Patch1:         CVE-2024-32884.patch
 Patch2:         CVE-2024-31852.patch
+Patch3:         CVE-2025-4574_1.75.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -180,6 +181,7 @@ rm %{buildroot}%{_bindir}/*.old
 %changelog
 * Tue Jun 10 2025 Kavya Sree Kaitepalli kkaitepalli@microsoft.com - 1.75.0-15
 - Run %check as non root user to fix ptests
+- Patch CVE-2025-4574
 
 * Mon May 12 2025 Andrew Phelps anphel@microsoft.com - 1.75.0-14
 - Bump to rebuild with updated glibc
