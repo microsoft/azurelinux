@@ -2,8 +2,8 @@
 
 Summary:        Routing daemon
 Name:           frr
-Version:        9.1.1
-Release:        2%{?dist}
+Version:        10.3
+Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,12 +11,13 @@ URL:            https://www.frrouting.org
 Source0:        https://github.com/FRRouting/frr/archive/refs/tags/%{name}-%{version}.tar.gz
 Source1:        %{name}-tmpfiles.conf
 Source2:        %{name}-sysusers.conf
+	
 Patch0:         0000-remove-babeld-and-ldpd.patch
 Patch1:         0001-enable-openssl.patch
 Patch2:         0002-disable-eigrp-crypto.patch
 Patch3:         0003-fips-mode.patch
 Patch4:         0004-remove-grpc-test.patch
-Patch5:         CVE-2024-44070.patch
+Patch5:         0005-s390x-endianness-test.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -199,6 +200,10 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Fri Jun 13 2025 Kanishk Bansal <kanbansal@microsoft.com> - 10.3-1
+- Upgrade to 10.3 for CVE-2024-55553
+- Remove patch for CVE-2024-44070
+
 * Wed Aug 21 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 9.1.1-2
 - Fix CVE-2024-44070
 

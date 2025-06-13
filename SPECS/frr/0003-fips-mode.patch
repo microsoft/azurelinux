@@ -2,6 +2,17 @@ diff --git a/ospfd/ospf_vty.c b/ospfd/ospf_vty.c
 index 631465f..e084ff3 100644
 --- a/ospfd/ospf_vty.c
 +++ b/ospfd/ospf_vty.c
+@@ -7,6 +7,10 @@
+ #include <zebra.h>
+ #include <string.h>
+ 
++#ifdef CRYPTO_OPENSSL
++#include <openssl/fips.h>
++#endif
++
+ #include "printfrr.h"
+ #include "monotime.h"
+ #include "memory.h"
 @@ -1136,6 +1136,11 @@ DEFUN (ospf_area_vlink,
  		vl_config.keychain = argv[idx+1]->arg;
  	} else if (argv_find(argv, argc, "message-digest", &idx)) {
@@ -58,6 +69,17 @@ diff --git a/isisd/isis_circuit.c b/isisd/isis_circuit.c
 index 81b4b39..cce33d9 100644
 --- a/isisd/isis_circuit.c
 +++ b/isisd/isis_circuit.c
+@@ -13,6 +13,10 @@
+ #include <netinet/if_ether.h>
+ #endif
+ 
++#ifdef CRYPTO_OPENSSL
++#include <openssl/fips.h>
++#endif
++
+ #include "log.h"
+ #include "memory.h"
+ #include "vrf.h"
 @@ -1318,6 +1318,10 @@ static int isis_circuit_passwd_set(struct isis_circuit *circuit,
  		return ferr_code_bug(
  			"circuit password too long (max 254 chars)");
@@ -73,6 +95,17 @@ diff --git a/isisd/isisd.c b/isisd/isisd.c
 index 419127c..a6c36af 100644
 --- a/isisd/isisd.c
 +++ b/isisd/isisd.c
+@@ -9,6 +9,10 @@
+ 
+ #include <zebra.h>
+ 
++#ifdef CRYPTO_OPENSSL
++#include <openssl/fips.h>
++#endif
++
+ #include "frrevent.h"
+ #include "vty.h"
+ #include "command.h"
 @@ -1638,6 +1638,10 @@ static int isis_area_passwd_set(struct isis_area *area, int level,
  		if (len > 254)
  			return -1;
@@ -88,6 +121,17 @@ diff --git a/ripd/rip_cli.c b/ripd/rip_cli.c
 index 5bb81ef..02a09ef 100644
 --- a/ripd/rip_cli.c
 +++ b/ripd/rip_cli.c
+@@ -7,6 +7,10 @@
+ 
+ #include <zebra.h>
+ 
++#ifdef CRYPTO_OPENSSL
++#include <openssl/fips.h>
++#endif
++
+ #include "if.h"
+ #include "if_rmap.h"
+ #include "vrf.h"
 @@ -796,6 +796,12 @@ DEFPY (ip_rip_authentication_mode,
  			value = "20";
  	}
@@ -101,15 +145,3 @@ index 5bb81ef..02a09ef 100644
  	nb_cli_enqueue_change(vty, "./authentication-scheme/mode", NB_OP_MODIFY,
  			      strmatch(mode, "md5") ? "md5" : "plain-text");
  	if (strmatch(mode, "md5"))
-diff --git a/lib/zebra.h b/lib/zebra.h
-index 53ae5b4..930307f 100644
---- a/lib/zebra.h
-+++ b/lib/zebra.h
-@@ -114,6 +114,7 @@
- #ifdef CRYPTO_OPENSSL
- #include <openssl/evp.h>
- #include <openssl/hmac.h>
-+#include <openssl/fips.h>
- #endif
-
- #include "openbsd-tree.h"
