@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.30.3
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -26,6 +26,7 @@ Patch7:         CVE-2023-44487.patch
 # required to determine what upstream patches are included.
 Patch8:         CVE-2023-35945.patch
 Patch9:		CVE-2024-48615.patch
+Patch10:	CVE-2025-4947.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -105,6 +106,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
+* Tue Jun 03 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.30.3-7
+- Patch CVE-2025-4947
+
 * Mon Apr 07 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.30.3-6
 - Backport patch to fix CVE-2024-48615
 
