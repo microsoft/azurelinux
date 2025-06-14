@@ -42,9 +42,7 @@ Patch1002:      CVE-2024-3651.patch
 Patch1003:      CVE-2023-43804.patch
 Patch1004:      CVE-2024-37891.patch
 Patch1005:      CVE-2023-5752.patch
-Patch1006:      CVE-2023-45803_1.patch
-Patch1007:      CVE-2023-45803_2.patch
-Patch1008:      CVE-2023-45803_3.patch
+Patch1006:      CVE-2023-45803.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -258,12 +256,8 @@ echo 'Patching CVE-2024-37891 in bundled wheel file %{_libdir}/python%{majmin}/s
 patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py < %{PATCH1004}
 echo 'Patching CVE-2023-5752 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_internal/vcs/mercurial.py'
 patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_internal/vcs/mercurial.py < %{PATCH1005}
-echo 'Patching CVE-2023-45803_1 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/_collections.py'
-patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/_collections.py < %{PATCH1006}
-echo 'Patching CVE-2023-45803_2 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/connectionpool.py'
-patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/connectionpool.py < %{PATCH1007}
-echo 'Patching CVE-2023-45803_3 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/poolmanager.py'
-patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/poolmanager.py < %{PATCH1008}
+echo 'Patching CVE-2023-45803 in bundled wheel folder %{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3'
+patch -p1 -d %{buildroot}%{_libdir}/python%{majmin}/site-packages < %{PATCH1006}
 
 # Windows executables get installed by pip and setuptools- we don't need these.
 find %{buildroot}%{_libdir}/python%{majmin}/site-packages -name '*.exe' -delete -print
