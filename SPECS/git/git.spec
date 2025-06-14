@@ -7,7 +7,7 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.45.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -118,11 +118,13 @@ make configure
     --libexec=%{_libexecdir} \
     --with-gitconfig=%{_sysconfdir}/gitconfig
 make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}"
+%make_build -C contrib/subtree/ all
 
 %install
 %make_install
 install -vdm 755 %{buildroot}%{_datadir}/bash-completion/completions
 install -m 0644 contrib/completion/git-completion.bash %{buildroot}%{_datadir}/bash-completion/completions/git
+%make_install -C contrib/subtree
 %find_lang %{name}
 %{_fixperms} %{buildroot}/*
 
@@ -164,7 +166,7 @@ fi
 
 %if %{with subtree}
 %files subtree
-%{_libexecdir}/git-core/git-merge-subtree
+%{_libexecdir}/git-core/git-subtree
 %endif
 
 %if %{with svn}
@@ -173,6 +175,9 @@ fi
 %endif
 
 %changelog
+* Tue Jun 03 2025 Muhammad Falak <mwani@microsoft.com> - 2.45.3-3
+- Fix subtree subpackage
+
 * Thu Apr 17 2025 Muhammad Falak <mwani@microsoft.com> - 2.45.3-2
 - Add dependency only for openssh-clients instead of openssh
 
