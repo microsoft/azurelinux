@@ -1107,8 +1107,8 @@
         "type": "other",
         "other": {
           "name": "binutils",
-          "version": "2.41",
-          "downloadUrl": "https://ftp.gnu.org/gnu/binutils/binutils-2.41.tar.xz"
+          "version": "2.44",
+          "downloadUrl": "https://ftp.gnu.org/gnu/binutils/binutils-with-gold-2.44.tar.xz"
         }
       }
     },
