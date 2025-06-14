@@ -1,0 +1,10 @@
+packages:
+- ca-certificates
+- core-packages-base-image
+- cronie-anacron
+- dracut-hostonly
+- dracut-vrf
+- grub2-efi-binary
+- logrotate
+- shadow-utils
+- shim
