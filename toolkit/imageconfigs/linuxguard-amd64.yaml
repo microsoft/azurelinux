@@ -211,6 +211,13 @@ scripts:
       - --variant
       - Linux Guard Image
 
+    - path: scripts/set_os_release_variant_entries.sh
+      arguments:
+      - --variant-id
+      - linuxguard
+      - --variant
+      - Linux Guard Image
+
 previewFeatures:
   - uki
   - output-artifacts
