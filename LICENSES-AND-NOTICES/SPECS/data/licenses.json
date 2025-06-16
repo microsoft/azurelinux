@@ -2687,6 +2687,7 @@
                 "c-ares",
                 "cairo",
                 "cassandra",
+                "cassandra-driver",
                 "cdrkit",
                 "check",
                 "chkconfig",
