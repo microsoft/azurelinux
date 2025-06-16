@@ -131,7 +131,7 @@ install -m 644 wiretap/*.h "${IDIR}/wiretap"
 install -m 644 wsutil/*.h "${IDIR}/wsutil"
 install -m 644 %{SOURCE2} %{buildroot}%{_udevrulesdir}
 install -Dpm 644 %{SOURCE3} %{buildroot}%{_sysusersdir}/%{name}.conf
-
+rm %{buildroot}/usr/share/doc/wireshark/COPYING
 
 touch %{buildroot}%{_bindir}/%{name}
 
