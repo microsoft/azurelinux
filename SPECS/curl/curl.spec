@@ -11,7 +11,7 @@ Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
 Patch0:         CVE-2025-0665.patch
 Patch1:         CVE-2025-0167.patch
 Patch2:         CVE-2025-0725.patch
-BuildRequires:  cmake
+
 BuildRequires:  krb5-devel
 BuildRequires:  libnghttp2-devel
 BuildRequires:  libssh2-devel
