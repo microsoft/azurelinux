@@ -60,6 +60,7 @@ transferred over HTTP or CIFS, or play back an RTP audio stream.
 
 %package        cli
 Summary:        Network traffic analyzer
+Requires:       shadow-utils
 
 %description    cli
 This package contains command-line utilities, plugins, and documentation for
