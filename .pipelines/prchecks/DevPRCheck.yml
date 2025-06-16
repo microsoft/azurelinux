@@ -55,7 +55,7 @@ extends:
       policheck:
         break: true
       sbom:
-        enabled: false # OB doesn't support Mariner artifacts, so we handle SBOM generation manually. Commit, another commit
+        enabled: false # OB doesn't support Mariner artifacts, so we handle SBOM generation manually.
       tsa:
         enabled: false
     stages:
