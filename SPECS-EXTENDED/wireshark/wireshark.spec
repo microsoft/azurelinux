@@ -202,6 +202,7 @@ fi
 %changelog
 * Tue Jun 10 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> 4.4.7-1
 - Upgrade to 4.4.7
+- Reference Fedora42 spec and patches applicable
 
 * Thu Sep 07 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 4.0.8-1
 - Upgrade version to address 27 CVEs
