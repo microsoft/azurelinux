@@ -3,7 +3,7 @@
 Summary:        A firewall daemon with D-Bus interface providing a dynamic firewall
 Name:           firewalld
 Version:        2.0.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ Source0:        https://github.com/firewalld/firewalld/releases/download/v%{vers
 Source1:        FedoraServer.xml
 Source2:        FedoraWorkstation.xml
 Patch0:         firewalld-only-MDNS-default.patch
+Patch1:         firewalld_fix_testsuite.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -71,6 +72,8 @@ are required by other packages that add firewalld configuration files.
 
 %package -n firewalld-test
 Summary: Firewalld testsuite
+
+Requires:       time
 
 %description -n firewalld-test
 This package provides the firewalld testsuite.
@@ -304,6 +307,9 @@ fi
 %{_mandir}/man1/firewall-config*.1*
 
 %changelog
+* Mon Jun 16 2025 Sumedh Sharma <sumsharma@microsoft.com> - 2.0.2-3
+- fix testsuite provided by firewalld-test sub-package
+
 * Sun Feb 04 2024 Dan Streetman <ddstreet@ieee.org> - 2.0.2-2
 - workaround "circular dependencies" from build tooling
 
