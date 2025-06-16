@@ -32,4 +32,3 @@ extends:
       - template: ../templates/PackageBuildPRCheck.yml@self
         parameters:
           dailyBuildID: "lkg"
-          isDailyBuildUpdateManifests: "false"
