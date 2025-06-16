@@ -3,7 +3,7 @@
 
 Summary:        Network traffic analyzer
 Name:           wireshark
-Version:        4.4.5
+Version:        4.4.7
 Release:        1%{?dist}
 License:        BSD-1-Clause AND BSD-2-Clause AND BSD-3-Clause AND MIT AND GPL-2.0-or-later AND LGPL-2.0-or-later AND Zlib AND ISC AND (BSD-3-Clause OR GPL-2.0-only) AND (GPL-2.0-or-later AND Zlib)
 Vendor:         Microsoft Corporation
