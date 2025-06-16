@@ -65,7 +65,7 @@ stages:
               - template: ToolchainBuild.yml@self
                 parameters:
                   dailyBuildID: "${{ parameters.dailyBuildID }}"
-                  isDailyBuildUpdateManifests: ${{ iif eq(parameters.dailyBuildID, 'lkg'), false, true }}
+                  isDailyBuildUpdateManifests: false
                   outputArtifactsFolder: $(ob_outputDirectory)
                   selfRepoName: self
 
@@ -128,7 +128,7 @@ stages:
                   checkBuildRetries: "1"
                   customToolchainTarballName: $(toolchainTarballName)
                   dailyBuildID: "${{ parameters.dailyBuildID }}"
-                  isDailyBuildUpdateManifests: "${{ parameters.isDailyBuildUpdateManifests }}"
+                  isDailyBuildUpdateManifests: false
                   inputArtifactsFolder: $(inputArtifactsLocation)
                   isCheckBuild: true
                   isQuickRebuildPackages: true
@@ -189,7 +189,7 @@ stages:
                   checkBuildRetries: "1"
                   customToolchainTarballName: $(toolchainTarballName)
                   dailyBuildID: "${{ parameters.dailyBuildID }}"
-                  isDailyBuildUpdateManifests: ${{ iif eq(parameters.dailyBuildID, 'lkg'), false, true }}
+                  isDailyBuildUpdateManifests: false
                   inputArtifactsFolder: $(inputArtifactsLocation)
                   isAllowToolchainRebuilds: true
                   isCheckBuild: true
