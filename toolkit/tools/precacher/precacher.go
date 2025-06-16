@@ -85,7 +85,7 @@ func main() {
 			logger.Log.Errorf("%s", err)
 			return
 		} else {
-			logger.FatalOnError(err)
+			logger.PanicOnError(err)
 		}
 
 	}
@@ -95,7 +95,7 @@ func main() {
 			logger.Log.Errorf("%s", err)
 			return
 		} else {
-			logger.FatalOnError(err)
+			logger.PanicOnError(err)
 		}
 	}
 
@@ -122,7 +122,7 @@ func main() {
 			logger.Log.Errorf("%s", err)
 			return
 		} else {
-			logger.FatalOnError(err)
+			logger.PanicOnError(err)
 		}
 	}
 }
