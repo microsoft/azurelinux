@@ -200,8 +200,8 @@ fi
 %{_libdir}/cmake/%{name}/*.cmake
 
 %changelog
-* Tue Jun 10 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> 4.4.5-1
-- Upgrade to 4.4.5
+* Tue Jun 10 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> 4.4.7-1
+- Upgrade to 4.4.7
 
 * Thu Sep 07 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 4.0.8-1
 - Upgrade version to address 27 CVEs
