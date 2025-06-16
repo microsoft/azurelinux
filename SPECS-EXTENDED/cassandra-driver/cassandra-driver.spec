@@ -2,8 +2,8 @@
 
 Summary:        A modern, feature-rich and highly-tunable Python client library for Apache Cassandra (2.1+)
 Name:           %{srcname}
-Version:        3.25.0
-Release:        2%{?dist}
+Version:        3.29.2
+Release:        1%{?dist}
 Url:            https://github.com/datastax/python-driver#datastax-python-driver-for-apache-cassandra
 License:        Apache 2.0
 Group:          Development/Languages/Python
@@ -17,13 +17,12 @@ BuildRequires: libev-devel
 
 Requires: libev
 Requires: python3
-Requires: python3-six
-Requires: python3-geomet
+Requires: python-geomet
 
 %description
 A modern, feature-rich and highly-tunable Python client library for Apache Cassandra (2.1+)
 using exclusively Cassandra's binary protocol and Cassandra Query Language v3. The driver
-supports Python 3.3, 3.4, 3.5, and 3.6, 3.8, 3.12.
+supports Python 3.8, 3.9, 3.10, 3.11 and 3.12.
 
 %prep
 %autosetup -p1 -n python-driver-%{version}
@@ -40,8 +39,9 @@ supports Python 3.3, 3.4, 3.5, and 3.6, 3.8, 3.12.
 %{python3_sitelib}/*
 
 %changelog
-* Thu May 22 2025 Jyoti kanase <v-jykanase@microsoft.com> - 3.25.0-2
+* Thu May 22 2025 Jyoti kanase <v-jykanase@microsoft.com> - 3.29.2-1
 - Initial Azure Linux import from Photon (license: Apache2).
+- Upgrade to 3.29.2
 - License verified.
 
 * Sun Aug 21 2022 Gerrit Photon <photon-checkins@vmware.com> 3.25.0-1

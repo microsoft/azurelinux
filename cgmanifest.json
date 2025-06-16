@@ -1457,8 +1457,8 @@
         "type": "other",
         "other": {
 	  "name": "cassandra-driver",
-          "version": "3.25.0",
-	  "downloadUrl": "https://github.com/datastax/python-driver/archive/refs/tags/3.25.0.tar.gz"
+          "version": "3.29.2",
+	  "downloadUrl": "https://github.com/datastax/python-driver/archive/refs/tags/3.29.2.tar.gz"
         }
       }
     },
