@@ -13,13 +13,6 @@ RUN set -eux; \
     mkdir -p /var/lib/influxdb && \
     chown -R influxdb:influxdb /var/lib/influxdb
 
-# install dasel for config parsing
-RUN GO111MODULE=on && \
-    go install github.com/tomwright/dasel/v2/cmd/dasel@master && \
-    cp $HOME/go/bin/dasel /usr/local/bin/dasel && \
-    chmod +x /usr/local/bin/dasel && \
-    dasel --version
-
 # Smoke test for influxdb server and CLI.
 RUN set -eux && \
     influxd version &&\
