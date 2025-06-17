@@ -119,6 +119,7 @@ os:
       - rd.luks=0
       - rd.hostonly=0
       - ipe.enforce=0
+      - systemd.journald.forward_to_console=1
 
   packages:
     remove:
