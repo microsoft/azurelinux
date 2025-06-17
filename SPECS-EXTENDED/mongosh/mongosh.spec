@@ -15,10 +15,13 @@ Group: Development/Tools
 Summary: MongoDB Shell CLI REPL Package
 License: ASL 2.0 and Proprietary
 URL: https://github.com/mongodb-js/mongosh
-Source: https://github.com/mongodb-js/mongosh/archive/refs/tags/v2.5.2.tar.gz
+Source0: https://github.com/mongodb-js/mongosh/archive/refs/tags/v2.5.2.tar.gz
+# The Tarball contains all the node_modules on which the package is dependent upon. 
+# To generate the tarball we need to run rpm install --force under source. 
+# Once all the node_modules are fetch a tarball needs to be generated using the command tar -cvzf node_modules.tar.gz node_modules
+Source1: node_modules.tar.gz
 
 BuildRequires: nodejs-devel
-BuildRequires: nodejs-npm
 BuildRequires: nodejs-packaging
 Requires:       openssl-devel >= 1.1.1
 Requires:       zlib-devel
@@ -28,9 +31,9 @@ MongoDB Shell CLI REPL Package
 
 %prep
 %autosetup
+tar -zxvf %{SOURCE1} .
 
 %build
-npm install --no-package-lock
 SEGMENT_API_KEY="dummy" BOXEDNODE_CONFIGURE_ARGS="--shared-openssl,--shared-zlib" npm run compile-exec
 
 %install
