@@ -1,6 +1,6 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%global rt_version rt50
+%global rt_version rt53
 %define uname_r %{version}-%{rt_version}-%{release}
 %define mariner_version 3
 %define version_upstream %(echo %{version} | rev | cut -d'.' -f2- | rev)
@@ -23,7 +23,7 @@
 
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
-Version:        6.6.77.1
+Version:        6.6.85.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -37,10 +37,11 @@ Source3:        cbl-mariner-ca-20211013.pem
 Source4:        cpupower
 Source5:        cpupower.service
 
+Patch0:         reapply-serial-8250-adjust-fifo-mode-timeout.patch
 # When updating, make sure to grab the matching patch from
 # https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/
 # Also, remember to bump the global rt_version macro above ^
-Patch0:         patch-%{version_upstream}-%{rt_version}.patch
+Patch1:         patch-%{version_upstream}-%{rt_version}.patch
 
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -161,6 +162,7 @@ manipulation of eBPF programs and maps.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
 %patch 0 -p1
+%patch 1 -p1
 
 make mrproper
 
@@ -414,6 +416,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sat May 22 2025 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.85.1-1
+- Auto-upgrade to 6.6.85.1
+- Add reapply-serial-8250-adjust-fifo-mode-timeout.patch
+
 * Mon Feb 24 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.77.1-1
 - Auto-upgrade to 6.6.77.1
 

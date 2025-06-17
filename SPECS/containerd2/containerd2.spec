@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.0.0
-Release: 8%{?dist}
+Release: 10%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -19,6 +19,8 @@ Source2: containerd.toml
 Patch0:	CVE-2024-45338.patch
 Patch1:	CVE-2025-27144.patch
 Patch2:	CVE-2024-40635.patch
+Patch3:	CVE-2025-22872.patch
+Patch4:	CVE-2025-47291.patch
 %{?systemd_requires}
 
 BuildRequires: golang
@@ -90,6 +92,12 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Fri May 30 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.0.0-10
+- Patch CVE-2025-47291
+
+* Thu May 22 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.0.0-9
+- Patch CVE-2025-22872
+
 * Wed Apr 09 2025 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.0.0-8
 - Fix CVE-2024-40635
 

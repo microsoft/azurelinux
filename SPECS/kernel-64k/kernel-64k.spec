@@ -14,6 +14,8 @@
 %undefine _unique_debug_names
 %global _missing_build_ids_terminate_build 1
 %global _no_recompute_build_ids 1
+# Prevent find_debuginfo.sh from removing the BTF section from modules
+%define _find_debuginfo_opts --keep-section '.BTF'
 
 %ifarch aarch64
 %global __provides_exclude_from %{_libdir}/debug/.build-id/
@@ -24,8 +26,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-64k
-Version:        6.6.85.1
-Release:        3%{?dist}
+Version:        6.6.92.2
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -38,7 +40,7 @@ Source3:        azurelinux-ca-20230216.pem
 Source4:        cpupower
 Source5:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
-Patch1:         0002-Increase-EFI_MMAP_NR_SLACK_SLOTS-for-GB200.patch
+Patch1:         0002-efi-Added-efi-cmdline-line-option-to-dynamically-adj.patch
 ExclusiveArch:  aarch64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -371,6 +373,18 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Jun 09 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.92.2-2
+- Prevent debuginfo from stripping BTF data
+
+* Fri May 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.92.2-1
+- Auto-upgrade to 6.6.92.2
+
+* Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.90.1-1
+- Auto-upgrade to 6.6.90.1
+
+* Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.6.85.1-4
+- Added a new patch to EFI slack slots issue
+
 * Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.6.85.1-3
 - Updated config_aarch64 based on nvidia patch guide recommendations
 
