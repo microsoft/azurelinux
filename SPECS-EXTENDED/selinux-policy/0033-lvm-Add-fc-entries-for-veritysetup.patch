@@ -1,0 +1,43 @@
+From 2e27c8c841359ac67dad70351c64ee84b49e1b83 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <pebenito@ieee.org>
+Date: Tue, 18 Feb 2025 14:11:50 -0500
+Subject: [PATCH 33/34] lvm: Add fc entries for veritysetup.
+
+Includes systemd-veritysetup.
+
+Signed-off-by: Chris PeBenito <pebenito@ieee.org>
+---
+ policy/modules/system/lvm.fc | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/system/lvm.fc b/policy/modules/system/lvm.fc
+index 2d5d5f600..d045c178f 100644
+--- a/policy/modules/system/lvm.fc
++++ b/policy/modules/system/lvm.fc
+@@ -53,6 +53,7 @@
+ /usr/bin/pvremove		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/bin/pvs			--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/bin/pvscan			--	gen_context(system_u:object_r:lvm_exec_t,s0)
++/usr/bin/veritysetup		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/bin/vgcfgbackup		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/bin/vgcfgrestore		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/bin/vgchange		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+@@ -81,6 +82,7 @@ ifdef(`distro_gentoo',`
+ /usr/lib/lvm-10/.*				--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/lib/lvm-200/.*				--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/lib/systemd/systemd-cryptsetup		--	gen_context(system_u:object_r:lvm_exec_t,s0)
++/usr/lib/systemd/systemd-veritysetup		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/lib/systemd/system/blk-availability.*	--	gen_context(system_u:object_r:lvm_unit_t,s0)
+ /usr/lib/systemd/system/dm-event.*		--	gen_context(system_u:object_r:lvm_unit_t,s0)
+ /usr/lib/systemd/system/lvm2-.*			--	gen_context(system_u:object_r:lvm_unit_t,s0)
+@@ -121,6 +123,7 @@ ifdef(`distro_gentoo',`
+ /usr/sbin/pvremove		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/sbin/pvs			--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/sbin/pvscan		--	gen_context(system_u:object_r:lvm_exec_t,s0)
++/usr/sbin/veritysetup		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/sbin/vgcfgbackup		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/sbin/vgcfgrestore		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/sbin/vgchange		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+-- 
+2.49.0
+

@@ -1,0 +1,78 @@
+From 267e2a1f1ab1b3159a8eef67877653e9f4cd9ea4 Mon Sep 17 00:00:00 2001
+From: Clayton Casciato <ccasciato@21sw.us>
+Date: Tue, 1 Apr 2025 12:18:56 -0600
+Subject: [PATCH 41/43] locallogin: allow sulogin_t user_tty_device_t rw
+
+type=PROCTITLE proctitle=/usr/sbin/sulogin
+
+type=SYSCALL arch=armeb syscall=openat per=PER_LINUX success=yes exit=3
+a0=AT_FDCWD a1=0x4e77d0 a2=O_RDWR|O_NOCTTY|O_NONBLOCK|O_NOFOLLOW a3=0x0
+items=0 ppid=432 pid=433 auid=unset uid=root gid=root euid=root
+suid=root fsuid=root egid=root sgid=root fsgid=root tty=ttyAMA0
+ses=unset comm=sulogin exe=/usr/sbin/sulogin.util-linux
+subj=system_u:system_r:sulogin_t:s0 key=(null)
+
+type=AVC avc:  denied  { open } for  pid=433 comm=sulogin
+path=/dev/ttyAMA0 dev="devtmpfs" ino=2
+scontext=system_u:system_r:sulogin_t:s0
+tcontext=unconfined_u:object_r:user_tty_device_t:s0 tclass=chr_file
+
+type=AVC avc:  denied  { read write } for  pid=433 comm=sulogin
+name=ttyAMA0 dev="devtmpfs" ino=2
+scontext=system_u:system_r:sulogin_t:s0
+tcontext=unconfined_u:object_r:user_tty_device_t:s0 tclass=chr_file
+----
+type=PROCTITLE proctitle=/usr/sbin/sulogin
+
+type=SYSCALL arch=armeb syscall=ioctl per=PER_LINUX success=yes exit=0
+a0=0x3 a1=0x5457 a2=0xbe8cba90 a3=0xbe8cba40 items=0 ppid=432 pid=433
+auid=unset uid=root gid=root euid=root suid=root fsuid=root egid=root
+sgid=root fsgid=root tty=ttyAMA0 ses=unset comm=sulogin
+exe=/usr/sbin/sulogin.util-linux subj=system_u:system_r:sulogin_t:s0
+key=(null)
+
+type=AVC avc:  denied  { ioctl } for  pid=433 comm=sulogin
+path=/dev/ttyAMA0 dev="devtmpfs" ino=2 ioctlcmd=0x5457
+scontext=system_u:system_r:sulogin_t:s0
+tcontext=unconfined_u:object_r:user_tty_device_t:s0 tclass=chr_file
+----
+type=PROCTITLE proctitle=/usr/sbin/sulogin
+
+type=SYSCALL arch=armeb syscall=statx per=PER_LINUX success=yes exit=0
+a0=0x0 a1=0xb6f046ac a2=0x1800 a3=0x7ff items=0 ppid=432 pid=433
+auid=unset uid=root gid=root euid=root suid=root fsuid=root egid=root
+sgid=root fsgid=root tty=ttyAMA0 ses=unset comm=sulogin
+exe=/usr/sbin/sulogin.util-linux subj=system_u:system_r:sulogin_t:s0
+key=(null)
+
+type=AVC avc:  denied  { getattr } for  pid=433 comm=sulogin
+path=/dev/ttyAMA0 dev="devtmpfs" ino=2
+scontext=system_u:system_r:sulogin_t:s0
+tcontext=unconfined_u:object_r:user_tty_device_t:s0 tclass=chr_file
+
+--
+
+Fedora:
+https://github.com/fedora-selinux/selinux-policy/blob/v41.35/policy/modules/system/locallogin.te#L266
+
+Signed-off-by: Clayton Casciato <ccasciato@21sw.us>
+---
+ policy/modules/system/locallogin.te | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
+index 11ff29437..884949a79 100644
+--- a/policy/modules/system/locallogin.te
++++ b/policy/modules/system/locallogin.te
+@@ -279,7 +279,7 @@ seutil_read_default_contexts(sulogin_t)
+ userdom_use_unpriv_users_fds(sulogin_t)
+ 
+ userdom_search_user_home_dirs(sulogin_t)
+-userdom_use_user_ptys(sulogin_t)
++userdom_use_user_terminals(sulogin_t)
+ 
+ sysadm_shell_domtrans(sulogin_t)
+ 
+-- 
+2.49.0
+

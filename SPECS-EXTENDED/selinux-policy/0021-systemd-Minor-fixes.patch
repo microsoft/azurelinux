@@ -1,0 +1,28 @@
+From a036efb792863f8ecf3895fa3f94168191694568 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 25 Mar 2024 10:04:38 -0400
+Subject: [PATCH 21/34] systemd: Minor fixes.
+
+sys_rawio on systemd_generator_t is from running blkid.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/system/systemd.te | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 5b99316d3..09eeec043 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -546,7 +546,7 @@ seutil_search_default_contexts(systemd_coredump_t)
+ #
+ 
+ allow systemd_generator_t self:fifo_file rw_fifo_file_perms;
+-allow systemd_generator_t self:capability { dac_override sys_admin sys_resource };
++allow systemd_generator_t self:capability { dac_override sys_admin sys_rawio sys_resource };
+ allow systemd_generator_t self:process { getcap getsched setfscreate signal };
+ # for systemd-ssh-generator
+ allow systemd_generator_t self:vsock_socket create;
+-- 
+2.49.0
+

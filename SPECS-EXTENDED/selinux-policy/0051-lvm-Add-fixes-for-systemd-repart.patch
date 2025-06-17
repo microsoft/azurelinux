@@ -1,0 +1,50 @@
+From 381167820643f27ba2fa7655c3cad314b4391b82 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 28 Apr 2025 15:56:30 -0400
+Subject: [PATCH 51/53] lvm: Add fixes for systemd-repart.
+
+Add futher systemd-cryptsetup and systemd-veritysetup labeling.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/system/lvm.fc | 4 ++++
+ policy/modules/system/lvm.te | 1 +
+ 2 files changed, 5 insertions(+)
+
+diff --git a/policy/modules/system/lvm.fc b/policy/modules/system/lvm.fc
+index d045c178f..e023129cb 100644
+--- a/policy/modules/system/lvm.fc
++++ b/policy/modules/system/lvm.fc
+@@ -53,6 +53,9 @@
+ /usr/bin/pvremove		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/bin/pvs			--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/bin/pvscan			--	gen_context(system_u:object_r:lvm_exec_t,s0)
++/usr/bin/systemd-cryptsetup	--	gen_context(system_u:object_r:lvm_exec_t,s0)
++/usr/bin/systemd-repart		--	gen_context(system_u:object_r:lvm_exec_t,s0)
++/usr/bin/systemd-veritysetup	--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/bin/veritysetup		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/bin/vgcfgbackup		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/bin/vgcfgrestore		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+@@ -82,6 +85,7 @@ ifdef(`distro_gentoo',`
+ /usr/lib/lvm-10/.*				--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/lib/lvm-200/.*				--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/lib/systemd/systemd-cryptsetup		--	gen_context(system_u:object_r:lvm_exec_t,s0)
++/usr/lib/systemd/systemd-repart			--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/lib/systemd/systemd-veritysetup		--	gen_context(system_u:object_r:lvm_exec_t,s0)
+ /usr/lib/systemd/system/blk-availability.*	--	gen_context(system_u:object_r:lvm_unit_t,s0)
+ /usr/lib/systemd/system/dm-event.*		--	gen_context(system_u:object_r:lvm_unit_t,s0)
+diff --git a/policy/modules/system/lvm.te b/policy/modules/system/lvm.te
+index 52ee270d2..a90f74e2e 100644
+--- a/policy/modules/system/lvm.te
++++ b/policy/modules/system/lvm.te
+@@ -203,6 +203,7 @@ init_dontaudit_getattr_initctl(lvm_t)
+ init_use_script_ptys(lvm_t)
+ init_read_script_state(lvm_t)
+ init_read_script_tmp_files(lvm_t)
++init_search_script_keys(lvm_t)
+ # for systemd-cryptsetup to talk to /run/systemd/journal/socket
+ init_stream_connect(lvm_t)
+ 
+-- 
+2.49.0
+

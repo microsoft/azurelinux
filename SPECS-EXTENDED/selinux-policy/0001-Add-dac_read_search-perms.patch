@@ -1,0 +1,65 @@
+From 5f21471778f4a231f9bece4ceed0436c86d98349 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Fri, 20 Aug 2021 18:11:23 +0000
+Subject: [PATCH 01/34] Add dac_read_search perms.
+
+May be Mariner-specific.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/admin/usermanage.te | 2 +-
+ policy/modules/services/chronyd.te | 4 ++--
+ policy/modules/system/systemd.te   | 2 ++
+ 3 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
+index 0d84c0c44..3589f18bf 100644
+--- a/policy/modules/admin/usermanage.te
++++ b/policy/modules/admin/usermanage.te
+@@ -478,7 +478,7 @@ optional_policy(`
+ # Useradd local policy
+ #
+ 
+-allow useradd_t self:capability { chown dac_override fowner fsetid kill setuid sys_resource };
++allow useradd_t self:capability { chown dac_read_search dac_override fowner fsetid kill setuid sys_resource };
+ dontaudit useradd_t self:capability { net_admin sys_ptrace sys_tty_config };
+ dontaudit useradd_t self:cap_userns sys_ptrace;
+ allow useradd_t self:process { dyntransition getattr getcap getpgid getrlimit getsched getsession noatsecure rlimitinh setcap setfscreate setkeycreate setpgid setsched setsockcreate share siginh signal_perms transition };
+diff --git a/policy/modules/services/chronyd.te b/policy/modules/services/chronyd.te
+index 9e6ba5bf1..500ce6fe2 100644
+--- a/policy/modules/services/chronyd.te
++++ b/policy/modules/services/chronyd.te
+@@ -54,7 +54,7 @@ logging_log_file(chronyd_var_log_t)
+ # chronyd local policy
+ #
+ 
+-allow chronyd_t self:capability { chown dac_override ipc_lock setgid setuid sys_resource sys_time };
++allow chronyd_t self:capability { chown dac_read_search dac_override ipc_lock setgid setuid sys_resource sys_time };
+ allow chronyd_t self:process { getcap setcap setrlimit signal };
+ allow chronyd_t self:shm create_shm_perms;
+ allow chronyd_t self:fifo_file rw_fifo_file_perms;
+@@ -134,7 +134,7 @@ optional_policy(`
+ # chronyc local policy
+ #
+ 
+-allow chronyc_t self:capability { dac_override };
++allow chronyc_t self:capability { dac_read_search dac_override };
+ allow chronyc_t self:process { signal };
+ allow chronyc_t self:udp_socket create_socket_perms;
+ allow chronyc_t self:netlink_route_socket create_netlink_socket_perms;
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 523e49f14..546c122e6 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -852,6 +852,8 @@ optional_policy(`
+ # hw local policy
+ #
+ 
++allow systemd_hw_t self:capability dac_override;
++
+ kernel_read_kernel_sysctls(systemd_hw_t)
+ 
+ allow systemd_hw_t systemd_hwdb_t:file { manage_file_perms relabel_file_perms };
+-- 
+2.49.0
+

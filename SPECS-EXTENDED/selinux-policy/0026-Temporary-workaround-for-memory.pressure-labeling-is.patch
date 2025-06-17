@@ -1,0 +1,31 @@
+From d935e280ce48a8ba36a18596a37b8d0c4804826f Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Tue, 7 May 2024 09:23:39 -0400
+Subject: [PATCH 26/34] Temporary workaround for memory.pressure labeling
+ issues.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/kernel/filesystem.if | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/kernel/filesystem.if b/policy/modules/kernel/filesystem.if
+index bee4bb406..8bc2f668d 100644
+--- a/policy/modules/kernel/filesystem.if
++++ b/policy/modules/kernel/filesystem.if
+@@ -1357,9 +1357,12 @@ interface(`fs_getattr_memory_pressure',`
+ interface(`fs_watch_memory_pressure',`
+ 	gen_require(`
+ 		type memory_pressure_t;
++		type cgroup_t;
+ 	')
+ 
+ 	allow $1 memory_pressure_t:file { rw_file_perms setattr };
++	# temp workaround until labeling issues are resolved.
++	allow $1 cgroup_t:file { rw_file_perms setattr };
+ ')
+ 
+ ########################################
+-- 
+2.49.0
+

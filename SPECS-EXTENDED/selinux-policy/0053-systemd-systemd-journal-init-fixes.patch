@@ -1,0 +1,41 @@
+From 7893710304576b143d92d93c7b5d067c386a3298 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 28 Apr 2025 16:03:19 -0400
+Subject: [PATCH 53/53] systemd: systemd-journal-init fixes.
+
+Minor tweak for systemd-tmpfiles too.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/system/systemd.te | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 922bbb6d0..6287b99d1 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -888,9 +888,12 @@ seutil_read_file_contexts(systemd_hw_t)
+ #
+ 
+ dontaudit systemd_journal_init_t self:capability net_admin;
++dontaudit systemd_journal_init_t self:process setrlimit;
+ 
+ manage_dirs_pattern(systemd_journal_init_t, systemd_journal_t, systemd_journal_t)
+-manage_files_pattern(systemd_journal_init_t, systemd_journal_t, systemd_journal_t)
++mmap_manage_files_pattern(systemd_journal_init_t, systemd_journal_t, systemd_journal_t)
++
++files_read_etc_runtime_files(systemd_journal_init_t)
+ 
+ fs_getattr_all_fs(systemd_journal_init_t)
+ fs_search_cgroup_dirs(systemd_journal_init_t)
+@@ -1925,6 +1928,7 @@ userdom_use_inherited_user_terminals(systemd_sysusers_t)
+ 
+ allow systemd_tmpfiles_t self:capability { chown dac_override dac_read_search fowner fsetid mknod net_admin sys_admin };
+ allow systemd_tmpfiles_t self:process { getcap setfscreate };
++dontaudit systemd_tmpfiles_t self:process setrlimit;
+ 
+ allow systemd_tmpfiles_t systemd_coredump_var_lib_t:dir { manage_dir_perms relabel_dir_perms };
+ allow systemd_tmpfiles_t systemd_coredump_var_lib_t:file manage_file_perms;
+-- 
+2.49.0
+

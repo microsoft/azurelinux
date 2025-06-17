@@ -1,0 +1,28 @@
+From b6574aa23d96003a9cb792d0867d0032ad8626cc Mon Sep 17 00:00:00 2001
+From: Daniel De Graaf <dgdegra@uwe.nsa.gov>
+Date: Wed, 9 Apr 2025 13:42:22 -0400
+Subject: [PATCH 42/43] systemd: allow reading /dev/cpu/0/msr
+
+To detect confidential virtualization on AMD processors, systemd as of
+v254 needs to perform an MSR read.
+
+Signed-off-by: Daniel De Graaf <dgdegra@uwe.nsa.gov>
+---
+ policy/modules/system/init.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 3534f650d..eeceddb5c 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -206,6 +206,7 @@ corecmd_exec_chroot(init_t)
+ corecmd_exec_bin(init_t)
+ 
+ dev_read_sysfs(init_t)
++dev_read_cpuid(init_t)
+ # Early devtmpfs
+ dev_rw_generic_chr_files(init_t)
+ 
+-- 
+2.49.0
+

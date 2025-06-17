@@ -1,0 +1,26 @@
+From 37ec9f13ae3673e3346b271290196105d95290f8 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Wed, 22 Feb 2023 19:45:50 +0000
+Subject: [PATCH 09/34] domain: Unconfined can transition to other domains.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/kernel/domain.te | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/kernel/domain.te b/policy/modules/kernel/domain.te
+index 0f38015b6..c239734e7 100644
+--- a/policy/modules/kernel/domain.te
++++ b/policy/modules/kernel/domain.te
+@@ -188,7 +188,7 @@ allow unconfined_domain_type domain:fd use;
+ allow unconfined_domain_type domain:fifo_file rw_fifo_file_perms;
+ 
+ # Act upon any other process.
+-allow unconfined_domain_type domain:process { fork getattr getcap getpgid getrlimit getsched getsession noatsecure ptrace rlimitinh setcap setcurrent setexec setfscreate setkeycreate setpgid setrlimit setsched setsockcreate share siginh signal_perms };
++allow unconfined_domain_type domain:process { fork getattr getcap getpgid getrlimit getsched getsession noatsecure ptrace rlimitinh setcap setcurrent setexec setfscreate setkeycreate setpgid setrlimit setsched setsockcreate share siginh signal_perms transition };
+ 
+ # Create/access any System V IPC objects.
+ allow unconfined_domain_type domain:sem create_sem_perms;
+-- 
+2.49.0
+

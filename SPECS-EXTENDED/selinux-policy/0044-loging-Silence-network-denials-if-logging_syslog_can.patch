@@ -1,0 +1,27 @@
+From 9c3675ca7e9f26d4fc4378e8b38c447f71158d07 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Fri, 25 Apr 2025 14:54:08 -0400
+Subject: [PATCH 44/50] loging: Silence network denials if
+ logging_syslog_can_network is disabled.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/system/logging.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index dc87d403a..f3ca95af4 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -614,6 +614,8 @@ tunable_policy(`logging_syslog_can_network',`
+ 	corenet_sendrecv_syslogd_server_packets(syslogd_t)
+ 	corenet_sendrecv_postgresql_client_packets(syslogd_t)
+ 	corenet_sendrecv_mysqld_client_packets(syslogd_t)
++',`
++	dontaudit syslogd_t self:capability net_admin;
+ ')
+ 
+ optional_policy(`
+-- 
+2.49.0
+

@@ -1,0 +1,80 @@
+From b6782faf083bc52fb05b2b5ec1ba9223df113293 Mon Sep 17 00:00:00 2001
+From: Clayton Casciato <ccasciato@21sw.us>
+Date: Tue, 18 Mar 2025 12:49:43 -0600
+Subject: [PATCH 38/43] locallogin: allow sulogin_t unconfined domtrans
+
+type=PROCTITLE proctitle=/usr/sbin/sulogin
+
+type=PATH item=0 name=/usr/lib/ld-linux-armhf.so.3 inode=1956 dev=b3:32
+mode=file,755 ouid=root ogid=root rdev=00:00
+obj=system_u:object_r:ld_so_t:s0 nametype=NORMAL cap_fp=none cap_fi=none
+cap_fe=0 cap_fver=0 cap_frootid=0
+
+type=CWD cwd=/root
+
+type=EXECVE argc=1 a0=sh
+
+type=SYSCALL arch=armeb syscall=execve per=PER_LINUX success=yes exit=0
+a0=0x43032e a1=0xbec21aa8 a2=0x431760 a3=0xb6f61df0 items=1 ppid=352
+pid=353 auid=unset uid=root gid=root euid=root suid=root fsuid=root
+egid=root sgid=root fsgid=root tty=ttyS0 ses=unset comm=sh
+exe=/usr/bin/bash.bash subj=unconfined_u:unconfined_r:unconfined_t:s0
+key=(null)
+
+type=AVC avc:  denied  { siginh } for  pid=353 comm=sh
+scontext=system_u:system_r:sulogin_t:s0
+tcontext=unconfined_u:unconfined_r:unconfined_t:s0 tclass=process
+
+type=AVC avc:  denied  { rlimitinh } for  pid=353 comm=sh
+scontext=system_u:system_r:sulogin_t:s0
+tcontext=unconfined_u:unconfined_r:unconfined_t:s0 tclass=process
+
+type=AVC avc:  denied  { noatsecure } for  pid=353 comm=sulogin
+scontext=system_u:system_r:sulogin_t:s0
+tcontext=unconfined_u:unconfined_r:unconfined_t:s0 tclass=process
+
+type=AVC avc:  denied  { transition } for  pid=353 comm=sulogin
+path=/usr/bin/bash.bash dev="mmcblk0p2" ino=689
+scontext=system_u:system_r:sulogin_t:s0
+tcontext=unconfined_u:unconfined_r:unconfined_t:s0 tclass=process
+
+--
+
+Similar policy:
+
+https://github.com/SELinuxProject/refpolicy/blob/RELEASE_2_20250213/policy/modules/services/cockpit.te#L222
+
+--
+
+Fedora:
+
+$ sesearch -A --source sulogin_t --target unconfined_t --class process
+allow domain unconfined_t:process sigchld;
+allow unconfined_login_domain unconfined_t:process transition;
+[ unconfined_login ]:True
+
+$ getsebool -a | grep unconfined_login
+unconfined_login --> on
+
+https://github.com/fedora-selinux/selinux-policy/blob/v41.34/policy/modules/system/locallogin.te#L277
+
+Signed-off-by: Clayton Casciato <ccasciato@21sw.us>
+---
+ policy/modules/system/locallogin.te | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
+index cab988c56..11ff29437 100644
+--- a/policy/modules/system/locallogin.te
++++ b/policy/modules/system/locallogin.te
+@@ -301,3 +301,7 @@ optional_policy(`
+ optional_policy(`
+ 	nscd_use(sulogin_t)
+ ')
++
++optional_policy(`
++	unconfined_domtrans(sulogin_t)
++')
+-- 
+2.49.0
+

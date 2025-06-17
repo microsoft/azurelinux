@@ -1,0 +1,26 @@
+From 838918476a500f46e93e6f6afa15d9c3573a4d4c Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <pebenito@ieee.org>
+Date: Wed, 16 Apr 2025 11:04:13 -0400
+Subject: [PATCH 43/43] systemd: Add log env to systemd-machine-id-setup.
+
+Signed-off-by: Chris PeBenito <pebenito@ieee.org>
+---
+ policy/modules/system/systemd.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 68d63d46c..922bbb6d0 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -1268,6 +1268,8 @@ kernel_read_system_state(systemd_machine_id_setup_t)
+ init_read_runtime_files(systemd_machine_id_setup_t)
+ init_read_state(systemd_machine_id_setup_t)
+ 
++systemd_log_parse_environment(systemd_machine_id_setup_t)
++
+ ########################################
+ #
+ # modules-load local policy
+-- 
+2.49.0
+

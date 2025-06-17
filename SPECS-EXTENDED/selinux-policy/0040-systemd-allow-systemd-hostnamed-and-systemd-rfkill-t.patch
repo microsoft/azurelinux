@@ -1,0 +1,34 @@
+From 531b3d1503fcd2a17d4fc84bcc1e976ee2427262 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 25 Mar 2025 11:41:16 +0800
+Subject: [PATCH 40/43] systemd: allow systemd-hostnamed and systemd-rfkill to
+ get attributes of nsfs inodes
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ policy/modules/system/systemd.te | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 18cfae547..68d63d46c 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -819,6 +819,7 @@ files_read_etc_files(systemd_hostnamed_t)
+ files_read_etc_runtime_files(systemd_hostnamed_t)
+ 
+ fs_getattr_all_fs(systemd_hostnamed_t)
++fs_getattr_nsfs_files(systemd_hostnamed_t)
+ 
+ init_delete_runtime_files(systemd_hostnamed_t)
+ init_read_runtime_files(systemd_hostnamed_t)
+@@ -1720,6 +1721,7 @@ manage_files_pattern(systemd_rfkill_t, systemd_rfkill_var_lib_t, systemd_rfkill_
+ init_var_lib_filetrans(systemd_rfkill_t, systemd_rfkill_var_lib_t, dir)
+ 
+ fs_getattr_all_fs(systemd_rfkill_t)
++fs_getattr_nsfs_files(systemd_rfkill_t)
+ 
+ kernel_getattr_proc(systemd_rfkill_t)
+ kernel_read_kernel_sysctls(systemd_rfkill_t)
+-- 
+2.49.0
+

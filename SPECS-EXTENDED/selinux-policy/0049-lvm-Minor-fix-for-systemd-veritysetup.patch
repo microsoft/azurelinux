@@ -1,0 +1,25 @@
+From 81d75a5cce960acd55d6d7fd4374aecf53c83832 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 28 Apr 2025 08:57:08 -0400
+Subject: [PATCH 49/50] lvm: Minor fix for systemd-veritysetup.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/system/lvm.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/lvm.te b/policy/modules/system/lvm.te
+index ddd991dcd..52ee270d2 100644
+--- a/policy/modules/system/lvm.te
++++ b/policy/modules/system/lvm.te
+@@ -114,6 +114,7 @@ files_search_mnt(lvm_t)
+ kernel_request_load_module(lvm_t)
+ kernel_get_sysvipc_info(lvm_t)
+ kernel_read_system_state(lvm_t)
++kernel_getattr_proc(lvm_t)
+ # Read system variables in /proc/sys
+ kernel_read_kernel_sysctls(lvm_t)
+ kernel_read_fs_sysctls(lvm_t)
+-- 
+2.49.0
+

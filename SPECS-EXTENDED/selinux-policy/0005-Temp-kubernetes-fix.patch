@@ -1,0 +1,23 @@
+From 2fd02316d6c0a89693dc2af26eeb6df5dce319cb Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Tue, 30 Aug 2022 13:46:15 +0000
+Subject: [PATCH 05/34] Temp kubernetes fix
+
+---
+ policy/modules/services/container.te | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/services/container.te b/policy/modules/services/container.te
+index c71ae54f4..d4e6f8e12 100644
+--- a/policy/modules/services/container.te
++++ b/policy/modules/services/container.te
+@@ -1249,3 +1249,6 @@ optional_policy(`
+        unconfined_domain_noaudit(spc_user_t)
+        domain_ptrace_all_domains(spc_user_t)
+ ')
++
++# temp kubernetes fix
++type_transition initrc_t var_run_t:dir container_runtime_t "k8s.cni.cncf.io";
+-- 
+2.49.0
+

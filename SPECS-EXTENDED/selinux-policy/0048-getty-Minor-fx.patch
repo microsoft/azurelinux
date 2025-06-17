@@ -1,0 +1,25 @@
+From b78df81b4720bd758fdab9642bfde4d14c35bb7e Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 28 Apr 2025 08:56:35 -0400
+Subject: [PATCH 48/50] getty: Minor fx.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/system/getty.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/getty.te b/policy/modules/system/getty.te
+index 360f7c67f..45ef2911a 100644
+--- a/policy/modules/system/getty.te
++++ b/policy/modules/system/getty.te
+@@ -75,6 +75,7 @@ files_dontaudit_search_var_lib(getty_t)
+ fs_search_auto_mountpoints(getty_t)
+ fs_getattr_cgroup(getty_t)
+ fs_search_cgroup_dirs(getty_t)
++fs_search_tmpfs(getty_t)
+ # for error condition handling
+ fs_getattr_xattr_fs(getty_t)
+ 
+-- 
+2.49.0
+

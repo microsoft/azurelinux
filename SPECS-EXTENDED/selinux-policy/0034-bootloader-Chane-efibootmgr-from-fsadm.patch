@@ -1,0 +1,54 @@
+From 1692431acf09dff54915d364a36acf1b2e72f145 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <pebenito@ieee.org>
+Date: Tue, 18 Feb 2025 14:18:02 -0500
+Subject: [PATCH 34/34] bootloader: Chane efibootmgr from fsadm.
+
+Signed-off-by: Chris PeBenito <pebenito@ieee.org>
+---
+ policy/modules/admin/bootloader.fc | 2 ++
+ policy/modules/system/fstools.fc   | 2 --
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/policy/modules/admin/bootloader.fc b/policy/modules/admin/bootloader.fc
+index 58b2c7c3a..9166123f4 100644
+--- a/policy/modules/admin/bootloader.fc
++++ b/policy/modules/admin/bootloader.fc
+@@ -3,6 +3,7 @@
+ /etc/yaboot\.conf.*	--	gen_context(system_u:object_r:bootloader_etc_t,s0)
+ 
+ /usr/bin/bootctl		--	gen_context(system_u:object_r:bootloader_exec_t,s0)
++/usr/bin/efibootmgr		--	gen_context(system_u:object_r:bootloader_exec_t,s0)
+ /usr/bin/grub			--	gen_context(system_u:object_r:bootloader_exec_t,s0)
+ /usr/bin/grub2?-bios-setup	--	gen_context(system_u:object_r:bootloader_exec_t,s0)
+ /usr/bin/grub2?-install		--	gen_context(system_u:object_r:bootloader_exec_t,s0)
+@@ -15,6 +16,7 @@
+ /usr/bin/ybin.*			--	gen_context(system_u:object_r:bootloader_exec_t,s0)
+ 
+ /usr/sbin/bootctl		--	gen_context(system_u:object_r:bootloader_exec_t,s0)
++/usr/sbin/efibootmgr		--	gen_context(system_u:object_r:bootloader_exec_t,s0)
+ /usr/sbin/grub		--	gen_context(system_u:object_r:bootloader_exec_t,s0)
+ /usr/sbin/grub2?-bios-setup	--	gen_context(system_u:object_r:bootloader_exec_t,s0)
+ /usr/sbin/grub2?-install	--	gen_context(system_u:object_r:bootloader_exec_t,s0)
+diff --git a/policy/modules/system/fstools.fc b/policy/modules/system/fstools.fc
+index 0fa9fb5c0..4e8e260a5 100644
+--- a/policy/modules/system/fstools.fc
++++ b/policy/modules/system/fstools.fc
+@@ -12,7 +12,6 @@
+ /usr/bin/e4fsck			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/e2label		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/e2mmpstatus		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+-/usr/bin/efibootmgr		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/fatsort		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/fdisk			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/bin/findfs			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+@@ -70,7 +69,6 @@
+ /usr/sbin/e4fsck		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/e2label		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/e2mmpstatus		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+-/usr/sbin/efibootmgr		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/fatsort		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/fdisk			--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+ /usr/sbin/findfs		--	gen_context(system_u:object_r:fsadm_exec_t,s0)
+-- 
+2.49.0
+

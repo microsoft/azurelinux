@@ -1,0 +1,27 @@
+From 4e30607ca340eaf68788c7bea0c018466dbba7fe Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 28 Apr 2025 08:56:15 -0400
+Subject: [PATCH 47/50] udev: Minor fixes for udevadm.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/system/udev.te | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/system/udev.te b/policy/modules/system/udev.te
+index efff96c17..23608293b 100644
+--- a/policy/modules/system/udev.te
++++ b/policy/modules/system/udev.te
+@@ -424,6 +424,9 @@ files_read_etc_files(udevadm_t)
+ files_read_usr_files(udevadm_t)
+ 
+ fs_getattr_xattr_fs(udevadm_t)
++fs_getattr_cgroup(udevadm_t)
++fs_search_cgroup_dirs(udevadm_t)
++fs_getattr_tmpfs(udevadm_t)
+ 
+ init_list_runtime(udevadm_t)
+ init_read_state(udevadm_t)
+-- 
+2.49.0
+

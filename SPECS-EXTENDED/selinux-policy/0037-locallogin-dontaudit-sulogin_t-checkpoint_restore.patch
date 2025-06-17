@@ -1,0 +1,52 @@
+From 875fdf869d8c2c0d97c000a25255f52a3e7893a9 Mon Sep 17 00:00:00 2001
+From: Clayton Casciato <ccasciato@21sw.us>
+Date: Mon, 17 Mar 2025 20:09:55 -0600
+Subject: [PATCH 37/43] locallogin: dontaudit sulogin_t checkpoint_restore
+
+type=PROCTITLE proctitle=/usr/sbin/sulogin
+
+type=SYSCALL arch=armeb syscall=ioctl per=PER_LINUX success=yes exit=0
+a0=0x3 a1=0x5457 a2=0xbec20a90 a3=0xbec20a40 items=0 ppid=277 pid=278
+auid=unset uid=root gid=root euid=root suid=root fsuid=root egid=root
+sgid=root fsgid=root tty=ttyS0 ses=unset comm=sulogin
+exe=/usr/sbin/sulogin.util-linux subj=system_u:system_r:sulogin_t:s0
+key=(null)
+
+type=AVC avc:  denied  { checkpoint_restore } for  pid=278 comm=sulogin
+capability=checkpoint_restore  scontext=system_u:system_r:sulogin_t:s0
+tcontext=system_u:system_r:sulogin_t:s0 tclass=capability2
+
+--
+
+Ref: https://criu.org/Main_Page
+
+--
+
+Fedora:
+
+$ sesearch --dontaudit --source sulogin_t --target sulogin_t --class capability2
+dontaudit sulogin_t sulogin_t:capability2 checkpoint_restore;
+
+https://github.com/fedora-selinux/selinux-policy/commit/853dc2b6436ca5f2d7cb984bde3b000358829109
+https://bugzilla.redhat.com/show_bug.cgi?id=2265391
+
+Signed-off-by: Clayton Casciato <ccasciato@21sw.us>
+---
+ policy/modules/system/locallogin.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/locallogin.te b/policy/modules/system/locallogin.te
+index 495ddd71e..cab988c56 100644
+--- a/policy/modules/system/locallogin.te
++++ b/policy/modules/system/locallogin.te
+@@ -237,6 +237,7 @@ optional_policy(`
+ 
+ allow sulogin_t self:capability { dac_read_search sys_admin sys_tty_config };
+ dontaudit sulogin_t self:capability dac_override;
++dontaudit sulogin_t self:capability2 checkpoint_restore;
+ allow sulogin_t self:process setexec;
+ allow sulogin_t self:fd use;
+ allow sulogin_t self:fifo_file rw_fifo_file_perms;
+-- 
+2.49.0
+

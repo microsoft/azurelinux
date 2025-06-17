@@ -1,0 +1,82 @@
+From 6a301ec787344e2ff85de6187ea6424db4c00ce6 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 25 Mar 2024 09:50:17 -0400
+Subject: [PATCH 17/34] various: Add additional logging access for domains run
+ from cloud_init.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/admin/bootloader.te   |  2 ++
+ policy/modules/admin/rpm.if          |  2 +-
+ policy/modules/system/selinuxutil.te | 10 ++++++++++
+ policy/modules/system/udev.te        |  5 +++++
+ 4 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/admin/bootloader.te b/policy/modules/admin/bootloader.te
+index 02d4d07cf..654b92da5 100644
+--- a/policy/modules/admin/bootloader.te
++++ b/policy/modules/admin/bootloader.te
+@@ -264,4 +264,6 @@ optional_policy(`
+ 
+ optional_policy(`
+ 	rpm_rw_pipes(bootloader_t)
++	rpm_read_inherited_tmp_files(bootloader_t)
++	rpm_append_inherited_tmp_files(bootloader_t)
+ ')
+diff --git a/policy/modules/admin/rpm.if b/policy/modules/admin/rpm.if
+index b20c3cd3d..19943a0ae 100644
+--- a/policy/modules/admin/rpm.if
++++ b/policy/modules/admin/rpm.if
+@@ -373,7 +373,7 @@ interface(`rpm_read_inherited_tmp_files',`
+ 	')
+ 
+ 	allow $1 rpm_t:fd use;
+-	allow $1 rpm_tmp_t:file { getattr read };
++	allow $1 rpm_tmp_t:file { getattr read ioctl };
+ ')
+ 
+ #####################################
+diff --git a/policy/modules/system/selinuxutil.te b/policy/modules/system/selinuxutil.te
+index 86a6e5503..befa8fd3c 100644
+--- a/policy/modules/system/selinuxutil.te
++++ b/policy/modules/system/selinuxutil.te
+@@ -612,6 +612,11 @@ optional_policy(`
+ 	locallogin_use_fds(semanage_t)
+ ')
+ 
++optional_policy(`
++	rpm_read_inherited_tmp_files(semanage_t)
++	rpm_append_inherited_tmp_files(semanage_t)
++')
++
+ ########################################
+ #
+ # Setfiles local policy
+@@ -741,6 +746,11 @@ optional_policy(`
+ 	container_getattr_fs(setfiles_t)
+ ')
+ 
++optional_policy(`
++	rpm_read_inherited_tmp_files(setfiles_t)
++	rpm_append_inherited_tmp_files(setfiles_t)
++')
++
+ optional_policy(`
+         # leaked file descriptors
+         udev_dontaudit_rw_dgram_sockets(setfiles_t)
+diff --git a/policy/modules/system/udev.te b/policy/modules/system/udev.te
+index c9b32c822..0e8722d5c 100644
+--- a/policy/modules/system/udev.te
++++ b/policy/modules/system/udev.te
+@@ -437,3 +437,8 @@ seutil_read_file_contexts(udevadm_t)
+ storage_getattr_fixed_disk_dev(udevadm_t)
+ 
+ userdom_use_user_terminals(udevadm_t)
++
++optional_policy(`
++	rpm_read_inherited_tmp_files(udevadm_t)
++	rpm_append_inherited_tmp_files(udevadm_t)
++')
+-- 
+2.49.0
+

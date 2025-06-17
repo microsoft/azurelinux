@@ -1,0 +1,65 @@
+From df17f017233fa082dc48c2b7bec7be15bb379945 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Fri, 25 Apr 2025 14:57:57 -0400
+Subject: [PATCH 46/53] cloudinit: Misc updates.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/admin/cloudinit.te | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/policy/modules/admin/cloudinit.te b/policy/modules/admin/cloudinit.te
+index ccc1d1a0f..056494649 100644
+--- a/policy/modules/admin/cloudinit.te
++++ b/policy/modules/admin/cloudinit.te
+@@ -86,6 +86,7 @@ corenet_udp_bind_all_unreserved_ports(cloud_init_t)
+ dbus_system_bus_client(cloud_init_t)
+ 
+ dev_getattr_all_blk_files(cloud_init_t)
++dev_write_urand(cloud_init_t)
+ # /sys/devices/pci0000:00/0000:00:03.0/net/eth0/address
+ dev_read_sysfs(cloud_init_t)
+ 
+@@ -99,6 +100,7 @@ files_relabel_config_files(cloud_init_t)
+ files_manage_mnt_dirs(cloud_init_t)
+ 
+ fs_getattr_all_fs(cloud_init_t)
++fs_list_all(cloud_init_t)
+ fs_search_tmpfs(cloud_init_t)
+ fs_search_cgroup_dirs(cloud_init_t)
+ fs_read_iso9660_files(cloud_init_t)
+@@ -123,10 +125,12 @@ selinux_set_enforce_mode(cloud_init_t)
+ selinux_set_all_booleans(cloud_init_t)
+ selinux_set_parameters(cloud_init_t)
+ selinux_read_policy(cloud_init_t)
++selinux_validate_context(cloud_init_t)
+ 
+ seutil_read_default_contexts(cloud_init_t)
+ seutil_run_semanage(cloud_init_t, system_r)
+ seutil_run_setfiles(cloud_init_t, system_r)
++seutil_read_file_contexts(cloud_init_t)
+ 
+ ssh_run_keygen(cloud_init_t, system_r)
+ ssh_manage_home_files(cloud_init_t)
+@@ -386,6 +390,10 @@ optional_policy(`
+ 	dkim_admin(cloud_init_t, system_r)
+ ')
+ 
++optional_policy(`
++	dmesg_domtrans(cloud_init_t)
++')
++
+ optional_policy(`
+ 	dmidecode_run(cloud_init_t, system_r)
+ ')
+@@ -994,6 +1002,7 @@ optional_policy(`
+ optional_policy(`
+ 	sysnet_run_ifconfig(cloud_init_t, system_r)
+ 	sysnet_run_dhcpc(cloud_init_t, system_r)
++	sysnet_kill_dhcpc(cloud_init_t)
+ ')
+ 
+ optional_policy(`
+-- 
+2.49.0
+

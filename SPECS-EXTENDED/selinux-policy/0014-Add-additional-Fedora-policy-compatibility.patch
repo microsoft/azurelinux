@@ -1,0 +1,27 @@
+From db169b867be362af0371b20a8e8925025a3b52a3 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Wed, 26 Apr 2023 12:52:04 +0000
+Subject: [PATCH 14/34] Add additional Fedora policy compatibility.
+
+MSFT_TAG: not upstreamable.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/system/init.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 43d62b2e1..c427b77fd 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -96,6 +96,7 @@ files_type(initctl_t)
+ mls_trusted_object(initctl_t)
+ 
+ type initrc_t, init_script_domain_type, init_run_all_scripts_domain, init_domain_type;
++typealias initrc_t alias unconfined_service_t;
+ type initrc_exec_t, init_script_file_type;
+ init_domain(initrc_t, initrc_exec_t)
+ 
+-- 
+2.49.0
+

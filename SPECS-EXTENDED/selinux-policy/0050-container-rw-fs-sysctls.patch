@@ -1,0 +1,59 @@
+From 2919e60c0679b4ead2e0978e9278da35dbbd6ac8 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 28 Apr 2025 08:57:33 -0400
+Subject: [PATCH 50/53] container: rw fs sysctls.
+
+See on containerd.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/kernel/kernel.if   | 20 ++++++++++++++++++++
+ policy/modules/services/docker.te |  1 +
+ 2 files changed, 21 insertions(+)
+
+diff --git a/policy/modules/kernel/kernel.if b/policy/modules/kernel/kernel.if
+index b9863032c..5fa3540ed 100644
+--- a/policy/modules/kernel/kernel.if
++++ b/policy/modules/kernel/kernel.if
+@@ -2500,6 +2500,26 @@ interface(`kernel_rw_fs_sysctls',`
+ 	list_dirs_pattern($1, { proc_t sysctl_t }, sysctl_fs_t)
+ ')
+
++########################################
++## <summary>
++##	Do not audit attempts to read and write
++##	filesystem sysctls.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain to not audit.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`kernel_dontaudit_rw_fs_sysctls',`
++	gen_require(`
++		type sysctl_fs_t;
++	')
++
++	dontaudit $1 sysctl_fs_t:file rw_file_perms;
++')
++
+ ########################################
+ ## <summary>
+ ##	Read IRQ sysctls.
+diff --git a/policy/modules/services/docker.te b/policy/modules/services/docker.te
+index c8d54183f..60bc44c79 100644
+--- a/policy/modules/services/docker.te
++++ b/policy/modules/services/docker.te
+@@ -54,6 +54,7 @@ kernel_relabelfrom_unlabeled_dirs(dockerd_t)
+ # docker wants to load binfmt_misc
+ kernel_request_load_module(dockerd_t)
+ kernel_dontaudit_search_fs_sysctls(dockerd_t)
++kernel_dontaudit_rw_fs_sysctls(dockerd_t)
+
+ logging_send_syslog_msg(dockerd_t)
+
+--
+2.49.0
+

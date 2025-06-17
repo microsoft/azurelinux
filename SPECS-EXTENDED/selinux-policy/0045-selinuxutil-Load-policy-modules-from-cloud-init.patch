@@ -1,0 +1,68 @@
+From 7eba99ae01778a11911efebc78413e5845d616ed Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Fri, 25 Apr 2025 14:54:59 -0400
+Subject: [PATCH 45/50] selinuxutil: Load policy modules from cloud-init.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/admin/cloudinit.if    | 19 +++++++++++++++++++
+ policy/modules/system/selinuxutil.te |  6 +++++-
+ 2 files changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/admin/cloudinit.if b/policy/modules/admin/cloudinit.if
+index 25e94729e..bcbf6e285 100644
+--- a/policy/modules/admin/cloudinit.if
++++ b/policy/modules/admin/cloudinit.if
+@@ -200,6 +200,25 @@ interface(`cloudinit_manage_tmp_dirs',`
+ 	manage_dirs_pattern($1, cloud_init_tmp_t, cloud_init_tmp_t)
+ ')
+ 
++########################################
++## <summary>
++##	mmap() PROT_READ cloud-init temporary files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`cloudinit_mmap_read_tmp_files',`
++	gen_require(`
++		type cloud_init_tmp_t;
++	')
++
++	files_search_tmp($1)
++	mmap_read_files_pattern($1, cloud_init_tmp_t, cloud_init_tmp_t)
++')
++
+ ########################################
+ ## <summary>
+ ##	Write inherited cloud-init temporary files.
+diff --git a/policy/modules/system/selinuxutil.te b/policy/modules/system/selinuxutil.te
+index 828151ae9..cc0002af5 100644
+--- a/policy/modules/system/selinuxutil.te
++++ b/policy/modules/system/selinuxutil.te
+@@ -515,7 +515,7 @@ optional_policy(`
+ # semodule local policy
+ #
+ 
+-allow semanage_t self:capability { audit_write dac_override };
++allow semanage_t self:capability { audit_write dac_override dac_read_search };
+ dontaudit semanage_t self:capability { sys_admin sys_resource };
+ allow semanage_t self:unix_stream_socket create_stream_socket_perms;
+ allow semanage_t self:unix_dgram_socket create_socket_perms;
+@@ -610,6 +610,10 @@ ifdef(`init_systemd',`
+ 	')
+ ')
+ 
++optional_policy(`
++	cloudinit_mmap_read_tmp_files(semanage_t)
++')
++
+ optional_policy(`
+ 	locallogin_use_fds(semanage_t)
+ ')
+-- 
+2.49.0
+

@@ -1,0 +1,27 @@
+From 3b46e62a84fafff813704014e889eccb8483116b Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 28 Apr 2025 16:00:50 -0400
+Subject: [PATCH 52/53] docker: Read PMD-mappable transparent hugepage size.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/services/docker.te | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/services/docker.te b/policy/modules/services/docker.te
+index 60bc44c79..536f9853d 100644
+--- a/policy/modules/services/docker.te
++++ b/policy/modules/services/docker.te
+@@ -44,6 +44,9 @@ allow dockerd_t self:netlink_xfrm_socket create_socket_perms;
+ init_write_runtime_socket(dockerd_t)
+ container_runtime_named_socket_activation(dockerd_t)
+ 
++# read /sys/kernel/mm/transparent_hugepage/hpage_pmd_size
++dev_read_sysfs(dockerd_t)
++
+ files_search_mnt(dockerd_t)
+ # docker fails to start if /proc/kallsyms is unreadable,
+ # but only when btrfs support is disabled
+-- 
+2.49.0
+
