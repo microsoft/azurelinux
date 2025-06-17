@@ -30036,8 +30036,8 @@
         "type": "other",
         "other": {
           "name": "wireshark",
-          "version": "4.0.8",
-          "downloadUrl": "https://wireshark.org/download/src/wireshark-4.0.8.tar.xz"
+          "version": "4.4.7",
+          "downloadUrl": "https://wireshark.org/download/src/wireshark-4.4.7.tar.xz"
         }
       }
     },
