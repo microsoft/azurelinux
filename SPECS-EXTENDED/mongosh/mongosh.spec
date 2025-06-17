@@ -37,8 +37,6 @@ tar -zxvf %{SOURCE1} .
 SEGMENT_API_KEY="dummy" BOXEDNODE_CONFIGURE_ARGS="--shared-openssl,--shared-zlib" npm run compile-exec
 
 %install
-ls dist/
-
 mkdir -p %{buildroot}/%{_bindir}/.
 install -m 755 dist/mongosh %{buildroot}/%{_bindir}/mongosh
 mkdir -p %{buildroot}/%{_mandir}/man1
