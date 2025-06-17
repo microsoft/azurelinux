@@ -9,7 +9,7 @@ This page outlines the requirements for building with the Azure Linux toolkit on
 
 The Azure Linux toolkit on Ubuntu has been validated with the following:
 
-- **Ubuntu 22.04**: Validated with `go1.21.1` (available as `golang-1.21-go` package)
+- **Ubuntu 22.04**: Validated with `golang-1.23.1` (available as `golang-1.23-go` package)
 
 ## Installation Methods
 
@@ -23,8 +23,8 @@ The make targets automatically install the appropriate packages:
 sudo make -C toolkit install-prereqs
 
 # Manually create Go symlinks for proper PATH integration
-sudo ln -sf /usr/lib/go-1.21/bin/go /usr/bin/go
-sudo ln -sf /usr/lib/go-1.21/bin/gofmt /usr/bin/gofmt
+sudo ln -sf /usr/lib/go-1.23/bin/go /usr/bin/go
+sudo ln -sf /usr/lib/go-1.23/bin/gofmt /usr/bin/gofmt
 
 # Manually configure Docker if needed
 curl -fsSL https://get.docker.com -o get-docker.sh

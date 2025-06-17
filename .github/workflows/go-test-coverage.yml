@@ -12,7 +12,7 @@ on:
 permissions: read-all
 
 env:
-  EXPECTED_GO_VERSION: "1.21"
+  EXPECTED_GO_VERSION: "1.23"
 
 jobs:
   build:
