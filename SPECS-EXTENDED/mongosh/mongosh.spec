@@ -46,12 +46,9 @@ install -m 644 mongosh.1.gz %{buildroot}/%{_mandir}/man1/mongosh.1.gz
 
 %files
 %{_bindir}/mongosh
-%{_libdir}/mongosh_crypt_v1.so
 %license LICENSE-mongosh
-%license LICENSE-crypt-library
 %doc README
 %doc THIRD_PARTY_NOTICES
-%doc .sbom.json
 %{_mandir}/man1/mongosh.1.gz
 
 %changelog
