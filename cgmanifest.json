@@ -22368,6 +22368,16 @@
         }
       }
     },
+     {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cqlsh",
+          "version": "6.1.2",
+	  "downloadUrl": "https://files.pythonhosted.org/packages/source/c/cqlsh/cqlsh-6.1.2.tar.gz"
+        }
+      }
+    },
     {
       "component": {
         "type": "other",
