@@ -2170,6 +2170,7 @@
                 "cmake-fedora",
                 "coredns",
                 "csi-driver-lvm",
+                "dasel",
                 "dcos-cli",
                 "debugedit",
                 "dejavu-fonts",

@@ -2436,6 +2436,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dasel",
+          "version": "2.8.1",
+          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dbus",
           "version": "1.15.6",
           "downloadUrl": "https://dbus.freedesktop.org/releases/dbus/dbus-1.15.6.tar.xz"
