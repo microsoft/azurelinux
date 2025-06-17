@@ -44,6 +44,6 @@ go test ./...
 
 %changelog
 * Tue June 17 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.8.1-1
-- Initial onboarding of the package dasel 2.8.1
-- License verified as MIT
+- Original version for Azure Linux (license: MIT)
+- License verified
 
