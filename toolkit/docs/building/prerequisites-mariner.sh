@@ -73,14 +73,12 @@ if [ "$INSTALL_PREREQS" = true ]; then
     binutils \
     cdrkit \
     curl \
-    diffutils \
     dosfstools \
     gawk \
     genisoimage \
     git \
     glibc-devel \
     $GOLANG_PKG \
-    jq \
     kernel-headers \
     make \
     moby-cli \
@@ -95,8 +93,7 @@ if [ "$INSTALL_PREREQS" = true ]; then
     systemd \
     tar \
     wget \
-    xfsprogs \
-    zstd
+    xfsprogs
 else
     echo "Skipping installation of prerequisite packages..."
 fi

@@ -55,7 +55,6 @@ if [ "$INSTALL_PREREQS" = true ]; then
     apt install -y \
     acl \
     curl \
-    diffutils \
     gawk \
     genisoimage \
     git \
@@ -70,8 +69,7 @@ if [ "$INSTALL_PREREQS" = true ]; then
     systemd \
     tar \
     wget \
-    xfsprogs \
-    zstd
+    xfsprogs
 else
     echo "Skipping installation of prerequisite packages..."
 fi
