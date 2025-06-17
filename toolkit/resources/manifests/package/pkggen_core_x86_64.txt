@@ -1,4 +1,5 @@
 filesystem-1.1-21.azl3.x86_64.rpm
+<<<<<<< HEAD
 kernel-headers-6.6.92.2-2.azl3.noarch.rpm
 glibc-2.38-10.azl3.x86_64.rpm
 glibc-devel-2.38-10.azl3.x86_64.rpm
@@ -8,6 +9,17 @@ glibc-lang-2.38-10.azl3.x86_64.rpm
 glibc-locales-all-2.38-10.azl3.x86_64.rpm
 glibc-nscd-2.38-10.azl3.x86_64.rpm
 glibc-tools-2.38-10.azl3.x86_64.rpm
+=======
+kernel-headers-6.6.92.2-1.azl3.noarch.rpm
+glibc-2.38-11.azl3.x86_64.rpm
+glibc-devel-2.38-11.azl3.x86_64.rpm
+glibc-i18n-2.38-11.azl3.x86_64.rpm
+glibc-iconv-2.38-11.azl3.x86_64.rpm
+glibc-lang-2.38-11.azl3.x86_64.rpm
+glibc-locales-all-2.38-11.azl3.x86_64.rpm
+glibc-nscd-2.38-11.azl3.x86_64.rpm
+glibc-tools-2.38-11.azl3.x86_64.rpm
+>>>>>>> 10c1198da (Patch `glibc` for CVE-2023-4527, CVE-2023-4806, CVE-2024-33599, CVE-2024-33600, CVE-2024-33601, CVE-2025-0395, CVE-2025-4802 [High] (#13864))
 zlib-1.3.1-1.azl3.x86_64.rpm
 zlib-devel-1.3.1-1.azl3.x86_64.rpm
 file-5.45-1.azl3.x86_64.rpm
@@ -175,8 +187,8 @@ openssl-devel-3.3.3-2.azl3.x86_64.rpm
 openssl-libs-3.3.3-2.azl3.x86_64.rpm
 openssl-perl-3.3.3-2.azl3.x86_64.rpm
 openssl-static-3.3.3-2.azl3.x86_64.rpm
-libcap-2.69-4.azl3.x86_64.rpm
-libcap-devel-2.69-4.azl3.x86_64.rpm
+libcap-2.69-5.azl3.x86_64.rpm
+libcap-devel-2.69-5.azl3.x86_64.rpm
 debugedit-5.0-2.azl3.x86_64.rpm
 libarchive-3.7.7-2.azl3.x86_64.rpm
 libarchive-devel-3.7.7-2.azl3.x86_64.rpm
