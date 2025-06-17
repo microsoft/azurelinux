@@ -58,6 +58,7 @@ storage:
       hashDeviceId: usr-hash-a
       dataDeviceMountIdType: uuid
       hashDeviceMountIdType: uuid
+      hashSignaturePath: /boot/usr.hash.sig
 
   filesystems:
     - deviceId: esp
