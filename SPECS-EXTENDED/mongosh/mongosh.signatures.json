@@ -1,6 +1,7 @@
 {
  "Signatures": {
-  "node_modules.tar.gz": "763d9b6d867aa9415311889c2ed0ff7a44ac9b7a55c25ceee45f76222f87d6c4",
-  "v2.5.2.tar.gz": "66fa410e497be9708e914892156e3acdb551b0281a60a718fd6c454a1cc18c43"
+  "node_modules.tar.gz": "559bc139761786253aea6295261f97af234151e400fc65f7b95a69e390aff146",
+  "packages.tar.gz": "bcd7220966b1ecb003b93c9b7b64806599b53995119827bb52ac399e38738d06",
+  "v2.5.1.tar.gz": "1e884437e67b7da8e8fb7ae77327f365554fce7bdfec52e46613a1ce16edc7b2"
  }
 }
