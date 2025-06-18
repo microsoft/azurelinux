@@ -44,6 +44,6 @@ go test ./...
 
 %changelog
 * Tue June 17 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.8.1-1
-- Original version for Azure Linux (license: MIT)
+- Original version for CBL-Mariner (license: MIT)
 - License verified
 
