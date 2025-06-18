@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -104,6 +104,25 @@ Patch:          sbat-4-0004-fs-ntfs-Fix-an-OOB-read-when-parsing-bitmaps-for-ind
 Patch:          sbat-4-0005-fs-ntfs-Fix-an-OOB-read-when-parsing-a-volume-label.patch
 Patch:          sbat-4-0006-fs-ntfs-Make-code-more-readable.patch
 Patch:          CVE-2025-0624.patch
+
+# Additional bulk CVEs
+Patch:          CVE-2014-3591.patch
+Patch:          CVE-2019-13627.patch
+Patch:          CVE-2017-7526.patch
+Patch:          CVE-2024-56737-and-CVE-2024-45782.patch
+Patch:          CVE-2024-45774.patch
+Patch:          CVE-2024-45781.patch
+Patch:          CVE-2024-45775.patch
+Patch:          CVE-2025-1118.patch
+Patch:          CVE-2025-0677_CVE-2025-0684_CVE-2025-0685_CVE-2025-0686_CVE-2025-0689.patch
+Patch:          CVE-2024-45777.patch
+Patch:          CVE-2024-45776.patch
+Patch:          CVE-2024-45783.patch
+Patch:          CVE-2025-0690.patch
+Patch:          CVE-2024-45778-CVE-2024-45779.patch
+Patch:          CVE-2025-0678-CVE-2025-1125.patch
+Patch:          CVE-2024-45780.patch
+
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
@@ -406,6 +425,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %{_sysconfdir}/default/grub.d
 
 %changelog
+* Tue Jun 17 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.06-15
+- Patch Multiple CVEs
+
 * Mon Jun 02 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.06-14
 - Patch CVE-2025-0624
 
