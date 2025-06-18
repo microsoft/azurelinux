@@ -81,7 +81,6 @@ stages:
               - template: ToolchainBuild.yml@self
                 parameters:
                   dailyBuildID: "${{ parameters.dailyBuildID }}"
-                  isDailyBuildUpdateManifests: "${{ parameters.isDailyBuildUpdateManifests }}"
                   isDailyBuildUpdateManifests: false
                   outputArtifactsFolder: $(ob_outputDirectory)
                   outputToolchainDeltaRPMsTarballName: ${{ parameters.toolchainDeltaRPMsTarballName }}
