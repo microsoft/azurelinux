@@ -39,6 +39,7 @@ os:
     - packagelists/hyperv-packages.yaml
     - packagelists/core-packages-image.yaml
     - packagelists/cloud-init-packages.yaml
+    - packagelists/virt-guest-packages.yaml
 
 scripts:
   finalizeCustomization:
