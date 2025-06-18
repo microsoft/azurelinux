@@ -9,8 +9,7 @@ Group:          Applications/System
 URL:            https://github.com/TomWright/dasel
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-govendor-v1.tar.gz
-BuildRequires:  golang
-BuildRequires:  systemd-rpm-macros
+BuildRequires:  golang >= 1.22
 
 %description
 Say good bye to learning new tools just to work with a different data format.
