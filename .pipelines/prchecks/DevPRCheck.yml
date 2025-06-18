@@ -62,7 +62,6 @@ extends:
       - template: ../templates/PackageBuildPRCheck.yml@self
         parameters:
           dailyBuildID: "lkg"
-          isDailyBuildUpdateManifests: "false"
           rpmsArtifactNameBase: "$(rpmsArtifactNameBase)"
           toolchainArtifactNameBase: "$(toolchainArtifactNameBase)"
           toolchainRPMsTarballName: "$(toolchainRPMsTarballName)"
