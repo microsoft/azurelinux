@@ -2,7 +2,7 @@
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
 Version:        %{BaseVersion}.4
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,13 @@ Patch9:          CVE-2025-32051.patch
 Patch10:         CVE-2025-46420.patch
 Patch11:         CVE-2025-46421.patch
 Patch12:         CVE-2025-32053.patch
+# CVE-2025-32909 will be fixed in 3.6.2 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/ba4c3a6f988beff59e45801ab36067293d24ce92
+Patch13:         CVE-2025-32909.patch
+# CVE-2025-32910 will be fixed in 3.6.2 by https://gitlab.gnome.org/GNOME/libsoup/-/merge_requests/417
+Patch14:         CVE-2025-32910.patch
+# CVE-2025-32912 will be fixed in 3.6.5 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/cd077513f267e43ce4b659eb18a1734d8a369992
+Patch15:         CVE-2025-32912.patch
+Patch16:         CVE-2025-4476.patch
 
 BuildRequires:  meson
 BuildRequires:  autogen
@@ -136,7 +143,13 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 
 %changelog
-* Wed 07 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 3.0.4-6
+* Fri May 09 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.0.4-7
+- Add patch for CVE-2025-32909
+- Add patch for CVE-2025-32910
+- Add patch for CVE-2025-32912
+- Add patch for CVE-2025-4476
+
+* Wed May 07 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 3.0.4-6
 - Patche for CVE-2025-32053
 
 * Sun May 04 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.0.4-5

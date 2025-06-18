@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -103,6 +103,7 @@ Patch:          sbat-4-0003-fs-ntfs-Fix-an-OOB-read-when-parsing-directory-entri
 Patch:          sbat-4-0004-fs-ntfs-Fix-an-OOB-read-when-parsing-bitmaps-for-ind.patch
 Patch:          sbat-4-0005-fs-ntfs-Fix-an-OOB-read-when-parsing-a-volume-label.patch
 Patch:          sbat-4-0006-fs-ntfs-Make-code-more-readable.patch
+Patch:          CVE-2025-0624.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
@@ -405,6 +406,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %{_sysconfdir}/default/grub.d
 
 %changelog
+* Mon Jun 02 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.06-14
+- Patch CVE-2025-0624
+
 * Thu Feb 15 2024 Dan Streetman <ddstreet@microsoft.com> - 2.06-13
 - update grub to sbat 4
 
