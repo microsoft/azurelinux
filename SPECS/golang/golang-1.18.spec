@@ -13,7 +13,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.18.8
-Release:        4%{?dist}
+Release:        8%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,7 +25,13 @@ Patch0:         go14_bootstrap_aarch64.patch
 # CVE-2022-41717 is fixed in 1.18.9
 Patch1:         CVE-2022-41717.patch
 # CVE-2024-24790 is fixed in 1.18.8
-Patch2:		CVE-2024-24790.patch
+Patch2:         CVE-2024-24790.patch
+Patch3:         CVE-2024-45341.patch
+Patch4:         CVE-2024-34158.patch
+Patch5:         CVE-2025-22871.patch
+Patch6:         CVE-2024-24789.patch
+Patch7:         CVE-2025-22870-1.18.patch
+Patch8:         CVE-2024-34155.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -44,6 +50,13 @@ mv -v go go-bootstrap
 %setup -q -n go
 patch -Np1 --ignore-whitespace < %{PATCH1}
 patch -Np1 --ignore-whitespace < %{PATCH2}
+patch -Np1 --ignore-whitespace < %{PATCH3}
+patch -Np1 --ignore-whitespace < %{PATCH4}
+patch -Np1 --ignore-whitespace < %{PATCH5}
+patch -Np1 --ignore-whitespace < %{PATCH6}
+patch -Np1 --ignore-whitespace < %{PATCH7}
+patch -Np1 --ignore-whitespace < %{PATCH8}
+
 %build
 # Build go 1.4 bootstrap
 pushd %{_topdir}/BUILD/go-bootstrap/src
@@ -123,7 +136,19 @@ fi
 %{_bindir}/*
 
 %changelog
-* Mon July 29 2024 Bhagyashri Pathak bhapathak@microsoft.com - 1.18.8.4
+* Fri Apr 25 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.18.8-8
+- Patch CVE-2024-24789, CVE-2024-34155 & CVE-2025-22870
+
+* Mon Apr 21 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.18.8-7
+- Address CVE-2025-22871 using an upstream patch.
+
+* Fri Apr 18 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.18.8-6
+- Address CVE-2024-34158 using an upstream patch.
+
+* Tue Feb 04 2025 Kanishk bansal <kanbansal@microsoft.com> - 1.18.8-5
+- Address CVE-2024-45341 using an upstream patch.
+
+* Mon Jul 29 2024 Bhagyashri Pathak bhapathak@microsoft.com - 1.18.8-4
 - Patch CVE-2024-24790
 
 * Mon Jan 23 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.8-3

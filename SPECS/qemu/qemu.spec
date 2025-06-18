@@ -217,7 +217,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.2.0
-Release:        20%{?dist}
+Release:        24%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -276,6 +276,28 @@ Patch1014:      CVE-2021-3750.patch
 Patch1015:      CVE-2022-36648.patch
 Patch1016:      CVE-2023-3354.patch
 Patch1017:      CVE-2024-24474.patch
+Patch1018:      CVE-2023-6683.patch
+Patch1019:      CVE-2023-6693.patch
+Patch1020:      CVE-2023-5088.patch
+# CVE-2023-2861 will be fixed in 8.1.0 by https://gitlab.com/qemu-project/qemu/-/commit/f6b0de53fb87ddefed348a39284c8e2f28dc4eda
+Patch1021:      CVE-2023-2861.patch
+# CVE-2023-1544 will be fixed in 8.2.0 by https://gitlab.com/qemu-project/qemu/-/commit/85fc35afa93c7320d1641d344d0c5dfbe341d087
+Patch1022:      CVE-2023-1544.patch
+# CVE-2023-3019 will be fixed in 8.2.0 by
+# https://gitlab.com/qemu-project/qemu/-/commit/9050f976e447444ea6ee2ba12c9f77e4b0dc54bc,
+# which depends upon
+# https://gitlab.com/qemu-project/qemu/-/commit/7d0fefdf81f5973334c344f6b8e1896c309dff66
+Patch1023:      CVE-2023-3019.patch
+# CVE-2023-3180 will be fixed in 8.1.0 by https://gitlab.com/qemu-project/qemu/-/commit/9d38a8434721a6479fe03fb5afb150ca793d3980
+Patch1024:      CVE-2023-3180.patch
+# CVE-2023-3255 will be fixed in 8.1.0 by https://gitlab.com/qemu-project/qemu/-/commit/d921fea3
+Patch1025:      CVE-2023-3255.patch
+# CVE-2023-3301 will be fixed in 8.1.0 by https://gitlab.com/qemu-project/qemu/-/commit/a0d7215e339b61c7d7a7b3fcf754954d80d93eb8
+Patch1026:      CVE-2023-3301.patch
+
+Patch1027:      CVE-2024-3447.patch
+Patch1028:      CVE-2024-4467.patch
+Patch1029:      CVE-2024-6505.patch
 
 # alsa audio output
 BuildRequires:  alsa-lib-devel
@@ -2310,6 +2332,26 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Thu Apr 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 6.2.0-24
+- Add patch for CVE-2024-3447
+- Add patch for CVE-2024-4467
+- Add patch for CVE-2024-6505
+
+* Mon Apr 14 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 6.2.0-23
+- Add patch for CVE-2023-3180
+- Add patch for CVE-2023-3255
+- Add patch for CVE-2023-3301
+- Add patch for CVE-2023-3019
+
+* Wed Apr 09 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 6.2.0-22
+- Add patch for CVE-2023-2861
+- Add patch for CVE-2023-1544
+
+* Wed Mar 19 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 6.2.0-21
+- Add patch for CVE-2023-6683
+- Add patch for CVE-2023-6693
+- Add patch for CVE-2023-5088
+
 * Mon Aug 19 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 6.2.0-20
 - Address CVE-2024-24474
 

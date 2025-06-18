@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        17.0.7
-Release:        3%{?dist}
+Release:        8%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -27,6 +27,12 @@ Source0:        %{name}-%{version}.tar.gz
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2024-45338.patch
+Patch1:         CVE-2024-45339.patch
+Patch2:         CVE-2025-22868.patch
+Patch3:         CVE-2024-53257.patch
+Patch4:         CVE-2025-22870.patch
+# CVE-2025-22872 is fixed in go net v0.38 by https://github.com/golang/net/commit/e1fcd82abba34df74614020343be8eb1fe85f0d9
+Patch5:         CVE-2025-22872.patch
 BuildRequires: golang
 
 %description
@@ -40,10 +46,7 @@ with an atomic cutover step that takes only a few seconds.
 
 
 %prep
-%autosetup -N
-# Apply vendor before patching
-tar --no-same-owner -xf %{SOURCE1}
-%autopatch -p1
+%autosetup -p1 -a1
 
 # sed in Mariner does not work on a group of files; use for-loop to apply
 # to apply to individual file
@@ -73,29 +76,24 @@ install -m 0755 -vd                     %{buildroot}%{_bindir}
 install -m 0755 -vp ./bin/*             %{buildroot}%{_bindir}/
 
 %check
-go check -t go/cmd \
-         -d go/mysql \
-         -d go/mysql/endtoend \
-         -d go/sqltypes \
-         -d go/vt/hook \
-         -d go/vt/mysqlctl \
-         -d go/vt/srvtopo \
-         -t go/vt/topo \
-         -d go/vt/vtctld \
-         -d go/vt/vtgate/evalengine \
-         -d go/vt/vtqueryserver \
-         -d go/vt/vttablet/endtoend \
-         -t go/vt/vttablet/tabletmanager \
-         -t go/vt/vttablet/tabletserver \
-         -t go/vt/vttablet/worker \
-         -d go/vt/withddl \
-         -t go/vt/worker \
-         -d go/vt/workflow/reshardingworkflowgen \
-         -d go/vt/wrangler \
-         -d go/vt/wrangler/testlib \
-         -d go/vt/zkctl \
-         -d go/json2 \
-         -t go/test/endtoend
+go test -v ./go/cmd/... \
+           ./go/mysql/... \
+           ./go/mysql/endtoend/... \
+           ./go/sqltypes/... \
+           ./go/vt/hook/... \
+           ./go/vt/mysqlctl/... \
+           ./go/vt/srvtopo/... \
+           ./go/vt/topo/... \
+           ./go/vt/vtctld/... \
+           ./go/vt/vtgate/evalengine/... \
+           ./go/vt/vttablet/endtoend/... \
+           ./go/vt/vttablet/tabletmanager/... \
+           ./go/vt/vttablet/tabletserver/... \
+           ./go/vt/wrangler/... \
+           ./go/vt/wrangler/testlib/... \
+           ./go/vt/zkctl/... \
+           ./go/json2/... \
+           ./go/test/endtoend/...
 
 %files
 %license LICENSE
@@ -104,6 +102,21 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
+* Fri Apr 25 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 17.0.7-8
+- Add patch for CVE-2025-22872
+
+* Thu Mar 20 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 17.0.7-7
+- Fix CVE-2024-51744 with an upstream patch
+
+* Thu Mar 06 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 17.0.7-6
+- Fix add patch for CVE-2024-53257
+
+* Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 17.0.7-5
+- Fix CVE-2025-22868 with an upstream patch
+
+* Fri Jan 31 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 17.0.7-4
+- Add patch for CVE-2024-45339
+
 * Thu Jan 02 2025 Sumedh Sharma <sumsharma@microsoft.com> - 17.0.7-3
 - Add patch for CVE-2024-45338.
 

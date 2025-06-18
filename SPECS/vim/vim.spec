@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.1.0791
+Version:        9.1.1198
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -197,8 +197,26 @@ fi
 %{_bindir}/rview
 %{_bindir}/vim
 %{_bindir}/vimdiff
+%{_datarootdir}/vim/vim91/LICENSE
+%{_datarootdir}/vim/vim91/README.txt
 
 %changelog
+* Mon Mar 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.1198-1
+- Auto-upgrade to 9.1.1198 - for CVE-2025-29768
+
+* Wed Mar 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.1164-1
+- Auto-upgrade to 9.1.1164 - for CVE-2025-27423
+- Remove previously applied patches
+
+* Sun Feb 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 9.1.0791-4
+- Patch CVE-2025-26603 & CVE-2025-1215
+
+* Thu Jan 23 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 9.1.0791-3
+- Patch to fix CVE-2025-24014.
+
+* Thu Jan 16 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 9.1.0791-2
+- Patch for fixing CVE-2025-22134
+
 * Thu Oct 17 2024 Nick Samson <nisamson@microsoft.com> - 9.1.0791-1
 - Upgrade to 9.1.0791 to fix CVE-2024-47814, CVE-2024-43802
 - Added language configurations for Amharic and Hungarian

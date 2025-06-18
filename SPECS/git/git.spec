@@ -1,13 +1,13 @@
 Summary:        Fast distributed version control system
 Name:           git
-Version:        2.39.4
+Version:        2.40.4
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Programming
 URL:            https://git-scm.com/
-Source0:        https://www.kernel.org/pub/software/scm/git/%{name}-%{version}.tar.xz
+Source0:        https://github.com/git/git/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  curl-devel
 BuildRequires:  python3-devel
 Requires:       curl
@@ -106,6 +106,7 @@ BuildArch:      noarch
 %{py3_shebang_fix} git-p4.py
 
 %build
+make configure
 %configure \
     CFLAGS="%{optflags}" \
     CXXFLAGS="%{optflags}" \
@@ -168,6 +169,9 @@ fi
 %endif
 
 %changelog
+* Thu Jan 16 2024 Suresh Thelkar <sthelkar@microsoft.com> - 2.40.4-1
+- Upgrade to 2.40.4 to address CVE-2024-50349 and CVE-2024-52006
+
 * Tue May 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.39.4-1
 - Auto-upgrade to 2.39.4 - Fix CVE-2024-32002, CVE-2024-32004, CVE-2024-32020, CVE-2024-32021, CVE-2024-32465
 

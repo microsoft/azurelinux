@@ -1,7 +1,7 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        12.0.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,7 @@ Group:          Development/Tools
 URL:            https://llvm.org/
 Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{name}-%{version}.src.tar.xz
 Patch1:         llvm-12.0.1-issue-49955-workaround.patch
+Patch2:         CVE-2023-29932.patch
 BuildRequires:  cmake
 BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
@@ -29,7 +30,8 @@ for developing applications that use llvm.
 
 %prep
 %setup -q -n %{name}-%{version}.src
-%autopatch -p2
+%autopatch -p2 -M 1
+%autopatch -p1 -m 2
 
 %build
 # Disable symbol generation
@@ -89,6 +91,9 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
+* Mon Mar 03 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 12.0.1-8
+- Add patch for CVE-2023-29932
+
 * Thu Jun 29 2023 Andrew Phelps <anphel@microsoft.com> - 12.0.1-7
 - Modify parallel compile jobs limit to _smp_ncpus_max if set, or _smp_build_ncpus
 

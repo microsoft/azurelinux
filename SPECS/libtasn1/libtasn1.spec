@@ -1,13 +1,14 @@
 Summary:        ASN.1 library
 Name:           libtasn1
 Version:        4.19.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://www.gnu.org/software/libtasn1/
 Source0:        https://ftp.gnu.org/gnu/libtasn1/%{name}-%{version}.tar.gz
+Patch0:         CVE-2024-12133.patch
 Provides:       libtasn1-tools = %{version}-%{release}
 
 %description
@@ -23,7 +24,7 @@ The package contains libraries and header files for
 developing applications that use libtasn1.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./configure \
@@ -57,6 +58,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Fri Feb 21 2025 Ankita Pareek <ankitapareek@microsoft.com> - 4.19.0-2
+- Address CVE-2024-12133
+
 * Tue Oct 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.19.0-1
 - Updating to version 4.19.0 to fix CVE-2021-46848.
 

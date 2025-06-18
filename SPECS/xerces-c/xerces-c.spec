@@ -1,12 +1,13 @@
 Summary:        Validating XML Parser
 Name:           xerces-c
 Version:        3.2.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://xml.apache.org/xerces-c/
-Source:         https://downloads.apache.org/xerces/c/3/sources/xerces-c-%{version}.tar.xz
+Source0:        https://archive.apache.org/dist/xerces/c/3/sources/%{name}-%{version}.tar.xz
+Patch0:		CVE-2024-23807.patch
 BuildRequires:  dos2unix
 BuildRequires:  gcc-c++
 BuildRequires:  make
@@ -44,7 +45,7 @@ write XML data. A shared library is provided for parsing, generating,
 manipulating, and validating XML documents.
 
 %prep
-%setup -q
+%autosetup -p1
 # Copy samples before build to avoid including built binaries in -doc package
 mkdir -p _docs
 cp -a samples/ _docs/
@@ -87,6 +88,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %doc README NOTICE CREDITS doc _docs/*
 
 %changelog
+* Thu Jan 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.2.4-2
+- Fix CVE-2024-23807
+
 * Thu Aug 10 2023 Saranya R <rsaranya@microsoft.com> - 3.2.4-1
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - License verified

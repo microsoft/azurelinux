@@ -1,15 +1,14 @@
 %define  debug_package %{nil}
 Summary:        erlang
 Name:           erlang
-Version:        25.2
-Release:        2%{?dist}
+Version:        25.3.2.21
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://erlang.org
 Source0:        https://github.com/erlang/otp/archive/OTP-%{version}/otp-OTP-%{version}.tar.gz
-Patch0:         CVE-2023-48795.patch
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  unixODBC-devel
@@ -19,8 +18,7 @@ BuildRequires:  unzip
 erlang programming language
 
 %prep
-%setup -q -n otp-OTP-%{version}
-%patch0 -p1
+%autosetup -p1 -n otp-OTP-%{version}
 
 %build
 export ERL_TOP=`pwd`
@@ -48,6 +46,18 @@ make
 %{_libdir}/erlang/*
 
 %changelog
+* Wed May 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 25.3.2.21-1
+- Auto-upgrade to 25.3.2.21 - for CVE-2025-46712
+
+* Thu Apr 17 2025 Kshitiz Godara <kgodara@microsoft.com> - 25.3.2.20-1
+- Upgrade minor version to fix CVE-2025-32433
+
+* Thu Apr 03 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 25.2-4
+- Include patch to fix CVE-2025-30211
+
+* Fri Feb 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 25.2-3
+- Include patch to fix CVE-2025-26618
+
 * Wed Jan 17 2024 Harshit Gupta <guptaharshit@microsoft.com> - 25.2-2
 - Include patch to fix CVE-2023-48795
 

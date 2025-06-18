@@ -3,7 +3,7 @@
 %define mod_probe_dir deps/src/nvidia-modprobe-%{modprobe_version}
 Summary:        NVIDIA container runtime library
 Name:           libnvidia-container
-Version:        1.17.3
+Version:        1.17.4
 Release:        1%{?dist}
 License:        BSD AND ASL2.0 AND GPLv3+ AND LGPLv3+ AND MIT AND GPLv2
 Vendor:         Microsoft Corporation
@@ -135,6 +135,9 @@ This package contains command-line tools that facilitate using the library.
 %{_bindir}/*
 
 %changelog
+* Fri Feb 14 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.17.4-1
+- Upgrade to version 1.17.4 to stay in sync with nvidia-container-toolkit.
+
 * Thu Dec 05 2024 Henry Li <lihl@microsoft.com> - 1.17.3-1
 - Upgrade to v1.17.3
 

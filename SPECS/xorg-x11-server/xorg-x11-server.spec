@@ -21,7 +21,7 @@
 Summary:        X.Org X11 X server
 Name:           xorg-x11-server
 Version:        1.20.10
-Release:        13%{?dist}
+Release:        15%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -70,6 +70,14 @@ Patch20:        CVE-2024-0229.patch
 Patch21:        CVE-2024-0409.patch
 Patch22:        CVE-2024-21886.patch
 Patch23:        CVE-2024-9632.patch
+Patch24:        CVE-2025-26594.patch
+Patch25:        CVE-2025-26595.patch
+Patch26:        CVE-2025-26596.patch
+Patch27:        CVE-2025-26597.patch
+Patch28:        CVE-2025-26598.patch
+Patch29:        CVE-2025-26599.patch
+Patch30:        CVE-2025-26600.patch
+Patch31:        CVE-2025-26601.patch
 
 # Backported Xwayland randr resolution change emulation support
 Patch501:       0001-dix-Add-GetCurrentClient-helper.patch
@@ -97,6 +105,9 @@ Patch522:       0022-xwayland-Call-xwl_window_check_resolution_change_emu.patch
 Patch523:       0023-xwayland-Fix-setting-of-_XWAYLAND_RANDR_EMU_MONITOR_.patch
 Patch524:       0024-xwayland-Remove-unnecessary-xwl_window_is_toplevel-c.patch
 Patch525:       0025-xwayland-Make-window_get_client_toplevel-non-recursi.patch
+
+# a flaw was founnd in the x.org server in GLX PBuffer
+Patch601:       CVE-2024-0408.patch
 
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
@@ -400,6 +411,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/aclocal/xorg-server.m4
 
 %changelog
+* Tue Mar 04 2025 Kanishk Bansal <kanbansal@microsft.com> - 1.20.10-15
+- Patch CVE-2025-26594, CVE-2025-26595, CVE-2025-26596, CVE-2025-26597, CVE-2025-26598, CVE-2025-26599, CVE-2025-26600, CVE-2025-26601
+
+* Thu Feb 06 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.20.10-14
+- Patch to fix CVE-2024-0408
+
 * Thu Nov 14 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.20.10-13
 - Fix for CVE-2024-9632
 
