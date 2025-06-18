@@ -1,6 +1,6 @@
 Summary:        advanced key-value store
 Name:           redis
-Version:        6.2.16
+Version:        7.5
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
