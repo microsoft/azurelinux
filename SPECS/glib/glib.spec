@@ -101,6 +101,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 
 %files devel
 %defattr(-, root, root)
+%license COPYING
 %{_bindir}/*
 %exclude %{_bindir}/glib-compile-schemas
 %exclude %{_bindir}/gsettings
