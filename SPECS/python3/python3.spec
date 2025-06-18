@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.19
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,12 +33,16 @@ Patch9:         CVE-2023-27043.patch
 Patch10:        CVE-2025-0938.patch
 Patch11:        CVE-2024-9287.patch
 Patch12:        CVE-2025-1795.patch
+Patch13:        CVE-2025-4516.patch
+Patch14:        CVE-2025-4138.patch
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
 Patch1001:      CVE-2024-6345.patch
 Patch1002:      CVE-2024-3651.patch
 Patch1003:      CVE-2023-43804.patch
 Patch1004:      CVE-2024-37891.patch
+Patch1005:      CVE-2023-5752.patch
+Patch1006:      CVE-2023-45803.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -186,6 +190,8 @@ The test package contains all regression tests for Python as well as the modules
 %patch10 -p1
 %patch11 -p1
 %patch12 -p1
+%patch13 -p1
+%patch14 -p1
 
 %build
 # Remove GCC specs and build environment linker scripts
@@ -248,7 +254,10 @@ echo 'Patching CVE-2023-43804 in bundled wheel file %{_libdir}/python%{majmin}/s
 patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py < %{PATCH1003}
 echo 'Patching CVE-2024-37891 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py'
 patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3/util/retry.py < %{PATCH1004}
-
+echo 'Patching CVE-2023-5752 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/pip/_internal/vcs/mercurial.py'
+patch -p1 %{buildroot}%{_libdir}/python%{majmin}/site-packages/pip/_internal/vcs/mercurial.py < %{PATCH1005}
+echo 'Patching CVE-2023-45803 in bundled wheel folder %{_libdir}/python%{majmin}/site-packages/pip/_vendor/urllib3'
+patch -p1 -d %{buildroot}%{_libdir}/python%{majmin}/site-packages < %{PATCH1006}
 
 # Windows executables get installed by pip and setuptools- we don't need these.
 find %{buildroot}%{_libdir}/python%{majmin}/site-packages -name '*.exe' -delete -print
@@ -350,6 +359,10 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Thu Jun 12 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 3.9.19-14
+- Patch CVE-2023-5752 and CVE-2023-45803 in the bundled setuptools wheel
+- Patch CVE-2024-12718, CVE-2025-4138, CVE-2025-4330, CVE-2025-4435, CVE-2025-4516, CVE-2025-4517
+
 * Fri Apr 11 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.9.19-13
 - Add patch for CVE-2024-3651, CVE-2023-43804 and CVE-2024-37891 in the bundled pip wheel
 
