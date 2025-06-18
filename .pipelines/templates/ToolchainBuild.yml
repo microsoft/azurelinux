@@ -15,6 +15,7 @@ parameters:
     type: string
     default: "default"
     values:
+      - "default"
       - "false"
       - "true"
 
@@ -52,10 +53,8 @@ steps:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
   - bash: |
-      if [[ ${{ parameters.dailyBuildID }} == "lkg" ]]; then
+      if [[ -n ${{ parameters.dailyBuildID }} ]]; then
         daily_build_id_arg="DAILY_BUILD_ID=${{ parameters.dailyBuildID }}"
-      elif [[ -n "${{ parameters.dailyBuildID }}" ]]; then
-        daily_build_id_arg=""
       fi
 
       if [[ ${{ parameters.isDailyBuildUpdateManifests }} == "true" ]]; then

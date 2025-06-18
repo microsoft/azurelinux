@@ -10,13 +10,6 @@ parameters:
     default: ""
     displayName: "Daily build ID"
 
-  - name: isDailyBuildUpdateManifests
-    type: string
-    default: "true"
-    values:
-      - "true"
-      - "false"
-
   # Parameters acting as local constants since we can't use global variables in templates.
   - name: buildConfiguration
     type: object
@@ -89,6 +82,7 @@ stages:
                 parameters:
                   dailyBuildID: "${{ parameters.dailyBuildID }}"
                   isDailyBuildUpdateManifests: "${{ parameters.isDailyBuildUpdateManifests }}"
+                  isDailyBuildUpdateManifests: false
                   outputArtifactsFolder: $(ob_outputDirectory)
                   outputToolchainDeltaRPMsTarballName: ${{ parameters.toolchainDeltaRPMsTarballName }}
                   outputToolchainRPMsTarballName: ${{ parameters.toolchainRPMsTarballName }}
@@ -154,7 +148,7 @@ stages:
                   checkBuildRetries: "1"
                   customToolchainTarballName: $(toolchainTarballName)
                   dailyBuildID: "${{ parameters.dailyBuildID }}"
-                  isDailyBuildUpdateManifests: "${{ parameters.isDailyBuildUpdateManifests }}"
+                  isDailyBuildUpdateManifests: false
                   inputArtifactsFolder: $(inputArtifactsLocation)
                   isCheckBuild: true
                   isQuickRebuildPackages: true
@@ -215,7 +209,7 @@ stages:
                   checkBuildRetries: "1"
                   customToolchainTarballName: $(toolchainTarballName)
                   dailyBuildID: "${{ parameters.dailyBuildID }}"
-                  isDailyBuildUpdateManifests: "${{ parameters.isDailyBuildUpdateManifests }}"
+                  isDailyBuildUpdateManifests: false
                   inputArtifactsFolder: $(inputArtifactsLocation)
                   isAllowToolchainRebuilds: true
                   isCheckBuild: true
