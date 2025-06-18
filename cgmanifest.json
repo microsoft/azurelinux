@@ -26363,46 +26363,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-async",
-          "version": "2.8.0",
-          "downloadUrl": "https://github.com/socketry/async/archive/refs/tags/v2.8.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-async-http",
-          "version": "0.63.0",
-          "downloadUrl": "https://github.com/socketry/async-http/archive/refs/tags/v0.63.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-async-io",
-          "version": "1.35.0",
-          "downloadUrl": "https://github.com/socketry/async-io/archive/refs/tags/v1.35.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-async-pool",
-          "version": "0.4.0",
-          "downloadUrl": "https://github.com/socketry/async-pool/archive/refs/tags/v0.4.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rubygem-bindata",
           "version": "2.4.15",
           "downloadUrl": "https://github.com/dmendel/bindata/archive/refs/tags/v2.4.15.tar.gz"
@@ -26446,16 +26406,6 @@
           "name": "rubygem-connection_pool",
           "version": "2.4.1",
           "downloadUrl": "https://github.com/mperham/connection_pool/archive/refs/tags/v2.4.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-console",
-          "version": "1.23.3",
-          "downloadUrl": "https://github.com/socketry/console/archive/refs/tags/v1.23.3.tar.gz"
         }
       }
     },
@@ -26626,16 +26576,6 @@
           "name": "rubygem-faraday-net_http_persistent",
           "version": "2.1.0",
           "downloadUrl": "https://github.com/lostisland/faraday-net_http_persistent/archive/refs/tags/v2.1.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-faraday-patron",
-          "version": "2.0.1",
-          "downloadUrl": "https://github.com/lostisland/faraday-patron/archive/refs/tags/v2.0.1.tar.gz"
         }
       }
     },
