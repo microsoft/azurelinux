@@ -1195,7 +1195,7 @@ export LIBGUESTFS_TRACE=1
 
 
 %changelog
-* Wed Jan 15 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.35.3-4
+* Wed Jun 18 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.35.3-4
 - add patch for CVE-2025-47711.patch
 - add patch for CVE-2025-47712.patch
 
