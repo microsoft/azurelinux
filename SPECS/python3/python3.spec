@@ -6,7 +6,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -238,7 +238,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
-* Mon June 09 2025 Aditya Dubey <adityadubey@microsoft.com> - 3.12.9-1
+* Mon June 09 2025 Aditya Dubey <adityadubey@microsoft.com> - 3.12.9-3
 - Adding vsock loopback module required for VSOCK loopback ptests to pass
 
 * Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.12.9-1
