@@ -1,7 +1,7 @@
 Summary:        Compression and decompression routines
 Name:           zlib
 Version:        1.3.1
-Release:        2%{?dist}
+Release:        1%{?dist}
 URL:            https://www.zlib.net/
 License:        zlib
 Group:          Applications/System
@@ -49,9 +49,6 @@ make  %{?_smp_mflags} check
 %{_mandir}/man3/zlib.3.gz
 
 %changelog
-* Tue May 20 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.3.1-2
-- Dummy bump for testing
-
 * Thu May 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.1-1
 - Auto-upgrade to 1.3.1 - address CVE-2023-45853
 
