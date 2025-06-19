@@ -2,17 +2,19 @@
 Summary:        erlang
 Name:           erlang
 Version:        26.2.5.12
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://erlang.org
-Source0:        https://github.com/erlang/otp/archive/OTP-%{version}/otp-OTP-%{version}.tar.gz#/%{name}-%{version}.tar.gz      
+Source0:        https://github.com/erlang/otp/archive/OTP-%{version}/otp-OTP-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  unixODBC-devel
 BuildRequires:  unzip
+
+Patch0:         CVE-2025-4748.patch
 
 %if 0%{?with_check}
 BuildRequires:  clang-tools-extra
@@ -53,6 +55,9 @@ export ERL_TOP=`pwd`
 %{_libdir}/erlang/*
 
 %changelog
+* Thu Jun 19 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 26.2.5.11-3
+- Patch CVE-2025-4748
+
 * Wed Jun 04 2025 Muhammad Falak <mwani@microsoft.com> - 26.2.5.11-2
 - Skip format-check in tests
 
