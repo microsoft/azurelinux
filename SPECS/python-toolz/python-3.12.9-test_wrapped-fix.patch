@@ -1,0 +1,67 @@
+From 0c2b43a926a3543817240c878c6ded1180c81b71 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <adam@blueradius.ca>
+Date: Fri, 27 Sep 2024 12:14:21 -0700
+Subject: [PATCH] Test fixes for changes in recent upstream Python (#582)
+
+---
+ toolz/tests/test_functoolz.py    |  7 +++++--
+ toolz/tests/test_inspect_args.py | 21 +++++++++++++++++++--
+ 2 files changed, 24 insertions(+), 4 deletions(-)
+
+diff --git a/toolz/tests/test_functoolz.py b/toolz/tests/test_functoolz.py
+index 555cf48d..a28c2a77 100644
+--- a/toolz/tests/test_functoolz.py
++++ b/toolz/tests/test_functoolz.py
+@@ -738,10 +738,13 @@ def f(a, b):
+ def test_excepts():
+     # These are descriptors, make sure this works correctly.
+     assert excepts.__name__ == 'excepts'
++    # in Python < 3.13 the second line is indented, in 3.13+
++    # it is not, strip all lines to fudge it
++    testlines = "\n".join((line.strip() for line in excepts.__doc__.splitlines()))
+     assert (
+         'A wrapper around a function to catch exceptions and\n'
+-        '    dispatch to a handler.\n'
+-    ) in excepts.__doc__
++        'dispatch to a handler.\n'
++    ) in testlines
+ 
+     def idx(a):
+         """idx docstring
+diff --git a/toolz/tests/test_inspect_args.py b/toolz/tests/test_inspect_args.py
+index 93408eb5..f26dbc64 100644
+--- a/toolz/tests/test_inspect_args.py
++++ b/toolz/tests/test_inspect_args.py
+@@ -2,6 +2,7 @@
+ import inspect
+ import itertools
+ import operator
++import sys
+ import toolz
+ from toolz.functoolz import (curry, is_valid_args, is_partial_args, is_arity,
+                              num_required_args, has_varargs, has_keywords)
+@@ -482,6 +483,22 @@ def __wrapped__(self):
+     wrapped = Wrapped(func)
+     assert inspect.signature(func) == inspect.signature(wrapped)
+ 
+-    assert num_required_args(Wrapped) is None
+-    _sigs.signatures[Wrapped] = (_sigs.expand_sig((0, lambda func: None)),)
++    # inspect.signature did not used to work properly on wrappers,
++    # but it was fixed in Python 3.11.9, Python 3.12.3 and Python
++    # 3.13+
++    inspectbroken = True
++    if sys.version_info.major > 3:
++        inspectbroken = False
++    if sys.version_info.major == 3:
++        if sys.version_info.minor == 11 and sys.version_info.micro > 8:
++            inspectbroken = False
++        if sys.version_info.minor == 12 and sys.version_info.micro > 2:
++            inspectbroken = False
++        if sys.version_info.minor > 12:
++            inspectbroken = False
++
++    if inspectbroken:
++        assert num_required_args(Wrapped) is None
++        _sigs.signatures[Wrapped] = (_sigs.expand_sig((0, lambda func: None)),)
++
+     assert num_required_args(Wrapped) == 1
