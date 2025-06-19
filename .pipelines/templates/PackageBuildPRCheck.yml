@@ -97,7 +97,7 @@ stages:
 
               - script: |
                   echo "##vso[task.setvariable variable=toolchainArtifactName;isOutput=true]$(ob_artifactBaseName)"
-                  echo "##vso[task.setvariable variable=toolchainTarballName;isOutput=true]toolchain_built_rpms_all.tar.gz"
+                  echo "##vso[task.setvariable variable=toolchainTarballName;isOutput=true]${{ parameters.toolchainRPMsTarballName }}"
                 name: "ToolchainArtifactName"
                 displayName: "Set variables for published toolchain tarball"
 
