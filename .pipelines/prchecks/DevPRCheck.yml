@@ -24,7 +24,7 @@ resources:
     - repository: mariner-parallel-test-system
       type: git
       name: mariner/mariner-parallel-test-system
-      ref: refs/heads/mbykhovtsev/tweak-paths # TODO: make sure to use main once finished. Use main branch as default, such as `ref: refs/heads/main`.
+      ref: refs/heads/mbykhovtsev/tweak-paths # TODO: make sure to use main once finished. Use main branch as default, such as `ref: refs/heads/main`. 
 
 variables:
   - group: "Agent pools (DEV)"
