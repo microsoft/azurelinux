@@ -1,316 +1,187 @@
-Summary:        Library implementing XML-based Remote Procedure Calls
+# Upstream libxml2 backend is completely broken since 2015 https://sourceforge.net/p/xmlrpc-c/patches/49/
+%bcond_with libxml2
+ 
 Name:           xmlrpc-c
-Version:        1.54.06
-Release:        2%{?dist}
-License:        BSD-3-Clause AND MIT
+Version:        1.59.03
+Release:        1%{?dist}
+Summary:        Lightweight RPC library based on XML and HTTP
+# See doc/COPYING for details.
+# The Python 1.5.2 license used by a few files is just BSD.
+# Automatically converted from old format: BSD and MIT - review is highly recommended.
+License:        LicenseRef-Callaway-BSD AND LicenseRef-Callaway-MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Group:          Development/Libraries/C and C++
-URL:            https://xmlrpc-c.sourceforge.net/
-Source0:        https://sourceforge.net/projects/xmlrpc-c/files/Xmlrpc-c%20Super%20Stable/%{version}/xmlrpc-c-%{version}.tgz
+URL:            http://xmlrpc-c.sourceforge.net/
+Source: https://sourceforge.net/projects/xmlrpc-c/files/Xmlrpc-c%20Super%20Stable/%{version}/xmlrpc-c-%{version}.tgz
 # Upstreamable patches
-Patch101:       0001-xmlrpc_server_abyss-use-va_args-properly.patch
-%define         soname 3
-%define         soname_cpp 8
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  gcc-c++
+Patch102:       0002-Use-proper-datatypes-for-long-long.patch
+Patch103:       0003-allow-30x-redirections.patch
+ 
 BuildRequires:  git-core
-BuildRequires:  ncurses-devel
-BuildRequires:  pkgconfig
-BuildRequires:  readline-devel
-BuildRequires:  pkgconfig(libcurl)
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+%if %{with libxml2}
 BuildRequires:  pkgconfig(libxml-2.0)
-
-%description
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
+%else
+# upstream has its own fork of expat
+Provides:       bundled(expat)
+%endif
+BuildRequires:  pkgconfig(openssl)
+BuildRequires:  pkgconfig(libcurl)
+BuildRequires:  readline-devel
+BuildRequires:  ncurses-devel
+ 
+%package c++
+Summary:        C++ libraries for xmlrpc-c
+Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+ 
+%package client
+Summary:        C client libraries for xmlrpc-c
+Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+ 
+%package client++
+Summary:        C++ client libraries for xmlrpc-c
+Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-c++%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-client%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+ 
 %package devel
-Summary:        Development package for xmlrpc-c
-Group:          Development/Libraries/C and C++
-Requires:       libxmlrpc%{soname} = %{version}
-Requires:       libxmlrpc++%{soname_cpp} = %{version}
-Requires:       libxmlrpc_abyss%{soname} = %{version}
-Requires:       libxmlrpc_abyss++%{soname_cpp} = %{version}
-Requires:       libxmlrpc_client%{soname} = %{version}
-Requires:       libxmlrpc_client++%{soname_cpp} = %{version}
-Requires:       libxmlrpc_cpp%{soname_cpp} = %{version}
-Requires:       libxmlrpc_packetsocket%{soname_cpp} = %{version}
-Requires:       libxmlrpc_server%{soname} = %{version}
-Requires:       libxmlrpc_server++%{soname_cpp} = %{version}
-Requires:       libxmlrpc_server_abyss%{soname} = %{version}
-Requires:       libxmlrpc_server_abyss++%{soname_cpp} = %{version}
-Requires:       libxmlrpc_server_cgi%{soname} = %{version}
-Requires:       libxmlrpc_server_cgi++%{soname_cpp} = %{version}
-Requires:       libxmlrpc_server_pstream++%{soname_cpp} = %{version}
-Requires:       libxmlrpc_util++%{soname_cpp} = %{version}
-Requires:       libxmlrpc_util4 = %{version}
-Requires:       pkgconfig(libxml-2.0)
-
+Summary:        Development files for xmlrpc-c based programs
+Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-c++%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-client%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-client++%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+ 
+%package apps
+Summary:        Sample XML-RPC applications
+Requires:       %{name}%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-c++%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-client%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name}-client++%{?_isa} = %{?epoch:%{epoch}:}%{version}-%{release}
+ 
+ 
+%description
+XML-RPC is a quick-and-easy way to make procedure calls over the
+Internet. It converts the procedure call into XML document, sends it
+to a remote server using HTTP, and gets back the response as XML.
+ 
+This library provides a modular implementation of XML-RPC for C.
+ 
+ 
+%description c++
+XML-RPC is a quick-and-easy way to make procedure calls over the
+Internet. It converts the procedure call into XML document, sends it
+to a remote server using HTTP, and gets back the response as XML.
+ 
+This library provides a modular implementation of XML-RPC for C++.
+ 
+ 
+%description client
+XML-RPC is a quick-and-easy way to make procedure calls over the
+Internet. It converts the procedure call into XML document, sends it
+to a remote server using HTTP, and gets back the response as XML.
+ 
+This library provides a modular implementation of XML-RPC for C
+clients.
+ 
+%description client++
+XML-RPC is a quick-and-easy way to make procedure calls over the
+Internet. It converts the procedure call into XML document, sends it
+to a remote server using HTTP, and gets back the response as XML.
+ 
+This library provides a modular implementation of XML-RPC for C++
+clients.
+ 
+ 
 %description devel
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-This subpackage contains libraries and header files for developing
-applications that want to make use of xmlrpc-c.
-
-%package -n libxmlrpc%{soname}
-Summary:        A library implementing XML-based remote procedure calls
-Group:          System/Libraries
-
-%description -n libxmlrpc%{soname}
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-%package -n libxmlrpc++%{soname_cpp}
-Summary:        A library implementing XML-based remote procedure calls
-Group:          System/Libraries
-
-%description -n libxmlrpc++%{soname_cpp}
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-%package -n libxmlrpc_abyss%{soname}
-Summary:        Library implementing XML-based Remote Procedure Calls
-Group:          System/Libraries
-
-%description -n libxmlrpc_abyss%{soname}
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-%package -n libxmlrpc_abyss++%{soname_cpp}
-Summary:        Library implementing XML-based Remote Procedure Calls
-Group:          System/Libraries
-
-%description -n libxmlrpc_abyss++%{soname_cpp}
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-%package -n libxmlrpc_client%{soname}
-Summary:        Library implementing XML-based Remote Procedure Calls
-Group:          System/Libraries
-
-%description -n libxmlrpc_client%{soname}
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-%package -n libxmlrpc_client++%{soname_cpp}
-Summary:        Library implementing XML-based Remote Procedure Calls
-Group:          System/Libraries
-
-%description -n libxmlrpc_client++%{soname_cpp}
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-%package -n libxmlrpc_cpp%{soname_cpp}
-Summary:        Library implementing XML-based Remote Procedure Calls
-Group:          System/Libraries
-
-%description -n libxmlrpc_cpp%{soname_cpp}
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-%package -n libxmlrpc_packetsocket%{soname_cpp}
-Summary:        Library implementing XML-based Remote Procedure Calls
-Group:          System/Libraries
-
-%description -n libxmlrpc_packetsocket%{soname_cpp}
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-%package -n libxmlrpc_server%{soname}
-Summary:        Library implementing XML-based Remote Procedure Calls
-Group:          System/Libraries
-
-%description -n libxmlrpc_server%{soname}
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-%package -n libxmlrpc_server++%{soname_cpp}
-Summary:        Library implementing XML-based Remote Procedure Calls
-Group:          System/Libraries
-
-%description -n libxmlrpc_server++%{soname_cpp}
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-%package -n libxmlrpc_server_abyss%{soname}
-Summary:        Library implementing XML-based Remote Procedure Calls
-Group:          System/Libraries
-
-%description -n libxmlrpc_server_abyss%{soname}
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-%package -n libxmlrpc_server_abyss++%{soname_cpp}
-Summary:        Library implementing XML-based Remote Procedure Calls
-Group:          System/Libraries
-
-%description -n libxmlrpc_server_abyss++%{soname_cpp}
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-%package -n libxmlrpc_server_cgi%{soname}
-Summary:        Library implementing XML-based Remote Procedure Calls
-Group:          System/Libraries
-
-%description -n libxmlrpc_server_cgi%{soname}
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-%package -n libxmlrpc_server_cgi++%{soname_cpp}
-Summary:        Library implementing XML-based Remote Procedure Calls
-Group:          System/Libraries
-
-%description -n libxmlrpc_server_cgi++%{soname_cpp}
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-%package -n libxmlrpc_server_pstream++%{soname_cpp}
-Summary:        Library implementing XML-based Remote Procedure Calls
-Group:          System/Libraries
-
-%description -n libxmlrpc_server_pstream++%{soname_cpp}
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-%package -n libxmlrpc_util4
-Summary:        Library implementing XML-based Remote Procedure Calls
-Group:          System/Libraries
-
-%description -n libxmlrpc_util4
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
-%package -n libxmlrpc_util++%{soname_cpp}
-Summary:        Library implementing XML-based Remote Procedure Calls
-Group:          System/Libraries
-
-%description -n libxmlrpc_util++%{soname_cpp}
-XML-RPC is a lightweight RPC protocol based on XML and HTTP. This
-package is used by XML-RPC clients and servers written in C and C++.
-
+Static libraries and header files for writing XML-RPC applications in
+C and C++.
+ 
+ 
+%description apps
+XML-RPC is a quick-and-easy way to make procedure calls over the
+Internet. It converts the procedure call into XML document, sends it
+to a remote server using HTTP, and gets back the response as XML.
+ 
+This package contains some handy XML-RPC demo applications.
+ 
+ 
 %prep
 %autosetup -Sgit
-
+ 
+ 
 %build
-export CFLAGS_PERSONAL="%{optflags}"
-%configure \
-    --enable-libxml2-backend
-%make_build CADD="-fPIC -DPIC" AR=ar RANLIB=ranlib --jobs 1
-
-%check
-%make_build check CADD="-fPIC -DPIC" AR=ar RANLIB=ranlib --jobs 1
-
+%configure
+%make_build
+# build order matters and multiple threads break it
+%make_build -j1 -C tools
+ 
+ 
 %install
-%make_install AR=ar RANLIB=ranlib
-
-# Remove static libraries
-rm -f %{buildroot}%{_libdir}/*.a
-
-make -C examples clean
-make -C examples/cpp clean
-
-%post -n libxmlrpc%{soname} -p /sbin/ldconfig
-%post -n libxmlrpc++%{soname_cpp} -p /sbin/ldconfig
-%post -n libxmlrpc_abyss%{soname} -p /sbin/ldconfig
-%post -n libxmlrpc_abyss++%{soname_cpp} -p /sbin/ldconfig
-%post -n libxmlrpc_client%{soname} -p /sbin/ldconfig
-%post -n libxmlrpc_client++%{soname_cpp} -p /sbin/ldconfig
-%post -n libxmlrpc_cpp%{soname_cpp} -p /sbin/ldconfig
-%post -n libxmlrpc_packetsocket%{soname_cpp} -p /sbin/ldconfig
-%post -n libxmlrpc_server%{soname} -p /sbin/ldconfig
-%post -n libxmlrpc_server++%{soname_cpp} -p /sbin/ldconfig
-%post -n libxmlrpc_server_abyss%{soname} -p /sbin/ldconfig
-%post -n libxmlrpc_server_abyss++%{soname_cpp} -p /sbin/ldconfig
-%post -n libxmlrpc_server_cgi%{soname} -p /sbin/ldconfig
-%post -n libxmlrpc_server_cgi++%{soname_cpp} -p /sbin/ldconfig
-%post -n libxmlrpc_server_pstream++%{soname_cpp} -p /sbin/ldconfig
-%post -n libxmlrpc_util4 -p /sbin/ldconfig
-%post -n libxmlrpc_util++%{soname_cpp} -p /sbin/ldconfig
-%postun -n libxmlrpc%{soname} -p /sbin/ldconfig
-%postun -n libxmlrpc++%{soname_cpp} -p /sbin/ldconfig
-%postun -n libxmlrpc_abyss%{soname} -p /sbin/ldconfig
-%postun -n libxmlrpc_abyss++%{soname_cpp} -p /sbin/ldconfig
-%postun -n libxmlrpc_client%{soname} -p /sbin/ldconfig
-%postun -n libxmlrpc_client++%{soname_cpp} -p /sbin/ldconfig
-%postun -n libxmlrpc_cpp%{soname_cpp} -p /sbin/ldconfig
-%postun -n libxmlrpc_packetsocket%{soname_cpp} -p /sbin/ldconfig
-%postun -n libxmlrpc_server%{soname} -p /sbin/ldconfig
-%postun -n libxmlrpc_server++%{soname_cpp} -p /sbin/ldconfig
-%postun -n libxmlrpc_server_abyss%{soname} -p /sbin/ldconfig
-%postun -n libxmlrpc_server_abyss++%{soname_cpp} -p /sbin/ldconfig
-%postun -n libxmlrpc_server_cgi%{soname} -p /sbin/ldconfig
-%postun -n libxmlrpc_server_cgi++%{soname_cpp} -p /sbin/ldconfig
-%postun -n libxmlrpc_server_pstream++%{soname_cpp} -p /sbin/ldconfig
-%postun -n libxmlrpc_util4 -p /sbin/ldconfig
-%postun -n libxmlrpc_util++%{soname_cpp} -p /sbin/ldconfig
-
+%make_install
+%make_install -C tools
+ 
+ 
+%check
+#%%make_test
+ 
+ 
 %files
 %license doc/COPYING lib/abyss/license.txt
 %doc doc/CREDITS doc/HISTORY
-%{_libdir}/*.so
-%{_bindir}/xmlrpc-c-config
-%{_libdir}/pkgconfig/xmlrpc*pc
-
+%if ! %{with libxml2}
+%{_libdir}/libxmlrpc_xml*.so.*
+%endif
+%{_libdir}/libxmlrpc.so.*
+%{_libdir}/libxmlrpc_util.so.*
+%{_libdir}/libxmlrpc_abyss.so.*
+%{_libdir}/libxmlrpc_server.so.*
+%{_libdir}/libxmlrpc_server_abyss.so.*
+%{_libdir}/libxmlrpc_server_cgi.so.*
+%exclude %{_libdir}/libxmlrpc*.a
+ 
+ 
+%files client
+%{_libdir}/libxmlrpc_client.so.*
+ 
+%files c++
+%{_libdir}/libxmlrpc_cpp.so.*
+%{_libdir}/libxmlrpc++.so.*
+%{_libdir}/libxmlrpc_util++.so.*
+%{_libdir}/libxmlrpc_abyss++.so.*
+%{_libdir}/libxmlrpc_server++.so.*
+%{_libdir}/libxmlrpc_server_abyss++.so.*
+%{_libdir}/libxmlrpc_server_cgi++.so.*
+%{_libdir}/libxmlrpc_packetsocket.so.*
+%{_libdir}/libxmlrpc_server_pstream++.so.*
+ 
+%files client++
+%{_libdir}/libxmlrpc_client++.so.*
+ 
 %files devel
-%doc examples/
-%{_includedir}/XmlRpcCpp.h
-%{_includedir}/xmlrpc*
-
-%files -n libxmlrpc%{soname}
-%{_libdir}/libxmlrpc.so.%{soname}*
-
-%files -n libxmlrpc++%{soname_cpp}
-%{_libdir}/libxmlrpc++.so.%{soname_cpp}*
-
-%files -n libxmlrpc_abyss%{soname}
-%{_libdir}/libxmlrpc_abyss.so.%{soname}*
-
-%files -n libxmlrpc_abyss++%{soname_cpp}
-%{_libdir}/libxmlrpc_abyss++.so.%{soname_cpp}*
-
-%files -n libxmlrpc_client%{soname}
-%{_libdir}/libxmlrpc_client.so.%{soname}*
-
-%files -n libxmlrpc_client++%{soname_cpp}
-%{_libdir}/libxmlrpc_client++.so.%{soname_cpp}*
-
-%files -n libxmlrpc_cpp%{soname_cpp}
-%{_libdir}/libxmlrpc_cpp.so.%{soname_cpp}*
-
-%files -n libxmlrpc_packetsocket%{soname_cpp}
-%{_libdir}/libxmlrpc_packetsocket.so.%{soname_cpp}*
-
-%files -n libxmlrpc_server%{soname}
-%{_libdir}/libxmlrpc_server.so.%{soname}*
-
-%files -n libxmlrpc_server++%{soname_cpp}
-%{_libdir}/libxmlrpc_server++.so.%{soname_cpp}*
-
-%files -n libxmlrpc_server_abyss%{soname}
-%{_libdir}/libxmlrpc_server_abyss.so.%{soname}*
-
-%files -n libxmlrpc_server_abyss++%{soname_cpp}
-%{_libdir}/libxmlrpc_server_abyss++.so.%{soname_cpp}*
-
-%files -n libxmlrpc_server_cgi%{soname}
-%{_libdir}/libxmlrpc_server_cgi.so.%{soname}*
-
-%files -n libxmlrpc_server_cgi++%{soname_cpp}
-%{_libdir}/libxmlrpc_server_cgi++.so.%{soname_cpp}*
-
-%files -n libxmlrpc_server_pstream++%{soname_cpp}
-%{_libdir}/libxmlrpc_server_pstream++.so.%{soname_cpp}*
-
-%files -n libxmlrpc_util4
-%{_libdir}/libxmlrpc_util.so.4*
-
-%files -n libxmlrpc_util++%{soname_cpp}
-%{_libdir}/libxmlrpc_util++.so.%{soname_cpp}*
+%{_bindir}/xmlrpc-c-config
+%{_includedir}/xmlrpc-c/
+%{_includedir}/*.h
+%{_libdir}/pkgconfig/xmlrpc*.pc
+%{_libdir}/libxmlrpc*.so
+ 
+%files apps
+%{_bindir}/xmlrpc_parsecall
+%{_bindir}/xmlrpc
+%{_bindir}/xmlrpc_transport
+%doc tools/xmlrpc_transport/xmlrpc_transport.html
+%{_bindir}/xml-rpc-api2cpp
+%{_mandir}/man1/xml-rpc-api2cpp.1*
+%{_bindir}/xml-rpc-api2txt
+%{_mandir}/man1/xml-rpc-api2txt.1*
+%{_bindir}/xmlrpc_cpp_proxy
+%{_bindir}/xmlrpc_pstream
+%{_bindir}/xmlrpc_dumpserver
 
 %changelog
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.59.03-1
+- Update to version 1.59.03
+
 * Wed Nov 16 2022 Suresh Thelkar <sthelkar@microsoft.com> - 1.54.06-2
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Added upstream patch to use va_args properly
