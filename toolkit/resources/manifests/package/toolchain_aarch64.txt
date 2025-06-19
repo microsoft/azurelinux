@@ -521,7 +521,11 @@ python3-gpg-1.16.0-2.cm2.aarch64.rpm
 python3-jinja2-3.0.3-7.cm2.noarch.rpm
 python3-libcap-ng-0.8.2-2.cm2.aarch64.rpm
 python3-libs-3.9.19-13.cm2.aarch64.rpm
+<<<<<<< HEAD
 python3-libxml2-2.10.4-7.cm2.aarch64.rpm
+=======
+python3-libxml2-2.10.4-6.cm2.aarch64.rpm
+>>>>>>> e995767ac (Revert "[High] Patch python3 for CVE-2025-4138, CVE-2025-4330, CVE-2025-4517, CVE-2025-4516, CVE-2024-12718, CVE-2025-4435, CVE-2023-5752, and CVE-2023-45803" (#14054))
 python3-lxml-4.9.1-1.cm2.aarch64.rpm
 python3-magic-5.40-3.cm2.noarch.rpm
 python3-markupsafe-2.1.0-1.cm2.aarch64.rpm
