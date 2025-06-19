@@ -37,6 +37,22 @@ parameters:
     type: string
     default: "Toolchain_tests"
 
+  - name: baseRpmsTarballName
+    type: string
+    default: "rpms.tar.gz"
+
+  - name: toolchainRPMsTarballName
+    type: string
+    default: "toolchain_built_rpms_all.tar.gz"
+
+  - name: toolchainSRPMsTarballName
+    type: string
+    default: "toolchain_built_srpms_all.tar.gz"
+
+  - name: toolchainDeltaRPMsTarballName
+    type: string
+    default: "toolchain_built_rpms_delta.tar.gz"
+
 stages:
   - ${{ each configuration in parameters.buildConfiguration }}:
       - stage: Toolchain_${{ configuration.name }}
@@ -67,6 +83,9 @@ stages:
                   dailyBuildID: "${{ parameters.dailyBuildID }}"
                   isDailyBuildUpdateManifests: false
                   outputArtifactsFolder: $(ob_outputDirectory)
+                  outputToolchainDeltaRPMsTarballName: ${{ parameters.toolchainDeltaRPMsTarballName }}
+                  outputToolchainRPMsTarballName: ${{ parameters.toolchainRPMsTarballName }}
+                  outputToolchainSRPMsTarballName: ${{ parameters.tolchainSRPMsTarballName }}
                   selfRepoName: self
 
               # Toolchain package tests should be run through the full package build, calculate the list of packages that should be re-tested
@@ -78,7 +97,7 @@ stages:
 
               - script: |
                   echo "##vso[task.setvariable variable=toolchainArtifactName;isOutput=true]$(ob_artifactBaseName)"
-                  echo "##vso[task.setvariable variable=toolchainTarballName;isOutput=true]toolchain_built_rpms_all.tar.gz"
+                  echo "##vso[task.setvariable variable=toolchainTarballName;isOutput=true]${{ parameters.toolchainRPMsTarballName }}"
                 name: "ToolchainArtifactName"
                 displayName: "Set variables for published toolchain tarball"
 
@@ -105,7 +124,7 @@ stages:
               inputArtifactsLocation: $(Agent.TempDirectory)
               ob_artifactBaseName: ${{ parameters.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
               ob_outputDirectory: $(Build.ArtifactStagingDirectory)
-              outputRPMsTarballName: "rpms.tar.gz"
+              outputRPMsTarballName: ${{ parameters.baseRpmsTarballName }}
               toolchainArtifactName: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['ToolchainArtifactName.toolchainArtifactName'] ]
               toolchainTarballName: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['ToolchainArtifactName.toolchainTarballName'] ]
             steps:
