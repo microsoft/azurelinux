@@ -144,7 +144,6 @@ Patch0900:      do-not-test-openssl-sm3.patch
 Patch0901:      networkd-default-use-domains.patch
 Patch0902:      CVE-2023-7008.patch
 Patch0903:      CVE-2025-4598.patch
-Patch0904:      CVE-2025-5054.patch
 
 %ifarch %{ix86} x86_64
 %global want_bootloader 1
@@ -1220,7 +1219,7 @@ rm -f %{name}.lang
 # changelog here.
 %changelog
 * Thu Jun 12 2025 Akhila Guruju <v-guakhila@microsoft.com> - 255-22
-- Patch CVE-2025-4598 & CVE-2025-5054
+- Patch CVE-2025-4598
 
 * Mon Apr 14 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 255-21
 - Bumping 'Release' tag to match the 'signed' version of the spec.
