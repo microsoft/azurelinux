@@ -2,7 +2,7 @@
 Summary:        First stage UEFI bootloader
 Name:           shim-unsigned-x64
 Version:        15.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://github.com/rhboot/shim
 Source0:        https://github.com/rhboot/shim/releases/download/%{version}/shim-%{version}.tar.bz2
 Source1:        sbat.csv.in
 Source100:      db.x64.esl
+Patch0:         CVE-2024-13176.patch
 BuildRequires:  dos2unix
 BuildRequires:  vim-extra
 BuildRequires:  efivar-devel
@@ -45,6 +46,9 @@ make VENDOR_DB_FILE=db.esl test
 %{_datadir}/%{name}/shimx64.efi
 
 %changelog
+* Wed Jun 04 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 15.8-2
+- Patch CVE-2024-13176
+
 * Mon Feb 12 2024 Dan Streetman <ddstreet@microsoft.com> - 15.8-1
 - Update to 15.8
 - Convert from single signing certificate to ESL containing both old and new signing certificates
