@@ -1,0 +1,8 @@
+scripts:
+  postCustomization:
+  - content: |
+      echo "Updating yum repos"
+      sed -i 's/\/prod\//\/preview\//g' /etc/yum.repos.d/azurelinux-official-base.repo
+      sed -i 's/\/prod\//\/preview\//g' /etc/yum.repos.d/azurelinux-ms-non-oss.repo
+      sed -i 's/\/prod\//\/preview\//g' /etc/yum.repos.d/azurelinux-ms-oss.repo
+    name: fixing yum repos
