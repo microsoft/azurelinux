@@ -1,0 +1,36 @@
+From 268ffea51d623e9eff721a76a396b3feecaf7fa8 Mon Sep 17 00:00:00 2001
+From: Andrew Phelps <anphel@microsoft.com>
+Date: Thu, 5 Jun 2025 16:16:23 +0000
+Subject: [PATCH] disable dmi in test-gather-topology
+
+test-gather-topology.sh test fails due to MemoryModule difference #719
+https://github.com/open-mpi/hwloc/issues/719
+
+---
+ tests/hwloc/linux/gather/test-gather-topology.sh.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/hwloc/linux/gather/test-gather-topology.sh.in b/tests/hwloc/linux/gather/test-gather-topology.sh.in
+index 41f8dee57..219d8f7a9 100644
+--- a/tests/hwloc/linux/gather/test-gather-topology.sh.in
++++ b/tests/hwloc/linux/gather/test-gather-topology.sh.in
+@@ -62,7 +62,7 @@ export HWLOC_FSROOT=//
+ 
+ echo "Saving current system topology to XML..."
+ # ignore DAXDevice info attr because it won't appear in save2.xml unless we pass --io to gather below
+-if ! "$lstopo" --no-io -.xml | grep -v DAXDevice > "$tmpdir/save1.xml" ; then
++if ! "$lstopo" --no-io --ignore misc -.xml | grep -v DAXDevice > "$tmpdir/save1.xml" ; then
+     error "Failed"
+     exit 1
+ fi
+@@ -85,7 +85,7 @@ export HWLOC_FSROOT="$tmpdir/save"
+ rm -f "$tmpdir/save/proc/hwloc-nofile-info"
+ 
+ echo "Saving tarball topology to XML..."
+-if ! "$lstopo" --no-io "$tmpdir/save2.xml" ; then
++if ! "$lstopo" --no-io --ignore misc "$tmpdir/save2.xml" ; then
+     error "Failed"
+     exit 1
+ fi
+-- 
+2.45.3

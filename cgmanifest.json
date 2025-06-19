@@ -1097,8 +1097,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.20.5",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.20.5/bind-9.20.5.tar.xz"
+          "version": "9.20.9",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.20.9/bind-9.20.9.tar.xz"
         }
       }
     },
@@ -1447,8 +1447,18 @@
         "type": "other",
         "other": {
           "name": "cassandra",
-          "version": "4.0.10",
-          "downloadUrl": "https://archive.apache.org/dist/cassandra/4.0.10/apache-cassandra-4.0.10-src.tar.gz"
+          "version": "5.0.0",
+          "downloadUrl": "https://archive.apache.org/dist/cassandra/5.0.0/apache-cassandra-5.0.0-src.tar.gz"
+        }
+      }
+    },
+     {
+      "component": {
+        "type": "other",
+        "other": {
+	  "name": "cassandra-driver",
+          "version": "3.29.2",
+	  "downloadUrl": "https://github.com/datastax/python-driver/archive/refs/tags/3.29.2.tar.gz"
         }
       }
     },
@@ -1757,8 +1767,8 @@
         "type": "other",
         "other": {
           "name": "clang",
-          "version": "18.1.2",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
+          "version": "18.1.8",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.8.tar.gz"
         }
       }
     },
@@ -1967,8 +1977,8 @@
         "type": "other",
         "other": {
           "name": "compiler-rt",
-          "version": "18.1.2",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
+          "version": "18.1.8",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.8.tar.gz"
         }
       }
     },
@@ -8251,8 +8261,8 @@
         "type": "other",
         "other": {
           "name": "kernel-rt",
-          "version": "6.6.77.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.77.1.tar.gz"
+          "version": "6.6.85.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.85.1.tar.gz"
         }
       }
     },
@@ -9051,8 +9061,8 @@
         "type": "other",
         "other": {
           "name": "libcxx",
-          "version": "18.1.2",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
+          "version": "18.1.8",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.8.tar.gz"
         }
       }
     },
@@ -12221,8 +12231,8 @@
         "type": "other",
         "other": {
           "name": "lld",
-          "version": "18.1.2",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
+          "version": "18.1.8",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.8.tar.gz"
         }
       }
     },
@@ -12231,8 +12241,8 @@
         "type": "other",
         "other": {
           "name": "lldb",
-          "version": "18.1.2",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
+          "version": "18.1.8",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.8.tar.gz"
         }
       }
     },
@@ -12261,8 +12271,8 @@
         "type": "other",
         "other": {
           "name": "llvm",
-          "version": "18.1.2",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
+          "version": "18.1.8",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.8.tar.gz"
         }
       }
     },
@@ -13732,8 +13742,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.41",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.41.tar.gz"
+          "version": "8.0.42",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.42.tar.gz"
         }
       }
     },
@@ -16102,16 +16112,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "perl-BDB",
-          "version": "1.92",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/BDB-1.92.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "perl-B-Debug",
           "version": "1.26",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RU/RURBAN/B-Debug-1.26.tar.gz"
@@ -16165,6 +16165,16 @@
           "name": "perl-bareword-filehandles",
           "version": "0.007",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IL/ILMARI/bareword-filehandles-0.007.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-BDB",
+          "version": "1.92",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/BDB-1.92.tar.gz"
         }
       }
     },
@@ -21433,8 +21443,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "16.7",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.7/postgresql-16.7.tar.bz2"
+          "version": "16.9",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.9/postgresql-16.9.tar.bz2"
         }
       }
     },
@@ -22825,6 +22835,16 @@
           "name": "python-genshi",
           "version": "0.7.5",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/G/Genshi/Genshi-0.7.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-geomet",
+          "version": "1.1.0",
+	  "downloadUrl": "https://github.com/geomet/geomet/archive/refs/tags/1.1.0.tar.gz"
         }
       }
     },
@@ -24772,16 +24792,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-sphinxygen",
-          "version": "1.0.2",
-          "downloadUrl": "https://gitlab.com/drobilla/sphinxygen/-/archive/v1.0.2/sphinxygen-v1.0.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-sphinx-epytext",
           "version": "0.0.4",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sphinx-epytext/sphinx-epytext-0.0.4.tar.gz"
@@ -24915,6 +24925,16 @@
           "name": "python-sphinxcontrib-websupport",
           "version": "1.2.7",
           "downloadUrl": "https://github.com/sphinx-doc/sphinxcontrib-websupport/archive/1.2.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-sphinxygen",
+          "version": "1.0.2",
+          "downloadUrl": "https://gitlab.com/drobilla/sphinxygen/-/archive/v1.0.2/sphinxygen-v1.0.2.tar.gz"
         }
       }
     },
@@ -26333,46 +26353,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-async",
-          "version": "2.8.0",
-          "downloadUrl": "https://github.com/socketry/async/archive/refs/tags/v2.8.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-async-http",
-          "version": "0.63.0",
-          "downloadUrl": "https://github.com/socketry/async-http/archive/refs/tags/v0.63.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-async-io",
-          "version": "1.35.0",
-          "downloadUrl": "https://github.com/socketry/async-io/archive/refs/tags/v1.35.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-async-pool",
-          "version": "0.4.0",
-          "downloadUrl": "https://github.com/socketry/async-pool/archive/refs/tags/v0.4.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rubygem-bindata",
           "version": "2.4.15",
           "downloadUrl": "https://github.com/dmendel/bindata/archive/refs/tags/v2.4.15.tar.gz"
@@ -26416,16 +26396,6 @@
           "name": "rubygem-connection_pool",
           "version": "2.4.1",
           "downloadUrl": "https://github.com/mperham/connection_pool/archive/refs/tags/v2.4.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-console",
-          "version": "1.23.3",
-          "downloadUrl": "https://github.com/socketry/console/archive/refs/tags/v1.23.3.tar.gz"
         }
       }
     },
@@ -26596,16 +26566,6 @@
           "name": "rubygem-faraday-net_http_persistent",
           "version": "2.1.0",
           "downloadUrl": "https://github.com/lostisland/faraday-net_http_persistent/archive/refs/tags/v2.1.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-faraday-patron",
-          "version": "2.0.1",
-          "downloadUrl": "https://github.com/lostisland/faraday-patron/archive/refs/tags/v2.0.1.tar.gz"
         }
       }
     },
@@ -28596,8 +28556,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.8.1",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.8.1.tar.gz"
+          "version": "1.9.0",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.0.tar.gz"
         }
       }
     },
@@ -30016,8 +29976,8 @@
         "type": "other",
         "other": {
           "name": "wireshark",
-          "version": "4.0.8",
-          "downloadUrl": "https://wireshark.org/download/src/wireshark-4.0.8.tar.xz"
+          "version": "4.4.7",
+          "downloadUrl": "https://wireshark.org/download/src/wireshark-4.4.7.tar.xz"
         }
       }
     },
