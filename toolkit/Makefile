@@ -134,6 +134,9 @@ SRPMS_DIR       ?= $(OUT_DIR)/SRPMS
 IMAGES_DIR      ?= $(OUT_DIR)/images
 
 PRECACHER_SNAPSHOT   ?= $(rpms_snapshot)
+# Turning on non-fatal mode by default. The precacher is not critical to the build
+# if the user is depending on failures from the precacher, it can be turned off with this option or with the tool directly.
+PRECACHER_NON_FATAL ?= y
 
 # External source server
 SOURCE_URL         ?= https://azurelinuxsrcstorage.blob.core.windows.net/sources/core
