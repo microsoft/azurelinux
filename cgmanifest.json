@@ -1718,7 +1718,7 @@
         "other": {
           "name": "cim-schema",
           "version": "2.54.1",
-          "downloadUrl": "http://www.dmtf.org/standards/cim/cim_schema_v2541/cim_schema_2.54.1Experimental-MOFs.zip"
+          "downloadUrl": "https://www.dmtf.org/standards/cim/cim_schema_v2541/cim_schema_2.54.1Experimental-MOFs.zip"
         }
       }
     },
