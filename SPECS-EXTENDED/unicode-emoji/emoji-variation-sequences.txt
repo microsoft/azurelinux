@@ -1,13 +1,13 @@
 # emoji-variation-sequences.txt
-# Date: 2020-01-21, 07:15:05 GMT
-# © 2020 Unicode®, Inc.
+# Date: 2024-05-01, 21:25:24 GMT
+# © 2024 Unicode®, Inc.
 # Unicode and the Unicode Logo are registered trademarks of Unicode, Inc. in the U.S. and other countries.
-# For terms of use, see http://www.unicode.org/terms_of_use.html
+# For terms of use and license, see https://www.unicode.org/terms_of_use.html
 #
 # Emoji Variation Sequences for UTS #51
-# Version: 13.0
+# Used with Emoji Version 16.0 and subsequent minor revisions (if any)
 #
-# For documentation and usage, see http://www.unicode.org/reports/tr51
+# For documentation and usage, see https://www.unicode.org/reports/tr51
 #
 0023 FE0E  ; text style;  # (1.1) NUMBER SIGN
 0023 FE0F  ; emoji style; # (1.1) NUMBER SIGN
@@ -73,12 +73,18 @@
 23E9 FE0F  ; emoji style; # (6.0) BLACK RIGHT-POINTING DOUBLE TRIANGLE
 23EA FE0E  ; text style;  # (6.0) BLACK LEFT-POINTING DOUBLE TRIANGLE
 23EA FE0F  ; emoji style; # (6.0) BLACK LEFT-POINTING DOUBLE TRIANGLE
+23EB FE0E  ; text style;  # (6.0) BLACK UP-POINTING DOUBLE TRIANGLE
+23EB FE0F  ; emoji style; # (6.0) BLACK UP-POINTING DOUBLE TRIANGLE
+23EC FE0E  ; text style;  # (6.0) BLACK DOWN-POINTING DOUBLE TRIANGLE
+23EC FE0F  ; emoji style; # (6.0) BLACK DOWN-POINTING DOUBLE TRIANGLE
 23ED FE0E  ; text style;  # (6.0) BLACK RIGHT-POINTING DOUBLE TRIANGLE WITH VERTICAL BAR
 23ED FE0F  ; emoji style; # (6.0) BLACK RIGHT-POINTING DOUBLE TRIANGLE WITH VERTICAL BAR
 23EE FE0E  ; text style;  # (6.0) BLACK LEFT-POINTING DOUBLE TRIANGLE WITH VERTICAL BAR
 23EE FE0F  ; emoji style; # (6.0) BLACK LEFT-POINTING DOUBLE TRIANGLE WITH VERTICAL BAR
 23EF FE0E  ; text style;  # (6.0) BLACK RIGHT-POINTING TRIANGLE WITH DOUBLE VERTICAL BAR
 23EF FE0F  ; emoji style; # (6.0) BLACK RIGHT-POINTING TRIANGLE WITH DOUBLE VERTICAL BAR
+23F0 FE0E  ; text style;  # (6.0) ALARM CLOCK
+23F0 FE0F  ; emoji style; # (6.0) ALARM CLOCK
 23F1 FE0E  ; text style;  # (6.0) STOPWATCH
 23F1 FE0F  ; emoji style; # (6.0) STOPWATCH
 23F2 FE0E  ; text style;  # (6.0) TIMER CLOCK
@@ -239,6 +245,8 @@
 26C5 FE0F  ; emoji style; # (5.2) SUN BEHIND CLOUD
 26C8 FE0E  ; text style;  # (5.2) THUNDER CLOUD AND RAIN
 26C8 FE0F  ; emoji style; # (5.2) THUNDER CLOUD AND RAIN
+26CE FE0E  ; text style;  # (6.0) OPHIUCHUS
+26CE FE0F  ; emoji style; # (6.0) OPHIUCHUS
 26CF FE0E  ; text style;  # (5.2) PICK
 26CF FE0F  ; emoji style; # (5.2) PICK
 26D1 FE0E  ; text style;  # (5.2) HELMET WITH WHITE CROSS
@@ -275,10 +283,16 @@
 26FD FE0F  ; emoji style; # (5.2) FUEL PUMP
 2702 FE0E  ; text style;  # (1.1) BLACK SCISSORS
 2702 FE0F  ; emoji style; # (1.1) BLACK SCISSORS
+2705 FE0E  ; text style;  # (6.0) WHITE HEAVY CHECK MARK
+2705 FE0F  ; emoji style; # (6.0) WHITE HEAVY CHECK MARK
 2708 FE0E  ; text style;  # (1.1) AIRPLANE
 2708 FE0F  ; emoji style; # (1.1) AIRPLANE
 2709 FE0E  ; text style;  # (1.1) ENVELOPE
 2709 FE0F  ; emoji style; # (1.1) ENVELOPE
+270A FE0E  ; text style;  # (6.0) RAISED FIST
+270A FE0F  ; emoji style; # (6.0) RAISED FIST
+270B FE0E  ; text style;  # (6.0) RAISED HAND
+270B FE0F  ; emoji style; # (6.0) RAISED HAND
 270C FE0E  ; text style;  # (1.1) VICTORY HAND
 270C FE0F  ; emoji style; # (1.1) VICTORY HAND
 270D FE0E  ; text style;  # (1.1) WRITING HAND
@@ -295,6 +309,8 @@
 271D FE0F  ; emoji style; # (1.1) LATIN CROSS
 2721 FE0E  ; text style;  # (1.1) STAR OF DAVID
 2721 FE0F  ; emoji style; # (1.1) STAR OF DAVID
+2728 FE0E  ; text style;  # (6.0) SPARKLES
+2728 FE0F  ; emoji style; # (6.0) SPARKLES
 2733 FE0E  ; text style;  # (1.1) EIGHT SPOKED ASTERISK
 2733 FE0F  ; emoji style; # (1.1) EIGHT SPOKED ASTERISK
 2734 FE0E  ; text style;  # (1.1) EIGHT POINTED BLACK STAR
@@ -303,16 +319,34 @@
 2744 FE0F  ; emoji style; # (1.1) SNOWFLAKE
 2747 FE0E  ; text style;  # (1.1) SPARKLE
 2747 FE0F  ; emoji style; # (1.1) SPARKLE
+274C FE0E  ; text style;  # (6.0) CROSS MARK
+274C FE0F  ; emoji style; # (6.0) CROSS MARK
+274E FE0E  ; text style;  # (6.0) NEGATIVE SQUARED CROSS MARK
+274E FE0F  ; emoji style; # (6.0) NEGATIVE SQUARED CROSS MARK
 2753 FE0E  ; text style;  # (6.0) BLACK QUESTION MARK ORNAMENT
 2753 FE0F  ; emoji style; # (6.0) BLACK QUESTION MARK ORNAMENT
+2754 FE0E  ; text style;  # (6.0) WHITE QUESTION MARK ORNAMENT
+2754 FE0F  ; emoji style; # (6.0) WHITE QUESTION MARK ORNAMENT
+2755 FE0E  ; text style;  # (6.0) WHITE EXCLAMATION MARK ORNAMENT
+2755 FE0F  ; emoji style; # (6.0) WHITE EXCLAMATION MARK ORNAMENT
 2757 FE0E  ; text style;  # (5.2) HEAVY EXCLAMATION MARK SYMBOL
 2757 FE0F  ; emoji style; # (5.2) HEAVY EXCLAMATION MARK SYMBOL
 2763 FE0E  ; text style;  # (1.1) HEAVY HEART EXCLAMATION MARK ORNAMENT
 2763 FE0F  ; emoji style; # (1.1) HEAVY HEART EXCLAMATION MARK ORNAMENT
 2764 FE0E  ; text style;  # (1.1) HEAVY BLACK HEART
 2764 FE0F  ; emoji style; # (1.1) HEAVY BLACK HEART
+2795 FE0E  ; text style;  # (6.0) HEAVY PLUS SIGN
+2795 FE0F  ; emoji style; # (6.0) HEAVY PLUS SIGN
+2796 FE0E  ; text style;  # (6.0) HEAVY MINUS SIGN
+2796 FE0F  ; emoji style; # (6.0) HEAVY MINUS SIGN
+2797 FE0E  ; text style;  # (6.0) HEAVY DIVISION SIGN
+2797 FE0F  ; emoji style; # (6.0) HEAVY DIVISION SIGN
 27A1 FE0E  ; text style;  # (1.1) BLACK RIGHTWARDS ARROW
 27A1 FE0F  ; emoji style; # (1.1) BLACK RIGHTWARDS ARROW
+27B0 FE0E  ; text style;  # (6.0) CURLY LOOP
+27B0 FE0F  ; emoji style; # (6.0) CURLY LOOP
+27BF FE0E  ; text style;  # (6.0) DOUBLE CURLY LOOP
+27BF FE0F  ; emoji style; # (6.0) DOUBLE CURLY LOOP
 2934 FE0E  ; text style;  # (3.2) ARROW POINTING RIGHTWARDS THEN CURVING UPWARDS
 2934 FE0F  ; emoji style; # (3.2) ARROW POINTING RIGHTWARDS THEN CURVING UPWARDS
 2935 FE0E  ; text style;  # (3.2) ARROW POINTING RIGHTWARDS THEN CURVING DOWNWARDS
@@ -718,6 +752,6 @@
 1F6F3 FE0E ; text style;  # (7.0) PASSENGER SHIP
 1F6F3 FE0F ; emoji style; # (7.0) PASSENGER SHIP
 
-#Total sequences: 354
+#Total sequences: 371
 
 #EOF
