@@ -1,7 +1,7 @@
 Summary:        Metapackage to install all build tools
 Name:           build-essential
 Version:        %{azl}.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,6 +21,7 @@ Requires:       make
 Requires:       patch
 Requires:       pkgconf
 Requires:       tar
+Requires:       libxcrypt-devel
 
 %description
 Metapackage to install all build tools
@@ -33,6 +34,9 @@ Metapackage to install all build tools
 %defattr(-,root,root,0755)
 
 %changelog
+* Mon May 12 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.0-4
+- Add libxcrypt-devel to build-essential for crypt.h
+
 * Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.0-3
 - Add missing Vendor and Distribution tags.
 
