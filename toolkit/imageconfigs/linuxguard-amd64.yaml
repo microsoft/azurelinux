@@ -207,4 +207,4 @@ output:
       - ukis
     path: ./output
   image:
-    format: vhd-fixed
+    format: raw
