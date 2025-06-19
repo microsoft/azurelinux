@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "lzip-1.21.tar.gz": "e48b5039d3164d670791f9c5dbaa832bf2df080cb1fbb4f33aa7b3300b670d8b",
-  "lzip-1.21.tar.gz.sig": "8a5bb3be370b17a65cece63dea0c83de01a02d1605a362b4ea9a2f32d1903110"
+  "lzip-1.25.tar.gz": "09418a6d8fb83f5113f5bd856e09703df5d37bae0308c668d0f346e3d3f0a56f",
+  "lzip-1.25.tar.gz.sig": "c0e9cd7137e0f194131c47706a005a7cbd286cfc2ca94948b148288409853d30"
  }
 }
