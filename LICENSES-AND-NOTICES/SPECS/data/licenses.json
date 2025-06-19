@@ -2696,6 +2696,7 @@
                 "coreutils",
                 "cpio",
                 "cppunit",
+                "cqlsh",
                 "cracklib",
                 "crash",
                 "crash-gcore-command",
