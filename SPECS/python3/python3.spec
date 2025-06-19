@@ -169,7 +169,7 @@ rm %{buildroot}%{_bindir}/2to3
 rm -rf %{buildroot}%{_bindir}/__pycache__
 
 %check
-%{buildroot}%{_bindir}/python3 -m test
+%{buildroot}%{_bindir}/python3 -m test -v
 
 %ldconfig_scriptlets
 
