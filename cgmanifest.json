@@ -18083,8 +18083,8 @@
         "type": "other",
         "other": {
           "name": "perl-IO-Socket-INET6",
-          "version": "2.72",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/IO-Socket-INET6-2.72.tar.gz"
+          "version": "2.73",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-Socket-INET6-2.73.tar.gz"
         }
       }
     },
