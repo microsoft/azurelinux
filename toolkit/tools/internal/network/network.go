@@ -23,7 +23,7 @@ import (
 
 const (
 	// Default upper bound on a single network operation, across all retries.
-	DefaultTimeout = time.Minute * 10
+	DefaultTimeout = time.Minute * 20
 )
 
 // ErrDownloadFileInvalidResponse404 is returned when the download response is 404.
