@@ -106,9 +106,7 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 
 %changelog
 * Fri Jun 20 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.21.4-19
-- Add patch for CVE-2025-5916.patch
-- Add patch for CVE-2025-5917.patch
-- Add patch for CVE-2025-5918.patch
+- Patch CVE-2025-5916, CVE-2025-5917 & CVE-2025-5918
 
 * Mon May 12 2025 Archana Shettigar <v-shettigara@microsoft.com> - 3.21.4-18
 - Fix CVE-2024-8096 by backporting
