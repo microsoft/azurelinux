@@ -2447,8 +2447,8 @@
         "type": "other",
         "other": {
           "name": "dbus-python",
-          "version": "1.2.16",
-          "downloadUrl": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.2.16.tar.gz"
+          "version": "1.3.2",
+          "downloadUrl": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.3.2.tar.gz"
         }
       }
     },
