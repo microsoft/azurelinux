@@ -15773,8 +15773,8 @@
         "type": "other",
         "other": {
           "name": "papi",
-          "version": "5.7.0",
-          "downloadUrl": "http://icl.cs.utk.edu/projects/papi/downloads/papi-5.7.0.tar.gz"
+          "version": "7.1.0",
+          "downloadUrl": "https://icl.cs.utk.edu/projects/papi/downloads/papi-7.1.0.tar.gz"
         }
       }
     },
