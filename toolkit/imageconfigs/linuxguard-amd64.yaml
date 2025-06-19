@@ -106,8 +106,8 @@ os:
     resetType: hard-reset
   hostname: linuxguard-base
 
-  # selinux:
-  #   mode: enforcing
+  selinux:
+    mode: enforcing
 
   uki:
     kernels: auto
@@ -133,6 +133,7 @@ os:
       - policycoreutils-python-utils
       - selinux-policy
       - selinux-policy-modules
+      - selinux-policy-ci
       - checkpolicy  
       - secilc 
       - setools-console
@@ -162,6 +163,9 @@ os:
     - source: files/linuxguard/no-password-prompt-on-sudo
       destination: /etc/sudoers.d/no-password-prompt-on-sudo
       permissions: "440"
+    # SELinux customizations
+    - source: files/linuxguard/selinux-ci-uki.semanage
+      destination: /etc/selinux/targeted/selinux-ci.semanage
     - source: files/linuxguard/99-dhcp-eth0.network
       destination: /etc/systemd/network/99-dhcp-eth0.network
     # Verity signature verification support
@@ -193,6 +197,8 @@ scripts:
     # Config AzureLinuxagent
     - path: scripts/linuxguard/azlinuxagentconfig.sh
     - path: scripts/linuxguard/duid-type-to-link-layer.sh
+    # Disable unused SELinux policy modules and configure SELinux policy for CI
+    - path: scripts/linuxguard/selinux-ci-config.sh
     - path: scripts/linuxguard/cleanup-machineid.sh
     - path: scripts/linuxguard/prepare_trusted_cni_plugins.sh
 
