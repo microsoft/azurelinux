@@ -4,7 +4,7 @@
 Summary:        Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store
 Name:           cassandra
 Version:        5.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 URL:            https://cassandra.apache.org/
 License:        Apache License, Version 2.0
 Group:          Applications/System
@@ -16,7 +16,6 @@ Source1:        cassandra.service
 # instructions to regenerate cassandra-build-cache
 # whenever updating to newer version.
 Source2:        cassandra-build-cache-1-%{version}.tar.gz
-ExclusiveArch:  x86_64
 
 BuildRequires:  ant
 BuildRequires:  ant-junit
@@ -67,6 +66,13 @@ ant -v clean jar javadoc -Drelease=true -Duse.jdk11=true
 
 # clean build cache
 rm -rf ~/.m2
+
+%ifarch x86_64
+rm $(find lib/sigar-bin -type f -name "*" ! -name "libsigar-amd64-linux.so")
+%endif
+%ifarch aarch64
+rm -r lib/sigar-bin
+%endif
 
 %install
 mkdir -p %{buildroot}%{_var}/opt/%{name}/data
@@ -141,6 +147,9 @@ fi
 %exclude %{_var}/opt/cassandra/build/lib
 
 %changelog
+* Thu Jun 19 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 5.0.0-2
+- Adding support for aarch64
+
 * Thu May 29 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 5.0.0-1
 - Upgrade version to 5.0.0
 
