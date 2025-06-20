@@ -123,8 +123,10 @@ os:
 
   packages:
     remove:
-      - kernel
+      - dracut-hostonly
       - grub2-efi-binary
+      - kernel
+
     install:
       - kernel-ipe
       - openssh-server
@@ -201,6 +203,13 @@ scripts:
     - path: scripts/linuxguard/selinux-ci-config.sh
     - path: scripts/linuxguard/cleanup-machineid.sh
     - path: scripts/linuxguard/prepare_trusted_cni_plugins.sh
+
+    - path: scripts/set_os_release_variant_entries.sh
+      arguments:
+      - --variant-id
+      - linuxguard
+      - --variant
+      - Linux Guard Image
 
     - path: scripts/set_os_release_variant_entries.sh
       arguments:
