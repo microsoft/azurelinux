@@ -158,25 +158,25 @@ os:
       - cloud-init
 
   additionalFiles:
-    - source: files/no-password-prompt-on-sudo
+    - source: files/linuxguar/dno-password-prompt-on-sudo
       destination: /etc/sudoers.d/no-password-prompt-on-sudo
       permissions: "440"
-    - source: files/99-dhcp-eth0.network
+    - source: files/linuxguard/99-dhcp-eth0.network
       destination: /etc/systemd/network/99-dhcp-eth0.network
     # Verity signature verification support
-    - source: files/verity-signature/90mountbootpartition/module-setup.sh
+    - source: files/linuxguard/verity-signature/90mountbootpartition/module-setup.sh
       destination: /usr/lib/dracut/modules.d/90mountbootpartition/module-setup.sh
       permissions: "755"
-    - source: files/verity-signature/90mountbootpartition/mountbootpartition-generator.sh
+    - source: files/linuxguard/verity-signature/90mountbootpartition/mountbootpartition-generator.sh
       destination: /usr/lib/dracut/modules.d/90mountbootpartition/mountbootpartition-generator.sh
       permissions: "755"
-    - source: files/verity-signature/90mountbootpartition/mountbootpartition-genrules.sh
+    - source: files/linuxguard/verity-signature/90mountbootpartition/mountbootpartition-genrules.sh
       destination: /usr/lib/dracut/modules.d/90mountbootpartition/mountbootpartition-genrules.sh
       permissions: "755"
-    - source: files/verity-signature/90mountbootpartition/mountbootpartition.sh
+    - source: files/linuxguard/verity-signature/90mountbootpartition/mountbootpartition.sh
       destination: /usr/lib/dracut/modules.d/90mountbootpartition/mountbootpartition.sh
       permissions: "755"
-    - source: files/verity-signature/10-mountbootpartition.conf
+    - source: files/linuxguard/verity-signature/10-mountbootpartition.conf
       destination: /etc/dracut.conf.d/10-mountbootpartition.conf
       permissions: "644"
 
@@ -188,12 +188,12 @@ os:
 
 scripts:
   postCustomization:
-    - path: scripts/performance-tuning.sh
+    - path: scripts/linuxguard/performance-tuning.sh
     # Config AzureLinuxagent
-    - path: scripts/azlinuxagentconfig.sh
-    - path: scripts/duid-type-to-link-layer.sh
-    - path: scripts/cleanup-machineid.sh
-    - path: scripts/prepare_trusted_cni_plugins.sh
+    - path: scripts/linuxguard/azlinuxagentconfig.sh
+    - path: scripts/linuxguard/duid-type-to-link-layer.sh
+    - path: scripts/linuxguard/cleanup-machineid.sh
+    - path: scripts/linuxguard/prepare_trusted_cni_plugins.sh
 
 previewFeatures:
   - uki
