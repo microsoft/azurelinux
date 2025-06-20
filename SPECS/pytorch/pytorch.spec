@@ -2,7 +2,7 @@
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
 Version:        2.2.2
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -66,6 +66,7 @@ You can reuse your favorite Python packages such as NumPy, SciPy and Cython to e
 
 %prep
 %autosetup -p 1 -n %{name}-v%{version}
+rm -rf third_party/protobuf/python
 
 %build
 export USE_CUDA=0
@@ -93,6 +94,9 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+* Thu Jun 19 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.2.2-8
+- Patch CVE-2025-4565
+
 * Tue Apr 29 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.2.2-7
 - Patch CVE-2025-2953
 
