@@ -158,7 +158,7 @@ os:
       - cloud-init
 
   additionalFiles:
-    - source: files/linuxguar/dno-password-prompt-on-sudo
+    - source: files/linuxguadr/no-password-prompt-on-sudo
       destination: /etc/sudoers.d/no-password-prompt-on-sudo
       permissions: "440"
     - source: files/linuxguard/99-dhcp-eth0.network
