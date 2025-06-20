@@ -2257,6 +2257,7 @@
                 "cmake-fedora",
                 "containerd2",
                 "coredns",
+                "dasel",
                 "dcos-cli",
                 "debugedit",
                 "dejavu-fonts",
