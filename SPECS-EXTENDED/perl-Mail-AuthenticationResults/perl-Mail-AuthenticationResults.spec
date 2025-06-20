@@ -1,19 +1,21 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Mail-AuthenticationResults
-Version:        1.20200108
-Release:        3%{?dist}
+Version:        2.20231031
+Release:        1%{?dist}
 Summary:        Object Oriented Authentication-Results Headers
-License:        GPL+ or Artistic
-URL:            http://search.cpan.org/dist/Mail-AuthenticationResults/
-Source0:        http://www.cpan.org/modules/by-module/Mail/Mail-AuthenticationResults-%{version}.tar.gz
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+URL:            https://metacpan.org/release/Mail-AuthenticationResults/
+Source0:        https://cpan.metacpan.org/modules/by-module/Mail/Mail-AuthenticationResults-%{version}.tar.gz
 BuildArch:      noarch
 
+BuildRequires: make
 BuildRequires:  perl >= 0:5.008
 BuildRequires:  perl-generators
 BuildRequires:  perl(base)
 BuildRequires:  perl(Carp)
-BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(Clone)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(JSON)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(Scalar::Util)
@@ -21,7 +23,6 @@ BuildRequires:  perl(strict)
 BuildRequires:  perl(Test::Exception)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(warnings)
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 
 %description
@@ -33,21 +34,16 @@ Object Oriented Authentication-Results email headers.
 
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 %make_build
 
-
 %install
-make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
-
-find $RPM_BUILD_ROOT -type f -name .packlist -exec rm -f {} \;
-find $RPM_BUILD_ROOT -depth -type d -exec rmdir {} 2>/dev/null \;
-
+%make_install
 %{_fixperms} $RPM_BUILD_ROOT/*
 
 
 %check
-make test
+%make_build test
 
 
 %files
@@ -57,6 +53,10 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 2.20231031-1
+- Update to version 2.20231031
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20200108-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
