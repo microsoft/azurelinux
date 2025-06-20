@@ -1,4 +1,6 @@
 cronie
+dasel
+golang
 influx-cli
 influxdb
 libflux

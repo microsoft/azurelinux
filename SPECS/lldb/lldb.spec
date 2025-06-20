@@ -2,8 +2,8 @@
 
 Summary:        A next generation, high-performance debugger.
 Name:           lldb
-Version:        18.1.2
-Release:        2%{?dist}
+Version:        18.1.8
+Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -106,6 +106,9 @@ rm -f %{buildroot}%{python3_sitelib}/six.*
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jun 03 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 18.1.8-1
+- Updated to version 18.1.8.
+
 * Wed May 29 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 18.1.2-2
 - Bump release to build with new llvm to fix CVE-2024-31852
 
