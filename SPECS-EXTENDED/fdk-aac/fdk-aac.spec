@@ -3,10 +3,10 @@ Version:        2.0.3
 Release:        1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Summary:        Third-Party Modified Version of the Fraunhofer FDK AAC Codec Library for Android
+Summary:        Fraunhofer FDK AAC Codec Library for Android
 License:        FDK-AAC
-URL:            https://cgit.freedesktop.org/~wtay/fdk-aac/log/?h=fedora
-Source0:        https://people.freedesktop.org/~wtay/fdk-aac-free-%{version}.tar.gz
+URL:            http://sourceforge.net/projects/opencore-amr
+Source0:        http://downloads.sourceforge.net/opencore-amr/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc gcc-c++
 BuildRequires:  automake libtool
