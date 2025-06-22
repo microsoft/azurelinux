@@ -1,12 +1,12 @@
-Name:           fdk-aac
-Version:        2.0.3
-Release:        1%{?dist}
+Name:           fdk-aac-free
+Version:        2.0.0
+Release:        15%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Summary:        Fraunhofer FDK AAC Codec Library for Android
+Summary:        Third-Party Modified Version of the Fraunhofer FDK AAC Codec Library for Android
 License:        FDK-AAC
-URL:            http://sourceforge.net/projects/opencore-amr
-Source0:        http://downloads.sourceforge.net/opencore-amr/%{name}-%{version}.tar.gz
+URL:            https://cgit.freedesktop.org/~wtay/fdk-aac/log/?h=fedora
+Source0:        https://people.freedesktop.org/~wtay/fdk-aac-free-%{version}.tar.gz
 
 BuildRequires:  gcc gcc-c++
 BuildRequires:  automake libtool
@@ -25,8 +25,6 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
-
-
 
 %prep
 %autosetup
@@ -61,6 +59,10 @@ find %{buildroot} -name '*.la' -print -delete
 
 
 %changelog
+* Thu Jun 19 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.0.3-1
+- Initial Azure Linux import from Fedora 42
+- License Verified
+
 * Thu Jan 16 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
 
