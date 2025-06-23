@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.0.0
-Release: 12%{?dist}
+Release: 13%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -94,6 +94,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Tue Jun 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-13
+- Test buddybuild
+
 * Tue Jun 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-12
 - Add updated tardev-snapshotter support patch
 
