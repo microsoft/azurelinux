@@ -1,16 +1,16 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global cpan_version 1.40
+%global cpan_version 1.42
 
 Name:           perl-Crypt-PasswdMD5
 # Keep 1-digit version because of history
 Version:        %(echo '%{cpan_version}' | sed 's/\.\(.\)/.\1./')
-Release:        19%{?dist}
+Release:        9%{?dist}
 Summary:        Provides interoperable MD5-based crypt() functions
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Crypt-PasswdMD5
-Source0:        https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-PasswdMD5-%{cpan_version}.tgz
-Patch0:         Crypt-PasswdMD5-1.40-d-md5-version.patch
+Source0:        https://cpan.metacpan.org/authors/id/R/RS/RSAVAGE/Crypt-PasswdMD5-%{cpan_version}.tgz#/%{name}-%{cpan_version}.tgz
+Patch0:         Crypt-PasswdMD5-1.42-d-md5-version.patch
 BuildArch:      noarch
 # Build:
 BuildRequires:  coreutils
@@ -21,11 +21,12 @@ BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker)
 # Run-time:
 BuildRequires:  perl(Digest::MD5) >= 2.53
+BuildRequires:  perl(Encode)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 # Tests:
-BuildRequires:  perl(Test::More) >= 0.94
+BuildRequires:  perl(Test::More) >= 1.001002
 # Dependencies:
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
@@ -38,7 +39,7 @@ This package provides MD5-based crypt() functions.
 # Specify version requirement for Digest::MD5
 # This avoids the need to add an explicit dependency in the spec file
 # and the need to filter the underspecified auto-generated dependency
-%patch 0
+%patch -P0
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor
@@ -53,14 +54,72 @@ find %{buildroot} -type f -name .packlist -delete
 make test
 
 %files
+%license LICENSE
 %doc Changes README
 %{perl_vendorlib}/Crypt/
 %{_mandir}/man3/Crypt::PasswdMD5.3*
 
 %changelog
-* Wed Apr 28 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.0-19
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove colons from patchnames
+* Tue May 13 2025 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.4.2-9
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Mar 03 2023 Michal Josef Špaček <mspacek@redhat.com> - 1.4.2-4
+- Update license to SPDX format
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jul 13 2022 Paul Howarth <paul@city-fan.org> - 1.4.2-1
+- Update to 1.42
+  - Handle the case where the password has the utf8 bit set (GH#1)
+  - Update t/basic.t to use Encode and to test the utf8 bit setting
+  - Very slightly reformat the source code of PasswdMD5.pm and basic.t
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.4.1-5
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.4.1-2
+- Perl 5.34 rebuild
+
+* Mon Feb  1 2021 Paul Howarth <paul@city-fan.org> - 1.4.1-1
+- Update to 1.41
+  - Adopt new repo structure - see:
+    http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html
+  - Reformat Makefile.PL
+  - Add t/00.*
+  - Update POD to change RT to GitHub
+- Package new LICENSE file
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.4.0-19
+- Perl 5.32 rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-18
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
