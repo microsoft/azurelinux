@@ -142,22 +142,45 @@ stages:
                   onlyAddExtraIndex: false
                   artifactFeeds: "MarinerFeed"
 
-              - template: PackageBuild.yml@self
-                parameters:
-                  checkBuildRetries: "1"
-                  customToolchainTarballName: $(toolchainTarballName)
-                  dailyBuildID: "${{ parameters.dailyBuildID }}"
-                  isDailyBuildUpdateManifests: false
-                  inputArtifactsFolder: $(inputArtifactsLocation)
-                  isCheckBuild: true
-                  isQuickRebuildPackages: true
-                  isUseCCache: true
-                  maxCPU: "${{ configuration.maxCPUs }}"
-                  outputArtifactsFolder: $(ob_outputDirectory)
-                  outputRPMsTarballName: $(outputRPMsTarballName)
-                  pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
-                  selfRepoName: self
-                  testSuiteName: "[${{ configuration.name }}] Package test"
+
+              - bash: |
+                  TEMP_DIR_NAME="RPMS"
+                  mkdir -p $(Pipeline.Workspace)/$TEMP_DIR_NAME
+                  ARCHITECTURE="x86_64"
+
+                  if [[ "${{ configuration.name }} == "ARM64" ]]
+                  then
+                    ARCHITECTURE="aarch64"
+                  fi
+
+                  mkdir -p $(Pipeline.Workspace)/$TEMP_DIR_NAME/$ARCHITECTURE
+
+                  wget -q https://packages.microsoft.com/azurelinux/3.0/prod/base/$ARCHITECTURE/Packages/l/libflux-0.194.5-4.azl3.$ARCHITECTURE.rpm -O $(Pipeline.Workspace)/$TEMP_DIR_NAME/$ARCHITECTURE
+                  wget -q https://packages.microsoft.com/azurelinux/3.0/prod/base/$ARCHITECTURE/Packages/l/libflux-devel-0.194.5-4.azl3.$ARCHITECTURE.rpm -O $(Pipeline.Workspace)/$TEMP_DIR_NAME/$ARCHITECTURE
+                  wget -q https://packages.microsoft.com/azurelinux/3.0/prod/base/$ARCHITECTURE/Packages/i/influxdb-2.7.5-5.azl3.$ARCHITECTURE.rpm -O $(Pipeline.Workspace)/$TEMP_DIR_NAME/$ARCHITECTURE
+                  wget -q https://packages.microsoft.com/azurelinux/3.0/prod/base/$ARCHITECTURE/Packages/i/influx-cli-2.7.5-2.azl3.$ARCHITECTURE.rpm -O $(Pipeline.Workspace)/$TEMP_DIR_NAME/$ARCHITECTURE
+                  wget -q https://packages.microsoft.com/azurelinux/3.0/prod/base/$ARCHITECTURE/Packages/c/containerd2-2.0.0-10.azl3.$ARCHITECTURE.rpm -O $(Pipeline.Workspace)/$TEMP_DIR_NAME/$ARCHITECTURE
+
+                  tar -czf $(ob_outputDirectory)/$(outputRPMsTarballName) -C $(Pipeline.Workspace)/$TEMP_DIR_NAME
+                displayName: "Mock having built RPMs"
+
+              # TODO: revert this change
+              # - template: PackageBuild.yml@self
+              #   parameters:
+              #     checkBuildRetries: "1"
+              #     customToolchainTarballName: $(toolchainTarballName)
+              #     dailyBuildID: "${{ parameters.dailyBuildID }}"
+              #     isDailyBuildUpdateManifests: false
+              #     inputArtifactsFolder: $(inputArtifactsLocation)
+              #     isCheckBuild: true
+              #     isQuickRebuildPackages: true
+              #     isUseCCache: true
+              #     maxCPU: "${{ configuration.maxCPUs }}"
+              #     outputArtifactsFolder: $(ob_outputDirectory)
+              #     outputRPMsTarballName: $(outputRPMsTarballName)
+              #     pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
+              #     selfRepoName: self
+              #     testSuiteName: "[${{ configuration.name }}] Package test"
 
               - script: |
                   echo "##vso[task.setvariable variable=rpmsArtifactName;isOutput=true]$(ob_artifactBaseName)"
