@@ -91,6 +91,7 @@ BuildRequires: pkgconfig(xcb-renderutil)
 Patch0:        CVE-2025-49175.patch
 Patch1:        CVE-2025-49177.patch
 Patch2:        CVE-2025-49178.patch
+Patch3:        CVE-2025-49179.patch
 
 %description
 Xwayland is an X server for running X clients under Wayland.
@@ -145,6 +146,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 - Add patch for CVE-2025-49175
 - Add patch for CVE-2025-49177
 - Add patch for CVE-2025-49178
+- Add patch for CVE-2025-49179
 
 * Tue Mar 04 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.1.6-1
 - Auto-upgrade to 24.1.6 - to fix CVE-2025-26594, CVE-2025-26595, CVE-2025-26596, CVE-2025-26597, CVE-2025-26598, CVE-2025-26599, CVE-2025-26600, CVE-2025-26601[High]
