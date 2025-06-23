@@ -58,6 +58,7 @@ storage:
       hashDeviceId: usr-hash-a
       dataDeviceMountIdType: uuid
       hashDeviceMountIdType: uuid
+      hashSignaturePath: /boot/usr.hash.sig
 
   filesystems:
     - deviceId: esp
@@ -65,14 +66,14 @@ storage:
       mountPoint:
         idType: part-label
         path: /boot/efi
-        options: umask=0077,noexec,nodev
+        options: umask=0077,nodev
 
     - deviceId: boot-a
       type: ext4
       mountPoint:
         idType: uuid
         path: /boot
-        options: noexec,nodev
+        options: nodev
 
     - deviceId: root-a
       type: ext4
@@ -91,14 +92,14 @@ storage:
       mountPoint:
         idType: part-label
         path: /var/lib/trident
-        options: noexec,nodev
+        options: nodev
 
     - deviceId: home
       type: ext4
       mountPoint:
         idType: part-label
         path: /home
-        options: noexec,nodev
+        options: nodev
 
 os:
   bootloader:
@@ -117,6 +118,8 @@ os:
       - console=ttyS0
       - rd.luks=0
       - rd.hostonly=0
+      - ipe.enforce=0
+      - systemd.journald.forward_to_console=1
 
   packages:
     remove:
@@ -132,6 +135,7 @@ os:
       - policycoreutils-python-utils
       - selinux-policy
       - selinux-policy-modules
+      - selinux-policy-ci
       - checkpolicy  
       - secilc 
       - setools-console
@@ -161,6 +165,9 @@ os:
     - source: files/linuxguard/no-password-prompt-on-sudo
       destination: /etc/sudoers.d/no-password-prompt-on-sudo
       permissions: "440"
+    # SELinux customizations
+    - source: files/linuxguard/selinux-ci-uki.semanage
+      destination: /etc/selinux/targeted/selinux-ci.semanage
     - source: files/linuxguard/99-dhcp-eth0.network
       destination: /etc/systemd/network/99-dhcp-eth0.network
     # Verity signature verification support
@@ -192,9 +199,10 @@ scripts:
     # Config AzureLinuxagent
     - path: scripts/linuxguard/azlinuxagentconfig.sh
     - path: scripts/linuxguard/duid-type-to-link-layer.sh
+    # Disable unused SELinux policy modules and configure SELinux policy for CI
+    - path: scripts/linuxguard/selinux-ci-config.sh
     - path: scripts/linuxguard/cleanup-machineid.sh
     - path: scripts/linuxguard/prepare_trusted_cni_plugins.sh
-    - path: scripts/linuxguard/tmp-no-exec.sh
 
     - path: scripts/set_os_release_variant_entries.sh
       arguments:
@@ -214,4 +222,4 @@ output:
       - ukis
     path: ./output
   image:
-    format: vhd
+    format: raw
