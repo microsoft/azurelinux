@@ -66,6 +66,7 @@ You can reuse your favorite Python packages such as NumPy, SciPy and Cython to e
 
 %prep
 %autosetup -a 1 -p 1 -n %{name}-v%{version}
+rm -rf third_party/protobuf/python
 
 %build
 # Use MAX_JOBS=8 to prevent build failure in ADO pipelines
