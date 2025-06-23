@@ -7,7 +7,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.35
-Release:        8%{?dist}
+Release:        7%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,8 +35,6 @@ Patch10:        CVE-2024-33599.patch
 Patch11:        CVE-2024-33600.patch
 # This patch fixes both CVE-2024-33601 and CVE-2024-33602
 Patch12:        CVE-2024-33601.patch
-Patch13:        CVE-2025-0395.patch
-Patch14:        CVE-2025-4802.patch
 BuildRequires:  bison
 BuildRequires:  gawk
 BuildRequires:  gettext
@@ -329,9 +327,6 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
-* Sun Jun 01 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.35-8
-- Patch CVE-2025-4802 & CVE-2025-0395
-
 * Mon May 06 2024 Rachel Menge <rachelmenge@microsoft.com> - 2.35-7
 - Fixup CVE-2023-4806.patch and CVE-2023-5156.patch
 - Backport typo fix for nscd
