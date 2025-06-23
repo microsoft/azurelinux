@@ -1,19 +1,15 @@
+%global apiver 1.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-# This package depends on automagic byte compilation
-# https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
-%global _python_bytecompile_extra 1
-
-%global apiver 1.0
 
 Name:           libpeas
-Version:        1.26.0
-Release:        3%{?dist}
+Version:        1.36.0
+Release:        4%{?dist}
 Summary:        Plug-ins implementation convenience library
 
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 URL:            https://wiki.gnome.org/Projects/Libpeas
-Source0:        https://download.gnome.org/sources/%{name}/1.26/%{name}-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/1.36/%{name}-%{version}.tar.xz
 
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  gcc
@@ -107,14 +103,78 @@ that are needed to write applications that use libpeas.
 %{_libdir}/pkgconfig/libpeas-gtk-%{apiver}.pc
 
 %changelog
-* Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.26.0-3
+* Wed Mar 19 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.36.0-4
+- Initial Azure Linux import from Fedora 39 (license: MIT).
 - Adding BR on '%%{_bindir}/xsltproc'.
 - Disabled gtk doc generation to remove network dependency during build-time.
 - License verified.
 
-* Wed Jul 14 2021 Muhammad Falak Wani <mwani@microsoft.com> - 1.26.0-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove dependency on gladeui
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.36.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 1.36.0-2
+- Rebuilt for Python 3.12
+
+* Sat Mar 18 2023 David King <amigadave@amigadave.com> - 1.36.0-1
+- Update to 1.36.0
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.34.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Dec 15 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 1.34.0-2
+- Ensure correct fonts are installed for HTML docs
+
+* Mon Sep 19 2022 Kalev Lember <klember@redhat.com> - 1.34.0-1
+- Update to 1.34.0
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.32.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1.32.0-2
+- Rebuilt for Python 3.11
+
+* Sat Mar 19 2022 David King <amigadave@amigadave.com> - 1.32.0-1
+- Update to 1.32.0
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.30.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.30.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jun 14 2021 Bastien Nocera <bnocera@redhat.com> - 1.30.0-4
++ libpeas-1.30.0-4
+- Fix licenses again
+
+* Fri Jun 11 2021 Bastien Nocera <bnocera@redhat.com> - 1.30.0-3
++ libpeas-1.30.0-3
+- Correct license for some of the icons
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.30.0-2
+- Rebuilt for Python 3.10
+
+* Mon Mar 22 2021 Kalev Lember <klember@redhat.com> - 1.30.0-1
+- Update to 1.30.0
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.28.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Sep 12 2020 Kalev Lember <klember@redhat.com> - 1.28.0-1
+- Update to 1.28.0
+
+* Tue Aug 04 2020 Bastien Nocera <bnocera@redhat.com> - 1.26.0-5
++ libpeas-1.26.0-5
+- Remove unused Python macro that caused errors on install (#1863667)
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.26.0-4
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.26.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1.26.0-2
+- Rebuilt for Python 3.9
 
 * Fri Mar 06 2020 Kalev Lember <klember@redhat.com> - 1.26.0-1
 - Update to 1.26.0
