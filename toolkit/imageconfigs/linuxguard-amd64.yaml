@@ -106,8 +106,8 @@ os:
     resetType: hard-reset
   hostname: linuxguard-base
 
-  # selinux:
-  #   mode: enforcing
+  selinux:
+    mode: enforcing
 
   uki:
     kernels: auto
