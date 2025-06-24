@@ -31,16 +31,6 @@ variables:
   - group: "Raw toolchain info"
   - name: system.debug
     value: "${{ parameters.debug }}"
-  - name: rpmsArtifactNameBase
-    value: "RPMs"
-  - name: toolchainArtifactNameBase
-    value: "Toolchain"
-  - name: baseRpmsTarballName
-    value: "rpms.tar.gz"
-  - name: toolchainRPMsTarballName
-    value: "toolchain_built_rpms_all.tar.gz"
-  - name: marinerVersion
-    value: $[ iif(eq(variables['System.PullRequest.TargetBranch'], 'main'), '2.0', '3.0') ]
 
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@obTemplates
@@ -59,21 +49,14 @@ extends:
       tsa:
         enabled: false
     stages:
-      - template: ../templates/PackageBuildPRCheck.yml@self
+      - template: ../templates/PackageBuildAndTestCheck@self
         parameters:
           dailyBuildID: "lkg"
-          rpmsArtifactNameBase: "$(rpmsArtifactNameBase)"
-          toolchainArtifactNameBase: "$(toolchainArtifactNameBase)"
-          toolchainRPMsTarballName: ${{ variables.toolchainRPMsTarballName }}
-          baseRpmsTarballName: ${{ variables.baseRpmsTarballName }}
-
-      - template: ../templates/PackageTests.yml@self
-        parameters:
-          rpmsArtifactNameBase: "$(rpmsArtifactNameBase)"
-          toolchainArtifactNameBase: "$(toolchainArtifactNameBase)"
-          toolchainRPMsTarballName: ${{ variables.toolchainRPMsTarballName }}
-          baseRpmsTarballName: ${{ variables.baseRpmsTarballName }}
+          rpmsArtifactNameBase: "RPMS"
+          toolchainArtifactNameBase: "Toolchain"
+          toolchainRPMsTarballName: "toolchain_built_rpms_all.tar.gz"
+          baseRpmsTarballName: "rpms.tar.gz"
           selfRepoName: self
-          marinerVersion: "$(marinerVersion)"
+          marinerVersion: $[ iif(eq(variables['System.PullRequest.TargetBranch'], 'main'), '2.0', '3.0') ]
           marinerParallelTestSystemRepoName: mariner-parallel-test-system
           marinerPipelinesRepoName: CBL-Mariner-Pipelines
