@@ -53,7 +53,7 @@ install -vm 644 doc/doxygen.1 %{buildroot}%{_mandir}/man1/
 
 %changelog
 
-* Mon Jun 23 2025 CBL-Mariner Servicing Account <suneelyadava@microsoft.com> - 1.9.8-2
+* Mon Jun 23 2025 Suneel Yadava <suneelyadava@microsoft.com> - 1.9.8-2
 - patch for CVE-2025-6140
 
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.8-1
