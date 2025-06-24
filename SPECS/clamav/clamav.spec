@@ -1,6 +1,6 @@
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        1.0.7
+Version:        1.0.9
 Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
@@ -11,7 +11,7 @@ Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-
 # Note: the %%{name}-%%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache run:
 #   [repo_root]/toolkit/scripts/build_cargo_cache.sh %%{name}-%%{version}.tar.gz %%{name}-%%{name}-%%{version}
-Source1:        %{name}-%{version}-cargo.tar.gz
+Source1:        %{name}-1.0.7-cargo.tar.gz
 BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
 BuildRequires:  cmake
@@ -133,6 +133,9 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Tue Jun 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.0.9-1
+- Upgrade to version 1.0.9 to fix CVE-2025-20260
+
 * Tue Nov 19 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.7-1
 - Auto-upgrade to 1.0.7 - CVE-2024-20505, CVE-2024-20506
 
