@@ -12,6 +12,7 @@ Distribution: Azure Linux
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{sourceName}-%{version}.tar.gz
 Source1:      %{sourceName}-%{version}-cargo.tar.gz
 Patch0:       CVE-2025-4574.patch
+Patch1:       CVE-2025-5791.patch
 
 ExclusiveArch: x86_64
 
@@ -148,8 +149,8 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Tue May 27 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 3.15.0.ask0-2
-- Patch CVE-2025-4574
+* Tue Jun 24 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 3.15.0.ask0-2
+- Patch CVE-2025-4574, CVE-2025-5791
 
 * Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.15.0.aks0-1
 - Auto-upgrade to 3.15.0.aks0
