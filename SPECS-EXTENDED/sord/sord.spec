@@ -74,7 +74,7 @@ mv %{buildroot}%{_docdir}/%{name}-%{maj} %{buildroot}%{_docdir}/%{name}
 %changelog
 * Tue Feb 25 2025 Jyoti kanase <v-jykanase@microsoft.com> - 0.16.18-1
 - Upgrade to 0.16.18
-- License verified.
+- License Verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16.4-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
