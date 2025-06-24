@@ -64,15 +64,15 @@ extends:
           dailyBuildID: "lkg"
           rpmsArtifactNameBase: "$(rpmsArtifactNameBase)"
           toolchainArtifactNameBase: "$(toolchainArtifactNameBase)"
-          toolchainRPMsTarballName: "$[variables['toolchainRPMsTarballName'] ]"
-          baseRpmsTarballName: "$[ variables['baseRpmsTarballName'] ]"
+          toolchainRPMsTarballName: ${{ variables.toolchainRPMsTarballName }}
+          baseRpmsTarballName: ${{ variables.baseRpmsTarballName }}
 
       - template: ../templates/PackageTests.yml@self
         parameters:
           rpmsArtifactNameBase: "$(rpmsArtifactNameBase)"
           toolchainArtifactNameBase: "$(toolchainArtifactNameBase)"
-          toolchainRPMsTarballName: "$[variables['toolchainRPMsTarballName'] ]"
-          baseRpmsTarballName: "$[ variables['baseRpmsTarballName'] ]"
+          toolchainRPMsTarballName: ${{ variables.toolchainRPMsTarballName }}
+          baseRpmsTarballName: ${{ variables.baseRpmsTarballName }}
           selfRepoName: self
           marinerVersion: "$(marinerVersion)"
           marinerParallelTestSystemRepoName: mariner-parallel-test-system
