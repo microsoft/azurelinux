@@ -177,7 +177,7 @@ stages:
                   wget -q https://packages.microsoft.com/azurelinux/3.0/prod/base/$ARCHITECTURE/Packages/i/influx-cli-2.7.5-2.azl3.$ARCHITECTURE.rpm -O $(Pipeline.Workspace)/$TEMP_DIR_NAME/$ARCHITECTURE
                   wget -q https://packages.microsoft.com/azurelinux/3.0/prod/base/$ARCHITECTURE/Packages/c/containerd2-2.0.0-10.azl3.$ARCHITECTURE.rpm -O $(Pipeline.Workspace)/$TEMP_DIR_NAME/$ARCHITECTURE
 
-                  tar -czf $(ob_outputDirectory)/$(outputRPMsTarballName) $(Pipeline.Workspace)/$TEMP_DIR_NAME
+                  tar -czf $(ob_outputDirectory)/ARTIFACTS/$(outputRPMsTarballName) $(Pipeline.Workspace)/$TEMP_DIR_NAME
                 displayName: "Mock having built RPMs"
 
               # TODO: revert this change
