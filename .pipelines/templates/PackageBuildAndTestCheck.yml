@@ -185,7 +185,7 @@ stages:
 
 
                   mkdir -pv $(ob_outputDirectory)/ARTIFACTS
-                  tar -czf $(ob_outputDirectory)/ARTIFACTS/$(outputRPMsTarballName) $(Pipeline.Workspace)/$TEMP_DIR_NAME
+                  tar -czf $(ob_outputDirectory)/ARTIFACTS/$(outputRPMsTarballName) -C $(Pipeline.Workspace) $TEMP_DIR_NAME
                 displayName: "Mock having built RPMs"
 
               # TODO: revert this change
