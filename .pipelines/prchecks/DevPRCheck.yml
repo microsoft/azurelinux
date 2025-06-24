@@ -49,31 +49,14 @@ extends:
       tsa:
         enabled: false
     stages:
-    - stage: Test
-      jobs:
-      - job: DevPRCheck
-        pool:
-          type: linux
-        variables:
-          ob_artifactBaseName: "foo"
-          ob_outputDirectory: $(Build.ArtifactStagingDirectory)
-        steps:
-        - checkout: CBL-Mariner-Pipelines
-
-        - checkout: mariner-parallel-test-system
-
-        - bash: |
-            ls -lart "$(Pipeline.Workspace)"
-            ls -lart "$(Build.SourcesDirectory)"
-            ls -lart "$(Agent.BuildDirectory)"
-      # - template: ../templates/PackageBuildAndTestCheck.yml@self
-      #   parameters:
-      #     dailyBuildID: "lkg"
-      #     rpmsArtifactNameBase: "RPMS"
-      #     toolchainArtifactNameBase: "Toolchain"
-      #     toolchainRPMsTarballName: "toolchain_built_rpms_all.tar.gz"
-      #     baseRpmsTarballName: "rpms.tar.gz"
-      #     selfRepoName: self
-      #     marinerVersion: $[ iif(eq(variables['System.PullRequest.TargetBranch'], 'main'), '2.0', '3.0') ]
-      #     marinerParallelTestSystemRepoName: mariner-parallel-test-system
-      #     marinerPipelinesRepoName: CBL-Mariner-Pipelines
+      - template: ../templates/PackageBuildAndTestCheck.yml@self
+        parameters:
+          dailyBuildID: "lkg"
+          rpmsArtifactNameBase: "RPMS"
+          toolchainArtifactNameBase: "Toolchain"
+          toolchainRPMsTarballName: "toolchain_built_rpms_all.tar.gz"
+          baseRpmsTarballName: "rpms.tar.gz"
+          selfRepoName: self
+          marinerVersion: $[ iif(eq(variables['System.PullRequest.TargetBranch'], 'main'), '2.0', '3.0') ]
+          marinerParallelTestSystemRepoName: mariner-parallel-test-system
+          marinerPipelinesRepoName: CBL-Mariner-Pipelines
