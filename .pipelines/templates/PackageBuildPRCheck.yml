@@ -148,7 +148,7 @@ stages:
                   mkdir -p $(Pipeline.Workspace)/$TEMP_DIR_NAME
                   ARCHITECTURE="x86_64"
 
-                  if [[ "${{ configuration.name }} == "ARM64" ]]
+                  if [[ ${{ configuration.name }} == "ARM64" ]]
                   then
                     ARCHITECTURE="aarch64"
                   fi
