@@ -177,6 +177,13 @@ stages:
                   wget -q https://packages.microsoft.com/azurelinux/3.0/prod/base/$ARCHITECTURE/Packages/i/influx-cli-2.7.5-2.azl3.$ARCHITECTURE.rpm -O $(Pipeline.Workspace)/$TEMP_DIR_NAME/$ARCHITECTURE
                   wget -q https://packages.microsoft.com/azurelinux/3.0/prod/base/$ARCHITECTURE/Packages/c/containerd2-2.0.0-10.azl3.$ARCHITECTURE.rpm -O $(Pipeline.Workspace)/$TEMP_DIR_NAME/$ARCHITECTURE
 
+                  wget -q https://packages.microsoft.com/azurelinux/3.0/prod/base/$ARCHITECTURE/Packages/grub2-2.06-23.azl3.$ARCHITECTURE.rpm -O $(Pipeline.Workspace)/$TEMP_DIR_NAME/$ARCHITECTURE
+                  wget -q https://packages.microsoft.com/azurelinux/3.0/prod/base/$ARCHITECTURE/Packages/grub2-efi-2.06-23.azl3.$ARCHITECTURE.rpm -O $(Pipeline.Workspace)/$TEMP_DIR_NAME/$ARCHITECTURE
+                  wget -q https://packages.microsoft.com/azurelinux/3.0/prod/base/$ARCHITECTURE/Packages/grub2-binary-2.06-23.azl3.$ARCHITECTURE.rpm -O $(Pipeline.Workspace)/$TEMP_DIR_NAME/$ARCHITECTURE
+                  wget -q https://packages.microsoft.com/azurelinux/3.0/prod/base/$ARCHITECTURE/Packages/grub2-tools-minimal-2.06-23.azl3.$ARCHITECTURE.rpm -O $(Pipeline.Workspace)/$TEMP_DIR_NAME/$ARCHITECTURE
+
+
+
                   mkdir -pv $(ob_outputDirectory)/ARTIFACTS
                   tar -czf $(ob_outputDirectory)/ARTIFACTS/$(outputRPMsTarballName) $(Pipeline.Workspace)/$TEMP_DIR_NAME
                 displayName: "Mock having built RPMs"
