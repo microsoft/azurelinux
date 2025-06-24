@@ -140,6 +140,8 @@ install -c -m 644 %{SOURCE2} %{buildroot}%{_libdir}/firewalld/zones/FedoraWorkst
 # standard firewalld.conf
 mv %{buildroot}%{_sysconfdir}/firewalld/firewalld.conf \
     %{buildroot}%{_sysconfdir}/firewalld/firewalld-standard.conf
+sed -i 's|^IPv6_rpfilter=.*|IPv6_rpfilter=no|g' \
+    %{buildroot}%{_sysconfdir}/firewalld/firewalld-standard.conf
 
 # server firewalld.conf
 cp -a %{buildroot}%{_sysconfdir}/firewalld/firewalld-standard.conf \
@@ -308,6 +310,7 @@ fi
 
 %changelog
 * Mon Jun 16 2025 Sumedh Sharma <sumsharma@microsoft.com> - 2.0.2-3
+- disable ipv6_rpfilter in configuration
 - fix testsuite provided by firewalld-test sub-package
 
 * Sun Feb 04 2024 Dan Streetman <ddstreet@ieee.org> - 2.0.2-2
