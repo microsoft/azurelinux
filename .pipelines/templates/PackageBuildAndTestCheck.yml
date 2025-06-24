@@ -300,25 +300,25 @@ stages:
                   inputArtifactsFolder: $(inputArtifactsLocation)
                   inputRPMsTarballName: $(rpmsTarballName)
 
-  - template: Test-System.yml@${{ parameters.marinerParallelTestSystemRepoName }}
-    parameters:
-      architecture: ${{ configuration.name }}
-      buildNumber: ""
-      continueOnDashboardAPIError: true
-      dependsOnStages: RPMs_${{ configuration.name }}
-      embargoedBuild: false
-      marinerGitHubBranchName: $(Build.SourceBranch)
-      thisRepoName: ${{ parameters.marinerParallelTestSystemRepoName }}
-      marinerGithubRepoName: ${{ parameters.selfRepoName }}
-      marinerVersion: ${{ parameters.marinerVersion }}
-      marinerPipelinesRepoName: ${{ parameters.marinerPipelinesRepoName }}
-      toolchainArtifactName: ${{ parameters.toolchainArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
-      toolchainArtifactNestedDirectoryName: ARTIFACTS
-      baseRpmsArtifactName: ${{ parameters.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
-      baseRpmsArtifactNestedDirectoryName: ARTIFACTS
-      baseRpmsTarballName: ${{ parameters.baseRpmsTarballName }}
-      toolchainTarballName: ${{ parameters.toolchainRPMsTarballName }}
-      productionBuild: false
-      releaseId: ""
-      testNames:
-        - bvt
+      - template: Test-System.yml@${{ parameters.marinerParallelTestSystemRepoName }}
+        parameters:
+          architecture: ${{ configuration.name }}
+          buildNumber: ""
+          continueOnDashboardAPIError: true
+          dependsOnStages: RPMs_${{ configuration.name }}
+          embargoedBuild: false
+          marinerGitHubBranchName: $(Build.SourceBranch)
+          thisRepoName: ${{ parameters.marinerParallelTestSystemRepoName }}
+          marinerGithubRepoName: ${{ parameters.selfRepoName }}
+          marinerVersion: ${{ parameters.marinerVersion }}
+          marinerPipelinesRepoName: ${{ parameters.marinerPipelinesRepoName }}
+          toolchainArtifactName: ${{ parameters.toolchainArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
+          toolchainArtifactNestedDirectoryName: ARTIFACTS
+          baseRpmsArtifactName: ${{ parameters.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
+          baseRpmsArtifactNestedDirectoryName: ARTIFACTS
+          baseRpmsTarballName: ${{ parameters.baseRpmsTarballName }}
+          toolchainTarballName: ${{ parameters.toolchainRPMsTarballName }}
+          productionBuild: false
+          releaseId: ""
+          testNames:
+            - bvt
