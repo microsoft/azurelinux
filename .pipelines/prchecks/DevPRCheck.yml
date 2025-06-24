@@ -50,15 +50,17 @@ extends:
         enabled: false
     stages:
     - stage: Test
-      steps:
-      - checkout: CBL-Mariner-Pipelines
+      jobs:
+      - job: DevPRCheck
+        steps:
+        - checkout: CBL-Mariner-Pipelines
 
-      - checkout: mariner-parallel-test-system
+        - checkout: mariner-parallel-test-system
 
-      - bash: |
-          ls -lart "$(Pipeline.Workspace)"
-          ls -lart "$(Build.SourcesDirectory)"
-          ls -lart "$(Agent.BuildDirectory)"
+        - bash: |
+            ls -lart "$(Pipeline.Workspace)"
+            ls -lart "$(Build.SourcesDirectory)"
+            ls -lart "$(Agent.BuildDirectory)"
       # - template: ../templates/PackageBuildAndTestCheck.yml@self
       #   parameters:
       #     dailyBuildID: "lkg"
