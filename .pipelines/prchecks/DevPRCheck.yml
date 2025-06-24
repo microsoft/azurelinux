@@ -52,6 +52,8 @@ extends:
     - stage: Test
       jobs:
       - job: DevPRCheck
+        pool:
+          type: linux
         steps:
         - checkout: CBL-Mariner-Pipelines
 
