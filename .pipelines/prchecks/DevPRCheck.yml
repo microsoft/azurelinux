@@ -54,6 +54,9 @@ extends:
       - job: DevPRCheck
         pool:
           type: linux
+        variables:
+          ob_artifactBaseName: "foo"
+          ob_outputDirectory: $(Build.ArtifactStagingDirectory)
         steps:
         - checkout: CBL-Mariner-Pipelines
 
