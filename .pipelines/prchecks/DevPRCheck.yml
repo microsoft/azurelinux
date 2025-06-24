@@ -58,7 +58,7 @@ extends:
       - bash: |
           ls -lart "$(Pipeline.Workspace)"
           ls -lart "$(Build.SourcesDirectory)"
-          ls -lart"$(Agent.BuildDirectory)"
+          ls -lart "$(Agent.BuildDirectory)"
       # - template: ../templates/PackageBuildAndTestCheck.yml@self
       #   parameters:
       #     dailyBuildID: "lkg"
