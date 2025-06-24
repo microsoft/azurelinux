@@ -49,7 +49,7 @@ extends:
       tsa:
         enabled: false
     stages:
-      - template: ../templates/PackageBuildAndTestCheck@self
+      - template: ../templates/PackageBuildAndTestCheck.yml@self
         parameters:
           dailyBuildID: "lkg"
           rpmsArtifactNameBase: "RPMS"
