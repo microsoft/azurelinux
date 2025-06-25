@@ -60,6 +60,7 @@ pytest -v tests/unit
 %changelog
 * Tue Jun 24 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 24.2-3
 - Patch for CVE-2025-50181
+- Added %check
 
 * Fri Nov 22 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 24.2-2
 - Patch for CVE-2024-37891
