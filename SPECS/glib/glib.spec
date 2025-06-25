@@ -92,7 +92,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 
 %files
 %defattr(-,root,root)
-%license COPYING
+%license LICENSES/LGPL-2.1-or-later.txt
 %{_libdir}/libglib-*.so.*
 %{_libdir}/libgthread-*.so.*
 %{_libdir}/libgmodule-*.so.*
@@ -102,7 +102,6 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 
 %files devel
 %defattr(-, root, root)
-%license COPYING
 %{_bindir}/*
 %exclude %{_bindir}/glib-compile-schemas
 %exclude %{_bindir}/gsettings
