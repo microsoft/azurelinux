@@ -28,7 +28,6 @@ BuildRequires:  fuse-devel
 # kernel-uvm is required for debuggability, exercising confidential guest (confidential_guest=true)
 # code paths without actual SEV SNP enablement (sev_snp_guest=false)
 Requires:  kernel-uvm
-Requires:  containerd2
 # Must match the version specified by the `assets.virtiofsd.version` field in the source's versions.yaml.
 Requires:  virtiofsd = 1.8.0
 
@@ -151,7 +150,7 @@ fi
 
 %changelog
 * Fri Jun 20 2025 Mitch Zhu <mitchzhu@microsoft.com> 3.15.0.aks0-2
-- Update containerd dependency
+- Remove moby-containerd-cc dependency
 
 * Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.15.0.aks0-1
 - Auto-upgrade to 3.15.0.aks0
