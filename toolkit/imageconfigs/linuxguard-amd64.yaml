@@ -222,4 +222,4 @@ output:
       - ukis
     path: ./output
   image:
-    format: raw
+    format: vhd
