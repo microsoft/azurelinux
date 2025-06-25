@@ -23232,6 +23232,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-junit_xml",
+          "version": "1.9^20200222gitba89b41",
+          "downloadUrl": "https://github.com/kyrus/python-junit-xml/archive/ba89b41638df8ad2011c2818672f208a91a5a4a0/python-junit-xml-ba89b41638df8ad2011c2818672f208a91a5a4a0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-junitxml",
           "version": "0.7",
           "downloadUrl": "https://pypi.python.org/packages/source/j/junitxml/junitxml-0.7.tar.gz"
