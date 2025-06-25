@@ -43,7 +43,7 @@ This is a simple re-bundling of the open source tool that comes bundled with Cas
 %changelog
 * Thu May 22 2025 Jyoti kanase <v-jykanase@microsoft.com> - 6.1.2-2
 - Initial Azure Linux import from Photon (license: Apache2).
-- License verified.
+- License Verified.
 
 * Sat Aug 05 2023 Shreenidhi Shedi <sshedi@vmware.com> 6.1.2-1
 - Upgrade to v6.1.2
