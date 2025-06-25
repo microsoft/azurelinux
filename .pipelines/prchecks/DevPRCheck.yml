@@ -56,7 +56,4 @@ extends:
           toolchainArtifactNameBase: "Toolchain"
           toolchainRPMsTarballName: "toolchain_built_rpms_all.tar.gz"
           baseRpmsTarballName: "rpms.tar.gz"
-          selfRepoName: self
           marinerVersion: $[ iif(eq(variables['System.PullRequest.TargetBranch'], 'main'), '2.0', '3.0') ]
-          marinerParallelTestSystemRepoName: mariner-parallel-test-system
-          marinerPipelinesRepoName: CBL-Mariner-Pipelines

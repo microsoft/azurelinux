@@ -55,7 +55,7 @@ parameters:
 
   - name: selfRepoName
     type: string
-    default: "CBL-Mariner"
+    default: "azurelinux"
 
   - name: marinerParallelTestSystemRepoName
     type: string
