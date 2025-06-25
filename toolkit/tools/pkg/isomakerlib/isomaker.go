@@ -63,7 +63,7 @@ type IsoMaker struct {
 }
 
 // NewIsoMaker returns a new ISO maker.
-func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath, configFilePath, initrdPath, isoRepoDirPath, outputDir, imageNameTag, isoRepoSnapshotTime string) (isoMaker *IsoMaker, err error) {
+func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath, configFilePath, initrdPath, isoRepoDirPath, outputDir, grubCfg, imageNameTag, isoRepoSnapshotTime string) (isoMaker *IsoMaker, err error) {
 	if baseDirPath == "" {
 		baseDirPath = filepath.Dir(configFilePath)
 	}
@@ -90,6 +90,7 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 		releaseVersion:     releaseVersion,
 		resourcesDirPath:   resourcesDirPath,
 		fetchedRepoDirPath: isoRepoDirPath,
+		grubCfgPath:        grubCfg,
 		outputDirPath:      outputDir,
 		imageNameBase:      imageNameBase,
 		imageNameTag:       imageNameTag,

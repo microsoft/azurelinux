@@ -24,6 +24,7 @@ var (
 	releaseVersion    = app.Flag("release-version", "The repository OS release version").Required().String()
 	resourcesDirPath  = app.Flag("resources", "Path to 'resources' directory").Required().ExistingDir()
 	outputDir         = app.Flag("output-dir", "Path to directory to place final image").Required().String()
+	grubCfg           = app.Flag("grub-cfg", "Path to iso grub.cfg to place final image").Required().String()
 	repoSnapshotTime  = app.Flag("repo-snapshot-time", "Optional: tdnf image repo snapshot time").String()
 
 	imageTag = app.Flag("image-tag", "Tag (text) appended to the image name. Empty by default.").String()
@@ -47,6 +48,7 @@ func main() {
 		*initrdPath,
 		*isoRepoDirPath,
 		*outputDir,
+		*grubCfg,
 		*imageTag,
 		*repoSnapshotTime)
 	if err != nil {
