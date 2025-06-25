@@ -327,6 +327,7 @@ stages:
           baseRpmsTarballName: ${{ parameters.baseRpmsTarballName }}
           toolchainTarballName: ${{ parameters.toolchainRPMsTarballName }}
           productionBuild: false
+          isSelfRepoGithub: true
           releaseId: ""
           testNames:
             - bvt
