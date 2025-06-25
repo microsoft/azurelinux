@@ -28136,8 +28136,8 @@
         "type": "other",
         "other": {
           "name": "sord",
-          "version": "0.16.4",
-          "downloadUrl": "https://download.drobilla.net/sord-0.16.4.tar.bz2"
+          "version": "0.16.18",
+          "downloadUrl": "https://download.drobilla.net/sord-0.16.18.tar.xz"
         }
       }
     },
