@@ -11,10 +11,20 @@ parameters:
 
 resources:
   repositories:
-    - repository: templates
+    - repository: obTemplates
       type: git
       name: OneBranch.Pipelines/GovernedTemplates
       ref: refs/heads/main
+
+    - repository: CBL-Mariner-Pipelines
+      type: git
+      name: mariner/CBL-Mariner-Pipelines
+      ref: refs/heads/master
+
+    - repository: mariner-parallel-test-system
+      type: git
+      name: mariner/mariner-parallel-test-system
+      ref: refs/heads/mbykhovtsev/tweak-paths # TODO: make sure to use main once finished. Use main branch as default, such as `ref: refs/heads/main`. 
 
 variables:
   - group: "Agent pools (DEV)"
@@ -23,12 +33,27 @@ variables:
     value: "${{ parameters.debug }}"
 
 extends:
-  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@obTemplates
   parameters:
+    featureFlags:
+      runOnHost: true
+      EnableCDPxPAT: false
+    git:
+      lfs: false
     globalSdl:
-      credscan:
-        suppressionsFile: .config/CredScanSuppressions.json
+      disableLegacyManifest: true
+      policheck:
+        break: true
+      sbom:
+        enabled: false # OB doesn't support Mariner artifacts, so we handle SBOM generation manually.
+      tsa:
+        enabled: false
     stages:
-      - template: ../templates/PackageBuildPRCheck.yml@self
+      - template: ../templates/PackageBuildAndTestCheck.yml@self
         parameters:
           dailyBuildID: "lkg"
+          rpmsArtifactNameBase: "RPMS"
+          toolchainArtifactNameBase: "Toolchain"
+          toolchainRPMsTarballName: "toolchain_built_rpms_all.tar.gz"
+          baseRpmsTarballName: "rpms.tar.gz"
+          marinerVersion: $[ iif(eq(variables['System.PullRequest.TargetBranch'], 'main'), '2.0', '3.0') ]
