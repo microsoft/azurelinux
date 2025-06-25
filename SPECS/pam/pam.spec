@@ -18,7 +18,7 @@ Recommends:     cracklib-dicts
 Patch0:         CVE-2024-22365.patch
 Patch1:         CVE-2024-10963.patch
 Patch2:         CVE-2024-10041.patch
-Patch3:         Upgrade-pam_namespace-to-1.7.0-and-post-11-patches.patch
+Patch3:         Upgrade-pam_namespace-to-1.7.0-and-post-14-patches.patch
 Patch4:         CVE-2025-6020.patch
 
 %description
