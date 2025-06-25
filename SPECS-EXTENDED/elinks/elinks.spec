@@ -1,13 +1,13 @@
-Name:       	elinks
-Summary:   	A text-mode Web browser
-Version:   	0.17.0
-Release:   	1%{?dist}
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-License:   	GPLv2
-URL:       	https://github.com/rkd77/elinks
-Source:    	https://github.com/rkd77/elinks/releases/download/v%{version}/elinks-%{version}.tar.xz
-Source2:   	elinks.conf
+Name:         elinks
+Summary:      A text-mode Web browser
+Version:      0.17.0
+Release:      1%{?dist}
+Vendor:       Microsoft Corporation
+Distribution: Azure Linux
+License:      GPLv2
+URL:          https://github.com/rkd77/elinks
+Source:       https://github.com/rkd77/elinks/releases/download/v%{version}/elinks-%{version}.tar.xz
+Source2:      elinks.conf
 
 BuildRequires: automake
 BuildRequires: bzip2-devel
@@ -131,7 +131,7 @@ exit 0
 %changelog
 * Fri Mar 21 2025 Jyoti kanase <v-jykanase@microsoft.com> -  0.17.0-1
 - Upgrade to 0.17.0.
-- License verified.
+- License Verified.
 
 * Thu Jan 26 2023 Henry Li <lihl@microsoft.com> - 0.16.0-1
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
