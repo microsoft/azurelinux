@@ -56,7 +56,7 @@ export ERL_TOP=`pwd`
 * Tue Jun 24 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 26.2.5.13-1
 - Upgrade to 26.2.5.13 to fix CVE-2025-4748
 
-* Wed Jun 04 2025 Muhammad Falak <mwani@microsoft.com> - 26.2.5.11-2
+* Wed Jun 04 2025 Muhammad Falak <mwani@microsoft.com> - 26.2.5.12-2
 - Skip format-check in tests
 
 * Wed May 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 26.2.5.12-1
