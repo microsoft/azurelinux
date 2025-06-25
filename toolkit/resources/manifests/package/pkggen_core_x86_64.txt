@@ -1,5 +1,9 @@
 filesystem-1.1-20.cm2.x86_64.rpm
+<<<<<<< HEAD
 kernel-headers-5.15.184.1-1.cm2.noarch.rpm
+=======
+kernel-headers-5.15.182.1-1.cm2.noarch.rpm
+>>>>>>> b174980a1 (Revert "Patch `glibc` for CVE-2025-4802 & CVE-2025-0395 [High] (#13934)" (#14079))
 glibc-2.35-7.cm2.x86_64.rpm
 glibc-devel-2.35-7.cm2.x86_64.rpm
 glibc-i18n-2.35-7.cm2.x86_64.rpm
