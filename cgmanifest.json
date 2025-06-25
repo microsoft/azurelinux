@@ -8741,8 +8741,8 @@
         "type": "other",
         "other": {
           "name": "libappstream-glib",
-          "version": "0.8.2",
-          "downloadUrl": "http://people.freedesktop.org/~hughsient/appstream-glib/releases/appstream-glib-0.8.2.tar.xz"
+          "version": "0.8.3",
+          "downloadUrl": "https://people.freedesktop.org/~hughsient/appstream-glib/releases/appstream-glib-0.8.3.tar.xz"
         }
       }
     },
