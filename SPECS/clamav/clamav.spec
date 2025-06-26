@@ -11,7 +11,7 @@ Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-
 # Note: the %%{name}-%%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache run:
 #   [repo_root]/toolkit/scripts/build_cargo_cache.sh %%{name}-%%{version}.tar.gz %%{name}-%%{name}-%%{version}
-Source1:        %{name}-1.0.7-cargo.tar.gz
+Source1:        %{name}-%{version}-cargo.tar.gz
 BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
 BuildRequires:  cmake
