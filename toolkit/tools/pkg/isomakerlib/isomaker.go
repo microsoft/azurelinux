@@ -92,7 +92,7 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 		fetchedRepoDirPath: isoRepoDirPath,
 		outputDirPath:      outputDir,
 		imageNameBase:      imageNameBase,
-                grubCfgPath:        isoGrubCfg,
+		grubCfgPath:        isoGrubCfg,
 		imageNameTag:       imageNameTag,
 		osFilesPath:        defaultOSFilesPath,
 		repoSnapshotTime:   isoRepoSnapshotTime,
