@@ -1,0 +1,7 @@
+# Fails since 10.5.20
+innodb.innodb_defrag_concurrent        :
+parts.partition_alter4_innodb          :
+rpl.rpl_parallel_optimistic_xa_lsu_off :
+
+# Fails on 10.11.6
+perfschema.threads_innodb :
