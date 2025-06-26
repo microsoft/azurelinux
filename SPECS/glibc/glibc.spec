@@ -10,7 +10,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,6 +40,7 @@ Patch11:		nscd-Do-not-rebuild-getaddrinfo-bug-30709.patch
 Patch12:        glibc-2.34_pthread_cond_wait.patch
 # Patches for testing
 Patch100:       0001-Remove-Wno-format-cflag-from-tests.patch
+Patch101:       CVE-2024-33599.patch
 
 BuildRequires:  bison
 BuildRequires:  gawk
@@ -359,6 +360,9 @@ grep "^FAIL: nptl/tst-mutex10" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
+* Thu Jun 26 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.38-11
+- Patch for CVE-2024-33599
+
 * Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 2.38-10
 - Add glibc-2.34_pthread_cond_wait.patch
 
