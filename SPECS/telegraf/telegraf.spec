@@ -24,6 +24,7 @@ Patch9:         CVE-2025-27144.patch
 Patch10:        CVE-2025-30215.patch
 Patch11:        CVE-2025-22872.patch
 Patch12:        CVE-2025-29923.patch
+Patch13:        CVE-2025-46327.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
@@ -90,6 +91,7 @@ fi
 %changelog
 * Wed Jun 18 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.31.0-11
 - Patch CVE-2025-29923
+- Patch CVE-2025-46327
 
 * Tue Apr 22 2025 Mayank Singh <mayansingh@microsoft.com> - 1.31.0-10
 - Fix CVE-2025-22872 with an upstream patch
@@ -103,7 +105,7 @@ fi
 * Mon Mar 31 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.31.0-7
 - Patch CVE-2025-30204
 
-* Tue Mar 26 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.31.0-6
+* Wed Mar 26 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.31.0-6
 - Fix CVE-2025-22870, CVE-2024-51744 with an upstream patch
 
 * Wed Mar 05 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.31.0-5
