@@ -18,10 +18,10 @@ BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  gnupg2
 BuildRequires:  graphviz
-BuildRequires:  pkgconfig(sord-0) >= 0.16.16
-BuildRequires:  pkgconfig(serd-0) >= 0.30.10
+BuildRequires:  sord-devel >= 0.16.16
+BuildRequires:  serd-devel >= 0.30.10
 BuildRequires:  meson
-BuildRequires:  pkgconfig(lv2) >= 1.18.4
+BuildRequires:  lv2-devel >= 1.18.4
 %if %{with docs}
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_lv2_theme
