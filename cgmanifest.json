@@ -2416,6 +2416,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dasel",
+          "version": "2.8.1",
+          "downloadUrl": "https://github.com/TomWright/dasel/archive/refs/tags/v2.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dbus",
           "version": "1.15.8",
           "downloadUrl": "https://dbus.freedesktop.org/releases/dbus/dbus-1.15.8.tar.xz"
@@ -3338,8 +3348,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "26.2.5.12",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.12/otp-OTP-26.2.5.12.tar.gz"
+          "version": "26.2.5.13",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.13/otp-OTP-26.2.5.13.tar.gz"
         }
       }
     },
@@ -7050,8 +7060,8 @@
         "type": "other",
         "other": {
           "name": "ibus",
-          "version": "1.5.22",
-          "downloadUrl": "https://github.com/ibus/ibus/releases/download/1.5.22/ibus-1.5.22.tar.gz"
+          "version": "1.5.31",
+          "downloadUrl": "https://github.com/ibus/ibus/releases/download/1.5.31/ibus-1.5.31.tar.gz"
         }
       }
     },
@@ -12882,7 +12892,7 @@
         "other": {
           "name": "mariadb",
           "version": "10.11.11",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.11.11.tar.gz"
+          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.11/source/mariadb-10.11.11.tar.gz"
         }
       }
     },
@@ -27744,8 +27754,8 @@
         "type": "other",
         "other": {
           "name": "serd",
-          "version": "0.30.2",
-          "downloadUrl": "https://download.drobilla.net/serd-0.30.2.tar.bz2"
+          "version": "0.32.4",
+          "downloadUrl": "https://download.drobilla.net/serd-0.32.4.tar.xz"
         }
       }
     },
@@ -28126,8 +28136,8 @@
         "type": "other",
         "other": {
           "name": "sord",
-          "version": "0.16.4",
-          "downloadUrl": "https://download.drobilla.net/sord-0.16.4.tar.bz2"
+          "version": "0.16.18",
+          "downloadUrl": "https://download.drobilla.net/sord-0.16.18.tar.xz"
         }
       }
     },
@@ -31182,6 +31192,16 @@
           "version": "1.0.3",
           "downloadUrl": "https://github.com/sebastiandev/zipper/archive/v1.0.3.tar.gz"
         }
+      }
+    },
+    {
+      "component": {                                                              
+        "type": "other",
+        "other": {
+          "name": "zix",                                                           
+	  "version": "0.6.2",
+          "downloadUrl": "https://download.drobilla.net/zix-0.6.2.tar.xz"
+        }                                                                 
       }
     },
     {

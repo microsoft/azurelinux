@@ -117,6 +117,9 @@ popd
 * Wed Jun 25 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.18.0.kata0-1
 - Auto-upgrade to 3.18.0.kata0
 
+* Fri Jun 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0.aks0-2
+- Bump release to rebuild with rust
+
 * Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.15.0.aks0-1
 - Auto-upgrade to 3.15.0.aks0
 

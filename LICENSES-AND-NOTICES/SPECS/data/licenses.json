@@ -887,6 +887,7 @@
                 "man-pages-ru",
                 "man-pages-zh-CN",
                 "mandoc",
+                "mariadb",
                 "mariadb-connector-c",
                 "mariadb-connector-odbc",
                 "marisa",
@@ -2207,6 +2208,7 @@
                 "zerofree",
                 "zfs-fuse",
                 "zipper",
+                "zix",
                 "zopfli",
                 "zziplib"
             ]
@@ -2257,6 +2259,7 @@
                 "cmake-fedora",
                 "containerd2",
                 "coredns",
+                "dasel",
                 "dcos-cli",
                 "debugedit",
                 "dejavu-fonts",
@@ -2898,7 +2901,6 @@
                 "make",
                 "man-db",
                 "man-pages",
-                "mariadb",
                 "maven",
                 "mc",
                 "mercurial",
