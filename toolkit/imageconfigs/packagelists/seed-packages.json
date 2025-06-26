@@ -1,0 +1,27 @@
+{
+    "packages": [
+        "azurelinux-release",
+        "azurelinux-repos-ms-non-oss",
+        "azurelinux-repos-ms-oss",
+        "azurelinux-repos",
+        "azurelinux-rpm-macros",
+        "ca-certificates",
+        "ca-certificates-base",
+        "grub2-efi-binary",
+        "grub2",
+        "iana-etc",
+        "initramfs",
+        "iproute",
+        "iputils",
+        "irqbalance",
+        "shim",
+        "sudo",
+        "SymCrypt-OpenSSL",
+        "SymCrypt",
+        "systemd-networkd",
+        "systemd-resolved",
+        "systemd",
+        "tdnf-plugin-repogpgcheck",
+        "tdnf"
+    ]
+}
