@@ -1452,13 +1452,13 @@
         }
       }
     },
-     {
+    {
       "component": {
         "type": "other",
         "other": {
-	  "name": "cassandra-driver",
+          "name": "cassandra-driver",
           "version": "3.29.2",
-	  "downloadUrl": "https://github.com/datastax/python-driver/archive/refs/tags/3.29.2.tar.gz"
+          "downloadUrl": "https://github.com/datastax/python-driver/archive/refs/tags/3.29.2.tar.gz"
         }
       }
     },
@@ -6580,8 +6580,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.92.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.92.2.tar.gz"
+          "version": "6.6.93.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.93.1.tar.gz"
         }
       }
     },
@@ -8211,8 +8211,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.92.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.92.2.tar.gz"
+          "version": "6.6.93.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.93.1.tar.gz"
         }
       }
     },
@@ -8221,8 +8221,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.92.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.92.2.tar.gz"
+          "version": "6.6.93.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.93.1.tar.gz"
         }
       }
     },
@@ -8231,8 +8231,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.92.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.92.2.tar.gz"
+          "version": "6.6.93.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.93.1.tar.gz"
         }
       }
     },
@@ -8241,8 +8241,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.92.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.92.2.tar.gz"
+          "version": "6.6.93.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.93.1.tar.gz"
         }
       }
     },
@@ -22854,7 +22854,7 @@
         "other": {
           "name": "python-geomet",
           "version": "1.1.0",
-	  "downloadUrl": "https://github.com/geomet/geomet/archive/refs/tags/1.1.0.tar.gz"
+          "downloadUrl": "https://github.com/geomet/geomet/archive/refs/tags/1.1.0.tar.gz"
         }
       }
     },
@@ -31195,13 +31195,13 @@
       }
     },
     {
-      "component": {                                                              
+      "component": {
         "type": "other",
         "other": {
-          "name": "zix",                                                           
-	  "version": "0.6.2",
+          "name": "zix",
+          "version": "0.6.2",
           "downloadUrl": "https://download.drobilla.net/zix-0.6.2.tar.xz"
-        }                                                                 
+        }
       }
     },
     {
