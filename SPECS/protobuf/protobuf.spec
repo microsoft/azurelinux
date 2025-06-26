@@ -1,13 +1,14 @@
 Summary:        Google's data interchange format
 Name:           protobuf
 Version:        25.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://developers.google.com/protocol-buffers/
 Source0:        https://github.com/protocolbuffers/protobuf/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2025-4565.patch
 BuildRequires:  curl
 BuildRequires:  libstdc++
 BuildRequires:  cmake
@@ -62,7 +63,7 @@ Provides:       %{name}-python3 = %{version}-%{release}
 This contains protobuf python3 libraries.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %{cmake} \
@@ -122,6 +123,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Thu Jun 19 2025 Akhila Guruju <v-guakhila@microsoft.com> - 25.3-5
+- Patch CVE-2025-4565
+
 * Thu Jul 25 2024 Devin Anderson <danderson@microsoft.com> - 25.3-4
 - Bump release to rebuild with latest 'abseil-cpp'.
 
