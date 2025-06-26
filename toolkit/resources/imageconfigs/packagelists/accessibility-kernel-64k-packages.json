@@ -1,0 +1,9 @@
+{
+    "packages": [
+        "alsa-lib",
+        "espeak-ng",
+        "pcaudiolib",
+        "kernel-64k-drivers-accessibility",
+        "kernel-64k-drivers-sound"
+    ]
+}
