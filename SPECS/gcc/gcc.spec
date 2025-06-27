@@ -398,6 +398,11 @@ EOF
 chmod +x %{__ar_no_strip}
 %undefine __strip
 %global __strip %{__ar_no_strip}
+# Copy libcc1 libray files on the systems where it is not copied
+if [[ ! -f %{buildroot}%{_libdir}/libcc1.so ]]
+then
+    cp -p %{buildroot}%{_lib64dir}/libcc1.* %{buildroot}%{_libdir}/
+fi
 
 %check
 ulimit -s 32768
@@ -476,7 +481,7 @@ $tests_ok
 %files -n libgcc-devel
 %defattr(-,root,root)
 %{_lib64dir}/libgcc_s.so
-#%{_libdir}/libcc1.*
+%{_libdir}/libcc1.*
 
 %files c++
 %defattr(-,root,root)
