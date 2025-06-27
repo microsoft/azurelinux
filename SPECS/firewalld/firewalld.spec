@@ -56,7 +56,7 @@ firewall with a D-Bus interface.
 %{?python_provide:%python_provide python3-firewall}
 Summary:        Python3 bindings for firewalld
 
-Requires:       python3-dbus
+Requires:       python3-dbus >= 1.3.2
 Requires:       python3-gobject-base
 Requires:       python3-nftables
 
