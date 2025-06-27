@@ -1,7 +1,7 @@
 Summary:        Multi-format archive and compression library
 Name:           libarchive
 Version:        3.6.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 # Certain files have individual licenses. For more details see contents of "COPYING".
 License:        BSD AND Public Domain AND (ASL 2.0 OR CC0 1.0 OR OpenSSL)
 Vendor:         Microsoft Corporation
@@ -16,6 +16,11 @@ Patch3:         CVE-2024-48958.patch
 Patch4:         CVE-2024-48957.patch
 Patch5:         CVE-2025-25724.patch
 Patch6:		CVE-2024-48615.patch
+Patch7:         CVE-2025-5914.patch
+Patch8:         CVE-2025-5915.patch
+Patch9:         CVE-2025-5916.patch
+Patch10:        CVE-2025-5917.patch
+Patch11:        CVE-2025-5918.patch
 Provides:       bsdtar = %{version}-%{release}
 
 BuildRequires:  xz-libs
@@ -38,6 +43,7 @@ It contains the libraries and header files to create applications
 
 %build
 export CFLAGS="%{optflags}"
+autoreconf --force --install
 ./configure  --prefix=%{_prefix} --disable-static
 
 make %{?_smp_mflags}
@@ -68,6 +74,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Jun 26 2025 Sumit Jena <v-sumitjena@microsoft.com> - 3.6.1-7
+- Patch CVE-2025-5914, CVE-2025-5915, CVE-2025-5916, CVE-2025-5917, CVE-5918
+
 * Mon Apr 07 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.6.1-6
 - Patch CVE-2024-48615
 
