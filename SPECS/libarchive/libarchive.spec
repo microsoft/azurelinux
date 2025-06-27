@@ -75,7 +75,7 @@ make %{?_smp_mflags} check
 
 %changelog
 * Thu Jun 26 2025 Sumit Jena <v-sumitjena@microsoft.com> - 3.6.1-7
-- Patch CVE-2025-5914, CVE-2025-5915, CVE-2025-5916, CVE-2025-5917, CVE-5918
+- Patch CVE-2025-5914, CVE-2025-5915, CVE-2025-5916, CVE-2025-5917, CVE-2025-5918
 
 * Mon Apr 07 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.6.1-6
 - Patch CVE-2024-48615
