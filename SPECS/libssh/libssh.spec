@@ -12,7 +12,6 @@ Source1:        https://www.libssh.org/files/0.10/%{name}-%{version}.tar.xz.asc
 Source2:        https://cryptomilk.org/gpgkey-8DFF53E18F2ABC8D8F3C92237EE0FC4DCC014E3D.gpg#/%{name}.keyring
 Source3:        libssh_client.config
 Source4:        libssh_server.config
-
 Patch0:         CVE-2025-5318.patch
 
 BuildRequires:  cmake
