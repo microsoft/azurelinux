@@ -27,8 +27,8 @@ Source0:        https://github.com/PipeWire/%{name}/archive/refs/tags/%{version}
 %if %{with media_session}
 Source1:        https://gitlab.freedesktop.org/pipewire/media-session/-/archive/%{ms_version}/media-session-%{ms_version}.tar.gz
 Patch0:      0001-Build-media-session-from-local-tarbal.patch
-Patch1:      build_without_fdk_aac.patch
 %endif
+Patch1:      build_without_fdk_aac.patch
 BuildRequires:  gettext
 BuildRequires:  meson >= 0.59.0
 BuildRequires:  gcc
