@@ -18,7 +18,7 @@
 Summary:        Media Sharing Server
 Name:           pipewire
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,6 +27,7 @@ Source0:        https://github.com/PipeWire/%{name}/archive/refs/tags/%{version}
 %if %{with media_session}
 Source1:        https://gitlab.freedesktop.org/pipewire/media-session/-/archive/%{ms_version}/media-session-%{ms_version}.tar.gz
 Patch0:      0001-Build-media-session-from-local-tarbal.patch
+Patch1:      build_without_fdk_aac.patch
 %endif
 BuildRequires:  gettext
 BuildRequires:  meson >= 0.59.0
@@ -42,7 +43,6 @@ BuildRequires:  pkgconfig(gstreamer-base-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-plugins-base-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-net-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-allocators-1.0) >= 1.10.0
-BuildRequires:  pkgconfig(fdk-aac)
 %if %{with vulkan}
 BuildRequires:  pkgconfig(vulkan)
 %endif
@@ -267,7 +267,7 @@ mv -fv %{buildroot}/lib/udev/rules.d/90-pipewire-alsa.rules %{buildroot}%{_libdi
 # The plugin loader helper binary "gst-plugin-scanner" causes this hang issue.
 # Disabling the binary fixes the hang and gst-inspect-1.0 binary successfully parses the
 # plugin and generates the rpm provides information.
-rm %{_libexecdir}/gstreamer-1.0/gst-plugin-scanner
+# rm %{_libexecdir}/gstreamer-1.0/gst-plugin-scanner
 
 %check
 %meson_test
@@ -428,6 +428,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Jun 30 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 0.3.60-3
+- Build without fdk-aac package since that package has license issues
+
 * Thu Nov 24 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.3.60-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Build with features disabled: jack, jackserver-plugin and libcamera-plugin
