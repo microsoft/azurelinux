@@ -59,7 +59,6 @@ the functionality of the installed %{name} package.
 
 %prep
 %autosetup -n gdk-pixbuf-%{version} -p1
-%patch1 -p1
 
 %build
 %meson \
