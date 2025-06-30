@@ -15,7 +15,7 @@
 Summary:        Go
 Name:           msft-golang
 Version:        1.24.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,8 @@ Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.
 Source4:        https://github.com/microsoft/go/releases/download/v1.22.12-2/go1.22.12-20250211.4.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Patch1:         CVE-2025-22871.patch
+Patch2:         CVE-2025-22874.patch
+Patch3:         CVE-2025-4673.patch
 Conflicts:      go
 Conflicts:      golang
 
@@ -55,6 +57,8 @@ mv -v go go-bootstrap-03
 
 %setup -q -n go
 patch -Np1 --ignore-whitespace < %{PATCH1}
+patch -Np1 --ignore-whitespace < %{PATCH2}
+patch -Np1 --ignore-whitespace < %{PATCH3}
 %build
 # go 1.4 bootstraps with C.
 # go 1.20 bootstraps with go >= 1.17.13
@@ -160,7 +164,10 @@ fi
 %{_bindir}/*
 
 %changelog
-Mon Apr 14 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.24.1-2
+* Mon Jun 30 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.24.1-3
+- Patch CVE-2025-22874 & CVE-2025-4673
+
+* Mon Apr 14 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.24.1-2
 - Patch to address CVE-2025-22871
 
 * Mon Mar 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.24.1-1
