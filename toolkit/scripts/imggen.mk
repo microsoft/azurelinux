@@ -12,9 +12,13 @@ imggen_local_repo        = $(MANIFESTS_DIR)/image/local.repo
 imagefetcher_local_repo  = $(MANIFESTS_DIR)/package/local.repo
 imagefetcher_cloned_repo = $(MANIFESTS_DIR)/package/fetcher.repo
 ifeq ($(build_arch),aarch64)
-initrd_config_json       = $(RESOURCES_DIR)/imageconfigs/iso_initrd_arm64.json
+    ifeq ($(config_name),full-aarch64-64k)
+        initrd_config_json = $(RESOURCES_DIR)/imageconfigs/iso_initrd_arm64_64k.json
+    else
+        initrd_config_json = $(RESOURCES_DIR)/imageconfigs/iso_initrd_arm64.json
+    endif
 else
-initrd_config_json       = $(RESOURCES_DIR)/imageconfigs/iso_initrd.json
+    initrd_config_json     = $(RESOURCES_DIR)/imageconfigs/iso_initrd.json
 endif
 initrd_assets_dir        = $(RESOURCES_DIR)/imageconfigs/additionalfiles/iso_initrd/
 initrd_scripts_dir       = $(RESOURCES_DIR)/imageconfigs/postinstallscripts/iso_initrd/
@@ -23,7 +27,11 @@ initrd_packages_json     = $(RESOURCES_DIR)/imageconfigs/packagelists/iso-initrd
 else
 initrd_packages_json     = $(RESOURCES_DIR)/imageconfigs/packagelists/iso-initrd-packages.json
 endif
+ifeq ($(config_name),full-aarch64-64k)
+initrd_packages_json    += $(RESOURCES_DIR)/imageconfigs/packagelists/accessibility-kernel-64k-packages.json
+else
 initrd_packages_json    += $(RESOURCES_DIR)/imageconfigs/packagelists/accessibility-packages.json
+endif
 initrd_assets_files      = $(initrd_packages_json) $(call shell_real_build_only, find $(initrd_assets_dir) $(initrd_scripts_dir))
 meta_user_data_files     = $(META_USER_DATA_DIR)/user-data $(META_USER_DATA_DIR)/meta-data
 ova_ovfinfo              = $(assets_dir)/ova/ovfinfo.txt
@@ -51,9 +59,13 @@ artifact_dir             = $(IMAGES_DIR)/$(config_name)
 imager_disk_output_dir   = $(imggen_config_dir)/imager_output
 imager_disk_output_files = $(call shell_real_build_only, find $(imager_disk_output_dir) -not -name '*:*' -not -name '* *')
 ifeq ($(build_arch),aarch64)
-initrd_img               = $(IMAGES_DIR)/iso_initrd_arm64/iso-initrd.img
+    ifeq ($(config_name),full-aarch64-64k)
+        initrd_img       = $(IMAGES_DIR)/iso_initrd_arm64_64k/iso-initrd.img
+    else
+        initrd_img       = $(IMAGES_DIR)/iso_initrd_arm64/iso-initrd.img
+    endif
 else
-initrd_img               = $(IMAGES_DIR)/iso_initrd/iso-initrd.img
+    initrd_img           = $(IMAGES_DIR)/iso_initrd/iso-initrd.img
 endif
 meta_user_data_iso       = $(IMAGES_DIR)/meta-user-data.iso
 
@@ -271,6 +283,7 @@ iso: $(initrd_img) $(iso_deps)
 		--log-color=$(LOG_COLOR) \
 		$(if $(filter y,$(UNATTENDED_INSTALLER)),--unattended-install) \
 		--output-dir $(artifact_dir) \
+                $(if $(filter full-aarch64-64k,$(config_name)),--custom-iso-grub-cfg=$(RESOURCES_DIR)/imageconfigs/additionalfiles/custom_grub_64k/grub.cfg) \
 		--image-tag=$(IMAGE_TAG)
 
 ##help:target:meta-user-data=Create a `meta-user-data.iso` file under `IMAGES_DIR` using `meta-data` and `user-data` from `META_USER_DATA_DIR`.
