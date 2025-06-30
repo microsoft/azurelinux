@@ -4811,7 +4811,7 @@
         "other": {
           "name": "gphoto2",
           "version": "2.5.28",
-          "downloadUrl": "http://downloads.sourceforge.net/gphoto/gphoto2-2.5.28.tar.bz2"
+          "downloadUrl": "https://downloads.sourceforge.net/gphoto/gphoto2-2.5.28.tar.bz2"
         }
       }
     },
