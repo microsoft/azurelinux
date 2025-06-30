@@ -18,7 +18,7 @@
 Summary:        Media Sharing Server
 Name:           pipewire
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -428,6 +428,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Jun 30 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 0.3.60-3
+- Build without fdk-aac package since that package has license issues
+
 * Thu Nov 24 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.3.60-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Build with features disabled: jack, jackserver-plugin and libcamera-plugin
