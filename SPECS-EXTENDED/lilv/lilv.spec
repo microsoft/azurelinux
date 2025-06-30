@@ -7,26 +7,25 @@ Version:        0.24.26
 Release:        1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-
-License:    MIT
-URL:        https://drobilla.net/software/lilv
-Source0:    https://download.drobilla.net/%{name}-%{version}.tar.xz
-Source1:    https://download.drobilla.net/%{name}-%{version}.tar.xz.sig
-Source2:    https://drobilla.net/drobilla.gpg
+License:        MIT
+URL:            https://drobilla.net/software/lilv
+Source0:        https://download.drobilla.net/%{name}-%{version}.tar.xz
+Source1:        https://download.drobilla.net/%{name}-%{version}.tar.xz.sig
+Source2:        https://drobilla.net/drobilla.gpg
 
 BuildRequires:  gnupg2
 BuildRequires:  meson
 BuildRequires:  doxygen
 BuildRequires:  graphviz
-BuildRequires:  pkgconfig(sord-0) >= 0.16.16
-BuildRequires:  pkgconfig(sratom-0) >= 0.6.10
-BuildRequires:  pkgconfig(lv2) >= 1.18.2
-BuildRequires:  pkgconfig(python3)
-BuildRequires:  pkgconfig(serd-0) >= 0.30.10
+BuildRequires:  sord-devel >= 0.16.16
+BuildRequires:  sratom-devel >= 0.6.10
+BuildRequires:  lv2-devel >= 1.18.2
+BuildRequires:  python3-devel
+BuildRequires:  serd-devel >= 0.30.10
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
-BuildRequires:  pkgconfig(sndfile) >= 1.0.0
-BuildRequires:  pkgconfig(zix-0) >= 0.6.0
+BuildRequires:  libsndfile-devel >= 1.0.0
+BuildRequires:  zix-devel >= 0.6.0
 %if %{with docs}
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_lv2_theme
