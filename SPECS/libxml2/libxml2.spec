@@ -88,7 +88,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
-* Mon Jun 23 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.10.4-8
+* Mon Jun 30 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.10.4-8
 - Patch CVE-2025-6021
 
 * Mon May 05 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.10.4-7
