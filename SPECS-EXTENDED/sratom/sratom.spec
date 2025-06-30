@@ -26,6 +26,7 @@ BuildRequires:  lv2-devel >= 1.18.4
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_lv2_theme
 %endif
+Requires:       serd >= 0.30.10
 
 %description
 %{name} is a new C library for serializing LV2 atoms to/from Turtle. It is
@@ -37,6 +38,7 @@ control with network transparency.
 %package devel
 Summary:        Development libraries and headers for %{name}
 Requires:       %{name}%{_isa} = %{version}-%{release}
+Requires:       lv2-devel >= 1.18.4
 
 %description devel
 %{name} is a C library for serializing LV2 atoms to/from Turtle. It is
