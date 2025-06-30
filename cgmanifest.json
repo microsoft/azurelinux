@@ -2457,8 +2457,8 @@
         "type": "other",
         "other": {
           "name": "dbus-python",
-          "version": "1.2.16",
-          "downloadUrl": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.2.16.tar.gz"
+          "version": "1.3.2",
+          "downloadUrl": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.3.2.tar.gz"
         }
       }
     },
@@ -12191,8 +12191,8 @@
         "type": "other",
         "other": {
           "name": "lilv",
-          "version": "0.24.14",
-          "downloadUrl": "https://download.drobilla.net/lilv-0.24.14.tar.bz2"
+          "version": "0.24.26",
+          "downloadUrl": "https://download.drobilla.net/lilv-0.24.26.tar.xz"
         }
       }
     },
@@ -22365,6 +22365,16 @@
           "name": "python-cpuinfo",
           "version": "7.0.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/py-cpuinfo/py-cpuinfo-7.0.0.tar.gz"
+        }
+      }
+    },
+     {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cqlsh",
+          "version": "6.1.2",
+	  "downloadUrl": "https://files.pythonhosted.org/packages/source/c/cqlsh/cqlsh-6.1.2.tar.gz"
         }
       }
     },
