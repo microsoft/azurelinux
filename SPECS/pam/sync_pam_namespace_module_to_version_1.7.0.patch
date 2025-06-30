@@ -1,7 +1,7 @@
 From a9b0d98f640e3675ffd9cd4711bdd38d28aa1c97 Mon Sep 17 00:00:00 2001
 From: jykanase <v-jykanase@microsoft.com>
 Date: Tue, 24 Jun 2025 06:42:29 +0000
-Subject: [PATCH] upgrade namespace to 1.7.0 & post 11 patches
+Subject: [PATCH] sync pam_namespace module to version 1.7.0
 
 Upstream Patch Reference: https://launchpadlibrarian.net/799962342/pam_1.5.3-5ubuntu5.4_source.changes
 ---

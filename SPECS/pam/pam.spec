@@ -18,7 +18,7 @@ Recommends:     cracklib-dicts
 Patch0:         CVE-2024-22365.patch
 Patch1:         CVE-2024-10963.patch
 Patch2:         CVE-2024-10041.patch
-Patch3:         Upgrade-pam_namespace-to-1.7.0-and-post-11-patches.patch
+Patch3:         sync_pam_namespace_module_to_version_1.7.0.patch
 Patch4:         CVE-2025-6020.patch
 
 %description
@@ -109,7 +109,7 @@ EOF
 
 %changelog
 * Tue Jun 24 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.5.3-5
-- Add patch for Upgrade-pam_namespace-to-1.7.0-and-post-11-patches and CVE-2025-6020
+- Add patch for sync_pam_namespace_module_to_version_1.7.0.patch and CVE-2025-6020
 
 * Wed Dec 18 2024 Adit Jha <aditjha@microsoft.com> - 1.5.3-4
 - Patching CVE-2024-10041.
