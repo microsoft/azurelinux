@@ -29,7 +29,7 @@ $(warning |     use 'sudo make install-prereqs' to get the latest dependencies. 
 $(warning | If this is an automated system,                                     |)
 $(warning |     consider 'sudo make install-prereqs-and-configure' to get the   |)
 $(warning |     latest deps and automatically configure the system.             |)
-$(warning |     See ./toolkit/docs/building/prerequisites.md for details.       |)
+$(warning | See ./toolkit/docs/building/prerequisites.md for details.           |)
 $(warning -----------------------------------------------------------------------)
 $(error Go version '$(go_current_version)' is less than minimum required version '$(go_min_version)'.)
 endif
