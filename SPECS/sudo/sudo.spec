@@ -1,6 +1,6 @@
 Summary:        Sudo
 Name:           sudo
-Version:        1.9.15p5
+Version:        1.9.17
 Release:        1%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
@@ -8,6 +8,8 @@ Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.sudo.ws/sudo/dist/%{name}-%{version}.tar.gz
+Patch0:         CVE-2025-32462.patch
+Patch1:         CVE-2025-32463.patch
 BuildRequires:  audit-devel
 BuildRequires:  man-db
 BuildRequires:  openssl-devel
@@ -27,7 +29,7 @@ The Sudo package allows a system administrator to give certain users (or groups 
 the ability to run some (or all) commands as root or another user while logging the commands and arguments.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./configure \
@@ -99,6 +101,10 @@ fi
 %exclude  /etc/sudoers.dist
 
 %changelog
+* Fri Jun 27 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.17-1
+- Upgrade to version 1.9.17.
+- Patching CVEs: 2025-32462 and 2025-32463.
+
 * Mon Jan  8 13:11:48 EST 2024 Dan Streetman <ddstreet@ieee.org> - 1.9.15p5-1
 - Update for CVE-2023-42465
 
