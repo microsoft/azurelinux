@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "bind-9.20.5.tar.xz": "19274fd739c023772b4212a0b6c201cf4364855fa7e6a7d3db49693f55db1ab8",
+  "bind-9.20.9.tar.xz": "3d26900ed9c9a859073ffea9b97e292c1248dad18279b17b05fcb23c3091f86d",
   "dlz-modules-main.tar.gz": "884bef3535317a7757ad0e3556a27e2ed1a80f5b1040bce4074780c8719667d0",
   "generate-rndc-key.sh": "da0964516a9abe4074e262a1d0b7f63e63b2150c4cc2dddaaca029010383c422",
   "named-chroot.files": "5dbc7bd2a21836fb86cb740a2d4d72eb9f2b4f341996cd0c8ae9c39e95c0d76c",

@@ -26,10 +26,11 @@
 #
 #
 
-%global last-known-kernel 6.6.76.1
-
 %if 0%{azl}
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
+%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
 %global target_kernel_version_full f.a.k.e
 %endif
@@ -39,6 +40,7 @@
 
 %{!?_name: %define _name srp}
 %{!?_version: %define _version 24.10}
+%{!?_mofed_full_version: %define _mofed_full_version %{_version}-20%{release_suffix}%{?dist}}
 %{!?_release: %define _release OFED.24.10.0.6.7.1}
 
 # KMP is disabled by default
@@ -64,7 +66,7 @@
 Summary:	 srp driver
 Name:		 srp
 Version:	 24.10
-Release:	 8%{?dist}
+Release:	 20%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -82,11 +84,11 @@ BuildRequires:  binutils
 BuildRequires:  systemd
 BuildRequires:  kmod
 BuildRequires:  libconfig-devel
-BuildRequires:  mlnx-ofa_kernel-devel = %{_version}
-BuildRequires:  mlnx-ofa_kernel-source = %{_version}
+BuildRequires:  mlnx-ofa_kernel-devel = %{_mofed_full_version}
+BuildRequires:  mlnx-ofa_kernel-source = %{_mofed_full_version}
 
-Requires:       mlnx-ofa_kernel = %{_version}
-Requires:       mlnx-ofa_kernel-modules  = %{_version}
+Requires:       mlnx-ofa_kernel = %{_mofed_full_version}
+Requires:       mlnx-ofa_kernel-modules  = %{_mofed_full_version}
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
@@ -253,6 +255,42 @@ fi
 %endif
 
 %changelog
+* Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-20
+- Add kernel version and release nb into release nb
+
+* Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-19
+- Bump release to rebuild for new kernel release
+
+* Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-18
+- Bump release to rebuild for new kernel release
+
+* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-17
+- Bump release to rebuild for new kernel release
+
+* Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 24.10-16
+- Bump release to rebuild for new kernel release
+
+* Tue Apr 08 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-15
+- Bump release to match "signed" spec changes.
+
+* Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-14
+- Bump release to rebuild for new kernel release
+
+* Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-13
+- Bump release to rebuild for new kernel release
+
+* Tue Mar 11 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-12
+- Bump release to rebuild for new kernel release
+
+* Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 24.10-11
+- Bump release to rebuild for new kernel release
+
+* Wed Mar 05 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-10
+- Bump release to rebuild for new kernel release
+
+* Tue Mar 04 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-9
+- Bump release to rebuild for new kernel release
+
 * Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 24.10-8
 - Bump release to rebuild for new kernel release
 
@@ -274,8 +312,9 @@ fi
 * Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-2
 - Bump release to match kernel
 
-* Thu Jan 9 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
+* Thu Jan 9 2025 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
+
 * Thu Feb 20 2014 Alaa Hleihel <alaa@mellanox.com>
 - Initial packaging

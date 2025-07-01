@@ -1,7 +1,9 @@
-%global last-known-kernel 6.6.76.1
 
 %if 0%{azl}
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
+%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
 %global target_kernel_version_full f.a.k.e
 %endif
@@ -33,7 +35,7 @@
 Name:		 mft_kernel
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 4.30.0
-Release:	 8%{?dist}
+Release:	 20%{release_suffix}%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -59,7 +61,7 @@ Requires:       kmod
 Provides:       kernel-mft = %{version}-%{release}
 
 %description
-mft kernel module(s)
+This package provides a %{name} kernel module for kernel.
 
 %global debug_package %{nil}
 
@@ -83,9 +85,6 @@ EOF)
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
 %endif
-
-%description
-This package provides a %{name} kernel module for kernel.
 
 %if "%{KMP}" == "1"
 %package utils
@@ -228,6 +227,42 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
+* Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 4.30.0-20
+- Add kernel version and release nb into release nb
+
+* Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.30.0-19
+- Bump release to rebuild for new kernel release
+
+* Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 4.30.0-18
+- Bump release to rebuild for new kernel release
+
+* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 4.30.0-17
+- Bump release to rebuild for new kernel release
+
+* Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 4.30.0-16
+- Bump release to rebuild for new kernel release
+
+* Tue Apr 08 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.30.0-15
+- Removing duplicate description.
+
+* Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.30.0-14
+- Bump release to rebuild for new kernel release
+
+* Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.30.0-13
+- Bump release to rebuild for new kernel release
+
+* Tue Mar 11 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.30.0-12
+- Bump release to rebuild for new kernel release
+
+* Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 4.30.0-11
+- Bump release to rebuild for new kernel release
+
+* Wed Mar 05 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-10
+- Bump release to rebuild for new kernel release
+
+* Tue Mar 04 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-9
+- Bump release to rebuild for new kernel release
+
 * Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 4.30.0-8
 - Bump release to rebuild for new kernel release
 

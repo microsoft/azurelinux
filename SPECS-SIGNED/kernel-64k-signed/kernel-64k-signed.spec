@@ -6,7 +6,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-64k-signed-%{buildarch}
-Version:        6.6.76.1
+Version:        6.6.92.2
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -105,6 +105,42 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Mon Jun 09 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.92.2-2
+- Bump release to match kernel
+
+* Fri May 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.92.2-1
+- Auto-upgrade to 6.6.92.2
+
+* Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.90.1-1
+- Auto-upgrade to 6.6.90.1
+
+* Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.6.85.1-4
+- Bump release to match kernel
+
+* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.6.85.1-3
+- Bump release to match kernel
+
+* Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 6.6.85.1-2
+- Bump release to rebuild for new kernel release
+
+* Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.85.1-1
+- Auto-upgrade to 6.6.85.1
+
+* Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.82.1-1
+- Auto-upgrade to 6.6.82.1
+
+* Tue Mar 11 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.79.1-1
+- Auto-upgrade to 6.6.79.1
+
+* Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 6.6.78.1-3
+- Bump release to match kernel
+
+* Wed Mar 05 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.78.1-2
+- Bump release to match kernel
+
+* Mon Mar 03 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.78.1-1
+- Auto-upgrade to 6.6.78.1
+
 * Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 6.6.76.1-2
 - Bump release to match kernel
 

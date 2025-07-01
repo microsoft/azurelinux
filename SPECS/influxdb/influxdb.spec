@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.7.5
-Release:        1%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -61,12 +61,17 @@ Patch2:         CVE-2024-6104.patch
 Patch3:         CVE-2023-45288.patch
 Patch4:         CVE-2024-24786.patch
 Patch5:         CVE-2024-45338.patch
-Patch6:		CVE-2024-28180.patch
+Patch6:         CVE-2024-28180.patch
+Patch7:         CVE-2025-27144.patch
+Patch8:         CVE-2025-22868.patch
+Patch9:         CVE-2025-22870.patch
+Patch10:        CVE-2024-51744.patch
+Patch11:        CVE-2025-22872.patch
 BuildRequires:  clang
 BuildRequires:  golang
 BuildRequires:  kernel-headers
 BuildRequires:  protobuf-devel
-BuildRequires:  rust >= 1.60.0
+BuildRequires:  rust < 1.85.0
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  tzdata
 # IMPORTANT:  when upgrading this, make sure the flux version matches what is required by go.mod file in the soure code of influxdb.
@@ -151,6 +156,24 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Tue Jun 10 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.7.5-7
+- Bump release to rebuild with rust
+
+* Wed May 28 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.5-6
+- Updated config.yaml file to include boltpath, engine path and nats port
+
+* Fri Apr 25 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.7.5-5
+- Patch CVE-2025-22872
+
+* Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.7.5-4
+- Pin rust version
+
+* Mon Mar 24 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.7.5-3
+- Patch CVE-2025-22870, CVE-2024-51744
+
+* Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.7.5-2
+- Fix CVE-2025-22868, CVE-2025-27144 with an upstream patch
+
 * Mon Feb 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.5-1
 - Auto-upgrade to 2.7.5 - Upgrade influxdb to fix CVE-2023-44487
 

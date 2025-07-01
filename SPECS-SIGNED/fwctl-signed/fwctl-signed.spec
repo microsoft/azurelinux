@@ -35,17 +35,19 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azurelinux_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
 %global KVERSION %{target_kernel_version_full}
 
 %{!?_name: %define _name fwctl}
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-20%{release_suffix}%{?dist}}
 
 Summary:	 %{_name} Driver
-Name:		 %{_name}
+Name:		 %{_name}-signed
 Version:	 24.10
-Release:	 8%{?dist}
+Release:	 20%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
@@ -57,7 +59,7 @@ Group:		 System Environment/Base
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 
-Source0:        %{name}-%{version}-%{release}.%{_arch}.rpm
+Source0:        %{_name}-%{version}-%{release}.%{_arch}.rpm
 Source1:        fwctl.ko
 Source2:        mlx5_fwctl.ko
 
@@ -65,13 +67,18 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 ExclusiveArch:  x86_64
 
-Requires:       mlnx-ofa_kernel = %{version}
-Requires:       mlnx-ofa_kernel-modules  = %{version}
+%description
+fwctl signed kernel modules
+
+%package -n %{_name}
+Summary:        %{summary}
+Requires:       mlnx-ofa_kernel = %{_mofed_full_version}
+Requires:       mlnx-ofa_kernel-modules  = %{_mofed_full_version}
 Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
-%description
-fwctl signed kernel modules
+%description -n %{_name}
+%{description}
 
 %prep
 
@@ -95,23 +102,59 @@ cp -rp ./. %{buildroot}/
 
 popd
 
-%post
+%post -n %{_name}
 if [ $1 -ge 1 ]; then # 1 : This package is being installed or reinstalled
   /sbin/depmod %{KVERSION}
 fi # 1 : closed
 # END of post
 
-%postun
+%postun -n %{_name}
 /sbin/depmod %{KVERSION}
 
-%files
+%files -n %{_name}
 %defattr(-,root,root,-)
-%license %{_datadir}/licenses/%{name}/copyright
+%license %{_datadir}/licenses/%{_name}/copyright
 /lib/modules/%{KVERSION}/updates/
-%config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{name}-*.conf
+%config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{_name}-*.conf
 
 
 %changelog
+* Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-20
+- Add kernel version and release nb into release nb
+
+* Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-19
+- Bump release to rebuild for new kernel release
+
+* Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-18
+- Bump release to rebuild for new kernel release
+
+* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-17
+- Bump release to rebuild for new kernel release
+
+* Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 24.10-16
+- Bump release to rebuild for new kernel release
+
+* Tue Apr 08 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-15
+- Re-naming the package to de-duplicate the SRPM name.
+
+* Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-14
+- Bump release to rebuild for new kernel release
+
+* Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-13
+- Bump release to rebuild for new kernel release
+
+* Tue Mar 11 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-12
+- Bump release to rebuild for new kernel release
+
+* Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 24.10-11
+- Bump release to rebuild for new kernel release
+
+* Wed Mar 05 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-10
+- Bump release to rebuild for new kernel release
+
+* Tue Mar 04 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-9
+- Bump release to rebuild for new kernel release
+
 * Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 24.10-8
 - Bump release to rebuild for new kernel release
 
@@ -133,7 +176,7 @@ fi # 1 : closed
 * Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-2
 - Bump release to match kernel
 
-* Sat Jan 18 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
+* Sat Jan 18 2025 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
 - Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

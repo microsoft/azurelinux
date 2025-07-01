@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.0.0
-Release: 4%{?dist}
+Release: 12%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -15,9 +15,14 @@ Distribution: Azure Linux
 Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{upstream_name}-%{version}.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
-# Added patch to support tardev-snapshotter for Kata CC
+
 Patch0:	CVE-2024-45338.patch
-Patch1:  add-tardev-support.patch
+Patch1:	CVE-2025-27144.patch
+Patch2:	CVE-2024-40635.patch
+Patch3:	CVE-2025-22872.patch
+Patch4:	CVE-2025-47291.patch
+Patch5:	multi-snapshotters-support.patch
+Patch6:	tardev-support.patch
 %{?systemd_requires}
 
 BuildRequires: golang
@@ -26,6 +31,14 @@ BuildRequires: make
 BuildRequires: systemd-rpm-macros
 
 Requires: runc >= 1.2.2
+
+# This package replaces the old name of containerd
+Provides: containerd = %{version}-%{release}
+Obsoletes: containerd < %{version}-%{release}
+
+# This package replaces the old name of moby-containerd
+Provides: moby-containerd = %{version}-%{release}
+Obsoletes: moby-containerd < %{version}-%{release}
 
 %description
 containerd is an industry-standard container runtime with an emphasis on
@@ -81,6 +94,30 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Tue Jun 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-12
+- Add updated tardev-snapshotter support patch
+
+* Tue Jun 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-11
+- Add updated multi-snapshotters-support patch
+
+* Fri May 30 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.0.0-10
+- Patch CVE-2025-47291
+
+* Thu May 22 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.0.0-9
+- Patch CVE-2025-22872
+
+* Wed Apr 09 2025 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.0.0-8
+- Fix CVE-2024-40635
+
+* Tue Apr 01 2025 Nan Liu <liunan@microsoft.com> - 2.0.0-7
+- Remove the tardev-snapshotter patch for Kata CC support.
+
+* Fri Mar 21 2025 Dallas Delaney <dadelan@microsoft.com> - 2.0.0-6
+- Fix CVE-2025-27144
+
+* Mon Mar 03 2025 Nan Liu <liunan@microsoft.com> - 2.0.0-5
+- Add "Provides/Obsoletes:" to shift all installs of containerd and moby-containerd to containerd2
+
 * Mon Feb 03 2025 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-4
 - Fix ptest in tardev-snapshotter support patch
 

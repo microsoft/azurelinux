@@ -1,0 +1,13 @@
+[Unit]
+Description=Azure Linux OTEL Collector
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/azl-otelcol --config /etc/azl-otel-collector/config.yaml
+KillMode=process
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

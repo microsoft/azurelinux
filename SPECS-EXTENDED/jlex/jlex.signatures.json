@@ -1,6 +1,8 @@
 {
  "Signatures": {
   "Main.java": "aeebaece3b3a53972bb0ba0f810540386c267070ee9dca6ffa43c6ff74a54bd7",
-  "jlex-1.2.6.build.xml": "8681e302734a977b195fd28d44aea70c826ef071f0047e0667b142a8137140d0"
+  "jlex-1.2.6.build.xml": "7589b45e54152eacb12b7a31e1dbb57818ce665fdcfa47ea949079a14c57fa4f",
+  "manual.html": "f0c045bc635f054de5a19a876eab58e9118dde8d37cee152572cf7dfd5ab05f9",
+  "sample.lex": "6613558c248a7d2462aea9718ca53ed5639f095988765ef7ce2665ee06dab6c5"
  }
 }

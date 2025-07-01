@@ -1,0 +1,165 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# This check verifies basic package build success and failure cases.
+# It should only be dependent on toolkit changes, not on the specs.
+# This is why each build uses the 3.0-stable version of the specs and manifests.
+
+name: Package build checks
+
+env:
+  REGULAR_PKG: words
+  REGULAR_PKG_SPEC_PATH: SPECS/words/words.spec
+  TOOLCHAIN_PKG: xz
+
+on:
+  push:
+    branches: [3.0*, fasttrack/3.0]
+    paths:
+      - ".github/workflows/check-package-builds.yml"
+      - "toolkit/Makefile"
+      - "toolkit/scripts/*"
+      - "toolkit/tools/*"
+  pull_request:
+    branches: [3.0*, fasttrack/3.0]
+    paths:
+      - ".github/workflows/check-package-builds.yml"
+      - "toolkit/Makefile"
+      - "toolkit/scripts/*"
+      - "toolkit/tools/*"
+
+jobs:
+  package-checks:
+    name: ${{ matrix.check-name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - check-name: "Simple package build succeeds"
+            package-type: "REGULAR_PKG"
+            extra-args: ""
+
+          - check-name: "Simple package build fails"
+            package-type: "REGULAR_PKG"
+            error-pattern: "Number of failed SRPMs:\\s+1\\s*$"
+            extra-args: ""
+            build-prep: |
+              # Adding an invalid command to the '%prep' section will cause the build to fail.
+              sed -i '/%prep/a this-command-should-fail-because-its-not-a-command-at-all' "$REGULAR_PKG_SPEC_PATH"
+
+          - check-name: "Toolchain package rebuild succeeds"
+            package-type: "TOOLCHAIN_PKG"
+            extra-args: "ALLOW_TOOLCHAIN_REBUILDS=y"
+
+          - check-name: "Toolchain package rebuild fails"
+            package-type: "TOOLCHAIN_PKG"
+            error-pattern: "Number of toolchain SRPM conflicts:\\s+1\\s*$"
+            extra-args: "ALLOW_TOOLCHAIN_REBUILDS=n"
+            build-prep: ""
+
+          - check-name: "None license check does not break the build"
+            package-type: "REGULAR_PKG"
+            extra-args: "LICENSE_CHECK_MODE=none"
+            build-prep: |
+              license_file_name=$(grep -oP '^%license\s+\K\S+' "$REGULAR_PKG_SPEC_PATH")
+              if [[ -z "$license_file_name" ]]; then
+                  echo "ERROR: no license file found in the spec $REGULAR_PKG_SPEC_PATH"
+                  exit 1
+              fi
+              # Tagging a license file as a documentation file will not fail the license check on the 'none' level.
+              sed -i "/^%license/a %doc $license_file_name" "$REGULAR_PKG_SPEC_PATH"
+
+          - check-name: "Warning-only license check does not break the build"
+            package-type: "REGULAR_PKG"
+            extra-args: "LICENSE_CHECK_MODE=warn"
+            build-prep: |
+              license_file_name=$(grep -oP '^%license\s+\K\S+' "$REGULAR_PKG_SPEC_PATH")
+              if [[ -z "$license_file_name" ]]; then
+                echo "ERROR: no license file found in the spec $REGULAR_PKG_SPEC_PATH"
+                exit 1
+              fi
+              # Tagging a license file as a documentation file will not fail the license check on the 'warn' level.
+              sed -i "/^%license/a %doc $license_file_name" "$REGULAR_PKG_SPEC_PATH"
+
+          - check-name: "Fatal license check succeeds on duplicated license as documentation"
+            package-type: "REGULAR_PKG"
+            extra-args: "LICENSE_CHECK_MODE=fatal"
+            build-prep: |
+              license_file_name=$(grep -oP '^%license\s+\K\S+' "$REGULAR_PKG_SPEC_PATH")
+              if [[ -z "$license_file_name" ]]; then
+                echo "ERROR: no license file found in the spec $REGULAR_PKG_SPEC_PATH"
+                exit 1
+              fi
+              # Tagging a license file as a documentation file will not fail the license check on the 'fatal' level.
+              sed -i "/^%license/a %doc $license_file_name" "$REGULAR_PKG_SPEC_PATH"
+
+          - check-name: "Fatal license check fails"
+            package-type: "REGULAR_PKG"
+            error-pattern: "Number of SRPMs with license errors:\\s+1\\s*$"
+            extra-args: "LICENSE_CHECK_MODE=fatal"
+            build-prep: |
+              if ! grep -q '^%license' "$REGULAR_PKG_SPEC_PATH"; then
+                echo "ERROR: no '%license' macro found in the spec $REGULAR_PKG_SPEC_PATH"
+                exit 1
+              fi
+              # Tagging a license file as a documentation file will cause the license check to fail.
+              sed -i "s/^%license/%doc/" "$REGULAR_PKG_SPEC_PATH"
+
+          - check-name: "Pedantic license check fails"
+            package-type: "REGULAR_PKG"
+            error-pattern: "Number of SRPMs with license errors:\\s+1\\s*$"
+            extra-args: "LICENSE_CHECK_MODE=pedantic"
+            build-prep: |
+              license_file_name=$(grep -oP '^%license\s+\K\S+' "$REGULAR_PKG_SPEC_PATH")
+              if [[ -z "$license_file_name" ]]; then
+                echo "ERROR: no license file found in the spec $REGULAR_PKG_SPEC_PATH"
+                exit 1
+              fi
+              sed -i "/^%license/a %doc $license_file_name" "$REGULAR_PKG_SPEC_PATH"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout a stable version of the specs
+        uses: ./.github/actions/checkout-with-stable-pkgs
+
+      - name: Prepare the build environment
+        if: ${{ matrix.build-prep != '' }}
+        run: |
+          set -euo pipefail
+
+          ${{ matrix.build-prep }}
+
+      - name: Run the build
+        run: |
+          set -euo pipefail
+
+          if sudo make -C toolkit -j$(nproc) build-packages \
+            PACKAGE_REBUILD_LIST="${{ env[matrix.package-type] }}" \
+            REBUILD_TOOLS=y \
+            SRPM_PACK_LIST="${{ env[matrix.package-type] }}" \
+            ${{ matrix.extra-args }} 2>&1 | tee build.log; then
+            touch build.succeeded
+          fi
+
+      - name: Check the results
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${{ matrix.error-pattern }}" ]]; then
+            if [[ ! -f build.succeeded ]]; then
+              echo "Build failed, but it was expected to succeed."
+              exit 1
+            fi
+          else
+            if [[ -f build.succeeded ]]; then
+              echo "Build succeeded, but it was expected to fail."
+              exit 1
+            fi
+
+            if ! grep -qP '${{ matrix.error-pattern }}' build.log; then
+              echo "Build failed, but not with the expected error message."
+              exit 1
+            fi
+          fi
