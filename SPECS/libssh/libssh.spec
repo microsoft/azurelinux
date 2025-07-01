@@ -147,6 +147,7 @@ popd
 
 %changelog
 * Fri Jun 27 2025 BinduSri Adabala <v-badabala@microsoft.com> - 0.10.6-2
+- License verified.
 - Patch CVE-2025-5318
 
 * Tue Feb 25 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.10.6-1
