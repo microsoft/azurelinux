@@ -7,7 +7,7 @@
 Summary:        FUSE adapter - Azure Storage
 Name:           blobfuse2
 Version:        %{blobfuse2_version}
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,6 +38,7 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2023-45288.patch
 Patch1:         CVE-2024-24786.patch
 Patch2:         CVE-2025-22868.patch
+Patch3:         CVE-2025-30204.patch
 BuildRequires:  cmake
 BuildRequires:  fuse3-devel
 BuildRequires:  gcc
@@ -82,6 +83,9 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %{_sysconfdir}/logrotate.d/blobfuse2
 
 %changelog
+* Tue Jul 01 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.2-9
+- Patch for CVE-2025-30204
+
 * Sun Mar 02 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.1.2-8
 - Fix CVE-2025-22868 with an upstream patch
 
