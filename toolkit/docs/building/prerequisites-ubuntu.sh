@@ -59,7 +59,7 @@ if [ "$INSTALL_PREREQS" = true ]; then
     gawk \
     genisoimage \
     git \
-    golang-1.21-go \
+    golang-1.23-go \
     jq \
     make \
     openssl \
@@ -79,8 +79,8 @@ fi
 # Fix go 1.23 links if requested
 if [ "$FIX_GO_LINKS" = true ]; then
     echo "Creating Go symlinks..."
-    ln -vsf /usr/lib/go-1.21/bin/go /usr/bin/go
-    ln -vsf /usr/lib/go-1.21/bin/gofmt /usr/bin/gofmt
+    ln -vsf /usr/lib/go-1.23/bin/go /usr/bin/go
+    ln -vsf /usr/lib/go-1.23/bin/gofmt /usr/bin/gofmt
 fi
 
 # Install and configure Docker if requested
