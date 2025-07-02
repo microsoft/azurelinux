@@ -8,8 +8,7 @@ Distribution:   Azure Linux
 Group:          Applications/Communications
 URL:            https://github.com/iputils/iputils
 Source0:        https://github.com/iputils/iputils/archive/20240117.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         ping_test_ipv6_localhost.patch
-Patch1:         CVE-2025-47268.patch
+Patch0:         CVE-2025-47268.patch
 BuildRequires:  iproute
 BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
@@ -66,7 +65,7 @@ mv -f RELNOTES.tmp RELNOTES.old
 
 %changelog
 * Thu Jun 19 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 20240117-2
-- Add patch for CVE-2025-47268
+- Add patch for CVE-2025-47268, removed ping_test_ipv6_localhost.patch as it causes test failure
 
 * Thu Feb 01 2024 Suresh Thelkar <sthelkaro@microsoft.com> - 20240117-1
 - Upgrade to 20240117
