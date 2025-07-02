@@ -10,7 +10,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.16.50
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -36,6 +36,7 @@ Patch10:        bind-9.10-dist-native-pkcs11.patch
 Patch11:        CVE-2024-1737.patch
 Patch12:        CVE-2024-1975.patch
 Patch13:        CVE-2024-4076.patch
+Patch14:        CVE-2024-11187.patch
 
 BuildRequires:  gcc
 BuildRequires:  json-c-devel
@@ -237,9 +238,7 @@ cp -r bin/dnssec{,-pkcs11}
 cp -r lib/dns{,-pkcs11}
 cp -r lib/ns{,-pkcs11}
 %patch10 -p1 -b .dist_pkcs11
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
+%autopatch -p1 -m 11
 
 libtoolize -c -f; aclocal -I libtool.m4 --force; autoconf -f
 
@@ -619,6 +618,9 @@ fi;
 %{_mandir}/man8/named-nzd2nzf.8*
 
 %changelog
+* Wed Jun 25 2025 Archana Shettigar <v-shettigara@microsoft.com> - 9.16.50-2
+- Patch CVE-2024-11187
+
 * Tue Aug 06 2024 Muhammad Falak <mwani@microsoft.com> - 9.16.50-1
 - Bump version to 9.16.50
 - Introduce patch to address CVE-2024-1737, CVE-2024-1975 & CVE-2024-4076
