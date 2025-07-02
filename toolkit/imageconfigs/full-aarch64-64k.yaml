@@ -92,6 +92,13 @@ scripts:
     - path: postinstallscripts/imagecustomizer/isoinstaller_postinstalltask.sh
       arguments:
       - /config/attended_config.json
+  finalizeCustomization:
+    - path: scripts/set_os_release_variant_entries.sh
+      arguments:
+      - --variant-id
+      - full-aarch64-64k
+      - --variant
+      - Azure Linux Iso for 64k Kernel
 
 iso:
   additionalFiles:
