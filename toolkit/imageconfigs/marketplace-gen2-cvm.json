@@ -53,7 +53,11 @@
                 "packagelists/hyperv-packages.json"
             ],
             "AdditionalFiles": {
-                "additionalconfigs/sdboot-loader.conf": "/efi/loader/loader.conf"
+                "additionalconfigs/sdboot-loader.conf": "/efi/loader/loader.conf",
+                "additionalconfigs/cloud-init.cfg": "/etc/cloud/cloud.cfg",
+                "additionalconfigs/chrony.cfg": "/etc/chrony.conf",
+                "additionalconfigs/wait-for-ptp-hyperv.conf": "/etc/systemd/system/chronyd.service.d/wait-for-ptp-hyperv.conf",
+                "additionalconfigs/51-ptp-hyperv.rules": "/etc/udev/rules.d/51-ptp-hyperv.rules"
             },
             "KernelOptions": {
                 "default": "kernel"
