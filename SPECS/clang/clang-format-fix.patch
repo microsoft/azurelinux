@@ -1,0 +1,90 @@
+From 85df28180bd38d3fd5356efe6022eebec31e0814 Mon Sep 17 00:00:00 2001
+From: Owen Pan <owenpiano@gmail.com>
+Date: Fri, 18 Oct 2024 21:10:00 -0700
+Subject: [PATCH] [clang-format] Fix a bug that always returns error for JSON
+ (#112839)
+
+Fixes #108556.
+
+---
+ clang/test/Format/dry-run-warning.cpp    | 22 ++++++++++++++++++++++
+ clang/tools/clang-format/ClangFormat.cpp | 18 +++++++++---------
+ 2 files changed, 31 insertions(+), 9 deletions(-)
+ create mode 100644 clang/test/Format/dry-run-warning.cpp
+
+diff --git a/clang/test/Format/dry-run-warning.cpp b/clang/test/Format/dry-run-warning.cpp
+new file mode 100644
+index 000000000..4b85de40b
+--- /dev/null
++++ b/clang/test/Format/dry-run-warning.cpp
+@@ -0,0 +1,22 @@
++// RUN: echo '{' > %t.json
++// RUN: echo '  "married": true' >> %t.json
++// RUN: echo '}' >> %t.json
++
++// RUN: clang-format -n -style=LLVM %t.json 2>&1 | FileCheck %s -allow-empty
++
++// RUN: clang-format -n -style=LLVM < %t.json 2>&1 \
++// RUN:   | FileCheck %s -check-prefix=CHECK2 -strict-whitespace
++
++// RUN: echo '{' > %t.json
++// RUN: echo '  "married" : true' >> %t.json
++// RUN: echo '}' >> %t.json
++
++// RUN: clang-format -n -style=LLVM < %t.json 2>&1 | FileCheck %s -allow-empty
++
++// RUN: clang-format -n -style=LLVM %t.json 2>&1 \
++// RUN:   | FileCheck %s -check-prefix=CHECK2 -strict-whitespace
++
++// RUN: rm %t.json
++
++// CHECK-NOT: warning
++// CHECK2: warning: code should be clang-formatted
+diff --git a/clang/tools/clang-format/ClangFormat.cpp b/clang/tools/clang-format/ClangFormat.cpp
+index e122cea50..d40d8f5d1 100644
+--- a/clang/tools/clang-format/ClangFormat.cpp
++++ b/clang/tools/clang-format/ClangFormat.cpp
+@@ -341,9 +341,6 @@ static void outputReplacementsXML(const Replacements &Replaces) {
+ static bool
+ emitReplacementWarnings(const Replacements &Replaces, StringRef AssumedFileName,
+                         const std::unique_ptr<llvm::MemoryBuffer> &Code) {
+-  if (Replaces.empty())
+-    return false;
+-
+   unsigned Errors = 0;
+   if (WarnFormat && !NoWarnFormat) {
+     llvm::SourceMgr Mgr;
+@@ -479,9 +476,11 @@ static bool format(StringRef FileName) {
+   Replacements Replaces = sortIncludes(*FormatStyle, Code->getBuffer(), Ranges,
+                                        AssumedFileName, &CursorPosition);
+ 
++  const bool IsJson = FormatStyle->isJson();
++
+   // To format JSON insert a variable to trick the code into thinking its
+   // JavaScript.
+-  if (FormatStyle->isJson() && !FormatStyle->DisableFormat) {
++  if (IsJson && !FormatStyle->DisableFormat) {
+     auto Err = Replaces.add(tooling::Replacement(
+         tooling::Replacement(AssumedFileName, 0, 0, "x = ")));
+     if (Err)
+@@ -499,11 +498,12 @@ static bool format(StringRef FileName) {
+   Replacements FormatChanges =
+       reformat(*FormatStyle, *ChangedCode, Ranges, AssumedFileName, &Status);
+   Replaces = Replaces.merge(FormatChanges);
+-  if (OutputXML || DryRun) {
+-    if (DryRun)
+-      return emitReplacementWarnings(Replaces, AssumedFileName, Code);
+-    else
+-      outputXML(Replaces, FormatChanges, Status, Cursor, CursorPosition);
++  if (DryRun) {
++    return Replaces.size() > (IsJson ? 1 : 0) &&
++           emitReplacementWarnings(Replaces, AssumedFileName, Code);
++  }
++  if (OutputXML) {
++    outputXML(Replaces, FormatChanges, Status, Cursor, CursorPosition);
+   } else {
+     IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem(
+         new llvm::vfs::InMemoryFileSystem);
+-- 
+2.34.1
+

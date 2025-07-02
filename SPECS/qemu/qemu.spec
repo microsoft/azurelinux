@@ -428,7 +428,7 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 8.2.0
-Release: 16%{?dist}
+Release: 17%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -651,7 +651,7 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %endif
 
 %if %{user_static}
-BuildRequires: glibc-static >= 2.38-10
+BuildRequires: glibc-static >= 2.38-11%{?dist}
 BuildRequires: glib2-static zlib-static
 BuildRequires: pcre2-static
 %endif
@@ -3432,6 +3432,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
+* Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.2.0-17
+- Bump to rebuild with updated glibc
+
 * Tue May 13 2025 Kshitiz Godara <kgodara@microsoft.com> - 8.2.0-16
 - Added patch for CVE-2024-26327 CVE-2024-26328
 
