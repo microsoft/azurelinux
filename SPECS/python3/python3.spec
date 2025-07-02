@@ -6,7 +6,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,8 @@ Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.t
 # It has been removed in Python-3.12.0.tar.xz, but as our packages still require it, we will still provide for now.
 Source1:        https://github.com/python/cpython/blob/3.9/Tools/scripts/pathfix.py
 Patch0:         cgi3.patch
+Patch1:         CVE-2025-4516.patch
+Patch2:         CVE-2025-4517.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -238,6 +240,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Tue Jun 10 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.12.9-2
+- Patch CVE-2025-4516, CVE-2025-4517, CVE-2024-12718, CVE-2025-4138, CVE-2025-4330, CVE-2025-4330
+
 * Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.12.9-1
 - Auto-upgrade to 3.12.9 - to fix CVE-2025-0938 & CVE-2024-4032
 - Clean up the earlier patches not needed anymore

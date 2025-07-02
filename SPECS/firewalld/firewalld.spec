@@ -3,7 +3,7 @@
 Summary:        A firewall daemon with D-Bus interface providing a dynamic firewall
 Name:           firewalld
 Version:        2.0.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ Source0:        https://github.com/firewalld/firewalld/releases/download/v%{vers
 Source1:        FedoraServer.xml
 Source2:        FedoraWorkstation.xml
 Patch0:         firewalld-only-MDNS-default.patch
+Patch1:         firewalld_fix_testsuite.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -55,7 +56,7 @@ firewall with a D-Bus interface.
 %{?python_provide:%python_provide python3-firewall}
 Summary:        Python3 bindings for firewalld
 
-Requires:       python3-dbus
+Requires:       python3-dbus >= 1.3.2
 Requires:       python3-gobject-base
 Requires:       python3-nftables
 
@@ -71,6 +72,8 @@ are required by other packages that add firewalld configuration files.
 
 %package -n firewalld-test
 Summary: Firewalld testsuite
+
+Requires:       time
 
 %description -n firewalld-test
 This package provides the firewalld testsuite.
@@ -136,6 +139,8 @@ install -c -m 644 %{SOURCE2} %{buildroot}%{_libdir}/firewalld/zones/FedoraWorkst
 
 # standard firewalld.conf
 mv %{buildroot}%{_sysconfdir}/firewalld/firewalld.conf \
+    %{buildroot}%{_sysconfdir}/firewalld/firewalld-standard.conf
+sed -i 's|^IPv6_rpfilter=.*|IPv6_rpfilter=no|g' \
     %{buildroot}%{_sysconfdir}/firewalld/firewalld-standard.conf
 
 # server firewalld.conf
@@ -304,6 +309,10 @@ fi
 %{_mandir}/man1/firewall-config*.1*
 
 %changelog
+* Mon Jun 16 2025 Sumedh Sharma <sumsharma@microsoft.com> - 2.0.2-3
+- disable ipv6_rpfilter in configuration
+- fix testsuite provided by firewalld-test sub-package
+
 * Sun Feb 04 2024 Dan Streetman <ddstreet@ieee.org> - 2.0.2-2
 - workaround "circular dependencies" from build tooling
 
