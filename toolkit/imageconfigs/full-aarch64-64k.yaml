@@ -29,9 +29,6 @@ os:
   bootloader:
     resetType: hard-reset
 
-  selinux:
-    mode: disabled
-
   kernelCommandLine:
     extraCommandLine:
     - efi_mmap_nr_slack_slots=256
@@ -43,13 +40,13 @@ os:
     - kernel-64k
     - kernel-64k-drivers-accessibility
     - kernel-64k-drivers-sound
+    - createrepo_c
+    - jq
     # iso required packages
     - squashfs-tools
     - tar
     - device-mapper
     - curl
-    - createrepo_c
-    - jq
 
     installLists:
     - packagelists/isoinstaller-64k-packages.yaml
@@ -90,6 +87,12 @@ os:
       passwordExpiresDays: 99999
       startupCommand: /root/runliveinstaller
 
+scripts:
+  postCustomization:
+    - path: postinstallscripts/imagecustomizer/isoinstaller_postinstalltask.sh
+      arguments:
+      - /config/attended_config.json
+
 iso:
   additionalFiles:
   - source: additionalconfigs/99-dhcp-en.network
@@ -112,12 +115,6 @@ iso:
     destination: /config/packages/virt-guest-packages.json
   - source: files/imagecustomizer/isoinstaller/attended_config_aarch64_64k.json
     destination: /config/attended_config.json
-
-scripts:
-  postCustomization:
-    - path: postinstallscripts/imagecustomizer/isoinstaller_postinstalltask.sh
-      arguments:
-      - /config/attended_config.json
 
 output:
   image:
