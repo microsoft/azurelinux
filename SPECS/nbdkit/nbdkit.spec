@@ -51,13 +51,15 @@ Distribution:   Mariner
 
 Name:           nbdkit
 Version:        1.35.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        NBD server
 
 License:        BSD
 URL:            https://gitlab.com/nbdkit/nbdkit
 
 Source0:        http://libguestfs.org/download/nbdkit/%{source_directory}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2025-47712.patch
+Patch1:         CVE-2025-47711.patch
 
 BuildRequires: make
 %if 0%{patches_touch_autotools}
@@ -1193,6 +1195,9 @@ export LIBGUESTFS_TRACE=1
 
 
 %changelog
+* Wed Jul 02 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.35.3-4
+- Patch for CVE-2025-47712, CVE-2025-47711
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.35.3-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
