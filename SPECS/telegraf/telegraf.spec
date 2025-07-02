@@ -24,7 +24,8 @@ Patch9:         CVE-2025-27144.patch
 Patch10:        CVE-2025-30215.patch
 Patch11:        CVE-2025-22872.patch
 Patch12:        CVE-2025-29923.patch
-Patch13:        CVE-2025-46327.patch
+Patch13:        CVE-2025-46327-prereqs.patch
+Patch14:        CVE-2025-46327.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
