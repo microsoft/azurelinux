@@ -28,7 +28,6 @@ Source0:        https://github.com/PipeWire/%{name}/archive/refs/tags/%{version}
 Source1:        https://gitlab.freedesktop.org/pipewire/media-session/-/archive/%{ms_version}/media-session-%{ms_version}.tar.gz
 Patch0:      0001-Build-media-session-from-local-tarbal.patch
 %endif
-Patch1:      build_without_fdk_aac.patch
 BuildRequires:  gettext
 BuildRequires:  meson >= 0.59.0
 BuildRequires:  gcc
@@ -213,6 +212,7 @@ cp %{SOURCE1} subprojects/packagefiles/
     -D volume=disabled -D bluez5-codec-aptx=disabled -D roc=disabled 		\
     -D bluez5-codec-lc3plus=disabled						\
     -D bluez5-codec-ldac=disabled						\
+    -D bluez5-codec-aac=disabled						\
     -D bluez5-codec-opus=disabled                                               \
     -D x11-xfixes=disabled                                                      \
 %if %{with media_session}
