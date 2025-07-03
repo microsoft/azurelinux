@@ -1,7 +1,7 @@
 Summary:       A dictionary of English words for the /usr/share/dict directory
 Name:          words
 Version:       3.0
-Release:       38%{?dist}
+Release:       39%{?dist}
 License:       Public Domain
 # Note that Moby Project officially does not exist any more. The most complete
 # information about the project is in Wikipedia.
@@ -54,6 +54,9 @@ ln -sf linux.words $RPM_BUILD_ROOT%{_datadir}/dict/words
 %{_datadir}/dict/words
 
 %changelog
+* Thu Jul 03 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-39
+- Dummy CVE fix.
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-38
 - Fixing source URL.
 
