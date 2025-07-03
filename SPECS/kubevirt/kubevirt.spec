@@ -30,16 +30,14 @@ Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{versio
 # The containers_meta packages and associated files are not required for the Mariner build
 # Nexus team needs these to-be-upstreamed patches for the operator Edge to work
 # correctly.
-Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
-Patch1:         CVE-2023-48795.patch
-Patch2:         CVE-2024-24786.patch
-Patch3:         CVE-2024-45337.patch
-Patch4:         CVE-2024-45338.patch
-Patch5:         CVE-2023-45288.patch
-Patch6:         CVE-2023-44487.patch
-Patch7:         CVE-2025-22869.patch
-Patch8:         CVE-2025-22872.patch
-Patch9:         CVE-2024-33394.patch
+Patch0:         CVE-2024-24786.patch
+Patch1:         CVE-2024-45337.patch
+Patch2:         CVE-2024-45338.patch
+Patch3:         CVE-2023-45288.patch
+Patch4:         CVE-2023-44487.patch
+Patch5:         CVE-2025-22869.patch
+Patch6:         CVE-2025-22872.patch
+Patch7:         CVE-2024-33394.patch
 
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
@@ -283,6 +281,7 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %changelog
 * Thu Jul 03 2025 Harshit Gupta <guptaharshit@microsoft.com> - 1.5.0-1
 - Upgrade to 1.5.0
+- Removed patches
 
 * Thu Jul 10 2025 BinduSri Adabala <v-badabala@microsoft.com> - 1.2.0-19
 - Patch CVE-2024-33394
