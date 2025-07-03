@@ -172,7 +172,7 @@ mv %{buildroot}/usr/sbin/ppp-watch %{buildroot}%{_bindir}/
 %changelog
 * Mon Mar 10 2025 Jyoti kanase <v-jykanase@microsoft.com> - 2.5.0-1
 - Upgrade to 2.5.0
-- License verified.
+- License Verified.
 
 * Thu Mar 25 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.7-36
 - Remove epoch from minimum supported libpcap version
