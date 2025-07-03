@@ -16,8 +16,8 @@ Distribution:   Azure Linux
 URL: https://icl.cs.utk.edu/papi/
 Source0: https://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 Patch1: papi-python3.patch
-Patch5: papi-nostatic.patch
-Patch6: papi-libsde.patch
+Patch2: papi-nostatic.patch
+Patch3: papi-libsde.patch
 
 BuildRequires: autoconf
 BuildRequires: doxygen
@@ -76,10 +76,7 @@ PAPI-static includes the static versions of the library files for
 the PAPI user-space libraries and interfaces.
 
 %prep
-%setup -q
-%patch 1 -p1 -b .python3
-%patch 5 -p1
-%patch 6 -p1 -b .flags
+%autosetup -p1
 
 %build
 %if %{without bundled_libpfm}
