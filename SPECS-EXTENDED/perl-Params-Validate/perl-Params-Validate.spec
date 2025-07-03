@@ -1,22 +1,20 @@
 Summary:        Params-Validate Perl module
 Name:           perl-Params-Validate
-Version:        1.29
-Release:        13%{?dist}
-# One file is GPL+ or Artistics (c/ppport.h)
-License:        Artistic 2.0 and (GPL+ or Artistic)
+Version:        1.31
+Release:        1%{?dist}
+# One file is GPL-1.0-or-later OR Artistic-1.0-Perl (c/ppport.h)
+License:        Artistic-2.0 AND (GPL-1.0-or-later OR Artistic-1.0-Perl)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Params-Validate
 Source0:        https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Params-Validate-%{version}.tar.gz#/perl-Params-Validate-%{version}.tar.gz
-
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(ExtUtils::CBuilder)
 BuildRequires:  perl(Module::Implementation) >= 0.04
-BuildRequires:  perl(Module::Build) >= 0.28
+BuildRequires:  perl(Module::Build) >= 0.4227
 
 # Run-time:
 BuildRequires:  perl(Exporter)
@@ -60,8 +58,7 @@ certain methods, or applying validation callbacks to arguments.
 
 %install
 ./Build install destdir=$RPM_BUILD_ROOT create_packlist=0
-find $RPM_BUILD_ROOT -type d -depth -exec rmdir {} 2>/dev/null ';'
-
+find $RPM_BUILD_ROOT -type f -name '*.bs' -size 0 -exec rm -f {} \;
 %{_fixperms} $RPM_BUILD_ROOT/*
 
 %check
@@ -75,6 +72,10 @@ find $RPM_BUILD_ROOT -type d -depth -exec rmdir {} 2>/dev/null ';'
 %{_mandir}/man3/*
 
 %changelog
+* Mon Mar 17 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.31-1
+- Update to version 1.31
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.29-13
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
