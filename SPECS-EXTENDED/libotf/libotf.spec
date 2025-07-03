@@ -1,13 +1,13 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:		libotf
-Version:	0.9.13
-Release:	16%{?dist}
+Version:	0.9.16
+Release:	1%{?dist}
 Summary:	A Library for handling OpenType Font
 
-License:	LGPLv2+
-URL:            http://www.nongnu.org/m17n/
-Source0:        http://download.savannah.gnu.org/releases/m17n/%{name}-%{version}.tar.gz
+License:	LGPL-2.1-or-later
+URL:            https://www.nongnu.org/m17n/
+Source0:        https://download.savannah.gnu.org/releases/m17n/%{name}-%{version}.tar.gz
 
 BuildRequires:	gcc chrpath freetype-devel
 Requires:	freetype
@@ -45,17 +45,17 @@ make %{?_smp_mflags}
 %install
 make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
 find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
-for file in $RPM_BUILD_ROOT/usr/bin/*; do chrpath -d $file || true; done
+for file in $RPM_BUILD_ROOT%{bindir}/*; do chrpath -d $file || true; done
 
 (cd example && make clean && rm -rf .deps && rm Makefile)
-rm $RPM_BUILD_ROOT/usr/bin/libotf-config
+rm $RPM_BUILD_ROOT%{_bindir}/libotf-config
 
 %ldconfig_scriptlets
 
 
 %files
 %doc AUTHORS COPYING README NEWS
-%{_libdir}/*.so.*
+%{_libdir}/*.so.1{,.*}
 %{_bindir}/otfdump
 %{_bindir}/otflist
 %{_bindir}/otftobdf
@@ -67,6 +67,9 @@ rm $RPM_BUILD_ROOT/usr/bin/libotf-config
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Thu Nov 21 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.9.16-1
+- Upgrade to version 0.9.16
+
 * Thu Mar 25 2021 Henry Li <lihl@microsoft.com> - 0.9.13-16
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove libXaw-devel from build requirement
