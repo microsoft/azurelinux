@@ -5,17 +5,15 @@ A tool for installing and managing Python packages}
 Summary:        A tool for installing and managing Python packages
 Name:           python-pip
 Version:        24.2
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        MIT AND Python-2.0.1 AND Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND LGPL-2.1-only AND MPL-2.0 AND (Apache-2.0 OR BSD-2-Clause)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://pip.pypa.io/
 Source0:        https://github.com/pypa/pip/archive/%{version}/%{srcname}-%{version}.tar.gz
-Patch0:         CVE-2024-37891.patch
-Patch1:         CVE-2025-50181.patch
+Patch0:		CVE-2024-37891.patch
 
-BuildRequires:  git
 BuildArch:      noarch
 
 %description    %{_description}
@@ -48,20 +46,12 @@ BuildRequires:  python3-wheel
 %pyproject_install
 %pyproject_save_files %{srcname}
 
-%check
-%{buildroot}%{_bindir}/pip3 install -r tests/requirements.txt
-pytest -v tests/unit
-
 %files -n python3-pip
 %defattr(-,root,root,755)
 %{_bindir}/pip*
 %{python3_sitelib}/pip*
 
 %changelog
-* Tue Jun 24 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 24.2-3
-- Patch for CVE-2025-50181
-- Added %check
-
 * Fri Nov 22 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 24.2-2
 - Patch for CVE-2024-37891
 
