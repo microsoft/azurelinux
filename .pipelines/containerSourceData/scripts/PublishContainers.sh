@@ -92,11 +92,29 @@ function acr_login {
 # $1: image name
 function oras_attach {
     local image_name=$1
+    local max_retries=3
+    local retry_count=0
 
-    oras attach \
-        --artifact-type "application/vnd.microsoft.artifact.lifecycle" \
-        --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$END_OF_LIFE_1_YEAR" \
-        "$image_name"
+    while [ $retry_count -lt $max_retries ]; do
+        echo "+++ Attempting to attach lifecycle annotation to $image_name (attempt $((retry_count + 1))/$max_retries)"
+        
+        if oras attach \
+            --artifact-type "application/vnd.microsoft.artifact.lifecycle" \
+            --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$END_OF_LIFE_1_YEAR" \
+            "$image_name"; then
+            echo "+++ Successfully attached lifecycle annotation to $image_name"
+            return 0
+        else
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+                echo "+++ Failed to attach lifecycle annotation to $image_name. Retrying in 5 seconds..."
+                sleep 5
+            else
+                echo "+++ Failed to attach lifecycle annotation to $image_name after $max_retries attempts"
+                return 1
+            fi
+        fi
+    done
 }
 
 # Detach the end-of-life annotation from the container image.
