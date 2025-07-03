@@ -164,7 +164,7 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="/usr/bin/install -p"
 %changelog
 * Wed Dec 18 2024 Jyoti kanase <v-jykanase@microsoft.com> - 0.8.0-12
 - Initial Azure Linux import from Fedora 41 (license: MIT).
-- License verified.
+- License Verified.
 
 * Fri Sep 13 2024 Akira TAGOH <tagoh@redhat.com> - 0.8.0-11
 - Fix build with glib 2.82
