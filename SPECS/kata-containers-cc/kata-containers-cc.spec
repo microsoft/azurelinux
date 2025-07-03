@@ -26,6 +26,7 @@ Patch1:       CVE-2023-39325.patch
 Patch2:       CVE-2024-24786.patch
 Patch3:       CVE-2023-44487.patch
 Patch4:       CVE-2024-43806.patch
+Patch5:       CVE-2025-5791.patch
 
 ExclusiveArch: x86_64
 
@@ -79,7 +80,7 @@ This package contains the the tooling and files required to build the UVM
 %autosetup -N -n %{name}-%{version}
 pushd %{_builddir}/%{name}-%{version}
 tar -xf %{SOURCE1}
-&autopatch -p1
+%autopatch -p1
 popd
 
 %build
@@ -295,7 +296,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 %changelog
 * Mon May 05 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.2.0.azl2-7
-- Add patch for CVE-2024-43806
+- Add patch for CVE-2024-43806, CVE-2025-5791
 
 * Mon Mar 10 2025 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl2-6
 - Add patch for CVE-2023-44487
