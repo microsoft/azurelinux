@@ -267,7 +267,7 @@ mv -fv %{buildroot}/lib/udev/rules.d/90-pipewire-alsa.rules %{buildroot}%{_libdi
 # The plugin loader helper binary "gst-plugin-scanner" causes this hang issue.
 # Disabling the binary fixes the hang and gst-inspect-1.0 binary successfully parses the
 # plugin and generates the rpm provides information.
-# rm %{_libexecdir}/gstreamer-1.0/gst-plugin-scanner
+rm %{_libexecdir}/gstreamer-1.0/gst-plugin-scanner
 
 %check
 %meson_test
@@ -428,7 +428,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
-* Thu Jun 30 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 0.3.60-3
+* Mon Jun 30 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 0.3.60-3
 - Build without fdk-aac package since that package has license issues
 
 * Thu Nov 24 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.3.60-2
