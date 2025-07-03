@@ -79,8 +79,27 @@ os:
     destination: /usr/lib/systemd/system/serial-getty@.service
   - source: ../resources/manifests/image/local.repo
     destination: /etc/yum.repos.d/mariner-iso.repo
+  - source: additionalconfigs/99-dhcp-en.network
+    destination: /config/additionalfiles/99-dhcp-en.network
+  - source: packagelists/hyperv-packages.json
+    destination: /config/packages/hyperv-packages.json
+  - source: packagelists/developer-packages.json
+    destination: /config/packages/developer-packages.json
+  - source: packagelists/virtualization-host-packages.json
+    destination: /config/packages/virtualization-host-packages.json
+  - source: packagelists/core-packages-image-aarch64.json
+    destination: /config/packages/core-packages-image-aarch64.json
+  - source: packagelists/core-tools-packages.json
+    destination: /config/packages/core-tools-packages.json
+  - source: packagelists/selinux-full.json
+    destination: /config/packages/selinux-full.json
+  - source: packagelists/virt-guest-packages.json
+    destination: /config/packages/virt-guest-packages.json
+  - source: packagelists/ssh-server.json
+    destination: /config/packages/ssh-server.json
   - source: files/imagecustomizer/isoinstaller/attended_config_aarch64_64k.json
     destination: /config/attended_config.json
+
 
   users:
     - name: root
@@ -118,8 +137,8 @@ iso:
     destination: /config/packages/selinux-full.json
   - source: packagelists/virt-guest-packages.json
     destination: /config/packages/virt-guest-packages.json
-  - source: packagelists/hyperv-packages.json
-    destination: /config/packages/virt-guest-packages.json
+  - source: packagelists/ssh-server.json
+    destination: /config/packages/ssh-server.json
   - source: files/imagecustomizer/isoinstaller/attended_config_aarch64_64k.json
     destination: /config/attended_config.json
 

@@ -17,7 +17,8 @@
     "packages/core-packages-image-aarch64.json",
     "packages/core-tools-packages.json",
     "packages/selinux-full.json",
-    "packages/virt-guest-packages.json"
+    "packages/virt-guest-packages.json",
+    "packages/ssh-server.json"
    ],
    "Packages": null,
    "KernelOptions": {
@@ -69,7 +70,8 @@
    "PackageLists": [
     "packages/hyperv-packages.json",
     "packages/core-packages-image-aarch64.json",
-    "packages/virt-guest-packages.json"
+    "packages/virt-guest-packages.json",
+    "packages/ssh-server.json"
    ],
    "Packages": null,
    "KernelOptions": {
@@ -126,7 +128,8 @@
    "packages/core-packages-image-aarch64.json",
    "packages/core-tools-packages.json",
    "packages/selinux-full.json",
-   "packages/virt-guest-packages.json"
+   "packages/virt-guest-packages.json",
+   "packages/ssh-server.json"
   ],
   "Packages": null,
   "KernelOptions": {
