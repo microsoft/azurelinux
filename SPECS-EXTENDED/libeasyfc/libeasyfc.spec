@@ -96,7 +96,7 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %changelog
 * Tue Nov 19 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 0.14.1-1
 - Update to 0.14.1
-- License verified
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.0-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
