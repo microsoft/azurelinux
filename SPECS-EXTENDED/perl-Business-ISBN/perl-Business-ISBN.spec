@@ -101,7 +101,7 @@ make test
 %changelog
 * Fri Dec 13 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 3.009-1
 - Update to 3.009
-- License verified
+- License Verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.005-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
