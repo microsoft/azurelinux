@@ -1,3 +1,5 @@
+%global with_tests 0
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 %global srcname	PyGreSQL
@@ -68,7 +70,8 @@ find -type f -exec chmod 644 {} +
 %{python3_sitearch}/pgdb/py.typed
 %{python3_sitearch}/*.egg-info
 
-
+# Requires postgresql-test-rpm-macros which is not provided by postgresql in Azure Linux.
+%if 0%{?with_tests}
 %check
 %postgresql_tests_run
 
@@ -81,6 +84,7 @@ dbport = $PGPORT
 EOF
 
 %{__python3} setup.py test
+%endif
 
 %changelog
 * Wed Sep 25 2024 jyoti kanase <v-jykanase@microsoft.com> - 6.0.1-1
