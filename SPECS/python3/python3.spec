@@ -172,6 +172,7 @@ rm %{buildroot}%{_bindir}/2to3
 rm -rf %{buildroot}%{_bindir}/__pycache__
 
 %check
+# vsock_loopback module needed by `test_socket` is not loaded by default in AzureLinux.
 %{buildroot}%{_bindir}/python3 -m test --exclude test_socket
 
 %ldconfig_scriptlets
@@ -243,6 +244,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %changelog
 * Tue Jul 01 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.12.9-3
 - Patch CVE-2025-6069
+- Fixed the test in %check
 
 * Tue Jun 10 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.12.9-2
 - Patch CVE-2025-4516, CVE-2025-4517, CVE-2024-12718, CVE-2025-4138, CVE-2025-4330, CVE-2025-4330
