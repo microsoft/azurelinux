@@ -704,7 +704,7 @@ fi
 
 %changelog
 * Fri Jun 27 2025 Akhila Guruju <v-guakhila@microsoft.com> - 6.6.3-4
-- Patch CVE-2025-5455.patch
+- Patch CVE-2025-5455
 
 * Wed Mar 26 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 6.6.3-3
 - Fix CVE-2025-30348
