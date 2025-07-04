@@ -127,7 +127,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        490%{?dist}
+Release:        491%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -178,6 +178,7 @@ Patch202:       CVE-2023-47100.patch
 Patch203:       CVE-2023-31486.patch
 Patch204:       CVE-2023-31484.patch
 Patch205:       CVE-2024-56406.patch
+Patch206:       CVE-2025-40909.patch
 
 # Update some of the bundled modules
 # see http://fedoraproject.org/wiki/Perl/perl.spec for instructions
@@ -6822,6 +6823,9 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Thu Jun 05 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 4:5.34.1-491
+- Patch CVE-2025-40909
+
 * Tue Apr 08 2025 Andrew Phelps <anphel@microsoft.com> - 4:5.34.1-490
 - Add patch for CVE-2024-56406
 
