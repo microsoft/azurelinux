@@ -1,0 +1,34 @@
+g_utf8_next_char no longer includes a cast to char* as of 2.81.0:
+
+https://gitlab.gnome.org/GNOME/glib/-/merge_requests/4016
+
+diff -up a/src/paps.cc b/src/paps.cc
+--- a/src/paps.cc	2024-09-12 19:21:02.858439427 -0400
++++ b/src/paps.cc	2024-09-12 21:15:46.905955152 -0400
+@@ -1115,7 +1115,7 @@ split_text_into_paragraphs (PangoContext
+       while (p != nullptr && *p)
+         {
+           wc = g_utf8_get_char (p);
+-          next = g_utf8_next_char (p);
++          next = (char *) g_utf8_next_char (p);
+           if (wc == (gunichar)-1)
+             {
+               fprintf (stderr, _("%s: Invalid character in input\n"), g_get_prgname ());
+@@ -1130,7 +1130,7 @@ split_text_into_paragraphs (PangoContext
+               para->length = p - last_para;
+               /* handle dos line breaks */
+               if (wc == '\r' && *next == '\n')
+-                  next = g_utf8_next_char(next);
++                  next = (char *) g_utf8_next_char(next);
+               para->layout = pango_layout_new (pango_context);
+ 
+               if (page_layout->cpi > 0.0L)
+@@ -1201,7 +1201,7 @@ split_text_into_paragraphs (PangoContext
+                       g_free (newtext);
+ 
+                       para->length = i;
+-                      next = g_utf8_offset_to_pointer (para->text, para->length);
++                      next = (char *) g_utf8_offset_to_pointer (para->text, para->length);
+                       wc = g_utf8_get_char (g_utf8_prev_char (next));
+                     }
+                   else
