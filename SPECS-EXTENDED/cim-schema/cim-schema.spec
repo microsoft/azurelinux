@@ -38,13 +38,13 @@ Distribution:   Azure Linux
 %global update 1
 
 Name:           cim-schema
-Url:            http://www.dmtf.org/
+Url:            https://www.dmtf.org/
 Summary:        Common Information Model (CIM) Schema
 Version:        %{major}.%{minor}.%{update}
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LicenseRef-DMTF
-Source0:        http://www.dmtf.org/standards/cim/cim_schema_v%{major}%{minor}%{update}/cim_schema_%{version}Experimental-MOFs.zip
-Source1:        http://www.dmtf.org/standards/cim/cim_schema_v%{major}%{minor}%{update}/cim_schema_%{version}Experimental-Doc.zip
+Source0:        https://www.dmtf.org/standards/cim/cim_schema_v%{major}%{minor}%{update}/cim_schema_%{version}Experimental-MOFs.zip
+Source1:        https://www.dmtf.org/standards/cim/cim_schema_v%{major}%{minor}%{update}/cim_schema_%{version}Experimental-Doc.zip
 Source2:        LICENSE
 BuildArch:      noarch
 
@@ -63,7 +63,7 @@ provides the actual model descriptions.
 
 Authors:
 --------
-    DTMF <http://www.dmtf.org/about/contact>
+    DTMF <https://www.dmtf.org/about/contact>
 
 %description docs
 Common Information Model (CIM) schema documentation.
@@ -88,19 +88,22 @@ ln -s cimv%{version} $RPM_BUILD_ROOT/$MOFDIR/cim-current
 ln -s cim_schema_%{version}.mof $RPM_BUILD_ROOT/$MOFDIR/cim-current/CIM_Schema.mof
 install -d $RPM_BUILD_ROOT/usr/bin
 mkdir -p $RPM_BUILD_ROOT/%{_docdir}/%{name}
-cp -a %{SOURCE2} $RPM_BUILD_ROOT/%{_docdir}/%{name}
+cp -a %{SOURCE2} .
 
 %files
 %dir %{_datarootdir}/mof
 %dir %{_datarootdir}/mof/cimv%{version}
 %{_datarootdir}/mof/cimv%{version}/*
 %{_datarootdir}/mof/cim-current
-%doc %{_docdir}/%{name}/LICENSE
+%license LICENSE
 
 %files docs
 %doc ../%{name}-docs/*
 
 %changelog
+* Thu Jun 19 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.54.1-7
+- Address issues introduced by PR 11486
+
 * Tue Dec 17 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 2.54.1-6
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
