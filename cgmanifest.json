@@ -21483,8 +21483,8 @@
         "type": "other",
         "other": {
           "name": "ppp",
-          "version": "2.4.7",
-          "downloadUrl": "ftp://ftp.samba.org/pub/ppp/ppp-2.4.7.tar.gz"
+          "version": "2.5.0",
+          "downloadUrl": "https://github.com/paulusmack/ppp/archive/ppp-2.5.0.tar.gz"
         }
       }
     },
