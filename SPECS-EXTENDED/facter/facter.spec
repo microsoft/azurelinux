@@ -103,7 +103,7 @@ GEM_HOME="%{buildroot}%{gem_dir}" %{buildroot}%{_bindir}/facter --help
 %changelog
 * Wed Oct 30 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 4.8.0-1
 - Upgrade to 4.8.0
-- License verified
+- License verified.
 
 * Tue May 07 2024 Andy Zaugg <azaugg@linkedin.com> 4.2.13-1
 - Bumped version to facter version which has Mariner Linux Support
