@@ -1,8 +1,8 @@
 packages:
-- pam
 - alsa-lib
 - attr
 - awk
+- azurelinux-release
 - bash
 - bzip2
 - cifs-utils
@@ -44,7 +44,7 @@ packages:
 - nspr
 - nss
 - openssl
-- azurelinux-release
+- pam
 - parted
 - pcaudiolib
 - pkg-config
