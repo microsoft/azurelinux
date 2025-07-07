@@ -1,4 +1,5 @@
 %global gem_name facter
+%bcond_with docs
 
 Name:           facter
 Version:        4.8.0
@@ -53,7 +54,7 @@ custom or site specific. It is easy to extend by including your own custom
 facts. Facter can also be used to create conditional expressions in Puppet that
 key off the values returned by facts.
 
-
+%if %{with docs}
 %package doc
 Summary: Documentation for %{name}
 Requires: %{name} = %{version}-%{release}
@@ -61,7 +62,7 @@ BuildArch: noarch
 
 %description doc
 Documentation for %{name}.
-
+%endif
 
 %prep
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
@@ -81,7 +82,9 @@ rm %{buildroot}%{gem_instdir}/LICENSE
 mkdir -p %{buildroot}%{_bindir}
 cp -a .%{gem_instdir}/bin/facter %{buildroot}%{_bindir}
 rm -rf %{buildroot}/%{gem_instdir}/bin
-
+%if %{without docs}
+rm -rf %{buildroot}/%{gem_docdir}
+%endif
 
 %check
 # No test suite can run since the spec files are not part of the gem
@@ -97,8 +100,10 @@ GEM_HOME="%{buildroot}%{gem_dir}" %{buildroot}%{_bindir}/facter --help
 %exclude %{gem_cache}
 %{gem_spec}
 
+%if %{with docs}
 %files doc
 %doc %{gem_docdir}
+%endif
 
 %changelog
 * Wed Oct 30 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 4.8.0-1
