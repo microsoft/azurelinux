@@ -62,7 +62,7 @@ make %{?_smp_mflags} check
 %files devel
 %defattr(-,root,root)
 %{_includedir}
-%{_mandir}
+%doc %{_mandir}
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 
