@@ -1,6 +1,6 @@
 acl-2.3.1-2.azl3.aarch64.rpm
 acl-debuginfo-2.3.1-2.azl3.aarch64.rpm
-asciidoc-10.2.0-2.azl3.noarch.rpm
+asciidoc-10.2.0-3.azl3.noarch.rpm
 attr-2.5.2-1.azl3.aarch64.rpm
 attr-debuginfo-2.5.2-1.azl3.aarch64.rpm
 audit-3.1.2-1.azl3.aarch64.rpm
@@ -549,7 +549,7 @@ python3-magic-5.45-1.azl3.noarch.rpm
 python3-markupsafe-2.1.3-1.azl3.aarch64.rpm
 python3-newt-0.52.23-1.azl3.aarch64.rpm
 python3-packaging-23.2-3.azl3.noarch.rpm
-python3-pip-24.2-2.azl3.noarch.rpm
+python3-pip-24.2-3.azl3.noarch.rpm
 python3-pygments-2.7.4-2.azl3.noarch.rpm
 python3-rpm-4.18.2-1.azl3.aarch64.rpm
 python3-rpm-generators-14-11.azl3.noarch.rpm
