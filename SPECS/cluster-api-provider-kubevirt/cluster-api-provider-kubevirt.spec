@@ -8,7 +8,7 @@ Group:          System/Management
 # The Group has been set to System/Management to mimic SPEC file of Kubevirt
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://github.com/kubernetes-sigs/cluster-api-provider-kubevirtarchive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/kubernetes-sigs/cluster-api-provider-kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         golang-version-and-makefile-targets-upgrade.patch
 %global debug_package %{nil}
 BuildRequires:  golang >= 1.24
