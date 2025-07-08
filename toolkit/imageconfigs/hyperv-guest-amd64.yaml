@@ -1,0 +1,55 @@
+storage:
+  bootType: efi
+
+  disks:
+  - partitionTableType: gpt
+    maxSize: 4096M
+    partitions:
+    - id: esp
+      type: esp
+      size: 8M
+
+    - id: rootfs
+      type: root
+      size: grow
+
+  filesystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
+
+os:
+  bootloader:
+    resetType: hard-reset
+
+  hostname: azurelinux
+
+  packages:
+    remove:
+    - dracut-hostonly
+
+    installLists:
+    - packagelists/hyperv-packages.yaml
+    - packagelists/core-packages-image.yaml
+    - packagelists/cloud-init-packages.yaml
+    - packagelists/virt-guest-packages.yaml
+
+scripts:
+  finalizeCustomization:
+  - path: scripts/set_os_release_variant_entries.sh
+    arguments:
+    - --variant-id
+    - hyperv-guest
+    - --variant
+    - Hyper-V Guest Image
+
+output:
+  image:
+    format: vhdx
