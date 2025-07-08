@@ -8,12 +8,13 @@ Distribution:   Azure Linux
 
 Name:           gcr
 Version:        3.38.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A library for bits of crypto UI and parsing
 
 License:        GPLv2
 URL:            https://wiki.gnome.org/Projects/CryptoGlue
 Source0:        https://download.gnome.org/sources/%{name}/%{majmin}/%{name}-%{version}.tar.xz
+Patch0:         fix-meson-packages-build-keyword.patch
 
 BuildRequires:  gettext
 BuildRequires:  gtk-doc
@@ -115,6 +116,9 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/gcr-viewer.desktop
 %{_libdir}/libgcr-base-3.so.*
 
 %changelog
+* Tue Jun 03 2025 Andy Zaugg <azaugg@linkedin.com> - 3.38.1-2
+- Fix meson syntax to allow gcr to compile
+
 * Mon Dec 30 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.38.1-1
 - Bump to 3.38.1 to fix missing OID header bug (GCR issue #48).
 

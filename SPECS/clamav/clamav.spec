@@ -139,6 +139,9 @@ fi
 * Tue Jun 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.0.9-1
 - Upgrade to version 1.0.9 to fix CVE-2025-20260
 
+* Tue Jun 10 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.0.7-3
+- Bump release to rebuild with rust
+
 * Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.0.7-2
 - Pin rust version
 
