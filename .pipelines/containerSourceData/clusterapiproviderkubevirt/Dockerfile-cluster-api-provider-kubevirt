@@ -8,7 +8,7 @@ FROM $BASE_IMAGE
 @INCLUDE_MAIN_RUN_INSTRUCTION@
 
 #simple smoke test
-RUN rpm -ql cluster-api-provider-kubevirt.rpm
+RUN rpm -ql cluster-api-provider-kubevirt-0.1.10-1.azl3.x86_64.rpm
 RUN ls /usr/bin/cluster-api-provider-kubevirt-manager
 
 # Use uid of nonroot user (65532) because kubernetes expects numeric user when applying pod security policies
