@@ -51,7 +51,7 @@ Distribution:   Mariner
 
 Name:           nbdkit
 Version:        1.35.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        NBD server
 
 License:        BSD
@@ -128,6 +128,8 @@ Requires:       nbdkit-server%{?_isa} = %{version}-%{release}
 Requires:       nbdkit-basic-plugins%{?_isa} = %{version}-%{release}
 Requires:       nbdkit-basic-filters%{?_isa} = %{version}-%{release}
 
+Patch0: CVE-2025-47711.patch
+Patch1: CVE-2025-47712.patch
 
 %description
 NBD is a protocol for accessing block devices (hard disks and
@@ -1193,6 +1195,10 @@ export LIBGUESTFS_TRACE=1
 
 
 %changelog
+* Wed Jun 18 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.35.3-4
+- add patch for CVE-2025-47711.patch
+- add patch for CVE-2025-47712.patch
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.35.3-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
