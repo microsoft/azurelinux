@@ -39,7 +39,6 @@ cmake -G "Unix Makefiles"     \
     -Wno-dev .
 make %{?_smp_mflags}
 
-
 %install
 make install DESTDIR=%{buildroot}
 mkdir -p %{buildroot}%{_mandir}/man1/
@@ -52,7 +51,6 @@ install -vm 644 doc/doxygen.1 %{buildroot}%{_mandir}/man1/
 %license LICENSE
 
 %changelog
-
 * Mon Jun 23 2025 Suneel Yadava <suneelyadava@microsoft.com> - 1.9.8-2
 - patch for CVE-2025-6140
 
