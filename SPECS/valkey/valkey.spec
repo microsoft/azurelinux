@@ -13,6 +13,7 @@ Patch1:         disable-mem-defrag-tests.patch
 Patch2:         CVE-2025-49112.patch
 Patch3:         CVE-2025-27151.patch
 Patch4:         CVE-2025-32023.patch
+Patch5:         CVE-2025-48367.patch
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  openssl-devel
@@ -89,6 +90,7 @@ exit 0
 %changelog
 * Wed Jul 09 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 8.0.3-4
 - Fix CVE-2025-32023
+- Fix CVE-2025-48367
 
 * Wed Jun 18 2025 Sumit Jena <v-sumitjena@microsoft.com> - 8.0.3-3
 - Fix CVE-2025-27151
