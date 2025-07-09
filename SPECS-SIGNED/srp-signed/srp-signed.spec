@@ -42,7 +42,7 @@
 %global KVERSION %{target_kernel_version_full}
 
 %define _name srp
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-20%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-21%{release_suffix}%{?dist}}
 
 Summary:	 srp driver
 Name:		 %{_name}-signed
