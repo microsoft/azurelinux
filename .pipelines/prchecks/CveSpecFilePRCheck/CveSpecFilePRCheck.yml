@@ -1,5 +1,5 @@
 # prchecks/CveSpecFilePRCheck/CveSpecFilePRCheck.yml
-# Trigger on PRs to fasttrack/abadawi/test/3.0 when .spec or .patch files change
+# Trigger on PRs to fasttrack/3.0 when .spec or .patch files change
 # Uses the CBL-Mariner bot PAT from key vault to post PR comments on GitHub
 # Also performs anti-pattern detection and AI analysis of spec file changes
 
@@ -18,7 +18,7 @@ trigger: none
 pr:
   branches:
     include:
-      - fasttrack/abadawi/test/3.0
+      - fasttrack/3.0
   paths:
     include:
       - '**/*.spec'
