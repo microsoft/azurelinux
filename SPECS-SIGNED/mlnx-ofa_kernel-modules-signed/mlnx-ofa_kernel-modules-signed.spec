@@ -45,7 +45,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 %{_name}-signed
 Version:	 24.10
-Release:	 20%{release_suffix}%{?dist}
+Release:	 21%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -90,8 +90,6 @@ Source29:       xprtrdma.ko
 
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-ExclusiveArch:   x86_64
-
 
 %description 
 Mellanox infiniband kernel modules.
@@ -112,7 +110,11 @@ Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
 
+%ifarch aarch64
+BuildRequires:  kernel-64k-devel = %{target_kernel_version_full}
+%else
 Requires: kernel = %{target_kernel_version_full}
+%endif
 Requires: kmod
 Requires: libstdc++
 Requires: libunwind
@@ -192,6 +194,9 @@ fi
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Wed July 09 2025 Elaheh Dehghani <edehghani@microsoft.com> - 24.10-21
+- Enabled aarch64 (ARM64) build by removing ExclusiveArch
+
 * Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-20
 - Add kernel version and release nb into release nb
 
