@@ -4,15 +4,22 @@
 # The default %%__os_install_post macro ends up stripping the signatures off of the kernel module.
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
+%ifarch aarch64
+# hard code versions due to ADO bug:58993948
+%global target_kernel_version_full 6.12.40.1-1.azl3
+%global target_azl_build_kernel_version 6.12.40.1
+%global release_suffix _6.12.40.1.1
+%else
 %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
+#endif
 
 %global KVERSION %{target_kernel_version_full}
 
 %define _name xpmem-modules
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-20%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-21%{release_suffix}%{?dist}}
 
 # xpmem-modules is a sub-package in SPECS/xpmem.
 # We are making that into a main package for signing.
@@ -20,14 +27,13 @@
 Summary:	 Cross-partition memory
 Name:		 %{_name}-signed
 Version:	 2.7.4
-Release:	 20%{release_suffix}%{?dist}
+Release:	 21%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 BuildRequires:	 automake autoconf
 URL:		 https://github.com/openucx/xpmem
-ExclusiveArch:   x86_64
 
 #
 # To populate these sources:
@@ -51,7 +57,11 @@ This package includes the kernel module.
 Summary:        %{summary}
 Requires:       mlnx-ofa_kernel = %{_mofed_full_version}
 Requires:       mlnx-ofa_kernel-modules = %{_mofed_full_version}
+%ifarch aarch64
+Requires:       kernel-hwe = %{target_kernel_version_full}
+%else
 Requires:       kernel = %{target_kernel_version_full}
+%endif
 Requires:       kmod
 
 %description -n %{_name}
@@ -85,6 +95,10 @@ popd
 
 
 %changelog
+* Wed July 09 2025 Elaheh Dehghani <edehghani@microsoft.com> - 2.7.4-21
+- Enabled aarch64 (ARM64) build by removing ExclusiveArch
+- Build aarch64 (ARM64) build using kernel 6.12.40
+
 * Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 2.7.4-20
 - Add kernel version and release nb into release nb
 
