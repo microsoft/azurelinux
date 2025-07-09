@@ -3,7 +3,7 @@
 
 Name:         kata-containers-cc
 Version:      3.15.0.aks0
-Release:      2%{?dist}
+Release:      3%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 URL:          https://github.com/microsoft/kata-containers
@@ -11,6 +11,8 @@ Vendor:       Microsoft Corporation
 Distribution: Azure Linux
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{sourceName}-%{version}.tar.gz
 Source1:      %{sourceName}-%{version}-cargo.tar.gz
+Patch0:       CVE-2025-4574.patch
+Patch1:       CVE-2025-5791.patch
 
 ExclusiveArch: x86_64
 
@@ -44,10 +46,7 @@ Summary:        Kata Confidential Containers tools package for building the UVM
 This package contains the scripts and files required to build the UVM
 
 %prep
-%autosetup -p1 -n %{sourceName}-%{version}
-pushd %{_builddir}/%{sourceName}-%{version}
-tar -xf %{SOURCE1}
-popd
+%autosetup -p1 -a1 -n %{sourceName}-%{version}
 
 %build
 pushd %{_builddir}/%{sourceName}-%{version}/tools/osbuilder/node-builder/azure-linux
@@ -150,6 +149,9 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Tue Jun 24 2025 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 3.15.0.aks0-3
+- Patch CVE-2025-4574, CVE-2025-5791
+
 * Fri Jun 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0.aks0-2
 - Bump release to rebuild with rust
 
