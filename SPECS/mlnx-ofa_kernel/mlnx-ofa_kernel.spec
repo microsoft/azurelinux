@@ -106,7 +106,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel
 Version:	 24.10
-Release:	 20%{release_suffix}%{?dist}
+Release:	 21%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -116,7 +116,6 @@ Patch0:          001-fix-module-init-for-ibt.patch
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-ExclusiveArch:   x86_64
 
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -130,7 +129,11 @@ Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
 
+%ifarch aarch64
+BuildRequires:  kernel-64k-devel = %{target_kernel_version_full}
+%else
 BuildRequires:  kernel-devel = %{target_kernel_version_full}
+%endif
 BuildRequires:  kernel-headers = %{target_kernel_version_full}
 BuildRequires:  binutils
 BuildRequires:  kmod
@@ -138,7 +141,11 @@ BuildRequires:  libstdc++-devel
 BuildRequires:  libunwind-devel
 BuildRequires:  pkgconfig
 
+%ifarch aarch64
+Requires: kernel-64k = %{target_kernel_version_full}
+%else
 Requires: kernel = %{target_kernel_version_full}
+%endif
 Requires: kmod
 Requires: libstdc++
 Requires: libunwind
@@ -741,6 +748,9 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
+* Wed July 09 2025 Elaheh Dehghani <edehghani@microsoft.com> - 24.10-21
+- Enabled aarch64 (ARM64) build by removing ExclusiveArch
+
 * Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-20
 - Add kernel version and release nb into release nb
 
