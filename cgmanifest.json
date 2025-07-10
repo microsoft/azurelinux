@@ -22853,8 +22853,8 @@
         "type": "other",
         "other": {
           "name": "python-genshi",
-          "version": "0.7.5",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/G/Genshi/Genshi-0.7.5.tar.gz"
+          "version": "0.7.9",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/G/Genshi/Genshi-0.7.9.tar.gz"
         }
       }
     },
