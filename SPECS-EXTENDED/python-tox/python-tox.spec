@@ -27,7 +27,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 License:        MIT
 URL:            https://tox.readthedocs.io/
-Source:         https://files.pythonhosted.org/packages/cf/7b/97f757e159983737bdd8fb513f4c263cd411a846684814ed5433434a1fa9/tox-4.24.1.tar.gz#/%{name}-%{version}.tar.gz
+Source:         https://files.pythonhosted.org/packages/cf/7b/97f757e159983737bdd8fb513f4c263cd411a846684814ed5433434a1fa9/tox-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 # Remove dependency on devpi-process.
 # Remove dependency on detect-test-pollution.
@@ -155,6 +155,16 @@ export SETUPTOOLS_SCM_PRETEND_VERSION="%{version}"
 k="${k-}${k+ and }not test_virtualenv_flipped_settings"
 k="${k-}${k+ and }not test_virtualenv_env_ignored_if_set"
 k="${k-}${k+ and }not test_virtualenv_env_used_if_not_set"
+k="${k-}${k+ and }not test_build_wheel_in_non_base_pkg_env"
+
+#we don't have dependency packages in Azure Linux.
+#Excluding test
+k="${k-}${k+ and }not test_shebang_limited_on"
+k="${k-}${k+ and }not test_shebang_failed_to_parse"
+k="${k-}${k+ and }not test_shebang_limited_off"
+k="${k-}${k+ and }not test_tox_install_pkg_wheel"
+k="${k-}${k+ and }not test_install_pkg_via"
+k="${k-}${k+ and }not test_tox_install_pkg_with_skip_install"
 
 # https://github.com/tox-dev/tox/issues/3290
 %if v"0%{?python3_version}" >= v"3.13"
@@ -181,7 +191,10 @@ k="${k-}${k+ and }not test_call_as_exe"
 k="${k-}${k+ and }not test_run_installpkg_targz"
 %endif
 
-%pytest -v -n auto -k "${k-}" --run-integration
+#Ignoring test_sequential.py and test_spinner.py files which requires re-assert and time-machine modules that we don't ship through azl packages.
+%pytest -v -n auto -k "${k-}" --run-integration \
+  --ignore=tests/session/cmd/test_sequential.py \
+  --ignore=tests/util/test_spinner.py
 %endif
 
 
@@ -190,7 +203,7 @@ k="${k-}${k+ and }not test_run_installpkg_targz"
 %license %{python3_sitelib}/tox-%{version}.dist-info/licenses/LICENSE
 
 %changelog
-* Fri Dec 21 2025 Jyoti kanase <v-jykanase@microsoft.com> -  4.24.1-2
+* Fri Feb 21 2025 Jyoti kanase <v-jykanase@microsoft.com> -  4.24.1-2
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
