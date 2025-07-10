@@ -229,9 +229,9 @@ libsolv-0.7.28-3.azl3.aarch64.rpm
 libsolv-debuginfo-0.7.28-3.azl3.aarch64.rpm
 libsolv-devel-0.7.28-3.azl3.aarch64.rpm
 libsolv-tools-0.7.28-3.azl3.aarch64.rpm
-libssh2-1.11.1-1.azl3.aarch64.rpm
-libssh2-debuginfo-1.11.1-1.azl3.aarch64.rpm
-libssh2-devel-1.11.1-1.azl3.aarch64.rpm
+libssh2-0.10.6-2.azl3.aarch64.rpm
+libssh2-debuginfo-0.10.6-2.azl3.aarch64.rpm
+libssh2-devel-0.10.6-2.azl3.aarch64.rpm
 libstdc++-13.2.0-7.azl3.aarch64.rpm
 libstdc++-devel-13.2.0-7.azl3.aarch64.rpm
 libtasn1-4.19.0-2.azl3.aarch64.rpm
