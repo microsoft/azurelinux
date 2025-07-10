@@ -373,7 +373,7 @@ make test TESTOPTS="-x test_multiprocessing_spawn -x test_socket -x test_email"
 %changelog
 * Mon Jun 30 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 3.9.19-14
 - Addresses CVE-2025-6069, CVE-2025-4516, CVE-2025-50181, CVE-2023-5752, CVE-2023-45803
-- Patch CVE-2025-4138: Addresses CVE-2024-12718, CVE-2025-4138, CVE-2025-4330, CVE-2025-4517, CVE-2025-4435
+- Patch for CVE-2025-4138: Addresses CVE-2024-12718, CVE-2025-4138, CVE-2025-4330, CVE-2025-4517, CVE-2025-4435
 
 * Fri Apr 11 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.9.19-13
 - Add patch for CVE-2024-3651, CVE-2023-43804 and CVE-2024-37891 in the bundled pip wheel
