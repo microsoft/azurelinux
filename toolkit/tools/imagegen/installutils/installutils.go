@@ -1241,6 +1241,8 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 	// https://microsoft.visualstudio.com/OS/_workitems/edit/56076960/
 	CryptTabOptions := fmt.Sprintf("%v,x-systemd.device-timeout=480s", Options)
 	newEntry := fmt.Sprintf("%v %v %v %v\n", blockDevice, encryptedUUID, encryptionPassword, CryptTabOptions)
+	// Print a message to the user to indicate that the crypttab is being updated
+	logger.Log.Warnf("Adding entry to crypttab: %v", newEntry)
 	err = file.Append(newEntry, fullCryptTabPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to append crypttab")
