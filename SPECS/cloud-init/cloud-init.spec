@@ -5,7 +5,7 @@ Summary:        Cloud instance init scripts
 Name:           cloud-init
 Epoch:          1
 Version:        %{package_version}
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,8 @@ Patch3:         0001-feat-azure-Add-ProvisionGuestProxyAgent-OVF-setting.patch
 Patch4:         0002-feat-azure-parse-ProvisionGuestProxyAgent-as-bool-51.patch
 Patch5:         0003-feat-azure-add-support-for-azure-proxy-agent.patch
 Patch6:         0001-add-PPS-support-for-azure-proxy-agent.patch
+Patch7:         CVE-2024-6174.patch
+Patch8:         CVE-2024-11584.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -163,6 +165,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Sat Jun 28 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1:23.3-7
+- Patch CVE-2024-6174 & CVE-2024-11584
+
 * Tue Dec 10 2024 Minghe Ren <mingheren@microsoft.com> - 1:23.3-6
 - Add module-setup.sh to prevent an intermittent issue where ephemeral disk not being formatted on Azure
 
