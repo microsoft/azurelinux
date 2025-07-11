@@ -1,0 +1,47 @@
+From b6f38b47c3bb31a6e7af4aeae33434ab40a969b3 Mon Sep 17 00:00:00 2001
+From: Olivier Fourdan <ofourdan@redhat.com>
+Date: Mon, 28 Apr 2025 14:59:46 +0200
+Subject: [PATCH xserver 2/2] xfree86: Check for RandR provider functions
+
+Changing XRandR provider properties if the driver has set no provider
+function such as the modesetting driver will cause a NULL pointer
+dereference and a crash of the Xorg server.
+
+Related to CVE-2025-49180
+
+This issue was discovered by Nils Emmerich <nemmerich@ernw.de> and
+reported by Julian Suleder via ERNW Vulnerability Disclosure.
+
+Signed-off-by: Olivier Fourdan <ofourdan@redhat.com>
+Reviewed-by: Peter Hutterer <peter.hutterer@who-t.net>
+---
+ hw/xfree86/modes/xf86RandR12.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/hw/xfree86/modes/xf86RandR12.c b/hw/xfree86/modes/xf86RandR12.c
+index ddcf5e748..bf33da377 100644
+--- a/hw/xfree86/modes/xf86RandR12.c
++++ b/hw/xfree86/modes/xf86RandR12.c
+@@ -2146,7 +2146,8 @@ xf86RandR14ProviderSetProperty(ScreenPtr pScreen,
+     /* If we don't have any property handler, then we don't care what the
+      * user is setting properties to.
+      */
+-    if (config->provider_funcs->set_property == NULL)
++    if (config->provider_funcs == NULL ||
++        config->provider_funcs->set_property == NULL)
+         return TRUE;
+ 
+     /*
+@@ -2164,7 +2165,8 @@ xf86RandR14ProviderGetProperty(ScreenPtr pScreen,
+     ScrnInfoPtr pScrn = xf86ScreenToScrn(pScreen);
+     xf86CrtcConfigPtr config = XF86_CRTC_CONFIG_PTR(pScrn);
+ 
+-    if (config->provider_funcs->get_property == NULL)
++    if (config->provider_funcs == NULL ||
++        config->provider_funcs->get_property == NULL)
+         return TRUE;
+ 
+     /* Should be safe even w/o vtSema */
+-- 
+2.49.0
+

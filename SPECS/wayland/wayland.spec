@@ -1,12 +1,20 @@
 Summary:        Wayland Compositor Infrastructure
 Name:           wayland
 Version:        1.21.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://wayland.freedesktop.org/
 Source0:        https://gitlab.freedesktop.org/%{name}/%{name}/-/releases/%{version}/downloads/%{name}-%{version}.tar.xz
+Patch1:         CVE-2025-49175.patch
+Patch2:         CVE-2025-49176.patch
+Patch3:         CVE-2025-49177.patch
+Patch4:         CVE-2025-49178.patch
+Patch5:         CVE-2025-49179.patch
+Patch6:         CVE-2025-49180.patch
+Patch7:         0002-xfree86-Check-for-RandR-provider-functions.patch
+
 BuildRequires:  docbook-style-xsl
 BuildRequires:  doxygen
 BuildRequires:  expat-devel
@@ -113,6 +121,10 @@ Wayland server library
 %{_libdir}/libwayland-server.so.0*
 
 %changelog
+* Fri Jun 13 2025 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.21.0-2
+- Patch CVE-2025-49175, CVE-2025-49176, CVE-2025-49177, CVE-2025-49178,
+- CVE-2025-49179, CVE-2025-49180
+
 * Wed Oct 05 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.21.0-1
 - Upgrade to version 1.21.0 to fix CVE-2021-3782
 
