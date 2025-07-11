@@ -1,7 +1,7 @@
 Summary:        AsciiDoc is a human readable text document format
 Name:           asciidoc
 Version:        10.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 URL:            https://asciidoc.org/
 Group:          System Environment/Development
@@ -15,6 +15,7 @@ BuildRequires:  libxslt
 BuildRequires:  docbook-style-xsl
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  python3-pip
+BuildRequires:  python-wheel
 Requires:       python3
 Requires:       python3-xml
 Requires:       libxslt
@@ -66,6 +67,9 @@ python3 tests/testasciidoc.py run
 %dir %{python3_sitelib}/asciidoc/resources/filters/music
 
 %changelog
+*   Mon Jul 07 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 10.2.0-3
+-   Add BR on python-wheel to fix build
+
 *   Fri Feb 02 2024 Andrew Phelps <anphel@microsoft.com> - 10.2.0-2
 -   Fix path for egg-info
 
