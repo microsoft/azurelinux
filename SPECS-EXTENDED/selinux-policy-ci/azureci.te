@@ -1,0 +1,494 @@
+policy_module(azureci)
+
+gen_require(`
+    class dbus all_dbus_perms;
+    class nscd all_nscd_perms;
+    class passwd all_passwd_perms;
+    class service all_service_perms;
+    attribute boolean_type, filesystem_type, netif_type, node_type, packet_type, port_type;
+    attribute proc_type, sysctl_type;
+    type boot_t, container_ro_file_t, kernel_t, lib_t, modules_object_t, security_t, textrel_shlib_t, unlabeled_t, user_bin_t;
+    type memory_device_t, user_cert_t, user_home_t, user_tmpfs_t;
+')
+
+# Macro to define the list of negated types for write.  These are intended
+# to be executable or otherwise protected types (e.g grub.cfg, *.ko)
+define(`ci_write_negations',`-exec_type -lib_t -textrel_shlib_t -ld_so_t -boot_t -modules_object_t -container_ro_file_t')
+
+#######################################
+#
+# Declarations
+#
+
+attribute ci_unconfined_type;
+
+#######################################
+#
+# CI-unconfined user domain
+#
+role ci_unconfined_r;
+userdom_base_user_template(ci_unconfined)
+domain_obj_id_change_exemption(ci_unconfined_t)
+domain_dyntrans_type(ci_unconfined_t)
+domain_interactive_fd(ci_unconfined_t)
+typeattribute ci_unconfined_t ci_unconfined_type;
+type_member ci_unconfined_t user_home_dir_t:dir user_home_dir_t;
+
+allow ci_unconfined_t user_home_t:file entrypoint;
+filetrans_pattern(ci_unconfined_t, user_home_dir_t, user_home_t, { dir file lnk_file sock_file fifo_file })
+
+userdom_user_home_dir_filetrans(ci_unconfined_t, user_bin_t, dir, "bin")
+
+userdom_user_home_dir_filetrans(ci_unconfined_t, user_cert_t, dir, ".pki")
+
+files_poly_member_tmp(ci_unconfined_t, user_tmp_t)
+files_tmp_filetrans(ci_unconfined_t, user_tmp_t, { dir file lnk_file sock_file fifo_file })
+userdom_user_runtime_filetrans_user_tmp(ci_unconfined_t, { dir file lnk_file sock_file fifo_file })
+
+fs_tmpfs_filetrans(ci_unconfined_t, user_tmpfs_t, { dir file lnk_file sock_file fifo_file })
+
+init_dbus_chat(ci_unconfined_t)
+# for systemd-analyze
+init_service_status(ci_unconfined_t)
+# for systemd --user:
+init_linkable_keyring(ci_unconfined_t)
+init_pgm_spec_user_daemon_domain(ci_unconfined_t)
+allow ci_unconfined_t self:system { status start stop reload };
+
+# Temporary access for switching SELinux and IPE to permissive mode.
+allow ci_unconfined_t self:capability2 mac_admin;
+selinux_set_enforce_mode(ci_unconfined_t)
+
+# These is required until trident has its own policy
+storage_raw_write_fixed_disk(ci_unconfined_t)
+
+optional_policy(`
+	apache_run_helper(ci_unconfined_t, ci_unconfined_r)
+	apache_role(ci_unconfined, ci_unconfined_t, ci_unconfined_application_exec_domain, ci_unconfined_r)
+')
+
+optional_policy(`
+	bind_run_ndc(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	bluetooth_dbus_chat(ci_unconfined_t)
+')
+
+optional_policy(`
+	bootloader_run(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	container_unconfined_role(ci_unconfined, ci_unconfined_t, ci_unconfined_application_exec_domain, ci_unconfined_r)
+')
+
+optional_policy(`
+	cron_unconfined_role(ci_unconfined, ci_unconfined_t, ci_unconfined_application_exec_domain, ci_unconfined_r)
+')
+
+optional_policy(`
+	dpkg_nnp_domtrans(ci_unconfined_t)
+	dpkg_run(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	firstboot_run(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	ftp_run_ftpdctl(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	fstools_run(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	hadoop_role(ci_unconfined, ci_unconfined_t, ci_unconfined_application_exec_domain, ci_unconfined_r)
+')
+
+optional_policy(`
+	init_admin(ci_unconfined_t)
+')
+
+optional_policy(`
+	inn_domtrans(ci_unconfined_t)
+')
+
+optional_policy(`
+	java_run_unconfined(ci_unconfined_application_exec_domain, ci_unconfined_r)
+')
+
+optional_policy(`
+	lpd_run_checkpc(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	lvm_run(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	modemmanager_dbus_chat(ci_unconfined_t)
+')
+
+optional_policy(`
+	modutils_run(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	mono_run(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	mount_run(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	mta_role(ci_unconfined, ci_unconfined_t, ci_unconfined_application_exec_domain, ci_unconfined_r)
+')
+
+optional_policy(`
+	oddjob_domtrans_mkhomedir(ci_unconfined_t)
+')
+
+optional_policy(`
+	portage_run(ci_unconfined_t, ci_unconfined_r)
+	portage_run_fetch(ci_unconfined_t, ci_unconfined_r)
+	portage_run_gcc_config(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	prelink_run(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	portmap_run_helper(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	postfix_run_map(ci_unconfined_t, ci_unconfined_r)
+	# cjp: this should probably be removed:
+	postfix_domtrans_master(ci_unconfined_t)
+')
+
+optional_policy(`
+	pyzor_role(ci_unconfined, ci_unconfined_t, ci_unconfined_application_exec_domain, ci_unconfined_r)
+')
+
+optional_policy(`
+	# cjp: this should probably be removed:
+	rpc_domtrans_nfsd(ci_unconfined_t)
+')
+
+optional_policy(`
+	rtkit_scheduled(ci_unconfined_t)
+')
+
+optional_policy(`
+	rpm_run(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	samba_run_net(ci_unconfined_t, ci_unconfined_r)
+	samba_run_winbind_helper(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	spamassassin_role(ci_unconfined, ci_unconfined_t, ci_unconfined_application_exec_domain, ci_unconfined_r)
+')
+
+optional_policy(`
+	syncthing_role(ci_unconfined, ci_unconfined_t, ci_unconfined_application_exec_domain, ci_unconfined_r)
+')
+
+optional_policy(`
+	sysnet_run_dhcpc(ci_unconfined_t, ci_unconfined_r)
+	sysnet_dbus_chat_dhcpc(ci_unconfined_t)
+')
+
+optional_policy(`
+    systemd_dbus_chat_logind(ci_unconfined_t)
+    systemd_dbus_chat_resolved(ci_unconfined_t)
+    systemd_filetrans_passwd_runtime_dirs(ci_unconfined_t)
+')
+
+optional_policy(`
+	tzdata_run(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	usermanage_run_admin_passwd(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	vpn_run(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	webalizer_run(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+	wine_run(ci_unconfined_t, ci_unconfined_r)
+')
+
+optional_policy(`
+    xdg_data_filetrans(ci_unconfined_t, user_bin_t, dir, "bin")
+')
+
+optional_policy(`
+	xserver_role(ci_unconfined, ci_unconfined_t, ci_unconfined_application_exec_domain, ci_unconfined_r)
+	xserver_dbus_chat_xdm(ci_unconfined_t)
+')
+
+#######################################
+#
+# Apply CI-unconfined to previously full-unconfined domains
+#
+gen_require(`
+    type kernel_t, init_t, initrc_t, mount_t;
+')
+typeattribute kernel_t ci_unconfined_type;
+typeattribute init_t ci_unconfined_type;
+typeattribute initrc_t ci_unconfined_type;
+# for overlays:
+typeattribute mount_t ci_unconfined_type;
+
+#######################################
+#
+# Replacement rules for cloudinit_manage_non_security boolean
+#
+optional_policy(`
+    gen_require(`
+        attribute non_security_file_type;
+        type cloud_init_t;
+    ')
+
+    tunable_policy(`cloudinit_manage_non_security',`
+        allow cloud_init_t { non_security_file_type ci_write_negations }:file manage_file_perms;
+        allow cloud_init_t boot_t:file mmap_read_file_perms;
+        allow cloud_init_t non_security_file_type:lnk_file manage_lnk_file_perms;
+        allow cloud_init_t non_security_file_type:dir manage_dir_perms;
+    ')
+')
+
+#######################################
+#
+# Replacement rules for removed init rules
+#
+gen_require(`
+    attribute init_mountpoint_type;
+    type init_t;
+')
+
+allow init_t { init_mountpoint_type ci_write_negations }:file { getattr mounton };
+
+tunable_policy(`init_create_mountpoints',`
+    allow init_t init_mountpoint_type:dir { add_entry_dir_perms create_dir_perms };
+    allow init_t init_mountpoint_type:fifo_file create_fifo_file_perms;
+    allow init_t init_mountpoint_type:sock_file create_sock_file_perms;
+    allow init_t init_mountpoint_type:lnk_file create_lnk_file_perms;
+
+    allow init_t { init_mountpoint_type ci_write_negations -proc_type }:file { create_file_perms write_file_perms };
+')
+
+tunable_policy(`init_create_mountpoints && init_mounton_non_security',`
+    files_create_non_security_dirs(init_t)
+	allow init_t { non_security_file_type ci_write_negations }:file { create_file_perms write_file_perms };
+')
+
+tunable_policy(`init_mounton_non_security',`
+	allow init_t { non_security_file_type ci_write_negations }:dir { mounton_dir_perms search };
+	allow init_t { non_security_file_type ci_write_negations }:file mounton_file_perms;
+')
+
+#######################################
+#
+# Replacement rules for removed mount rules
+#
+gen_require(`
+    attribute mountpoint;
+    type mount_t;
+')
+allow mount_t { mountpoint ci_write_negations }:file { getattr mounton };
+
+tunable_policy(`allow_mount_anyfile',`
+    allow mount_t { non_security_file_type ci_write_negations }:file { getattr mounton };
+')
+
+#######################################
+#
+# Replacement rules for systemd_tmpfiles_manage_all boolean
+#
+gen_require(`
+    type systemd_tmpfiles_t;
+')
+
+tunable_policy(`systemd_tmpfiles_manage_all',`
+    gen_require(`
+        attribute non_security_file_type;
+    ')
+
+    # systemd-tmpfiles can be configured to manage anything.
+    # have a last-resort option for users to do this.
+    files_manage_non_security_dirs(systemd_tmpfiles_t)
+    files_relabel_non_security_dirs(systemd_tmpfiles_t)
+    allow systemd_tmpfiles_t non_security_file_type:file read_file_perms;
+    allow systemd_tmpfiles_t { non_security_file_type ci_write_negations }:file { manage_file_perms relabel_file_perms };
+')
+
+#######################################
+#
+# Unconfined domains with CI limits
+#
+
+gen_require(`
+    type kmsg_device_t;
+')
+
+# Use most Linux capabilities
+allow ci_unconfined_type self:{ capability cap_userns } { chown dac_override dac_read_search fowner fsetid kill setgid setuid setpcap linux_immutable net_bind_service net_broadcast net_admin net_raw ipc_lock ipc_owner sys_rawio sys_chroot sys_ptrace sys_pacct sys_admin sys_boot sys_nice sys_resource sys_time sys_tty_config mknod lease audit_write audit_control setfcap };
+allow ci_unconfined_type self:{ capability2 cap2_userns } { syslog wake_alarm bpf perfmon checkpoint_restore };
+allow ci_unconfined_type self:fifo_file manage_fifo_file_perms;
+
+# Manage most namespace capabilities
+allow ci_unconfined_type self:cap_userns { audit_write chown dac_override dac_read_search fowner fsetid ipc_lock ipc_owner kill lease linux_immutable mknod net_admin net_bind_service net_raw setfcap setgid setpcap setuid sys_admin sys_boot sys_chroot sys_nice sys_pacct sys_ptrace sys_rawio sys_resource sys_time sys_tty_config };
+allow ci_unconfined_type self:cap2_userns { audit_read bpf block_suspend mac_admin mac_override perfmon syslog wake_alarm };
+#allow ci_unconfined_type self:user_namespace create;
+
+# Transition to myself, to make get_ordered_context_list happy.
+allow ci_unconfined_type self:process transition;
+
+# Write access is for setting attributes under /proc/self/attr.
+allow ci_unconfined_type self:file manage_file_perms;
+
+# Userspace object managers
+allow ci_unconfined_type self:nscd { getpwd getgrp gethost getstat admin shmempwd shmemgrp shmemhost getserv shmemserv };
+allow ci_unconfined_type self:passwd { passwd chfn chsh rootok crontab };
+allow ci_unconfined_type self:association { sendto recvfrom setcontext polmatch };
+
+allow ci_unconfined_type boolean_type:file read_file_perms;
+
+corenet_ib_access_all_pkeys(ci_unconfined_type)
+corenet_ib_manage_subnet_all_endports(ci_unconfined_type)
+corenet_ib_access_unlabeled_pkeys(ci_unconfined_type)
+corenet_ib_manage_subnet_unlabeled_endports(ci_unconfined_type)
+
+allow ci_unconfined_type device_node:blk_file { getattr setattr map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type device_node:chr_file { getattr setattr map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type { device_node -memory_device_t }:chr_file manage_chr_file_perms;
+
+# unconfined access to bpf
+allow ci_unconfined_type domain:bpf { map_create map_read map_write prog_load prog_run };
+
+# Use/sendto/connectto sockets created by any domain.
+allow ci_unconfined_type domain:{ socket_class_set socket key_socket } { create_stream_socket_perms lock name_bind map sendto recvfrom };
+allow ci_unconfined_type domain:rawip_socket node_bind;
+allow ci_unconfined_type domain:sctp_socket node_bind;
+allow ci_unconfined_type domain:icmp_socket node_bind;
+allow ci_unconfined_type domain:udp_socket node_bind;
+allow ci_unconfined_type domain:tcp_socket { node_bind name_connect };
+allow ci_unconfined_type domain:tun_socket attach_queue;
+allow ci_unconfined_type domain:unix_stream_socket connectto;
+allow ci_unconfined_type domain:netlink_audit_socket { nlmsg_write nlmsg_relay nlmsg_readpriv nlmsg_read nlmsg_tty_audit };
+allow ci_unconfined_type domain:netlink_route_socket { nlmsg_write nlmsg_read };
+allow ci_unconfined_type domain:netlink_tcpdiag_socket { nlmsg_write nlmsg_read };
+allow ci_unconfined_type domain:netlink_xfrm_socket { nlmsg_write nlmsg_read };
+
+# Use descriptors and pipes created by any domain.
+allow ci_unconfined_type domain:fd use;
+allow ci_unconfined_type domain:fifo_file rw_fifo_file_perms;
+
+# Act upon any other process.
+allow ci_unconfined_type domain:process { fork signal_perms ptrace getsched setsched getsession getpgid setpgid getcap setcap share getattr setexec setfscreate noatsecure siginh setrlimit rlimitinh setcurrent setkeycreate setsockcreate getrlimit transition };
+
+# Create/access any System V IPC objects.
+allow ci_unconfined_type domain:sem create_sem_perms;
+allow ci_unconfined_type domain:msgq create_msgq_perms;
+allow ci_unconfined_type domain:shm create_shm_perms;
+allow ci_unconfined_type domain:msg { send receive };
+
+# For /proc/pid
+allow ci_unconfined_type domain:dir list_dir_perms;
+allow ci_unconfined_type domain:file rw_file_perms;
+allow ci_unconfined_type domain:lnk_file { read_lnk_file_perms ioctl lock };
+
+# act on all domains keys
+allow ci_unconfined_type domain:key manage_key_perms;
+
+# dbus
+allow ci_unconfined_type domain:dbus { acquire_svc send_msg };
+
+allow ci_unconfined_type { file_type ci_write_negations }:file { manage_file_perms map mounton watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type { exec_type lib_t textrel_shlib_t }:file { exec_file_perms watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type boot_t:file { mmap_read_file_perms watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type file_type:lnk_file  { manage_lnk_file_perms append map open watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type file_type:sock_file { manage_sock_file_perms map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type file_type:fifo_file { manage_fifo_file_perms map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type file_type:blk_file { manage_blk_file_perms map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type file_type:chr_file { manage_chr_file_perms map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type file_type:dir { manage_dir_perms mounton append map add_name remove_name reparent search rmdir watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type file_type:filesystem { getattr associate quotamod quotaget watch };
+# systemd units
+allow ci_unconfined_type file_type:service { status start stop enable disable reload };
+# due to Python __pycache__ creation
+libs_dontaudit_manage_lib_dirs(ci_unconfined_type)
+libs_dontaudit_manage_lib_files(ci_unconfined_type)
+
+allow ci_unconfined_type filesystem_type:file { manage_file_perms map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type filesystem_type:lnk_file  { manage_lnk_file_perms append map open watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type filesystem_type:sock_file { manage_sock_file_perms map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type filesystem_type:fifo_file { manage_fifo_file_perms map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type filesystem_type:blk_file { manage_blk_file_perms map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type filesystem_type:chr_file { manage_chr_file_perms map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type filesystem_type:dir { manage_dir_perms append map add_name remove_name reparent search rmdir watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type filesystem_type:filesystem { getattr associate quotamod quotaget watch mount unmount remount };
+
+allow ci_unconfined_type init_t:system { halt reboot status start stop enable disable reload };
+
+allow ci_unconfined_type kernel_t:system { ipc_info syslog_read syslog_mod syslog_console module_request module_load halt reboot status start stop enable disable reload };
+
+allow ci_unconfined_type kmsg_device_t:chr_file rw_chr_file_perms;
+
+allow ci_unconfined_type netif_type:netif { ingress egress };
+
+allow ci_unconfined_type node_type:node { recvfrom sendto };
+allow ci_unconfined_type node_type:{ tcp_socket udp_socket rawip_socket sctp_socket } node_bind;
+
+allow ci_unconfined_type packet_type:packet { send recv relabelto forward_in forward_out };
+
+allow ci_unconfined_type port_type:{ tcp_socket udp_socket rawip_socket sctp_socket } name_bind;
+allow ci_unconfined_type port_type:{ tcp_socket sctp_socket } name_connect;
+
+allow ci_unconfined_type proc_type:dir { manage_dir_perms append map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type proc_type:lnk_file { manage_lnk_file_perms append map open watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type proc_type:file { manage_file_perms watch watch_mount watch_reads watch_sb watch_with_perm };
+
+allow ci_unconfined_type security_t:dir list_dir_perms;
+allow ci_unconfined_type security_t:file read_file_perms;
+allow ci_unconfined_type security_t:security { compute_av compute_create compute_member check_context compute_relabel compute_user read_policy validate_trans };
+
+allow ci_unconfined_type sysctl_type:dir { manage_dir_perms append map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type sysctl_type:file { manage_file_perms watch watch_mount watch_reads watch_sb watch_with_perm };
+
+allow ci_unconfined_type unlabeled_t:file { manage_file_perms map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type unlabeled_t:lnk_file  { manage_lnk_file_perms append map open watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type unlabeled_t:sock_file { manage_sock_file_perms map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type unlabeled_t:fifo_file { manage_fifo_file_perms map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type unlabeled_t:blk_file { getattr setattr map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type unlabeled_t:chr_file { getattr setattr map watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type unlabeled_t:dir { manage_dir_perms append map add_name remove_name reparent search rmdir watch watch_mount watch_reads watch_sb watch_with_perm };
+allow ci_unconfined_type unlabeled_t:filesystem { getattr quotamod quotaget watch };
+allow ci_unconfined_type unlabeled_t:association { sendto recvfrom setcontext polmatch };
+allow ci_unconfined_type unlabeled_t:packet { send recv forward_in forward_out };
+allow ci_unconfined_type unlabeled_t:process { fork signal_perms ptrace getsched setsched getsession getpgid setpgid getcap setcap share getattr setexec setfscreate noatsecure siginh setrlimit rlimitinh setcurrent setkeycreate setsockcreate getrlimit };
+
+optional_policy(`
+    ipsec_setcontext_default_spd(ci_unconfined_type)
+    ipsec_match_default_spd(ci_unconfined_type)
+')
+
+gen_user(ci_unconfined_u, ci_unconfined, ci_unconfined_r, s0, s0 - mls_systemhigh, mcs_allcats)
+
+undefine(`ci_write_negations')
