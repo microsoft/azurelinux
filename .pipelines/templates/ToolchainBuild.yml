@@ -41,7 +41,7 @@ steps:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
   - bash: |
-      if [[ -n ${{ parameters.dailyBuildID }} ]]; then
+      if [[ -n "${{ parameters.dailyBuildID }}" ]]; then
         daily_build_id_arg="DAILY_BUILD_ID=${{ parameters.dailyBuildID }}"
       fi
 
