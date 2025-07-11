@@ -1,7 +1,7 @@
 Summary:        Unzip-6.0
 Name:           unzip
 Version:        6.0
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,6 +24,7 @@ Patch12:        unzip-zipbomb-manpage.patch
 Patch13:        CVE-2015-7697.patch
 Patch14:        CVE-2018-1000035.patch
 Patch15:	CVE-2022-0529.patch
+Patch16:        CVE-2021-4217.patch
 
 %description
 The UnZip package contains ZIP extraction utilities. These are useful
@@ -58,6 +59,9 @@ ln -sf unzip %{buildroot}%{_bindir}/zipinfo
 %{_bindir}/*
 
 %changelog
+* Tue Mar 25 2025 Archana Shettigar <v-shettigara@microsoft.com> - 6.0.22
+- Fix CVE-2021-4217 with an upstream patch
+
 * Mon Nov 25 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 6.0-21
 - Fix CVE-2022-0529 and CVE-2022-0530
 

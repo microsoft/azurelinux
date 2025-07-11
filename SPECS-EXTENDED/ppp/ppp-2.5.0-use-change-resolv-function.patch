@@ -1,0 +1,51 @@
+diff --git a/scripts/ip-down.local.add b/scripts/ip-down.local.add
+index b93590e..8889cb6 100644
+--- a/scripts/ip-down.local.add
++++ b/scripts/ip-down.local.add
+@@ -9,12 +9,13 @@
+ #
+ # Nick Walker (nickwalker@email.com)
+ #
++. /etc/sysconfig/network-scripts/network-functions
+ 
+ if [ -n "$USEPEERDNS" -a -f /etc/ppp/resolv.conf ]; then
+ 	if [ -f /etc/ppp/resolv.prev ]; then
+-		cp -f /etc/ppp/resolv.prev /etc/resolv.conf
++		change_resolv_conf /etc/ppp/resolv.prev
+ 	else
+-		rm -f /etc/resolv.conf
++		change_resolv_conf
+ 	fi
+ fi
+ 
+diff --git a/scripts/ip-up.local.add b/scripts/ip-up.local.add
+index 8017209..5ced496 100644
+--- a/scripts/ip-up.local.add
++++ b/scripts/ip-up.local.add
+@@ -9,16 +9,22 @@
+ #
+ # Nick Walker (nickwalker@email.com)
+ #
++. /etc/sysconfig/network-scripts/network-functions
+ 
+ if [ -n "$USEPEERDNS" -a -f /etc/ppp/resolv.conf ]; then
+ 	rm -f /etc/ppp/resolv.prev
+ 	if [ -f /etc/resolv.conf ]; then
+ 		cp /etc/resolv.conf /etc/ppp/resolv.prev
+-		grep domain /etc/ppp/resolv.prev > /etc/resolv.conf
+-		grep search /etc/ppp/resolv.prev >> /etc/resolv.conf
+-		cat /etc/ppp/resolv.conf >> /etc/resolv.conf
++		rscf=/etc/ppp/resolv.new
++		grep domain /etc/ppp/resolv.prev > $rscf
++		grep search /etc/ppp/resolv.prev >> $rscf
++		if [ -f /etc/ppp/resolv.conf ]; then
++			cat /etc/ppp/resolv.conf >> $rscf
++		fi
++		change_resolv_conf $rscf
++		rm -f $rscf
+ 	else
+-		cp /etc/ppp/resolv.conf /etc
++		change_resolv_conf /etc/ppp/resolv.conf
+ 	fi
+ fi
+ 

@@ -1,0 +1,273 @@
+From 1bf06687ff8b0db8b3ac38b0206eea8a7b6f4632 Mon Sep 17 00:00:00 2001
+From: Xin Long <lucien.xin@gmail.com>
+Date: Mon, 27 Feb 2023 17:37:19 -0500
+Subject: [PATCH 4/6] man: improve the description in SOCKET OPTIONS in sctp.7
+
+SCTP_{FUTURE|CURRENT|ALL}_ASSOC have been introduced for some options to
+make set/get more effectively, we should mention it in the description
+of these options. Also, it's better to give users more information like:
+the structure it uses as parameter, the default value, the dependence on
+other options if any, write or read permissions etc.
+
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ man/sctp.7 | 186 +++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 123 insertions(+), 63 deletions(-)
+
+diff --git a/man/sctp.7 b/man/sctp.7
+index 730e1a8..7756dda 100644
+--- a/man/sctp.7
++++ b/man/sctp.7
+@@ -251,95 +251,148 @@ to read or
+ .BR setsockopt (2)
+ to write the option with the option level argument set to 
+ .BR SOL_SCTP.
++Note that all these macros and structures described for parameters are defined
++in /usr/include/netinet/sctp.h, and for one-to-one style sockets a specified
++assoc_id works the same as SCTP_FUTURE_ASSOC.
+ .TP
+ .BR SCTP_RTOINFO.
+ This option is used to get or set the protocol parameters used to
+-initialize and bound retransmission timeout(RTO). The structure sctp_rtoinfo
+-defined in /usr/include/netinet/sctp.h is used to access and modify these
+-parameters.
++initialize and bound retransmission timeout(RTO).
++
++The parameter type is struct sctp_rtoinfo, for reading and writing.
++srto_assoc_id is a specified assoc_id or SCTP_FUTURE_ASSOC.
++
++Default: srto_max=sysctl_net.sctp.rto_max, srto_min=sysctl_net.sctp.rto_min,
++srto_initial=sysctl_net.sctp.rto_initial.
+ .TP
+ .B SCTP_ASSOCINFO
+ This option is used to both examine and set various association and endpoint
+-parameters. The structure sctp_assocparams defined in
+-/usr/include/netinet/sctp.h is used to access and modify these parameters.
++parameters.
++
++The parameter type is struct sctp_assocparams, for reading and writing.
++sasoc_assoc_id is a specified assoc_id or SCTP_FUTURE_ASSOC. Note that
++some fields of this structure are for reading only:
++
++  struct sctp_assocparams {
++          sctp_assoc_t    sasoc_assoc_id;
++          __u16           sasoc_asocmaxrxt; (RW)
++          __u16           sasoc_number_peer_destinations; (R)
++          __u32           sasoc_peer_rwnd; (R)
++          __u32           sasoc_local_rwnd; (R)
++          __u32           sasoc_cookie_life; (RW)
++  };
++
++Default: sasoc_asocmaxrxt=sysctl_net.sctp.association_max_retrans,
++sasoc_cookie_life=sysctl_net.sctp.valid_cookie_life.
+ .TP
+ .B SCTP_INITMSG
+ This option is used to get or set the protocol parameters for the default
+-association initialization. The structure sctp_initmsg defined in
+-/usr/include/netinet/sctp.h is used to access and modify these parameters. 
++association initialization.
++
++The parameter type is struct sctp_initmsg, for reading and writing.
+ 
+-Setting initialization parameters is effective only on an unconnected
+-socket (for one-to-many style sockets only future associations are
+-effected by the change). With one-to-one style sockets, this option
+-is inherited by sockets derived from a listener socket.
++Default: sinit_num_ostreams=10, sinit_max_instreams=10,
++sinit_max_attempts=sysctl_net.sctp.max_init_retransmits,
++sinit_max_init_timeo=sysctl_net.sctp.rto_max.
+ .TP
+ .B SCTP_NODELAY
+ Turn on/off any Nagle-like algorithm. This means that packets are generally
+-sent as soon as possible and no unnecessary delays are introduced, at the cost 
+-of more packets in the network.  Expects an integer boolean flag.
++sent as soon as possible and no unnecessary delays are introduced, at the
++cost of more packets in the network.
++
++The parameter type is int boolean, for reading and writing.
++
++Default: 0.
+ .TP
+ .B SCTP_AUTOCLOSE
+-This socket option is applicable to the one-to-many style socket
+-only. When set it will cause associations that are idle for more than
+-the specified number of seconds to automatically close. An
+-association being idle is defined an association that has NOT sent or
+-received user data. The special value of 0 indicates that no
+-automatic close of any associations should be performed. The option
+-expects an integer defining the number of seconds of idle time before
+-an association is closed.
++This socket option is applicable to the one-to-many style socket only.
++When set it will cause associations that are idle for more than the
++specified number of seconds to automatically close. An association
++being idle is defined an association that has NOT sent or received
++user data within a period.
++
++The parameter type is int(seconds), for reading and writing. 0 indicates
++that no automatic close of any associations should be performed.
++
++Default: sysctl_net.sctp.max_autoclose.
+ .TP
+ .B SCTP_SET_PEER_PRIMARY_ADDR
+ Requests that the peer mark the enclosed address as the association
+ primary. The enclosed address must be one of the association's
+-locally bound addresses. The structure sctp_setpeerprim defined in
+-/usr/include/netinet/sctp.h is used to make a set peer primary request.
++locally bound addresses.
++
++The parameter type is struct sctp_setpeerprim, for writing only.
++sspp_assoc_id is a specified assoc_id.
++
++Default: the 1st local address added.
++Require: SCTP_ASCONF_SUPPORTED.
+ .TP
+ .B SCTP_PRIMARY_ADDR
+ Requests that the local SCTP stack use the enclosed peer address as
+ the association primary. The enclosed address must be one of the
+-association peer's addresses. The structure sctp_prim defined in
+-/usr/include/netinet/sctp.h is used to make a get/set primary request.
++association peer's addresses.
++
++The parameter type is struct sctp_prim, for writing only. ssp_assoc_id
++is a specified assoc_id.
++
++Default: the 1st peer address added.
++Require: SCTP_ASCONF_SUPPORTED.
+ .TP
+ .B SCTP_DISABLE_FRAGMENTS
+-This option is a on/off flag and is passed an integer where a non-zero is on 
+-and a zero is off. If enabled no SCTP message fragmentation will be performed.
+-Instead if a message being sent exceeds the current PMTU size, the message will 
+-NOT be sent and an error will be indicated to the user.
++If enabled no SCTP message fragmentation will be performed. Instead if a
++message being sent exceeds the current PMTU size, the message will NOT
++be sent and an error will be indicated to the user.
++
++The parameter type is int boolean, for reading and writing.
++
++Default: 0.
+ .TP
+ .B SCTP_PEER_ADDR_PARAMS
+ Using this option, applications can enable or disable heartbeats for any peer
+ address of an association, modify an address's heartbeat interval, force a
+ heartbeat to be sent immediately, and adjust the address's maximum number of
+-retransmissions sent before an address is considered unreachable. The structure 
+-sctp_paddrparams defined in /usr/include/netinet/sctp.h is used to
+-access and modify an address's parameters.
++retransmissions sent before an address is considered unreachable.
++
++The parameter type is struct sctp_paddrparams, for reading and writing.
++spp_address is a specified transport address or 0, spp_assoc_id is
++a specified assoc_id or SCTP_FUTURE_ASSOC.
++
++Default: hbinterval=sysctl_net.sctp.hb_interval,
++pathmaxrxt=sysctl_net.sctp.path_max_retrans,
++pathmtu=dev/route's, sackdelay=sysctl_net.sctp.sack_timeout,
++param_flags=HB_ENABLE|PMTUD_ENABLE|SACKDELAY_ENABLE, flowlabel=0, dscp=0.
+ .TP
+ .B SCTP_DEFAULT_SEND_PARAM
+ Applications that wish to use the sendto() system call may wish to specify
+ a default set of parameters that would normally be supplied through the
+-inclusion of ancillary data. This socket option allows such an application to
+-set the default sctp_sndrcvinfo structure. The application that wishes to use
+-this socket option simply passes in to this call the sctp_sndrcvinfo structure
+-defined in /usr/include/netinet/sctp.h. The input parameters accepted by this
+-call include sinfo_stream, sinfo_flags, sinfo_ppid, sinfo_context,
+-sinfo_timetolive. The user must set the sinfo_assoc_id field to identify the
+-association to affect if the caller is using the one-to-many style.
++inclusion of ancillary data. This option has been obsoleted by
++SCTP_DEFAULT_SNDINFO.
++
++The parameter type is struct sctp_sndrcvinfo. For reading, sinfo_assoc_id is
++a specified assoc_id or SCTP_FUTURE_ASSOC. For writing, sinfo_assoc_id is a
++specified assoc_id or SCTP_{FUTURE|CURRENT|ALL}_ASSOC.
++
++Default: default_stream=0, default_flags=0, default_ppid=0, default_context=0,
++default_timetolive=0.
+ .TP
+ .B SCTP_EVENTS
+ This socket option is used to specify various notifications and ancillary data
+-the user wishes to receive. The structure sctp_event_subscribe defined in
+-/usr/include/netinet/sctp.h is used to access or modify the events of interest
+-to the user.
++the user wishes to receive. This option has been obsoleted by SCTP_EVENT.
++
++The parameter type is struct sctp_event_subscribe, for reading and writing.
++
++Default: 0.
+ .TP
+ .B SCTP_I_WANT_MAPPED_V4_ADDR
+-This socket option is a boolean flag which turns on or off mapped V4
+-addresses. If this option is turned on and the socket is type PF_INET6,
+-then IPv4 addresses will be mapped to V6 representation. If this option is
+-turned off, then no mapping will be done of V4 addresses and a user will
+-receive both PF_INET6 and PF_INET type addresses on the socket.
++This socket option is used to turn on or off mapped V4 addresses. If this
++option is turned on and the socket is type PF_INET6, then IPv4 addresses
++will be mapped to V6 representation. If this option is turned off, then
++no mapping will be done of V4 addresses and a user will receive both
++PF_INET6 and PF_INET type addresses on the socket.
+ 
+-By default this option is turned on and expects an integer to be passed where
+-non-zero turns on the option and zero turns off the option.
++The parameter type is int boolean, for reading and writing.
++
++Default: 1.
+ .TP
+ .B SCTP_MAXSEG
+ This socket option specifies the maximum size to put in any outgoing
+@@ -347,30 +400,37 @@ SCTP DATA chunk. If a message is larger than this size it will be
+ fragmented by SCTP into the specified size. Note that the underlying
+ SCTP implementation may fragment into smaller sized chunks when the
+ PMTU of the underlying association is smaller than the value set by
+-the user. The option expects an integer.
++the user. 0 indicates the user is NOT limiting fragmentation and only
++the PMTU will effect SCTP's choice of DATA chunk size.
++
++The parameter type is struct sctp_assoc_value, for reading and writing.
++assoc_id is a specified assoc_id or SCTP_FUTURE_ASSOC.
+ 
+-The default value for this option is 0 which indicates the user is
+-NOT limiting fragmentation and only the PMTU will effect SCTP's
+-choice of DATA chunk size.
++Default: 0(no limit).
+ .TP
+ .B SCTP_STATUS
+ Applications can retrieve current status information about an association,
+ including association state, peer receiver window size, number of unacked
+-data chunks, and number of data chunks pending receipt.  This information is
+-read-only.  The structure sctp_status defined in /usr/include/netinet/sctp.h
+-is used to access this information.
++data chunks, and number of data chunks pending receipt.
++
++The parameter type is struct sctp_status, for reading only. sstat_assoc_id
++is a specified assoc_id.
+ .TP
+ .B SCTP_GET_PEER_ADDR_INFO
+-Applications can retrieve information about a specific peer address
+-of an association, including its reachability state, congestion window,
+-and retransmission timer values.  This information is read-only. The structure
+-sctp_paddrinfo defined in /usr/include/netinet/sctp.h is used to access this
+-information.
++Applications can retrieve information about a specific peer address of
++an association, including its reachability state, congestion window,
++and retransmission timer values.
++
++The parameter type is struct sctp_paddrinfo, for reading only. spinfo_address
++is a specified transport address, sas_assoc_id is a specified assoc_id
++or SCTP_FUTURE_ASSOC.
+ .TP
+ .B SCTP_GET_ASSOC_STATS
+ Applications can retrieve current statistics about an association, including
+-SACKs sent and received, SCTP packets sent and received. The complete list can
+-be found in /usr/include/netinet/sctp.h in struct sctp_assoc_stats.
++SACKs sent and received, SCTP packets sent and received.
++
++The parameter type is struct sctp_assoc_stats, for reading only.
++sas_assoc_id is a specified assoc_id.
+ .SH AUTHORS
+ Sridhar Samudrala <sri@us.ibm.com>
+ .SH "SEE ALSO"
+-- 
+2.39.1
+

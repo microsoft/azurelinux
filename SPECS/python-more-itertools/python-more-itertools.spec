@@ -6,7 +6,7 @@ Python iterables.}
 Summary:        More routines for operating on Python iterables, beyond itertools
 Name:           python-more-itertools
 Version:        10.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,9 @@ BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 BuildArch:      noarch
+%if 0%{?with_check}
+BuildRequires:  python3-pytest
+%endif
 
 %description %{_description}
 
@@ -36,14 +39,16 @@ Summary:        %{summary}
 %pyproject_save_files more_itertools
 
 %check
-pip3 install tox
-tox -e py%{python3_version_nodots}
+%pytest
 
 %files -n python3-more-itertools -f %{pyproject_files}
 %doc README.rst
 %license LICENSE
 
 %changelog
+* Tue Apr 29 2025 Riken Maharjan <rmaharjan@microsoft.com> - 10.2.0-2
+- Switch to pytest from tox to fix the pytest
+
 * Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.2.0-1
 - Auto-upgrade to 10.2.0 - 3.0 package upgrade
 

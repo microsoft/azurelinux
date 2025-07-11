@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.62.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,6 +21,7 @@ Patch5:         CVE-2024-53859.patch
 Patch6:         CVE-2025-25204.patch
 Patch7:         CVE-2025-27144.patch
 Patch8:         CVE-2025-22869.patch
+Patch9:         CVE-2025-22872.patch
 
 BuildRequires:  golang < 1.23
 BuildRequires:  git
@@ -63,6 +64,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Tue Apr 22 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.62.0-8
+- Patch CVE-2025-22872
+
 * Fri Feb 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.62.0-7
 - Fix CVE-2025-27144, CVE-2025-22869 with an upstream patch
 

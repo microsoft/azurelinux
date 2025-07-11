@@ -1,0 +1,22 @@
+From 0a9ee3b58517a961a9b2d313fab4513b3e4909a1 Mon Sep 17 00:00:00 2001
+From: Vitaly Zaitsev <vitaly@easycoding.org>
+Date: Thu, 16 Mar 2023 08:57:09 +0100
+Subject: [PATCH] Fixed version number in exported CMake configs.
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ddab64e..7152b41 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
+ project(tl-expected
+   HOMEPAGE_URL https://tl.tartanllama.xyz
+   DESCRIPTION "C++11/14/17 std::expected with functional-style extensions"
+-  VERSION 1.0.0
++  VERSION 1.1.0
+   LANGUAGES CXX)
+ 
+ include(CMakePackageConfigHelpers)

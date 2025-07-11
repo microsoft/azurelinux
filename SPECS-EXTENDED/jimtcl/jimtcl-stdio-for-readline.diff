@@ -1,0 +1,27 @@
+From 35e0e1f9b1f018666e5170a35366c5fc3b97309c Mon Sep 17 00:00:00 2001
+From: Steve Bennett <steveb@workware.net.au>
+Date: Thu, 29 Aug 2024 08:25:11 +1000
+Subject: [PATCH] readline: work around buggy readline.h
+
+Some versions don't included needed stdio.h
+
+Fixes: #308
+
+Signed-off-by: Steve Bennett <steveb@workware.net.au>
+---
+ jim-readline.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/jim-readline.c b/jim-readline.c
+index 5715b2c9..c83e649b 100644
+--- a/jim-readline.c
++++ b/jim-readline.c
+@@ -34,6 +34,8 @@
+ 
+ #include <jim.h>
+ 
++#include <stdio.h>
++
+ #include <readline/readline.h>
+ #include <readline/history.h>
+ 

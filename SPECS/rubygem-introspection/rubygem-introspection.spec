@@ -2,7 +2,7 @@
 Summary:        Dynamic inspection of the hierarchy of method definitions on a Ruby object
 Name:           rubygem-%{gem_name}
 Version:        0.0.4
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,12 +50,16 @@ cp Rakefile %{buildroot}%{gem_instdir}/
 cp Gemfile %{buildroot}%{gem_instdir}/
 
 %check
-pushd .%{gem_instdir}
 # Disable Bundler.
-sed -i '/bundler\/setup/ d' test/test_helper.rb
-
+# Drop BlankSlate test case. There should be no need for BlankSlate, when
+# there is BasicObject available for years.
+# https://github.com/floehopper/introspection/issues/11
+sed -i -e '/require.*blankslate/ s/^/#/' \
+  -e '/def test_should_cope_with_blankslate_object$/a\\    skip' \
+  test/snapshot_test.rb
+  
+sed -i '/require "bundler\/setup"/ d' test/test_helper.rb
 ruby -Ilib:test -e 'Dir.glob "./test/**/*_test.rb", &method(:require)'
-popd
 
 %files
 %license %{gem_instdir}/COPYING.txt
@@ -73,6 +77,9 @@ popd
 %doc %{gem_docdir}
 
 %changelog
+* Wed May 21 2025 Riken Maharjan <rmaharjan@microsoft.com> - 0.0.4-14
+- Fix ptest by not using bundler and skiping a known failing test case using Fedora 42 (License: MIT) 
+
 * Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.0.4-13
 - Build from .tar.gz source.
 

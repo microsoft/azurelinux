@@ -1,13 +1,14 @@
 Summary:        Networking Tools
 Name:           net-tools
 Version:        2.10
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://sourceforge.net/projects/net-tools/
 Source0:        https://downloads.sourceforge.net/project/%{name}/%{name}-%{version}.tar.xz
+Patch0:         CVE-2025-46836.patch
 Conflicts:      toybox
 Obsoletes:      inetutils
 Provides:       hostname = %{version}-%{release}
@@ -47,6 +48,9 @@ make BASEDIR=%{buildroot} install
 %{_mandir}/man8/*
 
 %changelog
+* Mon May 19 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.10-4
+- Fixes CVE-2025-46836 with an upstream patch
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.10-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

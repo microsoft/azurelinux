@@ -6,7 +6,7 @@
 Summary:        Sphinx extension for QtHelp documents
 Name:           python-%{pypi_name}
 Version:        1.0.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -73,7 +73,7 @@ popd
 %find_lang sphinxcontrib.qthelp
 
 %check
-pip3 install sphinx exceptiongroup iniconfig tomli
+pip3 install sphinx==7.2.6 exceptiongroup iniconfig tomli
 %pytest
 
 %files -n python%{python3_pkgversion}-%{pypi_name} -f sphinxcontrib.qthelp.lang
@@ -83,6 +83,9 @@ pip3 install sphinx exceptiongroup iniconfig tomli
 %{python3_sitelib}/%{pypi_name_underscore}-%{version}.dist-info/
 
 %changelog
+* Tue Apr 22 2025 Riken Maharjan <rmaharjan@microsoft.com> -  1.0.7-2
+- Fix ptest by using compatible sphinx version.
+
 * Wed Feb 21 2024 Amrita Kohli <amritakohli@microsoft.com> - 1.0.7-1
 - Upgrade to latest version.
 
