@@ -115,9 +115,9 @@ scripts:
     - path: scripts/set_os_release_variant_entries.sh
       arguments:
       - --variant-id
-      - full-aarch64-64k
+      - full-64k
       - --variant
-      - Azure Linux Iso for 64k Kernel
+      - ISO installer for 64k Kernel
 
 iso:
   additionalFiles:
