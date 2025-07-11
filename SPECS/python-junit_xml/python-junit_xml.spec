@@ -36,6 +36,8 @@ generate the XML test reports.}
 %package -n python3-junit-xml
 Summary:        %{summary}
 
+Requires:       python3-six
+
 # The source package is named python-junit_xml for historical reasons.  The
 # binary package, python3-junit-xml, is named using the canonical project
 # name[1]; see also [2].
@@ -93,6 +95,7 @@ pip3 install pytest==7.4.3 tox tox-current-env virtualenv
 * Wed Jun 25 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9^20200222gitba89b41-21
 - Initial CBL-Mariner import from Fedora 42 (license: MIT).
 - License verified.
+- Manually added run-time dependency on 'python3-six'.
 
 * Sat Jan 18 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.9^20200222gitba89b41-20
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
