@@ -3880,8 +3880,8 @@
         "type": "other",
         "other": {
           "name": "freeradius",
-          "version": "3.2.3",
-          "downloadUrl": "ftp://ftp.freeradius.org/pub/radius/freeradius-server-3.2.3.tar.bz2"
+          "version": "3.2.5",
+          "downloadUrl": "https://github.com/FreeRADIUS/freeradius-server/releases/download/release_3_2_5/freeradius-server-3.2.5.tar.bz2"
         }
       }
     },
