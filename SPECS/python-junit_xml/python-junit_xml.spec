@@ -79,7 +79,8 @@ sed -r -i 's/^([[:blank:]]+)(pytest-sugar)/\1# \2/' tox.ini
 
 
 %check
-# Manually use 'rpm' to remove the 'python3-packaging' package:
+# Removing the 'python3-packaging' package. It conflicts with
+# the modules installed by "pip3" below.
 rpm -e python3-packaging --nodeps
 
 # Freezing 'pytest' to a known working version as updates tend to introduce regressions.
