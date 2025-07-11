@@ -6,8 +6,8 @@
 
 Summary:        Fast distributed version control system
 Name:           git
-Version:        2.45.3
-Release:        2%{?dist}
+Version:        2.45.4
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -106,7 +106,7 @@ BuildArch:      noarch
 %endif
 
 %prep
-%setup -q
+%autosetup
 %{py3_shebang_fix} git-p4.py
 
 %build
@@ -173,6 +173,9 @@ fi
 %endif
 
 %changelog
+* Fri Jul 11 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.45.4-1
+- Upgrade to 2.45.4 - CVE-2025-48384, CVE-2025-48385, CVE-2025-27613 & CVE-2025-27614
+
 * Thu Apr 17 2025 Muhammad Falak <mwani@microsoft.com> - 2.45.3-2
 - Add dependency only for openssh-clients instead of openssh
 
