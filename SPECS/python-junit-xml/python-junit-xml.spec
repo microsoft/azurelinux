@@ -13,7 +13,7 @@ generate the XML test reports.}
 Summary:        Python module for creating JUnit XML test result documents
 Name:           python-%{pypi_name}
 Version:        1.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,7 @@ BuildRequires:  python3-wheel
 
 %package -n python3-%{pypi_name}
 Summary:        %{summary}
+Requires:       python3-six
 Provides:       python3-junit_xml = %{version}-%{release}
 
 %description -n python3-%{pypi_name} %{common_description}
@@ -59,6 +60,9 @@ pip3 install pytest==7.4.3 tox tox-current-env virtualenv
 %doc README.rst
 
 %changelog
+* Fri Jul 11 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9-2
+- Added missing dependency on 'python3-six'.
+
 * Fri Nov 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9-1
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - License verified.
