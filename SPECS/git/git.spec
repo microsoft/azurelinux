@@ -123,6 +123,8 @@ make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}"
 %make_install
 install -vdm 755 %{buildroot}%{_datadir}/bash-completion/completions
 install -m 0644 contrib/completion/git-completion.bash %{buildroot}%{_datadir}/bash-completion/completions/git
+install -vdm 755 %{buildroot}%{_datadir}/git-core/contrib/completion/
+install -m 0644 contrib/completion/git-prompt.sh %{buildroot}%{_datadir}/git-core/contrib/completion/git-prompt.sh
 %find_lang %{name}
 %{_fixperms} %{buildroot}/*
 
@@ -173,6 +175,9 @@ fi
 %endif
 
 %changelog
+* Mon Jun 23 2025 Victor Maznev <bullmastiffo@gmail.com> - 2.45.3-3
+- Add git-prompt.sh to git-core contrib/completion directory
+
 * Thu Apr 17 2025 Muhammad Falak <mwani@microsoft.com> - 2.45.3-2
 - Add dependency only for openssh-clients instead of openssh
 
