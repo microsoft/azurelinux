@@ -33,7 +33,7 @@
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
 Version:        8.1.32
-Release:        1%{?dist}
+Release:        2%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -83,6 +83,8 @@ Patch47:        php-8.1.0-phpinfo.patch
 # Fixes for tests (300+)
 # Factory is droped from system tzdata
 Patch300:       php-7.4.0-datetests.patch
+Patch301:       CVE-2025-6491.patch
+Patch302:       CVE-2025-1735.patch
 # used for tests
 BuildRequires:  /bin/ps
 BuildRequires:  autoconf
@@ -719,6 +721,8 @@ in pure PHP.
 
 # Fixes for tests
 %patch300 -p1 -b .datetests
+%patch301 -p1
+%patch302 -p1
 
 
 # Prevent %%doc confusion over LICENSE files
@@ -1516,6 +1520,9 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Mon Jul 14 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.1.32-2
+- Patch for CVE-2025-6491, CVE-2025-1735
+
 * Sun Mar 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.1.32-1
 - Auto-upgrade to 8.1.32 - for CVE-2025-1219, CVE-2025-1736, CVE-2025-1861, CVE-2025-1734, CVE-2025-1217
 
