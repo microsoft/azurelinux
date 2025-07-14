@@ -6,12 +6,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/ccachemanager"
@@ -24,8 +26,11 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/tdnf"
-	"golang.org/x/sys/unix"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/telemetry"
 
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -61,6 +66,10 @@ var (
 	maxCPU               = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
 	timeout              = app.Flag("timeout", "Timeout for package building").Required().Duration()
 
+	// Telemetry flags
+	enableTelemetry = app.Flag("enable-telemetry", "Enable OpenTelemetry tracing.").Bool()
+	otlpEndpoint    = app.Flag("otlp-endpoint", "OTLP collector endpoint for telemetry export.").String()
+
 	logFlags = exe.SetupLogFlags(app)
 )
 
@@ -73,14 +82,69 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(logFlags)
 
+	// Initialize telemetry
+	ctx := context.Background()
+	telemetryConfig := telemetry.DefaultConfig()
+	telemetryConfig.ServiceName = "azurelinux-toolkit-pkgworker"
+	telemetryConfig.ServiceVersion = exe.ToolkitVersion
+
+	// Override with command line flags if provided
+	if *enableTelemetry {
+		telemetryConfig.Enabled = true
+	}
+	if *otlpEndpoint != "" {
+		telemetryConfig.OTLPEndpoint = *otlpEndpoint
+		telemetryConfig.Enabled = true
+	}
+
+	var tracerProvider *telemetry.TracerProvider
+	if telemetryConfig.Enabled {
+		var err error
+		tracerProvider, err = telemetry.Initialize(ctx, telemetryConfig)
+		if err != nil {
+			logger.Log.Warnf("Failed to initialize telemetry: %s", err)
+		} else {
+			logger.Log.Infof("Telemetry initialized with endpoint: %s", telemetryConfig.OTLPEndpoint)
+			defer func() {
+				shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+				defer cancel()
+				if err := tracerProvider.Shutdown(shutdownCtx); err != nil {
+					logger.Log.Warnf("Failed to shutdown telemetry: %s", err)
+				}
+			}()
+		}
+	}
+
+	// Create main span for the entire pkgworker run
+	ctx, mainSpan := telemetry.StartSpan(ctx, "pkgworker.main",
+		trace.WithAttributes(
+			attribute.String("pkgworker.version", exe.ToolkitVersion),
+			attribute.String("package.base_name", *basePackageName),
+			attribute.String("package.srpm_file", *srpmFile),
+			attribute.Bool("package.run_check", *runCheck),
+			attribute.String("package.dist_tag", *distTag),
+			attribute.Bool("package.use_ccache", *useCcache),
+		),
+	)
+	defer mainSpan.End()
+
 	rpmsDirAbsPath, err := filepath.Abs(*rpmsDirPath)
-	logger.FatalOnError(err, "Unable to find absolute path for RPMs directory '%s'", *rpmsDirPath)
+	if err != nil {
+		telemetry.RecordError(ctx, err)
+		logger.FatalOnError(err, "Unable to find absolute path for RPMs directory '%s'", *rpmsDirPath)
+	}
 
 	toolchainDirAbsPath, err := filepath.Abs(*toolchainDirPath)
-	logger.FatalOnError(err, "Unable to find absolute path for toolchain RPMs directory '%s'", *toolchainDirPath)
+	if err != nil {
+		telemetry.RecordError(ctx, err)
+		logger.FatalOnError(err, "Unable to find absolute path for toolchain RPMs directory '%s'", *toolchainDirPath)
+	}
 
 	srpmsDirAbsPath, err := filepath.Abs(*srpmsDirPath)
-	logger.FatalOnError(err, "Unable to find absolute path for SRPMs directory '%s'", *srpmsDirPath)
+	if err != nil {
+		telemetry.RecordError(ctx, err)
+		logger.FatalOnError(err, "Unable to find absolute path for SRPMs directory '%s'", *srpmsDirPath)
+	}
 
 	chrootDir := buildChrootDirPath(*workDir, *srpmFile, *runCheck)
 
@@ -115,10 +179,22 @@ func main() {
 
 	if *maxCPU != "" {
 		defines[rpm.MaxCPUDefine] = *maxCPU
+		telemetry.SetAttributes(ctx, attribute.String("build.max_cpu", *maxCPU))
 	}
 
-	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, ccacheManager, *timeout)
-	logger.FatalOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFlags.LogFile)
+	telemetry.SetAttributes(ctx,
+		attribute.String("build.timeout", timeout.String()),
+		attribute.Int("build.packages_to_install_count", len(*packagesToInstall)),
+	)
+
+	builtRPMs, err := buildSRPMInChroot(ctx, chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, ccacheManager, *timeout)
+	if err != nil {
+		telemetry.RecordError(ctx, err)
+		telemetry.SetStatus(ctx, codes.Error, "Failed to build SRPM")
+		logger.FatalOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFlags.LogFile)
+	}
+
+	telemetry.SetAttributes(ctx, attribute.Int("build.rpms_built_count", len(builtRPMs)))
 
 	// For regular (non-test) package builds:
 	// - Copy the SRPM which produced the package to the output directory.
@@ -126,10 +202,15 @@ func main() {
 	//   Any output from logger will be on stderr so stdout will only contain this output.
 	if !*runCheck {
 		err = copySRPMToOutput(*srpmFile, srpmsDirAbsPath)
-		logger.FatalOnError(err, "Failed to copy SRPM '%s' to output directory '%s'.", *srpmFile, rpmsDirAbsPath)
+		if err != nil {
+			telemetry.RecordError(ctx, err)
+			logger.FatalOnError(err, "Failed to copy SRPM '%s' to output directory '%s'.", *srpmFile, rpmsDirAbsPath)
+		}
 
 		fmt.Print(strings.Join(builtRPMs, ","))
 	}
+
+	telemetry.SetStatus(ctx, codes.Ok, "Package worker completed successfully")
 }
 
 func copySRPMToOutput(srpmFilePath, srpmOutputDirPath string) (err error) {
@@ -154,7 +235,17 @@ func isCCacheEnabled(ccacheManager *ccachemanager.CCacheManager) bool {
 	return ccacheManager != nil && ccacheManager.CurrentPkgGroup.Enabled
 }
 
-func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, ccacheManager *ccachemanager.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
+func buildSRPMInChroot(ctx context.Context, chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, ccacheManager *ccachemanager.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
+	ctx, span := telemetry.StartSpan(ctx, "pkgworker.build_srpm_in_chroot",
+		trace.WithAttributes(
+			attribute.String("build.srpm_file", filepath.Base(srpmFile)),
+			attribute.String("build.out_arch", outArch),
+			attribute.Bool("build.no_cleanup", noCleanup),
+			attribute.Bool("build.run_check", runCheck),
+			attribute.Bool("build.use_ccache", isCCacheEnabled(ccacheManager)),
+		),
+	)
+	defer span.End()
 
 	const (
 		buildHeartbeatTimeout = 30 * time.Minute
@@ -240,7 +331,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	results := make(chan error)
 	err = chroot.Run(func() (err error) {
 		go func() {
-			results <- buildRPMFromSRPMInChroot(srpmFileInChroot, outArch, runCheck, defines, packagesToInstall, isCCacheEnabled(ccacheManager))
+			results <- buildRPMFromSRPMInChroot(ctx, srpmFileInChroot, outArch, runCheck, defines, packagesToInstall, isCCacheEnabled(ccacheManager))
 		}()
 
 		var chrootErr error = nil
@@ -249,7 +340,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 			logger.Log.Debug("Build thread in chroot finished.")
 		case <-time.After(timeout):
 			logger.Log.Errorf("Timeout after %v: stopping chroot...", timeout)
-			shell.StopAllChildProcesses(unix.SIGKILL)
+			shell.StopAllChildProcesses(syscall.SIGKILL)
 			chrootErr = fmt.Errorf("build timed out after %s", timeout)
 		}
 		return chrootErr // Internal error is returned via the channel
@@ -261,7 +352,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	}
 
 	if !runCheck {
-		builtRPMs, err = moveBuiltRPMs(chroot.RootDir(), rpmDirPath)
+		builtRPMs, err = moveBuiltRPMs(ctx, chroot.RootDir(), rpmDirPath)
 	}
 
 	// Only if the groupSize is 1 we can archive since no other packages will
@@ -276,7 +367,23 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	return
 }
 
-func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines map[string]string, packagesToInstall []string, useCcache bool) (err error) {
+func buildRPMFromSRPMInChroot(ctx context.Context, srpmFile, outArch string, runCheck bool, defines map[string]string, packagesToInstall []string, useCcache bool) (err error) {
+	ctx, span := telemetry.StartSpan(ctx, "pkgworker.build_rpm_from_srpm",
+		trace.WithAttributes(
+			attribute.String("build.srpm_file", filepath.Base(srpmFile)),
+			attribute.String("build.out_arch", outArch),
+			attribute.Bool("build.run_check", runCheck),
+			attribute.Bool("build.use_ccache", useCcache),
+			attribute.Int("build.packages_to_install_count", len(packagesToInstall)),
+		),
+	)
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		}
+		span.End()
+	}()
 
 	// Convert /localrpms into a repository that a package manager can use.
 	err = rpmrepomanager.CreateRepo(chrootLocalRpmsDir)
@@ -293,7 +400,7 @@ func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines m
 	}
 
 	// install any additional packages, such as build dependencies.
-	err = tdnfInstall(packagesToInstall)
+	err = tdnfInstall(ctx, packagesToInstall)
 	if err != nil {
 		err = fmt.Errorf("failed to install additional packages:\n%w", err)
 		return
@@ -302,7 +409,7 @@ func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines m
 	if useCcache {
 		ccachePkgName := []string{"ccache"}
 		logger.Log.Infof("USE_CCACHE: installing package: %s", ccachePkgName[0])
-		err = tdnfInstall(ccachePkgName)
+		err = tdnfInstall(ctx, ccachePkgName)
 		if err != nil {
 			err = fmt.Errorf("failed to install ccache:\n%w", err)
 			return
@@ -333,7 +440,21 @@ func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines m
 	return
 }
 
-func moveBuiltRPMs(chrootRootDir, dstDir string) (builtRPMs []string, err error) {
+func moveBuiltRPMs(ctx context.Context, chrootRootDir, dstDir string) (builtRPMs []string, err error) {
+	ctx, span := telemetry.StartSpan(ctx, "pkgworker.move_built_rpms",
+		trace.WithAttributes(
+			attribute.String("move.chroot_root_dir", chrootRootDir),
+			attribute.String("move.dst_dir", dstDir),
+		),
+	)
+	defer func() {
+		span.SetAttributes(attribute.Int("move.rpm_count", len(builtRPMs)))
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		}
+		span.End()
+	}()
 	const (
 		chrootRpmBuildDir = "/usr/src/azl/RPMS"
 		rpmExtension      = ".rpm"
@@ -375,7 +496,20 @@ func moveBuiltRPMs(chrootRootDir, dstDir string) (builtRPMs []string, err error)
 	return
 }
 
-func tdnfInstall(packages []string) (err error) {
+func tdnfInstall(ctx context.Context, packages []string) (err error) {
+	ctx, span := telemetry.StartSpan(ctx, "pkgworker.tdnf_install",
+		trace.WithAttributes(
+			attribute.Int("install.package_count", len(packages)),
+			attribute.StringSlice("install.packages", packages),
+		),
+	)
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		}
+		span.End()
+	}()
 	const (
 		alreadyInstalledPostfix = "is already installed"
 		noMatchingPackagesErr   = "Error(1011) : No matching packages"

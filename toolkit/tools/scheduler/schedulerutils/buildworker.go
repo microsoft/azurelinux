@@ -20,6 +20,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/telemetry"
 	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/buildagents"
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/traverse"
@@ -102,9 +103,18 @@ func selectNextBuildRequest(channels *BuildChannels) (req *BuildRequest, finish 
 
 // BuildNodeWorker process all build requests, can be run concurrently with multiple instances.
 func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, graphMutex *sync.RWMutex, buildAttempts int, checkAttempts int, ignoredPackages, ignoredTests []*pkgjson.PackageVer) {
+	ctx := context.Background()
+	ctx, workerSpan := telemetry.StartSpan(ctx, "scheduler.worker")
+	defer workerSpan.End()
+
 	// Track the time a worker spends waiting on a task. We will add a timing node each time we finish processing a request, and stop
 	// it when we pick up the next request
 	for req, cancelled := selectNextBuildRequest(channels); !cancelled && req != nil; req, cancelled = selectNextBuildRequest(channels) {
+		// Create telemetry span for this specific build request
+		reqCtx, reqSpan := PackageBuildTelemetry(ctx, req)
+		defer reqSpan.End()
+		BuildRequestTelemetry(reqCtx, req)
+
 		res := &BuildResult{
 			Node:           req.Node,
 			AncillaryNodes: req.AncillaryNodes,
@@ -139,6 +149,9 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 		default:
 			res.Err = fmt.Errorf("invalid node type (%v) on node (%v)", req.Node.Type, req.Node)
 		}
+
+		// Add telemetry for the build result
+		BuildResultTelemetry(reqCtx, res)
 
 		channels.Results <- res
 		// Track the time a worker spends waiting on a task

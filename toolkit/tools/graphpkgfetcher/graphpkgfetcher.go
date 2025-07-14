@@ -4,10 +4,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
@@ -17,10 +19,14 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/telemetry"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/schedulerutils"
 
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"gonum.org/v1/gonum/graph"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -71,12 +77,61 @@ var (
 	logFlags      = exe.SetupLogFlags(app)
 	profFlags     = exe.SetupProfileFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
+
+	// Telemetry flags
+	enableTelemetry = app.Flag("enable-telemetry", "Enable OpenTelemetry tracing.").Bool()
+	otlpEndpoint    = app.Flag("otlp-endpoint", "OTLP collector endpoint for telemetry export.").String()
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(logFlags)
+
+	// Initialize telemetry
+	ctx := context.Background()
+	telemetryConfig := telemetry.DefaultConfig()
+	telemetryConfig.ServiceName = "azurelinux-toolkit-graphpkgfetcher"
+	telemetryConfig.ServiceVersion = exe.ToolkitVersion
+
+	// Override with command line flags if provided
+	if *enableTelemetry {
+		telemetryConfig.Enabled = true
+	}
+	if *otlpEndpoint != "" {
+		telemetryConfig.OTLPEndpoint = *otlpEndpoint
+		telemetryConfig.Enabled = true
+	}
+
+	var tracerProvider *telemetry.TracerProvider
+	if telemetryConfig.Enabled {
+		var err error
+		tracerProvider, err = telemetry.Initialize(ctx, telemetryConfig)
+		if err != nil {
+			logger.Log.Warnf("Failed to initialize telemetry: %s", err)
+		} else {
+			logger.Log.Infof("Telemetry initialized with endpoint: %s", telemetryConfig.OTLPEndpoint)
+			defer func() {
+				shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+				defer cancel()
+				if err := tracerProvider.Shutdown(shutdownCtx); err != nil {
+					logger.Log.Warnf("Failed to shutdown telemetry: %s", err)
+				}
+			}()
+		}
+	}
+
+	// Create main span for the entire graphpkgfetcher run
+	ctx, mainSpan := telemetry.StartSpan(ctx, "graphpkgfetcher.main",
+		trace.WithAttributes(
+			attribute.String("graphpkgfetcher.version", exe.ToolkitVersion),
+			attribute.String("input.graph", *inputGraph),
+			attribute.String("output.graph", *outputGraph),
+			attribute.Bool("try_download_delta_rpms", *tryDownloadDeltaRPMs),
+			attribute.Bool("stop_on_failure", *stopOnFailure),
+		),
+	)
+	defer mainSpan.End()
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
@@ -89,13 +144,22 @@ func main() {
 
 	dependencyGraph, err := pkggraph.ReadDOTGraphFile(*inputGraph)
 	if err != nil {
+		telemetry.RecordError(ctx, err)
+		telemetry.SetStatus(ctx, codes.Error, "Failed to read graph")
 		logger.Log.Fatalf("Failed to read graph to file:\n%v", err)
 	}
 
 	hasUnresolvedNodes := hasUnresolvedNodes(dependencyGraph)
+	telemetry.SetAttributes(ctx,
+		attribute.Bool("graph.has_unresolved_nodes", hasUnresolvedNodes),
+		attribute.Int("graph.total_nodes", dependencyGraph.Nodes().Len()),
+	)
+
 	if hasUnresolvedNodes || *tryDownloadDeltaRPMs {
-		err = fetchPackages(dependencyGraph, hasUnresolvedNodes, *tryDownloadDeltaRPMs)
+		err = fetchPackages(ctx, dependencyGraph, hasUnresolvedNodes, *tryDownloadDeltaRPMs)
 		if err != nil {
+			telemetry.RecordError(ctx, err)
+			telemetry.SetStatus(ctx, codes.Error, "Failed to fetch packages")
 			logger.Log.Fatalf("Failed to fetch packages:\n%v", err)
 		}
 	}
@@ -103,15 +167,28 @@ func main() {
 	// Write the final graph to file
 	err = pkggraph.WriteDOTGraphFile(dependencyGraph, *outputGraph)
 	if err != nil {
+		telemetry.RecordError(ctx, err)
+		telemetry.SetStatus(ctx, codes.Error, "Failed to write graph")
 		logger.Log.Fatalf("Failed to write cache graph to file:\n%v", err)
 	}
+
+	telemetry.SetStatus(ctx, codes.Ok, "Graph package fetcher completed successfully")
 }
 
-func fetchPackages(dependencyGraph *pkggraph.PkgGraph, hasUnresolvedNodes, tryDownloadDeltaRPMs bool) (err error) {
+func fetchPackages(ctx context.Context, dependencyGraph *pkggraph.PkgGraph, hasUnresolvedNodes, tryDownloadDeltaRPMs bool) (err error) {
+	ctx, span := telemetry.StartSpan(ctx, "graphpkgfetcher.fetch_packages",
+		trace.WithAttributes(
+			attribute.Bool("has_unresolved_nodes", hasUnresolvedNodes),
+			attribute.Bool("try_download_delta_rpms", tryDownloadDeltaRPMs),
+		),
+	)
+	defer span.End()
+
 	// Create the worker environment
 	cloner, err := setupCloner()
 	if err != nil {
 		err = fmt.Errorf("failed to setup cloner:\n%w", err)
+		telemetry.RecordError(ctx, err)
 		return
 	}
 	defer cloner.Close()
@@ -119,17 +196,24 @@ func fetchPackages(dependencyGraph *pkggraph.PkgGraph, hasUnresolvedNodes, tryDo
 	if hasUnresolvedNodes {
 		var toolchainPackages []string
 		logger.Log.Info("Found unresolved packages to cache, downloading packages")
+
+		ctx, resolveSpan := telemetry.StartSpan(ctx, "graphpkgfetcher.resolve_unresolved_nodes")
 		toolchainPackages, err = schedulerutils.ReadReservedFilesList(*toolchainManifest)
 		if err != nil {
 			err = fmt.Errorf("failed to read toolchain manifest file (%s):\n%w", *toolchainManifest, err)
+			telemetry.RecordError(ctx, err)
+			resolveSpan.End()
 			return
 		}
 
-		err = resolveGraphNodes(dependencyGraph, *inputSummaryFile, toolchainPackages, cloner, *stopOnFailure)
+		err = resolveGraphNodes(ctx, dependencyGraph, *inputSummaryFile, toolchainPackages, cloner, *stopOnFailure)
 		if err != nil {
 			err = fmt.Errorf("failed to resolve graph:\n%w", err)
+			telemetry.RecordError(ctx, err)
+			resolveSpan.End()
 			return
 		}
+		resolveSpan.End()
 	} else {
 		logger.Log.Info("No unresolved packages to cache")
 	}
@@ -137,11 +221,16 @@ func fetchPackages(dependencyGraph *pkggraph.PkgGraph, hasUnresolvedNodes, tryDo
 	// Optional delta build cache hydration
 	if tryDownloadDeltaRPMs {
 		logger.Log.Info("Attempting to download delta RPMs for build nodes")
-		err = downloadDeltaNodes(dependencyGraph, cloner)
+
+		ctx, deltaSpan := telemetry.StartSpan(ctx, "graphpkgfetcher.download_delta_rpms")
+		err = downloadDeltaNodes(ctx, dependencyGraph, cloner)
 		if err != nil {
 			err = fmt.Errorf("failed to download delta RPMs:\n%w", err)
+			telemetry.RecordError(ctx, err)
+			deltaSpan.End()
 			return
 		}
+		deltaSpan.End()
 	}
 
 	// If we grabbed any RPMs, we need to convert them into a local repo
@@ -197,10 +286,13 @@ func setupCloner() (cloner *rpmrepocloner.RpmRepoCloner, err error) {
 //   - pkgsToIgnore: The list of packages to ignore
 //   - imageConfig: The image config to use to find the packages we need to build
 //   - baseDirPath: The base directory to use to find the packages we need to build
-func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
+func downloadDeltaNodes(ctx context.Context, dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
 	const (
 		useImplicitForOptimization = true
 	)
+
+	ctx, span := telemetry.StartSpan(ctx, "graphpkgfetcher.download_delta_nodes")
+	defer span.End()
 
 	timestamp.StartEvent("delta package download", nil)
 	defer timestamp.StopEvent(nil)
@@ -238,9 +330,10 @@ func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepoclone
 		logger.Log.Warnf("Delta fetcher was unable to prune the build graph. All possible build nodes will be included so delta package downloading will be very slow!")
 	}
 
-	err = downloadAllAvailableDeltaRPMs(dependencyGraph, deltaPkgGraphCopy, cloner)
+	err = downloadAllAvailableDeltaRPMs(ctx, dependencyGraph, deltaPkgGraphCopy, cloner)
 	if err != nil {
 		err = fmt.Errorf("failed to download delta RPMs:\n%w", err)
+		telemetry.RecordError(ctx, err)
 		return
 	}
 
@@ -268,7 +361,7 @@ func findUnresolvedNodes(runNodes []*pkggraph.PkgNode) (unreslovedNodes []*pkggr
 
 // resolveGraphNodes scans a graph and for each unresolved node in the graph clones the RPMs needed
 // to satisfy it.
-func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile string, toolchainPackages []string, cloner *rpmrepocloner.RpmRepoCloner, stopOnFailure bool) (err error) {
+func resolveGraphNodes(ctx context.Context, dependencyGraph *pkggraph.PkgGraph, inputSummaryFile string, toolchainPackages []string, cloner *rpmrepocloner.RpmRepoCloner, stopOnFailure bool) (err error) {
 	const downloadDependencies = true
 
 	timestamp.StartEvent("Clone packages", nil)
@@ -293,18 +386,37 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile stri
 	unresolvedNodes := findUnresolvedNodes(dependencyGraph.AllRunNodes())
 	unresolvedNodesCount := len(unresolvedNodes)
 
+	telemetry.SetAttributes(ctx,
+		attribute.Int("unresolved_nodes.count", unresolvedNodesCount),
+	)
+
 	timestamp.StartEvent("clone graph", nil)
 	for i, n := range unresolvedNodes {
 		progressHeader := fmt.Sprintf("Cache progress %d%%", (i*100)/unresolvedNodesCount)
-		resolveErr := resolveSingleNode(cloner, n, downloadDependencies, toolchainPackages, fetchedPackages, prebuiltPackages, *outDir)
+
+		nodeCtx, nodeSpan := telemetry.StartSpan(ctx, "graphpkgfetcher.resolve_single_node",
+			trace.WithAttributes(
+				attribute.String("package.name", n.VersionedPkg.Name),
+				attribute.String("package.architecture", n.Architecture),
+				attribute.Int("progress.index", i),
+				attribute.Int("progress.total", unresolvedNodesCount),
+			),
+		)
+
+		resolveErr := resolveSingleNode(nodeCtx, cloner, n, downloadDependencies, toolchainPackages, fetchedPackages, prebuiltPackages, *outDir)
 		if resolveErr == nil {
 			logger.Log.Infof("(%s): choosing (%s) to provide (%s)", progressHeader, filepath.Base(n.RpmPath), n.VersionedPkg.Name)
+			telemetry.SetAttributes(nodeCtx, attribute.Bool("resolve.success", true))
+			nodeSpan.End()
 			continue
 		}
 
 		// Failing to clone a dependency should not halt a build.
 		// The build should continue and attempt best effort to build as many packages as possible.
 		logger.Log.Warnf("(%s): failed to resolve graph node (%s):\n(%s)", progressHeader, n, resolveErr)
+		telemetry.RecordError(nodeCtx, resolveErr)
+		telemetry.SetAttributes(nodeCtx, attribute.Bool("resolve.success", false))
+		nodeSpan.End()
 		cachingSucceeded = false
 		errorMessage := strings.Builder{}
 		errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", n))
@@ -328,7 +440,10 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile stri
 //   - dependencyGraphDeltaCopy: A copy of the graph we will use to try to optimize the build nodes. This graph should be
 //     optimized to only contain the nodes we need to build.
 //   - cloner: The cloner to use to download the RPMs
-func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy *pkggraph.PkgGraph, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
+func downloadAllAvailableDeltaRPMs(ctx context.Context, realDependencyGraph, dependencyGraphDeltaCopy *pkggraph.PkgGraph, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
+	ctx, span := telemetry.StartSpan(ctx, "graphpkgfetcher.download_all_available_delta_rpms")
+	defer span.End()
+
 	timestamp.StartEvent("downloading delta nodes", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -350,8 +465,9 @@ func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy
 		}
 
 		logger.Log.Debugf("Resolving build node (%s)", n)
-		err = downloadSingleDeltaRPM(realDependencyGraph, n, cloner)
+		err = downloadSingleDeltaRPM(ctx, realDependencyGraph, n, cloner)
 		if err != nil {
+			telemetry.RecordError(ctx, err)
 			return fmt.Errorf("failed to download delta RPM for build node (%s):\n%w", n, err)
 		}
 		if n.State == pkggraph.StateDelta {
@@ -372,7 +488,7 @@ func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy
 //   - buildNode: The build node to update. This node should be from the real graph as we will be updating it directly.
 //     to find the actual build node in the graph.
 //   - cloner: The cloner to use to download the RPMs
-func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *pkggraph.PkgNode, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
+func downloadSingleDeltaRPM(ctx context.Context, realDependencyGraph *pkggraph.PkgGraph, buildNode *pkggraph.PkgNode, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
 	const downloadDependencies = false
 	var lookup *pkggraph.LookupNode
 
@@ -456,7 +572,7 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 
 // resolveSingleNode caches the RPM for a single node.
 // It will modify fetchedPackages on a successful package clone.
-func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNode, cloneDeps bool, toolchainPackages []string, fetchedPackages, prebuiltPackages map[string]bool, outDir string) (err error) {
+func resolveSingleNode(ctx context.Context, cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNode, cloneDeps bool, toolchainPackages []string, fetchedPackages, prebuiltPackages map[string]bool, outDir string) (err error) {
 	logger.Log.Debugf("Adding node (%s) to the cache", node.FriendlyName())
 
 	logger.Log.Debugf("Searching for a package which supplies: (%s)", node.VersionedPkg.Name)

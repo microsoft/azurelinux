@@ -4,6 +4,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/ccachemanager"
@@ -19,13 +21,16 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/telemetry"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/licensecheck"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/buildagents"
 	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/schedulerutils"
 	"github.com/sirupsen/logrus"
 
-	"golang.org/x/sys/unix"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -115,12 +120,58 @@ var (
 	logFlags      = exe.SetupLogFlags(app)
 	profFlags     = exe.SetupProfileFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
+
+	// Telemetry flags
+	enableTelemetry = app.Flag("enable-telemetry", "Enable OpenTelemetry tracing.").Bool()
+	otlpEndpoint    = app.Flag("otlp-endpoint", "OTLP collector endpoint for telemetry export.").String()
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(logFlags)
+
+	// Initialize telemetry
+	ctx := context.Background()
+	telemetryConfig := telemetry.DefaultConfig()
+	telemetryConfig.ServiceVersion = exe.ToolkitVersion
+
+	// Override with command line flags if provided
+	if *enableTelemetry {
+		telemetryConfig.Enabled = true
+	}
+	if *otlpEndpoint != "" {
+		telemetryConfig.OTLPEndpoint = *otlpEndpoint
+		telemetryConfig.Enabled = true
+	}
+
+	var tracerProvider *telemetry.TracerProvider
+	if telemetryConfig.Enabled {
+		var err error
+		tracerProvider, err = telemetry.Initialize(ctx, telemetryConfig)
+		if err != nil {
+			logger.Log.Warnf("Failed to initialize telemetry: %s", err)
+		} else {
+			logger.Log.Infof("Telemetry initialized with endpoint: %s", telemetryConfig.OTLPEndpoint)
+			defer func() {
+				shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+				defer cancel()
+				if err := tracerProvider.Shutdown(shutdownCtx); err != nil {
+					logger.Log.Warnf("Failed to shutdown telemetry: %s", err)
+				}
+			}()
+		}
+	}
+
+	// Create main span for the entire scheduler run
+	ctx, mainSpan := telemetry.StartSpan(ctx, "scheduler.main",
+		trace.WithAttributes(
+			attribute.String("scheduler.version", exe.ToolkitVersion),
+			attribute.Int("scheduler.workers", *workers),
+			attribute.String("scheduler.build_agent", *buildAgent),
+		),
+	)
+	defer mainSpan.End()
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
@@ -221,11 +272,13 @@ func main() {
 	defer cancelOutstandingBuilds(agent)
 	// On a SIGINT or SIGTERM stop all agents.
 	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, unix.SIGINT, unix.SIGTERM)
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 	go cancelBuildsOnSignal(signals, agent)
 
-	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, licenseCheckerConfig, *workers, *buildAttempts, *checkAttempts, *extraLayers, *maxCascadingRebuilds, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, finalTestsToRun, testsToRerun, ignoredTests, toolchainPackages, *optimizeWithCachedImplicit, *allowToolchainRebuilds)
+	err = buildGraph(ctx, *inputGraphFile, *outputGraphFile, agent, licenseCheckerConfig, *workers, *buildAttempts, *checkAttempts, *extraLayers, *maxCascadingRebuilds, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, finalTestsToRun, testsToRerun, ignoredTests, toolchainPackages, *optimizeWithCachedImplicit, *allowToolchainRebuilds)
 	if err != nil {
+		telemetry.RecordError(ctx, err)
+		telemetry.SetStatus(ctx, codes.Error, "Scheduler failed")
 		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above and the build log '%s'.\nError: %s.", *logFlags.LogFile, err)
 	}
 
@@ -265,7 +318,7 @@ func cancelOutstandingBuilds(agent buildagents.BuildAgent) {
 	}
 
 	// Issue a SIGINT to all children processes to allow them to gracefully exit.
-	shell.StopAllChildProcesses(unix.SIGINT)
+	shell.StopAllChildProcesses(syscall.SIGINT)
 }
 
 // cancelBuildsOnSignal will stop any builds running on SIGINT/SIGTERM.
@@ -279,7 +332,11 @@ func cancelBuildsOnSignal(signals chan os.Signal, agent buildagents.BuildAgent) 
 
 // buildGraph builds all packages in the dependency graph requested.
 // It will save the resulting graph to outputFile.
-func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, licenseCheckerConfig schedulerutils.PackageLicenseCheckerConfig, workers, buildAttempts, checkAttempts, extraLayers int, maxCascadingRebuilds uint, stopOnFailure, canUseCache bool, packagesToBuild, packagesToRebuild, ignoredPackages, testsToRun, testsToRerun, ignoredTests []*pkgjson.PackageVer, toolchainPackages []string, optimizeWithCachedImplicit bool, allowToolchainRebuilds bool) (err error) {
+func buildGraph(ctx context.Context, inputFile, outputFile string, agent buildagents.BuildAgent, licenseCheckerConfig schedulerutils.PackageLicenseCheckerConfig, workers, buildAttempts, checkAttempts, extraLayers int, maxCascadingRebuilds uint, stopOnFailure, canUseCache bool, packagesToBuild, packagesToRebuild, ignoredPackages, testsToRun, testsToRerun, ignoredTests []*pkgjson.PackageVer, toolchainPackages []string, optimizeWithCachedImplicit bool, allowToolchainRebuilds bool) (err error) {
+	// Create span for the entire build graph operation
+	ctx, span := telemetry.StartSpan(ctx, "scheduler.build_graph")
+	defer span.End()
+
 	// graphMutex guards pkgGraph from concurrent reads and writes during build.
 	var graphMutex sync.RWMutex
 
@@ -295,11 +352,30 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, lice
 	// Setup and start the worker pool and scheduler routine.
 	numberOfNodes := pkgGraph.Nodes().Len()
 
+	// Add telemetry attributes for the build
+	telemetry.SetAttributes(ctx,
+		attribute.Int("graph.node_count", numberOfNodes),
+		attribute.Int("scheduler.worker_count", workers),
+		attribute.Int("scheduler.build_attempts", buildAttempts),
+		attribute.Int("scheduler.check_attempts", checkAttempts),
+		attribute.Int("scheduler.extra_layers", extraLayers),
+		attribute.Bool("scheduler.stop_on_failure", stopOnFailure),
+		attribute.Bool("scheduler.can_use_cache", canUseCache),
+		attribute.Bool("scheduler.optimize_with_cached_implicit", optimizeWithCachedImplicit),
+		attribute.Bool("scheduler.allow_toolchain_rebuilds", allowToolchainRebuilds),
+		attribute.Int("packages.to_build_count", len(packagesToBuild)),
+		attribute.Int("packages.to_rebuild_count", len(packagesToRebuild)),
+		attribute.Int("packages.ignored_count", len(ignoredPackages)),
+		attribute.Int("tests.to_run_count", len(testsToRun)),
+		attribute.Int("tests.to_rerun_count", len(testsToRerun)),
+		attribute.Int("tests.ignored_count", len(ignoredTests)),
+	)
+
 	channels := startWorkerPool(agent, workers, buildAttempts, checkAttempts, numberOfNodes, &graphMutex, ignoredPackages, ignoredTests)
 	logger.Log.Infof("Building %d nodes with %d workers", numberOfNodes, workers)
 
 	// After this call pkgGraph will be given to multiple routines and accessing it requires acquiring the mutex.
-	builtGraph, err := buildAllNodes(stopOnFailure, canUseCache, packagesToRebuild, testsToRerun, pkgGraph, &graphMutex, goalNode, channels, licenseCheckerConfig, maxCascadingRebuilds, toolchainPackages, allowToolchainRebuilds)
+	builtGraph, err := buildAllNodes(ctx, stopOnFailure, canUseCache, packagesToRebuild, testsToRerun, pkgGraph, &graphMutex, goalNode, channels, licenseCheckerConfig, maxCascadingRebuilds, toolchainPackages, allowToolchainRebuilds)
 
 	if builtGraph != nil {
 		graphMutex.RLock()
@@ -352,7 +428,7 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, check
 // - Attempts to satisfy any unresolved dynamic dependencies with new implicit provides from the build result.
 // - Attempts to subgraph the graph to only contain the requested packages if possible.
 // - Repeat.
-func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels, licenseCheckerConfig schedulerutils.PackageLicenseCheckerConfig, maxCascadingRebuilds uint, reservedFiles []string, allowToolchainRebuilds bool) (builtGraph *pkggraph.PkgGraph, err error) {
+func buildAllNodes(ctx context.Context, stopOnFailure, canUseCache bool, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels, licenseCheckerConfig schedulerutils.PackageLicenseCheckerConfig, maxCascadingRebuilds uint, reservedFiles []string, allowToolchainRebuilds bool) (builtGraph *pkggraph.PkgGraph, err error) {
 	var (
 		// stopBuilding tracks if the build has entered a failed state and this routine should stop as soon as possible.
 		stopBuilding bool
