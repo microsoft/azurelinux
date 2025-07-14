@@ -6,7 +6,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.9
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -136,8 +136,8 @@ The test package contains all regression tests for Python as well as the modules
 # Remove GCC specs and build environment linker scripts
 # from the flags used when compiling outside of an RPM environment
 # https://fedoraproject.org/wiki/Changes/Python_Extension_Flags
-export CFLAGS="%{extension_cflags} %{openssl_flags}"
-export CFLAGS_NODIST="%{build_cflags} %{openssl_flags}"
+export CFLAGS="%{extension_cflags} %{openssl_flags} -O3"
+export CFLAGS_NODIST="%{build_cflags} %{openssl_flags} -O3"
 export CXXFLAGS="%{extension_cxxflags} %{openssl_flags}"
 export LDFLAGS="%{extension_ldflags}"
 export LDFLAGS_NODIST="%{build_ldflags}"
@@ -150,7 +150,8 @@ export OPT="%{extension_cflags} %{openssl_flags}"
     --with-system-ffi \
     --with-dbmliborder=gdbm:ndbm \
     --with-ensurepip=no \
-    --enable-optimizations
+    --enable-optimizations \
+    --with-lto    
 %make_build
 
 %install
