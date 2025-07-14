@@ -701,8 +701,6 @@ in pure PHP.
 
 %prep
 %setup -q
-%patch301 -p1
-%patch302 -p1
 
 %patch 1 -p1 -b .mpmcheck
 %patch 5 -p1 -b .includedir
@@ -724,6 +722,8 @@ in pure PHP.
 # Fixes for tests
 %patch 300 -p1 -b .datetests
 
+%patch301 -p1
+%patch302 -p1
 
 # Prevent %%doc confusion over LICENSE files
 cp Zend/LICENSE ZEND_LICENSE
