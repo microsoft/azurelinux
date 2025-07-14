@@ -33,7 +33,7 @@ command line, e.g. for SSH sessions; and a GTK+ interface for X (provided
 in the mtr-gtk package).
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 export CFLAGS="%{optflags} -fPIE"
