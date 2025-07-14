@@ -31,7 +31,7 @@
 Summary:        Linux Kernel
 Name:           kernel-ipe
 Version:        6.6.85.1
-Release:        2%{?dist}
+Release:        14%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -191,24 +191,24 @@ sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/marine
 cp %{SOURCE7} ipe_boot_policy.pol
 sed -i 's#CONFIG_IPE_BOOT_POLICY=""#CONFIG_IPE_BOOT_POLICY="ipe_boot_policy.pol"#' .config
 
-cp .config current_config
-sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
-make LC_ALL=  ARCH=%{arch} oldconfig
+# cp .config current_config
+# sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
+# make LC_ALL=  ARCH=%{arch} oldconfig
 
-# Verify the config files match
-cp .config new_config
-sed -i 's/CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION=""/' new_config
-diff --unified new_config current_config > config_diff || true
-if [ -s config_diff ]; then
-    printf "\n\n\n\n\n\n\n\n"
-    cat config_diff
-    printf "\n\n\n\n\n\n\n\n"
-    echo "Config file has unexpected changes"
-    echo "Update config file to set changed values explicitly"
+# # Verify the config files match
+# cp .config new_config
+# sed -i 's/CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION=""/' new_config
+# diff --unified new_config current_config > config_diff || true
+# if [ -s config_diff ]; then
+#     printf "\n\n\n\n\n\n\n\n"
+#     cat config_diff
+#     printf "\n\n\n\n\n\n\n\n"
+#     echo "Config file has unexpected changes"
+#     echo "Update config file to set changed values explicitly"
 
-#  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
-#    exit 1
-fi
+# #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
+# #    exit 1
+# fi
 
 mkdir tarfs
 cp %{SOURCE8} tarfs/Makefile
@@ -233,16 +233,23 @@ make -C tools turbostat cpupower
 make -C tools/bpf/bpftool
 
 %define __modules_install_post \
-for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
+echo "In modules_install_post" \
+echo "Buildroot" \
+ls %{buildroot} \
+echo "Buildroot lib modules" \
+ls %{buildroot}/lib/modules \
+for MODULE in `find %{buildroot}/lib/modules -name *.ko` ; do \
+    echo "SIGNING in spec file" \
     ./scripts/sign-file sha512 certs/signing_key.pem certs/signing_key.x509 $MODULE \
     rm -f $MODULE.{sig,dig} \
-    xz --threads=1 --check=crc32 --lzma2=dict=1MiB $MODULE \
+    xz --check=crc32 --lzma2=dict=1MiB $MODULE \
     done \
 %{nil}
 
 # We want to compress modules after stripping. Extra step is added to
 # the default __spec_install_post.
 %define __spec_install_post\
+    echo "Spec install post"\
     %{?__debug_package:%{__debug_install_post}}\
     %{__arch_install_post}\
     %{__os_install_post}\
@@ -261,12 +268,33 @@ install -c -m 644 %{SOURCE5} %{buildroot}/%{_sysconfdir}/sysconfig/cpupower
 install -d -m 755 %{buildroot}%{_unitdir}
 install -c -m 644 %{SOURCE6} %{buildroot}%{_unitdir}/cpupower.service
 
+echo "Installing modules!!!!"
+
+# install -vd -m 755 %{buildroot}/lib/modules/%{uname_r}/extra/tarfs
+# ./scripts/sign-file sha512 certs/signing_key.pem certs/signing_key.x509 tarfs/tarfs.ko
+# install -vc -m 644 tarfs/tarfs.ko %{buildroot}/lib/modules/%{uname_r}/extra/tarfs/tarfs.ko
+
+make INSTALL_MOD_PATH=%{buildroot} modules_install
+set -x
+echo "Decompressing modules before stripping"
+echo "buildroot"
+ls %{buildroot}
+
+echo "Processing modules"
+for MODULE in `find %{buildroot} -name *.ko.xz` ; do 
+    echo "Decompressing $MODULE"
+    xz -d $MODULE 
+done
+echo "Loop complete"
+ls %{buildroot}/lib/modules
+ls %{buildroot}/lib/modules/%{version}
+mv %{buildroot}/lib/modules/%{version} %{buildroot}/lib/modules/%{uname_r}
+
 install -vd -m 755 %{buildroot}/lib/modules/%{uname_r}/extra/tarfs
 ./scripts/sign-file sha512 certs/signing_key.pem certs/signing_key.x509 tarfs/tarfs.ko
 install -vc -m 644 tarfs/tarfs.ko %{buildroot}/lib/modules/%{uname_r}/extra/tarfs/tarfs.ko
 
-make INSTALL_MOD_PATH=%{buildroot} modules_install
-
+set +x
 %ifarch x86_64
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
 %endif
