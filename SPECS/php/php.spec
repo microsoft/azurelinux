@@ -722,8 +722,8 @@ in pure PHP.
 # Fixes for tests
 %patch 300 -p1 -b .datetests
 
-%patch301 -p1
-%patch302 -p1
+%patch 301 -p1
+%patch 302 -p1
 
 # Prevent %%doc confusion over LICENSE files
 cp Zend/LICENSE ZEND_LICENSE
