@@ -21084,8 +21084,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.1.32",
-          "downloadUrl": "https://www.php.net/distributions/php-8.1.32.tar.xz"
+          "version": "8.1.33",
+          "downloadUrl": "https://www.php.net/distributions/php-8.1.33.tar.xz"
         }
       }
     },
