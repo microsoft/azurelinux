@@ -13,6 +13,7 @@ Patch1:         CVE-2024-12243.patch
 Patch2:         CVE-2025-6395.patch
 Patch3:         CVE-2025-32989.patch
 Patch4:         CVE-2025-32988.patch
+Patch5:         CVE-2025-32990.patch
 BuildRequires:  autogen-libopts-devel
 BuildRequires:  gc-devel
 BuildRequires:  guile-devel
@@ -100,7 +101,7 @@ sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 
 %changelog
 * Tue Jul 15 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.7.11-4
-- Patch for CVE-2025-6395, CVE-2025-32989, CVE-2025-32988
+- Patch for CVE-2025-6395, CVE-2025-32989, CVE-2025-32988, CVE-2025-32990
 
 * Tue Mar 11 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 3.7.11-3
 - Patch to fix CVE-2024-12243
