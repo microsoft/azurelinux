@@ -12,13 +12,18 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/network"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/telemetry"
 	"github.com/sirupsen/logrus"
 
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -36,6 +41,10 @@ var (
 	dstFile   = app.Flag("output-file", "Destination file to download to").Short('O').String()
 	prefixDir = app.Flag("directory-prefix", "Directory to download to").Short('P').String()
 	srcUrl    = app.Arg("url", "URL to download").Required().String()
+
+	// Telemetry flags
+	enableTelemetry = app.Flag("enable-telemetry", "Enable OpenTelemetry tracing.").Bool()
+	otlpEndpoint    = app.Flag("otlp-endpoint", "OTLP collector endpoint for telemetry export.").Default("").String()
 )
 
 func main() {
@@ -45,6 +54,48 @@ func main() {
 	if *noVerbose {
 		logger.Log.SetLevel(logrus.WarnLevel)
 	}
+
+	// Initialize telemetry
+	ctx := context.Background()
+	telemetryConfig := telemetry.DefaultConfig()
+	telemetryConfig.ServiceName = "azurelinux-toolkit-downloader"
+	telemetryConfig.ServiceVersion = exe.ToolkitVersion
+
+	// Override with command line flags if provided
+	if *enableTelemetry {
+		telemetryConfig.Enabled = true
+	}
+	if *otlpEndpoint != "" {
+		telemetryConfig.OTLPEndpoint = *otlpEndpoint
+		telemetryConfig.Enabled = true
+	}
+
+	var tracerProvider *telemetry.TracerProvider
+	if telemetryConfig.Enabled {
+		var err error
+		tracerProvider, err = telemetry.Initialize(ctx, telemetryConfig)
+		if err != nil {
+			logger.Log.Warnf("Failed to initialize telemetry: %s", err)
+		} else {
+			logger.Log.Infof("Telemetry initialized with endpoint: %s", telemetryConfig.OTLPEndpoint)
+			defer func() {
+				shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+				defer cancel()
+				if err := tracerProvider.Shutdown(shutdownCtx); err != nil {
+					logger.Log.Warnf("Failed to shutdown telemetry: %s", err)
+				}
+			}()
+		}
+	}
+
+	// Create main span for the entire downloader run
+	ctx, mainSpan := telemetry.StartSpan(ctx, "downloader.main",
+		trace.WithAttributes(
+			attribute.String("downloader.version", exe.ToolkitVersion),
+			attribute.String("downloader.source_url", *srcUrl),
+		),
+	)
+	defer mainSpan.End()
 
 	caCerts, err := x509.SystemCertPool()
 	if err != nil {
@@ -97,8 +148,24 @@ func main() {
 		}
 	}
 
-	_, err = network.DownloadFileWithRetry(context.Background(), *srcUrl, *dstFile, caCerts, tlsCerts, network.DefaultTimeout)
+	// Create span for the download operation
+	downloadCtx, downloadSpan := telemetry.StartSpan(ctx, "downloader.download",
+		trace.WithAttributes(
+			attribute.String("download.url", *srcUrl),
+			attribute.String("download.destination", *dstFile),
+		),
+	)
+	defer downloadSpan.End()
+
+	_, err = network.DownloadFileWithRetry(downloadCtx, *srcUrl, *dstFile, caCerts, tlsCerts, network.DefaultTimeout)
 	if err != nil {
+		telemetry.RecordError(downloadCtx, err)
+		telemetry.SetStatus(downloadCtx, codes.Error, "Download failed")
 		logger.Log.Fatalf("Failed to download (%s) to (%s). Error:\n%s", *srcUrl, *dstFile, err)
 	}
+
+	telemetry.SetStatus(downloadCtx, codes.Ok, "Download completed successfully")
+	telemetry.AddEvent(downloadCtx, "download_completed",
+		attribute.String("file_path", *dstFile),
+	)
 }

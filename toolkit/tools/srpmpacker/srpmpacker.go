@@ -15,6 +15,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/directory"
@@ -26,9 +27,13 @@ import (
 	packagelist "github.com/microsoft/azurelinux/toolkit/tools/internal/packlist"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/telemetry"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -124,12 +129,60 @@ var (
 
 	validSignatureLevels = []string{signatureEnforceString, signatureSkipCheckString, signatureUpdateString}
 	signatureHandling    = app.Flag("signature-handling", "Specifies how to handle signature mismatches for source files.").Default(signatureEnforceString).PlaceHolder(exe.PlaceHolderize(validSignatureLevels)).Enum(validSignatureLevels...)
+
+	// Telemetry flags
+	enableTelemetry = app.Flag("enable-telemetry", "Enable OpenTelemetry tracing.").Bool()
+	otlpEndpoint    = app.Flag("otlp-endpoint", "OTLP collector endpoint for telemetry export.").Default("").String()
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(logFlags)
+
+	// Initialize telemetry
+	ctx := context.Background()
+	telemetryConfig := telemetry.DefaultConfig()
+	telemetryConfig.ServiceName = "azurelinux-toolkit-srpmpacker"
+	telemetryConfig.ServiceVersion = exe.ToolkitVersion
+
+	// Override with command line flags if provided
+	if *enableTelemetry {
+		telemetryConfig.Enabled = true
+	}
+	if *otlpEndpoint != "" {
+		telemetryConfig.OTLPEndpoint = *otlpEndpoint
+		telemetryConfig.Enabled = true
+	}
+
+	var tracerProvider *telemetry.TracerProvider
+	if telemetryConfig.Enabled {
+		var err error
+		tracerProvider, err = telemetry.Initialize(ctx, telemetryConfig)
+		if err != nil {
+			logger.Log.Warnf("Failed to initialize telemetry: %s", err)
+		} else {
+			logger.Log.Infof("Telemetry initialized with endpoint: %s", telemetryConfig.OTLPEndpoint)
+			defer func() {
+				shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+				defer cancel()
+				if err := tracerProvider.Shutdown(shutdownCtx); err != nil {
+					logger.Log.Warnf("Failed to shutdown telemetry: %s", err)
+				}
+			}()
+		}
+	}
+
+	// Create main span for the entire srpmpacker run
+	ctx, mainSpan := telemetry.StartSpan(ctx, "srpmpacker.main",
+		trace.WithAttributes(
+			attribute.String("srpmpacker.version", exe.ToolkitVersion),
+			attribute.String("srpmpacker.specs_dir", *specsDir),
+			attribute.String("srpmpacker.dist_tag", *distTag),
+			attribute.Int64("srpmpacker.workers", int64(*workers)),
+		),
+	)
+	defer mainSpan.End()
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
@@ -139,6 +192,10 @@ func main() {
 
 	timestamp.BeginTiming("srpmpacker", *timestampFile)
 	defer timestamp.CompleteTiming()
+
+	// Create span for configuration
+	configCtx, configSpan := telemetry.StartSpan(ctx, "srpmpacker.configure")
+	defer configSpan.End()
 
 	timestamp.StartEvent("configuring packer", nil)
 
@@ -155,16 +212,25 @@ func main() {
 		logger.Log.Warn("Will update signature files as needed")
 		templateSrcConfig.signatureHandling = signatureUpdate
 	default:
+		err := fmt.Errorf("invalid signature handling encountered: %s. Allowed: %s", *signatureHandling, validSignatureLevels)
+		telemetry.RecordError(configCtx, err)
+		telemetry.SetStatus(configCtx, codes.Error, "Invalid signature handling")
 		logger.Log.Fatalf("Invalid signature handling encountered: %s. Allowed: %s", *signatureHandling, validSignatureLevels)
 	}
 
 	// Setup remote source configuration
 	templateSrcConfig.sourceURL = *sourceURL
 	templateSrcConfig.caCerts, err = x509.SystemCertPool()
-	logger.PanicOnError(err, "Received error calling x509.SystemCertPool(). Error: %v", err)
+	if err != nil {
+		telemetry.RecordError(configCtx, err)
+		telemetry.SetStatus(configCtx, codes.Error, "Failed to get system cert pool")
+		logger.PanicOnError(err, "Received error calling x509.SystemCertPool(). Error: %v", err)
+	}
 	if *caCertFile != "" {
 		newCACert, err := os.ReadFile(*caCertFile)
 		if err != nil {
+			telemetry.RecordError(configCtx, err)
+			telemetry.SetStatus(configCtx, codes.Error, "Failed to read CA certificate")
 			logger.Log.Panicf("Invalid CA certificate (%s), error: %s", *caCertFile, err)
 		}
 
@@ -174,21 +240,43 @@ func main() {
 	if *tlsClientCert != "" && *tlsClientKey != "" {
 		cert, err := tls.LoadX509KeyPair(*tlsClientCert, *tlsClientKey)
 		if err != nil {
+			telemetry.RecordError(configCtx, err)
+			telemetry.SetStatus(configCtx, codes.Error, "Failed to load TLS certificate")
 			logger.Log.Panicf("Invalid TLS client key pair (%s) (%s), error: %s", *tlsClientCert, *tlsClientKey, err)
 		}
 
 		templateSrcConfig.tlsCerts = append(templateSrcConfig.tlsCerts, cert)
 	}
+	telemetry.SetStatus(configCtx, codes.Ok, "Configuration completed successfully")
 
 	timestamp.StopEvent(nil)
+
+	// Create span for parsing pack list
+	packListCtx, packListSpan := telemetry.StartSpan(ctx, "srpmpacker.parse_pack_list")
+	defer packListSpan.End()
 
 	// A pack list may be provided, if so only pack this subset.
 	// If non is provided, pack all srpms.
 	packList, err := packagelist.ParsePackageList(*srpmPackList)
-	logger.PanicOnError(err)
+	if err != nil {
+		telemetry.RecordError(packListCtx, err)
+		telemetry.SetStatus(packListCtx, codes.Error, "Failed to parse pack list")
+		logger.PanicOnError(err)
+	}
+	telemetry.SetStatus(packListCtx, codes.Ok, "Pack list parsed successfully")
+	telemetry.SetAttributes(packListCtx, attribute.Int("pack_list.size", len(packList)))
+
+	// Create span for SRPM creation
+	createCtx, createSpan := telemetry.StartSpan(ctx, "srpmpacker.create_srpms")
+	defer createSpan.End()
 
 	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *concurrentNetOps, *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
-	logger.PanicOnError(err)
+	if err != nil {
+		telemetry.RecordError(createCtx, err)
+		telemetry.SetStatus(createCtx, codes.Error, "Failed to create SRPMs")
+		logger.PanicOnError(err)
+	}
+	telemetry.SetStatus(createCtx, codes.Ok, "SRPMs created successfully")
 }
 
 // createAllSRPMsWrapper wraps createAllSRPMs to conditionally run it inside a chroot.

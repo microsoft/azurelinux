@@ -20,10 +20,14 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/network"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repoutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/telemetry"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 	"github.com/sirupsen/logrus"
 
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -63,12 +67,58 @@ var (
 
 	concurrentNetOps = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultNetOpsCount).Uint()
 	nonFatalMode     = app.Flag("non-fatal-mode", "Run in non-fatal mode, where errors are logged but do not cause the program to exit with a non-zero code.").Bool()
+
+	// Telemetry flags
+	enableTelemetry = app.Flag("enable-telemetry", "Enable OpenTelemetry tracing.").Bool()
+	otlpEndpoint    = app.Flag("otlp-endpoint", "OTLP collector endpoint for telemetry export.").Default("").String()
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(logFlags)
+
+	// Initialize telemetry
+	ctx := context.Background()
+	telemetryConfig := telemetry.DefaultConfig()
+	telemetryConfig.ServiceName = "azurelinux-toolkit-precacher"
+	telemetryConfig.ServiceVersion = exe.ToolkitVersion
+
+	// Override with command line flags if provided
+	if *enableTelemetry {
+		telemetryConfig.Enabled = true
+	}
+	if *otlpEndpoint != "" {
+		telemetryConfig.OTLPEndpoint = *otlpEndpoint
+		telemetryConfig.Enabled = true
+	}
+
+	var tracerProvider *telemetry.TracerProvider
+	if telemetryConfig.Enabled {
+		var err error
+		tracerProvider, err = telemetry.Initialize(ctx, telemetryConfig)
+		if err != nil {
+			logger.Log.Warnf("Failed to initialize telemetry: %s", err)
+		} else {
+			logger.Log.Infof("Telemetry initialized with endpoint: %s", telemetryConfig.OTLPEndpoint)
+			defer func() {
+				shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+				defer cancel()
+				if err := tracerProvider.Shutdown(shutdownCtx); err != nil {
+					logger.Log.Warnf("Failed to shutdown telemetry: %s", err)
+				}
+			}()
+		}
+	}
+
+	// Create main span for the entire precacher run
+	ctx, mainSpan := telemetry.StartSpan(ctx, "precacher.main",
+		trace.WithAttributes(
+			attribute.String("precacher.version", exe.ToolkitVersion),
+			attribute.Int64("precacher.concurrent_net_ops", int64(*concurrentNetOps)),
+		),
+	)
+	defer mainSpan.End()
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
@@ -79,18 +129,32 @@ func main() {
 	timestamp.BeginTiming("precacher", *timestampFile)
 	defer timestamp.CompleteTiming()
 
+	// Create span for reading snapshot
+	snapshotCtx, snapshotSpan := telemetry.StartSpan(ctx, "precacher.read_snapshot")
+	defer snapshotSpan.End()
+
 	rpmSnapshot, err := rpmSnapshotFromFile(*snapshot)
 	if err != nil {
+		telemetry.RecordError(snapshotCtx, err)
+		telemetry.SetStatus(snapshotCtx, codes.Error, "Failed to read RPM snapshot")
 		if *nonFatalMode {
 			logger.Log.Errorf("%s", err)
 			return
 		} else {
 			logger.FatalOnError(err)
 		}
-
 	}
+	telemetry.SetStatus(snapshotCtx, codes.Ok, "RPM snapshot read successfully")
+	telemetry.SetAttributes(snapshotCtx, attribute.Int("snapshot.package_count", len(rpmSnapshot.Repo)))
+
+	// Create span for getting repo data
+	repoCtx, repoSpan := telemetry.StartSpan(ctx, "precacher.get_repo_data")
+	defer repoSpan.End()
+
 	packagesAvailableFromRepos, err := repoutils.GetAllRepoData(*repoUrls, *repoFiles, *workerTar, *buildDir, *repoUrlsFile)
 	if err != nil {
+		telemetry.RecordError(repoCtx, err)
+		telemetry.SetStatus(repoCtx, codes.Error, "Failed to get repo data")
 		if *nonFatalMode {
 			logger.Log.Errorf("%s", err)
 			return
@@ -98,6 +162,8 @@ func main() {
 			logger.FatalOnError(err)
 		}
 	}
+	telemetry.SetStatus(repoCtx, codes.Ok, "Repo data retrieved successfully")
+	telemetry.SetAttributes(repoCtx, attribute.Int("repo.available_packages", len(packagesAvailableFromRepos)))
 
 	logger.Log.Infof("Found %d available packages", len(packagesAvailableFromRepos))
 	if logger.Log.IsLevelEnabled(logrus.DebugLevel) {
@@ -106,18 +172,34 @@ func main() {
 		}
 	}
 
+	// Create span for downloading packages
+	downloadCtx, downloadSpan := telemetry.StartSpan(ctx, "precacher.download_packages")
+	defer downloadSpan.End()
+
 	downloadedPackages, err := downloadMissingPackages(rpmSnapshot, packagesAvailableFromRepos, *outDir, *concurrentNetOps)
 	if err != nil {
+		telemetry.RecordError(downloadCtx, err)
+		telemetry.SetStatus(downloadCtx, codes.Error, "Package download failed")
 		logger.Log.Warnf("Package download failed")
 		logger.Log.Warnf("Missing package download failed: %s", err)
 		// reset the error to nil so we can still write the summary file
 		// packages which are not able to be downloaded are not considered a failure of the tool, just a failure to download some packages
 		err = nil
+	} else {
+		telemetry.SetStatus(downloadCtx, codes.Ok, "Package download completed successfully")
 	}
+	telemetry.SetAttributes(downloadCtx, attribute.Int("download.downloaded_packages", len(downloadedPackages)))
 
 	logger.Log.Infof("Downloaded %d packages into the cache", len(downloadedPackages))
+
+	// Create span for writing summary
+	summaryCtx, summarySpan := telemetry.StartSpan(ctx, "precacher.write_summary")
+	defer summarySpan.End()
+
 	err = writeSummaryFile(*outputSummaryFile, downloadedPackages)
 	if err != nil {
+		telemetry.RecordError(summaryCtx, err)
+		telemetry.SetStatus(summaryCtx, codes.Error, "Failed to write summary file")
 		if *nonFatalMode {
 			logger.Log.Errorf("%s", err)
 			return
@@ -125,6 +207,7 @@ func main() {
 			logger.FatalOnError(err)
 		}
 	}
+	telemetry.SetStatus(summaryCtx, codes.Ok, "Summary file written successfully")
 }
 
 func rpmSnapshotFromFile(snapshotFile string) (rpmSnapshot *repocloner.RepoContents, err error) {

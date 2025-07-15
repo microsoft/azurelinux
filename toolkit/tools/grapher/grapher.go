@@ -4,8 +4,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -13,9 +15,13 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/telemetry"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -43,6 +49,10 @@ var (
 	disableDefaultRepos           = app.Flag("disable-default-repos", "Disable pulling packages from PMC repos").Bool()
 	ignoreVersionToResolveSelfDep = app.Flag("ignore-version-to-resolve-selfdep", "Ignore package version while downloading package from upstream when resolving cycle").Bool()
 	repoSnapshotTime              = app.Flag("repo-snapshot-time", "Optional: Repo time limit for tdnf virtual snapshot").String()
+
+	// Telemetry flags
+	enableTelemetry = app.Flag("enable-telemetry", "Enable OpenTelemetry tracing.").Bool()
+	otlpEndpoint    = app.Flag("otlp-endpoint", "OTLP collector endpoint for telemetry export.").Default("").String()
 )
 
 func main() {
@@ -51,6 +61,49 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(logFlags)
+
+	// Initialize telemetry
+	ctx := context.Background()
+	telemetryConfig := telemetry.DefaultConfig()
+	telemetryConfig.ServiceName = "azurelinux-toolkit-grapher"
+	telemetryConfig.ServiceVersion = exe.ToolkitVersion
+
+	// Override with command line flags if provided
+	if *enableTelemetry {
+		telemetryConfig.Enabled = true
+	}
+	if *otlpEndpoint != "" {
+		telemetryConfig.OTLPEndpoint = *otlpEndpoint
+		telemetryConfig.Enabled = true
+	}
+
+	var tracerProvider *telemetry.TracerProvider
+	if telemetryConfig.Enabled {
+		var err error
+		tracerProvider, err = telemetry.Initialize(ctx, telemetryConfig)
+		if err != nil {
+			logger.Log.Warnf("Failed to initialize telemetry: %s", err)
+		} else {
+			logger.Log.Infof("Telemetry initialized with endpoint: %s", telemetryConfig.OTLPEndpoint)
+			defer func() {
+				shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+				defer cancel()
+				if err := tracerProvider.Shutdown(shutdownCtx); err != nil {
+					logger.Log.Warnf("Failed to shutdown telemetry: %s", err)
+				}
+			}()
+		}
+	}
+
+	// Create main span for the entire grapher run
+	ctx, mainSpan := telemetry.StartSpan(ctx, "grapher.main",
+		trace.WithAttributes(
+			attribute.String("grapher.version", exe.ToolkitVersion),
+			attribute.String("grapher.input", *input),
+			attribute.String("grapher.output", *output),
+		),
+	)
+	defer mainSpan.End()
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
@@ -61,28 +114,51 @@ func main() {
 	timestamp.BeginTiming("grapher", *timestampFile)
 	defer timestamp.CompleteTiming()
 
+	// Create span for parsing package JSON
+	parseCtx, parseSpan := telemetry.StartSpan(ctx, "grapher.parse_package_json")
+	defer parseSpan.End()
+
 	localPackages := pkgjson.PackageRepo{}
 	err = localPackages.ParsePackageJSON(*input)
 	if err != nil {
+		telemetry.RecordError(parseCtx, err)
+		telemetry.SetStatus(parseCtx, codes.Error, "Failed to parse package JSON")
 		logger.Log.Panic(err)
 	}
+	telemetry.SetStatus(parseCtx, codes.Ok, "Package JSON parsed successfully")
+	telemetry.SetAttributes(parseCtx, attribute.Int("packages.count", len(localPackages.Repo)))
+
+	// Create span for populating graph
+	populateCtx, populateSpan := telemetry.StartSpan(ctx, "grapher.populate_graph")
+	defer populateSpan.End()
 
 	depGraph := pkggraph.NewPkgGraph()
 	err = populateGraph(depGraph, &localPackages)
 	if err != nil {
+		telemetry.RecordError(populateCtx, err)
+		telemetry.SetStatus(populateCtx, codes.Error, "Failed to populate graph")
 		logger.Log.Panic(err)
 	}
+	telemetry.SetStatus(populateCtx, codes.Ok, "Graph populated successfully")
 
 	// Add a default "ALL" goal to build everything local
 	_, err = depGraph.AddGoalNode(goalNodeName, nil, nil, *strictGoals)
 	if err != nil {
+		telemetry.RecordError(ctx, err)
+		telemetry.SetStatus(ctx, codes.Error, "Failed to add goal node")
 		logger.Log.Panic(err)
 	}
+
+	// Create span for cycle resolution
+	cycleCtx, cycleSpan := telemetry.StartSpan(ctx, "grapher.cycle_resolution")
+	defer cycleSpan.End()
 
 	var cloner *rpmrepocloner.RpmRepoCloner = nil
 	if *resolveCyclesFromUpstream {
 		cloner, err = rpmrepocloner.ConstructCloner(*outDir, *tmpDir, *workerTar, *existingRpmsDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *repoFiles, *repoSnapshotTime)
 		if err != nil {
+			telemetry.RecordError(cycleCtx, err)
+			telemetry.SetStatus(cycleCtx, codes.Error, "Failed to construct cloner")
 			logger.Log.Panic(err)
 		}
 		enabledRepos := rpmrepocloner.RepoFlagAll
@@ -99,13 +175,24 @@ func main() {
 	logger.Log.Info("Running cycle resolution to fix any cycles in the dependency graph")
 	err = depGraph.MakeDAGUsingUpstreamRepos(*resolveCyclesFromUpstream, *ignoreVersionToResolveSelfDep, cloner)
 	if err != nil {
+		telemetry.RecordError(cycleCtx, err)
+		telemetry.SetStatus(cycleCtx, codes.Error, "Failed to resolve cycles")
 		logger.Log.Panic(err)
 	}
+	telemetry.SetStatus(cycleCtx, codes.Ok, "Cycle resolution completed successfully")
+
+	// Create span for writing graph
+	writeCtx, writeSpan := telemetry.StartSpan(ctx, "grapher.write_graph")
+	defer writeSpan.End()
 
 	err = pkggraph.WriteDOTGraphFile(depGraph, *output)
 	if err != nil {
+		telemetry.RecordError(writeCtx, err)
+		telemetry.SetStatus(writeCtx, codes.Error, "Failed to write graph file")
 		logger.Log.Panic(err)
 	}
+	telemetry.SetStatus(writeCtx, codes.Ok, "Graph file written successfully")
+	telemetry.SetAttributes(writeCtx, attribute.String("output_file", *output))
 
 	logger.Log.Info("Finished generating graph.")
 }

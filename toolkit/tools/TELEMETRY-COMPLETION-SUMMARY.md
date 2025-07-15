@@ -4,7 +4,7 @@ This document summarizes the completed OpenTelemetry instrumentation work for th
 
 ## Overview
 
-The Azure Linux Toolkit tools (scheduler, graphpkgfetcher, pkgworker) have been successfully instrumented with OpenTelemetry to enable telemetry collection when a collector is running. All test/demo files have been removed and documentation has been cleaned up.
+The Azure Linux Toolkit tools (scheduler, graphpkgfetcher, pkgworker, downloader, grapher, precacher, and srpmpacker) have been successfully instrumented with OpenTelemetry to enable telemetry collection when a collector is running. All test/demo files have been removed and documentation has been cleaned up.
 
 ## Instrumented Components
 
@@ -25,14 +25,14 @@ The Azure Linux Toolkit tools (scheduler, graphpkgfetcher, pkgworker) have been 
 #### `scheduler/scheduler.go`
 - Main span covering entire scheduler execution
 - Command-line flags: `--enable-telemetry`, `--otlp-endpoint`
-- Environment variable support: `ENABLE_TELEMETRY`, `OTLP_ENDPOINT`
+- Environment variable support: `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_SDK_DISABLED`
 - Telemetry attributes: graph file, output directory, worker count, etc.
 - Error and status reporting to spans
 
 #### `graphpkgfetcher/graphpkgfetcher.go`
 - Main span covering entire graph package fetcher execution
 - Command-line flags: `--enable-telemetry`, `--otlp-endpoint`
-- Environment variable support: `ENABLE_TELEMETRY`, `OTLP_ENDPOINT`
+- Environment variable support: `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_SDK_DISABLED`
 - Context propagation through key functions:
   - `fetchPackages`
   - `resolveGraphNodes`
@@ -45,7 +45,7 @@ The Azure Linux Toolkit tools (scheduler, graphpkgfetcher, pkgworker) have been 
 #### `pkgworker/pkgworker.go`
 - Main span covering entire package worker execution
 - Command-line flags: `--enable-telemetry`, `--otlp-endpoint`
-- Environment variable support: `ENABLE_TELEMETRY`, `OTLP_ENDPOINT`
+- Environment variable support: `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_SDK_DISABLED`
 - Context propagation through key functions:
   - `buildSRPMInChroot` (main build function)
   - `buildRPMFromSRPMInChroot` (RPM build from SRPM)
@@ -54,13 +54,57 @@ The Azure Linux Toolkit tools (scheduler, graphpkgfetcher, pkgworker) have been 
 - Telemetry attributes: SRPM file, architecture, build flags, package counts, etc.
 - Error and status reporting to spans
 
+#### `downloader/downloader.go`
+- Main span covering entire downloader execution
+- Command-line flags: `--enable-telemetry`, `--otlp-endpoint`
+- Environment variable support: `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_SDK_DISABLED`
+- Spans for download operations with URL and destination tracking
+- Telemetry attributes: source URL, destination file, download status
+- Error and status reporting for download failures and successes
+
+#### `grapher/grapher.go`
+- Main span covering entire grapher execution
+- Command-line flags: `--enable-telemetry`, `--otlp-endpoint`
+- Environment variable support: `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_SDK_DISABLED`
+- Context propagation through key functions:
+  - Package JSON parsing
+  - Graph population
+  - Cycle resolution
+  - Graph file writing
+- Telemetry attributes: input/output files, package counts, graph statistics
+- Error and status reporting to spans
+
+#### `precacher/precacher.go`
+- Main span covering entire precacher execution
+- Command-line flags: `--enable-telemetry`, `--otlp-endpoint`
+- Environment variable support: `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_SDK_DISABLED`
+- Context propagation through key functions:
+  - RPM snapshot reading
+  - Repository data retrieval
+  - Package downloading
+  - Summary file writing
+- Telemetry attributes: package counts, download statistics, concurrent operations
+- Error and status reporting to spans
+
+#### `srpmpacker/srpmpacker.go`
+- Main span covering entire SRPM packer execution
+- Command-line flags: `--enable-telemetry`, `--otlp-endpoint`
+- Environment variable support: `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_SDK_DISABLED`
+- Context propagation through key functions:
+  - Configuration setup
+  - Pack list parsing
+  - SRPM creation
+- Telemetry attributes: specs directory, distribution tag, worker count, pack list size
+- Error and status reporting to spans
+
 ## Telemetry Features
 
 ### Initialization
 - Telemetry is disabled by default
-- Can be enabled via command-line flag `--enable-telemetry` or environment variable `ENABLE_TELEMETRY=true`
-- OTLP endpoint can be specified via `--otlp-endpoint` flag or `OTLP_ENDPOINT` environment variable
-- Default endpoint: `localhost:4317` (standard OTLP gRPC port)
+- Can be enabled via command-line flag `--enable-telemetry` or environment variable detection
+- OTLP endpoint can be specified via `--otlp-endpoint` flag or `OTEL_EXPORTER_OTLP_ENDPOINT` environment variable
+- Can be disabled with `OTEL_SDK_DISABLED=true` environment variable
+- Default endpoint detection from environment variables
 
 ### Span Hierarchy
 - Main tool spans serve as root spans for each tool execution
@@ -69,15 +113,16 @@ The Azure Linux Toolkit tools (scheduler, graphpkgfetcher, pkgworker) have been 
 - Spans include relevant attributes for debugging and monitoring
 
 ### Error Handling
-- Errors are recorded in spans using `span.RecordError(err)`
-- Span status is set to error with descriptive messages
-- Success cases are marked with appropriate status codes
+- Errors are recorded in spans using `telemetry.RecordError(ctx, err)`
+- Span status is set to error with descriptive messages using `telemetry.SetStatus(ctx, codes.Error, description)`
+- Success cases are marked with appropriate status codes using `telemetry.SetStatus(ctx, codes.Ok, description)`
 
 ### Attributes
 - Tool-specific attributes for identification and debugging
 - Input/output file paths and directories
 - Counts and metrics (package counts, download counts, etc.)
 - Build configuration (architecture, flags, cache usage)
+- Performance metrics (worker counts, concurrent operations)
 
 ## Removed Files
 
