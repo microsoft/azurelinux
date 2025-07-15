@@ -125,7 +125,7 @@ var (
 
 	// Telemetry flags
 	enableTelemetry = app.Flag("enable-telemetry", "Enable OpenTelemetry tracing.").Bool()
-	otlpEndpoint    = app.Flag("otlp-endpoint", "OTLP collector endpoint for telemetry export.").String()
+	otlpEndpoint    = app.Flag("otlp-endpoint", "OTLP collector endpoint for telemetry export.").Default("").String()
 )
 
 func main() {
