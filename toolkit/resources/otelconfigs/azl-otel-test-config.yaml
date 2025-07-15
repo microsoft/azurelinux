@@ -1,0 +1,40 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+processors:
+  batch:
+    send_batch_size: 8000
+    timeout: 500ms
+
+exporters:
+  debug:
+    verbosity: normal
+  azuredataexplorer:
+    cluster_uri: "https://sam-hack-cluster.eastus2.kusto.windows.net"
+    use_azure_auth: true
+    db_name: "AzureLinuxBuildTelemetry"
+    metrics_table_name: "TESTBuildMetrics"
+    logs_table_name: "TESTBuildLogs"
+    traces_table_name: "TESTBuildTraces"
+    ingestion_type: "managed"
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, azuredataexplorer]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, azuredataexplorer]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, azuredataexplorer]
+  telemetry:
+    logs:
+      level: info
