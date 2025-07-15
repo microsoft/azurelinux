@@ -2242,6 +2242,7 @@
                 "azcopy",
                 "azl-otel-collector",
                 "azure-iot-sdk-c",
+                "azure-linux-image-tools",
                 "azure-nvme-utils",
                 "azure-storage-cpp",
                 "azurelinux-release",
