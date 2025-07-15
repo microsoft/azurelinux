@@ -124,8 +124,9 @@ var (
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 
 	// Telemetry flags
+	// Note: Telemetry can also be configured via OTEL_EXPORTER_OTLP_ENDPOINT environment variable
 	enableTelemetry = app.Flag("enable-telemetry", "Enable OpenTelemetry tracing.").Bool()
-	otlpEndpoint    = app.Flag("otlp-endpoint", "OTLP collector endpoint for telemetry export.").Default("").String()
+	otlpEndpoint    = app.Flag("otlp-endpoint", "OTLP collector endpoint for telemetry export (overrides OTEL_EXPORTER_OTLP_ENDPOINT).").Default("").String()
 )
 
 func main() {
@@ -142,10 +143,14 @@ func main() {
 	if *enableTelemetry {
 		telemetryConfig.Enabled = true
 	}
+	// Only override OTLP endpoint if explicitly provided via flag
 	if *otlpEndpoint != "" {
 		telemetryConfig.OTLPEndpoint = *otlpEndpoint
 		telemetryConfig.Enabled = true
 	}
+
+	// Log telemetry configuration for debugging
+	logger.Log.Debugf("Telemetry configuration: enabled=%v, endpoint=%s", telemetryConfig.Enabled, telemetryConfig.OTLPEndpoint)
 
 	var tracerProvider *telemetry.TracerProvider
 	if telemetryConfig.Enabled {
