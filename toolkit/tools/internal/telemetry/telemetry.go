@@ -50,13 +50,10 @@ type Config struct {
 
 // DefaultConfig returns a default telemetry configuration
 func DefaultConfig() *Config {
-	enabled := false
 	endpoint := os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
 
-	// Enable telemetry if OTLP endpoint is configured or if explicitly enabled
-	if endpoint != "" || os.Getenv("OTEL_SDK_DISABLED") != "true" {
-		enabled = true
-	}
+	// Enable telemetry if OTLP endpoint is configured and SDK is not explicitly disabled
+	enabled := endpoint != "" && os.Getenv("OTEL_SDK_DISABLED") != "true"
 
 	return &Config{
 		ServiceName:    ServiceName,
@@ -99,11 +96,11 @@ func Initialize(ctx context.Context, config *Config) (*TracerProvider, error) {
 		)
 		exporter, err = otlptrace.New(ctx, client)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create OTLP exporter: %w", err)
+			return nil, fmt.Errorf("failed to create OTLP exporter for endpoint %s: %w", config.OTLPEndpoint, err)
 		}
 	} else {
-		// Fallback to stdout exporter for development/debugging
-		return nil, fmt.Errorf("no OTLP endpoint configured and stdout exporter not implemented")
+		// No endpoint configured, return error with helpful message
+		return nil, fmt.Errorf("telemetry is enabled but no OTLP endpoint is configured. Set OTEL_EXPORTER_OTLP_ENDPOINT environment variable or use --otlp-endpoint flag")
 	}
 
 	// Create tracer provider
