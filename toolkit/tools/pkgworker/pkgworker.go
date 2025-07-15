@@ -15,7 +15,6 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/ccachemanager"
@@ -29,6 +28,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/tdnf"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/telemetry"
+	"golang.org/x/sys/unix"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -342,7 +342,7 @@ func buildSRPMInChroot(ctx context.Context, chrootDir, rpmDirPath, toolchainDirP
 			logger.Log.Debug("Build thread in chroot finished.")
 		case <-time.After(timeout):
 			logger.Log.Errorf("Timeout after %v: stopping chroot...", timeout)
-			shell.StopAllChildProcesses(syscall.SIGKILL)
+			shell.StopAllChildProcesses(unix.SIGKILL)
 			chrootErr = fmt.Errorf("build timed out after %s", timeout)
 		}
 		return chrootErr // Internal error is returned via the channel

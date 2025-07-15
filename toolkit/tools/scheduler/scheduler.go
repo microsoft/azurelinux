@@ -14,7 +14,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/ccachemanager"
@@ -29,6 +28,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/buildagents"
 	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/schedulerutils"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/sys/unix"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -274,7 +274,7 @@ func main() {
 	defer cancelOutstandingBuilds(agent)
 	// On a SIGINT or SIGTERM stop all agents.
 	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(signals, unix.SIGINT, unix.SIGTERM)
 	go cancelBuildsOnSignal(signals, agent)
 
 	err = buildGraph(ctx, *inputGraphFile, *outputGraphFile, agent, licenseCheckerConfig, *workers, *buildAttempts, *checkAttempts, *extraLayers, *maxCascadingRebuilds, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, finalTestsToRun, testsToRerun, ignoredTests, toolchainPackages, *optimizeWithCachedImplicit, *allowToolchainRebuilds)
@@ -320,7 +320,7 @@ func cancelOutstandingBuilds(agent buildagents.BuildAgent) {
 	}
 
 	// Issue a SIGINT to all children processes to allow them to gracefully exit.
-	shell.StopAllChildProcesses(syscall.SIGINT)
+	shell.StopAllChildProcesses(unix.SIGINT)
 }
 
 // cancelBuildsOnSignal will stop any builds running on SIGINT/SIGTERM.
