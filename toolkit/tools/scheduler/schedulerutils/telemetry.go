@@ -25,9 +25,8 @@ func BuildRequestTelemetry(ctx context.Context, req *BuildRequest) context.Conte
 		attribute.String("package.architecture", req.Node.Architecture),
 		attribute.String("package.source_name", req.Node.SrpmPath),
 		attribute.Bool("package.use_cache", req.UseCache),
-		attribute.Bool("package.allow_test_failures", req.AllowTestFailures),
-		attribute.Int("build.attempt", req.Attempt),
-		attribute.Int("test.attempt", req.TestAttempt),
+		attribute.Bool("package.is_delta", req.IsDelta),
+		attribute.Int("package.freshness", int(req.Freshness)),
 	)
 
 	return ctx
@@ -44,9 +43,11 @@ func BuildResultTelemetry(ctx context.Context, res *BuildResult) context.Context
 		attribute.String("package.type", res.Node.Type.String()),
 		attribute.Bool("build.success", res.Err == nil),
 		attribute.Bool("build.was_delta", res.WasDelta),
-		attribute.Bool("build.was_cached", res.WasCached),
+		attribute.Bool("build.used_cache", res.UsedCache),
 		attribute.Int("build.files_built_count", len(res.BuiltFiles)),
-		attribute.Int("build.log_files_count", len(res.LogFiles)),
+		attribute.Bool("build.ignored", res.Ignored),
+		attribute.Bool("test.check_failed", res.CheckFailed),
+		attribute.Int("package.freshness", int(res.Freshness)),
 	}
 
 	if res.Err != nil {
@@ -57,14 +58,9 @@ func BuildResultTelemetry(ctx context.Context, res *BuildResult) context.Context
 		telemetry.SetStatus(ctx, codes.Ok, "Build completed successfully")
 	}
 
-	if res.TestErr != nil {
-		attrs = append(attrs,
-			attribute.String("test.error", res.TestErr.Error()),
-			attribute.Bool("test.success", false),
-		)
-		telemetry.RecordError(ctx, res.TestErr)
-	} else {
-		attrs = append(attrs, attribute.Bool("test.success", true))
+	// Add log file information if available
+	if res.LogFile != "" {
+		attrs = append(attrs, attribute.String("build.log_file", res.LogFile))
 	}
 
 	if res.HasLicenseWarnings {
@@ -101,7 +97,8 @@ func PackageBuildTelemetry(ctx context.Context, req *BuildRequest) (context.Cont
 			attribute.String("package.type", req.Node.Type.String()),
 			attribute.String("package.architecture", req.Node.Architecture),
 			attribute.Bool("package.use_cache", req.UseCache),
-			attribute.Int("build.attempt", req.Attempt),
+			attribute.Bool("package.is_delta", req.IsDelta),
+			attribute.Int("package.freshness", int(req.Freshness)),
 		),
 	)
 }
