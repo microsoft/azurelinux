@@ -115,6 +115,11 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, basePackageName, 
 		serializedArgs = append(serializedArgs, fmt.Sprintf("--ccache-config=%s", config.CCacheConfig))
 	}
 
+	if config.EnableTelemetry {
+		serializedArgs = append(serializedArgs, "--enable-telemetry")
+		serializedArgs = append(serializedArgs, fmt.Sprintf("--otlp-endpoint=%s", config.OTLPEndpoint))
+	}
+
 	for _, dependency := range dependencies {
 		serializedArgs = append(serializedArgs, fmt.Sprintf("--install-package=%s", dependency))
 	}

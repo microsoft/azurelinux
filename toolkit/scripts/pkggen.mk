@@ -243,6 +243,8 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
 		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
 		--timestamp-file=$(TIMESTAMP_DIR)/graph_cache.jsonl \
+		$(if $(OTEL_ENDPOINT),--otlp-endpoint="$(OTEL_ENDPOINT)") \
+		$(if $(filter y, $(ENABLE_TELEMETRY)),--enable-telemetry) \
 		--output=$(cached_file) && \
 	touch $@
 
@@ -352,6 +354,8 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroo
 		$(if $(filter y,$(ALLOW_TOOLCHAIN_REBUILDS)),--allow-toolchain-rebuilds) \
 		--max-cpu="$(MAX_CPU)" \
 		$(if $(PACKAGE_BUILD_TIMEOUT),--timeout="$(PACKAGE_BUILD_TIMEOUT)") \
+		$(if $(OTEL_ENDPOINT),--otlp-endpoint="$(OTEL_ENDPOINT)") \
+		$(if $(filter y, $(ENABLE_TELEMETRY)),--enable-telemetry) \
 		$(logging_command) && \
 	touch $@
 

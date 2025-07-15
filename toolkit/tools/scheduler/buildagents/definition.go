@@ -34,6 +34,9 @@ type BuildAgentConfig struct {
 
 	LogDir   string
 	LogLevel string
+
+	EnableTelemetry bool
+	OTLPEndpoint    string
 }
 
 // BuildAgent provides an interface for a build agent that takes in an input package and builds it.

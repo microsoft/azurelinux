@@ -139,18 +139,32 @@ func main() {
 	telemetryConfig := telemetry.DefaultConfig()
 	telemetryConfig.ServiceVersion = exe.ToolkitVersion
 
+	// Debug: Log environment variables for troubleshooting chroot issues
+	envEndpoint := os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
+	envDisabled := os.Getenv("OTEL_SDK_DISABLED")
+	logger.Log.Debugf("Environment variables: OTEL_EXPORTER_OTLP_ENDPOINT='%s', OTEL_SDK_DISABLED='%s'", envEndpoint, envDisabled)
+	logger.Log.Debugf("Default telemetry config: enabled=%v, endpoint='%s'", telemetryConfig.Enabled, telemetryConfig.OTLPEndpoint)
+
+	// Warn if running in a chroot-like environment where env vars might not be available
+	if envEndpoint == "" && envDisabled == "" {
+		logger.Log.Debugf("No OpenTelemetry environment variables detected. This may be due to running in a chroot environment.")
+		logger.Log.Debugf("To enable telemetry in chroot environments, use: --enable-telemetry --otlp-endpoint <endpoint>")
+	}
+
 	// Override with command line flags if provided
 	if *enableTelemetry {
 		telemetryConfig.Enabled = true
+		logger.Log.Debugf("Telemetry explicitly enabled via --enable-telemetry flag")
 	}
 	// Only override OTLP endpoint if explicitly provided via flag
 	if *otlpEndpoint != "" {
 		telemetryConfig.OTLPEndpoint = *otlpEndpoint
 		telemetryConfig.Enabled = true
+		logger.Log.Debugf("OTLP endpoint set via --otlp-endpoint flag: '%s'", *otlpEndpoint)
 	}
 
-	// Log telemetry configuration for debugging
-	logger.Log.Debugf("Telemetry configuration: enabled=%v, endpoint=%s", telemetryConfig.Enabled, telemetryConfig.OTLPEndpoint)
+	// Log final telemetry configuration
+	logger.Log.Debugf("Final telemetry configuration: enabled=%v, endpoint='%s'", telemetryConfig.Enabled, telemetryConfig.OTLPEndpoint)
 
 	var tracerProvider *telemetry.TracerProvider
 	if telemetryConfig.Enabled {
@@ -262,6 +276,9 @@ func main() {
 
 		LogDir:   *buildLogsDir,
 		LogLevel: *logFlags.LogLevel,
+
+		EnableTelemetry: *enableTelemetry,
+		OTLPEndpoint:    *otlpEndpoint,
 	}
 
 	agent, err := buildagents.BuildAgentFactory(*buildAgent)

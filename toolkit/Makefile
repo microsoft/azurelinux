@@ -138,6 +138,9 @@ PRECACHER_SNAPSHOT   ?= $(rpms_snapshot)
 # if the user is depending on failures from the precacher, it can be turned off with this option or with the tool directly.
 PRECACHER_NON_FATAL ?= y
 
+OTEL_ENDPOINT ?=
+ENABLE_TELEMETRY ?= n
+
 # External source server
 SOURCE_URL         ?= https://azurelinuxsrcstorage.blob.core.windows.net/sources/core
 

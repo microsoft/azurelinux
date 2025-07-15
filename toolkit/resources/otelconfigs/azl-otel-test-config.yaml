@@ -15,7 +15,7 @@ exporters:
   azuredataexplorer:
     cluster_uri: "https://sam-hack-cluster.eastus2.kusto.windows.net"
     use_azure_auth: true
-    db_name: "AzureLinuxBuildTelemetry"
+    db_name: "SamHack"
     metrics_table_name: "TESTBuildMetrics"
     logs_table_name: "TESTBuildLogs"
     traces_table_name: "TESTBuildTraces"
