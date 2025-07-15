@@ -222,7 +222,7 @@ tdnf-plugin-repogpgcheck-3.5.8-7.azl3.aarch64.rpm
 libassuan-2.5.6-1.azl3.aarch64.rpm
 libassuan-devel-2.5.6-1.azl3.aarch64.rpm
 libgpg-error-1.48-1.azl3.aarch64.rpm
-libgcrypt-1.10.2-1.azl3.aarch64.rpm
+libgcrypt-1.10.3-1.azl3.aarch64.rpm
 libksba-1.6.4-1.azl3.aarch64.rpm
 libksba-devel-1.6.4-1.azl3.aarch64.rpm
 libxslt-1.1.43-1.azl3.aarch64.rpm
