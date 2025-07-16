@@ -1,13 +1,17 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.40.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Programming
 URL:            https://git-scm.com/
 Source0:        https://github.com/git/git/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2025-48384.patch
+Patch1:         CVE-2025-48385.patch
+Patch2:         CVE-2025-27613.patch
+
 BuildRequires:  curl-devel
 BuildRequires:  python3-devel
 Requires:       curl
@@ -102,7 +106,7 @@ BuildArch:      noarch
 %endif
 
 %prep
-%setup -q
+%autosetup -p1
 %{py3_shebang_fix} git-p4.py
 
 %build
@@ -169,6 +173,9 @@ fi
 %endif
 
 %changelog
+* Mon Jul 14 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.40.4-2
+- Add patch for CVE-2025-48384, CVE-2025-48385 and CVE-2025-27613
+
 * Thu Jan 16 2024 Suresh Thelkar <sthelkar@microsoft.com> - 2.40.4-1
 - Upgrade to 2.40.4 to address CVE-2024-50349 and CVE-2024-52006
 
