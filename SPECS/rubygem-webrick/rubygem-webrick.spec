@@ -50,7 +50,7 @@ popd
 
 %files
 %defattr(-,root,root,-)
-%doc %{gemdir}/gems/%{gem_name}-%{version}/LICENSE.txt
+%license LICENSE.txt
 %{gemdir}
 
 %changelog
