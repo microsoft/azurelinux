@@ -58,6 +58,6 @@ install -m 755 dist/mongosh %{buildroot}/%{_bindir}/mongosh
 
 %changelog
 %changelog
-* Thu Jul 03 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.5.2-1
+* Thu Jul 03 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.5.5-1
 - Initial Azure Linux import from the source project
 - License Verified
