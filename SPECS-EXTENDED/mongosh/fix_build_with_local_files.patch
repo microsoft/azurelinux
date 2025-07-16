@@ -1,0 +1,21 @@
+diff --git a/scripts/prep-fle-addon.sh b/scripts/prep-fle-addon.sh
+index b072b27..e629f47 100755
+--- a/scripts/prep-fle-addon.sh
++++ b/scripts/prep-fle-addon.sh
+@@ -23,7 +23,6 @@ set -x
+ cd "$(dirname "$0")"/..
+ MONGOSH_ROOT_DIR="$PWD"
+ BUILDROOT="$MONGOSH_ROOT_DIR"/tmp/fle-buildroot
+-rm -rf "$BUILDROOT"
+ mkdir -p "$BUILDROOT"
+ cd "$BUILDROOT"
+ 
+@@ -31,8 +30,6 @@ cd "$BUILDROOT"
+ 
+ echo Using mongodb-client-encryption at git tag "$MONGODB_CLIENT_ENCRYPTION_VERSION"
+ 
+-git clone https://github.com/mongodb-js/mongodb-client-encryption --branch "$MONGODB_CLIENT_ENCRYPTION_VERSION" --depth 2
+-
+ cd mongodb-client-encryption
+ 
+ unset IS_WINDOWS

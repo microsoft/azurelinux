@@ -1,0 +1,81 @@
+Summary:        MongoDB Shell CLI REPL Package.
+Name:           mongosh
+Version:        2.5.5
+#Version:        2.2.10
+Release:        1%{?dist}
+License:        Apache License Version 2.0
+Group:          Development/Tools
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+Url:            https://github.com/mongodb-js/mongosh
+Source0:        https://github.com/mongodb-js/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        node_modules.tar.gz
+Source2:        packages.tar.gz
+Source3:        mongodb-client-encryption.tar.gz
+Source4:        lazy-webpack-modules.tar.gz
+Source5:        node-v20.19.3.tar.gz
+Source6:        SHASUMS256.txt
+Patch0:         fix_build_with_local_files.patch
+BuildRequires:  nodejs-npm
+BuildRequires:  nodejs-devel
+
+%description
+MongoDB Shell CLI REPL Package
+
+%prep
+%autosetup -p1
+tar -xf %{SOURCE1}
+tar -xf %{SOURCE2}
+mkdir -p tmp/fle-buildroot
+tar -xf %{SOURCE3} -C tmp/fle-buildroot/
+tar -xf %{SOURCE4} -C tmp/
+#rm .gitignore
+# autopatch -p1
+#git init
+#git add .
+#git config --global user.email "skarambelkar@microsoft.com"
+#git config --global user.name "Sandeep Karambelkar"
+#git commit -m "base"
+#exit 1
+mkdir -p /tmp/boxednode/mongosh
+cp %{SOURCE5} /tmp/boxednode/mongosh/
+cp %{SOURCE6} /tmp/boxednode/mongosh/
+#rm -rf /tmp/boxednode/mongosh/node-v20.18.0
+#tar -xf %{SOURCE5} -C /tmp/boxednode/mongosh/
+#cd /tmp/boxednode/mongosh/node-v20.18.0
+#git init
+#git add .
+#git config --global user.email "skarambelkar@microsoft.com"
+#git config --global user.name "Sandeep Karambelkar"
+#git commit -m "base"
+#cd -
+
+%build
+# Run npm_lazy server in the background for npm requests proxying from local cache
+./node_modules/npm_lazy/bin/npm_lazy > ~/npm_lazy.log 2>&1 &
+
+# Route npm calls to npm_lazy
+npm config set registry http://localhost:8080/
+
+#npm run compile
+#Run with BOXEDNODE_MAKE_ARGS="-j6" if running in container
+BOXEDNODE_MAKE_ARGS="-j2" SEGMENT_API_KEY="dummy" NODE_JS_VERSION=20.19.3 npm run compile-exec
+
+#stop the npm_lazy server
+kill %1
+
+%install
+mkdir -p %{buildroot}/%{_bindir}/.
+install -m 755 dist/mongosh %{buildroot}/%{_bindir}/mongosh
+
+%files
+%{_bindir}/mongosh
+%license LICENSE
+%doc README.md
+%doc THIRD_PARTY_NOTICES.md
+
+%changelog
+%changelog
+* Thu Jul 03 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.5.2-1
+- Initial Azure Linux import from upstream
+- License Verified
