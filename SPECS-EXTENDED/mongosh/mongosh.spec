@@ -13,7 +13,7 @@ Source2:        mongosh_packages.tar.gz
 Source3:        mongodb-client-encryption.tar.gz
 Source4:        mongosh_lazy-webpack-modules.tar.gz
 Source5:        node-v20.19.3.tar.gz
-Source6:        mongosh_SHASUMS256.txt
+Source6:        SHASUMS256.txt
 Patch0:         fix_build_with_local_files.patch
 BuildRequires:  nodejs-npm
 BuildRequires:  nodejs-devel
@@ -59,5 +59,5 @@ install -m 755 dist/mongosh %{buildroot}/%{_bindir}/mongosh
 %changelog
 %changelog
 * Thu Jul 03 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.5.2-1
-- Initial Azure Linux import from upstream
+- Initial Azure Linux import from the source project
 - License Verified
