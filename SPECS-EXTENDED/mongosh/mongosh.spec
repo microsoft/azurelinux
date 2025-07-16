@@ -1,7 +1,6 @@
 Summary:        MongoDB Shell CLI REPL Package.
 Name:           mongosh
 Version:        2.5.5
-#Version:        2.2.10
 Release:        1%{?dist}
 License:        Apache License Version 2.0
 Group:          Development/Tools
@@ -29,26 +28,9 @@ tar -xf %{SOURCE2}
 mkdir -p tmp/fle-buildroot
 tar -xf %{SOURCE3} -C tmp/fle-buildroot/
 tar -xf %{SOURCE4} -C tmp/
-#rm .gitignore
-# autopatch -p1
-#git init
-#git add .
-#git config --global user.email "skarambelkar@microsoft.com"
-#git config --global user.name "Sandeep Karambelkar"
-#git commit -m "base"
-#exit 1
 mkdir -p /tmp/boxednode/mongosh
 cp %{SOURCE5} /tmp/boxednode/mongosh/
 cp %{SOURCE6} /tmp/boxednode/mongosh/
-#rm -rf /tmp/boxednode/mongosh/node-v20.18.0
-#tar -xf %{SOURCE5} -C /tmp/boxednode/mongosh/
-#cd /tmp/boxednode/mongosh/node-v20.18.0
-#git init
-#git add .
-#git config --global user.email "skarambelkar@microsoft.com"
-#git config --global user.name "Sandeep Karambelkar"
-#git commit -m "base"
-#cd -
 
 %build
 # Run npm_lazy server in the background for npm requests proxying from local cache
