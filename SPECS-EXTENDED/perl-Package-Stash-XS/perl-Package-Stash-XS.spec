@@ -6,14 +6,14 @@
 %endif
 
 Name:		perl-Package-Stash-XS
-Version:	0.29
-Release:	7%{?dist}
+Version:	0.30
+Release:	1%{?dist}
 Summary:	Faster and more correct implementation of the Package::Stash API
-License:	GPL+ or Artistic
+License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Package-Stash-XS
-Source0:	https://cpan.metacpan.org/modules/by-module/Package/Package-Stash-XS-%{version}.tar.gz#/perl-Package-Stash-XS-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/modules/by-module/Package/Package-Stash-XS-%{version}.tar.gz
 # Module Build
 BuildRequires:	coreutils
 BuildRequires:	findutils
@@ -30,27 +30,23 @@ BuildRequires:	perl(XSLoader)
 # Test Suite
 BuildRequires:	perl(B)
 BuildRequires:	perl(base)
+BuildRequires:	perl(blib)
 BuildRequires:	perl(constant)
 BuildRequires:	perl(File::Spec)
-BuildRequires:	perl(IO::Handle)
-BuildRequires:	perl(IPC::Open3)
 BuildRequires:	perl(lib)
-BuildRequires:	perl(blib)
 BuildRequires:	perl(Scalar::Util)
 BuildRequires:	perl(Symbol)
 BuildRequires:	perl(Test::Fatal)
 BuildRequires:	perl(Test::More) >= 0.88
-BuildRequires:	perl(Test::Requires)
+BuildRequires:	perl(Test::Needs)
 %if %{with perl_Package_Stash_XS_enables_optional_test}
 # Optional Tests
 BuildRequires:	perl(CPAN::Meta) >= 2.120900
-
 BuildRequires:	perl(Package::Anon)
-
 BuildRequires:	perl(Variable::Magic)
 %endif
 # Dependencies
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# (none)
 
 # Don't "provide" private Perl libs
 %{?perl_default_filter}
@@ -77,17 +73,17 @@ find %{buildroot} -type f -name '*.bs' -empty -delete
 make test
 
 %files
-%if 0%{?_licensedir:1}
 %license LICENSE
-%else
-%doc LICENSE
-%endif
 %doc Changes CONTRIBUTING README
 %{perl_vendorarch}/auto/Package/
 %{perl_vendorarch}/Package/
 %{_mandir}/man3/Package::Stash::XS.3*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.30-1
+- Update to version 0.30
+- License verified
+
 * Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 0.29-7
 - Add an explicit BR on `perl(blib)` to enable ptest
 - License verified
