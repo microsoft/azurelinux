@@ -8,12 +8,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Url:            https://github.com/mongodb-js/mongosh
 Source0:        https://github.com/mongodb-js/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        node_modules.tar.gz
-Source2:        packages.tar.gz
+Source1:        mongosh_node_modules.tar.gz
+Source2:        mongosh_packages.tar.gz
 Source3:        mongodb-client-encryption.tar.gz
-Source4:        lazy-webpack-modules.tar.gz
+Source4:        mongosh_lazy-webpack-modules.tar.gz
 Source5:        node-v20.19.3.tar.gz
-Source6:        SHASUMS256.txt
+Source6:        mongosh_SHASUMS256.txt
 Patch0:         fix_build_with_local_files.patch
 BuildRequires:  nodejs-npm
 BuildRequires:  nodejs-devel
@@ -30,7 +30,7 @@ tar -xf %{SOURCE3} -C tmp/fle-buildroot/
 tar -xf %{SOURCE4} -C tmp/
 mkdir -p /tmp/boxednode/mongosh
 cp %{SOURCE5} /tmp/boxednode/mongosh/
-cp %{SOURCE6} /tmp/boxednode/mongosh/
+cp %{SOURCE6} /tmp/boxednode/mongosh/SHASUMS256.txt
 
 %build
 # Run npm_lazy server in the background for npm requests proxying from local cache
@@ -40,8 +40,8 @@ cp %{SOURCE6} /tmp/boxednode/mongosh/
 npm config set registry http://localhost:8080/
 
 #npm run compile
-#Run with BOXEDNODE_MAKE_ARGS="-j6" if running in container
-BOXEDNODE_MAKE_ARGS="-j2" SEGMENT_API_KEY="dummy" NODE_JS_VERSION=20.19.3 npm run compile-exec
+#Run with BOXEDNODE_MAKE_ARGS="-j2" if running in container
+SEGMENT_API_KEY="dummy" NODE_JS_VERSION=20.19.3 npm run compile-exec
 
 #stop the npm_lazy server
 kill %1
