@@ -6,6 +6,8 @@ package telemetry
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"time"
@@ -34,6 +36,8 @@ var (
 	GlobalTracer trace.Tracer
 	// isInitialized tracks whether telemetry has been initialized
 	isInitialized bool
+	// globalBuildID is the unique build ID for this execution
+	globalBuildID string
 )
 
 // Config holds telemetry configuration
@@ -46,20 +50,55 @@ type Config struct {
 	OTLPEndpoint string
 	// Enabled controls whether telemetry is enabled
 	Enabled bool
+	// BuildID is the unique identifier for the build, generated at random
+	BuildID string
+}
+
+// generateBuildID creates a new unique build identifier
+func generateBuildID() string {
+	// Generate 8 random bytes (16 hex characters)
+	bytes := make([]byte, 8)
+	if _, err := rand.Read(bytes); err != nil {
+		// Fallback to timestamp-based ID if random generation fails
+		return fmt.Sprintf("build-%d", time.Now().Unix())
+	}
+	return hex.EncodeToString(bytes)
+}
+
+// GetOrCreateBuildID returns the global build ID, creating one if it doesn't exist
+func GetOrCreateBuildID() string {
+	if globalBuildID == "" {
+		globalBuildID = generateBuildID()
+	}
+	return globalBuildID
 }
 
 // DefaultConfig returns a default telemetry configuration
 func DefaultConfig() *Config {
+	return DefaultConfigWithBuildID("")
+}
+
+// DefaultConfigWithBuildID returns a default telemetry configuration with an optional build ID
+func DefaultConfigWithBuildID(buildID string) *Config {
 	endpoint := os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
 
 	// Enable telemetry if OTLP endpoint is configured and SDK is not explicitly disabled
 	enabled := endpoint != "" && os.Getenv("OTEL_SDK_DISABLED") != "true"
+
+	// Use provided build ID or generate one if empty
+	if buildID == "" {
+		buildID = GetOrCreateBuildID()
+	} else {
+		// Store the provided build ID globally
+		globalBuildID = buildID
+	}
 
 	return &Config{
 		ServiceName:    ServiceName,
 		ServiceVersion: ServiceVersion,
 		OTLPEndpoint:   endpoint,
 		Enabled:        enabled,
+		BuildID:        buildID,
 	}
 }
 
@@ -81,6 +120,7 @@ func Initialize(ctx context.Context, config *Config) (*TracerProvider, error) {
 		resource.WithAttributes(
 			semconv.ServiceName(config.ServiceName),
 			semconv.ServiceVersion(config.ServiceVersion),
+			attribute.String("build.id", config.BuildID),
 		),
 	)
 	if err != nil {
@@ -116,6 +156,9 @@ func Initialize(ctx context.Context, config *Config) (*TracerProvider, error) {
 
 	// Set global tracer
 	GlobalTracer = otel.Tracer(config.ServiceName)
+
+	// Store the build ID globally for cross-tool consistency
+	globalBuildID = config.BuildID
 	isInitialized = true
 
 	return &TracerProvider{provider: tp}, nil
@@ -129,12 +172,28 @@ func (tp *TracerProvider) Shutdown(ctx context.Context) error {
 	return nil
 }
 
+// SetBuildID sets the global build ID
+func SetBuildID(buildID string) {
+	globalBuildID = buildID
+}
+
+// GetBuildID returns the current build ID
+func GetBuildID() string {
+	return globalBuildID
+}
+
 // StartSpan starts a new span with the given name and options
 func StartSpan(ctx context.Context, spanName string, opts ...trace.SpanStartOption) (context.Context, trace.Span) {
 	if !isInitialized || GlobalTracer == nil {
 		// Return a no-op span if telemetry is not initialized
 		return ctx, trace.SpanFromContext(ctx)
 	}
+
+	// Add build ID as a span attribute if available
+	if globalBuildID != "" {
+		opts = append(opts, trace.WithAttributes(attribute.String("build.id", globalBuildID)))
+	}
+
 	return GlobalTracer.Start(ctx, spanName, opts...)
 }
 
