@@ -18,7 +18,7 @@
 Summary:        Apache Commons Lang Package
 Name:           apache-%{short_name}
 Version:        3.8.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,7 @@ URL:            https://commons.apache.org/proper/commons-lang
 Source0:        https://archive.apache.org/dist/commons/lang/source/%{short_name}-%{version}-src.tar.gz
 Source1:        build.xml
 Source2:        default.properties
+Patch0:         CVE-2025-48924.patch
 BuildRequires:  ant
 BuildRequires:  ant-junit
 BuildRequires:  fdupes
@@ -57,7 +58,8 @@ Group:          Documentation/HTML
 Javadoc for %{name}.
 
 %prep
-%setup -q -n %{short_name}-%{version}-src
+
+%autosetup -n %{short_name}-%{version}-src -p1
 cp %{SOURCE1} .
 cp %{SOURCE2} .
 sed -i 's/\r//' *.txt
@@ -98,6 +100,9 @@ cp -pr target/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Wed Jul 16 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 3.8.1-6
+- Addressed CVE-2025-48924
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.1-5
 - Moved from extended to core
 - License verified
