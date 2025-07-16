@@ -20,8 +20,8 @@ Distribution:   Azure Linux
 
 %bcond_with tests
 Name:           httpcomponents-core
-Version:        4.4.13
-Release:        2%{?dist}
+Version:        4.4.16
+Release:        1%{?dist}
 Summary:        Set of low level Java HTTP transport components for HTTP services
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -29,9 +29,11 @@ URL:            https://hc.apache.org/
 Source0:        https://archive.apache.org/dist/httpcomponents/httpcore/source/httpcomponents-core-%{version}-src.tar.gz
 Source1:        %{name}-build.tar.xz
 Patch0:         %{name}-java8compat.patch
+Patch1:         fix-compiler-version.patch
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  javapackages-local-bootstrap
+BuildRequires:  xerces-j2
 BuildArch:      noarch
 %if %{with tests}
 BuildRequires:  ant-junit
@@ -65,9 +67,7 @@ Group:          Development/Libraries/Java
 %{summary}.
 
 %prep
-%setup -q -a1
-
-%patch 0 -p1
+%autosetup -a1 -p1 -c
 
 # Random test failures on ARM -- 100 ms sleep is not eneough on this
 # very performant arch, lets make it 2 s
@@ -157,6 +157,9 @@ done
 %{_javadocdir}/%{name}
 
 %changelog
+* Wed Jul 16 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 4.4.16-1
+- Update to 4.4.16 (latest minor release)
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.4.13-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
