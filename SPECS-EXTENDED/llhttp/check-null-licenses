@@ -1,0 +1,179 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+import json
+from argparse import ArgumentParser, FileType, RawDescriptionHelpFormatter
+from pathlib import Path
+from sys import exit, stderr
+
+import tomllib
+
+
+def main():
+    args = parse_args()
+    problem = False
+    if not args.tree.is_dir():
+        return f"Not a directory: {args.tree}"
+    for pjpath in args.tree.glob("**/package.json"):
+        name, version, license = parse(pjpath)
+        identity = f"{name} {version}"
+        if version in args.exceptions.get(name, ()):
+            continue  # Do not even check the license
+        elif license is None:
+            problem = True
+            print(f"Missing license in package.json for {identity}", file=stderr)
+        elif isinstance(license, dict):
+            if isinstance(license.get("type"), str):
+                continue
+            print(
+                (
+                    "Missing type for (deprecated) license object in "
+                    f"package.json for {identity}: {license}"
+                ),
+                file=stderr,
+            )
+        elif isinstance(license, list):
+            if license and all(
+                isinstance(entry, dict) and isinstance(entry.get("type"), str)
+                for entry in license
+            ):
+                continue
+            print(
+                (
+                    "Defective (deprecated) licenses array-of objects in "
+                    f"package.json for {identity}: {license}"
+                ),
+                file=stderr,
+            )
+        elif isinstance(license, str):
+            continue
+        else:
+            print(
+                (
+                    "Weird type for license in "
+                    f"package.json for {identity}: {license}"
+                ),
+                file=stderr,
+            )
+        problem = True
+    if problem:
+        return "At least one missing license was found."
+
+
+def parse(package_json_path):
+    with package_json_path.open("rb") as pjfile:
+        pj = json.load(pjfile)
+    try:
+        license = pj["license"]
+    except KeyError:
+        license = pj.get("licenses")
+    try:
+        name = pj["name"]
+    except KeyError:
+        name = package_json_path.parent.name
+    version = pj.get("version", "<unknown version>")
+
+    return name, version, license
+
+
+def parse_args():
+    parser = ArgumentParser(
+        formatter_class=RawDescriptionHelpFormatter,
+        description=("Search for bundled dependencies without declared licenses"),
+        epilog="""
+
+The exceptions file must be a TOML file with zero or more tables. Each table’s
+keys are package names; the corresponding values values are exact version
+number strings, or arrays of version number strings, that have been manually
+audited to determine their license status and should therefore be ignored.
+
+Exceptions in a table called “any” are always applied. Otherwise, exceptions
+are applied only if a corresponding --with TABLENAME argument is given;
+multiple such arguments may be given.
+
+For
+example:
+
+    [any]
+    example-foo = "1.0.0"
+
+    [prod]
+    example-bar = [ "2.0.0", "2.0.1",]
+
+    [dev]
+    example-bat = [ "3.7.4",]
+
+would always ignore version 1.0.0 of example-foo. It would ignore example-bar
+2.0.1 only when called with “--with prod”.
+
+Comments may (and should) be used to describe the manual audits upon which the
+exclusions are based.
+
+Otherwise, any package.json with missing or null license field in the tree is
+considered an error, and the program returns with nonzero status.
+""",
+    )
+    parser.add_argument(
+        "-x",
+        "--exceptions",
+        type=FileType("rb"),
+        help="Manually audited package versions file",
+    )
+    parser.add_argument(
+        "-w",
+        "--with",
+        action="append",
+        default=[],
+        help="Enable a table in the exceptions file",
+    )
+    parser.add_argument(
+        "tree",
+        metavar="node_modules_dir",
+        type=Path,
+        help="Path to search recursively",
+        default=".",
+    )
+    args = parser.parse_args()
+
+    if args.exceptions is None:
+        args.exceptions = {}
+        xname = None
+    else:
+        with args.exceptions as xfile:
+            xname = getattr(xfile, "name", "<exceptions>")
+            args.exceptions = tomllib.load(args.exceptions)
+        if not isinstance(args.exceptions, dict):
+            parser.error(f"Invalid format in {xname}: not an object")
+        for tablename, table in args.exceptions.items():
+            if not isinstance(table, dict):
+                parser.error(f"Non-table entry in {xname}: {tablename} = {table!r}")
+            overlay = {}
+            for key, value in table.items():
+                if isinstance(value, str):
+                    overlay[key] = [value]
+                elif not isinstance(value, list) or not all(
+                    isinstance(entry, str) for entry in value
+                ):
+                    parser.error(
+                        f"Invalid format in {xname} in [{tablename}]: "
+                        f"{key!r} = {value!r}"
+                    )
+            table.update(overlay)
+
+    x = args.exceptions.get("any", {})
+    for add in getattr(args, "with"):
+        try:
+            x.update(args.exceptions[add])
+        except KeyError:
+            if xname is None:
+                parser.error(f"No table {add}, as no exceptions file was given")
+            else:
+                parser.error(f"No table {add} in {xname}")
+    # Store the merged dictionary
+    args.exceptions = x
+
+    return args
+
+
+if __name__ == "__main__":
+    exit(main())
