@@ -1452,13 +1452,13 @@
         }
       }
     },
-     {
+    {
       "component": {
         "type": "other",
         "other": {
-	  "name": "cassandra-driver",
+          "name": "cassandra-driver",
           "version": "3.29.2",
-	  "downloadUrl": "https://github.com/datastax/python-driver/archive/refs/tags/3.29.2.tar.gz"
+          "downloadUrl": "https://github.com/datastax/python-driver/archive/refs/tags/3.29.2.tar.gz"
         }
       }
     },
@@ -3498,8 +3498,8 @@
         "type": "other",
         "other": {
           "name": "facter",
-          "version": "4.2.13",
-          "downloadUrl": "https://downloads.puppetlabs.com/facter/facter-4.2.13.gem"
+          "version": "4.8.0",
+          "downloadUrl": "https://downloads.puppetlabs.com/facter/facter-4.8.0.gem"
         }
       }
     },
@@ -3830,8 +3830,8 @@
         "type": "other",
         "other": {
           "name": "foomatic-db",
-          "version": "4.0",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/foomatic-db-4.0-20201104.tar.gz"
+          "version": "4.0.20250707",
+          "downloadUrl": "https://www.openprinting.org/download/foomatic/foomatic-db-4.0-20250707.tar.gz"
         }
       }
     },
@@ -4360,8 +4360,8 @@
         "type": "other",
         "other": {
           "name": "git",
-          "version": "2.45.3",
-          "downloadUrl": "https://github.com/git/git/archive/refs/tags/v2.45.3.tar.gz"
+          "version": "2.45.4",
+          "downloadUrl": "https://github.com/git/git/archive/refs/tags/v2.45.4.tar.gz"
         }
       }
     },
@@ -4660,8 +4660,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.23.10",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.10-1/go1.23.10-20250605.3.src.tar.gz"
+          "version": "1.23.11",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.11-1/go1.23.11-20250708.6.src.tar.gz"
         }
       }
     },
@@ -4670,8 +4670,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.24.4",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.4-1/go1.24.4-20250605.5.src.tar.gz"
+          "version": "1.24.5",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.5-1/go1.24.5-20250708.7.src.tar.gz"
         }
       }
     },
@@ -5410,8 +5410,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.62",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.62.tar.bz2"
+          "version": "2.4.64",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.64.tar.bz2"
         }
       }
     },
@@ -6580,8 +6580,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.92.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.92.2.tar.gz"
+          "version": "6.6.96.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.1.tar.gz"
         }
       }
     },
@@ -8211,8 +8211,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.92.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.92.2.tar.gz"
+          "version": "6.6.96.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.1.tar.gz"
         }
       }
     },
@@ -8221,8 +8221,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.92.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.92.2.tar.gz"
+          "version": "6.6.96.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.1.tar.gz"
         }
       }
     },
@@ -8231,8 +8231,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.92.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.92.2.tar.gz"
+          "version": "6.6.96.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.1.tar.gz"
         }
       }
     },
@@ -8241,8 +8241,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.92.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.92.2.tar.gz"
+          "version": "6.6.96.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.1.tar.gz"
         }
       }
     },
@@ -10771,8 +10771,8 @@
         "type": "other",
         "other": {
           "name": "libproxy",
-          "version": "0.4.17",
-          "downloadUrl": "https://github.com/libproxy/libproxy/archive/refs/tags/0.4.17.tar.gz"
+          "version": "0.5.8",
+          "downloadUrl": "https://github.com/libproxy/libproxy/archive/refs/tags/0.5.8.tar.gz"
         }
       }
     },
@@ -11181,8 +11181,8 @@
         "type": "other",
         "other": {
           "name": "libsrtp",
-          "version": "2.3.0",
-          "downloadUrl": "https://github.com/cisco/libsrtp/archive/v2.3.0.tar.gz"
+          "version": "2.6.0",
+          "downloadUrl": "https://github.com/cisco/libsrtp/archive/v2.6.0.tar.gz"
         }
       }
     },
@@ -15783,8 +15783,8 @@
         "type": "other",
         "other": {
           "name": "papi",
-          "version": "5.7.0",
-          "downloadUrl": "http://icl.cs.utk.edu/projects/papi/downloads/papi-5.7.0.tar.gz"
+          "version": "7.1.0",
+          "downloadUrl": "https://icl.cs.utk.edu/projects/papi/downloads/papi-7.1.0.tar.gz"
         }
       }
     },
@@ -15793,8 +15793,8 @@
         "type": "other",
         "other": {
           "name": "paps",
-          "version": "0.6.8",
-          "downloadUrl": "http://downloads.sourceforge.net/paps/paps-0.6.8.tar.gz"
+          "version": "0.8.0",
+          "downloadUrl": "https://github.com/dov/paps/releases/download/v0.8.0/paps-0.8.0.tar.gz"
         }
       }
     },
@@ -21483,8 +21483,8 @@
         "type": "other",
         "other": {
           "name": "ppp",
-          "version": "2.4.7",
-          "downloadUrl": "ftp://ftp.samba.org/pub/ppp/ppp-2.4.7.tar.gz"
+          "version": "2.5.0",
+          "downloadUrl": "https://github.com/paulusmack/ppp/archive/ppp-2.5.0.tar.gz"
         }
       }
     },
@@ -21813,8 +21813,8 @@
         "type": "other",
         "other": {
           "name": "PyGreSQL",
-          "version": "5.2.2",
-          "downloadUrl": "https://github.com/PyGreSQL/PyGreSQL/archive/5.2.2/PyGreSQL-5.2.2.tar.gz"
+          "version": "6.0.1",
+          "downloadUrl": "https://github.com/PyGreSQL/PyGreSQL/archive/refs/tags/6.0.1.tar.gz"
         }
       }
     },
@@ -22368,13 +22368,13 @@
         }
       }
     },
-     {
+    {
       "component": {
         "type": "other",
         "other": {
           "name": "cqlsh",
           "version": "6.1.2",
-	  "downloadUrl": "https://files.pythonhosted.org/packages/source/c/cqlsh/cqlsh-6.1.2.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/cqlsh/cqlsh-6.1.2.tar.gz"
         }
       }
     },
@@ -22864,7 +22864,7 @@
         "other": {
           "name": "python-geomet",
           "version": "1.1.0",
-	  "downloadUrl": "https://github.com/geomet/geomet/archive/refs/tags/1.1.0.tar.gz"
+          "downloadUrl": "https://github.com/geomet/geomet/archive/refs/tags/1.1.0.tar.gz"
         }
       }
     },
@@ -25703,8 +25703,8 @@
         "type": "other",
         "other": {
           "name": "qpdf",
-          "version": "10.1.0",
-          "downloadUrl": "http://downloads.sourceforge.net/sourceforge/qpdf/qpdf-10.1.0.tar.gz"
+          "version": "11.9.1",
+          "downloadUrl": "https://github.com/qpdf/qpdf/releases/download/v11.9.1/qpdf-11.9.1.tar.gz"
         }
       }
     },
@@ -29496,8 +29496,8 @@
         "type": "other",
         "other": {
           "name": "usbguard",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/USBGuard/usbguard/releases/download/usbguard-1.1.0/usbguard-1.1.0.tar.gz"
+          "version": "1.1.3",
+          "downloadUrl": "https://github.com/USBGuard/usbguard/releases/download/usbguard-1.1.3/usbguard-1.1.3.tar.gz"
         }
       }
     },
@@ -31205,13 +31205,13 @@
       }
     },
     {
-      "component": {                                                              
+      "component": {
         "type": "other",
         "other": {
-          "name": "zix",                                                           
-	  "version": "0.6.2",
+          "name": "zix",
+          "version": "0.6.2",
           "downloadUrl": "https://download.drobilla.net/zix-0.6.2.tar.xz"
-        }                                                                 
+        }
       }
     },
     {
