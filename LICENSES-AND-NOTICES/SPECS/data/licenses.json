@@ -2316,6 +2316,7 @@
                 "mm-common",
                 "moby-containerd-cc",
                 "moby-engine",
+                "mongosh",
                 "msgpack",
                 "ncompress",
                 "networkd-dispatcher",
