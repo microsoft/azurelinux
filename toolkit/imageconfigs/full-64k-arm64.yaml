@@ -100,8 +100,8 @@ os:
   - source: files/imagecustomizer/isoinstaller/attended_config_aarch64_64k.json
     destination: /config/attended_config.json
 
-  additionalDirectories:
-  - source: ./installer-rpms
+  additionalDirs:
+  - source: ./installer-pkgs
     destination: /RPMS
 
   users:
