@@ -66,14 +66,14 @@ storage:
       mountPoint:
         idType: part-label
         path: /boot/efi
-        options: umask=0077,nodev
+        options: umask=0077,noexec,nodev
 
     - deviceId: boot-a
       type: ext4
       mountPoint:
         idType: uuid
         path: /boot
-        options: nodev
+        options: noexec,nodev
 
     - deviceId: root-a
       type: ext4
@@ -92,14 +92,14 @@ storage:
       mountPoint:
         idType: part-label
         path: /var/lib/trident
-        options: nodev
+        options: noexec,nodev
 
     - deviceId: home
       type: ext4
       mountPoint:
         idType: part-label
         path: /home
-        options: nodev
+        options: noexec,nodev
 
 os:
   bootloader:
@@ -119,14 +119,12 @@ os:
       - rd.luks=0
       - rd.hostonly=0
       - ipe.enforce=0
-      - systemd.journald.forward_to_console=1
 
   packages:
     remove:
       - dracut-hostonly
-      - grub2-efi-binary
       - kernel
-
+      - grub2-efi-binary
     install:
       - kernel-ipe
       - openssh-server
@@ -136,15 +134,14 @@ os:
       - selinux-policy
       - selinux-policy-modules
       - selinux-policy-ci
-      - checkpolicy  
-      - secilc 
+      - libselinux
+      - checkpolicy
+      - secilc
       - setools-console
       - veritysetup
-      - vim
       - WALinuxAgent
       - containerd2
       - ca-certificates
-      - wget
       - syslog
       - jq
       - keyutils
@@ -153,6 +150,7 @@ os:
       - tardev-snapshotter
       - erofs-utils
       - netplan
+      - notation
       # UKI
       - systemd-boot
       # hyperv
