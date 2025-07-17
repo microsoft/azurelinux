@@ -1,0 +1,46 @@
+From 5415cf267c1b5a4ef9591e11106085bc24b7131b Mon Sep 17 00:00:00 2001
+From: archana25-ms <v-shettigara@microsoft.com>
+Date: Thu, 17 Jul 2025 17:21:37 +0000
+Subject: [PATCH] Fix  git config syntax
+Upstream Patch reference: https://lkml.org/lkml/2025/7/8/1608
+
+---
+ t/t1300-config.sh           | 4 ++--
+ t/t7450-bad-git-dotfiles.sh | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/t/t1300-config.sh b/t/t1300-config.sh
+index 00f34c5..3ed4a0b 100755
+--- a/t/t1300-config.sh
++++ b/t/t1300-config.sh
+@@ -2743,8 +2743,8 @@ test_expect_success 'writing value with trailing CR not stripped on read' '
+ 
+ 	printf "bar\r\n" >expect &&
+ 	git init cr-test &&
+-	git -C cr-test config set core.foo $(printf "bar\r") &&
+-	git -C cr-test config get core.foo >actual &&
++	git -C cr-test config core.foo $(printf "bar\r") &&
++	git -C cr-test config --get core.foo >actual &&
+ 
+ 	test_cmp expect actual
+ '
+diff --git a/t/t7450-bad-git-dotfiles.sh b/t/t7450-bad-git-dotfiles.sh
+index ff63c05..38b9db8 100755
+--- a/t/t7450-bad-git-dotfiles.sh
++++ b/t/t7450-bad-git-dotfiles.sh
+@@ -388,10 +388,10 @@ test_expect_success SYMLINKS,!WINDOWS,!MINGW 'submodule must not checkout into d
+ 	git -C repo mv sub $(printf "sub\r") &&
+ 
+ 	# Ensure config values containing CR are wrapped in quotes.
+-	git config unset -f repo/.gitmodules submodule.sub.path &&
++	git config --unset -f repo/.gitmodules submodule.sub.path &&
+ 	printf "\tpath = \"sub\r\"\n" >>repo/.gitmodules &&
+ 
+-	git config unset -f repo/.git/modules/sub/config core.worktree &&
++	git config --unset -f repo/.git/modules/sub/config core.worktree &&
+ 	{
+ 		printf "[core]\n" &&
+ 		printf "\tworktree = \"../../../sub\r\"\n"
+-- 
+2.45.3
+
