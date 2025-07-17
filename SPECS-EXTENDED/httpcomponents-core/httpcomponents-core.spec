@@ -159,6 +159,7 @@ done
 %changelog
 * Wed Jul 16 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 4.4.16-1
 - Update to 4.4.16 (latest minor release)
+- License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.4.13-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
