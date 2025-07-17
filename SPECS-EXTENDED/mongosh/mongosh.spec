@@ -18,6 +18,7 @@ Source7:        SHASUMS256.txt
 Patch0:         fix_build_with_local_files.patch
 BuildRequires:  nodejs-npm
 BuildRequires:  nodejs-devel
+BuildRequires:  git
 
 %description
 MongoDB Shell CLI REPL Package
