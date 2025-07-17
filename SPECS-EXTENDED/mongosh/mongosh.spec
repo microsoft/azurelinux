@@ -12,8 +12,9 @@ Source1:        mongosh_node_modules.tar.gz
 Source2:        mongosh_packages.tar.gz
 Source3:        mongodb-client-encryption.tar.gz
 Source4:        mongosh_lazy-webpack-modules.tar.gz
-Source5:        node-v20.19.3.tar.gz
-Source6:        SHASUMS256.txt
+Source5:        mongosh_npm_lazy_cache.tar.gz
+Source6:        node-v20.19.3.tar.gz
+Source7:        SHASUMS256.txt
 Patch0:         fix_build_with_local_files.patch
 BuildRequires:  nodejs-npm
 BuildRequires:  nodejs-devel
@@ -28,9 +29,10 @@ tar -xf %{SOURCE2}
 mkdir -p tmp/fle-buildroot
 tar -xf %{SOURCE3} -C tmp/fle-buildroot/
 tar -xf %{SOURCE4} -C tmp/
+tar -xf %{SOURCE5} -C /root/
 mkdir -p /tmp/boxednode/mongosh
-cp %{SOURCE5} /tmp/boxednode/mongosh/
-cp %{SOURCE6} /tmp/boxednode/mongosh/SHASUMS256.txt
+cp %{SOURCE6} /tmp/boxednode/mongosh/
+cp %{SOURCE7} /tmp/boxednode/mongosh/SHASUMS256.txt
 
 %build
 # Run npm_lazy server in the background for npm requests proxying from local cache
@@ -41,7 +43,7 @@ npm config set registry http://localhost:8080/
 
 #npm run compile
 #Run with BOXEDNODE_MAKE_ARGS="-j2" if running in container
-BOXEDNODE_MAKE_ARGS="-j2" SEGMENT_API_KEY="dummy" NODE_JS_VERSION=20.19.3 npm run compile-exec
+SEGMENT_API_KEY="dummy" NODE_JS_VERSION=20.19.3 npm run compile-exec
 
 #stop the npm_lazy server
 kill %1
