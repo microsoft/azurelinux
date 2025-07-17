@@ -1,0 +1,45 @@
+diff -ur cheetah3-3.2.6.post1.orig/Cheetah/c/_namemapper.c cheetah3-3.2.6.post1/Cheetah/c/_namemapper.c
+--- cheetah3-3.2.6.post1.orig/Cheetah/c/_namemapper.c	2021-02-22 02:22:54.000000000 -0800
++++ cheetah3-3.2.6.post1/Cheetah/c/_namemapper.c	2024-10-30 12:41:44.371896758 -0700
+@@ -179,11 +179,26 @@
+             return NULL;
+         }
+ 
++        #if PY_VERSION_HEX >= 0x030d0000
++        /* Python 3.13+: this is to silent error from PyMapping_HasKeyString */
++        if (PyMapping_Check(currentVal) && PyMapping_GetOptionalItemString(currentVal, currentKey, &nextVal)
++                && (!PyErr_Occurred())
++           ) {
++        #else
+         if (PyMapping_Check(currentVal) && PyMapping_HasKeyString(currentVal, currentKey)) {
+             nextVal = PyMapping_GetItemString(currentVal, currentKey);
+-        }
++        #endif
+ 
+-        else {
++        } else {
++        #if PY_VERSION_HEX >= 0x030d0000
++            if ((PyErr_Occurred() != NULL) &&
++                   (PyErr_ExceptionMatches(PyExc_TypeError))) {
++                /* Python 3.13+ don't like testing 'str1'['str2'].
++                   The error must be silenced to continue testing
++                   getattr('str1', 'str2'). */
++                PyErr_Clear();
++            }
++        #endif
+             PyObject *exc;
+             nextVal = PyObject_GetAttrString(currentVal, currentKey);
+             exc = PyErr_Occurred();
+diff -ur cheetah3-3.2.6.post1.orig/docs/news.rst cheetah3-3.2.6.post1/docs/news.rst
+--- cheetah3-3.2.6.post1.orig/docs/news.rst	2024-10-30 09:54:36.896932574 -0700
++++ cheetah3-3.2.6.post1/docs/news.rst	2024-10-30 12:42:50.772613341 -0700
+@@ -8,6 +8,9 @@
+    - Protect ``import cgi`` in preparation to Python 3.13.
+    - Fix DeprecationWarning: ``unittest.findTestCases()`` is deprecated. Use
+      ``unittest.TestLoader.loadTestsFromModule()`` instead.
++   - Fixed ``_namemapper.c``: Silent an inadvertent ``TypeError`` exception
++     in ``PyMapping_HasKeyString`` under Python 3.13+
++     caused by ``_namemapper`` looking up a key in a non-dictionary.
+ 
+ 3.2.6.post1 (2021-02-22)
+ ------------------------

@@ -1,0 +1,20 @@
+diff --git a/tox.ini b/tox.ini
+index 6d72c6e..b54f815 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -8,15 +8,6 @@ minversion = 3.15
+ envlist = py27,py3{4,5,6,7,8,9},pypy,py{27,38,39}-flake8
+ 
+ [testenv]
+-basepython =
+-    py27: {env:TOXPYTHON:python2.7}
+-    py34: {env:TOXPYTHON:python3.4}
+-    py35: {env:TOXPYTHON:python3.5}
+-    py36: {env:TOXPYTHON:python3.6}
+-    py37: {env:TOXPYTHON:python3.7}
+-    py38: {env:TOXPYTHON:python3.8}
+-    py39: {env:TOXPYTHON:python3.9}
+-    pypy: {env:TOXPYTHON:pypy}
+ commands =
+     {envpython} --version
+     {envpython} -c "import struct; print(struct.calcsize('P') * 8)"

@@ -106,7 +106,7 @@ func printSummary(numFailures, numWarnings int) {
 Errors/warnings fall into three buckets:
 	1. 'bad %doc files': A %doc documentation file that the tool believes to be a license file.
 	2. 'bad general file': A file that is placed into '/usr/share/licenses/' that is not flagged as
-		a license file. These files should use %license instead of %doc. Ideally whey should also
+		a license file. These files should use %license instead of %doc. Ideally, they should also
 		not be placed in a directory manually. (e.g. prefer '%license COPYING' over
 		'%license %{_docdir}/%{name}/COPYING')
 	3. 'duplicated license files': A license file that is both a %license and a %doc file, pick one.")

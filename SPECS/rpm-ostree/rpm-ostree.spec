@@ -1,7 +1,7 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
 Version:        2024.4
-Release:        1%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,13 +9,14 @@ URL:            https://github.com/coreos/rpm-ostree
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Patch0:         0001-Revert-compose-Inject-our-static-tmpfiles.d-dropins-.patch
 Patch1:         rpm-ostree-libdnf-build.patch
+Patch2:         CVE-2024-2905.patch
 
 BuildRequires:  attr-devel
 BuildRequires:  autoconf
 BuildRequires:  autogen
 BuildRequires:  automake
 BuildRequires:  bubblewrap
-BuildRequires:  cargo
+BuildRequires:  cargo < 1.85.0
 BuildRequires:  check
 BuildRequires:  cppunit-devel
 BuildRequires:  createrepo_c
@@ -45,7 +46,7 @@ BuildRequires:  polkit-devel
 BuildRequires:  popt-devel
 BuildRequires:  python3-devel
 BuildRequires:  python3-pygments
-BuildRequires:  rust
+BuildRequires:  rust < 1.85.0
 BuildRequires:  sqlite-devel
 BuildRequires:  systemd-devel
 BuildRequires:  which
@@ -177,6 +178,15 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Tue Jun 10 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2024.4-4
+- Bump release to rebuild with rust
+
+* Fri May 16 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2024.4-3
+- Patch CVE-2024-2905
+
+* Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2024.4-2
+- Pin rust version
+
 * Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 2024.4-1
 - Upgrade to 2024.4 and remove libgsystem dependency
 

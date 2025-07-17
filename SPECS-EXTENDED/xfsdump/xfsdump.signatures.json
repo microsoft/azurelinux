@@ -1,5 +1,7 @@
 {
  "Signatures": {
-  "xfsdump-3.1.9.tar.xz": "55aeede6232ddce6c9e79e2af88d6f808534df1552eb2bfaf7fb85b92add6dd1"
+  "13F703E6C11CF6F0.asc": "04d66154090ae73ae48f5b6acfa605fe30de03c166d6da9d024c8e8784da6e93",
+  "xfsdump-3.1.12.tar.sign": "11e781f437cf4e46c47222549508691fc5b8eac59c039d165380525805f53830",
+  "xfsdump-3.1.12.tar.xz": "f39c4c1b306b2dd7ec979c0e94d60fe69083d2ecf9af051cac5ef3bed772c74a"
  }
 }

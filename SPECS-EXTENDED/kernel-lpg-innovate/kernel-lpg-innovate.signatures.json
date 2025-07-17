@@ -1,0 +1,11 @@
+{
+  "Signatures": {
+    "azurelinux-ca-20230216.pem": "d545401163c75878319f01470455e6bc18a5968e39dd964323225e3fe308849b",
+    "cpupower": "d7518767bf2b1110d146a49c7d42e76b803f45eb8bd14d931aa6d0d346fae985",
+    "cpupower.service": "b057fe9e5d0e8c36f485818286b80e3eba8ff66ff44797940e99b1fd5361bb98",
+    "kernel-lpg-innovate-6.6.89.2.tar.gz": "1e990a0a25d3c7a2aa45f92e713257eb72afb5c10e5a1fdb0953f5bdac8524ac",
+    "kernel-lpg-innovate.normal.config": "2e38b5509d2645117ba30eb79d71dc88c6f1734d1499ef9cd9f92a57c5bf4ad1",
+    "kernel-lpg-innovate.secure.config": "6fb187a273f4da472af7b76cca55772713688b4fe18b0df7f2e63e9a3af5e882",
+    "sha512hmac-openssl.sh": "02ab91329c4be09ee66d759e4d23ac875037c3b56e5a598e32fd1206da06a27f"
+  }
+}

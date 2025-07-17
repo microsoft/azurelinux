@@ -4,7 +4,7 @@
 Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
 Name:           packer
 Version:        1.9.5
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,6 +40,10 @@ Patch5:         CVE-2025-27144.patch
 Patch6:         CVE-2025-22869.patch
 Patch7:         CVE-2025-22868.patch
 Patch8:         CVE-2025-30204.patch
+Patch9:         CVE-2025-22870.patch
+Patch10:        CVE-2024-51744.patch
+Patch11:        CVE-2025-22872.patch
+
 BuildRequires:  golang >= 1.21
 BuildRequires:  kernel-headers
 BuildRequires:  glibc-devel
@@ -48,10 +52,7 @@ BuildRequires:  glibc-devel
 Packer is a tool for building identical machine images for multiple platforms from a single source configuration.
 
 %prep
-%autosetup -N
-# Apply vendor before patching
-tar --no-same-owner -xf %{SOURCE1}
-%autopatch -p1
+%autosetup -p1 -a1
 
 %build
 export GOPATH=%{our_gopath}
@@ -73,6 +74,12 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
+* Tue Apr 22 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.9.5-9
+- Patch CVE-2025-22872
+
+* Tue Apr 15 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.9.5-8
+- Fix CVE-2025-22870, CVE-2024-51744 with upstream patches
+
 * Sat Mar 29 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.9.5-7
 - Patch CVE-2025-30204
 

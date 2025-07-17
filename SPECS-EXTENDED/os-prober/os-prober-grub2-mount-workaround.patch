@@ -1,5 +1,5 @@
 diff --git a/os-probes/mounted/common/90linux-distro b/os-probes/mounted/common/90linux-distro
-index 9bc5154..541079e 100755
+index b9c24dd..52db3f6 100755
 --- a/os-probes/mounted/common/90linux-distro
 +++ b/os-probes/mounted/common/90linux-distro
 @@ -19,7 +19,7 @@ subvol="$5"
@@ -11,9 +11,9 @@ index 9bc5154..541079e 100755
  	if [ -e "$dir/etc/os-release" ]; then
  		short="$(grep ^NAME= "$dir/etc/os-release" | sed 's/^[^=]*=//; s/^['\''"]\(.*\)['\''"]$/\1/; s/\\\(.\)/\1/g; s/[[:space:]].*//')"
  		long="$(grep ^PRETTY_NAME= "$dir/etc/os-release" | sed 's/^[^=]*=//; s/^['\''"]\(.*\)['\''"]$/\1/; s/\\\(.\)/\1/g')"
-@@ -140,8 +140,9 @@ if (ls "$dir"/lib*/ld*.so* && [ -d "$dir/boot" ] || ls "$dir"/usr/lib*/ld*.so*)
- 		short="Devuan"
- 		long="$(printf "Devuan GNU/Linux (%s)\n" "$(cat "$dir/etc/devuan_version")")"
+@@ -146,8 +146,9 @@ if (ls "$dir"/lib*/ld*.so* && [ -d "$dir/boot" ] || ls "$dir"/usr/lib*/ld*.so*)
+ 		short="Exherbo"
+ 		long="Exherbo Linux"
  	else
 -		short="Linux"
 -		long="unknown Linux distribution"
@@ -23,7 +23,7 @@ index 9bc5154..541079e 100755
  	fi
  	
          label="$(count_next_label "$short")"
-@@ -151,6 +152,6 @@ if (ls "$dir"/lib*/ld*.so* && [ -d "$dir/boot" ] || ls "$dir"/usr/lib*/ld*.so*)
+@@ -157,6 +158,6 @@ if (ls "$dir"/lib*/ld*.so* && [ -d "$dir/boot" ] || ls "$dir"/usr/lib*/ld*.so*)
  		result "$partition:$long:$label:linux"
  	fi
  	exit 0

@@ -1,0 +1,38 @@
+diff -ru perl-5.38.2-orig/MANIFEST perl-5.38.2/MANIFEST
+--- perl-5.38.2-orig/MANIFEST	2025-05-27 11:19:46.070345254 -0400
++++ perl-5.38.2/MANIFEST	2025-05-27 11:23:50.224235644 -0400
+@@ -1399,7 +1399,6 @@
+ cpan/IO-Compress/t/cz-14gzopen.t			IO::Compress
+ cpan/IO-Compress/t/files/bad-efs.zip
+ cpan/IO-Compress/t/files/encrypt-aes.zip
+-cpan/IO-Compress/t/files/encrypt-standard.zip
+ cpan/IO-Compress/t/files/jar.zip
+ cpan/IO-Compress/t/files/meta.xml
+ cpan/IO-Compress/t/files/test.ods
+diff -ru perl-5.38.2-orig/cpan/IO-Compress/t/105oneshot-zip-only.t perl-5.38.2/cpan/IO-Compress/t/105oneshot-zip-only.t
+--- perl-5.38.2-orig/cpan/IO-Compress/t/105oneshot-zip-only.t	2025-05-27 11:19:46.300345249 -0400
++++ perl-5.38.2/cpan/IO-Compress/t/105oneshot-zip-only.t	2025-05-27 11:23:45.336599173 -0400
+@@ -163,23 +163,6 @@
+ }
+ 
+ {
+-    title "Detect encrypted zip file";
+-
+-    my $files = "./t/" ;
+-    $files = "./" if $ENV{PERL_CORE} ;
+-    $files .= "files/";
+-
+-    my $zipfile = "$files/encrypt-standard.zip" ;
+-    my $output;
+-
+-    ok ! unzip "$files/encrypt-standard.zip" => \$output ;
+-    like $UnzipError, qr/Encrypted content not supported/ ;
+-
+-    ok ! unzip "$files/encrypt-aes.zip" => \$output ;
+-    like $UnzipError, qr/Encrypted content not supported/ ;
+-}
+-
+-{
+     title "jar file with deflated directory";
+ 
+     # Create Jar as follow

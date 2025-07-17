@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -35,6 +35,7 @@ Patch307:       pam_ssh_agent_auth-0.10.2-dereference.patch
 #CVE Patches
 #This CVE Patches both CVE-2025-26465 and CVE-2025-26466
 Patch400:       CVE-2025-26465.patch
+Patch401:       CVE-2025-32728.patch
 # sk-dummy.so built with -fvisibility=hidden does not work
 # The tests fail with the following error:
 #   dlsym(sk_api_version) failed: (...)/sk-dummy.so: undefined symbol: sk_api_version
@@ -113,6 +114,7 @@ autoreconf
 popd
 
 %patch -P 400 -p1 -b .CVE-2025-26465.patch
+%patch -P 401 -p1 -b .CVE-2025-32728.patch
 %patch -P 965 -p1 -b .visibility
 
 %build
@@ -272,6 +274,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Thu Apr 17 2025 Sudipta Pandit <sudpandit@microsoft.com> - 9.8p1-4
+- Patch CVE-2025-32728
+
 * Sun Feb 16 2025 Jon Slobodzian <joslobo@microsoft.com> - 9.8p1-3
 - Patch CVE-2025-26465 and CVE-2025-26466
 

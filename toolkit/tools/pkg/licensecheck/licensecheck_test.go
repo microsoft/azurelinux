@@ -6,6 +6,7 @@ package licensecheck
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -282,4 +283,53 @@ func TestParseCheckResults(t *testing.T) {
 	assert.Equal(t, expectedBadDocFiles, badDocFiles)
 	assert.Equal(t, expectedBadOtherFiles, badOtherFiles)
 	assert.Equal(t, expectedDuplicatedDocs, duplicatedDocs)
+}
+
+func TestMalformedExceptionJson(t *testing.T) {
+	if os.Geteuid() != 0 {
+		t.Skip("Test must be run as root because it uses a chroot")
+	}
+
+	// create directory paths
+	workingDir, err := os.Getwd()
+	assert.NoError(t, err)
+	testDir := filepath.Join(workingDir, "testdata")
+	proposedDir := filepath.Join(workingDir, "_tmp_TestMalformedExceptionJson")
+
+	namesPath := filepath.Join(testDir, "test_license_names.json")
+	exceptionsPath := filepath.Join(testDir, "not_a_json.json")
+
+	// make a new license chcker
+	_, err = New(proposedDir, "", testDir, namesPath, exceptionsPath, "")
+
+	// check if correct errors are present
+	assert.NotEqual(t, nil, err)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to load license exceptions:")
+	assert.Contains(t, err.Error(), "invalid character 'I' looking for beginning of value")
+}
+
+func TestMalformedNamesJson(t *testing.T) {
+	if os.Geteuid() != 0 {
+		t.Skip("Test must be run as root because it uses a chroot")
+	}
+
+	// create directory paths
+	workingDir, err := os.Getwd()
+	assert.NoError(t, err)
+
+	testDir := filepath.Join(workingDir, "testdata")
+	proposedDir := filepath.Join(workingDir, "_tmp_TestMalformedExceptionJson")
+	err = os.MkdirAll(proposedDir, os.ModePerm)
+	assert.NoError(t, err)
+
+	namesPath := filepath.Join(testDir, "not_a_json.json")
+
+	// make a new license chcker
+	_, err = New(proposedDir, "", testDir, namesPath, "", "")
+
+	assert.NotEqual(t, nil, err)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to load license names:")
+	assert.Contains(t, err.Error(), "invalid character 'I' looking for beginning of value")
 }

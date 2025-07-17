@@ -1,12 +1,12 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           liblqr-1
-Version:        0.4.2
-Release:        15%{?dist}
+Version:        0.4.3
+Release:        1%{?dist}
 Summary:        LiquidRescale library
-License:        GPLv3
-URL:            http://liquidrescale.wikidot.com/
-Source0:        http://liblqr.wikidot.com/local--files/en:download-page/%{name}-%{version}.tar.bz2
+License:        GPLv3 AND LGPLv3
+URL:            https://liquidrescale.wikidot.com/
+Source0:        https://liblqr.wikidot.com/local--files/en:download-page/%{name}-%{version}.tar.bz2
 BuildRequires:  gcc
 BuildRequires:  glib2-devel
 
@@ -55,6 +55,10 @@ find $RPM_BUILD_ROOT -name \*.la -exec %{__rm} -f {} \;
 
 
 %changelog
+* Thu Nov 07 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.4.3-1
+- Update to 0.4.3
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.2-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

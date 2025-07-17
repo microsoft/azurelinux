@@ -1,34 +1,22 @@
 %global bootstrap 0
 
-%{!?python3_sitearch: %define python3_sitearch %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?__python3: %global __python3 /usr/bin/python3}
-%{!?py3_build: %define py3_build CFLAGS="%{optflags}" %{__python3} setup.py build}
-%{!?py3_install: %define py3_install %{__python3} setup.py install --skip-build --root %{buildroot}}
-
 Name:           python-pymongo
-Version:        3.10.1
-Release:        6%{?dist}
-# All code is ASL 2.0 except for:
-# - bson/time64*.{c,h} - MIT,
-# - encoding_helpers.c - Unicode with a "Portions Copyright 2001 Unicode, Inc." header,
-# - ssl_match_hostname.py - Python-2.0
-License:        ASL 2.0 and MIT and Python-2.0 and Unicode
-Summary:        Python driver for MongoDB
-URL:            https://github.com/mongodb/mongo-python-driver
+Version:        4.2.0
+Release:        9%{?dist}
+# All code is ASL 2.0 except bson/time64*.{c,h} which is MIT
+License:        ASL 2.0 and MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://github.com/mongodb/mongo-python-driver/archive/%{version}/pymongo-%{version}.tar.gz
-# This patch removes the bundled ssl.match_hostname library as it was vulnerable to CVE-2013-7440
-# and CVE-2013-2099, and wasn't needed anyway since Fedora >= 22 has the needed module in the Python
-# standard library. It also adjusts imports so that they exclusively use the code from Python.
-Patch01:        0001-Use-ssl.match_hostname-from-the-Python-stdlib.patch
+Summary:        Python driver for MongoDB
+URL:            https://pymongo.readthedocs.io/en/stable/
+Source0:        https://github.com/mongodb/mongo-python-driver/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
+BuildRequires:  make
 %if 0%{!?bootstrap:1}
 BuildRequires:  python3-sphinx
 %endif
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 
 %description
 The Python driver for MongoDB.
@@ -69,20 +57,14 @@ GridFS is a storage specification for large objects in MongoDB.  This package
 contains the python3 version of this module.
 
 %prep
-%setup -q -n mongo-python-driver-%{version}
-%patch 01 -p1 -b .ssl
-
-# Remove the bundled ssl.match_hostname library as it was vulnerable to CVE-2013-7440
-# and CVE-2013-2099, and isn't needed anyway since Fedora >= 22 has the needed module in the Python
-# standard library.
-rm pymongo/ssl_match_hostname.py
+%autosetup -n mongo-python-driver-%{version}
 
 %build
 %py3_build
 
 %if 0%{!?bootstrap:1}
 pushd doc
-make %{?_smp_mflags} html
+%make_build html
 popd
 %endif
 
@@ -93,34 +75,73 @@ chmod 755 %{buildroot}%{python3_sitearch}/bson/*.so
 chmod 755 %{buildroot}%{python3_sitearch}/pymongo/*.so
 
 %files doc
-%license LICENSE THIRD-PARTY-NOTICES
+%license LICENSE
 %if 0%{!?bootstrap:1}
 %doc doc/_build/html/*
 %endif
 
 %files -n python3-bson
-%license LICENSE THIRD-PARTY-NOTICES
+%license LICENSE
 %doc README.rst
 %{python3_sitearch}/bson
 
 %files -n python3-pymongo
-%license LICENSE THIRD-PARTY-NOTICES
+%license LICENSE
 %doc README.rst
 %{python3_sitearch}/pymongo
 %{python3_sitearch}/pymongo-%{version}-*.egg-info
 
 %files -n python3-pymongo-gridfs
-%license LICENSE THIRD-PARTY-NOTICES
+%license LICENSE
 %doc README.rst
 %{python3_sitearch}/gridfs
 
 %changelog
-* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.10.1-6
-- Release bump to fix package information.
+* Mon Dec 23 2024 Akhila Guruju <v-guakhila@microsoft.com> - 4.2.0-9
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
-* Mon Oct 19 2020 Steve Laughman <steve.laughman@microsoft.com> - 3.10.1-5
-- Initial CBL-Mariner import from Fedora 33 (license: MIT)
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 4.2.0-7
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 4.2.0-3
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.2.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Aug 27 2022 Orion Poplawski <orion@nwra.com> - 4.2.0-1
+- Update to 4.2.0
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 3.10.1-9
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 3.10.1-6
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild

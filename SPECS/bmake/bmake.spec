@@ -1,12 +1,14 @@
 Summary:       The NetBSD make(1) tool
 Name:          bmake
 Version:       20230723
-Release:       1%{?dist}
+Release:       3%{?dist}
 License:       BSD
 Vendor:        Microsoft Corporation
 Distribution:   Azure Linux
 URL:           https://ftp.netbsd.org/pub/NetBSD/misc/sjg/
 Source0:       %{url}/bmake-%{version}.tar.gz
+Patch0:        do-not-run-tests-on-install.patch
+Patch1:        remove-inconsistent-time-tests.patch
 BuildRequires: gcc
 BuildRequires: sed
 BuildRequires: util-linux
@@ -44,6 +46,9 @@ sh ./make-bootstrap.sh
 ./bmake -m mk install DESTDIR=%{buildroot} INSTALL='install -p' STRIP_FLAG=''
 chmod a-x %{buildroot}%{_datadir}/mk/mkopt.sh
 
+%check
+./bmake -m mk test
+
 %files
 %doc ChangeLog README
 %license LICENSE
@@ -56,6 +61,13 @@ chmod a-x %{buildroot}%{_datadir}/mk/mkopt.sh
 %{_datadir}/mk
 
 %changelog
+* Tue July 1 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 20230723-3
+- Add patch do-not-run-tests-on-install.patch to skip unreliable tests
+- tests in varmod-localtime.mk
+
+* Thu May 15 2025 Andrew Phelps <anphel@microsoft.com> - 20230723-2
+- Move unit tests to check section
+
 * Fri Dec 08 2023 Andrew Phelps <anphel@microsoft.com> - 20230723-1
 - Upgrade to version 20230723
 

@@ -1,0 +1,39 @@
+From: Riken Maharjan <rmaharjan@microsoft.com>
+Date: Tue, 28 Apr 2025 10:00:00 -0700
+Subject: Fix Pytest Output issue for Forked Tests
+
+diff --git a/testing/test_xfail_behavior.py b/testing/test_xfail_behavior.py
+index ef00385..15edd93 100644
+--- a/testing/test_xfail_behavior.py
++++ b/testing/test_xfail_behavior.py
+@@ -6,6 +6,7 @@
+ 
+ IS_PYTEST4_PLUS = int(pytest.__version__[0]) >= 4  # noqa: WPS609
+ FAILED_WORD = "FAILED" if IS_PYTEST4_PLUS else "FAIL"
++PYTEST_GTE_7_2 = hasattr(pytest, "version_tuple") and pytest.version_tuple >= (7, 2)  # type: ignore[attr-defined]
+ 
+ pytestmark = pytest.mark.skipif(  # pylint: disable=invalid-name
+     not hasattr(os, "fork"),  # noqa: WPS421
+@@ -68,10 +69,12 @@ def test_xfail(is_crashing, is_strict, testdir):
+             )
+         )
+     reason_string = (
+-        "  reason: The process gets terminated; "
++        "reason: The process gets terminated; "
+         "pytest-forked reason: "
+         "*:*: running the test CRASHED with signal {sig_num:d}".format(**locals())
+     )
++    if expected_lowercase == "xfailed" and PYTEST_GTE_7_2:
++        short_test_summary += " - " + reason_string
+     total_summary_line = "*==== 1 {expected_lowercase!s} in 0.*s* ====*".format(
+         **locals()
+     )
+@@ -95,7 +98,7 @@ def test_xfail(is_crashing, is_strict, testdir):
+     )
+     if expected_lowercase == "xpassed" and expected_word == FAILED_WORD:
+         # XPASS(strict)
+-        expected_lines += (reason_string,)
++        expected_lines += ("  " + reason_string,)
+     expected_lines += (total_summary_line,)
+ 
+     test_module = testdir.makepyfile(

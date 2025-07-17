@@ -1,14 +1,14 @@
---- hyph-tk.tex	2010-03-16 13:42:31.000000000 +0000
-+++ hyph-tk.tex	2010-03-16 13:42:43.000000000 +0000
-@@ -14,7 +14,6 @@
- % links to this file see
- %     http://www.tug.org/tex-hyphen/
+--- hyph-tk.tex	2023-03-28 22:26:50.638117327 +0100
++++ hyph-tk.tex	2023-03-28 22:27:21.875694151 +0100
+@@ -41,7 +41,6 @@
+ %     message: Turkmen hyphenation patterns
+ %     description: Hyphenation patterns for Turkmen in T1/EC and UTF-8 encodings.
  %
 -\patterns{
  % Some suffixes are added through a hyphen. When hyphenating these words, a hyphen is added before the hyphen so that the line ends with a hyphen and the new line starts with a hyphen.
  1-4
  % Allow hyphen after a vowel if and only if there is a single consonant before next the vowel
-@@ -2393,4 +2392,3 @@
+@@ -2420,4 +2419,3 @@
  n2g1l
  n1g2r
  s2k1w

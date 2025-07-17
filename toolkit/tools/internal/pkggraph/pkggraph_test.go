@@ -1630,3 +1630,94 @@ func TestAllImplicitNodes(t *testing.T) {
 
 	checkEqualComponents(t, []*PkgNode{actualImplicitNode}, g.AllImplicitNodes())
 }
+
+func TestAllUnresolvedNodesEmptyForNewGraph(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+
+	assert.Empty(t, g.AllUnresolvedNodes())
+}
+
+func TestAllUnresolvedNodesReturnsUnresolvedNode(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+
+	// Add an unresolved node
+	unresolvedNode, err := g.AddRemoteUnresolvedNode(&pkgjson.PackageVer{Name: "test-unresolved"})
+	assert.NoError(t, err)
+	assert.NotNil(t, unresolvedNode)
+
+	// Verify it's returned by AllUnresolvedNodes
+	unresolvedList := g.AllUnresolvedNodes()
+	assert.Len(t, unresolvedList, 1)
+	assert.Equal(t, unresolvedNode, unresolvedList[0])
+}
+
+func TestAllUnresolvedNodesDoesNotIncludeResolvedNodes(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+
+	// Add an unresolved node
+	unresolvedNode, err := g.AddRemoteUnresolvedNode(&pkgjson.PackageVer{Name: "test-unresolved"})
+	assert.NoError(t, err)
+	assert.NotNil(t, unresolvedNode)
+
+	// Add a resolved node (should not be returned)
+	resolvedNode, err := g.AddPkgNode(&pkgjson.PackageVer{Name: "test-resolved"},
+		StateUpToDate, TypeLocalRun, NoSRPMPath, NoRPMPath, NoSpecPath,
+		NoSourceDir, NoArchitecture, NoSourceRepo)
+	assert.NoError(t, err)
+	assert.NotNil(t, resolvedNode)
+
+	// Only the unresolved node should be returned
+	unresolvedList := g.AllUnresolvedNodes()
+	assert.Len(t, unresolvedList, 1)
+	assert.Equal(t, unresolvedNode, unresolvedList[0])
+}
+
+func TestAllUnresolvedNodesReturnsMultipleNodes(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+
+	// Add first unresolved node
+	unresolvedNode1, err := g.AddRemoteUnresolvedNode(&pkgjson.PackageVer{Name: "test-unresolved1"})
+	assert.NoError(t, err)
+	assert.NotNil(t, unresolvedNode1)
+
+	// Add second unresolved node
+	unresolvedNode2, err := g.AddRemoteUnresolvedNode(&pkgjson.PackageVer{Name: "test-unresolved2"})
+	assert.NoError(t, err)
+	assert.NotNil(t, unresolvedNode2)
+
+	// Both should be returned
+	unresolvedList := g.AllUnresolvedNodes()
+	assert.Len(t, unresolvedList, 2)
+	assert.Contains(t, unresolvedList, unresolvedNode1)
+	assert.Contains(t, unresolvedList, unresolvedNode2)
+}
+
+func TestAllUnresolvedNodesStateChange(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+
+	// Add two unresolved nodes
+	unresolvedNode1, err := g.AddRemoteUnresolvedNode(&pkgjson.PackageVer{Name: "test-unresolved1"})
+	assert.NoError(t, err)
+	assert.NotNil(t, unresolvedNode1)
+
+	unresolvedNode2, err := g.AddRemoteUnresolvedNode(&pkgjson.PackageVer{Name: "test-unresolved2"})
+	assert.NoError(t, err)
+	assert.NotNil(t, unresolvedNode2)
+
+	// Initially both should be returned
+	unresolvedList := g.AllUnresolvedNodes()
+	assert.Len(t, unresolvedList, 2)
+
+	// Change state of one unresolved node
+	unresolvedNode1.State = StateBuild
+
+	// Now only one node should be returned
+	unresolvedList = g.AllUnresolvedNodes()
+	assert.Len(t, unresolvedList, 1)
+	assert.Equal(t, unresolvedNode2, unresolvedList[0])
+}

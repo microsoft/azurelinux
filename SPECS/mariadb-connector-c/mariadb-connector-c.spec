@@ -3,7 +3,7 @@
 Summary:        The MariaDB Native Client library (C driver)
 Name:           mariadb-connector-c
 Version:        3.3.8
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -155,6 +155,9 @@ pushd unittest/libmariadb/
 %ctest || :
 popd
 
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
 
 %files
 %{_libdir}/libmariadb.so.3
@@ -207,6 +210,9 @@ popd
 #      NEW:         PR submitted, problem explained, waiting on upstream response
 
 %changelog
+* Thu Apr 10 2025 Andy Zaugg <azaugg@linkedin.com> - 3.3.8-3
+- Run ldconfig as part of post install to ensure new libs are in ld cache
+
 * Tue Apr 09 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.3.8-2
 - Remove multilib handling since azl doesn't support it
 

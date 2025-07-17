@@ -1,0 +1,104 @@
+From 946c1985dabc832689715f29ee90506905d1f81b Mon Sep 17 00:00:00 2001
+From: Orion Poplawski <orion@nwra.com>
+Date: Wed, 2 Oct 2024 10:01:25 -0600
+Subject: [PATCH] Test fixes for Python 3.13 (#206)
+
+---
+ cytoolz/functoolz.pyx              |  5 +++++
+ cytoolz/tests/test_docstrings.py   |  6 ++++--
+ cytoolz/tests/test_functoolz.py    |  7 +++++--
+ cytoolz/tests/test_inspect_args.py | 24 +++++++++++++++++++++---
+ 4 files changed, 35 insertions(+), 7 deletions(-)
+
+diff --git a/cytoolz/functoolz.pyx b/cytoolz/functoolz.pyx
+index 446e85c..269a143 100644
+--- a/cytoolz/functoolz.pyx
++++ b/cytoolz/functoolz.pyx
+@@ -27,6 +27,11 @@ __all__ = ['identity', 'thread_first', 'thread_last', 'memoize', 'compose', 'com
+ 
+ 
+ cpdef object identity(object x):
++    """ Identity function. Return x
++
++    >>> identity(3)
++    3
++    """
+     return x
+ 
+ 
+diff --git a/cytoolz/tests/test_docstrings.py b/cytoolz/tests/test_docstrings.py
+index 85654e6..0420e7b 100644
+--- a/cytoolz/tests/test_docstrings.py
++++ b/cytoolz/tests/test_docstrings.py
+@@ -49,8 +49,10 @@ def test_docstrings_uptodate():
+     d = merge_with(identity, toolz_dict, cytoolz_dict)
+     for key, (toolz_func, cytoolz_func) in d.items():
+         # only check if the new doctstring *contains* the expected docstring
+-        toolz_doc = convertdoc(toolz_func)
+-        cytoolz_doc = cytoolz_func.__doc__
++        # in Python < 3.13 the second line is indented, in 3.13+
++        # it is not, strip all lines to fudge it
++        toolz_doc = "\n".join((line.strip() for line in convertdoc(toolz_func).splitlines()))
++        cytoolz_doc = "\n".join((line.strip() for line in cytoolz_func.__doc__.splitlines()))
+         if toolz_doc not in cytoolz_doc:
+             diff = list(differ.compare(toolz_doc.splitlines(),
+                                        cytoolz_doc.splitlines()))
+diff --git a/cytoolz/tests/test_functoolz.py b/cytoolz/tests/test_functoolz.py
+index a459dad..dc1c038 100644
+--- a/cytoolz/tests/test_functoolz.py
++++ b/cytoolz/tests/test_functoolz.py
+@@ -748,10 +748,13 @@ def f(a, b):
+ def test_excepts():
+     # These are descriptors, make sure this works correctly.
+     assert excepts.__name__ == 'excepts'
++    # in Python < 3.13 the second line is indented, in 3.13+
++    # it is not, strip all lines to fudge it
++    testlines = "\n".join((line.strip() for line in excepts.__doc__.splitlines()))
+     assert (
+         'A wrapper around a function to catch exceptions and\n'
+-        '    dispatch to a handler.\n'
+-    ) in excepts.__doc__
++        'dispatch to a handler.\n'
++    ) in testlines
+ 
+     def idx(a):
+         """idx docstring
+diff --git a/cytoolz/tests/test_inspect_args.py b/cytoolz/tests/test_inspect_args.py
+index b2c5669..0dc0156 100644
+--- a/cytoolz/tests/test_inspect_args.py
++++ b/cytoolz/tests/test_inspect_args.py
+@@ -2,6 +2,7 @@
+ import inspect
+ import itertools
+ import operator
++import sys
+ import cytoolz
+ from cytoolz.functoolz import (curry, is_valid_args, is_partial_args, is_arity,
+                              num_required_args, has_varargs, has_keywords)
+@@ -482,6 +483,23 @@ def __wrapped__(self):
+     wrapped = Wrapped(func)
+     assert inspect.signature(func) == inspect.signature(wrapped)
+ 
+-    assert num_required_args(Wrapped) is None
+-    _sigs.signatures[Wrapped] = (_sigs.expand_sig((0, lambda func: None)),)
+-    assert num_required_args(Wrapped) == 1
++    # inspect.signature did not used to work properly on wrappers,
++    # but it was fixed in Python 3.11.9, Python 3.12.3 and Python
++    # 3.13+
++    inspectbroken = True
++    if sys.version_info.major > 3:
++        inspectbroken = False
++    if sys.version_info.major == 3:
++        if sys.version_info.minor == 11 and sys.version_info.micro > 8:
++            inspectbroken = False
++        if sys.version_info.minor == 12 and sys.version_info.micro > 2:
++            inspectbroken = False
++        if sys.version_info.minor > 12:
++            inspectbroken = False
++
++    if inspectbroken:
++        assert num_required_args(Wrapped) is None
++        _sigs.signatures[Wrapped] = (_sigs.expand_sig((0, lambda func: None)),)
++        assert num_required_args(Wrapped) == 1
++    else:
++        assert num_required_args(Wrapped) is 1

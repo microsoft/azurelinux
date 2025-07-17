@@ -1,0 +1,33 @@
+From: Pavel Raiskup <praiskup@redhat.com>
+Date: Tue, 16 Feb 2021 08:10:22 +0100
+Subject: [PATCH] Related discussion in the Fedora pull-request:
+ https://src.fedoraproject.org/rpms/tar/pull-request/8
+
+Upstream report:
+https://www.mail-archive.com/bug-tar@gnu.org/msg05943.html
+
+* tests/capabs_raw01.at: Newer systems (currently e.g. Fedora 34)
+print getcap output in format CAP=VAL, not CAP+VAL.
+---
+ tests/capabs_raw01.at | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/capabs_raw01.at b/tests/capabs_raw01.at
+index a1d9411..d3da923 100644
+--- a/tests/capabs_raw01.at
++++ b/tests/capabs_raw01.at
+@@ -45,10 +45,10 @@ rm -rf dir
+ tar --xattrs --xattrs-include='*' -xf archive.tar
+ 
+ # Newer systems print = instead of + here
+-getcap dir/file | sed 's/+/=/'
++getcap dir/file | sed -e 's/+/=/' -e 's|dir/file = |dir/file |'
+ ],
+ [0],
+-[dir/file = cap_chown=ei
++[dir/file cap_chown=ei
+ ])
+ 
+ AT_CLEANUP
+-- 
+2.26.0

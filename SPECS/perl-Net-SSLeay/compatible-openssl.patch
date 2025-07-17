@@ -1,0 +1,51 @@
+diff -urN Net-SSLeay-1.92/t/local/33_x509_create_cert.t Net-SSLeay-1.92/t/local/33_x509_create_cert.t
+--- Net-SSLeay-1.92/t/local/33_x509_create_cert.t	2021-09-28 22:15:32.000000000 +0000
++++ Net-SSLeay-1.92/t/local/33_x509_create_cert.t	2025-05-21 19:23:50.928133272 +0000
+@@ -53,7 +53,8 @@
+   #set organizationName via add_entry_by_txt
+   ok(Net::SSLeay::X509_NAME_add_entry_by_txt($name, "organizationName", MBSTRING_UTF8, "Company Name"), "X509_NAME_add_entry_by_txt");
+   
+-  ok(Net::SSLeay::X509_set_version($x509, 3), "X509_set_version");
++  my $x509_version_3 = (defined &Net::SSLeay::X509_VERSION_3) ? Net::SSLeay::X509_VERSION_3() : 2; # Note: X509_VERSION_3 is 2
++  ok(Net::SSLeay::X509_set_version($x509, $x509_version_3), "X509_set_version");
+   ok(my $sn = Net::SSLeay::X509_get_serialNumber($x509), "X509_get_serialNumber");
+   
+   my $pubkey = Net::SSLeay::X509_get_X509_PUBKEY($x509);
+@@ -96,7 +97,7 @@
+   ok(my $sha1_digest = Net::SSLeay::EVP_get_digestbyname("sha1"), "EVP_get_digestbyname");
+   ok(Net::SSLeay::X509_sign($x509, $ca_pk, $sha1_digest), "X509_sign");
+   
+-  is(Net::SSLeay::X509_get_version($x509), 3, "X509_get_version");  
++  is(Net::SSLeay::X509_get_version($x509), $x509_version_3, "X509_get_version");
+   is(Net::SSLeay::X509_verify($x509, Net::SSLeay::X509_get_pubkey($ca_cert)), 1, "X509_verify");
+   
+   like(my $crt_pem = Net::SSLeay::PEM_get_string_X509($x509), qr/-----BEGIN CERTIFICATE-----/, "PEM_get_string_X509");
+@@ -184,7 +185,8 @@
+   #49 = NID_pkcs9_unstructuredName - XXX-TODO add new constant
+   ok(Net::SSLeay::X509_REQ_add1_attr_by_NID($req, 49, MBSTRING_ASC, 'Any Uns.name'), "X509_REQ_add1_attr_by_NID");
+    
+-  ok(Net::SSLeay::X509_REQ_set_version($req, 2), "X509_REQ_set_version");
++  my $x509_req_version_1 = (defined &Net::SSLeay::X509_REQ_VERSION_1) ? Net::SSLeay::X509_REQ_VERSION_1() : 0; # Note: X509_REQ_VERSION_1 is 0
++  ok(Net::SSLeay::X509_REQ_set_version($req, $x509_req_version_1), "X509_REQ_set_version");
+ 
+   ok(my $sha1_digest = Net::SSLeay::EVP_get_digestbyname("sha1"), "EVP_get_digestbyname");
+   ok(Net::SSLeay::X509_REQ_sign($req, $pk, $sha1_digest), "X509_REQ_sign");
+@@ -192,7 +194,7 @@
+   ok(my $req_pubkey = Net::SSLeay::X509_REQ_get_pubkey($req), "X509_REQ_get_pubkey");
+   is(Net::SSLeay::X509_REQ_verify($req, $req_pubkey), 1, "X509_REQ_verify");
+   
+-  is(Net::SSLeay::X509_REQ_get_version($req), 2, "X509_REQ_get_version");
++  is(Net::SSLeay::X509_REQ_get_version($req), $x509_req_version_1, "X509_REQ_get_version");
+   ok(my $obj_challengePassword = Net::SSLeay::OBJ_txt2obj('1.2.840.113549.1.9.7'), "OBJ_txt2obj");
+   ok(my $nid_challengePassword = Net::SSLeay::OBJ_obj2nid($obj_challengePassword), "OBJ_obj2nid");  
+   is(Net::SSLeay::X509_REQ_get_attr_count($req), 3, "X509_REQ_get_attr_count");
+@@ -214,7 +216,8 @@
+   
+   ## PHASE2 - turn X509_REQ into X509 cert + sign with CA key
+   ok(my $x509ss = Net::SSLeay::X509_new(), "X509_new");
+-  ok(Net::SSLeay::X509_set_version($x509ss, 2), "X509_set_version");
++  my $x509_version_3 = (defined &Net::SSLeay::X509_VERSION_3) ? Net::SSLeay::X509_VERSION_3() : 2; # Note: X509_VERSION_3 is 2
++  ok(Net::SSLeay::X509_set_version($x509ss, $x509_version_3), "X509_set_version");
+   ok(my $sn = Net::SSLeay::X509_get_serialNumber($x509ss), "X509_get_serialNumber");
+   Net::SSLeay::P_ASN1_INTEGER_set_hex($sn, 'ABCDEF');
+   Net::SSLeay::X509_set_issuer_name($x509ss, Net::SSLeay::X509_get_subject_name($ca_cert));

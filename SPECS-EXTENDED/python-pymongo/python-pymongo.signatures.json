@@ -1,5 +1,5 @@
 {
-    "Signatures": {
-        "pymongo-3.10.1.tar.gz": "24dc5aa6f379de44ce5299b610d72e92a401a2b4fdac3516dfed536cc5b080fe"
-    }
+ "Signatures": {
+  "python-pymongo-4.2.0.tar.gz": "efd44e18a6f16156f8495d7786afbdc3952d1d09cfe9ad022bee3b86a6535e3f"
+ }
 }

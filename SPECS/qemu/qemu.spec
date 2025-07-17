@@ -428,7 +428,7 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 8.2.0
-Release: 12%{?dist}
+Release: 17%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -436,8 +436,19 @@ Source0: https://download.qemu.org/%{name}-%{version}%{?rcstr}.tar.xz
 
 # https://patchwork.kernel.org/project/qemu-devel/patch/20231128143647.847668-1-crobinso@redhat.com/
 # Fix pvh.img ld build failure on fedora rawhide
-Patch: 0001-pc-bios-optionrom-Fix-pvh.img-ld-build-failure-on-fe.patch
-Patch2: 0002-Disable-failing-tests-on-azl.patch
+Patch1:   0001-pc-bios-optionrom-Fix-pvh.img-ld-build-failure-on-fe.patch
+Patch2:   0002-Disable-failing-tests-on-azl.patch
+Patch3:   CVE-2023-6683.patch
+Patch4:   CVE-2023-6693.patch
+Patch5:   CVE-2021-20255.patch
+Patch6:   CVE-2024-3447.patch
+Patch7:   CVE-2024-4467.patch
+Patch8:   CVE-2024-6505.patch
+Patch9:   CVE-2024-4693.patch
+Patch10:  CVE-2024-7730.patch
+Patch11:  CVE-2024-3567.patch
+Patch12:  CVE-2024-26327.patch
+Patch13:  CVE-2024-26328.patch
 
 Source10: qemu-guest-agent.service
 Source11: 99-qemu-guest-agent.rules
@@ -640,7 +651,7 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %endif
 
 %if %{user_static}
-BuildRequires: glibc-static >= 2.38-9
+BuildRequires: glibc-static >= 2.38-11%{?dist}
 BuildRequires: glib2-static zlib-static
 BuildRequires: pcre2-static
 %endif
@@ -3421,6 +3432,23 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
+* Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.2.0-17
+- Bump to rebuild with updated glibc
+
+* Tue May 13 2025 Kshitiz Godara <kgodara@microsoft.com> - 8.2.0-16
+- Added patch for CVE-2024-26327 CVE-2024-26328
+
+* Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 8.2.0-15
+- Bump to rebuild with updated glibc
+
+* Mon May 05 2025 Kshitiz Godara <kgodara@microsoft.com> - 8.2.0-14
+- Added patch for CVE-2024-6505 CVE-2024-4467 CVE-2024-4693 CVE-2024-7730 CVE-2024-3447 CVE-2024-3567
+
+* Thu Mar 20 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 8.2.0-13
+- Add patch for CVE-2023-6683
+- Add patch for CVE-2023-6693
+- Add patch for CVE-2021-20255
+
 * Tue Feb 25 2025 Chris Co <chrco@microsoft.com> - 8.2.0-12
 - Bump to rebuild with updated glibc
 

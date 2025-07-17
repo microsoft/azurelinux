@@ -2,7 +2,7 @@
 
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
-Version:        3.5.18
+Version:        3.5.21
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -145,6 +145,9 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Sun Mar 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.21-1
+- Auto-upgrade to 3.5.21 - for CVE-2025-30204 [High]
+
 * Tue Feb 04 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.18-1
 - Auto-upgrade to 3.5.18 - Upgrade to fix CVE-2023-39325, CVE-2023-44487 and CVE-2023-45288.
 

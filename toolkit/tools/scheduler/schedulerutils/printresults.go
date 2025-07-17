@@ -14,6 +14,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
+	"github.com/sirupsen/logrus"
 
 	"github.com/fatih/color"
 )
@@ -124,6 +125,53 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 	}
 }
 
+// PrintHiddenBuildBlockers will list the nodes the goal node is blocked by but only
+// in the scenario where there are no:
+// - failed or blocked SRPM nodes,
+// - failed or blocked SRPM test nodes,
+// - unresolved dependencies, and
+// - (S)RPM conflicts with the toolchain.
+func PrintHiddenBuildBlockers(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState, goalNode *pkggraph.PkgNode) error {
+	graphMutex.RLock()
+	defer graphMutex.RUnlock()
+
+	srpmBuildData := getSRPMsState(pkgGraph, buildState)
+	srpmTestData := getSRPMsTestsState(pkgGraph, buildState)
+
+	unresolvedDependencies := getUnresolvedDependencies(pkgGraph)
+	rpmConflicts := buildState.ConflictingRPMs()
+	srpmConflicts := buildState.ConflictingSRPMs()
+
+	blockedNodesGraph := buildBlockedNodesGraph(pkgGraph, graphMutex, buildState, goalNode)
+
+	// Skip printing if either:
+	// - the goal node is not blocked or
+	// - there are obvious blockers, which would already be visible to the user.
+	if !blockedNodesGraph.HasNode(goalNode) ||
+		len(buildState.LicenseFailureSRPMs()) > 0 ||
+		len(rpmConflicts) > 0 ||
+		len(srpmBuildData.blockedSRPMs) > 0 ||
+		len(srpmBuildData.failedLicenseSRPMs) > 0 ||
+		len(srpmBuildData.failedSRPMs) > 0 ||
+		len(srpmConflicts) > 0 ||
+		len(srpmTestData.blockedSRPMsTests) > 0 ||
+		len(srpmTestData.failedSRPMsTests) > 0 ||
+		len(unresolvedDependencies) > 0 {
+		return nil
+	}
+
+	logger.Log.Errorf("Detected a blocked build despite no obvious failures.")
+	logger.Log.Errorf("Blocked nodes tree:")
+
+	graphPrinter := pkggraph.NewGraphPrinter(pkggraph.GraphPrinterLogOutput(logrus.ErrorLevel))
+	err := graphPrinter.Print(blockedNodesGraph, goalNode)
+	if err != nil {
+		return fmt.Errorf("failed to print the graph:\n%w", err)
+	}
+
+	return nil
+}
+
 // PrintBuildSummary prints the summary of the entire build to the logger.
 func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState, allowToolchainRebuilds bool, licenseChecker *PackageLicenseChecker) {
 	graphMutex.RLock()
@@ -132,19 +180,13 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	srpmBuildData := getSRPMsState(pkgGraph, buildState)
 	srpmTestData := getSRPMsTestsState(pkgGraph, buildState)
 
-	unresolvedDependencies := make(map[string]bool)
+	unresolvedDependencies := getUnresolvedDependencies(pkgGraph)
 	rpmConflicts := buildState.ConflictingRPMs()
 	srpmConflicts := buildState.ConflictingSRPMs()
 
 	conflictsLogger := logger.Log.Errorf
 	if allowToolchainRebuilds || (len(rpmConflicts) == 0 && len(srpmConflicts) == 0) {
 		conflictsLogger = logger.Log.Infof
-	}
-
-	for _, node := range pkgGraph.AllRunNodes() {
-		if node.State == pkggraph.StateUnresolved {
-			unresolvedDependencies[node.VersionedPkg.String()] = true
-		}
 	}
 
 	printSummary(srpmBuildData, srpmTestData, unresolvedDependencies, rpmConflicts, srpmConflicts, allowToolchainRebuilds, conflictsLogger)
@@ -357,6 +399,14 @@ func getSRPMsTestsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState
 	return
 }
 
+func getUnresolvedDependencies(pkgGraph *pkggraph.PkgGraph) map[string]bool {
+	unresolvedDependencies := make(map[string]bool)
+	for _, node := range pkgGraph.AllUnresolvedNodes() {
+		unresolvedDependencies[node.VersionedPkg.String()] = true
+	}
+	return unresolvedDependencies
+}
+
 func successfulPackagesCSVRows(unblockedPackages map[string]bool, state string, isTest bool) (csvRows [][]string) {
 	const emptyBlockers = ""
 
@@ -408,11 +458,11 @@ func printSummary(srpmBuildData srpmBuildDataContainer, srpmTestData srpmTestDat
 	logger.Log.Info("--------- Summary ---------")
 	logger.Log.Info("---------------------------")
 
-	logger.Log.Infof(color.GreenString(summaryLine("Number of prebuilt SRPMs:", len(srpmBuildData.prebuiltSRPMs))))
-	logger.Log.Infof(color.GreenString(summaryLine("Number of prebuilt delta SRPMs:", len(srpmBuildData.prebuiltDeltaSRPMs))))
-	logger.Log.Infof(color.GreenString(summaryLine("Number of skipped SRPMs tests:", len(srpmTestData.skippedSRPMsTests))))
-	logger.Log.Infof(color.GreenString(summaryLine("Number of built SRPMs:", len(srpmBuildData.builtSRPMs))))
-	logger.Log.Infof(color.GreenString(summaryLine("Number of passed SRPMs tests:", len(srpmTestData.passedSRPMsTests))))
+	logger.Log.Info(color.GreenString(summaryLine("Number of prebuilt SRPMs:", len(srpmBuildData.prebuiltSRPMs))))
+	logger.Log.Info(color.GreenString(summaryLine("Number of prebuilt delta SRPMs:", len(srpmBuildData.prebuiltDeltaSRPMs))))
+	logger.Log.Info(color.GreenString(summaryLine("Number of skipped SRPMs tests:", len(srpmTestData.skippedSRPMsTests))))
+	logger.Log.Info(color.GreenString(summaryLine("Number of built SRPMs:", len(srpmBuildData.builtSRPMs))))
+	logger.Log.Info(color.GreenString(summaryLine("Number of passed SRPMs tests:", len(srpmTestData.passedSRPMsTests))))
 	printErrorInfoByCondition(len(unresolvedDependencies) > 0, summaryLine("Number of unresolved dependencies:", len(unresolvedDependencies)))
 	printErrorInfoByCondition(len(srpmBuildData.blockedSRPMs) > 0, summaryLine("Number of blocked SRPMs:", len(srpmBuildData.blockedSRPMs)))
 	printErrorInfoByCondition(len(srpmTestData.blockedSRPMsTests) > 0, summaryLine("Number of blocked SRPMs tests:", len(srpmTestData.blockedSRPMsTests)))
@@ -432,9 +482,9 @@ func printSummary(srpmBuildData srpmBuildDataContainer, srpmTestData srpmTestDat
 // If the condition is true, it prints an error level log and an info level one otherwise.
 func printErrorInfoByCondition(condition bool, format string, arg ...any) {
 	if condition {
-		logger.Log.Errorf(color.RedString(format, arg...))
+		logger.Log.Error(color.RedString(format, arg...))
 	} else {
-		logger.Log.Infof(color.GreenString(format, arg...))
+		logger.Log.Info(color.GreenString(format, arg...))
 	}
 }
 
@@ -442,9 +492,9 @@ func printErrorInfoByCondition(condition bool, format string, arg ...any) {
 // If the condition is true, it prints a warning level log and an info level one otherwise.
 func printWarningInfoByCondition(condition bool, format string, arg ...any) {
 	if condition {
-		logger.Log.Warnf(color.YellowString(format, arg...))
+		logger.Log.Warn(color.YellowString(format, arg...))
 	} else {
-		logger.Log.Infof(color.GreenString(format, arg...))
+		logger.Log.Info(color.GreenString(format, arg...))
 	}
 }
 

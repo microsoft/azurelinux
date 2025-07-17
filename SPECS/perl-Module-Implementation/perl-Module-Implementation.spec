@@ -10,7 +10,7 @@
 
 Name:		perl-Module-Implementation
 Version:	0.09
-Release:	25%{?dist}
+Release:	26%{?dist}
 Summary:	Loads one of several alternate underlying implementations for a module
 License:	Artistic 2.0
 Vendor:         Microsoft Corporation
@@ -45,6 +45,7 @@ BuildRequires:	perl(lib)
 BuildRequires:	perl(Test::Fatal) >= 0.006
 BuildRequires:	perl(Test::More) >= 0.96
 BuildRequires:	perl(Test::Requires)
+BuildRequires:  perl(blib)
 %if %{with perl_Module_Implementation_enables_optional_test}
 # ===================================================================
 # Optional test requirements
@@ -131,6 +132,9 @@ make test
 %{_mandir}/man3/Module::Implementation.3*
 
 %changelog
+* Wed May 21 2025 Riken Maharjan <rmaharjan@microsoft.com> - 0.09-26
+- Fix ptest byadding missing test dep.
+
 * Wed Aug 28 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.09-25
 - Promote package to Core repository.
 - License verified.

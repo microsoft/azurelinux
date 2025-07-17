@@ -3,12 +3,13 @@
 Summary:        HTTP server toolkit
 Name:           rubygem-%{gem_name}
 Version:        1.8.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:	        Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/ruby/webrick
 Source0:        https://github.com/ruby/webrick/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Patch0:         CVE-2025-6442.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
@@ -35,6 +36,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Fri Jun 27 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.8.1-2
+- Patch for CVE-2025-6442
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.1-1
 - Auto-upgrade to 1.8.1 - Azure Linux 3.0 - package upgrades
 

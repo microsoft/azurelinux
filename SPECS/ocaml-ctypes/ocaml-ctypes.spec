@@ -1,12 +1,15 @@
 Summary:        Combinators for binding to C libraries without writing any C
 Name:           ocaml-ctypes
 Version:        0.21.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/ocamllabs/ocaml-ctypes
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+
+#Remove ocaml-shims dependency from the test as this dep is not available in Mariner
+Patch0:          %{name}-stdlib-shims.patch
 
 BuildRequires:  ocaml >= 4.03.0
 BuildRequires:  ocaml-bigarray-compat-devel
@@ -52,7 +55,7 @@ The %{name}-devel package contains libraries and signature
 files for developing applications that use %{name}.
 
 %prep
-%autosetup
+%autosetup -p1
 # Use Mariner flags
 sed -i 's/ "-cclib"; "-Wl,--no-as-needed";//' src/ctypes-foreign/config/discover.ml
 
@@ -72,6 +75,9 @@ sed -i 's/ "-cclib"; "-Wl,--no-as-needed";//' src/ctypes-foreign/config/discover
 %files devel -f .ofiles-devel
 
 %changelog
+* Tue Apr 15 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.21.1-2
+- Fix ptest by importing ocaml-ctypes-stdlib-shims patch from Fedora (LICENSE: MIT).
+
 * Tue Jun 04 2024 Andrew Phelps <anphel@microsoft.com> - 0.21.1-1
 - Upgrade to version 0.21.1 based on Fedora 40 package (license: MIT)
 - Remove doc subpackage

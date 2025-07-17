@@ -50,6 +50,7 @@ BuildRequires: libseccomp-static
 Requires: libseccomp >= 2.4.1-0
 Suggests: cpp
 
+
 %description
 The %{name} package provides a command line tool which can be used to
 * create a working container from scratch

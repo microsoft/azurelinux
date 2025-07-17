@@ -4,33 +4,35 @@
 %bcond_with tests
 
 Name:           uglify-js
-Version:        2.8.22
-Release:        10%{?dist}
+Version:        3.19.3
+Release:        11%{?dist}
 Summary:        JavaScript parser, mangler/compressor and beautifier toolkit
-License:        BSD
+License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://github.com/mishoo/UglifyJS2
-Source0:        https://github.com/mishoo/UglifyJS2/archive/v%{version}/uglify-js-%{version}.tar.gz
-Patch0:         uglify-js-esfuzz.patch
+URL:            https://github.com/mishoo/UglifyJS
+Source0:        https://registry.npmjs.org/%{name}/-/%{name}-%{version}.tgz
 
 BuildArch:      noarch
 ExclusiveArch:  %{nodejs_arches} noarch
 
 Provides:       nodejs-uglify-js = %{version}-%{release}
 
+Provides:       uglify-js3 = %{version}-%{release}
+Obsoletes:      uglify-js3 < 3.14.5-2
+
+Provides:       nodejs-uglify-js3 = %{version}-%{release}
+
+BuildRequires:  nodejs
 BuildRequires:  nodejs-packaging
 BuildRequires:  web-assets-devel
 
 %if %{with tests}
 BuildRequires:  npm(acorn)
-BuildRequires:  npm(async)
-BuildRequires:  npm(mocha)
-BuildRequires:  npm(optimist)
-BuildRequires:  npm(source-map)
+BuildRequires:  npm(semver)
 %endif
 
-Requires: js-uglify = %{version}-%{release}
+Requires:       js-uglify = %{version}-%{release}
 
 %description
 JavaScript parser, mangler/compressor and beautifier toolkit.
@@ -39,12 +41,15 @@ This package ships the uglifyjs command-line tool and a library suitable for
 use within Node.js.
 
 %package -n js-uglify
-Summary: JavaScript parser, mangler/compressor and beautifier toolkit - core library
+Summary:        JavaScript parser, mangler/compressor and beautifier toolkit - core library
 
-Obsoletes: uglify-js-common < 2.2.5-4
-Provides: uglify-js-common = %{version}-%{release}
-Requires: web-assets-filesystem
+Provides:       js-uglify3 = %{version}-%{release}
+Obsoletes:      js-uglify3 < 3.14.5-2
 
+Provides:       uglify-js-common = %{version}-%{release}
+Obsoletes:      uglify-js-common < 2.2.5-4
+
+Requires:       web-assets-filesystem
 
 %description -n js-uglify
 JavaScript parser, mangler/compressor and beautifier toolkit.
@@ -53,40 +58,40 @@ This package ships a JavaScript library suitable for use by any JavaScript
 runtime.
 
 %prep
-%autosetup -p 1 -n UglifyJS2-%{version}
+%autosetup -n package
 
-%nodejs_fixdep async "^1.5.0"
-%nodejs_fixdep yargs "^3.2.1"
-
+chmod 0755 bin/uglifyjs
 
 %build
 #nothing to do
 
 
 %install
-rm -rf %buildroot
-
-mkdir -p %{buildroot}%{_jsdir}/%{name}-2
-cp -pr lib/* %{buildroot}%{_jsdir}/%{name}-2
-ln -sf %{name}-2 %{buildroot}%{_jsdir}/%{name}
+mkdir -p %{buildroot}%{_jsdir}/%{name}-3
+cp -pr lib/* %{buildroot}%{_jsdir}/%{name}-3
+ln -s %{name}-3 %{buildroot}%{_jsdir}/%{name}
 
 #compat symlink
 mkdir -p %{buildroot}%{_datadir}
-ln -sf javascript/%{name} %{buildroot}%{_datadir}/%{name}
+ln -rs %{buildroot}%{_jsdir}/%{name} %{buildroot}%{_datadir}/%{name}
 
-mkdir -p %{buildroot}%{nodejs_sitelib}/uglify-js@2
-cp -pr bin tools package.json %{buildroot}%{nodejs_sitelib}/uglify-js@2
-ln -sf %{_jsdir}/%{name} %{buildroot}%{nodejs_sitelib}/uglify-js@2/lib
+mkdir -p %{buildroot}%{nodejs_sitelib}/uglify-js@3
+cp -pr bin tools package.json %{buildroot}%{nodejs_sitelib}/uglify-js@3
+ln -rs %{buildroot}%{_jsdir}/%{name}-3 \
+       %{buildroot}%{nodejs_sitelib}/uglify-js@3/lib
 # Fix for rpmlint.
 sed -i -e 's|^#! */usr/bin/env node|#!/usr/bin/node|' \
-  %{buildroot}%{nodejs_sitelib}/uglify-js@2/bin/*
+  %{buildroot}%{nodejs_sitelib}/uglify-js@3/bin/uglifyjs
+chmod 755 %{buildroot}%{nodejs_sitelib}/uglify-js@3/bin/uglifyjs
 
 mkdir -p %{buildroot}%{_bindir}
-ln -sf ../lib/node_modules/uglify-js@2/bin/uglifyjs %{buildroot}%{_bindir}/uglifyjs
+ln -rs %{buildroot}%{nodejs_sitelib}/uglify-js@3/bin/uglifyjs \
+       %{buildroot}%{_bindir}/uglifyjs-3
+ln -s uglifyjs-3 %{buildroot}%{_bindir}/uglifyjs
 
 %nodejs_symlink_deps
 
-ln -sf uglify-js@2 %{buildroot}%{nodejs_sitelib}/uglify-js
+ln -s uglify-js@3 %{buildroot}%{nodejs_sitelib}/uglify-js
 
 
 %check
@@ -117,12 +122,13 @@ end
 
 %files
 %{nodejs_sitelib}/uglify-js
-%{nodejs_sitelib}/uglify-js@2
+%{nodejs_sitelib}/uglify-js@3
+%{_bindir}/uglifyjs-3
 %{_bindir}/uglifyjs
 
 
 %files -n js-uglify
-%{_jsdir}/%{name}-2
+%{_jsdir}/%{name}-3
 %{_jsdir}/%{name}
 %{_datadir}/%{name}
 %doc README.md
@@ -130,9 +136,96 @@ end
 
 
 %changelog
-* Wed Jan 13 2021 Joe Schmitt <joschmit@microsoft.com> - 2.8.22-10
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Mar 17 2025 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.3-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - Turn off tests
+- License verified
+
+* Tue Sep 10 2024 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.19.3-1
+- Update to 3.19.3
+
+* Mon Aug 12 2024 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.19.2-1
+- Update to 3.19.2
+
+* Sun Aug 04 2024 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.19.1-1
+- Update to 3.19.1
+
+* Thu Jul 18 2024 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.19.0-1
+- Update to 3.19.0
+
+* Mon Jun 10 2024 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.18.0-1
+- Update to 3.18.0
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.17.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.17.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Mar 15 2023 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.17.4-1
+- Update to 3.17.4
+- Rebuilt for updated rpm macros (Fedora 37+)
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.17.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Sep 20 2022 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.17.1-1
+- Update to 3.17.1
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.16.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jun 17 2022 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.16.1-1
+- Update to 3.16.1
+
+* Wed Apr 20 2022 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.15.4-1
+- Update to 3.15.4
+
+* Sun Mar 20 2022 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.15.3-1
+- Update to 3.15.3
+
+* Mon Feb 28 2022 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.15.2-1
+- Update to 3.15.2
+
+* Mon Feb 07 2022 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.15.1-1
+- Update to 3.15.1
+
+* Wed Jan 26 2022 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.15.0-1
+- Update to 3.15.0
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.14.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jan 19 2022 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.14.5-2
+- Update uglify-js for EPEL 7 to version 3
+- Provide/Obsolete uglify-js3
+
+* Thu Dec 16 2021 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.14.5-1
+- Update to 3.14.5
+
+* Wed Dec 01 2021 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.14.4-1
+- Update to 3.14.4
+
+* Tue Nov 02 2021 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.14.3-1
+- Update to 3.14.3
+
+* Thu Oct 14 2021 Mattias Ellert <mattias.ellert@physics.uu.se> - 3.14.2-1
+- Update to 3.14.2
+
+* Fri Aug 13 2021 Sérgio Basto <sergio@serjux.com> - 3.14.1-1
+- Update to 3.14.1
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Sep 18 2020 Troy Dawson <tdawson@redhat.com> - 3.10.4-1
+- Update to 3.10.4
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.8.22-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.8.22-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

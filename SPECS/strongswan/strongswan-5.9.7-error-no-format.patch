@@ -1,0 +1,12 @@
+diff --git a/configure.ac b/configure.ac
+index f9e6e55c2..247d055d8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1480,7 +1480,6 @@ else
+ fi
+ # disable some warnings, whether explicitly enabled above or by default
+ # these are not compatible with our custom printf specifiers
+-WARN_CFLAGS="$WARN_CFLAGS -Wno-format"
+ WARN_CFLAGS="$WARN_CFLAGS -Wno-format-security"
+ # we generally use comments, but GCC doesn't seem to recognize many of them
+ WARN_CFLAGS="$WARN_CFLAGS -Wno-implicit-fallthrough"

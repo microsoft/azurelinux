@@ -1,0 +1,40 @@
+diff -ur cheetah3-3.2.6.post1.orig/Cheetah/Template.py cheetah3-3.2.6.post1/Cheetah/Template.py
+--- cheetah3-3.2.6.post1.orig/Cheetah/Template.py	2024-10-30 07:25:43.621206329 -0700
++++ cheetah3-3.2.6.post1/Cheetah/Template.py	2024-10-30 07:28:32.723440631 -0700
+@@ -21,7 +21,10 @@
+     from io import StringIO
+ import traceback
+ import pprint
+-import cgi  # Used by .webInput() if the template is a CGI script.
++try:
++    import cgi  # Used by .webInput() if the template is a CGI script.
++except ImportError:  # Python 3.13+
++    cgi = None
+ import types
+ 
+ from Cheetah import ErrorCatchers              # for placeholder tags
+@@ -1916,7 +1919,7 @@
+         """
+         src = src.lower()
+         isCgi = not self._CHEETAH__isControlledByWebKit
+-        if isCgi and src in ('f', 'v'):
++        if isCgi and (cgi is not None) and src in ('f', 'v'):
+             global _formUsedByWebInput
+             if _formUsedByWebInput is None:
+                 _formUsedByWebInput = cgi.FieldStorage()
+diff -ur cheetah3-3.2.6.post1.orig/docs/news.rst cheetah3-3.2.6.post1/docs/news.rst
+--- cheetah3-3.2.6.post1.orig/docs/news.rst	2021-02-22 02:22:54.000000000 -0800
++++ cheetah3-3.2.6.post1/docs/news.rst	2024-10-30 07:37:07.891109768 -0700
+@@ -1,6 +1,12 @@
+ News
+ ====
+ 
++Backports
++---------
++2024-10-30:
++
++   - Protect ``import cgi`` in preparation to Python 3.13.
++
+ 3.2.6.post1 (2021-02-22)
+ ------------------------
+ 

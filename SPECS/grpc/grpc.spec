@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
-Version:        1.62.0
-Release:        4%{?dist}
+Version:        1.62.3
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -152,6 +152,9 @@ export GRPC_PYTHON_CFLAGS="%{optflags} -std=c++$CXX_VERSION"
 %{python3_sitearch}/grpcio-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Tue Mar 25 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.62.3-1
+- Upgrade to 1.62.3 to fix CVE-2024-7246
+
 * Wed Jan 25 2024 Suresh Thelkar <sthelkar@microsoft.com> - 1.62.0-4
 - Patch CVE-2024-11407
 

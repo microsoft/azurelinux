@@ -1,15 +1,15 @@
 # Prevent librustc_driver from inadvertently being listed as a requirement
 %global __requires_exclude ^librustc_driver-
 
-# Release date and version of stage 0 compiler can be found in "src/stage0.json" inside the extracted "Source0".
+# Release date and version of stage 0 compiler can be found in "src/stage0" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2023-11-16
-%define stage0_version 1.74.0
+%define release_date 2025-02-20
+%define stage0_version 1.85.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.75.0
-Release:        12%{?dist}
+Version:        1.86.0
+Release:        3%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,10 +41,7 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
-Patch0:         CVE-2023-45853.patch
-Patch1:         CVE-2024-32884.patch
-Patch2:         CVE-2024-31852.patch
-
+Patch0:		CVE-2025-4574.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -59,8 +56,11 @@ BuildRequires:  ninja-build
 # make sure rust relies on openssl from CBL-Mariner (instead of using its vendored flavor)
 BuildRequires:  openssl-devel
 BuildRequires:  python3
+# make sure rust depends on system zlib
+BuildRequires:  zlib-devel
 %if 0%{?with_check}
-BuildRequires:  glibc-static >= 2.38-9%{?dist}
+BuildRequires:  glibc-static >= 2.38-11%{?dist}
+BuildRequires:	sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
@@ -113,7 +113,7 @@ sh ./configure \
     --prefix=%{_prefix} \
     --enable-extended \
     --enable-profiler \
-    --tools="cargo,clippy,rustfmt,rust-analyzer-proc-macro-srv,rust-demangler" \
+    --tools="cargo,clippy,rustfmt,rust-analyzer-proc-macro-srv" \
     --release-channel="stable" \
     --release-description="Azure Linux %{version}-%{release}"
 
@@ -125,21 +125,25 @@ USER=root SUDO_USER=root %make_build
 # We expect to generate dynamic CI contents in this folder, but it will fail since the .github folder is not included
 # with the published sources.
 mkdir -p .github/workflows
-./x.py run src/tools/expand-yaml-anchors
 
 ln -s %{_topdir}/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_topdir}/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
 ln -s %{_topdir}/BUILD/rustc-%{version}-src/vendor/ /root/vendor
+# Since mariner has `aarch64-unknown-linux-gnu-gcc` as native compiler in arm64 and a ptest is expecting `aarch64-linux-gnu-gcc`
+ln -s /usr/bin/aarch64-unknown-linux-gnu-gcc /usr/bin/aarch64-linux-gnu-gcc
 # remove rustdoc ui flaky test issue-98690.rs (which is tagged with 'unstable-options')
-rm -v ./tests/rustdoc-ui/issue-98690.*
-%make_build check
-
+rm -v ./tests/rustdoc-ui/issues/issue-98690.*
+useradd -m -d /home/test test
+chown -R test:test .
+sudo -u test %make_build check
+userdel -r test
 %install
 USER=root SUDO_USER=root %make_install
-mv %{buildroot}%{_docdir}/%{name}/LICENSE-THIRD-PARTY .
-rm %{buildroot}%{_docdir}/%{name}/{COPYRIGHT,LICENSE-APACHE,LICENSE-MIT}
-rm %{buildroot}%{_docdir}/%{name}/html/.lock
-rm %{buildroot}%{_docdir}/%{name}/*.old
-rm %{buildroot}%{_bindir}/*.old
+mv %{buildroot}%{_docdir}/cargo/LICENSE-THIRD-PARTY .
+rm %{buildroot}%{_docdir}/rustc/{COPYRIGHT-library.html,COPYRIGHT.html}
+rm %{buildroot}%{_docdir}/cargo/{LICENSE-APACHE,LICENSE-MIT}
+rm %{buildroot}%{_docdir}/clippy/{LICENSE-APACHE,LICENSE-MIT}
+rm %{buildroot}%{_docdir}/rustfmt/{LICENSE-APACHE,LICENSE-MIT}
+rm %{buildroot}%{_docdir}/docs/html/.lock
 
 %ldconfig_scriptlets
 
@@ -153,7 +157,6 @@ rm %{buildroot}%{_bindir}/*.old
 %{_libexecdir}/rust-analyzer-proc-macro-srv
 %{_bindir}/rust-gdb
 %{_bindir}/rust-gdbgui
-%{_bindir}/rust-demangler
 %{_bindir}/cargo
 %{_bindir}/cargo-clippy
 %{_bindir}/cargo-fmt
@@ -164,14 +167,40 @@ rm %{buildroot}%{_bindir}/*.old
 
 %files doc
 %license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
-%doc %{_docdir}/%{name}/html/*
-%doc %{_docdir}/%{name}/README.md
+%license %{_docdir}/rustc/licenses/*
+%doc %{_docdir}/rustc/README.md
+%doc %{_docdir}/cargo/*
+%doc %{_docdir}/rustfmt/*
+%doc %{_docdir}/clippy/*
+%doc %{_docdir}/docs/html/*
 %doc CONTRIBUTING.md README.md RELEASES.md
 %doc src/tools/clippy/CHANGELOG.md
 %doc src/tools/rustfmt/Configurations.md
 %{_mandir}/man1/*
 
 %changelog
+* Fri Jun 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.86.0-3
+- Patch CVE-2025-4574
+
+* Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.86.0-2
+- Bump to rebuild with updated glibc
+
+
+* Tue May 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.86.0-1
+- Upgrade to 1.86.0
+
+* Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 1.85.0-2
+- Bump to rebuild with updated glibc
+
+* Sun Apr 20 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.85.0-1
+- Upgrade to 1.85.0
+- Drop patches
+- Remove expand-yaml-anchors tool in %check
+- Remove rust-demangler tool 
+- Update generate_source_tarball script
+- Run %check as test user
+- Add explicit build dependency on zlib
+
 * Thu Feb 27 2025 Chris Co <chrco@microsoft.com> - 1.75.0-12
 - Bump to rebuild with updated glibc
 

@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Leo Sandoval <lsandova@redhat.com>
+Date: Thu, 13 Jun 2024 17:05:44 -0600
+Subject: [PATCH] 50mounted-tests: trap do_unmount function on errors
+
+Although previous commit unmounts a (grub2-mounted)
+partition in case of error, script continues executing
+instead of exiting, resulting in a wrong behavior when called on
+behalf of grub2-mkconfig (grub2-mkconfig -> 30_os-prober ->
+linux-boot-prober ->50mounted-tests), including extra non-bootable menu
+entries.
+
+The propose change effectively reverts previous change and traps the
+do_unmount function on error, unmounting any previous
+partition in case of error and not letting the partition to be included
+as boot entry when called on behalf of grub2-mkconfig.
+
+Signed-off-by: Leo Sandoval <lsandova@redhat.com>
+---
+ linux-boot-probes/common/50mounted-tests | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/linux-boot-probes/common/50mounted-tests b/linux-boot-probes/common/50mounted-tests
+index ad68874..63b2174 100755
+--- a/linux-boot-probes/common/50mounted-tests
++++ b/linux-boot-probes/common/50mounted-tests
+@@ -13,6 +13,8 @@ do_unmount() {
+ 	rmdir "$tmpmnt" || true
+ }
+ 
++trap do_unmount ERR
++
+ partition="$1"
+ 
+ types="$(fs_type "$partition")"

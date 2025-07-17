@@ -1,7 +1,7 @@
 Summary:        cifs client utils
 Name:           cifs-utils
-Version:        7.0
-Release:        2%{?dist}
+Version:        7.3
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ BuildRequires:  keyutils-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libtalloc-devel
 BuildRequires:  pam-devel
+BuildRequires:  krb5-devel
 Requires:       libcap-ng
 
 %description
@@ -43,15 +44,19 @@ Provides header files needed for Cifs-Utils development.
 
 %build
 autoreconf -fiv
-# Disabling 'cifsupcall' to not introduce a dependency on 'krb5'.
 %configure \
     --prefix=%{_prefix} \
-    ROOTSBINDIR=%{_sbindir} \
-    --disable-cifsupcall
+    ROOTSBINDIR=%{_sbindir}
 %make_build
 
 %install
-%make_install
+#%make_install
+rm -rf %{buildroot}
+make install DESTDIR=%{buildroot}
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}
+mkdir -p %{buildroot}%{_sysconfdir}/request-key.d
+install -m 644 contrib/request-key.d/cifs.idmap.conf %{buildroot}%{_sysconfdir}/request-key.d
+install -m 644 contrib/request-key.d/cifs.spnego.conf %{buildroot}%{_sysconfdir}/request-key.d
 
 %check
 make %{?_smp_mflags} check
@@ -64,6 +69,9 @@ make %{?_smp_mflags} check
 %{_bindir}/smbinfo
 %{_sbindir}/mount.cifs
 %{_sbindir}/mount.smb3
+%{_sbindir}/cifs.upcall
+%config(noreplace) %{_sysconfdir}/request-key.d/cifs.idmap.conf
+%config(noreplace) %{_sysconfdir}/request-key.d/cifs.spnego.conf
 
 %files -n pam_cifscreds
 %{_libdir}/security/pam_cifscreds.so
@@ -73,6 +81,9 @@ make %{?_smp_mflags} check
 %{_includedir}/cifsidmap.h
 
 %changelog
+* Wed Mar 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.3-1
+- Auto-upgrade to 7.3 - Bugfix: 56213770, 56248605
+
 * Fri Feb 07 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.0-2
 - Explicitly disable 'cifs-upcall'.
 

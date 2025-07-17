@@ -6,7 +6,7 @@
 Summary:        Sphinx extension for math in HTML via JavaScript
 Name:           python-%{pypi_name}
 Version:        1.0.1
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -52,7 +52,7 @@ via JavaScript.
 %py3_install
 
 %check
-pip3 install more-itertools sphinx exceptiongroup iniconfig tomli
+pip3 install more-itertools sphinx==7.2.6 exceptiongroup iniconfig tomli
 python3 -m pytest
 
 %files -n python%{python3_pkgversion}-%{pypi_name}
@@ -63,6 +63,9 @@ python3 -m pytest
 %{python3_sitelib}/%{pypi_name_underscore}-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Tue Apr 22 2025 Riken Maharjan <rmaharjan@microsoft.com> -  1.0.1-18
+- Fix ptest by using compatible sphinx version.
+
 * Fri Feb 23 2024 Amrita Kohli <amritakohli@microsoft.com> - 1.0.1-17
 - Installing packages needed for tests to run. 
 

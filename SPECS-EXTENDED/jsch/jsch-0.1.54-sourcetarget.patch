@@ -6,8 +6,8 @@
             destdir="${build}"
 -           target="1.4"
 -           source="1.4"
-+           target="1.6"
-+           source="1.6"
++           target="1.8"
++           source="1.8"
             debug="${javac.debug}">
        <classpath refid="lib.path.ref"/>
        <exclude name="com/jcraft/jsch/jcraft/Compression.java"

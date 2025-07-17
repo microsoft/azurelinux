@@ -5,7 +5,7 @@ Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        20.14.0
-Release:        5%{?dist}
+Release:        9%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -23,6 +23,12 @@ Patch4:         CVE-2025-22150.patch
 Patch5:         CVE-2025-23085.patch
 Patch6:         CVE-2024-22020.patch
 Patch7:         CVE-2024-22195.patch
+Patch8:         CVE-2020-28493.patch
+Patch9:         CVE-2024-34064.patch
+Patch10:        CVE-2025-27516.patch
+Patch11:        CVE-2025-47279.patch
+Patch12:        CVE-2025-23165.patch
+Patch13:        CVE-2025-23166.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -116,7 +122,7 @@ make cctest
 %files
 %defattr(-,root,root)
 %license LICENSE
-%doc CHANGELOG.md LICENSE README.md
+%doc CHANGELOG.md README.md
 %{_bindir}/node
 %dir %{_prefix}/lib/node_modules
 %{_mandir}/man*/*
@@ -134,6 +140,19 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
+* Tue May 27 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 20.14.0-9
+- Patch CVE-2025-23165, CVE-2025-23166
+
+* Wed May 21 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 20.14.0-8
+- Patch CVE-2025-47279
+
+* Mon Mar 10 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 20.14.0-7
+- Patch CVE-2025-27516
+
+* Wed Feb 12 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 20.14.0-6
+- Patch CVE-2020-28493
+- Patch CVE-2024-34064
+
 * Tue Feb 11 2025 Kanishk Bansal <kanbansal@microsoft.com> - 20.14.0-5
 - Patch CVE-2025-22150, CVE-2025-23085, CVE-2024-22020, CVE-2024-22195
 

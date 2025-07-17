@@ -1,0 +1,27 @@
+From 4e64300bc6d0f96c59c7d06c0f6f57a5d0f8e6ad Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Tue, 8 Apr 2025 19:20:37 +0000
+Subject: [PATCH] Fix test build on aarch64-linux. Fixes upstream issue
+ https://github.com/influxdata/flux/issues/5495. Modeled after
+ https://github.com/magneticflux-/nixpkgs/blob/reposilite-module/pkgs/servers/nosql/influxdb2/fix-unsigned-char.patch.
+
+---
+ libflux/flux/src/cffi.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libflux/flux/src/cffi.rs b/libflux/flux/src/cffi.rs
+index 2e686ec..9fbae64 100644
+--- a/libflux/flux/src/cffi.rs
++++ b/libflux/flux/src/cffi.rs
+@@ -1149,7 +1149,7 @@ from(bucket: v.bucket)
+     fn parse_with_invalid_utf8() {
+         let cfname = CString::new("foo.flux").unwrap();
+         let cfname_ptr: *const c_char = cfname.as_ptr();
+-        let v: Vec<c_char> = vec![-61, 0];
++        let v: Vec<c_char> = vec![-61i8 as c_char, 0];
+         let csrc: *const c_char = &v[0];
+         // Safety: both pointers are valid
+         let pkg = unsafe { flux_parse(cfname_ptr, csrc) };
+-- 
+2.45.3
+

@@ -185,7 +185,7 @@
 Summary:        Library providing a simple virtualization API
 Name:           libvirt
 Version:        10.0.0
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND OFL-1.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -196,6 +196,9 @@ URL:            https://libvirt.org/
 %endif
 Source:         https://download.libvirt.org/%{?mainturl}libvirt-%{version}.tar.xz
 Patch0:         libvirt-conf.patch
+Patch1:         CVE-2024-1441.patch
+Patch2:         CVE-2024-2494.patch
+Patch3:         CVE-2024-4418.patch
 
 Requires: libvirt-daemon = %{version}-%{release}
 Requires: libvirt-daemon-config-network = %{version}-%{release}
@@ -2186,6 +2189,12 @@ exit 0
 %endif
 
 %changelog
+* Thu May 15 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 10.0.0-5
+- Fixes CVE-2024-4418 with an upstream patch
+
+* Fri May 23 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 10.0.0-4
+- Fix for CVE-2024-1441 and CVE-2024-2494
+
 * Thu May 30 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 10.0.0-3
 - Add patch to libvirt.conf to work with kubevirt.
 

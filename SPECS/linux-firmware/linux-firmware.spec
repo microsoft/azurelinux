@@ -5,13 +5,14 @@
 Summary:        Linux Firmware
 Name:           linux-firmware
 Version:        20230804
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ AND GPLv2+ AND MIT AND Redistributable, no modification permitted
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://www.kernel.org/
-Source0:        https://git.kernel.org/pub/scm/linux/kernel/git/firmware/%{name}.git/snapshot/%{name}-%{version}.tar.gz
+# Note that scrubbed version of the source tarball contains upstream source minus password protected files which password is not known
+Source0:        https://www.kernel.org/pub/linux/kernel/firmware/%{name}-%{version}.tar.gz#/%{name}-%{version}-scrubbed.tar.gz
 BuildArch:      noarch
 
 Requires:       %{name}-broadcom = %{version}-%{release}
@@ -96,6 +97,9 @@ cp iwlwifi-8000C-*.ucode %{buildroot}%{_firmwarepath}
 %{_firmwarepath}/intel
 
 %changelog
+* Tue May 27 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 0230804-2
+- Remove password protected compressed files from upstream src tarball
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20230804-1
 - Auto-upgrade to 20230804 - Azure Linux 3.0 - package upgrades
 

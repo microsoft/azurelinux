@@ -1,7 +1,7 @@
 Summary:        A free package dependency solver
 Name:           libsolv
 Version:        0.7.28
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 URL:            https://github.com/openSUSE/libsolv
 Source0:        https://github.com/openSUSE/libsolv/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -49,6 +49,7 @@ Requires:       xz
     -DENABLE_RPMDB_LIBRPM=ON            \
     -DENABLE_RPMMD=ON                   \
     -DENABLE_COMPS=ON                   \
+    -DENABLE_CONDA=ON                   \
     -DENABLE_ZSTD_COMPRESSION=ON
 %make_build
 
@@ -79,6 +80,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*
 
 %changelog
+* Fri April 11 2025 Riken Maharjan <rmaharjan@microsoft.com> - 0.7.28-3
+- Enable conda support.
+
 * Wed Sep 04 2024 Reuben Olinsky <reubeno@microsoft.com> - 0.7.28-2
 - Enable zstd support to match createrepo_c.
 

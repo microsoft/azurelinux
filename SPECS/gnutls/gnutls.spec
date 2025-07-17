@@ -1,7 +1,7 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
 Version:        3.8.3
-Release:        2%{?dist}
+Release:        6%{?dist}
 License:        GPLv3+ AND LGPLv2.1+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,9 +9,15 @@ Group:          System Environment/Libraries
 URL:            https://www.gnutls.org
 Source0:        https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/%{name}-%{version}.tar.xz
 # Patch taken from 3.8.4 release
-Patch1:          CVE-2024-28834.patch
+Patch1:         CVE-2024-28834.patch
 # Patch taken from 3.8.4 release
-Patch2:          CVE-2024-28835.patch
+Patch2:         CVE-2024-28835.patch
+Patch3:         CVE-2024-12133.patch
+Patch4:         CVE-2024-12243.patch
+Patch5:         CVE-2025-32990.patch
+Patch6:         CVE-2025-32989.patch
+Patch7:         CVE-2025-32988.patch
+Patch8:         CVE-2025-6395.patch
 BuildRequires:  autogen-libopts-devel
 BuildRequires:  gc-devel
 BuildRequires:  libtasn1-devel
@@ -93,6 +99,18 @@ sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 %{_mandir}/man3/*
 
 %changelog
+* Tue Jul 15 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.8.3-6
+- Patch for CVE-2025-6395
+
+* Mon Jul 14 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.8.3-5
+- Patch for CVE-2025-32990, CVE-2025-32989, CVE-2025-32988
+
+* Tue Mar 11 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 3.8.3-4
+- Patch CVE-2024-12243
+
+* Wed Feb 26 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.8.3-3
+- Address CVE-2024-12133 with a patch
+
 * Wed Oct 30 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.8.3-2
 - Fix CVE-2024-28834 and CVE-2024-28835 with patches from 3.8.4
 

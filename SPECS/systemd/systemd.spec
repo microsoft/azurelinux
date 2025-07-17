@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        20%{?dist}
+Release:        21%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -1217,6 +1217,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Mon Apr 14 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 255-21
+- Bumping 'Release' tag to match the 'signed' version of the spec.
+
 * Fri Jan 10 2025 Aditya Dubey <adityadubey@microsoft.com> - 255-20
 - adding patch for enhancing DNSSEC signature validation integrity
 - addresses CVE-2023-7008

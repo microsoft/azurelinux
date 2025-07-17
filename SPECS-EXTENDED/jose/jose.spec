@@ -1,19 +1,23 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           jose
-Version:        10
-Release:        7%{?dist}
+Version:        14
+Release:        3%{?dist}
 Summary:        Tools for JSON Object Signing and Encryption (JOSE)
 
-License:        ASL 2.0
+License:        Apache-2.0
 URL:            https://github.com/latchset/%{name}
-Source0:        https://github.com/latchset/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.bz2
+Source0:        https://github.com/latchset/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 
 BuildRequires:  gcc
 BuildRequires:  pkgconfig
 BuildRequires:  jansson-devel >= 2.10
 BuildRequires:  openssl-devel
 BuildRequires:  zlib-devel
+BuildRequires:  git-core
+BuildRequires:  meson
+BuildRequires:  ninja-build
+BuildRequires:  asciidoc
 Requires: lib%{name}%{?_isa} = %{version}-%{release}
 
 %description
@@ -46,28 +50,26 @@ Obsoletes:      lib%{name}-zlib-devel < %{version}-%{release}
 This package contains development files for lib%{name}.
 
 %prep
-%setup -q
+%autosetup -S git
 
 %build
-%if 0%{?rhel}
-%__sed -i 's|libcrypto >= 1\.0\.2|libcrypto >= 1\.0\.1|' configure
-%endif
-%configure --disable-openmp
-make %{?_smp_mflags}
+%meson
+%meson_build
 
 %install
 rm -rf %{buildroot}
-%make_install
+%meson_install
 rm -rf %{buildroot}/%{_libdir}/lib%{name}.la
 
 %check
-make %{?_smp_mflags} check
+%meson_test
 
 %ldconfig_scriptlets -n lib%{name}
 
 %files
 %{_bindir}/%{name}
 %{_mandir}/man1/jose*.1*
+%license COPYING
 
 %files -n lib%{name}
 %license COPYING
@@ -81,8 +83,64 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/jose*.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 10-7
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon May 12 2025 Archana Shettigar <v-shettigara@microsoft.com> - 14-3
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 14-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu May 23 2024 Sergio Arroutbi <sarroutb@redhat.com> - 14-1
+- Update to release 14
+
+* Wed Apr 03 2024 Sergio Correia <scorreia@redhat.com> - 13-1
+- Update to release 13
+
+* Fri Feb 02 2024 Sergio Arroutbi <sarroutb@redhat.com> - 12-1
+- Update to release v12
+
+* Tue Jan 30 2024 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 11-11
+- Fix test when using zlib-ng
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 11-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 11-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 11-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 11-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 11-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 11-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 11-4
+- Rebuilt with OpenSSL 3.0.0
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 11-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 07 2021 Sergio Correia <scorreia@redhat.com> - 11-2
+- Update sources file to v11.
+
+* Fri May 07 2021 Sergio Correia <scorreia@redhat.com> - 11-1
+- Update to new jose upstream release, v11.
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 10-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Tom Stellard <tstellar@redhat.com> - 10-8
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 10-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 10-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

@@ -2,7 +2,7 @@
 Summary:        Python templating language
 Name:           python-mako
 Version:        1.2.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,8 @@ BuildArch:      noarch
 
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-markupsafe
 %endif
 
 %description
@@ -47,8 +49,7 @@ many others, including Django templates, Cheetah, Myghty, and Genshi.
 ln -s mako-render %{buildroot}/%{_bindir}/mako-render3
 
 %check
-pip3 install tox
-tox -e py%{python3_version_nodots}
+%pytest
 
 %files -n python3-mako
 %defattr(-,root,root,-)
@@ -58,6 +59,9 @@ tox -e py%{python3_version_nodots}
 %{_bindir}/mako-render3
 
 %changelog
+* Tue May 13 2025 Riken Maharjan <rmaharjan@microsoft.com> - 1.2.4-2
+- Fix Ptest by using pytest instead of tox.
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.4-1
 - Auto-upgrade to 1.2.4 - Azure Linux 3.0 - package upgrades
 

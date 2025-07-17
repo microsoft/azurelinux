@@ -18,7 +18,7 @@ encrypted JSON objects.}
 
 Name:           python-jwt
 Version:        2.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        JSON Web Token implementation in Python
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -59,7 +59,7 @@ rm -rf %{eggname}.egg-info
 %py3_install
 
 %check
-pip3 install tox
+pip3 install tox==4.25.0 --ignore-installed
 tox
 
 %if %{with python3}
@@ -71,6 +71,9 @@ tox
 %endif
 
 %changelog
+* Tue Apr 08 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.8.0-2
+- Fixed ptest
+
 * Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 2.8.0-1
 - Updating to 2.8.0-1 for 3.0
 - Using literal package name so auto-upgrader can do its thing

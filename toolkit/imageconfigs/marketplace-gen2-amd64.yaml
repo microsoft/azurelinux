@@ -1,0 +1,82 @@
+storage:
+  bootType: efi
+
+  disks:
+  - partitionTableType: gpt
+    maxSize: 5000M
+    partitions:
+    - id: esp
+      type: esp
+      size: 64M
+
+    - id: boot
+      type: xbootldr
+      size: 500M
+
+    - id: rootfs
+      type: root
+      size: grow
+
+  filesystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+
+  - deviceId: boot
+    type: ext4
+    mountPoint:
+      path: /boot
+
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
+
+os:
+  bootloader:
+    resetType: hard-reset
+
+  hostname: azurelinux
+
+  kernelCommandLine:
+    extraCommandLine:
+    - console=ttyS0
+
+  packages:
+    remove:
+    - dracut-hostonly
+
+    installLists:
+    - packagelists/azurevm-packages.yaml
+    - packagelists/core-packages-image.yaml
+    - packagelists/hyperv-packages.yaml
+    - packagelists/marketplace-tools-packages.yaml
+
+  additionalFiles:
+  - source: additionalconfigs/51-ptp-hyperv.rules
+    destination: /etc/udev/rules.d/51-ptp-hyperv.rules
+
+  - source: additionalconfigs/chrony.cfg
+    destination: /etc/chrony.conf
+
+  - source: additionalconfigs/cloud-init.cfg
+    destination: /etc/cloud/cloud.cfg
+
+  - source: additionalconfigs/wait-for-ptp-hyperv.conf
+    destination: /etc/systemd/system/chronyd.service.d/wait-for-ptp-hyperv.conf
+
+scripts:
+  finalizeCustomization:
+  - path: additionalconfigs/configure-systemd-networkd.sh
+  - path: scripts/set_os_release_variant_entries.sh
+    arguments:
+    - --variant-id
+    -  marketplace-gen2
+    - --variant
+    - Marketplace (Gen2) Image
+
+output:
+  image:
+    format: vhd

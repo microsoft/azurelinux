@@ -1,23 +1,13 @@
 [source.crates-io]
 replace-with = "vendored-sources"
 
-[source."git+https://github.com/cloud-hypervisor/kvm-bindings?branch=ch-v0.7.0"]
-git = "https://github.com/cloud-hypervisor/kvm-bindings"
-branch = "ch-v0.7.0"
-replace-with = "vendored-sources"
-
-[source."git+https://github.com/cloud-hypervisor/versionize_derive?branch=ch-0.1.6"]
-git = "https://github.com/cloud-hypervisor/versionize_derive"
-branch = "ch-0.1.6"
+[source."git+https://github.com/NunoDasNeves/vfio?branch=nudasnev/mshv-ioctls-v0.3.0"]
+git = "https://github.com/NunoDasNeves/vfio"
+branch = "nudasnev/mshv-ioctls-v0.3.0"
 replace-with = "vendored-sources"
 
 [source."git+https://github.com/firecracker-microvm/micro-http?branch=main"]
 git = "https://github.com/firecracker-microvm/micro-http"
-branch = "main"
-replace-with = "vendored-sources"
-
-[source."git+https://github.com/microsoft/igvm?branch=main"]
-git = "https://github.com/microsoft/igvm"
 branch = "main"
 replace-with = "vendored-sources"
 
@@ -26,18 +16,13 @@ git = "https://github.com/rust-vmm/acpi_tables"
 branch = "main"
 replace-with = "vendored-sources"
 
-[source."git+https://github.com/rust-vmm/mshv?branch=main"]
+[source."git+https://github.com/rust-vmm/mshv?tag=v0.3.0"]
 git = "https://github.com/rust-vmm/mshv"
-branch = "main"
+tag = "v0.3.0"
 replace-with = "vendored-sources"
 
 [source."git+https://github.com/rust-vmm/vfio-user?branch=main"]
 git = "https://github.com/rust-vmm/vfio-user"
-branch = "main"
-replace-with = "vendored-sources"
-
-[source."git+https://github.com/rust-vmm/vfio?branch=main"]
-git = "https://github.com/rust-vmm/vfio"
 branch = "main"
 replace-with = "vendored-sources"
 

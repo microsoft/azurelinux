@@ -38,12 +38,17 @@
 Summary:        Command-line package manager
 Name:           dnf5
 Version:        %{project_version_major}.%{project_version_minor}.%{project_version_patch}
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/rpm-software-management/dnf5
 Source0:        %{url}/archive/%{version}/dnf5-%{version}.tar.gz
+Patch0:         dnf5-repo-snapshot.patch
+Patch1:         CVE-2024-1929.patch
+Patch2:         CVE-2024-1930.patch
+Patch3:         CVE-2024-2746.patch
+
 # ========== build requires ==========
 BuildRequires:  bash-completion
 BuildRequires:  cmake
@@ -674,6 +679,13 @@ done
 
 
 %changelog
+* Tue May 06 2025 Sam Meluch <sammeluch@microsoft.com> - 5.1.11-3
+- Add repo snapshot to dnf5
+- fixup merge conflict
+
+* Wed Apr 30 2025 Kanishk Bansal <kanbansal@microsoft.com> - 5.1.11-2
+- Patch CVE-2024-1929, CVE-2024-1930, CVE-2024-2746
+
 * Wed Jan 31 2024 Sam Meluch <sammeluch@microsoft.com> - 5.1.11-1
 - Update to version 5.1.11
 - Merge spec from upstream dnf5 repo

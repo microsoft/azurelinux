@@ -1,0 +1,55 @@
+diff -ur cheetah3-3.2.6.post1.orig/Cheetah/Tests/Test.py cheetah3-3.2.6.post1/Cheetah/Tests/Test.py
+--- cheetah3-3.2.6.post1.orig/Cheetah/Tests/Test.py	2024-10-30 07:25:43.621206329 -0700
++++ cheetah3-3.2.6.post1/Cheetah/Tests/Test.py	2024-10-30 09:48:51.480330619 -0700
+@@ -31,23 +31,24 @@
+ SyntaxAndOutput.install_eols()
+ 
+ suites = [
+-    unittest.findTestCases(Analyzer),
+-    unittest.findTestCases(Filters),
+-    unittest.findTestCases(ImportHooks),
+-    unittest.findTestCases(LoadTemplate),
+-    unittest.findTestCases(Misc),
+-    unittest.findTestCases(NameMapper),
+-    unittest.findTestCases(Parser),
+-    unittest.findTestCases(Regressions),
+-    unittest.findTestCases(SyntaxAndOutput),
+-    unittest.findTestCases(Template),
+-    unittest.findTestCases(TemplateCmdLineIface),
+-    unittest.findTestCases(Unicode),
+-    unittest.findTestCases(NameMapper_pure),
++    unittest.defaultTestLoader.loadTestsFromModule(Analyzer),
++    unittest.defaultTestLoader.loadTestsFromModule(Filters),
++    unittest.defaultTestLoader.loadTestsFromModule(ImportHooks),
++    unittest.defaultTestLoader.loadTestsFromModule(LoadTemplate),
++    unittest.defaultTestLoader.loadTestsFromModule(Misc),
++    unittest.defaultTestLoader.loadTestsFromModule(NameMapper),
++    unittest.defaultTestLoader.loadTestsFromModule(Parser),
++    unittest.defaultTestLoader.loadTestsFromModule(Regressions),
++    unittest.defaultTestLoader.loadTestsFromModule(SyntaxAndOutput),
++    unittest.defaultTestLoader.loadTestsFromModule(Template),
++    unittest.defaultTestLoader.loadTestsFromModule(TemplateCmdLineIface),
++    unittest.defaultTestLoader.loadTestsFromModule(Unicode),
++    unittest.defaultTestLoader.loadTestsFromModule(NameMapper_pure),
+ ]
+ 
+ if not sys.platform.startswith('java'):
+-    suites.append(unittest.findTestCases(CheetahWrapper))
++    suites.append(
++        unittest.defaultTestLoader.loadTestsFromModule(CheetahWrapper))
+ 
+ if __name__ == '__main__':
+     if 'xml' in sys.argv:
+Only in cheetah3-3.2.6.post1/Cheetah/Tests: Test.py.orig
+diff -ur cheetah3-3.2.6.post1.orig/docs/news.rst cheetah3-3.2.6.post1/docs/news.rst
+--- cheetah3-3.2.6.post1.orig/docs/news.rst	2024-10-30 07:37:07.891109768 -0700
++++ cheetah3-3.2.6.post1/docs/news.rst	2024-10-30 09:50:52.787837501 -0700
+@@ -6,6 +6,8 @@
+ 2024-10-30:
+ 
+    - Protect ``import cgi`` in preparation to Python 3.13.
++   - Fix DeprecationWarning: ``unittest.findTestCases()`` is deprecated. Use
++     ``unittest.TestLoader.loadTestsFromModule()`` instead.
+ 
+ 3.2.6.post1 (2021-02-22)
+ ------------------------

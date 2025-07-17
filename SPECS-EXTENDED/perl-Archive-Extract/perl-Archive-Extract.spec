@@ -1,5 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 # Enable LZMA and XZ support via pure-Perl implementation
 %if 0%{?rhel}
 %bcond_with perl_Archive_Extract_enables_perl_xz
@@ -8,10 +6,13 @@ Distribution:   Azure Linux
 %endif
 
 Name:           perl-Archive-Extract
-Version:        0.86
-Release:        4%{?dist}
+# Epoch to compete with core module from perl.spec
+Version:        0.88
+Release:        13%{?dist}
 Summary:        Generic archive extracting mechanism
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Archive-Extract
 Source0:        https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Archive-Extract-%{version}.tar.gz#/perl-Archive-Extract-%{version}.tar.gz
 BuildArch:      noarch
@@ -43,6 +44,7 @@ BuildRequires:  perl(File::Spec::Unix)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::More)
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+
 Requires:       perl(deprecate)
 # Prefer Archive::Tar to suppress warnings, bug #1217352, CPAN RT#104121
 Requires:       perl(Archive::Tar)
@@ -133,8 +135,8 @@ Obsoletes:  perl-Archive-Extract-lzma-Compress-unLZMA < 1:0.80-8
 # Compress::unLZMA not yet packaged
 #%%package lzma-Compress-unLZMA
 #Summary:    Lzma decompressor for %%{name} via Compress::unLZMA
-#Provides:   %%{name}-lzma = %%%{version}-%%{release}
-#Requires:   %%{name} = %%%{version}-%%{release}
+#Provides:   %%{name}-lzma = %%{version}-%%{release}
+#Requires:   %%{name} = %%{version}-%%{release}
 #Requires:   perl(Compress::unLZMA)
 #%%description lzma-Compress-unLZMA
 #%%{summary}.
@@ -332,11 +334,54 @@ make test
 %endif
 
 %changelog
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.86-4
-- Remove epoch
+* Fri Dec 20 2024 Jyoti kanase <v-jykanase@microsoft.com> -  0.88 - 13
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:0.86-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.88-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.88-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.88-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.88-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.88-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Oct 25 2022 Michal Josef Špaček <mspacek@redhat.com> - 1:0.88-7
+- Update license to SPDX
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.88-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.88-5
+- Perl 5.36 rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.88-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.88-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.88-2
+- Perl 5.34 rebuild
+
+* Thu May 06 2021 Michal Josef Špaček <mspacek@redhat.com> - 1:0.88-1
+- 0.88 bump
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.86-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.86-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1:0.86-3
+- Perl 5.32 rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.86-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

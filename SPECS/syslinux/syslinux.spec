@@ -2,7 +2,7 @@
 Summary:        Simple kernel loader which boots from a FAT filesystem
 Name:           syslinux
 Version:        6.04
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv2+
 URL:            https://www.syslinux.org
 Group:          Applications/System
@@ -12,6 +12,11 @@ Source0:        https://www.kernel.org/pub/linux/utils/boot/%{name}/Testing/%{ve
 Patch0:         0001-Add-install-all-target-to-top-side-of-HAVE_FIRMWARE.patch
 Patch1:         0006-Replace-builtin-strlen-that-appears-to-get-optimized.patch
 Patch2:         syslinux-6.04_pre1-fcommon.patch
+Patch3:         CVE-2011-3045.patch
+Patch4:         CVE-2011-2501.patch
+Patch5:         CVE-2011-2691.patch
+Patch6:         CVE-2012-3425.patch
+Patch7:         CVE-2015-7981.patch
 ExclusiveArch:  x86_64
 BuildRequires:  gcc >= 11.2.0
 BuildRequires:  nasm
@@ -32,10 +37,7 @@ Provides: %{name}-static = %{version}-%{release}
 Headers and libraries for syslinux development.
 
 %prep
-%setup -q -n %{name}-%{version}-pre1
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
+%autosetup -n %{name}-%{version}-pre1 -p1
 
 %build
 # gcc 11.2.0 and above produce error: "cc1: error: '-fcf-protection' is not compatible with this target"
@@ -79,6 +81,9 @@ rm %{buildroot}/%{_bindir}/sha1pass
 %{_datadir}/syslinux/com32/*
 
 %changelog
+* Wed Mar 12 2025 Archana Shettigar <v-shettigara@microsoft.com> 6.04-11
+- Patch CVE-2011-3045, CVE-2011-2501, CVE-2011-2691, CVE-2012-3425 &  CVE-2015-7981.patch
+
 * Thu Nov 11 2021 Nicolas Guibourge <nicolasg@microsoft.com> 6.04-10
 - Fix build issue triggered by gcc 11.2.0 usage.
 * Thu Jun 11 2020 Henry Beberman <henry.beberman@microsoft.com> 6.04-9

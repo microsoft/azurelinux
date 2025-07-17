@@ -1,18 +1,19 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global xfceversion 4.14
+%global xfceversion 4.18
 %bcond_with perl
 
 Name:           xfconf
-Version:        4.14.4
+Version:        4.18.3
 Release:        4%{?dist}
 Summary:        Hierarchical configuration system for Xfce
 
 License:        GPLv2
-URL:            http://www.xfce.org/
+URL:            https://www.xfce.org/
 #VCS git:git://git.xfce.org/xfce/xfconf
-Source0:        http://archive.xfce.org/src/xfce/%{name}/%{xfceversion}/%{name}-%{version}.tar.bz2
+Source0:        https://archive.xfce.org/src/xfce/%{name}/%{xfceversion}/%{name}-%{version}.tar.bz2
 
+BuildRequires:  make
 BuildRequires:  glib2-devel
 BuildRequires:  perl(File::Find)
 BuildRequires:  pkgconfig(libxfce4util-1.0) >= %{xfceversion}
@@ -33,7 +34,7 @@ BuildRequires:  gcc-c++
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  vala
 
-Requires:       dbus-x11
+Requires:       dbus
 
 Obsoletes:      libxfce4mcs < 4.4.3-3
 Obsoletes:      xfconf-perl < 4.13.8
@@ -69,14 +70,9 @@ interact with xfconf using perl.
 %endif
 
 %prep
-%setup -q
+%autosetup
 
 %build
-# gobject introspection does not work with LTO.  There is an effort to fix this
-# in the appropriate project upstreams, so hopefully LTO can be enabled someday
-# Disable LTO.
-%define _lto_cflags %{nil}
-
 %configure --disable-static --with-perl-options=INSTALLDIRS="vendor"
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
@@ -111,7 +107,7 @@ find %{buildroot} -type f -name *.la -exec rm -f {} \;
 
 %files -f %{name}.lang
 %license COPYING
-%doc AUTHORS ChangeLog NEWS TODO
+%doc AUTHORS NEWS TODO
 %{_libdir}/lib*.so.*
 %{_bindir}/xfconf-query
 %{_libdir}/xfce4/xfconf/
@@ -120,12 +116,15 @@ find %{buildroot} -type f -name *.la -exec rm -f {} \;
 %{_datadir}/vala/vapi/libxfconf-0.vapi
 %{_datadir}/dbus-1/services/org.xfce.Xfconf.service
 %{_datadir}/gir-1.0/Xfconf-0.gir
+%{_datadir}/bash-completion/completions/xfconf-query
 
 %files devel
 %doc %{_datadir}/gtk-doc
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*.pc
 %{_includedir}/xfce4/xfconf-0
+%{_libdir}/gio/modules/libxfconfgsettingsbackend.so
+%{_datadir}/gtk-doc/html/%{name}/*
 
 %if %{with perl}
 %files perl
@@ -135,15 +134,56 @@ find %{buildroot} -type f -name *.la -exec rm -f {} \;
 %endif
 
 %changelog
-* Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.14.4-4
+* Mon Mar 17 2025 Archana Shettigar <v-shettigara@microsoft.com> - 4.18.3-4
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- Adding missing BRs on Perl modules.
+- Unconditionally use "%%bcond_with perl"
 - License verified.
 
-* Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.14.4-3
-- Adding missing BRs on Perl modules.
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.18.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Thu May 27 2021 Thomas Crain <thcrain@microsoft.com> - 4.14.4-2
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
-- Unconditionally use "%%bcond_with perl"
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.18.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Nov 16 2023 Mukundan Ragavan <nonamedotc@gmail.com> - 4.18.3-1
+- Update to v4.18.3
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.18.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Apr 21 2023 Mukundan Ragavan <nonamedotc@gmail.com> - 4.18.1-1
+- Update to v4.18.1
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.18.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Jan 16 2023 Mukundan Ragavan <nonamedotc@gmail.com> - 4.18.0-1
+- Update to v4.18.0 (Xfce 4.18)
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.16.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri May 13 2022 Mukundan Ragavan <nonamedotc@fedoraproject.org> - 4.16.0-7
+- Remove all perl conditionals
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.16.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sun Sep 19 2021 Mukundan Ragavan <nonamedotc@fedoraproject.org> - 4.16.0-5
+- Replace dbus-x11 with dbus in requires (fixes bz#1975572)
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.16.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sun May 09 2021 Jeff Law <jlaw@tachyum.com> - 4.16.0-3
+- Re-enable LTO now that gobject-introspection has been fixed.
+
+* Thu Jan 28 2021 Fedora Release Engineering <releng@fedoraproject.org> - 4.16.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Dec 23 2020 Mukundan Ragavan <nonamedotc@fedoraproject.org> - 4.16.0-1
+- Update to 4.16.0
 
 * Tue Nov 10 2020 Mukundan Ragavan <nonamedotc@fedoraproject.org> - 4.14.4-1
 - Update to 4.14.4
@@ -156,7 +196,7 @@ find %{buildroot} -type f -name *.la -exec rm -f {} \;
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Tue Jun 30 2020 Jeff Law <law@redhat.com> - 4.14.3-2
-Disable LTO
+- Disable LTO
 
 * Wed May 06 2020 Mukundan Ragavan <nonamedotc@fedoraproject.org> - 4.14.3-1
 - Update to 4.14.3

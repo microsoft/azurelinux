@@ -3,12 +3,13 @@ Distribution:   Azure Linux
 %define oname IPy
 Summary:        Python module for handling IPv4 and IPv6 Addresses and Networks
 Name:           python-%{oname}
-Version:        0.81
-Release:        30%{?dist}
+Version:        1.01
+Release:        13%{?dist}
 URL:            https://github.com/haypo/python-ipy
 Source0:        https://files.pythonhosted.org/packages/source/I/IPy/IPy-%{version}.tar.gz#/python-IPy-%{version}.tar.gz
 License:        BSD
 BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 BuildArch:      noarch
 
 %description
@@ -24,10 +25,6 @@ and IPv6 Addresses and Networks.
 Summary: Python 3 module for handling IPv4 and IPv6 Addresses and Networks
 %{?python_provide:%python_provide python3-%{oname}}
 
-# The following is juts for backwards compatibility (can be removed in F30):
-Provides: %{name}-python3 = %{version}-%{release}
-Obsoletes: %{name}-python3 < 0.81-19
-
 %description -n python3-%{oname}
 IPy is a Python 3 module for handling IPv4 and IPv6 Addresses and Networks 
 in a fashion similar to perl's Net::IP and friends. The IP class allows 
@@ -37,7 +34,7 @@ and IPv6 Addresses and Networks.
 
 
 %prep
-%setup -q -n %{oname}-%{version}
+%autosetup -n %{oname}-%{version} -p1
 
 
 %build
@@ -55,14 +52,67 @@ PYTHONPATH=$PWD %{__python3} test/test_IPy.py
 
 %files -n python3-%{oname}
 %license COPYING
-%doc AUTHORS ChangeLog README
+%doc AUTHORS ChangeLog README.rst
 %{python3_sitelib}/%{oname}*
 %{python3_sitelib}/__pycache__/%{oname}*
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.81-30
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.01-13
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.01-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.01-11
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.01-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.01-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.01-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 1.01-7
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.01-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.01-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1.01-4
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.01-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.01-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sat Jun 19 2021 Kevin Fenzi <kevin@scrye.com> - 1.01-1
+- Update to 1.0.1. Fixes rhbz#1926615
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.00-4
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.00-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.00-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 02 2020 Adam Williamson <awilliam@redhat.com> - 1.00-1
+- Update to 1.00
+- Backport PR #69 to fix for Python 3.9
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.81-30
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.81-29
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

@@ -10,7 +10,7 @@
 
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
-Version:        6.1.58.mshv4
+Version:        6.1.58.mshv8
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -154,6 +154,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.1.58.mshv8-1
+- Auto-upgrade to 6.1.58.mshv8
+
 * Tue May 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.1.58.mshv4-1
 - Auto-upgrade to 6.1.58.mshv4
 
@@ -176,7 +179,7 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 * Fri Oct 06 2023 Manuel Huber <mahuber@microsoft.com> - 6.1.0.mshv11-2
 - Enable dm-crypt and dm-integrity for encfs sidecar functionality
 
-* Thu Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv11-1
+* Fri Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv11-1
 - Update to v6.1.0.mshv11
 
 * Fri Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv10-1

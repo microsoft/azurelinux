@@ -1,7 +1,7 @@
 Summary:        Inspect container images and repositories on registries
 Name:           skopeo
 Version:        1.14.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,7 +33,6 @@ registries without the need to pull them.
 %autosetup -p1
 
 %build
-tar --no-same-owner -xf %{SOURCE0}
 export GOPATH=%{our_gopath}
 make
 
@@ -52,6 +51,9 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
+* Thu Apr 10 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.14.4-5
+- Remove extraction command from build
+
 * Sat Mar 01 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.14.4-4
 - Fix CVE-2025-27144 with an upstream patch
 

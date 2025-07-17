@@ -1,0 +1,52 @@
+diff -urN ocaml-ctypes-0.21.1/ctypes-foreign.opam ocaml-ctypes-0.21.1/ctypes-foreign.opam
+--- ocaml-ctypes-0.21.1/ctypes-foreign.opam	2023-07-20 20:00:22.000000000 +0000
++++ ocaml-ctypes-0.21.1/ctypes-foreign.opam	2025-04-14 22:58:02.803357501 +0000
+@@ -22,7 +22,6 @@
+   "lwt" {with-test & >= "2.4.7"}
+   "ounit2" {with-test}
+   "conf-ncurses" {with-test}
+-  "stdlib-shims" {with-test}
+   "conf-fts" {with-test & os != "win32"}
+   "conf-libffi" {>= "2.0.0"}
+   "odoc" {with-doc}
+diff -urN ocaml-ctypes-0.21.1/dune-project ocaml-ctypes-0.21.1/dune-project
+--- ocaml-ctypes-0.21.1/dune-project	2023-07-20 20:00:22.000000000 +0000
++++ ocaml-ctypes-0.21.1/dune-project	2025-04-14 22:58:31.004981718 +0000
+@@ -53,7 +53,6 @@
+   (lwt (and :with-test (>= 2.4.7)))
+   (ounit2 :with-test)
+   (conf-ncurses :with-test)
+-  (stdlib-shims :with-test)
+   (conf-fts (and :with-test (<> :os win32)))
+   (conf-libffi (>= 2.0.0)))
+  (synopsis "Dynamic access to foreign C libraries using Ctypes")
+diff -urN ocaml-ctypes-0.21.1/tests/test-arrays/dune ocaml-ctypes-0.21.1/tests/test-arrays/dune
+--- ocaml-ctypes-0.21.1/tests/test-arrays/dune	2023-07-20 20:00:22.000000000 +0000
++++ ocaml-ctypes-0.21.1/tests/test-arrays/dune	2025-04-14 22:59:31.577118597 +0000
+@@ -11,5 +11,4 @@
+   ctypes-foreign
+   test_arrays_stubs
+   test_arrays_bindings
+-  tests_common
+-  stdlib-shims))
++  tests_common))
+diff -urN ocaml-ctypes-0.21.1/tests/test-cstdlib/dune ocaml-ctypes-0.21.1/tests/test-cstdlib/dune
+--- ocaml-ctypes-0.21.1/tests/test-cstdlib/dune	2023-07-20 20:00:22.000000000 +0000
++++ ocaml-ctypes-0.21.1/tests/test-cstdlib/dune	2025-04-14 22:59:50.118295595 +0000
+@@ -8,5 +8,4 @@
+   ctypes-foreign
+   test_cstdlib_stubs
+   test_cstdlib_bindings
+-  tests_common
+-  stdlib-shims))
++  tests_common))
+diff -urN ocaml-ctypes-0.21.1/tests/test-pointers/dune ocaml-ctypes-0.21.1/tests/test-pointers/dune
+--- ocaml-ctypes-0.21.1/tests/test-pointers/dune	2023-07-20 20:00:22.000000000 +0000
++++ ocaml-ctypes-0.21.1/tests/test-pointers/dune	2025-04-14 23:01:15.531460339 +0000
+@@ -11,5 +11,4 @@
+   ctypes-foreign
+   test_pointers_stubs
+   test_pointers_bindings
+-  tests_common
+-  stdlib-shims))
++  tests_common))
