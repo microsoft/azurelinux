@@ -2,7 +2,7 @@
 Summary:        An image loading library
 Name:           gdk-pixbuf2
 Version:        2.42.10
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,7 @@ URL:            https://gitlab.gnome.org/GNOME/gdk-pixbuf
 Source0:        https://download.gnome.org/sources/gdk-pixbuf/2.42/gdk-pixbuf-%{version}.tar.xz
 Patch0:         CVE-2022-48622.patch
 Patch1:         CVE-2025-6199.patch
+Patch2:         CVE-2025-7345.patch
 BuildRequires:  %{_bindir}/rst2man
 BuildRequires:  gettext
 BuildRequires:  libjpeg-devel
@@ -116,6 +117,9 @@ gdk-pixbuf-query-loaders-%{__isa_bits} --update-cache
 %{_datadir}/installed-tests
 
 %changelog
+* Mon Jul 14 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.42.10-4
+- Patch for CVE-2025-7345
+
 * Tue Jul 01 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.42.10-3
 - Patch for CVE-2025-6199
 
