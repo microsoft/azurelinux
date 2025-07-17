@@ -34,14 +34,14 @@ cp %{SOURCE6} /tmp/boxednode/mongosh/SHASUMS256.txt
 
 %build
 # Run npm_lazy server in the background for npm requests proxying from local cache
-./node_modules/npm_lazy/bin/npm_lazy > ~/npm_lazy.log 2>&1 &
+#./node_modules/npm_lazy/bin/npm_lazy > ~/npm_lazy.log 2>&1 &
 
 # Route npm calls to npm_lazy
-npm config set registry http://localhost:8080/
+#npm config set registry http://localhost:8080/
 
 #npm run compile
 #Run with BOXEDNODE_MAKE_ARGS="-j2" if running in container
-SEGMENT_API_KEY="dummy" NODE_JS_VERSION=20.19.3 npm run compile-exec
+BOXEDNODE_MAKE_ARGS="-j2" SEGMENT_API_KEY="dummy" NODE_JS_VERSION=20.19.3 npm run compile-exec
 
 #stop the npm_lazy server
 kill %1
