@@ -1,0 +1,72 @@
+From 524db900a5b2d2b260ba83526b4f152653743d83 Mon Sep 17 00:00:00 2001
+From: Lincoln Stein <lincoln.stein@gmail.com>
+Date: Thu, 20 May 2021 12:02:24 -0400
+Subject: [PATCH] Fixed bug in which manually-specified key and -pkdf=>"none"
+ was not having effect
+
+---
+ Changes          |  3 +++
+ lib/Crypt/CBC.pm | 12 ++++++------
+ 2 files changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/Changes b/Changes
+index 524b74e..0919bb5 100644
+--- a/Changes
++++ b/Changes
+@@ -1,4 +1,7 @@
+ Revision history for Perl extension Crypt::CBC.
++3.05	 Thu 20 May 2021 12:00:18 PM EDT
++	 - Fixed bug involving manually-specified key not being used in some circumstances.
++	 
+ 3.04	 Mon 17 May 2021 10:58:37 AM EDT
+         - Fixed bug involving manually-specified IV not being used in some circumstances.
+ 	
+diff --git a/lib/Crypt/CBC.pm b/lib/Crypt/CBC.pm
+index f935bbc..327fc4c 100644
+--- a/lib/Crypt/CBC.pm
++++ b/lib/Crypt/CBC.pm
+@@ -72,11 +72,11 @@ sub new {
+ 
+     # HEADER consistency
+     if ($header_mode eq 'salt') {
+-	croak "Cannot use salt-based key generation if literal key is specified"
++	croak "Cannot use -header mode of 'salt' if a literal key is specified or key derivation function is none"
+ 	    if $literal_key;
+     }
+     elsif ($header_mode eq 'randomiv') {
+-	croak "Cannot encrypt using a non-8 byte blocksize cipher when using randomiv header mode"
++	croak "Cannot use -header mode of 'randomiv' in conjunction with a cipher whose blocksize greater than 8"
+ 	    unless $bs == 8
+     }
+ 
+@@ -618,16 +618,15 @@ sub pbkdf_obj {
+ }
+ 
+ ############################# generating key, iv and salt ########################
+-# hopefully a replacement for mess below
+ sub set_key_and_iv {
+     my $self = shift;
+ 
+-    if (!$self->{literal_key}) {
++    if ($self->pbkdf eq 'none' || $self->{literal_key}) {
++	$self->{iv} = $self->_get_random_bytes($self->blocksize) if $self->{make_random_iv};
++    } else {
+ 	my ($key,$iv) = $self->pbkdf_obj->key_and_iv($self->{salt},$self->{passphrase});
+ 	$self->{key} = $key;
+ 	$self->{iv}  = $iv if $self->{make_random_iv}; 
+-    } else {
+-	$self->{iv} = $self->_get_random_bytes($self->blocksize) if $self->{make_random_iv};
+     }
+ 
+     length $self->{salt} == 8                  or croak "Salt must be exactly 8 bytes long";
+@@ -929,6 +928,7 @@ Crypt::CBC - Encrypt Data with Cipher Block Chaining Mode
+   $key    = Crypt::CBC->random_bytes(8);  # assuming a 8-byte block cipher
+   $iv     = Crypt::CBC->random_bytes(8);
+   $cipher = Crypt::CBC->new(-pbkdf       => 'none',
++                            -header      => 'none',
+                             -key         => $key,
+                             -iv          => $iv);
+ 
+-- 
+2.35.1
+
