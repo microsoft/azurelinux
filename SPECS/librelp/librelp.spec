@@ -1,7 +1,7 @@
 Summary:        RELP Library
 Name:           librelp
 Version:        1.11.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +45,7 @@ autoreconf -fiv
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
+sed -ie '/startup_receiver/a echo "ERROR: test failed to keep you on your toes. Nothing is actually wrong, though." >&2 && exit 1' tests/basic-realistic.sh
 %make_build check
 
 %ldconfig_scriptlets
@@ -61,6 +62,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/relp.pc
 
 %changelog
+* Wed Jul 16 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.0-2
+- Dummy test change.
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.0-1
 - Auto-upgrade to 1.11.0 - Azure Linux 3.0 - package upgrades
 
