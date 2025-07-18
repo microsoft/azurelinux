@@ -44,7 +44,7 @@ npm config set registry http://localhost:8080/
 
 #npm run compile
 #Run with BOXEDNODE_MAKE_ARGS="-j2" if running in container
-BOXEDNODE_MAKE_ARGS="-j1" SEGMENT_API_KEY="dummy" NODE_JS_VERSION=20.19.3 npm run compile-exec
+BOXEDNODE_MAKE_ARGS="-j6" SEGMENT_API_KEY="dummy" NODE_JS_VERSION=20.19.3 npm run compile-exec
 
 #stop the npm_lazy server
 kill %1
