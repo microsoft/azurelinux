@@ -140,6 +140,7 @@ cp -r %{name}-tools/target/site/apidocs %{buildroot}%{_javadocdir}/%{name}/%{nam
 %changelog
 * Fri Jul 18 2025 Sumit Jena <v-sumitjena@microsoft.com> - 2.33.3
 - Patch to change source and target options as build fix
+- License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.33-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
