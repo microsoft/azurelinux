@@ -150,7 +150,6 @@ os:
       - tardev-snapshotter
       - erofs-utils
       - netplan
-      - notation
       # UKI
       - systemd-boot
       # hyperv
