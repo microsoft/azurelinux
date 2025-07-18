@@ -14,6 +14,7 @@ Distribution:   Azure Linux
 Group:          System Environment/Programming
 URL:            https://git-scm.com/
 Source0:        https://github.com/git/git/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Below patch not needed for Git 2.46.0, already includes this fix.
 Patch0:         Ptest-fix-git-config-syntax.patch
 BuildRequires:  curl-devel
 BuildRequires:  python3-devel
