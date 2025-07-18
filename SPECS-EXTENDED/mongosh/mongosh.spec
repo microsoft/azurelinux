@@ -56,8 +56,9 @@ install -m 755 dist/mongosh %{buildroot}/%{_bindir}/mongosh
 %files
 %{_bindir}/mongosh
 %license LICENSE
+%license THIRD_PARTY_NOTICES.md
 %doc README.md
-%doc THIRD_PARTY_NOTICES.md
+# doc THIRD_PARTY_NOTICES.md
 
 %changelog
 %changelog
