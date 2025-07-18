@@ -14,7 +14,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        LGPL-2.1-or-later AND MIT AND GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -93,6 +93,9 @@ popd
 /boot/efi/EFI/BOOT/grubx64.efi
 
 %changelog
+* Fri May 16 2025 Thien Trung Vuong <tvuong@microsoft.com> - 255-22
+- Bump release to match systemd spec
+
 * Mon Apr 14 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 255-21
 - Updating SRPM name to systemd-boot-signed-%%{buildarch}.
 
@@ -102,7 +105,7 @@ popd
 
 * Thu Dec 12 2024 Daniel McIlvaney <damcilva@microsoft.com> - 255-19
 - Version bump to force signing with new Azure Linux secure boot key
-- Add confilcts/recommends on shim to ensure the keys match
+- Add conflicts/recommends on shim to ensure the keys match
 
 * Fri Sep 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-18
 - Update sd-boot install location
