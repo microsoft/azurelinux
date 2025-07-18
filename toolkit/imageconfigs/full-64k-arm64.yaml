@@ -35,9 +35,6 @@ os:
     - console=tty0
     - console=ttyS0,115200n8
 
-  selinux:
-    mode: disabled
-
   packages:
     install:
     - kernel-64k
