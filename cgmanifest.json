@@ -21073,8 +21073,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.3.19",
-          "downloadUrl": "https://www.php.net/distributions/php-8.3.19.tar.xz"
+          "version": "8.3.23",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.23.tar.xz"
         }
       }
     },
