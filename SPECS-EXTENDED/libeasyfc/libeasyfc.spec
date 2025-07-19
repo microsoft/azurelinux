@@ -1,15 +1,14 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-Name:		libeasyfc
-Version:	0.14.0
-Release:	8%{?dist}
-Summary:	Easy configuration generator interface for fontconfig
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
+Name:	       libeasyfc
+Version:       0.14.1
+Release:       1%{?dist}
+Summary:       Easy configuration generator interface for fontconfig
 
-License:	LGPLv3+
-URL:		http://tagoh.bitbucket.org/libeasyfc/
-Source0:	https://bitbucket.org/tagoh/libeasyfc/downloads/%{name}-%{version}.tar.bz2
-Patch0:		%{name}-freetype.patch
-Patch1:		%{name}-fix-config.patch
+License:       LGPLv3+
+URL:	       https://bitbucket.org/tagoh/libeasyfc/
+Source0:       https://bitbucket.org/tagoh/libeasyfc/downloads/%{name}-%{version}.tar.bz2
+Patch0:	       %{name}-freetype.patch
 
 BuildRequires:	glib2-devel gobject-introspection-devel libxml2-devel fontconfig-devel >= 2.12.93 harfbuzz-devel
 BuildRequires:	gettext
@@ -59,7 +58,6 @@ applications with libeasyfc-gobject.
 %prep
 %autosetup -p1
 
-
 %build
 %configure --disable-static
 make %{?_smp_mflags} V=1
@@ -96,6 +94,10 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_datadir}/gir-*/Easyfc-*.gir
 
 %changelog
+* Tue Nov 19 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 0.14.1-1
+- Update to 0.14.1
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.0-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
