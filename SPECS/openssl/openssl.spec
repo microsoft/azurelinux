@@ -169,10 +169,10 @@ License: Apache-2.0
 URL: http://www.openssl.org/
 BuildRequires: gcc g++
 BuildRequires: coreutils, perl-interpreter, sed, zlib-devel, /usr/bin/cmp
-BuildRequires: lksctp-tools-devel
+# BuildRequires: lksctp-tools-devel
 BuildRequires: /usr/bin/rename
 BuildRequires: /usr/bin/pod2man
-BuildRequires: /usr/sbin/sysctl
+# BuildRequires: /usr/sbin/sysctl
 BuildRequires: perl(Test::Harness), perl(Test::More), perl(Math::BigInt)
 BuildRequires: perl(Module::Load::Conditional), perl(File::Temp)
 BuildRequires: perl(Time::HiRes), perl(IPC::Cmd), perl(Pod::Html), perl(Digest::SHA)
@@ -191,7 +191,7 @@ protocols.
 %package libs
 Summary: A general purpose cryptography library with TLS implementation
 Requires: ca-certificates >= 2008-5
-Requires: crypto-policies >= 20180730
+# Requires: crypto-policies >= 20180730
 %if 0%{?fedora} >= 40 || 0%{?rhel} >= 10
 Recommends: pkcs11-provider%{?_isa}
 %else
@@ -320,11 +320,9 @@ export HASHBANGPERL=/usr/bin/perl
 # RPM_OPT_FLAGS, so we can skip specifiying them here.
 ./Configure \
 	--prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls ${sslflags} \
-%ifarch riscv64
         --libdir=%{_lib} \
-%endif
 	--system-ciphers-file=%{_sysconfdir}/crypto-policies/back-ends/opensslcnf.config \
-	zlib enable-camellia enable-seed enable-rfc3779 enable-sctp \
+	zlib enable-camellia enable-seed enable-rfc3779 no-sctp \
 	enable-cms enable-md2 enable-rc5 ${ktlsopt} enable-fips -D_GNU_SOURCE\
 	no-mdc2 no-ec2m no-sm2 no-sm4 no-atexit enable-buildtest-c++\
 	shared  ${sslarch} $RPM_OPT_FLAGS '-DDEVRANDOM="\"/dev/urandom\"" -DREDHAT_FIPS_VERSION="\"%{fips}\""'\
