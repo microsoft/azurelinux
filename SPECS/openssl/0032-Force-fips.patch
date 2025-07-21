@@ -1,14 +1,18 @@
-From c70a57cd0da56957a958ed8d7eb939a9734982aa Mon Sep 17 00:00:00 2001
-From: Tobias Brick <tobiasb@microsoft.com>
-Date: Wed, 17 Apr 2024 21:47:50 +0000
-Subject: [PATCH] Force fips
+From 2c110cf5551a3869514e697d8dc06682b62ca57d Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <dbelyavs@redhat.com>
+Date: Mon, 21 Aug 2023 11:59:02 +0200
+Subject: [PATCH 16/48] 0032-Force-fips.patch
 
+Patch-name: 0032-Force-fips.patch
+Patch-id: 32
+Patch-status: |
+    # We load FIPS provider and set FIPS properties implicitly
 ---
- crypto/provider_conf.c | 40 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 39 insertions(+), 1 deletion(-)
+ crypto/provider_conf.c | 28 +++++++++++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
 
 diff --git a/crypto/provider_conf.c b/crypto/provider_conf.c
-index 6a8b88e..cb7a40a 100644
+index 058fb58837..5274265a70 100644
 --- a/crypto/provider_conf.c
 +++ b/crypto/provider_conf.c
 @@ -10,6 +10,8 @@
@@ -20,7 +24,7 @@ index 6a8b88e..cb7a40a 100644
  #include <openssl/conf.h>
  #include <openssl/safestack.h>
  #include <openssl/provider.h>
-@@ -237,7 +239,7 @@ static int provider_conf_activate(OSSL_LIB_CTX *libctx, const char *name,
+@@ -169,7 +171,7 @@ static int provider_conf_activate(OSSL_LIB_CTX *libctx, const char *name,
          if (path != NULL)
              ossl_provider_set_module_path(prov, path);
  
@@ -29,43 +33,43 @@ index 6a8b88e..cb7a40a 100644
  
          if (ok == 1) {
              if (!ossl_provider_activate(prov, 1, 0)) {
-@@ -420,6 +422,42 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
+@@ -268,6 +268,8 @@ static int provider_conf_activate(OSSL_L
+ 
+         if (ok <= 0)
+             ossl_provider_free(prov);
++    } else {
++        ok = 1;
+     }
+     CRYPTO_THREAD_unlock(pcgbl->lock);
+ 
+@@ -309,6 +311,33 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
              return 0;
      }
  
-+#  define SYMCRYPT_PROV_CONF           OPENSSLDIR "/symcrypt_prov.cnf"
-+    OSSL_LIB_CTX *libctx = NCONF_get0_libctx((CONF *)cnf);
-+    PROVIDER_CONF_GLOBAL *pcgbl
-+        = ossl_lib_ctx_get_data(libctx, OSSL_LIB_CTX_PROVIDER_CONF_INDEX);
-+    int symcrypt_prov_activated;
-+    int default_prov_activated;
++    if (ossl_get_kernel_fips_flag() != 0) { /* XXX from provider_conf_load */
++        OSSL_LIB_CTX *libctx = NCONF_get0_libctx((CONF *)cnf);
++#  define FIPS_LOCAL_CONF           OPENSSLDIR "/fips_local.cnf"
 +
-+    if (pcgbl == NULL || !CRYPTO_THREAD_write_lock(pcgbl->lock)) {
-+        ERR_raise(ERR_LIB_CRYPTO, ERR_R_INTERNAL_ERROR);
-+        return 0;
-+    }
-+
-+    // Trying to activate either provider again will fail.
-+    symcrypt_prov_activated = prov_already_activated("symcryptprovider", pcgbl->activated_providers);
-+    default_prov_activated = prov_already_activated("default", pcgbl->activated_providers);
-+
-+    CRYPTO_THREAD_unlock(pcgbl->lock);
-+
-+    if (!symcrypt_prov_activated)
-+    {
-+        if (access(SYMCRYPT_PROV_CONF, R_OK) == 0) {
-+            CONF *symcrypt_prov_conf = NCONF_new_ex(libctx, NCONF_default());
-+            if (NCONF_load(symcrypt_prov_conf, SYMCRYPT_PROV_CONF, NULL) <= 0)
++        if (access(FIPS_LOCAL_CONF, R_OK) == 0) {
++            CONF *fips_conf = NCONF_new_ex(libctx, NCONF_default());
++            if (NCONF_load(fips_conf, FIPS_LOCAL_CONF, NULL) <= 0)
 +                return 0;
 +
-+            if (provider_conf_load(libctx, "symcryptprovider", "symcrypt_prov_sect", symcrypt_prov_conf) != 1) {
-+                NCONF_free(symcrypt_prov_conf);
++            if (provider_conf_load(libctx, "fips", "fips_sect", fips_conf) != 1) {
++                NCONF_free(fips_conf);
 +                return 0;
 +            }
-+            NCONF_free(symcrypt_prov_conf);
-+        // Always load the symcrypt provider for fips mode
-+        } else if (ossl_get_kernel_fips_flag()
-+                   && provider_conf_activate(libctx, "symcryptprovider", NULL, NULL, 0, NULL) != 1)
++            NCONF_free(fips_conf);
++        } else {
++            if (provider_conf_activate(libctx, "fips", NULL, NULL, 0, NULL) != 1)
++                return 0;
++        }
++        /* provider_conf_load can return 1 even when the test is failed so check explicitly */
++        if (OSSL_PROVIDER_available(libctx, "fips") != 1)
++            return 0;
++        if (provider_conf_activate(libctx, "base", NULL, NULL, 0, NULL) != 1)
++            return 0;
++        if (EVP_default_properties_enable_fips(libctx, 1) != 1)
 +            return 0;
 +    }
 +
@@ -73,5 +77,5 @@ index 6a8b88e..cb7a40a 100644
  }
  
 -- 
-2.33.8
+2.41.0
 
