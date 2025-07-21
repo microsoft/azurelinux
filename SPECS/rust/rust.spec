@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.86.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -89,6 +89,7 @@ pushd $HOME
 tar -xf %{SOURCE1} --no-same-owner
 popd
 %autosetup -p1 -n rustc-%{version}-src
+rm -rf vendor/protobuf-3.7.1
 
 # Setup build/cache directory
 BUILD_CACHE_DIR="build/cache/%{release_date}"
