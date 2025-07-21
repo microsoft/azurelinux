@@ -3,6 +3,8 @@ From: dj_palli <v-dpalli@microsoft.com>
 Date: Mon, 21 Jul 2025 03:20:51 +0000
 Subject: [PATCH] Upgrade llhttp-v6 to llhtt-v9.1.2 w.r.t CVE-2025-23167
 
+Sub-package llhttp-v9.1.2 upstream reference: https://github.com/nodejs/llhttp/releases
+
 ---
  deps/llhttp/CMakeLists.txt   |    14 +-
  deps/llhttp/README.md        |   365 +-

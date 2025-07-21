@@ -129,8 +129,11 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
-* Mon Jul 14 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 18.20.3-8
+* Mon Jul 21 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 18.20.3-8
 - Upgrading llhttp6 to llhttp9 to address the Patch CVE-2025-23167
+
+* Mon Jul 14 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 18.20.3-7
+- Patch CVE-2025-23166
 
 * Wed May 21 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 18.20.3-6
 - Patch CVE-2025-47279
