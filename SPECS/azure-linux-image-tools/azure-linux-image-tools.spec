@@ -91,3 +91,4 @@ go test -C toolkit/tools ./...
 %changelog
 * Tue Jul 15 2025 Lanze Liu <lanzeliu@microsoft.com> 0.15.0-1
 - Original version for Azure Linux (license: MIT).
+- License verified.
