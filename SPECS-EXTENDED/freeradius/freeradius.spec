@@ -303,12 +303,13 @@ rm -f $RPM_BUILD_ROOT/%{_sysconfdir}/raddb/mods-config/sql/ippool/mongo/queries.
 rm -f $RPM_BUILD_ROOT/%{_sysconfdir}/raddb/mods-config/sql/main/mongo/queries.conf
 
 # install doc files omitted by standard install
-for f in COPYRIGHT CREDITS INSTALL.rst README.rst VERSION; do
+for f in CREDITS INSTALL.rst README.rst VERSION; do
     cp $f $RPM_BUILD_ROOT/%{docdir}
 done
-cp LICENSE $RPM_BUILD_ROOT/%{docdir}/LICENSE.gpl
-cp src/lib/LICENSE $RPM_BUILD_ROOT/%{docdir}/LICENSE.lgpl
-cp src/LICENSE.openssl $RPM_BUILD_ROOT/%{docdir}/LICENSE.openssl
+# license files
+cp LICENSE LICENSE.gpl
+cp src/lib/LICENSE LICENSE.lgpl
+cp src/LICENSE.openssl LICENSE.openssl
 
 # add Red Hat specific documentation
 cat >> $RPM_BUILD_ROOT/%{docdir}/REDHAT << EOF
@@ -339,7 +340,11 @@ EOF
 
 
 %files
-
+# license
+%license COPYRIGHT
+%license LICENSE.gpl
+%license LICENSE.lgpl
+%license LICENSE.openssl
 # doc
 %license %{docdir}/LICENSE.gpl
 %license %{docdir}/LICENSE.lgpl
@@ -681,6 +686,10 @@ EOF
 
 %files utils
 /usr/bin/*
+# These files require additional dependencies, two perl modules, Base32 and Net module
+# which are currently unavailable. Skip them for now.
+%exclude /usr/bin/radsecret
+%exclude /usr/bin/rlm_sqlippool_tool
 
 # utils man pages
 %doc %{_mandir}/man1/radclient.1.gz
