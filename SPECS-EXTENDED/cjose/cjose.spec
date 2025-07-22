@@ -15,7 +15,7 @@ BuildRequires:  doxygen
 BuildRequires:  openssl-devel
 BuildRequires:  jansson-devel
 BuildRequires:  check-devel
-BuildRequires: make
+BuildRequires:  make
 
 %description
 Implementation of JOSE for C/C++
