@@ -3,7 +3,7 @@
 
 Name:           python-%{srcname}
 Version:        1.10.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        %{sum}
 
 License:        BSD-2-Clause
@@ -39,18 +39,21 @@ A fast and thorough lazy object proxy.
 
 
 %prep
-%autosetup -n python-%{srcname}-%{version} -p0
+%autosetup -p1 -n python-%{srcname}-%{version}
 
 #%%generate_buildrequires
 #%%pyproject_buildrequires -t
 
 %build
+export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 %pyproject_wheel
 
 %install
+export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 %pyproject_install
 
 %check
+export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 %tox
 
 # Note that there is no %%files section for the unversioned python module if we are building for several python runtimes
@@ -62,8 +65,11 @@ A fast and thorough lazy object proxy.
 %exclude %{python3_sitearch}/lazy_object_proxy/cext.c
 
 %changelog
+* Thu Jul 03 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.10.0-7
+- Fix setuptools-scm lookup error
+
 * Fri Mar 14 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.10.0-6
--  Initial Azure Linux import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.0-5
