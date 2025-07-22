@@ -25,7 +25,6 @@ a
 lib
 obj
 o
-rpm
 
 # Image files
 jpg
@@ -39,6 +38,8 @@ svg
 ico
 webp
 raw
+heif
+
 
 # Audio/Video files
 mp3
@@ -52,15 +53,6 @@ flv
 ogg
 m4a
 aac
-
-# Document formats (binary)
-pdf
-doc
-docx
-xls
-xlsx
-ppt
-pptx
 
 # Package files
 rpm

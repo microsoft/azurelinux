@@ -60,7 +60,11 @@ jobs:
 
         # Create array of disallowed extensions
         mapfile -t disallowed_extensions < .github/workflows/blob-store-extensions.txt
-
+        if [[ $? -ne 0 ]]; then
+          echo "Error occurred while reading disallowed extensions. Exiting."
+          exit 1
+        fi
+        
         # Check each changed file
         while IFS= read -r file; do
           if [[ -z "$file" ]]; then
@@ -107,7 +111,7 @@ jobs:
           if [[ "$should_be_in_blob_store" == "true" ]]; then
             1>&2 echo "**** ERROR ****"
             1>&2 echo "File '$file' should be stored in blob store, not in git repository."
-            1>&2 echo "Reason: Large files, binaries, tarballs, and non-text files slow down git operations"
+            1>&2 echo "Reason: Images, Large files, binaries, tarballs, and non-text files slow down git operations"
             1>&2 echo "and cannot be efficiently diffed. Please upload to blob store instead."
             1>&2 echo "**** ERROR ****"
             error_found=1
