@@ -25,7 +25,7 @@ BuildRequires:  python3-pip
 %endif
 Requires:       python3
 
-Patch1: CVE-2025-50181.patch
+Patch0: CVE-2025-50181.patch
 
 %description -n python3-urllib3
 urllib3 is a powerful, sanity-friendly HTTP client for Python. Much of the Python ecosystem already uses urllib3 and you should too.
