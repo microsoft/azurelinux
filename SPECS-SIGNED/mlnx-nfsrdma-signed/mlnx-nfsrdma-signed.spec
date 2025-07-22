@@ -37,7 +37,7 @@
 
 %global KVERSION %{target_kernel_version_full}
 
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-20%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-21%{release_suffix}%{?dist}}
 
 %{!?_name: %define _name mlnx-nfsrdma}
 
