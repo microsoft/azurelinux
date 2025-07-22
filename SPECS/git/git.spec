@@ -1,4 +1,3 @@
-
 %bcond daemon 1
 %bcond subtree 1
 %bcond svn 0
@@ -7,7 +6,7 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.45.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -168,7 +167,7 @@ fi
 
 %if %{with subtree}
 %files subtree
-%{_libexecdir}/git-core/git-merge-subtree
+%{_libexecdir}/git-core/git-subtree
 %endif
 
 %if %{with svn}
@@ -177,6 +176,9 @@ fi
 %endif
 
 %changelog
+* Tue Jun 03 2025 Muhammad Falak <mwani@microsoft.com> - 2.45.4-3
+- Fix subtree subpackage
+
 * Fri Jul 18 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.45.4-2
 - Fix ptest with new git config syntax in CVE-2025-48384
 
