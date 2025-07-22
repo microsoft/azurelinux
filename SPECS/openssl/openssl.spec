@@ -28,8 +28,8 @@ print(string.sub(hash, 0, 16))
 
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
-Version: 3.2.4
-Release: 4%{?dist}
+Version: 3.3.3
+Release: 4000%{?dist}
 Epoch: 1
 Source: openssl-%{version}.tar.gz
 Source2: Makefile.certificate
@@ -87,18 +87,28 @@ Patch34:  0034.fipsinstall_disable.patch
 Patch35:  0035-speed-skip-unavailable-dgst.patch
 # Extra public/private key checks required by FIPS-140-3
 Patch44:  0044-FIPS-140-3-keychecks.patch
+# # Minimize fips services
+# Patch45:  0045-FIPS-services-minimize.patch
 # Minimize fips services
-Patch45:  0045-FIPS-services-minimize.patch
+Patch45:  0045-FIPS-services-minimize-AZL3.patch
 # Execute KATS before HMAC verification
 Patch47:  0047-FIPS-early-KATS.patch
+# # Selectively disallow SHA1 signatures rhbz#2070977
+# Patch49:  0049-Allow-disabling-of-SHA1-signatures.patch
 # Selectively disallow SHA1 signatures rhbz#2070977
-Patch49:  0049-Allow-disabling-of-SHA1-signatures.patch
+Patch49:  0049-Allow-disabling-of-SHA1-signatures-AZL3.patch
+# # Originally from https://github.com/openssl/openssl/pull/18103
+# # As we rebased to 3.0.7 and used the version of the function
+# # not matching the upstream one, we have to use aliasing.
+# # When we eliminate this patch, the `-Wl,--allow-multiple-definition`
+# # should also be removed
+# Patch56:  0056-strcasecmp.patch
 # Originally from https://github.com/openssl/openssl/pull/18103
 # As we rebased to 3.0.7 and used the version of the function
 # not matching the upstream one, we have to use aliasing.
 # When we eliminate this patch, the `-Wl,--allow-multiple-definition`
 # should also be removed
-Patch56:  0056-strcasecmp.patch
+Patch56:  0056-strcasecmp-AZL3.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=2053289
 Patch58:  0058-FIPS-limit-rsa-encrypt.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=2087147
@@ -116,8 +126,10 @@ Patch75:  0075-FIPS-Use-FFDHE2048-in-self-test.patch
 Patch76:  0076-FIPS-140-3-DRBG.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=2102542
 Patch77:  0077-FIPS-140-3-zeroization.patch
+# # https://bugzilla.redhat.com/show_bug.cgi?id=2114772
+# Patch78:  0078-KDF-Add-FIPS-indicators.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=2114772
-Patch78:  0078-KDF-Add-FIPS-indicators.patch
+Patch78:  0078-KDF-Add-FIPS-indicators-AZL3.patch
 # We believe that some changes present in CentOS are not necessary
 # because ustream has a check for FIPS version
 Patch80:  0080-rand-Forbid-truncated-hashes-SHA-3-in-FIPS-prov.patch
@@ -141,25 +153,35 @@ Patch110: 0110-GCM-Implement-explicit-FIPS-indicator-for-IV-gen.patch
 Patch112: 0112-pbdkf2-Set-indicator-if-pkcs5-param-disabled-checks.patch
 # 0113-asymciphers-kem-Add-explicit-FIPS-indicator.patch
 Patch113: 0113-asymciphers-kem-Add-explicit-FIPS-indicator.patch
+# # We believe that some changes present in CentOS are not necessary
+# # because ustream has a check for FIPS version
+# Patch114: 0114-FIPS-enforce-EMS-support.patch
 # We believe that some changes present in CentOS are not necessary
 # because ustream has a check for FIPS version
-Patch114: 0114-FIPS-enforce-EMS-support.patch
+Patch114: 0114-FIPS-enforce-EMS-support-AZL3.patch
 # Amend tests according to Fedora/RHEL code
 Patch115: 0115-skip-quic-pairwise.patch
+# # Add version aliasing due to
+# # https://github.com/openssl/openssl/issues/23534
+# Patch116: 0116-version-aliasing.patch
 # Add version aliasing due to
 # https://github.com/openssl/openssl/issues/23534
-Patch116: 0116-version-aliasing.patch
-# https://github.com/openssl/openssl/issues/23050
-Patch117: 0117-ignore-unknown-sigalgorithms-groups.patch
+Patch116: 0116-version-aliasing-AZL3.patch
+# AZL3 -- NOT NEEDED -- already in 3.3.3
+# # https://github.com/openssl/openssl/issues/23050
+# Patch117: 0117-ignore-unknown-sigalgorithms-groups.patch
 # https://fedoraproject.org/wiki/Changes/OpenSSLDistrustSHA1SigVer
 Patch120: 0120-Allow-disabling-of-SHA1-signatures.patch
 # From CentOS 9
 Patch121: 0121-FIPS-cms-defaults.patch
-# [PATCH 50/50] Assign IANA numbers for hybrid PQ KEX Porting the fix
-#  in https://github.com/openssl/openssl/pull/22803
-Patch122: 0122-Assign-IANA-numbers-for-hybrid-PQ-KEX.patch
+# # AZL3 -- NOT NEEDED -- already in 3.3.3
+# # [PATCH 50/50] Assign IANA numbers for hybrid PQ KEX Porting the fix
+# #  in https://github.com/openssl/openssl/pull/22803
+# Patch122: 0122-Assign-IANA-numbers-for-hybrid-PQ-KEX.patch
+# # https://github.com/openssl/openssl/issues/24577
+# Patch124: 0124-PBMAC1-PKCS12-FIPS-support.patch
 # https://github.com/openssl/openssl/issues/24577
-Patch124: 0124-PBMAC1-PKCS12-FIPS-support.patch
+Patch124: 0124-PBMAC1-PKCS12-FIPS-support-AZL3.patch
 # Downstream patch: enforce PBMAC1 in FIPS mode
 Patch125: 0125-PBMAC1-PKCS12-FIPS-default.patch
 # https://github.com/openssl/openssl/issues/25127
@@ -168,6 +190,10 @@ Patch126: 0126-pkeyutl-encap.patch
 Patch127: 0127-speedup-SSL_add_cert_subjects_to_stack.patch
 Patch128: 0128-SAST-findings.patch
 Patch140: 0140-PQ-groups.patch 
+# TODO: document and rename
+Patch141: 0001-AZL3-remove-kbkdf-kmac-self-tests-kbkdf-kmac-is-unsu.patch
+# TODO: document, rename -- maybe fold into the other speed one.
+Patch142: 0050-Make-openssl-speed-run-in-FIPS-mode.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -313,7 +339,7 @@ ktlsopt=disable-ktls
 # marked as not requiring an executable stack.
 # Also add -DPURIFY to make using valgrind with openssl easier as we do not
 # want to depend on the uninitialized memory as a source of entropy anyway.
-RPM_OPT_FLAGS="$RPM_OPT_FLAGS -Wa,--noexecstack -Wa,--generate-missing-build-notes=yes -DPURIFY $RPM_LD_FLAGS"
+RPM_OPT_FLAGS="$RPM_OPT_FLAGS -Wa,--noexecstack -Wa,--generate-missing-build-notes=yes -DPURIFY $RPM_LD_FLAGS -O0"
 
 export HASHBANGPERL=/usr/bin/perl
 
@@ -487,6 +513,9 @@ cat > $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fips_local.cnf <<EOF
 tls1-prf-ems-check = 1
 activate = 1
 EOF
+
+# AZL3: Remove cmake files that are install for some reason.
+rm -rf $RPM_BUILD_ROOT%{_libdir}/cmake
 
 %files
 %{!?_licensedir:%global license %%doc}
