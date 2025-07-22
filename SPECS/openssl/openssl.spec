@@ -47,8 +47,10 @@ Patch1:   0001-Aarch64-and-ppc64le-use-lib64.patch
 Patch2:   0002-Use-more-general-default-values-in-openssl.cnf.patch
 # Do not install html docs
 Patch3:   0003-Do-not-install-html-docs.patch
+# # Override default paths for the CA directory tree
+# Patch4:   0004-Override-default-paths-for-the-CA-directory-tree.patch
 # Override default paths for the CA directory tree
-Patch4:   0004-Override-default-paths-for-the-CA-directory-tree.patch
+Patch4:   0004-Override-default-paths-for-the-CA-directory-tree-AZL.patch
 # apps/ca: fix md option help text
 Patch5:   0005-apps-ca-fix-md-option-help-text.patch
 # Disable signature verification with totally unsafe hash algorithms
@@ -69,8 +71,10 @@ Patch11:  0011-Remove-EC-curves.patch
 Patch12:  0012-Disable-explicit-ec.patch
 # Skipped tests from former 0011-Remove-EC-curves.patch
 Patch13:  0013-skipped-tests-EC-curves.patch
+# # Instructions to load legacy provider in openssl.cnf
+# Patch24:  0024-load-legacy-prov.patch
 # Instructions to load legacy provider in openssl.cnf
-Patch24:  0024-load-legacy-prov.patch
+Patch24:  0024-load-legacy-prov-AZL3.patch
 # We load FIPS provider and set FIPS properties implicitly
 Patch32:  0032-Force-fips.patch
 # Embed HMAC into the fips.so
@@ -321,7 +325,6 @@ export HASHBANGPERL=/usr/bin/perl
 ./Configure \
 	--prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls ${sslflags} \
         --libdir=%{_lib} \
-	--system-ciphers-file=%{_sysconfdir}/crypto-policies/back-ends/opensslcnf.config \
 	zlib enable-camellia enable-seed enable-rfc3779 no-sctp \
 	enable-cms enable-md2 enable-rc5 ${ktlsopt} enable-fips -D_GNU_SOURCE\
 	no-mdc2 no-ec2m no-sm2 no-sm4 no-atexit enable-buildtest-c++\
@@ -477,7 +480,13 @@ cat $RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h >> \
 install -m644 %{SOURCE9} \
 	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h
 %endif
-ln -s /etc/crypto-policies/back-ends/openssl_fips.config $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fips_local.cnf
+# ln -s /etc/crypto-policies/back-ends/openssl_fips.config $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fips_local.cnf
+cat > $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fips_local.cnf <<EOF
+
+[fips_sect]
+tls1-prf-ems-check = 1
+activate = 1
+EOF
 
 %files
 %{!?_licensedir:%global license %%doc}
