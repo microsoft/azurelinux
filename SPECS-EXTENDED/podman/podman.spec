@@ -8,36 +8,21 @@
 %endif
 
 %global gomodulesmode GO111MODULE=on
- 
-%if %{defined copr_username}
-%define copr_build 1
-%if "%{copr_username}" == "rhcontainerbot" && "%{copr_projectname}" == "podman-next"
-%define next_build 1
-%endif
-%endif
- 
+
 %global container_base_path github.com/containers
 %global container_base_url https://%{container_base_path}
- 
+
 # For LDFLAGS
 %global ld_project %{container_base_path}/%{name}/v5
 %global ld_libpod %{ld_project}/libpod
- 
+
 # %%{name}
 %global git0 %{container_base_url}/%{name}
- 
-%if %{defined copr_build}
-%define build_origin Copr: %{?copr_username}/%{?copr_projectname}
-%else
+
 %define build_origin %{?packager}
-%endif
 
 Name: podman
-%if %{defined next_build}
-Epoch: 102
-%else
 Epoch: 5
-%endif
 # DO NOT TOUCH the Version string!
 # The TRUE source of this specfile is:
 # https://github.com/containers/podman/blob/main/rpm/podman.spec
@@ -45,7 +30,6 @@ Epoch: 5
 # copr and koji builds.
 # If you're reading this on dist-git, the version is automatically filled in by Packit.
 Version: 5.5.2
-# The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 Release: 1%{?dist}
 ExclusiveArch: aarch64 ppc64le s390x x86_64 riscv64
@@ -87,7 +71,7 @@ Requires: conmon >= 2:2.1.7-2
 Requires: libcontainers-common
 Obsoletes: %{name}-quadlet <= 5:4.4.0-1
 Provides: %{name}-quadlet = %{epoch}:%{version}-%{release}
- 
+
 %description
 %{name} (Pod Manager) is a fully featured container engine that is a simple
 daemonless tool.  %{name} provides a Docker-CLI comparable command line that
@@ -95,7 +79,7 @@ eases the transition from other container engines and allows the management of
 pods, containers and images.  Simply put: alias docker=%{name}.
 Most %{name} commands can be run as a regular user, without requiring
 additional privileges.
- 
+
 %{name} uses Buildah(1) internally to create container images.
 Both tools share image (not container) storage, hence each can use or
 manipulate images (but not containers) created by the other.
@@ -109,15 +93,15 @@ Conflicts: docker-latest
 Conflicts: docker-ce
 Conflicts: docker-ee
 Conflicts: moby-engine
- 
+
 %description docker
 This package installs a script named docker that emulates the Docker CLI by
 executes %{name} commands, it also creates links between all Docker CLI man
 pages and %{name}.
- 
+
 %package tests
 Summary: Tests for %{name}
- 
+
 Requires: %{name} = %{epoch}:%{version}-%{release}
 Requires: attr
 Requires: jq
@@ -130,21 +114,21 @@ Requires: slirp4netns
 Requires: buildah
 Requires: gnupg
 Requires: xfsprogs
- 
+
 %description tests
 %{summary}
- 
+
 This package contains system tests for %{name}
- 
+
 %package remote
 Summary: (Experimental) Remote client for managing %{name} containers
- 
+
 %description remote
 Remote client for managing %{name} containers.
- 
+
 This experimental remote client is under heavy development. Please do not
 run %{name}-remote in production.
- 
+
 %{name}-remote uses the version 2 API to connect to a %{name} client to
 manage pods, containers and container images. %{name}-remote supports ssh
 connections as well.
@@ -154,19 +138,19 @@ Summary: Confined login and user shell using %{name}
 Requires: %{name} = %{epoch}:%{version}-%{release}
 Provides: %{name}-shell = %{epoch}:%{version}-%{release}
 Provides: %{name}-%{name}sh = %{epoch}:%{version}-%{release}
- 
+
 %description -n %{name}sh
 %{name}sh provides a confined login and user shell with access to volumes and
 capabilities specified in user quadlets.
- 
+
 It is a symlink to %{_bindir}/%{name} and execs into the `%{name}sh` container
 when `%{_bindir}/%{name}sh` is set as a login shell or set as os.Args[0].
 
- 
+
 %prep
 %autosetup -Sgit -n %{name}-%{version_no_tilde}
 sed -i 's;@@PODMAN@@\;$(BINDIR);@@PODMAN@@\;%{_bindir};' Makefile
- 
+
 %build
 %set_build_flags
 export CGO_CFLAGS=$CFLAGS
@@ -174,29 +158,29 @@ export CGO_CFLAGS=$CFLAGS
 CGO_CFLAGS=$(echo $CGO_CFLAGS | sed 's/-flto=auto//g')
 CGO_CFLAGS=$(echo $CGO_CFLAGS | sed 's/-Wp,D_GLIBCXX_ASSERTIONS//g')
 CGO_CFLAGS=$(echo $CGO_CFLAGS | sed 's/-specs=\/usr\/lib\/rpm\/redhat\/redhat-annobin-cc1//g')
- 
+
 %ifarch x86_64
 export CGO_CFLAGS+=" -m64 -mtune=generic -fcf-protection=full"
 %endif
- 
+
 export GOPROXY=direct
- 
+
 LDFLAGS="-X %{ld_libpod}/define.buildInfo=${SOURCE_DATE_EPOCH:-$(date +%s)} \
          -X \"%{ld_libpod}/define.buildOrigin=%{build_origin}\" \
          -X %{ld_libpod}/config._installPrefix=%{_prefix} \
          -X %{ld_libpod}/config._etcDir=%{_sysconfdir} \
          -X %{ld_project}/pkg/systemd/quadlet._binDir=%{_bindir}"
- 
+
 # This variable will be set by Packit actions. See .packit.yaml in the root dir
 # of the repo (upstream as well as Fedora dist-git).
 GIT_COMMIT="e7d8226745ba07a64b7176a7f128e4ef53225a0e"
 LDFLAGS="$LDFLAGS -X %{ld_libpod}/define.gitCommit=$GIT_COMMIT"
- 
+
 # build rootlessport first
 %gobuild -o bin/rootlessport ./cmd/rootlessport
- 
+
 export BASEBUILDTAGS="seccomp $(hack/systemd_tag.sh) $(hack/libsubid_tag.sh)"
- 
+
 # libtrust_openssl buildtag switches to using the FIPS-compatible func
 # `ecdsa.HashSign`.
 # Ref 1: https://github.com/golang-fips/go/blob/main/patches/015-add-hash-sign-verify.patch#L22
@@ -204,28 +188,28 @@ export BASEBUILDTAGS="seccomp $(hack/systemd_tag.sh) $(hack/libsubid_tag.sh)"
 %if %{defined fips_enabled}
 export BASEBUILDTAGS="$BASEBUILDTAGS libtrust_openssl"
 %endif
- 
+
 # build %%{name}
 export BUILDTAGS="$BASEBUILDTAGS $(hack/btrfs_installed_tag.sh) $(hack/btrfs_tag.sh) $(hack/libdm_tag.sh)"
 %gobuild -o bin/%{name} ./cmd/%{name}
- 
+
 # build %%{name}-remote
 export BUILDTAGS="$BASEBUILDTAGS exclude_graphdriver_btrfs btrfs_noversion remote"
 %gobuild -o bin/%{name}-remote ./cmd/%{name}
- 
+
 # build quadlet
 export BUILDTAGS="$BASEBUILDTAGS $(hack/btrfs_installed_tag.sh) $(hack/btrfs_tag.sh)"
 %gobuild -o bin/quadlet ./cmd/quadlet
- 
+
 # build %%{name}-testing
 export BUILDTAGS="$BASEBUILDTAGS $(hack/btrfs_installed_tag.sh) $(hack/btrfs_tag.sh)"
 %gobuild -o bin/podman-testing ./cmd/podman-testing
- 
+
 # reset LDFLAGS for plugins binaries
 LDFLAGS=''
 
 %{__make} docs docker-docs
- 
+
 %install
 install -dp %{buildroot}%{_unitdir}
 PODMAN_VERSION=%{version} %{__make} DESTDIR=%{buildroot} PREFIX=%{_prefix} ETCDIR=%{_sysconfdir} \
@@ -239,23 +223,23 @@ PODMAN_VERSION=%{version} %{__make} DESTDIR=%{buildroot} PREFIX=%{_prefix} ETCDI
        install.testing
 
 sed -i 's;%{buildroot};;g' %{buildroot}%{_bindir}/docker
- 
+
 # do not include docker and podman-remote man pages in main package
 for file in `find %{buildroot}%{_mandir}/man[157] -type f | sed "s,%{buildroot},," | grep -v -e %{name}sh.1 -e remote -e docker`; do
     echo "$file*" >> %{name}.file-list
 done
- 
+
 rm -f %{buildroot}%{_mandir}/man5/docker*.5
- 
+
 install -d -p %{buildroot}%{_datadir}/%{name}/test/system
 cp -pav test/system %{buildroot}%{_datadir}/%{name}/test/
- 
+
 #define license tag if not already defined
 %{!?_licensedir:%global license %doc}
 
 # Include empty check to silence rpmlint warning
 %check
- 
+
 %files -f %{name}.file-list
 %license LICENSE vendor/modules.txt
 %doc README.md CONTRIBUTING.md install.md transfer.md
@@ -280,14 +264,14 @@ cp -pav test/system %{buildroot}%{_datadir}/%{name}/test/
 %if %{defined fedora} && 0%{?fedora} < 41
 %{_modulesloaddir}/%{name}-iptables.conf
 %endif
- 
+
 %files docker
 %{_bindir}/docker
 %{_mandir}/man1/docker*.1*
 %{_sysconfdir}/profile.d/%{name}-docker.*
 %{_tmpfilesdir}/%{name}-docker.conf
 %{_user_tmpfilesdir}/%{name}-docker.conf
- 
+
 %files remote
 %license LICENSE
 %{_bindir}/%{name}-remote
@@ -297,7 +281,7 @@ cp -pav test/system %{buildroot}%{_datadir}/%{name}/test/
 %{_datadir}/fish/vendor_completions.d/%{name}-remote.fish
 %dir %{_datadir}/zsh/site-functions
 %{_datadir}/zsh/site-functions/_%{name}-remote
- 
+
 %files tests
 %license LICENSE
 %{_bindir}/%{name}-testing
