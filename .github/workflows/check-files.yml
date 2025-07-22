@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-name: Check Blob Store Files
+name: Check Disallowed Files
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
 jobs:
 
   build:
-    name: Check Blob Store Files
+    name: Check Disallowed Files
     runs-on: ubuntu-latest
     steps:
 
@@ -53,13 +53,13 @@ jobs:
         error_found=0
 
         # Read disallowed extensions from the configuration file
-        if [[ ! -f ".github/workflows/blob-store-extensions.txt" ]]; then
-          echo "Configuration file '.github/workflows/blob-store-extensions.txt' not found. Skipping check."
+        if [[ ! -f ".github/workflows/disallowed-extensions.txt" ]]; then
+          echo "Configuration file '.github/workflows/disallowed-extensions.txt' not found. Skipping check."
           exit 0
         fi
 
         # Create array of disallowed extensions
-        mapfile -t disallowed_extensions < .github/workflows/blob-store-extensions.txt
+        mapfile -t disallowed_extensions < .github/workflows/disallowed-extensions.txt
         if [[ $? -ne 0 ]]; then
           echo "Error occurred while reading disallowed extensions. Exiting."
           exit 1
