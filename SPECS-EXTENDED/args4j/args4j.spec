@@ -66,8 +66,7 @@ Group:          Documentation/HTML
 This package contains the API documentation for %{name}.
 
 %prep
-%setup -q -n %{name}-%{name}-site-%{version} -a 1
-%patch 0 -p1
+%autosetup -a1 -p1 -n %{name}-%{name}-site-%{version}
 
 # removing classpath addition
 sed -i 's/<addClasspath>true/<addClasspath>false/g' %{name}-tools/pom.xml
