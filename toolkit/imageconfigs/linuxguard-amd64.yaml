@@ -162,21 +162,6 @@ os:
       destination: /etc/selinux/targeted/selinux-ci.semanage
     - source: files/linuxguard/99-dhcp-eth0.network
       destination: /etc/systemd/network/99-dhcp-eth0.network
-    # Verity signature verification support
-    - source: files/linuxguard/verity-signature/90mountbootpartition/module-setup.sh
-      destination: /usr/lib/dracut/modules.d/90mountbootpartition/module-setup.sh
-      permissions: "755"
-    - source: files/linuxguard/verity-signature/90mountbootpartition/mountbootpartition-generator.sh
-      destination: /usr/lib/dracut/modules.d/90mountbootpartition/mountbootpartition-generator.sh
-      permissions: "755"
-    - source: files/linuxguard/verity-signature/90mountbootpartition/mountbootpartition-genrules.sh
-      destination: /usr/lib/dracut/modules.d/90mountbootpartition/mountbootpartition-genrules.sh
-      permissions: "755"
-    - source: files/linuxguard/verity-signature/90mountbootpartition/mountbootpartition.sh
-      destination: /usr/lib/dracut/modules.d/90mountbootpartition/mountbootpartition.sh
-      permissions: "755"
-    - source: files/linuxguard/verity-signature/10-mountbootpartition.conf
-      destination: /etc/dracut.conf.d/10-mountbootpartition.conf
     # Cloud-init configuration
     - source: files/linuxguard/cloud.cfg
       destination: /etc/cloud/cloud.cfg
