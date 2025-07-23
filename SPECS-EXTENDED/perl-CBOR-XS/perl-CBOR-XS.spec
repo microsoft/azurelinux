@@ -1,11 +1,11 @@
 Summary:        Concise Binary Object Representation (CBOR)
 Name:           perl-CBOR-XS
-Version:        1.86
-Release:        2%{?dist}
-# COPYING:      GPLv3+
+Version:        1.87
+Release:        1%{?dist}
+# COPYING:      GPL-3.0 text
 ## Replaced by system header-only package
-# ecb.h:        BSD or GPLv2+
-License:        GPLv3+ AND (BSD OR GPLv2+)
+# ecb.h:        BSD-2-Clause OR GPL-2.0-or-later
+License:        GPL-1.0-or-later AND (BSD-2-Clause OR GPL-2.0-or-later)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/CBOR-XS
@@ -14,10 +14,8 @@ Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/CBOR-XS-%{ver
 Patch0:         CBOR-XS-1.6-Include-ecb.h-from-system.patch
 # Silent compiler warnings
 Patch1:         CBOR-XS-1.84-Cast-char-and-U8-where-needed.patch
-
 BuildRequires:  coreutils
 BuildRequires:  findutils
-# gcc for standard header files
 BuildRequires:  gcc
 BuildRequires:  libecb-static
 BuildRequires:  make
@@ -25,8 +23,10 @@ BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(Canary::Stability)
-BuildRequires:  perl(Exporter)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+# Run-time:
+BuildRequires:  perl(common::sense)
+BuildRequires:  perl(Exporter)
 BuildRequires:  perl(Math::BigFloat)
 BuildRequires:  perl(Math::BigInt)
 BuildRequires:  perl(Math::BigRat)
@@ -34,15 +34,10 @@ BuildRequires:  perl(Time::Piece)
 BuildRequires:  perl(Types::Serialiser)
 BuildRequires:  perl(URI)
 BuildRequires:  perl(XSLoader)
-BuildRequires:  perl(common::sense)
-
-%if 0%{?with_check}
+# Tests:
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Math::BigInt::FastCalc)
-%endif
-
-# Run-time:
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+BuildRequires:  perl(Scalar::Util)
 Requires:       perl(Math::BigFloat)
 Requires:       perl(Math::BigInt)
 Requires:       perl(Math::BigRat)
@@ -58,10 +53,11 @@ represent it in CBOR.
 
 %package tests
 Summary:        Tests for %{name}
+License:        GPL-1.0-or-later
+BuildArch:      noarch
 Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:       perl-Test-Harness
 Requires:       perl(Math::BigInt::FastCalc)
-BuildArch:      noarch
 
 %description tests
 Tests from %{name}. Execute them
@@ -72,13 +68,15 @@ with "%{_libexecdir}/%{name}/test".
 # Remove bundled libecb
 rm ecb.h
 perl -i -ne 'print $_ unless m{^ecb\.h}' MANIFEST
+# Copy libecb license because the license requires it.
+install -m 0644 %{_datadir}/licenses/libecb-devel/LICENSE libecb.LICENSE
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1 OPTIMIZE="%{optflags}" </dev/null
-%make_build
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1 OPTIMIZE="$RPM_OPT_FLAGS" </dev/null
+%{make_build}
 
 %install
-%make_install
+%{make_install}
 find %{buildroot} -type f -name '*.bs' -size 0 -delete
 %{_fixperms} %{buildroot}/*
 # Install tests
@@ -95,16 +93,22 @@ export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print
 make test
 
 %files
-%license COPYING
+%license COPYING libecb.LICENSE
 %doc Changes README
-%{perl_vendorarch}/auto/*
-%{perl_vendorarch}/CBOR*
-%{_mandir}/man3/*
+%dir %{perl_vendorarch}/auto/CBOR
+%{perl_vendorarch}/auto/CBOR/XS
+%dir %{perl_vendorarch}/CBOR
+%{perl_vendorarch}/CBOR/XS.pm
+%{_mandir}/man3/CBOR::XS.*
 
 %files tests
 %{_libexecdir}/%{name}
 
 %changelog
+* Thu Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.87-1
+- Update to version 1.87
+- License verified
+
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.86-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
