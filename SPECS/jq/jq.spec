@@ -54,6 +54,7 @@ make check
 %license COPYING
 %{_bindir}/*
 %{_datadir}/*
+%exclude %{_datadir}/doc/jq/COPYING
 %{_libdir}/libjq.so.*
 %{_libdir}/pkgconfig/libjq.pc
 
@@ -64,6 +65,7 @@ make check
 %changelog
 * Wed Jul 23 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-4
 - Patch for CVE-2025-48060
+- Updated files section to fix duplicated license files
 
 * Mon May 26 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.7.1-3
 - Patch CVE-2024-23337
