@@ -104,7 +104,7 @@ storage:
 os:
   bootloader:
     resetType: hard-reset
-  hostname: linuxguard-base
+  hostname:  azure-linux-guard
 
   selinux:
     mode: enforcing
@@ -143,8 +143,6 @@ os:
       - containerd2
       - ca-certificates
       - syslog
-      - jq
-      - keyutils
       - cri-tools
       - cni
       - tardev-snapshotter
@@ -159,29 +157,14 @@ os:
       - cloud-init
 
   additionalFiles:
-    - source: files/linuxguard/no-password-prompt-on-sudo
-      destination: /etc/sudoers.d/no-password-prompt-on-sudo
-      permissions: "440"
     # SELinux customizations
     - source: files/linuxguard/selinux-ci-uki.semanage
       destination: /etc/selinux/targeted/selinux-ci.semanage
     - source: files/linuxguard/99-dhcp-eth0.network
       destination: /etc/systemd/network/99-dhcp-eth0.network
-    # Verity signature verification support
-    - source: files/linuxguard/verity-signature/90mountbootpartition/module-setup.sh
-      destination: /usr/lib/dracut/modules.d/90mountbootpartition/module-setup.sh
-      permissions: "755"
-    - source: files/linuxguard/verity-signature/90mountbootpartition/mountbootpartition-generator.sh
-      destination: /usr/lib/dracut/modules.d/90mountbootpartition/mountbootpartition-generator.sh
-      permissions: "755"
-    - source: files/linuxguard/verity-signature/90mountbootpartition/mountbootpartition-genrules.sh
-      destination: /usr/lib/dracut/modules.d/90mountbootpartition/mountbootpartition-genrules.sh
-      permissions: "755"
-    - source: files/linuxguard/verity-signature/90mountbootpartition/mountbootpartition.sh
-      destination: /usr/lib/dracut/modules.d/90mountbootpartition/mountbootpartition.sh
-      permissions: "755"
-    - source: files/linuxguard/verity-signature/10-mountbootpartition.conf
-      destination: /etc/dracut.conf.d/10-mountbootpartition.conf
+    # Cloud-init configuration
+    - source: files/linuxguard/cloud.cfg
+      destination: /etc/cloud/cloud.cfg
       permissions: "644"
 
   services:
@@ -198,8 +181,10 @@ scripts:
     - path: scripts/linuxguard/duid-type-to-link-layer.sh
     # Disable unused SELinux policy modules and configure SELinux policy for CI
     - path: scripts/linuxguard/selinux-ci-config.sh
+    # Setup notation cli for OCI signature verification
     - path: scripts/linuxguard/cleanup-machineid.sh
     - path: scripts/linuxguard/prepare_trusted_cni_plugins.sh
+    - path: scripts/linuxguard/tmp-no-exec.sh
 
     - path: scripts/set_os_release_variant_entries.sh
       arguments:
@@ -207,11 +192,6 @@ scripts:
       - linuxguard
       - --variant
       - Linux Guard Image
-
-previewFeatures:
-  - uki
-  - output-artifacts
-
 output:
   artifacts:
     items:
@@ -220,3 +200,7 @@ output:
     path: ./output
   image:
     format: vhd
+
+previewFeatures:
+  - output-artifacts
+  - uki
