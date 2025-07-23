@@ -176,7 +176,7 @@ fi
 %endif
 
 %changelog
-* Tue Jun 03 2025 Muhammad Falak <mwani@microsoft.com> - 2.45.4-3
+* Wed Jul 23 2025 Muhammad Falak <mwani@microsoft.com> - 2.45.4-3
 - Fix subtree subpackage
 
 * Fri Jul 18 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.45.4-2
