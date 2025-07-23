@@ -26655,7 +26655,7 @@
         "other": {
           "name": "rubygem-hocon",
           "version": "1.4.0",
-          "downloadUrl": "https://github.com/puppetlabs/ruby-hocon/archive/1.4.0/ruby-hocon-1.4.0.tar.gz"
+          "downloadUrl": "https://rubygems.org/gems/hocon-1.4.0.gem"
         }
       }
     },
