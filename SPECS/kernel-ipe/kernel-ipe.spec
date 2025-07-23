@@ -33,7 +33,7 @@
 Summary:        Linux Kernel
 Name:           kernel-ipe
 Version:        6.6.96.1
-Release:        12%{?dist}
+Release:        17%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -276,6 +276,8 @@ install -vd -m 755 %{buildroot}/lib/modules/%{uname_r}/extra/tarfs
 install -vc -m 644 tarfs/tarfs.ko %{buildroot}/lib/modules/%{uname_r}/extra/tarfs/tarfs.ko
 
 make INSTALL_MOD_PATH=%{buildroot} modules_install
+# Decompress all the kernel modules
+find %{buildroot}/lib/modules/%{uname_r} -name '*.ko.xz' -execdir unxz {} \;
 
 %ifarch x86_64
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
