@@ -1,0 +1,38 @@
+From 8a691351d32d3da7d225a2386f35e751ab1ff659 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 23 Jul 2025 22:37:04 +0000
+Subject: [PATCH] AZL3 -- disable kems for unsupported rsa sizes in speed in
+ fips mode
+
+---
+ apps/speed.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/apps/speed.c b/apps/speed.c
+index d535d20..49c173d 100644
+--- a/apps/speed.c
++++ b/apps/speed.c
+@@ -2557,12 +2557,20 @@ int speed_main(int argc, char **argv)
+     // TOBIASB: Disable brainpool for FIPS provider because it isn't supported. See curve_list in ec_curve.c.
+     // TOBIASB: Disable X25519 and NID_X448 for FIPS provider because it isn't supported.
+     // TOBIASB: Disable EdDSA for FIPS provider because it isn't supported. See fipsprov.c.
++    // TOBIASB: Disable KEMS for unsupported RSA sizes for FIPS provider because they supported.
+     if (FIPS_mode()) {
+         for (i = 0; i < RSA_NUM; i++) {
+             if (rsa_keys[i].bits < 2048)
+                 rsa_doit[i] = 0;
+         }
+ 
++        for (i = 0; i < kems_algs_len; i++) {
++            if (kems_doit[i] && strcmp(kems_algname[i], "rsa512") == 0
++                || strcmp(kems_algname[i], "rsa1024") == 0) {
++                kems_doit[i] = 0;
++            }
++        }
++
+         memset(dsa_doit, 0, sizeof(dsa_doit));
+         memset(eddsa_doit, 0, sizeof(eddsa_doit));
+ 
+-- 
+2.45.4
+
