@@ -27,15 +27,10 @@ obj
 o
 
 # Image files
-jpg
-jpeg
-png
 gif
 bmp
 tiff
 tif
-svg
-ico
 webp
 raw
 heif
