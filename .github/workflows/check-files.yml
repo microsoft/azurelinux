@@ -126,7 +126,7 @@ jobs:
           echo "The following file types should be stored in blob store:"
           echo "- Source tarballs (.tar.gz, .tar.xz, .zip, etc.)"
           echo "- Binary files (.bin, .exe, .so, .dll, etc.)"
-          echo "- Images (.jpg, .png, .gif, .bmp, etc.)"
+          echo "- Images (.gif, .bmp, etc.)"
           echo "- Archives (.rar, .7z, .tar, etc.)"
           echo "- Large files (> 1MB)"
           echo "- Any non-text files that cannot be efficiently diffed"
