@@ -104,7 +104,7 @@ storage:
 os:
   bootloader:
     resetType: hard-reset
-  hostname: linuxguard-base
+  hostname:  azure-linux-guard
 
   selinux:
     mode: enforcing
@@ -122,7 +122,7 @@ os:
 
   packages:
     remove:
-      - dracut-hostonly
+      # - dracut-hostonly
       - kernel
       - grub2-efi-binary
     install:
