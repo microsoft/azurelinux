@@ -33,7 +33,7 @@
 Summary:        Linux Kernel
 Name:           kernel-ipe
 Version:        6.6.96.1
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -246,6 +246,7 @@ for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
     echo "SIGNING $MODULE" \
     ./scripts/sign-file sha512 certs/signing_key.pem certs/signing_key.x509 $MODULE \
     rm -f $MODULE.{sig,dig} \
+    xz --check=crc32 --lzma2=dict=1MiB $MODULE \
     done \
 %{nil}
 
