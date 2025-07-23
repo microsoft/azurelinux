@@ -56,8 +56,6 @@ Requires: jq
 Requires: grub2-pc
 Requires: systemd-ukify
 %endif
-# Requires: oras
-# Requires: azurelinux-repos-cloud-native
 
 %description
 The Azure Linux Image Customizer is a tool that can take an
