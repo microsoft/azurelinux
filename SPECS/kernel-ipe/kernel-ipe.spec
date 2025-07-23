@@ -33,7 +33,7 @@
 Summary:        Linux Kernel
 Name:           kernel-ipe
 Version:        6.6.96.1
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -242,12 +242,11 @@ make -C tools turbostat cpupower
 make -C tools/bpf/bpftool
 
 %define __modules_install_post \
-# for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
-#     echo "SIGNING $MODULE" \
-#     ./scripts/sign-file sha512 certs/signing_key.pem certs/signing_key.x509 $MODULE \
-#     rm -f $MODULE.{sig,dig} \
-#     xz $MODULE \
-#     done \
+for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
+    echo "SIGNING $MODULE" \
+    ./scripts/sign-file sha512 certs/signing_key.pem certs/signing_key.x509 $MODULE \
+    rm -f $MODULE.{sig,dig} \
+    done \
 %{nil}
 
 # We want to compress modules after stripping. Extra step is added to
