@@ -26,7 +26,7 @@ Patch6:         CVE-2024-34064.patch
 Patch7:         CVE-2025-27516.patch
 Patch8:         CVE-2025-47279.patch
 Patch9:         CVE-2025-23166.patch
-
+Patch10:        CVE-2025-5889.patch
 BuildRequires:  brotli-devel
 BuildRequires:  coreutils >= 8.22
 BuildRequires:  gcc
@@ -127,6 +127,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Fri Jun 20 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 18.20.3-8
+- Patch CVE-2025-5889
+
 * Mon Jul 14 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 18.20.3-7
 - Patch CVE-2025-23166
 
