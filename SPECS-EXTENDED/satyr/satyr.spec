@@ -4,9 +4,9 @@ Distribution:   Azure Linux
 
 %define libdw_devel elfutils-devel
 %define libelf_devel elfutils-libelf-devel
- 
+
 %define glib_ver 2.43.4
- 
+
 Name: satyr
 Version: 0.43
 Release: 1%{?dist}
@@ -36,7 +36,7 @@ BuildRequires: python3-sphinx
 %endif
 Requires: json-c%{?_isa}
 Requires: glib2%{?_isa} >= %{glib_ver}
- 
+
 %description
 Satyr is a library that can be used to create and process microreports.
 Microreports consist of structured data suitable to be analyzed in a fully
@@ -45,43 +45,43 @@ to fix the underlying problem. The reports are designed not to contain any
 potentially sensitive data to eliminate the need for review before submission.
 Included is a tool that can create microreports and perform some basic
 operations on them.
- 
+
 %package devel
 Summary: Development libraries for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
- 
+
 %description devel
 Development libraries and headers for %{name}.
- 
+
 %if %{with python3}
 %package -n python3-satyr
 %{?python_provide:%python_provide python3-satyr}
 Summary: Python 3 bindings for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
- 
+
 %description -n python3-satyr
 Python 3 bindings for %{name}.
 %endif
- 
+
 %prep
 %setup -q
- 
+
 %build
 autoreconf
- 
+
 %configure \
 %if %{without python3}
         --without-python3 \
 %endif
         --disable-static \
         --enable-doxygen-docs
- 
+
 %make_build
 %install
 %make_install
 # Remove all libtool archives (*.la) from modules directory.
 find %{buildroot} -name "*.la" -delete
- 
+
 %check
 make check|| {
     # find and print the logs of failed test
@@ -93,21 +93,21 @@ make check|| {
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
- 
+
 %files
 %doc README.md NEWS
 %license COPYING
 %{_bindir}/satyr
 %{_mandir}/man1/%{name}.1*
 %{_libdir}/lib*.so.*
- 
+
 %files devel
 # The complex pattern below (instead of simlpy *) excludes Makefile{.am,.in}:
 %doc apidoc/html/*.{html,png,css,js}
 %{_includedir}/*
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*
- 
+
 %if 0%{?with_python3}
 %files -n python3-satyr
 %dir %{python3_sitearch}/%{name}
