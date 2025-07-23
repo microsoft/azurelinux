@@ -1,60 +1,95 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Summary:            XML-Generator Perl module
+Summary:            Perl extension for generating XML
 Name:               perl-XML-Generator
-Version:            1.04
-Release:            25%{?dist}
-License:            GPL+ or Artistic
+Version:            1.13
+Release:            1%{?dist}
+License:            GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:                https://metacpan.org/release/XML-Generator
+Source0:            https://cpan.metacpan.org/authors/id/T/TI/TIMLEGGE/XML-Generator-%{version}.tar.gz
 BuildArch:          noarch
-Source0:            https://cpan.metacpan.org/authors/id/B/BH/BHOLZMAN/XML-Generator-%{version}.tar.gz#/perl-XML-Generator-%{version}.tar.gz
 BuildRequires:      coreutils
-BuildRequires:      findutils
 BuildRequires:      make
-BuildRequires:      perl-interpreter
 BuildRequires:      perl-generators
-BuildRequires:      perl(ExtUtils::MakeMaker)
+BuildRequires:      perl-interpreter
+BuildRequires:      perl(Config)
+BuildRequires:      perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:      perl(strict)
+BuildRequires:      perl(warnings)
 # Run-time:
 BuildRequires:      perl(base)
 BuildRequires:      perl(Carp)
 BuildRequires:      perl(constant)
 BuildRequires:      perl(overload)
-BuildRequires:      perl(strict)
 BuildRequires:      perl(vars)
-BuildRequires:      perl(warnings)
 BuildRequires:      perl(XML::DOM)
 # Tests:
 BuildRequires:      perl(Test)
+BuildRequires:      perl(Test::More)
+BuildRequires:      perl(utf8)
 # Optional tests:
 BuildRequires:      perl(Tie::IxHash)
-Requires:           perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Requires:           perl(warnings)
 
 %description
-perl module for generating XML documents
+Perl module for generating XML documents
+
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+Requires:       perl(Tie::IxHash)
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
 
 %prep
 %setup -q -n XML-Generator-%{version}
 
+# Help generators to recognize Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
+
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install PERL_INSTALL_ROOT=%{buildroot}
-find %{buildroot} -type f -name .packlist -exec rm -f {} ';'
-find %{buildroot} -depth -type d -exec rmdir {} 2>/dev/null ';'
-chmod -R u+w %{buildroot}/*
+%{make_install}
+%{_fixperms} %{buildroot}/*
+
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+rm %{buildroot}%{_libexecdir}/%{name}/t/author-pod-*
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+cd %{_libexecdir}/%{name} && exec prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 
 %check
+unset AUTHOR_TESTING
+export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 make test
 
 %files
+%license LICENSE
 %doc Changes README
 %{perl_vendorlib}/*
 %{_mandir}/man3/*.3*
 
+%files tests
+%{_libexecdir}/%{name}
+
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.13-1
+- Update to version 1.13
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.04-25
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
