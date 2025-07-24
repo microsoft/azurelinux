@@ -29,6 +29,14 @@ Source0:        https://github.com/microsoft/azure-linux-image-tools/archive/ref
 Source1:        %{name}-%{version}-vendor-test.tar.gz
 BuildRequires: golang >= 1.24.1
 BuildRequires: systemd-udev
+Requires: imagecustomizer = %{version}-%{release}
+
+%description
+Azure Linux Image Tools. This package provides the Azure Linux Image Customizer tool
+and its dependencies for customizing Azure Linux images.
+
+%package -n imagecustomizer
+Summary: Image Customizer
 Requires: qemu-img
 Requires: rpm
 Requires: coreutils
@@ -56,9 +64,6 @@ Requires: grub2-pc
 Requires: systemd-ukify
 %endif
 
-%package -n imagecustomizer
-Summary: Image Customizer
-
 %description -n imagecustomizer
 The Azure Linux Image Customizer is a tool that can take an
 existing generic Azure Linux image and modify it to be suited for a particular
@@ -83,6 +88,9 @@ install -p -m 0755 toolkit/out/tools/imagecustomizer %{buildroot}%{_bindir}/imag
 
 %check
 go test -C toolkit/tools ./...
+
+%files
+%license LICENSE
 
 %files -n imagecustomizer
 %license LICENSE
