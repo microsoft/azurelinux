@@ -97,13 +97,13 @@ sudo -u test make test || { cat Testing/Temporary/LastTest.log; false; }
 %files devel
 %{_libdir}/*.so
 %{_libdir}/*.a
-%{_libdir}/private/icudt73l/brkitr/*.res
-%{_libdir}/private/icudt73l/brkitr/*.brk
-%{_libdir}/private/icudt73l/brkitr/*.dict
-%{_libdir}/private/icudt73l/unames.icu
-%{_libdir}/private/icudt73l/ulayout.icu
-%{_libdir}/private/icudt73l/uemoji.icu
-%{_libdir}/private/icudt73l/cnvalias.icu
+%{_libdir}/private/icudt77l/brkitr/*.res
+%{_libdir}/private/icudt77l/brkitr/*.brk
+%{_libdir}/private/icudt77l/brkitr/*.dict
+%{_libdir}/private/icudt77l/unames.icu
+%{_libdir}/private/icudt77l/ulayout.icu
+%{_libdir}/private/icudt77l/uemoji.icu
+%{_libdir}/private/icudt77l/cnvalias.icu
 %{_includedir}/*
 %{_libdir}/pkgconfig/mysqlclient.pc
 
@@ -117,7 +117,7 @@ sudo -u test make test || { cat Testing/Temporary/LastTest.log; false; }
   CVE-2025-21574, CVE-2025-30682, CVE-2025-21580, CVE-2025-21575, CVE-2025-21577, CVE-2025-30693, CVE-2025-30696, CVE-2025-30688,
   CVE-2025-21584, CVE-2025-30684
 
-* Tue Mar 26 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.41-1
+* Wed Mar 26 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.41-1
 - Upgrade to 8.0.41 to fix CVE-2025-21490 & CVE-2024-11053
 - Remove patch for CVE-2024-9681
 - Remove patch for CVE-2025-0725 as we are building without curl
