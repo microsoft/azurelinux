@@ -29,7 +29,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.3
-Release: 130000%{?dist}
+Release: 140000%{?dist}
 # Epoch: 1
 Source: openssl-%{version}.tar.gz
 Source2: Makefile.certificate
@@ -250,6 +250,8 @@ Recommends: openssl-pkcs11%{?_isa}
 %if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) )
 Requires: openssl-fips-provider
 %endif
+Obsoletes: SymCrypt >= 0.0.0
+Obsoletes: SymCrypt-OpenSSL >= 0.0.0
 
 %description libs
 OpenSSL is a toolkit for supporting cryptography. The openssl-libs
