@@ -29,7 +29,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.3
-Release: 110000%{?dist}
+Release: 120000%{?dist}
 # Epoch: 1
 Source: openssl-%{version}.tar.gz
 Source2: Makefile.certificate
@@ -265,18 +265,6 @@ Requires: pkgconfig
 OpenSSL is a toolkit for supporting cryptography. The openssl-devel
 package contains include files needed to develop applications which
 support various cryptographic algorithms and protocols.
-
-%package devel-engine
-Summary: Files for development of applications which will use OpenSSL and use deprecated ENGINE API.
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-Requires: %{name}-devel%{?_isa} = %{version}-%{release}
-Requires: pkgconfig
-Provides: deprecated()
-
-%description devel-engine
-OpenSSL is a toolkit for supporting cryptography. The openssl-devel-engine
-package contains include files needed to develop applications which
-use deprecated OpenSSL ENGINE functionality.
 
 %package static
 Summary:        Libraries for static linking of applications which will use OpenSSL
@@ -583,15 +571,9 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/cmake
 %files devel
 %doc CHANGES.md doc/dir-locals.example.el doc/openssl-c-indent.el
 %{_prefix}/include/openssl
-%exclude %{_prefix}/include/openssl/engine*.h
 %{_libdir}/*.so
 %{_mandir}/man3/*
-%exclude %{_mandir}/man3/ENGINE*
 %{_libdir}/pkgconfig/*.pc
-
-%files devel-engine
-%{_prefix}/include/openssl/engine*.h
-%{_mandir}/man3/ENGINE*
 
 %files static
 %{_libdir}/*.a
