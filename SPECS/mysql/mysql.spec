@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          Applications/Databases
 URL:            https://www.mysql.com
 Source0:        https://dev.mysql.com/get/Downloads/MySQL-8.0/%{name}-boost-%{version}.tar.gz
-Patch0:         CVE-2012-5627.nopatch
 # Patch can be removed after upgrading MySQL to 8.4+
 # or switching to system Protobuf 3.25+ with the 'WITH_PROTOBUF=system' option.
 Patch1:         CVE-2024-2410.patch
