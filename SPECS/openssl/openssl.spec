@@ -29,7 +29,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.3
-Release: 100000%{?dist}
+Release: 110000%{?dist}
 # Epoch: 1
 Source: openssl-%{version}.tar.gz
 Source2: Makefile.certificate
@@ -278,6 +278,17 @@ OpenSSL is a toolkit for supporting cryptography. The openssl-devel-engine
 package contains include files needed to develop applications which
 use deprecated OpenSSL ENGINE functionality.
 
+%package static
+Summary:        Libraries for static linking of applications which will use OpenSSL
+# Group:          Development/Libraries
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+
+%description static
+OpenSSL is a toolkit for supporting cryptography. The openssl-static
+package contains static libraries needed for static linking of
+applications which support various cryptographic algorithms and
+protocols.
+
 %package perl
 Summary: Perl scripts provided with OpenSSL
 Requires: perl-interpreter
@@ -459,10 +470,10 @@ for lib in $RPM_BUILD_ROOT%{_libdir}/*.so.%{version} ; do
 	ln -s -f `basename ${lib}` $RPM_BUILD_ROOT%{_libdir}/`basename ${lib} .%{version}`.%{soversion}
 done
 
-# Remove static libraries
-for lib in $RPM_BUILD_ROOT%{_libdir}/*.a ; do
-	rm -f ${lib}
-done
+# # Remove static libraries
+# for lib in $RPM_BUILD_ROOT%{_libdir}/*.a ; do
+# 	rm -f ${lib}
+# done
 
 # Install a makefile for generating keys and self-signed certs, and a script
 # for generating them on the fly.
@@ -581,6 +592,9 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/cmake
 %files devel-engine
 %{_prefix}/include/openssl/engine*.h
 %{_mandir}/man3/ENGINE*
+
+%files static
+%{_libdir}/*.a
 
 %files perl
 %{_bindir}/c_rehash
