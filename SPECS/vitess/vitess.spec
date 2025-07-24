@@ -113,7 +113,6 @@ go check -t go/cmd \
 
 * Thu Mar 13 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 19.0.4-6
 - Patch to fix CVE-2025-22870
-
 * Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> -19.0.4-5
 - Fix CVE-2025-22868 with an upstream patch
 
