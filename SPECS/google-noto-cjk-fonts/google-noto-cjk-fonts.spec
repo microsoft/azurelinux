@@ -14,7 +14,7 @@ supported for compatibility with CJK standards. \
 
 Name:           google-noto-cjk-fonts
 Version:        20190416
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Google Noto Sans CJK Fonts
 
 License:        OFL
@@ -244,6 +244,9 @@ ln -s %{_fontconfig_templatedir}/%{fontconf2} \
 
 
 %changelog
+* Wed Jul 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 20190416-8
+- Move to SPECS from SPECS-EXTENDED
+
 * Tue Feb 09 2021 Joe Schmitt <joschmit@microsoft.com> - 20190416-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Define %%files section when %%_font_pkg is not defined
