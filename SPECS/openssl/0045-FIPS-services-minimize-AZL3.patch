@@ -82,7 +82,7 @@ index 86c18de..209e37b 100644
  
      p = OSSL_PARAM_locate(params, OSSL_PROV_PARAM_NAME);
 -    if (p != NULL && !OSSL_PARAM_set_utf8_ptr(p, "OpenSSL FIPS Provider"))
-+    if (p != NULL && !OSSL_PARAM_set_utf8_ptr(p, "Red Hat Enterprise Linux 9 - OpenSSL FIPS Provider"))
++    if (p != NULL && !OSSL_PARAM_set_utf8_ptr(p, "AZL3 - OpenSSL FIPS Provider"))
          return 0;
      p = OSSL_PARAM_locate(params, OSSL_PROV_PARAM_VERSION);
 -    if (p != NULL && !OSSL_PARAM_set_utf8_ptr(p, OPENSSL_VERSION_STR))
