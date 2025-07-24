@@ -3,7 +3,7 @@
 
 Summary:        Azure Linux Image Tools
 Name:           azure-linux-image-tools
-Version:        0.15.0
+Version:        0.16.0
 Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
@@ -26,8 +26,7 @@ Source0:        https://github.com/microsoft/azure-linux-image-tools/archive/ref
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
-Source1:        %{name}-%{version}-vendor-1.tar.gz
-Patch0:         skip-license-scan.patch
+Source1:        %{name}-%{version}-vendor-test.tar.gz
 BuildRequires: golang >= 1.24.1
 BuildRequires: systemd-udev
 Requires: qemu-img
@@ -57,7 +56,10 @@ Requires: grub2-pc
 Requires: systemd-ukify
 %endif
 
-%description
+%package -n imagecustomizer
+Summary: Image Customizer
+
+%description -n imagecustomizer
 The Azure Linux Image Customizer is a tool that can take an
 existing generic Azure Linux image and modify it to be suited for a particular
 scenario. By providing an Azure Linux base image, users can also supply a config
@@ -82,11 +84,11 @@ install -p -m 0755 toolkit/out/tools/imagecustomizer %{buildroot}%{_bindir}/imag
 %check
 go test -C toolkit/tools ./...
 
-%files
+%files -n imagecustomizer
 %license LICENSE
 %{_bindir}/imagecustomizer
 
 %changelog
-* Tue Jul 15 2025 Lanze Liu <lanzeliu@microsoft.com> 0.15.0-1
+* Fri Jul 25 2025 Lanze Liu <lanzeliu@microsoft.com> 0.16.0-1
 - Original version for Azure Linux (license: MIT).
 - License verified.

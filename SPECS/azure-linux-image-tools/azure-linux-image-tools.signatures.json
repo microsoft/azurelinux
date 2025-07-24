@@ -1,6 +1,6 @@
 {
     "Signatures": {
-        "azure-linux-image-tools-0.15.0.tar.gz": "57ae57393434e1a1b46d60bde29b1381c95ca855a01037a1d96e3d335f9d93f6",
-        "azure-linux-image-tools-0.15.0-vendor-1.tar.gz": "355da2445acd460f28f3fb808125a35193f908f56f8b87cd759835fc0b093557"
+        "azure-linux-image-tools-0.16.0.tar.gz": "2af99782b9aaccdaa162a24db56f4520be8b6701c6f5cf6c6e33960e90917b8e",
+        "azure-linux-image-tools-0.16.0-vendor-test.tar.gz": "44ca4f97d2fe8f41d2ae0116ae7835063be60338394493a22cf648cbae1f43cf"
     }
 }
