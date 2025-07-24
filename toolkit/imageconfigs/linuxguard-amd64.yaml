@@ -140,7 +140,7 @@ os:
       - cni
       - containerd2
       - cri-tools
-      - erofs-utils
+      # - erofs-utils
       # - notation
       # - tardev-snapshotter
       # UKI
