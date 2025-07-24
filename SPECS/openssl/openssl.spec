@@ -29,8 +29,8 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.3
-Release: 15000%{?dist}
-Epoch: 1
+Release: 100000%{?dist}
+# Epoch: 1
 Source: openssl-%{version}.tar.gz
 Source2: Makefile.certificate
 Source3: genpatches
@@ -230,7 +230,7 @@ BuildRequires: perl(FindBin), perl(lib), perl(File::Compare), perl(File::Copy), 
 BuildRequires: git-core
 BuildRequires: systemtap-sdt-devel
 Requires: coreutils
-Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -258,7 +258,7 @@ support cryptographic algorithms and protocols.
 
 %package devel
 Summary: Files for development of applications which will use OpenSSL
-Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
 
 %description devel
@@ -268,8 +268,8 @@ support various cryptographic algorithms and protocols.
 
 %package devel-engine
 Summary: Files for development of applications which will use OpenSSL and use deprecated ENGINE API.
-Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
-Requires: %{name}-devel%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
 Provides: deprecated()
 
@@ -281,7 +281,7 @@ use deprecated OpenSSL ENGINE functionality.
 %package perl
 Summary: Perl scripts provided with OpenSSL
 Requires: perl-interpreter
-Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description perl
 OpenSSL is a toolkit for supporting cryptography. The openssl-perl
