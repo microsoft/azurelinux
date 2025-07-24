@@ -462,6 +462,8 @@ build_rpm_in_chroot_no_install perl-Test-Warnings
 chroot_and_install_rpms perl-Test-Warnings
 build_rpm_in_chroot_no_install perl-Text-Template
 chroot_and_install_rpms perl-Text-Template
+build_rpm_in_chroot_no_install git
+chroot_and_install_rpms git
 build_rpm_in_chroot_no_install openssl
 
 # build and install additional openjdk build dependencies
