@@ -142,7 +142,7 @@ os:
       - cri-tools
       - erofs-utils
       # - notation
-      - tardev-snapshotter
+      # - tardev-snapshotter
       # UKI
       - systemd-boot
       # hyperv
