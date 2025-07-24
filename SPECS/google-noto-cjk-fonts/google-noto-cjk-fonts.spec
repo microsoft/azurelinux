@@ -245,6 +245,7 @@ ln -s %{_fontconfig_templatedir}/%{fontconf2} \
 
 %changelog
 * Wed Jul 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 20190416-8
+- License verified.
 - Move to SPECS from SPECS-EXTENDED
 
 * Tue Feb 09 2021 Joe Schmitt <joschmit@microsoft.com> - 20190416-7
