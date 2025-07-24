@@ -104,13 +104,13 @@ fi
 %files devel
 %{_libdir}/*.so
 %{_libdir}/*.a
-%{_libdir}/private/icudt73l/brkitr/*.res
-%{_libdir}/private/icudt73l/brkitr/*.brk
-%{_libdir}/private/icudt73l/brkitr/*.dict
-%{_libdir}/private/icudt73l/unames.icu
-%{_libdir}/private/icudt73l/cnvalias.icu
-%{_libdir}/private/icudt73l/uemoji.icu
-%{_libdir}/private/icudt73l/ulayout.icu
+%{_libdir}/private/icudt77l/brkitr/*.res
+%{_libdir}/private/icudt77l/brkitr/*.brk
+%{_libdir}/private/icudt77l/brkitr/*.dict
+%{_libdir}/private/icudt77l/unames.icu
+%{_libdir}/private/icudt77l/cnvalias.icu
+%{_libdir}/private/icudt77l/uemoji.icu
+%{_libdir}/private/icudt77l/ulayout.icu
 %{_includedir}/*
 %{_libdir}/pkgconfig/mysqlclient.pc
 
@@ -129,7 +129,7 @@ fi
 - Remove patch for CVE-2025-0725
 - Exclude merge_large_tests in package test.
 
-* Tue Mar 26 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.41-1
+* Wed Mar 26 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.41-1
 - Upgrade to 8.0.41 to fix CVE-2025-21490
 - Remove patch for CVE-2024-9681
 - Refresh patch for CVE-2025-0725
