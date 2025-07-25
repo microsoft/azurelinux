@@ -3258,8 +3258,8 @@
         "type": "other",
         "other": {
           "name": "elinks",
-          "version": "0.16.0",
-          "downloadUrl": "https://github.com/rkd77/elinks/releases/download/v0.16.0/elinks-0.16.0.tar.xz"
+          "version": "0.17.0",
+          "downloadUrl": "https://github.com/rkd77/elinks/releases/download/v0.17.0/elinks-0.17.0.tar.xz"
         }
       }
     },
