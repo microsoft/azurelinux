@@ -468,6 +468,8 @@ build_rpm_in_chroot_no_install lzo
 chroot_and_install_rpms lzo
 build_rpm_in_chroot_no_install cmake
 chroot_and_install_rpms cmake
+build_rpm_in_chroot_no_install gtest
+chroot_and_install_rpms gtest
 build_rpm_in_chroot_no_install snappy
 chroot_and_install_rpms snappy
 build_rpm_in_chroot_no_install crash

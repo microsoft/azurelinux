@@ -153,6 +153,7 @@ gpgme-devel-1.23.2-2.azl3.aarch64.rpm
 grep-3.11-2.azl3.aarch64.rpm
 grep-debuginfo-3.11-2.azl3.aarch64.rpm
 grep-lang-3.11-2.azl3.aarch64.rpm
+gtest-devel-1.14.0-1.azl3.aarch64.rpm
 gtk-doc-1.33.2-1.azl3.noarch.rpm
 gzip-1.13-1.azl3.aarch64.rpm
 gzip-debuginfo-1.13-1.azl3.aarch64.rpm
