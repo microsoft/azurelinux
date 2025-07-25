@@ -27694,8 +27694,8 @@
         "type": "other",
         "other": {
           "name": "SDL2",
-          "version": "2.24.0",
-          "downloadUrl": "https://www.libsdl.org/release/SDL2-2.24.0.tar.gz"
+          "version": "2.30.9",
+          "downloadUrl": "https://www.libsdl.org/release/SDL2-2.30.9.tar.gz"
         }
       }
     },
