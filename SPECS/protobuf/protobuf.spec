@@ -110,7 +110,7 @@ popd
 %{python3_sitelib}/*
 
 %changelog
-* Mon Jul 21 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.17.3-4
+* Tue Jul 22 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.17.3-4
 - Patch CVE-2025-4565
 
 * Tue Jul 16 2024 Archana Choudhary <archana1@microsoft.com> - 3.17.3-3
