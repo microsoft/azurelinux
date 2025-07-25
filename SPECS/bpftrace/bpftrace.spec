@@ -83,7 +83,7 @@ install -p -m 644 tools/*.txt %{buildroot}%{_datadir}/bpftrace/tools/doc
 %{_datadir}/bpftrace/tools
 
 %changelog
-* Tue Jul 24 2025 Sriram Nambakam <snambakam@microsoft.com> - 0.23.5-1
+* Thu Jul 24 2025 Sriram Nambakam <snambakam@microsoft.com> - 0.23.5-1
 - Upgrade version to 0.23.5
   This version has LLVM18 support. Therefore remove corresponding patch.
   Apply patch to disable cstring_view null termination check.
