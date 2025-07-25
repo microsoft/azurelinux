@@ -1,6 +1,6 @@
 Summary:        Berkeley Packet Filter Tracing Language
 Name:           bpftrace
-Version:        0.21.3
+Version:        0.23.5
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -84,8 +84,8 @@ install -p -m 644 tools/*.txt %{buildroot}%{_datadir}/bpftrace/tools/doc
 %{_datadir}/bpftrace/tools
 
 %changelog
-* Tue Apr 11 2025 Sriram Nambakam <snambakam@microsoft.com> - 0.21.3-1
-- Upgrade version to 0.21.3
+* Tue Jul 24 2025 Sriram Nambakam <snambakam@microsoft.com> - 0.23.5-1
+- Upgrade version to 0.23.5
   This version has LLVM18 support. Therefore remove corresponding patch.
   Apply patch to disable cstring_view null termination check.
 
