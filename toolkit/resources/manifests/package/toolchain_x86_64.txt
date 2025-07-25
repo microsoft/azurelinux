@@ -67,6 +67,7 @@ cracklib-debuginfo-2.9.11-1.azl3.x86_64.rpm
 cracklib-devel-2.9.11-1.azl3.x86_64.rpm
 cracklib-dicts-2.9.11-1.azl3.x86_64.rpm
 cracklib-lang-2.9.11-1.azl3.x86_64.rpm
+crash-devel-8.0.4-4.azl3.x86_64.rpm
 createrepo_c-1.0.3-1.azl3.x86_64.rpm
 createrepo_c-debuginfo-1.0.3-1.azl3.x86_64.rpm
 createrepo_c-devel-1.0.3-1.azl3.x86_64.rpm
