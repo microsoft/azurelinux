@@ -466,6 +466,8 @@ build_rpm_in_chroot_no_install git
 chroot_and_install_rpms git
 build_rpm_in_chroot_no_install lzo
 chroot_and_install_rpms lzo
+build_rpm_in_chroot_no_install cmake
+chroot_and_install_rpms cmake
 build_rpm_in_chroot_no_install snappy
 chroot_and_install_rpms snappy
 build_rpm_in_chroot_no_install crash
@@ -539,7 +541,6 @@ build_rpm_in_chroot_no_install cracklib
 
 # pam needs cracklib and libxcrypt (installed above)
 chroot_and_install_rpms cracklib
-build_rpm_in_chroot_no_install cmake
 build_rpm_in_chroot_no_install pam
 build_rpm_in_chroot_no_install docbook-dtd-xml
 
@@ -552,7 +553,6 @@ chroot_and_install_rpms pam
 build_rpm_in_chroot_no_install docbook-style-xsl
 
 # libsolv needs cmake, zstd-devel
-chroot_and_install_rpms cmake
 chroot_and_install_rpms zstd
 build_rpm_in_chroot_no_install libsolv
 
