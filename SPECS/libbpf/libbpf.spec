@@ -1,13 +1,12 @@
 Summary:        Libbpf library
 Name:           libbpf
-Version:        1.2.2
-Release:        2%{?dist}
+Version:        1.5.0
+Release:        1%{?dist}
 License:        LGPLv2 OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/%{name}/%{name}
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2025-29481.patch
 
 BuildRequires:  elfutils-devel
 BuildRequires:  elfutils-libelf-devel
@@ -51,6 +50,9 @@ find %{buildroot} -type f -name "*.a" -delete -print
 %{_libdir}/pkgconfig/libbpf.pc
 
 %changelog
+* Fri Jul 25 2025 Sriram Nambakam <snambakam@microsoft.com> - 1.5.0-1
+- Update to version 1.5.0
+
 * Mon Apr 14 2025 Jyoti Kanase <v-jykanase@microsoft.com> -  1.2.2-2
 - Patch for CVE-2025-29481
 
