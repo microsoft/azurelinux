@@ -8,8 +8,6 @@ Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/bpftrace/bpftrace
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         remove-cstring-view.patch
-Patch1:         silence-uninitialized-variable-compiler-warning.patch
 BuildRequires:  bcc-devel
 BuildRequires:  binutils-devel
 BuildRequires:  bison
