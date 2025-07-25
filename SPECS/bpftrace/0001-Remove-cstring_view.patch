@@ -1,4 +1,4 @@
-From 9759c1d09bf686ee31b320899582b89142e1e79b Mon Sep 17 00:00:00 2001
+From 876b5118fa521f62e31a5bec7ec0be27da3bb7ab Mon Sep 17 00:00:00 2001
 From: Thierry Treyer <ttreyer@meta.com>
 Date: Fri, 11 Apr 2025 09:04:29 -0700
 Subject: [PATCH] Remove 'cstring_view'
@@ -12,11 +12,13 @@ Fixes: #4001
 Signed-off-by: Thierry Treyer <ttreyer@meta.com>
 ---
  src/bpfmap.cpp               |  2 +-
- src/bpfmap.h                 | 10 ++++-----
- src/container/cstring_view.h | 39 ------------------------------------
- tests/CMakeLists.txt         |  2 +-
- 4 files changed, 6 insertions(+), 47 deletions(-)
+ src/bpfmap.h                 | 10 +++---
+ src/container/cstring_view.h | 39 -----------------------
+ tests/CMakeLists.txt         |  1 -
+ tests/cstring_view.cpp       | 60 ------------------------------------
+ 5 files changed, 5 insertions(+), 107 deletions(-)
  delete mode 100644 src/container/cstring_view.h
+ delete mode 100644 tests/cstring_view.cpp
 
 diff --git a/src/bpfmap.cpp b/src/bpfmap.cpp
 index 9464e8ed..eb65621e 100644
@@ -123,18 +125,83 @@ index 2e1c4602..00000000
 -
 -} // namespace bpftrace
 diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
-index c5d10f9c..26fbeb89 100644
+index c5d10f9c..d012cad7 100644
 --- a/tests/CMakeLists.txt
 +++ b/tests/CMakeLists.txt
-@@ -33,7 +33,7 @@ add_executable(bpftrace_test
+@@ -33,7 +33,6 @@ add_executable(bpftrace_test
    clang_parser.cpp
    config.cpp
    collect_nodes.cpp
 -  cstring_view.cpp
-+  deprecated.cpp
    field_analyser.cpp
    function_registry.cpp
    log.cpp
+diff --git a/tests/cstring_view.cpp b/tests/cstring_view.cpp
+deleted file mode 100644
+index 5b82a990..00000000
+--- a/tests/cstring_view.cpp
++++ /dev/null
+@@ -1,60 +0,0 @@
+-#include "container/cstring_view.h"
+-#include "gtest/gtest.h"
+-
+-#include <type_traits>
+-
+-namespace bpftrace::test::cstring_view {
+-
+-using bpftrace::cstring_view;
+-
+-TEST(cstring_view, c_string)
+-{
+-  const char *str = "abc";
+-  cstring_view sv{ str };
+-
+-  EXPECT_EQ("abc", sv);
+-
+-  EXPECT_EQ('a', sv[0]);
+-  EXPECT_EQ('b', sv[1]);
+-  EXPECT_EQ('c', sv[2]);
+-  EXPECT_EQ('\0', sv[3]);
+-}
+-
+-TEST(cstring_view, std_string)
+-{
+-  std::string str = "abc";
+-  cstring_view sv{ str };
+-
+-  EXPECT_EQ("abc", sv);
+-
+-  EXPECT_EQ('a', sv[0]);
+-  EXPECT_EQ('b', sv[1]);
+-  EXPECT_EQ('c', sv[2]);
+-  EXPECT_EQ('\0', sv[3]);
+-}
+-
+-TEST(cstring_view, std_string_view)
+-{
+-  EXPECT_FALSE((std::is_constructible_v<cstring_view, std::string_view>));
+-
+-  // Sanity checks:
+-  EXPECT_TRUE((std::is_constructible_v<cstring_view, std::string>));
+-  EXPECT_TRUE((std::is_constructible_v<cstring_view, const char *>));
+-}
+-
+-TEST(cstring_view, length)
+-{
+-  cstring_view sv{ "abc" };
+-
+-  EXPECT_EQ("abc", sv);
+-  EXPECT_EQ(3, sv.size());
+-  EXPECT_EQ(3, sv.length());
+-}
+-
+-TEST(cstring_view, c_str)
+-{
+-  cstring_view sv{ "abc" };
+-  EXPECT_EQ(0, strcmp(sv.c_str(), "abc"));
+-}
+-
+-} // namespace bpftrace::test::cstring_view
 -- 
 2.45.4
 
