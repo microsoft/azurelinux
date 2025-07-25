@@ -1,6 +1,5 @@
 {
  "Signatures": {
-  "gnutls-utilize-system-crypto-policy.patch": "d3c20363dad32f3c85b1898ad0c657c2682a128ce4bec1c93bf19e49b966a41d",
   "libmicrohttpd-0.9.77.tar.gz": "9e7023a151120060d2806a6ea4c13ca9933ece4eacfc5c9464d20edddb76b0a0"
  }
 }

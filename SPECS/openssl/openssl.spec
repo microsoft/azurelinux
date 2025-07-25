@@ -227,8 +227,8 @@ BuildRequires: perl(Test::Harness), perl(Test::More), perl(Math::BigInt)
 BuildRequires: perl(Module::Load::Conditional), perl(File::Temp)
 BuildRequires: perl(Time::HiRes), perl(IPC::Cmd), perl(Pod::Html), perl(Digest::SHA)
 BuildRequires: perl(FindBin), perl(lib), perl(File::Compare), perl(File::Copy), perl(bigint)
-BuildRequires: git-core
-BuildRequires: systemtap-sdt-devel
+# BuildRequires: git-core
+# BuildRequires: systemtap-sdt-devel
 Requires: coreutils
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
@@ -240,7 +240,7 @@ protocols.
 
 %package libs
 Summary: A general purpose cryptography library with TLS implementation
-Requires: ca-certificates >= 2008-5
+# Requires: ca-certificates >= 2008-5
 # Requires: crypto-policies >= 20180730
 %if 0%{?fedora} >= 40 || 0%{?rhel} >= 10
 Recommends: pkcs11-provider%{?_isa}

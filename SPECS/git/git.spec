@@ -20,7 +20,7 @@ BuildRequires:  python3-devel
 Requires:       curl
 Requires:       expat
 Requires:       less
-Requires:       openssh-clients
+# Requires:       openssh-clients
 Requires:       openssl
 Requires:       perl-CGI
 Requires:       perl-DBI
