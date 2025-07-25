@@ -555,6 +555,9 @@ python3-libxml2-2.11.5-6.azl3.x86_64.rpm
 =======
 python3-libs-3.12.9-2.azl3.x86_64.rpm
 python3-libxml2-2.11.5-6.azl3.x86_64.rpm
+<<<<<<< HEAD
+>>>>>>> dca904027 (Patch libxml2 for CVE-2025-49794, CVE-2025-49796[CRITICAL], CVE-2025-6021[MED], CVE-2025-6170[LOW] (#14351))
+=======
 >>>>>>> dca904027 (Patch libxml2 for CVE-2025-49794, CVE-2025-49796[CRITICAL], CVE-2025-6021[MED], CVE-2025-6170[LOW] (#14351))
 python3-lxml-4.9.3-1.azl3.x86_64.rpm
 python3-magic-5.45-1.azl3.noarch.rpm
