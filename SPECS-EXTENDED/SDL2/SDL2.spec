@@ -171,7 +171,7 @@ install -p -m 644 %{SOURCE2} %{buildroot}%{_includedir}/SDL2/SDL_revision.h
 %changelog
 * Tue Mar 11 2025 Jyoti kanase <v-jykanase@microsoft.com> - 2.30.9-1
 - Upgrade to 2.30.9
-- License verified.
+- License Verified.
 
 * Fri Nov 25 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.24.0-2                           
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
