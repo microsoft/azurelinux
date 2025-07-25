@@ -168,7 +168,11 @@ Patch93: CVE-2022-25255.patch
 Patch94: CVE-2024-25580.patch
 Patch95: CVE-2023-34410.patch
 Patch96: CVE-2025-30348.patch
+<<<<<<< HEAD
 Patch97: CVE-2025-5455.patch
+=======
+Patch97: CVE-2025-6558.patch
+>>>>>>> fd5507ac3 ([High] Patch qt5-qtbase for CVE-2025-6558 (#14367))
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -778,8 +782,13 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 
 %changelog
+<<<<<<< HEAD
 * Tue Jul 01 2025 Akhila Guruju <v-guakhila@microsoft.com> - 5.12.11-17
 - Patch CVE-2025-5455
+=======
+* Mon Jul 21 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 5.12.11-17
+- Fix CVE-2025-6558
+>>>>>>> fd5507ac3 ([High] Patch qt5-qtbase for CVE-2025-6558 (#14367))
 
 * Fri Jun 13 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 5.12.11-16
 - Fix CVE-2025-30348
