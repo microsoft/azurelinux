@@ -542,7 +542,11 @@ python3-flit-core-3.9.0-1.azl3.noarch.rpm
 python3-gpg-1.23.2-2.azl3.aarch64.rpm
 python3-jinja2-3.1.2-3.azl3.noarch.rpm
 python3-libcap-ng-0.8.4-1.azl3.aarch64.rpm
+<<<<<<< HEAD
 python3-libs-3.12.9-4.azl3.aarch64.rpm
+=======
+python3-libs-3.12.9-2.azl3.aarch64.rpm
+>>>>>>> dca904027 (Patch libxml2 for CVE-2025-49794, CVE-2025-49796[CRITICAL], CVE-2025-6021[MED], CVE-2025-6170[LOW] (#14351))
 python3-libxml2-2.11.5-6.azl3.aarch64.rpm
 python3-lxml-4.9.3-1.azl3.aarch64.rpm
 python3-magic-5.45-1.azl3.noarch.rpm
