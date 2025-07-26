@@ -1,0 +1,16 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+RUN tdnf update -y && \
+   tdnf install -y azurelinux-repos-cloud-native && \
+   tdnf update -y && \
+   tdnf install -y oras && \
+   tdnf clean all
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
