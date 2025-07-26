@@ -1,0 +1,9 @@
+{
+ "Signatures": {
+  "audited-null-licenses.toml": "3207b63cad4bfbe65905dbdeb4c9d3ca89dbe423579c194ab48214964fc4751b",
+  "check-null-licenses": "a664afbecb6a93c0e9b50cf5708253bf2624dc8100a2fcc5fc9808028434e36d",
+  "llhttp-9.2.1-nm-dev.tar.zst": "3da09d4032c839e3060cb93c3127bbfc75df58713b6e4a208f33a3674834b03d",
+  "llhttp-9.2.1.tar.gz": "9b8a4838b5813c4ad11dfb79e695bd867b493ec7f13aae00a7567c64c10613a5",
+  "llhttp-packaging-bundler": "079c04dcea95d05cb15147cf5cc8471ee260de519fe159e58dfa42a965e1da6a"
+ }
+}
