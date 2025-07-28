@@ -1,0 +1,48 @@
+diff -up dovecot-2.3.21/dovecot-pigeonhole/src/lib-sieve/plugins/include/cmd-include.c.ph_optglob dovecot-2.3.21/dovecot-pigeonhole/src/lib-sieve/plugins/include/cmd-include.c
+--- dovecot-2.3.21/dovecot-pigeonhole/src/lib-sieve/plugins/include/cmd-include.c.ph_optglob	2024-06-04 09:11:28.514189662 +0200
++++ dovecot-2.3.21/dovecot-pigeonhole/src/lib-sieve/plugins/include/cmd-include.c	2024-06-04 09:18:23.219809778 +0200
+@@ -368,11 +368,13 @@ static bool opc_include_dump
+ 		return FALSE;
+ 
+ 	sieve_code_descend(denv);
+-	sieve_code_dumpf(denv, "script: `%s' from %s %s%s[ID: %d, BLOCK: %d]",
++	sieve_code_dumpf(denv, "script: `%s' from %s %s%s%s[ID: %d, BLOCK: %d]",
+ 		sieve_script_name(included->script), sieve_script_location(included->script),
+ 		((flags & EXT_INCLUDE_FLAG_ONCE) != 0 ? "(once) " : ""), 
+ 		((flags & EXT_INCLUDE_FLAG_OPTIONAL) != 0 ? "(optional) " : ""),
+-		include_id, sieve_binary_block_get_id(included->block));
++		(included->block == NULL ? "(missing) " : ""), 
++		include_id, 
++		(included->block == NULL ? -1 : sieve_binary_block_get_id(included->block)));
+ 
+ 	return TRUE;
+ }
+diff -up dovecot-2.3.21/dovecot-pigeonhole/src/lib-sieve/plugins/include/ext-include-common.c.ph_optglob dovecot-2.3.21/dovecot-pigeonhole/src/lib-sieve/plugins/include/ext-include-common.c
+--- dovecot-2.3.21/dovecot-pigeonhole/src/lib-sieve/plugins/include/ext-include-common.c.ph_optglob	2023-09-14 15:18:26.000000000 +0200
++++ dovecot-2.3.21/dovecot-pigeonhole/src/lib-sieve/plugins/include/ext-include-common.c	2024-06-04 09:10:45.187823805 +0200
+@@ -693,6 +693,25 @@ int ext_include_execute_include(const st
+ 	}
+ 
+ 	ctx = ext_include_get_interpreter_context(this_ext, renv->interp);
++	if (included->block == NULL) {
++		if ((flags & EXT_INCLUDE_FLAG_OPTIONAL) != 0) {
++			sieve_runtime_trace(
++				renv, SIEVE_TRLVL_NONE,
++				"include: skipped include for script '%s' "
++				"[inc id: %d, block: NULL]; optional and unavailable",
++				sieve_script_name(included->script),
++				include_id);
++			return result;
++		} else {
++			sieve_runtime_trace(
++				renv, SIEVE_TRLVL_NONE,
++				"include: unavailable script '%s' "
++				"[inc id: %d, block: NULL]",
++				sieve_script_name(included->script),
++				include_id);
++			return SIEVE_EXEC_BIN_CORRUPT;
++		}
++	}
+ 	block_id = sieve_binary_block_get_id(included->block);
+ 
+ 	/* If :once modifier is specified, check for duplicate include */

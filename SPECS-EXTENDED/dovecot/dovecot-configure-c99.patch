@@ -1,0 +1,25 @@
+m4: crypt_xxpg6.m4: Define _DEFAULT_SOURCE for current glibc
+
+Current glibc no longer implements the CRYPT extension, so it does not
+declare crypt in <unistd.h> in strict standard modes.  The check
+defines _XOPEN_SOURCE, which enables one of these modes.  Defining
+_DEFAULT_SOURCE as well again makes available the crypt function
+prototype.
+
+This avoids a configure check result change with compilers which do
+not support implicit function declarations.
+
+Submitted upstream: <https://github.com/dovecot/core/pull/193>
+
+diff --git a/m4/crypt_xpg6.m4 b/m4/crypt_xpg6.m4
+index 0085b2ac76..3a288a3713 100644
+--- a/m4/crypt_xpg6.m4
++++ b/m4/crypt_xpg6.m4
+@@ -6,6 +6,7 @@ AC_DEFUN([DOVECOT_CRYPT_XPG6], [
+       #define _XOPEN_SOURCE 4
+       #define _XOPEN_SOURCE_EXTENDED 1
+       #define _XOPEN_VERSION 4
++      #define _DEFAULT_SOURCE
+       #define _XPG4_2
+       #define _XPG6
+       #include <unistd.h>
