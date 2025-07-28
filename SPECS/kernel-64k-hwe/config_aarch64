@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 6.12.39.1 Kernel Configuration
+# Linux/arm64 6.12.40.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 13.2.0"
 CONFIG_CC_IS_GCC=y
@@ -10577,7 +10577,7 @@ CONFIG_HISI_PTT=m
 # CONFIG_FPGA is not set
 # CONFIG_FSI is not set
 # CONFIG_TEE is not set
-CONFIG_MULTIPLEXER=m
+CONFIG_MULTIPLEXER=y
 
 #
 # Multiplexer drivers
