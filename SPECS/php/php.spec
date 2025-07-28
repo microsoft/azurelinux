@@ -32,7 +32,7 @@
 %global with_qdbm     0
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
-Version:        8.1.32
+Version:        8.1.33
 Release:        1%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -1516,6 +1516,9 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Mon Jul 14 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 8.1.33-1
+- Upgrade to 8.1.33 - for CVE-2025-1735, CVE-2025-6491, CVE-2025-1220
+
 * Sun Mar 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.1.32-1
 - Auto-upgrade to 8.1.32 - for CVE-2025-1219, CVE-2025-1736, CVE-2025-1861, CVE-2025-1734, CVE-2025-1217
 
