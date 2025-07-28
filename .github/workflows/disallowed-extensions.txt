@@ -53,7 +53,6 @@ aac
 rpm
 deb
 msi
-pkg
 dmg
 iso
 

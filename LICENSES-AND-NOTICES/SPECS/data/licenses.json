@@ -2000,7 +2000,7 @@
                 "scotch",
                 "screen",
                 "scrub",
-                "SDL",
+                "sdl12-compat",
                 "SDL2",
                 "SDL_sound",
                 "sdparm",
