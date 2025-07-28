@@ -68,7 +68,7 @@ make
 %check
 cd build
 %ifarch aarch64
-./tests/bpftrace_test --gtest_filter=-codegen.* --rerun-failed --output-on-failure
+BPFTRACE_UPDATE_TESTS=1 ./tests/bpftrace_test --gtest_filter=-codegen.* --rerun-failed --output-on-failure
 %else
 ./tests/bpftrace_test --rerun-failed --output-on-failure
 %endif
