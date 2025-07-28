@@ -21,7 +21,7 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.41
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,6 +42,8 @@ Patch8:         CVE-2025-5245.patch
 Patch9:         CVE-2025-5244.patch
 Patch10:        CVE-2025-7546.patch
 Patch11:        CVE-2025-7545.patch
+Patch12:        CVE-2025-8225.patch
+Patch13:        CVE-2025-8224.patch
 Provides:       bundled(libiberty)
 
 # Moving macro before the "SourceX" tags breaks PR checks parsing the specs.
@@ -331,6 +333,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %do_files aarch64-linux-gnu %{build_aarch64}
 
 %changelog
+* Mon Jul 28 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.41-8
+- Patch for CVE-2025-8225, CVE-2025-8224
+
 * Thu Jul 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.41-7
 - Patch for CVE-2025-7546, CVE-2025-7545
 
