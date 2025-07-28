@@ -1,5 +1,7 @@
 {
  "Signatures": {
-  "whois_5.5.15.tar.xz": "16951471874750cd735405cc995d659f8b45005f6dfe4eabf71e8b4f59f8aeb8"
+  "md-pgp.asc": "ad57a215dc479aa1ac90274e48bb6857125467ba0fab738de4a24ba09141882b",
+  "whois_5.5.20.dsc": "0c540d2aed0602003db1c0bf31a728a35b2fe389cbd4616983df22afd444265b",
+  "whois_5.5.20.tar.xz": "42085102dfad82067abe2d5d1cfca59586573dee528718559b022e762bb85cf1"
  }
 }
