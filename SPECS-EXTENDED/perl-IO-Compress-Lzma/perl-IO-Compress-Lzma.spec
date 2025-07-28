@@ -1,67 +1,69 @@
-Summary:        Read and write lzma compressed data
-Name:           perl-IO-Compress-Lzma
-Version:        2.101
-Release:        5%{?dist}
-License:        GPL+ OR Artistic
+# Perform optional tests
+%if 0%{?rhel} >= 9
+%bcond_with perl_IO_Compress_Lzma_enables_optional_test
+%else
+%bcond_without perl_IO_Compress_Lzma_enables_optional_test
+%endif
+
+Name:		perl-IO-Compress-Lzma
+Version:	2.213
+Release:	1%{?dist}
+Summary:	Read and write lzma compressed data
+License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/IO-Compress-Lzma
 Source0:        https://cpan.metacpan.org/modules/by-module/IO/IO-Compress-Lzma-%{version}.tar.gz
 Source1:        LICENSE.PTR
-BuildArch:      noarch
-
+BuildArch:	noarch
 # Module Build
-BuildRequires:  coreutils
-BuildRequires:  findutils
-BuildRequires:  make
-BuildRequires:  perl-generators
-BuildRequires:  perl-interpreter
-BuildRequires:  perl(Config)
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 5.16
-BuildRequires:  perl(File::Copy)
-BuildRequires:  perl(File::Spec::Functions)
-BuildRequires:  perl(lib)
-
+BuildRequires:	coreutils
+BuildRequires:	findutils
+BuildRequires:	make
+BuildRequires:	perl-generators
+BuildRequires:	perl-interpreter
+BuildRequires:	perl(Config)
+BuildRequires:	perl(ExtUtils::MakeMaker) >= 5.16
+BuildRequires:	perl(File::Copy)
+BuildRequires:	perl(File::Spec::Functions)
+BuildRequires:	perl(lib)
 # Module Runtime
-BuildRequires:  perl(Compress::Raw::Lzma) >= %{version}
-BuildRequires:  perl(Exporter)
-BuildRequires:  perl(IO::Compress::Base) >= %{version}
-BuildRequires:  perl(IO::Compress::Base::Common) >= %{version}
-BuildRequires:  perl(IO::Uncompress::Base) >= %{version}
-BuildRequires:  perl(bytes)
-BuildRequires:  perl(constant)
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
-
-%if 0%{?with_check}
-BuildRequires:  xz
-BuildRequires:  xz-lzma-compat
-BuildRequires:  perl(Carp)
-BuildRequires:  perl(Compress::Raw::Zlib) >= 2
-BuildRequires:  perl(File::Path)
-BuildRequires:  perl(File::Spec)
-BuildRequires:  perl(File::Temp)
-BuildRequires:  perl(IO::Compress::Zip)
-BuildRequires:  perl(IO::File)
-BuildRequires:  perl(IO::Handle)
-BuildRequires:  perl(IO::Uncompress::AnyUncompress)
-BuildRequires:  perl(IO::Uncompress::Unzip)
-BuildRequires:  perl(List::Util)
-BuildRequires:  perl(Test::More)
-
+BuildRequires:	perl(bytes)
+BuildRequires:	perl(Compress::Raw::Lzma) >= %{version}
+BuildRequires:	perl(constant)
+BuildRequires:	perl(Exporter)
+BuildRequires:	perl(IO::Compress::Base) >= %{version}
+BuildRequires:	perl(IO::Compress::Base::Common) >= %{version}
+BuildRequires:	perl(IO::Uncompress::Base) >= %{version}
+BuildRequires:	perl(strict)
+BuildRequires:	perl(warnings)
+# Test Suite
+BuildRequires:	perl(Carp)
+BuildRequires:	perl(Compress::Raw::Zlib) >= 2
+BuildRequires:	perl(File::Path)
+BuildRequires:	perl(File::Spec)
+BuildRequires:	perl(File::Temp)
+BuildRequires:	perl(IO::Compress::Zip)
+BuildRequires:	perl(IO::File)
+BuildRequires:	perl(IO::Handle)
+BuildRequires:	perl(IO::Uncompress::AnyUncompress)
+BuildRequires:	perl(IO::Uncompress::Unzip)
+BuildRequires:	perl(List::Util)
+BuildRequires:	perl(Test::More)
+BuildRequires:	xz, xz-lzma-compat
+%if %{with perl_IO_Compress_Lzma_enables_optional_test}
 # Optional Tests
-BuildRequires:  %{_bindir}/7z
-BuildRequires:  lzip
-BuildRequires:  perl(Encode)
-BuildRequires:  perl(IO::String)
-BuildRequires:  perl(Test::CPAN::Meta)
-BuildRequires:  perl(Test::CPAN::Meta::JSON)
-BuildRequires:  perl(Test::NoWarnings)
-BuildRequires:  perl(Test::Pod) >= 1.00
+BuildRequires:	lzip
+BuildRequires:	perl(Encode)
+BuildRequires:	perl(IO::String)
+BuildRequires:	perl(Test::CPAN::Meta)
+BuildRequires:	perl(Test::CPAN::Meta::JSON)
+BuildRequires:	perl(Test::NoWarnings)
+BuildRequires:	perl(Test::Pod) >= 1.00
+BuildRequires:	/usr/bin/7z
 %endif
-
-# Runtime
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Dependencies
+# (none)
 
 %description
 This distribution provides a Perl interface to allow reading and writing of
@@ -107,6 +109,10 @@ make test COMPRESS_ZLIB_RUN_MOST=1
 %{_mandir}/man3/IO::Uncompress::UnXz.3*
 
 %changelog
+* Thu Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 2.213-1
+- Update to version 2.213
+- License verified
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.101-5
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
