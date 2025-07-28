@@ -3,22 +3,35 @@
 
 ARG BASE_IMAGE
 ARG TARGETARCH
+ARG AZ_MON_CONN_STR
 
 FROM $BASE_IMAGE
 
+ENV AZURE_MONITOR_CONNECTION_STRING=${AZ_MON_CONN_STR}
+
 @INCLUDE_MAIN_RUN_INSTRUCTION@
 
-# Install architecture-specific packages for AMD64
-RUN if [ "$TARGETARCH" = "amd64" ]; then \
-        echo "Installing AMD64-specific packages..."; \
-        tdnf install -y grub2-pc systemd-ukify; \
-    else \
-        echo "Skipping AMD64-specific packages for $TARGETARCH"; \
-    fi && \
-    tdnf update -y && \
-    tdnf install -y azurelinux-repos-cloud-native && \
-    tdnf update -y && \
-    tdnf install -y oras && \
-    tdnf clean all
+# Install core packages and architecture-specific packages
+RUN tdnf update -y && \
+   tdnf install -y azurelinux-repos-cloud-native && \
+   tdnf update -y && \
+   tdnf install -y oras && \
+   if [ "$TARGETARCH" = "amd64" ]; then \
+       echo "Installing AMD64-specific packages..."; \
+       tdnf install -y grub2-pc systemd-ukify; \
+   else \
+       echo "Skipping AMD64-specific packages for $TARGETARCH"; \
+   fi && \
+   tdnf clean all
+
+# Create virtual environment and install Python dependencies for telemetry
+RUN python3 -m venv /opt/telemetry-venv
+COPY telemetry-requirements.txt /telemetry-requirements.txt
+RUN /opt/telemetry-venv/bin/pip install --no-cache-dir -r /telemetry-requirements.txt
+RUN rm -rf /telemetry-requirements.txt
+
+# Copy all necessary files
+COPY .mariner-toolkit-ignore-dockerenv /
+COPY usr /usr
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
