@@ -1,0 +1,9 @@
+os:
+  kernelCommandLine:
+    extraCommandLine:
+    - console=tty0
+    - console=ttyS0,115200n8
+
+output:
+  image:
+    format: qcow2
