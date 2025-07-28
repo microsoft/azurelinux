@@ -131,8 +131,9 @@ pushd obj
 popd
 
 %files
-%doc AUTHORS BSD CHANGELOG README
+%doc AUTHORS CHANGELOG README
 %license COPYING
+%license BSD
 %{_libdir}/libssh.so.4*
 %{_libdir}/libssh_threads.so.4*
 
