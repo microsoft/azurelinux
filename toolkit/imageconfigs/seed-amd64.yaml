@@ -1,0 +1,39 @@
+storage:
+  bootType: efi
+  disks:
+  - partitionTableType: gpt
+    maxSize: 5G
+    partitions:
+    - id: esp
+      type: esp
+      size: 9M
+    - id: boot
+      size: 512M
+    - id: root
+      size: grow
+  filesystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+  - deviceId: boot
+    type: ext4
+    mountPoint:
+      path: /boot
+  - deviceId: root
+    type: ext4
+    mountPoint:
+      path: /
+os:
+  bootloader:
+    resetType: hard-reset
+
+  kernelCommandLine:
+    extraCommandLine:
+    - console=tty0
+    - console=ttyS0,115200n8
+
+output:
+  image:
+    format: qcow2
