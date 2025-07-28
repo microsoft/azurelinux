@@ -136,7 +136,7 @@ install -m644 %{SOURCE1} %{buildroot}/%{_includedir}/SDL/SDL_config.h
 %changelog
 * Mon Mar 17 2025 Jyoti kanase <v-jykanase@microsoft.com> - 1.2.68-4
 - Initial Azure Linux import from Fedora 41 (license: MIT).
-- License verified.
+- License Verified.
 
 * Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.68-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
