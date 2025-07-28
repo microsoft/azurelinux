@@ -22378,19 +22378,6 @@
         }
       }
     },
-<<<<<<< HEAD
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "cqlsh",
-          "version": "6.1.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/cqlsh/cqlsh-6.1.2.tar.gz"
-        }
-      }
-    },
-=======
->>>>>>> 056d6feb4 (Added the `python-junit-xml` package. (#14266))
     {
       "component": {
         "type": "other",
