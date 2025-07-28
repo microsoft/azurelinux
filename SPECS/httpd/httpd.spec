@@ -316,7 +316,7 @@ fi
 %{_bindir}/*
 %{_mandir}/man1/*
 %license LICENSE
-%doc NOTICE
+%license NOTICE
 %exclude %{_bindir}/apxs
 %exclude %{_mandir}/man1/apxs.1*
 
