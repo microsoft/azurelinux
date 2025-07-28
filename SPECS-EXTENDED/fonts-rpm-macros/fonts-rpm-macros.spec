@@ -31,6 +31,7 @@ Source:    %{forgesource}
 Patch0:    %{name}-omit-foundry-in-family.patch
 Patch1:    %{name}-drop-yaml.patch
 Patch2:    %{name}-epoch-in-req.patch
+Patch3:    update_for_azl.patch
 
 Requires:  fonts-srpm-macros = %{version}-%{release}
 Requires:  fonts-filesystem  = %{version}-%{release}
@@ -102,6 +103,7 @@ done
 %patch -P0 -p1 -b .1-omit-foundry-in-family
 %patch -P1 -p1 -b .1-drop-yaml
 %patch -P2 -p1 -b .2-epoch-in-req
+%patch -P3 -p1
 
 %install
 install -m 0755 -d    %{buildroot}%{_fontbasedir} \
