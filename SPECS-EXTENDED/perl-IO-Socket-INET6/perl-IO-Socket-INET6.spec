@@ -1,22 +1,29 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %if ! (0%{?rhel})
 %{bcond_without perl_IO_Socket_INET6_enables_optional_test}
 %else
 %{bcond_with perl_IO_Socket_INET6_enables_optional_test}
 %endif
 
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Name:           perl-IO-Socket-INET6
-Version:        2.72
-Release:        19%{?dist}
+Version:        2.73
+Release:        10%{?dist}
 Summary:        Perl Object interface for AF_INET|AF_INET6 domain sockets
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/IO-Socket-INET6
-Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/IO-Socket-INET6-%{version}.tar.gz#/perl-IO-Socket-INET6-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/IO/IO-Socket-INET6-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Fix bad code in test. Original code hides error, related to BZ#1207174
+Patch0:         IO-Socket-INET6-2.72-fix_die_in_test.patch
+# Fix random test error in binding to socket BZ#1207174
+Patch1:         IO-Socket-INET6-2.72-bz1207174-fix_random_test_error.patch
 BuildArch:      noarch
 # Module Build
-BuildRequires:  perl-interpreter
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  make
 BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker)
 # Module Runtime
 BuildRequires:  perl(Carp)
@@ -38,13 +45,14 @@ BuildRequires:  perl(Test::Pod::Coverage) >= 1.04
 BuildRequires:  perl(Test::TrailingSpace)
 %endif
 # Runtime
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 Perl Object interface for AF_INET|AF_INET6 domain sockets.
 
 %prep
 %setup -q -n IO-Socket-INET6-%{version}
+%patch -P0 -p1
+%patch -P1 -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor
@@ -52,8 +60,8 @@ make %{?_smp_mflags}
 
 %install
 make pure_install DESTDIR=%{buildroot}
-find %{buildroot} -type f -name .packlist -exec rm -f {} ';'
-%{_fixperms} %{buildroot}
+find %{buildroot} -type f -name .packlist -delete
+%{_fixperms} -c %{buildroot}
 
 %check
 make test
@@ -65,8 +73,63 @@ make test
 %{_mandir}/man3/IO::Socket::INET6.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.72-19
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Apr 09 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.73-10
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.73-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.73-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.73-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Apr 18 2023 Michal Josef Špaček <mspacek@redhat.com> - 2.73-6
+- Update license to SPDX format
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.73-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.73-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2.73-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.73-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Dec 10 2021 Paul Howarth <paul@city-fan.org> - 2.73-1
+- Update to 2.73
+  - Deprecate in favour of IO::Socket::IP
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.72-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.72-24
+- Perl 5.34 rebuild
+
+* Tue May 18 2021 Michal Josef Špaček <mspacek@redhat.com> - 2.72-23
+- Patch for bad code in test
+- Patch for random test fail (BZ#1207174)
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.72-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jan 11 2021 Paul Howarth <paul@city-fan.org> - 2.72-21
+- Spec tidy-up
+  - Use author-independent source URL
+  - Specify all build dependencies
+  - Simplify find command using -delete
+  - Fix permissions verbosely
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.72-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.72-19
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.72-18
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
