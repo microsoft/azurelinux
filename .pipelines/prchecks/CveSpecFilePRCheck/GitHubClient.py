@@ -219,31 +219,7 @@ class GitHubClient:
         except requests.exceptions.RequestException as e:
             logger.error(f"Failed to get PR comments: {str(e)}")
             return []
-    
-    def delete_pr_comment(self, comment_id: int) -> bool:
-        """
-        Delete a comment on the PR.
-        
-        Args:
-            comment_id: ID of the comment to delete
-            
-        Returns:
-            True if successful, False otherwise
-        """
-        if not self.token or not self.repo_name:
-            logger.warning("Required GitHub params not available, skipping comment deletion")
-            return False
-            
-        url = f"{self.api_base_url}/repos/{self.repo_name}/issues/comments/{comment_id}"
-        
-        try:
-            response = requests.delete(url, headers=self.headers)
-            response.raise_for_status()
-            return True
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Failed to delete PR comment: {str(e)}")
-            return False
-    
+
     def update_pr_comment(self, comment_id: int, body: str) -> Dict[str, Any]:
         """
         Update an existing comment on the PR.
