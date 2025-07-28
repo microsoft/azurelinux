@@ -1,7 +1,7 @@
 Summary:        Linux Pluggable Authentication Modules
 Name:           pam
 Version:        1.5.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        BSD and GPLv2+
 URL:            https://github.com/linux-pam/linux-pam
 Source0:        https://github.com/linux-pam/linux-pam/releases/download/v%{version}/Linux-PAM-%{version}.tar.xz
@@ -84,7 +84,9 @@ EOF
 %files
 %defattr(-,root,root)
 %license COPYING
-%{_sysconfdir}/*
+%config(noreplace) %{_sysconfdir}/environment
+%dir %{_sysconfdir}/security
+%{_sysconfdir}/security/*
 /sbin/*
 %{_libdir}/security/*
 %{_libdir}/systemd/system/pam_namespace.service
@@ -102,6 +104,9 @@ EOF
 %{_docdir}/%{name}-%{version}/*
 
 %changelog
+* Thu Jul 24 2025 Chris Co <chrco@microsoft.com> - 1.5.1-9
+- Set /etc/environment as config(noreplace)
+
 * Wed Jul 02 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.5.1-8
 - Add patch for CVE-2025-6020
 
