@@ -1,0 +1,56 @@
+[any]
+
+[prod]
+
+[dev]
+
+# Just a module wrapper around the code in tslib, which does have a proper
+# license (0BSD) in its package.json:
+# tslib/modules
+modules = "<unknown version>"
+# A “dummy” module in the tests for tslib
+# tslib/test/validateModuleExportsMatchCommonJS
+validateModuleExportsMatchCommonJS = "<unknown version>"
+
+# Similarly, these are all just ES6 module (mjs) or CommonJS (cjs) module
+# wrappers in packages that do have proper license information:
+# node_modules_dev/@ungap/structured-clone/cjs
+# node_modules_dev/@typescript-eslint/utils/node_modules/minimatch/dist/cjs
+# node_modules_dev/@typescript-eslint/utils/node_modules/minimatch/dist/mjs
+# node_modules_dev/@typescript-eslint/parser/node_modules/minimatch/dist/cjs
+# node_modules_dev/@typescript-eslint/parser/node_modules/minimatch/dist/mjs
+# node_modules_dev/@typescript-eslint/type-utils/node_modules/minimatch/dist/cjs
+# node_modules_dev/@typescript-eslint/type-utils/node_modules/minimatch/dist/mjs
+# node_modules_dev/flatted/cjs
+cjs = "<unknown version>"
+mjs = "<unknown version>"
+
+# These are all “dummy” modules in the tests for resolve:
+# resolve/test/module_dir/zmodules/bbb
+bbb = "<unknown version>"
+# resolve/test/resolver/invalid_main
+"invalid main" = "<unknown version>"
+# resolve/test/resolver/incorrect_main
+incorrect_main = "<unknown version>"
+# resolve/test/resolver/dot_slash_main
+dot_slash_main = "<unknown version>"
+# resolve/test/resolver/dot_main
+dot_main = "<unknown version>"
+# resolve/test/resolver/baz
+baz = "<unknown version>"
+# resolve/test/resolver/browser_field
+browser_field = "<unknown version>"
+# resolve/test/resolver/symlinked/package
+package = "<unknown version>"
+
+# These are all part of nanoid, which is MIT-licensed.
+# nanoid/url-alphabet
+url-alphabet = "<unknown version>"
+# nanoid/non-secure
+non-secure = "<unknown version>"
+# nanoid/async
+async = "<unknown version>"
+
+# This is part of yargs, which is MIT-licensed.
+# mocha/node_modules/yargs/helpers
+helpers = "<unknown version>"
