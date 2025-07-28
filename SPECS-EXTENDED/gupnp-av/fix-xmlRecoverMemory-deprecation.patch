@@ -1,0 +1,63 @@
+From 9557768121d54fdcedabe7544863515d6a813354 Mon Sep 17 00:00:00 2001
+From: Jens Georg <mail@jensge.org>
+Date: Thu, 3 Aug 2023 23:52:43 +0200
+Subject: [PATCH] Remove deprecates xmlRecoverMemory
+
+Cannot currently remove xmlSchemaValidateStream as validateDoc fails to
+accept the XSD
+---
+ libgupnp-av/gupnp-didl-lite-parser.c    | 9 +++++++--
+ libgupnp-av/gupnp-feature-list-parser.c | 9 +++++++--
+ 2 files changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/libgupnp-av/gupnp-didl-lite-parser.c b/libgupnp-av/gupnp-didl-lite-parser.c
+index 3a5727f..948f934 100644
+--- a/libgupnp-av/gupnp-didl-lite-parser.c
++++ b/libgupnp-av/gupnp-didl-lite-parser.c
+@@ -230,12 +230,17 @@ gupnp_didl_lite_parser_parse_didl_recursive (GUPnPDIDLLiteParser *parser,
+         GUPnPAVXMLDoc *xml_doc = NULL;
+         gboolean       result;
+ 
+-        doc = xmlRecoverMemory (didl, strlen (didl));
++        doc = xmlReadMemory (didl,
++                             strlen (didl),
++                             NULL,
++                             NULL,
++                             XML_PARSE_NONET | XML_PARSE_RECOVER);
+         if (doc == NULL) {
+                 g_set_error (error,
+                              G_MARKUP_ERROR,
+                              G_MARKUP_ERROR_PARSE,
+-                             "Could not parse DIDL-Lite XML:\n%s", didl);
++                             "Could not parse DIDL-Lite XML:\n%s",
++                             didl);
+ 
+                 return FALSE;
+         }
+diff --git a/libgupnp-av/gupnp-feature-list-parser.c b/libgupnp-av/gupnp-feature-list-parser.c
+index 16208b5..2e7c15d 100644
+--- a/libgupnp-av/gupnp-feature-list-parser.c
++++ b/libgupnp-av/gupnp-feature-list-parser.c
+@@ -114,12 +114,17 @@ gupnp_feature_list_parser_parse_text
+         xmlNode      *element;
+         GList        *feature_list = NULL;
+ 
+-        doc = xmlRecoverMemory (text, strlen (text));
++        doc = xmlReadMemory (text,
++                             strlen (text),
++                             NULL,
++                             NULL,
++                             XML_PARSE_NONET | XML_PARSE_RECOVER);
+         if (doc == NULL) {
+                 g_set_error (error,
+                              G_MARKUP_ERROR,
+                              G_MARKUP_ERROR_PARSE,
+-                             "Could not parse FeatureList XML:\n%s", text);
++                             "Could not parse FeatureList XML:\n%s",
++                             text);
+ 
+                 return NULL;
+         }
+-- 
+GitLab
+
