@@ -2,15 +2,23 @@
 # Licensed under the MIT License.
 
 ARG BASE_IMAGE
+ARG TARGETARCH
 
 FROM $BASE_IMAGE
 
 @INCLUDE_MAIN_RUN_INSTRUCTION@
 
-RUN tdnf update -y && \
-   tdnf install -y azurelinux-repos-cloud-native && \
-   tdnf update -y && \
-   tdnf install -y oras && \
-   tdnf clean all
+# Install architecture-specific packages for AMD64
+RUN if [ "$TARGETARCH" = "amd64" ]; then \
+        echo "Installing AMD64-specific packages..."; \
+        tdnf install -y grub2-pc systemd-ukify; \
+    else \
+        echo "Skipping AMD64-specific packages for $TARGETARCH"; \
+    fi && \
+    tdnf update -y && \
+    tdnf install -y azurelinux-repos-cloud-native && \
+    tdnf update -y && \
+    tdnf install -y oras && \
+    tdnf clean all
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

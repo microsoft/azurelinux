@@ -6,16 +6,29 @@
 set -e
 
 PKG_VERSION=""
+SRC_TARBALL=""
 OUT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # parameters:
 #
-# --outFolder   : folder where to copy the new tarball(s)
-# --pkgVersion  : package version
+# --srcTarball    : src tarball file
+#                   this file contains the 'initial' source code of the component
+#                   and should be replaced with the new/modified src code
+# --outFolder     : folder where to copy the new tarball(s)
+# --pkgVersion    : package version
 #
 PARAMS=""
 while (( "$#" )); do
     case "$1" in
+        --srcTarball)
+        if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+            SRC_TARBALL=$2
+            shift 2
+        else
+            echo "Error: Argument for $1 is missing" >&2
+            exit 1
+        fi
+        ;;
         --outFolder)
         if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
             OUT_FOLDER=$2
@@ -45,8 +58,9 @@ while (( "$#" )); do
   esac
 done
 
-echo "--outFolder    -> $OUT_FOLDER"
-echo "--pkgVersion   -> $PKG_VERSION"
+echo "--srcTarball      -> $SRC_TARBALL"
+echo "--outFolder       -> $OUT_FOLDER"
+echo "--pkgVersion      -> $PKG_VERSION"
 
 if [ -z "$PKG_VERSION" ]; then
     echo "--pkgVersion parameter cannot be empty"
@@ -63,13 +77,23 @@ trap cleanup EXIT
 
 pushd $tmpdir > /dev/null
 
-NAME_VER="azure-linux-image-tools-$PKG_VERSION"
+PKG_NAME="azure-linux-image-tools"
+NAME_VER="$PKG_NAME-$PKG_VERSION"
 VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-vendor.tar.gz"
 
-echo "Downloading source tarball..."
-wget https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v$PKG_VERSION.tar.gz -O $NAME_VER.tar.gz
+# If source tarball is provided, use it; otherwise download it
+if [ -n "$SRC_TARBALL" ]; then
+    echo "Using provided source tarball: $SRC_TARBALL"
+    cp "$SRC_TARBALL" .
+    SOURCE_FILE=$(basename "$SRC_TARBALL")
+else
+    echo "Downloading source tarball..."
+    SOURCE_FILE="$NAME_VER.tar.gz"
+    wget https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v$PKG_VERSION.tar.gz -O "$SOURCE_FILE"
+fi
+
 echo "Unpacking source tarball..."
-tar -xf $NAME_VER.tar.gz
+tar -xf "$SOURCE_FILE"
 cd "$NAME_VER/toolkit/tools"
 
 echo "Generate vendored modules tarball"
@@ -84,4 +108,4 @@ tar  --sort=name \
      -cf "$VENDOR_TARBALL" vendor
 
 popd > /dev/null
-echo "azure-linux-image-tools vendored modules are available at $VENDOR_TARBALL"
+echo "$PKG_NAME vendored modules are available at $VENDOR_TARBALL"
