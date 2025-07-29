@@ -109,6 +109,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jul 22 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.17.3-4
+- Patch CVE-2025-4565
+
 * Tue Jul 16 2024 Archana Choudhary <archana1@microsoft.com> - 3.17.3-3
 - Add patch for CVE-2022-1941
 

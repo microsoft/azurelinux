@@ -2,7 +2,7 @@
 %define _confdir %{_sysconfdir}
 Summary:        The Apache HTTP Server
 Name:           httpd
-Version:        2.4.62
+Version:        2.4.65
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
@@ -316,7 +316,7 @@ fi
 %{_bindir}/*
 %{_mandir}/man1/*
 %license LICENSE
-%doc NOTICE
+%license NOTICE
 %exclude %{_bindir}/apxs
 %exclude %{_mandir}/man1/apxs.1*
 
@@ -345,6 +345,12 @@ fi
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %changelog
+* Mon Jul 28 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.4.65-1
+- Upgrade to 2.4.65 to fix CVE-2025-54090
+
+* Mon Jul 14 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 2.4.64-1
+- Upgrade to 2.4.64 to fix CVE-2025-49812, CVE-2025-53020
+
 * Thu Jul 25 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2.4.62-1
 - Upgrade to 2.4.62 to fix CVE-2024-40725
 

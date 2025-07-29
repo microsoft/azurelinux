@@ -1,7 +1,7 @@
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.10.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,9 @@ Patch5:         CVE-2025-24928.patch
 Patch6:         CVE-2025-27113.patch
 Patch7:         CVE-2025-32414.patch
 Patch8:         CVE-2025-32415.patch
+Patch9:         CVE-2025-6170.patch
+Patch10:        CVE-2025-6021.patch
+Patch11:        CVE-2025-49794_CVE-2025-49796.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-xml
 Provides:       %{name}-tools = %{version}-%{release}
@@ -87,6 +90,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Sun Jul 20 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.10.4-8
+- Patch CVE-2025-49794 and CVE-2025-49796
+- Also added patches for CVE-2025-6021 (PR#14310) and CVE-2025-6170 (PR#14228)
+
 * Mon May 05 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.10.4-7
 - Patch CVE-2025-32414 and CVE-2025-32415
 
