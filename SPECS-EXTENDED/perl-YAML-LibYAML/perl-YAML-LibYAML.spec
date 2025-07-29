@@ -6,7 +6,6 @@
 %endif
 
 Name:           perl-YAML-LibYAML
-Epoch:          1
 Version:        0.902.0
 Release:        2%{?dist}
 Summary:        Perl YAML Serialization using XS and libyaml
@@ -87,7 +86,7 @@ bound to Python and was later bound to Ruby.
 
 %package tests
 Summary:        Tests for %{name}
-Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Requires:       perl-Test-Harness
 
 %description tests
