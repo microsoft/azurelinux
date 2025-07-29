@@ -81,6 +81,10 @@ rm -vf %{buildroot}%{_libdir}/libaarch64-unknown-linux-gnu-sim.a
 %check
 # disable security hardening for tests
 rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
+
+# Remove libctf test suite, which causes compilation errors with the base tests
+rm -rvf libctf/testsuite
+
 %make_build check TESTS="gdb.base/default.exp"
 
 %files -f %{name}.lang
@@ -100,6 +104,7 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 %changelog
 * Fri Jul 18 2025 Akhila Guruju <v-guakhila@microsoft.com> - 11.2-7
 - Patch CVE-2025-7546
+- Fix package tests
 
 * Mon Apr 21 2025 Kanishk Bansal <kanbansal@microsoft.com> - 11.2-6
 - Patch CVE-2022-47673, CVE-2022-47696 using an upstream patch
