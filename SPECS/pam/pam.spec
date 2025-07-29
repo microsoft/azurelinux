@@ -1,7 +1,7 @@
 Summary:        Linux Pluggable Authentication Modules
 Name:           pam
 Version:        1.5.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD and GPLv2+
 URL:            https://github.com/linux-pam/linux-pam
 Source0:        https://github.com/linux-pam/linux-pam/releases/download/v%{version}/Linux-PAM-%{version}.tar.xz
@@ -16,6 +16,7 @@ Recommends:     cracklib-dicts
 
 Patch0:         CVE-2024-22365.patch
 Patch1:         CVE-2024-10041.patch
+Patch2:         CVE-2025-6020.patch
 
 %description
 The Linux PAM package contains Pluggable Authentication Modules used to
@@ -101,6 +102,9 @@ EOF
 %{_docdir}/%{name}-%{version}/*
 
 %changelog
+* Wed Jul 02 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.5.1-8
+- Add patch for CVE-2025-6020
+
 * Tue Dec 03 2024 Adit Jha <aditjha@microsoft.com> - 1.5.1-7
 - Add patch for CVE-2024-10041
 
