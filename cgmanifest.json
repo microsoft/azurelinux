@@ -2206,6 +2206,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cqlsh",
+          "version": "6.1.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/cqlsh/cqlsh-6.1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cracklib",
           "version": "2.9.11",
           "downloadUrl": "https://github.com/cracklib/cracklib/releases/download/v2.9.11/cracklib-2.9.11.tar.gz"
@@ -22372,16 +22382,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "cqlsh",
-          "version": "6.1.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/cqlsh/cqlsh-6.1.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-cryptography",
           "version": "42.0.5",
           "downloadUrl": "https://pypi.io/packages/source/c/cryptography/cryptography-42.0.5.tar.gz"
@@ -23225,6 +23225,16 @@
           "name": "python-jsonschema",
           "version": "2.6.0",
           "downloadUrl": "https://pypi.python.org/packages/source/j/jsonschema/jsonschema-2.6.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-junit_xml",
+          "version": "1.9^20200222gitba89b41",
+          "downloadUrl": "https://github.com/kyrus/python-junit-xml/archive/ba89b41638df8ad2011c2818672f208a91a5a4a0/python-junit-xml-ba89b41638df8ad2011c2818672f208a91a5a4a0.tar.gz"
         }
       }
     },
