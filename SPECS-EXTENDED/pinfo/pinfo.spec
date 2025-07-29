@@ -6,7 +6,7 @@ License: GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:    https://github.com/baszoetekouw/pinfo
-Source: %{url}/archive/refs/tags/v%{version}.tar.gz#%{name}-%{version}.tar.gz
+Source: %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 Patch1: pinfo-0.6.9-infopath.patch
 Patch2: pinfo-0.6.9-xdg.patch
