@@ -66,14 +66,14 @@ storage:
       mountPoint:
         idType: part-label
         path: /boot/efi
-        options: umask=0077,nodev
+        options: umask=0077,noexec,nodev
 
     - deviceId: boot-a
       type: ext4
       mountPoint:
         idType: uuid
         path: /boot
-        options: nodev
+        options: noexec,nodev
 
     - deviceId: root-a
       type: ext4
@@ -92,19 +92,19 @@ storage:
       mountPoint:
         idType: part-label
         path: /var/lib/trident
-        options: nodev
+        options: noexec,nodev
 
     - deviceId: home
       type: ext4
       mountPoint:
         idType: part-label
         path: /home
-        options: nodev
+        options: noexec,nodev
 
 os:
   bootloader:
     resetType: hard-reset
-  hostname: linuxguard-base
+  hostname: azure-linux-guard
 
   selinux:
     mode: enforcing
@@ -119,40 +119,30 @@ os:
       - rd.luks=0
       - rd.hostonly=0
       - ipe.enforce=0
-      - systemd.journald.forward_to_console=1
 
   packages:
     remove:
-      - dracut-hostonly
-      - grub2-efi-binary
-      - kernel
-
+      - dracut-hostonly # Not used for UKI images
+      - grub2-efi-binary # Replaced by systemd-boot
+      - kernel # Replaced by kernel-ipe
     install:
-      - kernel-ipe
       - openssh-server
-      - device-mapper
-      # selinux
-      - policycoreutils-python-utils
-      - selinux-policy
-      - selinux-policy-modules
-      - selinux-policy-ci
-      - checkpolicy  
-      - secilc 
-      - setools-console
-      - veritysetup
-      - vim
-      - WALinuxAgent
-      - containerd2
-      - ca-certificates
-      - wget
       - syslog
-      - jq
-      - keyutils
-      - cri-tools
+      - WALinuxAgent
+      # OS
+      - device-mapper
+      - kernel-ipe
+      # servicing
+      # - trident
+      # - trident-service
+      - veritysetup
+      # OCI
       - cni
-      - tardev-snapshotter
-      - erofs-utils
-      - netplan
+      - containerd2
+      - cri-tools
+      # - erofs-utils
+      # - notation
+      # - tardev-snapshotter
       # UKI
       - systemd-boot
       # hyperv
@@ -160,31 +150,25 @@ os:
       - hyperv-daemons
       # cloud-init
       - cloud-init
+      # selinux
+      - checkpolicy
+      - libselinux
+      - policycoreutils-python-utils
+      - secilc
+      - selinux-policy
+      - selinux-policy-ci
+      - selinux-policy-modules
+      - setools-console
 
   additionalFiles:
-    - source: files/linuxguard/no-password-prompt-on-sudo
-      destination: /etc/sudoers.d/no-password-prompt-on-sudo
-      permissions: "440"
     # SELinux customizations
     - source: files/linuxguard/selinux-ci-uki.semanage
       destination: /etc/selinux/targeted/selinux-ci.semanage
     - source: files/linuxguard/99-dhcp-eth0.network
       destination: /etc/systemd/network/99-dhcp-eth0.network
-    # Verity signature verification support
-    - source: files/linuxguard/verity-signature/90mountbootpartition/module-setup.sh
-      destination: /usr/lib/dracut/modules.d/90mountbootpartition/module-setup.sh
-      permissions: "755"
-    - source: files/linuxguard/verity-signature/90mountbootpartition/mountbootpartition-generator.sh
-      destination: /usr/lib/dracut/modules.d/90mountbootpartition/mountbootpartition-generator.sh
-      permissions: "755"
-    - source: files/linuxguard/verity-signature/90mountbootpartition/mountbootpartition-genrules.sh
-      destination: /usr/lib/dracut/modules.d/90mountbootpartition/mountbootpartition-genrules.sh
-      permissions: "755"
-    - source: files/linuxguard/verity-signature/90mountbootpartition/mountbootpartition.sh
-      destination: /usr/lib/dracut/modules.d/90mountbootpartition/mountbootpartition.sh
-      permissions: "755"
-    - source: files/linuxguard/verity-signature/10-mountbootpartition.conf
-      destination: /etc/dracut.conf.d/10-mountbootpartition.conf
+    # Cloud-init configuration
+    - source: files/linuxguard/cloud.cfg
+      destination: /etc/cloud/cloud.cfg
       permissions: "644"
 
   services:
@@ -203,6 +187,7 @@ scripts:
     - path: scripts/linuxguard/selinux-ci-config.sh
     - path: scripts/linuxguard/cleanup-machineid.sh
     - path: scripts/linuxguard/prepare_trusted_cni_plugins.sh
+    - path: scripts/linuxguard/tmp-no-exec.sh
 
     - path: scripts/set_os_release_variant_entries.sh
       arguments:
@@ -210,11 +195,6 @@ scripts:
       - linuxguard
       - --variant
       - Linux Guard Image
-
-previewFeatures:
-  - uki
-  - output-artifacts
-
 output:
   artifacts:
     items:
@@ -223,3 +203,7 @@ output:
     path: ./output
   image:
     format: vhd
+
+previewFeatures:
+  - output-artifacts
+  - uki

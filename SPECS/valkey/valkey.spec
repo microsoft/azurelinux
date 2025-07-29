@@ -1,7 +1,7 @@
 Summary:        advanced key-value store
 Name:           valkey
-Version:        8.0.3
-Release:        3%{?dist}
+Version:        8.0.4
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -86,6 +86,9 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/valkey.conf
 
 %changelog
+* Tue Jul 22 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 8.0.4-1
+- Upgrade to 8.0.4 to fix CVE-2025-32023, CVE-2025-48367
+
 * Wed Jun 18 2025 Sumit Jena <v-sumitjena@microsoft.com> - 8.0.3-3
 - Fix CVE-2025-27151
 
