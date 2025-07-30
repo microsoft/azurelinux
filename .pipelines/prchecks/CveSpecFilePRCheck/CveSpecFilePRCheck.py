@@ -11,6 +11,86 @@ This module integrates anti-pattern detection with Azure OpenAI analysis to
 provide a comprehensive check of spec files in pull requests. It will fail
 the pipeline explicitly when critical issues are detected, with detailed
 output explaining the problems.
+
+Functions Overview:
+------------------
+
+
+
+gather_diff():
+    Extracts git diff between source and target commits for a PR using Azure DevOps environment variables.
+    Handles multiple fallback strategies for diff generation and provides detailed commit context.
+
+    * Git Commit Context:
+        - Source Commit: The latest commit on the feature branch being proposed for merge
+        - Target Commit: The latest commit on the destination branch (e.g., main) that the PR targets
+
+get_changed_spec_files(diff_text):
+    Parses git diff output to identify .spec files that have been modified in the PR.
+    Returns list of spec file paths for focused analysis.
+
+get_spec_file_content(spec_path):
+    Reads and returns the complete content of a spec file from the filesystem.
+    Handles file access errors gracefully with logging.
+
+get_package_directory_files(spec_path):
+    Lists all files in the directory containing a spec file (package directory).
+    Used to identify patch files and other package artifacts for validation.
+
+analyze_spec_files(diff_text, changed_spec_files):
+    Main analysis orchestrator that combines anti-pattern detection with AI analysis.
+    Returns detected anti-patterns, AI analysis results, and fatal error status.
+
+_initialize_openai_client():
+    Creates and configures Azure OpenAI client using environment variables.
+    Sets up model configuration for GPT-based analysis.
+
+call_openai(openai_client, diff_text, changed_spec_files):
+    Calls Azure OpenAI for comprehensive spec file analysis including:
+    - General spec analysis
+    - Patch verification 
+    - CVE validation
+    Uses PromptTemplates for structured analysis.
+
+get_severity_exit_code(severity):
+    Maps anti-pattern severity levels to appropriate pipeline exit codes.
+    Supports fine-grained exit code reporting based on issue severity.
+
+update_github_status(severity, anti_patterns, ai_analysis, analyzer, post_comments, use_checks_api):
+    Updates GitHub PR with analysis results via comments and/or Checks API.
+    Integrates with GitHubClient for posting structured feedback on PRs.
+
+_derive_github_context():
+    Extracts GitHub repository and PR information from Azure DevOps environment variables.
+    Handles multiple environment variable sources for GitHub integration.
+
+main():
+    Entry point that orchestrates the entire analysis pipeline:
+    1. Gathers git diff
+    2. Identifies changed spec files
+    3. Runs anti-pattern detection and AI analysis
+    4. Generates reports and saves results
+    5. Updates GitHub status
+    6. Returns appropriate exit codes
+
+Exit Codes:
+----------
+0 (EXIT_SUCCESS): No issues or warnings only
+1 (EXIT_CRITICAL): Critical issues detected
+2 (EXIT_ERROR): Error-level issues detected  
+3 (EXIT_WARNING): Warning-level issues detected
+10 (EXIT_FATAL): Fatal errors during execution
+
+Environment Variables Required:
+------------------------------
+- SYSTEM_PULLREQUEST_SOURCECOMMITID: Source commit for PR diff
+- SYSTEM_PULLREQUEST_TARGETCOMMITID: Target commit for PR diff  
+- BUILD_SOURCESDIRECTORY: Repository root directory
+- AZURE_OPENAI_ENDPOINT: Azure OpenAI API endpoint
+- AZURE_OPENAI_DEPLOYMENT_NAME: OpenAI model deployment name
+- GITHUB_TOKEN or SYSTEM_ACCESSTOKEN: For GitHub integration
+- GITHUB_REPOSITORY: Repository in owner/repo format
+- GITHUB_PR_NUMBER: Pull request number
 """
 
 import os
@@ -48,6 +128,20 @@ def gather_diff() -> str:
     """
     Extracts the diff between source and target commits for a PR.
     Uses environment variables set by Azure DevOps pipeline.
+    
+    Source Commit (SYSTEM_PULLREQUEST_SOURCECOMMITID):
+        What it is: The latest commit on the feature branch that contains the changes being proposed
+        Example: If you're working on a feature branch called fix-cve-2023-1234 and you've made 
+                several commits, the source commit is the HEAD (most recent commit) of that branch
+        Purpose: This represents the "new" state - what you want to merge into the target
+    
+    Target Commit (SYSTEM_PULLREQUEST_TARGETCOMMITID):
+        What it is: The latest commit on the destination branch that the PR wants to merge into
+        Example: The HEAD commit of the main branch at the time the PR was created or last updated
+        Purpose: This represents the "current" state - what exists before your changes
+    
+    The diff generated shows: "What changes do I need to apply to the target commit to get to the source commit?"
+    This allows the pipeline to analyze only the delta/changes rather than the entire codebase.
     """
     logger.info("Gathering git diff between source and target commits...")
     

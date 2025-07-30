@@ -9,6 +9,39 @@ Detects anti-patterns in spec files and related artifacts.
 
 This module provides systematic detection of common problems in spec files,
 with configurable severity levels and detailed reporting.
+
+Functions:
+----------
+detect_all():
+    Main entry point that runs all anti-pattern detection methods on a spec file.
+    Combines results from patch file, CVE, and changelog issue detection.
+
+detect_patch_file_issues():
+    Detects patch file related problems:
+    - Missing patch files referenced in spec but not found in directory
+    - Unused patch files present in directory but not referenced in spec  
+    - CVE patch naming mismatches (CVE-named patches without corresponding CVE documentation)
+
+detect_cve_issues():
+    Detects CVE reference related problems:
+    - Future-dated CVEs (CVE years beyond current expected range)
+    - Missing CVE documentation in changelog (CVEs referenced in spec but not in changelog)
+    - Validates CVE format and cross-references with changelog entries
+
+detect_changelog_issues():
+    Detects changelog format and content problems:
+    - Missing %changelog section entirely
+    - Empty changelog sections with no entries
+    - Invalid changelog entry format (non-standard RPM changelog format)
+    - Validates standard format: * Day Month DD YYYY User <email> - Version
+
+Severity Levels:
+---------------
+- CRITICAL: Must be fixed before merge
+- ERROR: Should be fixed before merge  
+- WARNING: Review recommended but doesn't block merge
+- INFO: Informational only
+
 """
 
 import os
