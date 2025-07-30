@@ -65,13 +65,14 @@ storage:
 os:
   bootloader:
     resetType: hard-reset
-  hostname: azure-linux-guard
+  hostname: azure-linux-os-guard
 
   selinux:
-    mode: enforcing
+    mode: permissive
 
   uki:
     kernels: auto
+  
   kernelCommandLine:
     extraCommandLine:
       - console=tty0
