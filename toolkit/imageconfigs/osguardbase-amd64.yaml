@@ -121,7 +121,7 @@ os:
       - policycoreutils-python-utils
       - secilc
       - selinux-policy
-      - selinux-policy-ci
+      # - selinux-policy-ci
       - selinux-policy-modules
       - setools-console
       # === test-dev packages ===
@@ -200,9 +200,6 @@ os:
   - name: azuresu
     secondaryGroups:
     - sudo
-
-previewFeatures:
-  - uki
 
 scripts:
   postCustomization:
