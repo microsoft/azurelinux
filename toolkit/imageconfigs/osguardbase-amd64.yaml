@@ -191,6 +191,19 @@ os:
       - systemd-networkd
       - systemd-resolved
 
+  modules:
+  # Explicitly enable iptable_nat for prometheus
+  - name: iptable_nat
+    loadMode: always
+
+  users:
+  - name: azuresu
+    secondaryGroups:
+    - sudo
+
+previewFeatures:
+  - uki
+
 scripts:
   postCustomization:
     - path: scripts/linuxguard/performance-tuning.sh
