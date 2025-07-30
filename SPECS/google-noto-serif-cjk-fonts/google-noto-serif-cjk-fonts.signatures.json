@@ -1,3 +1,7 @@
 {
- "Signatures": {}
+ "Signatures": {
+    "65-google-noto-serif-cjk-fonts.conf": "157ba32fc9f9b074057e8ba271f94cdb5ab4a4f22de54d742216e8b1716cfbba",
+    "genfontconf.py": "127ef5c0fb1ae8d0598ac210b6463762bf5e84ae7ad4a6bce1d6824b4f39a44f",
+    "google-noto-serif-cjk-fonts-2.003.zip": "c76ed8fd491ce98182ec6430238b90a1eabea8857c7db64e9037efa38e198a31"
+ }
 }
