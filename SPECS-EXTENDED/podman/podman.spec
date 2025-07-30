@@ -82,7 +82,6 @@ BuildRequires: systemd-devel
 Requires: catatonit
 Requires: conmon >= 2:2.1.7-2
 Requires: libcontainers-common
-Obsoletes: %{name}-quadlet <= 5:4.4.0-1
 Provides: %{name}-quadlet = %{epoch}:%{version}-%{release}
 
 %description
