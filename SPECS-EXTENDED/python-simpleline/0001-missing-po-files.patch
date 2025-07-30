@@ -1,0 +1,1934 @@
+From 6882414e216b43d140d1b451d66aa2aeae09e92b Mon Sep 17 00:00:00 2001
+From: akhila-guruju <v-guakhila@microsoft.com>
+Date: Wed, 30 Jul 2025 09:00:11 +0000
+Subject: [PATCH] missing po files
+
+---
+ po/ca.po    | 93 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/cs.po    | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/da.po    | 93 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/en_GB.po | 89 +++++++++++++++++++++++++++++++++++++++++++++++++
+ po/es.po    | 93 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/fi.po    | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/fr.po    | 93 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/ja.po    | 93 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/ko.po    | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/lt.po    | 95 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/pl.po    | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/pt_BR.po | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/ro.po    | 93 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/si.po    | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/sk.po    | 93 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/sv.po    | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/tr.po    | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/uk.po    | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ po/zh_CN.po | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 19 files changed, 1771 insertions(+)
+ create mode 100644 po/ca.po
+ create mode 100644 po/cs.po
+ create mode 100644 po/da.po
+ create mode 100644 po/en_GB.po
+ create mode 100644 po/es.po
+ create mode 100644 po/fi.po
+ create mode 100644 po/fr.po
+ create mode 100644 po/ja.po
+ create mode 100644 po/ko.po
+ create mode 100644 po/lt.po
+ create mode 100644 po/pl.po
+ create mode 100644 po/pt_BR.po
+ create mode 100644 po/ro.po
+ create mode 100644 po/si.po
+ create mode 100644 po/sk.po
+ create mode 100644 po/sv.po
+ create mode 100644 po/tr.po
+ create mode 100644 po/uk.po
+ create mode 100644 po/zh_CN.po
+
+diff --git a/po/ca.po b/po/ca.po
+new file mode 100644
+index 0000000..3a6f2d1
+--- /dev/null
++++ b/po/ca.po
+@@ -0,0 +1,93 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
++# Jiri Konecny <jkonecny@redhat.com>, 2016. #zanata
++# Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>, 2017. #zanata
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2017-03-17 03:47+0000\n"
++"Last-Translator: Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>\n"
++"Language-Team: Catalan\n"
++"Language: ca\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=2; plural=(n != 1)\n"
++"X-Generator: Zanata 4.6.2\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "Error"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "Premeu %s per sortir"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "Contrasenya"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "Introduïu la vostra contrasenya"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "Contrasenya: "
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "Pregunta"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "Responeu '%(yes)s' o '%(no)s'"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "Ajuda"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "L'ajuda no està disponible."
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "Premeu %s per tornar"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr "Feu la vostra selecció de les següents opcions"
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "RETORN"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "per sortir"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "per continuar"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "per refrescar"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "per l'ajuda"
+diff --git a/po/cs.po b/po/cs.po
+new file mode 100644
+index 0000000..7722dda
+--- /dev/null
++++ b/po/cs.po
+@@ -0,0 +1,94 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# Jiri Konecny <jkonecny@redhat.com>, 2016. #zanata
++# Jiri Konecny <jkonecny@redhat.com>, 2017. #zanata
++# Jiří Konečný <jkonecny@redhat.com>, 2020.
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2020-06-15 13:10+0000\n"
++"Last-Translator: Jiří Konečný <jkonecny@redhat.com>\n"
++"Language-Team: Czech <https://translate.fedoraproject.org/projects/python-"
++"simpleline/master/cs/>\n"
++"Language: cs\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
++"X-Generator: Weblate 4.0.4\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "Chyba"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "Pro ukončení stiskněte klávesu %s"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "Heslo"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "Zadejte heslo"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "Heslo: "
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "Otázka"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "Prosím odpovězte '%(yes)s' nebo '%(no)s'"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "Nápověda"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "Nápověda není k dispozici."
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "Pro návrat stiskněte klávesu %s"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr "Vyberte prosím z výše uvedených možností"
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "ENTER"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "pro ukončení"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "pro pokračování"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "pro obnovení"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "pro nápovědu"
+diff --git a/po/da.po b/po/da.po
+new file mode 100644
+index 0000000..27e045a
+--- /dev/null
++++ b/po/da.po
+@@ -0,0 +1,93 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# scootergrisen <scootergrisen@gmail.com>, 2018. #zanata
++# Jiří Konečný <jkonecny@redhat.com>, 2020.
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2020-07-21 09:29+0000\n"
++"Last-Translator: Jiří Konečný <jkonecny@redhat.com>\n"
++"Language-Team: Danish <https://translate.fedoraproject.org/projects/python-"
++"simpleline/master/da/>\n"
++"Language: da\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=2; plural=n != 1;\n"
++"X-Generator: Weblate 4.1.1\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "Fejl"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "Tryk på %s for at afslutte"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "Adgangskode"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "Indtast din adgangsfrase"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "Adgangsfrase: "
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "Spørgsmål"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "Svar venligst '%(yes)s' eller '%(no)s'"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "Hjælp"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "Hjælpen er ikke tilgængelig."
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "Tryk på %s for at gå tilbage"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr "Vælg venligst ovenfor"
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "ENTER"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "for at afslutte"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "for at fortsætte"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "for at genopfriske"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "for hjælp"
+diff --git a/po/en_GB.po b/po/en_GB.po
+new file mode 100644
+index 0000000..3566217
+--- /dev/null
++++ b/po/en_GB.po
+@@ -0,0 +1,89 @@
++# Jiri Konecny <jkonecny@redhat.com>, 2016. #zanata
++# Jiri Konecny <jkonecny@redhat.com>, 2017. #zanata
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2017-07-26 09:50+0000\n"
++"Last-Translator: Jiri Konecny <jkonecny@redhat.com>\n"
++"Language-Team: English (United Kingdom)\n"
++"Language: en_GB\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=2; plural=(n != 1)\n"
++"X-Generator: Zanata 4.6.2\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "Error"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "Press %s to exit"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "Password"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "Enter your passphrase"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "Passphrase: "
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "Question"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "Please respond '%(yes)s' or '%(no)s'"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "Help"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "The help is not available."
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "Press %s to return"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr ""
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "ENTER"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "to quit"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "to continue"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "to refresh"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "to help"
+diff --git a/po/es.po b/po/es.po
+new file mode 100644
+index 0000000..b056880
+--- /dev/null
++++ b/po/es.po
+@@ -0,0 +1,93 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
++# Jiri Konecny <jkonecny@redhat.com>, 2016. #zanata
++# Máximo Castañeda Riloba <mcrcctm@gmail.com>, 2017. #zanata
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2017-09-12 11:33+0000\n"
++"Last-Translator: Máximo Castañeda Riloba <mcrcctm@gmail.com>\n"
++"Language-Team: Spanish\n"
++"Language: es\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=2; plural=(n != 1)\n"
++"X-Generator: Zanata 4.6.2\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "Error"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "Pulse %s para salir"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "Contraseña"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "Introduzca su contraseña"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "Contraseña: "
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "Pregunta"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "Responda «%(yes)s» o «%(no)s»"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "Ayuda"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "La ayuda no está disponible."
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "Pulse %s para volver"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr "Seleccione una opción de las anteriores"
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "INTRO"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "para salir"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "para contnuar"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "para actualizar"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "para ayuda"
+diff --git a/po/fi.po b/po/fi.po
+new file mode 100644
+index 0000000..c811554
+--- /dev/null
++++ b/po/fi.po
+@@ -0,0 +1,92 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# Jan Kuparinen <copper_fin@hotmail.com>, 2021.
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2021-04-26 17:02+0000\n"
++"Last-Translator: Jan Kuparinen <copper_fin@hotmail.com>\n"
++"Language-Team: Finnish <https://translate.fedoraproject.org/projects/"
++"python-simpleline/master/fi/>\n"
++"Language: fi\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=2; plural=n != 1;\n"
++"X-Generator: Weblate 4.6\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "Virhe"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "Paina %s lopettaaksesi"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "Salasana"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "Anna tunnuslauseesi"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "Tunnuslause: "
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "Kysymys"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "Ole hyvä ja vastaa'%(yes)s' vai '%(no)s'"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "Ohjeet"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "Ohjeita ei ole saatavilla."
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "Paina %s palataksesi takaisin"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr "Tee valinta yllä olevista"
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "ENTER"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "lopettaaksesi"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "jatkaaksesi"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "päivittääksesi"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "ohjeisiin"
+diff --git a/po/fr.po b/po/fr.po
+new file mode 100644
+index 0000000..abd2c8e
+--- /dev/null
++++ b/po/fr.po
+@@ -0,0 +1,93 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# Jean-Baptiste Holcroft <jean-baptiste@holcroft.fr>, 2019. #zanata
++# Julien Humbert <julroy67@gmail.com>, 2020.
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2020-06-22 06:40+0000\n"
++"Last-Translator: Julien Humbert <julroy67@gmail.com>\n"
++"Language-Team: French <https://translate.fedoraproject.org/projects/python-"
++"simpleline/master/fr/>\n"
++"Language: fr\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=2; plural=n > 1;\n"
++"X-Generator: Weblate 4.1.1\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "Erreur"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "Appuyez sur %s pour poursuivre"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "Mot de passe"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "Saisissez votre phrase de passe"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "Phrase de passe : "
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "Question"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "Veuillez répondre par « %(yes)s » ou par « %(no)s »"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "Aide"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "L’aide n’est pas disponible."
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "Appuyez sur « %s » pour revenir"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr "Faites votre choix parmi ce qui précède"
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "Entrée"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "pour quitter"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "pour continuer"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "pour rafraîchir"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "pour l’aide (help)"
+diff --git a/po/ja.po b/po/ja.po
+new file mode 100644
+index 0000000..db4dd59
+--- /dev/null
++++ b/po/ja.po
+@@ -0,0 +1,93 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# Ludek Janda <ljanda@redhat.com>, 2020.
++# Jiří Konečný <jkonecny@redhat.com>, 2020.
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2020-07-21 09:29+0000\n"
++"Last-Translator: Jiří Konečný <jkonecny@redhat.com>\n"
++"Language-Team: Japanese <https://translate.fedoraproject.org/projects/python-"
++"simpleline/master/ja/>\n"
++"Language: ja\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=1; plural=0;\n"
++"X-Generator: Weblate 4.1.1\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "エラー"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "%s を押して終了します"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "パスワード"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "パスフレーズを入力してください"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "パスフレーズ: "
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "質問"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "'%(yes)s' または '%(no)s'"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "ヘルプ"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "利用できるヘルプはありません。"
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "%sを押して戻る"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr "上記の中からお選びください"
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "ENTER"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "終了"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "続行"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "最新の状態に更新"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "ヘルプ"
+diff --git a/po/ko.po b/po/ko.po
+new file mode 100644
+index 0000000..30ad27e
+--- /dev/null
++++ b/po/ko.po
+@@ -0,0 +1,94 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# Ludek Janda <ljanda@redhat.com>, 2020.
++# Jiří Konečný <jkonecny@redhat.com>, 2020.
++# simmon <simmon@nplob.com>, 2021.
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2021-04-02 09:02+0000\n"
++"Last-Translator: simmon <simmon@nplob.com>\n"
++"Language-Team: Korean <https://translate.fedoraproject.org/projects/"
++"python-simpleline/master/ko/>\n"
++"Language: ko\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=1; plural=0;\n"
++"X-Generator: Weblate 4.5.3\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "오류"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "%s을 눌러 종료하십시오"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "암호"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "암호를 입력하십시오"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "암호: "
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "질문"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "'%(yes)s' 또는 '%(no)s'로 답하십시오"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "도움말"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "도움말을 사용할 수 없습니다."
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "%s을 누르십시오"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr "위에서 선택하십시오"
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "ENTER"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "종료"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "계속 진행"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "새로 고침"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "도움말"
+diff --git a/po/lt.po b/po/lt.po
+new file mode 100644
+index 0000000..a32e952
+--- /dev/null
++++ b/po/lt.po
+@@ -0,0 +1,95 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
++# Jiri Konecny <jkonecny@redhat.com>, 2016. #zanata
++# Carlos Munoz <camunoz@redhat.com>, 2019. #zanata
++# Jiri Konecny <jkonecny@redhat.com>, 2019. #zanata
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2019-09-20 05:07+0000\n"
++"Last-Translator: Carlos Munoz <camunoz@redhat.com>\n"
++"Language-Team: Lithuanian\n"
++"Language: lt\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
++"%100<10 || n%100>=20) ? 1 : 2)\n"
++"X-Generator: Zanata 4.6.2\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "Error"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr ""
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr ""
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr ""
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr ""
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr ""
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr ""
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr ""
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr ""
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr ""
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr ""
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr ""
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr ""
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr ""
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr ""
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr ""
+diff --git a/po/pl.po b/po/pl.po
+new file mode 100644
+index 0000000..d9a6766
+--- /dev/null
++++ b/po/pl.po
+@@ -0,0 +1,94 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
++# Jiri Konecny <jkonecny@redhat.com>, 2016. #zanata
++# Piotr Drąg <piotrdrag@gmail.com>, 2017. #zanata
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2017-02-08 07:23+0000\n"
++"Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
++"Language-Team: Polish\n"
++"Language: pl\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
++"|| n%100>=20) ? 1 : 2)\n"
++"X-Generator: Zanata 4.6.2\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "Błąd"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "Naciśnięcie klawisza %s zakończy"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "Hasło"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "Proszę podać hasło"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "Hasło: "
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "Pytanie"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "Proszę odpowiedzieć „%(yes)s” lub „%(no)s”"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "Pomoc"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "Pomoc jest niedostępna."
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "Naciśnięcie klawisza %s powróci"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr "Proszę wybrać jedno z powyższych"
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "Enter"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "aby zakończyć"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "aby kontynuować"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "aby odświeżyć"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "aby wyświetlić pomoc"
+diff --git a/po/pt_BR.po b/po/pt_BR.po
+new file mode 100644
+index 0000000..e43b099
+--- /dev/null
++++ b/po/pt_BR.po
+@@ -0,0 +1,96 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# Jiri Konecny <jkonecny@redhat.com>, 2016. #zanata
++# Jiri Konecny <jkonecny@redhat.com>, 2019. #zanata
++# Maria Betania Honorio <betanialinux@gmail.com>, 2020.
++# Jiří Konečný <jkonecny@redhat.com>, 2020.
++# Caio Fontes de Castro <caiofcastro@usp.br>, 2020.
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2020-08-07 04:29+0000\n"
++"Last-Translator: Caio Fontes de Castro <caiofcastro@usp.br>\n"
++"Language-Team: Portuguese (Brazil) <https://translate.fedoraproject.org/"
++"projects/python-simpleline/master/pt_BR/>\n"
++"Language: pt_BR\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=2; plural=(n != 1);\n"
++"X-Generator: Weblate 4.1.1\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "Erro"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "Pressione %s para sair"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "Senha"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "Digite sua frase-senha"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "Frase-senha: "
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "Pergunta"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "Responda '%(yes)s' ou '%(no)s'"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "Ajuda"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "A ajuda não esta disponível."
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "Pressione %s para retornar"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr "Por favor, selecione acima"
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "ENTER"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "para sair"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "para continuar"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "para atualizar"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "para ajuda"
+diff --git a/po/ro.po b/po/ro.po
+new file mode 100644
+index 0000000..d0ca664
+--- /dev/null
++++ b/po/ro.po
+@@ -0,0 +1,93 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# Vlad <milovlad@outlook.com>, 2020.
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2020-12-25 19:36+0000\n"
++"Last-Translator: Vlad <milovlad@outlook.com>\n"
++"Language-Team: Romanian <https://translate.fedoraproject.org/projects/python-"
++"simpleline/master/ro/>\n"
++"Language: ro\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
++"20)) ? 1 : 2;\n"
++"X-Generator: Weblate 4.3.2\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "Eroare"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "Apasă %s pentru ieșire"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "Parolă"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "Introduceți fraza secretă"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "Fraza secretă: "
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "Întrebare"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "Te rog să răspunzi cu '%(yes)s' sau '%(no)s'"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "Ajutor"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "Pagina de ajutor nu este disponibilă."
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "Apasă %s pentru întoarcere"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr "Te rog să faci o selecție din cele prezentate mai sus"
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "ENTER"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "pentru părăsire"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "pentru continuare"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "pentru reîmprospătare"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "pentru ajutor"
+diff --git a/po/si.po b/po/si.po
+new file mode 100644
+index 0000000..bff906f
+--- /dev/null
++++ b/po/si.po
+@@ -0,0 +1,92 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# Hela Basa <r45xveza@pm.me>, 2021.
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2021-08-19 07:04+0000\n"
++"Last-Translator: Hela Basa <r45xveza@pm.me>\n"
++"Language-Team: Sinhala <https://translate.fedoraproject.org/projects/"
++"python-simpleline/master/si/>\n"
++"Language: si\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=2; plural=n > 1;\n"
++"X-Generator: Weblate 4.7.2\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "දෝෂය"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr ""
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "මුරපදය"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr ""
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr ""
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr ""
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr ""
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr ""
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr ""
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr ""
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr ""
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr ""
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr ""
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr ""
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr ""
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr ""
+diff --git a/po/sk.po b/po/sk.po
+new file mode 100644
+index 0000000..cc6086b
+--- /dev/null
++++ b/po/sk.po
+@@ -0,0 +1,93 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
++# Jiri Konecny <jkonecny@redhat.com>, 2016. #zanata
++# feonsu <feonsu@gmail.com>, 2017. #zanata
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2017-09-20 05:42+0000\n"
++"Last-Translator: feonsu <feonsu@gmail.com>\n"
++"Language-Team: Slovak\n"
++"Language: sk\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
++"X-Generator: Zanata 4.6.2\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "Chyba"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "Stlačte %s na ukončenie"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "Heslo"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "Zadajte heslo"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "Heslo:"
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "Otázka"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "Prosím odpovedzte '%(yes)s' alebo '%(no)s'"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "Pomocník"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "Pomocník nie je k dispozícii."
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "Stlačte %s pre návrat"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr "Prosím vyberte z vyššie uvedených možností"
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "ENTER"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "na ukončenie"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "na pokračovanie"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "na obnovenie"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "pomocník"
+diff --git a/po/sv.po b/po/sv.po
+new file mode 100644
+index 0000000..6f4590c
+--- /dev/null
++++ b/po/sv.po
+@@ -0,0 +1,94 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# Jiri Konecny <jkonecny@redhat.com>, 2016. #zanata
++# Jiri Konecny <jkonecny@redhat.com>, 2019. #zanata
++# Göran Uddeborg <goeran@uddeborg.se>, 2020.
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2020-09-03 13:29+0000\n"
++"Last-Translator: Göran Uddeborg <goeran@uddeborg.se>\n"
++"Language-Team: Swedish <https://translate.fedoraproject.org/projects/python-"
++"simpleline/master/sv/>\n"
++"Language: sv\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=2; plural=n != 1;\n"
++"X-Generator: Weblate 4.2.2\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "Fel"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "Tryck %s för att avsluta"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "Lösenord"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "Ange din lösenfras"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "Lösenfras: "
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "Fråga"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "Svara ”%(yes)s” eller ”%(no)s”"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "Hjälp"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "Hjälpen är inte tillgänglig."
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "Tryck %s för att återgå"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr "Gör ett val från ovanstående"
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "RETUR"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "för att avsluta"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "för att fortsätta"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "för att uppdatera"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "för hjälp"
+diff --git a/po/tr.po b/po/tr.po
+new file mode 100644
+index 0000000..8f0ec07
+--- /dev/null
++++ b/po/tr.po
+@@ -0,0 +1,92 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# Oğuz Ersen <oguzersen@protonmail.com>, 2020.
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2020-06-16 17:40+0000\n"
++"Last-Translator: Oğuz Ersen <oguzersen@protonmail.com>\n"
++"Language-Team: Turkish <https://translate.fedoraproject.org/projects/python-"
++"simpleline/master/tr/>\n"
++"Language: tr\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=2; plural=n != 1;\n"
++"X-Generator: Weblate 4.0.4\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "Hata"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "Çıkmak için %s tuşuna basın"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "Parola"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "Parolanızı girin"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "Parola: "
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "Soru"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "Lütfen '%(yes)s' veya '%(no)s' olarak cevap verin"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "Yardım"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "Yardım kullanılamıyor."
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "Geri dönmek için %s tuşuna basın"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr "Lütfen yukarıdakilerden bir seçim yapın"
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "ENTER"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "çıkmak için"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "devam etmek için"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "yenilemek için"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "yardım için"
+diff --git a/po/uk.po b/po/uk.po
+new file mode 100644
+index 0000000..c0fe0ca
+--- /dev/null
++++ b/po/uk.po
+@@ -0,0 +1,94 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# Jiri Konecny <jkonecny@redhat.com>, 2016. #zanata
++# Yuri Chornoivan <yurchor@ukr.net>, 2017. #zanata, 2020.
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2020-06-22 06:40+0000\n"
++"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
++"Language-Team: Ukrainian <https://translate.fedoraproject.org/projects/"
++"python-simpleline/master/uk/>\n"
++"Language: uk\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
++"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
++"X-Generator: Weblate 4.1.1\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "Помилка"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "Натисніть %s, щоб вийти"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "Пароль"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "Вкажіть ваш пароль"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "Пароль: "
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "Питання"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "Будь ласка, дайте відповідь, «%(yes)s» (так) чи «%(no)s» (ні)"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "Довідка"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "Довідкові матеріали недоступні."
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "Натисніть %s, щоб повернутися"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr "Будь ласка, виберіть один з наведених вище варіантів"
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "ENTER"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "вийти"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "продовжити"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "оновити"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "переглянути довідку"
+diff --git a/po/zh_CN.po b/po/zh_CN.po
+new file mode 100644
+index 0000000..ec66f93
+--- /dev/null
++++ b/po/zh_CN.po
+@@ -0,0 +1,94 @@
++# SOME DESCRIPTIVE TITLE.
++# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
++# This file is distributed under the same license as the PACKAGE package.
++# Jiri Konecny <jkonecny@redhat.com>, 2016. #zanata
++# Jiri Konecny <jkonecny@redhat.com>, 2019. #zanata
++# Jiří Konečný <jkonecny@redhat.com>, 2020.
++msgid ""
++msgstr ""
++"Project-Id-Version: PACKAGE VERSION\n"
++"Report-Msgid-Bugs-To: \n"
++"POT-Creation-Date: 2021-02-22 16:27+0000\n"
++"PO-Revision-Date: 2020-07-21 09:29+0000\n"
++"Last-Translator: Jiří Konečný <jkonecny@redhat.com>\n"
++"Language-Team: Chinese (Simplified) <https://translate.fedoraproject.org/"
++"projects/python-simpleline/master/zh_CN/>\n"
++"Language: zh_CN\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Plural-Forms: nplurals=1; plural=0;\n"
++"X-Generator: Weblate 4.1.1\n"
++
++#: ../simpleline/render/adv_widgets.py:43
++msgid "Error"
++msgstr "错误"
++
++#: ../simpleline/render/adv_widgets.py:52
++#, python-format
++msgid "Press %s to exit"
++msgstr "按 %s 退出"
++
++#: ../simpleline/render/adv_widgets.py:71
++msgid "Password"
++msgstr "密码"
++
++#: ../simpleline/render/adv_widgets.py:72
++msgid "Enter your passphrase"
++msgstr "输入您的密码"
++
++#: ../simpleline/render/adv_widgets.py:85
++msgid "Passphrase: "
++msgstr "口令： "
++
++#: ../simpleline/render/adv_widgets.py:122
++msgid "Question"
++msgstr "问题"
++
++#: ../simpleline/render/adv_widgets.py:132
++#, python-format
++msgid "Please respond '%(yes)s' or '%(no)s'"
++msgstr "请回答 '%(yes)s' 或 '%(no)s'"
++
++#: ../simpleline/render/adv_widgets.py:167
++msgid "Help"
++msgstr "帮助"
++
++#: ../simpleline/render/adv_widgets.py:173
++msgid "The help is not available."
++msgstr "帮助不可用。"
++
++#: ../simpleline/render/adv_widgets.py:186
++#, python-format
++msgid "Press %s to return"
++msgstr "按 %s 返回"
++
++#. Default message of the prompt
++#: ../simpleline/render/prompt.py:32
++msgid "Please make a selection from the above"
++msgstr "请从上方进行选择"
++
++#. String to use in a prompt when we want users to press the key ENTER.
++#: ../simpleline/render/prompt.py:35
++msgid "ENTER"
++msgstr "ENTER"
++
++#. TRANSLATORS: 'q' to quit
++#: ../simpleline/render/prompt.py:38
++msgid "to quit"
++msgstr "退出"
++
++#. TRANSLATORS:'c' to continue
++#: ../simpleline/render/prompt.py:42
++msgid "to continue"
++msgstr "继续"
++
++#. TRANSLATORS:'r' to refresh
++#: ../simpleline/render/prompt.py:46
++msgid "to refresh"
++msgstr "刷新"
++
++#. TRANSLATORS:'h' to help
++#: ../simpleline/render/prompt.py:50
++msgid "to help"
++msgstr "帮助"
+-- 
+2.45.2
+

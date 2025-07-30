@@ -9,7 +9,8 @@ Release: 	13%{?dist}
 #   git clone https://github.com/rhinstaller/python-simpleline
 #   cd python-simpleline && make archive
 Source0: 	https://github.com/rhinstaller/python-%{srcname}/releases/download/%{version}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
+# Adding patch for missing po files, as a tarball without po files has been uploaded to blobstore.
+Patch0:         0001-missing-po-files.patch
 License: 	LGPL-3.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,7 +44,7 @@ is appended to the bottom of the screen.
 Printed lines are never rewritten!
 
 %prep
-%autosetup -n %{srcname}-%{version}
+%autosetup -p1 -n %{name}-%{version}
 
 %build
 %make_build
@@ -57,7 +58,7 @@ make test
 
 %files -n python3-%{srcname} -f python-%{srcname}.lang
 %license LICENSE.md
-%doc ChangeLog README.md
+%doc README.md
 %{python3_sitelib}/*
 
 %changelog
