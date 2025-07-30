@@ -10,6 +10,10 @@ Distribution:   Azure Linux
 
 BuildRequires:   python3
 BuildRequires:   unzip
+URL:             https://github.com/googlefonts/noto-cjk
+Source0:         https://github.com/googlefonts/noto-cjk/releases/download/Serif%{version}/04_NotoSerifCJKOTC.zip#/%{name}-%{version}.zip
+Source1:         genfontconf.py
+Source10:        65-%{name}.conf
 
 %description
 Noto CJK fonts, supporting Simplified Chinese, Traditional Chinese, \
@@ -17,11 +21,6 @@ Japanese, and Korean. The supported scripts are Han, Hiragana, Katakana, \
 Hangul, and Bopomofo. Latin, Greek, Cyrllic, and various symbols are also \
 supported for compatibility with CJK standards.
 The google-noto-serif-cjk-fonts package contains Google Noto Serif CJK fonts.
-
-URL:             https://github.com/googlefonts/noto-cjk
-Source0:         https://github.com/googlefonts/noto-cjk/releases/download/Serif%{version}/04_NotoSerifCJKOTC.zip/%{name}-%{version}.zip
-Source1:         genfontconf.py
-Source10:        65-%{name}.conf
 
 %prep
 unzip %{SOURCE0}
@@ -44,10 +43,8 @@ install -m 0644 -p OTC/*.ttc %{buildroot}%{_fontdir}
 install -m 0755 -d %{buildroot}%{_fontconfig_templatedir} \
                    %{buildroot}%{_fontconfig_confdir}
 
-install -m 0644 -p 65-google-noto-serif-cjk-fonts.conf \
-         %{buildroot}%{_fontconfig_templatedir}/65-%{name}.conf
-install -m 0644 -p 65-1-google-noto-serif-cjk-fonts.conf \
-         %{buildroot}%{_fontconfig_templatedir}/65-1-%{name}.conf
+install -m 0644 -p %{SOURCE10} %{buildroot}%{_fontconfig_templatedir}/65-%{name}.conf
+install -m 0644 -p 65-1-google-noto-serif-cjk-fonts.conf %{buildroot}%{_fontconfig_templatedir}/65-1-%{name}.conf
 
 ln -s %{_fontconfig_templatedir}/65-%{name}.conf \
       %{buildroot}%{_fontconfig_confdir}/65-%{name}.conf
@@ -57,7 +54,9 @@ ln -s %{_fontconfig_templatedir}/65-1-%{name}.conf \
 %files
 %{_fontdir}/*.ttc
 %{_fontconfig_templatedir}/65-%{name}.conf
+%{_fontconfig_templatedir}/65-1-%{name}.conf
 %{_fontconfig_confdir}/65-%{name}.conf
+%{_fontconfig_confdir}/65-1-%{name}.conf
 %license LICENSE
 
 %changelog
