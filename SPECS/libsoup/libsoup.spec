@@ -33,7 +33,7 @@ Patch15:         CVE-2025-32910.patch
 # CVE-2025-32912 will be fixed in 3.6.5 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/cd077513f267e43ce4b659eb18a1734d8a369992
 Patch16:         CVE-2025-32912.patch
 Patch17:         CVE-2025-4476.patch
-Patch18:        CVE-2025-4948.patch
+Patch18:         CVE-2025-4948.patch
 
 
 BuildRequires:  meson
