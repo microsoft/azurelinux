@@ -22,7 +22,7 @@
 %define build_origin %{?packager}
 
 Name: podman
-Epoch: 5
+Epoch: 0
 # DO NOT TOUCH the Version string!
 # The TRUE source of this specfile is:
 # https://github.com/containers/podman/blob/main/rpm/podman.spec
