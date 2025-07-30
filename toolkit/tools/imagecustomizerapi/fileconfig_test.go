@@ -18,17 +18,17 @@ func TestParseFileConfigValidStringInArray(t *testing.T) {
 }
 
 func TestParseFileConfigValidBasicStruct(t *testing.T) {
-	testValidYamlValue(t, "{ \"Path\": \"/b.txt\" }", &FileConfigList{{Path: "/b.txt"}})
+	testValidYamlValue(t, "{ \"path\": \"/b.txt\" }", &FileConfigList{{Path: "/b.txt"}})
 }
 
 func TestParseFileConfigValidFullStruct(t *testing.T) {
-	testValidYamlValue(t, "{ \"Path\": \"/b.txt\", \"Permissions\": \"770\" }",
+	testValidYamlValue(t, "{ \"path\": \"/b.txt\", \"permissions\": \"770\" }",
 		&FileConfigList{{Path: "/b.txt", Permissions: ptrutils.PtrTo(FilePermissions(0o770))}},
 	)
 }
 
 func TestParseFileConfigValidMixedArray(t *testing.T) {
-	testValidYamlValue(t, "[ { \"Path\": \"/b.txt\" }, \"/c.txt\" ]",
+	testValidYamlValue(t, "[ { \"path\": \"/b.txt\" }, \"/c.txt\" ]",
 		&FileConfigList{
 			{Path: "/b.txt"},
 			{Path: "/c.txt"},
@@ -53,5 +53,5 @@ func TestParseFileConfigInvalidEmptyString(t *testing.T) {
 
 func TestParseFileConfigInvalidFilePermissions(t *testing.T) {
 	// Empty string.
-	testInvalidYamlValue[*FileConfigList](t, "{ \"Path\": \"/b.txt\", \"Permissions\": \"7777\" }")
+	testInvalidYamlValue[*FileConfigList](t, "{ \"path\": \"/b.txt\", \"permissions\": \"7777\" }")
 }
