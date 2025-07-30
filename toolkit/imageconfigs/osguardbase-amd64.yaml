@@ -41,20 +41,14 @@ storage:
       mountPoint:
         idType: part-label
         path: /boot/efi
-        options: umask=0077,noexec,nodev
+        options: umask=0077,noexec,nodev,nosuid
 
     - deviceId: boot-a
       type: ext4
       mountPoint:
         idType: uuid
         path: /boot
-        options: noexec,nodev
-
-    - deviceId: root-a
-      type: ext4
-      mountPoint:
-        path: /
-        options: nodev,nosuid
+        options: noexec,nodev,nosuid
 
     - deviceId: usrverity
       type: ext4
@@ -62,19 +56,11 @@ storage:
         path: /usr
         options: ro,nodev
 
-    - deviceId: trident
+    - deviceId: root-a
       type: ext4
       mountPoint:
-        idType: part-label
-        path: /var/lib/trident
-        options: noexec,nodev
-
-    - deviceId: home
-      type: ext4
-      mountPoint:
-        idType: part-label
-        path: /home
-        options: noexec,nodev
+        path: /
+        options: nodev,nosuid,x-initrd.mount,x-systemd.growfs
 
 os:
   bootloader:
