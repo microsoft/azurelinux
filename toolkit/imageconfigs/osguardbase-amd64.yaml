@@ -11,25 +11,10 @@ storage:
 
         - id: boot-a
           type: linux-generic
-          size: 1G
-
-        - id: boot-b
-          type: linux-generic
-          size: 1G
-
-        - id: root-a
-          type: root
-          size: 4G
-
-        - id: root-b
-          type: root
-          size: 4G
+          label: boot-a
+          size: 100M
 
         - id: usr-a
-          type: linux-generic
-          size: 1G
-
-        - id: usr-b
           type: linux-generic
           size: 1G
 
@@ -37,19 +22,10 @@ storage:
           type: usr-verity
           size: 128M
 
-        - id: usr-hash-b
-          type: usr-verity
-          size: 128M
-
-        - id: trident
-          type: linux-generic
-          label: trident
-          size: 512M
-
-        - id: home
-          type: linux-generic
-          label: home
-          size: 128M
+        - id: root-a
+          type: root
+          label: root-a
+          size: 4G
 
   verity:
     - id: usrverity
