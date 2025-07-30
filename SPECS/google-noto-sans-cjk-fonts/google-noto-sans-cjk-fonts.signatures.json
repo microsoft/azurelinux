@@ -1,0 +1,8 @@
+{
+ "Signatures": {
+  "03_NotoSansCJK-OTC.zip": "528f4e1b25ff3badb0321b38d015d954c4c0de926c7830ef50e4a1948f6a3eed",
+  "65-google-noto-sans-cjk-fonts.conf": "1cf170a9c3454f59f9fc1c683b3f15b94744d22dfe90b2574d5c847058400e15",
+  "65-google-noto-sans-cjk-mono-fonts.conf": "e81260113439221bdc20d7f03166e3bfb8466ce987b04613099549b2038f9360",
+  "genfontconf.py": "127ef5c0fb1ae8d0598ac210b6463762bf5e84ae7ad4a6bce1d6824b4f39a44f"
+ }
+}
