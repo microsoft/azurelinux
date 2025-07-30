@@ -1,12 +1,13 @@
 Summary:        Libbpf library
 Name:           libbpf
 Version:        1.5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2 OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/%{name}/%{name}
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         0001-libbpf-Fix-buffer-overflow-in-bpf_object__init_prog.patch
 
 BuildRequires:  elfutils-devel
 BuildRequires:  elfutils-libelf-devel
@@ -50,6 +51,9 @@ find %{buildroot} -type f -name "*.a" -delete -print
 %{_libdir}/pkgconfig/libbpf.pc
 
 %changelog
+* Wed Jul 30 2025 Sriram Nambakam <snambakam@microsoft.com> - 1.5.0-2
+- Patch CVE-2025-29481
+
 * Fri Jul 25 2025 Sriram Nambakam <snambakam@microsoft.com> - 1.5.0-1
 - Update to version 1.5.0
 
