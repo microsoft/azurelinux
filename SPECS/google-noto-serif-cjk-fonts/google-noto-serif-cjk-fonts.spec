@@ -19,7 +19,7 @@ supported for compatibility with CJK standards.
 The google-noto-serif-cjk-fonts package contains Google Noto Serif CJK fonts.
 
 URL:             https://github.com/googlefonts/noto-cjk
-Source0:         04_NotoSerifCJKOTC.zip
+Source0:         https://github.com/googlefonts/noto-cjk/releases/download/Serif%{version}/04_NotoSerifCJKOTC.zip/%{name}-%{version}.zip
 Source1:         genfontconf.py
 Source10:        65-%{name}.conf
 
