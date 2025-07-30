@@ -84,11 +84,14 @@ os:
 
   packages:
     remove:
+      - initramfs
       - dracut-hostonly # Not used for UKI images
       - grub2-efi-binary # Replaced by systemd-boot
       - kernel # Replaced by kernel-ipe
+      - tardev-snapshotter
+
     install:
-      - openssh-server
+      - openssh-server #Remove?
       - syslog
       - WALinuxAgent
       # OS
@@ -121,6 +124,55 @@ os:
       - selinux-policy-ci
       - selinux-policy-modules
       - setools-console
+      # === test-dev packages ===
+      - vim
+
+      # === System packages ===
+      - systemd-ukify
+      - systemd-boot
+      - efibootmgr
+      - lvm2
+      - veritysetup
+      - selinux-policy
+      - selinux-policy-modules
+      - gptfdisk
+      - curl
+      - bind-utils
+      - tar
+      # =====AKS=====
+      - ca-certificates
+      - cifs-utils
+      - cloud-init-azure-kvp
+      - conntrack-tools
+      - cracklib
+      - ebtables
+      - ethtool
+      - fuse
+      - inotify-tools
+      - iotop
+      - iproute
+      - ipset
+      - iptables
+      - jq
+      - logrotate
+      - lsof
+      - nmap-ncat
+      - nfs-utils
+      - pam
+      - psmisc
+      - rsyslog
+      - socat
+      - sysstat
+      - traceroute
+      - util-linux
+      - xz
+      - zip
+      - blobfuse2
+      - nftables
+      - iscsi-initiator-utils
+      - netplan
+      - oras
+      - initramfs
 
   additionalFiles:
     # SELinux customizations
