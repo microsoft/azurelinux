@@ -41,7 +41,6 @@ Severity Levels:
 - ERROR: Should be fixed before merge  
 - WARNING: Review recommended but doesn't block merge
 - INFO: Informational only
-
 """
 
 import os
