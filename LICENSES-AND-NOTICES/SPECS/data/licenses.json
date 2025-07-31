@@ -296,6 +296,8 @@
                 "google-guice",
                 "google-noto-cjk-fonts",
                 "google-noto-emoji-fonts",
+                "google-noto-sans-cjk-fonts",
+                "google-noto-serif-cjk-fonts",
                 "google-roboto-slab-fonts",
                 "gphoto2",
                 "gpm",
