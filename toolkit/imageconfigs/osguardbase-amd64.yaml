@@ -177,9 +177,21 @@ os:
     - source: files/common/99-dhcp-eth0.network
       destination: /etc/systemd/network/99-dhcp-eth0.network
     # Cloud-init configuration
-    - source: files/linuxguard/cloud.cfg
+    - source: files/osguard/cloud.cfg
       destination: /etc/cloud/cloud.cfg
       permissions: "644"
+    # Include systemd-repart in the initrd
+    - source: files/osguard/10-repart.conf
+      destination: /etc/dracut.conf.d/10-repart.conf
+      permissions: "644"
+    # Set chrony to use /dev/ptp_hyperv
+    - source: files/osguard/chrony.conf
+      destination: /etc/chrony.conf
+      permissions: "644"
+    # Fix systemd resolved caching
+    - source: files/resolv-uplink-override.service
+      destination: /etc/systemd/system/resolv-uplink-override.service
+      permissions: "600"
 
   services:
     enable:
