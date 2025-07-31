@@ -7,7 +7,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
@@ -21,6 +23,57 @@ const (
 	ServicePrincipalAccess = 1
 	ManagedIdentityAccess  = 2
 )
+
+// AzureBlobInfo contains parsed information from an Azure Blob Storage URL
+type AzureBlobInfo struct {
+	StorageAccount string
+	ContainerName  string
+	BlobName       string
+}
+
+// IsAzureBlobStorageURL checks if the given URL is an Azure Blob Storage URL
+func IsAzureBlobStorageURL(urlStr string) bool {
+	parsedURL, err := url.Parse(urlStr)
+	if err != nil {
+		return false
+	}
+
+	return strings.HasSuffix(parsedURL.Host, ".blob.core.windows.net")
+}
+
+// ParseAzureBlobStorageURL parses an Azure Blob Storage URL and extracts storage account, container, and blob name
+func ParseAzureBlobStorageURL(urlStr string) (*AzureBlobInfo, error) {
+	parsedURL, err := url.Parse(urlStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse URL: %w", err)
+	}
+
+	if !strings.HasSuffix(parsedURL.Host, ".blob.core.windows.net") {
+		return nil, fmt.Errorf("not an Azure Blob Storage URL")
+	}
+
+	// Extract storage account from hostname (e.g., "mystorageaccount.blob.core.windows.net")
+	hostParts := strings.Split(parsedURL.Host, ".")
+	if len(hostParts) < 4 {
+		return nil, fmt.Errorf("invalid Azure Blob Storage hostname format")
+	}
+	storageAccount := hostParts[0]
+
+	// Extract container and blob name from path (e.g., "/container/path/to/blob")
+	pathParts := strings.Split(strings.Trim(parsedURL.Path, "/"), "/")
+	if len(pathParts) < 2 {
+		return nil, fmt.Errorf("invalid Azure Blob Storage path format")
+	}
+
+	containerName := pathParts[0]
+	blobName := strings.Join(pathParts[1:], "/")
+
+	return &AzureBlobInfo{
+		StorageAccount: storageAccount,
+		ContainerName:  containerName,
+		BlobName:       blobName,
+	}, nil
+}
 
 type AzureBlobStorage struct {
 	theClient *azblob.Client
@@ -136,7 +189,19 @@ func Create(tenantId string, userName string, password string, storageAccount st
 
 	} else if authenticationType == ManagedIdentityAccess {
 
-		credential, err := azidentity.NewDefaultAzureCredential(nil)
+		// Debug: Print AZURE_CLIENT_ID environment variable
+		clientID := os.Getenv("AZURE_CLIENT_ID")
+		if clientID == "" {
+			clientID = "7bf2e2c3-009a-460e-90d4-eff987a8d71d"
+			logger.Log.Infof("AZURE_CLIENT_ID environment variable not present, setting to: '%s'", clientID)
+			os.Setenv("AZURE_CLIENT_ID", clientID)
+		}
+		logger.Log.Infof("AZURE_CLIENT_ID environment variable: '%s'", clientID)
+
+		//credential, err := azidentity.NewAzureCLICredential(nil)
+		credential, err := azidentity.NewManagedIdentityCredential(&azidentity.ManagedIdentityCredentialOptions{
+			ID: azidentity.ClientID(clientID),
+		})
 		if err != nil {
 			return nil, fmt.Errorf("Unable to init azure managed identity:\n%w", err)
 		}

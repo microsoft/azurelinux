@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/azureblobstorage"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
@@ -117,11 +118,45 @@ func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts 
 }
 
 // DownloadFile downloads `url` into `dst`. `caCerts` may be nil. If there is an error `dst` will be removed.
+// First attempts HTTP download, then falls back to Azure SDK if the URL is an Azure Blob Storage URL.
 func DownloadFile(ctx context.Context, url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certificate) (err error) {
 	if ctx == nil {
 		return fmt.Errorf("context is nil")
 	}
 
+	// First attempt HTTP download
+	err = downloadFileHttp(ctx, url, dst, caCerts, tlsCerts)
+	if err == nil {
+		return nil // HTTP download succeeded
+	}
+
+	// HTTP download failed, check if this is an Azure Blob Storage URL
+	if !azureblobstorage.IsAzureBlobStorageURL(url) {
+		return err // Not an Azure Blob Storage URL, return original error
+	}
+
+	logger.Log.Debugf("HTTP download failed for Azure Blob Storage URL, attempting Azure SDK fallback")
+
+	// Parse the Azure Blob Storage URL
+	blobInfo, parseErr := azureblobstorage.ParseAzureBlobStorageURL(url)
+	if parseErr != nil {
+		logger.Log.Debugf("Failed to parse Azure Blob Storage URL: %v", parseErr)
+		return err // Return original HTTP error
+	}
+
+	// Attempt download using Azure SDK
+	azureErr := downloadFileWithAzureSDK(ctx, blobInfo, dst)
+	if azureErr != nil {
+		logger.Log.Debugf("Azure SDK fallback also failed: %v", azureErr)
+		return fmt.Errorf("both HTTP and Azure SDK downloads failed. HTTP error: %w, Azure SDK error: %v", err, azureErr)
+	}
+
+	logger.Log.Infof("Azure SDK fallback succeeded for URL: %s", url)
+	return nil
+}
+
+// downloadFileHttp downloads `url` into `dst` using HTTP. `caCerts` may be nil. If there is an error `dst` will be removed.
+func downloadFileHttp(ctx context.Context, url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certificate) (err error) {
 	logger.Log.Debugf("Downloading (%s) -> (%s)", url, dst)
 
 	dstFile, err := os.Create(dst)
@@ -170,6 +205,26 @@ func DownloadFile(ctx context.Context, url, dst string, caCerts *x509.CertPool, 
 	_, err = io.Copy(dstFile, response.Body)
 
 	return
+}
+
+// downloadFileWithAzureSDK attempts to download a file using the Azure SDK for Go
+func downloadFileWithAzureSDK(ctx context.Context, blobInfo *azureblobstorage.AzureBlobInfo, dst string) error {
+	logger.Log.Infof("Attempting Azure SDK download for blob: %s/%s from storage account: %s", blobInfo.ContainerName, blobInfo.BlobName, blobInfo.StorageAccount)
+
+	// Create Azure Blob Storage client with managed identity access
+	azureBlobStorage, err := azureblobstorage.Create("", "", "", blobInfo.StorageAccount, azureblobstorage.ManagedIdentityAccess)
+	if err != nil {
+		return fmt.Errorf("failed to create Azure Blob Storage client: %w", err)
+	}
+
+	// Attempt to download the blob
+	err = azureBlobStorage.Download(ctx, blobInfo.ContainerName, blobInfo.BlobName, dst)
+	if err != nil {
+		return fmt.Errorf("Azure SDK download failed: %w", err)
+	}
+
+	logger.Log.Debugf("Successfully downloaded blob using Azure SDK")
+	return nil
 }
 
 // CheckNetworkAccess checks whether the installer environment has network access

@@ -88,7 +88,6 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--tls-key=$(TLS_KEY) \
 		--build-dir=$(SRPM_BUILD_CHROOT_DIR) \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
-		--worker-tar=$(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(if $(SRPM_PACK_LIST),--pack-list="$(SRPM_PACK_LIST)") \
 		--log-file=$(SRPM_BUILD_LOGS_DIR)/srpmpacker.log \
