@@ -1,0 +1,101 @@
+From 806b4e0a9f658d831119cece11a082ba1578b800 Mon Sep 17 00:00:00 2001
+From: Viktor Malik <vmalik@redhat.com>
+Date: Tue, 15 Apr 2025 17:50:14 +0200
+Subject: [PATCH] libbpf: Fix buffer overflow in bpf_object__init_prog
+
+As shown in [1], it is possible to corrupt a BPF ELF file such that
+arbitrary BPF instructions are loaded by libbpf. This can be done by
+setting a symbol (BPF program) section offset to a large (unsigned)
+number such that <section start + symbol offset> overflows and points
+before the section data in the memory.
+
+Consider the situation below where:
+- prog_start = sec_start + symbol_offset    <-- size_t overflow here
+- prog_end   = prog_start + prog_size
+
+    prog_start        sec_start        prog_end        sec_end
+        |                |                 |              |
+        v                v                 v              v
+    .....................|################################|............
+
+The report in [1] also provides a corrupted BPF ELF which can be used as
+a reproducer:
+
+    $ readelf -S crash
+    Section Headers:
+      [Nr] Name              Type             Address           Offset
+           Size              EntSize          Flags  Link  Info  Align
+    ...
+      [ 2] uretprobe.mu[...] PROGBITS         0000000000000000  00000040
+           0000000000000068  0000000000000000  AX       0     0     8
+
+    $ readelf -s crash
+    Symbol table '.symtab' contains 8 entries:
+       Num:    Value          Size Type    Bind   Vis      Ndx Name
+    ...
+         6: ffffffffffffffb8   104 FUNC    GLOBAL DEFAULT    2 handle_tp
+
+Here, the handle_tp prog has section offset ffffffffffffffb8, i.e. will
+point before the actual memory where section 2 is allocated.
+
+This is also reported by AddressSanitizer:
+
+    =================================================================
+    ==1232==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x7c7302fe0000 at pc 0x7fc3046e4b77 bp 0x7ffe64677cd0 sp 0x7ffe64677490
+    READ of size 104 at 0x7c7302fe0000 thread T0
+        #0 0x7fc3046e4b76 in memcpy (/lib64/libasan.so.8+0xe4b76)
+        #1 0x00000040df3e in bpf_object__init_prog /src/libbpf/src/libbpf.c:856
+        #2 0x00000040df3e in bpf_object__add_programs /src/libbpf/src/libbpf.c:928
+        #3 0x00000040df3e in bpf_object__elf_collect /src/libbpf/src/libbpf.c:3930
+        #4 0x00000040df3e in bpf_object_open /src/libbpf/src/libbpf.c:8067
+        #5 0x00000040f176 in bpf_object__open_file /src/libbpf/src/libbpf.c:8090
+        #6 0x000000400c16 in main /poc/poc.c:8
+        #7 0x7fc3043d25b4 in __libc_start_call_main (/lib64/libc.so.6+0x35b4)
+        #8 0x7fc3043d2667 in __libc_start_main@@GLIBC_2.34 (/lib64/libc.so.6+0x3667)
+        #9 0x000000400b34 in _start (/poc/poc+0x400b34)
+
+    0x7c7302fe0000 is located 64 bytes before 104-byte region [0x7c7302fe0040,0x7c7302fe00a8)
+    allocated by thread T0 here:
+        #0 0x7fc3046e716b in malloc (/lib64/libasan.so.8+0xe716b)
+        #1 0x7fc3045ee600 in __libelf_set_rawdata_wrlock (/lib64/libelf.so.1+0xb600)
+        #2 0x7fc3045ef018 in __elf_getdata_rdlock (/lib64/libelf.so.1+0xc018)
+        #3 0x00000040642f in elf_sec_data /src/libbpf/src/libbpf.c:3740
+
+The problem here is that currently, libbpf only checks that the program
+end is within the section bounds. There used to be a check
+`while (sec_off < sec_sz)` in bpf_object__add_programs, however, it was
+removed by commit 6245947c1b3c ("libbpf: Allow gaps in BPF program
+sections to support overriden weak functions").
+
+Add a check for detecting the overflow of `sec_off + prog_sz` to
+bpf_object__init_prog to fix this issue.
+
+[1] https://github.com/lmarch2/poc/blob/main/libbpf/libbpf.md
+
+Fixes: 6245947c1b3c ("libbpf: Allow gaps in BPF program sections to support overriden weak functions")
+Reported-by: lmarch2 <2524158037@qq.com>
+Signed-off-by: Viktor Malik <vmalik@redhat.com>
+Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+Reviewed-by: Shung-Hsi Yu <shung-hsi.yu@suse.com>
+Link: https://github.com/lmarch2/poc/blob/main/libbpf/libbpf.md
+Link: https://lore.kernel.org/bpf/20250415155014.397603-1-vmalik@redhat.com
+---
+ src/libbpf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libbpf.c b/src/libbpf.c
+index b2591f5..56250b5 100644
+--- a/src/libbpf.c
++++ b/src/libbpf.c
+@@ -896,7 +896,7 @@ bpf_object__add_programs(struct bpf_object *obj, Elf_Data *sec_data,
+ 			return -LIBBPF_ERRNO__FORMAT;
+ 		}
+ 
+-		if (sec_off + prog_sz > sec_sz) {
++		if (sec_off + prog_sz > sec_sz || sec_off + prog_sz < sec_off) {
+ 			pr_warn("sec '%s': program at offset %zu crosses section boundary\n",
+ 				sec_name, sec_off);
+ 			return -LIBBPF_ERRNO__FORMAT;
+-- 
+2.45.4
+
