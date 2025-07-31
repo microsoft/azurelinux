@@ -65,7 +65,10 @@ make %{?_smp_mflags} -k check
 %{_includedir}/*
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
+%license LICENSE.md
 %{_docdir}/*
+# The above LICENSE.md is same as below hence removing duplicate in doc file
+%exclude %{_docdir}/tiff-%{version}/LICENSE.md
 
 %changelog
 * Thu Jul 31 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.6.0-7
