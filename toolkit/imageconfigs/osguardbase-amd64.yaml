@@ -177,7 +177,7 @@ os:
     # SELinux customizations
     - source: files/linuxguard/selinux-ci-uki.semanage
       destination: /etc/selinux/targeted/selinux-ci.semanage
-    - source: files/linuxguard/99-dhcp-eth0.network
+    - source: files/common/99-dhcp-eth0.network
       destination: /etc/systemd/network/99-dhcp-eth0.network
     # Cloud-init configuration
     - source: files/linuxguard/cloud.cfg
