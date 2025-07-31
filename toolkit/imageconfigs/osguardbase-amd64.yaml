@@ -227,6 +227,8 @@ scripts:
       - linuxguard
       - --variant
       - Linux Guard Image
+    - path: scripts/osguard/create-empty-certs-dir.sh
+
 output:
   artifacts:
     items:
