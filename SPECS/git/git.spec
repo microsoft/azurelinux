@@ -6,7 +6,7 @@
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.45.4
-Release:        3%{?dist}
+Release:        1000%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,7 +20,7 @@ BuildRequires:  python3-devel
 Requires:       curl
 Requires:       expat
 Requires:       less
-Requires:       openssh-clients
+# Requires:       openssh-clients
 Requires:       openssl
 Requires:       perl-CGI
 Requires:       perl-DBI
