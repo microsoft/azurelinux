@@ -29,7 +29,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.3
-Release: 160000%{?dist}
+Release: 170000%{?dist}
 # Epoch: 1
 Source: openssl-%{version}.tar.gz
 Source2: Makefile.certificate
@@ -360,7 +360,7 @@ ktlsopt=disable-ktls
 # marked as not requiring an executable stack.
 # Also add -DPURIFY to make using valgrind with openssl easier as we do not
 # want to depend on the uninitialized memory as a source of entropy anyway.
-RPM_OPT_FLAGS="$RPM_OPT_FLAGS -Wa,--noexecstack -Wa,--generate-missing-build-notes=yes -DPURIFY $RPM_LD_FLAGS -O0"
+RPM_OPT_FLAGS="$RPM_OPT_FLAGS -Wa,--noexecstack -Wa,--generate-missing-build-notes=yes -DPURIFY $RPM_LD_FLAGS"
 
 export HASHBANGPERL=/usr/bin/perl
 
