@@ -227,7 +227,7 @@ BuildRequires: perl(Test::Harness), perl(Test::More), perl(Math::BigInt)
 BuildRequires: perl(Module::Load::Conditional), perl(File::Temp)
 BuildRequires: perl(Time::HiRes), perl(IPC::Cmd), perl(Pod::Html), perl(Digest::SHA)
 BuildRequires: perl(FindBin), perl(lib), perl(File::Compare), perl(File::Copy), perl(bigint)
-BuildRequires: git-core
+# BuildRequires: git-core
 # BuildRequires: systemtap-sdt-devel
 Requires: coreutils
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
@@ -290,7 +290,7 @@ package provides Perl scripts for converting certificates and keys
 from other formats to the formats used by the OpenSSL toolkit.
 
 %prep
-%autosetup -S git -n %{name}-%{version}
+%autosetup -p1 -n %{name}-%{version}
 
 %build
 # Figure out which flags we want to use.
