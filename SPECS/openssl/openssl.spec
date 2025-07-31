@@ -29,7 +29,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.3
-Release: 140000%{?dist}
+Release: 150000%{?dist}
 # Epoch: 1
 Source: openssl-%{version}.tar.gz
 Source2: Makefile.certificate
@@ -171,7 +171,7 @@ Patch116: 0116-version-aliasing-AZL3.patch
 # # https://github.com/openssl/openssl/issues/23050
 # Patch117: 0117-ignore-unknown-sigalgorithms-groups.patch
 # https://fedoraproject.org/wiki/Changes/OpenSSLDistrustSHA1SigVer
-Patch120: 0120-Allow-disabling-of-SHA1-signatures.patch
+Patch120: 0120-Allow-disabling-of-SHA1-signatures-AZL3.patch
 # From CentOS 9
 Patch121: 0121-FIPS-cms-defaults.patch
 # # AZL3 -- NOT NEEDED -- already in 3.3.3
@@ -228,7 +228,7 @@ BuildRequires: perl(Module::Load::Conditional), perl(File::Temp)
 BuildRequires: perl(Time::HiRes), perl(IPC::Cmd), perl(Pod::Html), perl(Digest::SHA)
 BuildRequires: perl(FindBin), perl(lib), perl(File::Compare), perl(File::Copy), perl(bigint)
 BuildRequires: git-core
-BuildRequires: systemtap-sdt-devel
+# BuildRequires: systemtap-sdt-devel
 Requires: coreutils
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
