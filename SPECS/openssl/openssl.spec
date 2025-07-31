@@ -29,7 +29,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.3
-Release: 150000%{?dist}
+Release: 160000%{?dist}
 # Epoch: 1
 Source: openssl-%{version}.tar.gz
 Source2: Makefile.certificate
@@ -240,7 +240,7 @@ protocols.
 
 %package libs
 Summary: A general purpose cryptography library with TLS implementation
-Requires: ca-certificates >= 2008-5
+# Requires: ca-certificates >= 2008-5
 # Requires: crypto-policies >= 20180730
 %if 0%{?fedora} >= 40 || 0%{?rhel} >= 10
 Recommends: pkcs11-provider%{?_isa}
