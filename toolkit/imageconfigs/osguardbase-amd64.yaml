@@ -170,6 +170,11 @@ os:
       - oras
       - initramfs
 
+  additionalDirs:
+    - source: files/osguard/repart.d
+      destination: /etc/repart.d
+      childFilePermissions: 644
+
   additionalFiles:
     # SELinux customizations
     - source: files/linuxguard/selinux-ci-uki.semanage
