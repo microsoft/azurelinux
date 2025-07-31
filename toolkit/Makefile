@@ -176,9 +176,10 @@ include $(SCRIPTS_DIR)/utils.mk
 # Daily build ID and repo configuration
 include $(SCRIPTS_DIR)/daily_build.mk
 
-CA_CERT     ?=
-TLS_CERT    ?=
-TLS_KEY     ?=
+CA_CERT         ?=
+TLS_CERT        ?=
+TLS_KEY         ?=
+AZURE_CLIENT_ID ?=
 
 ##help:var:LOG_LEVEL:{panic,fatal,error,warn,info,debug,trace}=Set logging level for toolkit.
 # panic,fatal,error,warn,info,debug,trace
