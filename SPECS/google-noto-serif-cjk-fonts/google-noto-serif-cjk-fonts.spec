@@ -12,7 +12,7 @@ BuildRequires:   python3
 BuildRequires:   unzip
 URL:             https://github.com/googlefonts/noto-cjk
 Source0:         https://github.com/googlefonts/noto-cjk/releases/download/Serif%{version}/04_NotoSerifCJKOTC.zip#/%{name}-%{version}.zip
-Source1:         genfontconf.py
+Source1:         %{name}-%{version}-genfontconf.py
 Source10:        65-%{name}.conf
 
 %description

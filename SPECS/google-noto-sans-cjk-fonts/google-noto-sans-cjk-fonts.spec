@@ -9,7 +9,7 @@ Distribution:   Azure Linux
 
 URL:      https://github.com/googlefonts/noto-cjk
 Source0:  https://github.com/googlefonts/noto-cjk/releases/download/Sans%{version}/03_NotoSansCJK-OTC.zip#/%{name}-%{version}.zip
-Source1:  genfontconf.py
+Source1:  %{name}-%{version}-genfontconf.py
 Source10: 65-google-noto-sans-cjk-fonts.conf
 Source11: 65-google-noto-sans-cjk-mono-fonts.conf
 

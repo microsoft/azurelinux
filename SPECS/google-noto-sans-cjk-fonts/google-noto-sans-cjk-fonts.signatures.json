@@ -2,7 +2,7 @@
  "Signatures": {
   "65-google-noto-sans-cjk-fonts.conf": "decac9dd165405677b0dc280c626c5676c49f663e32c8b78944390479b0aa84c",
   "65-google-noto-sans-cjk-mono-fonts.conf": "e81260113439221bdc20d7f03166e3bfb8466ce987b04613099549b2038f9360",
-  "genfontconf.py": "127ef5c0fb1ae8d0598ac210b6463762bf5e84ae7ad4a6bce1d6824b4f39a44f",
+  "google-noto-sans-cjk-fonts-2.004-genfontconf.py": "127ef5c0fb1ae8d0598ac210b6463762bf5e84ae7ad4a6bce1d6824b4f39a44f",
   "google-noto-sans-cjk-fonts-2.004.zip": "528f4e1b25ff3badb0321b38d015d954c4c0de926c7830ef50e4a1948f6a3eed"
  }
 }
