@@ -250,8 +250,8 @@ Recommends: openssl-pkcs11%{?_isa}
 %if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) )
 Requires: openssl-fips-provider
 %endif
-Obsoletes: SymCrypt >= 0.0.0
-Obsoletes: SymCrypt-OpenSSL >= 0.0.0
+# Obsoletes: SymCrypt >= 0.0.0
+# Obsoletes: SymCrypt-OpenSSL >= 0.0.0
 
 %description libs
 OpenSSL is a toolkit for supporting cryptography. The openssl-libs
