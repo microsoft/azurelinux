@@ -90,7 +90,6 @@ os:
       - kernel # Replaced by kernel-ipe
 
     install:
-      - openssh-server #Remove?
       - syslog
       - WALinuxAgent
       # OS
@@ -123,8 +122,6 @@ os:
       # - selinux-policy-ci
       - selinux-policy-modules
       - setools-console
-      # === test-dev packages ===
-      - vim
 
       # === System packages ===
       - systemd-ukify
