@@ -204,11 +204,6 @@ os:
   - name: iptable_nat
     loadMode: always
 
-  users:
-  - name: azuresu
-    secondaryGroups:
-    - sudo
-
 scripts:
   postCustomization:
     - path: scripts/linuxguard/performance-tuning.sh
