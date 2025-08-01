@@ -29,7 +29,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.3
-Release: 170000%{?dist}
+Release: 200000%{?dist}
 # Epoch: 1
 Source: openssl-%{version}.tar.gz
 Source2: Makefile.certificate
@@ -595,6 +595,9 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/cmake
 %ldconfig_scriptlets libs
 
 %changelog
+* Fri Jul 08 2025 tobiasb <tobiasb@microsoft.com> - 3.3.3-200000
+- TEMP: Initial fedora-like upgrade to 3.3.3
+
 * Mon Jul 14 2025 gstarovo <gstarovo@redhat.com> - 1:3.2.4-4
 - Assign IANA numbers for hybrid PQ KEX
 
