@@ -236,10 +236,10 @@ func TestDistroDefines(t *testing.T) {
 			distroVersion: distVersion,
 			check:         true,
 			expected: map[string]string{
-				"ReleaseNumber": releaseNumber,
 				"dist":          distTag,
 				distName:        fmt.Sprint(distVersion),
 				"with_check":    "1",
+				"ReleaseNumber": releaseNumber,
 			},
 			errorExpected: false,
 		},
@@ -250,10 +250,10 @@ func TestDistroDefines(t *testing.T) {
 			distroVersion: distVersion,
 			check:         false,
 			expected: map[string]string{
-				"ReleaseNumber": releaseNumber,
 				"dist":          distTag,
 				distName:        fmt.Sprint(distVersion),
 				"with_check":    "0",
+				"ReleaseNumber": releaseNumber,
 			},
 			errorExpected: false,
 		},
@@ -264,10 +264,10 @@ func TestDistroDefines(t *testing.T) {
 			distroVersion: distVersion,
 			check:         true,
 			expected: map[string]string{
-				"ReleaseNumber": releaseNumber,
 				"dist":          "",
 				distName:        fmt.Sprint(distVersion),
 				"with_check":    "1",
+				"ReleaseNumber": releaseNumber,
 			},
 			errorExpected: false,
 		},
@@ -314,10 +314,10 @@ func TestDistroDefines(t *testing.T) {
 			distroVersion: 1,
 			check:         true,
 			expected: map[string]string{
-				"ReleaseNumber": releaseNumber,
 				"dist":          distTag,
 				distName:        "1",
 				"with_check":    "1",
+				"ReleaseNumber": releaseNumber,
 			},
 			errorExpected: false,
 		},
@@ -397,15 +397,15 @@ func TestDistroMacrosLdLoad(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Save the original values and restore them after the test
-			originalDistroName := exe.DistroNameAbreviation
+			originalDistroName := exe.DistroNameAbbreviation
 			originalDistroVersion := exe.DistroMajorVersion
 			t.Cleanup(func() {
-				exe.DistroNameAbreviation = originalDistroName
+				exe.DistroNameAbbreviation = originalDistroName
 				exe.DistroMajorVersion = originalDistroVersion
 			})
 
 			exe.DistroMajorVersion = tt.distroVersion
-			exe.DistroNameAbreviation = tt.distroName
+			exe.DistroNameAbbreviation = tt.distroName
 			var (
 				ldDistroName    string
 				ldDistroVersion int
@@ -702,7 +702,7 @@ func TestStripEpochFromPackageFullQualifiedNameWithInvalidInput(t *testing.T) {
 		expected string
 	}{
 		{
-			name:     "
+			name:     "invalid package name",
 			input:    "invalid-package-name",
 			expected: "invalid-package-name",
 		},
