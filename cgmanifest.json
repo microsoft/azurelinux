@@ -4779,6 +4779,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "google-noto-sans-cjk-fonts",
+          "version": "2.004",
+          "downloadUrl": "https://github.com/googlefonts/noto-cjk/releases/download/Sans2.004/03_NotoSansCJK-OTC.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "google-noto-serif-cjk-fonts",
+          "version": "2.003",
+          "downloadUrl": "https://github.com/googlefonts/noto-cjk/releases/download/Serif2.003/04_NotoSerifCJKOTC.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "google-noto-emoji-fonts",
           "version": "20200723",
           "downloadUrl": "https://github.com/googlei18n/noto-emoji/archive/d5e261484286d33a1fe8a02676f5907ecc02106f.tar.gz"
