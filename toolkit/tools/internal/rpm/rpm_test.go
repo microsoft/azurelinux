@@ -24,10 +24,9 @@ const (
 	specsDir            = "testdata"
 
 	// Distro macro intpus
-	distName      = "myDistro"
-	distVersion   = 1234
-	distTag       = ".myDistro1234"
-	releaseNumber = ""
+	distName    = "myDistro"
+	distVersion = 1234
+	distTag     = ".myDistro1234"
 )
 
 var buildArch = goArchToRpmArch[runtime.GOARCH]
@@ -239,7 +238,7 @@ func TestDistroDefines(t *testing.T) {
 				"dist":          distTag,
 				distName:        fmt.Sprint(distVersion),
 				"with_check":    "1",
-				"ReleaseNumber": releaseNumber,
+				"ReleaseNumber": exe.Release,
 			},
 			errorExpected: false,
 		},
@@ -253,7 +252,7 @@ func TestDistroDefines(t *testing.T) {
 				"dist":          distTag,
 				distName:        fmt.Sprint(distVersion),
 				"with_check":    "0",
-				"ReleaseNumber": releaseNumber,
+				"ReleaseNumber": exe.Release,
 			},
 			errorExpected: false,
 		},
@@ -267,7 +266,7 @@ func TestDistroDefines(t *testing.T) {
 				"dist":          "",
 				distName:        fmt.Sprint(distVersion),
 				"with_check":    "1",
-				"ReleaseNumber": releaseNumber,
+				"ReleaseNumber": exe.Release,
 			},
 			errorExpected: false,
 		},
@@ -317,7 +316,7 @@ func TestDistroDefines(t *testing.T) {
 				"dist":          distTag,
 				distName:        "1",
 				"with_check":    "1",
-				"ReleaseNumber": releaseNumber,
+				"ReleaseNumber": exe.Release,
 			},
 			errorExpected: false,
 		},
@@ -400,12 +399,12 @@ func TestDistroMacrosLdLoad(t *testing.T) {
 			originalDistroName := exe.DistroNameAbbreviation
 			originalDistroVersion := exe.DistroMajorVersion
 			t.Cleanup(func() {
-				exe.DistroNameAbbreviation = originalDistroName
+				exe.DistroNameAbreviation = originalDistroName
 				exe.DistroMajorVersion = originalDistroVersion
 			})
 
 			exe.DistroMajorVersion = tt.distroVersion
-			exe.DistroNameAbbreviation = tt.distroName
+			exe.DistroNameAbreviation = tt.distroName
 			var (
 				ldDistroName    string
 				ldDistroVersion int
