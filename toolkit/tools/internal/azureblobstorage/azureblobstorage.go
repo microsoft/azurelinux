@@ -189,16 +189,15 @@ func Create(tenantId string, userName string, password string, storageAccount st
 
 	} else if authenticationType == ManagedIdentityAccess {
 
-		// Debug: Print AZURE_CLIENT_ID environment variable
 		clientID := os.Getenv("AZURE_CLIENT_ID")
 		if clientID == "" {
+			logger.Log.Infof("AZURE_CLIENT_ID environment variable not present, setting explicitly")
 			clientID = "7bf2e2c3-009a-460e-90d4-eff987a8d71d"
-			logger.Log.Infof("AZURE_CLIENT_ID environment variable not present, setting to: '%s'", clientID)
-			os.Setenv("AZURE_CLIENT_ID", clientID)
 		}
-		logger.Log.Infof("AZURE_CLIENT_ID environment variable: '%s'", clientID)
+		else {
+			logger.Log.Infof("AZURE_CLIENT_ID environment variable present")
+		}
 
-		//credential, err := azidentity.NewAzureCLICredential(nil)
 		credential, err := azidentity.NewManagedIdentityCredential(&azidentity.ManagedIdentityCredentialOptions{
 			ID: azidentity.ClientID(clientID),
 		})
