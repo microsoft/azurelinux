@@ -24,9 +24,10 @@ const (
 	specsDir            = "testdata"
 
 	// Distro macro intpus
-	distName    = "myDistro"
-	distVersion = 1234
-	distTag     = ".myDistro1234"
+	distName      = "myDistro"
+	distVersion   = 1234
+	distTag       = ".myDistro1234"
+	releaseNumber = ""
 )
 
 var buildArch = goArchToRpmArch[runtime.GOARCH]
@@ -235,9 +236,10 @@ func TestDistroDefines(t *testing.T) {
 			distroVersion: distVersion,
 			check:         true,
 			expected: map[string]string{
-				"dist":       distTag,
-				distName:     fmt.Sprint(distVersion),
-				"with_check": "1",
+				"ReleaseNumber": releaseNumber,
+				"dist":          distTag,
+				distName:        fmt.Sprint(distVersion),
+				"with_check":    "1",
 			},
 			errorExpected: false,
 		},
@@ -248,9 +250,10 @@ func TestDistroDefines(t *testing.T) {
 			distroVersion: distVersion,
 			check:         false,
 			expected: map[string]string{
-				"dist":       distTag,
-				distName:     fmt.Sprint(distVersion),
-				"with_check": "0",
+				"ReleaseNumber": releaseNumber,
+				"dist":          distTag,
+				distName:        fmt.Sprint(distVersion),
+				"with_check":    "0",
 			},
 			errorExpected: false,
 		},
@@ -261,9 +264,10 @@ func TestDistroDefines(t *testing.T) {
 			distroVersion: distVersion,
 			check:         true,
 			expected: map[string]string{
-				"dist":       "",
-				distName:     fmt.Sprint(distVersion),
-				"with_check": "1",
+				"ReleaseNumber": releaseNumber,
+				"dist":          "",
+				distName:        fmt.Sprint(distVersion),
+				"with_check":    "1",
 			},
 			errorExpected: false,
 		},
@@ -310,9 +314,10 @@ func TestDistroDefines(t *testing.T) {
 			distroVersion: 1,
 			check:         true,
 			expected: map[string]string{
-				"dist":       distTag,
-				distName:     "1",
-				"with_check": "1",
+				"ReleaseNumber": releaseNumber,
+				"dist":          distTag,
+				distName:        "1",
+				"with_check":    "1",
 			},
 			errorExpected: false,
 		},
@@ -392,15 +397,15 @@ func TestDistroMacrosLdLoad(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Save the original values and restore them after the test
-			originalDistroName := exe.DistroNameAbbreviation
+			originalDistroName := exe.DistroNameAbreviation
 			originalDistroVersion := exe.DistroMajorVersion
 			t.Cleanup(func() {
-				exe.DistroNameAbbreviation = originalDistroName
+				exe.DistroNameAbreviation = originalDistroName
 				exe.DistroMajorVersion = originalDistroVersion
 			})
 
 			exe.DistroMajorVersion = tt.distroVersion
-			exe.DistroNameAbbreviation = tt.distroName
+			exe.DistroNameAbreviation = tt.distroName
 			var (
 				ldDistroName    string
 				ldDistroVersion int
@@ -697,7 +702,7 @@ func TestStripEpochFromPackageFullQualifiedNameWithInvalidInput(t *testing.T) {
 		expected string
 	}{
 		{
-			name:     "invalid package name",
+			name:     "
 			input:    "invalid-package-name",
 			expected: "invalid-package-name",
 		},
