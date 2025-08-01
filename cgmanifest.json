@@ -13522,8 +13522,8 @@
         "type": "other",
         "other": {
           "name": "mod_md",
-          "version": "2.2.7",
-          "downloadUrl": "https://github.com/icing/mod_md/releases/download/v2.2.7/mod_md-2.2.7.tar.gz"
+          "version": "2.4.26",
+          "downloadUrl": "https://github.com/icing/mod_md/releases/download/v2.4.26/mod_md-2.4.26.tar.gz"
         }
       }
     },
