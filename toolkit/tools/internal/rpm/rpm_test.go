@@ -399,12 +399,12 @@ func TestDistroMacrosLdLoad(t *testing.T) {
 			originalDistroName := exe.DistroNameAbbreviation
 			originalDistroVersion := exe.DistroMajorVersion
 			t.Cleanup(func() {
-				exe.DistroNameAbreviation = originalDistroName
+				exe.DistroNameAbbreviation = originalDistroName
 				exe.DistroMajorVersion = originalDistroVersion
 			})
 
 			exe.DistroMajorVersion = tt.distroVersion
-			exe.DistroNameAbreviation = tt.distroName
+			exe.DistroNameAbbreviation = tt.distroName
 			var (
 				ldDistroName    string
 				ldDistroVersion int
