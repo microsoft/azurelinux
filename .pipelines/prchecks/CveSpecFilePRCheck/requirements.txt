@@ -1,0 +1,3 @@
+openai>=1.63.0
+azure-identity>=1.12.0
+requests>=2.25.0
