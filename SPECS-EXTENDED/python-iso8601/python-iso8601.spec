@@ -75,6 +75,7 @@ BuildRequires:  python%{python3_other_pkgversion}-setuptools
 %changelog
 * Fri Aug 01 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 2.1.0-1
 - Upgrade to 2.1.0
+- License verified.
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.12-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
