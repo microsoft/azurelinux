@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -48,6 +48,7 @@ Patch7:         update-cifs-for-kernel-headers-6.1.patch
 #    5. Repeat from 2. as needed until it builds
 #    6. Build both systemd and systemd-bootstrap, validate the contents of systemd-rpm-macros and system-bootstrap-rpm-macros are identical
 Patch8:         use-255-macros.patch
+Patch9:         CVE-2023-7008.patch
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gettext
@@ -285,6 +286,9 @@ fi
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Fri May 23 2025 Akhila Guruju <v-guakhila@microsoft.com> - 250.3-18
+- Patch CVE-2023-7008
+
 * Mon Mar 11 2024 Daniel McIlvaney <damcilva@microsoft.com> - 250.3-17
 - Split libs into their own subpackage to align with full systemd.
 
