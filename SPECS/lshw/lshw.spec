@@ -1,13 +1,13 @@
 Summary:        Hardware lister
 Name:           lshw
-Version:        B.02.19
+Version:        B.02.19.2
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
-URL:            https://github.com/lyonel/lshw/releases
-Source0:        https://github.com/lyonel/lshw/archive/%{version}/%{name}-%{version}.tar.gz
+URL:            https://ezix.org/src/pkg/lshw/tags
+Source0:        https://www.ezix.org/software/files/%{name}-%{version}.tar.gz
 
 %description
 lshw is a small tool to provide detailed informaton on the hardware
@@ -42,6 +42,10 @@ make DESTDIR=%{buildroot} install
 %{_datadir}/*
 
 %changelog
+* Wed Nov 22 2023 Aditya Dubey <adityadubey@microsoft.com> - B.02.19.2-1
+- Upgrade to B.02.19.2
+- Updated Source0
+
 * Tue Feb 08 2022 Henry Li <lihl@microsoft.com> - B.02.19-1
 - Upgrade to B.02.19
 - Fix Source0
