@@ -1,56 +1,91 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-# This package depends on automagic byte compilation
-# https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
-%global _python_bytecompile_extra 1
+%global source_version %%(echo "%version" | tr '~' '-')
 
-%global with_kde5 1
+%global with_python2 0
+
+%global with_pkg_config %(pkg-config --version >/dev/null 2>&1 && echo -n "1" || echo -n "0")
 
 %global ibus_api_version 1.0
-
+%global pkgcache /var/cache/%name
 # for bytecompile in %%{_datadir}/ibus/setup
 %global __python %{__python3}
+
+
+%bcond_without gtk2
+%bcond_without xinit
+%bcond_without gtk4
+
+%if %with_pkg_config
+%if %{with gtk2}
+%{!?gtk2_binary_version: %global gtk2_binary_version %(pkg-config  --variable=gtk_binary_version gtk+-2.0)}
+%else
+%{!?gtk2_binary_version: %global gtk2_binary_version ?.?.?}
+%endif
+%{!?gtk3_binary_version: %global gtk3_binary_version %(pkg-config  --variable=gtk_binary_version gtk+-3.0)}
+%if %{with gtk4}
+%{!?gtk4_binary_version: %global gtk4_binary_version %(pkg-config  --variable=gtk_binary_version gtk4)}
+%else
+%{!?gtk4_binary_version: %global gtk4_binary_version ?.?.?}
+%endif
+%global glib_ver %([ -a %{_libdir}/pkgconfig/glib-2.0.pc ] && pkg-config --modversion glib-2.0 | cut -d. -f 1,2 || echo -n "999")
+%else
+%{!?gtk2_binary_version: %global gtk2_binary_version ?.?.?}
+%{!?gtk3_binary_version: %global gtk3_binary_version ?.?.?}
+%{!?gtk4_binary_version: %global gtk4_binary_version ?.?.?}
+%global glib_ver 0
+%endif
 
 %global dbus_python_version 0.83.0
 
 Name:           ibus
-Version:        1.5.22
-Release:        9%{?dist}
+Version:        1.5.31
+# https://github.com/fedora-infra/rpmautospec/issues/101
+Release:        1%{?dist}
 Summary:        Intelligent Input Bus for Linux OS
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 URL:            https://github.com/ibus/%name/wiki
-Source0:        https://github.com/ibus/%name/releases/download/%{version}/%{name}-%{version}.tar.gz
-Source1:        %{name}-xinput
-Source2:        %{name}.conf.5
+Source0:        https://github.com/ibus/%name/releases/download/%{source_version}/%{name}-%{source_version}.tar.gz
+Source1:        https://github.com/ibus/%name/releases/download/%{source_version}/%{name}.tar.gz.sum
+Source2:        %{name}-xinput
+Source3:        %{name}.conf.5
 # Patch0:         %%{name}-HEAD.patch
-Patch0:         %{name}-HEAD.patch
 # Under testing #1349148 #1385349 #1350291 #1406699 #1432252 #1601577
 Patch1:         %{name}-1385349-segv-bus-proxy.patch
 
+# autoreconf requires autopoint but not po.m4
 BuildRequires:  gettext-devel
 BuildRequires:  libtool
 # for gtkdoc-fixxref
 BuildRequires:  glib2-doc
-BuildRequires:  dbus-glib-devel
+BuildRequires:  gtk3-devel
 BuildRequires:  dbus-python-devel >= %{dbus_python_version}
 BuildRequires:  desktop-file-utils
 BuildRequires:  gtk-doc
 BuildRequires:  dconf-devel
+BuildRequires:  dbus-x11
 BuildRequires:  python3-devel
 BuildRequires:  python3-gobject
+%if %with_python2
+# https://bugzilla.gnome.org/show_bug.cgi?id=759334
+# Need python2 for gsettings-schema-convert
+BuildRequires:  python2-devel
+# for AM_GCONF_SOURCE_2 in configure.ac
+BuildRequires:  GConf2-devel
+BuildRequires:  intltool
+%endif
 BuildRequires:  git
 BuildRequires:  vala
 BuildRequires:  iso-codes-devel
 BuildRequires:  libnotify-devel
 BuildRequires:  wayland-devel
-%if %with_kde5
-BuildRequires:  qt5-qtbase-devel
-%endif
 BuildRequires:  cldr-emoji-annotation
 BuildRequires:  unicode-emoji
 BuildRequires:  unicode-ucd
+BuildRequires:  systemd
 
 Requires:       %{name}-libs%{?_isa}   = %{version}-%{release}
+Requires:       %{name}-gtk3%{?_isa}   = %{version}-%{release}
 Requires:       %{name}-setup          = %{version}-%{release}
 
 Requires:       iso-codes
@@ -73,11 +108,6 @@ Requires:               %{_sbindir}/alternatives
 Requires(post):         %{_sbindir}/alternatives
 Requires(postun):       %{_sbindir}/alternatives
 
-# Obsoletes ibus-xkbc by ibus xkb engine
-Provides: ibus-xkbc = 1.3.4
-Obsoletes: ibus-xkbc < 1.3.4
-
-
 %global _xinputconf %{_sysconfdir}/X11/xinit/xinput.d/ibus.conf
 
 %description
@@ -87,16 +117,25 @@ IBus means Intelligent Input Bus. It is an input framework for Linux OS.
 Summary:        IBus libraries
 
 Requires:       dbus >= 1.2.4
-Requires:       glib2
+Requires:       glib2 >= %{glib_ver}
 # Owner of %%{_libdir}/girepository-1.0
 Requires:       gobject-introspection
-
-
-
-
+%if (0%{?fedora} > 28 || 0%{?rhel} > 7)
+%else
+Conflicts:      %{name}%{?_isa} < %{version}
+%endif
 
 %description libs
 This package contains the libraries for IBus
+
+%package gtk3
+Summary:        IBus IM module for GTK3
+Requires:       %{name}-libs%{?_isa}   = %{version}-%{release}
+Requires:       glib2 >= %{glib_ver}
+Requires(post): glib2 >= %{glib_ver}
+
+%description gtk3
+This package contains IBus IM module for GTK3
 
 %package setup
 Summary:        IBus setup utility
@@ -104,11 +143,80 @@ Requires:       %{name} = %{version}-%{release}
 %{?__python3:Requires: %{__python3}}
 Requires:       python3-gobject
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  pygobject3-devel
+BuildRequires:  python3-gobject-devel
+BuildRequires:  make
 BuildArch:      noarch
 
 %description setup
 This is a setup utility for IBus.
+
+%if %with_python2
+%package pygtk2
+Summary:        IBus PyGTK2 library
+%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
+Requires:       dbus-python >= %{dbus_python_version}
+%else
+Requires:       python2-dbus >= %{dbus_python_version}
+%endif
+Requires:       python2
+Requires:       pygtk2
+BuildArch:      noarch
+
+%description pygtk2
+This is a PyGTK2 library for IBus. Now major IBus engines use PyGObject3
+and this package will be deprecated.
+%endif
+
+%package py2override
+Summary:        IBus Python2 override library
+Requires:       %{name}-libs%{?_isa}   = %{version}-%{release}
+# Owner of %%python2_sitearch/gi/overrides
+%if (0%{?fedora} && 0%{?fedora} <= 27) || (0%{?rhel} && 0%{?rhel} <= 7)
+Requires:       pygobject3-base
+%else
+Requires:       python2-gobject-base
+%endif
+Requires:       python2
+
+%description py2override
+This is a Python2 override library for IBus. The Python files override
+some functions in GObject-Introspection.
+
+%package wayland
+Summary:        IBus IM module for Wayland
+Requires:       %{name}-libs%{?_isa}   = %{version}-%{release}
+
+%description wayland
+This package contains IBus IM module for Wayland
+
+%package panel
+Summary:        IBus Panel icon
+Requires:       %{name}%{?_isa}        = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa}   = %{version}-%{release}
+%if %{with xinit}
+# setxkbmap can change XKB options for Xorg desktop sessions
+Requires:       setxkbmap
+%endif
+BuildRequires:  libdbusmenu-gtk3-devel
+
+%description panel
+This package contains IBus Panel icon using GtkStatusIcon or AppIndicator
+in non-GNOME desktop sessions likes XFCE or Plasma because gnome-shell
+shows the IBus Icon. This package depends on libdbusmenu-gtk3 for Wayland
+desktop sessions.
+
+%package xinit
+Summary:        IBus Xinit
+Requires:       %{name} = %{version}-%{release}
+%if %{with xinit}
+# Owner of %%{_sysconfdir}/X11/xinit
+Requires:       xorg-x11-xinit
+%endif
+BuildArch:      noarch
+
+%description xinit
+This package includes xinit scripts to set environment variables of IBus
+for Xorg desktop sessions and this is not needed by Wayland desktop sessions.
 
 %package devel
 Summary:        Development tools for ibus
@@ -116,7 +224,7 @@ Requires:       %{name}-libs%{?_isa}   = %{version}-%{release}
 Requires:       dbus-devel
 Requires:       glib2-devel
 # for %%{_datadir}/gettext/its
-Requires:       gettext
+Requires:       gettext-devel
 
 %description devel
 The ibus-devel package contains the header files and developer
@@ -129,44 +237,106 @@ BuildArch:      noarch
 %description devel-docs
 The ibus-devel-docs package contains developer documentation for IBus
 
+%package desktop-testing
+Summary:        Wrapper of InstalledTests Runner for IBus
+Requires:       %{name} = %{version}-%{release}
+%if 0%{?fedora:1}%{?rhel:0}
+# Use no-overview mode in CI to get input focus
+BuildRequires:  gnome-shell-extension-no-overview
+Requires:       gnome-shell-extension-no-overview
+%endif
+BuildArch:      noarch
+
+%description desktop-testing
+GNOME desktop testing runner implements the InstalledTests specification
+and IBus also needs focus events to enable input contexts on text widgets.
+The wrapper script runs gnome-session for the focus events and GNOME
+desktop testing runner internally.
+
+%package  tests
+Summary:        Tests for the %{name} package
+Requires:       %{name}%{?_isa}        = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa}   = %{version}-%{release}
+
+%description tests
+The %{name}-tests package contains tests that can be used to verify
+the functionality of the installed %{name} package.
+
+
 %prep
-%autosetup -S git
+SAVED_SUM=$(grep sha512sum %SOURCE1 | awk '{print $2}')
+MY_SUM=$(sha512sum %SOURCE0 | awk '{print $1}')
+if test x"$SAVED_SUM" != x"$MY_SUM" ; then
+    abort
+fi
+%autosetup -S git -n %{name}-%{source_version}
 # cp client/gtk2/ibusimcontext.c client/gtk3/ibusimcontext.c || :
+# cp client/gtk2/ibusim.c client/gtk3/ibusim.c || :
+# cp client/gtk2/ibusimcontext.c client/gtk4/ibusimcontext.c || :
+cp client/gtk2/ibusimcontext.c client/gtk3/ibusimcontext.c || :
+cp client/gtk2/ibusimcontext.c client/gtk4/ibusimcontext.c || :
+
+
+# prep test
+for f in ibusimcontext.c ibusim.c
+do
+    diff client/gtk2/$f client/gtk3/$f
+    if test $? -ne 0 ; then
+        echo "Have to copy $f into client/gtk3"
+        abort
+    fi
+done
+diff client/gtk2/ibusimcontext.c client/gtk4/ibusimcontext.c
+if test $? -ne 0 ; then
+    echo "Have to copy ibusimcontext.c into client/gtk4"
+    abort
+fi
 
 %build
 #autoreconf -f -i -v
 #make -C ui/gtk3 maintainer-clean-generic
 #make -C tools maintainer-clean-generic
+#make -C src/compose maintainer-clean-generic
 autoreconf -f -i -v
 %configure \
     --disable-static \
     --disable-gtk2 \
-    --disable-gtk3 \
-    --disable-xim \
-    --enable-gtk-doc=yes \
-    --enable-gtk-doc-html=no \
+    --disable-gtk4 \
+    --enable-gtk3 \
+    --enable-xim \
+    --enable-gtk-doc \
     --enable-surrounding-text \
     --with-python=python3 \
-    --disable-ui \
-    --enable-vala=no \
-    --disable-tests \
+%if ! %with_python2
     --disable-python2 \
-%if ! %with_kde5
-    --disable-appindicator \
+%else
+    --enable-python-library \
 %endif
+    --with-python-overrides-dir=%{python3_sitearch}/gi/overrides \
+    --enable-wayland \
     --enable-introspection \
     --enable-install-tests \
     %{nil}
-
 make -C ui/gtk3 maintainer-clean-generic
-%make_build
 
+%make_build
 %install
 make install DESTDIR=$RPM_BUILD_ROOT INSTALL='install -p'
 rm -f $RPM_BUILD_ROOT%{_libdir}/libibus-*%{ibus_api_version}.la
+%if %{with gtk2}
+rm -f $RPM_BUILD_ROOT%{_libdir}/gtk-2.0/%{gtk2_binary_version}/immodules/im-ibus.la
+%endif
+rm -f $RPM_BUILD_ROOT%{_libdir}/gtk-3.0/%{gtk3_binary_version}/immodules/im-ibus.la
+%if %{with gtk4}
+rm -f $RPM_BUILD_ROOT%{_libdir}/gtk-4.0/%{gtk4_binary_version}/immodules/libim-ibus.la
+%endif
+%if %{without xinit}
+# setxkbmap is not available in RHEL10
+rm -f $RPM_BUILD_ROOT%{_datadir}/installed-tests/ibus/xkb-latin-layouts.test
+%endif
 
 # install man page
-for S in %{SOURCE2}
+for S in %{SOURCE3}
 do
   cp $S .
   MP=`basename $S` 
@@ -175,11 +345,27 @@ do
 done
 
 # install xinput config file
-install -pm 644 -D %{SOURCE1} $RPM_BUILD_ROOT%{_xinputconf}
+install -pm 644 -D %{SOURCE2} $RPM_BUILD_ROOT%{_xinputconf}
 
+install -m 755 -d $RPM_BUILD_ROOT%pkgcache/bus
+# `rpm -Vaq ibus` compare st_mode of struct stat with lstat(2) and
+# st_mode of the RPM cache and if the file does not exist, st_mode of
+# RPM cache is o0100000 while the actual st_mode is o0100644.
+touch $RPM_BUILD_ROOT%pkgcache/bus/registry
 # install .desktop files
+%if %with_python2
+echo "NoDisplay=true" >> $RPM_BUILD_ROOT%{_datadir}/applications/ibus-setup.desktop
+%else
 echo "NoDisplay=true" >> $RPM_BUILD_ROOT%{_datadir}/applications/org.freedesktop.IBus.Setup.desktop
+%endif
 #echo "X-GNOME-Autostart-enabled=false" >> $RPM_BUILD_ROOT%%{_sysconfdir}/xdg/autostart/ibus.desktop
+
+mkdir -p $RPM_BUILD_ROOT%{_libdir}/ibus
+cp src/compose/sequences-* $RPM_BUILD_ROOT%{_libdir}/ibus
+
+HAS_PREFIX=$(grep prefix $RPM_BUILD_ROOT%{_bindir}/ibus-setup | wc -l)
+[ x"$HAS_PREFIX" == x1 ] && \
+  sed -i -e '/prefix/d' $RPM_BUILD_ROOT%{_bindir}/ibus-setup
 
 desktop-file-install --delete-original          \
   --dir $RPM_BUILD_ROOT%{_datadir}/applications \
@@ -190,32 +376,39 @@ desktop-file-install --delete-original          \
 
 %check
 make check \
-    DISABLE_GUI_TESTS="ibus-compose ibus-keypress test-stress" \
+    DISABLE_GUI_TESTS="ibus-compose ibus-keypress test-stress xkb-latin-layouts" \
     VERBOSE=1 \
     %{nil}
 
-%post
+%post xinit
 %{_sbindir}/alternatives --install %{_sysconfdir}/X11/xinit/xinputrc xinputrc %{_xinputconf} 83 || :
 
 %postun
 if [ "$1" -eq 0 ]; then
-  %{_sbindir}/alternatives --remove xinputrc %{_xinputconf} || :
-  # if alternative was set to manual, reset to auto
-  [ -L %{_sysconfdir}/alternatives/xinputrc -a "`readlink %{_sysconfdir}/alternatives/xinputrc`" = "%{_xinputconf}" ] && %{_sbindir}/alternatives --auto xinputrc || :
-
   # 'dconf update' sometimes does not update the db...
   dconf update || :
   [ -f %{_sysconfdir}/dconf/db/ibus ] && \
       rm %{_sysconfdir}/dconf/db/ibus || :
-  # 'ibus write-cache --system' updates the system cache.
-  [ -f /var/cache/ibus/bus/registry ] && \
-      rm /var/cache/ibus/bus/registry || :
+fi
+
+%postun xinit
+if [ "$1" -eq 0 ]; then
+  %{_sbindir}/alternatives --remove xinputrc %{_xinputconf} || :
+  # if alternative was set to manual, reset to auto
+  [ -L %{_sysconfdir}/alternatives/xinputrc -a "`readlink %{_sysconfdir}/alternatives/xinputrc`" = "%{_xinputconf}" ] && %{_sbindir}/alternatives --auto xinputrc || :
 fi
 
 %posttrans
 dconf update || :
+
+%transfiletriggerin -- %{_datadir}/ibus/component
 [ -x %{_bindir}/ibus ] && \
   %{_bindir}/ibus write-cache --system &>/dev/null || :
+
+%transfiletriggerpostun -- %{_datadir}/ibus/component
+[ -x %{_bindir}/ibus ] && \
+  %{_bindir}/ibus write-cache --system &>/dev/null || :
+
 
 %ldconfig_scriptlets libs
 
@@ -225,53 +418,104 @@ dconf update || :
 %dir %{_datadir}/ibus/
 %{_bindir}/ibus
 %{_bindir}/ibus-daemon
+%{_datadir}/applications/org.freedesktop.IBus.Panel.Emojier.desktop
+%{_datadir}/applications/org.freedesktop.IBus.Panel.Extension.Gtk3.desktop
 %{_datadir}/bash-completion/completions/ibus.bash
 %{_datadir}/dbus-1/services/*.service
+%dir %{_datadir}/GConf
+%dir %{_datadir}/GConf/gsettings
 %{_datadir}/GConf/gsettings/*
 %{_datadir}/glib-2.0/schemas/*.xml
 %{_datadir}/ibus/component
 %{_datadir}/ibus/dicts
-%{_datadir}/ibus/engine
+%dir %{_datadir}/ibus/engine
 %{_datadir}/ibus/keymaps
 %{_datadir}/icons/hicolor/*/apps/*
 %{_datadir}/man/man1/ibus.1.gz
 %{_datadir}/man/man1/ibus-daemon.1.gz
+%{_datadir}/man/man7/ibus-emoji.7.gz
 %{_datadir}/man/man5/00-upstream-settings.5.gz
 %{_datadir}/man/man5/ibus.5.gz
-%{_datadir}/man/man5/ibus.conf.5.gz
 %{_libexecdir}/ibus-engine-simple
 %{_libexecdir}/ibus-dconf
 %{_libexecdir}/ibus-portal
+%{_libexecdir}/ibus-extension-gtk3
+%{_libexecdir}/ibus-ui-emojier
+%{_libexecdir}/ibus-x11
 %{_sysconfdir}/dconf/db/ibus.d
 %{_sysconfdir}/dconf/profile/ibus
+%dir %{_sysconfdir}/xdg/Xwayland-session.d
+%{_sysconfdir}/xdg/Xwayland-session.d/10-ibus-x11
+%dir %{_prefix}/lib/systemd/user/gnome-session.target.wants
+%{_prefix}/lib/systemd/user/gnome-session.target.wants/*.service
+%{_prefix}/lib/systemd/user/org.freedesktop.IBus.session.*.service
 %python3_sitearch/gi/overrides/__pycache__/*.py*
 %python3_sitearch/gi/overrides/IBus.py
-# ibus owns xinput.d because gnome does not like to depend on imsettings.
-%dir %{_sysconfdir}/X11/xinit/xinput.d
-# Do not use %%config(noreplace) to always get the new keywords in _xinputconf
-# For user customization, $HOME/.xinputrc can be used instead.
-%config %{_xinputconf}
-
+%verify(not mtime) %dir %pkgcache
+%verify(not mtime) %dir %pkgcache/bus
+# 'ibus write-cache --system' updates the system cache.
+%ghost %pkgcache/bus/registry
 %files libs
 %{_libdir}/libibus-*%{ibus_api_version}.so.*
 %dir %{_libdir}/girepository-1.0
 %{_libdir}/girepository-1.0/IBus*-1.0.typelib
 
+%files gtk3
+%{_libdir}/gtk-3.0/%{gtk3_binary_version}/immodules/im-ibus.so
+
 # The setup package won't include icon files so that
 # gtk-update-icon-cache is executed in the main package only one time.
 %files setup
 %{_bindir}/ibus-setup
+%if %with_python2
+%{_datadir}/applications/ibus-setup.desktop
+%else
 %{_datadir}/applications/org.freedesktop.IBus.Setup.desktop
+%endif
 %{_datadir}/ibus/setup
 %{_datadir}/man/man1/ibus-setup.1.gz
 
+%if %with_python2
+%files pygtk2
+%dir %{python2_sitelib}/ibus
+%{python2_sitelib}/ibus/*
+%endif
+
+%if %with_python2
+%files py2override
+%python2_sitearch/gi/overrides/IBus.py*
+%endif
+
+%files wayland
+%{_libexecdir}/ibus-wayland
+
+%files panel
+%{_datadir}/applications/org.freedesktop.IBus.Panel.Wayland.Gtk3.desktop
+%{_libexecdir}/ibus-ui-gtk3
+
+%files xinit
+%{_datadir}/man/man5/ibus.conf.5.gz
+%if %{without xinit}
+# ibus owns xinit directory without xorg-x11-xinit package
+%dir %{_sysconfdir}/X11/xinit
+%dir %{_sysconfdir}/X11/xinit/xinput.d
+%endif
+# Do not use %%config(noreplace) to always get the new keywords in _xinputconf
+# For user customization, $HOME/.xinputrc can be used instead.
+%config %{_xinputconf}
+
 %files devel
+%{_libdir}/ibus
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*
 %{_includedir}/*
 %{_datadir}/gettext/its/ibus.*
 %dir %{_datadir}/gir-1.0
 %{_datadir}/gir-1.0/IBus*-1.0.gir
+%dir %{_datadir}/vala
+%dir %{_datadir}/vala/vapi
+%{_datadir}/vala/vapi/ibus-*1.0.vapi
+%{_datadir}/vala/vapi/ibus-*1.0.deps
 
 %files devel-docs
 # Own html dir since gtk-doc is heavy.
@@ -279,7 +523,23 @@ dconf update || :
 %dir %{_datadir}/gtk-doc/html
 %{_datadir}/gtk-doc/html/*
 
+%files desktop-testing
+%{_bindir}/ibus-desktop-testing-runner
+%{_datadir}/ibus/tests
+%{_libexecdir}/ibus-desktop-testing-autostart
+%{_libexecdir}/ibus-desktop-testing-module
+
+%files tests
+%dir %{_libexecdir}/installed-tests
+%{_libexecdir}/installed-tests/ibus
+%dir %{_datadir}/installed-tests
+%{_datadir}/installed-tests/ibus
+
 %changelog
+* Thu Mar 13 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.5.31-1
+- Update to version 1.5.31
+- License verified
+
 * Tue Aug 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.5.22-9
 - Remove python2 support
 - Remove build-time dependency version checking

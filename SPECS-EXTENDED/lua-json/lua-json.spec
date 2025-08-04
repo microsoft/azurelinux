@@ -6,16 +6,18 @@ Distribution:   Azure Linux
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:           lua-json
-Version:        1.3.2
-Release:        16%{?dist}
+Version:        1.3.4
+Release:        9%{?dist}
 Summary:        JSON Parser/Constructor for Lua
 License:        MIT
 URL:            https://github.com/harningt/luajson
-Source0:        https://github.com/harningt/luajson/archive/%{commit}/luajson-%{version}-%{shortcommit}.tar.gz
-Patch0:		luajson-lua-5.2.patch
+Source0:        https://github.com/harningt/luajson/archive/%{version}/luajson-%{version}.tar.gz
+# Support for lpeg 1.1.0
+Patch0:         https://github.com/harningt/luajson/pull/48.patch
 BuildRequires:  lua >= %{luaver}, lua-lpeg >= 0.8.1
 # for checks
 BuildRequires:  lua-filesystem >= 1.4.1, lua-lunit >= 0.4
+BuildRequires: make
 Requires:       lua(abi) >= %{luaver}, lua-lpeg >= 0.8.1
 BuildArch:      noarch
 
@@ -23,8 +25,7 @@ BuildArch:      noarch
 LuaJSON is a customizable JSON decoder/encoder, using LPEG for parsing.
 
 %prep
-%setup -q -n luajson-%{commit}
-%patch 0 -p1 -b .lua-52
+%autosetup -p1 -n luajson-%{version}
 
 %build
 
@@ -39,17 +40,52 @@ make check-regression
 # grep -q "0 failed, 0 errors" testlog.txt
 
 %files
-%license LICENSE
-%doc docs/LuaJSON.txt docs/ReleaseNotes-1.0.txt
+%doc LICENSE docs/LuaJSON.txt docs/ReleaseNotes-1.0.txt
 %{luapkgdir}/*
 
 %changelog
-* Mon Feb 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.2-16
-- Fixing run-time dependencies.
-- License verified.
+* Tue Apr 08 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.3.4-9
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.2-15
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Aug 01 2024 Orion Poplawski <orion@nwra.com> - 1.3.4-8
+- Add upstream patch to support lua lpeg 1.1.0 (bz#2302036)
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.4-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.4-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.4-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat May 28 2022 Orion Poplawski <orion@nwra.com> - 1.3.4-1
+- Update to 1.3.4
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.2-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.2-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.2-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.2-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 30 2020 Miro Hrončok <mhroncok@redhat.com> - 1.3.2-15
+- Rebuilt for Lua 5.4
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.2-14
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -110,3 +146,4 @@ make check-regression
 
 * Thu Sep 10 2009 Michel Salim <salimma@fedoraproject.org> - 1.0-1
 - Initial package
+

@@ -2,7 +2,7 @@
 %define sourceName kata-containers
 
 Name:         kata-containers-cc
-Version:      3.2.0.azl5
+Version:      3.15.0.aks0
 Release:      2%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
@@ -17,7 +17,7 @@ ExclusiveArch: x86_64
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
-BuildRequires:  rust < 1.85.0
+BuildRequires:  rust >= 1.85.0
 BuildRequires:  libseccomp-devel
 BuildRequires:  openssl-devel
 BuildRequires:  clang
@@ -150,6 +150,12 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Fri Jun 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0.aks0-2
+- Bump release to rebuild with rust
+
+* Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.15.0.aks0-1
+- Auto-upgrade to 3.15.0.aks0
+
 * Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.2.0.azl5-2
 - Pin rust version
 
@@ -241,7 +247,7 @@ fi
 *   Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.0-2
 -   Bump release to rebuild with go 1.19.12
 
-*   Tue Jul 11 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
+*   Fri Jul 28 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
 -   Upgrade to version 0.6.0
 
 *   Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.2-2

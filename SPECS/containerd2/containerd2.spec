@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.0.0
-Release: 8%{?dist}
+Release: 12%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -19,6 +19,10 @@ Source2: containerd.toml
 Patch0:	CVE-2024-45338.patch
 Patch1:	CVE-2025-27144.patch
 Patch2:	CVE-2024-40635.patch
+Patch3:	CVE-2025-22872.patch
+Patch4:	CVE-2025-47291.patch
+Patch5:	multi-snapshotters-support.patch
+Patch6:	tardev-support.patch
 %{?systemd_requires}
 
 BuildRequires: golang
@@ -90,6 +94,18 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Tue Jun 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-12
+- Add updated tardev-snapshotter support patch
+
+* Tue Jun 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-11
+- Add updated multi-snapshotters-support patch
+
+* Fri May 30 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.0.0-10
+- Patch CVE-2025-47291
+
+* Thu May 22 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.0.0-9
+- Patch CVE-2025-22872
+
 * Wed Apr 09 2025 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.0.0-8
 - Fix CVE-2024-40635
 

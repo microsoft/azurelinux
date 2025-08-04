@@ -3,7 +3,7 @@
 %global debug_package %{nil}
 Summary:        Azure Linux OpenTelemetry Collector Distribution
 Name:           azl-otel-collector
-Version:        0.124.0
+Version:        0.127.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -68,6 +68,9 @@ for the Azure Linux OpenTelemetry Collector.
 %{_unitdir}/azl-otel-collector.service
 
 %changelog
+* Mon Jun 01 2025 Adit Jha <aditjha@microsoft.com> - 0.127.0-1
+- Bump to 0.127.0 release
+
 * Wed Apr 23 2025 Adit Jha <aditjha@microsoft.com> - 0.124.0-1
 - Original version for Azure Linux
 - License Verified

@@ -1,0 +1,140 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: Check Disallowed Files
+
+on:
+  push:
+    branches: [main, 2.0*, 3.0*, fasttrack/*]
+  pull_request:
+    branches: [main, 2.0*, 3.0*, fasttrack/*]
+
+jobs:
+
+  build:
+    name: Check Disallowed Files
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Get base commit for PRs
+      if: ${{ github.event_name == 'pull_request' }}
+      run: |
+        git fetch origin ${{ github.base_ref }}
+        echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV
+        echo "Merging ${{ github.sha }} into ${{ github.base_ref }}"
+
+    - name: Get base commit for Pushes
+      if: ${{ github.event_name == 'push' }}
+      run: |
+        git fetch origin ${{ github.event.before }}
+        echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV
+        echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
+
+    - name: Get the changed files
+      run: |
+        echo "Files changed: '$(git diff-tree --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }})'"
+        changed_files=$(git diff-tree --diff-filter=AM --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }})
+        echo "Files to validate: '${changed_files}'"
+        echo "changed-files<<EOF" >> $GITHUB_ENV
+        echo "${changed_files}" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
+    - name: Check for disallowed file types
+      run: |
+        if [[ -z "${{ env.changed-files }}" ]]; then
+          echo "No files to validate. Exiting."
+          exit 0
+        fi
+
+        echo "Checking files..."
+        error_found=0
+
+        # Read disallowed extensions from the configuration file
+        if [[ ! -f ".github/workflows/disallowed-extensions.txt" ]]; then
+          echo "Configuration file '.github/workflows/disallowed-extensions.txt' not found. Skipping check."
+          exit 0
+        fi
+
+        # Create array of disallowed extensions
+        mapfile -t disallowed_extensions < .github/workflows/disallowed-extensions.txt
+        if [[ $? -ne 0 ]]; then
+          echo "Error occurred while reading disallowed extensions. Exiting."
+          exit 1
+        fi
+        
+        # Check each changed file
+        while IFS= read -r file; do
+          if [[ -z "$file" ]]; then
+            continue
+          fi
+
+          echo "Checking file: $file"
+          
+          # Get file extension (convert to lowercase for comparison)
+          extension=$(echo "${file##*.}" | tr '[:upper:]' '[:lower:]')
+          filename=$(basename "$file")
+          
+          # Check if file should be in blob store
+          should_be_in_blob_store=false
+          
+          # Check against disallowed extensions
+          for disallowed_ext in "${disallowed_extensions[@]}"; do
+            # Remove any whitespace and comments
+            clean_ext=$(echo "$disallowed_ext" | sed 's/#.*//' | xargs)
+            if [[ -z "$clean_ext" ]]; then
+              continue
+            fi
+            
+            if [[ "$extension" == "$clean_ext" ]]; then
+              should_be_in_blob_store=true
+              break
+            fi
+          done
+          
+          # Additional checks for binary files and large files
+          if [[ -f "$file" ]]; then
+            # Check if file is binary (but allow .sh files even if executable)
+            if  file "$file" | grep -q "binary\|archive\|compressed"; then
+              should_be_in_blob_store=true
+            fi
+            
+            # Check file size (files > 1MB should be in blob store)
+            file_size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null || echo 0)
+            if [[ $file_size -gt 1048576 ]]; then  # 1MB
+              should_be_in_blob_store=true
+            fi
+          fi
+          
+          if [[ "$should_be_in_blob_store" == "true" ]]; then
+            1>&2 echo "**** ERROR ****"
+            1>&2 echo "File '$file' should be stored in blob store, not in git repository."
+            1>&2 echo "Reason: Images, Large files, binaries, tarballs, and non-text files slow down git operations"
+            1>&2 echo "and cannot be efficiently diffed. Please upload to blob store instead."
+            1>&2 echo "**** ERROR ****"
+            error_found=1
+          fi
+        done <<< "${{ env.changed-files }}"
+
+        if [[ $error_found -eq 1 ]]; then
+          echo ""
+          echo "=========================================="
+          echo "FILES THAT SHOULD BE IN BLOB STORE DETECTED"
+          echo "=========================================="
+          echo "The following file types should be stored in blob store:"
+          echo "- Source tarballs (.tar.gz, .tar.xz, .zip, etc.)"
+          echo "- Binary files (.bin, .exe, .so, .dll, etc.)"
+          echo "- Images (.gif, .bmp, etc.)"
+          echo "- Archives (.rar, .7z, .tar, etc.)"
+          echo "- Large files (> 1MB)"
+          echo "- Any non-text files that cannot be efficiently diffed"
+          echo ""
+          echo "Please upload these files to the blob store and reference them"
+          echo "in your spec files or configuration instead of checking them into git."
+          echo "=========================================="
+          exit 1
+        fi
+
+        echo "All files are appropriate for git storage."

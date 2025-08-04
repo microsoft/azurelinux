@@ -19,7 +19,7 @@
 
 Name:           javapackages-bootstrap
 Version:        1.14.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A means of bootstrapping Java Packages Tools
 # For detailed info see the file javapackages-bootstrap-PACKAGE-LICENSING
 License:        ASL 2.0 and ASL 1.1 and (ASL 2.0 or EPL-2.0) and (EPL-2.0 or GPLv2 with exceptions) and MIT and (BSD with advertising) and BSD-3-Clause and EPL-1.0 and EPL-2.0 and CDDL-1.0 and xpp and CC0 and Public Domain
@@ -154,6 +154,8 @@ Source1118:     xmvn-jpb-4.2.0.tar.xz
 Source1119:     xmvn-generator-1.2.1.tar.xz
 Source1120:     xz-java-1.9.tar.xz
 Patch1:         CVE-2023-2976.patch
+
+Patch0:       CVE-2024-25710.patch
 
 Provides:     bundled(ant) = 1.10.14
 Provides:     bundled(aopalliance) = 1.0
@@ -319,6 +321,10 @@ do
   tar -xf "${source}"
 done
 
+pushd "downstream/commons-compress"
+%patch -P 0 -p1
+popd
+
 for patch_path in patches/*/*
 do
   package_name="$(echo ${patch_path} | cut -f2 -d/)"
@@ -405,9 +411,12 @@ sed -i s/_xmvngen_/_jpbgen_/ %{buildroot}%{_fileattrsdir}/jpbgen.attr
 %doc AUTHORS
 
 %changelog
-* Thu May 15 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.14.0-3
+* Mon May 19 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.14.0-4
 - Patch guava to fix CVE-2023-2976
 - Upgrade commons-io version to 2.14.0 to fix CVE-2024-47554
+
+* Fri May 16 2025 Sudipta Pandit <sudpandit@microsoft.com> - 1.14.0-3
+- Add backported patch for CVE-2024-25710
 
 * Thu Mar 21 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.14.0-2
 - Change JAVA_HOME for xmvn to be msopenjdk location.
