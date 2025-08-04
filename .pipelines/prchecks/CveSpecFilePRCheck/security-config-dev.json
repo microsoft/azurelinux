@@ -1,0 +1,38 @@
+{
+  "umiId": "7bf2e2c3-009a-460e-90d4-eff987a8d71d",
+  "aiCvePatching": {
+    "models": {
+      "gpt4o": {
+        "openaiApiVersion":      "2025-01-01-preview",
+        "openaiApiBase":         "https://monitoringtools-ai-automaton.openai.azure.com/",
+        "openaiDeploymentName":  "automaton-gpt4o",
+        "openaiModelName":       "gpt-4o"
+      },
+      "o1-mini": {
+        "openaiApiVersion":      "2025-01-01-preview",
+        "openaiApiBase":         "https://monitoringtools-ai-automaton.openai.azure.com/",
+        "openaiDeploymentName":  "o1-mini",
+        "openaiModelName":       "o1-mini"
+      },
+      "o1": {
+        "openaiApiVersion":      "2025-01-01-preview",
+        "openaiApiBase":         "https://monitoringtools-ai-automaton.openai.azure.com/",
+        "openaiDeploymentName":  "o1",
+        "openaiModelName":       "o1"
+      },
+      "o3-mini": {
+        "openaiApiVersion":      "2025-01-01-preview",
+        "openaiApiBase":         "https://monitoringtools-ai-automaton.openai.azure.com/",
+        "openaiDeploymentName":  "o3-mini",
+        "openaiModelName":       "o3-mini"
+      }
+    },
+    
+    "cblMarinerRepo": {
+        "keyvaultName": "mariner-pipelines-kv",
+        "secretNames": {
+            "prPatName": "cblmarghGithubPRPat"
+        }
+    }
+  }
+}
