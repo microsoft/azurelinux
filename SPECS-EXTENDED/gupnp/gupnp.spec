@@ -3,7 +3,7 @@
 %global docs 0
 Summary:        A framework for creating UPnP devices & control points
 Name:           gupnp
-Version:        1.6.7
+Version:        1.6.9
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -97,8 +97,8 @@ This package contains developer documentation for %{name}.
 %endif
 
 %changelog
-* Thu Oct 24 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.6.7-1
-- Update to 1.6.7
+* Thu Oct 24 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.6.9-1
+- Update to 1.6.9
 - License verified
 
 * Wed Feb 01 2023 Sumedh Sharma <sumsharma@microsoft.com> - 1.6.3-3
