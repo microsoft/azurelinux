@@ -6,7 +6,7 @@ Name:           nodejs18
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        18.20.3
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -26,6 +26,8 @@ Patch6:         CVE-2024-34064.patch
 Patch7:         CVE-2025-27516.patch
 Patch8:         CVE-2025-47279.patch
 Patch9:         CVE-2025-23166.patch
+Patch10:        Upgrade_llhttp-v6.1.1_to_llhttp_v8.1.2.patch
+Patch11:        updated_callBack_pointers_in_llhttp_settings_t_structure_fix_http_parser_error.patch
 
 BuildRequires:  brotli-devel
 BuildRequires:  coreutils >= 8.22
@@ -127,6 +129,10 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Tue Aug 04 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 18.20.3-8
+- Upgrading llhttp-v6.1.1 to llhttp-v8.1.2 to address the Patch CVE-2025-23167
+- Patch to update callBack pointers in llhttp settings_t_structure to fix http_parser error.
+
 * Mon Jul 14 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 18.20.3-7
 - Patch CVE-2025-23166
 
