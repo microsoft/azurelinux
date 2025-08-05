@@ -1,9 +1,10 @@
-From a997055923f218b5406168c27eb68c3deaf052e9 Mon Sep 17 00:00:00 2001
+From e6f3c6ba0eaa6c23f93981184cd699b3874e4dbd Mon Sep 17 00:00:00 2001
 From: dj_palli <v-dpalli@microsoft.com>
-Date: Mon, 21 Jul 2025 03:20:51 +0000
-Subject: [PATCH] Upgrade llhttp-v6 to llhtt-v9.1.2 w.r.t CVE-2025-23167
+Date: Mon, 4 Aug 2025 13:53:59 +0000
+Subject: [PATCH] Patch for upgrading llhttp-v6.1.1 to llgttp-v9.1.2
 
-Sub-package llhttp-v9.1.2 upstream reference: https://github.com/nodejs/llhttp/releases
+Upstream Patch reference: https://github.com/nodejs/llhttp/releases
+                          https://github.com/nodejs/llhttp/archive/refs/tags/release/v9.1.2.tar.gz
 
 ---
  deps/llhttp/CMakeLists.txt   |    14 +-
@@ -17418,5 +17419,5 @@ index 6f1e1532..dfc1c414 100644
 +}
 \ No newline at end of file
 -- 
-2.45.2
+2.45.4
 

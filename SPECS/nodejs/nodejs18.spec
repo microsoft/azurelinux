@@ -26,7 +26,8 @@ Patch6:         CVE-2024-34064.patch
 Patch7:         CVE-2025-27516.patch
 Patch8:         CVE-2025-47279.patch
 Patch9:         CVE-2025-23166.patch
-Patch10:        Upgrade_llhttp_v9.1.2.patch
+Patch10:        upgrade_llhttp-v6.1.1_to_llhttp-v9.1.2.patch
+Patch11:        update_callBack_pointers_in_llhttp_settings_t_structure_fix_http_parser_error.patch
 
 
 BuildRequires:  brotli-devel
@@ -129,8 +130,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
-* Mon Jul 21 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 18.20.3-8
-- Upgrading llhttp6 to llhttp9 to address the Patch CVE-2025-23167
+* Tue Aug 04 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 18.20.3-8
+- Patch to upgrade the subpackage llhttp-v6.1.1 to llhttp-v9.1.2 to address CVE-2025-23167
+- Patch to update callBack pointers in llhttp settings_t_structure to fix http_parser error.
 
 * Mon Jul 14 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 18.20.3-7
 - Patch CVE-2025-23166
