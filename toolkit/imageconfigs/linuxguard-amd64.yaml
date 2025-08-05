@@ -164,8 +164,6 @@ os:
     # SELinux customizations
     - source: files/linuxguard/selinux-ci-uki.semanage
       destination: /etc/selinux/targeted/selinux-ci.semanage
-    - source: files/linuxguard/99-dhcp-eth0.network
-      destination: /etc/systemd/network/99-dhcp-eth0.network
     # Cloud-init configuration
     - source: files/linuxguard/cloud.cfg
       destination: /etc/cloud/cloud.cfg
@@ -182,9 +180,9 @@ scripts:
     - path: scripts/linuxguard/performance-tuning.sh
     # Config AzureLinuxagent
     - path: scripts/linuxguard/azlinuxagentconfig.sh
-    - path: scripts/linuxguard/duid-type-to-link-layer.sh
     # Disable unused SELinux policy modules and configure SELinux policy for CI
-    - path: scripts/linuxguard/selinux-ci-config.sh
+    - path: scripts/linuxguard/selinux-ci-config.py
+      interpreter: /usr/bin/python3
     - path: scripts/linuxguard/cleanup-machineid.sh
     - path: scripts/linuxguard/prepare_trusted_cni_plugins.sh
     - path: scripts/linuxguard/tmp-no-exec.sh
