@@ -894,7 +894,11 @@ python3 %{SOURCE2} %buildroot %{!?want_bootloader:--no-bootloader}
 
 %if 0%{?want_bootloader}
 mkdir -p %{buildroot}/boot/efi/EFI/BOOT
+%ifarch x86_64
 cp %{buildroot}/usr/lib/systemd/boot/efi/systemd-bootx64.efi %{buildroot}/boot/efi/EFI/BOOT/grubx64.efi
+%elifarch aarch64
+cp %{buildroot}/usr/lib/systemd/boot/efi/systemd-bootaa64.efi %{buildroot}/boot/efi/EFI/BOOT/grubaa64.efi
+%endif
 %endif
 
 %check
@@ -1181,7 +1185,11 @@ fi
 %if 0%{?want_bootloader}
 %files ukify -f .file-list-ukify
 %files boot -f .file-list-boot
+%ifarch x86_64
 /boot/efi/EFI/BOOT/grubx64.efi
+%elifarch aarch64
+/boot/efi/EFI/BOOT/grubaa64.efi
+%endif
 %endif
 
 %files container -f .file-list-container
