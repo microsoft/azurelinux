@@ -123,6 +123,7 @@ os:
       # - selinux-policy-ci
       - selinux-policy-modules
       - setools-console
+      - chrony
 
       # === System packages ===
       - systemd-ukify
