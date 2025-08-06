@@ -41,7 +41,7 @@ storage:
       mountPoint:
         idType: part-label
         path: /boot/efi
-        options: umask=0077,noexec,nodev
+        options: umask=0077,noexec,nodev,nosuid
 
     - deviceId: boot-a
       type: ext4
@@ -82,6 +82,9 @@ os:
       - rd.hostonly=0
       - ipe.enforce=0
       - fips=1
+      - console=ttyAMA0
+      - earlycon=pl011,0xeffec000
+      - initcall_blacklist=arm_pmu_acpi_init
 
   packages:
     remove:
@@ -123,7 +126,6 @@ os:
       # - selinux-policy-ci
       - selinux-policy-modules
       - setools-console
-      - chrony
 
       # === System packages ===
       - systemd-ukify
@@ -213,14 +215,16 @@ os:
 
 scripts:
   postCustomization:
-    - path: scripts/common/performance-tuning.sh
+    - path: scripts/linuxguard/performance-tuning.sh
     # Config AzureLinuxagent
-    - path: scripts/common/azlinuxagentconfig.sh
+    - path: scripts/linuxguard/azlinuxagentconfig.sh
+    - path: scripts/linuxguard/duid-type-to-link-layer.sh
     # Disable unused SELinux policy modules and configure SELinux policy for CI
     #- path: scripts/linuxguard/selinux-ci-config.sh
-    - path: scripts/common/cleanup-machineid.sh
-    - path: scripts/common/prepare_trusted_cni_plugins.sh
-    - path: scripts/common/tmp-no-exec.sh
+    - path: scripts/linuxguard/cleanup-machineid.sh
+    - path: scripts/linuxguard/prepare_trusted_cni_plugins.sh
+    - path: scripts/linuxguard/tmp-no-exec.sh
+
     - path: scripts/set_os_release_variant_entries.sh
       arguments:
       - --variant-id
