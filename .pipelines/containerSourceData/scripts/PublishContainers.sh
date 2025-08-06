@@ -95,11 +95,52 @@ function acr_login {
 # $1: image name
 function oras_attach {
     local image_name=$1
+    local max_retries=3
+    local retry_count=0
 
-    oras attach \
-        --artifact-type "application/vnd.microsoft.artifact.lifecycle" \
-        --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$END_OF_LIFE_1_YEAR" \
-        "$image_name"
+    while [ $retry_count -lt $max_retries ]; do
+        echo "+++ Attempting to attach lifecycle annotation to $image_name (attempt $((retry_count + 1))/$max_retries)"
+        
+        if oras attach \
+            --artifact-type "application/vnd.microsoft.artifact.lifecycle" \
+            --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$END_OF_LIFE_1_YEAR" \
+            "$image_name"; then
+            echo "+++ Successfully attached lifecycle annotation to $image_name"
+            return 0
+        else
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+                echo "+++ Failed to attach lifecycle annotation to $image_name. Retrying in 5 seconds..."
+                sleep 5
+            else
+                echo "+++ Failed to attach lifecycle annotation to $image_name after $max_retries attempts"
+                return 1
+            fi
+        fi
+    done
+}
+
+# Detach the end-of-life annotation from the container image.
+# $1: image name
+function oras_detach {
+    local image_name=$1
+    lifecycle_manifests=$(oras discover -o json  --artifact-type "application/vnd.microsoft.artifact.lifecycle" "$image_name")
+    manifests=$(echo "$lifecycle_manifests" | jq -r '.manifests')
+
+    if [[ -z $manifests ]]; then
+        echo "+++ No lifecycle manifests found for $image_name"
+        return
+    fi
+
+    echo "+++ Found lifecycle manifests for $image_name: $manifests"
+    # Loop through the manifests and delete them.
+    manifest_count=$(echo "$manifests" | jq length)
+    for (( i=0; i<manifest_count; i++ )); do
+        digest=$(echo "$lifecycle_manifests" | jq -r ".manifests[$i].digest")
+        echo "Deleting manifest with digest: $digest"
+        imageNameWithoutTag=${image_name%:*}
+        oras manifest delete --force "$imageNameWithoutTag@$digest"
+    done
 }
 
 function create_multi_arch_tags {
@@ -194,6 +235,7 @@ function create_multi_arch_tags {
     echo "+++ push $full_multiarch_tag tag"
     docker manifest push "$full_multiarch_tag"
     echo "+++ $full_multiarch_tag tag pushed successfully"
+    oras_detach "$full_multiarch_tag"
     oras_attach "$full_multiarch_tag"
 
     # Save the multi-arch tag to a file.
@@ -282,6 +324,7 @@ do
             docker image tag "$amd64_image" "$amd64_retagged_image_name"
             docker rmi "$amd64_image"
             docker image push "$amd64_retagged_image_name"
+            oras_detach "$amd64_retagged_image_name"
             oras_attach "$amd64_retagged_image_name"
 
             if [[ $ARCHITECTURE_TO_BUILD == *"ARM64"*  ]]; then
@@ -290,6 +333,7 @@ do
                 docker image tag "$arm64_image" "$arm64_retagged_image_name"
                 docker rmi "$arm64_image"
                 docker image push "$arm64_retagged_image_name"
+                oras_detach "$arm64_retagged_image_name"
                 oras_attach "$arm64_retagged_image_name"
             fi
 
