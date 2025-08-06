@@ -190,11 +190,18 @@ func Create(tenantId string, userName string, password string, storageAccount st
 	} else if authenticationType == ManagedIdentityAccess {
 
 		clientID := os.Getenv("AZURE_CLIENT_ID")
-		logger.Log.Infof("AZURE_CLIENT_ID environment variable: '%s'", clientID)
 
-		credential, err := azidentity.NewManagedIdentityCredential(&azidentity.ManagedIdentityCredentialOptions{
-			ID: azidentity.ClientID(clientID),
-		})
+		var credential azidentity.TokenCredential
+		if clientID == "" {
+			//TODO Debugf
+			logger.Log.Infof("Using DefaultAzureCredential for managed identity access")
+			credential, err = azidentity.NewDefaultAzureCredential(nil)
+		} else {
+			logger.Log.Infof("Using ManagedIdentityCredential with supplied client ID for managed identity access: %s", clientID)
+			credential, err = azidentity.NewManagedIdentityCredential(&azidentity.ManagedIdentityCredentialOptions{
+				ID: azidentity.ClientID(clientID),
+			})
+		}
 		if err != nil {
 			return nil, fmt.Errorf("Unable to init azure managed identity:\n%w", err)
 		}
