@@ -127,3 +127,39 @@ $(valid_arch_spec_names): $(go-specarchchecker) $(chroot_worker) $(local_specs) 
 		--log-level=$(LOG_LEVEL) \
 		--log-file="$(valid_arch_spec_names_logs_path)" \
 		--log-color="$(LOG_COLOR)"
+
+##help:target:install-prereqs=Install basic build prerequisites automatically.
+install-prereqs:
+	@echo "Installing build prerequisites for AzureLinux..." && \
+	current_os=$$(grep '^ID=' /etc/os-release | cut -d'=' -f2-) && \
+	echo "Current OS: $$current_os" && \
+	if [ "$$current_os" = "mariner" ]; then \
+		"$(toolkit_root)/docs/building/prerequisites-mariner.sh" --use-msft-golang || \
+		$(call print_error,Install failed) ; \
+	elif [ "$$current_os" = "azurelinux" ]; then \
+		"$(toolkit_root)/docs/building/prerequisites-mariner.sh" || \
+		$(call print_error,Install failed) ; \
+	elif [ "$$current_os" = "ubuntu" ]; then \
+		"$(toolkit_root)/docs/building/prerequisites-ubuntu.sh" || \
+		$(call print_error,Install failed) ; \
+	else \
+		$(call print_error,"Unsupported OS: $$current_os") ; \
+	fi
+
+##help:target:install-prereqs-and-configure=Install prerequisites and configure Docker and Go (where applicable).
+install-prereqs-and-configure:
+	@echo "Installing prerequisites and configuring system to build AzureLinux..." && \
+	current_os=$$(grep '^ID=' /etc/os-release | cut -d'=' -f2-) && \
+	echo "Current OS: $$current_os" && \
+	if [ "$$current_os" = "mariner" ]; then \
+		"$(toolkit_root)/docs/building/prerequisites-mariner.sh" --use-msft-golang --configure-docker || \
+		$(call print_error,Install failed) ; \
+	elif [ "$$current_os" = "azurelinux" ]; then \
+		"$(toolkit_root)/docs/building/prerequisites-mariner.sh" --configure-docker || \
+		$(call print_error,Install failed) ; \
+	elif [ "$$current_os" = "ubuntu" ]; then \
+		"$(toolkit_root)/docs/building/prerequisites-ubuntu.sh" --fix-go-links --configure-docker || \
+		$(call print_error,Install failed) ; \
+	else \
+		$(call print_error,"Unsupported OS: $$current_os") ; \
+	fi
