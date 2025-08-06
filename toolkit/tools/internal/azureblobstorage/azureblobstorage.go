@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
@@ -29,16 +30,6 @@ type AzureBlobInfo struct {
 	StorageAccount string
 	ContainerName  string
 	BlobName       string
-}
-
-// IsAzureBlobStorageURL checks if the given URL is an Azure Blob Storage URL
-func IsAzureBlobStorageURL(urlStr string) bool {
-	parsedURL, err := url.Parse(urlStr)
-	if err != nil {
-		return false
-	}
-
-	return strings.HasSuffix(parsedURL.Host, ".blob.core.windows.net")
 }
 
 // ParseAzureBlobStorageURL parses an Azure Blob Storage URL and extracts storage account, container, and blob name
@@ -158,7 +149,7 @@ func (abs *AzureBlobStorage) Delete(
 	return nil
 }
 
-func Create(tenantId string, userName string, password string, storageAccount string, authenticationType int) (abs *AzureBlobStorage, err error) {
+func Create(tenantId string, userName string, password string, storageAccount string, authenticationType int, azureClientID string) (abs *AzureBlobStorage, err error) {
 
 	url := "https://" + storageAccount + ".blob.core.windows.net/"
 
@@ -189,19 +180,18 @@ func Create(tenantId string, userName string, password string, storageAccount st
 
 	} else if authenticationType == ManagedIdentityAccess {
 
-		clientID := os.Getenv("AZURE_CLIENT_ID")
+		var credential azcore.TokenCredential
 
-		var credential azidentity.TokenCredential
-		if clientID == "" {
-			//TODO Debugf
+		if azureClientID == "" {
 			logger.Log.Infof("Using DefaultAzureCredential for managed identity access")
 			credential, err = azidentity.NewDefaultAzureCredential(nil)
 		} else {
-			logger.Log.Infof("Using ManagedIdentityCredential with supplied client ID for managed identity access: %s", clientID)
+			logger.Log.Infof("Using ManagedIdentityCredential with supplied client ID for managed identity access: %s", azureClientID)
 			credential, err = azidentity.NewManagedIdentityCredential(&azidentity.ManagedIdentityCredentialOptions{
-				ID: azidentity.ClientID(clientID),
+				ID: azidentity.ClientID(azureClientID),
 			})
 		}
+
 		if err != nil {
 			return nil, fmt.Errorf("Unable to init azure managed identity:\n%w", err)
 		}

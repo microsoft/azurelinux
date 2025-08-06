@@ -56,7 +56,7 @@ func JoinURL(baseURL string, extraPaths ...string) string {
 	return fmt.Sprintf("%s%s%s", baseURL, urlPathSeparator, appendToBase)
 }
 
-// DownloadFile downloads a file from a URL to a local file. It will retry the download if it fails. If the externalCancel
+// DownloadFileWithRetry downloads a file from a URL to a local file. It will retry the download if it fails. If the externalCancel
 // channel is provided, the download will be cancelled if the externalCancel channel is closed. The function will return
 // true if the download was cancelled, and an error if the download failed. 404 errors are considered unrecoverable and
 // will not be retried.
@@ -66,9 +66,10 @@ func JoinURL(baseURL string, extraPaths ...string) string {
 // caCerts: The CA certificates to use for the download.
 // tlsCerts: The TLS certificates to use for the download.
 // timeout: The maximum duration for the download operation, use 0 for no timeout, or network.DefaultTimeout for a default timeout.
+// azureClientID: Optional Azure client ID for managed identity authentication.
 // returns: wasCancelled: true if the download was cancelled via the external cancel channel, false otherwise.
 // returns: err: An error if the download failed (including being cancelled), nil otherwise.
-func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls.Certificate, timeout time.Duration) (wasCancelled bool, err error) {
+func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls.Certificate, azureClientID string, timeout time.Duration) (wasCancelled bool, err error) {
 	var closeCtx context.CancelFunc
 
 	if ctx == nil {
@@ -89,7 +90,7 @@ func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts 
 	retryNum := 1
 	errorWas404 := false
 	wasCancelled, err = retry.RunWithDefaultDownloadBackoff(ctx, func() error {
-		netErr := DownloadFile(ctx, srcUrl, dstFile, caCerts, tlsCerts)
+		netErr := DownloadFile(ctx, srcUrl, dstFile, caCerts, tlsCerts, azureClientID)
 		if netErr != nil {
 			// Check if the error is a 404, we should print a warning in that case so the user
 			// sees it even if we are running with --no-verbose. 404's are unlikely to fix themselves on retry, give up.
@@ -119,7 +120,7 @@ func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts 
 
 // DownloadFile downloads `url` into `dst`. `caCerts` may be nil. If there is an error `dst` will be removed.
 // First attempts HTTP download, then falls back to Azure SDK if the URL is an Azure Blob Storage URL.
-func DownloadFile(ctx context.Context, url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certificate) (err error) {
+func DownloadFile(ctx context.Context, url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certificate, azureClientID string) (err error) {
 	if ctx == nil {
 		return fmt.Errorf("context is nil")
 	}
@@ -130,24 +131,17 @@ func DownloadFile(ctx context.Context, url, dst string, caCerts *x509.CertPool, 
 		return nil // HTTP download succeeded
 	}
 
-	// HTTP download failed, check if this is an Azure Blob Storage URL
-	if !azureblobstorage.IsAzureBlobStorageURL(url) {
-		return err // Not an Azure Blob Storage URL, return original error
+	// HTTP download failed, attempt to parse as Azure Blob Storage URL
+	blobInfo, parseErr := azureblobstorage.ParseAzureBlobStorageURL(url)
+	if parseErr != nil {
+		return fmt.Errorf("both HTTP and Azure SDK downloads failed. HTTP error: %w, URL parse error: %v", err, parseErr)
 	}
 
 	logger.Log.Debugf("HTTP download failed for Azure Blob Storage URL, attempting Azure SDK fallback")
 
-	// Parse the Azure Blob Storage URL
-	blobInfo, parseErr := azureblobstorage.ParseAzureBlobStorageURL(url)
-	if parseErr != nil {
-		logger.Log.Debugf("Failed to parse Azure Blob Storage URL: %v", parseErr)
-		return err // Return original HTTP error
-	}
-
 	// Attempt download using Azure SDK
-	azureErr := downloadFileWithAzureSDK(ctx, blobInfo, dst)
+	azureErr := downloadFileWithAzureSDK(ctx, blobInfo, dst, azureClientID)
 	if azureErr != nil {
-		logger.Log.Debugf("Azure SDK fallback also failed: %v", azureErr)
 		return fmt.Errorf("both HTTP and Azure SDK downloads failed. HTTP error: %w, Azure SDK error: %v", err, azureErr)
 	}
 
@@ -208,11 +202,11 @@ func downloadFileHttp(ctx context.Context, url, dst string, caCerts *x509.CertPo
 }
 
 // downloadFileWithAzureSDK attempts to download a file using the Azure SDK for Go
-func downloadFileWithAzureSDK(ctx context.Context, blobInfo *azureblobstorage.AzureBlobInfo, dst string) error {
+func downloadFileWithAzureSDK(ctx context.Context, blobInfo *azureblobstorage.AzureBlobInfo, dst string, azureClientID string) error {
 	logger.Log.Infof("Attempting Azure SDK download for blob: %s/%s from storage account: %s", blobInfo.ContainerName, blobInfo.BlobName, blobInfo.StorageAccount)
 
 	// Create Azure Blob Storage client with managed identity access
-	azureBlobStorage, err := azureblobstorage.Create("", "", "", blobInfo.StorageAccount, azureblobstorage.ManagedIdentityAccess)
+	azureBlobStorage, err := azureblobstorage.Create("", "", "", blobInfo.StorageAccount, azureblobstorage.ManagedIdentityAccess, azureClientID)
 	if err != nil {
 		return fmt.Errorf("failed to create Azure Blob Storage client: %w", err)
 	}

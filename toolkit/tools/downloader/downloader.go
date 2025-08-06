@@ -32,6 +32,7 @@ var (
 	caCertFile    = app.Flag("ca-certificate", "Root certificate authority to use when downloading files.").String()
 	tlsClientCert = app.Flag("certificate", "TLS client certificate to use when downloading files.").String()
 	tlsClientKey  = app.Flag("private-key", "TLS client key to use when downloading files.").String()
+	azureClientID = app.Flag("azure-client-id", "Azure client ID for managed identity authentication").String()
 
 	dstFile   = app.Flag("output-file", "Destination file to download to").Short('O').String()
 	prefixDir = app.Flag("directory-prefix", "Directory to download to").Short('P').String()
@@ -97,7 +98,7 @@ func main() {
 		}
 	}
 
-	_, err = network.DownloadFileWithRetry(context.Background(), *srcUrl, *dstFile, caCerts, tlsCerts, network.DefaultTimeout)
+	_, err = network.DownloadFileWithRetry(context.Background(), *srcUrl, *dstFile, caCerts, tlsCerts, *azureClientID, network.DefaultTimeout)
 	if err != nil {
 		logger.Log.Fatalf("Failed to download (%s) to (%s). Error:\n%s", *srcUrl, *dstFile, err)
 	}

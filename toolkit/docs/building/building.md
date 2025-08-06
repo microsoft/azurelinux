@@ -376,6 +376,11 @@ If supplying custom endpoints for source/SRPM/package servers, accessing these r
 sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" CA_CERT=/path/to/rootca.crt TLS_CERT=/path/to/user.crt TLS_KEY=/path/to/user.key
 ```
 
+A managed identity ID can be passed for hydrating package sources from authenticated blob storages using:
+```bash
+sudo make build-packages AZURE_CLIENT_ID="<uuid>"
+```
+
 ## Building Everything From Scratch
 
 **NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Azure Linux source packages are available at `SOURCE_URL=https://azurelinuxsrcstorage.blob.core.windows.net/sources/core`**
@@ -840,6 +845,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | CA_CERT                       |                                                                                                          | CA cert to access the above resources, in addition to the system certificate store
 | TLS_CERT                      |                                                                                                          | TLS cert to access the above resources
 | TLS_KEY                       |                                                                                                          | TLS key to access the above resources
+| AZURE_CLIENT_ID               |                                                                                                          | Azure client ID for managed identity authentication when accessing package sources from Azure Blob Storages
 
 ---
 
