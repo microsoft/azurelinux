@@ -1,5 +1,4 @@
 Name:           google-noto-serif-cjk-fonts
-epoch:          1
 Version:        2.003
 Release:        4%{?dist}
 Summary:        google-noto-serif-cjk-fonts for fonts
@@ -60,7 +59,7 @@ ln -s %{_fontconfig_templatedir}/65-1-%{name}.conf \
 %license LICENSE
 
 %changelog
-* Wed Jul 30 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1:2.003-4
+* Wed Jul 30 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.003-4
 - License verified
 - Initial Azure Linux import from Fedora 43 (license: MIT).
 

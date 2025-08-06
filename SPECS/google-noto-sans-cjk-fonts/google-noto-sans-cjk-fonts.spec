@@ -1,5 +1,4 @@
 Name:           google-noto-sans-cjk-fonts
-epoch:          1
 Version:        2.004
 Release:        11%{?dist}
 Summary:        google-noto-sans-cjk-fonts for fonts
@@ -73,7 +72,7 @@ ln -s %{_fontconfig_templatedir}/65-1-%{name}.conf %{buildroot}%{_fontconfig_con
 %license LICENSE
 
 %changelog
-* Wed Jul 30 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1:2.004-11
+* Wed Jul 30 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.004-11
 - License verified
 - Initial Azure Linux import from Fedora 43 (license: MIT).
 
