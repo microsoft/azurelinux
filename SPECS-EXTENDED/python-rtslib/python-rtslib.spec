@@ -11,7 +11,7 @@ Summary:          API for Linux kernel LIO SCSI target
 Version:          2.1.76
 Release:          10%{?dist}
 URL:              https://github.com/open-iscsi/%{oname}
-Source:           %{url}/archive/v%{version}/%{oname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:          %{url}/archive/v%{version}/%{oname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:           0001-disable-xen_pvscsi.patch
 Patch1:           0002-rtslib-explicitely-import-kmod.error-and-kmod.Kmod.patch
 BuildArch:        noarch
