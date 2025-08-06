@@ -121,10 +121,6 @@ parameters:
     type: string
     default: ""
 
-  - name: pipArtifactFeeds
-    type: string
-    default: ""
-
   - name: publishLogs
     type: boolean
     default: true
@@ -153,12 +149,6 @@ steps:
   - template: ToolkitCheck.yml@${{ parameters.selfRepoName }}
     parameters:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
-
-  - ${{ if parameters.pipArtifactFeeds }}:
-      - task: PipAuthenticate@1
-        inputs:
-          artifactFeeds: "${{ parameters.pipArtifactFeeds }}"
-        displayName: "Authenticate to custom pip artifact feeds"
 
   - ${{ if parameters.customToolchainTarballName }}:
       - script: |
