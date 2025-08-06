@@ -14,8 +14,8 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           msft-golang
-Version:        1.24.1
-Release:        3%{?dist}
+Version:        1.24.5
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -164,6 +164,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Aug 06 2025 Muhammad Falak <mwani@microsoft.com> - 1.24.5-1
+- Bump version to 1.24.5
+
 * Mon Jun 30 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.24.1-3
 - Patch CVE-2025-22874 & CVE-2025-4673
 
