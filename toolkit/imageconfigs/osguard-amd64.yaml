@@ -82,6 +82,7 @@ os:
       - rd.hostonly=0
       - ipe.enforce=0
       - fips=1
+      - net.ifnames=1
 
   packages:
     remove:
