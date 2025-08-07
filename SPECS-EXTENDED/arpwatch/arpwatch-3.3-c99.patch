@@ -1,0 +1,17 @@
+diff --git a/dns.c b/dns.c
+index 82106e1244f94aec..75cc27b6775649f7 100644
+--- a/dns.c
++++ b/dns.c
+@@ -115,10 +115,10 @@ gethinfo(char *hostname, char *cpu, int cpulen, char *os, int oslen)
+ 		    (u_char *)cp, (char *)bp, buflen)) < 0)
+ 			break;
+ 		cp += n;
+-		type = _getshort(cp);
++		type = ns_get16(cp);
+ 		cp += sizeof(u_short);			/* class */
+ 		cp += sizeof(u_short) + sizeof(u_int32_t);
+-		n = _getshort(cp);
++		n = ns_get16(cp);
+ 		cp += sizeof(u_short);
+ 		if (type == T_HINFO) {
+ 			/* Unpack */
