@@ -1,9 +1,9 @@
 {
- "Signatures": {
-  "README.Fedora": "150876479af4ace0b6f1eb24acb765cb143899137065d75394941e653e80980a",
-  "README.watchdog.ipmi": "1dfd3470d33043324887872ef53824390a4156a7f577bd9a51a80b84ddff4ce9",
-  "watchdog-5.15.tar.gz": "ffdc865137ad5d8e53664bd22bad4de6ca136d1b4636720320cb52af0c18947c",
-  "watchdog-ping.service": "ff1d361cfad1d7df5413d82eb701acdfe989c87cdfbf81b7e8376c8d217f65aa",
-  "watchdog.service": "be0e68c23577f6e4ba66ab7dccddb781acd6fabec228ef6d03adc6cbb8d37f09"
- }
-}
+    "Signatures": {
+     "README.Fedora": "150876479af4ace0b6f1eb24acb765cb143899137065d75394941e653e80980a",
+     "README.watchdog.ipmi": "1dfd3470d33043324887872ef53824390a4156a7f577bd9a51a80b84ddff4ce9",
+     "watchdog-5.16.tar.gz": "b8e7c070e1b72aee2663bdc13b5cc39f76c9232669cfbb1ac0adc7275a3b019d",
+     "watchdog-ping.service": "ff1d361cfad1d7df5413d82eb701acdfe989c87cdfbf81b7e8376c8d217f65aa",
+     "watchdog.service": "be0e68c23577f6e4ba66ab7dccddb781acd6fabec228ef6d03adc6cbb8d37f09"
+    }
+   }
