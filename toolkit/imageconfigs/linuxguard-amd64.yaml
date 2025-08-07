@@ -189,6 +189,8 @@ scripts:
     - path: scripts/common/cleanup-machineid.sh
     # Move CNI binaries from /opt to /usr for IPE
     - path: scripts/common/prepare_trusted_cni_plugins.sh
+    # Move iptables scripts from /etc to /usr for IPE
+    - path: scripts/common/move-iptables-scripts-to-usr.sh
     # Disable exec and suid on /tmp
     - path: scripts/common/tmp-no-exec.sh
     # Remove ImportCredential from getty services to avoid boot log warnings
