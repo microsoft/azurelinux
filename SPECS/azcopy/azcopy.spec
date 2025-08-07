@@ -31,6 +31,7 @@ Patch0:         CVE-2025-22868.patch
 Patch1:         CVE-2025-30204.patch
 Patch2:         CVE-2025-22870.patch
 Patch3:         CVE-2024-51744.patch
+Patch4:         CVE-2025-1111.patch
 
 BuildRequires:  golang >= 1.17.9
 BuildRequires:  git
