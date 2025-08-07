@@ -1,40 +1,41 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global somajor 8
+%global somajor 9
 %global sominor 0
 %global sotiny  0
 %global soversion %{somajor}.%{sominor}.%{sotiny}
 
 Name:			libvpx
 Summary:		VP8/VP9 Video Codec SDK
-Version:		1.13.1
-Release:		1%{?dist}
-License:		BSD
+Version:		1.14.1
+Release:		3%{?dist}
+License:		BSD-3-Clause
+URL:			http://www.webmproject.org/code/
 Source0:		https://github.com/webmproject/libvpx/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:		vpx_config.h
 # Thanks to debian.
 Source2:		libvpx.ver
-URL:			http://www.webmproject.org/code/
-BuildRequires:		gcc
-BuildRequires:		gcc-c++
-%ifarch %{ix86} x86_64
-BuildRequires:		yasm
-%endif
-BuildRequires:		doxygen, php-cli, perl(Getopt::Long)
 # Do not disable FORTIFY_SOURCE=2
 Patch0:			libvpx-1.7.0-leave-fortify-source-on.patch
+BuildRequires:		gcc
+BuildRequires:		gcc-c++
+BuildRequires:		make
+%ifarch %{ix86} x86_64
+BuildRequires:		nasm
+%endif
+BuildRequires:		doxygen, perl(Getopt::Long)
 
 %description
-libvpx provides the VP8/VP9 SDK, which allows you to integrate your applications 
-with the VP8 and VP9 video codecs, high quality, royalty free, open source codecs 
-deployed on millions of computers and devices worldwide. 
+libvpx provides the VP8/VP9 SDK, which allows you to integrate your applications
+with the VP8 and VP9 video codecs, high quality, royalty free, open source codecs
+deployed on millions of computers and devices worldwide.
 
 %package devel
 Summary:		Development files for libvpx
 Requires:		%{name}%{?_isa} = %{version}-%{release}
 
 %description devel
-Development libraries and headers for developing software against 
+Development libraries and headers for developing software against
 libvpx.
 
 %package utils
@@ -47,23 +48,20 @@ and decoder.
 
 %prep
 %setup -q -n libvpx-%{version}
-%patch 0 -p1 -b .leave-fs-on
+%patch -P0 -p1 -b .fortify-source-on
 
 %build
+
 %ifarch %{ix86}
 %global vpxtarget x86-linux-gcc
 %else
 %ifarch	x86_64
 %global	vpxtarget x86_64-linux-gcc
 %else
-%ifarch armv7hl
-%global vpxtarget armv7-linux-gcc
-%else
 %ifarch aarch64
 %global vpxtarget arm64-linux-gcc
 %else
 %global vpxtarget generic-gnu
-%endif
 %endif
 %endif
 %endif
@@ -82,40 +80,22 @@ and decoder.
 
 %set_build_flags
 
-%ifarch armv7hl
-CROSS=armv7hl-redhat-linux-gnueabi- CHOST=armv7hl-redhat-linux-gnueabi-hardfloat ./configure \
-%else
 ./configure --target=%{vpxtarget} \
-%endif
-%ifarch %{arm}
---disable-neon --disable-neon_asm \
-%endif
 --enable-pic --disable-install-srcs \
 --enable-vp9-decoder --enable-vp9-encoder \
 --enable-experimental \
 --enable-vp9-highbitdepth \
+--enable-debug \
 %if ! %{generic_target}
 --enable-shared \
+%endif
+%ifarch %{ix86} x86_64
+--as=nasm \
 %endif
 --enable-install-srcs \
 --prefix=%{_prefix} --libdir=%{_libdir} --size-limit=16384x16384
 
-%ifarch armv7hl
-#hackety hack hack
-sed -i "s|AR=armv7hl-redhat-linux-gnueabi-ar|AR=ar|g" libs-%{vpxtarget}.mk
-sed -i "s|AR=armv7hl-redhat-linux-gnueabi-ar|AR=ar|g" examples-%{vpxtarget}.mk
-sed -i "s|AR=armv7hl-redhat-linux-gnueabi-ar|AR=ar|g" docs-%{vpxtarget}.mk
-
-sed -i "s|AS=armv7hl-redhat-linux-gnueabi-as|AS=as|g" libs-%{vpxtarget}.mk
-sed -i "s|AS=armv7hl-redhat-linux-gnueabi-as|AS=as|g" examples-%{vpxtarget}.mk
-sed -i "s|AS=armv7hl-redhat-linux-gnueabi-as|AS=as|g" docs-%{vpxtarget}.mk
-
-sed -i "s|NM=armv7hl-redhat-linux-gnueabi-nm|NM=nm|g" libs-%{vpxtarget}.mk
-sed -i "s|NM=armv7hl-redhat-linux-gnueabi-nm|NM=nm|g" examples-%{vpxtarget}.mk
-sed -i "s|NM=armv7hl-redhat-linux-gnueabi-nm|NM=nm|g" docs-%{vpxtarget}.mk
-%endif
-
-make %{?_smp_mflags} verbose=true
+%make_build verbose=true
 
 # Manual shared library creation
 # We should never need to do this anymore, and if we do, we need to fix the version-script.
@@ -135,18 +115,14 @@ rm -rf tmp
 # We need to do this so the examples can link against it.
 # ln -sf libvpx.so.%{soversion} libvpx.so
 
-# make %{?_smp_mflags} verbose=true target=examples CONFIG_SHARED=1
-# make %{?_smp_mflags} verbose=true target=docs
+# %make_build verbose=true target=examples CONFIG_SHARED=1
+# %make_build verbose=true target=docs
 
 # Put them back so the install doesn't fail
 # mv libNOTvpx.a libvpx.a
 # mv libNOTvpx_g.a libvpx_g.a
 
 %install
-%ifarch armv7hl
-export CROSS=armv7hl-redhat-linux-gnueabi-
-export CHOST=armv7hl-redhat-linux-gnueabi-hardfloat
-%endif
 make DIST_DIR=%{buildroot}%{_prefix} dist
 
 # Simpler to label the dir as %%doc.
@@ -181,9 +157,6 @@ chmod 755 .%{_bindir}/*
 popd
 
 # Get the vpx_config.h file
-%ifarch %{arm}
-cp -a vpx_config.h %{buildroot}%{_includedir}/vpx/vpx_config-arm.h
-%else
 # Does ppc64le need its own?
 %ifarch ppc64 ppc64le
 cp -a vpx_config.h %{buildroot}%{_includedir}/vpx/vpx_config-ppc64.h
@@ -195,7 +168,6 @@ cp -a vpx_config.h %{buildroot}%{_includedir}/vpx/vpx_config-s390.h
 cp -a vpx_config.h %{buildroot}%{_includedir}/vpx/vpx_config-x86.h
 %else
 cp -a vpx_config.h %{buildroot}%{_includedir}/vpx/vpx_config-%{_arch}.h
-%endif
 %endif
 %endif
 %endif
@@ -237,16 +209,96 @@ make test
 %{_bindir}/*
 
 %changelog
-* Wed Oct 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.13.1-1
-- Auto-upgrade to 1.13.1 - to fix CVE.
-- Add %check section.
+* Thu Feb 27 2025 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.14.1-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
 
-* Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.2-4
-- Updating source URLs.
-- License verified.
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.14.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.2-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 05 2024 Wim Taymans <wtaymans@redhat.com> - 1.14.1-1
+- Update to 1.14.1
+
+* Mon Mar 04 2024 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 1.14.0-2
+- Replace yasm with nasm
+
+* Tue Feb 06 2024 Pete Walter <pwalter@fedoraproject.org> - 1.14.0-1
+- Update to 1.14.0
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.13.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.13.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Oct  1 2023 Tom Callaway <spot@fedoraproject.org> - 1.13.1-1
+- update to 1.13.1
+
+* Fri Sep 29 2023 Neal Gompa <ngompa@fedoraproject.org> - 1.13.0-5
+- Minor spec cleanups
+
+* Thu Sep 28 2023 Boudhayan Bhattacharya <bbhtt.zn0i8@slmail.me> - 1.13.0-4
+- Patch for CVE-2023-5217
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.13.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Feb 15 2023 Pete Walter <pwalter@fedoraproject.org> - 1.13.0-2
+- Fix whitespace in spec file
+- Drop 32 bit arm support
+
+* Wed Feb 15 2023 Tom Callaway <spot@fedoraproject.org> - 1.13.0-1
+- update to 1.13.0
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.12.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Dec  6 2022 Florian Weimer <fweimer@redhat.com> - 1.12.0-2
+- Backport upstream commit to improve C99 compatibility
+
+* Wed Aug 17 2022 Pete Walter <pwalter@fedoraproject.org> - 1.12.0-1
+- Update to 1.12.0
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.11.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 27 2022 Tom Callaway <spot@fedoraproject.org> - 1.11.0-1
+- update to 1.11.0
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Mar 29 2021 Tom Callaway <spot@fedoraproject.org> - 1.10.0-1
+- update to 1.10.0
+
+* Mon Mar  8 2021 Tom Callaway <spot@fedoraproject.org> - 1.10.0-0.1.rc1
+- update to 1.10.0-rc1
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Oct 10 2020 Jeff Law <law@redhat.com> - 1.9.0-2
+- Re-enable LTO
+
+* Thu Aug 13 2020 Tom Callaway <spot@fedoraproject.org> - 1.9.0-1
+- update to 1.9.0
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.2-6
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 13 2020 Tom Stellard <tstellar@redhat.com> - 1.8.2-4
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Wed Jul 01 2020 Jeff Law <law@redhat.com> - 1.8.2-3
+- Disable LTO
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
