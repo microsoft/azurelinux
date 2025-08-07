@@ -336,8 +336,11 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 		OS: &OS{
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",
+
 			KernelCommandLine: KernelCommandLine{
-				ExtraCommandLine: "console=ttyS0",
+				ExtraCommandLine: []string{
+					"console=ttyS0",
+				},
 			},
 		},
 	}
