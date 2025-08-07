@@ -1297,8 +1297,8 @@
         "type": "other",
         "other": {
           "name": "buildah",
-          "version": "1.18.0",
-          "downloadUrl": "https://github.com/containers/buildah/archive/v1.18.0.tar.gz"
+          "version": "1.38.0",
+          "downloadUrl": "https://github.com/containers/buildah/archive/v1.38.0.tar.gz"
         }
       }
     },
@@ -21373,8 +21373,8 @@
         "type": "other",
         "other": {
           "name": "podman",
-          "version": "4.1.1",
-          "downloadUrl": "https://github.com/containers/podman/archive/v4.1.1.tar.gz"
+          "version": "5.5.2",
+          "downloadUrl": "https://github.com/containers/podman/archive/v5.5.2.tar.gz"
         }
       }
     },
