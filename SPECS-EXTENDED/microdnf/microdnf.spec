@@ -1,15 +1,16 @@
-Vendor:         Microsoft Corporation
+%global libdnf_version 0.62.0
+
 Distribution:   Azure Linux
-%global libdnf_version 0.43.1
+Vendor:         Microsoft Corporation
 
 Name:           microdnf
-Version:        3.5.1
+Version:        3.10.1
 Release:        2%{?dist}
-Summary:        Minimal C implementation of DNF
+Summary:        Lightweight implementation of DNF in C
 
-License:        GPLv3+
+License:        GPL-2.0-or-later
 URL:            https://github.com/rpm-software-management/microdnf
-Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  meson >= 0.36.0
@@ -21,18 +22,16 @@ BuildRequires:  pkgconfig(smartcols)
 BuildRequires:  help2man
 
 Requires:       libdnf%{?_isa} >= %{libdnf_version}
+# Ensure DNF package manager configuration skeleton is installed
+Requires:       /etc/dnf/dnf.conf
 
 %description
-Micro DNF is a very minimal C implementation of DNF's install, upgrade,
-remove, repolist, and clean commands, designed to be used for doing simple
-packaging actions in containers when you don't need full-blown DNF and
-you want the tiniest useful containers possible.
+Micro DNF is a lightweight C implementation of DNF, designed to be used
+for doing simple packaging actions when you don't need full-blown DNF and
+you want the tiniest useful environments possible.
 
 That is, you don't want any interpreter stack and you want the most
 minimal environment possible so you can build up to exactly what you need.
-
-This is not a substitute for DNF for real systems, and many of DNF's
-capabilities are intentionally not implemented in Micro DNF.
 
 
 %prep
@@ -55,18 +54,107 @@ capabilities are intentionally not implemented in Micro DNF.
 %{_bindir}/%{name}
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.5.1-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Jan 28 2025 Archana Shettigar <v-shettigara@microsoft.com> - 3.10.1-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License Verified
+
+* Wed Dec 11 2024 Evan Goode <egoode@redhat.com> - 3.10.1-1
+- Update to 3.10.1
+- Correct spelling of summary
+- Print more helpful error message when reinstalling non-installed pkg
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jun 14 2023 Jan Kolarik <jkolarik@redhat.com> - 3.10.0-2
+- Don't use libdnf5 as a dependency
+
+* Tue Jun 06 2023 Jan Kolarik <jkolarik@redhat.com> - 3.10.0-1
+- Update to 3.10.0
+- Add swap command
+- Prepare for dnf5 transition in Fedora 39
+
+* Fri May 19 2023 Petr Pisar <ppisar@redhat.com> - 3.9.0-3
+- Rebuild against rpm-4.19 (https://fedoraproject.org/wiki/Changes/RPM-4.19)
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.9.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Aug 15 2022 Jaroslav Rohel <jrohel@redhat.com> - 3.9.0-1
+- Update to 3.9.0
+- Add leaves command - List installed packages not required by other installed packages
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.8.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Mar 14 2022 Pavla Kratochvilova <pkratoch@redhat.com> - 3.8.1-1
+- Remove non-breaking space from "Size" column (RhBug:2010676)
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.8.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.8.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Apr 19 2021 Nicola Sella <nsella@redhat.com> - 3.8.0-1
+- Update to 3.8.0
+- distrosync: Fix style issues and plugin build with Meson 
+- Add distro-sync subcommand
+- Add "makecache" command 
+
+* Tue Mar 02 2021 Nicola Sella <nsella@redhat.com> - 3.7.1-1
+- Update to 3.7.1
+- [download] fix: unwanted dependency on newer glib 
+- [download] Support for "--resolve" and "--alldeps" arguments 
+- [download] New get_packages_query function
+- Support "--setopt=keepcache=0/1"
+- [download] Support "--archlist=" argument
+- [download] Move package download code to "download_packages" function
+- [download] several optimizations
+- Don't set default value of "assumeyes" to TRUE 
+- Support for user confirmation and assumeyes, assumeno, defaultyes
+- Extend "--setopt" to support repository options 
+- Added alias "update" to "upgrade" command
+- Command "update" renamed to "upgrade"
+- Add support for command aliases
+- dnf-data requirement only for Fedora and future RHEL
+- Relicense to GPLv2+ [errata corrige: not in 3.5.1-1]
+- Sync summary and description from openSUSE [errata corrige: not in 3.6.0-1]
+
+* Thu Jan 28 2021 Nicola Sella <nsella@redhat.com> - 3.6.0-1
+- Update to 3.6.0
+- spec: Sync summary and description from openSUSE
+- Add support for setting a platform module ID
+- Add dependency for DNF configurations skeleton
+- Add support for setting allow_vendor_change
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.5.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Thu Nov 26 2020 Nicola Sella <nsella@redhat.com> - 3.5.1-1
 - Update to 3.5.1
 - Relicense to GPLv2+
 - Bump minimum version of libdnf in CMake and Meson
+
+* Fri Nov 13 2020 Nicola Sella <nsella@redhat.com> - 3.5.0-1
+- Update to 3.5.0
 - Add module enable and disable commands
 - Add reports of module changes
 - Add "module enable" command
 - Add subcommands support
 - Print info about obsoleted packages before transaction (RhBug:1855542)
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.4.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.4.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
