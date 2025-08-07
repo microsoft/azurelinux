@@ -17,7 +17,10 @@ Patch0:         CVE-2024-37891.patch
 Patch1:         CVE-2025-50181.patch
 
 BuildArch:      noarch
+
+%if 0%{?with_check}
 BuildRequires:  git
+%endif
 
 %description    %{_description}
 
