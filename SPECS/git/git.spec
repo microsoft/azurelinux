@@ -126,6 +126,8 @@ make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}"
 install -vdm 755 %{buildroot}%{_datadir}/bash-completion/completions
 install -m 0644 contrib/completion/git-completion.bash %{buildroot}%{_datadir}/bash-completion/completions/git
 %make_install -C contrib/subtree
+install -vdm 755 %{buildroot}%{_datadir}/git-core/contrib/completion/
+install -m 0644 contrib/completion/git-prompt.sh %{buildroot}%{_datadir}/git-core/contrib/completion/git-prompt.sh
 %find_lang %{name}
 %{_fixperms} %{buildroot}/*
 
@@ -176,6 +178,9 @@ fi
 %endif
 
 %changelog
+* Mon Aug 07 2025 Victor Maznev <bullmastiffo@gmail.com> - 2.45.4-4
+- Add git-prompt.sh to git-core contrib/completion directory
+
 * Wed Jul 23 2025 Muhammad Falak <mwani@microsoft.com> - 2.45.4-3
 - Fix subtree subpackage
 
