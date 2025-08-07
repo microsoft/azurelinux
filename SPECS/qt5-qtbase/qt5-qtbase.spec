@@ -33,7 +33,7 @@
 Name:         qt5-qtbase
 Summary:      Qt5 - QtBase components
 Version:      5.12.11
-Release:      17%{?dist}
+Release:      18%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -169,6 +169,7 @@ Patch94: CVE-2024-25580.patch
 Patch95: CVE-2023-34410.patch
 Patch96: CVE-2025-30348.patch
 Patch97: CVE-2025-6558.patch
+Patch98: CVE-2025-5455.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -778,6 +779,9 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 
 %changelog
+* Fri Jul 25 2025 Akhila Guruju <v-guakhila@microsoft.com> - 5.12.11-18
+- Patch CVE-2025-5455
+
 * Mon Jul 21 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 5.12.11-17
 - Fix CVE-2025-6558
 
