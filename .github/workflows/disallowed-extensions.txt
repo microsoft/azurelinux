@@ -1,0 +1,79 @@
+# File extensions that should be stored in blob store instead of git repository
+# Lines starting with # are comments and will be ignored
+# Extensions should be lowercase without the leading dot
+
+# Source tarballs and archives
+tar
+gz
+tgz
+bz2
+xz
+zip
+rar
+7z
+tar.gz
+tar.xz
+tar.bz2
+
+# Binary executables
+bin
+exe
+dll
+so
+dylib
+a
+lib
+obj
+o
+
+# Image files
+gif
+bmp
+tiff
+tif
+webp
+raw
+heif
+
+
+# Audio/Video files
+mp3
+wav
+avi
+mp4
+mkv
+mov
+wmv
+flv
+ogg
+m4a
+aac
+
+# Package files
+rpm
+deb
+msi
+dmg
+iso
+
+# Compressed source packages
+gem
+whl
+egg
+
+# Database files
+db
+sqlite
+sqlite3
+
+# Fonts
+ttf
+otf
+woff
+woff2
+
+# Other binary formats
+jar
+war
+ear
+class

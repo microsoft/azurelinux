@@ -29,7 +29,7 @@
 Summary:        Linux Kernel
 Name:           kernel-lpg-innovate
 Version:        6.6.89.2
-Release:        1001%{?dist}
+Release:        1002%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -76,6 +76,10 @@ Requires:       kmod
 Requires:       %{name}-grub
 Requires(post): coreutils
 Requires(postun): coreutils
+Conflicts:      kernel
+Conflicts:      kernel-64k
+Conflicts:      kernel-ipe
+Conflicts:      kernel-rt
 %{?grub2_configuration_requires}
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
@@ -168,6 +172,8 @@ This package contains a grub config file to add required LPG-Innovate parameters
 
 %package -n     python3-perf-%{short_name}
 Summary:        Python 3 extension for perf tools
+Provides:       python3-perf
+Requires:       %{name} = %{version}-%{release}
 Requires:       python3
 
 %description -n python3-perf-%{short_name}
@@ -175,6 +181,8 @@ This package contains the Python 3 extension for the 'perf' performance analysis
 
 %package -n     bpftool-%{short_name}
 Summary:        Inspection and simple manipulation of eBPF programs and maps
+Provides:       bpftool
+Requires:       %{name} = %{version}-%{release}
 
 %description -n bpftool-%{short_name}
 This package contains the bpftool, which allows inspection and simple
@@ -461,6 +469,10 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed 11 Jun 2025 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.89.2-1002
+- Add Conflicts with other kernels
+- Rename bpftool and python3-perf to be kernel specific
+
 * Mon May 19 2025 Dan Streetman <ddstreet@ieee.org> - 6.6.89.2-1001
 - update to 6.6.89.2
 
