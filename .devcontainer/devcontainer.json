@@ -23,5 +23,5 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created
 	// Installing prerequisites as defined in toolkit/docs/building/prerequisites-ubuntu.md
-	 "postCreateCommand": "sudo ./toolkit/docs/building/prerequisites-ubuntu.sh && sudo ln -vsf /usr/lib/go-1.21/bin/go /usr/bin/go && sudo ln -vsf /usr/lib/go-1.21/bin/gofmt /usr/bin/gofmt"
+	 "postCreateCommand": "sudo ./toolkit/docs/building/prerequisites-ubuntu.sh && sudo ln -sf /usr/lib/go-1.23/bin/go /usr/bin/go && sudo ln -sf /usr/lib/go-1.23/bin/gofmt /usr/bin/gofmt"
 }
