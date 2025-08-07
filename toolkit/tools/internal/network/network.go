@@ -76,7 +76,14 @@ func JoinURL(baseURL string, extraPaths ...string) string {
 // azureClientID: Optional Azure client ID for managed identity authentication.
 // returns: wasCancelled: true if the download was cancelled via the external cancel channel, false otherwise.
 // returns: err: An error if the download failed (including being cancelled), nil otherwise.
-func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls.Certificate, azureClientID string, timeout time.Duration) (wasCancelled bool, err error) {
+func DownloadFileWithRetry(
+	ctx context.Context,
+	srcUrl, dstFile string,
+	caCerts *x509.CertPool,
+	tlsCerts []tls.Certificate,
+	azureClientID string,
+	timeout time.Duration,
+) (wasCancelled bool, err error) {
 	var closeCtx context.CancelFunc
 
 	if ctx == nil {
@@ -127,7 +134,13 @@ func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts 
 
 // DownloadFile downloads `url` into `dst`. `caCerts` may be nil. If there is an error `dst` will be removed.
 // First attempts HTTP download, then falls back to Azure SDK if the URL is an Azure Blob Storage URL.
-func DownloadFile(ctx context.Context, url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certificate, azureClientID string) (err error) {
+func DownloadFile(
+	ctx context.Context,
+	url, dst string,
+	caCerts *x509.CertPool,
+	tlsCerts []tls.Certificate,
+	azureClientID string,
+) (err error) {
 	if ctx == nil {
 		return fmt.Errorf("context is nil")
 	}
@@ -156,8 +169,13 @@ func DownloadFile(ctx context.Context, url, dst string, caCerts *x509.CertPool, 
 	return nil
 }
 
-// downloadFileHttp downloads `url` into `dst` using HTTP. `caCerts` may be nil. If there is an error `dst` will be removed.
-func downloadFileHttp(ctx context.Context, url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certificate) (err error) {
+// downloadFileHttp attempts to download a file using HTTP with optional TLS configuration.
+func downloadFileHttp(
+	ctx context.Context,
+	url, dst string,
+	caCerts *x509.CertPool,
+	tlsCerts []tls.Certificate,
+) (err error) {
 	logger.Log.Debugf("Downloading (%s) -> (%s)", url, dst)
 
 	dstFile, err := os.Create(dst)
@@ -208,12 +226,24 @@ func downloadFileHttp(ctx context.Context, url, dst string, caCerts *x509.CertPo
 	return
 }
 
-// downloadFileWithAzureSDK attempts to download a file using the Azure SDK for Go
-func downloadFileWithAzureSDK(ctx context.Context, blobInfo *azureblobstorage.AzureBlobInfo, dst string, azureClientID string) error {
-	logger.Log.Infof("Attempting Azure SDK download for blob: %s/%s from storage account: %s", blobInfo.ContainerName, blobInfo.BlobName, blobInfo.StorageAccount)
+// downloadFileWithAzureSDK attempts to download a file from an Azure Blob Storage using the Azure SDK for Go
+func downloadFileWithAzureSDK(
+	ctx context.Context,
+	blobInfo *azureblobstorage.AzureBlobInfo,
+	dst string,
+	azureClientID string,
+) error {
+	logger.Log.Infof("Attempting Azure SDK download for blob: %s/%s from storage account: %s",
+		blobInfo.ContainerName, blobInfo.BlobName, blobInfo.StorageAccount)
 
 	// Create Azure Blob Storage client with managed identity access
-	azureBlobStorage, err := azureblobstorage.Create("", "", "", blobInfo.StorageAccount, azureblobstorage.ManagedIdentityAccess, azureClientID)
+	azureBlobStorage, err := azureblobstorage.Create(
+		"",
+		"",
+		"",
+		blobInfo.StorageAccount,
+		azureblobstorage.ManagedIdentityAccess,
+		azureClientID)
 	if err != nil {
 		return fmt.Errorf("failed to create Azure Blob Storage client: %w", err)
 	}

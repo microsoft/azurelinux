@@ -457,7 +457,13 @@ func CreateManager(rootDir string, configFileName string) (m *CCacheManager, err
 		accessType = azureblobstorage.ManagedIdentityAccess
 	}
 
-	azureBlobStorage, err := azureblobstorage.Create(configuration.RemoteStoreConfig.TenantId, configuration.RemoteStoreConfig.UserName, configuration.RemoteStoreConfig.Password, configuration.RemoteStoreConfig.StorageAccount, accessType, "")
+	azureBlobStorage, err := azureblobstorage.Create(
+		configuration.RemoteStoreConfig.TenantId,
+		configuration.RemoteStoreConfig.UserName,
+		configuration.RemoteStoreConfig.Password,
+		configuration.RemoteStoreConfig.StorageAccount,
+		accessType,
+		"")
 	if err != nil {
 		return nil, fmt.Errorf("Unable to init azure blob storage client:\n%w", err)
 	}

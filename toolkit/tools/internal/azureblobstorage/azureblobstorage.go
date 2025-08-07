@@ -32,7 +32,7 @@ type AzureBlobInfo struct {
 	BlobName       string
 }
 
-// ParseAzureBlobStorageURL parses an Azure Blob Storage URL and extracts storage account, container, and blob name
+// ParseAzureBlobStorageURL parses an Azure Blob Storage URL and extracts storage account information.
 func ParseAzureBlobStorageURL(urlStr string) (*AzureBlobInfo, error) {
 	parsedURL, err := url.Parse(urlStr)
 	if err != nil {
@@ -40,7 +40,8 @@ func ParseAzureBlobStorageURL(urlStr string) (*AzureBlobInfo, error) {
 	}
 
 	if !strings.HasSuffix(parsedURL.Host, ".blob.core.windows.net") {
-		return nil, fmt.Errorf("not an Azure Blob Storage URL")
+		return nil, fmt.Errorf("not a common Azure Blob Storage URL format " +
+			"(expected <storage_account>.blob.core.windows.net)")
 	}
 
 	// Extract storage account from hostname (e.g., "mystorageaccount.blob.core.windows.net")
@@ -149,7 +150,13 @@ func (abs *AzureBlobStorage) Delete(
 	return nil
 }
 
-func Create(tenantId string, userName string, password string, storageAccount string, authenticationType int, azureClientID string) (abs *AzureBlobStorage, err error) {
+func Create(
+	tenantId string,
+	userName string,
+	password string,
+	storageAccount string,
+	authenticationType int,
+	azureClientID string) (abs *AzureBlobStorage, err error) {
 
 	url := "https://" + storageAccount + ".blob.core.windows.net/"
 
@@ -186,10 +193,12 @@ func Create(tenantId string, userName string, password string, storageAccount st
 			logger.Log.Infof("Using DefaultAzureCredential for managed identity access")
 			credential, err = azidentity.NewDefaultAzureCredential(nil)
 		} else {
-			logger.Log.Infof("Using ManagedIdentityCredential with supplied client ID for managed identity access: %s", azureClientID)
-			credential, err = azidentity.NewManagedIdentityCredential(&azidentity.ManagedIdentityCredentialOptions{
-				ID: azidentity.ClientID(azureClientID),
-			})
+			logger.Log.Infof("Using ManagedIdentityCredential with supplied Azure client ID " +
+				"for managed identity access: %s", azureClientID)
+			credential, err = azidentity.NewManagedIdentityCredential(
+				&azidentity.ManagedIdentityCredentialOptions{
+					ID: azidentity.ClientID(azureClientID),
+				})
 		}
 
 		if err != nil {

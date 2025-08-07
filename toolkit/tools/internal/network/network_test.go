@@ -181,7 +181,14 @@ func TestDownloadFile(t *testing.T) {
 			}
 
 			startTime := time.Now()
-			gotWasCancelled, err := DownloadFileWithRetry(tt.args._ctx, tt.args.srcUrl, tt.args.dstFile, tt.args.caCerts, tt.args.tlsCerts, tt.args.azureClientID, tt.args.timeout)
+			gotWasCancelled, err := DownloadFileWithRetry(
+				tt.args._ctx,
+				tt.args.srcUrl,
+				tt.args.dstFile,
+				tt.args.caCerts,
+				tt.args.tlsCerts,
+				tt.args.azureClientID,
+				tt.args.timeout)
 			endTime := time.Now()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DownloadFile() error = %v, wantErr %v", err, tt.wantErr)
@@ -216,7 +223,14 @@ func TestDownloadWithRetryNilContext(t *testing.T) {
 	dstDir := t.TempDir()
 	dstFile := filepath.Join(dstDir, "README.md")
 	//lint:ignore SA1012 We intentionally want to test the error case of a nil context
-	_, err := DownloadFileWithRetry(nil, "https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/README.md", dstFile, nil, nil, "", 0)
+	_, err := DownloadFileWithRetry(
+		nil,
+		"https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/README.md",
+		dstFile,
+		nil,
+		nil,
+		"",
+		0)
 	if err == nil {
 		t.Errorf("DownloadFile() should have failed with nil context")
 	}
