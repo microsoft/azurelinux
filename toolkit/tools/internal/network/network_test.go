@@ -111,6 +111,21 @@ func TestDownloadFile(t *testing.T) {
 			expectedTime:     noCancelDelay, // 404 is not retried, should fail immediately.
 		},
 		{
+			name: "TestDownload404SDKFallback",
+			args: args{
+				srcUrl:        doesNotExistUrl,
+				dstFile:       doesNotExistFile,
+				caCerts:       nil,
+				tlsCerts:      nil,
+				azureClientID: "",
+			},
+			useCtx:           false,
+			wantWasCancelled: false,
+			wantErr:          true,
+			expectedErr:      ErrDownloadFileSDKFallback, // validates SDK fallback path is attempted.
+			expectedTime:     noCancelDelay,
+		},
+		{
 			name: "TestDownloadWithBogusCerts",
 			args: args{
 				srcUrl:        bogusUrl,
@@ -151,6 +166,7 @@ func TestDownloadFile(t *testing.T) {
 			expectedErr:      ErrDownloadFileInvalidTimeout,
 			expectedTime:     noCancelDelay,
 		},
+
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

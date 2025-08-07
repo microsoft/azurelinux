@@ -36,12 +36,19 @@ var ErrDownloadFileInvalidTimeout = errors.New("invalid timeout")
 // ErrDownloadFileOther is returned when the download error is anything other than 404.
 var ErrDownloadFileOther = errors.New("download error")
 
+// ErrDownloadFileSDKFallback is returned when both HTTP and Azure SDK downloads fail.
+var ErrDownloadFileSDKFallback = errors.New("both HTTP and Azure SDK downloads failed.")
+
 func buildResponseError(statusCode int) error {
 	if statusCode == http.StatusNotFound {
 		return ErrDownloadFileInvalidResponse404
 	} else {
 		return fmt.Errorf("%w: %d", ErrDownloadFileOther, statusCode)
 	}
+}
+
+func buildResponseErrorSDKFallback(httpError error, azureError error) error {
+	return fmt.Errorf("%w HTTP error: %w, Azure SDK error: %v", ErrDownloadFileSDKFallback, httpError, azureError)
 }
 
 // JoinURL concatenates baseURL with extraPaths
@@ -134,7 +141,7 @@ func DownloadFile(ctx context.Context, url, dst string, caCerts *x509.CertPool, 
 	// HTTP download failed, attempt to parse as Azure Blob Storage URL
 	blobInfo, parseErr := azureblobstorage.ParseAzureBlobStorageURL(url)
 	if parseErr != nil {
-		return fmt.Errorf("both HTTP and Azure SDK downloads failed. HTTP error: %w, URL parse error: %v", err, parseErr)
+		return buildResponseErrorSDKFallback(err, parseErr)
 	}
 
 	logger.Log.Debugf("HTTP download failed for Azure Blob Storage URL, attempting Azure SDK fallback")
@@ -142,7 +149,7 @@ func DownloadFile(ctx context.Context, url, dst string, caCerts *x509.CertPool, 
 	// Attempt download using Azure SDK
 	azureErr := downloadFileWithAzureSDK(ctx, blobInfo, dst, azureClientID)
 	if azureErr != nil {
-		return fmt.Errorf("both HTTP and Azure SDK downloads failed. HTTP error: %w, Azure SDK error: %v", err, azureErr)
+		return buildResponseErrorSDKFallback(err, azureErr)
 	}
 
 	logger.Log.Infof("Azure SDK fallback succeeded for URL: %s", url)
