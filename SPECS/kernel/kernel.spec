@@ -2,7 +2,7 @@
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %global mstflintver 4.28.0
 %define uname_r %{version}-%{release}
-%define mariner_version 3
+%define mariner_version 2
 
 # find_debuginfo.sh arguments are set by default in rpm's macros.
 # The default arguments regenerate the build-id for vmlinux in the
