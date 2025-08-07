@@ -403,7 +403,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 %{_datadir}/conda/condarc.d/
 
 %changelog
-* Thu Aug 07 2025 Riken Maharjan <copilot@microsoft.com> - 24.3.0-4
+* Thu Aug 07 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-4
 - Add missing conda.xsh file to /etc/profile.d
 - also move conda.fish to /etc/fish/conf.d/
 - add sudo 
