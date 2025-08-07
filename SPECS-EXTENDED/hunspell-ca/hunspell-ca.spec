@@ -1,15 +1,21 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+%if 0%{?fedora} >= 36 || 0%{?rhel} > 9
+%global dict_dirname hunspell
+%else
+%global dict_dirname myspell
+%endif
+
 Name: hunspell-ca
 Summary: Catalan hunspell dictionaries
-Version: 2.3
-Release: 16%{?dist}
-Source: http://www.softcatala.org/diccionaris/actualitzacions/OOo/catalan.oxt
-URL: http://www.softcatala.org/wiki/Projectes/Corrector_ortogràfic
-License: GPLv2+
+Version: 3.0.8
+Release: 1%{?dist}
+Source: https://github.com/Softcatala/catalan-dict-tools/releases/download/v%{version}/ca.%{version}-hunspell.zip
+URL: https://www.softcatala.org/projectes/corrector-ortografic/
+License: GPL-2.0-or-later OR LGPL-2.1-or-later
 BuildArch: noarch
 
-Requires: hunspell
+Requires: hunspell-filesystem
 Supplements: (hunspell and langpacks-ca)
 
 %description
@@ -19,15 +25,15 @@ Catalan hunspell dictionaries.
 %setup -q -c
 
 %build
-tr -d '\r' < dictionaries/catalan.aff > ca_ES.aff
-touch -r dictionaries/catalan.aff ca_ES.aff
-tr -d '\r' < dictionaries/catalan.dic > ca_ES.dic
-touch -r dictionaries/catalan.dic ca_ES.dic
+tr -d '\r' < catalan.aff > ca_ES.aff
+touch -r catalan.aff ca_ES.aff
+tr -d '\r' < catalan.dic > ca_ES.dic
+touch -r catalan.dic ca_ES.dic
 
 %install
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/myspell
-cp -p ca_ES.dic ca_ES.aff $RPM_BUILD_ROOT/%{_datadir}/myspell
-pushd $RPM_BUILD_ROOT/%{_datadir}/myspell/
+mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
+cp -p ca_ES.dic ca_ES.aff $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
+pushd $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}/
 ca_ES_aliases="ca_AD ca_FR ca_IT"
 for lang in $ca_ES_aliases; do
         ln -s ca_ES.aff $lang.aff
@@ -37,12 +43,54 @@ popd
 
 
 %files
-%doc LICENSES-en.txt LLICENCIES-ca.txt       
-%{_datadir}/myspell/*
+%doc README.txt release-notes_en.txt
+%license LICENSE gpl-2.0.txt lgpl-2.1.txt
+%{_datadir}/%{dict_dirname}/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3-16
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Mar 18 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 3.0.8-1
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.8-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Aug 10 2023 Parag Nemade <pnemade AT redhat DOT com> - 3.0.8-1
+- Resolves:rh#2230531 - Update to new Upstream Source
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-24
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Feb 22 2023 Caolán McNamara <caolanm@redhat.com> - 2.3-23
+- migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Mar 22 2022 Parag Nemade <pnemade AT redhat DOT com> - 2.3-20
+- Add conditional for new hunspell dir path and update to Requires:
+  hunspell-filesystem
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
