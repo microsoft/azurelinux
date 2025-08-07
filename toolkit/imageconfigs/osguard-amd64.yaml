@@ -41,7 +41,7 @@ storage:
       mountPoint:
         idType: part-label
         path: /boot/efi
-        options: umask=0077,noexec,nodev,nosuid
+        options: umask=0077,noexec,nodev
 
     - deviceId: boot-a
       type: ext4
