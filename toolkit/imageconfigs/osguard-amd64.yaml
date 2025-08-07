@@ -217,7 +217,7 @@ scripts:
     # Config AzureLinuxagent
     - path: scripts/common/azlinuxagentconfig.sh
     # Disable unused SELinux policy modules and configure SELinux policy for CI
-    #- path: scripts/linuxguard/selinux-ci-config.sh
+    #- path: scripts/common/selinux-ci-config.sh
     - path: scripts/common/cleanup-machineid.sh
     - path: scripts/common/prepare_trusted_cni_plugins.sh
     - path: scripts/common/tmp-no-exec.sh

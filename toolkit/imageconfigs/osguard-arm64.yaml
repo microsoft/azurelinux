@@ -215,16 +215,14 @@ os:
 
 scripts:
   postCustomization:
-    - path: scripts/linuxguard/performance-tuning.sh
+    - path: scripts/common/performance-tuning.sh
     # Config AzureLinuxagent
-    - path: scripts/linuxguard/azlinuxagentconfig.sh
-    - path: scripts/linuxguard/duid-type-to-link-layer.sh
+    - path: scripts/common/azlinuxagentconfig.sh
     # Disable unused SELinux policy modules and configure SELinux policy for CI
-    #- path: scripts/linuxguard/selinux-ci-config.sh
-    - path: scripts/linuxguard/cleanup-machineid.sh
-    - path: scripts/linuxguard/prepare_trusted_cni_plugins.sh
-    - path: scripts/linuxguard/tmp-no-exec.sh
-
+    #- path: scripts/common/selinux-ci-config.sh
+    - path: scripts/common/cleanup-machineid.sh
+    - path: scripts/common/prepare_trusted_cni_plugins.sh
+    - path: scripts/common/tmp-no-exec.sh
     - path: scripts/set_os_release_variant_entries.sh
       arguments:
       - --variant-id
