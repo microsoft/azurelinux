@@ -45,6 +45,8 @@ BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-trove-classifiers
 BuildRequires:  sed
 Requires:       sudo
+Requires:       ca-certificates
+Requires:       libsolv-devel
 Requires:       python%{python3_pkgversion}-conda = %{version}-%{release}
 
 %?python_enable_dependency_generator
@@ -406,7 +408,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 * Thu Aug 07 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-4
 - Add missing conda.xsh file to /etc/profile.d
 - also move conda.fish to /etc/fish/conf.d/
-- add sudo 
+- add sudo, ca-certificates, and libsolv-devel as runtime dependencies
 
 * Thu May 01 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-3
 - Skip some test cases that are failing in the current version of conda using Fedora (License: MIT)
