@@ -22,7 +22,7 @@ Distribution:   Azure Linux
 
 Name:           junitperf
 Version:        1.9.1
-Release:        27%{?dist}
+Release:        28%{?dist}
 Summary:        JUnit extension for performance and scalability testing
 License:        BSD
 Group:          Development/Libraries/Java
@@ -79,8 +79,8 @@ find . -name "*.jar" | xargs -t rm
 export CLASSPATH=
 export OPT_JAR_LIST="junit ant/ant-junit"
 # performance tests sometimes failed on build farm, so lets disable them to avoid unpredictable build fails
-#ant -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 -Dbuild.sysclasspath=first jar test javadoc
-ant -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 -Dbuild.sysclasspath=first jar javadoc
+#ant -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 -Dbuild.sysclasspath=first jar test javadoc
+ant -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 -Dbuild.sysclasspath=first jar javadoc
 
 %install
 # jars
@@ -111,6 +111,9 @@ cp -pr samples $RPM_BUILD_ROOT%{_datadir}/%{name}
 %{_datadir}/%{name}
 
 %changelog
+* Mon Feb 24 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.9.1-28
+- Bumped build option to 8.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.1-27
 - Removing the explicit %%clean stage.
 - License verified.
