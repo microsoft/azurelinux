@@ -3,7 +3,7 @@ storage:
 
   disks:
     - partitionTableType: gpt
-      maxSize: 24G
+      maxSize: 40G
       partitions:
         - id: esp
           type: esp
@@ -26,7 +26,7 @@ storage:
         - id: root-a
           type: root
           label: root-a
-          size: 4G
+          size: 12G
 
   verity:
     - id: usrverity
