@@ -1,7 +1,7 @@
 Summary:        Scriptable database and system performance benchmark
 Name:           sysbench
 Version:        1.0.20
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Group:          Applications/System
 URL:            https://github.com/akopytov/sysbench/
@@ -11,6 +11,8 @@ Source0:        https://github.com/akopytov/%{name}/archive/%{version}/%{name}-%
 Patch0:         enable-python3.patch
 Patch1:         CVE-2019-19391.patch
 Patch2:         sysbench-1.0.20-fix_deprecated_egrep_call.patch
+Patch3:         CVE-2024-25178.patch
+Patch4:         CVE-2024-25176.patch
 
 BuildRequires:  automake
 BuildRequires:  libaio-devel
@@ -64,6 +66,9 @@ rm -f %{buildroot}%{_docdir}/sysbench/manual.html
 %{_datadir}/%{name}
 
 %changelog
+* Thu Jul 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.20-6
+- Patch for CVE-2024-25178, CVE-2024-25176
+
 * Wed Apr 02 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.0.20-5
 - Fix ptest by adding a patch to replace deprecated egrep with grep -E.
 

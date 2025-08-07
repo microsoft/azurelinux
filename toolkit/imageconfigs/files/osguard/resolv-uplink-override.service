@@ -1,0 +1,11 @@
+[Unit]
+Description=Symlink /etc/resolv.conf to /run/systemd/resolve/resolv.conf
+After=systemd-networkd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+RemainAfterExit=no
+
+[Install]
+RequiredBy=network-online.target kubelet.service

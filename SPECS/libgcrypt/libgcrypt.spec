@@ -1,6 +1,6 @@
 Summary:        GNU Crypto Libraries
 Name:           libgcrypt
-Version:        1.10.2
+Version:        1.10.3
 Release:        1%{?dist}
 License:        GPLv2+ and LGPLv2+ and BSD and MIT and Public Domain
 Vendor:         Microsoft Corporation
@@ -59,6 +59,9 @@ rm -rf %{buildroot}%{_infodir}
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Tue Jul 15 2025 Andrew Phelps <anphel@microsoft.com> - 1.10.3-1
+- Upgrade to 1.10.3
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.2-1
 - Auto-upgrade to 1.10.2 - Azure Linux 3.0 - package upgrades
 

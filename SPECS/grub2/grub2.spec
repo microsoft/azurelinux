@@ -7,7 +7,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -108,6 +108,7 @@ Patch:          sbat-4-0006-fs-ntfs-Make-code-more-readable.patch
 # time optimizes the code incorrectly, leading to network traffic getting
 # dropped in scenarios like PXE booting.
 Patch:          disable-checksum-code-optimization.patch
+Patch:          CVE-2025-0624.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
@@ -434,6 +435,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
+* Mon Jun 02 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.06-24
+- Patch CVE-2025-0624
+
 * Wed Apr 16 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.06-23
 - Add patch to replace fgrep with grep -F
 

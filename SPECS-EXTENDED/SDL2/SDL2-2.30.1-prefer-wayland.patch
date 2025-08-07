@@ -1,0 +1,19 @@
+diff -up ./src/video/SDL_video.c.prefer-wayland ./src/video/SDL_video.c
+--- ./src/video/SDL_video.c.prefer-wayland	2024-03-25 11:11:50.474311044 +1000
++++ ./src/video/SDL_video.c	2024-03-25 11:40:04.785892199 +1000
+@@ -69,12 +69,12 @@ static VideoBootStrap *bootstrap[] = {
+ #ifdef SDL_VIDEO_DRIVER_COCOA
+     &COCOA_bootstrap,
+ #endif
+-#ifdef SDL_VIDEO_DRIVER_X11
+-    &X11_bootstrap,
+-#endif
+ #ifdef SDL_VIDEO_DRIVER_WAYLAND
+     &Wayland_bootstrap,
+ #endif
++#ifdef SDL_VIDEO_DRIVER_X11
++    &X11_bootstrap,
++#endif
+ #ifdef SDL_VIDEO_DRIVER_VIVANTE
+     &VIVANTE_bootstrap,
+ #endif

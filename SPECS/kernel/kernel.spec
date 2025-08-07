@@ -13,6 +13,8 @@
 %undefine _unique_debug_names
 %global _missing_build_ids_terminate_build 1
 %global _no_recompute_build_ids 1
+# Prevent find_debuginfo.sh from removing the BTF section from modules
+%define _find_debuginfo_opts --keep-section '.BTF'
 
 %ifarch x86_64
 %define arch x86_64
@@ -29,8 +31,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.92.2
-Release:        1%{?dist}
+Version:        6.6.96.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -77,6 +79,10 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+Conflicts:      kernel-64k
+Conflicts:      kernel-ipe
+Conflicts:      kernel-lpg-innovate
+Conflicts:      kernel-rt
 %{?grub2_configuration_requires}
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
@@ -158,6 +164,8 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 
 %package -n     python3-perf
 Summary:        Python 3 extension for perf tools
+Provides:       python3-perf
+Requires:       %{name} = %{version}-%{release}
 Requires:       python3
 
 %description -n python3-perf
@@ -165,6 +173,9 @@ This package contains the Python 3 extension for the 'perf' performance analysis
 
 %package -n     bpftool
 Summary:        Inspection and simple manipulation of eBPF programs and maps
+Provides:       bpftool
+Requires:       %{name} = %{version}-%{release}
+
 
 %description -n bpftool
 This package contains the bpftool, which allows inspection and simple
@@ -428,6 +439,18 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Jul 17 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.96.1-2
+- Add additional crypto support
+
+* Mon Jul 07 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.96.1-1
+- Auto-upgrade to 6.6.96.1
+
+* Tue Jun 10 2025 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.92.2-3
+- Add Conflicts with other kernels
+
+* Mon Jun 09 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.92.2-2
+- Prevent debuginfo from stripping BTF data
+
 * Fri May 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.92.2-1
 - Auto-upgrade to 6.6.92.2
 

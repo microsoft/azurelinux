@@ -18,6 +18,11 @@ parameters:
     type: string
     default: ""
 
+  - name: dailyBuildID
+    type: string
+    default: ""
+    displayName: "Daily build ID"
+
   - name: extraPackageRepos
     type: string
     default: ""
@@ -46,6 +51,14 @@ parameters:
       - "true"
 
   - name: isCheckBuild
+    type: string
+    default: "default"
+    values:
+      - "default"
+      - "false"
+      - "true"
+
+  - name: isDailyBuildUpdateManifests
     type: string
     default: "default"
     values:
@@ -226,6 +239,16 @@ steps:
         max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}"
       fi
 
+      if [[ -n "${{ parameters.dailyBuildID }}" ]]; then
+        daily_build_id_arg="DAILY_BUILD_ID=${{ parameters.dailyBuildID }}"
+      fi
+
+      if [[ ${{ parameters.isDailyBuildUpdateManifests }} == "true" ]]; then
+        daily_build_update_manifests_arg="DAILY_BUILD_ID_UPDATE_MANIFESTS=y"
+      elif [[ ${{ parameters.isDailyBuildUpdateManifests }} == "false" ]]; then
+        daily_build_update_manifests_arg="DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
+      fi
+
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
@@ -239,6 +262,8 @@ steps:
         TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
         $allow_toolchain_rebuilds_arg \
         $check_build_retries_arg \
+        $daily_build_id_arg \
+        $daily_build_update_manifests_arg \
         $delta_fetch_arg \
         $max_cascading_rebuilds_arg \
         $quick_rebuild_packages_arg \

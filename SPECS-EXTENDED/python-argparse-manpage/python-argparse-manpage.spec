@@ -14,14 +14,14 @@ There is a limited support for (deprecated) optparse objects, too.
 
 Name:           python-%{modname}
 Version:        1.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        %{sum Python}
 BuildArch:      noarch
 
 License:        ASL 2.0
 URL:            https://github.com/praiskup/%{modname}
 Source0:        %pypi_source argparse-manpage
-
+Patch0:         0001-Fix-setuptools-v60.patch
 BuildRequires: python3-setuptools python3-devel
 %if 0%{?with_check}
 BuildRequires: python3-pip
@@ -38,7 +38,7 @@ Summary:        %{sum Python 3}
 %{desc}
 
 %prep
-%setup -q -n %{modname}-%{version}
+%autosetup -p1 -n %{modname}-%{version}
 
 %build
 %py3_build
@@ -68,6 +68,9 @@ pip3 install pytest==7.1.2 six==1.16.0
 
 
 %changelog
+* Thu May 29 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.5-4
+- Fix ptests
+
 * Tue May 03 2022 Muhammad Falak <mwani@microsoft.com> - 1.5-3
 - Drop BR on pytest, six & pip install deps to enable ptest
 - License verified

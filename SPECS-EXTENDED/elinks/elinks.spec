@@ -1,13 +1,13 @@
-Name:      elinks
-Summary:   A text-mode Web browser
-Version:   0.16.0
-Release:   3%{?dist}
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-License:   GPLv2
-URL:       https://github.com/rkd77/elinks
-Source:    https://github.com/rkd77/elinks/releases/download/v%{version}/elinks-%{version}.tar.xz
-Source2:   elinks.conf
+Name:         elinks
+Summary:      A text-mode Web browser
+Version:      0.17.0
+Release:      1%{?dist}
+Vendor:       Microsoft Corporation
+Distribution: Azure Linux
+License:      GPLv2
+URL:          https://github.com/rkd77/elinks
+Source:       https://github.com/rkd77/elinks/releases/download/v%{version}/elinks-%{version}.tar.xz
+Source2:      elinks.conf
 
 BuildRequires: automake
 BuildRequires: bzip2-devel
@@ -46,11 +46,9 @@ Patch4: 0004-elinks-0.15.0-sysname.patch
 # Fix xterm terminal: "Linux" driver seems better than "VT100" (#128105)
 Patch5: 0005-elinks-0.15.0-xterm.patch
 
-# add support for GNU Libidn2, patch by Robert Scheck (#1098789)
-Patch6: 0006-elinks-0.16.0-libidn2.patch
 
 # let list_is_singleton() return false for an empty list (#1075415)
-Patch15: elinks-0.12pre6-list_is_singleton.patch
+Patch6: elinks-0.12pre6-list_is_singleton.patch
 
 %description
 Elinks is a text-based Web browser. Elinks does not display any images,
@@ -85,7 +83,7 @@ CFLAGS="$CFLAGS -DLUA_COMPAT_5_3"
     --without-spidermonkey          \
     --without-x
 
-%make_build
+%make_build -j1
 
 %install
 %make_install
@@ -122,7 +120,7 @@ exit 0
 
 %files -f elinks.lang
 %license COPYING
-%doc README
+%doc README.md
 %ghost %verify(not md5 size mtime) %{_bindir}/links
 %{_bindir}/elinks
 %ghost %verify(not md5 size mtime) %{_mandir}/man1/links.1.gz
@@ -131,6 +129,10 @@ exit 0
 %{_mandir}/man5/*
 
 %changelog
+* Fri Mar 21 2025 Jyoti kanase <v-jykanase@microsoft.com> -  0.17.0-1
+- Upgrade to 0.17.0.
+- License Verified.
+
 * Thu Jan 26 2023 Henry Li <lihl@microsoft.com> - 0.16.0-1
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - License Verified

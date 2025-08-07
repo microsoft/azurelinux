@@ -1,0 +1,12 @@
+diff -pruN paps-0.6.8.orig/src/paps.c paps-0.6.8/src/paps.c
+--- paps-0.6.8.orig/src/paps.c	2024-09-13 21:07:13.225683344 +0900
++++ paps-0.6.8/src/paps.c	2024-09-13 21:10:24.177041518 +0900
+@@ -784,7 +784,7 @@ split_text_into_paragraphs (PangoContext
+       while (p != NULL && *p)
+         {
+           wc = g_utf8_get_char (p);
+-          next = g_utf8_next_char (p);
++          next = (char *) g_utf8_next_char (p);
+           if (wc == (gunichar)-1)
+             {
+               fprintf (stderr, "%s: Invalid character in input\n", g_get_prgname ());
