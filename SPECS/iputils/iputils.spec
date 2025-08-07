@@ -68,6 +68,7 @@ mv -f RELNOTES.tmp RELNOTES.old
 %changelog
 * Wed Aug 06 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240117-2
 - Patch for CVE-2025-48964, CVE-2025-47268
+- Remove patch for ping_test_ipv6_localhost as it causes test failure
 
 * Thu Feb 01 2024 Suresh Thelkar <sthelkaro@microsoft.com> - 20240117-1
 - Upgrade to 20240117
