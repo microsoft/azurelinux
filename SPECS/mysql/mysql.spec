@@ -74,7 +74,8 @@ chown -R test:test .
 
 # In case of failure, print the test log.
 #merge_large_tests is a large test that takes a long time to run and eventually fails
-sudo -u test CTEST_TEST_EXCLUDE_REGEX='merge_large_tests' make test || { cat Testing/Temporary/LastTest.log; false; }
+export CTEST_TEST_EXCLUDE_REGEX="merge_large_tests"
+sudo -u test make test || { cat Testing/Temporary/LastTest.log; false; }
 
 %files
 %defattr(-,root,root)
