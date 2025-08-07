@@ -213,14 +213,14 @@ fi
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
 
 # Compile perf, python3-perf
-make -C tools/perf PYTHON=%{python3} all
+make -C -Werror tools/perf PYTHON=%{python3} all  
 
 %ifarch x86_64
-make -C tools turbostat cpupower
+make -C -Werror tools turbostat cpupower
 %endif
 
 #Compile bpftool
-make -C tools/bpf/bpftool
+make -C -Werror tools/bpf/bpftool
 
 %define __modules_install_post \
 for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
