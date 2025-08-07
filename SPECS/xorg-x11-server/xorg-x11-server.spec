@@ -21,7 +21,7 @@
 Summary:        X.Org X11 X server
 Name:           xorg-x11-server
 Version:        1.20.10
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -78,6 +78,11 @@ Patch28:        CVE-2025-26598.patch
 Patch29:        CVE-2025-26599.patch
 Patch30:        CVE-2025-26600.patch
 Patch31:        CVE-2025-26601.patch
+Patch32:        CVE-2025-49175.patch
+Patch33:        CVE-2025-49176.patch
+Patch34:        CVE-2025-49178.patch
+Patch35:        CVE-2025-49179.patch
+Patch36:        CVE-2025-49180.patch
 
 # Backported Xwayland randr resolution change emulation support
 Patch501:       0001-dix-Add-GetCurrentClient-helper.patch
@@ -411,6 +416,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/aclocal/xorg-server.m4
 
 %changelog
+* Mon Jun 23 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.20.10-16
+- Patch CVE-2025-49175, CVE-2025-49176, CVE-2025-49178, CVE-2025-49179 & CVE-2025-49180
+
 * Tue Mar 04 2025 Kanishk Bansal <kanbansal@microsft.com> - 1.20.10-15
 - Patch CVE-2025-26594, CVE-2025-26595, CVE-2025-26596, CVE-2025-26597, CVE-2025-26598, CVE-2025-26599, CVE-2025-26600, CVE-2025-26601
 
