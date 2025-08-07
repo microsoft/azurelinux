@@ -79,7 +79,9 @@ pushd $tmpdir > /dev/null
 
 PKG_NAME="azure-linux-image-tools"
 NAME_VER="$PKG_NAME-$PKG_VERSION"
-VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-vendor.tar.gz"
+VENDOR_PKG_NAME="azurelinux-image-tools"
+VENDOR_NAME_VER="$VENDOR_PKG_NAME-$PKG_VERSION"
+VENDOR_TARBALL="$OUT_FOLDER/$VENDOR_NAME_VER-vendor.tar.gz"
 
 # If source tarball is provided, use it; otherwise download it
 if [ -n "$SRC_TARBALL" ]; then
@@ -108,4 +110,4 @@ tar  --sort=name \
      -cf "$VENDOR_TARBALL" vendor
 
 popd > /dev/null
-echo "$PKG_NAME vendored modules are available at $VENDOR_TARBALL"
+echo "$VENDOR_PKG_NAME vendored modules are available at $VENDOR_TARBALL"
