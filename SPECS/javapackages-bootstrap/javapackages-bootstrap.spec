@@ -13,7 +13,7 @@
 
 Name:           javapackages-bootstrap
 Version:        1.5.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        A means of bootstrapping Java Packages Tools
 # For detailed info see the file javapackages-bootstrap-PACKAGE-LICENSING
 License:        ASL 2.0 and ASL 1.1 and (ASL 2.0 or EPL-2.0) and (EPL-2.0 or GPLv2 with exceptions) and MIT and (BSD with advertising) and BSD-3-Clause and EPL-1.0 and EPL-2.0 and CDDL-1.0 and xpp and CC0 and Public Domain
@@ -141,6 +141,7 @@ Patch1:         0001-Remove-usage-of-ArchiveStreamFactory.patch
 Patch2:         CVE-2023-37460.patch
 Patch3:         Internal-Java-API.patch
 Patch4:         CVE-2021-36373.patch
+Patch5:         CVE-2024-25710.patch
 
 Provides:       bundled(ant) = 1.10.9
 Provides:       bundled(apache-parent) = 23
@@ -305,6 +306,8 @@ pushd "downstream/ant"
 %patch4 -p1
 popd
 
+%patch5 -p1
+
 # remove guava.xml from javapackage-bootstrap 1.5.0
 # import guava.xml 32.1.3 from Fedora 40
 # edit version from guava.properties
@@ -393,6 +396,9 @@ sed -i 's|/usr/lib/jvm/java-11-openjdk|%{java_home}|' %{buildroot}%{launchersPat
 %doc AUTHORS
 
 %changelog
+* Thu Jul 10 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.5.0-8
+- Patch CVE-2024-25710
+
 * Thu May 15 2025 Andrew Phelps <anphel@microsoft.com> - 1.5.0-7
 - Attempt incremental build twice to avoid random Dependency cycle errors
 
