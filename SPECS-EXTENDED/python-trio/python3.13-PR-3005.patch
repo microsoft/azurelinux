@@ -1,0 +1,363 @@
+From d2d3d4dcdc2182e8e126c73473108eeb50eb25e7 Mon Sep 17 00:00:00 2001
+From: EXPLOSION <git@helvetica.moe>
+Date: Mon, 27 May 2024 12:23:31 +0200
+Subject: [PATCH] Fixes for 3.13
+ 
+---
+ trio/_core/_generated_instrumentation.py |  5 +++--
+ trio/_core/_generated_io_epoll.py        |  6 +++---
+ trio/_core/_generated_io_kqueue.py       | 12 ++++++------
+ trio/_core/_generated_io_windows.py      | 18 +++++++++---------
+ trio/_core/_generated_run.py             | 17 +++++++++--------
+ trio/_core/_ki.py                        |  2 +-
+ trio/_core/_run.py                       |  6 +++---
+ trio/_tests/test_path.py                 |  2 +-
+ 8 files changed, 35 insertions(+), 33 deletions(-)
+ 
+diff --git a/trio/_core/_generated_instrumentation.py b/trio/_core/_generated_instrumentation.py
+index c7fefc3..990c405 100644
+--- a/trio/_core/_generated_instrumentation.py
++++ b/trio/_core/_generated_instrumentation.py
+@@ -3,6 +3,7 @@
+ # *************************************************************
+ from __future__ import annotations
+ 
++import sys
+ from ._instrumentation import Instrument
+ from ._ki import LOCALS_KEY_KI_PROTECTION_ENABLED
+ from ._run import GLOBAL_RUN_CONTEXT
+@@ -17,7 +18,7 @@ def add_instrument(instrument: Instrument) -> None:
+     If ``instrument`` is already active, does nothing.
+ 
+     """
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.instruments.add_instrument(instrument)
+     except AttributeError:
+@@ -37,7 +38,7 @@ def remove_instrument(instrument: Instrument) -> None:
+           deactivated.
+ 
+     """
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.instruments.remove_instrument(instrument)
+     except AttributeError:
+diff --git a/trio/_core/_generated_io_epoll.py b/trio/_core/_generated_io_epoll.py
+index f80e988..7927f79 100644
+--- a/trio/_core/_generated_io_epoll.py
++++ b/trio/_core/_generated_io_epoll.py
+@@ -16,7 +16,7 @@ assert not TYPE_CHECKING or sys.platform == "linux"
+ 
+ 
+ async def wait_readable(fd: (int | _HasFileNo)) -> None:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return await GLOBAL_RUN_CONTEXT.runner.io_manager.wait_readable(fd)
+     except AttributeError:
+@@ -24,7 +24,7 @@ async def wait_readable(fd: (int | _HasFileNo)) -> None:
+ 
+ 
+ async def wait_writable(fd: (int | _HasFileNo)) -> None:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return await GLOBAL_RUN_CONTEXT.runner.io_manager.wait_writable(fd)
+     except AttributeError:
+@@ -32,7 +32,7 @@ async def wait_writable(fd: (int | _HasFileNo)) -> None:
+ 
+ 
+ def notify_closing(fd: (int | _HasFileNo)) -> None:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.io_manager.notify_closing(fd)
+     except AttributeError:
+diff --git a/trio/_core/_generated_io_kqueue.py b/trio/_core/_generated_io_kqueue.py
+index b572831..1dd0626 100644
+--- a/trio/_core/_generated_io_kqueue.py
++++ b/trio/_core/_generated_io_kqueue.py
+@@ -20,7 +20,7 @@ assert not TYPE_CHECKING or sys.platform == "darwin"
+ 
+ 
+ def current_kqueue() -> select.kqueue:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.io_manager.current_kqueue()
+     except AttributeError:
+@@ -30,7 +30,7 @@ def current_kqueue() -> select.kqueue:
+ def monitor_kevent(
+     ident: int, filter: int
+ ) -> ContextManager[_core.UnboundedQueue[select.kevent]]:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.io_manager.monitor_kevent(ident, filter)
+     except AttributeError:
+@@ -40,7 +40,7 @@ def monitor_kevent(
+ async def wait_kevent(
+     ident: int, filter: int, abort_func: Callable[[RaiseCancelT], Abort]
+ ) -> Abort:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return await GLOBAL_RUN_CONTEXT.runner.io_manager.wait_kevent(
+             ident, filter, abort_func
+@@ -50,7 +50,7 @@ async def wait_kevent(
+ 
+ 
+ async def wait_readable(fd: (int | _HasFileNo)) -> None:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return await GLOBAL_RUN_CONTEXT.runner.io_manager.wait_readable(fd)
+     except AttributeError:
+@@ -58,7 +58,7 @@ async def wait_readable(fd: (int | _HasFileNo)) -> None:
+ 
+ 
+ async def wait_writable(fd: (int | _HasFileNo)) -> None:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return await GLOBAL_RUN_CONTEXT.runner.io_manager.wait_writable(fd)
+     except AttributeError:
+@@ -66,7 +66,7 @@ async def wait_writable(fd: (int | _HasFileNo)) -> None:
+ 
+ 
+ def notify_closing(fd: (int | _HasFileNo)) -> None:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.io_manager.notify_closing(fd)
+     except AttributeError:
+diff --git a/trio/_core/_generated_io_windows.py b/trio/_core/_generated_io_windows.py
+index e859829..f0bef74 100644
+--- a/trio/_core/_generated_io_windows.py
++++ b/trio/_core/_generated_io_windows.py
+@@ -20,7 +20,7 @@ assert not TYPE_CHECKING or sys.platform == "win32"
+ 
+ 
+ async def wait_readable(sock: (_HasFileNo | int)) -> None:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return await GLOBAL_RUN_CONTEXT.runner.io_manager.wait_readable(sock)
+     except AttributeError:
+@@ -28,7 +28,7 @@ async def wait_readable(sock: (_HasFileNo | int)) -> None:
+ 
+ 
+ async def wait_writable(sock: (_HasFileNo | int)) -> None:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return await GLOBAL_RUN_CONTEXT.runner.io_manager.wait_writable(sock)
+     except AttributeError:
+@@ -36,7 +36,7 @@ async def wait_writable(sock: (_HasFileNo | int)) -> None:
+ 
+ 
+ def notify_closing(handle: (Handle | int | _HasFileNo)) -> None:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.io_manager.notify_closing(handle)
+     except AttributeError:
+@@ -44,7 +44,7 @@ def notify_closing(handle: (Handle | int | _HasFileNo)) -> None:
+ 
+ 
+ def register_with_iocp(handle: (int | CData)) -> None:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.io_manager.register_with_iocp(handle)
+     except AttributeError:
+@@ -54,7 +54,7 @@ def register_with_iocp(handle: (int | CData)) -> None:
+ async def wait_overlapped(
+     handle_: (int | CData), lpOverlapped: (CData | int)
+ ) -> object:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return await GLOBAL_RUN_CONTEXT.runner.io_manager.wait_overlapped(
+             handle_, lpOverlapped
+@@ -66,7 +66,7 @@ async def wait_overlapped(
+ async def write_overlapped(
+     handle: (int | CData), data: Buffer, file_offset: int = 0
+ ) -> int:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return await GLOBAL_RUN_CONTEXT.runner.io_manager.write_overlapped(
+             handle, data, file_offset
+@@ -78,7 +78,7 @@ async def write_overlapped(
+ async def readinto_overlapped(
+     handle: (int | CData), buffer: Buffer, file_offset: int = 0
+ ) -> int:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return await GLOBAL_RUN_CONTEXT.runner.io_manager.readinto_overlapped(
+             handle, buffer, file_offset
+@@ -88,7 +88,7 @@ async def readinto_overlapped(
+ 
+ 
+ def current_iocp() -> int:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.io_manager.current_iocp()
+     except AttributeError:
+@@ -96,7 +96,7 @@ def current_iocp() -> int:
+ 
+ 
+ def monitor_completion_key() -> ContextManager[tuple[int, UnboundedQueue[object]]]:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.io_manager.monitor_completion_key()
+     except AttributeError:
+diff --git a/trio/_core/_generated_run.py b/trio/_core/_generated_run.py
+index 399e1db..6bfc5f2 100644
+--- a/trio/_core/_generated_run.py
++++ b/trio/_core/_generated_run.py
+@@ -3,6 +3,7 @@
+ # *************************************************************
+ from __future__ import annotations
+ 
++import sys
+ import contextvars
+ from collections.abc import Awaitable, Callable
+ from typing import Any
+@@ -38,7 +39,7 @@ def current_statistics() -> RunStatistics:
+       other attributes vary between backends.
+ 
+     """
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.current_statistics()
+     except AttributeError:
+@@ -55,7 +56,7 @@ def current_time() -> float:
+         RuntimeError: if not inside a call to :func:`trio.run`.
+ 
+     """
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.current_time()
+     except AttributeError:
+@@ -64,7 +65,7 @@ def current_time() -> float:
+ 
+ def current_clock() -> Clock:
+     """Returns the current :class:`~trio.abc.Clock`."""
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.current_clock()
+     except AttributeError:
+@@ -77,7 +78,7 @@ def current_root_task() -> Task | None:
+     This is the task that is the ultimate parent of all other tasks.
+ 
+     """
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.current_root_task()
+     except AttributeError:
+@@ -102,7 +103,7 @@ def reschedule(task: Task, next_send: Outcome[Any] = _NO_SEND) -> None:
+           raise) from :func:`wait_task_rescheduled`.
+ 
+     """
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.reschedule(task, next_send)
+     except AttributeError:
+@@ -166,7 +167,7 @@ def spawn_system_task(
+       Task: the newly spawned task
+ 
+     """
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.spawn_system_task(
+             async_fn, *args, name=name, context=context
+@@ -180,7 +181,7 @@ def current_trio_token() -> TrioToken:
+     :func:`trio.run`.
+ 
+     """
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return GLOBAL_RUN_CONTEXT.runner.current_trio_token()
+     except AttributeError:
+@@ -245,7 +246,7 @@ async def wait_all_tasks_blocked(cushion: float = 0.0) -> None:
+                      print("FAIL")
+ 
+     """
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     try:
+         return await GLOBAL_RUN_CONTEXT.runner.wait_all_tasks_blocked(cushion)
+     except AttributeError:
+diff --git a/trio/_core/_ki.py b/trio/_core/_ki.py
+index 0ea3461..a5e32d5 100644
+--- a/trio/_core/_ki.py
++++ b/trio/_core/_ki.py
+@@ -176,7 +176,7 @@ def _ki_protection_decorator(
+ 
+             @wraps(fn)
+             def wrapper(*args: ArgsT.args, **kwargs: ArgsT.kwargs) -> RetT:
+-                locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = enabled
++                sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = enabled
+                 return fn(*args, **kwargs)
+ 
+             return wrapper
+diff --git a/trio/_core/_run.py b/trio/_core/_run.py
+index b5a4912..16657c0 100644
+--- a/trio/_core/_run.py
++++ b/trio/_core/_run.py
+@@ -617,7 +617,7 @@ class CancelScope:
+ 
+         # This inlines the enable_ki_protection decorator so we can fix
+         # f_locals *locally* below to avoid reference cycles
+-        locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++        sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+ 
+         # Tracebacks show the 'raise' line below out of context, so let's give
+         # this variable a name that makes sense out of context.
+@@ -640,7 +640,7 @@ class CancelScope:
+                 # see test_cancel_scope_exit_doesnt_create_cyclic_garbage
+                 del remaining_error_after_cancel_scope, value, _, exc
+                 # deep magic to remove refs via f_locals
+-                locals()
++                sys._getframe().f_locals
+                 # TODO: check if PEP558 changes the need for this call
+                 # https://github.com/python/cpython/pull/3640
+ 
+@@ -2409,7 +2409,7 @@ def unrolled_run(
+     args: tuple[object, ...],
+     host_uses_signal_set_wakeup_fd: bool = False,
+ ) -> Generator[float, EventResult, None]:
+-    locals()[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
++    sys._getframe().f_locals[LOCALS_KEY_KI_PROTECTION_ENABLED] = True
+     __tracebackhide__ = True
+ 
+     try:
+diff --git a/trio/_tests/test_path.py b/trio/_tests/test_path.py
+index 3528053..dd3ec66 100644
+--- a/trio/_tests/test_path.py
++++ b/trio/_tests/test_path.py
+@@ -120,7 +120,7 @@ async def test_async_method_signature(path: trio.Path) -> None:
+     assert path.resolve.__qualname__ == "Path.resolve"
+ 
+     assert path.resolve.__doc__ is not None
+-    assert "pathlib.Path.resolve" in path.resolve.__doc__
++    assert path.resolve.__qualname__ in path.resolve.__doc__
+ 
+ 
+ @pytest.mark.parametrize("method_name", ["is_dir", "is_file"])
+-- 
+2.44.0
