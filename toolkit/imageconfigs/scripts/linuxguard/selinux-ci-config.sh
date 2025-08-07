@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 set -eux
 
 # import SELinux policy CI customizations.  This is installed by MIC
@@ -24,6 +27,7 @@ ENABLED_MODULES: set[str] = {
     "application",
     "authlogin",
     "azureci",
+    "azureci_deletions",
     "bootloader",
     "brctl",
     "clock",
@@ -53,7 +57,6 @@ ENABLED_MODULES: set[str] = {
     "libraries",
     "logrotate",
     "lvm", # includes dm, cryptsetup, etc.
-    "mcelogd",
     "miscfiles",
     "modutils",
     "mount",
@@ -81,6 +84,7 @@ ENABLED_MODULES: set[str] = {
     "sysnetwork",
     "systemd",
     "tpm2",
+    "trident",
     "udev",
     "userdomain",
     "usermanage",
@@ -123,3 +127,11 @@ EOF
 )
 
 /usr/bin/python3 -c "$python_script"
+
+# Move policy to /usr
+if [ ! -d /usr/etc/selinux ]; then
+    mkdir -p /usr/etc
+    mv /etc/selinux /usr/etc/selinux
+    # add backwards compatibility for /etc/selinux
+    ln -sf ../usr/etc/selinux /etc/selinux
+fi
