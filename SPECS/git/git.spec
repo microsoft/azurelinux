@@ -178,7 +178,7 @@ fi
 %endif
 
 %changelog
-* Mon Jun 23 2025 Victor Maznev <bullmastiffo@gmail.com> - 2.45.3-3
+* Mon Aug 07 2025 Victor Maznev <bullmastiffo@gmail.com> - 2.45.4-4
 - Add git-prompt.sh to git-core contrib/completion directory
 
 * Wed Jul 23 2025 Muhammad Falak <mwani@microsoft.com> - 2.45.4-3
