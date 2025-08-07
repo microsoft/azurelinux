@@ -1,0 +1,57 @@
+diff -pruN fonts-rpm-macros-2.0.5.orig/rpm/lua/srpm/fonts.lua fonts-rpm-macros-2.0.5/rpm/lua/srpm/fonts.lua
+--- fonts-rpm-macros-2.0.5.orig/rpm/lua/srpm/fonts.lua	2024-06-19 16:39:41.814323447 +0900
++++ fonts-rpm-macros-2.0.5/rpm/lua/srpm/fonts.lua	2024-06-19 16:42:07.095849192 +0900
+@@ -172,13 +172,31 @@ local function pkg(forcemain, forcesub,
+   end
+ end
+ 
++-- Output Requires(meta) line
++local function output_requires(fontpkg)
++  if tonumber(rpm.expand("0%{?epoch}")) == 0 then
++    print(rpm.expand(  "Requires(meta):  " .. fontpkg .. " = %{version}-%{release}\n"))
++  else
++    print(rpm.expand(  "Requires(meta):  " .. fontpkg .. " = %{epoch}:%{version}-%{release}\n"))
++  end
++end
++
+ -- Create a font (sub)metapackage header
+ local function metapkg(name, summary, description, suffixes)
+   local   fedora = require "fedora.common"
+   local fontpkgs = fedora.getsuffixed("fontpkgname")
++  local hsuffix
+   if (name == "") then
+     name, _ = string.gsub(rpm.expand("%{name}"), "-fonts$", "")
+     name    = name .. "-fonts-all"
++    hsuffix = "all"
++  else
++    hsuffix = norm(name)
++  end
++  if (rpm.expand("%{?fontpkgheader" .. hsuffix .. "}") ~= "") then
++    fedora.explicitset(  "currentfontpkgheader", "%{fontpkgheader" .. hsuffix .. "}", false)
++  else
++    fedora.explicitunset(  "currentfontpkgheader",                                 false)
+   end
+   if (summary == "") then
+     summary = "All the font packages, generated from %{name}"
+@@ -192,18 +210,19 @@ local function metapkg(name, summary, de
+     "Summary:   "    .. summary .. "\n"))
+   if (suffixes == "") then
+     for _, fontpkg in pairs(fontpkgs) do
+-      print(rpm.expand(  "Requires(meta):  " .. fontpkg .. " = %{version}-%{release}\n"))
++      output_requires(fontpkg)
+     end
+   else
+     for suffix in string.gmatch(rpm.expand(suffixes), "[^%s%p]+") do
+       local fontpkg = fontpkgs[suffix]
+       if (fontpkg ~= nil) then
+-        print(rpm.expand("Requires(meta):  " .. fontpkg .. " = %{version}-%{release}\n"))
++        output_requires(fontpkg)
+       end
+     end
+   end
+   print(rpm.expand(
+     "BuildArch: noarch\n" ..
++    "%{?currentfontpkgheader}\n" ..
+     "%description -n "    .. name .. "\n" ..
+     description                   .. "\n" ..
+     "%files -n "          .. name .. "\n\n"))

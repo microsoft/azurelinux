@@ -1,6 +1,6 @@
 Summary:        libgpg-error
 Name:           libgpg-error
-Version:        1.47
+Version:        1.48
 Release:        1%{?dist}
 License:        GPLv2+
 URL:            https://gnupg.org/
@@ -75,6 +75,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Mon Jun 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.48-1
+- Upgrade to version 1.48 to support gnupg2
+
 * Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 1.47-1
 - Upgrade to version 1.47
 

@@ -22,7 +22,7 @@ Distribution:   Azure Linux
 %define __requires_exclude system.bundle
 Name:           xerces-j2
 Version:        2.12.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Java XML parser
 License:        ASL 2.0 and Public Domain and W3C
 Group:          Development/Libraries/Java
@@ -106,7 +106,7 @@ popd
 
 # Build everything
 export ANT_OPTS="-Xmx256m -Djava.awt.headless=true -Dbuild.sysclasspath=first -Ddisconnected=true"
-ant -Djavac.source=1.6 -Djavac.target=1.6 \
+ant -Djavac.source=1.8 -Djavac.target=1.8 \
     -Dbuild.compiler=modern \
     clean jars javadocs
 
@@ -173,6 +173,9 @@ ln -sf %{name}.jar %{_javadir}/jaxp_parser_impl.jar
 %{_datadir}/%{name}
 
 %changelog
+* Thu May 22 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.12.0-6
+- Fixed the build for 2.12.0
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.12.0-5
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 - License verified.

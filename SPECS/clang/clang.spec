@@ -4,8 +4,8 @@
 
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
 Name:           clang
-Version:        18.1.2
-Release:        4%{?dist}
+Version:        18.1.8
+Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,7 @@ Group:          Development/Tools
 URL:            https://clang.llvm.org
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
 Patch1:         CVE-2024-7883.patch
+Patch2:         clang-format-fix.patch
 BuildRequires:  cmake
 BuildRequires:  libxml2-devel
 BuildRequires:  llvm-devel = %{version}
@@ -245,6 +246,9 @@ make clang-check
 %{_includedir}/clang-tidy/
 
 %changelog
+* Tue Jun 03 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 18.1.8-1
+- Updated to version 18.1.8.
+
 * Thu Apr 10 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 18.1.2-4
 - Fix CVE-2024-7883
 

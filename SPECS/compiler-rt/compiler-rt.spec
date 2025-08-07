@@ -4,8 +4,8 @@
 
 Summary:        LLVM compiler support routines
 Name:           compiler-rt
-Version:        18.1.2
-Release:        3%{?dist}
+Version:        18.1.8
+Release:        1%{?dist}
 License:        Apache 2.0 WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,6 +50,9 @@ cd build
 %{_libdir}/clang/%{maj_ver}/share/*
 
 %changelog
+* Tue Jun 03 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 18.1.8-1
+- Updated to version 18.1.8.
+
 * Thu Jul 25 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-3
 - Fix installation path
 

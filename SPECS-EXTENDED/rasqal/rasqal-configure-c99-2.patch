@@ -1,0 +1,31 @@
+Fix incompatible pointer type due to misuse of the gcry_md_open
+function.
+
+Submitted upstream: <https://github.com/dajobe/rasqal/pull/13>
+
+diff --git a/configure b/configure
+index 038ea7c3efaf06a0..17a107cda735a257 100755
+--- a/configure
++++ b/configure
+@@ -14541,7 +14541,7 @@ elif test "$ac_cv_header_gcrypt_h" = "yes"; then
+ int
+ main ()
+ {
+- gcry_md_hd_t hash; gcry_md_open(hash, GCRY_MD_MD5, 0);
++ gcry_md_hd_t hash; gcry_md_open(&hash, GCRY_MD_MD5, 0);
+   ;
+   return 0;
+ }
+diff --git a/configure.ac b/configure.ac
+index 7bfc38e9261d6c96..eea4d34e7dc9fd4b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -631,7 +631,7 @@ elif test "$ac_cv_header_gcrypt_h" = "yes"; then
+   LIBS="$LIBS `$LIBGCRYPT_CONFIG --libs`"
+ 
+   AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+-  #include <gcrypt.h>]], [[ gcry_md_hd_t hash; gcry_md_open(hash, GCRY_MD_MD5, 0); ]])],[have_digest_gcrypt=yes],[have_digest_gcrypt=no])
++  #include <gcrypt.h>]], [[ gcry_md_hd_t hash; gcry_md_open(&hash, GCRY_MD_MD5, 0); ]])],[have_digest_gcrypt=yes],[have_digest_gcrypt=no])
+ 
+   CPPFLAGS="$oCPPFLAGS"
+   LIBS="$oLIBS"
