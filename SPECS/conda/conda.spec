@@ -187,6 +187,9 @@ mkdir -p %{buildroot}%{_localstatedir}/cache/conda/pkgs/cache
 
 # install does not create the directory on EL7
 install -m 0644 -Dt %{buildroot}/etc/profile.d/ conda/shell/etc/profile.d/conda.{sh,csh}
+install -m 0644 -Dt %{buildroot}%{_datadir}/fish/vendor_conf.d/ conda/shell/etc/fish/conf.d/conda.fish
+install -m 0644 -Dt %{buildroot}/etc/profile.d/ conda/shell/conda.xsh
+
 sed -r -i -e '1i [ -z "$CONDA_EXE" ] && CONDA_EXE=%{_bindir}/conda' \
           -e '/PATH=.*condabin/s|PATH=|[ -d $(dirname "$CONDA_EXE")/condabin ] \&\& PATH=|' %{buildroot}/etc/profile.d/conda.sh
 sed -r -i -e '1i set _CONDA_EXE=%{_bindir}/conda\nset _CONDA_ROOT=' \
@@ -389,6 +392,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 %{_datadir}/fish/vendor_conf.d/conda.fish
 /etc/profile.d/conda.sh
 /etc/profile.d/conda.csh
+/etc/profile.d/conda.xsh
 
 %files tests
 %{_datadir}/conda/tests/
