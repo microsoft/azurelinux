@@ -123,7 +123,8 @@ os:
       - policycoreutils-python-utils
       - secilc
       - selinux-policy
-      - selinux-policy-ci
+      # Not provided on ARM64
+      # - selinux-policy-ci
       - selinux-policy-modules
       - setools-console
 
@@ -218,9 +219,10 @@ scripts:
     - path: scripts/common/performance-tuning.sh
     # Config AzureLinuxAgent
     - path: scripts/common/azlinuxagentconfig.sh
+    # Requires selinux-policy-ci package which is not available on ARM64.
     # Disable unused SELinux policy modules and configure SELinux policy for CI
-    - path: scripts/common/selinux-ci-config.py
-      interpreter: /usr/bin/python3
+    # - path: scripts/common/selinux-ci-config.py
+    #   interpreter: /usr/bin/python3
     # Ensure the /etc/machine-id is cleared before the first boot
     - path: scripts/common/cleanup-machineid.sh
     # Move CNI binaries from /opt to /usr for IPE
