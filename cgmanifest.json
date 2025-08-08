@@ -4789,6 +4789,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "google-noto-sans-cjk-fonts",
+          "version": "2.004",
+          "downloadUrl": "https://github.com/googlefonts/noto-cjk/releases/download/Sans2.004/03_NotoSansCJK-OTC.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "google-noto-serif-cjk-fonts",
+          "version": "2.003",
+          "downloadUrl": "https://github.com/googlefonts/noto-cjk/releases/download/Serif2.003/04_NotoSerifCJKOTC.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "google-roboto-slab-fonts",
           "version": "1.100263",
           "downloadUrl": "https://fonts.google.com/download?family=Roboto%20Slab"
