@@ -469,6 +469,8 @@ Requires:       python3dist(cryptography)
 Recommends:     python3dist(pillow)
 %endif
 
+BuildRequires:  python3dist(pyflakes)
+
 BuildArch:      noarch
 
 %description ukify
