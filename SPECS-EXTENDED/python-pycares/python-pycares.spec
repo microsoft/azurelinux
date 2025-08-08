@@ -1,31 +1,35 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 # set upstream name variable
 %global srcname pycares
 
-
 Name:           python-pycares
-Version:        3.1.1
-Release:        3%{?dist}
+Version:        4.5.0
+Release:        1%{?dist}
 Summary:        Python interface for c-ares
 
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/saghul/pycares
-Source0:        https://github.com/saghul/%{srcname}/archive/%{srcname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
+Source0:        https://github.com/saghul/pycares/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
+BuildRequires:  make
 BuildRequires:  gcc
 BuildRequires:  python3-cffi
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  c-ares-devel
+BuildRequires:  iana-etc
 # for docs
 BuildRequires:  python3-sphinx
-BuildRequires:  python3-devel
 BuildRequires:  python3-sphinx_rtd_theme
+BuildRequires:  python3-sphinxcontrib-jquery
+# for tests
+BuildRequires:  python3-pytest
 
 %description
 pycares is a Python module which provides an interface to
 c-ares. c-ares is a C library that performs DNS requests and name
 resolutions asynchronously.
-
-
 
 %package     -n python3-%{srcname}
 Summary:        Python interface for c-ares
@@ -36,11 +40,10 @@ pycares is a Python module which provides an interface to
 c-ares. c-ares is a C library that performs DNS requests and name
 resolutions asynchronously.
 
-
 %package     -n python-%{srcname}-doc
 Summary:        Documentation for python-pycares
 BuildArch:      noarch
-Requires:       python3-%{srcname}
+Requires:       python3-%{srcname} = %{version}-%{release}
 
 %description -n python-%{srcname}-doc
 pycares is a Python module which provides an interface to
@@ -49,20 +52,17 @@ resolutions asynchronously.
 
 This package contains documentation in reST and HTML formats.
 
-
-
 %prep
-%autosetup -p1 -n %{srcname}-%{srcname}-%{version}
-
+%autosetup -p1 -n %{srcname}-%{version}
 
 %build
+export PYCARES_USE_SYSTEM_LIB=1
 %py3_build
 
 # Build sphinx documentation
 pushd docs/
 make html
 popd # docs
-
 
 %install
 %py3_install
@@ -77,30 +77,27 @@ mv -f %{buildroot}%{_pkgdocdir}/html/_sources/ %{buildroot}%{_pkgdocdir}/rst/
 # Remove buildinfo sphinx documentation
 rm -rf %{buildroot}%{_pkgdocdir}/html/.buildinfo
 
-# Fix non-standard modes (775)
-chmod 755 %{buildroot}%{python3_sitearch}/%{srcname}/_cares.cpython-*.so
-
-
 %check
-%{__python3} setup.py test -s pycares._cares
-
-
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=%{buildroot}%{python3_sitelib} \
+  %{python3} -m unittest -v
 
 %files -n python3-%{srcname}
 %license LICENSE
 %doc README.rst ChangeLog
 # For arch-specific packages: sitearch
 %{python3_sitearch}/%{srcname}/
-%{python3_sitearch}/%{srcname}-%{version}-*.egg-info/
-
+%{python3_sitearch}/%{srcname}-%{version}-py%{python3_version}.egg-info/
 
 %files -n python-%{srcname}-doc
 %doc examples/
 %{_pkgdocdir}/
 
-
-
 %changelog
+* Wed Feb 19 2025 Akhila Guruju <v-guakhila@microsoft.com> - 4.5.0-1
+- Upgrade to 4.5.0 by taking reference from Fedora 41 spec (license: MIT).
+- License verified.
+- Added BR on python3-sphinxcontrib-jquery to fix build.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.1-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
