@@ -92,6 +92,9 @@ exit 0
 * Wed Jul 09 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.2.18-2
 - Patch for CVE-2025-32023
 
+* Wed Jul 09 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.2.18-2
+- Patch for CVE-2025-32023
+
 * Wed Apr 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.2.18-1
 - Auto-upgrade to 6.2.18 - for CVE-2025-21605
 
