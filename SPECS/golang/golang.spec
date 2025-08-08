@@ -14,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.24.5
+Version:        1.24.6
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -160,6 +160,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Aug 08 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.24.6-1
+- Auto-upgrade to 1.24.6 - for CVE-2025-47906
+
 * Tue Jul 08 2025 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.24.5-1
 - Bump version to 1.24.5-1
 
