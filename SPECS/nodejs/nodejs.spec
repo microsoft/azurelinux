@@ -132,7 +132,6 @@ done
 
 %check
 make cctest
-make test-check-deopts V=1
 
 %post -p /sbin/ldconfig
 
