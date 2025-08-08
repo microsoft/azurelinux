@@ -46,11 +46,11 @@ patch -Np1 --ignore-whitespace < %{PATCH0}
 mv -v go go-bootstrap
 
 %setup -q -n go
-%patch 5 -p1
 %patch 1 -p1
 %patch 2 -p1
 %patch 3 -p1
 %patch 4 -p1
+%patch 5 -p1
 
 %build
 # Go 1.22 requires the final point release of Go 1.20 or later for bootstrap.
