@@ -31,7 +31,7 @@ emit_partition() {
 [Partition]
 Type=$type_out
 Label=$label
-SizeMinBytes=10G
+SizeMinBytes=12G
 Weight=1000
 GrowFileSystem=true
 EOF
