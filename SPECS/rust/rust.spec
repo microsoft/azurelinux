@@ -181,7 +181,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 
 %changelog
 * Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.86.0-4
-- Add patch for CVE-2025-53605
+- patch for CVE-2025-53605
 
 * Fri Jun 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.86.0-3
 - Patch CVE-2025-4574
