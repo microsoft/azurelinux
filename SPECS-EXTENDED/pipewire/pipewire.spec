@@ -18,7 +18,7 @@
 Summary:        Media Sharing Server
 Name:           pipewire
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,7 +42,6 @@ BuildRequires:  pkgconfig(gstreamer-base-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-plugins-base-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-net-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-allocators-1.0) >= 1.10.0
-BuildRequires:  pkgconfig(fdk-aac)
 %if %{with vulkan}
 BuildRequires:  pkgconfig(vulkan)
 %endif
@@ -213,6 +212,7 @@ cp %{SOURCE1} subprojects/packagefiles/
     -D volume=disabled -D bluez5-codec-aptx=disabled -D roc=disabled 		\
     -D bluez5-codec-lc3plus=disabled						\
     -D bluez5-codec-ldac=disabled						\
+    -D bluez5-codec-aac=disabled						\
     -D bluez5-codec-opus=disabled                                               \
     -D x11-xfixes=disabled                                                      \
 %if %{with media_session}
@@ -428,6 +428,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Mon Jun 30 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 0.3.60-3
+- Build without fdk-aac package since that package has license issues
+
 * Thu Nov 24 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.3.60-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Build with features disabled: jack, jackserver-plugin and libcamera-plugin

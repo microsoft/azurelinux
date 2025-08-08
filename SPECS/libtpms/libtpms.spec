@@ -1,6 +1,6 @@
 Name:           libtpms
 Version:        0.9.6
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Library providing Trusted Platform Module (TPM) functionality
 License:        BSD and TCGL
 
@@ -12,6 +12,7 @@ Source1:        %{url}/releases/download/v%{version}/v%{version}.tar.gz.asc#/%{n
 # https://github.com/stefanberger.gpg
 Source2:        gpgkey-B818B9CADF9089C2D5CEC66B75AD65802A0B4211.asc
 Patch1:         0001-Export-RSA-private-key-primes-to-OpenSSL.patch
+Patch2:         CVE-2025-49133.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -66,6 +67,9 @@ make check
 %{_mandir}/man3/TPM*
 
 %changelog
+* Tue Jun 17 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.9.6-8
+- Patch CVE-2025-49133
+
 * Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.9.6-7
 - Add missing Vendor and Distribution tags.
 

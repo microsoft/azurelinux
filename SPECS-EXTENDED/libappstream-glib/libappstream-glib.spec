@@ -2,15 +2,15 @@
 %global json_glib_version 1.1.2
 %global gdk_pixbuf_version 2.31.5
 
-Summary:   Library for AppStream metadata
-Name:      libappstream-glib
-Version:   0.8.2
-Release:   4%{?dist}
-License:   LGPL-2.0-or-later
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:       http://people.freedesktop.org/~hughsient/appstream-glib/
-Source0:   http://people.freedesktop.org/~hughsient/appstream-glib/releases/appstream-glib-%{version}.tar.xz
+Summary:       Library for AppStream metadata
+Name:          libappstream-glib
+Version:       0.8.3
+Release:       1%{?dist}
+License:       LGPL-2.0-or-later
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
+URL:           https://people.freedesktop.org/~hughsient/appstream-glib/
+Source0:       https://people.freedesktop.org/~hughsient/appstream-glib/releases/appstream-glib-%{version}.tar.xz
 
 BuildRequires: glib2-devel >= %{glib2_version}
 BuildRequires: docbook-utils
@@ -76,12 +76,11 @@ This library and command line tool is used for building AppStream metadata
 from a directory of packages.
 
 %prep
-%autosetup -p1 -Sgit -n appstream-glib-%{version}
+%autosetup -p1 -n appstream-glib-%{version}
 
 %build
 %meson \
     -Dgtk-doc=false \
-    -Dstemmer=true \
     -Ddep11=false
 %meson_build
 
@@ -130,6 +129,10 @@ from a directory of packages.
 %{_mandir}/man1/appstream-builder.1.gz
 
 %changelog
+* Fri Mar 21 2025 Jyoti kanase <v-jykanase@microsoft.com> - 0.8.3-1
+- Upgrade to 0.8.3
+- License Verified.
+
 * Tue Feb 14 2023 Muhammad Falak <mwani@microsoft.com> - 0.8.2-4
 - Drop docs generation to fix build
 

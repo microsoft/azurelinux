@@ -1,0 +1,44 @@
+Use AC_USE_SYSTEM_EXTENSIONS and include <config.h>, so that <wchar.h>
+makes a declaration of wcwidth available.  Include <glib/gprintf.h>
+for a declaration of g_vasprintf.  This avoids implicit function
+declarations and build failures with future compilers.
+
+No need to upstream this because it only impacts the bundled 0.6.8
+sources, the later 0.8.0 version has already been fixed upstream.  The
+g_vasprintf call was introduced in the paps-0.6.6-lcnumeric.patch
+downstream patch.
+
+diff -ur paps-0.8.0.orig/paps-0.6.8/configure.in paps-0.8.0/paps-0.6.8/configure.in
+--- paps-0.8.0.orig/paps-0.6.8/configure.in	2023-04-13 11:56:29.571277839 +0200
++++ paps-0.8.0/paps-0.6.8/configure.in	2023-04-13 12:00:03.228135149 +0200
+@@ -6,6 +6,7 @@
+ AC_LANG_C
+ AC_PROG_CC
+ AM_PROG_LIBTOOL
++AC_USE_SYSTEM_EXTENSIONS
+ 
+ dnl ======================================================
+ dnl check for CUPS
+diff -ur paps-0.8.0.orig/paps-0.6.8/src/paps.c paps-0.8.0/paps-0.6.8/src/paps.c
+--- paps-0.8.0.orig/paps-0.6.8/src/paps.c	2023-04-13 11:56:29.583277719 +0200
++++ paps-0.8.0/paps-0.6.8/src/paps.c	2023-04-13 12:02:28.958673663 +0200
+@@ -20,7 +20,7 @@
+  *
+  */
+ 
+-
++#include <config.h>
+ #include <pango/pango.h>
+ #include <pango/pangoft2.h>
+ #include "libpaps.h"
+diff -ur paps-0.8.0.orig/paps-0.6.8/src/libpaps.c paps-0.8.0/paps-0.6.8/src/libpaps.c
+--- paps-0.8.0.orig/paps-0.6.8/src/libpaps.c	2023-04-13 11:56:29.581277739 +0200
++++ paps-0.8.0/paps-0.6.8/src/libpaps.c	2023-04-13 12:07:17.504779917 +0200
+@@ -23,6 +23,7 @@
+ 
+ #include "libpaps.h"
+ 
++#include <glib/gprintf.h>
+ #include <pango/pango.h>
+ #include <pango/pangoft2.h>
+ #include <ft2build.h>
