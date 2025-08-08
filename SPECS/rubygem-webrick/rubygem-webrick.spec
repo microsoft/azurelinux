@@ -3,12 +3,13 @@
 Summary:        HTTP server toolkit
 Name:           rubygem-%{gem_name}
 Version:        1.7.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:	        Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/ruby/webrick
 Source0:        https://github.com/ruby/webrick/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Patch0:         CVE-2025-6442.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
@@ -35,6 +36,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Fri Jun 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.7.0-2
+- Patch CVE-2025-6442
+
 * Mon Jun 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.7.0-1
 - License verified
 - Original version for CBL-Mariner

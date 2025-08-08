@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
-Version:        1.17.4
+Version:        1.17.8
 Release:        1%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
@@ -88,6 +88,9 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %{_bindir}/nvidia-cdi-hook
 
 %changelog
+* Thu Jul 24 2025 Sam Meluch <sammeluch@microsoft.com> - 1.17.8-1
+- Upgrade to 1.17.8 to resolve CVE-2025-23266
+
 * Thu Feb 13 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.17.4-1
 - Upgrade to v1.17.4 to resolve CVE-2025-23359
 

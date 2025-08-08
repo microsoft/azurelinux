@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,7 @@ Patch3:         CVE-2022-3821.patch
 Patch4:         CVE-2022-45873.patch
 Patch5:         backport-helper-util-macros.patch
 Patch6:         CVE-2022-4415.patch
+Patch7:         CVE-2023-7008.patch
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gettext
@@ -246,6 +247,9 @@ fi
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Fri May 23 2025 Akhila Guruju <v-guakhila@microsoft.com> - 250.3-13
+- Patch CVE-2023-7008
+
 * Mon Mar 13 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 250.3-12
 - Add patch for CVE-2022-4415
 - Add patch backport-helper-util-macros.patch to backport needed macros for CVE-2022-4415.patch

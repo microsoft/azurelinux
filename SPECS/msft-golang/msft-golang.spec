@@ -1,6 +1,6 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.24.1-20250304.4.src.tar.gz
+%global ms_go_filename  go1.24.5-20250708.7.src.tar.gz
 %global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
@@ -14,8 +14,8 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           msft-golang
-Version:        1.24.1
-Release:        2%{?dist}
+Version:        1.24.5
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,7 +31,6 @@ Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.
 # bootstrap 03
 Source4:        https://github.com/microsoft/go/releases/download/v1.22.12-2/go1.22.12-20250211.4.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
-Patch1:         CVE-2025-22871.patch
 Conflicts:      go
 Conflicts:      golang
 
@@ -54,7 +53,6 @@ tar xf %{SOURCE4} --no-same-owner
 mv -v go go-bootstrap-03
 
 %setup -q -n go
-patch -Np1 --ignore-whitespace < %{PATCH1}
 %build
 # go 1.4 bootstraps with C.
 # go 1.20 bootstraps with go >= 1.17.13
@@ -160,7 +158,14 @@ fi
 %{_bindir}/*
 
 %changelog
-Mon Apr 14 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.24.1-2
+* Wed Aug 06 2025 Muhammad Falak <mwani@microsoft.com> - 1.24.5-1
+- Bump version to 1.24.5
+- Drop un-needed patches
+
+* Mon Jun 30 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.24.1-3
+- Patch CVE-2025-22874 & CVE-2025-4673
+
+* Mon Apr 14 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 1.24.1-2
 - Patch to address CVE-2025-22871
 
 * Mon Mar 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.24.1-1

@@ -27,7 +27,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.182.1
+Version:        5.15.186.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -426,6 +426,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Jul 07 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.186.1-1
+- Auto-upgrade to 5.15.186.1
+
+* Fri May 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.184.1-1
+- Auto-upgrade to 5.15.184.1
+
 * Sat May 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.182.1-1
 - Auto-upgrade to 5.15.182.1
 

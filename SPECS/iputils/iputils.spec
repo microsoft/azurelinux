@@ -1,7 +1,7 @@
 Summary:        Programs for basic networking
 Name:           iputils
 Version:        20211215
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3 AND GPLv2+ AND Rdisc
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,7 @@ Group:          Applications/Communications
 URL:            https://github.com/iputils/iputils
 Source0:        https://github.com/iputils/iputils/archive/20211215.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         ping_test_ipv6_localhost.patch
+Patch1:         CVE-2025-47268.patch
 BuildRequires:  iproute
 BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
@@ -67,6 +68,9 @@ mv -f RELNOTES.tmp RELNOTES.old
 %exclude %{_sysconfdir}/init.d/ninfod.sh
 
 %changelog
+* Thu Jun 19 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 20211215-3
+- Fix CVE-2025-47268 with an upstream patch
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 20211215-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
