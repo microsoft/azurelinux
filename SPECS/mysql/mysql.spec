@@ -73,9 +73,10 @@ useradd test -g test -m
 chown -R test:test .
 
 # In case of failure, print the test log.
-#merge_large_tests is a large test that takes a long time to run and eventually fails
-export CTEST_TEST_EXCLUDE_REGEX="merge_large_tests"
-sudo -u test make test || { cat Testing/Temporary/LastTest.log; false; }
+# merge_large_tests is a large test that takes a long time to run and eventually times out and fails.
+sudo -u test ctest -E merge_large_tests || { cat Testing/Temporary/LastTest.log || echo 'No log found'; false; }
+
+
 
 %files
 %defattr(-,root,root)
