@@ -1,15 +1,17 @@
-Name:           perl-Perl-MinimumVersion
-Version:        1.38
-Release:        25%{?dist}
-Summary:        Find a minimum required version of perl for Perl code
-License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Name:           perl-Perl-MinimumVersion
+Version:        1.40
+Release:        14%{?dist}
+Summary:        Find a minimum required version of perl for Perl code
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Perl-MinimumVersion
-Source0:        https://cpan.metacpan.org/authors/id/N/NE/NEILB/Perl-MinimumVersion-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/authors/id/D/DB/DBOOK/Perl-MinimumVersion-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 BuildArch:      noarch
+
+BuildRequires: %{__make}
+BuildRequires: %{__perl}
 
 BuildRequires: perl-generators
 BuildRequires: perl(ExtUtils::MakeMaker) >= 6.30
@@ -18,10 +20,6 @@ BuildRequires: perl(Carp)
 BuildRequires: perl(Exporter)
 BuildRequires: perl(List::Util) >= 1.20
 BuildRequires: perl(Params::Util) >= 0.25
-BuildRequires: perl(Perl::Critic::Utils) >= 1.104
-BuildRequires: perl(PPI) >= 1.215
-BuildRequires: perl(PPI::Util)
-BuildRequires: perl(PPIx::Regexp) >= 0.033
 BuildRequires: perl(strict)
 BuildRequires: perl(vars)
 BuildRequires: perl(version) >= 0.76
@@ -47,16 +45,16 @@ Find a minimum required version of perl for Perl code
 %setup -q -n Perl-MinimumVersion-%{version}
 
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
-make %{?_smp_mflags}
+%{__perl} Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install PERL_INSTALL_ROOT=$RPM_BUILD_ROOT
+%{make_install}
 %{_fixperms} $RPM_BUILD_ROOT/*
 
 %check
 %if !%{defined perl_bootstrap}
-make test
+%{__make} test
 %endif
 
 %files
@@ -68,8 +66,67 @@ make test
 %{_mandir}/man3/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.38-25
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Apr 09 2025 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 1.40-14
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.40-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.40-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.40-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.40-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.40-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Nov 29 2022 Ralf Corsépius <corsepiu@fedoraproject.org> - 1.40-8
+- Modernize spec.
+- Convert license to SPDX.
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.40-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jun 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.40-6
+- Perl 5.36 re-rebuild of bootstrapped packages
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 1.40-5
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.40-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.40-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon May 24 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.40-2
+- Perl 5.34 re-rebuild of bootstrapped packages
+
+* Sun May 23 2021 Jitka Plesnikova <jplesnik@redhat.com> - 1.40-1
+- Perl 5.34 rebuild
+
+* Thu May 06 2021 Ralf Corsépius <corsepiu@fedoraproject.org> - 1.40-1
+- Upstream update to 1.40.
+- Reflect Source0-URL having changed.
+- Add BR: perl(PPIx::Utils).
+- Modernize spec.
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.38-28
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.38-27
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.38-26
+- Perl 5.32 re-rebuild of bootstrapped packages
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 1.38-25
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.38-24
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
