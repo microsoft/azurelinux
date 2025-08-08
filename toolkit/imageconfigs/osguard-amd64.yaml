@@ -3,7 +3,7 @@ storage:
 
   disks:
     - partitionTableType: gpt
-      maxSize: 24G
+      maxSize: 40G
       partitions:
         - id: esp
           type: esp
@@ -26,7 +26,7 @@ storage:
         - id: root-a
           type: root
           label: root-a
-          size: 4G
+          size: 12G
 
   verity:
     - id: usrverity
@@ -42,26 +42,26 @@ storage:
       mountPoint:
         idType: part-label
         path: /boot/efi
-        options: umask=0077,noexec,nodev
+        options: nodev,noexec,umask=0077
 
     - deviceId: boot-a
       type: ext4
       mountPoint:
         idType: uuid
         path: /boot
-        options: noexec,nodev,nosuid
+        options: nodev,noexec,nosuid
 
     - deviceId: usrverity
       type: ext4
       mountPoint:
         path: /usr
-        options: ro,nodev
+        options: nodev,ro
 
     - deviceId: root-a
       type: ext4
       mountPoint:
         path: /
-        options: nodev,nosuid,x-initrd.mount,x-systemd.growfs
+        options: nodev,nosuid,x-systemd.growfs,x-initrd.mount
 
 os:
   bootloader:
@@ -83,14 +83,13 @@ os:
       - rd.hostonly=0
       - ipe.enforce=0
       - fips=1
+      - net.ifnames=1
 
   packages:
     remove:
-      - initramfs
       - dracut-hostonly # Not used for UKI images
       - grub2-efi-binary # Replaced by systemd-boot
       - kernel # Replaced by kernel-ipe
-
     install:
       - syslog
       - WALinuxAgent
@@ -121,10 +120,9 @@ os:
       - policycoreutils-python-utils
       - secilc
       - selinux-policy
-      # - selinux-policy-ci
+      - selinux-policy-ci
       - selinux-policy-modules
       - setools-console
-      - chrony
 
       # === System packages ===
       - systemd-ukify
@@ -139,7 +137,9 @@ os:
       - bind-utils
       - tar
       # =====AKS=====
+      - blobfuse2
       - ca-certificates
+      - chrony
       - cifs-utils
       - cloud-init-azure-kvp
       - conntrack-tools
@@ -152,11 +152,15 @@ os:
       - iproute
       - ipset
       - iptables
+      - iscsi-initiator-utils
       - jq
       - logrotate
       - lsof
+      - netplan
+      - nftables
       - nmap-ncat
       - nfs-utils
+      - oras
       - pam
       - psmisc
       - rsyslog
@@ -166,12 +170,6 @@ os:
       - util-linux
       - xz
       - zip
-      - blobfuse2
-      - nftables
-      - iscsi-initiator-utils
-      - netplan
-      - oras
-      - initramfs
 
   additionalDirs:
     - source: files/osguard/repart.d
@@ -182,8 +180,6 @@ os:
     # SELinux customizations
     - source: files/linuxguard/selinux-ci-uki.semanage
       destination: /etc/selinux/targeted/selinux-ci.semanage
-    - source: files/common/99-dhcp-eth0.network
-      destination: /etc/systemd/network/99-dhcp-eth0.network
     # Cloud-init configuration
     - source: files/osguard/cloud.cfg
       destination: /etc/cloud/cloud.cfg
@@ -202,8 +198,9 @@ os:
       permissions: "600"
 
   services:
-    enable:
+    disable:
       - sshd
+    enable:
       - systemd-networkd
       - systemd-resolved
 
@@ -214,14 +211,24 @@ os:
 
 scripts:
   postCustomization:
+    # Various performance tuning steps
     - path: scripts/common/performance-tuning.sh
-    # Config AzureLinuxagent
+    # Config AzureLinuxAgent
     - path: scripts/common/azlinuxagentconfig.sh
     # Disable unused SELinux policy modules and configure SELinux policy for CI
-    #- path: scripts/linuxguard/selinux-ci-config.sh
+    - path: scripts/common/selinux-ci-config.py
+      interpreter: /usr/bin/python3
+    # Ensure the /etc/machine-id is cleared before the first boot
     - path: scripts/common/cleanup-machineid.sh
+    # Move CNI binaries from /opt to /usr for IPE
     - path: scripts/common/prepare_trusted_cni_plugins.sh
+    # Move iptables scripts from /etc to /usr for IPE
+    - path: scripts/common/move-iptables-scripts-to-usr.sh
+    # Disable exec and suid on /tmp
     - path: scripts/common/tmp-no-exec.sh
+    # Remove ImportCredential from getty services to avoid boot log warnings
+    - path: scripts/common/remove-getty-import-credential.sh
+    # Set OS release variant entries
     - path: scripts/set_os_release_variant_entries.sh
       arguments:
       - --variant-id
