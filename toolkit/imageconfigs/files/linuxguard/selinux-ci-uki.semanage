@@ -21,3 +21,4 @@ fcontext -a -f f -t fsadm_exec_t -r 's0' '/usr/bin/lsblk'
 fcontext -a -f f -t dockerd_exec_t -r 's0' '/usr/bin/tardev-snapshotter'
 fcontext -a -f f -t bin_t -r 's0' '/usr/share/netplan/netplan\.script'
 fcontext -a -e / /rw
+fcontext -a -e /etc/selinux /usr/etc/selinux
