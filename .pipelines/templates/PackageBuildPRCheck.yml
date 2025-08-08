@@ -136,7 +136,6 @@ stages:
                   maxCPU: "${{ configuration.maxCPUs }}"
                   outputArtifactsFolder: $(ob_outputDirectory)
                   outputRPMsTarballName: $(outputRPMsTarballName)
-                  pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                   selfRepoName: self
                   testSuiteName: "[${{ configuration.name }}] Package test"
 
@@ -197,7 +196,6 @@ stages:
                   isUseCCache: true
                   maxCPU: "${{ configuration.maxCPUs }}"
                   outputArtifactsFolder: $(ob_outputDirectory)
-                  pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                   selfRepoName: self
                   srpmPackList: "$(testListFromToolchain)"
                   testRerunList: "$(testListFromToolchain)"
