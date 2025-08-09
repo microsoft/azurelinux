@@ -36,7 +36,7 @@
 
 Name:		shim-unsigned-%{efiarch}
 Version:	15.8
-Release:	5%{?dist}
+Release:	6%{?dist}
 Summary:	First-stage UEFI bootloader
 ExclusiveArch:	x86_64
 License:	BSD
@@ -52,6 +52,7 @@ Source3:	sbat.azurelinux.csv
 Source4:	shim.patches
 
 Source100:	shim-find-debuginfo.sh
+Patch0:         CVE-2024-9143.patch
 
 %include %{SOURCE4}
 
@@ -221,6 +222,9 @@ HASH=$(cat %{buildroot}%{shimdir}/shim%{efiarch}.hash | cut -d ' ' -f 1)
 %files debugsource -f build-%{efiarch}/debugsource.list
 
 %changelog
+* Mon Jun 02 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 15.8-6
+- Patch CVE-2024-9143
+
 * Thu Nov 28 2024 Chris Co <chrco@microsoft.com> - 15.8-5
 - Bump to match shim release
 
