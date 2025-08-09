@@ -1,0 +1,63 @@
+From fc67ceacd81f0c74fcab85447c23a532ae482827 Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <slyich@gmail.com>
+Date: Thu, 11 Nov 2021 18:59:57 +0000
+Subject: [PATCH 1/2] src/utils.c: suppres unused parameter warning
+
+    utils.c:372:62: error: unused parameter 'completions' [-Werror=unused-parameter]
+      372 | getstring_with_completion(char *prompt, const char * const * completions)
+          |                                         ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~
+---
+ src/utils.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/utils.c b/src/utils.c
+index 2e4139c..34c9b88 100644
+--- a/src/utils.c
++++ b/src/utils.c
+@@ -394,7 +394,7 @@ getstring_with_completion(char *prompt, const char * const * completions)
+ 	curs_set(0);
+ 
+ #else
+-
++	(void)completions; /* unused */
+ 	move(maxy - 1, 0);
+ 	buf = readlinewrapper(prompt);
+ 
+-- 
+2.39.1
+
+From ab604fdb67296dad27f3a25f3c9aabdd2fb8c3fa Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <slyich@gmail.com>
+Date: Thu, 11 Nov 2021 19:02:24 +0000
+Subject: [PATCH 2/2] src/video.c: use %ld to print longs
+
+ncurses-6.3 added printf()-stype attribute annotations for gcc-like
+compilers that can now detect argument mismatches:
+
+    video.c:114:26: error: format '%d' expects argument of type 'int',
+      but argument 3 has type 'long unsigned int' [-Werror=format=]
+      114 |                 printw(_("Viewing line %d/%d, 100%%"), lines, lines);
+          |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+ src/video.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/video.c b/src/video.c
+index f6b444a..195d781 100644
+--- a/src/video.c
++++ b/src/video.c
+@@ -109,9 +109,9 @@ showscreen(char **message, unsigned long lines, unsigned long pos, long cursor,
+ 	mymvhline(maxy - 1, 0, ' ', maxx);
+ 	move(maxy - 1, 0);
+ 	if ((pos < lines - 1) &&(lines > pos + maxy - 2))
+-		printw(_("Viewing line %d/%d, %d%%"), pos + maxy - 2, lines,((pos + maxy - 2) * 100) / lines);
++		printw(_("Viewing line %ld/%ld, %ld%%"), pos + maxy - 2, lines,((pos + maxy - 2) * 100) / lines);
+ 	else
+-		printw(_("Viewing line %d/%d, 100%%"), lines, lines);
++		printw(_("Viewing line %ld/%ld, 100%%"), lines, lines);
+ 	info_add_highlights(pos, cursor, lines, column, message);
+ 	attrset(normal);
+ 	move(0, 0);
+-- 
+2.39.1
+
