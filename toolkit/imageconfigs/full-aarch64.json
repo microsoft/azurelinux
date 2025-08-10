@@ -31,6 +31,9 @@
             "KernelOptions": {
                 "default": "kernel"
             },
+	    "KernelCommandLine": {
+                "ExtraCommandLine": "systemd.default_device_timeout_sec=90s"
+            },
             "AdditionalFiles": {
                 "additionalconfigs/99-dhcp-en.network": "/etc/systemd/network/99-dhcp-en.network"
             }
