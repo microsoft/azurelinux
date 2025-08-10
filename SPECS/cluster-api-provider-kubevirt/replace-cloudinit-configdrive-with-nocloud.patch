@@ -1,0 +1,62 @@
+From 4c1d1fd16df8c560854ce8d50bf7427790ee0685 Mon Sep 17 00:00:00 2001
+From: Sharath Srikanth Chellappa <sharathsr@microsoft.com>
+Date: Fri, 8 Aug 2025 14:30:14 -0700
+Subject: [PATCH] Replace CloudInit ConfigDrive with CloudInitNoCloud
+
+These changes enhance bootstrapping reliability and speed.
+
+The readiness probe addition is especially useful for rolling updates, 
+where knowing the API server's state is critical.
+
+---
+ pkg/kubevirt/utils.go | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/pkg/kubevirt/utils.go b/pkg/kubevirt/utils.go
+index 5f5de35..5270ae1 100644
+--- a/pkg/kubevirt/utils.go
++++ b/pkg/kubevirt/utils.go
+@@ -23,6 +23,7 @@ import (
+ 	"github.com/pkg/errors"
+ 	corev1 "k8s.io/api/core/v1"
+ 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
++	"k8s.io/apimachinery/pkg/util/intstr"
+ 	kubevirtv1 "kubevirt.io/api/core/v1"
+ 	"sigs.k8s.io/cluster-api/util"
+ 	"sigs.k8s.io/kind/pkg/cluster/constants"
+@@ -182,7 +183,7 @@ func buildVirtualMachineInstanceTemplate(ctx *context.MachineContext) *kubevirtv
+ 	cloudInitVolume := kubevirtv1.Volume{
+ 		Name: cloudInitVolumeName,
+ 		VolumeSource: kubevirtv1.VolumeSource{
+-			CloudInitConfigDrive: &kubevirtv1.CloudInitConfigDriveSource{
++			CloudInitNoCloud: &kubevirtv1.CloudInitNoCloudSource{
+ 				UserDataSecretRef: &corev1.LocalObjectReference{
+ 					Name: *ctx.Machine.Spec.Bootstrap.DataSecretName + "-userdata",
+ 				},
+@@ -201,6 +202,23 @@ func buildVirtualMachineInstanceTemplate(ctx *context.MachineContext) *kubevirtv
+ 	}
+ 	template.Spec.Domain.Devices.Disks = append(template.Spec.Domain.Devices.Disks, cloudInitDisk)
+ 
++	if ctx.KubevirtCluster.Spec.ControlPlaneServiceTemplate.Spec.Type == corev1.ServiceTypeClusterIP ||
++		ctx.KubevirtCluster.Spec.ControlPlaneServiceTemplate.Spec.Type == corev1.ServiceTypeLoadBalancer ||
++		ctx.KubevirtCluster.Spec.ControlPlaneServiceTemplate.Spec.Type == corev1.ServiceTypeNodePort {
++		if util.IsControlPlaneMachine(ctx.Machine) && template.Spec.ReadinessProbe == nil {
++			template.Spec.ReadinessProbe = &kubevirtv1.Probe{
++				Handler: kubevirtv1.Handler{
++					HTTPGet: &corev1.HTTPGetAction{
++						Scheme: corev1.URISchemeHTTPS,
++						Port:   intstr.FromInt(6443),
++						Path:   "/readyz",
++					},
++				},
++				PeriodSeconds: 10,
++			}
++		}
++	}
++
+ 	return template
+ }
+ 
+-- 
+2.49.0
+
