@@ -26,6 +26,10 @@ Source0:        https://github.com/kubernetes-sigs/cluster-api-provider-kubevirt
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         golang-version-and-makefile-targets-upgrade.patch
+Patch1:         enforce-tls-1.2-on-webhooks.patch
+Patch2:         patch-datavolume-based-on-kubernetes-version.patch
+Patch3:         replace-cloudinit-configdrive-with-nocloud.patch
+Patch4:         refactor-bootstrap-handling-for-faster-reconciliation.patch
 %global debug_package %{nil}
 BuildRequires:  golang >= 1.24
 
