@@ -27,10 +27,10 @@ index 0b2cd74de8..8c623cf95c 100644
  #
  #  For creating documentation via doc/all.mk
 diff --git a/configure b/configure
-index 77a1436510..74ff9a1fd4 100755
+index 5041ca264f..ed01ee2bdd 100755
 --- a/configure
 +++ b/configure
-@@ -652,6 +652,7 @@ AUTOCONF
+@@ -679,6 +679,7 @@ AUTOCONF
  ACLOCAL
  RUSERS
  SNMPWALK
@@ -38,16 +38,15 @@ index 77a1436510..74ff9a1fd4 100755
  SNMPGET
  openssl_version_check_config
  WITH_DHCP
-@@ -5961,7 +5962,7 @@ else
-   openssl_version_check_config=
- fi
+@@ -6976,6 +6977,7 @@ fi
  
--
-+ENABLE_REPRODUCIBLE_BUILDS=yes
+ 
  # Check whether --enable-reproducible-builds was given.
- if test "${enable_reproducible_builds+set}" = set; then :
++ENABLE_REPRODUCIBLE_BUILDS=yes
+ if test ${enable_reproducible_builds+y}
+ then :
    enableval=$enable_reproducible_builds;  case "$enableval" in
-@@ -5973,6 +5974,7 @@ $as_echo "#define ENABLE_REPRODUCIBLE_BUILDS 1" >>confdefs.h
+@@ -6987,6 +6989,7 @@ printf "%s\n" "#define ENABLE_REPRODUCIBLE_BUILDS 1" >>confdefs.h
      ;;
    *)
      reproducible_builds=no
