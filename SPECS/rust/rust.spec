@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.72.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,7 @@ Patch1:         CVE-2024-32884.patch
 Patch2:         CVE-2024-31852.patch
 Patch3:         CVE-2024-43806.patch
 Patch4:         CVE-2024-9681.patch
+Patch5:         CVE-2025-53605.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -173,6 +174,9 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Thu Aug 7 2025 Akarsh Chaudhary <v-akarshc@microsoft.com>- 1.72.0-11
+- Patch CVE-2025-53605
+
 * Fri Jan 31 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.72.0-10
 - Fix CVE-2024-9681
 
