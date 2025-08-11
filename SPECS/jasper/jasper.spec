@@ -16,12 +16,14 @@ Source0: https://github.com/jasper-software/%{name}/archive/refs/tags/version-%{
 
 # architecture related patches
 Patch0:   CVE-2024-31744.patch
+Patch1: CVE-2025-8837.patch
+Patch2: CVE-2025-8836.patch
+Patch3: CVE-2025-8835.patch
+
 Patch100: jasper-2.0.2-test-ppc64-disable.patch
 Patch101: jasper-2.0.2-test-ppc64le-disable.patch
 Patch102: jasper-4.1.0-test-i686-disable.patch
-Patch105: CVE-2025-8837.patch
-Patch104: CVE-2025-8836.patch
-Patch103: CVE-2025-8835.patch
+
 
 # autoreconf
 BuildRequires: cmake
@@ -66,10 +68,10 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 %prep
 %setup -q -n %{name}-version-%{version}
-%patch 103 -p1
-%patch 104 -p1
-%patch 105 -p1
 %patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
 
 # Need to disable one test to be able to build it on ppc64 arch
 # At ppc64 this test just stuck (nothing happend - no exception or error)
