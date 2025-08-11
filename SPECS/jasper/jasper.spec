@@ -6,7 +6,7 @@
 Summary: Implementation of the JPEG-2000 standard, Part 1
 Name:    jasper
 Version: 4.2.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 License: JasPer-2.0
 Vendor:  Microsoft Corporation
@@ -19,6 +19,9 @@ Patch0:   CVE-2024-31744.patch
 Patch100: jasper-2.0.2-test-ppc64-disable.patch
 Patch101: jasper-2.0.2-test-ppc64le-disable.patch
 Patch102: jasper-4.1.0-test-i686-disable.patch
+Patch105: CVE-2025-8837.patch
+Patch104: CVE-2025-8836.patch
+Patch103: CVE-2025-8835.patch
 
 # autoreconf
 BuildRequires: cmake
@@ -63,6 +66,9 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 %prep
 %setup -q -n %{name}-version-%{version}
+%patch 103 -p1
+%patch 104 -p1
+%patch 105 -p1
 %patch 0 -p1
 
 # Need to disable one test to be able to build it on ppc64 arch
@@ -131,6 +137,9 @@ make test -C builder
 
 
 %changelog
+* Mon Aug 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.2.1-3
+- Patch for CVE-2025-8837, CVE-2025-8836, CVE-2025-8835
+
 * Tue May 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2.1-2
 - Patch CVE-2024-31744.
 
