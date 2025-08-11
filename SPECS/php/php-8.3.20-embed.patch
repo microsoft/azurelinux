@@ -1,0 +1,25 @@
+diff -up ./sapi/embed/config.m4.embed ./sapi/embed/config.m4
+--- ./sapi/embed/config.m4.embed	2025-03-26 08:07:06.692333414 +0100
++++ ./sapi/embed/config.m4	2025-03-26 08:07:42.872879994 +0100
+@@ -15,7 +15,8 @@ if test "$PHP_EMBED" != "no"; then
+         SAPI_SHARED="libs/libphp.dylib"
+         PHP_EMBED_TYPE=shared-dylib
+       ], [PHP_EMBED_TYPE=shared])
+-      INSTALL_IT="\$(mkinstalldirs) \$(INSTALL_ROOT)\$(prefix)/lib; \$(INSTALL) -m 0755 $SAPI_SHARED \$(INSTALL_ROOT)\$(prefix)/lib"
++      EXTRA_LDFLAGS="$EXTRA_LDFLAGS -release \$(PHP_MAJOR_VERSION).\$(PHP_MINOR_VERSION)"
++      INSTALL_IT="\$(mkinstalldirs) \$(INSTALL_ROOT)\$(libdir); \$(LIBTOOL) --mode=install \$(INSTALL) -m 0755 \$(OVERALL_TARGET) \$(INSTALL_ROOT)\$(libdir)"
+       ;;
+     static)
+       LIBPHP_CFLAGS="-static"
+diff -up ./scripts/php-config.in.embed ./scripts/php-config.in
+--- ./scripts/php-config.in.embed	2025-03-25 22:00:06.000000000 +0100
++++ ./scripts/php-config.in	2025-03-26 08:07:06.692518461 +0100
+@@ -18,7 +18,7 @@ exe_extension="@EXEEXT@"
+ php_cli_binary=NONE
+ php_cgi_binary=NONE
+ configure_options="@CONFIGURE_OPTIONS@"
+-php_sapis="@PHP_INSTALLED_SAPIS@"
++php_sapis="apache2handler litespeed fpm phpdbg @PHP_INSTALLED_SAPIS@"
+ ini_dir="@EXPANDED_PHP_CONFIG_FILE_SCAN_DIR@"
+ ini_path="@EXPANDED_PHP_CONFIG_FILE_PATH@"
+ 

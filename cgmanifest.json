@@ -1097,8 +1097,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.20.9",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.20.9/bind-9.20.9.tar.xz"
+          "version": "9.20.11",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.20.11/bind-9.20.11.tar.xz"
         }
       }
     },
@@ -1237,8 +1237,8 @@
         "type": "other",
         "other": {
           "name": "bpftrace",
-          "version": "0.20.3",
-          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/refs/tags/v0.20.3.tar.gz"
+          "version": "0.23.5",
+          "downloadUrl": "https://github.com/bpftrace/bpftrace/archive/refs/tags/v0.23.5.tar.gz"
         }
       }
     },
@@ -1718,7 +1718,7 @@
         "other": {
           "name": "cim-schema",
           "version": "2.54.1",
-          "downloadUrl": "http://www.dmtf.org/standards/cim/cim_schema_v2541/cim_schema_2.54.1Experimental-MOFs.zip"
+          "downloadUrl": "https://www.dmtf.org/standards/cim/cim_schema_v2541/cim_schema_2.54.1Experimental-MOFs.zip"
         }
       }
     },
@@ -1737,8 +1737,8 @@
         "type": "other",
         "other": {
           "name": "cjose",
-          "version": "0.6.1",
-          "downloadUrl": "https://github.com/cisco/cjose/archive/0.6.1/cjose-0.6.1.tar.gz"
+          "version": "0.6.2.2",
+          "downloadUrl": "https://github.com/OpenIDC/cjose/releases/download/v0.6.2.2/cjose-0.6.2.2.tar.gz"
         }
       }
     },
@@ -2199,6 +2199,16 @@
           "name": "cpulimit",
           "version": "3.0",
           "downloadUrl": "https://downloads.sourceforge.net/limitcpu/cpulimit-3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "cqlsh",
+          "version": "6.1.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/cqlsh/cqlsh-6.1.2.tar.gz"
         }
       }
     },
@@ -3258,8 +3268,8 @@
         "type": "other",
         "other": {
           "name": "elinks",
-          "version": "0.16.0",
-          "downloadUrl": "https://github.com/rkd77/elinks/releases/download/v0.16.0/elinks-0.16.0.tar.xz"
+          "version": "0.17.0",
+          "downloadUrl": "https://github.com/rkd77/elinks/releases/download/v0.17.0/elinks-0.17.0.tar.xz"
         }
       }
     },
@@ -3880,8 +3890,8 @@
         "type": "other",
         "other": {
           "name": "freeradius",
-          "version": "3.2.3",
-          "downloadUrl": "ftp://ftp.freeradius.org/pub/radius/freeradius-server-3.2.3.tar.bz2"
+          "version": "3.2.5",
+          "downloadUrl": "https://github.com/FreeRADIUS/freeradius-server/releases/download/release_3_2_5/freeradius-server-3.2.5.tar.bz2"
         }
       }
     },
@@ -4360,8 +4370,8 @@
         "type": "other",
         "other": {
           "name": "git",
-          "version": "2.45.3",
-          "downloadUrl": "https://github.com/git/git/archive/refs/tags/v2.45.3.tar.gz"
+          "version": "2.45.4",
+          "downloadUrl": "https://github.com/git/git/archive/refs/tags/v2.45.4.tar.gz"
         }
       }
     },
@@ -4660,8 +4670,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.23.11",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.11-1/go1.23.11-20250708.6.src.tar.gz"
+          "version": "1.23.12",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.12-1/go1.23.12-20250806.6.src.tar.gz"
         }
       }
     },
@@ -4670,8 +4680,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.24.5",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.5-1/go1.24.5-20250708.7.src.tar.gz"
+          "version": "1.24.6",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.6-1/go1.24.6-20250806.4.src.tar.gz"
         }
       }
     },
@@ -5410,8 +5420,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.62",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.62.tar.bz2"
+          "version": "2.4.65",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.65.tar.bz2"
         }
       }
     },
@@ -8131,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.15.0.aks0",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.15.0.aks0.tar.gz"
+          "version": "3.18.0.kata0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.18.0.kata0.tar.gz"
         }
       }
     },
@@ -8741,8 +8751,8 @@
         "type": "other",
         "other": {
           "name": "libappstream-glib",
-          "version": "0.8.2",
-          "downloadUrl": "http://people.freedesktop.org/~hughsient/appstream-glib/releases/appstream-glib-0.8.2.tar.xz"
+          "version": "0.8.3",
+          "downloadUrl": "https://people.freedesktop.org/~hughsient/appstream-glib/releases/appstream-glib-0.8.3.tar.xz"
         }
       }
     },
@@ -8841,8 +8851,8 @@
         "type": "other",
         "other": {
           "name": "libbpf",
-          "version": "1.2.2",
-          "downloadUrl": "https://github.com/libbpf/libbpf/archive/v1.2.2.tar.gz"
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/libbpf/libbpf/archive/v1.5.0.tar.gz"
         }
       }
     },
@@ -9501,8 +9511,8 @@
         "type": "other",
         "other": {
           "name": "libgcrypt",
-          "version": "1.10.2",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.2.tar.bz2"
+          "version": "1.10.3",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.3.tar.bz2"
         }
       }
     },
@@ -10501,8 +10511,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.17.4",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.4.tar.gz"
+          "version": "1.17.8",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.8.tar.gz"
         }
       }
     },
@@ -14522,8 +14532,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.17.4",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.4.tar.gz"
+          "version": "1.17.8",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.8.tar.gz"
         }
       }
     },
@@ -21073,8 +21083,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.3.19",
-          "downloadUrl": "https://www.php.net/distributions/php-8.3.19.tar.xz"
+          "version": "8.3.23",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.23.tar.xz"
         }
       }
     },
@@ -22372,16 +22382,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "cqlsh",
-          "version": "6.1.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/cqlsh/cqlsh-6.1.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-cryptography",
           "version": "42.0.5",
           "downloadUrl": "https://pypi.io/packages/source/c/cryptography/cryptography-42.0.5.tar.gz"
@@ -23225,6 +23225,16 @@
           "name": "python-jsonschema",
           "version": "2.6.0",
           "downloadUrl": "https://pypi.python.org/packages/source/j/jsonschema/jsonschema-2.6.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-junit_xml",
+          "version": "1.9^20200222gitba89b41",
+          "downloadUrl": "https://github.com/kyrus/python-junit-xml/archive/ba89b41638df8ad2011c2818672f208a91a5a4a0/python-junit-xml-ba89b41638df8ad2011c2818672f208a91a5a4a0.tar.gz"
         }
       }
     },
@@ -27683,9 +27693,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "SDL",
-          "version": "1.2.15",
-          "downloadUrl": "https://github.com/libsdl-org/SDL-1.2/archive/refs/tags/release-1.2.15.tar.gz"
+          "name": "sdl12-compat",
+          "version": "1.2.68",
+          "downloadUrl": "https://github.com/libsdl-org/sdl12-compat/archive/release-1.2.68/sdl12-compat-1.2.68.tar.gz"
         }
       }
     },
@@ -27694,8 +27704,8 @@
         "type": "other",
         "other": {
           "name": "SDL2",
-          "version": "2.24.0",
-          "downloadUrl": "https://www.libsdl.org/release/SDL2-2.24.0.tar.gz"
+          "version": "2.30.9",
+          "downloadUrl": "https://www.libsdl.org/release/SDL2-2.30.9.tar.gz"
         }
       }
     },
@@ -28576,8 +28586,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.9.0",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.0.tar.gz"
+          "version": "1.9.1",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.1.tar.gz"
         }
       }
     },
@@ -29666,8 +29676,8 @@
         "type": "other",
         "other": {
           "name": "valkey",
-          "version": "8.0.3",
-          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.3.tar.gz"
+          "version": "8.0.4",
+          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.4.tar.gz"
         }
       }
     },
@@ -29706,8 +29716,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.1.1198",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.1198.tar.gz"
+          "version": "9.1.1552",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.1552.tar.gz"
         }
       }
     },

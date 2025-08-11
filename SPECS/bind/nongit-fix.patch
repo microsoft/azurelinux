@@ -12,7 +12,7 @@ index 9701cdb..b7c84f6 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -19,7 +19,7 @@ m4_define([bind_VERSION_MINOR], 20)dnl
- m4_define([bind_VERSION_PATCH], 9)dnl
+ m4_define([bind_VERSION_PATCH], 11)dnl
  m4_define([bind_VERSION_EXTRA], )dnl
  m4_define([bind_DESCRIPTION], [(Stable Release)])dnl
 -m4_define([bind_SRCID], [m4_esyscmd_s([git rev-parse --short HEAD | cut -b1-7])])dnl
