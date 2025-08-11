@@ -138,7 +138,7 @@ Patch1002: CVE-2024-4741.patch
 Patch1003: CVE-2024-13176.patch
 Patch1004: CVE-2024-2511.patch
 Patch1005: CVE-2024-4603.patch
-Patch1006:  CVE-2025-3770.patch
+Patch1006: CVE-2025-3770.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
