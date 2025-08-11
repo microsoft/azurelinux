@@ -5,13 +5,14 @@
 Summary:        International Components for Unicode.
 Name:           icu
 Version:        72.1.0.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 URL:            https://github.com/microsoft/icu
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/icu/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0: CVE-2025-5222.patch
 BuildRequires:  autoconf
 BuildRequires:  python3
 BuildRequires:  python3-xml
@@ -30,6 +31,7 @@ It contains the libraries and header files to create applications
 
 %prep
 %setup -q
+%patch 0 -p1
 
 %build
 pushd icu/icu4c/source
@@ -64,6 +66,9 @@ make -C icu/icu4c/source DESTDIR=%{buildroot} install
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Aug 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 72.1.0.3-2
+- Patch for CVE-2025-5222
+
 * Thu Feb 05 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 72.1.0.3-1
 - Update to version  "72.1.0.3".
 - Add check section.
