@@ -45,7 +45,7 @@ Patch12:        CVE-2025-22869.patch
 Patch13:        CVE-2023-48795.patch
 Patch14:        CVE-2024-51744.patch
 Patch15:        CVE-2025-22872.patch
-Patch16:	CVE-2024-33394.patch
+Patch16:        CVE-2024-33394.patch
 
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
