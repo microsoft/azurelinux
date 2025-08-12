@@ -2,7 +2,7 @@
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
 Version:        %{BaseVersion}.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,6 +33,7 @@ Patch15:         CVE-2025-32910.patch
 # CVE-2025-32912 will be fixed in 3.6.5 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/cd077513f267e43ce4b659eb18a1734d8a369992
 Patch16:         CVE-2025-32912.patch
 Patch17:         CVE-2025-4476.patch
+Patch18:         CVE-2025-4948.patch
 
 
 BuildRequires:  meson
@@ -145,6 +146,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 
 %changelog
+* Tue Jul 29 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.0.4-8
+- Patch for CVE-2025-4948
+
 * Wed Jun 18 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.0.4-8
 - Add patch for CVE-2025-32909
 - Add patch for CVE-2025-32910
