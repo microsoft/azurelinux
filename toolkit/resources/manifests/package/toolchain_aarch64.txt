@@ -51,8 +51,8 @@ check-debuginfo-0.15.2-1.azl3.aarch64.rpm
 chkconfig-1.25-1.azl3.aarch64.rpm
 chkconfig-debuginfo-1.25-1.azl3.aarch64.rpm
 chkconfig-lang-1.25-1.azl3.aarch64.rpm
-cmake-3.30.3-7.azl3.aarch64.rpm
-cmake-debuginfo-3.30.3-7.azl3.aarch64.rpm
+cmake-3.30.3-8.azl3.aarch64.rpm
+cmake-debuginfo-3.30.3-8.azl3.aarch64.rpm
 coreutils-9.4-6.azl3.aarch64.rpm
 coreutils-debuginfo-9.4-6.azl3.aarch64.rpm
 coreutils-lang-9.4-6.azl3.aarch64.rpm
@@ -579,11 +579,11 @@ sqlite-devel-3.44.0-1.azl3.aarch64.rpm
 sqlite-libs-3.44.0-1.azl3.aarch64.rpm
 swig-4.2.1-1.azl3.aarch64.rpm
 swig-debuginfo-4.2.1-1.azl3.aarch64.rpm
-systemd-bootstrap-250.3-17.azl3.aarch64.rpm
-systemd-bootstrap-debuginfo-250.3-17.azl3.aarch64.rpm
-systemd-bootstrap-devel-250.3-17.azl3.aarch64.rpm
-systemd-bootstrap-libs-250.3-17.azl3.aarch64.rpm
-systemd-bootstrap-rpm-macros-250.3-17.azl3.noarch.rpm
+systemd-bootstrap-250.3-18.azl3.aarch64.rpm
+systemd-bootstrap-debuginfo-250.3-18.azl3.aarch64.rpm
+systemd-bootstrap-devel-250.3-18.azl3.aarch64.rpm
+systemd-bootstrap-libs-250.3-18.azl3.aarch64.rpm
+systemd-bootstrap-rpm-macros-250.3-18.azl3.noarch.rpm
 tar-1.35-2.azl3.aarch64.rpm
 tar-debuginfo-1.35-2.azl3.aarch64.rpm
 tdnf-3.5.8-7.azl3.aarch64.rpm

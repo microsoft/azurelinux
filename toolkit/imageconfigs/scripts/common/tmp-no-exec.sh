@@ -5,4 +5,4 @@
 
 set -euxo pipefail
 
-sed -i 's/^Options=/Options=noexec,/' /usr/lib/systemd/system/tmp.mount
+sed -i 's/^Options=/Options=noexec,nosuid,/' /usr/lib/systemd/system/tmp.mount
