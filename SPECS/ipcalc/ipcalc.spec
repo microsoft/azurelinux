@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name: ipcalc
 Version: 1.0.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: IP network address calculator
 License: GPL-2.0-or-later
 URL: https://gitlab.com/ipcalc/ipcalc
@@ -45,6 +45,10 @@ or check the validity of an address.
 #%{_mandir}/man1/ipcalc.1*
 
 %changelog
+* Mon Aug 11 2025 Suneel Yadava <suneelyadava@microsoft.com> - 1.0.3-2
+- Promoted from SPECS-EXTENDED to SPECS; tests pass with RUN_CHECK=y.
+- License metadata verified; cgmanifest/NOTICE checked.
+
 * Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.0.3-1
 - Update to version 1.0.3
 - License verified
