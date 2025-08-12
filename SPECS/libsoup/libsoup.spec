@@ -66,7 +66,7 @@ Patch16:         CVE-2025-32053.patch
 Patch17:         CVE-2025-4476.patch
 Patch18:         CVE-2025-32907.patch
 Patch19:         CVE-2025-4948.patch
-Patch20:          CVE-2025-4969.patch
+Patch20:         CVE-2025-4969.patch
 
 %description
 libsoup is HTTP client/server library for GNOME
