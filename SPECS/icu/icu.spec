@@ -30,8 +30,7 @@ Provides:       libicu-devel = %{version}-%{release}
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1
 
 %build
 pushd icu/icu4c/source
@@ -60,8 +59,10 @@ make -C icu/icu4c/source DESTDIR=%{buildroot} install
 
 %files devel
 %defattr(-,root,root)
+%license LICENSE
 %{_includedir}/*
 %{_datadir}/*
+%exclude %{_datadir}/licenses/icu/LICENSE
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 
