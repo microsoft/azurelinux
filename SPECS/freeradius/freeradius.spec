@@ -6,7 +6,7 @@
 Summary:       High-performance and highly configurable free RADIUS server
 Name:          freeradius
 Version:       3.2.5
-Release:       3%{?dist}
+Release:       4%{?dist}
 Vendor:        Microsoft Corporation
 Distribution:  Azure Linux
 License:       GPL-2.0-or-later AND LGPL-2.0-or-later
@@ -869,6 +869,10 @@ EOF
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/rest
 
 %changelog
+* Mon Aug 11 2025 Suneel Yadava <suneelyadava@microsoft.com> - 3.2.5-4
+- Promoted from SPECS-EXTENDED to SPECS; tests pass with RUN_CHECK=y.
+- License metadata verified; cgmanifest/NOTICE checked.
+
 * Fri Jan 31 2025 Jyoti kanase <v-jykanase@microsoft.com> -  3.2.5-3
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
