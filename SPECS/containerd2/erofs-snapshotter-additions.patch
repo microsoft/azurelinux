@@ -1,0 +1,2205 @@
+From 8213fdc2f14d713872ebf99495d9e5569f506a06 Mon Sep 17 00:00:00 2001
+From: Aadhar Agarwal <aadagarwal@microsoft.com>
+Date: Wed, 21 May 2025 23:34:56 +0000
+Subject: [PATCH 1/5] erofs snapshotter: Add tar index mode
+
+Signed-off-by: Aadhar Agarwal <aadagarwal@microsoft.com>
+---
+ docs/snapshotters/erofs.md                | 20 +++++++
+ internal/erofsutils/mount_linux.go        | 68 +++++++++++++++++++++++
+ plugins/diff/erofs/differ_linux.go        | 53 +++++++++++++++---
+ plugins/diff/erofs/plugin/plugin_linux.go | 25 +++++++--
+ 4 files changed, 155 insertions(+), 11 deletions(-)
+
+diff --git a/docs/snapshotters/erofs.md b/docs/snapshotters/erofs.md
+index 87ac51d13..e5578658c 100644
+--- a/docs/snapshotters/erofs.md
++++ b/docs/snapshotters/erofs.md
+@@ -164,6 +164,26 @@ When enabled via `enable_fsverity = true`, the snapshotter will:
+ - Verify fsverity status before mounting layers
+ - Skip fsverity if the filesystem or kernel does not support it
+ 
++## Tar Index Mode
++
++The EROFS differ also supports a "tar index" mode that offers a unique approach to handling OCI image layers:
++
++Instead of extracting the entire tar archive to create an EROFS filesystem, the tar index mode:
++1. Generates a tar index for the tar content
++2. Appends the original tar content to the index
++3. Creates a combined file: `[Tar index][Original tar content]`
++
++The tar index can be stored in a registry alongside image layers, allowing nodes to fetch it directly when needed. Typically, the tar index is much smaller than a full EROFS blob, making it more efficient to store and transfer. If the tar index is not available in the registry, it can be generated on the node as a fallback. When integrating with dm-verity, the registry can also store the dm-verity Merkle tree and root hash signature together with the tar index, enabling nodes to retrieve all necessary artifacts without redundant computation.
++
++### Configuration
++
++For the EROFS differ:
++
++```toml
++[plugins."io.containerd.differ.v1.erofs"]
++  enable_tar_index = true
++```
++
+ ## TODO
+ 
+ The EROFS Fsmerge feature is NOT supported in the current implementation
+diff --git a/internal/erofsutils/mount_linux.go b/internal/erofsutils/mount_linux.go
+index a2e95f04e..7ac096055 100644
+--- a/internal/erofsutils/mount_linux.go
++++ b/internal/erofsutils/mount_linux.go
+@@ -17,6 +17,7 @@
+ package erofsutils
+ 
+ import (
++	"bytes"
+ 	"context"
+ 	"fmt"
+ 	"io"
+@@ -43,6 +44,61 @@ func ConvertTarErofs(ctx context.Context, r io.Reader, layerPath string, mkfsExt
+ 	return nil
+ }
+ 
++// GenerateTarIndexAndAppendTar calculates tar index using --tar=i option
++// and appends the original tar content to create a combined EROFS layer.
++//
++// The `--tar=i` option instructs mkfs.erofs to only generate the tar index
++// for the tar content. The resulting file structure is:
++// [Tar index][Original tar content]
++func GenerateTarIndexAndAppendTar(ctx context.Context, r io.Reader, layerPath string, mkfsExtraOpts []string) error {
++	// Create a temporary file for storing the tar content
++	tarFile, err := os.CreateTemp("", "erofs-tar-*")
++	if err != nil {
++		return fmt.Errorf("failed to create temporary tar file: %w", err)
++	}
++	defer os.Remove(tarFile.Name())
++	defer tarFile.Close()
++
++	// Use TeeReader to process the input once while saving it to disk
++	teeReader := io.TeeReader(r, tarFile)
++
++	// Generate tar index directly to layerPath using --tar=i option
++	args := append([]string{"--tar=i", "--aufs", "--quiet"}, mkfsExtraOpts...)
++	args = append(args, layerPath)
++	cmd := exec.CommandContext(ctx, "mkfs.erofs", args...)
++	cmd.Stdin = teeReader
++	out, err := cmd.CombinedOutput()
++	if err != nil {
++		return fmt.Errorf("tar index generation failed with command 'mkfs.erofs %s': %s: %w",
++			strings.Join(args, " "), out, err)
++	}
++
++	// Log the command execution for debugging
++	log.G(ctx).Tracef("Generated tar index with command: %s %s, output: %s",
++		cmd.Path, strings.Join(cmd.Args, " "), string(out))
++
++	// Open layerPath for appending
++	f, err := os.OpenFile(layerPath, os.O_APPEND|os.O_WRONLY, 0644)
++	if err != nil {
++		return fmt.Errorf("failed to open layer file for appending: %w", err)
++	}
++	defer f.Close()
++
++	// Rewind the temporary file
++	if _, err := tarFile.Seek(0, 0); err != nil {
++		return fmt.Errorf("failed to seek to the beginning of tar file: %w", err)
++	}
++
++	// Append tar content
++	if _, err := io.Copy(f, tarFile); err != nil {
++		return fmt.Errorf("failed to append tar to layer: %w", err)
++	}
++
++	log.G(ctx).Infof("Successfully generated EROFS layer with tar index and tar content: %s", layerPath)
++
++	return nil
++}
++
+ func ConvertErofs(ctx context.Context, layerPath string, srcDir string, mkfsExtraOpts []string) error {
+ 	args := append([]string{"--quiet", "-Enoinline_data"}, mkfsExtraOpts...)
+ 	args = append(args, layerPath, srcDir)
+@@ -96,3 +152,15 @@ func MountsToLayer(mounts []mount.Mount) (string, error) {
+ 	}
+ 	return layer, nil
+ }
++
++// SupportGenerateFromTar checks if the installed version of mkfs.erofs supports
++// the tar mode (--tar option).
++func SupportGenerateFromTar() (bool, error) {
++	cmd := exec.Command("mkfs.erofs", "--help")
++	output, err := cmd.CombinedOutput()
++	if err != nil {
++		return false, fmt.Errorf("failed to run mkfs.erofs --help: %w", err)
++	}
++
++	return bytes.Contains(output, []byte("--tar=")), nil
++}
+diff --git a/plugins/diff/erofs/differ_linux.go b/plugins/diff/erofs/differ_linux.go
+index f84115258..2d6d3ac74 100644
+--- a/plugins/diff/erofs/differ_linux.go
++++ b/plugins/diff/erofs/differ_linux.go
+@@ -56,15 +56,42 @@ type differ interface {
+ type erofsDiff struct {
+ 	store         content.Store
+ 	mkfsExtraOpts []string
++	// enableTarIndex enables generating tar index for tar content
++	// instead of fully converting the tar to EROFS format
++	enableTarIndex bool
+ }
+ 
+-func NewErofsDiffer(store content.Store, mkfsExtraOpts []string) differ {
+-	return &erofsDiff{
+-		store:         store,
+-		mkfsExtraOpts: mkfsExtraOpts,
++// DifferOpt is an option for configuring the erofs differ
++type DifferOpt func(d *erofsDiff)
++
++// WithMkfsOptions sets extra options for mkfs.erofs
++func WithMkfsOptions(opts []string) DifferOpt {
++	return func(d *erofsDiff) {
++		d.mkfsExtraOpts = opts
+ 	}
+ }
+ 
++// WithTarIndexMode enables tar index mode for EROFS layers
++func WithTarIndexMode() DifferOpt {
++	return func(d *erofsDiff) {
++		d.enableTarIndex = true
++	}
++}
++
++// NewErofsDiffer creates a new EROFS differ with the provided options
++func NewErofsDiffer(store content.Store, opts ...DifferOpt) differ {
++	d := &erofsDiff{
++		store: store,
++	}
++
++	// Apply all options
++	for _, opt := range opts {
++		opt(d)
++	}
++
++	return d
++}
++
+ // A valid EROFS native layer media type should end with ".erofs".
+ //
+ // Please avoid using any +suffix to list the algorithms used inside EROFS
+@@ -299,9 +326,21 @@ func (s erofsDiff) Apply(ctx context.Context, desc ocispec.Descriptor, mounts []
+ 		r: io.TeeReader(processor, digester.Hash()),
+ 	}
+ 
+-	err = erofsutils.ConvertTarErofs(ctx, rc, layerBlobPath, s.mkfsExtraOpts)
+-	if err != nil {
+-		return emptyDesc, fmt.Errorf("failed to convert erofs: %w", err)
++	// Choose between tar index or tar conversion mode
++	if s.enableTarIndex {
++		// Use the tar index method: generate tar index and append tar
++		err = erofsutils.GenerateTarIndexAndAppendTar(ctx, rc, layerBlobPath, s.mkfsExtraOpts)
++		if err != nil {
++			return emptyDesc, fmt.Errorf("failed to generate tar index: %w", err)
++		}
++		log.G(ctx).WithField("path", layerBlobPath).Debug("Applied layer using tar index mode")
++	} else {
++		// Use the tar method: fully convert tar to EROFS
++		err = erofsutils.ConvertTarErofs(ctx, rc, layerBlobPath, s.mkfsExtraOpts)
++		if err != nil {
++			return emptyDesc, fmt.Errorf("failed to convert tar to erofs: %w", err)
++		}
++		log.G(ctx).WithField("path", layerBlobPath).Debug("Applied layer using tar conversion mode")
+ 	}
+ 
+ 	// Read any trailing data
+diff --git a/plugins/diff/erofs/plugin/plugin_linux.go b/plugins/diff/erofs/plugin/plugin_linux.go
+index 735afd131..89ba98866 100644
+--- a/plugins/diff/erofs/plugin/plugin_linux.go
++++ b/plugins/diff/erofs/plugin/plugin_linux.go
+@@ -18,9 +18,9 @@ package plugin
+ 
+ import (
+ 	"fmt"
+-	"os/exec"
+ 
+ 	"github.com/containerd/containerd/v2/core/metadata"
++	"github.com/containerd/containerd/v2/internal/erofsutils"
+ 	"github.com/containerd/containerd/v2/plugins"
+ 	"github.com/containerd/containerd/v2/plugins/diff/erofs"
+ 	"github.com/containerd/platforms"
+@@ -32,6 +32,10 @@ import (
+ type Config struct {
+ 	// MkfsOptions are extra options used for the applier
+ 	MkfsOptions []string `toml:"mkfs_options"`
++
++	// EnableTarIndex enables the tar index mode where the index is generated
++	// for tar content without extracting the tar
++	EnableTarIndex bool `toml:"enable_tar_index"`
+ }
+ 
+ func init() {
+@@ -43,9 +47,12 @@ func init() {
+ 		},
+ 		Config: &Config{},
+ 		InitFn: func(ic *plugin.InitContext) (interface{}, error) {
+-			_, err := exec.LookPath("mkfs.erofs")
++			tarModeSupported, err := erofsutils.SupportGenerateFromTar()
+ 			if err != nil {
+-				return nil, fmt.Errorf("could not find mkfs.erofs: %v: %w", err, plugin.ErrSkipPlugin)
++				return nil, fmt.Errorf("failed to check mkfs.erofs availability: %v: %w", err, plugin.ErrSkipPlugin)
++			}
++			if !tarModeSupported {
++				return nil, fmt.Errorf("mkfs.erofs does not support tar mode (--tar option), disabling erofs differ: %w", plugin.ErrSkipPlugin)
+ 			}
+ 
+ 			md, err := ic.GetSingle(plugins.MetadataPlugin)
+@@ -57,7 +64,17 @@ func init() {
+ 			cs := md.(*metadata.DB).ContentStore()
+ 			config := ic.Config.(*Config)
+ 
+-			return erofs.NewErofsDiffer(cs, config.MkfsOptions), nil
++			var opts []erofs.DifferOpt
++
++			if len(config.MkfsOptions) > 0 {
++				opts = append(opts, erofs.WithMkfsOptions(config.MkfsOptions))
++			}
++
++			if config.EnableTarIndex {
++				opts = append(opts, erofs.WithTarIndexMode())
++			}
++
++			return erofs.NewErofsDiffer(cs, opts...), nil
+ 		},
+ 	})
+ }
+-- 
+2.45.3
+
+
+From bdc4e7660dce6f3dc7e0c05ea98dd9357cebb2e5 Mon Sep 17 00:00:00 2001
+From: ChengyuZhu6 <hudson@cyzhu.com>
+Date: Wed, 23 Apr 2025 16:59:43 +0800
+Subject: [PATCH 2/5] Add dmverity support in the erofs snapshotter
+
+---
+ internal/dmverity/dmverity.go                 | 210 +++++++++++++++
+ internal/dmverity/dmverity_linux.go           | 179 +++++++++++++
+ internal/dmverity/dmverity_other.go           |  43 +++
+ internal/dmverity/dmverity_test.go            | 177 ++++++++++++
+ plugins/snapshots/erofs/erofs_linux.go        | 251 ++++++++++++++++--
+ .../snapshots/erofs/plugin/plugin_linux.go    |   7 +
+ 6 files changed, 851 insertions(+), 16 deletions(-)
+ create mode 100644 internal/dmverity/dmverity.go
+ create mode 100644 internal/dmverity/dmverity_linux.go
+ create mode 100644 internal/dmverity/dmverity_other.go
+ create mode 100644 internal/dmverity/dmverity_test.go
+
+diff --git a/internal/dmverity/dmverity.go b/internal/dmverity/dmverity.go
+new file mode 100644
+index 000000000..74948d52a
+--- /dev/null
++++ b/internal/dmverity/dmverity.go
+@@ -0,0 +1,210 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++// Package dmverity provides functions for working with dm-verity for integrity verification
++package dmverity
++
++import (
++	"bufio"
++	"strconv"
++	"strings"
++)
++
++// VeritySetupCommand represents the type of veritysetup command to execute
++type VeritySetupCommand string
++
++const (
++	// FormatCommand corresponds to "veritysetup format"
++	FormatCommand VeritySetupCommand = "format"
++	// OpenCommand corresponds to "veritysetup open"
++	OpenCommand VeritySetupCommand = "open"
++	// CloseCommand corresponds to "veritysetup close"
++	CloseCommand VeritySetupCommand = "close"
++	// StatusCommand corresponds to "veritysetup status"
++	StatusCommand VeritySetupCommand = "status"
++)
++
++// DmverityOptions contains configuration options for dm-verity operations
++type DmverityOptions struct {
++	// Salt for hashing, represented as a hex string
++	Salt string
++	// Hash algorithm to use (default: sha256)
++	HashAlgorithm string
++	// Size of data blocks in bytes (default: 4096)
++	DataBlockSize uint64
++	// Size of hash blocks in bytes (default: 4096)
++	HashBlockSize uint64
++	// Number of data blocks
++	DataBlocks uint64
++	// Offset of hash area in bytes
++	HashOffset uint64
++	// Hash type (default: 1)
++	HashType uint64
++	// Superblock usage flag (false meaning --no-superblock)
++	UseSuperblock bool
++	// Debug flag
++	Debug bool
++	// UUID for device to use
++	UUID string
++}
++
++// DefaultDmverityOptions returns a DmverityOptions struct with default values
++func DefaultDmverityOptions() DmverityOptions {
++	return DmverityOptions{
++		HashAlgorithm: "sha256",
++		DataBlockSize: 4096,
++		HashBlockSize: 4096,
++		HashType:      1,
++		UseSuperblock: false,
++		Salt:          "1234000000000000000000000000000000000000000000000000000000000000",
++	}
++}
++
++// FormatOutputInfo represents the parsed information from veritysetup format command output
++type FormatOutputInfo struct {
++	// Basic dm-verity options, reused from DmverityOptions
++	DmverityOptions
++	// Number of hash blocks in the hash area
++	HashBlocks int64
++	// Root hash value for verification
++	RootHash string
++}
++
++// ParseFormatOutput parses the output from veritysetup format command
++// and returns a structured representation of the information
++func ParseFormatOutput(output string) (*FormatOutputInfo, error) {
++	info := &FormatOutputInfo{}
++
++	scanner := bufio.NewScanner(strings.NewReader(output))
++	for scanner.Scan() {
++		line := scanner.Text()
++		// Skip the header line and command echo line
++		if strings.HasPrefix(line, "VERITY header") || strings.HasPrefix(line, "# veritysetup") {
++			continue
++		}
++
++		parts := strings.Split(line, ":")
++		if len(parts) != 2 {
++			continue
++		}
++
++		key := strings.TrimSpace(parts[0])
++		value := strings.TrimSpace(parts[1])
++
++		switch key {
++		case "UUID":
++			info.UUID = value
++		case "Hash type":
++			hashType, err := strconv.Atoi(value)
++			if err == nil {
++				info.HashType = uint64(hashType)
++			}
++		case "Data blocks":
++			dataBlocks, err := strconv.ParseInt(value, 10, 64)
++			if err == nil {
++				info.DataBlocks = uint64(dataBlocks)
++			}
++		case "Data block size":
++			dataBlockSize, err := strconv.ParseInt(value, 10, 64)
++			if err == nil {
++				info.DataBlockSize = uint64(dataBlockSize)
++			}
++		case "Hash blocks":
++			hashBlocks, err := strconv.ParseInt(value, 10, 64)
++			if err == nil {
++				info.HashBlocks = hashBlocks
++			}
++		case "Hash block size":
++			hashBlockSize, err := strconv.ParseInt(value, 10, 64)
++			if err == nil {
++				info.HashBlockSize = uint64(hashBlockSize)
++			}
++		case "Hash algorithm":
++			info.HashAlgorithm = value
++		case "Salt":
++			info.Salt = value
++		case "Root hash":
++			info.RootHash = value
++		}
++	}
++
++	return info, scanner.Err()
++}
++
++// StatusInfo represents the parsed information from veritysetup status command output
++type StatusInfo struct {
++	// Device path
++	Device string
++	// Whether the device is active
++	IsActive bool
++	// Whether the device is in use
++	InUse bool
++	// Type of the device (e.g., "VERITY")
++	Type string
++	// Status of verification (e.g., "verified")
++	Status string
++}
++
++// ParseStatusOutput parses the output from veritysetup status command
++// and returns a structured representation of the information
++func ParseStatusOutput(output string) (*StatusInfo, error) {
++	info := &StatusInfo{}
++
++	scanner := bufio.NewScanner(strings.NewReader(output))
++	for scanner.Scan() {
++		line := strings.TrimSpace(scanner.Text())
++
++		// Skip empty lines and command echo lines
++		if line == "" || strings.HasPrefix(line, "#") {
++			continue
++		}
++
++		// Parse the first line: "/dev/mapper/containerd-erofs-1 is active and is in use."
++		if strings.Contains(line, " is ") {
++			info.Device = strings.Fields(line)[0]
++			info.IsActive = strings.Contains(line, "active")
++			info.InUse = strings.Contains(line, "in use")
++			continue
++		}
++
++		// Parse key-value pairs
++		parts := strings.Split(line, ":")
++		if len(parts) != 2 {
++			continue
++		}
++
++		key := strings.TrimSpace(parts[0])
++		value := strings.TrimSpace(parts[1])
++
++		switch key {
++		case "type":
++			info.Type = value
++		case "status":
++			info.Status = value
++		}
++	}
++
++	return info, scanner.Err()
++}
++
++// IsVerified checks if the dm-verity device status is "verified"
++func (s *StatusInfo) IsVerified() bool {
++	return s.Status == "verified"
++}
++
++func (s *StatusInfo) IsInUse() bool {
++	return s.IsActive && s.InUse
++}
+diff --git a/internal/dmverity/dmverity_linux.go b/internal/dmverity/dmverity_linux.go
+new file mode 100644
+index 000000000..6e518712a
+--- /dev/null
++++ b/internal/dmverity/dmverity_linux.go
+@@ -0,0 +1,179 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package dmverity
++
++import (
++	"bytes"
++	"fmt"
++	"os"
++	"os/exec"
++)
++
++func IsSupported() (bool, error) {
++	moduleData, err := os.ReadFile("/proc/modules")
++	if err != nil || !bytes.Contains(moduleData, []byte("dm_verity")) {
++		return false, fmt.Errorf("dm_verity module not loaded")
++	}
++	if _, err := exec.LookPath("veritysetup"); err == nil {
++		cmd := exec.Command("veritysetup", "--version")
++		if _, err := cmd.CombinedOutput(); err != nil {
++			return false, fmt.Errorf("veritysetup not found")
++		}
++	}
++	return true, nil
++}
++
++// runVeritySetup executes a veritysetup command with the given arguments and options
++func actions(cmd VeritySetupCommand, args []string, opts *DmverityOptions) (string, error) {
++	cmdArgs := []string{string(cmd)}
++
++	if opts == nil {
++		defaultOpts := DefaultDmverityOptions()
++		opts = &defaultOpts
++	}
++
++	if opts.UUID != "" {
++		cmdArgs = append(cmdArgs, fmt.Sprintf("--uuid=%s", opts.UUID))
++	}
++
++	if !opts.UseSuperblock {
++		cmdArgs = append(cmdArgs, "--no-superblock")
++	}
++
++	if opts.HashType == 0 {
++		cmdArgs = append(cmdArgs, fmt.Sprintf("--format=%d", opts.HashType))
++	}
++
++	if opts.Debug {
++		cmdArgs = append(cmdArgs, "--debug")
++	}
++
++	if opts.HashAlgorithm != "" {
++		cmdArgs = append(cmdArgs, "--hash="+opts.HashAlgorithm)
++	}
++
++	if opts.DataBlockSize > 0 {
++		cmdArgs = append(cmdArgs, fmt.Sprintf("--data-block-size=%d", opts.DataBlockSize))
++	}
++
++	if opts.HashBlockSize > 0 {
++		cmdArgs = append(cmdArgs, fmt.Sprintf("--hash-block-size=%d", opts.HashBlockSize))
++	}
++
++	if opts.DataBlocks > 0 {
++		cmdArgs = append(cmdArgs, "--data-blocks", fmt.Sprintf("%d", opts.DataBlocks))
++	}
++
++	if opts.HashOffset > 0 {
++		cmdArgs = append(cmdArgs, "--hash-offset", fmt.Sprintf("%d", opts.HashOffset))
++	}
++
++	if opts.Salt != "" {
++		cmdArgs = append(cmdArgs, "-s", opts.Salt)
++	}
++
++	cmdArgs = append(cmdArgs, args...)
++	fmt.Println("veritysetup command: veritysetup", cmdArgs)
++	execCmd := exec.Command("veritysetup", cmdArgs...)
++	output, err := execCmd.CombinedOutput()
++	if err != nil {
++		return "", fmt.Errorf("veritysetup %s failed: %w, output: %s", cmd, err, string(output))
++	}
++
++	return string(output), nil
++}
++
++// Format creates a dm-verity hash for a data device
++// If hashDevice is the same as dataDevice, the hash will be stored on the same device
++func Format(dataDevice, hashDevice string, opts *DmverityOptions) (*FormatOutputInfo, error) {
++	args := []string{dataDevice, hashDevice}
++	if dataDevice == hashDevice {
++		fileInfo, err := os.Stat(dataDevice)
++		if err != nil {
++			return nil, fmt.Errorf("failed to stat data device: %w", err)
++		}
++		if opts.HashOffset == 0 {
++			opts.HashOffset = uint64(fileInfo.Size())
++		}
++		dataBlocks := (opts.HashOffset + opts.DataBlockSize - 1) / opts.DataBlockSize
++		opts.HashOffset = dataBlocks * opts.DataBlockSize
++
++		args = append(args, fmt.Sprintf("--hash-offset=%d", opts.HashOffset))
++		args = append(args, fmt.Sprintf("--data-blocks=%d", dataBlocks))
++	}
++	output, err := actions(FormatCommand, args, opts)
++	if err != nil {
++		return nil, fmt.Errorf("failed to format dm-verity device: %w, output: %s", err, output)
++	}
++
++	// Parse the output to extract structured information
++	info, err := ParseFormatOutput(output)
++	if err != nil {
++		return nil, fmt.Errorf("failed to parse format output: %w", err)
++	}
++
++	return info, nil
++}
++
++// Open creates a read-only device-mapper target for transparent integrity verification
++func Open(dataDevice string, name string, hashDevice string, rootHash string, opts *DmverityOptions) (string, error) {
++	args := []string{dataDevice, name, hashDevice, rootHash}
++	if dataDevice == hashDevice {
++		fileInfo, err := os.Stat(dataDevice)
++		if err != nil {
++			return "", fmt.Errorf("failed to stat data device: %w", err)
++		}
++		if opts.HashOffset == 0 {
++			opts.HashOffset = uint64(fileInfo.Size())
++		}
++		dataBlocks := (opts.HashOffset + opts.DataBlockSize - 1) / opts.DataBlockSize
++		opts.HashOffset = dataBlocks * opts.DataBlockSize
++		args = append(args, fmt.Sprintf("--hash-offset=%d", opts.HashOffset))
++		args = append(args, fmt.Sprintf("--data-blocks=%d", dataBlocks))
++	}
++	output, err := actions(OpenCommand, args, opts)
++	if err != nil {
++		return "", fmt.Errorf("failed to open dm-verity device: %w, output: %s", err, output)
++	}
++	return output, nil
++}
++
++// Close removes a dm-verity target and its underlying device from the device mapper table
++func Close(name string) (string, error) {
++	args := []string{name}
++	output, err := actions(CloseCommand, args, nil)
++	if err != nil {
++		return "", fmt.Errorf("failed to close dm-verity device: %w, output: %s", err, output)
++	}
++	return output, nil
++}
++
++func Status(name string) (*StatusInfo, error) {
++	args := []string{name}
++	output, err := actions(StatusCommand, args, nil)
++	if err != nil {
++		return nil, fmt.Errorf("failed to get dm-verity device status: %w, output: %s", err, output)
++	}
++
++	// Parse the output to extract structured information
++	info, err := ParseStatusOutput(output)
++	if err != nil {
++		return nil, fmt.Errorf("failed to parse status output: %w", err)
++	}
++
++	return info, nil
++}
+diff --git a/internal/dmverity/dmverity_other.go b/internal/dmverity/dmverity_other.go
+new file mode 100644
+index 000000000..88793dbb3
+--- /dev/null
++++ b/internal/dmverity/dmverity_other.go
+@@ -0,0 +1,43 @@
++//go:build !linux
++
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package dmverity
++
++import "fmt"
++
++var errUnsupported = fmt.Errorf("dmverity is only supported on Linux systems")
++
++func IsSupported() (bool, error) {
++	return false, errUnsupported
++}
++
++func Format(_ string, _ string, _ *DmverityOptions) (*FormatOutputInfo, error) {
++	return nil, errUnsupported
++}
++
++func Open(_ string, _ string, _ string, _ string, _ *DmverityOptions) (string, error) {
++	return "", errUnsupported
++}
++
++func Close(_ string) (string, error) {
++	return "", errUnsupported
++}
++
++func Status(_ string) (*StatusInfo, error) {
++	return nil, errUnsupported
++}
+diff --git a/internal/dmverity/dmverity_test.go b/internal/dmverity/dmverity_test.go
+new file mode 100644
+index 000000000..cda39972b
+--- /dev/null
++++ b/internal/dmverity/dmverity_test.go
+@@ -0,0 +1,177 @@
++//go:build linux
++
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package dmverity
++
++import (
++	"os"
++	"testing"
++
++	"github.com/containerd/containerd/v2/core/mount"
++	"github.com/containerd/containerd/v2/pkg/testutil"
++	"github.com/docker/go-units"
++	"github.com/stretchr/testify/assert"
++)
++
++const (
++	testDeviceName = "test-verity-device"
++)
++
++func TestDMVerity(t *testing.T) {
++	testutil.RequiresRoot(t)
++
++	// Skip if dm-verity is not supported
++	supported, err := IsSupported()
++	if !supported || err != nil {
++		t.Skipf("dm-verity is not supported on this system: %v", err)
++	}
++
++	// Create temp directory for test files
++	tempDir := t.TempDir()
++
++	// Create a single loop device for both data and hash
++	loopImage, loopDevice := createLoopbackDevice(t, tempDir, "1Mb")
++
++	defer func() {
++		err := mount.DetachLoopDevice(loopDevice)
++		assert.NoError(t, err, "failed to detach loop device for image: %s", loopImage)
++	}()
++
++	// Create default options for the tests
++	opts := DmverityOptions{
++		HashAlgorithm: "sha256",
++		Salt:          "1234000000000000000000000000000000000000000000000000000000000000",
++		DataBlockSize: 4096,
++		HashBlockSize: 4096,
++		HashType:      1,
++		UseSuperblock: false,
++		Debug:         false,
++		DataBlocks:    256,
++		HashOffset:    1048576,
++	}
++
++	t.Run("IsSupported", func(t *testing.T) {
++		supported, err := IsSupported()
++		assert.True(t, supported, "dm-verity should be supported")
++		assert.NoError(t, err, "IsSupported should not return an error")
++	})
++
++	var formatInfo *FormatOutputInfo
++
++	t.Run("Format", func(t *testing.T) {
++		var err error
++		// Use the same device for both data and hash
++		formatInfo, err = Format(loopDevice, loopDevice, &opts)
++		assert.NoError(t, err, "failed to format dm-verity device")
++		assert.NotEmpty(t, formatInfo.RootHash, "root hash should not be empty")
++		t.Logf("Root hash: %s", formatInfo.RootHash)
++	})
++
++	t.Run("Open", func(t *testing.T) {
++		output, err := Open(loopDevice, testDeviceName, loopDevice, formatInfo.RootHash, &opts)
++		assert.NoError(t, err, "failed to open dm-verity device")
++		t.Logf("Open output: %s", output)
++
++		_, err = os.Stat("/dev/mapper/" + testDeviceName)
++		assert.NoError(t, err, "device should exist in /dev/mapper")
++	})
++
++	t.Run("Close", func(t *testing.T) {
++		output, err := Close(testDeviceName)
++		assert.NoError(t, err, "failed to close dm-verity device")
++		t.Logf("Close output: %s", output)
++
++		_, err = os.Stat("/dev/mapper/" + testDeviceName)
++		assert.True(t, os.IsNotExist(err), "device should not exist after closing")
++	})
++}
++
++func createLoopbackDevice(t *testing.T, dir string, size string) (string, string) {
++	file, err := os.CreateTemp(dir, "dmverity-tests-")
++	assert.NoError(t, err)
++
++	sizeInBytes, err := units.RAMInBytes(size)
++	assert.NoError(t, err)
++
++	err = file.Truncate(sizeInBytes * 2)
++	assert.NoError(t, err)
++
++	err = file.Close()
++	assert.NoError(t, err)
++
++	imagePath := file.Name()
++
++	loopDevice, err := mount.AttachLoopDevice(imagePath)
++	assert.NoError(t, err)
++
++	return imagePath, loopDevice
++}
++
++func TestParseStatusOutput(t *testing.T) {
++	testutil.RequiresRoot(t)
++
++	tests := []struct {
++		name     string
++		output   string
++		expected *StatusInfo
++	}{
++		{
++			name: "verified status",
++			output: `# veritysetup status containerd-erofs-1
++/dev/mapper/containerd-erofs-1 is active and is in use.
++  type:        VERITY
++  status:      verified`,
++			expected: &StatusInfo{
++				Device:   "/dev/mapper/containerd-erofs-1",
++				IsActive: true,
++				InUse:    true,
++				Type:     "VERITY",
++				Status:   "verified",
++			},
++		},
++		{
++			name: "corrupted status",
++			output: `# veritysetup status containerd-erofs-1
++/dev/mapper/containerd-erofs-1 is active and is in use.
++  type:        VERITY
++  status:      corrupted`,
++			expected: &StatusInfo{
++				Device:   "/dev/mapper/containerd-erofs-1",
++				IsActive: true,
++				InUse:    true,
++				Type:     "VERITY",
++				Status:   "corrupted",
++			},
++		},
++	}
++
++	for _, tt := range tests {
++		t.Run(tt.name, func(t *testing.T) {
++			result, err := ParseStatusOutput(tt.output)
++			assert.NoError(t, err)
++			assert.Equal(t, tt.expected, result)
++
++			// Test IsVerified method
++			if tt.expected.Status == "verified" {
++				assert.True(t, result.IsVerified())
++			} else {
++				assert.False(t, result.IsVerified())
++			}
++		})
++	}
++}
+diff --git a/plugins/snapshots/erofs/erofs_linux.go b/plugins/snapshots/erofs/erofs_linux.go
+index 3993b3261..a6e5075c7 100644
+--- a/plugins/snapshots/erofs/erofs_linux.go
++++ b/plugins/snapshots/erofs/erofs_linux.go
+@@ -23,19 +23,21 @@ import (
+ 	"fmt"
+ 	"os"
+ 	"path/filepath"
++	"strconv"
+ 	"strings"
+ 	"syscall"
+-
+-	"github.com/containerd/continuity/fs"
+-	"github.com/containerd/log"
+-	"github.com/containerd/plugin"
+-	"golang.org/x/sys/unix"
++	"time"
+ 
+ 	"github.com/containerd/containerd/v2/core/mount"
+ 	"github.com/containerd/containerd/v2/core/snapshots"
+ 	"github.com/containerd/containerd/v2/core/snapshots/storage"
++	"github.com/containerd/containerd/v2/internal/dmverity"
+ 	"github.com/containerd/containerd/v2/internal/erofsutils"
+ 	"github.com/containerd/containerd/v2/internal/fsverity"
++	"github.com/containerd/continuity/fs"
++	"github.com/containerd/log"
++	"github.com/containerd/plugin"
++	"golang.org/x/sys/unix"
+ )
+ 
+ // SnapshotterConfig is used to configure the erofs snapshotter instance
+@@ -44,6 +46,8 @@ type SnapshotterConfig struct {
+ 	ovlOptions []string
+ 	// enableFsverity enables fsverity for EROFS layers
+ 	enableFsverity bool
++	// enableDmverity enables dmverity for EROFS layers
++	enableDmverity bool
+ }
+ 
+ // Opt is an option to configure the erofs snapshotter
+@@ -63,6 +67,13 @@ func WithFsverity() Opt {
+ 	}
+ }
+ 
++// WithDmverity enables dmverity for EROFS layers
++func WithDmverity() Opt {
++	return func(config *SnapshotterConfig) {
++		config.enableDmverity = true
++	}
++}
++
+ type MetaStore interface {
+ 	TransactionContext(ctx context.Context, writable bool) (context.Context, storage.Transactor, error)
+ 	WithTransaction(ctx context.Context, writable bool, fn storage.TransactionCallback) error
+@@ -74,6 +85,7 @@ type snapshotter struct {
+ 	ms             *storage.MetaStore
+ 	ovlOptions     []string
+ 	enableFsverity bool
++	enableDmverity bool
+ }
+ 
+ // check if EROFS kernel filesystem is registered or not
+@@ -132,6 +144,16 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
+ 		}
+ 	}
+ 
++	if config.enableDmverity {
++		supported, err := dmverity.IsSupported()
++		if err != nil {
++			return nil, fmt.Errorf("failed to check dmverity support on %q: %w", root, err)
++		}
++		if !supported {
++			return nil, fmt.Errorf("dmverity is not supported on the filesystem of %q", root)
++		}
++	}
++
+ 	ms, err := storage.NewMetaStore(filepath.Join(root, "metadata.db"))
+ 	if err != nil {
+ 		return nil, err
+@@ -146,11 +168,30 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
+ 		ms:             ms,
+ 		ovlOptions:     config.ovlOptions,
+ 		enableFsverity: config.enableFsverity,
++		enableDmverity: config.enableDmverity,
+ 	}, nil
+ }
+ 
+ // Close closes the snapshotter
+ func (s *snapshotter) Close() error {
++	// If dmverity is enabled, try to close all devices
++	if s.enableDmverity {
++		// Get a list of all snapshots
++		err := s.ms.WithTransaction(context.Background(), false, func(ctx context.Context) error {
++			return storage.WalkInfo(ctx, func(ctx context.Context, info snapshots.Info) error {
++				if info.Kind == snapshots.KindCommitted {
++					// Close the device if it exists
++					if err := s.closeDmverityDevice(info.Name); err != nil {
++						log.L.WithError(err).Warnf("failed to close dmverity device for %v", info.Name)
++					}
++				}
++				return nil
++			})
++		})
++		if err != nil {
++			log.L.WithError(err).Warn("error closing dmverity devices")
++		}
++	}
+ 	return s.ms.Close()
+ }
+ 
+@@ -166,6 +207,94 @@ func (s *snapshotter) workPath(id string) string {
+ func (s *snapshotter) layerBlobPath(id string) string {
+ 	return filepath.Join(s.root, "snapshots", id, "layer.erofs")
+ }
++func (s *snapshotter) formatLayerBlob(id string) error {
++	layerBlob := s.layerBlobPath(id)
++	if _, err := os.Stat(layerBlob); err != nil {
++		return fmt.Errorf("failed to find valid erofs layer blob: %w", err)
++	}
++	if !s.isLayerWithDmverity(id) {
++		opts := dmverity.DefaultDmverityOptions()
++		fileinfo, err := os.Stat(layerBlob)
++		if err != nil {
++			return fmt.Errorf("failed to stat layer blob: %w", err)
++		}
++
++		// Open file for truncating
++		f, err := os.OpenFile(layerBlob, os.O_RDWR, 0644)
++		if err != nil {
++			return fmt.Errorf("failed to open layer blob for truncating: %w", err)
++		}
++		defer f.Close()
++		file_size := fileinfo.Size()
++		// Truncate the file to double its size
++		if err := f.Truncate(file_size * 2); err != nil {
++			return fmt.Errorf("failed to truncate layer blob: %w", err)
++		}
++		opts.HashOffset = uint64(file_size)
++		info, err := dmverity.Format(layerBlob, layerBlob, &opts)
++		if err != nil {
++			return fmt.Errorf("failed to format dmverity: %w", err)
++		}
++		dmverityData := fmt.Sprintf("%s|%d", info.RootHash, fileinfo.Size())
++		if err := os.WriteFile(filepath.Join(s.root, "snapshots", id, ".dmverity"), []byte(dmverityData), 0644); err != nil {
++			return fmt.Errorf("failed to write dmverity root hash: %w", err)
++		}
++	}
++	return nil
++}
++func (s *snapshotter) runDmverity(id string) (string, error) {
++	layerBlob := s.layerBlobPath(id)
++	if _, err := os.Stat(layerBlob); err != nil {
++		return "", fmt.Errorf("failed to find valid erofs layer blob: %w", err)
++	}
++	dmName := fmt.Sprintf("containerd-erofs-%s", id)
++	devicePath := fmt.Sprintf("/dev/mapper/%s", dmName)
++	if _, err := os.Stat(devicePath); err == nil {
++		status, err := dmverity.Status(dmName)
++		fmt.Println("dmverity device status: ", status)
++		if err != nil {
++			return "", fmt.Errorf("failed to get dmverity device status: %w", err)
++		}
++		if !status.IsVerified() {
++			return "", fmt.Errorf("dmverity device %s is not verified, status: %s", dmName, status.Status)
++		}
++
++		return devicePath, nil
++	}
++	dmverityContent, err := os.ReadFile(filepath.Join(s.root, "snapshots", id, ".dmverity"))
++	if err != nil {
++		return "", fmt.Errorf("failed to read dmverity root hash: %w", err)
++	}
++
++	parts := strings.Split(string(dmverityContent), "|")
++	rootHash := parts[0]
++	var originalSize uint64
++	if len(parts) > 1 {
++		var err error
++		originalSize, err = strconv.ParseUint(parts[1], 10, 64)
++		if err != nil {
++			return "", fmt.Errorf("failed to parse original size: %w", err)
++		}
++	}
++
++	if _, err := os.Stat(devicePath); err != nil {
++		fmt.Println("openning dmverity")
++		opts := dmverity.DefaultDmverityOptions()
++		opts.HashOffset = originalSize
++		_, err = dmverity.Open(layerBlob, dmName, layerBlob, string(rootHash), &opts)
++		if err != nil {
++			return "", fmt.Errorf("failed to open dmverity device: %w", err)
++		}
++
++		for i := 0; i < 50; i++ {
++			if _, err := os.Stat(devicePath); err == nil {
++				break
++			}
++			time.Sleep(10 * time.Millisecond)
++		}
++	}
++	return devicePath, nil
++}
+ 
+ func (s *snapshotter) lowerPath(id string) (mount.Mount, string, error) {
+ 	layerBlob := s.layerBlobPath(id)
+@@ -206,8 +335,12 @@ func (s *snapshotter) prepareDirectory(ctx context.Context, snapshotDir string,
+ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]mount.Mount, error) {
+ 	var options []string
+ 
++	fmt.Println("mounts called, info :", info)
++	fmt.Println("snap: ", snap)
+ 	if len(snap.ParentIDs) == 0 {
+-		m, _, err := s.lowerPath(snap.ID)
++		fmt.Println("no parent ids")
++		m, mntpoint, err := s.lowerPath(snap.ID)
++		fmt.Printf("lowerPath: m = %v, mntpoint = %v\n", m, mntpoint)
+ 		if err == nil {
+ 			if snap.Kind != snapshots.KindView {
+ 				return nil, fmt.Errorf("only works for snapshots.KindView on a committed snapshot: %w", err)
+@@ -217,8 +350,17 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+ 					return nil, err
+ 				}
+ 			}
++			fmt.Println("formatting layer blob m: ", m)
++			if s.enableDmverity {
++				if err := s.formatLayerBlob(snap.ID); err != nil {
++					return nil, err
++				}
++			}
+ 			// We have to force a loop device here since mount[] is static.
+-			m.Options = append(m.Options, "loop")
++			// However, if we're using dmverity, it's already a block device
++			if !strings.HasPrefix(m.Source, "/dev/mapper/") {
++				m.Options = append(m.Options, "loop")
++			}
+ 			return []mount.Mount{m}, nil
+ 		}
+ 		// if we only have one layer/no parents then just return a bind mount as overlay
+@@ -239,34 +381,48 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+ 		}, nil
+ 	}
+ 
++	fmt.Println("snap.Kind", snap.Kind)
+ 	if snap.Kind == snapshots.KindActive {
+ 		options = append(options,
+ 			fmt.Sprintf("workdir=%s", s.workPath(snap.ID)),
+ 			fmt.Sprintf("upperdir=%s", s.upperPath(snap.ID)),
+ 		)
+ 	} else if len(snap.ParentIDs) == 1 {
+-		m, _, err := s.lowerPath(snap.ParentIDs[0])
++		fmt.Println("len(snap.ParentIDs) == 1")
++		m, mntpoint, err := s.lowerPath(snap.ParentIDs[0])
+ 		if err != nil {
+ 			return nil, err
+ 		}
++		fmt.Printf("lowerPath: m = %v, mntpoint = %v\n", m, mntpoint)
++		if s.enableDmverity {
++			if err := s.formatLayerBlob(snap.ParentIDs[0]); err != nil {
++				return nil, err
++			}
++		}
++		fmt.Printf("lowerPath: m = %v, mntpoint = %v\n", m, mntpoint)
+ 		// We have to force a loop device here too since mount[] is static.
+-		m.Options = append(m.Options, "loop")
++		// However, if we're using dmverity, it's already a block device
++		if !strings.HasPrefix(m.Source, "/dev/mapper/") {
++			m.Options = append(m.Options, "loop")
++		}
+ 		return []mount.Mount{m}, nil
+ 	}
+ 
++	fmt.Println("snap.ParentIDs", snap.ParentIDs)
+ 	var lowerdirs []string
+ 	for i := range snap.ParentIDs {
+ 		m, mntpoint, err := s.lowerPath(snap.ParentIDs[i])
+ 		if err != nil {
+ 			return nil, err
+ 		}
+-
++		fmt.Printf("active lowerPath: m = %v, mntpoint = %v\n", m, mntpoint)
+ 		// If the lowerdir is actually an EROFS committed layer but
+ 		// doesn't have an EROFS mount.  Let's recover now.
+-		if mntpoint != m.Source && !isErofs(mntpoint) {
++		if !s.enableDmverity && mntpoint != m.Source && !isErofs(mntpoint) {
+ 			err := m.Mount(mntpoint)
+ 			// Use loop if the current kernel (6.12+) doesn't support file-backed mount
+-			if errors.Is(err, unix.ENOTBLK) {
++			// Skip 'loop' if using dmverity device
++			if errors.Is(err, unix.ENOTBLK) && (!s.enableDmverity || !strings.HasPrefix(m.Source, "/dev/mapper/")) {
+ 				m.Options = append(m.Options, "loop")
+ 				err = m.Mount(mntpoint)
+ 			}
+@@ -274,11 +430,33 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+ 				return nil, err
+ 			}
+ 		}
++		if s.enableDmverity {
++			devicePath, err := s.runDmverity(snap.ParentIDs[i])
++			if err != nil {
++				return nil, err
++			}
++			dmName := fmt.Sprintf("containerd-erofs-%s", snap.ParentIDs[i])
++			if _, err := os.Stat(devicePath); err == nil {
++				status, err := dmverity.Status(dmName)
++				if err != nil {
++					return nil, fmt.Errorf("failed to get dmverity device status: %w", err)
++				}
++				m.Source = devicePath
++				if !status.IsInUse() {
++					err = m.Mount(mntpoint)
++					if err != nil {
++						return nil, err
++					}
++				}
++			}
++
++		}
+ 		lowerdirs = append(lowerdirs, mntpoint)
+ 	}
++	fmt.Println("lowerdirs: ", lowerdirs)
+ 	options = append(options, fmt.Sprintf("lowerdir=%s", strings.Join(lowerdirs, ":")))
+ 	options = append(options, s.ovlOptions...)
+-
++	fmt.Printf("options = %v\n", options)
+ 	return []mount.Mount{{
+ 		Type:    "overlay",
+ 		Source:  "overlay",
+@@ -359,6 +537,13 @@ func (s *snapshotter) View(ctx context.Context, key, parent string, opts ...snap
+ 	return s.createSnapshot(ctx, snapshots.KindView, key, parent, opts)
+ }
+ 
++func (s *snapshotter) isLayerWithDmverity(id string) bool {
++	if _, err := os.Stat(filepath.Join(s.root, "snapshots", id, ".dmverity")); err != nil {
++		return false
++	}
++	return true
++}
++
+ func setImmutable(path string, enable bool) error {
+ 	//nolint:revive	// silence "don't use ALL_CAPS in Go names; use CamelCase"
+ 	const (
+@@ -432,10 +617,19 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
+ 				return fmt.Errorf("failed to enable fsverity: %w", err)
+ 			}
+ 		}
+-		// Set IMMUTABLE_FL on the EROFS layer to avoid artificial data loss
+-		if err := setImmutable(layerBlob, true); err != nil {
+-			log.G(ctx).WithError(err).Warnf("failed to set IMMUTABLE_FL for %s", layerBlob)
++
++		if s.enableDmverity {
++			err := s.formatLayerBlob(id)
++			// _, err := s.runDmverity(id)
++			if err != nil {
++				return fmt.Errorf("failed to run dmverity: %w", err)
++			}
+ 		}
++
++		// Set IMMUTABLE_FL on the EROFS layer to avoid artificial data loss
++		// if err := setImmutable(layerBlob, true); err != nil {
++		// 	log.G(ctx).WithError(err).Warnf("failed to set IMMUTABLE_FL for %s", layerBlob)
++		// }
+ 		return nil
+ 	})
+ 
+@@ -513,6 +707,7 @@ func (s *snapshotter) getCleanupDirectories(ctx context.Context) ([]string, erro
+ func (s *snapshotter) Remove(ctx context.Context, key string) (err error) {
+ 	var removals []string
+ 	var id string
++	fmt.Println("Remove called, key: ", key)
+ 	// Remove directories after the transaction is closed, failures must not
+ 	// return error since the transaction is committed with the removal
+ 	// key no longer available.
+@@ -522,6 +717,10 @@ func (s *snapshotter) Remove(ctx context.Context, key string) (err error) {
+ 				log.G(ctx).Warnf("failed to unmount EROFS mount for %v", id)
+ 			}
+ 
++			if err := s.closeDmverityDevice(id); err != nil {
++				log.G(ctx).WithError(err).Warnf("failed to close dmverity device for %v", id)
++			}
++
+ 			for _, dir := range removals {
+ 				if err := os.RemoveAll(dir); err != nil {
+ 					log.G(ctx).WithError(err).WithField("path", dir).Warn("failed to remove directory")
+@@ -543,6 +742,11 @@ func (s *snapshotter) Remove(ctx context.Context, key string) (err error) {
+ 		}
+ 		// The layer blob is only persisted for committed snapshots.
+ 		if k == snapshots.KindCommitted {
++			fmt.Println("closing dmverity device for ", id)
++			if err := s.closeDmverityDevice(id); err != nil {
++				log.G(ctx).WithError(err).Warnf("failed to close dmverity device for %v", id)
++			}
++
+ 			// Clear IMMUTABLE_FL before removal, since this flag avoids it.
+ 			err = setImmutable(s.layerBlobPath(id), false)
+ 			if err != nil {
+@@ -628,3 +832,18 @@ func (s *snapshotter) verifyFsverity(path string) error {
+ 	}
+ 	return nil
+ }
++
++// closeDmverityDevice closes the dmverity device for a specific snapshot ID
++func (s *snapshotter) closeDmverityDevice(id string) error {
++	if !s.enableDmverity || !s.isLayerWithDmverity(id) {
++		return nil
++	}
++
++	dmName := fmt.Sprintf("containerd-erofs-%s", id)
++	devicePath := fmt.Sprintf("/dev/mapper/%s", dmName)
++	if _, err := os.Stat(devicePath); err == nil {
++		_, err = dmverity.Close(dmName)
++		return err
++	}
++	return nil
++}
+diff --git a/plugins/snapshots/erofs/plugin/plugin_linux.go b/plugins/snapshots/erofs/plugin/plugin_linux.go
+index 5fb524138..e96a09181 100644
+--- a/plugins/snapshots/erofs/plugin/plugin_linux.go
++++ b/plugins/snapshots/erofs/plugin/plugin_linux.go
+@@ -36,6 +36,9 @@ type Config struct {
+ 
+ 	// EnableFsverity enables fsverity for EROFS layers
+ 	EnableFsverity bool `toml:"enable_fsverity"`
++
++	// EnableDmverity enables dmverity for EROFS layers
++	EnableDmverity bool `toml:"enable_dmverity"`
+ }
+ 
+ func init() {
+@@ -65,6 +68,10 @@ func init() {
+ 				opts = append(opts, erofs.WithFsverity())
+ 			}
+ 
++			if config.EnableDmverity {
++				opts = append(opts, erofs.WithDmverity())
++			}
++
+ 			ic.Meta.Exports[plugins.SnapshotterRootDir] = root
+ 			return erofs.NewSnapshotter(root, opts...)
+ 		},
+-- 
+2.45.3
+
+
+From 954cacab508bf06d8dd47d28bce64d42dccc9f80 Mon Sep 17 00:00:00 2001
+From: Aadhar Agarwal <aadagarwal@microsoft.com>
+Date: Thu, 26 Jun 2025 21:48:20 +0000
+Subject: [PATCH 3/5] Integrate tar index with dmverity
+
+---
+ internal/dmverity/dmverity.go | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/internal/dmverity/dmverity.go b/internal/dmverity/dmverity.go
+index 74948d52a..204ecc85b 100644
+--- a/internal/dmverity/dmverity.go
++++ b/internal/dmverity/dmverity.go
+@@ -65,11 +65,11 @@ type DmverityOptions struct {
+ func DefaultDmverityOptions() DmverityOptions {
+ 	return DmverityOptions{
+ 		HashAlgorithm: "sha256",
+-		DataBlockSize: 4096,
+-		HashBlockSize: 4096,
++		DataBlockSize: 512,
++		HashBlockSize: 512,
+ 		HashType:      1,
+-		UseSuperblock: false,
+-		Salt:          "1234000000000000000000000000000000000000000000000000000000000000",
++		UseSuperblock: true,
++		Salt:          "0000000000000000000000000000000000000000000000000000000000000000",
+ 	}
+ }
+ 
+-- 
+2.45.3
+
+
+From 810e0572bea74b0c7920e381ed030de96158e692 Mon Sep 17 00:00:00 2001
+From: aadhar-agarwal <108542189+aadhar-agarwal@users.noreply.github.com>
+Date: Thu, 24 Jul 2025 18:31:47 -0700
+Subject: [PATCH 4/5] Add local signature support (#5)
+
+* Add local signature support
+
+Signed-off-by: Aadhar Agarwal <aadagarwal@microsoft.com>
+
+* Use trace logs, and remove a leftover debug log
+
+* readSignatures does not need to depend on snapshotter
+
+* Use common constants for the root hash / root hash sig labels
+
+* Split the logic in formatLayerBlob into different functions
+
+* Use s.root for signature directory
+
+* Always initiaize sig map and use a separate function in runDmverity
+
+* Update based on comments in dmverity.go
+
+* Use rootHashSignaturePath and signatureBase64 to be more explicit
+
+* Ignore all non files when reading through the signatures dir
+
+* Initialize signatures as part of the snapshot initialization and add the actual label into error message
+
+* Create a helper function so that formatLayerBlob is more readable
+
+* Check if signature file exists before creating it
+
+* Renaming signatures to signature manifests and signature-binary-files to signatures
+
+* Change map name to reflect digest->layerInfo
+
+---------
+
+Signed-off-by: Aadhar Agarwal <aadagarwal@microsoft.com>
+---
+ core/snapshots/storage/bolt.go         |  31 ++
+ internal/dmverity/dmverity.go          |  23 +-
+ internal/dmverity/dmverity_linux.go    |   5 +
+ plugins/snapshots/erofs/erofs_linux.go | 408 ++++++++++++++++++++++---
+ 4 files changed, 419 insertions(+), 48 deletions(-)
+
+diff --git a/core/snapshots/storage/bolt.go b/core/snapshots/storage/bolt.go
+index 728fb0df7..03191b4e0 100644
+--- a/core/snapshots/storage/bolt.go
++++ b/core/snapshots/storage/bolt.go
+@@ -435,6 +435,37 @@ func IDMap(ctx context.Context) (map[string]string, error) {
+ 	return m, nil
+ }
+ 
++// KeyFromID returns the key for a given snapshot ID.
++func KeyFromID(ctx context.Context, id string) (string, error) {
++	var key string = ""
++
++	err := withBucket(ctx, func(ctx context.Context, bkt, _ *bolt.Bucket) error {
++		return bkt.ForEach(func(k, v []byte) error {
++			// Skip non-buckets
++			if v != nil {
++				return nil
++			}
++
++			// Check if the ID matches
++			if strconv.FormatUint(readID(bkt.Bucket(k)), 10) == id {
++				key = string(k)
++				return nil // Stop iteration
++			}
++			return nil
++		})
++	})
++
++	if err != nil {
++		return "", err
++	}
++
++	if key == "" {
++		return "", fmt.Errorf("key not found for ID %s", id)
++	}
++
++	return key, nil
++}
++
+ func withSnapshotBucket(ctx context.Context, key string, fn func(context.Context, *bolt.Bucket, *bolt.Bucket) error) error {
+ 	tx, ok := ctx.Value(transactionKey{}).(*bolt.Tx)
+ 	if !ok {
+diff --git a/internal/dmverity/dmverity.go b/internal/dmverity/dmverity.go
+index 204ecc85b..dbe731eec 100644
+--- a/internal/dmverity/dmverity.go
++++ b/internal/dmverity/dmverity.go
+@@ -59,17 +59,22 @@ type DmverityOptions struct {
+ 	Debug bool
+ 	// UUID for device to use
+ 	UUID string
++	// RootHashSignaturePath specifies the path to a file containing the binary signature
++	// for the root hash. This file is passed to veritysetup using the --root-hash-signature option.
++	// The file should contain the raw binary signature data (not base64 encoded).
++	RootHashSignaturePath string
+ }
+ 
+ // DefaultDmverityOptions returns a DmverityOptions struct with default values
+ func DefaultDmverityOptions() DmverityOptions {
+ 	return DmverityOptions{
+-		HashAlgorithm: "sha256",
+-		DataBlockSize: 512,
+-		HashBlockSize: 512,
+-		HashType:      1,
+-		UseSuperblock: true,
+-		Salt:          "0000000000000000000000000000000000000000000000000000000000000000",
++		HashAlgorithm:         "sha256",
++		DataBlockSize:         512,
++		HashBlockSize:         512,
++		HashType:              1,
++		UseSuperblock:         true,
++		Salt:                  "0000000000000000000000000000000000000000000000000000000000000000",
++		RootHashSignaturePath: "",
+ 	}
+ }
+ 
+@@ -154,7 +159,7 @@ type StatusInfo struct {
+ 	InUse bool
+ 	// Type of the device (e.g., "VERITY")
+ 	Type string
+-	// Status of verification (e.g., "verified")
++	// Status of verification (e.g., "verified" or "verified (with signature)")
+ 	Status string
+ }
+ 
+@@ -200,9 +205,9 @@ func ParseStatusOutput(output string) (*StatusInfo, error) {
+ 	return info, scanner.Err()
+ }
+ 
+-// IsVerified checks if the dm-verity device status is "verified"
++// IsVerified checks if the dm-verity device status is "verified" or "verified (with signature)"
+ func (s *StatusInfo) IsVerified() bool {
+-	return s.Status == "verified"
++	return s.Status == "verified" || s.Status == "verified (with signature)"
+ }
+ 
+ func (s *StatusInfo) IsInUse() bool {
+diff --git a/internal/dmverity/dmverity_linux.go b/internal/dmverity/dmverity_linux.go
+index 6e518712a..c4bf213f5 100644
+--- a/internal/dmverity/dmverity_linux.go
++++ b/internal/dmverity/dmverity_linux.go
+@@ -86,6 +86,11 @@ func actions(cmd VeritySetupCommand, args []string, opts *DmverityOptions) (stri
+ 		cmdArgs = append(cmdArgs, "-s", opts.Salt)
+ 	}
+ 
++	// --root-hash-signature is only applicable for veritysetup open command
++	if cmd == OpenCommand && opts.RootHashSignaturePath != "" {
++		cmdArgs = append(cmdArgs, fmt.Sprintf("--root-hash-signature=%s", opts.RootHashSignaturePath))
++	}
++
+ 	cmdArgs = append(cmdArgs, args...)
+ 	fmt.Println("veritysetup command: veritysetup", cmdArgs)
+ 	execCmd := exec.Command("veritysetup", cmdArgs...)
+diff --git a/plugins/snapshots/erofs/erofs_linux.go b/plugins/snapshots/erofs/erofs_linux.go
+index a6e5075c7..317ba9947 100644
+--- a/plugins/snapshots/erofs/erofs_linux.go
++++ b/plugins/snapshots/erofs/erofs_linux.go
+@@ -19,6 +19,8 @@ package erofs
+ import (
+ 	"bytes"
+ 	"context"
++	"encoding/base64"
++	"encoding/json"
+ 	"errors"
+ 	"fmt"
+ 	"os"
+@@ -34,6 +36,7 @@ import (
+ 	"github.com/containerd/containerd/v2/internal/dmverity"
+ 	"github.com/containerd/containerd/v2/internal/erofsutils"
+ 	"github.com/containerd/containerd/v2/internal/fsverity"
++	"github.com/containerd/containerd/v2/pkg/snapshotters"
+ 	"github.com/containerd/continuity/fs"
+ 	"github.com/containerd/log"
+ 	"github.com/containerd/plugin"
+@@ -80,12 +83,135 @@ type MetaStore interface {
+ 	Close() error
+ }
+ 
++// Label keys for EROFS snapshotter metadata
++const (
++	// ErofsRootHashLabel is the label key for the root hash of the EROFS layer
++	ErofsRootHashLabel = "containerd.io/snapshot/erofs.root-hash"
++	// ErofsSignatureLabel is the label key for the signature of the EROFS layer
++	ErofsSignatureLabel = "containerd.io/snapshot/erofs.signature"
++	// Default signature manifests directory relative to root (for JSON metadata files)
++	SignatureManifestsDir = "signature-manifests"
++	// Directory for binary signature files relative to root used by dm-verity
++	SignaturesDir = "signatures"
++)
++
++// ImageInfo holds information about an image and its layers
++type ImageInfo struct {
++	Layers []LayerInfo `json:"layers"`
++}
++
++// LayerInfo holds information about a specific layer
++type LayerInfo struct {
++	Digest    string `json:"digest"`
++	RootHash  string `json:"root_hash"`
++	Signature string `json:"signature"`
++}
++
++// readSignatureManifests reads all signature manifest files from the signature manifests directory
++// and builds a map of layer digest to layer info
++func readSignatureManifests(root string) (map[string]LayerInfo, error) {
++	digestToLayerInfoMap := make(map[string]LayerInfo)
++
++	// Get signature manifests directory path relative to the provided root
++	signatureManifestDirPath := filepath.Join(root, SignatureManifestsDir)
++
++	// Check if the signature manifests directory exists
++	if _, err := os.Stat(signatureManifestDirPath); err != nil {
++		if os.IsNotExist(err) {
++			// Directory doesn't exist, return empty digest to layer info map
++			log.L.Debugf("signature manifests directory %s does not exist, skipping signature manifest loading", signatureManifestDirPath)
++			return digestToLayerInfoMap, nil
++		}
++		return nil, fmt.Errorf("failed to access signature manifests directory: %w", err)
++	}
++
++	// Read all files from the signature manifests directory
++	files, err := os.ReadDir(signatureManifestDirPath)
++	if err != nil {
++		return nil, fmt.Errorf("failed to read signature manifests directory: %w", err)
++	}
++
++	// Process each signature manifest file
++	for _, file := range files {
++		// Skip directories and non-regular files (symlinks, pipes, devices, etc.)
++		if !file.Type().IsRegular() {
++			log.L.Debugf("skipping non-regular file %s", file.Name())
++			continue
++		}
++
++		// Read the signature manifest file content
++		sigPath := filepath.Join(signatureManifestDirPath, file.Name())
++		sigContent, err := os.ReadFile(sigPath)
++		if err != nil {
++			return nil, fmt.Errorf("failed to read signature manifest file %s: %w", sigPath, err)
++		}
++
++		// Parse the JSON content
++		var imageInfoList []ImageInfo
++		if err := json.Unmarshal(sigContent, &imageInfoList); err != nil {
++			// Log the error but continue with other files
++			log.L.WithError(err).Warnf("failed to parse signature manifest file %s", sigPath)
++			continue
++		}
++
++		// Extract layer information
++		for _, imageInfo := range imageInfoList {
++			for _, layerInfo := range imageInfo.Layers {
++				digestToLayerInfoMap[layerInfo.Digest] = layerInfo
++				// Log the digest, root hash and signature
++				log.L.Debugf("loaded signature manifest for layer %s: root hash %s, signature %s\n",
++					layerInfo.Digest, layerInfo.RootHash, layerInfo.Signature)
++			}
++		}
++	}
++
++	return digestToLayerInfoMap, nil
++}
++
++// prepareSignatureFile writes the signature bytes to a file that can be used with veritysetup
++// Reference: https://man7.org/linux/man-pages/man8/veritysetup.8.html
++func (s *snapshotter) prepareSignatureFile(hash, signatureBase64 string) (string, error) {
++	log.L.Debugf("Preparing signature file for root hash %s", hash)
++
++	// Create signatures directory if it doesn't exist
++	sigDir := filepath.Join(s.root, SignaturesDir)
++	if err := os.MkdirAll(sigDir, 0700); err != nil {
++		return "", fmt.Errorf("failed to create signature directory: %w", err)
++	}
++
++	// Create a file to store the signature bytes
++	sigPath := filepath.Join(sigDir, fmt.Sprintf("%s.sig", hash))
++
++	// Check if the signature file already exists
++	if _, err := os.Stat(sigPath); err == nil {
++		log.L.Debugf("Signature file already exists at %s", sigPath)
++		return sigPath, nil
++	} else if !os.IsNotExist(err) {
++		return "", fmt.Errorf("failed to check if signature file exists: %w", err)
++	}
++
++	// Decode the base64 encoded signature
++	signatureBytes, err := base64.StdEncoding.DecodeString(signatureBase64)
++	if err != nil {
++		return "", fmt.Errorf("failed to decode signature: %w", err)
++	}
++
++	if err := os.WriteFile(sigPath, signatureBytes, 0644); err != nil {
++		return "", fmt.Errorf("failed to write signature to file: %w", err)
++	}
++
++	log.L.Debugf("Wrote signature to file %s", sigPath)
++
++	return sigPath, nil
++}
++
+ type snapshotter struct {
+-	root           string
+-	ms             *storage.MetaStore
+-	ovlOptions     []string
+-	enableFsverity bool
+-	enableDmverity bool
++	root                 string
++	ms                   *storage.MetaStore
++	ovlOptions           []string
++	enableFsverity       bool
++	enableDmverity       bool
++	digestToLayerInfoMap map[string]LayerInfo
+ }
+ 
+ // check if EROFS kernel filesystem is registered or not
+@@ -163,13 +289,27 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
+ 		return nil, err
+ 	}
+ 
+-	return &snapshotter{
+-		root:           root,
+-		ms:             ms,
+-		ovlOptions:     config.ovlOptions,
+-		enableFsverity: config.enableFsverity,
+-		enableDmverity: config.enableDmverity,
+-	}, nil
++	s := &snapshotter{
++		root:                 root,
++		ms:                   ms,
++		ovlOptions:           config.ovlOptions,
++		enableFsverity:       config.enableFsverity,
++		enableDmverity:       config.enableDmverity,
++		digestToLayerInfoMap: make(map[string]LayerInfo),
++	}
++
++	// get signature manifests if available
++	digestToLayerInfoMap, err := readSignatureManifests(root)
++	if err != nil {
++		log.L.WithError(err).Warn("failed to read signature manifests, continuing without signature verification")
++	} else if len(digestToLayerInfoMap) > 0 {
++		s.digestToLayerInfoMap = digestToLayerInfoMap
++		log.L.Debugf("initialized with %d signature manifests", len(digestToLayerInfoMap))
++	} else {
++		log.L.Debug("no signature manifests found, continuing without signature verification")
++	}
++
++	return s, nil
+ }
+ 
+ // Close closes the snapshotter
+@@ -207,7 +347,8 @@ func (s *snapshotter) workPath(id string) string {
+ func (s *snapshotter) layerBlobPath(id string) string {
+ 	return filepath.Join(s.root, "snapshots", id, "layer.erofs")
+ }
+-func (s *snapshotter) formatLayerBlob(id string) error {
++
++func (s *snapshotter) formatLayerBlob(ctx context.Context, id string, snapshotInfo snapshots.Info) error {
+ 	layerBlob := s.layerBlobPath(id)
+ 	if _, err := os.Stat(layerBlob); err != nil {
+ 		return fmt.Errorf("failed to find valid erofs layer blob: %w", err)
+@@ -235,14 +376,21 @@ func (s *snapshotter) formatLayerBlob(id string) error {
+ 		if err != nil {
+ 			return fmt.Errorf("failed to format dmverity: %w", err)
+ 		}
++
+ 		dmverityData := fmt.Sprintf("%s|%d", info.RootHash, fileinfo.Size())
+ 		if err := os.WriteFile(filepath.Join(s.root, "snapshots", id, ".dmverity"), []byte(dmverityData), 0644); err != nil {
+ 			return fmt.Errorf("failed to write dmverity root hash: %w", err)
+ 		}
++
++		// Find signature and update snapshot labels
++		if err := s.findSignatureAndUpdateLabels(ctx, info, snapshotInfo); err != nil {
++			return err
++		}
+ 	}
+ 	return nil
+ }
+-func (s *snapshotter) runDmverity(id string) (string, error) {
++
++func (s *snapshotter) runDmverity(ctx context.Context, id string) (string, error) {
+ 	layerBlob := s.layerBlobPath(id)
+ 	if _, err := os.Stat(layerBlob); err != nil {
+ 		return "", fmt.Errorf("failed to find valid erofs layer blob: %w", err)
+@@ -251,7 +399,7 @@ func (s *snapshotter) runDmverity(id string) (string, error) {
+ 	devicePath := fmt.Sprintf("/dev/mapper/%s", dmName)
+ 	if _, err := os.Stat(devicePath); err == nil {
+ 		status, err := dmverity.Status(dmName)
+-		fmt.Println("dmverity device status: ", status)
++		log.L.Debugf("dmverity device status: ", status)
+ 		if err != nil {
+ 			return "", fmt.Errorf("failed to get dmverity device status: %w", err)
+ 		}
+@@ -277,10 +425,24 @@ func (s *snapshotter) runDmverity(id string) (string, error) {
+ 		}
+ 	}
+ 
++	// Prepare signature file if a signature is available
++	rootHashSignaturePath, err := s.prepareSnapshotSignature(ctx, id, rootHash)
++	if err != nil {
++		return "", err
++	}
++
+ 	if _, err := os.Stat(devicePath); err != nil {
+-		fmt.Println("openning dmverity")
++		log.L.Debugf("Opening dmverity device for %s", id)
+ 		opts := dmverity.DefaultDmverityOptions()
+ 		opts.HashOffset = originalSize
++
++		if rootHashSignaturePath != "" {
++			log.L.Debugf("Using signature file %s for root hash %s", rootHashSignaturePath, rootHash)
++			// The rootHashSignaturePath now contains the path to the signature file
++			// We'll pass the file path to be used with --root-hash-signature by veritysetup
++			opts.RootHashSignaturePath = rootHashSignaturePath
++		}
++
+ 		_, err = dmverity.Open(layerBlob, dmName, layerBlob, string(rootHash), &opts)
+ 		if err != nil {
+ 			return "", fmt.Errorf("failed to open dmverity device: %w", err)
+@@ -332,15 +494,15 @@ func (s *snapshotter) prepareDirectory(ctx context.Context, snapshotDir string,
+ 	return td, nil
+ }
+ 
+-func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]mount.Mount, error) {
++func (s *snapshotter) mounts(ctx context.Context, snap storage.Snapshot, info snapshots.Info) ([]mount.Mount, error) {
+ 	var options []string
+ 
+-	fmt.Println("mounts called, info :", info)
+-	fmt.Println("snap: ", snap)
++	log.L.Debugf("mounts called, info: %+v", info)
++	log.L.Debugf("snap: %+v", snap)
+ 	if len(snap.ParentIDs) == 0 {
+-		fmt.Println("no parent ids")
++		log.L.Debugf("no parent ids")
+ 		m, mntpoint, err := s.lowerPath(snap.ID)
+-		fmt.Printf("lowerPath: m = %v, mntpoint = %v\n", m, mntpoint)
++		log.L.Debugf("lowerPath: m = %v, mntpoint = %v", m, mntpoint)
+ 		if err == nil {
+ 			if snap.Kind != snapshots.KindView {
+ 				return nil, fmt.Errorf("only works for snapshots.KindView on a committed snapshot: %w", err)
+@@ -350,9 +512,9 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+ 					return nil, err
+ 				}
+ 			}
+-			fmt.Println("formatting layer blob m: ", m)
++			log.L.Debugf("formatting layer blob m: %+v", m)
+ 			if s.enableDmverity {
+-				if err := s.formatLayerBlob(snap.ID); err != nil {
++				if err := s.formatLayerBlob(ctx, snap.ID, info); err != nil {
+ 					return nil, err
+ 				}
+ 			}
+@@ -381,21 +543,29 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+ 		}, nil
+ 	}
+ 
+-	fmt.Println("snap.Kind", snap.Kind)
++	log.L.Debugf("snap.Kind: %+v", snap.Kind)
+ 	if snap.Kind == snapshots.KindActive {
+ 		options = append(options,
+ 			fmt.Sprintf("workdir=%s", s.workPath(snap.ID)),
+ 			fmt.Sprintf("upperdir=%s", s.upperPath(snap.ID)),
+ 		)
+ 	} else if len(snap.ParentIDs) == 1 {
+-		fmt.Println("len(snap.ParentIDs) == 1")
++		log.L.Debugf("len(snap.ParentIDs) == 1")
+ 		m, mntpoint, err := s.lowerPath(snap.ParentIDs[0])
+ 		if err != nil {
+ 			return nil, err
+ 		}
+-		fmt.Printf("lowerPath: m = %v, mntpoint = %v\n", m, mntpoint)
++		log.L.Debugf("lowerPath: m = %v, mntpoint = %v", m, mntpoint)
+ 		if s.enableDmverity {
+-			if err := s.formatLayerBlob(snap.ParentIDs[0]); err != nil {
++			parentKey, err := storage.KeyFromID(ctx, snap.ParentIDs[0])
++			if err != nil {
++				return nil, fmt.Errorf("failed to get parent key from ID: %w", err)
++			}
++			var parentInfo, parentInfoErr = s.Stat(ctx, parentKey)
++			if parentInfoErr != nil {
++				return nil, fmt.Errorf("failed to get parent snapshot info: %w", parentInfoErr)
++			}
++			if err := s.formatLayerBlob(ctx, snap.ParentIDs[0], parentInfo); err != nil {
+ 				return nil, err
+ 			}
+ 		}
+@@ -408,7 +578,7 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+ 		return []mount.Mount{m}, nil
+ 	}
+ 
+-	fmt.Println("snap.ParentIDs", snap.ParentIDs)
++	log.L.Debugf("snap.ParentIDs: %+v", snap.ParentIDs)
+ 	var lowerdirs []string
+ 	for i := range snap.ParentIDs {
+ 		m, mntpoint, err := s.lowerPath(snap.ParentIDs[i])
+@@ -431,7 +601,7 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+ 			}
+ 		}
+ 		if s.enableDmverity {
+-			devicePath, err := s.runDmverity(snap.ParentIDs[i])
++			devicePath, err := s.runDmverity(ctx, snap.ParentIDs[i])
+ 			if err != nil {
+ 				return nil, err
+ 			}
+@@ -453,10 +623,10 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+ 		}
+ 		lowerdirs = append(lowerdirs, mntpoint)
+ 	}
+-	fmt.Println("lowerdirs: ", lowerdirs)
++	log.L.Debugf("lowerdirs: %+v", lowerdirs)
+ 	options = append(options, fmt.Sprintf("lowerdir=%s", strings.Join(lowerdirs, ":")))
+ 	options = append(options, s.ovlOptions...)
+-	fmt.Printf("options = %v\n", options)
++	log.L.Debugf("options = %+v", options)
+ 	return []mount.Mount{{
+ 		Type:    "overlay",
+ 		Source:  "overlay",
+@@ -526,14 +696,16 @@ func (s *snapshotter) createSnapshot(ctx context.Context, kind snapshots.Kind, k
+ 	}); err != nil {
+ 		return nil, err
+ 	}
+-	return s.mounts(snap, info)
++	return s.mounts(ctx, snap, info)
+ }
+ 
+ func (s *snapshotter) Prepare(ctx context.Context, key, parent string, opts ...snapshots.Opt) ([]mount.Mount, error) {
++	log.G(ctx).Tracef("In Prepare for key: %s, parent: %s, opts: %v", key, parent, opts)
+ 	return s.createSnapshot(ctx, snapshots.KindActive, key, parent, opts)
+ }
+ 
+ func (s *snapshotter) View(ctx context.Context, key, parent string, opts ...snapshots.Opt) ([]mount.Mount, error) {
++	log.G(ctx).Tracef("In View for key: %s, parent: %s, opts: %v", key, parent, opts)
+ 	return s.createSnapshot(ctx, snapshots.KindView, key, parent, opts)
+ }
+ 
+@@ -570,12 +742,14 @@ func setImmutable(path string, enable bool) error {
+ }
+ 
+ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snapshots.Opt) error {
++	log.G(ctx).Tracef("In Commit for key: %s, name: %s, opts: %v", key, name, opts)
++
+ 	var layerBlob, upperDir string
+ 
+ 	// Apply the overlayfs upperdir (generated by non-EROFS differs) into a EROFS blob
+ 	// in a read transaction first since conversion could be slow.
+-	err := s.ms.WithTransaction(ctx, false, func(ctx context.Context) error {
+-		id, _, _, err := storage.GetInfo(ctx, key)
++	err := s.ms.WithTransaction(ctx, true, func(ctx context.Context) error {
++		id, info, _, err := storage.GetInfo(ctx, key)
+ 		if err != nil {
+ 			return err
+ 		}
+@@ -619,7 +793,7 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
+ 		}
+ 
+ 		if s.enableDmverity {
+-			err := s.formatLayerBlob(id)
++			err := s.formatLayerBlob(ctx, id, info)
+ 			// _, err := s.runDmverity(id)
+ 			if err != nil {
+ 				return fmt.Errorf("failed to run dmverity: %w", err)
+@@ -641,18 +815,35 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
+ 			return fmt.Errorf("failed to get the converted erofs blob: %w", err)
+ 		}
+ 
++		// Get current snapshot info to preserve the labels we've set in formatLayerBlob
++		_, info, _, err := storage.GetInfo(ctx, key)
++		if err != nil {
++			return fmt.Errorf("failed to get snapshot info: %w", err)
++		}
++
++		// Add any labels from formatLayerBlob to our opts
++		preservedOpts := append([]snapshots.Opt{}, opts...)
++		if len(info.Labels) > 0 {
++			labelOpt := snapshots.WithLabels(info.Labels)
++			preservedOpts = append(preservedOpts, labelOpt)
++		}
++
+ 		usage, err := fs.DiskUsage(ctx, layerBlob)
+ 		if err != nil {
+ 			return err
+ 		}
+-		if _, err = storage.CommitActive(ctx, key, name, snapshots.Usage(usage), opts...); err != nil {
++
++		if _, err = storage.CommitActive(ctx, key, name, snapshots.Usage(usage), preservedOpts...); err != nil {
+ 			return fmt.Errorf("failed to commit snapshot %s: %w", key, err)
+ 		}
++		log.G(ctx).Infof("Committed snapshot %s to %s", key, name)
+ 		return nil
+ 	})
+ }
+ 
+ func (s *snapshotter) Mounts(ctx context.Context, key string) (_ []mount.Mount, err error) {
++	log.G(ctx).Tracef("In Mounts for key: %s", key)
++
+ 	var snap storage.Snapshot
+ 	var info snapshots.Info
+ 	if err := s.ms.WithTransaction(ctx, false, func(ctx context.Context) error {
+@@ -669,7 +860,7 @@ func (s *snapshotter) Mounts(ctx context.Context, key string) (_ []mount.Mount,
+ 	}); err != nil {
+ 		return nil, err
+ 	}
+-	return s.mounts(snap, info)
++	return s.mounts(ctx, snap, info)
+ }
+ 
+ func (s *snapshotter) getCleanupDirectories(ctx context.Context) ([]string, error) {
+@@ -705,9 +896,10 @@ func (s *snapshotter) getCleanupDirectories(ctx context.Context) ([]string, erro
+ // immediately become unavailable and unrecoverable. Disk space will
+ // be freed up on the next call to `Cleanup`.
+ func (s *snapshotter) Remove(ctx context.Context, key string) (err error) {
++	log.L.Tracef("Remove called, key: %s", key)
++
+ 	var removals []string
+ 	var id string
+-	fmt.Println("Remove called, key: ", key)
+ 	// Remove directories after the transaction is closed, failures must not
+ 	// return error since the transaction is committed with the removal
+ 	// key no longer available.
+@@ -742,7 +934,7 @@ func (s *snapshotter) Remove(ctx context.Context, key string) (err error) {
+ 		}
+ 		// The layer blob is only persisted for committed snapshots.
+ 		if k == snapshots.KindCommitted {
+-			fmt.Println("closing dmverity device for ", id)
++			log.L.Debugf("closing dmverity device for %v", id)
+ 			if err := s.closeDmverityDevice(id); err != nil {
+ 				log.G(ctx).WithError(err).Warnf("failed to close dmverity device for %v", id)
+ 			}
+@@ -847,3 +1039,141 @@ func (s *snapshotter) closeDmverityDevice(id string) error {
+ 	}
+ 	return nil
+ }
++
++// getLayerDigestFromLabels extracts the layer digest from snapshot labels
++// Returns the layer digest if found
++// Returns an error if the labels are nil or if the digest label is not found
++func getLayerDigestFromLabels(labels map[string]string) (string, error) {
++	if labels == nil {
++		return "", fmt.Errorf("snapshot labels are nil, cannot find layer digest")
++	}
++
++	digest, ok := labels[snapshotters.TargetLayerDigestLabel]
++	if !ok {
++		return "", fmt.Errorf("target layer digest label '%s' not found in snapshot labels", snapshotters.TargetLayerDigestLabel)
++	}
++
++	return digest, nil
++}
++
++// findMatchingSignature looks for a matching signature for the layer digest and verifies the root hash
++// Returns the signature if found and verified, or empty string if no signature was found
++// Returns an error ONLY if the root hashes don't match
++func findMatchingSignature(digestToLayerInfoMap map[string]LayerInfo, layerDigest string, calculatedRootHash string) (string, error) {
++	if len(digestToLayerInfoMap) == 0 {
++		return "", nil // No signature manifests available
++	}
++
++	// Check if the layer digest exists in our digest to layer info map
++	layerInfo, ok := digestToLayerInfoMap[layerDigest]
++	if !ok {
++		log.L.Debugf("no signature found for layer digest: %s", layerDigest)
++		return "", nil
++	}
++
++	// Verify that the calculated root hash matches the one in the signature
++	if layerInfo.RootHash != calculatedRootHash {
++		return "", fmt.Errorf("root hash mismatch: calculated %s vs expected %s",
++			calculatedRootHash, layerInfo.RootHash)
++	}
++
++	log.L.Debugf("root hash from signature matches calculated root hash: %s", calculatedRootHash)
++	return layerInfo.Signature, nil
++}
++
++// updateSnapshotLabelsWithSignature updates the snapshot labels with root hash and signature information
++func updateSnapshotLabelsWithSignature(ctx context.Context, info snapshots.Info, rootHash, signature string) error {
++	// Update labels with root hash and signature
++	info.Labels[ErofsRootHashLabel] = rootHash
++	info.Labels[ErofsSignatureLabel] = signature
++
++	// Update the info in storage
++	updatedInfo, err := storage.UpdateInfo(ctx, info, "labels."+ErofsRootHashLabel, "labels."+ErofsSignatureLabel)
++	if err != nil {
++		log.L.WithError(err).Warn("failed to update snapshot labels with signature")
++		return err
++	}
++
++	log.L.Debugf("Updated snapshot labels with signature and root hash: %v", updatedInfo.Labels)
++	return nil
++}
++
++// prepareSnapshotSignature retrieves a snapshot's signature from its labels and prepares
++// a signature file for dm-verity verification.
++// Returns the path to the prepared signature file, or empty string if no signature is found.
++func (s *snapshotter) prepareSnapshotSignature(ctx context.Context, id string, rootHash string) (string, error) {
++	if len(s.digestToLayerInfoMap) == 0 {
++		return "", nil // No signature manifests available
++	}
++
++	var rootHashSignaturePath string = ""
++	var snapshotInfo snapshots.Info
++
++	if err := s.ms.WithTransaction(ctx, false, func(ctx context.Context) error {
++		var key, key_err = storage.KeyFromID(ctx, id)
++		if key_err != nil {
++			return fmt.Errorf("failed to get snapshot key from ID: %w", key_err)
++		}
++		log.L.Debugf("Key for snapshot %s: %s", id, key)
++
++		var snapshotInfoErr error
++		snapshotInfo, snapshotInfoErr = s.Stat(ctx, key)
++		if snapshotInfoErr != nil {
++			return fmt.Errorf("failed to get snapshot info: %w", snapshotInfoErr)
++		}
++		log.L.Debugf("Snapshot info for %s: %+v", id, snapshotInfo)
++		return nil
++	}); err != nil {
++		return "", err
++	}
++
++	log.L.Debugf("Labels from snapshot: %+v", snapshotInfo.Labels)
++
++	// Extract signature from labels and prepare signature file if available
++	if signature, exists := snapshotInfo.Labels[ErofsSignatureLabel]; exists && signature != "" {
++		log.L.Debugf("Found signature for %s: %s", id, signature)
++		// Prepare the signature file to be used with veritysetup
++		var err error
++		rootHashSignaturePath, err = s.prepareSignatureFile(rootHash, signature)
++		if err != nil {
++			return "", fmt.Errorf("failed to prepare signature file for root hash %s: %w", rootHash, err)
++		}
++		log.L.Debugf("Prepared signature file for root hash %s at %s", rootHash, rootHashSignaturePath)
++	} else {
++		log.L.Debugf("No signature found for root hash %s in snapshot labels", rootHash)
++	}
++
++	return rootHashSignaturePath, nil
++}
++
++// findSignatureAndUpdateLabels locates a matching signature for the snapshot's layer
++// and updates the snapshot's labels with signature information when found
++func (s *snapshotter) findSignatureAndUpdateLabels(ctx context.Context, info *dmverity.FormatOutputInfo, snapshotInfo snapshots.Info) error {
++	// Extract layer digest from snapshot labels
++	layerDigest, err := getLayerDigestFromLabels(snapshotInfo.Labels)
++	if err != nil {
++		// Error out if the layer digest is not found
++		return fmt.Errorf("missing target layer digest label: %w", err)
++	}
++	log.L.Debugf("found target layer digest in labels: %s", layerDigest)
++
++	// Try to find a matching signature and verify its root hash
++	signature, err := findMatchingSignature(s.digestToLayerInfoMap, layerDigest, info.RootHash)
++	if err != nil {
++		return fmt.Errorf("failed to verify signature for layer %s: %w", layerDigest, err)
++	}
++
++	// Update the snapshot labels only if a signature was found
++	if signature != "" {
++		updatedInfoErr := updateSnapshotLabelsWithSignature(ctx, snapshotInfo, info.RootHash, signature)
++		if updatedInfoErr != nil {
++			// Error out if updating labels fails
++			return fmt.Errorf("failed to update snapshot labels with signature info: %w", updatedInfoErr)
++		}
++		log.L.Debugf("Updated snapshot with verified signature")
++	} else {
++		log.L.Debugf("No signature found for layer digest %s, continuing without signature verification", layerDigest)
++	}
++
++	return nil
++}
+-- 
+2.45.3
+
+
+From bea5a79bd54bfb9b28266e98ed74a0ec73a60bdf Mon Sep 17 00:00:00 2001
+From: aadhar-agarwal <108542189+aadhar-agarwal@users.noreply.github.com>
+Date: Tue, 12 Aug 2025 15:02:47 -0700
+Subject: [PATCH 5/5] Fix log statement formatting in runDmverity function (#7)
+
+---
+ plugins/snapshots/erofs/erofs_linux.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugins/snapshots/erofs/erofs_linux.go b/plugins/snapshots/erofs/erofs_linux.go
+index 317ba9947..6efa6c891 100644
+--- a/plugins/snapshots/erofs/erofs_linux.go
++++ b/plugins/snapshots/erofs/erofs_linux.go
+@@ -399,7 +399,7 @@ func (s *snapshotter) runDmverity(ctx context.Context, id string) (string, error
+ 	devicePath := fmt.Sprintf("/dev/mapper/%s", dmName)
+ 	if _, err := os.Stat(devicePath); err == nil {
+ 		status, err := dmverity.Status(dmName)
+-		log.L.Debugf("dmverity device status: ", status)
++		log.L.Debugf("dmverity device status: %v", status)
+ 		if err != nil {
+ 			return "", fmt.Errorf("failed to get dmverity device status: %w", err)
+ 		}
+-- 
+2.45.3
+
