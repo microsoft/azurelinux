@@ -29,8 +29,7 @@ Provides:       libicu-devel = %{version}-%{release}
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1
 
 %build
 pushd icu/icu4c/source
