@@ -3,7 +3,7 @@
 Summary:        International Components for Unicode.
 Name:           icu
 Version:        68.2.0.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 URL:            https://github.com/microsoft/icu
 Group:          System Environment/Libraries
@@ -11,6 +11,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 #Source0:       %{url}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0: CVE-2025-5222.patch
 BuildRequires:  autoconf
 BuildRequires:  python3
 BuildRequires:  python3-xml
@@ -29,6 +30,7 @@ It contains the libraries and header files to create applications
 
 %prep
 %setup -q
+%patch 0 -p1
 
 %build
 pushd icu/icu4c/source
@@ -60,6 +62,9 @@ make -C icu/icu4c/source DESTDIR=%{buildroot} install
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Aug 12 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 68.2.0.9-2
+- Patch for CVE-2025-5222
+
 * Fri May 20 2022 CBL-Mariner Service Account <cblmargh@microsoft.com> - 68.2.0.9-1
 - Update to version  "68.2.0.9".
 
