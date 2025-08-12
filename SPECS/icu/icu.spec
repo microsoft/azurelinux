@@ -11,7 +11,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 #Source0:       %{url}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-Patch0: CVE-2025-5222.patch
+Patch0:         CVE-2025-5222.patch
 BuildRequires:  autoconf
 BuildRequires:  python3
 BuildRequires:  python3-xml
