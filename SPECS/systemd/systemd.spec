@@ -239,6 +239,9 @@ BuildRequires:  python3dist(zstd)
 %if 0%{?want_bootloader}
 BuildRequires:  python3dist(pyelftools)
 %endif
+%if 0%{?with_check}
+BuildRequires:  python3dist(pyflakes)
+%endif
 # gzip and lzma are provided by the stdlib
 BuildRequires:  firewalld-filesystem
 BuildRequires:  libseccomp-devel
@@ -469,7 +472,6 @@ Requires:       python3dist(cryptography)
 Recommends:     python3dist(pillow)
 %endif
 
-BuildRequires:  python3dist(pyflakes)
 
 BuildArch:      noarch
 
@@ -1229,6 +1231,7 @@ rm -f %{name}.lang
 %changelog
 * Tue Aug 05 2025 Chris Co <chrco@microsoft.com> - 255-22 
 - enable building ukify and sd-boot on arm64
+- enable pyflakes buildrequires which is needed for ukify testing
 
 * Mon Apr 14 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 255-21
 - Bumping 'Release' tag to match the 'signed' version of the spec.
