@@ -13,6 +13,12 @@
             ]
         },
         {
+                "PackageName": "jasper",
+                "IgnoredFilesRegexList": [
+                        "^/usr/share/doc/jasper-devel/src/license\\.dox\\.in$"
+                ]
+        },
+        {
             "PackageName": "libdb-docs",
             "IgnoredFilesRegexList": [
                 "^/usr/share/doc/libdb-[0-9\\.]+/installation/build_unix_freebsd\\.html$",
