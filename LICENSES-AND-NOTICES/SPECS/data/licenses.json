@@ -1605,6 +1605,8 @@
                 "pmix",
                 "pngcrush",
                 "pngnq",
+                "poppler",
+                "poppler-data",
                 "po4a",
                 "podman",
                 "poetry",
