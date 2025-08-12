@@ -472,7 +472,6 @@ Requires:       python3dist(cryptography)
 Recommends:     python3dist(pillow)
 %endif
 
-
 BuildArch:      noarch
 
 %description ukify
