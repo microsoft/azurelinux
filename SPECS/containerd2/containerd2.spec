@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.0.0
-Release: 16%{?dist}
+Release: 17%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -25,6 +25,19 @@ Patch5:	multi-snapshotters-support.patch
 Patch6:	tardev-support.patch
 Patch7: CVE-2024-25621.patch
 Patch8: CVE-2025-64329.patch
+
+# Erofs Snapshotter patches
+# Patches made from https://github.com/aadhar-agarwal/containerd/commits/aadagarwal/containerd2/erofs-snapshotter-main
+
+# This patch has the erofs snapshotter changes in containerd 2.1.2
+# To create this patch: git format-patch f0f8799^..345e5e4 --stdout > erofs-snapshotter-initial-implementation.patch
+Patch8: erofs-snapshotter-initial-implementation.patch
+
+# This patch has additional changes not in containerd 2.1.2
+# Tar index mode, dmverity and local signature support
+# To create this patch: git format-patch 8213fdc^..bea5a79 --stdout > erofs-snapshotter-additions.patch
+Patch9: erofs-snapshotter-additions.patch
+
 %{?systemd_requires}
 
 BuildRequires: golang < 1.25
@@ -100,6 +113,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Wed Dec 017 2025 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.0.0-17
+- Backport the erofs snapshotter into containerd2
+
 * Mon Nov 24 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-16
 - Patch for CVE-2025-64329
 
