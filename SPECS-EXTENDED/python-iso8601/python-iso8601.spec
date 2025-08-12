@@ -6,17 +6,19 @@ This module parses the most common forms of ISO 8601 date strings \
 (e.g. 2007-01-14T20:34:22+00:00) into datetime objects.
 
 Name:           python-%{srcname}
-Version:        0.1.12
-Release:        2%{?dist}
+Version:        2.1.0
+Release:        1%{?dist}
 Summary:        Simple module to parse ISO 8601 dates
 
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/micktwomey/pyiso8601
-# source0:      https://github.com/micktwomey/pyiso8601/archive/refs/tags/0.1.12.tar.gz
+# source0:      https://github.com/micktwomey/pyiso8601/archive/refs/tags/2.1.0.tar.gz
 Source0:        %{pypi_source}
 BuildArch:      noarch
+BuildRequires: python3-pip
+BuildRequires: poetry
 
 %description %{pkgdesc}
 
@@ -43,16 +45,21 @@ BuildRequires:  python%{python3_other_pkgversion}-setuptools
 %prep
 %autosetup -n %{srcname}-%{version}
 
+%generate_buildrequires
+%pyproject_buildrequires %{?with_tests:-x test}
+
 %build
-%py3_build
-%if 0%{?with_python3_other}
-%py3_other_build
-%endif
+%pyproject_wheel
 
 %install
-%py3_install
-%if 0%{?with_python3_other}
-%py3_other_install
+%pyproject_install
+%pyproject_save_files %{srcname}
+
+%check
+%if %{with tests}
+%pytest
+%else
+%pyproject_check_import -e iso8601.test_iso8601
 %endif
 
 %files -n python%{python3_pkgversion}-%{srcname}
@@ -66,6 +73,10 @@ BuildRequires:  python%{python3_other_pkgversion}-setuptools
 %endif
 
 %changelog
+* Fri Aug 01 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 2.1.0-1
+- Upgrade to 2.1.0
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1.12-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
