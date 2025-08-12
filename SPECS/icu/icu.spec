@@ -12,7 +12,7 @@ Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/icu/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0: CVE-2025-5222.patch
+Patch0:         CVE-2025-5222.patch
 BuildRequires:  autoconf
 BuildRequires:  python3
 BuildRequires:  python3-xml
