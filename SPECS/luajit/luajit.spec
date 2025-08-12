@@ -10,7 +10,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://luajit.org/
-Source0:        https://luajit.org/download/LuaJIT-%{srcver}.tar.gz
+Source0:        https://github.com/LuaJIT/LuaJIT/archive/refs/tags/v2.1.0-beta3.tar.gz#/LuaJIT-%{srcver}_v1.tar.gz
 
 # Patches from https://github.com/LuaJit/LuaJIT.git
 # Generated from v2.1 branch against the 2.1.0-beta3 tag using
