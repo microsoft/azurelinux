@@ -93,7 +93,7 @@ PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{_pkgdocdir}/
 
 %changelog
-* Wed Feb 19 2025 Akhila Guruju <v-guakhila@microsoft.com> - 4.5.0-1
+* Thu Feb 20 2025 Akhila Guruju <v-guakhila@microsoft.com> - 4.5.0-1
 - Upgrade to 4.5.0 by taking reference from Fedora 41 spec (license: MIT).
 - License verified.
 - Added BR on python3-sphinxcontrib-jquery to fix build.
