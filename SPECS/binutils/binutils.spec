@@ -27,7 +27,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://www.gnu.org/software/binutils
-Source0:        https://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
+Source0:        https://sourceware.org/pub/binutils/releases/%{name}-%{version}.tar.xz
 # Patch was derived from source: https://src.fedoraproject.org/rpms/binutils/blob/f34/f/binutils-export-demangle.h.patch
 Patch0:         export-demangle-header.patch
 # The gold linker doesn't understand the 'module_info.ld' script passed to all linkers and the tests fail to correctly link.
