@@ -1,0 +1,66 @@
+storage:
+  bootType: efi
+
+  disks:
+  - partitionTableType: gpt
+    maxSize: 1024M
+    partitions:
+    - id: esp
+      type: esp
+      size: 8M
+
+    - id: rootfs
+      type: root
+      size: grow
+
+  filesystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
+
+os:
+  bootloader:
+    resetType: hard-reset
+
+  hostname: azure-linux
+
+  kernelCommandLine:
+    extraCommandLine:
+    - console=tty0
+    - console=ttyS0
+    - rd.info
+    - log_buf_len=1M
+
+  selinux:
+    mode: enforcing
+
+  packages:
+    remove:
+    - dracut-hostonly
+
+    installLists:
+    - packagelists/baremetal-packages.yaml
+    - packagelists/base-image-packages.yaml
+    - packagelists/cloud-init-packages.yaml
+    - packagelists/selinux.yaml
+
+scripts:
+  finalizeCustomization:
+  - path: scripts/cleanup.sh
+  - path: scripts/set_os_release_variant_entries.sh
+    arguments:
+    - --variant-id
+    - baremetal
+    - --variant
+    - Bare Metal Image
+
+output:
+  image:
+    format: vhdx
