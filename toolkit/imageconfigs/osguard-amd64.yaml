@@ -1,0 +1,253 @@
+storage:
+  bootType: efi
+
+  disks:
+    - partitionTableType: gpt
+      maxSize: 40G
+      partitions:
+        - id: esp
+          type: esp
+          label: esp
+          size: 512M
+
+        - id: boot-a
+          type: linux-generic
+          label: boot-a
+          size: 100M
+
+        - id: usr-a
+          type: linux-generic
+          size: 1G
+
+        - id: usr-hash-a
+          type: usr-verity
+          size: 128M
+
+        - id: root-a
+          type: root
+          label: root-a
+          size: 12G
+
+  verity:
+    - id: usrverity
+      name: usr
+      dataDeviceId: usr-a
+      hashDeviceId: usr-hash-a
+      dataDeviceMountIdType: uuid
+      hashDeviceMountIdType: uuid
+      hashSignaturePath: /boot/usr.hash.sig
+
+  filesystems:
+    - deviceId: esp
+      type: fat32
+      mountPoint:
+        idType: part-label
+        path: /boot/efi
+        options: nodev,noexec,umask=0077
+
+    - deviceId: boot-a
+      type: ext4
+      mountPoint:
+        idType: uuid
+        path: /boot
+        options: nodev,noexec,nosuid
+
+    - deviceId: usrverity
+      type: ext4
+      mountPoint:
+        path: /usr
+        options: nodev,ro
+
+    - deviceId: root-a
+      type: ext4
+      mountPoint:
+        path: /
+        options: nodev,nosuid,x-systemd.growfs,x-initrd.mount
+
+os:
+  bootloader:
+    resetType: hard-reset
+  hostname: azure-linux-os-guard
+
+  selinux:
+    mode: permissive
+
+  uki:
+    kernels: auto
+  
+  kernelCommandLine:
+    extraCommandLine:
+      - console=tty0
+      - console=tty1
+      - console=ttyS0
+      - rd.luks=0
+      - rd.hostonly=0
+      - ipe.enforce=0
+      - fips=1
+      - net.ifnames=1
+
+  packages:
+    remove:
+      - dracut-hostonly # Not used for UKI images
+      - grub2-efi-binary # Replaced by systemd-boot
+      - kernel # Replaced by kernel-ipe
+    install:
+      - syslog
+      - WALinuxAgent
+      # OS
+      - device-mapper
+      - kernel-ipe
+      # servicing
+      # - trident
+      # - trident-service
+      - veritysetup
+      # OCI
+      - cni
+      - containerd2
+      - cri-tools
+      # - erofs-utils
+      # - notation
+      # - tardev-snapshotter
+      # UKI
+      - systemd-boot
+      # hyperv
+      - dracut-hyperv
+      - hyperv-daemons
+      # cloud-init
+      - cloud-init
+      # selinux
+      - checkpolicy
+      - libselinux
+      - policycoreutils-python-utils
+      - secilc
+      - selinux-policy
+      - selinux-policy-ci
+      - selinux-policy-modules
+      - setools-console
+
+      # === System packages ===
+      - systemd-ukify
+      - systemd-boot
+      - efibootmgr
+      - lvm2
+      - veritysetup
+      - selinux-policy
+      - selinux-policy-modules
+      - gptfdisk
+      - curl
+      - bind-utils
+      - tar
+      - wget
+      # =====AKS=====
+      - blobfuse2
+      - ca-certificates
+      - chrony
+      - cifs-utils
+      - cloud-init-azure-kvp
+      - conntrack-tools
+      - cracklib
+      - ebtables
+      - ethtool
+      - fuse
+      - inotify-tools
+      - iotop
+      - iproute
+      - ipset
+      - iptables
+      - iscsi-initiator-utils
+      - jq
+      - logrotate
+      - lsof
+      - netplan
+      - nftables
+      - nmap-ncat
+      - nfs-utils
+      - oras
+      - pam
+      - psmisc
+      - rsyslog
+      - socat
+      - sysstat
+      - traceroute
+      - util-linux
+      - xz
+      - zip
+
+  additionalDirs:
+    - source: files/osguard/repart.d
+      destination: /etc/repart.d
+      childFilePermissions: 644
+
+  additionalFiles:
+    # SELinux customizations
+    - source: files/linuxguard/selinux-ci-uki.semanage
+      destination: /etc/selinux/targeted/selinux-ci.semanage
+    # Cloud-init configuration
+    - source: files/osguard/cloud.cfg
+      destination: /etc/cloud/cloud.cfg
+      permissions: "644"
+    # Include systemd-repart in the initrd
+    - source: files/osguard/10-repart.conf
+      destination: /etc/dracut.conf.d/10-repart.conf
+      permissions: "644"
+    # Set chrony to use /dev/ptp_hyperv
+    - source: files/osguard/chrony.conf
+      destination: /etc/chrony.conf
+      permissions: "644"
+    # Fix systemd resolved caching
+    - source: files/osguard/resolv-uplink-override.service
+      destination: /etc/systemd/system/resolv-uplink-override.service
+      permissions: "600"
+
+  services:
+    disable:
+      - sshd
+    enable:
+      - systemd-networkd
+      - systemd-resolved
+
+  modules:
+  # Explicitly enable iptable_nat for prometheus
+  - name: iptable_nat
+    loadMode: always
+
+scripts:
+  postCustomization:
+    # Various performance tuning steps
+    - path: scripts/common/performance-tuning.sh
+    # Config AzureLinuxAgent
+    - path: scripts/common/azlinuxagentconfig.sh
+    # Disable unused SELinux policy modules and configure SELinux policy for CI
+    - path: scripts/common/selinux-ci-config.py
+      interpreter: /usr/bin/python3
+    # Ensure the /etc/machine-id is cleared before the first boot
+    - path: scripts/common/cleanup-machineid.sh
+    # Move CNI binaries from /opt to /usr for IPE
+    - path: scripts/common/prepare_trusted_cni_plugins.sh
+    # Move iptables scripts from /etc to /usr for IPE
+    - path: scripts/common/move-iptables-scripts-to-usr.sh
+    # Disable exec and suid on /tmp
+    - path: scripts/common/tmp-no-exec.sh
+    # Remove ImportCredential from getty services to avoid boot log warnings
+    - path: scripts/common/remove-getty-import-credential.sh
+    # Set OS release variant entries
+    - path: scripts/set_os_release_variant_entries.sh
+      arguments:
+      - --variant-id
+      - osguard
+      - --variant
+      - OS Guard Image
+    - path: scripts/osguard/create-empty-certs-dir.sh
+
+output:
+  artifacts:
+    items:
+      - verity-hash
+      - ukis
+    path: ./output
+  image:
+    format: vhdx
+
+previewFeatures:
+  - output-artifacts
+  - uki

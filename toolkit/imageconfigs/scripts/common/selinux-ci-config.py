@@ -1,26 +1,28 @@
-#!/bin/bash
+#!/usr/bin/python3
 
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-set -eux
+import os
+from semanage import (
+    semanage_module_key_create,
+    semanage_module_key_set_name,
+    semanage_module_set_enabled,
+)
+import seobject
+import shutil
+import subprocess
 
 # import SELinux policy CI customizations.  This is installed by MIC
-semanage import -f /etc/selinux/targeted/selinux-ci.semanage
-
-# MIC expects customization scripts to be bash scripts.
-python_script=$(cat << EOF
-#!/usr/bin/python3
+subprocess.run(
+    ["semanage", "import", "-f", "/etc/selinux/targeted/selinux-ci.semanage"],
+    check=True,
+)
 
 #
 # Module disabling done by script instead of 'semanage import' so new
 # modules are disabled by default
 #
-
-from semanage import (semanage_module_key_create,
-                      semanage_module_key_set_name,
-                      semanage_module_set_enabled)
-import seobject
 
 ENABLED_MODULES: set[str] = {
     "base",
@@ -39,14 +41,14 @@ ENABLED_MODULES: set[str] = {
     "chronyd",
     "dbus",
     "dmesg",
-    "docker", # handles docker and containerd
+    "docker",  # handles docker and containerd
     "fstools",
     "getty",
     "gpg",
     "hostname",
     "hotfix",
     "hypervkvp",
-    "init", # systemd
+    "init",  # systemd
     "iptables",
     "irqbalance",
     "kerberos",
@@ -56,7 +58,7 @@ ENABLED_MODULES: set[str] = {
     "logging",
     "libraries",
     "logrotate",
-    "lvm", # includes dm, cryptsetup, etc.
+    "lvm",  # includes dm, cryptsetup, etc.
     "miscfiles",
     "modutils",
     "mount",
@@ -66,7 +68,7 @@ ENABLED_MODULES: set[str] = {
     "ntp",
     "oddjob",
     "openvswitch",
-    "podman", # there is a hard dependency for this in crio
+    "podman",  # there is a hard dependency for this in crio
     "policykit",
     "qemu",
     "rdisc",
@@ -90,7 +92,7 @@ ENABLED_MODULES: set[str] = {
     "usermanage",
     "uuidd",
     "virt",
-    "xdg", # required by systemd
+    "xdg",  # required by systemd
 }
 
 records = seobject.moduleRecords()
@@ -123,15 +125,10 @@ for name in modules_to_enable:
     semanage_module_set_enabled(handle, key, 1)
 
 records.commit()
-EOF
-)
-
-/usr/bin/python3 -c "$python_script"
 
 # Move policy to /usr
-if [ ! -d /usr/etc/selinux ]; then
-    mkdir -p /usr/etc
-    mv /etc/selinux /usr/etc/selinux
+if not os.path.isdir("/usr/etc/selinux"):
+    os.makedirs("/usr/etc", exist_ok=True)
+    shutil.move("/etc/selinux", "/usr/etc/selinux")
     # add backwards compatibility for /etc/selinux
-    ln -sf ../usr/etc/selinux /etc/selinux
-fi
+    os.symlink("../usr/etc/selinux", "/etc/selinux")

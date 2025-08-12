@@ -1237,8 +1237,8 @@
         "type": "other",
         "other": {
           "name": "bpftrace",
-          "version": "0.20.3",
-          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/refs/tags/v0.20.3.tar.gz"
+          "version": "0.23.5",
+          "downloadUrl": "https://github.com/bpftrace/bpftrace/archive/refs/tags/v0.23.5.tar.gz"
         }
       }
     },
@@ -4670,8 +4670,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.23.11",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.11-1/go1.23.11-20250708.6.src.tar.gz"
+          "version": "1.23.12",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.23.12-1/go1.23.12-20250806.6.src.tar.gz"
         }
       }
     },
@@ -4680,8 +4680,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.24.5",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.5-1/go1.24.5-20250708.7.src.tar.gz"
+          "version": "1.24.6",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.6-1/go1.24.6-20250806.4.src.tar.gz"
         }
       }
     },
@@ -8851,8 +8851,8 @@
         "type": "other",
         "other": {
           "name": "libbpf",
-          "version": "1.2.2",
-          "downloadUrl": "https://github.com/libbpf/libbpf/archive/v1.2.2.tar.gz"
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/libbpf/libbpf/archive/v1.5.0.tar.gz"
         }
       }
     },
@@ -9511,8 +9511,8 @@
         "type": "other",
         "other": {
           "name": "libgcrypt",
-          "version": "1.10.2",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.2.tar.bz2"
+          "version": "1.10.3",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.3.tar.bz2"
         }
       }
     },
@@ -21083,8 +21083,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.3.19",
-          "downloadUrl": "https://www.php.net/distributions/php-8.3.19.tar.xz"
+          "version": "8.3.23",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.23.tar.xz"
         }
       }
     },
@@ -28586,8 +28586,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.9.0",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.0.tar.gz"
+          "version": "1.9.1",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.1.tar.gz"
         }
       }
     },
