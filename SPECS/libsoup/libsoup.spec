@@ -34,7 +34,7 @@ Patch15:         CVE-2025-32910.patch
 Patch16:         CVE-2025-32912.patch
 Patch17:         CVE-2025-4476.patch
 Patch18:         CVE-2025-4948.patch
-Patch19:          CVE-2025-4969.patch
+Patch19:         CVE-2025-4969.patch
 
 
 BuildRequires:  meson
