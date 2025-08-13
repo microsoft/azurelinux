@@ -13,7 +13,7 @@
 
 Name:         kata-containers-cc
 Version:      3.2.0.azl2
-Release:      7%{?dist}
+Release:      8%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -27,6 +27,7 @@ Patch2:       CVE-2024-24786.patch
 Patch3:       CVE-2023-44487.patch
 Patch4:       CVE-2024-43806.patch
 Patch5:       CVE-2025-5791.patch
+Patch6:       CVE-2025-53605.patch
 
 ExclusiveArch: x86_64
 
@@ -55,7 +56,7 @@ BuildRequires:  kernel-uvm-devel
 Requires:  kernel-uvm
 Requires:  moby-containerd-cc
 # Must match the version specified by the `assets.virtiofsd.version` field in
-# %{SOURCE0}/versions.yaml.
+# %%{SOURCE0}/versions.yaml.
 Requires:  virtiofsd = 1.8.0
 
 %description
@@ -295,6 +296,9 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+* Wed Aug 06 2025 BinduSri Adabala <v-badabala@microsoft.com> - 3.2.0.azl2-8
+- Patch CVE-2025-53605
+
 * Mon May 05 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.2.0.azl2-7
 - Add patch for CVE-2024-43806, CVE-2025-5791
 
@@ -342,7 +346,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 -   Remove kernel-uvm-cvm modules/sources/files
 -   Remove instructions to build kernel-uvm-cvm related binaries
 
-*   Tue Jan 24 2024 Manuel Huber <mahuber@microsoft.com> - 0.6.3-2
+*   Wed Jan 24 2024 Manuel Huber <mahuber@microsoft.com> - 0.6.3-2
 -   Enforce a restrictive security policy
 
 *   Mon Jan 08 2024 Dallas Delaney <dadelan@microsoft.com> - 0.6.3-1
@@ -377,7 +381,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 *   Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.0-2
 -   Bump release to rebuild with go 1.19.12
 
-*   Tue Jul 13 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
+*   Thu Jul 13 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
 -   Upgrade to version 0.6.0
 
 *   Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.2-2
