@@ -54,11 +54,11 @@ This enhancement:
 ---
  api/v1alpha1/kubevirtmachine_types.go         |   6 +
  controllers/kubevirtmachine_controller.go     |  20 +++-
- .../kubevirtmachine_controller_test.go        | 111 ++++++++++++++++++
+ .../kubevirtmachine_controller_test.go        | 112 ++++++++++++++++++
  pkg/kubevirt/machine.go                       |   8 ++
  pkg/kubevirt/machine_factory.go               |   2 +
- .../mock/machine_factory_generated.go         |  26 +++-
- 6 files changed, 170 insertions(+), 3 deletions(-)
+ .../mock/machine_factory_generated.go         |  14 +++
+ 6 files changed, 160 insertions(+), 2 deletions(-)
 
 diff --git a/api/v1alpha1/kubevirtmachine_types.go b/api/v1alpha1/kubevirtmachine_types.go
 index 94e2bcf..3b7f3a0 100644
@@ -78,10 +78,10 @@ index 94e2bcf..3b7f3a0 100644
  	// added to the load balancer
  	// +optional
 diff --git a/controllers/kubevirtmachine_controller.go b/controllers/kubevirtmachine_controller.go
-index 9832a96..613020c 100644
+index 0983c93..1e74daf 100644
 --- a/controllers/kubevirtmachine_controller.go
 +++ b/controllers/kubevirtmachine_controller.go
-@@ -277,11 +277,27 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
+@@ -279,11 +279,27 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
  		// Mark VMProvisionedCondition to indicate that the VM has successfully started
  		conditions.MarkTrue(ctx.KubevirtMachine, infrav1.VMProvisionedCondition)
  	} else {
@@ -112,18 +112,10 @@ index 9832a96..613020c 100644
  		return ctrl.Result{RequeueAfter: 20 * time.Second}, nil
  	}
 diff --git a/controllers/kubevirtmachine_controller_test.go b/controllers/kubevirtmachine_controller_test.go
-index 0bb2017..4f8f11f 100644
+index 85ee2ba..cc63a2a 100644
 --- a/controllers/kubevirtmachine_controller_test.go
 +++ b/controllers/kubevirtmachine_controller_test.go
-@@ -405,6 +405,7 @@ var _ = Describe("reconcile a kubevirt machine", func() {
- 		machineMock.EXPECT().IsTerminal().Return(false, "", nil).Times(1)
- 		machineMock.EXPECT().Exists().Return(true).Times(1)
- 		machineMock.EXPECT().IsReady().Return(false).AnyTimes()
-+		machineMock.EXPECT().GetVMNotReadyReason().Return("TestReason", "Test message").AnyTimes()
- 		machineMock.EXPECT().Address().Return("1.1.1.1").AnyTimes()
- 		machineMock.EXPECT().SupportsCheckingIsBootstrapped().Return(false).AnyTimes()
- 		machineMock.EXPECT().GenerateProviderID().Return("abc", nil).AnyTimes()
-@@ -1307,6 +1308,116 @@ var _ = Describe("reconcile a kubevirt machine", func() {
+@@ -1359,6 +1359,118 @@ var _ = Describe("reconcile a kubevirt machine", func() {
  		Expect(out).To(Equal(ctrl.Result{RequeueAfter: 20 * time.Second}))
  		Expect(machineContext.BootstrapDataSecret.Data["userdata"]).To(Equal(bootstrapSecret.Data["value"]))
  	})
@@ -142,6 +134,7 @@ index 0bb2017..4f8f11f 100644
 +		machineMock.EXPECT().IsTerminal().Return(false, "", nil).Times(1)
 +		machineMock.EXPECT().Exists().Return(true).Times(2) // once early (skip create), once for delete guard
 +		machineMock.EXPECT().IsReady().Return(false).Times(1)
++		// machineMock.EXPECT().GetVMNotReadyReason().Return("VMNotReady", "VM is not ready").Times(1)
 +		machineMock.EXPECT().GetCreationTimestamp().Return(oldTime.Time).Times(1)
 +		machineMock.EXPECT().Delete().Return(nil).Times(1)
 +
@@ -179,6 +172,7 @@ index 0bb2017..4f8f11f 100644
 +		machineMock.EXPECT().IsTerminal().Return(false, "", nil).Times(1)
 +		machineMock.EXPECT().Exists().Return(true).Times(1) // early (skip create); no delete guard here
 +		machineMock.EXPECT().IsReady().Return(false).Times(1)
++		// machineMock.EXPECT().GetVMNotReadyReason().Return("VMNotReady", "VM is not ready").Times(1)
 +		machineMock.EXPECT().GetCreationTimestamp().Return(recentTime.Time).Times(1)
 +
 +		// Nothing else on this path:
@@ -241,7 +235,7 @@ index 0bb2017..4f8f11f 100644
  
  var _ = Describe("updateNodeProviderID", func() {
 diff --git a/pkg/kubevirt/machine.go b/pkg/kubevirt/machine.go
-index 38a839d..686e77c 100644
+index 1fb9829..c29a68e 100644
 --- a/pkg/kubevirt/machine.go
 +++ b/pkg/kubevirt/machine.go
 @@ -237,6 +237,14 @@ func (m *Machine) IsReady() bool {
@@ -260,10 +254,10 @@ index 38a839d..686e77c 100644
  func (m *Machine) IsLiveMigratable() (bool, string, string, error) {
  	if m.vmiInstance == nil {
 diff --git a/pkg/kubevirt/machine_factory.go b/pkg/kubevirt/machine_factory.go
-index d5724df..ca42628 100644
+index 88a730f..2bbf325 100644
 --- a/pkg/kubevirt/machine_factory.go
 +++ b/pkg/kubevirt/machine_factory.go
-@@ -27,6 +27,8 @@ type MachineInterface interface {
+@@ -28,6 +28,8 @@ type MachineInterface interface {
  	IsReady() bool
  	// IsLiveMigratable reports back the live-migratability state of the VM: Status, Reason and Message
  	IsLiveMigratable() (bool, string, string, error)
@@ -273,11 +267,11 @@ index d5724df..ca42628 100644
  	Address() string
  	// SupportsCheckingIsBootstrapped checks if we have a method of checking
 diff --git a/pkg/kubevirt/mock/machine_factory_generated.go b/pkg/kubevirt/mock/machine_factory_generated.go
-index 1431362..3b525c2 100644
+index 9c7365e..5bf4ff2 100644
 --- a/pkg/kubevirt/mock/machine_factory_generated.go
 +++ b/pkg/kubevirt/mock/machine_factory_generated.go
-@@ -126,9 +126,33 @@ func (mr *MockMachineInterfaceMockRecorder) GenerateProviderID() *gomock.Call {
- 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateProviderID", reflect.TypeOf((*MockMachineInterface)(nil).GenerateProviderID))
+@@ -141,6 +141,20 @@ func (mr *MockMachineInterfaceMockRecorder) GetConditions() *gomock.Call {
+ 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConditions", reflect.TypeOf((*MockMachineInterface)(nil).GetConditions))
  }
  
 +// GetCreationTimestamp mocks base method.
@@ -296,21 +290,6 @@ index 1431362..3b525c2 100644
 +
  // GetVMNotReadyReason mocks base method.
  func (m *MockMachineInterface) GetVMNotReadyReason() (string, string) {
--	return "", ""
-+	m.ctrl.T.Helper()
-+	ret := m.ctrl.Call(m, "GetVMNotReadyReason")
-+	ret0, _ := ret[0].(string)
-+	ret1, _ := ret[1].(string)
-+	return ret0, ret1
-+}
-+
-+// GetVMNotReadyReason indicates an expected call of GetVMNotReadyReason.
-+func (mr *MockMachineInterfaceMockRecorder) GetVMNotReadyReason() *gomock.Call {
-+	mr.mock.ctrl.T.Helper()
-+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVMNotReadyReason", reflect.TypeOf((*MockMachineInterface)(nil).GetVMNotReadyReason))
- }
- 
- // IsBootstrapped mocks base method.
+ 	m.ctrl.T.Helper()
 -- 
 2.49.0
-
