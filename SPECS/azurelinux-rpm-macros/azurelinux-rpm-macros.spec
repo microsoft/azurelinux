@@ -143,7 +143,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
-* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - %{azl}.0-8
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 3.0-8
 - Bump to rebuild with build-id fix from toolchain gcc
 
 * Mon Sep 09 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-7

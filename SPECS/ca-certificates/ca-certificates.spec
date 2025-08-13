@@ -340,7 +340,7 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
-* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1:%{azl}.0.0-9
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 3.0.0-9
 - Bump to rebuild with build-id fix from toolchain gcc
 
 * Wed Dec 11 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.0-8
