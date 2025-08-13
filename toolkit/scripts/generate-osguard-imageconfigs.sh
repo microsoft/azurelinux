@@ -32,6 +32,7 @@ fi
 
 BASE_TPL="../imageconfigs/templates/osguard-base.yaml"
 DELTA_TPL="../imageconfigs/templates/osguard-no-ci-delta.yaml"
+CI_DELTA_TPL="../imageconfigs/templates/osguard-ci-delta.yaml"
 
 run_generate() {
 	local out_dir="$1"
