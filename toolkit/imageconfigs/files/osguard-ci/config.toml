@@ -1,0 +1,45 @@
+version = 2
+oom_score = 0
+[plugins."io.containerd.grpc.v1.cri"]
+  enable_selinux = true
+  sandbox_image = "mcr.microsoft.com/oss/kubernetes/pause:3.6"
+  [plugins."io.containerd.grpc.v1.cri".containerd]
+    snapshotter = "erofs"
+    disable_snapshot_annotations = false
+    default_runtime_name = "runc"
+    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+      snapshotter = "erofs"
+      runtime_type = "io.containerd.runc.v2"
+    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+      BinaryName = "/usr/bin/runc"
+    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.untrusted]
+      runtime_type = "io.containerd.runc.v2"
+    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.untrusted.options]
+      BinaryName = "/usr/bin/runc"
+  [plugins."io.containerd.grpc.v1.cri".registry]
+    config_path = "/etc/containerd/certs.d"
+  [plugins."io.containerd.grpc.v1.cri".registry.headers]
+    X-Meta-Source-Client = ["azure/aks"]
+  [plugins."io.containerd.grpc.v1.cri".cni]
+    bin_dir = "/usr/libexec/cni"
+    conf_dir = "/etc/cni/net.d"
+    conf_template = ""
+[metrics]
+  address = "0.0.0.0:10257"
+
+[plugins."io.containerd.image-verifier.v1.bindir"]
+  bin_dir = "/usr/libexec/verifier"
+  max_verifiers = 10
+  per_verifier_timeout = "10s"
+
+[plugins."io.containerd.snapshotter.v1.erofs"]
+  # Optional: Additional mount options for overlayfs
+  ovl_mount_options = []
+  enable_dmverity = true
+
+[plugins."io.containerd.service.v1.diff-service"]
+  default = ["erofs"]
+
+[plugins."io.containerd.differ.v1.erofs"]
+  mkfs_options = ["--sort=none", "-T 0", "--mkfs-time", "-Uc1b9d5a2-f162-11cf-9ece-0020afc76f16"]
+  enable_tar_index = true
