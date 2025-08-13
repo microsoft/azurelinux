@@ -1,7 +1,7 @@
 Summary:        A utility for generating programs that recognize patterns in text
 Name:           flex
 Version:        2.6.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -70,6 +70,9 @@ make %{?_smp_mflags} check
 %{_includedir}/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 2.6.4-8
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.4-7
 - Merge the following releases from 1.0 to dev branch
 - niontive@microsoft.com, 2.6.4-6: No patch CVE-2019-6293, Move "lex" script to separate file

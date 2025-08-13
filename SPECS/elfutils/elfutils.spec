@@ -4,7 +4,7 @@
 Summary:        A collection of utilities and DSOs to handle compiled objects
 Name:           elfutils
 Version:        0.189
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3+ AND (GPLv2+ OR LGPLv3+)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -283,6 +283,9 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 0.189-6
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Wed Jan 15 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.189-5
 - add patch for CVE-2025-1352
 

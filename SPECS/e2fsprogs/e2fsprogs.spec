@@ -1,7 +1,7 @@
 Summary:        Contains the utilities for the ext2 file system
 Name:           e2fsprogs
 Version:        1.47.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2 AND LGPLv2 AND BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -148,6 +148,9 @@ done
 %defattr(-,root,root)
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1.47.0-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Aug 19 2024 Andrew Phelps <anphel@microsoft.com> - 1.47.0-2
 - Remove known bad package test
 

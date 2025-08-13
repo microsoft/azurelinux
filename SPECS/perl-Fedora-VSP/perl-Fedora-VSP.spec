@@ -2,7 +2,7 @@
 Summary:        Perl version normalization for RPM
 Name:           perl-Fedora-VSP
 Version:        0.001
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,6 +50,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 0.001-21
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Fri May 24 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.001-20
 - Release bump to regenerate package's requires and provides.
 

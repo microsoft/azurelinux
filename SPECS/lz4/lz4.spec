@@ -1,7 +1,7 @@
 Summary:        Extremely fast compression.
 Name:           lz4
 Version:        1.9.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD 2-Clause and GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -56,6 +56,9 @@ make install DESTDIR=%{buildroot} LIBDIR=%{_libdir} PREFIX=%{_prefix}
 %{_includedir}/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1.9.4-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.4-1
 - Auto-upgrade to 1.9.4 - Azure Linux 3.0 - package upgrades
 

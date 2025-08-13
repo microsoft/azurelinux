@@ -1,7 +1,7 @@
 Summary:        Contains programs for compressing and decompressing files
 Name:           bzip2
 Version:        1.0.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 URL:            https://sourceware.org/bzip2/index.html
 Group:          System Environment/Base
@@ -94,6 +94,9 @@ make %{?_smp_mflags} check
 %{_libdir}/libbz2.so.*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1.0.8-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Thu Oct 14 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0.8-1
 - Upgrade to 1.0.8 to fix CVE-2016-3189
 

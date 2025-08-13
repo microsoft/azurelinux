@@ -1,7 +1,7 @@
 Summary:        libgpg-error
 Name:           libgpg-error
 Version:        1.48
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 URL:            https://gnupg.org/
 Group:          Development/Libraries
@@ -75,6 +75,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1.48-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Jun 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.48-1
 - Upgrade to version 1.48 to support gnupg2
 

@@ -1,7 +1,7 @@
 Summary:        Tools for zstd compression and decompression
 Name:           zstd
 Version:        1.5.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause AND GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -76,6 +76,9 @@ install -D -m755 contrib/pzstd/pzstd %{buildroot}%{_bindir}/pzstd
 %{_mandir}/man1/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1.5.5-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Tue Jan 16 2024 Andrew Phelps <anphel@microsoft.com> - 1.5.5-2
 - Add pzstd binary
 

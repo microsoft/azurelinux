@@ -6,7 +6,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.9
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -242,6 +242,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 3.12.9-4
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Tue Jul 01 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.12.9-3
 - Patch CVE-2025-6069
 - Fixed the test in %check

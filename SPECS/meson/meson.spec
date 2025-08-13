@@ -1,7 +1,7 @@
 Summary:        Extremely fast and user friendly build system
 Name:           meson
 Version:        1.3.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -67,6 +67,9 @@ python3 ./run_tests.py
 %{_datadir}/polkit-1/actions/com.mesonbuild.install.policy
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1.3.1-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Thu Feb 29 2024 Betty Lakes <bettylakes@microsoft.com> - 1.3.1-1
 - Update version to 1.3.1
 - Remove flaky and unsupported tests

@@ -1,7 +1,7 @@
 Summary:        Interface to create per object accessors
 Name:           perl-Object-Accessor
 Version:        0.48
-Release:        10%{?dist}
+Release:        11%{?dist}
 Group:          Development/Libraries
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Object-Accessor
@@ -53,6 +53,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 0.48-11
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Fri May 24 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.48-10
 - Release bump to regenerate package's requires and provides.
 

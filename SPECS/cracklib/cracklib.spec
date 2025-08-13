@@ -4,7 +4,7 @@
 Summary:          A password strength-checking library.
 Name:             cracklib
 Version:          2.9.11
-Release:          1%{?dist}
+Release:          2%{?dist}
 Group:            System Environment/Libraries
 URL:              https://github.com/cracklib/cracklib
 License:          LGPLv2+
@@ -180,6 +180,9 @@ rm -f %{_datadir}/cracklib/pw_dict.pwi
 %{_mandir}/man8/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 2.9.11-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Jan 15 2024 Archana Choudhary <archana1@microsoft.com> - 2.9.11-1
 - Upgrade to 2.9.11
 - Add man pages to files

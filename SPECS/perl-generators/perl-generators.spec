@@ -1,7 +1,7 @@
 Summary:        RPM Perl dependencies generators
 Name:           perl-generators
 Version:        1.15
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -61,6 +61,9 @@ make test
 %{_rpmconfigdir}/fileattrs/perl*.attr
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1.15-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Fri May 24 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.15-2
 - Release bump to regenerate package's requires and provides.
 

@@ -1,7 +1,7 @@
 Summary:        Multi-format archive and compression library
 Name:           libarchive
 Version:        3.7.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 # Certain files have individual licenses. For more details see contents of "COPYING".
 License:        BSD AND Public Domain AND (ASL 2.0 OR CC0 1.0 OR OpenSSL)
 Vendor:         Microsoft Corporation
@@ -62,6 +62,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 3.7.7-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Tue Mar 11 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.7.7-2
 - Patch CVE-2025-1632, CVE-2025-25724
 

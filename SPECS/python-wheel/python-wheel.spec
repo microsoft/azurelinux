@@ -4,7 +4,7 @@
 Summary:        Built-package format for Python
 Name:           python-%{pypi_name}
 Version:        0.43.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -115,6 +115,9 @@ pip3 install iniconfig
 %endif
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 0.43.0-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Fri May 10 2024 Betty Lakes <bettylakes@microsoft.com> - 0.43.0-1
 - Updated to 0.43.0
 

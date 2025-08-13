@@ -21,7 +21,7 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.41
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -331,6 +331,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %do_files aarch64-linux-gnu %{build_aarch64}
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 2.41-8
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Thu Jul 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.41-7
 - Patch for CVE-2025-7546, CVE-2025-7545
 

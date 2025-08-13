@@ -3,7 +3,7 @@
 Summary:        libssh2 is a library implementing the SSH2 protocol.
 Name:           libssh2
 Version:        1.11.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 URL:            https://www.libssh2.org/
 Group:          System Environment/NetworkingLibraries
@@ -57,6 +57,9 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 %{_mandir}/man3/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1.11.1-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Fri Apr 04 2025 Sumedh Sharma <sumsharma@microsoft.com> - 1.11.1-1
 - Bump patch version to fix CVE-2023-48795.
 

@@ -1,7 +1,7 @@
 Summary:        An interpreted language that may be embedded into an application to make the application extensible.
 Name:           slang
 Version:        2.3.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -62,6 +62,9 @@ make  check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 2.3.3-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.3.3-1
 - Auto-upgrade to 2.3.3 - Azure Linux 3.0 - package upgrades
 

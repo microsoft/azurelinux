@@ -1,7 +1,7 @@
 Summary:        AzureLinux repo files, gpg keys
 Name:           azurelinux-repos
 Version:        %{azl}.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -275,6 +275,9 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - %{azl}.0-6
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Sat Mar 01 2025 Chris Co <chrco@microsoft.com> - 3.0-5
 - Add cloud-native repo subpackages
 

@@ -1,7 +1,7 @@
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           libffi
 Version:        3.4.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -75,6 +75,9 @@ rm -rf %{buildroot}/%{_infodir}
 %{_mandir}/man3/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 3.4.4-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.4.4-1
 - Auto-upgrade to 3.4.4 - Azure Linux 3.0 - package upgrades
 

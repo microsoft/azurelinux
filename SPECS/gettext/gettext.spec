@@ -1,7 +1,7 @@
 Summary:        Utilities for internationalization and localization
 Name:           gettext
 Version:        0.22
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 URL:            https://www.gnu.org/software/gettext
 Group:          Applications/System
@@ -58,6 +58,9 @@ make %{?_smp_mflags} check
 %{_mandir}/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 0.22-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.22-1
 - Auto-upgrade to 0.22 - Azure Linux 3.0 - package upgrades
 

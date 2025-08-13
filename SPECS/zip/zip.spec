@@ -1,7 +1,7 @@
 Summary:        zip-3.0
 Name:           zip
 Version:        3.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        BSD
 URL:            http://infozip.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/infozip/zip30.tar.gz
@@ -30,6 +30,9 @@ make prefix=%{buildroot}/%{_prefix} MANDIR=%{buildroot}/usr/share/man/man1 -f un
 %{_mandir}/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 3.0-7
+- Bump to rebuild with build-id fix from toolchain gcc
+
 *   Thu Feb 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-6
 -   Updated patch application macros.
 
