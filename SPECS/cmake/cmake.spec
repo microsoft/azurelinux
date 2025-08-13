@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.30.3
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -106,6 +106,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 3.30.3-8
+- Rebuild with build-id compiler fix
+
 * Tue Jun 03 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.30.3-7
 - Patch CVE-2025-4947
 

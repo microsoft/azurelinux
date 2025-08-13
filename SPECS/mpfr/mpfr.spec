@@ -1,7 +1,7 @@
 Summary:        Functions for multiple precision math
 Name:           mpfr
 Version:        4.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 URL:            http://www.mpfr.org
 Group:          Applications/System
@@ -68,6 +68,9 @@ make %{?_smp_mflags} check
 %{_docdir}/mpfr-%{version}/COPYING
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 4.2.1-2
+- Rebuild with build-id compiler fix
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.2.1-1
 - Auto-upgrade to 4.2.1 - Azure Linux 3.0 - package upgrades
 

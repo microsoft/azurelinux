@@ -1,7 +1,7 @@
 Summary:        A library for text mode user interfaces
 Name:           newt
 Version:        0.52.23
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -95,6 +95,9 @@ make %{?_smp_mflags} test
 %defattr(-,root,root)
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 0.52.23-2
+- Rebuild with build-id compiler fix
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.52.23-1
 - Auto-upgrade to 0.52.23 - Azure Linux 3.0 - package upgrades
 

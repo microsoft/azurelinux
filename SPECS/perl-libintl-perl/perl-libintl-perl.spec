@@ -2,7 +2,7 @@
 Summary:        Internationalization library for Perl, compatible with gettext
 Name:           perl-libintl-perl
 Version:        1.33
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/libintl-perl/
@@ -203,6 +203,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1.33-2
+- Rebuild with build-id compiler fix
+
 * Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 1.33-1
 - Upgrade to 1.33
 

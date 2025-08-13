@@ -1,7 +1,7 @@
 Summary:	Programs to parse command-line options
 Name:		popt
 Version:	1.19
-Release:    1%{?dist}
+Release:    2%{?dist}
 License:	MIT
 URL:		https://github.com/rpm-software-management/popt
 Group:		Applications/System
@@ -59,6 +59,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1.19-2
+- Rebuild with build-id compiler fix
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19-1
 - Auto-upgrade to 1.19 - Azure Linux 3.0 - package upgrades
 

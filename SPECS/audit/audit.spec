@@ -1,7 +1,7 @@
 Summary:        Kernel Audit Tool
 Name:           audit
 Version:        3.1.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -137,6 +137,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{python3_sitelib}/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 3.1.2-2
+- Rebuild with build-id compiler fix
+
 * Wed Nov 08 2023 Andrew Phelps <anphel@microsoft.com> - 3.1.2-1
 - Upgrade to version 3.1.2
 

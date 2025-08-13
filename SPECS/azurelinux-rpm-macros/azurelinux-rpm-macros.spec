@@ -7,7 +7,7 @@
 Summary:        Azure Linux specific rpm macro files
 Name:           azurelinux-rpm-macros
 Version:        %{azl}.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -143,6 +143,9 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - %{azl}.0-8
+- Rebuild with build-id compiler fix
+
 * Mon Sep 09 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-7
 - Include release information in ELF metadata version field
 

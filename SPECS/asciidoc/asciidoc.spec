@@ -1,7 +1,7 @@
 Summary:        AsciiDoc is a human readable text document format
 Name:           asciidoc
 Version:        10.2.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 URL:            https://asciidoc.org/
 Group:          System Environment/Development
@@ -67,6 +67,9 @@ python3 tests/testasciidoc.py run
 %dir %{python3_sitelib}/asciidoc/resources/filters/music
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 10.2.0-4
+- Rebuild with build-id compiler fix
+
 *   Mon Jul 07 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 10.2.0-3
 -   Add BR on python-wheel to fix build
 

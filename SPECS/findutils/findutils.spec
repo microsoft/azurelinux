@@ -1,7 +1,7 @@
 Summary:        This package contains programs to find files
 Name:           findutils
 Version:        4.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -64,6 +64,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 4.9.0-2
+- Rebuild with build-id compiler fix
+
 * Wed Oct 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9.0-1
 - Auto-upgrade to 4.9.0 - Azure Linux 3.0 - package upgrades
 

@@ -1,7 +1,7 @@
 Summary:        The package automatically configure source code
 Name:           autoconf
 Version:        2.72
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,6 +50,9 @@ make -k check %{?_smp_mflags}
 %{_datarootdir}/autoconf/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 2.72-3
+- Rebuild with build-id compiler fix
+
 * Tue July 30 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.72-2
 - Add missing runtime Requires: perl(File::Compare)
 

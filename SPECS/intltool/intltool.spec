@@ -1,7 +1,7 @@
 Summary:       Intltool
 Name:          intltool
 Version:       0.51.0
-Release:       7%{?dist}
+Release:       8%{?dist}
 License:       GPLv2+
 URL:           https://freedesktop.org/wiki/Software/intltool/
 Source0:       https://launchpad.net/%{name}/trunk/%{version}/+download/%{name}-%{version}.tar.gz
@@ -36,6 +36,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man8/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 0.51.0-8
+- Rebuild with build-id compiler fix
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.51.0-7
 - Added %%license line automatically
 

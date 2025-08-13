@@ -1,7 +1,7 @@
 Summary:        The GNU Database Manager
 Name:           gdbm
 Version:        1.23
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/gdbm
 Group:          Applications/Databases
@@ -75,6 +75,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1.23-2
+- Rebuild with build-id compiler fix
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.23-1
 - Auto-upgrade to 1.23 - Azure Linux 3.0 - package upgrades
 

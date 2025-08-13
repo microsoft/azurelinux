@@ -14,7 +14,7 @@
 Summary:        Powerful light-weight programming language
 Name:           lua
 Version:        %{major_version}.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -212,6 +212,9 @@ popd
 %{_libdir}/*.a
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 5.4.6-2
+- Rebuild with build-id compiler fix
+
 * Tue Feb 27 2024 Andrew Phelps <anphel@microsoft.com> - 5.4.6-1
 - Upgrade to version 5.4.6
 - Disable bootstrap

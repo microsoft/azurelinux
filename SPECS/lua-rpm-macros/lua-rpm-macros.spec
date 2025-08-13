@@ -5,7 +5,7 @@
 
 Name:           lua-rpm-macros
 Version:        1
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        The common Lua RPM macros
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -63,6 +63,9 @@ install -Dpm 0644 lua.attr %{buildroot}/%{_fileattrsdir}/lua.attr
 
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1-7
+- Rebuild with build-id compiler fix
+
 * Wed Jan 19 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1-6
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified

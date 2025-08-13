@@ -1,7 +1,7 @@
 Summary:        Provides IPC between GnuPG Components
 Name:           libassuan
 Version:        2.5.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 URL:            https://gnupg.org/software/libassuan/index.html
 Group:          Development/Libraries
@@ -57,6 +57,9 @@ rm -rf %{buildroot}/%{_infodir}
 %{_datadir}/aclocal/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 2.5.6-2
+- Rebuild with build-id compiler fix
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.6-1
 - Auto-upgrade to 2.5.6 - Azure Linux 3.0 - package upgrades
 

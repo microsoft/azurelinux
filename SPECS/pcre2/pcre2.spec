@@ -1,7 +1,7 @@
 Summary:        A library for Perl-compatible regular expressions
 Name:           pcre2
 Version:        10.42
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -235,6 +235,9 @@ make check -j1
 %{_libdir}/*.a
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 10.42-4
+- Rebuild with build-id compiler fix
+
 * Mon Mar 25 2024 Chris PeBenito <chpebeni@microsoft.com> 10.42-3
 - Drop coreutils BuildRequires to break dependency cycle between pcre2, libselinux, and coreutils.
 

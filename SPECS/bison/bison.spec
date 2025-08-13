@@ -1,7 +1,7 @@
 Summary:        Contains a parser generator
 Name:           bison
 Version:        3.8.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -55,6 +55,9 @@ make %{?_smp_mflags} check
 %{_docdir}/bison/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 3.8.2-2
+- Rebuild with build-id compiler fix
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.8.2-1
 - Auto-upgrade to 3.8.2 - Azure Linux 3.0 - package upgrades
 

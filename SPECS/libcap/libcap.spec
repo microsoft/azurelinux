@@ -1,7 +1,7 @@
 Summary:        Libcap
 Name:           libcap
 Version:        2.69
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Group:          System Environment/Security
 URL:            https://www.gnu.org/software/hurd/community/gsoc/project_ideas/libcap.html
@@ -62,6 +62,9 @@ sed -i '/echo "attempt to exploit kernel bug"/,/^fi$/d' quicktest.sh
 %{_mandir}/man3/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 2.69-6
+- Rebuild with build-id compiler fix
+
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.69-5
 - Bump to rebuild with updated glibc
 

@@ -1,7 +1,7 @@
 Summary:        High-Level Crypto API
 Name:           gpgme
 Version:        1.23.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+ and LGPLv2+ and MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -83,6 +83,9 @@ cd tests
 %{python3_sitearch}/gpg-%{version}-*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1.23.2-3
+- Rebuild with build-id compiler fix
+
 * Fri Feb 02 2024 Andrew Phelps <anphel@microsoft.com> - 1.23.2-2
 - Fix python3-gpg files location
 

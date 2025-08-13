@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
@@ -365,6 +365,9 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 3.3.3-3
+- Rebuild with build-id compiler fix
+
 * Mon Mar 17 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.3-2
 - Patch to fix segfaults and errors in openssl speed.
 

@@ -1,7 +1,7 @@
 Summary:        Math libraries
 Name:           gmp
 Version:        6.3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ AND GPLv3+ AND LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -67,6 +67,9 @@ make %{?_smp_mflags} check
 %{_docdir}/%{name}-%{version}/isa_abi_headache
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 6.3.0-2
+- Rebuild with build-id compiler fix
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.3.0-1
 - Auto-upgrade to 6.3.0 - Azure Linux 3.0 - package upgrades
 

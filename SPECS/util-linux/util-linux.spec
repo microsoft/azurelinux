@@ -2,7 +2,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.40.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -152,6 +152,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 2.40.2-2
+- Rebuild with build-id compiler fix
+
 * Wed Sep 18 2024 Vince Perri <viperri@microsoft.com> - 2.40.2-1
 - Upgrade to 2.40.2:
 -   Added --disable-liblastlog2 to avoid building new liblastlog2 libraries

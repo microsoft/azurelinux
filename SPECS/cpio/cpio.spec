@@ -1,7 +1,7 @@
 Summary:        cpio-2.13
 Name:           cpio
 Version:        2.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -58,6 +58,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 2.14-2
+- Rebuild with build-id compiler fix
+
 * Tue Nov 21 2023 Andrew Phelps <anphel@microsoft.com> - 2.14-1
 - Upgrade to version 2.14
 

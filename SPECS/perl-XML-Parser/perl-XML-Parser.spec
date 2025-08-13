@@ -1,7 +1,7 @@
 Summary:        XML-Parser perl module
 Name:           perl-XML-Parser
 Version:        2.47
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -55,6 +55,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 2.47-2
+- Rebuild with build-id compiler fix
+
 * Thu Feb 01 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.47-1
 - Upgrade to 2.47
 
