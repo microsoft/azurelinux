@@ -1,7 +1,7 @@
 Summary:        Unzip-6.0
 Name:           unzip
 Version:        6.0
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -59,6 +59,9 @@ ln -sf unzip %{buildroot}%{_bindir}/zipinfo
 %{_bindir}/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 6.0-23
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Tue Mar 25 2025 Archana Shettigar <v-shettigara@microsoft.com> - 6.0.22
 - Fix CVE-2021-4217 with an upstream patch
 

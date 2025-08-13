@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
 Version:        9.4
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -92,6 +92,9 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 9.4-7
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Thu Aug 8 2024 Chris Gunn <chrisgun@microsoft.com> - 9.4-6
 - Enable xattr and acl support.
 

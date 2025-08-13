@@ -1,7 +1,7 @@
 Summary:        Docbook-xml-4.5
 Name:           docbook-dtd-xml
 Version:        4.5
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        MIT
 URL:            https://www.docbook.org
 Source0:        https://docbook.org/xml/4.5/docbook-xml-%{version}.zip
@@ -161,6 +161,9 @@ fi
 /etc/xml
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 4.5-12
+- Bump to rebuild with build-id fix from toolchain gcc
+
 *   Tue May 05 2020 Emre Girgin <mrgirgin@microsoft.com> 4.5-11
 -   Renaming docbook-xml to docbook-dtd-xml
 *   Thu Apr 16 2020 Nick Samson <nisamson@microsoft.com> 4.5-10

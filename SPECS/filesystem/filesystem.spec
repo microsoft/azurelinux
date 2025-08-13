@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      21%{?dist}
+Release:      22%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -708,6 +708,9 @@ return 0
 %config(noreplace) /etc/modprobe.d/tipc.conf
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1.1-22
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Wed Mar 20 2024 Dan Streetman <ddstreet@microsoft.com> - 1.1-21
 - remove /srv and /var/srv
 

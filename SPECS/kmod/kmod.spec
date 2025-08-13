@@ -1,7 +1,7 @@
 Summary:        Utilities for loading kernel modules
 Name:           kmod
 Version:        30
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2.1+ AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -66,6 +66,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.so
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 30-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 30-1
 - Auto-upgrade to 30 - Azure Linux 3.0 - package upgrades
 

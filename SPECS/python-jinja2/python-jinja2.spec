@@ -1,7 +1,7 @@
 Summary:        A fast and easy to use template engine written in pure Python
 Name:           python-jinja2
 Version:        3.1.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -60,6 +60,9 @@ tox -v -e py%{python3_version_nodots} --
 %{python3_sitelib}/Jinja2-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 3.1.2-4
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Fri Mar 07 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.1.2-3
 - Address CVE-2025-27516 with an upstream patch and fix the ptest
 

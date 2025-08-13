@@ -1,7 +1,7 @@
 Summary:        Connects C/C++/Objective C to some high-level programming languages
 Name:           swig
 Version:        4.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -64,6 +64,9 @@ ln -fs ../../bin/ccache-swig %{buildroot}%{_libdir}/ccache/swig
 %{_libdir}/ccache
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 4.2.1-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 4.2.1-1
 - Upgrade to 4.2.1
 - Add swig-java-Avoid-using-deprecated-API-in-doxygen-example patch from Fedora

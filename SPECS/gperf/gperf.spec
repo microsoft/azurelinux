@@ -1,7 +1,7 @@
 Summary:	Gperf
 Name:		gperf
 Version:	3.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:	GPLv3+
 URL:		http://freedesktop.org/wiki/Software/%{name}l/
 Source0:	http://ftp.gnu.org/gnu/gperf/%{name}-%{version}.tar.gz
@@ -42,6 +42,9 @@ make %{?_smp_mflags} check
 %{_bindir}/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 3.1-6
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.1-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

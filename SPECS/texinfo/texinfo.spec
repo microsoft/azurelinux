@@ -1,7 +1,7 @@
 Summary:        Reading, writing, and converting info pages
 Name:           texinfo
 Version:        7.0.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/texinfo/
 Group:          Applications/System
@@ -61,6 +61,9 @@ rm -rf %{buildroot}%{_infodir}
 %{_datarootdir}/texmf/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 7.0.3-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.0.3-1
 - Auto-upgrade to 7.0.3 - Azure Linux 3.0 - package upgrades
 

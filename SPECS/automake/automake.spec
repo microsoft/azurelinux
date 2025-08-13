@@ -1,7 +1,7 @@
 Summary:	Programs for generating Makefiles
 Name:		automake
 Version:	1.16.5
-Release:	2%{?dist}
+Release:	3%{?dist}
 License:	GPLv2+
 URL:		https://www.gnu.org/software/automake/
 Group:		System Environment/Base
@@ -45,6 +45,9 @@ make %{?_smp_mflags} check
 %{_defaultdocdir}/%{name}-%{version}/*
 %{_mandir}/*/*
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1.16.5-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Tue July 30 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.16.5-2
 - Add missing runtime Requires: perl(Thread::Queue), perl(threads) and autoconf
 

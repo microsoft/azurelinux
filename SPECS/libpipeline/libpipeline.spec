@@ -1,7 +1,7 @@
 Summary:        Library for manipulating pipelines
 Name:           libpipeline
 Version:        1.5.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -54,6 +54,9 @@ make -C tests check
 %{_mandir}/man3/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1.5.7-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.7-1
 - Auto-upgrade to 1.5.7 - Azure Linux 3.0 - package upgrades
 

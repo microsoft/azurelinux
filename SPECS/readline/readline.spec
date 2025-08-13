@@ -1,7 +1,7 @@
 Summary:        Command-line editing and history capabilities
 Name:           readline
 Version:        8.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -111,6 +111,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/history.pc
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 8.2-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Tue Mar 11 2025 Thien Trung Vuong <tvuong@microsoft.com> - 8.2-2
 - Add patch to fix readline crash when initialized with an invalid locale specification
 

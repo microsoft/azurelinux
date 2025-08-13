@@ -1,7 +1,7 @@
 Summary:        Library for accessing X.509 and CMS data structure.
 Name:           libksba
 Version:        1.6.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 # See AUTHORS file for licensing details
 License:        (LGPLv3+ or GPLv2+) and GPLv3+ 
 Vendor:         Microsoft Corporation
@@ -57,6 +57,9 @@ rm -rf %{buildroot}%{_infodir}
 %{_libdir}/pkgconfig/ksba.pc
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 1.6.4-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.4-1
 - Auto-upgrade to 1.6.4 - Azure Linux 3.0 - package upgrades
 

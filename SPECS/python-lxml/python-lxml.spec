@@ -3,7 +3,7 @@
 Summary:        XML and HTML with Python
 Name:           python-lxml
 Version:        4.9.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 # Test suite (and only the test suite) is GPLv2+
 License:        BSD and GPLv2+
 Vendor:         Microsoft Corporation
@@ -53,6 +53,9 @@ make test
 %{python3_sitelib}/*
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 4.9.3-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 4.9.3-1
 - Upgrade to version 4.9.3
 

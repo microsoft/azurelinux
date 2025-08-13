@@ -1,7 +1,7 @@
 Summary:        Shared libraries, portable interface
 Name:           libtool
 Version:        2.4.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 URL:            http://www.gnu.org/software/libtool
 Group:          Development/Tools
@@ -81,6 +81,9 @@ make %{?_smp_mflags} check
 %{_libdir}/libltdl.so.7.3.2
 
 %changelog
+* Wed Aug 13 2025 Andrew Phelps <anphel@microsoft.com> - 2.4.7-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.7-1
 - Auto-upgrade to 2.4.7 - Azure Linux 3.0 - package upgrades
 
