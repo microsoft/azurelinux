@@ -13,8 +13,8 @@ Patch2:         jasper-2.0.14-rpath.patch
 Patch100:       jasper-2.0.2-test-ppc64-disable.patch
 Patch101:       jasper-2.0.2-test-ppc64le-disable.patch
 Patch102:       CVE-2023-51257.patch
-Patch104:       CVE-2025-8837.patch
 Patch103:       CVE-2025-8836.patch
+Patch104:       CVE-2025-8837.patch
 # autoreconf
 BuildRequires:  cmake
 BuildRequires:  gcc
