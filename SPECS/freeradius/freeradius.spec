@@ -869,6 +869,10 @@ EOF
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/rest
 
 %changelog
+* Wed Aug 13 2025 Suneel Yadava <suneelyadava@microsoft.com> - 3.2.5-4
+- Promoted pacakages to core (moved from SPECS-EXTENDED to SPECS).
+- License verified.
+
 * Fri Jan 31 2025 Jyoti kanase <v-jykanase@microsoft.com> -  3.2.5-3
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
