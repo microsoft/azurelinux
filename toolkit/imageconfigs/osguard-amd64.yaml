@@ -137,6 +137,7 @@ os:
       - curl
       - bind-utils
       - tar
+      - wget
       # =====AKS=====
       - blobfuse2
       - ca-certificates

@@ -9381,8 +9381,8 @@
         "type": "other",
         "other": {
           "name": "libetonyek",
-          "version": "0.1.9",
-          "downloadUrl": "http://dev-www.libreoffice.org/src/libetonyek/libetonyek-0.1.9.tar.xz"
+          "version": "0.1.12",
+          "downloadUrl": "https://dev-www.libreoffice.org/src/libetonyek/libetonyek-0.1.12.tar.xz"
         }
       }
     },
@@ -18333,8 +18333,8 @@
         "type": "other",
         "other": {
           "name": "perl-Locale-Maketext-Gettext",
-          "version": "1.30",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IM/IMACAT/Locale-Maketext-Gettext-1.30.tar.gz"
+          "version": "1.32",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IM/IMACAT/Locale-Maketext-Gettext-1.32.tar.gz"
         }
       }
     },

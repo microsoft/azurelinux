@@ -12,14 +12,7 @@ rm -f "$REPART_DIR"/*.conf
 
 emit_partition() {
     local num="$1" part="$2" type="$3" label="$4" size="$5"
-    # Set Type for root and root-hash partitions
-    if [[ "$part" =~ ^usr-(a|b)$ ]]; then
-        type_out="usr"
-    elif [[ "$part" =~ ^usr-hash-(a|b)$ ]]; then
-        type_out="usr-verity"
-    else
-        type_out="$type"
-    fi
+    type_out="$type"
     
     # Ensure label is never null
     if [[ -z "$label" || "$label" == "null" ]]; then
