@@ -72,11 +72,14 @@ groupadd test
 useradd test -g test -m
 chown -R test:test .
 
+echo "Detected architecture: %{_arch}"
 # In case of failure, print the test log.
-# merge_large_tests is a large test that takes a long time to run and eventually times out and fails.
+%if "%{_arch}" == "aarch64"
+# merge_large_tests takes long time to run and eventually times out and fails.
 sudo -u test ctest -E merge_large_tests || { cat Testing/Temporary/LastTest.log || echo 'No log found'; false; }
-
-
+%else
+sudo -u test ctest || { cat Testing/Temporary/LastTest.log || echo 'No log found'; false; }
+%endif
 
 %files
 %defattr(-,root,root)
