@@ -196,7 +196,8 @@ func Create(
 			logger.Log.Infof("Using ManagedIdentityCredential with supplied Azure client ID "+
 				"for managed identity access: %s", azureClientID)
 			// HACK FOR TEST
-			credential, err = azidentity.NewAzureCLICredential(nil)
+			//credential, err = azidentity.NewAzureCLICredential(nil)
+			credential, err = azidentity.NewManagedIdentityCredential(nil)
 
 			// credential, err = azidentity.NewManagedIdentityCredential(
 			// 	&azidentity.ManagedIdentityCredentialOptions{
