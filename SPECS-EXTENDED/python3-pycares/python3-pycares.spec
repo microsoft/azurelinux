@@ -1,7 +1,7 @@
 # set upstream name variable
 %global srcname pycares
 
-Name:           python-pycares
+Name:           python3-pycares
 Version:        4.5.0
 Release:        1%{?dist}
 Summary:        Python interface for c-ares
@@ -31,21 +31,12 @@ pycares is a Python module which provides an interface to
 c-ares. c-ares is a C library that performs DNS requests and name
 resolutions asynchronously.
 
-%package     -n python3-%{srcname}
-Summary:        Python interface for c-ares
-%{?python_provide:%python_provide python3-%{srcname}}
-
-%description -n python3-%{srcname}
-pycares is a Python module which provides an interface to
-c-ares. c-ares is a C library that performs DNS requests and name
-resolutions asynchronously.
-
-%package     -n python-%{srcname}-doc
+%package     -n python3-%{srcname}-doc
 Summary:        Documentation for python-pycares
 BuildArch:      noarch
 Requires:       python3-%{srcname} = %{version}-%{release}
 
-%description -n python-%{srcname}-doc
+%description -n python3-%{srcname}-doc
 pycares is a Python module which provides an interface to
 c-ares. c-ares is a C library that performs DNS requests and name
 resolutions asynchronously.
@@ -88,12 +79,12 @@ PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitearch}/%{srcname}/
 %{python3_sitearch}/%{srcname}-%{version}-py%{python3_version}.egg-info/
 
-%files -n python-%{srcname}-doc
+%files -n python3-%{srcname}-doc
 %doc examples/
 %{_pkgdocdir}/
 
 %changelog
-* Thu Feb 20 2025 Akhila Guruju <v-guakhila@microsoft.com> - 4.5.0-1
+* Wed Aug 13 2025 Akhila Guruju <v-guakhila@microsoft.com> - 4.5.0-1
 - Upgrade to 4.5.0 by taking reference from Fedora 41 spec (license: MIT).
 - License verified.
 - Added BR on python3-sphinxcontrib-jquery to fix build.
