@@ -1,7 +1,6 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
-%define hwe_version 1
 %define short_name 64k-hwe
 
 # find_debuginfo.sh arguments are set by default in rpm's macros.
@@ -30,7 +29,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe-%{hwe_version}/%{version}.tar.gz#/kernel-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/%{version}.tar.gz#/kernel-%{version}.tar.gz
 Source1:        config_aarch64
 Source2:        sha512hmac-openssl.sh
 Source3:        azurelinux-ca-20230216.pem
@@ -154,7 +153,7 @@ This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
 %prep
-%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-hwe-%{hwe_version}-%{version}
+%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-hwe-%{version}
 make mrproper
 
 cp %{config_source} .config
