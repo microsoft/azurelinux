@@ -1,5 +1,3 @@
-%define hwe 1
-
 # This package doesn't contain any binaries, thus no debuginfo package is needed.
 %global debug_package %{nil}
 
@@ -40,7 +38,7 @@ cross-glibc package.
 %endif
 
 %prep
-%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-hwe-%{hwe}-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-hwe-%{version}
 
 %build
 make mrproper
