@@ -25,15 +25,15 @@ Patch5:	multi-snapshotters-support.patch
 Patch6:	tardev-support.patch
 
 # Erofs Snapshotter patches
-# Patches made from https://github.com/aadhar-agarwal/containerd/commits/aadagarwal/containerd2/erofs-snapshotter-main
+# Patches made from https://github.com/aadhar-agarwal/containerd/commits/aadagarwal/containerd-2.0.0/erofs-snapshotter-main/
 
 # This patch has the erofs snapshotter changes in containerd 2.1.2
-# To create this patch: git format-patch f0f8799^..345e5e4 --stdout > erofs-snapshotter-initial-implementation.patch
+# To create this patch: git format-patch 42831e9^..1ce7e1d --stdout > erofs-snapshotter-initial-implementation.patch
 Patch7: erofs-snapshotter-initial-implementation.patch
 
 # This patch has additional changes not in containerd 2.1.2
 # Tar index mode, dmverity and local signature support
-# To create this patch: git format-patch 8213fdc^..bea5a79 --stdout > erofs-snapshotter-additions.patch
+# To create this patch: git format-patch 9270bd4^..c15fff0 --stdout > erofs-snapshotter-additions.patch
 Patch8: erofs-snapshotter-additions.patch
 
 %{?systemd_requires}

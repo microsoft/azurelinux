@@ -1,4 +1,4 @@
-From 8213fdc2f14d713872ebf99495d9e5569f506a06 Mon Sep 17 00:00:00 2001
+From 9270bd43b1e15bc9ce7a3d1dc03b82621d75a7dd Mon Sep 17 00:00:00 2001
 From: Aadhar Agarwal <aadagarwal@microsoft.com>
 Date: Wed, 21 May 2025 23:34:56 +0000
 Subject: [PATCH 1/5] erofs snapshotter: Add tar index mode
@@ -272,7 +272,7 @@ index 735afd131..89ba98866 100644
 2.45.3
 
 
-From bdc4e7660dce6f3dc7e0c05ea98dd9357cebb2e5 Mon Sep 17 00:00:00 2001
+From d06938f5fd2190b2e861f67a9d4b93f6e66cfcb9 Mon Sep 17 00:00:00 2001
 From: ChengyuZhu6 <hudson@cyzhu.com>
 Date: Wed, 23 Apr 2025 16:59:43 +0800
 Subject: [PATCH 2/5] Add dmverity support in the erofs snapshotter
@@ -924,10 +924,10 @@ index 000000000..cda39972b
 +	}
 +}
 diff --git a/plugins/snapshots/erofs/erofs_linux.go b/plugins/snapshots/erofs/erofs_linux.go
-index 3993b3261..a6e5075c7 100644
+index 66a9d0b1d..fc4b520f8 100644
 --- a/plugins/snapshots/erofs/erofs_linux.go
 +++ b/plugins/snapshots/erofs/erofs_linux.go
-@@ -23,19 +23,21 @@ import (
+@@ -22,19 +22,21 @@ import (
  	"fmt"
  	"os"
  	"path/filepath"
@@ -954,7 +954,7 @@ index 3993b3261..a6e5075c7 100644
  )
  
  // SnapshotterConfig is used to configure the erofs snapshotter instance
-@@ -44,6 +46,8 @@ type SnapshotterConfig struct {
+@@ -43,6 +45,8 @@ type SnapshotterConfig struct {
  	ovlOptions []string
  	// enableFsverity enables fsverity for EROFS layers
  	enableFsverity bool
@@ -963,7 +963,7 @@ index 3993b3261..a6e5075c7 100644
  }
  
  // Opt is an option to configure the erofs snapshotter
-@@ -63,6 +67,13 @@ func WithFsverity() Opt {
+@@ -62,6 +66,13 @@ func WithFsverity() Opt {
  	}
  }
  
@@ -977,7 +977,7 @@ index 3993b3261..a6e5075c7 100644
  type MetaStore interface {
  	TransactionContext(ctx context.Context, writable bool) (context.Context, storage.Transactor, error)
  	WithTransaction(ctx context.Context, writable bool, fn storage.TransactionCallback) error
-@@ -74,6 +85,7 @@ type snapshotter struct {
+@@ -73,6 +84,7 @@ type snapshotter struct {
  	ms             *storage.MetaStore
  	ovlOptions     []string
  	enableFsverity bool
@@ -985,7 +985,7 @@ index 3993b3261..a6e5075c7 100644
  }
  
  // check if EROFS kernel filesystem is registered or not
-@@ -132,6 +144,16 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
+@@ -131,6 +143,16 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
  		}
  	}
  
@@ -1002,7 +1002,7 @@ index 3993b3261..a6e5075c7 100644
  	ms, err := storage.NewMetaStore(filepath.Join(root, "metadata.db"))
  	if err != nil {
  		return nil, err
-@@ -146,11 +168,30 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
+@@ -145,11 +167,30 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
  		ms:             ms,
  		ovlOptions:     config.ovlOptions,
  		enableFsverity: config.enableFsverity,
@@ -1033,7 +1033,7 @@ index 3993b3261..a6e5075c7 100644
  	return s.ms.Close()
  }
  
-@@ -166,6 +207,94 @@ func (s *snapshotter) workPath(id string) string {
+@@ -165,6 +206,94 @@ func (s *snapshotter) workPath(id string) string {
  func (s *snapshotter) layerBlobPath(id string) string {
  	return filepath.Join(s.root, "snapshots", id, "layer.erofs")
  }
@@ -1128,7 +1128,7 @@ index 3993b3261..a6e5075c7 100644
  
  func (s *snapshotter) lowerPath(id string) (mount.Mount, string, error) {
  	layerBlob := s.layerBlobPath(id)
-@@ -206,8 +335,12 @@ func (s *snapshotter) prepareDirectory(ctx context.Context, snapshotDir string,
+@@ -205,8 +334,12 @@ func (s *snapshotter) prepareDirectory(ctx context.Context, snapshotDir string,
  func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]mount.Mount, error) {
  	var options []string
  
@@ -1142,7 +1142,7 @@ index 3993b3261..a6e5075c7 100644
  		if err == nil {
  			if snap.Kind != snapshots.KindView {
  				return nil, fmt.Errorf("only works for snapshots.KindView on a committed snapshot: %w", err)
-@@ -217,8 +350,17 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+@@ -216,8 +349,17 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
  					return nil, err
  				}
  			}
@@ -1161,7 +1161,7 @@ index 3993b3261..a6e5075c7 100644
  			return []mount.Mount{m}, nil
  		}
  		// if we only have one layer/no parents then just return a bind mount as overlay
-@@ -239,34 +381,48 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+@@ -238,34 +380,48 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
  		}, nil
  	}
  
@@ -1209,13 +1209,13 @@ index 3993b3261..a6e5075c7 100644
 +		if !s.enableDmverity && mntpoint != m.Source && !isErofs(mntpoint) {
  			err := m.Mount(mntpoint)
  			// Use loop if the current kernel (6.12+) doesn't support file-backed mount
--			if errors.Is(err, unix.ENOTBLK) {
+-			if err == unix.ENOTBLK {
 +			// Skip 'loop' if using dmverity device
-+			if errors.Is(err, unix.ENOTBLK) && (!s.enableDmverity || !strings.HasPrefix(m.Source, "/dev/mapper/")) {
++			if err == unix.ENOTBLK && (!s.enableDmverity || !strings.HasPrefix(m.Source, "/dev/mapper/")) {
  				m.Options = append(m.Options, "loop")
  				err = m.Mount(mntpoint)
  			}
-@@ -274,11 +430,33 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+@@ -273,11 +429,33 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
  				return nil, err
  			}
  		}
@@ -1250,7 +1250,7 @@ index 3993b3261..a6e5075c7 100644
  	return []mount.Mount{{
  		Type:    "overlay",
  		Source:  "overlay",
-@@ -359,6 +537,13 @@ func (s *snapshotter) View(ctx context.Context, key, parent string, opts ...snap
+@@ -358,6 +536,13 @@ func (s *snapshotter) View(ctx context.Context, key, parent string, opts ...snap
  	return s.createSnapshot(ctx, snapshots.KindView, key, parent, opts)
  }
  
@@ -1264,7 +1264,7 @@ index 3993b3261..a6e5075c7 100644
  func setImmutable(path string, enable bool) error {
  	//nolint:revive	// silence "don't use ALL_CAPS in Go names; use CamelCase"
  	const (
-@@ -432,10 +617,19 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
+@@ -431,10 +616,19 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
  				return fmt.Errorf("failed to enable fsverity: %w", err)
  			}
  		}
@@ -1287,7 +1287,7 @@ index 3993b3261..a6e5075c7 100644
  		return nil
  	})
  
-@@ -513,6 +707,7 @@ func (s *snapshotter) getCleanupDirectories(ctx context.Context) ([]string, erro
+@@ -512,6 +706,7 @@ func (s *snapshotter) getCleanupDirectories(ctx context.Context) ([]string, erro
  func (s *snapshotter) Remove(ctx context.Context, key string) (err error) {
  	var removals []string
  	var id string
@@ -1295,7 +1295,7 @@ index 3993b3261..a6e5075c7 100644
  	// Remove directories after the transaction is closed, failures must not
  	// return error since the transaction is committed with the removal
  	// key no longer available.
-@@ -522,6 +717,10 @@ func (s *snapshotter) Remove(ctx context.Context, key string) (err error) {
+@@ -521,6 +716,10 @@ func (s *snapshotter) Remove(ctx context.Context, key string) (err error) {
  				log.G(ctx).Warnf("failed to unmount EROFS mount for %v", id)
  			}
  
@@ -1306,7 +1306,7 @@ index 3993b3261..a6e5075c7 100644
  			for _, dir := range removals {
  				if err := os.RemoveAll(dir); err != nil {
  					log.G(ctx).WithError(err).WithField("path", dir).Warn("failed to remove directory")
-@@ -543,6 +742,11 @@ func (s *snapshotter) Remove(ctx context.Context, key string) (err error) {
+@@ -542,6 +741,11 @@ func (s *snapshotter) Remove(ctx context.Context, key string) (err error) {
  		}
  		// The layer blob is only persisted for committed snapshots.
  		if k == snapshots.KindCommitted {
@@ -1318,7 +1318,7 @@ index 3993b3261..a6e5075c7 100644
  			// Clear IMMUTABLE_FL before removal, since this flag avoids it.
  			err = setImmutable(s.layerBlobPath(id), false)
  			if err != nil {
-@@ -628,3 +832,18 @@ func (s *snapshotter) verifyFsverity(path string) error {
+@@ -627,3 +831,18 @@ func (s *snapshotter) verifyFsverity(path string) error {
  	}
  	return nil
  }
@@ -1366,7 +1366,7 @@ index 5fb524138..e96a09181 100644
 2.45.3
 
 
-From 954cacab508bf06d8dd47d28bce64d42dccc9f80 Mon Sep 17 00:00:00 2001
+From 84781785eaadd2148947521a80f16e6c894d2c0e Mon Sep 17 00:00:00 2001
 From: Aadhar Agarwal <aadagarwal@microsoft.com>
 Date: Thu, 26 Jun 2025 21:48:20 +0000
 Subject: [PATCH 3/5] Integrate tar index with dmverity
@@ -1399,7 +1399,7 @@ index 74948d52a..204ecc85b 100644
 2.45.3
 
 
-From 810e0572bea74b0c7920e381ed030de96158e692 Mon Sep 17 00:00:00 2001
+From d96d1146d162ad4823c3719e1414f7bbed820f8b Mon Sep 17 00:00:00 2001
 From: aadhar-agarwal <108542189+aadhar-agarwal@users.noreply.github.com>
 Date: Thu, 24 Jul 2025 18:31:47 -0700
 Subject: [PATCH 4/5] Add local signature support (#5)
@@ -1559,7 +1559,7 @@ index 6e518712a..c4bf213f5 100644
  	fmt.Println("veritysetup command: veritysetup", cmdArgs)
  	execCmd := exec.Command("veritysetup", cmdArgs...)
 diff --git a/plugins/snapshots/erofs/erofs_linux.go b/plugins/snapshots/erofs/erofs_linux.go
-index a6e5075c7..317ba9947 100644
+index fc4b520f8..9eb93401b 100644
 --- a/plugins/snapshots/erofs/erofs_linux.go
 +++ b/plugins/snapshots/erofs/erofs_linux.go
 @@ -19,6 +19,8 @@ package erofs
@@ -1568,10 +1568,10 @@ index a6e5075c7..317ba9947 100644
  	"context"
 +	"encoding/base64"
 +	"encoding/json"
- 	"errors"
  	"fmt"
  	"os"
-@@ -34,6 +36,7 @@ import (
+ 	"path/filepath"
+@@ -33,6 +35,7 @@ import (
  	"github.com/containerd/containerd/v2/internal/dmverity"
  	"github.com/containerd/containerd/v2/internal/erofsutils"
  	"github.com/containerd/containerd/v2/internal/fsverity"
@@ -1579,7 +1579,7 @@ index a6e5075c7..317ba9947 100644
  	"github.com/containerd/continuity/fs"
  	"github.com/containerd/log"
  	"github.com/containerd/plugin"
-@@ -80,12 +83,135 @@ type MetaStore interface {
+@@ -79,12 +82,135 @@ type MetaStore interface {
  	Close() error
  }
  
@@ -1720,7 +1720,7 @@ index a6e5075c7..317ba9947 100644
  }
  
  // check if EROFS kernel filesystem is registered or not
-@@ -163,13 +289,27 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
+@@ -162,13 +288,27 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
  		return nil, err
  	}
  
@@ -1755,7 +1755,7 @@ index a6e5075c7..317ba9947 100644
  }
  
  // Close closes the snapshotter
-@@ -207,7 +347,8 @@ func (s *snapshotter) workPath(id string) string {
+@@ -206,7 +346,8 @@ func (s *snapshotter) workPath(id string) string {
  func (s *snapshotter) layerBlobPath(id string) string {
  	return filepath.Join(s.root, "snapshots", id, "layer.erofs")
  }
@@ -1765,7 +1765,7 @@ index a6e5075c7..317ba9947 100644
  	layerBlob := s.layerBlobPath(id)
  	if _, err := os.Stat(layerBlob); err != nil {
  		return fmt.Errorf("failed to find valid erofs layer blob: %w", err)
-@@ -235,14 +376,21 @@ func (s *snapshotter) formatLayerBlob(id string) error {
+@@ -234,14 +375,21 @@ func (s *snapshotter) formatLayerBlob(id string) error {
  		if err != nil {
  			return fmt.Errorf("failed to format dmverity: %w", err)
  		}
@@ -1788,7 +1788,7 @@ index a6e5075c7..317ba9947 100644
  	layerBlob := s.layerBlobPath(id)
  	if _, err := os.Stat(layerBlob); err != nil {
  		return "", fmt.Errorf("failed to find valid erofs layer blob: %w", err)
-@@ -251,7 +399,7 @@ func (s *snapshotter) runDmverity(id string) (string, error) {
+@@ -250,7 +398,7 @@ func (s *snapshotter) runDmverity(id string) (string, error) {
  	devicePath := fmt.Sprintf("/dev/mapper/%s", dmName)
  	if _, err := os.Stat(devicePath); err == nil {
  		status, err := dmverity.Status(dmName)
@@ -1797,7 +1797,7 @@ index a6e5075c7..317ba9947 100644
  		if err != nil {
  			return "", fmt.Errorf("failed to get dmverity device status: %w", err)
  		}
-@@ -277,10 +425,24 @@ func (s *snapshotter) runDmverity(id string) (string, error) {
+@@ -276,10 +424,24 @@ func (s *snapshotter) runDmverity(id string) (string, error) {
  		}
  	}
  
@@ -1823,7 +1823,7 @@ index a6e5075c7..317ba9947 100644
  		_, err = dmverity.Open(layerBlob, dmName, layerBlob, string(rootHash), &opts)
  		if err != nil {
  			return "", fmt.Errorf("failed to open dmverity device: %w", err)
-@@ -332,15 +494,15 @@ func (s *snapshotter) prepareDirectory(ctx context.Context, snapshotDir string,
+@@ -331,15 +493,15 @@ func (s *snapshotter) prepareDirectory(ctx context.Context, snapshotDir string,
  	return td, nil
  }
  
@@ -1844,7 +1844,7 @@ index a6e5075c7..317ba9947 100644
  		if err == nil {
  			if snap.Kind != snapshots.KindView {
  				return nil, fmt.Errorf("only works for snapshots.KindView on a committed snapshot: %w", err)
-@@ -350,9 +512,9 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+@@ -349,9 +511,9 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
  					return nil, err
  				}
  			}
@@ -1856,7 +1856,7 @@ index a6e5075c7..317ba9947 100644
  					return nil, err
  				}
  			}
-@@ -381,21 +543,29 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+@@ -380,21 +542,29 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
  		}, nil
  	}
  
@@ -1890,7 +1890,7 @@ index a6e5075c7..317ba9947 100644
  				return nil, err
  			}
  		}
-@@ -408,7 +578,7 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+@@ -407,7 +577,7 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
  		return []mount.Mount{m}, nil
  	}
  
@@ -1899,7 +1899,7 @@ index a6e5075c7..317ba9947 100644
  	var lowerdirs []string
  	for i := range snap.ParentIDs {
  		m, mntpoint, err := s.lowerPath(snap.ParentIDs[i])
-@@ -431,7 +601,7 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+@@ -430,7 +600,7 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
  			}
  		}
  		if s.enableDmverity {
@@ -1908,7 +1908,7 @@ index a6e5075c7..317ba9947 100644
  			if err != nil {
  				return nil, err
  			}
-@@ -453,10 +623,10 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+@@ -452,10 +622,10 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
  		}
  		lowerdirs = append(lowerdirs, mntpoint)
  	}
@@ -1921,7 +1921,7 @@ index a6e5075c7..317ba9947 100644
  	return []mount.Mount{{
  		Type:    "overlay",
  		Source:  "overlay",
-@@ -526,14 +696,16 @@ func (s *snapshotter) createSnapshot(ctx context.Context, kind snapshots.Kind, k
+@@ -525,14 +695,16 @@ func (s *snapshotter) createSnapshot(ctx context.Context, kind snapshots.Kind, k
  	}); err != nil {
  		return nil, err
  	}
@@ -1939,7 +1939,7 @@ index a6e5075c7..317ba9947 100644
  	return s.createSnapshot(ctx, snapshots.KindView, key, parent, opts)
  }
  
-@@ -570,12 +742,14 @@ func setImmutable(path string, enable bool) error {
+@@ -569,12 +741,14 @@ func setImmutable(path string, enable bool) error {
  }
  
  func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snapshots.Opt) error {
@@ -1956,7 +1956,7 @@ index a6e5075c7..317ba9947 100644
  		if err != nil {
  			return err
  		}
-@@ -619,7 +793,7 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
+@@ -618,7 +792,7 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
  		}
  
  		if s.enableDmverity {
@@ -1965,7 +1965,7 @@ index a6e5075c7..317ba9947 100644
  			// _, err := s.runDmverity(id)
  			if err != nil {
  				return fmt.Errorf("failed to run dmverity: %w", err)
-@@ -641,18 +815,35 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
+@@ -640,18 +814,35 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
  			return fmt.Errorf("failed to get the converted erofs blob: %w", err)
  		}
  
@@ -2002,7 +2002,7 @@ index a6e5075c7..317ba9947 100644
  	var snap storage.Snapshot
  	var info snapshots.Info
  	if err := s.ms.WithTransaction(ctx, false, func(ctx context.Context) error {
-@@ -669,7 +860,7 @@ func (s *snapshotter) Mounts(ctx context.Context, key string) (_ []mount.Mount,
+@@ -668,7 +859,7 @@ func (s *snapshotter) Mounts(ctx context.Context, key string) (_ []mount.Mount,
  	}); err != nil {
  		return nil, err
  	}
@@ -2011,7 +2011,7 @@ index a6e5075c7..317ba9947 100644
  }
  
  func (s *snapshotter) getCleanupDirectories(ctx context.Context) ([]string, error) {
-@@ -705,9 +896,10 @@ func (s *snapshotter) getCleanupDirectories(ctx context.Context) ([]string, erro
+@@ -704,9 +895,10 @@ func (s *snapshotter) getCleanupDirectories(ctx context.Context) ([]string, erro
  // immediately become unavailable and unrecoverable. Disk space will
  // be freed up on the next call to `Cleanup`.
  func (s *snapshotter) Remove(ctx context.Context, key string) (err error) {
@@ -2023,7 +2023,7 @@ index a6e5075c7..317ba9947 100644
  	// Remove directories after the transaction is closed, failures must not
  	// return error since the transaction is committed with the removal
  	// key no longer available.
-@@ -742,7 +934,7 @@ func (s *snapshotter) Remove(ctx context.Context, key string) (err error) {
+@@ -741,7 +933,7 @@ func (s *snapshotter) Remove(ctx context.Context, key string) (err error) {
  		}
  		// The layer blob is only persisted for committed snapshots.
  		if k == snapshots.KindCommitted {
@@ -2032,7 +2032,7 @@ index a6e5075c7..317ba9947 100644
  			if err := s.closeDmverityDevice(id); err != nil {
  				log.G(ctx).WithError(err).Warnf("failed to close dmverity device for %v", id)
  			}
-@@ -847,3 +1039,141 @@ func (s *snapshotter) closeDmverityDevice(id string) error {
+@@ -846,3 +1038,141 @@ func (s *snapshotter) closeDmverityDevice(id string) error {
  	}
  	return nil
  }
@@ -2178,7 +2178,7 @@ index a6e5075c7..317ba9947 100644
 2.45.3
 
 
-From bea5a79bd54bfb9b28266e98ed74a0ec73a60bdf Mon Sep 17 00:00:00 2001
+From c15fff0c3bf8df91bc8e78db661be708800ae5af Mon Sep 17 00:00:00 2001
 From: aadhar-agarwal <108542189+aadhar-agarwal@users.noreply.github.com>
 Date: Tue, 12 Aug 2025 15:02:47 -0700
 Subject: [PATCH 5/5] Fix log statement formatting in runDmverity function (#7)
@@ -2188,10 +2188,10 @@ Subject: [PATCH 5/5] Fix log statement formatting in runDmverity function (#7)
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/plugins/snapshots/erofs/erofs_linux.go b/plugins/snapshots/erofs/erofs_linux.go
-index 317ba9947..6efa6c891 100644
+index 9eb93401b..644669cd7 100644
 --- a/plugins/snapshots/erofs/erofs_linux.go
 +++ b/plugins/snapshots/erofs/erofs_linux.go
-@@ -399,7 +399,7 @@ func (s *snapshotter) runDmverity(ctx context.Context, id string) (string, error
+@@ -398,7 +398,7 @@ func (s *snapshotter) runDmverity(ctx context.Context, id string) (string, error
  	devicePath := fmt.Sprintf("/dev/mapper/%s", dmName)
  	if _, err := os.Stat(devicePath); err == nil {
  		status, err := dmverity.Status(dmName)
