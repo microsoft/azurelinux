@@ -2228,6 +2228,12 @@
                 "python-resolvelib"
             ]
         },
+        "Fedora (Apache-2.0 WITH LLVM-exception OR BSL-1.0)": {
+            "license": "[Apache-2.0 WITH LLVM-exception](/LICENSES-AND-NOTICES/SPECS/LICENSE-Apache2-LLVM.md) OR [BSL-1.0](/LICENSES-AND-NOTICES/SPECS/LICENSE-BSL.md)",
+            "specs": [
+                "dragonbox"
+            ]
+        },
         "Magnus Edenhill Open Source": {
             "license": "[Magnus Edenhill Open Source BSD License](https://github.com/jemalloc/jemalloc/blob/dev/COPYING)",
             "specs": [
