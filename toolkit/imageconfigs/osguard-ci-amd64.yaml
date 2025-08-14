@@ -73,7 +73,7 @@ os:
     - rd.hostonly=0
     - fips=1
     - net.ifnames=1
-    - ipe.enforce=1
+    - dm_verity.require_signatures=1
   packages:
     remove:
     - dracut-hostonly
@@ -84,7 +84,6 @@ os:
     - WALinuxAgent
     - device-mapper
     - kernel-ipe
-    - veritysetup
     - cni
     - containerd2
     - cri-tools
@@ -152,7 +151,7 @@ os:
     destination: /etc/repart.d
     childFilePermissions: 644
   additionalFiles:
-  - source: files/linuxguard/selinux-ci-uki.semanage
+  - source: files/osguard/selinux-ci-uki.semanage
     destination: /etc/selinux/targeted/selinux-ci.semanage
   - source: files/osguard/cloud.cfg
     destination: /etc/cloud/cloud.cfg
