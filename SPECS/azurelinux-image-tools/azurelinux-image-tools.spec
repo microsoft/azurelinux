@@ -46,6 +46,7 @@ Requires: binutils
 Requires: lsof
 Requires: python3
 Requires: python3-pip
+Requires: python3-venv
 Requires: jq
 %ifarch x86_64
 Requires: grub2-pc
@@ -73,6 +74,17 @@ make -C toolkit go-imagecustomizer REBUILD_TOOLS=y SKIP_LICENSE_SCAN=y
 mkdir -p %{buildroot}%{_bindir}
 install -p -m 0755 toolkit/out/tools/imagecustomizer %{buildroot}%{_bindir}/imagecustomizer
 
+# Install container support files for imagecustomizer subpackage
+# These files are used when building the imagecustomizer container
+mkdir -p %{buildroot}/usr/local/bin
+mkdir -p %{buildroot}/
+
+# Copy container scripts from their source locations to container paths
+install -p -m 0755 toolkit/tools/imagecustomizer/container/entrypoint.sh %{buildroot}/usr/local/bin/imagecustomizer-entrypoint.sh
+install -p -m 0755 toolkit/tools/imagecustomizer/container/run.sh %{buildroot}/usr/local/bin/imagecustomizer-run.sh
+install -p -m 0755 toolkit/scripts/telemetry_hopper/telemetry_hopper.py %{buildroot}/usr/local/bin/imagecustomizer-telemetry_hopper.py
+install -p -m 0644 toolkit/scripts/telemetry_hopper/requirements.txt %{buildroot}/imagecustomizer-telemetry-requirements.txt
+
 %check
 go test -C toolkit/tools ./...
 
@@ -81,6 +93,11 @@ go test -C toolkit/tools ./...
 %files imagecustomizer
 %license LICENSE
 %{_bindir}/imagecustomizer
+# Container support files - placed in container filesystem paths with imagecustomizer- prefix
+/usr/local/bin/imagecustomizer-entrypoint.sh
+/usr/local/bin/imagecustomizer-run.sh
+/usr/local/bin/imagecustomizer-telemetry_hopper.py
+/imagecustomizer-telemetry-requirements.txt
 
 %changelog
 * Mon Aug 11 2025 Lanze Liu <lanzeliu@microsoft.com> 0.17.0-1
