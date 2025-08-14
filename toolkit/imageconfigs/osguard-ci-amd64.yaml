@@ -73,7 +73,7 @@ os:
     - rd.hostonly=0
     - fips=1
     - net.ifnames=1
-    - ipe.enforce=1
+    - dm_verity.require_signatures=1
   packages:
     remove:
     - dracut-hostonly
