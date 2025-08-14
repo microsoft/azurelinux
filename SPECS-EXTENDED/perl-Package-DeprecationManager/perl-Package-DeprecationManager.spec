@@ -1,6 +1,6 @@
 Name:		perl-Package-DeprecationManager
-Version:	0.17
-Release:	12%{?dist}
+Version:	0.18
+Release:	1%{?dist}
 Summary:	Manage deprecation warnings for your distribution
 License:	Artistic 2.0
 Vendor:         Microsoft Corporation
@@ -69,6 +69,10 @@ make test
 %{_mandir}/man3/Package::DeprecationManager.3*
 
 %changelog
+* Fri Dec 13 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.18-1
+- Update to 0.18
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.17-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
