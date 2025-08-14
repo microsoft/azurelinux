@@ -4,7 +4,9 @@
 
 # Generates osguard image configurations by merging base + delta YAML templates.
 # Usage:
-#   ./generate_osguard_configs.sh
+#   ./generate-osguard-imageconfigs.sh [output-directory]
+#     output-directory (optional): directory to write the generated files into.
+#       If omitted, defaults to ../imageconfigs relative to this script's CWD.
 #
 # Optional env:
 #   PYTHON   - Python executable to use (default: python3)
@@ -16,6 +18,10 @@ set -euo pipefail
 
 PYTHON_BIN=${PYTHON:-python3}
 
+# Optional first arg: override output directory
+OUT_DIR_DEFAULT="../imageconfigs"
+OUT_DIR="${1:-$OUT_DIR_DEFAULT}"
+
 # Ensure merge_yaml.py is available in the current directory
 if [[ ! -f ./merge_yaml.py ]]; then
 	echo "Error: merge_yaml.py not found in the current directory." >&2
@@ -26,9 +32,13 @@ fi
 BASE_TPL="../imageconfigs/templates/osguard-base.yaml"
 DELTA_TPL="../imageconfigs/templates/osguard-no-ci-delta.yaml"
 
-OUT_STD="../imageconfigs/osguard-amd64.yaml"
+# Ensure output directory exists
+mkdir -p "$OUT_DIR"
+
+OUT_STD="$OUT_DIR/osguard-amd64.yaml"
 
 echo "Generating osguard configs..."
+echo "Output directory: $OUT_DIR"
 "$PYTHON_BIN" ./merge_yaml.py "$BASE_TPL" "$DELTA_TPL" -o "$OUT_STD"
 
 echo "Done. Wrote:"
