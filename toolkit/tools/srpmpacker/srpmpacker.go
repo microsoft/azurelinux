@@ -78,6 +78,8 @@ type sourceRetrievalConfiguration struct {
 
 	signatureHandling signatureHandlingType
 	signatureLookup   map[string]string
+
+	azureClientID string
 }
 
 // packResult holds the worker results from packing a SPEC file into an SRPM.
@@ -119,6 +121,7 @@ var (
 	caCertFile    = app.Flag("ca-cert", "Root certificate authority to use when downloading files.").String()
 	tlsClientCert = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
 	tlsClientKey  = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
+	azureClientID = app.Flag("azure-client-id", "Azure client ID for managed identity authentication").String()
 
 	workerTar = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz. If this argument is empty, SRPMs will be packed in the host environment.").ExistingFile()
 
@@ -179,6 +182,8 @@ func main() {
 
 		templateSrcConfig.tlsCerts = append(templateSrcConfig.tlsCerts, cert)
 	}
+
+	templateSrcConfig.azureClientID = *azureClientID
 
 	timestamp.StopEvent(nil)
 
@@ -935,7 +940,7 @@ func hydrateFromRemoteSource(ctx context.Context, fileHydrationState map[string]
 			}
 		}
 
-		cancelled, internalErr := network.DownloadFileWithRetry(ctx, url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts, network.DefaultTimeout)
+		cancelled, internalErr := network.DownloadFileWithRetry(ctx, url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts, srcConfig.azureClientID, network.DefaultTimeout)
 
 		if netOpsSemaphore != nil {
 			// Clear the channel to allow another operation to start

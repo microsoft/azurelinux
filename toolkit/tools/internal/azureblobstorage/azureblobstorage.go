@@ -7,9 +7,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
+	"strings"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
@@ -21,6 +24,48 @@ const (
 	ServicePrincipalAccess = 1
 	ManagedIdentityAccess  = 2
 )
+
+// AzureBlobInfo contains parsed information from an Azure Blob Storage URL
+type AzureBlobInfo struct {
+	StorageAccount string
+	ContainerName  string
+	BlobName       string
+}
+
+// ParseAzureBlobStorageURL parses an Azure Blob Storage URL and extracts storage account information.
+func ParseAzureBlobStorageURL(urlStr string) (*AzureBlobInfo, error) {
+	parsedURL, err := url.Parse(urlStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse URL: %w", err)
+	}
+
+	if !strings.HasSuffix(parsedURL.Host, ".blob.core.windows.net") {
+		return nil, fmt.Errorf("not a common Azure Blob Storage URL format " +
+			"(expected <storage_account>.blob.core.windows.net)")
+	}
+
+	// Extract storage account from hostname (e.g., "mystorageaccount.blob.core.windows.net")
+	hostParts := strings.Split(parsedURL.Host, ".")
+	if len(hostParts) < 4 {
+		return nil, fmt.Errorf("invalid Azure Blob Storage hostname format")
+	}
+	storageAccount := hostParts[0]
+
+	// Extract container and blob name from path (e.g., "/container/path/to/blob")
+	pathParts := strings.Split(strings.Trim(parsedURL.Path, "/"), "/")
+	if len(pathParts) < 2 {
+		return nil, fmt.Errorf("invalid Azure Blob Storage path format")
+	}
+
+	containerName := pathParts[0]
+	blobName := strings.Join(pathParts[1:], "/")
+
+	return &AzureBlobInfo{
+		StorageAccount: storageAccount,
+		ContainerName:  containerName,
+		BlobName:       blobName,
+	}, nil
+}
 
 type AzureBlobStorage struct {
 	theClient *azblob.Client
@@ -105,7 +150,13 @@ func (abs *AzureBlobStorage) Delete(
 	return nil
 }
 
-func Create(tenantId string, userName string, password string, storageAccount string, authenticationType int) (abs *AzureBlobStorage, err error) {
+func Create(
+	tenantId string,
+	userName string,
+	password string,
+	storageAccount string,
+	authenticationType int,
+	azureClientID string) (abs *AzureBlobStorage, err error) {
 
 	url := "https://" + storageAccount + ".blob.core.windows.net/"
 
@@ -136,7 +187,20 @@ func Create(tenantId string, userName string, password string, storageAccount st
 
 	} else if authenticationType == ManagedIdentityAccess {
 
-		credential, err := azidentity.NewDefaultAzureCredential(nil)
+		var credential azcore.TokenCredential
+
+		if azureClientID == "" {
+			logger.Log.Infof("Using DefaultAzureCredential for managed identity access")
+			credential, err = azidentity.NewDefaultAzureCredential(nil)
+		} else {
+			logger.Log.Infof("Using ManagedIdentityCredential with supplied Azure client ID "+
+				"for managed identity access: %s", azureClientID)
+			credential, err = azidentity.NewManagedIdentityCredential(
+				&azidentity.ManagedIdentityCredentialOptions{
+					ID: azidentity.ClientID(azureClientID),
+				})
+		}
+
 		if err != nil {
 			return nil, fmt.Errorf("Unable to init azure managed identity:\n%w", err)
 		}

@@ -50,12 +50,13 @@ func TestDownloadFile(t *testing.T) {
 	bogusUrl := fmt.Sprintf("%s/%s", fileServer.URL, bogusFile)
 
 	type args struct {
-		_ctx     context.Context // Build dynamically in test. Set via useCtx.
-		srcUrl   string
-		dstFile  string
-		caCerts  *x509.CertPool
-		tlsCerts []tls.Certificate
-		timeout  time.Duration
+		_ctx          context.Context // Build dynamically in test. Set via useCtx.
+		srcUrl        string
+		dstFile       string
+		caCerts       *x509.CertPool
+		tlsCerts      []tls.Certificate
+		azureClientID string
+		timeout       time.Duration
 	}
 	tests := []struct {
 		name             string
@@ -69,10 +70,11 @@ func TestDownloadFile(t *testing.T) {
 		{
 			name: "TestDownloadFile",
 			args: args{
-				srcUrl:   validUrl,
-				dstFile:  validFile,
-				caCerts:  nil,
-				tlsCerts: nil,
+				srcUrl:        validUrl,
+				dstFile:       validFile,
+				caCerts:       nil,
+				tlsCerts:      nil,
+				azureClientID: "",
 			},
 			useCtx:           false,
 			wantWasCancelled: false,
@@ -82,10 +84,11 @@ func TestDownloadFile(t *testing.T) {
 		{
 			name: "TestDownloadWithContext",
 			args: args{
-				srcUrl:   validUrl,
-				dstFile:  validFile,
-				caCerts:  nil,
-				tlsCerts: nil,
+				srcUrl:        validUrl,
+				dstFile:       validFile,
+				caCerts:       nil,
+				tlsCerts:      nil,
+				azureClientID: "",
 			},
 			useCtx:           true,
 			wantWasCancelled: false,
@@ -95,10 +98,11 @@ func TestDownloadFile(t *testing.T) {
 		{
 			name: "TestDownload404",
 			args: args{
-				srcUrl:   doesNotExistUrl,
-				dstFile:  doesNotExistFile,
-				caCerts:  nil,
-				tlsCerts: nil,
+				srcUrl:        doesNotExistUrl,
+				dstFile:       doesNotExistFile,
+				caCerts:       nil,
+				tlsCerts:      nil,
+				azureClientID: "",
 			},
 			useCtx:           false,
 			wantWasCancelled: false,
@@ -107,10 +111,26 @@ func TestDownloadFile(t *testing.T) {
 			expectedTime:     noCancelDelay, // 404 is not retried, should fail immediately.
 		},
 		{
+			name: "TestDownload404SDKFallback",
+			args: args{
+				srcUrl:        doesNotExistUrl,
+				dstFile:       doesNotExistFile,
+				caCerts:       nil,
+				tlsCerts:      nil,
+				azureClientID: "",
+			},
+			useCtx:           false,
+			wantWasCancelled: false,
+			wantErr:          true,
+			expectedErr:      ErrDownloadFileSDKFallback, // validates SDK fallback path is attempted.
+			expectedTime:     noCancelDelay,
+		},
+		{
 			name: "TestDownloadWithBogusCerts",
 			args: args{
-				srcUrl:  bogusUrl,
-				dstFile: bogusFile,
+				srcUrl:        bogusUrl,
+				dstFile:       bogusFile,
+				azureClientID: "",
 			},
 			useCtx:           true,
 			wantWasCancelled: true,
@@ -121,9 +141,10 @@ func TestDownloadFile(t *testing.T) {
 		{
 			name: "TestDownloadWithBogusCertsTimeout",
 			args: args{
-				srcUrl:  bogusUrl,
-				dstFile: bogusFile,
-				timeout: cancelDelay,
+				srcUrl:        bogusUrl,
+				dstFile:       bogusFile,
+				azureClientID: "",
+				timeout:       cancelDelay,
 			},
 			useCtx:           false,
 			wantWasCancelled: true,
@@ -134,9 +155,10 @@ func TestDownloadFile(t *testing.T) {
 		{
 			name: "TestDownloadWithBadTimeout",
 			args: args{
-				srcUrl:  validUrl,
-				dstFile: validFile,
-				timeout: -1,
+				srcUrl:        validUrl,
+				dstFile:       validFile,
+				azureClientID: "",
+				timeout:       -1,
 			},
 			useCtx:           false,
 			wantWasCancelled: false,
@@ -158,7 +180,14 @@ func TestDownloadFile(t *testing.T) {
 			}
 
 			startTime := time.Now()
-			gotWasCancelled, err := DownloadFileWithRetry(tt.args._ctx, tt.args.srcUrl, tt.args.dstFile, tt.args.caCerts, tt.args.tlsCerts, tt.args.timeout)
+			gotWasCancelled, err := DownloadFileWithRetry(
+				tt.args._ctx,
+				tt.args.srcUrl,
+				tt.args.dstFile,
+				tt.args.caCerts,
+				tt.args.tlsCerts,
+				tt.args.azureClientID,
+				tt.args.timeout)
 			endTime := time.Now()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DownloadFile() error = %v, wantErr %v", err, tt.wantErr)
@@ -193,7 +222,14 @@ func TestDownloadWithRetryNilContext(t *testing.T) {
 	dstDir := t.TempDir()
 	dstFile := filepath.Join(dstDir, "README.md")
 	//lint:ignore SA1012 We intentionally want to test the error case of a nil context
-	_, err := DownloadFileWithRetry(nil, "https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/README.md", dstFile, nil, nil, 0)
+	_, err := DownloadFileWithRetry(
+		nil,
+		"https://raw.githubusercontent.com/microsoft/azurelinux/HEAD/README.md",
+		dstFile,
+		nil,
+		nil,
+		"",
+		0)
 	if err == nil {
 		t.Errorf("DownloadFile() should have failed with nil context")
 	}
