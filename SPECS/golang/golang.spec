@@ -15,7 +15,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.22.7
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +30,8 @@ Patch1:         CVE-2024-45336.patch
 Patch2:         CVE-2024-45341.patch
 Patch3:         CVE-2025-22871.patch
 Patch4:         CVE-2025-22870.patch
+Patch6:         CVE-2025-47906.patch
+Patch5:         CVE-2025-4673.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -164,6 +166,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Aug 14 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.22.7-5
+- Patch for CVE-2025-4673, CVE-2025-47906
+
 * Thu May 08 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.22.7-4
 - Address CVE-2025-22870 using an upstream patch.
 
@@ -199,6 +204,8 @@ fi
 
 * Tue Aug 15 2023 Muhammad Falak <mwani@microsoft.com> - 1.19.12-1
 - Auto-upgrade to 1.19.12 to address CVE-2023-29409
+%patch 5 -p1
+%patch 6 -p1
 - Introduce patch to permit requests with invalid header
 
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.11-1
