@@ -20,4 +20,4 @@ lsof
 python3
 python3-pip
 jq
-imagecustomizer
+azurelinux-image-tools-imagecustomizer
