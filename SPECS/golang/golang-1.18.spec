@@ -13,7 +13,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.18.8
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,7 @@ Patch5:         CVE-2025-22871.patch
 Patch6:         CVE-2024-24789.patch
 Patch7:         CVE-2025-22870-1.18.patch
 Patch8:         CVE-2024-34155.patch
+Patch9:         CVE-2025-47907_golang-1.18.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -48,6 +49,7 @@ patch -Np1 --ignore-whitespace < %{PATCH0}
 mv -v go go-bootstrap
 
 %setup -q -n go
+%patch 9 -p1
 patch -Np1 --ignore-whitespace < %{PATCH1}
 patch -Np1 --ignore-whitespace < %{PATCH2}
 patch -Np1 --ignore-whitespace < %{PATCH3}
@@ -136,6 +138,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Aug 14 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.18.8-9
+- Patch for CVE-2025-47907
+
 * Fri Apr 25 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.18.8-8
 - Patch CVE-2024-24789, CVE-2024-34155 & CVE-2025-22870
 
