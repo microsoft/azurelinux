@@ -46,6 +46,6 @@ pkgconfig utility allowing your software to be build with poppler-data.
 %{_datadir}/pkgconfig/poppler-data.pc
 
 %changelog
-* Mon Aug 12 2025 Azure Linux Team <azlinux@microsoft.com> - 0.4.11-1
+* Mon Aug 12 2025 Ruiyang Li <ruiyli@microsoft.com> - 0.4.11-1
 - Original version for Azure Linux
 - License Verified

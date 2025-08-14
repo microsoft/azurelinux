@@ -173,6 +173,6 @@ test "$(pkg-config --modversion poppler-glib)" = "%{version}"
 %{_mandir}/man1/*
 
 %changelog
-* Mon Aug 12 2025 Azure Linux Team <azlinux@microsoft.com> - 25.02.0-1
+* Mon Aug 12 2025 Ruiyang Li <ruiyli@microsoft.com> - 25.02.0-1
 - Original version for Azure Linux
 - License Verified
