@@ -1216,6 +1216,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "Box2D",
+          "version": "2.4.2",
+          "downloadUrl": "https://github.com/erincatto/box2d/archive/v2.4.2/Box2D-2.4.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "booth",
           "version": "1.0",
           "downloadUrl": "https://github.com/ClusterLabs/booth/archive/5d837d2b5bf1c240a5f1c5efe4e8d79f55727cca/booth-5d837d2.tar.gz"
