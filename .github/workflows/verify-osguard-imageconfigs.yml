@@ -1,0 +1,55 @@
+name: Verify osguard imageconfigs are up-to-date
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify-osguard-imageconfigs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Python dependencies for merge_yaml
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+
+      - name: Generate osguard imageconfigs to temp dir
+        working-directory: toolkit/scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          TMP_OUT_DIR="$(mktemp -d)"
+          echo "Using temp output dir: ${TMP_OUT_DIR}"
+          ./generate-osguard-imageconfigs.sh "${TMP_OUT_DIR}"
+          echo "Generated: ${TMP_OUT_DIR}/osguard-amd64.yaml"
+          # Save path for next step
+          echo "TMP_OUT_FILE=${TMP_OUT_DIR}/osguard-amd64.yaml" >> "$GITHUB_ENV"
+
+      - name: Compare with default committed file
+        working-directory: toolkit/scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEFAULT_FILE="../imageconfigs/osguard-amd64.yaml"
+          echo "Comparing generated file with default:"
+          echo "  Generated: ${TMP_OUT_FILE}"
+          echo "  Default:   ${DEFAULT_FILE}"
+          # Filter out the variable header line that lists source paths
+          FILT_GEN="$(mktemp)"
+          FILT_DEF="$(mktemp)"
+          grep -v '^# Sources:' "${TMP_OUT_FILE}" > "${FILT_GEN}"
+          grep -v '^# Sources:' "${DEFAULT_FILE}" > "${FILT_DEF}"
+          # Show a brief unified diff if there are differences (after filtering)
+          if ! diff -u "${FILT_GEN}" "${FILT_DEF}"; then
+            echo "Error: Generated osguard imageconfig differs from the committed default." >&2
+            exit 1
+          fi
+          echo "Success: Generated osguard imageconfig matches the committed default."
