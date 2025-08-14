@@ -40,7 +40,7 @@ if [[ ! -f ./merge_yaml.py ]]; then
 fi
 
 
-# List of generation jobs: "<delta-template-filename>|<output-filename>"
+# List of generation jobs: "<base-template-filename>|<delta-template-filename>|<output-filename>"
 # Add new entries here to support additional outputs.
 GEN_JOBS=(
 	"osguard-base.yaml|osguard-no-ci-delta.yaml|osguard-amd64.yaml"
