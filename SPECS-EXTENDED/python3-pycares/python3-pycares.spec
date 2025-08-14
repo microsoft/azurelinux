@@ -10,7 +10,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/saghul/pycares
-Source0:        https://github.com/saghul/pycares/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/saghul/pycares/archive/refs/tags/v%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
 
 BuildRequires:  make
 BuildRequires:  gcc
@@ -72,7 +72,7 @@ rm -rf %{buildroot}%{_pkgdocdir}/html/.buildinfo
 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=%{buildroot}%{python3_sitelib} \
   %{python3} -m unittest -v
 
-%files -n python3-%{srcname}
+%files
 %license LICENSE
 %doc README.rst ChangeLog
 # For arch-specific packages: sitearch
