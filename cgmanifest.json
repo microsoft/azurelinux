@@ -10691,8 +10691,8 @@
         "type": "other",
         "other": {
           "name": "libpeas",
-          "version": "1.26.0",
-          "downloadUrl": "https://download.gnome.org/sources/libpeas/1.26/libpeas-1.26.0.tar.xz"
+          "version": "1.36.0",
+          "downloadUrl": "https://download.gnome.org/sources/libpeas/1.36/libpeas-1.36.0.tar.xz"
         }
       }
     },
