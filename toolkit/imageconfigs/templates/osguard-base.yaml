@@ -96,17 +96,10 @@ os:
       # OS
       - device-mapper
       - kernel-ipe
-      # servicing
-      # - trident
-      # - trident-service
-      - veritysetup
       # OCI
       - cni
       - containerd2
       - cri-tools
-      # - erofs-utils
-      # - notation
-      # - tardev-snapshotter
       # UKI
       - systemd-boot
       # hyperv
@@ -179,7 +172,7 @@ os:
 
   additionalFiles:
     # SELinux customizations
-    - source: files/linuxguard/selinux-ci-uki.semanage
+    - source: files/osguard/selinux-ci-uki.semanage
       destination: /etc/selinux/targeted/selinux-ci.semanage
     # Cloud-init configuration
     - source: files/osguard/cloud.cfg
