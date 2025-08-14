@@ -206,8 +206,6 @@ fi
 
 * Tue Aug 15 2023 Muhammad Falak <mwani@microsoft.com> - 1.19.12-1
 - Auto-upgrade to 1.19.12 to address CVE-2023-29409
-%patch 5 -p1
-%patch 6 -p1
 - Introduce patch to permit requests with invalid header
 
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.11-1
