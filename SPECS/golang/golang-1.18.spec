@@ -49,7 +49,6 @@ patch -Np1 --ignore-whitespace < %{PATCH0}
 mv -v go go-bootstrap
 
 %setup -q -n go
-%patch 9 -p1
 patch -Np1 --ignore-whitespace < %{PATCH1}
 patch -Np1 --ignore-whitespace < %{PATCH2}
 patch -Np1 --ignore-whitespace < %{PATCH3}
@@ -58,6 +57,7 @@ patch -Np1 --ignore-whitespace < %{PATCH5}
 patch -Np1 --ignore-whitespace < %{PATCH6}
 patch -Np1 --ignore-whitespace < %{PATCH7}
 patch -Np1 --ignore-whitespace < %{PATCH8}
+patch -Np1 --ignore-whitespace < %{PATCH9}
 
 %build
 # Build go 1.4 bootstrap
