@@ -1,6 +1,6 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.23.12-20250806.6.src.tar.gz
+%global ms_go_filename  go1.24.6-20250806.4.src.tar.gz
 %global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
@@ -14,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.23.12
+Version:        1.24.6
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -30,6 +30,8 @@ Patch0:         go14_bootstrap_aarch64.patch
 Source2:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.20230802.5.src.tar.gz
 # bootstrap 02
 Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.20240206.2.src.tar.gz
+# bootstrap 03
+Source4:        https://github.com/microsoft/go/releases/download/v1.22.12-2/go1.22.12-20250211.4.src.tar.gz
 
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -50,6 +52,9 @@ mv -v go go-bootstrap-01
 
 tar xf %{SOURCE3} --no-same-owner
 mv -v go go-bootstrap-02
+
+tar xf %{SOURCE4} --no-same-owner
+mv -v go go-bootstrap-03
 
 %setup -q -n go
 
@@ -84,6 +89,7 @@ function go_bootstrap() {
 go_bootstrap 00
 go_bootstrap 01
 go_bootstrap 02
+go_bootstrap 03
 
 # Build current go version
 export GOHOSTOS=linux
@@ -154,23 +160,26 @@ fi
 %{_bindir}/*
 
 %changelog
-* Wed Aug 06 2025 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.23.12-1
-- Bump version to 1.23.12-1
+* Wed Aug 06 2025 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.24.6-1
+- Bump version to 1.24.6-1
 
-* Tue Jul 08 2025 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.23.11-1
-- Bump version to 1.23.11-1
+* Tue Jul 08 2025 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.24.5-1
+- Bump version to 1.24.5-1
 
-* Fri Jun 06 2025 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.23.10-1
-- Bump version to 1.23.10-1
+* Fri Jun 06 2025 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.24.4-1
+- Bump version to 1.24.4-1
 
-* Wed May 07 2025 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.23.9-1
-- Bump version to 1.23.9-1
+* Wed May 07 2025 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.24.3-1
+- Bump version to 1.24.3-1
 
-* Tue Apr 01 2025 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.23.8-1
-- Bump version to 1.23.8-1
+* Tue Apr 01 2025 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.24.2-1
+- Bump version to 1.24.2-1
 
-* Wed Mar 05 2025 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.23.7-1
-- Bump version to 1.23.7-1
+* Wed Mar 05 2025 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.24.1-1
+- Bump version to 1.24.1-1
+
+* Fri Feb 14 2025 Microsoft Golang Bot <microsoft-golang-bot@users.noreply.github.com> - 1.24.0-1
+- Bump version to 1.24.0-1
 
 * Tue Feb 04 2025 Tobias Brick <tobiasb@microsoft.com> - 1.23.3-3
 - Fix post scriptlet
