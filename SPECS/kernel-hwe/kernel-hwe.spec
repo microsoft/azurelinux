@@ -1,7 +1,7 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
-%define short_name 64k-hwe
+%define short_name hwe
 
 # find_debuginfo.sh arguments are set by default in rpm's macros.
 # The default arguments regenerate the build-id for vmlinux in the
@@ -21,7 +21,7 @@
 %endif
 
 Summary:        Linux Kernel
-Name:           kernel-64k-hwe
+Name:           kernel-hwe
 Version:        6.12.40.1
 Release:        1%{?dist}
 License:        GPLv2
@@ -29,7 +29,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/%{version}.tar.gz#/kernel-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/%{version}.tar.gz#/kernel-hwe-%{version}.tar.gz
 Source1:        config_aarch64
 Source2:        sha512hmac-openssl.sh
 Source3:        azurelinux-ca-20230216.pem
