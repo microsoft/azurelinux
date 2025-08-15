@@ -2,7 +2,7 @@
 Summary:        An XML parser library
 Name:           expat
 Version:        2.6.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -67,6 +67,9 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/libexpat.so.1*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 2.6.4-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Thu Mar 20 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.6.4-1
 - Fix CVE-2024-8176 with a patch
 

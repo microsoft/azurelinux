@@ -1,7 +1,7 @@
 Summary:        Creates a common metadata repository
 Name:           createrepo_c
 Version:        1.0.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
@@ -83,6 +83,9 @@ popd
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 1.0.3-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Tue Feb 06 2024 Suresh Thelkar <sthelkar@microsoft.com> - 1.0.3-1
 - Upgrade to 1.0.3
 

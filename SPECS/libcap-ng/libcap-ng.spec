@@ -1,7 +1,7 @@
 Summary:        POSIX capability Library
 Name:           libcap-ng
 Version:        0.8.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -70,6 +70,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.a
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 0.8.4-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Apr 08 2024 Betty Lakes <bettylakes@microsoft.com> - 0.8.4-1
 - Upgrade to 0.8.4
 

@@ -1,7 +1,7 @@
 Summary:        Compiler Cache
 Name:           ccache
 Version:        4.8.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BeOpen AND BSD AND GPLv3+ AND (Patrick Powell's AND Holger Weiss' license) AND Public Domain AND Python AND zlib
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -57,6 +57,9 @@ done
 %{_libdir}/*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 4.8.3-4
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Tue Sep 17 2024 Andrew Phelps <anphel@microsoft.com> - 4.8.3-3
 - Remove dangling link to %%{_host}-cc
 

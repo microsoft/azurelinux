@@ -1,7 +1,7 @@
 Summary:        ASN.1 library
 Name:           libtasn1
 Version:        4.19.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -58,6 +58,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 4.19.0-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Fri Feb 21 2024 Ankita Pareek <ankitapareek@microsoft.com> - 4.19.0-2
 - Address CVE-2024-12133
 

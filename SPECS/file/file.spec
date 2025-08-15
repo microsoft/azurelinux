@@ -1,7 +1,7 @@
 Summary:        Contains a utility for determining file types
 Name:           file
 Version:        5.45
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -90,6 +90,9 @@ python3 setup.py install -O1 --skip-build --root %{buildroot}
 %{python3_sitelib}/__pycache__/*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 5.45-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.45-1
 - Auto-upgrade to 5.45 - Azure Linux 3.0 - package upgrades
 

@@ -1,7 +1,7 @@
 Summary:	Program shows full path of (shell) commands
 Name:		which
 Version:	2.21
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:	GPLv3+
 URL:		http://savannah.gnu.org/projects/which
 Source0:	http://ftp.gnu.org/gnu/which/%{name}-%{version}.tar.gz
@@ -26,6 +26,9 @@ rm -rf %{buildroot}%{_infodir}
 %{_mandir}/man1/*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 2.21-9
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.21-8
 - Remove unused `%%define sha1` lines
 - License verified

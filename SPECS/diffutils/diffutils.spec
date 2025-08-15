@@ -1,7 +1,7 @@
 Summary:        Programs that show the differences between files or directories
 Name:           diffutils
 Version:        3.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/diffutils
 Group:          System Environment/Base
@@ -42,6 +42,9 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 3.10-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.10-1
 - Auto-upgrade to 3.10 - Azure Linux 3.0 - package upgrades
 

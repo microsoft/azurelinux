@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -286,6 +286,9 @@ fi
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 250.3-19
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Fri May 23 2025 Akhila Guruju <v-guakhila@microsoft.com> - 250.3-18
 - Patch CVE-2023-7008
 

@@ -2,7 +2,7 @@
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           sqlite
 Version:        3.44.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -82,6 +82,9 @@ make %{?_smp_mflags} check
 %{_libdir}/libsqlite3.so.0.8.6
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 3.44.0-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Thu Jul 24 2025 Madhur Aggarwal <madaggarwal@microsoft.com> - 3.44.0-2
 - Patch CVE-2025-6965
 - remove unused patch file from SPEC folder.

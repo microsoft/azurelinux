@@ -1,7 +1,7 @@
 Summary:        Programs for searching through files
 Name:           grep
 Version:        3.11
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -56,6 +56,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 3.11-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Thu Dec 09 2023 Andrew Phelps <anphel@microsoft.com> - 3.11-2
 - Rebuild with PCRE2
 

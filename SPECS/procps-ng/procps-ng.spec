@@ -1,7 +1,7 @@
 Summary:        Programs for monitoring processes
 Name:           procps-ng
 Version:        4.0.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 AND LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -105,6 +105,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 4.0.4-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.0.4-1
 - Auto-upgrade to 4.0.4 - Azure Linux 3.0 - package upgrades
 

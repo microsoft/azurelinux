@@ -1,7 +1,7 @@
 Summary:        Archiving program
 Name:           tar
 Version:        1.35
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/tar
 Group:          Applications/System
@@ -50,6 +50,9 @@ make  %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 1.35-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Wed Apr 02 2025 Riken Maharjan <rmaharjan@microsoft.com> - 1.35-2
 - import patches from fedora (LICENSE:MIT) to fix libcap issue.
 * Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 1.35-1

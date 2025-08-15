@@ -1,7 +1,7 @@
 Summary:        A macro processor
 Name:           m4
 Version:        1.4.19
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,6 +37,9 @@ make  %{?_smp_mflags}  check
 %{_datadir}/locale/*/*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 1.4.19-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.4.19-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

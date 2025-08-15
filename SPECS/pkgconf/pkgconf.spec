@@ -11,7 +11,7 @@
 Summary:        Package compiler and linker metadata toolkit
 Name:           pkgconf
 Version:        2.0.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -179,6 +179,9 @@ rm -rf %{buildroot}%{_datadir}/aclocal
 %endif
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 2.0.2-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 2.0.2-1
 - Upgrade to version 2.0.2
 

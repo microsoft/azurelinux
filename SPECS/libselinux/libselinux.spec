@@ -1,7 +1,7 @@
 Summary:        SELinux library and simple utilities
 Name:           libselinux
 Version:        3.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -109,6 +109,9 @@ echo "d /run/setrans 0755 root root" > %{buildroot}/%{_libdir}/tmpfiles.d/libsel
 %{python3_sitelib}/*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 3.6-4
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 3.6-3
 - Move to pcre2
 

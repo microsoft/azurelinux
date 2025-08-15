@@ -1,7 +1,7 @@
 Summary:        A collection of PIN or passphrase entry dialogs
 Name:           pinentry
 Version:        1.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,6 +41,9 @@ They utilize the Assuan protocol as specified in the Libassuan manual.
 %exclude %{_infodir}/dir
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 1.2.1-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 1.2.1-1
 - Upgrade to 1.2.1
 

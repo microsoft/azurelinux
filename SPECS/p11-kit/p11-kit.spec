@@ -2,7 +2,7 @@
 Summary:        Library for loading and sharing PKCS#11 modules
 Name:           p11-kit
 Version:        0.25.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -134,6 +134,9 @@ fi
 %{_userunitdir}/p11-kit-server.socket
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 0.25.0-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.25.0-1
 - Auto-upgrade to 0.25.0 - Azure Linux 3.0 - package upgrades
 

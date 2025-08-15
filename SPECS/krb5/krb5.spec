@@ -4,7 +4,7 @@
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
 Version:        1.21.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -126,6 +126,9 @@ make check
 %{_datarootdir}/locale/*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 1.21.3-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Sep 2 2024 Ankita Pareek <ankitapareek@microsoft.com> - 1.21.3-2
 - Add patch for CVE-2024-26458 and CVE-2024-26461
 

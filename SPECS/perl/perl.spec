@@ -127,7 +127,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        509%{?dist}
+Release:        510%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -6846,6 +6846,9 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com>
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Wed Jun 04 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 4:5.38.2-509
 - Patch CVE-2025-40909
 

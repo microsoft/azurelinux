@@ -1,7 +1,7 @@
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.11.5
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -91,6 +91,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 2.11.5-7
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Sat Jul 19 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.11.5-6
 - Patch CVE-2025-49794 and CVE-2025-49796
 - Also added patches for CVE-2025-6021 (PR#14237) and CVE-2025-6170 (PR#14226)

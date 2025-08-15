@@ -56,7 +56,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        13.2.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -523,6 +523,9 @@ $tests_ok
 %do_files aarch64-linux-gnu %{build_cross}
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 13.2.0-8
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Fri Jun 21 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-7
 - Re-enable CVE-2023-4039.patch and refresh against 13.2.0 source
 

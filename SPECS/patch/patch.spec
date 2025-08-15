@@ -1,7 +1,7 @@
 Summary:        Program for modifying or creating files
 Name:           patch
 Version:        2.7.6
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/patch/
 Source0:        https://ftp.gnu.org/gnu/patch/%{name}-%{version}.tar.gz
@@ -43,6 +43,9 @@ make  %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 2.7.6-10
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Thu Feb 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.6-9
 - Updated patch application macros.
 

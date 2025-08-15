@@ -1,7 +1,7 @@
 Summary:        libmetalink is a Metalink library written in C language. It is intended to provide the programs written in C to add Metalink functionality such as parsing Metalink XML files.
 Name:           libmetalink
 Version:        0.1.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,6 +50,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 0.1.3-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Fri Dec 10 2021 Mateusz Malisz <mamalisz@microsoft.com> 0.1.3-1
 - Original version for CBL-Mariner
 - License verified

@@ -1,7 +1,7 @@
 Summary:        Access control list utilities
 Name:           acl
 Version:        2.3.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -90,6 +90,9 @@ sed -e 's|test/misc.test||' -i test/Makemodule.am Makefile.in Makefile
 %{_libdir}/libacl.so.*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 2.3.1-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.3.1-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

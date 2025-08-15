@@ -1,7 +1,7 @@
 Summary:        Small build system with focus on speed
 Name:           ninja-build
 Version:        1.11.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +45,9 @@ install -Dpm0644 %{SOURCE1} %{buildroot}%{_libdir}/rpm/macros.d/macros.ninja
 %{_libdir}/rpm/macros.d/macros.ninja
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 1.11.1-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.1-1
 - Auto-upgrade to 1.11.1 - Azure Linux 3.0 - package upgrades
 

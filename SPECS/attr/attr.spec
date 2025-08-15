@@ -1,7 +1,7 @@
 Summary:        Utilities for managing filesystem extended attributes
 Name:           attr
 Version:        2.5.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -109,6 +109,9 @@ ln -fs ../sys/xattr.h %{buildroot}%{_includedir}/attr/xattr.h
 %config(noreplace) %{_sysconfdir}/xattr.conf
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 2.5.2-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Tue Feb 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.2-1
 - Auto-upgrade to 2.5.2 - Package upgrade for Azure Linux 3.0
 

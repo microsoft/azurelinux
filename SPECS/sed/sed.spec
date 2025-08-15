@@ -1,7 +1,7 @@
 Summary:        Stream editor
 Name:           sed
 Version:        4.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 URL:            https://www.gnu.org/software/sed
 Group:          Applications/Editors
@@ -54,6 +54,9 @@ make check
 %defattr(-,root,root)
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 4.9-2
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9-1
 - Auto-upgrade to 4.9 - Azure Linux 3.0 - package upgrades
 

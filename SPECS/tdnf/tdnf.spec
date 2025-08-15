@@ -4,7 +4,7 @@
 Summary:        dnf equivalent using C libs
 Name:           tdnf
 Version:        3.5.8
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -242,6 +242,9 @@ fi
 /%{_lib}/systemd/system/tdnf*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 3.5.8-8
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Thu Jan 23 2025 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-7
 - Fix an issue with autoremove for installonlypkgs on tdnf
 

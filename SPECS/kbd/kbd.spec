@@ -1,7 +1,7 @@
 Summary:        Key table files, console fonts, and keyboard utilities
 Name:           kbd
 Version:        2.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -57,6 +57,9 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 2.2.0-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Thu Feb 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.0-2
 - Updated patch application macros.
 

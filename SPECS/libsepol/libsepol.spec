@@ -1,7 +1,7 @@
 Summary:        SELinux binary policy manipulation library
 Name:           libsepol
 Version:        3.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -97,6 +97,9 @@ exit 0
 %{_bindir}/chkcon
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 3.6-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Wed Apr 02 2025 Chris PeBenito <chpebeni@microsoft.com> - 3.6-2
 - Install the chkcon binary into the devel package as it is needed by selinux-policy
   builds starting with 2.20250213.

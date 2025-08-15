@@ -1,7 +1,7 @@
 Summary:        Program for compiling packages
 Name:           make
 Version:        4.4.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -47,6 +47,9 @@ sudo -u testuser -s /bin/bash -c "PATH=$PATH make check"
 %{_mandir}/*/*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 4.4.1-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Aug 19 2024 Andrew Phelps <anphel@microsoft.com> - 4.4.1-2
 - Fix package tests by running as non-root user
 

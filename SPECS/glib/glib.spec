@@ -2,7 +2,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.78.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -123,6 +123,9 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Fri Aug 15 2025 Andrew Phelps <anphel@microsoft.com> - 2.78.6-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Wed Apr 16 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.78.6-2
 - Patch CVE-2025-3360
 
