@@ -67,7 +67,7 @@
 Name:           mesa
 Summary:        Mesa graphics libraries
 Version:        24.0.1
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -741,6 +741,12 @@ popd
 %endif
 
 %changelog
+* Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 24.0.1-4
+- Bump release to rebuild with rust
+
+* Tue Jun 10 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 24.0.1-3
+- Bump release to rebuild with rust
+
 * Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 24.0.1-2
 - Pin rust version
 

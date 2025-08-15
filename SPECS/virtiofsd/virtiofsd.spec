@@ -22,7 +22,7 @@ Name:           virtiofsd
 # Version to be kept in sync with the `asset.virtiofsd.version` field from
 # https://github.com/microsoft/kata-containers/blob/msft-main/versions.yaml
 Version:        1.8.0
-Release:        3%{?dist}
+Release:        5%{?dist}
 Summary:        vhost-user virtio-fs device backend written in Rust
 Group:          Development/Libraries/Rust
 License:        Apache-2.0
@@ -75,6 +75,12 @@ cargo test --release
 %{_datadir}/qemu/vhost-user/50-qemu-virtiofsd.json
 
 %changelog
+* Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.8.0-5
+- Bump release to rebuild with rust
+
+* Tue Jun 10 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.8.0-4
+- Bump release to rebuild with rust
+
 * Mon May 05 2025 Archana Choudhary <archana1@microsoft.com> - 1.8.0-3
 - Patch for CVE-2024-43806
 * Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.8.0-2

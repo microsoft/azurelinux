@@ -32,8 +32,7 @@ parameters:
     default: "$(Agent.TempDirectory)"
 
 steps:
-  - bash: pip3 install --user junit_xml==1.9
-    retryCountOnTaskFailure: 3
+  - bash: sudo tdnf install -y python3-junit-xml
     displayName: "Install Python dependencies"
 
   - task: PythonScript@0

@@ -1,7 +1,7 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
-Version:        2.4.4
-Release:        2%{?dist}
+Version:        2.4.7
+Release:        1%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,10 +15,10 @@ BuildRequires:  npth-devel >= 1.2
 BuildRequires:  libassuan-devel >= 2.5.0
 BuildRequires:  libksba-devel >= 1.3.4
 BuildRequires:  libgcrypt-devel > 1.9.1
-BuildRequires:  libgpg-error-devel >= 1.46
+BuildRequires:  libgpg-error-devel >= 1.48
 Requires:       libksba > 1.3.4
 Requires:       libgcrypt >= 1.9.1
-Requires:       libgpg-error >= 1.46
+Requires:       libgpg-error >= 1.48
 Requires:       npth >= 1.2
 Requires:       libassuan >= 2.5.0
 Requires:       pinentry
@@ -63,6 +63,9 @@ These are the additional language files of gnupg2
 %make_build
 
 %install
+ln -sf gpg2.1 doc/gpg.1
+ln -sf gpgv2.1 doc/gpgv.1
+
 %make_install
 
 pushd %{buildroot}%{_bindir}
@@ -90,6 +93,7 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %{_mandir}/man1/*
 %{_mandir}/man7/*
 %{_mandir}/man8/*
+%{_mandir}/manh/*
 %{_infodir}/gnupg*
 %{_libexecdir}/*
 %{_datadir}/gnupg/*
@@ -101,6 +105,9 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %defattr(-,root,root)
 
 %changelog
+* Mon Jun 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.4.7-1
+- Upgrade to version 2.4.7
+
 * Tue May 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.4-2
 - Disabled keyboxd.
 

@@ -310,7 +310,7 @@ index 334d547..72dbaad 100644
 +
 +			      para->length = i;
 +			      next = g_utf8_offset_to_pointer(para->text, para->length);
-+			      wc = g_utf8_prev_char(next);
++			      wc = g_utf8_get_char(g_utf8_prev_char(next));
 +		      } else {
 +			      pango_layout_set_text(para->layout, para->text, para->length);
 +		      }

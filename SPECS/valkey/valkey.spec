@@ -1,7 +1,7 @@
 Summary:        advanced key-value store
 Name:           valkey
-Version:        8.0.3
-Release:        2%{?dist}
+Version:        8.0.4
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,7 @@ Source0:        https://github.com/valkey-io/valkey/archive/refs/tags/%{version}
 Patch0:         valkey-conf.patch
 Patch1:         disable-mem-defrag-tests.patch
 Patch2:         CVE-2025-49112.patch
+Patch3:         CVE-2025-27151.patch
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  openssl-devel
@@ -85,6 +86,12 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/valkey.conf
 
 %changelog
+* Tue Jul 22 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 8.0.4-1
+- Upgrade to 8.0.4 to fix CVE-2025-32023, CVE-2025-48367
+
+* Wed Jun 18 2025 Sumit Jena <v-sumitjena@microsoft.com> - 8.0.3-3
+- Fix CVE-2025-27151
+
 * Thu Jun 12 2025 Sumit Jena <v-sumitjena@microsoft.com> - 8.0.3-2
 - Fix CVE-2025-49112
 

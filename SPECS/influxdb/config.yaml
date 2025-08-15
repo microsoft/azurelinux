@@ -18,7 +18,6 @@ query-memory-bytes: 67108863
 
 # Allow to move storage to different directory
 
-# Metadata
-# bolt-path: /var/lib/influxdb/.influxdbv2/influxd.bolt
-# Time series data
-# engine-path: /var/lib/influxdb/.influxdbv2/engine
+bolt-path: /var/lib/influxdb/influxd.bolt
+engine-path: /var/lib/influxdb/engine
+nats-port: 4222

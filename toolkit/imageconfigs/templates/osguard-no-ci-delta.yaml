@@ -1,0 +1,12 @@
+os:
+  kernelCommandLine:
+    extraCommandLine:
+      - ipe.enforce=0
+scripts:
+  postCustomization:
+  - path: scripts/set_os_release_variant_entries.sh
+    arguments:
+    - --variant-id
+    - osguard
+    - --variant
+    - OS Guard Image

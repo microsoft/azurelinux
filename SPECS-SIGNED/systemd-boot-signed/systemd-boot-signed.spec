@@ -14,7 +14,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        LGPL-2.1-or-later AND MIT AND GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -93,7 +93,10 @@ popd
 /boot/efi/EFI/BOOT/grubx64.efi
 
 %changelog
-* Fri Jun 13 2025 Akhila Guruju <v-guakhila@microsoft.com> - 255-22
+* Fri Aug 15 2025 Akhila Guruju <v-guakhila@microsoft.com> - 255-23
+- Bump release to match systemd spec
+
+* Wed Aug 06 2025 Sean Dougherty <sdougherty@microsoft.com> - 255-22
 - Bump release to match systemd spec
 
 * Mon Apr 14 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 255-21
