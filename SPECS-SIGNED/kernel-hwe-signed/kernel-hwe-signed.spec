@@ -1,8 +1,6 @@
 %global debug_package %{nil}
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%ifarch aarch64
 %global buildarch aarch64
-%endif
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-hwe-signed-%{buildarch}

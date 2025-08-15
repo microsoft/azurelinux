@@ -13,12 +13,10 @@
 %global _missing_build_ids_terminate_build 1
 %global _no_recompute_build_ids 1
 
-%ifarch aarch64
 %global __provides_exclude_from %{_libdir}/debug/.build-id/
 %define arch arm64
 %define archdir arm64
 %define config_source %{SOURCE1}
-%endif
 
 Summary:        Linux Kernel
 Name:           kernel-hwe
@@ -221,9 +219,7 @@ install -c -m 644 %{SOURCE5} %{buildroot}%{_unitdir}/cpupower.service
 
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
-%ifarch aarch64
 install -vm 600 arch/arm64/boot/Image %{buildroot}/boot/vmlinuz-%{uname_r}
-%endif
 
 # Restrict the permission on System.map-X file
 install -vm 400 System.map %{buildroot}/boot/System.map-%{uname_r}
@@ -253,9 +249,7 @@ cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config ma
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
 
-%ifarch aarch64
 cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
-%endif
 
 # disable (JOBS=1) parallel build to fix this issue:
 # fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
@@ -347,9 +341,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %defattr(-,root,root)
 %{_libexecdir}
 %exclude %dir %{_libdir}/debug
-%ifarch aarch64
 %{_libdir}/libperf-jvmti.so
-%endif
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
 %{_datadir}/perf-core/strace/groups/file
