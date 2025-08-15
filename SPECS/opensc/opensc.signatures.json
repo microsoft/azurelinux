@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "opensc-0.25.1.tar.gz": "23cbaae8bd7c8eb589b68c0a961dfb0d02007bea3165a3fc5efe2621d549b37b",
-  "opensc.module": "0dee4b20c6ccae90f01c4b9fc503971f9f963a01a91de3a9da29f9a62a4cbfe1"
- }
+  "Signatures": {
+    "opensc.module": "0dee4b20c6ccae90f01c4b9fc503971f9f963a01a91de3a9da29f9a62a4cbfe1",
+    "opensc-0.26.1.tar.gz": "f16291a031d86e570394762e9f35eaf2fcbc2337a49910f3feae42d54e1688cb"
+  }
 }
