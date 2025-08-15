@@ -45,6 +45,10 @@ or check the validity of an address.
 #%{_mandir}/man1/ipcalc.1*
 
 %changelog
+* Thu Aug 14 2025 Suneel Yadava <suneelyadava@microsoft.com> - 1.0.3-2
+- Promoted pacakages to core (from SPECS-EXTENDED to SPECS).
+- License verified.
+
 * Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.0.3-1
 - Update to version 1.0.3
 - License verified
