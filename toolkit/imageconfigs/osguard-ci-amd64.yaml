@@ -119,6 +119,7 @@ os:
       - containerd2
       - cri-tools
       - erofs-utils
+      - notation
       # UKI
       - systemd-boot
       # hyperv
