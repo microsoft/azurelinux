@@ -21362,6 +21362,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "poppler",
+          "version": "25.02.0",
+          "downloadUrl": "https://poppler.freedesktop.org/poppler-25.02.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "poppler-data",
+          "version": "0.4.11",
+          "downloadUrl": "https://poppler.freedesktop.org/poppler-data-0.4.11.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "po4a",
           "version": "0.60",
           "downloadUrl": "https://github.com/mquinson/po4a/archive/v0.60/po4a-0.60.tar.gz"
