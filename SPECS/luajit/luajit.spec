@@ -5,22 +5,23 @@ Name:           luajit
 Version:        2.1.0
 %global apiver %(v=%{version}; echo ${v%.${v#[0-9].[0-9].}})
 %global srcver %{version}%{?rctag:-%{rctag}}
-Release:        27%{?dist}
+Release:        28%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://luajit.org/
-Source0:        https://luajit.org/download/LuaJIT-%{srcver}.tar.gz
+Source0:        https://github.com/LuaJIT/LuaJIT/archive/refs/tags/v2.1.0-beta3.tar.gz#/LuaJIT-%{srcver}_v1.tar.gz
 
 # Patches from https://github.com/LuaJit/LuaJIT.git
 # Generated from v2.1 branch against the 2.1.0-beta3 tag using
 # git diff v2.1.0-beta3..v2.1 > luajit-2.1-update.patch
-Patch0: luajit-2.1-update.patch
+Patch0:         luajit-2.1-update.patch
 # Patches from https://github.com/cryptomilk/LuaJIT/commits/v2.1-fedora
 # git format-patch --stdout -l1 --no-renames v2.1..v2.1-fedora > luajit-2.1-fedora.patch
-Patch1: luajit-2.1-fedora.patch
+Patch1:         luajit-2.1-fedora.patch
 Patch2:         CVE-2024-25178.patch
 Patch3:         CVE-2024-25176.patch
+Patch4:         CVE-2024-25177.patch
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -96,6 +97,9 @@ make check || true
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Tue Aug 05 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.1.0-28
+- Patch for CVE-2024-25177
+
 * Thu Jul 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.0-27
 - Patch for CVE-2024-25178, CVE-2024-25176
 
