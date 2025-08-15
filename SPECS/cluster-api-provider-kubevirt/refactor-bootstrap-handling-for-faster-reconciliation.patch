@@ -52,10 +52,11 @@ enhanced GetVMNotReadyReason() with gomock expectations.
 ---
  controllers/kubevirtmachine_controller.go     | 114 +++++++++++++-----
  .../kubevirtmachine_controller_test.go        |  75 ++++++++++--
+ main.go                                       |   1 +
  pkg/kubevirt/machine.go                       |   5 +
  pkg/kubevirt/machine_factory.go               |   3 +
  .../mock/machine_factory_generated.go         |  27 ++++-
- 5 files changed, 179 insertions(+), 45 deletions(-)
+ 6 files changed, 180 insertions(+), 45 deletions(-)
 
 diff --git a/controllers/kubevirtmachine_controller.go b/controllers/kubevirtmachine_controller.go
 index 9832a96..0983c93 100644
@@ -430,6 +431,18 @@ index 0bb2017..85ee2ba 100644
  			WorkloadCluster: workloadClusterMock,
  			InfraCluster:    infraClusterMock,
  		}
+diff --git a/main.go b/main.go
+index 8ef2a92..ca46694 100644
+--- a/main.go
++++ b/main.go
+@@ -194,6 +194,7 @@ func setupReconcilers(ctx context.Context, mgr ctrl.Manager) {
+ 
+ 	if err := (&controllers.KubevirtMachineReconciler{
+ 		Client:          mgr.GetClient(),
++		DirectClient:    noCachedClient,
+ 		InfraCluster:    infracluster.New(mgr.GetClient(), noCachedClient),
+ 		WorkloadCluster: workloadcluster.New(mgr.GetClient()),
+ 		MachineFactory:  kubevirt.DefaultMachineFactory{},
 diff --git a/pkg/kubevirt/machine.go b/pkg/kubevirt/machine.go
 index 38a839d..1fb9829 100644
 --- a/pkg/kubevirt/machine.go
