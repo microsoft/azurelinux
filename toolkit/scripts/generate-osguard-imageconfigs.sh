@@ -30,13 +30,25 @@ if [[ ! -f ./merge_yaml.py ]]; then
 	exit 2
 fi
 
-BASE_TPL="../imageconfigs/templates/osguard-base.yaml"
-DELTA_TPL="../imageconfigs/templates/osguard-no-ci-delta.yaml"
+declare -A AMD_VARS=(
+	[delta_name]="osguard amd64"
+    [base_tpl]="../imageconfigs/templates/osguard-base.yaml"
+    [delta_tpl]="../imageconfigs/templates/osguard-no-ci-delta.yaml"
+    [out_name]="osguard-amd64.yaml"
+)
+
+declare -A ARM_VARS=(
+	[delta_name]="osguard arm64"
+	[base_tpl]="../imageconfigs/templates/osguard-base.yaml"
+	[delta_tpl]="../imageconfigs/templates/osguard-arm64-delta.yaml"
+	[out_name]="osguard-arm64.yaml"
+)
+
 
 run_generate() {
 	local out_dir="$1"
 	mkdir -p "$out_dir"
-	local out_std="$out_dir/osguard-amd64.yaml"
+	local out_std="$out_dir/${OUT_NAME}"
 	echo "Generating osguard configs..."
 	echo "Output directory: $out_dir"
 	"$PYTHON_BIN" ./merge_yaml.py "$BASE_TPL" "$DELTA_TPL" -o "$out_std"
@@ -51,8 +63,8 @@ run_test() {
 	run_generate "$tmp_out_dir"
 
 	local generated_file default_file
-	generated_file="$tmp_out_dir/osguard-amd64.yaml"
-	default_file="../imageconfigs/osguard-amd64.yaml"
+	generated_file="$tmp_out_dir/${OUT_NAME}"
+	default_file="../imageconfigs/${OUT_NAME}"
 
 	echo "Comparing:"
 	echo "  Generated: $generated_file"
@@ -66,25 +78,35 @@ run_test() {
 	grep -v '^# Sources:' "$default_file" > "$filt_def"
 
 	if ! diff -u "$filt_gen" "$filt_def"; then
-		echo "Error: Generated osguard imageconfig differs from the committed default." >&2
+		echo "Error: Generated ${DELTA_NAME} imageconfig differs from the committed default." >&2
 		exit 1
 	fi
-	echo "Success: Generated osguard imageconfig matches the committed default."
+	echo "Success: Generated ${DELTA_NAME} imageconfig matches the committed default."
 }
 
 main() {
-	case "${1:-}" in
-		"" )
-			run_generate "$OUT_DIR_DEFAULT"
-			;;
-		test|--test )
-			run_test
-			;;
-		* )
-			echo "Usage: $0 [test]" >&2
-			exit 2
-			;;
-	esac
+
+	for arr in AMD_VARS ARM_VARS; do
+		declare -n vars="$arr"  # 'vars' now refers to the current array
+
+		BASE_TPL="${vars[base_tpl]}"
+		DELTA_TPL="${vars[delta_tpl]}"
+		OUT_NAME="${vars[out_name]}"
+		DELTA_NAME="${vars[delta_name]}"
+
+		case "${1:-}" in
+			"" )
+				run_generate "$OUT_DIR_DEFAULT"
+				;;
+			test|--test )
+				run_test
+				;;
+			* )
+				echo "Usage: $0 [test]" >&2
+				exit 2
+				;;
+		esac
+	done
 }
 
 main "$@"
