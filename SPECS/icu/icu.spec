@@ -59,16 +59,16 @@ make -C icu/icu4c/source DESTDIR=%{buildroot} install
 
 %files devel
 %defattr(-,root,root)
-%license LICENSE
 %{_includedir}/*
-%{_datadir}/*
-%exclude %{_datadir}/licenses/icu/LICENSE
+%{_datadir}/%{name}
+%{_datadir}/man
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
 * Tue Aug 12 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 72.1.0.3-2
 - Patch for CVE-2025-5222
+- Fixed license check warning.
 
 * Thu Feb 05 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 72.1.0.3-1
 - Update to version  "72.1.0.3".
