@@ -90,6 +90,7 @@ pushd $HOME
 tar -xf %{SOURCE1} --no-same-owner
 popd
 %autosetup -p1 -n rustc-%{version}-src
+rm -rf vendor/protobuf-3.7.1
 
 # Setup build/cache directory
 BUILD_CACHE_DIR="build/cache/%{release_date}"
