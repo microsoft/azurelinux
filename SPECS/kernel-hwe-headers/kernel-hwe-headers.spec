@@ -32,5 +32,5 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 
 %changelog
 * Fri Aug 15 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.40.1-1
-- Original version for Azure Linux
+- Initial CBL-Mariner import from Photon (license: Apache2)
 - License verified
