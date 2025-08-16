@@ -1,36 +1,44 @@
-Summary:        Library to rectify defects introduced by photographic lenses
-Name:           lensfun
-Version:        0.3.2
-Release:        26%{?dist}
-License:        LGPLv3 AND CC-BY-SA
+%global tests 1
+%global python3 python%{python3_pkgversion}
+
+Name:    lensfun
+Version: 0.3.4
+Summary: Library to rectify defects introduced by photographic lenses
+Release: 3%{?dist}
+
+License: LGPLv3 and CC-BY-SA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://lensfun.sourceforge.net/
-Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+URL: https://lensfun.github.io/
+Source0: https://github.com/lensfun/lensfun/archive/v%{version}/%{name}-%{version}.tar.gz
+Source1: https://lensfun.sourceforge.net/db/version_1.tar.bz2
+
 ## upstream patches
-Patch1:         0001-Only-require-glib-2.40-when-tests-are-build-without-.patch
-Patch38:        0038-Only-use-proper-C-new-and-delete-syntax-for-object-c.patch
-Patch58:        0058-Use-database-in-source-directory-while-running-tests.patch
-Patch59:        0059-Patch-47-respect-DESTDIR-when-installing-python-stuf.patch
-Patch60:        0060-Various-CMake-patches-from-the-mailing-list.patch
-Patch113:       0113-Added-std-namespace-to-isnan.patch
+
 ## upstreamable patches
 # install manpages only when INSTALL_HELPER_SCRIPTS=ON
-Patch200:       lensfun-0.3.2-INSTALL_HELPER_SCRIPTS.patch
-## upstream patches (master branch)
-Patch866:       0866-Pull-isnan-into-std-namespace-include-cmath-not-math.patch
+Patch200: lensfun-0.3.2-INSTALL_HELPER_SCRIPTS.patch
+
+BuildRequires: cmake
+BuildRequires: doxygen
+BuildRequires: gcc
+BuildRequires: gcc-c++
+BuildRequires: pkgconfig(glib-2.0)
+BuildRequires: pkgconfig(libpng)
+BuildRequires: pkgconfig(zlib)
+%if 0%{?python3:1}
+BuildRequires: %{python3} %{python3}-devel
+BuildRequires: python3-setuptools
+# we cannot use pyproject_buildrequires as setup.py is created in
+# build phase
+BuildRequires: python3-pip
+BuildRequires: python3-wheel
+%else
+Obsoletes: lensfun-python3 < %{version}-%{release}
+Obsoletes: lensfun-tools < %{version}-%{release}
+%endif
 # for rst2man, if INSTALL_HELPER_SCRIPTS != OFF
-BuildRequires:  %{_bindir}/rst2man
-BuildRequires:  cmake >= 2.8
-BuildRequires:  doxygen
-BuildRequires:  gcc
-BuildRequires:  gcc-c++
-BuildRequires:  pkgconfig
-BuildRequires:  pkgconfig(glib-2.0)
-BuildRequires:  pkgconfig(libpng)
-BuildRequires:  pkgconfig(zlib)
-BuildRequires:  python3
-BuildRequires:  python3-devel
+BuildRequires: /usr/bin/rst2man
 
 %description
 The lensfun library provides an open source database of photographic lenses and
@@ -41,79 +49,90 @@ distortion, transversal (also known as lateral) chromatic aberrations,
 vignetting and color contribution of a lens.
 
 %package devel
-Summary:        Development toolkit for %{name}
-License:        LGPLv3
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
+Summary: Development toolkit for %{name}
+License: LGPLv3
+Requires: %{name}%{?_isa} = %{version}-%{release}
 %description devel
 This package contains library and header files needed to build applications
 using lensfun.
 
 %package tools
-Summary:        Tools for managing %{name} data
-License:        LGPLv3
-Requires:       python3-lensfun = %{version}-%{release}
-
+Summary: Tools for managing %{name} data
+License: LGPLv3
+Requires: %{python3}-lensfun = %{version}-%{release}
 %description tools
 This package contains tools to fetch lens database updates and manage lens
 adapters in lensfun.
 
-%package -n python3-lensfun
-Summary:        Python3 lensfun bindings
-License:        LGPLv3 AND CC-BY-SA
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+%package -n %{python3}-lensfun
+Summary:  Python3 lensfun bindings
+Requires: %{name}%{?_isa} = %{version}-%{release}
 
-%description -n python3-lensfun
+%description -n %{python3}-lensfun
 %{summary}.
 
 %prep
 %autosetup -p1
+# extract the updated data
+pushd data/db
+tar xvf %{SOURCE1} > /dev/null
+popd
+
+# disable calls to setup.py, we use our own python build/install macros
+# this is the 0.3.4 version...
+sed -i -e '/${PYTHON} ${SETUP_PY}/d' apps/CMakeLists.txt
+# ...this is how it is on master branch, for future-proofing
+sed -i -e '/${Python3_EXECUTABLE} ${SETUP_PY}/d' apps/CMakeLists.txt
+# creating a timestamp doesn't work with build step disabled
+sed -i -e '/touch/d' apps/CMakeLists.txt
 
 %if 0%{?python3:1}
 sed -i.shbang \
-  -e "s|^#!%{_bindir}/env python3$|#!python3|g" \
+  -e "s|^#!/usr/bin/env python3$|#!%{__python3}|g" \
   apps/lensfun-add-adapter \
   apps/lensfun-update-data
 %endif
 
-
 %build
-mkdir %{_target_platform}
-pushd %{_target_platform}
-%cmake .. \
+%cmake \
   -DBUILD_DOC:BOOL=ON \
-%if 0%{?with_check}
-  -DBUILD_TESTS:BOOL=ON\
-%else
-  -DBUILD_TESTS:BOOL=OFF\
-%endif
+  -DBUILD_TESTS:BOOL=%{?tests:ON}%{!?tests:OFF} \
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DCMAKE_INSTALL_DOCDIR:PATH=%{_pkgdocdir} \
   %{?!python3:-DINSTALL_HELPER_SCRIPTS:BOOL=OFF}
+
+%cmake_build
+
+%cmake_build --target doc
+
+# do a proper guideline-compliant build of the python library
+pushd apps
+%py3_build
 popd
 
-%make_build -C %{_target_platform}
-
-make doc -C %{_target_platform}
-
-
 %install
-make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
+%cmake_install
+
+# do a proper guideline-compliant install of the python library
+pushd apps
+%py3_install
+popd
 
 # create/own /var/lib/lensfun-updates
-mkdir -p %{buildroot}%{_sharedstatedir}/lensfun-updates
+mkdir -p %{buildroot}/var/lib/lensfun-updates
 
 ## unpackaged files
 # omit g-lensfun-update-data because it needs gksudo which we don't ship
 rm -fv %{buildroot}%{_bindir}/g-lensfun-update-data \
-       %{buildroot}%{_mandir}/man1/g-lensfun-update-data.*
+       %{buildroot}%{_mandir}/man1/g-lensfun-update-data.* \
+       %{buildroot}%{_docdir}/%{name}/doxygen.svg
 
 
 %check
-pushd %{_target_platform}
+%if 0%{?tests}
 export CTEST_OUTPUT_ON_FAILURE=1
-ctest -vv
-popd
+%ctest
+%endif
 
 
 %ldconfig_scriptlets
@@ -124,13 +143,14 @@ popd
 %{_datadir}/lensfun/
 %{_libdir}/liblensfun.so.%{version}
 %{_libdir}/liblensfun.so.1*
-%dir %{_sharedstatedir}/lensfun-updates/
+%dir /var/lib/lensfun-updates/
 
 %files devel
-%{_pkgdocdir}/*.css
 %{_pkgdocdir}/*.html
-%{_pkgdocdir}/*.js
 %{_pkgdocdir}/*.png
+%{_pkgdocdir}/*.css
+%{_pkgdocdir}/*.js
+# seems like we install no SVGs on EPEL <= 9
 %{_pkgdocdir}/*.svg
 %{_includedir}/lensfun/
 %{_libdir}/liblensfun.so
@@ -143,21 +163,91 @@ popd
 %{_mandir}/man1/lensfun-add-adapter.1*
 %{_mandir}/man1/lensfun-update-data.1*
 
-%files -n python3-lensfun
+%files -n %{python3}-lensfun
+%{python3_sitelib}/lensfun-*.egg-info/
 %{python3_sitelib}/lensfun/
-%{python3_sitelib}/lensfun*.egg-info
 %endif
 
-
 %changelog
-* Thu Oct 20 2022 Muhammad Falak R Wani <mwani@microsoft.com> - 0.3.2-26
-- Switch to https for source url
-- Drop fedora specific bits
+* Mon Feb 11 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.3.4-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
-* Wed Jul 07 2021 Muhammad Falak R Wani <mwani@microsoft.com> - 0.3.2-25
-- Initial CBL-Mariner import from Fedora 31 (license: MIT).
-- Fix usage of %{python3} macro. Use python3 instead of %{python3}.
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jun 27 2024 Adam Williamson <awilliam@redhat.com> - 0.3.4-1
+- Update to 0.3.4, drop merged and no-longer-needed patches
+- Fix Python build/install so Python subpackage works
+- Fix build on EPEL 8 and 9
+- Include latest database from upstream
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.3-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sun Jul 9 2023 Tom Rix <trix@redhat.com> - 0.3.3-5
+- Fix *.egg-info to *.egg
+
+* Wed Jun 28 2023 Michael J Gruber <mjg@fedoraproject.org> - 0.3.3-4
+- fix FTBFS pre py 3.12
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.3.3-3
+- Rebuilt for Python 3.12
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Aug 04 2022 Rex Dieter <rdieter@fedoraproject.org> 0.3.3-1
+- lensfun-0.3.3
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-38
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.3.2-37
+- Rebuilt for Python 3.11
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-36
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Aug 03 2021 Rex Dieter <rdieter@fedoraproject.org> - 0.3.2-35
+- better FTBFS fix
+
+* Tue Aug 03 2021 Graham White <graham_alton@hotmail.com> - 0.3.2-34
+- Fix FTBFS (#1987636)
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-33
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.3.2-32
+- Rebuilt for Python 3.10
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-31
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Sep 07 2020 Than Ngo <than@redhat.com> - 0.3.2-30
+- Fix FTBFS
+
+* Tue Aug 11 2020 Rex Dieter <rdieter@fedoraproject.org> - 0.3.2-29
+- fix FTBFS
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-28
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-27
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.3.2-26
+- Rebuilt for Python 3.9
+
+* Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.2-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
 * Thu Oct 03 2019 Miro Hrončok <mhroncok@redhat.com> - 0.3.2-24
 - Rebuilt for Python 3.8.0rc1 (#1748018)
