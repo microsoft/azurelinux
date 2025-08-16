@@ -32,5 +32,5 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 
 %changelog
 * Fri Aug 15 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.40.1-1
-- Initial build. First version
+- Original version for Azure Linux
 - License verified
