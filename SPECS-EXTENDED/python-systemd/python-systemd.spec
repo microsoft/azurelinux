@@ -8,6 +8,8 @@ Summary:        Python module wrapping libsystemd functionality
 License:        LGPL-2.1-or-later
 URL:            https://github.com/systemd/python-systemd
 Source0:        https://github.com/systemd/python-systemd/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Patch to fix test failures
+Patch:          https://github.com/systemd/python-systemd/pull/119.patch
 
 BuildRequires: make
 BuildRequires:  gcc
