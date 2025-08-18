@@ -76,6 +76,7 @@ os:
     - console=ttyAMA0
     - earlycon=pl011,0xeffec000
     - initcall_blacklist=arm_pmu_acpi_init
+    - ipe.enforce=0
   packages:
     remove:
     - dracut-hostonly
@@ -186,6 +187,12 @@ scripts:
   - path: scripts/common/tmp-no-exec.sh
   - path: scripts/common/remove-getty-import-credential.sh
   - path: scripts/osguard/create-empty-certs-dir.sh
+  - path: scripts/set_os_release_variant_entries.sh
+    arguments:
+    - --variant-id
+    - osguard-arm64
+    - --variant
+    - OS Guard Image (ARM64)
 output:
   artifacts:
     items:

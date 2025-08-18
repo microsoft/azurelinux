@@ -46,7 +46,7 @@ GEN_JOBS=(
 	"osguard-base.yaml|osguard-no-ci-delta.yaml|osguard-amd64.yaml"
 	"osguard-base.yaml|osguard-ci-delta.yaml|osguard-ci-amd64.yaml"
 	"osguard-base.yaml|osguard-arm64-delta.yaml|osguard-arm64.yaml"
-	"osguard-base.yaml|osguard-arm64-no-ci-delta.yaml|osguard-arm64-no-ci.yaml"
+	"osguard-base.yaml|osguard-ci-arm64-delta.yaml|osguard-ci-arm64.yaml"
 )
 
 run_generate() {
