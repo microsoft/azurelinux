@@ -7,14 +7,12 @@ os:
       - earlycon=pl011,0xeffec000
       # Stopping ACPI-based ARM PMU initialization
       - initcall_blacklist=arm_pmu_acpi_init
-      # Disable IPE code integrity enforcement 
-      - ipe.enforce=0
 scripts:
-  postCustomization:
   # Tag this image variant with its specific variant-id
+  postCustomization:
   - path: scripts/set_os_release_variant_entries.sh
     arguments:
     - --variant-id
-    - osguard-arm64
+    - osguard-ci-arm64
     - --variant
-    - OS Guard Image (ARM64)
+    - OS Guard Code Integrity Image (ARM64)
