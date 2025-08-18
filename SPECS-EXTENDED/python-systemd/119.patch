@@ -5,6 +5,7 @@ Subject: [PATCH 1/2] tests: check for errnos that sd_id128_get_machine
  actually returns
 
 Fixes #118.
+Upstream Patch Reference: https://github.com/systemd/python-systemd/pull/119.patch
 ---
  systemd/test/test_id128.py   | 11 +++++++----
  systemd/test/test_journal.py |  6 +++++-
