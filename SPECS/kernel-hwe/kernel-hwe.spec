@@ -1,5 +1,4 @@
 %global security_hardening none
-%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
 %define short_name hwe
 
@@ -29,10 +28,9 @@ Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/%{version}.tar.gz#/kernel-hwe-%{version}.tar.gz
 Source1:        config_aarch64
-Source2:        sha512hmac-openssl.sh
-Source3:        azurelinux-ca-20230216.pem
-Source4:        cpupower
-Source5:        cpupower.service
+Source2:        azurelinux-ca-20230216.pem
+Source3:        cpupower
+Source4:        cpupower.service
 ExclusiveArch:  aarch64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -157,7 +155,7 @@ make mrproper
 cp %{config_source} .config
 
 # Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE3} certs/mariner.pem
+cp %{SOURCE2} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
 cp .config current_config
@@ -213,9 +211,9 @@ install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
 
 install -d -m 755 %{buildroot}%{_sysconfdir}/sysconfig
-install -c -m 644 %{SOURCE4} %{buildroot}/%{_sysconfdir}/sysconfig/cpupower
+install -c -m 644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/sysconfig/cpupower
 install -d -m 755 %{buildroot}%{_unitdir}
-install -c -m 644 %{SOURCE5} %{buildroot}%{_unitdir}/cpupower.service
+install -c -m 644 %{SOURCE4} %{buildroot}%{_unitdir}/cpupower.service
 
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
@@ -228,10 +226,6 @@ cp -r Documentation/*        %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
 install -vm 744 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
-
-# hmac sign the kernel for FIPS
-%{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
-cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
 
 # Symlink /lib/modules/uname/vmlinuz to boot partition
 ln -s /boot/vmlinuz-%{uname_r} %{buildroot}/lib/modules/%{uname_r}/vmlinuz
@@ -307,10 +301,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
-/boot/.vmlinuz-%{uname_r}.hmac
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
-/lib/modules/%{uname_r}/.vmlinuz.hmac
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu

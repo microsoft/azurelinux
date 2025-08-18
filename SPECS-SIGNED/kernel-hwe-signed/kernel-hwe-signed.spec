@@ -1,5 +1,4 @@
 %global debug_package %{nil}
-%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %global buildarch aarch64
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
@@ -25,7 +24,6 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 #   4. Build this spec
 Source0:        kernel-hwe-%{version}-%{release}.%{buildarch}.rpm
 Source1:        vmlinuz-%{uname_r}
-Source2:        sha512hmac-openssl.sh
 BuildRequires:  cpio
 BuildRequires:  grub2-rpm-macros
 BuildRequires:  openssl
@@ -66,10 +64,6 @@ cp -rp ./. %{buildroot}/
 
 popd
 
-# Recalculate sha512hmac for FIPS
-%{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
-cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
-
 %triggerin -n kernel-hwe -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
 touch %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
@@ -93,10 +87,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
-/boot/.vmlinuz-%{uname_r}.hmac
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
-/lib/modules/%{uname_r}/.vmlinuz.hmac
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
 %exclude /lib/modules/%{uname_r}/kernel/sound
