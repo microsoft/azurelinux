@@ -45,7 +45,7 @@
 Summary:        Graph Visualization Tools
 Name:           graphviz
 Version:        2.42.4
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -87,9 +87,12 @@ BuildRequires:  sed
 BuildRequires:  swig >= 1.3.33
 BuildRequires:  tcl-devel >= 8.3
 BuildRequires:  zlib-devel
+BuildRequires:  cairo-devel
 BuildRequires:  pkgconfig(cairo) >= 1.1.10
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
+Requires: cairo
+
 %if %{PHP}
 BuildRequires:  php-devel
 %endif
@@ -266,9 +269,10 @@ sed -i '/JavaVM.framework/!s/JAVA_INCLUDES=/JAVA_INCLUDES=\"_MY_JAVA_INCLUDES_\"
 sed -i 's|_MY_JAVA_INCLUDES_|-I%{java_home}/include/ -I%{java_home}/include/linux/|g' configure
 
 %configure --with-x --disable-static --disable-dependency-tracking \
-	--without-mylibgd --with-ipsepcola --with-pangocairo \
-	--without-gdk-pixbuf --with-visio --disable-silent-rules \
+       --without-mylibgd --with-ipsepcola --with-pangocairo \
+       --without-gdk-pixbuf --with-visio --disable-silent-rules \
     --without-ruby --without-python2 \
+    --with-cairo --with-expat \
     --with-freetypeincludedir=%{_includedir}/freetype2 --with-freetypelibdir=%{_libdir}/lib \
 %if ! %{LASI}
 	--without-lasi \
@@ -338,7 +342,6 @@ find %{buildroot}%{_docdir}/%{name}/demo -type f -name "*.py" -exec mv {} {}.dem
 rm -f %{buildroot}%{_bindir}/dot_builtins
 
 # These are part of gnome subpkg
-rm -f %{buildroot}%{_libdir}/graphviz/libgvplugin_pango*
 rm -f %{buildroot}%{_libdir}/graphviz/libgvplugin_xlib*
 # This is part of the x11 subpkg only
 rm -rf %{buildroot}%{_datadir}/graphviz/lefty
@@ -520,6 +523,9 @@ php --no-php-ini \
 %{_mandir}/man3/*.3tcl*
 
 %changelog
+* Mon Aug 18 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.42.4-13
+- add pdf support for the graphviz
+
 * Mon Apr 21 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.42.4-12
 - Patch CVE-2023-46045 using an upstream patch
 
