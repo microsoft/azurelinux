@@ -2,6 +2,7 @@
 - [Overview](#overview)
 - [Building in Stages](#building-in-stages)
    - [Install Prerequisites](#install-prerequisites)
+   - [Using containers as an option](#using-containers-as-an-option)
    - [Clone and Sync To Stable Commit](#clone-and-sync-to-stable-commit)
    - [Toolchain Stage](#toolchain-stage)
      - [Populate Toolchain](#populate-toolchain)
@@ -106,6 +107,10 @@ The following sections run through a build one step at a time, briefly explainin
 ## **Install Prerequisites**
 
 Prepare your system by installing the necessary prerequisites [here](prerequisites.md).
+
+## **Using containers as an option**
+
+As an alternative to installation of all the tools and prerequisites in your main OS you can use containers or devcontainer, see [here](developer-tools.md).
 
 ## **Clone and Sync To Stable Commit**
 
