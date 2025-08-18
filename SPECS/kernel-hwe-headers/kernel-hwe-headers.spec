@@ -1,3 +1,6 @@
+# This package doesn't contain any binaries, thus no debuginfo package is needed.
+%global debug_package %{nil}
+
 Summary:        Linux API header files
 Name:           kernel-hwe-headers
 Version:        6.12.40.1
