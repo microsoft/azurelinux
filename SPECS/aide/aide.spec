@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:        Intrusion detection environment
 Name:           aide
-Version:        0.18.6
+Version:        0.19.2
 Release:        1%{?dist}
 URL:            https://github.com/aide/aide
 License:        GPLv2+
@@ -68,6 +68,9 @@ mkdir -p -m0700 %{buildroot}%{_localstatedir}/lib/aide
 %dir %attr(0700,root,root) %{_localstatedir}/log/aide
 
 %changelog
+* Mon Aug 18 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.19.2-1
+- Auto-upgrade to 0.19.2 - for CVE-2025-54389
+
 * Wed Jan 03 2024 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 0.18.6-1
 - Bump version to 0.18.6
 
