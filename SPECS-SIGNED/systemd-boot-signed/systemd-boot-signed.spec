@@ -36,7 +36,6 @@ URL:            https://systemd.io
 Source0:        systemd-boot-%{version}-%{release}.%{buildarch}.rpm
 %ifarch x86_64
 Source1:        systemd-bootx64.efi
-ExclusiveArch:  x86_64
 %elifarch aarch64
 Source1:        systemd-bootaa64.efi
 %endif
