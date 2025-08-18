@@ -167,9 +167,6 @@ os:
   - source: files/osguard-ci/config.toml
     destination: /etc/containerd/config.toml
     permissions: '644'
-  - source: files/osguard-ci/10-podnet.conf
-    destination: /etc/cni/net.d/10-podnet.conf
-    permissions: '644'
   services:
     disable:
     - sshd
