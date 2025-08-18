@@ -2,7 +2,7 @@
 %define groupname postgres
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        16.9
+Version:        14.19
 Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
@@ -243,6 +243,9 @@ fi
 %{_unitdir}/%{name}.service
 
 %changelog
+* Mon Aug 18 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 14.19-1
+- Auto-upgrade to 14.19 - for CVE-2025-8714, CVE-2025-8715, CVE-2025-8713
+
 * Mon May 19 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.9-1
 - Auto-upgrade to 16.9 - for CVE-2025-4207
 

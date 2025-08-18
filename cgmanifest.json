@@ -21463,8 +21463,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "16.9",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.9/postgresql-16.9.tar.bz2"
+          "version": "14.19",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.19/postgresql-14.19.tar.bz2"
         }
       }
     },
