@@ -52,19 +52,19 @@ This enhancement:
 - Protects VMs that have been successful at least once from automatic deletion
 
 ---
- api/v1alpha1/kubevirtmachine_types.go         |   7 ++
- controllers/kubevirtmachine_controller.go     |  20 +++-
+ api/v1alpha1/kubevirtmachine_types.go         |   8 ++
+ controllers/kubevirtmachine_controller.go     |  24 +++-
  .../kubevirtmachine_controller_test.go        | 112 ++++++++++++++++++
  pkg/kubevirt/machine.go                       |   8 ++
  pkg/kubevirt/machine_factory.go               |   2 +
  .../mock/machine_factory_generated.go         |  14 +++
- 6 files changed, 161 insertions(+), 2 deletions(-)
+ 6 files changed, 166 insertions(+), 2 deletions(-)
 
 diff --git a/api/v1alpha1/kubevirtmachine_types.go b/api/v1alpha1/kubevirtmachine_types.go
-index 94e2bcf..a0d29a6 100644
+index 94e2bcf..c8d0fca 100644
 --- a/api/v1alpha1/kubevirtmachine_types.go
 +++ b/api/v1alpha1/kubevirtmachine_types.go
-@@ -74,6 +74,13 @@ type KubevirtMachineStatus struct {
+@@ -74,6 +74,14 @@ type KubevirtMachineStatus struct {
  	// +kubebuilder:default=false
  	Ready bool `json:"ready"`
  
@@ -73,18 +73,24 @@ index 94e2bcf..a0d29a6 100644
 +	// we don't accidentally delete the VM Object.
 +	// This value however will be explicitly set to false, everytime a new KubevirtMachine is created.
 +	// +kubebuilder:default=false
-+	Started bool `json:"started"`
++	// +optional
++	Started bool `json:"started,omitempty"`
 +
  	// LoadBalancerConfigured denotes that the machine has been
  	// added to the load balancer
  	// +optional
 diff --git a/controllers/kubevirtmachine_controller.go b/controllers/kubevirtmachine_controller.go
-index 0983c93..1e74daf 100644
+index 0983c93..ad6094b 100644
 --- a/controllers/kubevirtmachine_controller.go
 +++ b/controllers/kubevirtmachine_controller.go
-@@ -279,11 +279,27 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
+@@ -278,12 +278,32 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
+ 	if externalMachine.IsReady() {
  		// Mark VMProvisionedCondition to indicate that the VM has successfully started
  		conditions.MarkTrue(ctx.KubevirtMachine, infrav1.VMProvisionedCondition)
++		// Set Started to true when VM becomes ready for the first time
++		if !ctx.KubevirtMachine.Status.Started {
++			ctx.KubevirtMachine.Status.Started = true
++		}
  	} else {
 +		// Waiting for VM to boot
 +		ctx.KubevirtMachine.Status.Ready = false
