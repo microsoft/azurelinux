@@ -61,7 +61,7 @@ os:
     resetType: hard-reset
   hostname: azure-linux-os-guard
   selinux:
-    mode: permissive
+    mode: enforcing
   uki:
     kernels: auto
   kernelCommandLine:
@@ -76,6 +76,7 @@ os:
     - console=ttyAMA0
     - earlycon=pl011,0xeffec000
     - initcall_blacklist=arm_pmu_acpi_init
+    - dm_verity.require_signatures=1
   packages:
     remove:
     - dracut-hostonly
