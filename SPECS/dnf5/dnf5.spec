@@ -43,8 +43,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/rpm-software-management/dnf5
 Source0:        %{url}/archive/%{version}/dnf5-%{version}.tar.gz
-Patch1:         CVE-2024-2746.patch
 Patch0:         CVE-2024-1929.patch
+Patch1:         CVE-2024-2746.patch
 # ========== build requires ==========
 BuildRequires:  bash-completion
 BuildRequires:  cmake
