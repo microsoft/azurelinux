@@ -96,7 +96,8 @@ clean-go-tools:
 go_ldflags := 	-X github.com/microsoft/azurelinux/toolkit/tools/internal/exe.ToolkitVersion=$(RELEASE_VERSION) \
 				-X github.com/microsoft/azurelinux/toolkit/tools/pkg/imagecustomizerlib.ToolVersion=$(image_customizer_full_version) \
 				-X github.com/microsoft/azurelinux/toolkit/tools/internal/exe.DistroNameAbbreviation=$(DIST_NAME_ABRV) \
-				-X github.com/microsoft/azurelinux/toolkit/tools/internal/exe.DistroMajorVersion=$(dist_major_version_number)
+				-X github.com/microsoft/azurelinux/toolkit/tools/internal/exe.DistroMajorVersion=$(dist_major_version_number) \
+				-X github.com/microsoft/azurelinux/toolkit/tools/internal/exe.Release=$(RELEASE_VERSION)
 
 # Matching rules for the above targets
 # Tool specific pre-requisites are tracked via $(go-util): $(shell find...) dynamic variable defined above

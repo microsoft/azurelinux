@@ -21,6 +21,8 @@ var DistroNameAbbreviation = "default_dist"
 // DistroMajorVersion is the major version of the distro used for conditional tests (i.e. 3)
 var DistroMajorVersion = "1"
 
+var Release = ""
+
 // InputFlag registers an input flag for k with documentation doc and returns the passed value
 func InputFlag(k *kingpin.Application, doc string) *string {
 	return k.Flag("input", doc).Required().ExistingFile()

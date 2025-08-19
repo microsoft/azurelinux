@@ -1,11 +1,11 @@
-
 %define dist_version 3
 %define distro_release_version_no_time %(echo %{distro_release_version} | cut -d. -f 1-3)
+%global release_suffix %{?ReleaseNumber:.%{ReleaseNumber}}
 
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        %{dist_version}.0
-Release:        26%{?dist}
+Release:        29%{?release_suffix}%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

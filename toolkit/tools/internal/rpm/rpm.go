@@ -128,6 +128,7 @@ var (
 	// For most use-cases, the distro name abbreviation and major version are set by the exe package. However, if the
 	// module is used outside of the main Azure Linux build system, the caller can override these values with SetDistroMacros().
 	distNameAbreviation, distMajorVersion = loadLdDistroFlags()
+	release = loadLdReleaseFlag()
 )
 
 // checkDistroMacros validates the distro macro values.
@@ -137,6 +138,25 @@ func checkDistroMacros(nameAbreviation string, majorVersion int) error {
 		return err
 	}
 	return nil
+}
+
+func checkRelease(release string) (string, error) {
+	if release == "" {
+		err := fmt.Errorf("failed to set distro defines, empty release")
+		return "", err
+	}
+
+	return release, nil
+}
+
+func loadLdReleaseFlag() (string) {
+	release, err := checkRelease(exe.Release)
+	if err != nil {
+		err = fmt.Errorf("failed to load distro release from exe package:\n%w", err)
+		panic(err)
+	}
+
+	return release
 }
 
 // loadDistroFlags will load the values of exe.DistroNameAbbreviation and exe.DistroMajorVersion into the local copies
@@ -324,6 +344,7 @@ func DefaultDistroDefines(runChecks bool, distTag string) map[string]string {
 	defines := defaultDefines(runChecks)
 	defines[DistTagDefine] = distTag
 	defines[distNameAbreviation] = fmt.Sprintf("%d", distMajorVersion)
+	defines["ReleaseNumber"] = release
 	return defines
 }
 
