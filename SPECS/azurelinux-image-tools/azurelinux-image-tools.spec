@@ -46,7 +46,6 @@ Requires: binutils
 Requires: lsof
 Requires: python3
 Requires: python3-pip
-Requires: python3-venv
 Requires: jq
 %ifarch x86_64
 Requires: grub2-pc
