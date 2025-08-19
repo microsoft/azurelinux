@@ -30,8 +30,7 @@ components for parsing, generating, and processing HTML, XML or other
 textual content for output generation on the web. The major feature is
 a template language, which is heavily inspired by Kid. 
 %prep
-%autosetup -p1 -n Genshi-%{version}
- 
+%autosetup -p1 -n Genshi-%{version} 
 # Remove bundled egg-info in case it exists
 rm -rf %{modname}.egg-info 
 find examples -type f | xargs chmod a-x
@@ -44,7 +43,6 @@ find examples -type f | xargs chmod a-x
 %install
 %pyproject_install
 %pyproject_save_files genshi
- 
 sed -i -e '/\/tests/d' %{pyproject_files}
 sed -i -e '/_speedups.c/d' %{pyproject_files}
 
