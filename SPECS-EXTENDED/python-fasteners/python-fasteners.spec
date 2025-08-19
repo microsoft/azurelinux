@@ -14,7 +14,7 @@ BuildArch:      noarch
  
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
-BuildRequires:  pyproject-rpm-macros   
+BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-packaging
 BuildRequires:  python3-requests
 BuildRequires:  python3-wheel
