@@ -269,8 +269,8 @@ sed -i '/JavaVM.framework/!s/JAVA_INCLUDES=/JAVA_INCLUDES=\"_MY_JAVA_INCLUDES_\"
 sed -i 's|_MY_JAVA_INCLUDES_|-I%{java_home}/include/ -I%{java_home}/include/linux/|g' configure
 
 %configure --with-x --disable-static --disable-dependency-tracking \
-       --without-mylibgd --with-ipsepcola --with-pangocairo \
-       --without-gdk-pixbuf --with-visio --disable-silent-rules \
+	--without-mylibgd --with-ipsepcola --with-pangocairo \
+	--without-gdk-pixbuf --with-visio --disable-silent-rules \
     --without-ruby --without-python2 \
     --with-cairo --with-expat \
     --with-freetypeincludedir=%{_includedir}/freetype2 --with-freetypelibdir=%{_libdir}/lib \
