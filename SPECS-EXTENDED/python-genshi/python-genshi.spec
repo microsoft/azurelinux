@@ -21,8 +21,6 @@ Genshi is a Python library that provides an integrated set of
 components for parsing, generating, and processing HTML, XML or other
 textual content for output generation on the web. The major feature is
 a template language, which is heavily inspired by Kid.
- 
- 
 %package -n python3-genshi
 Summary:        %{summary}
  
@@ -37,12 +35,12 @@ a template language, which is heavily inspired by Kid.
 # Remove bundled egg-info in case it exists
 rm -rf %{modname}.egg-info 
 find examples -type f | xargs chmod a-x
- 
+
 %generate_buildrequires
 %pyproject_buildrequires -x i18n 
 %build
 %pyproject_wheel
- 
+
 %install
 %pyproject_install
 %pyproject_save_files genshi
