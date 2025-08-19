@@ -32,7 +32,6 @@ storage:
     hashDeviceId: usr-hash-a
     dataDeviceMountIdType: uuid
     hashDeviceMountIdType: uuid
-    hashSignaturePath: /boot/usr.hash.sig
   filesystems:
   - deviceId: esp
     type: fat32
@@ -121,6 +120,7 @@ os:
     - ebtables
     - ethtool
     - fuse
+    - ig
     - inotify-tools
     - iotop
     - iproute
@@ -134,6 +134,8 @@ os:
     - nftables
     - nmap-ncat
     - nfs-utils
+    - node-exporter-kubernetes
+    - node-problem-detector-kubernetes
     - oras
     - pam
     - psmisc
