@@ -127,7 +127,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        509%{?dist}
+Release:        508%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -188,8 +188,6 @@ Patch201:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-MM-on-Linux.pa
 Patch202:       perl-5.36.0-Add-definition-of-OPTIMIZE-to-.ph-files.patch
 
 Patch203:       CVE-2024-56406.patch
-
-Patch204:       CVE-2025-40909.patch
 
 # Update some of the bundled modules
 # see http://fedoraproject.org/wiki/Perl/perl.spec for instructions
@@ -6846,9 +6844,6 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
-* Wed Jun 04 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 4:5.38.2-509
-- Patch CVE-2025-40909
-
 * Tue May 27 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 4:5.38.2-508
 - Remove password protected zip files from upstream src tarball
 
