@@ -370,11 +370,18 @@ Daily build packages are available via `DAILY_BUILD_ID`. Use `DAILY_BUILD_ID=lkg
 
 ### Authentication
 
-If supplying custom endpoints for source/SRPM/package servers, accessing these resources may require keys and certificates. The keys and certificates can be set using:
+If supplying custom endpoints for source/SRPM/package servers, accessing these resources may require authentication.
+Keys and certificates for TLS based authentication can be set using:
 
 ```bash
 sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" CA_CERT=/path/to/rootca.crt TLS_CERT=/path/to/user.crt TLS_KEY=/path/to/user.key
 ```
+
+For SRPM packing (i.e., for retrieving package sources), an Azure CLI based identity can be used to access authenticated Azure blob storages:
+```bash
+sudo make build-packages SRPM_DOWNLOAD_MODE="azurecli"
+```
+Using this ID requires prior `az login` with your managed identity ID.
 
 ## Building Everything From Scratch
 
@@ -840,6 +847,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | CA_CERT                       |                                                                                                          | CA cert to access the above resources, in addition to the system certificate store
 | TLS_CERT                      |                                                                                                          | TLS cert to access the above resources
 | TLS_KEY                       |                                                                                                          | TLS key to access the above resources
+| SRPM_DOWNLOAD_MODE            |                                                                                                          | Enables managed identity based authentication for accessing package sources from protected Azure Blob Storages. This is useful when package sources are located in storage accounts prohibiting public access.
 
 ---
 
