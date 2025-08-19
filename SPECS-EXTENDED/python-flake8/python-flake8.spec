@@ -1,6 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Name:             python-flake8
+%global modname flake8
+
+Name:             python-%{modname}
 Version:          6.1.0
 Release:          1%{?dist}
 Summary:          Python code checking using pyflakes, pycodestyle, and mccabe
