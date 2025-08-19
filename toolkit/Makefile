@@ -25,6 +25,8 @@ PACKAGE_REBUILD_LIST    ?=
 PACKAGE_IGNORE_LIST     ?=
 ##help:var:SRPM_PACK_LIST:<spec_list>=List of space-separated spec folders inside "SPECS_DIR" to analyze for the build. If empty, all items inside the "SPECS_DIR" will be analyzed. Example: SRPM_PACK_LIST="kernel go which".
 SRPM_PACK_LIST          ?=
+##help:var:SRPM_DOWNLOAD_MODE:<mode>=Mode to use for downloading SRPMs. Modes are define in the SRPM packager functionality.
+SRPM_DOWNLOAD_MODE      ?=
 ##help:var:TEST_RUN_LIST:<spec_list>=List of space-separated spec folders to consider for package tests. Specs from the listed folders MUST contain the "%check" section. If empty, all testable items from "SRPM_PACK_LIST" will be considered. Will not re-test previously built packages. Example: TEST_RUN_LIST="libguestfs zlib".
 TEST_RUN_LIST           ?=
 ##help:var:TEST_RERUN_LIST:<spec_list>=List of space-separated spec folders to force running a package test for. Specs from the listed folders MUST contain the "%check" section. Must not overlap with "TEST_IGNORE_LIST". Example: TEST_RERUN_LIST="libguestfs zlib".
