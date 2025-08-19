@@ -85,6 +85,7 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %changelog
 * Tue Aug 19 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.0.0-3
 - Setting compiler.source to value 1.8 to fix the Build.
+- License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
