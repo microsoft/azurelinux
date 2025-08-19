@@ -145,6 +145,7 @@ rm doc/conf.py
 %changelog
 * Mon nov 4 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> -1.6.5-1
 - Update to new Version-1.6.5 
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
