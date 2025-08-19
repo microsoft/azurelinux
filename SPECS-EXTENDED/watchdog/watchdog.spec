@@ -7,7 +7,7 @@ Release:          1%{?dist}
 License:          GPL-2.0-or-later
 
 URL:              http://sourceforge.net/projects/watchdog/
-Source0:          http://downloads.sourceforge.net/watchdog/watchdog-%{version}.tar.gz
+Source0:          https://downloads.sourceforge.net/watchdog/watchdog-%{version}.tar.gz
 Source2:          README.watchdog.ipmi
 Source3:          README.Fedora
 Source4:          watchdog.service
@@ -19,7 +19,7 @@ Patch1:           0001-Choose-libtirpc-or-another-RPC-library-for-XDR-heade.patc
 Patch2:           0002-mem-leak-verbose.patch
 
 # Non-upstream patch to document SELinux support.
-Patch99:          0099-watchdog-5.16-rhseldoc.patch
+Patch99:         0099-watchdog-5.16-rhseldoc.patch
 
 BuildRequires: make
 BuildRequires:    gcc
