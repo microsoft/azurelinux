@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 Summary:        Intrusion detection environment
 Name:           aide
 Version:        0.18.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 URL:            https://github.com/aide/aide
 License:        GPLv2+
 
@@ -11,6 +11,7 @@ Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        aide.conf
 Source2:        README.quickstart
 Source3:        aide.logrotate
+Patch0:         CVE-2025-54409.patch
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -68,6 +69,9 @@ mkdir -p -m0700 %{buildroot}%{_localstatedir}/lib/aide
 %dir %attr(0700,root,root) %{_localstatedir}/log/aide
 
 %changelog
+* Tue Aug 19 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.18.6-2
+- Patch for CVE-2025-54409
+
 * Wed Jan 03 2024 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 0.18.6-1
 - Bump version to 0.18.6
 
