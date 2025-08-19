@@ -16,6 +16,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/directory"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
@@ -63,6 +64,18 @@ const (
 	signatureUpdateString    = "update"
 )
 
+type downloadModeType int
+
+const (
+	downloadModeAnonymous downloadModeType = iota
+	downloadModeAzureCli
+)
+
+const (
+	downloadModeAnonymousString = "anonymous"
+	downloadModeAzureCliString  = "azurecli"
+)
+
 const (
 	defaultBuildDir    = "./build/SRPMS"
 	defaultWorkerCount = "80"
@@ -78,6 +91,8 @@ type sourceRetrievalConfiguration struct {
 
 	signatureHandling signatureHandlingType
 	signatureLookup   map[string]string
+
+	downloadMode downloadModeType
 }
 
 // packResult holds the worker results from packing a SPEC file into an SRPM.
@@ -124,6 +139,9 @@ var (
 
 	validSignatureLevels = []string{signatureEnforceString, signatureSkipCheckString, signatureUpdateString}
 	signatureHandling    = app.Flag("signature-handling", "Specifies how to handle signature mismatches for source files.").Default(signatureEnforceString).PlaceHolder(exe.PlaceHolderize(validSignatureLevels)).Enum(validSignatureLevels...)
+
+	validDownloadModes = []string{downloadModeAnonymousString, downloadModeAzureCliString}
+	downloadMode       = app.Flag("download-mode", "SRPM download mode: anonymous or azurecli.").Default(downloadModeAnonymousString).PlaceHolder(exe.PlaceHolderize(validDownloadModes)).Enum(validDownloadModes...)
 )
 
 func main() {
@@ -180,6 +198,15 @@ func main() {
 		templateSrcConfig.tlsCerts = append(templateSrcConfig.tlsCerts, cert)
 	}
 
+	switch *downloadMode {
+	case downloadModeAnonymousString:
+		templateSrcConfig.downloadMode = downloadModeAnonymous
+	case downloadModeAzureCliString:
+		templateSrcConfig.downloadMode = downloadModeAzureCli
+	default:
+		logger.Log.Fatalf("Invalid download mode encountered: %s. Allowed: %s", *downloadMode, validDownloadModes)
+	}
+
 	timestamp.StopEvent(nil)
 
 	// A pack list may be provided, if so only pack this subset.
@@ -198,7 +225,8 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 	originalOutDir := outDir
 	if workerTar != "" {
 		const leaveFilesOnDisk = false
-		chroot, buildDir, outDir, specsDir, err = createChroot(workerTar, buildDir, outDir, specsDir)
+		useAzureCliAuth := templateSrcConfig.downloadMode == downloadModeAzureCli
+		chroot, buildDir, outDir, specsDir, err = createChroot(workerTar, buildDir, outDir, specsDir, useAzureCliAuth)
 		if err != nil {
 			return
 		}
@@ -288,7 +316,7 @@ func findSPECFiles(specsDir string, packList map[string]bool) (specFiles []strin
 }
 
 // createChroot creates a chroot to pack SRPMs inside of.
-func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechroot.Chroot, newBuildDir, newOutDir, newSpecsDir string, err error) {
+func createChroot(workerTar, buildDir, outDir, specsDir string, useAzureCliAuth bool) (chroot *safechroot.Chroot, newBuildDir, newOutDir, newSpecsDir string, err error) {
 	const (
 		chrootName       = "srpmpacker_chroot"
 		existingDir      = false
@@ -297,6 +325,7 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 		outMountPoint    = "/output"
 		specsMountPoint  = "/specs"
 		buildDirInChroot = "/build"
+		azureMountPoint  = "/root/.azure"
 	)
 	timestamp.StartEvent("create chroot", nil)
 	defer timestamp.StopEvent(nil)
@@ -304,6 +333,18 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 	extraMountPoints := []*safechroot.MountPoint{
 		safechroot.NewMountPoint(outDir, outMountPoint, "", safechroot.BindMountPointFlags, ""),
 		safechroot.NewMountPoint(specsDir, specsMountPoint, "", safechroot.BindMountPointFlags, ""),
+	}
+
+	// Adding the .azure mount ensures the chroot environment can access CLI credentials
+	if useAzureCliAuth {
+		homeDir, homeErr := os.UserHomeDir()
+		if homeErr == nil {
+			azureDir := filepath.Join(homeDir, ".azure")
+			extraMountPoints = append(extraMountPoints, safechroot.NewMountPoint(azureDir, azureMountPoint, "", safechroot.BindMountPointFlags, ""))
+		} else {
+			err = fmt.Errorf("Could not determine user home directory for .azure mount: %v", homeErr)
+			return
+		}
 	}
 
 	extraDirectories := []string{
@@ -354,7 +395,53 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 	}
 
 	err = chroot.AddFiles(files...)
+	if err != nil {
+		err = fmt.Errorf("failed to add files to chroot:\n%w", err)
+		return
+	}
+
+	if useAzureCliAuth {
+		err = installAzureCliPackage(chroot)
+		if err != nil {
+			return
+		}
+	}
+
 	return
+}
+
+func installAzureCliPackage(chroot *safechroot.Chroot) (err error) {
+	const (
+		rootDir                = "/"
+		azureLinuxReposPackage = "azurelinux-repos-ms-oss"
+		azureCLIPackage        = "azure-cli"
+	)
+
+	logger.Log.Debugf("Installing '%s' and '%s' packages for Azure CLI authenticated downloads", azureLinuxReposPackage, azureCLIPackage)
+
+	err = chroot.Run(func() error {
+		_, repoErr := installutils.TdnfInstall(azureLinuxReposPackage, rootDir)
+		if repoErr != nil {
+			return fmt.Errorf("failed to install '%s':\n%w", azureLinuxReposPackage, repoErr)
+		}
+		return nil
+	})
+	if err != nil {
+		return fmt.Errorf("failed to install required '%s' package:\n%w", azureLinuxReposPackage, err)
+	}
+
+	err = chroot.Run(func() error {
+		_, cliErr := installutils.TdnfInstall(azureCLIPackage, rootDir)
+		if cliErr != nil {
+			return fmt.Errorf("failed to install '%s':\n%w", azureCLIPackage, cliErr)
+		}
+		return nil
+	})
+	if err != nil {
+		return fmt.Errorf("failed to install required '%s' package:\n%w", azureCLIPackage, err)
+	}
+
+	return nil
 }
 
 // calculateSPECsToRepack will check which SPECs should be packed.
@@ -935,7 +1022,9 @@ func hydrateFromRemoteSource(ctx context.Context, fileHydrationState map[string]
 			}
 		}
 
-		cancelled, internalErr := network.DownloadFileWithRetry(ctx, url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts, network.DefaultTimeout)
+		// Pass true if downloadMode is azurecli, false otherwise
+		useAzureCliAuth := srcConfig.downloadMode == downloadModeAzureCli
+		cancelled, internalErr := network.DownloadFileWithRetry(ctx, url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts, useAzureCliAuth, network.DefaultTimeout)
 
 		if netOpsSemaphore != nil {
 			// Clear the channel to allow another operation to start

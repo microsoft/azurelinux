@@ -86,6 +86,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--ca-cert=$(CA_CERT) \
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
+		$(if $(SRPM_DOWNLOAD_MODE),--download-mode=$(SRPM_DOWNLOAD_MODE)) \
 		--build-dir=$(SRPM_BUILD_CHROOT_DIR) \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--worker-tar=$(chroot_worker) \
@@ -112,6 +113,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_files) $(go-srpmpack
 		--ca-cert=$(CA_CERT) \
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
+		$(if $(SRPM_DOWNLOAD_MODE),--download-mode=$(SRPM_DOWNLOAD_MODE)) \
 		--build-dir=$(SRPM_BUILD_CHROOT_DIR) \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--pack-list="$(toolchain_spec_list)" \
