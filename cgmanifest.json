@@ -29897,7 +29897,7 @@
         "other": {
           "name": "watchdog",
           "version": "5.16",
-          "downloadUrl": "http://downloads.sourceforge.net/watchdog/watchdog-5.16.tar.gz"
+          "downloadUrl": "https://downloads.sourceforge.net/watchdog/watchdog-5.16.tar.gz"
         }
       }
     },
