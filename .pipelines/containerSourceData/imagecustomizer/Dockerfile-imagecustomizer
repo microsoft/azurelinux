@@ -27,7 +27,4 @@ RUN tdnf update -y && \
 RUN python3 -m venv /opt/telemetry-venv
 RUN /opt/telemetry-venv/bin/pip install --no-cache-dir -r /imagecustomizer-telemetry-requirements.txt
 
-# Copy remaining necessary files
-COPY .mariner-toolkit-ignore-dockerenv /
-
 ENTRYPOINT ["/usr/local/bin/imagecustomizer-entrypoint.sh"]
