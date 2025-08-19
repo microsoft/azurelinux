@@ -19,7 +19,7 @@ Patch1:           0001-Choose-libtirpc-or-another-RPC-library-for-XDR-heade.patc
 Patch2:           0002-mem-leak-verbose.patch
 
 # Non-upstream patch to document SELinux support.
-Patch99:       0099-watchdog-5.16-rhseldoc.patch
+Patch99:      0099-watchdog-5.16-rhseldoc.patch
 
 BuildRequires: make
 BuildRequires:    gcc
