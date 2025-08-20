@@ -17,8 +17,8 @@
 
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
-Version:        2.6.1
-Release:        22%{?dist}
+Version:        2.7.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,22 +56,21 @@ Source4:        influxdb.tmpfiles
 Source5:        config.yaml
 Source6:        influxdb-user.conf
 Patch0:         CVE-2024-6104.patch
-Patch1:         CVE-2022-32149.patch
-Patch2:         CVE-2024-24786.patch
-Patch3:         CVE-2024-45338.patch
-Patch4:         CVE-2024-28180.patch
-Patch5:         CVE-2025-27144.patch
-Patch6:         CVE-2025-22870.patch
-Patch7:         CVE-2024-51744.patch
+Patch1:         CVE-2024-24786.patch
+Patch2:         CVE-2024-45338.patch
+Patch3:         CVE-2024-28180.patch
+Patch4:         CVE-2025-27144.patch
+Patch5:         CVE-2025-22870.patch
+Patch6:         CVE-2024-51744.patch
 BuildRequires:  clang
-BuildRequires:  golang <= 1.18.8
+BuildRequires:  golang >= 1.20
 BuildRequires:  kernel-headers
 BuildRequires:  protobuf-devel
 BuildRequires:  rust >= 1.60.0
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  tzdata
-# IMPORTANT:  when upgrading this, make sure the flux version matches what is required by go.mod file in the soure code of influxdb.
-BuildRequires:  pkgconfig(flux) >= 0.191.0
+# IMPORTANT:  when upgrading this, make sure the flux version matches what is required by go.mod file in the source code of influxdb.
+BuildRequires:  pkgconfig(flux) >= 0.193.0
 Requires:       tzdata
 Requires(post): systemd
 Conflicts:      influxdb
@@ -152,6 +151,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Wed Aug 20 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.7.0-1
+- Upgrade to version 2.7.0.
+
 * Tue Mar 18 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.6.1-22
 - Fix CVE-2025-22870, CVE-2024-51744 with an upstream patch
 
