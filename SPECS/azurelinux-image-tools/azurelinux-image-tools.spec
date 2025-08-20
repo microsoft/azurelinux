@@ -2,7 +2,7 @@
 
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
-Version:        0.17.0
+Version:        0.18.0
 Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
@@ -99,6 +99,6 @@ go test -C toolkit/tools ./...
 /imagecustomizer-telemetry-requirements.txt
 
 %changelog
-* Mon Aug 11 2025 Lanze Liu <lanzeliu@microsoft.com> 0.17.0-1
+* Wed Aug 20 2025 Lanze Liu <lanzeliu@microsoft.com> 0.18.0-1
 - Original version for Azure Linux (license: MIT).
 - License verified.

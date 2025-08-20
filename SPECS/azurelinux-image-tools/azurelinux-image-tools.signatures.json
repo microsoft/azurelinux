@@ -1,6 +1,6 @@
 {
     "Signatures": {
-        "azurelinux-image-tools-0.17.0.tar.gz": "35cbfad0c6a3cc748aafa7626edc916402cdc7d5e1d28b0ac83f57f171881e61",
-        "azurelinux-image-tools-0.17.0-vendor.tar.gz": "44ca4f97d2fe8f41d2ae0116ae7835063be60338394493a22cf648cbae1f43cf"
+        "azurelinux-image-tools-0.18.0.tar.gz": "dc0a167cbce8164f1a051abde165a575d411774cc65020bd39d6dfe0bb120064",
+        "azurelinux-image-tools-0.18.0-vendor.tar.gz": "6fadff7d823a97658704183f028ecc94e9725fe3ffcba1e4eb48c2d291c184da"
     }
 }
