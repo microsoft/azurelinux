@@ -17,7 +17,7 @@ storage:
       size: 100M
     - id: usr-a
       type: linux-generic
-      size: 1G
+      size: 2G
     - id: usr-hash-a
       type: usr-verity
       size: 128M
