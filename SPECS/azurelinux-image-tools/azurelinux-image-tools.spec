@@ -81,7 +81,7 @@ mkdir -p %{buildroot}/
 # Copy container scripts from their source locations to container paths
 install -p -m 0755 toolkit/tools/imagecustomizer/container/entrypoint.sh %{buildroot}/usr/local/bin/imagecustomizer-entrypoint.sh
 install -p -m 0755 toolkit/tools/imagecustomizer/container/run.sh %{buildroot}/usr/local/bin/imagecustomizer-run.sh
-install -p -m 0755 toolkit/scripts/telemetry_hopper/telemetry_hopper.py %{buildroot}/usr/local/bin/imagecustomizer-telemetry_hopper.py
+install -p -m 0755 toolkit/scripts/telemetry_hopper/telemetry_hopper.py %{buildroot}/usr/local/bin/telemetry_hopper.py
 install -p -m 0644 toolkit/scripts/telemetry_hopper/requirements.txt %{buildroot}/imagecustomizer-telemetry-requirements.txt
 
 %check
@@ -95,7 +95,7 @@ go test -C toolkit/tools ./...
 # Container support files - placed in container filesystem paths with imagecustomizer- prefix
 /usr/local/bin/imagecustomizer-entrypoint.sh
 /usr/local/bin/imagecustomizer-run.sh
-/usr/local/bin/imagecustomizer-telemetry_hopper.py
+/usr/local/bin/telemetry_hopper.py
 /imagecustomizer-telemetry-requirements.txt
 
 %changelog
