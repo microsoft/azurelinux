@@ -3,6 +3,9 @@
 # Licensed under the MIT License.
 
 # Generates osguard image configurations by merging base + delta YAML templates.
+# This script can be run from any directory - it automatically finds the
+# required files based on its own location.
+#
 # Usage:
 #   ./generate-osguard-imageconfigs.sh
 #   ./generate-osguard-imageconfigs.sh test
@@ -22,25 +25,34 @@
 #
 set -euo pipefail
 
-# This script uses relative paths from the current working directory.
-# Run it from toolkit/scripts.
+# This script determines paths based on its own location, making it
+# CWD-independent.
 
 PYTHON_BIN=${PYTHON:-python3}
 
-# Default paths (relative to this script's CWD)
-OUT_DIR_DEFAULT="../imageconfigs"
-TPL_DIR="../imageconfigs/templates"
+# Determine the script's directory and calculate paths relative to it
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+OUT_DIR_DEFAULT="$SCRIPT_DIR/../imageconfigs"
+TPL_DIR="$SCRIPT_DIR/../imageconfigs/templates"
+MERGE_YAML_PATH="$SCRIPT_DIR/merge_yaml.py"
 
+# Ensure merge_yaml.py is available
+if [[ ! -f "$MERGE_YAML_PATH" ]]; then
+	echo "Error: merge_yaml.py not found at expected location: $MERGE_YAML_PATH" >&2
+	echo "Expected structure: toolkit/scripts/merge_yaml.py" >&2
+	exit 2
+fi
 
-# Ensure merge_yaml.py is available in the current directory
-if [[ ! -f ./merge_yaml.py ]]; then
-	echo "Error: merge_yaml.py not found in the current directory." >&2
-	echo "Hint: run this script from the directory containing merge_yaml.py (e.g., toolkit/scripts)." >&2
+# Validate that the template directory exists
+if [[ ! -d "$TPL_DIR" ]]; then
+	echo "Error: Template directory not found: $TPL_DIR" >&2
+	echo "Expected structure: toolkit/imageconfigs/templates/" >&2
 	exit 2
 fi
 
 
-# List of generation jobs: "<base-template-filename>|<delta-template-filename>|<output-filename>"
+# List of generation jobs:
+#   "<base-template-filename>|<delta-template-filename>|<output-filename>"
 # Add new entries here to support additional outputs.
 GEN_JOBS=(
 	"osguard-base.yaml|osguard-no-ci-delta.yaml|osguard-amd64.yaml"
@@ -83,7 +95,7 @@ run_generate() {
 			continue
 		fi
 
-		"$PYTHON_BIN" ./merge_yaml.py "$base_path" "$delta_path" -o "$out_path"
+		"$PYTHON_BIN" "$MERGE_YAML_PATH" "$base_path" "$delta_path" -o "$out_path"
 		echo "  Wrote: $out_path"
 		wrote_any=true
 	done
