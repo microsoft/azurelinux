@@ -1,3 +1,4 @@
+%global srcname keras
 %define _enable_debug_package 0
 %global debug_package %{nil}
 Summary:        Keras is a high-level neural networks API.
@@ -19,7 +20,6 @@ BuildRequires:  libstdc++-devel
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-numpy
-BuildRequires:  python3-packaging
 BuildRequires:  python3-pip
 BuildRequires:  python3-requests
 BuildRequires:  python3-wheel
@@ -56,18 +56,26 @@ if [ "%{version}" != "3.3.3" ]; then
     exit 1
 fi
 
+
+%generate_buildrequires
+%pyproject_buildrequires -t
+
+
 %build
-%{py3_build}
+%pyproject_wheel
 
 %install
-# this extra script modifies api that enables tensorflow to communicate with keras
-python3 pip_build.py --install
-%{pyproject_install}
+%pyproject_install
+%pyproject_save_files %{srcname} benchmarks
 
 
-%files -n python3-keras
+%check
+pip3 install packaging==23.2 tox tox-current-env
+%tox
+
+
+%files -n python3-%{srcname} -f %{pyproject_files}
 %license LICENSE
-%{python3_sitelib}/*
 
 
 %changelog
