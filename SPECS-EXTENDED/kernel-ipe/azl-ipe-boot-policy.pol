@@ -1,7 +1,29 @@
-policy_name=azl_ipe_boot_policy policy_version=0.0.1
+policy_name=azl_ipe_boot_policy policy_version=0.0.2
 
-DEFAULT action=ALLOW
+DEFAULT action=DENY
 
 DEFAULT op=EXECUTE action=DENY
 op=EXECUTE boot_verified=TRUE action=ALLOW
 op=EXECUTE dmverity_signature=TRUE action=ALLOW
+
+# Using ALLOW for KMODULE until decision is made about kmod & compression
+DEFAULT op=KMODULE action=ALLOW
+# DEFAULT op=KMODULE action=DENY
+op=KMODULE boot_verified=TRUE action=ALLOW
+op=KMODULE dmverity_signature=TRUE action=ALLOW
+
+DEFAULT op=FIRMWARE action=DENY
+op=FIRMWARE boot_verified=TRUE action=ALLOW
+op=FIRMWARE dmverity_signature=TRUE action=ALLOW
+
+DEFAULT op=KEXEC_IMAGE action=DENY
+op=KEXEC_IMAGE boot_verified=TRUE action=ALLOW
+op=KEXEC_IMAGE dmverity_signature=TRUE action=ALLOW
+
+DEFAULT op=KEXEC_INITRAMFS action=DENY
+op=KEXEC_INITRAMFS boot_verified=TRUE action=ALLOW
+op=KEXEC_INITRAMFS dmverity_signature=TRUE action=ALLOW
+
+DEFAULT op=POLICY action=DENY
+
+DEFAULT op=X509_CERT action=DENY

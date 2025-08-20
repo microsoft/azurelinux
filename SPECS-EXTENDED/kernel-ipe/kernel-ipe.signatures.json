@@ -6,7 +6,7 @@
     "cpupower": "d7518767bf2b1110d146a49c7d42e76b803f45eb8bd14d931aa6d0d346fae985",
     "cpupower.service": "b057fe9e5d0e8c36f485818286b80e3eba8ff66ff44797940e99b1fd5361bb98",
     "sha512hmac-openssl.sh": "02ab91329c4be09ee66d759e4d23ac875037c3b56e5a598e32fd1206da06a27f",
-    "azl-ipe-boot-policy.pol": "f2b7941bd3b721aadc8e937d0472c36fe5e140221f7bb54af6ef905884e0372c",
+    "azl-ipe-boot-policy.pol": "c6b5fe11263b52d8d90314f55dc060e479321f1ef521577ac8a7e5a92dca02cc",
     "Makefile": "1c2e740407215ed9b9cbbc09f9102bc99c08b370bbe2cbb0490aefdc9eb70455",
     "tarfs.c": "066084e1ca2c1e7ba83e76a6696cf17928e7efb46a2b1670a7a1f597c2d9bc51",
     "kernel-6.6.96.1.tar.gz": "6d7b4f49abd8e8daf8e3964dacd3fe2676ce4fa243579b76fa16f9bdb5228152"

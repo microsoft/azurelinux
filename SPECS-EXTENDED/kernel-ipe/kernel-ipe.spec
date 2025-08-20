@@ -33,7 +33,7 @@
 Summary:        Linux Kernel
 Name:           kernel-ipe
 Version:        6.6.96.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -459,6 +459,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Aug 20 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 6.6.96.1-3
+- Expand kernel-ipe boot policy to control more operations
+
 * Thu Jul 17 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.96.1-2
 - Bump release to match kernel
 
