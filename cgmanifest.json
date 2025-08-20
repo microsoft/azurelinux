@@ -7221,8 +7221,8 @@
         "type": "other",
         "other": {
           "name": "influxdb",
-          "version": "2.6.1",
-          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.6.1.tar.gz"
+          "version": "2.7.0",
+          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.7.0.tar.gz"
         }
       }
     },
