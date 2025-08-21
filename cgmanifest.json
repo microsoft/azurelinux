@@ -13581,6 +13581,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mongosh",
+          "version": "2.5.5",
+          "downloadUrl": "https://github.com/mongodb-js/mongosh/archive/refs/tags/v2.5.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "mosh",
           "version": "1.4.0",
           "downloadUrl": "https://github.com/mobile-shell/mosh/releases/download/mosh-1.4.0/mosh-1.4.0.tar.gz"

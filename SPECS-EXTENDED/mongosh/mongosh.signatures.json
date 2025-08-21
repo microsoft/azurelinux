@@ -1,0 +1,12 @@
+{
+ "Signatures": {
+  "SHASUMS256.txt": "0f51e2f7af51a5224bff57045aa47ae14d148932a37f3150c71071314cbf7de7",
+  "mongodb-client-encryption.tar.gz": "609463ee89a5e21d74e2b20ebd4ac0f96029ffc60176a77fcb14e068763cf9b3",
+  "mongosh-2.5.5.tar.gz": "7efe030b48101f0c7b22304028fbae2b0c09224004a547c6c2268554946526fc",
+  "mongosh_lazy-webpack-modules.tar.gz": "4f1900d418bee9dd1e8a2da5893e466befb4d3ef87b222e61925667a667153ea",
+  "mongosh_node_modules.tar.gz": "01c8e70575e135a8d2b8c9c4f85808b050ad3a2e343b30023c53ade30818a41d",
+  "mongosh_npm_lazy_cache.tar.gz": "081fb290930ef04a950147fd08dcb513f5cbe2bc2c9b316e68fca209679dfd7e",
+  "mongosh_packages.tar.gz": "8db11ea870a01190a9d4995fb5478e9e7536a6e75c3745eb9cae252cc52ff1f4",
+  "node-v20.19.3.tar.gz": "4c9f238ad7c57af35efa6ba6259521aebbe20c2f91f6d846860a861c97fc6b99"
+ }
+}
