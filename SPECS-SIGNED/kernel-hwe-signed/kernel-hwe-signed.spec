@@ -24,6 +24,7 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 #   4. Build this spec
 Source0:        kernel-hwe-%{version}-%{release}.%{buildarch}.rpm
 Source1:        vmlinuz-%{uname_r}
+ExclusiveArch:  aarch64
 BuildRequires:  cpio
 BuildRequires:  grub2-rpm-macros
 BuildRequires:  openssl
