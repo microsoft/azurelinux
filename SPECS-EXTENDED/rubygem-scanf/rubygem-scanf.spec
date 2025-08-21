@@ -71,5 +71,5 @@ ruby -I.%{gem_instdir}/lib %{SOURCE3} %{SOURCE4} %{SOURCE5}
 
 %changelog
 * Fri Dec 06 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.0.0-1
-- Initial Azure Linux import from Fedora 41.
+- Initial Azure Linux import from Fedora 41
 - License verified
