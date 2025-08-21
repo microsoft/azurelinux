@@ -67,7 +67,7 @@ ruby -Ilib test/test_deep_merge.rb
 %exclude %{gem_instdir}/test
 %exclude %{gem_instdir}/Rakefile
 %{gem_spec}
-%doc %{gem_instdir}/LICENSE
+%license %{gem_instdir}/LICENSE
  
 %files doc
 %doc %{gem_docdir}
