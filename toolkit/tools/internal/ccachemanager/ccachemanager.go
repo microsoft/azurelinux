@@ -462,6 +462,16 @@ func CreateManager(rootDir string, configFileName string) (m *CCacheManager, err
 		return nil, fmt.Errorf("Unable to init azure blob storage client:\n%w", err)
 	}
 
+	logger.Log.Infof("  uploading /etc/os-release to blob storage...")
+
+	err = azureBlobStorage.Upload(context.Background(),
+		"/etc/os-release",
+		configuration.RemoteStoreConfig.ContainerName,
+		configuration.RemoteStoreConfig.UploadFolder+"/os-release")
+	if err != nil {
+		return nil, fmt.Errorf("Failed to upload /etc/os-release to blob storage:\n%w", err)
+	}
+
 	err = directory.EnsureDirExists(rootDir)
 	if err != nil {
 		return nil, fmt.Errorf("Cannot create ccache working folder:\n%w", err)
