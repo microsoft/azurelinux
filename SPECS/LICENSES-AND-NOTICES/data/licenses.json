@@ -2712,7 +2712,6 @@
                 "gnutls",
                 "gobject-introspection",
                 "golang",
-                "golang-1.18",
                 "gperf",
                 "gperftools",
                 "gpgme",
