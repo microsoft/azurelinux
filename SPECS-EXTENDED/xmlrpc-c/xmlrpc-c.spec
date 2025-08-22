@@ -175,6 +175,7 @@ make runtests
 %changelog
 * Thu Aug 22 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.60.04-1
 - Update to version 1.59.04
+- Added %check section
 
 * Wed Nov 16 2022 Suresh Thelkar <sthelkar@microsoft.com> - 1.54.06-2
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
