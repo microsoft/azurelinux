@@ -12,6 +12,7 @@ Source1:        aide.conf
 Source2:        README.quickstart
 Source3:        aide.logrotate
 Patch0:         CVE-2025-54389.patch
+Patch1:         CVE-2025-54409.patch
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -71,6 +72,7 @@ mkdir -p -m0700 %{buildroot}%{_localstatedir}/lib/aide
 %changelog
 * Mon Aug 18 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.18.6-2
 - Patch for CVE-2025-54389
+- Patch for CVE-2025-54409
 
 * Wed Jan 03 2024 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 0.18.6-1
 - Bump version to 0.18.6
