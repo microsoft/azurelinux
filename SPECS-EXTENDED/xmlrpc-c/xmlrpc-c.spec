@@ -1,9 +1,9 @@
-# Upstream libxml2 backend is completely broken since 2015 https://sourceforge.net/p/xmlrpc-c/patches/49/
-%bcond_with libxml2
+# build order matters and multiple threads break it
+%global _smp_mflags -j1
  
 Name:           xmlrpc-c
-Version:        1.59.03
-Release:        1%{?dist}
+Version:        1.60.04
+Release:        4%{?dist}
 Summary:        Lightweight RPC library based on XML and HTTP
 # See doc/COPYING for details.
 # The Python 1.5.2 license used by a few files is just BSD.
@@ -20,12 +20,7 @@ Patch103:       0003-allow-30x-redirections.patch
 BuildRequires:  git-core
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
-%if %{with libxml2}
 BuildRequires:  pkgconfig(libxml-2.0)
-%else
-# upstream has its own fork of expat
-Provides:       bundled(expat)
-%endif
 BuildRequires:  pkgconfig(openssl)
 BuildRequires:  pkgconfig(libcurl)
 BuildRequires:  readline-devel
@@ -112,9 +107,8 @@ This package contains some handy XML-RPC demo applications.
  
 %build
 %configure
-%make_build
-# build order matters and multiple threads break it
-%make_build -j1 -C tools
+%make_build CFLAGS="%{optflags} -std=gnu17"
+%make_build CFLAGS="%{optflags} -std=gnu17" -C tools
  
  
 %install
@@ -123,16 +117,16 @@ This package contains some handy XML-RPC demo applications.
  
  
 %check
-#%%make_test
+cd test
+make runtests
  
  
 %files
 %license doc/COPYING lib/abyss/license.txt
 %doc doc/CREDITS doc/HISTORY
-%if ! %{with libxml2}
 %{_libdir}/libxmlrpc_xml*.so.*
-%endif
 %{_libdir}/libxmlrpc.so.*
+%{_libdir}/libxmlrpc_openssl.so.*
 %{_libdir}/libxmlrpc_util.so.*
 %{_libdir}/libxmlrpc_abyss.so.*
 %{_libdir}/libxmlrpc_server.so.*
@@ -179,8 +173,8 @@ This package contains some handy XML-RPC demo applications.
 %{_bindir}/xmlrpc_dumpserver
 
 %changelog
-* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.59.03-1
-- Update to version 1.59.03
+* Thu Aug 22 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.60.04-1
+- Update to version 1.59.04
 
 * Wed Nov 16 2022 Suresh Thelkar <sthelkar@microsoft.com> - 1.54.06-2
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
