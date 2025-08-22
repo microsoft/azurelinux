@@ -15,7 +15,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.22.7
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +30,7 @@ Patch1:         CVE-2024-45336.patch
 Patch2:         CVE-2024-45341.patch
 Patch3:         CVE-2025-22871.patch
 Patch4:         CVE-2025-22870.patch
+Patch5:         CVE-2025-4673.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -49,6 +50,7 @@ mv -v go go-bootstrap
 %patch 2 -p1
 %patch 3 -p1
 %patch 4 -p1
+%patch 5 -p1
 
 %build
 # Go 1.22 requires the final point release of Go 1.20 or later for bootstrap.
@@ -164,6 +166,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Aug 22 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.22.7-5
+- Patch CVE-2025-4673
+
 * Thu May 08 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.22.7-4
 - Address CVE-2025-22870 using an upstream patch.
 
