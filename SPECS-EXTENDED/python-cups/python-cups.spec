@@ -24,12 +24,14 @@ BuildRequires: gcc
 BuildRequires: git-core
 # uses make
 BuildRequires: make
-
+BuildRequires: python3-pytest
+BuildRequires: python3-pytest-runner
 BuildRequires: cups-devel
 BuildRequires: python3-devel
 # distutils are removed from python3 project, use the one
 # from setuptools
 BuildRequires: python3-setuptools
+Buildrequires: python3-cups
 
 %description
 This package provides Python bindings for CUPS API,
@@ -64,6 +66,9 @@ export PYTHONPATH=%{buildroot}%{python3_sitearch}
 %{__python3} -m pydoc -w cups
 %{_bindir}/mkdir html
 %{_bindir}/mv cups.html html
+
+%check
+python3 test.py
 
 %files -n python3-cups
 %doc README NEWS TODO
