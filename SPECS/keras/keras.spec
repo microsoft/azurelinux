@@ -1,9 +1,10 @@
+%global srcname keras
 %define _enable_debug_package 0
 %global debug_package %{nil}
 Summary:        Keras is a high-level neural networks API.
 Name:           keras
 Version:        3.3.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,12 +14,12 @@ Source0:        https://github.com/keras-team/keras/archive/refs/tags/v%{version
 #Removes circular dependency between keras and tensorflow. Plus Enables Wheel installation.
 Patch00:        0001-Add-Keras-3.3.3.patch
 Patch01:        CVE-2025-1550.patch
+Patch02:        CVE-2025-8747.patch
 BuildRequires:  git
 BuildRequires:  libstdc++-devel
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-numpy
-BuildRequires:  python3-packaging
 BuildRequires:  python3-pip
 BuildRequires:  python3-requests
 BuildRequires:  python3-wheel
@@ -55,21 +56,32 @@ if [ "%{version}" != "3.3.3" ]; then
     exit 1
 fi
 
+
+%generate_buildrequires
+%pyproject_buildrequires -t
+
+
 %build
-%{py3_build}
+%pyproject_wheel
 
 %install
-# this extra script modifies api that enables tensorflow to communicate with keras
-python3 pip_build.py --install
-%{pyproject_install}
+%pyproject_install
+%pyproject_save_files %{srcname} benchmarks
 
 
-%files -n python3-keras
+%check
+pip3 install packaging==23.2 tox tox-current-env
+%tox
+
+
+%files -n python3-%{srcname} -f %{pyproject_files}
 %license LICENSE
-%{python3_sitelib}/*
 
 
 %changelog
+* Mon Aug 11 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.3.3-3
+- Patch for CVE-2025-8747
+
 * Wed Mar 12 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 3.3.3-2
 - Patch for CVE-2025-1550
 
