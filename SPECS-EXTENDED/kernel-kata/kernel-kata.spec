@@ -8,8 +8,8 @@
 %define config_source %{SOURCE1}
 %endif
 
-Summary:        Mariner kernel that has MSHV Host support
-Name:           kernel-mshv
+Summary:        AzureLinux kernel that has MSHV Host support
+Name:           kernel-kata
 Version:        6.6.57.mshv4
 Release:        1%{?dist}
 License:        GPLv2
@@ -19,8 +19,8 @@ Distribution:   Azure Linux
 Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
-Source3:        50_mariner_mshv.cfg
-Source4:        50_mariner_mshv_menuentry
+Source3:        50_azl_mshv.cfg
+Source4:        50_azl_mshv_menuentry
 ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -121,11 +121,11 @@ install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
-# Add kernel-mshv-specific boot configurations to /etc/default/grub.d
+# Add kernel-kata-specific boot configurations to /etc/default/grub.d
 # This configuration contains additional boot parameters required in our
 # Linux-Dom0-based images.
-install -Dm 755 %{SOURCE3} %{buildroot}%{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
-install -Dm 755 %{SOURCE4} %{buildroot}%{_sysconfdir}/grub.d/50_mariner_mshv_menuentry
+install -Dm 755 %{SOURCE3} %{buildroot}%{_sysconfdir}/default/grub.d/50_azl_mshv.cfg
+install -Dm 755 %{SOURCE4} %{buildroot}%{_sysconfdir}/grub.d/50_azl_mshv_menuentry
 
 %ifarch x86_64
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
