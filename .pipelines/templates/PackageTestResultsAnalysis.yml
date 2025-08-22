@@ -32,9 +32,7 @@ parameters:
     default: "$(Agent.TempDirectory)"
 
 steps:
-    # TODO: the "--index-url" argument must be removed once accessing internal ADO feeds from fork PR checks is supported.
-  - bash: pip3 install --user junit_xml==1.9 --index-url https://pypi.org/simple
-    retryCountOnTaskFailure: 3
+  - bash: sudo tdnf install -y python3-junit-xml
     displayName: "Install Python dependencies"
 
   - task: PythonScript@0
