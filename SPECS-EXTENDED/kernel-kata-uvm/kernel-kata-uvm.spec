@@ -9,7 +9,7 @@
 %endif
 
 Summary:        Linux Kernel for Kata UVM
-Name:           kernel-uvm
+Name:           kernel-kata-uvm
 Version:        6.1.58.mshv8
 Release:        1%{?dist}
 License:        GPLv2
