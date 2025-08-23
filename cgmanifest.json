@@ -23653,8 +23653,8 @@
         "type": "other",
         "other": {
           "name": "python-mutagen",
-          "version": "1.43.0",
-          "downloadUrl": "https://github.com/quodlibet/mutagen/releases/download/release-1.43.0/mutagen-1.43.0.tar.gz"
+          "version": "1.47.0",
+          "downloadUrl": "https://github.com/quodlibet/mutagen/releases/download/release-1.47.0/mutagen-1.47.0.tar.gz"
         }
       }
     },
