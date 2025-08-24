@@ -22,7 +22,8 @@ import (
 )
 
 const (
-	tmpParitionDirName = "tmppartition"
+	tmpParitionDirName    = "tmppartition"
+	tmpEspParitionDirName = "tmpesppartition"
 
 	// supported input formats
 	ImageFormatVhd      = "vhd"
@@ -385,6 +386,13 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 	if len(ic.config.Storage.Verity) > 0 {
 		// Customize image for dm-verity, setting up verity metadata and security features.
 		err = customizeVerityImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile, partIdToPartUuid)
+		if err != nil {
+			return err
+		}
+	}
+
+	if ic.config.OS.Uki != nil{
+		err = customizeUkiImageHelper(ic.buildDirAbs, ic.rawImageFile)
 		if err != nil {
 			return err
 		}
@@ -792,6 +800,13 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 	rootHash = rootHashMatches[1]
 
+	// Commit from fintelia - https://github.com/microsoft/azure-linux-image-tools/pull/6
+	// Refresh disk partitions after running veritysetup so that the hash partition's UUID is correct.
+	diskPartitions, err = diskutils.GetDiskPartitions(loopback.DevicePath())
+	if err != nil {
+		return err
+	}
+
 	systemBootPartition, err := findSystemBootPartition(diskPartitions)
 	if err != nil {
 		return err
@@ -950,6 +965,178 @@ func checkEnvironmentVars() error {
 		return fmt.Errorf("tool should be run as root (e.g. by using sudo):\n"+
 			"HOME must be set to '%s' (is '%s') and USER must be set to '%s' or '' (is '%s')",
 			rootHome, envHome, rootUser, envUser)
+	}
+
+	return nil
+}
+
+func customizeUkiImageHelper(buildDir string, buildImageFile string) error {
+	logger.Log.Debugf("Customizing UKI")
+
+	var err error
+
+	loopback, err := safeloopback.NewLoopback(buildImageFile)
+	if err != nil {
+		return fmt.Errorf("failed to connect to image file to provision UKI:\n%w", err)
+	}
+	defer loopback.Close()
+
+	diskPartitions, err := diskutils.GetDiskPartitions(loopback.DevicePath())
+	if err != nil {
+		return err
+	}
+
+	systemBootPartition, err := findSystemBootPartition(diskPartitions)
+	if err != nil {
+		return err
+	}
+	bootPartition, err := findBootPartitionFromEsp(systemBootPartition, diskPartitions, buildDir)
+	if err != nil {
+		return err
+	}
+
+	systemBootPartitionTmpDir := filepath.Join(buildDir, tmpEspParitionDirName)
+	// Temporarily mount the esp partition.
+	systemBootPartitionMount, err := safemount.NewMount(systemBootPartition.Path, systemBootPartitionTmpDir, systemBootPartition.FileSystemType, 0, "", true)
+	if err != nil {
+		return fmt.Errorf("failed to mount esp partition (%s):\n%w", bootPartition.Path, err)
+	}
+	defer systemBootPartitionMount.Close()
+
+	bootPartitionTmpDir := filepath.Join(buildDir, tmpParitionDirName)
+	// Temporarily mount the boot partition.
+	bootPartitionMount, err := safemount.NewMount(bootPartition.Path, bootPartitionTmpDir, bootPartition.FileSystemType, 0, "", true)
+	if err != nil {
+		return fmt.Errorf("failed to mount partition (%s):\n%w", bootPartition.Path, err)
+	}
+	defer bootPartitionMount.Close()
+
+	// Read the stub path.
+	stubPath := filepath.Join(bootPartitionTmpDir, "linuxx64.efi.stub")
+
+	// Prepare kernel cmdline arguments.
+	grubCfgFullPath := filepath.Join(bootPartitionTmpDir, "grub2/grub.cfg")
+	if err != nil {
+		return fmt.Errorf("failed to stat file (%s):\n%w", grubCfgFullPath, err)
+	}
+
+	// Read the grub.cfg file.
+	grubCfgContent, err := file.Read(grubCfgFullPath)
+	if err != nil {
+		return fmt.Errorf("failed to read file (%s):\n%w", grubCfgFullPath, err)
+	}
+
+	// Split the file content into lines and search for the 'linux' line
+	lines := strings.Split(string(grubCfgContent), "\n")
+	var linuxLine string
+	for _, line := range lines {
+		trimmedLine := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmedLine, "linux") {
+			linuxLine = trimmedLine
+			break
+		}
+	}
+	if linuxLine == "" {
+		return fmt.Errorf("failed to find linux line in %s", grubCfgFullPath)
+	}
+
+	// Find all ukify config files under bootPartitionTmpDir.
+	configFiles := []string{}
+	err = filepath.Walk(bootPartitionTmpDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return fmt.Errorf("error accessing path %s: %w", path, err)
+		}
+		if !info.IsDir() && strings.HasPrefix(info.Name(), "ukify_") && strings.HasSuffix(info.Name(), ".conf") {
+			configFiles = append(configFiles, path)
+		}
+		return nil
+	})
+	if err != nil {
+		return fmt.Errorf("failed to find ukify config files: %w", err)
+	}
+
+	// Loop over each config file and build the UKI.
+	for _, configFile := range configFiles {
+		logger.Log.Infof("Processing ukify config: %s", configFile)
+
+		// Read the Linux value from the ukify config.
+		linuxValue, err := retrieveLinuxFromUkifyConf(configFile)
+		if err != nil {
+			return fmt.Errorf("failed to retrieve Linux value from config (%s): %w", configFile, err)
+		}
+		linuxValueFullPath := filepath.Join(bootPartitionTmpDir, linuxValue)
+
+		// Read the Initrd value from the ukify config.
+		initramfsValue, err := retrieveInitramfsFromUkifyConf(configFile)
+		if err != nil {
+			return fmt.Errorf("failed to retrieve Initrd value from config (%s): %w", configFile, err)
+		}
+		initramfsValueFullPath := filepath.Join(bootPartitionTmpDir, initramfsValue)
+
+		ukifyConfigContent, err := file.Read(configFile)
+		if err != nil {
+			return fmt.Errorf("failed to read file (%s):\n%w", configFile, err)
+		}
+
+		// Replace the existing Linux and Initrd values with the full paths
+		updatedUkifyConfigContent := strings.Replace(string(ukifyConfigContent),
+			fmt.Sprintf("Linux=%s", linuxValue), fmt.Sprintf("Linux=%s", linuxValueFullPath), 1)
+		updatedUkifyConfigContent = strings.Replace(updatedUkifyConfigContent,
+			fmt.Sprintf("Initrd=%s", initramfsValue), fmt.Sprintf("Initrd=%s", initramfsValueFullPath), 1)
+	
+		// Append the linux line as Cmdline to the ukify.conf file content
+		updatedUkifyConfigContent += fmt.Sprintf("Cmdline=%s\n", linuxLine)
+
+		// os-subrelease
+		osSubreleaseFullPath := filepath.Join(bootPartitionTmpDir, "os-release")
+		updatedUkifyConfigContent += fmt.Sprintf("OSRelease=@%s\n", osSubreleaseFullPath)
+	
+		// Write the updated content back to the ukify.conf file
+		err = os.WriteFile(configFile, []byte(updatedUkifyConfigContent), 0644)
+		if err != nil {
+			return fmt.Errorf("failed to write to ukify.conf (%s):\n%w", configFile, err)
+		}
+	
+		// Read the updated ukify.conf file to print the latest content
+		latestUkifyConfigContent, err := os.ReadFile(configFile)
+		if err != nil {
+			return fmt.Errorf("failed to read updated ukify.conf file (%s):\n%w", configFile, err)
+		}
+	
+		// Print the latest ukify.conf content
+		logger.Log.Infof("Updated ukify.conf content:\n%s", string(latestUkifyConfigContent))
+
+		ukiFullPath := filepath.Join(systemBootPartitionTmpDir, fmt.Sprintf("EFI/Linux/%s.unsigned.efi", linuxValue))
+
+		// Build the UKI using ukify.
+		ukifyCmd := []string{
+			"ukify", "-c", fmt.Sprintf("%s", configFile), "build",
+			fmt.Sprintf("--stub=%s", stubPath),
+			fmt.Sprintf("--output=%s", ukiFullPath),
+		}
+
+		err = shell.ExecuteLiveWithErr(1, "sudo", ukifyCmd...)
+		if err != nil {
+			return fmt.Errorf("failed to build UKI for config (%s): %w", configFile, err)
+		}
+
+		logger.Log.Infof("Successfully built UKI: %s", ukiFullPath)
+	}
+
+	// Clean up mounts and loopback device.
+	err = systemBootPartitionMount.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	err = bootPartitionMount.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	err = loopback.CleanClose()
+	if err != nil {
+		return err
 	}
 
 	return nil
