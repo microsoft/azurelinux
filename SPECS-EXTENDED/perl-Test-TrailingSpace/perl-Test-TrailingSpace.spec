@@ -1,12 +1,12 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Test-TrailingSpace
-Version:        0.0302
-Release:        4%{?dist}
+Version:        0.0601
+Release:        11%{?dist}
 Summary:        Test for trailing space in source files
 License:        MIT
 URL:            https://metacpan.org/release/Test-TrailingSpace
-Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-TrailingSpace-%{version}.tar.gz#/perl-Test-TrailingSpace-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-TrailingSpace-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 # Build:
 BuildRequires:  coreutils
@@ -14,6 +14,7 @@ BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+BuildRequires:  perl(:VERSION) >= 5.14.0
 BuildRequires:  perl(ExtUtils::MakeMaker)
 # Run-time:
 BuildRequires:  perl(autodie)
@@ -22,15 +23,15 @@ BuildRequires:  perl(strict)
 BuildRequires:  perl(Test::More) >= 0.88
 BuildRequires:  perl(warnings)
 # Tests:
+BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Path)
 BuildRequires:  perl(File::Spec)
+BuildRequires:  perl(File::TreeCreate)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
-BuildRequires:  perl(lib)
-BuildRequires:  perl(blib)
 BuildRequires:  perl(Test::Builder::Tester)
 # Dependencies:
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# (none)
 
 %description
 This module is used to test for presence of trailing space.
@@ -57,12 +58,77 @@ make test
 %{_mandir}/man3/Test::TrailingSpace.3*
 
 %changelog
-* Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 0.0302-4
-- Add an explicit BR on `perl(blib)` to enable ptest
+* Tue Apr 08 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.0601-11
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.0302-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.0601-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.0601-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.0601-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.0601-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon May 29 2023 Paul Howarth <paul@city-fan.org> - 0.0601-6
+- SPDX migration
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.0601-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.0601-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.0601-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.0601-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Aug 27 2021 Paul Howarth <paul@city-fan.org> - 0.0601-1
+- Update to 0.0601
+  - Split File::TreeCreate off to its own distribution
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.0600-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.0600-5
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.0600-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.0600-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.0600-2
+- Perl 5.32 rebuild
+
+* Sun Jun  7 2020 Paul Howarth <paul@city-fan.org> - 0.0600-1
+- Update to 0.0600
+  - Avoid excessive callback calls by having the _path_cb take the $rule
+    object (optimization)
+
+* Sun Jun  7 2020 Paul Howarth <paul@city-fan.org> - 0.0501-1
+- Update to 0.0501
+  - Try to fix t/dogfood.t tests failures on MS Windows
+
+* Fri Jun  5 2020 Paul Howarth <paul@city-fan.org> - 0.0500-1
+- Update to 0.0500
+  - Convert the file processing to use a code generated callback (a speed
+    optimization)
+
+* Wed May 20 2020 Paul Howarth <paul@city-fan.org> - 0.0400-1
+- Update to 0.0400
+  - Add the 'find_cr' and 'find_tabs' options
+- Module now requires Perl 5.14
+
+* Tue Mar 10 2020 Paul Howarth <paul@city-fan.org> - 0.0302-3
+- BR: perl(blib) for t/00-compile.t
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.0302-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
