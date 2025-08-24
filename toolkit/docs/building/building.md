@@ -1,4 +1,20 @@
-# Building
+# Building Azure Linux
+
+## Is this document for you?
+
+|Task                              | Where to go                                                                   |
+|:---------------------------------|:------------------------------------------------------------------------------|
+|Add or build your own packages    | **[Azure Linux Tutorials](https://github.com/microsoft/AzureLinux-Tutorials)** |
+|Add or build your own images      | **[Azure Linux Tutorials](https://github.com/microsoft/AzureLinux-Tutorials)** |
+|Optimize build performance        | [Quick Build Optimization Guide](./dedicated_guides/quick_build_optimization.md) |
+|Quickly build core packages       | [Package Building Guide](./dedicated_guides/build_packages.md)                  |
+|Quickly build core images         | [Image Building Guide](./dedicated_guides/build_images.md)                      |
+|Learn how the tools work in depth | [Continue Reading](#overview)                                                 |
+|Add/Update a core Azure Linux package | [Continue Reading](#overview)                                             |
+|Improve Azure Linux tools         | [Continue Reading](#overview)                                                 |
+
+## Table of Contents
+
 - [Overview](#overview)
 - [Building in Stages](#building-in-stages)
    - [Install Prerequisites](#install-prerequisites)
@@ -84,19 +100,44 @@
 
 ## Overview
 
-The following documentation describes how to fully build Azure Linux end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of Azure Linux _**is not**_ generally needed.  All Azure Linux packages are built signed and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/3.0/prod/)
+The following documentation describes how to fully build Azure Linux end-to-end as well as advanced techniques for performing toolchain, or package builds. Full builds of Azure Linux _**are not**_ generally needed. All Azure Linux packages are built, signed, and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/3.0/prod/)
 
-If you simply want to test-drive Azure Linux you may download and install the ISO (see: [readme.md](../../README.md)).  If you want to experiment with Azure Linux and build custom images or add packages in a more focused environment, refer to the tutorial in the [AzureLinux-Tutorials](https://github.com/microsoft/AzureLinux-Tutorials) repository.
+If you simply want to test-drive Azure Linux, you may download and install the ISO (see: [readme.md](../../README.md)). If you want to experiment with Azure Linux and build custom images or add packages in a more focused environment, refer to the tutorial in the [AzureLinux-Tutorials](https://github.com/microsoft/AzureLinux-Tutorials) repository.
+
+### Build Optimization
+
+For optimal build performance across all build stages, consider using the `QUICK_REBUILD=y` flag which enables several optimizations documented throughout this guide. This includes:
+
+- `QUICK_REBUILD_TOOLCHAIN=y` - For optimizing toolchain builds
+- `QUICK_REBUILD_PACKAGES=y` - For optimizing package builds
+
+These optimization flags significantly improve build performance by:
+- Using existing published components where possible
+- Enabling delta builds to avoid unnecessary rebuilds
+- Pre-fetching and caching dependencies
+- Limiting cascading rebuilds when a dependency changes
+
+For more detailed information, refer to the [Quick Build Optimization Guide](./dedicated_guides/quick_build_optimization.md).
+
+### Build System Structure
 
 The Azure Linux build system consists of several phases and tools, but at a high level it can be viewed simply as 3 distinct build stages:
 
-- **Toolchain** This stage builds a bootstrap toolchain and then builds the official toolchain.  The official toolchain is used in the subsequent package build stage.  Building is highly scripted and serialized in this stage.
+- **Toolchain** This stage builds a bootstrap toolchain and then builds the official toolchain. The official toolchain is used in the subsequent package build stage. Building is highly scripted and serialized in this stage.
 
-- **Package** This stage uses outputs from the toolchain stage to build any package not built in toolchain stage.  Packages are built in parallel during this stage.
+- **Package** This stage uses outputs from the toolchain stage to build any package not built in toolchain stage. Packages are built in parallel during this stage.
 
 - **Image** This stage generates the resulting ISO, VHD, VHDX, and/or container images from the rpm packages built in the package stage.
 
 Each stage can be built completely from scratch, or in many cases may be seeded from pre-built packages and then partially built.
+
+### Dedicated Build Guides
+
+For more focused instructions on specific build tasks, see our dedicated guides:
+
+- [Quick Build Optimization Guide](./dedicated_guides/quick_build_optimization.md) - Learn how to use optimization flags
+- [Package Building Guide](./dedicated_guides/build_packages.md) - Focused guide on building packages
+- [Image Building Guide](./dedicated_guides/build_images.md) - Focused guide on building images
 
 
 ## **Building in Stages**
@@ -130,13 +171,13 @@ Alternate branches are not generally buildable because community builds require 
 
 ## **Toolchain Stage**
 
-The toolchain builds in two sub-phases.  The first phase builds an initial _bootstrap_ toolchain which is then used to build the _final_ toolchain used in package building.  In the first phase, the bootstrap toolchain downloads a series of source packages from upstream sources.  The second phase downloads SRPMS from packages.microsoft.com.
+The toolchain builds in two sub-phases. The first phase builds an initial _bootstrap_ toolchain which is then used to build the _final_ toolchain used in package building. In the first phase, the bootstrap toolchain downloads a series of source packages from upstream sources. The second phase downloads SRPMS from packages.microsoft.com.
 
 For expediency, the toolchain may be populated from upstream binaries, or may be completely rebuilt.
 
 ### **Populate Toolchain**
 
-A set of bootstrapped toolchain packages (gcc etc.) are used to build Azure Linux packages and images.  Rather than build the toolchain, the prebuilt binaries can be downloaded to your local machine.  This happens automatically when the `REBUILD_TOOLCHAIN=` parameter is set to `n` (the default).
+A set of bootstrapped toolchain packages (gcc etc.) are used to build Azure Linux packages and images. Rather than build the toolchain, the prebuilt binaries can be downloaded to your local machine. This happens automatically when the `REBUILD_TOOLCHAIN=` parameter is set to `n` (the default).
 
 ```bash
 # Populate Toolchain from pre-existing binaries
@@ -145,7 +186,19 @@ sudo make toolchain REBUILD_TOOLS=y
 
 ### **Rebuild Toolchain**
 
-Depending on hardware, rebuilding the toolchain can take several hours. The following builds **the entire toolchain** from scratch:
+Depending on hardware, rebuilding the toolchain can take several hours. For optimal performance when rebuilding, use the `QUICK_REBUILD_TOOLCHAIN=y` flag which will:
+
+- Set `REBUILD_TOOLCHAIN=y` to build the toolchain from source
+- Set `DELTA_BUILD=y` to enable delta builds
+- Set `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=y` to attempt to download existing components where possible
+- Set `REBUILD_TOOLS=y` to rebuild the go tools
+
+```bash
+# Rebuild the toolchain with optimal performance settings
+sudo make toolchain QUICK_REBUILD_TOOLCHAIN=y
+```
+
+If you need to build the entire toolchain completely from scratch without any downloaded components:
 
 ```bash
 # Add REBUILD_TOOLCHAIN=y to any subsequent command to ensure locally built toolchain packages are used
@@ -154,94 +207,107 @@ sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y
 
 ## **Package Stage**
 
-After the toolchain is built or populated, package building is possible.  The Azure Linux ecosystem provides a significant number of packages, but most of those packages are not used in an image.  When rebuilding packages, you can choose to build everything, or you can choose to build just what you need for a specific image.  This can save significant time because only the subset of the Azure Linux packages needed for an image are built.
+After the toolchain is built or populated, package building is possible. The Azure Linux ecosystem provides a significant number of packages, but most of those packages are not used in an image. When rebuilding packages, you can choose to build everything, or you can choose to build just what you need for a specific image. This can save significant time because only the subset of the Azure Linux packages needed for an image are built.
 
-The CONFIG_FILE argument provides a quick way to declare what to build. To manually build **all** packages you can use the default configuration (`CONFIG_FILE=""`) and invoke the package build target.  To build packages needed for a specific image, you must set the CONFIG_FILE= parameter to an image configuration file of your choice.  The standard image configuration files are in the toolkit/imageconfigs folder.
+The CONFIG_FILE argument provides a quick way to declare what to build. To manually build **all** packages you can use the default configuration (`CONFIG_FILE=""`) and invoke the package build target. To build packages needed for a specific image, you must set the CONFIG_FILE= parameter to an image configuration file of your choice. The standard image configuration files are in the toolkit/imageconfigs folder.
 
 Large parts of the package build stage are parallelized. Enable this by setting the `-j` flag for `make` to the number of parallel jobs to allow. (Recommend setting this value to the number of logical cores available on your system, or less)
 
-There are several more package build options.  For example it's possible to build a single package with all of its prerequisites.  For more details on package building options see [Packages](#packages).
+For optimal performance when building packages, use the `QUICK_REBUILD_PACKAGES=y` flag which will:
+- Set `DELTA_BUILD=y` to enable delta builds
+- Set `DELTA_FETCH=y` to download pre-built packages when possible
+- Set `PRECACHE=y` to pre-load the cache from upstream sources
+- Set `MAX_CASCADING_REBUILDS=1` to limit unnecessary rebuilds of dependent packages
+- Set `REBUILD_TOOLS=y` to rebuild the go tools
+
+There are several more package build options. For example it's possible to build a single package with all of its prerequisites. For more details on package building options see [Packages](#packages).
 
 ### **Rebuild All Packages**
 
-The following command rebuilds all Azure Linux packages.
+The following command rebuilds all Azure Linux packages with optimal settings.
 
 ```bash
-# Build ALL packages
+# Build ALL packages with optimal performance settings
 # (NOTE: Azure Linux compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
-sudo make build-packages -j$(nproc) REBUILD_TOOLS=y
+sudo make build-packages -j$(nproc) QUICK_REBUILD_PACKAGES=y CONFIG_FILE=""
+
+# For even faster builds, use QUICK_REBUILD=y which sets both QUICK_REBUILD_PACKAGES=y and QUICK_REBUILD_TOOLCHAIN=y
+sudo make build-packages -j$(nproc) QUICK_REBUILD=y CONFIG_FILE=""
 ```
 
 ### **Rebuild Minimal Required Packages**
 
-The following command rebuilds packages for the basic VHD.
+The following command rebuilds packages for the basic VHD with optimal settings.
 
 ```bash
-# Build the subset of packages needed to build the basic VHD
+# Build the subset of packages needed to build the basic VHD with optimal performance settings
 # (NOTE: Azure Linux compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
-sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y
+sudo make build-packages -j$(nproc) QUICK_REBUILD_PACKAGES=y CONFIG_FILE=./imageconfigs/core-legacy.json
 ```
 
-Note that the image config file passed to the CONFIG_FILE option _only_ builds the packages included in the image plus all packages needed to build those packages.  That is, more will be built than needed by the image, but only a subset of packages will be built.
+Note that the image config file passed to the CONFIG_FILE option _only_ builds the packages included in the image plus all packages needed to build those packages. That is, more will be built than needed by the image, but only a subset of packages will be built.
 
 ### **Targeted Package Building**
-Beginning with the Azure Linux 2.0's 2022 October Release (2.0.20221007) it is possible to rapidly build one or more packages "in-tree".  This technique can be helpful for modifying an existing SPEC file or adding a new one to Azure Linux.
+Beginning with the Azure Linux 3.0 it is possible to rapidly build one or more packages "in-tree". This technique can be helpful for modifying an existing SPEC file or adding a new one to Azure Linux.
 
 ```bash
-# Build targeted packages
-sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="openssh"
+# Build targeted packages with optimal performance settings
+sudo make build-packages -j$(nproc) QUICK_REBUILD_PACKAGES=y SRPM_PACK_LIST="openssh"
 ```
 Note that this process will download dependencies from packages.microsoft.com and rebuild just the SPEC files indicated by the SRPM_PACK_LIST
 
-After building a package you may choose to rebuild it or build additional packages.  The optional `REFRESH_WORKER_CHROOT=n` option (default is `y`) will avoid rebuilding the worker chroot saving some additional build overhead
+After building a package you may choose to rebuild it or build additional packages. The optional `REFRESH_WORKER_CHROOT=n` option (default is `y`) will avoid rebuilding the worker chroot saving some additional build overhead
 
 ```bash
-# Clean and rebuild targeted packages
+# Clean and rebuild targeted packages with optimal performance settings
 sudo make clean-build-packages
-sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="at openssh" REFRESH_WORKER_CHROOT=n
+sudo make build-packages -j$(nproc) QUICK_REBUILD_PACKAGES=y SRPM_PACK_LIST="at openssh" REFRESH_WORKER_CHROOT=n
 
-# Rebuild single package
-sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="at" PACKAGE_REBUILD_LIST="at" REFRESH_WORKER_CHROOT=n
+# Rebuild single package with optimal performance settings
+sudo make build-packages -j$(nproc) QUICK_REBUILD_PACKAGES=y SRPM_PACK_LIST="at" PACKAGE_REBUILD_LIST="at" REFRESH_WORKER_CHROOT=n
 ```
 
 ## **Image Stage**
 
-Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/AzureLinux-Tutorials#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/azurelinux/tree/3.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
+Different images and image formats can be produced from the build system. Images are assembled from a combination of _Image Configuration_ files and _Package list_ files. Each [Package List](https://github.com/microsoft/AzureLinux-Tutorials#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/azurelinux/tree/3.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image. Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
 
-By default, the `make image` and `make iso` commands (discussed below) build missing packages before starting the image build sequence.  By adding the `REBUILD_PACKAGES=n` argument, the image build phase will supplement missing packages with those on packages.microsoft.com.  This can accelerate the image build process, especially when performing targeted package builds ([targeted Package Building](#targeted-package-building))
+By default, the `make image` and `make iso` commands (discussed below) build missing packages before starting the image build sequence. By adding the `REBUILD_PACKAGES=n` argument, the image build phase will supplement missing packages with those on packages.microsoft.com. This can accelerate the image build process, especially when performing targeted package builds ([targeted Package Building](#targeted-package-building))
+
+For optimal performance when building images, use the `QUICK_REBUILD=y` flag which sets both `QUICK_REBUILD_PACKAGES=y` and `QUICK_REBUILD_TOOLCHAIN=y` as described in the previous sections.
 
 All images are generated in the `out/images` folder.
 
 ### Virtual Hard Disks and Containers
 
 ```bash
-# To build an Azure Linux VHD Image (VHD folder: ../out/images/core-legacy)
-sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y
+# To build an Azure Linux VHD Image with optimal performance settings (VHD folder: ../out/images/core-legacy)
+sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json QUICK_REBUILD=y
 
-# To build an Azure Linux VHDX Image (VHDX folder ../out/images/core-efi)
-sudo make image CONFIG_FILE=./imageconfigs/core-efi.json REBUILD_TOOLS=y
+# To build an Azure Linux VHDX Image with optimal performance settings (VHDX folder ../out/images/core-efi)
+sudo make image CONFIG_FILE=./imageconfigs/core-efi.json QUICK_REBUILD=y
 
-# To build a core Azure Linux Container (Container Folder: ../out/images/core-container/*.tar.gz
-sudo make image CONFIG_FILE=./imageconfigs/core-container.json REBUILD_TOOLS=y
+# To build a core Azure Linux Container with optimal performance settings (Container Folder: ../out/images/core-container/*.tar.gz)
+sudo make image CONFIG_FILE=./imageconfigs/core-container.json QUICK_REBUILD=y
 ```
 
 ### ISO Images
-ISOs are bootable images that install Azure Linux to either a physical or virtual machine.  The installation process can be manually guided through user prompting, or automated through unattended installation.
+ISOs are bootable images that install Azure Linux to either a physical or virtual machine. The installation process can be manually guided through user prompting, or automated through unattended installation.
 
-NOTE: ISOs require additional packaging and build steps (such as the creation of a separate `initrd` installer image used to install the final image to disk).  These additional resources are stored in the toolkit/resources/imagesconfigs folder.
+NOTE: ISOs require additional packaging and build steps (such as the creation of a separate `initrd` installer image used to install the final image to disk). These additional resources are stored in the toolkit/resources/imagesconfigs folder.
 
 
-The following builds an ISO with an interactive UI and selectable image configurations.
+The following builds an ISO with an interactive UI and selectable image configurations using optimal performance settings:
 ```bash
-# To build an Azure Linux ISO Image (ISO folder: ../out/images/full)
-sudo make iso CONFIG_FILE=./imageconfigs/full.json REBUILD_TOOLS=y
+# To build an Azure Linux ISO Image with optimal performance settings (ISO folder: ../out/images/full)
+sudo make iso CONFIG_FILE=./imageconfigs/full.json QUICK_REBUILD=y
 ```
 
 To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y` and run with a [`CONFIG_FILE`](https://github.com/microsoft/AzureLinux-Tutorials#image-config-file) that only specifies a _single_ SystemConfig.
 
 ```bash
-# Build the standard ISO with unattended installer that installs onto the default Gen1 HyperV VM. Needs to cloud-init provision the user once unattended installation finishes.
-sudo make iso -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy-unattended-hyperv.json REBUILD_TOOLS=y UNATTENDED_INSTALLER=y
+# Build the standard ISO with unattended installer that installs onto the default Gen1 HyperV VM 
+# with optimal performance settings. Needs to cloud-init provision the user once unattended installation finishes.
+sudo make iso -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy-unattended-hyperv.json QUICK_REBUILD=y UNATTENDED_INSTALLER=y
 ```
 
 # Further Reading
@@ -378,7 +444,7 @@ sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" CA_CERT=/path/to/root
 
 ## Building Everything From Scratch
 
-**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Azure Linux source packages are available at `SOURCE_URL=https://azurelinuxsrcstorage.blob.core.windows.net/sources/core`**
+**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packaged sources. Core Azure Linux source packages are available at `SOURCE_URL=https://azurelinuxsrcstorage.blob.core.windows.net/sources/core`**
 
 The build system can operate without using pre-built components if desired. There are several variables which enable/disable build components and sources of data. They are listed here along with their default values:
 
@@ -413,21 +479,27 @@ sudo make go-tools REBUILD_TOOLS=y
 
 # Bootstrap just the toolchain using publicly available sources via wget (or from SOURCE_URL if set),
 #  then rebuild the toolchain properly using the provided sources
-# NOTE: Source files must made available via one of:
+# NOTE: Source files must be made available via one of:
 # - `SOURCE_URL=<YOUR_SOURCE_SERVER>`
-# - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL_LIST=...)
+# - DOWNLOAD_SRPMS=y (will download pre-packaged sources from SRPM_URL_LIST=...)
 # - manually placing the correct sources in each /SPECS/* package folder
-#     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files to not match the existing hashes)
+#     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files do not match the existing hashes)
 sudo make toolchain PACKAGE_URL_LIST="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_TOOLS=y
 ```
 
 ```bash
-# Complete rebuild of all tool, package, and image files from source.
-# NOTE: Source files must made available via one of:
+# Build with optimal performance settings using QUICK_REBUILD flags where possible
+# This approach attempts to download components when available, speeding up the build process
+sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" QUICK_REBUILD=y
+```
+
+```bash
+# Complete rebuild of all tool, package, and image files from source
+# NOTE: Source files must be made available via one of:
 # - `SOURCE_URL=<YOUR_SOURCE_SERVER>`
-# - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL_LIST=...)
+# - DOWNLOAD_SRPMS=y (will download pre-packaged sources from SRPM_URL_LIST=...)
 # - manually placing the correct sources in each /SPECS/* package folder
-#     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files to not match the existing hashes)
+#     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files do not match the existing hashes)
 sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" PACKAGE_URL_LIST="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_PACKAGES=y REBUILD_TOOLS=y
 ```
 
@@ -455,17 +527,17 @@ Quickrebuild flags will set some flags to try and optimize builds for speed. Thi
 
 ##### `QUICK_REBUILD_TOOLCHAIN=`**`y`**
 
-> Set `REBUILD_TOOLCHAIN = y`, `INCREMENTAL_TOOLCHAIN = y`, `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL = y`, `REBUILD_TOOLS ?= y`.
+> Set `REBUILD_TOOLCHAIN = y` to build the toolchain from source, `DELTA_BUILD = y` to enable delta builds (which sets the deprecated `INCREMENTAL_TOOLCHAIN = y`), `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL = y` to attempt to download existing components where possible, `REBUILD_TOOLS ?= y` to rebuild the go tools if not already set.
 
 #### `QUICK_REBUILD_PACKAGES=...`
 
 ##### `QUICK_REBUILD_PACKAGES=`**`n`** _(default)_
 
-> Do not set toolchain specific quick rebuild flags
+> Do not set package build specific quick rebuild flags
 
 ##### `QUICK_REBUILD_PACKAGES=`**`y`**
 
-> Set `DELTA_BUILD = y`, `REBUILD_TOOLS ?= y`, `REBUILD_TOOLS ?= y`.
+> Set `DELTA_BUILD = y`, `DELTA_FETCH = y`, `PRECACHE = y`, `MAX_CASCADING_REBUILDS = 1`, `REBUILD_TOOLS ?= y`.
 
 #### URLS and Repos
 
