@@ -1,7 +1,7 @@
 Summary:    A minimalistic user-space library oriented to Netlink developers.
 Name:       libmnl
 Version:    1.0.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:    LGPLv2+
 URL:        http://netfilter.org/projects/libmnl
 Group:      System Environment/libraries
@@ -33,11 +33,9 @@ make install DESTDIR=%{buildroot}
 %check
 make %{?_smp_mflags} -k check
 
-%post
-/sbin/ldconfig
+%post -p /sbin/ldconfig
 
-%postun
-/sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
@@ -52,6 +50,9 @@ make %{?_smp_mflags} -k check
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Thu Mar 27 2025 Andrew Phelps <anphel@microsoft.com> - 1.0.5-2
+- Remove dependency on bash from post/postun phases
+
 * Fri Feb 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.5-1
 - Auto-upgrade to 1.0.5 - Azure Linux 3.0 Upgrades
 
