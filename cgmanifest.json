@@ -6100,8 +6100,8 @@
         "type": "other",
         "other": {
           "name": "hunspell-mr",
-          "version": "1.0.0",
-          "downloadUrl": "http://anishpatil.fedorapeople.org/mr_in.1.0.0.tar.gz"
+          "version": "14.01webext",
+          "downloadUrl": "https://addons.mozilla.org/firefox/downloads/file/4324409/marathi_dictionary-14.01webext.xpi"
         }
       }
     },
