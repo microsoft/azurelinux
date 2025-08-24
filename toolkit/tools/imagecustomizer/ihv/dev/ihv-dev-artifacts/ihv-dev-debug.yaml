@@ -1,0 +1,9 @@
+os:
+  users:
+  - name: debuguser
+    password:
+      type: plain-text
+      value: debugpassword
+    primaryGroup: sudo
+    secondaryGroups:
+    - sudo
