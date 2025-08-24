@@ -2680,6 +2680,7 @@
                 "bison",
                 "blktrace",
                 "boost",
+                "Box2D",
                 "btrfs-progs",
                 "bubblewrap",
                 "build-essential",
