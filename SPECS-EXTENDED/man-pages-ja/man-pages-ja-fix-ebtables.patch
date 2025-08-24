@@ -1,6 +1,0 @@
-diff -pruN man-pages-ja-20140415.orig/manual/ebtables/translation_list man-pages-ja-20140415/manual/ebtables/translation_list
---- man-pages-ja-20140415.orig/manual/ebtables/translation_list	2014-04-15 01:03:11.000000000 +0900
-+++ man-pages-ja-20140415/manual/ebtables/translation_list	2014-04-17 17:05:35.000000000 +0900
-@@ -1 +1 @@
--○::2.0.10-4:2011/12/15:ebtables:8:2014/02/27::kawai@stratosphere.co.jp:Hiroaki KAWAI:
-+○:ebtables:2.0.10-4:2011/12/15:ebtables:8:2014/02/27::kawai@stratosphere.co.jp:Hiroaki KAWAI:
