@@ -1,0 +1,120 @@
+.TH PAPERCONF 1 "24 April 2001"
+.SH NAME
+.B paperconf
+\- print paper configuration information
+.SH SYNOPSIS
+.B paperconf
+[
+[
+.B \-p
+]
+.I paper
+|
+.B \-d
+|
+.B \-a
+]
+[
+.B \-z
+]
+[
+.B \-n
+|
+.B \-N
+]
+[
+.B \-s
+|
+.B \-w
+|
+.B \-h
+]
+[
+.B \-c
+|
+.B \-m
+|
+.B \-i
+]
+.SH DESCRIPTION
+.B paperconf
+prints information about a given paper.
+The information that can be obtained is the name of the paper, its
+size and its width or height.
+When called without arguments,
+.B paperconf
+prints the name of the system- or user-specified paper, obtained by
+looking in order at the
+.B PAPERSIZE
+environment variable, at the contents of the file specified by the
+.B PAPERCONF
+environment variable, at the contents of the file
+.B /etc/papersize
+, consulting the values controlled by the
+.B LC_PAPER
+locale setting, or by using
+.B letter
+as a fall-back value if none of the other alternatives are successful.
+By default, width and height of the paper are printed in PostScript points.
+.SH OPTIONS
+.TP
+.BI \-p " paper"
+Specify the name of the
+.I paper
+about which information is asked.
+.TP
+.B \-d
+Use the default builtin paper name.
+.TP
+.B \-a
+Consider all known paper names.
+.TP
+.B \-z
+If the paper name is unknown, print it but issue a message on the
+standard error and exit with a non-zero code.
+.TP
+.B \-n
+Print the name of the paper.
+.TP
+.B \-N
+Print the name of the paper with the first letter capitalized.
+.TP
+.B \-s
+Print the size (width followed by height) of the paper.
+.TP
+.B \-w
+Print the width of the paper.
+.TP
+.B \-h
+Print the height of the paper.
+.TP
+.B \-c
+Use centimetres as unit for paper size.
+.TP
+.B \-m
+Use millimetres as unit for paper size.
+.TP
+.B \-i
+Use inches as unit for paper size.
+
+.SH ENVIRONMENT
+.TP 20
+.B PAPERSIZE
+Paper size to use regardless of what the papersize file contains.
+.TP 20
+.B PAPERCONF
+Full path to a file containing the paper size to use.
+.SH FILES
+.TP 20
+.B /etc/papersize
+Contains the name of the system-wide default paper size to be used
+if the
+.B PAPERSIZE
+and
+.B PAPERCONF
+variables are not set.
+.SH AUTHOR
+Yves Arrouye <arrouye@debian.org>
+.SH SEE ALSO
+.BR papersize (5)
+
