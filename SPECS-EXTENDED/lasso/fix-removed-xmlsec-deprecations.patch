@@ -1,0 +1,12 @@
+diff -uPr lasso-2.8.2.orig/lasso/lasso.c lasso-2.8.2/lasso/lasso.c
+--- lasso-2.8.2.orig/lasso/lasso.c	2023-01-25 12:10:30.746769119 -0500
++++ lasso-2.8.2/lasso/lasso.c	2023-04-20 12:14:57.332671023 -0400
+@@ -270,7 +270,7 @@
+ 	 * xmlsec-crypto library.
+ 	 */
+ #ifdef XMLSEC_CRYPTO_DYNAMIC_LOADING
+-	if (xmlSecCryptoDLLoadLibrary(BAD_CAST XMLSEC_CRYPTO) < 0) {
++	if (xmlSecCryptoDLLoadLibrary(BAD_CAST xmlSecGetDefaultCrypto()) < 0) {
+ 		message(G_LOG_LEVEL_CRITICAL,
+ 				"Unable to load default xmlsec-crypto library. Make sure"
+ 				"that you have it installed and check shared libraries path"
