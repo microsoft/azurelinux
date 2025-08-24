@@ -24,7 +24,7 @@ Distribution:   Azure Linux
 
 Name:           apache-commons-codec
 Version:        1.18.0
-Release:        1
+Release:        1%{?dist}
 Summary:        Apache Commons Codec Package
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -107,5 +107,5 @@ fi
 
 %changelog
 * Wed May 14 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.18.0-1
-- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
+- Initial Azure Linux import from openSUSE Tumbleweed (license: same as "License" tag).
 - License verified
