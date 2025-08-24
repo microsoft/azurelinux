@@ -208,7 +208,7 @@ pushd bash-5.2.15
             --without-bash-malloc
 make -j$(nproc)
 make DESTDIR=$LFS install
-ln -sv bash $LFS/bin/sh
+#ln -sv bash $LFS/bin/sh
 popd
 rm -rf bash-5.2.15
 
