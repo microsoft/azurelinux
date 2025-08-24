@@ -2027,8 +2027,8 @@
         "type": "other",
         "other": {
           "name": "console-setup",
-          "version": "1.194",
-          "downloadUrl": "http://ftp.de.debian.org/debian/pool/main/c/console-setup/console-setup_1.194.tar.xz"
+          "version": "1.230",
+          "downloadUrl": "http://ftp.de.debian.org/debian/pool/main/c/console-setup/console-setup_1.230.tar.xz"
         }
       }
     },
