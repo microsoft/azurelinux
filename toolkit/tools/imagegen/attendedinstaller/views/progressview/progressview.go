@@ -89,9 +89,6 @@ func (pv *ProgressView) Initialize(backButtonText string, sysConfig *configurati
 // HandleInput handles custom input.
 func (pv *ProgressView) HandleInput(event *tcell.EventKey) *tcell.EventKey {
 	switch event.Key() {
-	// Prevent exiting the UI here as installation has already begun.
-	case tcell.KeyCtrlC:
-		return nil
 	case tcell.KeyCtrlA:
 		pv.switchDetailLevel(!pv.moreDetails)
 	}
