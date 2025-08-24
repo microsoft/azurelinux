@@ -130,7 +130,7 @@ rm -rf glibc-2.38
 touch $LFS/logs/temptoolchain/status_glibc_complete
 
 # sanity check 1
-sh $LFS/tools/sanity_check.sh "1"
+$LFS/tools/sanity_check.sh "1"
 
 echo Libstdc++ from GCC-13.2.0
 tar xf gcc-13.2.0.tar.xz
@@ -203,7 +203,7 @@ echo Bash-5.2.15
 tar xf bash-5.2.15.tar.gz
 pushd bash-5.2.15
 ./configure --prefix=/usr \
-            --build=$(sh support/config.guess) \
+            --build=$(bash support/config.guess) \
             --host=$LFS_TGT                    \
             --without-bash-malloc
 make -j$(nproc)

@@ -97,12 +97,12 @@ else
     echo "Found existing container with tag ${sha_component_tag}, skipping build..."
 fi
 
+pushd $MARINER_BUILD_DIR/toolchain
 if [ "$NO_TOOLCHAIN_CONTAINER" = "y" ]; then
     echo Finished building toolchain, saving logs...
-    cp -r $MARINER_BUILD_DIR/toolchain/lfs_logs ${LOG_DIR}
+    cp -r ./lfs/logs ${LOG_DIR}
 else
     echo Finished building toolchain, extracting from container...
-    pushd $MARINER_BUILD_DIR/toolchain
 
     # Pull out the populated toolchain from the container
     docker rm -f marinertoolchain-container-temp 2>/dev/null || true
