@@ -5561,7 +5561,7 @@
         "other": {
           "name": "hunspell-ca",
           "version": "2.3",
-          "downloadUrl": "http://www.softcatala.org/diccionaris/actualitzacions/OOo/catalan.oxt"
+          "downloadUrl": "https://github.com/Softcatala/catalan-dict-tools/releases/download/v3.0.8/ca.3.0.8-hunspell.zip"
         }
       }
     },
