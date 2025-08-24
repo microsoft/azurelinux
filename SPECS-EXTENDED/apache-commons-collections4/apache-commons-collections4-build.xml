@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="commons-collections4" default="package" basedir=".">
+
+  <!-- ====================================================================== -->
+  <!-- Build environment properties                                           -->
+  <!-- ====================================================================== -->
+
+  <property file="build.properties"/>
+  <property name="project.groupId" value="org.apache.commons"/>
+  <property name="project.artifactId" value="commons-collections4"/>
+  <property name="project.version" value="4.4"/>
+  <property name="bundle.version" value="${project.version}.0"/>
+
+  <property name="compiler.release" value="8"/>
+  <property name="compiler.source" value="1.${compiler.release}"/>
+  <property name="compiler.target" value="${compiler.source}"/>
+
+  <property name="build.finalName" value="${project.artifactId}-${project.version}"/>
+  <property name="build.dir" value="target"/>
+  <property name="build.outputDir" value="${build.dir}/classes"/>
+  <property name="build.srcDir" value="src/main/java"/>
+  <property name="build.resourceDir" value="."/>
+
+  <property name="reporting.outputDirectory" value="${build.dir}/site"/>
+
+  <!-- ====================================================================== -->
+  <!-- Defining classpaths                                                    -->
+  <!-- ====================================================================== -->
+
+  <path id="build.classpath"/>
+
+  <!-- ====================================================================== -->
+  <!-- Cleaning up target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="clean" description="Clean the output directory">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Compilation target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="compile" description="Compile the code">
+    <mkdir dir="${build.outputDir}"/>
+    <javac destdir="${build.outputDir}" 
+           encoding="iso-8859-1" 
+           nowarn="false" 
+           debug="true" 
+           optimize="false" 
+           deprecation="true" 
+           release="${compiler.release}" 
+           target="${compiler.target}" 
+           verbose="false" 
+           fork="false" 
+           source="${compiler.source}">
+      <src>
+        <pathelement location="${build.srcDir}"/>
+      </src>
+      <classpath refid="build.classpath"/>
+    </javac>
+    <mkdir dir="${build.outputDir}/META-INF"/>
+    <copy todir="${build.outputDir}/META-INF">
+      <fileset dir="${build.resourceDir}">
+        <include name="NOTICE.txt"/>
+        <include name="LICENSE.txt"/>
+        <include name="NOTICE"/>
+        <include name="LICENSE"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Javadoc target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="javadoc" description="Generates the Javadoc of the application">
+    <javadoc sourcepath="${build.srcDir}" 
+             packagenames="*" 
+             destdir="${reporting.outputDirectory}/apidocs" 
+             access="protected" 
+             verbose="false" 
+             encoding="iso-8859-1" 
+             version="true" 
+             use="true" 
+             author="true" 
+             splitindex="false" 
+             nodeprecated="false" 
+             nodeprecatedlist="false" 
+             notree="false" 
+             noindex="false" 
+             nohelp="false" 
+             nonavbar="false" 
+             serialwarn="false" 
+             source="${compiler.source}" 
+             linksource="true" 
+             breakiterator="false">
+    </javadoc>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Package target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="package" depends="compile" description="Package the application">
+    <jar jarfile="${build.dir}/${build.finalName}.jar" 
+         compress="true" 
+         index="false" 
+         basedir="${build.outputDir}" 
+         excludes="**/package.html">
+      <manifest>
+		<attribute name="Automatic-Module-Name" value="org.apache.commons.collections4"/>
+		<attribute name="Bundle-Description" value="The Apache Commons Collections package contains types that extend and augment the Java Collections Framework."/>
+		<attribute name="Bundle-DocURL" value="https://commons.apache.org/proper/commons-collections/"/>
+		<attribute name="Bundle-License" value="https://www.apache.org/licenses/LICENSE-2.0.txt"/>
+		<attribute name="Bundle-ManifestVersion" value="2"/>
+		<attribute name="Bundle-Name" value="Apache Commons Collections"/>
+		<attribute name="Bundle-SymbolicName" value="${project.groupId}.${project.artifactId}"/>
+		<attribute name="Bundle-Vendor" value="The Apache Software Foundation"/>
+		<attribute name="Bundle-Version" value="${bundle.version}"/>
+		<attribute name="Export-Package" value="org.apache.commons.collections4.bag;version=&quot;${project.version}&quot;,org.apache.commons.collections4.bidimap;version=&quot;${project.version}&quot;,org.apache.commons.collections4.collection;version=&quot;${project.version}&quot;,org.apache.commons.collections4.comparators;version=&quot;${project.version}&quot;,org.apache.commons.collections4.functors;version=&quot;${project.version}&quot;,org.apache.commons.collections4.iterators;version=&quot;${project.version}&quot;,org.apache.commons.collections4.keyvalue;version=&quot;${project.version}&quot;,org.apache.commons.collections4.list;version=&quot;${project.version}&quot;,org.apache.commons.collections4.map;version=&quot;${project.version}&quot;,org.apache.commons.collections4.multimap;version=&quot;${project.version}&quot;,org.apache.commons.collections4.multiset;version=&quot;${project.version}&quot;,org.apache.commons.collections4.properties;version=&quot;${project.version}&quot;,org.apache.commons.collections4.queue;version=&quot;${project.version}&quot;,org.apache.commons.collections4.sequence;version=&quot;${project.version}&quot;,org.apache.commons.collections4.set;version=&quot;${project.version}&quot;,org.apache.commons.collections4.splitmap;version=&quot;${project.version}&quot;,org.apache.commons.collections4.trie.analyzer;version=&quot;${project.version}&quot;,org.apache.commons.collections4.trie;version=&quot;${project.version}&quot;,org.apache.commons.collections4;version=&quot;${project.version}&quot;"/>
+		<attribute name="Implementation-Title" value="Apache Commons Collections"/>
+		<attribute name="Implementation-Vendor" value="The Apache Software Foundation"/>
+		<attribute name="Implementation-Version" value="${project.version}"/>
+		<attribute name="Import-Package" value="org.w3c.dom"/>
+		<attribute name="Include-Resource" value="META-INF/LICENSE.txt=LICENSE.txt,META-INF/NOTICE.txt=NOTICE.txt"/>
+		<attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=${compiler.target}))&quot;"/>
+		<attribute name="Specification-Title" value="Apache Commons Collections"/>
+		<attribute name="Specification-Vendor" value="The Apache Software Foundation"/>
+		<attribute name="Specification-Version" value="${project.version}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- A dummy target for the package named after the type it creates         -->
+  <!-- ====================================================================== -->
+
+  <target name="jar" depends="package" description="Builds the jar for the application"/>
+
+</project>
