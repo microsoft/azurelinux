@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.86.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -44,6 +44,7 @@ Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Patch0:		CVE-2025-4574.patch
 Patch1:         CVE-2025-53605.patch
 Patch2:         CVE-2024-11738.patch
+Patch3:         CVE-2023-48795.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -181,6 +182,9 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
+* Mon Aug 26 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.86.0-6
+- Patch for CVE-2023-48795
+
 * Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.86.0-5
 - Patch for CVE-2024-11738
  
