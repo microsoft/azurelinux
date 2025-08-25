@@ -32,14 +32,18 @@ oom_score = 0
   max_verifiers = 10
   per_verifier_timeout = "10s"
 
+
 [plugins."io.containerd.snapshotter.v1.erofs"]
   # Optional: Additional mount options for overlayfs
   ovl_mount_options = []
+  # Enable dm-verity integrity verification in erofs layers
   enable_dmverity = true
 
 [plugins."io.containerd.service.v1.diff-service"]
   default = ["erofs"]
 
 [plugins."io.containerd.differ.v1.erofs"]
+  # Using well-known UUID for reproducibility of erofs container layers
   mkfs_options = ["--sort=none", "-T 0", "--mkfs-time", "-Uc1b9d5a2-f162-11cf-9ece-0020afc76f16"]
+  # Enable use of tar index to more efficiently handle OCI image layers
   enable_tar_index = true

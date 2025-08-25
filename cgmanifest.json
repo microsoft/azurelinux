@@ -904,6 +904,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "azurelinux-image-tools",
+          "version": "0.18.0",
+          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v0.18.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "babel",
           "version": "2.15.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/15/d2/9671b93d623300f0aef82cde40e25357f11330bdde91743891b22a555bed/babel-2.15.0.tar.gz"
@@ -6590,8 +6600,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.96.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.1.tar.gz"
+          "version": "6.6.96.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.2.tar.gz"
         }
       }
     },
@@ -8221,8 +8231,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.96.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.1.tar.gz"
+          "version": "6.6.96.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.2.tar.gz"
         }
       }
     },
@@ -8231,8 +8241,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.96.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.1.tar.gz"
+          "version": "6.6.96.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.2.tar.gz"
         }
       }
     },
@@ -8241,8 +8251,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.96.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.1.tar.gz"
+          "version": "6.6.96.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.2.tar.gz"
         }
       }
     },
@@ -8251,8 +8261,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.96.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.1.tar.gz"
+          "version": "6.6.96.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.2.tar.gz"
         }
       }
     },
@@ -13762,8 +13772,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.42",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.42.tar.gz"
+          "version": "8.0.43",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.43.tar.gz"
         }
       }
     },
@@ -15423,8 +15433,8 @@
         "type": "other",
         "other": {
           "name": "opensc",
-          "version": "0.25.1",
-          "downloadUrl": "https://github.com/OpenSC/OpenSC/releases/download/0.25.1/opensc-0.25.1.tar.gz"
+          "version": "0.26.1",
+          "downloadUrl": "https://github.com/OpenSC/OpenSC/releases/download/0.26.1/opensc-0.26.1.tar.gz"
         }
       }
     },
@@ -21463,8 +21473,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "16.9",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.9/postgresql-16.9.tar.bz2"
+          "version": "16.10",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.10/postgresql-16.10.tar.bz2"
         }
       }
     },

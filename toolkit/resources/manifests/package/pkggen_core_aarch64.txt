@@ -1,5 +1,5 @@
 filesystem-1.1-21.azl3.aarch64.rpm
-kernel-headers-6.6.96.1-2.azl3.noarch.rpm
+kernel-headers-6.6.96.2-1.azl3.noarch.rpm
 glibc-2.38-11.azl3.aarch64.rpm
 glibc-devel-2.38-11.azl3.aarch64.rpm
 glibc-i18n-2.38-11.azl3.aarch64.rpm
@@ -178,8 +178,8 @@ openssl-static-3.3.3-2.azl3.aarch64.rpm
 libcap-2.69-5.azl3.aarch64.rpm
 libcap-devel-2.69-5.azl3.aarch64.rpm
 debugedit-5.0-2.azl3.aarch64.rpm
-libarchive-3.7.7-2.azl3.aarch64.rpm
-libarchive-devel-3.7.7-2.azl3.aarch64.rpm
+libarchive-3.7.7-3.azl3.aarch64.rpm
+libarchive-devel-3.7.7-3.azl3.aarch64.rpm
 rpm-4.18.2-1.azl3.aarch64.rpm
 rpm-build-4.18.2-1.azl3.aarch64.rpm
 rpm-build-libs-4.18.2-1.azl3.aarch64.rpm
@@ -208,7 +208,7 @@ libxml2-devel-2.11.5-6.azl3.aarch64.rpm
 docbook-dtd-xml-4.5-11.azl3.noarch.rpm
 docbook-style-xsl-1.79.1-14.azl3.noarch.rpm
 libsepol-3.6-2.azl3.aarch64.rpm
-glib-2.78.6-2.azl3.aarch64.rpm
+glib-2.78.6-3.azl3.aarch64.rpm
 libltdl-2.4.7-1.azl3.aarch64.rpm
 libltdl-devel-2.4.7-1.azl3.aarch64.rpm
 lua-5.4.6-1.azl3.aarch64.rpm

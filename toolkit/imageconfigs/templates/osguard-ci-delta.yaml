@@ -37,10 +37,6 @@ os:
   - source: files/osguard-ci/config.toml
     destination: /etc/containerd/config.toml
     permissions: "644"
-  # Place custom CNI config for enabling pod networking on container creation
-  - source: files/osguard-ci/10-podnet.conf
-    destination: /etc/cni/net.d/10-podnet.conf
-    permissions: "644"
 scripts:
   postCustomization:
   # Tag this image variant with its specific variant-id
