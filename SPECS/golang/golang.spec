@@ -31,6 +31,8 @@ Patch2:         CVE-2024-45341.patch
 Patch3:         CVE-2025-22871.patch
 Patch4:         CVE-2025-22870.patch
 Patch5:         CVE-2025-47907.patch
+Patch6:         CVE-2025-4674.patch
+Patch7:         CVE-2025-4673.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -51,6 +53,8 @@ mv -v go go-bootstrap
 %patch 3 -p1
 %patch 4 -p1
 %patch 5 -p1
+%patch 6 -p1
+%patch 7 -p1
 
 %build
 # Go 1.22 requires the final point release of Go 1.20 or later for bootstrap.
@@ -167,7 +171,7 @@ fi
 
 %changelog
 * Wed Aug 20 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.22.7-5
-- Patch CVE-2025-47907
+- Patch CVE-2025-47907, CVE-2025-4674 and CVE-2025-4673
 
 * Thu May 08 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.22.7-4
 - Address CVE-2025-22870 using an upstream patch.
