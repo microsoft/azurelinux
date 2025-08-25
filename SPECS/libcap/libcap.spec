@@ -62,7 +62,7 @@ sed -i '/echo "attempt to exploit kernel bug"/,/^fi$/d' quicktest.sh
 %{_mandir}/man3/*
 
 %changelog
-* Mon Aug 25 21:12:58 UTC 2025 Andrew Phelps <anphel@microsoft.com> - 2.69-6
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 2.69-6
 - Bump to rebuild with updated glibc
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.69-5

@@ -181,7 +181,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
-* Mon Aug 25 21:12:58 UTC 2025 Andrew Phelps <anphel@microsoft.com> - 1.86.0-6
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.86.0-6
 - Bump to rebuild with updated glibc
 
 * Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.86.0-5

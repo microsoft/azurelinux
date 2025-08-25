@@ -1147,7 +1147,7 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
-* Mon Aug 25 21:12:58 UTC 2025 Andrew Phelps <anphel@microsoft.com> - 1.52.0-14
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.52.0-14
 - Bump to rebuild with updated glibc
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.52.0-13
