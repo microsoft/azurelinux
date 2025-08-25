@@ -22,7 +22,7 @@ Name:           virtiofsd
 # Version to be kept in sync with the `asset.virtiofsd.version` field from
 # https://github.com/microsoft/kata-containers/blob/msft-main/versions.yaml
 Version:        1.8.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        vhost-user virtio-fs device backend written in Rust
 Group:          Development/Libraries/Rust
 License:        Apache-2.0
@@ -75,6 +75,9 @@ cargo test --release
 %{_datadir}/qemu/vhost-user/50-qemu-virtiofsd.json
 
 %changelog
+* Mon Aug 26 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.8.0-6
+- Bump release to rebuild with rust
+
 * Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.8.0-5
 - Bump release to rebuild with rust
 
