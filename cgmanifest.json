@@ -8141,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.18.0.kata0",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.18.0.kata0.tar.gz"
+          "version": "3.19.1.kata0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.19.1.kata0.tar.gz"
         }
       }
     },
