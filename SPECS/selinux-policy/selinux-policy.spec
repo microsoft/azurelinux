@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -132,7 +132,7 @@ enforced by the kernel when running with SELinux enabled.
 %{_sharedstatedir}/selinux/%{policy_name}/active/seusers
 %{_sharedstatedir}/selinux/%{policy_name}/active/file_contexts
 %{_sharedstatedir}/selinux/%{policy_name}/active/modules_checksum
-%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/policy.kern
+%verify(not md5 size mtime) %{_sharedstatedir}/selinux/%{policy_name}/active/policy.kern
 %verify(not md5 size mtime) %{_sharedstatedir}/selinux/%{policy_name}/active/file_contexts.homedirs
 %{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/*
 
@@ -329,6 +329,9 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Thu Aug 18 2025 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-12
+- Include policy.kern otherwise some semanage operations fail without it.
+
 * Fri Apr 04 2025 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-11
 - Add fix for gpg-agent use in rpm scripts for watching root's secrets dir.
 
