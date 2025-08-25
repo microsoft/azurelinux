@@ -147,6 +147,7 @@ os:
     - util-linux
     - xz
     - zip
+    - erofs-utils
   additionalDirs:
   - source: files/osguard/repart.d
     destination: /etc/repart.d
@@ -166,6 +167,9 @@ os:
   - source: files/osguard/resolv-uplink-override.service
     destination: /etc/systemd/system/resolv-uplink-override.service
     permissions: '600'
+  - source: files/osguard-ci/config.toml
+    destination: /etc/containerd/config.toml
+    permissions: '644'
   services:
     disable:
     - sshd
@@ -174,6 +178,8 @@ os:
     - systemd-resolved
   modules:
   - name: iptable_nat
+    loadMode: always
+  - name: erofs
     loadMode: always
 scripts:
   postCustomization:

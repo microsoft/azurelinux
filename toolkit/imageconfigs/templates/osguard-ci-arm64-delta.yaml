@@ -27,6 +27,22 @@ os:
       # erofs-snapshotter to ensure erofs container layers, which are
       # dm-verity volumes, are signed by a trusted entity
       - dm_verity.require_signatures=1
+  packages:
+    install:
+    # For containerd erofs-snapshotter to function, supply its userland
+    # utilities
+    - erofs-utils
+  modules:
+  # Ensure the erofs kernel module is always loaded so containerd
+  # erofs-snapshotter can use it.
+  - name: erofs
+    loadMode: always
+  additionalFiles:
+  # Place custom containerd config that configures erofs-snapshotter as the
+  # default snapshotter when setting up container images
+  - source: files/osguard-ci/config.toml
+    destination: /etc/containerd/config.toml
+    permissions: "644"
 scripts:
   # Tag this image variant with its specific variant-id
   postCustomization:
