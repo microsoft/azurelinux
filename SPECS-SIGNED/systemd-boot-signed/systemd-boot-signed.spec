@@ -1,8 +1,12 @@
 %global debug_package %{nil}
 %ifarch x86_64
 %global buildarch x86_64
+%global grubefiname grubx64.efi
+%global sdbootefiname systemd-bootx64.efi
 %elifarch aarch64
 %global buildarch aarch64
+%global grubefiname grubx64.efi
+%global sdbootefiname systemd-bootaa64.efi
 %endif
 
 # Support for quick builds with rpmbuild --build-in-place.
@@ -34,11 +38,7 @@ URL:            https://systemd.io
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 Source0:        systemd-boot-%{version}-%{release}.%{buildarch}.rpm
-%ifarch x86_64
-Source1:        systemd-bootx64.efi
-%elifarch aarch64
-Source1:        systemd-bootaa64.efi
-%endif
+Source1:        %{sdbootefiname}
 
 %description
 This package contains the systemd-boot EFI binary signed for secure boot. The package is
@@ -77,12 +77,7 @@ pushd rpm_contents
 # This spec's whole purpose is to inject the signed systemd-boot binary
 rpm2cpio %{SOURCE0} | cpio -idmv
 
-%ifarch x86_64 
-cp %{SOURCE1} ./usr/lib/systemd/boot/efi/systemd-bootx64.efi
-%elifarch aarch64
-cp %{SOURCE1} ./usr/lib/systemd/boot/efi/systemd-bootaa64.efi
-%endif
-
+cp %{SOURCE1} ./usr/lib/systemd/boot/efi/%{sdbootefiname}
 popd
 
 %install
@@ -91,11 +86,7 @@ pushd rpm_contents
 # Don't use * wildcard. It does not copy over hidden files in the root folder...
 cp -rp ./. %{buildroot}/
 
-%ifarch x86_64
-cp %{buildroot}/usr/lib/systemd/boot/efi/systemd-bootx64.efi %{buildroot}/boot/efi/EFI/BOOT/grubx64.efi
-%elifarch aarch64
-cp %{buildroot}/usr/lib/systemd/boot/efi/systemd-bootaa64.efi %{buildroot}/boot/efi/EFI/BOOT/grubaa64.efi
-%endif
+cp %{buildroot}/usr/lib/systemd/boot/efi/%{sdbootefiname} %{buildroot}/boot/efi/EFI/BOOT/${grubefiname}
 
 popd
 
@@ -104,11 +95,7 @@ popd
 /usr/share/man/man5/loader.conf.5.gz
 /usr/share/man/man7/sd-boot.7.gz
 /usr/share/man/man7/systemd-boot.7.gz
-%ifarch x86_64
-/boot/efi/EFI/BOOT/grubx64.efi
-%elifarch aarch64
-/boot/efi/EFI/BOOT/grubaa64.efi
-%endif
+/boot/efi/EFI/BOOT/%{grubefiname}
 
 %changelog
 * Mon Aug 18 2025 Sean Dougherty <sdougherty@microsoft.com> - 255-23
