@@ -41,9 +41,8 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
-Patch0:		CVE-2025-4574.patch
-Patch1:         CVE-2025-53605.patch
-Patch2:         CVE-2024-11738.patch
+Patch0:         CVE-2025-53605.patch
+Patch1:         CVE-2024-11738.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -138,6 +137,7 @@ useradd -m -d /home/test test
 chown -R test:test .
 sudo -u test %make_build check
 userdel -r test
+
 %install
 USER=root SUDO_USER=root %make_install
 mv %{buildroot}%{_docdir}/cargo/LICENSE-THIRD-PARTY .
@@ -169,6 +169,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 
 %files doc
 %license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
+%license %{_docdir}/rustc/licenses/*
 %doc %{_docdir}/rustc/README.md
 %doc %{_docdir}/cargo/*
 %doc %{_docdir}/rustfmt/*
