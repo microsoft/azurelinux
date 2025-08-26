@@ -29468,7 +29468,7 @@
         "other": {
           "name": "vim",
           "version": "9.1.1616",
-          "downloadUrl": "https://github.com/vim/vim/archive/refs/tags/v9.1.1616.tar.gz"
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.1616.tar.gz"
         }
       }
     },
