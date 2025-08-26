@@ -1,7 +1,7 @@
 Summary:        Manipulate netfilter connection tracking table and run High Availability
 Name:           conntrack-tools
 Version:        1.4.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,9 +22,6 @@ BuildRequires:  libtirpc-devel
 BuildRequires:  pkg-config
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
-Requires(post): systemd
-Requires(postun): systemd
-Requires(preun): systemd
 Provides:       conntrack = 1.0-1
 Obsoletes:      conntrack < 1.0-1
 
@@ -46,6 +43,16 @@ currently tracked connections, delete connections from the state table,
 and even add new ones.
 In addition, you can also monitor connection tracking events, e.g.
 show an event message (one line) per newly established connection.
+
+%package service
+Summary: Systemd service files for conntrack-tools
+Requires: conntrack-tools
+Requires(post): systemd
+Requires(postun): systemd
+Requires(preun): systemd
+
+%description service
+This subpackage contains systemd service files and related content for conntrack-tools.
 
 %prep
 %autosetup -p1
@@ -74,9 +81,6 @@ echo "disable conntrackd.service" > %{buildroot}%{_libdir}/systemd/system-preset
 %files
 %license COPYING
 %doc AUTHORS TODO doc
-%dir %{_sysconfdir}/conntrackd
-%config(noreplace) %{_sysconfdir}/conntrackd/conntrackd.conf
-%{_unitdir}/conntrackd.service
 %{_sbindir}/conntrack
 %{_sbindir}/conntrackd
 %{_sbindir}/nfct
@@ -84,18 +88,26 @@ echo "disable conntrackd.service" > %{buildroot}%{_libdir}/systemd/system-preset
 %{_mandir}/man8/*
 %dir %{_libdir}/conntrack-tools
 %{_libdir}/conntrack-tools/*
+
+%files service
+%dir %{_sysconfdir}/conntrackd
+%config(noreplace) %{_sysconfdir}/conntrackd/conntrackd.conf
+%{_unitdir}/conntrackd.service
 %config(noreplace) %{_libdir}/systemd/system-preset/50-conntrackd.preset
 
-%post
+%post service
 %systemd_post conntrackd.service
 
-%preun
+%preun service
 %systemd_preun conntrackd.service
 
-%postun
+%postun service
 %systemd_postun conntrackd.service
 
 %changelog
+* Tue Aug 26 2025 Andrew Phelps <anphel@microsoft.com> - 1.4.8-2
+- Move systemd dependencies into service subpackage
+
 * Wed Jan 24 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.4.8-1
 - Bump version to v1.4.8 from v1.4.5
 - Updating source from tar.bz2 to tar.xz
