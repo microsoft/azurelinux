@@ -1,7 +1,7 @@
 Summary:        Manipulate netfilter connection tracking table and run High Availability
 Name:           conntrack-tools
 Version:        1.4.8
-Release:        2%{?dist}
+Release:        9%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,8 +24,8 @@ BuildRequires:  systemd
 BuildRequires:  systemd-devel
 Provides:       conntrack = 1.0-1
 Obsoletes:      conntrack < 1.0-1
-Requires:       conntrack-tools-base
-Requires:       conntrack-tools-service
+Requires:       %{name}-base = %{version}-%{release}
+Requires:       %{name}-service = %{version}-%{release}
 
 %description
 With conntrack-tools you can setup a High Availability cluster and
@@ -94,12 +94,12 @@ echo "disable conntrackd.service" > %{buildroot}%{_libdir}/systemd/system-preset
 
 %files base
 %{_sbindir}/conntrack
-%{_sbindir}/conntrackd
 %{_sbindir}/nfct
 %dir %{_libdir}/conntrack-tools
 %{_libdir}/conntrack-tools/*
 
 %files service
+%{_sbindir}/conntrackd
 %dir %{_sysconfdir}/conntrackd
 %config(noreplace) %{_sysconfdir}/conntrackd/conntrackd.conf
 %{_unitdir}/conntrackd.service
