@@ -10,7 +10,7 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        6.6.57.mshv4
+Version:        6.6.101.mshv1
 Release:        1%{?dist}
 License:        GPLv2
 Group:          Development/Tools
@@ -230,6 +230,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Tue Aug 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.101.mshv1-1
+- Auto-upgrade to 6.6.101.mshv1
+
 * Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.57.mshv4-1
 - Auto-upgrade to 6.6.57.mshv4
 
