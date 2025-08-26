@@ -1,0 +1,84 @@
+From aca713786debd68c81a823c5989afb3de82da45b Mon Sep 17 00:00:00 2001
+From: Enrico Scholz <enrico.scholz@informatik.tu-chemnitz.de>
+Date: Sat, 5 Apr 2008 11:41:34 +0200
+Subject: [PATCH 2/3] Use proper datatypes for 'long long'
+
+xmlrpc-c uses 'long long' at some places (e.g. in printf
+statements with PRId64) under the assumption that it has a
+width of exactly 64 bits.
+
+On 64 bit machines 'long long' has a width of 128 bit and
+will cause overhead both in memory and cpu usage there. As
+'long long' is used only to handle <i8> datatypes, the patch
+uses a plain 64 integer type there.
+
+It is arguable whether 'int_least64_t' (and 'int_least32_t')
+would be a better choice for 'int64_t' (and 'int32_t'), but
+for now, the patch uses datatypes with exact widths.
+---
+ include/xmlrpc-c/base.h     | 7 ++++---
+ lib/libutil/string_number.c | 1 +
+ src/cpp/param_list.cpp      | 2 +-
+ 3 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/include/xmlrpc-c/base.h b/include/xmlrpc-c/base.h
+index e74e2c5..90f2c91 100644
+--- a/include/xmlrpc-c/base.h
++++ b/include/xmlrpc-c/base.h
+@@ -5,6 +5,7 @@
+ 
+ #include <stddef.h>
+ #include <stdarg.h>
++#include <stdint.h>
+ #include <time.h>
+ #include <xmlrpc-c/c_util.h>  /* For XMLRPC_DLLEXPORT */
+ #include <xmlrpc-c/util.h>
+@@ -73,9 +74,9 @@ xmlrpc_version(unsigned int * const majorP,
+ 
+ typedef signed int xmlrpc_int;  
+     /* An integer of the type defined by XML-RPC <int>; i.e. 32 bit */
+-typedef XMLRPC_INT32 xmlrpc_int32;
++typedef int32_t xmlrpc_int32;
+     /* An integer of the type defined by XML-RPC <i4>; i.e. 32 bit */
+-typedef XMLRPC_INT64 xmlrpc_int64;
++typedef int64_t xmlrpc_int64;
+     /* An integer of the type defined by "XML-RPC" <i8>; i.e. 64 bit */
+ typedef int xmlrpc_bool;
+     /* A boolean (of the type defined by XML-RPC <boolean>, but there's
+@@ -112,7 +113,7 @@ typedef int xmlrpc_socket;
+ #define XMLRPC_INT32_MAX 0x7fffffff
+ #define XMLRPC_INT32_MIN (-XMLRPC_INT32_MAX - 1)
+ 
+-#define XMLRPC_INT64_MAX 0x7fffffffffffffffll
++#define XMLRPC_INT64_MAX ((xmlrpc_int64)0x7fffffffffffffffll)
+ #define XMLRPC_INT64_MIN (-XMLRPC_INT64_MAX - 1)
+ 
+ 
+diff --git a/lib/libutil/string_number.c b/lib/libutil/string_number.c
+index 1c284af..a7e78ad 100644
+--- a/lib/libutil/string_number.c
++++ b/lib/libutil/string_number.c
+@@ -6,6 +6,7 @@
+ ============================================================================*/
+ #include <stdlib.h>
+ #include <string.h>
++#include <inttypes.h>
+ #include <errno.h>
+ 
+ #include <xmlrpc-c/base.h>
+diff --git a/src/cpp/param_list.cpp b/src/cpp/param_list.cpp
+index 1f7ae41..60f7df9 100644
+--- a/src/cpp/param_list.cpp
++++ b/src/cpp/param_list.cpp
+@@ -277,7 +277,7 @@ paramList::getI8(unsigned int const paramNumber,
+         throw(fault("Parameter that is supposed to be 64-bit integer is not", 
+                     fault::CODE_TYPE));
+ 
+-    long long const longlongvalue(static_cast<long long>(
++    xmlrpc_int64 const longlongvalue(static_cast<xmlrpc_int64>(
+         value_i8(this->paramVector[paramNumber])));
+ 
+     if (longlongvalue < minimum)
+-- 
+2.13.1
+
