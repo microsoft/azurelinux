@@ -3,13 +3,13 @@
 
 # Release date and version of stage 0 compiler can be found in "src/stage0" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2025-02-20
-%define stage0_version 1.85.0
+%define release_date 2025-05-15
+%define stage0_version 1.87.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.86.0
-Release:        5%{?dist}
+Version:        1.88.0
+Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -169,7 +169,6 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 
 %files doc
 %license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
-%license %{_docdir}/rustc/licenses/*
 %doc %{_docdir}/rustc/README.md
 %doc %{_docdir}/cargo/*
 %doc %{_docdir}/rustfmt/*

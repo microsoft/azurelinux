@@ -38,6 +38,13 @@
             "IgnoredFilesRegexList": [
                 "^/usr/share/man/man3/.*NOTICE.*\\.3ossl\\.gz$"
             ]
+        },
+        {
+            "PackageName": "rust",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/doc/rust/html/.*/OPEN-SANS-LICENSE\\.txt$",
+                "^/usr/share/doc/rust/html/.*/SOURCE-CODE-PRO-LICENSE\\.txt$"
+            ]
         }
     ],
     "GlobalExceptionsRegexList": [
