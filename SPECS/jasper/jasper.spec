@@ -107,6 +107,7 @@ make install/fast DESTDIR=%{buildroot} -C builder
 # Unpackaged files
 rm -f doc/README
 rm -f %{buildroot}%{_libdir}/lib*.la
+rm -f doc/src/license.dox.in
 
 
 %check
