@@ -24,6 +24,8 @@ BuildRequires:  systemd
 BuildRequires:  systemd-devel
 Provides:       conntrack = 1.0-1
 Obsoletes:      conntrack < 1.0-1
+Requires:       conntrack-tools-base
+Requires:       conntrack-tools-service
 
 %description
 With conntrack-tools you can setup a High Availability cluster and
@@ -44,9 +46,15 @@ and even add new ones.
 In addition, you can also monitor connection tracking events, e.g.
 show an event message (one line) per newly established connection.
 
+%package base
+Summary: Base utilities for conntrack-tools without systemd integration
+
+%description base
+This subpackage contains the core utilities for conntrack-tools excluding systemd service files and dependencies.
+
 %package service
 Summary: Systemd service files for conntrack-tools
-Requires: conntrack-tools
+Requires: conntrack-tools-base
 Requires(post): systemd
 Requires(postun): systemd
 Requires(preun): systemd
@@ -81,11 +89,13 @@ echo "disable conntrackd.service" > %{buildroot}%{_libdir}/systemd/system-preset
 %files
 %license COPYING
 %doc AUTHORS TODO doc
+%{_mandir}/man5/*
+%{_mandir}/man8/*
+
+%files base
 %{_sbindir}/conntrack
 %{_sbindir}/conntrackd
 %{_sbindir}/nfct
-%{_mandir}/man5/*
-%{_mandir}/man8/*
 %dir %{_libdir}/conntrack-tools
 %{_libdir}/conntrack-tools/*
 
@@ -106,6 +116,7 @@ echo "disable conntrackd.service" > %{buildroot}%{_libdir}/systemd/system-preset
 
 %changelog
 * Tue Aug 26 2025 Andrew Phelps <anphel@microsoft.com> - 1.4.8-2
+- Create base subpackage with no systemd requirements
 - Move systemd dependencies into service subpackage
 
 * Wed Jan 24 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.4.8-1
