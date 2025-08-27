@@ -5,7 +5,7 @@
 %global sdbootefiname systemd-bootx64.efi
 %elifarch aarch64
 %global buildarch aarch64
-%global grubefiname grubx64.efi
+%global grubefiname grubaa64.efi
 %global sdbootefiname systemd-bootaa64.efi
 %endif
 
