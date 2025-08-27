@@ -86,7 +86,7 @@ pushd rpm_contents
 # Don't use * wildcard. It does not copy over hidden files in the root folder...
 cp -rp ./. %{buildroot}/
 
-cp %{buildroot}/usr/lib/systemd/boot/efi/%{sdbootefiname} %{buildroot}/boot/efi/EFI/BOOT/${grubefiname}
+cp %{buildroot}/usr/lib/systemd/boot/efi/%{sdbootefiname} %{buildroot}/boot/efi/EFI/BOOT/%{grubefiname}
 
 popd
 
