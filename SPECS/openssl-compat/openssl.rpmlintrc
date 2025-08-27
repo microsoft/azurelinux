@@ -1,0 +1,9 @@
+# capi.so is a dummy only used on Windows, it doesn't need dependency information
+addFilter("E: shared-lib(rary)?-without-dependency-information /usr/lib64/engines-3/capi.so")
+
+# The sources are hobbled and thus not a valid URL. That's expected.
+addFilter("W: invalid-url Source0: openssl-[0-9\\.]+-hobbled.tar.gz")
+
+# Technically this warning is correct, but in the case of the openssl binary we
+# want to allow SSL_CTX_set_cipher_list
+addFilter("W: crypto-policy-non-compliance-openssl /usr/bin/openssl SSL_CTX_set_cipher_list")

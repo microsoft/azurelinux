@@ -1,0 +1,314 @@
+From 8be4ef77c64fcada41041c00e02c34b07658ba66 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 6 Mar 2024 19:17:14 +0100
+Subject: [PATCH 07/49] 
+ 0007-Add-support-for-PROFILE-SYSTEM-system-default-cipher.patch
+
+Patch-name: 0007-Add-support-for-PROFILE-SYSTEM-system-default-cipher.patch
+Patch-id: 7
+Patch-status: |
+    # # Add support for PROFILE=SYSTEM system default cipherlist
+From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
+---
+ Configurations/unix-Makefile.tmpl |  5 ++
+ Configure                         | 11 +++-
+ doc/man1/openssl-ciphers.pod.in   |  9 ++++
+ include/openssl/ssl.h.in          |  5 ++
+ ssl/ssl_ciph.c                    | 86 +++++++++++++++++++++++++++----
+ ssl/ssl_lib.c                     |  4 +-
+ test/cipherlist_test.c            |  2 +
+ 7 files changed, 109 insertions(+), 13 deletions(-)
+
+diff --git a/Configurations/unix-Makefile.tmpl b/Configurations/unix-Makefile.tmpl
+index 5d61ce9550..e9fba957f1 100644
+--- a/Configurations/unix-Makefile.tmpl
++++ b/Configurations/unix-Makefile.tmpl
+@@ -324,6 +324,10 @@ MANDIR=$(INSTALLTOP)/share/man
+ DOCDIR=$(INSTALLTOP)/share/doc/$(BASENAME)
+ HTMLDIR=$(DOCDIR)/html
+ 
++{- output_off() if $config{system_ciphers_file} eq ""; "" -}
++SYSTEM_CIPHERS_FILE_DEFINE=-DSYSTEM_CIPHERS_FILE="\"{- $config{system_ciphers_file} -}\""
++{- output_on() if $config{system_ciphers_file} eq ""; "" -}
++
+ # MANSUFFIX is for the benefit of anyone who may want to have a suffix
+ # appended after the manpage file section number.  "ssl" is popular,
+ # resulting in files such as config.5ssl rather than config.5.
+@@ -347,6 +351,7 @@ CC=$(CROSS_COMPILE){- $config{CC} -}
+ CXX={- $config{CXX} ? "\$(CROSS_COMPILE)$config{CXX}" : '' -}
+ CPPFLAGS={- our $cppflags1 = join(" ",
+                                   (map { "-D".$_} @{$config{CPPDEFINES}}),
++                                  "\$(SYSTEM_CIPHERS_FILE_DEFINE)",
+                                   (map { "-I".$_} @{$config{CPPINCLUDES}}),
+                                   @{$config{CPPFLAGS}}) -}
+ CFLAGS={- join(' ', @{$config{CFLAGS}}) -}
+diff --git a/Configure b/Configure
+index cca1ac8d16..2ae1cd0bc2 100755
+--- a/Configure
++++ b/Configure
+@@ -27,7 +27,7 @@ use OpenSSL::config;
+ my $orig_death_handler = $SIG{__DIE__};
+ $SIG{__DIE__} = \&death_handler;
+ 
+-my $usage="Usage: Configure [no-<feature> ...] [enable-<feature> ...] [-Dxxx] [-lxxx] [-Lxxx] [-fxxx] [-Kxxx] [no-hw-xxx|no-hw] [[no-]threads] [[no-]thread-pool] [[no-]default-thread-pool] [[no-]shared] [[no-]zlib|zlib-dynamic] [no-asm] [no-egd] [sctp] [386] [--prefix=DIR] [--openssldir=OPENSSLDIR] [--with-xxx[=vvv]] [--config=FILE] os/compiler[:flags]\n";
++my $usage="Usage: Configure [no-<feature> ...] [enable-<feature> ...] [-Dxxx] [-lxxx] [-Lxxx] [-fxxx] [-Kxxx] [no-hw-xxx|no-hw] [[no-]threads] [[no-]thread-pool] [[no-]default-thread-pool] [[no-]shared] [[no-]zlib|zlib-dynamic] [no-asm] [no-egd] [sctp] [386] [--prefix=DIR] [--openssldir=OPENSSLDIR] [--system-ciphers-file=SYSTEMCIPHERFILE] [--with-xxx[=vvv]] [--config=FILE] os/compiler[:flags]\n";
+ 
+ my $banner = <<"EOF";
+ 
+@@ -61,6 +61,10 @@ EOF
+ #               given with --prefix.
+ #               This becomes the value of OPENSSLDIR in Makefile and in C.
+ #               (Default: PREFIX/ssl)
++#
++# --system-ciphers-file  A file to read cipher string from when the PROFILE=SYSTEM
++#		cipher is specified (default).
++#
+ # --banner=".." Output specified text instead of default completion banner
+ #
+ # -w            Don't wait after showing a Configure warning
+@@ -394,6 +398,7 @@ $config{prefix}="";
+ $config{openssldir}="";
+ $config{processor}="";
+ $config{libdir}="";
++$config{system_ciphers_file}="";
+ my $auto_threads=1;    # enable threads automatically? true by default
+ my $default_ranlib;
+ 
+@@ -1047,6 +1052,10 @@ while (@argvcopy)
+                         die "FIPS key too long (64 bytes max)\n"
+                            if length $1 > 64;
+                         }
++		elsif (/^--system-ciphers-file=(.*)$/)
++			{
++			$config{system_ciphers_file}=$1;
++			}
+                 elsif (/^--banner=(.*)$/)
+                         {
+                         $banner = $1 . "\n";
+diff --git a/doc/man1/openssl-ciphers.pod.in b/doc/man1/openssl-ciphers.pod.in
+index d4df30686f..cec4835268 100644
+--- a/doc/man1/openssl-ciphers.pod.in
++++ b/doc/man1/openssl-ciphers.pod.in
+@@ -190,6 +190,15 @@ As of OpenSSL 1.0.0, the B<ALL> cipher suites are sensibly ordered by default.
+ 
+ The cipher suites not enabled by B<ALL>, currently B<eNULL>.
+ 
++=item B<PROFILE=SYSTEM>
++
++The list of enabled cipher suites will be loaded from the system crypto policy
++configuration file B</etc/crypto-policies/back-ends/opensslcnf.config>.
++See also L<update-crypto-policies(8)>.
++This is the default behavior unless an application explicitly sets a cipher
++list. If used in a cipher list configuration value this string must be at the
++beginning of the cipher list, otherwise it will not be recognized.
++
+ =item B<HIGH>
+ 
+ "High" encryption cipher suites. This currently means those with key lengths
+diff --git a/include/openssl/ssl.h.in b/include/openssl/ssl.h.in
+index 9f91039f8a..fc34d4ca61 100644
+--- a/include/openssl/ssl.h.in
++++ b/include/openssl/ssl.h.in
+@@ -209,6 +209,11 @@ extern "C" {
+  * throwing out anonymous and unencrypted ciphersuites! (The latter are not
+  * actually enabled by ALL, but "ALL:RSA" would enable some of them.)
+  */
++# ifdef SYSTEM_CIPHERS_FILE
++#  define SSL_SYSTEM_DEFAULT_CIPHER_LIST "PROFILE=SYSTEM"
++# else
++#  define SSL_SYSTEM_DEFAULT_CIPHER_LIST OSSL_default_cipher_list()
++# endif
+ 
+ /* Used in SSL_set_shutdown()/SSL_get_shutdown(); */
+ # define SSL_SENT_SHUTDOWN       1
+diff --git a/ssl/ssl_ciph.c b/ssl/ssl_ciph.c
+index 8360991ce4..33c23efb0d 100644
+--- a/ssl/ssl_ciph.c
++++ b/ssl/ssl_ciph.c
+@@ -1455,6 +1455,49 @@ int SSL_set_ciphersuites(SSL *s, const char *str)
+     return ret;
+ }
+ 
++#ifdef SYSTEM_CIPHERS_FILE
++static char *load_system_str(const char *suffix)
++{
++    char buf[1024];
++    char *new_rules;
++    const char *ciphers_path;
++    unsigned len, slen;
++
++    if ((ciphers_path = secure_getenv("OPENSSL_SYSTEM_CIPHERS_OVERRIDE")) == NULL)
++        ciphers_path = SYSTEM_CIPHERS_FILE;
++    ERR_set_mark();
++    if (access(ciphers_path, R_OK) == 0) {
++        CONF *conf = NCONF_new_ex(NULL, NCONF_default());
++        char *value = NULL;
++
++        if (NCONF_load(conf, ciphers_path, NULL) > 0)
++            value = NCONF_get_string(conf, "global", "CipherString");
++
++        snprintf(buf, sizeof(buf), "%s", value ? value : SSL_DEFAULT_CIPHER_LIST);
++
++        NCONF_free(conf);
++    } else {
++        snprintf(buf, sizeof(buf), "%s", SSL_DEFAULT_CIPHER_LIST);
++    }
++    ERR_pop_to_mark();
++    slen = strlen(suffix);
++    len = strlen(buf);
++
++    new_rules = OPENSSL_zalloc(len + slen + 1);
++    if (new_rules == NULL)
++        return NULL;
++
++    memcpy(new_rules, buf, len);
++    if (slen > 0) {
++        memcpy(&new_rules[len], suffix, slen);
++        len += slen;
++    }
++    new_rules[len] = 0;
++
++    return new_rules;
++}
++#endif
++
+ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
+                                              STACK_OF(SSL_CIPHER) *tls13_ciphersuites,
+                                              STACK_OF(SSL_CIPHER) **cipher_list,
+@@ -1469,15 +1516,25 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
+     CIPHER_ORDER *co_list = NULL, *head = NULL, *tail = NULL, *curr;
+     const SSL_CIPHER **ca_list = NULL;
+     const SSL_METHOD *ssl_method = ctx->method;
++#ifdef SYSTEM_CIPHERS_FILE
++    char *new_rules = NULL;
++
++    if (rule_str != NULL && strncmp(rule_str, "PROFILE=SYSTEM", 14) == 0) {
++        const char *p = rule_str + 14;
++
++        new_rules = load_system_str(p);
++        rule_str = new_rules;
++    }
++#endif
+ 
+     /*
+      * Return with error if nothing to do.
+      */
+     if (rule_str == NULL || cipher_list == NULL || cipher_list_by_id == NULL)
+-        return NULL;
++        goto err;
+ 
+     if (!check_suiteb_cipher_list(ssl_method, c, &rule_str))
+-        return NULL;
++        goto err;
+ 
+     /*
+      * To reduce the work to do we only want to process the compiled
+@@ -1499,7 +1556,7 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
+     if (num_of_ciphers > 0) {
+         co_list = OPENSSL_malloc(sizeof(*co_list) * num_of_ciphers);
+         if (co_list == NULL)
+-            return NULL;          /* Failure */
++            goto err;
+     }
+ 
+     ssl_cipher_collect_ciphers(ssl_method, num_of_ciphers,
+@@ -1565,8 +1622,7 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
+      * in force within each class
+      */
+     if (!ssl_cipher_strength_sort(&head, &tail)) {
+-        OPENSSL_free(co_list);
+-        return NULL;
++        goto err;
+     }
+ 
+     /*
+@@ -1611,8 +1667,7 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
+     num_of_alias_max = num_of_ciphers + num_of_group_aliases + 1;
+     ca_list = OPENSSL_malloc(sizeof(*ca_list) * num_of_alias_max);
+     if (ca_list == NULL) {
+-        OPENSSL_free(co_list);
+-        return NULL;          /* Failure */
++        goto err;
+     }
+     ssl_cipher_collect_aliases(ca_list, num_of_group_aliases,
+                                disabled_mkey, disabled_auth, disabled_enc,
+@@ -1637,8 +1693,7 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
+     OPENSSL_free(ca_list);      /* Not needed anymore */
+ 
+     if (!ok) {                  /* Rule processing failure */
+-        OPENSSL_free(co_list);
+-        return NULL;
++        goto err;
+     }
+ 
+     /*
+@@ -1646,10 +1701,13 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
+      * if we cannot get one.
+      */
+     if ((cipherstack = sk_SSL_CIPHER_new_null()) == NULL) {
+-        OPENSSL_free(co_list);
+-        return NULL;
++        goto err;
+     }
+ 
++#ifdef SYSTEM_CIPHERS_FILE
++    OPENSSL_free(new_rules);    /* Not needed anymore */
++#endif
++
+     /* Add TLSv1.3 ciphers first - we always prefer those if possible */
+     for (i = 0; i < sk_SSL_CIPHER_num(tls13_ciphersuites); i++) {
+         const SSL_CIPHER *sslc = sk_SSL_CIPHER_value(tls13_ciphersuites, i);
+@@ -1701,6 +1759,14 @@ STACK_OF(SSL_CIPHER) *ssl_create_cipher_list(SSL_CTX *ctx,
+     *cipher_list = cipherstack;
+ 
+     return cipherstack;
++
++err:
++    OPENSSL_free(co_list);
++#ifdef SYSTEM_CIPHERS_FILE
++    OPENSSL_free(new_rules);
++#endif
++    return NULL;
++  
+ }
+ 
+ char *SSL_CIPHER_description(const SSL_CIPHER *cipher, char *buf, int len)
+diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
+index cf59d2dfa5..1329841aaf 100644
+--- a/ssl/ssl_lib.c
++++ b/ssl/ssl_lib.c
+@@ -700,7 +700,7 @@ int SSL_CTX_set_ssl_version(SSL_CTX *ctx, const SSL_METHOD *meth)
+                                 ctx->tls13_ciphersuites,
+                                 &(ctx->cipher_list),
+                                 &(ctx->cipher_list_by_id),
+-                                OSSL_default_cipher_list(), ctx->cert);
++                                SSL_SYSTEM_DEFAULT_CIPHER_LIST, ctx->cert);
+     if ((sk == NULL) || (sk_SSL_CIPHER_num(sk) <= 0)) {
+         ERR_raise(ERR_LIB_SSL, SSL_R_SSL_LIBRARY_HAS_NO_CIPHERS);
+         return 0;
+@@ -3966,7 +3966,7 @@ SSL_CTX *SSL_CTX_new_ex(OSSL_LIB_CTX *libctx, const char *propq,
+     if (!ssl_create_cipher_list(ret,
+                                 ret->tls13_ciphersuites,
+                                 &ret->cipher_list, &ret->cipher_list_by_id,
+-                                OSSL_default_cipher_list(), ret->cert)
++                                SSL_SYSTEM_DEFAULT_CIPHER_LIST, ret->cert)
+         || sk_SSL_CIPHER_num(ret->cipher_list) <= 0) {
+         ERR_raise(ERR_LIB_SSL, SSL_R_LIBRARY_HAS_NO_CIPHERS);
+         goto err;
+diff --git a/test/cipherlist_test.c b/test/cipherlist_test.c
+index c46e431b00..19d05e860b 100644
+--- a/test/cipherlist_test.c
++++ b/test/cipherlist_test.c
+@@ -261,7 +261,9 @@ end:
+ 
+ int setup_tests(void)
+ {
++#ifndef SYSTEM_CIPHERS_FILE
+     ADD_TEST(test_default_cipherlist_implicit);
++#endif
+     ADD_TEST(test_default_cipherlist_explicit);
+     ADD_TEST(test_default_cipherlist_clear);
+     ADD_TEST(test_stdname_cipherlist);
+-- 
+2.44.0
+

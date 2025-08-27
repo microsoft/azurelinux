@@ -1,0 +1,25 @@
+From 310ac502845b209a8cb4a1b5490cb3463959fb0c Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 25 Aug 2025 20:50:48 +0000
+Subject: [PATCH] AZL3 skip eddsa test in 30-test_pairwise_fail.t
+
+---
+ test/recipes/30-test_pairwise_fail.t | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/recipes/30-test_pairwise_fail.t b/test/recipes/30-test_pairwise_fail.t
+index fa467b4..d87088d 100644
+--- a/test/recipes/30-test_pairwise_fail.t
++++ b/test/recipes/30-test_pairwise_fail.t
+@@ -75,7 +75,7 @@ SKIP: {
+ 
+ SKIP: {
+     skip "Skip EDDSA test because of no ecx in this build", 1
+-        if disabled("ecx");
++        if 1; # disabled("ecx"); AZL3: eddsa is disabled in fips.
+ 
+     run(test(["fips_version_test", "-config", $provconf, ">=3.3.0"]),
+              capture => 1, statusvar => \my $exit);
+-- 
+2.45.4
+

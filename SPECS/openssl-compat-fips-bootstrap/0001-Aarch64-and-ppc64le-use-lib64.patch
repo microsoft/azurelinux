@@ -1,0 +1,33 @@
+From 603a35802319c0459737e3f067369ceb990fe2e6 Mon Sep 17 00:00:00 2001
+From: Tomas Mraz <tmraz@fedoraproject.org>
+Date: Thu, 24 Sep 2020 09:01:41 +0200
+Subject: Aarch64 and ppc64le use lib64
+
+(Was openssl-1.1.1-build.patch)
+---
+ Configurations/10-main.conf | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Configurations/10-main.conf b/Configurations/10-main.conf
+index d7580bf3e1..a7dbfd7f40 100644
+--- a/Configurations/10-main.conf
++++ b/Configurations/10-main.conf
+@@ -723,6 +723,7 @@ my %targets = (
+         lib_cppflags     => add("-DL_ENDIAN"),
+         asm_arch         => 'ppc64',
+         perlasm_scheme   => "linux64le",
++        multilib         => "64",
+     },
+ 
+     "linux-armv4" => {
+@@ -765,6 +766,7 @@ my %targets = (
+         inherit_from     => [ "linux-generic64" ],
+         asm_arch         => 'aarch64',
+         perlasm_scheme   => "linux64",
++        multilib         => "64",
+     },
+     "linux-arm64ilp32" => {  # https://wiki.linaro.org/Platform/arm64-ilp32
+         inherit_from     => [ "linux-generic32" ],
+-- 
+2.26.2
+

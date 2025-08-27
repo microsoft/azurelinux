@@ -1,0 +1,101 @@
+From 2306fde5556cbcb875d095c09fed01a0f16fe7ec Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <dbelyavs@redhat.com>
+Date: Mon, 21 Aug 2023 15:51:55 +0200
+Subject: [PATCH 40/48] 0085-FIPS-RSA-disable-shake.patch
+
+Patch-name: 0085-FIPS-RSA-disable-shake.patch
+Patch-id: 85
+---
+ crypto/rsa/rsa_oaep.c | 28 ++++++++++++++++++++++++++++
+ crypto/rsa/rsa_pss.c  | 16 ++++++++++++++++
+ 2 files changed, 44 insertions(+)
+
+diff --git a/crypto/rsa/rsa_oaep.c b/crypto/rsa/rsa_oaep.c
+index b2f7f7dc4b..af2b0b026c 100644
+--- a/crypto/rsa/rsa_oaep.c
++++ b/crypto/rsa/rsa_oaep.c
+@@ -78,9 +78,23 @@ int ossl_rsa_padding_add_PKCS1_OAEP_mgf1_ex2(OSSL_LIB_CTX *libctx,
+         return 0;
+ #endif
+     }
++
++#ifdef FIPS_MODULE
++    if (EVP_MD_is_a(md, "SHAKE-128") || EVP_MD_is_a(md, "SHAKE-256")) {
++        ERR_raise(ERR_LIB_RSA, RSA_R_DIGEST_NOT_ALLOWED);
++        return 0;
++    }
++#endif
+     if (mgf1md == NULL)
+         mgf1md = md;
+ 
++#ifdef FIPS_MODULE
++    if (EVP_MD_is_a(mgf1md, "SHAKE-128") || EVP_MD_is_a(mgf1md, "SHAKE-256")) {
++        ERR_raise(ERR_LIB_RSA, RSA_R_DIGEST_NOT_ALLOWED);
++        return 0;
++    }
++#endif
++
+     mdlen = EVP_MD_get_size(md);
+     if (mdlen <= 0) {
+         ERR_raise(ERR_LIB_RSA, RSA_R_INVALID_LENGTH);
+@@ -203,9 +217,23 @@ int RSA_padding_check_PKCS1_OAEP_mgf1(unsigned char *to, int tlen,
+ #endif
+     }
+ 
++#ifdef FIPS_MODULE
++    if (EVP_MD_is_a(md, "SHAKE-128") || EVP_MD_is_a(md, "SHAKE-256")) {
++        ERR_raise(ERR_LIB_RSA, RSA_R_DIGEST_NOT_ALLOWED);
++        return -1;
++    }
++#endif
++
+     if (mgf1md == NULL)
+         mgf1md = md;
+ 
++#ifdef FIPS_MODULE
++    if (EVP_MD_is_a(mgf1md, "SHAKE-128") || EVP_MD_is_a(mgf1md, "SHAKE-256")) {
++        ERR_raise(ERR_LIB_RSA, RSA_R_DIGEST_NOT_ALLOWED);
++        return -1;
++    }
++#endif
++
+     mdlen = EVP_MD_get_size(md);
+ 
+     if (tlen <= 0 || flen <= 0)
+diff --git a/crypto/rsa/rsa_pss.c b/crypto/rsa/rsa_pss.c
+index bb46ec64c7..c0fdf232da 100644
+--- a/crypto/rsa/rsa_pss.c
++++ b/crypto/rsa/rsa_pss.c
+@@ -53,6 +53,14 @@ int RSA_verify_PKCS1_PSS_mgf1(RSA *rsa, const unsigned char *mHash,
+     if (mgf1Hash == NULL)
+         mgf1Hash = Hash;
+ 
++#ifdef FIPS_MODULE
++    if (EVP_MD_is_a(Hash, "SHAKE-128") || EVP_MD_is_a(Hash, "SHAKE-256"))
++        goto err;
++
++    if (EVP_MD_is_a(mgf1Hash, "SHAKE-128") || EVP_MD_is_a(mgf1Hash, "SHAKE-256"))
++        goto err;
++#endif
++
+     hLen = EVP_MD_get_size(Hash);
+     if (hLen < 0)
+         goto err;
+@@ -168,6 +176,14 @@ int RSA_padding_add_PKCS1_PSS_mgf1(RSA *rsa, unsigned char *EM,
+     if (mgf1Hash == NULL)
+         mgf1Hash = Hash;
+ 
++#ifdef FIPS_MODULE
++    if (EVP_MD_is_a(Hash, "SHAKE-128") || EVP_MD_is_a(Hash, "SHAKE-256"))
++        goto err;
++
++    if (EVP_MD_is_a(mgf1Hash, "SHAKE-128") || EVP_MD_is_a(mgf1Hash, "SHAKE-256"))
++        goto err;
++#endif
++
+     hLen = EVP_MD_get_size(Hash);
+     if (hLen < 0)
+         goto err;
+-- 
+2.41.0
+

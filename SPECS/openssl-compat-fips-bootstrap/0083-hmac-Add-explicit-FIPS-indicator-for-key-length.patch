@@ -1,0 +1,104 @@
+From 8e388e194e665286a8996d7d5926bab5c1a6b4f9 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <dbelyavs@redhat.com>
+Date: Mon, 21 Aug 2023 15:46:40 +0200
+Subject: [PATCH 38/48] 
+ 0083-hmac-Add-explicit-FIPS-indicator-for-key-length.patch
+
+Patch-name: 0083-hmac-Add-explicit-FIPS-indicator-for-key-length.patch
+Patch-id: 83
+---
+ include/crypto/evp.h                       |  7 +++++++
+ include/openssl/core_names.h               |  1 +
+ include/openssl/evp.h                      |  3 +++
+ providers/implementations/macs/hmac_prov.c | 17 +++++++++++++++++
+ 4 files changed, 28 insertions(+)
+
+diff --git a/include/crypto/evp.h b/include/crypto/evp.h
+index aa07153441..a13127bd59 100644
+--- a/include/crypto/evp.h
++++ b/include/crypto/evp.h
+@@ -196,6 +196,13 @@ const EVP_PKEY_METHOD *ossl_ed448_pkey_method(void);
+ const EVP_PKEY_METHOD *ossl_rsa_pkey_method(void);
+ const EVP_PKEY_METHOD *ossl_rsa_pss_pkey_method(void);
+ 
++#ifdef FIPS_MODULE
++/* NIST SP 800-131Ar2, Table 9: Approval Status of MAC Algorithms specifies key
++ * lengths < 112 bytes are disallowed for HMAC generation and legacy use for
++ * HMAC verification. */
++# define EVP_HMAC_GEN_FIPS_MIN_KEY_LEN (112 / 8)
++#endif
++
+ struct evp_mac_st {
+     OSSL_PROVIDER *prov;
+     int name_id;
+diff --git a/include/openssl/core_names.h b/include/openssl/core_names.h
+index f185bc9342..1d1da4d3ca 100644
+--- a/include/openssl/core_names.h
++++ b/include/openssl/core_names.h
+@@ -175,6 +175,7 @@ extern "C" {
+ #define OSSL_MAC_PARAM_SIZE             "size"                    /* size_t */
+ #define OSSL_MAC_PARAM_BLOCK_SIZE       "block-size"              /* size_t */
+ #define OSSL_MAC_PARAM_TLS_DATA_SIZE    "tls-data-size"           /* size_t */
++#define OSSL_MAC_PARAM_REDHAT_FIPS_INDICATOR "redhat-fips-indicator"
+ 
+ /* Known MAC names */
+ #define OSSL_MAC_NAME_BLAKE2BMAC    "BLAKE2BMAC"
+diff --git a/include/openssl/evp.h b/include/openssl/evp.h
+index 86f4e22c70..615857caf5 100644
+--- a/include/openssl/evp.h
++++ b/include/openssl/evp.h
+@@ -1194,6 +1194,9 @@ void EVP_MD_do_all_provided(OSSL_LIB_CTX *libctx,
+                             void *arg);
+ 
+ /* MAC stuff */
++# define EVP_MAC_REDHAT_FIPS_INDICATOR_UNDETERMINED 0
++# define EVP_MAC_REDHAT_FIPS_INDICATOR_APPROVED     1
++# define EVP_MAC_REDHAT_FIPS_INDICATOR_NOT_APPROVED 2
+ 
+ EVP_MAC *EVP_MAC_fetch(OSSL_LIB_CTX *libctx, const char *algorithm,
+                        const char *properties);
+diff --git a/providers/implementations/macs/hmac_prov.c b/providers/implementations/macs/hmac_prov.c
+index 52ebb08b8f..cf5c3ecbe7 100644
+--- a/providers/implementations/macs/hmac_prov.c
++++ b/providers/implementations/macs/hmac_prov.c
+@@ -21,6 +21,8 @@
+ #include <openssl/evp.h>
+ #include <openssl/hmac.h>
+ 
++#include "crypto/evp.h"
++
+ #include "prov/implementations.h"
+ #include "prov/provider_ctx.h"
+ #include "prov/provider_util.h"
+@@ -244,6 +246,9 @@ static int hmac_final(void *vmacctx, unsigned char *out, size_t *outl,
+ static const OSSL_PARAM known_gettable_ctx_params[] = {
+     OSSL_PARAM_size_t(OSSL_MAC_PARAM_SIZE, NULL),
+     OSSL_PARAM_size_t(OSSL_MAC_PARAM_BLOCK_SIZE, NULL),
++#ifdef FIPS_MODULE
++    OSSL_PARAM_int(OSSL_MAC_PARAM_REDHAT_FIPS_INDICATOR, NULL),
++#endif /* defined(FIPS_MODULE) */
+     OSSL_PARAM_END
+ };
+ static const OSSL_PARAM *hmac_gettable_ctx_params(ossl_unused void *ctx,
+@@ -265,6 +270,18 @@ static int hmac_get_ctx_params(void *vmacctx, OSSL_PARAM params[])
+             && !OSSL_PARAM_set_int(p, hmac_block_size(macctx)))
+         return 0;
+ 
++#ifdef FIPS_MODULE
++    if ((p = OSSL_PARAM_locate(params, OSSL_MAC_PARAM_REDHAT_FIPS_INDICATOR)) != NULL) {
++        int fips_indicator = EVP_MAC_REDHAT_FIPS_INDICATOR_APPROVED;
++        /* NIST SP 800-131Ar2, Table 9: Approval Status of MAC Algorithms
++         * specifies key lengths < 112 bytes are disallowed for HMAC generation
++         * and legacy use for HMAC verification. */
++        if (macctx->keylen < EVP_HMAC_GEN_FIPS_MIN_KEY_LEN)
++            fips_indicator = EVP_MAC_REDHAT_FIPS_INDICATOR_NOT_APPROVED;
++        return OSSL_PARAM_set_int(p, fips_indicator);
++    }
++#endif /* defined(FIPS_MODULE) */
++
+     return 1;
+ }
+ 
+-- 
+2.41.0
+
