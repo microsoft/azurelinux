@@ -280,7 +280,7 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
-* Mon Aug 25 21:12:57 UTC 2025 Andrew Phelps <anphel@microsoft.com> - 1.2.0-19
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.2.0-19
 - Bump to rebuild with updated glibc
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-18

@@ -106,7 +106,7 @@ SKIP_KNOWN_BUGS=1 ./runtest
 %{_mandir}/man1/busybox.petitboot.1.gz
 
 %changelog
-* Mon Aug 25 21:12:57 UTC 2025 Andrew Phelps <anphel@microsoft.com> - 1.36.1-15
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.36.1-15
 - Bump to rebuild with updated glibc
 
 * Mon Jul 07 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.36.1-14
