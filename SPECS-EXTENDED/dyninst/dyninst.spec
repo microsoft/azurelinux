@@ -194,7 +194,7 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
-* Mon Aug 25 21:12:58 UTC 2025 Andrew Phelps <anphel@microsoft.com> - 10.1.0-22
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 10.1.0-22
 - Bump to rebuild with updated glibc
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 10.1.0-21

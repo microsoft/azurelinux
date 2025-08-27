@@ -123,7 +123,7 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 %{_datadir}/%{name}/test
 
 %changelog
-* Mon Aug 25 21:12:58 UTC 2025 Andrew Phelps <anphel@microsoft.com> - 1.18.0-32
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.18.0-32
 - Bump to rebuild with updated glibc
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.18.0-31
