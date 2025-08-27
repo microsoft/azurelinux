@@ -1,0 +1,82 @@
+From cb180c186ddcd46f3ffe13468d8ac4dff680b03e Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 8 Jul 2024 11:30:24 +0200
+Subject: [PATCH 04/50] 
+ 0004-Override-default-paths-for-the-CA-directory-tree.patch
+
+Patch-name: 0004-Override-default-paths-for-the-CA-directory-tree.patch
+Patch-id: 4
+Patch-status: |
+    # Override default paths for the CA directory tree
+From-dist-git-commit: e67e9d9c40cd2cb9547e539c658e2b63f2736762
+---
+ apps/CA.pl.in    |  2 +-
+ apps/openssl.cnf | 18 ++++++++++++++++--
+ 2 files changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/apps/CA.pl.in b/apps/CA.pl.in
+index 2c31ee6c8d..009eafe685 100644
+--- a/apps/CA.pl.in
++++ b/apps/CA.pl.in
+@@ -29,7 +29,7 @@ my $X509 = "$openssl x509";
+ my $PKCS12 = "$openssl pkcs12";
+ 
+ # Default values for various configuration settings.
+-my $CATOP = "./demoCA";
++my $CATOP = "/etc/pki/CA";
+ my $CAKEY = "cakey.pem";
+ my $CAREQ = "careq.pem";
+ my $CACERT = "cacert.pem";
+diff --git a/apps/openssl.cnf b/apps/openssl.cnf
+index 00f0d24673..3ec80986b7 100644
+--- a/apps/openssl.cnf
++++ b/apps/openssl.cnf
+@@ -52,6 +52,13 @@ tsa_policy3 = 1.2.3.4.5.7
+ 
+ [openssl_init]
+ providers = provider_sect
++# Load default TLS policy configuration
++ssl_conf = ssl_module
++alg_section = evp_properties
++
++[ evp_properties ]
++#This section is intentionally added empty here
++#to be tuned on particular systems
+ 
+ # List of providers to load
+ [provider_sect]
+@@ -71,6 +78,13 @@ default = default_sect
+ [default_sect]
+ # activate = 1
+ 
++[ ssl_module ]
++
++system_default = crypto_policy
++
++[ crypto_policy ]
++
++.include = /etc/crypto-policies/back-ends/opensslcnf.config
+ 
+ ####################################################################
+ [ ca ]
+@@ -79,7 +93,7 @@ default_ca	= CA_default		# The default ca section
+ ####################################################################
+ [ CA_default ]
+ 
+-dir		= ./demoCA		# Where everything is kept
++dir		= /etc/pki/CA		# Where everything is kept
+ certs		= $dir/certs		# Where the issued certs are kept
+ crl_dir		= $dir/crl		# Where the issued crl are kept
+ database	= $dir/index.txt	# database index file.
+@@ -311,7 +325,7 @@ default_tsa = tsa_config1	# the default TSA section
+ [ tsa_config1 ]
+ 
+ # These are used by the TSA reply generation only.
+-dir		= ./demoCA		# TSA root directory
++dir		= /etc/pki/CA		# TSA root directory
+ serial		= $dir/tsaserial	# The current serial number (mandatory)
+ crypto_device	= builtin		# OpenSSL engine to use for signing
+ signer_cert	= $dir/tsacert.pem 	# The TSA signing certificate
+-- 
+2.41.0
+
