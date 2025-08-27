@@ -19,7 +19,6 @@ Requires: /usr/bin/gcov
 Requires: /usr/bin/find
 Requires: perl(GD::Image)
 Requires: perl(JSON::XS)
-Requires: perl(DateTime)
 
 # lcovutil.pm is a private helper file
 %global __requires_exclude ^perl\\(lcovutil\\)$
