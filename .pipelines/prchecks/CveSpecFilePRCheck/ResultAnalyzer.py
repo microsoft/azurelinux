@@ -21,6 +21,7 @@ import re
 import logging
 from typing import Dict, List, Any, Optional, Tuple
 from AntiPatternDetector import AntiPattern, Severity
+from datetime import datetime
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -468,3 +469,137 @@ class ResultAnalyzer:
         content_parts.append("📋 **For detailed analysis and recommendations, check the Azure DevOps pipeline logs.**")
         
         return "\n".join(content_parts)
+    
+    def generate_multi_spec_report(self, analysis_result: 'MultiSpecAnalysisResult') -> str:
+        """
+        Generate a comprehensive report for multi-spec analysis results.
+        
+        Args:
+            analysis_result: MultiSpecAnalysisResult with all spec data
+            
+        Returns:
+            Formatted report string organized by package
+        """
+        report_lines = []
+        
+        # Header
+        report_lines.append("=" * 80)
+        report_lines.append("CVE SPEC FILE CHECK - ANALYSIS REPORT")
+        report_lines.append("=" * 80)
+        report_lines.append(f"Generated: {datetime.now().isoformat()}")
+        report_lines.append("")
+        
+        # Executive Summary
+        report_lines.append("EXECUTIVE SUMMARY")
+        report_lines.append("-" * 40)
+        stats = analysis_result.summary_statistics
+        report_lines.append(f"Total Spec Files Analyzed: {stats['total_specs']}")
+        report_lines.append(f"Specs with Errors: {stats['specs_with_errors']}")
+        report_lines.append(f"Specs with Warnings: {stats['specs_with_warnings']}")
+        report_lines.append(f"Total Issues Found: {analysis_result.total_issues}")
+        report_lines.append(f"Overall Severity: {analysis_result.overall_severity.name}")
+        report_lines.append("")
+        
+        # Package-by-package breakdown
+        report_lines.append("PACKAGE ANALYSIS DETAILS")
+        report_lines.append("-" * 40)
+        
+        for spec_result in sorted(analysis_result.spec_results, 
+                                  key=lambda x: x.package_name):
+            report_lines.append("")
+            report_lines.append(f"Package: {spec_result.package_name}")
+            report_lines.append(f"Spec File: {spec_result.spec_path}")
+            report_lines.append(f"Status: {spec_result.severity.name}")
+            report_lines.append(f"Issues: {spec_result.summary}")
+            
+            if spec_result.anti_patterns:
+                report_lines.append("\n  Anti-Patterns Detected:")
+                
+                # Group by type
+                issues_by_type = spec_result.get_issues_by_type()
+                for issue_type, patterns in issues_by_type.items():
+                    report_lines.append(f"    - {issue_type}: {len(patterns)} occurrence(s)")
+                    for pattern in patterns[:3]:  # Show first 3 of each type
+                        report_lines.append(f"      • {pattern.description[:80]}...")
+                    if len(patterns) > 3:
+                        report_lines.append(f"      ... and {len(patterns) - 3} more")
+            
+            if spec_result.ai_analysis:
+                report_lines.append("\n  AI Analysis Summary:")
+                # Take first 3 lines of AI analysis
+                ai_lines = spec_result.ai_analysis.split('\n')[:3]
+                for line in ai_lines:
+                    if line.strip():
+                        report_lines.append(f"    {line[:80]}...")
+        
+        # Recommendations
+        if analysis_result.get_failed_specs():
+            report_lines.append("")
+            report_lines.append("RECOMMENDED ACTIONS")
+            report_lines.append("-" * 40)
+            
+            for spec_result in analysis_result.get_failed_specs():
+                report_lines.append(f"\n{spec_result.package_name}:")
+                
+                # Get unique recommendations
+                recommendations = set()
+                for pattern in spec_result.anti_patterns:
+                    if pattern.severity >= Severity.ERROR:
+                        recommendations.add(pattern.recommendation)
+                
+                for rec in recommendations:
+                    report_lines.append(f"  • {rec}")
+        
+        # Footer
+        report_lines.append("")
+        report_lines.append("=" * 80)
+        report_lines.append("END OF REPORT")
+        report_lines.append("=" * 80)
+        
+        return '\n'.join(report_lines)
+
+    def save_json_results(self, analysis_result: 'MultiSpecAnalysisResult', filepath: str):
+        """
+        Save analysis results in structured JSON format.
+        
+        Args:
+            analysis_result: MultiSpecAnalysisResult to save
+            filepath: Path to save JSON file
+        """
+        import json
+        from dataclasses import asdict
+        
+        # Convert to JSON-serializable format
+        json_data = {
+            'timestamp': datetime.now().isoformat(),
+            'overall_severity': analysis_result.overall_severity.name,
+            'total_issues': analysis_result.total_issues,
+            'summary_statistics': analysis_result.summary_statistics,
+            'spec_results': []
+        }
+        
+        for spec_result in analysis_result.spec_results:
+            spec_data = {
+                'spec_path': spec_result.spec_path,
+                'package_name': spec_result.package_name,
+                'severity': spec_result.severity.name,
+                'summary': spec_result.summary,
+                'anti_patterns': [
+                    {
+                        'id': p.id,
+                        'name': p.name,
+                        'description': p.description,
+                        'severity': p.severity.name,
+                        'line_number': p.line_number,
+                        'recommendation': p.recommendation
+                    }
+                    for p in spec_result.anti_patterns
+                ],
+                'ai_analysis': spec_result.ai_analysis
+            }
+            json_data['spec_results'].append(spec_data)
+        
+        with open(filepath, 'w') as f:
+            json.dump(json_data, f, indent=2)
+        
+        logger.info(f"Saved JSON results to {filepath}")

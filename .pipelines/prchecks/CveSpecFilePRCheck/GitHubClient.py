@@ -447,3 +447,141 @@ class GitHubClient:
         comment += "See ADO pipeline logs for full details.*"
         
         return comment
+    
+    def format_multi_spec_comment(self, analysis_result: 'MultiSpecAnalysisResult') -> str:
+        """
+        Format a well-organized comment for multi-spec PRs.
+        
+        Args:
+            analysis_result: MultiSpecAnalysisResult containing all spec results
+            
+        Returns:
+            Formatted markdown comment with results organized by package
+        """
+        lines = []
+        
+        # Header
+        lines.append("## 🔍 CVE Spec File Check Results\n")
+        
+        # Overall Summary
+        stats = analysis_result.summary_statistics
+        status_emoji = "❌" if analysis_result.overall_severity >= Severity.ERROR else "✅"
+        
+        lines.append(f"### {status_emoji} Overall Status\n")
+        lines.append(f"- **Analyzed:** {stats['total_specs']} spec file(s)")
+        lines.append(f"- **Total Issues:** {analysis_result.total_issues}")
+        lines.append(f"- **Errors:** {stats['total_errors']} | **Warnings:** {stats['total_warnings']}")
+        lines.append("")
+        
+        # Summary table
+        if analysis_result.spec_results:
+            lines.append("### 📊 Summary by Package\n")
+            lines.append("| Package | Status | Issues | Details |")
+            lines.append("|---------|--------|--------|---------|")
+            
+            for spec_result in sorted(analysis_result.spec_results, 
+                                      key=lambda x: (x.severity.value, x.package_name),
+                                      reverse=True):
+                status = "❌ Failed" if spec_result.severity >= Severity.ERROR else "⚠️ Warning" if spec_result.severity == Severity.WARNING else "✅ Passed"
+                details_link = f"[View Details](#{spec_result.package_name.lower().replace(' ', '-')}-details)"
+                lines.append(f"| {spec_result.package_name} | {status} | {spec_result.summary} | {details_link} |")
+            
+            lines.append("")
+        
+        # Detailed results per package
+        for spec_result in analysis_result.spec_results:
+            if not spec_result.anti_patterns and not spec_result.ai_analysis:
+                continue
+                
+            # Package section header
+            lines.append(f"---\n")
+            lines.append(f"### 📦 {spec_result.package_name} Details\n")
+            lines.append(f"**Spec File:** `{spec_result.spec_path}`\n")
+            
+            # Anti-patterns for this package
+            if spec_result.anti_patterns:
+                lines.append("#### Anti-Pattern Issues\n")
+                
+                # Group by severity
+                issues_by_severity = spec_result.get_issues_by_severity()
+                
+                for severity in [Severity.CRITICAL, Severity.ERROR, Severity.WARNING, Severity.INFO]:
+                    if severity not in issues_by_severity:
+                        continue
+                        
+                    severity_icon = {
+                        Severity.CRITICAL: "🔴",
+                        Severity.ERROR: "❌",
+                        Severity.WARNING: "⚠️",
+                        Severity.INFO: "ℹ️"
+                    }.get(severity, "")
+                    
+                    lines.append(f"\n**{severity_icon} {severity.name} Issues:**\n")
+                    
+                    for pattern in issues_by_severity[severity]:
+                        location = f"Line {pattern.line_number}" if pattern.line_number else "N/A"
+                        lines.append(f"- **{pattern.name}**: {pattern.description}")
+                        lines.append(f"  - Location: {location}")
+                        lines.append(f"  - Recommendation: {pattern.recommendation}")
+                        lines.append("")
+            
+            # AI analysis for this package
+            if spec_result.ai_analysis:
+                lines.append("#### 🤖 AI Analysis\n")
+                lines.append(f"```\n{spec_result.ai_analysis}\n```\n")
+        
+        # Footer with action items
+        if analysis_result.overall_severity >= Severity.ERROR:
+            lines.append("\n---\n")
+            lines.append("### ⚠️ Required Actions\n")
+            lines.append("Please fix all **ERROR** and **CRITICAL** issues before merging.\n")
+            
+            # List packages that need fixing
+            failed_specs = analysis_result.get_failed_specs()
+            if failed_specs:
+                lines.append("\n**Packages requiring fixes:**")
+                for spec in failed_specs:
+                    lines.append(f"- {spec.package_name}")
+        
+        return '\n'.join(lines)
+
+    def post_pr_comment(self, pr_number: int, analysis_result: 'MultiSpecAnalysisResult'):
+        """
+        Post a well-formatted comment to a GitHub PR.
+        
+        Enhanced to handle multi-spec results with proper organization.
+        """
+        comment_body = self.format_multi_spec_comment(analysis_result)
+        
+        # Check if we should update existing comment or create new
+        existing_comment = self.find_existing_bot_comment(pr_number)
+        
+        if existing_comment:
+            # Update existing comment
+            url = f"{self.api_base}/repos/{self.repo_name}/issues/comments/{existing_comment['id']}"
+            response = requests.patch(url, headers=self.headers, json={"body": comment_body})
+        else:
+            # Create new comment
+            url = f"{self.api_base}/repos/{self.repo_name}/issues/{pr_number}/comments"
+            response = requests.post(url, headers=self.headers, json={"body": comment_body})
+        
+        if response.status_code in [200, 201]:
+            logger.info(f"Successfully posted comment to PR #{pr_number}")
+        else:
+            logger.error(f"Failed to post comment: {response.status_code} - {response.text}")
+        
+        return response
+
+    def find_existing_bot_comment(self, pr_number: int):
+        """Find existing bot comment to update instead of creating duplicates."""
+        url = f"{self.api_base}/repos/{self.repo_name}/issues/{pr_number}/comments"
+        response = requests.get(url, headers=self.headers)
+        
+        if response.status_code == 200:
+            comments = response.json()
+            for comment in comments:
+                # Look for our bot's comment marker
+                if "🔍 CVE Spec File Check Results" in comment.get("body", ""):
+                    return comment
+        
+        return None

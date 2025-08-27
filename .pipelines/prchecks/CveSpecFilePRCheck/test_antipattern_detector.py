@@ -698,7 +698,7 @@ Test package
         
         **CVE Issues**:
         - Future-dated CVE: "CVE-2030-1234" (year 2030 > 2026 threshold)
-        - Missing in changelog: "CVE-2023-5678", "CVE-2030-1234" (in description but not changelog)
+        - Missing in changelog: "CVE-2023-5678", "CVE-2030-1234" (in description, not changelog)
         
         **Changelog Issues**:
         - Invalid format: "Foo Bar 15 2024" (invalid day name)
@@ -985,6 +985,101 @@ Fixes cve-2023-1234 and CVE-2023-5678
         missing_cves = [p for p in patterns if p.id == 'missing-cve-in-changelog']
         self.assertEqual(len(missing_cves), 1)
         self.assertIn("CVE-2023-5678", missing_cves[0].description)
+
+    def test_patch_file_with_url(self):
+        """
+        Test that patch files referenced with full URLs are handled correctly.
+        
+        This test validates the detector's ability to:
+        - Extract filenames from full URLs in Patch declarations
+        - Match URL-based references with local patch files
+        - Not produce false positives for URL-based patch references
+        
+        Test scenarios:
+        - Full HTTP/HTTPS URLs with patch files
+        - URLs with complex paths
+        - Mix of URL and simple filename references
+        
+        Expected behavior:
+        - Only the filename part of URL should be used for matching
+        - Should find patches like glibc-2.38-fhs-1.patch when referenced as
+          https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.38-fhs-1.patch
+        """
+        spec_content = """
+Name: test-package
+Version: 1.0
+
+Patch0: simple.patch
+Patch1: https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.38-fhs-1.patch
+Patch2: https://example.com/patches/security-fix.patch
+Patch3: relative/path/to/local.patch
+
+%changelog
+* Mon Jan 15 2024 Test User <test@example.com> - 1.0-1
+- Initial release
+"""
+        
+        file_list = [
+            'test.spec',
+            'simple.patch',
+            'glibc-2.38-fhs-1.patch',  # Matches Patch1 URL
+            'security-fix.patch',       # Matches Patch2 URL
+            'local.patch',              # Matches Patch3 relative path
+        ]
+        
+        detector = AntiPatternDetector()
+        patterns = detector.detect_patch_file_issues(spec_content, 'test.spec', file_list)
+        
+        # Should not detect any missing patch files
+        missing_patches = [p for p in patterns if p.id == 'missing-patch-file']
+        self.assertEqual(len(missing_patches), 0, 
+                        f"Should not report missing patches for URL references. Found: {[p.description for p in missing_patches]}")
+        
+        # Should not detect any unused patch files
+        unused_patches = [p for p in patterns if p.id == 'unused-patch-file']
+        self.assertEqual(len(unused_patches), 0,
+                        f"Should not report unused patches. Found: {[p.description for p in unused_patches]}")
+    
+    def test_patch_file_url_mismatch(self):
+        """
+        Test detection of missing patches when URL-referenced patches don't exist locally.
+        
+        This test validates that the detector correctly identifies when:
+        - A patch is referenced via URL but the corresponding file doesn't exist
+        - The filename extraction from URL works correctly for missing files
+        
+        Expected behavior:
+        - Should report missing patch when extracted filename not in directory
+        - Should use only the filename part from the URL for checking
+        """
+        spec_content = """
+Name: test-package
+Version: 1.0
+
+Patch0: https://www.example.com/patches/missing-patch.patch
+Patch1: https://github.com/project/fixes/CVE-2023-1234.patch
+
+%changelog
+* Mon Jan 15 2024 Test User <test@example.com> - 1.0-1
+- Initial release
+"""
+        
+        file_list = [
+            'test.spec',
+            # Note: missing-patch.patch and CVE-2023-1234.patch are not in the list
+        ]
+        
+        detector = AntiPatternDetector()
+        patterns = detector.detect_patch_file_issues(spec_content, 'test.spec', file_list)
+        
+        # Should detect two missing patch files
+        missing_patches = [p for p in patterns if p.id == 'missing-patch-file']
+        self.assertEqual(len(missing_patches), 2)
+        
+        # Check that the correct filenames were extracted from URLs
+        missing_descriptions = [p.description for p in missing_patches]
+        self.assertTrue(any('missing-patch.patch' in d for d in missing_descriptions))
+        self.assertTrue(any('CVE-2023-1234.patch' in d for d in missing_descriptions))
 
 
 if __name__ == '__main__':

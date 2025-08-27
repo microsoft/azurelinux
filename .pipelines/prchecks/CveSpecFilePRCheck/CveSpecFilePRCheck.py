@@ -284,70 +284,153 @@ def get_package_directory_files(spec_path: str) -> List[str]:
         logger.warning(f"Could not list files in directory {dir_path}: {str(e)}")
         return []
 
-def analyze_spec_files(diff_text: str, changed_spec_files: List[str]) -> Tuple[List[AntiPattern], str, bool]:
+def extract_package_name(spec_content: str, spec_path: str) -> str:
     """
-    Analyzes spec files for anti-patterns and issues.
+    Extract package name from spec file content or path.
     
     Args:
-        diff_text: Git diff output as text
-        changed_spec_files: List of changed spec file paths
+        spec_content: Content of the spec file
+        spec_path: Path to the spec file
         
     Returns:
-        Tuple containing:
-        - List of detected anti-patterns
-        - OpenAI analysis results
-        - Boolean indicating if fatal errors occurred
+        Package name extracted from spec or derived from path
     """
-    repo_root = os.environ["BUILD_SOURCESDIRECTORY"]
-    detector = AntiPatternDetector(repo_root)
-    all_anti_patterns = []
-    ai_analysis = ""
+    # Try to extract from Name: field in spec
+    match = re.search(r'^Name:\s+(.+)$', spec_content, re.MULTILINE)
+    if match:
+        return match.group(1).strip()
     
-    try:
-        # Initialize OpenAI client for analysis and recommendations
-        openai_client = _initialize_openai_client()
+    # Fallback to directory name
+    path_parts = spec_path.split('/')
+    if 'SPECS' in path_parts:
+        idx = path_parts.index('SPECS')
+        if idx + 1 < len(path_parts):
+            return path_parts[idx + 1]
+    
+    # Last resort: use filename without extension
+    return os.path.splitext(os.path.basename(spec_path))[0]
+
+def analyze_spec_files(diff_text, changed_spec_files):
+    """
+    Analyze changed spec files for anti-patterns and AI insights.
+    
+    Enhanced to return organized results by spec file.
+    
+    Returns:
+        MultiSpecAnalysisResult: Organized results by spec file
+    """
+    from SpecFileResult import SpecFileResult, MultiSpecAnalysisResult
+    
+    result = MultiSpecAnalysisResult()
+    
+    # Analyze each spec file individually
+    for spec_file in changed_spec_files:
+        logger.info(f"Analyzing spec file: {spec_file}")
         
-        # Call OpenAI for analysis
-        ai_analysis = call_openai(openai_client, diff_text, changed_spec_files)
+        # Get spec content and file list
+        spec_content = get_spec_file_content(spec_file)
+        if not spec_content:
+            logger.warning(f"Could not read spec file: {spec_file}")
+            continue
         
-        # Dynamic recommendations have been consolidated into AI analysis; deprecated FixRecommender
+        file_list = get_package_directory_files(spec_file)
+        package_name = extract_package_name(spec_content, spec_file)
         
-        # Early exit if no spec files changed
-        if not changed_spec_files:
-            return [], ai_analysis, False
-            
-        # Process each changed spec file for anti-patterns
-        for spec_path in changed_spec_files:
-            logger.info(f"Running anti-pattern detection on: {spec_path}")
-            
-            spec_content = get_spec_file_content(spec_path)
-            if not spec_content:
-                logger.warning(f"Could not read spec file content for {spec_path}, skipping detailed analysis")
-                continue
-                
-            file_list = get_package_directory_files(spec_path)
-            
-            # Detect anti-patterns
-            anti_patterns = detector.detect_all(spec_path, spec_content, file_list)
-            
-            all_anti_patterns.extend(anti_patterns)
-            
-            # Log detected issues
-            if anti_patterns:
-                critical_count = sum(1 for p in anti_patterns if p.severity >= Severity.ERROR)
-                warning_count = sum(1 for p in anti_patterns if p.severity == Severity.WARNING)
-                
-                logger.warning(f"Found {len(anti_patterns)} anti-patterns in {spec_path}:")
-                logger.warning(f"   - {critical_count} critical/error issues")
-                logger.warning(f"   - {warning_count} warnings")
-            else:
-                logger.info(f"No anti-patterns detected in {spec_path}")
+        # Create result container for this spec
+        spec_result = SpecFileResult(
+            spec_path=spec_file,
+            package_name=package_name
+        )
         
-        return all_anti_patterns, ai_analysis, False
+        # Run anti-pattern detection
+        analyzer = AntiPatternDetector()
+        spec_result.anti_patterns = analyzer.detect_all(
+            spec_file, spec_content, file_list
+        )
         
-    except Exception as e:
-        logger.error(f"Error in analyze_spec_files: {str(e)}", exc_info=True)
-        return all_anti_patterns, ai_analysis, True
+        # Run AI analysis if enabled and configured
+        if os.environ.get("ENABLE_AI_ANALYSIS", "false").lower() == "true":
+            try:
+                openai_client = _initialize_openai_client()
+                if openai_client:
+                    # Get AI analysis for this specific spec
+                    spec_ai_analysis = call_openai_for_single_spec(
+                        openai_client, spec_file, spec_content, diff_text
+                    )
+                    spec_result.ai_analysis = spec_ai_analysis
+            except Exception as e:
+                logger.warning(f"AI analysis failed for {spec_file}: {e}")
+        
+        result.spec_results.append(spec_result)
+    
+    # Trigger post-init calculations
+    result.__post_init__()
+    
+    return result
+
+def call_openai_for_single_spec(openai_client, spec_file, spec_content, diff_text):
+    """
+    Call OpenAI for analysis of a single spec file.
+    
+    Args:
+        openai_client: Configured OpenAI client
+        spec_file: Path to the spec file
+        spec_content: Content of the spec file
+        diff_text: Git diff text
+        
+    Returns:
+        str: AI analysis for this specific spec file
+    """
+    # Extract relevant diff for this spec file
+    spec_diff = extract_spec_specific_diff(diff_text, spec_file)
+    
+    prompt = f"""
+    Analyze the following spec file changes for package '{os.path.basename(os.path.dirname(spec_file))}':
+    
+    Spec File: {spec_file}
+    
+    Relevant Diff:
+    ```diff
+    {spec_diff}
+    ```
+    
+    Full Spec Content:
+    ```spec
+    {spec_content[:5000]}  # Limit for token management
+    ```
+    
+    Please provide:
+    1. Summary of changes in this spec file
+    2. Potential security implications
+    3. Recommendations specific to this package
+    """
+    
+    # Call OpenAI (existing logic)
+    response = openai_client.chat.completions.create(
+        model=openai_client.model,
+        messages=[
+            {"role": "system", "content": "You are a security-focused package reviewer."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.3,
+        max_tokens=1000
+    )
+    
+    return response.choices[0].message.content
+
+def extract_spec_specific_diff(diff_text, spec_file):
+    """Extract diff sections relevant to a specific spec file."""
+    lines = diff_text.split('\n')
+    spec_diff_lines = []
+    in_spec_diff = False
+    
+    for line in lines:
+        if line.startswith('diff --git'):
+            in_spec_diff = spec_file in line
+        elif in_spec_diff:
+            spec_diff_lines.append(line)
+    
+    return '\n'.join(spec_diff_lines)
 
 def _initialize_openai_client() -> OpenAIClient:
     """
@@ -615,143 +698,67 @@ def _derive_github_context():
         os.environ["GITHUB_PR_NUMBER"] = pr_num
 
 def main():
-    """Main entry point for the script"""
-    parser = argparse.ArgumentParser(description="CVE Spec File PR Check")
-    parser.add_argument('--fail-on-warnings', action='store_true', 
-                      help='Fail the pipeline even when only warnings are detected')
-    parser.add_argument('--exit-code-severity', action='store_true', 
-                      help='Use different exit codes based on severity (0=success, 1=critical, 2=error, 3=warning)')
-    parser.add_argument('--post-github-comments', action='store_true',
-                      help='Post analysis results as comments on GitHub PR')
-    parser.add_argument('--use-github-checks', action='store_true',
-                      help='Use GitHub Checks API for multi-level notifications')
-    args = parser.parse_args()
+    """
+    Main entry point for the CVE Spec File PR check.
     
-    # Derive GitHub context from environment variables
-    _derive_github_context()
+    Enhanced to handle organized multi-spec results.
+    """
+    logger.info("Starting CVE Spec File PR Check")
     
-    # Debug environment variables related to GitHub authentication and context
-    logger.info("GitHub Environment Variables:")
-    logger.info(f"  - GITHUB_TOKEN: {'Set' if os.environ.get('GITHUB_TOKEN') else 'Not Set'}")
-    logger.info(f"  - SYSTEM_ACCESSTOKEN: {'Set' if os.environ.get('SYSTEM_ACCESSTOKEN') else 'Not Set'}")
-    logger.info(f"  - GITHUB_REPOSITORY: {os.environ.get('GITHUB_REPOSITORY', 'Not Set')}")
-    logger.info(f"  - GITHUB_PR_NUMBER: {os.environ.get('GITHUB_PR_NUMBER', 'Not Set')}")
-    logger.info(f"  - BUILD_REPOSITORY_NAME: {os.environ.get('BUILD_REPOSITORY_NAME', 'Not Set')}")
-    logger.info(f"  - SYSTEM_PULLREQUEST_PULLREQUESTNUMBER: {os.environ.get('SYSTEM_PULLREQUEST_PULLREQUESTNUMBER', 'Not Set')}")
-    
-    try:
-        # Gather git diff
-        diff = gather_diff()
-        
-        if not diff.strip():
-            logger.warning("No changes detected in the diff.")
-            return EXIT_SUCCESS
-        
-        logger.info(f"Found diff of {len(diff.splitlines())} lines")
-        
-        # Extract changed spec files from diff
-        changed_spec_files = get_changed_spec_files(diff)
-        logger.info(f"Found {len(changed_spec_files)} changed spec files in the diff")
-        
-        # Run analysis on spec files
-        anti_patterns, ai_analysis, fatal_error = analyze_spec_files(diff, changed_spec_files)
-        
-        # Process results with structured analysis
-        analyzer = ResultAnalyzer(anti_patterns, ai_analysis)
-        
-        # Print console summary (contains brief overview)
-        console_summary = analyzer.generate_console_summary()
-        print(f"\n{console_summary}")
-        
-        # Log detailed analysis to Azure DevOps pipeline logs
-        detailed_analysis = analyzer.extract_detailed_analysis_for_logs()
-        if detailed_analysis:
-            logger.info("=== DETAILED ANALYSIS FOR PIPELINE LOGS ===")
-            for line in detailed_analysis.split('\n'):
-                if line.strip():
-                    logger.info(line)
-            logger.info("=== END DETAILED ANALYSIS ===")
-        
-        # Generate and save comprehensive report files
-        detailed_report = analyzer.generate_detailed_report()
-        report_file = os.path.join(os.getcwd(), "spec_analysis_report.txt")
-        with open(report_file, "w") as f:
-            f.write(detailed_report)
-        logger.info(f"Detailed analysis report saved to {report_file}")
-        
-        # Save enhanced JSON report with structured content for pipeline and GitHub integration
-        json_file = os.path.join(os.getcwd(), "spec_analysis_report.json")
-        json_report = analyzer.to_json()
-        with open(json_file, "w") as f:
-            f.write(json_report)
-        logger.info(f"Enhanced JSON analysis report saved to {json_file}")
-        
-        # Log brief summary for quick reference
-        brief_summary = analyzer.extract_brief_summary_for_pr()
-        if brief_summary:
-            logger.info("=== BRIEF SUMMARY FOR PR ===")
-            logger.info(brief_summary)
-            logger.info("=== END BRIEF SUMMARY ===")
-        
-        # Determine exit code
-        if fatal_error:
-            logger.error("Fatal error occurred during analysis")
-            return EXIT_FATAL
-            
-        # Get highest severity
-        highest_severity = analyzer.get_highest_severity()
-        
-        # Update GitHub status with integrated comment posting using structured content
-        update_github_status(
-            highest_severity, 
-            anti_patterns, 
-            ai_analysis,
-            analyzer,
-            post_comments=args.post_github_comments,
-            use_checks_api=args.use_github_checks
-        )
-        
-        if args.exit_code_severity:
-            # Return exit codes based on severity, but do not fail on warnings unless requested
-            if highest_severity.value >= Severity.ERROR.value:
-                exit_code = get_severity_exit_code(highest_severity)
-            elif highest_severity == Severity.WARNING:
-                exit_code = EXIT_WARNING if args.fail_on_warnings else EXIT_SUCCESS
-            else:
-                exit_code = EXIT_SUCCESS
-            
-            # Log exit details
-            if exit_code == EXIT_SUCCESS:
-                logger.info("Analysis completed successfully - no issues detected or warnings only.")
-            else:
-                severity_name = highest_severity.name
-                logger.warning(f"Analysis completed with highest severity: {severity_name} (exit code {exit_code})")
-                
-            return exit_code
-        else:
-            # Traditional exit behavior (0 = success, 1 = failure)
-            # Determine if we should fail based on severity and fail_on_warnings flag
-            should_fail = False
-            
-            if highest_severity >= Severity.ERROR:
-                # Always fail on ERROR or CRITICAL
-                should_fail = True
-            elif highest_severity == Severity.WARNING and args.fail_on_warnings:
-                # Fail on WARNING only if fail_on_warnings is True
-                should_fail = True
-                
-            if should_fail:
-                # Generate structured error message for failure case
-                error_message = analyzer.generate_error_message()
-                print(f"\n{error_message}")
-                return EXIT_CRITICAL  # Traditional error exit code
-            else:
-                logger.info("Analysis completed - no critical issues detected")
-                return EXIT_SUCCESS
-        
-    except Exception as e:
-        logger.error(f"Unhandled exception: {str(e)}", exc_info=True)
+    # Gather diff
+    diff_text = gather_diff()
+    if not diff_text:
+        logger.error("Failed to gather diff")
         return EXIT_FATAL
+    
+    # Find changed spec files
+    changed_spec_files = get_changed_spec_files(diff_text)
+    
+    if not changed_spec_files:
+        logger.info("No spec files changed in this PR")
+        return EXIT_SUCCESS
+    
+    logger.info(f"Found {len(changed_spec_files)} changed spec file(s)")
+    
+    # Analyze spec files (now returns MultiSpecAnalysisResult)
+    analysis_result = analyze_spec_files(diff_text, changed_spec_files)
+    
+    # Generate and save reports
+    analyzer = ResultAnalyzer()
+    
+    # Generate text report
+    text_report = analyzer.generate_multi_spec_report(analysis_result)
+    print("\n" + text_report)
+    
+    # Save to file
+    with open("pr_check_report.txt", "w") as f:
+        f.write(text_report)
+    
+    # Save JSON results
+    analyzer.save_json_results(analysis_result, "pr_check_results.json")
+    
+    # Update GitHub status if configured
+    if os.environ.get("UPDATE_GITHUB_STATUS", "false").lower() == "true":
+        try:
+            github_client = GitHubClient()
+            pr_number = int(os.environ.get("GITHUB_PR_NUMBER", "0"))
+            
+            if pr_number:
+                # Post organized comment
+                github_client.post_pr_comment(pr_number, analysis_result)
+                
+                # Update checks API if enabled
+                if os.environ.get("USE_CHECKS_API", "false").lower() == "true":
+                    github_client.update_check_status(
+                        pr_number,
+                        analysis_result.overall_severity,
+                        analysis_result.summary_statistics
+                    )
+        except Exception as e:
+            logger.error(f"Failed to update GitHub status: {e}")
+    
+    # Return appropriate exit code
+    return get_severity_exit_code(analysis_result.overall_severity)
 
 if __name__ == "__main__":
     sys.exit(main())

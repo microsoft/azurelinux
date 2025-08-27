@@ -138,44 +138,72 @@ class AntiPatternDetector:
         logger.info(f"Found {len(all_patterns)} anti-patterns in {file_path}")
         return all_patterns
 
-    def detect_patch_file_issues(self, file_path: str, file_content: str, 
-                                file_list: List[str]) -> List[AntiPattern]:
+    def detect_patch_file_issues(self, spec_content: str, file_path: str, file_list: List[str]) -> List[AntiPattern]:
         """
-        Detect issues related to patch files.
+        Detect issues related to patch files in spec files.
+        
+        This function validates patch file references in spec files against the actual
+        files present in the package directory. It performs bidirectional validation
+        to ensure consistency between spec declarations and filesystem state.
+        
+        Issues detected:
+        ----------------
+        1. Missing patch files (ERROR):
+           - Patches referenced in spec but not found in directory
+           - Example: Patch0: security.patch (but file doesn't exist)
+        
+        2. Unused patch files (WARNING):
+           - .patch files in directory but not referenced in spec
+           - Example: old-fix.patch exists but no Patch line references it
+        
+        3. CVE patch mismatches (ERROR):
+           - CVE-named patches without corresponding CVE documentation in spec
+           - Example: CVE-2023-1234.patch exists but CVE-2023-1234 not in changelog
         
         Args:
-            file_path: Path to the spec file relative to repo root
-            file_content: Content of the spec file
-            file_list: List of files in the same directory
+            spec_content: Full text content of the spec file
+            file_path: Path to the spec file being analyzed
+            file_list: List of all files in the package directory
             
         Returns:
-            List of detected patch-related anti-patterns
+            List of AntiPattern objects representing detected issues
         """
         patterns = []
         
-        # Extract patch references from spec file
+        # Extract patch references from spec file with line numbers
+        # Updated regex to handle both simple filenames and full URLs
+        patch_regex = r'^Patch(\d+):\s+(.+?)$'
         patch_refs = {}
-        pattern = r'^Patch(\d+):\s+(.+?)$'
         
-        for line_num, line in enumerate(file_content.splitlines(), 1):
-            match = re.match(pattern, line.strip())
+        for line_num, line in enumerate(spec_content.split('\n'), 1):
+            match = re.match(patch_regex, line.strip())
             if match:
-                patch_num = match.group(1)
                 patch_file = match.group(2).strip()
-                patch_refs[patch_file] = line_num
                 
-                # Check if referenced patch file exists
-                if patch_file not in file_list:
-                    patterns.append(AntiPattern(
-                        id='missing-patch-file',
-                        name="Missing Patch File",
-                        description=f"Patch file '{patch_file}' is referenced in the spec but not found in the directory",
-                        severity=self.severity_map.get('missing-patch-file', Severity.ERROR),
-                        file_path=file_path,
-                        line_number=line_num,
-                        context=line.strip(),
-                        recommendation="Add the missing patch file or update the Patch reference"
-                    ))
+                # Extract just the filename from URL if it's a full path
+                # Handle URLs like https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.38-fhs-1.patch
+                if '://' in patch_file:
+                    # Extract filename from URL (last part after the final /)
+                    patch_file = patch_file.split('/')[-1]
+                elif '/' in patch_file:
+                    # Handle relative paths like patches/fix.patch
+                    patch_file = patch_file.split('/')[-1]
+                
+                patch_refs[patch_file] = (line_num, line.strip())
+        
+        # Check for missing patch files (referenced in spec but not in directory)
+        for patch_file, (line_num, line_content) in patch_refs.items():
+            if patch_file not in file_list:
+                patterns.append(AntiPattern(
+                    id='missing-patch-file',
+                    name="Missing Patch File",
+                    description=f"Patch file '{patch_file}' referenced in spec but not found in directory",
+                    severity=self.severity_map.get('missing-patch-file', Severity.ERROR),
+                    file_path=file_path,
+                    line_number=line_num,
+                    context=line_content,
+                    recommendation="Add the missing patch file or update the Patch reference"
+                ))
         
         # Check for CVE patch naming conventions
         for patch_file in file_list:
@@ -193,20 +221,22 @@ class AntiPatternDetector:
                         recommendation="Add a reference to the patch file or remove it if not needed"
                     ))
                 
-                # Check if CVE patches match CVE references
+                # Check for CVE-named patches
                 if patch_file.startswith('CVE-'):
-                    cve_id = re.match(r'(CVE-\d{4}-\d+)', patch_file)
-                    if cve_id and cve_id.group(1) not in file_content:
-                        patterns.append(AntiPattern(
-                            id='cve-patch-mismatch',
-                            name="CVE Patch Mismatch",
-                            description=f"Patch file '{patch_file}' appears to fix {cve_id.group(1)} but this CVE is not mentioned in the spec",
-                            severity=self.severity_map.get('cve-patch-mismatch', Severity.ERROR),
-                            file_path=file_path,
-                            line_number=None,
-                            context=None,
-                            recommendation=f"Add {cve_id.group(1)} to the spec file changelog entry"
-                        ))
+                    cve_match = re.search(r'(CVE-\d{4}-\d+)', patch_file)
+                    if cve_match:
+                        cve_id = cve_match.group(1)
+                        if cve_id not in spec_content:
+                            patterns.append(AntiPattern(
+                                id='cve-patch-mismatch',
+                                name="CVE Patch Mismatch",
+                                description=f"Patch file '{patch_file}' contains CVE reference but {cve_id} is not mentioned in spec",
+                                severity=self.severity_map.get('cve-patch-mismatch', Severity.ERROR),
+                                file_path=file_path,
+                                line_number=None,
+                                context=None,
+                                recommendation=f"Add {cve_id} to the spec file changelog entry"
+                            ))
         
         return patterns
     
