@@ -64,16 +64,16 @@ const (
 	signatureUpdateString    = "update"
 )
 
-type downloadModeType int
+type sourceAuthModeType int
 
 const (
-	downloadModeAnonymous downloadModeType = iota
-	downloadModeAzureCli
+	sourceAuthModeAnonymous sourceAuthModeType = iota
+	sourceAuthModeAzureCli
 )
 
 const (
-	downloadModeAnonymousString = "anonymous"
-	downloadModeAzureCliString  = "azurecli"
+	sourceAuthModeAnonymousString = "anonymous"
+	sourceAuthModeAzureCliString  = "azurecli"
 )
 
 const (
@@ -92,7 +92,7 @@ type sourceRetrievalConfiguration struct {
 	signatureHandling signatureHandlingType
 	signatureLookup   map[string]string
 
-	downloadMode downloadModeType
+	sourceAuthMode sourceAuthModeType
 }
 
 // packResult holds the worker results from packing a SPEC file into an SRPM.
@@ -140,8 +140,8 @@ var (
 	validSignatureLevels = []string{signatureEnforceString, signatureSkipCheckString, signatureUpdateString}
 	signatureHandling    = app.Flag("signature-handling", "Specifies how to handle signature mismatches for source files.").Default(signatureEnforceString).PlaceHolder(exe.PlaceHolderize(validSignatureLevels)).Enum(validSignatureLevels...)
 
-	validDownloadModes = []string{downloadModeAnonymousString, downloadModeAzureCliString}
-	downloadMode       = app.Flag("download-mode", "SRPM download mode: anonymous or azurecli.").Default(downloadModeAnonymousString).PlaceHolder(exe.PlaceHolderize(validDownloadModes)).Enum(validDownloadModes...)
+	validSourceAuthModes = []string{sourceAuthModeAnonymousString, sourceAuthModeAzureCliString}
+	sourceAuthMode       = app.Flag("source-auth-mode", "Authentication mode for source download: anonymous or azurecli.").Default(sourceAuthModeAnonymousString).PlaceHolder(exe.PlaceHolderize(validSourceAuthModes)).Enum(validSourceAuthModes...)
 )
 
 func main() {
@@ -198,13 +198,13 @@ func main() {
 		templateSrcConfig.tlsCerts = append(templateSrcConfig.tlsCerts, cert)
 	}
 
-	switch *downloadMode {
-	case downloadModeAnonymousString:
-		templateSrcConfig.downloadMode = downloadModeAnonymous
-	case downloadModeAzureCliString:
-		templateSrcConfig.downloadMode = downloadModeAzureCli
+	switch *sourceAuthMode {
+	case sourceAuthModeAnonymousString:
+		templateSrcConfig.sourceAuthMode = sourceAuthModeAnonymous
+	case sourceAuthModeAzureCliString:
+		templateSrcConfig.sourceAuthMode = sourceAuthModeAzureCli
 	default:
-		logger.Log.Fatalf("Invalid download mode encountered: %s. Allowed: %s", *downloadMode, validDownloadModes)
+		logger.Log.Fatalf("Invalid download mode encountered: %s. Allowed: %s", *sourceAuthMode, validSourceAuthModes)
 	}
 
 	timestamp.StopEvent(nil)
@@ -225,7 +225,7 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 	originalOutDir := outDir
 	if workerTar != "" {
 		const leaveFilesOnDisk = false
-		useAzureCliAuth := templateSrcConfig.downloadMode == downloadModeAzureCli
+		useAzureCliAuth := templateSrcConfig.sourceAuthMode == sourceAuthModeAzureCli
 		chroot, buildDir, outDir, specsDir, err = createChroot(workerTar, buildDir, outDir, specsDir, useAzureCliAuth)
 		if err != nil {
 			return
@@ -325,7 +325,6 @@ func createChroot(workerTar, buildDir, outDir, specsDir string, useAzureCliAuth 
 		outMountPoint    = "/output"
 		specsMountPoint  = "/specs"
 		buildDirInChroot = "/build"
-		azureMountPoint  = "/root/.azure"
 	)
 	timestamp.StartEvent("create chroot", nil)
 	defer timestamp.StopEvent(nil)
@@ -337,12 +336,8 @@ func createChroot(workerTar, buildDir, outDir, specsDir string, useAzureCliAuth 
 
 	// Adding the .azure mount ensures the chroot environment can access CLI credentials
 	if useAzureCliAuth {
-		homeDir, homeErr := os.UserHomeDir()
-		if homeErr == nil {
-			azureDir := filepath.Join(homeDir, ".azure")
-			extraMountPoints = append(extraMountPoints, safechroot.NewMountPoint(azureDir, azureMountPoint, "", safechroot.BindMountPointFlags, ""))
-		} else {
-			err = fmt.Errorf("Could not determine user home directory for .azure mount: %v", homeErr)
+		extraMountPoints, err = addAzureConfigMountPoint(extraMountPoints)
+		if err != nil {
 			return
 		}
 	}
@@ -408,6 +403,29 @@ func createChroot(workerTar, buildDir, outDir, specsDir string, useAzureCliAuth 
 	}
 
 	return
+}
+
+// addAzureConfigMountPoint appends a mount point for the Azure CLI config directory.
+func addAzureConfigMountPoint(extraMountPoints []*safechroot.MountPoint) ([]*safechroot.MountPoint, error) {
+	const (
+		chrootAzureConfigMountPoint = "/root/.azure"
+	)
+
+	// The variable is propagated into chroot, if set
+	azureConfigDir := os.Getenv("AZURE_CONFIG_DIR")
+	mountPoint := azureConfigDir
+	if azureConfigDir == "" {
+		logger.Log.Debug("AZURE_CONFIG_DIR is not set, defaulting to user's .azure folder.")
+		homeDir, homeErr := os.UserHomeDir()
+		if homeErr != nil {
+			return nil, fmt.Errorf("Could not determine user home directory for .azure mount: %v", homeErr)
+		}
+		azureConfigDir = filepath.Join(homeDir, ".azure")
+		mountPoint = chrootAzureConfigMountPoint
+	}
+
+	extraMountPoints = append(extraMountPoints, safechroot.NewMountPoint(azureConfigDir, mountPoint, "", safechroot.BindMountPointFlags, ""))
+	return extraMountPoints, nil
 }
 
 func installAzureCliPackage(chroot *safechroot.Chroot) (err error) {
@@ -1022,8 +1040,8 @@ func hydrateFromRemoteSource(ctx context.Context, fileHydrationState map[string]
 			}
 		}
 
-		// Pass true if downloadMode is azurecli, false otherwise
-		useAzureCliAuth := srcConfig.downloadMode == downloadModeAzureCli
+		// Pass true if sourceAuthMode is azurecli, false otherwise
+		useAzureCliAuth := srcConfig.sourceAuthMode == sourceAuthModeAzureCli
 		cancelled, internalErr := network.DownloadFileWithRetry(ctx, url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts, useAzureCliAuth, network.DefaultTimeout)
 
 		if netOpsSemaphore != nil {
