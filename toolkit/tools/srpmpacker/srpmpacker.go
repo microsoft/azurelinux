@@ -408,17 +408,39 @@ func createChroot(workerTar, buildDir, outDir, specsDir string, useAzureCliAuth 
 
 // addAzureConfigMountPoint appends a mount point for the Azure CLI config directory.
 func addAzureConfigMountPoint(extraMountPoints []*safechroot.MountPoint, azureMountPoint string) ([]*safechroot.MountPoint, error) {
-	azureDir := os.Getenv("AZURE_CONFIG_DIR")
-	if azureDir == "" {
-		logger.Log.Debug("AZURE_CONFIG_DIR is not set, defaulting to user's .azure folder.")
+	azureEnv := os.Getenv("AZURE_CONFIG_DIR")
+
+	var azureDir string
+	if azureEnv == "" {
+		logger.Log.Info("AZURE_CONFIG_DIR is not set, defaulting to user's .azure folder.")
 		homeDir, homeErr := os.UserHomeDir()
 		if homeErr != nil {
 			return nil, fmt.Errorf("Could not determine user home directory for .azure mount: %v", homeErr)
 		}
 		azureDir = filepath.Join(homeDir, ".azure")
+		logger.Log.Infof("Using fallback azure config dir: %s", azureDir)
+	} else {
+		azureDir = azureEnv
+		logger.Log.Infof("AZURE_CONFIG_DIR is set to: %s", azureEnv)
+	}
+
+	// Check whether the chosen path exists and whether it's a directory.
+	if info, statErr := os.Stat(azureDir); statErr != nil {
+		if os.IsNotExist(statErr) {
+			logger.Log.Infof("Azure config dir (%s) does not exist", azureDir)
+		} else {
+			logger.Log.Infof("Failed to stat azure config dir (%s): %v", azureDir, statErr)
+		}
+	} else {
+		if info.IsDir() {
+			logger.Log.Infof("Azure config dir (%s) exists and is a directory", azureDir)
+		} else {
+			logger.Log.Infof("Azure config path (%s) exists but is not a directory", azureDir)
+		}
 	}
 
 	extraMountPoints = append(extraMountPoints, safechroot.NewMountPoint(azureDir, azureMountPoint, "", safechroot.BindMountPointFlags, ""))
+	logger.Log.Infof("Added mount point: host '%s' -> chroot '%s'", azureDir, azureMountPoint)
 	return extraMountPoints, nil
 }
 
