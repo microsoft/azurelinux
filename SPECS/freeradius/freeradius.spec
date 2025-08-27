@@ -6,7 +6,7 @@
 Summary:       High-performance and highly configurable free RADIUS server
 Name:          freeradius
 Version:       3.2.5
-Release:       3%{?dist}
+Release:       4%{?dist}
 Vendor:        Microsoft Corporation
 Distribution:  Azure Linux
 License:       GPL-2.0-or-later AND LGPL-2.0-or-later
