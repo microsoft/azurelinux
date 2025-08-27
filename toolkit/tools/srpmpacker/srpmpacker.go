@@ -453,7 +453,35 @@ func installAzureCliPackage(chroot *safechroot.Chroot) (err error) {
 
 	logger.Log.Debugf("Installing '%s' and '%s' packages for Azure CLI authenticated downloads", azureLinuxReposPackage, azureCLIPackage)
 
+	// Log the user's home and whether ~/.azure exists inside the chroot, then install the repo package.
 	err = chroot.Run(func() error {
+		home := os.Getenv("HOME")
+		if home == "" {
+			// Try UserHomeDir(), fall back to /root if not available
+			if hd, hdErr := os.UserHomeDir(); hdErr == nil {
+				home = hd
+			} else {
+				home = "/root"
+			}
+		}
+
+		logger.Log.Infof("In chroot: user home directory is: %s", home)
+
+		azurePath := filepath.Join(home, ".azure")
+		if info, statErr := os.Stat(azurePath); statErr != nil {
+			if os.IsNotExist(statErr) {
+				logger.Log.Infof("In chroot: azure config dir (%s) does not exist", azurePath)
+			} else {
+				logger.Log.Infof("In chroot: failed to stat azure config dir (%s): %v", azurePath, statErr)
+			}
+		} else {
+			if info.IsDir() {
+				logger.Log.Infof("In chroot: azure config dir (%s) exists and is a directory", azurePath)
+			} else {
+				logger.Log.Infof("In chroot: azure config path (%s) exists but is not a directory", azurePath)
+			}
+		}
+
 		_, repoErr := installutils.TdnfInstall(azureLinuxReposPackage, rootDir)
 		if repoErr != nil {
 			return fmt.Errorf("failed to install '%s':\n%w", azureLinuxReposPackage, repoErr)
