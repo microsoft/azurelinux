@@ -17,6 +17,7 @@ import (
 	"sync"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/azureblobstorage"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/directory"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
@@ -1019,6 +1020,15 @@ func tryToHydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDi
 func hydrateFromRemoteSource(ctx context.Context, fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string, netOpsSemaphore chan struct{}) (err error) {
 	errPackerCancelReceived := fmt.Errorf("packer cancel signal received")
 
+	var azureBlobStorageClient *azureblobstorage.AzureBlobStorage
+	if srcConfig.sourceAuthMode == sourceAuthModeAzureCli {
+		// Create the Azure Blob Storage client once for all downloads
+		azureBlobStorageClient, err = azureblobstorage.CreateFromURL(srcConfig.sourceURL)
+		if err != nil {
+			return fmt.Errorf("failed to create Azure Blob Storage client: %w", err)
+		}
+	}
+
 	for fileName, alreadyHydrated := range fileHydrationState {
 		if alreadyHydrated {
 			continue
@@ -1040,9 +1050,13 @@ func hydrateFromRemoteSource(ctx context.Context, fileHydrationState map[string]
 			}
 		}
 
-		// Pass true if sourceAuthMode is azurecli, false otherwise
-		useAzureCliAuth := srcConfig.sourceAuthMode == sourceAuthModeAzureCli
-		cancelled, internalErr := network.DownloadFileWithRetry(ctx, url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts, useAzureCliAuth, network.DefaultTimeout)
+		var cancelled bool
+		var internalErr error
+		if srcConfig.sourceAuthMode == sourceAuthModeAzureCli {
+			cancelled, internalErr = azureblobstorage.DownloadFileWithRetry(ctx, azureBlobStorageClient, url, destinationFile, network.DefaultTimeout)
+		} else {
+			cancelled, internalErr = network.DownloadFileWithRetry(ctx, url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts, network.DefaultTimeout)
+		}
 
 		if netOpsSemaphore != nil {
 			// Clear the channel to allow another operation to start

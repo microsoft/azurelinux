@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/azureblobstorage"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
@@ -35,9 +34,6 @@ var ErrDownloadFileInvalidTimeout = errors.New("invalid timeout")
 
 // ErrDownloadFileOther is returned when the download error is anything other than 404.
 var ErrDownloadFileOther = errors.New("download error")
-
-// ErrDownloadFileSDK is returned when SDK based download fails
-var ErrDownloadFileSDK = errors.New("Azure SDK download failed")
 
 func buildResponseError(statusCode int) error {
 	if statusCode == http.StatusNotFound {
@@ -59,7 +55,7 @@ func JoinURL(baseURL string, extraPaths ...string) string {
 	return fmt.Sprintf("%s%s%s", baseURL, urlPathSeparator, appendToBase)
 }
 
-// DownloadFileWithRetry downloads a file from a URL to a local file. It will retry the download if it fails. If the externalCancel
+// DownloadFile downloads a file from a URL to a local file. It will retry the download if it fails. If the externalCancel
 // channel is provided, the download will be cancelled if the externalCancel channel is closed. The function will return
 // true if the download was cancelled, and an error if the download failed. 404 errors are considered unrecoverable and
 // will not be retried.
@@ -68,18 +64,10 @@ func JoinURL(baseURL string, extraPaths ...string) string {
 // dstFile: The local file to save the download to.
 // caCerts: The CA certificates to use for the download.
 // tlsCerts: The TLS certificates to use for the download.
-// useAzureCLICredential: Uses an AzureCLI credential for the download rather than attempting HTTP GET.
 // timeout: The maximum duration for the download operation, use 0 for no timeout, or network.DefaultTimeout for a default timeout.
 // returns: wasCancelled: true if the download was cancelled via the external cancel channel, false otherwise.
 // returns: err: An error if the download failed (including being cancelled), nil otherwise.
-func DownloadFileWithRetry(
-	ctx context.Context,
-	srcUrl, dstFile string,
-	caCerts *x509.CertPool,
-	tlsCerts []tls.Certificate,
-	useAzureCLICredential bool,
-	timeout time.Duration,
-) (wasCancelled bool, err error) {
+func DownloadFileWithRetry(ctx context.Context, srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls.Certificate, timeout time.Duration) (wasCancelled bool, err error) {
 	var closeCtx context.CancelFunc
 
 	if ctx == nil {
@@ -100,7 +88,7 @@ func DownloadFileWithRetry(
 	retryNum := 1
 	errorWas404 := false
 	wasCancelled, err = retry.RunWithDefaultDownloadBackoff(ctx, func() error {
-		netErr := DownloadFile(ctx, srcUrl, dstFile, caCerts, tlsCerts, useAzureCLICredential)
+		netErr := DownloadFile(ctx, srcUrl, dstFile, caCerts, tlsCerts)
 		if netErr != nil {
 			// Check if the error is a 404, we should print a warning in that case so the user
 			// sees it even if we are running with --no-verbose. 404's are unlikely to fix themselves on retry, give up.
@@ -129,33 +117,11 @@ func DownloadFileWithRetry(
 }
 
 // DownloadFile downloads `url` into `dst`. `caCerts` may be nil. If there is an error `dst` will be removed.
-func DownloadFile(
-	ctx context.Context,
-	url, dst string,
-	caCerts *x509.CertPool,
-	tlsCerts []tls.Certificate,
-	useAzureCLICredential bool,
-) (err error) {
+func DownloadFile(ctx context.Context, url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certificate) (err error) {
 	if ctx == nil {
 		return fmt.Errorf("context is nil")
 	}
 
-	if useAzureCLICredential {
-		// Use Azure SDK for authenticated download
-		return downloadFileWithAzureSDK(ctx, url, dst)
-	} else {
-		// Use regular HTTP download
-		return downloadFileHTTP(ctx, url, dst, caCerts, tlsCerts)
-	}
-}
-
-// downloadFileHTTP attempts to download a file using HTTP with optional TLS configuration.
-func downloadFileHTTP(
-	ctx context.Context,
-	url, dst string,
-	caCerts *x509.CertPool,
-	tlsCerts []tls.Certificate,
-) (err error) {
 	logger.Log.Debugf("Downloading (%s) -> (%s)", url, dst)
 
 	dstFile, err := os.Create(dst)
@@ -202,39 +168,6 @@ func downloadFileHTTP(
 	}
 
 	_, err = io.Copy(dstFile, response.Body)
-
-	return
-}
-
-// downloadFileWithAzureSDK attempts to download a file from an Azure Blob Storage using the Azure SDK for Go
-func downloadFileWithAzureSDK(
-	ctx context.Context,
-	url, dst string,
-) (err error) {
-	blobInfo, err := azureblobstorage.ParseAzureBlobStorageURL(url)
-	if err != nil {
-		return fmt.Errorf("%w:\nfailed to parse Azure Blob Storage URL: %w", ErrDownloadFileSDK, err)
-	}
-
-	logger.Log.Infof("Attempting Azure SDK download for blob: %s/%s from storage account: %s",
-		blobInfo.ContainerName, blobInfo.BlobName, blobInfo.StorageAccount)
-
-	azureBlobStorage, err := azureblobstorage.Create(
-		"",
-		"",
-		"",
-		blobInfo.StorageAccount,
-		azureblobstorage.AzureCLIAccess)
-	if err != nil {
-		return fmt.Errorf("%w:\nfailed to create Azure Blob Storage client: %w", ErrDownloadFileSDK, err)
-	}
-
-	err = azureBlobStorage.Download(ctx, blobInfo.ContainerName, blobInfo.BlobName, dst)
-	if err != nil {
-		return fmt.Errorf("%w:\nfailed to download using Azure Blob Storage connection: %w", ErrDownloadFileSDK, err)
-	}
-
-	logger.Log.Debugf("Successfully downloaded blob using Azure SDK")
 
 	return
 }
