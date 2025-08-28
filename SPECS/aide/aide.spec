@@ -3,7 +3,7 @@ Distribution:   Mariner
 Summary:        Intrusion detection environment
 Name:           aide
 Version:        0.16
-Release:        16%{?dist}
+Release:        17%{?dist}
 URL:            https://github.com/aide/aide
 License:        GPLv2+
 
@@ -37,6 +37,8 @@ Patch4: aide-0.15-syslog-format.patch
 Patch5: aide-0.16-crypto-disable-haval-and-others.patch
 Patch6: coverity.patch
 Patch7: aide-0.16-crash-elf.patch
+Patch8: CVE-2025-54389.patch
+Patch9: CVE-2025-54409.patch
 
 %description
 AIDE (Advanced Intrusion Detection Environment) is a file integrity
@@ -81,6 +83,9 @@ mkdir -p -m0700 %{buildroot}%{_localstatedir}/lib/aide
 %dir %attr(0700,root,root) %{_localstatedir}/log/aide
 
 %changelog
+* Thu Aug 28 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.16-17
+- Patch for CVE-2025-54389 and CVE-2025-54409
+
 * Thu Jan 05 2023 Thien Trung Vuong <tvuong@microsoft.com> - 0.16-16
 - Updated project URL to Github
 - Verified license
