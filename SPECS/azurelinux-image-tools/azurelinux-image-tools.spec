@@ -3,7 +3,7 @@
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
 Version:        0.18.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
 Group:          Applications/System
@@ -75,14 +75,14 @@ install -p -m 0755 toolkit/out/tools/imagecustomizer %{buildroot}%{_bindir}/imag
 
 # Install container support files for imagecustomizer subpackage
 # These files are used when building the imagecustomizer container
-mkdir -p %{buildroot}%{_prefix}/local/bin
-mkdir -p %{buildroot}%{_sysconfdir}
+mkdir -p %{buildroot}%{_bindir}
+mkdir -p %{buildroot}%{_libdir}/imagecustomizer
 
-# Copy container scripts from their source locations to container paths
-install -p -m 0755 toolkit/tools/imagecustomizer/container/entrypoint.sh %{buildroot}%{_prefix}/local/bin/imagecustomizer-entrypoint.sh
-install -p -m 0755 toolkit/tools/imagecustomizer/container/run.sh %{buildroot}%{_prefix}/local/bin/imagecustomizer-run.sh
-install -p -m 0755 toolkit/scripts/telemetry_hopper/telemetry_hopper.py %{buildroot}%{_prefix}/local/bin/telemetry_hopper.py
-install -p -m 0644 toolkit/scripts/telemetry_hopper/requirements.txt %{buildroot}%{_sysconfdir}/imagecustomizer-telemetry-requirements.txt
+# Copy container scripts from their source locations to standard system paths
+install -p -m 0755 toolkit/tools/imagecustomizer/container/entrypoint.sh %{buildroot}%{_bindir}/imagecustomizer-entrypoint.sh
+install -p -m 0755 toolkit/tools/imagecustomizer/container/run.sh %{buildroot}%{_bindir}/imagecustomizer-run.sh
+install -p -m 0755 toolkit/scripts/telemetry_hopper/telemetry_hopper.py %{buildroot}%{_bindir}/telemetry_hopper.py
+install -p -m 0644 toolkit/scripts/telemetry_hopper/requirements.txt %{buildroot}%{_libdir}/imagecustomizer/telemetry-requirements.txt
 
 %check
 go test -C toolkit/tools ./...
@@ -92,17 +92,17 @@ go test -C toolkit/tools ./...
 %files imagecustomizer
 %license LICENSE
 %{_bindir}/imagecustomizer
-# Container support files - placed in container filesystem paths with imagecustomizer- prefix
-%{_prefix}/local/bin/imagecustomizer-entrypoint.sh
-%{_prefix}/local/bin/imagecustomizer-run.sh
-%{_prefix}/local/bin/telemetry_hopper.py
-%{_sysconfdir}/imagecustomizer-telemetry-requirements.txt
+# Container support files - placed in standard system paths
+%{_bindir}/imagecustomizer-entrypoint.sh
+%{_bindir}/imagecustomizer-run.sh
+%{_bindir}/telemetry_hopper.py
+%{_libdir}/imagecustomizer/telemetry-requirements.txt
 
 %changelog
-* Wed Aug 27 2025 Lanze Liu <lanzeliu@microsoft.com> 0.18.0-2
-- Fixed telemetry requirements file location to comply with RPM packaging guidelines
-- Moved imagecustomizer-telemetry-requirements.txt from root directory to %{_sysconfdir}
-- Replaced hardcoded /usr paths with %{_prefix} macro
+* Thu Aug 28 2025 Lanze Liu <lanzeliu@microsoft.com> 0.18.0-2
+- Fixed imagecustomizer container files location to comply with RPM packaging guidelines
+- Moved telemetry requirements file from /etc to /usr/lib/imagecustomizer/
+- Moved container support scripts from /usr/local/bin to /usr/bin
 
 * Wed Aug 20 2025 Lanze Liu <lanzeliu@microsoft.com> 0.18.0-1
 - Original version for Azure Linux (license: MIT).
