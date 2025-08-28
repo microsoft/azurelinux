@@ -411,6 +411,7 @@ func addAzureConfigMountPoint(extraMountPoints []*safechroot.MountPoint, azureMo
 	azureEnv := os.Getenv("AZURE_CONFIG_DIR")
 
 	var azureDir string
+	var newMountPoint string
 	if azureEnv == "" {
 		logger.Log.Info("AZURE_CONFIG_DIR is not set, defaulting to user's .azure folder.")
 		homeDir, homeErr := os.UserHomeDir()
@@ -419,9 +420,11 @@ func addAzureConfigMountPoint(extraMountPoints []*safechroot.MountPoint, azureMo
 		}
 		azureDir = filepath.Join(homeDir, ".azure")
 		logger.Log.Infof("Using fallback azure config dir: %s", azureDir)
+		newMountPoint = azureMountPoint
 	} else {
 		azureDir = azureEnv
 		logger.Log.Infof("AZURE_CONFIG_DIR is set to: %s", azureEnv)
+		newMountPoint = azureEnv
 	}
 
 	// Check whether the chosen path exists and whether it's a directory.
@@ -439,8 +442,8 @@ func addAzureConfigMountPoint(extraMountPoints []*safechroot.MountPoint, azureMo
 		}
 	}
 
-	extraMountPoints = append(extraMountPoints, safechroot.NewMountPoint(azureDir, azureMountPoint, "", safechroot.BindMountPointFlags, ""))
-	logger.Log.Infof("Added mount point: host '%s' -> chroot '%s'", azureDir, azureMountPoint)
+	extraMountPoints = append(extraMountPoints, safechroot.NewMountPoint(azureDir, newMountPoint, "", safechroot.BindMountPointFlags, ""))
+	logger.Log.Infof("Added mount point: host '%s' -> chroot '%s'", azureDir, newMountPoint)
 	return extraMountPoints, nil
 }
 
