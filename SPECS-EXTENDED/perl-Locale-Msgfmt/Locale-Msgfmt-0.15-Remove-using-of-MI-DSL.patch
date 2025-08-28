@@ -1,0 +1,20 @@
+diff -up Locale-Msgfmt-0.15/Makefile.PL.dsl Locale-Msgfmt-0.15/Makefile.PL
+--- Locale-Msgfmt-0.15/Makefile.PL.dsl	2023-05-09 12:19:59.683493241 +0200
++++ Locale-Msgfmt-0.15/Makefile.PL	2023-05-09 12:22:13.026638686 +0200
+@@ -1,7 +1,9 @@
+-use inc::Module::Install::DSL 0.92;
++use inc::Module::Install;
+ 
+-all_from      lib/Locale/Msgfmt.pm
+-requires      File::Spec 0.80
+-test_requires Test::More 0.47
+-test_requires Locale::Maketext::Gettext 1.28 if $ENV{AUTOMATED_TESTING}
+-no_index      directory private
+\ No newline at end of file
++all_from      'lib/Locale/Msgfmt.pm';
++requires      'File::Spec' => '0.80';
++test_requires 'Test::More' => '0.47';
++test_requires 'Locale::Maketext::Gettext' => '1.28' if $ENV{AUTOMATED_TESTING};
++no_index      'directory private';
++
++WriteAll;
