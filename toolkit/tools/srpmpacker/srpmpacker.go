@@ -467,7 +467,20 @@ func installAzureCliPackage(chroot *safechroot.Chroot) (err error) {
 
 		logger.Log.Infof("In chroot: user home directory is: %s", home)
 
-		azurePath := filepath.Join(home, ".azure")
+		// Check whether AZURE_CONFIG_DIR is set in the chroot and log it
+		azureEnvChroot := os.Getenv("AZURE_CONFIG_DIR")
+		if azureEnvChroot == "" {
+			logger.Log.Infof("In chroot: AZURE_CONFIG_DIR is not set")
+		} else {
+			logger.Log.Infof("In chroot: AZURE_CONFIG_DIR is set to: %s", azureEnvChroot)
+		}
+
+		// Determine which path to inspect (prefer AZURE_CONFIG_DIR if set, otherwise ~/.azure)
+		azurePath := azureEnvChroot
+		if azurePath == "" {
+			azurePath = filepath.Join(home, ".azure")
+		}
+
 		if info, statErr := os.Stat(azurePath); statErr != nil {
 			if os.IsNotExist(statErr) {
 				logger.Log.Infof("In chroot: azure config dir (%s) does not exist", azurePath)
