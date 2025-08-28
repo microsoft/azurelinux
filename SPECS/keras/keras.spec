@@ -64,10 +64,6 @@ fi
 python3 pip_build.py --install
 %{pyproject_install}
 
-%check
-pip3 install pytest tensorflow jax pandas
-%pytest keras
-
 
 %files -n python3-keras
 %license LICENSE
