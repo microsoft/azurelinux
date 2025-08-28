@@ -58,6 +58,7 @@ BuildRequires:  python3-devel
 BuildRequires:  sed
 BuildRequires:  slang-devel
 BuildRequires:  systemd-bootstrap-rpm-macros
+BuildRequires:  python3-lxml
 Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
