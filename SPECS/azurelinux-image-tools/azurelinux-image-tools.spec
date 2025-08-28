@@ -3,7 +3,7 @@
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
 Version:        0.18.0
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
 Group:          Applications/System
@@ -78,7 +78,7 @@ install -p -m 0755 toolkit/out/tools/imagecustomizer %{buildroot}%{_bindir}/imag
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_libdir}/imagecustomizer
 
-# Copy container scripts from their source locations to standard system paths
+# Copy container scripts from their source locations to container paths
 install -p -m 0755 toolkit/tools/imagecustomizer/container/entrypoint.sh %{buildroot}%{_bindir}/imagecustomizer-entrypoint.sh
 install -p -m 0755 toolkit/tools/imagecustomizer/container/run.sh %{buildroot}%{_bindir}/imagecustomizer-run.sh
 install -p -m 0755 toolkit/scripts/telemetry_hopper/telemetry_hopper.py %{buildroot}%{_bindir}/telemetry_hopper.py
@@ -92,7 +92,7 @@ go test -C toolkit/tools ./...
 %files imagecustomizer
 %license LICENSE
 %{_bindir}/imagecustomizer
-# Container support files - placed in standard system paths
+# Container support files - placed in container filesystem paths with imagecustomizer- prefix
 %{_bindir}/imagecustomizer-entrypoint.sh
 %{_bindir}/imagecustomizer-run.sh
 %{_bindir}/telemetry_hopper.py
