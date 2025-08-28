@@ -27,7 +27,7 @@ Patch5:         CVE-2024-51744.patch
 Patch6:         CVE-2025-30204.patch
 Patch7:         CVE-2025-22872.patch
 BuildRequires:  flex-devel
-BuildRequires:  glibc-static >= 2.38-11%{?dist}
+BuildRequires:  glibc-static >= 2.38-12%{?dist}
 BuildRequires:  golang
 BuildRequires:  rsync
 BuildRequires:  systemd-devel

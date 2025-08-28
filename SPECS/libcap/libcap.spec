@@ -9,7 +9,7 @@ Source0:        https://www.kernel.org/pub/linux/libs/security/linux-privs/libca
 Patch0:         CVE-2025-1390.patch
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-BuildRequires:  glibc-static >= 2.38-11%{?dist}
+BuildRequires:  glibc-static >= 2.38-12%{?dist}
 
 %description
 The libcap package implements the user-space interfaces to the POSIX 1003.1e capabilities available

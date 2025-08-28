@@ -651,7 +651,7 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %endif
 
 %if %{user_static}
-BuildRequires: glibc-static >= 2.38-11%{?dist}
+BuildRequires: glibc-static >= 2.38-12%{?dist}
 BuildRequires: glib2-static zlib-static
 BuildRequires: pcre2-static
 %endif

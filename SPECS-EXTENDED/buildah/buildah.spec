@@ -32,7 +32,7 @@ BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  git
 BuildRequires:  glib2-devel
-BuildRequires:  glibc-static >= 2.38-11%{?dist}
+BuildRequires:  glibc-static >= 2.38-12%{?dist}
 BuildRequires:  go-md2man
 BuildRequires:  go-rpm-macros
 BuildRequires:  golang
