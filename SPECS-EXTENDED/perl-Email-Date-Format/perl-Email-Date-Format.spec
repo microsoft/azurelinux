@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Email-Date-Format
-Version:        1.005
-Release:        16%{?dist}
+Version:        1.008
+Release:        1%{?dist}
 Summary:        Produce RFC 2822 date strings
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Email-Date-Format
@@ -44,6 +44,10 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Wed Dec 18 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.008-1
+- Update to version 1.008
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.005-16
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
