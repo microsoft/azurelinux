@@ -78,10 +78,10 @@ install -p -m 0755 toolkit/out/tools/imagecustomizer %{buildroot}%{_bindir}/imag
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_libdir}/imagecustomizer
 
-# Copy container scripts from their source locations to container paths
-install -p -m 0755 toolkit/tools/imagecustomizer/container/entrypoint.sh %{buildroot}%{_bindir}/imagecustomizer-entrypoint.sh
-install -p -m 0755 toolkit/tools/imagecustomizer/container/run.sh %{buildroot}%{_bindir}/imagecustomizer-run.sh
-install -p -m 0755 toolkit/scripts/telemetry_hopper/telemetry_hopper.py %{buildroot}%{_bindir}/telemetry_hopper.py
+# Copy container scripts to component-specific lib directory (internal binaries)
+install -p -m 0755 toolkit/tools/imagecustomizer/container/entrypoint.sh %{buildroot}%{_libdir}/imagecustomizer/entrypoint.sh
+install -p -m 0755 toolkit/tools/imagecustomizer/container/run.sh %{buildroot}%{_libdir}/imagecustomizer/run.sh
+install -p -m 0755 toolkit/scripts/telemetry_hopper/telemetry_hopper.py %{buildroot}%{_libdir}/imagecustomizer/telemetry_hopper.py
 install -p -m 0644 toolkit/scripts/telemetry_hopper/requirements.txt %{buildroot}%{_libdir}/imagecustomizer/telemetry-requirements.txt
 
 %check
@@ -92,17 +92,16 @@ go test -C toolkit/tools ./...
 %files imagecustomizer
 %license LICENSE
 %{_bindir}/imagecustomizer
-# Container support files - placed in container filesystem paths with imagecustomizer- prefix
-%{_bindir}/imagecustomizer-entrypoint.sh
-%{_bindir}/imagecustomizer-run.sh
-%{_bindir}/telemetry_hopper.py
+# Container support files - internal binaries stored in component lib directory
+%{_libdir}/imagecustomizer/entrypoint.sh
+%{_libdir}/imagecustomizer/run.sh
+%{_libdir}/imagecustomizer/telemetry_hopper.py
 %{_libdir}/imagecustomizer/telemetry-requirements.txt
 
 %changelog
 * Thu Aug 28 2025 Lanze Liu <lanzeliu@microsoft.com> 0.18.0-2
 - Fixed imagecustomizer container files location to comply with RPM packaging guidelines
-- Moved telemetry requirements file from /etc to /usr/lib/imagecustomizer/
-- Moved container support scripts from /usr/local/bin to /usr/bin
+- Moved container dependency files from /etc to /usr/lib/imagecustomizer/
 
 * Wed Aug 20 2025 Lanze Liu <lanzeliu@microsoft.com> 0.18.0-1
 - Original version for Azure Linux (license: MIT).
