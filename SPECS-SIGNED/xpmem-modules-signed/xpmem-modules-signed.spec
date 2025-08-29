@@ -14,7 +14,7 @@
 %global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
 %global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
-#endif
+%endif
 
 %global KVERSION %{target_kernel_version_full}
 
