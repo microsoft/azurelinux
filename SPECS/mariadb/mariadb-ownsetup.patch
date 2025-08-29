@@ -1,0 +1,31 @@
+--- mariadb-10.4.14/support-files/CMakeLists.txt	2020-08-06 17:28:28.000000000 +0200
++++ mariadb-10.4.14/support-files/CMakeLists.txt_patched	2020-09-03 13:21:07.826658279 +0200
+@@ -187,6 +187,7 @@ IF(UNIX)
+               COMPONENT SharedLibraries)
+       INSTALL(FILES rpm/mysql-clients.cnf DESTINATION ${INSTALL_SYSCONF2DIR}
+               COMPONENT Client)
++      CONFIGURE_FILE(rpm/server.cnf ${CMAKE_CURRENT_SOURCE_DIR}/rpm/server.cnf @ONLY)
+       INSTALL(FILES rpm/server.cnf DESTINATION ${INSTALL_SYSCONF2DIR}
+               COMPONENT IniFiles)
+       INSTALL(FILES rpm/enable_encryption.preset DESTINATION ${INSTALL_SYSCONF2DIR}
+
+diff -up mariadb-10.0.15/support-files/rpm/server.cnf.ownsetup mariadb-10.0.15/support-files/rpm/server.cnf
+--- mariadb-10.0.15/support-files/rpm/server.cnf.ownsetup	2015-01-24 23:55:55.110063592 +0100
++++ mariadb-10.0.15/support-files/rpm/server.cnf	2015-01-24 23:57:42.308114387 +0100
+@@ -9,7 +9,16 @@
+ [server]
+ 
+ # this is only for the mysqld standalone daemon
++# Settings user and group are ignored when systemd is used.
++# If you need to run mysqld under a different user or group,
++# customize your systemd unit file for mysqld/mariadb according to the
++# instructions in http://fedoraproject.org/wiki/Systemd
+ [mysqld]
++datadir=@MYSQL_DATADIR@
++socket=@MYSQL_UNIX_ADDR@
++log-error=@LOG_LOCATION@
++pid-file=@PID_FILE_DIR@/@DAEMON_NO_PREFIX@.pid
++
+ 
+ #
+ # * Galera-related settings

@@ -10,7 +10,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,13 +31,21 @@ Patch3:         CVE-2020-1751.nopatch
 Patch4:         CVE-2018-20796.nopatch
 Patch5:         https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.38-memalign_fix-1.patch
 Patch6:         CVE-2023-4911.patch
-Patch7:         CVE-2023-5156.patch
-Patch8:         CVE-2023-6246.patch
-Patch9:         CVE-2023-6779.patch
-Patch10:        CVE-2023-6780.patch
+Patch7:         CVE-2023-6246.patch
+Patch8:         CVE-2023-6779.patch
+Patch9:         CVE-2023-6780.patch
 # Upstream backport for fixing: nscd fails to build with cleanup handler if built with -fexceptions
-Patch11:		nscd-Do-not-rebuild-getaddrinfo-bug-30709.patch
-Patch12:        glibc-2.34_pthread_cond_wait.patch
+Patch10:        nscd-Do-not-rebuild-getaddrinfo-bug-30709.patch
+Patch11:        glibc-2.34_pthread_cond_wait.patch
+Patch12:        CVE-2023-4527.patch
+Patch13:        CVE-2023-4806.patch
+Patch14:        CVE-2023-5156.patch
+Patch15:        CVE-2024-33599.patch
+Patch16:        CVE-2024-33600.patch
+# Patch of CVE-2024-33601 fixes CVE-2024-33602 also
+Patch17:        CVE-2024-33601.patch
+Patch18:        CVE-2025-0395.patch
+
 # Patches for testing
 Patch100:       0001-Remove-Wno-format-cflag-from-tests.patch
 
@@ -359,6 +367,10 @@ grep "^FAIL: nptl/tst-mutex10" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
+* Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.38-11
+- Patch CVE-2023-4527, CVE-2023-4806, CVE-2024-33599, CVE-2024-33600, CVE-2024-33601, CVE-2025-0395, CVE-2025-4802
+- Fix CVE-2023-5156
+
 * Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 2.38-10
 - Add glibc-2.34_pthread_cond_wait.patch
 

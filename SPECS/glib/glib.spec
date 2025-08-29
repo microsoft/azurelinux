@@ -2,7 +2,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.78.6
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,9 @@ Group:          Applications/System
 URL:            https://developer.gnome.org/glib/
 Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/%{majorver}/%{name}-%{version}.tar.xz
 Patch0:         CVE-2024-52533.patch
+Patch1:         CVE-2025-3360.patch
+Patch2:         CVE-2025-4373.patch
+Patch3:         CVE-2025-6052.patch
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
@@ -89,7 +92,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 
 %files
 %defattr(-,root,root)
-%license COPYING
+%license LICENSES/LGPL-2.1-or-later.txt
 %{_libdir}/libglib-*.so.*
 %{_libdir}/libgthread-*.so.*
 %{_libdir}/libgmodule-*.so.*
@@ -122,6 +125,12 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Mon Jun 09 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.78.6-3
+- Patch CVE-2025-4373 and CVE-2025-6052.patch
+
+* Wed Apr 16 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.78.6-2
+- Patch CVE-2025-3360
+
 * Wed Mar 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.78.6-1
 - Auto-upgrade to 2.78.6 - for CVE-2024-34397
 

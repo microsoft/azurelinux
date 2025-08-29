@@ -1,6 +1,6 @@
-From 7c38995d360d4abf2d919fd08428f5cb2c1b015e Mon Sep 17 00:00:00 2001
-From: Pawel <pawelwi@microsoft.com>
-Date: Mon, 5 Oct 2020 06:34:43 -0700
+From 115eca353c55587ff6dacdadf22075904adf92d6 Mon Sep 17 00:00:00 2001
+From: Mayank Singh <mayansingh@microsoft.com>
+Date: Thu, 22 May 2025 11:27:30 +0000
 Subject: [PATCH] Extending timeout for test cases with multiple read/writes.
 
 ---
@@ -8,10 +8,10 @@ Subject: [PATCH] Extending timeout for test cases with multiple read/writes.
  1 file changed, 1 insertion(+)
 
 diff --git a/src/libstrongswan/tests/suites/test_settings.c b/src/libstrongswan/tests/suites/test_settings.c
-index e060960..df3b4ef 100644
+index 8ef026b..a7b2b98 100644
 --- a/src/libstrongswan/tests/suites/test_settings.c
 +++ b/src/libstrongswan/tests/suites/test_settings.c
-@@ -1731,6 +1731,7 @@ Suite *settings_suite_create()
+@@ -1743,6 +1743,7 @@ Suite *settings_suite_create()
  	suite_add_tcase(s, tc);
  
  	tc = tcase_create("valid/invalid data");
@@ -20,5 +20,5 @@ index e060960..df3b4ef 100644
  	tcase_add_test(tc, test_valid);
  	tcase_add_test(tc, test_invalid);
 -- 
-2.17.1
+2.45.3
 

@@ -13,8 +13,8 @@
 
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        6.6.85.1
-Release:        4%{?dist}
+Version:        6.6.96.2
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -75,6 +75,27 @@ done
 %endif
 
 %changelog
+* Fri Aug 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.96.2-1
+- Auto-upgrade to 6.6.96.2
+
+* Thu Jul 17 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.96.1-2
+- Bump release to match kernel
+
+* Mon Jul 07 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.96.1-1
+- Auto-upgrade to 6.6.96.1
+
+* Mon Jun 16 2025 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.92.2-3
+- Bump release to match kernel
+
+* Mon Jun 09 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.92.2-2
+- Bump release to match kernel
+
+* Fri May 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.92.2-1
+- Auto-upgrade to 6.6.92.2
+
+* Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.90.1-1
+- Auto-upgrade to 6.6.90.1
+
 * Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.6.85.1-4
 - Bump release to match kernel
 

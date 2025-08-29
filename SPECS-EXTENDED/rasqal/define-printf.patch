@@ -1,0 +1,23 @@
+diff -ruN rasqal-0.9.33.orig/configure rasqal-0.9.33/configure
+--- rasqal-0.9.33.orig/configure	2023-01-23 13:14:38.861781072 +0100
++++ rasqal-0.9.33/configure	2023-01-23 16:57:03.874250005 +0100
+@@ -13712,6 +13712,7 @@
+ $as_echo_n "checking whether __FUNCTION__ is available... " >&6; }
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
++extern int printf(const char *);
+ int main() { printf(__FUNCTION__); }
+ _ACEOF
+ if ac_fn_c_try_compile "$LINENO"; then :
+diff -ruN rasqal-0.9.33.orig/configure.ac rasqal-0.9.33/configure.ac
+--- rasqal-0.9.33.orig/configure.ac	2014-11-23 23:11:33.000000000 +0100
++++ rasqal-0.9.33/configure.ac	2023-01-23 15:49:44.885025978 +0100
+@@ -312,7 +312,7 @@
+ AC_C_BIGENDIAN
+ 
+ AC_MSG_CHECKING(whether __FUNCTION__ is available)
+-AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main() { printf(__FUNCTION__); }])],
++AC_COMPILE_IFELSE([AC_LANG_SOURCE([extern int printf(const char *s); int main() { printf(__FUNCTION__); }])],
+     [AC_DEFINE([HAVE___FUNCTION__], [1], [Is __FUNCTION__ available])
+      AC_MSG_RESULT(yes)],
+     [AC_MSG_RESULT(no)])
