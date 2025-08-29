@@ -461,6 +461,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 
 %changelog
 * Fri Aug 22 2025 Siddharth Chintamaneni <siddharthc@microsoft.com> - 6.6.96.2-2
+- Added kernel-hwe as conflict.
 - Bump release to match kernel
 
 * Fri Aug 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.96.2-1
