@@ -31,16 +31,20 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 
-%ifarch aarch64
-# hard code versions due to ADO bug:58993948
-%global target_kernel_version_full 6.12.40.1-1.azl3
-%global target_azl_build_kernel_version 6.12.40.1
-%global release_suffix _6.12.40.1.1
+%if 0%{azl}
+    %ifarch aarch64
+    # hard code versions due to ADO bug:58993948
+    %global target_kernel_version_full 6.12.40.1-1.azl3
+    %global target_azl_build_kernel_version 6.12.40.1
+    %global release_suffix _6.12.40.1.1
+    %else
+    %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
+    %global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
+    %global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+    %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
+    %endif
 %else
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
-%global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
+%global target_kernel_version_full f.a.k.e
 %endif
 
 %global KVERSION %{target_kernel_version_full}
