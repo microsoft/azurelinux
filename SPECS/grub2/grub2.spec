@@ -122,6 +122,16 @@ Patch:          CVE-2025-0690.patch
 Patch:          CVE-2024-45778-CVE-2024-45779.patch
 Patch:          CVE-2025-0678-CVE-2025-1125.patch
 Patch:          CVE-2024-45780.patch
+# Following are included as part of above CVEs and kept here as nopatch
+# and commented out, because from patch command perspective, these files
+# have garbage content.
+#Patch:          CVE-2024-45782.nopatch
+#Patch:          CVE-2025-0684.nopatch
+#Patch:          CVE-2025-0685.nopatch
+#Patch:          CVE-2025-0686.nopatch
+#Patch:          CVE-2025-0689.nopatch
+#Patch:          CVE-2024-45779.nopatch
+#Patch:          CVE-2025-1125.nopatch
 
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
