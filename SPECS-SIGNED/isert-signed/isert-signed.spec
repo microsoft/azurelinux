@@ -30,20 +30,31 @@
 # The default %%__os_install_post macro ends up stripping the signatures off of the kernel module.
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
-%global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
+%if 0%{azl}
+    %ifarch aarch64
+    # hard code versions due to ADO bug:58993948
+    %global target_kernel_version_full 6.12.40.1-1.azl3
+    %global target_azl_build_kernel_version 6.12.40.1
+    %global release_suffix _6.12.40.1.1
+    %else
+    %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
+    %global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
+    %global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+    %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
+    %endif
+%else
+%global target_kernel_version_full f.a.k.e
+%endif
 
 %global KVERSION %{target_kernel_version_full}
 
 %{!?_name: %define _name isert}
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-20%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-21%{release_suffix}%{?dist}}
 
 Summary:	 %{_name} Driver
 Name:		   %{_name}-signed
 Version:	 24.10
-Release:	 20%{release_suffix}%{?dist}
+Release:	 21%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -60,7 +71,6 @@ Source1:         ib_isert.ko
 
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-ExclusiveArch:   x86_64
 
 %description
 isert signed kernel modules
@@ -69,7 +79,11 @@ isert signed kernel modules
 Summary:        %{summary}
 Requires:       mlnx-ofa_kernel = %{_mofed_full_version}
 Requires:       mlnx-ofa_kernel-modules  = %{_mofed_full_version}
+%ifarch aarch64
+Requires:       kernel-hwe = %{target_kernel_version_full}
+%else
 Requires:       kernel = %{target_kernel_version_full}
+%endif
 Requires:       kmod
 
 %description -n %{_name}
@@ -109,6 +123,10 @@ fi # 1 : closed
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{_name}-*.conf
 
 %changelog
+* Wed July 09 2025 Elaheh Dehghani <edehghani@microsoft.com> - 24.10-21
+- Enabled aarch64 (ARM64) build by removing ExclusiveArch
+- Build aarch64 (ARM64) build using kernel 6.12.40
+
 * Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-20
 - Add kernel version and release nb into release nb
 
