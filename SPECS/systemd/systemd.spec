@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        22%{?dist}
+Release:        23%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -143,6 +143,7 @@ Patch0491:      azurelinux-use-system-auth-in-pam-systemd-user.patch
 Patch0900:      do-not-test-openssl-sm3.patch
 Patch0901:      networkd-default-use-domains.patch
 Patch0902:      CVE-2023-7008.patch
+Patch0903:      CVE-2025-4598.patch
 
 %ifarch %{ix86} x86_64 aarch64
 %global want_bootloader 1
@@ -1228,6 +1229,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Fri Aug 15 2025 Akhila Guruju <v-guakhila@microsoft.com> - 255-23
+- Patch CVE-2025-4598
+
 * Tue Aug 05 2025 Chris Co <chrco@microsoft.com> - 255-22 
 - enable building ukify and sd-boot on arm64
 - enable pyflakes buildrequires which is needed for ukify testing
