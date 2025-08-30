@@ -1,0 +1,269 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+#
+# NOTES:
+#
+# This is a starting point for a validation workflow that can detect the specs that
+# have changed in a given git commit, build the RPMs for those specs, and run ptests
+# for those. For now, it builds the packages and attempts to validate that they
+# install correctly.
+#
+# Known limitations/concerns:
+#
+# * We build + test the packages in an Ubuntu VM runner. This is easiest in a GitHub
+#   action, since it's the only Linux OS supported running in the VM; in time,
+#   it may be worthwhile looking into running the package build itself in an
+#   Azure Linux 3.0 environment.
+#
+# * We take a specific dependency on daily repos in Azure Linux 3.0+, as well as the
+#   Azure Linux 3.0 container. To extend support to 2.0, some work will be required
+#   to make these dependencies conditional.
+#
+
+name: "Spec Build/Test"
+
+on:
+  # N.B. For now this workflow is only manually invoked. In the future we plan to enable
+  # it for pull requests and pushes.
+  workflow_dispatch:
+    inputs:
+      comparison_base_ref:
+        description: 'The base ref to compare changes against.'
+        required: true
+        default: '3.0-dev'
+
+env:
+  # For consistency, we use the same major/minor version of the latest version of Python that
+  # Azure Linux ships.
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  detect-changes:
+    name: 'Detect spec changes'
+    runs-on: ubuntu-latest
+
+    outputs:
+      updated_specs: ${{ steps.export.outputs.UPDATED_SPECS }}
+      updated_extended_specs: ${{ steps.export.outputs.UPDATED_EXTENDED_SPECS }}
+      target_ref: ${{ steps.export.outputs.TARGET_REF }}
+      azl_extra_make_args: ${{ steps.export.outputs.AZL_EXTRA_MAKE_ARGS }}
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Python dependencies for tools
+        run: python3 -m pip install -r toolkit/scripts/requirements.txt
+
+      #
+      # We first get oriented, figuring out which version of the code we're building
+      # and which version of the code we should be comparing against.
+      #
+      # We define the following:
+      #   - base_sha: The commit hash of the commit we're comparing against.
+      #   - target_ref: The ref we're building.
+      #
+
+      - name: "Find base commit (PRs)"
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          set -x
+          # In a PR workflow, 'github.base_ref' is the *target* branch of the PR.
+          git fetch origin ${{ github.base_ref }}
+          echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >>$GITHUB_ENV
+          echo "target_ref=${{ github.base_ref }}" >>$GITHUB_ENV
+          echo "Merging ${{ github.sha }} into ${{ github.base_ref }}"
+
+      - name: "Find base commit (pushes)"
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          set -x
+          # In a push workflow, 'github.event.before' is the SHA hash of the commit
+          # immediately preceding the commit being pushed. 
+          git fetch origin ${{ github.event.before }}
+          echo "base_sha=${{ github.event.before }}" >>$GITHUB_ENV
+          echo "target_ref=${{ github.ref }}" >>$GITHUB_ENV
+          echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
+
+      - name: "Find base commit (manual)"
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          set -x
+          # In a manually triggered workflow, we don't necessarily have a base commit to compare against.
+          # We rely on inputs providing it.
+          git fetch origin ${{ inputs.comparison_base_ref }}
+          echo "base_sha=$(git rev-parse origin/${{ inputs.comparison_base_ref }})" >>$GITHUB_ENV
+          echo "target_ref=${{ github.ref }}" >>$GITHUB_ENV
+          echo "Building ${{ github.ref }} and comparing against ${{ inputs.comparison_base_ref }}"
+
+      - name: Compute tooling args
+        run: |
+          # TODO: We naively assume that this is a 3.0+ version that will have a daily build.
+          # To support older versions, some work may be required.
+          echo 'azl_extra_make_args=DAILY_BUILD_ID=lkg' >>$GITHUB_ENV
+
+      - name: Infer changed specs
+        run: |
+          set -x
+          updated_specs=$(./toolkit/scripts/detect_changes.py --since ${{ env.base_sha }} --spec-names)
+          updated_extended_specs=$(./toolkit/scripts/detect_changes.py --since ${{ env.base_sha }} --extended-spec-names)
+          echo "Specs updated: '${updated_specs}'"
+          echo "Extended specs updated: '${updated_extended_specs}'"
+          echo "updated_specs=$(echo ${updated_specs})" >>$GITHUB_ENV
+          echo "updated_extended_specs=$(echo ${updated_extended_specs})" >>$GITHUB_ENV
+
+      - name: Export outputs
+        id: export
+        run: |
+          echo "UPDATED_SPECS=${{ env.updated_specs }}" >>$GITHUB_OUTPUT
+          echo "UPDATED_EXTENDED_SPECS=${{ env.updated_extended_specs }}" >>$GITHUB_OUTPUT
+          echo "TARGET_REF=${{ env.target_ref }}" >>$GITHUB_OUTPUT
+          echo "AZL_EXTRA_MAKE_ARGS=${{ env.azl_extra_make_args }}" >>$GITHUB_OUTPUT
+
+  build:
+    name: 'Build RPMS'
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    needs: [detect-changes]
+    if: ${{ needs.detect-changes.outputs.updated_specs != '' || needs.detect-changes.outputs.updated_extended_specs != '' }}
+    env:
+      updated_specs: ${{ needs.detect-changes.outputs.updated_specs }}
+      updated_extended_specs: ${{ needs.detect-changes.outputs.updated_extended_specs }}
+      azl_extra_make_args: ${{ needs.detect-changes.outputs.azl_extra_make_args }}
+
+    outputs:
+      daily_build_id: ${{ steps.find-daily-repo.outputs.DAILY_BUILD_ID }}
+      daily_build_arch: ${{ steps.find-daily-repo.outputs.DAILY_BUILD_ARCH }}
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Python dependencies for tools
+        run: python3 -m pip install -r toolkit/scripts/requirements.txt
+
+      - name: Find daily repo
+        id: find-daily-repo
+        run: |
+          DAILY_BUILD_ID=$(toolkit/scripts/get_lkg_id.sh /tmp)
+          echo "DAILY_BUILD_ID=${DAILY_BUILD_ID}" >>$GITHUB_OUTPUT
+          echo "DAILY_BUILD_ARCH=x86-64" >>$GITHUB_OUTPUT
+
+      - name: "Build modified specs (base)"
+        id: build-specs
+        if: ${{ env.updated_specs != '' }}
+        run: |
+          sudo make -C toolkit \
+            build-packages \
+            $azl_extra_make_args \
+            -j$(nproc) \
+            REBUILD_TOOLS=y \
+            SRPM_PACK_LIST='${{ env.updated_specs }}'
+
+      - name: "Build modified specs (extended)"
+        id: build-extended-specs
+        if: ${{ env.updated_extended_specs != '' }}
+        run: |
+          sudo make -C toolkit \
+            build-packages \
+            $azl_extra_make_args \
+            -j$(nproc) \
+            REBUILD_TOOLS=y \
+            SPECS_DIR=$(pwd)/SPECS-EXTENDED \
+            SRPM_PACK_LIST='${{ env.updated_extended_specs }}'
+
+      - name: Upload built RPMs
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpms
+          path: out/RPMS
+
+      - name: Upload build logs
+        id: upload-build-logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-${{ github.run_attempt }}
+          path: build/logs
+
+      - name: Publish result
+        if: always()
+        run: |
+          if [[ ( ${{ steps.build-specs.outcome }} == 'success' || ${{ steps.build-specs.outcome }} == 'skipped' ) && ( ${{ steps.build-extended-specs.outcome }} == 'success' || ${{ steps.build-extended-specs.outcome }} == 'skipped' ) ]]; then
+            echo "✅ Build succeeded" >>${GITHUB_STEP_SUMMARY}
+          else
+            echo "❌ Build failed" >>${GITHUB_STEP_SUMMARY}
+          fi
+
+      - name: Advertise build logs
+        if: always() && steps.upload-build-logs.outcome == 'success'
+        run: |
+          echo "_Build logs available [for download](${{ steps.upload-build-logs.outputs.artifact-url }})_" >>${GITHUB_STEP_SUMMARY}
+
+  install:
+    name: 'Test installing RPM'
+    needs: [build, detect-changes]
+    if: ${{ needs.detect-changes.outputs.updated_specs != '' || needs.detect-changes.outputs.updated_extended_specs != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      # Use a base Azure Linux 3.0 container.
+      image: mcr.microsoft.com/azurelinux/base/core:3.0
+      env:
+        daily_build_id: ${{ needs.build.outputs.daily_build_id }}
+        daily_build_arch: ${{ needs.build.outputs.daily_build_arch }}
+
+          # Reference: https://github.com/Azure/azure-cli/issues/29835
+        GNUPGHOME: /root/.gnupg
+
+    defaults:
+      run:
+        shell: bash
+    env:
+      target_ref: ${{ needs.detect-changes.outputs.target_ref }}
+
+    steps:
+      - name: Install prerequisites
+        run: |
+          tdnf install -y ca-certificates createrepo_c jq sudo tar wget
+
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Download built RPMs
+        uses: actions/download-artifact@v4
+        with:
+          name: rpms
+          path: RPMS
+
+      - name: Prepare downloaded RPMs
+        run: |
+          set -euxo pipefail
+
+          # Inventory what we downloaded
+          ls -l -R RPMS
+          find RPMS -type f -name "*.rpm" ! -name "*.src.rpm" ! -name "*debuginfo*" >rpms.txt
+          cat rpms.txt
+
+      - name: "Test package install/uninstall"
+        # TODO: For now we hard-code .azl3 + use of latest daily repo
+        run: |
+          set -euxo pipefail
+
+          declare -a rpm_names=()
+          for rpm_path in $(cat rpms.txt); do
+            rpm_names+=("$(basename ${rpm_path})")
+          done
+
+          ./toolkit/scripts/test_package_install.sh -p RPMS -s "${rpm_names[@]}" -y latest -d ".azl3"
