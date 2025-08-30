@@ -1,11 +1,11 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global xfceversion 4.18
+%global xfceversion 4.20
 %bcond_with perl
 
 Name:           xfconf
-Version:        4.18.3
-Release:        4%{?dist}
+Version:        4.20.0
+Release:        1%{?dist}
 Summary:        Hierarchical configuration system for Xfce
 
 License:        GPLv2
@@ -107,10 +107,11 @@ find %{buildroot} -type f -name *.la -exec rm -f {} \;
 
 %files -f %{name}.lang
 %license COPYING
-%doc AUTHORS NEWS TODO
+%doc AUTHORS NEWS
 %{_libdir}/lib*.so.*
 %{_bindir}/xfconf-query
 %{_libdir}/xfce4/xfconf/
+%{_libdir}/systemd/user/xfconfd.service
 %{_libdir}/girepository-1.0/Xfconf-0.typelib
 %{_datadir}/vala/vapi/libxfconf-0.deps
 %{_datadir}/vala/vapi/libxfconf-0.vapi
@@ -124,7 +125,6 @@ find %{buildroot} -type f -name *.la -exec rm -f {} \;
 %{_libdir}/pkgconfig/*.pc
 %{_includedir}/xfce4/xfconf-0
 %{_libdir}/gio/modules/libxfconfgsettingsbackend.so
-%{_datadir}/gtk-doc/html/%{name}/*
 
 %if %{with perl}
 %files perl
@@ -134,6 +134,10 @@ find %{buildroot} -type f -name *.la -exec rm -f {} \;
 %endif
 
 %changelog
+* Thu Aug 28 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 4.20.0-1
+- Update to 4.20.0
+- License verified
+
 * Mon Mar 17 2025 Archana Shettigar <v-shettigara@microsoft.com> - 4.18.3-4
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - Adding missing BRs on Perl modules.
