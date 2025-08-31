@@ -20,7 +20,8 @@ $LFS/tools/version-check-container.sh
 pushd $LFS/sources
 
 wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-local-wget-list --directory-prefix=$LFS/sources || true
-wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.2.tar.gz -O kernel-6.6.96.2.tar.gz --directory-prefix=$LFS/sources || true
+# need to skip this if it already exists because it inexplicably turns kernel-6.6.96.2.tar.gz into a 0-byte file
+[ -f kernel-6.6.96.2.tar.gz ] || wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.2.tar.gz -O kernel-6.6.96.2.tar.gz --directory-prefix=$LFS/sources || true
 
 mkdir -pv $LFS/{etc,var} $LFS/usr/{bin,lib,sbin}
 [ -L $LFS/bin ] || ln -sv usr/bin $LFS/bin
