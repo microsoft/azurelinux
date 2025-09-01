@@ -13,7 +13,7 @@ Patch1:         CVE-2024-28180.patch
 Patch2:         CVE-2025-27144.patch
 Patch3:         CVE-2024-51744.patch
 
-BuildRequires:  golang >= 1.17.1
+BuildRequires:  golang < 1.25
 BuildRequires:  git
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
