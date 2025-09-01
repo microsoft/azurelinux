@@ -1,4 +1,3 @@
-
 %bcond daemon 1
 %bcond subtree 1
 %bcond svn 0
@@ -6,14 +5,16 @@
 
 Summary:        Fast distributed version control system
 Name:           git
-Version:        2.45.3
-Release:        2%{?dist}
+Version:        2.45.4
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Programming
 URL:            https://git-scm.com/
 Source0:        https://github.com/git/git/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Below patch not needed for Git 2.46.0, already includes this fix.
+Patch0:         Ptest-fix-git-config-syntax.patch
 BuildRequires:  curl-devel
 BuildRequires:  python3-devel
 Requires:       curl
@@ -106,7 +107,7 @@ BuildArch:      noarch
 %endif
 
 %prep
-%setup -q
+%autosetup -p1
 %{py3_shebang_fix} git-p4.py
 
 %build
@@ -118,11 +119,13 @@ make configure
     --libexec=%{_libexecdir} \
     --with-gitconfig=%{_sysconfdir}/gitconfig
 make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}"
+%make_build -C contrib/subtree/ all
 
 %install
 %make_install
 install -vdm 755 %{buildroot}%{_datadir}/bash-completion/completions
 install -m 0644 contrib/completion/git-completion.bash %{buildroot}%{_datadir}/bash-completion/completions/git
+%make_install -C contrib/subtree
 %find_lang %{name}
 %{_fixperms} %{buildroot}/*
 
@@ -164,7 +167,7 @@ fi
 
 %if %{with subtree}
 %files subtree
-%{_libexecdir}/git-core/git-merge-subtree
+%{_libexecdir}/git-core/git-subtree
 %endif
 
 %if %{with svn}
@@ -173,6 +176,15 @@ fi
 %endif
 
 %changelog
+* Wed Jul 23 2025 Muhammad Falak <mwani@microsoft.com> - 2.45.4-3
+- Fix subtree subpackage
+
+* Fri Jul 18 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.45.4-2
+- Fix ptest with new git config syntax in CVE-2025-48384
+
+* Fri Jul 11 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.45.4-1
+- Upgrade to 2.45.4 - CVE-2025-48384, CVE-2025-48385, CVE-2025-27613 & CVE-2025-27614
+
 * Thu Apr 17 2025 Muhammad Falak <mwani@microsoft.com> - 2.45.3-2
 - Add dependency only for openssh-clients instead of openssh
 
