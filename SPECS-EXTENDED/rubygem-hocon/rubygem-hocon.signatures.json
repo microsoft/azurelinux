@@ -1,5 +1,6 @@
 {
  "Signatures": {
-  "ruby-hocon-1.3.1.tar.gz": "874b1af2dc1980594ac97ca04f5a44dea4a7da118e57617395a4bf041dba94ca"
+  "hocon-1.4.0.gem": "e71023ed7c56ae780ec34c0ce7789a233bcead08c045d50bc7b3af40f5afcd80",
+  "ruby-hocon-1.4.0.tar.gz": "ae74defe909ace97f8406393e4cd7a7c34454c3c99bbb712dbb4a67fbc31e5f6"
  }
 }
