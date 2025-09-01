@@ -12,10 +12,8 @@ Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://pip.pypa.io/
 Source0:        https://github.com/pypa/pip/archive/%{version}/%{srcname}-%{version}.tar.gz
-Patch0:         CVE-2024-37891.patch
-Patch1:         CVE-2025-50181.patch
+Patch0:		CVE-2024-37891.patch
 
-BuildRequires:  git
 BuildArch:      noarch
 
 %description    %{_description}
@@ -48,19 +46,14 @@ BuildRequires:  python3-wheel
 %pyproject_install
 %pyproject_save_files %{srcname}
 
-%check
-%{buildroot}%{_bindir}/pip3 install -r tests/requirements.txt
-pytest -v tests/unit
-
 %files -n python3-pip
 %defattr(-,root,root,755)
 %{_bindir}/pip*
 %{python3_sitelib}/pip*
 
 %changelog
-* Tue Jun 24 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 24.2-3
-- Patch for CVE-2025-50181
-- Added %check
+* Mon Jul 07 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 24.2-3
+- Bump release to build with asciidoc
 
 * Fri Nov 22 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 24.2-2
 - Patch for CVE-2024-37891
