@@ -33,6 +33,7 @@ Patch2:         CVE-2023-45288.patch
 Patch3:         CVE-2024-45338.patch
 # CVE-2025-22872 will be fixed in go net v0.38 by https://github.com/golang/net/commit/e1fcd82abba34df74614020343be8eb1fe85f0d9
 Patch4:         CVE-2025-22872.patch
+#
 BuildRequires:  golang < 1.25
 BuildRequires:  golang-packaging
 
