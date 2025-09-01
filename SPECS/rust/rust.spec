@@ -170,6 +170,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %files doc
 %license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
 %license %{_docdir}/rustc/licenses/*
+%license %{_docdir}/docs/html/*/fonts/*LICENSE*.txt
 %doc %{_docdir}/rustc/README.md
 %doc %{_docdir}/cargo/*
 %doc %{_docdir}/rustfmt/*
