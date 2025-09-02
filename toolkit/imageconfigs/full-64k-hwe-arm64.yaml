@@ -37,9 +37,9 @@ os:
 
   packages:
     install:
-    - kernel-64k
-    - kernel-64k-drivers-accessibility
-    - kernel-64k-drivers-sound
+    - kernel-hwe
+    - kernel-hwe-drivers-accessibility
+    - kernel-hwe-drivers-sound
     - createrepo_c
     - jq
     # iso required packages
@@ -49,7 +49,7 @@ os:
     - curl
 
     installLists:
-    - packagelists/isoinstaller-64k-packages.yaml
+    - packagelists/isoinstaller-64k-hwe-packages.yaml
 
     remove:
     - kernel
@@ -97,7 +97,7 @@ os:
     destination: /config/packages/virt-guest-packages.json
   - source: packagelists/ssh-server.json
     destination: /config/packages/ssh-server.json
-  - source: files/imagecustomizer/isoinstaller/attended_config_aarch64_64k.json
+  - source: files/imagecustomizer/isoinstaller/attended_config_aarch64_64k_hwe.json
     destination: /config/attended_config.json
 
   additionalDirs:
@@ -116,9 +116,9 @@ scripts:
     - path: scripts/set_os_release_variant_entries.sh
       arguments:
       - --variant-id
-      - full-64k
+      - full-64k-hwe
       - --variant
-      - ISO installer for 64k Kernel
+      - ISO installer for 64k HWE Kernel
 
 iso:
   additionalFiles:
@@ -140,7 +140,7 @@ iso:
     destination: /config/packages/virt-guest-packages.json
   - source: packagelists/ssh-server.json
     destination: /config/packages/ssh-server.json
-  - source: files/imagecustomizer/isoinstaller/attended_config_aarch64_64k.json
+  - source: files/imagecustomizer/isoinstaller/attended_config_aarch64_64k_hwe.json
     destination: /config/attended_config.json
 
 output:
