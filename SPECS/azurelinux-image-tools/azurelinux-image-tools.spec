@@ -2,8 +2,8 @@
 
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
-Version:        0.18.0
-Release:        2%{?dist}
+Version:        0.19.0
+Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
 Group:          Applications/System
@@ -99,7 +99,8 @@ go test -C toolkit/tools ./...
 %{_libdir}/imagecustomizer/telemetry-requirements.txt
 
 %changelog
-* Thu Aug 28 2025 Lanze Liu <lanzeliu@microsoft.com> 0.18.0-2
+* Wed Sep 3 2025 Lanze Liu <lanzeliu@microsoft.com> 0.19.0-1
+- Upgrade the version.
 - Fixed imagecustomizer container files location to comply with RPM packaging guidelines
 - Moved container dependency files from /etc to /usr/lib/imagecustomizer/
 
