@@ -44,7 +44,8 @@ BuildRequires:  pkgconfig
 BuildRequires:  rsync
 BuildRequires:  sed
 Provides:       cdi = %{version}-%{release}
-#ExclusiveArch:  x86_64 aarch64
+#
+ExclusiveArch:  x86_64 aarch64
 
 %description
 Containerized-Data-Importer (CDI) is a persistent storage management add-on for Kubernetes
