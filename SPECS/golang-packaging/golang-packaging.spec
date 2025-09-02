@@ -18,7 +18,7 @@
 
 Name:           golang-packaging
 Version:        15.0.17
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A toolchain to help packaging golang
 License:        GPLv3
 Vendor:         Microsoft Corporation
@@ -30,6 +30,7 @@ Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  rpm
 BuildRequires:  xz
 #Requires:       go
+Recommends:     go
 BuildArch:      noarch
 
 %description
@@ -59,6 +60,9 @@ install -m0644 macros.go %{buildroot}%{_sysconfdir}/rpm/
 %config %{_sysconfdir}/rpm/macros.go
 
 %changelog
+* Tue Sep 02 2025 Andrew Phelps <anphel@microsoft.com> - 15.0.17-2
+- Change to "Recommends: go" to resolve build conflict with golang 1.24 and 1.25
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 15.0.17-1
 - Auto-upgrade to 15.0.17 - Azure Linux 3.0 - package upgrades
 
