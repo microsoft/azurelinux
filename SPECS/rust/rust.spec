@@ -145,8 +145,6 @@ rm %{buildroot}%{_docdir}/rustc/{COPYRIGHT-library.html,COPYRIGHT.html}
 rm %{buildroot}%{_docdir}/cargo/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/clippy/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/rustfmt/{LICENSE-APACHE,LICENSE-MIT}
-rm %{buildroot}%{_docdir}/rustc/licenses/*
-rm %{buildroot}%{_docdir}/docs/html/*/fonts/*LICENSE*.txt
 rm %{buildroot}%{_docdir}/docs/html/.lock
 
 %ldconfig_scriptlets
@@ -178,6 +176,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %doc %{_docdir}/rustfmt/*
 %doc %{_docdir}/clippy/*
 %doc %{_docdir}/docs/html/*
+%exclude %{_docdir}/docs/html/*/fonts/*LICENSE*.txt
 %doc CONTRIBUTING.md README.md RELEASES.md
 %doc src/tools/clippy/CHANGELOG.md
 %doc src/tools/rustfmt/Configurations.md
