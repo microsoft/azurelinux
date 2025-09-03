@@ -1,15 +1,8 @@
 # This file is licensed under the terms of GNU GPLv2+.
 
-# Run optinonal tests
-%if ! (0%{?rhel})
-%{bcond_without perl_DynaLoader_Functions_enables_optional_test}
-%else
-%{bcond_with perl_DynaLoader_Functions_enables_optional_test}
-%endif
-
 Name:           perl-DynaLoader-Functions
-Version:        0.003
-Release:        9%{?dist}
+Version:        0.004
+Release:        1%{?dist}
 Summary:        Deconstructed dynamic C library loading
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -30,9 +23,8 @@ BuildRequires:  perl(DynaLoader)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(parent)
 # Tests:
+%if 0%{?with_check}
 BuildRequires:  perl(Test::More)
-%if %{with perl_DynaLoader_Functions_enables_optional_test}
-# Optional tests:
 BuildRequires:  perl(ExtUtils::CBuilder) >= 0.280209
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(Test::Pod) >= 1.00
@@ -70,6 +62,10 @@ perl Build.PL installdirs=vendor optimize="$RPM_OPT_FLAGS"
 %{_mandir}/man3/*
 
 %changelog
+* Tue Dec 17 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.004-1
+- Update to 0.004
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.003-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
