@@ -138,10 +138,8 @@ Obsoletes: mlnx-en-sources
 
 %ifarch aarch64
 BuildRequires:  kernel-hwe-devel = %{target_kernel_version_full}
-#BuildRequires:  kernel-hwe-headers = %{target_kernel_version_full}
 %else
 BuildRequires:  kernel-devel = %{target_kernel_version_full}
-BuildRequires:  kernel-headers = %{target_kernel_version_full}
 %endif
 BuildRequires:  binutils
 BuildRequires:  kmod
@@ -756,7 +754,7 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
-* Wed July 09 2025 Elaheh Dehghani <edehghani@microsoft.com> - 24.10-21
+* Wed Jul 09 2025 Elaheh Dehghani <edehghani@microsoft.com> - 24.10-21
 - Enabled aarch64 (ARM64) build by removing ExclusiveArch
 - Build aarch64 (ARM64) build using kernel 6.12.40
 

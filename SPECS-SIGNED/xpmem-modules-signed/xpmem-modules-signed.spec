@@ -99,7 +99,7 @@ popd
 
 
 %changelog
-* Wed July 09 2025 Elaheh Dehghani <edehghani@microsoft.com> - 2.7.4-21
+* Wed Jul 09 2025 Elaheh Dehghani <edehghani@microsoft.com> - 2.7.4-21
 - Enabled aarch64 (ARM64) build by removing ExclusiveArch
 - Build aarch64 (ARM64) build using kernel 6.12.40
 

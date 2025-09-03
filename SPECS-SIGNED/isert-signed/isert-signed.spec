@@ -123,7 +123,7 @@ fi # 1 : closed
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{_name}-*.conf
 
 %changelog
-* Wed July 09 2025 Elaheh Dehghani <edehghani@microsoft.com> - 24.10-21
+* Wed Jul 09 2025 Elaheh Dehghani <edehghani@microsoft.com> - 24.10-21
 - Enabled aarch64 (ARM64) build by removing ExclusiveArch
 - Build aarch64 (ARM64) build using kernel 6.12.40
 
