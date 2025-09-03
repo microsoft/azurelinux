@@ -22123,8 +22123,8 @@
         "type": "other",
         "other": {
           "name": "python-betamax",
-          "version": "0.8.1",
-          "downloadUrl": "https://github.com/sigmavirus24/betamax/archive/0.8.1/betamax-0.8.1.tar.gz"
+          "version": "0.9.0",
+          "downloadUrl": "https://github.com/sigmavirus24/betamax/archive/0.9.0/betamax-0.9.0.tar.gz"
         }
       }
     },
