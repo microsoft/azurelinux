@@ -1,9 +1,6 @@
 %global security_hardening none
-%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%global mstflintver 4.28.0
 %define uname_r %{version}-%{release}
-%define mariner_version 3
-%define short_name 64k
+%define short_name hwe
 
 # find_debuginfo.sh arguments are set by default in rpm's macros.
 # The default arguments regenerate the build-id for vmlinux in the
@@ -14,33 +11,26 @@
 %undefine _unique_debug_names
 %global _missing_build_ids_terminate_build 1
 %global _no_recompute_build_ids 1
-# Prevent find_debuginfo.sh from removing the BTF section from modules
-%define _find_debuginfo_opts --keep-section '.BTF'
 
-%ifarch aarch64
 %global __provides_exclude_from %{_libdir}/debug/.build-id/
 %define arch arm64
 %define archdir arm64
 %define config_source %{SOURCE1}
-%endif
 
 Summary:        Linux Kernel
-Name:           kernel-64k
-Version:        6.6.96.2
-Release:        2%{?dist}
+Name:           kernel-hwe
+Version:        6.12.40.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz#/kernel-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/%{version}.tar.gz#/kernel-hwe-%{version}.tar.gz
 Source1:        config_aarch64
-Source2:        sha512hmac-openssl.sh
-Source3:        azurelinux-ca-20230216.pem
-Source4:        cpupower
-Source5:        cpupower.service
-Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
-Patch1:         0002-efi-Added-efi-cmdline-line-option-to-dynamically-adj.patch
+Source2:        azurelinux-ca-20230216.pem
+Source3:        cpupower
+Source4:        cpupower.service
 ExclusiveArch:  aarch64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -68,15 +58,11 @@ BuildRequires:  python3-devel
 BuildRequires:  sed
 BuildRequires:  slang-devel
 BuildRequires:  systemd-bootstrap-rpm-macros
+BuildRequires:  python3-lxml
 Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
-Conflicts:      kernel
-Conflicts:      kernel-ipe
-Conflicts:      kernel-lpg-innovate
-Conflicts:      kernel-rt
-Conflicts:      kernel-hwe
 %{?grub2_configuration_requires}
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
@@ -149,7 +135,6 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 
 %package -n     python3-perf-%{short_name}
 Summary:        Python 3 extension for perf tools
-Provides:       python3-perf
 Requires:       %{name} = %{version}-%{release}
 Requires:       python3
 
@@ -158,7 +143,6 @@ This package contains the Python 3 extension for the 'perf' performance analysis
 
 %package -n     bpftool-%{short_name}
 Summary:        Inspection and simple manipulation of eBPF programs and maps
-Provides:       bpftool
 Requires:       %{name} = %{version}-%{release}
 
 %description -n bpftool-%{short_name}
@@ -166,13 +150,13 @@ This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
 %prep
-%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
+%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-hwe-%{version}
 make mrproper
 
 cp %{config_source} .config
 
 # Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE3} certs/mariner.pem
+cp %{SOURCE2} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
 cp .config current_config
@@ -228,15 +212,13 @@ install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
 
 install -d -m 755 %{buildroot}%{_sysconfdir}/sysconfig
-install -c -m 644 %{SOURCE4} %{buildroot}/%{_sysconfdir}/sysconfig/cpupower
+install -c -m 644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/sysconfig/cpupower
 install -d -m 755 %{buildroot}%{_unitdir}
-install -c -m 644 %{SOURCE5} %{buildroot}%{_unitdir}/cpupower.service
+install -c -m 644 %{SOURCE4} %{buildroot}%{_unitdir}/cpupower.service
 
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
-%ifarch aarch64
 install -vm 600 arch/arm64/boot/Image %{buildroot}/boot/vmlinuz-%{uname_r}
-%endif
 
 # Restrict the permission on System.map-X file
 install -vm 400 System.map %{buildroot}/boot/System.map-%{uname_r}
@@ -245,10 +227,6 @@ cp -r Documentation/*        %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
 install -vm 744 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
-
-# hmac sign the kernel for FIPS
-%{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
-cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
 
 # Symlink /lib/modules/uname/vmlinuz to boot partition
 ln -s /boot/vmlinuz-%{uname_r} %{buildroot}/lib/modules/%{uname_r}/vmlinuz
@@ -266,9 +244,7 @@ cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config ma
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
 
-%ifarch aarch64
 cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
-%endif
 
 # disable (JOBS=1) parallel build to fix this issue:
 # fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
@@ -326,10 +302,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
-/boot/.vmlinuz-%{uname_r}.hmac
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
-/lib/modules/%{uname_r}/.vmlinuz.hmac
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
 %exclude /lib/modules/%{uname_r}/kernel/drivers/gpu
@@ -360,9 +334,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %defattr(-,root,root)
 %{_libexecdir}
 %exclude %dir %{_libdir}/debug
-%ifarch aarch64
 %{_libdir}/libperf-jvmti.so
-%endif
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
 %{_datadir}/perf-core/strace/groups/file
@@ -380,104 +352,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Fri Aug 22 2025 Siddharth Chintamaneni <siddharthc@microsoft.com> - 6.6.96.2-2
-- Bump release to match kernel
-
-* Fri Aug 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.96.2-1
-- Auto-upgrade to 6.6.96.2
-
-* Thu Jul 17 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.96.1-2
-- Bump release to match kernel
-
-* Mon Jul 07 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.96.1-1
-- Auto-upgrade to 6.6.96.1
-
-* Mon Jun 16 2025 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.92.2-3
-- Add Conflicts with other kernels
-- Rename bpftool and python3-perf to be kernel specific
-
-* Mon Jun 09 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.92.2-2
-- Prevent debuginfo from stripping BTF data
-
-* Fri May 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.92.2-1
-- Auto-upgrade to 6.6.92.2
-
-* Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.90.1-1
-- Auto-upgrade to 6.6.90.1
-
-* Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.6.85.1-4
-- Added a new patch to EFI slack slots issue
-
-* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.6.85.1-3
-- Updated config_aarch64 based on nvidia patch guide recommendations
-
-* Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 6.6.85.1-2
-- Bump release to rebuild for new kernel release
-
-* Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.85.1-1
-- Auto-upgrade to 6.6.85.1
-
-* Fri Mar 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.82.1-1
-- Auto-upgrade to 6.6.82.1
-
-* Tue Mar 11 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.79.1-1
-- Auto-upgrade to 6.6.79.1
-- Remove jitterentropy patch as it is included in the source
-
-* Mon Mar 10 2025 Chris Co <chrco@microsoft.com> - 6.6.78.1-3
-- Add patch to revert UART change that breaks IPMI SEL panic message
-
-* Wed Mar 05 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.78.1-2
-- Add slang as BuildRequires, enabling tui on perf
-
-* Mon Mar 03 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.78.1-1
-- Auto-upgrade to 6.6.78.1
-
-* Wed Feb 19 2025 Chris Co <chrco@microsoft.com> - 6.6.76.1-2
-- Enable Tegra IVC protocol
-
-* Mon Feb 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.76.1-1
-- Auto-upgrade to 6.6.76.1
-
-* Wed Feb 05 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.64.2-9
-- Apply upstream patches to fix kernel panic in jitterentropy initialization on
-  ARM64 FIPS boot
-
-* Tue Feb 04 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 6.6.64.2-8
-- Bump release to match kernel
-
-* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 6.6.64.2-7
-- Bump release to match kernel
-
-* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 6.6.64.2-6
-- Bump release to match kernel
-
-* Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-5
-- Enable ipmitool for kernel-64k
-
-* Sat Jan 18 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-4
-- Build PCI_HYPERV as builtin
-
-* Thu Jan 16 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-3
-- Bump release to match kernel
-
-* Fri Jan 10 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.64.2-2
-- Bump release to match kernel
-
-* Thu Jan 09 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.64.2-1
-- Auto-upgrade to 6.6.64.2
-
-* Wed Jan 08 2025 Tobias Brick <tobiasb@microsoft.com> - 6.6.57.1-8
-- Enable dh kernel module (CONFIG_CRYPTO_DH) in aarch64
-- Bump release to match kernel
-
-* Sun Dec 22 2024 Ankita Pareek <ankitapareek@microsoft.com> - 6.6.57.1-7
-- Bump release to match kernel
-
-* Wed Dec 18 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.57.1-6
-- Enable kexec signature verification
-
-* Thu Nov 07 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.57.1-5
-- Initial CBL-Mariner import from Photon (license: Apache2).
-- Starting with release 5 to align with kernel release.
+* Fri Aug 15 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.40.1-1
+- Initial CBL-Mariner import from Photon (license: Apache2)
 - License verified
