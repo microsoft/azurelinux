@@ -75,7 +75,7 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
-* Wed Sep 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1:1.9.5-14
+* Wed Sep 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-14
 - Patch for CVE-2025-58058
 
 * Tue Apr 22 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.9.5-13
