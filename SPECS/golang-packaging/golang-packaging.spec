@@ -29,7 +29,6 @@ URL:            https://github.com/openSUSE/%{name}
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  rpm
 BuildRequires:  xz
-#Requires:       go
 Recommends:     go
 BuildArch:      noarch
 
