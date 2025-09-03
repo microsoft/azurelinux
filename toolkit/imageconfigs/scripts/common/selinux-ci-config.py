@@ -30,6 +30,7 @@ ENABLED_MODULES: set[str] = {
     "authlogin",
     "azureci",
     "azureci_deletions",
+    "azureci_prod", # enables SELinux and IPE lockout
     "bootloader",
     "brctl",
     "clock",

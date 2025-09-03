@@ -20,7 +20,7 @@
 
 Name:           ripgrep
 Version:        13.0.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        A search tool that combines ag with grep
 License:        MIT AND Unlicense
 Vendor:         Microsoft Corporation
@@ -104,6 +104,9 @@ install -Dm 644 complete/_rg %{buildroot}%{_datadir}/zsh/site-functions/_rg
 %{_datadir}/zsh
 
 %changelog
+* Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 13.0.0-10
+- Bump release to rebuild with rust
+
 * Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 13.0.0-9
 - Bump release to rebuild with rust
 

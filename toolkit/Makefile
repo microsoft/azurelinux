@@ -201,6 +201,9 @@ all: toolchain go-tools chroot-tools
 # its help will be displayed at the top of the help output.
 include $(SCRIPTS_DIR)/help.mk
 
+# Set-up the Azure configuration for the build
+include $(SCRIPTS_DIR)/azure_config.mk
+
 # Set up for the timestamp feature
 include $(SCRIPTS_DIR)/timestamp.mk
 
