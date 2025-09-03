@@ -841,6 +841,7 @@
                 "libXtst",
                 "libXv",
                 "libXxf86vm",
+                "libyami",
                 "libyang",
                 "libyubikey",
                 "libzip",
