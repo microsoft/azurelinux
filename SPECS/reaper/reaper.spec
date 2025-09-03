@@ -187,6 +187,7 @@ fi
 %{_sysconfdir}/init.d/cassandra-%{name}
 %{_unitdir}/cassandra-%{name}.service
 
+
 %changelog
 * Wed Sep 03 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.1.1-20
 - Upgrade to the latest version for fix the CVE-2025-9288
