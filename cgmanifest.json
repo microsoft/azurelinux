@@ -30647,8 +30647,8 @@
         "type": "other",
         "other": {
           "name": "xmlrpc-c",
-          "version": "1.54.06",
-          "downloadUrl": "https://sourceforge.net/projects/xmlrpc-c/files/Xmlrpc-c%20Super%20Stable/1.54.06/xmlrpc-c-1.54.06.tgz"
+          "version": "1.60.04",
+          "downloadUrl": "https://sourceforge.net/projects/xmlrpc-c/files/Xmlrpc-c%20Super%20Stable/1.60.04/xmlrpc-c-1.60.04.tgz"
         }
       }
     },
