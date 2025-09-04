@@ -26,14 +26,6 @@ BuildArch: noarch
 %description
 Recursively merge hashes. 
  
-%package doc
-Summary: Documentation for %{name}
-Requires: %{name} = %{version}-%{release}
-BuildArch: noarch
- 
-%description doc
-Documentation for %{name}
- 
 %prep
 gem unpack %{SOURCE0}
  
@@ -68,10 +60,7 @@ ruby -Ilib test/test_deep_merge.rb
 %exclude %{gem_instdir}/Rakefile
 %{gem_spec}
 %license %{gem_instdir}/LICENSE
- 
-%files doc
-%doc %{gem_docdir}
-%doc %{gem_instdir}/README.md 
+
 
 %changelog
 * Thu Dec 05 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.2.2-1
