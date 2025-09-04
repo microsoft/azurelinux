@@ -189,8 +189,9 @@ fi
 
 %changelog
 * Wed Sep 03 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.1.1-20
-- Upgrade the sha.js from v2.4.11 to v2.4.12 to address CVE-2025-9288
-- Fix the reaper_build_script.sh error to generate the new cache tar bal
+- Fix the error in reaper_build_caches.sh
+- CVE-2025-9288: generate new cache tarball for reaper-local-lib-node-modules of version 3.1.1
+- CVE-2025-9288: generate new cache tarball for reaper-m2-cache-3.1.1.tar.gz of version 3.1.1
 
 * Thu Jun 05 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.1.1-19
 - Patch CVE-2024-6484 and CVE-2025-48387
