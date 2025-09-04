@@ -44,7 +44,6 @@ BuildRequires:  pkgconfig
 BuildRequires:  rsync
 BuildRequires:  sed
 Provides:       cdi = %{version}-%{release}
-#
 ExclusiveArch:  x86_64 aarch64
 
 %description

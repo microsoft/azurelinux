@@ -278,7 +278,7 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
-* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.30.10-10
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.30.10-11
 - Set BR for golang to < 1.25
 
 * Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.30.10-10
