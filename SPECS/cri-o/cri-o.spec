@@ -124,9 +124,7 @@ Provides:       kubernetes-kubeadm-criconfig
 This package provides the CRI-O container runtime configuration for kubeadm
 
 %prep
-%setup -q
-tar -xf %{SOURCE1} --no-same-owner
-%autopatch -p1
+%autosetup -p1 -a1
 
 %build
 
