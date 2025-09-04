@@ -89,8 +89,13 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %{_bindir}/nvidia-cdi-hook
 
 %changelog
+<<<<<<< HEAD
 * Mon Jul 28 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.17.8-2
 - Patch for CVE-2025-22872
+=======
+* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.17.8-2
+- Bump release to rebuild with golang
+>>>>>>> 19dd9cdf2 ([High] Patch golang & golang-1.18 for CVE-2025-47907, golang for CVE-2025-4674, CVE-2025-47906 and [Medium] Patch golang & golang-1.18 for CVE-2025-4673 (#14552))
 
 * Thu Jul 24 2025 Sam Meluch <sammeluch@microsoft.com> - 1.17.8-1
 - Upgrade to 1.17.8 to resolve CVE-2025-23266

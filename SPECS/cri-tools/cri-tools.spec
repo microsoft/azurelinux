@@ -49,8 +49,13 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 %{_bindir}/critest
 
 %changelog
+<<<<<<< HEAD
 * Thu May 22 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.29.0-7
 - Patch CVE-2025-22872
+=======
+* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.29.0-7
+- Bump release to rebuild with golang
+>>>>>>> 19dd9cdf2 ([High] Patch golang & golang-1.18 for CVE-2025-47907, golang for CVE-2025-4674, CVE-2025-47906 and [Medium] Patch golang & golang-1.18 for CVE-2025-4673 (#14552))
 
 * Mon Jan 06 2025 Sumedh Sharma <sumsharma@microsoft.com> - 1.29.0-6
 - Add patch for CVE-2024-45338

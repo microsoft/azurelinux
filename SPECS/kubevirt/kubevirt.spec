@@ -226,8 +226,13 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+<<<<<<< HEAD
 * Fri Jul 11 2025 BinduSri Adabala <v-badabala@microsoft.com> - 0.59.0-29
 - Patch CVE-2024-33394
+=======
+* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 0.59.0-29
+- Bump release to rebuild with golang
+>>>>>>> 19dd9cdf2 ([High] Patch golang & golang-1.18 for CVE-2025-47907, golang for CVE-2025-4674, CVE-2025-47906 and [Medium] Patch golang & golang-1.18 for CVE-2025-4673 (#14552))
 
 * Tue Apr 22 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 0.59.0-28
 - Patch CVE-2025-22872
