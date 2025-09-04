@@ -449,6 +449,7 @@ Patch10:  CVE-2024-7730.patch
 Patch11:  CVE-2024-3567.patch
 Patch12:  CVE-2024-26327.patch
 Patch13:  CVE-2024-26328.patch
+Patch14:  CVE-2024-7409.patch
 
 Source10: qemu-guest-agent.service
 Source11: 99-qemu-guest-agent.rules
@@ -3432,8 +3433,13 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
+<<<<<<< HEAD
 * Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 8.2.0-18
 - Bump to rebuild with updated glibc
+=======
+* Thu Aug 14 2025 Kshitiz Godara <kgodara@microsoft.com> - 8.2.0-18
+- Added Patch for CVE-2024-7409
+>>>>>>> e63bd61fa (Patch qemu for CVE-2024-7409 [HIGH] (#14519))
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.2.0-17
 - Bump to rebuild with updated glibc
