@@ -62,21 +62,37 @@ function checkInternet {
 function installNodeModules {
 	echo "Installing node modules."
 	sudo tdnf install -y nodejs
-	npm config set cache "$homeCacheDir/.npm" --global
-	# Default node/npm versions in Mariner fails to build dependency node module versions due to known
-	# incompatibilities.
-	# Backward compatible with node@v14.18.0
-	# When installing modules via npm to default prefix='/usr/local' in mariner, the permissions for 'others'
-	# is incoorectly set that causes 'which' to still point to older path, as access/newfstatat fail with -ENOPERM
-	# Setting a new global npm folder for fixing permission issues.
-	# (works well with id=0, but reaper build will fail.)
-	mkdir --mode 0777 $homeCacheDir/.npm-global
+
+	# Set up npm to use only user-writable directories
+	export NPM_CONFIG_USERCONFIG="$homeCacheDir/.npmrc"
+	mkdir -p "$homeCacheDir/.npm"
+	mkdir -p "$homeCacheDir/.npm-global"
+	npm config set cache "$homeCacheDir/.npm"
 	npm config set prefix "$homeCacheDir/.npm-global"
-	export PATH="$homeCacheDir/.npm-global/bin":$PATH
+	export PATH="$homeCacheDir/.npm-global/bin:$PATH"
+	export NPM_CONFIG_PREFIX="$homeCacheDir/.npm-global"
+	export NPM_CONFIG_CACHE="$homeCacheDir/.npm"
+	export XDG_CACHE_HOME="$homeCacheDir/.cache"
+
+	echo "npm config list:"
+	npm config list
+	echo "env | grep -i npm:"
+	env | grep -i npm
+
+	# Install and use Node.js v14.18.0 with n
 	npm install -g n
 	export N_PREFIX="$homeCacheDir/.npm-global"
 	n 14.18.0
-	export XDG_CACHE_HOME=$homeCacheDir/.cache
+
+	# Ensure the shell uses the new node and npm
+	export PATH="$homeCacheDir/.npm-global/bin:$PATH"
+	hash -r
+	echo "After n:"
+	which node
+	which npm
+	node -v
+	npm -v
+
 	npm install -g bower
 	# Clear bash hash tables for node/npm paths
 	hash -r
@@ -147,7 +163,7 @@ buildReaperSources
 
 createCacheTars
 
-mkdir "$HOME/reaper_caches"
+mkdir -p $HOME/reaper_caches
 
 cp -a ${reaperCacheDir} "$HOME/reaper_caches"
 

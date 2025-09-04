@@ -6,7 +6,7 @@
 Summary:        Reaper for cassandra is a tool for running Apache Cassandra repairs against single or multi-site clusters.
 Name:           reaper
 Version:        3.1.1
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,25 +32,14 @@ Source7:        reaper-local-n-%{version}-%{local_n_release}.tar.gz
 # The src/ui/node_modules/ws/package.json file suggest we're on the
 # 6.x version of "ws". Patch for this version taken from here:
 # https://github.com/websockets/ws/commit/eeb76d313e2a00dd5247ca3597bba7877d064a63
-Patch0:         CVE-2024-37890.patch
-Patch1:         CVE-2023-42282.patch
-Patch2:         CVE-2017-18214.patch
-Patch3:         CVE-2024-42459.patch
-Patch4:         CVE-2024-43796.patch
-Patch5:         CVE-2024-45296.patch
-Patch6:         CVE-2024-43799.patch
-Patch7:         CVE-2024-43800.patch
-Patch8:         CVE-2024-47764.patch
-Patch9:         CVE-2024-48949.patch
-Patch10:        CVE-2024-45590.patch
-Patch11:        CVE-2024-21538.patch
-Patch12:        CVE-2020-28458.patch
-Patch13:        CVE-2024-52798.patch
-Patch14:        CVE-2020-24025.patch
-Patch15:        CVE-2024-28863.patch
-Patch16:        CVE-2024-12905.patch
-Patch17:        CVE-2024-6484.patch
-Patch18:        CVE-2025-48387.patch
+Patch0:        CVE-2023-42282.patch
+Patch1:        CVE-2017-18214.patch
+Patch2:        CVE-2020-28458.patch
+Patch3:        CVE-2020-24025.patch
+Patch4:        CVE-2024-28863.patch
+Patch5:        CVE-2024-12905.patch
+Patch6:        CVE-2024-6484.patch
+Patch7:        CVE-2025-48387.patch
 
 BuildRequires:  git
 BuildRequires:  javapackages-tools
@@ -108,15 +97,15 @@ ln -sf ../lib/node_modules/npm/bin/npx-cli.js bin/npx
 cp n/versions/node/14.18.0/bin/node bin
 popd
 
-%autopatch -p1 -M 14
+%autopatch -p1 -M 3
 
 pushd $tmp_local_dir/lib/node_modules/
-%autopatch -p1 15
+%autopatch -p1 4
 popd
 pushd $tmp_local_dir/n/versions/node/14.18.0/lib/node_modules/
-%autopatch -p1 15
+%autopatch -p1 4
 popd
-%autopatch -p1 -m 16
+%autopatch -p1 -m 5
 
 # Removed for CVE-2024-6484.patch as they are unused and contain
 # vulnerabilities that are not easily patched out.
@@ -199,6 +188,10 @@ fi
 %{_unitdir}/cassandra-%{name}.service
 
 %changelog
+* Wed Sep 03 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.1.1-20
+- Upgrade the sha.js from v2.4.11 to v2.4.12 to address CVE-2025-9288
+- Fix the reaper_build_script.sh error to generate the new cache tar bal
+
 * Thu Jun 05 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.1.1-19
 - Patch CVE-2024-6484 and CVE-2025-48387
 
