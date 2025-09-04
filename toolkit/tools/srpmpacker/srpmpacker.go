@@ -398,9 +398,6 @@ func createChroot(workerTar, buildDir, outDir, specsDir string, useAzureCliAuth 
 
 	if useAzureCliAuth {
 		err = installAzureCliPackage(chroot)
-		if err != nil {
-			return
-		}
 	}
 
 	return
@@ -419,7 +416,7 @@ func addAzureConfigMountPoint(extraMountPoints []*safechroot.MountPoint) ([]*saf
 		logger.Log.Debug("AZURE_CONFIG_DIR is not set, defaulting to user's .azure folder.")
 		homeDir, homeErr := os.UserHomeDir()
 		if homeErr != nil {
-			return nil, fmt.Errorf("Could not determine user home directory for .azure mount: %v", homeErr)
+			return nil, fmt.Errorf("could not determine user home directory for .azure mount: %v", homeErr)
 		}
 		azureConfigDir = filepath.Join(homeDir, ".azure")
 		mountPoint = chrootAzureConfigMountPoint
@@ -430,34 +427,23 @@ func addAzureConfigMountPoint(extraMountPoints []*safechroot.MountPoint) ([]*saf
 }
 
 func installAzureCliPackage(chroot *safechroot.Chroot) (err error) {
-	const (
-		rootDir                = "/"
-		azureLinuxReposPackage = "azurelinux-repos-ms-oss"
-		azureCLIPackage        = "azure-cli"
-	)
+	const rootDir = "/"
 
-	logger.Log.Debugf("Installing '%s' and '%s' packages for Azure CLI authenticated downloads", azureLinuxReposPackage, azureCLIPackage)
+	packagesToInstall := []string{"azurelinux-repos-ms-oss", "azure-cli"}
+
+	logger.Log.Debugf("Installing %v packages for Azure CLI authenticated downloads", packagesToInstall)
 
 	err = chroot.Run(func() error {
-		_, repoErr := installutils.TdnfInstall(azureLinuxReposPackage, rootDir)
-		if repoErr != nil {
-			return fmt.Errorf("failed to install '%s':\n%w", azureLinuxReposPackage, repoErr)
+		for _, packageName := range packagesToInstall {
+			_, repoErr := installutils.TdnfInstall(packageName, rootDir)
+			if repoErr != nil {
+				return fmt.Errorf("failed to install '%s':\n%w", packageName, repoErr)
+			}
 		}
 		return nil
 	})
 	if err != nil {
-		return fmt.Errorf("failed to install required '%s' package:\n%w", azureLinuxReposPackage, err)
-	}
-
-	err = chroot.Run(func() error {
-		_, cliErr := installutils.TdnfInstall(azureCLIPackage, rootDir)
-		if cliErr != nil {
-			return fmt.Errorf("failed to install '%s':\n%w", azureCLIPackage, cliErr)
-		}
-		return nil
-	})
-	if err != nil {
-		return fmt.Errorf("failed to install required '%s' package:\n%w", azureCLIPackage, err)
+		return fmt.Errorf("failed to install required packages:\n%w", err)
 	}
 
 	return nil
@@ -1018,14 +1004,19 @@ func tryToHydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDi
 // hydrateFromRemoteSource will update fileHydrationState.
 // Will alter `currentSignatures`.
 func hydrateFromRemoteSource(ctx context.Context, fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string, netOpsSemaphore chan struct{}) (err error) {
+	var (
+		azureBlobStorageClient *azureblobstorage.AzureBlobStorage
+		cancelled              bool
+		internalErr            error
+	)
+
 	errPackerCancelReceived := fmt.Errorf("packer cancel signal received")
 
-	var azureBlobStorageClient *azureblobstorage.AzureBlobStorage
 	if srcConfig.sourceAuthMode == sourceAuthModeAzureCli {
 		// Create the Azure Blob Storage client once for all downloads
 		azureBlobStorageClient, err = azureblobstorage.CreateFromURL(srcConfig.sourceURL)
 		if err != nil {
-			return fmt.Errorf("failed to create Azure Blob Storage client: %w", err)
+			return fmt.Errorf("failed to create Azure Blob Storage client:\n%w", err)
 		}
 	}
 
@@ -1050,8 +1041,6 @@ func hydrateFromRemoteSource(ctx context.Context, fileHydrationState map[string]
 			}
 		}
 
-		var cancelled bool
-		var internalErr error
 		if srcConfig.sourceAuthMode == sourceAuthModeAzureCli {
 			cancelled, internalErr = azureblobstorage.DownloadFileWithRetry(ctx, azureBlobStorageClient, url, destinationFile, network.DefaultTimeout)
 		} else {
