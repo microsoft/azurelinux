@@ -1970,6 +1970,7 @@
                 "rubygem-rspec-expectations",
                 "rubygem-rspec-mocks",
                 "rubygem-rspec-support",
+                "rubygem-scanf",
                 "rubygem-sys-filesystem",
                 "rubygem-thread_order",
                 "rusers",
