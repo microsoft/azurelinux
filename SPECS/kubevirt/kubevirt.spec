@@ -19,7 +19,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.59.0
-Release:        28%{?dist}
+Release:        29%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -225,6 +225,9 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 0.59.0-29
+- Bump release to rebuild with golang
+
 * Tue Apr 22 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 0.59.0-28
 - Patch CVE-2025-22872
 
