@@ -1,54 +1,48 @@
+%global base_version 3.15
+
 # Run optional test
+%if ! (0%{?rhel})
 %bcond_without perl_libnet_enables_optional_test
+%else
+%bcond_with perl_libnet_enables_optional_test
+%endif
 # SASL support
 %bcond_without perl_libnet_enables_sasl
 # SSL support
 %bcond_without perl_libnet_enables_ssl
-Summary:        Perl clients for various network protocols
+
 Name:           perl-libnet
-Version:        3.11
-Release:        444%{?dist}
-# other files:  GPL+ or Artistic
-## Not in binary packages
-# repackage.sh: GPLv2+
-## Removed from upstream sources:
-# lib/Net/libnetFAQ.pod:    Artistic    (CPAN RT#117888)
-License:        GPL+ OR Artistic
+Version:        3.15
+Release:        513%{?dist}
+Summary:        Perl clients for various network protocols
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/libnet
-# Origin source archive contains Artistic only files, CPAN RT#117888.
-# Local archive produced by "./repackage.sh %%{version}" command.
-# http://www.cpan.org/authors/id/S/SH/SHAY/libnet-%%{version}.tar.gz
-Source0:        %{_distro_sources_url}/%{name}_repackaged-%{version}.tar.gz
-# Replacement for the Artistic only file, CPAN RT#117888.
-Source1:        libnetFAQ.pod
+Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHAY/libnet-%{base_version}.tar.gz#%{name}-%{version}.tar.gz
 # Convert Changes to UTF-8
 Patch0:         libnet-3.09-Normalize-Changes-encoding.patch
 # Do not create Net/libnet.cfg, bug #1238689
 Patch1:         libnet-3.08-Do-not-create-Net-libnet.cfg.patch
-# Filter under-specified dependencies
-%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\((IO::Socket|Socket)\\)$
+BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+# Getopt::Std not used because of Do-not-create-Net-libnet.cfg.patch
+# IO::File not used because of Do-not-create-Net-libnet.cfg.patch
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
 # Run-time:
 BuildRequires:  perl(Carp)
-# MD5 not used because we prefer Digest::MD5
-# MIME::Base64 not used at tests
-# Tests:
-BuildRequires:  perl(Config)
-BuildRequires:  perl(Cwd)
+BuildRequires:  perl(constant)
 # Convert::EBCDIC not used
 BuildRequires:  perl(Errno)
 BuildRequires:  perl(Exporter)
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(Fcntl)
-BuildRequires:  perl(File::Temp)
 # File::Basename not used at tests
 BuildRequires:  perl(FileHandle)
-BuildRequires:  perl(IO::File)
 BuildRequires:  perl(IO::Select)
 BuildRequires:  perl(IO::Socket) >= 1.05
 # Prefer IO::Socket::IP over IO::Socket::INET6 and IO::Socket::INET
@@ -57,24 +51,7 @@ BuildRequires:  perl(IO::Socket::IP) >= 0.25
 BuildRequires:  perl(POSIX)
 BuildRequires:  perl(Socket) >= 2.016
 BuildRequires:  perl(Symbol)
-BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Time::Local)
-BuildRequires:  perl(constant)
-# Getopt::Std not used because of Do-not-create-Net-libnet.cfg.patch
-# IO::File not used because of Do-not-create-Net-libnet.cfg.patch
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-# Digest::MD5 or MD5
-Requires:       perl(Digest::MD5)
-Requires:       perl(File::Basename)
-Requires:       perl(IO::Socket) >= 1.05
-# Prefer IO::Socket::IP over IO::Socket::INET6 and IO::Socket::INET
-Requires:       perl(IO::Socket::IP) >= 0.25
-Requires:       perl(POSIX)
-Requires:       perl(Socket) >= 2.016
-Conflicts:      perl < 4:5.22.0-347
-BuildArch:      noarch
 # Optional run-time:
 # Authen::SASL not used at tests
 # Digest::MD5 not used at tests
@@ -82,17 +59,42 @@ BuildArch:      noarch
 # Core modules must be built without non-core dependencies
 BuildRequires:  perl(IO::Socket::SSL) >= 2.007
 %endif
+# MD5 not used because we prefer Digest::MD5
+# MIME::Base64 not used at tests
+# Tests:
+BuildRequires:  perl(Config)
+BuildRequires:  perl(Cwd)
+BuildRequires:  perl(File::Temp)
+BuildRequires:  perl(IO::File)
+BuildRequires:  perl(Test::More)
 %if %{with perl_libnet_enables_optional_test}
 # Optional tests:
 %if %{with perl_libnet_enables_ssl} && !%{defined perl_bootstrap}
 # Core modules must be built without non-core dependencies
 BuildRequires:  perl(IO::Socket::SSL::Utils)
 %endif
-# Test::CPAN::Changes not used
-# Test::Perl::Critic not used
-# Test::Pod 1.00 not used
-# Test::Pod::Coverage 0.08 not used
 %endif
+Requires:       perl(File::Basename)
+Requires:       perl(IO::Socket) >= 1.05
+# Prefer IO::Socket::IP over IO::Socket::INET6 and IO::Socket::INET
+Requires:       perl(IO::Socket::IP) >= 0.25
+Requires:       perl(POSIX)
+Requires:       perl(Socket) >= 2.016
+# Optional run-time:
+# Core modules must be built without non-core dependencies
+%if %{with perl_libnet_enables_sasl} && !%{defined perl_bootstrap}
+Suggests:       perl(Authen::SASL)
+Suggests:       perl(MIME::Base64)
+%endif
+# Digest::MD5 or MD5
+Requires:       perl(Digest::MD5)
+%if %{with perl_libnet_enables_ssl} && !%{defined perl_bootstrap}
+Suggests:       perl(IO::Socket::SSL) >= 2.007
+%endif
+Conflicts:      perl < 4:5.22.0-347
+
+# Filter under-specified dependencies
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\((IO::Socket|Socket)\\)$
 
 %description
 This is a collection of Perl modules which provides a simple and
@@ -100,20 +102,17 @@ consistent programming interface (API) to the client side of various
 protocols used in the internet community.
 
 %prep
-# Avoid autosetup
-%setup -q -n libnet-%{version}
-# Provide dummy Net::libnetFAQ document, CPAN RT#117888
-install -m 0644 %{SOURCE1} lib/Net
-%patch 0 -p1
-%patch 1 -p1
+%setup -q -n libnet-%{base_version}
+%patch -P0 -p1
+%patch -P1 -p1
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 </dev/null
-%make_build
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1 </dev/null
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
-%{_fixperms} %{buildroot}/*
+%{make_install}
+%{_fixperms} $RPM_BUILD_ROOT/*
 
 %check
 make test
@@ -125,14 +124,82 @@ make test
 %{_mandir}/man3/*
 
 %changelog
-* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.11-444
-- Updating naming for 3.0 version of Azure Linux.
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.15-513
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
 
-* Tue Mar 07 2023 Muhammad Falak <mwani@microsoft.com> - 3.11-443
-- License verified
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.15-512
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.11-442
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Jun 12 2024 Jitka Plesnikova <jplesnik@redhat.com> - 3.15-511
+- Perl 5.40 re-rebuild of bootstrapped packages
+
+* Mon Jun 10 2024 Jitka Plesnikova <jplesnik@redhat.com> - 3.15-510
+- Increase release to favour standalone package
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.15-503
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.15-502
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.15-501
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jul 12 2023 Jitka Plesnikova <jplesnik@redhat.com> - 3.15-500
+- Perl 5.38 re-rebuild of bootstrapped packages
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 3.15-499
+- Increase release to favour standalone package
+
+* Tue Mar 21 2023 Jitka Plesnikova <jplesnik@redhat.com> - 3.15-1
+- 3.15 bump
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.14-491
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.14-490
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jun 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 3.14-489
+- Perl 5.36 re-rebuild of bootstrapped packages
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 3.14-488
+- Increase release to favour standalone package
+
+* Thu May 12 2022 Jitka Plesnikova <jplesnik@redhat.com> - 3.14-1
+- Upgrade to 3.14 as provided in perl-5.35.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.13-480
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.13-479
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon May 24 2021 Jitka Plesnikova <jplesnik@redhat.com> - 3.13-478
+- Perl 5.34 re-rebuild of bootstrapped packages
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 3.13-477
+- Increase release to favour standalone package
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.13-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jan 04 2021 Jitka Plesnikova <jplesnik@redhat.com> - 3.13-1
+- 3.13 bump
+
+* Wed Dec 09 2020 Jitka Plesnikova <jplesnik@redhat.com> - 3.12-1
+- 3.12 bump
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.11-458
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Jitka Plesnikova <jplesnik@redhat.com> - 3.11-457
+- Perl 5.32 re-rebuild of bootstrapped packages
+
+* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 3.11-456
+- Increase release to favour standalone package
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.11-441
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -202,7 +269,7 @@ make test
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
 * Wed Jan 06 2016 Petr Pisar <ppisar@redhat.com> - 3.08-1
-- 8.08 bump
+- 3.08 bump
 
 * Mon Jul 20 2015 Petr Pisar <ppisar@redhat.com> - 3.07-1
 - 3.07 bump
