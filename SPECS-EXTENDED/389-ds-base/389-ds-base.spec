@@ -68,7 +68,7 @@ ExcludeArch: i686
 Summary:          389 Directory Server (%{variant})
 Name:             389-ds-base
 Version:          3.1.1
-Release:          5%{?dist}
+Release:          6%{?dist}
 License:          GPL-3.0-or-later AND (0BSD OR Apache-2.0 OR MIT) AND (Apache-2.0 OR Apache-2.0 WITH LLVM-exception OR MIT) AND (Apache-2.0 OR BSL-1.0) AND (Apache-2.0 OR MIT OR Zlib) AND (Apache-2.0 OR MIT) AND (CC-BY-4.0 AND MIT) AND (MIT OR Apache-2.0) AND Unicode-DFS-2016 AND (MIT OR CC0-1.0) AND (MIT OR Unlicense) AND 0BSD AND Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MIT AND ISC AND MPL-2.0 AND PSF-2.0
 URL:              https://www.port389.org
 Vendor:           Microsoft Corporation
@@ -732,6 +732,9 @@ exit 0
 %endif
 
 %changelog
+* Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.1.1-6
+- Bump release to rebuild with rust
+
 * Fri Jun 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.1.1-5
 - Bump release to rebuild with rust
 

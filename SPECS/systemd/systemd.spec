@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        21%{?dist}
+Release:        22%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -144,7 +144,7 @@ Patch0900:      do-not-test-openssl-sm3.patch
 Patch0901:      networkd-default-use-domains.patch
 Patch0902:      CVE-2023-7008.patch
 
-%ifarch %{ix86} x86_64
+%ifarch %{ix86} x86_64 aarch64
 %global want_bootloader 1
 %endif
 
@@ -238,6 +238,9 @@ BuildRequires:  python3dist(pytest)
 BuildRequires:  python3dist(zstd)
 %if 0%{?want_bootloader}
 BuildRequires:  python3dist(pyelftools)
+%endif
+%if 0%{?with_check}
+BuildRequires:  python3dist(pyflakes)
 %endif
 # gzip and lzma are provided by the stdlib
 BuildRequires:  firewalld-filesystem
@@ -894,7 +897,11 @@ python3 %{SOURCE2} %buildroot %{!?want_bootloader:--no-bootloader}
 
 %if 0%{?want_bootloader}
 mkdir -p %{buildroot}/boot/efi/EFI/BOOT
+%ifarch x86_64
 cp %{buildroot}/usr/lib/systemd/boot/efi/systemd-bootx64.efi %{buildroot}/boot/efi/EFI/BOOT/grubx64.efi
+%elifarch aarch64
+cp %{buildroot}/usr/lib/systemd/boot/efi/systemd-bootaa64.efi %{buildroot}/boot/efi/EFI/BOOT/grubaa64.efi
+%endif
 %endif
 
 %check
@@ -1181,7 +1188,11 @@ fi
 %if 0%{?want_bootloader}
 %files ukify -f .file-list-ukify
 %files boot -f .file-list-boot
+%ifarch x86_64
 /boot/efi/EFI/BOOT/grubx64.efi
+%elifarch aarch64
+/boot/efi/EFI/BOOT/grubaa64.efi
+%endif
 %endif
 
 %files container -f .file-list-container
@@ -1217,6 +1228,10 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Tue Aug 05 2025 Chris Co <chrco@microsoft.com> - 255-22 
+- enable building ukify and sd-boot on arm64
+- enable pyflakes buildrequires which is needed for ukify testing
+
 * Mon Apr 14 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 255-21
 - Bumping 'Release' tag to match the 'signed' version of the spec.
 

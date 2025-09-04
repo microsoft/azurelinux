@@ -3,7 +3,7 @@
 
 Name:         kata-containers-cc
 Version:      3.15.0.aks0
-Release:      2%{?dist}
+Release:      4%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 URL:          https://github.com/microsoft/kata-containers
@@ -28,7 +28,7 @@ BuildRequires:  fuse-devel
 # kernel-uvm is required for debuggability, exercising confidential guest (confidential_guest=true)
 # code paths without actual SEV SNP enablement (sev_snp_guest=false)
 Requires:  kernel-uvm
-Requires:  moby-containerd-cc
+Requires:  containerd2
 # Must match the version specified by the `assets.virtiofsd.version` field in the source's versions.yaml.
 Requires:  virtiofsd = 1.8.0
 
@@ -150,6 +150,12 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Tue Jul 22 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.15.0.aks0-4
+- Bump release to rebuild with rust
+
+* Mon Jul 21 2025 Saul Paredes <saulparedes@microsoft.com> - 3.15.0.aks0-3
+- Update dependency on containerd2
+
 * Fri Jun 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0.aks0-2
 - Bump release to rebuild with rust
 
