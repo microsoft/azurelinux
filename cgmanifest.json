@@ -905,8 +905,8 @@
         "type": "other",
         "other": {
           "name": "azurelinux-image-tools",
-          "version": "0.18.0",
-          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v0.18.0.tar.gz"
+          "version": "0.19.0",
+          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v0.19.0.tar.gz"
         }
       }
     },
@@ -8151,8 +8151,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.18.0.kata0",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.18.0.kata0.tar.gz"
+          "version": "3.19.1.kata1",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.19.1.kata1.tar.gz"
         }
       }
     },
@@ -8531,8 +8531,8 @@
         "type": "other",
         "other": {
           "name": "kubevirt",
-          "version": "1.2.0",
-          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.2.0.tar.gz"
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.5.0.tar.gz"
         }
       }
     },
@@ -16723,8 +16723,8 @@
         "type": "other",
         "other": {
           "name": "perl-Cpanel-JSON-XS",
-          "version": "4.27",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Cpanel-JSON-XS-4.27.tar.gz"
+          "version": "4.39",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Cpanel-JSON-XS-4.39.tar.gz"
         }
       }
     },
@@ -19223,8 +19223,8 @@
         "type": "other",
         "other": {
           "name": "perl-Params-Validate",
-          "version": "1.29",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Params-Validate-1.29.tar.gz"
+          "version": "1.31",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Params-Validate-1.31.tar.gz"
         }
       }
     },
@@ -20733,8 +20733,8 @@
         "type": "other",
         "other": {
           "name": "perl-Variable-Magic",
-          "version": "0.62",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/V/VP/VPIT/Variable-Magic-0.62.tar.gz"
+          "version": "0.64",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/V/VP/VPIT/Variable-Magic-0.64.tar.gz"
         }
       }
     },
@@ -20973,8 +20973,8 @@
         "type": "other",
         "other": {
           "name": "perl-XML-Writer",
-          "version": "0.625",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/J/JO/JOSEPHW/XML-Writer-0.625.tar.gz"
+          "version": "0.900",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/J/JO/JOSEPHW/XML-Writer-0.900.tar.gz"
         }
       }
     },
@@ -21213,8 +21213,8 @@
         "type": "other",
         "other": {
           "name": "pkcs11-helper",
-          "version": "1.22",
-          "downloadUrl": "http://downloads.sourceforge.net/opensc/pkcs11-helper-1.22.tar.bz2"
+          "version": "1.30.0",
+          "downloadUrl": "https://github.com/OpenSC/pkcs11-helper/releases/download/pkcs11-helper-1.30.0/pkcs11-helper-1.30.0.tar.bz2"
         }
       }
     },
@@ -22113,8 +22113,8 @@
         "type": "other",
         "other": {
           "name": "python-betamax",
-          "version": "0.8.1",
-          "downloadUrl": "https://github.com/sigmavirus24/betamax/archive/0.8.1/betamax-0.8.1.tar.gz"
+          "version": "0.9.0",
+          "downloadUrl": "https://github.com/sigmavirus24/betamax/archive/0.9.0/betamax-0.9.0.tar.gz"
         }
       }
     },
@@ -22873,8 +22873,8 @@
         "type": "other",
         "other": {
           "name": "python-genshi",
-          "version": "0.7.5",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/G/Genshi/Genshi-0.7.5.tar.gz"
+          "version": "0.7.9",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/G/Genshi/Genshi-0.7.9.tar.gz"
         }
       }
     },
@@ -27193,6 +27193,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rubygem-scanf",
+          "version": "1.0.0",
+          "downloadUrl": "https://rubygems.org/gems/scanf-1.0.0.gem"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rubygem-semantic_puppet",
           "version": "1.1.0",
           "downloadUrl": "https://github.com/puppetlabs/semantic_puppet/archive/refs/tags/1.1.0.tar.gz"
@@ -30637,8 +30647,8 @@
         "type": "other",
         "other": {
           "name": "xmlrpc-c",
-          "version": "1.54.06",
-          "downloadUrl": "https://sourceforge.net/projects/xmlrpc-c/files/Xmlrpc-c%20Super%20Stable/1.54.06/xmlrpc-c-1.54.06.tgz"
+          "version": "1.60.04",
+          "downloadUrl": "https://sourceforge.net/projects/xmlrpc-c/files/Xmlrpc-c%20Super%20Stable/1.60.04/xmlrpc-c-1.60.04.tgz"
         }
       }
     },
@@ -31159,8 +31169,8 @@
         "type": "other",
         "other": {
           "name": "z3",
-          "version": "4.8.7",
-          "downloadUrl": "https://github.com/Z3Prover/z3/archive/z3-4.8.7.tar.gz"
+          "version": "4.13.3",
+          "downloadUrl": "https://github.com/Z3Prover/z3/archive/z3-4.13.3.tar.gz"
         }
       }
     },

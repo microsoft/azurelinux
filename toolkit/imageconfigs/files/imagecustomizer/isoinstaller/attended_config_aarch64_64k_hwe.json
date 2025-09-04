@@ -22,7 +22,7 @@
    ],
    "Packages": null,
    "KernelOptions": {
-    "default": "kernel-64k"
+    "default": "kernel-hwe"
    },
    "KernelCommandLine": {
     "CGroup": "",
@@ -75,7 +75,7 @@
    ],
    "Packages": null,
    "KernelOptions": {
-    "default": "kernel-64k"
+    "default": "kernel-hwe"
    },
    "KernelCommandLine": {
     "CGroup": "",
@@ -133,7 +133,7 @@
   ],
   "Packages": null,
   "KernelOptions": {
-   "default": "kernel-64k"
+   "default": "kernel-hwe"
   },
   "KernelCommandLine": {
    "CGroup": "",
