@@ -20983,8 +20983,8 @@
         "type": "other",
         "other": {
           "name": "perl-XML-Writer",
-          "version": "0.625",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/J/JO/JOSEPHW/XML-Writer-0.625.tar.gz"
+          "version": "0.900",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/J/JO/JOSEPHW/XML-Writer-0.900.tar.gz"
         }
       }
     },
