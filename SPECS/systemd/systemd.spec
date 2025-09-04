@@ -32,7 +32,8 @@ Patch9:         mariner-2-do-not-default-zstd-journal-files-for-backwards-compat
 Patch10:        mariner-2-force-use-of-lz4-for-coredump.patch
 Patch11:        networkd-default-use-domains.patch
 Patch12:	CVE-2023-7008.patch
-Patch13:        CVE-2025-4598.patch
+Patch13:        0001-Prerequisite-for-CVE-2025-4598.patch
+Patch14:        CVE-2025-4598.patch
 BuildRequires:  audit-devel
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
@@ -291,7 +292,7 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
-* Mon Jun 16 2025 Akhila Guruju <v-guakhila@microsoft.com> - 250.3-23
+* Mon Jul 03 2025 Akhila Guruju <v-guakhila@microsoft.com> - 250.3-23
 - Patch CVE-2025-4598
 
 * Thu May 22 2025 Akhila Guruju <v-guakhila@microsoft.com> - 250.3-22
