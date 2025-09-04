@@ -31,7 +31,7 @@ BuildRequires: python3-devel
 # distutils are removed from python3 project, use the one
 # from setuptools
 BuildRequires: python3-setuptools
-Buildrequires: python3-cups
+Provides: python3-cups
 
 %description
 This package provides Python bindings for CUPS API,
