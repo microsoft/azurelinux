@@ -132,7 +132,8 @@ fi
 %{_sysconfdir}/*
 %{_unitdir}/*
 
-%changelog* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 24.0.9-18
+%changelog
+* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 24.0.9-18
 - Bump release to rebuild with golang
 
 * Thu May 22 2025 Akhila Guruju <v-guakhila@microsoft.com> - 24.0.9-17
