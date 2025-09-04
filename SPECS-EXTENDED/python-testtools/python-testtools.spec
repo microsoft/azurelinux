@@ -110,7 +110,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} %{python3} -m testtools.run testtools.
 %changelog
 * Fri Feb 21 2025 Jyoti kanase <v-jykanase@microsoft.com> -  2.7.1-8
 - Initial Azure Linux import from Fedora 41 (license: MIT).
-- License verified.
+- License Verified.
 
 * Tue Jul 23 2024 Tomáš Hrnčiar <thrnciar@redhat.com> - 2.7.1-7
 - Backport upstream patch needed for compatibility with pytest 8
