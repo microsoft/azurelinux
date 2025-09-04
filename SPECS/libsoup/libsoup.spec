@@ -4,7 +4,7 @@
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
 Version:        3.4.4
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -66,6 +66,7 @@ Patch16:         CVE-2025-32053.patch
 Patch17:         CVE-2025-4476.patch
 Patch18:         CVE-2025-32907.patch
 Patch19:         CVE-2025-4948.patch
+Patch20:         CVE-2025-4969.patch
 
 %description
 libsoup is HTTP client/server library for GNOME
@@ -133,6 +134,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 
 %changelog
+* Tue Aug 12 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-9
+- Patch for CVE-2025-4969
+
 * Tue Jul 29 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-8
 - Patch for CVE-2025-4948
 

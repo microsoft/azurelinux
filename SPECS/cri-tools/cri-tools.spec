@@ -7,7 +7,7 @@
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.32.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,6 +15,7 @@ Group:          Development/Tools
 URL:            https://github.com/kubernetes-sigs/cri-tools
 Source0:        https://github.com/kubernetes-sigs/cri-tools/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2024-45338.patch
+Patch1:         CVE-2025-22872.patch
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
 BuildRequires:  golang < 1.25
@@ -45,8 +46,11 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 %{_bindir}/critest
 
 %changelog
-* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.32.0-2
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.32.0-3
 - Set BR for golang to < 1.25
+
+* Thu May 22 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.32.0-2
+- Patch CVE-2025-22872
 
 * Thu Jan 16 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.32.0-1
 - Auto-upgrade to 1.32.0 - to sync up with the latest AKS version
