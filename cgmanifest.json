@@ -2496,16 +2496,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "dbxtool",
-          "version": "8",
-          "downloadUrl": "https://github.com/vathpela/dbxtool/releases/download/dbxtool-8/dbxtool-8.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "dconf",
           "version": "0.40.0",
           "downloadUrl": "https://download.gnome.org/sources/dconf/0.40/dconf-0.40.0.tar.xz"
