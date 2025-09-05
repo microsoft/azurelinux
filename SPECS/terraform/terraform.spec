@@ -1,7 +1,7 @@
 Summary:        Infrastructure as code deployment management tool
 Name:           terraform
 Version:        1.3.2
-Release:        26%{?dist}
+Release:        27%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -70,8 +70,11 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./terraform
 %{_bindir}/terraform
 
 %changelog
-* Wed Sep 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.3.2-26
+* Wed Sep 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.3.2-27
 - Patch for CVE-2025-58058
+
+* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.3.2-26
+- Bump release to rebuild with golang
 
 * Fri Apr 04 2025 Sumedh Sharma <sumsharma@microsoft.com> - 1.3.2-25
 - Add patch to resolve CVE-2023-48795
