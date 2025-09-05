@@ -104,6 +104,8 @@ else
     chroot "$chroot_builder_folder" rpm --initdb --dbpath="$TEMP_DB_PATH"
     # Populating the SQLite database with package info.
     while read -r package || [ -n "$package" ]; do
+        # Skip azurelinux-repos packages when upstream repos are disabled to ensure a clean rebuild
+        [ "${DISABLE_UPSTREAM_REPOS}" = "y" ] && (echo $package | grep -q 'azurelinux-repos') && continue
         full_rpm_path=$(find "$rpm_path" -name "$package" -type f 2>>"$chroot_log")
         cp $full_rpm_path $chroot_builder_folder/$package
         echo "Adding RPM DB entry to worker chroot $(format_progress): $package." | tee -a "$chroot_log"
