@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
@@ -25,12 +26,10 @@ const (
 	AzureCLIAccess         = 2
 )
 
-// ErrDownloadInvalidResponse404 is returned when the download response is 404.
-// Example for blob (similar response and code for container case):
+// Azure SDK error for 404-like condition for storage blobs (a similar message is returned for storage containers):
 // RESPONSE 404: 404 The specified blob does not exist.
 // ERROR CODE: BlobNotFound
-
-var ErrDownloadInvalidResponse404 = errors.New("RESPONSE 404")
+const AzureSDK404ErrorPattern = "RESPONSE 404"
 
 var (
 	// Every valid blob URL will be of the form: <storage_account>.blob.core.windows.net/<container>/<blob_name>
@@ -269,7 +268,7 @@ func DownloadFileWithRetry(
 		netErr := azureBlobStorage.Download(ctx, containerName, blobName, dstFile)
 		if netErr != nil {
 			// Check if the error is a 404-like condition (blob or container not found)
-			if errors.Is(netErr, ErrDownloadInvalidResponse404) {
+			if strings.Contains(netErr.Error(), AzureSDK404ErrorPattern) {
 				logger.Log.Warnf("Attempt %d/%d: failed to download (%s/%s) with error: (%s)", retryNum, retry.DefaultDownloadRetryAttempts, containerName, blobName, netErr)
 				logger.Log.Warnf("This error is likely unrecoverable, will not retry")
 				errorWas404 = true

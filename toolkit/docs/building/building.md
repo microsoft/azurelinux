@@ -381,7 +381,7 @@ For SRPM packing (i.e., for retrieving package sources), Azure CLI login can be 
 ```bash
 sudo make build-packages SOURCE_AUTH_MODE="azurecli"
 ```
-Using this ID requires prior `az login` with your managed identity ID.
+Using this mode requires prior `az login` with your managed identity ID.
 
 ## Building Everything From Scratch
 
