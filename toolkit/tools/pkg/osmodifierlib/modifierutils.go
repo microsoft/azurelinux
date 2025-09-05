@@ -61,6 +61,67 @@ func doModifications(baseConfigPath string, osConfig *osmodifierapi.OS) error {
 		}
 	}
 
+	if osConfig.Verity != nil {
+
+		bootCustomizer, err := imagecustomizerlib.NewBootCustomizer(dummyChroot)
+		if err != nil {
+			return err
+		}
+
+		err = updateDefaultGrubForVerity(osConfig.Verity, bootCustomizer)
+		if err != nil {
+			return err
+		}
+
+		err = bootCustomizer.WriteToFile(dummyChroot)
+		if err != nil {
+			return err
+		}
+	}
+
+	if osConfig.RootDevice != "" {
+
+		bootCustomizer, err := imagecustomizerlib.NewBootCustomizer(dummyChroot)
+		if err != nil {
+			return err
+		}
+
+		err = bootCustomizer.SetRootDevice(osConfig.RootDevice)
+		if err != nil {
+			return err
+		}
+
+		err = bootCustomizer.WriteToFile(dummyChroot)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func updateDefaultGrubForVerity(verity *imagecustomizerapi.Verity, bootCustomizer *imagecustomizerlib.BootCustomizer) error {
+
+	var err error
+
+	formattedCorruptionOption, err := imagecustomizerlib.SystemdFormatCorruptionOption(verity.CorruptionOption)
+	if err != nil {
+		return err
+	}
+
+	newArgs := []string{
+		"rd.systemd.verity=1",
+		fmt.Sprintf("systemd.verity_root_data=%s", verity.DataDeviceId),
+		fmt.Sprintf("systemd.verity_root_hash=%s", verity.HashDeviceId),
+		fmt.Sprintf("systemd.verity_root_options=%s", formattedCorruptionOption),
+	}
+
+	err = bootCustomizer.UpdateKernelCommandLineArgs("GRUB_CMDLINE_LINUX", []string{"rd.systemd.verity",
+		"systemd.verity_root_data", "systemd.verity_root_hash", "systemd.verity_root_options"}, newArgs)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -109,12 +170,7 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, bootCustomizer *i
 
 	logger.Log.Infof("Configuring SELinux mode")
 
-	err = bootCustomizer.UpdateSELinuxCommandLine(selinuxMode)
-	if err != nil {
-		return err
-	}
-
-	err = imagecustomizerlib.UpdateSELinuxModeInConfigFile(selinuxMode, dummyChroot)
+	err = bootCustomizer.UpdateSELinuxCommandLineWithEnforcingArg(selinuxMode)
 	if err != nil {
 		return err
 	}
