@@ -208,7 +208,7 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
-* Wed Sep 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.55.0-24
+* Wed Sep 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.55.0-25
 - Patch for CVE-2025-58058
 
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.55.0-24
