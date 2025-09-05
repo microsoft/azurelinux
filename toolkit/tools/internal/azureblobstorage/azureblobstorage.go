@@ -25,11 +25,11 @@ const (
 	AzureCLIAccess         = 2
 )
 
-// ErrDownloadInvalidResponse404 is returned when the download response is 404.
+// Azure SDK error patterns for 404-like conditions
 // Example for blob (similar response and code for container case):
 // RESPONSE 404: 404 The specified blob does not exist.
 // ERROR CODE: BlobNotFound
-var ErrDownloadInvalidResponse404 = errors.New("RESPONSE 404")
+const AzureSDK404ErrorPattern = "RESPONSE 404"
 
 // ParseAzureBlobStorageURL parses an Azure Blob Storage URL and extracts storage account, container, and optionally blob information.
 func ParseAzureBlobStorageURL(urlStr string) (storageAccountName, containerName, blobName string, err error) {
@@ -254,7 +254,7 @@ func DownloadFileWithRetry(
 		netErr := azureBlobStorage.Download(ctx, containerName, blobName, dstFile)
 		if netErr != nil {
 			// Check if the error is a 404-like condition (blob or container not found)
-			if errors.Is(netErr, ErrDownloadInvalidResponse404) {
+			if strings.Contains(netErr.Error(), AzureSDK404ErrorPattern) {
 				logger.Log.Warnf("Attempt %d/%d: Failed to download (%s/%s) with error: (%s)", retryNum, retry.DefaultDownloadRetryAttempts, containerName, blobName, netErr)
 				logger.Log.Warnf("This error is likely unrecoverable, will not retry")
 				errorWas404 = true
