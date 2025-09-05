@@ -3,7 +3,11 @@
 Summary:        Simple and easy way to configure a layer 3 network fabric designed for Kubernetes
 Name:           flannel
 Version:        0.24.2
+<<<<<<< HEAD
 Release:        17%{?dist}
+=======
+Release:        16%{?dist}
+>>>>>>> 6a0fb9388 (golang: bump Go version; major version update [fasttrack/3.0] (#14616))
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,7 +22,11 @@ Patch3:         CVE-2025-30204.patch
 Patch4:         CVE-2024-51744.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
+<<<<<<< HEAD
 BuildRequires:  glibc-static >= 2.38-12%{?dist}
+=======
+BuildRequires:  glibc-static >= 2.38-11%{?dist}
+>>>>>>> 6a0fb9388 (golang: bump Go version; major version update [fasttrack/3.0] (#14616))
 BuildRequires:  golang < 1.25
 BuildRequires:  kernel-headers
 
@@ -52,9 +60,12 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 %{_bindir}/flanneld
 
 %changelog
+<<<<<<< HEAD
 * Fri Sep 05 2025 Andrew Phelps <anphel@microsoft.com> - 0.24.2-17
 - Bump to rebuild with updated glibc
 
+=======
+>>>>>>> 6a0fb9388 (golang: bump Go version; major version update [fasttrack/3.0] (#14616))
 * Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 0.24.2-16
 - Set BR for golang to < 1.25
 
