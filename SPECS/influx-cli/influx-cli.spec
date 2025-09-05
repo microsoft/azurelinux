@@ -81,7 +81,7 @@ bin/influx completion zsh > %{buildroot}/%{_datadir}/zsh/site-functions/_influx
 %{_datadir}/zsh
 
 %changelog
-* Wed Aug 20 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.7.0-1
+* Fri Sep 05 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.7.0-1
 - Upgrade to version 2.7.0.
 
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.6.1-18
