@@ -1,0 +1,88 @@
+From 7a2813be7242f736e73f6c84c539ca06048be169 Mon Sep 17 00:00:00 2001
+From: JohnD <john.donoghue@ieee.org>
+Date: Tue, 12 Dec 2023 18:16:31 -0500
+Subject: [PATCH] Add H5FD_http_finalize function and call on hdf5 finalize
+
+Fixes Unidata#2617
+---
+ libhdf5/H5FDhttp.c     | 28 +++++++++++++++++++++++++---
+ libhdf5/H5FDhttp.h     |  2 ++
+ libhdf5/hdf5dispatch.c |  3 +++
+ 3 files changed, 30 insertions(+), 3 deletions(-)
+
+diff --git a/libhdf5/H5FDhttp.c b/libhdf5/H5FDhttp.c
+index c6658f46f2..d48aeb8c3e 100644
+--- a/libhdf5/H5FDhttp.c
++++ b/libhdf5/H5FDhttp.c
+@@ -239,6 +239,31 @@ H5FD_http_init(void)
+     return H5FD_HTTP_g;
+ } /* end H5FD_http_init() */
+ 
++
++/*-------------------------------------------------------------------------
++ * Function:  H5FD_http_finalize
++ *
++ * Purpose:  Free this driver by unregistering the driver with the
++ *    library.
++ *
++ * Returns:     Non-negative on success or negative on failure
++ *
++ * Programmer:  John Donoghue
++ *              Tuesday, December 12, 2023
++ *
++ *-------------------------------------------------------------------------
++ */
++EXTERNL hid_t
++H5FD_http_finalize(void)
++{
++    /* Reset VFL ID */
++    if (H5FD_HTTP_g)
++         H5FDunregister(H5FD_HTTP_g);
++    H5FD_HTTP_g = 0;
++
++    return H5FD_HTTP_g;
++} /* end H5FD_http_finalize() */
++
+ 
+ /*---------------------------------------------------------------------------
+  * Function:  H5FD_http_term
+@@ -256,9 +281,6 @@ H5FD_http_init(void)
+ static herr_t
+ H5FD_http_term(void)
+ {
+-    /* Reset VFL ID */
+-    H5FD_HTTP_g = 0;
+-
+     return 0;
+ } /* end H5FD_http_term() */
+ #endif
+diff --git a/libhdf5/H5FDhttp.h b/libhdf5/H5FDhttp.h
+index f3c46dca59..ee3d283705 100644
+--- a/libhdf5/H5FDhttp.h
++++ b/libhdf5/H5FDhttp.h
+@@ -44,9 +44,11 @@ extern "C" {
+ 
+ #if 0
+ H5_DLL hid_t H5FD_http_init(void);
++H5_DLL hid_t H5FD_http_finalize(void);
+ H5_DLL herr_t H5Pset_fapl_http(hid_t fapl_id);
+ #else
+ EXTERNL hid_t H5FD_http_init(void);
++EXTERNL hid_t H5FD_http_finalize(void);
+ EXTERNL herr_t H5Pset_fapl_http(hid_t fapl_id);
+ #endif
+ 
+diff --git a/libhdf5/hdf5dispatch.c b/libhdf5/hdf5dispatch.c
+index 130f0f0766..1e8f980daa 100644
+--- a/libhdf5/hdf5dispatch.c
++++ b/libhdf5/hdf5dispatch.c
+@@ -142,6 +142,9 @@ NC_HDF5_initialize(void)
+ int
+ NC_HDF5_finalize(void)
+ {
++#ifdef ENABLE_BYTERANGE
++    (void)H5FD_http_finalize();
++#endif
+     (void)nc4_hdf5_finalize();
+     return NC_NOERR;
+ }
