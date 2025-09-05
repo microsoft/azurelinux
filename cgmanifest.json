@@ -25262,16 +25262,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-uamqp",
-          "version": "1.5.1",
-          "downloadUrl": "https://github.com/Azure/azure-uamqp-python/archive/v1.5.1/uamqp-1.5.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-unittest2",
           "version": "1.1.0",
           "downloadUrl": "https://pypi.python.org/packages/source/u/unittest2/unittest2-1.1.0.tar.gz"
