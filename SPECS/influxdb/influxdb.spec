@@ -151,7 +151,7 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
-* Wed Aug 20 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.7.0-1
+* Fri Sep 05 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.7.0-1
 - Upgrade to version 2.7.0.
 
 * Mon Sep 22 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.6.1-24
