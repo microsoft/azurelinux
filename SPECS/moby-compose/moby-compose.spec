@@ -1,7 +1,7 @@
 Summary:        Define and run multi-container applications with Docker
 Name:           moby-compose
 Version:        2.17.3
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -74,6 +74,9 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 %{_libexecdir}/docker/cli-plugins/docker-compose
 
 %changelog
+* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.17.3-11
+- Bump release to rebuild with golang
+
 * Mon Mar 10 2025 Sudipta Pandit <sudpandit@microsoft.com> - 2.17.3-10
 - Add patch for CVE-2025-22869
 

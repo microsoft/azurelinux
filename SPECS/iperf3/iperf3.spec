@@ -1,7 +1,7 @@
 Summary:        A network performance benchmark tool.
 Name:           iperf3
 Version:        3.18
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and MIT and Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,8 @@ Group:          Applications/System
 URL:            https://github.com/esnet/iperf
 Source0:        https://github.com/esnet/iperf/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch1:         disablepg.patch
+Patch2:         CVE-2025-54350.patch
+Patch3:         CVE-2025-54349.patch
 BuildRequires:  autoconf >= 2.71
 BuildRequires:  automake
 
@@ -66,6 +68,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/libiperf.3.gz
 
 %changelog
+* Mon Aug 04 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.18-2
+- Patch for CVE-2025-54350, CVE-2025-54349
+
 * Sun Dec 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.18-1
 - Auto-upgrade to 3.18 - CVE-2024-53580
 

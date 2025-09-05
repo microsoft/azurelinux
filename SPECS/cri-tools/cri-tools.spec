@@ -7,7 +7,7 @@
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.29.0
-Release:        6%{?dist}
+Release:        8%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,7 @@ Patch0:         CVE-2024-21626.patch
 Patch1:         CVE-2023-45288.patch
 Patch2:         CVE-2024-24786.patch
 Patch3:         CVE-2024-45338.patch
+Patch4:         CVE-2025-22872.patch
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
 BuildRequires:  golang
@@ -48,6 +49,12 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 %{_bindir}/critest
 
 %changelog
+* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.29.0-8
+- Bump release to rebuild with golang
+
+* Thu May 22 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.29.0-7
+- Patch CVE-2025-22872
+
 * Mon Jan 06 2025 Sumedh Sharma <sumsharma@microsoft.com> - 1.29.0-6
 - Add patch for CVE-2024-45338
 

@@ -19,7 +19,7 @@ import (
 const (
 	AnonymousAccess        = 0
 	ServicePrincipalAccess = 1
-	ManagedIdentityAccess  = 2
+	AzureCLIAccess         = 2
 )
 
 type AzureBlobStorage struct {
@@ -36,13 +36,13 @@ func (abs *AzureBlobStorage) Upload(
 
 	localFile, err := os.OpenFile(localFileName, os.O_RDONLY, 0)
 	if err != nil {
-		return fmt.Errorf("Failed to open local file for upload:\n%w", err)
+		return fmt.Errorf("failed to open local file for upload:\n%w", err)
 	}
 	defer localFile.Close()
 
 	_, err = abs.theClient.UploadFile(ctx, containerName, blobName, localFile, nil)
 	if err != nil {
-		return fmt.Errorf("Failed to upload local file to blob:\n%w", err)
+		return fmt.Errorf("failed to upload local file to blob:\n%w", err)
 	}
 
 	uploadEndTime := time.Now()
@@ -77,7 +77,7 @@ func (abs *AzureBlobStorage) Download(
 
 	_, err = abs.theClient.DownloadFile(ctx, containerName, blobName, localFile, nil)
 	if err != nil {
-		return fmt.Errorf("Failed to download blob to local file:\n%w", err)
+		return fmt.Errorf("failed to download blob to local file:\n%w", err)
 	}
 
 	downloadEndTime := time.Now()
@@ -94,7 +94,7 @@ func (abs *AzureBlobStorage) Delete(
 	deleteStartTime := time.Now()
 	_, err = abs.theClient.DeleteBlob(ctx, containerName, blobName, nil)
 	if err != nil {
-		return fmt.Errorf("Failed to delete blob:\n%w", err)
+		return fmt.Errorf("failed to delete blob:\n%w", err)
 	}
 	deleteEndTime := time.Now()
 	logger.Log.Infof("  delete time: %v", deleteEndTime.Sub(deleteStartTime))
@@ -103,49 +103,45 @@ func (abs *AzureBlobStorage) Delete(
 }
 
 func Create(tenantId string, userName string, password string, storageAccount string, authenticationType int) (abs *AzureBlobStorage, err error) {
-
 	url := "https://" + storageAccount + ".blob.core.windows.net/"
 
 	abs = &AzureBlobStorage{}
 
-	if authenticationType == AnonymousAccess {
-
+	switch authenticationType {
+	case AnonymousAccess:
 		abs.theClient, err = azblob.NewClientWithNoCredential(url, nil)
 		if err != nil {
-			return nil, fmt.Errorf("Unable to init azure blob storage read-only client:\n%w", err)
+			return nil, fmt.Errorf("unable to init azure blob storage read-only client:\n%w", err)
 		}
 
 		return abs, nil
 
-	} else if authenticationType == ServicePrincipalAccess {
-
+	case ServicePrincipalAccess:
 		credential, err := azidentity.NewClientSecretCredential(tenantId, userName, password, nil)
 		if err != nil {
-			return nil, fmt.Errorf("Unable to init azure service principal identity:\n%w", err)
+			return nil, fmt.Errorf("unable to init azure service principal identity:\n%w", err)
 		}
 
 		abs.theClient, err = azblob.NewClient(url, credential, nil)
 		if err != nil {
-			return nil, fmt.Errorf("Unable to init azure blob storage read-write client:\n%w", err)
+			return nil, fmt.Errorf("unable to init azure blob storage read-write client:\n%w", err)
 		}
 
 		return abs, nil
 
-	} else if authenticationType == ManagedIdentityAccess {
-
-		credential, err := azidentity.NewDefaultAzureCredential(nil)
+	case AzureCLIAccess:
+		credential, err := azidentity.NewAzureCLICredential(nil)
 		if err != nil {
-			return nil, fmt.Errorf("Unable to init azure managed identity:\n%w", err)
+			return nil, fmt.Errorf("unable to init azure managed identity:\n%w", err)
 		}
 
 		abs.theClient, err = azblob.NewClient(url, credential, nil)
 		if err != nil {
-			return nil, fmt.Errorf("Unable to init azure blob storage read-write client:\n%w", err)
+			return nil, fmt.Errorf("unable to init azure blob storage read-write client:\n%w", err)
 		}
 
 		return abs, nil
-
 	}
 
-	return nil, errors.New("Unknown authentication type.")
+	return nil, errors.New("unknown authentication type")
 }
