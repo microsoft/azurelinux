@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"strings"
+	"regexp"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
@@ -29,38 +29,53 @@ const (
 // Example for blob (similar response and code for container case):
 // RESPONSE 404: 404 The specified blob does not exist.
 // ERROR CODE: BlobNotFound
+
 var ErrDownloadInvalidResponse404 = errors.New("RESPONSE 404")
+
+var (
+	// Every valid blob URL will be of the form: <storage_account>.blob.core.windows.net/<container>/<blob_name>
+	// With <blob_name> being optional.
+	//
+	// For:
+	//     https://mystorageaccount.blob.core.windows.net/mycontainer/my/blob/name
+	//
+	// We'd get:
+	//   - storage account:	mystorageaccount
+	//   - container:       mycontainer
+	//   - blob name:       my/blob/name
+	blobStorageURLRegex = regexp.MustCompile(`^([^.]+)\.blob\.core\.windows\.net/([^/]+)(?:/([^?#]+))?`)
+)
+
+const (
+	blobStorageURLMatchSubString = iota
+	blobStorageURLStorageName
+	blobStorageURLContainerName
+	blobStorageURLBlobName
+	blobStorageURLMaxMatchLen
+)
 
 // ParseAzureBlobStorageURL parses an Azure Blob Storage URL and extracts storage account, container, and optionally blob information.
 func ParseAzureBlobStorageURL(urlStr string) (storageAccountName, containerName, blobName string, err error) {
 	parsedURL, err := url.Parse(urlStr)
 	if err != nil {
-		return "", "", "", fmt.Errorf("failed to parse URL: %w", err)
+		return "", "", "", fmt.Errorf("failed to parse URL (%s):\n%w", urlStr, err)
 	}
 
-	if !strings.HasSuffix(parsedURL.Host, ".blob.core.windows.net") {
-		return "", "", "", fmt.Errorf("not a common Azure Blob Storage URL format " +
-			"(expected <storage_account>.blob.core.windows.net)")
+	if parsedURL.Scheme == "" {
+		return "", "", "", fmt.Errorf("URL (%s) is not a valid Azure Blob Storage URL - must start with a scheme", urlStr)
 	}
 
-	// Extract storage account from hostname (e.g., "mystorageaccount.blob.core.windows.net")
-	hostParts := strings.Split(parsedURL.Host, ".")
-	if len(hostParts) < 4 {
-		return "", "", "", fmt.Errorf("invalid Azure Blob Storage hostname format")
-	}
-	storageAccountName = hostParts[0]
-
-	// Extract container name and optionally blob name from path (e.g., "/container" or "/container/folder/blob")
-	pathParts := strings.Split(strings.Trim(parsedURL.Path, "/"), "/")
-	if len(pathParts) < 1 || pathParts[0] == "" {
-		return "", "", "", fmt.Errorf("invalid Azure Blob Storage path format: missing container name")
+	matches := blobStorageURLRegex.FindStringSubmatch(parsedURL.Host + parsedURL.Path)
+	if len(matches) < blobStorageURLBlobName {
+		return "", "", "", fmt.Errorf("URL (%s) is not a valid Azure Blob Storage URL"+
+			" (expected: <scheme>://<storage_account>.blob.core.windows.net/<container>/<optional_blob_name>)", urlStr)
 	}
 
-	containerName = pathParts[0]
+	storageAccountName = matches[blobStorageURLStorageName]
+	containerName = matches[blobStorageURLContainerName]
 
-	// If there are more path parts, they form the blob name (including folder hierarchy)
-	if len(pathParts) > 1 {
-		blobName = strings.Join(pathParts[1:], "/")
+	if len(matches) > blobStorageURLBlobName {
+		blobName = matches[blobStorageURLBlobName]
 	}
 
 	return storageAccountName, containerName, blobName, nil
@@ -198,12 +213,12 @@ func CreateFromURL(storageAccountURL string) (abs *AzureBlobStorage, err error) 
 	// Parse the URL to extract storage account information
 	storageAccountName, _, _, parseErr := ParseAzureBlobStorageURL(storageAccountURL)
 	if parseErr != nil {
-		return nil, fmt.Errorf("failed to parse storage account URL: %w", parseErr)
+		return nil, fmt.Errorf("failed to parse storage account URL:\n%w", parseErr)
 	}
 
 	abs, err = Create("", "", "", storageAccountName, AzureCLIAccess)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create Azure Blob Storage client: %w", err)
+		return nil, fmt.Errorf("failed to create Azure Blob Storage client:\n%w", err)
 	}
 
 	return abs, nil
@@ -243,10 +258,10 @@ func DownloadFileWithRetry(
 	// Parse the URL to get container and blob names
 	_, containerName, blobName, parseErr := ParseAzureBlobStorageURL(srcUrl)
 	if parseErr != nil {
-		return false, fmt.Errorf("failed to parse source URL: %w", parseErr)
+		return false, fmt.Errorf("failed to parse source URL:\n%w", parseErr)
 	}
 
-	logger.Log.Infof("Attempting Azure SDK download for blob: %s/%s", containerName, blobName)
+	logger.Log.Infof("Attempting Azure SDK download for blob (%s/%s)", containerName, blobName)
 
 	retryNum := 1
 	errorWas404 := false
@@ -255,12 +270,12 @@ func DownloadFileWithRetry(
 		if netErr != nil {
 			// Check if the error is a 404-like condition (blob or container not found)
 			if errors.Is(netErr, ErrDownloadInvalidResponse404) {
-				logger.Log.Warnf("Attempt %d/%d: Failed to download (%s/%s) with error: (%s)", retryNum, retry.DefaultDownloadRetryAttempts, containerName, blobName, netErr)
+				logger.Log.Warnf("Attempt %d/%d: failed to download (%s/%s) with error: (%s)", retryNum, retry.DefaultDownloadRetryAttempts, containerName, blobName, netErr)
 				logger.Log.Warnf("This error is likely unrecoverable, will not retry")
 				errorWas404 = true
 				closeCtx()
 			} else {
-				logger.Log.Infof("Attempt %d/%d: Failed to download (%s/%s) with error: (%s)", retryNum, retry.DefaultDownloadRetryAttempts, containerName, blobName, netErr)
+				logger.Log.Infof("Attempt %d/%d: failed to download (%s/%s) with error: (%s)", retryNum, retry.DefaultDownloadRetryAttempts, containerName, blobName, netErr)
 			}
 		}
 		retryNum++
