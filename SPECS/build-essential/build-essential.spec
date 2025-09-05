@@ -17,11 +17,11 @@ Requires:       glibc-devel
 Requires:       gzip
 Requires:       kernel-headers
 Requires:       libtool
+Requires:       libxcrypt-devel
 Requires:       make
 Requires:       patch
 Requires:       pkgconf
 Requires:       tar
-Requires:       libxcrypt-devel
 
 %description
 Metapackage to install all build tools
