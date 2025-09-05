@@ -21,6 +21,6 @@ func (t PartitionTableType) IsValid() error {
 		return nil
 
 	default:
-		return fmt.Errorf("invalid PartitionTableType value (%s)", t)
+		return fmt.Errorf("invalid partitionTableType value (%s)", t)
 	}
 }
