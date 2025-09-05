@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "mod_auth_gssapi-1.6.1.tar.gz": "a8fd06f4d46b6287796d6ccbe93290d02a9dbd76bc7db75e03d366ad34151854"
- }
-}
+    "Signatures": {
+     "mod_auth_gssapi-1.6.5.tar.gz": "a4bb89a2704b2a9461fbc9c0397f326b092c358d9d12b6311c2aa63d161f0530"
+    }
+   }
