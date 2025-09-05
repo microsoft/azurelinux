@@ -2,33 +2,26 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:          Software and/or Hardware watchdog daemon
 Name:             watchdog
-Version:          5.15
-Release:          8%{?dist}
-License:          GPLv2+
+Version:          5.16
+Release:          1%{?dist}
+License:          GPL-2.0-or-later
 
 URL:              http://sourceforge.net/projects/watchdog/
-Source0:          http://downloads.sourceforge.net/watchdog/watchdog-%{version}.tar.gz
+Source0:          https://downloads.sourceforge.net/watchdog/watchdog-%{version}.tar.gz
 Source2:          README.watchdog.ipmi
 Source3:          README.Fedora
 Source4:          watchdog.service
-Source5:          watchdog-ping.service
+Source5:          watchdog-ping.services
 
-# Upstream patches since 5.15.
-Patch1:       0001-Include-linux-param.h-for-EXEC_PAGESIZE-definition.patch
-Patch2:       0002-Generalize-and-make-watchdog-refresh-settimeout-work.patch
-Patch3:       0003-Ignore-build-products-in-GIT.patch
-Patch4:       0004-Compile-with-musl-when-nfs-is-disabled.patch
-Patch5:       0005-Rename-READ_ENUM-to-READ_YESNO.patch
-Patch6:       0006-Make-IT87-fix-up-automatic-by-default.patch
-Patch7:       0007-Synced-Debian-files-with-5.15-2.patch
-Patch8:       0008-Fix-automated-CentOS-7-build.patch
-Patch9:       0009-Bugfix-against-watchdog-configuration-file-corruptio.patch
 # Fixes building on glibc without RPC.  Sent upstream 2019-02-06.
-Patch10:      0010-Choose-libtirpc-or-another-RPC-library-for-XDR-heade.patch
+Patch1:           0001-Choose-libtirpc-or-another-RPC-library-for-XDR-heade.patch
+# Fixes potentional mem leak
+Patch2:           0002-mem-leak-verbose.patch
 
 # Non-upstream patch to document SELinux support.
-Patch99:      0004-watchdog-5.13-rhseldoc.patch
+Patch99:      0099-watchdog-5.16-rhseldoc.patch
 
+BuildRequires: make
 BuildRequires:    gcc
 BuildRequires:    libtirpc-devel
 BuildRequires:    systemd-units
@@ -61,14 +54,6 @@ expiration) initiated by the BMC.
 %setup -q -n %{name}-%{version}
 %patch 1 -p1
 %patch 2 -p1
-%patch 3 -p1
-%patch 4 -p1
-%patch 5 -p1
-%patch 6 -p1
-%patch 7 -p1
-%patch 8 -p1
-%patch 9 -p1
-%patch 10 -p1
 %patch 99 -p1 -b .rhseldoc
 autoreconf -i
 
@@ -144,8 +129,49 @@ rm %{name}.sysconfig
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Mar 18 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 5.16-1
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.16-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.16-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.16-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jul 19 2023 Josef Ridky <jridky@redhat.com> - 5.16-6
+- Migrate to SPDX license format
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.16-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.16-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.16-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Oct 14 2021 Josef Ridky <jridky@redhat.com> - 5.16-2
+- fix memory leak when verbose mode is on
+
+* Tue Aug 10 2021 Josef Ridky <jridky@redhat.com> - 5.16-1
+- New upstream release 5.16
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.15-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 5.15-10
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.15-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.15-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Mon Feb 03 2020 Václav Doležal <vdolezal@redhat.com> - 5.15-7
 - Clean up old SysV-init related files
