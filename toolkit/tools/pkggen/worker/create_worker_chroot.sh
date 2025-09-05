@@ -116,12 +116,14 @@ else
     chroot "$chroot_builder_folder" mv "$TEMP_DB_PATH" /var/lib/rpm
 fi
 
-echo "Importing Azure Linux GPG keys." | tee -a "$chroot_log"
-for gpg_key in $(chroot "$chroot_builder_folder" rpm -q -l azurelinux-repos-shared | grep "rpm-gpg")
-do
-    echo "Importing GPG key: $gpg_key" | tee -a "$chroot_log"
-    chroot "$chroot_builder_folder" rpm --import "$gpg_key"
-done
+if [ "${DISABLE_UPSTREAM_REPOS}" != "y" ]; then
+    echo "Importing Azure Linux GPG keys." | tee -a "$chroot_log"
+    for gpg_key in $(chroot "$chroot_builder_folder" rpm -q -l azurelinux-repos-shared | grep "rpm-gpg")
+    do
+        echo "Importing GPG key: $gpg_key" | tee -a "$chroot_log"
+        chroot "$chroot_builder_folder" rpm --import "$gpg_key"
+    done
+fi
 
 HOME=$ORIGINAL_HOME
 
