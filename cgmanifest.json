@@ -15694,7 +15694,7 @@
         "other": {
           "name": "oro",
           "version": "2.0.8",
-          "downloadUrl": "http://archive.apache.org/dist/jakarta/oro/jakarta-oro-2.0.8.tar.gz"
+          "downloadUrl": "https://archive.apache.org/dist/jakarta/oro/source/jakarta-oro-2.0.8.tar.gz"
         }
       }
     },
