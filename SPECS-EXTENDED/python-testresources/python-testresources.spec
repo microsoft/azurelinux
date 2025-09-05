@@ -3,8 +3,8 @@ Distribution:   Azure Linux
 %global pypi_name testresources
 
 Name:           python-%{pypi_name}
-Version:        1.0.0
-Release:        16%{?dist}
+Version:        2.0.1
+Release:        1%{?dist}
 Summary:        Testresources, a pyunit extension for managing expensive test resources
 
 License:        ASL 2.0 and BSD and GPLv2+
@@ -64,6 +64,9 @@ rm -rf lib/%{pypi_name}.egg-info
 %{python3_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.1-1
+- Auto-upgrade to 2.0.1 - Extended package upgrade to IDC
+
 * Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 1.0.0-16
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add understated dependency on python3-pbr
