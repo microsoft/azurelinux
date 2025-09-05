@@ -10,8 +10,8 @@ Distribution:   Azure Linux
 %global srcname productmd
 
 Name:           python-%{srcname}
-Version:        1.30
-Release:        2%{?dist}
+Version:        1.41
+Release:        1%{?dist}
 Summary:        Library providing parsers for metadata related to OS installation
 
 License:        LGPLv2+
@@ -104,6 +104,10 @@ Requires:       python%{python3_pkgversion}-six
 %endif
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.41-1
+- Auto-upgrade to 1.41 - Extended package upgrade to IDC
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.30-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 
