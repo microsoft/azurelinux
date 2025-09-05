@@ -24102,7 +24102,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-pycares",
+          "name": "python3-pycares",
           "version": "4.5.0",
           "downloadUrl": "https://github.com/saghul/pycares/archive/refs/tags/v4.5.0.tar.gz"
         }
