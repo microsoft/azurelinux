@@ -28826,8 +28826,8 @@
         "type": "other",
         "other": {
           "name": "tbb",
-          "version": "2020.2",
-          "downloadUrl": "https://github.com/intel/tbb/archive/v2020.2/tbb-2020.2.tar.gz"
+          "version": "2021.13.0",
+          "downloadUrl": "https://github.com/intel/tbb/archive/v2021.13.0/tbb-2021.13.0.tar.gz"
         }
       }
     },
