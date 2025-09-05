@@ -1,7 +1,7 @@
 Summary:        Command line tool for working with Jenkins X.
 Name:           jx
 Version:        3.10.182
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,6 +27,7 @@ Source0:        https://github.com/jenkins-x/jx/archive/v%{version}.tar.gz#/%{na
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2025-58058.patch
 
 BuildRequires:  golang >= 1.17.1
 %global debug_package %{nil}
@@ -62,6 +63,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./build/jx
 %{_bindir}/jx
 
 %changelog
+* Wed Sep 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.10.182-2
+- Patch for CVE-2025-58058
+
 * Thu Feb 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.10.182-1
 - Auto-upgrade to 3.10.182 - Fix CVE-2023-39325 and CVE-2023-44487 in jx
 
