@@ -4,7 +4,7 @@
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
 Version:        2.37.9
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,6 +24,7 @@ Patch3:         CVE-2023-39325.patch
 Patch4:         CVE-2023-45288.patch
 Patch5:         CVE-2025-30204.patch
 Patch6:         CVE-2024-51744.patch
+Patch7:         fix-ptests-for-local-test-CA-certificate.patch
 BuildRequires:  golang
 BuildRequires:  nodejs
 BuildRequires:  systemd-rpm-macros
@@ -137,6 +138,10 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
+* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.37.9-5
+- Bump release to rebuild with golang
+- Fix ptests for local test CA certificate
+
 * Thu Apr 03 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.37.9-4
 - Fix CVE-2024-51744 with an upstream patch
 
