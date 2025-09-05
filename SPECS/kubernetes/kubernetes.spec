@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.30.10
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,13 +28,8 @@ Patch6:         CVE-2025-30204.patch
 Patch7:         CVE-2025-22872.patch
 Patch8:         CVE-2025-4563.patch
 BuildRequires:  flex-devel
-<<<<<<< HEAD
 BuildRequires:  glibc-static >= 2.38-12%{?dist}
-BuildRequires:  golang
-=======
-BuildRequires:  glibc-static >= 2.38-11%{?dist}
 BuildRequires:  golang < 1.25
->>>>>>> 6a0fb9388 (golang: bump Go version; major version update [fasttrack/3.0] (#14616))
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
 BuildRequires:  which
@@ -283,13 +278,11 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
-<<<<<<< HEAD
-* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.30.10-10
+* Fri Sep 05 2025 Andrew Phelps <anphel@microsoft.com> - 1.30.10-11
 - Bump to rebuild with updated glibc
-=======
+
 * Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.30.10-10
 - Set BR for golang to < 1.25
->>>>>>> 6a0fb9388 (golang: bump Go version; major version update [fasttrack/3.0] (#14616))
 
 * Mon Jun 30 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.30.10-9
 - Patch CVE-2025-4563
