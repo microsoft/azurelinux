@@ -27,10 +27,17 @@
 #
 
 %if 0%{azl}
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
-%global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
+    %ifarch aarch64
+    # hard code versions due to ADO bug:58993948
+    %global target_kernel_version_full 6.12.40.1-1.azl3
+    %global target_azl_build_kernel_version 6.12.40.1
+    %global release_suffix _6.12.40.1.1
+    %else
+    %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
+    %global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
+    %global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+    %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
+    %endif
 %else
 %global target_kernel_version_full f.a.k.e
 %endif
@@ -106,7 +113,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel
 Version:	 24.10
-Release:	 20%{release_suffix}%{?dist}
+Release:	 21%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -116,7 +123,6 @@ Patch0:          001-fix-module-init-for-ibt.patch
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-ExclusiveArch:   x86_64
 
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -130,15 +136,22 @@ Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
 
+%ifarch aarch64
+BuildRequires:  kernel-hwe-devel = %{target_kernel_version_full}
+%else
 BuildRequires:  kernel-devel = %{target_kernel_version_full}
-BuildRequires:  kernel-headers = %{target_kernel_version_full}
+%endif
 BuildRequires:  binutils
 BuildRequires:  kmod
 BuildRequires:  libstdc++-devel
 BuildRequires:  libunwind-devel
 BuildRequires:  pkgconfig
 
+%ifarch aarch64
+Requires: kernel-hwe = %{target_kernel_version_full}
+%else
 Requires: kernel = %{target_kernel_version_full}
+%endif
 Requires: kmod
 Requires: libstdc++
 Requires: libunwind
@@ -741,6 +754,10 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
+* Wed Jul 09 2025 Elaheh Dehghani <edehghani@microsoft.com> - 24.10-21
+- Enabled aarch64 (ARM64) build by removing ExclusiveArch
+- Build aarch64 (ARM64) build using kernel 6.12.40
+
 * Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-20
 - Add kernel version and release nb into release nb
 
