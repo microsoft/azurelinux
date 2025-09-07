@@ -46,6 +46,7 @@ Patch16:        CVE-2024-33600.patch
 Patch17:        CVE-2024-33601.patch
 Patch18:        CVE-2025-0395.patch
 Patch19:        CVE-2025-4802.patch
+Patch20:		test-CVE-2025-4802.patch
 
 # Patches for testing
 Patch100:       0001-Remove-Wno-format-cflag-from-tests.patch
@@ -370,6 +371,7 @@ grep "^FAIL: nptl/tst-mutex10" tests.sum >/dev/null && n=$((n+1)) ||:
 %changelog
 * Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.38-12
 - Fix Patch application of CVE-2025-4802
+- Add test for CVE-2025-4802
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.38-11
 - Patch CVE-2023-4527, CVE-2023-4806, CVE-2024-33599, CVE-2024-33600, CVE-2024-33601, CVE-2025-0395, CVE-2025-4802
