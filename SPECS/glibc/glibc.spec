@@ -10,7 +10,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -367,6 +367,9 @@ grep "^FAIL: nptl/tst-mutex10" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
+* Sun Sep 07 2025 Chris Co <chrco@microsoft.com> - 2.38-13
+- test glibc build
+
 * Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 2.38-12
 - Bump to rebuild with build-id fix from toolchain gcc
 
