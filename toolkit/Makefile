@@ -23,6 +23,8 @@ PACKAGE_BUILD_LIST      ?=
 PACKAGE_REBUILD_LIST    ?=
 ##help:var:PACKAGE_IGNORE_LIST:<spec_list>=List of space-separated spec folders to ignore during the build. Must not overlap with "PACKAGE_REBUILD_LIST", may overlap with "PACKAGE_BUILD_LIST". Example: PACKAGE_IGNORE_LIST="zlib".
 PACKAGE_IGNORE_LIST     ?=
+##help:var:SOURCE_AUTH_MODE:<mode>=Mode to use for downloading source files for SRPM packing. Valid options: anonymous, azurecli (as defined in the srpmpacker code base).
+SOURCE_AUTH_MODE        ?=
 ##help:var:SRPM_PACK_LIST:<spec_list>=List of space-separated spec folders inside "SPECS_DIR" to analyze for the build. If empty, all items inside the "SPECS_DIR" will be analyzed. Example: SRPM_PACK_LIST="kernel go which".
 SRPM_PACK_LIST          ?=
 ##help:var:TEST_RUN_LIST:<spec_list>=List of space-separated spec folders to consider for package tests. Specs from the listed folders MUST contain the "%check" section. If empty, all testable items from "SRPM_PACK_LIST" will be considered. Will not re-test previously built packages. Example: TEST_RUN_LIST="libguestfs zlib".
