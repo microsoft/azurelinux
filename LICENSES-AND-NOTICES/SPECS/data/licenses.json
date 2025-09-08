@@ -273,7 +273,6 @@
                 "geolite2",
                 "geos",
                 "gfs2-utils",
-                "ghc-srpm-macros",
                 "gi-docgen",
                 "giflib",
                 "gl-manpages",
