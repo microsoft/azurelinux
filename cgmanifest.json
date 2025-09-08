@@ -24982,6 +24982,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-spnego",
+          "version": "0.11.2",
+          "downloadUrl": "https://github.com/jborean93/pyspnego/archive/refs/tags/v0.11.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-sqlalchemy",
           "version": "2.0.27",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/S/SQLAlchemy/SQLAlchemy-2.0.27.tar.gz"
