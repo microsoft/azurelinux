@@ -47,8 +47,8 @@ Patch17:        CVE-2024-33601.patch
 Patch18:        CVE-2025-0395.patch
 Patch19:        CVE-2025-4802.patch
 # Add test for CVE-2025-4802. Requires additional patch for a support function
-Patch20:		add_support_record_failure_barrier.patch
-Patch21:		test-CVE-2025-4802.patch
+Patch20:        add_support_record_failure_barrier.patch
+Patch21:        test-CVE-2025-4802.patch
 
 # Patches for testing
 Patch100:       0001-Remove-Wno-format-cflag-from-tests.patch
