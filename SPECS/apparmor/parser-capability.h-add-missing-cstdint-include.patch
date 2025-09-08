@@ -1,0 +1,27 @@
+From ea6d9ffb397315b2743fad15fa9ed74e872f5b17 Mon Sep 17 00:00:00 2001
+From: Aadhar Agarwal <aadagarwal@microsoft.com>
+Date: Mon, 8 Sep 2025 22:07:20 +0000
+Subject: [PATCH] parser/capability.h: add missing <cstdint> include
+
+Upstream issue: https://gitlab.com/apparmor/apparmor/-/issues/246
+Due to: https://gcc.gnu.org/gcc-13/porting_to.html#header-dep-changes
+---
+ parser/capability.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/parser/capability.h b/parser/capability.h
+index 23edf7c..d39dd34 100644
+--- a/parser/capability.h
++++ b/parser/capability.h
+@@ -19,6 +19,8 @@
+ #ifndef __AA_CAPABILITY_H
+ #define __AA_CAPABILITY_H
+ 
++#include <cstdint>
++
+ #define NO_BACKMAP_CAP 0xff
+ 
+ #ifndef CAP_PERFMON
+-- 
+2.45.3
+
