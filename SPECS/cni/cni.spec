@@ -24,7 +24,7 @@
 Summary:        Container Network Interface - networking for Linux containers
 Name:           cni
 Version:        1.0.1
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,6 +48,8 @@ Source2:        build.sh
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source3:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2022-32149.patch
+Patch1:         CVE-2024-45338.patch
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  xz
@@ -66,12 +68,12 @@ range of support and the specification is simple to implement.
 
 %prep
 %setup -q
-cp %{SOURCE2} build.sh
-
-%build
 # create vendor folder from the vendor tarball and set vendor mode
 tar -xf %{SOURCE3} --no-same-owner
+cp %{SOURCE2} build.sh
+%autopatch -p1
 
+%build
 # go1.16+ default is GO111MODULE=on set to auto temporarily
 # until using upstream release with go.mod
 export GO111MODULE=auto
@@ -113,6 +115,9 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
 %{_sbindir}/cnitool
 
 %changelog
+* Mon Sep 08 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.0.1-20
+- Patch for CVE-2022-32149 and CVE-2024-45338
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.0.1-19
 - Bump release to rebuild with golang
 
