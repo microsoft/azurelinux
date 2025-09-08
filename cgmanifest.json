@@ -5420,8 +5420,8 @@
         "type": "other",
         "other": {
           "name": "httpcomponents-core",
-          "version": "4.4.13",
-          "downloadUrl": "https://archive.apache.org/dist/httpcomponents/httpcore/source/httpcomponents-core-4.4.13-src.tar.gz"
+          "version": "4.4.16",
+          "downloadUrl": "https://archive.apache.org/dist/httpcomponents/httpcore/source/httpcomponents-core-4.4.16-src.tar.gz"
         }
       }
     },
