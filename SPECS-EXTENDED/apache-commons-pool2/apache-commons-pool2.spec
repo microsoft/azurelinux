@@ -1,30 +1,13 @@
-#
-# spec file for package apache-commons-pool2
-#
-# Copyright (c) 2024 SUSE LLC
-#
-# All modifications and additions to the file contributed by third parties
-# remain the property of their copyright owners, unless otherwise agreed
-# upon. The license for this file, and modifications and additions to the
-# file, is the same license as for the pristine package itself (unless the
-# license for the pristine package is not an Open Source License, in which
-# case the license is the MIT License). An "Open Source License" is a
-# license that conforms to the Open Source Definition (Version 1.9)
-# published by the Open Source Initiative.
-
-# Please submit bugfixes or comments via https://bugs.opensuse.org/
-#
-
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-
 %define base_name       pool
 %define short_name      commons-%{base_name}2
+Summary:        Apache Commons Pool 2.x series
 Name:           apache-commons-pool2
 Version:        2.4.2
 Release:        8%{?dist}
 Summary:        Apache Commons Pool 2.x series
 License:        Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://commons.apache.org/proper/commons-pool/
 Source0:        https://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
@@ -100,10 +83,17 @@ cp -pr dist/docs/api/* %{buildroot}%{_javadocdir}/%{name}
 - Initial Azure Linux import from openSUSE Tumbleweed (license: same as "License" tag).
 - License verified
 
-* Mon Apr 29 2024 Fridrich Strba <fstrba@suse.com>
-- Simplify and clean up the spec file: avoid versioned jars
-* Tue Feb 20 2024 Dominique Leuenberger <dimstar@opensuse.org>
-- Use %%patch -P N instead of deprecated %%patchN.
+* Wed Nov 09 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.4.2-7
+- Enable check section
+- License verified
+
+* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.2-6
+- Converting the 'Release' tag to the '[number].[distribution]' format.
+
+* Tue Nov 17 2020 Ruying Chen <v-ruyche@microsoft.com> - 2.4.2-5.7
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
+- Use javapackages-local-bootstrap to avoid build cycle.
+
 * Mon Mar 25 2019 Fridrich Strba <fstrba@suse.com>
 - Remove pom parent, since we don't use it when not building with
   maven
