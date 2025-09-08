@@ -63,7 +63,7 @@ BuildRequires:  python3dist(pytest)
 
 
 %changelog
-* Wed May 07 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.1.2-10
+* Mon Sep 08 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.1.2-10
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - Drop BR on `python3-freezegun` for tests
 - License verified
