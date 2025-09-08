@@ -16803,8 +16803,8 @@
         "type": "other",
         "other": {
           "name": "perl-Crypt-OpenSSL-RSA",
-          "version": "0.31",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TODDR/Crypt-OpenSSL-RSA-0.31.tar.gz"
+          "version": "0.33",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TODDR/Crypt-OpenSSL-RSA-0.33.tar.gz"
         }
       }
     },
