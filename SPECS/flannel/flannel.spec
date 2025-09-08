@@ -19,7 +19,7 @@ Patch4:         CVE-2024-51744.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.38-12%{?dist}
-BuildRequires:  golang >= 1.20
+BuildRequires:  golang < 1.25
 BuildRequires:  kernel-headers
 
 %description
@@ -52,8 +52,11 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 %{_bindir}/flanneld
 
 %changelog
-* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.24.2-16
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.24.2-17
 - Bump to rebuild with updated glibc
+
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 0.24.2-16
+- Set BR for golang to < 1.25
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.24.2-15
 - Bump to rebuild with updated glibc

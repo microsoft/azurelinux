@@ -2,7 +2,7 @@
 
 Name:           kata-containers
 Version:        3.18.0.kata0
-Release:        1%{?dist}
+Release:        3%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
@@ -26,6 +26,7 @@ BuildRequires:  cmake
 Requires:       kernel-uvm
 # Must match the version specified by the `assets.virtiofsd.version` field in the source's versions.yaml.
 Requires:       virtiofsd = 1.8.0
+Requires:       containerd2
 
 %description
 The Kata Containers package ships the Kata components for Pod Sandboxing on AKS.
@@ -114,6 +115,12 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Tue Jul 22 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.18.0.kata0-3
+- Bump release to rebuild with rust
+
+* Mon Jul 21 2025 Saul Paredes <saulparedes@microsoft.com> - 3.18.0.kata0-2
+- Add dependency on containerd2
+
 * Wed Jun 25 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.18.0.kata0-1
 - Auto-upgrade to 3.18.0.kata0
 

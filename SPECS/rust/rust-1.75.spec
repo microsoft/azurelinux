@@ -45,6 +45,7 @@ Patch0:         CVE-2023-45853.patch
 Patch1:         CVE-2024-32884.patch
 Patch2:         CVE-2024-31852.patch
 Patch3:         CVE-2025-4574_1.75.patch
+Patch4:         CVE-2025-53605_1.75.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -179,8 +180,11 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
-* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-17
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-18
 - Bump to rebuild with updated glibc
+
+* Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.75.0-17
+- Add patch for CVE-2025-53605
 
 * Tue Jun 10 2025 Kavya Sree Kaitepalli kkaitepalli@microsoft.com - 1.75.0-16
 - Run %check as non root user to fix ptests

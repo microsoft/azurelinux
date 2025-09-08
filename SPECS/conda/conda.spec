@@ -1,7 +1,7 @@
 Summary:        Cross-platform, Python-agnostic binary package manager
 Name:           conda
 Version:        24.3.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD-3-Clause AND Apache-2.0
 # The conda code is BSD-3-Clause
 # adapters/ftp.py is Apache-2.0
@@ -44,7 +44,6 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-trove-classifiers
 BuildRequires:  sed
-
 Requires:       python%{python3_pkgversion}-conda = %{version}-%{release}
 
 %?python_enable_dependency_generator
@@ -187,13 +186,14 @@ mkdir -p %{buildroot}%{_localstatedir}/cache/conda/pkgs/cache
 
 # install does not create the directory on EL7
 install -m 0644 -Dt %{buildroot}/etc/profile.d/ conda/shell/etc/profile.d/conda.{sh,csh}
+install -m 0644 -Dt %{buildroot}/etc/profile.d/ conda/shell/conda.xsh
 sed -r -i -e '1i [ -z "$CONDA_EXE" ] && CONDA_EXE=%{_bindir}/conda' \
           -e '/PATH=.*condabin/s|PATH=|[ -d $(dirname "$CONDA_EXE")/condabin ] \&\& PATH=|' %{buildroot}/etc/profile.d/conda.sh
 sed -r -i -e '1i set _CONDA_EXE=%{_bindir}/conda\nset _CONDA_ROOT=' \
           -e 's/CONDA_PFX=.*/CONDA_PFX=/' %{buildroot}/etc/profile.d/conda.csh
-install -m 0644 -Dt %{buildroot}%{_datadir}/fish/vendor_conf.d/ conda/shell/etc/fish/conf.d/conda.fish
+install -m 0644 -Dt %{buildroot}/etc/fish/conf.d/ conda/shell/etc/fish/conf.d/conda.fish
 sed -r -i -e '1i set -gx CONDA_EXE "/usr/bin/conda"\nset _CONDA_ROOT "/usr"\nset _CONDA_EXE "/usr/bin/conda"\nset -gx CONDA_PYTHON_EXE "/usr/bin/python3"' \
-          %{buildroot}%{_datadir}/fish/vendor_conf.d/conda.fish
+          %{buildroot}/etc/fish/conf.d/conda.fish
 
 # Install bash completion script
 install -m 0644 -Dt %{buildroot}%{bash_completionsdir}/ %SOURCE1
@@ -384,11 +384,11 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 %{_bindir}/conda
 %{_bindir}/conda-env
 %{bash_completionsdir}/conda
-# TODO - better ownership for fish/vendor_conf.d
-%dir %{_datadir}/fish/vendor_conf.d
-%{_datadir}/fish/vendor_conf.d/conda.fish
+%dir /etc/fish/conf.d
+/etc/fish/conf.d/conda.fish
 /etc/profile.d/conda.sh
 /etc/profile.d/conda.csh
+/etc/profile.d/conda.xsh
 
 %files tests
 %{_datadir}/conda/tests/
@@ -402,6 +402,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 %{_datadir}/conda/condarc.d/
 
 %changelog
+* Thu Aug 07 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-4
+- Add missing conda.xsh file to /etc/profile.d
+- also move conda.fish to /etc/fish/conf.d/
+
 * Thu May 01 2025 Riken Maharjan <rmaharjan@microsoft.com> - 24.3.0-3
 - Skip some test cases that are failing in the current version of conda using Fedora (License: MIT)
 

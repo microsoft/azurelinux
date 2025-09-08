@@ -42,6 +42,7 @@ Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Patch0:		CVE-2025-4574.patch
+Patch1:         CVE-2025-53605.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -179,8 +180,11 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
-* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.86.0-4
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.86.0-5
 - Bump to rebuild with updated glibc
+
+* Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.86.0-4
+- patch for CVE-2025-53605
 
 * Fri Jun 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.86.0-3
 - Patch CVE-2025-4574
