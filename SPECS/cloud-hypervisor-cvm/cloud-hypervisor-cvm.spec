@@ -42,7 +42,7 @@ ExclusiveArch:  x86_64
 
 %ifarch x86_64
 %define rust_def_target x86_64-unknown-linux-gnu
-%define cargo_pkg_feature_opts --no-default-features --features "mshv,kvm,sev_snp,igvm"
+%define cargo_pkg_feature_opts --features "mshv"
 %endif
 %ifarch aarch64
 %define rust_def_target aarch64-unknown-linux-gnu
