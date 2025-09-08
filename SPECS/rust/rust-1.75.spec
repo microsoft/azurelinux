@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.75.0
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
