@@ -14,8 +14,7 @@ Patch2:         CVE-2023-50471.patch
 Patch3:         CVE-2024-31755.patch
 Patch4:         CVE-2023-53154.patch
 Patch5:         removed_unused_global_variables_fix_test-aa.patch
-# CVE-2016-1585 has no upstream fix as of 2020/09/28
-Patch100:       CVE-2016-1585.nopatch
+Patch6:         parser-set-DISTRO-suse-if-built-on-Azure-Linux.patch
 
 BuildRequires:  apr
 BuildRequires:  apr-util-devel
@@ -287,6 +286,7 @@ make DESTDIR=%{buildroot} install
 /sbin/rcapparmor
 /lib/apparmor/rc.apparmor.functions
 /lib/apparmor/apparmor.systemd
+/lib/apparmor/profile-load
 %{_bindir}/aa-exec
 %{_bindir}/aa-enabled
 %attr(644,root,root) %{_unitdir}/apparmor.service
