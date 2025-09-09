@@ -5,8 +5,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Release:        28%{?dist}
 License:        ASL 1.1
-URL:            http://www.extreme.indiana.edu/xgws/xsoap/xpp/mxp1/index.html
-Source0:        http://www.extreme.indiana.edu/dist/java-repository/xpp3/distributions/xpp3-%{version}_src.tgz
+URL:            https://www.extreme.indiana.edu/xgws/xsoap/xpp/mxp1/index.html
+Source0:        https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xpp3-%{version}_src.tgz
 Source1:        https://repo1.maven.org/maven2/xpp3/xpp3/%{version}/xpp3-%{version}.pom
 Source2:        https://repo1.maven.org/maven2/xpp3/xpp3_xpath/%{version}/xpp3_xpath-%{version}.pom
 Source3:        https://repo1.maven.org/maven2/xpp3/xpp3_min/%{version}/xpp3_min-%{version}.pom
