@@ -165,7 +165,7 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
-* Wed Sep 09 2025 Mayank Singh <mayansingh@microsoft.com> - 1.25.4-6
+* Tue Sep 09 2025 Mayank Singh <mayansingh@microsoft.com> - 1.25.4-6
 - Enable stream ssl preread module
 
 * Tue Aug 19 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.25.4-5
