@@ -16,9 +16,9 @@ index 4ba484d..71754aa 100644
 --- a/utils/apparmor/aa.py
 +++ b/utils/apparmor/aa.py
 @@ -1486,7 +1486,6 @@ def set_logfile(filename):
+
  def do_logprof_pass(logmark=''):
      # set up variables for this pass
- #    transitions = hasher()
 -    global active_profiles
      global sev_db
  #    aa = hasher()
@@ -30,7 +30,7 @@ index bbe2834..b4ae059 100644
 @@ -69,7 +69,6 @@ def msg(out, output=sys.stdout):
  
  def debug(out):
-     '''Print debug message'''
+     """Print debug message"""
 -    global DEBUGGING
      if DEBUGGING:
          try:
@@ -42,11 +42,10 @@ index d205797..9d8e51c 100755
 @@ -108,7 +108,6 @@ class T(unittest.TestCase):
  
      def setUp(self):
-         '''Setup for tests'''
+         """Setup for tests"""
 -        global topdir
  
          self.tmpdir = os.path.realpath(tempfile.mkdtemp(prefix='test-aa-easyprof'))
  
 -- 
 2.45.2
-

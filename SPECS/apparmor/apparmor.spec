@@ -1,21 +1,19 @@
+%define version_major_minor %(echo %{version} | cut -d '.' -f -2)
 Summary:        AppArmor is an effective and easy-to-use Linux application security system.
 Name:           apparmor
-Version:        3.0.4
-Release:        6%{?dist}
+Version:        3.1.7
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Productivity/Security
 URL:            https://launchpad.net/apparmor
-Source0:        https://launchpad.net/apparmor/3.0/3.0.4/+download/%{name}-%{version}.tar.gz
+Source0:        https://launchpad.net/apparmor/%{version_major_minor}/%{version}/+download/%{name}-%{version}.tar.gz
 Patch1:         apparmor-service-start-fix.patch
 Patch2:         CVE-2023-50471.patch
 Patch3:         CVE-2024-31755.patch
 Patch4:         CVE-2023-53154.patch
 Patch5:         removed_unused_global_variables_fix_test-aa.patch
-Patch6:         parser-capability.h-add-missing-cstdint-include.patch
-Patch7:         support-setuptools-in-python-tests.patch
-
 # CVE-2016-1585 has no upstream fix as of 2020/09/28
 Patch100:       CVE-2016-1585.nopatch
 
@@ -361,9 +359,8 @@ make DESTDIR=%{buildroot} install
 %exclude %{perl_archlib}/perllocal.pod
 
 %changelog
-* Mon Sep 08 2025 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.0.4-6
-- Add patch to include cstdint in parser/capability.h
-- Add patch to support setuptools >= 62.1 in python tests
+* Mon Sep 08 2025 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.1.7-1
+- Upgrade to 3.1.7
 
 * Fri Jun 13 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.0.4-5
 - Patch CVE-2023-53154
