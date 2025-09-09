@@ -1,7 +1,6 @@
 %global security_hardening none
 %global debug_package %{nil}
 %define uname_r %{version}-%{release}
-%define kernel_version %(echo %{version} | sed 's/\mshv//')
 
 %ifarch x86_64
 %define arch x86_64
@@ -17,9 +16,8 @@ License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/%{kernel_version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
-Patch0:         mshv-version.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -86,7 +84,7 @@ Requires:       %{name} = %{version}-%{release}
 This package contains the kernel UVM devel files
 
 %prep
-%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-kata-uvm-%{kernel_version}
+%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-kata-uvm-%{version}
 
 make mrproper
 
