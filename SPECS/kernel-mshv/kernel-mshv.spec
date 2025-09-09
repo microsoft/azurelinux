@@ -90,8 +90,24 @@ cp %{SOURCE1} .config
 cp %{SOURCE2} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
+cp .config current_config
+
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
 make LC_ALL=  ARCH=%{arch} olddefconfig
+# Verify the config files match
+cp .config new_config
+sed -i 's/CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION=""/' new_config
+diff --unified new_config current_config > config_diff || true
+if [ -s config_diff ]; then
+    printf "\n\n\n\n\n\n\n\n"
+    cat config_diff
+    printf "\n\n\n\n\n\n\n\n"
+    echo "Config file has unexpected changes"
+    echo "Update config file to set changed values explicitly"
+
+#  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
+    exit 1
+fi
 
 %build
 make VERBOSE=1 V=1 KBUILD_VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
