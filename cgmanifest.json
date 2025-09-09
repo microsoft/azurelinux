@@ -4049,6 +4049,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fwctl-hwe",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/fwctl-24.10.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fwupd",
           "version": "2.0.1",
           "downloadUrl": "https://github.com/fwupd/fwupd/releases/download/2.0.1/fwupd-2.0.1.tar.xz"
@@ -7610,7 +7620,27 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "iser-hwe",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/iser-24.10.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "isert",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/isert-24.10.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "isert-hwe",
           "version": "24.10",
           "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/isert-24.10.tgz"
         }
@@ -13361,7 +13391,27 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mlnx-nfsrdma-hwe",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-nfsrdma-24.10.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "mlnx-ofa_kernel",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ofa_kernel-24.10.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mlnx-ofa_kernel-hwe",
           "version": "24.10",
           "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ofa_kernel-24.10.tgz"
         }
@@ -28425,6 +28475,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "srp-hwe",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/srp-24.10.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sscg",
           "version": "3.0.5",
           "downloadUrl": "https://github.com/sgallagher/sscg/archive/refs/tags/sscg-3.0.5.tar.gz"
@@ -30848,6 +30908,16 @@
         "type": "other",
         "other": {
           "name": "xpmem",
+          "version": "2.7.4",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/xpmem-2.7.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xpmem-hwe",
           "version": "2.7.4",
           "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/xpmem-2.7.4.tar.gz"
         }
