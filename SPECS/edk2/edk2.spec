@@ -45,7 +45,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    41%{?dist}
+Release:    43%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    BSD-2-Clause-Patent and OpenSSL and MIT
 URL:        http://www.tianocore.org
@@ -120,6 +120,9 @@ Patch0024: CVE-2023-45234.patch
 Patch0025: CVE-2023-45235.patch
 Patch0026: CVE-2023-45237.patch
 Patch0027: CVE-2023-45236.patch
+Patch0028: CVE-2024-38796.patch
+Patch0029: CVE-2023-45231.patch
+Patch0030: CVE-2023-45229.patch
 
 # Patches for the vendored OpenSSL are in the range from 1000 to 1999 (inclusive).
 Patch1000: CVE-2023-0464.patch
@@ -128,6 +131,8 @@ Patch1002: CVE-2023-0465.patch
 Patch1003: CVE-2023-2650.patch
 Patch1004: improve-safety-of-DH.patch
 Patch1005: vendored-openssl-1.1.1-Only-free-the-read-buffers-if-we-re-not-using-them.patch
+Patch1006: CVE-2022-4304.patch
+Patch1007: CVE-2025-3770.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -711,6 +716,12 @@ $tests_ok
 
 
 %changelog
+* Mon Aug 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20230301gitf80f052277c8-43
+- Patch for CVE-2025-3770
+
+* Fri May 02 2025 Ankita Pareek <ankitapareek@microsoft.com> - 20230301gitf80f052277c8-42
+- Add patch for CVE-2024-38796 CVE-2023-45229, CVE-2023-45231, CVE-2022-4304
+
 * Mon Mar 24 2025 Tobias Brick <tobiasb@microsoft.com> - 20230301gitf80f052277c8-41
 - Patch vendored openssl to only free read buffers if not in use.
 

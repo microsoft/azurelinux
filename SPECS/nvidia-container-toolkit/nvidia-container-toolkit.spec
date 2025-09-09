@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
-Version:        1.17.4
-Release:        1%{?dist}
+Version:        1.17.8
+Release:        3%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,6 +28,7 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2025-22872.patch
 BuildRequires:  golang
 Obsoletes: nvidia-container-runtime <= 3.5.0-1, nvidia-container-runtime-hook <= 1.4.0-2
 Provides: nvidia-container-runtime
@@ -88,6 +89,15 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %{_bindir}/nvidia-cdi-hook
 
 %changelog
+* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.17.8-3
+- Bump release to rebuild with golang
+
+* Mon Jul 28 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.17.8-2
+- Patch for CVE-2025-22872
+
+* Thu Jul 24 2025 Sam Meluch <sammeluch@microsoft.com> - 1.17.8-1
+- Upgrade to 1.17.8 to resolve CVE-2025-23266
+
 * Thu Feb 13 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.17.4-1
 - Upgrade to v1.17.4 to resolve CVE-2025-23359
 

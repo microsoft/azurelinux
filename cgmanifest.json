@@ -5370,8 +5370,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.64",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.64.tar.bz2"
+          "version": "2.4.65",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.65.tar.bz2"
         }
       }
     },
@@ -10341,8 +10341,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.17.4",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.4.tar.gz"
+          "version": "1.17.8",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.17.8.tar.gz"
         }
       }
     },
@@ -12572,7 +12572,7 @@
         "other": {
           "name": "luajit",
           "version": "2.1.0",
-          "downloadUrl": "https://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz"
+          "downloadUrl": "https://github.com/LuaJIT/LuaJIT/archive/refs/tags/v2.1.0-beta3.tar.gz"
         }
       }
     },
@@ -13663,8 +13663,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.24.1",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.1-1/go1.24.1-20250304.4.src.tar.gz"
+          "version": "1.24.5",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.5-1/go1.24.5-20250708.7.src.tar.gz"
         }
       }
     },
@@ -13803,8 +13803,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.42",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.42.tar.gz"
+          "version": "8.0.43",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.43.tar.gz"
         }
       }
     },
@@ -14593,8 +14593,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.17.4",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.4.tar.gz"
+          "version": "1.17.8",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.17.8.tar.gz"
         }
       }
     },
@@ -21084,8 +21084,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.1.32",
-          "downloadUrl": "https://www.php.net/distributions/php-8.1.32.tar.xz"
+          "version": "8.1.33",
+          "downloadUrl": "https://www.php.net/distributions/php-8.1.33.tar.xz"
         }
       }
     },
@@ -21444,8 +21444,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.18",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.18/postgresql-14.18.tar.bz2"
+          "version": "14.19",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.19/postgresql-14.19.tar.bz2"
         }
       }
     },
@@ -29467,8 +29467,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.1.1552",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.1552.tar.gz"
+          "version": "9.1.1616",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.1616.tar.gz"
         }
       }
     },
