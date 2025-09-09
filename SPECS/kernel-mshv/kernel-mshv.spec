@@ -2,7 +2,6 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
-%define kernel_version %(echo %{version} | sed 's/\mshv//')
 %ifarch x86_64
 %define arch x86_64
 %define archdir x86
@@ -17,13 +16,11 @@ License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive//rolling-lts/kata/%{kernel_version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
 Source4:        50_mariner_mshv_menuentry
-# TODO: REMOVE
-Patch0:         mshv-version.patch
 ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -82,7 +79,7 @@ Requires:       audit
 This package contains the 'perf' performance analysis tools for MSHV kernel.
 
 %prep
-%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-kata-%{kernel_version}
+%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-kata-%{version}
 make mrproper
 cp %{SOURCE1} .config
 
