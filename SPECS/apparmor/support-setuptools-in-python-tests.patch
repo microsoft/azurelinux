@@ -1,0 +1,129 @@
+From 67fda46f111461c8e97a7ee439cc8404c4621651 Mon Sep 17 00:00:00 2001
+From: Aadhar Agarwal <aadagarwal@microsoft.com>
+Date: Tue, 9 Sep 2025 00:27:03 +0000
+Subject: [PATCH 1/2] Support setuptools >= 61.2 in Python tests
+
+https://gitlab.com/apparmor/apparmor/-/issues/259
+https://gitlab.com/apparmor/apparmor/-/merge_requests/899
+---
+ libraries/libapparmor/swig/python/test/Makefile.am  |  3 +--
+ libraries/libapparmor/swig/python/test/buildpath.py | 10 ++++++++++
+ utils/test/Makefile                                 |  2 +-
+ utils/test/README.md                                |  4 ++--
+ 4 files changed, 14 insertions(+), 5 deletions(-)
+ create mode 100644 libraries/libapparmor/swig/python/test/buildpath.py
+
+diff --git a/libraries/libapparmor/swig/python/test/Makefile.am b/libraries/libapparmor/swig/python/test/Makefile.am
+index 9dccfde..761735a 100644
+--- a/libraries/libapparmor/swig/python/test/Makefile.am
++++ b/libraries/libapparmor/swig/python/test/Makefile.am
+@@ -10,8 +10,7 @@ test_python.py: test_python.py.in $(top_builddir)/config.status
+ 
+ CLEANFILES = test_python.py
+ 
+-# bah, how brittle is this?
+-PYTHON_DIST_BUILD_PATH = '$(builddir)/../build/$$($(PYTHON) -c "import sysconfig; print(\"lib.%s-%s\" %(sysconfig.get_platform(), sysconfig.get_python_version()))")'
++PYTHON_DIST_BUILD_PATH = '$(builddir)/../build/$$($(PYTHON) buildpath.py)'
+ 
+ TESTS	= test_python.py
+ TESTS_ENVIRONMENT = \
+diff --git a/libraries/libapparmor/swig/python/test/buildpath.py b/libraries/libapparmor/swig/python/test/buildpath.py
+new file mode 100644
+index 0000000..3989639
+--- /dev/null
++++ b/libraries/libapparmor/swig/python/test/buildpath.py
+@@ -0,0 +1,10 @@
++#!/usr/bin/python3
++# the build path has changed in setuptools 61.2
++import sys
++import sysconfig
++import setuptools
++if tuple(map(int,setuptools.__version__.split("."))) >= (61, 2):
++    identifier = sys.implementation.cache_tag
++else:
++    identifier = "%d.%d" % sys.version_info[:2]
++print("lib.%s-%s" % (sysconfig.get_platform(), identifier))
+\ No newline at end of file
+diff --git a/utils/test/Makefile b/utils/test/Makefile
+index bb456cc..b353009 100644
+--- a/utils/test/Makefile
++++ b/utils/test/Makefile
+@@ -28,7 +28,7 @@ ifdef USE_SYSTEM
+     PARSER=
+ else
+     # PYTHON_DIST_BUILD_PATH based on libapparmor/swig/python/test/Makefile.am
+-    PYTHON_DIST_BUILD_PATH = ../../libraries/libapparmor/swig/python/build/$$($(PYTHON) -c "import sysconfig; print(\"lib.%s-%s\" %(sysconfig.get_platform(), sysconfig.get_python_version()))")
++    PYTHON_DIST_BUILD_PATH = ../../libraries/libapparmor/swig/python/build/$$($(PYTHON) ../../libraries/libapparmor/swig/python/test/buildpath.py)
+     LIBAPPARMOR_PATH=../../libraries/libapparmor/src/.libs/
+     LD_LIBRARY_PATH=$(LIBAPPARMOR_PATH):$(PYTHON_DIST_BUILD_PATH)
+     PYTHONPATH=..:$(PYTHON_DIST_BUILD_PATH)
+diff --git a/utils/test/README.md b/utils/test/README.md
+index db62c26..2ac1fa0 100644
+--- a/utils/test/README.md
++++ b/utils/test/README.md
+@@ -7,7 +7,7 @@ For more information, refer to the [unittest documentation](https://docs.python.
+ Make sure to set the environment variables pointing to the in-tree apparmor modules, and the in-tree libapparmor and its python wrapper:
+ 
+ ```bash
+-$ export PYTHONPATH=..:../../libraries/libapparmor/swig/python/build/$(/usr/bin/python3 -c "import sysconfig; print(\"lib.%s-%s\" %(sysconfig.get_platform(), sysconfig.get_python_version()))")
++$ export PYTHONPATH=..:../../libraries/libapparmor/swig/python/build/$(/usr/bin/python3 ../../libraries/libapparmor/swig/python/test/buildpath.py)
+ $ export __AA_CONFDIR=.
+ ```
+ 
+@@ -15,4 +15,4 @@ To execute the test individually, run:
+ 
+ ```bash
+ $ python3 ./test-tile.py ClassFoo.test_bar
+-```
+\ No newline at end of file
++```
+-- 
+2.45.3
+
+
+From db50a4b33d77b5938639649753c97f2c539accb4 Mon Sep 17 00:00:00 2001
+From: Aadhar Agarwal <aadagarwal@microsoft.com>
+Date: Tue, 9 Sep 2025 00:28:30 +0000
+Subject: [PATCH 2/2] Fix setuptools version detection in buildpath.py
+
+https://gitlab.com/apparmor/apparmor/-/merge_requests/904
+---
+ libraries/libapparmor/swig/python/test/buildpath.py | 7 +++++--
+ profiles/Makefile                                   | 2 +-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/libraries/libapparmor/swig/python/test/buildpath.py b/libraries/libapparmor/swig/python/test/buildpath.py
+index 3989639..43bbd53 100644
+--- a/libraries/libapparmor/swig/python/test/buildpath.py
++++ b/libraries/libapparmor/swig/python/test/buildpath.py
+@@ -1,9 +1,12 @@
+ #!/usr/bin/python3
+-# the build path has changed in setuptools 61.2
++# the build path has changed in setuptools 62.1:
++# https://github.com/pypa/setuptools/commit/1c23f5e1e4b18b50081cbabb2dea22bf345f5894import sys
+ import sys
+ import sysconfig
+ import setuptools
+-if tuple(map(int,setuptools.__version__.split("."))) >= (61, 2):
++
++
++if tuple(map(int, setuptools.__version__.split("."))) >= (62, 1):
+     identifier = sys.implementation.cache_tag
+ else:
+     identifier = "%d.%d" % sys.version_info[:2]
+diff --git a/profiles/Makefile b/profiles/Makefile
+index 7342e5c..f8fa10b 100644
+--- a/profiles/Makefile
++++ b/profiles/Makefile
+@@ -41,7 +41,7 @@ ifdef USE_SYSTEM
+     LOGPROF?=aa-logprof
+ else
+     # PYTHON_DIST_BUILD_PATH based on libapparmor/swig/python/test/Makefile.am
+-    PYTHON_DIST_BUILD_PATH = ../libraries/libapparmor/swig/python/build/$$($(PYTHON) -c "import sysconfig; print(\"lib.%s-%s\" %(sysconfig.get_platform(), sysconfig.get_python_version()))")
++    PYTHON_DIST_BUILD_PATH = ../libraries/libapparmor/swig/python/build/$$($(PYTHON) ../libraries/libapparmor/swig/python/test/buildpath.py)
+     LIBAPPARMOR_PATH=../libraries/libapparmor/src/.libs/
+     LD_LIBRARY_PATH=$(LIBAPPARMOR_PATH):$(PYTHON_DIST_BUILD_PATH)
+     PYTHONPATH=../utils/:$(PYTHON_DIST_BUILD_PATH)
+-- 
+2.45.3
+
