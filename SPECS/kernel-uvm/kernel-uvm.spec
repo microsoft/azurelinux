@@ -154,6 +154,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Tue Sep 09 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.96.mshv1-1
+- Upgrade to 6.6.96.mshv1
+
 * Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.1.58.mshv8-1
 - Auto-upgrade to 6.1.58.mshv8
 
