@@ -6,7 +6,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed MSHV-enabled Linux Kernel for %{buildarch} systems
 Name:           kernel-mshv-signed-%{buildarch}
-Version:        6.6.57.mshv4
+Version:        6.6.100.mshv1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
