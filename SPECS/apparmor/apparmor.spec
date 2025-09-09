@@ -14,6 +14,7 @@ Patch3:         CVE-2024-31755.patch
 Patch4:         CVE-2023-53154.patch
 Patch5:         removed_unused_global_variables_fix_test-aa.patch
 Patch6:         parser-capability.h-add-missing-cstdint-include.patch
+Patch7:         support-setuptools-in-python-tests.patch
 
 # CVE-2016-1585 has no upstream fix as of 2020/09/28
 Patch100:       CVE-2016-1585.nopatch
@@ -362,6 +363,7 @@ make DESTDIR=%{buildroot} install
 %changelog
 * Mon Sep 08 2025 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.0.4-6
 - Add patch to include cstdint in parser/capability.h
+- Add patch to support setuptools >= 62.1 in python tests
 
 * Fri Jun 13 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.0.4-5
 - Patch CVE-2023-53154
