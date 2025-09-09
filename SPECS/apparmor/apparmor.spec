@@ -1,7 +1,7 @@
 Summary:        AppArmor is an effective and easy-to-use Linux application security system.
 Name:           apparmor
 Version:        3.0.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -359,6 +359,9 @@ make DESTDIR=%{buildroot} install
 %exclude %{perl_archlib}/perllocal.pod
 
 %changelog
+* Tue Sep  9 04:24:40 UTC 2025 Chris Co <chrco@microsoft.com> - 3.0.4-6
+- test
+
 * Fri Jun 13 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.0.4-5
 - Patch CVE-2023-53154
 - Patch removed_unused_global_variables_fix_test-aa.patch to fix PTest failure
