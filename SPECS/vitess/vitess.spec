@@ -3,7 +3,7 @@
 
 Name:           vitess
 Version:        17.0.7
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -102,6 +102,9 @@ go test -v ./go/cmd/... \
 %{_bindir}/*
 
 %changelog
+* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 17.0.7-9
+- Bump release to rebuild with golang
+
 * Fri Apr 25 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 17.0.7-8
 - Add patch for CVE-2025-22872
 

@@ -2,7 +2,7 @@
 Summary:       Git extension for versioning large files
 Name:          git-lfs
 Version:       3.5.1
-Release:       5%{?dist}
+Release:       6%{?dist}
 Group:         System Environment/Programming
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
@@ -79,6 +79,9 @@ git lfs uninstall
 %{_mandir}/man5/*
 
 %changelog
+* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.5.1-6
+- Bump release to rebuild with golang
+
 * Tue Apr 08 2025 Rohit Rawat <rohitrawat@microsoft.com> - 3.5.1-5
 - Patch CVE-2025-22870
 

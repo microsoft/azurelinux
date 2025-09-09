@@ -193,6 +193,9 @@ all: toolchain go-tools chroot-tools
 # its help will be displayed at the top of the help output.
 include $(SCRIPTS_DIR)/help.mk
 
+# Set-up the Azure configuration for the build
+include $(SCRIPTS_DIR)/azure_config.mk
+
 # Misc function defines
 # Variable prerequisite tracking
 include $(SCRIPTS_DIR)/utils.mk
