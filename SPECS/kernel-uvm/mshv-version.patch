@@ -1,0 +1,24 @@
+From 35aa79a840404bb409e7db4d275770b303a73f91 Mon Sep 17 00:00:00 2001
+From: Rachel <rachelmenge@microsoft.com>
+Date: Tue, 9 Sep 2025 00:42:05 +0000
+Subject: [PATCH] Update makefile
+
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 8e0c987cd..88ff613a1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -2,7 +2,7 @@
+ VERSION = 6
+ PATCHLEVEL = 6
+ SUBLEVEL = 96
+-EXTRAVERSION = .1
++EXTRAVERSION = .mshv1
+ NAME = Pinguïn Aangedreven
+ 
+ # *DOCUMENTATION*
+-- 
+2.45.4

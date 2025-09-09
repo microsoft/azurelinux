@@ -19,6 +19,7 @@ Distribution:   Azure Linux
 Group:          System Environment/Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/%{kernel_version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
+Patch0:         mshv-version.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
