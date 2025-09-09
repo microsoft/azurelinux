@@ -43,6 +43,7 @@ Source2:        config_aarch64
 Source3:        azurelinux-ca-20230216.pem
 Source4:        cpupower
 Source5:        cpupower.service
+Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
