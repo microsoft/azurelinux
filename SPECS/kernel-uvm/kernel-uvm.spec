@@ -1,6 +1,7 @@
 %global security_hardening none
 %global debug_package %{nil}
 %define uname_r %{version}-%{release}
+%define kernel_version %(echo %{version} | sed 's/\mshv//')
 
 %ifarch x86_64
 %define arch x86_64
@@ -10,13 +11,13 @@
 
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
-Version:        6.1.58.mshv8
+Version:        6.6.96.mshv1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
-Source0:        %{_distro_sources_url}/kernel-uvm-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/%{kernel_version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -84,7 +85,7 @@ Requires:       %{name} = %{version}-%{release}
 This package contains the kernel UVM devel files
 
 %prep
-tar xf %{SOURCE0} --strip-components=1
+%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-kata-uvm-%{kernel_version}
 
 make mrproper
 
