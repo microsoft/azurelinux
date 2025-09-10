@@ -105,7 +105,7 @@
 # !!!! to identify the depend spec look for "_mofed_full_version"
 
 Summary:	 Infiniband HCA Driver
-Name:		 mlnx-ofa_kernel-hwe-signed
+Name:		 mlnx-ofa_kernel-hwe-modules-signed
 Version:	 24.10
 Release:	 20%{release_suffix}%{?dist}
 License:	 GPLv2

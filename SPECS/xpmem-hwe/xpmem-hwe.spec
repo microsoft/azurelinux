@@ -210,12 +210,17 @@ mkdir -p $RPM_BUILD_ROOT/lib/firmware
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%post modules
+depmod %{KVERSION} -a
+/sbin/modprobe -r xpmem > /dev/null 2>&1
+/sbin/modprobe xpmem > /dev/null 2>&1
+
 %if ! %{with kernel_only}
 %post   -n libxpmem -p /sbin/ldconfig
 %postun -n libxpmem -p /sbin/ldconfig
 %endif
 
-%postun
+%postun modules
 if [ "$1" = 0 ]; then
 	if lsmod | grep -qw xpmem; then
 		# If the module fails to unload, give an error,
