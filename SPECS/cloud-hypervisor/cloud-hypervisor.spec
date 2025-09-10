@@ -2,8 +2,8 @@
 %define using_musl_libc 0
 %define using_vendored_crates 1
 
-Name:           cloud-hypervisor-cvm
-Summary:        Cloud Hypervisor CVM is an open source Virtual Machine Monitor (VMM) that enables running SEV SNP enabled VMs on top of MSHV using the IGVM file format as payload.
+Name:           cloud-hypervisor
+Summary:        Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on top of the KVM hypervisor and the Microsoft Hypervisor (MSHV).
 Version:        41.0.139
 Release:        1%{?dist}
 License:        ASL 2.0 OR BSD-3-clause
@@ -61,6 +61,12 @@ ExclusiveArch:  x86_64
 %if 0%{?using_vendored_crates}
 %define cargo_offline --offline
 %endif
+
+# This package replaces cloud-hypervisor-cvm. As of 9/10/2025, cloud-hypervisor-cvm is a deprecated name.
+# This is a temporary measure for compatibility.
+# todo: remove this provides/obsoletes pair in the future.
+Provides: cloud-hypervisor-cvm = %{version}-%{release}
+Obsoletes: cloud-hypervisor-cvm < %{version}-%{release}
 
 %description
 Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on top of KVM. The project focuses on exclusively running modern, cloud workloads, on top of a limited set of hardware architectures and platforms. Cloud workloads refers to those that are usually run by customers inside a cloud provider. For our purposes this means modern Linux* distributions with most I/O handled by paravirtualised devices (i.e. virtio), no requirement for legacy devices and recent CPUs and KVM.
@@ -135,6 +141,7 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 %changelog
 * Tue Sep 09 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 41.0.139-1
 - Auto-upgrade to 41.0.139
+- Rename package to cloud-hypervisor
 
 * Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 41.0.79-4
 - Bump release to rebuild with rust
