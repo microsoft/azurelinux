@@ -24,7 +24,7 @@ const (
 
 func TestBootCustomizerAddKernelCommandLine20(t *testing.T) {
 	b := createBootCustomizerFor20(t)
-	err := b.AddKernelCommandLine("console=tty0 console=ttyS0")
+	err := b.AddKernelCommandLine([]string{"console=tty0", "console=ttyS0"})
 	assert.NoError(t, err)
 
 	expectedGrubCfdDiff := `22c22
@@ -37,7 +37,7 @@ func TestBootCustomizerAddKernelCommandLine20(t *testing.T) {
 
 func TestBootCustomizerAddKernelCommandLine30(t *testing.T) {
 	b := createBootCustomizerFor30(t)
-	err := b.AddKernelCommandLine("console=tty0 console=ttyS0")
+	err := b.AddKernelCommandLine([]string{"console=tty0", "console=ttyS0"})
 	assert.NoError(t, err)
 
 	expectedDefaultGrubFileDiff := `6c6

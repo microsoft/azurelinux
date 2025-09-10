@@ -13,10 +13,11 @@ import (
 
 // OS defines how each system present on the image is supposed to be configured.
 type OS struct {
-	Hostname string                     `yaml:"hostname"`
-	SELinux  imagecustomizerapi.SELinux `yaml:"selinux"`
-	Users    []imagecustomizerapi.User  `yaml:"users"`
-	Overlays *[]Overlay                 `yaml:"overlays"`
+	Hostname          string                               `yaml:"hostname"`
+	SELinux           imagecustomizerapi.SELinux           `yaml:"selinux"`
+	Users             []imagecustomizerapi.User            `yaml:"users"`
+	Overlays          *[]Overlay                           `yaml:"overlays"`
+	KernelCommandLine imagecustomizerapi.KernelCommandLine `yaml:"kernelCommandLine"`
 }
 
 func (s *OS) IsValid() error {
@@ -63,6 +64,11 @@ func (s *OS) IsValid() error {
 			}
 			workDirs[overlay.WorkDir] = true
 		}
+	}
+
+	err = s.KernelCommandLine.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalid kernelCommandLine:\n%w", err)
 	}
 
 	return nil
