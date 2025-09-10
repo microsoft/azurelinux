@@ -41,7 +41,7 @@
 %endif
 
 Summary:	 Cross-partition memory
-Name:		 xpmem-hwe-signed
+Name:		 xpmem-hwe-modules-signed
 Version:	 2.7.4
 Release:	 20%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
