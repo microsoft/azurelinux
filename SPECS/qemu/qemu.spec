@@ -298,7 +298,7 @@ Patch1026:      CVE-2023-3301.patch
 Patch1027:      CVE-2024-3447.patch
 Patch1028:      CVE-2024-4467.patch
 Patch1029:      CVE-2024-6505.patch
-#Patch1030:      CVE-2024-7409.patch
+Patch1030:      CVE-2024-7409.patch
 
 # alsa audio output
 BuildRequires:  alsa-lib-devel
