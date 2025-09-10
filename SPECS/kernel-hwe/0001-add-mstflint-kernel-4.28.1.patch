@@ -1,7 +1,7 @@
-From 60074367d01f0fb79ac1f13bfd601b1a7339c07b Mon Sep 17 00:00:00 2001
-From: Juan Camposeco <juanarturoc@microsoft.com>
-Date: Wed, 12 Jun 2024 11:36:01 -0700
-Subject: [PATCH] add mstflint kernel 4.28
+From 2e26c328d390e197a97aea3926405e4f5b72607b Mon Sep 17 00:00:00 2001
+From: Siddharth Chintamaneni <siddharthc@microsoft.com>
+Date: Wed, 10 Sep 2025 18:44:22 +0000
+Subject: [PATCH] add mstflint kernel 4.28.1
 
 ---
  drivers/misc/Kconfig               |    1 +
@@ -524,7 +524,7 @@ index 000000000000..7d12c9938ca1
 +
 diff --git a/drivers/misc/mstflint/mst_main.c b/drivers/misc/mstflint/mst_main.c
 new file mode 100644
-index 000000000000..b3ec3f7b1194
+index 000000000000..d360c3e3b04e
 --- /dev/null
 +++ b/drivers/misc/mstflint/mst_main.c
 @@ -0,0 +1,1766 @@
@@ -928,7 +928,7 @@ index 000000000000..b3ec3f7b1194
 +    return 0;
 +}
 +
-+int pciconf_read4_legacy(struct mst_dev_data* dev, unsigned int offset, unsigned int* data)
++static int pciconf_read4_legacy(struct mst_dev_data* dev, unsigned int offset, unsigned int* data)
 +{
 +    int res = 0;
 +    unsigned int new_offset = offset;
@@ -955,7 +955,7 @@ index 000000000000..b3ec3f7b1194
 +    return 0;
 +}
 +
-+int pciconf_write4_legacy(struct mst_dev_data* dev, unsigned int offset, unsigned int data)
++static int pciconf_write4_legacy(struct mst_dev_data* dev, unsigned int offset, unsigned int data)
 +{
 +    int res = 0;
 +
@@ -1062,7 +1062,7 @@ index 000000000000..b3ec3f7b1194
 +
 +#define WO_REG_ADDR_DATA 0xbadacce5
 +#define DEVID_OFFSET 0xf0014
-+int is_wo_gw(struct pci_dev* pcidev, unsigned int addr_reg)
++static int is_wo_gw(struct pci_dev* pcidev, unsigned int addr_reg)
 +{
 +    int ret;
 +    unsigned int data = 0;
@@ -1859,7 +1859,7 @@ index 000000000000..b3ec3f7b1194
 +
 +            dev->hw_addr = ioremap(resource_start, MST_MEMORY_SIZE);
 +
-+            if (dev->hw_addr <= 0)
++            if (!dev->hw_addr)
 +            {
 +                mst_err("could not map device memory\n");
 +                res = -EFAULT;
@@ -2159,7 +2159,7 @@ index 000000000000..b3ec3f7b1194
 +            dev->data_reg = 0; /* invalid */
 +            dev->bar = 0;
 +            dev->hw_addr = ioremap(pci_resource_start(pdev, dev->bar), MST_MEMORY_SIZE);
-+            if (dev->hw_addr <= 0)
++            if (!dev->hw_addr)
 +            {
 +                mst_err("could not map device memory, BAR: %x\n", dev->bar);
 +                goto out;
