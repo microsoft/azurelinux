@@ -82,6 +82,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
 		--source-url=$(SOURCE_URL) \
+		$(if $(SOURCE_AUTH_MODE),--source-auth-mode=$(SOURCE_AUTH_MODE)) \
 		--dist-tag=$(DIST_TAG) \
 		--ca-cert=$(CA_CERT) \
 		--tls-cert=$(TLS_CERT) \
@@ -108,6 +109,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_files) $(go-srpmpack
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
 		--source-url=$(SOURCE_URL) \
+		$(if $(SOURCE_AUTH_MODE),--source-auth-mode=$(SOURCE_AUTH_MODE)) \
 		--dist-tag=$(DIST_TAG) \
 		--ca-cert=$(CA_CERT) \
 		--tls-cert=$(TLS_CERT) \
