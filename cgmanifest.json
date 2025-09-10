@@ -495,8 +495,8 @@
         "type": "other",
         "other": {
           "name": "apparmor",
-          "version": "3.0.4",
-          "downloadUrl": "https://launchpad.net/apparmor/3.0/3.0.4/+download/apparmor-3.0.4.tar.gz"
+          "version": "3.1.7",
+          "downloadUrl": "https://launchpad.net/apparmor/3.1/3.1.7/+download/apparmor-3.1.7.tar.gz"
         }
       }
     },
