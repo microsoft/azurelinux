@@ -17,6 +17,11 @@ verbose=False
 
 version_release_matching_groups = [
     frozenset([
+        "SPECS-SIGNED/kernel-hwe-signed/kernel-hwe-signed.spec",
+        "SPECS/kernel-hwe/kernel-hwe.spec",
+        "SPECS/kernel-hwe-headers/kernel-hwe-headers.spec"
+    ]),
+    frozenset([
         "SPECS-SIGNED/kernel-signed/kernel-signed.spec",
         "SPECS-SIGNED/kernel-64k-signed/kernel-64k-signed.spec",
         "SPECS-SIGNED/kernel-uki-signed/kernel-uki-signed.spec",
