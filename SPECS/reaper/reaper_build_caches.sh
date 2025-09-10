@@ -61,7 +61,14 @@ function checkInternet {
 
 function installNodeModules {
 	echo "Installing node modules."
-	sudo tdnf install -y nodejs
+	sudo tdnf install -y nodejs npm
+
+	#Verify installation
+	echo "Verifying npm installation..."
+	if ! command -v npm &> /dev/null; then
+		echo "Error: npm is not installed properly."
+		exit 1
+	fi
 
 	# Set up npm to use only user-writable directories
 	export NPM_CONFIG_USERCONFIG="$homeCacheDir/.npmrc"
@@ -163,8 +170,7 @@ buildReaperSources
 
 createCacheTars
 
-mkdir -p $HOME/reaper_caches
 
-cp -a ${reaperCacheDir} "$HOME/reaper_caches"
+cp -a ${reaperCacheDir}/*.tar.gz .
 
-echo "Copied cache tars to $HOME/reaper_caches/ .Exiting."
+echo "Copied cache tars to SPECS/reaper/ directory"
