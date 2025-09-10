@@ -66,7 +66,11 @@ ln -s %{_bindir}/tini-static %{buildroot}%{_bindir}/docker-init
 %{_bindir}/docker-init
 
 %changelog
+<<<<<<< HEAD
 * Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 0.19.0-22
+=======
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.19.0-22
+>>>>>>> 985e0b7b5 (Fix : patch application of CVE-2025-4802 in `glibc` (#14582))
 - Bump to rebuild with updated glibc
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.19.0-21

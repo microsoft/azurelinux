@@ -9,7 +9,11 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.86.0
+<<<<<<< HEAD
 Release:        6%{?dist}
+=======
+Release:        5%{?dist}
+>>>>>>> 985e0b7b5 (Fix : patch application of CVE-2025-4802 in `glibc` (#14582))
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -181,12 +185,18 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
+<<<<<<< HEAD
 * Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.86.0-6
 - Bump to rebuild with updated glibc
 
 * Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.86.0-5
 - Patch for CVE-2024-11738
  
+=======
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.86.0-5
+- Bump to rebuild with updated glibc
+
+>>>>>>> 985e0b7b5 (Fix : patch application of CVE-2025-4802 in `glibc` (#14582))
 * Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.86.0-4
 - patch for CVE-2025-53605
 

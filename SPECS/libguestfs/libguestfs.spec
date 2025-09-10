@@ -1147,7 +1147,11 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+<<<<<<< HEAD
 * Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.52.0-14
+=======
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.52.0-14
+>>>>>>> 985e0b7b5 (Fix : patch application of CVE-2025-4802 in `glibc` (#14582))
 - Bump to rebuild with updated glibc
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.52.0-13

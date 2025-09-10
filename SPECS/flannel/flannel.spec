@@ -52,7 +52,11 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 %{_bindir}/flanneld
 
 %changelog
+<<<<<<< HEAD
 * Fri Sep 05 2025 Andrew Phelps <anphel@microsoft.com> - 0.24.2-17
+=======
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.24.2-17
+>>>>>>> 985e0b7b5 (Fix : patch application of CVE-2025-4802 in `glibc` (#14582))
 - Bump to rebuild with updated glibc
 
 * Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 0.24.2-16
