@@ -10050,7 +10050,7 @@ CONFIG_NVMEM_IMX_OCOTP_SCU=y
 # CONFIG_FPGA is not set
 # CONFIG_FSI is not set
 # CONFIG_TEE is not set
-CONFIG_MULTIPLEXER=m
+CONFIG_MULTIPLEXER=y
 
 #
 # Multiplexer drivers
