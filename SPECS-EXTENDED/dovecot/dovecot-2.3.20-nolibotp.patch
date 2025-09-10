@@ -1,0 +1,295 @@
+diff -up dovecot-2.3.20/configure.ac.nolibotp dovecot-2.3.20/configure.ac
+--- dovecot-2.3.20/configure.ac.nolibotp	2022-12-21 09:49:12.000000000 +0100
++++ dovecot-2.3.20/configure.ac	2023-02-14 16:54:02.118531016 +0100
+@@ -854,7 +854,6 @@ src/lib-lua/Makefile
+ src/lib-mail/Makefile
+ src/lib-master/Makefile
+ src/lib-program-client/Makefile
+-src/lib-otp/Makefile
+ src/lib-dovecot/Makefile
+ src/lib-sasl/Makefile
+ src/lib-settings/Makefile
+diff -up dovecot-2.3.20/src/auth/main.c.nolibotp dovecot-2.3.20/src/auth/main.c
+--- dovecot-2.3.20/src/auth/main.c.nolibotp	2022-12-21 09:49:12.000000000 +0100
++++ dovecot-2.3.20/src/auth/main.c	2023-02-14 16:54:02.118531016 +0100
+@@ -19,8 +19,6 @@
+ #include "password-scheme.h"
+ #include "passdb-cache.h"
+ #include "mech.h"
+-#include "otp.h"
+-#include "mech-otp-common.h"
+ #include "auth.h"
+ #include "auth-penalty.h"
+ #include "auth-token.h"
+@@ -283,7 +281,6 @@ static void main_deinit(void)
+ 
+ 	auth_policy_deinit();
+ 	mech_register_deinit(&mech_reg);
+-	mech_otp_deinit();
+ 	mech_deinit(global_auth_settings);
+ 
+ 	/* allow modules to unregister their dbs/drivers/etc. before freeing
+diff -up dovecot-2.3.20/src/auth/Makefile.am.nolibotp dovecot-2.3.20/src/auth/Makefile.am
+--- dovecot-2.3.20/src/auth/Makefile.am.nolibotp	2022-12-21 09:49:12.000000000 +0100
++++ dovecot-2.3.20/src/auth/Makefile.am	2023-02-14 16:54:02.118531016 +0100
+@@ -45,7 +45,6 @@ AM_CPPFLAGS = \
+ 	-I$(top_srcdir)/src/lib-sql \
+ 	-I$(top_srcdir)/src/lib-settings \
+ 	-I$(top_srcdir)/src/lib-old-stats \
+-	-I$(top_srcdir)/src/lib-otp \
+ 	-I$(top_srcdir)/src/lib-master \
+ 	-I$(top_srcdir)/src/lib-oauth2 \
+ 	-I$(top_srcdir)/src/lib-ssl-iostream \
+@@ -67,7 +66,6 @@ libpassword_la_SOURCES = \
+ 	password-scheme-crypt.c \
+ 	password-scheme-md5crypt.c \
+ 	password-scheme-scram.c \
+-	password-scheme-otp.c \
+ 	password-scheme-pbkdf2.c \
+ 	password-scheme-sodium.c
+ libpassword_la_CFLAGS = $(AM_CPPFLAGS) $(LIBSODIUM_CFLAGS)
+@@ -76,7 +74,6 @@ auth_libs = \
+ 	libauth.la \
+ 	libstats_auth.la \
+ 	libpassword.la \
+-	../lib-otp/libotp.la \
+ 	$(AUTH_LUA_LIBS) \
+ 	$(LIBDOVECOT_SQL)
+ 
+@@ -95,7 +92,6 @@ libauth_la_SOURCES = \
+ 	auth-client-connection.c \
+ 	auth-master-connection.c \
+ 	auth-policy.c \
+-	mech-otp-common.c \
+ 	mech-plain-common.c \
+ 	auth-penalty.c \
+ 	auth-request.c \
+@@ -122,7 +118,6 @@ libauth_la_SOURCES = \
+ 	mech-digest-md5.c \
+ 	mech-external.c \
+ 	mech-gssapi.c \
+-	mech-otp.c \
+ 	mech-scram.c \
+ 	mech-apop.c \
+ 	mech-winbind.c \
+@@ -161,7 +156,6 @@ headers = \
+ 	auth-client-connection.h \
+ 	auth-common.h \
+ 	auth-master-connection.h \
+-	mech-otp-common.h \
+ 	mech-plain-common.h \
+ 	mech-digest-md5-private.h \
+ 	mech-scram.h \
+@@ -260,7 +254,6 @@ test_libs = \
+ test_libpassword_SOURCES = test-libpassword.c
+ test_libpassword_LDADD = \
+ 	libpassword.la \
+-        ../lib-otp/libotp.la \
+ 	$(CRYPT_LIBS) \
+ 	$(LIBDOVECOT_SQL) \
+ 	$(LIBSODIUM_LIBS) \
+diff -up dovecot-2.3.20/src/auth/mech.c.nolibotp dovecot-2.3.20/src/auth/mech.c
+--- dovecot-2.3.20/src/auth/mech.c.nolibotp	2023-02-14 16:55:38.421231797 +0100
++++ dovecot-2.3.20/src/auth/mech.c	2023-02-14 16:55:38.434231892 +0100
+@@ -71,7 +71,6 @@ extern const struct mech_module mech_apo
+ extern const struct mech_module mech_cram_md5;
+ extern const struct mech_module mech_digest_md5;
+ extern const struct mech_module mech_external;
+-extern const struct mech_module mech_otp;
+ extern const struct mech_module mech_scram_sha1;
+ extern const struct mech_module mech_scram_sha256;
+ extern const struct mech_module mech_anonymous;
+@@ -206,7 +205,6 @@ void mech_init(const struct auth_setting
+ 		mech_register_module(&mech_gssapi_spnego);
+ #endif
+ 	}
+-	mech_register_module(&mech_otp);
+ 	mech_register_module(&mech_scram_sha1);
+ 	mech_register_module(&mech_scram_sha256);
+ 	mech_register_module(&mech_anonymous);
+@@ -233,7 +231,6 @@ void mech_deinit(const struct auth_setti
+ 		mech_unregister_module(&mech_gssapi_spnego);
+ #endif
+ 	}
+-	mech_unregister_module(&mech_otp);
+ 	mech_unregister_module(&mech_scram_sha1);
+ 	mech_unregister_module(&mech_scram_sha256);
+ 	mech_unregister_module(&mech_anonymous);
+diff -up dovecot-2.3.20/src/auth/password-scheme.c.nolibotp dovecot-2.3.20/src/auth/password-scheme.c
+--- dovecot-2.3.20/src/auth/password-scheme.c.nolibotp	2023-02-14 16:54:02.109530950 +0100
++++ dovecot-2.3.20/src/auth/password-scheme.c	2023-02-14 16:54:02.119531023 +0100
+@@ -13,7 +13,6 @@
+ #include "randgen.h"
+ #include "sha1.h"
+ #include "sha2.h"
+-#include "otp.h"
+ #include "str.h"
+ #include "password-scheme.h"
+ 
+@@ -709,32 +708,6 @@ plain_md5_generate(const char *plaintext
+ 	*size_r = MD5_RESULTLEN;
+ }
+ 
+-static int otp_verify(const char *plaintext, const struct password_generate_params *params ATTR_UNUSED,
+-		      const unsigned char *raw_password, size_t size,
+-		      const char **error_r)
+-{
+-	const char *password, *generated;
+-
+-	password = t_strndup(raw_password, size);
+-	if (password_generate_otp(plaintext, password, UINT_MAX, &generated) < 0) {
+-		*error_r = "Invalid OTP data in passdb";
+-		return -1;
+-	}
+-
+-	return strcasecmp(password, generated) == 0 ? 1 : 0;
+-}
+-
+-static void
+-otp_generate(const char *plaintext, const struct password_generate_params *params ATTR_UNUSED,
+-	     const unsigned char **raw_password_r, size_t *size_r)
+-{
+-	const char *password;
+-
+-	if (password_generate_otp(plaintext, NULL, OTP_HASH_SHA1, &password) < 0)
+-		i_unreached();
+-	*raw_password_r = (const unsigned char *)password;
+-	*size_r = strlen(password);
+-}
+ 
+ static const struct password_scheme builtin_schemes[] = {
+ 	{ "MD5", PW_ENCODING_NONE, 0, md5_verify, md5_crypt_generate },
+@@ -770,7 +743,6 @@ static const struct password_scheme buil
+ 	  NULL, plain_md5_generate },
+ 	{ "LDAP-MD5", PW_ENCODING_BASE64, MD5_RESULTLEN,
+ 	  NULL, plain_md5_generate },
+-	{ "OTP", PW_ENCODING_NONE, 0, otp_verify, otp_generate },
+         { "PBKDF2", PW_ENCODING_NONE, 0, pbkdf2_verify, pbkdf2_generate },
+ };
+ 
+diff -up dovecot-2.3.20/src/auth/password-scheme.h.nolibotp dovecot-2.3.20/src/auth/password-scheme.h
+--- dovecot-2.3.20/src/auth/password-scheme.h.nolibotp	2023-02-14 16:56:50.929759540 +0100
++++ dovecot-2.3.20/src/auth/password-scheme.h	2023-02-14 16:56:50.947759671 +0100
+@@ -92,9 +92,6 @@ void password_set_encryption_rounds(unsi
+ /* INTERNAL: */
+ const char *password_generate_salt(size_t len);
+ const char *password_generate_md5_crypt(const char *pw, const char *salt);
+-int password_generate_otp(const char *pw, const char *state_data,
+-			  unsigned int algo, const char **result_r)
+-	ATTR_NULL(2);
+ 
+ int crypt_verify(const char *plaintext,
+ 		 const struct password_generate_params *params,
+diff -up dovecot-2.3.20/src/auth/test-libpassword.c.nolibotp dovecot-2.3.20/src/auth/test-libpassword.c
+--- dovecot-2.3.20/src/auth/test-libpassword.c.nolibotp	2023-02-14 16:54:55.880922175 +0100
++++ dovecot-2.3.20/src/auth/test-libpassword.c	2023-02-14 16:54:55.896922291 +0100
+@@ -106,7 +106,6 @@ static void test_password_schemes(void)
+ 	test_password_scheme("SHA512", "{SHA512}7iaw3Ur350mqGo7jwQrpkj9hiYB3Lkc/iBml1JQODbJ6wYX4oOHV+E+IvIh/1nsUNzLDBMxfqa2Ob1f1ACio/w==", "test");
+ 	test_password_scheme("SSHA", "{SSHA}H/zrDv8FXUu1JmwvVYijfrYEF34jVZcO", "test");
+ 	test_password_scheme("MD5-CRYPT", "{MD5-CRYPT}$1$GgvxyNz8$OjZhLh4P.gF1lxYEbLZ3e/", "test");
+-	test_password_scheme("OTP", "{OTP}sha1 1024 ae6b49aa481f7233 f69fc7f98b8fbf54", "test");
+ 	test_password_scheme("PBKDF2", "{PBKDF2}$1$bUnT4Pl7yFtYX0KU$5000$50a83cafdc517b9f46519415e53c6a858908680a", "test");
+ 	test_password_scheme("CRAM-MD5", "{CRAM-MD5}e02d374fde0dc75a17a557039a3a5338c7743304777dccd376f332bee68d2cf6", "test");
+ 	test_password_scheme("DIGEST-MD5", "{DIGEST-MD5}77c1a8c437c9b08ba2f460fe5d58db5d", "test");
+diff -up dovecot-2.3.20/src/auth/test-mech.c.nolibotp dovecot-2.3.20/src/auth/test-mech.c
+--- dovecot-2.3.20/src/auth/test-mech.c.nolibotp	2022-12-21 09:49:12.000000000 +0100
++++ dovecot-2.3.20/src/auth/test-mech.c	2023-02-14 16:54:02.119531023 +0100
+@@ -8,8 +8,6 @@
+ #include "auth-request-handler-private.h"
+ #include "auth-settings.h"
+ #include "mech-digest-md5-private.h"
+-#include "otp.h"
+-#include "mech-otp-common.h"
+ #include "settings-parser.h"
+ #include "password-scheme.h"
+ #include "auth-token.h"
+@@ -27,7 +25,6 @@ extern const struct mech_module mech_dov
+ extern const struct mech_module mech_external;
+ extern const struct mech_module mech_login;
+ extern const struct mech_module mech_oauthbearer;
+-extern const struct mech_module mech_otp;
+ extern const struct mech_module mech_plain;
+ extern const struct mech_module mech_scram_sha1;
+ extern const struct mech_module mech_scram_sha256;
+@@ -65,10 +62,7 @@ request_handler_reply_mock_callback(stru
+ 
+ 	if (request->passdb_result == PASSDB_RESULT_OK)
+ 		request->failed = FALSE;
+-	else if (request->mech == &mech_otp) {
+-		if (null_strcmp(request->fields.user, "otp_phase_2") == 0)
+-			request->failed = FALSE;
+-	} else if (request->mech == &mech_oauthbearer) {
++	else if (request->mech == &mech_oauthbearer) {
+ 	}
+ };
+ 
+@@ -224,10 +218,6 @@ static void test_mechs(void)
+ 		{&mech_plain, UCHAR_LEN("\0testuser\0testpass"), "testuser", NULL, TRUE, FALSE, FALSE},
+ 		{&mech_plain, UCHAR_LEN("normaluser\0masteruser\0masterpass"), "masteruser", NULL, TRUE, FALSE, FALSE},
+ 		{&mech_plain, UCHAR_LEN("normaluser\0normaluser\0masterpass"), "normaluser", NULL, TRUE, FALSE, FALSE},
+-		{&mech_otp, UCHAR_LEN("hex:5Bf0 75d9 959d 036f"), "otp_phase_2", NULL, TRUE, TRUE, FALSE},
+-		{&mech_otp, UCHAR_LEN("word:BOND FOGY DRAB NE RISE MART"), "otp_phase_2", NULL, TRUE, TRUE, FALSE},
+-		{&mech_otp, UCHAR_LEN("init-hex:f6bd 6b33 89b8 7203:md5 499 ke6118:23d1 b253 5ae0 2b7e"), "otp_phase_2", NULL, TRUE, TRUE, FALSE},
+-		{&mech_otp, UCHAR_LEN("init-word:END KERN BALM NICK EROS WAVY:md5 499 ke1235:BABY FAIN OILY NIL TIDY DADE"), "otp_phase_2", NULL , TRUE, TRUE, FALSE},
+ 		{&mech_oauthbearer, UCHAR_LEN("n,a=testuser,p=cHJvb2Y=,f=nonstandart\x01host=server\x01port=143\x01""auth=Bearer vF9dft4qmTc2Nvb3RlckBhbHRhdmlzdGEuY29tCg==\x01\x01"), "testuser", NULL, FALSE, TRUE, FALSE},
+ 		{&mech_scram_sha1, UCHAR_LEN("n,,n=testuser,r=rOprNGfwEbeRWgbNEkqO"), "testuser", NULL, TRUE, FALSE, FALSE},
+ 		{&mech_scram_sha256, UCHAR_LEN("n,,n=testuser,r=rOprNGfwEbeRWgbNEkqO"), "testuser",  NULL, TRUE, FALSE, FALSE},
+@@ -242,8 +232,6 @@ static void test_mechs(void)
+ 		{&mech_external, UCHAR_LEN(""), "testuser", NULL, FALSE, TRUE, FALSE},
+ 		{&mech_external, UCHAR_LEN(""), NULL, NULL, FALSE, FALSE, FALSE},
+ 		{&mech_login, UCHAR_LEN(""), NULL, NULL, FALSE, FALSE, FALSE},
+-		{&mech_otp, UCHAR_LEN(""), NULL, "invalid input", FALSE, FALSE, FALSE},
+-		{&mech_otp, UCHAR_LEN(""), "testuser", "invalid input", FALSE, FALSE, FALSE},
+ 		{&mech_plain, UCHAR_LEN(""), NULL, NULL, FALSE, FALSE, FALSE},
+ 		{&mech_oauthbearer, UCHAR_LEN(""), NULL, NULL, FALSE, FALSE, FALSE},
+ 		{&mech_xoauth2, UCHAR_LEN(""), NULL, NULL, FALSE, FALSE, FALSE},
+@@ -255,7 +243,6 @@ static void test_mechs(void)
+ 		{&mech_apop, UCHAR_LEN("1.1.1\0testuser\0tooshort"), NULL, NULL, FALSE, FALSE, FALSE},
+ 		{&mech_apop, UCHAR_LEN("1.1.1\0testuser\0responseoflen16-"), NULL, NULL, FALSE, FALSE, FALSE},
+ 		{&mech_apop, UCHAR_LEN("1.1.1"), NULL, NULL, FALSE, FALSE, FALSE},
+-		{&mech_otp, UCHAR_LEN("somebody\0testuser"), "testuser", "otp(testuser): unsupported response type", FALSE, TRUE, FALSE},
+ 		{&mech_cram_md5, UCHAR_LEN("testuser\0response"), "testuser", NULL, FALSE, FALSE, FALSE},
+ 		{&mech_plain, UCHAR_LEN("testuser\0"), "testuser", NULL, FALSE, FALSE, FALSE},
+ 
+@@ -297,9 +284,7 @@ static void test_mechs(void)
+ 		{&mech_plain, UCHAR_LEN("\0fa\0il\0ing\0withthis"), NULL, NULL, FALSE, FALSE, FALSE},
+ 		{&mech_plain, UCHAR_LEN("failingwiththis"), NULL, NULL, FALSE, FALSE, FALSE},
+ 		{&mech_plain, UCHAR_LEN("failing\0withthis"), NULL, NULL, FALSE, FALSE, FALSE},
+-		{&mech_otp, UCHAR_LEN("someb\0ody\0testuser"), NULL, "invalid input", FALSE, FALSE, FALSE},
+ 		/* phase 2 */
+-		{&mech_otp, UCHAR_LEN("someb\0ody\0testuser"), "testuser", "otp(testuser): unsupported response type", FALSE, TRUE, FALSE},
+ 		{&mech_scram_sha1, UCHAR_LEN("c=biws,r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,p=v0X8v3Bz2T0CJGbJQyF0X+HI4Ts="), NULL, NULL, FALSE, FALSE, FALSE},
+ 		{&mech_scram_sha1, UCHAR_LEN("iws0X8v3Bz2T0CJGbJQyF0X+HI4Ts=,,,,"), NULL, NULL, FALSE, FALSE, FALSE},
+ 		{&mech_scram_sha1, UCHAR_LEN("n,a=masteruser,,"), NULL, NULL, FALSE, FALSE, FALSE},
+@@ -387,7 +372,6 @@ static void test_mechs(void)
+ 
+ 		test_end();
+ 	} T_END;
+-	mech_otp_deinit();
+ 	auths_deinit();
+ 	auth_token_deinit();
+ 	password_schemes_deinit();
+diff -up dovecot-2.3.20/src/doveadm/Makefile.am.nolibotp dovecot-2.3.20/src/doveadm/Makefile.am
+--- dovecot-2.3.20/src/doveadm/Makefile.am.nolibotp	2022-12-21 09:49:12.000000000 +0100
++++ dovecot-2.3.20/src/doveadm/Makefile.am	2023-02-14 16:54:02.119531023 +0100
+@@ -36,8 +36,7 @@ AM_CPPFLAGS = \
+ 	$(BINARY_CFLAGS)
+ 
+ cmd_pw_libs = \
+-	../auth/libpassword.la \
+-	../lib-otp/libotp.la
++	../auth/libpassword.la
+ 
+ libs = \
+ 	dsync/libdsync.la \
+diff -up dovecot-2.3.20/src/Makefile.am.nolibotp dovecot-2.3.20/src/Makefile.am
+--- dovecot-2.3.20/src/Makefile.am.nolibotp	2022-12-21 09:49:12.000000000 +0100
++++ dovecot-2.3.20/src/Makefile.am	2023-02-14 16:54:02.119531023 +0100
+@@ -40,7 +40,6 @@ SUBDIRS = \
+ 	lib-index \
+ 	lib-storage \
+ 	lib-sql \
+-	lib-otp \
+ 	lib-lda \
+ 	lib-dict-backend \
+ 	anvil \
