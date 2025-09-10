@@ -1,14 +1,13 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-GD
-Version:        2.71
-Release:        5%{?dist}
+Version:        2.83
+Release:        1%{?dist}
 Summary:        Perl interface to the GD graphics library
-License:        GPL+ or Artistic 2.0
+License:        GPL-1.0-or-later OR Artistic-2.0
 URL:            https://metacpan.org/release/GD
 Source0:        https://cpan.metacpan.org/modules/by-module/GD/GD-%{version}.tar.gz#/perl-GD-%{version}.tar.gz
-Patch0:         GD-2.56-utf8.patch
-Patch1:         GD-2.70-cflags.patch
+Patch1:         GD-2.77-cflags.patch
 # Module Build
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -19,9 +18,12 @@ BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(Config)
-BuildRequires:  perl(ExtUtils::Constant)
+BuildRequires:  perl(ExtUtils::Constant) >= 0.23
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(ExtUtils::PkgConfig)
+BuildRequires:  perl(File::Basename)
+BuildRequires:  perl(File::Spec)
+BuildRequires:  perl(File::Which)
 BuildRequires:  perl(Getopt::Long)
 # Module Runtime
 BuildRequires:  perl(AutoLoader)
@@ -40,10 +42,10 @@ BuildRequires:  perl(FindBin)
 BuildRequires:  perl(IO::Dir)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(Test)
-BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Test::More) >= 0.88
+BuildRequires:  perl(Test::NoWarnings) >= 1.00
 BuildRequires:  perl(warnings)
-# Runtime
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Dependencies
 Requires:       gd >= 2.0.28
 
 %global __provides_exclude %{?__provides_exclude:__provides_exclude|}^perl\\(GD::Polygon\\)$
@@ -57,11 +59,8 @@ create PNG images on the fly or modify existing files.
 %prep
 %setup -q -n GD-%{version}
 
-# Re-code documentation as UTF8
-%patch 0
-
 # Upstream wants -Wformat=1 but we don't
-%patch 1
+%patch -P 1
 
 # Fix shellbangs in sample scripts
 perl -pi -e 's|/usr/local/bin/perl\b|%{__perl}|' \
@@ -96,6 +95,10 @@ make test TEST_VERBOSE=1
 %{_mandir}/man3/GD::Simple.3*
 
 %changelog
+* Thu Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.16-1
+- Update to version 1.16
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.71-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
