@@ -1,12 +1,5 @@
-%{!?python3_pkgversion: %global python3_pkgversion 3}
-%{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?__python3: %global __python3 /usr/bin/python3}
-%{!?py3_build: %define py3_build CFLAGS="%{optflags}" %{__python3} setup.py build}
-%{!?py3_install: %define py3_install %{__python3} setup.py install --skip-build --root %{buildroot}}
-
-%global project_owner readthedocs
-%global github_name recommonmark
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 %global sum docutils-compatibility bridge to CommonMark
 %global desc A docutils-compatibility bridge to CommonMark.\
 \
@@ -14,44 +7,39 @@ This allows you to write CommonMark inside of Docutils & Sphinx projects.\
 \
 Documentation is available on Read the Docs: http://recommonmark.readthedocs.org
 
-Name:           python-%{github_name}
-Version:        0.6.0
-Release:        5%{?dist}
+Name:           python-recommonmark
+Version:        0.7.1
+Release:        11%{?dist}
 Summary:        %{sum}
+
 License:        MIT
-URL:            https://github.com/%{project_owner}/%{github_name}
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-Source0:        https://github.com/%{project_owner}/%{github_name}/archive/%{version}/%{github_name}-%{version}.tar.gz
+URL:            https://github.com/readthedocs/recommonmark
+Source0:        %{url}/archive/%{version}/recommonmark-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
 %{desc}
 
-%package -n     python%{python3_pkgversion}-%{github_name}
+%package -n     python%{python3_pkgversion}-recommonmark
 Summary:        %{sum}
 BuildArch:      noarch
 BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-docutils
 BuildRequires:  python%{python3_pkgversion}-CommonMark
 BuildRequires:  python%{python3_pkgversion}-pytest
 BuildRequires:  python%{python3_pkgversion}-sphinx
-Requires:       python%{python3_pkgversion}-docutils
-Requires:       python%{python3_pkgversion}-CommonMark
-Requires:       python%{python3_pkgversion}-sphinx
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{github_name}}
-BuildRequires:  python%{python3_pkgversion}-sphinxcontrib-websupport 
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-xml
-Requires:       python%{python3_pkgversion}-sphinxcontrib-websupport
+# Dependencies
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+%{?python_provide:%python_provide python%{python3_pkgversion}-recommonmark}
 
-%description -n python%{python3_pkgversion}-%{github_name}
+%description -n python%{python3_pkgversion}-recommonmark
 %{desc}
 
 %prep
-%setup -qn %{github_name}-%{version}
+%setup -qn recommonmark-%{version}
 # Remove upstream's egg-info
-rm -rf %{github_name}.egg-info
+rm -rf recommonmark.egg-info
 
 sed -i '1{\@^#!/usr/bin/env python@d}' recommonmark/scripts.py
 
@@ -70,26 +58,66 @@ popd  # Leave buildroot bindir
 
 %check
 # Skip some tests because of https://github.com/readthedocs/recommonmark/issues/164
-# PYTHONPATH=$(pwd) py.test-%{python3_version} -k 'not test_lists and not test_integration' .
+%pytest --ignore tests/test_sphinx.py
 
-%files -n python%{python3_pkgversion}-%{github_name}
-%license license.md
+%files -n python%{python3_pkgversion}-recommonmark
 %doc README.md
-%{python3_sitelib}/%{github_name}-%{version}*-py%{python3_version}.egg-info/
-%{python3_sitelib}/%{github_name}/
+%license license.md
+%{python3_sitelib}/recommonmark-%{version}*-py%{python3_version}.egg-info/
+%{python3_sitelib}/recommonmark/
 %{_bindir}/cm2*-3
 %{_bindir}/cm2*-%{python3_version}
 
 %changelog
-* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.0-5
-- Release bump to fix package information.
-- License verified.
+* Thu Feb 27 2025 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.7.1-11
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.0-4
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.1-10.git
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
-* Wed Oct 21 2020 Steve Laughman <steve.laughman@microsoft.com> - 0.6.0-3
-- Initial CBL-Mariner import from Fedora 33 (license: MIT)
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.7.1-9.git
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.1-8.git
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.1-7.git
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Sep 21 2023 Miro Hrončok <mhroncok@redhat.com> - 0.7.1-6.git
+- Run at least some tests during the build
+- Remove duplicate manual runtime Requires
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.1-5.git
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 0.7.1-4.git
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.1-3.git
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.1-2.git
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 29 2022 Julien Enselme <jujens@jujens.eu> - 0.7.1-1
+- Update to 0.7.1
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.6.0-7.git
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.0-6.git
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.0-5.git
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.6.0-4.git
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.0-3.git
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.0-2.git
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
