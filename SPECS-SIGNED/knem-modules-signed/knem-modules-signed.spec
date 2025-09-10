@@ -27,9 +27,9 @@
 # The default %%__os_install_post macro ends up stripping the signatures off of the kernel module.
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global target_kernel_version_full 6.6.96.2-2.azl3
+%global target_azl_build_kernel_version 6.6.96.2
+%global target_kernel_release 2
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
 %global KVERSION %{target_kernel_version_full}

@@ -30,7 +30,7 @@
 %global BF_VERSION 3.9.0
 
 # take kernel version or default to uname -r
-%global KVERSION %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global KVERSION 6.6.96.2-2.azl3
 %global K_SRC %{_libdir}/modules/%{KVERSION}/build
 %global moddestdir %{buildroot}%{_libdir}/modules/%{KVERSION}/kernel/
 
