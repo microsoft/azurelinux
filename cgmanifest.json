@@ -1447,8 +1447,8 @@
         "type": "other",
         "other": {
           "name": "capstone",
-          "version": "4.0.2",
-          "downloadUrl": "https://github.com/aquynh/capstone/archive/4.0.2.tar.gz"
+          "version": "5.0.1",
+          "downloadUrl": "https://github.com/aquynh/capstone/archive/5.0.1.tar.gz"
         }
       }
     },
