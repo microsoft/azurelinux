@@ -26,97 +26,80 @@
 #
 #
 
-%if 0%{azl}
+%global debug_package %{nil}
+# The default %%__os_install_post macro ends up stripping the signatures off of the kernel module.
+%define __os_install_post %{__os_install_post_leave_signatures} %{nil}
+
 # hard code versions due to ADO bug:58993948
 %global target_azl_build_kernel_version 6.12.40.1
 %global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
-%else
-%global target_kernel_version_full f.a.k.e
-%endif
 
 %global KVERSION %{target_kernel_version_full}
-%global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
-# KMP is disabled by default
-%{!?KMP: %global KMP 0}
+%{!?_name: %global _name mlnx-ofa_kernel-hwe-modules}
 
-%global WITH_SYSTEMD %(if ( test -d "%{_unitdir}" > /dev/null); then echo -n '1'; else echo -n '0'; fi)
-
-%{!?configure_options: %global configure_options --with-core-mod --with-user_mad-mod --with-user_access-mod --with-addr_trans-mod --with-mlx5-mod --with-mlxfw-mod --with-ipoib-mod}
-
-%global MEMTRACK %(if ( echo %{configure_options} | grep "with-memtrack" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
-%global MADEYE %(if ( echo %{configure_options} | grep "with-madeye-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
-
-%global WINDRIVER %(if (grep -qiE "Wind River" /etc/issue /etc/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
-%global POWERKVM %(if (grep -qiE "powerkvm" /etc/issue /etc/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
-%global BLUENIX %(if (grep -qiE "Bluenix" /etc/issue /etc/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
-%global XENSERVER65 %(if (grep -qiE "XenServer.*6\.5" /etc/issue /etc/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
-
-%global IS_RHEL_VENDOR "%{_vendor}" == "redhat" || ("%{_vendor}" == "bclinux") || ("%{_vendor}" == "openEuler")
-%global KMOD_PREAMBLE "%{_vendor}" != "openEuler"
-
-# MarinerOS 1.0 sets -fPIE in the hardening cflags
-# (in the gcc specs file).
-# This seems to break only this package and not other kernel packages.
-%if "%{_vendor}" == "mariner" || "%{_vendor}" == "azl" || "%{_vendor}" == "azurelinux" || (0%{?rhel} >= 10)
-%global _hardened_cflags %{nil}
-%endif
-
-# WA: Centos Stream 10 kernel doesn't support PIC mode, so we removed the following flags
-%if (0%{?rhel} >= 10)
-%global _hardening_gcc_ldflags %{nil}
-%global _gcc_lto_cflags %{nil}
-%endif
-
-# %{!?KVERSION: %global KVERSION %(uname -r)}
-%{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
-%global kernel_version %{KVERSION}
-%global krelver %(echo -n %{KVERSION} | sed -e 's/-/_/g')
-# take path to kernel sources if provided, otherwise look in default location (for non KMP rpms).
-%{!?K_SRC: %global K_SRC /lib/modules/%{KVERSION}/build}
-
-# Select packages to build
-
-# Kernel module packages to be included into kernel-ib
-%global build_ipoib %(if ( echo %{configure_options} | grep "with-ipoib-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
-%global build_oiscsi %(if ( echo %{configure_options} | grep "with-iscsi-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
-%global build_mlx5 %(if ( echo %{configure_options} | grep "with-mlx5-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
-
-%{!?LIB_MOD_DIR: %global LIB_MOD_DIR /lib/modules/%{KVERSION}/updates}
-
-%{!?IB_CONF_DIR: %global IB_CONF_DIR /etc/infiniband}
-
-%{!?KERNEL_SOURCES: %global KERNEL_SOURCES /lib/modules/%{KVERSION}/source}
-
-%{!?_name: %global _name mlnx-ofa_kernel}
-%{!?_version: %global _version 24.10}
-%{!?_release: %global _release OFED.24.10.0.7.0.1}
-%global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
-
-%global utils_pname %{name}
-%global devel_pname %{name}-devel
-%global non_kmp_pname %{name}-modules
-
-# !!!! some OOT spec depends on this the exact version and release nb of this component
-# !!!! do not forget to upgrade those spec when upgrading version or release nb
-# !!!! e.g.: when going from version 24.10 to 24.11 or going from release 20 to 21
-# !!!! to identify the depend spec look for "_mofed_full_version"
+# mlnx-ofa_kernel-modules is a sub-package in SPECS/mlnx-ofa_kernel.
+# We are making that into a main package for signing.
 
 Summary:	 Infiniband HCA Driver
-Name:		 mlnx-ofa_kernel-hwe-modules-signed
+Name:		 %{_name}-signed
 Version:	 24.10
 Release:	 20%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
-Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ofa_kernel-24.10.tgz#/%{_name}-%{_version}.tgz
 
-BuildRoot:	 /var/tmp/%{name}-%{version}-build
+#
+# To populate these sources:
+#   1. Build the unsigned packages as normal
+#   2. Sign the desired binary
+#   3. Place the unsigned package and signed binary in this spec's folder
+#   4. Build this spec
+
+Source0:        %{_name}-%{version}-%{release}.%{_arch}.rpm
+Source1:        mlx_compat.ko
+Source2:        ib_cm.ko
+Source3:        ib_core.ko
+Source4:        ib_ucm.ko
+Source5:        ib_umad.ko
+Source6:        ib_uverbs.ko
+Source7:        iw_cm.ko
+Source8:        rdma_cm.ko
+Source9:        rdma_ucm.ko
+Source10:       bnxt_re.ko
+Source11:       efa.ko
+Source12:       mlx4_ib.ko
+Source13:       mlx5_ib.ko
+Source14:       rdma_rxe.ko
+Source15:       ib_ipoib.ko
+Source16:       ib_iser.ko
+Source17:       ib_isert.ko
+Source18:       ib_srp.ko
+Source19:       mlx5_core.ko
+Source20:       mlxfw.ko
+Source21:       mlxsw_spectrum.ko
+Source22:       nvme-rdma.ko
+Source23:       nvmet-rdma.ko
+Source24:       mlxdevm.ko
+Source25:       smc.ko
+Source26:       smc_diag.ko
+Source27:       rpcrdma.ko
+Source28:       svcrdma.ko
+Source29:       xprtrdma.ko
+
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 ExclusiveArch:   aarch64
+
+
+%description 
+Mellanox infiniband kernel modules.
+The driver sources are located at: http://www.mellanox.com/downloads/
+
+%package -n %{_name}
+Summary:        %{summary}
 
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -144,587 +127,70 @@ Requires: module-init-tools
 Requires: lsof
 Requires: ofed-scripts
 
-
-%if "%{KMP}" == "1"
-BuildRequires: %kernel_module_package_buildreqs
-BuildRequires: /usr/bin/perl
-%endif
-%description
-InfiniBand "verbs", Access Layer  and ULPs.
-Utilities rpm.
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
-
-
-# build KMP rpms?
-%if "%{KMP}" == "1"
-%global kernel_release() $(make -s -C %{1} kernelrelease M=$PWD)
-# prep file list for kmp rpm
-%(cat > %{_builddir}/kmp.files << EOF
-%defattr(644,root,root,755)
-/lib/modules/%2-%1
-%if %{IS_RHEL_VENDOR}
-%config(noreplace) %{_sysconfdir}/depmod.d/zz01-%{_name}-*.conf
-%endif
-EOF)
-%(echo "Obsoletes: kmod-mlnx-rdma-rxe, mlnx-rdma-rxe-kmp" >> %{_builddir}/preamble)
-%if %KMOD_PREAMBLE
-%kernel_module_package -f %{_builddir}/kmp.files -r %{_kmp_rel} -p %{_builddir}/preamble
-%else
-%kernel_module_package -f %{_builddir}/kmp.files -r %{_kmp_rel}
-%endif
-%else # not KMP
-%global kernel_source() %{K_SRC}
-%global kernel_release() %{KVERSION}
-%global flavors_to_build default
-%package -n %{non_kmp_pname}
-Obsoletes: kernel-ib
-Obsoletes: mlnx-en
-Obsoletes: mlnx_en
-Obsoletes: mlnx-en-utils
-Obsoletes: kmod-mlnx-en
-Obsoletes: mlnx-en-kmp-default
-Obsoletes: mlnx-en-kmp-xen
-Obsoletes: mlnx-en-kmp-trace
-Obsoletes: mlnx-en-doc
-Obsoletes: mlnx-en-debuginfo
-Obsoletes: mlnx-en-sources
-Obsoletes: mlnx-rdma-rxe
-Summary: Infiniband Driver and ULPs kernel modules
-Group: System Environment/Libraries
-%description -n %{non_kmp_pname}
-Core, HW and ULPs kernel modules
-Non-KMP format kernel modules rpm.
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
-%endif #end if "%{KMP}" == "1"
-
-%package -n %{devel_pname}
-Obsoletes: kernel-ib-devel
-Obsoletes: kernel-ib
-Obsoletes: mlnx-en
-Obsoletes: mlnx_en
-Obsoletes: mlnx-en-utils
-Obsoletes: kmod-mlnx-en
-Obsoletes: mlnx-en-kmp-default
-Obsoletes: mlnx-en-kmp-xen
-Obsoletes: mlnx-en-kmp-trace
-Obsoletes: mlnx-en-doc
-Obsoletes: mlnx-en-debuginfo
-Obsoletes: mlnx-en-sources
-Requires: coreutils
-Requires: pciutils
-Requires(post): %{_sbindir}/update-alternatives
-Requires(postun): %{_sbindir}/update-alternatives
-Summary: Infiniband Driver and ULPs kernel modules sources
-Group: System Environment/Libraries
-%description -n %{devel_pname}
-Core, HW and ULPs kernel modules sources
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
-
-%package source
-Summary: Source of the MLNX_OFED main kernel driver
-Group: System Environment/Libraries
-%description source
-Source of the mlnx-ofa_kernel modules.
-
-You should probably only install this package if you want to view the
-sourecs of driver. Use the -devel package if you want to build other
-drivers against it.
-
-#
-# setup module sign scripts if paths to the keys are given
-#
-%global WITH_MOD_SIGN %(if ( test -f "$MODULE_SIGN_PRIV_KEY" && test -f "$MODULE_SIGN_PUB_KEY" ); \
-	then \
-		echo -n '1'; \
-	else \
-		echo -n '0'; fi)
-
-%if "%{WITH_MOD_SIGN}" == "1"
-# call module sign script
-%global __modsign_install_post \
-    %{_builddir}/$NAME-$VERSION/source/ofed_scripts/tools/sign-modules %{buildroot}/lib/modules/ %{kernel_source default} || exit 1 \
-%{nil}
-
-%global __debug_package 1
-%global buildsubdir %{_name}-%{version}
-# Disgusting hack alert! We need to ensure we sign modules *after* all
-# invocations of strip occur, which is in __debug_install_post if
-# find-debuginfo.sh runs, and __os_install_post if not.
-#
-%global __spec_install_post \
-  %{?__debug_package:%{__debug_install_post}} \
-  %{__arch_install_post} \
-  %{__os_install_post} \
-  %{__modsign_install_post} \
-%{nil}
-
-%endif # end of setup module sign scripts
-#
-%if "%{_vendor}" == "suse"
-%debug_package
-%endif
-
-%if %{IS_RHEL_VENDOR}
-%global __find_requires %{nil}
-%endif
-
-# set modules dir
-%if %{IS_RHEL_VENDOR}
-%if 0%{?fedora}
-%global install_mod_dir updates
-%else
-%global install_mod_dir extra/%{_name}
-%endif
-%endif
-
-%if "%{_vendor}" == "suse"
-%global install_mod_dir updates
-%endif
-
-%{!?install_mod_dir: %global install_mod_dir updates}
+%description -n %{_name}
+%{description}
 
 %prep
 
 %build
-EXTRA_CFLAGS='-DVERSION=\"%version\"'
-%if (0%{?rhel} >= 10)
-EXTRA_CFLAGS+=' -fno-exceptions'
-%endif
-export EXTRA_CFLAGS
-export CFLAGS="$CFLAGS  -fno-exceptions "
-export INSTALL_MOD_DIR=%{install_mod_dir}
-export CONF_OPTIONS="%{configure_options}"
-for flavor in %flavors_to_build; do
-	export KSRC=%{kernel_source $flavor}
-	export KVERSION=%{kernel_release $KSRC}
-	export LIB_MOD_DIR=/lib/modules/$KVERSION/$INSTALL_MOD_DIR
-	rm -rf obj/$flavor
-	cp -a source obj/$flavor
-	cd $PWD/obj/$flavor
-	find compat -type f -exec touch -t 200012201010 '{}' \; || true
-	./configure --build-dummy-mods --prefix=%{_prefix} --kernel-version $KVERSION --kernel-sources $KSRC --modules-dir $LIB_MOD_DIR $CONF_OPTIONS %{?_smp_mflags}
-	make %{?_smp_mflags} kernel
-	make build_py_scripts
-	cd -
-done
+mkdir rpm_contents
+pushd rpm_contents
+
+# This spec's whole purpose is to inject the signed modules
+rpm2cpio %{SOURCE0} | cpio -idmv
+
+cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/compat/mlx_compat.ko
+cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_cm.ko
+cp -rf %{SOURCE3} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_core.ko
+cp -rf %{SOURCE4} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_ucm.ko
+cp -rf %{SOURCE5} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_umad.ko
+cp -rf %{SOURCE6} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/ib_uverbs.ko
+cp -rf %{SOURCE7} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/iw_cm.ko
+cp -rf %{SOURCE8} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/rdma_cm.ko
+cp -rf %{SOURCE9} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/core/rdma_ucm.ko
+cp -rf %{SOURCE10} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/bnxt_re/bnxt_re.ko
+cp -rf %{SOURCE11} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/efa/efa.ko
+cp -rf %{SOURCE12} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mlx4/mlx4_ib.ko
+cp -rf %{SOURCE13} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mlx5/mlx5_ib.ko
+cp -rf %{SOURCE14} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/sw/rxe/rdma_rxe.ko
+cp -rf %{SOURCE15} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/ipoib/ib_ipoib.ko
+cp -rf %{SOURCE16} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/iser/ib_iser.ko
+cp -rf %{SOURCE17} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/isert/ib_isert.ko
+cp -rf %{SOURCE18} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/srp/ib_srp.ko
+cp -rf %{SOURCE19} ./lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.ko
+cp -rf %{SOURCE20} ./lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlxfw/mlxfw.ko
+cp -rf %{SOURCE21} ./lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlxsw/mlxsw_spectrum.ko
+cp -rf %{SOURCE22} ./lib/modules/%{KVERSION}/updates/drivers/nvme/host/nvme-rdma.ko
+cp -rf %{SOURCE23} ./lib/modules/%{KVERSION}/updates/drivers/nvme/target/nvmet-rdma.ko
+cp -rf %{SOURCE24} ./lib/modules/%{KVERSION}/updates/net/mlxdevm/mlxdevm.ko
+cp -rf %{SOURCE25} ./lib/modules/%{KVERSION}/updates/net/smc/smc.ko
+cp -rf %{SOURCE26} ./lib/modules/%{KVERSION}/updates/net/smc/smc_diag.ko
+cp -rf %{SOURCE27} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/rpcrdma.ko
+cp -rf %{SOURCE28} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/svcrdma.ko
+cp -rf %{SOURCE29} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/xprtrdma.ko
+
+popd
 
 %install
-export RECORD_PY_FILES=1
-export INSTALL_MOD_PATH=%{buildroot}
-export INSTALL_MOD_DIR=%{install_mod_dir}
-export NAME=%{_name}
-export VERSION=%{version}
-export PREFIX=%{_prefix}
-mkdir -p %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}
-for flavor in %flavors_to_build; do
-	export KSRC=%{kernel_source $flavor}
-	export KVERSION=%{kernel_release $KSRC}
-	cd $PWD/obj/$flavor
-	make install_modules KERNELRELEASE=$KVERSION
-	# install script and configuration files
-	make install_scripts
-	mkdir -p %{_builddir}/src/$NAME/$flavor
-	cp -ar include/ %{_builddir}/src/$NAME/$flavor
-	cp -ar config* %{_builddir}/src/$NAME/$flavor
-	cp -ar compat*  %{_builddir}/src/$NAME/$flavor
-	cp -ar ofed_scripts %{_builddir}/src/$NAME/$flavor
+pushd rpm_contents
 
-	modsyms=`find . -name Module.symvers -o -name Modules.symvers`
-	if [ -n "$modsyms" ]; then
-		for modsym in $modsyms
-		do
-			cat $modsym >> %{_builddir}/src/$NAME/$flavor/Module.symvers
-		done
-	else
-		./ofed_scripts/create_Module.symvers.sh
-		cp ./Module.symvers %{_builddir}/src/$NAME/$flavor/Module.symvers
-	fi
-	cp -a %{_builddir}/src/$NAME/$flavor %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}/$KVERSION
-	# Cleanup unnecessary kernel-generated module dependency files.
-	find $INSTALL_MOD_PATH/lib/modules -iname 'modules.*' -exec rm {} \;
-	cd -
-done
+# Don't use * wildcard. It does not copy over hidden files in the root folder...
+cp -rp ./. %{buildroot}/
 
-# Set the module(s) to be executable, so that they will be stripped when packaged.
-find %{buildroot} \( -type f -name '*.ko' -o -name '*ko.gz' \) -exec %{__chmod} u+x \{\} \;
-
-%if %{IS_RHEL_VENDOR}
-%if ! 0%{?fedora}
-%{__install} -d %{buildroot}%{_sysconfdir}/depmod.d/
-for module in `find %{buildroot}/ -name '*.ko' -o -name '*.ko.gz' | sort`
-do
-ko_name=${module##*/}
-mod_name=${ko_name/.ko*/}
-mod_path=${module/*%{_name}}
-mod_path=${mod_path/\/${ko_name}}
-echo "override ${mod_name} * weak-updates/%{_name}${mod_path}" >> %{buildroot}%{_sysconfdir}/depmod.d/zz01-%{_name}-${mod_name}.conf
-echo "override ${mod_name} * extra/%{_name}${mod_path}" >> %{buildroot}%{_sysconfdir}/depmod.d/zz01-%{_name}-${mod_name}.conf
-done
-%endif
-%endif
-
-# copy sources
-mkdir -p %{buildroot}/%{_prefix}/src/ofa_kernel-%{version}
-cp -a %{_builddir}/%{_name}-%{version}/source %{buildroot}/%{_prefix}/src/ofa_kernel-%{version}/source
-ln -s ofa_kernel-%{version}/source %{buildroot}/%{_prefix}/src/mlnx-ofa_kernel-%{version}
-# Fix path of BACKPORT_INCLUDES
-sed -i -e "s@=-I.*backport_includes@=-I/usr/src/ofa_kernel-$VERSION/backport_includes@" %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION}/configure.mk.kernel || true
-rm -rf %{_builddir}/src
-
-INFO=${RPM_BUILD_ROOT}/etc/infiniband/info
-/bin/rm -f ${INFO}
-mkdir -p ${RPM_BUILD_ROOT}/etc/infiniband
-touch ${INFO}
-
-cat >> ${INFO} << EOFINFO
-#!/bin/bash
-
-echo prefix=%{_prefix}
-echo Kernel=%{KVERSION}
-echo
-echo "Configure options: %{configure_options}"
-echo
-EOFINFO
-
-chmod +x ${INFO} > /dev/null 2>&1
-
-%if "%{WITH_SYSTEMD}" == "1"
-install -d %{buildroot}%{_unitdir}
-install -d %{buildroot}/etc/systemd/system
-install -m 0644 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/openibd.service %{buildroot}%{_unitdir}
-install -m 0644 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_interface_mgr\@.service %{buildroot}/etc/systemd/system
-%endif
-
-install -d %{buildroot}/bin
-install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_conf_mgr.sh %{buildroot}/bin/
-%if "%{WINDRIVER}" == "0" && "%{BLUENIX}" == "0"
-install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_interface_mgr.sh %{buildroot}/bin/
-%else
-# Wind River and Mellanox Bluenix are rpm based, however, interfaces management is done in Debian style
-install -d %{buildroot}/usr/sbin
-install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_interface_mgr_deb.sh %{buildroot}/bin/mlnx_interface_mgr.sh
-install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/net-interfaces %{buildroot}/usr/sbin
-%endif
-
-# Install ibroute utilities
-# TBD: move these utilities into standalone package
-install -d %{buildroot}%{_sbindir}
-
-# update /etc/init.d/openibd header
-is_euler=`grep 'NAME=".*Euler' /etc/os-release 2>/dev/null || :`
-if [[ -f /etc/redhat-release || -f /etc/rocks-release || "$is_euler" != '' ]]; then
-perl -i -ne 'if (m@^#!/bin/bash@) {
-        print q@#!/bin/bash
-#
-# Bring up/down openib
-#
-# chkconfig: 2345 05 95
-# description: Activates/Deactivates InfiniBand Driver to \
-#              start at boot time.
-#
-### BEGIN INIT INFO
-# Provides:       openibd
-### END INIT INFO
-@;
-                 } else {
-                     print;
-                 }' %{buildroot}/etc/init.d/openibd
-fi
-
-if grep -qwE 'suse|SLES' /etc/os-release 2>/dev/null; then
-    local_fs='$local_fs'
-    openiscsi=''
-    %if %{build_oiscsi}
-        openiscsi='open-iscsi'
-    %endif
-        perl -i -ne "if (m@^#!/bin/bash@) {
-        print q@#!/bin/bash
-### BEGIN INIT INFO
-# Provides:       openibd
-# Required-Start: $local_fs
-# Required-Stop: opensmd $openiscsi
-# Default-Start:  2 3 5
-# Default-Stop: 0 1 2 6
-# Description:    Activates/Deactivates InfiniBand Driver to \
-#                 start at boot time.
-### END INIT INFO
-@;
-                 } else {
-                     print;
-                 }" %{buildroot}/etc/init.d/openibd
-fi
-
-%if %{build_ipoib}
-case $(uname -m) in
-	i[3-6]86)
-	# Decrease send/receive queue sizes on 32-bit arcitecture
-	echo "options ib_ipoib send_queue_size=64 recv_queue_size=128" >> %{buildroot}/etc/modprobe.d/ib_ipoib.conf
-	;;
-esac
-%endif
-
-%clean
-rm -rf %{buildroot}
+popd
 
 
-%if "%{KMP}" != "1"
-%post -n %{non_kmp_pname}
+%post -n %{_name}
 /sbin/depmod %{KVERSION}
-# W/A for OEL6.7/7.x inbox modules get locked in memory
-# in dmesg we get: Module mlx4_core locked in memory until next boot
-if (grep -qiE "Oracle.*(6.([7-9]|10)| 7)" /etc/issue /etc/*release* 2>/dev/null); then
-	/sbin/dracut --force
-fi
 
-%postun -n %{non_kmp_pname}
+%postun -n %{_name}
 if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 	/sbin/depmod %{KVERSION}
-	# W/A for OEL6.7/7.x inbox modules get locked in memory
-	# in dmesg we get: Module mlx4_core locked in memory until next boot
-	if (grep -qiE "Oracle.*(6.([7-9]|10)| 7)" /etc/issue /etc/*release* 2>/dev/null); then
-		/sbin/dracut --force
-	fi
-fi
-%endif # end KMP=1
-
-%post -n %{utils_pname}
-if [ $1 -eq 1 ]; then # 1 : This package is being installed
-#############################################################################################################
-is_euler=`grep 'NAME=".*Euler' /etc/os-release 2>/dev/null || :`
-is_kylin=`grep 'NAME=".*Kylin' /etc/os-release 2>/dev/null || :`
-if [[ -f /etc/redhat-release || -f /etc/rocks-release || -f /etc/UnionTech-release || -f /etc/ctyunos-release || "$is_euler" != '' || "$is_kylin" != '' ]]; then
-        /sbin/chkconfig openibd off >/dev/null 2>&1 || true
-        /usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-        /sbin/chkconfig --del openibd >/dev/null 2>&1 || true
-
-%if "%{WITH_SYSTEMD}" != "1"
-        /sbin/chkconfig --add openibd >/dev/null 2>&1 || true
-        /sbin/chkconfig openibd on >/dev/null 2>&1 || true
-%else
-        /usr/bin/systemctl enable openibd >/dev/null  2>&1 || true
-%endif
 fi
 
-if grep -qwE 'suse|SLES' /etc/os-release 2>/dev/null; then
-        /sbin/chkconfig openibd off >/dev/null  2>&1 || true
-        /usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-        /sbin/insserv -r openibd >/dev/null 2>&1 || true
-
-%if "%{WITH_SYSTEMD}" != "1"
-        /sbin/insserv openibd >/dev/null 2>&1 || true
-        /sbin/chkconfig openibd on >/dev/null 2>&1 || true
-%else
-        /usr/bin/systemctl enable openibd >/dev/null  2>&1 || true
-%endif
-fi
-
-%if "%{WINDRIVER}" == "1" || "%{BLUENIX}" == "1"
-/usr/sbin/update-rc.d openibd defaults || true
-%endif
-
-%if "%{POWERKVM}" == "1"
-/usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-/usr/bin/systemctl enable openibd >/dev/null  2>&1 || true
-%endif
-
-%if "%{WITH_SYSTEMD}" == "1"
-/usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-cat /proc/sys/kernel/random/boot_id 2>/dev/null | sed -e 's/-//g' > /var/run/openibd.bootid || true
-test -s /var/run/openibd.bootid || echo manual > /var/run/openibd.bootid || true
-%endif
-
-# Comment core modules loading hack
-if [ -e /etc/modprobe.conf.dist ]; then
-	sed -i -r -e 's/^(\s*install ib_core.*)/#MLX# \1/' /etc/modprobe.conf.dist
-	sed -i -r -e 's/^(\s*alias ib.*)/#MLX# \1/' /etc/modprobe.conf.dist
-fi
-
-%if %{build_ipoib}
-if [ -e /etc/modprobe.d/ipv6 ]; then
-	sed -i -r -e 's/^(\s*install ipv6.*)/#MLX# \1/' /etc/modprobe.d/ipv6
-fi
-%endif
-
-# Update limits.conf (but not for Containers)
-if [ ! -e "/.dockerenv" ] && ! (grep -q docker /proc/self/cgroup 2>/dev/null); then
-	if [ -e /etc/security/limits.conf ]; then
-		LIMITS_UPDATED=0
-		if ! (grep -qE "soft.*memlock" /etc/security/limits.conf 2>/dev/null); then
-			echo "* soft memlock unlimited" >> /etc/security/limits.conf
-			LIMITS_UPDATED=1
-		fi
-		if ! (grep -qE "hard.*memlock" /etc/security/limits.conf 2>/dev/null); then
-			echo "* hard memlock unlimited" >> /etc/security/limits.conf
-			LIMITS_UPDATED=1
-		fi
-		if [ $LIMITS_UPDATED -eq 1 ]; then
-			echo "Configured /etc/security/limits.conf"
-		fi
-	fi
-fi
-
-# Make IPoIB interfaces be unmanaged on XenServer
-if (grep -qi xenserver /etc/issue /etc/*-release 2>/dev/null); then
-	IPOIB_PNUM=$(lspci -d 15b3: 2>/dev/null | wc -l 2>/dev/null)
-	IPOIB_PNUM=$(($IPOIB_PNUM * 2))
-	for i in $(seq 1 $IPOIB_PNUM)
-	do
-		uuid=$(xe pif-list 2>/dev/null | grep -B2 ib${i} | grep uuid | cut -d : -f 2 | sed -e 's/ //g')
-		if [ "X${uuid}" != "X" ]; then
-			xe pif-forget uuid=${uuid} >/dev/null 2>&1 || true
-		fi
-	done
-fi
-
-fi # 1 : closed
-# END of post
-
-%preun -n %{utils_pname}
-is_euler=`grep 'NAME=".*Euler' /etc/os-release 2>/dev/null || :`
-is_kylin=`grep 'NAME=".*Kylin' /etc/os-release 2>/dev/null || :`
-if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
-          if [[ -f /etc/redhat-release || -f /etc/rocks-release || -f /etc/UnionTech-release || "$is_euler" != '' || "$is_kylin" != '' ]]; then
-                /sbin/chkconfig openibd off >/dev/null 2>&1 || true
-                /usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-                /sbin/chkconfig --del openibd  >/dev/null 2>&1 || true
-          fi
-	  if grep -qwE 'suse|SLES' /etc/os-release 2>/dev/null; then
-                /sbin/chkconfig openibd off >/dev/null 2>&1 || true
-                /usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-                /sbin/insserv -r openibd >/dev/null 2>&1 || true
-          fi
-          if [ -f /etc/debian_version ]; then
-                if ! ( /usr/sbin/update-rc.d openibd remove > /dev/null 2>&1 ); then
-                        true
-                fi
-          fi
-%if "%{WINDRIVER}" == "1" || "%{BLUENIX}" == "1"
-/usr/sbin/update-rc.d -f openibd remove || true
-%endif
-
-%if "%{POWERKVM}" == "1"
-/usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-%endif
-fi
-
-%postun -n %{utils_pname}
-%if "%{WITH_SYSTEMD}" == "1"
-/usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-%endif
-
-# Uncomment core modules loading hack
-if [ -e /etc/modprobe.conf.dist ]; then
-	sed -i -r -e 's/^#MLX# (.*)/\1/' /etc/modprobe.conf.dist
-fi
-
-%if %{build_ipoib}
-if [ -e /etc/modprobe.d/ipv6 ]; then
-	sed -i -r -e 's/^#MLX# (.*)/\1/' /etc/modprobe.d/ipv6
-fi
-%endif
-
-#end of post uninstall
-
-%post -n %{devel_pname}
-if [ -d "%{_prefix}/src/ofa_kernel/default" -a $1 -gt 1 ]; then
-	touch %{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION}.missing_link
-	# Will run update-alternatives in posttrans
-else
-	update-alternatives --install \
-		%{_prefix}/src/ofa_kernel/default \
-		ofa_kernel_headers \
-		%{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION} \
-		20
-fi
-
-%posttrans -n %{devel_pname}
-symlink="%{_prefix}/src/ofa_kernel/default"
-# Should only be used for upgrading from pre-5.5-0.2.6.0 packages:
-# At the time of upgrade there was still a directory, so postpone
-# generating the alternative symlink to that point:
-for flag_file in %{_prefix}/src/ofa_kernel/*/*.missing_link; do
-	dir=${flag_file%.missing_link}
-	if [ ! -d "$dir" ]; then
-		# Directory is no longer there. Nothing left to handle
-		rm -f "$flag_file"
-		continue
-	fi
-	if [ -d "$symlink" ]; then
-		echo "%{devel_pname}-%{version}: $symlink is still a non-empty directory. Deleting in preparation for a symlink."
-		rm -rf "$symlink"
-	fi
-	update-alternatives --install \
-		"$symlink" \
-		ofa_kernel_headers \
-		"$dir" \
-		20
-	rm -f "$flag_file"
-done
-
-%postun -n %{devel_pname}
-update-alternatives --remove \
-	ofa_kernel_headers \
-	%{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION} \
-
-%files -n %{utils_pname}
-%defattr(-,root,root,-)
-%license source/debian/copyright
-%doc source/ofed_scripts/82-net-setup-link.rules source/ofed_scripts/vf-net-link-name.sh
-%if "%{KMP}" == "1"
-%if %{IS_RHEL_VENDOR}
-%endif # end rh
-%endif # end KMP=1
-%dir /etc/infiniband
-%config(noreplace) /etc/infiniband/openib.conf
-%config(noreplace) /etc/infiniband/mlx5.conf
-/etc/infiniband/info
-/etc/init.d/openibd
-%if "%{WITH_SYSTEMD}" == "1"
-%{_unitdir}/openibd.service
-/etc/systemd/system/mlnx_interface_mgr@.service
-%endif
-/lib/udev/sf-rep-netdev-rename
-/lib/udev/auxdev-sf-netdev-rename
-/usr/sbin/setup_mr_cache.sh
-%_datadir/mlnx_ofed/mlnx_bf_assign_ct_cores.sh
-%config(noreplace) /etc/modprobe.d/mlnx.conf
-%config(noreplace) /etc/modprobe.d/mlnx-bf.conf
-%{_sbindir}/*
-/lib/udev/rules.d/83-mlnx-sf-name.rules
-/lib/udev/rules.d/90-ib.rules
-/bin/mlnx_interface_mgr.sh
-/bin/mlnx_conf_mgr.sh
-%if "%{WINDRIVER}" == "1" || "%{BLUENIX}" == "1"
-/usr/sbin/net-interfaces
-%endif
-%if %{build_ipoib}
-%config(noreplace) /etc/modprobe.d/ib_ipoib.conf
-%endif
-%if %{build_mlx5}
-%{_sbindir}/ibdev2netdev
-%endif
-
-%if "%{KMP}" != "1"
-%files -n %{non_kmp_pname}
-%license source/debian/copyright
-/lib/modules/%{KVERSION}/%{install_mod_dir}/
-%if %{IS_RHEL_VENDOR}
-%if ! 0%{?fedora}
-%config(noreplace) %{_sysconfdir}/depmod.d/zz01-%{_name}-*.conf
-%endif
-%endif
-%endif
-
-%files -n %{devel_pname}
-%defattr(-,root,root,-)
-%license source/debian/copyright
-%{_prefix}/src/ofa_kernel/%{_arch}/[0-9]*
-
-%files source
-%defattr(-,root,root,-)
-%license source/debian/copyright
-%{_prefix}/src/ofa_kernel-%version/source
-%{_prefix}/src/mlnx-ofa_kernel-%version
+%files -n %{_name}
+/lib/modules/%{KVERSION}/updates/
+%license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
 * Mon Sep 08 2025 Elaheh Dehghani <edehghani@microsoft.com> - 24.10-20
@@ -743,8 +209,7 @@ update-alternatives --remove \
 - Bump release to rebuild for new kernel release
 
 * Tue Apr 08 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-15
-- Bump release to match "signed" spec changes.
-- Removed extra 'Release' tag from the spec file.
+- Re-naming the package to de-duplicate the SRPM name.
 
 * Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-14
 - Bump release to rebuild for new kernel release
@@ -779,38 +244,13 @@ update-alternatives --remove \
 * Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10-4
 - Bump release to rebuild for new kernel release
 
-* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10-3
+* Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-3
 - Bump release to match kernel
 
 * Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-2
 - Bump release to match kernel
 
-* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
+* Sat Jan 18 2025 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
+- Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
-* Thu Jun 18 2015 Alaa Hleihel <alaa@mellanox.com>
-- Renamed kernel-ib package to mlnx-ofa_kernel-modules
-* Thu Apr 10 2014 Alaa Hleihel <alaa@mellanox.com>
-- Add QoS utils.
-* Thu Mar 13 2014 Alaa Hleihel <alaa@mellanox.com>
-- Use one spec for KMP and non-KMP OS's.
-* Tue Apr 24 2012 Vladimir Sokolovsky <vlad@mellanox.com>
-- Remove FC support
-* Tue Mar 6 2012 Vladimir Sokolovsky <vlad@mellanox.com>
-- Add weak updates support
-* Wed Jul 6 2011 Vladimir Sokolovsky <vlad@mellanox.co.il>
-- Add KMP support
-* Mon Oct 4 2010 Vladimir Sokolovsky <vlad@mellanox.co.il>
-- Add mlx4_fc and mlx4_vnic support
-* Mon May 10 2010 Vladimir Sokolovsky <vlad@mellanox.co.il>
-- Support install macro that removes RPM_BUILD_ROOT
-* Thu Feb 4 2010 Vladimir Sokolovsky <vlad@mellanox.co.il>
-- Added ibdev2netdev script
-* Mon Sep 8 2008 Vladimir Sokolovsky <vlad@mellanox.co.il>
-- Added nfsrdma support
-* Wed Aug 13 2008 Vladimir Sokolovsky <vlad@mellanox.co.il>
-- Added mlx4_en support
-* Tue Aug 21 2007 Vladimir Sokolovsky <vlad@mellanox.co.il>
-- Added %build macro
-* Sun Jan 28 2007 Vladimir Sokolovsky <vlad@mellanox.co.il>
-- Created spec file for kernel-ib

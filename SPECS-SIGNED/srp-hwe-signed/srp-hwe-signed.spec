@@ -26,6 +26,10 @@
 #
 #
 
+%global debug_package %{nil}
+# The default %%__os_install_post macro ends up stripping the signatures off of the kernel module.
+%define __os_install_post %{__os_install_post_leave_signatures} %{nil}
+
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
 %global target_azl_build_kernel_version 6.12.40.1
@@ -37,207 +41,74 @@
 %endif
 
 %global KVERSION %{target_kernel_version_full}
-%global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
-%{!?_name: %define _name srp}
-%{!?_version: %define _version 24.10}
-%{!?_mofed_full_version: %define _mofed_full_version %{_version}-20%{release_suffix}%{?dist}}
-%{!?_release: %define _release OFED.24.10.0.6.7.1}
-
-# KMP is disabled by default
-%{!?KMP: %global KMP 0}
-
-# take kernel version or default to uname -r
-# %{!?KVERSION: %global KVERSION %(uname -r)}
-%{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
-%global kernel_version %{KVERSION}
-%global krelver %(echo -n %{KVERSION} | sed -e 's/-/_/g')
-# take path to kernel sources if provided, otherwise look in default location (for non KMP rpms).
-%{!?K_SRC: %global K_SRC /lib/modules/%{KVERSION}/build}
-
-# define release version
-%{!?src_release: %global src_release %{_release}_%{krelver}}
-%if "%{KMP}" != "1"
-%global _release1 %{src_release}
-%else
-%global _release1 %{_release}
-%endif
-%global _kmp_rel %{_release1}%{?_kmp_build_num}%{?_dist}
+%define _name srp-hwe
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-20%{release_suffix}%{?dist}}
 
 Summary:	 srp driver
-Name:		 srp-hwe-signed
+Name:		 %{_name}-signed
 Version:	 24.10
 Release:	 20%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
-Source:		 https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/srp-24.10.tgz#/%{_name}-%{version}.tgz
-BuildRoot:	 /var/tmp/%{name}-%{version}-build
+
+#
+# To populate these sources:
+#   1. Build the unsigned packages as normal
+#   2. Sign the desired binary
+#   3. Place the unsigned package and signed binary in this spec's folder
+#   4. Build this spec
+
+Source0:         %{_name}-%{version}-%{release}.%{_arch}.rpm
+Source1:         ib_srp.ko
+Source2:         scsi_transport_srp.ko
+
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 ExclusiveArch:   aarch64
 
+%description
+srp kernel modules
+
+%package -n %{_name}
+Summary:        %{summary}
 Requires:       mlnx-ofa_kernel-hwe = %{_mofed_full_version}
-Requires:       mlnx-ofa_kernel-hwe-modules  = %{_mofed_full_version}
+Requires:       mlnx-ofa_kernel-hwe-modules = %{_mofed_full_version}
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
 
-%description
-%{name} kernel modules
-
-# build KMP rpms?
-%if "%{KMP}" == "1"
-%global kernel_release() $(make -s -C %{1} kernelrelease M=$PWD)
-BuildRequires: %kernel_module_package_buildreqs
-%(mkdir -p %{buildroot})
-%(echo '%defattr (-,root,root)' > %{buildroot}/file_list)
-%(echo '/lib/modules/%2-%1' >> %{buildroot}/file_list)
-%(echo '%config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{_name}-*-%1.conf' >> %{buildroot}/file_list)
-%{kernel_module_package -f %{buildroot}/file_list -x xen -r %{_kmp_rel} }
-%else
-%global kernel_source() %{K_SRC}
-%global kernel_release() %{KVERSION}
-%global flavors_to_build default
-%endif
-
-#
-# setup module sign scripts if paths to the keys are given
-#
-%global WITH_MOD_SIGN %(if ( test -f "$MODULE_SIGN_PRIV_KEY" && test -f "$MODULE_SIGN_PUB_KEY" ); \
-	then \
-		echo -n '1'; \
-	else \
-		echo -n '0'; fi)
-
-%if "%{WITH_MOD_SIGN}" == "1"
-# call module sign script
-%global __modsign_install_post \
-    %{_builddir}/%{_name}-%{version}/source/tools/sign-modules %{buildroot}/lib/modules/  %{kernel_source default} || exit 1 \
-%{nil}
-
-%global __debug_package 1
-%global buildsubdir %{_name}-%{version}
-# Disgusting hack alert! We need to ensure we sign modules *after* all
-# invocations of strip occur, which is in __debug_install_post if
-# find-debuginfo.sh runs, and __os_install_post if not.
-#
-%global __spec_install_post \
-  %{?__debug_package:%{__debug_install_post}} \
-  %{__arch_install_post} \
-  %{__os_install_post} \
-  %{__modsign_install_post} \
-%{nil}
-
-%endif # end of setup module sign scripts
-#
-
-%if "%{_vendor}" == "suse"
-%debug_package
-%endif
-
-%if 0%{?anolis} == 8
-%global __find_requires %{nil}
-%endif
-
-# set modules dir
-%if "%{_vendor}" == "redhat" || ("%{_vendor}" == "openEuler")
-%if 0%{?fedora}
-%global install_mod_dir updates/%{name}
-%else
-%global install_mod_dir extra/%{name}
-%endif
-%endif
-
-%if "%{_vendor}" == "suse"
-%global install_mod_dir updates/%{name}
-%endif
-
-%{!?install_mod_dir: %global install_mod_dir updates/%{name}}
+%description -n %{_name}
+%{description}
 
 %prep
 
 %build
-export EXTRA_CFLAGS='-DVERSION=\"%version\"'
-export INSTALL_MOD_DIR=%{install_mod_dir}
-export CONF_OPTIONS="%{configure_options}"
-for flavor in %{flavors_to_build}; do
-	export K_BUILD=%{kernel_source $flavor}
-	export KVER=%{kernel_release $K_BUILD}
-	export LIB_MOD_DIR=/lib/modules/$KVER/$INSTALL_MOD_DIR
-	rm -rf obj/$flavor
-	cp -r source obj/$flavor
-	cd $PWD/obj/$flavor
-	make
-	cd -
-done
+mkdir rpm_contents
+pushd rpm_contents
+
+# This spec's whole purpose is to inject the signed modules
+rpm2cpio %{SOURCE0} | cpio -idmv
+
+cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/srp/ib_srp.ko
+cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/srp/scsi/scsi_transport_srp.ko
+
+popd
 
 %install
-export INSTALL_MOD_PATH=%{buildroot}
-export INSTALL_MOD_DIR=%{install_mod_dir}
-export PREFIX=%{_prefix}
-for flavor in %flavors_to_build; do
-	export K_BUILD=%{kernel_source $flavor}
-	export KVER=%{kernel_release $K_BUILD}
-	cd $PWD/obj/$flavor
-	make install KERNELRELEASE=$KVER
-	# Cleanup unnecessary kernel-generated module dependency files.
-	find $INSTALL_MOD_PATH/lib/modules -iname 'modules.*' -exec rm {} \;
-	cd -
-done
+pushd rpm_contents
 
-# Set the module(s) to be executable, so that they will be stripped when packaged.
-find %{buildroot} \( -type f -name '*.ko' -o -name '*ko.gz' \) -exec %{__chmod} u+x \{\} \;
+# Don't use * wildcard. It does not copy over hidden files in the root folder...
+cp -rp ./. %{buildroot}/
 
-%{__install} -d %{buildroot}%{_sysconfdir}/depmod.d/
-for module in `find %{buildroot}/ -name '*.ko' -o -name '*.ko.gz' | sort`
-do
-ko_name=${module##*/}
-mod_name=${ko_name/.ko*/}
-mod_path=${module/*\/%{name}}
-mod_path=${mod_path/\/${ko_name}}
-%if "%{_vendor}" == "suse"
-    for flavor in %{flavors_to_build}; do
-        if [[ $module =~ $flavor ]] || [ "X%{KMP}" != "X1" ];then
-            echo "override ${mod_name} * updates/%{name}${mod_path}" >> %{buildroot}%{_sysconfdir}/depmod.d/zz02-%{_name}-${mod_name}-$flavor.conf
-        fi
-    done
-%else
-    %if 0%{?fedora}
-        echo "override ${mod_name} * updates/%{name}${mod_path}" >> %{buildroot}%{_sysconfdir}/depmod.d/zz02-%{_name}-${mod_name}.conf
-    %else
-        %if "%{_vendor}" == "redhat" || ("%{_vendor}" == "openEuler")
-            echo "override ${mod_name} * weak-updates/%{name}${mod_path}" >> %{buildroot}%{_sysconfdir}/depmod.d/zz02-%{_name}-${mod_name}.conf
-        %endif
-        echo "override ${mod_name} * extra/%{name}${mod_path}" >> %{buildroot}%{_sysconfdir}/depmod.d/zz02-%{_name}-${mod_name}.conf
-    %endif
-%endif
-done
+popd
 
-
-%clean
-rm -rf %{buildroot}
-
-%post
-if [ $1 -ge 1 ]; then # 1 : This package is being installed or reinstalled
-  /sbin/depmod %{KVERSION}
-fi # 1 : closed
-# add SRP_LOAD=no to  openib.conf
-if [ -f "/etc/infiniband/openib.conf" ] && ! (grep -q SRP_LOAD /etc/infiniband/openib.conf > /dev/null 2>&1) ; then
-    echo "# Load SRP module" >> /etc/infiniband/openib.conf
-    echo "SRP_LOAD=no" >> /etc/infiniband/openib.conf
-fi
-# END of post
-
-%postun
-/sbin/depmod %{KVERSION}
-
-%if "%{KMP}" != "1"
-%files
+%files -n %{_name}
 %defattr(-,root,root,-)
-%license source/debian/copyright
-/lib/modules/%{KVERSION}/%{install_mod_dir}/
-%config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{_name}-*.conf
-%endif
+/lib/modules/%{KVERSION}/updates/srp/ib_srp.ko
+/lib/modules/%{KVERSION}/updates/srp/scsi/scsi_transport_srp.ko
+%config(noreplace) %{_sysconfdir}/depmod.d/zz02-srp-*.conf
+%license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
 * Mon Sep 08 2025 Elaheh Dehghani <edehghani@microsoft.com> - 24.10-20
@@ -256,7 +127,7 @@ fi
 - Bump release to rebuild for new kernel release
 
 * Tue Apr 08 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-15
-- Bump release to match "signed" spec changes.
+- Re-naming the package to de-duplicate the SRPM name.
 
 * Sat Apr 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-14
 - Bump release to rebuild for new kernel release
@@ -291,15 +162,13 @@ fi
 * Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10-4
 - Bump release to rebuild for new kernel release
 
-* Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10-3
+* Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-3
 - Bump release to match kernel
 
 * Thu Jan 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-2
 - Bump release to match kernel
 
-* Thu Jan 9 2025 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
+* Sat Jan 18 2025 Binu Jose Philip <bphilip@microsoft.com> - 24.10-1
+- Creating signed spec
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
-
-* Thu Feb 20 2014 Alaa Hleihel <alaa@mellanox.com>
-- Initial packaging
