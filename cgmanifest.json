@@ -26083,8 +26083,8 @@
         "type": "other",
         "other": {
           "name": "resource-agents",
-          "version": "4.10.0",
-          "downloadUrl": "https://github.com/ClusterLabs/resource-agents/archive/refs/tags/v4.10.0.tar.gz"
+          "version": "4.16.0",
+          "downloadUrl": "https://github.com/ClusterLabs/resource-agents/archive/refs/tags/v4.16.0.tar.gz"
         }
       }
     },
@@ -30869,7 +30869,7 @@
         "other": {
           "name": "xpp3",
           "version": "1.1.4c",
-          "downloadUrl": "http://www.extreme.indiana.edu/dist/java-repository/xpp3/distributions/xpp3-1.1.4c_src.tgz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xpp3-1.1.4c_src.tgz"
         }
       }
     },
