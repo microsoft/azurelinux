@@ -1,6 +1,6 @@
 {
   "Signatures": {
-    "kata-containers-3.18.0.kata0.tar.gz": "164ac643e28b022449d0361decdcaa67df59c4eb589ae9ee87ff14926020f9d4",
-    "kata-containers-3.18.0.kata0-cargo.tar.gz": "fa08007f886b70c8bb475fb35da13c3ac9315427f1e390f1a8d36887a000da45"
+    "kata-containers-3.19.1.kata1-cargo.tar.gz": "4c0420e92432bfa5a4a6ea691098efb0683d9afbe04f8fe314dd2c2a8133994b",
+    "kata-containers-3.19.1.kata1.tar.gz": "5921c8d7f9564909ace1443724f91efa12b09d4eeb8585bf8f0cf4fd3faf9d4b"
   }
 }

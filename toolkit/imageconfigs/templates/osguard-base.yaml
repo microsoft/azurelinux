@@ -162,6 +162,7 @@ os:
       - sysstat
       - traceroute
       - util-linux
+      - which
       - xz
       - zip
 

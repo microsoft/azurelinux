@@ -29,7 +29,7 @@
 Summary:        Linux Kernel
 Name:           kernel-lpg-innovate
 Version:        6.6.89.2
-Release:        1002%{?dist}
+Release:        1003%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -80,6 +80,7 @@ Conflicts:      kernel
 Conflicts:      kernel-64k
 Conflicts:      kernel-ipe
 Conflicts:      kernel-rt
+Conflicts:      kernel-hwe
 %{?grub2_configuration_requires}
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
@@ -469,6 +470,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Aug 22 2025 Siddharth Chintamaneni <siddharthc@microsoft.com> - 6.6.89.2-1003
+- Introducing kernel-hwe
+
 * Wed 11 Jun 2025 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.89.2-1002
 - Add Conflicts with other kernels
 - Rename bpftool and python3-perf to be kernel specific

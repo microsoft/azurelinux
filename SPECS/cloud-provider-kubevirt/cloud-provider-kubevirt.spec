@@ -1,7 +1,7 @@
 Summary:        Package to create the cloud-provider-kubevirt binary.
 Name:           cloud-provider-kubevirt
 Version:        0.5.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kubevirt/cloud-provider-kubevirt/
 Group:          System/Management
@@ -30,7 +30,7 @@ Patch1:         single-ip-address-for-node.patch
 Patch2:         golang-version-upgrade.patch
 Patch3:         instanceexists-watches-vms-instead-of-vmis.patch
 %global debug_package %{nil}
-BuildRequires:  golang >= 1.23
+BuildRequires:  golang < 1.25
 
 %define our_gopath %{_topdir}/.gopath
 
@@ -69,6 +69,9 @@ make test
 %{_bindir}/kubevirt-cloud-controller-manager
 
 %changelog
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 0.5.1-2
+- Set BR for golang to < 1.25
+
 * Tue Feb 04 2025 Sharath Srikanth Chellappa <sharathsr@microsoft.com> 0.5.1-1
 - Original version for Azure Linux.
 - License verified.

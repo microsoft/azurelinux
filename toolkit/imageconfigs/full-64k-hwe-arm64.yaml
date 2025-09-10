@@ -1,0 +1,148 @@
+storage: 
+  bootType: efi 
+  disks: 
+  - partitionTableType: gpt
+    maxSize: 8G
+    partitions:
+    - id: esp
+      type: esp
+      size: 9M
+    - id: boot
+      size: 200M
+    - id: root
+      size: grow
+  filesystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+  - deviceId: boot
+    type: ext4
+    mountPoint:
+      path: /boot
+  - deviceId: root
+    type: ext4
+    mountPoint:
+      path: /
+os:
+  bootloader:
+    resetType: hard-reset
+
+  kernelCommandLine:
+    extraCommandLine:
+    - efi_mmap_nr_slack_slots=256
+    - console=tty0
+    - console=ttyS0,115200n8
+
+  packages:
+    install:
+    - kernel-hwe
+    - kernel-hwe-drivers-accessibility
+    - kernel-hwe-drivers-sound
+    - createrepo_c
+    - jq
+    # iso required packages
+    - squashfs-tools
+    - tar
+    - device-mapper
+    - curl
+
+    installLists:
+    - packagelists/isoinstaller-64k-hwe-packages.yaml
+
+    remove:
+    - kernel
+
+  additionalFiles:
+  - source: ../out/tools/imager
+    destination: /installer/imager
+  - source: ../out/tools/liveinstaller
+    destination: /installer/liveinstaller
+  - source: ../resources/imageconfigs/additionalfiles/iso_initrd/init
+    destination: /init
+  - source: ../resources/imageconfigs/additionalfiles/iso_initrd/installer/calamares-EULA.txt
+    destination: /etc/calamares/azl-eula  
+  - source: ../resources/imageconfigs/additionalfiles/iso_initrd/installer/terminal-EULA.txt
+    destination: /installer/EULA.txt
+  - source: ../resources/imageconfigs/additionalfiles/iso_initrd/root/asoundrc
+    destination: /root/.asoundrc
+  - source: ../resources/imageconfigs/additionalfiles/iso_initrd/root/runliveinstaller
+    destination: /root/runliveinstaller
+  - source: ../resources/imageconfigs/additionalfiles/iso_initrd/root/silence.wav
+    destination: /root/silence.wav
+  - source: ../resources/imageconfigs/additionalfiles/iso_initrd/usr/lib/mariner/terminfo/mariner-installer
+    destination: /usr/lib/mariner/terminfo/m/mariner-installer
+  - source: ../resources/imageconfigs/additionalfiles/iso_initrd/usr/lib/systemd/system/getty@.service
+    destination: /usr/lib/systemd/system/getty@.service
+  - source: ../resources/imageconfigs/additionalfiles/iso_initrd/usr/lib/systemd/system/serial-getty@.service
+    destination: /usr/lib/systemd/system/serial-getty@.service
+  - source: ../resources/manifests/image/local.repo
+    destination: /etc/yum.repos.d/mariner-iso.repo
+  - source: additionalconfigs/99-dhcp-en.network
+    destination: /config/additionalfiles/99-dhcp-en.network
+  - source: packagelists/hyperv-packages.json
+    destination: /config/packages/hyperv-packages.json
+  - source: packagelists/developer-packages.json
+    destination: /config/packages/developer-packages.json
+  - source: packagelists/virtualization-host-packages.json
+    destination: /config/packages/virtualization-host-packages.json
+  - source: packagelists/core-packages-image-aarch64.json
+    destination: /config/packages/core-packages-image-aarch64.json
+  - source: packagelists/core-tools-packages.json
+    destination: /config/packages/core-tools-packages.json
+  - source: packagelists/selinux-full.json
+    destination: /config/packages/selinux-full.json
+  - source: packagelists/virt-guest-packages.json
+    destination: /config/packages/virt-guest-packages.json
+  - source: packagelists/ssh-server.json
+    destination: /config/packages/ssh-server.json
+  - source: files/imagecustomizer/isoinstaller/attended_config_aarch64_64k_hwe.json
+    destination: /config/attended_config.json
+
+  additionalDirs:
+  - source: ./installer-pkgs
+    destination: /RPMS
+
+  users:
+    - name: root
+      passwordExpiresDays: 99999
+      startupCommand: /root/runliveinstaller
+
+scripts:
+  postCustomization:
+    - path: postinstallscripts/imagecustomizer/isoinstaller_postinstalltask.sh
+  finalizeCustomization:
+    - path: scripts/set_os_release_variant_entries.sh
+      arguments:
+      - --variant-id
+      - full-64k-hwe
+      - --variant
+      - ISO installer for 64k HWE Kernel
+
+iso:
+  additionalFiles:
+  - source: additionalconfigs/99-dhcp-en.network
+    destination: /config/additionalfiles/99-dhcp-en.network
+  - source: packagelists/hyperv-packages.json
+    destination: /config/packages/hyperv-packages.json
+  - source: packagelists/developer-packages.json
+    destination: /config/packages/developer-packages.json
+  - source: packagelists/virtualization-host-packages.json
+    destination: /config/packages/virtualization-host-packages.json
+  - source: packagelists/core-packages-image-aarch64.json
+    destination: /config/packages/core-packages-image-aarch64.json
+  - source: packagelists/core-tools-packages.json
+    destination: /config/packages/core-tools-packages.json
+  - source: packagelists/selinux-full.json
+    destination: /config/packages/selinux-full.json
+  - source: packagelists/virt-guest-packages.json
+    destination: /config/packages/virt-guest-packages.json
+  - source: packagelists/ssh-server.json
+    destination: /config/packages/ssh-server.json
+  - source: files/imagecustomizer/isoinstaller/attended_config_aarch64_64k_hwe.json
+    destination: /config/attended_config.json
+
+output:
+  image:
+    format: iso

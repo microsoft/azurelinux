@@ -25,7 +25,7 @@
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
 Version:        6.6.85.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -80,6 +80,7 @@ Conflicts:      kernel
 Conflicts:      kernel-64k
 Conflicts:      kernel-ipe
 Conflicts:      kernel-lpg-innovate
+Conflicts:      kernel-hwe
 ExclusiveArch:  x86_64
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
@@ -425,6 +426,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Aug 22 2025 Siddharth Chintamaneni <siddharthc@microsoft.com> - 6.6.85.1-3
+- Introducing kernel-hwe
+
 * Tue Jun 10 2025 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.85.1-2
 - Rename bpftool and python3-perf to be kernel specific
 
