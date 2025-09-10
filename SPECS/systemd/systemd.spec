@@ -292,7 +292,7 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
-* Mon Jul 03 2025 Akhila Guruju <v-guakhila@microsoft.com> - 250.3-23
+* Tue Jul 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 250.3-23
 - Patch CVE-2025-4598
 
 * Thu May 22 2025 Akhila Guruju <v-guakhila@microsoft.com> - 250.3-22
