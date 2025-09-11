@@ -32,7 +32,7 @@ Name:		shim-unsigned-aarch64
 Provides:       shim-unsigned-%{efiarch}
 
 Version:	15.8
-Release:	5%{?dist}
+Release:	6%{?dist}
 Summary:	First-stage UEFI bootloader
 ExclusiveArch:	aarch64
 License:	BSD
@@ -160,6 +160,9 @@ HASH=$(cat %{buildroot}%{shimdir}/shim%{efiarch}.hash | cut -d ' ' -f 1)
 %files debugsource -f build-%{efiarch}/debugsource.list
 
 %changelog
+* Mon Jun 02 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 15-8.6
+- Bump to match shim release
+
 * Thu Nov 28 2024 Chris Co <chrco@microsoft.com> - 15.8-5
 - Bump to match shim release
 
