@@ -1,18 +1,17 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-%global modname cmd2
+%global pypi_name cmd2
 
-Name:             python-cmd2
-Version:          0.9.16
-Release:          4%{?dist}
+Name:             python-%{pypi_name}
+Version:          2.4.2
+Release:          9%{?dist}
 Summary:          Extra features for standard library's cmd module
 
 License:          MIT
 URL:              https://pypi.python.org/pypi/cmd2
-Source0:          https://files.pythonhosted.org/packages/ef/77/7a13dbfc91018ad4d7ad07345c636e374a7655a17ac5b3c8c1248c4e722c/cmd2-0.9.16.tar.gz#/python-cmd2-0.9.16.tar.gz
+Source0:          https://files.pythonhosted.org/packages/39/a0/830934f19f07e77c7d332fd5b41358611afc8d33d8cea78259b9a5d7f8ef/cmd2-2.4.2.tar.gz#/python-cmd2-2.4.2.tar.gz
 BuildArch:        noarch
-
 
 %global _description\
 Enhancements for standard library's cmd module.\
@@ -41,45 +40,19 @@ See docs at http://packages.python.org/cmd2/
 %description %_description
 
 %package -n python3-cmd2
-Summary:        Extra features for standard library's cmd module
+Summary:          %{summary}
 BuildRequires:    python3-devel
 BuildRequires:    python3-setuptools
 BuildRequires:    python3-setuptools_scm
 BuildRequires:    dos2unix
 
-Requires:         python3-pyparsing
-Requires:         python3-pyperclip
-Requires:         python3-six
-Requires:         python3-wcwidth
 Requires:         /usr/bin/which
 %{?python_provide:%python_provide python3-cmd2}
 
-%description -n python3-cmd2
-Enhancements for standard library's cmd module.
-
-Drop-in replacement adds several features for command-prompt tools:
-
- * Searchable command history (commands: "hi", "li", "run")
- * Load commands from file, save to file, edit commands in file
- * Multi-line commands
- * Case-insensitive commands
- * Special-character shortcut commands (beyond cmd's "@" and "!")
- * Settable environment parameters 
- * Parsing commands with flags
- * > (filename), >> (filename) redirect output to file
- * < (filename) gets input from file
- * bare >, >>, < redirect to/from paste buffer
- * accepts abbreviated commands when unambiguous
- * `py` enters interactive Python console
- * test apps against sample session transcript (see example/example.py)
-
-Usable without modification anywhere cmd is used; simply import cmd2.Cmd
-in place of cmd.Cmd.
-
-See docs at http://packages.python.org/cmd2/
+%description -n python3-%{pypi_name} %_description
 
 %prep
-%setup -q -n %{modname}-%{version}
+%autosetup -n %{pypi_name}-%{version}
 
 %build
 %py3_build
@@ -87,16 +60,98 @@ See docs at http://packages.python.org/cmd2/
 %install
 %py3_install
 
-
-%files -n python3-%{modname}
+%files -n python3-%{pypi_name}
 %license LICENSE
-%doc CHANGELOG.md CODEOWNERS CONTRIBUTING.md README.md
+%doc CHANGELOG.md README.md docs
 %{python3_sitelib}/cmd2
-%{python3_sitelib}/%{modname}-%{version}*
+%{python3_sitelib}/%{pypi_name}-%{version}*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.16-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Dec 20 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.4.2-9
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 2.4.2-7
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 2.4.2-3
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sun Sep 18 2022 Kevin Fenzi <kevin@scrye.com> - 2.4.2-1
+- Update 2.4.2. Fixes rhbz#2075345
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 2.4.0-2
+- Rebuilt for Python 3.11
+
+* Thu Mar 03 2022 Fabian Affolter <mail@fabian-affolter.ch> - 2.4.0-1
+- Update to latest upstream release 2.4.0 (closes rhbz#2057232)
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sat Jan 08 2022 Kevin Fenzi <kevin@scrye.com> - 2.3.3-1
+- Update to 2.3.2. Fixes rhbz#2027510
+
+* Sun Nov 28 2021 Kevin Fenzi <kevin@scrye.com> - 2.3.2-1
+- Update to 2.3.2. Fixes rhbz#2022524
+
+* Sat Sep 25 2021 Kevin Fenzi <kevin@scrye.com> - 2.2.0-1
+- Update to 2.2.0. Fixes rhbz#2004224
+
+* Sun Aug 08 2021 Kevin Fenzi <kevin@scrye.com> - 2.1.2-1
+- Update to 2.1.2. Fixes rhbz#1971701
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sat Jun 19 2021 Kevin Fenzi <kevin@scrye.com> - 2.1.1-1
+- Update to 2.1.1. Fixed rhbz#1971701
+
+* Mon Jun 07 2021 Python Maint <python-maint@redhat.com> - 2.0.1-2
+- Rebuilt for Python 3.10
+
+* Mon Jun 07 2021 Ken Dreyer <kdreyer@redhat.com> - 2.0.1-1
+- Update to latest upstream release
+- Remove explicit Requires
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.4.0-3
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Dec 11 2020 Fabian Affolter <mail@fabian-affolter.ch> - 1.4.0-1
+- Update to latest upstream release 1.4.0
+
+* Thu Nov 19 2020 Joel Capitao <jcapitao@redhat.com> - 1.3.11-1
+- Update to 1.3.11.
+
+* Sun Sep 27 2020 Kevin Fenzi <kevin@scrye.com> - 1.3.10-1
+- Update to 1.3.10. Fixes bug #1878431
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.16-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.9.16-4
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.16-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
