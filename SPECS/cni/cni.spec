@@ -24,7 +24,7 @@
 Summary:        Container Network Interface - networking for Linux containers
 Name:           cni
 Version:        1.0.1
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,6 +48,8 @@ Source2:        build.sh
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source3:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2022-32149.patch
+Patch1:         CVE-2024-45338.patch
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  xz
@@ -65,6 +67,8 @@ the container is deleted. Because of this focus, CNI has a wide
 range of support and the specification is simple to implement.
 
 %prep
+%patch 0 -p1
+%patch 1 -p1
 %setup -q
 cp %{SOURCE2} build.sh
 
@@ -113,6 +117,9 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
 %{_sbindir}/cnitool
 
 %changelog
+* Thu Sep 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.1-20
+- Patch for CVE-2024-45338, CVE-2022-32149
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.0.1-19
 - Bump release to rebuild with golang
 
@@ -237,7 +244,7 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
     + Update cnitool documentation for spec v0.4.0
     + Add cni-route-override to CNI plugin list
   * Build and test changes:
-    + Release: 4%{?dist}
+    + Release: 20%{?dist}
 
 * Fri May 17 2019 John Paul Adrian Glaubitz <adrian.glaubitz@suse.com>
 - Update to version 0.7.0:
