@@ -87,9 +87,9 @@ pushd rpm_contents
 
 # This spec's whole purpose is to inject the signed modules
 rpm2cpio %{SOURCE0} | cpio -idmv
-cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/mlnx-nfsrdma/rpcrdma.ko
-cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/mlnx-nfsrdma/svcrdma.ko
-cp -rf %{SOURCE3} ./lib/modules/%{KVERSION}/updates/mlnx-nfsrdma/xprtrdma.ko
+cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/%{_name}/rpcrdma.ko
+cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/%{_name}/svcrdma.ko
+cp -rf %{SOURCE3} ./lib/modules/%{KVERSION}/updates/%{_name}/xprtrdma.ko
 
 popd
 

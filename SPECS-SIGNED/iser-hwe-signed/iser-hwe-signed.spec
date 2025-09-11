@@ -83,7 +83,7 @@ mkdir rpm_contents
 pushd rpm_contents
 
 rpm2cpio %{SOURCE0} | cpio -idmv
-cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/iser/ib_iser.ko
+cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/%{_name}/ib_iser.ko
 popd
 
 %install
@@ -106,7 +106,7 @@ fi # 1 : closed
 
 %files -n %{_name}
 %defattr(-,root,root,-)
-%license %{_datadir}/licenses/iser/copyright
+%license %{_datadir}/licenses/%{_name}/copyright
 /lib/modules/%{KVERSION}/updates/
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-iser-*.conf
 

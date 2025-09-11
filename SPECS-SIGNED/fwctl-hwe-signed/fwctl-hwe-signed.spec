@@ -90,8 +90,8 @@ pushd rpm_contents
 # This spec's whole purpose is to inject the signed modules
 rpm2cpio %{SOURCE0} | cpio -idmv
 
-cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/fwctl/fwctl.ko
-cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/fwctl/mlx5/mlx5_fwctl.ko
+cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/%{_name}/fwctl.ko
+cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/%{_name}/mlx5/mlx5_fwctl.ko
 
 popd
 
@@ -114,7 +114,7 @@ fi # 1 : closed
 
 %files -n %{_name}
 %defattr(-,root,root,-)
-%license %{_datadir}/licenses/fwctl/copyright
+%license %{_datadir}/licenses/%{_name}/copyright
 /lib/modules/%{KVERSION}/updates/
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-fwctl-*.conf
 

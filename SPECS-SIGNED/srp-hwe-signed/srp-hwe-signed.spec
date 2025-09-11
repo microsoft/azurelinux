@@ -90,8 +90,8 @@ pushd rpm_contents
 # This spec's whole purpose is to inject the signed modules
 rpm2cpio %{SOURCE0} | cpio -idmv
 
-cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/srp/ib_srp.ko
-cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/srp/scsi/scsi_transport_srp.ko
+cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/%{_name}/ib_srp.ko
+cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/%{_name}/scsi/scsi_transport_srp.ko
 
 popd
 
@@ -105,8 +105,8 @@ popd
 
 %files -n %{_name}
 %defattr(-,root,root,-)
-/lib/modules/%{KVERSION}/updates/srp/ib_srp.ko
-/lib/modules/%{KVERSION}/updates/srp/scsi/scsi_transport_srp.ko
+/lib/modules/%{KVERSION}/updates/%{_name}/ib_srp.ko
+/lib/modules/%{KVERSION}/updates/%{_name}/scsi/scsi_transport_srp.ko
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-srp-*.conf
 %license %{_datadir}/licenses/%{_name}/copyright
 
