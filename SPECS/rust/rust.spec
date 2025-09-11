@@ -133,7 +133,10 @@ ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-lin
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
 # remove rustdoc ui flaky test issue-98690.rs (which is tagged with 'unstable-options')
 rm -v ./tests/rustdoc-ui/issue-98690.*
-%make_build check
+useradd -m -d /home/test test
+chown -R test:test .
+sudo -u test %make_build check
+userdel -r test
 
 %install
 USER=root SUDO_USER=root %make_install
