@@ -1,15 +1,15 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global modname mutagen
 # Share doc between python2- and python3-
 %global _docdir_fmt %{name}
 
 Name:           python-%{modname}
-Version:        1.43.0
-Release:        4%{?dist}
+Version:        1.47.0
+Release:        6%{?dist}
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Summary:        Mutagen is a Python module to handle audio meta-data
 
-License:        GPLv2+
+License:        GPL-2.0-or-later
 URL:            https://github.com/quodlibet/mutagen
 Source0:        %{url}/releases/download/release-%{version}/%{modname}-%{version}.tar.gz
 
@@ -33,7 +33,13 @@ includes a module to handle generic Ogg bit-streams.
 Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{modname}}
 BuildRequires:  python3-devel
+BuildRequires:  python3-hypothesis
+BuildRequires:  python3-pytest
+BuildRequires:  python3-setuptools
 BuildRequires:  python3-sphinx_rtd_theme
+BuildRequires:  python3-sphinx
+BuildRequires:  python3-sphinxcontrib-jquery
+BuildRequires:  python3-sortedcontainers
 Obsoletes:      python2-mutagen < 1.42.0-10
 
 %description -n python3-%{modname} %{_description}
@@ -42,7 +48,7 @@ Python 3 version.
 
 %package doc
 Summary:        Documentation for python-mutagen
-BuildRequires:  %{_bindir}/sphinx-build
+BuildRequires:  /usr/bin/sphinx-build
 
 %description doc
 Contains the html documentation for python mutagen.
@@ -58,19 +64,13 @@ sphinx-build -b html -n docs docs/_build
 %install
 %py3_install
 
-%{__install} -D -p -m 0644 man/*.1 %{buildroot}%{_mandir}/man1
+install -D -p -m 0644 man/*.1 %{buildroot}%{_mandir}/man1
 
 # Remove hidden files
 rm -rf docs/_build/{.buildinfo,.doctrees}
 
 %check
-# Testing code quality is helpful upstream, to keep maintainability.
-# But lint and code style issues don't mean there's antyhing wrong
-# with the code.
-rm -rv tests/quality/
-pip3 install pytest==7.1.2 hypothesis==6.45.1
-
-%{__python3} setup.py test
+%pytest
 
 
 %files -n python3-%{modname}
@@ -79,19 +79,95 @@ pip3 install pytest==7.1.2 hypothesis==6.45.1
 %{python3_sitelib}/%{modname}-*.egg-info
 %{python3_sitelib}/%{modname}/
 
-%{_bindir}/*
-%{_mandir}/man1/*.1*
+%{_bindir}/mid3cp
+%{_bindir}/mid3iconv
+%{_bindir}/mid3v2
+%{_bindir}/moggsplit
+%{_bindir}/mutagen-inspect
+%{_bindir}/mutagen-pony
+
+%{_mandir}/man1/mid3cp.1*
+%{_mandir}/man1/mid3iconv.1*
+%{_mandir}/man1/mid3v2.1*
+%{_mandir}/man1/moggsplit.1*
+%{_mandir}/man1/mutagen-inspect.1*
+%{_mandir}/man1/mutagen-pony.1*
 
 %files doc
 %doc docs/_build/*
 
 %changelog
-* Wed May 04 2022 Muhammad Falak <mwani@microsoft.com> - 1.43.0-4
-- Drop BR on pytest & pip install latests deps to enable ptest
+* Wed Feb 19 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.47.0-6
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.43.0-3
-- Initial CBL-Mariner import from Fedora 31 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.47.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.47.0-4
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.47.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.47.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Sep 04 2023 Michele Baldessari <michele@acksyn.org> - 1.47.0-1
+- New upstream
+- Drop unneeded patch
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.46.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 1.46.0-5
+- Rebuilt for Python 3.12
+
+* Mon Mar 27 2023 Michele Baldessari <michele@acksyn.org> - 1.46.0-4
+- Fix doc build with newer sphinx versions (rhbz#2180475)
+
+* Wed Feb 01 2023 Maxwell G <gotmax@e.email> - 1.46.0-3
+- Adopt new licensing guidelines (SPDX)
+- Specfile cleanup
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.46.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sun Oct 09 2022 Michele Baldessari <michele@acksyn.org> - 1.46.0-1
+- New upstream
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.45.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1.45.1-7
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.45.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.45.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.45.1-4
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.45.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Oct 05 2020 Michele Baldessari <michele@acksyn.org> - 1.45.1-2
+- Add explicit python3-setuptools BR
+
+* Mon Aug 03 2020 Michele Baldessari <michele@acksyn.org> - 1.45.1-1
+- New upstream
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.44.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1.44.0-2
+- Rebuilt for Python 3.9
+
+* Tue Feb 11 2020 Michele Baldessari <michele@acksyn.org> - 1.44.0-1
+- New upstream
 
 * Tue Jan 28 2020 Michele Baldessari <michele@acksyn.org> - 1.43.0-2
 - Obsolete python2-mutagen
