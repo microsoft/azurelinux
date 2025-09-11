@@ -12170,16 +12170,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libyami",
-          "version": "1.3.2",
-          "downloadUrl": "https://github.com/intel/libyami/archive/edd1ad15e383d32c8d67bdc9198c834b6acebca5/libyami-edd1ad1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libyaml",
           "version": "0.2.5",
           "downloadUrl": "https://pyyaml.org/download/libyaml/yaml-0.2.5.tar.gz"
