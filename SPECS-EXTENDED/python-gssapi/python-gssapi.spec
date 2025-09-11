@@ -4,7 +4,7 @@ Distribution:   Azure Linux
 
 Name:           python-gssapi
 Version:        1.6.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Python Bindings for GSSAPI (RFC 2743/2744 and extensions)
 
 License:        ISC
@@ -12,6 +12,7 @@ URL:            https://github.com/pythongssapi/python-gssapi
 Source0:        https://github.com/pythongssapi/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 # Patches
+Patch0:		relimport.patch
 
 BuildRequires:  krb5-devel >= 1.10
 BuildRequires:  krb5-libs >= 1.10
@@ -62,6 +63,9 @@ find %{buildroot}%{python3_sitearch}/gssapi -name '*.so' \
 %{python3_sitearch}/*
 
 %changelog
+* Thu Sep 11 2025 Andy Zaugg <azaugg@linkedin.com> - 1.6.1-7
+- Patch to allow relative imports
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
