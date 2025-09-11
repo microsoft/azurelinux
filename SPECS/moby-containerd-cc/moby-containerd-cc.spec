@@ -35,6 +35,7 @@ BuildRequires: golang
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
+BuildRequires: glibc-static >= 2.38-12%{?dist}
 
 Requires: moby-runc >= 1.1.0
 
@@ -49,10 +50,12 @@ This is the containerd runtime meant for use with confidential containers
 
 %build
 export BUILDTAGS="-mod=vendor"
+export SHIM_CGO_ENABLED=1
 make VERSION="%{version}" REVISION="%{commit_hash}" binaries man
 
 %check
 export BUILDTAGS="-mod=vendor"
+export SHIM_CGO_ENABLED=1
 make VERSION="%{version}" REVISION="%{commit_hash}" test
 
 %install
