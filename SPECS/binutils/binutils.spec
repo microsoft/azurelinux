@@ -56,7 +56,6 @@ Patch21:         CVE-2025-5244.patch
 Patch22:         CVE-2025-7545.patch
 Patch23:         CVE-2025-7546.patch
 Patch24:        CVE-2025-8225.patch
-Patch25:        CVE-2025-8224.patch
 Provides:       bundled(libiberty)
 
 # Moving macro before the "SourceX" tags breaks PR checks parsing the specs.
@@ -314,7 +313,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Mon Jul 28 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.37-17
-- Patch for CVE-2025-8225, CVE-2025-8224
+- Patch for CVE-2025-8225
 
 * Thu Jul 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.37-16
 - Patch for CVE-2025-7545, CVE-2025-7546
