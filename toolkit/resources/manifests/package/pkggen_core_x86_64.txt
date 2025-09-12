@@ -1,4 +1,5 @@
 filesystem-1.1-21.azl3.x86_64.rpm
+<<<<<<< HEAD
 kernel-headers-6.6.96.2-2.azl3.noarch.rpm
 glibc-2.38-12.azl3.x86_64.rpm
 glibc-devel-2.38-12.azl3.x86_64.rpm
@@ -8,6 +9,17 @@ glibc-lang-2.38-12.azl3.x86_64.rpm
 glibc-locales-all-2.38-12.azl3.x86_64.rpm
 glibc-nscd-2.38-12.azl3.x86_64.rpm
 glibc-tools-2.38-12.azl3.x86_64.rpm
+=======
+kernel-headers-6.6.96.2-1.azl3.noarch.rpm
+glibc-2.38-11.azl3.x86_64.rpm
+glibc-devel-2.38-11.azl3.x86_64.rpm
+glibc-i18n-2.38-11.azl3.x86_64.rpm
+glibc-iconv-2.38-11.azl3.x86_64.rpm
+glibc-lang-2.38-11.azl3.x86_64.rpm
+glibc-locales-all-2.38-11.azl3.x86_64.rpm
+glibc-nscd-2.38-11.azl3.x86_64.rpm
+glibc-tools-2.38-11.azl3.x86_64.rpm
+>>>>>>> 5114dd278 (Revert "Fix : patch application of CVE-2025-4802 in `glibc` (#14582)" (#14668))
 zlib-1.3.1-1.azl3.x86_64.rpm
 zlib-devel-1.3.1-1.azl3.x86_64.rpm
 file-5.45-1.azl3.x86_64.rpm
@@ -170,6 +182,7 @@ gtk-doc-1.33.2-1.azl3.noarch.rpm
 autoconf-2.72-2.azl3.noarch.rpm
 automake-1.16.5-2.azl3.noarch.rpm
 ocaml-srpm-macros-9-4.azl3.noarch.rpm
+<<<<<<< HEAD
 openssl-3.3.3-3.azl3.x86_64.rpm
 openssl-devel-3.3.3-3.azl3.x86_64.rpm
 openssl-libs-3.3.3-3.azl3.x86_64.rpm
@@ -177,6 +190,15 @@ openssl-perl-3.3.3-3.azl3.x86_64.rpm
 openssl-static-3.3.3-3.azl3.x86_64.rpm
 libcap-2.69-6.azl3.x86_64.rpm
 libcap-devel-2.69-6.azl3.x86_64.rpm
+=======
+openssl-3.3.3-2.azl3.x86_64.rpm
+openssl-devel-3.3.3-2.azl3.x86_64.rpm
+openssl-libs-3.3.3-2.azl3.x86_64.rpm
+openssl-perl-3.3.3-2.azl3.x86_64.rpm
+openssl-static-3.3.3-2.azl3.x86_64.rpm
+libcap-2.69-5.azl3.x86_64.rpm
+libcap-devel-2.69-5.azl3.x86_64.rpm
+>>>>>>> 5114dd278 (Revert "Fix : patch application of CVE-2025-4802 in `glibc` (#14582)" (#14668))
 debugedit-5.0-2.azl3.x86_64.rpm
 libarchive-3.7.7-3.azl3.x86_64.rpm
 libarchive-devel-3.7.7-3.azl3.x86_64.rpm
