@@ -47,6 +47,7 @@ Patch11:        CVE-2025-29786.patch
 Patch12:        CVE-2024-51744.patch
 Patch13:        CVE-2025-47950.patch
 Patch14:        CVE-2025-58063.patch
+Patch15:        fix-import-order-etcd-ttl-test.patch
 
 BuildRequires:  msft-golang
 
@@ -87,6 +88,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %changelog
 * Thu Sep 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.1-20
 - Patch for CVE-2025-58063
+- Fix import order for ttl test
 
 * Tue Jun 17 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.11.1-19
 - Fix CVE-2025-47950 with an upstream patch
