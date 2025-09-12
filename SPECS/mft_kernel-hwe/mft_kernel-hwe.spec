@@ -147,7 +147,6 @@ set -- *
 mkdir source
 mv "$@" source/
 mkdir obj
-rpm -e --nodeps kernel-headers
 
 %build
 rm -rf $RPM_BUILD_ROOT

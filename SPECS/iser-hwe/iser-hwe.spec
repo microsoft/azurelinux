@@ -169,7 +169,6 @@ set -- *
 mkdir source
 mv "$@" source/
 mkdir obj
-rpm -e --nodeps kernel-headers
 
 %build
 export EXTRA_CFLAGS='-DVERSION=\"%version\"'

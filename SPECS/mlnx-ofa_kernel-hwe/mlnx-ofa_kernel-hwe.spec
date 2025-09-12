@@ -298,8 +298,6 @@ set -- *
 mkdir source
 mv "$@" source/
 mkdir obj
-rpm -e --nodeps kernel-headers
-tdnf install -y --releasever=%{distro_release_version} kernel-hwe-headers=%{target_kernel_version_full}
 
 %build
 EXTRA_CFLAGS='-DVERSION=\"%version\"'

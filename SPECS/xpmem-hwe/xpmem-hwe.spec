@@ -178,8 +178,6 @@ This package includes the kernel module (non KMP version).
 
 %prep
 %setup -q -n xpmem-%{version}
-rpm -e --nodeps kernel-headers
-tdnf install -y --releasever=%{distro_release_version} kernel-hwe-headers=%{target_kernel_version_full}
 
 %build
 env=
