@@ -4,8 +4,8 @@ Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        20.14.0
-Release:        9%{?dist}
+Version:        20.19.0
+Release:        1%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,19 +16,6 @@ URL:            https://github.com/nodejs/node
 # !!!  => use generate_source_tarball.sh script to create a clean and reproducible source tarball.
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
 Patch0:         disable-tlsv1-tlsv1-1.patch
-Patch1:         CVE-2019-10906.patch
-Patch2:         CVE-2024-21538.patch
-Patch3:         CVE-2025-23083.patch
-Patch4:         CVE-2025-22150.patch
-Patch5:         CVE-2025-23085.patch
-Patch6:         CVE-2024-22020.patch
-Patch7:         CVE-2024-22195.patch
-Patch8:         CVE-2020-28493.patch
-Patch9:         CVE-2024-34064.patch
-Patch10:        CVE-2025-27516.patch
-Patch11:        CVE-2025-47279.patch
-Patch12:        CVE-2025-23165.patch
-Patch13:        CVE-2025-23166.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -140,6 +127,9 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
+* Fri Sep 12 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.19.0-1
+- Auto-upgrade to 20.19.0 - upgrade
+
 * Tue May 27 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 20.14.0-9
 - Patch CVE-2025-23165, CVE-2025-23166
 
