@@ -9,7 +9,7 @@
 %bcond_with missing_dependencies
 Summary:        CUPS printing system
 Name:           cups
-Version:        2.4.10
+Version:        2.4.13
 Release:        1%{?dist}
 License:        ASL 2.0 with exceptions
 Vendor:         Microsoft Corporation
@@ -655,6 +655,9 @@ rm -f %{cups_serverbin}/backend/smb
 %{_mandir}/man7/ippeveps.7.gz
 
 %changelog
+* Fri Sep 12 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.13-1
+- Auto-upgrade to 2.4.13 - for CVE-2025-58060
+
 * Fri Jul 12 2024 Muhammad Falak <mwani@microsft.com> - 2.4.10-1
 - Upgrade version to 2.4.10
 - Refresh patches to apply cleanly
