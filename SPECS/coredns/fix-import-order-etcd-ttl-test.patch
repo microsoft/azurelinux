@@ -1,0 +1,24 @@
+From b315c059ae1cd65caf900089c97ea4a5719d553f Mon Sep 17 00:00:00 2001
+From: Ville Vesilehto <ville@vesilehto.fi>
+Date: Fri, 5 Sep 2025 14:28:29 +0300
+Subject: [PATCH] plugin/etcd: fix import order for ttl test
+
+To fix CI pipeline in master branch.
+
+Signed-off-by: Ville Vesilehto <ville@vesilehto.fi>
+---
+ plugin/etcd/ttl_test.go | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/plugin/etcd/ttl_test.go b/plugin/etcd/ttl_test.go
+index 6dd346bb7..44e76428f 100644
+--- a/plugin/etcd/ttl_test.go
++++ b/plugin/etcd/ttl_test.go
+@@ -4,6 +4,7 @@ import (
+ 	"testing"
+ 
+ 	"github.com/coredns/coredns/plugin/etcd/msg"
++
+ 	"go.etcd.io/etcd/api/v3/mvccpb"
+ )
+ 
