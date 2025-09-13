@@ -11,24 +11,19 @@ Distribution:   Azure Linux
 
 Summary:        SAX XML parser based on the Expat library
 Name:           lua-expat
-Version:        1.3.0
-Release:        19%{?dist}
+Version:        1.5.2
+Release:        3%{?dist}
 License:        MIT
-URL:            https://matthewwild.co.uk/projects/luaexpat/
-Source0:        https://matthewwild.co.uk/projects/luaexpat/luaexpat-%{version}.tar.gz
-Source1:        https://matthewwild.co.uk/projects/luaexpat/luaexpat-%{version}.tar.gz.asc
-Source2:        gpgkey-32A9EDDE3609931EB98CEAC315907E8E7BDD6BFE.gpg
-
+URL:            https://lunarmodules.github.io/luaexpat/
+Source0:        https://github.com/lunarmodules/luaexpat/archive/%{version}/luaexpat-%{version}.tar.gz
 Requires:       lua(abi) = %{lua_version}
-
-
-
-BuildRequires:  gcc, lua-devel >= %{lua_version}, expat-devel
-BuildRequires:  gnupg2
+BuildRequires:  gcc
+BuildRequires:  lua >= %{lua_version}
+BuildRequires:  lua-devel >= %{lua_version}
+BuildRequires:  expat-devel >= 2.4.0
 
 %description
 LuaExpat is a SAX XML parser based on the Expat library.
-
 
 %package -n lua%{lua_compat_version}-expat
 Summary:        SAX XML parser based on the Expat library for Lua %{lua_compat_version}
@@ -36,64 +31,110 @@ Obsoletes:      lua-expat-compat < 1.3.0-16
 Provides:       lua-expat-compat = %{version}-%{release}
 Provides:       lua-expat-compat%{?_isa} = %{version}-%{release}
 Requires:       lua(abi) = %{lua_compat_version}
+BuildRequires:  compat-lua >= %{lua_compat_version}
 BuildRequires:  compat-lua-devel >= %{lua_compat_version}
 
 %description -n lua%{lua_compat_version}-expat
 LuaExpat is a SAX XML parser based on the Expat library for Lua %{lua_compat_version}.
 
-
 %prep
-gpgv2 --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
 %setup -q -n luaexpat-%{version}
-
 
 rm -rf %{lua_compat_builddir}
 cp -a . %{lua_compat_builddir}
 
-
 %build
 %make_build \
-  CFLAGS="%{optflags} -fPIC -std=c99" LDFLAGS="%{?__global_ldflags}" \
-  LUA_V=%{lua_version} LUA_CDIR=%{lua_libdir} LUA_LDIR=%{lua_pkgdir} LUA_INC=-I%{_includedir} \
-  EXPAT_INC=-I%{_includedir}
-
+  CFLAGS="$RPM_OPT_FLAGS -fPIC -std=c99" LDFLAGS="$RPM_LD_FLAGS" \
+  LUA_V=%{lua_version} \
+  LUA_CDIR=%{lua_libdir} LUA_LDIR=%{lua_pkgdir} \
+  LUA_INC=-I%{_includedir}
 
 pushd %{lua_compat_builddir}
 %make_build \
-  CFLAGS="%{optflags} -fPIC -std=c99" LDFLAGS="%{?__global_ldflags}" \
-  LUA_V=%{lua_compat_version} LUA_CDIR=%{lua_compat_libdir} LUA_LDIR=%{lua_compat_pkgdir} LUA_INC=-I%{_includedir}/lua-%{lua_compat_version} \
-  EXPAT_INC=-I%{_includedir}
+  CFLAGS="$RPM_OPT_FLAGS -fPIC -std=c99" LDFLAGS="$RPM_LD_FLAGS" \
+  LUA_V=%{lua_compat_version} \
+  LUA_CDIR=%{lua_compat_libdir} LUA_LDIR=%{lua_compat_pkgdir} \
+  LUA_INC=-I%{_includedir}/lua-%{lua_compat_version}
 popd
-
 
 %install
 %make_install LUA_CDIR=%{lua_libdir} LUA_LDIR=%{lua_pkgdir}
-
 
 pushd %{lua_compat_builddir}
 %make_install LUA_CDIR=%{lua_compat_libdir} LUA_LDIR=%{lua_compat_pkgdir}
 popd
 
-
 %check
-lua -e 'package.cpath="./src/?.so;"..package.cpath; dofile("tests/test.lua");'
-lua -e 'package.cpath="./src/?.so;" .. package.cpath; package.path="./src/?.lua;" .. package.path; dofile("tests/test-lom.lua");'
+lua -e \
+  'package.cpath="%{buildroot}%{lua_libdir}/?.so;"..package.cpath;
+   package.path="%{buildroot}%{lua_pkgdir}/?.lua;"..package.path;
+   local lxp = require("lxp"); print("Hello from "..lxp._VERSION.."!");'
+lua-%{lua_compat_version} -e \
+  'package.cpath="%{buildroot}%{lua_compat_libdir}/?.so;"..package.cpath;
+   package.path="%{buildroot}%{lua_compat_pkgdir}/?.lua;"..package.path;
+   local lxp = require("lxp"); print("Hello from "..lxp._VERSION.."!");'
 
 %files
-%doc README doc/us/*
-%{lua_libdir}/*
-%{lua_pkgdir}/*
-
+%license LICENSE
+%doc README.md docs/*
+%{lua_libdir}/lxp.so
+%{lua_pkgdir}/lxp/
 
 %files -n lua%{lua_compat_version}-expat
-%doc README doc/us/*
-%{lua_compat_libdir}/*
-%{lua_compat_pkgdir}/*
-
+%doc README.md docs/*
+%{lua_compat_libdir}/lxp.so
+%{lua_compat_pkgdir}/lxp/
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.0-19
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Nov 26 2024 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.5.2-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jul 03 2024 Robert Scheck <robert@fedoraproject.org> 1.5.2-1
+- Upgrade to 1.5.2 (#2295598)
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Oct 03 2022 Robert Scheck <robert@fedoraproject.org> 1.5.1-1
+- Upgrade to 1.5.1
+
+* Mon Oct 03 2022 Robert Scheck <robert@fedoraproject.org> 1.5.0-1
+- Upgrade to 1.5.0
+
+* Mon Oct 03 2022 Robert Scheck <robert@fedoraproject.org> 1.4.1-1
+- Upgrade to 1.4.1
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-24
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jun 29 2020 Tom Callaway <spot@fedoraproject.org> - 1.3.0-19
+- rebuild for lua 5.4
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-18
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
