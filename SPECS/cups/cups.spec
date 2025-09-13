@@ -12,7 +12,7 @@
 Summary:        CUPS printing system
 Name:           cups
 Version:        2.3.3%{OP_VER}
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -65,6 +65,8 @@ Patch15:        CVE-2023-32324.patch
 Patch16:        CVE-2023-34241.patch
 Patch17:        CVE-2022-26691.patch
 Patch18:	CVE-2024-35235.patch
+Patch19:	CVE-2025-58060.patch
+Patch20:	CVE-2025-58364.patch
 #### UPSTREAM PATCHES (starts with 1000) ####
 ##### Patches removed because IMHO they aren't no longer needed
 ##### but still I'll leave them in git in case their removal
@@ -658,6 +660,9 @@ rm -f %{cups_serverbin}/backend/smb
 %{_mandir}/man7/ippeveps.7.gz
 
 %changelog
+* Sat Sep 13 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.3.3op2-10
+- Patch for CVE-2025-58364, CVE-2025-58060
+
 * Thu Nov 21 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.3.3op2-9
 - Add patch for CVE-2024-35235
 
@@ -2745,6 +2750,8 @@ rm -f %{cups_serverbin}/backend/smb
 
 * Wed Oct  4 2006 Tim Waugh <twaugh@redhat.com> 1:1.2.4-8
 - LSPP patch didn't get updated properly in 1:1.2.4-6.  Use the right
+%patch 19 -p1
+%patch 20 -p1
   patch this time (bug #208676).  LSPP re-enabled.
 
 * Wed Oct  4 2006 Tim Waugh <twaugh@redhat.com> 1:1.2.4-7
