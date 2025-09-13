@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Locale-Codes
-Version:        3.66
-Release:        4%{?dist}
+Version:        3.81
+Release:        1%{?dist}
 Summary:        Distribution of modules to handle locale codes
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Locale-Codes
@@ -90,6 +90,10 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Tue Dec 24 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 3.81-1
+- Update to 3.81
+- License verified.
+
 * Fri Apr 22 2022 Muhammad Falak <mwani@microsoft.com> - 3.66-4
 - Add an explicit BR on `perl(deprecate)` to enable ptest
 - License verified
