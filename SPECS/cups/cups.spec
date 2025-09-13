@@ -269,6 +269,9 @@ to CUPS daemon. This solution will substitute printer drivers and raw queues in 
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
+%patch 18 -p1
+%patch 19 -p1
+%patch 20 -p1
 
 # LSPP support.
 %patch100 -p1 -b .lspp
@@ -662,6 +665,7 @@ rm -f %{cups_serverbin}/backend/smb
 %changelog
 * Sat Sep 13 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.3.3op2-10
 - Patch for CVE-2025-58364, CVE-2025-58060
+- Fix patch applicaton of CVE-2024-35235
 
 * Thu Nov 21 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.3.3op2-9
 - Add patch for CVE-2024-35235
@@ -2750,8 +2754,6 @@ rm -f %{cups_serverbin}/backend/smb
 
 * Wed Oct  4 2006 Tim Waugh <twaugh@redhat.com> 1:1.2.4-8
 - LSPP patch didn't get updated properly in 1:1.2.4-6.  Use the right
-%patch 19 -p1
-%patch 20 -p1
   patch this time (bug #208676).  LSPP re-enabled.
 
 * Wed Oct  4 2006 Tim Waugh <twaugh@redhat.com> 1:1.2.4-7
