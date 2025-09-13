@@ -47,7 +47,6 @@ Patch11:        CVE-2025-29786.patch
 Patch12:        CVE-2024-51744.patch
 Patch13:        CVE-2025-47950.patch
 Patch14:        CVE-2025-58063.patch
-Patch15:        fix-import-order-etcd-ttl-test.patch
 
 BuildRequires:  msft-golang
 
