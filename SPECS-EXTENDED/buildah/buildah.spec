@@ -184,10 +184,6 @@ make test-unit
 * Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.18.0-32
 - Bump to rebuild with updated glibc
 
-* Fri May 23 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.38.0-1
-- Initial Azure Linux import from Fedora 41 (license: MIT).
-- License verified
-
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.18.0-31
 - Bump to rebuild with updated glibc
 
