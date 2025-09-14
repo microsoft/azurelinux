@@ -6,75 +6,58 @@
 %else
 %global debug_package   %{nil}
 %endif
-%global provider github
-%global provider_tld com
-%global project containers
-%global repo buildah
-# https://github.com/containers/buildah
-%global import_path %{provider}.%{provider_tld}/%{project}/%{repo}
-%global git0 https://%{import_path}
-# Used for comparing with latest upstream tag
-# to decide whether to autobuild (non-rawhide only)
-%define built_tag v1.18.0
-%define built_tag_strip %(b=%{built_tag}; echo ${b:1})
-%define download_url https://%{import_path}/archive/%{built_tag}.tar.gz
-Summary:        A command line tool used for creating OCI Images
-Name:           buildah
-Version:        1.18.0
-Release:        33%{?dist}
-License:        ASL 2.0
 
 %global gomodulesmode GO111MODULE=on
 
+%if %{defined fedora}
+%define build_with_btrfs 1
+%endif
+
+%if %{defined rhel}
+%define fips 1
+%endif
+
 %global git0 https://github.com/containers/%{name}
 
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://%{name}.io
-Source:         %{download_url}#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2022-2990.patch
-BuildRequires:  btrfs-progs-devel
-BuildRequires:  device-mapper-devel
-BuildRequires:  git
-BuildRequires:  glib2-devel
-BuildRequires:  glibc-static >= 2.38-13%{?dist}
-BuildRequires:  go-md2man
-BuildRequires:  go-rpm-macros
-BuildRequires:  golang
-BuildRequires:  gpgme-devel
-BuildRequires:  libassuan-devel
-BuildRequires:  libseccomp-static
-BuildRequires:  make
-BuildRequires:  ostree-devel
-Requires:       libcontainers-common
-Requires:       libseccomp >= 2.4.1-0
-Requires:       moby-runc
-Recommends:     container-selinux
-Recommends:     fuse-overlayfs
-Recommends:     slirp4netns >= 0.3-0
-Name:           buildah
-Version:        1.38.0
+Name: buildah
+Epoch: 0
+# DO NOT TOUCH the Version string!
+# The TRUE source of this specfile is:
+# https://github.com/containers/skopeo/blob/main/rpm/skopeo.spec
+# If that's what you're reading, Version must be 0, and will be updated by Packit for
+# copr and koji builds.
+# If you're reading this on dist-git, the version is automatically filled in by Packit.
+Version: 1.41.4
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 1%{?dist} 
+Release: 1%{?dist}
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 ExclusiveArch: aarch64 ppc64le s390x x86_64
 Summary: A command line tool used for creating OCI Images
 URL: https://%{name}.io
 # Tarball fetched from upstream
 Source: %{git0}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0: 0001-Run-selective-tests.patch
 BuildRequires: device-mapper-devel
 BuildRequires: git-core
 BuildRequires: golang >= 1.16.6
 BuildRequires: glib2-devel
-BuildRequires: glibc-static >= 2.38-11%{?dist}
+BuildRequires: glibc-static >= 2.38-13%{?dist}
+%if !%{defined gobuild}
 BuildRequires: go-rpm-macros
+%endif
 BuildRequires: gpgme-devel
 BuildRequires: libassuan-devel
 BuildRequires: make
-BuildRequires: ostree-devel
+%if %{defined build_with_btrfs}
 BuildRequires: btrfs-progs-devel
+%endif
 BuildRequires: shadow-utils-subid-devel
-BuildRequires: libseccomp-static
+BuildRequires: sqlite-devel
+BuildRequires:  netavark
+Requires: libcontainers-common
+BuildRequires: libseccomp-devel
 Requires: libseccomp >= 2.4.1-0
 Suggests: cpp
 
@@ -87,11 +70,17 @@ or
 * save container's root file system layer to create a new image
 * delete a working container or an image
 
+# This subpackage is only intended for CI testing.
+# Not meant for end user/customer usage.
 %package tests
 Summary: Tests for %{name}
 
-Requires: %{name} = %{version}-%{release}
+Requires: %{name} = %{epoch}:%{version}-%{release}
+%if %{defined bats_epel}
 Requires: bats
+%else
+Recommends: bats
+%endif
 Requires: bzip2
 Requires: podman
 Requires: golang
@@ -107,7 +96,7 @@ Requires: git-daemon
 This package contains system tests for %{name}
 
 %prep
-%autosetup -Sgit -n %{name}-%{version}
+%autosetup -p1 -Sgit -n %{name}-%{version}
 
 %build
 %set_build_flags
@@ -118,19 +107,29 @@ CGO_CFLAGS=$(echo $CGO_CFLAGS | sed 's/-flto=auto//g')
 CGO_CFLAGS=$(echo $CGO_CFLAGS | sed 's/-Wp,D_GLIBCXX_ASSERTIONS//g')
 CGO_CFLAGS=$(echo $CGO_CFLAGS | sed 's/-specs=\/usr\/lib\/rpm\/redhat\/redhat-annobin-cc1//g')
 
+%ifarch x86_64
 export CGO_CFLAGS+=" -m64 -mtune=generic -fcf-protection=full"
+%endif
 
 export CNI_VERSION=`grep '^# github.com/containernetworking/cni ' src/modules.txt | sed 's,.* ,,'`
 export LDFLAGS="-X main.buildInfo=`date +%s` -X main.cniVersion=${CNI_VERSION}"
 
-export BUILDTAGS="seccomp exclude_graphdriver_devicemapper $(hack/systemd_tag.sh) $(hack/libsubid_tag.sh)"
-export BUILDTAGS+=" btrfs_noversion exclude_graphdriver_btrfs"
+export BUILDTAGS="seccomp $(hack/systemd_tag.sh) $(hack/libsubid_tag.sh) libsqlite3"
+%if !%{defined build_with_btrfs}
+export BUILDTAGS+=" exclude_graphdriver_btrfs"
+%endif
+
+%if %{defined fips}
+export BUILDTAGS+=" libtrust_openssl"
+%endif
 
 %gobuild -o bin/%{name} ./cmd/%{name}
 %gobuild -o bin/imgtype ./tests/imgtype
 %gobuild -o bin/copy ./tests/copy
 %gobuild -o bin/tutorial ./tests/tutorial
 %gobuild -o bin/inet ./tests/inet
+%gobuild -o bin/dumpspec ./tests/dumpspec
+%gobuild -o bin/passwd ./tests/passwd
 %{__make} docs
 
 %install
@@ -142,11 +141,17 @@ cp bin/imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 cp bin/copy    %{buildroot}/%{_bindir}/%{name}-copy
 cp bin/tutorial %{buildroot}/%{_bindir}/%{name}-tutorial
 cp bin/inet     %{buildroot}/%{_bindir}/%{name}-inet
+cp bin/dumpspec %{buildroot}/%{_bindir}/%{name}-dumpspec
+cp bin/passwd %{buildroot}/%{_bindir}/%{name}-passwd
 
 rm %{buildroot}%{_datadir}/%{name}/test/system/tools/build/*
 
 #define license tag if not already defined
 %{!?_licensedir:%global license %doc}
+
+# Include check to silence rpmlint.
+%check
+make test-unit
 
 %files
 %license LICENSE vendor/modules.txt
@@ -163,18 +168,21 @@ rm %{buildroot}%{_datadir}/%{name}/test/system/tools/build/*
 %{_bindir}/%{name}-copy
 %{_bindir}/%{name}-tutorial
 %{_bindir}/%{name}-inet
+%{_bindir}/%{name}-dumpspec
+%{_bindir}/%{name}-passwd
 %{_datadir}/%{name}/test
 
 %changelog
+* Fri Sep 12 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.41.4-1
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- Added Check section
+- License verified
+
 * Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.18.0-33
 - Bump to rebuild with updated glibc
 
 * Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.18.0-32
 - Bump to rebuild with updated glibc
-
-* Fri May 23 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.38.0-1
-- Initial Azure Linux import from Fedora 41 (license: MIT).
-- License verified
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.18.0-31
 - Bump to rebuild with updated glibc
