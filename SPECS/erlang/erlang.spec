@@ -54,7 +54,7 @@ export ERL_TOP=`pwd`
 
 %changelog
 * Fri Sep 12 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 26.2.5.15-1
-- Auto-upgrade to 26.2.5.15 - for CVE-2025-48038, CVE-2025-48039, CVE-2025-48041
+- Auto-upgrade to 26.2.5.15 - for CVE-2025-48038, CVE-2025-48039, CVE-2025-48040, CVE-2025-48041
 
 * Tue Jun 24 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 26.2.5.13-1
 - Upgrade to 26.2.5.13 to fix CVE-2025-4748
