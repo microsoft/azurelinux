@@ -1,0 +1,21 @@
+From 864844ecc11f8cf65cd97bcffdb803211f7edaa4 Mon Sep 17 00:00:00 2001
+From: Piotr Wilkosz <piotr.wilkosz@gmail.com>
+Date: Mon, 23 May 2022 16:14:13 +0200
+Subject: [PATCH] remove tmp file at exit
+
+---
+ src/fallback.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/fallback.c b/src/fallback.c
+index c907a34..e67654a 100644
+--- a/src/fallback.c
++++ b/src/fallback.c
+@@ -246,6 +246,7 @@ scl_rc fallback_run_command(char * const colnames[], const char *cmd, bool exec)
+     enable_path = _free(enable_path);
+     colpath = _free(colpath);
+     bash_cmd = _free(bash_cmd);
++    unlink(tmp);
+ 
+     return ret;
+ }

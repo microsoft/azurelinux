@@ -1,0 +1,63 @@
+From f6d64dc3fdcba8f7ced61ea26270ebc0c38b5312 Mon Sep 17 00:00:00 2001
+From: Xin Long <lucien.xin@gmail.com>
+Date: Sun, 28 Jan 2024 12:18:08 -0500
+Subject: [PATCH] lib: define cmsg array with correct size in sendv and recvv
+
+Philipp recently found a buffer overflow crash in his application when
+using sctp_sendv().
+
+In sctp_sendv(), the cmsg array is defined as one whole cmsg:
+
+  char _cmsg[CMSG_SPACE(sizeof(struct sctp_sendv_spa))]
+
+while these options in struct sctp_sendv_spa are packed into msg_control
+with multiple cmsgs, instead one whole cmsg.
+
+So fix it by defining cmsg array with correct size:
+
+  char _cmsg[CMSG_SPACE(sizeof(struct sctp_sndinfo)) +
+             CMSG_SPACE(sizeof(struct sctp_prinfo)) +
+             CMSG_SPACE(sizeof(struct sctp_authinfo))];
+
+Note that the similar fix is also needed in sctp_recvv().
+
+Reported-by: Philipp Stanner <stanner@posteo.de>
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ src/lib/recvmsg.c | 4 ++--
+ src/lib/sendmsg.c | 4 +++-
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/lib/recvmsg.c b/src/lib/recvmsg.c
+index 88fe061..d4bf558 100644
+--- a/src/lib/recvmsg.c
++++ b/src/lib/recvmsg.c
+@@ -105,8 +105,8 @@ int sctp_recvv(int s, const struct iovec *iov, int iovlen,
+ 	       struct sockaddr *from, socklen_t *fromlen, void *info,
+ 	       socklen_t *infolen, unsigned int *infotype, int *flags)
+ {
+-	char incmsg[CMSG_SPACE(sizeof(struct sctp_rcvinfo) +
+-			       sizeof(struct sctp_nxtinfo))];
++	char incmsg[CMSG_SPACE(sizeof(struct sctp_rcvinfo)) +
++		    CMSG_SPACE(sizeof(struct sctp_nxtinfo))];
+ 	int error, len, _infolen;
+ 	struct cmsghdr *cmsg;
+ 	struct msghdr inmsg;
+diff --git a/src/lib/sendmsg.c b/src/lib/sendmsg.c
+index bee4921..385db7e 100644
+--- a/src/lib/sendmsg.c
++++ b/src/lib/sendmsg.c
+@@ -123,7 +123,9 @@ int sctp_sendv(int s, const struct iovec *iov, int iovcnt,
+ 	       struct sockaddr *addrs, int addrcnt, void *info,
+ 	       socklen_t infolen, unsigned int infotype, int flags)
+ {
+-	char _cmsg[CMSG_SPACE(sizeof(struct sctp_sendv_spa))];
++	char _cmsg[CMSG_SPACE(sizeof(struct sctp_sndinfo)) +
++		   CMSG_SPACE(sizeof(struct sctp_prinfo)) +
++		   CMSG_SPACE(sizeof(struct sctp_authinfo))];
+ 	struct cmsghdr *cmsg = (struct cmsghdr *)_cmsg;
+ 	struct msghdr outmsg = {};
+ 	struct sockaddr *addr;
+-- 
+2.39.1
+

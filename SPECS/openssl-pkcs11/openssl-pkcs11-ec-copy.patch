@@ -1,0 +1,394 @@
+diff --git a/src/libp11-int.h b/src/libp11-int.h
+index 2d4c48a..ffe0e2e 100644
+--- a/src/libp11-int.h
++++ b/src/libp11-int.h
+@@ -93,6 +93,8 @@ struct pkcs11_object_private {
+ 	EVP_PKEY *evp_key;
+ 	X509 *x509;
+ 	unsigned int forkid;
++	int refcnt;
++	pthread_mutex_t lock;
+ };
+ #define PRIVKEY(_key)		((PKCS11_OBJECT_private *) (_key)->_private)
+ #define PRIVCERT(_cert)		((PKCS11_OBJECT_private *) (_cert)->_private)
+@@ -253,6 +255,9 @@ extern PKCS11_OBJECT_private *pkcs11_object_from_template(PKCS11_SLOT_private *s
+ extern PKCS11_OBJECT_private *pkcs11_object_from_object(PKCS11_OBJECT_private *obj,
+ 	CK_SESSION_HANDLE session, CK_OBJECT_CLASS object_class);
+ 
++/* Reference the private object */
++extern PKCS11_OBJECT_private *pkcs11_object_ref(PKCS11_OBJECT_private *obj);
++
+ /* Free an object */
+ extern void pkcs11_object_free(PKCS11_OBJECT_private *obj);
+ 
+diff --git a/src/p11_ec.c b/src/p11_ec.c
+index e108504..b6b336f 100644
+--- a/src/p11_ec.c
++++ b/src/p11_ec.c
+@@ -50,6 +50,7 @@ typedef int (*compute_key_fn)(void *, size_t,
+ #endif
+ static compute_key_fn ossl_ecdh_compute_key;
+ static void (*ossl_ec_finish)(EC_KEY *);
++static int (*ossl_ec_copy)(EC_KEY *, const EC_KEY *);
+ 
+ static int ec_ex_index = 0;
+ 
+@@ -374,13 +375,16 @@ static EVP_PKEY *pkcs11_get_evp_key_ec(PKCS11_OBJECT_private *key)
+ 		ECDSA_set_method(ec, PKCS11_get_ecdsa_method());
+ 		ECDH_set_method(ec, PKCS11_get_ecdh_method());
+ #endif
++		/* This creates a new EC_KEY object which requires its own key object reference */
++		key = pkcs11_object_ref(key);
++		pkcs11_set_ex_data_ec(ec, key);
+ 	}
+ 	/* TODO: Retrieve the ECDSA private key object attributes instead,
+ 	 * unless the key has the "sensitive" attribute set */
+ 
+-	pkcs11_set_ex_data_ec(ec, key);
+ 	EVP_PKEY_set1_EC_KEY(pk, ec); /* Also increments the ec ref count */
+ 	EC_KEY_free(ec); /* Drops our reference to it */
++
+ 	return pk;
+ }
+ 
+@@ -681,6 +685,27 @@ static int pkcs11_ec_ckey(unsigned char **out, size_t *outlen,
+ 	return 1;
+ }
+ 
++/* Without this, the EC_KEY objects share the same PKCS11_OBJECT_private
++ * object in ex_data and when one of them is freed, the following frees
++ * result in crashes.
++ * We need to increase the reference to the private object.
++ */
++static int pkcs11_ec_copy(EC_KEY *dest, const EC_KEY *src)
++{
++	PKCS11_OBJECT_private *srckey = NULL;
++	PKCS11_OBJECT_private *destkey = NULL;
++
++	srckey = pkcs11_get_ex_data_ec(src);
++	destkey = pkcs11_object_ref(srckey);
++
++	pkcs11_set_ex_data_ec(dest, destkey);
++
++	if (ossl_ec_copy)
++		ossl_ec_copy(dest, src);
++
++	return 1;
++}
++
+ #else
+ 
+ /**
+@@ -740,7 +765,6 @@ EC_KEY_METHOD *PKCS11_get_ec_key_method(void)
+ {
+ 	static EC_KEY_METHOD *ops = NULL;
+ 	int (*orig_init)(EC_KEY *);
+-	int (*orig_copy)(EC_KEY *, const EC_KEY *);
+ 	int (*orig_set_group)(EC_KEY *, const EC_GROUP *);
+ 	int (*orig_set_private)(EC_KEY *, const BIGNUM *);
+ 	int (*orig_set_public)(EC_KEY *, const EC_POINT *);
+@@ -750,9 +774,9 @@ EC_KEY_METHOD *PKCS11_get_ec_key_method(void)
+ 	alloc_ec_ex_index();
+ 	if (!ops) {
+ 		ops = EC_KEY_METHOD_new((EC_KEY_METHOD *)EC_KEY_OpenSSL());
+-		EC_KEY_METHOD_get_init(ops, &orig_init, &ossl_ec_finish, &orig_copy,
++		EC_KEY_METHOD_get_init(ops, &orig_init, &ossl_ec_finish, &ossl_ec_copy,
+ 			&orig_set_group, &orig_set_private, &orig_set_public);
+-		EC_KEY_METHOD_set_init(ops, orig_init, pkcs11_ec_finish, orig_copy,
++		EC_KEY_METHOD_set_init(ops, orig_init, pkcs11_ec_finish, pkcs11_ec_copy,
+ 			orig_set_group, orig_set_private, orig_set_public);
+ 		EC_KEY_METHOD_get_sign(ops, &orig_sign, NULL, NULL);
+ 		EC_KEY_METHOD_set_sign(ops, orig_sign, NULL, pkcs11_ecdsa_sign_sig);
+diff --git a/src/p11_key.c b/src/p11_key.c
+index ec7f279..c253c91 100644
+--- a/src/p11_key.c
++++ b/src/p11_key.c
+@@ -115,6 +115,8 @@ PKCS11_OBJECT_private *pkcs11_object_from_handle(PKCS11_SLOT_private *slot,
+ 		return NULL;
+ 
+ 	memset(obj, 0, sizeof(*obj));
++	obj->refcnt = 1;
++	pthread_mutex_init(&obj->lock, 0);
+ 	obj->object_class = object_class;
+ 	obj->object = object;
+ 	obj->slot = pkcs11_slot_ref(slot);
+@@ -178,6 +180,9 @@ PKCS11_OBJECT_private *pkcs11_object_from_object(PKCS11_OBJECT_private *obj,
+ 
+ void pkcs11_object_free(PKCS11_OBJECT_private *obj)
+ {
++	if (pkcs11_atomic_add(&obj->refcnt, -1, &obj->lock) != 0)
++		return;
++
+ 	if (obj->evp_key) {
+ 		/* When the EVP object is reference count goes to zero,
+ 		 * it will call this function again. */
+@@ -189,6 +194,7 @@ void pkcs11_object_free(PKCS11_OBJECT_private *obj)
+ 	pkcs11_slot_unref(obj->slot);
+ 	X509_free(obj->x509);
+ 	OPENSSL_free(obj->label);
++	pthread_mutex_destroy(&obj->lock);
+ 	OPENSSL_free(obj);
+ }
+ 
+@@ -611,6 +617,12 @@ static int pkcs11_next_key(PKCS11_CTX_private *ctx, PKCS11_SLOT_private *slot,
+ 	return 0;
+ }
+ 
++PKCS11_OBJECT_private *pkcs11_object_ref(PKCS11_OBJECT_private *obj)
++{
++	pkcs11_atomic_add(&obj->refcnt, 1, &obj->lock);
++	return obj;
++}
++
+ static int pkcs11_init_key(PKCS11_SLOT_private *slot, CK_SESSION_HANDLE session,
+ 	CK_OBJECT_HANDLE object, CK_OBJECT_CLASS type, PKCS11_KEY **ret)
+ {
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index b1bc0fb..ba16448 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -17,7 +17,8 @@ check_PROGRAMS = \
+ 	rsa-pss-sign \
+ 	rsa-oaep \
+ 	check-privkey \
+-	store-cert
++	store-cert \
++	dup-key
+ dist_check_SCRIPTS = \
+ 	rsa-testpkcs11.softhsm \
+ 	rsa-testfork.softhsm \
+@@ -33,7 +34,8 @@ dist_check_SCRIPTS = \
+ 	ec-check-privkey.softhsm \
+ 	pkcs11-uri-without-token.softhsm \
+ 	search-all-matching-tokens.softhsm \
+-	ec-cert-store.softhsm
++	ec-cert-store.softhsm \
++	ec-copy.softhsm
+ dist_check_DATA = \
+ 	rsa-cert.der rsa-prvkey.der rsa-pubkey.der \
+ 	ec-cert.der ec-prvkey.der ec-pubkey.der
+diff --git a/tests/dup-key.c b/tests/dup-key.c
+new file mode 100644
+index 0000000..1284b46
+--- /dev/null
++++ b/tests/dup-key.c
+@@ -0,0 +1,175 @@
++/*
++* Copyright (C) 2019 - 2022 Red Hat, Inc.
++*
++* Authors: Anderson Toshiyuki Sasaki
++*          Jakub Jelen <jjelen@redhat.com>
++*
++* This program is free software: you can redistribute it and/or modify
++* it under the terms of the GNU General Public License as published by
++* the Free Software Foundation, either version 3 of the License, or
++* (at your option) any later version.
++*
++* This program is distributed in the hope that it will be useful,
++* but WITHOUT ANY WARRANTY; without even the implied warranty of
++* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++* GNU General Public License for more details.
++*
++* You should have received a copy of the GNU General Public License
++* along with this program.  If not, see <https://www.gnu.org/licenses/>.
++*/
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <string.h>
++
++#include <openssl/engine.h>
++#include <openssl/conf.h>
++#include <openssl/evp.h>
++#include <openssl/x509.h>
++#include <openssl/pem.h>
++#include <openssl/err.h>
++
++static void usage(char *argv[])
++{
++	fprintf(stderr, "%s [private key URL] [module] [conf]\n", argv[0]);
++}
++
++static void display_openssl_errors(int l)
++{
++	const char *file;
++	char buf[120];
++	int e, line;
++
++	if (ERR_peek_error() == 0)
++		return;
++	fprintf(stderr, "At dup-key.c:%d:\n", l);
++
++	while ((e = ERR_get_error_line(&file, &line))) {
++		ERR_error_string(e, buf);
++		fprintf(stderr, "- SSL %s: %s:%d\n", buf, file, line);
++	}
++}
++
++int main(int argc, char *argv[])
++{
++	ENGINE *engine = NULL;
++	EVP_PKEY *pkey = NULL;
++	EC_KEY *ec = NULL, *ec_dup = NULL;
++
++	const char *module, *efile, *privkey;
++
++	int ret = 0;
++
++	if (argc < 3){
++		printf("Too few arguments\n");
++		usage(argv);
++		return 1;
++	}
++
++	privkey = argv[1];
++	module = argv[2];
++	efile = argv[3];
++
++	ret = CONF_modules_load_file(efile, "engines", 0);
++	if (ret <= 0) {
++		fprintf(stderr, "cannot load %s\n", efile);
++		display_openssl_errors(__LINE__);
++		exit(1);
++	}
++
++	ENGINE_add_conf_module();
++#if OPENSSL_VERSION_NUMBER>=0x10100000
++	OPENSSL_init_crypto(OPENSSL_INIT_ADD_ALL_CIPHERS \
++		| OPENSSL_INIT_ADD_ALL_DIGESTS \
++		| OPENSSL_INIT_LOAD_CONFIG, NULL);
++#else
++	OpenSSL_add_all_algorithms();
++	OpenSSL_add_all_digests();
++	ERR_load_crypto_strings();
++#endif
++	ERR_clear_error();
++
++	ENGINE_load_builtin_engines();
++
++	engine = ENGINE_by_id("pkcs11");
++	if (engine == NULL) {
++		printf("Could not get engine\n");
++		display_openssl_errors(__LINE__);
++		ret = 1;
++		goto end;
++	}
++
++	if (!ENGINE_ctrl_cmd_string(engine, "VERBOSE", NULL, 0)) {
++		display_openssl_errors(__LINE__);
++		exit(1);
++	}
++
++	if (!ENGINE_ctrl_cmd_string(engine, "MODULE_PATH", module, 0)) {
++		display_openssl_errors(__LINE__);
++		exit(1);
++	}
++
++	if (!ENGINE_init(engine)) {
++		printf("Could not initialize engine\n");
++		display_openssl_errors(__LINE__);
++		ret = 1;
++		goto end;
++	}
++
++	pkey = ENGINE_load_private_key(engine, privkey, 0, 0);
++
++	if (pkey == NULL) {
++		printf("Could not load key\n");
++		display_openssl_errors(__LINE__);
++		ret = 1;
++		goto end;
++	}
++
++	switch (EVP_PKEY_base_id(pkey)) {
++	case EVP_PKEY_RSA:
++		/* TODO */
++		break;
++	case EVP_PKEY_EC:
++		ec = EVP_PKEY_get1_EC_KEY(pkey);
++		if (ec == NULL) {
++			printf("Could not get the EC_KEY\n");
++			display_openssl_errors(__LINE__);
++			ret = 1;
++			goto end;
++		}
++
++		ec_dup = EC_KEY_dup(ec);
++		if (ec_dup == NULL) {
++			printf("Could not dup EC_KEY\n");
++			display_openssl_errors(__LINE__);
++			ret = 1;
++			goto end;
++		}
++		EC_KEY_free(ec);
++		EC_KEY_free(ec_dup);
++		break;
++	}
++
++	EVP_PKEY_free(pkey);
++	/* Do it one more time */
++	pkey = ENGINE_load_private_key(engine, privkey, 0, 0);
++
++	if (pkey == NULL) {
++		printf("Could not load key\n");
++		display_openssl_errors(__LINE__);
++		ret = 1;
++		goto end;
++	}
++
++	ENGINE_finish(engine);
++
++	ret = 0;
++
++	CONF_modules_unload(1);
++end:
++	EVP_PKEY_free(pkey);
++
++	return ret;
++}
++
+diff --git a/tests/ec-copy.softhsm b/tests/ec-copy.softhsm
+new file mode 100755
+index 0000000..17b4cda
+--- /dev/null
++++ b/tests/ec-copy.softhsm
+@@ -0,0 +1,38 @@
++#!/bin/sh
++
++# Copyright (C) 2022 Red Hat, Inc.
++#
++# Authors: Jakub Jelen <jjelen@redhat.com>
++#
++# This program is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <https://www.gnu.org/licenses/>.
++
++outdir="output.$$"
++
++# Load common test functions
++. ${srcdir}/ec-no-pubkey.sh
++
++sed -e "s|@MODULE_PATH@|${MODULE}|g" -e "s|@ENGINE_PATH@|../src/.libs/pkcs11.so|g" <"${srcdir}/engines.cnf.in" >"${outdir}/engines.cnf"
++
++export OPENSSL_ENGINES="../src/.libs/"
++PRIVATE_KEY="pkcs11:token=libp11-test;id=%01%02%03%04;object=server-key;type=private;pin-value=1234"
++
++./dup-key ${PRIVATE_KEY} ${MODULE} "${outdir}/engines.cnf"
++if test $? != 0;then
++	echo "Could not duplicate private key"
++	exit 1;
++fi
++
++rm -rf "$outdir"
++
++exit 0

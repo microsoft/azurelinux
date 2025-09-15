@@ -1,0 +1,31 @@
+From 74eace0d89b63be92615364568ba36ad7d748477 Mon Sep 17 00:00:00 2001
+From: Kate Hsuan <hpa@redhat.com>
+Date: Tue, 14 Feb 2023 16:25:04 +0800
+Subject: [PATCH] test: test-unix: skip unix domain socket test
+
+Skip the test since we can't test unix domain socket in mock.
+---
+ tests/test-unix.c | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/tests/test-unix.c b/tests/test-unix.c
+index 98de3db..366488f 100644
+--- a/tests/test-unix.c
++++ b/tests/test-unix.c
+@@ -198,13 +198,6 @@ main (int argc, char **argv)
+               test_pid_is_alive,
+               NULL);
+ 
+-  g_test_add ("/common/unix/bolt_sd_notify",
+-              TestNotify,
+-              NULL,
+-              test_notify_setup,
+-              test_sd_notify,
+-              test_notify_teardown);
+-
+   g_test_add ("/common/unix/sd_watchdog_enabled",
+               TestDummy,
+               NULL,
+-- 
+2.39.1
+

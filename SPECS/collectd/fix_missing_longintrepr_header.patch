@@ -1,0 +1,33 @@
+From 623e95394e0e62e7f9ced2104b786d21e9c0bf53 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=C4=90o=C3=A0n=20Tr=E1=BA=A7n=20C=C3=B4ng=20Danh?=
+ <congdanhqx@gmail.com>
+Date: Wed, 21 Sep 2022 22:21:58 +0700
+Subject: [PATCH] cpython: fix build with Python 3.11
+
+Python 3.11 moves longintrepr.h into cpython sub-directory.
+However, in this version, longintrepr.h is always included.
+---
+ src/cpython.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/cpython.h b/src/cpython.h
+index 11e64fa62f..bcfa406feb 100644
+--- a/src/cpython.h
++++ b/src/cpython.h
+@@ -24,9 +24,15 @@
+  *   Sven Trenkel <collectd at semidefinite.de>
+  **/
+ 
++#include <Python.h>
+ /* Some python versions don't include this by default. */
+-
++#if PY_VERSION_HEX < 0x030B0000
++/*
++ * Python 3.11 move longintrepr.h to cpython/longintrepr.h
++ * And it's always included
++ */
+ #include <longintrepr.h>
++#endif /* PY_VERSION_HEX < 0x030B0000 */
+ 
+ /* These two macros are basically Py_BEGIN_ALLOW_THREADS and
+  * Py_BEGIN_ALLOW_THREADS

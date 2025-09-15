@@ -1,6 +1,6 @@
 Summary:        Configuration-management, application deployment, cloud provisioning system
 Name:           ansible
-Version:        2.15.3
+Version:        2.17.11
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -47,6 +47,12 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Thu May 08 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.17.11-1
+- Auto-upgrade to 2.17.11 - CVE-2024-8775 and CVE-2024-9902
+
+* Mon May 20 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.17.0-1
+- Auto-upgrade to 2.17.0 - none
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.15.3-1
 - Auto-upgrade to 2.15.3 - Azure Linux 3.0 - package upgrades
 

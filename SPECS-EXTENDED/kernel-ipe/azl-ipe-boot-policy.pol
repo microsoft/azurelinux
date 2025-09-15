@@ -1,0 +1,7 @@
+policy_name=azl_ipe_boot_policy policy_version=0.0.1
+
+DEFAULT action=ALLOW
+
+DEFAULT op=EXECUTE action=DENY
+op=EXECUTE boot_verified=TRUE action=ALLOW
+op=EXECUTE dmverity_signature=TRUE action=ALLOW

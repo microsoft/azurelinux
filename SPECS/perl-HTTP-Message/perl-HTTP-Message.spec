@@ -1,6 +1,6 @@
 Name:           perl-HTTP-Message
 Version:        6.45
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        HTTP style message
 # CONTRIBUTING.md:  CC0
 # other files:      GPL+ or Artistic
@@ -42,6 +42,8 @@ BuildRequires:  perl(Config)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(PerlIO::encoding)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Test::Needs)
+BuildRequires:  perl(Clone)
 # Testing requires Time::Local on MacOS only
 BuildRequires:  perl(Try::Tiny)
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -94,6 +96,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Fri Aug 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 6.45-2
+- Add missing test requirements
+
 * Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.45-1
 - Auto-upgrade to 6.45 - Azure Linux 3.0 - package upgrades
 

@@ -1,0 +1,12 @@
+diff -urN tensorboard-2.16.2/tensorboard/pip_package/build_pip_package.sh tensorboard-2.16.2/tensorboard/pip_package/build_pip_package.sh
+--- tensorboard-2.16.2/tensorboard/pip_package/build_pip_package.sh	2024-04-29 08:54:07.635971311 -0700
++++ tensorboard-2.16.2/tensorboard/pip_package/build_pip_package.sh	2024-04-29 08:55:27.281331937 -0700
+@@ -103,8 +103,6 @@
+ 
+   virtualenv -q -p python3 venv
+   export VIRTUAL_ENV=venv
+-  export PATH="${PWD}/venv/bin:${PATH}"
+-  unset PYTHON_HOME
+ 
+   # Require wheel for bdist_wheel command, and setuptools 36.2.0+ so that
+   # env markers are handled (https://github.com/pypa/setuptools/pull/1081)

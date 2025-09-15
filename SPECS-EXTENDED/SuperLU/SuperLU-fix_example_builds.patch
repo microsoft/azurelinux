@@ -1,0 +1,54 @@
+--- a/EXAMPLE/Makefile.orig	2020-10-18 00:23:21.000000000 +0200
++++ b/EXAMPLE/Makefile	2021-01-29 17:58:26.396762602 +0100
+@@ -101,10 +101,10 @@
+ 	$(LOADER) $(LOADOPTS) $(SLINXEXM3) $(LIBS) -lm -o $@
+ 
+ sitersol: $(SITSOL) $(SUPERLULIB)
+-	$(LOADER) $(LOADOPTS) $(SITSOL) $(LIBS) -lm -o $@
++	$(LOADER) $(LOADOPTS) $(SITSOL) $(LIBS) $(TPL_BLAS_LIBRARIES) -lm -o $@
+ 
+ sitersol1: $(SITSOL1) $(SUPERLULIB)
+-	$(LOADER) $(LOADOPTS) $(SITSOL1) $(LIBS) -lm -o $@
++	$(LOADER) $(LOADOPTS) $(SITSOL1) $(LIBS) $(TPL_BLAS_LIBRARIES) -lm -o $@
+ 
+ dlinsol: $(DLINEXM) $(SUPERLULIB)
+ 	$(LOADER) $(LOADOPTS) $(DLINEXM) $(LIBS) -lm -o $@
+@@ -128,10 +128,10 @@
+ 	$(LOADER) $(LOADOPTS) $(SUPERLUEXM) $(LIBS) -lm -o $@
+ 
+ ditersol: $(DITSOL) $(SUPERLULIB)
+-	$(LOADER) $(LOADOPTS) $(DITSOL) $(LIBS) -lm -o $@
++	$(LOADER) $(LOADOPTS) $(DITSOL) $(LIBS) $(TPL_BLAS_LIBRARIES) -lm -o $@
+ 
+ ditersol1: $(DITSOL1) $(SUPERLULIB)
+-	$(LOADER) $(LOADOPTS) $(DITSOL1) $(LIBS) -lm -o $@
++	$(LOADER) $(LOADOPTS) $(DITSOL1) $(LIBS) $(TPL_BLAS_LIBRARIES) -lm -o $@
+ 
+ clinsol: $(CLINEXM) $(SUPERLULIB)
+ 	$(LOADER) $(LOADOPTS) $(CLINEXM) $(LIBS) -lm -o $@
+@@ -152,10 +152,10 @@
+ 	$(LOADER) $(LOADOPTS) $(CLINXEXM3) $(LIBS) -lm -o $@
+ 
+ citersol: $(CITSOL) $(SUPERLULIB)
+-	$(LOADER) $(LOADOPTS) $(CITSOL) $(LIBS) -lm -o $@
++	$(LOADER) $(LOADOPTS) $(CITSOL) $(LIBS) $(TPL_BLAS_LIBRARIES) -lm -o $@
+ 
+ citersol1: $(CITSOL1) $(SUPERLULIB)
+-	$(LOADER) $(LOADOPTS) $(CITSOL1) $(LIBS) -lm -o $@
++	$(LOADER) $(LOADOPTS) $(CITSOL1) $(LIBS) $(TPL_BLAS_LIBRARIES) -lm -o $@
+ 
+ zlinsol: $(ZLINEXM) $(SUPERLULIB)
+ 	$(LOADER) $(LOADOPTS) $(ZLINEXM) $(LIBS) -lm -o $@
+@@ -176,10 +176,10 @@
+ 	$(LOADER) $(LOADOPTS) $(ZLINXEXM3) $(LIBS) -lm -o $@
+ 
+ zitersol: $(ZITSOL) $(SUPERLULIB)
+-	$(LOADER) $(LOADOPTS) $(ZITSOL) $(LIBS) -lm -o $@
++	$(LOADER) $(LOADOPTS) $(ZITSOL) $(LIBS) $(TPL_BLAS_LIBRARIES) -lm -o $@
+ 
+ zitersol1: $(ZITSOL1) $(SUPERLULIB)
+-	$(LOADER) $(LOADOPTS) $(ZITSOL1) $(LIBS) -lm -o $@
++	$(LOADER) $(LOADOPTS) $(ZITSOL1) $(LIBS) $(TPL_BLAS_LIBRARIES) -lm -o $@
+ 
+ .c.o:
+ 	$(CC) $(CFLAGS) $(CDEFS) $(INCLUDEDIR) -c $< $(VERBOSE)

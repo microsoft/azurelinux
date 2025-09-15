@@ -1,0 +1,12 @@
+--- opensc-0.24.0/etc/opensc.conf	2023-12-13 10:44:39.000000000 +0100
++++ opensc-0.24.0/etc/opensc.conf.pinpad	2023-12-14 13:31:40.723607168 +0100
+@@ -1,4 +1,9 @@
+ app default {
+ 	# debug = 3;
+ 	# debug_file = opensc-debug.txt;
++	reader_driver pcsc {
++		# The pinpad is disabled by default,
++		# because of many broken readers out there
++		enable_pinpad = false;
++	}
+ }

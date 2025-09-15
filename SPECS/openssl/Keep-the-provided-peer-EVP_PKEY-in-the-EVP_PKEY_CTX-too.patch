@@ -1,0 +1,34 @@
+From 782912cccc70f8c3fed4e49db2f479d97af0bdf9 Mon Sep 17 00:00:00 2001
+From: Tomas Mraz <tomas@openssl.org>
+Date: Tue, 4 Mar 2025 18:43:18 +0100
+Subject: [PATCH] Keep the provided peer EVP_PKEY in the EVP_PKEY_CTX too
+
+Reviewed-by: Tim Hudson <tjh@openssl.org>
+Reviewed-by: Dmitry Belyavskiy <beldmit@gmail.com>
+Reviewed-by: Matt Caswell <matt@openssl.org>
+(Merged from https://github.com/openssl/openssl/pull/26976)
+
+(cherry picked from commit 2656922febfc36f6b44cff1c363917685633b4c5)
+---
+ crypto/evp/exchange.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/evp/exchange.c b/crypto/evp/exchange.c
+index d9eed1cea5be2..70c2f441b9d7a 100644
+--- a/crypto/evp/exchange.c
++++ b/crypto/evp/exchange.c
+@@ -431,7 +431,13 @@ int EVP_PKEY_derive_set_peer_ex(EVP_PKEY_CTX *ctx, EVP_PKEY *peer,
+      */
+     if (provkey == NULL)
+         goto legacy;
+-    return ctx->op.kex.exchange->set_peer(ctx->op.kex.algctx, provkey);
++    ret = ctx->op.kex.exchange->set_peer(ctx->op.kex.algctx, provkey);
++    if (ret <= 0)
++        return ret;
++    EVP_PKEY_free(ctx->peerkey);
++    ctx->peerkey = peer;
++    EVP_PKEY_up_ref(peer);
++    return 1;
+ 
+  legacy:
+ #ifdef FIPS_MODULE

@@ -1,0 +1,89 @@
+From b3020da7da384d769f27a8713257fbe1001878be Mon Sep 17 00:00:00 2001
+From: "Dmitry V. Levin" <ldv@strace.io>
+Date: Mon, 1 Jan 2024 12:00:00 +0000
+Subject: [PATCH] pam_unix/passverify: always run the helper to obtain shadow
+ password file entries
+
+Initially, when pam_unix.so verified the password, it used to try to
+obtain the shadow password file entry for the given user by invoking
+getspnam(3), and only when that didn't work and the effective uid
+was nonzero, pam_unix.so used to invoke the helper as a fallback.
+
+When SELinux support was introduced by commit
+67aab1ff5515054341a438cf9804e9c9b3a88033, the fallback was extended
+also for the case when SELinux was enabled.
+
+Later, commit f220cace205332a3dc34e7b37a85e7627e097e7d extended the
+fallback conditions for the case when pam_modutil_getspnam() failed
+with EACCES.
+
+Since commit 470823c4aacef5cb3b1180be6ed70846b61a3752, the helper is
+invoked as a fallback when pam_modutil_getspnam() fails for any reason.
+
+The ultimate solution for the case when pam_unix.so does not have
+permissions to obtain the shadow password file entry is to stop trying
+to use pam_modutil_getspnam() and to invoke the helper instead.
+Here are two recent examples.
+
+https://github.com/linux-pam/linux-pam/pull/484 describes a system
+configuration where libnss_systemd is enabled along with libnss_files
+in the shadow entry of nsswitch.conf, so when libnss_files is unable
+to obtain the shadow password file entry for the root user, e.g. when
+SELinux is enabled, NSS falls back to libnss_systemd which returns
+a synthesized shadow password file entry for the root user, which
+in turn locks the root user out.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=2150155 describes
+essentially the same problem in a similar system configuration.
+
+This commit is the final step in the direction of addressing the issue:
+for password verification pam_unix.so now invokes the helper instead of
+making the pam_modutil_getspnam() call.
+
+* modules/pam_unix/passverify.c (get_account_info) [!HELPER_COMPILE]:
+Always return PAM_UNIX_RUN_HELPER instead of trying to obtain
+the shadow password file entry.
+
+Complements: https://github.com/linux-pam/linux-pam/pull/386
+Resolves: https://github.com/linux-pam/linux-pam/pull/484
+Link: https://github.com/authselect/authselect/commit/1e78f7e048747024a846fd22d68afc6993734e92
+---
+ modules/pam_unix/passverify.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/modules/pam_unix/passverify.c b/modules/pam_unix/passverify.c
+index 2474fa7aa4..c48e3c5a79 100644
+--- a/modules/pam_unix/passverify.c
++++ b/modules/pam_unix/passverify.c
+@@ -238,20 +238,21 @@ PAMH_ARG_DECL(int get_account_info,
+ 			return PAM_UNIX_RUN_HELPER;
+ #endif
+ 		} else if (is_pwd_shadowed(*pwd)) {
++#ifdef HELPER_COMPILE
+ 			/*
+-			 * ...and shadow password file entry for this user,
++			 * shadow password file entry for this user,
+ 			 * if shadowing is enabled
+ 			 */
+-			*spwdent = pam_modutil_getspnam(pamh, name);
+-			if (*spwdent == NULL) {
+-#ifndef HELPER_COMPILE
+-				/* still a chance the user can authenticate */
+-				return PAM_UNIX_RUN_HELPER;
+-#endif
+-				return PAM_AUTHINFO_UNAVAIL;
+-			}
+-			if ((*spwdent)->sp_pwdp == NULL)
++			*spwdent = getspnam(name);
++			if (*spwdent == NULL || (*spwdent)->sp_pwdp == NULL)
+ 				return PAM_AUTHINFO_UNAVAIL;
++#else
++			/*
++			 * The helper has to be invoked to deal with
++			 * the shadow password file entry.
++			 */
++			return PAM_UNIX_RUN_HELPER;
++#endif
+ 		}
+ 	} else {
+ 		return PAM_USER_UNKNOWN;

@@ -8,11 +8,9 @@ Before=sysinit.target shutdown.target
 ConditionSecurity=!selinux
 ConditionPathIsDirectory=/etc/selinux
 ConditionPathExists=!/.autorelabel
-
 [Service]
 ExecStart=-/bin/touch /.autorelabel
 Type=oneshot
 RemainAfterExit=yes
-
 [Install]
 WantedBy=sysinit.target

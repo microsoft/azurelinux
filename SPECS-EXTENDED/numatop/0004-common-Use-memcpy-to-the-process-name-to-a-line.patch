@@ -1,0 +1,51 @@
+From 5e8f0af6241fdadc7dd52a26c18df0789ebf03e8 Mon Sep 17 00:00:00 2001
+From: Dridi Boukelmoune <dridi.boukelmoune@gmail.com>
+Date: Mon, 4 Mar 2024 23:03:02 +0100
+Subject: [PATCH 4/9] common: Use memcpy() to the process name to a line
+
+The copy will either collect the whole string, and potentially a little
+more, but from a safe location, or a truncated string with a null char
+guaranteed by the memset() call above.
+
+This silences the stringop-truncation warning.
+---
+ common/win.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/common/win.c b/common/win.c
+index cdc5817..d97da43 100644
+--- a/common/win.c
++++ b/common/win.c
+@@ -355,8 +355,7 @@ topnproc_data_save(track_proc_t *proc, int intval, topnproc_line_t *line)
+ 	/*
+ 	 * Cut off the process name if it's too long.
+ 	 */
+-	(void) strncpy(line->proc_name, proc->name, sizeof (line->proc_name));
+-	line->proc_name[WIN_PROCNAME_SIZE - 1] = 0;
++	memcpy(line->proc_name, proc->name, sizeof (line->proc_name) - 1);
+ 	line->pid = proc->pid;
+ 	line->nlwp = proc_nlwp(proc);
+ 
+@@ -2892,8 +2891,7 @@ pqos_cmt_proc_data_save(track_proc_t *proc, track_lwp_t *lwp, int intval,
+ {
+ 	(void) memset(line, 0, sizeof (pqos_cmt_proc_line_t));
+ 
+-	(void) strncpy(line->proc_name, proc->name, sizeof (line->proc_name));
+-	line->proc_name[WIN_PROCNAME_SIZE - 1] = 0;
++	memcpy(line->proc_name, proc->name, sizeof (line->proc_name) - 1);
+ 	line->pid = proc->pid;
+ 	line->nlwp = proc_nlwp(proc);
+ 
+@@ -3216,8 +3214,7 @@ pqos_mbm_proc_data_save(track_proc_t *proc, track_lwp_t *lwp, int intval,
+ {
+ 	(void) memset(line, 0, sizeof (pqos_mbm_proc_line_t));
+ 
+-	(void) strncpy(line->proc_name, proc->name, sizeof (line->proc_name));
+-	line->proc_name[WIN_PROCNAME_SIZE - 1] = 0;
++	memcpy(line->proc_name, proc->name, sizeof (line->proc_name) - 1);
+ 	line->pid = proc->pid;
+ 	line->nlwp = proc_nlwp(proc);
+ 
+-- 
+2.44.0
+

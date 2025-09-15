@@ -1,74 +1,63 @@
-%{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-%{!?python3_version: %define python3_version %(python3 -c "import sys; sys.stdout.write(sys.version[:3])")}
-%{!?__python3: %global __python3 /usr/bin/python3}
+# Upstream doesn't plan to make any more releases.  Unless they change their
+# mind, we'll need to stick with git snapshots going forward.
+# https://github.com/dabeaz/curio/commit/45ada857189de0e6b3b81f50e93496fc710889ca
+%global commit      148454621f9bd8dd843f591e87715415431f6979
+%global shortcommit %{lua:print(macros.commit:sub(1,7))}
 
-# what it's called on pypi
-%global srcname curio
-# what it's imported as
-%global libname curio
-# name of egg info directory
-%global eggname curio
-# package name fragment
-%global pkgname curio
-
-%global _description \
-Curio is a library of building blocks for performing concurrent I/O and common\
-system programming tasks such as launching subprocesses, working with files,\
-and farming work out to thread and process pools.  It uses Python coroutines\
-and the explicit async/await syntax introduced in Python 3.5.  Its programming\
-model is based on cooperative multitasking and existing programming\
-abstractions such as threads, sockets, files, subprocesses, locks, and queues.\
-You'll find it to be small, fast, and fun.  Curio has no third-party\
-dependencies and does not use the standard asyncio module.  Most users will\
-probably find it to be a bit too-low level--it's probably best to think of it\
-as a library for building libraries.  Although you might not use it directly,\
-many of its ideas have influenced other libraries with similar functionality.
-
-
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+Name:           python-curio
+Version:        1.6^1.%{shortcommit}
+Release:        1%{?dist}
 Summary:        Building blocks for performing concurrent I/O
-Name:           python-%{pkgname}
-Version:        1.4
-Release:        5%{?dist}
-License:        BSD
+License:        BSD-3-Clause
 URL:            https://github.com/dabeaz/curio
-Source0:        https://files.pythonhosted.org/packages/source/c/%{pkgname}/%{pkgname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source:         %{url}/archive/%{commit}/curio-%{shortcommit}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
-%description %{_description}
+%global common_description %{expand:
+Curio is a coroutine-based library for concurrent Python systems programming
+using async/await. It provides standard programming abstractions such as tasks,
+sockets, files, locks, and queues as well as some advanced features such as
+support for structured concurrency. It works on Unix and Windows and has zero
+dependencies. You will find it to be familiar, small, fast, and fun.}
 
-%package -n python3-%{pkgname}
+
+%description %{common_description}
+
+
+%package -n python3-curio
 Summary:        %{summary}
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-%if 0%{?with_check}
+BuildRequires:  %{py3_dist pytest}
 BuildRequires:  python3-pip
-%endif
-%{?python_provide:%python_provide python3-%{pkgname}}
-
-%description -n python3-%{pkgname} %{_description}
+BuildRequires:  python3dist(wheel)
+%description -n python3-curio %{common_description}
 
 %prep
-%autosetup -n %{srcname}-%{version} -p 1
-rm -rf %{eggname}.egg-info
+%autosetup -n curio-%{commit}
+
+%generate_buildrequires
+%pyproject_buildrequires
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files curio
 
 %check
-pip3 install pytest
-pip3 install .
-py.test --verbose -m 'not internet'
+%pytest --verbose -m 'not internet'
 
-%files -n python3-%{pkgname}
-%license LICENSE
+%files -n python3-curio -f %{pyproject_files}
 %doc README.rst
-%{python3_sitelib}/%{libname}
-%{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Mon Mar 19 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.6^1.1484546-1
+- Update to version 1.6^1.1484546
+- License verified
+
 * Thu Apr 28 2022 Muhammad Falak <mwani@microsoft.com> - 1.4-5
 - Drop BR on pytest & pip install latest deps
 - Use py.test instead of py.test-3 to enable ptest

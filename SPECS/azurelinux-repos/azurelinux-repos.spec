@@ -1,14 +1,13 @@
 Summary:        AzureLinux repo files, gpg keys
 Name:           azurelinux-repos
 Version:        %{azl}.0
-Release:        2%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
 Source0:        MICROSOFT-RPM-GPG-KEY
-Source1:        MICROSOFT-METADATA-GPG-KEY
 Source2:        azurelinux-debuginfo.repo
 Source3:        azurelinux-debuginfo-preview.repo
 Source4:        azurelinux-extended.repo
@@ -21,13 +20,56 @@ Source10:       azurelinux-official-base.repo
 Source11:       azurelinux-official-preview.repo
 Source12:       azurelinux-extended-debuginfo.repo
 Source13:       azurelinux-extended-debuginfo-preview.repo
+Source14:       azurelinux-amd.repo
+Source15:       azurelinux-amd-preview.repo
+Source16:       azurelinux-cloud-native.repo
+Source17:       azurelinux-cloud-native-preview.repo
 
 Requires:       %{name}-shared = %{version}-%{release}
 
+# Capture the built architecture before setting noarch in order to install the
+# appropriate repos for x86_64 later in this spec
+%ifarch x86_64
+%define buildx86 1
+%endif 
 BuildArch:      noarch
 
 %description
 Azure Linux repo files and gpg keys
+
+%if %{defined buildx86}
+%package amd
+Summary:        Azure Linux AMD GPU repo file.
+Group:          System Environment/Base
+Requires:       %{name}-shared = %{version}-%{release}
+
+%description amd
+%{summary}
+
+%package amd-preview
+Summary:        Azure Linux AMD GPU preview repo file.
+Group:          System Environment/Base
+Requires:       %{name}-shared = %{version}-%{release}
+
+%description amd-preview
+%{summary}
+%endif
+
+%package cloud-native
+Summary:        Azure Linux cloud-native repo file.
+Group:          System Environment/Base
+Requires:       %{name}-shared = %{version}-%{release}
+
+%description cloud-native
+%{summary}
+
+%package cloud-native-preview
+Summary:        Azure Linux cloud-native preview repo file.
+Group:          System Environment/Base
+Requires:       %{name}-shared = %{version}-%{release}
+
+%description cloud-native-preview
+%{summary}
 
 %package debug
 Summary:        Azure Linux Debuginfo repo file.
@@ -143,26 +185,46 @@ install -m 644 %{SOURCE10} $REPO_DIRECTORY
 install -m 644 %{SOURCE11} $REPO_DIRECTORY
 install -m 644 %{SOURCE12} $REPO_DIRECTORY
 install -m 644 %{SOURCE13} $REPO_DIRECTORY
+%if %{defined buildx86}
+install -m 644 %{SOURCE14} $REPO_DIRECTORY
+install -m 644 %{SOURCE15} $REPO_DIRECTORY
+%endif
+install -m 644 %{SOURCE16} $REPO_DIRECTORY
+install -m 644 %{SOURCE17} $REPO_DIRECTORY
 
 export RPM_GPG_DIRECTORY="%{buildroot}%{_sysconfdir}/pki/rpm-gpg"
 
 install -d -m 755 $RPM_GPG_DIRECTORY
 install -m 644 %{SOURCE0} $RPM_GPG_DIRECTORY
-install -m 644 %{SOURCE1} $RPM_GPG_DIRECTORY
 
 %posttrans shared
-gpg --import %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 gpg --import %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 
 %preun shared
-# Remove the MICROSOFT-METADATA-GPG-KEY
-gpg --batch --yes --delete-keys BC528686B50D79E339D3721CEB3E94ADBE1229CF
 # Remove the MICROSOFT-RPM-GPG-KEY
 gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 
 %files
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-official-base.repo
+
+%if %{defined buildx86}
+%files amd
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-amd.repo
+
+%files amd-preview
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-amd-preview.repo
+%endif
+
+%files cloud-native
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-cloud-native.repo
+
+%files cloud-native-preview
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-cloud-native-preview.repo
 
 %files debug
 %defattr(-,root,root,-)
@@ -211,9 +273,17 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %files shared
 %dir %{_sysconfdir}/yum.repos.d
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
-%{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 
 %changelog
+* Sat Mar 01 2025 Chris Co <chrco@microsoft.com> - 3.0-5
+- Add cloud-native repo subpackages
+
+* Fri Dec 20 2024 Gary Swalling <gaswal@microsoft.com> - 3.0-4
+- Add amd .repo files.
+
+* Thu May 30 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-3
+- Remove MICROSOFT-METADATA-GPG-KEY
+
 * Wed Mar 20 2024 Jon Slobodzian <joslobo@microsoft.com> - 3.0-2
 - Fix the ms-oss and ms-non-oss .repo files to point to correct location.
 

@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/usr/bin/bash
 
-exec fltk-config-$(uname -i) "$@"
+exec fltk-config-$(uname -m) "$@"

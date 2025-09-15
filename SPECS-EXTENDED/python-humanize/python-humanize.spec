@@ -3,21 +3,29 @@ Distribution:   Azure Linux
 %bcond_without check
 
 Name:           python-humanize
-Version:        0.5.1
-Release:        23%{?dist}
+Version:        4.11.0
+Release:        1%{?dist}
 Summary:        Turns dates in to human readable format, e.g '3 minutes ago'
 
 License:        MIT
-URL:            https://github.com/jmoiron/humanize
-Source0:        %{url}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+URL:            https://github.com/python-humanize/humanize/
+Source:         %{pypi_source humanize}
 
 BuildArch:      noarch
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3-coverage
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-%if %{with check}
-BuildRequires:  python3-mock
+BuildRequires:  python3-hatch-vcs
+BuildRequires:  python3-hatchling
+BuildRequires:  python3-pathspec
+BuildRequires:  python3-pip
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-pytest
+BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-trove-classifiers
+%if 0%{?with_check}
+BuildRequires:  python3-pip
 %endif
-
 
 %global _description\
 This modest package contains various common humanization utilities, like turning\
@@ -40,38 +48,39 @@ readable size or throughput.
 %setup -q -n humanize-%{version}
 
 # Remove shebangs from libs.
-for lib in humanize/time.py humanize/filesize.py humanize/number.py; do
+for lib in src/humanize/filesize.py; do
  sed '1{\@^#!/usr/bin/env python@d}' $lib > $lib.new &&
  touch -r $lib $lib.new && mv $lib.new $lib
 done
 
+%generate_buildrequires
+%pyproject_buildrequires
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files humanize
 
 %find_lang humanize
 
 
 %if %{with check}
 %check
-%{__python3} setup.py test
+pip3 install freezegun
+%pytest
 %endif
 
-%files -n python3-humanize -f humanize.lang
-%doc README.rst LICENCE
-%dir %{python3_sitelib}/humanize
-%{python3_sitelib}/humanize/*.py
-%{python3_sitelib}/humanize/__pycache__
-%{python3_sitelib}/humanize-%{version}-py%{python3_version}.egg-info
-%dir %{python3_sitelib}/humanize/locale
-%dir %{python3_sitelib}/humanize/locale/*
-%dir %{python3_sitelib}/humanize/locale/*/LC_MESSAGES
-%{python3_sitelib}/humanize/locale/*/LC_MESSAGES/*.mo
-%exclude %{python3_sitelib}/humanize/locale/*/LC_MESSAGES/*.po
+%files -n python3-humanize -f %{pyproject_files}
+%doc README.md
+%license %{python_sitearch}/humanize-%{version}.dist-info/licenses/LICENCE
 
 %changelog
+* Tue Feb 11 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 4.11.0-1
+- Upgrade to 4.11.0
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.1-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

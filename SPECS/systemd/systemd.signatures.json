@@ -1,5 +1,6 @@
 {
  "Signatures": {
+  "10-console-messages.conf": "6cfc12931ac75df710aa1d323cdb98592935692cd9d32260d6118f9ad03a42e2",
   "10-map-count.conf": "bad4f0bbf268860582402bb4131b7b3586bf1f098a8bf89a6adf503191bc8913",
   "10-oomd-defaults.conf": "f7c8e9d3455bf54795063e3914956b4e15ba52f493b0f2304abef6326a80c6cb",
   "10-oomd-per-slice-defaults.conf": "3f0d6882312affecddfdc5a204a44c34b90c573839f2a4850a26b44f528520bd",

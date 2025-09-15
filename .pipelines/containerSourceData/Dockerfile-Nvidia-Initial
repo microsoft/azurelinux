@@ -1,0 +1,30 @@
+ARG BASE_IMAGE \
+\
+FROM $BASE_IMAGE \
+\
+ARG CORE_RPMS_TO_INSTALL \
+ARG NVIDIA_RPMS_TO_INSTALL \
+\
+RUN --mount=type=bind,source=./Stage/,target=/dockerStage/ \\\
+    RPMS_PATH="/dockerStage/RPMS"; \\\
+    LOCAL_REPO_PATH="/localrepo"; \\\
+    NVIDIA_RPM_DOWNLOAD_PATH="/opt/nvidia"; \\\
+    mkdir -p $LOCAL_REPO_PATH; \\\
+    mkdir -p $NVIDIA_RPM_DOWNLOAD_PATH; \\\
+    tdnf install -y createrepo; \\\
+    cp -r ${RPMS_PATH} ${LOCAL_REPO_PATH}; \\\
+    cat /dockerStage/azurelinuxlocal.repo >> /etc/yum.repos.d/local.repo; \\\
+    createrepo --compatibility --database ${LOCAL_REPO_PATH} --workers 10; tdnf makecache; \\\
+    tdnf autoremove -y createrepo; \\\
+    for rpm in "${CORE_RPMS_TO_INSTALL[@]}"; do \\\
+       echo "RPM: $rpm"; \\\
+       tdnf install -y $rpm; \\\
+    done; \\\
+    for rpm in "${NVIDIA_RPMS_TO_INSTALL[@]}"; do \\\
+        echo "RPM: $rpm"; \\\
+        tdnf -y --downloadonly --downloaddir=$NVIDIA_RPM_DOWNLOAD_PATH install $rpm; \\\
+    done; \\\
+    tdnf clean all; \\\
+    rm -f /etc/yum.repos.d/local.repo; \\\
+    rm -rf /var/cache/tdnf; \\\
+    rm -rf ${LOCAL_REPO_PATH};

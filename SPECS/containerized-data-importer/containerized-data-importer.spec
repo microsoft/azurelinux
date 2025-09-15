@@ -18,14 +18,26 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.57.0
-Release:        1%{?dist}
+Release:        15%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Packages
 URL:            https://github.com/kubevirt/containerized-data-importer
 Source0:        https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-BuildRequires:  golang
+Patch0:         CVE-2024-3727.patch
+Patch1:         CVE-2022-2879.patch
+Patch2:         CVE-2024-24786.patch
+Patch3:         CVE-2024-45338.patch
+Patch4:         CVE-2023-39325.patch
+Patch5:         CVE-2023-44487.patch
+Patch6:         CVE-2024-28180.patch
+Patch7:         CVE-2023-45288.patch
+Patch8:         CVE-2023-3978.patch
+Patch9:         CVE-2025-27144.patch
+Patch10:        CVE-2025-22868.patch
+Patch11:        CVE-2025-22872.patch
+BuildRequires:  golang < 1.25
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
 BuildRequires:  pkgconfig
@@ -108,45 +120,62 @@ kubernetes installation with kubectl apply.
 # to be 'physically' placed into the proper location.
 %setup -q -n go/src/kubevirt.io/%{name} -c -T
 tar --strip-components=1 -xf %{SOURCE0}
+%autopatch -p1
 
 %build
 
 export GOPATH=%{_builddir}/go
-export GOFLAGS+="-buildmode=pie -mod=vendor"
-env \
-CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
-CDI_GIT_COMMIT='v%{version}' \
-CDI_GIT_VERSION='v%{version}' \
-CDI_GIT_TREE_STATE="clean" \
-./hack/build/build-go.sh build \
-	cmd/cdi-apiserver \
-	cmd/cdi-cloner \
-	cmd/cdi-controller \
-	cmd/cdi-importer \
-	cmd/cdi-uploadproxy \
-	cmd/cdi-uploadserver \
-	cmd/cdi-operator \
-	%{nil}
+export GOFLAGS="-mod=vendor"
+export CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)"
+export CDI_GIT_COMMIT='v%{version}'
+export CDI_GIT_VERSION='v%{version}'
+export CDI_GIT_TREE_STATE="clean"
 
+GOFLAGS="-buildmode=pie ${GOFLAGS}" ./hack/build/build-go.sh build \
+    cmd/cdi-apiserver \
+    cmd/cdi-cloner \
+    cmd/cdi-controller \
+    cmd/cdi-importer \
+    cmd/cdi-uploadproxy \
+    cmd/cdi-uploadserver \
+    cmd/cdi-operator \
+    tools/cdi-image-size-detection \
+    tools/cdi-source-update-poller \
+    tools/csv-generator \
+    %{nil}
+
+# Disable cgo to build static binaries, so they can run on scratch images
+CGO_ENABLED=0 ./hack/build/build-go.sh build \
+    tools/cdi-containerimage-server \
+    %{nil}
+ 
 ./hack/build/build-manifests.sh
 
 %install
 mkdir -p %{buildroot}%{_bindir}
 
-install -p -m 0755 _out/cmd/cdi-apiserver/cdi-apiserver %{buildroot}%{_bindir}/virt-cdi-apiserver
+install -p -m 0755 _out/cmd/cdi-apiserver/cdi-apiserver %{buildroot}%{_bindir}/cdi-apiserver
 
 install -p -m 0755 cmd/cdi-cloner/cloner_startup.sh %{buildroot}%{_bindir}/
 install -p -m 0755 _out/cmd/cdi-cloner/cdi-cloner %{buildroot}%{_bindir}/
 
-install -p -m 0755 _out/cmd/cdi-controller/cdi-controller %{buildroot}%{_bindir}/virt-cdi-controller
+install -p -m 0755 _out/cmd/cdi-controller/cdi-controller %{buildroot}%{_bindir}/cdi-controller
 
-install -p -m 0755 _out/cmd/cdi-importer/cdi-importer %{buildroot}%{_bindir}/virt-cdi-importer
+install -p -m 0755 _out/cmd/cdi-importer/cdi-importer %{buildroot}%{_bindir}/cdi-importer
 
-install -p -m 0755 _out/cmd/cdi-operator/cdi-operator %{buildroot}%{_bindir}/virt-cdi-operator
+install -p -m 0755 _out/cmd/cdi-operator/cdi-operator %{buildroot}%{_bindir}/cdi-operator
 
-install -p -m 0755 _out/cmd/cdi-uploadproxy/cdi-uploadproxy %{buildroot}%{_bindir}/virt-cdi-uploadproxy
+install -p -m 0755 _out/cmd/cdi-uploadproxy/cdi-uploadproxy %{buildroot}%{_bindir}/cdi-uploadproxy
 
-install -p -m 0755 _out/cmd/cdi-uploadserver/cdi-uploadserver %{buildroot}%{_bindir}/virt-cdi-uploadserver
+install -p -m 0755 _out/cmd/cdi-uploadserver/cdi-uploadserver %{buildroot}%{_bindir}/cdi-uploadserver
+
+install -p -m 0755 _out/tools/cdi-containerimage-server/cdi-containerimage-server %{buildroot}%{_bindir}/cdi-containerimage-server
+
+install -p -m 0755 _out/tools/cdi-image-size-detection/cdi-image-size-detection %{buildroot}%{_bindir}/cdi-image-size-detection
+
+install -p -m 0755 _out/tools/cdi-source-update-poller/cdi-source-update-poller %{buildroot}%{_bindir}/cdi-source-update-poller
+
+install -p -m 0755 _out/tools/csv-generator/csv-generator %{buildroot}%{_bindir}/csv-generator
 
 # Install release manifests
 mkdir -p %{buildroot}%{_datadir}/cdi/manifests/release
@@ -156,7 +185,7 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %files api
 %license LICENSE
 %doc README.md
-%{_bindir}/virt-cdi-apiserver
+%{_bindir}/cdi-apiserver
 
 %files cloner
 %license LICENSE
@@ -167,27 +196,31 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %files controller
 %license LICENSE
 %doc README.md
-%{_bindir}/virt-cdi-controller
+%{_bindir}/cdi-controller
 
 %files importer
 %license LICENSE
 %doc README.md
-%{_bindir}/virt-cdi-importer
+%{_bindir}/cdi-importer
+%{_bindir}/cdi-containerimage-server
+%{_bindir}/cdi-image-size-detection
+%{_bindir}/cdi-source-update-poller
 
 %files operator
 %license LICENSE
 %doc README.md
-%{_bindir}/virt-cdi-operator
+%{_bindir}/cdi-operator
+%{_bindir}/csv-generator
 
 %files uploadproxy
 %license LICENSE
 %doc README.md
-%{_bindir}/virt-cdi-uploadproxy
+%{_bindir}/cdi-uploadproxy
 
 %files uploadserver
 %license LICENSE
 %doc README.md
-%{_bindir}/virt-cdi-uploadserver
+%{_bindir}/cdi-uploadserver
 
 %files manifests
 %license LICENSE
@@ -198,6 +231,48 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.57.0-15
+- Set BR for golang to < 1.25
+
+* Tue Apr 22 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.57.0-14
+- Patch CVE-2025-22872
+
+* Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.57.0-13
+- Fix CVE-2025-27144, CVE-2025-22868
+
+* Sun Feb 23 2025 Sudipta Pandit <sudpandit@microsoft.com> - 1.57.0-12
+- Fix CVE-2023-3978 with a backported patch
+
+* Fri Feb 14 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.57.0-11
+- Address CVE-2023-45288
+
+* Mon Feb 03 2025 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.57.0-10
+- Rename cdi binaries to be inline with upstream.
+
+* Wed Jan 29 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.57.0-9
+- Fix CVE-2024-28180 with an upstream patch
+
+* Fri Jan 24 2025 Henry Li <lihl@microsoft.com> - 1.57.0-8
+- Add patch for CVE-2023-39325 and CVE-2023-44487
+
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.57.0-7
+- Add patch for CVE-2024-45338
+
+* Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 1.57.0-6
+- Fix CVE-2024-24786
+
+* Fri Sep 06 2024 Aditya Dubey <adityadubey@microsoft.com> - 1.57.0-5
+- Statically building binaries
+
+* Fri Jul 19 2024 Aditya Dubey <adityadubey@microsoft.com> - 1.57.0-4
+- Building cdi tool binaries within package build
+
+* Wed Jul 10 2024 Thien Trung Vuong <tvuong@microsoft.com> - 1.57.0-3
+- Address CVE-2022-2879 by patching vendored github.com/vbatss/tar-split
+
+* Thu Jun 06 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.57.0-2
+- Address CVE-2024-3727 by patching vendored github.com/containers/image
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.57.0-1
 - Auto-upgrade to 1.57.0 - Azure Linux 3.0 - package upgrades
 

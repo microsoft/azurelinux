@@ -32,7 +32,7 @@ func replaceRunNodesWithPrebuiltNodes(pkgGraph *pkggraph.PkgGraph) (err error) {
 		_, missing := pkggraph.FindRPMFiles(node.SrpmPath, pkgGraph, nil)
 
 		if len(missing) > 0 {
-			logger.Log.Tracef("Can't mark %s as prebuilt, missing: %v", node.SrpmPath, missing)
+			logger.Log.Tracef("Can't mark (%s) as prebuilt, missing: %v", node.SrpmPath, missing)
 			continue
 		}
 
@@ -47,7 +47,7 @@ func replaceRunNodesWithPrebuiltNodes(pkgGraph *pkggraph.PkgGraph) (err error) {
 			if parentNode.Type != pkggraph.TypeGoal {
 				pkgGraph.RemoveEdge(parentNode.ID(), node.ID())
 
-				logger.Log.Debugf("Adding a 'PreBuilt' node '%s' with id %d. For '%s'", preBuiltNode.FriendlyName(), preBuiltNode.ID(), parentNode.FriendlyName())
+				logger.Log.Debugf("Adding a 'PreBuilt' node (%s) with id %d. For (%s)", preBuiltNode.FriendlyName(), preBuiltNode.ID(), parentNode.FriendlyName())
 				err = pkgGraph.AddEdge(parentNode, preBuiltNode)
 
 				if err != nil {

@@ -12,7 +12,8 @@ import (
 )
 
 var (
-	tmpDir string
+	testDataDir string
+	tmpDir      string
 )
 
 func TestMain(m *testing.M) {
@@ -24,6 +25,8 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		logger.Log.Panicf("Failed to get working directory, error: %s", err)
 	}
+
+	testDataDir = filepath.Join(workingDir, "testdata")
 
 	tmpDir = filepath.Join(workingDir, "_tmp")
 

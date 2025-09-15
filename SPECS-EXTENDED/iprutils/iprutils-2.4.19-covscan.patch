@@ -1,0 +1,449 @@
+diff -up iprutils-rel-2-4-19/iprconfig.c.me iprutils-rel-2-4-19/iprconfig.c
+--- iprutils-rel-2-4-19/iprconfig.c.me	2024-06-17 12:10:54.493119641 +0200
++++ iprutils-rel-2-4-19/iprconfig.c	2024-06-18 11:20:17.885495296 +0200
+@@ -2483,7 +2483,7 @@ static char *disk_details(char *body, st
+ 	char vendor_id[IPR_VENDOR_ID_LEN+1];
+ 	char serial_num[IPR_SERIAL_NUM_LEN+1];
+ 	char buffer[100];
+-	int len, scsi_channel, scsi_id, scsi_lun;
++	int len = 0, scsi_channel = 0, scsi_id = 0, scsi_lun = 0;
+ 
+ 	device_record = (struct ipr_dev_record *)dev->dev_rcd;
+ 
+@@ -2633,7 +2633,7 @@ int get_ses_phy_loc(struct ipr_dev *dev)
+ 	int rc, i, ret = 1;
+ 	struct ses_inquiry_page0  ses_page0_inq;
+ 	struct ses_serial_num_vpd ses_vpd_inq;
+-	struct esm_serial_num_vpd esm_vpd_inq;
++	struct esm_serial_num_vpd esm_vpd_inq = {0};
+ 	char buffer[100];
+ 
+ 	memset(&ses_vpd_inq, 0, sizeof(ses_vpd_inq));
+@@ -2649,18 +2649,18 @@ int get_ses_phy_loc(struct ipr_dev *dev)
+ 
+ 	if (ret == 0 ) {
+ 		dev->physical_location[0] = '\0';
+-		strncat(dev->physical_location, "U", strlen("U"));
++		strcat(dev->physical_location, "U");
+ 		ipr_strncpy_0(buffer, (char *)ses_vpd_inq.feature_code,
+ 				sizeof(ses_vpd_inq.feature_code));
+-		strncat(dev->physical_location, buffer, strlen(buffer));
++		strncat(dev->physical_location, buffer, sizeof(dev->physical_location) - strlen(dev->physical_location) -1);
+ 		ipr_strncpy_0(buffer, (char *)ses_vpd_inq.count,
+ 				sizeof(ses_vpd_inq.count));
+-		strncat(dev->physical_location, ".", strlen("."));
+-		strncat(dev->physical_location, buffer, strlen(buffer));
++		strcat(dev->physical_location, ".");
++		strncat(dev->physical_location, buffer, sizeof(dev->physical_location) - strlen(dev->physical_location) -1);
+ 		ipr_strncpy_0(buffer, (char *)ses_vpd_inq.ses_serial_num,
+ 				sizeof(ses_vpd_inq.ses_serial_num));
+-		strncat(dev->physical_location, ".", strlen("."));
+-		strncat(dev->physical_location, buffer, strlen(buffer));
++		strcat(dev->physical_location, ".");
++		strncat(dev->physical_location, buffer, sizeof(dev->physical_location) - strlen(dev->physical_location) -1);
+ 
+ 	}
+ 
+@@ -2676,8 +2676,8 @@ int get_ses_phy_loc(struct ipr_dev *dev)
+ 			ipr_strncpy_0((char *)&dev->serial_number, (char *)&esm_vpd_inq.esm_serial_num[0], sizeof(esm_vpd_inq.esm_serial_num));
+ 			ipr_strncpy_0(buffer, (char *)esm_vpd_inq.frb_label,
+ 					sizeof(esm_vpd_inq.frb_label));
+-			strncat(dev->physical_location, "-", strlen("-"));
+-			strncat(dev->physical_location, buffer, strlen(buffer));
++			strcat(dev->physical_location, "-");
++			strncat(dev->physical_location, buffer, sizeof(dev->physical_location) - strlen(dev->physical_location) -1);
+ 			return 0;
+ 		}
+ 	}
+@@ -3313,7 +3313,7 @@ static int raid_stop_complete()
+  **/
+ int do_confirm_raid_stop(i_container *i_con)
+ {
+-	struct ipr_dev *vset;
++	struct ipr_dev *vset = NULL;
+ 	struct array_cmd_data *cur_raid_cmd;
+ 	struct ipr_ioa *ioa;
+ 	int rc;
+@@ -3715,7 +3715,7 @@ int configure_raid_parameters(i_containe
+ 	int ch, start_row;
+ 	int cur_field_index;
+ 	int selected_count = 0, ssd_num = 0, hdd_num = 0;
+-	int stripe_sz, stripe_sz_mask, stripe_sz_list[16];
++	int stripe_sz, stripe_sz_mask, stripe_sz_list[16] = {0};
+ 	struct prot_level *prot_level_list;
+ 	int *userptr = NULL;
+ 	int *retptr;
+@@ -3979,7 +3979,7 @@ int configure_raid_parameters(i_containe
+ 							sprintf(stripe_menu_str[index].line,"%d k",stripe_sz_mask);
+ 
+ 						if (stripe_sz_mask == ntohs(cap_entry->recommended_stripe_size)) {
+-							sprintf(buffer,_("%s - recommend"),stripe_menu_str[index].line);
++							snprintf(buffer, sizeof(buffer), _("%s - recommend"),stripe_menu_str[index].line);
+ 							raid_item[index] = new_item(buffer, "");
+ 						} else {
+ 							raid_item[index] = new_item(stripe_menu_str[index].line, "");
+@@ -7486,7 +7486,7 @@ int remove_or_add_back_device_64bit(stru
+ 	int res_path_len, dev_slot;
+ 	struct ipr_dev *sec_dev, *tmp_dev;
+ 	char new_sysfs_res_path[IPR_MAX_RES_PATH_LEN];
+-	int rc;
++	int rc = 0;
+ 
+ 	res_path_len  = strlen(dev->res_path_name);
+ 	dev_slot = strtoul(dev->res_path_name + (res_path_len - 2), NULL, 16);
+@@ -7558,7 +7558,7 @@ int process_conc_maint(i_container *i_co
+ 	int toggle=0;
+ 	s_node *n_screen;
+ 	struct screen_output *s_out;
+-	struct ipr_res_addr res_addr;
++	struct ipr_res_addr res_addr = {0};
+ 	struct ipr_res_path res_path[2];
+ 	int max_y, max_x;
+ 
+@@ -7905,7 +7905,7 @@ static struct ipr_dev *alloc_empty_slot(
+ 	dev->ses[0] = ses;
+ 	dev->ioa = ioa;
+ 	dev->physical_location[0] = '\0';
+-	strncat(dev->physical_location, phy_loc, strlen(phy_loc));
++   strncat(dev->physical_location, phy_loc, sizeof(dev->physical_location) - strlen(dev->physical_location) -1);
+ 	get_res_addrs(dev);
+ 	return dev;
+ }
+@@ -7948,7 +7948,7 @@ static struct ipr_dev *alloc_empty_slot_
+ 	dev->ses[0] = ses;
+ 	dev->ioa = ioa;
+ 	dev->physical_location[0] = '\0';
+-	strncat(dev->physical_location, phy_loc, strlen(phy_loc));
++	strncat(dev->physical_location, phy_loc, sizeof(dev->physical_location) - strlen(dev->physical_location) -1);
+ 	get_res_path(dev);
+ 	return dev;
+ }
+@@ -8020,7 +8020,7 @@ static struct ipr_dev *get_dev_for_slot(
+ 			}
+ 			dev->physical_location[0] = '\0';
+ 			if (strlen(phy_loc))
+-				strncat(dev->physical_location, phy_loc, strlen(phy_loc));
++				strncat(dev->physical_location, phy_loc, sizeof(dev->physical_location) - strlen(dev->physical_location) -1);
+ 			return dev;
+ 		}
+ 	}
+@@ -8068,7 +8068,7 @@ static struct ipr_dev *get_dev_for_slot_
+ 				}
+ 			dev->physical_location[0] = '\0';
+ 			if (strlen(phy_loc))
+-				strncat(dev->physical_location, phy_loc, strlen(phy_loc));
++				strncat(dev->physical_location, phy_loc, sizeof(dev->physical_location) - strlen(dev->physical_location) -1);
+ 			return dev;
+ 
+ 			}
+@@ -8282,7 +8282,7 @@ static int get_conc_devs(struct ipr_dev
+ 	int ses_bus, scsi_id_found, is_spi, is_vses;
+ 	struct ipr_ses_config_pg ses_cfg;
+ 	struct drive_elem_desc_pg drive_data;
+-	char phy_loc[PHYSICAL_LOCATION_LENGTH + 1];
++	char phy_loc[PHYSICAL_LOCATION_LENGTH + 1] = {0};
+ 	int times, index;
+ 
+ 	for_each_primary_ioa(ioa) {
+@@ -11447,7 +11447,7 @@ int change_ioa_config(i_container * i_co
+ 	 * number of options showed at screen. It should be more generic...
+ 	*/
+ 	struct ioa_config_attr *config_attr = NULL;
+-	struct ipr_ioa_attr ioa_attr;
++	struct ipr_ioa_attr ioa_attr = {0};
+ 	int header_lines = 0, index = 0;
+ 	char *body = NULL;
+ 	struct screen_output *s_out;
+@@ -12418,8 +12418,7 @@ int ibm_storage_log(i_container *i_con)
+ 			 (*dirent)->d_name);
+ 		logsource_fp = gzopen(logfile, "r");
+ 		if (logsource_fp == NULL) {
+-			syslog(LOG_ERR, "Could not open %s: %m\n", line);
+-			close(log_fd);
++			syslog(LOG_ERR, "Could not open %s: %m\n", logfile);
+ 			continue; /* proceed to next log file */
+ 		}
+ 
+@@ -12524,8 +12523,7 @@ int kernel_log(i_container *i_con)
+ 			 (*dirent)->d_name);
+ 		logsource_fp = gzopen(logfile, "r");
+ 		if (logsource_fp == NULL) {
+-			syslog(LOG_ERR, "Could not open %s: %m\n", line);
+-			close(log_fd);
++			syslog(LOG_ERR, "Could not open %s: %m\n", logfile);
+ 			continue; /* proceed to next log file */
+ 		}
+ 
+@@ -12602,8 +12600,7 @@ int iprconfig_log(i_container *i_con)
+ 			 (*dirent)->d_name);
+ 		logsource_fp = gzopen(logfile, "r");
+ 		if (logsource_fp == NULL) {
+-			syslog(LOG_ERR, "Could not open %s: %m\n", line);
+-			close(log_fd);
++			syslog(LOG_ERR, "Could not open %s: %m\n", logfile);
+ 			continue; /* proceed to next log file */
+ 		}
+ 
+@@ -12855,7 +12852,7 @@ int ibm_boot_log(i_container *i_con)
+ 	snprintf(logfile, sizeof(logfile), "%s/boot.msg", log_root_dir);
+ 	logsource_fp = fopen(logfile, "r");
+ 	if (!logsource_fp) {
+-		syslog(LOG_ERR, "Could not open %s: %m\n", line);
++		syslog(LOG_ERR, "Could not open %s: %m\n", logfile);
+ 		free(tmp_log);
+ 		close(log_fd);
+ 		return RC_75_Failed_Read_Err_Log;
+@@ -12917,7 +12914,7 @@ static void get_status(struct ipr_dev *d
+ 	int blk_size = 0;
+ 	struct ipr_mode_pages mode_pages;
+ 	struct ipr_block_desc *block_desc;
+-	struct sense_data_t sense_data;
++	struct sense_data_t sense_data = {0};
+ 	struct ipr_cmd_status cmd_status;
+ 	struct ipr_cmd_status_record *status_record;
+ 	int percent_cmplt = 0;
+@@ -13261,7 +13258,7 @@ static char *print_phy64(struct ipr_fabr
+ 	ipr_format_res_path_wo_hyphen(cfg->res_path, buffer, IPR_MAX_RES_PATH_LEN);
+ 	ff_len = res_path_len - strlen(buffer);
+ 	for ( i = 0; i < ff_len;  i++)
+-		strncat(buffer, "F", strlen("F"));
++		strcat(buffer, "F");
+ 
+ 	len += sprintf(body + len, "%s", buffer);
+ 
+@@ -13419,8 +13416,8 @@ char *__print_device(struct ipr_dev *dev
+ 	char res_path_name[IPR_MAX_RES_PATH_LEN];
+ 	int tab_stop = 0;
+ 	int loc_len = 0;
+-	char vendor_id[IPR_VENDOR_ID_LEN + 1];
+-	char product_id[IPR_PROD_ID_LEN + 1];
++	char vendor_id[IPR_VENDOR_ID_LEN + 1] = {0};
++	char product_id[IPR_PROD_ID_LEN + 1] = {0};
+ 	struct ipr_ioa *ioa = dev->ioa, *ioa_phy_loc;
+ 	bool is4k = false, isri = false;
+ 
+@@ -14009,7 +14006,7 @@ static void curses_init()
+  **/
+ static int format_devices(char **args, int num_args, int fmt_flag)
+ {
+-	int i, rc, blksz;
++	int i, rc, blksz = 0;
+ 	struct ipr_dev *dev;
+ 
+ 	for (i = 0; i < num_args; i++) {
+@@ -17779,7 +17776,7 @@ static int get_drive_phy_loc(struct ipr_
+ 	struct ipr_ses_config_pg ses_cfg;
+ 	int ses_bus, scsi_id_found, is_spi, is_vses;
+ 	struct drive_elem_desc_pg drive_data;
+-	char phy_loc[PHYSICAL_LOCATION_LENGTH + 1];
++	char phy_loc[PHYSICAL_LOCATION_LENGTH + 1] = {0};
+ 	int times, index;
+ 
+ 	is_spi = ioa_is_spi(ioa);
+@@ -18222,7 +18219,7 @@ static int set_ioa_caching(char **args,
+ static int set_array_rebuild_verify(char **args, int num_args)
+ {
+ 	int rc;
+-	struct ipr_ioa_attr attr;
++	struct ipr_ioa_attr attr = {0};
+ 	struct ipr_ioa *ioa;
+ 	struct ipr_dev *dev;
+ 	int disable_rebuild_verify;
+@@ -18318,7 +18315,7 @@ static int set_array_rebuild_rate(char**
+ 	int err_rebuild_rate = 0;
+ 	int rebuild_rate = 0;
+ 	int rc;
+-	struct ipr_ioa_attr attr;
++	struct ipr_ioa_attr attr = {0};
+ 	struct ipr_ioa *ioa;
+ 	struct ipr_dev *dev;
+ 
+@@ -18382,7 +18379,7 @@ static int set_array_rebuild_rate(char**
+  **/
+ static int query_array_rebuild_rate(char**args, int num_args)
+ {
+-	struct ipr_ioa_attr attr;
++	struct ipr_ioa_attr attr = {0};
+ 	struct ipr_ioa *ioa;
+ 	struct ipr_dev *dev;
+ 	int rebuild_rate = 0;
+diff -up iprutils-rel-2-4-19/iprconfig.h.me iprutils-rel-2-4-19/iprconfig.h
+diff -up iprutils-rel-2-4-19/iprdump.c.me iprutils-rel-2-4-19/iprdump.c
+--- iprutils-rel-2-4-19/iprdump.c.me	2024-06-17 17:12:49.846400485 +0200
++++ iprutils-rel-2-4-19/iprdump.c	2024-06-18 00:41:47.907738323 +0200
+@@ -23,6 +23,7 @@
+ #define MAX_DUMP_FILES 4
+ #define TOOL_NAME "iprdump"
+ #define DUMP_PREFIX TOOL_NAME"."
++#define MAX_PATH_LENGTH 1024
+ 
+ char *tool_name = TOOL_NAME;
+ 
+@@ -156,7 +157,7 @@ static int dump_sort(const struct dirent
+ static void cleanup_old_dumps()
+ {
+ 	struct dirent **dirent;
+-	char fname[100];
++	char fname[MAX_PATH_LENGTH];
+ 	int rc, i;
+ 
+ 	rc = scandir(usr_dir, &dirent, select_dump_file, dump_sort);
+@@ -226,7 +227,7 @@ static void write_dump(struct ipr_ioa *i
+ 	if (get_dump_fname(dump_file))
+ 		return;
+ 
+-	sprintf(dump_path, "%s%s", usr_dir, dump_file);
++	snprintf(dump_path, sizeof(dump_path), "%s%s", usr_dir, dump_file);
+ 	f_dump = creat(dump_path, S_IRUSR);
+ 	if (f_dump < 0) {
+ 		syslog(LOG_ERR, "Cannot open %s. %m\n", dump_path);
+@@ -347,7 +348,7 @@ int main(int argc, char *argv[])
+ 		if (strcmp(argv[i], "-d") == 0) {
+ 			strcpy(usr_dir,argv[++i]);
+ 			len = strlen(usr_dir);
+-			if (len < sizeof(usr_dir) && usr_dir[len] != '/') {
++			if (len < sizeof(usr_dir) - 2 && usr_dir[len] != '/') {
+ 				usr_dir[len + 1] = '/';
+ 				usr_dir[len + 2] = '\0';
+ 			}
+diff -up iprutils-rel-2-4-19/iprlib.c.me iprutils-rel-2-4-19/iprlib.c
+--- iprutils-rel-2-4-19/iprlib.c.me	2024-06-17 12:22:56.983740856 +0200
++++ iprutils-rel-2-4-19/iprlib.c	2024-06-18 10:09:20.716132953 +0200
+@@ -2063,8 +2063,9 @@ static void ipr_get_pci_slots()
+ 				if (strcmp(pci_slot[i].pci_device, ioa->pci_address) &&
+ 				    strcmp(pci_slot[i].slot_name, ioa->pci_address))
+ 					continue;
+-				strcpy(ioa->physical_location,
+-				       pci_slot[i].physical_name);
++				strncpy(ioa->physical_location,
++				       pci_slot[i].physical_name, sizeof(ioa->physical_location) - 1);
++				ioa->physical_location[sizeof(ioa->physical_location) - 1] = '\0';
+ 				break;
+ 			}
+ 		}
+@@ -2101,7 +2102,7 @@ void load_system_p_oper_mode()
+  **/
+ static int __tool_init(int save_state)
+ {
+-	int temp, fw_type;
++	int temp, fw_type = 0;
+ 	struct ipr_ioa *ipr_ioa;
+ 	DIR *dirfd, *host_dirfd;
+ 	struct dirent *dent, *host_dent;
+@@ -2132,13 +2133,15 @@ static int __tool_init(int save_state)
+ 		memset(ipr_ioa,0,sizeof(struct ipr_ioa));
+ 
+ 		/* PCI address */
+-		strcpy(ipr_ioa->pci_address, dent->d_name);
++		strncpy(ipr_ioa->pci_address, dent->d_name, sizeof(ipr_ioa->pci_address) - 1);
++		ipr_ioa->pci_address[sizeof(ipr_ioa->pci_address) -1] = '\0';
+ 		ipr_ioa->host_num = -1;
+ 		sprintf(devpath, "/sys/bus/pci/drivers/ipr/%s",
+ 			dent->d_name);
+ 		host_dirfd = opendir(devpath);
+ 		if (!host_dirfd) {
+ 			syslog_dbg("Failed to open scsi_host class.\n");
++			closedir(dirfd);
+ 			return -EAGAIN;
+ 		}
+ 		while ((host_dent = readdir(host_dirfd)) != NULL) {
+@@ -2152,7 +2155,8 @@ static int __tool_init(int save_state)
+ 				   &ipr_ioa->host_num) != 1)
+ 				continue;
+ 
+-			strcpy(ipr_ioa->host_name, host_dent->d_name);
++			strncpy(ipr_ioa->host_name, host_dent->d_name, sizeof(ipr_ioa->host_name) - 1);
++			ipr_ioa->host_name[sizeof(ipr_ioa->host_name) - 1] = '\0';
+ 			get_pci_attrs(ipr_ioa, devpath);
+ 
+ 			sprintf(scsipath, "%s/%s/scsi_host/%s", devpath,
+@@ -2188,6 +2192,7 @@ static int __tool_init(int save_state)
+ 		len = sysfs_read_attr(devpath, "model", buff, 16);
+ 		if (len < 0 || (sscanf(buff, "%4X", &temp) != 1)) {
+ 			syslog_dbg("Cannot read SCSI device model.\n");
++			closedir(dirfd);
+ 			return -EAGAIN;
+ 		}
+ 		ipr_ioa->ccin = temp;
+@@ -5747,7 +5752,7 @@ int ipr_set_active_active_mode(struct ip
+  **/
+ int set_active_active_mode(struct ipr_ioa *ioa, int mode)
+ {
+-	struct ipr_ioa_attr attr;
++	struct ipr_ioa_attr attr = {0};
+ 	int rc;
+ 
+ 	/* Get the current ioa attributes. */
+@@ -5860,7 +5865,7 @@ int get_scsi_dev_data(struct scsi_dev_da
+ 		len = sysfs_read_attr(devpath, "resource_path", buff, 256);
+ 		if (len > 0)
+ 			ipr_strncpy_0n(scsi_dev_data->res_path,
+-				       buff, IPR_MAX_RES_PATH_LEN);
++				       buff, IPR_MAX_RES_PATH_LEN-1);
+  
+ 		len = sysfs_read_attr(devpath, "device_id", buff, 256);
+ 		if (len > 0)
+@@ -6255,15 +6260,19 @@ static void get_prot_levels(struct ipr_i
+ 	for_each_array(ioa, array) {
+ 		prot_level_str = get_prot_level_str(ioa->supported_arrays,
+ 						    array->raid_level);
+-		strncpy(array->prot_level_str, prot_level_str, 8);
++		strncpy(array->prot_level_str, prot_level_str, sizeof(array->prot_level_str) - 1);
++		array->prot_level_str[sizeof(array->prot_level_str) - 1] = '\0';
+ 	}
+ 
+ 	for_each_vset(ioa, vset) {
+ 		prot_level_str = get_prot_level_str(ioa->supported_arrays,
+ 						    vset->raid_level);
+-		strncpy(vset->prot_level_str, prot_level_str, 8);
+-		for_each_dev_in_vset(vset, dev)
+-			strncpy(dev->prot_level_str, prot_level_str, 8);
++		strncpy(vset->prot_level_str, prot_level_str, sizeof(vset->prot_level_str) - 1);
++		vset->prot_level_str[sizeof(vset->prot_level_str) - 1] = '\0';
++		for_each_dev_in_vset(vset, dev) {
++			strncpy(dev->prot_level_str, prot_level_str, sizeof(dev->prot_level_str) - 1);
++			dev->prot_level_str[sizeof(dev->prot_level_str) - 1] = '\0';
++		}
+ 	}
+ }
+ 
+@@ -7038,6 +7047,7 @@ static void ipr_save_attr(struct ipr_ioa
+ 	temp_fd = fopen(temp_fname, "w");
+ 	if (temp_fd == NULL) {
+ 		syslog(LOG_ERR, "Could not open %s. %m\n", temp_fname);
++		fclose(fd);
+ 		return;
+ 	}
+ 
+@@ -9175,6 +9185,8 @@ int ipr_update_ioa_fw(struct ipr_ioa *io
+ 		dir = opendir(hotplug_dir);
+ 		if (!dir)
+ 			mkdir(hotplug_dir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
++		else
++			closedir(dir);
+ 
+ 		dir = opendir(hotplug_dir);
+ 		if (!dir) {
+@@ -9356,7 +9368,12 @@ int ipr_ses_get_time(struct ipr_dev *dev
+ 		return -EIO;
+ 
+ 	*origin = !!get_time.timestamp_origin;
+-	*timestamp = be64toh(*((u64*) get_time.timestamp)) >> 16;
++	*timestamp = ((u64)get_time.timestamp[0] << 40) |
++					 ((u64)get_time.timestamp[1] << 32) |
++					 ((u64)get_time.timestamp[2] << 24) |
++					 ((u64)get_time.timestamp[3] << 16) |
++					 ((u64)get_time.timestamp[4] << 8)  |
++					 (u64)get_time.timestamp[5];
+ 	return 0;
+ }
+ 
+@@ -9776,7 +9793,7 @@ static void init_gpdd_dev(struct ipr_dev
+  */
+ static void init_af_dev(struct ipr_dev *dev)
+ {
+-	struct ipr_disk_attr attr;
++	struct ipr_disk_attr attr = {0};
+ 	int rc;
+ 
+ 	if (ipr_set_dasd_timeouts(dev, 0))

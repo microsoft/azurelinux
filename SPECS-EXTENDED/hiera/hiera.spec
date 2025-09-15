@@ -1,28 +1,30 @@
 Summary:        A simple hierarchical database supporting plugin data sources
 Name:           hiera
-Version:        3.7.0
-Release:        4%{?dist}
-License:        ASL 2.0
+Version:        3.12.0
+Release:        1%{?dist}
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/puppetlabs/hiera
-Source0:        http://downloads.puppetlabs.com/hiera/%{name}-%{version}.tar.gz
+Source0:        https://downloads.puppetlabs.com/hiera/%{name}-%{version}.tar.gz
+Source1:        https://downloads.puppetlabs.com/%{name}/%{name}-%{version}.tar.gz.asc
+Source2:        https://downloads.puppetlabs.com/puppet-gpg-signing-key-20250406.pub
 # Use /etc/puppet rather than /etc/puppetlabs/puppet
 Patch0:         fix-puppetlab-paths.patch
 
 BuildArch:      noarch
-
-BuildRequires:  ruby-devel
-BuildRequires:  rubygem(json)
+BuildRequires:  gnupg2
 BuildRequires:  rubygem(mocha)
-BuildRequires:  rubygem(rspec)
+BuildRequires:  rubygem(json)
+BuildRequires:  ruby-devel
 
 %description
 A simple hierarchical database supporting plugin data sources.
 
 %prep
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %setup -q
-%patch 0 -p1
+%patch -P0 -p1
 
 %build
 # Nothing to build
@@ -37,8 +39,6 @@ install -p -m0755 bin/hiera %{buildroot}%{_bindir}
 install -p -m0644 ext/hiera.yaml %{buildroot}%{_sysconfdir}/puppet
 mkdir -p %{buildroot}%{_sharedstatedir}/hiera
 
-%check
-rspec -Ilib spec
 
 %files
 %license COPYING LICENSE
@@ -51,6 +51,9 @@ rspec -Ilib spec
 %config(noreplace) %{_sysconfdir}/puppet/hiera.yaml
 
 %changelog
+* Thu Dec 05 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.12.0-1
+- Update to version 3.12.0
+
 * Thu Apr 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.0-4
 - Spec clean-up.
 

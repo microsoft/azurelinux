@@ -5,8 +5,8 @@ Summary:        %{sum}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           google-api-python-client
-Version:        2.73.0
-Release:        2%{?dist}
+Version:        2.140.0
+Release:        1%{?dist}
 
 License:        ASL 2.0
 URL:            https://github.com/googleapis/google-api-python-client
@@ -50,6 +50,10 @@ Python 3 client library for accessing Google APIs.
 %doc README.md
 
 %changelog
+* Thu Nov 21 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.140.0-1
+- Update to 2.140.0
+- License verified.
+
 * Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 2.73.0-2
 - Convert 'Release' tag to '[number].[distribution]' format
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).

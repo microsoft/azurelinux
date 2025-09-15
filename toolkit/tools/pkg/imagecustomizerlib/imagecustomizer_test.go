@@ -5,6 +5,7 @@ package imagecustomizerlib
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -13,8 +14,6 @@ import (
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/stretchr/testify/assert"
 )
@@ -23,33 +22,41 @@ const (
 	testImageRootDirName = "testimageroot"
 )
 
+var (
+	coreEfiMountPoints = []mountPoint{
+		{
+			PartitionNum:   2,
+			Path:           "/",
+			FileSystemType: "ext4",
+		},
+		{
+			PartitionNum:   1,
+			Path:           "/boot/efi",
+			FileSystemType: "vfat",
+		},
+	}
+
+	coreLegacyMountPoints = []mountPoint{
+		{
+			PartitionNum:   2,
+			Path:           "/",
+			FileSystemType: "ext4",
+		},
+	}
+)
+
 func TestCustomizeImageEmptyConfig(t *testing.T) {
 	var err error
 
-	if testing.Short() {
-		t.Skip("Short mode enabled")
-	}
-
-	if !buildpipeline.IsRegularBuild() {
-		t.Skip("loopback block device not available")
-	}
-
-	if os.Geteuid() != 0 {
-		t.Skip("Test must be run as root because it uses a chroot")
-	}
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	buildDir := filepath.Join(tmpDir, "TestCustomizeImageEmptyConfig")
 	outImageFilePath := filepath.Join(buildDir, "image.vhd")
 
-	// Create fake disk.
-	diskFilePath, err := createFakeEfiImage(buildDir)
-	if !assert.NoError(t, err) {
-		return
-	}
-
 	// Customize image.
-	err = CustomizeImage(buildDir, buildDir, &imagecustomizerapi.Config{}, diskFilePath, nil, outImageFilePath,
-		"vhd", "", false, false)
+	err = CustomizeImage(buildDir, buildDir, &imagecustomizerapi.Config{}, baseImage, nil, outImageFilePath,
+		"vhd", "",
+		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -58,54 +65,19 @@ func TestCustomizeImageEmptyConfig(t *testing.T) {
 	checkFileType(t, outImageFilePath, "vhd")
 }
 
-func TestCustomizeImageCopyFiles(t *testing.T) {
-	var err error
-
-	if testing.Short() {
-		t.Skip("Short mode enabled")
-	}
-
-	if !buildpipeline.IsRegularBuild() {
-		t.Skip("loopback block device not available")
-	}
-
-	if os.Geteuid() != 0 {
-		t.Skip("Test must be run as root because it uses a chroot")
-	}
-
-	buildDir := filepath.Join(tmpDir, "TestCustomizeImageCopyFiles")
-	configFile := filepath.Join(testDir, "addfiles-config.yaml")
-	outImageFilePath := filepath.Join(buildDir, "image.qcow2")
-
-	// Create fake disk.
-	diskFilePath, err := createFakeEfiImage(buildDir)
-	if !assert.NoError(t, err) {
-		return
-	}
-
-	// Customize image.
-	err = CustomizeImageWithConfigFile(buildDir, configFile, diskFilePath, nil, outImageFilePath, "raw", "", false, false)
-	if !assert.NoError(t, err) {
-		return
-	}
-
-	// Check output file type.
-	checkFileType(t, outImageFilePath, "raw")
-
-	// Mount the output disk image so that its contents can be checked.
-	imageConnection, err := reconnectToFakeEfiImage(buildDir, outImageFilePath)
-	if !assert.NoError(t, err) {
-		return
-	}
-	defer imageConnection.Close()
-
-	// Check the contents of the copied file.
-	file_contents, err := os.ReadFile(filepath.Join(imageConnection.Chroot().RootDir(), "a.txt"))
-	assert.NoError(t, err)
-	assert.Equal(t, "abcdefg\n", string(file_contents))
+func connectToCoreEfiImage(buildDir string, imageFilePath string) (*ImageConnection, error) {
+	return connectToImage(buildDir, imageFilePath, false /*includeDefaultMounts*/, coreEfiMountPoints)
 }
 
-func reconnectToFakeEfiImage(buildDir string, imageFilePath string) (*ImageConnection, error) {
+type mountPoint struct {
+	PartitionNum   int
+	Path           string
+	FileSystemType string
+	Flags          uintptr
+}
+
+func connectToImage(buildDir string, imageFilePath string, includeDefaultMounts bool, mounts []mountPoint,
+) (*ImageConnection, error) {
 	imageConnection := NewImageConnection()
 	err := imageConnection.ConnectLoopback(imageFilePath)
 	if err != nil {
@@ -115,15 +87,22 @@ func reconnectToFakeEfiImage(buildDir string, imageFilePath string) (*ImageConne
 
 	rootDir := filepath.Join(buildDir, testImageRootDirName)
 
-	bootPartitionDevPath := fmt.Sprintf("%sp1", imageConnection.Loopback().DevicePath())
-	osPartitionDevPath := fmt.Sprintf("%sp2", imageConnection.Loopback().DevicePath())
+	mountPoints := []*safechroot.MountPoint(nil)
+	for _, mount := range mounts {
+		devPath := partitionDevPath(imageConnection, mount.PartitionNum)
 
-	mountPoints := []*safechroot.MountPoint{
-		safechroot.NewPreDefaultsMountPoint(osPartitionDevPath, "/", "ext4", 0, ""),
-		safechroot.NewMountPoint(bootPartitionDevPath, "/boot/efi", "vfat", 0, ""),
+		var mountPoint *safechroot.MountPoint
+		if mount.Path == "/" {
+			mountPoint = safechroot.NewPreDefaultsMountPoint(devPath, mount.Path, mount.FileSystemType, mount.Flags,
+				"")
+		} else {
+			mountPoint = safechroot.NewMountPoint(devPath, mount.Path, mount.FileSystemType, mount.Flags, "")
+		}
+
+		mountPoints = append(mountPoints, mountPoint)
 	}
 
-	err = imageConnection.ConnectChroot(rootDir, false, []string{}, mountPoints, false)
+	err = imageConnection.ConnectChroot(rootDir, false, []string{}, mountPoints, includeDefaultMounts)
 	if err != nil {
 		imageConnection.Close()
 		return nil, err
@@ -132,11 +111,19 @@ func reconnectToFakeEfiImage(buildDir string, imageFilePath string) (*ImageConne
 	return imageConnection, nil
 }
 
+func partitionDevPath(imageConnection *ImageConnection, partitionNum int) string {
+	devPath := fmt.Sprintf("%sp%d", imageConnection.Loopback().DevicePath(), partitionNum)
+	return devPath
+}
+
 func TestValidateConfigValidAdditionalFiles(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		OS: imagecustomizerapi.OS{
-			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
-				"files/a.txt": {{Path: "/a.txt"}},
+		OS: &imagecustomizerapi.OS{
+			AdditionalFiles: imagecustomizerapi.AdditionalFileList{
+				{
+					Source:      "files/a.txt",
+					Destination: "/a.txt",
+				},
 			},
 		}}, nil, true)
 	assert.NoError(t, err)
@@ -144,9 +131,12 @@ func TestValidateConfigValidAdditionalFiles(t *testing.T) {
 
 func TestValidateConfigMissingAdditionalFiles(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		OS: imagecustomizerapi.OS{
-			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
-				"files/missing_a.txt": {{Path: "/a.txt"}},
+		OS: &imagecustomizerapi.OS{
+			AdditionalFiles: imagecustomizerapi.AdditionalFileList{
+				{
+					Source:      "files/missing_a.txt",
+					Destination: "/a.txt",
+				},
 			},
 		}}, nil, true)
 	assert.Error(t, err)
@@ -154,95 +144,69 @@ func TestValidateConfigMissingAdditionalFiles(t *testing.T) {
 
 func TestValidateConfigdditionalFilesIsDir(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		OS: imagecustomizerapi.OS{
-			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
-				"files": {{Path: "/a.txt"}},
+		OS: &imagecustomizerapi.OS{
+			AdditionalFiles: imagecustomizerapi.AdditionalFileList{
+				{
+					Source:      "files",
+					Destination: "/a.txt",
+				},
 			},
 		}}, nil, true)
 	assert.Error(t, err)
 }
 
 func TestValidateConfigScript(t *testing.T) {
-	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		OS: imagecustomizerapi.OS{
-			PostInstallScripts: []imagecustomizerapi.Script{
-				{
-					Path: "scripts/postinstallscript.sh",
-				},
+	err := validateScripts(testDir, &imagecustomizerapi.Scripts{
+		PostCustomization: []imagecustomizerapi.Script{
+			{
+				Path: "scripts/postcustomizationscript.sh",
 			},
-			FinalizeImageScripts: []imagecustomizerapi.Script{
-				{
-					Path: "scripts/finalizeimagescript.sh",
-				},
+		},
+		FinalizeCustomization: []imagecustomizerapi.Script{
+			{
+				Path: "scripts/finalizecustomizationscript.sh",
 			},
-		}}, nil, true)
+		},
+	})
 	assert.NoError(t, err)
 }
 
 func TestValidateConfigScriptNonLocalFile(t *testing.T) {
-	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		OS: imagecustomizerapi.OS{
-			PostInstallScripts: []imagecustomizerapi.Script{
-				{
-					Path: "../a.sh",
-				},
+	err := validateScripts(testDir, &imagecustomizerapi.Scripts{
+		FinalizeCustomization: []imagecustomizerapi.Script{
+			{
+				Path: "../a.sh",
 			},
-		}}, nil, true)
-	assert.Error(t, err)
-}
-
-func TestValidateConfigScriptNonExecutable(t *testing.T) {
-	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		OS: imagecustomizerapi.OS{
-			FinalizeImageScripts: []imagecustomizerapi.Script{
-				{
-					Path: "files/a.txt",
-				},
-			},
-		}}, nil, true)
+		},
+	})
 	assert.Error(t, err)
 }
 
 func TestCustomizeImageKernelCommandLineAdd(t *testing.T) {
 	var err error
 
-	if testing.Short() {
-		t.Skip("Short mode enabled")
-	}
-
-	if !buildpipeline.IsRegularBuild() {
-		t.Skip("loopback block device not available")
-	}
-
-	if os.Geteuid() != 0 {
-		t.Skip("Test must be run as root because it uses a chroot")
-	}
+	baseImage := checkSkipForCustomizeImage(t, baseImageTypeCoreEfi, baseImageVersionDefault)
 
 	buildDir := filepath.Join(tmpDir, "TestCustomizeImageKernelCommandLine")
 	outImageFilePath := filepath.Join(buildDir, "image.vhd")
 
-	// Create fake disk.
-	diskFilePath, err := createFakeEfiImage(buildDir)
-	if !assert.NoError(t, err) {
-		return
-	}
-
 	// Customize image.
 	config := &imagecustomizerapi.Config{
-		OS: imagecustomizerapi.OS{
+		OS: &imagecustomizerapi.OS{
 			KernelCommandLine: imagecustomizerapi.KernelCommandLine{
 				ExtraCommandLine: "console=tty0 console=ttyS0",
 			},
 		},
 	}
 
-	err = CustomizeImage(buildDir, buildDir, config, diskFilePath, nil, outImageFilePath, "raw", "", false, false)
+	err = CustomizeImage(buildDir, buildDir, config, baseImage, nil, outImageFilePath, "raw", "",
+		"" /*outputPXEArtifactsDir*/, false /*useBaseImageRpmRepos*/, false /*enableShrinkFilesystems*/)
 	if !assert.NoError(t, err) {
 		return
 	}
 
 	// Mount the output disk image so that its contents can be checked.
-	imageConnection, err := reconnectToFakeEfiImage(buildDir, outImageFilePath)
+	imageConnection, err := connectToCoreEfiImage(buildDir, outImageFilePath)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -264,70 +228,6 @@ func TestCustomizeImageKernelCommandLineAdd(t *testing.T) {
 	}
 
 	assert.True(t, linuxCommandLineRegex.Match(grub2ConfigFile))
-}
-
-func createFakeEfiImage(buildDir string) (string, error) {
-	var err error
-
-	err = os.MkdirAll(buildDir, os.ModePerm)
-	if err != nil {
-		return "", fmt.Errorf("failed to make build directory (%s):\n%w", buildDir, err)
-	}
-
-	// Use a prototypical Azure Linux image partition config.
-	diskConfig := imagecustomizerapi.Disk{
-		PartitionTableType: imagecustomizerapi.PartitionTableTypeGpt,
-		MaxSize:            4096,
-		Partitions: []imagecustomizerapi.Partition{
-			{
-				Id:    "boot",
-				Flags: []imagecustomizerapi.PartitionFlag{"esp", "boot"},
-				Start: 1,
-				End:   ptrutils.PtrTo(uint64(9)),
-			},
-			{
-				Id:    "rootfs",
-				Start: 9,
-				End:   nil,
-			},
-		},
-	}
-
-	fileSystems := []imagecustomizerapi.FileSystem{
-		{
-			DeviceId: "boot",
-			Type:     "fat32",
-			MountPoint: &imagecustomizerapi.MountPoint{
-				Path:    "/boot/efi",
-				Options: "umask=0077",
-			},
-		},
-		{
-			DeviceId: "rootfs",
-			Type:     "ext4",
-			MountPoint: &imagecustomizerapi.MountPoint{
-				Path: "/",
-			},
-		},
-	}
-
-	rawDisk := filepath.Join(buildDir, "disk.raw")
-
-	installOS := func(imageChroot *safechroot.Chroot) error {
-		// Don't write anything for the OS.
-		// The createNewImage function will still write the bootloader and fstab file, which will allow the partition
-		// discovery logic to work. This allows for a limited set of tests to run without needing any of the RPM files.
-		return nil
-	}
-
-	err = createNewImageWithBootLoader(rawDisk, diskConfig, fileSystems, "efi", imagecustomizerapi.SELinux{},
-		imagecustomizerapi.KernelCommandLine{}, buildDir, testImageRootDirName, imagecustomizerapi.SELinuxModeDisabled,
-		installOS)
-	if err != nil {
-		return "", err
-	}
-
-	return rawDisk, nil
 }
 
 func checkFileType(t *testing.T, filePath string, expectedFileType string) {
@@ -356,10 +256,25 @@ func getImageFileType(filePath string) (string, error) {
 	case readByteCount >= 8 && bytes.Equal(firstBytes[:8], []byte("vhdxfile")):
 		return "vhdx", nil
 
+	case isZstFile(firstBytes):
+		return "zst", nil
+
 	// Check for the MBR signature (which exists even on GPT formatted drives).
 	case readByteCount >= 512 && bytes.Equal(firstBytes[510:512], []byte{0x55, 0xAA}):
 		return "raw", nil
 	}
 
 	return "", fmt.Errorf("unknown file type: %s", filePath)
+}
+
+func isZstFile(firstBytes []byte) bool {
+	if len(firstBytes) < 4 {
+		return false
+	}
+
+	magicNumber := binary.LittleEndian.Uint32(firstBytes[:4])
+
+	// 0xFD2FB528 is a zst frame.
+	// 0x184D2A50-0x184D2A5F are skippable ztd frames.
+	return magicNumber == 0xFD2FB528 || (magicNumber >= 0x184D2A50 && magicNumber <= 0x184D2A5F)
 }

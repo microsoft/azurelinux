@@ -1,0 +1,25 @@
+From 0252d4efbcd111f83a100cf1b92cb0e3fab1202f Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 25 Mar 2024 09:50:39 -0400
+Subject: [PATCH 18/24] unconfined: Add user namespace creation.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/system/unconfined.if | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/unconfined.if b/policy/modules/system/unconfined.if
+index f556c1c0e..f82e647da 100644
+--- a/policy/modules/system/unconfined.if
++++ b/policy/modules/system/unconfined.if
+@@ -43,6 +43,7 @@ interface(`unconfined_domain_noaudit',`
+ 	# Manage most namespace capabilities
+ 	allow $1 self:cap_userns { audit_write chown dac_override dac_read_search fowner fsetid ipc_lock ipc_owner kill lease linux_immutable mknod net_admin net_bind_service net_raw setfcap setgid setpcap setuid sys_admin sys_boot sys_chroot sys_module sys_nice sys_pacct sys_ptrace sys_rawio sys_resource sys_time sys_tty_config };
+ 	allow $1 self:cap2_userns { audit_read bpf block_suspend mac_admin mac_override perfmon syslog wake_alarm };
++	allow $1 self:user_namespace create;
+ 
+ 	# Transition to myself, to make get_ordered_context_list happy.
+ 	allow $1 self:process transition;
+-- 
+2.44.0
+

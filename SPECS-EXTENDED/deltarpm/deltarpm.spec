@@ -1,10 +1,20 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+## START: Set by rpmautospec
+## (rpmautospec version 0.7.2)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 1;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
+
 Name:           deltarpm
 Summary:        Create deltas between rpms
-Version:        3.6.2
-Release:        7%{?dist}
-License:        BSD
+Version:        3.6.5
+Release:        2%{?dist}
+License:        BSD-3-Clause
 URL:            https://github.com/rpm-software-management/deltarpm
 Source:         %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
@@ -43,6 +53,7 @@ a difference between an old and a new iso containing rpms.
 Summary:        Python bindings for deltarpm
 %{?python_provide:%python_provide python3-%{name}}
 BuildRequires:  python3-devel
+BuildRequires: make
 Requires:       %{name}%{_isa} = %{version}-%{release}
 
 %description -n python3-%{name}
@@ -54,17 +65,19 @@ Python 3 version.
 %autosetup -p1
 
 %build
-%{__make} %{?_smp_mflags} CFLAGS="%{build_cflags} -DWITH_ZSTD=1" LDFLAGS="%{build_ldflags}" \
+%set_build_flags
+%make_build CFLAGS="${CFLAGS} -DWITH_ZSTD=1" \
     bindir=%{_bindir} libdir=%{_libdir} mandir=%{_mandir} prefix=%{_prefix} \
     zlibbundled='' zlibldflags='-lz' zlibcppflags=''
 
-%{__make} %{?_smp_mflags} CFLAGS="%{build_cflags} -DWITH_ZSTD=1" LDFLAGS="%{build_ldflags}" \
+%make_build CFLAGS="${CFLAGS} -DWITH_ZSTD=1" \
     bindir=%{_bindir} libdir=%{_libdir} mandir=%{_mandir} prefix=%{_prefix} \
     zlibbundled='' zlibldflags='-lz' zlibcppflags='' \
     python
 
 %install
-%makeinstall pylibprefix=%{buildroot}
+# cannot use %%make_install here, as then prefix is not passed into the Makefile
+%make_build pylibprefix=%{buildroot} mandir=%{buildroot}%{_mandir} prefix=%{buildroot}%{_prefix} install
 
 %files
 %license LICENSE.BSD
@@ -95,12 +108,78 @@ Python 3 version.
 %{python3_sitearch}/__pycache__/%{name}.*
 
 %changelog
-* Tue Jun 01 2021 Thomas Crain <thcrain@microsoft.com> - 3.6.2-7
-- Remove unneeded deletion of Python 2 sitelib in buildroot
+* Mon Nov 04 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 3.6.5-2
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
 
-* Fri Mar 05 2021 Henry Li <lihl@microsoft.com> - 3.6.2-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove python2 instances
+* Mon Sep 16 2024 Dan Čermák <dan.cermak@cgc-instruments.com> - 3.6.5-1
+- New upstream release 3.6.5, fixes rhbz#2312195
+
+* Mon Aug 19 2024 Dan Čermák <dan.cermak@cgc-instruments.com> - 3.6.4-1
+- New upstream release 3.6.4, fixes rhbz#2303707
+
+* Mon Aug 19 2024 Dan Čermák <dan.cermak@cgc-instruments.com> - 3.6.3-16
+- Switch License identifier to SPDX
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.3-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 3.6.3-14
+- Rebuilt for Python 3.13
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.3-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.3-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.3-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 3.6.3-10
+- Rebuilt for Python 3.12
+
+* Thu May 25 2023 Adam Williamson <awilliam@redhat.com> - 3.6.3-9
+- Rebuild for rpm 4.19
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.3-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Dec 20 2022 Dan Čermák <dan.cermak@cgc-instruments.com> - 3.6.3-7
+- Fix build failure due to %%%%make_install usage
+
+* Tue Dec 20 2022 Dan Čermák <dan.cermak@cgc-instruments.com> - 3.6.3-6
+- Switch from %%makeinstall to %%make_install
+
+* Tue Dec 20 2022 Dan Čermák <dan.cermak@cgc-instruments.com> - 3.6.3-5
+- Remove distutils from Makefile, fixes rhbz#2155020
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 3.6.3-3
+- Rebuilt for Python 3.11
+
+* Tue Mar 15 2022 Dan Čermák <dan.cermak@cgc-instruments.com> - 3.6.3-1
+- New upstream release 3.6.3
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.2-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.2-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 3.6.2-9
+- Rebuilt for Python 3.10
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 3.6.2-6
+- Rebuilt for Python 3.9
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.2-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -402,3 +481,5 @@ Python 3 version.
 
 * Sat Dec 03 2005 Dries Verachtert <dries@ulyssis.org> - 3.3-1 - 3768/dries
 - Initial package.
+
+## END: Generated by rpmautospec

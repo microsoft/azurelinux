@@ -1,0 +1,185 @@
+From d336dc3fb9788a247d512eee81ad8b49b2614100 Mon Sep 17 00:00:00 2001
+From: Rainer Gerhards <rgerhards@adiscon.com>
+Date: Tue, 26 Sep 2023 14:38:44 +0200
+Subject: [PATCH] fix startup issue on modern systemd systems
+
+When we startup AND are told to auto-background ourselfs, we must
+close all unneeded file descriptors. Not doing this has some
+security implications. Traditionally, we do this by iterating
+over all possible file descriptor values. This is fairly compatible,
+because we need no OS-specific method. However, modern systemd configs
+tend to not limit the number of fds, so there are potentially 2^30(*)
+fds to close. While this is OKish, it takes some time and makes
+systemd think that rsyslog did not properly start up.
+
+We have now solved this by using the /proc filesystem to obtain our
+currently open fds. This works for Linux, as well as Cygwin, NetBSD,
+FreeBDS and MacOS. Where not available,and close_range() is available
+on the (build) platform, we try to use it. If that fails as well, we
+fall back to the traditional method. In our opionion, this fallback
+is unproblematic, as on these platforms there is no systemd and in
+almost all cases a decent number of fds to close.
+
+Very special thanks go out to Brennan Kinney, who clearly described
+the issue to us on github and also provided ample ways to solve it.
+What we did is just implement what we think is the best fit from
+rsyslog's PoV.
+
+(*) Some details below on the number of potentially to close fds.
+    This is directly from a github posting from Brennan Kinney.
+Just to clarify, by default since systemd v240 (2018Q4), that
+should be `1024:524288` limit. As in the soft limit is the expected
+`1024`.
+
+The problem is other software shipping misconfiguration in systemd
+services that overrides this to something silly like
+`LimitNOFILE=infinity`.
+- Which will map to the sysctl `fs.nr_open` (_a value systemd
+  v240 also raises from `2^20` to 2^30`, some distro like Debian are
+  known to opt-out via patch for the `fs.nr_open` change_).
+- With the biggest issue there being that the soft limit was also
+  set to `infinity` instead of their software requesting to raise
+  the soft limit to a higher value that the hard limit permits.
+  `infinity` isn't at all sane though.
+- The known source of this misconfiguration is container software such
+  as Docker and `containerd` (_which would often sync with the
+  systemd `.service` config from the Docker daemon `dockerd.service`_).
+
+closes https://github.com/rsyslog/rsyslog/issues/5158
+---
+ configure.ac     |  4 +--
+ tools/rsyslogd.c | 68 +++++++++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 63 insertions(+), 9 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 484b74ca7..036a40d5d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -200,7 +200,7 @@ AC_CHECK_HEADERS([malloc.h],[],[],[
+      #endif
+   ]
+ ])
+-AC_CHECK_HEADERS([fcntl.h locale.h netdb.h netinet/in.h paths.h stddef.h stdlib.h string.h sys/file.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h sys/stat.h unistd.h utmp.h utmpx.h sys/epoll.h sys/prctl.h sys/select.h getopt.h])
++AC_CHECK_HEADERS([fcntl.h locale.h netdb.h netinet/in.h paths.h stddef.h stdlib.h string.h sys/file.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h sys/stat.h unistd.h utmp.h utmpx.h sys/epoll.h sys/prctl.h sys/select.h getopt.h linux/close_range.h])
+ 
+ # Checks for typedefs, structures, and compiler characteristics.
+ AC_C_CONST
+@@ -233,7 +233,7 @@ AC_TYPE_SIGNAL
+ AC_FUNC_STAT
+ AC_FUNC_STRERROR_R
+ AC_FUNC_VPRINTF
+-AC_CHECK_FUNCS([flock recvmmsg basename alarm clock_gettime gethostbyname gethostname gettimeofday localtime_r memset mkdir regcomp select setsid socket strcasecmp strchr strdup strerror strndup strnlen strrchr strstr strtol strtoul uname ttyname_r getline malloc_trim prctl epoll_create epoll_create1 fdatasync syscall lseek64 asprintf])
++AC_CHECK_FUNCS([flock recvmmsg basename alarm clock_gettime gethostbyname gethostname gettimeofday localtime_r memset mkdir regcomp select setsid socket strcasecmp strchr strdup strerror strndup strnlen strrchr strstr strtol strtoul uname ttyname_r getline malloc_trim prctl epoll_create epoll_create1 fdatasync syscall lseek64 asprintf close_range])
+ AC_CHECK_FUNC([setns], [AC_DEFINE([HAVE_SETNS], [1], [Define if setns exists.])])
+ AC_CHECK_TYPES([off64_t])
+ 
+diff --git a/tools/rsyslogd.c b/tools/rsyslogd.c
+index 08bd5fd89..fa37f7a3a 100644
+--- a/tools/rsyslogd.c
++++ b/tools/rsyslogd.c
+@@ -3,7 +3,7 @@
+  * because it was either written from scratch by me (rgerhards) or
+  * contributors who agreed to ASL 2.0.
+  *
+- * Copyright 2004-2022 Rainer Gerhards and Adiscon
++ * Copyright 2004-2023 Rainer Gerhards and Adiscon
+  *
+  * This file is part of rsyslog.
+  *
+@@ -27,6 +27,7 @@
+ #include <stdlib.h>
+ #include <sys/types.h>
+ #include <sys/wait.h>
++#include <dirent.h>
+ #include <unistd.h>
+ #include <errno.h>
+ #ifdef ENABLE_LIBLOGGING_STDLOG
+@@ -40,6 +41,9 @@
+ #ifdef ENABLE_LIBCAPNG
+ 	#include <cap-ng.h>
+ #endif
++#if defined(HAVE_LINUX_CLOSE_RANGE_H)
++#	include <linux/close_range.h>
++#endif
+ 
+ #include "rsyslog.h"
+ #include "wti.h"
+@@ -368,6 +372,36 @@ finalize_it:
+ 	RETiRet;
+ }
+ 
++
++
++/* note: this function is specific to OS'es which provide
++ * the ability to read open file descriptors via /proc.
++ * returns 0 - success, something else otherwise
++ */
++static int
++close_unneeded_open_files(const char *const procdir,
++	const int beginClose, const int parentPipeFD)
++{
++	DIR *dir;
++	struct dirent *entry;
++
++	dir = opendir(procdir);
++	if (dir == NULL) {
++		dbgprintf("closes unneeded files: opendir failed for %s\n", procdir);
++		return 1;
++	}
++
++	while ((entry = readdir(dir)) != NULL) {
++		const int fd = atoi(entry->d_name);
++		if(fd >= beginClose && (((fd != dbgGetDbglogFd()) && (fd != parentPipeFD)))) {
++			close(fd);
++		}
++	}
++
++	closedir(dir);
++	return 0;
++}
++
+ /* prepares the background processes (if auto-backbrounding) for
+  * operation.
+  */
+@@ -413,12 +447,32 @@ prepareBackground(const int parentPipeFD)
+ 	}
+ #endif
+ 
+-	/* close unnecessary open files */
+-	const int endClose = getdtablesize();
+-	close(0);
+-	for(int i = beginClose ; i <= endClose ; ++i) {
+-		if((i != dbgGetDbglogFd()) && (i != parentPipeFD)) {
+-			  aix_close_it(i); /* AIXPORT */
++	/* close unnecessary open files - first try to use /proc file system,
++	 * if that is not possible iterate through all potentially open file
++	 * descriptors. This can be lenghty, but in practice /proc should work
++	 * for almost all current systems, and the fallback is primarily for
++	 * Solaris and AIX, where we do expect a decent max numbers of fds.
++	 */
++	close(0); /* always close stdin, we do not need it */
++
++	/* try Linux, Cygwin, NetBSD */
++	if(close_unneeded_open_files("/proc/self/fd", beginClose, parentPipeFD) != 0) {
++		/* try MacOS, FreeBSD */
++		if(close_unneeded_open_files("/proc/fd", beginClose, parentPipeFD) != 0) {
++			/* did not work out, so let's close everything... */
++			const int endClose = getdtablesize();
++#		if defined(HAVE_CLOSE_RANGE)
++			if(close_range(beginClose, endClose, 0) != 0) {
++				dbgprintf("errno %d after close_range(), fallback to loop\n", errno);
++#		endif
++				for(int i = beginClose ; i <= endClose ; ++i) {
++					if((i != dbgGetDbglogFd()) && (i != parentPipeFD)) {
++						  aix_close_it(i); /* AIXPORT */
++					}
++				}
++#		if defined(HAVE_CLOSE_RANGE)
++			}
++#		endif
+ 		}
+ 	}
+ 	seedRandomNumberForChild();
+-- 
+2.33.8
+

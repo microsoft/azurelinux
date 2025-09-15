@@ -1,8 +1,11 @@
-Summary:        Low-level interface to lzma compression library
-Name:           perl-Compress-Raw-Lzma
-Version:        2.101
-Release:        4%{?dist}
-License:        GPL+ OR Artistic
+# Perform optional tests
+%bcond_without perl_Compress_Raw_Lzma_enables_optional_test
+
+Name:		perl-Compress-Raw-Lzma
+Version:	2.213
+Release:	1%{?dist}
+Summary:	Low-level interface to lzma compression library
+License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Compress-Raw-Lzma
@@ -10,55 +13,50 @@ Source0:        https://cpan.metacpan.org/modules/by-module/Compress/Compress-Ra
 Source1:        LICENSE.PTR
 
 # Module Build
-BuildRequires:  coreutils
-BuildRequires:  findutils
-BuildRequires:  gcc
-BuildRequires:  make
-BuildRequires:  perl-devel
-BuildRequires:  perl-generators
-BuildRequires:  perl-interpreter
-BuildRequires:  xz-devel
-BuildRequires:  perl(Config)
-BuildRequires:  perl(ExtUtils::Constant)
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(File::Copy)
-BuildRequires:  perl(File::Spec::Functions)
-BuildRequires:  perl(FindBin)
-BuildRequires:  perl(lib)
-BuildRequires:  perl(Module::CoreList)
-
+BuildRequires:	coreutils
+BuildRequires:	findutils
+BuildRequires:	gcc
+BuildRequires:	make
+BuildRequires:	perl-devel
+BuildRequires:	perl-generators
+BuildRequires:	perl-interpreter
+BuildRequires:	perl(Config)
+BuildRequires:	perl(ExtUtils::Constant)
+BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:	perl(File::Copy)
+BuildRequires:	perl(File::Spec::Functions)
+BuildRequires:	perl(lib)
+BuildRequires:	xz-devel
 # Module Runtime
-BuildRequires:  perl(AutoLoader)
-BuildRequires:  perl(Carp)
-BuildRequires:  perl(Exporter)
-BuildRequires:  perl(Scalar::Util)
-BuildRequires:  perl(UNIVERSAL)
-BuildRequires:  perl(XSLoader)
-BuildRequires:  perl(bytes)
-BuildRequires:  perl(constant)
-BuildRequires:  perl(strict)
-BuildRequires:  perl(warnings)
-
-%if 0%{?with_check}
+BuildRequires:	perl(AutoLoader)
+BuildRequires:	perl(bytes)
+BuildRequires:	perl(Carp)
+BuildRequires:	perl(constant)
+BuildRequires:	perl(Exporter)
+BuildRequires:	perl(Scalar::Util)
+BuildRequires:	perl(strict)
+BuildRequires:	perl(UNIVERSAL)
+BuildRequires:	perl(warnings)
+BuildRequires:	perl(XSLoader)
 # Test Suite
-BuildRequires:  perl(File::Path)
-BuildRequires:  perl(Test::More)
-
+BuildRequires:	perl(File::Path)
+BuildRequires:	perl(Test::More)
+%if %{with perl_Compress_Raw_Lzma_enables_optional_test}
 # Optional Tests
-BuildRequires:  xz
-BuildRequires:  perl(Test::CPAN::Meta)
-BuildRequires:  perl(Test::CPAN::Meta::JSON)
-BuildRequires:  perl(Test::NoWarnings)
-BuildRequires:  perl(Test::Pod) >= 1.00
+BuildRequires:	perl(Test::CPAN::Meta)
+BuildRequires:	perl(Test::CPAN::Meta::JSON)
+BuildRequires:	perl(Test::NoWarnings)
+BuildRequires:	perl(Test::Pod) >= 1.00
+BuildRequires:	xz
 %endif
+# Dependencies
+Requires:	perl(XSLoader)
 
-# Built-against version is embedded in module, so we have a strict version dependency
-Requires:       xz-libs%{?_isa} = %((pkg-config --modversion liblzma 2>/dev/null || echo 0) | tr -dc '[0-9.]')
-# Runtime
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:       perl(XSLoader)
 # Don't "provide" private Perl libs
 %{?perl_default_filter}
+# Filter modules bundled for tests
+%global __provides_exclude_from %{?__provides_exclude_from:%__provides_exclude_from|}^%{_libexecdir}
+%global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(CompTestUtils\\)
 
 %description
 This module provides a Perl interface to the lzma compression library.
@@ -71,23 +69,29 @@ It is used by IO::Compress::Lzma.
 rm -rv t/Test/
 perl -i -ne 'print $_ unless m{^t/Test/}' MANIFEST
 
+# Help generators to recognize Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
+
 %build
 perl Makefile.PL \
   INSTALLDIRS=vendor \
   NO_PACKLIST=1 \
   NO_PERLLOCAL=1 \
   OPTIMIZE="%{optflags}"
-%make_build
+%{make_build}
 
 %install
-%make_install
+%{make_install}
 find %{buildroot} -type f -name '*.bs' -empty -delete
 %{_fixperms} -c %{buildroot}
 
 cp %{SOURCE1} .
 
 %check
-%make_build test
+make test
 
 %files
 %license LICENSE.PTR
@@ -97,6 +101,10 @@ cp %{SOURCE1} .
 %{_mandir}/man3/Compress::Raw::Lzma.3*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 2.213-1
+- Update to version 2.213
+- License verified
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.101-4
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

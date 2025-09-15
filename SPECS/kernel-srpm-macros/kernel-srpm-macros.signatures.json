@@ -1,0 +1,21 @@
+{
+    "Signatures": {
+        "macros.kernel-srpm": "1cc89ac40a9d8eb30914917f62e1cf793c744510104a7b7870668bfc9d39f94c",
+        "macros.kmp": "407b4a425b3499fdcc78003ae3c3557da636e9a778390d7049c8e0756e158fb2",
+        "find-provides.ksyms": "c28ff43f881d347c82d2147daccd52e741d1e5b9389b57b0b2bc8c2a82b27808",
+        "find-requires.ksyms": "647a54a4d77f1c7a613e3ca4d073624adbe25f77e809c7142a738fb8f44b7885",
+        "firmware.prov": "0eb0052e964c1c2675b37bf078886cb564154fa686b2dc2556213f6be01c97a3",
+        "modalias.prov": "75cd6a3ba82831a86974004f5e1a4c5c23f7a10380e1ffab26a2ee7123668dc5",
+        "provided_ksyms.attr": "122c82aad04d824e35b568c8ff8773cfa65a5b78b394422cf7b0e28b5672e810",
+        "required_ksyms.attr": "e65bdc243a60e31120ad63870294a5a1b24c6f448667c0bd2bbaff218266cdd3",
+        "modalias.attr": "5cce7f849c9844017fafb54ec858266c97dc2099ca8bbd89e8259a20f4dd4a70",
+        "kmod.attr": "5c224344d0ad392236b184b9ee0939f24ca48a332688643c8aa8913ee3025339",
+        "kmodtool": "691b7231216616c26e170abc875199f0cfcbdd22380364bd6f91bc3c5514db54",
+        "rpmsort": "8ec77fd7087f4b22b5f2701272fc3fcbd460e78a3b1238d3c3ddc1f4e877e4ee",
+        "symset-table": "0e4f878d9d9f123b5e80678135511a48161d5d728efff9f1d4672687885426a3",
+        "kabi.attr": "5837779d0ea4bb35d5ec34885bc966a0e955cfd2f9f968edcd36097a59c6e69a",
+        "kabi.sh": "8298974fc5d860759da00583706679eedaa64a79343cf19a1692014f9e595ac9",
+        "brp-kmod-set-exec-bit": "2bffc9b96300203a49d409757d370aac4acb4e780a82f82cf4fa2be43c6efeb1",
+        "brp-kmod-restore-perms": "76548fc932ff5fa4da3dc16afebd9edfb42534b00de22d3bd0632b60622790f4"
+    }
+}

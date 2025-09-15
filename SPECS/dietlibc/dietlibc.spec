@@ -11,13 +11,14 @@
 Summary:        Small libc implementation
 Name:           dietlibc
 Version:        0.34
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.fefe.de/dietlibc/
 Source0:        https://www.fefe.de/dietlibc/%{name}-%{version}.tar.xz
 Patch1:         dietlibc-insecure-defpath.patch
+Patch2:         CVE-2015-1473.patch
 
 BuildRequires:  gcc
 BuildRequires:  gdb
@@ -62,6 +63,7 @@ This package contains the dynamic libraries for dietlibc.
 %setup -q
 
 %patch 1
+%patch 2 -p1
 
 %if %{without ssp}
 sed -i -e 's!^#define WANT_SSP$!// \0!g;
@@ -127,6 +129,9 @@ ulimit -m $[ 128*1024 ] -v $[ 256*1024 ] -d $[ 128*1024 ] -s 512
 %{pkglibdir}
 
 %changelog
+* Mon Feb 17 2025 Jyoti kanase <v-jykanase@microsoft.com> - 0.34-7
+- Fix CVE-2015-1473
+
 * Tue Mar 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.34-6
 - License verified.
 

@@ -22,13 +22,12 @@ set -e
 #   │   containerSourceData
 #   │   ├── base
 #   │   │   ├── Dockerfile-Base-Template
-#   │   │   ├── Dockerfile-Base-Nonroot-Template
-#   │   |   ├── Dockerfile-Busybox-Template
 #   │   │   ├── Dockerfile-Distroless-Template
-#   │   │   ├── Dockerfile-Distroless-Nonroot-Template
 #   │   container_tarballs
 #   │   ├── container_base
 #   │   │   ├── core-3.0.20240101.tar.gz
+#   │   ├── core_container_builder
+#   │   │   ├── core-container-builder-3.0.20240101.tar.gz
 #   │   ├── distroless_base
 #   │   │   ├── distroless-base-3.0.20240101.tar.gz
 #   │   ├── distroless_debug
@@ -48,7 +47,7 @@ set -e
 #    -r "" \
 #    -q "false"
 
-while getopts ":a:c:k:l:o:p:r:q:" OPTIONS; do
+while getopts ":a:c:k:l:o:p:r:q:s:t:u:v:" OPTIONS; do
     case ${OPTIONS} in
     a ) ACR=$OPTARG;;
     c ) CONTAINER_TARBALLS_DIR=$OPTARG;;
@@ -58,6 +57,10 @@ while getopts ":a:c:k:l:o:p:r:q:" OPTIONS; do
     p ) PUBLISHING_LEVEL=$OPTARG;;
     r ) REPO_PREFIX=$OPTARG;;
     q ) PUBLISH_TO_ACR=$OPTARG;;
+    s ) DISTROLESS_BASE_BUILD=$OPTARG;;
+    t ) DISTROLESS_DEBUG_BUILD=$OPTARG;; 
+    u ) DISTROLESS_MINIMAL_BUILD=$OPTARG;;
+    v ) BASE_BUILD=$OPTARG;;
 
     \? )
         echo "Error - Invalid Option: -$OPTARG" 1>&2
@@ -87,6 +90,10 @@ function print_inputs {
     echo "PUBLISHING_LEVEL              -> $PUBLISHING_LEVEL"
     echo "PUBLISH_TO_ACR                -> $PUBLISH_TO_ACR"
     echo "OUTPUT_DIR                    -> $OUTPUT_DIR"
+    echo "DISTROLESS_BASE_BUILD         -> $DISTROLESS_BASE_BUILD"
+    echo "DISTROLESS_DEBUG_BUILD        -> $DISTROLESS_DEBUG_BUILD"
+    echo "DISTROLESS_MINIMAL_BUILD      -> $DISTROLESS_MINIMAL_BUILD"
+    echo "BASE_BUILD                    -> $BASE_BUILD"
 }
 
 function validate_inputs {
@@ -101,13 +108,21 @@ function validate_inputs {
     fi
 
     BASE_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "core-[0-9.]*.tar.gz")
+    BASE_BUILDER_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "core-container-builder-[0-9.]*.tar.gz")
     DISTROLESS_BASE_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "distroless-base-[0-9.]*.tar.gz")
     DISTROLESS_DEBUG_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "distroless-debug-[0-9.]*.tar.gz")
     DISTROLESS_MINIMAL_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "distroless-minimal-[0-9.]*.tar.gz")
-    if [[ (! -f $BASE_TARBALL)  || \
-        (! -f $DISTROLESS_BASE_TARBALL) || \
-        (! -f $DISTROLESS_DEBUG_TARBALL) || \
-        (! -f $DISTROLESS_MINIMAL_TARBALL) ]]; then
+    
+    # Give default values for when the variables are not set (non fasttrack builds).
+    BASE_BUILD=${BASE_BUILD:-true}
+    DISTROLESS_BASE_BUILD=${DISTROLESS_BASE_BUILD:-true}
+    DISTROLESS_DEBUG_BUILD=${DISTROLESS_DEBUG_BUILD:-true}
+    DISTROLESS_MINIMAL_BUILD=${DISTROLESS_MINIMAL_BUILD:-true}
+
+    if [[ ($BASE_BUILD =~ [Tt]rue && ! -f $BASE_TARBALL) || \
+      ($DISTROLESS_BASE_BUILD =~ [Tt]rue  && ! -f $DISTROLESS_BASE_TARBALL) || \
+      ($DISTROLESS_DEBUG_BUILD =~ [Tt]rue && ! -f $DISTROLESS_DEBUG_TARBALL) || \
+      ($DISTROLESS_MINIMAL_BUILD =~ [Tt]rue && ! -f $DISTROLESS_MINIMAL_TARBALL) ]]; then
         echo "Error - Missing some tarball(s) in $CONTAINER_TARBALLS_DIR"
         exit 1
     fi
@@ -163,9 +178,9 @@ function initialization {
     EULA_FILE_NAME="EULA-Container.txt"
 
     # Image types
+    BASE_BUILDER="base-builder"
     BASE="base"
     DISTROLESS="distroless"
-    BUSYBOX="busybox"
     MARINARA="marinara"
 
     base_tarball_file_name=$(basename "$BASE_TARBALL")      # core-3.0.20240101.tar.gz
@@ -178,34 +193,33 @@ function initialization {
     echo "BUILD_ID                      -> $BUILD_ID"
 
     IMAGE_TAG=$BASE_IMAGE_TAG-$ARCHITECTURE
-    NONROOT_IMAGE_TAG=$AZL_VERSION-nonroot.$BUILD_ID-$ARCHITECTURE
 
     # Set various image names.
     BASE_IMAGE_NAME="$ACR_NAME_FULL/base/core:$IMAGE_TAG"
-    BASE_NONROOT_IMAGE_NAME="$ACR_NAME_FULL/base/core:$NONROOT_IMAGE_TAG"
-
     DISTROLESS_BASE_IMAGE_NAME="$ACR_NAME_FULL/distroless/base:$IMAGE_TAG"
-    DISTROLESS_BASE_NONROOT_IMAGE_NAME="$ACR_NAME_FULL/distroless/base:$NONROOT_IMAGE_TAG"
-
     DISTROLESS_MINIMAL_IMAGE_NAME="$ACR_NAME_FULL/distroless/minimal:$IMAGE_TAG"
-    DISTROLESS_MINIMAL_NONROOT_IMAGE_NAME="$ACR_NAME_FULL/distroless/minimal:$NONROOT_IMAGE_TAG"
-
-    DISTROLESS_DEBUG_NONROOT_IMAGE_NAME="$ACR_NAME_FULL/distroless/debug:$NONROOT_IMAGE_TAG"
     DISTROLESS_DEBUG_IMAGE_NAME="$ACR_NAME_FULL/distroless/debug:$IMAGE_TAG"
-
-    BUSYBOX_IMAGE_NAME="$ACR_NAME_FULL/busybox:$IMAGE_TAG"
     MARINARA_IMAGE_NAME="$ACR_NAME_FULL/marinara:$IMAGE_TAG"
 
     echo "BASE_IMAGE_NAME                       -> $BASE_IMAGE_NAME"
-    echo "BASE_NONROOT_IMAGE_NAME               -> $BASE_NONROOT_IMAGE_NAME"
     echo "DISTROLESS_BASE_IMAGE_NAME            -> $DISTROLESS_BASE_IMAGE_NAME"
-    echo "DISTROLESS_BASE_NONROOT_IMAGE_NAME    -> $DISTROLESS_BASE_NONROOT_IMAGE_NAME"
     echo "DISTROLESS_MINIMAL_IMAGE_NAME         -> $DISTROLESS_MINIMAL_IMAGE_NAME"
-    echo "DISTROLESS_MINIMAL_NONROOT_IMAGE_NAME -> $DISTROLESS_MINIMAL_NONROOT_IMAGE_NAME"
     echo "DISTROLESS_DEBUG_IMAGE_NAME           -> $DISTROLESS_DEBUG_IMAGE_NAME"
-    echo "DISTROLESS_DEBUG_NONROOT_IMAGE_NAME   -> $DISTROLESS_DEBUG_NONROOT_IMAGE_NAME"
-    echo "BUSYBOX_IMAGE_NAME                    -> $BUSYBOX_IMAGE_NAME"
     echo "MARINARA_IMAGE_NAME                   -> $MARINARA_IMAGE_NAME"
+    echo "DISTROLESS_BASE_BUILD                 -> $DISTROLESS_BASE_BUILD"
+    echo "DISTROLESS_DEBUG_BUILD                -> $DISTROLESS_DEBUG_BUILD"
+    echo "DISTROLESS_MINIMAL_BUILD              -> $DISTROLESS_MINIMAL_BUILD"
+    echo "BASE_BUILD                            -> $BASE_BUILD"
+
+    ROOT_FOLDER="$(git rev-parse --show-toplevel)"
+    EULA_FILE_PATH="$ROOT_FOLDER/.pipelines/container_artifacts/data"
+    END_OF_LIFE_1_YEAR=$(date -d "+1 year" "+%Y-%m-%dT%H:%M:%SZ")
+    echo "END_OF_LIFE_1_YEAR                    -> $END_OF_LIFE_1_YEAR"
+}
+
+function build_builder_image {
+    echo "+++ Build builder image"
+    docker import - "$BASE_BUILDER" < "$BASE_BUILDER_TARBALL"
 }
 
 function docker_build {
@@ -213,6 +227,12 @@ function docker_build {
     local image_full_name=$2
     local image_tarball=$3
     local dockerfile=$4
+    local should_build=$5
+
+    if [[ $should_build =~ [Ff]alse ]]; then
+        echo "+++ Skip building image- Fasttrack: $image_full_name"
+        return
+    fi
 
     echo "+++ Importing container image: $image_full_name"
     local temp_image=${image_full_name}_temp
@@ -221,8 +241,6 @@ function docker_build {
     local build_dir="$WORK_DIR/container_build_dir"
     mkdir -p "$build_dir"
 
-    ROOT_FOLDER="$(git rev-parse --show-toplevel)"
-    EULA_FILE_PATH="$ROOT_FOLDER/.pipelines/container_artifacts/data"
     if [ -d "$EULA_FILE_PATH" ]; then
         cp "$EULA_FILE_PATH/$EULA_FILE_NAME" "$build_dir"/
     fi
@@ -232,41 +250,17 @@ function docker_build {
     pushd "$build_dir" > /dev/null
 
     echo "+++ Build image: $image_full_name"
-    docker build . \
+    docker buildx build . \
+        --build-arg BUILDER_IMAGE="$BASE_BUILDER" \
         --build-arg EULA="$EULA_FILE_NAME" \
         --build-arg BASE_IMAGE="$temp_image" \
         -t "$image_full_name" \
-        --no-cache
+        --no-cache \
+        --progress=plain
 
     docker rmi "$temp_image"
     popd > /dev/null
     sudo rm -rf "$build_dir"
-
-    publish_to_acr "$image_full_name"
-    save_container_image "$image_type" "$image_full_name"
-}
-
-function docker_build_custom {
-    local image_type=$1
-    local image_full_name=$2
-    local final_image_to_use=$3
-    local dockerfile=$4
-
-    # $WORK_DIR has $RPMS_DIR directory and $LOCAL_REPO_FILE file.
-    pushd "$WORK_DIR" > /dev/null
-
-    echo "+++ Build image: $image_full_name"
-    docker build . \
-        --build-arg BASE_IMAGE="$BASE_IMAGE_NAME" \
-        --build-arg FINAL_IMAGE="$final_image_to_use" \
-        --build-arg AZL_VERSION="$AZL_VERSION" \
-        --build-arg RPMS="$RPMS_DIR" \
-        --build-arg LOCAL_REPO_FILE="$LOCAL_REPO_FILE" \
-        -t "$image_full_name" \
-        -f "$CONTAINER_SRC_DIR/base/$dockerfile" \
-        --no-cache
-
-    popd > /dev/null
 
     publish_to_acr "$image_full_name"
     save_container_image "$image_type" "$image_full_name"
@@ -278,14 +272,21 @@ function docker_build_marinara {
     local build_dir="$WORK_DIR/marinara_build_dir"
     mkdir -p "$build_dir"
     git clone "https://github.com/microsoft/$MARINARA.git" "$build_dir"
-    pushd "$build_dir"
 
-    sed -E "s|^FROM mcr\..*installer$|FROM $BASE_IMAGE_NAME as installer|g" -i "dockerfile-$MARINARA"
+    if [ -d "$EULA_FILE_PATH" ]; then
+        cp "$EULA_FILE_PATH/$EULA_FILE_NAME" "$build_dir"/
+    fi
 
-    docker build . \
+    pushd "$build_dir" > /dev/null
+
+    sed -E "s|^FROM mcr\..*installer$|FROM $BASE_BUILDER as installer|g" -i "dockerfile-$MARINARA"
+
+    docker buildx build . \
         -t "$MARINARA_IMAGE_NAME" \
         -f dockerfile-$MARINARA \
         --build-arg AZL_VERSION="$AZL_VERSION" \
+        --build-arg INSTALL_DEPENDENCIES=false \
+        --build-arg EULA=$EULA_FILE_NAME \
         --no-cache \
         --progress=plain
 
@@ -296,16 +297,31 @@ function docker_build_marinara {
     save_container_image "$MARINARA" "$MARINARA_IMAGE_NAME"
 }
 
+function oras_attach {
+    local image_name=$1
+    oras attach \
+        --artifact-type "application/vnd.microsoft.artifact.lifecycle" \
+        --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$END_OF_LIFE_1_YEAR" \
+        "$image_name"
+}
+
 function publish_to_acr {
     local image=$1
     if [[ ! "$PUBLISH_TO_ACR" =~ [Tt]rue ]]; then
         echo "+++ Skip publishing to ACR"
         return
     fi
+    
+    echo "+++ az login into Azure ACR $ACR"
+    local oras_access_token
+    oras_access_token=$(az acr login --name "$ACR" --expose-token --output tsv --query accessToken)
+    oras login "$ACR.azurecr.io" \
+        --username "00000000-0000-0000-0000-000000000000" \
+        --password "$oras_access_token"
+
     echo "+++ Publish container $image"
-    echo "login into ACR: $ACR"
-    az acr login --name "$ACR"
     docker image push "$image"
+    oras_attach "$image"
 }
 
 function save_container_image {
@@ -317,23 +333,15 @@ function save_container_image {
 
 function build_images {
     echo "+++ Build images"
-
-    docker_build $BASE "$BASE_IMAGE_NAME" "$BASE_TARBALL" "Dockerfile-Base-Template"
-    docker_build $DISTROLESS "$DISTROLESS_BASE_IMAGE_NAME" "$DISTROLESS_BASE_TARBALL" "Dockerfile-Distroless-Template"
-    docker_build $DISTROLESS "$DISTROLESS_MINIMAL_IMAGE_NAME" "$DISTROLESS_MINIMAL_TARBALL" "Dockerfile-Distroless-Template"
-    docker_build $DISTROLESS "$DISTROLESS_DEBUG_IMAGE_NAME" "$DISTROLESS_DEBUG_TARBALL" "Dockerfile-Distroless-Template"
-
-    docker_build_custom $BASE "$BASE_NONROOT_IMAGE_NAME" "" "Dockerfile-Base-Nonroot-Template"
-    docker_build_custom $DISTROLESS "$DISTROLESS_BASE_NONROOT_IMAGE_NAME" "$DISTROLESS_BASE_IMAGE_NAME" "Dockerfile-Distroless-Nonroot-Template"
-    docker_build_custom $DISTROLESS "$DISTROLESS_MINIMAL_NONROOT_IMAGE_NAME" "$DISTROLESS_MINIMAL_IMAGE_NAME" "Dockerfile-Distroless-Nonroot-Template"
-    docker_build_custom $DISTROLESS "$DISTROLESS_DEBUG_NONROOT_IMAGE_NAME" "$DISTROLESS_DEBUG_IMAGE_NAME" "Dockerfile-Distroless-Nonroot-Template"
-
-    docker_build_custom $BUSYBOX "$BUSYBOX_IMAGE_NAME" "" "Dockerfile-Busybox-Template"
-
+    docker_build $BASE "$BASE_IMAGE_NAME" "$BASE_TARBALL" "Dockerfile-Base-Template" "$BASE_BUILD"
+    docker_build $DISTROLESS "$DISTROLESS_BASE_IMAGE_NAME" "$DISTROLESS_BASE_TARBALL" "Dockerfile-Distroless-Template" "$DISTROLESS_BASE_BUILD"
+    docker_build $DISTROLESS "$DISTROLESS_MINIMAL_IMAGE_NAME" "$DISTROLESS_MINIMAL_TARBALL" "Dockerfile-Distroless-Template" "$DISTROLESS_MINIMAL_BUILD"
+    docker_build $DISTROLESS "$DISTROLESS_DEBUG_IMAGE_NAME" "$DISTROLESS_DEBUG_TARBALL" "Dockerfile-Distroless-Template" "$DISTROLESS_DEBUG_BUILD"
     docker_build_marinara
 }
 
 print_inputs
 validate_inputs
 initialization
+build_builder_image
 build_images

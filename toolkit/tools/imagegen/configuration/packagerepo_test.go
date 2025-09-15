@@ -22,7 +22,7 @@ var (
 			Install:      false,
 			GPGCheck:     true,
 			RepoGPGCheck: true,
-			GPGKeys:      "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY",
+			GPGKeys:      "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY",
 		},
 		{
 			Name:         "azurelinux-official-preview",
@@ -30,7 +30,7 @@ var (
 			Install:      true,
 			GPGCheck:     true,
 			RepoGPGCheck: true,
-			GPGKeys:      "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY",
+			GPGKeys:      "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY",
 		},
 	}
 
@@ -38,7 +38,7 @@ var (
 		"[azurelinux-official-base]",
 		"name=azurelinux-official-base",
 		"baseurl=https://packages.microsoft.com/azurelinux/$releasever/prod/base/$basearch",
-		"gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY",
+		"gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY",
 		"gpgcheck=1",
 		"repo_gpgcheck=1",
 		"enabled=1",
@@ -211,5 +211,5 @@ func TestShouldSucceedSettingDefaults_PackageRepo(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, checkedPackageRepo.GPGCheck)
 	assert.True(t, checkedPackageRepo.RepoGPGCheck)
-	assert.Equal(t, "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY", checkedPackageRepo.GPGKeys)
+	assert.Equal(t, "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY", checkedPackageRepo.GPGKeys)
 }

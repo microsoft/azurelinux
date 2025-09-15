@@ -1,17 +1,19 @@
-%global maj_ver 17
+%global maj_ver 18
 
 %global clang_srcdir llvm-project-llvmorg-%{version}
 
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
 Name:           clang
-Version:        17.0.6
-Release:        2%{?dist}
+Version:        18.1.8
+Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://clang.llvm.org
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
+Patch1:         CVE-2024-7883.patch
+Patch2:         clang-format-fix.patch
 BuildRequires:  cmake
 BuildRequires:  libxml2-devel
 BuildRequires:  llvm-devel = %{version}
@@ -84,26 +86,26 @@ A set of extra tools built using Clang's tooling API.
 %package tools-extra-devel
 Summary: Development header files for clang tools
 Requires: %{name}-tools-extra = %{version}-%{release}
- 
+
 %description tools-extra-devel
 Development header files for clang tools.
 
 %prep
-%setup -q -n %{clang_srcdir}
+%autosetup -p1 -n %{clang_srcdir}
 
 %py3_shebang_fix \
-	clang-tools-extra/clang-tidy/tool/ \
-	clang-tools-extra/clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
- 
+    clang-tools-extra/clang-tidy/tool/ \
+    clang-tools-extra/clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
+
 %py3_shebang_fix \
-	clang/tools/clang-format/ \
-	clang/tools/clang-format/git-clang-format \
-	clang/utils/hmaptool/hmaptool \
-	clang/tools/scan-view/bin/scan-view \
-	clang/tools/scan-view/share/Reporter.py \
-	clang/tools/scan-view/share/startfile.py \
-	clang/tools/scan-build-py/bin/* \
-	clang/tools/scan-build-py/libexec/*
+    clang/tools/clang-format/ \
+    clang/tools/clang-format/git-clang-format \
+    clang/utils/hmaptool/hmaptool \
+    clang/tools/scan-view/bin/scan-view \
+    clang/tools/scan-view/share/Reporter.py \
+    clang/tools/scan-view/share/startfile.py \
+    clang/tools/scan-build-py/bin/* \
+    clang/tools/scan-build-py/libexec/*
 
 %build
 # Disable symbol generation
@@ -112,7 +114,9 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 
 mkdir -p build
 cd build
-cmake  -DCMAKE_INSTALL_PREFIX=%{_prefix}       \
+cmake  \
+       -DCMAKE_INSTALL_PREFIX=%{_prefix}       \
+       -DLLVM_DIR=%{_libdir}/cmake/llvm        \
        -DLLVM_PARALLEL_LINK_JOBS=1             \
        -DCLANG_ENABLE_STATIC_ANALYZER:BOOL=ON  \
        -DCMAKE_BUILD_TYPE=Release              \
@@ -120,7 +124,7 @@ cmake  -DCMAKE_INSTALL_PREFIX=%{_prefix}       \
        -DLLVM_ENABLE_RTTI=ON                   \
        -DLLVM_LINK_LLVM_DYLIB:BOOL=ON          \
        -DCLANG_LINK_CLANG_DYLIB=ON             \
- 	     -DLLVM_INCLUDE_TESTS=OFF                \
+       -DLLVM_INCLUDE_TESTS=OFF                \
        -DLLVM_EXTERNAL_CLANG_TOOLS_EXTRA_SOURCE_DIR=../clang-tools-extra \
        -DCLANG_RESOURCE_DIR=../lib/clang/%{maj_ver} \
        -Wno-dev ../clang
@@ -240,8 +244,23 @@ make clang-check
 
 %files tools-extra-devel
 %{_includedir}/clang-tidy/
- 
+
 %changelog
+* Tue Jun 03 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 18.1.8-1
+- Updated to version 18.1.8.
+
+* Thu Apr 10 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 18.1.2-4
+- Fix CVE-2024-7883
+
+* Tue Sep 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-3
+- Define LLVM_DIR
+
+* Wed May 29 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 18.1.2-2
+- Bump release to build with new llvm to fix CVE-2024-31852
+
+* Wed Apr 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-1
+- Upgrade to version 18.1.2
+
 * Mon Jan 29 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-2
 - Fix missing binaries and tests
 

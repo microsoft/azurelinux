@@ -24,7 +24,7 @@
 Summary:        Container Network Interface - networking for Linux containers
 Name:           cni
 Version:        1.1.2
-Release:        1%{?dist}
+Release:        4%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -48,6 +48,10 @@ Source2:        build.sh
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source3:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2021-38561.patch
+Patch1:         CVE-2022-32149.patch
+Patch2:		CVE-2024-45338.patch
+Patch3:		CVE-2022-29526.patch
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  xz
@@ -65,13 +69,13 @@ the container is deleted. Because of this focus, CNI has a wide
 range of support and the specification is simple to implement.
 
 %prep
-%setup -q
+%autosetup -N
 cp %{SOURCE2} build.sh
-
-%build
 # create vendor folder from the vendor tarball and set vendor mode
 tar -xf %{SOURCE3} --no-same-owner
+%autopatch -p1
 
+%build
 # go1.16+ default is GO111MODULE=on set to auto temporarily
 # until using upstream release with go.mod
 export GO111MODULE=auto
@@ -113,6 +117,15 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
 %{_sbindir}/cnitool
 
 %changelog
+* Thu Jan 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.1.2-4
+- Patch CVE-2024-45338 and CVE-2022-29526
+
+* Fri Sep 06 2024 Muhammad Falak R Wani <mwani@microsoft.com> - 1.1.2-3
+- Patch CVE-2022-32149
+
+* Tue Jul 02 2024 Osama Esmail <osamaesmail@microsoft.com> - 1.1.2-2
+- Patching CVE-2021-38561
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.2-1
 - Auto-upgrade to 1.1.2 - Azure Linux 3.0 - package upgrades
 

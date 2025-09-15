@@ -1,0 +1,17 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: "Stable specs and manifests checkout"
+description: "Checks out the repo, and a stable version of both specs and manifests."
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: Checkout stable specs and manifests
+      shell: bash
+      run: git checkout 3.0-stable -- SPECS/ toolkit/resources/manifests/package/*.txt

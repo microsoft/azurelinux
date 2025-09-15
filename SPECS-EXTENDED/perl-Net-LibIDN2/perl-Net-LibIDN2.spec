@@ -1,12 +1,13 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-Net-LibIDN2
-Version:        1.01
-Release:        3%{?dist}
+Version:        1.02
+Release:        1%{?dist}
 Summary:        Perl binding for GNU Libidn2
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Net-LibIDN2
 Source0:        https://cpan.metacpan.org/authors/id/T/TH/THOR/Net-LibIDN2-%{version}.tar.gz#/perl-Net-LibIDN2-%{version}.tar.gz
+
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -36,11 +37,26 @@ This Perl module provides bindings for GNU Libidn2, a C library for handling
 internationalized domain names according to IDNA 2008 (RFC 5890, RFC 5891,
 RFC 5892, RFC 5893).
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+Requires:       perl(POSIX)
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n Net-LibIDN2-%{version}
 # Remove bundled modules
 rm -rf inc
 perl -i -ne 'print $_ unless m{^inc/}' MANIFEST
+# Help generators to recognize Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!\s*perl}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
 
 %build
 perl Build.PL installdirs=vendor optimize="$RPM_OPT_FLAGS"
@@ -49,6 +65,14 @@ perl Build.PL installdirs=vendor optimize="$RPM_OPT_FLAGS"
 %install
 ./Build install destdir=$RPM_BUILD_ROOT create_packlist=0
 find $RPM_BUILD_ROOT -type f -name '*.bs' -size 0 -delete
+# Install tests  
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/sh
+cd %{_libexecdir}/%{name} && exec prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 %{_fixperms} $RPM_BUILD_ROOT/*
 
 %check
@@ -61,7 +85,14 @@ find $RPM_BUILD_ROOT -type f -name '*.bs' -size 0 -delete
 %{perl_vendorarch}/Net*
 %{_mandir}/man3/*
 
+%files tests
+%{_libexecdir}/%{name}
+
 %changelog
+* Tue Dec 10 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 1.02-1
+- Upgrade to 1.02
+- License verified
+
 * Fri Jan 29 2021 Joe Schmitt <joschmit@microsoft.com> - 1.01-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove optional glibc test dep

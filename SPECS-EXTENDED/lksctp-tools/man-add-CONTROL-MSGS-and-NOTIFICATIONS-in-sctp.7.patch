@@ -1,0 +1,150 @@
+From 2a3a4bc0ba94656c007ebaae52e50b42b95ded32 Mon Sep 17 00:00:00 2001
+From: Xin Long <lucien.xin@gmail.com>
+Date: Mon, 27 Feb 2023 18:10:32 -0500
+Subject: [PATCH 6/6] man: add CONTROL MSGS and NOTIFICATIONS in sctp.7
+
+Control msgs and notifications are two very important parts
+for users to understand and user in programming, and they
+are wonth a place in the SCTP manual doc.
+
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ man/sctp.7 | 122 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 122 insertions(+)
+
+diff --git a/man/sctp.7 b/man/sctp.7
+index 01bff6f..323d42e 100644
+--- a/man/sctp.7
++++ b/man/sctp.7
+@@ -244,6 +244,128 @@ The number of SCTP packets discarded in receiving.
+ .TP
+ .B SctpInDataChunkDiscards
+ The number of SCTP data chunks discarded in receiving.
++.SH CONTROL MSGS
++The ancillary data is carried in msg_control field of struct msghdr, which is
++used in
++.B sendmsg(2)
++and
++.B recvmsg(2)
++call. The SCTP stack uses the ancillary data to communicate the attributes,
++such as SCTP_RCVINFO, of the message stored in msg_iov to the socket endpoint.
++Each ancillary data item is preceded by a struct cmsghdr, see
++.B cmsg(3).
++The different cmsg types for SCTP are listed below, and all these related macros
++and structures are defined in /usr/include/netinet/sctp.h.
++.TP
++.B SCTP_INIT
++This cmsg provides information for initializing new SCTP associations for sendmsg()
++with struct sctp_initmsg, which is the same as SCTP_INITMSG socket option's data
++structure.
++.TP
++.B SCTP_SNDRCV
++This cmsg specifies SCTP options for sendmsg() and describes SCTP header information
++about a received message through recvmsg() with struct sctp_sndrcvinfo. It mixes the
++send and receive path, and SCTP_SNDINFO and SCTP_RCVINFO split this information, so
++these structures should be used, when possible, since SCTP_SNDRCV is deprecated.
++.B sctp_sendmsg(3)
++and
++.B sctp_send(3)
++provide a simple way to use this cmsg.
++
++Note that an application must use the SCTP_RECVRCVINFO socket option to enable the
++delivery of this information.
++.TP
++.B SCTP_EXTRCV
++This cmsg specifies SCTP options for SCTP header information about a received message
++via recvmsg() with struct sctp_extrcvinfo, and this structure is an extended version
++of SCTP_SNDRCV. Note that data in the next message is not valid unless the current
++message is completely read, i.e., unless the MSG_EOR is set. SCTP_NXTINFO should be
++used when possible, since SCTP_EXTRCV is considered deprecated.
++.B sctp_recvmsg(3)
++provides a simple way to use this cmsg.
++
++Note that an application must use the SCTP_RECVNXTINFO socket option to enable the
++delivery of this information.
++.TP
++.B SCTP_RCVINFO, SCTP_NXTINFO
++These cmsgs describe SCTP receive information about a received message through
++recvmsg() with struct sctp_rcvinfo, and SCTP receive information of the next
++message that will be delivered through recvmsg() if this information is already
++available when delivering the current message with struct sctp_nxtinfo.
++.B sctp_recvv(3)
++provides a simple way to use these cmsgs.
++
++Note that an application must use the SCTP_RECVRCVINFO and SCTP_RECVNXTINFO socket
++options accordingly to enable the delivery of this information.
++.TP
++.B SCTP_SNDINFO, SCTP_PRINFO, SCTP_AUTHINFO, SCTP_DSTADDRV4, SCTP_DSTADDRV6
++These cmsgs specifie a couple of SCTP options for sendmsg() for SEND, PRSCTP, AUTH
++and DSTADDR information with struct sctp_sndinfo, sctp_prinfo, sctp_authinfo and
++in(6)_addr accordingly.
++.BR sctp_sendv(3)
++provides a simple way to use these cmsgs.
++.SH EVENTS and NOTIFICATIONS
++An SCTP application may need to understand and process events and errors
++that happen on the SCTP stack. These events include network status changes,
++association startups, remote operational errors, and undeliverable messages.
++When a notification arrives, recvmsg() returns the notification in the
++application-supplied data buffer via msg_iov, and sets MSG_NOTIFICATION in
++msg_flags. See socket option SCTP_EVENT for the event enabling. The different
++events are listed below, and all these related macros and structures are
++defined in /usr/include/netinet/sctp.h.
++.TP
++.B SCTP_ASSOC_CHANGE
++Communication notifications inform the application that an SCTP
++association has either begun or ended. The notification format
++is struct sctp_assoc_change.
++.TP
++.B SCTP_PEER_ADDR_CHANGE
++When a destination address of a multi-homed peer encounters a state
++change, a peer address change event is sent. The notification format
++is struct sctp_paddr_change.
++.TP
++.B SCTP_REMOTE_ERROR
++A remote peer may send an Operation Error message to its peer.  This
++message indicates a variety of error conditions on an association.
++The notification format is struct sctp_remote_error.
++.TP
++.B SCTP_SEND_FAILED
++If SCTP cannot deliver a message, it can return back the message as a
++notification if the SCTP_SEND_FAILED event is enabled. The notification
++format is struct sctp_send_failed. Please note that this notification
++is deprecated. Use SCTP_SEND_FAILED_EVENT instead.
++.TP
++.B SCTP_SHUTDOWN_EVENT
++When a peer sends a SHUTDOWN, SCTP delivers this notification to inform
++the application that it should cease sending data. The notification
++format is struct sctp_shutdown_event.
++.TP
++.B SCTP_ADAPTATION_INDICATION
++When a peer sends an Adaptation Layer Indication parameter, SCTP delivers
++this notification to inform the application about the peer's adaptation
++layer indication. The notification format is struct sctp_adaptation_event.
++.TP
++.B SCTP_PARTIAL_DELIVERY_EVENT
++When a receiver is engaged in a partial delivery of a message, this
++notification will be used to indicate various events. The notification
++format is struct sctp_pdapi_event.
++.TP
++.B SCTP_AUTHENTICATION_EVENT
++This is used to report different events relating to the use of the
++extension to authenticate SCTP messages. The notification format is
++struct sctp_authkey_event.
++.TP
++.B SCTP_SENDER_DRY_EVENT
++When the SCTP stack has no more user data to send or retransmit, this
++notification is given to the user.  Also, at the time when a user app
++subscribes to this event, if there is no data to be sent or retransmit,
++the stack will immediately send up this notification. The notification
++format is struct sctp_sender_dry_event.
++.TP
++.B SCTP_SEND_FAILED_EVENT
++If SCTP cannot deliver a message, it can return back the message as a
++notification if the SCTP_SEND_FAILED_EVENT event is enabled. The
++notification format is struct sctp_send_failed_event.
+ .SH "SOCKET OPTIONS"
+ To set or get a SCTP socket option, call
+ .BR getsockopt (2)
+-- 
+2.39.1
+

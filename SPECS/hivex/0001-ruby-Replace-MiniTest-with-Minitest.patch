@@ -1,0 +1,102 @@
+From fbcff7fbd8f96214c7f13f36bd7669a9142824ab Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Mon, 7 Aug 2023 10:21:54 +0100
+Subject: [PATCH 1/3] ruby: Replace MiniTest with Minitest
+ 
+Apparently the old MiniTest module is somewhat ancient.  Use "new"
+Minitest module instead.  This was broken by the following change in
+minitest 5.19:
+ 
+https://github.com/minitest/minitest/commit/a2c6c18570f6f0a1bf6af70fe3b6d9599a13fdd6
+ 
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=2229653
+---
+ ruby/tests/tc_010_load.rb      | 2 +-
+ ruby/tests/tc_021_close.rb     | 2 +-
+ ruby/tests/tc_120_rlenvalue.rb | 2 +-
+ ruby/tests/tc_130_special.rb   | 2 +-
+ ruby/tests/tc_200_write.rb     | 2 +-
+ ruby/tests/tc_210_setvalue.rb  | 2 +-
+ 6 files changed, 6 insertions(+), 6 deletions(-)
+ 
+diff --git a/ruby/tests/tc_010_load.rb b/ruby/tests/tc_010_load.rb
+index 76fef60..58fac33 100644
+--- a/ruby/tests/tc_010_load.rb
++++ b/ruby/tests/tc_010_load.rb
+@@ -17,7 +17,7 @@
+ 
+ require File::join(File::dirname(__FILE__), 'test_helper')
+ 
+-class TestLoad < MiniTest::Unit::TestCase
++class TestLoad < Minitest::Test
+   def test_load
+     h = Hivex::open("../images/minimal", {})
+     refute_nil (h)
+diff --git a/ruby/tests/tc_021_close.rb b/ruby/tests/tc_021_close.rb
+index 38b88a9..bc8f79d 100644
+--- a/ruby/tests/tc_021_close.rb
++++ b/ruby/tests/tc_021_close.rb
+@@ -17,7 +17,7 @@
+ 
+ require File::join(File::dirname(__FILE__), 'test_helper')
+ 
+-class TestClose < MiniTest::Unit::TestCase
++class TestClose < Minitest::Test
+   def test_close
+     h = Hivex::open("../images/minimal", {})
+     refute_nil (h)
+diff --git a/ruby/tests/tc_120_rlenvalue.rb b/ruby/tests/tc_120_rlenvalue.rb
+index 6a2fb72..ee881bb 100644
+--- a/ruby/tests/tc_120_rlenvalue.rb
++++ b/ruby/tests/tc_120_rlenvalue.rb
+@@ -23,7 +23,7 @@
+ 
+ require File::join(File::dirname(__FILE__), 'test_helper')
+ 
+-class TestRLenValue < MiniTest::Unit::TestCase
++class TestRLenValue < Minitest::Test
+   def test_RLenValue
+     h = Hivex::open(File::join(ENV['abs_srcdir'], '..', 'images', 'rlenvalue_test_hive'), {})
+     refute_nil(h)
+diff --git a/ruby/tests/tc_130_special.rb b/ruby/tests/tc_130_special.rb
+index 7570824..6179f51 100644
+--- a/ruby/tests/tc_130_special.rb
++++ b/ruby/tests/tc_130_special.rb
+@@ -3,7 +3,7 @@
+ 
+ require File::join(File::dirname(__FILE__), 'test_helper')
+ 
+-class TestRLenValue < MiniTest::Unit::TestCase
++class TestRLenValue < Minitest::Test
+   def test_RLenValue
+     h = Hivex::open(File::join(ENV['abs_srcdir'], '..', 'images', 'special'), {})
+     refute_nil(h)
+diff --git a/ruby/tests/tc_200_write.rb b/ruby/tests/tc_200_write.rb
+index 463283e..a713d77 100644
+--- a/ruby/tests/tc_200_write.rb
++++ b/ruby/tests/tc_200_write.rb
+@@ -17,7 +17,7 @@
+ 
+ require File::join(File::dirname(__FILE__), 'test_helper')
+ 
+-class TestWrite < MiniTest::Unit::TestCase
++class TestWrite < Minitest::Test
+   def test_write
+     h = Hivex::open("../images/minimal", {:write => 1})
+     refute_nil (h)
+diff --git a/ruby/tests/tc_210_setvalue.rb b/ruby/tests/tc_210_setvalue.rb
+index 736b073..2ffd07b 100644
+--- a/ruby/tests/tc_210_setvalue.rb
++++ b/ruby/tests/tc_210_setvalue.rb
+@@ -17,7 +17,7 @@
+ 
+ require File::join(File::dirname(__FILE__), 'test_helper')
+ 
+-class TestSetValue < MiniTest::Unit::TestCase
++class TestSetValue < Minitest::Test
+   def test_set_value
+     h = Hivex::open("../images/minimal", {:write => 1})
+     refute_nil (h)
+-- 
+2.41.0
+ 

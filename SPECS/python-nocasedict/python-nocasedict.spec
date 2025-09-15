@@ -2,8 +2,8 @@
 %define six_version 1.14.0
 Summary:        Case-insensitive ordered dictionary library for Python
 Name:           python-%{pkgname}
-Version:        2.0.1
-Release:        1%{?dist}
+Version:        2.0.3
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,6 +15,7 @@ BuildRequires:  python3-six >= %{six_version}
 BuildRequires:  python3-wheel
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 BuildArch:      noarch
 
@@ -40,16 +41,21 @@ rm -rf *.egg-info
 %py3_install
 
 %check
-pip3 install 'tox>=3.27.1,<4.0.0'
-PYTHONPATH=%{buildroot}%{python3_sitelib} tox -e py%{python3_version_nodots}
+%pytest
 
 %files -n python3-%{pkgname}
 %license LICENSE
-%doc README.rst
+%doc README.md
 %{python3_sitelib}/%{pkgname}
 %{python3_sitelib}/*.egg-info
 
 %changelog
+* Tue May 13 2025 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.3-2
+- Fix Ptest by using pytest instead of tox.
+
+* Thu Jul 11 2024 Sam Meluch <sammeluch@microsoft.com> - 2.0.3-1
+- Upgrade to 2.0.3
+
 * Fri Nov 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.1-1
 - Auto-upgrade to 2.0.1 - Azure Linux 3.0 - package upgrades
 

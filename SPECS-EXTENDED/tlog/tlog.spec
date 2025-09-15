@@ -1,26 +1,82 @@
+%global _hardened_build 1
+
+%if 0%{?rhel} && 0%{?rhel} < 7
+# If it's RHEL6 and older
+%bcond_with systemd
+%else
+%bcond_without systemd
+%endif
+
+%if "%{_vendor}" == "debbuild"
+# Set values to make debian builds work well
+%global _defaultdocdir /usr/share/doc/%{name}
+%global _buildshell /bin/bash
+%global _lib lib/%(%{__dpkg_architecture} -qDEB_HOST_MULTIARCH)
+%endif
+
+# Compatibility macros
+%{!?_tmpfilesdir:%global _tmpfilesdir %{_prefix}/lib/tmpfiles.d}
+%{!?make_build:%global make_build %{__make} %{?_smp_mflags}}
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Name:       tlog
-Version:    9
-Release:    2%{?dist}
-Summary:    Terminal I/O logger
+Name:           tlog
+Version:        14
+Release:        3%{?dist}
+Summary:        Terminal I/O logger
 
-License:    GPLv2+
-URL:        https://github.com/Scribery/%{name}
-Source:     https://github.com/Scribery/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
-
-BuildRequires:  gcc
-BuildRequires:  json-c-devel
-BuildRequires:  curl-devel
-BuildRequires:  m4
-# If it's not RHEL6 and older
-%if 0%{?rhel} == 0 || 0%{?rhel} >= 7
-BuildRequires:  systemd-devel
-BuildRequires:  systemd-units
+%if "%{_vendor}" == "debbuild"
+# Required for Debian
+Packager:       Justin Stephenson <jstephen@redhat.com>
+Group:          admin
+License:        GPL-2.0+
+%else
+Group:          Applications/System
+License:        GPL-2.0-or-later
 %endif
-Requires(post):     sed
-Requires(postun):   sed
 
+URL:            https://github.com/Scribery/%{name}
+Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Source1:        tlog.sysusers
+
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
+BuildRequires:  m4
+BuildRequires:  gcc
+BuildRequires:  make
+
+%if "%{_vendor}" == "debbuild"
+BuildRequires:  libjson-c-dev
+BuildRequires:  libcurl4-gnutls-dev
+BuildRequires:  libutempter-dev
+# Debian/Ubuntu doesn't automatically pull this in...
+BuildRequires:  pkg-config
+
+%if %{with systemd}
+BuildRequires:  libsystemd-dev
+# Expanded form of systemd_requires macro
+Requires:         systemd-sysv
+Requires(preun):  systemd
+Requires(post):   systemd
+Requires(postun): systemd
+%{?sysusers_requires_compat}
+%endif
+
+%else
+BuildRequires:  pkgconfig(json-c)
+BuildRequires:  pkgconfig(libcurl)
+%if %{defined suse_version}
+BuildRequires:  utempter-devel
+%else
+BuildRequires:  libutempter-devel
+%endif
+
+%if %{with systemd}
+BuildRequires:  pkgconfig(libsystemd)
+%{?systemd_requires}
+%endif
+%endif
 
 %description
 Tlog is a terminal I/O recording program similar to "script", but used in
@@ -28,55 +84,39 @@ place of a user's shell, starting the recording and executing the real user's
 shell afterwards. The recorded I/O can then be forwarded to a logging server
 in JSON format.
 
-%global _hardened_build 1
-
 %prep
 %setup -q
 
 %build
-# If it's not RHEL6 and older
-%if 0%{?rhel} == 0 || 0%{?rhel} >= 7
-%configure --disable-rpath --disable-static
-# Else, if it's RHEL6 or older
-%else
-%configure --disable-rpath --disable-static --disable-journal
-%endif
-make %{?_smp_mflags}
+%configure --disable-rpath --disable-static --enable-utempter %{!?with_systemd:--disable-journal} --docdir=%{_defaultdocdir}/%{name}
+%make_build
 
 %check
-make %{?_smp_mflags} check
-
-%pre
-getent group %{name} >/dev/null ||
-    groupadd -r %{name}
-getent passwd %{name} >/dev/null ||
-    useradd -r -g %{name} -d %{_localstatedir}/run/%{name} -s /usr/sbin/nologin \
-            -c "Tlog terminal I/O logger" %{name}
+%make_build check
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 rm %{buildroot}/%{_libdir}/*.la
+
 # Remove development files as we're not doing a devel package yet
 rm %{buildroot}/%{_libdir}/*.so
 rm -r %{buildroot}/usr/include/%{name}
 
-# If it's not RHEL6 and older
-%if 0%{?rhel} == 0 || 0%{?rhel} >= 7
+%if %{with systemd}
     # Create tmpfiles.d configuration for the lock dir
     mkdir -p %{buildroot}%{_tmpfilesdir}
     {
         echo "# Type Path Mode UID GID Age Argument"
         echo "d /run/%{name} 0755 %{name} %{name}"
     } > %{buildroot}%{_tmpfilesdir}/%{name}.conf
-    # Create the lock dir
-    mkdir -p %{buildroot}/run
-    install -d -m 0755 %{buildroot}/run/%{name}
 # Else, if it's RHEL6 or older
 %else
     # Create the lock dir
     mkdir -p %{buildroot}%{_localstatedir}/run
     install -d -m 0755 %{buildroot}%{_localstatedir}/run/%{name}
 %endif
+
+install -p -D -m 0644 %{SOURCE1} %{buildroot}%{_sysusersdir}/%{name}.conf
 
 %files
 %{!?_licensedir:%global license %doc}
@@ -89,29 +129,98 @@ rm -r %{buildroot}/usr/include/%{name}
 %{_datadir}/%{name}
 %{_mandir}/man5/*
 %{_mandir}/man8/*
-# If it's not RHEL6 and older
-%if 0%{?rhel} == 0 || 0%{?rhel} >= 7
-%config(noreplace) %{_tmpfilesdir}/%{name}.conf
-%dir %attr(-,%{name},%{name}) /run/%{name}
-# Else if it's RHEL6 or older
+%if %{with systemd}
+%{_tmpfilesdir}/%{name}.conf
 %else
+# If it's RHEL6 and older
 %dir %attr(-,%{name},%{name}) %{_localstatedir}/run/%{name}
 %endif
 %dir %{_sysconfdir}/%{name}
 %config(noreplace) %{_sysconfdir}/%{name}/%{name}-rec.conf
 %config(noreplace) %{_sysconfdir}/%{name}/%{name}-rec-session.conf
 %config(noreplace) %{_sysconfdir}/%{name}/%{name}-play.conf
+%{_sysusersdir}/%{name}.conf
+
+%pre
+%sysusers_create_compat %{SOURCE1}
 
 %post
 /sbin/ldconfig
+%if 0%{?el7} || 0%{?suse_version} >= 1315
+# For RHEL7 and SUSE Linux distributions, creation doesn't happen automatically
+%tmpfiles_create %{name}.conf
+%endif
+%if 0%{?ubuntu} || 0%{?debian}
+# For Debian/Ubuntu, creation doesn't happen automatically
+systemd-tmpfiles --create %{name}.conf >/dev/null 2>&1 || :
+%endif
 
 %postun
 /sbin/ldconfig
 
 %changelog
-* Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 9-2
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
-- Making binaries paths compatible with CBL-Mariner's paths.
+* Wed Jan 15 2025 Archana Shettigar <v-shettigara@microsoft.com> - 14-3
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 14-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Feb 06 2024 Justin Stephenson <jstephen@redhat.com> - 14-1
+- Release v14
+- configure: correctly handle systemd versions before 245
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 13-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 13-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jul 14 2023 Justin Stephenson <jstephen@redhat.com> - 13-2
+- Provide a sysusers.d file to get user() and group() provides
+  (see https://fedoraproject.org/wiki/Changes/Adopting_sysusers.d_format).
+
+* Fri Apr 14 2023 Justin Stephenson <jstephen@redhat.com> - 13-1
+- Release v13
+- Update the Fedora license
+- MAN: Add missing comma in tlog-rec-session.conf
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 12.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 12.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Apr 20 2022 Justin Stephenson <jstephen@redhat.com> - 12.1
+- Exit transfer loop when output fd is closed
+- Revert "Prevent infinite transfer loop on GDM login"
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 12-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Nov 16 2021 Justin Stephenson <jstephen@redhat.com> - 12-1
+- Release v12
+- Prevent infinite transfer loop on GDM login.
+- tlog-play: add journal namespace support.
+- tlitest: extend delay for limit-action delay test.
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 11-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sat Jul 10 2021 Björn Esser <besser82@fedoraproject.org> - 11-3
+- Rebuild for versioned symbols in json-c
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 11-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jan 19 2021 Justin Stephenson <jstephen@redhat.com> - 11-1
+- Release v11
+- Fire SIGCHLD after utempter_add_record since it probably eats it.
+
+* Fri Jan 8 2021 Justin Stephenson <jstephen@redhat.com> - 10-1
+- Release v10
+- Correct suse rpmbuild
+- Update debbuild for travis CI
 
 * Tue Oct 13 2020 Justin Stephenson <jstephen@redhat.com> - 9-1
 - Release v9

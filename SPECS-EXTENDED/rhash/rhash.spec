@@ -1,14 +1,15 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Name:           rhash
-Version:        1.3.8
-Release:        4%{?dist}
+Version:        1.4.4
+Release:        3%{?dist}
 Summary:        Great utility for computing hash sums
 
-License:        MIT
+License:        0BSD
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/rhash/RHash
 Source0:        https://github.com/rhash/RHash/archive/v%{version}/%{name}-%{version}.tar.gz
 
+BuildRequires: make
 BuildRequires:  gcc
 
 %description
@@ -55,40 +56,75 @@ developing applications that use lib%{name}.
 %setup -q -n RHash-%{version}
 sed -i -e '/^INSTALL_SHARED/s/644/755/' librhash/Makefile
 
-
 %build
 INSTALL_INCDIR=%{_includedir} ./configure --sysconfdir=%{_sysconfdir} --exec-prefix=%{_prefix} --mandir=%{_mandir} --libdir=%{_libdir}
-%make_build OPTFLAGS="%{optflags}" OPTLDFLAGS="-g %{?__global_ldflags}" build-shared
-
+%make_build OPTFLAGS="%{optflags}" OPTLDFLAGS="-g %{?__global_ldflags}" build
 
 %install
 %make_install
 make DESTDIR=%{buildroot} -C librhash install-so-link install-lib-headers
 
-
 %check
 make test-shared
-
-
-%ldconfig_scriptlets
-
 
 %files
 %license COPYING
 %doc ChangeLog README.md
 %config(noreplace) %{_sysconfdir}/rhashrc
 %{_bindir}/*
-%{_libdir}/*.so.*
+%{_libdir}/*.so.1*
 %{_mandir}/man1/*.1*
 
 %files devel
 %{_includedir}/*
 %{_libdir}/*.so
 
-
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.8-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Dec 18 2024 Akhila Guruju <v-guakhila@microsoft.com> - 1.4.4-3
+- Initial CBL-Mariner import from Fedora 41 (license: MIT).
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Apr 23 2024 Orion Poplawski <orion@nwra.com> - 1.4.4-1
+- Update to 1.4.4
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Sep 26 2022 Orion Poplawski <orion@cora.nwra.com> - 1.4.3-1
+- Update to 1.4.3
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Sep 16 2021 Orion Poplawski <orion@nwra.com> - 1.4.2-1
+- Update to 1.4.2
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Thu Jul 16 2020 Orion Poplawski <orion@nwra.com> - 1.4.0-1
+- Update to 1.4.0
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.8-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

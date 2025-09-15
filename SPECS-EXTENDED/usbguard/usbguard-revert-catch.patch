@@ -1,0 +1,17 @@
+diff -up ./configure.ac.fix ./configure.ac
+--- ./configure.ac.fix	2022-03-03 15:05:03.357194713 +0100
++++ ./configure.ac	2022-03-03 15:06:02.849787794 +0100
+@@ -394,11 +394,11 @@ if test "x$with_bundled_catch" = xyes; t
+ 	catch_summary="bundled; $catch_CFLAGS $catch_LIBS"
+ else
+ 	SAVE_CPPFLAGS=$CPPFLAGS
+-	CPPFLAGS="-std=c++17 $CPPFLAGS -I/usr/include/catch2"
++	CPPFLAGS="-std=c++17 $CPPFLAGS -I/usr/include/catch"
+ 	AC_LANG_PUSH([C++])
+ 	AC_CHECK_HEADER([catch.hpp], [], [AC_MSG_FAILURE(catch.hpp not found or not usable. Re-run with --with-bundled-catch to use the bundled library.)])
+ 	AC_LANG_POP
+-	catch_CFLAGS="-I/usr/include/catch2"
++	catch_CFLAGS="-I/usr/include/catch"
+ 	catch_LIBS=""
+ 	CPPFLAGS=$SAVE_CPPFLAGS
+ 	catch_summary="system-wide; $catch_CFLAGS $catch_LIBS"

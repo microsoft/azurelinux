@@ -1,0 +1,46 @@
+diff -pruN fonts-rpm-macros-2.0.5.orig/bin/gen-fontconf fonts-rpm-macros-2.0.5/bin/gen-fontconf
+--- fonts-rpm-macros-2.0.5.orig/bin/gen-fontconf	2020-04-03 07:55:50.000000000 +0900
++++ fonts-rpm-macros-2.0.5/bin/gen-fontconf	2024-06-03 14:07:58.244902559 +0900
+@@ -23,7 +23,11 @@ from lxml import etree
+ from operator import itemgetter
+ import os
+ from pathlib import PurePath
+-import ruamel.yaml
++yaml_supported = True
++try:
++    import ruamel.yaml
++except ModuleNotFoundError:
++    yaml_supported = False
+ import subprocess
+ import sys
+ 
+@@ -36,14 +40,17 @@ oneormore = ['fullname', 'family', 'styl
+ parser = argparse.ArgumentParser(
+            description='Generate traditional fontconfig syntax from a high-level configuration file')
+ cgroup = parser.add_mutually_exclusive_group(required=True)
+-cgroup.add_argument("-y", "--yaml", "-c", "--config", type=str,
+-                    help="YAML configuration file to process")
++mode = ['xml', 'legacy']
++if yaml_supported:
++    mode.append('yaml')
++    cgroup.add_argument("-y", "--yaml", "-c", "--config", type=str,
++                        help="YAML configuration file to process")
+ cgroup.add_argument("-x", "--xml", type=str,
+                     help="XML configuration file to process")
+ parser.add_argument("-l", "--license", metavar="SPDX ID", type=str, nargs='?', default="MIT",
+                      help="SPDX license identifier for the generated files")
+ parser.add_argument("-m", "--mode", metavar="MODE", type=str, nargs='?',
+-                     default="legacy",  choices=['xml', 'yaml', 'legacy'],
++                     default="legacy",  choices=mode,
+                      help="Output format: current fontconfig syntax, or XML/YAML syntax proposals")
+ parser.add_argument("-w", "--write", action="store_true",
+                      help="Write output to disk")
+@@ -685,7 +692,7 @@ ext = '.conf'
+ if args.mode == 'xml':
+   ext = '.xml'
+ 
+-if args.yaml != None:
++if yaml_supported and args.yaml != None:
+   groups = readyaml(args.yaml)
+   if args.write and output == None:
+     output = PurePath(PurePath(args.yaml).name).with_suffix(ext)

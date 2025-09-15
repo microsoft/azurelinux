@@ -1,0 +1,152 @@
+--- ocaml-gettext-0.4.2/gettext-camomile.opam.orig	2020-06-11 14:40:42.000000000 -0600
++++ ocaml-gettext-0.4.2/gettext-camomile.opam	2023-06-22 13:31:24.299464751 -0600
+@@ -19,9 +19,8 @@ depends: [
+   "ocaml" {>= "4.03.0"}
+   "dune" {>= "1.11.0"}
+   "camomile"
+-  "base-bytes"
+   "gettext" {= version}
+-  "ounit" {with-test & > "2.0.8"}
++  "ounit2" {with-test & > "2.2.6"}
+   "fileutils" {with-test}
+ ]
+ synopsis: "Internationalization library using camomile (i18n)"
+--- ocaml-gettext-0.4.2/gettext.opam.orig	2020-06-11 14:40:42.000000000 -0600
++++ ocaml-gettext-0.4.2/gettext.opam	2023-06-22 13:30:52.810938219 -0600
+@@ -20,8 +20,7 @@ depends: [
+   "dune" {>= "1.11.0"}
+   "cppo" {build}
+   "fileutils"
+-  "base-bytes"
+-  "ounit" {with-test & > "2.0.8"}
++  "ounit2" {with-test & > "2.2.6"}
+ ]
+ synopsis: "Internationalization library (i18n)"
+ description:"""
+--- ocaml-gettext-0.4.2/gettext-stub.opam.orig	2020-06-11 14:40:42.000000000 -0600
++++ ocaml-gettext-0.4.2/gettext-stub.opam	2023-06-22 13:32:14.938703327 -0600
+@@ -19,9 +19,8 @@ depends: [
+   "ocaml" {>= "4.03.0"}
+   "dune" {>= "1.11.0"}
+   "dune-configurator"  
+-  "base-bytes"
+   "gettext" {= version}
+-  "ounit" {with-test & > "2.0.8"}
++  "ounit2" {with-test & > "2.2.6"}
+   "fileutils" {with-test}
+ ]
+ depexts: [
+--- ocaml-gettext-0.4.2/src/lib/gettext-stub/gettextStubCompat_stubs.c.orig	2020-06-11 14:40:42.000000000 -0600
++++ ocaml-gettext-0.4.2/src/lib/gettext-stub/gettextStubCompat_stubs.c	2023-06-22 13:33:17.080769220 -0600
+@@ -76,7 +76,7 @@ CAMLprim value gettextStubCompat_gettext
+ 	value v_msgid)
+ {
+   CAMLparam1(v_msgid);
+-  CAMLreturn(copy_string(gettext(String_val(v_msgid))));
++  CAMLreturn(caml_copy_string(gettext(String_val(v_msgid))));
+ }
+ 
+ CAMLprim value gettextStubCompat_dgettext(
+@@ -85,7 +85,7 @@ CAMLprim value gettextStubCompat_dgettex
+ {
+   CAMLparam2(v_domainname, v_msgid);
+   CAMLreturn(
+-      copy_string(
++      caml_copy_string(
+         dgettext(
+           String_val(v_domainname),
+           String_val(v_msgid))));
+@@ -98,7 +98,7 @@ CAMLprim value gettextStubCompat_dcgette
+ {
+   CAMLparam3(v_domainname, v_msgid, v_category);
+   CAMLreturn(
+-      copy_string(
++      caml_copy_string(
+         dcgettext(
+           String_val(v_domainname),
+           String_val(v_msgid),
+@@ -112,7 +112,7 @@ CAMLprim value gettextStubCompat_ngettex
+ {
+   CAMLparam3(v_msgid1, v_msgid2, v_n);
+   CAMLreturn(
+-      copy_string(
++      caml_copy_string(
+         ngettext(
+           String_val(v_msgid1),
+           String_val(v_msgid2),
+@@ -127,7 +127,7 @@ CAMLprim value gettextStubCompat_dngette
+ {
+   CAMLparam4(v_domainname, v_msgid1, v_msgid2, v_n);
+   CAMLreturn(
+-      copy_string(
++      caml_copy_string(
+         dngettext(
+           String_val(v_domainname),
+           String_val(v_msgid1),
+@@ -158,7 +158,7 @@ CAMLprim value gettextStubCompat_dcngett
+         "NULL string not expected at "STRINGIFY(__LINE__)" in "__FILE__);
+   };
+ 
+-  CAMLreturn(copy_string(res));
++  CAMLreturn(caml_copy_string(res));
+ }
+ 
+ CAMLprim value gettextStubCompat_textdomain(
+--- ocaml-gettext-0.4.2/test/common/dune.orig	2020-06-11 14:40:42.000000000 -0600
++++ ocaml-gettext-0.4.2/test/common/dune	2023-06-22 13:33:50.049275086 -0600
+@@ -1,3 +1,3 @@
+ (library
+  (name common)
+- (libraries gettext.base oUnit))
++ (libraries gettext.base ounit2))
+--- ocaml-gettext-0.4.2/test/dune.orig	2020-06-11 14:40:42.000000000 -0600
++++ ocaml-gettext-0.4.2/test/dune	2023-06-22 13:34:09.487983748 -0600
+@@ -6,7 +6,7 @@
+   ../src/bin/ocaml-xgettext/xgettext.exe
+   (glob_files testdata/*)
+   (glob_files testdata/fr_FR/LC_MESSAGES/*))
+- (libraries oUnit str fileutils gettext.extension common)
++ (libraries ounit2 str fileutils gettext.extension common)
+  (action
+   (run %{test}
+     -runner sequential
+--- ocaml-gettext-0.4.2/test/test-camomile/dune.orig	2020-06-11 14:40:42.000000000 -0600
++++ ocaml-gettext-0.4.2/test/test-camomile/dune	2023-06-22 13:34:24.840753623 -0600
+@@ -4,6 +4,6 @@
+  (deps
+   (glob_files testdata/*)
+   (glob_files ../testdata/fr_FR/LC_MESSAGES/*))
+- (libraries common gettext-camomile oUnit fileutils)
++ (libraries common gettext-camomile ounit2 fileutils)
+  (action
+   (run %{test} -test-dir ../testdata)))
+--- ocaml-gettext-0.4.2/test/test.ml.orig	2020-06-11 14:40:42.000000000 -0600
++++ ocaml-gettext-0.4.2/test/test.ml	2023-06-22 13:35:08.719095972 -0600
+@@ -221,7 +221,7 @@ let install_test =
+     Printf.sprintf "%s warning" fl_mo >:: fun ctxt ->
+       let tests = make_tests ctxt in
+       let out = Buffer.create 13 in
+-      let capture_out strm = Stream.iter (Buffer.add_char out) strm in
++      let capture_out strm = Seq.iter (Buffer.add_char out) strm in
+       let fl_mo = concat tests.test_dir fl_mo in
+       let fl_dst = make_filename (tests.install_dir :: fl_dsts) in
+         assert_command
+@@ -392,7 +392,7 @@ let compile_ocaml =
+                 []
+             in
+             let out = Buffer.create 13 in
+-            let capture_out strm = Stream.iter (Buffer.add_char out) strm in
++            let capture_out strm = Seq.iter (Buffer.add_char out) strm in
+             let match_exp_err = Str.regexp (".*"^(Str.quote exp_err)^".*") in
+             assert_command
+               ~exit_code:(Unix.WEXITED exp_return_code)
+--- ocaml-gettext-0.4.2/test/test-stub/dune.orig	2020-06-11 14:40:42.000000000 -0600
++++ ocaml-gettext-0.4.2/test/test-stub/dune	2023-06-22 13:34:43.239477852 -0600
+@@ -4,6 +4,6 @@
+  (deps
+   (glob_files ../testdata/*)
+   (glob_files ../testdata/fr_FR/LC_MESSAGES/*))
+- (libraries common gettext-stub oUnit)
++ (libraries common gettext-stub ounit2)
+  (action
+   (run %{test} -test-dir ../testdata)))

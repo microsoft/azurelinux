@@ -1,23 +1,17 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-# This package depends on automagic byte compilation
-# https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
-%global _python_bytecompile_extra 1
-
 # these are all substituted by autoconf
 %define pot_file  libsmbios
 %define lang_dom  libsmbios-2.4
 
 Name: libsmbios
-Version: 2.4.2
-Release: 8%{?dist}
+Version: 2.4.3
+Release: 1%{?dist}
 Summary: Libsmbios C/C++ shared libraries
 
-License: GPLv2+ or OSL 2.1
+License: GPL-2.0-or-later or OSL-2.1
 URL: https://github.com/dell/libsmbios
 Source0: https://github.com/dell/libsmbios/archive/v%{version}/libsmbios-%{version}.tar.gz
-
-Patch0001: 0001-libsmbios-fix-more-places-with-loop-iterators-with-b.patch
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -26,10 +20,10 @@ BuildRequires: doxygen
 BuildRequires: gcc-c++
 BuildRequires: gettext
 BuildRequires: gettext-devel
-BuildRequires: git
 BuildRequires: help2man
 BuildRequires: libtool
 BuildRequires: libxml2-devel
+BuildRequires: make
 BuildRequires: pkgconfig
 BuildRequires: python3-devel
 BuildRequires: strace
@@ -94,19 +88,11 @@ This package contains the headers and .a files necessary to compile new client
 programs against libsmbios.
 
 %prep
-%setup -q -n libsmbios-%{version}
+%autosetup -p1
+
 find . -type d -exec chmod -f 755 {} \;
 find doc src -type f -exec chmod -f 644 {} \;
 chmod 755 src/cppunit/*.sh
-git init
-git config user.email "%{name}-owner@fedoraproject.org"
-git config user.name "Fedora Ninjas"
-git config gc.auto 0
-git add .
-git commit -a -q -m "%{version} baseline."
-git am %{patches} </dev/null
-git config --unset user.email
-git config --unset user.name
 
 %build
 # this line lets us build an RPM directly from a git tarball
@@ -119,9 +105,8 @@ echo '../configure "$@"' > configure
 chmod +x ./configure
 
 %configure
-
 mkdir -p out/libsmbios_c
-make CFLAGS+="%{optflags} -Werror" %{?_smp_mflags} 2>&1 | tee build-%{_arch}.log
+%make_build CFLAGS+="%{optflags} -Werror" 2>&1 | tee build-%{_arch}.log
 
 echo \%doc _build/build-%{_arch}.log > buildlogs.txt
 
@@ -150,28 +135,29 @@ find %{buildroot}/%{_includedir} out/libsmbios_c -exec touch -r $TOPDIR/configur
 
 mv out/libsmbios_c    out/libsmbios_c-%{_arch}
 
+# https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_3
+%py_byte_compile %{python3} %{buildroot}%{python3_sitearch}/
+ 
 rename %{pot_file}.mo %{lang_dom}.mo $(find %{buildroot}/%{_datadir} -name %{pot_file}.mo)
 %find_lang %{lang_dom}
 
 %ldconfig_scriptlets
-
 %files -f _build/%{lang_dom}.lang
+# Only need to include license once here
+%license COPYING-GPL COPYING-OSL
 %{_libdir}/libsmbios_c.so.*
 
 %files -n libsmbios-devel -f _build/buildlogs.txt
-%doc COPYING-GPL COPYING-OSL README.md src/bin/getopts_LICENSE.txt src/include/smbios_c/config/boost_LICENSE_1_0_txt
+%license src/bin/getopts_LICENSE.txt src/include/smbios_c/config/boost_LICENSE_1_0_txt
+%doc README.md _build/out/libsmbios_c-%{_arch}
 %{_includedir}/smbios_c
 %{_libdir}/libsmbios_c.so
 %{_libdir}/pkgconfig/*.pc
-%doc _build/out/libsmbios_c-%{_arch}
 
 %files -n smbios-utils
-%doc COPYING-GPL COPYING-OSL README.md
-# no other files.
 
 %files -n smbios-utils-bin
-%doc COPYING-GPL COPYING-OSL README.md
-%doc src/bin/getopts_LICENSE.txt src/include/smbios_c/config/boost_LICENSE_1_0_txt
+%license src/bin/getopts_LICENSE.txt src/include/smbios_c/config/boost_LICENSE_1_0_txt
 %{_sbindir}/smbios-state-byte-ctl
 %{_mandir}/man?/smbios-state-byte-ctl.*
 %{_sbindir}/smbios-get-ut-data
@@ -182,12 +168,10 @@ rename %{pot_file}.mo %{lang_dom}.mo $(find %{buildroot}/%{_datadir} -name %{pot
 %{_mandir}/man?/smbios-sys-info-lite.*
 
 %files -n python3-smbios
-%doc COPYING-GPL COPYING-OSL README.md
 %{python3_sitearch}/*
 
 %files -n smbios-utils-python
-%doc COPYING-GPL COPYING-OSL README.md
-%doc src/bin/getopts_LICENSE.txt src/include/smbios_c/config/boost_LICENSE_1_0_txt
+%license src/bin/getopts_LICENSE.txt src/include/smbios_c/config/boost_LICENSE_1_0_txt
 %dir %{_sysconfdir}/libsmbios
 %config(noreplace) %{_sysconfdir}/libsmbios/*
 
@@ -215,6 +199,10 @@ rename %{pot_file}.mo %{lang_dom}.mo $(find %{buildroot}/%{_datadir} -name %{pot
 %{_datadir}/smbios-utils
 
 %changelog
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.4.3-1
+- Update to version 2.4.3
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.2-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

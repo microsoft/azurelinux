@@ -1,0 +1,43 @@
+From 820bf9f58bd8bd88a45f8355ffea8e8ac4890328 Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 19 Jun 2024 09:07:56 +0200
+Subject: [PATCH 19/19] NetworkPkg/DxeNetLib: adjust PseudoRandom error logging
+
+There is a list of allowed rng algorithms, if /one/ of them is not
+supported this is not a problem, only /all/ of them failing is an
+error condition.
+
+Downgrade the message for a single unsupported algorithm from ERROR to
+VERBOSE.  Add an error message in case we finish the loop without
+finding a supported algorithm.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+(cherry picked from commit 6862b9d538d96363635677198899e1669e591259)
+---
+ NetworkPkg/Library/DxeNetLib/DxeNetLib.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/NetworkPkg/Library/DxeNetLib/DxeNetLib.c b/NetworkPkg/Library/DxeNetLib/DxeNetLib.c
+index 01c13c08d203..4dfbe91a5554 100644
+--- a/NetworkPkg/Library/DxeNetLib/DxeNetLib.c
++++ b/NetworkPkg/Library/DxeNetLib/DxeNetLib.c
+@@ -951,7 +951,7 @@ PseudoRandom (
+         //
+         // Secure Algorithm was not supported on this platform
+         //
+-        DEBUG ((DEBUG_ERROR, "Failed to generate random data using secure algorithm %d: %r\n", AlgorithmIndex, Status));
++        DEBUG ((DEBUG_VERBOSE, "Failed to generate random data using secure algorithm %d: %r\n", AlgorithmIndex, Status));
+ 
+         //
+         // Try the next secure algorithm
+@@ -971,6 +971,7 @@ PseudoRandom (
+     // If we get here, we failed to generate random data using any secure algorithm
+     // Platform owner should ensure that at least one secure algorithm is supported
+     //
++    DEBUG ((DEBUG_ERROR, "Failed to generate random data, no supported secure algorithm found\n"));
+     ASSERT_EFI_ERROR (Status);
+     return Status;
+   }
+-- 
+2.45.2
+

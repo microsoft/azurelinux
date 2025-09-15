@@ -1,0 +1,7 @@
+{
+    "packages": [
+        "createrepo_c",
+        "python3",
+        "shadow-utils"
+    ]
+}

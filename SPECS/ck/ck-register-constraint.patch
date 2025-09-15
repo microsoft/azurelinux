@@ -1,0 +1,33 @@
+commit b02bb2b805c970e6ef90e8e15daafa5d78cb195f
+Author: Paul Khuong <pvk@google.com>
+Date:   Wed Aug 21 10:08:10 2019 -0400
+
+    x86/ck_pr: fix register constraint for ck_pr_foo_is_zero
+    
+    setcc works with byte registers, so we want `q` to ensure
+    the low byte register is encodable, not the general `r`.
+    
+    Fixes https://github.com/concurrencykit/ck/issues/142.
+
+diff --git a/include/gcc/x86/ck_pr.h b/include/gcc/x86/ck_pr.h
+index e678e83..8ef8864 100644
+--- a/include/gcc/x86/ck_pr.h
++++ b/include/gcc/x86/ck_pr.h
+@@ -239,7 +239,7 @@ CK_PR_FAA_S(8,  uint8_t,  "xaddb")
+ 		bool ret;						\
+ 		__asm__ __volatile__(CK_PR_LOCK_PREFIX I " %0; setz %1"	\
+ 					: "+m" (*(C *)target),		\
+-					  "=rm" (ret)			\
++					  "=qm" (ret)			\
+ 					:				\
+ 					: "memory", "cc");		\
+ 		return ret;						\
+@@ -354,7 +354,7 @@ CK_PR_CAS_S(8,  uint8_t,  "cmpxchgb")
+ 					: "q"   (set),				\
+ 					  "a"   (compare)			\
+ 					: "memory", "cc");			\
+-		return (bool)z;							\
++		return z;							\
+ 	}
+ 
+ CK_PR_CAS_O(ptr, void, void *, char, "l", "eax")

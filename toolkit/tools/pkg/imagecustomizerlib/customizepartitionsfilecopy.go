@@ -7,17 +7,17 @@ import (
 	"fmt"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/sirupsen/logrus"
 )
 
 func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	buildImageFile string, newBuildImageFile string,
-) error {
+) (map[string]string, error) {
 	existingImageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot", false)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer existingImageConnection.Close()
 
@@ -27,18 +27,18 @@ func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, co
 		return copyFilesIntoNewDisk(existingImageConnection.Chroot(), imageChroot)
 	}
 
-	err = createNewImage(newBuildImageFile, diskConfig, config.Storage.FileSystems,
+	partIdToPartUuid, err := createNewImage(newBuildImageFile, diskConfig, config.Storage.FileSystems,
 		buildDir, "newimageroot", installOSFunc)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = existingImageConnection.CleanClose()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return partIdToPartUuid, nil
 }
 
 func copyFilesIntoNewDisk(existingImageChroot *safechroot.Chroot, newImageChroot *safechroot.Chroot) error {
@@ -56,7 +56,10 @@ func copyPartitionFiles(sourceRoot, targetRoot string) error {
 	copyArgs := []string{"--verbose", "--no-clobber", "-a", "--no-dereference", "--sparse", "always",
 		sourceRoot, targetRoot}
 
-	err := shell.ExecuteLiveWithErrAndCallbacks(1, func(...interface{}) {}, logger.Log.Debug, "cp", copyArgs...)
+	err := shell.NewExecBuilder("cp", copyArgs...).
+		LogLevel(logrus.TraceLevel, logrus.DebugLevel).
+		ErrorStderrLines(1).
+		Execute()
 	if err != nil {
 		return fmt.Errorf("failed to copy files:\n%w", err)
 	}

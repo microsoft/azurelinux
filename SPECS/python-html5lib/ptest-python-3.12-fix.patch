@@ -1,0 +1,57 @@
+From 4a87368b71090f1432df6302f178c4babfcec93f Mon Sep 17 00:00:00 2001
+From: Christian Clauss <cclauss@me.com>
+Date: Wed, 10 Jan 2024 15:13:40 +0100
+Subject: [PATCH] GitHub Actions: python: ["3.8", "3.9", "3.10", "3.11",
+ "3.12"] (#575)
+
+---
+ html5lib/tests/tokenizer.py         |  4 +++-
+ html5lib/tests/tree_construction.py |  4 +++-
+ requirements-test.txt               |  3 ++-
+ 3 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/html5lib/tests/tokenizer.py b/html5lib/tests/tokenizer.py
+index cc9897a4..b49d2e6e 100644
+--- a/html5lib/tests/tokenizer.py
++++ b/html5lib/tests/tokenizer.py
+@@ -246,7 +246,9 @@ def runtest(self):
+     def repr_failure(self, excinfo):
+         traceback = excinfo.traceback
+         ntraceback = traceback.cut(path=__file__)
+-        excinfo.traceback = ntraceback.filter()
++        pytest_ver = getattr(pytest, "version_tuple", ())
++        filter_args = (excinfo,) if pytest_ver >= (7, 4, 0) else ()
++        excinfo.traceback = ntraceback.filter(*filter_args)
+ 
+         return excinfo.getrepr(funcargs=True,
+                                showlocals=False,
+diff --git a/html5lib/tests/tree_construction.py b/html5lib/tests/tree_construction.py
+index fb0657bf..363b48c2 100644
+--- a/html5lib/tests/tree_construction.py
++++ b/html5lib/tests/tree_construction.py
+@@ -135,7 +135,9 @@ def runtest(self):
+     def repr_failure(self, excinfo):
+         traceback = excinfo.traceback
+         ntraceback = traceback.cut(path=__file__)
+-        excinfo.traceback = ntraceback.filter()
++        pytest_ver = getattr(pytest, "version_tuple", ())
++        filter_args = (excinfo,) if pytest_ver >= (7, 4, 0) else ()
++        excinfo.traceback = ntraceback.filter(*filter_args)
+ 
+         return excinfo.getrepr(funcargs=True,
+                                showlocals=False,
+diff --git a/requirements-test.txt b/requirements-test.txt
+index 27866e59..39913ee4 100644
+--- a/requirements-test.txt
++++ b/requirements-test.txt
+@@ -3,8 +3,9 @@
+ tox>=3.15.1,<4
+ flake8>=3.8.1,<3.9
+ pytest>=4.6.10,<5 ; python_version < '3'
+-pytest>=5.4.2,<7 ; python_version >= '3'
++pytest>=5.4.2,<8 ; python_version >= '3'
+ coverage>=5.1,<6
+ pytest-expect>=1.1.0,<2
+ mock>=3.0.5,<4 ; python_version < '3.6'
+ mock>=4.0.2,<5 ; python_version >= '3.6'
++setuptools; python_version >= '3.12'

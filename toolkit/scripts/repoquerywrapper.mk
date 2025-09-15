@@ -28,7 +28,7 @@ clean-repo-query:
 #
 .PHONY: repoquerywrapper_always_run_phony
 repo-query: $(STATUS_FLAGS_DIR)/repoquerywrapper.flag
-$(STATUS_FLAGS_DIR)/repoquerywrapper.flag: $(go-repoquerywrapper) $(chroot_worker) repoquerywrapper_always_run_phony 
+$(STATUS_FLAGS_DIR)/repoquerywrapper.flag: $(go-repoquerywrapper) $(chroot_worker) $(depend_REPO_LIST) $(REPO_LIST) repoquerywrapper_always_run_phony
 	@if [ "$(DISABLE_UPSTREAM_REPOS)" = "y" ]; then \
 		echo "ERROR: Upstream repos are disabled (DISABLE_UPSTREAM_REPOS=y), cannot repo-query RPMs"; \
 		exit 1; \

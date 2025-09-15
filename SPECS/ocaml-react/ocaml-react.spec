@@ -1,85 +1,81 @@
 Summary:        OCaml framework for Functional Reactive Programming (FRP)
 Name:           ocaml-react
-Version:        1.2.1
-Release:        8%{?dist}
+Version:        1.2.2
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://erratique.ch/software/react
-Source0:        http://erratique.ch/software/react/releases/react-%{version}.tbz
+Source0:        %{url}/releases/react-%{version}.tbz
 
-BuildRequires:  ocaml >= 4.01.0
-BuildRequires:  ocaml-findlib-devel
+BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-ocamlbuild
+BuildRequires:  ocaml-findlib
 BuildRequires:  ocaml-ocamldoc
-BuildRequires:  ocaml-topkg-devel >= 0.9.0
+BuildRequires:  ocaml-rpm-macros
+BuildRequires:  ocaml-topkg-devel >= 1.0.3
 
+# Do not require ocaml-compiler-libs at runtime
+%global __ocaml_requires_opts -i Asttypes -i Build_path_prefix_map -i Cmi_format -i Env -i Ident -i Identifiable -i Load_path -i Location -i Longident -i Misc -i Outcometree -i Parsetree -i Path -i Primitive -i Shape -i Subst -i Toploop -i Type_immediacy -i Types -i Warnings
+ 
+ 
 %description
 React is an OCaml module for functional reactive programming (FRP). It
 provides support to program with time varying values : declarative
 events and signals. React doesn't define any primitive event or
 signal; it lets the client choose the concrete timeline.
-
+ 
 React is made of a single, independent module and distributed under
 the ISC license.
-
+ 
 Given an absolute notion of time Rtime helps you to manage a timeline
 and provides time stamp events, delayed events and delayed signals.
-
+ 
+ 
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-
+ 
+ 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
-
+ 
+ 
 %prep
 %autosetup -n react-%{version}
-
+ 
 # require debug info
 echo $'\ntrue: debug' >> _tags
-
+ 
+# expose a math library dependency to RPM
+echo $'\ntrue: cclib(-lm)' >> _tags
+ 
+ 
 %build
 ocaml pkg/pkg.ml build --tests true
-
+ 
+ 
 %install
-mkdir -p %{buildroot}%{_libdir}/ocaml/react
-for f in \
-  pkg/META \
-  opam \
-%ifarch %{ocaml_native_compiler}
-  src/*.cmx \
-%endif
-  src/*.{a,cma,cmi,mli,cmxa,cmxs}
-do
-  cp -p _build/$f %{buildroot}%{_libdir}/ocaml/react/
-done
-
+%ocaml_install
+ 
 %check
 ocaml pkg/pkg.ml test
-
-%files
+ 
+ 
+%files -f .ofiles
 %license LICENSE.md
-%dir %{_libdir}/ocaml/react/
-%{_libdir}/ocaml/react/META
-%{_libdir}/ocaml/react/*.cma
-%{_libdir}/ocaml/react/*.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/react/*.cmxs
-%endif
-
-%files devel
+ 
+ 
+%files devel -f .ofiles-devel
 %doc CHANGES.md README.md
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/react/*.a
-%{_libdir}/ocaml/react/*.cmx
-%{_libdir}/ocaml/react/*.cmxa
-%endif
-%{_libdir}/ocaml/react/*.mli
-%{_libdir}/ocaml/react/opam
 
 %changelog
+* Mon May 06 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.2.2-1
+- Converted spec file to match with Fedora 41.
+- Upgrade to 1.2.2
+- Use ocaml 5.1.1 to build and update other build requirements
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.1-8
 - Cleaning-up spec. License verified.
 

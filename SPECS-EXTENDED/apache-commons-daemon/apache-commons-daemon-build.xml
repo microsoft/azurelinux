@@ -7,7 +7,7 @@
     <property name="project.artifactId" value="commons-daemon" />
     <property name="project.version" value="1.2.3" />
 
-    <property name="compiler.source" value="1.6" />
+    <property name="compiler.source" value="1.8" />
     <property name="compiler.target" value="${compiler.source}" />
 
     <property name="build.finalName" value="${project.artifactId}-${project.version}" />

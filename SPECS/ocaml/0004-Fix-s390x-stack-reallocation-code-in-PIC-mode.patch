@@ -1,0 +1,24 @@
+From 81d3fb3e20afede32298e4d3e78bcebf6a22858a Mon Sep 17 00:00:00 2001
+From: Vincent Laviron <vincent.laviron@gmail.com>
+Date: Fri, 15 Dec 2023 10:00:52 +0100
+Subject: [PATCH 4/4] Fix s390x stack reallocation code in PIC mode
+ 
+(cherry picked from commit c40a955c029a203d0d7f05718e297e66987ec87f)
+---
+ asmcomp/s390x/emit.mlp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+ 
+diff --git a/asmcomp/s390x/emit.mlp b/asmcomp/s390x/emit.mlp
+index 35ade079f6..0212cf3b00 100644
+--- a/asmcomp/s390x/emit.mlp
++++ b/asmcomp/s390x/emit.mlp
+@@ -751,7 +751,7 @@ let fundecl fundecl =
+       `  lay  %r15, -8(%r15)\n`;
+       `  stg  %r14, 0(%r15)\n`;
+       `  lgfi %r12, {emit_int s}\n`;
+-      `  brasl %r14, {emit_symbol "caml_call_realloc_stack"}\n`;
++      emit_call "caml_call_realloc_stack";
+       `  lg   %r14, 0(%r15)\n`;
+       `  la  %r15, 8(%r15)\n`;
+       `  brcl 15, {emit_label ret}\n`
+-- 

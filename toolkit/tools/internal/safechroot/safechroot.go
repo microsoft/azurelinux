@@ -4,10 +4,12 @@
 package safechroot
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -28,11 +30,26 @@ const BindMountPointFlags = unix.MS_BIND | unix.MS_MGC_VAL
 
 // FileToCopy represents a file to copy into a chroot using AddFiles. Dest is relative to the chroot directory.
 type FileToCopy struct {
-	Src         string
+	// The source file path.
+	// Mutually exclusive with 'Content'.
+	Src string
+	// The contents of the file to write.
+	// Mutually exclusive with 'Src'.
+	Content *string
+	// The destination path to write/copy the file to.
 	Dest        string
 	Permissions *os.FileMode
 	// Set to true to copy symlinks as symlinks.
 	NoDereference bool
+}
+
+// DirToCopy represents a directory to copy into a chroot using AddDirs. Dest is relative to the chroot directory.
+type DirToCopy struct {
+	Src                  string
+	Dest                 string
+	NewDirPermissions    os.FileMode
+	ChildFilePermissions os.FileMode
+	MergedDirPermissions *os.FileMode
 }
 
 // MountPoint represents a system mount point used by a Chroot.
@@ -55,7 +72,8 @@ type Chroot struct {
 	rootDir     string
 	mountPoints []*MountPoint
 
-	isExistingDir bool
+	isExistingDir        bool
+	includeDefaultMounts bool
 }
 
 // inChrootMutex guards against multiple Chroots entering their respective Chroots
@@ -287,6 +305,7 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 
 		// Assign to `c.mountPoints` now since `Initialize` will call `unmountAndRemove` if an error occurs.
 		c.mountPoints = allMountPoints
+		c.includeDefaultMounts = includeDefaultMounts
 
 		// Mount with the original unsorted order. Assumes the order of mounts is important.
 		err = c.createMountPoints()
@@ -303,6 +322,12 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 	return
 }
 
+// AddDirs copies each directory 'Src' to the relative path chrootRootDir/'Dest' in the chroot.
+func (c *Chroot) AddDirs(dirToCopy DirToCopy) (err error) {
+	return file.CopyDir(dirToCopy.Src, filepath.Join(c.rootDir, dirToCopy.Dest), dirToCopy.NewDirPermissions,
+		dirToCopy.ChildFilePermissions, dirToCopy.MergedDirPermissions)
+}
+
 // AddFiles copies each file 'Src' to the relative path chrootRootDir/'Dest' in the chroot.
 func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
 	return AddFilesToDestination(c.rootDir, filesToCopy...)
@@ -310,20 +335,66 @@ func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
 
 func AddFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 	for _, f := range filesToCopy {
-		dest := filepath.Join(destDir, f.Dest)
-		fileCopyOp := file.NewFileCopyBuilder(f.Src, dest)
-		if f.NoDereference {
-			fileCopyOp = fileCopyOp.SetNoDereference()
-		}
-		if f.Permissions != nil {
-			fileCopyOp = fileCopyOp.SetFileMode(*f.Permissions)
-		}
+		switch {
+		case f.Src != "" && f.Content != nil:
+			return fmt.Errorf("cannot specify both 'Src' and 'Content' for 'FileToCopy'")
 
-		err := fileCopyOp.Run()
-		if err != nil {
-			return fmt.Errorf("failed to copy (%s):\n%w", f.Src, err)
+		case f.Src != "":
+			err := copyFile(destDir, f)
+			if err != nil {
+				return err
+			}
+
+		case f.Content != nil:
+			err := writeFile(destDir, f)
+			if err != nil {
+				return err
+			}
+
+		default:
+			return fmt.Errorf("must specify either 'Src' and 'Content' for 'FileToCopy'")
 		}
 	}
+
+	return nil
+}
+
+func copyFile(destDir string, f FileToCopy) error {
+	dest := filepath.Join(destDir, f.Dest)
+	fileCopyOp := file.NewFileCopyBuilder(f.Src, dest)
+	if f.NoDereference {
+		fileCopyOp = fileCopyOp.SetNoDereference()
+	}
+	if f.Permissions != nil {
+		fileCopyOp = fileCopyOp.SetFileMode(*f.Permissions)
+	}
+
+	err := fileCopyOp.Run()
+	if err != nil {
+		return fmt.Errorf("failed to copy (%s) to (%s):\n%w", f.Src, f.Dest, err)
+	}
+
+	return nil
+}
+
+func writeFile(destDir string, f FileToCopy) error {
+	dest := filepath.Join(destDir, f.Dest)
+	err := file.Write(*f.Content, dest)
+	if err != nil {
+		return fmt.Errorf("failed to write file (%s):\n%w", f.Dest, err)
+	}
+
+	if f.Permissions != nil {
+		err = os.Chmod(dest, *f.Permissions)
+		if err != nil {
+			return fmt.Errorf("failed to set file permissions (%s):\n%w", f.Dest, err)
+		}
+	}
+
+	return nil
+}
+
+func (c *Chroot) WriteFiles() error {
 	return nil
 }
 
@@ -428,6 +499,14 @@ func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 		if index < 0 {
 			// Already closed.
 			return
+		}
+
+		// Stops gpg-agent and keyboxd if they are running inside the chroot.
+		// This is to avoid leaving folders like /dev mounted when the chroot folder is forcefully deleted in cleanup.
+		err = c.stopGPGComponents()
+		if err != nil {
+			// Don't want to leave a stale root if GPG components fail to exit. Logging a Warn and letting close continue...
+			logger.Log.Warnf("Failed to stop GPG components while tearing down the (%s) chroot: %s", c.rootDir, err)
 		}
 
 		// mount is only supported in regular pipeline
@@ -579,11 +658,11 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, lazyUnmount bool) (err error) {
 			continue
 		}
 
-		_, err = retry.RunWithExpBackoff(func() error {
+		_, err = retry.RunWithExpBackoff(context.Background(), func() error {
 			logger.Log.Debugf("Calling unmount on path(%s) with flags (%v)", fullPath, unmountFlags)
 			umountErr := unix.Unmount(fullPath, unmountFlags)
 			return umountErr
-		}, totalAttempts, retryDuration, 2.0, nil)
+		}, totalAttempts, retryDuration, 2.0)
 
 		if err != nil {
 			err = fmt.Errorf("failed to unmount (%s):\n%w", fullPath, err)
@@ -688,4 +767,73 @@ func (c *Chroot) GetMountPoints() []*MountPoint {
 	// Create a copy of the list so that the caller can't mess with the list.
 	mountPoints := append([]*MountPoint(nil), c.mountPoints...)
 	return mountPoints
+}
+
+// stopGPGComponents stops gpg-agent and keyboxd if they are running inside the chroot.
+//
+// A GPG agent may have been started while the chroot was in use. Newer versions of "gnupg2" will also start keyboxd.
+// E.g. when installing the azurelinux-repos-shared package, a GPG import occurs. This starts the gpg-agent process inside the chroot.
+// To be able to cleanly exit the setup chroot, we must stop it.
+func (c *Chroot) stopGPGComponents() (err error) {
+	if !c.includeDefaultMounts {
+		// gpgconf doesn't work if it doesn't have access to /proc.
+		return
+	}
+
+	err = c.UnsafeRun(func() (err error) {
+		found, chrootErr := file.CommandExists("gpgconf")
+		if chrootErr != nil {
+			return chrootErr
+		}
+		if !found {
+			logger.Log.Debugf("gpgconf is not installed, so gpg-agent is not running: %s", err)
+			return nil
+		}
+
+		components, chrootErr := listGPGComponents()
+		if chrootErr != nil {
+			return chrootErr
+		}
+		// List of components to kill. The names must be verbatim identical to the name tag that is used by `gpgconf`
+		componentsToKill := []string{"gpg-agent", "keyboxd"}
+		return killGPGComponents(componentsToKill, components)
+	})
+
+	return
+}
+
+// killGPGComponents will kill the GPG components from the 'componentsToKill' list
+// if they are inside the 'availableComponents' set.
+func killGPGComponents(componentsToKill []string, availableComponents map[string]bool) (err error) {
+	for _, component := range componentsToKill {
+		if availableComponents[component] {
+			logger.Log.Debugf("Found %s running inside chroot. Stopping it.", component)
+			_, stderr, err := shell.Execute("gpgconf", "--kill", component)
+			if err != nil {
+				return fmt.Errorf("failed to stop GPG component (%s):\nerr: %w\nstderr: %s", component, err, stderr)
+			}
+		}
+	}
+	return
+}
+
+// listGPGComponents will return a set of all GPG component.
+func listGPGComponents() (components map[string]bool, err error) {
+	stdout, stderr, err := shell.NewExecBuilder("gpgconf", "--list-components").
+		LogLevel(logrus.DebugLevel, logrus.DebugLevel).
+		ExecuteCaptureOuput()
+	if err != nil {
+		err = fmt.Errorf("failed to list GPG components.\nerr:%w\nstderr: %s", err, stderr)
+		return
+	}
+
+	components = make(map[string]bool)
+
+	// Split --list-components stdout into a list of name tags, one for each component
+	// Stdout has the following format: <component>:<description>:<pgmname>:
+	for _, line := range strings.Split(stdout, "\n") {
+		components[strings.Split(line, ":")[0]] = true
+	}
+
+	return
 }

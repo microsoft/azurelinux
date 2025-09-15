@@ -2,7 +2,7 @@
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.15.8
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,6 +16,8 @@ BuildRequires:  expat-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  systemd-bootstrap-devel
 BuildRequires:  xz-devel
+BuildRequires:  filesystem
+Requires:       filesystem
 Requires:       expat
 Requires:       xz
 # Using the weak dependency 'Recommends' to break a circular dependency during
@@ -67,31 +69,35 @@ make %{?_smp_mflags} check
 
 %files
 %defattr(-,root,root)
+%attr(4750,root,messagebus) %{_libexecdir}/dbus-daemon-launch-helper
 %license COPYING
-%{_sysconfdir}/dbus-1
 %{_bindir}/*
+%{_datadir}/dbus-1
+%{_docdir}/*
 %{_libdir}/libdbus-1.so.*
 %{_libdir}/tmpfiles.d/dbus.conf
-%exclude %{_libdir}/sysusers.d
+%{_sysconfdir}/dbus-1
 %{_unitdir}/*
-%{_libexecdir}/*
-%{_docdir}/*
-%{_datadir}/dbus-1
+%exclude %{_libdir}/sysusers.d
 
 #%%{_sharedstatedir}/*
 
 %files devel
 %defattr(-,root,root)
-%{_includedir}/*
 %{_datadir}/xml/dbus-1
-%{_libdir}/cmake/DBus1
-%dir %{_libdir}/dbus-1.0
-%{_libdir}/dbus-1.0/include/
-%{_libdir}/pkgconfig/*.pc
+%{_includedir}/*
 %{_libdir}/*.a
 %{_libdir}/*.so
+%{_libdir}/cmake/DBus1
+%{_libdir}/dbus-1.0/include/
+%{_libdir}/pkgconfig/*.pc
+%dir %{_libdir}/dbus-1.0
 
 %changelog
+* Tue Mar 20 2024 Sam Meluch <sammeluch@microsfot.com> - 1.15.8-3
+- fix attributes on dbus-daemon-launch-helper
+- sort files list
+
 * Wed Mar 20 2024 Dan Streetman <ddstreet@microsoft.com> - 1.15.8-2
 - specify runstatedir to avoid "Line references path below legacy
   directory /var/run/" warnings

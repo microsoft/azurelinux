@@ -69,7 +69,6 @@ const (
 	// Errors
 	InvalidBootPartitionErrorFmt       = "Invalid boot partition: first partition must be of type '%s'"
 	InvalidRootPartitionErrorFmt       = "Must specify a partition to have the mount point '%s'"
-	InvalidRootDeviceMapperError       = "Must have a root to use with device mapper roots (Encryption, Read-Only)"
 	InvalidRootPartitionErrorFormatFmt = "Root partition cannot be %s"
 	MountPointAlreadyInUseError        = "Mount point is already in use"
 	MountPointStartError               = "Mount point must start with `/`"
@@ -136,8 +135,6 @@ const (
 
 	PasswordMismatchFeedback = "Passwords do not match"
 	EnumNavigationFeedback   = "Use left or right arrow keys to change the selection"
-
-	EncryptionVerityIncompatible = "Encrypted and read-only roots are currently incompatible with each other"
 
 	UserNameEmptyError            = "user name cannot be empty"
 	UserNameInvalidRuneError      = "user name should only contain alpha-numeric and '-', '.' or '_' characters"

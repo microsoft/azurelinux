@@ -8,20 +8,21 @@ Distribution:   Azure Linux
 
 Summary: Library for reading RAW files obtained from digital photo cameras
 Name: LibRaw
-Version: 0.19.5
-Release: 5%{?dist}
+Version: 0.21.3
+Release: 1%{?dist}
 License: BSD and (CDDL or LGPLv2)
 URL: http://www.libraw.org
+Source0: https://www.libraw.org/data/%{name}-%{version}.tar.gz
 
 BuildRequires: gcc-c++
 BuildRequires: pkgconfig(lcms2)
 BuildRequires: pkgconfig(jasper)
 BuildRequires: pkgconfig(libjpeg)
-BuildRequires: autoconf automake libtool
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: libtool
 
-Source0: http://www.libraw.org/data/%{name}-%{version}.tar.gz
-Patch0:  LibRaw-0.6.0-pkgconfig.patch
-Patch1:  CVE-2020-15503.patch
+Patch0:  LibRaw-pkgconfig.patch
 Provides: bundled(dcraw) = 9.25
 
 %description
@@ -58,9 +59,6 @@ LibRaw sample programs
 %prep
 %setup -q
 
-%patch 0 -p0 -b .pkgconfig
-%patch 1 -p1 -b .cve-2020-15503
-
 %build
 autoreconf -if
 %configure \
@@ -95,8 +93,8 @@ rm -fv %{buildroot}%{_libdir}/lib*.la
 %files
 %doc Changelog.txt
 %license LICENSE.CDDL LICENSE.LGPL COPYRIGHT
-%{_libdir}/libraw.so.19*
-%{_libdir}/libraw_r.so.19*
+%{_libdir}/libraw.so.*
+%{_libdir}/libraw_r.so.*
 
 %files static
 %{_libdir}/libraw.a
@@ -121,6 +119,10 @@ rm -fv %{buildroot}%{_libdir}/lib*.la
 
 
 %changelog
+* Mon Sept 30 2024 Jyoti Kanase  <v-jykanase@microsoft.com> - 0.21.3-1
+- Upgrade the version to 0.21.3
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.19.5-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

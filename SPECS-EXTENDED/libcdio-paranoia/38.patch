@@ -1,0 +1,620 @@
+From 9106b5c9031dee5175d8b347114553362c916166 Mon Sep 17 00:00:00 2001
+From: Matt McKenzie <matt.mckenzie@gmail.com>
+Date: Wed, 14 Feb 2024 15:43:11 -0800
+Subject: [PATCH 1/8] Ignore drive offset when verifying track numbers. cdio
+ doesn't bias by them and the results are wrong for drives with offsets
+ greater than a sector's worth of samples (588).
+
+---
+ include/cdio/paranoia/cdda.h |  1 +
+ lib/cdda_interface/toc.c     |  2 +-
+ src/cd-paranoia.c            | 12 +++++++-----
+ 3 files changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/include/cdio/paranoia/cdda.h b/include/cdio/paranoia/cdda.h
+index 05718ea..bd638c9 100644
+--- a/include/cdio/paranoia/cdda.h
++++ b/include/cdio/paranoia/cdda.h
+@@ -137,6 +137,7 @@ struct cdrom_drive_s {
+ 		       the flag masks to simulate a particular kind of
+ 		       failure.    */
+ 
++  long toc_offset;
+ };
+ 
+ 
+diff --git a/lib/cdda_interface/toc.c b/lib/cdda_interface/toc.c
+index 2e32be8..4c2d6fc 100644
+--- a/lib/cdda_interface/toc.c
++++ b/lib/cdda_interface/toc.c
+@@ -172,7 +172,7 @@ cdio_cddap_sector_gettrack(cdrom_drive_t *d, lsn_t lsn)
+     cderror(d,"400: Device not open\n");
+     return CDIO_INVALID_TRACK;
+   } else {
+-    if (lsn < d->disc_toc[0].dwStartSector)
++    if (lsn < d->disc_toc[0].dwStartSector - d->toc_offset)
+       return 0; /* We're in the pre-gap of first track */
+ 
+     return cdio_get_track(d->p_cdio, lsn);
+diff --git a/src/cd-paranoia.c b/src/cd-paranoia.c
+index 1bb3af8..ee424aa 100644
+--- a/src/cd-paranoia.c
++++ b/src/cd-paranoia.c
+@@ -225,7 +225,7 @@ parse_offset(cdrom_drive_t *d, char *offset, int begin)
+ 
+   /* We don't want to outside of the track; if it's relative, that's OK... */
+   if( i_track != CDIO_INVALID_TRACK ){
+-    if (cdda_sector_gettrack(d,ret) != i_track) {
++    if (cdda_sector_gettrack(d,ret - d->toc_offset) != i_track) {
+       report("Time/sector offset goes beyond end of specified track.");
+       exit(1);
+     }
+@@ -1123,6 +1123,8 @@ main(int argc,char *argv[])
+     toc_offset = -cdda_track_firstsector(d,1);
+   }
+ 
++  d->toc_offset = toc_offset;
++
+   {
+     int i;
+     for( i=0; i < d->tracks+1; i++ )
+@@ -1189,9 +1191,9 @@ main(int argc,char *argv[])
+     }
+ 
+     {
+-      int track1 = cdda_sector_gettrack(d, i_first_lsn);
++      int track1 = cdda_sector_gettrack(d, i_first_lsn - d->toc_offset);
+ 
+-      int track2 = cdda_sector_gettrack(d, i_last_lsn);
++      int track2 = cdda_sector_gettrack(d, i_last_lsn - d->toc_offset);
+       long off1  = i_first_lsn - cdda_track_firstsector(d, track1);
+       long off2  = i_last_lsn  - cdda_track_firstsector(d, track2);
+       int i;
+@@ -1468,7 +1470,7 @@ main(int argc,char *argv[])
+ 
+           /* One last bit of silliness to deal with sample offsets */
+           if(sample_offset && cursor>batch_last){
+-	    if (cdda_sector_gettrack(d, batch_last) < d->tracks || force_overread) {
++	    if (cdda_sector_gettrack(d, batch_last - toc_offset) < d->tracks || force_overread) {
+ 	      int i;
+ 
+ 	      /* Need to flush the buffer when overreading into the leadout */
+@@ -1521,7 +1523,7 @@ main(int argc,char *argv[])
+ 
+ 	/* Write sectors of silent audio to compensate for
+ 	   missing samples that would be in the leadout */
+-	if (cdda_sector_gettrack(d, batch_last) == d->tracks &&
++	if (cdda_sector_gettrack(d, batch_last - toc_offset) == d->tracks &&
+ 		toc_offset > 0 && !force_overread)
+ 	{
+ 		char *silence;
+
+From b5f04b7d1e70fdec06f516551a6b18590379f273 Mon Sep 17 00:00:00 2001
+From: Matt McKenzie <matt.mckenzie@gmail.com>
+Date: Thu, 15 Feb 2024 00:48:45 -0800
+Subject: [PATCH 2/8] Attempt to catch all cases of biased sectors in
+ cd-paranoia and toc. Use correct, raw values when calling cdio.
+
+---
+ lib/cdda_interface/toc.c | 16 ++++++++--------
+ src/cd-paranoia.c        | 14 +++++++++-----
+ 2 files changed, 17 insertions(+), 13 deletions(-)
+
+diff --git a/lib/cdda_interface/toc.c b/lib/cdda_interface/toc.c
+index 4c2d6fc..9d945f6 100644
+--- a/lib/cdda_interface/toc.c
++++ b/lib/cdda_interface/toc.c
+@@ -43,7 +43,7 @@ cdda_track_firstsector(cdrom_drive_t *d, track_t i_track)
+ 
+     if (i_track == CDIO_CDROM_LEADOUT_TRACK) i_track = i_last_track;
+     if (i_track == 0) {
+-      if (d->disc_toc[0].dwStartSector == 0) {
++      if (d->disc_toc[0].dwStartSector - d->toc_offset == 0) {
+ 	/* first track starts at lba 0 -> no pre-gap */
+ 	cderror(d,"402: No initial pregap\n");
+ 	return(-402);
+@@ -57,7 +57,7 @@ cdda_track_firstsector(cdrom_drive_t *d, track_t i_track)
+       cderror(d, buf);
+       return(-401);
+     }
+-    return(d->disc_toc[i_track-i_first_track].dwStartSector);
++    return(d->disc_toc[i_track-i_first_track].dwStartSector - d->toc_offset);
+   }
+ }
+ 
+@@ -99,13 +99,13 @@ cdda_track_lastsector(cdrom_drive_t *d, track_t i_track)
+     const track_t i_last_track  = cdio_get_last_track_num(d->p_cdio);
+ 
+     if (i_track == 0) {
+-      if (d->disc_toc[0].dwStartSector == 0) {
++      if (d->disc_toc[0].dwStartSector - d->toc_offset == 0) {
+ 	/* first track starts at lba 0 -> no pre-gap */
+ 	cderror(d,"402: No initial pregap\n");
+ 	return(-402);
+       }
+       else {
+-	return d->disc_toc[0].dwStartSector-1;
++	return ((d->disc_toc[0].dwStartSector - d->toc_offset) - 1);
+       }
+     } else if (i_track < i_first_track || i_track > i_last_track) {
+       char buf[100];
+@@ -116,15 +116,15 @@ cdda_track_lastsector(cdrom_drive_t *d, track_t i_track)
+ 
+     /* CD Extra have their first session ending at the last audio track */
+     if (d->cd_extra > 0 && i_track-i_first_track+2 <= d->tracks) {
+-      if (d->audio_last_sector >= d->disc_toc[i_track-i_first_track].dwStartSector &&
+-          d->audio_last_sector < d->disc_toc[i_track-i_first_track+1].dwStartSector) {
++      if (d->audio_last_sector >= (d->disc_toc[i_track-i_first_track].dwStartSector - d->toc_offset) &&
++          d->audio_last_sector < (d->disc_toc[i_track-i_first_track+1].dwStartSector - d->toc_offset)) {
+         return d->audio_last_sector;
+       }
+     }
+ 
+     /* Index safe because we always have the leadout at
+      * disc_toc[tracks] */
+-    return(d->disc_toc[i_track-i_first_track+1].dwStartSector-1);
++    return((d->disc_toc[i_track-i_first_track+1].dwStartSector - d->toc_offset) - 1);
+   }
+ }
+ 
+@@ -172,7 +172,7 @@ cdio_cddap_sector_gettrack(cdrom_drive_t *d, lsn_t lsn)
+     cderror(d,"400: Device not open\n");
+     return CDIO_INVALID_TRACK;
+   } else {
+-    if (lsn < d->disc_toc[0].dwStartSector - d->toc_offset)
++    if (lsn < (d->disc_toc[0].dwStartSector - d->toc_offset))
+       return 0; /* We're in the pre-gap of first track */
+ 
+     return cdio_get_track(d->p_cdio, lsn);
+diff --git a/src/cd-paranoia.c b/src/cd-paranoia.c
+index ee424aa..b81f077 100644
+--- a/src/cd-paranoia.c
++++ b/src/cd-paranoia.c
+@@ -225,7 +225,7 @@ parse_offset(cdrom_drive_t *d, char *offset, int begin)
+ 
+   /* We don't want to outside of the track; if it's relative, that's OK... */
+   if( i_track != CDIO_INVALID_TRACK ){
+-    if (cdda_sector_gettrack(d,ret - d->toc_offset) != i_track) {
++    if (cdda_sector_gettrack(d,ret) != i_track) {
+       report("Time/sector offset goes beyond end of specified track.");
+       exit(1);
+     }
+@@ -1191,9 +1191,9 @@ main(int argc,char *argv[])
+     }
+ 
+     {
+-      int track1 = cdda_sector_gettrack(d, i_first_lsn - d->toc_offset);
++      int track1 = cdda_sector_gettrack(d, i_first_lsn);
+ 
+-      int track2 = cdda_sector_gettrack(d, i_last_lsn - d->toc_offset);
++      int track2 = cdda_sector_gettrack(d, i_last_lsn);
+       long off1  = i_first_lsn - cdda_track_firstsector(d, track1);
+       long off2  = i_last_lsn  - cdda_track_firstsector(d, track2);
+       int i;
+@@ -1220,11 +1220,15 @@ main(int argc,char *argv[])
+ 
+     }
+ 
++    i_first_lsn += toc_offset;
++    i_last_lsn += toc_offset;
++
+     if (toc_offset && !force_overread) {
+ 	d->disc_toc[d->tracks].dwStartSector -= toc_offset;
+ 	if (i_last_lsn > cdda_track_lastsector(d, d->tracks))
+ 		i_last_lsn -= toc_offset;
+     }
++
+     {
+       long cursor;
+       int16_t offset_buffer[1176];
+@@ -1267,7 +1271,7 @@ main(int argc,char *argv[])
+         char outfile_name[PATH_MAX];
+         if ( batch ){
+           batch_first = cursor;
+-          batch_track = cdda_sector_gettrack(d,cursor);
++          batch_track = cdda_sector_gettrack(d,cursor - toc_offset);
+           batch_last  = cdda_track_lastsector(d, batch_track);
+           if (batch_last>i_last_lsn) batch_last=i_last_lsn;
+         } else {
+@@ -1385,7 +1389,7 @@ main(int argc,char *argv[])
+         }
+ 
+ 	sectorlen = batch_last - batch_first + 1;
+-	if (cdda_sector_gettrack(d, cursor) == d->tracks &&
++	if (cdda_sector_gettrack(d, cursor - toc_offset) == d->tracks &&
+ 		toc_offset > 0 && !force_overread){
+ 		sectorlen += toc_offset;
+ 	}
+
+From 2477ee52efc34d75caa8c70dd6ae946a1a5965c6 Mon Sep 17 00:00:00 2001
+From: Matt McKenzie <matt.mckenzie@gmail.com>
+Date: Fri, 16 Feb 2024 00:24:56 -0800
+Subject: [PATCH 3/8] Hopefully a better fix. Keep the drive offset management
+ in cd-paranoia.c and only deal with raw sector id's when calling
+ libcdio_cdda.
+
+---
+ include/cdio/paranoia/cdda.h |  2 --
+ lib/cdda_interface/toc.c     | 16 ++++++++--------
+ src/cd-paranoia.c            | 16 ++++------------
+ 3 files changed, 12 insertions(+), 22 deletions(-)
+
+diff --git a/include/cdio/paranoia/cdda.h b/include/cdio/paranoia/cdda.h
+index bd638c9..2b23809 100644
+--- a/include/cdio/paranoia/cdda.h
++++ b/include/cdio/paranoia/cdda.h
+@@ -136,8 +136,6 @@ struct cdrom_drive_s {
+ 		       paranoia operation this can be set to one of
+ 		       the flag masks to simulate a particular kind of
+ 		       failure.    */
+-
+-  long toc_offset;
+ };
+ 
+ 
+diff --git a/lib/cdda_interface/toc.c b/lib/cdda_interface/toc.c
+index 9d945f6..cd24867 100644
+--- a/lib/cdda_interface/toc.c
++++ b/lib/cdda_interface/toc.c
+@@ -43,7 +43,7 @@ cdda_track_firstsector(cdrom_drive_t *d, track_t i_track)
+ 
+     if (i_track == CDIO_CDROM_LEADOUT_TRACK) i_track = i_last_track;
+     if (i_track == 0) {
+-      if (d->disc_toc[0].dwStartSector - d->toc_offset == 0) {
++      if (d->disc_toc[0].dwStartSector == 0) {
+ 	/* first track starts at lba 0 -> no pre-gap */
+ 	cderror(d,"402: No initial pregap\n");
+ 	return(-402);
+@@ -57,7 +57,7 @@ cdda_track_firstsector(cdrom_drive_t *d, track_t i_track)
+       cderror(d, buf);
+       return(-401);
+     }
+-    return(d->disc_toc[i_track-i_first_track].dwStartSector - d->toc_offset);
++    return(d->disc_toc[i_track-i_first_track].dwStartSector);
+   }
+ }
+ 
+@@ -99,13 +99,13 @@ cdda_track_lastsector(cdrom_drive_t *d, track_t i_track)
+     const track_t i_last_track  = cdio_get_last_track_num(d->p_cdio);
+ 
+     if (i_track == 0) {
+-      if (d->disc_toc[0].dwStartSector - d->toc_offset == 0) {
++      if (d->disc_toc[0].dwStartSector == 0) {
+ 	/* first track starts at lba 0 -> no pre-gap */
+ 	cderror(d,"402: No initial pregap\n");
+ 	return(-402);
+       }
+       else {
+-	return ((d->disc_toc[0].dwStartSector - d->toc_offset) - 1);
++	return (d->disc_toc[0].dwStartSector - 1);
+       }
+     } else if (i_track < i_first_track || i_track > i_last_track) {
+       char buf[100];
+@@ -116,15 +116,15 @@ cdda_track_lastsector(cdrom_drive_t *d, track_t i_track)
+ 
+     /* CD Extra have their first session ending at the last audio track */
+     if (d->cd_extra > 0 && i_track-i_first_track+2 <= d->tracks) {
+-      if (d->audio_last_sector >= (d->disc_toc[i_track-i_first_track].dwStartSector - d->toc_offset) &&
+-          d->audio_last_sector < (d->disc_toc[i_track-i_first_track+1].dwStartSector - d->toc_offset)) {
++      if (d->audio_last_sector >= d->disc_toc[i_track-i_first_track].dwStartSector &&
++          d->audio_last_sector < d->disc_toc[i_track-i_first_track+1].dwStartSector) {
+         return d->audio_last_sector;
+       }
+     }
+ 
+     /* Index safe because we always have the leadout at
+      * disc_toc[tracks] */
+-    return((d->disc_toc[i_track-i_first_track+1].dwStartSector - d->toc_offset) - 1);
++    return(d->disc_toc[i_track-i_first_track+1].dwStartSector - 1);
+   }
+ }
+ 
+@@ -172,7 +172,7 @@ cdio_cddap_sector_gettrack(cdrom_drive_t *d, lsn_t lsn)
+     cderror(d,"400: Device not open\n");
+     return CDIO_INVALID_TRACK;
+   } else {
+-    if (lsn < (d->disc_toc[0].dwStartSector - d->toc_offset))
++    if (lsn < (d->disc_toc[0].dwStartSector))
+       return 0; /* We're in the pre-gap of first track */
+ 
+     return cdio_get_track(d->p_cdio, lsn);
+diff --git a/src/cd-paranoia.c b/src/cd-paranoia.c
+index b81f077..3a4d9ec 100644
+--- a/src/cd-paranoia.c
++++ b/src/cd-paranoia.c
+@@ -1123,14 +1123,6 @@ main(int argc,char *argv[])
+     toc_offset = -cdda_track_firstsector(d,1);
+   }
+ 
+-  d->toc_offset = toc_offset;
+-
+-  {
+-    int i;
+-    for( i=0; i < d->tracks+1; i++ )
+-      d->disc_toc[i].dwStartSector+=toc_offset;
+-  }
+-
+   if (d->nsectors==1) {
+     report("WARNING: The autosensed/selected sectors per read value is\n"
+            "         one sector, making it very unlikely Paranoia can \n"
+@@ -1220,13 +1212,13 @@ main(int argc,char *argv[])
+ 
+     }
+ 
++    // Apply the sector read offset now that we are starting to read data
+     i_first_lsn += toc_offset;
+     i_last_lsn += toc_offset;
+ 
+     if (toc_offset && !force_overread) {
+-	d->disc_toc[d->tracks].dwStartSector -= toc_offset;
+-	if (i_last_lsn > cdda_track_lastsector(d, d->tracks))
+-		i_last_lsn -= toc_offset;
++        if (i_last_lsn > cdda_track_lastsector(d, d->tracks))
++            i_last_lsn -= toc_offset;
+     }
+ 
+     {
+@@ -1265,7 +1257,7 @@ main(int argc,char *argv[])
+          willing to read past, assuming that works on the hardware, of
+          course */
+       if(sample_offset && force_overread)
+-        d->disc_toc[d->tracks].dwStartSector++;
++        i_last_lsn++;
+ 
+       while(cursor<=i_last_lsn){
+         char outfile_name[PATH_MAX];
+
+From 6908b9df7c1567dc37645cf973c67f58d1f8294e Mon Sep 17 00:00:00 2001
+From: Matt McKenzie <matt.mckenzie@gmail.com>
+Date: Fri, 16 Feb 2024 00:36:59 -0800
+Subject: [PATCH 4/8] Revert formatting changes to files where I reverted
+ functional changes.
+
+---
+ include/cdio/paranoia/cdda.h | 1 +
+ lib/cdda_interface/toc.c     | 6 +++---
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/include/cdio/paranoia/cdda.h b/include/cdio/paranoia/cdda.h
+index 2b23809..05718ea 100644
+--- a/include/cdio/paranoia/cdda.h
++++ b/include/cdio/paranoia/cdda.h
+@@ -136,6 +136,7 @@ struct cdrom_drive_s {
+ 		       paranoia operation this can be set to one of
+ 		       the flag masks to simulate a particular kind of
+ 		       failure.    */
++
+ };
+ 
+ 
+diff --git a/lib/cdda_interface/toc.c b/lib/cdda_interface/toc.c
+index cd24867..9f67bc3 100644
+--- a/lib/cdda_interface/toc.c
++++ b/lib/cdda_interface/toc.c
+@@ -105,7 +105,7 @@ cdda_track_lastsector(cdrom_drive_t *d, track_t i_track)
+ 	return(-402);
+       }
+       else {
+-	return (d->disc_toc[0].dwStartSector - 1);
++	return (d->disc_toc[0].dwStartSector-1);
+       }
+     } else if (i_track < i_first_track || i_track > i_last_track) {
+       char buf[100];
+@@ -124,7 +124,7 @@ cdda_track_lastsector(cdrom_drive_t *d, track_t i_track)
+ 
+     /* Index safe because we always have the leadout at
+      * disc_toc[tracks] */
+-    return(d->disc_toc[i_track-i_first_track+1].dwStartSector - 1);
++    return(d->disc_toc[i_track-i_first_track+1].dwStartSector-1);
+   }
+ }
+ 
+@@ -172,7 +172,7 @@ cdio_cddap_sector_gettrack(cdrom_drive_t *d, lsn_t lsn)
+     cderror(d,"400: Device not open\n");
+     return CDIO_INVALID_TRACK;
+   } else {
+-    if (lsn < (d->disc_toc[0].dwStartSector))
++    if (lsn < d->disc_toc[0].dwStartSector)
+       return 0; /* We're in the pre-gap of first track */
+ 
+     return cdio_get_track(d->p_cdio, lsn);
+
+From a327427124fec7d326c35b2e5f322696750ee44a Mon Sep 17 00:00:00 2001
+From: Matt McKenzie <matt.mckenzie@gmail.com>
+Date: Fri, 16 Feb 2024 00:38:36 -0800
+Subject: [PATCH 5/8] Missed one
+
+---
+ lib/cdda_interface/toc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/cdda_interface/toc.c b/lib/cdda_interface/toc.c
+index 9f67bc3..2e32be8 100644
+--- a/lib/cdda_interface/toc.c
++++ b/lib/cdda_interface/toc.c
+@@ -105,7 +105,7 @@ cdda_track_lastsector(cdrom_drive_t *d, track_t i_track)
+ 	return(-402);
+       }
+       else {
+-	return (d->disc_toc[0].dwStartSector-1);
++	return d->disc_toc[0].dwStartSector-1;
+       }
+     } else if (i_track < i_first_track || i_track > i_last_track) {
+       char buf[100];
+
+From c0b25be7025b561084f638c4659728710939fa65 Mon Sep 17 00:00:00 2001
+From: Matt McKenzie <matt.mckenzie@gmail.com>
+Date: Fri, 16 Feb 2024 01:50:37 -0800
+Subject: [PATCH 6/8] Fix batch reads - add offset to returned track last
+ sector
+
+---
+ src/cd-paranoia.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/cd-paranoia.c b/src/cd-paranoia.c
+index 3a4d9ec..c33eb95 100644
+--- a/src/cd-paranoia.c
++++ b/src/cd-paranoia.c
+@@ -1264,7 +1264,7 @@ main(int argc,char *argv[])
+         if ( batch ){
+           batch_first = cursor;
+           batch_track = cdda_sector_gettrack(d,cursor - toc_offset);
+-          batch_last  = cdda_track_lastsector(d, batch_track);
++          batch_last  = cdda_track_lastsector(d, batch_track) + toc_offset;
+           if (batch_last>i_last_lsn) batch_last=i_last_lsn;
+         } else {
+           batch_first = i_first_lsn;
+
+From 847f2f4be7e92b40af622ea5e12bb3a3d0c6d580 Mon Sep 17 00:00:00 2001
+From: Matt McKenzie <matt.mckenzie@gmail.com>
+Date: Fri, 16 Feb 2024 03:50:24 -0800
+Subject: [PATCH 7/8] Tweak the sector read offset configuration and adjust
+ comments
+
+---
+ src/cd-paranoia.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/src/cd-paranoia.c b/src/cd-paranoia.c
+index c33eb95..540531f 100644
+--- a/src/cd-paranoia.c
++++ b/src/cd-paranoia.c
+@@ -1212,14 +1212,15 @@ main(int argc,char *argv[])
+ 
+     }
+ 
+-    // Apply the sector read offset now that we are starting to read data
++    /* Apply read sector offset to the first and last sector indicies.
++       If the option has not been given to force overreading, do not offset
++       the last index beyond the last sector of the final track. */
+     i_first_lsn += toc_offset;
+-    i_last_lsn += toc_offset;
+-
+-    if (toc_offset && !force_overread) {
+-        if (i_last_lsn > cdda_track_lastsector(d, d->tracks))
+-            i_last_lsn -= toc_offset;
+-    }
++    lsn_t lasttrack_lastsector = cdda_track_lastsector(d, d->tracks);
++    if (!force_overread && i_last_lsn + toc_offset >= lasttrack_lastsector)
++        i_last_lsn = lasttrack_lastsector;
++    else
++        i_last_lsn += toc_offset;
+ 
+     {
+       long cursor;
+
+From 2389007b1eb3e43c8d3f3034dcbd9c478afc7dc4 Mon Sep 17 00:00:00 2001
+From: Matt McKenzie <matt.mckenzie@gmail.com>
+Date: Fri, 16 Feb 2024 03:51:43 -0800
+Subject: [PATCH 8/8] Fix --force-overread behavior and add comments on the
+ offset behavior
+
+---
+ src/cd-paranoia.c | 78 ++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 57 insertions(+), 21 deletions(-)
+
+diff --git a/src/cd-paranoia.c b/src/cd-paranoia.c
+index 540531f..d89af2b 100644
+--- a/src/cd-paranoia.c
++++ b/src/cd-paranoia.c
+@@ -1093,19 +1093,62 @@ main(int argc,char *argv[])
+ 
+   if (query_only) exit(0);
+ 
+-  /* bias the disc.  A hack.  Of course. this is never the default. */
+   /*
+-     Some CD-ROM/CD-R drives will add an offset to the position on
+-     reading audio data. This is usually around 500-700 audio samples
+-     (ca. 1/75 second) on reading. So when this program queries a
+-     specific sector, it might not receive exactly that sector, but
+-     shifted by some amount.
+-
+-     Note that if ripping includes the end of the CD, this will this
+-     cause this program to attempt to read partial sectors before or
+-     past the known user data area of the disc, probably causing read
+-     errors on most drives and possibly even hard lockups on some
+-     buggy hardware.
++     Nearly all CD-ROM/CD-R drives will add a sample offset (either
++     positive or negative) to the position when reading audio data.
++     This is usually around 500-700 audio samples (ca. 1/75 second)
++     but can consist of multiple sectors for some drives.
++
++     To account for this, the --sample-offset option can be specified
++     to adjust for a drive's read offset by a given number of
++     samples. In doing so, the exact data desired can be retrieved,
++     assuming the proper offset is specified for a given drive.
++
++     An audio CD sector is 2352 bytes in size, consisting of 1176
++     16-bit (2-byte) samples or 588 paris of samples (left and right
++     channels). Therefore, every 588 samples of offset required for a
++     given drive will necesitate shifting reads by N sectors and by M
++     samples (assuming the sample offset is not an exact multiple of
++     588).
++
++     For example:
++       --sample-offset 0 (default)
++         results in a sector offset of 0 and a sample offset of 0
++
++       --sample-offset +48
++         results in a sector offset of 0 and a sample offset of 48
++
++       --sample-offset +667
++         results in a sector offset of 1 and a sample offset of 79
++
++       --sample-offset +1776
++         results in a sector offset of 3 and a sample offset of 12
++
++       --sample-offset -54
++         results in a sector offset of -1 and a sample offset of 534
++
++       --sample-offset -589
++         results in a sector offset of -2 and a sample offset of 587
++
++       --sample-offset -1164
++         results in a sector offset of -2 and a sample offset of 12
++
++     toc_offset - accounts for the number of sectors to offset reads
++     sample_offset - accounts for the number of samples to shift the
++                     results
++
++     Note that if ripping includes the end of the CD and the
++     --force-overread option is specified, this program will attempt
++     to read partial sectors before or past the known user data area
++     of the disc. The drive must suppport this or it will probably
++     cause read errors on most drives and possibly even hard lockups
++     on some buggy hardware. If the --force-overread is not provided,
++     tracks will be padded with empty data rather than attempting to
++     read beyond the disk lead-in/lead-out.
++
++     For more info, see:
++       - https://www.exactaudiocopy.de/en/index.php/support/faq/offset-questions/
++       - https://wiki.hydrogenaud.io/index.php?title=AccurateRip#Drive_read_offsets
+ 
+      [Note to libcdio driver hackers: make sure all CD-drivers don't
+      try to read outside of the stated disc boundaries.]
+@@ -1214,7 +1257,8 @@ main(int argc,char *argv[])
+ 
+     /* Apply read sector offset to the first and last sector indicies.
+        If the option has not been given to force overreading, do not offset
+-       the last index beyond the last sector of the final track. */
++       the last sector index beyond the last sector of the final track.
++    */
+     i_first_lsn += toc_offset;
+     lsn_t lasttrack_lastsector = cdda_track_lastsector(d, d->tracks);
+     if (!force_overread && i_last_lsn + toc_offset >= lasttrack_lastsector)
+@@ -1252,14 +1296,6 @@ main(int argc,char *argv[])
+       dummy = setegid(getgid());
+ #endif
+ 
+-      /* we'll need to be able to read one sector past user data if we
+-         have a sample offset in order to pick up the last bytes.  We
+-         need to set the disc length forward here so that the libs are
+-         willing to read past, assuming that works on the hardware, of
+-         course */
+-      if(sample_offset && force_overread)
+-        i_last_lsn++;
+-
+       while(cursor<=i_last_lsn){
+         char outfile_name[PATH_MAX];
+         if ( batch ){

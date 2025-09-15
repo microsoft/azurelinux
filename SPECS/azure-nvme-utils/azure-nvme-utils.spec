@@ -1,10 +1,12 @@
 Name:           azure-nvme-utils
 Version:        0.1.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Utility and udev rules to help identify Azure NVMe devices
 
 License:        MIT
 URL:            https://github.com/Azure/%{name}
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  binutils
@@ -31,6 +33,9 @@ make install DESTDIR=%{buildroot}
 /lib/udev/rules.d/80-azure-nvme.rules
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.1.1-2
+- Add missing Vendor and Distribution tags.
+
 * Mon Mar 18 2024 Chris Patterson <cpatterson@microsoft.com> - 0.1.1-1
 - Original version for Azure Linux.
 - License verified.

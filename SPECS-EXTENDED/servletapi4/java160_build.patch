@@ -6,7 +6,7 @@ Index: jakarta-servletapi-4-src/build.xml
  
      <!-- Java classes -->
      <javac srcdir="src/share" destdir="${servletapi.build}/classes"
-+      source="1.6" target="1.6"
++      source="1.8" target="1.8"
             debug="${compile.debug}" deprecation="${compile.deprecation}"
          optimize="${compile.optimize}"/>
  
@@ -14,7 +14,7 @@ Index: jakarta-servletapi-4-src/build.xml
    <target name="javadoc" depends="prepare">
  
      <javadoc packagenames="javax.servlet.*"
-+      source="1.6"
++      source="1.8"
               sourcepath="${basedir}/src/share"
               destdir="${servletapi.build}/docs/api"
               use="true"

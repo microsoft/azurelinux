@@ -1,6 +1,6 @@
 Name:       btrfs-progs
-Version:    5.16
-Release:    102%{?dist}
+Version:    6.8
+Release:    2%{?dist}
 Summary:    Userspace programs for btrfs
 Group:      System Environment/Base
 License:    GPLv2+
@@ -17,6 +17,8 @@ BuildRequires:  asciidoc
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
+BuildRequires:  python3-sphinx
+BuildRequires:  pkgconfig(libgcrypt) >= 1.8.0
 Requires:   e2fsprogs
 Requires:   lzo
 
@@ -41,13 +43,14 @@ btrfs filesystem-specific programs.
 
 %build
 ./autogen.sh
-%configure \
-	--disable-zstd
-make DISABLE_DOCUMENTATION=1 %{?_smp_mflags}
+%configure CFLAGS="%{optflags} -fno-strict-aliasing" --with-crypto=libgcrypt --disable-python --disable-zstd
+%make_build
 
 %install
 #disabled the documentation
 make DISABLE_DOCUMENTATION=1 mandir=%{_mandir} bindir=%{_sbindir} libdir=%{_libdir} incdir=%{_includedir} install DESTDIR=%{buildroot}
+# Nuke the static lib
+rm -v %{buildroot}%{_libdir}/*.a
 
 %files
 %defattr(-,root,root,-)
@@ -68,15 +71,18 @@ make DISABLE_DOCUMENTATION=1 mandir=%{_mandir} bindir=%{_sbindir} libdir=%{_libd
 
 %files devel
 %{_includedir}/*
-%{_libdir}/libbtrfs.a
-%{_libdir}/libbtrfsutil.a
 %{_libdir}/libbtrfs.so
 %{_libdir}/libbtrfsutil.so
-%{_libdir}/udev/rules.d/64-btrfs-dm.rules
 %{_libdir}/pkgconfig/libbtrfsutil.pc
 
 
 %changelog
+* Wed Mar 27 2024 Betty Lakes <bettylakes@microsoft.com> - 6.8-2
+- Disable zstd
+
+* Wed Mar 27 2024 Betty Lakes <bettylakes@microsoft.com> - 6.8-1
+- Update to 6.8
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.16-102
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

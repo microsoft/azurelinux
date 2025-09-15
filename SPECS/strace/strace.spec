@@ -1,7 +1,7 @@
 %global __requires_exclude ^%{_bindir}/perl$
 Summary:        Tracks system calls that are made by a running process
 Name:           strace
-Version:        6.6
+Version:        6.8
 Release:        1%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
@@ -44,6 +44,9 @@ all the arugments and return values from the system calls. This is useful in deb
 %{_mandir}/man1/*
 
 %changelog
+* Thu Apr 25 2024 Andrew Phelps <anphel@microsoft.com> - 6.8-1
+- Upgrade to version 6.8
+
 * Tue Dec 19 2023 Andrew Phelps <anphel@microsoft.com> - 6.6-1
 - Upgrade to version 6.6
 

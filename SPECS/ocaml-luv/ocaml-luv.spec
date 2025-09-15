@@ -6,8 +6,8 @@
 
 Summary:        OCaml binding to libuv for cross-platform asynchronous I/O
 Name:           ocaml-%{srcname}
-Version:        0.5.10
-Release:        3%{?dist}
+Version:        0.5.13
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

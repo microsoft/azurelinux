@@ -1,0 +1,81 @@
+From 242668e6f9896f4179f995ca7b146608cff713da Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Thu, 28 Mar 2024 09:41:41 -0400
+Subject: [PATCH 25/25] kernel: Exec systemctl.
+
+When running as a Hyper-V guest, a poweroff from the host will cause a
+hv_utils kernel thread to run poweroff which is symlinked to systemctl.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/kernel/kernel.if  | 21 +++++++++++++++++++++
+ policy/modules/kernel/kernel.te  |  7 +++++++
+ policy/modules/system/systemd.te |  2 ++
+ 3 files changed, 30 insertions(+)
+
+diff --git a/policy/modules/kernel/kernel.if b/policy/modules/kernel/kernel.if
+index 85b4da0c3..1d696a07c 100644
+--- a/policy/modules/kernel/kernel.if
++++ b/policy/modules/kernel/kernel.if
+@@ -691,6 +691,27 @@ interface(`kernel_get_sysvipc_info',`
+ 	allow $1 kernel_t:system ipc_info;
+ ')
+ 
++########################################
++## <summary>
++##	Do not audit attempts to read the /proc/pid
++##	entries of kernel threads.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`kernel_dontadit_read_state',`
++	gen_require(`
++		type kernel_t;
++	')
++
++	dontaudit $1 kernel_t:dir list_dir_perms;
++	dontaudit $1 kernel_t:file read_file_perms;
++	dontaudit $1 kernel_t:lnk_file read_lnk_file_perms;
++')
++
+ ########################################
+ ## <summary>
+ ##	Get the attributes of a kernel debugging filesystem.
+diff --git a/policy/modules/kernel/kernel.te b/policy/modules/kernel/kernel.te
+index 887ca3332..ea08036b6 100644
+--- a/policy/modules/kernel/kernel.te
++++ b/policy/modules/kernel/kernel.te
+@@ -395,6 +395,13 @@ ifdef(`init_systemd',`
+ 	optional_policy(`
+ 		systemd_start_power_units(kernel_t)
+ 		systemd_status_power_units(kernel_t)
++		# when running as a Hyper-V guest, a poweroff from the host
++		# will cause a hv_utils kernel thread to run poweroff
++		# which is symlinked to systemctl.
++		systemd_exec_systemctl(kernel_t)
++		systemd_start_power_units(kernel_t)
++		systemd_status_power_units(kernel_t)
++		systemd_dbus_chat_logind(kernel_t)
+ 	')
+ 
+ 	optional_policy(`
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 0fe7bcdd5..e45a797a6 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -909,6 +909,8 @@ stream_connect_pattern(systemd_logind_t, systemd_userdbd_runtime_t, systemd_user
+ kernel_dontaudit_getattr_proc(systemd_logind_t)
+ kernel_read_kernel_sysctls(systemd_logind_t)
+ kernel_rw_psi(systemd_logind_t)
++# related to Hyper-V guests shutdown:
++kernel_dontadit_read_state(systemd_logind_t)
+ 
+ dev_getattr_dri_dev(systemd_logind_t)
+ dev_getattr_generic_usb_dev(systemd_logind_t)
+-- 
+2.44.0
+

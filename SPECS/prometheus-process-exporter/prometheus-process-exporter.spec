@@ -4,8 +4,8 @@
 
 Summary:        Prometheus exporter exposing process metrics from procfs
 Name:           prometheus-process-exporter
-Version:        0.7.10
-Release:        15%{?dist}
+Version:        0.8.2
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,8 +30,9 @@ Source3:        %{name}.logrotate
 Source4:        %{name}.conf
 Patch0:         01-fix-RSS-test-on-non4K-pagesize-systems.patch
 Patch1:         03-disable-fakescraper.patch
+Patch2:         CVE-2025-22870.patch
 
-BuildRequires:  golang
+BuildRequires:  golang < 1.25
 BuildRequires:  systemd-rpm-macros
 
 Requires(pre):  shadow-utils
@@ -45,10 +46,7 @@ instrument with Prometheus. This exporter solves that issue by mining
 process metrics from procfs.
 
 %prep
-%autosetup -p1 -n process-exporter-%{version}
-
-rm -rf vendor
-tar -xf %{SOURCE1} --no-same-owner
+%autosetup -n process-exporter-%{version} -p1 -a1
 
 %build
 LDFLAGS="-X github.com/ncabatoff/process-exporter/version.Version=%{version}      \
@@ -72,7 +70,7 @@ install -Dpm0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/default/%{name}
 mkdir -vp %{buildroot}%{_sharedstatedir}/prometheus
 
 %check
-make test integ
+make test
 
 %pre
 # Same user/group creation steps as for "prometheus-node-exporter".
@@ -97,6 +95,15 @@ getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_share
 %dir %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 
 %changelog
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 0.8.2-3
+- Set BR for golang to < 1.25
+
+* Tue Apr 08 2025 Rohit Rawat <rohitrawat@microsoft.com> - 0.8.2-2
+- Patch CVE-2025-22870
+
+* Fri Jul 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.2-1
+- Auto-upgrade to 0.8.2 - CVE-2022-46146, CVE-2022-21698, CVE-2021-44716
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.7.10-15
 - Bump release to rebuild with go 1.20.10
 

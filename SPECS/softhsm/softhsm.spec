@@ -3,13 +3,14 @@
 Summary:        Software version of a PKCS#11 Hardware Security Module
 Name:           softhsm
 Version:        2.6.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.opendnssec.org/
 Source0:        https://dist.opendnssec.org/source/%{name}-%{version}.tar.gz
 Patch1:         softhsm-2.6.1-rh1831086-exit.patch
+Patch2:         softhsm-openssl3-tests.patch
 BuildRequires:  cppunit-devel
 BuildRequires:  gcc-c++
 BuildRequires:  openssl-devel >= 1.0.1k-6
@@ -99,6 +100,9 @@ if [ -f /var/softhsm/slot0.db ]; then
 fi
 
 %changelog
+* Fri Mar 29 2024 Andrew Phelps <anphel@microsoft.com> - 2.6.1-7
+- Add patch to fix cryptotest
+
 * Thu Feb 10 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.6.1-6
 - License verified.
 

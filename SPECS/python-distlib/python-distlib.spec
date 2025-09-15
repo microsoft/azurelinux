@@ -1,8 +1,8 @@
 %global srcname distlib
 Summary:        Low-level components of distutils2/packaging, augmented with higher-level APIs
 Name:           python-distlib
-Version:        0.3.6
-Release:        2%{?dist}
+Version:        0.3.8
+Release:        1%{?dist}
 License:        Python
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,7 +43,6 @@ between tools.
 
 rm distlib/*.exe
 
-
 %build
 %pyproject_wheel
 
@@ -53,16 +52,22 @@ rm distlib/*.exe
 
 %check
 export PYTHONHASHSEED=0
+pip3 install iniconfig
 # test_sequencer_basic test fails due to relying
 # on the ordering of the input, hence disabling it.
 # https://github.com/pypa/distlib/issues/161
-%pytest -k "not test_sequencer_basic"
+# test_is_writable depends on network access
+%pytest -k "not test_sequencer_basic and not test_is_writable"
 
 %files -n python%{python3_pkgversion}-%{srcname} -f %pyproject_files
 %license LICENSE.txt
 %doc README.rst
 
 %changelog
+* Wed Apr 24 2024 Osama Esmail <osamaesmail@microsoft.com> - 0.3.8-1
+- Auto-upgrade to 0.3.8
+- Added "and not test_is_writable" to the %%check section
+
 * Tue Dec 21 2021 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.6-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License verified.

@@ -1,6 +1,5 @@
 {
- "Signatures": {
-  "ocaml-fileutils_2-0.5.2.tar.gz": "c96442d7c032d6ba45e63143476f0c5fe2ea6f9b4bb452b0b9406decc5268352",
-  "ocaml-fileutils-old-sources-build-files.tar.gz": "69c8ddcadefbb0d800c23e0e96f707fe181c03de39f59b309ee5542636d628ff"
- }
+    "Signatures": {
+        "ocaml-fileutils-0.6.4.tar.gz": "70988d3a5ef30658df57cfd235f610693dfddf69448355df5bb1423014f05c1a"
+    }
 }

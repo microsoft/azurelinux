@@ -1,14 +1,18 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+%if 0%{?fedora} >= 36 || 0%{?rhel} > 9
+%global dict_dirname hunspell 
+%else
+%global dict_dirname myspell
+%endif 
+
 Name: hunspell-nl
 Summary: Dutch hunspell dictionaries
-Version: 2.10
-Release: 17%{?dist}
-#http://www.opentaal.org/bestanden/doc_download/20-woordenlijst-v-210g-voor-openofficeorg-3
-#annoying click through makes direct link apparently impossible
-Source: OpenTaal-210G-LO.oxt
-URL: http://www.opentaal.org/english.php
-License: BSD or CC-BY
+Version: 2.20.19
+Release: 15%{?dist}
+Source: https://github.com/OpenTaal/opentaal-hunspell/archive/2.20.19.tar.gz
+URL: https://opentaal.org/
+License: BSD-3-Clause OR CC-BY-3.0
 BuildArch: noarch
 
 Requires: hunspell
@@ -18,16 +22,16 @@ Supplements: (hunspell and langpacks-nl)
 Dutch hunspell dictionaries.
 
 %prep
-%setup -q -c
+%setup -q -n opentaal-hunspell-%{version}
 
 %build
-chmod -x nl_NL.*
 
 %install
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/myspell
-cp -p nl_NL.aff nl_NL.dic $RPM_BUILD_ROOT/%{_datadir}/myspell
+mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
+cp -p nl.dic $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}/nl_NL.dic
+cp -p nl.aff $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}/nl_NL.aff
 
-pushd $RPM_BUILD_ROOT/%{_datadir}/myspell/
+pushd $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}/
 nl_NL_aliases="nl_AW nl_BE"
 for lang in $nl_NL_aliases; do
         ln -s nl_NL.aff $lang.aff
@@ -36,12 +40,60 @@ done
 
 
 %files
-%doc description/desc_en_US.txt description/desc_nl_NL.txt README_nl_NL.txt license_en_EN.txt licentie_nl_NL.txt
-%{_datadir}/myspell/*
+%doc LICENSE.txt README.md
+%{_datadir}/%{dict_dirname}/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.10-17
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Dec 17 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 2.20.19-15
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Sun Aug 04 2024 Parag Nemade <pnemade AT redhat DOT com> - 2.20.19-14
+- Add conditional for RHEL for using hunspell directory
+- Add tmt CI tests
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.20.19-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.20.19-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.20.19-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.20.19-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Feb 22 2023 Caolán McNamara <caolanm@redhat.com> - 2.20.19-9
+- migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.20.19-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.20.19-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Feb 11 2022 Vishal Vijayraghavan <vishalvvr@fedoraproject.org> - 2.20.19-6
+- rename install directory name from myspell to hunspell
+- https://fedoraproject.org/wiki/Changes/Hunspell_dictionary_dir_change 
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.20.19-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.20.19-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.20.19-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jan 11 2021 Caolán McNamara <caolanm@redhat.com> - 2.20.19-2
+- bump n-v-r
+
+* Mon Jan 11 2021 Caolán McNamara <caolanm@redhat.com> - 2.20.19-1
+- Resolves: rhbz#1912135 latest version
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.10-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.10-16
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

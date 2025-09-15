@@ -3,13 +3,13 @@ Distribution:   Azure Linux
 %global modname isort
 
 Name:               python-%{modname}
-Version:            4.3.21
-Release:            8%{?dist}
+Version:            5.13.2
+Release:            6%{?dist}
 Summary:            Python utility / library to sort Python imports
 
 License:            MIT
 URL:                https://github.com/timothycrosley/%{modname}
-Source0:            %{url}/archive/%{version}-2/%{modname}-%{version}-2.tar.gz
+Source0:            https://files.pythonhosted.org/packages/87/f9/c1eb8635a24e87ade2efce21e3ce8cd6b8630bb685ddc9cdaca1349b2eb5/%{modname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:          noarch
 
 %description
@@ -20,11 +20,9 @@ Summary:            %{summary}
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{modname}}
 BuildRequires:      python%{python3_pkgversion}-devel
 BuildRequires:      python%{python3_pkgversion}-setuptools
-BuildRequires:      python%{python3_pkgversion}-mock
 BuildRequires:      python%{python3_pkgversion}-pytest
-# Explicitly conflict with the python2 package that used to ship
-# /usr/bin/isort. Drop the conflict in F32.
-Conflicts:          python2-%{modname} < 4.3.4-7
+# Dependencies
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description -n python%{python3_pkgversion}-%{modname}
 %{summary}.
@@ -32,11 +30,11 @@ Conflicts:          python2-%{modname} < 4.3.4-7
 Python %{python3_pkgversion} version.
 
 %prep
-%autosetup -n %{modname}-%{version}-2
+%autosetup -n %{modname}-%{version}
 
 # Drop shebang
-sed -i -e '1{\@^#!.*@d}' %{modname}/main.py
-chmod -x LICENSE
+#sed -i -e '1{\@^#!.*@d}' %{modname}/main.py
+#chmod -x LICENSE
 
 %build
 %py3_build
@@ -52,17 +50,181 @@ ln -s %{modname}-3 %{buildroot}%{_bindir}/%{modname}
 #%{__python3} setup.py test
 
 %files -n python%{python3_pkgversion}-%{modname}
-%doc README.rst *.md
+%doc *.md
 %license LICENSE
 %{_bindir}/%{modname}
 %{_bindir}/%{modname}-%{python3_pkgversion}
 %{_bindir}/%{modname}-%{python3_version}
+%{_bindir}/%{modname}-identify-imports
 %{python3_sitelib}/%{modname}/
 %{python3_sitelib}/%{modname}-*.egg-info/
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.3.21-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Feb 27 2025 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 5.13.2-6
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.13.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 5.13.2-4
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.13.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.13.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Dec 15 2023 Gwyn Ciesla <gwync@protonmail.com> - 5.13.2-1
+- 5.13.2
+
+* Tue Dec 12 2023 Gwyn Ciesla <gwync@protonmail.com> - 5.13.1-1
+- 5.13.1
+
+* Mon Dec 11 2023 Gwyn Ciesla <gwync@protonmail.com> - 5.13.0-1
+- 5.13.0
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.12.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 5.12.0-3
+- Rebuilt for Python 3.12
+
+* Wed Mar 01 2023 Gwyn Ciesla <gwync@protonmail.com> - 5.12.0-2
+- migrated to SPDX license
+
+* Mon Jan 30 2023 Gwyn Ciesla <gwync@protonmail.com> - 5.12.0-1
+- 5.12.0
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.11.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Jan 03 2023 Gwyn Ciesla <gwync@protonmail.com> - 5.11.4-1
+- 5.11.4
+
+* Mon Dec 19 2022 Gwyn Ciesla <gwync@protonmail.com> - 5.11.3-1
+- 5.11.3
+
+* Thu Dec 15 2022 Gwyn Ciesla <gwync@protonmail.com> - 5.11.2-1
+- 5.11.2
+
+* Tue Dec 13 2022 Gwyn Ciesla <gwync@protonmail.com> - 5.11.1-1
+- 5.11.1
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.10.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 5.10.1-4
+- Rebuilt for Python 3.11
+
+* Sat Jun 11 2022 Tom Rix <trix@redhat.com> - 5.10.1-3
+- Remove python-mock BuildRequires
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.10.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Nov 09 2021 Gwyn Ciesla <gwync@protonmail.com> - 5.10.1-1
+- 5.10.1
+
+* Wed Nov 03 2021 Gwyn Ciesla <gwync@protonmail.com> - 5.10.0-1
+- 5.10.0
+
+* Thu Jul 29 2021 Gwyn Ciesla <gwync@protonmail.com> - 5.9.3-1
+- 5.9.3
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.9.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jul 08 2021 Gwyn Ciesla <gwync@protonmail.com> - 5.9.2-1
+- 5.9.2
+
+* Mon Jun 21 2021 Gwyn Ciesla <gwync@protonmail.com> - 5.9.1-1
+- 5.9.1
+
+* Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 5.8.0-2
+- Rebuilt for Python 3.10
+
+* Mon Mar 22 2021 Gwyn Ciesla <gwync@protonmail.com> - 5.8.0-1
+- 5.8.0
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.7.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Dec 31 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.7.0-1
+- 5.7.0
+
+* Tue Oct 13 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.6.4-1
+- 5.6.4
+
+* Sun Oct 11 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.6.3-1
+- 5.6.3
+
+* Sat Oct 10 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.6.2-1
+- 5.6.2
+
+* Thu Oct 08 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.6.1-1
+- 5.6.1
+
+* Wed Sep 30 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.5.4-1
+- 5.5.4
+
+* Mon Sep 21 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.5.3-1
+- 5.5.3
+
+* Thu Sep 10 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.5.2-1
+- 5.5.2
+
+* Fri Sep 04 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.5.1-1
+- 5.5.1
+
+* Thu Sep 03 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.5.0-1
+- 5.5.0
+
+* Mon Aug 17 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.4.2-1
+- 5.4.2
+
+* Thu Aug 13 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.4.1-1
+- 5.4.1
+
+* Thu Aug 13 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.4.0-1
+- 5.4.0
+
+* Fri Aug 07 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.3.2-1
+- 5.3.2
+
+* Wed Aug 05 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.3.0-1
+- 5.3.0
+
+* Thu Jul 30 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.2.2-1
+- 5.2.2
+
+* Mon Jul 27 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.2.0-1
+- 5.2.0
+
+* Mon Jul 20 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.1.4-1
+- 5.1.4
+
+* Thu Jul 16 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.1.1-1
+- 5.1.1
+
+* Wed Jul 15 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.1.0-1
+- 5.1.0
+
+* Mon Jul 13 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.0.9-1
+- 5.0.9
+
+* Fri Jul 10 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.0.7-1
+- 5.0.7
+
+* Thu Jul 09 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.0.6-1
+- 5.0.6
+
+* Wed Jul 08 2020 Gwyn Ciesla <gwync@protonmail.com> - 5.0.5-1
+- 5.0.5
+
+* Sat May 23 2020 Miro Hrončok <mhroncok@redhat.com> - 4.3.21-8
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.3.21-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

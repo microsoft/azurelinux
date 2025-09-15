@@ -1,0 +1,4 @@
+distroless-packages-base
+nodejs
+nodejs-npm
+prebuilt-ca-certificates

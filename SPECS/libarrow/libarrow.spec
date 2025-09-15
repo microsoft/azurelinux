@@ -13,7 +13,7 @@
  
 Name:	libarrow
 Version:	15.0.0
-Release:	4%{?dist}
+Release:	7%{?dist}
 Summary:	A toolbox for accelerated data interchange and in-memory processing
 License:	Apache-2.0
 URL:		https://arrow.apache.org/
@@ -21,8 +21,9 @@ Requires:	%{name}-doc = %{version}-%{release}
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:	https://dist.apache.org/repos/dist/release/arrow/arrow-%{version}/apache-arrow-%{version}.tar.gz
+Source0:       https://github.com/apache/arrow/archive/refs/tags/apache-arrow-%{version}.tar.gz#/libarrow-%{version}.tar.gz
 Patch0001: 0001-python-pyproject.toml.patch
+Patch0002: CVE-2024-52338.patch
  
 # Apache ORC (liborc) has numerous compile errors and apparently assumes
 # a 64-bit build and runtime environment. This is only consumer of the liborc
@@ -51,7 +52,7 @@ BuildRequires:	pkgconfig
 BuildRequires:	python3-devel
 BuildRequires:	python3-numpy
 BuildRequires:	python3-Cython
-BuildRequires:	abseil-cpp-devel
+BuildRequires:	abseil-cpp-devel >= 20240116.0-2
 BuildRequires:	c-ares-devel
 BuildRequires:	thrift-devel
 %if %{with have_rapidjson}
@@ -143,7 +144,7 @@ Libraries and header files for Apache Parquet C++.
 #--------------------------------------------------------------------
 
 %prep
-%autosetup -p1 -n apache-arrow-%{version}
+%autosetup -p1 -n arrow-apache-arrow-%{version}
 # We do not need to (nor can we) build for an old version of numpy:
 sed -r -i 's/(oldest-supported-)(numpy)/\2/' python/pyproject.toml
  
@@ -232,7 +233,7 @@ popd
 %{_libdir}/pkgconfig/arrow-json.pc
 %{_libdir}/pkgconfig/arrow.pc
 %{_datadir}/arrow/gdb/gdb_arrow.py
-#%{_datadir}/gdb/auto-load/usr/lib64/libarrow.so.*-gdb.py
+#%%{_datadir}/gdb/auto-load/usr/lib64/libarrow.so.*-gdb.py
 
 
 %files -n parquet-libs
@@ -246,6 +247,16 @@ popd
 %{_libdir}/pkgconfig/parquet*.pc
  
 %changelog
+* Wed Dec 4 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 15.0.0-7
+- Patch to fix CVE-2024-52338
+
+* Thu Jul 25 2024 Devin Anderson <danderson@microsoft.com> - 15.0.0-6
+- Bump release to rebuild with latest 'abseil-cpp'.
+- Fix 'rpm' warning about macro expansion inside a comment.
+
+* Mon May 20 2024 Henry Beberman <henry.beberman@microsoft.com> - 15.0.0-5
+- Move to using source tarball from GitHub releases.
+
 * Fri Mar 22 2024 Himaja Kesari <himajakesari@microsoft.com> - 15.0.0-4
 - Initial CBL-Mariner import from Fedora 40 (license: MIT).
 - License verified.

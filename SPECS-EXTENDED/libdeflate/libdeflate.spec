@@ -1,14 +1,18 @@
 Summary:        Fast implementation of DEFLATE, gzip, and zlib
+
 Name:           libdeflate
-Version:        1.9
-Release:        4%{?dist}
+Version:        1.22
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/ebiggers/libdeflate
-Source0:        https://github.com/ebiggers/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/ebiggers/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
+
 BuildRequires:  gcc
-BuildRequires:  make
+BuildRequires:  cmake
+BuildRequires: zlib-devel
 
 %description
 libdeflate is a library for fast, whole-buffer DEFLATE-based compression and
@@ -28,16 +32,29 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description utils
 Binaries from libdeflate.
 
+
 %prep
 %autosetup
-sed -r -i 's/-O2 -fomit-frame-pointer -std=c99/-std=c99/' Makefile
 
 %build
-%make_build CFLAGS="%{optflags} -fpic -pie -g" USE_SHARED_LIB=1 LIBDIR=%{_libdir} PREFIX=%{_prefix}
+cmake_opts="\
+    -DLIBDEFLATE_BUILD_STATIC_LIB:BOOL=OFF \
+    -DLIBDEFLATE_BUILD_SHARED_LIB:BOOL=ON \
+    -DLIBDEFLATE_COMPRESSION_SUPPORT:BOOL=ON \
+    -DLIBDEFLATE_DECOMPRESSION_SUPPORT:BOOL=ON \
+    -DLIBDEFLATE_ZLIB_SUPPORT:BOOL=ON \
+    -DLIBDEFLATE_GZIP_SUPPORT:BOOL=ON \
+    -DLIBDEFLATE_FREESTANDING:BOOL=OFF \
+    -DLIBDEFLATE_BUILD_GZIP:BOOL=ON \
+    -DLIBDEFLATE_BUILD_TESTS:BOOL=ON \
+    -DLIBDEFLATE_USE_SHARED_LIBS:BOOL=ON"
+
+%cmake $cmake_opts
+%cmake_build 
 
 %install
-%make_install CFLAGS="%{optflags} -fpic -pie -g" USE_SHARED_LIB=1 LIBDIR=%{_libdir} PREFIX=%{_prefix}
-rm %{buildroot}/%{_libdir}/*.a
+%cmake_install
+
 
 %files
 %doc NEWS.md README.md
@@ -48,12 +65,18 @@ rm %{buildroot}/%{_libdir}/*.a
 %{_includedir}/libdeflate.h
 %{_libdir}/libdeflate.so
 %{_libdir}/pkgconfig/*
+%{_libdir}/cmake/libdeflate/
 
 %files utils
 %{_bindir}/libdeflate-gzip
 %{_bindir}/libdeflate-gunzip
 
+
 %changelog
+* Mon Oct 14 2024 Jyoti kanase <v-jykanase@microsoft.com> - 1.22-1
+- Update to version 1.22
+- License verified
+
 * Wed Jan 18 2023 Suresh Thelkar <sthelkar@microsoft.com> - 1.9-4
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified

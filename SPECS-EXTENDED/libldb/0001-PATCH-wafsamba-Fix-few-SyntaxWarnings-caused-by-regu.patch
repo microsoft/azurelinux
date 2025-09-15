@@ -131,19 +131,6 @@ index ef632ba903369e4211991f17a3b204bcd96c3a2f..63e50567860ff890b00b0ce6c7607c91
          if not m:
              conf.end_msg('not found', color='YELLOW')
              return
-diff --git a/buildtools/wafsamba/samba_cross.py b/buildtools/wafsamba/samba_cross.py
-index 8863c2c53e7d7dd9317c9233f0085ffd0eea6b2f..34793902fba884cf2d8358bf4315dc98027266b6 100644
---- a/buildtools/wafsamba/samba_cross.py
-+++ b/buildtools/wafsamba/samba_cross.py
-@@ -77,7 +77,7 @@ def cross_answer(ca_file, msg):
-                 f.close()
-                 return (0, ans.strip("'"))
-             else:
--                m = re.match('\(\s*(-?\d+)\s*,\s*\"(.*)\"\s*\)', ans)
-+                m = re.match(r'\(\s*(-?\d+)\s*,\s*\"(.*)\"\s*\)', ans)
-                 if m:
-                     f.close()
-                     return (int(m.group(1)), m.group(2))
 diff --git a/buildtools/wafsamba/samba_headers.py b/buildtools/wafsamba/samba_headers.py
 index a268c011c5d8e406e0d763554c55668cfb5388bc..c8bee19010978a04460b0637fcc8fd484a699ea8 100644
 --- a/buildtools/wafsamba/samba_headers.py

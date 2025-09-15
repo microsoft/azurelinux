@@ -1,0 +1,12 @@
+diff -u -r SNMP_Session-1.13.orig/lib/SNMP_Session.pm SNMP_Session-1.13/lib/SNMP_Session.pm
+--- SNMP_Session-1.13.orig/lib/SNMP_Session.pm	2023-06-05 11:48:19.304310300 +0200
++++ SNMP_Session-1.13/lib/SNMP_Session.pm	2023-06-05 11:48:48.422475999 +0200
+@@ -622,7 +622,7 @@
+        $local_hostname,$ipv4only) = @_;
+     my($remote_addr,$socket,$sockfamily);
+ 
+-    $ipv4only = 1 unless defined $ipv4only;
++    $ipv4only = 1 if defined $ipv4only;
+     $sockfamily = AF_INET;
+ 
+     $community = 'public' unless defined $community;

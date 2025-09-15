@@ -1,0 +1,12 @@
+diff -up qhull-8.0.2/CMakeLists.txt.install qhull-8.0.2/CMakeLists.txt
+--- qhull-8.0.2/CMakeLists.txt.install	2022-10-04 22:07:47.273041741 -0600
++++ qhull-8.0.2/CMakeLists.txt	2022-10-04 22:17:36.977621187 -0600
+@@ -344,7 +344,7 @@ set(qhull_SHAREDP qhull_p)  # libqhull a
+ 
+ set(qhull_TARGETS_APPLICATIONS qhull rbox qconvex qdelaunay qvoronoi qhalf)
+ set(qhull_TARGETS_STATIC ${qhull_CPP} ${qhull_STATIC} ${qhull_STATICR})
+-set(qhull_TARGETS_SHARED ${qhull_SHAREDR})
++set(qhull_TARGETS_SHARED ${qhull_SHAREDR} ${qhull_SHARED} ${qhull_SHAREDP})
+ 
+ set(
+     qhull_TARGETS_TEST   # Unused

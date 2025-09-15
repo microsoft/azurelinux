@@ -4,6 +4,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -18,9 +19,11 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/pkg/licensecheck"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/buildagents"
 	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/schedulerutils"
+	"github.com/sirupsen/logrus"
 
 	"golang.org/x/sys/unix"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -94,6 +97,12 @@ var (
 	buildAgentProgram    = app.Flag("build-agent-program", "Path to the build agent that will be invoked to build packages.").String()
 	workers              = app.Flag("workers", "Number of concurrent build agents to spawn. If set to 0, will automatically set to the logical CPU count.").Default(defaultWorkerCount).Int()
 
+	licenseCheckMode     = app.Flag("license-check-mode", "Do additional validation of licenses after the build").Default(string(licensecheck.LicenseCheckModeDefault)).Enum(licensecheck.ValidLicenseCheckModeStrings()...)
+	licenseNameFile      = app.Flag("license-check-name-file", "File containing license names to check for.").ExistingFile()
+	licenseExceptionFile = app.Flag("license-check-exception-file", "File containing license exceptions.").ExistingFile()
+	licenseResultsFile   = app.Flag("license-results-file", "File to save the license check results to.").String()
+	licenseSummaryFile   = app.Flag("license-summary-file", "File to save the license check summary to.").String()
+
 	pkgsToIgnore = app.Flag("ignored-packages", "Space separated list of specs ignoring rebuilds if their dependencies have been updated. Will still build if all of the spec's RPMs have not been built.").String()
 
 	pkgsToBuild   = app.Flag("packages", "Space separated list of top-level packages that should be built. Omit this argument to build all packages.").String()
@@ -126,6 +135,28 @@ func main() {
 
 	if *buildAttempts <= 0 {
 		logger.Log.Fatalf("Value in --build-attempts must be greater than zero. Found %d.", *buildAttempts)
+	}
+
+	var licenseCheckerConfig = schedulerutils.PackageLicenseCheckerConfig{Mode: licensecheck.LicenseCheckModeNone}
+	if *licenseCheckMode != string(licensecheck.LicenseCheckModeNone) {
+		if *licenseNameFile == "" {
+			logger.Log.Fatalf("License check mode is set to '%s', but no license name file was provided.", *licenseCheckMode)
+		}
+		if *licenseExceptionFile == "" {
+			logger.Log.Fatalf("License check mode is set to '%s', but no license exception file was provided.", *licenseCheckMode)
+		}
+
+		licenseCheckerWorkDir := filepath.Join(*workDir, "license-checker")
+		licenseCheckerConfig = schedulerutils.PackageLicenseCheckerConfig{
+			BuildDirPath:      licenseCheckerWorkDir,
+			WorkerTarPath:     *workerTar,
+			NameFilePath:      *licenseNameFile,
+			ExceptionFilePath: *licenseExceptionFile,
+			DistTag:           *distTag,
+			Mode:              licensecheck.LicenseCheckMode(*licenseCheckMode),
+			ResultsFile:       *licenseResultsFile,
+			SummaryFile:       *licenseSummaryFile,
+		}
 	}
 
 	dependencyGraph, err := pkggraph.ReadDOTGraphFile(*inputGraphFile)
@@ -193,9 +224,9 @@ func main() {
 	signal.Notify(signals, unix.SIGINT, unix.SIGTERM)
 	go cancelBuildsOnSignal(signals, agent)
 
-	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *extraLayers, *maxCascadingRebuilds, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, finalTestsToRun, testsToRerun, ignoredTests, toolchainPackages, *optimizeWithCachedImplicit, *allowToolchainRebuilds)
+	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, licenseCheckerConfig, *workers, *buildAttempts, *checkAttempts, *extraLayers, *maxCascadingRebuilds, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, finalTestsToRun, testsToRerun, ignoredTests, toolchainPackages, *optimizeWithCachedImplicit, *allowToolchainRebuilds)
 	if err != nil {
-		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s.", err)
+		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above and the build log '%s'.\nError: %s.", *logFlags.LogFile, err)
 	}
 
 	if *useCcache {
@@ -210,6 +241,20 @@ func main() {
 			logger.Log.Warnf("Failed to initialize the ccache manager:\n%v", err)
 		}
 	}
+
+	if *noCleanup {
+		message := []string{
+			"ATTENTION!",
+			"",
+			"'--no-cleanup' requested. Build agent directories will not be removed automatically.",
+			"(" + *workDir + "/*)",
+			"Manual cleanup is required.",
+			"Use 'make clean-build-packages-workers' to remove build agent directories.",
+			"",
+			"Also consider using 'make containerized-rpmbuild' to debug package build issues",
+		}
+		logger.PrintMessageBox(logrus.InfoLevel, message)
+	}
 }
 
 // cancelOutstandingBuilds stops any builds that are currently running.
@@ -220,7 +265,7 @@ func cancelOutstandingBuilds(agent buildagents.BuildAgent) {
 	}
 
 	// Issue a SIGINT to all children processes to allow them to gracefully exit.
-	shell.PermanentlyStopAllChildProcesses(unix.SIGINT)
+	shell.StopAllChildProcesses(unix.SIGINT)
 }
 
 // cancelBuildsOnSignal will stop any builds running on SIGINT/SIGTERM.
@@ -234,7 +279,7 @@ func cancelBuildsOnSignal(signals chan os.Signal, agent buildagents.BuildAgent) 
 
 // buildGraph builds all packages in the dependency graph requested.
 // It will save the resulting graph to outputFile.
-func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts, checkAttempts, extraLayers int, maxCascadingRebuilds uint, stopOnFailure, canUseCache bool, packagesToBuild, packagesToRebuild, ignoredPackages, testsToRun, testsToRerun, ignoredTests []*pkgjson.PackageVer, toolchainPackages []string, optimizeWithCachedImplicit bool, allowToolchainRebuilds bool) (err error) {
+func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, licenseCheckerConfig schedulerutils.PackageLicenseCheckerConfig, workers, buildAttempts, checkAttempts, extraLayers int, maxCascadingRebuilds uint, stopOnFailure, canUseCache bool, packagesToBuild, packagesToRebuild, ignoredPackages, testsToRun, testsToRerun, ignoredTests []*pkgjson.PackageVer, toolchainPackages []string, optimizeWithCachedImplicit bool, allowToolchainRebuilds bool) (err error) {
 	// graphMutex guards pkgGraph from concurrent reads and writes during build.
 	var graphMutex sync.RWMutex
 
@@ -254,7 +299,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 	logger.Log.Infof("Building %d nodes with %d workers", numberOfNodes, workers)
 
 	// After this call pkgGraph will be given to multiple routines and accessing it requires acquiring the mutex.
-	builtGraph, err := buildAllNodes(stopOnFailure, canUseCache, packagesToRebuild, testsToRerun, pkgGraph, &graphMutex, goalNode, channels, maxCascadingRebuilds, toolchainPackages, allowToolchainRebuilds)
+	builtGraph, err := buildAllNodes(stopOnFailure, canUseCache, packagesToRebuild, testsToRerun, pkgGraph, &graphMutex, goalNode, channels, licenseCheckerConfig, maxCascadingRebuilds, toolchainPackages, allowToolchainRebuilds)
 
 	if builtGraph != nil {
 		graphMutex.RLock()
@@ -307,7 +352,7 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, check
 // - Attempts to satisfy any unresolved dynamic dependencies with new implicit provides from the build result.
 // - Attempts to subgraph the graph to only contain the requested packages if possible.
 // - Repeat.
-func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels, maxCascadingRebuilds uint, reservedFiles []string, allowToolchainRebuilds bool) (builtGraph *pkggraph.PkgGraph, err error) {
+func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels, licenseCheckerConfig schedulerutils.PackageLicenseCheckerConfig, maxCascadingRebuilds uint, reservedFiles []string, allowToolchainRebuilds bool) (builtGraph *pkggraph.PkgGraph, err error) {
 	var (
 		// stopBuilding tracks if the build has entered a failed state and this routine should stop as soon as possible.
 		stopBuilding bool
@@ -322,6 +367,8 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 		// by using cached implicit provides to satisfy unresolved dynamic dependencies during the first pass of the optimizer.
 		useCachedImplicit bool
 		isGraphOptimized  bool
+
+		licenseChecker *schedulerutils.PackageLicenseChecker
 	)
 
 	// Start the build at the leaf nodes.
@@ -329,6 +376,22 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	buildState := schedulerutils.NewGraphBuildState(reservedFiles, maxCascadingRebuilds)
 	buildRunsTests := len(pkgGraph.AllTestNodes()) > 0
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
+
+	if licenseCheckerConfig.Mode != licensecheck.LicenseCheckModeNone {
+		logger.Log.Infof("Starting license checker with mode '%s'.", licenseCheckerConfig.Mode)
+		licenseChecker, err = schedulerutils.NewPackageLicenseChecker(licenseCheckerConfig)
+		defer func() {
+			cleanupErr := licenseChecker.CleanupPackageLicenseChecker()
+			if cleanupErr != nil {
+				if err == nil {
+					err = fmt.Errorf("failed to cleanup after license checker:\n%w", cleanupErr)
+				} else {
+					// Append the cleanup error to the existing error
+					err = fmt.Errorf("%w\nfailed to cleanup after license checker failed:\n%w", err, cleanupErr)
+				}
+			}
+		}()
+	}
 
 	for {
 		logger.Log.Debugf("Found %d unblocked nodes: %v.", len(nodesToBuild), nodesToBuild)
@@ -383,6 +446,16 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 
 		// Process the the next build result
 		res := <-channels.Results
+
+		// Pass the paths to the built RPMs to the license checker if it is enabled.
+		if licenseChecker != nil && res.Err == nil {
+			res.HasLicenseWarnings, res.HasLicenseErrors, err = licenseChecker.CheckPkgLicenses(res.BuiltFiles)
+			if err != nil {
+				// The license checker itself should not fail, stop the build if it does.
+				err = fmt.Errorf("failed to check licenses for packages:\n%w", err)
+				break
+			}
+		}
 
 		schedulerutils.PrintBuildResult(res)
 		err = buildState.RecordBuildResult(res, allowToolchainRebuilds)
@@ -481,11 +554,33 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	time.Sleep(time.Second)
 
 	builtGraph = pkgGraph
-	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState, allowToolchainRebuilds)
+	schedulerutils.RecordLicenseSummary(licenseChecker)
+	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState, allowToolchainRebuilds, licenseChecker)
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
-	if !allowToolchainRebuilds && (len(buildState.ConflictingRPMs()) > 0 || len(buildState.ConflictingSRPMs()) > 0) {
-		err = fmt.Errorf("toolchain packages rebuilt. See build summary for details. Use 'ALLOW_TOOLCHAIN_REBUILDS=y' to suppress this error if rebuilds were expected")
+
+	printErr := schedulerutils.PrintHiddenBuildBlockers(builtGraph, graphMutex, buildState, goalNode)
+	if printErr != nil {
+		logger.Log.Warnf("Failed to print hidden build blockers:\n%s", printErr)
 	}
+
+	err = errors.Join(err, performPostBuildChecks(allowToolchainRebuilds, buildState))
+
+	return
+}
+
+// performPostBuildChecks checks for any fatal post-build errors
+// and turns them into as a single error.
+func performPostBuildChecks(allowToolchainRebuilds bool, buildState *schedulerutils.GraphBuildState) (err error) {
+	if !allowToolchainRebuilds && (len(buildState.ConflictingRPMs()) > 0 || len(buildState.ConflictingSRPMs()) > 0) {
+		toolchainErr := fmt.Errorf("toolchain packages rebuilt. See build summary for details. Use 'ALLOW_TOOLCHAIN_REBUILDS=y' to suppress this error if rebuilds were expected")
+		err = errors.Join(err, toolchainErr)
+	}
+
+	if len(buildState.LicenseFailureSRPMs()) > 0 {
+		licenseErr := fmt.Errorf("license check failed for some packages. See build summary for details")
+		err = errors.Join(err, licenseErr)
+	}
+
 	return
 }
 

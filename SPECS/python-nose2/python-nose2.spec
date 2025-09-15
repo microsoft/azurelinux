@@ -2,21 +2,26 @@
 
 Summary:        Next generation of nicer testing for Python
 Name:           python-%{srcname}
-Version:        0.10.0
-Release:        2%{?dist}
+Version:        0.14.1
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://nose2.readthedocs.org
 Source0:        https://github.com/nose-devs/nose2/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         pyproject-use-flit-core.patch
 
 BuildArch:      noarch
 
+BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python%{python3_pkgversion}-coverage
 BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-flit-core
 BuildRequires:  python%{python3_pkgversion}-mock
+BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-six
+BuildRequires:  python%{python3_pkgversion}-wheel
 
 %description
 nose2 is the next generation of nicer testing for Python, based on the plugins
@@ -53,23 +58,29 @@ nose2. See the documentation for a thorough rundown.
 %prep
 %autosetup -n %{srcname}-%{version} -p0
 
+%generate_buildrequires
+%pyproject_buildrequires
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files %{srcname}
 
 %check
 PYTHONPATH=`pwd` python3 -m nose2.__main__ -v
 
 %files -n python%{python3_pkgversion}-%{srcname}
-%license license.txt
+%license LICENSE
 %doc README.rst
 %{python3_sitelib}/*
-%{_bindir}/nose2-%{python3_version}
 %{_bindir}/nose2
 
 %changelog
+* Thu Apr 04 2024 Aurélien Bombo <abombo@microsoft.com> - 0.14.1-1
+- Azure Linux 3.0 upgrade.
+
 * Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10.0-2
 - Updating dependencies.
 

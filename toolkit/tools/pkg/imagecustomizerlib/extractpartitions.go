@@ -1,7 +1,6 @@
 package imagecustomizerlib
 
 import (
-	"crypto/rand"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -28,12 +27,12 @@ type outputPartitionMetadata struct {
 
 const (
 	SkippableFrameMagicNumber uint32 = 0x184D2A50
-	SkippableFramePayloadSize uint32 = 16
+	SkippableFramePayloadSize uint32 = UuidSize
 	SkippableFrameHeaderSize  int    = 8
 )
 
 // Extract all partitions of connected image into separate files with specified format.
-func extractPartitions(imageLoopDevice string, outDir string, basename string, partitionFormat string) error {
+func extractPartitions(imageLoopDevice string, outDir string, basename string, partitionFormat string, imageUuid [UuidSize]byte) error {
 
 	// Get partition info
 	diskPartitions, err := diskutils.GetDiskPartitions(imageLoopDevice)
@@ -44,43 +43,54 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 	// Stores the output partition metadata that will be written to JSON file
 	var partitionMetadataOutput []outputPartitionMetadata
 
-	// Create skippable frame metadata defined as a random 128-bit number
-	skippableFrameMetadata, err := createSkippableFrameMetadata()
-	if err != nil {
-		return err
-	}
-
 	// Extract partitions to files
-	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
-		if diskPartitions[partitionNum].Type == "part" {
-			partitionFilename := basename + "_" + strconv.Itoa(partitionNum)
-			rawFilename := partitionFilename + ".raw"
-			partitionLoopDevice := diskPartitions[partitionNum].Path
+	for _, partition := range diskPartitions {
+		if partition.Type != "part" {
+			continue
+		}
 
-			partitionFilepath, err := copyBlockDeviceToFile(outDir, partitionLoopDevice, rawFilename)
+		partitionNum, err := getPartitionNum(partition.Path)
+		if err != nil {
+			return err
+		}
+
+		partitionFilename := basename + "_" + strconv.Itoa(partitionNum)
+		rawFilename := partitionFilename + ".raw"
+
+		partitionFilepath, err := copyBlockDeviceToFile(outDir, partition.Path, rawFilename)
+		if err != nil {
+			return err
+		}
+
+		partitionFullFilePath, err := filepath.Abs(partitionFilepath)
+		if err != nil {
+			return fmt.Errorf("failed to get absolute path (%s):\n%w", partitionFilepath, err)
+		}
+
+		// Sanity check the partition file.
+		err = checkFileSystemFile(partition.FileSystemType, partitionFullFilePath)
+		if err != nil {
+			return fmt.Errorf("failed to check file system integrity (%s):\n%w", partitionFilepath, err)
+		}
+
+		switch partitionFormat {
+		case "raw":
+			// Do nothing for "raw" case
+		case "raw-zst":
+			partitionFilepath, err = extractRawZstPartition(partitionFilepath, imageUuid, partitionFilename, outDir)
 			if err != nil {
 				return err
 			}
-
-			switch partitionFormat {
-			case "raw":
-				// Do nothing for "raw" case
-			case "raw-zst":
-				partitionFilepath, err = extractRawZstPartition(partitionFilepath, skippableFrameMetadata, partitionFilename, outDir)
-				if err != nil {
-					return err
-				}
-			default:
-				return fmt.Errorf("unsupported partition format (supported: raw, raw-zst): %s", partitionFormat)
-			}
-
-			partitionMetadata, err := constructOutputPartitionMetadata(diskPartitions[partitionNum], partitionNum, partitionFilepath)
-			if err != nil {
-				return fmt.Errorf("failed to construct partition metadata:\n%w", err)
-			}
-			partitionMetadataOutput = append(partitionMetadataOutput, partitionMetadata)
-			logger.Log.Infof("Partition file created: %s", partitionFilepath)
+		default:
+			return fmt.Errorf("unsupported partition format (supported: raw, raw-zst): %s", partitionFormat)
 		}
+
+		partitionMetadata, err := constructOutputPartitionMetadata(partition, partitionNum, partitionFilepath)
+		if err != nil {
+			return fmt.Errorf("failed to construct partition metadata:\n%w", err)
+		}
+		partitionMetadataOutput = append(partitionMetadataOutput, partitionMetadata)
+		logger.Log.Infof("Partition file created: %s", partitionFilepath)
 	}
 
 	// Write partition metadata JSON to a file
@@ -198,26 +208,6 @@ func createSkippableFrame(magicNumber uint32, frameSize uint32, skippableFrameMe
 	logger.Log.Infof("Skippable frame has been created with the following metadata: %d", skippableFrame[8:8+frameSize])
 
 	return skippableFrame
-}
-
-// Create user metadata that will be inserted into the skippable frame.
-func createSkippableFrameMetadata() (skippableFrameMetadata [SkippableFramePayloadSize]byte, err error) {
-	// Set the skippableFrameMetadata to be a random 128-Bit number
-	skippableFrameMetadata, err = generateRandom128BitNumber()
-	if err != nil {
-		return skippableFrameMetadata, err
-	}
-	return skippableFrameMetadata, nil
-}
-
-// Generates a Random 128-Bit number.
-func generateRandom128BitNumber() ([SkippableFramePayloadSize]byte, error) {
-	var randomBytes [SkippableFramePayloadSize]byte
-	_, err := rand.Read(randomBytes[:])
-	if err != nil {
-		return randomBytes, err
-	}
-	return randomBytes, nil
 }
 
 // Construct outputPartitionMetadata for given partition.

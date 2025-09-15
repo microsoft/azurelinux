@@ -1,7 +1,7 @@
 Name:           giflib
 Summary:        A library and utilities for processing GIFs
 Version:        5.2.1
-Release:        6%{?dist}
+Release:        10%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,11 @@ URL:            http://www.sourceforge.net/projects/giflib/
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 # Move quantize.c back into libgif.so (#1750122)
 Patch0:         giflib_quantize.patch
+Patch1:         CVE-2023-48161.patch
+Patch2:         CVE-2022-28506.patch
+Patch3:         CVE-2023-39742.patch
+Patch4:         CVE-2025-31344.patch
+Patch5:         CVE-2021-40633.patch
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  xmlto
@@ -59,6 +64,18 @@ find %{buildroot} -name '*.a' -print -delete
 %{_mandir}/man1/*.1*
 
 %changelog
+* Mon Apr 21 2025 Kanishk Bansal <kanbansal@microsoft.com> - 5.2.1-10
+- Patch CVE-2021-40633 using an upstream patch
+
+* Tue Apr 15 2025 Sudipta Pandit <sudpandit@microsoft.com> - 5.2.1-9
+- Patch CVE-2025-31344
+
+* Fri Feb 14 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 5.2.1-8
+- Patch CVE-2023-39742
+
+* Fri Oct 11 2024 Suresh Thelkar <sthelkar@microsoft.com> - 5.2.1-7
+- Patch CVE-2023-48161 and CVE-2022-28506
+
 * Mon Jul 11 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.2.1-6
 - Promote to mariner-official-base repo
 - Lint spec

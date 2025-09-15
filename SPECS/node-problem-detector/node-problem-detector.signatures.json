@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "node-problem-detector-0.8.15.tar.gz": "349cfd7f995218abb208391b16a4c5191877dfaf9d6208700fe6225de62fab2f",
-  "node-problem-detector-0.8.15-vendor.tar.gz": "8515aad9f408d7e040f4589a649799f6ace8a777bc74d9a2a18cafd0092ac25c",
-  "node-problem-detector-0.8.15-test-vendor.tar.gz": "cdff5ed0f4ceb009b3b34eb52980dd94dc204fbaf2bac78bc6f4ac662843d782"
- }
-}

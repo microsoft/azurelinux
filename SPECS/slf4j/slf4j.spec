@@ -17,8 +17,8 @@
 
 Summary:        Simple Logging Facade for Java
 Name:           slf4j
-Version:        1.7.30
-Release:        6%{?dist}
+Version:        2.0.7
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -26,19 +26,8 @@ Group:          Development/Libraries/Java
 URL:            https://www.slf4j.org/
 Source0:        https://github.com/qos-ch/%{name}/archive/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        http://www.apache.org/licenses/LICENSE-2.0.txt
-Source2:        build.xml.tar.bz2
-Patch1:         build-remove-slf4j_api-binder.patch
-Patch2:         slf4j-commons-lang3.patch
-BuildRequires:  ant >= 1.6.5
-BuildRequires:  ant-junit >= 1.6.5
-BuildRequires:  apache-commons-lang3
-BuildRequires:  apache-commons-logging
-BuildRequires:  cal10n
-BuildRequires:  java-devel >= 1.5.0
+BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  javapackages-tools
-BuildRequires:  javassist >= 3.4
-BuildRequires:  junit >= 3.8.2
 Requires:       cal10n
 Requires:       java
 # this is ugly hack, which creates package which requires the same,
@@ -84,16 +73,6 @@ Requires:       mvn(org.slf4j:slf4j-api) = %{version}
 %description jdk14
 SLF4J JDK14 Binding.
 
-%package jcl
-Summary:        SLF4J JCL Binding
-License:        MIT
-Group:          Development/Libraries/Java
-Requires:       mvn(commons-logging:commons-logging)
-Requires:       mvn(org.slf4j:slf4j-api) = %{version}
-
-%description jcl
-SLF4J JCL Binding.
-
 %package -n jcl-over-slf4j
 Summary:        JCL 1.1.1 implemented over SLF4J
 License:        ASL 2.0
@@ -112,134 +91,116 @@ Requires:       mvn(org.slf4j:slf4j-api) = %{version}
 %description -n log4j-over-slf4j
 Log4j implemented over SLF4J.
 
+%package migrator
+Summary:        SLF4J Migrator
+License:        MIT
+Group:          Development/Libraries/Java
+Requires:       mvn(org.slf4j:slf4j-api) = %{version}
+ 
+%description migrator
+SLF4J Migrator.
+
+%package jdk-platform-logging
+Summary:        SLF4J jdk Platform Logging
+License:        MIT
+Group:          Development/Libraries/Java
+Requires:       mvn(org.slf4j:slf4j-api) = %{version}
+ 
+%description jdk-platform-logging
+SLF4J jdk Platform Logging.
+
+%package sources
+Summary:        SLF4J Source JARs
+License:        MIT
+Group:          Documentation/Other
+ 
+%description sources
+SLF4J Source JARs.
+
 %prep
-%setup -q -n %{name}-v_%{version} -a2
-%patch 1 -p1
-%patch 2 -p1
+%setup -q -n %{name}-v_%{version}
 find . -name "*.jar" | xargs rm
 cp -p %{SOURCE1} APACHE-LICENSE
 
-sed -i -e "s|ant<|org.apache.ant<|g" integration/pom.xml
-
-%{_bindir}/find -name "*.css" -o -name "*.js" -o -name "*.txt" | \
-    %{_bindir}/xargs -t perl -pi -e 's/
-$//g'
-
-# Unexpanded variable in the manifests
-for i in */src/main/resources/META-INF/MANIFEST.MF; do
-  echo "" >> ${i}
-  echo "Bundle-Version: %{version}" >> ${i}
-  sed -i '/^$/d' ${i}
-  perl -pi -e 's#\$\{parsedVersion\.osgiVersion\}#%{version}#g' ${i}
-  perl -pi -e 's#\$\{slf4j\.api\.minimum\.compatible\.version\}#1\.6\.0#g' ${i}
-done
-
-for i in */maven-build.xml; do
-  sed -i 's/target="1.6"/target="1.8"/' ${i}
-  sed -i 's/source="1.6"/source="1.8"/' ${i}
-done
-
-# The general pattern is that the API package exports API classes and does
-# # not require impl classes. slf4j was breaking that causing "A cycle was
-# # detected when generating the classpath slf4j.api, slf4j.nop, slf4j.api."
-# # The API bundle requires impl package, so to avoid cyclic dependencies
-# # during build time, it is necessary to mark the imported package as an
-# # optional one.
-# # Reported upstream: http://bugzilla.slf4j.org/show_bug.cgi?id=283
-sed -i "/Import-Package/s/$/;resolution:=optional/" slf4j-api/src/main/resources/META-INF/MANIFEST.MF
-
-%pom_change_dep -r -f ::::: :::::
-
-# Disabling log4j12 and modules depending on it.
-sed -i "/log4j12/d" maven-build.xml
+%pom_disable_module integration
 %pom_disable_module slf4j-log4j12
 %pom_disable_module jul-to-slf4j
 %pom_disable_module slf4j-ext
+%pom_disable_module slf4j-reload4j
+%pom_disable_module osgi-over-slf4j
+
+# Port to maven-antrun-plugin 3.0.0
+sed -i s/tasks/target/ slf4j-api/pom.xml
+
+# dos2unix
+find -name "*.css" -o -name "*.js" -o -name "*.txt" | \
+    xargs -t sed -i 's/\r$//'
+
+%pom_xpath_remove "pom:extensions"
+
+%mvn_package :::sources: sources
+
+%mvn_package :%{name}-api
+%mvn_package :%{name}-simple
+%mvn_package :%{name}-nop
 
 %build
-export CLASSPATH=$(build-classpath \
-                   commons-logging \
-                   commons-lang3 \
-                   javassist-3.14.0 \
-                   cal10n)
-export CLASSPATH=$CLASSPATH:$(pwd)/slf4j-api/target/slf4j-api-%{version}.jar
-export MAVEN_REPO_LOCAL=$(pwd)/.m2
-ant -Dmaven2.jpp.mode=true \
-    -Dmaven.test.skip=true \
-    -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
-    -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8 \
-    package javadoc \
+%mvn_build -f -s -- -Drequired.jdk.version=1.8
 
 %install
-# jars
-install -d -m 0755 %{buildroot}%{_javadir}/%{name}
-for i in api jcl jdk14 nop simple; do
-  install -m 644 slf4j-${i}/target/slf4j-${i}-%{version}.jar \
-    %{buildroot}%{_javadir}/%{name}/${i}.jar
-  ln -sf ${i}.jar %{buildroot}%{_javadir}/%{name}/%{name}-${i}.jar
-done
-for i in jcl-over-slf4j log4j-over-slf4j; do
-  install -m 644 ${i}/target/${i}-%{version}.jar %{buildroot}%{_javadir}/%{name}/${i}.jar
-done
-
-# poms
-install -d -m 755 %{buildroot}%{_mavenpomdir}/%{name}
-for i in api jcl jdk14 nop simple; do
-  %pom_remove_parent slf4j-${i}
-  %pom_xpath_inject "pom:project" "
-    <groupId>org.slf4j</groupId>
-    <version>%{version}</version>" slf4j-${i}
-  install -pm 644 slf4j-${i}/pom.xml %{buildroot}%{_mavenpomdir}/%{name}/${i}.pom
-done
-for i in jcl-over-slf4j log4j-over-slf4j; do
-  %pom_remove_parent ${i}
-  %pom_xpath_inject "pom:project" "
-    <groupId>org.slf4j</groupId>
-    <version>%{version}</version>" ${i}
-  install -pm 644 ${i}/pom.xml %{buildroot}%{_mavenpomdir}/%{name}/${i}.pom
-done
-for i in api nop simple; do
-  %add_maven_depmap %{name}/${i}.pom %{name}/${i}.jar
-done
-for i in jcl jdk14 jcl-over-slf4j log4j-over-slf4j; do
-  %add_maven_depmap %{name}/${i}.pom %{name}/${i}.jar -f ${i}
-done
+# Compat symlinks
+%mvn_file ':%{name}-{*}' %{name}/%{name}-@1 %{name}/@1
+%mvn_install
 
 # manual
 install -d -m 0755 %{buildroot}%{_docdir}/%{name}-%{version}
-rm -f target/site/.htaccess
-cp -pr target/site %{buildroot}%{_docdir}/%{name}-%{version}/
-install -m 644 LICENSE.txt %{buildroot}%{_docdir}/%{name}-%{version}/
-
-# javadoc
-install -d -m 0755 %{buildroot}%{_javadocdir}/%{name}
-cp -pr target/site/* %{buildroot}%{_javadocdir}/%{name}/
-rm -rf target/site
+rm -f .xmvn/apidoc
+cp -pr .xmvn/* %{buildroot}%{_docdir}/%{name}-%{version}/
 
 %files -f .mfiles
-%dir %{_docdir}/%{name}-%{version}
-%license %{_docdir}/%{name}-%{version}/LICENSE.txt
-%{_javadir}/%{name}/%{name}-api.jar
+%license LICENSE.txt APACHE-LICENSE
+%{_javadir}/%{name}/api.jar
+%{_javadir}/%{name}/nop.jar
+%{_javadir}/%{name}/simple.jar
 %{_javadir}/%{name}/%{name}-nop.jar
 %{_javadir}/%{name}/%{name}-simple.jar
+%{_datadir}/maven-metadata/%{name}-%{name}-parent.xml
+%{_datadir}/maven-metadata/%{name}.xml
+%{_datadir}/maven-poms/%{name}/api.pom
+%{_datadir}/maven-poms/%{name}/nop.pom
+%{_datadir}/maven-poms/%{name}/parent.pom
+%{_datadir}/maven-poms/%{name}/simple.pom
+%{_datadir}/maven-poms/%{name}/%{name}-api.pom
+%{_datadir}/maven-poms/%{name}/%{name}-nop.pom
+%{_datadir}/maven-poms/%{name}/%{name}-parent.pom
+%{_datadir}/maven-poms/%{name}/%{name}-simple.pom
 
-%files jdk14 -f .mfiles-jdk14
-%{_javadir}/%{name}/%{name}-jdk14.jar
-
-%files jcl -f .mfiles-jcl
-%{_javadir}/%{name}/%{name}-jcl.jar
+%files jdk14 -f .mfiles-slf4j-jdk14
 
 %files -n jcl-over-slf4j -f .mfiles-jcl-over-slf4j
 
 %files -n log4j-over-slf4j -f .mfiles-log4j-over-slf4j
 
+%files migrator -f .mfiles-slf4j-migrator
+
+%files jdk-platform-logging -f .mfiles-slf4j-jdk-platform-logging
+
+%files sources -f .mfiles-sources
+
 %files javadoc
 %{_javadocdir}/%{name}
 
 %files manual
-%{_docdir}/%{name}-%{version}/site
+%{_docdir}/%{name}-%{version}/
 
 %changelog
+* Thu Apr 04 2024 Henry Li <lihl@microsoft.com> - 2.0.7-1
+- Upgrade to v2.0.7
+- Change to maven build and install
+- Remove jcl subpackage as it does not exist in updated version
+- Add and modify files provided by main package
+- Add subpackages for migrator, jdk-platform-logging and sources
+
 * Wed Feb 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.7.30-6
 - rebuild with msopenjdk-17
 

@@ -2,25 +2,24 @@
 %define using_musl_libc 0
 %define using_vendored_crates 1
 
-Summary:        Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on top of KVM.
 Name:           cloud-hypervisor
-Version:        37.0
+Summary:        Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on top of the KVM hypervisor and the Microsoft Hypervisor (MSHV).
+Version:        41.0.139
 Release:        1%{?dist}
 License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
-URL:            https://github.com/cloud-hypervisor/cloud-hypervisor
-Source0:        https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+URL:            https://github.com/microsoft/cloud-hypervisor
+Source0:        https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 %if 0%{?using_vendored_crates}
-# Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
+# Note: the %%{name}-%%{version}-vendor.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache and config.toml run:
-#   tar -xf %{name}-%{version}.tar.gz
-#   cd %{name}-%{version}
+#   tar -xf %%{name}-%%{version}.tar.gz
+#   cd %%{name}-%%{version}
 #   cargo vendor > config.toml
-#   tar -czf %{name}-%{version}-cargo.tar.gz vendor/
-Source1:        %{name}-%{version}-cargo.tar.gz
-Source2:        config.toml
+#   tar -czf %%{name}-%%{version}-vendor.tar.gz vendor/
+Source1:        %{name}-%{version}-vendor.tar.gz
 %endif
 
 BuildRequires:  binutils
@@ -30,8 +29,8 @@ BuildRequires:  glibc-devel
 BuildRequires:  openssl-devel
 
 %if ! 0%{?using_rustup}
-BuildRequires:  rust >= 1.60.0
-BuildRequires:  cargo >= 1.60.0
+BuildRequires:  rust >= 1.85.0
+BuildRequires:  cargo >= 1.85.0
 %endif
 
 Requires: bash
@@ -43,7 +42,7 @@ ExclusiveArch:  x86_64
 
 %ifarch x86_64
 %define rust_def_target x86_64-unknown-linux-gnu
-%define cargo_pkg_feature_opts --no-default-features --features "mshv,kvm"
+%define cargo_pkg_feature_opts --features "mshv"
 %endif
 %ifarch aarch64
 %define rust_def_target aarch64-unknown-linux-gnu
@@ -63,32 +62,29 @@ ExclusiveArch:  x86_64
 %define cargo_offline --offline
 %endif
 
+# This package replaces cloud-hypervisor-cvm. As of 9/10/2025, cloud-hypervisor-cvm is a deprecated name.
+# This is a temporary measure for compatibility.
+# todo: remove this provides/obsoletes pair in the future.
+Provides: cloud-hypervisor-cvm = %{version}-%{release}
+Obsoletes: cloud-hypervisor-cvm < %{version}-%{release}
+
 %description
 Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on top of KVM. The project focuses on exclusively running modern, cloud workloads, on top of a limited set of hardware architectures and platforms. Cloud workloads refers to those that are usually run by customers inside a cloud provider. For our purposes this means modern Linux* distributions with most I/O handled by paravirtualised devices (i.e. virtio), no requirement for legacy devices and recent CPUs and KVM.
 
 %prep
 
-%setup -q -n %{name}-%{version}
+%setup -q -n cloud-hypervisor-%{version}
 %if 0%{?using_vendored_crates}
 tar xf %{SOURCE1}
-mkdir -p .cargo
-cp %{SOURCE2} .cargo/
 %endif
 
 %install
 install -d %{buildroot}%{_bindir}
 install -D -m755  ./target/%{rust_def_target}/release/cloud-hypervisor %{buildroot}%{_bindir}
-install -D -m755  ./target/%{rust_def_target}/release/ch-remote %{buildroot}%{_bindir}
-install -d %{buildroot}%{_libdir}
-install -d %{buildroot}%{_libdir}/cloud-hypervisor
-install -D -m755 target/%{rust_def_target}/release/vhost_user_block %{buildroot}%{_libdir}/cloud-hypervisor
-install -D -m755 target/%{rust_def_target}/release/vhost_user_net %{buildroot}%{_libdir}/cloud-hypervisor
 
 %if 0%{?using_musl_libc}
 install -d %{buildroot}%{_libdir}/cloud-hypervisor/static
 install -D -m755 target/%{rust_musl_target}/release/cloud-hypervisor %{buildroot}%{_libdir}/cloud-hypervisor/static
-install -D -m755 target/%{rust_musl_target}/release/vhost_user_block %{buildroot}%{_libdir}/cloud-hypervisor/static
-install -D -m755 target/%{rust_musl_target}/release/vhost_user_net %{buildroot}%{_libdir}/cloud-hypervisor/static
 install -D -m755 target/%{rust_musl_target}/release/ch-remote %{buildroot}%{_libdir}/cloud-hypervisor/static
 %endif
 
@@ -127,107 +123,126 @@ fi
 export OPENSSL_NO_VENDOR=1
 %endif
 cargo build --release --target=%{rust_def_target} %{cargo_pkg_feature_opts} %{cargo_offline}
-cargo build --release --target=%{rust_def_target} --package vhost_user_net %{cargo_offline}
-cargo build --release --target=%{rust_def_target} --package vhost_user_block %{cargo_offline}
 %if 0%{?using_musl_libc}
 cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{cargo_offline}
-cargo build --release --target=%{rust_musl_target} --package vhost_user_net %{cargo_offline}
-cargo build --release --target=%{rust_musl_target} --package vhost_user_block %{cargo_offline}
 %endif
 
 %files
 %defattr(-,root,root,-)
-%{_bindir}/ch-remote
 %caps(cap_net_admin=ep) %{_bindir}/cloud-hypervisor
-%{_libdir}/cloud-hypervisor/vhost_user_block
-%caps(cap_net_admin=ep) %{_libdir}/cloud-hypervisor/vhost_user_net
 %if 0%{?using_musl_libc}
 %{_libdir}/cloud-hypervisor/static/ch-remote
 %caps(cap_net_admim=ep) %{_libdir}/cloud-hypervisor/static/cloud-hypervisor
-%{_libdir}/cloud-hypervisor/static/vhost_user_block
-%caps(cap_net_admin=ep) %{_libdir}/cloud-hypervisor/static/vhost_user_net
 %endif
-%license LICENSE-APACHE
-%license LICENSE-BSD-3-Clause
+%license LICENSES/Apache-2.0.txt
+%license LICENSES/BSD-3-Clause.txt
+%license LICENSES/CC-BY-4.0.txt
 
 %changelog
-* Mon Feb 05 2024 Mitch Zhu <mitchzhu@microsoft.com> - 37.0-1
-- Update to v37.0
+* Tue Sep 09 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 41.0.139-1
+- Auto-upgrade to 41.0.139
+- Rename package to cloud-hypervisor
 
-* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 35.0-1
-- Auto-upgrade to 35.0 - Azure Linux 3.0 - package upgrades
+* Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 41.0.79-4
+- Bump release to rebuild with rust
 
-* Mon Oct 23 2023 Rohit Rawat <rohitrawat@microsoft.com> - 32.0-2
-- Patch CVE-2023-45853 in vendor/libz-sys/src/zlib
+* Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 41.0.79-3
+- Bump release to rebuild with rust
 
-* Wed Sep 27 2023 Saul Paredes <saulparedes@microsoft.com> - 32.0-1
-- Update to v32.0
+* Fri Jun 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 41.0.79-2
+- Bump release to rebuild with rust
 
-* Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 31.1-2
-- Bump package to rebuild with rust 1.72.0
+* Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 41.0.79-1
+- Auto-upgrade to 41.0.79
 
-* Fri May 12 2023 Saul Paredes <saulparedes@microsoft.com> - 31.1-1
-- Update to v31.1
+* Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 38.0.72.2-4
+- Pin rust version
 
-* Mon Apr 03 2023 Henry Beberman <henry.beberman@microsoft.com> 30.0-2
-- Patch CVE-2023-28448 in vendor/versionize
+* Sun Feb 16 2025 Kanishk Bansal <kanbansal@microsoft.com> - 38.0.72.2-3
+- Patch CVE-2024-12797
 
-* Fri Mar 24 2023 Mitch Zhu <mitchzhu@microsoft.com> 30.0-1
-- Update to v30.0
+* Tue Sep 17 2024 Jiri Appl <jiria@microsoft.com> - 38.0.72.2-2
+- Patch openssl in the vendored archive to 3.3.2 to address CVE-2024-6119
 
-* Tue Jan 24 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 29.0-1
-- Update to v29.0
+* Fri Jul 12 2024 Archana Choudhary <archana1@microsoft.com> - 38.0.72.2-1
+- Upgrade to v38.0.72.2
+- Fixes CVE-2023-45853, CVE-2018-25032, CVE-2023-5363, CVE-2023-5678, CVE-2023-6129, CVE-2023-6237, CVE-2024-0727, CVE-2024-4603
 
-* Mon Dec 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 28.0-1
-- Update to v28.0
+* Tue Jun 25 2024 Chris Co <chrco@microsoft.com> - 38.0.72-2
+- Remove conflicts with cloud-hypervisor
 
-* Thu Oct 27 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 27.0.60-1
-- Update to v27.0.60
-
-* Wed Aug 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 26.0-2
-- Bump package to rebuild with stable Rust compiler
-
-* Thu Aug 18 2022 Chris Co <chrco@microsoft.com> - 26.0-1
-- anbelski@linux.microsoft.com, 26.0-1 - Pull release 26.0 for Mariner from upstream
-- anbelski@linux.microsoft.com, 23.1-0 - Initial import 23.1 for Mariner from upstream
-- robert.bradford@intel.com, 23.0-0 - Update to 23.0
-- robert.bradford@intel.com, 22.0-0 - Update to 22.0
-- robert.bradford@intel.com, 21.0-0 - Update to 21.0
-- sebastien.boeuf@intel.com, 20.0-0 - Update to 20.0
-- fabiano.fidencio@intel.com, 19.0-0 - Update to 19.0
-- muislam@microsoft.com, 15.0-0 - Update version to 15.0
-- muislam@microsoft.com, 0.8.0-0 - Initial version
-
-* Wed Mar 09 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 22.0-1
-- Updating to version 22.0 to build with 'rust' 1.59.0.
-
-* Tue Feb 08 2022 Henry Li <lihl@microsoft.com> - 21.0-1
-- Update to version 21.0
-
-* Wed Dec 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 19.0-1
-- Updating to version 19.0 to use existing dependencies and build with the 1.56.1 version of 'rust'.
-
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.0-7
-- Bump release to rebuild with rust 1.47.0-3 (security update)
-
-* Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.0-6
-- Bump release to rebuild with rust 1.47.0-2 (security update)
-
-* Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.6.0-5
-- Added %%license line automatically
-
-* Thu May 07 2020 Nicolas Guibourge <mrgirgin@microsoft.com> - 0.6.0-4
-- Fix docker based build issue
-
-* Mon May 04 2020 Emre Girgin <mrgirgin@microsoft.com> - 0.6.0-3
-- Replace BuildArch with ExclusiveArch
-
-* Fri Apr 24 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.0-3
+* Wed May 15 2024 Saul Paredes <saulparedes@microsoft.com> - 38.0.72-1
+- Initial CBL-Mariner import from Azure
+- Upgrade to v38.0.72
+- Update install to match cloud-hypervisor install locations
+- Add conflicts with cloud-hypervisor
 - License verified.
-- Fixed Source0 tag.
 
-* Tue Apr 21 2020 Andrew Phelps <anphel@microsoft.com> - 0.6.0-2
-- Support building offline with prepopulated .cargo directory.
+* Mon Nov 6 2023 Dallas Delaney <dadelan@microsoft.com> - 32.0.314-2000
+- Upgrade to v32.0.314
 
-* Thu Feb 13 2020 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.6.0-1
-- Original version for CBL-Mariner.
+* Thu Sep 21 2023 Saul Paredes <saulparedes@microsoft.com> - 32.0.209-2000
+- Upgrade to v32.0.209
+
+* Fri Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 32.0.192-2000
+- Upgrade to v32.0.192
+
+* Tue Aug 1 2023 Saul Paredes <saulparedes@microsoft.com> - 32.0.0-2000
+- Accomodate cloud-hypervisor
+
+* Fri May 19 2023 Anatol Belski <anbelski@linux.microsoft.com> - 32.0.0-1000
+- Upgrade to v32.0
+
+* Wed Apr 19 2023 Anatol Belski <anbelski@linux.microsoft.com> - 31.1.0-1000
+- Upgrade to v31.1
+
+* Thu Apr 06 2023 Anatol Belski <anbelski@linux.microsoft.com> - 31.0.0-1000
+- Upgrade to v31.0
+
+* Fri Feb 24 2023 Anatol Belski <anbelski@linux.microsoft.com> - 30.0.0-1000
+- Upgrade to v30.0
+
+* Sun Jan 15 2023 Anatol Belski <anbelski@linux.microsoft.com> - 29.0.0-1000
+- Upgrade to v29.0
+
+* Thu Dec 15 2022 Anatol Belski <anbelski@linux.microsoft.com> - 28.1.0-1000
+- Upgrade to v28.1
+
+* Thu Nov 17 2022 Anatol Belski <anbelski@linux.microsoft.com> - 28.0.0-1000
+- Upgrade to v28.0
+
+* Wed Oct 12 2022 Anatol Belski <anbelski@linux.microsoft.com> - 27.0.0-1001
+- Spec refactoring towards pulling an arbitrary revision
+
+* Wed Oct 05 2022 Anatol Belski <anbelski@linux.microsoft.com> - 27.0-1
+- Upgrade to 27.0
+
+* Thu Sep 15 2022 Anatol Belski <anbelski@linux.microsoft.com> - 26.0-2
+- Unbundle tarballs from git
+
+* Wed Aug 17 2022 Anatol Belski <anbelski@linux.microsoft.com> - 26.0-1
+- Pull release 26.0 for Mariner from upstream
+
+* Tue May 16 2022 Anatol Belski <anbelski@linux.microsoft.com> - 23.1-0
+- Initial import 23.1 for Mariner from upstream
+
+*   Thu Apr 13 2022 Rob Bradford <robert.bradford@intel.com> 23.0-0
+-   Update to 23.0
+
+*   Thu Mar 03 2022 Rob Bradford <robert.bradford@intel.com> 22.0-0
+-   Update to 22.0
+
+*   Thu Jan 20 2022 Rob Bradford <robert.bradford@intel.com> 21.0-0
+-   Update to 21.0
+
+*   Thu Dec 02 2021 Sebastien Boeuf <sebastien.boeuf@intel.com> 20.0-0
+-   Update to 20.0
+
+*   Mon Nov 08 2021 Fabiano Fidêncio <fabiano.fidencio@intel.com> 19.0-0
+-   Update to 19.0
+
+*   Fri May 28 2021 Muminul Islam <muislam@microsoft.com> 15.0-0
+-   Update version to 15.0
+
+*   Wed Jul 22 2020 Muminul Islam <muislam@microsoft.com> 0.8.0-0
+-   Initial version

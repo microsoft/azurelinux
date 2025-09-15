@@ -1,9 +1,0 @@
-[Unit]
-Description=PPPoE Server.
-After=syslog.target
-
-[Service]
-ExecStart=/sbin/pppoe-server
-
-[Install]
-WantedBy=multi-user.target

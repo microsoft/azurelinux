@@ -1,5 +1,6 @@
 {
-  "Signatures": {
-    "strongswan-5.9.11.tar.bz2": "ddf53f1f26ad26979d5f55e8da95bd389552f5de3682e35593f9a70b2584ed2d"
-  }
+ "Signatures": {
+  "strongswan-5.9.14.tar.bz2": "728027ddda4cb34c67c4cec97d3ddb8c274edfbabdaeecf7e74693b54fc33678",
+  "tmpfiles-strongswan.conf": "940d91e3082906a5594fac1527ab0149d71662a23096475e804f1fd98d5c51a2"
+ }
 }

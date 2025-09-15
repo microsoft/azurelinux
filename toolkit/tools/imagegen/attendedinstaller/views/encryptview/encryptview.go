@@ -153,11 +153,6 @@ func (ev *EncryptView) onNextButton(nextPage func(), cfg *configuration.Config) 
 		return
 	}
 
-	if ev.sysConfig.ReadOnlyVerityRoot.Enable {
-		ev.navBar.SetUserFeedback(uitext.EncryptionVerityIncompatible, tview.Styles.TertiaryTextColor)
-		return
-	}
-
 	err := ev.passwordValidator.Check(enteredPassword)
 	if err != nil {
 		ev.navBar.SetUserFeedback(uiutils.ErrorToUserFeedback(err), tview.Styles.TertiaryTextColor)

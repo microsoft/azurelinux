@@ -1,0 +1,4 @@
+os:
+  additionalFiles:
+  - source: /dev/zero
+    destination: /zero.txt

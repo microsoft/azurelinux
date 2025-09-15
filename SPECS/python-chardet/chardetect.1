@@ -1,0 +1,29 @@
+.TH CHARDETECT "1" "June 2022" "" "User Commands"
+.SH NAME
+.B chardetect
+\(en takes one or more file paths and reports their detected encodings
+.SH SYNOPSIS
+.B chardetect
+.RB [ \-h ]
+.RB [ \-\-version ]
+.RI [ input \ ...]
+.SH OPTIONS
+.SS "POSITIONAL ARGUMENTS"
+.TP
+.I input
+File whose encoding we would like to determine.
+(default:
+.IR stdin )
+.SS "OPTIONAL ARGUMENTS"
+.TP
+.B \-h\fR, \fB\-\-help
+show a help message and exit
+.TP
+.B \-\-minimal
+Print only the encoding to standard output
+.TP
+.B \-l\fR, \fB\-\-legacy
+Rename legacy encodings to more modern ones.
+.TP
+.B \-\-version
+show program\(cqs version number and exit

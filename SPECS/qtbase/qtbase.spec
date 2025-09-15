@@ -34,8 +34,8 @@
 
 Name:         qtbase
 Summary:      Qt6 - QtBase components
-Version:      6.6.1
-Release:      1%{?dist}
+Version:      6.6.3
+Release:      4%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -43,6 +43,7 @@ Distribution:   Azure Linux
 URL:          https://qt-project.org/
 %global       majmin %(echo %{version} | cut -d. -f1-2)
 Source0:      https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
+Patch0:       CVE-2024-56732.patch
 
 BuildRequires: build-essential
 BuildRequires: systemd
@@ -96,6 +97,8 @@ Patch61: qtbase-cxxflag.patch
 
 # fix for new mariadb
 Patch65: qtbase-mysql.patch
+Patch66: CVE-2025-30348.patch
+Patch67: CVE-2025-5455.patch
 
 # Do not check any files in %%{_qt_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -344,9 +347,9 @@ install -m 644 src/plugins/platforms/xcb/*.h %{buildroot}%{_qt_headerdir}/QtXcb/
 
 
 %check
-# verify Qt5.pc
+# verify Qt6.pc
 export PKG_CONFIG_PATH=%{buildroot}%{_libdir}/pkgconfig
-test "$(pkg-config --modversion Qt5)" = "%{version}"
+test "$(pkg-config --modversion Qt6)" = "%{version}"
 %if 0%{?tests}
 ## see tests/README for expected environment (running a plasma session essentially)
 ## we are not quite there yet
@@ -476,7 +479,7 @@ fi
 # mostly empty for now, consider: filesystem/dir ownership, licenses
 %{rpm_macros_dir}/macros.qtbase
 
-	
+
 %files devel
 %{_bindir}/androiddeployqt
 %{_bindir}/androiddeployqt6
@@ -700,7 +703,22 @@ fi
 %{_qt_plugindir}/platformthemes/libqxdgdesktopportal.so
 
 %changelog
-* Tue Jan 02 2024 Sam Meluch <sammeluch@micrsoft.com> - 6.6.1
+* Fri Jun 27 2025 Akhila Guruju <v-guakhila@microsoft.com> - 6.6.3-4
+- Patch CVE-2025-5455
+
+* Wed Mar 26 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 6.6.3-3
+- Fix CVE-2025-30348
+
+* Thu Jan 16 2025 Lanze Liu <lanzeliu@micrsoft.com> - 6.6.3-2
+- Added a patch for addressing CVE-2024-56732
+
+* Wed Jan 15 2025 Lanze Liu <lanzeliu@micrsoft.com> - 6.6.3-1
+- Upgrade to version 6.6.3 to fix CVE-2024-30161
+
+* Fri May 17 2024 Neha Agarwal <nehaagarwal@micrsoft.com> - 6.6.2-1
+- Upgrade to version 6.6.2 to fix CVE-2023-51714
+
+* Tue Jan 02 2024 Sam Meluch <sammeluch@micrsoft.com> - 6.6.1-1
 - Upgrade to version 6.6.1 for Azure Linux 3.0
 
 * Tue Aug 01 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.11-9

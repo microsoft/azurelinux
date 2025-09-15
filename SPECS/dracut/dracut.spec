@@ -3,35 +3,69 @@
 
 Summary:        dracut to create initramfs
 Name:           dracut
-Version:        059
-Release:        15%{?dist}
+Version:        102
+Release:        12%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
-URL:            https://github.com/dracutdevs/dracut/wiki
+URL:            https://github.com/dracut-ng/dracut-ng/wiki
 
-Source0:        https://github.com/dracutdevs/dracut/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/dracut-ng/dracut-ng/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://www.gnu.org/licenses/lgpl-2.1.txt
 Source3:        megaraid.conf
 Source4:        20overlayfs/module-setup.sh
 Source5:        20overlayfs/overlayfs-mount.sh
-Source6:        defaults.conf
+Source6:        00-hostonly.conf
+Source7:        00-hyperv.conf
+Source8:        00-virtio.conf
+Source9:        00-vrf.conf
+Source10:       00-xen.conf
+Source11:       50-noxattr.conf
+# The 90livenet/azl-liveos-artifacts-download.service and 
+# 90livenet/azl-liveos-artifacts-download.sh are part of the 
+# add-livenet-download-service.patch. They are kept separate for easier
+# code reviews given that they are new to Dracut.
+Source12:       90livenet/azl-liveos-artifacts-download.service
+Source13:       90livenet/azl-liveos-artifacts-download.sh
+Source14:       90overlayfs/azl-configure-selinux.sh
 
-Patch:          fix-functions-Avoid-calling-grep-with-PCRE-P.patch
 # allow-liveos-overlay-no-user-confirmation-prompt.patch has been introduced by
-# the Mariner team to allow skipping the user confirmation prompt during boot
-# when the overlay of the liveos is backed by ram. This allows the machine to
-# boot without being blocked on user input in such a scenario.
+# the Azure Linux team to allow skipping the user confirmation prompt during
+# boot when the overlay of the liveos is backed by ram. This allows the machine
+# to boot without being blocked on user input in such a scenario.
 Patch:          allow-liveos-overlay-no-user-confirmation-prompt.patch
-
-Patch:          0002-disable-xattr.patch
+# add-livenet-download-service.patch has been introduced by the Azure Linux
+# team to enable Dracut's livenet module to download and ISO image and proceed
+# with a rootfs overlay mouting/pivoting (using Dracut's existing dmsquash-live
+# module). This enables PXE booting using an ISO image with an embededed rootfs
+# image.
+# This is a temporary fix until Dracut is upgraded to 103.
+# - For reference, see https://github.com/dracut-ng/dracut-ng/issues/719.
+# This patch relies on two new files (azl-liveos-artifacts-download.service and 
+# azl-liveos-artifacts-download.sh) - which are included as separate sources in
+# this package.
+Patch:          add-livenet-download-service.patch
 Patch:          0006-dracut.sh-validate-instmods-calls.patch
-Patch:          0007-feat-dracut.sh-support-multiple-config-dirs.patch
-Patch:          0008-fix-dracut-systemd-rootfs-generator-cannot-write-out.patch
-Patch:          0009-install-systemd-executor.patch
+Patch:          0011-Remove-reference-to-kernel-module-zlib-in-fips-module.patch
+Patch:          0012-fix-dracut-functions-avoid-awk-in-get_maj_min.patch
+Patch:          0013-revert-fix-crypt-unlock-encrypted-devices-by-default.patch
+Patch:          0014-fix-systemd-pcrphase-in-hostonly-mode-do-not-try-to-include-systemd-pcrphase.patch
+Patch:          0015-fix-systemd-pcrphase-make-tpm2-tss-an-optional-dependency.patch
+Patch:          0016-Handle-SELinux-configuration-for-overlayfs-folders.patch
+Patch:          avoid-mktemp-collisions-with-find-not-path.patch
+# fix-dracut-systemd-include-systemd-cryptsetup.patch has been introduced  
+# by the Azure Linux team to ensure that the systemd-cryptsetup module is included  
+# in the initramfs when needed.  
+# In dracut 102, systemd-cryptsetup was split from the crypt module and is no longer  
+# included by default, causing encrypted volumes in crypttab to be skipped in initrd.  
+# This patch modifies dracut-systemd to explicitly include systemd-cryptsetup.  
+# The patch can be removed if Dracut is upgraded to 104+.
+# - References: https://github.com/dracut-ng/dracut-ng/pull/262  
+#               https://github.com/dracut-ng/dracut-ng/commit/e0e5424a7b5e387ccb70e47ffea5a59716bf7b76  
+Patch:          fix-dracut-systemd-include-systemd-cryptsetup.patch
 
 BuildRequires:  bash
 BuildRequires:  kmod-devel
@@ -73,12 +107,33 @@ Requires:       nss
 This package requires everything which is needed to build an
 initramfs with dracut, which does an integrity check.
 
+%package hostonly
+Summary:        dracut configuration needed to build an initramfs with hostonly enabled
+Requires:       %{name} = %{version}-%{release}
+
+%description hostonly
+This package contains dracut configuration needed to build an initramfs with hostonly enabled
+
+%package hyperv
+Summary:        dracut configuration needed to build an initramfs with hyperv guest drivers
+Requires:       %{name} = %{version}-%{release}
+
+%description hyperv
+This package contains dracut configuration needed to build an initramfs with hyperv guest drivers
+
 %package megaraid
 Summary:        dracut configuration needed to build an initramfs with MegaRAID driver support
 Requires:       %{name} = %{version}-%{release}
 
 %description megaraid
 This package contains dracut configuration needed to build an initramfs with MegaRAID driver support.
+
+%package noxattr
+Summary:        dracut configuration needed to disable preserving of xattr file metadata
+Requires:       %{name} = %{version}-%{release}
+
+%description noxattr
+This package contains dracut configuration needed to disable preserving of xattr file metadata.
 
 %package tools
 Summary:        dracut tools to build the local initramfs
@@ -94,8 +149,29 @@ Requires:       %{name} = %{version}-%{release}
 %description overlayfs
 This package contains dracut module needed to build an initramfs with OverlayFS support.
 
+%package virtio
+Summary:        dracut configuration needed to build an initramfs with virtio guest drivers
+Requires:       %{name} = %{version}-%{release}
+
+%description virtio
+This package contains dracut configuration needed to build an initramfs with virtio guest drivers
+
+%package vrf
+Summary:        dracut configuration needed to build an initramfs with the vrf driver
+Requires:       %{name} = %{version}-%{release}
+
+%description vrf
+This package contains dracut configuration needed to build an initramfs with the vrf driver
+
+%package xen
+Summary:        dracut configuration needed to build an initramfs with xen guest drivers
+Requires:       %{name} = %{version}-%{release}
+
+%description xen
+This package contains dracut configuration needed to build an initramfs with xen guest drivers
+
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-ng-%{version}
 cp %{SOURCE1} .
 
 %build
@@ -132,7 +208,17 @@ install -m 0644 dracut.conf.d/fips.conf.example %{buildroot}%{_sysconfdir}/dracu
 > %{buildroot}%{_sysconfdir}/system-fips
 
 install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-megaraid.conf
-install -m 0644 %{SOURCE6} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-defaults.conf
+install -m 0644 %{SOURCE6} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-hostonly.conf
+install -m 0644 %{SOURCE7} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-hyperv.conf
+install -m 0644 %{SOURCE8} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-virtio.conf
+install -m 0644 %{SOURCE9} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-vrf.conf
+install -m 0644 %{SOURCE10} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-xen.conf
+install -m 0644 %{SOURCE11} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-noxattr.conf
+
+install -m 0644 %{SOURCE12} %{buildroot}%{dracutlibdir}/modules.d/90livenet/azl-liveos-artifacts-download.service
+install -m 0755 %{SOURCE13} %{buildroot}%{dracutlibdir}/modules.d/90livenet/azl-liveos-artifacts-download.sh
+
+install -m 0755 %{SOURCE14} %{buildroot}%{dracutlibdir}/modules.d/90overlayfs/azl-configure-selinux.sh
 
 mkdir -p %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
 install -p -m 0755 %{SOURCE4} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
@@ -168,7 +254,6 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %{dracutlibdir}/skipcpio
 %{dracutlibdir}/%{name}-util
 %config(noreplace) %{_sysconfdir}/%{name}.conf
-%config %{_sysconfdir}/dracut.conf.d/00-defaults.conf
 %dir %{_sysconfdir}/%{name}.conf.d
 %dir %{dracutlibdir}/%{name}.conf.d
 %dir %{_var}/opt/%{name}/log
@@ -199,9 +284,21 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %{_sysconfdir}/dracut.conf.d/40-fips.conf
 %config(missingok) %{_sysconfdir}/system-fips
 
+%files hostonly
+%defattr(-,root,root,0755)
+%{_sysconfdir}/dracut.conf.d/00-hostonly.conf
+
+%files hyperv
+%defattr(-,root,root,0755)
+%{_sysconfdir}/dracut.conf.d/00-hyperv.conf
+
 %files megaraid
 %defattr(-,root,root,0755)
 %{_sysconfdir}/dracut.conf.d/50-megaraid.conf
+
+%files noxattr
+%defattr(-,root,root,0755)
+%{_sysconfdir}/dracut.conf.d/50-noxattr.conf
 
 %files tools
 %defattr(-,root,root,0755)
@@ -210,12 +307,77 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{dracutlibdir}/modules.d/20overlayfs
 %{dracutlibdir}/modules.d/20overlayfs/*
 
+%files virtio
+%defattr(-,root,root,0755)
+%{_sysconfdir}/dracut.conf.d/00-virtio.conf
+
+%files vrf
+%defattr(-,root,root,0755)
+%{_sysconfdir}/dracut.conf.d/00-vrf.conf
+
+%files xen
+%defattr(-,root,root,0755)
+%{_sysconfdir}/dracut.conf.d/00-xen.conf
+
 %{_bindir}/%{name}-catimages
 %dir /boot/%{name}
 %dir %{_sharedstatedir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Tue Mar 11 2025 Archana Choudhary <archana1@microsoft.com> - 102-12
+- Add fix for systemd-cryptsetup module to be included in initramfs when needed
+
+* Mon Mar 05 2025 George Mileka <gmileka@microsoft.com> - 102-11
+- Update overlayfs selinux handling with the full path of chcon
+
+* Tue Feb 25 2025 Cameron Baird <cameronbaird@microsoft.com> - 102-10
+- Fix 0006-dracut.sh-validate-instmods patch to not break crypto module blacklisting
+
+* Tue Feb 04 2025 Brian Fjeldstad <bfjelds@microsoft.com> - 102-9
+- Avoid mktemp folder name colliding with find filter.
+
+* Mon Dec 09 2024 George Mileka <gmileka@microsoft.com> - 102-8
+- Augment overlayfs with selinux handling.
+
+* Thu Oct 31 2024 George Mileka <gmileka@microsoft.com> - 102-7
+- Augment livenet module with a download daemon.
+
+* Thu Oct 10 2024 Thien Trung Vuong <tvuong@microsoft.com> - 102-6
+- Add patch to make tpm2-tss an optional dependency for systemd-pcrphase
+
+* Sun Oct 06 2024 Jon Slobodzian <joslobo@microsoft.com> - 102-5
+- Bump version to build with latest systemd
+
+* Mon Aug 19 2024 Cameron Baird <cameronbaird@microsoft.com> - 102-4
+- Drop 0002-disable-xattr.patch
+- Introduce dracut-noxattr subpackage to expose this behavior as an option
+
+* Thu Aug 08 2024 Cameron Baird <cameronbaird@microsoft.com> - 102-3
+- Drop 0007-feat-dracut.sh-support-multiple-config-dirs.patch
+
+* Tue Aug 06 2024 Thien Trung Vuong <tvuong@microsoft.com> - 102-2
+- Add fix for initrd not showing prompt when root device is locked
+
+* Tue Jun 25 2024 Cameron Baird <cameronbaird@microsoft.com> - 102-1
+- Update to 102
+
+* Fri Jun 7 2024 Daniel McIlvaney <damcilva@microsoft.com> - 059-20
+- Suppress missing awk errors on size-constrained images
+
+* Thu May 30 2024 Chris Gunn <chrisgun@microsoft.com> - 059-19
+- Split defaults into separate subpackages: hostonly, hyperv, virtio, vrf, and xen
+
+* Tue May 28 2024 Cameron Baird <cameronbaird@microsoft.com> - 059-18
+- Remove reference to zlib from dracut-fips module setup to address
+    pedantic initramfs regeneration behavior
+
+* Fri May 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 059-17
+- Patch microcode output check based on CONFIG_MICROCODE_AMD/INTEL
+
+* Wed Mar 27 2024 Cameron Baird <cameronbaird@microsoft.com> - 059-16
+- Remove x86-specific xen-acpi-processor driver from defaults
+
 * Fri Mar 22 2024 Lanze Liu <lanzeliu@microsoft.com> - 059-15
 - Exclude overlayfs module from main dracut package
 
@@ -310,7 +472,7 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 -   Remove toybox from requires.
 
 *   Thu Mar 26 2020 Nicolas Ontiveros <niontive@microsoft.com> 049-1
--   Update version to 49. License verified. 
+-   Update version to 49. License verified.
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 048-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).

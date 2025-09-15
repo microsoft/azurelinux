@@ -1,0 +1,13 @@
+diff -up qhull-8.0.2/CMakeLists.txt.FPIC qhull-8.0.2/CMakeLists.txt
+--- qhull-8.0.2/CMakeLists.txt.FPIC	2023-08-10 11:10:20.914574070 -0400
++++ qhull-8.0.2/CMakeLists.txt	2023-08-10 11:10:56.136136910 -0400
+@@ -447,7 +447,8 @@ set_target_properties(${qhull_STATIC} PR
+ add_library(${qhull_STATICR} STATIC ${libqhullr_SOURCES})
+ set_target_properties(${qhull_STATICR} PROPERTIES
+     VERSION ${qhull_VERSION}
+-    OUTPUT_NAME "${qhull_STATICR}$<$<CONFIG:Debug>:d>")
++    OUTPUT_NAME "${qhull_STATICR}$<$<CONFIG:Debug>:d>"
++    POSITION_INDEPENDENT_CODE "TRUE")
+ 
+ if(UNIX)
+     target_link_libraries(${qhull_STATIC} m)

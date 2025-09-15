@@ -1,0 +1,117 @@
+--- findlib-1.9.6/src/findlib-toolbox/Makefile.orig	2022-09-24 09:13:16.000000000 -0600
++++ findlib-1.9.6/src/findlib-toolbox/Makefile	2023-06-16 08:46:01.965686356 -0600
+@@ -9,7 +9,7 @@ opt:
+ 	true
+ 
+ make_wizard$(EXEC_SUFFIX): make_wizard.ml
+-	ocamlc -o make_wizard$(EXEC_SUFFIX) -I +unix -I +labltk -I ../findlib \
++	ocamlc -o make_wizard$(EXEC_SUFFIX) -I +str -I +unix -I +labltk -I ../findlib \
+ 		unix.cma str.cma labltk.cma findlib.cma make_wizard.ml
+ 
+ install:
+--- findlib-1.9.6/src/findlib-toolbox/make_wizard.ml.orig	2022-09-24 09:13:16.000000000 -0600
++++ findlib-1.9.6/src/findlib-toolbox/make_wizard.ml	2023-06-16 08:50:49.066603769 -0600
+@@ -468,23 +468,23 @@ let makemake() =
+           mkquote(metaquote !wiz_package_description);
+       "byte_objects", 
+           String.concat " " (List.map 
+-			       (fun m -> String.uncapitalize m ^ ".cmo")
++			       (fun m -> String.uncapitalize_ascii m ^ ".cmo")
+ 			       !wiz_objects);
+       "nat_objects",
+           String.concat " " (List.map 
+-			       (fun m -> String.uncapitalize m ^ ".cmx")
++			       (fun m -> String.uncapitalize_ascii m ^ ".cmx")
+ 			       !wiz_objects);
+       "byte_executables",
+           String.concat " " byte_execs;
+       "byte_exec_objects",
+           String.concat " " (List.map 
+-			       (fun m -> String.uncapitalize m ^ ".cmo")
++			       (fun m -> String.uncapitalize_ascii m ^ ".cmo")
+ 			       byte_exec_modules);
+       "nat_executables",
+           String.concat " " nat_execs;
+       "nat_exec_objects",
+           String.concat " " (List.map 
+-			       (fun m -> String.uncapitalize m ^ ".cmx")
++			       (fun m -> String.uncapitalize_ascii m ^ ".cmx")
+ 			       nat_exec_modules);
+       "prereqs",
+           String.concat " " required_packages;
+@@ -526,7 +526,7 @@ let makemake() =
+        let deptargets =
+ 	 String.concat " " (List.map 
+ 			      (fun m -> 
+-				 let m' = String.uncapitalize m in
++				 let m' = String.uncapitalize_ascii m in
+ 				 m' ^ ".ml " ^ m' ^ ".mli")
+ 			      !modlist) in
+        write "makemake_exec" ( [ "switches", switches;
+@@ -543,7 +543,7 @@ let makemake() =
+        if is_byte_exec execname then begin
+ 	 let execobjs = 
+ 	   String.concat " " (List.map 
+-				(fun m -> String.uncapitalize m ^ ".cmo")
++				(fun m -> String.uncapitalize_ascii m ^ ".cmo")
+ 				!modlist) in
+ 	 write "byte_exec" ( ["execname", execname;
+ 			      "execobjs", execobjs ] @ variables )
+@@ -555,7 +555,7 @@ let makemake() =
+        if not (is_byte_exec execname) then begin
+ 	 let execobjs = 
+ 	   String.concat " " (List.map 
+-				(fun m -> String.uncapitalize m ^ ".cmx")
++				(fun m -> String.uncapitalize_ascii m ^ ".cmx")
+ 				!modlist) in
+ 	 write "nat_exec" ( ["execname", execname;
+ 			     "execobjs", execobjs ] @ variables )
+@@ -1090,7 +1090,7 @@ let pkginfo lb row =  (* when the user r
+ 	  let files = Array.to_list(Sys.readdir dir) in
+ 	  List.map
+ 	    (fun name -> 
+-	       String.capitalize (Filename.chop_suffix name ".cmi"))
++	       String.capitalize_ascii (Filename.chop_suffix name ".cmi"))
+ 	    (List.filter
+ 	       (fun name -> 
+ 		  Filename.check_suffix name ".cmi")
+@@ -1128,7 +1128,7 @@ let preprocessor_scan_extensions() =
+ 	 not (List.mem pkg plist)
+       )
+       !wiz_camlp4_selected in
+-  List.sort Pervasives.compare (plist @ plist')
++  List.sort Stdlib.compare (plist @ plist')
+ ;;
+ 
+ 
+@@ -1196,7 +1196,7 @@ add_screen preprocessor_screen;;
+ 
+ let prerequisites_scan_packages() =
+   (* Find out all packages *)
+-  List.sort Pervasives.compare (Fl_package_base.list_packages())
++  List.sort Stdlib.compare (Fl_package_base.list_packages())
+ ;;
+ 
+ 
+@@ -1255,10 +1255,10 @@ let buildlib_scan_modules() =
+   let files'' =
+     List.map
+       (fun f ->
+-	 String.capitalize (Filename.chop_extension f)
++	 String.capitalize_ascii (Filename.chop_extension f)
+       )
+       files' in
+-  remove_dups (List.sort Pervasives.compare files'')
++  remove_dups (List.sort Stdlib.compare files'')
+ ;;
+ 
+ 
+@@ -1353,7 +1353,7 @@ build any.";
+ 	 end
+ 	 else begin
+ 	   wiz_executables := 
+-	     List.sort Pervasives.compare (name :: !wiz_executables);
++	     List.sort Stdlib.compare (name :: !wiz_executables);
+ 	   wiz_exec_objects := (name, ref []) :: !wiz_exec_objects;
+ 	   wiz_exec_native := (name, ref false) :: !wiz_exec_native;
+ 	   !update_listbox();

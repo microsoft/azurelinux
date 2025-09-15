@@ -8,11 +8,11 @@
 
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
-Version: 3.1.4
-Release: 5%{?dist}
+Version: 3.3.3
+Release: 3%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
+Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
 Source2: Makefile.certificate
 Source3: genpatches
 Source9: configuration-switch.h
@@ -29,6 +29,8 @@ Patch3:   0003-Do-not-install-html-docs.patch
 Patch5:   0005-apps-ca-fix-md-option-help-text.patch
 # # Disable signature verification with totally unsafe hash algorithms
 Patch6:   0006-Disable-signature-verification-with-totally-unsafe-h.patch
+# # Add FIPS_mode() compatibility macro
+Patch8:   0008-Add-FIPS_mode-compatibility-macro.patch
 # # Add check to see if fips flag is enabled in kernel
 Patch9: 0009-Add-Kernel-FIPS-mode-flag-support.patch
 # # Add support for PROFILE=SYSTEM system default cipherlist
@@ -57,11 +59,17 @@ Patch35:  0035-speed-skip-unavailable-dgst.patch
 Patch49:  0049-Allow-disabling-of-SHA1-signatures.patch
 # # Support SHA1 in TLS in LEGACY crypto-policy (which is SECLEVEL=1)
 Patch52:  0052-Allow-SHA1-in-seclevel-1-if-rh-allow-sha1-signatures.patch
-# # https://github.com/openssl/openssl/pull/13817
-Patch79:  0079-RSA-PKCS15-implicit-rejection.patch
-# See notes in the patch for details, but this patch will not be needed if
-# the openssl issue https://github.com/openssl/openssl/issues/7048 is ever implemented and released.
+# # See notes in the patch for details, but this patch will not be needed if
+# # the openssl issue https://github.com/openssl/openssl/issues/7048 is ever implemented and released.
 Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
+# Fix crashes in openssl speed with providers that don't refcount keys.
+# Upstream: https://github.com/openssl/openssl/pull/26976 has been merged into 3.3, so if we
+# upgrade to 3.3.4 when it comes out, we can remove this patch.
+Patch81:  Keep-the-provided-peer-EVP_PKEY-in-the-EVP_PKEY_CTX-too.patch
+# The Symcrypt provider, which is our default, doesn't support some of the
+# algorithms that are used in the speed tests. This patch skips those tests.
+# If SymCrypt adds support, we should change and eventually remove this patch.
+Patch82:  prevent-unsupported-calls-into-symcrypt-in-speed.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -83,6 +91,8 @@ BuildRequires: perl(Text::Template)
 BuildRequires: sed
 
 %if 0%{?with_check}
+BuildRequires: perl(Math::BigInt)
+BuildRequires: perl(Test::Harness)
 BuildRequires: perl(Test::More)
 %endif
 
@@ -96,6 +106,8 @@ protocols.
 
 %package libs
 Summary: A general purpose cryptography library with TLS implementation
+Recommends: SymCrypt
+Recommends: SymCrypt-OpenSSL
 
 %description libs
 OpenSSL is a toolkit for supporting cryptography. The openssl-libs
@@ -333,6 +345,7 @@ install -m644 %{SOURCE9} \
 %{_libdir}/*.so
 %{_mandir}/man3/*
 %{_libdir}/pkgconfig/*.pc
+%{_libdir}/cmake/OpenSSL/*.cmake
 
 %files static
 %{_libdir}/*.a
@@ -352,10 +365,45 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 3.3.3-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
+* Mon Mar 17 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.3-2
+- Patch to fix segfaults and errors in openssl speed.
+
+* Wed Feb 26 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.3-1
+- Auto-upgrade to 3.3.3 - none
+- Initially run through autoupgrader (CBL-Mariner Servicing Account <cblmargh@microsoft.com>)
+
+* Fri Jan 31 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.2-2
+- Move SymCrypt and SymCrypt-OpenSSL Recommends from main package to libs
+
+* Thu Sep 19 2024 Tobias Brick <tobiasb@microsoft.com> - 3.3.2-1
+- Upgrade to 3.3.2
+
+* Fri Jul 12 2024 Suresh Thelkar <sthelkar@microsoft.com> - 3.3.0-2
+- Patch CVE-2023-5535
+
+* Tue May 07 2024 Tobias Brick <tobiasb@microsoft.com> - 3.3.0-1
+- Upgrade to 3.3.0
+
+* Fri Apr 26 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-9
+- Add recommends on SymCrypt and SymCrypt-OpenSSL
+
+* Tue Apr 23 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-8
+- Add FIPS_mode patch back for compatibility
+
+* Tue Apr 16 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-7
+- Change config to load symcrypt provider if present
+
+* Wed Apr 03 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-6
+- Add check build requirements
+- Modify patch to not force load default provider
+
 * Wed Mar 20 2024 Chris Co <chrco@microsoft.com> - 3.1.4-5
 - Remove make-dummy-cert and renew-dummy-cert scripts
 
-* Thu Mar 13 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-4
+* Tue Mar 19 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-4
 - Remove runtime dependency on coreutils
 
 * Tue Mar 12 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-3

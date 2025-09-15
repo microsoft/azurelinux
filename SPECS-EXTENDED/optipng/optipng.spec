@@ -1,16 +1,17 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           optipng
-Version:        0.7.7
-Release:        7%{?dist}
+Version:        0.7.8
+Release:        5%{?dist}
 Summary:        PNG optimizer and converter
 
 License:        zlib
-URL:            http://optipng.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/optipng/%{name}-%{version}.tar.gz
+URL:            https://optipng.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/optipng/%{name}-%{version}.tar.gz
 
-BuildRequires:  gcc
-BuildRequires:  zlib-devel libpng-devel
+BuildRequires: make
+BuildRequires: gcc
+BuildRequires: zlib-devel libpng-devel
 
 %description
 OptiPNG is a PNG optimizer that recompresses image files to a smaller size,
@@ -56,8 +57,40 @@ chmod -c 755 $RPM_BUILD_ROOT%{_bindir}/optipng
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.7-7
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+* Wed Jan 15 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.7.8-5
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- change the URL and Source0 from http to https
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.8-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Nov  5 2023 Peter Hanecak <hany@hany.sk> - 0.7.8-1
+- Update to 0.7.8
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.7-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.7-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.7-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.7-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.7-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.7-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Thu Dec 10 2020 Peter Hanecak <hany@hany.sk> - 0.7.7-6
 - Use make macros (PR from  tbaeder)

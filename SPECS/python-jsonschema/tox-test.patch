@@ -1,0 +1,87 @@
+From 7e934da39b92e2704bbd40b79f942a9a8d1d89aa Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Fri, 12 Jul 2024 15:29:29 -0700
+Subject: [PATCH] remove py27, add py212 for tests, remove docs tests, update
+ webcolors import, require lower webcolors version
+
+---
+ jsonschema/_format.py |  4 ++--
+ tox.ini               | 28 ++++++++--------------------
+ 2 files changed, 10 insertions(+), 22 deletions(-)
+
+diff --git a/jsonschema/_format.py b/jsonschema/_format.py
+index caae127..32738a7 100644
+--- a/jsonschema/_format.py
++++ b/jsonschema/_format.py
+@@ -256,13 +256,13 @@ else:
+     def is_css21_color(instance):
+         if (
+             not isinstance(instance, str_types) or
+-            instance.lower() in webcolors.css21_names_to_hex
++            instance.lower() in webcolors.CSS21_NAMES_TO_HEX
+         ):
+             return True
+         return is_css_color_code(instance)
+ 
+     def is_css3_color(instance):
+-        if instance.lower() in webcolors.css3_names_to_hex:
++        if instance.lower() in webcolors.CSS3_NAMES_TO_HEX:
+             return True
+         return is_css_color_code(instance)
+ 
+diff --git a/tox.ini b/tox.ini
+index b8d5d90..30b3f72 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -1,40 +1,28 @@
+ [tox]
+-envlist = py{27,35,py}, docs, style
++envlist = py{35,312,py}, docs, style
+ 
+ 
+ [testenv]
+ setenv =
+     JSON_SCHEMA_TEST_SUITE = {toxinidir}/json
+ whitelist_externals =
+-    python2.7
++    python3.12
+     sh
+     virtualenv
+ commands =
+-    py{27,35,py,py3}: {envbindir}/green [] jsonschema
++    py{35,312,py,py3}: {envbindir}/green [] jsonschema
+ 
+-    {envpython} -m doctest {toxinidir}/README.rst
+-    py{27,35}: {envbindir}/sphinx-build -b doctest {toxinidir}/docs {envtmpdir}/html
+-
+-    # Check to make sure that releases build and install properly
+-    virtualenv --quiet --python=python2.7 {envtmpdir}/venv
+-    {envtmpdir}/venv/bin/pip install --quiet wheel
+-
+-    {envtmpdir}/venv/bin/python {toxinidir}/setup.py --quiet bdist_wheel --dist-dir={envtmpdir}/wheel
+-    sh -c '{envbindir}/pip install --quiet --upgrade --force-reinstall {envtmpdir}/wheel/jsonschema*.whl'
+-
+-    python2.7 {toxinidir}/setup.py --quiet sdist --dist-dir={envtmpdir}/sdist --format=gztar,zip
+-    sh -c '{envbindir}/pip install --quiet --upgrade --force-reinstall {envtmpdir}/sdist/jsonschema*.tar.gz'
+-    sh -c '{envbindir}/pip install --quiet --upgrade --force-reinstall {envtmpdir}/sdist/jsonschema*.zip'
+ deps =
+     -e{toxinidir}[format]
+ 
+-    py{27,35,py,py3},coverage: green
++    py{35,312,py,py3},coverage: green
+     coverage: coverage
+ 
+-    py{27,py,py3},coverage: mock
++    py{py,py3},coverage: mock
+ 
+-    py{27,35}: lxml
+-    py{27,35,py}: sphinx
++    py{35,312}: lxml
++    py{35,312,py}: sphinx
++	py{35,312,py}: webcolors<24.6.0
+ 
+ 
+ [testenv:coverage]
+-- 
+2.34.1
+

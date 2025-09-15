@@ -1,0 +1,35 @@
+diff -up rdflib-7.0.0/test/test_misc/test_parse_file_guess_format.py.pytest8 rdflib-7.0.0/test/test_misc/test_parse_file_guess_format.py
+--- rdflib-7.0.0/test/test_misc/test_parse_file_guess_format.py.pytest8	2023-06-01 21:15:21.520171900 +0200
++++ rdflib-7.0.0/test/test_misc/test_parse_file_guess_format.py	2024-07-02 17:45:47.257339626 +0200
+@@ -61,7 +61,7 @@ class TestFileParserGuessFormat:
+             g.parse(os.path.join(TEST_DATA_DIR, "example-lots_of_graphs.n3")), Graph
+         )
+ 
+-    def test_warning(self) -> None:
++    def test_warning(self, caplog: pytest.LogCaptureFixture) -> None:
+         g = Graph()
+         graph_logger = logging.getLogger("rdflib")
+ 
+@@ -78,9 +78,16 @@ class TestFileParserGuessFormat:
+                 ),
+                 str(newpath),
+             )
+-            with pytest.raises(ParserError, match=r"Could not guess RDF format"):
+-                with pytest.warns(
+-                    UserWarning,
+-                    match="does not look like a valid URI, trying to serialize this will break.",
+-                ) as logwarning:
+-                    g.parse(str(newpath))
++            with pytest.raises(
++                ParserError, match=r"Could not guess RDF format"
++            ), caplog.at_level("WARNING"):
++                g.parse(str(newpath))
++
++            assert any(
++                rec.levelno == logging.WARNING
++                and (
++                    "does not look like a valid URI, trying to serialize this will break."
++                    in rec.message
++                )
++                for rec in caplog.records
++            )

@@ -1,0 +1,43 @@
+diff -up mamba-libmamba-1.5.3/libmamba/CMakeLists.txt.fedora mamba-libmamba-1.5.3/libmamba/CMakeLists.txt
+--- mamba-libmamba-1.5.3/libmamba/CMakeLists.txt.fedora 2023-11-30 06:15:31.442933848 -0700
++++ mamba-libmamba-1.5.3/libmamba/CMakeLists.txt        2023-11-30 06:32:26.957230936 -0700
+@@ -448,7 +448,7 @@ macro(libmamba_create_target target_name
+             find_library(LIBLZMA_LIBRARIES lzma REQUIRED)
+             find_library(LZ4_LIBRARY NAMES lz4)
+             find_library(LZO2_LIBRARY NAMES lzo2)
+-            find_package(zstd CONFIG REQUIRED)
++            find_library(ZSTD_LIBRARY NAMES zstd REQUIRED)
+             find_library(BZIP2_LIBRARIES NAMES bz2)
+             find_library(CRYPTO_LIBRARIES NAMES libcrypto)
+ 
+@@ -467,7 +467,7 @@ macro(libmamba_create_target target_name
+                 ${LIBXML2_LIBRARY}
+                 ${ICONV_LIBRARY}
+                 ${CHARSET_LIBRARY}
+-                zstd::libzstd_static
++                ${ZSTD_LIBRARY}
+                 ${LZ4_LIBRARY}
+                 ${LZO2_LIBRARY}
+                 ${BZIP2_LIBRARIES}
+@@ -504,7 +504,7 @@ macro(libmamba_create_target target_name
+         find_library(LIBSOLVEXT_LIBRARIES NAMES solvext)
+         find_package(CURL REQUIRED)
+         find_package(LibArchive REQUIRED)
+-        find_package(zstd REQUIRED)
++        find_library(ZSTD_LIBRARIES NAMES zstd)
+         find_package(BZip2 REQUIRED)
+         find_package(OpenSSL REQUIRED)
+         find_package(reproc++ CONFIG REQUIRED)
+@@ -525,10 +525,10 @@ macro(libmamba_create_target target_name
+                 reproc++
+             PRIVATE
+                 ${LibArchive_LIBRARIES}
+-                zstd::libzstd_shared
++                ${ZSTD_LIBRARIES}
+                 ${CURL_LIBRARIES}
+                 ${OPENSSL_LIBRARIES}
+-                zstd::libzstd_shared
++                ${ZSTD_LIBRARY}
+                 BZip2::BZip2
+                 reproc
+                 ${MAMBA_FORCE_DYNAMIC_LIBS}

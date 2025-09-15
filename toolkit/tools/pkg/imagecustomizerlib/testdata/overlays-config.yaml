@@ -1,0 +1,72 @@
+storage:
+  disks:
+  - partitionTableType: gpt
+    maxSize: 4096M
+    partitions:
+    - id: esp
+      type: esp
+      start: 1M
+      end: 9M
+
+    - id: boot
+      start: 9M
+      end: 108M
+
+    - id: rootfs
+      start: 108M
+      end: 2048M
+    
+    - id: var
+      start: 2048M
+      
+  bootType: efi
+
+  filesystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+
+  - deviceId: boot
+    type: ext4
+    mountPoint:
+      path: /boot
+
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
+
+  - deviceId: var
+    type: ext4
+    mountPoint:
+      path: /var
+      options: defaults,x-initrd.mount
+
+os:
+  resetBootLoaderType: hard-reset
+
+  packages:
+    install:
+    - openssh-server
+
+  services:
+    enable:
+    - sshd
+
+  overlays:
+    - mountPoint: /etc
+      lowerDirs:
+      - /etc
+      upperDir: /var/overlays/etc/upper
+      workDir: /var/overlays/etc/work
+      isInitrdOverlay: true
+      mountDependencies: 
+      - /var
+    - mountPoint: /media
+      lowerDirs:
+      - /media
+      - /home
+      upperDir: /overlays/media/upper
+      workDir: /overlays/media/work

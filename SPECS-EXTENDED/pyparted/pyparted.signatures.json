@@ -1,8 +1,8 @@
 {
  "Signatures": {
   "keyring.gpg": "f3523e7f78a16339d0aa5020e53a6f02b9d79b56d9d2750adf70cc5fea1f8268",
-  "pyparted-3.11.4.tar.gz": "553a84155512bb5bd1382151bd689002bf7ceeacf86436b5fb2446d47ec55e98",
-  "pyparted-3.11.4.tar.gz.asc": "2b45e5e5e15f9d5cf117a28bb411e11a99e19d9016b6c347e24a57b44445133b",
+  "pyparted-3.13.0.tar.gz": "8fc6758abd16c7b0429fd4c07b6a7672678d493bfe1811040cd77d45e04964ea",
+  "pyparted-3.13.0.tar.gz.asc": "5d23cced3ced5ed45276b48cf53f4250d28028cc23279c9c347ffb48fb0e5c9d",
   "trustdb.gpg": "6724142955dd6c759195cbc66b4ac11613849123a50f4a5ca7b08dc1008bdd96"
  }
 }

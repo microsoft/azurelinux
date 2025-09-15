@@ -1,0 +1,207 @@
+From ffefe24cc261c6d98282de47c141b02c12dc13b5 Mon Sep 17 00:00:00 2001
+From: Sharath Srikanth Chellappa <sharathsr@microsoft.com>
+Date: Thu, 3 Apr 2025 13:09:09 -0700
+Subject: [PATCH] InstanceExists should watch VMs instead of VMIs
+
+Modifies the instances_v2 implementation to locate node Instances
+based on their corresponding VMs rather than VMIs to prevent node
+deletion in cases where the node is intentionally powered off and
+the VMI is not available.
+
+The node-lifecycle-controller does check for cases where an Instance
+is shutdown, but because a VMI will always fail the existence check
+here -
+https://github.com/kubernetes/cloud-provider/blob/277393583629c7382333496c81a6d3e772d851bc/controllers/nodelifecycle/node_lifecycle_controller.go#L154
+the node will be deleted before the shutdown check can happen. This change
+allows a VM to be shutdown while keeping its Node intact
+
+This is a Nexus specific patch useful for Nexus during runtime upgrades.
+
+---
+ pkg/provider/instances_v2.go      | 20 ++++++++++----
+ pkg/provider/instances_v2_test.go | 45 +++++++++----------------------
+ pkg/provider/vm_getter.go         | 28 +++++++++++++++++++
+ 3 files changed, 55 insertions(+), 38 deletions(-)
+ create mode 100644 pkg/provider/vm_getter.go
+
+diff --git a/pkg/provider/instances_v2.go b/pkg/provider/instances_v2.go
+index cde1a325..6a57621d 100644
+--- a/pkg/provider/instances_v2.go
++++ b/pkg/provider/instances_v2.go
+@@ -36,15 +36,24 @@ type instancesV2 struct {
+ 
+ // InstanceExists returns true if the instance for the given node exists according to the cloud provider.
+ func (i *instancesV2) InstanceExists(ctx context.Context, node *corev1.Node) (bool, error) {
+-	instanceID, err := instanceIDFromProviderID(node.Spec.ProviderID)
+-	if err != nil {
+-		return false, err
++	// NOTE: There are cases where a node's infrastructure gets deleted before the providerID has
++	// been set. To avoid orphaned nodes we'll default the instanceID to the node name
++	instanceID := node.Name
++	var err error
++
++	if node.Spec.ProviderID != "" {
++		instanceID, err = instanceIDFromProviderID(node.Spec.ProviderID)
++		if err != nil {
++			return false, err
++		}
+ 	}
+ 
+-	_, err = InstanceByVMIName(instanceID).Get(ctx, i.client, i.namespace)
++	// NOTE: we're checking for a VirtualMachine here to avoid deleting Nodes that have been
++	// powered off and won't have a VirtualMachineInstance
++	_, err = InstanceByVMName(instanceID).Get(ctx, i.client, i.namespace)
+ 	if err != nil {
+ 		if errors.IsNotFound(err) {
+-			klog.Infof("Unable to find virtual machine instance %s", instanceID)
++			klog.Infof("Unable to find virtual machine %s", instanceID)
+ 			return false, nil
+ 		}
+ 		return false, err
+@@ -63,6 +72,7 @@ func (i *instancesV2) InstanceShutdown(ctx context.Context, node *corev1.Node) (
+ 	instance, err := InstanceByVMIName(instanceID).Get(ctx, i.client, i.namespace)
+ 	if err != nil {
+ 		if errors.IsNotFound(err) {
++			klog.Infof("instance %s is shut down", instanceID)
+ 			return true, nil
+ 		}
+ 		return false, err
+diff --git a/pkg/provider/instances_v2_test.go b/pkg/provider/instances_v2_test.go
+index 83ab2a0e..916b78e0 100644
+--- a/pkg/provider/instances_v2_test.go
++++ b/pkg/provider/instances_v2_test.go
+@@ -1272,31 +1272,31 @@ var _ = Describe("Instances V2", func() {
+ 
+ 		Context("With providerID set", func() {
+ 
+-			It("Should return true if VMI exists", func() {
+-				vmi := &kubevirtv1.VirtualMachineInstance{ObjectMeta: metav1.ObjectMeta{
++			It("Should return true if VM exists", func() {
++				vm := &kubevirtv1.VirtualMachine{ObjectMeta: metav1.ObjectMeta{
+ 					Name:      "test",
+ 					Namespace: "cluster-test",
+ 				}}
+ 				node := corev1.Node{
+ 					ObjectMeta: metav1.ObjectMeta{
+-						Name: vmi.Name,
++						Name: vm.Name,
+ 					},
+ 					Spec: corev1.NodeSpec{
+-						ProviderID: getProviderID(vmi.Name),
++						ProviderID: getProviderID(vm.Name),
+ 					},
+ 				}
+ 
+ 				mockClient.EXPECT().
+-					Get(ctx, types.NamespacedName{Name: vmi.Name, Namespace: vmi.Namespace}, &kubevirtv1.VirtualMachineInstance{}).
++					Get(ctx, types.NamespacedName{Name: vm.Name, Namespace: vm.Namespace}, &kubevirtv1.VirtualMachine{}).
+ 					Times(1)
+ 
+-				i := instancesV2{namespace: vmi.Namespace, client: mockClient}
++				i := instancesV2{namespace: vm.Namespace, client: mockClient}
+ 				exists, err := i.InstanceExists(ctx, &node)
+ 				Expect(exists).To(BeTrue())
+ 				Expect(err).ToNot(HaveOccurred())
+ 			})
+ 
+-			It("Should not return an error if VMI does not exist", func() {
++			It("Should not return an error if VM does not exist", func() {
+ 				namespace := "cluster-test"
+ 
+ 				node := corev1.Node{
+@@ -1309,8 +1309,8 @@ var _ = Describe("Instances V2", func() {
+ 				}
+ 
+ 				mockClient.EXPECT().
+-					Get(ctx, types.NamespacedName{Name: node.Name, Namespace: namespace}, &kubevirtv1.VirtualMachineInstance{}).
+-					Return(errors.NewNotFound(schema.GroupResource{Group: "kubevirt.io", Resource: "virtualmachineinstances"}, "missingVMI")).
++					Get(ctx, types.NamespacedName{Name: node.Name, Namespace: namespace}, &kubevirtv1.VirtualMachine{}).
++					Return(errors.NewNotFound(schema.GroupResource{Group: "kubevirt.io", Resource: "virtualmachineinstances"}, "missingVM")).
+ 					Times(1)
+ 
+ 				i := instancesV2{namespace: namespace, client: mockClient}
+@@ -1320,45 +1320,24 @@ var _ = Describe("Instances V2", func() {
+ 			})
+ 
+ 			It("Should return an error if provider id is invalid", func() {
+-				vmi := &kubevirtv1.VirtualMachineInstance{ObjectMeta: metav1.ObjectMeta{
++				vm := &kubevirtv1.VirtualMachine{ObjectMeta: metav1.ObjectMeta{
+ 					Name:      "test",
+ 					Namespace: "cluster-test",
+ 				}}
+ 				node := corev1.Node{
+ 					ObjectMeta: metav1.ObjectMeta{
+-						Name: vmi.Name,
++						Name: vm.Name,
+ 					},
+ 					Spec: corev1.NodeSpec{
+ 						ProviderID: "invalid-provider-id",
+ 					},
+ 				}
+ 
+-				i := instancesV2{namespace: vmi.Namespace, client: mockClient}
+-				exists, err := i.InstanceExists(ctx, &node)
+-				Expect(exists).To(BeFalse())
+-				Expect(err).To(HaveOccurred())
+-			})
+-		})
+-
+-		Context("Without providerID set", func() {
+-
+-			It("Should return an error", func() {
+-				vmi := &kubevirtv1.VirtualMachineInstance{ObjectMeta: metav1.ObjectMeta{
+-					Name:      "test",
+-					Namespace: "cluster-test",
+-				}}
+-				node := corev1.Node{
+-					ObjectMeta: metav1.ObjectMeta{
+-						Name: vmi.Name,
+-					},
+-				}
+-
+-				i := instancesV2{namespace: vmi.Namespace, client: mockClient}
++				i := instancesV2{namespace: vm.Namespace, client: mockClient}
+ 				exists, err := i.InstanceExists(ctx, &node)
+ 				Expect(exists).To(BeFalse())
+ 				Expect(err).To(HaveOccurred())
+ 			})
+-
+ 		})
+ 	})
+ 
+diff --git a/pkg/provider/vm_getter.go b/pkg/provider/vm_getter.go
+new file mode 100644
+index 00000000..31578014
+--- /dev/null
++++ b/pkg/provider/vm_getter.go
+@@ -0,0 +1,28 @@
++package provider
++
++import (
++	"context"
++
++	"k8s.io/apimachinery/pkg/types"
++	kubevirtv1 "kubevirt.io/api/core/v1"
++	"sigs.k8s.io/controller-runtime/pkg/client"
++)
++
++// Getter allows fetching virtual machine with multiple fetching strategies
++type Getter interface {
++	// Get gets a virtual machine
++	Get(ctx context.Context, cli client.Client, namespace string) (*kubevirtv1.VirtualMachine, error)
++}
++
++// InstanceByVMName tries to fetch a vm by its name
++type InstanceByVMName string
++
++func (i InstanceByVMName) Get(ctx context.Context, cli client.Client, namespace string) (*kubevirtv1.VirtualMachine, error) {
++	var instance kubevirtv1.VirtualMachine
++
++	err := cli.Get(ctx, types.NamespacedName{Namespace: namespace, Name: string(i)}, &instance)
++	if err != nil {
++		return nil, err
++	}
++	return &instance, nil
++}
+-- 
+2.48.1

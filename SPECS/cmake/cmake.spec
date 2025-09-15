@@ -1,8 +1,8 @@
 %global major_version 3
 Summary:        Cmake
 Name:           cmake
-Version:        3.28.2
-Release:        1%{?dist}
+Version:        3.30.3
+Release:        9%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,7 +10,28 @@ Group:          Development/Tools
 URL:            https://www.cmake.org/
 Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        macros.cmake
-Patch0:         disableUnstableUT.patch
+Patch0:         0001-manually-recreating-patches.patch
+Patch1:         CVE-2024-6197.patch
+Patch2:         CVE-2024-6874.patch
+Patch3:         CVE-2024-8096.patch
+Patch4:         CVE-2024-11053.patch
+Patch5:         CVE-2024-7264.patch
+Patch6:         CVE-2024-9681.patch
+Patch7:         CVE-2023-44487.patch
+# When upgrading cmake, verify by hand that this patch is actually contained
+# within the cmnghttp2 source. The autoupgrader mistakenly removes it. Upstream
+# nghttp2 patched this with v1.55.1 and newer. As of cmake v3.30.3, cmake has
+# nghttp2 v1.52.0 plus some upstream patches. nghttp2 version can be found in
+# Utilities/cmnghttp2/lib/includes/nghttp2/nghttp2ver.h. Manual inspection is
+# required to determine what upstream patches are included.
+Patch8:         CVE-2023-35945.patch
+Patch9:		CVE-2024-48615.patch
+Patch10:	CVE-2025-4947.patch
+Patch11:	CVE-2025-5916.patch
+Patch12:	CVE-2025-5917.patch
+Patch13:	CVE-2025-5918.patch
+Patch14:	CVE-2025-9301.patch
+
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -24,6 +45,10 @@ BuildRequires:  xz
 BuildRequires:  xz-devel
 BuildRequires:  zlib
 BuildRequires:  zlib-devel
+%if 0%{?with_check}
+BuildRequires:  javapackages-tools
+BuildRequires:  msopenjdk-17
+%endif
 Requires:       bzip2
 Requires:       expat
 Requires:       libarchive
@@ -41,6 +66,7 @@ operating system and in a compiler-independent manner.
 %autosetup -p1
 
 %build
+export JAVA_HOME="%{_libdir}/jvm/msopenjdk-17"
 ./bootstrap \
     --prefix=%{_prefix} \
     --system-expat \
@@ -56,11 +82,21 @@ find %{buildroot} -type f -name "*.la" -delete -print
 install -Dpm0644 %{SOURCE1} %{buildroot}%{_libdir}/rpm/macros.d/macros.cmake
 sed -i -e "s|@@CMAKE_VERSION@@|%{version}|" -e "s|@@CMAKE_MAJOR_VERSION@@|%{major_version}|" %{buildroot}%{_libdir}/rpm/macros.d/macros.cmake
 
+# Collect all license files into one spot
+for f in Copyright.txt cmcppdap/NOTICE cmcurl/COPYING cmlibrhash/COPYING cmlibuv/LICENSE cmnghttp2/COPYING cmsys/Copyright.txt; do
+    filename_part=$(basename $f)
+    dir_part=$(dirname $f)
+    mkdir -p ./Licenses/$dir_part
+    mv %{buildroot}%{_prefix}/doc/%{name}-*/$f ./Licenses/$dir_part/$filename_part
+done
+find "%{buildroot}%{_prefix}/doc" -type d -empty -delete
+
 %check
 # Removing static libraries to fix issues with the "ParseImplicitLinkInfo" test runs for the "craype-C-Cray-8.7.input" and "craype-CXX-Cray-8.7.input" inputs.
 # Should be removed once the issue is fixed upstream and we apply the fix: https://gitlab.kitware.com/cmake/cmake/-/issues/22470.
 rm -f %{_lib64dir}/lib{stdc++,gfortran}.a
 
+export JAVA_HOME="%{java_home}"
 bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 
 %files
@@ -73,9 +109,54 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_datadir}/emacs/site-lisp/cmake-mode.el
 %{_datadir}/vim/vimfiles/*
 %{_libdir}/rpm/macros.d/macros.cmake
-%{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Fri Aug 22 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.30.3-9
+- Patch for CVE-2025-9301
+
+* Tue Jun 24 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.30.3-8
+- Patch CVE-2025-5916, CVE-2025-5917 & CVE-2025-5918
+
+* Tue Jun 03 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.30.3-7
+- Patch CVE-2025-4947
+
+* Mon Apr 07 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.30.3-6
+- Backport patch to fix CVE-2024-48615
+
+* Thu Mar 06 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 3.30.3-5
+- Patch vendored nghttp2 to fix CVE-2023-44487 and CVE-2023-35945
+
+* Wed Jan 22 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.30.3-4
+- Fix CVE-2024-7264 and CVE-2024-9681
+
+* Wed Jan 15 2025 Henry Beberman <henry.beberman@microsoft.com> - 3.30.3-3
+- Patch vendored curl for CVE-2024-11053
+
+* Thu Sep 26 2024 Jonathan Behrens <jbehrens@microsoft.com> - 3.30.3-2
+- Fix CVE-2024-6197, CVE-2024-6874, and CVE-2024-8096
+
+* Mon Sep 23 2024 Jonathan Behrens <jbehrens@microsoft.com> - 3.30.3-1
+- Upgrade to 3.30.3 to address CVE-2024-24806
+
+* Wed Jun 19 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.29.6-1
+- Auto-upgrade to 3.29.6 to address CVE-2023-28320 and CVE-2024-46218
+- Adding 0001-manually-recreating-patches.patch to patch CVE-2024-28182
+
+* Thu May 30 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.28.2-6
+- fix CVE-2024-24806 (cmake is built using libuv embedded in its code)
+
+* Wed May 22 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.28.2-5
+- Bump release to build with new expat to fix CVE-2024-28757
+
+* Tue May 21 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.28.2-4
+- Bump release to build with new libuv to fix CVE-2024-24806
+
+* Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.28.2-3
+- Sanitize license files
+
+* Fri Mar 29 2024 Andrew Phelps <anphel@microsoft.com> - 3.28.2-2
+- Fix JDK test issue
+
 * Fri Feb 02 2024 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 3.28.2-1
 - Auto-upgrade to 3.28.2 - Upgrades for 3.0-dev
 - Remove old CVE patches that don't apply

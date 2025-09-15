@@ -2,21 +2,22 @@
 %global debug_package %{nil}
 
 Name:           glm
-Version:        0.9.9.6
-Release:        5%{?dist}
+Version:        1.0.1
+Release:        3%{?dist}
 Summary:        C++ mathematics library for graphics programming
 
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://glm.g-truc.net/
-Source0:        https://github.com/g-truc/glm/releases/download/%{version}/%{name}-%{version}.zip
-Patch0:         glm-0.9.9.6-install.patch
-Patch1:         glm-0.9.9.6-noarch.patch
+URL:            https://glm.g-truc.net/
+Source0:        https://github.com/g-truc/glm/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         glm-1.0.1-noarch.patch
+Patch1:         glm-1.0.1-without-werror.patch
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  cmake >= 3.14
+BuildRequires:  make
 
 %description
 GLM is a C++ library for doing mathematics operations
@@ -28,8 +29,6 @@ types of the OpenGL shading language.
 Summary:        C++ mathematics library for graphics programming
 BuildArch:      noarch
 
-# As required in
-# https://fedoraproject.org/wiki/Packaging:Guidelines#Packaging_Static_Libraries_2
 Provides:       %{name}-static = %{version}-%{release}
 
 %description    devel
@@ -63,7 +62,7 @@ a programming manual for the %{name}-devel package.
 # Also it looks like some versions get shipped with a common
 # directory in archive root, but with an unusual name for the
 # directory. In this case, use the -n option of the setup macro.
-%setup -q -n glm
+%setup -q
 
 # A couple of files had CRLF line-ends in them.
 # Check with rpmlint after updating the package that we are not
@@ -88,64 +87,90 @@ sed -i 's/\r//' test/core/core_setup_message.cpp
 %patch 1 -p1
 
 %build
-mkdir build
-cd build
-%{cmake} -DGLM_TEST_ENABLE=ON ..
-make %{?_smp_mflags}
+
+export CXXFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing"
+%{cmake} -DGLM_TEST_ENABLE=ON -DGLM_BUILD_LIBRARY=OFF -DCMAKE_INSTALL_DATAROOTDIR=%{_datadir}/cmake
+%cmake_build
 
 %check
-cd build
+export CXXFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing"
 
 # Some tests are disabled due to failing tests (to be reported)
-# - test-core_func_common   fails on aarch64
-# - test-core_func_integer  fails on Mariner (x86_64)
-%ifarch x86_64
-ctest --output-on-failure -E '(test-core_func_integer)'
-%endif
-
-%ifarch aarch64
-ctest --output-on-failure -E '(test-core_func_common)'
-%endif
-
+# - test-gtc_packing      fails on s390x
+%ctest -- --output-on-failure -E 'test-gtc_packing'
 
 %install
-cd build
-
-make install DESTDIR=$RPM_BUILD_ROOT
+%cmake_install
 find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 find $RPM_BUILD_ROOT -name CMakeLists.txt -exec rm -f {} ';'
 
-# The cmake config files seem architecture independent and since
-# also glm-devel is otherwise noarch, it is desired to ship the
-# cmake configuration files under /usr/share.
-mkdir -pv $RPM_BUILD_ROOT%{_datadir}
-mv $RPM_BUILD_ROOT%{_libdir}/cmake $RPM_BUILD_ROOT%{_datadir}/cmake
-mv $RPM_BUILD_ROOT%{_libdir}/pkgconfig $RPM_BUILD_ROOT%{_datadir}/pkgconfig
-rmdir $RPM_BUILD_ROOT%{_libdir}
+# The library can get installed into the include directory - seen on EPEL8
+rm -rf $RPM_BUILD_ROOT%{_includedir}/%{name}/{CMakeFiles,libglm_shared.so}
 
-# Here it seems to be acceptable to own the cmake and pkgconfig directories
-# as an alternative to having glm-devel depending on cmake and pkg-config
-# https://fedoraproject.org/wiki/Packaging:Guidelines#The_directory_is_owned_by_a_package_which_is_not_required_for_your_package_to_function
 %files devel
-%license copying.txt
 %doc readme.md
 %{_includedir}/%{name}
-%{_datadir}/cmake
-%{_datadir}/pkgconfig/
+%{_datadir}/cmake/%{name}
 
 %files doc
-%license copying.txt
 %doc doc/manual.pdf
 %doc doc/api/
 
 %changelog
-* Wed Apr 20 2022 Muhammad Falak <mwani@microsoft.com> - 0.9.9.6-5
-- Re-enable `test-gtc_packing` for all archs
-- Skip broken tests based of arch
+* Fri Jan 03 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.0.1-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.9.6-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Mar 02 2024 Joonas Sarajärvi <muep@iki.fi> - 1.0.1-1
+- Update to upstream GLM version 1.0.1
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.8-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.8-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.8-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.8-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Sep 30 2022 Orion Poplawski <orion@nwra.com> - 0.9.9.8-5
+- Use cmake_install/ctest macros
+- Cleanup library artifacts if they get installed (seen on EPEL8)
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.8-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sun Feb 07 2021 Joonas Sarajärvi <muep@iki.fi> - 0.9.9.8-1
+- New upstream release (#1823615)
+- pkgconfig support is no longer supported in upstream and not shipped
+
+* Tue Feb 02 2021 Jeff Law <law@redhat.com> - 0.9.9.6-8
+- Disable strict aliasing due to bugs in testsuite (#1923456)
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.6-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Oct 26 2020 Joonas Sarajärvi <muep@iki.fi> - 0.9.9.6-6
+- Fix #1863634 - FTBFS in Fedora rawhide/f33
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.6-5
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.9.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Sat May 02 2020 Joonas Sarajärvi <muep@iki.fi> - 0.9.9.6-3
 - Remove arch check from glmConfigVersion.cmake, fix #1758009

@@ -42,7 +42,7 @@ jobs:
             if grep -q "^\s*%clean" "$spec"
             then
               1>&2 echo "**** ERROR ****"
-              1>&2 echo "Spec '$spec' contains a %clean stage, which should be unnecessary for CBL-Mariner. Please remove it or add an exception for this spec file."
+              1>&2 echo "Spec '$spec' contains a %clean stage, which should be unnecessary for Azure Linux. Please remove it or add an exception for this spec file."
               1>&2 echo "**** ERROR ****"
               error_found=1
             fi

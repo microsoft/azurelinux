@@ -1,0 +1,66 @@
+From 508280f7ac31c7d0ab2eaed33b26e6df59bb4dd9 Mon Sep 17 00:00:00 2001
+From: "L. E. Segovia" <amy@centricular.com>
+Date: Fri, 19 Jul 2024 22:25:20 -0300
+Subject: [PATCH 1/2] powerpc: fix div255w which still used the inexact
+ substitution
+
+The code for this architecture used the substitution suggested in the
+original bug report. That one had subtle failures on armv7a and aarch64,
+but I was not able to verify if they affected PowerPC too.
+
+This commit fixes it by reusing the mulhuw instruction implementation --
+sse2 can be ported directly that way.
+
+Fixes #71
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/orc/-/merge_requests/195>
+---
+ orc/orcrules-altivec.c | 31 +++++++++++++++----------------
+ 1 file changed, 15 insertions(+), 16 deletions(-)
+
+diff --git a/orc/orcrules-altivec.c b/orc/orcrules-altivec.c
+index 23409a8..a13fb5b 100644
+--- a/orc/orcrules-altivec.c
++++ b/orc/orcrules-altivec.c
+@@ -1513,23 +1513,22 @@ powerpc_rule_convlf (OrcCompiler *p, void *user, OrcInstruction *insn)
+ static void
+ powerpc_rule_div255w (OrcCompiler *p, void *user, OrcInstruction *insn)
+ {
+-  int src1 = ORC_SRC_ARG (p, insn, 0);
+-  int dest = ORC_DEST_ARG (p, insn, 0);
+-  int tmp = orc_compiler_get_temp_reg (p);
+-  int tmp2 = orc_compiler_get_temp_reg (p);
+-  int tmpc;
+-
+-  tmpc = powerpc_get_constant (p, ORC_CONST_SPLAT_W, 0x0001);
+-
+-  ORC_ASM_CODE(p,"  vspltish %s, 8\n", powerpc_get_regname(tmp2));
+-  powerpc_emit_VX(p, 0x1000034c, powerpc_regnum(tmp2), 8, 0);
+-
+-  powerpc_emit_VX_2 (p, "vadduhm", 0x10000040, dest, src1, tmpc);
+-
+-  powerpc_emit_VX_2 (p, "vsrh", 0x10000244, tmp, src1, tmp2);
+-  powerpc_emit_VX_2 (p, "vadduhm", 0x10000040, dest, dest, tmp);
++  const int src1 = ORC_SRC_ARG (p, insn, 0);
++  const int dest = ORC_DEST_ARG(p, insn, 0);
++  const int tmp = powerpc_get_constant (p, ORC_CONST_SPLAT_W, 7);
++  const int tmpc = powerpc_get_constant (p, ORC_CONST_SPLAT_W, 0x8081);
++
++  {
++    // mulhuw
++    const int perm = powerpc_get_constant_full(p, 0x10110001, 0x14150405,
++        0x18190809, 0x1c1d0c0d);
++
++    powerpc_emit_vmuleuh (p, p->tmpreg, src1, tmpc);
++    powerpc_emit_vmulouh (p, dest, src1, tmpc);
++    powerpc_emit_vperm (p, dest, dest, p->tmpreg, perm);
++  }
+ 
+-  powerpc_emit_VX_2 (p, "vsrh", 0x10000244, dest, dest, tmp2);
++  powerpc_emit_VX_2 (p, "vsrh", 0x10000244, dest, dest, tmp);
+ }
+ 
+ static void
+-- 
+2.45.2
+

@@ -1,20 +1,28 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+
 %global pypi_name colorama
 
-%bcond_with python2
-%bcond_without python3
-
 Name:           python-%{pypi_name}
-Version:        0.4.1
-Release:        6%{?dist}
+Version:        0.4.6
+Release:        10%{?dist}
 Summary:        Cross-platform colored terminal text
 
-License:        BSD
-URL:            http://pypi.python.org/pypi/colorama
-Source0:        https://files.pythonhosted.org/packages/source/c/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/python-%{pypi_name}-%{version}.tar.gz
+License:        BSD-3-Clause
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+URL:            https://github.com/tartley/colorama
+Source0:        https://files.pythonhosted.org/packages/d8/53/6f443c9a4a8358a93a6792e2acffb9d9d5cb0a5cfd8802644b7b1c9a02e4/colorama-0.4.6.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
- 
+
+BuildRequires:  python3-devel
+BuildRequires: 	python3-pip
+BuildRequires: 	python3-wheel
+BuildRequires: 	python3-trove-classifiers
+BuildRequires: 	python3-hatchling
+BuildRequires: 	python3-pathspec
+
+# for check
+BuildRequires:  python3dist(pytest)
+
 %description
 Makes ANSI escape character sequences, for producing colored
 terminal text and cursor positioning, work under MS Windows.
@@ -26,35 +34,8 @@ It also provides some shortcuts to help generate ANSI sequences, and works fine
 in conjunction with any other ANSI sequence generation library, such as
 Termcolor.
 
-%if %{with python2}
-%package -n python2-%{pypi_name}
-Summary:        Cross-platform colored terminal text
-BuildRequires:  python2-devel
-%{?el6:BuildRequires:  python-setuptools}
-%{!?el6:BuildRequires:  python2-setuptools}
-%{?el6:Provides: python-%{pypi_name}}
-%{?python_provide:%python_provide python2-%{pypi_name}}
-
-%description -n python2-%{pypi_name}
-Makes ANSI escape character sequences, for producing colored
-terminal text and cursor positioning, work under MS Windows.
-
-ANSI escape character sequences have long been used to produce colored terminal
-text and cursor positioning on Unix and Macs. Colorama makes this work on
-Windows, too.
-It also provides some shortcuts to help generate ANSI sequences, and works fine
-in conjunction with any other ANSI sequence generation library, such as
-Termcolor.
-
-Python 2 version.
-%endif
-
-%if %{with python3}
 %package -n python3-%{pypi_name}
 Summary:        Cross-platform colored terminal text
-%{?python_provide:%python_provide python3-%{pypi_name}}
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
 
 %description -n python3-%{pypi_name}
 Makes ANSI escape character sequences, for producing colored
@@ -67,49 +48,97 @@ It also provides some shortcuts to help generate ANSI sequences, and works fine
 in conjunction with any other ANSI sequence generation library, such as
 Termcolor.
 
-Python 3 version.
-%endif
-
 %prep
 %autosetup -n %{pypi_name}-%{version}
-rm -rf *.egg-info
+
+%generate_buildrequires
+%pyproject_buildrequires -r
 
 %build
-%if %{with python2}
-%py2_build
-%endif
-%if %{with python3}
-%py3_build
-%endif
+%pyproject_wheel
 
 %install
-%if %{with python2}
-%py2_install
-%endif
-%if %{with python3}
-%py3_install
-%endif
+%pyproject_install
+%pyproject_save_files colorama
 
-%if %{with python2}
-%files -n python2-%{pypi_name}
-%doc README.rst
-%license LICENSE.txt
-%{python2_sitelib}/%{pypi_name}/
-%{python2_sitelib}/%{pypi_name}-%{version}-*.egg-info/
-%endif
+%check
+%pytest
 
-%if %{with python3}
-%files -n python3-%{pypi_name}
-%doc README.rst
-%license LICENSE.txt
-%{python3_sitelib}/%{pypi_name}/
-%{python3_sitelib}/%{pypi_name}-%{version}-*.egg-info/
-%endif
+%files -n python3-%{pypi_name} -f %{pyproject_files}
+%doc CHANGELOG.rst README.rst
+%license %{python3_sitelib}/%{pypi_name}-*.dist-info/licenses/LICENSE.txt
 
 %changelog
-* Fri Mar 05 2021 Henry Li <lihl@microsoft.com> - 0.4.1-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Fix distro check to enable python3 build and disable python2 build
+* Wed Feb 26 2025 Akhila Guruju <v-guakhila@microsoft.com> - 0.4.6-10
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+- Added `BuildRequires: python3-trove-classifiers python3-hatchling python3-pathspec` to fix build.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.6-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.4.6-8
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.6-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.6-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Oct 22 2023 Miroslav Suchý <msuchy@redhat.com> - 0.4.6-5
+- Migrate to SPDX license
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.4.6-3
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Nov 01 2022 Mikel Olasagasti Uranga <mikel@olasagasti.info> - 0.4.6-1
+- Update to 0.4.6 - Closes rhz#2136298
+
+* Tue Aug 09 2022 Mikel Olasagasti Uranga <mikel@olasagasti.info> - 0.4.5-1
+- Update to 0.4.5 - Closes rhbz#2097423
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.4-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.4.4-14
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.4-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jan 14 2022 Mikel Olasagasti Uranga <mikel@olasagasti.info> - 0.4.4-12
+- Clean up spec
+- Remove all python2 bits
+- Adopt pyproject-rpm-macros
+- Switch to GitHub tarball for tests and enable check
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jun 02 2021 Python Maint <python-maint@redhat.com> - 0.4.4-3
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Nov 19 2020 Joel Capitao <jcapitao@redhat.com> - 0.4.4-1
+- Update to 0.4.4 (rhbz#1887630)
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.4.3-2
+- Rebuilt for Python 3.9
+
+* Sun May 03 2020 Fabio Alessandro Locati <me@fale.io> - 0.4.3-1
+* Update to 0.4.3
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -206,3 +235,4 @@ rm -rf *.egg-info
 
 * Tue Sep 11 2012 Matthias Runge <mrunge@redhat.com> - 0.2.4-1
 - Initial package.
+

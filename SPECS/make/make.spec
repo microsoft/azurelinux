@@ -1,7 +1,7 @@
 Summary:        Program for compiling packages
 Name:           make
 Version:        4.4.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,8 @@ Source0:        https://ftp.gnu.org/gnu/make/%{name}-%{version}.tar.gz
 %if 0%{?with_check}
 BuildRequires: perl(lib)
 BuildRequires: perl(FindBin)
+BuildRequires: shadow-utils
+BuildRequires: sudo
 %endif
 
 %description
@@ -33,7 +35,9 @@ rm -rf %{buildroot}%{_infodir}
 %find_lang %{name}
 
 %check
-%make_build check
+chmod g+w . -R
+useradd testuser -G root -m
+sudo -u testuser -s /bin/bash -c "PATH=$PATH make check"
 
 %files -f %{name}.lang
 %defattr(-,root,root)
@@ -43,6 +47,9 @@ rm -rf %{buildroot}%{_infodir}
 %{_mandir}/*/*
 
 %changelog
+* Mon Aug 19 2024 Andrew Phelps <anphel@microsoft.com> - 4.4.1-2
+- Fix package tests by running as non-root user
+
 * Mon Jan 22 2024 Andrew Phelps <anphel@microsoft.com> - 4.4.1-1
 - Upgrade to version 4.4.1
 

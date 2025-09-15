@@ -20,7 +20,7 @@ diff -Naur jbigkit-2.1.old/libjbig/Makefile jbigkit-2.1/libjbig/Makefile
 -tstcodec85: tstcodec85.o jbig85.o jbig_ar.o
 -	$(CC) $(CFLAGS) -o tstcodec85 tstcodec85.o jbig85.o jbig_ar.o
 +tstcodec85: tstcodec85.o libjbig85.so
-+	$(CC) $(CFLAGS) -o tstcodec85 $^ -L. -ljbig
++	$(CC) $(CFLAGS) -o tstcodec85 $< -L. -ljbig85
  
 -libjbig.a: jbig.o jbig_ar.o
 -	rm -f libjbig.a

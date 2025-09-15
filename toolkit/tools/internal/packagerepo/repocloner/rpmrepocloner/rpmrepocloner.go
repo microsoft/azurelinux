@@ -5,10 +5,12 @@ package rpmrepocloner
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
@@ -16,10 +18,12 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/tdnf"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
+	"github.com/sirupsen/logrus"
 )
 
 // RepoFlag* flags are used to denote which repos the cloner is allowed to use for its queries.
@@ -50,12 +54,19 @@ const (
 	useMultipleTransactions = !useSingleTransaction
 )
 
+var (
+	serverErrorsRegex    = regexp.MustCompile(`(?m)Error: (5\d{2}) when downloading`)
+	serverErrorCodeIndex = 1
+)
+
 // RpmRepoCloner represents an RPM repository cloner.
 type RpmRepoCloner struct {
 	chroot                   *safechroot.Chroot
 	chrootCloneDir           string
 	defaultAzureLinuxRepoIDs []string
 	mountedCloneDir          string
+	repoSnapshotTime         string
+	repoSnapshotArgs         []string
 	repoIDCache              string
 	reposArgsList            [][]string
 	reposFlags               uint64
@@ -70,12 +81,12 @@ type RpmRepoCloner struct {
 //   - tlsCert is the path to the TLS certificate, "" if not needed
 //   - tlsKey is the path to the TLS key, "" if not needed
 //   - repoDefinitions is a list of repo files to use
-func ConstructCloner(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir, tlsCert, tlsKey string, repoDefinitions []string) (r *RpmRepoCloner, err error) {
+func ConstructCloner(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir, tlsCert, tlsKey string, repoDefinitions []string, posixTime string) (r *RpmRepoCloner, err error) {
 	timestamp.StartEvent("initialize and configure cloner", nil)
 	defer timestamp.StopEvent(nil) // initialize and configure cloner
 
 	r = &RpmRepoCloner{}
-	err = r.initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir, repoDefinitions)
+	err = r.initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir, repoDefinitions, posixTime)
 	if err != nil {
 		err = fmt.Errorf("failed to prep new rpm cloner:\n%w", err)
 		return
@@ -98,7 +109,7 @@ func ConstructCloner(destinationDir, tmpDir, workerTar, existingRpmsDir, toolcha
 //   - existingRpmsDir is the directory with prebuilt RPMs
 //   - prebuiltRpmsDir is the directory with toolchain RPMs
 //   - repoDefinitions is a list of repo files to use when cloning RPMs
-func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, repoDefinitions []string) (err error) {
+func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, repoDefinitions []string, posixTime string) (err error) {
 	const (
 		isExistingDir          = false
 		leaveChrootFilesOnDisk = false
@@ -199,6 +210,10 @@ func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRp
 	}
 
 	r.SetEnabledRepos(repoFlagClonerDefault)
+
+	if posixTime != "" {
+		r.SetRepoEpochTimeLimitArgs(posixTime)
+	}
 
 	return
 }
@@ -391,6 +406,10 @@ func (r *RpmRepoCloner) cloneRawPackageNames(cloneDeps, singleTransaction bool, 
 		r.chrootCloneDir,
 	}
 
+	if r.GetRepoSnapshotTime() != "" {
+		constantArgs = append(constantArgs, r.GetRepoSnapshotArgs()...)
+	}
+
 	logger.Log.Debugf("Will clone in total %d items.", len(rawPackageNames))
 
 	// Create a list of lists for each transaction. Each transaction will be cloned separately. Generally either all
@@ -444,7 +463,11 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 		releaseverCliArg,
 	}
 
-	// Consider the built (tooolchain, local) RPMs first, then the already cached, and finally all remote packages.
+	if r.GetRepoSnapshotTime() != "" {
+		baseArgs = append(baseArgs, r.GetRepoSnapshotArgs()...)
+	}
+
+	// Consider the built (toolchain, local) RPMs first, then the already cached, and finally all remote packages.
 	for _, reposArgs := range r.reposArgsList {
 		logger.Log.Debugf("Using repos args: %v", reposArgs)
 
@@ -459,11 +482,21 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 				return
 			}
 
+			// Flag the result if we did case-insensitive lookup.
+			lookupIgnoredCase := tdnf.DidCaseInsensitiveMatchRegex.MatchString(stdout)
+
 			// MUST keep order of packages printed by TDNF.
 			// TDNF will print the packages starting from the highest version, which allows us to work around an RPM bug:
 			// https://github.com/rpm-software-management/rpm/issues/2359
-			for _, matches := range tdnf.PackageLookupNameMatchRegex.FindAllStringSubmatch(stdout, -1) {
-				packageName := matches[tdnf.PackageNameIndex]
+			for _, matches := range tdnf.PackageProvidesRegex.FindAllStringSubmatch(stdout, -1) {
+				packageName := matches[tdnf.PackageProvidesNameIndex]
+				if lookupIgnoredCase {
+					logger.Log.Warnf("'%s' was found by case-insensitive lookup of '%s', but this is not valid and will be ignored", packageName, pkgVer.Name)
+					// This is not a valid mapping of requires -> provides, so we skip it. This is not a fatal error since
+					// we may still find a valid mapping either in a subsequent repo lookup, or via a local build. If this
+					// is infact invalid, the package build will fail later with an unresolved dependency error.
+					return
+				}
 				packageNames = append(packageNames, packageName)
 				logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, packageName)
 			}
@@ -535,22 +568,17 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 	// and we don't want to list them twice.
 	foundPackages := map[string]bool{}
 	repoContents = &repocloner.RepoContents{}
-	onStdout := func(args ...interface{}) {
-		if len(args) == 0 {
-			return
-		}
-
-		line := args[0].(string)
+	onStdout := func(line string) {
 		matches := tdnf.ListedPackageRegex.FindStringSubmatch(line)
-		if len(matches) != tdnf.ListMaxMatchLen {
+		if len(matches) != tdnf.ListedPackageMaxMatchLen {
 			return
 		}
 
 		pkg := &repocloner.RepoPackage{
-			Name:         matches[tdnf.ListPackageName],
-			Version:      matches[tdnf.ListPackageVersion],
-			Architecture: matches[tdnf.ListPackageArch],
-			Distribution: matches[tdnf.ListPackageDist],
+			Name:         matches[tdnf.ListedPackageName],
+			Version:      matches[tdnf.ListedPackageVersion],
+			Architecture: matches[tdnf.ListedPackageArch],
+			Distribution: matches[tdnf.ListedPackageDist],
 		}
 
 		pkgID := pkg.ID()
@@ -575,7 +603,11 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 			releaseverCliArg,
 		}
 
-		return shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", tdnfArgs...)
+		return shell.NewExecBuilder("tdnf", tdnfArgs...).
+			StdoutCallback(onStdout).
+			LogLevel(logrus.TraceLevel, logrus.WarnLevel).
+			WarnLogLines(shell.DefaultWarnLogLines).
+			Execute()
 	})
 
 	return
@@ -595,11 +627,6 @@ func (r *RpmRepoCloner) Close() error {
 // clonePackage clones a given package using pre-populated arguments.
 // It will gradually enable more repos to consider until the package is found.
 func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err error) {
-	const (
-		unresolvedOutputPrefix  = "No package"
-		toyboxConflictsPrefix   = "toybox conflicts"
-		unresolvedOutputPostfix = "available"
-	)
 
 	releaseverCliArg, err := tdnf.GetReleaseverCliArg()
 	if err != nil {
@@ -613,40 +640,25 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 
 		finalArgs := append(baseArgs, reposArgs...)
 
-		var (
-			stdout string
-			stderr string
-		)
-		stdout, stderr, err = shell.Execute("tdnf", finalArgs...)
+		// We run in a retry loop on errors deemed retriable.
+		ctx, closeCtx := context.WithCancel(context.Background())
+		defer closeCtx()
 
-		logger.Log.Debugf("stdout: %s", stdout)
-		logger.Log.Debugf("stderr: %s", stderr)
-
-		if err != nil {
-			logger.Log.Debugf("tdnf error (will continue if the only errors are toybox conflicts):\n '%s'", stderr)
-		}
-
-		// ============== TDNF SPECIFIC IMPLEMENTATION ==============
-		// Check if TDNF could not resolve a given package. If TDNF does not find a requested package,
-		// it will not error. Instead it will print a message to stdout. Check for this message.
-		//
-		// *NOTE*: TDNF will attempt best effort. If N packages are requested, and 1 cannot be found,
-		// it will still download N-1 packages while also printing the message.
-		splitStdout := strings.Split(stdout, "\n")
-		for _, line := range splitStdout {
-			trimmedLine := strings.TrimSpace(line)
-			// Toybox conflicts are a known issue, reset the err value if encountered
-			if strings.HasPrefix(trimmedLine, toyboxConflictsPrefix) {
-				logger.Log.Warn("Ignoring known toybox conflict")
-				err = nil
-				continue
+		retryNum := 1
+		_, err = retry.RunWithDefaultDownloadBackoff(ctx, func() error {
+			downloadErr, retriable := tdnfDownload(finalArgs...)
+			if downloadErr != nil {
+				if retriable {
+					logger.Log.Debugf("Package cloning attempt %d/%d failed with a retriable error.", retryNum, retry.DefaultDownloadRetryAttempts)
+				} else {
+					logger.Log.Debugf("Package cloning attempt %d/%d failed with an unrecoverable error. Cancelling.", retryNum, retry.DefaultDownloadRetryAttempts)
+					closeCtx()
+				}
 			}
-			// If a package was not available, update err
-			if strings.HasPrefix(trimmedLine, unresolvedOutputPrefix) && strings.HasSuffix(trimmedLine, unresolvedOutputPostfix) {
-				err = fmt.Errorf(trimmedLine)
-				break
-			}
-		}
+
+			retryNum++
+			return downloadErr
+		})
 
 		if err == nil {
 			preBuilt = r.reposArgsHaveOnlyLocalSources(reposArgs)
@@ -683,6 +695,44 @@ func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string)
 	}
 
 	return
+}
+
+func (r *RpmRepoCloner) GetRepoSnapshotTime() string {
+	return r.repoSnapshotTime
+}
+
+func (r *RpmRepoCloner) GetRepoSnapshotArgs() []string {
+	return r.repoSnapshotArgs
+}
+
+func (r *RpmRepoCloner) SetRepoEpochTimeLimitArgs(posixTime string) {
+	var (
+		snapshotTimeArg    string
+		snapshotExcludeArg string
+		excludeRepoIds     []string
+		err                error
+	)
+
+	r.repoSnapshotTime = posixTime
+	r.repoSnapshotArgs = []string{}
+
+	if r.repoSnapshotTime == "" { // no args to add
+		return
+	}
+
+	snapshotTimeArg, err = tdnf.GetRepoSnapshotCliArg(r.repoSnapshotTime)
+	if err != nil {
+		logger.Log.Errorf("Snapshot Time is invalid")
+		return
+	}
+	excludeRepoIds = []string{repoIDBuilt, repoIDToolchain, r.repoIDCache, repoIDCacheRegular}
+	snapshotExcludeArg, err = tdnf.GetRepoSnapshotExcludeCliArg(excludeRepoIds)
+	if err != nil {
+		logger.Log.Errorf("Snapshot Repo to exclude is invalid")
+		return
+	}
+
+	r.repoSnapshotArgs = append(r.repoSnapshotArgs, snapshotTimeArg, snapshotExcludeArg)
 }
 
 // GetEnabledRepos returns the repo flags that the cloner is allowed to use for its queries.
@@ -807,4 +857,51 @@ func (r *RpmRepoCloner) reposArgsHaveOnlyLocalSources(reposArgs []string) bool {
 	}
 
 	return true
+}
+
+func tdnfDownload(args ...string) (err error, retriable bool) {
+	const (
+		unresolvedOutputPrefix = "No package"
+		unresolvedOutputSuffix = "available"
+	)
+
+	stdout, stderr, err := shell.Execute("tdnf", args...)
+
+	logger.Log.Debugf("stdout: %s", stdout)
+	logger.Log.Debugf("stderr: %s", stderr)
+
+	// ============== TDNF SPECIFIC IMPLEMENTATION ==============
+	//
+	// Check if TDNF could not resolve a given package. If TDNF does not find a requested package,
+	// it will not error. Instead it will print a message to stdout. Check for this message.
+	//
+	// *NOTE*: TDNF will attempt best effort. If N packages are requested, and 1 cannot be found,
+	// it will still download N-1 packages while also printing the message.
+	splitStdout := strings.Split(stdout, "\n")
+	for _, line := range splitStdout {
+		trimmedLine := strings.TrimSpace(line)
+		// If a package was not available, update err
+		if strings.HasPrefix(trimmedLine, unresolvedOutputPrefix) && strings.HasSuffix(trimmedLine, unresolvedOutputSuffix) {
+			err = fmt.Errorf(trimmedLine)
+			return
+		}
+	}
+
+	//
+	// *NOTE*: There are cases in which some of our upstream package repositories are hosted
+	// on services that are prone to intermittent errors (e.g., HTTP 502 errors). We
+	// specifically look for such known cases and apply some retry logic in hopes of getting
+	// a better result; note that we don't indiscriminately retry because there are legitimate
+	// cases in which the upstream repo doesn't contain the package and a 404 error is to be
+	// expected. This involves scraping through stderr, but it's better than not doing so.
+	//
+	if err != nil {
+		serverErrorMatch := serverErrorsRegex.FindStringSubmatch(stderr)
+		if len(serverErrorMatch) > serverErrorCodeIndex {
+			logger.Log.Debugf("Encountered possibly intermittent HTTP %s error.", serverErrorMatch[serverErrorCodeIndex])
+			retriable = true
+		}
+	}
+
+	return
 }

@@ -3,17 +3,22 @@
 Summary:        A Docker CLI plugin for extended build capabilities with BuildKit
 Name:           docker-buildx
 # update "commit_hash" above when upgrading version
-Version:        0.12.1
-Release:        1%{?dist}
+Version:        0.14.0
+Release:        7%{?dist}
 License:        ASL 2.0
 Group:          Tools/Container
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.github.com/docker/buildx
 Source0:        https://github.com/docker/buildx/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2024-45337.patch
+Patch1:         CVE-2024-45338.patch
+Patch2:         CVE-2025-22869.patch
+Patch3:         CVE-2025-0495.patch
+Patch4:         CVE-2025-22872.patch
 
 BuildRequires: bash
-BuildRequires: golang
+BuildRequires: golang < 1.25
 
 # conflicting packages
 Conflicts: docker-ce
@@ -44,6 +49,27 @@ install -m 755 buildx "%{buildroot}%{_libexecdir}/docker/cli-plugins/docker-buil
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 0.14.0-7
+- Set BR for golang to < 1.25
+
+* Wed May 21 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 0.14-0-6
+- Patch CVE-2025-22872
+
+* Tue May 13 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 0.14.0-5
+- Fix CVE-2025-0495 with upstream patch modified to apply for azurelinux package
+
+* Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.14.0-4
+- Fix CVE-2025-22869 with an upstream patch
+
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 0.14.0-3
+- Add patch for CVE-2024-45338
+
+* Fri Dec 20 2024 Aurelien Bombo <abombo@microsoft.com> - 0.14.0-2
+- Add patch for CVE-2024-45337
+
+* Thu May 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.14.0-1
+- Auto-upgrade to 0.14.0 - address CVE-2024-23653
+
 * Tue Feb 27 2024 Henry Beberman <henry.beberman@microsoft.com> - 0.12.1-1
 - Rename package from moby-buildx to docker-buildx
 - Upgrade to version 0.12.1

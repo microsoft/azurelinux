@@ -1,0 +1,25 @@
+From 1cc07822c72993b6a600657bae78d1d877c836ff Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Franti=C5=A1ek=20Zatloukal?= <fzatlouk@redhat.com>
+Date: Fri, 26 Apr 2024 12:46:59 +0200
+Subject: [PATCH] Define SPDLOG_FMT_EXTERNAL
+
+---
+ include/spdlog/tweakme.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/include/spdlog/tweakme.h b/include/spdlog/tweakme.h
+index 5bcb5ff..2596d5d 100644
+--- a/include/spdlog/tweakme.h
++++ b/include/spdlog/tweakme.h
+@@ -79,6 +79,9 @@
+ // accordingly.
+ //
+ // #define SPDLOG_FMT_EXTERNAL
++#ifndef SPDLOG_FMT_EXTERNAL
++#define SPDLOG_FMT_EXTERNAL
++#endif
+ ///////////////////////////////////////////////////////////////////////////////
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+-- 
+2.44.0

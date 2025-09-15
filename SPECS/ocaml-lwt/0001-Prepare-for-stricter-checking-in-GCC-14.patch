@@ -1,0 +1,103 @@
+From 0d8725d3d113a9f0738b599957d2d97aecdc42d8 Mon Sep 17 00:00:00 2001
+From: Jerry James <loganjerry@gmail.com>
+Date: Fri, 1 Dec 2023 19:42:55 -0700
+Subject: [PATCH] Prepare for stricter checking in GCC 14
+
+---
+ src/unix/config/discover.ml                   | 21 +++++++++----------
+ .../unix_c/unix_getprotoby_getservby_job.c    |  1 +
+ 2 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/src/unix/config/discover.ml b/src/unix/config/discover.ml
+index bd528ca..931efd5 100644
+--- a/src/unix/config/discover.ml
++++ b/src/unix/config/discover.ml
+@@ -652,9 +652,8 @@ struct
+ 
+         int main()
+         {
+-            struct hostent *he;
+-            struct servent *se;
+-            he =
++            int x;
++            x =
+               gethostbyname_r(
+                 (const char*)NULL,
+                 (struct hostent*)NULL,
+@@ -662,9 +661,9 @@ struct
+                 (int)0,
+                 (struct hostent**)NULL,
+                 (int*)NULL);
+-            he =
++            x =
+               gethostbyaddr_r(
+-                (const char*)NULL,
++                (const void*)NULL,
+                 (int)0,
+                 (int)0,
+                 (struct hostent*)NULL,
+@@ -672,7 +671,7 @@ struct
+                 (int)0,
+                 (struct hostent**)NULL,
+                 (int*)NULL);
+-            se =
++            x =
+               getservbyname_r(
+                 (const char*)NULL,
+                 (const char*)NULL,
+@@ -680,7 +679,7 @@ struct
+                 (char*)NULL,
+                 (int)0,
+                 (struct servent**)NULL);
+-            se =
++            x =
+               getservbyport_r(
+                 (int)0,
+                 (const char*)NULL,
+@@ -688,20 +687,20 @@ struct
+                 (char*)NULL,
+                 (int)0,
+                 (struct servent**)NULL);
+-            pr =
++            x =
+               getprotoent_r(
+                 (struct protoent*)NULL,
+                 (char*)NULL,
+                 (int)0,
+                 (struct protoent**)NULL);
+-            pr =
++            x =
+               getprotobyname_r(
+                 (const char*)NULL,
+                 (struct protoent*)NULL,
+                 (char*)NULL,
+                 (int)0,
+                 (struct protoent**)NULL);
+-            pr =
++            x =
+               getprotobynumber_r(
+                 (int)0,
+                 (struct protoent*)NULL,
+@@ -793,7 +792,7 @@ struct
+ 
+         int main()
+         {
+-            int (*mincore_ptr)(const void*, size_t, char*) = mincore;
++            int (*mincore_ptr)(void*, size_t, unsigned char*) = mincore;
+             return (int)(mincore_ptr == NULL);
+         }
+       |}
+diff --git a/src/unix/unix_c/unix_getprotoby_getservby_job.c b/src/unix/unix_c/unix_getprotoby_getservby_job.c
+index 5169fc9..88804d1 100644
+--- a/src/unix/unix_c/unix_getprotoby_getservby_job.c
++++ b/src/unix/unix_c/unix_getprotoby_getservby_job.c
+@@ -9,6 +9,7 @@
+ 
+ #define ARGS(args...) args
+ 
++#include <errno.h>
+ #include <caml/alloc.h>
+ #include <caml/fail.h>
+ #include <caml/memory.h>
+-- 
+2.43.0

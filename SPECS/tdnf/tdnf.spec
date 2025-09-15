@@ -1,11 +1,10 @@
-%undefine __cmake_in_source_build
 %define _tdnfpluginsdir %{_libdir}/tdnf-plugins
 %define _tdnf_history_db_dir %{_libdir}/sysimage/tdnf
 
 Summary:        dnf equivalent using C libs
 Name:           tdnf
-Version:        3.5.6
-Release:        1%{?dist}
+Version:        3.5.8
+Release:        8%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,6 +24,16 @@ Patch3:         tdnf-printf-fix.patch
 # Patch to be removed once we upgrade to a version of tdnf which contains the upstream fix
 # https://github.com/vmware/tdnf/commit/5311b5ed0867a40ceb71b89358d70290bc2d0c51
 Patch4:         tdnf-sqlite-library.patch
+
+# Patch in vitual snapshot
+Patch5:	        virtual-repo-snapshot.patch
+Patch6:         fix-tests-for-azl.patch
+
+# Install only package configuration and implemenation
+Patch7:         tdnf-add-installonlypkgs-config.patch
+Patch8:         tdnf-installonlypkgs.patch
+Patch10:        tdnf-installonly-install-status.patch
+
 #Cmake requires binutils
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -52,12 +61,20 @@ Requires:       tdnf-cli-libs = %{version}-%{release}
 Requires:       zlib
 Obsoletes:      yum
 %if 0%{?with_check}
+BuildRequires:  azurelinux-release
 BuildRequires:  createrepo_c
 BuildRequires:  glib
+BuildRequires:  e2fsprogs
+BuildRequires:  findutils
 BuildRequires:  libxml2
 BuildRequires:  python3-pip
 BuildRequires:  python3-requests
 BuildRequires:  python3-xml
+BuildRequires:  sed
+BuildRequires:  shadow-utils
+BuildRequires:  sudo
+BuildRequires:  util-linux
+BuildRequires:  which
 %endif
 
 %description
@@ -117,23 +134,33 @@ systemd services for periodic automatic update
 %autosetup -p1
 
 %build
+mkdir -p build && cd build
 %cmake \
     -DCMAKE_BUILD_TYPE=Debug \
     -DBUILD_SHARED_LIBS=OFF \
     -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir} \
-    -DHISTORY_DB_DIR=%{_tdnf_history_db_dir}
+    -DHISTORY_DB_DIR=%{_tdnf_history_db_dir} \
+    ..
 
-%cmake_build
-
-cd %{__cmake_builddir}
+%make_build
 %make_build python
 
 %check
-pip3 install pytest requests pyOpenSSL
-cd build && make %{?_smp_mflags} check
+# remove test files with dependencies on state and cleanup of rpm build directory
+# these are problematic when running tests from within the rpm build directory
+rm pytests/tests/test_srpms.py
+rm build/pytests/tests/test_srpms.py
+
+# link MS key as expected VMWare Key in test files
+ln -sf /etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY /etc/pki/rpm-gpg/VMWARE-RPM-GPG-KEY
+
+pip3 install 'pytest==8.3.3' 'pyOpenSSL==24.2.1' 'flake8==7.1.1'
+cd build && %make_build check
 
 %install
-%cmake_install
+pushd build
+%make_install
+popd
 find %{buildroot} -name '*.a' -delete -print
 mkdir -p %{buildroot}%{_var}/cache/tdnf
 mkdir -p %{buildroot}%{_tdnf_history_db_dir}
@@ -147,7 +174,7 @@ rm -rf %{buildroot}%{_datadir}/tdnf
 
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}/protected.d
 
-pushd %{__cmake_builddir}/python
+pushd build/python
 %py3_install
 popd
 find %{buildroot} -name '*.pyc' -delete
@@ -215,6 +242,33 @@ fi
 /%{_lib}/systemd/system/tdnf*
 
 %changelog
+* Fri Aug 22 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 3.5.8-8
+- Add kernel-hwe installonlypkgs entry
+
+* Thu Jan 23 2025 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-7
+- Fix an issue with autoremove for installonlypkgs on tdnf
+
+* Tue Nov 19 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-6
+- Add kernel-64k installonlypkgs entry
+
+* Tue Nov 12 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-5
+- Add install only implementation to v3.5.8 from upstream
+
+* Thu Oct 10 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-4
+- Add install only packages to tdnf.conf
+
+* Fri Sep 20 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-3
+- Fix an issue with snapshottime config option
+
+* Wed Sep 18 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-2
+- Add virtual repo snapshot exclude repos
+
+* Mon Sep 09 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.8-1
+- Minor upgrade to tdnf
+
+* Fri Jul 26 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.6-2
+- Add tdnf virtual repo snapshots
+
 * Mon Feb 26 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.6-1
 - Upgrade tdnf to version 3.5.6 for Azure Linux 3.0
 - Remove patches which are no longer needed

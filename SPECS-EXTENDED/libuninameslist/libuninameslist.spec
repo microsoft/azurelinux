@@ -1,17 +1,18 @@
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Name:           libuninameslist
-Version:        20200313
-Release:        2%{?dist}
+Version:        20230916
+Release:        5%{?dist}
 
 Summary:        A library providing Unicode character names and annotations
 
 License:        BSD
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 URL:            https://github.com/fontforge/libuninameslist
-Source0:        https://github.com/fontforge/libuninameslist/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/fontforge/libuninameslist/archive/%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
+BuildRequires: make
 
 %description
 libuninameslist provides applications with access to Unicode name and
@@ -51,8 +52,66 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 %{_libdir}/pkgconfig/libuninameslist.pc
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200313-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Nov 15 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 20230916-5
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20230916-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20230916-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20230916-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Sep 18 2023 Parag Nemade <pnemade AT redhat DOT com> - 20230916-1
+- Update to 20230916 version (#2239363)
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20230523-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jun 23 2023 Parag Nemade <pnemade AT redhat DOT com> - 20230523-2
+- Migrate to SPDX license expression
+
+* Tue May 30 2023 Parag Nemade <pnemade AT redhat DOT com> - 20230523-1
+- Update to 20230523 version (#2209761)
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20221022-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Oct 26 2022 Parag Nemade <pnemade AT redhat DOT com> - 20221022-1
+- Update to 20221022 version (#2137768)
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20220701-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jul 04 2022 Parag Nemade <pnemade AT redhat DOT com> - 20220701-1
+- Update to 20220701 version (#2103354)
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20211114-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Nov 16 2021 Parag Nemade <pnemade AT redhat DOT com> - 20211114-1
+- Update to 20211114 version (#2023054)
+
+* Tue Sep 28 2021 Parag Nemade <pnemade AT redhat DOT com> - 20210917-1
+- Update to 20210917 version (#2005533)
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20210626-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jul 02 2021 Parag Nemade <pnemade AT redhat DOT com> - 20210626-1
+- Update to 20210626 version (#1976540)
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20200413-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 20200413-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Apr 15 2020 Parag Nemade <pnemade AT redhat DOT com> - 20200413-1
+- Update to 20200413 version (#1823434)
 
 * Wed Mar 25 2020 Parag Nemade <pnemade AT redhat DOT com> - 20200313-1
 - Update to 20200313 version (#1813493)

@@ -1,12 +1,13 @@
 Summary:        C library for reading, creating, and modifying zip archives
 Name:           libzip
 Version:        1.10.1
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://libzip.org/
-Source0:        https://libzip.org/download/libzip-%{version}.tar.xz
+# Note that scrubbed version of the source tarball contains upstream source minus password protected files which password is not known
+Source0:        https://libzip.org/download/libzip-%{version}.tar.xz#/libzip-%{version}-scrubbed.tar.xz
 BuildRequires:  bzip2-devel
 BuildRequires:  cmake >= 3.0.2
 BuildRequires:  gcc
@@ -28,7 +29,10 @@ BuildRequires:  perl(Symbol)
 BuildRequires:  perl(UNIVERSAL)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
+BuildRequires:  python3
+BuildRequires:  python3-pip
 %endif
+Patch0:         always_generate_regression_tests.patch
 
 %description
 libzip is a C library for reading, creating, and modifying zip archives. Files
@@ -61,6 +65,11 @@ The %{name}-tools package provides command line tools split off %{name}:
 rm INSTALL.md
 
 %build
+%if 0%{?with_check}
+pip3 install nihtest
+%endif
+mkdir build
+cd build
 %cmake \
   -DENABLE_COMMONCRYPTO:BOOL=OFF \
   -DENABLE_GNUTLS:BOOL=OFF \
@@ -73,16 +82,17 @@ rm INSTALL.md
   -DBUILD_REGRESS:BOOL=ON \
   -DBUILD_EXAMPLES:BOOL=OFF \
   -DBUILD_DOC:BOOL=ON \
-  .
+  ..
 
 make %{?_smp_mflags}
 
 %install
+cd build
 make install DESTDIR=%{buildroot} INSTALL='install -p'
 
 %check
-make check
-
+cd build
+make test
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -106,6 +116,14 @@ make check
 %{_libdir}/pkgconfig/libzip.pc
 
 %changelog
+* Tue May 27 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 1.10.1-3
+- Remove password protected zip files from upstream src tarball
+
+* Mon Aug 19 2024 Andrew Phelps <anphel@microsoft.com> - 1.10.1-2
+- Fix package tests
+- Switch to out-of-source build
+- Add patch to ensure regression tests are built even when nihtest is not detected
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.1-1
 - Auto-upgrade to 1.10.1 - Azure Linux 3.0 - package upgrades
 

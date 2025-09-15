@@ -9,7 +9,7 @@ and are synchronized with data exchanges on "channels".
 Summary:        Lightweight in-process concurrent programming
 Name:           python-%{modname}
 Version:        3.0.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 # Most is MIT except for these, which are under the Python Software License:
 # - src/greenlet/slp_platformselect.h
 # - src/greenlet/platform/ directory
@@ -19,7 +19,13 @@ Distribution:   Azure Linux
 URL:            https://github.com/python-greenlet/greenlet
 Source0:        %{url}/archive/%{version}/%{modname}-%{version}.tar.gz
 
+# Skip leak checking to avoid a missing dependency, `objgraph`
+Patch0:          skip-leak-checks.patch
+
 BuildRequires:  gcc-c++
+%if 0%{?with_check}
+BuildRequires:  python3-psutil
+%endif
 
 %description %{_description}
 
@@ -55,7 +61,9 @@ Python 3 version.
 %py3_install
 
 %check
-PYTHONPATH="%{buildroot}%{python3_sitearch}" %{python3} -m unittest discover greenlet.tests
+PYTHONPATH="%{buildroot}%{python3_sitearch}" %{python3} -m unittest discover -v \
+              -s "%{buildroot}%{python3_sitearch}/greenlet/tests" \
+              -t "%{buildroot}%{python3_sitearch}"
 
 %files -n python3-%{modname}
 %license LICENSE LICENSE.PSF
@@ -67,6 +75,10 @@ PYTHONPATH="%{buildroot}%{python3_sitearch}" %{python3} -m unittest discover gre
 %{_includedir}/python%{python3_version}*/%{modname}/
 
 %changelog
+* Mon Apr 15 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.0.3-2
+- Fix Ptest by importing skip-leak-checks patch from Fedora (License:MIT)
+- Remove unused patch - cleanup.
+
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 3.0.3-1
 - Upgrade to version 3.0.3
 

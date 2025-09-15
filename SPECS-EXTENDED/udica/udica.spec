@@ -1,20 +1,26 @@
-Summary: A tool for generating SELinux security policies for containers
-Name: udica
-Version: 0.2.1
-Release: 3%{?dist}
-Source0: https://github.com/containers/udica/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-License: GPLv3+
-BuildArch: noarch
+Summary:        A tool for generating SELinux security policies for containers
+Name:           udica
+Version:        0.2.8
+Release:        1%{?dist}
+License:        GPLv3+
+BuildArch:      noarch
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: https://github.com/containers/udica
+URL:            https://github.com/containers/udica
+Source0:        https://github.com/containers/udica/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-BuildRequires: python3 python3-devel python3-setuptools
-Requires: python3 python3-libsemanage python3-libselinux
+#git format-patch -N v0.2.8 -- . ':!.cirrus.yml' ':!.github'
+Patch0001: 0001-Add-option-to-generate-custom-policy-for-a-confined-.patch
+Patch0002: 0002-Add-tests-covering-confined-user-policy-generation.patch
+Patch0003: 0003-confined-make-l-non-optional.patch
+Patch0004: 0004-confined-allow-asynchronous-I-O-operations.patch
 
-
-
-
+BuildRequires: python3 
+BuildRequires: python3-devel
+BuildRequires: python3-setuptools
+Requires:      python3
+Requires:      python3-libsemanage 
+Requires:      python3-libselinux
 
 %description
 Tool for generating SELinux security profiles for containers based on
@@ -24,21 +30,11 @@ inspection of container JSON file.
 %autosetup -p 1
 
 %build
-
 %{__python3} setup.py build
 
-
-
-
 %install
-install --directory %%{buildroot}%{_datadir}/udica/templates
-
-
 %{__python3} setup.py install --single-version-externally-managed --root=%{buildroot}
-
-
-
-
+install --directory %{buildroot}%{_datadir}/udica/macros
 install --directory %{buildroot}%{_mandir}/man8
 install -m 0644 udica/man/man8/udica.8 %{buildroot}%{_mandir}/man8/udica.8
 
@@ -47,21 +43,19 @@ install -m 0644 udica/man/man8/udica.8 %{buildroot}%{_mandir}/man8/udica.8
 %{_bindir}/udica
 %dir %{_datadir}/udica
 %dir %{_datadir}/udica/ansible
-%dir %{_datadir}/udica/templates
+%dir %{_datadir}/udica/macros
 %{_datadir}/udica/ansible/*
-%{_datadir}/udica/templates/*
-
-
+%{_datadir}/udica/macros/*
 %license LICENSE
 %{python3_sitelib}/udica/
 %{python3_sitelib}/udica-*.egg-info
 
 
-
-
-
-
 %changelog
+* Thu Mar 06 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.2.8-1
+- Upgrade to 0.2.8
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2.1-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

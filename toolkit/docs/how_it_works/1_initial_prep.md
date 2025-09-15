@@ -88,6 +88,8 @@ The `imagepkgfetcher` tool is similar to the `graphpkgfetcher` tool. It will fin
 The `imager` tool is responsible for composing an image based on the selected configuration file. It creates partitions, installs packages, configures the users, etc. It can output either a `*.raw` file or a simple filesystem.
 #### isomaker
 The `isomaker` tool creates an installable ISO which can be booted from a CD or other device. The ISO contains the `initrd` used to boot from a read-only device, and all the packages needed to create a copy of the selected configuration on a new computer.
+#### licensechecker
+The `licensechecker` tool is used to validate the licensing files in packages. It will check all `*.rpm` files in a directory and provide a list of issues found.
 #### liveinstaller
 The `liveinstaller` tool is included in the ISO `initrd` and is responsible for installing the requested image onto a new computer.
 #### pkgworker

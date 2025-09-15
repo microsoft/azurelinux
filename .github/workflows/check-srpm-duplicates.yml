@@ -1,0 +1,48 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# This action checks that the specs in this repo
+# generate SRPMs with unique names.
+name: SRPMs duplicates check
+
+on:
+  push:
+    branches: [main, 2.0*, 3.0*, fasttrack/*]
+  pull_request:
+    branches: [main, 2.0*, 3.0*, fasttrack/*]
+
+jobs:
+  check:
+    name: SRPMs duplicates check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Each group is published to a different repo, thus we only need to check
+        # for SRPM duplicates within the group.
+        specs-dirs-groups: ["SPECS SPECS-SIGNED", "SPECS-EXTENDED"]
+
+    steps:
+      # Checkout the branch of our repo that triggered this action
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v4
+
+      # For consistency, we use the same major/minor version of Python that Azure Linux ships
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      # Generate the specs.json files. They are the input for the duplicates check script.
+      - name: Generate specs.json
+        run: |
+          set -euo pipefail
+
+          for spec_folder in ${{ matrix.specs-dirs-groups }}; do
+            echo "Generating specs.json for spec folder '$spec_folder'."
+
+            sudo make -C toolkit -j$(nproc) parse-specs REBUILD_TOOLS=y DAILY_BUILD_ID=lkg SPECS_DIR=../$spec_folder
+            cp -v build/pkg_artifacts/specs.json ${spec_folder}_specs.json
+          done
+
+      - name: Check for duplicate SRPMs
+        run: python3 toolkit/scripts/check_srpm_duplicates.py *_specs.json

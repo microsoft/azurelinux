@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           v4l-utils
 Version:        1.22.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Utilities for video4linux and DVB devices
 # libdvbv5, dvbv5 utils, ir-keytable and v4l2-sysfs-path are GPLv2 only
 License:        GPLv2+ and GPLv2
@@ -10,6 +10,10 @@ URL:            https://www.linuxtv.org/downloads/v4l-utils/
 
 Source0:        https://www.linuxtv.org/downloads/%{name}/%{name}-%{version}.tar.bz2
 Patch0:         0001-utils-v4l2-TPG-Update-use-of-typeof.patch
+Patch1:         0002-libv4lconvert-Fix-v4lconvert_yuv420_to_rgb-bgr24-not.patch
+Patch2:         0003-libv4lconvert-Fix-v4lconvert_rgb565_to_rgb-bgr24-not.patch
+Patch3:         0004-libv4lconvert-Fix-v4lconvert_nv12_-not-taking-stride.patch
+Patch4:         0005-libv4lconvert-Fix-v4lconvert_nv16_to_yuyv-not-taking.patch
 
 BuildRequires:  alsa-lib-devel
 BuildRequires:  desktop-file-utils
@@ -18,8 +22,9 @@ BuildRequires:  gettext
 BuildRequires:  kernel-headers
 BuildRequires:  libjpeg-devel
 BuildRequires:  make
-BuildRequires:  qt5-qtbase-devel
+BuildRequires:  qtbase-devel
 BuildRequires:  systemd-devel
+BuildRequires:  systemd
 
 # BPF decoder dependencies
 %define with_bpf 1
@@ -47,16 +52,6 @@ Requires:       libv4l%{?_isa} = %{version}-%{release}
 %description    devel-tools
 Utilities for v4l2 / DVB driver authors: decode_tm6000, v4l2-compliance and
 v4l2-dbg.
-
-
-%package -n     qv4l2
-Summary:        QT v4l2 test control and streaming test application
-License:        GPLv2+
-Requires:       libv4l%{?_isa} = %{version}-%{release}
-
-%description -n qv4l2
-QT v4l2 test control and streaming test application.
-
 
 %package -n     libv4l
 Summary:        Collection of video4linux support libraries 
@@ -114,7 +109,7 @@ files for developing applications that use libdvbv5.
 %autosetup -p1
 
 %build
-export CXXFLAGS="$CXXFLAGS -std=c++14"
+export CXXFLAGS="-std=c++14 $RPM_OPT_FLAGS"
 %configure --disable-static --enable-libdvbv5 --enable-doxygen-man
 # Don't use rpath!
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
@@ -130,7 +125,6 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/{v4l1compat.so,v4l2convert.so}
 mkdir -p $RPM_BUILD_ROOT%{_mandir}/man3/
 cp -arv %{_builddir}/%{name}-%{version}/doxygen-doc/man/man3 $RPM_BUILD_ROOT%{_mandir}/
 rm $RPM_BUILD_ROOT%{_mandir}/man3/_*3
-desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/qv4l2.desktop
 %find_lang %{name}
 %find_lang libdvbv5
 
@@ -166,13 +160,6 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/qv4l2.desktop
 %{_mandir}/man1/v4l2-compliance.1*
 %{_sbindir}/v4l2-dbg
 
-%files -n qv4l2
-%doc README
-%{_bindir}/qv4l2
-%{_datadir}/applications/qv4l2.desktop
-%{_datadir}/icons/hicolor/*/apps/qv4l2.*
-%{_mandir}/man1/qv4l2.1*
-
 %files -n libv4l
 %doc ChangeLog README.libv4l TODO
 %license COPYING.libv4l COPYING
@@ -198,6 +185,10 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/qv4l2.desktop
 
 
 %changelog
+* Tue Mar 04 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.22.1-2
+- added patch to fix build
+- License Verified
+
 * Fri Mar 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.22.1-1
 - Fixing building with GCC 11 using Fedora 36 spec (license: MIT) for guidance.
 - License verified.

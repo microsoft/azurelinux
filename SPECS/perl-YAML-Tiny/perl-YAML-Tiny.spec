@@ -2,7 +2,7 @@
 Summary:        Read/Write YAML files with as little code as possible
 Name:           perl-YAML-Tiny
 Version:        1.74
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/YAML-Tiny/
@@ -16,6 +16,7 @@ BuildRequires:  perl(ExtUtils::MakeMaker)
 %if 0%{?with_check}
 BuildRequires:  perl(JSON::PP)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(open)
 %endif
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -51,6 +52,9 @@ make test
 %{_mandir}/man3/YAML::Tiny.3*
 
 %changelog
+* Tue Apr 22 2025 Riken Maharjan <rmaharjan@microsoft.com> - 1.74-2
+- Add missing check dependencies.
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.74-1
 - Auto-upgrade to 1.74 - Azure Linux 3.0 - package upgrades
 

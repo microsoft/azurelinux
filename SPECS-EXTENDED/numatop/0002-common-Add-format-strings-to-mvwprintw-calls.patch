@@ -1,0 +1,35 @@
+From 6316116c1e05031e53a1f5196ed92559c3123cc2 Mon Sep 17 00:00:00 2001
+From: Dridi Boukelmoune <dridi.boukelmoune@gmail.com>
+Date: Mon, 4 Mar 2024 23:00:10 +0100
+Subject: [PATCH 2/9] common: Add format strings to mvwprintw() calls
+
+This silences the format-security warning.
+---
+ common/reg.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/common/reg.c b/common/reg.c
+index 1a87161..ad37274 100644
+--- a/common/reg.c
++++ b/common/reg.c
+@@ -240,7 +240,7 @@ reg_line_write(win_reg_t *r, int line, reg_align_t align, char *content)
+ 	}
+ 
+ 	if (len > 0) {
+-		(void) mvwprintw(r->hdl, line, pos_x, content);
++		(void) mvwprintw(r->hdl, line, pos_x, "%s", content);
+ 	}
+ 
+ 	if (r->mode != 0) {
+@@ -267,7 +267,7 @@ reg_highlight_write(win_reg_t *r, int line, int align, char *content)
+ 	}
+ 
+ 	if (len > 0) {
+-		(void) mvwprintw(r->hdl, line, pos_x, content);
++		(void) mvwprintw(r->hdl, line, pos_x, "%s", content);
+ 	}
+ 
+ 	(void) wattroff(r->hdl, A_REVERSE | A_BOLD);
+-- 
+2.44.0
+

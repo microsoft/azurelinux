@@ -3,13 +3,16 @@ Distribution:   Azure Linux
 # noarch, but to avoid debug* files interfering with manifest test:
 %global debug_package %{nil}
 
+# Similarly, for package note feature
+%undefine _package_note_file
+
 Name:		perl-Test-Synopsis
-Version:	0.16
-Release:	7%{?dist}
+Version:	0.17
+Release:	12%{?dist}
 Summary:	Test your SYNOPSIS code
-License:	GPL+ or Artistic
+License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Test-Synopsis
-Source0:	https://cpan.metacpan.org/modules/by-module/Test/Test-Synopsis-%{version}.tar.gz#/perl-Test-Synopsis-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/authors/id/Z/ZO/ZOFFIX/Test-Synopsis-%{version}.tar.gz#/perl-Test-Synopsis-%{version}.tar.gz
 BuildArch:	noarch
 # Module Build
 BuildRequires:	coreutils
@@ -26,13 +29,13 @@ BuildRequires:	perl(strict)
 BuildRequires:	perl(Test::Builder::Module)
 BuildRequires:	perl(warnings)
 # Test Suite
+BuildRequires:	perl(blib)
 BuildRequires:	perl(File::Spec)
 BuildRequires:	perl(IO::Handle)
 BuildRequires:	perl(IPC::Open3)
 BuildRequires:	perl(Test::Builder) >= 0.34
 BuildRequires:	perl(Test::Builder::Tester)
 BuildRequires:	perl(Test::More)
-BuildRequires:	perl(blib)
 # Extra Tests; can't run these when bootstrapping or in EL since many
 # of these packages won't be available
 %if 0%{!?perl_bootstrap:1} && 0%{!?rhel:1}
@@ -51,11 +54,11 @@ BuildRequires:	perl(Test::NoTabs)
 BuildRequires:	perl(Test::Pod) >= 1.41
 BuildRequires:	perl(Test::Pod::Coverage) >= 1.08
 BuildRequires:	perl(Test::Portability::Files)
-BuildRequires:	perl(Test::Spelling) >= 0.23, hunspell-en
+BuildRequires:	perl(Test::Spelling) >= 0.12, hunspell-en
 BuildRequires:	perl(Test::Version)
 %endif
 # Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:	perl(Test::Builder::Module)
 
 %description
@@ -85,22 +88,74 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %endif
 
 %files
-%if 0%{?_licensedir:1}
 %license LICENSE
-%else
-%doc LICENSE
-%endif
 %doc Changes README README.md
 %{perl_vendorlib}/Test/
 %{_mandir}/man3/Test::Synopsis.3*
 
 %changelog
-* Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 0.16-7
-- Add an explicit BR on `perl(blib)` to enable ptest
+* Fri Dec 20 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.17-12
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.17-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.17-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.17-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.17-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.17-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.17-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jun 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.17-5
+- Perl 5.36 re-rebuild of bootstrapped packages
+
+* Mon May 30 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.17-4
+- Perl 5.36 rebuild
+
+* Fri Mar 11 2022 Paul Howarth <paul@city-fan.org> - 0.17-3
+- Work around FTBFS triggered by package note feature
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.17-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Dec 13 2021 Paul Howarth <paul@city-fan.org> - 0.17-1
+- Update to 0.17
+  - Mention related module Test::Synopsis::Expectation in docs (GH#22)
+- Use %%license unconditionally
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.16-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon May 24 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.16-12
+- Perl 5.34 re-rebuild of bootstrapped packages
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.16-11
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.16-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.16-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.16-8
+- Perl 5.32 re-rebuild of bootstrapped packages
+
+* Mon Jun 22 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.16-7
+- Perl 5.32 rebuild
+
+* Tue Mar 10 2020 Paul Howarth <paul@city-fan.org> - 0.16-6
+- BR: perl(blib) for t/00-compile.t
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.16-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

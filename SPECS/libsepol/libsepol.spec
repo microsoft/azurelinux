@@ -1,7 +1,7 @@
 Summary:        SELinux binary policy manipulation library
 Name:           libsepol
 Version:        3.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -62,8 +62,7 @@ mkdir -p %{buildroot}%{_mandir}/man8
 
 rm -f %{buildroot}%{_bindir}/genpolbools
 rm -f %{buildroot}%{_bindir}/genpolusers
-rm -f %{buildroot}%{_bindir}/chkcon
-rm -rf %{buildroot}%{_mandir}/man8
+rm -rf %{buildroot}%{_mandir}/man8/genpol*
 rm -rf %{buildroot}%{_mandir}/ru/man8
 
 %post
@@ -94,8 +93,14 @@ exit 0
 %{_includedir}/sepol/*.h
 %{_includedir}/sepol/cil/*.h
 %{_mandir}/man3/*.3.gz
+%{_mandir}/man8/*.8.gz
+%{_bindir}/chkcon
 
 %changelog
+* Wed Apr 02 2025 Chris PeBenito <chpebeni@microsoft.com> - 3.6-2
+- Install the chkcon binary into the devel package as it is needed by selinux-policy
+  builds starting with 2.20250213.
+
 * Tue Feb 06 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.6-1
 - Upgrade to version 3.6
 

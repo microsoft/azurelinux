@@ -11,7 +11,7 @@
 
 Name:          netavark
 Version:       1.10.3
-Release:       1%{?dist}
+Release:       4%{?dist}
 Summary:       OCI network stack
 License:       ASL 2.0 and BSD and MIT
 Vendor:        Microsoft Corporation
@@ -19,11 +19,11 @@ Distribution:   Azure Linux
 URL:           https://github.com/containers/%{name}
 Source0:       %{url}/archive/%{built_tag}/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:       %{url}/releases/download/%{built_tag}/%{name}-%{built_tag}-vendor.tar.gz
-BuildRequires: cargo
+BuildRequires: cargo < 1.85.0
 BuildRequires: make
 BuildRequires: protobuf-c
 BuildRequires: protobuf-compiler
-BuildRequires: rust
+BuildRequires: rust < 1.85.0
 BuildRequires: git
 BuildRequires: go-md2man
 Recommends:    aardvark-dns >= 1.10.3-1
@@ -225,6 +225,15 @@ popd
 %{_unitdir}/%{name}-firewalld-reload.service
 
 %changelog
+* Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.10.3-4
+- Bump release to rebuild with rust
+
+* Tue Jun 10 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.10.3-3
+- Bump release to rebuild with rust
+
+* Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.10.3-2
+- Pin rust version
+
 * Thu Feb 22 2024 Mitch Zhu <mitchzhu@microsoft.com> - 1.10.3-1
 - upgrade to v1.10.3
 

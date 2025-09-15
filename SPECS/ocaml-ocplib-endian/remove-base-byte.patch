@@ -1,0 +1,58 @@
+From fda4d5525063c8444020be369c63de23d39c246e Mon Sep 17 00:00:00 2001
+From: Marek Kubica <marek@tarides.com>
+Date: Mon, 27 Jun 2022 15:26:36 +0200
+Subject: [PATCH] Remove dependency on base-bytes
+
+Bytes has been part of the compiler since 4.02 and that's also the
+oldest version dune supports.
+---
+ ocplib-endian.opam | 1 -
+ src/dune           | 5 ++---
+ tests/dune         | 2 +-
+ 3 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/ocplib-endian.opam b/ocplib-endian.opam
+index 834740e..41f0d9a 100644
+--- a/ocplib-endian.opam
++++ b/ocplib-endian.opam
+@@ -14,7 +14,6 @@ homepage: "https://github.com/OCamlPro/ocplib-endian"
+ bug-reports: "https://github.com/OCamlPro/ocplib-endian/issues"
+ doc: "https://ocamlpro.github.io/ocplib-endian/ocplib-endian/"
+ depends: [
+-  "base-bytes"
+   "ocaml" {>= "4.03.0"}
+   "cppo" {>= "1.1.0" & build}
+   "dune" {>= "1.0"}
+diff --git a/src/dune b/src/dune
+index a5b90d1..dc0bd0e 100644
+--- a/src/dune
++++ b/src/dune
+@@ -62,8 +62,7 @@
+  (synopsis "Optimised functions to read and write int16/32/64 from strings and bytes")
+  (wrapped false)
+  (ocamlopt_flags (:standard -inline 1000))
+- (modules endianString endianBytes)
+- (libraries bytes))
++ (modules endianString endianBytes))
+ 
+ (library
+  (name ocplib_endian_bigstring)
+@@ -72,4 +71,4 @@
+  (wrapped false)
+  (modules endianBigstring)
+  (ocamlopt_flags (:standard -inline 1000))
+- (libraries ocplib_endian bigarray bytes))
++ (libraries ocplib_endian bigarray))
+diff --git a/tests/dune b/tests/dune
+index e3e0f17..be4acad 100644
+--- a/tests/dune
++++ b/tests/dune
+@@ -17,7 +17,7 @@
+  (name tests)
+  (wrapped false)
+  (modules test_string test_bytes test_bigstring)
+- (libraries ocplib-endian ocplib-endian.bigstring bigarray bytes))
++ (libraries ocplib-endian ocplib-endian.bigstring bigarray))
+ 
+ (executables
+  (names test)

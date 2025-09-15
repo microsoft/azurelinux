@@ -1,10 +1,10 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           perl-PAR-Dist
-Version:        0.51
-Release:        2%{?dist}
+Version:        0.53
+Release:        3%{?dist}
 Summary:        Toolkit for creating and manipulating Perl PAR distributions
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/PAR-Dist
 Source0:        https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/PAR-Dist-%{version}.tar.gz#/perl-PAR-Dist-%{version}.tar.gz
 BuildArch:      noarch
@@ -17,6 +17,7 @@ BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 # Run-time:
 BuildRequires:  perl(Archive::Zip)
 BuildRequires:  perl(Carp)
+BuildRequires:  perl(Config)
 BuildRequires:  perl(Cwd)
 BuildRequires:  perl(Exporter)
 # perl(ExtUtils::Install) not tested
@@ -26,14 +27,13 @@ BuildRequires:  perl(File::Find)
 BuildRequires:  perl(File::Path)
 BuildRequires:  perl(File::Spec)
 # perl(LWP::Simple) not tested
-# perl(Module::Signature) >= 0.25 not tested
+BuildRequires:  perl(strict)
+BuildRequires:  perl(vars)
+BuildRequires:  perl(warnings)
 BuildRequires:  perl(YAML::Tiny)
 # Tests:
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::More)
-# Optional tests:
-BuildRequires:  perl(Test::Pod) >= 1.00
-BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Requires:       perl(Archive::Zip)
 Requires:       perl(Cwd)
@@ -42,8 +42,8 @@ Requires:       perl(ExtUtils::MY)
 Requires:       perl(File::Copy)
 Requires:       perl(File::Find)
 Requires:       perl(File::Path)
+Requires:       perl(File::Temp)
 Requires:       perl(LWP::Simple)
-Requires:       perl(Module::Signature) >= 0.25
 Requires:       perl(YAML::Tiny)
 
 %description
@@ -53,35 +53,123 @@ after their make or Build stage, a META.yml describing metadata of the
 original CPAN distribution, and a MANIFEST detailing all files within it.
 Digitally signed PAR distributions will also contain a SIGNATURE file.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n PAR-Dist-%{version}
 
+# Help generators to recognize Perl scripts
+for F in t/*.t; do
+    perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!.*perl\b}{$Config{startperl}}' "$F"
+    chmod +x "$F"
+done
+
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-%{_fixperms} $RPM_BUILD_ROOT/*
+%{make_install}
+%{_fixperms} %{buildroot}/*
+
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+rm %{buildroot}%{_libexecdir}/%{name}/t/00pod*
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/bash
+set -e
+# Some tests write into temporary files/directories. The easiest solution
+# is to copy the tests into a writable directory and execute them from there.
+DIR=$(mktemp -d)
+pushd "$DIR"
+cp -a %{_libexecdir}/%{name}/* ./
+prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+popd
+rm -rf "$DIR"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 
 %check
-make test PERL_TEST_POD=1
+unset PERL_TEST_POD
+make test
 
 %files
 %license LICENSE
 %doc Changes README
-%{perl_vendorlib}/*
-%{_mandir}/man3/*
+%{perl_vendorlib}/PAR*
+%{_mandir}/man3/PAR::Dist*
+
+%files tests
+%{_libexecdir}/%{name}
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.51-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Dec 19 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.53-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.53-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Jun 24 2024 Jitka Plesnikova <jplesnik@redhat.com> - 0.53-1
+- 0.53 bump (rhbz#2292891)
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.52-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.52-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.52-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu May 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 0.52-1
+- 0.52 bump
+- Package tests
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.51-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.51-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.51-6
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.51-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.51-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.51-3
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.51-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Tue Dec 01 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.51-1
 - 0.51 bump
 
 * Wed Nov 18 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.50-1
 - 0.50 bump
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.49-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.49-22
+- Perl 5.32 rebuild
+
+* Wed Feb 26 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.49-21
+- Use make_* macros
+- Specify all dependencies
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.49-20
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

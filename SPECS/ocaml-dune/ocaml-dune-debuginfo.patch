@@ -1,0 +1,11 @@
+--- dune-3.11.0/src/dune_rules/dune_project.ml.orig	2023-09-23 19:52:10.552217543 -0600
++++ dune-3.11.0/src/dune_rules/dune_project.ml	2023-09-23 22:03:32.641347776 -0600
+@@ -455,7 +455,7 @@ let filename = "dune-project"
+ let opam_file_location_default ~lang:_ = `Relative_to_project
+ let implicit_transitive_deps_default ~lang:_ = true
+ let wrapped_executables_default ~(lang : Lang.Instance.t) = lang.version >= (2, 0)
+-let map_workspace_root_default ~(lang : Lang.Instance.t) = lang.version >= (3, 0)
++let map_workspace_root_default ~(lang : Lang.Instance.t) = false
+ 
+ let executables_implicit_empty_intf_default ~(lang : Lang.Instance.t) =
+   lang.version >= (3, 0)

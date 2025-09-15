@@ -1,14 +1,14 @@
 Summary:        Symbolic constants in Python
 Name:           python-constantly
-Version:        15.1.0
-Release:        7%{?dist}
+Version:        23.10.4
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/twisted/constantly
 # Source to be fixed as part of https://microsoft.visualstudio.com/OS/_workitems/edit/25936171.
-Source0:        https://files.pythonhosted.org/packages/95/f1/207a0a478c4bb34b1b49d5915e2db574cadc415c9ac3a7ef17e29b2e8951/constantly-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/4d/6f/cb2a94494ff74aa9528a36c5b1422756330a75a8367bf20bd63171fc324d/constantly-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -19,6 +19,12 @@ Summary:        Symbolic constants in Python
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
+BuildRequires:  python3-pip
+BuildRequires:  python3-versioneer
+%if 0%{?with_check}
+Buildrequires:  python3-twisted
+Buildrequires:  python3-typing-extensions
+%endif
 Requires:       python3
 
 %description -n python3-constantly
@@ -26,9 +32,6 @@ A library that provides symbolic constant support. It includes collections and c
 
 %prep
 %autosetup -n constantly-%{version}
-# SafeConfigParser class is renamed to ConfigParser in python 3.12. See: python/cpython#89336
-sed -i 's/SafeConfigParser/ConfigParser/g' ./versioneer.py
-sed -i 's/readfp/read_file/g' ./versioneer.py
 
 %build
 %py3_build
@@ -45,6 +48,9 @@ sed -i 's/readfp/read_file/g' ./versioneer.py
 %{python3_sitelib}/*
 
 %changelog
+* Tue May 14 2024 Betty Lakes <bettylakes@microsoft.com> - 23.10.4-1
+- Upgrade to 23.10.4
+
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 15.1.0-7
 - Fix build for python 3.12
 
@@ -56,7 +62,7 @@ sed -i 's/readfp/read_file/g' ./versioneer.py
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 15.1.0-5
 - Added %%license line automatically
 
-* Wed Apr 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 15.1.0-4
+* Thu Apr 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 15.1.0-4
 - Fixed "Source0" tag.
 - License verified.
 - Removed "%%define sha1".

@@ -1,9 +1,12 @@
 %global debug_package %{nil}
 
+# set commit number that corresponds to the github tag for the version
+%global coredns_gitcommit "6e11ebddfc13bfca683fcbcae72cc4af6de47dd2"
+
 Summary:        Fast and flexible DNS server
 Name:           coredns
-Version:        1.11.1
-Release:        1%{?dist}
+Version:        1.11.4
+Release:        8%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,27 +33,48 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         makefile-buildoption-commitnb.patch
+Patch0:         CVE-2025-22868.patch
+# Patch to fix the package test suite due to external akamai update
+# https://github.com/coredns/coredns/commit/d8ecde1080e7cbbeb98257ba4e03a271f16b4cd9
+Patch1:         coredns-example-net-test.patch
+Patch2:         CVE-2025-29786.patch
+Patch3:         CVE-2025-30204.patch
+Patch4:         CVE-2024-53259.patch
+Patch5:         CVE-2025-47950.patch
 
-BuildRequires:  golang >= 1.12
+BuildRequires:  golang < 1.25
 
 %description
 CoreDNS is a fast and flexible DNS server.
 
 %prep
-%autosetup -p1
+%autosetup -a1 -p1
 
 %build
-# create vendor folder from the vendor tarball and set vendor mode
-tar -xf %{SOURCE1} --no-same-owner
 export BUILDOPTS="-mod=vendor -v"
-# set commit number that correspond to the github tag for that version
-export GITCOMMIT="ae2bbc29be1aaae0b3ded5d188968a6c97bb3144"
+export GITCOMMIT=%{coredns_gitcommit}
+
+# use go provided by host
+go_version_host=`go version | { read _ _ v _; echo ${v#go}; }`
+go_version_min=$(cat %{_builddir}/%{name}-%{version}/.go-version)
+echo "+++ using go version ${go_version_host} (minimum ${go_version_min})"
+echo "${go_version_host}" > %{_builddir}/%{name}-%{version}/.go-version
+
 make
 
 %install
 install -m 755 -d %{buildroot}%{_bindir}
 install -p -m 755 -t %{buildroot}%{_bindir} %{name}
+
+%check
+# From go.test.yml
+go install github.com/fatih/faillint@latest && \
+(cd request && go test -v -race ./...) && \
+(cd core && go test -v -race ./...) && \
+(cd coremain && go test -v -race ./...) && \
+(cd plugin && go test -v -race ./...) && \
+(cd test && go test -v -race ./...) && \
+./coredns -version
 
 %files
 %defattr(-,root,root)
@@ -58,7 +82,37 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %{_bindir}/%{name}
 
 %changelog
-* Tue Oct 18 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.11.1-1
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.11.4-8
+- Set BR for golang to < 1.25
+
+* Tue Jun 17 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.11.4-7
+- Fix CVE-2025-47950 with an upstream patch
+
+* Tue Apr 01 2025 Ankita Pareek <ankitapareek@microsoft.com> - 1.11.4-6
+- Add patch for CVE-2024-53259
+
+* Sat Mar 29 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.11.4-5
+- Patch CVE-2025-30204
+
+* Mon Mar 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.11.4-4
+- Fix CVE-2025-29786 with an upstream patch
+
+* Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.11.4-3
+- Fix CVE-2025-22868 with an upstream patch
+
+* Mon Feb 10 2025 Sam Meluch <sammeluch@microsoft.com> - 1.11.4-2
+- readd check section from 2.0
+
+* Fri Feb 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.4-1
+- Auto-upgrade to 1.11.4 to fix CVE-2023-44487
+
+* Mon Nov 25 2024 Bala <balakumaran.kannan@microsoft.com> - 1.11.1-3
+- Fix CVE-2024-24786
+
+* Mon Jun 24 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.11.1-2
+- Address CVE-2023-44487, CVE-2023-45288, CVE-2023-49295, CVE-2024-0874, CVE-2024-22189
+
+* Wed Oct 18 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.11.1-1
 - Upgrade to 1.11.1 to match version required by kubernetes
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.3-10

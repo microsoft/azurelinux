@@ -1,16 +1,18 @@
-Summary:  Thai language support routines
-Name: libthai
-Version: 0.1.28
-Release: 5%{?dist}
-License: LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source: ftp://linux.thai.net/pub/thailinux/software/libthai/libthai-%{version}.tar.xz
+Summary:  Thai language support routines
+Name: libthai
+Version: 0.1.29
+Release: 10%{?dist}
+License: LGPL-2.1-or-later
+Source0: https://linux.thai.net/pub/thailinux/software/libthai/libthai-%{version}.tar.xz
 Patch0: libthai-0.1.9-multilib.patch
 URL: http://linux.thai.net
 
 BuildRequires: gcc
 BuildRequires: pkgconfig(datrie-0.2)
+BuildRequires: doxygen
+BuildRequires: make
 
 %description
 LibThai is a set of Thai language support routines aimed to ease
@@ -31,8 +33,7 @@ Install libthai-devel if you want to develop programs which will use
 libthai.
 
 %prep
-%setup -q
-%patch 0 -p1 -b .multilib
+%autosetup -p1
 
 %build
 %configure --disable-static
@@ -42,6 +43,12 @@ make
 rm -rf $RPM_BUILD_ROOT
 
 %makeinstall
+
+# move installed doc files back to build directory to package them
+# in the right place
+mkdir installed-docs
+mv $RPM_BUILD_ROOT%{_docdir}/libthai/* installed-docs
+rmdir $RPM_BUILD_ROOT%{_docdir}/libthai
 
 rm $RPM_BUILD_ROOT%{_libdir}/*.la
 
@@ -53,14 +60,51 @@ rm $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_datadir}/libthai
 
 %files devel
+%doc installed-docs/*
 %{_includedir}/thai
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*
 
 %changelog
-* Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 0.1.28-5
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Remove doxygen dependency.
+* Wed oNov 13 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.1.29-10
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.29-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.29-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.29-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.29-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed May 17 2023 Peng Wu <pwu@redhat.com> - 0.1.29-5
+- Migrate to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.29-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.29-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.29-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Dec 23 2021 Peng Wu <pwu@redhat.com> - 0.1.29-1
+- Update to 0.1.29
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.28-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.28-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.28-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.28-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

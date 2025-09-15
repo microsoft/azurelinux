@@ -6,23 +6,22 @@ package imagecustomizerapi
 import (
 	"fmt"
 	"unicode"
-
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 )
 
 type Partition struct {
-	// ID is used to correlate `Partition` objects with `PartitionSetting` objects.
+	// ID is used to correlate `Partition` objects with `FileSystem` objects.
 	Id string `yaml:"id"`
 	// Name is the label to assign to the partition.
 	Label string `yaml:"label"`
-	// Start is the offset where the partition begins (inclusive), in MiBs.
-	Start uint64 `yaml:"start"`
-	// End is the offset where the partition ends (exclusive), in MiBs.
-	End *uint64 `yaml:"end"`
-	// Size is the size of the partition in MiBs.
-	Size *uint64 `yaml:"size"`
-	// Flags assigns features to the partition.
-	Flags []PartitionFlag `yaml:"flags"`
+	// Start is the offset where the partition begins (inclusive).
+	// Note: When not provided, value is filled in by Disk.IsValid().
+	Start *DiskSize `yaml:"start"`
+	// End is the offset where the partition ends (exclusive).
+	End *DiskSize `yaml:"end"`
+	// Size is the size of the partition.
+	Size PartitionSize `yaml:"size"`
+	// Type specifies the type of partition the partition is.
+	Type PartitionType `yaml:"type"`
 }
 
 func (p *Partition) IsValid() error {
@@ -31,48 +30,32 @@ func (p *Partition) IsValid() error {
 		return err
 	}
 
-	if p.End != nil && p.Size != nil {
+	if p.End != nil && p.Size.Type != PartitionSizeTypeUnset {
 		return fmt.Errorf("cannot specify both end and size on partition (%s)", p.Id)
 	}
 
-	if (p.End != nil && p.Start >= *p.End) || (p.Size != nil && *p.Size <= 0) {
+	if (p.End != nil && p.Start != nil && *p.Start >= *p.End) || (p.Size.Type == PartitionSizeTypeExplicit && p.Size.Size <= 0) {
 		return fmt.Errorf("partition's (%s) size can't be 0 or negative", p.Id)
 	}
 
-	for _, f := range p.Flags {
-		err := f.IsValid()
-		if err != nil {
-			return err
-		}
-	}
-
-	if p.IsBiosBoot() {
-		if p.Start != 1 {
-			return fmt.Errorf("BIOS boot partition must start at block 1")
-		}
+	err = p.Type.IsValid()
+	if err != nil {
+		return err
 	}
 
 	return nil
 }
 
-func (p *Partition) GetEnd() (uint64, bool) {
+func (p *Partition) GetEnd() (DiskSize, bool) {
 	if p.End != nil {
 		return *p.End, true
 	}
 
-	if p.Size != nil {
-		return p.Start + *p.Size, true
+	if p.Size.Type == PartitionSizeTypeExplicit {
+		return *p.Start + p.Size.Size, true
 	}
 
 	return 0, false
-}
-
-func (p *Partition) IsESP() bool {
-	return sliceutils.ContainsValue(p.Flags, PartitionFlagESP)
-}
-
-func (p *Partition) IsBiosBoot() bool {
-	return sliceutils.ContainsValue(p.Flags, PartitionFlagBiosGrub)
 }
 
 // isGPTNameValid checks if a GPT partition name is valid.

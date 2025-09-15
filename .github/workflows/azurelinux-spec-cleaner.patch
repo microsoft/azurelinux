@@ -471,7 +471,6 @@ index e89d188..b4e231d 100644
 -GFDL-1.3-or-later | GNU Free Documentation License v1.3 or later
 -Giftware | Giftware License
 -GL2PS | GL2PS License
--Glide | 3dfx Glide License
 -Glulxe | Glulxe License
 -gnuplot | gnuplot License
 -GPL-1.0-only | GNU General Public License v1.0 only
@@ -2210,8 +2209,6 @@ index 3f9e69c..b08a76f 100644
  Giftware	Giftware
 -Giftware+	Giftware+
 +GL2PS	GL2PS
- Glide	Glide
--Glide+	Glide+
  Glulxe	Glulxe
 -Glulxe+	Glulxe+
 -HPND	HPND
@@ -6103,10 +6100,6 @@ index 3fe64bb..0000000
 -movit-devel: movit 
 -mozilla-nspr-devel: nspr 
 -mozilla-nss-devel: nss 
--mozjs17-devel: mozjs-17.0 
--mozjs38-devel: mozjs-38 
--mozjs52-devel: mozjs-52 
--mozjs60-devel: mozjs-60 
 -mozldap-devel: mozldap 
 -mpfr-devel: mpfr 
 -mpg123-devel: libmpg123 libout123 

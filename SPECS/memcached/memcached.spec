@@ -6,8 +6,8 @@
 %bcond_with seccomp
 Summary:        High Performance, Distributed Memory Object Cache
 Name:           memcached
-Version:        1.6.21
-Release:        1%{?dist}
+Version:        1.6.27
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,6 +15,8 @@ URL:            https://www.memcached.org/
 Source0:        https://www.memcached.org/files/%{name}-%{version}.tar.gz
 Source1:        memcached.sysconfig
 Patch0:         memcached-unit.patch
+Patch1:         CVE-2021-43519.patch
+Patch2:         CVE-2021-44647.patch
 BuildRequires:  gcc
 BuildRequires:  libevent-devel
 BuildRequires:  systemd-devel
@@ -36,8 +38,7 @@ BuildRequires:  libseccomp-devel
 %if %{with tls}
 BuildRequires:  openssl-devel
 %endif
-Requires(pre):  shadow-utils
-%{?systemd_requires}
+Requires:       openssl-libs
 
 %description
 memcached is a high-performance, distributed memory object caching
@@ -51,6 +52,15 @@ Requires:       %{name} = %{version}-%{release}
 %description devel
 Install memcached-devel if you are developing C/C++ applications that require
 access to the memcached binary include files.
+
+%package        service
+Summary:        This package automatically runs scripts to set up memcached as a service.
+Requires(pre):  shadow-utils
+Requires:       %{name} = %{version}-%{release}
+%{?systemd_requires}
+
+%description service
+Install memcached-service if you want to run memcached as a service automatically.
 
 %prep
 %autosetup -p1
@@ -89,20 +99,20 @@ install -Dp -m0644 %{SOURCE1} %{buildroot}/%{_sysconfdir}/sysconfig/%{name}
 %check
 %make_build test
 
-%pre
+%pre service
 getent group %{groupname} >/dev/null || groupadd -r %{groupname}
 getent passwd %{username} >/dev/null || \
 useradd -r -g %{groupname} -d /run/memcached \
     -s /sbin/nologin -c "Memcached daemon" %{username}
 exit 0
 
-%post
+%post service
 %systemd_post memcached.service
 
-%preun
+%preun service
 %systemd_preun memcached.service
 
-%postun
+%postun service
 %systemd_postun_with_restart memcached.service
 
 %files
@@ -113,12 +123,24 @@ exit 0
 %{_bindir}/memcached
 %{_mandir}/man1/memcached-tool.1*
 %{_mandir}/man1/memcached.1*
-%{_unitdir}/memcached.service
 
 %files devel
 %{_includedir}/memcached/*
 
+%files service
+%{_unitdir}/memcached.service
+
 %changelog
+* Thu Mar 20 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.6.27-3
+- Fix CVE-2023-6228
+
+* Wed Feb 05 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.6.27-2
+- Address CVE-2021-43519
+
+* Wed May 08 2024 Osama Esmail <osamaesmail@microsoft.com> - 1.6.27-1
+- Upgrading to 1.6.27
+- Separating out memcached-service into a subpackage
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.21-1
 - Auto-upgrade to 1.6.21 - Azure Linux 3.0 - package upgrades
 

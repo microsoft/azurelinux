@@ -1,7 +1,7 @@
 %define majminorver %(echo %{version} | cut -d. -f1-2)
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
-Version:        2.39.2
+Version:        2.40.2
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -77,6 +77,7 @@ autoreconf -fi
     --disable-silent-rules \
     --disable-static \
     --disable-use-tty-group \
+    --disable-liblastlog2 \
     --without-python \
     --with-selinux \
     --with-audit
@@ -151,6 +152,14 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Wed Sep 18 2024 Vince Perri <viperri@microsoft.com> - 2.40.2-1
+- Upgrade to 2.40.2:
+-   Added --disable-liblastlog2 to avoid building new liblastlog2 libraries
+-   Removed CVE-2024-28085 patch as it is fixed in 2.40.2
+
+* Mon Sep 09 2024 Harshit Gupta <guptaharshit@microsoft.com> - 2.39.2-2
+- Fix CVE-2024-28085 by adding patch
+
 * Tue Nov 28 2023 Andrew Phelps <anphel@microsoft.com> - 2.39.2-1
 - Upgrade to 2.39.2
 

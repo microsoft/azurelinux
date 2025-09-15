@@ -10,7 +10,7 @@ set -e
 # - b) ACR name (e.g. azurelinepreview, acrafoimages, etc.)
 # - c) Container repository name (e.g. base/nodejs, base/postgres, base/kubevirt/cdi-apiserver, etc.)
 # - d) Image name (e.g. nodejs, postgres, cdi, etc.)
-# - e) Component name (e.g. nodejs18, postgresql, containerized-data-importer-api, etc.)
+# - e) Component file name (e.g. nodejs.name, postgres.name, api.name, etc.)
 # - f) Package file name (e.g. nodejs18.pkg, postgres.pkg, api.pkg, etc.)
 # - g) Dockerfile name (e.g. Dockerfile-nodejs, Dockerfile-Postgres, Dockerfile-cdi-apiserver, etc.)
 # - h) Docker build arguments (e.g. '--build-arg BINARY_NAME="cdi-apiserver" --build-arg USER=1001')
@@ -27,6 +27,7 @@ set -e
 # - s) SBOM tool path.
 # - t) Script to create SBOM for the container image.
 # - u) Create Distroless container (e.g. true, false. If true, the script will also create a distroless container)
+# - v) Version extract command (e.g. 'busybox | head -1 | cut -c 10-15')
 
 # Assuming you are in your current working directory. Below should be the directory structure:
 #   │   rpms.tar.gz
@@ -37,14 +38,16 @@ set -e
 #   ~/azurelinux/.pipelines/containerSourceData
 #   ├── nodejs
 #   │   ├── distroless
-#   │   │   ├── holdback-nodejs18.pkg
-#   │   │   ├── nodejs18.pkg
+#   │   │   ├── holdback-nodejs.pkg
+#   │   │   ├── nodejs.pkg
 #   │   ├── Dockerfile-Nodejs
-#   │   ├── nodejs18.pkg
+#   │   ├── nodejs.pkg
+#   |   |── nodejs.name
 #   ├── configuration
 #   │   ├── acrRepoV2.json
 #   ├── scripts
 #   │   ├── BuildGoldenContainer.sh
+#   │   ├── BuildContainerCommonSteps.sh
 #   ├── Dockerfile-Initial
 #   ├── azurelinuxlocal.repo
 
@@ -55,13 +58,13 @@ set -e
 #     -j OUTPUT -k ./rpms.tar.gz -l ~/azurelinux/.pipelines/containerSourceData \
 #     -m "false" -n "false" -p development -q "false" -u "true"
 
-while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:" OPTIONS; do
+while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:" OPTIONS; do
     case ${OPTIONS} in
     a ) BASE_IMAGE_NAME_FULL=$OPTARG;;
     b ) ACR=$OPTARG;;
     c ) REPOSITORY=$OPTARG;;
     d ) IMAGE=$OPTARG;;
-    e ) COMPONENT=$OPTARG;;
+    e ) COMPONENT_FILE=$OPTARG;;
     f ) PACKAGE_FILE=$OPTARG;;
     g ) DOCKERFILE=$OPTARG;;
     h ) DOCKER_BUILD_ARGS=$OPTARG;;
@@ -78,6 +81,8 @@ while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:" OPTIONS; do
     s ) SBOM_TOOL_PATH=$OPTARG;;
     t ) SBOM_SCRIPT=$OPTARG;;
     u ) DISTROLESS=$OPTARG;;
+    v ) VERSION_EXTRACT_CMD=$OPTARG;;
+    w ) TOOLCHAIN_RPMS_TARBALL=$OPTARG;;
 
     \? )
         echo "Error - Invalid Option: -$OPTARG" 1>&2
@@ -103,7 +108,7 @@ function print_inputs {
     echo "ACR                           -> $ACR"
     echo "REPOSITORY                    -> $REPOSITORY"
     echo "IMAGE                         -> $IMAGE"
-    echo "COMPONENT                     -> $COMPONENT"
+    echo "COMPONENT_FILE                -> $COMPONENT_FILE"
     echo "PACKAGE_FILE                  -> $PACKAGE_FILE"
     echo "DOCKERFILE                    -> $DOCKERFILE"
     echo "DOCKER_BUILD_ARGS             -> $DOCKER_BUILD_ARGS"
@@ -113,6 +118,7 @@ function print_inputs {
     echo "CONTAINER_SRC_DIR             -> $CONTAINER_SRC_DIR"
     echo "IS_HCI_IMAGE                  -> $IS_HCI_IMAGE"
     echo "USE_RPM_QA_CMD                -> $USE_RPM_QA_CMD"
+    echo "VERSION_EXTRACT_CMD           -> $VERSION_EXTRACT_CMD"
     echo "REPO_PREFIX                   -> $REPO_PREFIX"
     echo "PUBLISHING_LEVEL              -> $PUBLISHING_LEVEL"
     echo "PUBLISH_TO_ACR                -> $PUBLISH_TO_ACR"
@@ -120,6 +126,7 @@ function print_inputs {
     echo "SBOM_TOOL_PATH                -> $SBOM_TOOL_PATH"
     echo "SBOM_SCRIPT                   -> $SBOM_SCRIPT"
     echo "DISTROLESS                    -> $DISTROLESS"
+    echo "TOOLCHAIN_RPMS_TARBALL -> $TOOLCHAIN_RPMS_TARBALL"
 }
 
 function validate_inputs {
@@ -163,6 +170,11 @@ function validate_inputs {
         exit 1
     fi
 
+    if [[ ! -f $TOOLCHAIN_RPMS_TARBALL ]]; then
+        echo "Error - No TOOLCHAIN_RPMS tarball found under '$TOOLCHAIN_RPMS_TARBALL'."
+        exit 1
+    fi
+
     if [ ! -d "$CONTAINER_SRC_DIR" ]; then
         echo "Error - Container source directory does not exist."
         exit 1
@@ -185,24 +197,18 @@ function validate_inputs {
     fi
 }
 
-function initialization {
-    echo "+++ Initialization"
-    if [ "$PUBLISHING_LEVEL" = "preview" ]; then
-        GOLDEN_IMAGE_NAME=${ACR}.azurecr.io/${REPO_PREFIX}/${REPOSITORY}
-    elif [ "$PUBLISHING_LEVEL" = "development" ]; then
-        GOLDEN_IMAGE_NAME=${ACR}.azurecr.io/${REPOSITORY}
-    fi
+function get_packages_to_install {
+    echo "+++ Get packages to install"
+    packagesFilePath="$CONTAINER_SRC_DIR/$IMAGE/$PACKAGE_FILE"
+    PACKAGES_TO_INSTALL=$(paste -s -d' ' < "$packagesFilePath")
+    echo "Packages to install           -> $PACKAGES_TO_INSTALL"
+}
 
-    BASE_IMAGE_NAME=${BASE_IMAGE_NAME_FULL%:*}  # mcr.microsoft.com/azurelinux/base/core
-    BASE_IMAGE_TAG=${BASE_IMAGE_NAME_FULL#*:}   # 3.0
-    AZURE_LINUX_VERSION=${BASE_IMAGE_TAG%.*}    # 3.0
-    DISTRO_IDENTIFIER="azl"
-
-    echo "Golden Image Name             -> $GOLDEN_IMAGE_NAME"
-    echo "Base ACR Container Name       -> $BASE_IMAGE_NAME"
-    echo "Base ACR Container Tag        -> $BASE_IMAGE_TAG"
-    echo "Azure Linux Version           -> $AZURE_LINUX_VERSION"
-    echo "Distro Identifier             -> $DISTRO_IDENTIFIER"
+function get_component_name {
+    echo "+++ Get Component name"
+    componentFilePath="$CONTAINER_SRC_DIR/$IMAGE/$COMPONENT_FILE"
+    COMPONENT=$(cat "$componentFilePath")
+    echo "Component name                -> $COMPONENT"
 }
 
 function prepare_dockerfile {
@@ -225,13 +231,6 @@ function prepare_dockerfile {
     echo ""
 }
 
-function get_packages_to_install {
-    echo "+++ Get packages to install"
-    packagesFilePath="$CONTAINER_SRC_DIR/$IMAGE/$PACKAGE_FILE"
-    PACKAGES_TO_INSTALL=$(paste -s -d' ' < "$packagesFilePath")
-    echo "Packages to install           -> $PACKAGES_TO_INSTALL"
-}
-
 function prepare_docker_directory {
     echo "+++ Prepare docker directory"
     # Get additional required files for the container build from Azure Linux repo.
@@ -244,7 +243,9 @@ function prepare_docker_directory {
     mkdir -pv "$HOST_MOUNTED_DIR"
 
     # Copy files into docker context directory
-    tar -xf "$RPMS_TARBALL" -C "$HOST_MOUNTED_DIR"/
+    tar -xvf "$RPMS_TARBALL" -C "$HOST_MOUNTED_DIR"/
+    # we look for the toolchain rpms in the same directory as the rpms tarball
+    tar -xvf "$TOOLCHAIN_RPMS_TARBALL" -C "$HOST_MOUNTED_DIR/RPMS"/
     cp -v "$CONTAINER_SRC_DIR/azurelinuxlocal.repo" "$HOST_MOUNTED_DIR"/
 }
 
@@ -256,14 +257,14 @@ function docker_build {
     echo "docker buildx build $DOCKER_BUILD_ARGS" \
     "--build-arg BASE_IMAGE=$BASE_IMAGE_NAME_FULL" \
     "--build-arg RPMS_TO_INSTALL=$PACKAGES_TO_INSTALL" \
-    "-t $GOLDEN_IMAGE_NAME --no-cache --progress=plain" \
+    "-t $CONTAINER_IMAGE_NAME --no-cache --progress=plain" \
     "-f $WORK_DIR/Dockerfile ."
 
     echo ""
     docker buildx build $DOCKER_BUILD_ARGS \
         --build-arg BASE_IMAGE="$BASE_IMAGE_NAME_FULL" \
         --build-arg RPMS_TO_INSTALL="$PACKAGES_TO_INSTALL" \
-        -t "$GOLDEN_IMAGE_NAME" --no-cache --progress=plain \
+        -t "$CONTAINER_IMAGE_NAME" --no-cache --progress=plain \
         -f "$WORK_DIR/Dockerfile" .
     popd > /dev/null
 }
@@ -273,81 +274,38 @@ function set_image_tag {
     local containerId
     local installedPackage
 
-    containerId=$(docker run --entrypoint /bin/bash -dt "$GOLDEN_IMAGE_NAME")
+    containerId=$(docker run --entrypoint /bin/sh -dt "$CONTAINER_IMAGE_NAME")
 
     echo "Container ID                  -> $containerId"
 
-    if [[ $USE_RPM_QA_CMD =~ [Tt]rue ]] ; then
-        echo "Using rpm -qa command to get installed package."
-        installedPackage=$(docker exec "$containerId" rpm -qa | grep ^"$COMPONENT")
+    if [[ -n "$VERSION_EXTRACT_CMD" ]]; then
+        echo "Using custom version extract command."
+        COMPONENT_VERSION=$(docker exec "$containerId" sh -c "$VERSION_EXTRACT_CMD")
     else
-        echo "Using tdnf repoquery command to get installed package."
-        # exec as root as the default user for some containers is non-root
-        installedPackage=$(docker exec -u 0 "$containerId" tdnf repoquery --installed "$COMPONENT" | grep ^"$COMPONENT")
+        if [[ $USE_RPM_QA_CMD =~ [Tt]rue ]] ; then
+            echo "Using rpm -qa command to get installed package."
+            installedPackage=$(docker exec "$containerId" rpm -qa | grep ^"$COMPONENT")
+        else
+            echo "Using tdnf repoquery command to get installed package."
+            # exec as root as the default user for some containers is non-root
+            installedPackage=$(docker exec -u 0 "$containerId" tdnf repoquery --installed "$COMPONENT" | grep ^"$COMPONENT")
+        fi
+        echo "Full Installed Package:       -> $installedPackage"
+        COMPONENT_VERSION=$(echo "$installedPackage" | awk '{n=split($0,a,"-")};{split(a[n],b,".")}; {print a[n-1]"-"b[1]}') # 16.16.0-1
     fi
 
-    echo "Full Installed Package:       -> $installedPackage"
-    COMPONENT_VERSION=$(echo "$installedPackage" | awk '{n=split($0,a,"-")};{split(a[n],b,".")}; {print a[n-1]"-"b[1]}') # 16.16.0-1
     echo "Component Version             -> $COMPONENT_VERSION"
     docker rm -f "$containerId"
 
     # Rename the image to include package version
     # For HCI Images, do not include "-$DISTRO_IDENTIFIER" in the image tag; Instead use a "."
     if [ "$IS_HCI_IMAGE" = true ]; then
-        # Example: acrafoimages.azurecr.io/base/kubevirt/virt-operator:0.59.0-2.3.0.20240101-amd64
-        GOLDEN_IMAGE_NAME_FINAL="$GOLDEN_IMAGE_NAME:$COMPONENT_VERSION.$BASE_IMAGE_TAG"
+        # Example: acrafoimages.azurecr.io/base/kubevirt/virt-operator:0.59.0-2.2.0.20230607-amd64
+        CONTAINER_IMAGE_NAME_FINAL="$CONTAINER_IMAGE_NAME:$COMPONENT_VERSION.$BASE_IMAGE_TAG"
     else
-        # Example: azurelinuxpreview.azurecr.io/base/nodejs:18.18.2-2-$DISTRO_IDENTIFIER3.0.20240101-amd64
-        GOLDEN_IMAGE_NAME_FINAL="$GOLDEN_IMAGE_NAME:$COMPONENT_VERSION-$DISTRO_IDENTIFIER$BASE_IMAGE_TAG"
+        # Example: azurelinuxpreview.azurecr.io/base/nodejs:16.19.1-2-$DISTRO_IDENTIFIER2.0.20230607-amd64
+        CONTAINER_IMAGE_NAME_FINAL="$CONTAINER_IMAGE_NAME:$COMPONENT_VERSION-$DISTRO_IDENTIFIER$BASE_IMAGE_TAG"
     fi
-}
-
-function finalize {
-    echo "+++ Finalize"
-    docker image tag "$GOLDEN_IMAGE_NAME" "$GOLDEN_IMAGE_NAME_FINAL"
-    docker rmi -f "$GOLDEN_IMAGE_NAME"
-    echo "+++ Save container image name to file PublishedContainers-$IMAGE.txt"
-    echo "$GOLDEN_IMAGE_NAME_FINAL" >> "$OUTPUT_DIR/PublishedContainers-$IMAGE.txt"
-}
-
-function publish_to_acr {
-    CONTAINER_IMAGE=$1
-    if [[ ! "$PUBLISH_TO_ACR" =~ [Tt]rue ]]; then
-        echo "+++ Skip publishing to ACR"
-        return
-    fi
-    echo "+++ Publish container $CONTAINER_IMAGE"
-    echo "login into ACR: $ACR"
-    az acr login --name "$ACR"
-    docker image push "$CONTAINER_IMAGE"
-}
-
-function generate_image_sbom {
-    if [[ ! "$CREATE_SBOM" =~ [Tt]rue ]]; then
-        echo "+++ Skip creating SBOM"
-        return
-    fi
-
-    echo "+++ Generate SBOM for the container image"
-    echo "Sanitized image name has '/' replaced with '-' and ':' replaced with '_'."
-    GOLDEN_IMAGE_NAME_SANITIZED=$(echo "$GOLDEN_IMAGE_NAME_FINAL" | tr '/' '-' | tr ':' '_')
-    echo "GOLDEN_IMAGE_NAME_SANITIZED   -> $GOLDEN_IMAGE_NAME_SANITIZED"
-
-    DOCKER_BUILD_DIR=$(mktemp -d)
-    # SBOM script will create the SBOM at the following path.
-    IMAGE_SBOM_MANIFEST_PATH="$DOCKER_BUILD_DIR/_manifest/spdx_2.2/manifest.spdx.json"
-    /bin/bash "$SBOM_SCRIPT" \
-        "$DOCKER_BUILD_DIR" \
-        "$GOLDEN_IMAGE_NAME_FINAL" \
-        "$SBOM_TOOL_PATH" \
-        "$BASE_IMAGE_NAME-$COMPONENT" \
-        "$COMPONENT_VERSION-$DISTRO_IDENTIFIER$BASE_IMAGE_TAG"
-
-    SBOM_IMAGES_DIR="$OUTPUT_DIR/SBOM_IMAGES"
-    mkdir -p "$SBOM_IMAGES_DIR"
-    cp -v "$IMAGE_SBOM_MANIFEST_PATH" "$SBOM_IMAGES_DIR/$GOLDEN_IMAGE_NAME_SANITIZED.spdx.json"
-    echo "Generated SBOM:'$SBOM_IMAGES_DIR/$GOLDEN_IMAGE_NAME_SANITIZED.spdx.json'"
-    sudo rm -rf "$DOCKER_BUILD_DIR"
 }
 
 function distroless_container {
@@ -361,15 +319,15 @@ function distroless_container {
     create_distroless_container
 }
 
+source "$CONTAINER_SRC_DIR/scripts/BuildContainerCommonSteps.sh"
 print_inputs
 validate_inputs
 initialization
-prepare_dockerfile
 get_packages_to_install
+get_component_name
+prepare_dockerfile
 prepare_docker_directory
 docker_build
 set_image_tag
 finalize
-publish_to_acr "$GOLDEN_IMAGE_NAME_FINAL"
-generate_image_sbom
 distroless_container

@@ -18,8 +18,8 @@
 
 Summary:        CNI plugin providing multiple interfaces in containers
 Name:           multus
-Version:        3.8
-Release:        13%{?dist}
+Version:        4.0.2
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,7 +27,13 @@ Group:          System/Management
 URL:            https://github.com/intel/multus-cni
 Source0:        https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 %define commit efdc0a5c7d1ea4bb236d638403420448b48782b3
-BuildRequires:  golang
+Patch0:         CVE-2023-3978.patch
+Patch1:         CVE-2023-44487.patch
+Patch2:         CVE-2023-45288.patch
+Patch3:         CVE-2024-45338.patch
+# CVE-2025-22872 will be fixed in go net v0.38 by https://github.com/golang/net/commit/e1fcd82abba34df74614020343be8eb1fe85f0d9
+Patch4:         CVE-2025-22872.patch
+BuildRequires:  golang < 1.25
 BuildRequires:  golang-packaging
 
 %description
@@ -54,15 +60,14 @@ containers in a Kubernetes cluster.
 VERSION=%{version} COMMIT=%{commit} ./hack/build-go.sh
 
 %install
-install -D -m0755 bin/multus %{buildroot}%{_bindir}/multus
-install -D -m0755 images/entrypoint.sh %{buildroot}%{_bindir}/multus-entrypoint
-install -D -m0644 images/multus-daemonset-crio.yml %{buildroot}%{_datadir}/k8s-yaml/multus/multus.yaml
+mkdir -p %{buildroot}%{_bindir}
+install -pm 0755 bin/* %{buildroot}%{_bindir}
+install -D -m0644 deployments/multus-daemonset-crio.yml %{buildroot}%{_datadir}/k8s-yaml/multus/multus.yaml
 
 %files
 %license LICENSE
 %doc README.md
-%{_bindir}/multus
-%{_bindir}/multus-entrypoint
+%{_bindir}/*
 
 %files k8s-yaml
 %dir %{_datarootdir}/k8s-yaml
@@ -70,6 +75,25 @@ install -D -m0644 images/multus-daemonset-crio.yml %{buildroot}%{_datadir}/k8s-y
 %{_datarootdir}/k8s-yaml/multus/multus.yaml
 
 %changelog
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 4.0.2-6
+- Set BR for golang to < 1.25
+
+* Fri Apr 25 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 4.0.2-5
+- Add patch for CVE-2025-22872
+
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 4.0.2-4
+- Add patch for CVE-2024-45338
+
+* Fri Nov 22 2024 Xiaohong Deng <xiaohongdeng@microsoft.com> - 4.0.2-3
+- Add patches to resolve CVE-2023-39325, CVE-2023-44487 and CVE-2023-45288.
+- CVE-2023-39325 is a subset of CVE-2023-44487 and the patches are combined.
+
+* Wed Aug 21 2024 Sumedh Sharma <sumsharma@microsoft.com> - 4.0.2-2
+- Add patch to resolve CVE-2023-3978
+
+* Mon Jun 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.0.2-1
+- Auto-upgrade to 4.0.2 - upgrade to 4.0.2
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.8-13
 - Bump release to rebuild with go 1.20.10
 

@@ -6,28 +6,30 @@
 %endif
 
 Name:           perl-Class-Data-Inheritable
-Version:        0.08
-Release:        37%{?dist}
+Version:        0.09
+Release:        10%{?dist}
 Summary:        Inheritable, overridable class data
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Class-Data-Inheritable
 # has non-free and outdated jp docs
 # rm -rf doc
-# Source0:      https://cpan.metacpan.org/authors/id/T/TM/TMTM/Class-Data-Inheritable-%%{version}.tar.gz
-Source0:        %{_distro_sources_url}/Class-Data-Inheritable-%{version}-clean.tar.gz
+Source0:       https://cpan.metacpan.org/authors/id/R/RS/RSHERER/Class-Data-Inheritable-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
+
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker)
+
 # Run-time:
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(vars)
+
 # Tests:
 BuildRequires:  perl(base)
 BuildRequires:  perl(Test::More)
@@ -36,7 +38,6 @@ BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Test::Pod) >= 1.00
 BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
 %endif
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Carp)
 
 %description
@@ -53,28 +54,66 @@ perl Makefile.PL INSTALLDIRS=vendor
 make
 
 %install
-rm -rf %{buildroot}
 make pure_install DESTDIR=%{buildroot}
 find %{buildroot} -type f -name .packlist -delete
-%{_fixperms} %{buildroot}
+%{_fixperms} -c %{buildroot}
 
 %check
 make test
 
 %files
 %{perl_vendorlib}/Class/
-%{_mandir}/man3/Class::Data::Inheritable.3pm*
+%{_mandir}/man3/Class::Data::Inheritable.3*
 
 %changelog
-* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.08-37
-- Updating naming for 3.0 version of Azure Linux.
-
-* Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.08-36
-- Updated source URL.
+* Thu Dec 19 2024 Jyoti kanase <v-jykanase@microsoft.com> -  0.09-10
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.08-35
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.09-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.09-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.09-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.09-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.09-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.09-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.09-3
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.09-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sat Jul 31 2021 Paul Howarth <paul@city-fan.org> - 0.09-1
+- Update to 0.09
+  - Update spelling errors to resolve CPAN RT#83824 and CPAN RT#86563
+- Drop redundant buildroot cleaning in %%install section
+- Fix permissions verbosely
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-39
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.08-38
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-37
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-36
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.08-35
+- Perl 5.32 rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.08-34
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

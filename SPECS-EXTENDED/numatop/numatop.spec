@@ -1,23 +1,30 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-
 Name:           numatop
-Version:        2.1
-Release:        5%{?dist}
+Version:        2.4
+Release:        3%{?dist}
 Summary:        Memory access locality characterization and analysis
 
-License:        BSD
+License:        BSD-3-Clause
 URL:            https://01.org/numatop
-Source:         https://github.com/intel/%{name}/releases/download/v%{version}/%{name}-v%{version}.tar.xz
-# https://github.com/intel/numatop/pull/53
-Patch0:         as-needed.patch
-Patch1:         fix-format-security.patch
+Source:         https://github.com/intel/numatop/archive/refs/tags/v%{version}.tar.gz#/%{name}-v%{version}.tar.gz
+
+# https://github.com/intel/numatop/pull/71
+Patch:          0001-common-Use-sym_type_t-in-elf64_binary_read-signature.patch
+Patch:          0002-common-Add-format-strings-to-mvwprintw-calls.patch
+Patch:          0003-common-Remove-unnecessary-temp-buffer.patch
+Patch:          0004-common-Use-memcpy-to-the-process-name-to-a-line.patch
+Patch:          0005-common-Replace-malloc-strncpy-with-strdup.patch
+Patch:          0006-common-Build-node-string-with-bound-checks.patch
+Patch:          0007-common-Increase-node-string-buffer-size.patch
+Patch:          0008-x86-Add-missing-fields-to-s_emr_config.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  make
 BuildRequires:  libtool
-BuildRequires:  check-devel
 BuildRequires:  gcc
+BuildRequires:  check-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  numactl-devel
 
@@ -31,14 +38,16 @@ analysis of processes and threads running on a NUMA system. It helps the user
 characterize the NUMA behavior of processes and threads and identify where the
 NUMA-related performance bottlenecks reside.
 
-NumaTOP supports the Intel Xeon processors and PowerPC processors.
+NumaTOP supports the Intel Xeon processors, AMD Zen processors and PowerPC
+processors.
 
 
 %prep
-%autosetup -p1 -n %{name}-v%{version}
+%autosetup -p1
+
 
 %build
-autoreconf -ivf
+autoreconf --force --install --symlink
 %configure
 %make_build
 
@@ -59,13 +68,42 @@ autoreconf -ivf
 
 
 %changelog
-* Tue Jun 21 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.1-5
-- Add patch to fix format-security wanings with ncurses 6.3
+* Fri Dec 20 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.4-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
-* Wed Aug 11 2021 Thomas Crain <thcrain@microsoft.com> - 2.1-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Add patch to fix linking error
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Mar 04 2024 Dridi Boukelmoune <dridi.boukelmoune@gmail.com> - 2.4-1
+- Bump version to 2.4
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Feb 17 2023 Dridi Boukelmoune <dridi.boukelmoune@gmail.com> - 2.3-3
+- Migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Dec 22 2022 Dridi Boukelmoune <dridi@fedoraproject.org>- 2.3-1
+- Update to 2.3
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

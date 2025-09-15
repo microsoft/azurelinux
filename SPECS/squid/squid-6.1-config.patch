@@ -1,0 +1,27 @@
+diff --git a/src/cf.data.pre b/src/cf.data.pre
+index 44aa34d..12225bc 100644
+--- a/src/cf.data.pre
++++ b/src/cf.data.pre
+@@ -5453,7 +5453,7 @@ DOC_END
+ 
+ NAME: logfile_rotate
+ TYPE: int
+-DEFAULT: 10
++DEFAULT: 0
+ LOC: Config.Log.rotateNumber
+ DOC_START
+ 	Specifies the default number of logfile rotations to make when you
+@@ -7447,11 +7447,11 @@ COMMENT_END
+ 
+ NAME: cache_mgr
+ TYPE: string
+-DEFAULT: webmaster
++DEFAULT: root
+ LOC: Config.adminEmail
+ DOC_START
+ 	Email-address of local cache manager who will receive
+-	mail if the cache dies.  The default is "webmaster".
++	mail if the cache dies.  The default is "root".
+ DOC_END
+ 
+ NAME: mail_from

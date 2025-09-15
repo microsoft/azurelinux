@@ -10,10 +10,10 @@
 Summary:        Invoke py.test as distutils command with dependency resolution
 Name:           python-%{modulename}
 Version:        4.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        MIT
 URL:            https://pypi.python.org/pypi/pytest-runner
-Vendor:         Microsoft
+Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 # setuptools-scm requires a pypi tarball and doesn't like github tarball
 Source0:        https://files.pythonhosted.org/packages/source/p/%{modulename}/%{modulename}-%{version}.tar.gz
@@ -58,6 +58,10 @@ Python 3 version.
 %{python3_sitelib}/__pycache__/ptr.*
 
 %changelog
+* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0-13
+- Release bump to fix package information.
+- License verified.
+
 * Thu Oct 22 2020 Steve Laughman <steve.laughman@microsoft.com> - 4.0-12
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 

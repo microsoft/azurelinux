@@ -23,12 +23,12 @@ Distribution:   Azure Linux
 %define section         free
 Name:           regexp
 Version:        1.5
-Release:        23%{?dist}
+Release:        24%{?dist}
 Summary:        Simple regular expressions API
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-Url:            http://jakarta.apache.org/%{name}/
-Source0:        http://www.apache.org/dist/jakarta/regexp/jakarta-regexp-%{version}.tar.gz
+Url:            https://jakarta.apache.org/%{name}/
+Source0:        https://archive.apache.org/dist/jakarta/regexp/source/jakarta-regexp-%{version}.tar.gz
 Source1:        regexp-%{version}.pom
 BuildRequires:  ant
 BuildRequires:  ant >= 1.6
@@ -58,7 +58,7 @@ find . -type f -name "*.jar" | xargs -t rm
 export OPT_JAR_LIST=:
 export CLASSPATH=
 mkdir lib
-ant -Djakarta-site2.dir=. -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6  jar
+ant -Djakarta-site2.dir=. -Dant.build.javac.source=1.7 -Dant.build.javac.target=1.7  jar
 
 %install
 # jars
@@ -79,6 +79,10 @@ install -p -m 0644 %{SOURCE1} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
 %{_datadir}/maven-metadata/%{name}.xml*
 
 %changelog
+* Fri Mar 21 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.5-24
+- Fixed build failure caused by javac source & target version 6 not being supported.
+- License Verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-23
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

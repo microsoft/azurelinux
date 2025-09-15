@@ -4,6 +4,7 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
@@ -14,8 +15,9 @@ import (
 	"runtime"
 	"strings"
 	"sync"
-	"time"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/azureblobstorage"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/directory"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
@@ -24,7 +26,6 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/network"
 	packagelist "github.com/microsoft/azurelinux/toolkit/tools/internal/packlist"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
@@ -64,6 +65,18 @@ const (
 	signatureUpdateString    = "update"
 )
 
+type sourceAuthModeType int
+
+const (
+	sourceAuthModeAnonymous sourceAuthModeType = iota
+	sourceAuthModeAzureCli
+)
+
+const (
+	sourceAuthModeAnonymousString = "anonymous"
+	sourceAuthModeAzureCliString  = "azurecli"
+)
+
 const (
 	defaultBuildDir    = "./build/SRPMS"
 	defaultWorkerCount = "80"
@@ -79,6 +92,8 @@ type sourceRetrievalConfiguration struct {
 
 	signatureHandling signatureHandlingType
 	signatureLookup   map[string]string
+
+	sourceAuthMode sourceAuthModeType
 }
 
 // packResult holds the worker results from packing a SPEC file into an SRPM.
@@ -107,7 +122,7 @@ var (
 
 	buildDir     = app.Flag("build-dir", "Directory to store temporary files while building.").Default(defaultBuildDir).String()
 	distTag      = app.Flag("dist-tag", "The distribution tag SRPMs will be built with.").Required().String()
-	packListFile = app.Flag("pack-list", "Path to a list of SPECs to pack. If empty will pack all SPECs.").ExistingFile()
+	srpmPackList = app.Flag("pack-list", "List of SPECs to pack. If empty will pack all SPECs.").Default("").String()
 	runCheck     = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
 
 	workers          = app.Flag("workers", "Number of concurrent goroutines to parse with.").Default(defaultWorkerCount).Uint()
@@ -125,6 +140,9 @@ var (
 
 	validSignatureLevels = []string{signatureEnforceString, signatureSkipCheckString, signatureUpdateString}
 	signatureHandling    = app.Flag("signature-handling", "Specifies how to handle signature mismatches for source files.").Default(signatureEnforceString).PlaceHolder(exe.PlaceHolderize(validSignatureLevels)).Enum(validSignatureLevels...)
+
+	validSourceAuthModes = []string{sourceAuthModeAnonymousString, sourceAuthModeAzureCliString}
+	sourceAuthMode       = app.Flag("source-auth-mode", "Authentication mode for source download: anonymous or azurecli.").Default(sourceAuthModeAnonymousString).PlaceHolder(exe.PlaceHolderize(validSourceAuthModes)).Enum(validSourceAuthModes...)
 )
 
 func main() {
@@ -181,11 +199,20 @@ func main() {
 		templateSrcConfig.tlsCerts = append(templateSrcConfig.tlsCerts, cert)
 	}
 
+	switch *sourceAuthMode {
+	case sourceAuthModeAnonymousString:
+		templateSrcConfig.sourceAuthMode = sourceAuthModeAnonymous
+	case sourceAuthModeAzureCliString:
+		templateSrcConfig.sourceAuthMode = sourceAuthModeAzureCli
+	default:
+		logger.Log.Fatalf("Invalid download mode encountered: %s. Allowed: %s", *sourceAuthMode, validSourceAuthModes)
+	}
+
 	timestamp.StopEvent(nil)
 
 	// A pack list may be provided, if so only pack this subset.
 	// If non is provided, pack all srpms.
-	packList, err := packagelist.ParsePackageListFile(*packListFile)
+	packList, err := packagelist.ParsePackageList(*srpmPackList)
 	logger.PanicOnError(err)
 
 	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *concurrentNetOps, *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
@@ -199,7 +226,8 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 	originalOutDir := outDir
 	if workerTar != "" {
 		const leaveFilesOnDisk = false
-		chroot, buildDir, outDir, specsDir, err = createChroot(workerTar, buildDir, outDir, specsDir)
+		useAzureCliAuth := templateSrcConfig.sourceAuthMode == sourceAuthModeAzureCli
+		chroot, buildDir, outDir, specsDir, err = createChroot(workerTar, buildDir, outDir, specsDir, useAzureCliAuth)
 		if err != nil {
 			return
 		}
@@ -289,7 +317,7 @@ func findSPECFiles(specsDir string, packList map[string]bool) (specFiles []strin
 }
 
 // createChroot creates a chroot to pack SRPMs inside of.
-func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechroot.Chroot, newBuildDir, newOutDir, newSpecsDir string, err error) {
+func createChroot(workerTar, buildDir, outDir, specsDir string, useAzureCliAuth bool) (chroot *safechroot.Chroot, newBuildDir, newOutDir, newSpecsDir string, err error) {
 	const (
 		chrootName       = "srpmpacker_chroot"
 		existingDir      = false
@@ -305,6 +333,14 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 	extraMountPoints := []*safechroot.MountPoint{
 		safechroot.NewMountPoint(outDir, outMountPoint, "", safechroot.BindMountPointFlags, ""),
 		safechroot.NewMountPoint(specsDir, specsMountPoint, "", safechroot.BindMountPointFlags, ""),
+	}
+
+	// Adding the .azure mount ensures the chroot environment can access CLI credentials
+	if useAzureCliAuth {
+		extraMountPoints, err = addAzureConfigMountPoint(extraMountPoints)
+		if err != nil {
+			return
+		}
 	}
 
 	extraDirectories := []string{
@@ -355,7 +391,62 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 	}
 
 	err = chroot.AddFiles(files...)
+	if err != nil {
+		err = fmt.Errorf("failed to add files to chroot:\n%w", err)
+		return
+	}
+
+	if useAzureCliAuth {
+		err = installAzureCliPackage(chroot)
+	}
+
 	return
+}
+
+// addAzureConfigMountPoint appends a mount point for the Azure CLI config directory.
+func addAzureConfigMountPoint(extraMountPoints []*safechroot.MountPoint) ([]*safechroot.MountPoint, error) {
+	const (
+		chrootAzureConfigMountPoint = "/root/.azure"
+	)
+
+	// The variable is propagated into chroot, if set
+	azureConfigDir := os.Getenv("AZURE_CONFIG_DIR")
+	mountPoint := azureConfigDir
+	if azureConfigDir == "" {
+		logger.Log.Debug("AZURE_CONFIG_DIR is not set, defaulting to user's .azure folder.")
+		homeDir, homeErr := os.UserHomeDir()
+		if homeErr != nil {
+			return nil, fmt.Errorf("could not determine user home directory for .azure mount: %v", homeErr)
+		}
+		azureConfigDir = filepath.Join(homeDir, ".azure")
+		mountPoint = chrootAzureConfigMountPoint
+	}
+
+	extraMountPoints = append(extraMountPoints, safechroot.NewMountPoint(azureConfigDir, mountPoint, "", safechroot.BindMountPointFlags, ""))
+	return extraMountPoints, nil
+}
+
+func installAzureCliPackage(chroot *safechroot.Chroot) (err error) {
+	const rootDir = "/"
+
+	packagesToInstall := []string{"azurelinux-repos-ms-oss", "azure-cli"}
+
+	logger.Log.Debugf("Installing %v packages for Azure CLI authenticated downloads", packagesToInstall)
+
+	err = chroot.Run(func() error {
+		for _, packageName := range packagesToInstall {
+			_, repoErr := installutils.TdnfInstall(packageName, rootDir)
+			if repoErr != nil {
+				return fmt.Errorf("failed to install '%s':\n%w", packageName, repoErr)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return fmt.Errorf("failed to install required packages:\n%w", err)
+	}
+
+	return nil
 }
 
 // calculateSPECsToRepack will check which SPECs should be packed.
@@ -366,7 +457,8 @@ func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 
 	requests := make(chan string, len(specFiles))
 	results := make(chan *specState, len(specFiles))
-	cancel := make(chan struct{})
+	ctx, closeCtX := context.WithCancel(context.Background())
+	defer closeCtX()
 
 	logger.Log.Infof("Calculating SPECs to repack")
 
@@ -378,7 +470,7 @@ func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := uint(0); i < workers; i++ {
 		wg.Add(1)
-		go specsToPackWorker(requests, results, cancel, &wg, distTag, outDir, arch, nestedSourcesDir, repackAll, runCheck)
+		go specsToPackWorker(ctx, requests, results, &wg, distTag, outDir, arch, nestedSourcesDir, repackAll, runCheck)
 	}
 
 	for _, specFile := range specFiles {
@@ -399,15 +491,14 @@ func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 	// Currently all functions that employ workers pool of size `workers` are serialized,
 	// resulting in `workers` being the upper capacity at any given time.
 	totalToRepack := 0
-	states = make([]*specState, len(specFiles))
 	for i := 0; i < len(specFiles); i++ {
 		result := <-results
-		states[i] = result
+		states = append(states, result)
 
 		if result.err != nil {
 			logger.Log.Errorf("Failed to check (%s). Error: %s", result.specFile, result.err)
 			err = result.err
-			close(cancel)
+			closeCtX()
 			break
 		}
 
@@ -428,7 +519,7 @@ func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 }
 
 // specsToPackWorker will process a channel of spec files that should be checked if packing is needed.
-func specsToPackWorker(requests <-chan string, results chan<- *specState, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, outDir string, arch string, nestedSourcesDir, repackAll, runCheck bool) {
+func specsToPackWorker(ctx context.Context, requests <-chan string, results chan<- *specState, wg *sync.WaitGroup, distTag, outDir string, arch string, nestedSourcesDir, repackAll, runCheck bool) {
 	const (
 		queryFormat         = `%{NAME}-%{VERSION}-%{RELEASE}.src.rpm`
 		nestedSourceDirName = "SOURCES"
@@ -443,7 +534,7 @@ func specsToPackWorker(requests <-chan string, results chan<- *specState, cancel
 
 	for specFile := range requests {
 		select {
-		case <-cancel:
+		case <-ctx.Done():
 			logger.Log.Debug("Cancellation signal received")
 			return
 		default:
@@ -542,13 +633,14 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 
 	allSpecStates := make(chan *specState, len(specStates))
 	results := make(chan *packResult, len(specStates))
-	cancel := make(chan struct{})
 	netOpsSemaphore := make(chan struct{}, concurrentNetOps)
+	ctx, closeCtx := context.WithCancel(context.Background())
+	defer closeCtx()
 
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; uint(i) < workers; i++ {
 		wg.Add(1)
-		go packSRPMWorker(allSpecStates, results, cancel, netOpsSemaphore, &wg, distTag, buildDir, templateSrcConfig, tsRoot)
+		go packSRPMWorker(ctx, allSpecStates, results, netOpsSemaphore, &wg, distTag, buildDir, templateSrcConfig, tsRoot)
 	}
 
 	for _, state := range specStates {
@@ -564,7 +656,7 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 		if result.err != nil {
 			logger.Log.Errorf("Failed to pack (%s). Cancelling outstanding workers. Error: %s", result.specFile, result.err)
 			err = result.err
-			close(cancel)
+			closeCtx()
 			break
 		}
 
@@ -583,12 +675,12 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 }
 
 // packSRPMWorker will process a channel of SPECs and pack any that are marked as toPack.
-func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult, cancel <-chan struct{}, netOpsSemaphore chan struct{}, wg *sync.WaitGroup, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, tsRoot *timestamp.TimeStamp) {
+func packSRPMWorker(ctx context.Context, allSpecStates <-chan *specState, results chan<- *packResult, netOpsSemaphore chan struct{}, wg *sync.WaitGroup, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, tsRoot *timestamp.TimeStamp) {
 	defer wg.Done()
 
 	for specState := range allSpecStates {
 		select {
-		case <-cancel:
+		case <-ctx.Done():
 			logger.Log.Debug("Cancellation signal received")
 			return
 		default:
@@ -624,7 +716,7 @@ func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult,
 			continue
 		}
 
-		outputPath, err := packSingleSPEC(specState.specFile, specState.srpmFile, signaturesFilePath, buildDir, fullOutDirPath, distTag, srcConfig, cancel, netOpsSemaphore)
+		outputPath, err := packSingleSPEC(ctx, specState.specFile, specState.srpmFile, signaturesFilePath, buildDir, fullOutDirPath, distTag, srcConfig, netOpsSemaphore)
 		if err != nil {
 			result.err = err
 			results <- result
@@ -682,7 +774,7 @@ func readSignatures(signaturesFilePath string) (readSignatures map[string]string
 }
 
 // packSingleSPEC will pack a given SPEC file into an SRPM.
-func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTag string, srcConfig sourceRetrievalConfiguration, cancel <-chan struct{}, netOpsSemaphore chan struct{}) (outputPath string, err error) {
+func packSingleSPEC(ctx context.Context, specFile, srpmFile, signaturesFile, buildDir, outDir, distTag string, srcConfig sourceRetrievalConfiguration, netOpsSemaphore chan struct{}) (outputPath string, err error) {
 	srpmName := filepath.Base(srpmFile)
 	workingDir := filepath.Join(buildDir, srpmName)
 
@@ -714,13 +806,13 @@ func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTa
 	defines := rpm.DefaultDistroDefines(*runCheck, distTag)
 
 	// Hydrate all patches. Exclusively using `sourceDir`
-	err = hydrateFiles(fileTypePatch, specFile, workingDir, srcConfig, currentSignatures, defines, nil, nil)
+	err = hydrateFiles(ctx, fileTypePatch, specFile, workingDir, srcConfig, currentSignatures, defines, nil)
 	if err != nil {
 		return
 	}
 
 	// Hydrate all sources. Download any missing ones not in `sourceDir`
-	err = hydrateFiles(fileTypeSource, specFile, workingDir, srcConfig, currentSignatures, defines, cancel, netOpsSemaphore)
+	err = hydrateFiles(ctx, fileTypeSource, specFile, workingDir, srcConfig, currentSignatures, defines, netOpsSemaphore)
 	if err != nil {
 		return
 	}
@@ -782,7 +874,7 @@ func readSPECTagArray(specFile, sourceDir, tag string, arch string, defines map[
 
 // hydrateFiles will attempt to retrieve all sources needed to build an SRPM from a SPEC.
 // Will alter `currentSignatures`,
-func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcConfig sourceRetrievalConfiguration, currentSignatures, defines map[string]string, cancel <-chan struct{}, netOpsSemaphore chan struct{}) (err error) {
+func hydrateFiles(ctx context.Context, fileTypeToHydrate fileType, specFile, workingDir string, srcConfig sourceRetrievalConfiguration, currentSignatures, defines map[string]string, netOpsSemaphore chan struct{}) (err error) {
 	const (
 		downloadMissingPatchFiles = false
 		skipPatchSignatures       = true
@@ -842,7 +934,7 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 	}
 
 	if hydrateRemotely && srcConfig.sourceURL != "" {
-		err = hydrateFromRemoteSource(fileHydrationState, newSourceDir, srcConfig, skipSignatureHandling, currentSignatures, cancel, netOpsSemaphore)
+		err = hydrateFromRemoteSource(ctx, fileHydrationState, newSourceDir, srcConfig, skipSignatureHandling, currentSignatures, netOpsSemaphore)
 		if err != nil {
 			return
 		}
@@ -911,15 +1003,22 @@ func tryToHydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDi
 
 // hydrateFromRemoteSource will update fileHydrationState.
 // Will alter `currentSignatures`.
-func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string, cancel <-chan struct{}, netOpsSemaphore chan struct{}) (err error) {
-	const (
-		// With 5 attempts, initial delay of 1 second, and a backoff factor of 2.0 the total time spent retrying will be
-		// ~30 seconds.
-		downloadRetryAttempts = 5
-		failureBackoffBase    = 2.0
-		downloadRetryDuration = time.Second
+func hydrateFromRemoteSource(ctx context.Context, fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string, netOpsSemaphore chan struct{}) (err error) {
+	var (
+		azureBlobStorageClient *azureblobstorage.AzureBlobStorage
+		cancelled              bool
+		internalErr            error
 	)
+
 	errPackerCancelReceived := fmt.Errorf("packer cancel signal received")
+
+	if srcConfig.sourceAuthMode == sourceAuthModeAzureCli {
+		// Create the Azure Blob Storage client once for all downloads
+		azureBlobStorageClient, err = azureblobstorage.CreateFromURL(srcConfig.sourceURL)
+		if err != nil {
+			return fmt.Errorf("failed to create Azure Blob Storage client:\n%w", err)
+		}
+	}
 
 	for fileName, alreadyHydrated := range fileHydrationState {
 		if alreadyHydrated {
@@ -935,21 +1034,18 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 		if netOpsSemaphore != nil {
 			select {
 			case netOpsSemaphore <- struct{}{}:
-			case <-cancel:
+			case <-ctx.Done():
 				logger.Log.Debug("Cancellation signal received at network operation semaphore")
 				err = errPackerCancelReceived
 				return
 			}
 		}
 
-		cancelled, internalErr := retry.RunWithExpBackoff(func() error {
-			downloadErr := network.DownloadFile(url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts)
-			if downloadErr != nil {
-				logger.Log.Debugf("Failed an attempt to download (%s). Error: %s.", url, downloadErr)
-			}
-
-			return downloadErr
-		}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, cancel)
+		if srcConfig.sourceAuthMode == sourceAuthModeAzureCli {
+			cancelled, internalErr = azureblobstorage.DownloadFileWithRetry(ctx, azureBlobStorageClient, url, destinationFile, network.DefaultTimeout)
+		} else {
+			cancelled, internalErr = network.DownloadFileWithRetry(ctx, url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts, network.DefaultTimeout)
+		}
 
 		if netOpsSemaphore != nil {
 			// Clear the channel to allow another operation to start

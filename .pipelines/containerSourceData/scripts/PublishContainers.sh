@@ -72,6 +72,73 @@ FILE_EXT='.txt'
 
 OS_VERSION_PREFIX="azurelinux-"
 DISTRO_IDENTIFIER="azl"
+END_OF_LIFE_1_YEAR=$(date -d "+1 year" "+%Y-%m-%dT%H:%M:%SZ")
+
+# Login to the container registry.
+# Also login ORAS to the container registry.
+# $1: container registry name
+function acr_login {
+    local container_registry=$1
+    local oras_access_token
+
+    echo "+++ az login into Azure ACR $container_registry"
+    oras_access_token=$(az acr login --name "$container_registry" --expose-token --output tsv --query accessToken)
+    oras login "$container_registry.azurecr.io" \
+        --username "00000000-0000-0000-0000-000000000000" \
+        --password "$oras_access_token"
+}
+
+# Attach the end-of-life annotation to the container image.
+# $1: image name
+function oras_attach {
+    local image_name=$1
+    local max_retries=3
+    local retry_count=0
+
+    while [ $retry_count -lt $max_retries ]; do
+        echo "+++ Attempting to attach lifecycle annotation to $image_name (attempt $((retry_count + 1))/$max_retries)"
+        
+        if oras attach \
+            --artifact-type "application/vnd.microsoft.artifact.lifecycle" \
+            --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$END_OF_LIFE_1_YEAR" \
+            "$image_name"; then
+            echo "+++ Successfully attached lifecycle annotation to $image_name"
+            return 0
+        else
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+                echo "+++ Failed to attach lifecycle annotation to $image_name. Retrying in 5 seconds..."
+                sleep 5
+            else
+                echo "+++ Failed to attach lifecycle annotation to $image_name after $max_retries attempts"
+                return 1
+            fi
+        fi
+    done
+}
+
+# Detach the end-of-life annotation from the container image.
+# $1: image name
+function oras_detach {
+    local image_name=$1
+    lifecycle_manifests=$(oras discover -o json  --artifact-type "application/vnd.microsoft.artifact.lifecycle" "$image_name")
+    manifests=$(echo "$lifecycle_manifests" | jq -r '.manifests')
+
+    if [[ -z $manifests ]]; then
+        echo "+++ No lifecycle manifests found for $image_name"
+        return
+    fi
+
+    echo "+++ Found lifecycle manifests for $image_name: $manifests"
+    # Loop through the manifests and delete them.
+    manifest_count=$(echo "$manifests" | jq length)
+    for (( i=0; i<manifest_count; i++ )); do
+        digest=$(echo "$lifecycle_manifests" | jq -r ".manifests[$i].digest")
+        echo "Deleting manifest with digest: $digest"
+        imageNameWithoutTag=${image_name%:*}
+        oras manifest delete --force "$imageNameWithoutTag@$digest"
+    done
+}
 
 function create_multi_arch_tags {
     # $1: original container (without '-amd64' or '-arm64' extension in tag)
@@ -158,13 +225,15 @@ function create_multi_arch_tags {
     if [[ $architecture_build == *"ARM64"*  ]]; then
         docker manifest create "$full_multiarch_tag" --amend "$original_container-arm64"
         docker manifest annotate "$full_multiarch_tag" "$original_container-arm64" \
-             --os-version "$OS_VERSION_PREFIX$azure_linux_version" \
-             --variant "v8"
+            --os-version "$OS_VERSION_PREFIX$azure_linux_version" \
+            --variant "v8"
     fi
 
     echo "+++ push $full_multiarch_tag tag"
     docker manifest push "$full_multiarch_tag"
     echo "+++ $full_multiarch_tag tag pushed successfully"
+    oras_detach "$full_multiarch_tag"
+    oras_attach "$full_multiarch_tag"
 
     # Save the multi-arch tag to a file.
     image_basename=${multiarch_name#*/}
@@ -204,6 +273,7 @@ do
     IS_CORE_IMAGE=$(jq -r '.data_is_core_image' "$TEMP_FILE")
     IS_GOLDEN_IMAGE=$(jq -r '.data_is_golden_image' "$TEMP_FILE")
     IS_HCI_GOLDEN_IMAGE=$(jq -r '.data_is_hci_golden_image' "$TEMP_FILE")
+    IS_NVIDIA_GOLDEN_IMAGE=$(jq -r '.data_is_nvidia_golden_image' "$TEMP_FILE")
     ARCHITECTURE_TO_BUILD=$(jq -r '.data_architecture_to_build' "$TEMP_FILE")
     TARGET_ACR=$(jq -r '.data_target_acr' "$TEMP_FILE")
 
@@ -215,12 +285,13 @@ do
     # Remove the temp file.
     [ -f "$TEMP_FILE" ] && rm "$TEMP_FILE"
 
-    echo "Container Type        -> $container_type"
-    echo "IS_CORE_IMAGE         -> $IS_CORE_IMAGE"
-    echo "IS_GOLDEN_IMAGE       -> $IS_GOLDEN_IMAGE"
-    echo "IS_HCI_GOLDEN_IMAGE   -> $IS_HCI_GOLDEN_IMAGE"
-    echo "ARCHITECTURE_TO_BUILD -> $ARCHITECTURE_TO_BUILD"
-    echo "TARGET_ACR            -> $TARGET_ACR"
+    echo "Container Type            -> $container_type"
+    echo "IS_CORE_IMAGE             -> $IS_CORE_IMAGE"
+    echo "IS_GOLDEN_IMAGE           -> $IS_GOLDEN_IMAGE"
+    echo "IS_HCI_GOLDEN_IMAGE       -> $IS_HCI_GOLDEN_IMAGE"
+    echo "IS_NVIDIA_GOLDEN_IMAGE    -> $IS_NVIDIA_GOLDEN_IMAGE"
+    echo "ARCHITECTURE_TO_BUILD     -> $ARCHITECTURE_TO_BUILD"
+    echo "TARGET_ACR                -> $TARGET_ACR"
 
     while IFS= read -r image_name
     do
@@ -230,8 +301,7 @@ do
         echo "Image name: $image_name"
         echo
         container_registry="${image_name%%.*}"
-        echo "+++ login into Azure ACR $container_registry"
-        az acr login --name "$container_registry"
+        acr_login "$container_registry"
 
         amd64_image=${image_name%-*}-amd64
         docker pull "$amd64_image"
@@ -243,9 +313,7 @@ do
         fi
 
         if [[ $container_registry != "$TARGET_ACR" ]]; then
-            echo "+++ login into Azure ACR $TARGET_ACR"
-            az acr login --name "$TARGET_ACR"
-
+            acr_login "$TARGET_ACR"
             echo "Retagging the images to $TARGET_ACR"
             # E.g., If container_registry is azurelinuxdevpreview and TARGET_ACR is azurelinuxpreview, then
             # azurelinuxdevpreview.azurecr.io/base/core:3.0 -> azurelinuxpreview.azurecr.io/base/core:3.0
@@ -255,6 +323,8 @@ do
             docker image tag "$amd64_image" "$amd64_retagged_image_name"
             docker rmi "$amd64_image"
             docker image push "$amd64_retagged_image_name"
+            oras_detach "$amd64_retagged_image_name"
+            oras_attach "$amd64_retagged_image_name"
 
             if [[ $ARCHITECTURE_TO_BUILD == *"ARM64"*  ]]; then
                 arm64_retagged_image_name=${arm64_image/"$container_registry"/"$TARGET_ACR"}
@@ -262,6 +332,8 @@ do
                 docker image tag "$arm64_image" "$arm64_retagged_image_name"
                 docker rmi "$arm64_image"
                 docker image push "$arm64_retagged_image_name"
+                oras_detach "$arm64_retagged_image_name"
+                oras_attach "$arm64_retagged_image_name"
             fi
 
             image_name=$amd64_retagged_image_name
@@ -305,6 +377,21 @@ do
                 "$image_name_with_noarch" \
                 "$container_name" \
                 "$major_version" \
+                "$azure_linux_version" \
+                "$ARCHITECTURE_TO_BUILD"
+        elif "$IS_NVIDIA_GOLDEN_IMAGE"; then
+            # For nvidia images, we need to create multi-arch tag for the following format:
+            # E.g. for azurelinuxpreview.azurecr.io/nvidia/cuda/driver:550-5.15.160.1-1.cm2-mariner2.0.2.0.20240626-amd64
+            # the multi-arch tag to create is: azurelinuxpreview.azurecr.io/nvidia/cuda/driver:550-5.15.160.1-1.cm2-mariner2.0
+            multiarch_tag=${container_tag%.*.*.*}
+
+            azure_linux_version=$(awk -F '-' '{print $4}' <<< "$container_tag")              # 550-5.15.160.1-1.cm2-mariner2.0.2.0.20240626 -> mariner2.0.2.0.20240626
+            azure_linux_version=$(awk -F '.' '{print $3"."$4}' <<< "$azure_linux_version")   # [mariner2].[0].[2].[0].[20240626] -> 2.0
+            #                                                                                                  ^   ^
+            create_multi_arch_tags \
+                "$image_name_with_noarch" \
+                "$container_name" \
+                "$multiarch_tag" \
                 "$azure_linux_version" \
                 "$ARCHITECTURE_TO_BUILD"
         elif "$IS_GOLDEN_IMAGE"; then

@@ -1,0 +1,38 @@
+From 65e500726581466c8e46a482cdb0db2271bd54e5 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 25 Mar 2024 10:08:04 -0400
+Subject: [PATCH 23/24] systemd-tmpfiles/loadkeys: Read var_t symlinks.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/apps/loadkeys.te  | 1 +
+ policy/modules/system/systemd.te | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/policy/modules/apps/loadkeys.te b/policy/modules/apps/loadkeys.te
+index 56fb45114..2263e9dba 100644
+--- a/policy/modules/apps/loadkeys.te
++++ b/policy/modules/apps/loadkeys.te
+@@ -36,6 +36,7 @@ files_search_runtime(loadkeys_t)
+ files_search_src(loadkeys_t)
+ files_search_tmp(loadkeys_t)
+ files_dontaudit_getattr_all_dirs(loadkeys_t)
++files_read_var_symlinks(loadkeys_t)
+ 
+ term_dontaudit_use_console(loadkeys_t)
+ term_use_unallocated_ttys(loadkeys_t)
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 89ead9f00..47aa62600 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -1839,6 +1839,7 @@ files_relabelfrom_home(systemd_tmpfiles_t)
+ files_relabelto_home(systemd_tmpfiles_t)
+ files_relabelto_etc_dirs(systemd_tmpfiles_t)
+ files_setattr_lock_dirs(systemd_tmpfiles_t)
++files_read_var_symlinks(systemd_tmpfiles_t)
+ # for /etc/mtab
+ files_manage_etc_symlinks(systemd_tmpfiles_t)
+ 
+-- 
+2.44.0
+

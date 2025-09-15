@@ -1,5 +1,5 @@
 # The source directory.
-%global source_directory 5.2-stable
+%global source_directory 5.3-development
 
 %ifnarch %{ocaml_native_compiler}
 %global __strip /bin/true
@@ -20,8 +20,8 @@
 
 Summary:        Tool for creating supermin appliances
 Name:           supermin
-Version:        5.2.2
-Release:        3%{?dist}
+Version:        5.3.4
+Release:        7%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,7 +45,7 @@ BuildRequires:  findutils
 # into a /boot/<machine-id> subdirectory.  Read the
 # kernel-install script to understand why.
 BuildRequires:  grubby
-BuildRequires:  ocaml
+BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-findlib-devel
 BuildRequires:  rpm
 BuildRequires:  rpm-devel
@@ -54,7 +54,7 @@ BuildRequires:  systemd-udev
 %if %{with dietlibc}
 BuildRequires:  dietlibc-devel
 %else
-BuildRequires:  glibc-static >= 2.38-3%{?dist}
+BuildRequires:  glibc-static >= 2.38-12%{?dist}
 %endif
 
 %if 0%{?with_check}
@@ -129,6 +129,34 @@ make check || {
 %{_rpmconfigdir}/supermin-find-requires
 
 %changelog
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 5.3.4-7
+- Bump to rebuild with updated glibc
+
+* Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 5.3.4-6
+- Bump to rebuild with updated glibc
+
+* Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 5.3.4-5
+- Bump to rebuild with updated glibc
+
+* Tue Feb 25 2025 Chris Co <chrco@microsoft.com> - 5.3.4-4
+- Bump to rebuild with updated glibc
+
+* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.3.4-3
+- Update to build dep latest glibc-static version
+
+* Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 5.3.4-2
+- Bump to rebuild with updated glibc
+
+* Tue May 28 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.3.4-1
+- Upgrade to version 5.3.4 to support building using ocaml 5.1.1
+- Fixed patch for the test suite
+
+* Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.2.2-5
+- update to build dep latest glibc-static version
+
+* Mon May 13 2024 Chris Co <chrco@microsoft.com> - 5.2.2-4
+- Update to build dep latest glibc-static version
+
 * Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 5.2.2-3
 - update to build dep latest glibc-static version
 

@@ -12,19 +12,17 @@ import (
 
 // OS defines how each system present on the image is supposed to be configured.
 type OS struct {
-	ResetBootLoaderType  ResetBootLoaderType `yaml:"resetBootLoaderType"`
-	Hostname             string              `yaml:"hostname"`
-	Packages             Packages            `yaml:"packages"`
-	SELinux              SELinux             `yaml:"selinux"`
-	KernelCommandLine    KernelCommandLine   `yaml:"kernelCommandLine"`
-	AdditionalFiles      AdditionalFilesMap  `yaml:"additionalFiles"`
-	PostInstallScripts   []Script            `yaml:"postInstallScripts"`
-	FinalizeImageScripts []Script            `yaml:"finalizeImageScripts"`
-	Users                []User              `yaml:"users"`
-	Services             Services            `yaml:"services"`
-	Modules              Modules             `yaml:"modules"`
-	Verity               *Verity             `yaml:"verity"`
-	Overlays             *[]Overlay          `yaml:"overlays"`
+	ResetBootLoaderType ResetBootLoaderType `yaml:"resetBootLoaderType"`
+	Hostname            string              `yaml:"hostname"`
+	Packages            Packages            `yaml:"packages"`
+	SELinux             SELinux             `yaml:"selinux"`
+	KernelCommandLine   KernelCommandLine   `yaml:"kernelCommandLine"`
+	AdditionalFiles     AdditionalFileList  `yaml:"additionalFiles"`
+	AdditionalDirs      DirConfigList       `yaml:"additionalDirs"`
+	Users               []User              `yaml:"users"`
+	Services            Services            `yaml:"services"`
+	Modules             []Module            `yaml:"modules"`
+	Overlays            *[]Overlay          `yaml:"overlays"`
 }
 
 func (s *OS) IsValid() error {
@@ -36,7 +34,7 @@ func (s *OS) IsValid() error {
 
 	if s.Hostname != "" {
 		if !govalidator.IsDNSName(s.Hostname) || strings.Contains(s.Hostname, "_") {
-			return fmt.Errorf("invalid hostname: %s", s.Hostname)
+			return fmt.Errorf("invalid hostname (%s)", s.Hostname)
 		}
 	}
 
@@ -47,32 +45,23 @@ func (s *OS) IsValid() error {
 
 	err = s.KernelCommandLine.IsValid()
 	if err != nil {
-		return fmt.Errorf("invalid kernelCommandLine: %w", err)
+		return fmt.Errorf("invalid kernelCommandLine:\n%w", err)
 	}
 
 	err = s.AdditionalFiles.IsValid()
 	if err != nil {
-		return fmt.Errorf("invalid additionalFiles: %w", err)
+		return fmt.Errorf("invalid additionalFiles:\n%w", err)
 	}
 
-	for i, script := range s.PostInstallScripts {
-		err = script.IsValid()
-		if err != nil {
-			return fmt.Errorf("invalid postInstallScripts item at index %d: %w", i, err)
-		}
-	}
-
-	for i, script := range s.FinalizeImageScripts {
-		err = script.IsValid()
-		if err != nil {
-			return fmt.Errorf("invalid finalizeImageScripts item at index %d: %w", i, err)
-		}
+	err = s.AdditionalDirs.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalid additionalDirs:\n%w", err)
 	}
 
 	for i, user := range s.Users {
 		err = user.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid users item at index %d: %w", i, err)
+			return fmt.Errorf("invalid users item at index %d:\n%w", i, err)
 		}
 	}
 
@@ -80,18 +69,21 @@ func (s *OS) IsValid() error {
 		return err
 	}
 
-	if err := s.Modules.IsValid(); err != nil {
-		return err
-	}
-
-	if s.Verity != nil {
-		err = s.Verity.IsValid()
+	moduleMap := make(map[string]int)
+	for i, module := range s.Modules {
+		// Check if module is duplicated to avoid conflicts with modules potentially having different LoadMode
+		if _, exists := moduleMap[module.Name]; exists {
+			return fmt.Errorf("duplicate module found: %s at index %d", module.Name, i)
+		}
+		moduleMap[module.Name] = i
+		err = module.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid verity: %w", err)
+			return fmt.Errorf("invalid modules item at index %d:\n%w", i, err)
 		}
 	}
 
 	if s.Overlays != nil {
+		mountPoints := make(map[string]bool)
 		upperDirs := make(map[string]bool)
 		workDirs := make(map[string]bool)
 
@@ -99,18 +91,24 @@ func (s *OS) IsValid() error {
 			// Validate the overlay itself
 			err := overlay.IsValid()
 			if err != nil {
-				return fmt.Errorf("invalid overlay (lowerDir: '%s') at index %d: %w", overlay.LowerDir, i, err)
+				return fmt.Errorf("invalid overlay at index %d:\n%w", i, err)
 			}
+
+			// Check for unique MountPoint
+			if _, exists := mountPoints[overlay.MountPoint]; exists {
+				return fmt.Errorf("duplicate mountPoint (%s) found in overlay at index %d", overlay.MountPoint, i)
+			}
+			mountPoints[overlay.MountPoint] = true
 
 			// Check for unique UpperDir
 			if _, exists := upperDirs[overlay.UpperDir]; exists {
-				return fmt.Errorf("duplicate upperDir '%s' found in overlay (lowerDir: '%s') at index %d", overlay.UpperDir, overlay.LowerDir, i)
+				return fmt.Errorf("duplicate upperDir (%s) found in overlay at index %d", overlay.UpperDir, i)
 			}
 			upperDirs[overlay.UpperDir] = true
 
 			// Check for unique WorkDir
 			if _, exists := workDirs[overlay.WorkDir]; exists {
-				return fmt.Errorf("duplicate workDir '%s' found in overlay (lowerDir: '%s') at index %d", overlay.WorkDir, overlay.LowerDir, i)
+				return fmt.Errorf("duplicate workDir (%s) found in overlay at index %d", overlay.WorkDir, i)
 			}
 			workDirs[overlay.WorkDir] = true
 		}

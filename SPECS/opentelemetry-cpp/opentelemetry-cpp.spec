@@ -1,14 +1,17 @@
+%global proto_name opentelemetry-proto
+%global proto_version 1.1.0
+
 Summary:        The OpenTelemetry C++ Client
 Name:           opentelemetry-cpp
-Version:        1.10.0
-Release:        2%{?dist}
+Version:        1.14.2
+Release:       	2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/open-telemetry/opentelemetry-cpp
 Source0:        https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Standard proto files source: https://github.com/open-telemetry/opentelemetry-proto
-Source1:        opentelemetry-proto-1.0.0.tar.gz
+Source1:        https://github.com/open-telemetry/%{proto_name}/archive/refs/tags/v%{proto_version}.tar.gz#/%{proto_name}-%{proto_version}.tar.gz
+
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
 BuildRequires:  curl-devel
@@ -16,9 +19,14 @@ BuildRequires:  gmock-devel
 BuildRequires:  grpc-devel
 BuildRequires:  grpc-plugins
 BuildRequires:  gtest-devel
+BuildRequires:  abseil-cpp-devel >= 20240116.0-2
 BuildRequires:  nlohmann-json-devel
 BuildRequires:  protobuf-devel
+BuildRequires:  protobuf-static
+BuildRequires:  protobuf-c-devel
 BuildRequires:  re2-devel
+BuildRequires:	systemd-devel
+Requires:       abseil-cpp >= 20240116.0-2
 
 %description
 The official OpenTelemetry CPP client
@@ -33,8 +41,8 @@ Development Libraries for OpenTelemetry CPP client
 
 %prep
 %autosetup -p1
-mkdir -p third_party/opentelemetry-proto
-tar xf %{SOURCE1} -C third_party/opentelemetry-proto --strip-components=1
+mkdir -p third_party/%{proto_name}
+tar xf %{SOURCE1} -C third_party/%{proto_name} --strip-components=1
 
 %build
 mkdir build && cd build
@@ -45,9 +53,10 @@ mkdir build && cd build
 	-DWITH_NO_DEPRECATED_CODE=ON \
 	-DWITH_OTLP_GRPC=ON \
 	-DWITH_OTLP_HTTP=ON \
+	-DWITH_ABSEIL=ON \
 	-DWITH_STL=ON \
 	-DWITH_ZPAGES=ON \
-	-DOTELCPP_PROTO_PATH=../third_party/opentelemetry-proto \
+	-DOTELCPP_PROTO_PATH=../third_party/%{proto_name} \
 	..
 
 %make_build
@@ -60,32 +69,22 @@ mkdir build && cd build
 
 %files
 %license LICENSE
-%{_libdir}/libopentelemetry_common.so
-%{_libdir}/libopentelemetry_exporter_in_memory.so
-%{_libdir}/libopentelemetry_exporter_ostream_metrics.so
-%{_libdir}/libopentelemetry_exporter_ostream_span.so
-%{_libdir}/libopentelemetry_exporter_otlp_grpc_client.so
-%{_libdir}/libopentelemetry_exporter_otlp_grpc_log.so
-%{_libdir}/libopentelemetry_exporter_otlp_grpc_metrics.so
-%{_libdir}/libopentelemetry_exporter_otlp_grpc.so
-%{_libdir}/libopentelemetry_exporter_otlp_http_client.so
-%{_libdir}/libopentelemetry_exporter_otlp_http_metric.so
-%{_libdir}/libopentelemetry_exporter_otlp_http.so
-%{_libdir}/libopentelemetry_http_client_curl.so
-%{_libdir}/libopentelemetry_metrics.so
-%{_libdir}/libopentelemetry_otlp_recordable.so
-%{_libdir}/libopentelemetry_proto_grpc.so
-%{_libdir}/libopentelemetry_proto.so
-%{_libdir}/libopentelemetry_resources.so
-%{_libdir}/libopentelemetry_trace.so
-%{_libdir}/libopentelemetry_version.so
-%{_libdir}/libopentelemetry_zpages.so
+%{_libdir}/libopentelemetry_*.so
 
 %files devel
+%{_libdir}/pkgconfig/opentelemetry_*.pc
 %{_includedir}/opentelemetry/*
 %{_libdir}/cmake/opentelemetry-cpp/*
 
 %changelog
+* Thu Jul 25 2024 Devin Anderson <danderson@microsoft.com> - 1.14.2-2
+- Bump release to rebuild with latest 'abseil-cpp'.
+- Provide explicit fetch for protobuf archive.
+
+* Mon Mar 18 2024 Betty Lakes <bettylakes@microsoft.com> - 1.14.2-1
+- Upgrade to 1.14.2
+- Upgrade opentelemetry-proto to 1.1.0
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.10.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

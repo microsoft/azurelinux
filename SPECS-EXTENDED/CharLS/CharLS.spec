@@ -1,13 +1,14 @@
 Summary:        An optimized implementation of the JPEG-LS standard
 Name:           CharLS
-Version:        2.0.0
-Release:        10%{?dist}
+Version:        2.4.2
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/team-charls/charls
-Source0:        https://github.com/team-charls/charls/archive/%{version}/%{name}-%{version}.tar.gz
-BuildRequires:  cmake >= 2.6.0
+Source0:        https://github.com/team-charls/charls/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
+BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 
@@ -42,7 +43,6 @@ rm CharLS*.sln* -v
 
 %cmake_build
 
-
 %install
 %cmake_install
 
@@ -55,16 +55,20 @@ popd
 
 
 %files
-%license License.txt
-%{_libdir}/lib%{name}.so.2
-%{_libdir}/lib%{name}.so.2.0
+%license LICENSE.md
+%{_libdir}/libcharls.so.2*
 
 %files devel
-%dir %{_includedir}/%{name}/
-%{_includedir}/%{name}/*
-%{_libdir}/lib%{name}.so
+%dir %{_includedir}/charls/
+%{_includedir}/charls/*
+%{_libdir}/cmake/charls/
+%{_libdir}/libcharls.so
+%{_libdir}/pkgconfig/charls.pc
 
 %changelog
+* Tue Sept 24 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 2.4.2-1
+- Update to version 2.4.2
+
 * Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 2.0.0-10
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified

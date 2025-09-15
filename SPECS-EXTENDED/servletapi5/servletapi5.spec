@@ -55,11 +55,11 @@ cd jakarta-tomcat-%{version}-src/jakarta-servletapi-5
 find . -type f -name "*.jar" -exec rm -f {} \;
 pushd .
 cd jsr154
-ant jar examples -Dservletapi.build=build -Dservletapi.dist=dist -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6
+ant jar examples -Dservletapi.build=build -Dservletapi.dist=dist -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8
 popd
 pushd .
 cd jsr152
-ant jar examples -Dservletapi.build=build -Dservletapi.dist=dist -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6
+ant jar examples -Dservletapi.build=build -Dservletapi.dist=dist -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8
 popd
 
 %install

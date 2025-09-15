@@ -1,7 +1,7 @@
 %define  debug_package %{nil}
 Summary:        erlang
 Name:           erlang
-Version:        26.2.3
+Version:        26.2.5.15
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
@@ -22,7 +22,7 @@ BuildRequires:  clang-tools-extra
 Erlang is a programming language and runtime system for building massively scalable soft real-time systems with requirements on high availability.
 
 %prep
-%autosetup -n otp-OTP-%{version}
+%autosetup -n otp-OTP-%{version} -p1
 
 %build
 export ERL_TOP=`pwd`
@@ -34,7 +34,7 @@ export ERL_TOP=`pwd`
 
 %check
 export ERL_TOP=`pwd`
-./otp_build check --no-docs
+./otp_build check --no-docs --no-format-check
 
 %post
 
@@ -53,6 +53,33 @@ export ERL_TOP=`pwd`
 %{_libdir}/erlang/*
 
 %changelog
+* Fri Sep 12 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 26.2.5.15-1
+- Auto-upgrade to 26.2.5.15 - for CVE-2025-48038, CVE-2025-48039, CVE-2025-48040, CVE-2025-48041
+
+* Tue Jun 24 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 26.2.5.13-1
+- Upgrade to 26.2.5.13 to fix CVE-2025-4748
+
+* Wed Jun 04 2025 Muhammad Falak <mwani@microsoft.com> - 26.2.5.12-2
+- Skip format-check in tests
+
+* Wed May 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 26.2.5.12-1
+- Auto-upgrade to 26.2.5.12 - for CVE-2025-46712
+
+* Thu Apr 17 2025 Kshitiz Godara <kgodara@microsoft.com> - 26.2.5.11-1
+- Upgrade to 26.2.5.11 - fix cve CVE-2025-32433.
+
+* Thu Apr 03 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 26.2.5.10-1
+- Upgrade to 26.2.5.10 - fix cve CVE-2025-30211.
+
+* Tue Feb 25 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 26.2.5.9-1
+- Auto-upgrade to 26.2.5.9 - for CVE-2025-26618
+
+* Fri Dec 13 2024 Ahmed Badawi <ahmedbadawi@microsoft.com> - 26.2.5.6-1
+- Upgrade to 26.2.5.6 - fix cve CVE-2024-53846. Removed previous patch below as vulnerability is addressed in new version
+
+* Mon Apr 01 2024 Sam Meluch <sammeluch@microsoft.com> - 26.2.3-2
+- Add patch to fix issue when running with compiled code from OTP-24 on aarch64
+
 * Thu Mar 21 2024 Sam Meluch <sammeluch@microsoft.com> - 26.2.3-1
 - Update to version 26.2.3
 

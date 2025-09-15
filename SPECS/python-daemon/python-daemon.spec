@@ -1,7 +1,7 @@
 Summary:        Library to implement a well-behaved Unix daemon process.
 Name:           python-daemon
-Version:        2.2.0
-Release:        7%{?dist}
+Version:        3.0.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -52,6 +52,9 @@ pip3 install mock testscenarios testtools
 %{python3_sitelib}/*
 
 %changelog
+* Wed May 08 2024 Sam Meluch <sammeluch@microsoft.com> - 3.0.1-1
+- Upgrade package to latest version
+
 * Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 2.2.0-7
 - Remove change to ChangelogAwareDistribution in setup.py
 

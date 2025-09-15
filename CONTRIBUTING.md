@@ -65,7 +65,7 @@ Microsoft follows the principle of [Coordinated Vulnerability Disclosure](https:
 
 ## Develop for Azure Linux
 
-When starting to develop for Azure Linux, use the [Azure LinuxTutorials](https://github.com/microsoft/AzureLinux-Tutorials) repo. This repository guides developers on using Azure Linux's tools to customize or add new packages or images. Once you have confirmed your change builds and functions as expected, consider whether it should be added to the core repo, [Azure Linux](https://github.com/microsoft/azurelinux). Please see our [quickstart](toolkit/docs/quick_start/quickstart.md) for a tutorial and [building instructions](toolkit/docs/building/building.md) for an in-depth overview of building within Azure Linux. Please adhere to the [Pull Request guidelines](pull-request-guidelines) when contributing.
+When starting to develop for Azure Linux, use the [Azure LinuxTutorials](https://github.com/microsoft/AzureLinux-Tutorials) repo. This repository guides developers on using Azure Linux's tools to customize or add new packages or images. Once you have confirmed your change builds and functions as expected, consider whether it should be added to the core repo, [Azure Linux](https://github.com/microsoft/azurelinux). Please see our [quickstart](toolkit/docs/quick_start/quickstart.md) for a tutorial and [building instructions](toolkit/docs/building/building.md) for an in-depth overview of building within Azure Linux. Please adhere to the [Pull Request guidelines](#pull-request-guidelines) when contributing.
 
 ### Packages
 
@@ -95,25 +95,25 @@ We welcome documentation improvements. See [toolkit/docs](toolkit/docs) for the 
 
 ## Pull Request Guidelines
 
-Please direct pull requests to the desired development branch. Development changes to `2.0` should target `main`. Development changes to `1.0` should target `1.0-dev`.
+Please direct pull requests to the desired development branch. Development changes to `3.0` should target `3.0-dev`. Development changes to `2.0` should target `main`. `1.0` is deprecated and should not be used.
 
 ### Branch structure
 
 An overview of how the branches are structured can be seen below
 
-| Branch / Tag | For PRs | Published | Notes
-|:-------------|:--------|:----------|:------------
-|main          |Yes       |No         | **Primary development branch**
-|2.0           |No       |Yes - eventually   | Staging branch for publishing
-|2.0-stable    |No       |  Yes      | Last published release
-|2.0-preview   |No       |No         | Publishing in progress
+| Git Ref      | Branch / Tag | For PRs | Published | Notes
+|:-------------|:-------------|:--------|:----------|:------------
+|3.0-dev       |Branch        |Yes      |No         | **Primary development branch**
+|3.0           |Branch        |No       |Yes - eventually | Staging branch for publishing
+|3.0-preview   |Tag           |No       |No         | Publishing in progress
+|3.0-stable    |Tag           |No       |Yes        | Last published release
 
-| Branch / Tag | For PRs | Published | Notes
-|:-------------|:--------|:----------|:------------
-|1.0-dev       |Yes      |No         | Development branch for 1.0
-|1.0           |No       |Yes - eventually    | Staging branch for publishing
-|1.0-stable    |No       |Yes        | Last published release
-|1.0-preview   |No       |No         | Publishing in progress
+| Git Ref      | Branch / Tag | For PRs | Published | Notes
+|:-------------|:-------------|:--------|:----------|:------------
+|main          |Branch        |Yes      |No         | **Primary development branch**
+|2.0           |Branch        |No       |Yes - eventually | Staging branch for publishing
+|2.0-preview   |Tag           |No       |No         | Publishing in progress
+|2.0-stable    |Tag           |No       |Yes        | Last published release
 
 ### PR Titles
 
@@ -134,7 +134,7 @@ Please avoid titles such as
 ```bash
 - package: <whatever you did to the package>
 - CVE-XXXX-YYYY (leaving off what package was patched or upgraded)
-- [1.0] (prefixing with branch or other information)
+- [2.0] (prefixing with branch or other information)
 ```
 
 ### PR Checklist
@@ -155,7 +155,7 @@ When creating your PR, please ensure the following:
 
 * Package tests (%check section) have been verified with RUN_CHECK=y for existing SPEC files, or added to new SPEC files. When running the check section, results will not fail a build. Check the logs for the results of this section.
 
-* All package sources are available. The sources are either in the source server or local `SPECS` folder (`SPECS/<package>/SOURCES` or `SPECS/<package>`). While it is possible to build packages with all sources inside the repo, our policy is generally to have the source compressed and placed on the source server. Uploading to the source server can only be accomplished by an Azure Linux developer. Please request help in your PR for uploading your sources to the source server. To check the source server see [https://cblmarinerstorage.blob.core.windows.net/sources/core/< source tar >].
+* All package sources are available. The sources are either in the source server or local `SPECS` folder (`SPECS/<package>/SOURCES` or `SPECS/<package>`). While it is possible to build packages with all sources inside the repo, our policy is generally to have the source compressed and placed on the source server. Uploading to the source server can only be accomplished by an Azure Linux developer. Please request help in your PR for uploading your sources to the source server. To check the source server see [https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/< source tar >].
 
 * cgmanifest files are up-to-date and alphabetically sorted. The cgmanifest files are used to record all package sources. They include the following files:
 
@@ -171,15 +171,15 @@ When creating your PR, please ensure the following:
    ```
 
 * LICENSE-MAP files are up-to-date. These files indicate which licenses are being used by Azure Linux's packages and where the package may be derived from. The license files include the following files:
-  * ./SPECS/LICENSES-AND-NOTICES/data/licenses.json
-  * ./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md
+  * ./LICENSES-AND-NOTICES/SPECS/data/licenses.json
+  * ./LICENSES-AND-NOTICES/SPECS/LICENSES-MAP.md
 
   This can be checked by running
 
   ```bash
   python3 ./toolkit/scripts/license_map.py \
-  ./SPECS/LICENSES-AND-NOTICES/data/licenses.json \
-  ./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md \
+  ./LICENSES-AND-NOTICES/SPECS/data/licenses.json \
+  ./LICENSES-AND-NOTICES/SPECS/LICENSES-MAP.md \
   ./SPECS \
   ./SPECS-EXTENDED \
   ./SPECS-SIGNED

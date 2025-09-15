@@ -23,6 +23,7 @@
   - [packages.microsoft.com Repository Structure](#packagesmicrosoftcom-repository-structure)
       - [Azure Linux 1.0](#azure-linux-10)
       - [Azure Linux 2.0](#azure-linux-20)
+      - [Azure Linux 3.0](#azure-linux-30)
   - [Keys, Certs, and Remote Sources](#keys-certs-and-remote-sources)
     - [Sources](#sources)
     - [Authentication](#authentication)
@@ -108,22 +109,22 @@ Prepare your system by installing the necessary prerequisites [here](prerequisit
 
 ## **Clone and Sync To Stable Commit**
 
-Clone the 2.0-stable build of Azure Linux as shown here.
+Clone the 3.0-stable build of Azure Linux as shown here.
 
 ```bash
 # Get the source code
 git clone https://github.com/microsoft/azurelinux.git
 cd azurelinux/toolkit
 
-# Checkout the desired release branch. The 2.0-stable tag tracks the most recent successful release of the 2.0 branch.
-git checkout 2.0-stable
+# Checkout the desired release branch. The 3.0-stable tag tracks the most recent successful release of the 3.0 branch.
+git checkout 3.0-stable
 ```
 
-**IMPORTANT:** The 2.0-stable tag always points to the latest known good build of Azure Linux of the 2.0 branch. A similar tag, 1.0-stable, exists for the 1.0 branch. Other branchses are also buildable but not guarnateed to be stable.  The 1.0 and 2.0 branches are periodically updated with bug fixes, security vulnerability fixes or occasional feature enhancements.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable.  The 2.0-stable tag will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the 2.0-stable tag is advanced.  To ensure you have the latest invoke _git fetch --tags_ before building.
+**IMPORTANT:** The `3.0-stable` tag always points to the latest known good build of Azure Linux of the 3.0 branch. A similar tag, `2.0-stable`, exists for the 2.0 branch. Other branches are also buildable but not guaranteed to be stable.  The 2.0 and 3.0 branches are periodically updated with bug fixes, security vulnerability fixes or occasional feature enhancements.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable.  The `3.0-stable` tag will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the `3.0-stable` tag is advanced.  To ensure you have the latest invoke _git fetch --all --tags_ before building.
 
-It is also possible to build an older version of Azure Linux from the 2.0 branch.  Azure Linux may be updated at any time, but an aggregate release is declared monthly and [tagged in github](https://github.com/microsoft/azurelinux/releases).  These monthly builds are stable and their tags can be substituted for the 2.0-stable label above.
+It is also possible to build an older version of Azure Linux from the 3.0 branch.  Azure Linux may be updated at any time, but an aggregate release is declared monthly and [tagged in github](https://github.com/microsoft/azurelinux/releases).  These monthly builds are stable and their tags can be substituted for the `3.0-stable` label above.
 
-Alternate branches are not generally buildable because community builds require the SRPMs and/or RPMs be published.  At this time, published files are only available for the 2.0 branch.
+Alternate branches are not generally buildable because community builds require the SRPMs and/or RPMs be published.  At this time, published files are only available for the 2.0 and 3.0 branches.
 
 **NOTE: All subsequent commands are assumed to be executed from inside the toolkit directory.**
 
@@ -205,9 +206,9 @@ sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="at" PACKAGE_
 
 ## **Image Stage**
 
-Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/AzureLinux-Tutorials#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/azurelinux/tree/2.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
+Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/AzureLinux-Tutorials#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/azurelinux/tree/3.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
 
-By default, the `make image` and `make iso` commands (discussed below) build missing packages before starting the image build sequence.  By adding the `REBUILD_PACKAGES=n` argument, the image build phase will supplement missing packages with those on packages.microsoft.com.  This can accelerate the image build process, especially when performing targeted package builds ([targeted Package Building](#targeted-package-building)
+By default, the `make image` and `make iso` commands (discussed below) build missing packages before starting the image build sequence.  By adding the `REBUILD_PACKAGES=n` argument, the image build phase will supplement missing packages with those on packages.microsoft.com.  This can accelerate the image build process, especially when performing targeted package builds ([targeted Package Building](#targeted-package-building))
 
 All images are generated in the `out/images` folder.
 
@@ -305,7 +306,7 @@ Azure Linux packages are available on [packages.microsoft.com](https://packages.
 
 The "preview" and "production" folders are further subdivided into purpose, and then again for architecture. This includes locations for source-rpms.
 
-#### Azure Linux 1.0
+#### [Azure Linux 1.0](https://packages.microsoft.com/cbl-mariner/1.0/)
 
 For Azure Linux 1.0, the repositories are structured as follows:
 
@@ -316,7 +317,7 @@ For Azure Linux 1.0, the repositories are structured as follows:
 - **NVIDIA:** Specially licensed NVIDIA packages.
 - **Microsoft:** Packages built by other, non-Azure Linux, Microsoft teams.
 
-#### Azure Linux 2.0
+#### [Azure Linux 2.0](https://packages.microsoft.com/cbl-mariner/2.0/)
 
 For Azure Linux 2.0, the repositories are structured as follows:
 
@@ -325,6 +326,18 @@ For Azure Linux 2.0, the repositories are structured as follows:
 - **Extended:** Azure Linux 2.0 packages that are not considered part of core. Generally, viewed as experimental or for development purposes.
 - **NVIDIA:** Specially licensed NVIDIA packages.
 - **Microsoft:** Packages built by other, non-Azure Linux, Microsoft teams.
+
+#### [Azure Linux 3.0](https://packages.microsoft.com/azurelinux/3.0/)
+
+For Azure Linux 3.0, the repositories are structured as follows:
+
+- **Base:** Packages released with Azure Linux 3.0 and their updates.
+- **Cloud-native:** This repository is for CNCF (Cloud Native Computing Foundation) packages.
+- **Extended:** Azure Linux 3.0 packages that are not considered part of core. Generally, viewed as experimental or for development purposes.
+- **ms-non-oss:** Azure Linux 3.0 packages that are built by Microsoft and are closed source. Formerly known as **extras**
+- **ms-oss:** Packages built by other, non-Azure Linux, Microsoft teams. Formerly known as **Microsoft**
+- **nvidia:** Specially licensed NVIDIA/CUDA packages.
+
 
 ## Keys, Certs, and Remote Sources
 
@@ -353,22 +366,31 @@ The `REPO_LIST` variable supports multiple repo files, and they are prioritized 
 The Azure Linux base repo is implicitly provided and an optional preview repo is available by setting `USE_PREVIEW_REPO=y`.
 If `DISABLE_UPSTREAM_REPOS=y` is set, any repo that is accessed through the network is disabled.
 
+Daily build packages are available via `DAILY_BUILD_ID`. Use `DAILY_BUILD_ID=lkg`, or `DAILY_BUILD_ID=V-v-YYYYMMDD`.
+
 ### Authentication
 
-If supplying custom endpoints for source/SRPM/package servers, accessing these resources may require keys and certificates. The keys and certificates can be set using:
+If supplying custom endpoints for source/SRPM/package servers, accessing these resources may require authentication.
+Keys and certificates for TLS based authentication can be set using:
 
 ```bash
 sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" CA_CERT=/path/to/rootca.crt TLS_CERT=/path/to/user.crt TLS_KEY=/path/to/user.key
 ```
 
+For SRPM packing (i.e., for retrieving package sources), Azure CLI login can be used to access authenticated Azure blob storages, which do not support anonymous access:
+```bash
+sudo make build-packages SOURCE_AUTH_MODE="azurecli"
+```
+Using this mode requires prior `az login` with your managed identity ID.
+
 ## Building Everything From Scratch
 
-**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Azure Linux source packages are available at `SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core`**
+**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Azure Linux source packages are available at `SOURCE_URL=https://azurelinuxsrcstorage.blob.core.windows.net/sources/core` and support anonymous access.**
 
 The build system can operate without using pre-built components if desired. There are several variables which enable/disable build components and sources of data. They are listed here along with their default values:
 
 ```makefile
-SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/core
+SOURCE_URL         ?= https://azurelinuxsrcstorage.blob.core.windows.net/sources/core
 PACKAGE_URL_LIST   ?= https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
 SRPM_URL_LIST      ?= https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/srpms
 REPO_LIST          ?=
@@ -464,7 +486,8 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 #### `PACKAGE_URL_LIST=...`
 
-> Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `n`. Defaults to the standard distro repos. Overriding this will clear all the default values. May be augmented by passing `USE_PREVIEW_REPO=y` which will uncondinally append the distro's preview repos to what ever set of URLs is being used.
+> Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `n`. Defaults to the standard distro repos. Overriding this will clear all the default values. May be augmented by passing `USE_PREVIEW_REPO=y` which will unconditionally append the distro's preview repos to what ever set of URLs is being used. `DAILY_BUILD_ID=...` will
+also augment the URL list.
 
 #### `SRPM_URL_LIST=...`
 
@@ -478,6 +501,8 @@ If that is not desired all remote sources can be disabled by clearing the follow
 > - `azurelinux-preview.repo` - Azure Linux repository containing pre-release versions of RPMs **subject to change without notice**. Using this .repo file is equivalent to adding the [`USE_PREVIEW_REPO=y`](#use_preview_repoy) argument to your build command.
 > - `mariner-ms-non-oss.repo` and `mariner-ms-non-oss-preview.repo` - Azure Linux repository containing Microsoft non open Source RPMs with sources not viewable to the public. The preview version serves the same purpose as the official preview repo.
 >
+
+`DAILY_BUILD_ID` and `DAILY_BUILD_REPO` will automatically augment the `REPO_LIST`.
 
 #### Build Enable/Disable Flags
 
@@ -560,6 +585,24 @@ If that is not desired all remote sources can be disabled by clearing the follow
 ##### `USE_PREVIEW_REPO=`**`y`**
 
 > Pull missing packages from the upstream preview repository in addition to the base repository. This will uncondinally append the preview repo sources to `PACKAGE_URL_LIST`, `SRPM_URL_LIST`, and `REPO_LIST`.
+
+#### `DAILY_BUILD_ID=...`
+
+##### `DAILY_BUILD_ID=`**`""`** *(default)*
+
+> Disable daily build sources.
+
+##### `DAILY_BUILD_ID=`**`lkg` | `V-v-YYYYMMDD`**
+
+> Use the daily build sources for the given date. `lkg` will use the last known good build.
+
+##### `DAILY_BUILD_SKIP_TOOLCHAIN_AUTO_CLEANUP=`**`n`** *(default)*
+
+> Delete the already downloaded toolchain RPMs and freshly download from LKG repo
+
+##### `DAILY_BUILD_SKIP_TOOLCHAIN_AUTO_CLEANUP=`**`y`**
+
+> Don't delete the already download tolchain RPMs to save time. Use only if are sure about this behaviour.
 
 #### `DISABLE_UPSTREAM_REPOS=...`
 
@@ -665,6 +708,8 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 
 ## All Build Targets
 
+**Help is available via `make help`**
+
 These are the useful build targets:
 | Target                           | Description
 |:---------------------------------|:---
@@ -673,7 +718,7 @@ These are the useful build targets:
 | clean                            | Clean all built files.
 | clean-*                          | Most targets have a `clean-<target>` target which selectively cleans the target's output.
 | compress-rpms                    | Compresses all RPMs in `../out/RPMS` into `../out/rpms.tar.gz`. See `hydrate-rpms` target.
-| compress-srpms                   | Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`.
+| compress-srpms                   | Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`. See `hydrate-srpms` target.
 | copy-toolchain-rpms              | **[DEPRECATED]: This should no longer be needed as a work around in core repo builds. Will be removed in future versions.** Copy all toolchain RPMS from `../build/toolchain_rpms` to  `../out/RPMS`.
 | expand-specs                     | Extract working copies of the `*.spec` files from the local `*.src.rpm` files.
 | fetch-image-packages             | Locate and download all packages required for an image build.
@@ -686,6 +731,7 @@ These are the useful build targets:
 | go-tools                         | Preps all go tools (ensure `REBUILD_TOOLS=y` to rebuild).
 | help                             | Display basic usage information for most commonly used build targets and variables.
 | hydrate-rpms                     | Hydrates the `../out/RPMS` directory from `rpms.tar.gz`. See `compress-rpms` target.
+| hydrate-srpms                    | Hydrates the `../out/SRPMS` directory from `srpms.tar.gz`. See `compress-srpms` target.
 | image                            | Generate an image (see [Images](#images)).
 | initrd                           | Create the initrd for the ISO installer.
 | input-srpms                      | Scan the local `*.spec` files, locate sources, and create `*.src.rpm` files.
@@ -724,7 +770,7 @@ To reproduce a build, there are four constraints:
 
 1. The local SPEC files must be the same. That is, you cannot reproduce a build having modified any of the local SPEC files since when the summary files were generated.
 2. What is being built must be the same. That is, if the summary files were generated from an image build then the reproduced build must be building the exact same image configuration.
-3. The toolkit version must be the same. That is, if the summary files were generated from a `2.0` toolkit, then the reproduced build must be done using the `2.0` toolkit.
+3. The toolkit version must be the same. That is, if the summary files were generated from a `3.0` toolkit, then the reproduced build must be done using the `3.0` toolkit.
 4. The builds must be from clean. Both the build that generated the summary files and the reproduced build must be done from a clean state, otherwise there may be leftover files that affect the summary files. The only exception is the mentioned case of using external packages not present in the PMC repository - in this case you'll need to pre-populate the local cache with these packages after cleaning your repository, but before running the build.
 
 If the above constraints are met then a build can be reproduced from summary files.
@@ -783,6 +829,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | PACKAGE_ARCHIVE               |                                                                                                        | Use with `make hydrate-rpms` to populate a set of rpms from an archive.
 | DOWNLOAD_SRPMS                | n                                                                                                      | Pack SRPMs from local SPECs or download published ones?
 | USE_PREVIEW_REPO              | n                                                                                                      | Pull missing packages from the upstream preview repository in addition to the base repository?
+| DAILY_BUILD_ID                |                                                                                                        | `lkg` or `V-v-YYYYMMDD` to use the daily build resources for the given date.
 | DISABLE_UPSTREAM_REPOS        | n                                                                                                      | Only pull missing packages from local repositories? This does not affect hydrating the toolchain from `$(PACKAGE_URL_LIST)`.
 | DISABLE_DEFAULT_REPOS         | n                                                                                                      | Disable pulling packages from PMC. Use this option with `REPO_LIST` if you want to use your own repository exclusively.
 | CACHED_PACKAGES_ARCHIVE       |                                                                                                        | Use with `make hydrate-cached-rpms` to populate the external RPMs cache from an archive.
@@ -800,34 +847,38 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | CA_CERT                       |                                                                                                          | CA cert to access the above resources, in addition to the system certificate store
 | TLS_CERT                      |                                                                                                          | TLS cert to access the above resources
 | TLS_KEY                       |                                                                                                          | TLS key to access the above resources
+| SOURCE_AUTH_MODE              |                                                                                                          |
+Authentication mode for downloading source files for SRPM packing. Valid options: anonymous, azurecli (as defined in the srpmpacker code base). The azurecli option enables Azure CLI based authentication for accessing Azure Blob Storages which do not allow for public access. The default method is anonymous access using HTTP GET.
 
 ---
 
 ### Misc Build
 
-| Variable                      | Default                                                                                                | Description
-|:------------------------------|:-------------------------------------------------------------------------------------------------------|:---
-| LOG_LEVEL                     | info                                                                                                   | Console log level for go tools (`panic, fatal, error, warn, info, debug, trace`)
-| LOG_COLOR                     | auto                                                                                                   | Console log color for go tools (`always`, `auto`, `never`). `always` enables color in both logs and terminal output, `auto`(default option) enables color in terminal output, and `never` disables color in all.
-| STOP_ON_WARNING               | n                                                                                                      | Stop on non-fatal makefile failures (see `$(call print_warning, message)`)
-| STOP_ON_PKG_FAIL              | n                                                                                                      | Stop all package builds on any failure rather than try and continue.
-| SRPM_FILE_SIGNATURE_HANDLING  | enforce                                                                                                | Behavior when checking source file hashes from SPEC files. `update` will create a new entry in the signature file (`enforce, skip, update`)
-| ARCHIVE_TOOL                  | $(shell if command -v pigz 1>/dev/null 2>&1 ; then echo pigz ; else echo gzip ; fi )                   | Default tool to use in conjunction with `tar` to extract `*.tar.gz` files. Tries to use `pigz` if available, otherwise uses `gzip`
-| INCREMENTAL_TOOLCHAIN         | n                                                                                                      | Only build toolchain RPM packages if they are not already present
-| RUN_CHECK                     | n                                                                                                      | Run the %check sections when compiling packages
-| ALLOW_TOOLCHAIN_REBUILDS      | n                                                                                                      | Do not treat rebuilds of toolchain packages during regular package build phase as errors.
-|  PACKAGE_BUILD_RETRIES        | 1                                                                                                      | Number of build retries for each package
-| CHECK_BUILD_RETRIES           | 1                                                                                                      | Minimum number of check section retries for each package if RUN_CHECK=y and tests fail.
-| MAX_CASCADING_REBUILDS        |                                                                                                        | When a package rebuilds, how many additional layers of dependent packages will be forced to rebuild (leave unset for unbounded, i.e., all downstream packages will rebuild)
-| EXTRA_BUILD_LAYERS            | 0                                                                                                      | How many additional layers of the build graph to build beyond the requested packages (useful for testing changes in dependent packages)
-| IMAGE_TAG                     | (empty)                                                                                                | Text appended to a resulting image name - empty by default. Does not apply to the initrd. The text will be prepended with a hyphen.
-| CONCURRENT_PACKAGE_BUILDS     | 0                                                                                                      | The maximum number of concurrent package builds that are allowed at once. If set to 0 this defaults to the number of logical CPUs.
-| CLEANUP_PACKAGE_BUILDS        | y                                                                                                      | Cleanup a package build's working directory when it finishes. Note that `build` directory will still be removed on a successful package build even when this is turned off.
-| USE_PACKAGE_BUILD_CACHE       | y                                                                                                      | Skip building a package if it and its dependencies are already built.
-| NUM_OF_ANALYTICS_RESULTS      | 10                                                                                                     | The number of entries to print when using the `graphanalytics` tool. If set to 0 this will print all available results.
-| TARGET_ARCH                   |                                                                                                        | The architecture of the machine that will run the package binaries.
-| USE_CCACHE                    | n                                                                                                      | Use ccache automatically to speed up repeat package builds.
-| MAX_CPU                       |                                                                                                        | Max number of CPUs used for package building. Use 0 for unlimited. Overrides `%_smp_ncpus_max` macro.
+| Variable                         | Default                                                                                                | Description
+|:---------------------------------|:-------------------------------------------------------------------------------------------------------|:---
+| LOG_LEVEL                        | info                                                                                                   | Console log level for go tools (`panic, fatal, error, warn, info, debug, trace`)
+| LOG_COLOR                        | auto                                                                                                   | Console log color for go tools (`always`, `auto`, `never`). `always` enables color in both logs and terminal output, `auto`(default option) enables color in terminal output, and `never` disables color in all.
+| STOP_ON_WARNING                  | n                                                                                                      | Stop on non-fatal makefile failures (see `$(call print_warning, message)`)
+| STOP_ON_PKG_FAIL                 | n                                                                                                      | Stop all package builds on any failure rather than try and continue.
+| SRPM_FILE_SIGNATURE_HANDLING     | enforce                                                                                                | Behavior when checking source file hashes from SPEC files. `update` will create a new entry in the signature file (`enforce, skip, update`)
+| ARCHIVE_TOOL                     | $(shell if command -v pigz 1>/dev/null 2>&1 ; then echo pigz ; else echo gzip ; fi )                   | Default tool to use in conjunction with `tar` to extract `*.tar.gz` files. Tries to use `pigz` if available, otherwise uses `gzip`
+| INCREMENTAL_TOOLCHAIN            | n                                                                                                      | Only build toolchain RPM packages if they are not already present
+| RUN_CHECK                        | n                                                                                                      | Run the %check sections when compiling packages
+| ALLOW_TOOLCHAIN_REBUILDS         | n                                                                                                      | Do not treat rebuilds of toolchain packages during regular package build phase as errors.
+|  PACKAGE_BUILD_RETRIES           | 1                                                                                                      | Number of build retries for each package
+| CHECK_BUILD_RETRIES              | 1                                                                                                      | Minimum number of check section retries for each package if RUN_CHECK=y and tests fail.
+| MAX_CASCADING_REBUILDS           |                                                                                                        | When a package rebuilds, how many additional layers of dependent packages will be forced to rebuild (leave unset for unbounded, i.e., all downstream packages will rebuild)
+| EXTRA_BUILD_LAYERS               | 0                                                                                                      | How many additional layers of the build graph to build beyond the requested packages (useful for testing changes in dependent packages)
+| IMAGE_TAG                        | (empty)                                                                                                | Text appended to a resulting image name - empty by default. Does not apply to the initrd. The text will be prepended with a hyphen.
+| CONCURRENT_PACKAGE_BUILDS        | 0                                                                                                      | The maximum number of concurrent package builds that are allowed at once. If set to 0 this defaults to the number of logical CPUs.
+| CLEANUP_PACKAGE_BUILDS           | y                                                                                                      | Cleanup a package build's working directory (`./build/worker/chroot/<pkg>/*`) when it finishes. Note that `rpmbuild`'s `BUILD` directory will still be removed on a successful package build even when this is turned off. Consider `make containerized-rpmbuild SRPM_PACKLIST=<pkg>` for debugging build issues instead. The user must call `sudo make clean-build-packages-workers` to tidy any uncleaned build environments after a build.
+| USE_PACKAGE_BUILD_CACHE          | y                                                                                                      | Skip building a package if it and its dependencies are already built.
+| NUM_OF_ANALYTICS_RESULTS         | 10                                                                                                     | The number of entries to print when using the `graphanalytics` tool. If set to 0 this will print all available results.
+| TARGET_ARCH                      |                                                                                                        | The architecture of the machine that will run the package binaries.
+| USE_CCACHE                       | n                                                                                                      | Use ccache automatically to speed up repeat package builds.
+| MAX_CPU                          |                                                                                                        | Max number of CPUs used for package building. Use 0 for unlimited. Overrides `%_smp_ncpus_max` macro.
+| BUILD_TOOLS_NONPROD              | n                                                                                                      | Enables non-production features in the go build tools.
+| IMAGE_CUSTOMIZER_VERSION_PREVIEW | -dev.\<date>.\<time>+\<commit-id>                                                                      | Overrides the prefix suffix of the Image Customizer version string.
 
 ---
 
@@ -872,6 +923,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | RPMS_DIR                      | `$(OUT_DIR)`/RPMS                                                                                      | Directory to place RPMs in
 | SRPMS_DIR                     | `$(OUT_DIR)`/SRPMS                                                                                     | Directory to place SRPMs in
 | IMAGES_DIR                    | `$(OUT_DIR)`/images                                                                                    | Directory to place images in
+| PRECACHER_SNAPSHOT            | `$(OUT_DIR)`/rpms_snapshot.json                                                                        | Location of snapshot file for the pre-cacher
 
 ---
 

@@ -1,0 +1,102 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: Source Signature Check
+
+on:
+  push:
+    branches: [3.0*]
+  pull_request:
+    branches: [3.0*]
+
+jobs:
+  spec-check:
+    name: Source Signature Check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        specs-dir: [SPECS, SPECS-EXTENDED]
+
+    steps:
+      # Checkout the branch of our repo that triggered this action
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v4
+
+      # For consistency, we use the same major/minor version of Python that Azure Linux ships
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Get Python dependencies
+        run: python3 -m pip install -r toolkit/scripts/requirements.txt
+
+      - name: Get base commit for PRs
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV
+          echo "Merging ${{ github.sha }} into ${{ github.base_ref }}"
+
+      - name: Get base commit for Pushes
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          git fetch origin ${{ github.event.before }}
+          echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV
+          echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
+
+      - name: Get changed packages
+        run: |
+          # Find the packages that have been modified in the current PR. They will be of the form '/path/to/SPECS/<pkgname>/**/.*', and we want to extract
+          # the package's directory name (ie the folder inside ./SPECS).
+          changed_pkg_dirs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep -oP "(?<=^${{ matrix.specs-dir }}/)([^/]+)" || [[ $? -eq 1 ]]; } | sort -u | xargs)
+
+          echo "Folders with modified files in this PR:"
+          echo "${{ matrix.specs-dir }}/*: '${changed_pkg_dirs}'"
+
+          # For each package directory, get the names of all .spec files contained and add them to the list of SRPMS to repack.
+          # We need to filter since some directories may not contain .spec files we can rebuild, or the naming may not be 1:1.
+          changed_pkgs=""
+          for pkg in $changed_pkg_dirs; do
+            changed_pkgs="$changed_pkgs $(find ${{ matrix.specs-dir }}/$pkg -name '*.spec' -exec basename {} .spec \; | xargs)"
+          done
+
+          echo "Packages modified in this PR:"
+          echo "${{ matrix.specs-dir }}: '${changed_pkgs}'"
+          echo "changed_pkgs=${changed_pkgs}" >> $GITHUB_ENV
+
+      - name: Prepare the build environment
+        run: |
+          if [ -z "${{ env.changed_pkgs }}" ] && [ -z "${{ env.changed_pkgs_extended }}" ]; then
+            echo "No package changes detected."
+            exit 0
+          fi
+
+          echo "Checking for invalid signatures..."
+          # Call this script to sync the toolchain manifests with the LKG daily build.
+          ./toolkit/scripts/setuplkgtoolchain.sh
+          # Determine the LKG daily build ID.
+          LKG_BUILD_ID=$(wget -qO - https://mariner3dailydevrepo.blob.core.windows.net/lkg/lkg-3.0-dev.json | jq -r ".dailybuildid" | tr '\.' '-')
+          echo "LKG_BUILD_ID=${LKG_BUILD_ID}" >> $GITHUB_ENV
+
+          sudo make -C toolkit -j$(nproc) chroot-tools REBUILD_TOOLS=y DAILY_BUILD_ID=${LKG_BUILD_ID}
+
+      - name: Check for invalid source signatures
+        run: |
+          if [ -z "${{ env.changed_pkgs }}" ]; then
+            echo "No package changes detected in '${{ matrix.specs-dir }}''."
+            exit 0
+          fi
+
+          set -x
+          if ! sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs }}" SPECS_DIR=../${{ matrix.specs-dir }}; then
+            set +x
+            printf "\n\n******************************\n"
+            echo "Failed to check the signatures of the modified packages."
+            echo "Check the logs above for details on the mismatches files and their expected hashes."
+            echo "Consider running: sudo make -C toolkit input-srpms REBUILD_TOOLS=y SRPM_PACK_LIST='${{ env.changed_pkgs }}' SPECS_DIR=../${{ matrix.specs-dir }}"
+            printf "******************************\n\n"
+            exit 1
+          else
+            echo "All modified packages have valid source signatures."
+          fi

@@ -14,6 +14,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/randomization"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -21,7 +22,11 @@ const (
 	RootHomeDir       = "/root"
 	UserHomeDirPrefix = "/home"
 
-	ShadowFile = "/etc/shadow"
+	ShadowFile                = "/etc/shadow"
+	PasswdFile                = "/etc/passwd"
+	GroupFile                 = "/etc/group"
+	SSHDirectoryName          = ".ssh"
+	SSHAuthorizedKeysFileName = "authorized_keys"
 )
 
 func HashPassword(password string) (string, error) {
@@ -38,7 +43,10 @@ func HashPassword(password string) (string, error) {
 
 	// Generate hashed password based on salt value provided.
 	// -6 option indicates to use the SHA256/SHA512 algorithm
-	stdout, _, err := shell.ExecuteWithStdin(password, "openssl", "passwd", "-6", "-salt", salt, "-stdin")
+	stdout, _, err := shell.NewExecBuilder("openssl", "passwd", "-6", "-salt", salt, "-stdin").
+		Stdin(password).
+		LogLevel(shell.LogDisabledLevel, logrus.DebugLevel).
+		ExecuteCaptureOuput()
 	if err != nil {
 		return "", fmt.Errorf("failed to generate hashed password:\n%w", err)
 	}
@@ -70,7 +78,7 @@ func UserExists(username string, installChroot safechroot.ChrootInterface) (bool
 	return userExists, nil
 }
 
-func AddUser(username string, hashedPassword string, uid string, installChroot safechroot.ChrootInterface) error {
+func AddUser(username string, homeDir string, primaryGroup string, hashedPassword string, uid string, installChroot safechroot.ChrootInterface) error {
 	var args = []string{username, "-m"}
 	if hashedPassword != "" {
 		args = append(args, "-p", hashedPassword)
@@ -78,9 +86,15 @@ func AddUser(username string, hashedPassword string, uid string, installChroot s
 	if uid != "" {
 		args = append(args, "-u", uid)
 	}
+	if homeDir != "" {
+		args = append(args, "-d", homeDir)
+	}
+	if primaryGroup != "" {
+		args = append(args, "-g", primaryGroup)
+	}
 
 	err := installChroot.UnsafeRun(func() error {
-		return shell.ExecuteLive(false /*squashErrors*/, "useradd", args...)
+		return shell.ExecuteLiveWithErr(1, "useradd", args...)
 	})
 	if err != nil {
 		return fmt.Errorf("failed to add user (%s):\n%w", username, err)
@@ -134,12 +148,25 @@ func UpdateUserPassword(installRoot, username, hashedPassword string) error {
 	return nil
 }
 
-func UserHomeDirectory(username string) string {
-	if username == RootUser {
-		return RootHomeDir
-	} else {
-		return filepath.Join(UserHomeDirPrefix, username)
+// UserHomeDirectory returns the home directory for a user.
+func UserHomeDirectory(installRoot string, username string) (string, error) {
+	entry, err := GetPasswdFileEntryForUser(installRoot, username)
+	if err != nil {
+		return "", err
 	}
+
+	return entry.HomeDirectory, nil
+}
+
+// UserSSHDirectory returns the path of the .ssh directory for a user.
+func UserSSHDirectory(installRoot string, username string) (string, error) {
+	homeDir, err := UserHomeDirectory(installRoot, username)
+	if err != nil {
+		return "", err
+	}
+
+	userSSHKeyDir := filepath.Join(homeDir, SSHDirectoryName)
+	return userSSHKeyDir, nil
 }
 
 // NameIsValid returns an error if the User name is empty

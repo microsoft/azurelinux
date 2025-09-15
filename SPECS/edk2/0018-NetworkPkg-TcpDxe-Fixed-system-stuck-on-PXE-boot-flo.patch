@@ -1,0 +1,57 @@
+From be52b5be73ab0a5e0cd37272a6f8f768a3395ffc Mon Sep 17 00:00:00 2001
+From: Sam <Sam_Tsai@wiwynn.com>
+Date: Wed, 29 May 2024 07:46:03 +0800
+Subject: [PATCH 18/18] NetworkPkg TcpDxe: Fixed system stuck on PXE boot flow
+ in iPXE environment
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This bug fix is based on the following commit "NetworkPkg TcpDxe: SECURITY PATCH"
+REF: 1904a64
+
+Issue Description:
+An "Invalid handle" error was detected during runtime when attempting to destroy a child instance of the hashing protocol. The problematic code segment was:
+
+NetworkPkg\TcpDxe\TcpDriver.c
+Status = Hash2ServiceBinding->DestroyChild(Hash2ServiceBinding, ​&mHash2ServiceHandle);
+
+Root Cause Analysis:
+The root cause of the error was the passing of an incorrect parameter type, a pointer to an EFI_HANDLE instead of an EFI_HANDLE itself, to the DestroyChild function. This mismatch resulted in the function receiving an invalid handle.
+
+Implemented Solution:
+To resolve this issue, the function call was corrected to pass mHash2ServiceHandle directly:
+
+NetworkPkg\TcpDxe\TcpDriver.c
+Status = Hash2ServiceBinding->DestroyChild(Hash2ServiceBinding, mHash2ServiceHandle);
+
+This modification ensures the correct handle type is used, effectively rectifying the "Invalid handle" error.
+
+Verification:
+Testing has been conducted, confirming the efficacy of the fix. Additionally, the BIOS can boot into the OS in an iPXE environment.
+
+Cc: Doug Flick [MSFT] <doug.edk2@gmail.com>
+
+Signed-off-by: Sam Tsai [Wiwynn] <sam_tsai@wiwynn.com>
+Reviewed-by: Saloni Kasbekar <saloni.kasbekar@intel.com>
+(cherry picked from commit ced13b93afea87a8a1fe6ddbb67240a84cb2e3d3)
+---
+ NetworkPkg/TcpDxe/TcpDriver.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/NetworkPkg/TcpDxe/TcpDriver.c b/NetworkPkg/TcpDxe/TcpDriver.c
+index 40bba4080c87..c6e7c0df540a 100644
+--- a/NetworkPkg/TcpDxe/TcpDriver.c
++++ b/NetworkPkg/TcpDxe/TcpDriver.c
+@@ -509,7 +509,7 @@ TcpDestroyService (
+     //
+     // Destroy the instance of the hashing protocol for this controller.
+     //
+-    Status = Hash2ServiceBinding->DestroyChild (Hash2ServiceBinding, &mHash2ServiceHandle);
++    Status = Hash2ServiceBinding->DestroyChild (Hash2ServiceBinding, mHash2ServiceHandle);
+     if (EFI_ERROR (Status)) {
+       return EFI_UNSUPPORTED;
+     }
+-- 
+2.45.1
+

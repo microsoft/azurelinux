@@ -1,7 +1,7 @@
 Summary:        A tiny but valid init for containers
 Name:           tini
 Version:        0.19.0
-Release:        14%{?dist}
+Release:        22%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,7 +13,7 @@ BuildRequires:  diffutils
 BuildRequires:  file
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-3%{?dist}
+BuildRequires:  glibc-static >= 2.38-12%{?dist}
 BuildRequires:  kernel-headers
 BuildRequires:  make
 BuildRequires:  sed
@@ -66,6 +66,30 @@ ln -s %{_bindir}/tini-static %{buildroot}%{_bindir}/docker-init
 %{_bindir}/docker-init
 
 %changelog
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 0.19.0-22
+- Bump to rebuild with updated glibc
+
+* Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.19.0-21
+- Bump to rebuild with updated glibc
+
+* Mon May 12 2025 Andrew Phelps anphel@microsoft.com - 0.19.0-20
+- Bump to rebuild with updated glibc
+
+* Tue Feb 25 2025 Chris Co <chrco@microsoft.com> - 0.19.0-19
+- Bump to rebuild with updated glibc
+
+* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 0.19.0-18
+- Update to build dep latest glibc-static version
+
+* Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 0.19.0-17
+- Bump to rebuild with updated glibc
+
+* Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.19.0-16
+- update to build dep latest glibc-static version
+
+* Mon May 13 2024 Chris Co <chrco@microsoft.com> - 0.19.0-15
+- Update to build dep latest glibc-static version
+
 * Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 0.19.0-14
 - update to build dep latest glibc-static version
 

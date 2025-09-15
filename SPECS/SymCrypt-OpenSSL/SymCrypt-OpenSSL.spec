@@ -1,18 +1,21 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
-Version:        1.4.0
+Version:        1.9.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Libraries
 URL:            https://github.com/microsoft/SymCrypt-OpenSSL
-#Source0:       https://github.com/microsoft/SymCrypt-OpenSSL/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-BuildRequires:  SymCrypt
+Source0:        https://github.com/microsoft/SymCrypt-OpenSSL/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  openssl-devel
+BuildRequires:  SymCrypt >= 103.8.0
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  make
+
+Requires:       SymCrypt >= 103.8.0
+Requires:       openssl
 
 %description
 The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
@@ -33,10 +36,11 @@ The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt
 mkdir bin; cd bin
 
 cmake   .. \
+        -DKEYSINUSE_ENABLED=1 \
         -DOPENSSL_ROOT_DIR="%{_prefix}/local/ssl" \
         -DSYMCRYPT_ROOT_DIR=%{buildroot}%{_includedir}/.. \
         -DCMAKE_TOOLCHAIN_FILE="../cmake-toolchain/LinuxUserMode-%{symcrypt_arch}.cmake" \
-        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo
 
 cmake --build .
 
@@ -45,6 +49,7 @@ mkdir -p %{buildroot}%{_libdir}/engines-3/
 mkdir -p %{buildroot}%{_libdir}/ossl-modules/
 mkdir -p %{buildroot}%{_includedir}
 mkdir -p %{buildroot}%{_sysconfdir}/pki/tls/
+mkdir -p %{buildroot}%{_localstatedir}/log/keysinuse/
 
 # We still install the engine for backwards compatibility with legacy applications. Callers must
 # explicitly load the engine to use it. It will be removed in a future release.
@@ -54,8 +59,14 @@ install SymCryptEngine/inc/e_scossl.h %{buildroot}%{_includedir}/e_scossl.h
 install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/symcrypt_prov.cnf
 
 %check
-# SslPlay has some dependencies on the 1.1.1 engine behavior that must be updated for 3.0
-# ./bin/SslPlay/SslPlay
+# Run in a subshell so the exit code of the test does not affect the main shell's exit code.
+# This is important because the entire section is wrapped in a script by rpmbuild itself.
+# The test is run twice: once with the default provider and once with the SymCrypt provider.
+(
+        set -e
+        ./bin/SslPlay/SslPlay
+        ./bin/SslPlay/SslPlay --provider-path ./bin/SymCryptProvider/ --provider symcryptprovider --no-engine
+)
 
 %files
 %license LICENSE
@@ -64,7 +75,67 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 %{_includedir}/e_scossl.h
 %{_sysconfdir}/pki/tls/symcrypt_prov.cnf
 
+# The log directory for certsinuse logging has permissions set to 1733.
+# These permissions are a result of a security review to mitigate potential risks:
+# - Group and others are denied read access to prevent user-level code from inferring
+#   details about other running applications and their certsinuse usage.
+# - All users have write and execute permissions to create new log files and to 
+#   check file attributes (e.g., to ensure a log file hasn't been tampered with or 
+#   replaced by a symlink).
+# - The sticky bit is set to prevent malicious users from deleting the log files
+#   and interfering with certsinuse alerting mechanisms.
+%dir %attr(1733, root, root) %{_localstatedir}/log/keysinuse/
+
 %changelog
+* Fri Jul 25 2025 Tobias Brick <tobiasb@microsoft.com> - 1.9.1-1
+- Upgrade SymCrypt-OpenSSL to 1.9.1 for compatability and bug fixes.
+
+* Wed Jun 11 2025 Tobias Brick <tobiasb@microsoft.com> - 1.9.0-1
+- Auto-upgrade to 1.9.0 - Support digest state exports.
+- Added second test run that forces the use of the SymCrypt provider.
+
+* Tue May 13 2025 Tobias Brick <tobiasb@microsoft.com> - 1.8.1-1
+- Upgrade to SymCrypt-OpenSSL 1.8.1 with minor bugfixes.
+
+* Thu May 08 2025 Tobias Brick <tobiasb@microsoft.com> - 1.8.0-2
+- Update mechanism for creating keysinuse logging directory.
+
+* Thu Mar 27 2025 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.8.0-1
+- Upgrade to SymCrypt-OpenSSL 1.8.0 with PBKDF2 and minor bugfixes
+
+* Fri Jan 31 2025 Tobias Brick <tobiasb@microsoft.com> - 1.7.0-1
+- Add optional debug logging instead of writing some errors to stderr
+- Add optional KeysInUse feature, which can be turned on by config
+
+* Wed Nov 27 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.1-1
+- Auto-upgrade to 1.6.1 - bug fixes
+
+* Mon Nov 25 2024 Tobias Brick <tobiasb@microsoft.com> - 1.6.0-1
+- Upgrade to SymCrypt-OpenSSL 1.6.0
+
+* Wed Oct 02 2024 Tobias Brick <tobiasb@microsoft.com> - 1.5.1-2
+- Add sources to debuginfo package
+
+* Wed Aug 21 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.5.1-1
+- Fix minor behavior differences with default provider
+
+* Thu Aug 15 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.5.0-1
+- Fix AES-CFB to match expected OpenSSL calling patterns
+- Support ECC key X and Y coordinate export
+
+* Thu May 16 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.4.3-1
+- Additional bugfixes for TLS connections
+- Add variable length GCM IV support to the SymCrypt engine
+
+* Thu Apr 25 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.4.2-1
+- Support additional parameters in the SymCrypt provider required for TLS connections
+- Various bugfixes for TLS scenarios
+
+* Wed Apr 17 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.4.1-1
+- Update SymCrypt-OpenSSL to v1.4.1
+- Adds support for RSASSA-PSS keys, SP800-108 KDF
+- Fixes smoke test for check in OpenSSL 3.1
+
 * Thu Dec 28 2023 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.4.0-1
 - Update SymCrypt-OpenSSL to v1.4.0.
 - Adds SymCrypt-OpenSSL provider for OpenSSL 3.

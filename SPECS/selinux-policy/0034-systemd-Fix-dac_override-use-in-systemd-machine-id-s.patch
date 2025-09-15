@@ -1,0 +1,27 @@
+From aff599f9d5186afad60703f3f9bc5ad75df63899 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Thu, 18 Jul 2024 15:51:20 -0400
+Subject: [PATCH 34/34] systemd: Fix dac_override use in
+ systemd-machine-id-setup.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/system/systemd.te | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index f64c29cc3..664f4f31a 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -1170,7 +1170,7 @@ optional_policy(`
+ # machine-id-setup local policy
+ #
+ 
+-allow systemd_machine_id_setup_t self:capability { setgid sys_admin sys_chroot };
++allow systemd_machine_id_setup_t self:capability { dac_override setgid sys_admin sys_chroot };
+ 
+ files_list_var(systemd_machine_id_setup_t)
+ files_mounton_root(systemd_machine_id_setup_t)
+-- 
+2.45.2
+

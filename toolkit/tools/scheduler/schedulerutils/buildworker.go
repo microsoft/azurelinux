@@ -5,6 +5,7 @@ package schedulerutils
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -38,7 +39,6 @@ type BuildRequest struct {
 	Node           *pkggraph.PkgNode   // The main node being analyzed for the build.
 	PkgGraph       *pkggraph.PkgGraph  // The graph of all packages.
 	AncillaryNodes []*pkggraph.PkgNode // For SRPM builds: other nodes stemming from the same SRPM. Empty otherwise.
-	ExpectedFiles  []string            // List of RPMs built by this node.
 	UseCache       bool                // Can we use a cached copy of this package instead of building it.
 	IsDelta        bool                // Is this a pre-downloaded RPM (not traditional cache) that we may be able to skip rebuilding.
 	Freshness      uint                // The freshness of the node (used to determine if we can skip building future nodes).
@@ -46,16 +46,18 @@ type BuildRequest struct {
 
 // BuildResult represents the results of a build agent trying to build a given node.
 type BuildResult struct {
-	AncillaryNodes []*pkggraph.PkgNode // For SRPM builds: other nodes stemming from the same SRPM. Empty otherwise.
-	BuiltFiles     []string            // List of RPMs built by this node.
-	Err            error               // Error encountered during the build.
-	LogFile        string              // Path to the log file from the build.
-	Node           *pkggraph.PkgNode   // The main node being analyzed for the build.
-	CheckFailed    bool                // Indicator if the package test failed but the build itself was correct.
-	Ignored        bool                // Indicator if the build was ignored by user request.
-	UsedCache      bool                // Indicator if we used the cached artifacts (external or earlier local build) instead of building the node.
-	WasDelta       bool                // Indicator if we used a pre-built component from an external repository instead of building the node.
-	Freshness      uint                // The freshness of the node (used to determine if we can skip building future nodes).
+	AncillaryNodes     []*pkggraph.PkgNode // For SRPM builds: other nodes stemming from the same SRPM. Empty otherwise.
+	BuiltFiles         []string            // List of RPMs built by this node.
+	Err                error               // Error encountered during the build.
+	LogFile            string              // Path to the log file from the build.
+	Node               *pkggraph.PkgNode   // The main node being analyzed for the build.
+	CheckFailed        bool                // Indicator if the package test failed but the build itself was correct.
+	Ignored            bool                // Indicator if the build was ignored by user request.
+	UsedCache          bool                // Indicator if we used the cached artifacts (external or earlier local build) instead of building the node.
+	WasDelta           bool                // Indicator if we used a pre-built component from an external repository instead of building the node.
+	Freshness          uint                // The freshness of the node (used to determine if we can skip building future nodes).
+	HasLicenseWarnings bool                // Package has at least one license check warning
+	HasLicenseErrors   bool                // Package has at least one license check error
 }
 
 // selectNextBuildRequest selects a job based on priority:
@@ -164,7 +166,7 @@ func buildNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagent
 
 	if request.UseCache {
 		logger.Log.Debugf("%s is prebuilt, skipping", baseSrpmName)
-		builtFiles = request.ExpectedFiles
+		builtFiles, _ = pkggraph.FindRPMFiles(node.SrpmPath, request.PkgGraph, graphMutex)
 		return
 	}
 
@@ -277,10 +279,27 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, basePackageN
 	)
 
 	logBaseName := filepath.Base(srpmFile) + ".log"
-	err = retry.Run(func() (buildErr error) {
-		builtFiles, logFile, buildErr = agent.BuildPackage(basePackageName, srpmFile, logBaseName, outArch, runCheck, dependencies)
+
+	// Track the time the build may take, and ensure we don't exceed the maximum limit.
+	attemptNumber := 0
+	totalExecutionTimeout := agent.Config().Timeout
+	deadline := time.Now().Add(totalExecutionTimeout)
+	ctx, cancelFunc := context.WithDeadline(context.Background(), deadline)
+	defer cancelFunc()
+
+	wasCancelled, err := retry.RunWithLinearBackoff(ctx, func() (buildErr error) {
+		if attemptNumber > 0 {
+			logger.Log.Warnf("Build for '%s' failed %d times, retrying up to %d times.", srpmFile, attemptNumber, buildAttempts)
+		}
+		attemptNumber++
+
+		builtFiles, logFile, buildErr = agent.BuildPackage(basePackageName, srpmFile, logBaseName, outArch, runCheck, dependencies, time.Until(deadline))
 		return
 	}, buildAttempts, retryDuration)
+	if wasCancelled {
+		err = fmt.Errorf("after %d/%d attempts, the build exceeded the maximum time of %s", attemptNumber, buildAttempts, totalExecutionTimeout)
+		return
+	}
 
 	return
 }
@@ -295,10 +314,23 @@ func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, basePackageNa
 	)
 
 	logBaseName := filepath.Base(srpmFile) + ".test.log"
-	err = retry.Run(func() (buildErr error) {
+
+	// Track the time the build may take, and ensure we don't exceed the maximum limit.
+	attemptNumber := 0
+	totalExecutionTimeout := agent.Config().Timeout
+	deadline := time.Now().Add(totalExecutionTimeout)
+	ctx, cancelFunc := context.WithDeadline(context.Background(), deadline)
+	defer cancelFunc()
+
+	wasCancelled, err := retry.RunWithLinearBackoff(ctx, func() (buildErr error) {
+		if attemptNumber > 0 {
+			logger.Log.Warnf("Test for '%s' failed %d times, retrying up to %d times.", srpmFile, attemptNumber, checkAttempts)
+		}
+		attemptNumber++
+
 		checkFailed = false
 
-		_, logFile, buildErr = agent.BuildPackage(basePackageName, srpmFile, logBaseName, outArch, runCheck, dependencies)
+		_, logFile, buildErr = agent.BuildPackage(basePackageName, srpmFile, logBaseName, outArch, runCheck, dependencies, time.Until(deadline))
 		if buildErr != nil {
 			logger.Log.Warnf("Test build for '%s' failed on a non-test build issue. Error: %s", srpmFile, buildErr)
 			return
@@ -311,9 +343,13 @@ func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, basePackageNa
 		}
 		return
 	}, checkAttempts, retryDuration)
+	if wasCancelled {
+		err = fmt.Errorf("after %d/%d attempts, the check exceeded the maximum time of %s", attemptNumber, checkAttempts, totalExecutionTimeout)
+		return
+	}
 
 	if checkFailed {
-		logger.Log.Debugf("Tests failed for '%s' after %d retries.", basePackageName, checkAttempts)
+		logger.Log.Debugf("Tests failed for '%s' after %d attempt(s).", basePackageName, checkAttempts)
 		err = nil
 	}
 	return

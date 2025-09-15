@@ -1,0 +1,710 @@
+From 90fc635807dd23c2015358cc6cf3126e12bdacdc Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Tue, 29 Oct 2024 14:08:32 -0700
+Subject: [PATCH] dnf5 repo snapshot
+
+---
+ .../share/dnf5/aliases.d/compatibility.conf   |  12 +
+ dnf5/main.cpp                                 |  29 ++
+ doc/dnf5.8.rst                                |   6 +
+ include/libdnf5/conf/config_main.hpp          |   4 +
+ include/libdnf5/repo/config_repo.hpp          |   4 +
+ libdnf5/CMakeLists.txt                        |   2 +-
+ libdnf5/conf/config_main.cpp                  |  13 +
+ libdnf5/repo/config_repo.cpp                  |  13 +
+ libdnf5/repo/solv_repo.cpp                    | 387 +++++++++++++++++-
+ libdnf5/repo/solv_repo.hpp                    |  23 +-
+ 10 files changed, 484 insertions(+), 9 deletions(-)
+
+diff --git a/dnf5/config/usr/share/dnf5/aliases.d/compatibility.conf b/dnf5/config/usr/share/dnf5/aliases.d/compatibility.conf
+index e0776f29..e746efb8 100644
+--- a/dnf5/config/usr/share/dnf5/aliases.d/compatibility.conf
++++ b/dnf5/config/usr/share/dnf5/aliases.d/compatibility.conf
+@@ -20,6 +20,18 @@ long_name = 'nodocs'
+ source = 'no-docs'
+ group_id = 'options-compatibility-aliases'
+ 
++['snapshottime']
++type = 'cloned_named_arg'
++long_name = 'snapshottime'
++source = 'snapshot-time'
++group_id = 'options-compatibility-aliases'
++
++['snapshotexcluderepos']
++type = 'cloned_named_arg'
++long_name = 'snapshotexcluderepos'
++source = 'snapshot-exclude-repos'
++group_id = 'options-compatibility-aliases'
++
+ ['enablerepo']
+ type = 'cloned_named_arg'
+ long_name = 'enablerepo'
+diff --git a/dnf5/main.cpp b/dnf5/main.cpp
+index ab1b8702..2abd7069 100644
+--- a/dnf5/main.cpp
++++ b/dnf5/main.cpp
+@@ -340,6 +340,35 @@ void RootCommand::set_argument_parser() {
+         global_options_group->register_argument(exclude);
+     }
+ 
++    auto snapshot_repo_time = parser.add_new_named_arg("snapshot-time");
++    snapshot_repo_time->set_long_name("snapshot-time");
++    snapshot_repo_time->set_has_value(true);
++    snapshot_repo_time->set_arg_value_help("posix_time");
++    snapshot_repo_time->set_description(
++        "Posix time to be used for clientside repository snapshot");
++    snapshot_repo_time->link_value(&config.get_snapshot_time_option());
++    global_options_group->register_argument(snapshot_repo_time);
++
++    auto snapshot_repo_exclude = parser.add_new_named_arg("snapshot-exclude-repos");
++    snapshot_repo_exclude->set_long_name("snapshot-exclude-repos");
++    snapshot_repo_exclude->set_has_value(true);
++    snapshot_repo_exclude->set_arg_value_help("REPO_ID,...");
++    snapshot_repo_exclude->set_description(
++        "Repos to exclude from clientside repository snapshot");
++    snapshot_repo_exclude->set_parse_hook_func([&ctx](
++            [[maybe_unused]] ArgumentParser::NamedArg * arg, 
++            [[maybe_unused]] const char * option, 
++            const char * value) {
++            
++            // Store the repositories enablement to vector. Use it later when repositories configuration will be loaded.
++            libdnf5::OptionStringList repoid_patterns(value);
++            for (auto & repoid_pattern : repoid_patterns.get_value()) {
++                ctx.setopts.emplace_back(repoid_pattern + ".snapshot-exclude", "1");
++            }
++            return true;
++        });
++    global_options_group->register_argument(snapshot_repo_exclude);
++
+     auto enable_repo_ids = parser.add_new_named_arg("enable-repo");
+     enable_repo_ids->set_long_name("enable-repo");
+     enable_repo_ids->set_has_value(true);
+diff --git a/doc/dnf5.8.rst b/doc/dnf5.8.rst
+index 005a5cdc..f7d9d5f3 100644
+--- a/doc/dnf5.8.rst
++++ b/doc/dnf5.8.rst
+@@ -272,6 +272,12 @@ Following options are applicable in the general context for any ``dnf5`` command
+ ``--show-new-leaves``
+     | Show newly installed leaf packages and packages that became leaves after a transaction.
+ 
++``--snapshot-time=POSIX_TIME``
++    | POSIX_TIME to be used by ``DNF5`` when creating clientside repository snapshots of each available repo.
++
++``--snapshot-exclude-repos=REPO_ID,...``
++    | Repos which should be specifically excluded from clientside repository snapshots.
++
+ ``-y, --assumeyes``
+     | Automatically answer yes for all questions.
+ 
+diff --git a/include/libdnf5/conf/config_main.hpp b/include/libdnf5/conf/config_main.hpp
+index 0b4f9150..9d3942c6 100644
+--- a/include/libdnf5/conf/config_main.hpp
++++ b/include/libdnf5/conf/config_main.hpp
+@@ -215,6 +215,10 @@ public:
+     OptionBool & get_build_cache_option();
+     const OptionBool & get_build_cache_option() const;
+ 
++    // snapshot time config vars
++    OptionString & get_snapshot_time_option();
++    const OptionString & get_snapshot_time_option() const;
++
+     // Repo main config
+     OptionNumber<std::uint32_t> & get_retries_option();
+     const OptionNumber<std::uint32_t> & get_retries_option() const;
+diff --git a/include/libdnf5/repo/config_repo.hpp b/include/libdnf5/repo/config_repo.hpp
+index 1582c4bc..c6506b28 100644
+--- a/include/libdnf5/repo/config_repo.hpp
++++ b/include/libdnf5/repo/config_repo.hpp
+@@ -136,6 +136,10 @@ public:
+     OptionString & get_enabled_metadata_option();
+     const OptionString & get_enabled_metadata_option() const;
+ 
++    // snapshot exclude option for each repo
++    OptionBool & get_snapshot_exclude_option();
++    const OptionBool & get_snapshot_exclude_option() const;
++
+     OptionChild<OptionString> & get_user_agent_option();
+     const OptionChild<OptionString> & get_user_agent_option() const;
+     OptionChild<OptionBool> & get_countme_option();
+diff --git a/libdnf5/CMakeLists.txt b/libdnf5/CMakeLists.txt
+index ddcee4fa..7eaeb83b 100644
+--- a/libdnf5/CMakeLists.txt
++++ b/libdnf5/CMakeLists.txt
+@@ -53,7 +53,7 @@ target_link_libraries(libdnf5 PRIVATE ${LIBMODULEMD_LIBRARIES})
+ 
+ pkg_check_modules(LIBSOLV REQUIRED libsolv>=0.7.25)
+ list(APPEND LIBDNF5_PC_REQUIRES "${LIBSOLV_MODULE_NAME}")
+-target_link_libraries(libdnf5 PRIVATE ${LIBSOLV_LIBRARIES})
++target_link_libraries(libdnf5 PUBLIC ${LIBSOLV_LIBRARIES})
+ 
+ pkg_check_modules(LIBSOLVEXT REQUIRED libsolvext>=0.7.7)
+ list(APPEND LIBDNF5_PC_REQUIRES_PRIVATE "${LIBSOLVEXT_MODULE_NAME}")
+diff --git a/libdnf5/conf/config_main.cpp b/libdnf5/conf/config_main.cpp
+index 379cfe27..f9b2fee1 100644
+--- a/libdnf5/conf/config_main.cpp
++++ b/libdnf5/conf/config_main.cpp
+@@ -220,6 +220,8 @@ class ConfigMain::Impl {
+     OptionString bugtracker_url{BUGTRACKER};
+     OptionBool zchunk{true};
+ 
++    OptionString snapshot_time{""};
++
+     OptionEnum<std::string> color{"auto", {"auto", "never", "always"}, [](const std::string & value) {
+                                       const std::array<const char *, 4> always{{"on", "yes", "1", "true"}};
+                                       const std::array<const char *, 4> never{{"off", "no", "0", "false"}};
+@@ -358,6 +360,9 @@ ConfigMain::Impl::Impl(Config & owner) : owner(owner) {
+     owner.opt_binds().add("pluginconfpath", pluginconfpath);
+     owner.opt_binds().add("persistdir", persistdir);
+ 
++    //snapshot var
++    owner.opt_binds().add("snapshot-time", snapshot_time);
++
+     // Unless transaction_history_dir has been explicitly set, use the system_state_dir as its default
+     owner.opt_binds().add(
+         "system_state_dir",
+@@ -1154,6 +1159,14 @@ const OptionBool & ConfigMain::get_build_cache_option() const {
+     return p_impl->build_cache;
+ }
+ 
++// snapshot time config
++OptionString & ConfigMain::get_snapshot_time_option() {
++    return p_impl->snapshot_time;
++}
++const OptionString & ConfigMain::get_snapshot_time_option() const {
++    return p_impl->snapshot_time;
++}
++
+ // Repo main config
+ OptionNumber<std::uint32_t> & ConfigMain::get_retries_option() {
+     return p_impl->retries;
+diff --git a/libdnf5/repo/config_repo.cpp b/libdnf5/repo/config_repo.cpp
+index 94c1b8c4..5f1396eb 100644
+--- a/libdnf5/repo/config_repo.cpp
++++ b/libdnf5/repo/config_repo.cpp
+@@ -39,6 +39,9 @@ class ConfigRepo::Impl {
+     ConfigMain & main_config;
+     std::string id;
+ 
++    // snapshot var
++    OptionBool snapshot_exclude{false};
++
+     OptionString name{""};
+     OptionChild<OptionBool> enabled{main_config.get_enabled_option()};
+     OptionChild<OptionString> basecachedir{main_config.get_cachedir_option()};
+@@ -103,6 +106,9 @@ ConfigRepo::Impl::Impl(Config & owner, ConfigMain & main_config, const std::stri
+     owner.opt_binds().add("mediaid", mediaid);
+     owner.opt_binds().add("gpgkey", gpgkey);
+ 
++    //snapshot var
++    owner.opt_binds().add("snapshot-exclude", snapshot_exclude);
++
+     owner.opt_binds().add(
+         "excludepkgs",
+         excludepkgs,
+@@ -560,6 +566,13 @@ const OptionChild<OptionBool> & ConfigRepo::get_build_cache_option() const {
+     return p_impl->build_cache;
+ }
+ 
++OptionBool & ConfigRepo::get_snapshot_exclude_option() {
++    return p_impl->snapshot_exclude;
++}
++const OptionBool & ConfigRepo::get_snapshot_exclude_option() const {
++    return p_impl->snapshot_exclude;
++}
++
+ 
+ std::string ConfigRepo::get_unique_id() const {
+     std::string tmp;
+diff --git a/libdnf5/repo/solv_repo.cpp b/libdnf5/repo/solv_repo.cpp
+index 54dba3eb..20daac3c 100644
+--- a/libdnf5/repo/solv_repo.cpp
++++ b/libdnf5/repo/solv_repo.cpp
+@@ -30,6 +30,7 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+ 
+ extern "C" {
+ #include <solv/chksum.h>
++#include <solv/repo.h>
+ #include <solv/repo_comps.h>
+ #include <solv/repo_deltainfoxml.h>
+ #include <solv/repo_repomdxml.h>
+@@ -38,6 +39,7 @@ extern "C" {
+ #include <solv/repo_solv.h>
+ #include <solv/repo_updateinfoxml.h>
+ #include <solv/repo_write.h>
++#include <solv/solv_xfopen.h>
+ }
+ 
+ 
+@@ -167,6 +169,354 @@ void checksum_calc(unsigned char * out, fs::File & file) {
+ }
+ 
+ 
++//#### XML FILTER CODE ####
++// Copy the nonXmlFormattedString to a formatted xmlString
++// all '&', '<', and '>' characters will be replaced with the xml escape
++// character versions of each in line.
++std::string escapeForXml(const std::string_view& nonXmlString) {
++    const char * amp = "&amp;";
++    const char * gt = "&gt;";
++    const char * lt = "&lt;";
++
++    std::string xmlString;
++
++    // Loop through string to lint looking for chars in need of escaping
++    for(auto it=nonXmlString.cbegin(); it!=nonXmlString.cend(); ++it) {
++        // check current char for escape character
++        switch (*it) {
++            case '&':
++                xmlString+=amp;
++                break;
++            case '>':
++                xmlString+=gt;
++                break;
++            case '<':
++                xmlString+=lt;
++                break;
++            default:
++                xmlString+=*it;
++
++        }
++    }
++    return xmlString;
++}
++
++// Function to recompose start elements of snapshot repo xml files
++// Adds name and all attributes to the start element being constructed, returns a string
++// containing the xml element
++std::string composeStartElement(const std::string_view& name, const XML_Char **ppAttrs) {
++    std::string element;
++
++    element+="<";
++    element+=name;
++
++    const XML_Char** pCurrAttr = ppAttrs;
++    while (*pCurrAttr != nullptr)
++    {
++        element+=" ";
++        element+=std::string_view( *pCurrAttr );
++        ++pCurrAttr;
++
++        element+="=\"";
++        element+=escapeForXml( *pCurrAttr );
++        element+="\"";
++        ++pCurrAttr;
++    }
++
++    element+=">";
++
++    return element;
++}
++
++// Function to recompose end elements of snapshot repo xml files
++// Adds name to the end element being constructed, returns a string
++// containing the xml element
++std::string composeEndElement(const std::string_view& name) {
++
++    std::string element;
++
++    element+="</";
++    element+=name;
++    element+=">";
++
++    return element;
++}
++
++// Function to compose and write start elements (with attributes) out to a file directly
++void printElementStartToFile(std::ofstream& outStream, const std::string_view& name, const XML_Char **ppAttrs) {
++
++    std::string startElement = composeStartElement(name, ppAttrs);
++    outStream.write(startElement.c_str(), startElement.length());
++}
++
++// Function to compose and write end elements out to a file directly
++void printElementEndToFile(std::ofstream& outStream, const std::string_view& name) {
++
++    std::string endElement = composeEndElement(name);
++    outStream.write(endElement.c_str(), endElement.length());
++}
++
++// expat callback to process new start elements in reop xmls
++// On a new start element, the time element being used to keep or remove a given
++// package needs to be found and determined if it is within the snapshot. If already found
++// the determinatation is cached on userData, and otherwise the previous elements will be
++// added to a temporary cache until the time element is found.
++void FilterStartCallback(void * userData, const XML_Char *name, const XML_Char **ppAttrs){
++    XMLFilterData * pTracking = static_cast<XMLFilterData*>(userData);
++
++    try
++    {
++        std::string newLine;
++        if (pTracking->nPrevElement != 0) {
++            newLine += "\n";
++        }
++
++        // increment depth
++        pTracking->nDepth += 1;
++        pTracking->nPrevElement = 0;
++        std::ofstream & outStream = *(pTracking->pOutStream);
++
++        // new package to parse or currently parsing package info
++        const std::string_view name_sv(name);
++        if (name_sv.compare("package") == 0 || pTracking->nInPackage) {
++            pTracking->nInPackage = 1;
++
++            // already found/checked time
++            if (pTracking->nTimeFound && pTracking->nPrintPackage) {
++                printElementStartToFile(outStream, name_sv, ppAttrs);
++
++            } else {  // still checking for time
++                if (name_sv.compare("time") == 0) {
++                    // time found
++                    // validate file POSIX time
++                    for (int i = 0; ppAttrs[i]; i += 2) {
++                        std::string_view attr(ppAttrs[i]);
++                        if (attr.compare("file") == 0) {
++                            // file time is the time the package is published to the repo
++                            // when this is less than our search time, allow the package to be
++                            // printed to the temp repo file, otherwise the current package
++                            // can be discarded.
++                            errno = 0;
++                            char * pszSnapshotTimeEnd = nullptr;
++                            long nCurrentPackageTime = strtoll(ppAttrs[i + 1], &pszSnapshotTimeEnd, 10);
++                            if (errno || pszSnapshotTimeEnd == ppAttrs[i + 1]) {
++                                //error
++                                return;
++                            }
++                            pTracking->nPrintPackage = (nCurrentPackageTime <= pTracking->nSearchTime);
++                            pTracking->nTimeFound = 1;
++                            break;
++                        }
++                    }
++                    if (pTracking->nPrintPackage) {
++                        // print buffer when time is found
++                        outStream.write(pTracking->elementBuffer.c_str(), pTracking->elementBuffer.length());
++                        printElementStartToFile(outStream, name_sv, ppAttrs);
++                    }
++                } else if (!pTracking->nTimeFound) {
++                    // if we haven't found a time yet, the element must be stored
++                    // add to file buffer
++                    std::string startElement;
++                    startElement = composeStartElement(name_sv, ppAttrs);
++                    pTracking->elementBuffer += startElement;
++                }
++            }
++        } else {  // not in a package or parsing a new package
++            printElementStartToFile(outStream, name_sv, ppAttrs);
++        }
++    }
++    catch(const std::exception& e)
++    {
++        std::cerr << "FilterStartCallback Exception: " << e.what() << '\n';
++        pTracking->bParseError = true;
++    }
++}
++
++// expat end element callback function for repo snapshot parsing
++// userData contains information about the current package. On the end of
++// a package we need to clean up and reset the current package data to blank
++void FilterEndCallback(void * userData, const XML_Char *name) {
++
++    // load tracking data
++    XMLFilterData * pTracking = static_cast<XMLFilterData*>(userData);
++
++    try
++    {
++        // decrement depth
++        pTracking->nDepth -= 1;
++        pTracking->nPrevElement = 2;
++
++        std::string_view name_sv(name);
++        if (!pTracking->nInPackage || pTracking->nPrintPackage) {
++            // print end element to file
++            std::ofstream & outStream = *(pTracking->pOutStream);
++            printElementEndToFile(outStream, name_sv);
++
++        } else if (pTracking->nInPackage && !pTracking->nTimeFound) {
++            std::string elementBuffer = composeEndElement(name_sv);
++            pTracking->elementBuffer += elementBuffer;
++
++        }  // else do nothing
++
++        if (name_sv.compare("package") == 0) {  // on end package, reset tracking function
++            // reset userData
++            pTracking->elementBuffer.clear();
++            pTracking->nInPackage = 0;
++            pTracking->nPrintPackage = 0;
++            pTracking->nTimeFound = 0;
++        }
++    }
++    catch(const std::exception& e)
++    {
++        std::cerr << "FilterEndCallback Exception: " << e.what() << '\n';
++        pTracking->bParseError = true;
++    }
++}
++
++// expat character data handler for parsing desciptions and other element content
++// Some elements have data inbetween the start and end such as descriptions. The
++// data needs to have escape characters handled and be cached, output, or discarded
++// depending on the snapshot being applied.
++void FilterCharDataHandler(void * userData, const XML_Char *pContent, int len) {
++    // load tracking data
++    XMLFilterData * pTracking = static_cast<XMLFilterData*>(userData);
++    try
++    {
++        pTracking->nPrevElement = 1;
++
++        std::string_view content(pContent, len);
++        std::string xmlFormattedString = escapeForXml(content);
++
++        // check params
++        if (!pTracking->nInPackage || pTracking->nPrintPackage) {
++            // print to file
++            std::ofstream& outStream = *(pTracking->pOutStream);
++            outStream.write(xmlFormattedString.c_str(), xmlFormattedString.length());
++        } else if (pTracking->nInPackage && !pTracking->nTimeFound) {
++            // add to buffer
++            pTracking->elementBuffer += xmlFormattedString;
++        }  // else do nothing (skipped package)
++    }
++    catch(const std::exception& e)
++    {
++         std::cerr << "FilterCharDataHandler Exception: " << e.what() << '\n';
++        pTracking->bParseError = true;
++    }
++}
++
++// setup function for repo snapshot logic
++bool SolvFilterFile(const std::string& inFilePath, const std::string& snapshotTime, std::string& outFilePath) {
++    // vars
++    const int XML_BUFSIZ=16*1024;
++    const int DEFAULT_TIME_FILTER_BUFF_SIZE = 16000;
++
++    std::ofstream outStream;
++    XMLFilterData filterContext;
++    time_t nSnapshotTime;
++    XML_Parser pParser = nullptr;
++    FILE * pbInFile = nullptr;
++    size_t bytes_read=0;
++
++    // convert snapshot string to time for use by the parser and the temp file name
++    errno = 0;
++    char * pszSnapshotTimeEnd = nullptr;
++    nSnapshotTime = strtoll(snapshotTime.c_str(), &pszSnapshotTimeEnd, 10);
++    if (errno || pszSnapshotTimeEnd == snapshotTime.c_str()) {
++        //error
++        return false;
++    }
++
++    std::filesystem::path path(inFilePath);
++
++    outFilePath = path.parent_path();
++    outFilePath += "/";
++    while (path.has_extension()) {
++        path = path.stem();
++    }
++    outFilePath += path.filename();
++    outFilePath += "-";
++    outFilePath += std::to_string(nSnapshotTime);
++    outFilePath += ".xml";
++
++    // init vars, load files
++    pbInFile = solv_xfopen(inFilePath.c_str(), "r");
++    if (!pbInFile) {
++        //error
++        goto cleanup;
++    }
++
++    //create parser
++    pParser = XML_ParserCreate(nullptr);
++    if (!pParser) {
++        //error
++        goto cleanup;
++    }
++
++    outStream.open( outFilePath.c_str(), std::ofstream::out );
++
++    filterContext.elementBuffer.reserve(DEFAULT_TIME_FILTER_BUFF_SIZE);
++    filterContext.nSearchTime = nSnapshotTime;
++    filterContext.nDepth = 0;
++    filterContext.nInPackage = 0;
++    filterContext.nPrintPackage = 0;
++    filterContext.nTimeFound = 0;
++    filterContext.pOutStream = &outStream;
++    filterContext.bParseError = false;
++
++    XML_SetUserData(pParser, &filterContext);
++    XML_SetElementHandler(pParser, FilterStartCallback, FilterEndCallback);
++    XML_SetCharacterDataHandler(pParser, FilterCharDataHandler);
++
++    //parse XML
++    outStream.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n", 39);
++
++    do {
++        // Get pointer to expat managed buffer
++        void * pXMLParseBuffer = XML_GetBuffer(pParser, XML_BUFSIZ);
++        if (!pXMLParseBuffer) {
++            std::cerr << "Couldn't allocate memory for buffer\n";
++            filterContext.bParseError = true;
++            break;
++        }
++
++        // Read content into the buffer
++        bytes_read = fread(pXMLParseBuffer, 1, XML_BUFSIZ - 1, pbInFile);
++        if (ferror(pbInFile)) {
++            std::cerr << "Failed reading input file\n";
++            filterContext.bParseError = true;
++            break;
++        }
++
++        // Direct expat to process the buffer
++        if (XML_ParseBuffer(pParser, static_cast<int>(bytes_read), bytes_read == 0) == XML_STATUS_ERROR) {
++            std::cerr   << "Parse error at line "
++                        << XML_GetCurrentLineNumber(pParser)
++                        << "\n"
++                        << XML_ErrorString(XML_GetErrorCode(pParser));
++            filterContext.bParseError = true;
++            break;
++        }
++    } while (bytes_read!=0);
++
++    outStream.write("\n", 1);
++
++cleanup:
++    if (pParser) {
++        XML_ParserFree(pParser);
++        pParser = nullptr;
++    }
++
++    if (pbInFile) {
++        fclose(pbInFile);
++        pbInFile = nullptr;
++    }
++
++    filterContext.pOutStream = nullptr;
++
++    return filterContext.bParseError;
++}
++// #### END XML SNAPSHOT FILTER CODE ####
++
+ static const char * repodata_type_to_name(RepodataType type) {
+     switch (type) {
+         case RepodataType::FILELISTS:
+@@ -236,6 +586,11 @@ SolvRepo::~SolvRepo() {
+ void SolvRepo::load_repo_main(const std::string & repomd_fn, const std::string & primary_fn) {
+     auto & logger = *base->get_logger();
+     auto & pool = get_rpm_pool(base);
++    auto & main_config = config.get_main_config();
++    std::string primary_snapshot_fn;
++    const std::string snapshot_time = main_config.get_snapshot_time_option().get_value();
++    bool isSnapshotRepo = !config.get_snapshot_exclude_option().get_value() && !snapshot_time.empty();
++
+ 
+     fs::File repomd_file(repomd_fn, "r");
+ 
+@@ -243,14 +598,25 @@ void SolvRepo::load_repo_main(const std::string & repomd_fn, const std::string &
+ 
+     int solvables_start = pool->nsolvables;
+ 
+-    if (load_solv_cache(pool, nullptr, 0)) {
+-        main_solvables_start = solvables_start;
+-        main_solvables_end = pool->nsolvables;
+ 
+-        return;
++    if (isSnapshotRepo) {
++        if (SolvFilterFile(primary_fn, snapshot_time, primary_snapshot_fn)) {
++            printf("snapshot filter failure\n");
++        }
++
++    } else {
++        if (load_solv_cache(pool, nullptr, 0)) {
++            main_solvables_start = solvables_start;
++            main_solvables_end = pool->nsolvables;
++
++            return;
++        }
+     }
+ 
+-    fs::File primary_file(primary_fn, "r", true);
++    const std::string & temp_fn = primary_snapshot_fn.empty() ? primary_fn : primary_snapshot_fn;
++
++    printf("primary fn used: %s\n",temp_fn.c_str());
++    fs::File primary_file(temp_fn, "r", true);
+ 
+     logger.debug("Loading repomd and primary for repo \"{}\"", config.get_id());
+     if (repo_add_repomdxml(repo, repomd_file.get(), 0) != 0) {
+@@ -265,14 +631,14 @@ void SolvRepo::load_repo_main(const std::string & repomd_fn, const std::string &
+         throw SolvError(
+             M_("Failed to load primary for repo \"{}\" from \"{}\": {}."),
+             config.get_id(),
+-            primary_fn,
++            temp_fn,
+             std::string(pool_errstr(*pool)));
+     }
+ 
+     main_solvables_start = solvables_start;
+     main_solvables_end = pool->nsolvables;
+ 
+-    if (config.get_build_cache_option().get_value()) {
++    if (!isSnapshotRepo && config.get_build_cache_option().get_value()) {
+         write_main(true);
+     }
+ }
+@@ -533,6 +899,13 @@ void SolvRepo::write_main(bool load_after_write) {
+     auto & logger = *base->get_logger();
+     auto & pool = get_rpm_pool(base);
+ 
++    //add snapshot check to exit here if present and excluded
++    const std::string snapshot_time = config.get_main_config().get_snapshot_time_option().get_value();
++    if (!config.get_snapshot_exclude_option().get_value() && !snapshot_time.empty()) {
++        // intentionally skip when snapshots
++        return;
++    }
++
+     const char * chksum = pool_bin2hex(*pool, checksum, solv_chksum_len(CHKSUM_TYPE));
+ 
+     const auto solvfile_path = solv_file_path();
+diff --git a/libdnf5/repo/solv_repo.hpp b/libdnf5/repo/solv_repo.hpp
+index f3f9b822..1501bab4 100644
+--- a/libdnf5/repo/solv_repo.hpp
++++ b/libdnf5/repo/solv_repo.hpp
+@@ -29,7 +29,9 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+ #include "libdnf5/repo/config_repo.hpp"
+ #include "libdnf5/utils/fs/file.hpp"
+ 
+-#include <solv/repo.h>
++#include <expat.h>
++#include <iostream>
++#include <fstream>
+ 
+ #include <filesystem>
+ 
+@@ -54,6 +56,25 @@ namespace libdnf5::repo {
+ using LibsolvRepo = ::Repo;
+ enum class RepodataType { FILELISTS, PRESTO, UPDATEINFO, COMPS, OTHER };
+ 
++typedef struct {
++    // frequently changed values
++    std::string elementBuffer;
++    int nInPackage;
++    int nPrintPackage;
++    int nTimeFound;
++
++    // managed values
++    int nDepth;
++    int nPrevElement; // enum 0 -> start, 1 -> data, 2 -> end
++
++    //set and forget on creation
++    time_t nSearchTime;
++    std::ofstream* pOutStream;
++    bool bParseError;
++} XMLFilterData;
++
++#define MAX_FILTER_INPUT_THRESHOLD 500000000
++
+ 
+ class SolvError : public Error {
+     using Error::Error;
+-- 
+2.34.1
+

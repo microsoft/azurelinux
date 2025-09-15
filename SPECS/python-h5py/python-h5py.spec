@@ -13,15 +13,17 @@ simplifies the process of reading and writing data from Python.
 Summary:        A Python interface to the HDF5 library
 Name:           h5py
 Version:        3.10.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.h5py.org/
 Source0:        https://files.pythonhosted.org/packages/source/h/h5py/h5py-%{version}.tar.gz
 
-# https://github.com/h5py/h5py/issues/2268
-Patch1:         0001-Fix-compiling-fileobj-file-driver-with-Cython-3.0.patch
+# https://github.com/h5py/h5py/issues/2268; https://github.com/h5py/h5py/pull/2345
+# The contents of this patch are in the main line after the 3.10.0 release tag.
+# It can be removed with the next upgrade.
+Patch1:         Cython-3-support.patch
 
 BuildRequires:  gcc
 BuildRequires:  hdf5-devel
@@ -69,7 +71,7 @@ export CFLAGS="%{optflags} -fopenmp"
 cd serial
 %py3_build
 cd -
- 
+
 # MPI
 export CC=mpicc
 export HDF5_MPI="ON"
@@ -83,7 +85,7 @@ export H5PY_SYSTEM_LZF=1
 cd serial
 %py3_install
 rm -rf %{buildroot}%{python3_sitearch}/h5py/tests
-cd - 
+cd -
 
 %files -n python%{python3_pkgversion}-h5py
 %license serial/licenses/*.txt
@@ -93,6 +95,9 @@ cd -
 %{python3_sitearch}/%{name}-%{version}-*.egg-info
 
 %changelog
+* Mon Mar 25 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 3.10.0-2
+- Fix Cython 3 support
+
 * Wed Feb 21 2024 Yash Panchal <yashpanchal@microsoft.com> - 3.10.0-1
 - Update to 3.10.0
 

@@ -1,0 +1,63 @@
+From dbc239002967e2e506f60dc5f7c73f91b92a46f4 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Tue, 7 May 2024 09:18:57 -0400
+Subject: [PATCH 30/31] init: Add homectl dbus access.
+
+homectl is used in the systemd-homed-activate.service ExecStop.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/system/init.te    |  4 ++++
+ policy/modules/system/systemd.if | 21 +++++++++++++++++++++
+ 2 files changed, 25 insertions(+)
+
+diff --git a/policy/modules/system/init.te b/policy/modules/system/init.te
+index 8578257b8..9ec685c74 100644
+--- a/policy/modules/system/init.te
++++ b/policy/modules/system/init.te
+@@ -1198,6 +1198,10 @@ ifdef(`init_systemd',`
+ 		# create /var/lock/lvm/
+ 		lvm_create_lock_dirs(initrc_t)
+ 	')
++
++	optional_policy(`
++		systemd_dbus_chat_homed(initrc_t)
++	')
+ ')
+ 
+ optional_policy(`
+diff --git a/policy/modules/system/systemd.if b/policy/modules/system/systemd.if
+index 28f0ad089..b7a392a13 100644
+--- a/policy/modules/system/systemd.if
++++ b/policy/modules/system/systemd.if
+@@ -1113,6 +1113,27 @@ interface(`systemd_PrivateDevices',`
+ 	fs_read_tmpfs_symlinks($1)
+ ')
+ 
++########################################
++## <summary>
++##   Send and receive messages from
++##   systemd homed over dbus.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`systemd_dbus_chat_homed',`
++	gen_require(`
++		type systemd_homed_t;
++		class dbus send_msg;
++	')
++
++	allow $1 systemd_homed_t:dbus send_msg;
++	allow systemd_homed_t $1:dbus send_msg;
++')
++
+ ######################################
+ ## <summary>
+ ##   Read and write systemd-homework semaphores.
+-- 
+2.45.0
+

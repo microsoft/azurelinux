@@ -6,7 +6,7 @@ as produced by ast.parse from the standard ast module.}
 Summary:        Python AST that abstracts the underlying Python version
 Name:           python-gast
 Version:        0.5.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,9 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-packaging
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
+%if 0%{?with_check}
+BuildRequires:  python3-pytest
+%endif
 BuildArch:      noarch
 
 %description %{_description}
@@ -43,15 +46,16 @@ Summary:        %{summary}
 
 
 %check
-pip3 install tox tox-current-env pytest==7.1.3
-%tox
-
+%pytest
 
 %files -n python3-gast -f %{pyproject_files}
 %license LICENSE
 %doc README.rst
 
 %changelog
+* Tue May 13 2025 Riken Maharjan <rmaharjan@microsoft.com> - 0.5.4-2
+- Fix Ptest by using pytest instead of tox.
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.5.4-1
 - Auto-upgrade to 0.5.4 - Azure Linux 3.0 - package upgrades
 

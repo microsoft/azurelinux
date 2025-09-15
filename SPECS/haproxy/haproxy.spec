@@ -1,16 +1,17 @@
 Summary:        A fast, reliable HA, load balancing, and proxy solution.
 Name:           haproxy
-Version:        2.9.1
-Release:        1%{?dist}
+Version:        2.9.11
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.haproxy.org
 Source0:        https://www.haproxy.org/download/2.9/src/%{name}-%{version}.tar.gz
+Patch0:         CVE-2025-32464.patch
 BuildRequires:  lua-devel
 BuildRequires:  openssl-devel
-BuildRequires:  pcre-devel
+BuildRequires:  pcre2-devel
 BuildRequires:  pkg-config
 BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
@@ -29,11 +30,11 @@ It contains the documentation and manpages for haproxy package.
 Requires:       %{name} = %{version}-%{release}
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
-make %{?_smp_mflags} TARGET="linux-glibc" USE_PCRE=1 USE_OPENSSL=1 \
-        USE_GETADDRINFO=1 USE_ZLIB=1 USE_SYSTEMD=1
+make %{?_smp_mflags} TARGET="linux-glibc" USE_PCRE2=1 USE_OPENSSL=1 \
+        USE_GETADDRINFO=1 USE_ZLIB=1 USE_SYSTEMD=1 USE_PROMEX=1
 make %{?_smp_mflags} -C admin/systemd
 sed -i s/"local\/"/""/g admin/systemd/haproxy.service
 sed -i "s/\/run/\/var\/run/g" admin/systemd/haproxy.service
@@ -59,6 +60,19 @@ install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/hapr
 %{_mandir}/*
 
 %changelog
+* Mon Apr 14 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.9.11-3
+- Patch CVE-2025-32464
+
+* Thu Jan 23 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.9.11-2
+- Support for Prometheus exporter in HAProxy
+
+* Wed Sep 25 2024 Archana Choudhary <archana1@microsoft.com> - 2.9.11-1
+- Upgrade to 2.9.11
+- Fix CVE-2024-45506
+
+* Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 2.9.1-2
+- Move from pcre to pcre2
+
 * Tue Jan 02 2024 Muhammad Falak <mwani@microsoft.com> - 2.9.1-1
 - Update version to 2.9.1
 

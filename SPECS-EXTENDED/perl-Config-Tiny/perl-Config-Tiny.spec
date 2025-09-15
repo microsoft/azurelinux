@@ -6,10 +6,10 @@
 %endif
 
 Name:		perl-Config-Tiny
-Version:	2.24
-Release:	4%{?dist}
+Version:	2.30
+Release:	1%{?dist}
 Summary:	Perl module for reading and writing .ini style configuration files
-License:	GPL+ or Artistic
+License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Config-Tiny
@@ -28,8 +28,8 @@ BuildRequires:	perl(strict)
 # Test Suite
 BuildRequires:	perl(File::Spec) >= 3.30
 BuildRequires:	perl(File::Temp) >= 0.22
-BuildRequires:	perl(Test::More) >= 0.47
-BuildRequires:	perl(UNIVERSAL)
+BuildRequires:	perl(Test::More) >= 1.001002
+BuildRequires:	perl(UNIVERSAL::isa)
 BuildRequires:	perl(utf8)
 %if %{with perl_Config_Tiny_enables_extra_test}
 # Extra Tests
@@ -40,8 +40,6 @@ BuildRequires:	perl(Test::MinimumVersion) >= 0.101080
 %endif
 BuildRequires:	perl(Test::Pod) >= 1.44
 %endif
-# Runtime
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 Config::Tiny is a Perl module designed for reading and writing .ini
@@ -73,6 +71,10 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))" AUTOMATED_TESTING=1
 %{_mandir}/man3/Config::Tiny.3*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 2.30-1
+- Update to version 2.30
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.24-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

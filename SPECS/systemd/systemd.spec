@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        9%{?dist}
+Release:        23%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -96,6 +96,7 @@ Source14:       10-oomd-defaults.conf
 Source15:       10-oomd-per-slice-defaults.conf
 Source16:       10-timeout-abort.conf
 Source17:       10-map-count.conf
+Source18:       10-console-messages.conf
 
 Source21:       macros.sysusers
 Source22:       sysusers.attr
@@ -121,16 +122,27 @@ GIT_DIR=../../src/systemd/.git git diffab -M v233..master@{2017-06-15} -- hwdb/[
 # Drop when dracut-060 is available.
 Patch0001:      https://github.com/systemd/systemd/pull/26494.patch
 
-
 # Those are downstream-only patches, but we don't want them in packit builds:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1738828
-Patch0490:      use-bfq-scheduler.patch
+%if 0%{?azl}
+# On Azure, it is recommended to use an i/o scheduler that passes the scheduling
+# decisions to the underlying Hyper-V hypervisor. In our case, we should use
+# the "none" scheduler, which is also ideal for fast random I/O devices like
+# NVMe. So we update Fedora's bfq patch to change the udev rule to select "none"
+# instead of Fedora's default Budget Fair Queuing (bfq) and rename the patch
+# from referencing "bfq" to "none".
+Patch0490:      use-none-scheduler.patch
+%endif
 
 # Adjust upstream config to use our shared stack
-Patch0491:      fedora-use-system-auth-in-pam-systemd-user.patch
+# NOTE: the patch was based on the fedora patch, but renamed to
+# 'azurelinux-...' and modified for our 'system-*' pam files
+Patch0491:      azurelinux-use-system-auth-in-pam-systemd-user.patch
 
 # Patches for Azure Linux
-Patch0900: do-not-test-openssl-sm3.patch
+Patch0900:      do-not-test-openssl-sm3.patch
+Patch0901:      networkd-default-use-domains.patch
+Patch0902:      CVE-2023-7008.patch
 
 %ifarch %{ix86} x86_64 aarch64
 %global want_bootloader 1
@@ -227,6 +239,9 @@ BuildRequires:  python3dist(zstd)
 %if 0%{?want_bootloader}
 BuildRequires:  python3dist(pyelftools)
 %endif
+%if 0%{?with_check}
+BuildRequires:  python3dist(pyflakes)
+%endif
 # gzip and lzma are provided by the stdlib
 BuildRequires:  firewalld-filesystem
 BuildRequires:  libseccomp-devel
@@ -300,8 +315,6 @@ Conflicts:      %{name}-standalone-shutdown < %{version}-%{release}^
 Provides:       %{name}-shutdown = %{version}-%{release}
 
 # Recommends to replace normal Requires deps for stuff that is dlopen()ed
-Recommends:     libidn2.so.0%{?elf_suffix}
-Recommends:     libidn2.so.0(IDN2_0.0.0)%{?elf_bits}
 Recommends:     libpcre2-8.so.0%{?elf_suffix}
 Recommends:     libpwquality.so.1%{?elf_suffix}
 Recommends:     libpwquality.so.1(LIBPWQUALITY_1.0)%{?elf_bits}
@@ -466,20 +479,21 @@ This package provides ukify, a script that combines a kernel image, an initrd,
 with a command line, and possibly PCR measurements and other metadata, into a
 Unified Kernel Image (UKI).
 
-%package boot-unsigned
+%package boot
 Summary: UEFI boot manager (unsigned version)
 
-Provides: systemd-boot-unsigned-%{efi_arch} = %version-%release
+Provides: systemd-boot-%{efi_arch} = %version-%release
 Provides: systemd-boot = %version-%release
 Provides: systemd-boot%{_isa} = %version-%release
 # A provides with just the version, no release or dist, used to build systemd-boot
-Provides: version(systemd-boot-unsigned) = %version
-Provides: version(systemd-boot-unsigned)%{_isa} = %version
+Provides: version(systemd-boot) = %version
+Provides: version(systemd-boot)%{_isa} = %version
 
 # self-obsoletes to install both packages after split of systemd-boot
 Obsoletes:      systemd-udev < 252.2^
+Conflicts:      grub2-efi-binary
 
-%description boot-unsigned
+%description boot
 systemd-boot (short: sd-boot) is a simple UEFI boot manager. It provides a
 graphical menu to select the entry to boot and an editor for the kernel command
 line. systemd-boot supports systems with UEFI firmware only.
@@ -532,6 +546,8 @@ Requires:       %{name}%{_isa} = %{version}-%{release}
 License:        LGPL-2.1-or-later
 # https://src.fedoraproject.org/rpms/systemd/pull-request/34
 Obsoletes:      systemd < 246.6-2
+Recommends:     libidn2.so.0%{?elf_suffix}
+Recommends:     libidn2.so.0(IDN2_0.0.0)%{?elf_bits}
 
 %description networkd
 systemd-networkd is a system service that manages networks. It detects and
@@ -703,7 +719,12 @@ CONFIGURE_OPTS=(
         -Ddefault-dns-over-tls=no
         # https://bugzilla.redhat.com/show_bug.cgi?id=1867830
         -Ddefault-mdns=no
+%if 0%{?azl}
+        # By default, disable llmnr to prevent llmnr poisoning MitM attacks
+        -Ddefault-llmnr=no
+%else
         -Ddefault-llmnr=resolve
+%endif
         # https://bugzilla.redhat.com/show_bug.cgi?id=2028169
         -Dstatus-unit-format-default=combined
         # https://fedoraproject.org/wiki/Changes/Shorter_Shutdown_Timer
@@ -853,6 +874,10 @@ install -Dm0644 10-timeout-abort.conf.user %{buildroot}%{user_unit_dir}/service.
 # https://fedoraproject.org/wiki/Changes/IncreaseVmMaxMapCount
 install -Dm0644 -t %{buildroot}%{_prefix}/lib/sysctl.d/ %{SOURCE17}
 
+%if 0%{?azl}
+install -Dm0644 -t %{buildroot}%{_prefix}/lib/sysctl.d/ %{SOURCE18}
+%endif
+
 sed -i 's|#!/usr/bin/env python3|#!%{__python3}|' %{buildroot}/usr/lib/systemd/tests/run-unit-tests.py
 
 install -m 0644 -D -t %{buildroot}%{_rpmconfigdir}/macros.d/ %{SOURCE21}
@@ -869,6 +894,15 @@ ln -s --relative %{buildroot}%{_bindir}/kernel-install %{buildroot}%{_sbindir}/i
 
 # Split files in build root into rpms
 python3 %{SOURCE2} %buildroot %{!?want_bootloader:--no-bootloader}
+
+%if 0%{?want_bootloader}
+mkdir -p %{buildroot}/boot/efi/EFI/BOOT
+%ifarch x86_64
+cp %{buildroot}/usr/lib/systemd/boot/efi/systemd-bootx64.efi %{buildroot}/boot/efi/EFI/BOOT/grubx64.efi
+%elifarch aarch64
+cp %{buildroot}/usr/lib/systemd/boot/efi/systemd-bootaa64.efi %{buildroot}/boot/efi/EFI/BOOT/grubaa64.efi
+%endif
+%endif
 
 %check
 %if %{with tests}
@@ -1153,7 +1187,12 @@ fi
 
 %if 0%{?want_bootloader}
 %files ukify -f .file-list-ukify
-%files boot-unsigned -f .file-list-boot
+%files boot -f .file-list-boot
+%ifarch x86_64
+/boot/efi/EFI/BOOT/grubx64.efi
+%elifarch aarch64
+/boot/efi/EFI/BOOT/grubaa64.efi
+%endif
 %endif
 
 %files container -f .file-list-container
@@ -1189,6 +1228,50 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Mon Aug 18 2025 Sean Dougherty <sdougherty@microsoft.com> - 255-23
+- Bump release to match systemd-boot-signed spec
+
+* Tue Aug 05 2025 Chris Co <chrco@microsoft.com> - 255-22 
+- enable building ukify and sd-boot on arm64
+- enable pyflakes buildrequires which is needed for ukify testing
+
+* Mon Apr 14 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 255-21
+- Bumping 'Release' tag to match the 'signed' version of the spec.
+
+* Fri Jan 10 2025 Aditya Dubey <adityadubey@microsoft.com> - 255-20
+- adding patch for enhancing DNSSEC signature validation integrity
+- addresses CVE-2023-7008
+
+* Thu Dec 12 2024 Daniel McIlvaney <damcilva@microsoft.com> - 255-19
+- Version bump to force signing with new Azure Linux secure boot key
+
+* Fri Sep 13 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-18
+- Install systemd-boot binary to ESP
+
+* Fri Aug 23 2024 Chris Co <chrco@microsoft.com> - 255-17
+- Change bfq scheduler patch to select "none" i/o scheduler
+
+* Wed Jul 10 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-16
+- Update tag to build systemd-boot exclusively on x86_64
+
+* Tue Jun 25 2024 Thien Trung Vuong <tvuong@microsoft.com> - 255-15
+- Rename systemd-boot-unsigned to systemd-boot
+
+* Thu Jun 13 2024 Chris Co <chrco@microsoft.com> - 255-14
+- Disable LLMNR by default to prevent LLMNR poisoning MitM attacks
+
+* Thu May 02 2024 Rachel Menge <rachelmenge@microsoft.com> - 255-13
+- Supply 10-console-messages.conf sysctl to lower the default kernel messages to the console
+
+* Thu Apr 25 2024 Dan Streetman <ddstreet@microsoft.com> - 255-12
+- move libidn2 recommends from core package to systemd-networkd
+
+* Wed Apr 24 2024 Dan Streetman <ddstreet@microsoft.com> - 255-11
+- adjust pam.d/systemd-user file to include correct pam files
+
+* Mon Apr 15 2024 Henry Li <lihl@microsoft.com> - 255-10
+- Add patch to allow configurability of "UseDomains=" for networkd
+
 * Wed Mar 20 2024 Dan Streetman <ddstreet@microsoft.com> - 255-9
 - build dep the "bootstrap" macros because our maint scripts are broken without
   our rpm macros available during the build
@@ -1196,7 +1279,7 @@ rm -f %{name}.lang
 * Mon Mar 11 2024 Daniel McIlvaney <damcilva@microsoft.com> - 255-8
 - Obsolete the new systemd-bootstrap-libs subpacakge.
 
-* Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 255-7
+* Thu Feb 29 2024 Dan Streetman <ddstreet@microsoft.com> - 255-7
 - remove use of %%azure (or %%azl) macro
 
 * Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 255-6

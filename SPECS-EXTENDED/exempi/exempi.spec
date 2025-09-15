@@ -1,13 +1,16 @@
 Summary:	Library for easy parsing of XMP metadata
 Name:		exempi
-Version:	2.6.1
-Release:	2%{?dist}
+Version:	2.6.5
+Release:	1%{?dist}
 License:	BSD
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:		http://libopenraw.freedesktop.org/wiki/Exempi
 Source0:	https://gitlab.freedesktop.org/libopenraw/%{name}/-/archive/%{version}/%{name}-%{version}.tar.bz2
-Patch0:		exempi-e23c213-typeinfos.patch
+
 BuildRequires:	gcc-c++
 BuildRequires:	boost-devel expat-devel zlib-devel pkgconfig
+
 # Work around for aarch64 support (https://bugzilla.redhat.com/show_bug.cgi?id=925327)
 BuildRequires:	autoconf automake libtool
 BuildRequires: make
@@ -42,8 +45,15 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
 %make_build
 
+
 %check
+%ifarch s390x
+# testcore test fails on big endian arches since exempi 2.5.2:
+# https://gitlab.freedesktop.org/libopenraw/exempi/-/issues/23
+make check || [ "$(grep '^FAIL:' exempi/test-suite.log)" = "FAIL: tests/testcore" ]
+%else
 make check
+%endif
 
 %install
 %make_install
@@ -64,6 +74,10 @@ rm -rf %{buildroot}%{_libdir}/*.a
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Oct 21 2024 Jyoti kanase <v-jykanase@microsoft.com> - 2.6.5-1
+- Update to version 2.6.5
+- License verified
+
 * Tue Aug 16 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.6.1-2
 - Bump to rebuild with zlib 1.2.1-2 (fixes CVE-2022-37434)
 

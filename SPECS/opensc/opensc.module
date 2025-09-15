@@ -1,5 +1,6 @@
 # This file describes how to load the opensc module
-# See: http://p11-glue.freedesktop.org/doc/p11-kit/config.html
+# See: https://p11-glue.github.io/p11-glue/p11-kit/manual/pkcs11-conf.html
+# or man pkcs11.conf
 
 # This is a relative path, which means it will be loaded from
 # the p11-kit default path which is usually $(libdir)/pkcs11.

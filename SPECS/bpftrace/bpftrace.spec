@@ -1,13 +1,14 @@
 Summary:        Berkeley Packet Filter Tracing Language
 Name:           bpftrace
-Version:        0.19.1
+Version:        0.23.5
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
-URL:            https://github.com/iovisor/bpftrace
+URL:            https://github.com/bpftrace/bpftrace
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         0001-Remove-cstring_view.patch
 BuildRequires:  bcc-devel
 BuildRequires:  binutils-devel
 BuildRequires:  bison
@@ -21,7 +22,7 @@ BuildRequires:  gcc
 BuildRequires:  git
 BuildRequires:  libbpf-devel
 BuildRequires:  libpcap-devel
-BuildRequires:  llvm-devel >= 12.0.1-1
+BuildRequires:  llvm-devel >= 18
 BuildRequires:  make
 BuildRequires:  systemtap-sdt-devel
 BuildRequires:  vim-extra
@@ -32,7 +33,7 @@ Requires:       clang
 Requires:       glibc
 Requires:       libgcc
 Requires:       libstdc++
-Requires:       llvm >= 12.0.1-1
+Requires:       llvm >= 18
 %if 0%{?with_check}
 BuildRequires:  gmock
 BuildRequires:  gmock-devel
@@ -55,16 +56,22 @@ cd build
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DBUILD_SHARED_LIBS:BOOL=OFF \
     -DUSE_SYSTEM_BPF_BCC:BOOL=ON \
-%if !%{with_check}
-    -DBUILD_TESTING=0 \
+%if 0%{?with_check}
+    -DBUILD_TESTING:BOOL=ON \
+%else
+    -DBUILD_TESTING:BOOL=OFF \
 %endif
     ..
 
-make bpftrace
+make
 
 %check
 cd build
-make test
+%ifarch aarch64
+BPFTRACE_UPDATE_TESTS=1 ./tests/bpftrace_test --gtest_filter=-codegen.* --rerun-failed --output-on-failure
+%else
+./tests/bpftrace_test --rerun-failed --output-on-failure
+%endif
 
 %install
 mkdir -p %{buildroot}%{_bindir}/
@@ -80,6 +87,15 @@ install -p -m 644 tools/*.txt %{buildroot}%{_datadir}/bpftrace/tools/doc
 %{_datadir}/bpftrace/tools
 
 %changelog
+* Thu Jul 24 2025 Sriram Nambakam <snambakam@microsoft.com> - 0.23.5-1
+- Upgrade version to 0.23.5
+- This version has LLVM18 support. Therefore remove corresponding patch.
+- Apply patch to disable cstring_view null termination check.
+
+* Thu Apr 18 2024 Andrew Phelps <anphel@microsoft.com> - 0.20.3-1
+- Upgrade version to 0.20.3
+- Add patch to support building with LLVM 18
+
 * Thu Jan 04 2024 Muhammad Falak <mwani@microsoft.com> - 0.19.1-1
 - Upgrade version to 0.19.1
 - Use system libbpf

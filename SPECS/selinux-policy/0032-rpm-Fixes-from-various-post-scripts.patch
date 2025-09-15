@@ -1,0 +1,63 @@
+From ece12a30c46bb4f6bd310838b42c4b5b6244fd5b Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 13 May 2024 09:40:36 -0400
+Subject: [PATCH 32/32] rpm: Fixes from various %post scripts.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/admin/bootloader.te  | 2 +-
+ policy/modules/admin/rpm.te         | 2 ++
+ policy/modules/system/unconfined.te | 4 ++++
+ 3 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/admin/bootloader.te b/policy/modules/admin/bootloader.te
+index 4e097a1b9..5b3be2d5b 100644
+--- a/policy/modules/admin/bootloader.te
++++ b/policy/modules/admin/bootloader.te
+@@ -43,7 +43,7 @@ dev_node(bootloader_tmp_t)
+ 
+ allow bootloader_t self:capability { chown dac_override dac_read_search fsetid mknod setgid sys_admin sys_rawio };
+ dontaudit bootloader_t self:capability { net_admin sys_resource };
+-allow bootloader_t self:process { signal_perms execmem };
++allow bootloader_t self:process { getsched signal_perms execmem };
+ allow bootloader_t self:fifo_file rw_fifo_file_perms;
+ 
+ allow bootloader_t bootloader_etc_t:file read_file_perms;
+diff --git a/policy/modules/admin/rpm.te b/policy/modules/admin/rpm.te
+index a646d0cef..41253a4e2 100644
+--- a/policy/modules/admin/rpm.te
++++ b/policy/modules/admin/rpm.te
+@@ -271,6 +271,7 @@ allow rpm_script_t self:shm create_shm_perms;
+ allow rpm_script_t self:sem create_sem_perms;
+ allow rpm_script_t self:msgq create_msgq_perms;
+ allow rpm_script_t self:msg { send receive };
++allow rpm_script_t self:alg_socket create_stream_socket_perms;
+ allow rpm_script_t self:netlink_kobject_uevent_socket create_socket_perms;
+ 
+ allow rpm_script_t rpm_t:netlink_route_socket { read write };
+@@ -300,6 +301,7 @@ kernel_read_system_state(rpm_script_t)
+ kernel_read_network_state(rpm_script_t)
+ kernel_list_all_proc(rpm_script_t)
+ kernel_read_software_raid_state(rpm_script_t)
++kernel_request_load_module(rpm_script_t)
+ 
+ corenet_all_recvfrom_netlabel(rpm_script_t)
+ corenet_tcp_sendrecv_generic_if(rpm_script_t)
+diff --git a/policy/modules/system/unconfined.te b/policy/modules/system/unconfined.te
+index 6c9769b04..ccde6cc06 100644
+--- a/policy/modules/system/unconfined.te
++++ b/policy/modules/system/unconfined.te
+@@ -214,6 +214,10 @@ optional_policy(`
+ 	tzdata_run(unconfined_t, unconfined_r)
+ ')
+ 
++optional_policy(`
++	udev_run_udevadm(unconfined_t, unconfined_r)
++')
++
+ optional_policy(`
+ 	unconfined_dbus_chat(unconfined_t)
+ ')
+-- 
+2.45.0
+

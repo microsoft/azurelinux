@@ -1,11 +1,15 @@
+%define full_version %{version}.0
+%define commit_hash gdfea26
+
 Summary:        C11 Annex K functions
 Name:           libsafec
-Version:        3.7.1
+Version:        3.8.1
 Release:        2%{?dist}
 License:        MIT
 URL:            https://github.com/rurban/safeclib
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        https://github.com/rurban/safeclib/releases/download/v%{version}/safeclib-%{version}.tar.xz
-Patch0:         libsafec-3.7.1-issue119.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  awk
@@ -33,7 +37,7 @@ Summary:        Tools to detect use of unsafe libc APIs
 Tools to detect use of unsafe libc APIs
 
 %prep
-%autosetup -n safeclib-%{version} -p1
+%autosetup -n safeclib-%{full_version}-%{commit_hash} -p1
 
 %build
 autoreconf -Wall --install
@@ -68,6 +72,12 @@ find %{buildroot} -type f -name "*.pc" -delete -print
 %{_mandir}/man1/*
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.8.1-2
+- Add missing Vendor and Distribution tags.
+
+* Thu Aug 29 2024 Andrew Phelps <anphel@microsoft.com> - 3.8.1-1
+- Upgrade to version 3.8.1
+
 * Wed Jul 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 3.7.1-2
 - Don't emit runtime safety check when getenv fails to find variable.
 

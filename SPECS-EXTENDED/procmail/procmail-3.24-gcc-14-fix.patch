@@ -1,0 +1,241 @@
+diff --git a/initmake b/initmake
+index b901add..703d651 100755
+--- a/initmake
++++ b/initmake
+@@ -124,7 +124,7 @@ else
+ fi
+ 
+ cat >_autotst.c <<HERE
+-main()
++int main()
+ { return 0;
+ }
+ HERE
+@@ -200,7 +200,7 @@ cat >_autotst.c <<HERE
+ #include <sys/types.h>
+ #include <stdio.h>
+ #include <sys/stat.h>
+-main()
++int main()
+ { struct stat buf;return!&buf;
+ }
+ HERE
+diff --git a/src/autoconf b/src/autoconf
+index deb97c1..c3f2576 100755
+--- a/src/autoconf
++++ b/src/autoconf
+@@ -361,6 +361,7 @@ cat >_autotst.c <<HERE
+ #include <unistd.h>		/* getpid() getppid() */
+ #endif
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <time.h>
+ #include <fcntl.h>
+ #include <signal.h>		/* SIGKILL */
+@@ -414,6 +415,16 @@ cat >_autotst.c <<HERE
+ int dolock,child[NR_of_forks],timeout,fdcollect;
+ char dirlocktest[]="_locktest";
+ 
++int killchildren()
++{ int i;
++  i=NR_of_forks;
++  do
++     if(child[--i]>0)
++	kill(child[i],SIGTERM),child[i]=0;
++  while(i);
++  return 0;
++}
++
+ void stimeout()
+ { timeout=1;close(fdcollect);killchildren();
+ }
+@@ -435,7 +446,79 @@ unsigned sfork()
+   return pid;
+ }
+ 
+-int main(argc,argv)char*argv[];
++static int oldfdlock;
++#ifdef F_SETLKW
++static struct flock flck;		/* why can't it be a local variable? */
++#endif
++#ifdef F_LOCK
++static off_t oldlockoffset;
++#endif
++
++int fdlock(int fd)
++{ int i;unsigned gobble[GOBBLE>>2];
++  for(i=GOBBLE>>2;i;gobble[--i]=~(unsigned)0);		 /* SunOS crash test */
++  oldfdlock=fd;fd=0;
++  if(MSK_fcntl&dolock)
++#ifdef F_SETLKW
++   { static unsigned extra;
++     flck.l_type=F_WRLCK;flck.l_whence=SEEK_SET;flck.l_start=tell(oldfdlock);
++     if(!extra--)
++	extra=MIN_locks/4,flck.l_len=2,i|=fcntl(oldfdlock,F_SETLK,&flck);
++     flck.l_len=0;fd|=fcntl(oldfdlock,F_SETLKW,&flck);
++   }
++#else
++     fd=1;
++#endif
++  if(MSK_lockf&dolock)
++#ifdef F_LOCK
++     oldlockoffset=tell(oldfdlock),fd|=lockf(oldfdlock,F_LOCK,(off_t)0);
++#else
++     fd=1;
++#endif
++  if(MSK_flock&dolock)
++#ifdef LOCK_EX
++     fd|=flock(oldfdlock,LOCK_EX);
++#else
++     fd=1;
++#endif
++  return fd;
++}
++
++int sfdlock(int fd)
++{ int i;unsigned gobble[GOBBLE>>2];
++  for(i=GOBBLE>>2;i;gobble[--i]=~(unsigned)0);		 /* SunOS crash test */
++  return fdlock(fd);
++}
++
++int fdunlock()
++{ int i;unsigned gobble[GOBBLE];
++  for(i=GOBBLE;i;gobble[--i]=~(unsigned)0);  /* some SunOS libs mess this up */
++  if(MSK_flock&dolock)
++#ifdef LOCK_EX
++     i|=flock(oldfdlock,LOCK_UN);
++#else
++     i=1;
++#endif
++  if(MSK_lockf&dolock)
++#ifdef F_LOCK
++   { lseek(oldfdlock,oldlockoffset,SEEK_SET);
++     i|=lockf(oldfdlock,F_LOCK,(off_t)2);i|=lockf(oldfdlock,F_ULOCK,(off_t)0);
++   }
++#else
++     i=1;
++#endif
++  if(MSK_fcntl&dolock)
++#ifdef F_SETLKW
++     flck.l_type=F_UNLCK,flck.l_len=0,i|=fcntl(oldfdlock,F_SETLK,&flck);
++#else
++     i=1;
++#endif
++  if(!i)
++     for(i=GOBBLE;i&&gobble[--i]==~(unsigned)0;);
++  return i;
++}
++
++int main(argc,argv)int argc;char*argv[];
+ { int goodlock,testlock,i,pip[2],pipw[2];time_t otimet;unsigned dtimet;
+   static char filename[]="_locktst.l0";
+   close(0);goodlock=0;testlock=FIRST_lock;signal(SIGPIPE,SIG_DFL);
+@@ -574,88 +657,6 @@ skip_tests:
+   puts("Kernel-locking tests completed.");fprintf(stderr,"\n");
+   return EXIT_SUCCESS;
+ }
+-
+-int killchildren()
+-{ int i;
+-  i=NR_of_forks;
+-  do
+-     if(child[--i]>0)
+-	kill(child[i],SIGTERM),child[i]=0;
+-  while(i);
+-  return 0;
+-}
+-
+-int sfdlock(fd)
+-{ int i;unsigned gobble[GOBBLE>>2];
+-  for(i=GOBBLE>>2;i;gobble[--i]=~(unsigned)0);		 /* SunOS crash test */
+-  return fdlock(fd);
+-}
+-
+-static oldfdlock;
+-#ifdef F_SETLKW
+-static struct flock flck;		/* why can't it be a local variable? */
+-#endif
+-#ifdef F_LOCK
+-static off_t oldlockoffset;
+-#endif
+-
+-int fdlock(fd)
+-{ int i;unsigned gobble[GOBBLE>>2];
+-  for(i=GOBBLE>>2;i;gobble[--i]=~(unsigned)0);		 /* SunOS crash test */
+-  oldfdlock=fd;fd=0;
+-  if(MSK_fcntl&dolock)
+-#ifdef F_SETLKW
+-   { static unsigned extra;
+-     flck.l_type=F_WRLCK;flck.l_whence=SEEK_SET;flck.l_start=tell(oldfdlock);
+-     if(!extra--)
+-	extra=MIN_locks/4,flck.l_len=2,i|=fcntl(oldfdlock,F_SETLK,&flck);
+-     flck.l_len=0;fd|=fcntl(oldfdlock,F_SETLKW,&flck);
+-   }
+-#else
+-     fd=1;
+-#endif
+-  if(MSK_lockf&dolock)
+-#ifdef F_LOCK
+-     oldlockoffset=tell(oldfdlock),fd|=lockf(oldfdlock,F_LOCK,(off_t)0);
+-#else
+-     fd=1;
+-#endif
+-  if(MSK_flock&dolock)
+-#ifdef LOCK_EX
+-     fd|=flock(oldfdlock,LOCK_EX);
+-#else
+-     fd=1;
+-#endif
+-  return fd;
+-}
+-
+-int fdunlock()
+-{ int i;unsigned gobble[GOBBLE];
+-  for(i=GOBBLE;i;gobble[--i]=~(unsigned)0);  /* some SunOS libs mess this up */
+-  if(MSK_flock&dolock)
+-#ifdef LOCK_EX
+-     i|=flock(oldfdlock,LOCK_UN);
+-#else
+-     i=1;
+-#endif
+-  if(MSK_lockf&dolock)
+-#ifdef F_LOCK
+-   { lseek(oldfdlock,oldlockoffset,SEEK_SET);
+-     i|=lockf(oldfdlock,F_LOCK,(off_t)2);i|=lockf(oldfdlock,F_ULOCK,(off_t)0);
+-   }
+-#else
+-     i=1;
+-#endif
+-  if(MSK_fcntl&dolock)
+-#ifdef F_SETLKW
+-     flck.l_type=F_UNLCK,flck.l_len=0,i|=fcntl(oldfdlock,F_SETLK,&flck);
+-#else
+-     i=1;
+-#endif
+-  if(!i)
+-     for(i=GOBBLE;i&&gobble[--i]==~(unsigned)0;);
+-  return i;
+-}
+ HERE
+ 
+ if $MAKE _autotst >_autotst.rrr 2>&1
+@@ -1029,6 +1030,10 @@ cat >_autotst.c <<HERE
+ #ifndef NO_COMSAT
+ #include "network.h"
+ #endif
++#include <string.h>
++#include <unistd.h>
++int setrgid();
++int setresgid();
+ int main(){char a[2];
+  endpwent();endgrent();memmove(a,"0",1);bcopy("0",a,1);strcspn(a,"0");
+  strtol("0",(char**)0,10);strchr("0",'0');strpbrk(a,"0");rename(a,"0");
+@@ -1059,7 +1064,7 @@ echo 'Testing for memmove, strchr, strpbrk, strcspn, strtol, strstr,'
+ echo '	rename, setrgid, setegid, pow, opendir, mkdir, waitpid, fsync,'
+ echo '	ftruncate, strtod, strncasecmp, strerror, strlcat,'
+ echo '	memset, bzero, and _exit'
+-if $MAKE _autotst.$O >$DEVNULL 2>&1
++if $MAKE _autotst.$O >_autotst.rrr 2>&1
+ then
+ :
+ else

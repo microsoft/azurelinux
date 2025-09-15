@@ -1,0 +1,50 @@
+# Three things important for creating the cache
+# i) Bazel version should match .bazelversion file
+# ii) The Working directory should match the directory where this cache will be used.
+# for example: In AZL3.0 tensorflow is built in "/usr/src/azl/BUILD/tensorflow-$version".
+# iii) Python version should match the version in caching phase and the build phase
+
+FROM mcr.microsoft.com/cbl-mariner/base/core:2.0
+
+ARG TB_VERSION
+
+WORKDIR /root/
+# RUN tdnf -y install createrepo
+# COPY RPMS /opt/rpms
+# COPY custom.repo /etc/yum.repos.d
+
+# COPY toolchain_rpms /opt/rpms
+# RUN createrepo /opt/rpms
+#bazel version must match with the .bazelversion
+RUN tdnf -y install build-essential git tar bazel python3-devel python3-numpy python3-pip python3-wheel python3-six python3-setuptools python3-virtualenv python3-protobuf python3-absl-py gcc zlib wget ca-certificates
+RUN tdnf -y install which python3-werkzeug
+# Create Working Directory
+RUN wget https://github.com/tensorflow/tensorboard/archive/refs/tags/$TB_VERSION.tar.gz
+RUN mkdir -p /usr/src/azl/BUILD
+RUN tar -xvf $TB_VERSION.tar.gz -C /usr/src/azl/BUILD
+WORKDIR /usr/src/azl/BUILD/tensorboard-$TB_VERSION
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+RUN bazel --output_user_root=./tb_tmp fetch //tensorboard/pip_package:build_pip_package
+# As compiling start we exit the command. This indicates all the dependencies has been downloaded
+# should take 5-10 mins
+RUN bazel --output_user_root=./tb_tmp build //tensorboard/pip_package:build_pip_package > /tmp/bazel_output.log 2>&1 & \
+    pid=$! && \
+    while true; do \
+        if grep -q "Compiling" /tmp/bazel_output.log; then \
+            echo "Compiling detected, exiting..." && \
+            kill $pid && \
+            exit 0; \
+        fi; \
+        sleep 1; \
+    done
+
+
+# clean up any compiled code
+RUN bazel clean
+
+WORKDIR /usr/src/azl/BUILD
+RUN tar -czf tensorboard-$TB_VERSION.tar.gz tensorboard-$TB_VERSION
+RUN mv tensorboard-$TB_VERSION.tar.gz /root
+
+CMD ["bash"]

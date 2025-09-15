@@ -1,10 +1,12 @@
 Summary:        Python 2 and 3 compatibility utilities
 Name:           python-six
 Version:        1.16.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Group:          Development/Languages/Python
 URL:            https://pypi.org/project/six/
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        https://pypi.python.org/packages/source/s/six/six-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
@@ -16,7 +18,7 @@ BuildRequires:  python3-pip
 BuildArch:      noarch
 
 %description
-Six is a Python 2 and 3 compatibility library. It provides utility functions for smoothing over the differences between the Python versions with the goal of writing Python code that is compatible on both Python versions. 
+Six is a Python 2 and 3 compatibility library. It provides utility functions for smoothing over the differences between the Python versions with the goal of writing Python code that is compatible on both Python versions.
 
 %package -n     python3-six
 Summary:        Python 2 and 3 compatibility utilities
@@ -45,6 +47,9 @@ pip3 install pytest
 %{python3_sitelib}/*
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.16.0-3
+- Add missing Vendor and Distribution tags.
+
 * Tue Mar 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.16.0-2
 - Remove python2 package
 - Add license file to the python3 subpackage

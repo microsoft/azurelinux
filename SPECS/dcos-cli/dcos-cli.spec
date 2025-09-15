@@ -1,15 +1,19 @@
 Summary:        The command line for DC/OS
 Name:           dcos-cli
 Version:        1.2.0
-Release:        14%{?dist}
+Release:        19%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Tools
 URL:            https://github.com/dcos/dcos-cli
 Source0:        https://github.com/dcos/dcos-cli/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2020-26160.patch
+Patch1:         CVE-2024-28180.patch
+Patch2:         CVE-2025-27144.patch
+Patch3:         CVE-2024-51744.patch
 
-BuildRequires:  golang >= 1.17.1
+BuildRequires:  golang < 1.25
 BuildRequires:  git
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
@@ -45,6 +49,21 @@ go test -mod=vendor
 %{_bindir}/dcos
 
 %changelog
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.2.0-19
+- Set BR for golang to < 1.25
+
+* Wed Mar 19 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.2.0-18
+- Fix CVE-2024-51744
+
+* Sat Mar 01 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-17
+- Fix CVE-2025-27144 with an upstream patch
+
+* Tue Oct 01 2024 Henry Li <lihl@microsoft.com> - 1.2.0-16
+- Add patch to resolve CVE-2024-28180
+
+* Fri Jul 05 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.2.0-15
+- Patch CVE-2020-26160
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.0-14
 - Bump release to rebuild with go 1.20.10
 

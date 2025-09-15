@@ -6,25 +6,34 @@ TensorBoard is a suite of web applications for inspecting and understanding your
 
 Summary:        TensorBoard is a suite of web applications for inspecting and understanding your TensorFlow runs and graphs
 Name:           python-%{pypi_name}
-Version:        2.11.0
-Release:        3%{?dist}
+Version:        2.16.2
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/tensorflow/tensorboard
-Source0:        https://github.com/tensorflow/tensorboard/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-cache.tar.gz
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-pip
-BuildRequires:  python3-wheel
-BuildRequires:  python3-six
+# This source also contains the dependencies required for building tensorboard
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         0000-Use-system-package.patch
+Patch1:         CVE-2024-43788.patch
+Patch2:         CVE-2024-43796.patch
+Patch3:         CVE-2024-45590.patch
+
 BuildRequires:  bazel
-BuildRequires:  python3-tf-nightly
-BuildRequires:  gcc
 BuildRequires:  build-essential
-BuildRequires:  protobuf
-BuildRequires:  zlib
+BuildRequires:  gcc
+BuildRequires:  git
+BuildRequires:  python3-absl-py
+BuildRequires:  python3-numpy
+BuildRequires:  python3-pip
+BuildRequires:  python3-protobuf
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-six
 BuildRequires:  python3-virtualenv
+BuildRequires:  python3-wheel
+BuildRequires:  python3-werkzeug
+BuildRequires:  which
+BuildRequires:  zlib
 ExclusiveArch:  x86_64
 
 
@@ -41,7 +50,6 @@ Requires:   python3-numpy
 Requires:   python3-protobuf
 Requires:   python3-requests
 Requires:   python3-setuptools
-Requires:   python3-tensorflow-estimator
 Requires:   python3-werkzeug
 Requires:   python3-wheel
 
@@ -56,12 +64,11 @@ Summary:        %{summary}
 
 %prep
 %autosetup -p1 -n tensorboard-%{version}
+rm -rf tensorboard-%{version}/tb_tmp/b069b9e9814ff76ffa6219506d1f1e79/external/npm
 
 %build
-tar -xf %{SOURCE1} -C /root/
 
-ln -s /usr/bin/python3 /usr/bin/python
-
+ln -s %{_bindir}/python3 %{_bindir}/python
 #tensorboard-data-server
 pushd tensorboard/data/server/pip_package
 python3 setup.py -q bdist_wheel
@@ -69,21 +76,10 @@ popd
 mkdir -p pyproject-wheeldir/ && cp tensorboard/data/server/pip_package/dist/*.whl pyproject-wheeldir/
 
 #tensorboard built using bazel
-bazel --batch build //tensorboard/pip_package:build_pip_package
-#cache
-# ---------
-# steps to create the cache tar. network connection is required to create the cache.
-#----------------------------------
-# bazel clean
-# pushd /root
-# tar -czvf %{name}-%{version}-cache.tar.gz .cache  #creating the cache using the /root/.cache directory
-# popd
-# mv /root/%{name}-%{version}-cache.tar.gz /usr/
-
-#tensorboard package build script build_pip_package.sh doesn't assign RUNFILES variable successfully.
-sed -i 's/output="$1"/output="$1"\n \ RUNFILES="$(CDPATH="" cd -- "$0.runfiles" \&\& pwd)"/' bazel-bin/tensorboard/pip_package/build_pip_package
+#tb_tmp contains all the dependencies for bazel build
+bazel --batch --output_user_root=./tb_tmp build //tensorboard/pip_package:build_pip_package
 bazel-bin/tensorboard/pip_package/build_pip_package .
-mv %{pypi_name}-%{version}-*.whl pyproject-wheeldir/
+mv %{pypi_name}-*.whl pyproject-wheeldir/
 
 %install
 %{pyproject_install}
@@ -102,6 +98,28 @@ mv %{pypi_name}-%{version}-*.whl pyproject-wheeldir/
 %{python3_sitelib}/tensorboard_data_server*
 
 %changelog
+* Tue Nov 19 2024 Bala <balakumaran.kannan@microsoft.com> - 2.16.2-6
+- Remove npm directory before building to make sure as no nodejs vulnerability is getting through
+- It is done while fixing CVE-2024-21538
+
+* Thu Sep 26 09 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.16.2-5
+- Patch to fix CVE-2024-45590
+
+* Wed Sep 25 09 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.16.2-4
+- Patch to fix CVE-2024-43796
+
+* Mon Sep 02 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.16.2-3
+- Patch to fix CVE-2024-43788
+
+* Thu May 30 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.16.2-2
+- Bump release to build with new python-werkzeug to fix CVE-2024-34069
+
+* Thu Apr 25 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.16.2-1
+- Upgrade tensorboard to 2.16.2.
+
+* Tue Apr 23 2024 Andrew Phelps <anphel@microsoft.com> - 2.11.0-4
+- Remove missing requirements `python3-tf-nightly` and `python3-tensorflow-estimator`
+
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 2.11.0-3
 - Relax version requirements
 

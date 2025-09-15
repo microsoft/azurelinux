@@ -3,17 +3,14 @@ Distribution:   Azure Linux
 %global debug_package   %{nil}
 
 Name:           PEGTL
-Version:        2.8.3
-Release:        2%{?dist}
+Version:        3.2.8
+Release:        1%{?dist}
 Summary:        Parsing Expression Grammar Template Library
 License:        MIT
 URL:            https://github.com/taocpp/%{name}/
-Source0:        https://github.com/taocpp/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
+Source0:        https://github.com/taocpp/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc-c++
-BuildRequires: /usr/bin/make
-
-Patch0: PEGTL-compiler-warning.patch
+BuildRequires:  /usr/bin/make
 
 %description
 The Parsing Expression Grammar Template Library (PEGTL) is a zero-dependency
@@ -33,8 +30,6 @@ applications that use %{name}.
 %prep
 %setup -q -n %{name}-%{version}
 
-%patch 0 -p1 -b .compiler
-
 %check
 make
 
@@ -51,6 +46,10 @@ popd
 %{_includedir}/tao/pegtl
 
 %changelog
+* Fri Oct 14 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 3.2.8-1
+- Update version to 3.2.8
+- License Verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.8.3-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 

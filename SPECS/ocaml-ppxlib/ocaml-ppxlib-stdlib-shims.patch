@@ -1,5 +1,5 @@
---- a/ast/dune	2021-08-31 06:52:05.000000000 -0600
-+++ b/ast/dune	2021-09-01 09:24:02.193068151 -0600
+--- a/ast/dune.orig	2023-06-20 02:51:14.000000000 -0600
++++ b/ast/dune	2023-06-22 10:20:37.555218092 -0600
 @@ -5,7 +5,7 @@
  (library
   (name ppxlib_ast)
@@ -9,36 +9,36 @@
   (flags
    (:standard -safe-string)
    -w
---- a/dune-project	2021-08-31 06:52:05.000000000 -0600
-+++ b/dune-project	2021-09-01 09:25:13.279201740 -0600
+--- a/dune-project.orig	2023-06-20 02:51:14.000000000 -0600
++++ b/dune-project	2023-06-22 10:20:37.555218092 -0600
 @@ -20,7 +20,6 @@
-   (ocaml-compiler-libs (>= v0.11.0))
    (ppx_derivers (>= 1.0))
    (sexplib0 (>= v0.12))
+   (sexplib0 (and :with-test (>= "v0.15"))) ; Printexc.register_printer in sexplib0 changed
 -  stdlib-shims
    (ocamlfind :with-test)
    (re (and :with-test (>= 1.9.0)))
-   (cinaps (and :with-test (>= v0.12.1)))
---- a/metaquot_lifters/dune	2021-08-31 06:52:05.000000000 -0600
-+++ b/metaquot_lifters/dune	2021-09-01 09:25:29.440232074 -0600
+   (cinaps (and :with-test (>= v0.12.1))))
+--- a/metaquot_lifters/dune.orig	2023-06-20 02:51:14.000000000 -0600
++++ b/metaquot_lifters/dune	2023-06-22 10:20:37.555218092 -0600
 @@ -3,4 +3,4 @@
   (public_name ppxlib.metaquot_lifters)
   (flags
    (:standard -safe-string))
 - (libraries ppxlib ppxlib_traverse_builtins stdppx stdlib-shims))
 + (libraries ppxlib ppxlib_traverse_builtins stdppx))
---- a/ppxlib.opam	2021-08-31 06:52:05.000000000 -0600
-+++ b/ppxlib.opam	2021-09-01 09:24:15.993094078 -0600
-@@ -25,7 +25,6 @@ depends: [
-   "ocaml-compiler-libs" {>= "v0.11.0"}
+--- a/ppxlib.opam.orig	2023-06-20 02:51:14.000000000 -0600
++++ b/ppxlib.opam	2023-06-22 10:20:37.555218092 -0600
+@@ -26,7 +26,6 @@ depends: [
    "ppx_derivers" {>= "1.0"}
    "sexplib0" {>= "v0.12"}
+   "sexplib0" {with-test & >= "v0.15"}
 -  "stdlib-shims"
    "ocamlfind" {with-test}
    "re" {with-test & >= "1.9.0"}
    "cinaps" {with-test & >= "v0.12.1"}
---- a/src/dune	2021-08-31 06:52:05.000000000 -0600
-+++ b/src/dune	2021-09-01 09:24:44.977148546 -0600
+--- a/src/dune.orig	2023-06-20 02:51:14.000000000 -0600
++++ b/src/dune	2023-06-22 10:20:37.555218092 -0600
 @@ -9,7 +9,6 @@
    ppx_derivers
    ppxlib_traverse_builtins
@@ -47,16 +47,16 @@
    sexplib0)
   (flags
    (:standard -safe-string))
---- a/src/gen/dune	2021-08-31 06:52:05.000000000 -0600
-+++ b/src/gen/dune	2021-09-01 09:24:57.866172770 -0600
+--- a/src/gen/dune.orig	2023-06-20 02:51:14.000000000 -0600
++++ b/src/gen/dune	2023-06-22 10:20:37.556218077 -0600
 @@ -2,4 +2,4 @@
   (names gen_ast_pattern gen_ast_builder)
   (flags
    (:standard -safe-string))
 - (libraries ppxlib_ast astlib ppxlib_traverse_builtins stdppx stdlib-shims))
 + (libraries ppxlib_ast astlib ppxlib_traverse_builtins stdppx))
---- a/stdppx/dune	2021-08-31 06:52:05.000000000 -0600
-+++ b/stdppx/dune	2021-09-01 09:24:34.025127963 -0600
+--- a/stdppx/dune.orig	2023-06-20 02:51:14.000000000 -0600
++++ b/stdppx/dune	2023-06-22 10:20:37.556218077 -0600
 @@ -1,6 +1,6 @@
  (library
   (name stdppx)
@@ -65,8 +65,8 @@
 + (libraries sexplib0)
   (flags
    (:standard -safe-string)))
---- a/traverse/dune	2021-08-31 06:52:05.000000000 -0600
-+++ b/traverse/dune	2021-09-01 09:23:48.745042886 -0600
+--- a/traverse/dune.orig	2023-06-20 02:51:14.000000000 -0600
++++ b/traverse/dune	2023-06-22 10:20:37.556218077 -0600
 @@ -4,6 +4,6 @@
   (kind ppx_deriver)
   (flags

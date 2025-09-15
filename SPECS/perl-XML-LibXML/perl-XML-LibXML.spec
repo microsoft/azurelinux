@@ -8,11 +8,13 @@ Name:           perl-XML-LibXML
 # it might not be needed anymore
 # this module is maintained, the other is not
 Version:        2.0209
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Perl interface to the libxml2 library
 License:        (GPL+ or Artistic) and MIT
 URL:            https://metacpan.org/release/XML-LibXML
-Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXML-%{version}.tar.gz 
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXML-%{version}.tar.gz
 # Fix parsing ampersand entities in SAX interface, CPAN RT#131498,
 # posted to the upstream.
 Patch0:         XML-LibXML-2.0202-Parse-an-ampersand-entity-in-SAX-interface.patch
@@ -183,6 +185,9 @@ fi
 %{_libexecdir}/%{name}
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0209-2
+- Add missing Vendor and Distribution tags.
+
 * Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0209-1
 - Auto-upgrade to 2.0209 - Azure Linux 3.0 - package upgrades
 
@@ -518,7 +523,7 @@ fi
 - use better workaround until rhbz#769537 is resolved
 
 * Tue Dec 20 2011 Karsten Hopp <karsten@redhat.com> - 1:1.88-2
-- disable tests on ppc as most ppc buildmachines have only 2Gb 
+- disable tests on ppc as most ppc buildmachines have only 2Gb
   and the tests run out of memory
 
 * Sun Oct  2 2011 Tom Callaway <spot@fedoraproject.org> - 1:1.88-1

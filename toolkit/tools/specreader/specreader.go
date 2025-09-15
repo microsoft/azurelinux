@@ -27,7 +27,7 @@ const (
 var (
 	app                     = kingpin.New("specreader", "A tool to parse spec dependencies into JSON")
 	specsDir                = exe.InputDirFlag(app, "Directory to scan for SPECS")
-	specListFile            = app.Flag("spec-list", "Path to a list of SPECs to parse. If empty will parse all SPECs.").ExistingFile()
+	specList                = app.Flag("spec-list", "List of SPECs to parse. If empty will parse all SPECs.").Default("").String()
 	output                  = exe.OutputFlag(app, "Output file to export the JSON")
 	workers                 = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
 	buildDir                = app.Flag("build-dir", "Directory to store temporary files while parsing.").String()
@@ -67,7 +67,7 @@ func main() {
 
 	// A parse list may be provided, if so only parse this subset.
 	// If none is provided, parse all specs.
-	specListSet, err := packagelist.ParsePackageListFile(*specListFile)
+	specListSet, err := packagelist.ParsePackageList(*specList)
 	logger.PanicOnError(err)
 
 	// Convert specsDir to an absolute path

@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "vim-9.0.2190.tar.gz": "c0f06f783e922136e64570e754ed8eac565725206460a88f0c43b7b175573099"
- }
+  "Signatures": {
+    "macros.vim": "98d2e285e93e339defc13ef1dc4fa76f24e3fca6282e4196a3dae45de778eab8",
+    "vim-9.1.1616.tar.gz": "3cde3f24e79d6a4c4a32cdc7139526fd4c743ed6c6c106e5b2657e429104779a"
+  }
 }
-

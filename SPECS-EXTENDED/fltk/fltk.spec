@@ -10,43 +10,35 @@ Distribution:   Azure Linux
 
 Summary:	C++ user interface toolkit
 Name:		fltk
-Version:	1.3.5
-Release:	4%{?dist}
+Version:	1.3.8
+Release:	1%{?dist}
 
 # see COPYING (or http://www.fltk.org/COPYING.php ) for exceptions details
 License:	LGPLv2+ with exceptions	
-URL:		http://www.fltk.org/
-
-%if "%{?snap:1}" == "1"
-Source0:        http://ftp.easysw.com/pub/fltk/snapshots/fltk-1.3.x-%{snap}.tar.bz2
-%else
-Source0:        http://fltk.org/pub/%{name}/%{version}/%{name}-%{version}-source.tar.gz
-%endif
-
+URL:		https://www.fltk.org/
+Source0:        https://www.fltk.org/pub/%{name}/%{version}/%{name}-%{version}-source.tar.gz
 Source1:        fltk-config.sh
 
+Patch0:         fltk-cmake.patch
 ## FIXME/TODO: upstream these asap -- Rex
 # add lib64 support, drop extraneous libs (bug #708185) and ldflags (#1112930)
 Patch1:        	fltk-1.3.4-fltk_config.patch
 
-## upstream patches
-
-## upstreamable patches
-Patch100:       fltk-1.3.4-x-fluid_mimetype.patch
-
 BuildRequires: gcc-c++
+BuildRequires: cmake
 BuildRequires: desktop-file-utils
-BuildRequires: libjpeg-devel
-BuildRequires: pkgconfig(libpng)
-BuildRequires: pkgconfig(gl) pkgconfig(glu) 
-BuildRequires: pkgconfig(ice)
-BuildRequires: pkgconfig(sm) 
-BuildRequires: pkgconfig(xext) pkgconfig(xinerama) pkgconfig(xft) pkgconfig(xt) pkgconfig(x11) 
-BuildRequires: pkgconfig(xcursor)
-BuildRequires: pkgconfig(xproto)
-BuildRequires: xorg-x11-utils
-BuildRequires: zlib-devel
-BuildRequires: autoconf
+BuildRequires: doxygen
+#BuildRequires:  fltk-fluid
+#BuildRequires:  texlive-latex
+BuildRequires:  pkgconfig(libjpeg)
+BuildRequires:  pkgconfig(libpng)
+BuildRequires:  pkgconfig(gl) pkgconfig(glu)
+BuildRequires:  pkgconfig(ice)
+BuildRequires:  pkgconfig(sm)
+BuildRequires:  pkgconfig(xext) pkgconfig(xinerama) pkgconfig(xft) pkgconfig(xt) pkgconfig(x11) 
+BuildRequires:  pkgconfig(xcursor)
+BuildRequires:  pkgconfig(xproto)
+BuildRequires:  pkgconfig(zlib)
 
 %description
 FLTK (pronounced "fulltick") is a cross-platform C++ GUI toolkit.
@@ -58,9 +50,13 @@ It provides modern GUI functionality without the bloat, and supports
 Summary: Development files for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: libstdc++-devel
+Requires: pkgconfig(fontconfig)
 Requires: pkgconfig(gl) pkgconfig(glu)
 Requires: pkgconfig(ice) pkgconfig(sm)
 Requires: pkgconfig(xft) pkgconfig(xt) pkgconfig(x11)
+Requires:       pkgconfig(libjpeg)
+Requires:       pkgconfig(libpng)
+Requires:       pkgconfig(zlib)
 %description devel
 %{summary}.
 
@@ -79,84 +75,60 @@ Requires: %{name}-devel
 
 
 %prep
-%if 0%{?snap:1}
-%autosetup -p1 -n fltk-1.3.x-%{snap}
-%else
 %autosetup -p1
-%endif
-
-# verbose build output
-sed -i.silent '\,^.SILENT:,d' makeinclude.in
-autoconf
-
 
 %build
-# set DSOFLAGS too, used to link shlibs (LDFLAGS used only for static libs)
-%{?__global_ldflags:DSOFLAGS="%{__global_ldflags}" ; export DSOFLAGS}
+%cmake -DFLTK_CONFIG_PATH:PATH=%{_libdir}/cmake/fltk \
+       -DOpenGL_GL_PREFERENCE=GLVND \
+       -DOPTION_BUILD_HTML_DOCUMENTATION:BOOL=ON \
+       -DOPTION_BUILD_PDF_DOCUMENTATION:BOOL=OFF \
+       -DOPTION_BUILD_SHARED_LIBS:BOOL=ON
 
-%configure \
-  --with-links \
-  --with-optim="%{optflags}" \
-  --disable-localjpeg \
-  --disable-localzlib \
-  --disable-localpng \
-  --enable-shared \
-  --enable-threads \
-  --enable-xdbe \
-  --enable-xinerama \
-  --enable-xft
-
-%make_build
+%cmake_build
 
 
 %install
-%make_install
+%cmake_install
 
-make install-linux -C fluid DESTDIR=$RPM_BUILD_ROOT
+# Deal with license file of same name
+mv src/xutf8/COPYING ./COPYING.xutf8
 
 # we only apply this hack to multilib arch's
-%ifarch x86_64 %{ix86} ppc64 ppc s390x s390 sparc64 sparc
+%ifarch x86_64 %{ix86}
 %global arch %(uname -i 2>/dev/null || echo undefined)
 mv $RPM_BUILD_ROOT%{_bindir}/fltk-config \
    $RPM_BUILD_ROOT%{_bindir}/fltk-config-%{arch}
 install -p -m755 -D %{SOURCE1} $RPM_BUILD_ROOT%{_bindir}/fltk-config
 %endif
 
-# docs
-rm -rf __docs
-mv $RPM_BUILD_ROOT%{_docdir}/fltk __docs
-
-## unpackaged files
-# errant docs
-rm -rv $RPM_BUILD_ROOT%{_mandir}/cat*
-
-
 %check
-desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/fluid.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/fluid.desktop
 
 
 %ldconfig_scriptlets
 
 %files
 %doc ANNOUNCEMENT CHANGES CREDITS README
-%license COPYING
-%{_libdir}/libfltk.so.1.3
-%{_libdir}/libfltk_forms.so.1.3
-%{_libdir}/libfltk_gl.so.1.3
-%{_libdir}/libfltk_images.so.1.3
+%license COPYING COPYING.xutf8
+%{_libdir}/libfltk.so.1.3*
+%{_libdir}/libfltk_forms.so.1.3*
+%{_libdir}/libfltk_gl.so.1.3*
+%{_libdir}/libfltk_images.so.1.3*
 
 %files devel
-%doc __docs/*
+#%doc %{_vpath_builddir}/documentation/html
+#%doc __docs/*
 %{_bindir}/fltk-config
 %{?arch:%{_bindir}/fltk-config-%{arch}}
 %{_includedir}/FL/
-%{_includedir}/Fl
 %{_libdir}/libfltk.so
 %{_libdir}/libfltk_forms.so
 %{_libdir}/libfltk_gl.so
 %{_libdir}/libfltk_images.so
+%{_libdir}/cmake/fltk/
 %{_mandir}/man1/fltk-config.1*
 %{_mandir}/man3/fltk.3*
+%{_mandir}/man6/*.6*
 
 %files static
 %{_libdir}/libfltk.a
@@ -168,10 +140,15 @@ desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/fluid.desktop
 %{_bindir}/fluid
 %{_mandir}/man1/fluid.1*
 %{_datadir}/applications/fluid.desktop
+%{_datadir}/mime/packages/fluid.xml
 %{_datadir}/icons/hicolor/*/*/*
 
 
 %changelog
+* Fri Nov 29 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 1.3.8-1
+- Update to 1.3.8
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.5-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

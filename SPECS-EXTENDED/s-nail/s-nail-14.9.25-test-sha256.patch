@@ -1,0 +1,46 @@
+commit 2336b1c31d16dcb24b8390f2166e25ef51fd6b05
+Author: Tomas Korbar <tkorbar@redhat.com>
+Date:   Thu Aug 1 14:10:09 2024 +0200
+
+    Change hash algorithm in testing to sha256
+
+diff --git a/mx-test.sh b/mx-test.sh
+index 119dbcd..239659c 100755
+--- a/mx-test.sh
++++ b/mx-test.sh
+@@ -10025,7 +10025,7 @@ t_s_mime() {
+       # Sign/verify
+       echo bla | ${MAILX} ${ARGS} \
+          -Ssmime-sign -Ssmime-sign-cert=./.tpair.pem -Sfrom=test@localhost \
+-         -Ssmime-sign-digest=sha1 \
++         -Ssmime-sign-digest=sha256 \
+          -S password-test@localhost.smime-cert-key=${_pass} \
+          -s 'S/MIME test' ./.VERIFY >>${ERR} 2>&1
+       check_ex0 ${_z}-estat
+@@ -10036,7 +10036,7 @@ t_s_mime() {
+          { if(!skip) print }
+       ' \
+          < ./.VERIFY > "${MBOX}"
+-      check ${_z} - "${MBOX}" '335634014 644'
++      check ${_z} - "${MBOX}" '374578409 646'
+       _z=`add ${_z} 1`
+ 
+       printf 'verify\nx\n' |
+@@ -10054,7 +10054,7 @@ t_s_mime() {
+       ${MAILX} ${ARGS} \
+          -Smta=test://./.ENCRYPT \
+          -Ssmime-force-encryption -Ssmime-encrypt-recei@ver.com=./.tpair.pem \
+-         -Ssmime-sign-digest=sha1 \
++         -Ssmime-sign-digest=sha256 \
+          -Ssmime-sign -Ssmime-sign-cert=./.tpair.pem -Sfrom=test@localhost \
+          -S password-test@localhost.smime-cert-key=${_pass} \
+          -s 'S/MIME test' recei@ver.com >>${ERR} 2>&1
+@@ -10079,7 +10079,7 @@ t_s_mime() {
+          { if(!skip) print }
+       ' \
+          < ./.DECRYPT > "${MBOX}"
+-      check ${_z} - "${MBOX}" '2602978204 940'
++      check ${_z} - "${MBOX}" '101680387 942'
+       _z=`add ${_z} 1`
+ 
+       (openssl smime -decrypt ${_ossl} -inkey ./.tkey.pem -in ./.ENCRYPT |

@@ -1,0 +1,69 @@
+From e4ca53ee775b570279305df108e5e7597a5357b9 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 29 Apr 2024 16:36:38 -0400
+Subject: [PATCH 29/31] filesystem/systemd: memory.pressure fixes.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/kernel/filesystem.fc | 5 +++--
+ policy/modules/kernel/filesystem.te | 1 +
+ policy/modules/system/systemd.te    | 2 ++
+ 3 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/policy/modules/kernel/filesystem.fc b/policy/modules/kernel/filesystem.fc
+index 8cdca1855..ca88fdc49 100644
+--- a/policy/modules/kernel/filesystem.fc
++++ b/policy/modules/kernel/filesystem.fc
+@@ -14,14 +14,15 @@
+ /sys/fs/bpf(/.*)?	<<none>>
+ 
+ /sys/fs/cgroup	-d	gen_context(system_u:object_r:cgroup_t,s0)
+-/sys/fs/cgroup/.*	<<none>>
+-/sys/fs/cgroup/[^/]+	-l	gen_context(system_u:object_r:cgroup_t,s0)
++/sys/fs/cgroup/.*	gen_context(system_u:object_r:cgroup_t,s0)
+ 
+ /sys/fs/pstore	-d	gen_context(system_u:object_r:pstore_t,s0)
+ /sys/fs/pstore/.*	<<none>>
+ 
+ /sys/kernel/tracing(/.*)?	<<none>>
+ 
++/sys/fs/cgroup/.*/memory\.pressure -- gen_context(system_u:object_r:memory_pressure_t,s0)
++
+ ifdef(`distro_debian',`
+ /run/shm		-d	gen_context(system_u:object_r:tmpfs_t,s0)
+ /run/shm/.*			<<none>>
+diff --git a/policy/modules/kernel/filesystem.te b/policy/modules/kernel/filesystem.te
+index c5b6573f6..b40cb5f6c 100644
+--- a/policy/modules/kernel/filesystem.te
++++ b/policy/modules/kernel/filesystem.te
+@@ -95,6 +95,7 @@ files_mountpoint(cgroup_t)
+ dev_associate_sysfs(cgroup_t)
+ genfscon cgroup / gen_context(system_u:object_r:cgroup_t,s0)
+ genfscon cgroup2 / gen_context(system_u:object_r:cgroup_t,s0)
++allow cgroup_types cgroup_t:filesystem associate;
+ # When running under systemd, the cgroup file memory.pressure will have this
+ # separate label, to allow unprivileged process to access it without accessing
+ # the rest of the cgroup tree.
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index a7f1bcf85..f64c29cc3 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -656,6 +656,7 @@ files_search_tmp(systemd_homed_t)
+ 
+ fs_get_xattr_fs_quotas(systemd_homed_t)
+ fs_getattr_all_fs(systemd_homed_t)
++fs_watch_memory_pressure(systemd_homed_t)
+ 
+ kernel_read_kernel_sysctls(systemd_homed_t)
+ kernel_read_system_state(systemd_homed_t)
+@@ -2081,6 +2082,7 @@ files_read_usr_files(systemd_userdbd_t)
+ fs_getattr_all_fs(systemd_userdbd_t)
+ fs_search_cgroup_dirs(systemd_userdbd_t)
+ fs_read_efivarfs_files(systemd_userdbd_t)
++fs_watch_memory_pressure(systemd_userdbd_t)
+ 
+ kernel_read_system_state(systemd_userdbd_t)
+ kernel_rw_psi(systemd_userdbd_t)
+-- 
+2.45.0
+

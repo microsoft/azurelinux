@@ -14,7 +14,7 @@ users:
    sudo: [ "ALL=(ALL) NOPASSWD:ALL" ]
    lock_passwd: true
    groups: sudo, docker
-   ssh-authorized-keys:
+   ssh_authorized_keys:
     - ssh-rsa <YOUR SSH KEY HERE>
 packages:
  - openssh-server

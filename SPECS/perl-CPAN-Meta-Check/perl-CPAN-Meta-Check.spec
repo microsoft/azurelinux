@@ -1,7 +1,7 @@
 Name:           perl-CPAN-Meta-Check
 Summary:        Verify requirements in a CPAN::Meta object
 Version:        0.018
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
@@ -29,6 +29,7 @@ BuildRequires:  perl(Env)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(Test::Deep)
 BuildRequires:  perl(Test::More) >= 0.88
+BuildRequires:  perl(blib)
 %endif
 
 # Runtime
@@ -58,6 +59,9 @@ make test
 %{_mandir}/man3/CPAN::Meta::Check.3*
 
 %changelog
+* Tue May 06 2025 Riken Maharjan <rmaharjan@microsoft.com> - 0.018-2
+- Fix Ptest for perl-CPAN-Meta-Check
+
 * Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.018-1
 - Auto-upgrade to 0.018 - Azure Linux 3.0 - package upgrades
 

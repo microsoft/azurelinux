@@ -1,19 +1,16 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%bcond_without check
+%bcond_with check
 
 Name:           libqb
-Version:        1.0.5
-Release:        7%{?dist}
+Version:        2.0.8
+Release:        1%{?dist}
 Summary:        Library providing high performance logging, tracing, ipc, and poll
 
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 URL:            https://github.com/ClusterLabs/libqb
 Source0:        https://github.com/ClusterLabs/libqb/releases/download/v%{version}/%{name}-%{version}.tar.xz
-Patch0:         IPC-avoid-temporary-channel-priority-loss.patch
-# https://github.com/ClusterLabs/libqb/pull/383
-Patch1:         libqb-fix-list-handling-gcc10.patch
-Patch2:         libqb-fix-list-handling-gcc10-2.patch
+Patch0: include-libxml-parser.patch
 
 BuildRequires:  autoconf automake libtool
 BuildRequires:  check-devel
@@ -24,14 +21,18 @@ BuildRequires:  procps
 BuildRequires:  pkgconfig(glib-2.0)
 # git-style patch application
 BuildRequires:  git-core
+# For doxygen2man
+BuildRequires:  libxml2-devel
+BuildRequires: make
 
 %description
-libqb provides high-performance, reusable features for client-server
+A "Quite Boring" library that provides high-performance, reusable features for client-server
 architecture, such as logging, tracing, inter-process communication (IPC),
 and polling.
 
 %prep
-%autosetup -p1 -S git_am  # for when patches around
+%setup -q -n %{name}-%{version}
+%patch -P0 -p1 -b .include-libxml-parser.patch
 
 %build
 ./autogen.sh
@@ -40,8 +41,7 @@ and polling.
 
 %if 0%{?with_check}
 %check
-make check V=1 \
-  && make -C tests/functional/log_internal check V=1
+make check V=1
 %endif
 
 %install
@@ -72,8 +72,25 @@ developing applications that use %{name}.
 %{_libdir}/libqb.so
 %{_libdir}/pkgconfig/libqb.pc
 %{_mandir}/man3/qb*3*
+ 
+ 
+%package -n     doxygen2man
+Summary:        Program to create nicely-formatted man pages from Doxygen XML files
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+ 
+ 
+%description -n doxygen2man
+This package contains a program to create nicely-formatted man pages from Doxygen XML files
+ 
+%files -n       doxygen2man
+%{_bindir}/doxygen2man
+%{_mandir}/man1/doxygen2man.1.gz
 
 %changelog
+* Tue Nov 12 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.0.8-1
+- Update to version 2.0.8
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.5-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -3,15 +3,15 @@
         "cloud-init",
         "cloud-init-azure-kvp",
         "cloud-utils-growpart",
-        "dhcp-client",
+        "dhcpcd",
+        "dracut-hyperv",
         "grubby",
         "hyperv-daemons",
-        "kexec-tools",
         "netplan",
         "openssh-server",
         "python3",
         "rsyslog",
-        "sgx-backwards-compatability",
+        "sgx-backwards-compatibility",
         "WALinuxAgent",
         "wireless-regdb"
     ]

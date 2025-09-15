@@ -22,7 +22,7 @@ Distribution:   Azure Linux
 %global artifactId javax.annotation-api
 Name:           glassfish-annotation-api
 Version:        1.3.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Common Annotations API Specification (JSR 250)
 License:        CDDL-1.0 OR GPL-2.0-only WITH Classpath-exception-2.0
 Group:          Development/Libraries/Java
@@ -76,6 +76,10 @@ install -pdm 0755 target/site/apidocs %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Feb 28 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.3.2-4
+- Build error fix, bump up the java source version from 1.6 to 1.8.
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.2-3
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

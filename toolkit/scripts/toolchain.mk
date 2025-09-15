@@ -16,11 +16,13 @@ toolchain_local_temp = $(toolchain_build_dir)/extract_dir
 toolchain_from_repos = $(toolchain_build_dir)/repo_rpms
 toolchain_logs_dir = $(LOGS_DIR)/toolchain
 toolchain_downloads_logs_dir = $(toolchain_logs_dir)/downloads
+toolchain_rehydrate_logs_dir = $(toolchain_logs_dir)/rehydrate
+toolchain_raw_logs_dir = $(toolchain_logs_dir)/raw
+toolchain_official_logs_dir = $(toolchain_logs_dir)/official
 toolchain_downloads_manifest = $(toolchain_downloads_logs_dir)/download_manifest.txt
 toolchain_log_tail_length = 20
 populated_toolchain_chroot = $(toolchain_build_dir)/populated_toolchain
 populated_toolchain_rpms = $(populated_toolchain_chroot)/usr/src/azl/RPMS
-toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
 toolchain_actual_contents = $(toolchain_build_dir)/actual_archive_contents.txt
 toolchain_expected_contents = $(toolchain_build_dir)/expected_archive_contents.txt
 raw_toolchain = $(toolchain_build_dir)/toolchain_from_container.tar.gz
@@ -28,8 +30,7 @@ final_toolchain = $(toolchain_build_dir)/toolchain_built_rpms_all.tar.gz
 toolchain_files = \
 	$(call shell_real_build_only, find $(SCRIPTS_DIR)/toolchain -name '*.sh') \
 	$(SCRIPTS_DIR)/toolchain/container/Dockerfile
-
-TOOLCHAIN_MANIFEST ?= $(TOOLCHAIN_MANIFESTS_DIR)/toolchain_$(build_arch).txt
+toolchain_spec_list := $(call shell_real_build_only, $(SCRIPTS_DIR)/toolchain/list_toolchain_specs.sh $(SCRIPTS_DIR)/toolchain/build_official_toolchain_rpms.sh)
 # Find the *.rpm corresponding to each of the entries in the manifest
 # regex operation: (.*\.([^\.]+)\.rpm) extracts *.(<arch>).rpm" to determine
 # the exact path of the required rpm
@@ -57,8 +58,6 @@ ifeq ($(REBUILD_TOOLCHAIN),y)
 # If we are rebuilding the toolchain, we also expect the built RPMs to end up in out/RPMS
 toolchain: $(toolchain_out_rpms)
 endif
-##help:target:toolchain_spec_list=Generate a file containing a list of toolchain specs.
-toolchain_spec_list: $(toolchain_spec_list)
 
 clean: clean-toolchain
 
@@ -69,6 +68,7 @@ clean-toolchain: clean-toolchain-rpms
 	rm -rf $(toolchain_logs_dir)
 	rm -rf $(toolchain_from_repos)
 	rm -rf $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag
+	rm -rf $(STATUS_FLAGS_DIR)/toolchain_auto_cleanup.flag
 	rm -f $(SCRIPTS_DIR)/toolchain/container/toolchain-local-wget-list
 	rm -f $(SCRIPTS_DIR)/toolchain/container/texinfo-perl-fix.patch
 	rm -f $(SCRIPTS_DIR)/toolchain/container/Awt_build_headless_only.patch
@@ -89,6 +89,17 @@ clean-toolchain-rpms:
 	@for f in $(toolchain_out_rpms); do rm -vf $$f; done
 	rm -rvf $(TOOLCHAIN_RPMS_DIR)
 
+# We need to clear the toolchain if we are using a daily build, or we change validation state. The filenames will all be
+# the same, but the actual .rpm files may be fundamentally different.
+# We leave the directory structure in place since docker based builds using re-usable chroots will have mounted the
+# toolchain subdirectories into the chroots. Removing the directories would break the mounts.
+$(STATUS_FLAGS_DIR)/toolchain_auto_cleanup.flag: $(STATUS_FLAGS_DIR)/daily_build_id.flag $(depend_VALIDATE_TOOLCHAIN_GPG)
+ifeq ($(SKIP_TOOLCHAIN_AUTO_CLEANUP),n)
+	@echo "Daily build ID or validation mode changed, sanitizing toolchain"
+	find $(TOOLCHAIN_RPMS_DIR) -type f -name '*.rpm' -exec rm -f {} +
+endif
+	touch $@
+
 copy-toolchain-rpms:
 	for f in $(toolchain_rpms_buildarch); do cp -vf $(TOOLCHAIN_RPMS_DIR)/$(build_arch)/$$f $(RPMS_DIR)/$(build_arch); done
 	for f in $(toolchain_rpms_noarch); do cp -vf $(TOOLCHAIN_RPMS_DIR)/noarch/$$f $(RPMS_DIR)/noarch; done
@@ -99,32 +110,10 @@ copy-toolchain-rpms:
 
 # check that the manifest files only contain RPMs that could have been generated from toolchain specs.
 check-manifests: check-x86_64-manifests check-aarch64-manifests
-check-aarch64-manifests: $(toolchain_spec_list)
-	cd $(SCRIPTS_DIR)/toolchain && \
-		./check_manifests.sh \
-			"$(toolchain_spec_list)" \
-			"$(SPECS_DIR)" \
-			"$(TOOLCHAIN_MANIFESTS_DIR)" \
-			"$(DIST_TAG)" \
-			"$(DIST_VERSION_MACRO)" \
-			"aarch64"
-check-x86_64-manifests: $(toolchain_spec_list)
-	cd $(SCRIPTS_DIR)/toolchain && \
-		./check_manifests.sh \
-			"$(toolchain_spec_list)" \
-			"$(SPECS_DIR)" \
-			"$(TOOLCHAIN_MANIFESTS_DIR)" \
-			"$(DIST_TAG)" \
-			"$(DIST_VERSION_MACRO)" \
-			"x86_64"
-
-# Generate a list of a specs built as part of the toolchain.
-$(toolchain_spec_list): $(toolchain_files)
-	cd $(SCRIPTS_DIR)/toolchain && \
-		./list_toolchain_specs.sh \
-			$(SCRIPTS_DIR)/toolchain/build_official_toolchain_rpms.sh \
-			$(toolchain_spec_list)
-	@echo "Toolchain spec list created under '$(toolchain_spec_list)'."
+check-aarch64-manifests: $(toolchain_files)
+	$(SCRIPTS_DIR)/toolchain/check_manifests.sh -a "aarch64"
+check-x86_64-manifests: $(toolchain_files)
+	$(SCRIPTS_DIR)/toolchain/check_manifests.sh -a "x86_64"
 
 # To save toolchain artifacts use compress-toolchain and cache the tarballs
 # To restore toolchain artifacts use hydrate-toolchain and give the location of the tarballs on the command-line
@@ -134,6 +123,12 @@ compress-toolchain:
 	tar -I $(ARCHIVE_TOOL) -cvp --exclude='SOURCES' -f $(raw_toolchain) -C $(toolchain_build_dir) populated_toolchain
 	tar -cvp -f $(final_toolchain) -C $(toolchain_build_dir) built_rpms_all
 	$(if $(CACHE_DIR), cp $(raw_toolchain) $(final_toolchain) $(CACHE_DIR))
+
+# Creates a toolchain archive from the final toolchain rpms placed in ./build/toolchain_rpms, regardless of their source. This may be used with both locally built or downloaded toolchains.
+# The archive is placed in ./out/toolchain_final_extracted_rpms.tar.gz and may be used with TOOLCHAIN_ARCHIVE= to populate a toolchain during subsequent builds.
+compress-toolchain-final-rpms:
+	tar -I $(ARCHIVE_TOOL) -cvf $(OUT_DIR)/toolchain_final_extracted_rpms.tar.gz --transform='s`/*[^/]*/``' -C $(TOOLCHAIN_RPMS_DIR) .
+	echo "Created $(OUT_DIR)/toolchain_final_extracted_rpms.tar.gz"
 
 # After hydrating the toolchain run
 # "sudo touch build/toolchain/toolchain_from_container.tar.gz" (should really check for existence of files in toolchain_*.txt)
@@ -164,13 +159,18 @@ hydrate-toolchain:
 # out/toolchain/toolchain_from_container.tar.gz
 $(raw_toolchain): $(toolchain_files)
 	@echo "Building raw toolchain"
+	rm -rf $(toolchain_raw_logs_dir) && mkdir -p $(toolchain_raw_logs_dir)
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./create_toolchain_in_container.sh \
 			$(BUILD_DIR) \
 			$(SPECS_DIR) \
 			$(SOURCE_URL) \
 			$(INCREMENTAL_TOOLCHAIN) \
-			$(ARCHIVE_TOOL)
+			$(ARCHIVE_TOOL) \
+			$(toolchain_raw_logs_dir) 2>&1 | tee $(toolchain_raw_logs_dir)/create_toolchain_in_container_full.log; \
+		if [ $${PIPESTATUS[0]} -ne 0 ]; then \
+			$(call print_error, create_toolchain_in_container.sh failed); \
+		fi
 
 # This target establishes a cache of toolchain RPMs for partially rehydrating the toolchain from package repos.
 # $(toolchain_from_repos) is a staging folder for these RPMs. We use the toolchain manifest to get a list of
@@ -188,24 +188,21 @@ $(raw_toolchain): $(toolchain_files)
 # - ALLOW_TOOLCHAIN_DOWNLOAD_FAIL = n: This flag explicitly disables partial toolchain rehydration from repos
 # In these cases, we just create empty files for each possible rehydrated RPM.
 ifeq ($(strip $(INCREMENTAL_TOOLCHAIN))$(strip $(REBUILD_TOOLCHAIN))$(strip $(ALLOW_TOOLCHAIN_DOWNLOAD_FAIL)),yyy)
-$(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST) $(go-downloader)
-	@rpm_filename="$(notdir $@)" && \
-	rpm_dir="$(dir $@)" && \
-	log_file="$(toolchain_downloads_logs_dir)/$$rpm_filename.log" && \
-	echo "Attempting to download toolchain RPM: $$rpm_filename" | tee -a "$$log_file" && \
-	mkdir -p $$rpm_dir && \
-	cd $$rpm_dir && \
-	for url in $(PACKAGE_URL_LIST); do \
-		$(go-downloader) --no-verbose --no-clobber $$url/$$rpm_filename \
-			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
-			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
-			--log-file $$log_file 2>/dev/null && \
-		echo "Downloaded toolchain RPM: $$rpm_filename" >> $$log_file && \
-		echo "$$rpm_filename" >> $(toolchain_downloads_manifest) | tee -a "$$log_file" && \
-		touch $@ && \
-		break; \
-	done || { \
-		echo "Could not find toolchain package in package repo: $$rpm_filename." | tee -a "$$log_file" && \
+$(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST) $(go-downloader) $(SCRIPTS_DIR)/toolchain/download_toolchain_rpm.sh
+	@log_file="$(toolchain_rehydrate_logs_dir)/$(notdir $@).log" && \
+	rm -f "$$log_file" && \
+	$(SCRIPTS_DIR)/toolchain/download_toolchain_rpm.sh \
+		--downloader-tool "$(go-downloader)" \
+		--rpm-name "$(notdir $@)" \
+		--dst "$@" \
+		--log-base "$$log_file" \
+		--hydrate \
+		--url-list "$(PACKAGE_URL_LIST)" \
+		--allowable-gpg-keys "$(TOOLCHAIN_GPG_VALIDATION_KEYS)" \
+		$(if $(TLS_CERT),--certificate $(TLS_CERT)) \
+		$(if $(TLS_KEY),--private-key $(TLS_KEY)) && \
+		echo "$(notdir $@)" >> $(toolchain_downloads_manifest) || { \
+		echo "Could not find toolchain package in package repo to rehydrate with: $(notdir $@)." >> "$$log_file" && \
 		touch $@; \
 	}
 else
@@ -221,6 +218,7 @@ $(final_toolchain): $(no_repo_acl) $(raw_toolchain) $(toolchain_rpms_rehydrated)
 	# Clean the existing chroot if not doing an incremental build
 	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,$(SCRIPTS_DIR)/safeunmount.sh "$(populated_toolchain_chroot)" || $(call print_error,failed to clean mounts for toolchain build))
 	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,rm -rf $(populated_toolchain_chroot))
+	rm -rf $(toolchain_official_logs_dir) && mkdir -p $(toolchain_official_logs_dir)
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./build_mariner_toolchain.sh \
 			"$(DIST_TAG)" \
@@ -238,7 +236,10 @@ $(final_toolchain): $(no_repo_acl) $(raw_toolchain) $(toolchain_rpms_rehydrated)
 			"$(toolchain_from_repos)" \
 			"$(TOOLCHAIN_MANIFEST)" \
 			"$(go-bldtracker)" \
-			"$(TIMESTAMP_DIR)/build_mariner_toolchain.jsonl" && \
+			"$(TIMESTAMP_DIR)/build_mariner_toolchain.jsonl" 2>&1 | tee $(toolchain_official_logs_dir)/build_official_rpms.log; \
+		if [ $${PIPESTATUS[0]} -ne 0 ]; then \
+			$(call print_error, build_mariner_toolchain.sh failed); \
+		fi && \
 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
 	touch $@
 
@@ -293,7 +294,7 @@ $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag: $(selected_toolchain_archive) $(t
 #	The .rpm doesn't exist
 #	The .rpm is older than the archive we are extracting it from
 #	The toolchain configuration has been changed (depend_TOOLCHAIN_ARCHIVE and depend_REBUILD_TOOLCHAIN)
-$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag $(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN)
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag $(STATUS_FLAGS_DIR)/toolchain_auto_cleanup.flag $(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN)
 	tempFile=$(toolchain_local_temp)/$(notdir $@) && \
 	if [ ! -f $@ \
 			-o $(selected_toolchain_archive) -nt $@ \
@@ -308,26 +309,26 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_tem
 
 # No archive was selected, so download from online package server instead. All packages must be available for this step to succeed.
 else
-$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(depend_REBUILD_TOOLCHAIN) $(go-downloader)
-	@rpm_filename="$(notdir $@)" && \
-	rpm_dir="$(dir $@)" && \
-	log_file="$(toolchain_downloads_logs_dir)/$$rpm_filename.log" && \
-	echo "Downloading toolchain RPM: $$rpm_filename" | tee -a "$$log_file" && \
-	mkdir -p $$rpm_dir && \
-	cd $$rpm_dir && \
-	for url in $(PACKAGE_URL_LIST); do \
-		$(go-downloader) --no-verbose --no-clobber $$url/$$rpm_filename \
-			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
-			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
-			--log-file $$log_file 2>/dev/null && \
-		echo "Downloaded toolchain RPM: $$rpm_filename" >> $$log_file && \
-		touch $@ && \
-		break; \
-	done || { \
-		echo "\nERROR: Failed to download toolchain package: $$rpm_filename." && \
-		echo "ERROR: Last $(toolchain_log_tail_length) lines from log '$$log_file':\n" && \
-		tail -n$(toolchain_log_tail_length) $$log_file | sed 's/^/\t/' && \
-		$(call print_error,\nToolchain download failed. See above errors for more details.) \
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_auto_cleanup.flag $(depend_REBUILD_TOOLCHAIN) $(go-downloader) $(SCRIPTS_DIR)/toolchain/download_toolchain_rpm.sh $(TOOLCHAIN_GPG_VALIDATION_KEYS)
+	@log_file="$(toolchain_downloads_logs_dir)/$(notdir $@).log" && \
+	rm -f "$$log_file" && \
+	$(SCRIPTS_DIR)/toolchain/download_toolchain_rpm.sh \
+		--downloader-tool "$(go-downloader)" \
+		--rpm-name "$(notdir $@)" \
+		--dst "$@" \
+		--log-base "$$log_file" \
+		--url-list "$(PACKAGE_URL_LIST)" \
+		$(if $(TLS_CERT),--certificate $(TLS_CERT)) \
+		$(if $(TLS_KEY),--private-key $(TLS_KEY)) \
+		$(if $(filter y,$(VALIDATE_TOOLCHAIN_GPG)),--enforce-signatures,) \
+		--allowable-gpg-keys "$(TOOLCHAIN_GPG_VALIDATION_KEYS)" || \
+	{ \
+		echo "No entries in PACKAGE_URL_LIST ($(PACKAGE_URL_LIST)) were able to provide the toolchain package: $(notdir $@)." >> "$$log_file" && \
+		echo -e "\nERROR: Failed to download toolchain package: "$(notdir $@)"." && \
+		echo "ERROR: Last $(toolchain_log_tail_length) lines from log '$$log_file':" && \
+		tail -n $(toolchain_log_tail_length) $$log_file | sed 's/^/\t/' && \
+		rm -f "$@" && \
+		$(call print_error,Toolchain download failed. See above errors for more details.) ; \
 	}
 endif
 

@@ -3,8 +3,8 @@ Distribution:   Azure Linux
 %global         upstreamname  bats-core
 
 Name:           bats
-Version:        1.2.1
-Release:        2%{?dist}
+Version:        1.11.0
+Release:        1%{?dist}
 Summary:        Bash Automated Testing System
 
 License:        MIT
@@ -44,6 +44,10 @@ program.
 %{_mandir}/man7/%{name}.7.gz
 
 %changelog
+* Thu Oct 10 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.11.0-1
+- Update to current upstream
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.1-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 

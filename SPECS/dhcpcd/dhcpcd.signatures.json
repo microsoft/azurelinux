@@ -1,0 +1,8 @@
+{
+  "Signatures": {
+    "dhcpcd.service": "e8481ab68b97b8a3e5fc60e316bb31881bebd4c139514584b5cf5fc253b949cb",
+    "dhcpcd@.service": "9bcf8f9fe8323c82ecbeb210548ff802bc97191a8d94999583d9ecb05b19af1b",
+    "systemd-sysusers.conf": "b215549ac0b481a8a35b738498db34bee0bd4e1276be93ef32f26dd90e3744bc",
+    "dhcpcd-10.0.8.tar.gz": "f12babff1d3b880a63afc1df1c64c408f3784106e47c932f690bafbed8a83c3e"
+  }
+}

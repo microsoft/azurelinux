@@ -1,24 +1,27 @@
 Summary:        Perl extension for using OpenSSL
 Name:           perl-Net-SSLeay
 Version:        1.92
-Release:        3%{?dist}
+Release:        6%{?dist}
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            https://metacpan.org/pod/distribution/Net-SSLeay/lib/Net/SSLeay.pod
 Source:         https://cpan.metacpan.org/modules/by-module/Net/Net-SSLeay-%{version}.tar.gz
 Patch0:         0001-local-tests-skip-2-failing-tests.patch
+Patch1:         compatible-openssl.patch
+
 %if 0%{?with_fips:1}
 Source100:      openssl-fips-2.0.9-lin64.tar.gz
 %endif
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl(English)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl-generators
 %if 0%{?with_check}
-BuildRequires:  perl(Autoloader)
+BuildRequires:  perl(AutoLoader)
 BuildRequires:  perl(CPAN)
 BuildRequires:  perl(CPAN::Meta)
 BuildRequires:  perl(CPAN::Meta::Requirements)
@@ -48,7 +51,7 @@ Net::SSLeay module basically comprise of:
 
 %prep
 %setup -q -n Net-SSLeay-%{version}
-%patch 0 -p1
+%autopatch -p1
 
 %build
 %if 0%{?with_fips:1}
@@ -80,6 +83,15 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Wed May 21 2025 Riken Maharjan <rmaharjan@microsoft.com> -  1.92-6
+- Fix ptest by adding upstream fix to the test.
+
+* Mon Aug 05 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.92-5
+- Fix bad capitalization of perl(AutoLoader)
+
+* Thu May 30 2024 Andrew Phelps <anphel@microsoft.com> - 1.92-4
+- Add BR on openssl
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.92-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

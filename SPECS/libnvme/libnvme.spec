@@ -1,9 +1,11 @@
 Summary: Linux-native nvme device management library
 Name:    libnvme
 Version: 1.8
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: LGPL-2.1-or-later
 URL:     https://github.com/linux-nvme/libnvme
+Vendor:  Microsoft Corporation
+Distribution:  Azure Linux
 Source0: https://github.com/linux-nvme/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires: dbus-devel
 BuildRequires:  gcc
@@ -73,6 +75,9 @@ This package contains Python bindings for libnvme.
 %{python3_sitearch}/libnvme/*
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.8-2
+- Add missing Vendor and Distribution tags.
+
 * Wed Feb 21 2024 Adit Jha <aditjha@microsoft.com> - 1.8-1
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).  License verified.
 

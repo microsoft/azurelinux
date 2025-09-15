@@ -1,18 +1,24 @@
 Summary:        ECDSA cryptographic signature library (pure python)
 Name:           python-ecdsa
 Version:        0.18.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://pypi.python.org/pypi/ecdsa
 Source0:        https://github.com/tlsfuzzer/%{name}/archive/refs/tags/%{name}-%{version}.tar.gz
+Patch0:         308.patch
 BuildRequires:  openssl
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-six
+BuildRequires:  python3-hypothesis
+BuildRequires:  python3-attrs
+BuildRequires:  python3-sortedcontainers
+BuildRequires:  python3-pytest
 %endif
 BuildArch:      noarch
 
@@ -33,7 +39,7 @@ and signatures are very short, making them easy to handle and incorporate
 into other protocols.
 
 %prep
-%autosetup -n %{name}-%{name}-%{version}
+%autosetup -p1 -n %{name}-%{name}-%{version}
 
 %build
 %py3_build
@@ -42,8 +48,7 @@ into other protocols.
 %{py3_install "--single-version-externally-managed"}
 
 %check
-pip3 install tox
-tox -e py%{python3_version_nodots}
+%pytest
 
 %files -n python3-ecdsa
 %defattr(-, root, root)
@@ -51,6 +56,11 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Tue Apr 15 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.18.0-2
+- Fix Ptest by importing 308 patch from Fedora (License:MIT)
+- Add missing test packages
+- Use normal pytest instead of tox
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.18.0-1
 - Auto-upgrade to 0.18.0 - Azure Linux 3.0 - package upgrades
 

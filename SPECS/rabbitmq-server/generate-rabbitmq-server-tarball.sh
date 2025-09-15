@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script serves to generate the rabbitmq-server-hex-vendor-3.11.11.tar.gz
+# This script serves to generate the rabbitmq-server-hex-vendor-3.13.0.tar.gz
 # used in rabbitmq-server.spec. to run this script, use the following command:
 #   ./generate-rabbitmq-server-tarball.sh
 #
@@ -8,44 +8,34 @@
 # source), then tar everything up into the name specified in 
 # VENDOR_TARBALL_NAME. If the directory name in TEMP_TARBALL_DIR conflits 
 # locally, adjust the variable contents as necessary.
+#
+# NOTE: Rabbitmq currently does not seem to require an additional hex modules at this
+#       time. This may change in the future so this script is left in place for future
+#       reference. 
+#       Additionally, the steps to create the rabbitmq-server-hex-cache tarball are 
+#       included here rather than the spec.
+# --------
+# Steps to create the rabbitmq-server-hex-cache tarball. A network connection is required to create this cache.
+# --------
+# 1. To ensure the cache file is as small as possible, first delete ~/.hex/cache.ets if it exists
+# 2. Pull the rabbitmq-server source from Source0
+# 3. Unpack the source and run `make` with the rabbitmq-server-<version> directory
+# 4. Run `make install`
+# 5. Find the cache.ets file created by hex (likely ~/.hex/cache.ets by default)
+# 6. Copy the cache.ets file to the same directory as rabbitmqHexCacheMakefile
+# 7. Run `make generate-hex-cache -f rabbitmqHexCacheMakefile`
+# 8. Run `tar -czf rabbitmq-server-hex-cache-<version>.tar.gz cache.erl`
+# --------
 
 
 # baseline variables for filename and temporary directory to avoid filenme collisions
 TEMP_TARBALL_DIR="TempRabbitmqTarball"
-VENDOR_TARBALL_NAME="rabbitmq-server-hex-vendor-3.11.11"
+VENDOR_TARBALL_NAME="rabbitmq-server-hex-vendor-3.13.0"
 
-#Create Hex Packag arrays and link
+# Create Hex Packag arrays and link
 HEX_PM_LINK="https://repo.hex.pm/tarballs"
 declare -a HEX_PACKAGES
-HEX_PACKAGES+=("benchfella-0.3.5")
-HEX_PACKAGES+=("bunt-0.2.1")
-HEX_PACKAGES+=("certifi-2.9.0")
-HEX_PACKAGES+=("cesso-0.1.3")
-HEX_PACKAGES+=("credo-1.7.0")
-HEX_PACKAGES+=("csvlixir-2.0.4")
-HEX_PACKAGES+=("dialyzex-1.3.0")
-HEX_PACKAGES+=("earmark-1.4.37")
-HEX_PACKAGES+=("earmark_parser-1.4.31")
-HEX_PACKAGES+=("excoveralls-0.16.0")
-HEX_PACKAGES+=("excoveralls-0.13.4")
-HEX_PACKAGES+=("ex_csv-0.1.5")
-HEX_PACKAGES+=("ex_doc-0.29.3")
-HEX_PACKAGES+=("file_system-0.2.10")
-HEX_PACKAGES+=("hackney-1.18.1")
-HEX_PACKAGES+=("idna-6.1.1")
-HEX_PACKAGES+=("inch_ex-0.5.6")
-HEX_PACKAGES+=("jason-1.4.0")
-HEX_PACKAGES+=("makeup-1.1.0")
-HEX_PACKAGES+=("makeup_elixir-0.16.0")
-HEX_PACKAGES+=("makeup_erlang-0.1.1")
-HEX_PACKAGES+=("metrics-1.0.1")
-HEX_PACKAGES+=("mimerl-1.2.0")
-HEX_PACKAGES+=("nimble_parsec-1.2.3")
-HEX_PACKAGES+=("parallel_stream-1.0.6")
-HEX_PACKAGES+=("parse_trans-3.3.1")
-HEX_PACKAGES+=("poison-3.1.0")
-HEX_PACKAGES+=("ssl_verify_fun-1.1.6")
-HEX_PACKAGES+=("unicode_util_compat-0.7.0")
+# HEX_PACKAGES+=("<package>-<version>")
 
 # Create Git Links
 ELIXIR_HEX_VERSION="2.0.6"

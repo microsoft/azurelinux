@@ -1,0 +1,68 @@
+Description: Workaround environment variable settings
+ Add environment to be set by packaging
+Forwarded: not-needed
+Author: Colin Ian King <colin.i.king@gmail.com>
+
+Index: intel-cmt-cat-24.05/lib/Makefile
+===================================================================
+--- intel-cmt-cat-24.05.orig/lib/Makefile
++++ intel-cmt-cat-24.05/lib/Makefile
+@@ -121,10 +121,10 @@ endif
+ 
+ HDR = pqos.h
+ PREFIX ?= /usr/local
+-LIB_INSTALL_DIR ?= $(PREFIX)/lib
+-HDR_DIR ?= $(PREFIX)/include
++LIB_INSTALL_DIR ?= $(DESTDIR)/usr/lib64
++HDR_DIR ?= $(DESTDIR)/usr/include
+ DEPFILE = $(LIB).dep
+-NOLDCONFIG ?= n
++NOLDCONFIG ?= y
+ 
+ all: $(LIBNAME)
+ 
+Index: intel-cmt-cat-24.05/pqos/Makefile
+===================================================================
+--- intel-cmt-cat-24.05.orig/pqos/Makefile
++++ intel-cmt-cat-24.05/pqos/Makefile
+@@ -96,8 +96,8 @@ MAN = pqos.8
+ 
+ # XXX: modify as desired
+ PREFIX ?= /usr/local
+-BIN_DIR = $(PREFIX)/bin
+-MAN_DIR = $(PREFIX)/man/man8
++BIN_DIR = $(DESTDIR)/usr/sbin
++MAN_DIR = $(DESTDIR)/usr/share/man/man8
+ 
+ SRCS = $(sort $(wildcard *.c))
+ OBJS = $(addprefix $(OBJDIR)/,$(SRCS:.c=.o))
+Index: intel-cmt-cat-24.05/rdtset/Makefile
+===================================================================
+--- intel-cmt-cat-24.05.orig/rdtset/Makefile
++++ intel-cmt-cat-24.05/rdtset/Makefile
+@@ -97,8 +97,8 @@ MAN = rdtset.8
+ 
+ # XXX: modify as desired
+ PREFIX ?= /usr/local
+-BIN_DIR = $(PREFIX)/bin
+-MAN_DIR = $(PREFIX)/man/man8
++BIN_DIR = $(DESTDIR)/usr/sbin
++MAN_DIR = $(DESTDIR)/usr/share/man/man8
+ 
+ SRCS = $(sort $(wildcard *.c))
+ OBJS = $(SRCS:.c=.o)
+Index: intel-cmt-cat-24.05/tools/membw/Makefile
+===================================================================
+--- intel-cmt-cat-24.05.orig/tools/membw/Makefile
++++ intel-cmt-cat-24.05/tools/membw/Makefile
+@@ -41,8 +41,8 @@ MAN = membw.8
+ 
+ # XXX: modify as desired
+ PREFIX ?= /usr/local
+-BIN_DIR = $(PREFIX)/bin
+-MAN_DIR = $(PREFIX)/man/man8
++BIN_DIR = $(DESTDIR)/usr/bin
++MAN_DIR = $(DESTDIR)/usr/share/man/man8
+ 
+ CFLAGS=-W -Wall -Wextra -Wstrict-prototypes -Wmissing-prototypes \
+ 	-Wmissing-declarations -Wold-style-definition -Wpointer-arith \

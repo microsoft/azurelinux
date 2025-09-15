@@ -1,13 +1,26 @@
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.11.5
-Release:        1%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/General Libraries
 URL:            https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 Source0:        https://gitlab.gnome.org/GNOME/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
+Patch0:         CVE-2024-40896.patch
+Patch1:         CVE-2023-45322.patch
+Patch2:         CVE-2024-34459.patch
+Patch3:         CVE-2024-56171.patch
+Patch4:         CVE-2025-24928.patch
+Patch5:         CVE-2024-25062.patch
+Patch6:         CVE-2025-27113.patch
+Patch7:         CVE-2025-32414.patch
+Patch8:         CVE-2025-32415.patch
+Patch9:         CVE-2025-6021.patch
+Patch10:        CVE-2025-6170.patch
+Patch11:        CVE-2025-49794_CVE-2025-49796.patch
+
 BuildRequires:  python3-devel
 BuildRequires:  python3-xml
 Provides:       %{name}-tools = %{version}-%{release}
@@ -78,6 +91,22 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Sat Jul 19 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.11.5-6
+- Patch CVE-2025-49794 and CVE-2025-49796
+- Also added patches for CVE-2025-6021 (PR#14237) and CVE-2025-6170 (PR#14226)
+
+* Mon May 05 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.11.5-5
+- Patch CVE-2025-32414 and CVE-2025-32415
+
+* Sat Feb 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.11.5-4
+- Patch CVE-2025-24928, CVE-2024-56171, CVE-2024-25062, CVE-2025-27113
+
+* Fri Jan 24 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.11.5-3
+- Fix CVE-2023-45322 & CVE-2024-34459
+
+* Thu Dec 26 2024 Muhammad Falak <mwani@microsoft.com> - 2.11.5-2
+- Patch CVE-2024-40896
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.11.5-1
 - Auto-upgrade to 2.11.5 - Azure Linux 3.0 - package upgrades
 

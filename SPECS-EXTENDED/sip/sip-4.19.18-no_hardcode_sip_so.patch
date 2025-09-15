@@ -1,7 +1,7 @@
-diff -up sip-4.19.18/configure.py.orig sip-4.19.18/configure.py
---- sip-4.19.18/configure.py.orig	2019-07-04 12:28:08.000000000 -0400
-+++ sip-4.19.18/configure.py	2019-08-27 21:56:33.871428348 -0400
-@@ -447,7 +447,7 @@ def create_makefiles(macros):
+diff -rupN --no-dereference sip-4.19.25/configure.py sip-4.19.25-new/configure.py
+--- sip-4.19.25/configure.py	2021-02-26 16:28:41.621025600 +0100
++++ sip-4.19.25-new/configure.py	2021-10-21 13:45:54.845566597 +0200
+@@ -449,7 +449,7 @@ def create_makefiles(macros):
          if sys.platform == 'win32':
              mod = 'sip.lib' if opts.static else 'sip.pyd'
          else:

@@ -1,0 +1,65 @@
+From ab01996d4d539cada0013b837b782f27db6b96ff Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 16 Sep 2011 10:33:54 +0200
+Subject: [PATCH] Redirect to ca-certificates bundle
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This patch replaces Mozilla-CA certificate bundle with a bundle
+delivered by ca-certificates RPM package used as a single source of
+the Mozilla certificate bundle.
+
+See <https://bugzilla.redhat.com/show_bug.cgi?id=738383> for more
+details.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+
+diff --git a/MANIFEST b/MANIFEST
+index a88847b..6577ede 100644
+--- a/MANIFEST
++++ b/MANIFEST
+@@ -1,7 +1,6 @@
+ .editorconfig
+ Changes
+ lib/Mozilla/CA.pm
+-lib/Mozilla/CA/cacert.pem
+ maint/cacert-diff
+ maint/get-tarball-name
+ maint/make-tarball
+diff --git a/Makefile.PL b/Makefile.PL
+index 9faf720..a491813 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -90,3 +90,11 @@
+ 
+ ExtUtils::MakeMaker::WriteMakefile(%MM_ARGS);
+ ## END BOILERPLATE ###########################################################
++
++package MY;
++sub MY::libscan {
++    my $name = shift->SUPER::libscan(@_);
++    # Remove private certificate bundle
++    if ($name =~ /cacert.pem\z/) { $name = '' };
++    return $name;
++}
+diff --git a/lib/Mozilla/CA.pm b/lib/Mozilla/CA.pm
+index e4a6c56..fdb3c75 100644
+--- a/lib/Mozilla/CA.pm
++++ b/lib/Mozilla/CA.pm
+@@ -5,11 +5,9 @@
+ our $VERSION = '20240730';
+ 
+ use File::Spec ();
+-use File::Basename qw(dirname);
+ 
+ sub SSL_ca_file {
+-    my $file = File::Spec->catfile(dirname(__FILE__), "CA", "cacert.pem");
+-    return File::Spec->rel2abs($file);
++    return File::Spec->catfile('/etc/pki/tls/certs/ca-bundle.crt');
+ }
+ 
+ 1;
+-- 
+2.25.4
+

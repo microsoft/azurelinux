@@ -1,0 +1,70 @@
+commit 6502759a528dbd5a816431ccc0fd51bfa752a934
+Author: Will Cohen <wcohen@redhat.com>
+Date:   Wed Jan 29 12:25:43 2025 +1100
+
+    build: fixes to allow pcp to build with gcc version 15
+
+diff --git a/qa/src/hp-mib.c b/qa/src/hp-mib.c
+index 7293a7e11..4a3f8a991 100644
+--- a/qa/src/hp-mib.c
++++ b/qa/src/hp-mib.c
+@@ -56,9 +56,11 @@ static const char *metrics[] = {
+ static pmID pmids[NMETRICS];
+ 
+ static int
+-int_compare(int *a, int *b)
++int_compare(const void *a, const void *b)
+ {
+-    return *a - *b;
++    const int x = *(const int *)a;
++    const int y = *(const int *)b;
++    return x - y;
+ }
+ 
+ int
+@@ -73,7 +75,6 @@ main(int argc, char **argv)
+     int		all_n;
+     int		*all_inst;
+     char	**all_names;
+-    int		(*int_cmp)() = int_compare;
+     static char	*usage = "[-D debugspec] [-n namespace]";
+ 
+     pmSetProgname(argv[0]);
+@@ -155,7 +156,7 @@ main(int argc, char **argv)
+      * sort the instance identifiers
+      * [This has to be done before every fetch]
+      */
+-    qsort(all_inst, all_n, sizeof(int), int_cmp);
++    qsort(all_inst, all_n, sizeof(int), int_compare);
+ 
+     /*
+      * establish an explicit instance profile
+diff --git a/src/pmdas/summary/summary.c b/src/pmdas/summary/summary.c
+index 5d63c60c3..492fb14db 100644
+--- a/src/pmdas/summary/summary.c
++++ b/src/pmdas/summary/summary.c
+@@ -277,7 +277,7 @@ summary_store(pmResult *result, pmdaExt * ex)
+ void
+ summary_init(pmdaInterface *dp)
+ {
+-    void (*callback)() = freeResultCallback;
++    void (*callback)(pmResult *) = freeResultCallback;
+ 
+     dp->version.two.profile = summary_profile;
+     dp->version.two.fetch = summary_fetch;
+diff --git a/src/zabbix-agent/src/zbxpcp.c b/src/zabbix-agent/src/zbxpcp.c
+index e6b83391d..7112d0aff 100644
+--- a/src/zabbix-agent/src/zbxpcp.c
++++ b/src/zabbix-agent/src/zbxpcp.c
+@@ -185,9 +185,9 @@ static void zbx_module_pcp_add_metric(const char *name)
+     metrics[metric_count].key = metric;
+     metrics[metric_count].flags = 0;
+     if (zbx_version >= ZBX_VERSION3)
+-	metrics[metric_count].function = zbx_module3_pcp_fetch_metric;
++	metrics[metric_count].function = (int (*)()) zbx_module3_pcp_fetch_metric;
+     else
+-	metrics[metric_count].function = zbx_module2_pcp_fetch_metric;
++	metrics[metric_count].function = (int (*)()) zbx_module2_pcp_fetch_metric;
+     metrics[metric_count].test_param = NULL;
+     metric_count++;
+ }

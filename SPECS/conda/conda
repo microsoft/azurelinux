@@ -37,8 +37,9 @@ function __comp_conda_ensure_root() {
         :    import conda
         :    print(os.path.dirname(conda.__file__))
         "
+        script="${script//        :    /}"
         # don't assume an active base environment
-        CONDA_SOURCE=$(conda activate base; python -c "${script//        :    /}")
+        CONDA_SOURCE=$(conda activate base; python -c "$script")
     fi
 }
 
@@ -51,40 +52,49 @@ function __comp_conda_commands () {
     echo activate deactivate
 
     # check commands from full anaconda install
-    for f in $CONDA_SOURCE/cli/main_*.py
+    for f in "$CONDA_SOURCE"/cli/main_*.py
     do
         # skip pip -- not a sub-command
-        [[ $f == */main_pip.py ]] && continue
-        \expr match "$f" '.*_\([a-z]\+\)\.py$'
+        [[ "$f" == */main_pip.py ]] && continue
+        if [[ "$f" =~ .*_([a-z]+)\.py$ ]]; then
+            echo "${BASH_REMATCH[1]}"
+        fi
     done
 
     # check extra pluggins
-    for f in $CONDA_ROOT/bin/conda-*
+    for f in "$CONDA_ROOT"/bin/conda-*
     do
         if [[ -x "$f" && ! -d "$f" ]]
         then
-            \expr match "$f" '^.*/conda-\(.*\)'
+            if [[ "$f" =~ .*/conda-(.*) ]]; then
+                echo "${BASH_REMATCH[1]}"
+            fi
         fi
     done
 }
 
 function __comp_conda_env_commands() {
-    for f in $CONDA_SOURCE/../conda_env/cli/main_*.py
+    for f in "$CONDA_SOURCE"/../conda_env/cli/main_*.py
     do
-        \expr match "$f" '.*_\([a-z]\+\)\.py$'
+        [[ "$f" == */main_vars.py ]] && continue
+        if [[ "$f" =~ .*_([a-z]+)\.py$ ]]; then
+            echo "${BASH_REMATCH[1]}"
+        fi
     done
 }
 
 function __comp_conda_envs() {
     \local script="
-    :    from __future__ import print_function;
-    :    import json, os, sys;
-    :    from os.path import isdir, join;
+    :    from __future__ import print_function
+    :    import json, os, sys
+    :    from os.path import isdir, join
     :    print('\n'.join(
     :       d for ed in json.load(sys.stdin)['envs_dirs'] if isdir(ed)
-    :       for d in os.listdir(ed) if isdir(join(ed, d))));
+    :       for d in os.listdir(ed) if isdir(join(ed, d)))
+    :    )
     "
-    conda config --json --show envs_dirs | python -c "${script//    :    /}"
+    script="${script//    :    /}"
+    conda config --json --show envs_dirs | $CONDA_PYTHON_EXE -c "$script"
 }
 
 function __comp_conda_packages() {
@@ -95,13 +105,13 @@ function __comp_conda_cmds_str() {
     # get a list of commands, skipping options
     \local cmd
     \local -a cmds
-    for cmd in $*; do
+    for cmd in "$@"; do
         case "$cmd" in
             -*) continue ;;
-            *) cmds+=($cmd) ;;
+            *) cmds+=("$cmd") ;;
         esac
     done
-    echo "${cmds[*]}"
+    echo "${cmds[@]}"
 }
 
 # helper for debugging issues with the cache
@@ -135,7 +145,7 @@ function __comp_conda_option_lookup() {
     else
         word_list=${__comp_conda_cache[$cmd_key]}
     fi
-    echo $word_list
+    echo "$word_list"
 }
 
 # cache conda subcommand help lookups for the duration of the shell
@@ -149,6 +159,7 @@ __comp_conda_ensure_root 2>/dev/null || :
 
 _comp_conda()
 {
+    # shellcheck disable=SC2034
     \local cur prev words cword
     _init_completion || return
 
@@ -157,7 +168,7 @@ _comp_conda()
     \local word_list cmd_str
     if [[ $cur == -* ]]; then
         # get the current list of commands as a string sans options
-        cmd_str="$(__comp_conda_cmds_str ${words[@]})"
+        cmd_str=$(__comp_conda_cmds_str "${words[@]}")
         word_list=$(__comp_conda_option_lookup "$cmd_str")
     else
         case "$prev" in
@@ -168,8 +179,12 @@ _comp_conda()
                 word_list=$(__comp_conda_env_commands 2>/dev/null)
                 ;;
             activate)
-                _filedir -d                     # environment directories
-                word_list=$(__comp_conda_envs 2>/dev/null)
+                if [[ $cur == */* ]]
+                then
+                    _filedir -d  # environment directories
+                else
+                    word_list=$(__comp_conda_envs 2>/dev/null)
+                fi
                 ;;
             remove|uninstall|upgrade|update)
                 word_list=$(__comp_conda_packages 2>/dev/null)
@@ -193,7 +208,9 @@ _comp_conda()
         esac
     fi
     if [[ -n $word_list ]]; then
-        COMPREPLY+=( $(compgen -W "$word_list" -- "$cur") )
+        # append completion suggestions to COMPREPLY
+        mapfile -t -O "${#COMPREPLY[@]}" COMPREPLY < \
+            <(compgen -W "$word_list" -- "$cur")
     fi
 } &&
 complete -F _comp_conda conda

@@ -1,24 +1,20 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global modname uritemplate
 %global altname uritemplate.py
 
 %global _docdir_fmt %{name}
 
 Name:           python-%{modname}
-Version:        3.0.0
-Release:        13%{?dist}
+Version:        4.1.1
+Release:        11%{?dist}
 Summary:        Simple python library to deal with URI Templates (RFC 6570)
 
-License:        BSD
+License:        BSD or ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://%{modname}.readthedocs.io
 Source0:        https://github.com/sigmavirus24/%{modname}/archive/%{version}/%{modname}-%{version}.tar.gz#/python-%{modname}-%{version}.tar.gz
 
 BuildArch:      noarch
-
-%if 0%{?with_check}
-BuildRequires:  python3-pip
-%endif
 
 %description
 %{summary}.
@@ -30,7 +26,7 @@ Conflicts:      python3-uri-templates
 %{?python_provide:%python_provide python3-%{altname}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-
+BuildRequires:  python3-pytest
 
 %description -n python3-%{modname}
 %{summary}.
@@ -47,24 +43,71 @@ Python 3 version.
 %py3_install
 
 %check
-pip3 install pytest
-pip3 install .
-py.test -v
+PYTHONPATH=%{buildroot}%{python3_sitelib} py.test -v
 
 %files -n python3-%{modname}
-%license LICENSE
+%license LICENSE LICENSE.APACHE LICENSE.BSD
 %doc HISTORY.rst README.rst
 %{python3_sitelib}/%{modname}-*.egg-info/
 %{python3_sitelib}/%{modname}/
 
 %changelog
-* Tue Apr 26 2022 Muhammad Falak <mwani@microsoft.com> - 3.0.0-13
-- Enable tests by removing build gates
-- Drop BR on pytest & pip install latest deps to enable pytest
-- License verified
+* Mon Dec 23 2024 Akhila Guruju <v-guakhila@microsoft.com> - 4.1.1-11
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.0-12
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 4.1.1-9
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 4.1.1-5
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.1.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 4.1.1-2
+- Rebuilt for Python 3.11
+
+* Fri May 27 2022 Nick Bebout <nb@fedoraproject.org> - 4.1.0-1
+- Update to 4.1.0
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.1-6
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 3.0.1-5
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 3.0.1-2
+- Rebuilt for Python 3.9
+
+* Sun May 03 2020 Felix Schwarz <fschwarz@fedoraproject.org> - 3.0.1-1
+- update to 3.0.1
+- declare licensing correctly and include actual license files
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-11
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

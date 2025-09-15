@@ -1,0 +1,25 @@
+diff -up ./rpm/macros.scl.old ./rpm/macros.scl
+--- ./rpm/macros.scl.old	2024-08-21 10:07:50.179485587 +0200
++++ ./rpm/macros.scl	2024-08-21 10:08:32.739167017 +0200
+@@ -7,10 +7,10 @@
+ %define old_debug %{lua:print(rpm.expand("%{debug_package}"):len())}
+ %undefine _debugsource_packages
+ %global debug_package %{expand:
+-%if "%{?old_debug}" == "0"
++%if "%{?old_debug}" == "0"
+        %{expand: %{nil}}
+ %else
+-%if "%{?scl}%{!?scl:0}" == "%{pkg_name}"
++%if 0
+         %{expand: %{nil}}
+ %else
+ %ifnarch noarch
+@@ -97,7 +97,7 @@ package or when debugging this package.
+     [ -f /usr/lib/rpm/redhat/brp-python-hardlink ] && /usr/lib/rpm/redhat/brp-python-hardlink || /usr/lib/rpm/brp-python-hardlink
+ %{nil}}
+ BuildRequires: scl-utils-build
+-%if "%{?scl}%{!?scl:0}" == "%{pkg_name}"
++%if 0
+ Requires: %{scl_runtime}
+ Provides: scl-package(%{scl})
+ %endif

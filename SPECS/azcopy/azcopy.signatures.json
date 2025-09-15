@@ -1,6 +1,6 @@
 {
-  "Signatures": {
-    "azure-storage-azcopy-10.22.1-vendor.tar.gz": "a6cd11881e490b0ba451243113009d5b7b372ab04f18afc608f8d6e6fbcd2c13",
-    "azure-storage-azcopy-10.22.1.tar.gz": "fc7314f534845353252a743928845bfc0b1a9e56752e9cf01e4e4c12eb0f1bf6"
-  }
+ "Signatures": {
+  "azure-storage-azcopy-10.25.1-vendor.tar.gz": "2e51019e29834b9b4ea2480fa80eaa95d2ce09601eb1be2edcf5febd927e5a4e",
+  "azure-storage-azcopy-10.25.1.tar.gz": "d62f0a88e8899a611d9ef627252e4379bee8530177caca081f155e28917e70d3"
+ }
 }

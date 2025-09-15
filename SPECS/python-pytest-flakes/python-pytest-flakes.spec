@@ -3,11 +3,13 @@
 
 Name:           python-%{srcname}
 Version:        4.0.5
-Release:        8%{?dist}
+Release:        10%{?dist}
 Summary:        Pytest plugin to check source code with pyflakes
 
 License:        MIT
 URL:            https://pypi.python.org/pypi/pytest-flakes
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        %{pypi_source}
 
 BuildArch:      noarch
@@ -22,6 +24,9 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3dist(pytest) >= 2.8
 BuildRequires:  python3dist(pyflakes)
+%if 0%{?with_check}
+BuildRequires:  python3-pip
+%endif
 
 %description -n python3-%{srcname}
 Py.test plugin for efficiently checking python source with pyflakes.
@@ -49,6 +54,12 @@ rm -rf *.egg-info
 %{python3_sitelib}/__pycache__/pytest_flakes.*
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 4.0.5-10
+- Add missing Vendor and Distribution tags.
+
+* Mon May 20 2024 Sam Meluch <sammeluch@microsoft.com> - 4.0.5-9
+- Add pip test dependency to fix package tests
+
 * Tue Feb 27 2024 Dan Streetman <ddstreet@microsoft.com> - 4.0.5-8
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 - license verified

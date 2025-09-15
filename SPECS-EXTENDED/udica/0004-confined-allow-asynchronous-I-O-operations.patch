@@ -1,0 +1,31 @@
+From 131d228c6a91eaaeccc1d000821beeccba69d134 Mon Sep 17 00:00:00 2001
+From: Vit Mojzis <vmojzis@redhat.com>
+Date: Mon, 4 Mar 2024 12:59:53 +0100
+Subject: [PATCH] confined: allow asynchronous I/O operations
+
+Signed-off-by: Vit Mojzis <vmojzis@redhat.com>
+---
+ udica/macros/confined_user_macros.cil | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/udica/macros/confined_user_macros.cil b/udica/macros/confined_user_macros.cil
+index 06c4c56..dcb5198 100644
+--- a/udica/macros/confined_user_macros.cil
++++ b/udica/macros/confined_user_macros.cil
+@@ -4012,6 +4012,13 @@
+       (allow remote_login_t utype (process (signal transition)))
+       (allow utype self (bpf (prog_load)))
+     )
++    ; asynchronous I/O operations RHEL 10
++    (optional  confinedom_user_login_optional_4
++      (typeattributeset cil_gen_require io_uring_t)
++      (allow utype self (io_uring (sqpoll)))
++      (allow utype io_uring_t (anon_inode (create)))
++      (allow utype io_uring_t (anon_inode (read write getattr map)))
++    )
+ )
+ 
+ (macro confined_ssh_connect_macro ((type utype) (role urole) (type ssh_agent_type))
+-- 
+2.43.0
+

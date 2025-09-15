@@ -5,7 +5,7 @@ The plugin manager stripped of pytest specific details.
 Summary:        The plugin manager stripped of pytest specific details
 Name:           python-pluggy
 Version:        1.3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,7 @@ BuildRequires:  python3-setuptools_scm
 %if 0%{?with_check}
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
+BuildRequires:  python3-more-itertools
 BuildRequires:  python3-pytest
 %endif
 
@@ -39,7 +40,7 @@ The plugin manager stripped of pytest specific details.
 %py3_install
 
 %check
-pip3 install more-itertools
+pip3 install iniconfig
 
 # TODO investigate test_load_setuptools_instantiation failure
 PYTHONPATH=%{buildroot}%{python3_sitelib} python3 -m pytest testing -k "not test_load_setuptools_instantiation"
@@ -51,6 +52,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} python3 -m pytest testing -k "not test
 %license LICENSE
 
 %changelog
+* Mon May 13 2024 Sam Meluch <sammeluch@microsoft.com> - 1.3.0-2
+- Add missing iniconfig dependency to check section
+
 * Tue Jan 23 2024 Andrew Phelps <anphel@microsoft.com> - 1.3.0-1
 - Upgrade to version 1.3.0
 

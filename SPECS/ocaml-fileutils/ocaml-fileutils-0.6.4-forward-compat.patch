@@ -1,0 +1,27 @@
+--- fileutils-0.6.4/fileutils.opam.orig	2022-10-28 14:22:35.000000000 -0600
++++ fileutils-0.6.4/fileutils.opam	2023-06-22 13:01:26.779533940 -0600
+@@ -16,8 +16,6 @@ build: [
+ depends: [
+   "ocaml" {>= "4.03"}
+   "base-unix"
+-  "stdlib-shims"
+-  "seq"
+   "dune" {>= "1.11.0"}
+   "ounit2" {with-test & >= "2.0.0"}
+ ]
+--- fileutils-0.6.4/src/lib/fileutils/dune.orig	2022-10-28 14:22:35.000000000 -0600
++++ fileutils-0.6.4/src/lib/fileutils/dune	2023-06-22 13:01:47.403222843 -0600
+@@ -30,4 +30,4 @@
+     fileUtilWHICH
+     unixPath
+     win32Path)
+-  (libraries unix seq stdlib-shims))
++  (libraries unix))
+--- fileutils-0.6.4/test/dune.orig	2022-10-28 14:22:35.000000000 -0600
++++ fileutils-0.6.4/test/dune	2023-06-22 13:02:04.739961336 -0600
+@@ -6,4 +6,4 @@
+ (test
+   (name test)
+   (modules test)
+-  (libraries fileutils fileutils_str ounit2 stdlib-shims))
++  (libraries fileutils fileutils_str ounit2))

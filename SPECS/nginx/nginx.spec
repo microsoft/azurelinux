@@ -1,13 +1,12 @@
 %global nginx_user nginx
-%global njs_version 0.7.12
-%global opentelemetry_cpp_contrib_git_commit 37e4466d882cbddff6f607a20fe327060de76166
+%global njs_version 0.8.3
 
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
-Version:        1.25.2
-Release:        1%{?dist}
+Version:        1.25.4
+Release:        5%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,11 +15,25 @@ URL:            https://nginx.org/
 Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        https://github.com/nginx/njs/archive/refs/tags/%{njs_version}.tar.gz#/%{name}-njs-%{njs_version}.tar.gz
-Source3:        https://github.com/open-telemetry/opentelemetry-cpp-contrib/archive/%{opentelemetry_cpp_contrib_git_commit}.tar.gz#/opentelemetry-cpp-contrib-%{opentelemetry_cpp_contrib_git_commit}.tar.gz
+
+%if 0%{?with_check}
+Source3:        nginx-tests.tgz
+%endif
+
+Patch0:         CVE-2024-7347.patch
+Patch1:         CVE-2025-23419.patch
+Patch2:         CVE-2025-53859.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
-BuildRequires:  pcre-devel
+
+%if 0%{?with_check}
+BuildRequires:  perl-FindBin
+BuildRequires:  perl-Test-Harness
+BuildRequires:  perl-lib
+BuildRequires:  perl-App-cpanminus
+%endif
+
 BuildRequires:  pcre2-devel
 BuildRequires:  readline-devel
 BuildRequires:  which
@@ -55,21 +68,12 @@ The OpenTelemetry module for Nginx
 %prep
 %autosetup -p1
 pushd ../
-mkdir nginx-njs
+mkdir -p nginx-njs
 tar -C nginx-njs -xf %{SOURCE2}
-mkdir otel-cpp-contrib
-tar -C otel-cpp-contrib -xf %{SOURCE3}
-# The following change is a build break in upstream and a PR has been raised to fix it.
-# PR: https://github.com/open-telemetry/opentelemetry-cpp-contrib/pull/314
-sed -i \
-        '/\#include <opentelemetry\/sdk\/trace\/processor.h>$/a \#include <opentelemetry\/sdk\/trace\/batch_span_processor_options.h>' \
-        otel-cpp-contrib/opentelemetry-cpp-contrib-%{opentelemetry_cpp_contrib_git_commit}/instrumentation/nginx/src/otel_ngx_module.cpp
-popd
 
 %build
 sh configure \
     --add-module=../nginx-njs/njs-%{njs_version}/nginx   \
-    --add-dynamic-module=../otel-cpp-contrib/opentelemetry-cpp-contrib-%{opentelemetry_cpp_contrib_git_commit}/instrumentation/nginx   \
     --conf-path=%{_sysconfdir}/nginx/nginx.conf    \
     --error-log-path=%{_var}/log/nginx/error.log   \
     --group=%{nginx_user} \
@@ -81,6 +85,7 @@ sh configure \
     --user=%{nginx_user} \
     --with-stream_ssl_module \
     --with-http_auth_request_module \
+    --with-http_dav_module \
     --with-http_gunzip_module \
     --with-http_gzip_static_module \
     --with-http_realip_module \
@@ -89,7 +94,6 @@ sh configure \
     --with-http_sub_module \
     --with-http_v2_module \
     --with-ipv6 \
-    --with-pcre \
     --with-stream \
     --with-compat
 
@@ -112,6 +116,26 @@ getent passwd %{nginx_user} > /dev/null || \
     useradd -r -d %{_localstatedir}/lib/nginx -g %{nginx_user} \
     -s /sbin/nologin -c "Nginx web server" %{nginx_user}
 exit 0
+
+%if 0%{?with_check}
+%check
+cpanm Test::Simple@1.302199 --force
+cpanm Time::HiRes
+cd %{buildroot}
+cp -r usr/sbin/* /usr/sbin/
+cp -r var/opt/* /var/opt/
+cp -r var/log/* /var/log/
+cp -r usr/lib/debug/usr/sbin/* /usr/lib/debug/sbin/
+cp -r usr/lib/systemd/* /usr/lib/systemd/
+cp -r etc/* /etc/
+cp /etc/nginx/mime.types.default /etc/nginx/mime.types
+useradd -s /usr/bin/sh %{nginx_user}
+tar -xvf %{SOURCE3}
+cd nginx-tests
+su nginx -s /bin/sh -c 'TEST_NGINX_BINARY=%{_sbindir}/nginx prove ./*.t'
+cd ..
+rm -rf nginx-tests
+%endif
 
 %files
 %defattr(-,root,root)
@@ -139,11 +163,24 @@ exit 0
 %files filesystem
 %dir %{_sysconfdir}/%{name}
 
-%files otel_ngx_module
-%license ../otel-cpp-contrib/opentelemetry-cpp-contrib-%{opentelemetry_cpp_contrib_git_commit}/LICENSE
-%{_sysconfdir}/%{name}/modules/otel_ngx_module.so
-
 %changelog
+* Tue Aug 19 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.25.4-5
+- Patch for CVE-2025-53859
+
+* Tue Mar 11 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.25.4-4
+- Enable webdav module
+- Added tests to verify nginx server and its supported modules
+
+* Tue Feb 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.25.4-3
+- Fix CVE-2025-234419
+
+* Tue Aug 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.25.4-2
+- Fix CVE-2024-7347
+
+* Wed Mar 20 2024 Betty Lakes <bettylakes@microsoft.com> - 1.25.4-1
+- Upgrade to 1.25.4, upgrade njs to 0.8.3
+- Move from pcre to pcre2
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.2-1
 - Auto-upgrade to 1.25.2 - Azure Linux 3.0 - package upgrades
 

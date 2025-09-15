@@ -2,15 +2,39 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:             adobe-mappings-cmap
 Summary:          CMap resources for Adobe's character collections
-Version:          20171205
-Release:          8%{?dist}
-License:          BSD
+Version:          20231115
+Release:          1%{?dist}
+License:          BSD-3-Clause
 
 URL:              https://www.adobe.com/
-Source:           https://github.com/adobe-type-tools/cmap-resources/archive/%{version}.tar.gz#/cmap-resources-%{version}.tar.gz
+Source:           https://github.com/adobe-type-tools/cmap-resources/archive/refs/tags/%{version}.tar.gz#/cmap-resources-%{version}.tar.gz
+
 
 BuildArch:        noarch
 BuildRequires:    git
+BuildRequires: make
+
+#The cmap-resources package duplicated this one (albeit with different
+# installation paths). It was retired for F36. Provide an upgrade path.
+%global crversion %(echo '%{version}' | \
+    awk '{print substr($0,1,4)"."substr($0,5,2)"."substr($0,7)}')
+Provides:         cmap-resources = %{crversion}-6.%{release}
+Obsoletes:        cmap-resources < 2019.07.30-6
+Provides:         cmap-resources-cns1-6 = %{crversion}-6.%{release}
+Obsoletes:        cmap-resources-cns1-6 < 2019.07.30-6
+Provides:         cmap-resources-cns1-7 = %{crversion}-6.%{release}
+Obsoletes:        cmap-resources-cns1-7 < 2019.07.30-6
+Provides:         cmap-resources-gb1-5 = %{crversion}-6.%{release}
+Obsoletes:        cmap-resources-gb1-5 < 2019.07.30-6
+Provides:         cmap-resources-japan1-7 = %{crversion}-6.%{release}
+Obsoletes:        cmap-resources-japan1-7 < 2019.07.30-6
+Provides:         cmap-resources-korea1-2 = %{crversion}-6.%{release}
+Obsoletes:        cmap-resources-korea1-2 < 2019.07.30-6
+Provides:         cmap-resources-identity-0 = %{crversion}-6.%{release}
+Obsoletes:        cmap-resources-identity-0 < 2019.07.30-6
+Provides:         cmap-resources-kr-9 = %{crversion}-6.%{release}
+Obsoletes:        cmap-resources-kr-9 < 2019.07.30-6
+
 
 %description
 CMap (Character Map) resources are used to unidirectionally map character codes,
@@ -64,7 +88,7 @@ _EOF
 
 %files
 %doc README.md VERSIONS.txt
-%license LICENSE.txt
+%license LICENSE.md
 
 # Necessary directories ownership (to remove them correctly when uninstalling):
 %dir %{_datadir}/adobe
@@ -76,6 +100,8 @@ _EOF
 %{_datadir}/adobe/resources/mapping/Identity
 %{_datadir}/adobe/resources/mapping/Japan1
 %{_datadir}/adobe/resources/mapping/Korea1
+%{_datadir}/adobe/resources/mapping/KR
+%{_datadir}/adobe/resources/mapping/Manga1
 
 %files deprecated
 %{_datadir}/adobe/resources/mapping/deprecated
@@ -86,6 +112,10 @@ _EOF
 # =============================================================================
 
 %changelog
+* Thu Oct 17 2024 Jyoti kanase <v-jykanase@microsoft.com> - 20231115-1
+- Update to version 20231115
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20171205-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

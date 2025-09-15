@@ -1,0 +1,26 @@
+From e02c2eb0ad3e43df71c27a8f9c5ae7150add310a Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 1 Jul 2024 09:27:04 -0400
+Subject: [PATCH 33/33] kmod fix for /run/modprobe.d.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/system/modutils.fc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/policy/modules/system/modutils.fc b/policy/modules/system/modutils.fc
+index 323120062..de9f88fa8 100644
+--- a/policy/modules/system/modutils.fc
++++ b/policy/modules/system/modutils.fc
+@@ -8,6 +8,8 @@ ifdef(`distro_gentoo',`
+ /etc/modprobe\.devfs.*		--	gen_context(system_u:object_r:modules_conf_t,s0)
+ ')
+ 
++/run/modprobe\.d(/.*)?			gen_context(system_u:object_r:modules_conf_t,s0)
++
+ ifdef(`init_systemd',`
+ /run/tmpfiles\.d/kmod\.conf	--	gen_context(system_u:object_r:kmod_tmpfiles_conf_t,s0)
+ /run/tmpfiles\.d/static-nodes\.conf --  gen_context(system_u:object_r:kmod_tmpfiles_conf_t,s0)
+-- 
+2.45.2
+

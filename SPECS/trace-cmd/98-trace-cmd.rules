@@ -1,0 +1,1 @@
+SUBSYSTEM=="module", ACTION=="add", PROGRAM="/usr/bin/systemctl is-active trace-cmd.service", PROGRAM="/usr/bin/systemctl reload trace-cmd.service"

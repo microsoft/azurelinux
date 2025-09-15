@@ -1,0 +1,104 @@
+From de3e822976773916caa913e4339a35c08a98569d Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Thu, 23 Jan 2025 11:55:10 -0800
+Subject: [PATCH] Retain installonlypkg install status on upgrade
+
+---
+ client/goal.c                      | 30 +++++++++++++++++++++
+ pytests/tests/test_multiinstall.py | 42 ++++++++++++++++++++++++++++++
+ 2 files changed, 72 insertions(+)
+
+diff --git a/client/goal.c b/client/goal.c
+index 4d95c71..f2360c4 100644
+--- a/client/goal.c
++++ b/client/goal.c
+@@ -754,6 +754,36 @@ TDNFMarkAutoInstalled(
+                 }
+             }
+         }
++        /* During upgrades, ppInfo->pPkgsToInstall contains any packages that are
++           being installed as a dependency automatically as well as any
++           ppszInstallOnlyPkgs which are installing a new version. The packages
++           configured as installonlypkgs need to retain to retain their previous
++           install status.
++        */
++        if (nFlag == 1 && pTdnf->pConf && pTdnf->pConf->ppszInstallOnlyPkgs)
++        {
++            for (int i = 0; pTdnf->pConf->ppszInstallOnlyPkgs[i]; i++)
++            {
++                if (strcmp(pTdnf->pConf->ppszInstallOnlyPkgs[i], pszName) == 0)
++                {
++                    // Lookup current auto install status, ensure matching status
++                    int value = 0;
++                    rc = history_get_auto_flag(pHistoryCtx, pszName, &value);
++                    if (rc != 0)
++                    {
++                        dwError = ERROR_TDNF_HISTORY_ERROR;
++                        BAIL_ON_TDNF_ERROR(dwError);
++                    }
++                    if (value == 0)
++                    {
++                        // Packages previously marked as user installed should
++                        // remain user installed.
++                        nFlag = 0;
++                        break;
++                    }
++                }
++            }
++        }
+         if (!nAutoOnly || nFlag == 1)
+         {
+             rc = history_set_auto_flag(pHistoryCtx, pszName, nFlag);
+diff --git a/pytests/tests/test_multiinstall.py b/pytests/tests/test_multiinstall.py
+index efc921c..e069fe1 100644
+--- a/pytests/tests/test_multiinstall.py
++++ b/pytests/tests/test_multiinstall.py
+@@ -149,3 +149,45 @@ def test_install_reinstall(utils):
+     # both pkgs should remain installed:
+     assert utils.check_package(pkgname, version=first)
+     assert utils.check_package(pkgname, version=second)
++
++def test_autoremove_after_upgrade_user_installed(utils):
++    pkgname = PKGNAME
++    utils.erase_package(pkgname)
++
++    # install first version
++    first = PKG_VERSIONS[0]
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', f"{pkgname}={first}"])
++    assert utils.check_package(pkgname, version=first)
++
++    # upgrade to latest
++    upgrade_version = PKG_VERSIONS[3]
++    utils.run(['tdnf', 'upgrade', '-y', '--nogpgcheck'])
++    assert utils.check_package(pkgname, version=upgrade_version)
++
++    utils.run(['tdnf', 'autoremove', '-y'])
++    # check both packages remain installed after autoremove
++    assert utils.check_package(pkgname, version=upgrade_version)
++    assert utils.check_package(pkgname, version=first)
++
++def test_autoremove_after_upgrade_auto_installed(utils):
++    pkgname = PKGNAME
++    utils.erase_package(pkgname)
++
++    # install first version
++    first = PKG_VERSIONS[0]
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', f"{pkgname}={first}"])
++    assert utils.check_package(pkgname, version=first)
++
++    # mark package as autoinstalled
++    ret = utils.run(['tdnf', 'mark', 'remove', pkgname])
++    assert ret['retval'] == 0
++
++    # upgrade to latest
++    upgrade_version = PKG_VERSIONS[3]
++    utils.run(['tdnf', 'upgrade', '-y', '--nogpgcheck'])
++    assert utils.check_package(pkgname, version=upgrade_version)
++
++    utils.run(['tdnf', 'autoremove', '-y'])
++    # check both packages remain installed after autoremove
++    assert not utils.check_package(pkgname, version=upgrade_version)
++    assert not utils.check_package(pkgname, version=first)
+-- 
+2.34.1
+

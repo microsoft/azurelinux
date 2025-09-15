@@ -1,7 +1,7 @@
 Summary:	    Standard Linux utility for controlling network drivers and hardware
 Name:		    ethtool
 Version:        6.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:	    GPLv2
 URL:		    https://www.kernel.org/pub/software/network/ethtool/
 Group:		    Productivity/Networking/Diagnostic
@@ -30,14 +30,17 @@ make install DESTDIR=%{buildroot}
 make %{?_smp_mflags} check
 
 %files
-%doc AUTHORS COPYING NEWS README ChangeLog
+%license COPYING LICENSE
+%doc AUTHORS NEWS README ChangeLog
 %defattr(-,root,root)
-%license LICENSE
 /sbin/*
 %{_mandir}
 %{_datadir}/bash-completion/completions/ethtool
 
 %changelog
+* Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 6.4-2
+- Sanitize license files
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.4-1
 - Auto-upgrade to 6.4 - Azure Linux 3.0 - package upgrades
 

@@ -12,34 +12,38 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 )
 
 // SystemConfig defines how each system present on the image is supposed to be configured.
 type SystemConfig struct {
-	IsDefault            bool                      `json:"IsDefault"`
-	IsKickStartBoot      bool                      `json:"IsKickStartBoot"`
-	IsIsoInstall         bool                      `json:"IsIsoInstall"`
-	BootType             string                    `json:"BootType"`
-	EnableGrubMkconfig   bool                      `json:"EnableGrubMkconfig"`
-	Hostname             string                    `json:"Hostname"`
-	Name                 string                    `json:"Name"`
-	PackageLists         []string                  `json:"PackageLists"`
-	Packages             []string                  `json:"Packages"`
-	KernelOptions        map[string]string         `json:"KernelOptions"`
-	KernelCommandLine    KernelCommandLine         `json:"KernelCommandLine"`
-	AdditionalFiles      map[string]FileConfigList `json:"AdditionalFiles"`
-	PartitionSettings    []PartitionSetting        `json:"PartitionSettings"`
-	PreInstallScripts    []InstallScript           `json:"PreInstallScripts"`
-	PostInstallScripts   []InstallScript           `json:"PostInstallScripts"`
-	FinalizeImageScripts []InstallScript           `json:"FinalizeImageScripts"`
-	Networks             []Network                 `json:"Networks"`
-	PackageRepos         []PackageRepo             `json:"PackageRepos"`
-	Groups               []Group                   `json:"Groups"`
-	Users                []User                    `json:"Users"`
-	Encryption           RootEncryption            `json:"Encryption"`
-	RemoveRpmDb          bool                      `json:"RemoveRpmDb"`
-	ReadOnlyVerityRoot   ReadOnlyVerityRoot        `json:"ReadOnlyVerityRoot"`
-	EnableHidepid        bool                      `json:"EnableHidepid"`
+	IsDefault              bool                      `json:"IsDefault"`
+	IsKickStartBoot        bool                      `json:"IsKickStartBoot"`
+	IsIsoInstall           bool                      `json:"IsIsoInstall"`
+	BootType               string                    `json:"BootType"`
+	EnableGrubMkconfig     bool                      `json:"EnableGrubMkconfig"`
+	EnableSystemdFirstboot bool                      `json:"EnableSystemdFirstboot"`
+	Hostname               string                    `json:"Hostname"`
+	Name                   string                    `json:"Name"`
+	PackageLists           []string                  `json:"PackageLists"`
+	Packages               []string                  `json:"Packages"`
+	KernelOptions          map[string]string         `json:"KernelOptions"`
+	KernelCommandLine      KernelCommandLine         `json:"KernelCommandLine"`
+	AdditionalFiles        map[string]FileConfigList `json:"AdditionalFiles"`
+	PartitionSettings      []PartitionSetting        `json:"PartitionSettings"`
+	PreInstallScripts      []InstallScript           `json:"PreInstallScripts"`
+	PostInstallScripts     []InstallScript           `json:"PostInstallScripts"`
+	FinalizeImageScripts   []InstallScript           `json:"FinalizeImageScripts"`
+	Networks               []Network                 `json:"Networks"`
+	PackageRepos           []PackageRepo             `json:"PackageRepos"`
+	Groups                 []Group                   `json:"Groups"`
+	Users                  []User                    `json:"Users"`
+	Encryption             RootEncryption            `json:"Encryption"`
+	RemoveRpmDb            bool                      `json:"RemoveRpmDb"`
+	PreserveTdnfCache      bool                      `json:"PreserveTdnfCache"`
+	EnableHidepid          bool                      `json:"EnableHidepid"`
+	DisableRpmDocs         bool                      `json:"DisableRpmDocs"`
+	OverrideRpmLocales     string                    `json:"OverrideRpmLocales"`
 }
 
 const (
@@ -61,6 +65,36 @@ func (s *SystemConfig) IsRootFS() bool {
 // corresponding to a mount point.
 func (s *SystemConfig) GetMountpointPartitionSetting(mountPoint string) (partitionSetting *PartitionSetting) {
 	return FindMountpointPartitionSetting(s.PartitionSettings, mountPoint)
+}
+
+func (s *SystemConfig) validateUsersAndGroups() (err error) {
+	groupMatchFunc := func(groupName interface{}, groupObj interface{}) bool {
+		return groupName == groupObj.(Group).Name
+	}
+
+	for _, user := range s.Users {
+
+		if user.PrimaryGroup != "" {
+			if !sliceutils.Contains(s.Groups, user.PrimaryGroup, groupMatchFunc) {
+				// Unclear how to validate that users and groups match together correctly while still allowing
+				// users to be added to existing system groups. If we define a group in the config that already
+				// exists it will cause errors, but we don't have insight into the default users/groups already in
+				// an image before we install the filesystem package.
+				logger.Log.Warnf("Primary group (%s) for user (%s) not defined in [SystemConfig.Groups], if this group is not present user creation may fail.", user.PrimaryGroup, user.Name)
+			}
+		}
+
+		for _, group := range user.SecondaryGroups {
+			if !sliceutils.Contains(s.Groups, group, groupMatchFunc) {
+				// Unclear how to validate these while allowing users to be added to existing system groups. If we
+				// define a group in the config that already exists it will cause errors.
+				// Maybe we can scrape /etc/group and /etc/passwd from filesystem.sepc to validate these?
+				logger.Log.Warnf("Secondary group (%s) for user (%s) not defined in [SystemConfig.Groups], if this group is not present user creation may fail.", group, user.Name)
+			}
+		}
+	}
+
+	return err
 }
 
 // IsValid returns an error if the SystemConfig is not valid
@@ -124,24 +158,14 @@ func (s *SystemConfig) IsValid() (err error) {
 		}
 	}
 
-	if s.ReadOnlyVerityRoot.Enable || s.Encryption.Enable {
+	if s.Encryption.Enable {
 		if len(mountPointUsed) == 0 {
-			logger.Log.Warnf("[ReadOnlyVerityRoot] or [Encryption] is enabled, but no partitions are listed as part of System Config '%s'. This is only valid for ISO installers", s.Name)
+			logger.Log.Warnf("[Encryption] is enabled, but no partitions are listed as part of System Config '%s'. This is only valid for ISO installers", s.Name)
 		} else {
 			if !mountPointUsed["/"] {
-				return fmt.Errorf("invalid [ReadOnlyVerityRoot] or [Encryption]: must have a partition mounted at '/'")
-			}
-			if s.ReadOnlyVerityRoot.Enable && s.Encryption.Enable {
-				return fmt.Errorf("invalid [ReadOnlyVerityRoot] and [Encryption]: verity root currently does not support root encryption")
-			}
-			if s.ReadOnlyVerityRoot.Enable && !mountPointUsed["/boot"] {
-				return fmt.Errorf("invalid [ReadOnlyVerityRoot]: must have a separate partition mounted at '/boot'")
+				return fmt.Errorf("invalid [Encryption]: must have a partition mounted at '/'")
 			}
 		}
-	}
-
-	if err = s.ReadOnlyVerityRoot.IsValid(); err != nil {
-		return fmt.Errorf("invalid [ReadOnlyVerityRoot]: %w", err)
 	}
 
 	if err = s.KernelCommandLine.IsValid(); err != nil {
@@ -184,8 +208,15 @@ func (s *SystemConfig) IsValid() (err error) {
 			return fmt.Errorf("invalid [User]: %w", err)
 		}
 	}
+	// Currently validateUsersAndGroups() is not able to return an error, it will only print warnings.
+	err = s.validateUsersAndGroups()
+	if err != nil {
+		return fmt.Errorf("invalid [Users]: %w", err)
+	}
 
 	//Validate Encryption
+
+	// Validate locales
 
 	return
 }

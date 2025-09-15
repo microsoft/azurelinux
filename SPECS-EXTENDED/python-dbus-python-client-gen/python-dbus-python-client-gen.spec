@@ -1,20 +1,15 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global srcname dbus-python-client-gen
 
 Name:           python-%{srcname}
-Version:        0.7
-Release:        9%{?dist}
+Version:        0.8.3
+Release:        8%{?dist}
 Summary:        Python Library for Generating dbus-python Client Code
-
-License:        MPLv2.0
+License:        MPL-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/stratis-storage/dbus-python-client-gen
-Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
-
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
-%if 0%{?with_check}
-BuildRequires:  python3-pip
-%endif
 
 %global _description \
 %{summary}.
@@ -26,10 +21,6 @@ Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-dbus
-BuildRequires:  python3-into-dbus-python >= 0.06
-Requires:       python3-dbus
-Requires:       python3-into-dbus-python >= 0.06
 
 %description -n python3-%{srcname} %{_description}
 
@@ -44,10 +35,6 @@ Python 3 version.
 %install
 %py3_install
 
-%check
-pip3 install pytest
-py.test -v tests
-
 %files -n python3-%{srcname}
 %license LICENSE
 %doc README.rst
@@ -55,12 +42,88 @@ py.test -v tests
 %{python3_sitelib}/dbus_python_client_gen-*.egg-info/
 
 %changelog
-* Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 0.7-9
-- Use py.test instead of py.test-3 to enable ptest
-- License verified
+* Mon Dec 23 2024 Akhila Guruju <v-guakhila@microsoft.com> - 0.8.3-8
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.8.3-6
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.8.3-2
+- Rebuilt for Python 3.12
+
+* Thu Apr 27 2023 mulhern <amulhern@redhat.com> - 0.8.3-1
+- Update to 0.8.3
+
+* Tue Apr 25 2023 mulhern <amulhern@redhat.com> - 0.8.2-6
+- Revise gating.yaml so that the phantom tier0 test becomes real
+
+* Tue Apr 25 2023 mulhern <amulhern@redhat.com> - 0.8.2-5
+- Rebuild again to see if tier0 test continues to appear
+
+* Tue Apr 25 2023 mulhern <amulhern@redhat.com> - 0.8.2-4
+- Rebuild to get rid of phantom tier0 test
+
+* Tue Apr 25 2023 mulhern <amulhern@redhat.com> - 0.8.2-3
+- Amend tmt specification
+
+* Tue Apr 25 2023 mulhern <amulhern@redhat.com> - 0.8.2-2
+- Use tmt format testing specification
+
+* Thu Feb 23 2023 Bryan Gurney <bgurney@redhat.com> - 0.8.2-1
+- Update to 0.8.2
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.8-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.8-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.8-9
+- Rebuilt for Python 3.11
+
+* Sat Feb 26 2022 mulhern <amulhern@redhat.com> - 0.8-8
+- Fix gating tests
+
+* Sat Feb 26 2022 mulhern <amulhern@redhat.com> - 0.8-7
+- Add gating tests
+
+* Tue Feb 15 2022 mulhern <amulhern@redhat.com> - 0.8-6
+- Remove redundant Requires
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.8-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.8-4
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.8-3
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Dec 8 2020 mulhern <amulhern@redhat.com> - 0.8-1
+- Update to 0.8
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.7-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.7-8
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.7-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

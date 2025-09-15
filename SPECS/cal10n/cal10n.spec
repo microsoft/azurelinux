@@ -1,4 +1,3 @@
-
 #
 # spec file for package cal10n
 #
@@ -16,16 +15,16 @@
 #
 Summary:        Compiler assisted localization library (CAL10N)
 Name:           cal10n
-Version:        0.7.7
-Release:        6%{?dist}
+Version:        0.8.1.10
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            http://cal10n.qos.ch
-Source0:        https://github.com/qos-ch/cal10n/archive/refs/tags/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        build.xml-0.7.7.tar.xz
-Patch0:         cal10n-0.7.7-sourcetarget.patch
+Source0:        https://code.opensuse.org/adrianSuSE/%{name}/blob/factory/f/%{name}-%{version}.tar.xz
+# cal10n-build.tar.gz provides build process for cal10-api and cal10n-ant-task
+Source1:        https://code.opensuse.org/adrianSuSE/%{name}/blob/factory/f/%{name}-build.tar.xz
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  java-devel >= 1.8
@@ -55,10 +54,12 @@ Group:          Development/Libraries/Java
 API documentation for %{name}.
 
 %prep
-%setup -q
-tar -xf %{SOURCE1}
-%patch 0 -p1
-find . -name "*.jar" | xargs rm
+%setup -q -a1
+find . -name "*.jar" -exec rm -f {} \;
+
+# We don't want to depend on ant, since it will be
+# present when we try to use the task
+%pom_change_dep :ant :::provided %{name}-ant-task 
 
 # bnc#759912
 rm -rf docs cal10n-site
@@ -73,58 +74,54 @@ http://cal10n.qos.ch/manual.html
 EOF
 
 %build
-for dir in cal10n-api
-do
-  pushd $dir
-  export CLASSPATH=$(build-classpath \
-                     junit \
-                     ):target/classes:target/test-classes
-  ant -Dmaven.mode.offline=true package javadoc \
-      -Dmaven.test.skip=true \
-      -lib %{_datadir}/java
-  popd
-done
+mkdir -p lib
+build-jar-repository -s lib \
+%if 0%{?with_check}
+    ant-antunit \
+%endif
+    ant/ant
+%{ant} \
+%if ! 0%{?with_check}
+    -Dtest.skip=true \
+%endif
+    package javadoc
 
 %install
 # jars
 install -d -m 0755 %{buildroot}%{_javadir}/%{name}
-install -m 644 cal10n-api/target/cal10n-api-%{version}.jar \
-        %{buildroot}%{_javadir}/%{name}/cal10n-api-%{version}.jar
+install -m 644 %{name}-api/target/%{name}-api-*.jar \
+        %{buildroot}%{_javadir}/%{name}/%{name}-api.jar
+install -m 644 %{name}-ant-task/target/%{name}-ant-task-*.jar \
+        %{buildroot}%{_javadir}/%{name}/%{name}-ant-task.jar
 
 # pom
 install -d -m 755 %{buildroot}%{_mavenpomdir}
 install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 %add_maven_depmap %{name}.pom
 install -pm 644 %{name}-api/pom.xml %{buildroot}%{_mavenpomdir}/%{name}-api.pom
-%add_maven_depmap %{name}-api.pom %{name}/cal10n-api-%{version}.jar
+%add_maven_depmap %{name}-api.pom %{name}/%{name}-api.jar
+install -pm 644 %{name}-ant-task/pom.xml %{buildroot}%{_mavenpomdir}/%{name}-ant-task.pom
+%add_maven_depmap %{name}-ant-task.pom %{name}/%{name}-ant-task.jar
 
 # javadoc
-pushd cal10n-api
-install -d -m 0755 %{buildroot}%{_javadocdir}/%{name}-%{version}
-cp -pr target/site/apidocs*/* %{buildroot}%{_javadocdir}/%{name}-%{version}/
-rm -rf target/site/api*
-popd
-%fdupes -s %{buildroot}%{_javadocdir}/%{name}-%{version}
+install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
+for i in api ant-task; do
+  install -dm 0755 %{buildroot}%{_javadocdir}/%{name}/${i}
+  cp -pr %{name}-${i}/target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/${i}/
+done
+%fdupes -s %{buildroot}%{_javadocdir}/%{name}
 
-%files
-%license LICENSE.txt
-%defattr(0644,root,root,0755)
+%files -f .mfiles
 %doc README.SUSE
-%dir %{_javadir}/%{name}
-%{_javadir}/%{name}/%{name}*.jar
-%{_mavenpomdir}/*
-%if %{defined _maven_repository}
-%{_mavendepmapfragdir}/%{name}
-%else
-%{_datadir}/maven-metadata/%{name}.xml*
-%endif
 
 %files javadoc
-%license LICENSE.txt
-%defattr(-,root,root,-)
-%{_javadocdir}/%{name}-%{version}
+%{_javadocdir}/%{name}
 
 %changelog
+* Fri Apr 05 2024 Mitch Zhu <mitchzhu@microsoft.com> - 0.8.1.10-1
+- Update to version 0.8.1.10
+- Import build, install section, and source file from openSUSE (license: MIT).
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.7.7-6
 - Moved from extended to core
 - Updated source URL

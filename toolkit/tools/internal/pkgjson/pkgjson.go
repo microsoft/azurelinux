@@ -6,6 +6,7 @@ package pkgjson
 import (
 	"fmt"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/jsonutils"
@@ -73,11 +74,49 @@ type Package struct {
 	RunTests      bool          `json:"RunTests"`      // Should we run tests for this package.
 }
 
+func packageLess(a, b PackageVer) bool {
+	if a.Name == b.Name {
+		v1 := versioncompare.New(a.Version)
+		v2 := versioncompare.New(b.Version)
+		return v1.Compare(v2) < 0
+	}
+
+	return a.Name < b.Name
+}
+
+// SortPackageList ensures the package list is sorted in a deterministic way. It will primarily sort by name, then
+// version. It will also sort the package lists (requires, buildRequires, testRequires) of each package.
+func SortPackageList(packages []*Package) {
+	sort.Slice(packages, func(i, j int) bool {
+		return packageLess(*packages[i].Provides, *packages[j].Provides)
+	})
+
+	// For each package, also sort the lists of its dependencies
+	for _, pkg := range packages {
+		sort.Slice(pkg.Requires, func(i, j int) bool {
+			return packageLess(*pkg.Requires[i], *pkg.Requires[j])
+		})
+		sort.Slice(pkg.BuildRequires, func(i, j int) bool {
+			return packageLess(*pkg.BuildRequires[i], *pkg.BuildRequires[j])
+		})
+		sort.Slice(pkg.TestRequires, func(i, j int) bool {
+			return packageLess(*pkg.TestRequires[i], *pkg.TestRequires[j])
+		})
+	}
+}
+
 // ParsePackageJSON reads a package list json file
 func (pkg *PackageRepo) ParsePackageJSON(path string) (err error) {
 	logger.Log.Infof("Opening %s", path)
 
-	return jsonutils.ReadJSONFile(path, &pkg)
+	if err = jsonutils.ReadJSONFile(path, &pkg); err != nil {
+		return err
+	}
+
+	// Ensure deterministic ordering of the package list
+	SortPackageList(pkg.Repo)
+
+	return nil
 }
 
 // IsImplicitPackage returns true if a PackageVer represents an implicit provide.

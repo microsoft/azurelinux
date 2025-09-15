@@ -23,7 +23,7 @@ Distribution:   Azure Linux
 Summary: An utility for manipulating storage encryption keys and passphrases
 Name: volume_key
 Version: 0.3.12
-Release: 8%{?dist}
+Release: 9%{?dist}
 # lib/{SECerrs,SSLerrs}.h are both licensed under MPLv1.1, GPLv2 and LGPLv2
 License: GPLv2 and (MPLv1.1 or GPLv2 or LGPLv2)
 URL: https://pagure.io/%{name}/
@@ -33,9 +33,24 @@ Source0: https://releases.pagure.org/%{name}/%{name}-%{version}.tar.xz
 # Support all LUKS devices
 # - backport of 26c09768662d8958debe8c9410dae9fda02292c3
 Patch0: volume_key-0.3.12-support_LUKS2_and_more.patch
+# Fix resource leaks
+# - backport of bf6618ec0b09b4e51fc97fa021e687fbd87599ba
+Patch1: volume_key-0.3.12-fix_resource_leaks.patch
+
 BuildRequires: gcc
-BuildRequires: cryptsetup-luks-devel, gettext-devel, glib2-devel, /usr/bin/gpg2
-BuildRequires: gpgme-devel, libblkid-devel, nss-devel, python3-devel
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: libtool
+BuildRequires: make
+
+BuildRequires: cryptsetup-luks-devel
+BuildRequires: gettext-devel
+BuildRequires: glib2-devel
+BuildRequires: /usr/bin/gpg2
+BuildRequires: gpgme-devel
+BuildRequires: libblkid-devel
+BuildRequires: nss-devel
+BuildRequires: python3-devel
 %if 0%{?drop_python2} < 1
 BuildRequires: python2-devel
 %endif
@@ -105,15 +120,15 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 %endif
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1
+autoreconf -fiv
 
 %build
 %configure %{?with_pythons}
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL='install -p'
+%make_install
 
 # Remove libtool archive
 find %{buildroot} -type f -name "*.la" -delete
@@ -157,6 +172,10 @@ exit 1; \
 %endif
 
 %changelog
+* Wed Nov 06 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 0.3.12-9
+- added patch to fix resource leaks
+- License Verified
+
 * Mon Mar 16 2021 Henry Li <lihl@microsoft.com> - 0.3.12-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Disable python2 build and enable python3 build

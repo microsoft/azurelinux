@@ -1,5 +1,4 @@
 ### Abstract ###
-# global prerelease b4
 %global openldap_version 2.4.45-4
 %global _description\
 python-ldap provides an object-oriented API for working with LDAP within\
@@ -9,13 +8,13 @@ OpenLDAP 2.x libraries, and contains modules for other LDAP-related tasks\
 
 Summary:        An object-oriented API to access LDAP directory servers
 Name:           python-ldap
-Version:        3.4.0
+Version:        3.4.4
 Release:        1%{?dist}
 License:        Python
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://python-ldap.org/
-Source0:        https://files.pythonhosted.org/packages/source/p/%{name}/%{name}-%{version}%{?prerelease}.tar.gz
+Source0:        https://github.com/%{name}/%{name}/archive/refs/tags/%{name}-%{version}.tar.gz
 
 # Test dependencies
 BuildRequires:  %{_bindir}/tox
@@ -30,6 +29,9 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-pyasn1 >= 0.3.7
 BuildRequires:  python3-pyasn1-modules >= 0.1.5
 BuildRequires:  python3-setuptools
+%if %{with check}
+BuildRequires:  python3-pip
+%endif
 
 %description %{_description}
 
@@ -47,14 +49,14 @@ Provides:       python3-pyldap%{?_isa} = %{version}-%{release}
 %description -n python3-ldap %{_description}
 
 %prep
-%setup -q -n %{name}-%{version}%{?prerelease}
+%autosetup -p1 -n %{name}-%{name}-%{version}%{?prerelease}
 
 # Fix interpreter
 find . -name '*.py' | xargs sed -i '1s|^#!/usr/bin/env python|#!%{__python3}|'
 
 # Disable warnings in test to work around "'U' mode is deprecated"
 # https://github.com/python-ldap/python-ldap/issues/96
-sed -i 's,-Werror,-Wignore,g' tox.ini
+# sed -i 's,-Werror,-Wignore,g' tox.ini
 
 
 %build
@@ -62,10 +64,18 @@ sed -i 's,-Werror,-Wignore,g' tox.ini
 
 
 %check
-# don't download packages
-export PIP_INDEX_URL=http://host.invalid./
-export PIP_NO_DEPS=yes
-TOXENV=py%{python3_version_nodots} LOGLEVEL=10 tox --sitepackages
+pip3 install tox pluggy py filelock toml six virtualenv
+# env SBIN=/usr/libexec/ python3 -m tox -e py312
+PYTHONPATH=%{buildroot}%{python3_sitearch} %{__python3} -m unittest -v \
+	   Tests/t_cidict.py \
+	   Tests/t_ldap_dn.py \
+	   Tests/t_ldap_filter.py \
+	   Tests/t_ldap_functions.py \
+	   Tests/t_ldap_modlist.py \
+	   Tests/t_ldap_schema_tokenizer.py \
+	   Tests/t_ldapurl.py \
+	   Tests/t_ldif.py \
+	   Tests/t_untested_mods.py
 
 
 %install
@@ -83,6 +93,10 @@ TOXENV=py%{python3_version_nodots} LOGLEVEL=10 tox --sitepackages
 %{python3_sitearch}/python_ldap-%{version}%{?prerelease}-py%{python3_version}.egg-info/
 
 %changelog
+* Thu Sep 26 2024 Muhammad Falak <mwani@microsoft.com> - 3.4.4-1
+- Enable ptest
+- Bump version to 3.4.4
+
 * Tue Sep 19 2023 Archana Choudhary <archana1@microsoft.com> - 3.4.0-1
 - Upgrade to 3.4.0 - CVE-2021-46823
 - License verified

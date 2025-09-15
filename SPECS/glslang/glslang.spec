@@ -2,11 +2,13 @@
 
 Name:           glslang
 Version:        14.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        OpenGL and OpenGL ES shader front end and validator
 
 License:        BSD and GPLv3+ and Apache-2.0
 URL:            https://github.com/KhronosGroup/%{name}
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        %url/archive/vulkan-sdk-%{sdkver}.tar.gz#/%{name}-sdk-%{sdkver}.tar.gz
 # Patch to build against system spirv-tools (rebased locally)
 #Patch3:         https://patch-diff.githubusercontent.com/raw/KhronosGroup/glslang/pull/1722.patch#/0001-pkg-config-compatibility.patch
@@ -77,6 +79,9 @@ popd
 %{_libdir}/cmake/*
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 14.0.0-2
+- Add missing Vendor and Distribution tags.
+
 * Thu Feb 29 2024 Vince Perri <viperri@microsoft.com> - 14.0.0-1
 - Initial Azure Linux import from Fedora 40 (license: MIT).
 - License verified.

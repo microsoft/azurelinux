@@ -4,12 +4,61 @@
 
 set -e
 
-TOOLCHAIN_SPEC_LIST_FILE=$1
-SPECS_DIR=$2
-MANIFESTS_DIR=$3
-DIST_TAG=$4
-DISTRO_MACRO=$5
-ARCH=$6
+help () {
+    echo "Script to check that the manifest files only contain RPMs that could have been generated from toolchain specs"
+    echo "Usage:"
+    echo "[REQUIRED] -a -> architecture to run for (x86_64 or aarch64)"
+    echo "[OPTIONAL] -t -> space-separated list of toolchain specs"
+    echo "[OPTIONAL] -s -> SPECS_DIR"
+    echo "[OPTIONAL] -m -> TOOLCHAIN_MANIFESTS_DIR"
+    echo "[OPTIONAL] -d -> DIST_TAG"
+    echo "[OPTIONAL] -i -> DISTRO_MACRO"
+    echo "[OPTIONAL] -h -> print this help dialogue and exit"
+}
+
+# assign default value
+TOOLCHAIN_SPEC_LIST=$(make --no-print-directory -s printvar-toolchain_spec_list  2> /dev/null)
+SPECS_DIR=$(make --no-print-directory -s printvar-SPECS_DIR  2> /dev/null)
+MANIFESTS_DIR=$(make --no-print-directory -s printvar-TOOLCHAIN_MANIFESTS_DIR  2> /dev/null)
+DIST_TAG=$(make --no-print-directory -s printvar-DIST_TAG  2> /dev/null)
+DISTRO_MACRO=$(make --no-print-directory -s printvar-DIST_VERSION_MACRO  2> /dev/null)
+
+if [ "$#" -eq 0 ]
+then
+    echo -e "ERROR: Missing required arg\n\n"
+    help >&2
+    exit 1
+fi
+
+while getopts "a:t:s:m:d:i:h:" OPTIONS
+do
+  case "${OPTIONS}" in
+    a ) ARCH=$OPTARG ;;
+    t ) TOOLCHAIN_SPEC_LIST=$OPTARG ;;
+    s ) SPECS_DIR=$OPTARG ;;
+    m ) MANIFESTS_DIR=$OPTARG ;;
+    d ) DIST_TAG=$OPTARG ;;
+    i ) DISTRO_MACRO=$OPTARG ;;
+    h ) help; exit 0 ;;
+    \? )
+        echo "ERROR: Invalid Option: -$OPTARG" 1>&2
+        help
+        exit 1
+        ;;
+    : )
+        echo "ERROR: Invalid Option: -$OPTIONS requires an argument" 1>&2
+        help
+        exit 1
+        ;;
+  esac
+done
+
+# mandatory argument
+if [ ! "$ARCH" ]; then
+    echo -e "ERROR: Missing required arg\n\n"
+    help >&2
+    exit 1
+fi
 
 write_rpms_from_spec () {
     # $1 = spec file
@@ -36,8 +85,7 @@ write_rpms_from_spec () {
 
 write_rpms_from_toolchain () {
     # $1 = file to save to
-    specs=$(cat $TOOLCHAIN_SPEC_LIST_FILE)
-    for specName in $specs
+    for specName in $TOOLCHAIN_SPEC_LIST
     do
         if [[ "$specName" == *"msopenjdk"* ]]; then
             # special case to add msopenjdk-17 which is downloaded and does not have a SPEC

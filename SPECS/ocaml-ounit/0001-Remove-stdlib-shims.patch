@@ -1,0 +1,56 @@
+From fec0a725231d5769b3d3454687d6b0e1bd6b5e58 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Tue, 5 May 2020 12:30:50 +0100
+Subject: [PATCH] Remove stdlib-shims and seq.
+
+We neither need nor want the stdlib-shims or seq packages in Fedora.  They
+are forward compatibility package for older OCaml installations.  Patch them
+out instead.  Upstream does not want this patch until stdlib-shims and seq
+are obsolete.
+---
+ ounit2.opam                  | 1 -
+ src/lib/ounit2/advanced/dune | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+--- a/ounit2-lwt.opam	2023-03-22 07:28:17.000000000 -0600
++++ b/ounit2-lwt.opam	2023-06-22 12:03:02.158210339 -0600
+@@ -14,7 +14,6 @@ depends: [
+   "dune" {>= "3.0"}
+   "ocaml" {>= "4.04.0"}
+   "lwt" {>= "2.5.2"}
+-  "seq"
+   "ounit2" {= version}
+   "odoc" {with-doc}
+ ]
+--- a/ounit2.opam	2023-03-22 07:28:17.000000000 -0600
++++ b/ounit2.opam	2023-06-22 12:03:02.158210339 -0600
+@@ -17,8 +17,6 @@ depends: [
+   "dune" {>= "3.0"}
+   "ocaml" {>= "4.04.0"}
+   "base-unix"
+-  "seq"
+-  "stdlib-shims"
+   "odoc" {with-doc}
+ ]
+ build: [
+--- a/src/lib/ounit2/advanced/dune	2023-03-22 07:28:17.000000000 -0600
++++ b/src/lib/ounit2/advanced/dune	2023-06-22 12:03:02.158210339 -0600
+@@ -11,4 +11,4 @@
+  (name oUnitAdvanced)
+  (public_name ounit2.advanced)
+  (wrapped false)
+- (libraries unix seq stdlib-shims))
++ (libraries unix))
+--- a/src/lib/ounit2/dune	2023-03-22 07:28:17.000000000 -0600
++++ b/src/lib/ounit2/dune	2023-06-22 12:03:23.748882355 -0600
+@@ -2,7 +2,7 @@
+  (name oUnit)
+  (public_name ounit2)
+  (wrapped false)
+- (libraries unix seq ounit2.advanced))
++ (libraries unix ounit2.advanced))
+ 
+ (documentation
+  (package ounit2)
+-- 
+2.29.2

@@ -5,6 +5,7 @@
 package safemount
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
@@ -94,13 +95,13 @@ func (m *Mount) close(async bool) error {
 	if m.isMounted {
 		if !async {
 			logger.Log.Debugf("Unmounting (%s)", m.target)
-			_, err = retry.RunWithExpBackoff(
+			_, err = retry.RunWithExpBackoff(context.Background(),
 				func() error {
 					logger.Log.Debugf("Trying to unmount (%s)", m.target)
 					umountErr := unix.Unmount(m.target, 0)
 					return umountErr
 				},
-				3, time.Second, 2.0, nil)
+				3, time.Second, 2.0)
 			if err != nil {
 				return fmt.Errorf("failed to unmount (%s):\n%w", m.target, err)
 			}

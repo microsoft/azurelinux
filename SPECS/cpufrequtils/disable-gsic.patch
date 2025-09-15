@@ -1,0 +1,11 @@
+--- cpufrequtils-0.3/debug/i386/Makefile~	2004-12-04 15:58:54.287473296 -0500
++++ cpufrequtils-0.3/debug/i386/Makefile	2004-12-04 15:59:08.035383296 -0500
+@@ -12,7 +12,7 @@ intel_gsic: intel_gsic.c
+ powernow-k8-decode: powernow-k8-decode.c
+ 	$(CC) $(CFLAGS) -o powernow-k8-decode powernow-k8-decode.c
+ 
+-all: centrino-decode dump_psb intel_gsic powernow-k8-decode
++all: centrino-decode dump_psb powernow-k8-decode
+ 
+ clean:
+ 	rm -rf centrino-decode dump_psb intel_gsic powernow-k8-decode

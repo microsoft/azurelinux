@@ -1,14 +1,18 @@
 Name:           libtpms
 Version:        0.9.6
-Release:        5%{?dist}
+Release:        8%{?dist}
 Summary:        Library providing Trusted Platform Module (TPM) functionality
 License:        BSD and TCGL
 
 URL:            https://github.com/stefanberger/libtpms
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:        %{url}/releases/download/v%{version}/v%{version}.tar.gz.asc#/%{name}-%{version}.tar.gz.asc
 # https://github.com/stefanberger.gpg
 Source2:        gpgkey-B818B9CADF9089C2D5CEC66B75AD65802A0B4211.asc
+Patch1:         0001-Export-RSA-private-key-primes-to-OpenSSL.patch
+Patch2:         CVE-2025-49133.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -35,7 +39,7 @@ Libtpms header files and documentation.
 
 %prep
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%autosetup
+%autosetup -p1 -n %{name}-%{version}
 
 %build
 NOCONFIGURE=1 ./autogen.sh
@@ -63,6 +67,15 @@ make check
 %{_mandir}/man3/TPM*
 
 %changelog
+* Tue Jun 17 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.9.6-8
+- Patch CVE-2025-49133
+
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.9.6-7
+- Add missing Vendor and Distribution tags.
+
+* Tue Jun 25 2024 Maxwell Moyer-McKee <bfjelds@microsoft.com> - 0.9.6-6
+- Add patch for compatibility with SymCrypt provider
+
 * Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.9.6-5
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 - license verified (TCG license in LICENSE file)
@@ -303,7 +316,7 @@ make check
 
 * Wed Apr 13 2011 Stefan Berger - 0.5.1-5
 - adding BuildRequires for nss-softokn-freebl-static
-- several libtpms-internal changes around state serialization and 
+- several libtpms-internal changes around state serialization and
   deserialization
 - fixes to libtpms makefile (makefile-libtpms)
 - adding build_type to generate a debug or production build
@@ -344,4 +357,3 @@ make check
 - Version of library is now 0.5.0
 - Debuginfo rpm is built but empty -- seems to be a known problem
   Check https://bugzilla.redhat.com/show_bug.cgi?id=209316
-  

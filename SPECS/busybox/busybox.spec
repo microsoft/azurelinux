@@ -1,7 +1,7 @@
 Summary:        Statically linked binary providing simplified versions of system commands
 Name:           busybox
 Version:        1.36.1
-Release:        3%{?dist}
+Release:        15%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,8 +11,15 @@ Source1:        busybox-static.config
 Source2:        busybox-petitboot.config
 Patch0:         busybox-1.31.1-stime-fix.patch
 Patch1:         CVE-2022-28391.patch
+Patch2:         CVE-2021-42380.patch
+Patch3:         CVE-2023-42363.patch
+# Also Fixes CVE-2023-42364
+Patch4:         CVE-2023-42365.patch
+Patch5:         CVE-2023-42366.patch
+Patch6:         CVE-2023-39810.patch
+Patch7:         CVE-2022-48174.patch
 BuildRequires:  gcc
-BuildRequires:  glibc-static >= 2.38-3%{?dist}
+BuildRequires:  glibc-static >= 2.38-12%{?dist}
 BuildRequires:  libselinux-devel >= 1.27.7-2
 BuildRequires:  libsepol-devel
 %if 0%{?with_check}
@@ -99,6 +106,42 @@ SKIP_KNOWN_BUGS=1 ./runtest
 %{_mandir}/man1/busybox.petitboot.1.gz
 
 %changelog
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.36.1-15
+- Bump to rebuild with updated glibc
+
+* Mon Jul 07 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.36.1-14
+- Patch CVE-2022-48174
+
+* Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.36.1-13
+- Bump to rebuild with updated glibc
+
+* Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 1.36.1-12
+- Bump to rebuild with updated glibc
+
+* Thu May 01 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.36.1-11
+- Added patch for CVE-2023-39810
+
+* Tue Feb 25 2025 Chris Co <chrco@microsoft.com> - 1.36.1-10
+- Bump to rebuild with updated glibc
+
+* Tue Nov 12 2024 Ankita Pareek <ankitapareek@microsoft.com> - 1.36.1-9
+- Address CVE-2023-42366
+
+* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.36.1-8
+- Update to build dep latest glibc-static version
+
+* Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 1.36.1-7
+- Bump to rebuild with updated glibc
+
+* Mon Aug 12 2024 Muhammad Falak <mwani@microsoft.com> - 1.36.1-6
+- Address CVE-2021-42380, CVE-2023-42363, CVE-2023-42364 & CVE-2023-42365
+
+* Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.36.1-5
+- update to build dep latest glibc-static version
+
+* Mon May 13 2024 Chris Co <chrco@microsoft.com> - 1.36.1-4
+- Update to build dep latest glibc-static version
+
 * Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 1.36.1-3
 - update to build dep latest glibc-static version
 

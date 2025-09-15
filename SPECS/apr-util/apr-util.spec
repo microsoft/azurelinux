@@ -3,13 +3,15 @@
 Summary:        The Apache Portable Runtime Utility Library
 Name:           apr-util
 Version:        1.6.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://apr.apache.org/
 Source0:        https://archive.apache.org/dist/apr/%{name}-%{version}.tar.gz
+# Using Fedora 40 patch to enable LMDB support:
+Patch0:         apr-util-1.6.3-lmdb-support.patch
 
 BuildRequires:  apr-devel
 BuildRequires:  expat-devel
@@ -23,14 +25,14 @@ Requires:       openssl
 %description
 The Apache Portable Runtime Utility Library.
 
-%package bdb
-Summary:        APR utility library Berkeley DB driver
-BuildRequires:  libdb-devel
-Requires:       %{name} = %{version}-%{release}
-Requires:       libdb
+%package lmdb
+Summary: APR utility library LMDB driver
 
-%description bdb
-This package provides the Berkeley DB driver for the apr-util
+BuildRequires:  lmdb-devel
+Requires:       apr-util%{?_isa} = %{version}-%{release}
+
+%description lmdb
+This package provides the LMDB driver for the apr-util
 DBM (database abstraction) interface.
 
 %package devel
@@ -112,13 +114,14 @@ This package provides the SQLite driver for the apr-util DBD
 (database abstraction) interface.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
+autoheader && autoconf
 %configure --with-apr=%{_prefix} \
         --includedir=%{_includedir}/apr-%{apuver} \
         --with-crypto \
-        --with-berkeley-db \
+        --with-dbm=lmdb --with-lmdb \
         --with-ldap \
         --with-mysql \
         --with-odbc \
@@ -149,9 +152,9 @@ This package provides the SQLite driver for the apr-util DBD
 %{_libdir}/libaprutil-%{apuver}.so.*
 %exclude %{_libdir}/debug
 
-%files bdb
+%files lmdb
 %defattr(-,root,root)
-%{_libdir}/apr-util-%{apuver}/apr_dbm_db*
+%{_libdir}/apr-util-%{apuver}/apr_dbm_lmdb*
 
 %files devel
 %defattr(-,root,root)
@@ -186,6 +189,9 @@ This package provides the SQLite driver for the apr-util DBD
 %{_libdir}/apr-util-%{apuver}/apr_dbd_sqlite*
 
 %changelog
+* Fri Jun 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.3-2
+- Switching to LMDB from BDB using Fedora 40 (license: MIT) spec for guidance.
+
 * Mon Feb 06 2023 Rachel Menge <rachelmenge@microsoft.com> - 1.6.3-1
 - Upgrade to 1.6.3
 - Fix license tag

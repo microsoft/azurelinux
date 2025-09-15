@@ -14,9 +14,15 @@ index bb7475b..c9bd17c 100644
    local     oldtag  = nil
    local oldadvance  = nil
 diff --git a/rpm/lua/srpm/fonts.lua b/rpm/lua/srpm/fonts.lua
-index 213fe61..2d3bf87 100644
+index 3a40f2c..8896225 100644
 --- a/rpm/lua/srpm/fonts.lua
 +++ b/rpm/lua/srpm/fonts.lua
+@@ -1,4 +1,4 @@
+--- Copyright © 2018-2019 Nicolas Mailhot <nim@fedoraproject.org>
++-- Copyright © 2018-2019 Nicolas Mailhot <nim@azlproject.org>
+ --
+ -- This program is free software: you can redistribute it and/or modify
+ -- it under the terms of the GNU General Public License as published by
 @@ -92,12 +92,12 @@ end
  -- The fontenv macro main processing function
  -- See the documentation in the macros.fonts file for argument description
@@ -34,7 +40,7 @@ index 213fe61..2d3bf87 100644
                     "fontpkgheader", "fonts", "fontsex", "fontconfs", "fontconfsex",
                     "fontconfngs", "fontconfngsex",
                     "fontappstreams", "fontappstreamsex",
-@@ -107,39 +107,39 @@ local function env(suffix, verbose, globvalues)
+@@ -107,41 +107,41 @@ local function env(suffix, verbose, globvalues)
    for _, v in ipairs({"foundry", "fontdocs", "fontdocsex",
                        "fontlicense", "fontlicenses", "fontlicensesex"}) do
      if (rpm.expand("%{" .. v .. "}") ~= "%{" .. v .. "}") then
@@ -52,7 +58,9 @@ index 213fe61..2d3bf87 100644
 +      azl.explicitunset("current" .. g,    verbose)
      end
    end
-   local basename = rpm.expand("%{?foundry" .. suffix .. ":%{foundry" .. suffix .. "} }%{fontfamily" .. suffix .. "}")
+   local foundry = rpm.expand("%{?foundry" .. suffix .. ":%{foundry" .. suffix .. "}}")
+   local family = string.gsub(rpm.expand("%{fontfamily" .. suffix .. "}"), "^" .. foundry, "")
+   local basename = foundry .. " " .. family
 -  fedora.safeset("fontpkgname"   .. suffix, rpmname(basename), verbose)
 -  fedora.safeset("fonthumanname" .. suffix, basename, verbose)
 -  fedora.safeset("fontdir"       .. suffix, "%{_fontbasedir}/%{fontpkgname"  .. suffix .. "}", verbose)
@@ -85,7 +93,7 @@ index 213fe61..2d3bf87 100644
    local    sub = (not forcemain) and (forcesub or ((suffix ~= nil) and (suffix ~= "") and (suffix ~= "0")))
    env(suffix, verbose, {})
    name = sub and "%package     -n " or "Name:           "
-@@ -154,15 +154,15 @@ local function singlepkg(forcemain, forcesub, suffix, verbose)
+@@ -156,15 +156,15 @@ local function singlepkg(forcemain, forcesub, suffix, verbose)
        "Requires:       fontpackages-filesystem\n" ..
        "%{?currentfontpkgheader}\n" ..
        "%description -n %{currentfontpkgname}\n") ..
@@ -104,7 +112,7 @@ index 213fe61..2d3bf87 100644
         singlepkg(forcemain, forcesub, suffix, verbose)
      end
    else
-@@ -172,8 +172,8 @@ end
+@@ -183,8 +183,8 @@ end
  
  -- Create a font (sub)metapackage header
  local function metapkg(name, summary, description, suffixes)
@@ -112,10 +120,22 @@ index 213fe61..2d3bf87 100644
 -  local fontpkgs = fedora.getsuffixed("fontpkgname")
 +  local   azl = require "azl.common"
 +  local fontpkgs = azl.getsuffixed("fontpkgname")
+   local hsuffix
    if (name == "") then
      name, _ = string.gsub(rpm.expand("%{name}"), "-fonts$", "")
-     name    = name .. "-fonts-all"
-@@ -184,7 +184,7 @@ local function metapkg(name, summary, description, suffixes)
+@@ -194,9 +194,9 @@ local function metapkg(name, summary, description, suffixes)
+     hsuffix = norm(name)
+   end
+   if (rpm.expand("%{?fontpkgheader" .. hsuffix .. "}") ~= "") then
+-    fedora.explicitset(  "currentfontpkgheader", "%{fontpkgheader" .. hsuffix .. "}", false)
++    azl.explicitset(  "currentfontpkgheader", "%{fontpkgheader" .. hsuffix .. "}", false)
+   else
+-    fedora.explicitunset(  "currentfontpkgheader",                                 false)
++    azl.explicitunset(  "currentfontpkgheader",                                 false)
+   end
+   if (summary == "") then
+     summary = "All the font packages, generated from %{name}"
+@@ -204,7 +204,7 @@ local function metapkg(name, summary, description, suffixes)
    if (description == "") then
      description = "This meta-package installs all the font packages, generated from the %{name} source package."
    end
@@ -257,3 +277,6 @@ index 77365d6..8132b95 100644
  local         name = rpm.expand("%{?-n*}")
  local      summary = rpm.expand("%{?-s*}")
  if (summary ~= "") then
+-- 
+2.45.2
+

@@ -26,13 +26,13 @@ clean-precache:
 # it does, so add the phony target as a dependency to the flag file
 .PHONY: precache_always_run_phony
 pre-cache: $(STATUS_FLAGS_DIR)/precache.flag
-$(STATUS_FLAGS_DIR)/precache.flag: $(go-precacher) $(chroot_worker) $(rpms_snapshot) precache_always_run_phony 
+$(STATUS_FLAGS_DIR)/precache.flag: $(go-precacher) $(chroot_worker) $(PRECACHER_SNAPSHOT) $(depend_REPO_LIST) $(REPO_LIST) precache_always_run_phony
 	@if [ "$(DISABLE_UPSTREAM_REPOS)" = "y" ]; then \
 		echo "ERROR: Upstream repos are disabled (DISABLE_UPSTREAM_REPOS=y), cannot precache RPMs"; \
 		exit 1; \
 	fi
 	$(go-precacher) \
-		--snapshot "$(rpms_snapshot)" \
+		--snapshot "$(PRECACHER_SNAPSHOT)" \
 		--output-dir "$(remote_rpms_cache_dir)" \
 		--output-summary-file "$(precache_downloaded_files)" \
 		--repo-urls-file "$(repo_urls_file)" \
@@ -49,6 +49,7 @@ $(STATUS_FLAGS_DIR)/precache.flag: $(go-precacher) $(chroot_worker) $(rpms_snaps
 		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
 		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
 		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
+		$(if $(filter y,$(PRECACHER_NON_FATAL)),--non-fatal-mode) \
 		--timestamp-file=$(TIMESTAMP_DIR)/precacher.jsonl && \
 	if [ ! -f $@ ] || [ -s "$(precache_downloaded_files)" ]; then \
 		touch $@; \

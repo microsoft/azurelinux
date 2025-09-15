@@ -1,0 +1,47 @@
+commit 567d4d1ab639d924e8d5af459476f331b9af0ce5
+Author: Dave Beckett <dave@dajobe.org>
+Date:   Tue Nov 4 15:25:20 2014 -0800
+
+    Fix error returns in new world methods
+    
+    (raptor_world_get_parser_factory,
+    raptor_world_get_serializers_count): Fix return value in assertions
+
+diff --git a/src/raptor_parse.c b/src/raptor_parse.c
+index 26911f47752119c6..6caa7f1c231cc0c3 100644
+--- a/src/raptor_parse.c
++++ b/src/raptor_parse.c
+@@ -252,12 +252,12 @@ raptor_world_get_parser_factory(raptor_world *world, const char *name)
+  *
+  * Get number of parsers
+  *
+- * Return value: number of parsers
++ * Return value: number of parsers or <0 on failure
+  **/
+ int
+ raptor_world_get_parsers_count(raptor_world* world)
+ {
+-  RAPTOR_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, raptor_world, NULL);
++  RAPTOR_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, raptor_world, -1);
+ 
+   raptor_world_open(world);
+ 
+diff --git a/src/raptor_serialize.c b/src/raptor_serialize.c
+index a1f29d78d33f82ee..a0344418441a2295 100644
+--- a/src/raptor_serialize.c
++++ b/src/raptor_serialize.c
+@@ -235,12 +235,12 @@ raptor_get_serializer_factory(raptor_world* world, const char *name)
+  *
+  * Get number of serializers
+  *
+- * Return value: number of serializers
++ * Return value: number of serializers or <0 on failure
+  **/
+ int
+ raptor_world_get_serializers_count(raptor_world* world)
+ {
+-  RAPTOR_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, raptor_world, NULL);
++  RAPTOR_ASSERT_OBJECT_POINTER_RETURN_VALUE(world, raptor_world, -1);
+ 
+   raptor_world_open(world);
+ 

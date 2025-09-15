@@ -1,0 +1,15 @@
+# Fails since 10.5.2
+perfschema.memory_aggregate_32bit :
+period.overlaps :
+
+# Fails on 10.11.6
+main.func_json_notembedded :
+main.analyze_stmt_slow_query_log :
+
+innodb_gis.rtree_rollback1 :
+mariabackup.encrypted_page_corruption :
+mariabackup.huge_lsn :
+mariabackup.xb_file_key_management :
+
+# Fails since 10.11.9
+main.having_cond_pushdown :

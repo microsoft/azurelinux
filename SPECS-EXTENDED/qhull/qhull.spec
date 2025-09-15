@@ -1,17 +1,27 @@
 Summary: General dimension convex hull programs
 Name: qhull
-Version: 7.2.1
-Release: 5%{?dist}
+Version: 8.0.2
+# Add epoch, because upstream changed their versioning scheme:
+# - Older releases used year.month
+# - Newer releases use x.y.z
+Epoch: 1
+Release: 6%{?dist}
 License: Qhull
-Source0: https://github.com/qhull/qhull/archive/v%{version}.tar.gz#/qhull-%{version}.tar.gz
-
-Patch1: 0001-Link-executables-against-shared-libs.patch
-Patch2: 0002-Install-docs-into-subdirs.patch
-
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+Source0: https://github.com/qhull/qhull/archive/v%{version}.tar.gz#/qhull-%{version}.tar.gz
+
+# Install cmake and pkgconfig file into proper libdir
+# https://github.com/qhull/qhull/pull/123
+Patch0: qhull-lib64.patch
+# Install extra targets - libqhull and qhull_p
+Patch1: qhull-install.patch
+# The static_r library needs fPIC
+Patch2: qhull-staticr-pic.patch
+
 URL: http://www.qhull.org
 
+BuildRequires: make
 BuildRequires: gcc
 BuildRequires: gcc-c++
 BuildRequires: cmake
@@ -44,9 +54,10 @@ Summary: libqhull_p
 
 %package devel
 Summary: Development files for qhull
-Requires: lib%{name}%{?_isa} = %{version}-%{release}
-Requires: lib%{name}_r%{?_isa} = %{version}-%{release}
-Requires: lib%{name}_p%{?_isa} = %{version}-%{release}
+Requires: lib%{name}%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: lib%{name}_r%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: lib%{name}_p%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description devel
 Qhull is a general dimension convex hull program that reads a set
@@ -57,14 +68,17 @@ about a point.
 
 %prep
 %setup -q
-%patch 1 -p1
-%patch 2 -p1
+%patch -P0 -p1 -b .lib64
+%patch -P1 -p1 -b .install
+%patch -P2 -p1 -b .pic
 
 %build
 mkdir -p build
 cd build
-%cmake ..
+%cmake -S .. -B . -DLINK_APPS_SHARED=ON
 make VERBOSE=1 %{?_smp_mflags}
+# These items are deprecated as of 8.0.2
+make VERBOSE=1 %{?_smp_mflags} libqhull qhull_p
 cd ..
 
 %install
@@ -74,12 +88,9 @@ cd ..
 
 chrpath --delete ${RPM_BUILD_ROOT}%{_libdir}/lib*.so.*
 
-
 %files
 %{_pkgdocdir}
 %exclude %{_pkgdocdir}/COPYING.txt
-%exclude %{_pkgdocdir}/src/libqhull
-%exclude %{_pkgdocdir}/src/libqhull_r
 %license COPYING.txt
 %{_bindir}/*
 %{_mandir}/man1/*
@@ -89,34 +100,79 @@ chrpath --delete ${RPM_BUILD_ROOT}%{_libdir}/lib*.so.*
 
 %ldconfig_scriptlets -n libqhull
 
-
 %files -n libqhull_r
 %{_libdir}/libqhull_r.so.*
 
 %ldconfig_scriptlets -n libqhull_r
-
 
 %files -n libqhull_p
 %{_libdir}/libqhull_p.so.*
 
 %ldconfig_scriptlets -n libqhull_p
 
-
 %files devel
-%{_pkgdocdir}/src/libqhull
-%{_pkgdocdir}/src/libqhull_r
 %{_libdir}/*.so
 %{_includedir}/*
+# Easier to include these than to hack them out of the cmake bits
 %{_libdir}/libqhullcpp.a
-%exclude %{_libdir}/libqhullstatic*.a
-
+%{_libdir}/libqhullstatic*.a
+%dir %{_libdir}/cmake/Qhull
+%{_libdir}/cmake/Qhull/QhullConfig*.cmake
+%{_libdir}/cmake/Qhull/QhullTargets*.cmake
+%{_libdir}/pkgconfig/qhull_r.pc
+%{_libdir}/pkgconfig/qhullcpp.pc
+%{_libdir}/pkgconfig/qhullstatic*.pc
 
 %changelog
-* Fri Oct 29 2021 Muhammad Falak <mwani@microsft.com> - 7.2.1-5
-- Remove epoch
+* Tue Dec 17 2024 Akhila Guruju <v-guakhila@microsoft.com> - 1:8.0.2-6
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:7.2.1-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.0.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.0.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.0.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Aug 10 2023 Tom Callaway <spot@fedoraproject.org> - 1:8.0.2-2
+- make the static_r library pic
+
+* Thu Aug  3 2023 Tom Callaway <spot@fedoraproject.org> - 1:8.0.2-1
+- update to 8.0.2 (thanks to Orion Poplawski)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:7.2.1-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:7.2.1-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sun Oct 02 2022 Orion Poplawski <orion@nwra.com> - 1:7.2.1-11
+- Compile libqhullcpp with -fPIC
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:7.2.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:7.2.1-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:7.2.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:7.2.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Aug 03 2020 Ralf Corsépius <corsepiu@fedoraproject.org> - 1:7.2.1-6
+- Work around cmake madness (RHBZ#1863716).
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:7.2.1-5
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:7.2.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:7.2.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -247,3 +303,4 @@ chrpath --delete ${RPM_BUILD_ROOT}%{_libdir}/lib*.so.*
 
 * Fri Jul 16 2004 Ralf Corsepius <ralf[AT]links2linux.de>	- 2003.1-0.fdr.1
 - Initial Fedora RPM.
+

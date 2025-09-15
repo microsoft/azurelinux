@@ -84,6 +84,7 @@ script_dir=$(realpath $(dirname "${BASH_SOURCE[0]}"))
 topdir=/usr/src/azl
 enable_local_repo=false
 keep_container="--rm"
+packages_to_install="azurelinux-release vim git jq"
 
 while (( "$#")); do
   case "$1" in
@@ -92,7 +93,7 @@ while (( "$#")); do
     -p ) repo_path="$(realpath $2)"; shift 2 ;;
     -mo ) extra_mounts="$2"; shift 2 ;;
     -b ) build_mount_dir="$(realpath $2)"; shift 2;;
-    -ep ) extra_packages="$2"; shift 2;;
+    -ep ) packages_to_install="${packages_to_install} $2"; shift 2;;
     -r ) enable_local_repo=true; shift ;;
     -k ) keep_container=""; shift ;;
     -q ) STD_OUT_REDIRECT=/dev/null; shift ;;
@@ -230,22 +231,11 @@ sed -i "s~<REPO_BRANCH>~${repo_branch}~" $tmp_dir/welcome.txt
 sed -i "s~<AARCH>~$(uname -m)~" $tmp_dir/welcome.txt
 cp resources/setup_functions.sh $tmp_dir/setup_functions.sh
 sed -i "s~<TOPDIR>~${topdir}~" $tmp_dir/setup_functions.sh
-# TODO: Remove when PMC is available for 3.0
-if [[ "${version}" == "3.0" ]]; then # Add 3.0 DailyBuild repo
-    cp resources/azl-3_repo $tmp_dir/azl-3_repo
-    sed -i "s~<DAILY_BUILD_ID>~${DAILY_BUILD_ID}~" $tmp_dir/azl-3_repo
-    if [[ $(uname -m) == "x86_64" ]]; then
-        sed -i "s~<ARCH>~x86-64~" $tmp_dir/azl-3_repo
-    else
-        sed -i "s~<ARCH>~aarch64~" $tmp_dir/azl-3_repo
-    fi
-fi
 
 # ============ Build the image ============
 dockerfile="${script_dir}/resources/azl.Dockerfile"
 
-# TODO: Remove test mode when image is available for 3.0
-if [[ "${mode}" == "build" || "${mode}" == "test" ]]; then # Configure base image
+if [[ "${mode}" == "build" ]]; then # Configure base image
     echo "Importing chroot into docker..."
     chroot_file="$BUILD_DIR/worker/worker_chroot.tar.gz"
     if [[ ! -f "${chroot_file}" ]]; then build_worker_chroot; fi
@@ -265,7 +255,7 @@ if [[ "${mode}" == "build" || "${mode}" == "test" ]]; then # Configure base imag
         docker import "${chroot_file}" $container_img
     fi
 else
-    container_img="mcr.microsoft.com/cbl-mariner/base/core:${version}"
+    container_img="mcr.microsoft.com/azurelinux/base/core:${version}"
 fi
 
 # ================== Launch Container ==================
@@ -279,7 +269,7 @@ docker build -q \
                 --build-arg enable_local_repo="$enable_local_repo" \
                 --build-arg azl_repo="$repo_path" \
                 --build-arg mode="$mode" \
-                --build-arg extra_packages="$extra_packages" \
+                --build-arg packages_to_install="$packages_to_install" \
                 .
 
 echo "docker_image_tag is ${docker_image_tag}"

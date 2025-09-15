@@ -1,16 +1,18 @@
-Vendor:         Microsoft Corporation
+Vendor:         Microsoft Corporation                                                 
 Distribution:   Azure Linux
 Name:           libgee
-Version:        0.20.3
-Release:        2%{?dist}
+Version:        0.20.6
+Release:        1%{?dist}
 Summary:        GObject collection library
 
-License:        LGPLv2+
+License:        LGPL-2.1-or-later
 URL:            https://wiki.gnome.org/Projects/Libgee
 Source0:        https://download.gnome.org/sources/libgee/0.20/libgee-%{version}.tar.xz
 
-BuildRequires:  glib2-devel
-BuildRequires:  gobject-introspection-devel
+BuildRequires:  pkgconfig(gio-2.0)
+BuildRequires:  pkgconfig(gobject-introspection-1.0)
+BuildRequires:  vala
+BuildRequires:  make
 
 %description
 libgee is a collection library providing GObject-based interfaces and
@@ -62,11 +64,11 @@ developing applications that use %{name}.
 
 %prep
 %setup -q
-
+find -name '*.vala' -exec touch {} \;
 
 %build
-%configure --disable-static
-make %{?_smp_mflags}
+%configure --disable-static --enable-vala
+%make_build
 
 
 %check
@@ -77,7 +79,7 @@ make check
 %make_install \
     typelibdir=%{_libdir}/girepository-1.0 \
     girdir=%{_datadir}/gir-1.0
-find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
+find $RPM_BUILD_ROOT -name '*.la' -delete
 
 
 %ldconfig_scriptlets
@@ -102,6 +104,10 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
+* Tue Dec 31 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.20.6-1
+- Update to 0.20.6.
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20.3-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

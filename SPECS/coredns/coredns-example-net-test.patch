@@ -1,0 +1,26 @@
+From d8ecde1080e7cbbeb98257ba4e03a271f16b4cd9 Mon Sep 17 00:00:00 2001
+From: Arthur Outhenin-Chalandre <arthur@cri.epita.fr>
+Date: Tue, 21 Jan 2025 09:41:38 +0100
+Subject: [PATCH] test: fix cname with proxy test (#7083)
+
+www.example.net is now behind akamai with various IP answered and a
+chain of CNAME. Let's replace www.example.net by one of the root server
+which answer a single IP and hopefully should remain this way.
+
+Signed-off-by: Arthur Outhenin-Chalandre <arthur@cri.epita.fr>
+---
+ test/example_test.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/example_test.go b/test/example_test.go
+index 863b69fcce1..ed1f9c7c30f 100644
+--- a/test/example_test.go
++++ b/test/example_test.go
+@@ -11,6 +11,6 @@ short   1    IN  A      127.0.0.3
+ 
+ *.w     3600 IN  TXT    "Wildcard"
+ a.b.c.w      IN  TXT    "Not a wildcard"
+-cname        IN  CNAME  www.example.net.
++cname        IN  CNAME  h.gtld-servers.net.
+ service      IN  SRV    8080 10 10 @
+ `

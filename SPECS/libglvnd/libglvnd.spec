@@ -3,7 +3,7 @@
 Summary:        The GL Vendor-Neutral Dispatch library
 Name:           libglvnd
 Version:        1.7.0
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        MIT AND GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,9 @@ Source0:        %{url}/-/archive/v%{version}/%{name}-%{version}.tar.gz
 Patch0:         libglvnd-python3.patch
 Patch1:         0001-glx-Add-another-fallback-library-name.patch
 Patch2:         0002-Adding-a-separate-conditional-to-disable-running-GLX.patch
+# this patch address both CVE-2019-11834 and CVE-2019-11835
+Patch3:         CVE-2019-11834.patch
+Patch4:         CVE-2023-26819.patch
 
 BuildRequires:  gcc
 BuildRequires:  libtool
@@ -212,6 +215,12 @@ make check V=1 || \
 %{_libdir}/pkgconfig/opengl.pc
 
 %changelog
+* Mon Jun 30 2025 BinduSri Adabala <v-badabala@microsoft.com> - 1.7.0-3
+- Patch CVE-2023-26819.
+
+* Tue Jun 04 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.7.0-2
+- Address CVE-2019-11834 and CVE-2019-11835.
+
 * Thu Feb 29 2024 Vince Perri <viperri@microsoft.com> - 1.7.0-1
 - Upgrade to 1.7.0 based on Fedora 40.
 - License verified.

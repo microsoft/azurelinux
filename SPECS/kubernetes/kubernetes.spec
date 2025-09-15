@@ -9,8 +9,8 @@
 %define container_image_components 'kube-proxy kube-apiserver kube-controller-manager kube-scheduler'
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
-Version:        1.29.1
-Release:        2%{?dist}
+Version:        1.30.10
+Release:        11%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,9 +18,18 @@ Group:          Microsoft Kubernetes
 URL:            https://kubernetes.io/
 Source0:        https://dl.k8s.io/v%{version}/kubernetes-src.tar.gz#/%{name}-v%{version}.tar.gz
 Source1:        kubelet.service
+Patch0:         CVE-2024-28180.patch
+Patch1:         CVE-2024-45338.patch
+Patch2:         CVE-2025-27144.patch
+Patch3:         CVE-2025-22868.patch
+Patch4:         CVE-2025-22869.patch
+Patch5:         CVE-2024-51744.patch
+Patch6:         CVE-2025-30204.patch
+Patch7:         CVE-2025-22872.patch
+Patch8:         CVE-2025-4563.patch
 BuildRequires:  flex-devel
-BuildRequires:  glibc-static >= 2.38-3%{?dist}
-BuildRequires:  golang
+BuildRequires:  glibc-static >= 2.38-12%{?dist}
+BuildRequires:  golang < 1.25
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
 BuildRequires:  which
@@ -90,13 +99,19 @@ Summary:        Kubernetes pause
 Pause component for Microsoft Kubernetes %{version}.
 
 %prep
-%setup -q -c -n %{name}
+%autosetup -p1 -c -n %{name}
 
 %build
 # set version information
 # (see k8s code: hack/lib/version.sh for more detail)
 export KUBE_GIT_TREE_STATE="clean"
 export KUBE_GIT_VERSION=v%{version}
+
+# use go provided by host
+go_version_host=`go version | { read _ _ v _; echo ${v#go}; }`
+go_version_min=$(cat %{_builddir}/%{name}/.go-version)
+echo "+++ using go version ${go_version_host} (minimum ${go_version_min})"
+export FORCE_HOST_GO=y
 
 # build host and container image related components
 echo "+++ build kubernetes components"
@@ -263,6 +278,66 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Fri Sep 05 2025 Andrew Phelps <anphel@microsoft.com> - 1.30.10-11
+- Bump to rebuild with updated glibc
+
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.30.10-10
+- Set BR for golang to < 1.25
+
+* Mon Jun 30 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.30.10-9
+- Patch CVE-2025-4563
+
+* Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.30.10-8
+- Bump to rebuild with updated glibc
+
+* Tue May 13 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.30-10-7
+- Patch CVE-2025-22872
+
+* Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 1.30-10-6
+- Bump to rebuild with updated glibc
+
+* Wed Apr 16 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.30.10-5
+- Fix CVE-2024-51744 with an upstream patch
+
+* Sat Mar 29 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.30.10-4
+- Patch CVE-2025-30204
+
+* Fri Feb 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.30.10-3
+- Fix CVE-2025-27144, CVE-2025-22868, CVE-2025-22869 with an upstream patch
+
+* Tue Feb 25 2025 Chris Co <chrco@microsoft.com> - 1.30.10-2
+- Bump to rebuild with updated glibc
+
+* Fri Feb 21 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.10-1
+- Auto-upgrade to 1.30.10 - fix CVE-2025-0426
+
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.30.3-2
+- Add patch for CVE-2024-45338
+
+* Wed Dec 11 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.3-1
+- Auto-upgrade to 1.30.3 - Fix CVE-2024-10220
+
+* Tue Oct 01 2024 Henry Li <lihl@microsoft.com> - 1.30.1-4
+- Add patch to resolve CVE-2024-28180
+
+* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.30.1-3
+- Update to build dep latest glibc-static version
+
+* Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 1.30.1-2
+- Bump to rebuild with updated glibc
+
+* Fri May 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.30.1-1
+- Auto-upgrade to 1.30.1
+
+* Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.29.1-5
+- update to build dep latest glibc-static version
+
+* Mon May 13 2024 Chris Co <chrco@microsoft.com> - 1.29.1-4
+- Update to build dep latest glibc-static version
+
+* Mon Mar 25 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.29.1-3
+- Fix build break due to golang version upgrade
+
 * Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 1.29.1-2
 - update to build dep latest glibc-static version
 
@@ -287,7 +362,7 @@ fi
 * Fri Oct 06 2023 Henry Beberman <henry.beberman@microsoft.com> - 1.28.2-2
 - Bump release to rebuild against glibc 2.35-6
 
-* Wdd Sep 20 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.28.2-1
+* Wed Sep 20 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.28.2-1
 - Upgrade to 1.28.2
 - License verified.
 
@@ -444,5 +519,3 @@ fi
 
 * Wed Dec 02 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-1
 - Original version for CBL-Mariner
-
-

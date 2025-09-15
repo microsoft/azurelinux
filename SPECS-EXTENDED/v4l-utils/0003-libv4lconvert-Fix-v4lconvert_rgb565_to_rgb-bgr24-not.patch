@@ -1,0 +1,91 @@
+From e864210793795a50b88e77af5b7d29e6bad584e8 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Sun, 16 Oct 2022 15:40:02 +0200
+Subject: [PATCH v4l-utils 3/5] libv4lconvert: Fix
+ v4lconvert_rgb565_to_rgb/bgr24() not taking stride into account
+
+The atomisp driver can generate V4L2_PIX_FMT_RGB565 buffers where
+stride != width. Where as v4lconvert_rgb565_to_rgb/bgr24() assumed that
+stride == width is always true.
+
+Add a stride argument to v4lconvert_rgb565_to_rgb/bgr24() to fix this.
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ lib/libv4lconvert/libv4lconvert-priv.h | 4 ++--
+ lib/libv4lconvert/libv4lconvert.c      | 4 ++--
+ lib/libv4lconvert/rgbyuv.c             | 6 ++++--
+ 3 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/lib/libv4lconvert/libv4lconvert-priv.h b/lib/libv4lconvert/libv4lconvert-priv.h
+index 495f726d..f87a43a4 100644
+--- a/lib/libv4lconvert/libv4lconvert-priv.h
++++ b/lib/libv4lconvert/libv4lconvert-priv.h
+@@ -178,10 +178,10 @@ int v4lconvert_y10b_to_yuv420(struct v4lconvert_data *data,
+ 	const unsigned char *src, unsigned char *dest, int width, int height);
+ 
+ void v4lconvert_rgb565_to_rgb24(const unsigned char *src, unsigned char *dest,
+-		int width, int height);
++		int width, int height, int stride);
+ 
+ void v4lconvert_rgb565_to_bgr24(const unsigned char *src, unsigned char *dest,
+-		int width, int height);
++		int width, int height, int stride);
+ 
+ void v4lconvert_rgb565_to_yuv420(const unsigned char *src, unsigned char *dest,
+ 		const struct v4l2_format *src_fmt, int yvu);
+diff --git a/lib/libv4lconvert/libv4lconvert.c b/lib/libv4lconvert/libv4lconvert.c
+index e5d5ddde..77f9eca5 100644
+--- a/lib/libv4lconvert/libv4lconvert.c
++++ b/lib/libv4lconvert/libv4lconvert.c
+@@ -1282,10 +1282,10 @@ static int v4lconvert_convert_pixfmt(struct v4lconvert_data *data,
+ 		}
+ 		switch (dest_pix_fmt) {
+ 		case V4L2_PIX_FMT_RGB24:
+-			v4lconvert_rgb565_to_rgb24(src, dest, width, height);
++			v4lconvert_rgb565_to_rgb24(src, dest, width, height, bytesperline);
+ 			break;
+ 		case V4L2_PIX_FMT_BGR24:
+-			v4lconvert_rgb565_to_bgr24(src, dest, width, height);
++			v4lconvert_rgb565_to_bgr24(src, dest, width, height, bytesperline);
+ 			break;
+ 		case V4L2_PIX_FMT_YUV420:
+ 			v4lconvert_rgb565_to_yuv420(src, dest, fmt, 0);
+diff --git a/lib/libv4lconvert/rgbyuv.c b/lib/libv4lconvert/rgbyuv.c
+index 1ca821ab..f9017016 100644
+--- a/lib/libv4lconvert/rgbyuv.c
++++ b/lib/libv4lconvert/rgbyuv.c
+@@ -511,7 +511,7 @@ void v4lconvert_swap_uv(const unsigned char *src, unsigned char *dest,
+ }
+ 
+ void v4lconvert_rgb565_to_rgb24(const unsigned char *src, unsigned char *dest,
+-		int width, int height)
++		int width, int height, int stride)
+ {
+ 	int j;
+ 	while (--height >= 0) {
+@@ -525,11 +525,12 @@ void v4lconvert_rgb565_to_rgb24(const unsigned char *src, unsigned char *dest,
+ 
+ 			src += 2;
+ 		}
++		src += stride - 2 * width;
+ 	}
+ }
+ 
+ void v4lconvert_rgb565_to_bgr24(const unsigned char *src, unsigned char *dest,
+-		int width, int height)
++		int width, int height, int stride)
+ {
+ 	int j;
+ 	while (--height >= 0) {
+@@ -543,6 +544,7 @@ void v4lconvert_rgb565_to_bgr24(const unsigned char *src, unsigned char *dest,
+ 
+ 			src += 2;
+ 		}
++		src += stride - 2 * width;
+ 	}
+ }
+ 
+-- 
+2.37.3
+

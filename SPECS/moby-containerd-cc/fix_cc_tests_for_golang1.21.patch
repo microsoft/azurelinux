@@ -1,0 +1,47 @@
+Backported from upstream 5d9bf7d1398f645882e5c2becc7815daa1770c26
+
+Signed-off-by: Akihiro Suda <akihiro.suda.cz@hco.ntt.co.jp>
+Signed-off-by: Henry Beberman <henry.beberman@microsoft.com>
+
+diff -Naur a/contrib/apparmor/apparmor.go b/contrib/apparmor/apparmor.go
+--- a/contrib/apparmor/apparmor.go	2024-02-09 13:19:03.000000000 +0000
++++ b/contrib/apparmor/apparmor.go	2024-02-22 00:22:43.993021818 +0000
+@@ -39,6 +39,11 @@
+ 
+ // WithDefaultProfile will generate a default apparmor profile under the provided name
+ // for the container.  It is only generated if a profile under that name does not exist.
++//
++// FIXME: pkg/cri/[sb]server/container_create_linux_test.go depends on go:noinline
++// since Go 1.21.
++//
++//go:noinline
+ func WithDefaultProfile(name string) oci.SpecOpts {
+ 	return func(_ context.Context, _ oci.Client, _ *containers.Container, s *specs.Spec) error {
+ 		if err := LoadDefaultProfile(name); err != nil {
+diff -Naur a/contrib/seccomp/seccomp.go b/contrib/seccomp/seccomp.go
+--- a/contrib/seccomp/seccomp.go	2024-02-09 13:19:03.000000000 +0000
++++ b/contrib/seccomp/seccomp.go	2024-02-22 00:49:25.471844786 +0000
+@@ -30,6 +30,11 @@
+ // WithProfile receives the name of a file stored on disk comprising a json
+ // formatted seccomp profile, as specified by the opencontainers/runtime-spec.
+ // The profile is read from the file, unmarshaled, and set to the spec.
++//
++// FIXME: pkg/cri/[sb]server/container_create_linux_test.go depends on go:noinline
++// since Go 1.21.
++//
++//go:noinline
+ func WithProfile(profile string) oci.SpecOpts {
+ 	return func(_ context.Context, _ oci.Client, _ *containers.Container, s *specs.Spec) error {
+ 		s.Linux.Seccomp = &specs.LinuxSeccomp{}
+@@ -46,6 +51,11 @@
+ 
+ // WithDefaultProfile sets the default seccomp profile to the spec.
+ // Note: must follow the setting of process capabilities
++//
++// FIXME: pkg/cri/[sb]server/container_create_linux_test.go depends on go:noinline
++// since Go 1.21.
++//
++//go:noinline
+ func WithDefaultProfile() oci.SpecOpts {
+ 	return func(_ context.Context, _ oci.Client, _ *containers.Container, s *specs.Spec) error {
+ 		s.Linux.Seccomp = DefaultProfile(s)

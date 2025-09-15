@@ -1,16 +1,20 @@
 Name:           glew
-Version:        2.1.0
-Release:        7%{?dist}
+Version:        2.2.0
+Release:        1%{?dist}
 Summary:        The OpenGL Extension Wrangler Library
 License:        BSD and MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://glew.sourceforge.net
+URL:            https://glew.sourceforge.net
 
 Source0:        https://sourceforge.net/projects/glew/files/glew/%{version}/glew-%{version}.tgz
 Patch0:         glew-2.1.0-install.patch
+Patch1:         glew-2.2.0-gcc12-cplusplus.patch
+
 BuildRequires:  gcc
 BuildRequires:  libGLU-devel
+BuildRequires:  make
+
 
 %description
 The OpenGL Extension Wrangler Library (GLEW) is a cross-platform C/C++
@@ -74,6 +78,11 @@ chmod 0755 $RPM_BUILD_ROOT%{_libdir}/*.so*
 %doc doc/*
 
 %changelog
+* Tue Oct 29 2024 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.2.0-1
+- Update to 2.2.0.
+- change http URL to https
+- License verified
+
 * Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.0-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove redhat-specific config.guess seeding

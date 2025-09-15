@@ -20,6 +20,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/sirupsen/logrus"
 
 	"golang.org/x/sys/unix"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -35,8 +36,8 @@ var (
 	imagerTool         = app.Flag("imager", "Path to the imager tool.").Required().ExistingFile()
 	buildDir           = app.Flag("build-dir", "Directory to store temporary files while building.").Required().ExistingDir()
 	baseDirPath        = app.Flag("base-dir", "Base directory for relative file paths from the config. Defaults to config's directory.").ExistingDir()
-
-	logFlags = exe.SetupLogFlags(app)
+	repoSnapshotTime   = app.Flag("repo-snapshot-time", "Optional: tdnf repo snapshot time").String()
+	logFlags           = exe.SetupLogFlags(app)
 )
 
 // Every valid mouse event handler will follow the format:
@@ -44,13 +45,14 @@ var (
 var mouseEventHandlerRegex = regexp.MustCompile(`^H:\s+Handlers=(\w+)\s+mouse\d+`)
 
 type imagerArguments struct {
-	imagerTool   string
-	configFile   string
-	buildDir     string
-	baseDirPath  string
-	emitProgress bool
-	logFile      string
-	logLevel     string
+	imagerTool       string
+	configFile       string
+	buildDir         string
+	baseDirPath      string
+	emitProgress     bool
+	logFile          string
+	logLevel         string
+	repoSnapshotTime string
 }
 
 type installationDetails struct {
@@ -78,11 +80,12 @@ func main() {
 
 	// Imager's stdout/stderr will be combined with this tool's, so it will automatically be logged to the current log file
 	args := imagerArguments{
-		imagerTool:  *imagerTool,
-		buildDir:    *buildDir,
-		baseDirPath: *baseDirPath,
-		logLevel:    logger.Log.GetLevel().String(),
-		logFile:     imagerLogFile,
+		imagerTool:       *imagerTool,
+		buildDir:         *buildDir,
+		baseDirPath:      *baseDirPath,
+		logLevel:         logger.Log.GetLevel().String(),
+		logFile:          imagerLogFile,
+		repoSnapshotTime: *repoSnapshotTime,
 	}
 
 	installFunc := installerFactory(*forceAttended, *configFile, *templateConfigFile)
@@ -266,7 +269,7 @@ func calamaresInstall(templateConfigFile string, args imagerArguments) (err erro
 	args.configFile = filepath.Join(calamaresDir, "unattended_config.json")
 
 	launchScript := filepath.Join(calamaresDir, "mariner-install.sh")
-	skuDir := filepath.Join(calamaresDir, "mariner-skus")
+	skuDir := filepath.Join(calamaresDir, "azurelinux-skus")
 
 	bootType := configuration.SystemBootType()
 	logger.Log.Infof("Boot type detected: %s", bootType)
@@ -396,17 +399,11 @@ func terminalAttendedInstall(cfg configuration.Config, progress chan int, status
 		return
 	}
 
-	onStdout := func(args ...interface{}) {
+	onStdout := func(line string) {
 		const (
 			progressPrefix = "progress:"
 			actionPrefix   = "action:"
 		)
-
-		if len(args) == 0 {
-			return
-		}
-
-		line := args[0].(string)
 
 		if strings.HasPrefix(line, progressPrefix) {
 			reportedProgress, err := strconv.Atoi(strings.TrimPrefix(line, progressPrefix))
@@ -423,7 +420,10 @@ func terminalAttendedInstall(cfg configuration.Config, progress chan int, status
 
 	args.emitProgress = true
 	program, commandArgs := formatImagerCommand(args)
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, false, program, commandArgs...)
+	err = shell.NewExecBuilder(program, commandArgs...).
+		LogLevel(logrus.TraceLevel, logrus.WarnLevel).
+		StdoutCallback(onStdout).
+		Execute()
 
 	return
 }
@@ -453,6 +453,7 @@ func formatImagerCommand(args imagerArguments) (program string, commandArgs []st
 		fmt.Sprintf("--base-dir=%s", args.baseDirPath),
 		fmt.Sprintf("--log-file=%s", args.logFile),
 		fmt.Sprintf("--log-level=%s", args.logLevel),
+		fmt.Sprintf("--repo-snapshot-time=%s", args.repoSnapshotTime),
 	}
 
 	if args.emitProgress {

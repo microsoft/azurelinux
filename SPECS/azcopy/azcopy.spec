@@ -1,7 +1,7 @@
 Summary:        The new Azure Storage data transfer utility - AzCopy v10
 Name:           azcopy
-Version:        10.22.1
-Release:        1%{?dist}
+Version:        10.25.1
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,6 +27,10 @@ Source0:        https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        azure-storage-%{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2025-22868.patch
+Patch1:         CVE-2025-30204.patch
+Patch2:         CVE-2025-22870.patch
+Patch3:         CVE-2024-51744.patch
 
 BuildRequires:  golang >= 1.17.9
 BuildRequires:  git
@@ -41,9 +45,11 @@ performance and throughput.
 
 %prep
 %setup -q -n azure-storage-%{name}-%{version}
+# Apply vendor before patching
+tar --no-same-owner -xf %{SOURCE1}
+%autopatch -p1
 
 %build
-tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
 go build -buildmode=pie -mod=vendor
 
@@ -61,6 +67,21 @@ go test -mod=vendor
 %{_bindir}/azcopy
 
 %changelog
+* Fri Apr 11 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 10.25.1-4
+- Patch CVE-2025-22870, CVE-2024-51744
+
+* Fri Mar 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 10.25.1-3
+- Patch CVE-2025-30204
+
+* Tue Mar 04 2025 Kanishk Bansal <kanbansal@microsoft.com> - 10.25.1-2
+- Fix CVE-2025-22868 with an upstream patch
+
+* Tue Aug 06 2024 Archana Choudhary <archana1@microsoft.com> - 10.25.1-1
+- Upgrade azcopy to latest 10.25.1 to fix multiple security issues  
+
+* Thu May 23 2024 Sudipta Pandit <sudpandit@microsoft.com> - 10.24.0-1
+- Upgrade azcopy to latest 10.24.0 to fix multiple security issues
+
 * Thu Jan 04 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.22.1-1
 - Auto-upgrade to 10.22.1 - 3.0 upgrade
 

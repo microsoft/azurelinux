@@ -1,0 +1,100 @@
+From 7b7aee01d72be5a310678cdad189cb7382f28549 Mon Sep 17 00:00:00 2001
+From: Robbie Harwood <rharwood@redhat.com>
+Date: Tue, 19 Jan 2021 11:41:40 -0500
+Subject: [PATCH] Drop coverage from tests
+
+To my knowledge, we've never looked at or done anything with this
+output.  Test coverage is a noble goal, but this project is mostly
+complete, so we don't expect heavy development soon.
+
+Requested-by: Petr Viktorin <pviktori@redhat.com>
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+(cherry picked from commit 86c3da13d5d6cdb5822d194f2b820da1fd31dddb)
+[rharwood@redhat.com: .gitignore]
+---
+ .coveragerc | 23 -----------------------
+ MANIFEST.in |  1 -
+ setup.py    |  2 +-
+ tox.ini     | 12 ++----------
+ 4 files changed, 3 insertions(+), 35 deletions(-)
+ delete mode 100644 .coveragerc
+
+diff --git a/.coveragerc b/.coveragerc
+deleted file mode 100644
+index 4038562..0000000
+--- a/.coveragerc
++++ /dev/null
+@@ -1,23 +0,0 @@
+-[run]
+-branch = True
+-source =
+-    kdcproxy
+-    tests.py
+-
+-[paths]
+-source =
+-   kdcproxy
+-   .tox/*/lib/python*/site-packages/kdcproxy
+-
+-[report]
+-ignore_errors = False
+-precision = 1
+-exclude_lines =
+-    pragma: no cover
+-    raise AssertionError
+-    raise NotImplementedError
+-    if 0:
+-    if False:
+-    if __name__ == .__main__.:
+-    if PY3
+-    if not PY3
+diff --git a/MANIFEST.in b/MANIFEST.in
+index 362f840..ff6b9a7 100644
+--- a/MANIFEST.in
++++ b/MANIFEST.in
+@@ -2,4 +2,3 @@ include README COPYING
+ include tox.ini
+ include setup.cfg
+ include tests.py tests.krb5.conf
+-include .coveragerc
+diff --git a/setup.py b/setup.py
+index 20b335e..4b34fcc 100644
+--- a/setup.py
++++ b/setup.py
+@@ -29,7 +29,7 @@ install_requires = [
+ ]
+ 
+ extras_require = {
+-    "tests": ["pytest", "coverage", "WebTest"],
++    "tests": ["pytest", "WebTest"],
+     "test_pep8": ['flake8', 'flake8-import-order', 'pep8-naming']
+ }
+ 
+diff --git a/tox.ini b/tox.ini
+index 038d996..9672cee 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -1,21 +1,13 @@
+ [tox]
+ minversion = 2.3.1
+-envlist = py36,py37,py38,py39,pep8,py3pep8,doc,coverage-report
++envlist = py36,py37,py38,py39,pep8,py3pep8,doc
+ skip_missing_interpreters = true
+ 
+ [testenv]
+ deps =
+     .[tests]
+ commands =
+-    {envpython} -m coverage run --parallel \
+-        -m pytest --capture=no --strict {posargs}
+-
+-[testenv:coverage-report]
+-deps = coverage
+-skip_install = true
+-commands =
+-    {envpython} -m coverage combine
+-    {envpython} -m coverage report --show-missing
++    {envpython} -m pytest --capture=no --strict {posargs}
+ 
+ [testenv:pep8]
+ basepython = python3

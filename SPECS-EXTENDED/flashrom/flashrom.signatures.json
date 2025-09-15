@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "flashrom-1.4.0.tar.xz": "ad7ee1b49239c6fb4f8f55e36706fcd731435db1a4bd2fab3d80f1f72508ccee",
+  "flashrom-1.4.0.tar.xz.asc": "640caaedcfc1295293103277ddb1228abf6116d9892cde2c64ca46f0a9b0ccbd",
+  "6E6EF9A0BA478006E2776E4CC037BB413134D111.gpg" : "37fddc425f413c9a6513691e8c92e357209cc17dc8bec7cbda822b285d1abebf"
+ }
+}

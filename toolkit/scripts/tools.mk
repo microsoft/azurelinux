@@ -23,7 +23,15 @@ ifeq ($(REBUILD_TOOLS),y)
 go_current_version = $(shell go version | awk '{print $$3}')
 go_version_check = $(shell printf '%s\n%s\n' "$(go_min_version)" "$(go_current_version)" | sort -V | head -n1)
 ifneq ($(go_version_check),$(go_min_version))
-$(error Go version '$(go_current_version)' is less than minimum required version '$(go_min_version)')
+$(warning -----------------------------------------------------------------------)
+$(warning | If this is a personal machine,                                      |)
+$(warning |     use 'sudo make install-prereqs' to get the latest dependencies. |)
+$(warning | If this is an automated system,                                     |)
+$(warning |     consider 'sudo make install-prereqs-and-configure' to get the   |)
+$(warning |     latest deps and automatically configure the system.             |)
+$(warning | See ./toolkit/docs/building/prerequisites.md for details.           |)
+$(warning -----------------------------------------------------------------------)
+$(error Go version '$(go_current_version)' is less than minimum required version '$(go_min_version)'.)
 endif
 endif
 
@@ -31,6 +39,7 @@ endif
 go_tool_list = \
 	bldtracker \
 	boilerplate \
+	containercheck \
 	depsearch \
 	downloader \
 	grapher \
@@ -42,6 +51,7 @@ go_tool_list = \
 	imagepkgfetcher \
 	imager \
 	isomaker \
+	licensecheck \
 	liveinstaller \
 	osmodifier \
 	pkgworker \
@@ -92,7 +102,7 @@ clean-go-tools:
 	rm -rf $(BUILD_DIR)/tools
 
 go_ldflags := 	-X github.com/microsoft/azurelinux/toolkit/tools/internal/exe.ToolkitVersion=$(RELEASE_VERSION) \
-				-X github.com/microsoft/azurelinux/toolkit/tools/pkg/imagecustomizerlib.ToolVersion=$(IMAGE_CUSTOMIZER_FULL_VERSION) \
+				-X github.com/microsoft/azurelinux/toolkit/tools/pkg/imagecustomizerlib.ToolVersion=$(image_customizer_full_version) \
 				-X github.com/microsoft/azurelinux/toolkit/tools/internal/exe.DistroNameAbbreviation=$(DIST_NAME_ABRV) \
 				-X github.com/microsoft/azurelinux/toolkit/tools/internal/exe.DistroMajorVersion=$(dist_major_version_number)
 
@@ -116,6 +126,7 @@ $(TOOL_BINS_DIR)/%: $(go_common_files)
 		go test -ldflags="$(go_ldflags)" -test.short -covermode=atomic -coverprofile=$(BUILD_DIR)/tools/$*.test_coverage ./... && \
 		CGO_ENABLED=0 go build \
 			-ldflags="$(go_ldflags)" \
+			$(if $(filter y,$(BUILD_TOOLS_NONPROD)),,-tags prod) \
 			-o $(TOOL_BINS_DIR)
 endif
 

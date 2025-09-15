@@ -10,17 +10,18 @@
 
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
-Version:        6.1.0.mshv11
-Release:        3%{?dist}
+Version:        6.6.96.mshv1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
-Source0:        %{_distro_sources_url}/kernel-uvm-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
+BuildRequires:  cpio
 BuildRequires:  diffutils
 BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
@@ -83,7 +84,7 @@ Requires:       %{name} = %{version}-%{release}
 This package contains the kernel UVM devel files
 
 %prep
-tar xf %{SOURCE0} --strip-components=1
+%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-kata-uvm-%{version}
 
 make mrproper
 
@@ -103,7 +104,7 @@ if [ -s config_diff ]; then
     echo "Update config file to set changed values explicitly"
 
 #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
-#    exit 1
+    exit 1
 fi
 
 %build
@@ -153,13 +154,35 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
-* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0.mshv11-3
-- Updating naming for 3.0 version of Azure Linux.
+* Tue Sep 09 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.96.mshv1-1
+- Upgrade to 6.6.96.mshv1
+
+* Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.1.58.mshv8-1
+- Auto-upgrade to 6.1.58.mshv8
+
+* Tue May 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.1.58.mshv4-1
+- Auto-upgrade to 6.1.58.mshv4
+
+* Wed Mar 27 2024 Archana Choudhary <archana1@microsoft.com> - 6.1.0.mshv16-2
+- Enable CIFS modules
+
+* Thu Feb 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.1.0.mshv16-1
+- Auto-upgrade to 6.1.0.mshv16 for LSG v2402.26.1
+
+* Wed Nov 29 2023 Manuel Huber <mahuber@microsoft.com> - 6.1.0.mshv14-3
+- Enable tmpfs xattr for supporting use of extended attributes when container
+    rootfs is an overlayfs with tmps as upper dir as with tardev-snapshotter
+
+* Mon Nov 20 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1.0.mshv14-2
+- Add cpio as BuildRequires
+
+* Mon Nov 6 2023 Dallas Delaney <dadelan@microsoft.com> - 6.1.0.mshv14-1
+- Update to v6.1.0.mshv14
 
 * Fri Oct 06 2023 Manuel Huber <mahuber@microsoft.com> - 6.1.0.mshv11-2
 - Enable dm-crypt and dm-integrity for encfs sidecar functionality
 
-* Thu Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv11-1
+* Fri Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv11-1
 - Update to v6.1.0.mshv11
 
 * Fri Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv10-1

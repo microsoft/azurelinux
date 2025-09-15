@@ -127,12 +127,13 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        505%{?dist}
+Release:        509%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://www.cpan.org/src/5.0/perl-%{perl_version}.tar.xz
+# Note that scrubbed version of the source tarball contains upstream source minus password protected files which password is not known
+Source0:        https://www.cpan.org/src/5.0/perl-%{perl_version}.tar.xz#/perl-%{perl_version}-scrubbed.tar.xz
 Source3:        macros.perl
 # Tom Christiansen confirms Pod::Html uses the same license as perl
 Source6:        Pod-Html-license-clarification
@@ -174,6 +175,9 @@ Patch13:        perl-5.28.0-Pass-CFLAGS-to-dtrace.patch
 # Fixed in perl 5.39.3, in locale.c was more changes
 Patch14:         perl-5.38.0-Revert-Do-uselocale-earlier-in-init-process.patch
 
+# remove password protected zip file which password is not known
+Patch15:         perl-remove-psw-protected-zip.patch
+
 # Link XS modules to libperl.so with EU::CBuilder on Linux, bug #960048
 Patch200:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-CBuilder-on-Li.patch
 
@@ -182,6 +186,10 @@ Patch201:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-MM-on-Linux.pa
 
 # If optimizing -O is used, add the definition to .ph files, bug #2152012
 Patch202:       perl-5.36.0-Add-definition-of-OPTIMIZE-to-.ph-files.patch
+
+Patch203:       CVE-2024-56406.patch
+
+Patch204:       CVE-2025-40909.patch
 
 # Update some of the bundled modules
 # see http://fedoraproject.org/wiki/Perl/perl.spec for instructions
@@ -6838,6 +6846,18 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Wed Jun 04 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 4:5.38.2-509
+- Patch CVE-2025-40909
+
+* Tue May 27 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 4:5.38.2-508
+- Remove password protected zip files from upstream src tarball
+
+* Tue Apr 08 2025 Andrew Phelps <anphel@microsoft.com> - 4:5.38.2-507
+- Patch CVE-2024-56406
+
+* Fri May 24 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.38.2-506
+- Release bump to regenerate package's requires and provides.
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.38.2-505
 - Updating naming for 3.0 version of Azure Linux.
 

@@ -1,0 +1,17 @@
+--- fileutils-0.6.4/src/lib/fileutils/FileUtilCMP.ml.orig	2022-10-28 14:22:35.000000000 -0600
++++ fileutils-0.6.4/src/lib/fileutils/FileUtilCMP.ml	2023-06-22 15:04:21.317130686 -0600
+@@ -48,11 +48,14 @@ let cmp ?(skip1 = 0) fln1 ?(skip2 = 0) f
+     let rec loop count s1 s2 =
+       match s1, s2 with
+       | Seq.Cons (v1, s1), Seq.Cons (v2, s2) when v1 = v2 -> loop (count + 1) (s1 ()) (s2 ())
++      | Seq.Nil, Seq.Nil -> (-1)
+       | _ -> count
+     in
+     let count = loop 0 (stream1 ()) (stream2 ()) in
+     clean_fd ();
+-    Some count
++    match count with
++    | (-1) -> None
++    | x -> Some x
+   end else
+     Some (-1)

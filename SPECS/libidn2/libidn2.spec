@@ -1,9 +1,11 @@
 Summary:          Library to support IDNA2008 internationalized domain names
 Name:             libidn2
 Version:          2.3.4
-Release:          4%{?dist}
+Release:          5%{?dist}
 License:          (GPLv2+ or LGPLv3+) and GPLv3+
 URL:              https://www.gnu.org/software/libidn/#libidn2
+Vendor:           Microsoft Corporation
+Distribution:     Azure Linux
 
 Source0:          https://ftp.gnu.org/gnu/libidn/%{name}-%{version}.tar.gz
 Source1:          https://ftp.gnu.org/gnu/libidn/%{name}-%{version}.tar.gz.sig
@@ -92,6 +94,9 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/info/dir
 %{_infodir}/%{name}.info*
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.3.4-5
+- Add missing Vendor and Distribution tags.
+
 * Tue Jan 16 17:26:11 EST 2024 Dan Streetman <ddstreet@ieee.org> - 2.3.4-4
 - Update to version from Fedora 39/rawhide.
 - Next line is present only to avoid tooling failures, and does not indicate the actual package license.

@@ -6,7 +6,7 @@ Name: sox
 # This workaround will go away with rebase to 14.4.3
 # it affects Source, %%prep and Version
 Version: 14.4.2.0
-Release: 33%{?dist}
+Release: 34%{?dist}
 License: GPLv2+ and LGPLv2+ and MIT
 # Modified source tarball with libgsm license, without unlicensed liblpc10:
 # _Source: http://downloads.sourceforge.net/%%{name}/%%{name}-%%{version}.tar.gz
@@ -75,7 +75,7 @@ BuildRequires: libvorbis-devel
 BuildRequires: alsa-lib-devel, libtool-ltdl-devel, libsamplerate-devel
 BuildRequires: gsm-devel, wavpack-devel, ladspa-devel, libpng-devel
 BuildRequires: flac-devel, libao-devel, libsndfile-devel, libid3tag-devel
-BuildRequires: pulseaudio-libs-devel, opusfile-devel
+BuildRequires: pulseaudio-libs-devel
 BuildRequires: libtool, libmad-devel, lame-devel, twolame-devel
 
 %description
@@ -112,6 +112,7 @@ autoreconf -vfi
 %build
 CFLAGS="$RPM_OPT_FLAGS -D_FILE_OFFSET_BITS=64"
 %configure --without-lpc10 \
+           --without-opus \
            --with-gsm \
            --includedir=%{_includedir}/sox \
            --disable-static \
@@ -150,6 +151,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/sox/*.a
 
 
 %changelog
+* Wed Jan 22 2025 Andrew Phelps <anphel@microsoft.com> - 14.4.2.0-34
+- Remove dependency on opusfile
+
 * Mon Mar 06 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 14.4.2.0-33
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License Verified

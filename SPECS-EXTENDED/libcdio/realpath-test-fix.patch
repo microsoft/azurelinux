@@ -1,0 +1,52 @@
+From 56335fff0f21d294cd0e478d49542a43e9495ed0 Mon Sep 17 00:00:00 2001
+From: "R. Bernstein" <rocky@gnu.org>
+Date: Wed, 24 Aug 2022 14:34:33 -0400
+Subject: Correct realpath test failure
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+See https://savannah.gnu.org/bugs/?62948
+Patch courtesy of Martin Liška <marxin>
+---
+ test/driver/realpath.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/test/driver/realpath.c b/test/driver/realpath.c
+index 289253e..cd46d62 100644
+--- a/test/driver/realpath.c
++++ b/test/driver/realpath.c
+@@ -1,5 +1,7 @@
+ /* -*- C -*-
+-  Copyright (C) 2010-2012, 2015, 2017 Rocky Bernstein <rocky@gnu.org>
++
++  Copyright (C) 2010-2012, 2015, 2017, 2022 Rocky Bernstein
++  <rocky@gnu.org>
+ 
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+@@ -175,16 +177,17 @@ main(int argc, const char *argv[])
+         rc = check_rc(symlink(psz_symlink_file, psz_symlink_file),
+                       "symlink", psz_symlink_file);
+         if (0 == rc) {
+-            cdio_realpath(psz_symlink_file, psz_file_check);
+-            if (0 != strncmp(psz_file_check, symlink_file, PATH_MAX)) {
++            char *retvalue = cdio_realpath(psz_symlink_file, psz_file_check);
++            if (0 != retvalue) {
++	      if (0 != strncmp(psz_file_check, symlink_file, PATH_MAX)) {
+                 fprintf(stderr, "direct cdio_realpath cycle test failed. %s vs %s\n",
+                         psz_file_check, symlink_file);
+ 		rc = 5;
+ 		goto err_exit;
++	      }
++	      check_rc(unlink(psz_symlink_file), "unlink", psz_symlink_file);
+             }
+-            check_rc(unlink(psz_symlink_file), "unlink", psz_symlink_file);
+         }
+-
+     }
+ 
+     check_rc(unlink(psz_orig_file), "unlink", psz_orig_file);
+-- 
+cgit v1.1
+

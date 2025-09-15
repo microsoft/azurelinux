@@ -1,10 +1,12 @@
 Name:            polkit-qt-1
 Version:         0.175.0
-Release:         1%{?dist}
+Release:         2%{?dist}
 Summary:         Qt bindings for PolicyKit
 
 License:         BSD-3-Clause AND GPL-2.0-or-later AND LGPL-2.0-or-later
 URL:             https://api.kde.org/kdesupport-api/polkit-qt-1-apidocs/
+Vendor:          Microsoft Corporation
+Distribution:    Azure Linux
 Source0:         https://invent.kde.org/libraries/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 
@@ -63,6 +65,9 @@ Requires: polkit-qt6-1%{?_isa} = %{version}-%{release}
 %{_libdir}/cmake/PolkitQt6-1/
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.175.0-2
+- Add missing Vendor and Distribution tags.
+
 * Thu Feb 08 2024 Sam Meluch <sammeluch@microsoft.com> - 0.175.0-1
 - License Verified
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).

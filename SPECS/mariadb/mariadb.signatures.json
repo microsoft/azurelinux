@@ -1,5 +1,24 @@
 {
  "Signatures": {
-  "mariadb-10.11.6.tar.gz": "9938de4f4ad4f75ca15ff67b32421b611a0538faf5f71a084586c61384736b4a"
+  "LICENSE.clustercheck": "f0349fec3ea7c49b1e7cd04df004dc49c6271f4e13dfec2a6e501d7546a79590",
+  "README.mariadb-docs": "c3c6584dbdc35445014ac48023da59cafc5abc6996859cebb4e357c2f380990f",
+  "README.wsrep_sst_rsync_tunnel": "f121b2f6e804a8aaf01e0c835e62b64a0d0bf6cd922cc1a21897f196f8b0714f",
+  "clustercheck.sh": "4be47a46f99b714bc3681fdf11b09d242dae5e3eb81274b3040a73f9d7800d50",
+  "mariadb-10.11.11.tar.gz": "14cc0d9d9a7a330231d9ed91ac28f29b502d2f1e7021d81c940280db52bac812",
+  "mariadb-check-socket.sh": "6d04410549275140f07b89a1dcef99f31cd47751ef9142d14e7898e7cbcff023",
+  "mariadb-check-upgrade.sh": "e49c23e79155d416f7bad292d073213c0beafed99c172a06d909ec3e24ee6e75",
+  "mariadb-prepare-db-dir.sh": "ff8d2e719f6db158eda0acb58a9d84b43c959baf0d2a8f4d9ce7a62f13af36d0",
+  "mariadb-scripts-common.sh": "6eec82621056a28a9cc3f8693ca65077ccc7e8c241569fcabe3c970b5e5ded1b",
+  "mariadb-server-galera.te": "e8e5aa82c4602b3b87ee1d2cf688ab1d1381c69b1c636de7b0e8eabd09dd1936",
+  "mariadb.tmpfiles.d.in": "be0e2e13e4a61aa009f49f9a8d3d8f903f859fcc4a6dbb74e84961126c8e3dc2",
+  "my.cnf.in": "cd6f7fe1f084d82d27b35bd2f0442fb4e2f9f51ff9a95707b94f5f1fe37c4a80",
+  "mysql.service.in": "e23fe7186f0ef85e062c94c5e105220df9e9f6a949aec86ce3e733a6c5146abd",
+  "mysql@.service.in": "269e4209e87f5c13a18185b118b9bab0c1c9b556adf4d9edc9218347af2cd00a",
+  "mysql_config_multilib.sh": "56737ac556128fe5bd4df9209e41a7e0808333872c812b11457c4c0c17ab9529",
+  "rh-skipped-tests-arm.list": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "rh-skipped-tests-base.list": "a3dbb078c009c5f0b671fbff65b087d61b2d4a3473c3e99e1a8efaf2a580ff1c",
+  "rh-skipped-tests-ppc.list": "8d844255335c4dbeeaf363f95b8b690d024c84ad65620d36ec78650a9d54460e",
+  "rh-skipped-tests-s390.list": "5e826f9f3cc920c0fe67434fd32b25a205d6a8530552e998edb376c4661b59f3",
+  "wsrep_sst_rsync_tunnel": "5194ed1971d0afe8d2836c1d143263f6891311c9ac0fae536b866f2a885d056e"
  }
 }

@@ -1,7 +1,7 @@
 Summary:        Wrapper Class for the various JSON classes
 Name:           perl-JSON-Any
 Version:        1.40
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/~ether/JSON-Any-1.39/lib/JSON/Any.pm
@@ -12,10 +12,12 @@ BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
-%if 0%{?with_check}
 BuildRequires:  perl(CPAN)
+%if 0%{?with_check}
 BuildRequires:  perl(CPAN::Meta)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Test::Needs)
+BuildRequires:  perl(open)
 %endif
 
 Requires:       perl(Carp)
@@ -51,6 +53,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Tue Apr 15 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.40-2
+- Add missing check dependencies.
+
 * Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.40-1
 - Auto-upgrade to 1.40 - Azure Linux 3.0 - package upgrades
 

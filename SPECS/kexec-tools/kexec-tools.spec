@@ -6,7 +6,7 @@
 Summary:        The kexec/kdump userspace component
 Name:           kexec-tools
 Version:        2.0.27
-Release:        4%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -61,7 +61,6 @@ Requires(pre): coreutils sed zlib
 Requires: dracut
 Requires: ethtool
 Requires: awk
-Requires: dhcp-client
 Requires: squashfs-tools
 %{?grub2_configuration_requires}
 
@@ -297,7 +296,7 @@ done
 %files
 /usr/sbin/kexec
 /usr/sbin/makedumpfile
-/usr/sbin/makedumpfile-R.pl
+%exclude /usr/sbin/makedumpfile-R.pl
 /usr/sbin/mkdumprd
 /usr/sbin/vmcore-dmesg
 %{_bindir}/*
@@ -331,6 +330,15 @@ done
 /usr/share/makedumpfile/
 
 %changelog
+* Tue Jul 09 2024 Chris Co <chrco@microsoft.com> - 2.0.27-7
+- Remove requires on dhcp-client
+
+* Tue Jun 04 2024 Chris Co <chrco@microsoft.com> - 2.0.27-6
+- Turn off force_no_rebuild and fix kdump initramfs image target path
+
+* Wed Apr 03 2024 Henry Beberman <henry.beberman@microsoft.com> - 2.0.27-5
+- Exclude makedumpfile-R.pl script to avoid an implicit dependency on perl
+
 * Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 2.0.27-4
 - Rename initrd.img-<kver> to initramfs-<kver>.img
 

@@ -1,0 +1,164 @@
+diff --git a/db/compaction/compaction_iteration_stats.h b/db/compaction/compaction_iteration_stats.h
+index 963c1d8eb..79acbec6a 100644
+--- a/db/compaction/compaction_iteration_stats.h
++++ b/db/compaction/compaction_iteration_stats.h
+@@ -5,6 +5,8 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
++
+ #include "rocksdb/rocksdb_namespace.h"
+ 
+ struct CompactionIterationStats {
+diff --git a/include/rocksdb/thread_status.h b/include/rocksdb/thread_status.h
+index 6b2f5c885..bb2de6c7b 100644
+--- a/include/rocksdb/thread_status.h
++++ b/include/rocksdb/thread_status.h
+@@ -13,13 +13,15 @@
+ 
+ #pragma once
+ 
+-#include <stdint.h>
+ #include <cstddef>
++#include <cstdint>
+ #include <map>
+ #include <string>
+ #include <utility>
+ #include <vector>
+ 
++#include "rocksdb/rocksdb_namespace.h"
++
+ #if !defined(ROCKSDB_LITE) && !defined(NROCKSDB_THREAD_STATUS) && \
+     defined(ROCKSDB_SUPPORT_THREAD_LOCAL)
+ #define ROCKSDB_USING_THREAD_STATUS
+diff --git a/include/rocksdb/universal_compaction.h b/include/rocksdb/universal_compaction.h
+index e3aeee6ce..58323f2d9 100644
+--- a/include/rocksdb/universal_compaction.h
++++ b/include/rocksdb/universal_compaction.h
+@@ -5,10 +5,12 @@
+ 
+ #pragma once
+ 
+-#include <stdint.h>
+ #include <climits>
++#include <cstdint>
+ #include <vector>
+ 
++#include "rocksdb/rocksdb_namespace.h"
++
+ namespace ROCKSDB_NAMESPACE {
+ 
+ //
+diff --git a/include/rocksdb/utilities/checkpoint.h b/include/rocksdb/utilities/checkpoint.h
+index c7f93b4cf..3c2ab8053 100644
+--- a/include/rocksdb/utilities/checkpoint.h
++++ b/include/rocksdb/utilities/checkpoint.h
+@@ -8,6 +8,7 @@
+ #pragma once
+ #ifndef ROCKSDB_LITE
+ 
++#include <cstdint>
+ #include <string>
+ #include <vector>
+ #include "rocksdb/status.h"
+diff --git a/include/rocksdb/utilities/ldb_cmd_execute_result.h b/include/rocksdb/utilities/ldb_cmd_execute_result.h
+index c837b47f7..57bac3346 100644
+--- a/include/rocksdb/utilities/ldb_cmd_execute_result.h
++++ b/include/rocksdb/utilities/ldb_cmd_execute_result.h
+@@ -5,6 +5,10 @@
+ //
+ #pragma once
+ 
++#include <string>
++
++#include "rocksdb/rocksdb_namespace.h"
++
+ #ifdef FAILED
+ #undef FAILED
+ #endif
+diff --git a/memory/memory_usage.h b/memory/memory_usage.h
+index 15e8b87cd..4c73cd40b 100644
+--- a/memory/memory_usage.h
++++ b/memory/memory_usage.h
+@@ -5,8 +5,11 @@
+ 
+ #pragma once
+ 
++#include <cstddef>
+ #include <unordered_map>
+ 
++#include "rocksdb/rocksdb_namespace.h"
++
+ namespace ROCKSDB_NAMESPACE {
+ 
+ // Helper methods to estimate memroy usage by std containers.
+diff --git a/table/block_based/data_block_hash_index.h b/table/block_based/data_block_hash_index.h
+index f356395f3..321522175 100644
+--- a/table/block_based/data_block_hash_index.h
++++ b/table/block_based/data_block_hash_index.h
+@@ -5,6 +5,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <string>
+ #include <vector>
+ 
+diff --git a/util/crc32c_ppc.h b/util/crc32c_ppc.h
+index c359061c6..5cb12c89a 100644
+--- a/util/crc32c_ppc.h
++++ b/util/crc32c_ppc.h
+@@ -7,6 +7,9 @@
+ 
+ #pragma once
+ 
++#include <cstddef>
++#include <cstdint>
++
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+diff --git a/util/string_util.h b/util/string_util.h
+index a761be66c..064d059f0 100644
+--- a/util/string_util.h
++++ b/util/string_util.h
+@@ -6,6 +6,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <sstream>
+ #include <string>
+ #include <unordered_map>
+diff --git a/utilities/blob_db/blob_db_gc_stats.h b/utilities/blob_db/blob_db_gc_stats.h
+index 1e6e4a25d..fea6b0032 100644
+--- a/utilities/blob_db/blob_db_gc_stats.h
++++ b/utilities/blob_db/blob_db_gc_stats.h
+@@ -5,6 +5,10 @@
+ //
+ #pragma once
+ 
++#include <cstdint>
++
++#include "rocksdb/rocksdb_namespace.h"
++
+ #ifndef ROCKSDB_LITE
+ 
+ namespace ROCKSDB_NAMESPACE {
+diff --git a/utilities/cassandra/serialize.h b/utilities/cassandra/serialize.h
+index cd980ade0..8f50a02dd 100644
+--- a/utilities/cassandra/serialize.h
++++ b/utilities/cassandra/serialize.h
+@@ -10,6 +10,11 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
++#include <string>
++
++#include "rocksdb/rocksdb_namespace.h"
++
+ namespace ROCKSDB_NAMESPACE {
+ namespace cassandra {
+ namespace {

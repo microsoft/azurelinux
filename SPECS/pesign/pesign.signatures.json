@@ -1,0 +1,8 @@
+{
+ "Signatures": {
+  "certs.tar.xz": "fd6cf1da31f5e7a1ddc91799d3bfd174f7c8612468bffe58b37d1bed1c12d71f",
+  "pesign-116.tar.bz2": "35331f75689863e5be595f2bb04a8bc934ce734b8d76fa5d6aeb4d85424e8996",
+  "pesign.patches": "20fd38ba8658f05e08372ce042b57f75bbc2dfb89fc4938396ed9eca98e1d0d6",
+  "pesign.py": "524806029d041be468764664498f36b85e9905c649870c9abd136281b47c9ee8"
+ }
+}

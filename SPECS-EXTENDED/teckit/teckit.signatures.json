@@ -1,7 +1,7 @@
 {
  "Signatures": {
   "gpgkey-15D41BC02EB807D405EFFAF6C9183BEA0288CDEE.gpg": "f5329aaf18398e5ac3d0ec5e6fd81df69d34bec52a83986ada164b899e74dcf8",
-  "teckit-2.5.9.tar.gz": "6823fb3142efa34e5d74de35d37cdf4724efbf577f5ff15a8e2b364e6ef47d3d",
-  "teckit-2.5.9.tar.gz.asc": "a03de624364644e776d2b407209f8ba4d549a4abf66b88c67cbf5eeaec8552d6"
+  "teckit-2.5.12.tar.gz": "7ef10e5bb79ea6437b7a06b4a92b314d3f142292758288efce50e12a455b6e7f",
+  "teckit-2.5.12.tar.gz.asc": "1f101179662f1c26f717ff5a1042bb0c1d9b709fd9334858bff4bd5e2b52a542"
  }
 }

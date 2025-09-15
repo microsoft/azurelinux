@@ -1,7 +1,7 @@
 Summary:        Test for warnings and the lack of them in Perl
 Name:           perl-Test-Warnings
 Version:        0.032
-Release:        1%{?dist}
+Release:        2%{?dist}
 URL:            https://metacpan.org/release/Test-Warnings
 License:        GPL+ or Artistic
 Group:          Development/Libraries
@@ -44,6 +44,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Fri May 24 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.032-2
+- Release bump to regenerate package's requires and provides.
+
 * Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 0.032-1
 - Upgrade to version 0.032
 

@@ -2,7 +2,7 @@
 %define _confdir %{_sysconfdir}
 Summary:        The Apache HTTP Server
 Name:           httpd
-Version:        2.4.58
+Version:        2.4.65
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
@@ -37,20 +37,18 @@ BuildRequires:  apr
 BuildRequires:  apr-util
 BuildRequires:  apr-util-devel
 BuildRequires:  expat-devel
-BuildRequires:  libdb-devel
 BuildRequires:  lua-devel
 BuildRequires:  openldap
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
-BuildRequires:  pcre-devel
+BuildRequires:  pcre2-devel
 BuildRequires:  systemd-rpm-macros
 
 Requires:       apr-util
-Requires:       libdb
 Requires:       lua
 Requires:       openldap
 Requires:       openssl
-Requires:       pcre
+Requires:       pcre2
 Requires(postun): %{_sbindir}/groupdel
 Requires(postun): %{_sbindir}/userdel
 Requires(pre):  %{_sbindir}/groupadd
@@ -153,6 +151,7 @@ Security (TLS) protocols.
             --enable-mpms-shared=all               \
             --enable-ssl                           \
             --exec-prefix=%{_prefix}               \
+            --includedir=%{_includedir}/httpd      \
             --libexecdir=%{_libdir}/httpd/modules  \
             --prefix=%{_sysconfdir}/httpd          \
             --sysconfdir=%{_confdir}/httpd/conf    \
@@ -274,6 +273,7 @@ fi
 %{_bindir}/apxs
 %{_bindir}/dbmmanage
 %{_mandir}/man1/apxs.1*
+%{_includedir}/httpd/*
 %{_includedir}/*
 %{_rpmconfigdir}/macros.d/macros.httpd
 
@@ -316,7 +316,7 @@ fi
 %{_bindir}/*
 %{_mandir}/man1/*
 %license LICENSE
-%doc NOTICE
+%license NOTICE
 %exclude %{_bindir}/apxs
 %exclude %{_mandir}/man1/apxs.1*
 
@@ -345,6 +345,27 @@ fi
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %changelog
+* Mon Jul 28 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.4.65-1
+- Upgrade to 2.4.65 to fix CVE-2025-54090
+
+* Mon Jul 14 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 2.4.64-1
+- Upgrade to 2.4.64 to fix CVE-2025-49812, CVE-2025-53020
+
+* Thu Jul 25 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2.4.62-1
+- Upgrade to 2.4.62 to address CVE-2024-40725
+
+* Thu Jul 11 2024 Tobias Brick <tobiasb@microsoft.com> - 2.4.61-1
+- Upgrade to 2.4.61 to address CVE-2024-38473
+
+* Fri Jun 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.58-4
+- Remove dependency on 'libdb'.
+
+* Thu May 09 2024 Andy Zaugg <azaugg@linkedin.com> - 2.4.58-3
+- Namespace httpd-devel include files into a httpd directory
+
+* Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 2.4.58-2
+- Move from pcre to pcre2
+
 * Fri Oct 20 2023 Muhammad Falak <mwani@microsoft.com> - 2.4.58-1
 - Upgrade version to address CVE-2023-45802, CVE-2023-43622 & CVE-2023-31122
 

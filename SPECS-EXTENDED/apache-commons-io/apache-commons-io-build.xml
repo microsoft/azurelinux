@@ -10,7 +10,7 @@
 
   <property name="project.groupId" value="commons-io"/>
   <property name="project.artifactId" value="commons-io"/>
-  <property name="project.version" value="2.8.0"/>
+  <property name="project.version" value="2.14.0"/>
   <property name="project.name" value="Apache Commons IO"/>
   <property name="project.description" value="The Apache Commons IO library 
 contains utility classes, stream implementations, file filters, 

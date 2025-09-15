@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
 Version:        %{azl}.0
-Release:        3%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -62,8 +62,10 @@ Requires:       findutils
 Requires:       grep
 Requires:       gzip
 Requires:       azurelinux-release
-Requires:       azurelinux-repos-ms-non-oss-preview
-Requires:       azurelinux-repos-preview
+Requires:       azurelinux-repos-cloud-native
+Requires:       azurelinux-repos-ms-non-oss
+Requires:       azurelinux-repos-ms-oss
+Requires:       azurelinux-repos
 Requires:       ncurses-libs
 Requires:       openssl
 Requires:       readline
@@ -71,6 +73,8 @@ Requires:       rpm
 Requires:       rpm-libs
 Requires:       sed
 Requires:       sqlite-libs
+Requires:       SymCrypt
+Requires:       SymCrypt-OpenSSL
 Requires:       tdnf
 Requires:       tdnf-plugin-repogpgcheck
 Requires:       xz
@@ -88,6 +92,18 @@ Requires:       zlib
 %files container
 
 %changelog
+* Thu May 29 2025 Andrew Phelps <anphel@microsoft.com> - 3.0-7
+- Add azurelinux-repos-cloud-native to the base container
+
+* Mon Jul 16 2024 Jon Slobodzian <joslobo@microsoft.com> - 3.0-6
+- Restore azurelinux-repos to their production versions for all images.
+
+* Mon Jul 08 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.0-5
+- Add azurelinux-repos-ms-oss-preview to the base container
+
+* Fri Apr 26 2024 Tobias Brick <tobiasb@microsoft.com> - 3.0-4
+- Add SymCrypt and SymCrypt-OpenSSL
+
 * Wed Mar 13 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-3
 - Preview-only changes in the 'container' subpackage.
 - Removed dependencies: 'azurelinux-repos-ms-oss'.

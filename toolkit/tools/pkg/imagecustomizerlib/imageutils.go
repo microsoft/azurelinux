@@ -60,81 +60,52 @@ func connectToExistingImageHelper(imageConnection *ImageConnection, imageFilePat
 func createNewImage(filename string, diskConfig imagecustomizerapi.Disk,
 	fileSystems []imagecustomizerapi.FileSystem, buildDir string, chrootDirName string,
 	installOS installOSFunc,
-) error {
+) (map[string]string, error) {
 	imageConnection := NewImageConnection()
 	defer imageConnection.Close()
 
-	err := createNewImageHelper(imageConnection, filename, diskConfig, fileSystems, buildDir, chrootDirName,
+	partIdToPartUuid, err := createNewImageHelper(imageConnection, filename, diskConfig, fileSystems, buildDir, chrootDirName,
 		installOS)
 	if err != nil {
-		return fmt.Errorf("failed to create new image:\n%w", err)
+		return nil, fmt.Errorf("failed to create new image:\n%w", err)
 	}
 
 	// Close image.
 	err = imageConnection.CleanClose()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
-}
-
-func createNewImageWithBootLoader(filename string, diskConfig imagecustomizerapi.Disk,
-	fileSystems []imagecustomizerapi.FileSystem, bootType imagecustomizerapi.BootType,
-	selinuxConfig imagecustomizerapi.SELinux, kernelCommandLine imagecustomizerapi.KernelCommandLine, buildDir string,
-	chrootDirName string, currentSELinuxMode imagecustomizerapi.SELinuxMode, installOS installOSFunc,
-) error {
-	imageConnection := NewImageConnection()
-	defer imageConnection.Close()
-
-	err := createNewImageHelper(imageConnection, filename, diskConfig, fileSystems, buildDir, chrootDirName,
-		installOS)
-	if err != nil {
-		return fmt.Errorf("failed to create new image:\n%w", err)
-	}
-
-	err = configureDiskBootLoader(imageConnection, fileSystems, bootType, selinuxConfig, kernelCommandLine,
-		currentSELinuxMode)
-	if err != nil {
-		return fmt.Errorf("failed to add bootloader to new image:\n%w", err)
-	}
-
-	// Close image.
-	err = imageConnection.CleanClose()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return partIdToPartUuid, nil
 }
 
 func createNewImageHelper(imageConnection *ImageConnection, filename string, diskConfig imagecustomizerapi.Disk,
 	fileSystems []imagecustomizerapi.FileSystem, buildDir string, chrootDirName string,
 	installOS installOSFunc,
-) error {
+) (map[string]string, error) {
 
 	// Convert config to image config types, so that the imager's utils can be used.
 	imagerDiskConfig, err := diskConfigToImager(diskConfig, fileSystems)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	imagerPartitionSettings, err := partitionSettingsToImager(fileSystems)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Create imager boilerplate.
-	_, tmpFstabFile, err := createImageBoilerplate(imageConnection, filename, buildDir, chrootDirName, imagerDiskConfig,
-		imagerPartitionSettings)
+	partIdToPartUuid, tmpFstabFile, err := createImageBoilerplate(imageConnection, filename, buildDir, chrootDirName,
+		imagerDiskConfig, imagerPartitionSettings)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Install the OS.
 	err = installOS(imageConnection.Chroot())
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Move the fstab file into the image.
@@ -142,13 +113,13 @@ func createNewImageHelper(imageConnection *ImageConnection, filename string, dis
 
 	err = file.Move(tmpFstabFile, imageFstabFilePath)
 	if err != nil {
-		return fmt.Errorf("failed to move fstab into new image:\n%w", err)
+		return nil, fmt.Errorf("failed to move fstab into new image:\n%w", err)
 	}
 
-	return nil
+	return partIdToPartUuid, nil
 }
 
-func configureDiskBootLoader(imageConnection *ImageConnection, fileSystems []imagecustomizerapi.FileSystem,
+func configureDiskBootLoader(imageConnection *ImageConnection, rootMountIdType imagecustomizerapi.MountIdentifierType,
 	bootType imagecustomizerapi.BootType, selinuxConfig imagecustomizerapi.SELinux,
 	kernelCommandLine imagecustomizerapi.KernelCommandLine, currentSELinuxMode imagecustomizerapi.SELinuxMode,
 ) error {
@@ -162,7 +133,12 @@ func configureDiskBootLoader(imageConnection *ImageConnection, fileSystems []ima
 		return err
 	}
 
-	imagerPartitionSettings, err := partitionSettingsToImager(fileSystems)
+	imagerRootMountIdType, err := mountIdentifierTypeToImager(rootMountIdType)
+	if err != nil {
+		return err
+	}
+
+	grubMkconfigEnabled, err := isGrubMkconfigEnabled(imageConnection.Chroot())
 	if err != nil {
 		return err
 	}
@@ -173,9 +149,10 @@ func configureDiskBootLoader(imageConnection *ImageConnection, fileSystems []ima
 	}
 
 	// Configure the boot loader.
-	err = installutils.ConfigureDiskBootloader(imagerBootType, false, false, imagerPartitionSettings,
+	err = installutils.ConfigureDiskBootloaderWithRootMountIdType(imagerBootType, false, imagerRootMountIdType,
 		imagerKernelCommandLine, imageConnection.Chroot(), imageConnection.Loopback().DevicePath(),
-		mountPointMap, diskutils.EncryptedRootDevice{}, diskutils.VerityDevice{}, false /*enableGrubMkconfig*/, true)
+		mountPointMap, diskutils.EncryptedRootDevice{}, grubMkconfigEnabled,
+		!grubMkconfigEnabled)
 	if err != nil {
 		return fmt.Errorf("failed to install bootloader:\n%w", err)
 	}
@@ -199,15 +176,27 @@ func createImageBoilerplate(imageConnection *ImageConnection, filename string, b
 	}
 
 	// Set up partitions.
-	partIDToDevPathMap, partIDToFsTypeMap, _, _, err := diskutils.CreatePartitions(
+	partIDToDevPathMap, partIDToFsTypeMap, _, err := diskutils.CreatePartitions(
 		imageConnection.Loopback().DevicePath(), imagerDiskConfig, configuration.RootEncryption{},
-		configuration.ReadOnlyVerityRoot{})
+		true /*diskKnownToBeEmpty*/)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to create partitions on disk (%s):\n%w", imageConnection.Loopback().DevicePath(), err)
 	}
 
+	// Refresh partition entries under /dev.
+	err = refreshPartitions(imageConnection.Loopback().DevicePath())
+	if err != nil {
+		return nil, "", err
+	}
+
 	// Read the disk partitions.
 	diskPartitions, err := diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
+	if err != nil {
+		return nil, "", err
+	}
+
+	// Create mapping from partition ID to partition UUID.
+	partIdToPartUuid, err := createPartIdToPartUuidMap(partIDToDevPathMap, diskPartitions)
 	if err != nil {
 		return nil, "", err
 	}
@@ -255,5 +244,22 @@ func createImageBoilerplate(imageConnection *ImageConnection, filename string, b
 		return nil, "", err
 	}
 
-	return mountPointMap, tmpFstabFile, nil
+	return partIdToPartUuid, tmpFstabFile, nil
+}
+
+func createPartIdToPartUuidMap(partIDToDevPathMap map[string]string, diskPartitions []diskutils.PartitionInfo,
+) (map[string]string, error) {
+	partIdToPartUuid := make(map[string]string)
+	for partId, devPath := range partIDToDevPathMap {
+		partition, found := sliceutils.FindValueFunc(diskPartitions, func(partition diskutils.PartitionInfo) bool {
+			return devPath == partition.Path
+		})
+		if !found {
+			return nil, fmt.Errorf("failed to find partition for device path (%s)", devPath)
+		}
+
+		partIdToPartUuid[partId] = partition.PartUuid
+	}
+
+	return partIdToPartUuid, nil
 }

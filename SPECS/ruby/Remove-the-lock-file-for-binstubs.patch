@@ -1,0 +1,99 @@
+From ace303c2d7bc0d98407e5e8b1ca77de07aa0eb75 Mon Sep 17 00:00:00 2001
+From: Nobuyoshi Nakada <nobu@ruby-lang.org>
+Date: Tue, 13 Aug 2024 17:19:41 +0900
+Subject: [PATCH] Remove the lock file for binstubs
+
+https://github.com/rubygems/rubygems/pull/7806#issuecomment-2241662488
+
+This patch is needed so other rubygems don't install unnecessary lock files per 
+https://src.fedoraproject.org/rpms/ruby/c/b7e197fb887200e4faaf8fae663a9df00bdc09d3?branch=rawhide
+
+---
+ lib/rubygems.rb                     |  2 +-
+ lib/rubygems/installer.rb           |  3 ++-
+ test/rubygems/test_gem_installer.rb | 10 ++++++++++
+ 3 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/lib/rubygems.rb b/lib/rubygems.rb
+index bd9f240e2091..7626ccfdf0d6 100644
+--- a/lib/rubygems.rb
++++ b/lib/rubygems.rb
+@@ -794,7 +794,7 @@ def self.open_file(path, flags, &block)
+     File.open(path, flags, &block)
+   end
+ 
+-  MODE_TO_FLOCK = IO::RDONLY | IO::APPEND | IO::CREAT # :nodoc:
++  MODE_TO_FLOCK = IO::RDONLY | IO::APPEND | IO::CREAT | IO::SHARE_DELETE | IO::BINARY # :nodoc:
+ 
+   ##
+   # Open a file with given flags, and protect access with flock
+diff --git a/lib/rubygems/installer.rb b/lib/rubygems/installer.rb
+index d558c0be2bfa..8f95bab733f8 100644
+--- a/lib/rubygems/installer.rb
++++ b/lib/rubygems/installer.rb
+@@ -538,7 +538,7 @@ def generate_plugins # :nodoc:
+   def generate_bin_script(filename, bindir)
+     bin_script_path = File.join bindir, formatted_program_filename(filename)
+ 
+-    Gem.open_file_with_flock("#{bin_script_path}.lock") do
++    Gem.open_file_with_flock("#{bin_script_path}.lock") do |lock|
+       require "fileutils"
+       FileUtils.rm_f bin_script_path # prior install may have been --no-wrappers
+ 
+@@ -546,6 +546,7 @@ def generate_bin_script(filename, bindir)
+         file.write app_script_text(filename)
+         file.chmod(options[:prog_mode] || 0o755)
+       end
++      File.unlink(lock.path)
+     end
+ 
+     verbose bin_script_path
+diff --git a/test/rubygems/test_gem_installer.rb b/test/rubygems/test_gem_installer.rb
+index a61d1b6fff28..2f4ff7349db4 100644
+--- a/test/rubygems/test_gem_installer.rb
++++ b/test/rubygems/test_gem_installer.rb
+@@ -1083,6 +1083,8 @@ def test_install_creates_working_binstub
+     end
+ 
+     assert_match(/ran executable/, e.message)
++
++    assert_path_not_exist(File.join(installer.bin_dir, "executable.lock"))
+   end
+ 
+   def test_conflicting_binstubs
+@@ -1131,6 +1133,8 @@ def test_conflicting_binstubs
+     # We expect the bin stub to activate the version that actually contains
+     # the binstub.
+     assert_match("I have an executable", e.message)
++
++    assert_path_not_exist(File.join(installer.bin_dir, "executable.lock"))
+   end
+ 
+   def test_install_creates_binstub_that_understand_version
+@@ -1160,6 +1164,8 @@ def test_install_creates_binstub_that_understand_version
+     end
+ 
+     assert_includes(e.message, "can't find gem a (= 3.0)")
++
++    assert_path_not_exist(File.join(installer.bin_dir, "executable.lock"))
+   end
+ 
+   def test_install_creates_binstub_that_prefers_user_installed_gem_to_default
+@@ -1192,6 +1198,8 @@ def test_install_creates_binstub_that_prefers_user_installed_gem_to_default
+     end
+ 
+     assert_equal(e.message, "ran executable")
++
++    assert_path_not_exist(File.join(installer.bin_dir, "executable.lock"))
+   end
+ 
+   def test_install_creates_binstub_that_dont_trust_encoding
+@@ -1222,6 +1230,8 @@ def test_install_creates_binstub_that_dont_trust_encoding
+     end
+ 
+     assert_match(/ran executable/, e.message)
++
++    assert_path_not_exist(File.join(installer.bin_dir, "executable.lock"))
+   end
+ 
+   def test_install_with_no_prior_files

@@ -1,14 +1,19 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           systemd-bootchart
-Version:        233
-Release:        8%{?dist}
+Version:        235
+Release:        1%{?dist}
 Summary:        Boot performance graphing tool
 
 License:        GPLv2+ and LGPLv2+
 URL:            https://github.com/systemd/systemd-bootchart
-Source0:        https://github.com/systemd/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
+Source0:        https://github.com/systemd/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 
+BuildRequires:  make
+BuildRequires:  automake
+BuildRequires:  autoconf
+BuildRequires:  libtool
+BuildRequires:  intltool
 BuildRequires:  gcc
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
@@ -27,6 +32,7 @@ are displayed separately.
 %autosetup -p1
 
 %build
+./autogen.sh
 %configure --disable-silent-rules
 %make_build
 
@@ -54,6 +60,10 @@ are displayed separately.
 %{_mandir}/man5/bootchart.conf.d.5*
 
 %changelog
+* Wed Feb 12 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 235-1
+- Update to version 235
+- License verified
+
 * Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 233-8
 - Fix build issue for systemd/systemd-bootstrap confusion
 - License verified

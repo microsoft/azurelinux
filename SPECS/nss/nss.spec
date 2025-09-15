@@ -8,13 +8,12 @@
     %{buildroot}%{unsupported_tools_directory}/shlibsign -i %{buildroot}%{_libdir}/libsoftokn3.so \
     %{buildroot}%{unsupported_tools_directory}/shlibsign -i %{buildroot}%{_libdir}/libfreeblpriv3.so \
     %{buildroot}%{unsupported_tools_directory}/shlibsign -i %{buildroot}%{_libdir}/libfreebl3.so \
-    %{buildroot}%{unsupported_tools_directory}/shlibsign -i %{buildroot}%{_libdir}/libnssdbm3.so \
     %{nil}
 
 Summary:        Security client
 Name:           nss
 Version:        3.96.1
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,10 +26,8 @@ Source3:        nss.pc.in
 Source4:        nss-config.in
 BuildRequires:  nspr-devel >= %{nspr_version}
 BuildRequires:  sqlite-devel
-BuildRequires:  libdb-devel
 Provides:       %{name}-softokn = %{version}-%{release}
 Requires:       nspr
-Requires:       libdb
 Requires:       nss-libs = %{version}-%{release}
 
 %description
@@ -98,7 +95,8 @@ make VERBOSE=1 BUILD_OPT=1 \
     ZLIB_LIBS=-lz \
     USE_64=1 \
     NSS_ENABLE_WERROR=0 \
-    $([ -f %{_includedir}/sqlite3.h ] && echo NSS_USE_SYSTEM_SQLITE=1)
+    NSS_USE_SYSTEM_SQLITE=1 \
+    NSS_DISABLE_DBM=1
 popd
 
 cat %{SOURCE1} | sed -e "s,%%libdir%%,%{_libdir},g" \
@@ -217,6 +215,12 @@ popd
 %{_bindir}/ssltap
 
 %changelog
+* Tue Aug 27 2024 Chris Gunn <chrisgun@microsoft.com> - 3.96.1-3
+- Disable building DBM backend.
+
+* Fri Jun 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.96.1-2
+- Remove dependency on 'libdb'.
+
 * Tue Feb 06 2024 Kanika Nema <kanikanema@microsoft.com> - 3.96.1-1
 - Upgrade to version 3.96.1
 

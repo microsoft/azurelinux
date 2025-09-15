@@ -1,7 +1,8 @@
 {
  "Signatures": {
   "key.asc": "0cdba4240cac049e5fdd6cff8cf2785c9fb2d69563f414b3d57c1324c42215b1",
-  "pyxattr-0.7.1.tar.gz": "965388dd629334e850aa989a67d2360ec8257cfe8f67d07c29f980d3152f2882",
-  "pyxattr-0.7.1.tar.gz.asc": "fe3b8c5e7eba44805fc53cb5af2ac93de3cff96a026edd8871a4ebde8b4b3c6e"
+  "pyxattr-0.7.2.tar.gz": "68477027e6d3310669f98aaef15393bfcd9b2823d7a7f00a6f1d91a3c971ae64",
+  "pyxattr-0.7.2.tar.gz.asc": "4ad89609c7cfc1faf3ee60cf2c78560bf89d409ccad84ed96e0fce1faf663542"
  }
 }
+

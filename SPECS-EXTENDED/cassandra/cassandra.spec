@@ -3,9 +3,9 @@
 
 Summary:        Cassandra is a highly scalable, eventually consistent, distributed, structured key-value store
 Name:           cassandra
-Version:        4.0.10
-Release:        1%{?dist}
-URL:            http://cassandra.apache.org/
+Version:        5.0.0
+Release:        2%{?dist}
+URL:            https://cassandra.apache.org/
 License:        Apache License, Version 2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -15,8 +15,7 @@ Source1:        cassandra.service
 # Refer to Readme file for detailed
 # instructions to regenerate cassandra-build-cache
 # whenever updating to newer version.
-Source2:        cassandra-build-cache-%{version}.tar.gz
-ExclusiveArch:  x86_64
+Source2:        cassandra-build-cache-1-%{version}.tar.gz
 
 BuildRequires:  ant
 BuildRequires:  ant-junit
@@ -29,7 +28,7 @@ BuildRequires:  git
 BuildRequires:  tar
 BuildRequires:  which
 BuildRequires:  systemd-rpm-macros
-BuildRequires:  msopenjdk-11
+BuildRequires:  msopenjdk-17
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  javapackages-tools
 BuildRequires:  xml-commons-apis
@@ -39,7 +38,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
 Requires:       javapackages-tools
 Requires:       which
 Requires:       gawk
@@ -62,11 +61,18 @@ mkdir -p ~/.m2
 mv repository ~/.m2/
 
 export JAVA_HOME="%{java_home}"
-export ANT_OPTS="-Xmx1024m -XX:MaxPermSize=512m"
+export ANT_OPTS="-Xmx1024m -XX:MaxMetaspaceSize=512m"
 ant -v clean jar javadoc -Drelease=true -Duse.jdk11=true
 
 # clean build cache
 rm -rf ~/.m2
+
+%ifarch x86_64
+rm $(find lib/sigar-bin -type f -name "*" ! -name "libsigar-amd64-linux.so")
+%endif
+%ifarch aarch64
+rm -r lib/sigar-bin
+%endif
 
 %install
 mkdir -p %{buildroot}%{_var}/opt/%{name}/data
@@ -141,6 +147,15 @@ fi
 %exclude %{_var}/opt/cassandra/build/lib
 
 %changelog
+* Thu Jun 19 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 5.0.0-2
+- Adding support for aarch64
+
+* Thu May 29 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 5.0.0-1
+- Upgrade version to 5.0.0
+
+* Thu May 22 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 4.0.10-2
+- Update path for JAVA_HOME
+
 * Tue May 30 2023 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.0.10-1
 - Upgrade version to 4.0.10 to address CVE-2023-30601.
 

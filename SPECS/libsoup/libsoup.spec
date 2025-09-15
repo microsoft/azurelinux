@@ -4,7 +4,7 @@
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
 Version:        3.4.4
-Release:        1%{?dist}
+Release:        9%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,6 +41,33 @@ Requires:       glib-networking
 Requires:       libpsl
 Requires:       libxml2
 
+Patch0:          CVE-2024-52530.patch
+Patch1:          CVE-2024-52531.patch
+Patch2:          CVE-2024-52532.patch
+# CVE-2025-32913 will be fixed in 3.6.2 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/f4a761fb66512fff59798765e8ac5b9e57dceef0
+Patch3:          CVE-2025-32913.patch
+# CVE-2025-32906 will be fixed in 3.6.5 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/af5b9a4a3945c52b940d5ac181ef51bb12011f1f
+Patch4:          CVE-2025-32906.patch
+# CVE-2025-32909 will be fixed in 3.6.2 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/ba4c3a6f988beff59e45801ab36067293d24ce92
+Patch5:          CVE-2025-32909.patch
+# CVE-2025-32910 will be fixed in 3.6.2 by https://gitlab.gnome.org/GNOME/libsoup/-/merge_requests/417
+Patch6:          CVE-2025-32910.patch
+# CVE-2025-32912 will be fixed in 3.6.5 by https://gitlab.gnome.org/GNOME/libsoup/-/commit/cd077513f267e43ce4b659eb18a1734d8a369992
+Patch7:          CVE-2025-32912.patch
+Patch8:          CVE-2025-32908.patch
+Patch9:          CVE-2025-32914.patch
+Patch10:         CVE-2025-2784.patch
+Patch11:         CVE-2025-32052.patch
+Patch12:         CVE-2025-32050.patch
+Patch13:         CVE-2025-32051.patch
+Patch14:         CVE-2025-46420.patch
+Patch15:         CVE-2025-46421.patch
+Patch16:         CVE-2025-32053.patch
+Patch17:         CVE-2025-4476.patch
+Patch18:         CVE-2025-32907.patch
+Patch19:         CVE-2025-4948.patch
+Patch20:         CVE-2025-4969.patch
+
 %description
 libsoup is HTTP client/server library for GNOME
 
@@ -62,7 +89,7 @@ Requires:       %{name} = %{version}-%{release}
 These are the additional language files of libsoup.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %meson \
@@ -107,6 +134,36 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 
 %changelog
+* Tue Aug 12 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-9
+- Patch for CVE-2025-4969
+
+* Tue Jul 29 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-8
+- Patch for CVE-2025-4948
+
+* Fri Jun 13 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.4.4-7
+- Add patch for CVE-2025-4476
+- Add patch for CVE-2025-32907
+
+* Wed May 7 2025 Bhagyashri Pathak <Bhapathak@microsoft.com> - 3.4.4-6
+- Patch for CVE-2025-32053
+
+* Fri May 02 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.4.4-5
+- Added patch for CVE-2025-2784 CVE-2025-32052 CVE-2025-32050 CVE-2025-32051 CVE-2025-46420 CVE-2025-46421
+
+* Fri Apr 25 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.4.4-4
+- Add patch for CVE-2025-32908
+- Add patch for CVE-2025-32914
+
+* Wed Apr 16 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.4.4-3
+- Add patch for CVE-2025-32913
+- Add patch for CVE-2025-32906
+- Add patch for CVE-2025-32909
+- Add patch for CVE-2025-32910
+- Add patch for CVE-2025-32912
+
+* Fri Nov 15 2024 Thien Trung Vuong <tvuong@microsoft.com> - 3.4.4-2
+- Add patches for CVE-2024-52530, CVE-2024-52531, CVE-2024-52532
+
 * Wed Dec 13 2023 Andrew Phelps <anphel@microsoft.com> - 3.4.4-1
 - Upgrade to version 3.4.4
 - Remove doc subpackage

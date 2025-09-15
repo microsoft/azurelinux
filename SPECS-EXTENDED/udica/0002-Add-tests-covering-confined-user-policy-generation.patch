@@ -1,0 +1,170 @@
+From d444e67ead27266d57184ab8bc032c5528f7e26c Mon Sep 17 00:00:00 2001
+From: Vit Mojzis <vmojzis@redhat.com>
+Date: Wed, 20 Dec 2023 14:33:27 +0100
+Subject: [PATCH] Add tests covering confined user policy generation
+
+Signed-off-by: Vit Mojzis <vmojzis@redhat.com>
+---
+ tests/test_confined_abcdgilmns.cil | 24 ++++++++++++++++++++
+ tests/test_confined_cla.cil        | 15 +++++++++++++
+ tests/test_confined_lb.cil         | 12 ++++++++++
+ tests/test_confined_lsid.cil       | 17 +++++++++++++++
+ tests/test_main.py                 | 35 +++++++++++++++++++++++++-----
+ 5 files changed, 98 insertions(+), 5 deletions(-)
+ create mode 100644 tests/test_confined_abcdgilmns.cil
+ create mode 100644 tests/test_confined_cla.cil
+ create mode 100644 tests/test_confined_lb.cil
+ create mode 100644 tests/test_confined_lsid.cil
+
+diff --git a/tests/test_confined_abcdgilmns.cil b/tests/test_confined_abcdgilmns.cil
+new file mode 100644
+index 0000000..5fd619f
+--- /dev/null
++++ b/tests/test_confined_abcdgilmns.cil
+@@ -0,0 +1,24 @@
++(boolean my_container_exec_content true)
++(role my_container_r)
++(type my_container_dbus_t)
++(type my_container_gkeyringd_t)
++(type my_container_ssh_agent_t)
++(type my_container_sudo_t)
++(type my_container_sudo_tmp_t)
++(type my_container_t)
++(type my_container_userhelper_t)
++(user my_container_u)
++(userrole my_container_u my_container_r)
++(userlevel my_container_u (s0))
++(userrange my_container_u ((s0 ) (s0 (c0))))
++
++(call confinedom_admin_commands_macro (my_container_t my_container_r my_container_sudo_t))
++(call confinedom_graphical_login_macro (my_container_t my_container_r my_container_dbus_t))
++(call confinedom_mozilla_usage_macro (my_container_t my_container_r))
++(call confinedom_networking_macro (my_container_t my_container_r))
++(call confinedom_security_advanced_macro (my_container_t my_container_r my_container_sudo_t my_container_userhelper_t))
++(call confinedom_security_basic_macro (my_container_t my_container_r))
++(call confinedom_sudo_macro (my_container_t my_container_r my_container_sudo_t my_container_sudo_tmp_t))
++(call confinedom_user_login_macro (my_container_t my_container_r my_container_gkeyringd_t my_container_dbus_t my_container_exec_content))
++(call confined_ssh_connect_macro (my_container_t my_container_r my_container_ssh_agent_t))
++(call confined_use_basic_commands_macro (my_container_t my_container_r))
+\ No newline at end of file
+diff --git a/tests/test_confined_cla.cil b/tests/test_confined_cla.cil
+new file mode 100644
+index 0000000..a633aaa
+--- /dev/null
++++ b/tests/test_confined_cla.cil
+@@ -0,0 +1,15 @@
++(boolean my_container_exec_content true)
++(role my_container_r)
++(type my_container_dbus_t)
++(type my_container_gkeyringd_t)
++(type my_container_ssh_agent_t)
++(type my_container_sudo_t)
++(type my_container_t)
++(user my_container_u)
++(userrole my_container_u my_container_r)
++(userlevel my_container_u (s0))
++(userrange my_container_u ((s0 ) (s0 (c0))))
++
++(call confinedom_admin_commands_macro (my_container_t my_container_r my_container_sudo_t))
++(call confinedom_user_login_macro (my_container_t my_container_r my_container_gkeyringd_t my_container_dbus_t my_container_exec_content))
++(call confined_ssh_connect_macro (my_container_t my_container_r my_container_ssh_agent_t))
+\ No newline at end of file
+diff --git a/tests/test_confined_lb.cil b/tests/test_confined_lb.cil
+new file mode 100644
+index 0000000..3e3c997
+--- /dev/null
++++ b/tests/test_confined_lb.cil
+@@ -0,0 +1,12 @@
++(boolean my_container_exec_content true)
++(role my_container_r)
++(type my_container_dbus_t)
++(type my_container_gkeyringd_t)
++(type my_container_t)
++(user my_container_u)
++(userrole my_container_u my_container_r)
++(userlevel my_container_u (s0))
++(userrange my_container_u ((s0 ) (s0 (c0))))
++
++(call confinedom_user_login_macro (my_container_t my_container_r my_container_gkeyringd_t my_container_dbus_t my_container_exec_content))
++(call confined_use_basic_commands_macro (my_container_t my_container_r))
+\ No newline at end of file
+diff --git a/tests/test_confined_lsid.cil b/tests/test_confined_lsid.cil
+new file mode 100644
+index 0000000..8719420
+--- /dev/null
++++ b/tests/test_confined_lsid.cil
+@@ -0,0 +1,17 @@
++(boolean my_container_exec_content true)
++(role my_container_r)
++(type my_container_dbus_t)
++(type my_container_gkeyringd_t)
++(type my_container_sudo_t)
++(type my_container_sudo_tmp_t)
++(type my_container_t)
++(type my_container_userhelper_t)
++(user my_container_u)
++(userrole my_container_u my_container_r)
++(userlevel my_container_u (s0))
++(userrange my_container_u ((s0 ) (s0 (c0))))
++
++(call confinedom_security_advanced_macro (my_container_t my_container_r my_container_sudo_t my_container_userhelper_t))
++(call confinedom_security_basic_macro (my_container_t my_container_r))
++(call confinedom_sudo_macro (my_container_t my_container_r my_container_sudo_t my_container_sudo_tmp_t))
++(call confinedom_user_login_macro (my_container_t my_container_r my_container_gkeyringd_t my_container_dbus_t my_container_exec_content))
+\ No newline at end of file
+diff --git a/tests/test_main.py b/tests/test_main.py
+index fb6a9ab..0c73861 100644
+--- a/tests/test_main.py
++++ b/tests/test_main.py
+@@ -369,7 +369,26 @@ class TestBase(unittest.TestCase):
+         self.assert_templates(output, ["base_container"])
+         self.assert_policy(test_file("test_devices.podman.cil"))
+ 
+-    def run_udica(self, args):
++    # Confined user tests
++    def test_confined_user(self):
++        """udica confined_user <args> --level s0 --range s0:c0 my_container"""
++        for arg in ["cla", "lb", "lsid", "abcdgilmns"]:
++            output = self.run_udica(
++                [
++                    "udica",
++                    "confined_user",
++                    "-{}".format(arg),
++                    "--level",
++                    "s0",
++                    "--range",
++                    "s0:c0",
++                    "my_container",
++                ],
++                True,
++            )
++            self.assert_policy(test_file("test_confined_{}.cil".format(arg)))
++
++    def run_udica(self, args, confined=False):
+         with patch("sys.argv", args):
+             with patch("sys.stderr.write") as mock_err, patch(
+                 "sys.stdout.write"
+@@ -383,10 +402,16 @@ class TestBase(unittest.TestCase):
+                 udica.__main__.main()
+                 mock_err.assert_not_called()
+ 
+-        self.assertRegex(mock_out.output, "Policy my_container created")
+-        self.assertRegex(
+-            mock_out.output, "--security-opt label=type:my_container.process"
+-        )
++        if confined:
++            self.assertRegex(mock_out.output, "semodule -i my_container.cil")
++            self.assertRegex(
++                mock_out.output, "semanage login -a -s my_container_u my_container"
++            )
++        else:
++            self.assertRegex(mock_out.output, "Policy my_container created")
++            self.assertRegex(
++                mock_out.output, "--security-opt label=type:my_container.process"
++            )
+ 
+         return mock_out.output
+ 
+-- 
+2.43.0
+

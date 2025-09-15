@@ -1,5 +1,5 @@
-%define with_gtk_doc 0
-%define with_bcache 1
+%define with_python3 1
+%define with_gtk_doc 1
 %define with_btrfs 1
 %define with_crypto 1
 %define with_dm 1
@@ -9,19 +9,16 @@
 %define with_mdraid 1
 %define with_mpath 1
 %define with_swap 1
-%define with_kbd 1
 %define with_part 1
 %define with_fs 1
 %define with_nvdimm 1
-%define with_vdo 0
 %define with_gi 1
 %define with_escrow 1
-%define with_dmraid 1
 %define with_tools 1
+%define with_nvme 1                                       
+%define with_smart 1
+%define with_smartmontools 1
 
-%if %{with_gtk_doc} != 1
-%define gtk_doc_copts --without-gtk-doc
-%endif
 %if %{with_btrfs} != 1
 %define btrfs_copts --without-btrfs
 %endif
@@ -35,9 +32,6 @@
 %if %{with_dm} != 1
 %define dm_copts --without-dm
 %else
-%if %{with_dmraid} != 1
-%define dm_copts --without-dmraid
-%endif
 %endif
 %if %{with_loop} != 1
 %define loop_copts --without-loop
@@ -57,9 +51,6 @@
 %if %{with_swap} != 1
 %define swap_copts --without-swap
 %endif
-%if %{with_kbd} != 1
-%define kbd_copts --without-kbd
-%endif
 %if %{with_part} != 1
 %define part_copts --without-part
 %endif
@@ -69,25 +60,34 @@
 %if %{with_nvdimm} != 1
 %define nvdimm_copts --without-nvdimm
 %endif
-%if %{with_vdo} != 1
-%define vdo_copts --without-vdo
-%endif
 %if %{with_tools} != 1
 %define tools_copts --without-tools
 %endif
 %if %{with_gi} != 1
 %define gi_copts --disable-introspection
 %endif
-%define configure_opts %{?gtk_doc_copts} %{?lvm_dbus_copts} %{?btrfs_copts} %{?crypto_copts} %{?dm_copts} %{?loop_copts} %{?lvm_copts} %{?lvm_dbus_copts} %{?mdraid_copts} %{?mpath_copts} %{?swap_copts} %{?kbd_copts} %{?part_copts} %{?fs_copts} %{?nvdimm_copts} %{?vdo_copts} %{?tools_copts} %{?gi_copts}
+%if %{with_nvme} != 1
+%define nvme_copts --without-nvme
+%endif
+%if %{with_smart} != 1
+%define smart_copts --without-smart
+%endif
+%if %{with_smartmontools} != 1
+%define smartmontools_copts --without-smartmontools
+%endif
+
+%define configure_opts %{?python3_copts} %{?lvm_dbus_copts} %{?btrfs_copts} %{?crypto_copts} %{?dm_copts} %{?loop_copts} %{?lvm_copts} %{?lvm_dbus_copts} %{?mdraid_copts} %{?mpath_copts} %{?swap_copts} %{?part_copts} %{?fs_copts} %{?nvdimm_copts} %{?tools_copts} %{?gi_copts} %{?nvme_copts} %{?smart_copts} %{?smartmontools_copts}  
+
 Summary:        A library for low-level manipulation with block devices
 Name:           libblockdev
-Version:        2.28
-Release:        3%{?dist}
+Version:        3.2.0
+Release:        1%{?dist}
 License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/storaged-project/libblockdev
-Source0:        https://github.com/storaged-project/libblockdev/releases/download/%{version}-1/%{name}-%{version}.tar.gz
+Source0:        https://github.com/storaged-project/libblockdev/releases/download/%{version}/%{name}-%{version}.tar.gz
+
 BuildRequires:  make
 BuildRequires:  glib2-devel
 %if %{with_gi}
@@ -95,11 +95,18 @@ BuildRequires:  gobject-introspection-devel
 %endif
 BuildRequires:  python3-devel
 %if %{with_gtk_doc}
-BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  gtk-doc
 %endif
 BuildRequires:  glib2-doc
 BuildRequires:  autoconf-archive
+
+# obsolete removed subpackages to allow upgrades
+Provides: libblockdev-kbd = %{version}-%{release}
+Obsoletes: libblockdev-kbd < %{version}-%{release}
+Provides: libblockdev-vdo = %{version}-%{release}
+Obsoletes: libblockdev-vdo < %{version}-%{release}
+
+Requires: %{name}-utils%{?_isa} = %{version}-%{release}
 
 %description
 The libblockdev is a C library with GObject introspection support that can be
@@ -113,7 +120,14 @@ no information about VGs when creating an LV).
 %package devel
 Summary:        Development files for libblockdev
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-utils-devel%{?_isa} = %{version}-%{release}
 Requires:       glib2-devel
+
+# obsolete removed devel subpackages to allow upgrades
+Provides: libblockdev-kbd-devel = %{version}-%{release}                                       
+Obsoletes: libblockdev-kbd-devel < %{version}-%{release}
+Provides: libblockdev-vdo-devel = %{version}-%{release}
+Obsoletes: libblockdev-vdo-devel < %{version}-%{release}
 
 %description devel
 This package contains header files and pkg-config files needed for development
@@ -123,6 +137,7 @@ with the libblockdev library.
 Summary:        Python3 gobject-introspection bindings for libblockdev
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       python3-gobject-base
+Requires:       python3-bytesize
 %{?python_provide:%python_provide python3-blockdev}
 
 %description -n python3-blockdev
@@ -171,8 +186,11 @@ with the libblockdev-btrfs plugin/library.
 %if %{with_crypto}
 %package crypto
 Summary:        The crypto plugin for the libblockdev library
-BuildRequires:  cryptsetup-devel
+Requires: %{name}-utils%{?_isa} = %{version}-%{release}
+BuildRequires:  cryptsetup-devel >= 2.3.0
 BuildRequires:  libblkid-devel
+BuildRequires: keyutils-libs-devel
+
 %if %{with_escrow}
 BuildRequires:  volume_key-devel >= 0.3.9-7
 BuildRequires:  nss-devel
@@ -185,6 +203,7 @@ providing the functionality related to encrypted devices (LUKS).
 %package crypto-devel
 Summary:        Development files for the libblockdev-crypto plugin/library
 Requires:       %{name}-crypto%{?_isa} = %{version}-%{release}
+Requires:       %{name}-utils-devel%{?_isa} = %{version}-%{release}
 Requires:       glib2-devel
 
 %description crypto-devel
@@ -196,15 +215,9 @@ with the libblockdev-crypto plugin/library.
 %package dm
 Summary:        The Device Mapper plugin for the libblockdev library
 BuildRequires:  device-mapper-devel
-%if %{with_dmraid}
-BuildRequires:  dmraid-devel
-%endif
 BuildRequires:  systemd-devel
 Requires:       %{name}-utils%{?_isa} = %{version}-%{release}
 Requires:       device-mapper
-%if %{with_dmraid}
-Requires:       dmraid
-%endif
 
 %description dm
 The libblockdev library plugin (and in the same time a standalone library)
@@ -216,9 +229,6 @@ Requires:       %{name}-dm%{?_isa} = %{version}-%{release}
 Requires:       glib2-devel
 Requires:       device-mapper-devel
 Requires:       systemd-devel
-%if %{with_dmraid}
-Requires:       dmraid-devel
-%endif
 Requires:       %{name}-utils-devel%{?_isa} = %{version}-%{release}
 
 %description dm-devel
@@ -229,9 +239,10 @@ with the libblockdev-dm plugin/library.
 %if %{with_fs}
 %package fs
 Summary:        The FS plugin for the libblockdev library
-BuildRequires:  parted-devel
 BuildRequires:  libblkid-devel
 BuildRequires:  libmount-devel
+BuildRequires: libuuid-devel
+BuildRequires: e2fsprogs-devel
 Requires:       %{name}-utils%{?_isa} = %{version}-%{release}
 
 %description fs
@@ -243,37 +254,10 @@ Summary:        Development files for the libblockdev-fs plugin/library
 Requires:       %{name}-fs%{?_isa} = %{version}-%{release}
 Requires:       %{name}-utils-devel%{?_isa} = %{version}-%{release}
 Requires:       glib2-devel
-Requires:       xfsprogs
-Requires:       dosfstools
 
 %description fs-devel
 This package contains header files and pkg-config files needed for development
 with the libblockdev-fs plugin/library.
-%endif
-
-%if %{with_kbd}
-%package kbd
-Summary:        The KBD plugin for the libblockdev library
-BuildRequires:  libbytesize-devel
-Requires:       %{name}-utils%{?_isa} = %{version}-%{release}
-%if %{with_bcache}
-Requires:       bcache-tools >= 1.0.8
-%endif
-
-%description kbd
-The libblockdev library plugin (and in the same time a standalone library)
-providing the functionality related to kernel block devices (namely zRAM and
-Bcache).
-
-%package kbd-devel
-Summary:        Development files for the libblockdev-kbd plugin/library
-Requires:       %{name}-kbd%{?_isa} = %{version}-%{release}
-Requires:       %{name}-utils-devel%{?_isa} = %{version}-%{release}
-Requires:       glib2-devel
-
-%description kbd-devel
-This package contains header files and pkg-config files needed for development
-with the libblockdev-kbd plugin/library.
 %endif
 
 %if %{with_loop}
@@ -300,6 +284,7 @@ with the libblockdev-loop plugin/library.
 %package lvm
 Summary:        The LVM plugin for the libblockdev library
 BuildRequires:  device-mapper-devel
+BuildRequires:  libyaml-devel
 Requires:       %{name}-utils%{?_isa} = %{version}-%{release}
 Requires:       lvm2
 
@@ -322,6 +307,7 @@ with the libblockdev-lvm plugin/library.
 %package lvm-dbus
 Summary:        The LVM plugin for the libblockdev library
 BuildRequires:  device-mapper-devel
+BuildRequires: libyaml-devel
 Requires:       %{name}-utils%{?_isa} = %{version}-%{release}
 Requires:       lvm2-dbusd >= 2.02.156
 
@@ -407,12 +393,33 @@ This package contains header files and pkg-config files needed for development
 with the libblockdev-nvdimm plugin/library.
 %endif
 
+%if %{with_nvme}
+%package nvme
+BuildRequires: libnvme-devel
+BuildRequires: libuuid-devel
+Summary:     The NVMe plugin for the libblockdev library
+Requires: %{name}-utils%{?_isa} = %{version}-%{release}
+
+%description nvme
+The libblockdev library plugin (and in the same time a standalone library)
+providing the functionality related to operations with NVMe devices.
+
+%package nvme-devel
+Summary:     Development files for the libblockdev-nvme plugin/library
+Requires: %{name}-nvme%{?_isa} = %{version}-%{release}
+Requires: %{name}-utils-devel%{?_isa} = %{version}-%{release}
+Requires: glib2-devel
+
+%description nvme-devel
+This package contains header files and pkg-config files needed for development
+with the libblockdev-nvme plugin/library.
+%endif
+
+
 %if %{with_part}
 %package part
 Summary:        The partitioning plugin for the libblockdev library
-BuildRequires:  parted-devel
 Requires:       %{name}-utils%{?_isa} = %{version}-%{release}
-Requires:       gdisk
 Requires:       util-linux
 
 %description part
@@ -428,6 +435,52 @@ Requires:       glib2-devel
 %description part-devel
 This package contains header files and pkg-config files needed for development
 with the libblockdev-part plugin/library.
+%endif
+
+%if %{with_smart}
+%package smart
+BuildRequires: libatasmart-devel >= 0.17
+Summary:     The smart plugin for the libblockdev library
+Requires: %{name}-utils%{?_isa} = %{version}-%{release}
+
+%description smart
+The libblockdev library plugin (and in the same time a standalone library)
+providing S.M.A.R.T. monitoring and testing functionality, based
+on libatasmart.
+
+%package smart-devel
+Summary:     Development files for the libblockdev-smart plugin/library
+Requires: %{name}-smart%{?_isa} = %{version}-%{release}
+Requires: %{name}-utils-devel%{?_isa} = %{version}-%{release}
+Requires: glib2-devel
+
+%description smart-devel
+This package contains header files and pkg-config files needed for development
+with the libblockdev-smart plugin/library.
+%endif
+
+
+%if %{with_smartmontools}
+%package smartmontools
+BuildRequires: json-glib-devel
+Summary:     The smartmontools plugin for the libblockdev library
+Requires: %{name}-utils%{?_isa} = %{version}-%{release}
+Requires: smartmontools >= 7.0
+
+%description smartmontools
+The libblockdev library plugin (and in the same time a standalone library)
+providing S.M.A.R.T. monitoring and testing functionality, based
+on smartmontools.
+
+%package smartmontools-devel
+Summary:     Development files for the libblockdev-smart plugin/library
+Requires: %{name}-smartmontools%{?_isa} = %{version}-%{release}
+Requires: %{name}-utils-devel%{?_isa} = %{version}-%{release}
+Requires: glib2-devel                                                                               
+                                                                                                    
+%description smartmontools-devel                                                                    
+This package contains header files and pkg-config files needed for development                      
+with the libblockdev-smart plugin/library. 
 %endif
 
 %if %{with_swap}
@@ -452,37 +505,14 @@ This package contains header files and pkg-config files needed for development
 with the libblockdev-swap plugin/library.
 %endif
 
-%if %{with_vdo}
-%package vdo
-Summary:        The vdo plugin for the libblockdev library
-BuildRequires:  libbytesize-devel
-BuildRequires:  libyaml-devel
-Requires:       %{name}-utils%{?_isa} >= 0.11
-# we want to build the plugin everywhere but the dependencies might not be
-# available so just use weak dependency
-Recommends:     vdo
-
-%description vdo
-The libblockdev library plugin (and in the same time a standalone library)
-providing the functionality related to VDO devices.
-
-%package vdo-devel
-Summary:        Development files for the libblockdev-vdo plugin/library
-Requires:       %{name}-vdo%{?_isa} = %{version}-%{release}
-Requires:       %{name}-utils-devel%{?_isa}
-Requires:       glib2-devel
-
-%description vdo-devel
-This package contains header files and pkg-config files needed for development
-with the libblockdev-vdo plugin/library.
-%endif
 
 %if %{with_tools}
 %package tools
 Summary:        Various nice tools based on libblockdev
 BuildRequires:  libbytesize-devel
-Requires:       %{name}
-Requires:       %{name}-lvm
+BuildRequires: parted-devel
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-lvm = %{version}-%{release}
 %if %{with_lvm_dbus} == 1
 Recommends:     %{name}-lvm-dbus
 %endif
@@ -492,47 +522,89 @@ Various nice storage-related tools based on libblockdev.
 
 %endif
 
+%ifarch s390 s390x
+%package s390
+Summary:    The s390 plugin for the libblockdev library
+Requires: %{name}-utils%{?_isa} = %{version}-%{release}
+Requires: s390utils
+
+%description s390
+The libblockdev library plugin (and in the same time a standalone library)
+providing the functionality related to s390 devices.
+
+%package s390-devel
+Summary:     Development files for the libblockdev-s390 plugin/library
+Requires: %{name}-s390%{?_isa} = %{version}-%{release}
+Requires: %{name}-utils-devel%{?_isa} = %{version}-%{release}
+Requires: glib2-devel
+
+%description s390-devel
+This package contains header files and pkg-config files needed for development
+with the libblockdev-s390 plugin/library.
+%endif
+
 %package plugins-all
 Summary:        Meta-package that pulls all the libblockdev plugins as dependencies
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+
 %if %{with_btrfs}
 Requires:       %{name}-btrfs%{?_isa} = %{version}-%{release}
 %endif
+
 %if %{with_crypto}
 Requires:       %{name}-crypto%{?_isa} = %{version}-%{release}
 %endif
+
 %if %{with_dm}
 Requires:       %{name}-dm%{?_isa} = %{version}-%{release}
 %endif
+
 %if %{with_fs}
 Requires:       %{name}-fs%{?_isa} = %{version}-%{release}
 %endif
-%if %{with_kbd}
-Requires:       %{name}-kbd%{?_isa} = %{version}-%{release}
-%endif
+
 %if %{with_loop}
 Requires:       %{name}-loop%{?_isa} = %{version}-%{release}
 %endif
+
 %if %{with_lvm}
 Requires:       %{name}-lvm%{?_isa} = %{version}-%{release}
 %endif
+
 %if %{with_mdraid}
 Requires:       %{name}-mdraid%{?_isa} = %{version}-%{release}
 %endif
+
 %if %{with_mpath}
 Requires:       %{name}-mpath%{?_isa} = %{version}-%{release}
 %endif
+
 %if %{with_nvdimm}
 Requires:       %{name}-nvdimm%{?_isa} = %{version}-%{release}
+
+%if %{with_nvme}
+Requires: %{name}-nvme%{?_isa} = %{version}-%{release}                                              
+%endif
+
 %endif
 %if %{with_part}
 Requires:       %{name}-part%{?_isa} = %{version}-%{release}
 %endif
+
+%if %{with_smart}
+Requires: %{name}-smart%{?_isa} = %{version}-%{release}
+%endif
+
+%if %{with_smartmontools}
+Requires: %{name}-smartmontools%{?_isa} = %{version}-%{release}
+%endif
+
 %if %{with_swap}
 Requires:       %{name}-swap%{?_isa} = %{version}-%{release}
 %endif
-%if %{with_vdo}
-Requires:       %{name}-vdo%{?_isa} = %{version}-%{release}
+
+%ifarch s390 s390x
+Requires: %{name}-s390%{?_isa} = %{version}-%{release}
 %endif
 
 %description plugins-all
@@ -544,11 +616,11 @@ A meta-package that pulls all the libblockdev plugins as dependencies.
 %build
 autoreconf -ivf
 %configure %{?configure_opts}
-%make_build
+%{__make} %{?_smp_mflags}
 
 %install
 %make_install
-find %{buildroot} -type f -name "*.la" -delete -print
+find %{buildroot} -type f -name "*.la" | xargs %{__rm}
 
 %ldconfig_scriptlets
 %ldconfig_scriptlets utils
@@ -593,22 +665,29 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %ldconfig_scriptlets nvdimm
 %endif
 
+%if %{with_nvme}
+%ldconfig_scriptlets nvme
+%endif
+
 %if %{with_part}
 %ldconfig_scriptlets part
+%endif
+
+%if %{with_smart}
+%ldconfig_scriptlets smart
+%endif
+
+%if %{with_smartmontools}
+%ldconfig_scriptlets smartmontools
 %endif
 
 %if %{with_swap}
 %ldconfig_scriptlets swap
 %endif
 
-%if %{with_vdo}
-%ldconfig_scriptlets vdo
+%ifarch s390 s390x
+%ldconfig_scriptlets s390
 %endif
-
-%if %{with_kbd}
-%ldconfig_scriptlets kbd
-%endif
-
 
 %files
 %{!?_licensedir:%global license %%doc}
@@ -618,11 +697,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/girepository*/BlockDev*.typelib
 %endif
 %dir %{_sysconfdir}/libblockdev
-%dir %{_sysconfdir}/libblockdev/conf.d
-%config %{_sysconfdir}/libblockdev/conf.d/00-default.cfg
+%dir %{_sysconfdir}/libblockdev/3/conf.d
+%config %{_sysconfdir}/libblockdev/3/conf.d/00-default.cfg
 
 %files devel
-%doc features.rst specs.rst
+#%doc features.rst specs.rst
 %{_libdir}/libblockdev.so
 %dir %{_includedir}/blockdev
 %{_includedir}/blockdev/blockdev.h
@@ -641,11 +720,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files utils
 %{_libdir}/libbd_utils.so.*
-%{_libdir}/libbd_part_err.so.*
+#%{_libdir}/libbd_part_err.so.*
 
 %files utils-devel
 %{_libdir}/libbd_utils.so
-%{_libdir}/libbd_part_err.so
 %{_libdir}/pkgconfig/blockdev-utils.pc
 %dir %{_includedir}/blockdev
 %{_includedir}/blockdev/utils.h
@@ -655,6 +733,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_includedir}/blockdev/dev_utils.h
 %{_includedir}/blockdev/module.h
 %{_includedir}/blockdev/dbus.h
+%{_includedir}/blockdev/logging.h
 
 %if %{with_btrfs}
 %files btrfs
@@ -698,16 +777,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_includedir}/blockdev/fs/*.h
 %endif
 
-%if %{with_kbd}
-%files kbd
-%{_libdir}/libbd_kbd.so.*
-
-%files kbd-devel
-%{_libdir}/libbd_kbd.so
-%dir %{_includedir}/blockdev
-%{_includedir}/blockdev/kbd.h
-%endif
-
 %if %{with_loop}
 %files loop
 %{_libdir}/libbd_loop.so.*
@@ -731,7 +800,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %if %{with_lvm_dbus}
 %files lvm-dbus
 %{_libdir}/libbd_lvm-dbus.so.*
-%config %{_sysconfdir}/libblockdev/conf.d/10-lvm-dbus.cfg
+%config %{_sysconfdir}/libblockdev/3/conf.d/10-lvm-dbus.cfg
 
 %files lvm-dbus-devel
 %{_libdir}/libbd_lvm-dbus.so
@@ -769,15 +838,50 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_includedir}/blockdev/nvdimm.h
 %endif
 
+%if %{with_nvme}
+%files nvme
+%{_libdir}/libbd_nvme.so.*
+
+
+%files nvme-devel
+%{_libdir}/libbd_nvme.so
+%dir %{_includedir}/blockdev
+%{_includedir}/blockdev/nvme.h
+%endif
+
 %if %{with_part}
 %files part
 %{_libdir}/libbd_part.so.*
+
 
 %files part-devel
 %{_libdir}/libbd_part.so
 %dir %{_includedir}/blockdev
 %{_includedir}/blockdev/part.h
 %endif
+
+
+%if %{with_smart}
+%files smart
+%{_libdir}/libbd_smart.so.*
+
+%files smart-devel
+%{_libdir}/libbd_smart.so
+%dir %{_includedir}/blockdev
+%{_includedir}/blockdev/smart.h
+%endif
+
+
+%if %{with_smartmontools}
+%files smartmontools
+%{_libdir}/libbd_smartmontools.so.*
+
+%files smartmontools-devel
+%{_libdir}/libbd_smartmontools.so
+%dir %{_includedir}/blockdev
+%{_includedir}/blockdev/smart.h
+%endif
+
 
 %if %{with_swap}
 %files swap
@@ -789,24 +893,31 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_includedir}/blockdev/swap.h
 %endif
 
-%if %{with_vdo}
-%files vdo
-%{_libdir}/libbd_vdo.so.*
-
-%files vdo-devel
-%{_libdir}/libbd_vdo.so
-%dir %{_includedir}/blockdev
-%{_includedir}/blockdev/vdo.h
-%endif
 
 %if %{with_tools}
 %files tools
 %{_bindir}/lvm-cache-stats
+%{_bindir}/vfat-resize
 %endif
+
+%ifarch s390 s390x
+%files s390
+%{_libdir}/libbd_s390.so.*
+
+%files s390-devel
+%{_libdir}/libbd_s390.so
+%dir %{_includedir}/blockdev
+%{_includedir}/blockdev/s390.h
+%endif
+
 
 %files plugins-all
 
 %changelog
+* Thu Nov 7 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 3.2.0-1
+- Update to 3.2.0
+- License verified
+
 * Thu Jan 05 2023 Sumedh Sharma <sumsharma@microsoft.com> - 2.28-3
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Disable conditional build with 'doc' & 'vdo'

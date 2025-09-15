@@ -32,12 +32,14 @@ cached_remote_rpms     = $(call shell_real_build_only, find $(remote_rpms_cache_
 validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
 
 # Outputs
-specs_file        = $(PKGBUILD_DIR)/specs.json
-graph_file        = $(PKGBUILD_DIR)/graph.dot
-cached_file       = $(PKGBUILD_DIR)/cached_graph.dot
-preprocessed_file = $(PKGBUILD_DIR)/preprocessed_graph.dot
-built_file        = $(PKGBUILD_DIR)/built_graph.dot
-output_csv_file   = $(PKGBUILD_DIR)/build_state.csv
+specs_file               = $(PKGBUILD_DIR)/specs.json
+graph_file               = $(PKGBUILD_DIR)/graph.dot
+cached_file              = $(PKGBUILD_DIR)/cached_graph.dot
+preprocessed_file        = $(PKGBUILD_DIR)/preprocessed_graph.dot
+built_file               = $(PKGBUILD_DIR)/built_graph.dot
+output_csv_file          = $(PKGBUILD_DIR)/build_state.csv
+pkg_license_summary_file = $(PKGBUILD_DIR)/license_issues.txt
+pkg_license_results_file = $(PKGBUILD_DIR)/license_issues.json
 
 logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level=$(LOG_LEVEL) --log-color=$(LOG_COLOR)
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
@@ -65,6 +67,7 @@ clean-cache-worker:
 clean-cache: clean-cache-worker
 	rm -rf $(CACHED_RPMS_DIR)
 	rm -f $(validate-pkggen-config)
+	rm -f $(cached_file)
 	@echo Verifying no mountpoints present in $(cache_working_dir)
 clean-spec-parse:
 	@echo Verifying no mountpoints present in $(parse_working_dir)
@@ -87,13 +90,12 @@ analyze-built-graph: $(go-graphanalytics)
 	fi
 
 # Parse specs in $(SPECS_DIR) and generate a specs.json file encoding all dependency information
-# We look at the same pack list as the srpmpacker tool via the target $(srpm_pack_list_file), which
-# is build from the contents of $(SRPM_PACK_LIST) if it is set. We only parse the spec files we will
-# actually pack.
-$(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(srpm_pack_list_file) $(depend_RUN_CHECK)
+# We look at the same pack list as the srpmpacker tool via the target $(SRPM_PACK_LIST) if it is set.
+# We only parse the spec files we will actually pack.
+$(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(depend_SRPM_PACK_LIST) $(depend_RUN_CHECK)
 	$(go-specreader) \
 		--dir $(SPECS_DIR) \
-		$(if $(SRPM_PACK_LIST),--spec-list=$(srpm_pack_list_file)) \
+		$(if $(SRPM_PACK_LIST),--spec-list="$(SRPM_PACK_LIST)") \
 		--build-dir $(parse_working_dir) \
 		--srpm-dir $(BUILD_SRPMS_DIR) \
 		--rpm-dir $(RPMS_DIR) \
@@ -121,7 +123,7 @@ endif
 
 # Convert the dependency information in the json file into a graph structure
 # We require all the toolchain RPMs to be available here to help resolve unfixable cyclic dependencies
-$(graph_file): $(specs_file) $(go-grapher) $(toolchain_rpms) $(TOOLCHAIN_MANIFEST) $(pkggen_local_repo) $(graphpkgfetcher_cloned_repo) $(chroot_worker) $(depend_REPO_LIST)
+$(graph_file): $(specs_file) $(go-grapher) $(toolchain_rpms) $(TOOLCHAIN_MANIFEST) $(pkggen_local_repo) $(graphpkgfetcher_cloned_repo) $(chroot_worker) $(depend_REPO_LIST) $(REPO_LIST) $(depend_REPO_SNAPSHOT_TIME)
 	$(go-grapher) \
 		--input $(specs_file) \
 		$(logging_command) \
@@ -144,6 +146,7 @@ $(graph_file): $(specs_file) $(go-grapher) $(toolchain_rpms) $(TOOLCHAIN_MANIFES
 		--tls-key=$(TLS_KEY) \
 		--tmp-dir=$(grapher_working_dir) \
 		--tdnf-worker=$(chroot_worker) \
+		--repo-snapshot-time=$(REPO_SNAPSHOT_TIME) \
 		$(foreach repo, $(pkggen_local_repo) $(graphpkgfetcher_cloned_repo) $(REPO_LIST), --repo-file=$(repo))
 
 # We want to detect changes in the RPM cache, but we are not responsible for directly rebuilding any missing files.
@@ -190,12 +193,32 @@ graphpkgfetcher_extra_flags += $(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR
 $(cached_file): $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST)
 endif
 
+ifneq ($(REPO_SNAPSHOT_TIME),)
+graphpkgfetcher_extra_flags += --repo-snapshot-time=$(REPO_SNAPSHOT_TIME)
+endif
+
 ifeq ($(PRECACHE),y)
 # Use highly parallel downlader to fully hydrate the cache before trying to use the package manager to download packages
 $(cached_file): $(STATUS_FLAGS_DIR)/precache.flag
 endif
 
-$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(cached_remote_rpms) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms) $(depend_EXTRA_BUILD_LAYERS)
+ifneq ($(strip $(PACKAGE_CACHE_SUMMARY)$(REPO_SNAPSHOT_TIME)),)
+# We MUST clear the RPM package cache ONLY in the following scenarios:
+# - the package cache summary file is used and has changed or
+# - the repo snapshot time is used and has changed.
+#
+# These scenario are meant to build with a specific set of RPMs, so we must
+# avoid contamination from previous builds.
+#
+# For other scenarios the cache is allowed to contain a mixture of packages and
+# we allow the tooling to figure out the appropriate ones to use during the build.
+#
+# IMPORTANT: update the '$(STATUS_FLAGS_DIR)/build_packages_cache_cleanup.flag' target
+# in tandem with updates to this one.
+$(cached_file): $(STATUS_FLAGS_DIR)/build_packages_cache_cleanup.flag
+endif
+
+$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(cached_remote_rpms) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms) $(depend_EXTRA_BUILD_LAYERS) $(depend_PACKAGE_CACHE_SUMMARY) $(depend_REPO_SNAPSHOT_TIME)
 	mkdir -p $(remote_rpms_cache_dir) && \
 	$(go-graphpkgfetcher) \
 		--input=$(graph_file) \
@@ -237,7 +260,7 @@ cache_archive	= $(OUT_DIR)/cache.tar.gz
 pkggen_archive	= $(OUT_DIR)/rpms.tar.gz
 srpms_archive  	= $(OUT_DIR)/srpms.tar.gz
 
-.PHONY: build-packages clean-build-packages hydrate-rpms compress-rpms clean-compress-rpms compress-srpms clean-compress-srpms clean-build-packages-workers
+.PHONY: build-packages clean-build-packages hydrate-rpms compress-rpms clean-compress-rpms hydrate-srpms compress-srpms clean-compress-srpms clean-build-packages-workers
 
 ##help:target:build-packages=Build .rpm packages selected by PACKAGE_(RE)BUILD_LIST= and IMAGE_CONFIG=.
 # Execute the package build scheduler.
@@ -258,6 +281,13 @@ clean-compress-rpms:
 clean-compress-srpms:
 	rm -rf $(srpms_archive)
 
+$(STATUS_FLAGS_DIR)/build_packages_cache_cleanup.flag: $(depend_PACKAGE_CACHE_SUMMARY) $(depend_REPO_SNAPSHOT_TIME)
+	@echo "Either 'PACKAGE_CACHE_SUMMARY' or 'REPO_SNAPSHOT_TIME' has changed, sanitizing rpm cache"
+	@if [ -d "$(remote_rpms_cache_dir)" ]; then \
+		find "$(remote_rpms_cache_dir)" -type f -name '*.rpm' -delete; \
+	fi
+	@touch $@
+
 ifeq ($(REBUILD_PACKAGES),y)
 $(RPMS_DIR): $(STATUS_FLAGS_DIR)/build-rpms.flag
 	@touch $@
@@ -267,7 +297,7 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_MAX_CASCADING_REBUILDS) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR) $(depend_EXTRA_BUILD_LAYERS)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_MAX_CASCADING_REBUILDS) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR) $(depend_EXTRA_BUILD_LAYERS) $(depend_LICENSE_CHECK_MODE)
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
@@ -285,8 +315,8 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroo
 		--distro-release-version="$(RELEASE_VERSION)" \
 		--distro-build-number="$(BUILD_NUMBER)" \
 		--rpmmacros-file="$(TOOLCHAIN_MANIFESTS_DIR)/macros.override" \
-		--build-attempts="$(PACKAGE_BUILD_RETRIES)" \
-		--check-attempts="$(CHECK_BUILD_RETRIES)" \
+		--build-attempts="$$(($(PACKAGE_BUILD_RETRIES)+1))" \
+		--check-attempts="$$(($(CHECK_BUILD_RETRIES)+1))" \
 		$(if $(MAX_CASCADING_REBUILDS),--max-cascading-rebuilds="$(MAX_CASCADING_REBUILDS)") \
 		--extra-layers="$(EXTRA_BUILD_LAYERS)" \
 		--build-agent="chroot-agent" \
@@ -297,6 +327,11 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroo
 		--ignored-tests="$(TEST_IGNORE_LIST)" \
 		--tests="$(TEST_RUN_LIST)" \
 		--rerun-tests="$(TEST_RERUN_LIST)" \
+		--license-check-mode="$(LICENSE_CHECK_MODE)" \
+		--license-check-exception-file="$(LICENSE_CHECK_EXCEPTION_FILE)" \
+		--license-check-name-file="$(LICENSE_CHECK_NAME_FILE)" \
+		--license-results-file="$(pkg_license_results_file)" \
+		--license-summary-file="$(pkg_license_summary_file)" \
 		--image-config-file="$(CONFIG_FILE)" \
 		--cpu-prof-file=$(PROFILE_DIR)/scheduler.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/scheduler.mem.pprof \
@@ -357,3 +392,10 @@ hydrate-rpms:
 	$(if $(PACKAGE_ARCHIVE),,$(error Must set PACKAGE_ARCHIVE=<path>))
 	@echo Unpacking RPMs from $(PACKAGE_ARCHIVE) into $(RPMS_DIR)
 	tar -xf $(PACKAGE_ARCHIVE) -C $(RPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
+
+##help:target:hydrate-srpms=Hydrates the `../out/SRPMS` directory from `srpms.tar.gz`. See `compress-srpms` target.
+# Seed the SRPMs folder with the any missing files from the archive.
+hydrate-srpms:
+	$(if $(PACKAGE_ARCHIVE),,$(error Must set PACKAGE_ARCHIVE=<path>))
+	@echo Unpacking SRPMs from $(PACKAGE_ARCHIVE) into $(SRPMS_DIR)
+	tar -xf $(PACKAGE_ARCHIVE) -C $(SRPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"

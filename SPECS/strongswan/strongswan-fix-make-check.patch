@@ -1,6 +1,18 @@
---- a/src/libstrongswan/tests/suites/test_rsa.c	2018-05-28 17:00:17.000000000 +0530
-+++ b/src/libstrongswan/tests/suites/test_rsa.c	2018-12-06 23:39:25.390434910 +0530
-@@ -5179,11 +5179,6 @@
+From efe7b6b9e93dfb50b23aac1f72a796310cad2be1 Mon Sep 17 00:00:00 2001
+From: Mayank Singh <mayansingh@microsoft.com>
+Date: Thu, 22 May 2025 11:25:06 +0000
+Subject: [PATCH] fix make check patch
+
+---
+ src/libstrongswan/tests/suites/test_rsa.c   | 5 -----
+ src/libstrongswan/tests/suites/test_utils.c | 1 -
+ 2 files changed, 6 deletions(-)
+
+diff --git a/src/libstrongswan/tests/suites/test_rsa.c b/src/libstrongswan/tests/suites/test_rsa.c
+index 7bc02f3..48cc68e 100644
+--- a/src/libstrongswan/tests/suites/test_rsa.c
++++ b/src/libstrongswan/tests/suites/test_rsa.c
+@@ -5560,11 +5560,6 @@ Suite *rsa_suite_create()
  		gen_count = min(1, gen_count);
  	}
  
@@ -12,13 +24,18 @@
  	tc = tcase_create("load");
  	tcase_add_loop_test(tc, test_load, 0, countof(keys));
  	suite_add_tcase(s, tc);
---- a/src/libstrongswan/tests/suites/test_utils.c	2018-05-28 17:00:17.000000000 +0530
-+++ b/src/libstrongswan/tests/suites/test_utils.c	2018-12-06 23:38:19.150438228 +0530
-@@ -1051,7 +1051,6 @@
+diff --git a/src/libstrongswan/tests/suites/test_utils.c b/src/libstrongswan/tests/suites/test_utils.c
+index bbaca6d..bf80a8f 100644
+--- a/src/libstrongswan/tests/suites/test_utils.c
++++ b/src/libstrongswan/tests/suites/test_utils.c
+@@ -1391,7 +1391,6 @@ Suite *utils_suite_create()
  	suite_add_tcase(s, tc);
  
  	tc = tcase_create("printf_hooks");
 -	tcase_add_loop_test(tc, test_time_printf_hook, 0, countof(time_data));
  	tcase_add_loop_test(tc, test_time_delta_printf_hook, 0, countof(time_delta_data));
  	suite_add_tcase(s, tc);
+ 
+-- 
+2.45.3
 

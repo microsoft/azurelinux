@@ -266,15 +266,28 @@ build_rpm_in_chroot_no_install () {
     rpmMacros=("${SHARED_RPM_MACROS[@]}" -D "_sourcedir $specDir")
     builtRpms="$(rpmspec -q $specPath --builtrpms "${rpmMacros[@]}" --queryformat="%{nvra}.rpm\n")"
 
-    # Find all the associated RPMs for the SRPM and check if they are in the chroot RPM directory
-    foundAllRPMs="false"
-    if [ "$INCREMENTAL_TOOLCHAIN" = "y" ]; then
-        foundAllRPMs="true"
+    builtEarlier=false
+    if grep -qP "^$1\$" $TEMP_BUILT_SPECS_LIST; then
+        builtEarlier=true
+    fi
+
+    # If a package was built earlier and we try to build it again,
+    # it means the earlier builds happened while only a subset of its build-time dependencies were available.
+    # Later builds are expected to have more/all dependencies available, so we rebuild the package.
+    #
+    # If the incremental build skipped the first build, it means the final version of the package
+    # was present from the beginning, so we skip further build attempts as well.
+    skipBuild=false
+    if $builtEarlier; then
+        echo "Package '$1' was built earlier. Skipping incremental toolchain check and building again."
+    elif [ "$INCREMENTAL_TOOLCHAIN" = "y" ]; then
+        # Find all the associated RPMs for the SRPM and check if they are in the chroot RPM directory.
+        skipBuild=true
         for rpm in $builtRpms; do
             rpmPath=$(find $CHROOT_RPMS_DIR -name "$rpm" -print -quit)
             if [ -z "$rpmPath" ]; then
                 echo "Did not find incremental toolchain rpm '$rpm' in '$CHROOT_RPMS_DIR', must rebuild."
-                foundAllRPMs="false"
+                skipBuild=false
                 break
             else
                 cp $rpmPath $FINISHED_RPM_DIR
@@ -282,7 +295,7 @@ build_rpm_in_chroot_no_install () {
         done
     fi
 
-    if [ "$foundAllRPMs" = "false" ]; then
+    if ! $skipBuild; then
         echo only building RPM $1 within the chroot
         srpmName=$(rpmspec -q $specPath --srpm "${rpmMacros[@]}" --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm)
         srpmPath=$MARINER_INPUT_SRPMS_DIR/$srpmName
@@ -331,6 +344,22 @@ stop_record_timestamp "build prep"
 start_record_timestamp "build packages"
 start_record_timestamp "build packages/build"
 start_record_timestamp "build packages/install"
+
+# Download JDK rpm
+echo "Downloading MsOpenJDK rpm"
+MSOPENJDK_FILENAME="msopenjdk-17-17.0.12-1.$(uname -m).rpm"
+MSOPENJDK_URL="https://packages.microsoft.com/azurelinux/3.0/prod/ms-oss/$(uname -m)/$MSOPENJDK_FILENAME"
+case $(uname -m) in
+    x86_64)  MSOPENJDK_EXPECTED_HASH="08d46b64dc0202ad54be937bb5eab7d4c6a6f7f355a40afbeb295cb591dba126" ;;
+    aarch64) MSOPENJDK_EXPECTED_HASH="0532d42d5c010152c09e88971f9aecd84af54f935973bbf0f1eba2c1c6839726" ;;
+esac
+wget -nv --server-response --no-clobber --timeout=30 --tries=3 --waitretry=10 --retry-connrefused $MSOPENJDK_URL --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+MSOPENJDK_ACTUAL_HASH=$(sha256sum "$CHROOT_RPMS_DIR_ARCH/$MSOPENJDK_FILENAME" | awk '{print $1}')
+if [[ "$MSOPENJDK_EXPECTED_HASH" != "$MSOPENJDK_ACTUAL_HASH" ]]; then
+    echo "Error, incorrect msopenjdk hash: '$MSOPENJDK_ACTUAL_HASH'. Expected hash: '$MSOPENJDK_EXPECTED_HASH'"
+    rm -vf "$CHROOT_RPMS_DIR_ARCH/$MSOPENJDK_FILENAME"
+    exit 1
+fi
 
 echo Building final list of toolchain RPMs
 build_rpm_in_chroot_no_install azurelinux-rpm-macros
@@ -390,6 +419,20 @@ chroot_and_install_rpms zlib
 build_rpm_in_chroot_no_install perl
 chroot_and_install_rpms perl
 
+# perl-generators requires perl-Fedora-VSP
+# All perl packages need perl-generators to correctly
+# generate their run-time provides and requires.
+build_rpm_in_chroot_no_install perl-Fedora-VSP
+chroot_and_install_rpms perl-Fedora-VSP
+build_rpm_in_chroot_no_install perl-generators
+chroot_and_install_rpms perl-generators
+
+# Rebuilding perl packages with perl-generators installed.
+# This only fixes the provides and requires - no need to re-install.
+build_rpm_in_chroot_no_install perl
+build_rpm_in_chroot_no_install perl-Fedora-VSP
+build_rpm_in_chroot_no_install perl-generators
+
 build_rpm_in_chroot_no_install flex
 build_rpm_in_chroot_no_install libarchive
 build_rpm_in_chroot_no_install diffutils
@@ -421,15 +464,9 @@ build_rpm_in_chroot_no_install perl-Text-Template
 chroot_and_install_rpms perl-Text-Template
 build_rpm_in_chroot_no_install openssl
 
-# perl-generators requires perl-Fedora-VSP
-build_rpm_in_chroot_no_install perl-Fedora-VSP
-chroot_and_install_rpms perl-Fedora-VSP
-build_rpm_in_chroot_no_install perl-generators
-chroot_and_install_rpms perl-generators
-
 # build and install additional openjdk build dependencies
-build_rpm_in_chroot_no_install pcre
-chroot_and_install_rpms pcre
+build_rpm_in_chroot_no_install pcre2
+chroot_and_install_rpms pcre2
 build_rpm_in_chroot_no_install which
 chroot_and_install_rpms which
 build_rpm_in_chroot_no_install zip
@@ -453,17 +490,6 @@ chroot_and_install_rpms python-setuptools python3-setuptools
 # libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
 chroot_and_install_rpms libxml2
-
-# Download JDK rpms (from Azure Linux 2.0 repo until it reaches AzuleLinux 3.0 repo on PMC)
-echo Download JDK rpms
-case $(uname -m) in
-    x86_64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-17-17.0.9-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
-    ;;
-    aarch64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-17-17.0.9-1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
-    ;;
-esac
 
 # Lua needs to be installed for RPM to build
 build_rpm_in_chroot_no_install lua
@@ -515,8 +541,9 @@ build_rpm_in_chroot_no_install libxslt
 chroot_and_install_rpms pam
 build_rpm_in_chroot_no_install docbook-style-xsl
 
-# libsolv needs cmake
+# libsolv needs cmake, zstd-devel
 chroot_and_install_rpms cmake
+chroot_and_install_rpms zstd
 build_rpm_in_chroot_no_install libsolv
 
 # ccache needs cmake
@@ -556,8 +583,17 @@ build_rpm_in_chroot_no_install pyproject-rpm-macros
 chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
 chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
 
+# ocaml and other ocmal packages require ocaml-srpm-macros 
+build_rpm_in_chroot_no_install ocaml-srpm-macros
+
 build_rpm_in_chroot_no_install python-packaging
 chroot_and_install_rpms python-packaging python3-packaging
+# rebuild python-packaging to resolve circular dependency
+build_rpm_in_chroot_no_install python-packaging
+
+# Now that python-packaging is built, re-build pygments and setuptools to re-evaluate auto-generated provides
+build_rpm_in_chroot_no_install python-pygments
+build_rpm_in_chroot_no_install python-setuptools
 
 # python3-lxml requires python3-Cython and libxslt
 build_rpm_in_chroot_no_install Cython
@@ -571,9 +607,6 @@ chroot_and_install_rpms gtk-doc
 build_rpm_in_chroot_no_install libtasn1
 
 build_rpm_in_chroot_no_install libsepol
-# swig requires pcre2
-build_rpm_in_chroot_no_install pcre2
-chroot_and_install_rpms pcre2
 build_rpm_in_chroot_no_install swig
 
 # libselinux requires libsepol and swig
@@ -586,8 +619,15 @@ chroot_and_install_rpms libselinux
 # PCRE2 needs to be installed (above) for grep to build with perl regexp support
 build_rpm_in_chroot_no_install grep
 
-# coreutils and findutils require libselinux
-# for SELinux support.
+# attr requires gettext, libtool
+build_rpm_in_chroot_no_install attr
+
+# acl requires libattr
+chroot_and_install_rpms libattr
+build_rpm_in_chroot_no_install acl
+
+# coreutils and findutils require libselinux, libacl, libattr
+chroot_and_install_rpms libacl
 build_rpm_in_chroot_no_install coreutils
 build_rpm_in_chroot_no_install findutils
 
@@ -653,9 +693,9 @@ chroot_and_install_rpms rpm rpm-build-libs
 chroot_and_install_rpms rpm rpm-devel
 chroot_and_install_rpms rpm rpm-build
 
-build_rpm_in_chroot_no_install python-wheel
-build_rpm_in_chroot_no_install python-flit-core
 build_rpm_in_chroot_no_install python-pip
+build_rpm_in_chroot_no_install python-flit-core
+build_rpm_in_chroot_no_install python-wheel
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-libs are also needed but already installed

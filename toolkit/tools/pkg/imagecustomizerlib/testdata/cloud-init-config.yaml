@@ -1,0 +1,13 @@
+os:
+  additionalFiles:
+  - source: files/cloud-init/user-data
+    destination: /var/lib/cloud/seed/nocloud/user-data
+
+  - source: files/cloud-init/network-config
+    destination: /var/lib/cloud/seed/nocloud/network-config
+
+  - source: files/cloud-init/meta-data
+    destination: /var/lib/cloud/seed/nocloud/meta-data
+
+  kernelCommandLine:
+    extraCommandLine: "ds=nocloud"

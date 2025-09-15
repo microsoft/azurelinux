@@ -3,7 +3,7 @@
 Summary:        Jakarta Commons Digester Package
 Name:           apache-%{short_name}
 Version:        2.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,7 @@ Group:          Development/Libraries/Java
 URL:            https://commons.apache.org/proper/commons-digester
 Source0:        https://dlcdn.apache.org/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
 Source1:        %{name}-build.xml
+
 BuildRequires:  ant
 BuildRequires:  commons-beanutils
 BuildRequires:  commons-collections
@@ -44,8 +45,9 @@ This package contains the javadoc documentation for the Jakarta Commons
 Digester Package.
 
 %prep
-%setup -q -n %{short_name}-%{version}-src
+%autosetup -n %{short_name}-%{version}-src
 cp %{SOURCE1} build.xml
+sed -i s/1.6/1.8/g build.xml
 
 mkdir -p lib
 build-jar-repository -s lib commons-beanutils commons-logging
@@ -82,6 +84,10 @@ ant test
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Mar 28 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.1-5
+- Build error fix
+- License verified
+
 * Mon Nov 07 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.1-4
 - Enable check section
 - License verified

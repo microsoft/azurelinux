@@ -2,12 +2,13 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary: Python serial port access library
 Name: pyserial
-Version: 3.4
-Release: 8%{?dist}
+Version: 3.5
+Release: 11%{?dist}
 Source0: %pypi_source
-License: Python
+License: BSD-3-Clause
 URL: http://pypi.python.org/pypi/pyserial
 BuildRequires: python3-devel
+BuildRequires: python3-setuptools
 BuildArch: noarch
 
 %global _description\
@@ -30,6 +31,9 @@ Conflicts: python2-pyserial < 3.4-6
 export UNZIP="-aa"
 %setup -q
 
+# Python 3.13+ has removed unittest.findTestCases()
+# Reported upstream: https://github.com/pyserial/pyserial/issues/754
+sed -i 's/unittest.findTestCases(module)/unittest.TestLoader().loadTestsFromModule(module)/' test/run_all_tests.py
 
 %build
 %py3_build
@@ -37,21 +41,73 @@ export UNZIP="-aa"
 
 %install
 %py3_install
-mv %{buildroot}/%{_bindir}/miniterm.py %{buildroot}/%{_bindir}/miniterm-3.py
-ln -sf %{_bindir}/miniterm-3.py %{buildroot}/%{_bindir}/miniterm-%{python3_version}.py
-ln -sf %{_bindir}/miniterm-3.py %{buildroot}/%{_bindir}/miniterm.py
+
+
+%check
+PYTHONPATH=%{buildroot}/%{python3_sitelib} %{python3} test/run_all_tests.py
 
 
 %files -n python3-pyserial
 %doc LICENSE.txt CHANGES.rst README.rst examples
-%{python3_sitelib}/*
-%{_bindir}/miniterm.py
-%{_bindir}/miniterm-3.py
-%{_bindir}/miniterm-%{python3_version}.py
+%{python3_sitelib}/serial
+%{python3_sitelib}/%{name}-%{version}-py%{python3_version}.egg-info
+%{_bindir}/pyserial-miniterm
+%{_bindir}/pyserial-ports
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.5-11
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.5-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 3.5-9
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.5-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.5-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.5-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 3.5-5
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.5-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 3.5-2
+- Rebuilt for Python 3.11
+
+* Fri Apr 08 2022 Lumír Balhar <lbalhar@redhat.com> - 3.5-1
+- Update to 3.5
+- Fix license tag: Python -> BSD
+Resolves: rhbz#1983151
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.4-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.4-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 3.4-11
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.4-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.4-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sat May 23 2020 Miro Hrončok <mhroncok@redhat.com> - 3.4-8
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.4-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

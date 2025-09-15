@@ -1,8 +1,8 @@
 %bcond_without bootstrap
 Summary:        Lightweight dependency injection framework for Java 5 and above
 Name:           google-guice
-Version:        4.2.3
-Release:        12%{?dist}
+Version:        5.1.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,9 @@ Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 BuildArch:      noarch
+BuildRequires:  jurand
+
+Obsoletes:      guice-multibindings < 5
 
 %description
 Put simply, Guice alleviates the need for factories and the use of new
@@ -74,13 +77,6 @@ Summary:        JNDI extension module for Guice
 Guice is a lightweight dependency injection framework for Java 5
 and above. This package provides JNDI module for Guice.
 
-%package -n guice-multibindings
-Summary:        MultiBindings extension module for Guice
-
-%description -n guice-multibindings
-Guice is a lightweight dependency injection framework for Java 5
-and above. This package provides MultiBindings module for Guice.
-
 %package -n guice-servlet
 Summary:        Servlet extension module for Guice
 
@@ -107,7 +103,12 @@ and above. This package provides Bill of Materials module for Guice.
 %prep
 %setup -q -n guice-%{version}
 
-# We don't have struts2 in Fedora yet.
+	
+%java_remove_annotations core/src/ \
+  -p ^com.google.common.annotations. \
+  -p ^com.google.errorprone.annotations. \
+
+	
 %pom_disable_module struts2 extensions
 # Android-specific extension
 %pom_disable_module dagger-adapter extensions
@@ -136,38 +137,30 @@ and above. This package provides Bill of Materials module for Guice.
 %pom_xpath_remove "pom:dependency[pom:classifier='tests']" extensions
 
 %pom_remove_parent
-%pom_set_parent com.google.inject:guice-parent:%{version} jdk8-tests
 
 %pom_disable_module persist extensions
 %pom_disable_module spring extensions
-
-%pom_disable_module jdk8-tests
-
-# Require a newer compiler
-%pom_xpath_set "pom:build/pom:pluginManagement/pom:plugins/pom:plugin[pom:artifactId='maven-compiler-plugin']/pom:configuration/pom:source" "1.8"
-%pom_xpath_set "pom:build/pom:pluginManagement/pom:plugins/pom:plugin[pom:artifactId='maven-compiler-plugin']/pom:configuration/pom:target" "1.8"
-
 %pom_disable_module testlib extensions
 
-%pom_remove_dep :aopalliance core
-%pom_remove_dep :asm core
-%pom_remove_dep :cglib core
-%pom_xpath_remove "pom:plugin[pom:artifactId='maven-jar-plugin']/pom:configuration"
-%pom_xpath_remove "pom:plugin[pom:artifactId='maven-jar-plugin']/pom:executions"
-%pom_xpath_set "pom:plugin[pom:artifactId='munge-maven-plugin']/pom:executions/pom:execution/pom:phase" generate-sources core
-%pom_xpath_set "pom:plugin[pom:artifactId='munge-maven-plugin']/pom:executions/pom:execution/pom:goals/pom:goal" munge core
+# %pom_remove_dep :aopalliance core
+# %pom_remove_dep :asm core
+# %pom_remove_dep :cglib core
+# %pom_xpath_remove "pom:plugin[pom:artifactId='maven-jar-plugin']/pom:configuration"
+# %pom_xpath_remove "pom:plugin[pom:artifactId='maven-jar-plugin']/pom:executions"
+# %pom_xpath_set "pom:plugin[pom:artifactId='munge-maven-plugin']/pom:executions/pom:execution/pom:phase" generate-sources core
+# %pom_xpath_set "pom:plugin[pom:artifactId='munge-maven-plugin']/pom:executions/pom:execution/pom:goals/pom:goal" munge core
 
-%pom_xpath_inject "pom:dependency[pom:artifactId='guice']" "<scope>provided</scope>" extensions
+# %pom_xpath_inject "pom:dependency[pom:artifactId='guice']" "<scope>provided</scope>" extensions
 
 %build
-%{mvn_alias} "com.google.inject.extensions:" "org.sonatype.sisu.inject:"
+# %{mvn_alias} "com.google.inject.extensions:" "org.sonatype.sisu.inject:"
 
-%{mvn_package} :::no_aop: guice
-%{mvn_package} :guice:jar:{}: __noinstall
+# %{mvn_package} :::no_aop: guice
+# %{mvn_package} :guice:jar:{}: __noinstall
 
 %{mvn_file}  ":guice-{*}"  guice/guice-@1
 %{mvn_file}  ":guice" guice/%{name} %{name}
-%{mvn_alias} ":guice" "org.sonatype.sisu:sisu-guice"
+# %{mvn_alias} ":guice" "org.sonatype.sisu:sisu-guice"
 # Skip tests because of missing dependency guice-testlib
 %{mvn_build} -f -s
 
@@ -189,8 +182,6 @@ and above. This package provides Bill of Materials module for Guice.
 
 %files -n guice-jndi -f .mfiles-guice-jndi
 
-%files -n guice-multibindings -f .mfiles-guice-multibindings
-
 %files -n guice-servlet -f .mfiles-guice-servlet
 
 %files -n guice-throwingproviders -f .mfiles-guice-throwingproviders
@@ -198,6 +189,9 @@ and above. This package provides Bill of Materials module for Guice.
 %files -n guice-bom -f .mfiles-guice-bom
 
 %changelog
+* Wed Mar 27 2024 Riken Maharjan <rmaharjan@microsoft.com> - 5.1.0-1
+- Update google-guice to 5.1.0 using Fedora 40 (License:MIT)
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.3-12
 - Updating naming for 3.0 version of Azure Linux.
 

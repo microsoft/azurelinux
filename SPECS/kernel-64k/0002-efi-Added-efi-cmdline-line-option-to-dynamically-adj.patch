@@ -1,0 +1,76 @@
+From e6f9d139d200404b2f8ffd19b161425ec43be0fd Mon Sep 17 00:00:00 2001
+From: Siddharth Chintamaneni <siddharthc@microsoft.com>
+Date: Mon, 12 May 2025 18:36:58 +0000
+Subject: [PATCH] efi: Added efi cmdline line option to dynamically adjust
+ slack slots
+
+GB200 and GB200F suffered from less slack slots. While changing the
+slack slots to 32 resolved the issue for GB200, it failed to boot
+on GB200F. By experimentation we found that boot issue is resolved
+for GB200F by increasing the slack slots to 256. To prevent this
+sort of problem, we are providing a dynamic interface to grub cmdline
+to adjust the slack slots as required.
+
+Signed-off-by: Siddharth Chintamaneni <siddharthc@microsoft.com>
+---
+ drivers/firmware/efi/libstub/efi-stub-helper.c | 9 +++++++++
+ drivers/firmware/efi/libstub/efistub.h         | 2 ++
+ drivers/firmware/efi/libstub/mem.c             | 2 +-
+ 3 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/firmware/efi/libstub/efi-stub-helper.c b/drivers/firmware/efi/libstub/efi-stub-helper.c
+index 3dc2f9aaf08db..ae6fc8f6d544b 100644
+--- a/drivers/firmware/efi/libstub/efi-stub-helper.c
++++ b/drivers/firmware/efi/libstub/efi-stub-helper.c
+@@ -23,6 +23,7 @@ bool efi_novamap;
+ static bool efi_noinitrd;
+ static bool efi_nosoftreserve;
+ static bool efi_disable_pci_dma = IS_ENABLED(CONFIG_EFI_DISABLE_PCI_DMA);
++unsigned long efi_mmap_nr_slack_slots = EFI_MMAP_NR_SLACK_SLOTS;
+ 
+ int efi_mem_encrypt;
+ 
+@@ -75,6 +76,14 @@ efi_status_t efi_parse_options(char const *cmdline)
+ 			efi_loglevel = CONSOLE_LOGLEVEL_QUIET;
+ 		} else if (!strcmp(param, "noinitrd")) {
+ 			efi_noinitrd = true;
++		} else if (!strcmp(param, "efi_mmap_nr_slack_slots")) {
++				char *end;
++				unsigned long n = simple_strtol(val, &end, 10);
++				efi_info("Provided value of efi_slack_slots %ld.\n", n);
++				if (*end == '\0' && n > 32 && n <= 512 && powerof2(n)) {
++					efi_info("Updated the efi_slack_slots to %ld.\n", n);
++					efi_mmap_nr_slack_slots = n;
++				}
+ 		} else if (IS_ENABLED(CONFIG_X86_64) && !strcmp(param, "no5lvl")) {
+ 			efi_no5lvl = true;
+ 		} else if (IS_ENABLED(CONFIG_ARCH_HAS_MEM_ENCRYPT) &&
+diff --git a/drivers/firmware/efi/libstub/efistub.h b/drivers/firmware/efi/libstub/efistub.h
+index fc18fd649ed77..2b3f7f720b773 100644
+--- a/drivers/firmware/efi/libstub/efistub.h
++++ b/drivers/firmware/efi/libstub/efistub.h
+@@ -43,6 +43,8 @@ extern const efi_system_table_t *efi_system_table;
+ 
+ typedef union efi_dxe_services_table efi_dxe_services_table_t;
+ extern const efi_dxe_services_table_t *efi_dxe_table;
++extern unsigned long efi_mmap_nr_slack_slots;
++#define powerof2(x) ((((x)-1)&(x))==0)
+ 
+ efi_status_t __efiapi efi_pe_entry(efi_handle_t handle,
+ 				   efi_system_table_t *sys_table_arg);
+diff --git a/drivers/firmware/efi/libstub/mem.c b/drivers/firmware/efi/libstub/mem.c
+index 4f1fa302234d8..d6248cf0ee02f 100644
+--- a/drivers/firmware/efi/libstub/mem.c
++++ b/drivers/firmware/efi/libstub/mem.c
+@@ -33,7 +33,7 @@ efi_status_t efi_get_memory_map(struct efi_boot_memmap **map,
+ 	if (status != EFI_BUFFER_TOO_SMALL)
+ 		return EFI_LOAD_ERROR;
+ 
+-	size = tmp.map_size + tmp.desc_size * EFI_MMAP_NR_SLACK_SLOTS;
++	size = tmp.map_size + tmp.desc_size * efi_mmap_nr_slack_slots;
+ 	status = efi_bs_call(allocate_pool, memtype, sizeof(*m) + size,
+ 			     (void **)&m);
+ 	if (status != EFI_SUCCESS)
+-- 
+2.43.0
+

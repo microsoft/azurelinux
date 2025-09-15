@@ -12,9 +12,11 @@
 Summary: TPM Emulator
 Name:           swtpm
 Version:        0.8.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD-3-Clause
-Url:            http://github.com/stefanberger/swtpm
+URL:            http://github.com/stefanberger/swtpm
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:        %{url}/archive/%{gitcommit}/%{name}-%{gitshortcommit}.tar.gz
 
 BuildRequires:  make
@@ -191,6 +193,9 @@ fi
 %{_datadir}/swtpm/swtpm-create-tpmca
 
 %changelog
+* Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.8.1-5
+- Add missing Vendor and Distribution tags.
+
 * Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.8.1-4
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).  License verified.
 

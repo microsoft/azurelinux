@@ -1,0 +1,48 @@
+From 9786a62726de5a8caba10021c4d4a58c8a3e9e3f Mon Sep 17 00:00:00 2001
+From: Leonard Richardson <leonardr@segfault.org>
+Date: Wed, 21 Aug 2024 20:18:33 -0400
+Subject: * Changes to make tests work whether tests are run under soupsieve
+ 2.6   or an earlier version. Based on a patch by Stefano Rivera.
+
+---
+ bs4/tests/test_css.py | 13 +++++++++++--
+ 1 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/bs4/tests/test_css.py b/bs4/tests/test_css.py
+index 359dbcd..3c2318b 100644
+--- a/bs4/tests/test_css.py
++++ b/bs4/tests/test_css.py
+@@ -8,14 +8,23 @@ from bs4 import (
+     ResultSet,
+ )
+ 
++from packaging.version import Version
++
+ from . import (
+     SoupTest,
+     SOUP_SIEVE_PRESENT,
+ )
+ 
+ if SOUP_SIEVE_PRESENT:
+-    from soupsieve import SelectorSyntaxError
++    from soupsieve import __version__, SelectorSyntaxError
+ 
++    # Some behavior changes in soupsieve 2.6 that affects one of our
++    # tests.  For the test to run under all versions of Python
++    # supported by Beautiful Soup (which includes versions of Python
++    # not supported by soupsieve 2.6) we need to check both behaviors.
++    SOUPSIEVE_EXCEPTION_ON_UNSUPPORTED_PSEUDOCLASS = SelectorSyntaxError
++    if Version(__version__) < Version("2.6"):
++        SOUPSIEVE_EXCEPTION_ON_UNSUPPORTED_PSEUDOCLASS = NotImplementedError
+ 
+ @pytest.mark.skipif(not SOUP_SIEVE_PRESENT, reason="Soup Sieve not installed")
+ class TestCSSSelectors(SoupTest):
+@@ -332,7 +341,7 @@ class TestCSSSelectors(SoupTest):
+         assert "yes" == chosen.string
+ 
+     def test_unsupported_pseudoclass(self):
+-        with pytest.raises(NotImplementedError):
++        with pytest.raises(SOUPSIEVE_EXCEPTION_ON_UNSUPPORTED_PSEUDOCLASS):
+             self.soup.select("a:no-such-pseudoclass")
+ 
+         with pytest.raises(SelectorSyntaxError):

@@ -6,23 +6,24 @@ parameters:
     type: string
     default: "$(Build.SourcesDirectory)"
 
+  - name: checkBuildRetries
+    type: string
+    default: ""
+
   - name: concurrentPackageBuilds
     type: number
     default: 12
 
-  - name: customToolchainArtifactName
-    type: string
-    default: ""
-
   - name: customToolchainTarballName
     type: string
-    default: "toolchain_built_rpms_all.tar.gz"
-
-  - name: extraPackageRepos
-    type: string
     default: ""
 
-  - name: testRerunList
+  - name: dailyBuildID
+    type: string
+    default: ""
+    displayName: "Daily build ID"
+
+  - name: extraPackageRepos
     type: string
     default: ""
 
@@ -30,14 +31,34 @@ parameters:
     type: boolean
     default: true
 
-  - name: inputCacheArtifacts
+  - name: inputArtifactsFolder
+    type: string
+    default: "$(Agent.TempDirectory)"
+
+  - name: inputCacheRPMsTarballs
     type: object
     default: []
     # Sample:
-    # - name: build-artifacts
-    #   rpmsTarball: cache.tar.gz
+    #   - cache.tar.gz
+    #   - cache2.tar.gz
+
+  - name: isAllowToolchainRebuilds
+    type: string
+    default: "default"
+    values:
+      - "default"
+      - "false"
+      - "true"
 
   - name: isCheckBuild
+    type: string
+    default: "default"
+    values:
+      - "default"
+      - "false"
+      - "true"
+
+  - name: isDailyBuildUpdateManifests
     type: string
     default: "default"
     values:
@@ -105,7 +126,11 @@ parameters:
     type: string
     default: "srpms.tar.gz"
 
-  - name: pipArtifactFeeds
+  - name: packageBuildList
+    type: string
+    default: ""
+
+  - name: packageRebuildList
     type: string
     default: ""
 
@@ -125,6 +150,10 @@ parameters:
     type: string
     default: ""
 
+  - name: testRerunList
+    type: string
+    default: ""
+
   - name: testSuiteName
     type: string
     default: "Package test"
@@ -134,21 +163,9 @@ steps:
     parameters:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
-  - ${{ if parameters.pipArtifactFeeds }}:
-      - task: PipAuthenticate@1
-        inputs:
-          artifactFeeds: "${{ parameters.pipArtifactFeeds }}"
-        displayName: "Authenticate to custom pip artifact feeds"
-
-  - ${{ if parameters.customToolchainArtifactName }}:
-      - task: DownloadPipelineArtifact@2
-        displayName: "Download toolchain"
-        inputs:
-          artifact: "${{ parameters.customToolchainArtifactName }}"
-          patterns: "**/${{ parameters.customToolchainTarballName }}"
-
+  - ${{ if parameters.customToolchainTarballName }}:
       - script: |
-          toolchain_archive="$(find "$(Pipeline.Workspace)" -name "${{ parameters.customToolchainTarballName }}" -print -quit)"
+          toolchain_archive="$(find "${{ parameters.inputArtifactsFolder }}" -name "${{ parameters.customToolchainTarballName }}" -print -quit)"
           if [[ ! -f "$toolchain_archive" ]]; then
             echo "ERROR: toolchain archive not found!" >&2
             exit 1
@@ -158,17 +175,11 @@ steps:
           sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
         displayName: "Populate toolchain"
 
-  - ${{ each inputCacheArtifact in parameters.inputCacheArtifacts }}:
-      - task: DownloadPipelineArtifact@2
-        displayName: "Download input cache RPM from ${{ inputCacheArtifact.name }}"
-        inputs:
-          artifact: "${{ inputCacheArtifact.name }}"
-          patterns: "**/${{ inputCacheArtifact.rpmsTarball }}"
-
+  - ${{ each inputCacheRPMsTarball in parameters.inputCacheRPMsTarballs }}:
       - script: |
-          rpms_archive="$(find "$(Pipeline.Workspace)" -name "${{ inputCacheArtifact.rpmsTarball }}" -print -quit)"
+          rpms_archive="$(find "${{ parameters.inputArtifactsFolder }}" -name "${{ inputCacheRPMsTarball }}" -print -quit)"
           if [[ ! -f "$rpms_archive" ]]; then
-            echo "ERROR: cache RPMs archive '${{ inputCacheArtifact.rpmsTarball }}' not found!" >&2
+            echo "ERROR: cache RPMs archive '${{ inputCacheRPMsTarball }}' not found!" >&2
             exit 1
           fi
 
@@ -176,6 +187,26 @@ steps:
         displayName: "Populate cache RPMs"
 
   - script: |
+      if [[ -n "${{ parameters.checkBuildRetries }}" ]]; then
+        check_build_retries_arg="CHECK_BUILD_RETRIES=${{ parameters.checkBuildRetries }}"
+      fi
+
+      if [[ -n "${{ parameters.customToolchainTarballName }}" ]]; then
+        toolchain_archive_arg="TOOLCHAIN_ARCHIVE=$(toolchainArchive)"
+      fi
+
+      if [[ ${{ parameters.isAllowToolchainRebuilds }} == "true" ]]; then
+        allow_toolchain_rebuilds_arg="ALLOW_TOOLCHAIN_REBUILDS=y"
+      elif [[ ${{ parameters.isAllowToolchainRebuilds }} == "false" ]]; then
+        allow_toolchain_rebuilds_arg="ALLOW_TOOLCHAIN_REBUILDS=n"
+      fi
+
+      if [[ ${{ parameters.isCheckBuild }} == "true" ]]; then
+        run_check_arg="RUN_CHECK=y"
+      elif [[ ${{ parameters.isCheckBuild }} == "false" ]]; then
+        run_check_arg="RUN_CHECK=n"
+      fi
+
       if [[ ${{ parameters.isDeltaBuild }} == "true" ]]; then
         delta_fetch_arg="DELTA_FETCH=y"
       elif [[ ${{ parameters.isDeltaBuild }} == "false" ]]; then
@@ -188,33 +219,43 @@ steps:
         quick_rebuild_packages_arg="QUICK_REBUILD_PACKAGES=n"
       fi
 
-      if [[ ${{ parameters.isCheckBuild }} == "true" ]]; then
-        run_check_arg="RUN_CHECK=y"
-      elif [[ ${{ parameters.isCheckBuild }} == "false" ]]; then
-        run_check_arg="RUN_CHECK=n"
-      fi
-
       if [[ ${{ parameters.isUseCCache }} == "true" ]]; then
         use_ccache_arg="USE_CCACHE=y"
       elif [[ ${{ parameters.isUseCCache }} == "false" ]]; then
         use_ccache_arg="USE_CCACHE=n"
       fi
 
-      if [[ -n "${{ parameters.customToolchainArtifactName }}" ]]; then
-        toolchain_archive_arg="TOOLCHAIN_ARCHIVE=$(toolchainArchive)"
+      if [[ -n "${{ parameters.maxCascadingRebuilds }}" ]]; then
+        max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}"
+      fi
+
+      if [[ -n "${{ parameters.dailyBuildID }}" ]]; then
+        daily_build_id_arg="DAILY_BUILD_ID=${{ parameters.dailyBuildID }}"
+      fi
+
+      if [[ ${{ parameters.isDailyBuildUpdateManifests }} == "true" ]]; then
+        daily_build_update_manifests_arg="DAILY_BUILD_ID_UPDATE_MANIFESTS=y"
+      elif [[ ${{ parameters.isDailyBuildUpdateManifests }} == "false" ]]; then
+        daily_build_update_manifests_arg="DAILY_BUILD_ID_UPDATE_MANIFESTS=n"
       fi
 
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
-        MAX_CASCADING_REBUILDS="${{ parameters.maxCascadingRebuilds }}" \
         MAX_CPU="${{ parameters.maxCPU }}" \
+        PACKAGE_BUILD_LIST="${{ parameters.packageBuildList }}" \
+        PACKAGE_REBUILD_LIST="${{ parameters.packageRebuildList }}" \
         REBUILD_TOOLS=y \
         REPO_LIST="${{ parameters.extraPackageRepos }}" \
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
         SRPM_PACK_LIST="${{ parameters.srpmPackList }}" \
         TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
+        $allow_toolchain_rebuilds_arg \
+        $check_build_retries_arg \
+        $daily_build_id_arg \
+        $daily_build_update_manifests_arg \
         $delta_fetch_arg \
+        $max_cascading_rebuilds_arg \
         $quick_rebuild_packages_arg \
         $run_check_arg \
         $toolchain_archive_arg \
@@ -259,7 +300,7 @@ steps:
           - bash: |
               published_logs_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsLogsSubfolder }}"
               mkdir -p "$published_logs_dir"
-              tar -C "${{ parameters.buildRepoRoot }}/build/logs/pkggen" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
+              tar -C "${{ parameters.buildRepoRoot }}/build/logs" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
               tar -C "${{ parameters.buildRepoRoot }}/build/pkg_artifacts" -czf "$published_logs_dir/pkg_artifacts.tar.gz" .
               tar -C "${{ parameters.buildRepoRoot }}/build/timestamp" -czf "$published_logs_dir/timestamp.tar.gz" .
             condition: always()

@@ -1,18 +1,24 @@
+%global maj_ver 18
+%global min_ver 1
+%global patch_ver 8
+
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
-Version:        17.0.6
-Release:        3%{?dist}
+Version:        %{maj_ver}.%{min_ver}.%{patch_ver}
+Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://llvm.org/
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
+BuildRequires:  binutils-devel
 BuildRequires:  cmake
 BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  ninja-build
 BuildRequires:  python3-devel
+BuildRequires:  binutils-devel
 Requires:       libxml2
 Provides:       %{name} = %{version}
 Provides:       %{name} = %{version}-%{release}
@@ -29,7 +35,7 @@ The llvm-devel package contains libraries, header files and documentation
 for developing applications that use llvm.
 
 %prep
-%setup -q -n llvm-project-llvmorg-%{version}
+%autosetup -p1 -n llvm-project-llvmorg-%{version}
 
 %build
 # Disable symbol generation
@@ -52,13 +58,18 @@ cmake -G Ninja                              \
       -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF" \
       -DLLVM_INCLUDE_GO_TESTS=No            \
       -DLLVM_ENABLE_RTTI=ON                 \
-      -Wno-dev ../llvm
+      -DLLVM_BINUTILS_INCDIR=%{_includedir} \
+      -Wno-dev                              \
+      ../llvm
 
 %ninja_build LLVM
 %ninja_build
 
 %install
 %ninja_install -C build
+
+mkdir -p %{buildroot}%{_libdir}/bfd-plugins/
+ln -s -t %{buildroot}%{_libdir}/bfd-plugins/ ../LLVMgold.so
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -80,9 +91,21 @@ ninja check-all
 %files
 %defattr(-,root,root)
 %license LICENSE.TXT
-%{_bindir}/*
-%{_libdir}/*.so
-%{_libdir}/*.so.*
+%{_bindir}/bugpoint
+%{_bindir}/dsymutil
+%{_bindir}/llc
+%{_bindir}/lli
+%{_bindir}/llvm-*
+%{_bindir}/opt
+%{_bindir}/sancov
+%{_bindir}/sanstats
+%{_bindir}/verify-uselistorder
+%{_libdir}/bfd-plugins/LLVMgold.so
+%{_libdir}/LLVMgold.so
+%{_libdir}/libLLVM-%{maj_ver}.so
+%{_libdir}/libLLVM.so.%{maj_ver}.%{min_ver}
+%{_libdir}/libLTO.so*
+%{_libdir}/libRemarks.so*
 %dir %{_datadir}/opt-viewer
 %{_datadir}/opt-viewer/opt-diff.py
 %{_datadir}/opt-viewer/opt-stats.py
@@ -93,14 +116,35 @@ ninja check-all
 
 %files devel
 %{_libdir}/*.a
-%{_libdir}/cmake/*
-%{_includedir}/*
+%{_libdir}/cmake/llvm/*
+%{_libdir}/libLLVM.so
+%{_includedir}/llvm
+%{_includedir}/llvm-c
 
 %changelog
+* Tue Jun 03 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 18.1.8-1
+- Updated to version 18.1.8.
+- Removed the patch for CVE-2024-31852 - already fixed in 18.1.3.
+
+* Tue Sep 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-4
+- Update file listing with explicit filenames
+
+* Wed May 29 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 18.1.2-3
+- Patch CVE-2024-31852
+
+* Fri Apr 5 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 18.1.2-2
+- Added symlink for %{buildroot}%{_libdir}/bfd-plugins/ -> LLVMgold.so to the main package
+
+* Wed Apr 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-1
+- Upgrade to version 18.1.2
+
+* Wed Mar 27 2024 Andrew Phelps <anphel@microsoft.com> - 17.0.6-4
+- Define LLVM_BINUTILS_INCDIR so that LLVMgold.so is built.
+
 * Mon Feb 05 2024 Kanika Nema <kanikanema@microsoft.com> - 17.0.6-3
 - Re-add 'BPF' and 'AMDGPU' as target-to-build. Without them, clang cannot
   compile files for the specified targets.
- 
+
 * Wed Jan 31 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-2
 - Address %check issues
 

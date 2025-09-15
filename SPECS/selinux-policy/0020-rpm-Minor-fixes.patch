@@ -1,0 +1,63 @@
+From 094926d59c010b8ae1b11394d7f10085cb048fb6 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 25 Mar 2024 10:03:54 -0400
+Subject: [PATCH 20/24] rpm: Minor fixes.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/admin/rpm.te |  5 +++++
+ policy/modules/apps/gpg.if  | 18 ++++++++++++++++++
+ 2 files changed, 23 insertions(+)
+
+diff --git a/policy/modules/admin/rpm.te b/policy/modules/admin/rpm.te
+index 1a2210bc8..a646d0cef 100644
+--- a/policy/modules/admin/rpm.te
++++ b/policy/modules/admin/rpm.te
+@@ -248,6 +248,10 @@ optional_policy(`
+ 	')
+ ')
+ 
++optional_policy(`
++	gpg_watch_user_secrets_dirs(rpm_t)
++')
++
+ optional_policy(`
+ 	prelink_run(rpm_t, rpm_roles)
+ ')
+@@ -356,6 +360,7 @@ init_domtrans_script(rpm_script_t)
+ init_manage_all_units(rpm_script_t)
+ init_reload(rpm_script_t)
+ init_telinit(rpm_script_t)
++init_start_system(rpm_script_t)   # method_enqueue_marked_jobs
+ 
+ libs_exec_ld_so(rpm_script_t)
+ libs_exec_lib_files(rpm_script_t)
+diff --git a/policy/modules/apps/gpg.if b/policy/modules/apps/gpg.if
+index 8dd707d93..5d0faa422 100644
+--- a/policy/modules/apps/gpg.if
++++ b/policy/modules/apps/gpg.if
+@@ -515,3 +515,21 @@ interface(`gpg_dontaudit_search_user_secrets_dirs',`
+ 
+ 	dontaudit $1 gpg_secret_t:dir search;
+ ')
++
++########################################
++## <summary>
++##	Watch gpg user secret dirs.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`gpg_watch_user_secrets_dirs',`
++	gen_require(`
++		type gpg_secret_t;
++	')
++
++	allow $1 gpg_secret_t:dir watch;
++')
+-- 
+2.44.0
+

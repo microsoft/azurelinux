@@ -2,7 +2,7 @@
 %global gem_name rexml
 Summary:        REXML is an XML toolkit for Ruby
 Name:           rubygem-%{gem_name}
-Version:        3.2.6
+Version:        3.3.9
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -20,7 +20,7 @@ REXML was inspired by the Electric XML library for Java, which features an easy-
 REXML supports both tree and stream document parsing. Stream parsing is faster (about 1.5 times as fast). However, with stream parsing, you don't get access to features such as XPath.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%autosetup -n %{gem_name}-%{version} -p1
 
 %build
 gem build %{gem_name}
@@ -30,10 +30,20 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 
 %files
 %defattr(-,root,root,-)
-%doc %{gemdir}/gems/%{gem_name}-%{version}/LICENSE.txt
+%license LICENSE.txt
 %{gemdir}
 
 %changelog
+* Wed May 21 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.9-1
+- Auto-upgrade to 3.3.9 - fix CVE-2024-49761
+
+* Fri Aug 9 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 3.3.4-1
+- Upgrade to 3.3.4 to resolve CVE-2024-39908
+
+* Wed May 22 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 3.2.8-1
+- Upgrade to v3.2.8 to fix CVE-2024-35176
+- Add patch to support old strscan
+
 * Fri Nov 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.6-1
 - Auto-upgrade to 3.2.6 - Azure Linux 3.0 - package upgrades
 

@@ -1,50 +1,132 @@
+%global srcname voluptuous
+
+Name:      python-%{srcname}
+Version:   0.15.2
+Release:   2%{?dist}
+Summary:   Python data validation library
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-%global srcname voluptuous
-
-Name: python-%{srcname}
-Version: 0.11.7
-Release: 4%{?dist}
-Summary: A Python data validation library
-License: BSD
-URL: http://github.com/alecthomas/voluptuous
-Source0: %{pypi_source}
-
+License:   BSD-3-Clause
+URL:       https://github.com/alecthomas/voluptuous
+Source0:   %{pypi_source}#/%{name}-%{version}.tar.gz
 BuildArch: noarch
-BuildRequires: python3-devel
 
-%description
+%global _description %{expand:
 Voluptuous, despite the name, is a Python data validation library. It is 
-primarily intended for validating data coming into Python as JSON, YAML, etc.
+primarily intended for validating data coming into Python as JSON, YAML, etc.}
 
+%description %_description
 
 %package -n python3-%{srcname}
-Summary: A Python data validation library
-BuildRequires: python3-devel python3-setuptools
-%{?python_provide:%python_provide python3-%{srcname}}
+Summary: %{summary}
+BuildRequires: python3-devel
+BuildRequires:  python3dist(wheel)
+BuildRequires:  python3-pip
+BuildRequires: python3-setuptools
+BuildRequires: python3-pytest
 
-%description -n python3-%{srcname}
-Voluptuous, despite the name, is a Python data validation library. It is 
-primarily intended for validating data coming into Python as JSON, YAML, etc.
+%description -n python3-%{srcname} %_description
 
 %prep
 %autosetup -n %{srcname}-%{version}
 
+%generate_buildrequires
+%pyproject_buildrequires
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 
-%files -n python3-%{srcname}
+%pyproject_save_files voluptuous
+
+%check
+%pytest
+
+%files -n python3-%{srcname} -f %{pyproject_files}
 %doc README.md
 %license COPYING
-%{python3_sitelib}/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.11.7-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Feb 12 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.15.2-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Wed Aug 21 2024 Sergio Pascual <sergiopr@fedoraproject.org> - 0.15.2-1
+- New upstream source 0.15.2
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jun 27 2024 Sergio Pascual <sergiopr@fedoraproject.org> - 0.15.0-1
+- New upstream source 0.15.0
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 0.14.2-2
+- Rebuilt for Python 3.13
+
+* Mon Feb 05 2024 Sergio Pascual <sergiopr@fedoraproject.org> - 0.14.2-1
+- New upstream source 0.14.2
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Nov 26 2023 Sergio Pascual <sergiopr@fedoraproject.org> - 0.14.1-1
+- New upstream source 0.14.1
+- Updated license to SPDX
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.13.1-5
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 0.13.1-2
+- Rebuilt for Python 3.11
+
+* Thu Apr 07 2022 Fedora Release Monitoring <release-monitoring@fedoraproject.org> - 0.13.1-1
+- Update to 0.13.1 (#2073109)
+
+* Fri Apr 01 2022 Fabian Affolter <mail@fabian-affolter.ch> - 0.13.0-1
+- Update to latest upstream release 0.13.0 (closes rhbz#2070062)
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Oct 06 2021 Sergio Pascual <sergiopr@fedoraproject.org> - 0.12.2-1
+- New upstream source (0.12.2)
+
+* Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.1-4
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 0.12.1-3
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Dec 17 2020 Sergio Pascual <sergiopr@fedoraproject.org> - 0.12.1-1
+- New upstream source (0.12.1)
+
+* Wed Nov 04 2020 Sergio Pascual <sergiopr@fedoraproject.org> - 0.12.0-1
+- New upstream source (0.12.0)
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.11.7-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 0.11.7-4
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.11.7-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

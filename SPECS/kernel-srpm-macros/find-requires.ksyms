@@ -1,0 +1,188 @@
+#! /bin/bash
+#
+# This script is called during external module building to create dependencies
+# both upon the RHEL kernel, and on additional external modules. Symbols that
+# cannot be reconciled against those provided by the kernel are assumed to be
+# provided by an external module and "ksym" replaces th regular "kernel" dep.
+
+IFS=$'\n'
+export LC_ALL=C
+
+# Prevent elfutils from trying to download debuginfos
+unset DEBUGINFOD_URLS
+
+# Extract all of the symbols provided by this module.
+all_provides() {
+    for module in "$@"; do
+        tmpfile=""
+        if [ "x${module%.ko}" = "x${module}" ]; then
+            tmpfile=$(mktemp -t ${0##*/}.XXXXXX.ko)
+            proc_bin=
+            case "${module##*.}" in
+            zst)
+                    proc_bin=zstd
+                    ;;
+            xz)
+                    proc_bin=xz
+                    ;;
+            bz2)
+                    proc_bin=bzip2
+                    ;;
+            gz)
+                    proc_bin=gzip
+                    ;;
+            esac
+
+            [ -n "$proc_bin" ] || continue
+
+            "$proc_bin" -d -c - < "$module" > "$tmpfile" || continue
+            module="$tmpfile"
+        fi
+
+        objdump -t "$module" \
+        | awk \
+          -v 'dep_pfx='"$dep_pfx" \
+          -v 'module='"$module" \
+          --non-decimal-data \
+          'BEGIN { revbytes = 0 }
+
+          function check_endianness(   t) {
+              if (revbytes) return revbytes;
+
+              revbytes = -1;
+              while (("readelf -h \"" module "\"" | getline t) > 0) {
+                  if (match(t, /^  Data: *2\047s complement, little endian$/)) {
+                      revbytes = 1;
+                      break;
+                  }
+              }
+
+              return revbytes;
+          }
+
+          function readsect(name,   a, t) {
+              a = "";
+              while (("readelf -R \"" name "\" \"" module "\"" | getline t) > 0) {
+                  if (match(t, /^  0x[0-9a-f]{8}/))
+                      a = a substr(t, 14, 8) substr(t, 23, 8) substr(t, 32, 8) substr(t, 41, 8);
+              }
+              if (revbytes) { a = gensub(/(..)(..)(..)(..)/, "\\4\\3\\2\\1", "g", a); }
+              sectdata[name] = a;
+          }
+
+          match($0, /^([0-9a-f]+) [gl]...... (.*)	[0-9a-f]+ __crc_(.*)$/, a) {
+              if (a[2] == "*ABS*") {
+                  printf("%s(%s) = 0x%08x\n", dep_pfx, a[3], strtonum("0x" a[1]));
+              } else {
+                  if (!(a[2] in sectdata)) { readsect(a[2]) }
+                  printf("%s(%s) = 0x%08s\n", dep_pfx, a[3], substr(sectdata[a[2]], (strtonum("0x" a[1]) * 2) + 1, 8))
+              }
+          }'
+
+        [ -z "$tmpfile" ] || rm -f -- "$tmpfile"
+    done \
+    | sort -k1,1 -u
+}
+
+# Extract all of the requirements of this module.
+all_requires() {
+    for module in "$@"; do
+        set -- $(/sbin/modinfo -F vermagic "$module" | sed -e 's: .*::' -e q)
+        /sbin/modprobe --dump-modversions "$module" \
+        | awk --non-decimal-data '
+            BEGIN { FS = "\t" ; OFS = "\t" }
+            {printf("%s:0x%08x\n", $2, $1)}' \
+        | sed -r -e 's:$:\t'"$1"':'
+    done \
+    | sort -k1,1 -u
+}
+
+# Filter out requirements fulfilled by the module itself.
+mod_requires() {
+    join -t $'\t' -j 1 -v 1 \
+        <(all_requires "$@") \
+        <(all_provides "$@") \
+    | sort -k1,1 -u
+}
+
+if ! [ -e /sbin/modinfo -a -e /sbin/modprobe ]; then
+    cat > /dev/null
+    exit 0
+fi
+
+check_kabi() {
+    arch=$(uname -m)
+    kabi_file="/lib/modules/kabi-current/kabi_stablelist_$arch"
+
+    # If not installed, output a warning and return (continue)
+    if [ ! -f "$kabi_file" ]; then
+        echo "" >&2
+        echo "********************************************************************************" >&2
+        echo "*********************** KERNEL ABI COMPATIBILITY WARNING ***********************" >&2
+        echo "********************************************************************************" >&2
+        echo "The kernel ABI reference files (provided by "kabi-stablelists") were not found." >&2
+        echo "No compatibility check was performed. Please install the kABI reference files" >&2
+        echo "and rebuild if you would like to verify compatibility with kernel ABI." >&2
+        echo "" >&2
+        return
+    fi
+
+    unset non_kabi
+    for symbol in "$@"; do
+        if ! egrep "^[[:space:]]$symbol\$" $kabi_file >/dev/null; then
+            non_kabi=("${non_kabi[@]}" "$symbol")
+        fi
+    done
+
+    if [ ${#non_kabi[@]} -gt 0 ]; then
+        echo "" >&2
+        echo "********************************************************************************" >&2
+        echo "*********************** KERNEL ABI COMPATIBILITY WARNING ***********************" >&2
+        echo "********************************************************************************" >&2
+        echo "The following kernel symbols are not guaranteed to remain compatible with" >&2
+        echo "future kernel updates to this RHEL release:" >&2
+        echo "" >&2
+        for symbol in "${non_kabi[@]}"; do
+            printf "\t$symbol\n" >&2
+        done
+        echo "" >&2
+        echo "Red Hat recommends that you consider using only official kernel ABI symbols" >&2
+        echo "where possible. Requests for additions to the kernel ABI can be filed with" >&2
+        echo "your partner or customer representative (component: driver-update-program)." >&2
+        echo "" >&2
+    fi
+}
+
+modules=($(grep -E '/lib/modules/.+\.ko(\.gz|\.bz2|\.xz|\.zst)?$') "$@")
+if [ ${#modules[@]} -gt 0 ]; then
+    kernel=$(/sbin/modinfo -F vermagic "${modules[0]}" | sed -e 's: .*::' -e q)
+
+    # get all that kernel provides
+    symvers=$(mktemp -t ${0##*/}.XXXXX)
+
+    cat /usr/src/kernels/$kernel/Module.symvers | awk '
+        BEGIN { FS = "\t" ; OFS = "\t" }
+        { print $2 ":" $1 }
+    ' \
+    | sed -r -e 's:$:\t'"$kernel"':' \
+    | sort -k1,1 -u > $symvers
+
+    # Symbols matching with the kernel get a "kernel" dependency
+    mod_req=$(mktemp -t mod_req.XXXXX)
+    mod_requires "${modules[@]}" > "$mod_req"
+    join -t $'\t' -j 1 $symvers "$mod_req" | sort -u \
+    | awk 'BEGIN { FS = "[\t:]" ; OFS = "\t" } { print "kernel(" $1 ") = " $2 }'
+
+    # Symbols from elsewhere get a "ksym" dependency
+    join -t $'\t' -j 1 -v 2 $symvers "$mod_req" | sort -u \
+    | awk 'BEGIN { FS = "[\t:]" ; OFS = "\t" } { print "ksym(" $1 ") = " $2 }'
+
+    os_id=$(sed -nr '/^ID[[:space:]]*=/{ s/ID[[:space:]]*=[[:space:]]*//; s/^"(.*)"$/\1/; p }' /etc/os-release)
+    if [ "rhel" = "$os_id" ]; then
+        # Check kABI if the kabi-stablelists package is installed
+        # Do this last so we can try to output this error at the end
+        kabi_check_symbols=($(join -t $'\t' -j 1 $symvers "$mod_req" | sort -u \
+        | awk 'BEGIN { FS = "[\t:]" ; OFS = "\t" } { print $1 }'))
+        check_kabi "${kabi_check_symbols[@]}"
+    fi
+fi

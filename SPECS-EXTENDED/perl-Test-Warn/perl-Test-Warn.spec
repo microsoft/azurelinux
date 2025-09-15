@@ -1,12 +1,12 @@
 Name:           perl-Test-Warn
-Version:        0.36
-Release:        9%{?dist}
+Version:        0.37
+Release:        1%{?dist}
 Summary:        Perl extension to test methods for warnings
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Warn
-Source0:        https://cpan.metacpan.org/authors/id/B/BI/BIGJ/Test-Warn-%{version}.tar.gz#/perl-Test-Warn-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-Warn-%{version}.tar.gz
 BuildArch:      noarch
 # Build
 BuildRequires:  coreutils
@@ -24,13 +24,12 @@ BuildRequires:  perl(Sub::Uplevel) >= 0.12
 BuildRequires:  perl(Test::Builder) >= 0.13
 BuildRequires:  perl(warnings)
 # Test Suite
-BuildRequires:  perl(constant)
 BuildRequires:  perl(blib)
+BuildRequires:  perl(constant)
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::Builder::Tester) >= 1.02
 BuildRequires:  perl(Test::More)
 # Dependencies
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Test::Builder) >= 0.13
 
 # Filter under-specified dependencies
@@ -64,6 +63,10 @@ make test
 %{_mandir}/man3/Test::Warn.3*
 
 %changelog
+* Mon Feb 27 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.37-1
+- Update to version 0.37
+- License verified
+
 * Mon Apr 25 2022 Muhammad Falak <mwani@microsoft.com> - 0.36-9
 - Add an explicit BR on `perl(blib)` to enable ptest
 - License verified

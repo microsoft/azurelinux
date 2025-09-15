@@ -1,0 +1,125 @@
+From 2d6530941682595b26067a8b679ec2eb3aceae54 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mat=C4=9Bj=20Cepl?= <mcepl@cepl.eu>
+Date: Tue, 17 May 2022 16:00:47 +0200
+Subject: [PATCH 1/3] Make the code future-proof against removal of distutils
+ module.
+
+---
+ src/setup_common.py | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/src/setup_common.py b/src/setup_common.py
+index aec1f9b..3fb9086 100644
+--- a/src/setup_common.py
++++ b/src/setup_common.py
+@@ -30,7 +30,12 @@
+ if sys.version_info[0] < 3:
+     import commands as subprocess
+ from os import path as os_path
+-from distutils.sysconfig import get_python_lib
++try:
++    from distutils.sysconfig import get_python_lib, get_config_var
++    __python_lib = get_python_lib(1)
++except ImportError:
++    from sysconfig import get_config_var, get_path
++    __python_lib = get_path('platlib')
+ 
+ # libxml2 - C flags
+ def libxml2_include(incdir):
+@@ -50,7 +55,7 @@ def libxml2_include(incdir):
+ 
+ # libxml2 - library flags
+ def libxml2_lib(libdir, libs):
+-    libdir.append(get_python_lib(1))
++    libdir.append(__python_lib)
+     if os_path.exists("/etc/debian_version"): #. XXX: Debian Workaround...
+         libdir.append("/usr/lib/pymodules/python%d.%d"%sys.version_info[0:2])
+ 
+From 7c0788b5c5ed7d1c79f70a74047abab161dca13a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mat=C4=9Bj=20Cepl?= <mcepl@cepl.eu>
+Date: Mon, 17 Oct 2022 19:59:52 +0200
+Subject: [PATCH 2/3] Don't be too complicated.
+
+There is actually no reason to use distutils.sysconfig at all,
+plain sysconfig works even on 2.7.
+---
+ Makefile            | 3 ++-
+ src/setup_common.py | 9 ++-------
+ 2 files changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/src/setup_common.py b/src/setup_common.py
+index 3fb9086..97ece95 100644
+--- a/src/setup_common.py
++++ b/src/setup_common.py
+@@ -30,12 +30,7 @@
+ if sys.version_info[0] < 3:
+     import commands as subprocess
+ from os import path as os_path
+-try:
+-    from distutils.sysconfig import get_python_lib, get_config_var
+-    __python_lib = get_python_lib(1)
+-except ImportError:
+-    from sysconfig import get_config_var, get_path
+-    __python_lib = get_path('platlib')
++from sysconfig import get_config_var, get_path
+ 
+ # libxml2 - C flags
+ def libxml2_include(incdir):
+@@ -55,7 +50,7 @@ def libxml2_include(incdir):
+ 
+ # libxml2 - library flags
+ def libxml2_lib(libdir, libs):
+-    libdir.append(__python_lib)
++    libdir.append(get_path('platlib'))
+     if os_path.exists("/etc/debian_version"): #. XXX: Debian Workaround...
+         libdir.append("/usr/lib/pymodules/python%d.%d"%sys.version_info[0:2])
+ 
+
+From 860c730309366d6062c410ee975a2fc159452dc6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mat=C4=9Bj=20Cepl?= <mcepl@cepl.eu>
+Date: Wed, 26 Oct 2022 17:39:47 +0200
+Subject: [PATCH 3/3] Make the discovery of the build .so file more robust.
+
+Different versions of Python apparently generate different
+directory names, there doesn't seem to be any more reliable
+method of the .so file discovery than brutal force of the shell
+find command.
+---
+ Makefile | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+--- a/Makefile.backup	2022-11-17 06:51:28.000000000 +0100
++++ b/Makefile	2023-05-20 12:56:07.590575539 +0200
+@@ -44,12 +44,11 @@
+ PY_VER  := $(shell $(PY_BIN) -c 'import sys; print("%d.%d"%sys.version_info[0:2])')
+ PY_MV   := $(shell echo $(PY_VER) | cut -b 1)
+ PY      := python$(PY_VER)
+-SO_PATH := build/lib.linux-$(shell uname -m)-$(PY_VER)
+ ifeq ($(PY_MV),2)
+-	SO  := $(SO_PATH)/dmidecodemod.so
++	SOLIB  := dmidecodemod.so
+ else
+ 	SOABI := $(shell $(PY_BIN) -c 'import sysconfig; print(sysconfig.get_config_var("SOABI"))')
+-	SO  := $(SO_PATH)/dmidecodemod.$(SOABI).so
++	SOLIB  := dmidecodemod.$(SOABI).so
+ endif
+ SHELL	:= /bin/bash
+ 
+@@ -59,13 +58,13 @@
+ all : build dmidump
+ 
+ build: $(PY)-dmidecodemod.so
+-$(PY)-dmidecodemod.so: $(SO)
+-	cp $< $@
+-$(SO):
++
++$(PY)-dmidecodemod.so:
+ 	$(PY) src/setup.py build
++	cp $$(find build -name $(SOLIB)) $@
+ 
+ dmidump : src/util.o src/efi.o src/dmilog.o
+-	$(CC) -o $@ src/dmidump.c $^ -g -Wall -D_DMIDUMP_MAIN_
++	$(CC) -o $@ src/dmidump.c $^ ${CFLAGS} -D_DMIDUMP_MAIN_
+ 
+ install:
+ 	$(PY) src/setup.py install

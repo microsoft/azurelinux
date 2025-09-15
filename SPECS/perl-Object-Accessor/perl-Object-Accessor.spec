@@ -1,7 +1,7 @@
 Summary:        Interface to create per object accessors
 Name:           perl-Object-Accessor
 Version:        0.48
-Release:        9%{?dist}
+Release:        10%{?dist}
 Group:          Development/Libraries
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Object-Accessor
@@ -53,6 +53,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Fri May 24 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.48-10
+- Release bump to regenerate package's requires and provides.
+
 * Fri Jul 29 2022 Muhammad Falak <mwani@microsoft.com> - 0.48-9
 - Add BR on `perl(ExtUtils::MakeMaker)` & other check deps to enable ptest
 

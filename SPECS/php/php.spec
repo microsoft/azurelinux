@@ -7,8 +7,8 @@
 # Please preserve changelog entries
 #
 # API/ABI check
-%global apiver      20210902
-%global zendver     20210902
+%global apiver      20230831
+%global zendver     20230831
 %global pdover      20170320
 %define majmin %(echo %{version} | cut -d. -f1-2)
 
@@ -32,8 +32,8 @@
 %global with_qdbm     0
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
-Version:        8.1.22
-Release:        2%{?dist}
+Version:        8.3.23
+Release:        1%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -64,20 +64,20 @@ Source53:       20-ffi.ini
 # Build fixes
 Patch1:         php-7.4.0-httpd.patch
 Patch5:         php-7.2.0-includedir.patch
-Patch6:         php-8.0.0-embed.patch
+Patch6:         php-8.3.20-embed.patch
 Patch8:         php-8.1.0-libdb.patch
 # Functional changes
 # Use system nikic/php-parser
-Patch41:        php-8.1.0-parser.patch
+Patch41:        php-8.3.3-parser.patch
 # use system tzdata
-Patch42:        php-8.1.0-systzdata-v22.patch
+Patch42:        php-8.3.12-systzdata-v25.patch
 # See http://bugs.php.net/53436
 Patch43:        php-7.4.0-phpize.patch
 # Use -lldap_r for OpenLDAP
 Patch45:        php-7.4.0-ldap_r.patch
 # drop "Configure command" from phpinfo output
 # and only use gcc (instead of full version)
-Patch47:        php-8.1.0-phpinfo.patch
+Patch47:        php-8.3.14-phpinfo.patch
 # Upstream fixes (100+)
 # Security fixes (200+)
 # Fixes for tests (300+)
@@ -221,7 +221,7 @@ Provides:       php-exif
 Provides:       php-exif%{?_isa}
 Provides:       php-fileinfo
 Provides:       php-fileinfo%{?_isa}
-Provides:       bundled(libmagic) = 5.29
+Provides:       bundled(libmagic) = 5.43
 Provides:       php-filter
 Provides:       php-filter%{?_isa}
 Provides:       php-ftp
@@ -386,7 +386,8 @@ Summary:        A PostgreSQL database module for PHP
 # All files licensed under PHP version 3.01
 License:        PHP
 BuildRequires:  krb5-devel
-BuildRequires:  libpq-devel
+# PostgreSQL provides libpq and obsoletes older versions (see postgresql.spec)
+BuildRequires:  postgresql-devel
 BuildRequires:  openssl-devel
 Requires:       php-pdo%{?_isa} = %{version}-%{release}
 Provides:       php_database
@@ -726,7 +727,6 @@ cp TSRM/LICENSE TSRM_LICENSE
 cp Zend/asm/LICENSE BOOST_LICENSE
 cp sapi/fpm/LICENSE fpm_LICENSE
 cp ext/mbstring/libmbfl/LICENSE libmbfl_LICENSE
-cp ext/fileinfo/libmagic/LICENSE libmagic_LICENSE
 cp ext/bcmath/libbcmath/LICENSE libbcmath_LICENSE
 cp ext/date/lib/LICENSE.rst timelib_LICENSE
 
@@ -1362,7 +1362,6 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %files common -f files.common
 %doc EXTENSIONS NEWS UPGRADING* README.REDIST.BINS *md docs
 %license LICENSE TSRM_LICENSE ZEND_LICENSE BOOST_LICENSE
-%license libmagic_LICENSE
 %license timelib_LICENSE
 %doc php.ini-*
 %config(noreplace) %{_sysconfdir}/php.ini
@@ -1515,6 +1514,31 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Tue Jul 15 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 8.3.23-1
+- Upgrade to 8.3.23 to fix CVE-2025-1735, CVE-2025-6491, CVE-2025-1220
+- Fixed build issue by replacing php-8.0.0-embed.patch with php-8.3.20-embed.patch
+
+* Sun Mar 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.3.19-1
+- Auto-upgrade to 8.3.19 - for CVE-2025-1217 CVE-2025-1219, CVE-2025-1736, CVE-2025-1861
+
+* Wed Dec 04 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 8.3.14-1
+- Upgrade to 8.3.14 to fix CVE-2024-8932, CVE-2024-11234, CVE-2024-11233, CVE-2024-11236
+- Update patch for phpinfo
+
+* Wed Oct 16 2024 Archana Choudhary <archana1@microsoft.com> - 8.3.12-1
+- Upgarde to 8.3.12 to fix CVE-2024-8927, CVE-2024-8925
+- Refactor patch (with fuzzing) for system tzdata
+
+* Tue Jun 11 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 8.3.8-1
+- Upgrade to 8.3.8 to fix CVE-2024-4577, CVE-2024-5458, CVE-2024-5585
+
+* Tue May 07 2024 Gary Swalling <gaswal@microsoft.com> - 8.3.6-1
+- Upgrade to 8.3.6 to fix CVE-2024-2756, CVE-2024-2757, CVE-2024-3096
+- Update BuildRequires, libpq is now provided by postgresql
+
+* Tue Apr 23 2024 Andrew Phelps <anphel@microsoft.com> - 8.3.4-1
+- Upgrade to version 8.3.4
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.1.22-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

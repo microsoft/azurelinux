@@ -1,0 +1,40 @@
+#! /bin/sh
+
+# Create a table of all symbol sets defined in all /boot/symsets*.tar.gz
+# files.
+#
+# Format:
+#   kernelrelease/modver/symbol <tab> symset <tab> symset_hash
+#
+# This table is needed for computing the appropriate Requires: tags for
+# kernel module packages.
+
+tmpdir=$(mktemp -t -d ${0##*/}.XXXXXX)
+trap "cd / ; rm -rf $tmpdir" EXIT
+cd $tmpdir
+
+shopt -s nullglob
+for symsets in /boot/symsets-*.tar.gz; do
+    zcat $symsets \
+    | tar xf -
+done
+
+for symsets in /usr/src/kernels/*/symsets-*.tar.gz; do
+    zcat $symsets \
+    | tar xf -
+done
+
+for symsets in *; do
+    krel=${symsets#symsets-}
+    for symset in $symsets/*; do
+	class=${symset##*/} ; class=${class%.*}
+	hash=${symset##*.}
+	awk '
+	BEGIN { FS = "\t" ; OFS = "\t" }
+	{ sub(/0x0*/, "", $1)
+	  print krel "/" $1 "/" $2, class, hash }
+	' krel="$krel" class="$class" hash="$hash" $symset
+    done
+done
+
+# vim:shiftwidth=4 softtabstop=4

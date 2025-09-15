@@ -3,11 +3,11 @@ Distribution:   Azure Linux
 %undefine __cmake_in_source_build
 
 Name:          uchardet
-Version:       0.0.6
-Release:       17%{?dist}
+Version:       0.0.8
+Release:       7%{?dist}
 Summary:       An encoding detector library ported from Mozilla
 
-License:       MPLv1.1 or GPLv2+ or LGPLv2+
+License:       MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.0-or-later
 URL:           https://www.freedesktop.org/wiki/Software/%{name}
 Source0:       https://www.freedesktop.org/software/%{name}/releases/%{name}-%{version}.tar.xz
 
@@ -56,20 +56,39 @@ popd
 
 %files
 %license COPYING
-%doc AUTHORS
+%doc AUTHORS README.md
 %{_bindir}/%{name}
 %{_libdir}/lib%{name}.so.*
 %{_mandir}/man1/%{name}.1*
 
 %files devel
 %{_includedir}/%{name}/
+%{_libdir}/cmake/%{name}
 %{_libdir}/lib%{name}.so
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
-* Mon Apr 03 2023 Bala <balakumaran.kannan@microsoft.com> - 0.0.6-17
-- Initial CBL-Mariner import from Fedora 37 (license: MIT)
+* Mon Jan 13 2025 Archana Shettigar <v-shettigara@microsoft.com> - 0.0.8-7
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.8-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.8-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 28 2023 Akira TAGOH <tagoh@redhat.com> - 0.0.8-4
+- Correct License tag for SPDX migration.
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jan 13 2023 Vasiliy N. Glazov <vascom2@gmail.com> - 0.0.8-1
+- Update to 0.0.8
 
 * Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.6-16
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
@@ -161,3 +180,4 @@ popd
 
 * Mon Sep 21 2015 Ilya Gradina <ilya.gradina@gmail.com> - 0.0.0-1
 - Initial package
+

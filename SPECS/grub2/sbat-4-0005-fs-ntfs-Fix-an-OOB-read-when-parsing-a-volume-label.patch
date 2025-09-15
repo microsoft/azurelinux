@@ -1,0 +1,61 @@
+From 1fe82c41e070385e273d7bb1cfb482627a3c28e8 Mon Sep 17 00:00:00 2001
+From: Maxim Suhanov <dfirblog@gmail.com>
+Date: Mon, 28 Aug 2023 16:38:19 +0300
+Subject: [PATCH 5/6] fs/ntfs: Fix an OOB read when parsing a volume label
+
+This fix introduces checks to ensure that an NTFS volume label is always
+read from the corresponding file record segment.
+
+The current NTFS code allows the volume label string to be read from an
+arbitrary, attacker-chosen memory location. However, the bytes read are
+always treated as UTF-16LE. So, the final string displayed is mostly
+unreadable and it can't be easily converted back to raw bytes.
+
+The lack of this check is a minor issue, likely not causing a significant
+data leak.
+
+Reported-by: Maxim Suhanov <dfirblog@gmail.com>
+Signed-off-by: Maxim Suhanov <dfirblog@gmail.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/ntfs.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/fs/ntfs.c b/grub-core/fs/ntfs.c
+index bb70c89fb..ff5e3740f 100644
+--- a/grub-core/fs/ntfs.c
++++ b/grub-core/fs/ntfs.c
+@@ -1213,13 +1213,29 @@ grub_ntfs_label (grub_device_t device, char **label)
+ 
+   init_attr (&mft->attr, mft);
+   pa = find_attr (&mft->attr, GRUB_NTFS_AT_VOLUME_NAME);
++
++  if (pa >= mft->buf + (mft->data->mft_size << GRUB_NTFS_BLK_SHR))
++    {
++      grub_error (GRUB_ERR_BAD_FS, "can\'t parse volume label");
++      goto fail;
++    }
++
++  if (mft->buf + (mft->data->mft_size << GRUB_NTFS_BLK_SHR) - pa < 0x16)
++    {
++      grub_error (GRUB_ERR_BAD_FS, "can\'t parse volume label");
++      goto fail;
++    }
++
+   if ((pa) && (pa[8] == 0) && (u32at (pa, 0x10)))
+     {
+       int len;
+ 
+       len = u32at (pa, 0x10) / 2;
+       pa += u16at (pa, 0x14);
+-      *label = get_utf8 (pa, len);
++      if (mft->buf + (mft->data->mft_size << GRUB_NTFS_BLK_SHR) - pa >= 2 * len)
++        *label = get_utf8 (pa, len);
++      else
++        grub_error (GRUB_ERR_BAD_FS, "can\'t parse volume label");
+     }
+ 
+ fail:
+-- 
+2.34.1
+

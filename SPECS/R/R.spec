@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        A language for data analysis and graphics
 Name:           R
-Version:        4.3.2
+Version:        4.4.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -16,7 +16,6 @@ BuildRequires:  gfortran
 BuildRequires:  glibc-iconv
 BuildRequires:  make
 BuildRequires:  msopenjdk-17
-BuildRequires:  pcre
 BuildRequires:  pcre2
 BuildRequires:  pcre2-devel
 BuildRequires:  readline-devel
@@ -118,6 +117,12 @@ TZ="Europe/Paris" make check -k -i
 %endif
 
 %changelog
+* Thu Jul 11 2024 Tobias Brick <tobiasb@microsoft.com> - 4.4.1-1
+- Upgrade to 4.4.1, which fixes CVE-2024-27322
+
+* Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 4.3.2-2
+- Move from pcre to pcre2
+
 * Tue Feb 13 2024 Rohit Rawat <rohitrawat@microsoft.com> - 4.3.2-1
 - Upgrade to 4.3.2
 

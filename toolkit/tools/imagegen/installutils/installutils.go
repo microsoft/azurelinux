@@ -6,6 +6,7 @@ package installutils
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -15,6 +16,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
@@ -27,9 +29,11 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/tdnf"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/userutils"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"
 )
 
@@ -39,12 +43,24 @@ const (
 	// NullDevice represents the /dev/null device used as a mount device for overlay images.
 	NullDevice = "/dev/null"
 
+	// CmdlineSELinuxSecurityArg is the "security" arg needed for enabling SELinux.
+	CmdlineSELinuxSecurityArg = "security=selinux"
+
+	// CmdlineSELinuxEnabledArg is the "selinux" arg needed for disabling SELinux.
+	CmdlineSELinuxDisabledArg = "selinux=0"
+
+	// CmdlineSELinuxEnabledArg is the "selinux" arg needed for enabling SELinux.
+	CmdlineSELinuxEnabledArg = "selinux=1"
+
+	// CmdlineSELinuxEnforcingArg is the arg required for forcing SELinux to be in enforcing mode.
+	CmdlineSELinuxEnforcingArg = "enforcing=1"
+
 	// CmdlineSELinuxSettings is the kernel command-line args for enabling SELinux.
-	CmdlineSELinuxSettings = "security=selinux selinux=1"
+	CmdlineSELinuxSettings = CmdlineSELinuxSecurityArg + " " + CmdlineSELinuxEnabledArg
 
 	// CmdlineSELinuxForceEnforcing is the kernel command-line args for enabling SELinux and force it to be in
 	// enforcing mode.
-	CmdlineSELinuxForceEnforcing = CmdlineSELinuxSettings + " enforcing=1"
+	CmdlineSELinuxForceEnforcing = CmdlineSELinuxSettings + " " + CmdlineSELinuxEnforcingArg
 
 	// SELinuxConfigFile is the file path of the SELinux config file.
 	SELinuxConfigFile = "/etc/selinux/config"
@@ -52,10 +68,10 @@ const (
 	// SELinuxConfigEnforcing is the string value to set SELinux to enforcing in the /etc/selinux/config file.
 	SELinuxConfigEnforcing = "enforcing"
 
-	// SELinuxConfigEnforcing is the string value to set SELinux to permissive in the /etc/selinux/config file.
+	// SELinuxConfigPermissive is the string value to set SELinux to permissive in the /etc/selinux/config file.
 	SELinuxConfigPermissive = "permissive"
 
-	// SELinuxConfigEnforcing is the string value to set SELinux to disabled in the /etc/selinux/config file.
+	// SELinuxConfigDisabled is the string value to set SELinux to disabled in the /etc/selinux/config file.
 	SELinuxConfigDisabled = "disabled"
 
 	// GrubCfgFile is the filepath of the grub config file.
@@ -63,11 +79,16 @@ const (
 
 	// GrubDefFile is the filepath of the config file used by grub-mkconfig.
 	GrubDefFile = "/etc/default/grub"
+
+	// CombinedBootPartitionBootPrefix is the grub.cfg boot prefix used when the boot partition is the same as the
+	// rootfs partition.
+	CombinedBootPartitionBootPrefix = "/boot"
 )
 
 const (
 	overlay        = "overlay"
 	rootMountPoint = "/"
+	bootMountPoint = "/boot"
 
 	// rpmDependenciesDirectory is the directory which contains RPM database. It is not required for images that do not contain RPM.
 	rpmDependenciesDirectory = "/var/lib/rpm"
@@ -410,6 +431,51 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 	return
 }
 
+// orderPackageInstallList updates the order we will install packages if needed. Installing each package one at a time
+// can cause issues with ordering since we aren't doing a single transaction. For example, the initramfs regeneration is
+// done as a post transaction step and only needs to be done once after all other packages are installed. Since we are
+// not doing a single transaction it has an opportunity to trigger repeatedly. Moving it to the end of the list means it
+// will only trigger once.
+func orderPackageInstallList(packageList []string) []string {
+	const initramfsPackagePrefix = "initramfs"
+
+	initramfsPackages := []string{}
+	orderedPackageList := []string{}
+	for _, pkg := range packageList {
+		// Search for initramfs, ignoring any version info at the end of the package name.
+		if strings.HasPrefix(pkg, initramfsPackagePrefix) {
+			initramfsPackages = append(initramfsPackages, pkg)
+		} else {
+			orderedPackageList = append(orderedPackageList, pkg)
+		}
+	}
+	orderedPackageList = append(orderedPackageList, initramfsPackages...)
+	return orderedPackageList
+}
+
+// PackagelistContainsPackage checks if the given package is in the list of packages to install. It will do
+// a fuzzy search for the package name and try to ignore version info.
+//
+// The installer tools have an undocumented feature which can support both "pkg-name" and "pkg-name=version" formats.
+// This is in use, so we need to handle pinned versions in this check. Technically, 'tdnf' also supports "pkg-name-version" format,
+// but it is not easily distinguishable from "long-package-name" format so it will not be supported here.
+func PackagelistContainsPackage(packageList []string, packageName string) (found bool, err error) {
+	if packageName == "" {
+		return false, fmt.Errorf("can't search for an empty package name")
+	}
+
+	for _, pkg := range packageList {
+		pkgVer, err := pkgjson.PackageStringToPackageVer(pkg)
+		if err != nil {
+			return false, err
+		}
+		if pkgVer.Name == packageName {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 // PopulateInstallRoot fills the installroot with packages and configures the image for boot
 // - installChroot is a pointer to the install Chroot object
 // - packagesToInstall is a slice of packages to install
@@ -430,10 +496,9 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	defer timestamp.StopEvent(nil)
 
 	const (
-		filesystemPkg = "filesystem"
+		filesystemPkg  = "filesystem"
+		shadowUtilsPkg = "shadow-utils"
 	)
-
-	defer stopGPGAgent(installChroot)
 
 	ReportAction("Initializing RPM Database")
 
@@ -459,6 +524,9 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		}()
 	}
 
+	// Change the ordering if needed (ie make sure initramfs is last)
+	packagesToInstall = orderPackageInstallList(packagesToInstall)
+
 	// Calculate how many packages need to be installed so an accurate percent complete can be reported
 	installedPackages, err := calculateTotalPackages(packagesToInstall, installRoot)
 	if err != nil {
@@ -473,14 +541,36 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		return
 	}
 
-	// Keep a running total of how many packages have been installed through all the `TdnfInstallWithProgress` invocations
+	// Keep a running total of how many packages have been installed through all the `TdnfInstallWithProgress` and
+	// `TdnfInstallPriorityPackage` invocations
 	packagesInstalled := 0
 
 	timestamp.StartEvent("installing packages", nil)
 	// Install filesystem package first
-	packagesInstalled, err = TdnfInstallWithProgress(filesystemPkg, installRoot, packagesInstalled, totalPackages, true)
+	packagesInstalled, packagesToInstall, err = TdnfInstallPriorityPackage(filesystemPkg, installRoot, packagesToInstall, packagesInstalled, totalPackages, true)
 	if err != nil {
+		err = fmt.Errorf("failed to install (%s) package in preparation for image creation:\n%w", filesystemPkg, err)
 		return
+	}
+
+	// imageconfigvalidator should have ensured that we intend to install shadow-utils, so we can go ahead and do that here.
+	if len(config.Users) > 0 || len(config.Groups) > 0 {
+		var hasShadowUtils bool
+		hasShadowUtils, err = PackagelistContainsPackage(packagesToInstall, "shadow-utils")
+		if err != nil {
+			err = fmt.Errorf("failed to check for shadow-utils package in package list:\n%w", err)
+			return
+		}
+		if !hasShadowUtils {
+			err = fmt.Errorf("shadow-utils package must be added to the image's package lists when setting users or groups")
+			return
+		}
+
+		packagesInstalled, packagesToInstall, err = TdnfInstallPriorityPackage(shadowUtilsPkg, installRoot, packagesToInstall, packagesInstalled, totalPackages, true)
+		if err != nil {
+			err = fmt.Errorf("failed to install (%s) package in preparation for modifying users/groups:\n%w", shadowUtilsPkg, err)
+			return
+		}
 	}
 
 	hostname := config.Hostname
@@ -490,6 +580,18 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		if err != nil {
 			return
 		}
+	}
+
+	// Add groups
+	err = addGroups(installChroot, config.Groups)
+	if err != nil {
+		return
+	}
+
+	// Add users
+	err = addUsers(installChroot, config.Users)
+	if err != nil {
+		return
 	}
 
 	// Install packages one-by-one to avoid exhausting memory
@@ -517,23 +619,12 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		if err != nil {
 			return
 		}
-
-		// Add groups
-		err = addGroups(installChroot, config.Groups)
-		if err != nil {
-			return
-		}
 	}
 
-	// Add users
-	err = addUsers(installChroot, config.Users)
+	// Configure machine-id and other systemd state files
+	err = clearSystemdState(installChroot, config.EnableSystemdFirstboot)
 	if err != nil {
-		return
-	}
-
-	// Add machine-id
-	err = addMachineID(installChroot)
-	if err != nil {
+		err = fmt.Errorf("failed to clean systemd files:\n%w", err)
 		return
 	}
 
@@ -562,6 +653,17 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 	// Run post-install scripts from within the installroot chroot
 	err = runPostInstallScripts(installChroot, config)
+	if err != nil {
+		return
+	}
+
+	// The system should be fully populated with packages, we can clear the tdnf cache now to free up space.
+	if !config.PreserveTdnfCache {
+		err = cleanupTdnfCache(installChroot)
+		if err != nil {
+			return
+		}
+	}
 	return
 }
 
@@ -606,6 +708,23 @@ func TdnfInstall(packageName, installRoot string) (packagesInstalled int, err er
 	return
 }
 
+// TdnfInstallPriorityPackage installs a specific package, removing it from the list of packages to install in future
+// steps. This is useful for installing requirements for actual tooling operations that need to be installed before
+// other packages.
+func TdnfInstallPriorityPackage(priorityPackageName, installRoot string, packagesToInstall []string, currentPackagesInstalled, totalPackages int, reportProgress bool,
+) (packagesInstalled int, updatedPackagesToInstall []string, err error) {
+	packagesInstalled, err = TdnfInstallWithProgress(priorityPackageName, installRoot, currentPackagesInstalled, totalPackages, reportProgress)
+	if err != nil {
+		err = fmt.Errorf("failed to install priority package (%s):\n%w", priorityPackageName, err)
+		return packagesInstalled, packagesToInstall, err
+	}
+
+	// Remove the package from the list of packages to install if present
+	updatedPackagesToInstall = sliceutils.FindMatches(packagesToInstall, func(pkg string) bool { return pkg != priorityPackageName })
+
+	return packagesInstalled, updatedPackagesToInstall, err
+}
+
 // TdnfInstallWithProgress installs a package in the current environment while optionally reporting progress
 func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesInstalled, totalPackages int, reportProgress bool) (packagesInstalled int, err error) {
 	timestamp.StartEvent("installing"+packageName, nil)
@@ -616,15 +735,10 @@ func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesIns
 
 	packagesInstalled = currentPackagesInstalled
 
-	onStdout := func(args ...interface{}) {
+	onStdout := func(line string) {
 		const tdnfInstallPrefix = "Installing/Updating: "
 
 		// Only process lines that match tdnfInstallPrefix
-		if len(args) == 0 {
-			return
-		}
-
-		line := args[0].(string)
 		if !strings.HasPrefix(line, tdnfInstallPrefix) {
 			return
 		}
@@ -653,9 +767,12 @@ func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesIns
 	}
 
 	// TDNF 3.x uses repositories from installchroot instead of host. Passing setopt for repo files directory to use local repo for installroot installation
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", "-v", "install", packageName,
-		"--installroot", installRoot, "--nogpgcheck", "--assumeyes", "--setopt", "reposdir=/etc/yum.repos.d/",
-		releaseverCliArg)
+	err = shell.NewExecBuilder("tdnf", "-v", "install", packageName, "--installroot", installRoot, "--nogpgcheck",
+		"--assumeyes", "--setopt", "reposdir=/etc/yum.repos.d/", releaseverCliArg).
+		StdoutCallback(onStdout).
+		LogLevel(logrus.TraceLevel, logrus.WarnLevel).
+		WarnLogLines(shell.DefaultWarnLogLines).
+		Execute()
 	if err != nil {
 		logger.Log.Warnf("Failed to tdnf install: %v. Package name: %v", err, packageName)
 	}
@@ -732,7 +849,7 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 		// end with an empty line.
 		for _, line := range splitStdout {
 			matches := tdnf.InstallPackageRegex.FindStringSubmatch(line)
-			if len(matches) != tdnf.InstallMaxMatchLen {
+			if len(matches) != tdnf.InstallPackageMaxMatchLen {
 				// This line contains output other than a package information; skip it
 				continue
 			}
@@ -762,36 +879,158 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 	return
 }
 
-// addMachineID creates the /etc/machine-id file in the installChroot, if it is
-// not already present (systemd package will include it if installed).
-func addMachineID(installChroot *safechroot.Chroot) (err error) {
-	// From https://www.freedesktop.org/software/systemd/man/machine-id.html:
+// clearSystemdState clears the systemd state files that should be unique to each instance of the image. This is
+// based on https://systemd.io/BUILDING_IMAGES/. Primarily, this function will ensure that /etc/machine-id is configured
+// correctly, and that random seed and credential files are removed if they exist.
+// - installChroot is the chroot to modify
+// - enableSystemdFirstboot will set the machine-id file to "uninitialized" if true, and "" if false
+func clearSystemdState(installChroot *safechroot.Chroot, enableSystemdFirstboot bool) (err error) {
+	const (
+		machineIDFile         = "/etc/machine-id"
+		machineIDFirstBootOn  = "uninitialized\n"
+		machineIDFirstbootOff = ""
+		machineIDFilePerms    = 0444
+	)
+
+	// These state files are very unlikely to be present, but we should be thorough and check for them.
+	// See https://systemd.io/BUILDING_IMAGES/ for more information.
+	var otherFilesToRemove = []string{
+		"/var/lib/systemd/random-seed",
+		"/boot/efi/loader/random-seed",
+		"/var/lib/systemd/credential.secret",
+	}
+
+	// From https://www.freedesktop.org/software/systemd/man/latest/machine-id.html#Initialization:
 	// For operating system images which are created once and used on multiple
 	// machines, for example for containers or in the cloud, /etc/machine-id
 	// should be either missing or an empty file in the generic file system
 	// image (the difference between the two options is described under
-	//"First Boot Semantics" below). An ID will be generated during boot and
+	// "First Boot Semantics" below). An ID will be generated during boot and
 	// saved to this file if possible. Having an empty file in place is useful
 	// because it allows a temporary file to be bind-mounted over the real file,
 	// in case the image is used read-only
+	//
+	// From https://www.freedesktop.org/software/systemd/man/latest/machine-id.html#First%20Boot%20Semantics:
+	//     etc/machine-id is used to decide whether a boot is the first one. The rules are as follows:
+	//     1. The kernel command argument systemd.condition-first-boot= may be used to override the autodetection logic,
+	//         see kernel-command-line(7).
+	//     2. Otherwise, if /etc/machine-id does not exist, this is a first boot. During early boot, systemd will write
+	//         "uninitialized\n" to this file and overmount a temporary file which contains the actual machine ID. Later
+	//         (after first-boot-complete.target has been reached), the real machine ID will be written to disk.
+	//     3. If /etc/machine-id contains the string "uninitialized", a boot is also considered the first boot. The same
+	//         mechanism as above applies.
+	//     4. If /etc/machine-id exists and is empty, a boot is not considered the first boot. systemd will still
+	//         bind-mount a file containing the actual machine-id over it and later try to commit it to disk (if /etc/ is
+	//         writable).
+	//     5. If /etc/machine-id already contains a valid machine-id, this is not a first boot.
+	//     If according to the above rules a first boot is detected, units with ConditionFirstBoot=yes will be run and
+	//     systemd will perform additional initialization steps, in particular presetting units.
+	//
+	// We will use option 4) by default since AZL has traditionally not used firstboot mechanisms. All configuration
+	// that systemd-firstboot would set should have already been configured by the imager tool. It is important to
+	// create an empty file so that read-only configurations will work as expected. If the user requests that firstboot
+	// be enabled we will set it to "uninitalized" as per option 3).
 
-	const (
-		machineIDFile      = "/etc/machine-id"
-		machineIDFilePerms = 0444
-	)
+	ReportAction("Configuring systemd state files for first boot")
 
-	ReportAction("Configuring machine id")
-
+	// The systemd package will create this file, but if its not installed, we need to create it.
 	exists, err := file.PathExists(filepath.Join(installChroot.RootDir(), machineIDFile))
 	if err != nil {
 		err = fmt.Errorf("failed to check if machine-id exists:\n%w", err)
 		return
 	}
 	if !exists {
-		err = installChroot.UnsafeRun(func() error {
-			return file.Create(machineIDFile, machineIDFilePerms)
-		})
+		logger.Log.Debug("Creating empty machine-id file")
+		err = file.Create(filepath.Join(installChroot.RootDir(), machineIDFile), machineIDFilePerms)
+		if err != nil {
+			err = fmt.Errorf("failed to create empty machine-id:\n%w", err)
+			return err
+		}
 	}
+
+	if enableSystemdFirstboot {
+		ReportAction("Enabling systemd firstboot")
+		err = file.Write(machineIDFirstBootOn, filepath.Join(installChroot.RootDir(), machineIDFile))
+	} else {
+		ReportAction("Disabling systemd firstboot")
+		err = file.Write(machineIDFirstbootOff, filepath.Join(installChroot.RootDir(), machineIDFile))
+	}
+	if err != nil {
+		err = fmt.Errorf("failed to write empty machine-id:\n%w", err)
+		return err
+	}
+
+	// These files should not be present in the image, but per https://systemd.io/BUILDING_IMAGES/ we should
+	// be thorough and double-check.
+	for _, filePath := range otherFilesToRemove {
+		fullPath := filepath.Join(installChroot.RootDir(), filePath)
+		exists, err = file.PathExists(fullPath)
+		if err != nil {
+			err = fmt.Errorf("failed to check if systemd state file (%s) exists:\n%w", filePath, err)
+			return err
+		}
+
+		// Do an explicit check for existence so we can log the file removal.
+		if exists {
+			ReportActionf("Removing systemd state file (%s)", filePath)
+			err = file.RemoveFileIfExists(fullPath)
+			if err != nil {
+				err = fmt.Errorf("failed to remove systemd state file (%s):\n%w", filePath, err)
+				return err
+			}
+		}
+	}
+
+	return
+}
+
+// AddImageIDFile adds image-id file in the /etc directory of the install root.
+// The file contains the following fields:
+// BUILD_NUMBER: The build number of the image
+// IMAGE_BUILD_DATE: The date when the image is built in format YYYYMMDDHHMMSS
+// IMAGE_UUID: The UUID of the image
+func AddImageIDFile(installChrootRootDir string, buildNumber string) (err error) {
+	// Check if /etc directory exists and it does not, throw an error
+	_, err = os.Stat(filepath.Join(installChrootRootDir, "/etc"))
+	if err != nil {
+		if os.IsNotExist(err) {
+			err = fmt.Errorf("directory /etc does not exist in the install root")
+		}
+		return
+	}
+
+	// If buildNumber is empty, then default to "local"
+	if buildNumber == "" {
+		buildNumber = "local"
+	}
+
+	const (
+		imageIDFile      = "/etc/image-id"
+		imageIDFilePerms = 0444
+	)
+
+	ReportAction("Creating image-id file")
+
+	// Get the current time in UTC and in format "YYYYMMDDHHMMSS"
+	imageBuildDate := time.Now().UTC().Format("20060102150405")
+
+	imageIDContent := fmt.Sprintf("BUILD_NUMBER=%s\nIMAGE_BUILD_DATE=%s\nIMAGE_UUID=%s\n", buildNumber, imageBuildDate, uuid.New().String())
+	imageIDFilePath := filepath.Join(installChrootRootDir, imageIDFile)
+
+	fileCreateErr := file.Create(imageIDFilePath, imageIDFilePerms)
+	if fileCreateErr != nil {
+		err = fmt.Errorf("failed to create image-id file: %v", fileCreateErr)
+		return
+	}
+
+	ReportAction(fmt.Sprintf("Writing following content to image-id file: %s", imageIDContent))
+
+	fileWriteErr := file.Write(imageIDContent, imageIDFilePath)
+	if fileWriteErr != nil {
+		err = fmt.Errorf("failed to write to image-id file: %v", fileWriteErr)
+		return
+	}
+
 	return
 }
 
@@ -920,7 +1159,6 @@ func addEntryToFstab(fullFstabPath, mountPoint, devicePath, fsType, mountArgs st
 		defaultOptions   = "defaults"
 		swapFsType       = "swap"
 		swapOptions      = "sw"
-		readOnlyOptions  = "ro"
 		defaultDump      = "0"
 		disablePass      = "0"
 		rootPass         = "1"
@@ -931,9 +1169,6 @@ func addEntryToFstab(fullFstabPath, mountPoint, devicePath, fsType, mountArgs st
 
 	if mountArgs == "" {
 		options = defaultOptions
-		if diskutils.IsReadOnlyDevice(devicePath) {
-			options = fmt.Sprintf("%s,%s", options, readOnlyOptions)
-		}
 	} else {
 		options = mountArgs
 	}
@@ -944,7 +1179,7 @@ func addEntryToFstab(fullFstabPath, mountPoint, devicePath, fsType, mountArgs st
 
 	// Get the block device
 	var device string
-	if diskutils.IsEncryptedDevice(devicePath) || diskutils.IsReadOnlyDevice(devicePath) || doPseudoFsMount {
+	if diskutils.IsEncryptedDevice(devicePath) || doPseudoFsMount {
 		device = devicePath
 	} else {
 		device, err = FormatMountIdentifier(identifierType, devicePath)
@@ -1012,27 +1247,42 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 	return
 }
 
-func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVerityRootEnable bool,
-	partitionSettings []configuration.PartitionSetting, kernelCommandLine configuration.KernelCommandLine,
-	installChroot *safechroot.Chroot, diskDevPath string, mountPointMap map[string]string,
-	encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, enableGrubMkconfig bool,
+func ConfigureDiskBootloader(bootType string, encryptionEnable bool, partitionSettings []configuration.PartitionSetting,
+	kernelCommandLine configuration.KernelCommandLine, installChroot *safechroot.Chroot, diskDevPath string,
+	mountPointMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, enableGrubMkconfig bool,
 	includeLegacyGrubCfg bool,
 ) (err error) {
 	timestamp.StartEvent("configuring bootloader", nil)
 	defer timestamp.StopEvent(nil)
 
-	const rootMountPoint = "/"
-	const bootMountPoint = "/boot"
+	if mountPointMap[rootMountPoint] == NullDevice {
+		// In case of overlay device being mounted at root, no need to change the bootloader.
+		return
+	}
 
-	var rootDevice string
+	rootPartitionSetting := configuration.FindRootPartitionSetting(partitionSettings)
+	if rootPartitionSetting == nil {
+		err = fmt.Errorf("failed to find partition setting for root mountpoint")
+		return
+	}
+	rootMountIdentifier := rootPartitionSetting.MountIdentifier
 
+	return ConfigureDiskBootloaderWithRootMountIdType(bootType, encryptionEnable, rootMountIdentifier, kernelCommandLine,
+		installChroot, diskDevPath, mountPointMap, encryptedRoot, enableGrubMkconfig, includeLegacyGrubCfg)
+}
+
+func ConfigureDiskBootloaderWithRootMountIdType(bootType string, encryptionEnable bool,
+	rootMountIdentifier configuration.MountIdentifier, kernelCommandLine configuration.KernelCommandLine,
+	installChroot *safechroot.Chroot, diskDevPath string, mountPointMap map[string]string,
+	encryptedRoot diskutils.EncryptedRootDevice, enableGrubMkconfig bool, includeLegacyGrubCfg bool,
+) (err error) {
 	// Add bootloader. Prefer a separate boot partition if one exists.
 	bootDevice, isBootPartitionSeparate := mountPointMap[bootMountPoint]
 	bootPrefix := ""
 	if !isBootPartitionSeparate {
 		bootDevice = mountPointMap[rootMountPoint]
 		// If we do not have a separate boot partition we will need to add a prefix to all paths used in the configs.
-		bootPrefix = "/boot"
+		bootPrefix = CombinedBootPartitionBootPrefix
 	}
 
 	if mountPointMap[rootMountPoint] == NullDevice {
@@ -1054,23 +1304,10 @@ func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVer
 	}
 
 	// Add grub config to image
-	rootPartitionSetting := configuration.FindRootPartitionSetting(partitionSettings)
-	if rootPartitionSetting == nil {
-		err = fmt.Errorf("failed to find partition setting for root mountpoint")
-		return
-	}
-	rootMountIdentifier := rootPartitionSetting.MountIdentifier
+	var rootDevice string
 	if encryptionEnable {
 		// Encrypted devices don't currently support identifiers
 		rootDevice = mountPointMap[rootMountPoint]
-	} else if readOnlyVerityRootEnable {
-		var partIdentifier string
-		partIdentifier, err = FormatMountIdentifier(rootMountIdentifier, readOnlyRoot.BackingDevice)
-		if err != nil {
-			err = fmt.Errorf("failed to get partIdentifier: %s", err)
-			return
-		}
-		rootDevice = fmt.Sprintf("verityroot:%v", partIdentifier)
 	} else {
 		var partIdentifier string
 		partIdentifier, err = FormatMountIdentifier(rootMountIdentifier, mountPointMap[rootMountPoint])
@@ -1084,7 +1321,7 @@ func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVer
 
 	// Grub will always use filesystem UUID, never PARTUUID or PARTLABEL
 	err = InstallGrubDefaults(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot,
-		kernelCommandLine, readOnlyRoot, isBootPartitionSeparate, includeLegacyGrubCfg)
+		kernelCommandLine, isBootPartitionSeparate, includeLegacyGrubCfg)
 	if err != nil {
 		err = fmt.Errorf("failed to install main grub config file: %s", err)
 		return
@@ -1139,11 +1376,11 @@ func InstallGrubEnv(installRoot string) (err error) {
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
 func InstallGrubDefaults(installRoot, rootDevice, bootUUID, bootPrefix string,
 	encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine,
-	readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool, includeLegacyCfg bool,
+	isBootPartitionSeparate bool, includeLegacyCfg bool,
 ) (err error) {
 	// Copy the bootloader's /etc/default/grub and set the file permission
 	err = installGrubTemplateFile(resources.AssetsGrubDefFile, GrubDefFile, installRoot, rootDevice, bootUUID,
-		bootPrefix, encryptedRoot, kernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
+		bootPrefix, encryptedRoot, kernelCommandLine, isBootPartitionSeparate)
 	if err != nil {
 		logger.Log.Warnf("Failed to install (%s): %v", GrubDefFile, err)
 		return
@@ -1152,7 +1389,7 @@ func InstallGrubDefaults(installRoot, rootDevice, bootUUID, bootPrefix string,
 	if includeLegacyCfg {
 		// Add the legacy /boot/grub2/grub.cfg file, which was used in Azure Linux 2.0.
 		err = installGrubTemplateFile(resources.AssetsGrubCfgFile, GrubCfgFile, installRoot, rootDevice, bootUUID,
-			bootPrefix, encryptedRoot, kernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
+			bootPrefix, encryptedRoot, kernelCommandLine, isBootPartitionSeparate)
 		if err != nil {
 			logger.Log.Warnf("Failed to install (%s): %v", GrubCfgFile, err)
 			return
@@ -1164,7 +1401,7 @@ func InstallGrubDefaults(installRoot, rootDevice, bootUUID, bootPrefix string,
 
 func installGrubTemplateFile(assetFile, targetFile, installRoot, rootDevice, bootUUID, bootPrefix string,
 	encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine,
-	readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool,
+	isBootPartitionSeparate bool,
 ) (err error) {
 	installGrubDefFile := filepath.Join(installRoot, targetFile)
 
@@ -1216,12 +1453,6 @@ func installGrubTemplateFile(assetFile, targetFile, installRoot, rootDevice, boo
 		return
 	}
 
-	err = setGrubCfgReadOnlyVerityRoot(installGrubDefFile, readOnlyRoot)
-	if err != nil {
-		logger.Log.Warnf("Failed to set verity root in in %s: %v", installGrubDefFile, err)
-		return
-	}
-
 	err = setGrubCfgSELinux(installGrubDefFile, kernelCommandLine)
 	if err != nil {
 		logger.Log.Warnf("Failed to set SELinux in %s: %v", installGrubDefFile, err)
@@ -1251,7 +1482,7 @@ func installGrubTemplateFile(assetFile, targetFile, installRoot, rootDevice, boo
 	return
 }
 
-func CallGrubMkconfig(installChroot *safechroot.Chroot) (err error) {
+func CallGrubMkconfig(installChroot safechroot.ChrootInterface) (err error) {
 	squashErrors := false
 
 	ReportActionf("Running grub2-mkconfig...")
@@ -1311,6 +1542,9 @@ func addGroups(installChroot *safechroot.Chroot, groups []configuration.Group) (
 		err = installChroot.UnsafeRun(func() error {
 			return shell.ExecuteLive(squashErrors, "groupadd", args...)
 		})
+		if err != nil {
+			return fmt.Errorf("failed to add group (%s):\n%w", group.Name, err)
+		}
 	}
 
 	return
@@ -1335,12 +1569,14 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 			rootUserAdded = true
 		}
 
-		err = ConfigureUserGroupMembership(installChroot, user.Name, user.PrimaryGroup, user.SecondaryGroups)
+		// Primary group will have already been set when the user was created so we don't need to set it again
+		err = ConfigureUserSecondaryGroupMembership(installChroot, user.Name, user.SecondaryGroups)
 		if err != nil {
 			return
 		}
 
-		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys)
+		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys,
+			false /*includeExistingKeys*/)
 		if err != nil {
 			return
 		}
@@ -1406,7 +1642,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 		}
 		isRoot = true
 	} else {
-		err = userutils.AddUser(user.Name, hashedPassword, user.UID, installChroot)
+		err = userutils.AddUser(user.Name, user.HomeDirectory, user.PrimaryGroup, hashedPassword, user.UID, installChroot)
 		if err != nil {
 			return
 		}
@@ -1494,7 +1730,7 @@ func Chage(installChroot safechroot.ChrootInterface, passwordExpirationInDays in
 
 				if passwordChanged == "" {
 					// Set to the number of days since epoch
-					fields[passwordChangedField] = fmt.Sprintf("%d", int64(time.Since(time.Unix(0, 0)).Hours()/24))
+					fields[passwordChangedField] = fmt.Sprintf("%d", DaysSinceUnixEpoch())
 				}
 				passwordAge, err = strconv.ParseInt(fields[passwordChangedField], 10, 64)
 				if err != nil {
@@ -1517,31 +1753,34 @@ func Chage(installChroot safechroot.ChrootInterface, passwordExpirationInDays in
 	return fmt.Errorf(`user "%s" not found when trying to change the password expiration date`, username)
 }
 
-func ConfigureUserGroupMembership(installChroot safechroot.ChrootInterface, username string, primaryGroup string,
-	secondaryGroups []string,
-) (err error) {
-	const squashErrors = false
+func DaysSinceUnixEpoch() int64 {
+	return int64(time.Since(time.Unix(0, 0)).Hours() / 24)
+}
 
-	// Update primary group
+func ConfigureUserPrimaryGroupMembership(installChroot safechroot.ChrootInterface, username string, primaryGroup string,
+) (err error) {
 	if primaryGroup != "" {
 		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "usermod", "-g", primaryGroup, username)
+			return shell.ExecuteLiveWithErr(1, "usermod", "-g", primaryGroup, username)
 		})
 
 		if err != nil {
-			return
+			return fmt.Errorf("failed to set user's (%s) primary group (%s):\n%w", username, primaryGroup, err)
 		}
 	}
 
-	// Update secondary groups
+	return
+}
+
+func ConfigureUserSecondaryGroupMembership(installChroot safechroot.ChrootInterface, username string, secondaryGroups []string,
+) (err error) {
 	if len(secondaryGroups) != 0 {
 		allGroups := strings.Join(secondaryGroups, ",")
 		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "usermod", "-a", "-G", allGroups, username)
+			return shell.ExecuteLiveWithErr(1, "usermod", "-a", "-G", allGroups, username)
 		})
-
 		if err != nil {
-			return
+			return fmt.Errorf("failed to set user's (%s) secondary groups:\n%w", username, err)
 		}
 	}
 
@@ -1550,8 +1789,7 @@ func ConfigureUserGroupMembership(installChroot safechroot.ChrootInterface, user
 
 func ConfigureUserStartupCommand(installChroot safechroot.ChrootInterface, username string, startupCommand string) (err error) {
 	const (
-		passwdFilePath = "etc/passwd"
-		sedDelimiter   = "|"
+		sedDelimiter = "|"
 	)
 
 	if startupCommand == "" {
@@ -1562,7 +1800,7 @@ func ConfigureUserStartupCommand(installChroot safechroot.ChrootInterface, usern
 
 	findPattern := fmt.Sprintf(`^\(%s.*\):[^:]*$`, username)
 	replacePattern := fmt.Sprintf(`\1:%s`, startupCommand)
-	filePath := filepath.Join(installChroot.RootDir(), passwdFilePath)
+	filePath := filepath.Join(installChroot.RootDir(), userutils.PasswdFile)
 	err = sed(findPattern, replacePattern, sedDelimiter, filePath)
 	if err != nil {
 		err = fmt.Errorf("failed to update user's (%s) startup command (%s):\n%w", username, startupCommand, err)
@@ -1572,7 +1810,9 @@ func ConfigureUserStartupCommand(installChroot safechroot.ChrootInterface, usern
 	return
 }
 
-func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string, sshPubKeys []string) (err error) {
+func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string,
+	sshPubKeys []string, includeExistingKeys bool,
+) (err error) {
 	var (
 		pubKeyData []string
 		exists     bool
@@ -1588,9 +1828,12 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 		return
 	}
 
-	homeDir := userutils.UserHomeDirectory(username)
-	userSSHKeyDir := filepath.Join(homeDir, ".ssh")
-	authorizedKeysFile := filepath.Join(userSSHKeyDir, "authorized_keys")
+	userSSHKeyDir, err := userutils.UserSSHDirectory(installChroot.RootDir(), username)
+	if err != nil {
+		return fmt.Errorf("failed to get user's SSH directory:\n%w", err)
+	}
+
+	authorizedKeysFile := filepath.Join(userSSHKeyDir, userutils.SSHAuthorizedKeysFileName)
 
 	exists, err = file.PathExists(authorizedKeysTempFile)
 	if err != nil {
@@ -1613,7 +1856,25 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 	}
 	defer os.Remove(authorizedKeysTempFile)
 
-	allSSHKeys := make([]string, 0, len(sshPubKeyPaths)+len(sshPubKeys))
+	allSSHKeys := []string(nil)
+
+	if includeExistingKeys {
+		authorizedKeysFileFullPath := filepath.Join(installChroot.RootDir(), authorizedKeysFile)
+
+		fileExists, err := file.PathExists(authorizedKeysFileFullPath)
+		if err != nil {
+			return fmt.Errorf("failed to check if authorized_keys file (%s) exists:\n%w", authorizedKeysFileFullPath, err)
+		}
+
+		if fileExists {
+			pubKeyData, err = file.ReadLines(authorizedKeysFileFullPath)
+			if err != nil {
+				return fmt.Errorf("failed to read existing authorized_keys (%s) file:\n%w", authorizedKeysFileFullPath, err)
+			}
+
+			allSSHKeys = append(allSSHKeys, pubKeyData...)
+		}
+	}
 
 	// Add SSH keys from sshPubKeyPaths
 	for _, pubKey := range sshPubKeyPaths {
@@ -1642,7 +1903,7 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 	allSSHKeys = append(allSSHKeys, sshPubKeys...)
 
 	for _, pubKey := range allSSHKeys {
-		logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), username)
+		logger.Log.Infof("Adding ssh key (%s) to user (%s)", filepath.Base(pubKey), username)
 		pubKey += "\n"
 
 		err = file.Append(pubKey, authorizedKeysTempFile)
@@ -1699,12 +1960,12 @@ func SELinuxConfigure(selinuxMode configuration.SELinux, installChroot *safechro
 	defer timestamp.StopEvent(nil)
 	logger.Log.Infof("Preconfiguring SELinux policy in %s mode", selinuxMode)
 
-	err = selinuxUpdateConfig(selinuxMode, installChroot)
+	err = SELinuxUpdateConfig(selinuxMode, installChroot)
 	if err != nil {
 		err = fmt.Errorf("failed to update SELinux config:\n%w", err)
 		return
 	}
-	err = selinuxRelabelFiles(installChroot, mountPointToFsTypeMap, isRootFS)
+	err = SELinuxRelabelFiles(installChroot, mountPointToFsTypeMap, isRootFS)
 	if err != nil {
 		err = fmt.Errorf("failed to label SELinux files:\n%w", err)
 		return
@@ -1712,7 +1973,7 @@ func SELinuxConfigure(selinuxMode configuration.SELinux, installChroot *safechro
 	return
 }
 
-func selinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safechroot.Chroot) (err error) {
+func SELinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot safechroot.ChrootInterface) (err error) {
 	const (
 		selinuxPattern = "^SELINUX=.*"
 	)
@@ -1723,6 +1984,8 @@ func selinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safec
 		mode = SELinuxConfigEnforcing
 	case configuration.SELinuxPermissive:
 		mode = SELinuxConfigPermissive
+	case configuration.SELinuxOff:
+		mode = SELinuxConfigDisabled
 	}
 
 	selinuxConfigPath := filepath.Join(installChroot.RootDir(), SELinuxConfigFile)
@@ -1731,10 +1994,9 @@ func selinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safec
 	return
 }
 
-func selinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool,
+func SELinuxRelabelFiles(installChroot safechroot.ChrootInterface, mountPointToFsTypeMap map[string]string, isRootFS bool,
 ) (err error) {
 	const (
-		squashErrors        = false
 		fileContextBasePath = "etc/selinux/%s/contexts/files/file_contexts"
 	)
 	var listOfMountsToLabel []string
@@ -1794,17 +2056,17 @@ func selinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap
 			// We only want to print basic info, filter out the real output unless at trace level (Execute call handles that)
 			files := 0
 			lastFile := ""
-			onStdout := func(args ...interface{}) {
-				if len(args) > 0 {
-					files++
-					lastFile = fmt.Sprintf("%v", args)
-				}
+			onStdout := func(line string) {
+				files++
+				lastFile = line
 				if (files % 1000) == 0 {
 					ReportActionf("SELinux: labelled %d files", files)
 				}
 			}
-			err := shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, squashErrors, "setfiles", "-m", "-v", "-r",
-				targetRootPath, fileContextPath, targetPath)
+			err := shell.NewExecBuilder("setfiles", "-m", "-v", "-r", targetRootPath, fileContextPath, targetPath).
+				StdoutCallback(onStdout).
+				LogLevel(logrus.TraceLevel, logrus.WarnLevel).
+				Execute()
 			if err != nil {
 				return fmt.Errorf("failed while labeling files (last file: %s) %w", lastFile, err)
 			}
@@ -1898,10 +2160,12 @@ func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bo
 // as part of a general "root" partition is assumed to have been done already.
 func installLegacyBootloader(installChroot *safechroot.Chroot, bootDevPath string, encryptEnabled bool) (err error) {
 	const (
-		squashErrors = false
-		bootDir      = "/boot"
-		bootDirArg   = "--boot-directory"
-		grub2BootDir = "/boot/grub2"
+		squashErrors     = false
+		bootDir          = "/boot"
+		bootDirArg       = "--boot-directory"
+		grub2BootDir     = "/boot/grub2"
+		grub2InstallName = "grub2-install"
+		grubInstallName  = "grub-install"
 	)
 
 	// Add grub cryptodisk settings
@@ -1913,10 +2177,31 @@ func installLegacyBootloader(installChroot *safechroot.Chroot, bootDevPath strin
 	}
 	installBootDir := filepath.Join(installChroot.RootDir(), bootDir)
 	grub2InstallBootDirArg := fmt.Sprintf("%s=%s", bootDirArg, installBootDir)
-	err = shell.ExecuteLive(squashErrors, "grub2-install", "--target=i386-pc", grub2InstallBootDirArg, bootDevPath)
+
+	installName := grub2InstallName
+	grub2InstallExists, err := file.CommandExists(grub2InstallName)
 	if err != nil {
 		return
 	}
+
+	if !grub2InstallExists {
+		grubInstallExists, err := file.CommandExists(grubInstallName)
+		if err != nil {
+			return err
+		}
+
+		if !grubInstallExists {
+			return fmt.Errorf("neither 'grub2-install' command nor 'grub-install' command found")
+		}
+
+		installName = grubInstallName
+	}
+
+	err = shell.ExecuteLive(squashErrors, installName, "--target=i386-pc", grub2InstallBootDirArg, bootDevPath)
+	if err != nil {
+		return
+	}
+
 	installGrub2BootDir := filepath.Join(installChroot.RootDir(), grub2BootDir)
 	err = shell.ExecuteLive(squashErrors, "chmod", "-R", "go-rwx", installGrub2BootDir)
 	return
@@ -2018,16 +2303,12 @@ func enableCryptoDisk() (err error) {
 func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix string) (err error) {
 	const (
 		defaultCfgFilename = "grub.cfg"
-		encryptCfgFilename = "grubEncrypt.cfg"
 		grubAssetDir       = "assets/efi/grub"
 		grubFinalDir       = "boot/grub2"
 	)
 
 	// Copy the bootloader's grub.cfg
 	grubAssetPath := filepath.Join(grubAssetDir, defaultCfgFilename)
-	if encryptEnabled {
-		grubAssetPath = filepath.Join(grubAssetDir, encryptCfgFilename)
-	}
 	grubFinalPath := filepath.Join(installRoot, grubFinalDir, defaultCfgFilename)
 	err = file.CopyResourceFile(resources.ResourcesFS, grubAssetPath, grubFinalPath, bootDirectoryDirMode,
 		bootDirectoryFileMode)
@@ -2051,13 +2332,11 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix
 		return
 	}
 
-	// Add in encrypted volume
-	if encryptEnabled {
-		err = setGrubCfgEncryptedVolume(grubFinalPath)
-		if err != nil {
-			logger.Log.Warnf("Failed to set encrypted volume in grub.cfg: %v", err)
-			return
-		}
+	// Add in encrypted volume mount command if needed
+	err = setGrubCfgEncryptedVolume(grubFinalPath, encryptEnabled)
+	if err != nil {
+		logger.Log.Warnf("Failed to set encrypted volume in grub.cfg: %v", err)
+		return
 	}
 
 	return
@@ -2162,6 +2441,55 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 	return
 }
 
+// cleanupTdnfCache runs 'tdnf clean all' and removes the contents of the tdnf cache directory.
+// If 'tdnf' is not installed, the function will skip the cleanup.
+// If /var/cache/tdnf does not exist, the function will skip removing its contents.
+func cleanupTdnfCache(installChroot *safechroot.Chroot) error {
+	const (
+		squashErrors      = false
+		rpmCacheDirectory = "/var/cache/tdnf"
+	)
+
+	ReportActionf("Cleaning tdnf cache")
+	err := installChroot.UnsafeRun(func() error {
+		// Check if 'tdnf' is in the chroot's PATH, some images may have removed it.
+		_, chrootErr := exec.LookPath("tdnf")
+		if chrootErr != nil {
+			logger.Log.Debugf("Skipping tdnf cache cleanup since 'tdnf' is not installed")
+			return nil
+		}
+		logger.Log.Infof("Cleaning tdnf cache")
+		chrootErr = shell.ExecuteLive(squashErrors, "tdnf", "clean", "all")
+		return chrootErr
+	})
+
+	if err != nil {
+		err = fmt.Errorf("failed to cleanup tdnf cache:\n%w", err)
+		return err
+	}
+
+	// Remove all files and subdirectories in the tdnf cache directory, but leave
+	// the directory since it's owned by the tdnf package.
+	cacheDir := filepath.Join(installChroot.RootDir(), rpmCacheDirectory)
+	// Skip if directory is missing already
+	exists, err := file.DirExists(cacheDir)
+	if err != nil {
+		return fmt.Errorf("failed to check if tdnf cache directory exists (%s):\n%w", cacheDir, err)
+	}
+	if !exists {
+		logger.Log.Debugf("Skipping tdnf cache cleanup since directory does not exist (%s)", cacheDir)
+		return nil
+	}
+
+	logger.Log.Infof("Removing contents of (%s)", cacheDir)
+	err = file.RemoveDirectoryContents(cacheDir)
+	if err != nil {
+		err = fmt.Errorf("failed to remove tdnf cache contents (%s/*):\n%w", cacheDir, err)
+		return err
+	}
+	return nil
+}
+
 func RunFinalizeImageScripts(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
 	const squashErrors = false
 
@@ -2250,7 +2578,7 @@ func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCo
 	case configuration.SELinuxPermissive, configuration.SELinuxEnforcing:
 		selinux = CmdlineSELinuxSettings
 	case configuration.SELinuxOff:
-		selinux = ""
+		selinux = CmdlineSELinuxDisabledArg
 	}
 
 	logger.Log.Debugf("Adding SELinuxConfiguration('%s') to '%s'", selinux, grubPath)
@@ -2310,56 +2638,6 @@ func setGrubCfgCGroup(grubPath string, kernelCommandline configuration.KernelCom
 	err = sed(cgroupPattern, cgroup, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's CGroup setting: %v", err)
-	}
-
-	return
-}
-
-// setGrubCfgReadOnlyVerityRoot populates the arguments needed to boot with a dm-verity read-only root partition
-func setGrubCfgReadOnlyVerityRoot(grubPath string, readOnlyRoot diskutils.VerityDevice) (err error) {
-	var (
-		verityMountArg          = fmt.Sprintf("rd.verityroot.devicename=%s", readOnlyRoot.MappedName)
-		verityHashArg           = fmt.Sprintf("rd.verityroot.hashtree=/%s.hashtree", readOnlyRoot.MappedName)
-		verityRootHashArg       = fmt.Sprintf("rd.verityroot.roothashfile=/%s.roothash", readOnlyRoot.MappedName)
-		verityRootHashSigArg    = fmt.Sprintf("rd.verityroot.roothashsig=/%s.p7", readOnlyRoot.MappedName)
-		verityFECDataArg        = fmt.Sprintf("rd.verityroot.fecdata=/%s.fec", readOnlyRoot.MappedName)
-		verityFECRootsArg       = fmt.Sprintf("rd.verityroot.fecroots=%d", readOnlyRoot.FecRoots)
-		verityErrorHandling     = fmt.Sprintf("rd.verityroot.verityerrorhandling=%s", readOnlyRoot.ErrorBehavior)
-		verityValidateOnBootArg = fmt.Sprintf("rd.verityroot.validateonboot=%v", readOnlyRoot.ValidateOnBoot)
-		verityOverlaysArg       = fmt.Sprintf("rd.verityroot.overlays=\"%s\"", strings.Join(readOnlyRoot.TmpfsOverlays, " "))
-		verityOverlaySizeArg    = fmt.Sprintf("rd.verityroot.overlaysize=\"%s\"", readOnlyRoot.TmpfsOverlaySize)
-		verityDebugMountsArg    = fmt.Sprintf("rd.verityroot.overlays_debug_mount=%s", readOnlyRoot.TmpfsOverlaysDebugMount)
-		verityPattern           = "{{.ReadOnlyVerityRoot}}"
-		verityArgs              = ""
-
-		cmdline configuration.KernelCommandLine
-	)
-
-	if readOnlyRoot.MappedName != "" {
-		// Basic set of verity arguments common to all use cases
-		verityArgs = fmt.Sprintf("%s %s %s %s %s %s %s %s",
-			verityMountArg,
-			verityHashArg,
-			verityRootHashArg,
-			verityErrorHandling,
-			verityValidateOnBootArg,
-			verityOverlaysArg,
-			verityOverlaySizeArg,
-			verityDebugMountsArg,
-		)
-		// Only include the FEC arguments if we have FEC enabled
-		if readOnlyRoot.FecRoots > 0 {
-			verityArgs = fmt.Sprintf("%s %s %s", verityArgs, verityFECDataArg, verityFECRootsArg)
-		}
-		if readOnlyRoot.UseRootHashSignature {
-			verityArgs = fmt.Sprintf("%s %s", verityArgs, verityRootHashSigArg)
-		}
-	}
-
-	logger.Log.Debugf("Adding Verity Root ('%s') to %s", verityArgs, grubPath)
-	err = sed(verityPattern, verityArgs, cmdline.GetSedDelimeter(), grubPath)
-	if err != nil {
-		logger.Log.Warnf("Failed to set grub.cfg's Verity Root setting: %v", err)
 	}
 
 	return
@@ -2453,16 +2731,22 @@ func setGrubCfgBootPrefix(bootPrefix, grubPath string) (err error) {
 	return
 }
 
-func setGrubCfgEncryptedVolume(grubPath string) (err error) {
+func setGrubCfgEncryptedVolume(grubPath string, enableEncryptedVolume bool) (err error) {
 	const (
-		encryptedVolPattern = "{{.EncryptedVolume}}"
-		lvmPrefix           = "lvm/"
+		encryptedVolPattern = "{{.CryptoMountCommand}}"
+		cryptoMountCommand  = "cryptomount -a"
 	)
-	var cmdline configuration.KernelCommandLine
+	var (
+		cmdline         configuration.KernelCommandLine
+		encryptedVolArg = ""
+	)
 
-	encryptedVol := fmt.Sprintf("%v%v%v%v", "(", lvmPrefix, diskutils.GetEncryptedRootVol(), ")")
-	logger.Log.Debugf("Adding EncryptedVolume('%s') to '%s'", encryptedVol, grubPath)
-	err = sed(encryptedVolPattern, encryptedVol, cmdline.GetSedDelimeter(), grubPath)
+	if enableEncryptedVolume {
+		encryptedVolArg = cryptoMountCommand
+	}
+
+	logger.Log.Debugf("Adding CryptoMountCommand('%s') to '%s'", encryptedVolArg, grubPath)
+	err = sed(encryptedVolPattern, encryptedVolArg, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to grub.cfg's encryptedVolume: %v", err)
 		return
@@ -2632,27 +2916,4 @@ func KernelPackages(config configuration.Config) []*pkgjson.PackageVer {
 		}
 	}
 	return packageList
-}
-
-// stopGPGAgent stops gpg-agent and keyboxd if they are running inside the installChroot.
-//
-// It is possible that one of the packages or post-install scripts started a GPG agent.
-// e.g. when installing the azurelinux-repos SPEC, a GPG import occurs. This starts the gpg-agent process inside the chroot.
-// To be able to cleanly exit the setup chroot, we must stop it.
-func stopGPGAgent(installChroot *safechroot.Chroot) {
-	installChroot.UnsafeRun(func() error {
-		err := shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "gpg-agent")
-		if err != nil {
-			// This is non-fatal, as there is no guarantee the image has gpg agent started.
-			logger.Log.Warnf("Failed to stop gpg-agent. This is expected if it is not installed: %s", err)
-		}
-
-		err = shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "keyboxd")
-		if err != nil {
-			// This is non-fatal, as there is no guarantee the image has gpg agent started.
-			logger.Log.Warnf("Failed to stop keyboxd. This is expected if it is not installed: %s", err)
-		}
-
-		return nil
-	})
 }

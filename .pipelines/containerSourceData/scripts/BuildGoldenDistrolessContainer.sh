@@ -22,6 +22,13 @@ function DockerBuild {
 
     # Create container
     echo "+++ Create container $containerName"
+
+    # DOCKER_BUILDKIT=0 is set to avoid the unknown timeout error in the Azure DevOps pipeline.
+    # The error is likely caused by some BuildKit feature in version 24.0.9 of moby-engine.
+    # The error is not seen in the local environment.
+    # Setting DOCKER_BUILDKIT=0 disables BuildKit and uses the legacy builder.
+    # TODO: Remove this line once the issue is resolved.
+    export DOCKER_BUILDKIT=0
     docker build . \
         -t "$containerName" \
         -f "$marinaraSrcDir/dockerfiles/dockerfile-new-image" \
@@ -33,8 +40,7 @@ function DockerBuild {
         --build-arg USER_UID=$userUid \
         --build-arg RPMS="$rpmsDir" \
         --build-arg LOCAL_REPO_FILE="$marinaraSrcDir/local.repo" \
-        --no-cache \
-        --progress=plain
+        --no-cache
 }
 
 function create_distroless_container {
@@ -47,7 +53,7 @@ function create_distroless_container {
     echo "Distroless Packages to install    -> $DISTROLESS_PACKAGES_TO_INSTALL"
     echo "Distroless Packages to hold back  -> $DISTROLESS_PACKAGES_TO_HOLD_BACK"
 
-    DISTROLESS_GOLDEN_IMAGE_NAME=${GOLDEN_IMAGE_NAME//base/distroless}
+    DISTROLESS_GOLDEN_IMAGE_NAME=${CONTAINER_IMAGE_NAME//base/distroless}
     standardContainerName="$DISTROLESS_GOLDEN_IMAGE_NAME:$COMPONENT_VERSION-$DISTRO_IDENTIFIER$BASE_IMAGE_TAG"
     debugContainerName="$DISTROLESS_GOLDEN_IMAGE_NAME:$COMPONENT_VERSION-debug-$DISTRO_IDENTIFIER$BASE_IMAGE_TAG"
     nonrootContainerName="$DISTROLESS_GOLDEN_IMAGE_NAME:$COMPONENT_VERSION-nonroot-$DISTRO_IDENTIFIER$BASE_IMAGE_TAG"

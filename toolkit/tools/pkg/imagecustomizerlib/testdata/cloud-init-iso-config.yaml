@@ -1,0 +1,20 @@
+scripts:
+  postCustomization:
+  - content: |
+      set -e
+      mkdir -p /var/lib/cloud/seed/
+      ln -s -T /run/initramfs/live/cloud-init-data /var/lib/cloud/seed/nocloud 
+
+iso:
+  additionalFiles:
+  - source: files/cloud-init/user-data
+    destination: /cloud-init-data/user-data
+
+  - source: files/cloud-init/network-config
+    destination: /cloud-init-data/network-config
+
+  - source: files/cloud-init/meta-data
+    destination: /cloud-init-data/meta-data
+
+  kernelCommandLine:
+    extraCommandLine: "ds=nocloud"

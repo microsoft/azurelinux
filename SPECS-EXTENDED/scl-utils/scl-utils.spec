@@ -1,22 +1,28 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+%global __cmake_in_source_build 1
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:       scl-utils
-Version:    2.0.2
-Release:    15%{?dist}
+Version:    2.0.3
+Release:    5%{?dist}
 Summary:    Utilities for alternative packaging
 
-License:    GPLv2+
+License:    GPL-2.0-or-later
 URL:        https://github.com/sclorg/scl-utils
 Source0:    https://github.com/sclorg/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 Source1:    macros.scl-filesystem
 BuildRequires:	gcc make
-Buildrequires:  cmake 
-Buildrequires:  rpm-devel
+BuildRequires:  cmake
+BuildRequires:  rpm-devel
+BuildRequires:  libcmocka libcmocka-devel environment-modules
 Requires:   %{_bindir}/modulecmd
 
 Patch1:     0003-Scl-utils-layout-patch-from-fedora-famillecollet.com.patch
+Patch2:     BZ-2056462-do-not-error-out-on-SIGINT.patch
+Patch3:     BZ-2091000-remove-tmp-file.patch
+Patch4:     brp-python-hardlink.patch
+Patch5:     rpm-bare-words.patch
 
 %description
 Run-time utility for alternative packaging.
@@ -52,7 +58,11 @@ mkdir modulefiles
 mkdir prefixes
 ln -s prefixes conf
 
+%check
+make check
+
 %files
+%dir %{_sysconfdir}/scl
 %dir %{_sysconfdir}/scl/modulefiles
 %dir %{_sysconfdir}/scl/prefixes
 %{_sysconfdir}/scl/conf
@@ -75,11 +85,59 @@ ln -s prefixes conf
 %{_rpmconfigdir}/brp-scl-python-bytecompile
 
 %changelog
-* Fri Oct 29 2021 Muhammad Falak <mwani@microsft.com> - 2.0.2-15
-- Remove epoch
+* Tue Jan 14 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.0.3-5
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- Removed Epoch
+- License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:2.0.2-14
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Sep 12 2024 Remi Collet <remi@remirepo.net> - 1:2.0.3-4
+- add workaround to "bare words are no longer supported" in RPM 4.20 #2306492
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Aug 23 2023 Remi Collet <remi@remirepo.net> - 1:2.0.3-1
+- Rebase to 2.0.3
+- add upstream patch to fix brp-python-hardlink path
+- use SPDX license ID
+- run upstream tests
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0.2-24
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jun 02 2023 Michal Nowak <mnowak@isc.org> - 2.0.2-23
+- Support F35+ "brp-python-hardlink" script location.
+  Resolves: rhbz#2029959
+
+* Mon May 29 2023 Petr Pisar <ppisar@redhat.com> - 1:2.0.2-22
+- Rebuild against rpm-4.19 (https://fedoraproject.org/wiki/Changes/RPM-4.19)
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0.2-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0.2-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0.2-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0.2-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0.2-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Vitaly Zaitsev <vitaly@easycoding.org> - 1:2.0.2-16
+- Backported upstream patches to resolve RHBZ#1728450.
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0.2-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jul 24 2020 Jeff Law <law@redhat.com> - 1:2.0.2-14
+- Use __cmake_in_source_build
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0.2-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

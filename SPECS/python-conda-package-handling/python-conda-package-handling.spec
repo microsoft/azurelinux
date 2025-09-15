@@ -4,7 +4,7 @@
 Summary:        Create and extract conda packages of various formats
 Name:           python-%{srcname}
 Version:        2.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -53,7 +53,9 @@ pip3 install atomicwrites>=1.3.0 \
     pluggy>=0.11.0 \
     pytest>=5.4.0 \
     pytest-cov>=2.7.1 \
-    pytest-mock
+    pytest-mock \
+	conda_package_streaming \
+	zstandard
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
     python%{python3_version} -m pytest -v tests -k 'not test_secure_refusal_to_extract_abs_paths'
@@ -67,6 +69,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/%{pkgname}/
 
 %changelog
+* Fri Jan 31 2015 Sam Meluch <sammeluch@microsoft.com> - 2.2.0-2
+- add missing pip modules for package tests
+
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 2.2.0-1
 - Upgrade to version 2.2.0
 

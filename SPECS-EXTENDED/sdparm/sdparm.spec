@@ -2,11 +2,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:       List or change SCSI/SATA disk parameters
 Name:          sdparm
-Version:       1.11
-Release:       2%{?dist}
+Version:       1.12
+Release:       9%{?dist}
 License:       BSD
-URL:           http://sg.danny.cz/sg/sdparm.html
-Source0:       http://sg.danny.cz/sg/p/sdparm-%{version}.tgz
+URL:           https://sg.danny.cz/sg/sdparm.html
+Source0:       https://sg.danny.cz/sg/p/sdparm-%{version}.tgz
+BuildRequires: make
 BuildRequires: gcc
 BuildRequires: sg3_utils-devel
 
@@ -43,8 +44,39 @@ make install DESTDIR=%{buildroot} INSTALL="%{__install} -p"
 %{_mandir}/man8/scsi_ch_swp*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Jan 08 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.12-9
+- Initial Azure Linux import from Fedora 32 (license: MIT).
+- License verified
+
+* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.12-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.12-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.12-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.12-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.12-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.12-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.12-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Apr 23 2021 Terje Rosten <terje.rosten@ntnu.no> - 1.12-1
+- 1.12
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.11-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.11-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Mon Mar 09 2020 Terje Rosten <terje.rosten@ntnu.no> - 1.11-1
 - 1.11

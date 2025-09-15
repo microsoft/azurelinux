@@ -1,8 +1,8 @@
 Summary:        Universally Unique Identifier library
 Name:           uuid
 Version:        1.6.2
-Release:        50%{?dist}
-License:        MIT
+Release:        51%{?dist}
+License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://www.ossp.org/pkg/lib/uuid/
@@ -117,6 +117,7 @@ make check
 %postun -p /sbin/ldconfig
 
 %files
+%license README
 %doc AUTHORS ChangeLog HISTORY NEWS PORTING README SEEALSO THANKS TODO USERS
 %{_bindir}/uuid
 %{_libdir}/libossp-uuid.so.*
@@ -147,6 +148,9 @@ make check
 %{_libdir}/libossp-uuid_dce.so
 
 %changelog
+* Tue Sep 03 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.2-51
+- License verified.
+
 * Mon Nov 30 2020 Nicolas Ontiveros <niontive@microsoft.com> - 1.6.2-50
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Replace ldconfig_scriptlets with post/postun ldconfig calls

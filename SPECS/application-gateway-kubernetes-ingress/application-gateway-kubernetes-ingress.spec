@@ -1,42 +1,34 @@
 %global debug_package %{nil}
 Summary:        Application Gateway Ingress Controller
 Name:           application-gateway-kubernetes-ingress
-Version:        1.7.2
-Release:        1%{?dist}
+Version:        1.7.7
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Networking
 URL:            https://github.com/Azure/application-gateway-kubernetes-ingress
 Source0:        https://github.com/Azure/application-gateway-kubernetes-ingress/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Below is a manually created tarball, no download link.
-# We're using vendored Go modules from this tarball, since network is disabled during build time.
-# How to re-build this file:
-#   1. wget https://github.com/Azure/%%{name}/archive/refs/tags/%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
-#   2. tar -xf %%{name}-%%{version}.tar.gz
-#   3. cd %%{name}-%%{version}
-#   4. go mod vendor
-#   5. tar  --sort=name \
-#           --mtime="2021-04-26 00:00Z" \
-#           --owner=0 --group=0 --numeric-owner \
-#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
-#
-Source1:        %{name}-%{version}-vendor.tar.gz
+# Leverage the `generate_source_tarball.sh` to create the vendor sources
+# NOTE: govendor-v1 format is for inplace CVE updates so that we do not have to overwrite in the blob-store.
+# After fixing any possible CVE for the vendored source, we must bump v1 -> v2
+Source1:        %{name}-%{version}-govendor-v1.tar.gz
+Patch0:         CVE-2025-30204.patch
 
-BuildRequires:  golang >= 1.13
+BuildRequires:  golang >= 1.23
 
 %description
-This is an ingress controller that can be run on Azure Kubernetes Service (AKS) to allow an Azure Application Gateway 
-to act as the ingress for an AKS cluster. 
+This is an ingress controller that can be run on Azure Kubernetes Service (AKS) to allow an Azure Application Gateway
+to act as the ingress for an AKS cluster.
 
 %prep
-%autosetup
+%autosetup -N
 
-%build
 rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
 
+%build
 export VERSION=%{version}
 export VERSION_PATH=github.com/Azure/application-gateway-kubernetes-ingress/pkg/version
 
@@ -53,6 +45,21 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 %{_bindir}/appgw-ingress
 
 %changelog
+* Sat Mar 29 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.7.7-2
+- Patch CVE-2025-30204
+
+* Tue Feb 04 2025 Gary Swalling <gaswal@microsoft.com> - 1.7.7-1
+- Upgrade to v1.7.7 with golang.org/x/net v0.33.0 for CVE-2023-39325, CVE-2023-44487,
+- CVE-2023-45288, CVE-2024-51744, CVE-2024-35255, CVE-2023-3978
+- Remove patches which are no longer needed
+
+* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.7.2-3
+- Add patch for CVE-2024-45338
+
+* Thu Jul 11 2024 Thien Trung Vuong <tvuong@microsoft.com> - 1.7.2-2
+- Add patch for CVE-2022-21698, CVE-2022-41273
+- Move vendored tarball extraction into %prep and %changed from %autosetup to %setup
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.2-1
 - Auto-upgrade to 1.7.2 - Azure Linux 3.0 - package upgrades
 
@@ -83,7 +90,7 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 * Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.0-8
 - Bump release to rebuild with go 1.19.5
 
-* Tues Jan 24 2023 Adit Jha <aditjha@microsoft.com> - 1.4.0-7
+* Tue Jan 24 2023 Adit Jha <aditjha@microsoft.com> - 1.4.0-7
 - Bump release to rebuild vendor repoistory which contain patch fix for CVE-2021-4235, CVE-2022-3064
 
 * Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.0-6

@@ -1,0 +1,150 @@
+From a8e53434a529e7d53514a8c44d1cec42f04b0723 Mon Sep 17 00:00:00 2001
+From: Colin Walters <walters@verbum.org>
+Date: Thu, 21 Mar 2024 10:43:07 -0400
+Subject: [PATCH] Revert "compose: Inject our static tmpfiles.d dropins
+ earlier"
+
+This reverts commit e1e78cf9df902d895a7fce9dc719726c283e9d03.
+
+It breaks idempotency with osbuild.
+
+Closes: https://github.com/coreos/rpm-ostree/issues/4879
+---
+ rust/src/passwd.rs                         |  3 --
+ src/app/rpmostree-compose-builtin-tree.cxx | 40 --------------------
+ src/libpriv/rpmostree-postprocess.cxx      | 44 ++++++++++++++++++++--
+ 3 files changed, 41 insertions(+), 46 deletions(-)
+
+diff --git a/rust/src/passwd.rs b/rust/src/passwd.rs
+index 79ee488f..821497d8 100644
+--- a/rust/src/passwd.rs
++++ b/rust/src/passwd.rs
+@@ -106,9 +106,6 @@ pub fn passwd_cleanup(rootfs_dfd: i32) -> Result<()> {
+ /// in /usr/etc at this point), and splitting it into two streams: a new
+ /// /etc/passwd that just contains the root entry, and /usr/lib/passwd which
+ /// contains everything else.
+-///
+-/// Note: the presence of /usr/lib/passwd is used in postprocess_final() to make
+-/// it idempotent. See related comment there.
+ #[context("Migrating 'passwd' to /usr/lib")]
+ pub fn migrate_passwd_except_root(rootfs_dfd: i32) -> CxxResult<()> {
+     static ETCSRC_PATH: &str = "usr/etc/passwd";
+diff --git a/src/app/rpmostree-compose-builtin-tree.cxx b/src/app/rpmostree-compose-builtin-tree.cxx
+index 1f2862f8..63648288 100644
+--- a/src/app/rpmostree-compose-builtin-tree.cxx
++++ b/src/app/rpmostree-compose-builtin-tree.cxx
+@@ -477,46 +477,6 @@ install_packages (RpmOstreeTreeComposeContext *self, gboolean *out_unmodified,
+                                         std::string (previous_ref), opt_unified_core),
+               error);
+ 
+-  /* Assembly will regen the rpm-ostree-autovar.conf tmpfiles.d dropin; let's
+-   * make sure to add our own static dropins before that so that they're taken
+-   * into account when looking for dupes. */
+-  g_print ("Adding rpm-ostree-0-integration.conf\n");
+-
+-  /* This is useful if we're running in an uninstalled configuration, e.g.
+-   * during tests. */
+-  const char *pkglibdir_path = g_getenv ("RPMOSTREE_UNINSTALLED_PKGLIBDIR") ?: PKGLIBDIR;
+-  glnx_autofd int pkglibdir_dfd = -1;
+-  if (!glnx_opendirat (AT_FDCWD, pkglibdir_path, TRUE, &pkglibdir_dfd, error))
+-    return FALSE;
+-
+-  if (!glnx_shutil_mkdir_p_at (rootfs_dfd, "usr/lib/tmpfiles.d", 0755, cancellable, error))
+-    return FALSE;
+-
+-  if (!glnx_file_copy_at (pkglibdir_dfd, "rpm-ostree-0-integration.conf", NULL, rootfs_dfd,
+-                          "usr/lib/tmpfiles.d/rpm-ostree-0-integration.conf",
+-                          GLNX_FILE_COPY_NOXATTRS, /* Don't take selinux label */
+-                          cancellable, error))
+-    return FALSE;
+-
+-  if ((*self->treefile_rs)->get_opt_usrlocal () == rpmostreecxx::OptUsrLocal::StateOverlay)
+-    {
+-      if (!glnx_file_copy_at (
+-              pkglibdir_dfd, "rpm-ostree-0-integration-opt-usrlocal-compat.conf", NULL, rootfs_dfd,
+-              "usr/lib/tmpfiles.d/rpm-ostree-0-integration-opt-usrlocal-compat.conf",
+-              GLNX_FILE_COPY_NOXATTRS, /* Don't take selinux label */
+-              cancellable, error))
+-        return FALSE;
+-    }
+-  else
+-    {
+-      if (!glnx_file_copy_at (pkglibdir_dfd, "rpm-ostree-0-integration-opt-usrlocal.conf", NULL,
+-                              rootfs_dfd,
+-                              "usr/lib/tmpfiles.d/rpm-ostree-0-integration-opt-usrlocal.conf",
+-                              GLNX_FILE_COPY_NOXATTRS, /* Don't take selinux label */
+-                              cancellable, error))
+-        return FALSE;
+-    }
+-
+   if (opt_unified_core)
+     {
+       if (!rpmostree_context_import (self->corectx, cancellable, error))
+diff --git a/src/libpriv/rpmostree-postprocess.cxx b/src/libpriv/rpmostree-postprocess.cxx
+index 9b5cdec7..311de70f 100644
+--- a/src/libpriv/rpmostree-postprocess.cxx
++++ b/src/libpriv/rpmostree-postprocess.cxx
+@@ -368,12 +368,13 @@ postprocess_final (int rootfs_dfd, rpmostreecxx::Treefile &treefile, gboolean un
+ {
+   GLNX_AUTO_PREFIX_ERROR ("Finalizing rootfs", error);
+ 
+-  /* Use the presence of /usr/lib/passwd as an "idempotence" marker to
++  /* Use installation of the tmpfiles integration as an "idempotence" marker to
+    * avoid doing postprocessing twice, which can happen when mixing `compose
+    * postprocess-root` with `compose commit`.
+    */
+-  const char usr_lib_passwd[] = "usr/lib/password";
+-  if (!glnx_fstatat_allow_noent (rootfs_dfd, usr_lib_passwd, NULL, AT_SYMLINK_NOFOLLOW, error))
++  const char tmpfiles_integration_path[] = "usr/lib/tmpfiles.d/rpm-ostree-0-integration.conf";
++  if (!glnx_fstatat_allow_noent (rootfs_dfd, tmpfiles_integration_path, NULL, AT_SYMLINK_NOFOLLOW,
++                                 error))
+     return FALSE;
+   if (errno == 0)
+     return TRUE;
+@@ -446,6 +447,43 @@ postprocess_final (int rootfs_dfd, rpmostreecxx::Treefile &treefile, gboolean un
+   if (!rpmostree_rootfs_postprocess_common (rootfs_dfd, cancellable, error))
+     return FALSE;
+ 
++  g_print ("Adding rpm-ostree-0-integration.conf\n");
++  /* This is useful if we're running in an uninstalled configuration, e.g.
++   * during tests. */
++  const char *pkglibdir_path = g_getenv ("RPMOSTREE_UNINSTALLED_PKGLIBDIR") ?: PKGLIBDIR;
++  glnx_autofd int pkglibdir_dfd = -1;
++
++  if (!glnx_opendirat (AT_FDCWD, pkglibdir_path, TRUE, &pkglibdir_dfd, error))
++    return FALSE;
++
++  if (!glnx_shutil_mkdir_p_at (rootfs_dfd, "usr/lib/tmpfiles.d", 0755, cancellable, error))
++    return FALSE;
++
++  if (!glnx_file_copy_at (pkglibdir_dfd, "rpm-ostree-0-integration.conf", NULL, rootfs_dfd,
++                          tmpfiles_integration_path,
++                          GLNX_FILE_COPY_NOXATTRS, /* Don't take selinux label */
++                          cancellable, error))
++    return FALSE;
++
++  if (treefile.get_opt_usrlocal () == rpmostreecxx::OptUsrLocal::StateOverlay)
++    {
++      if (!glnx_file_copy_at (
++              pkglibdir_dfd, "rpm-ostree-0-integration-opt-usrlocal-compat.conf", NULL, rootfs_dfd,
++              "usr/lib/tmpfiles.d/rpm-ostree-0-integration-opt-usrlocal-compat.conf",
++              GLNX_FILE_COPY_NOXATTRS, /* Don't take selinux label */
++              cancellable, error))
++        return FALSE;
++    }
++  else
++    {
++      if (!glnx_file_copy_at (pkglibdir_dfd, "rpm-ostree-0-integration-opt-usrlocal.conf", NULL,
++                              rootfs_dfd,
++                              "usr/lib/tmpfiles.d/rpm-ostree-0-integration-opt-usrlocal.conf",
++                              GLNX_FILE_COPY_NOXATTRS, /* Don't take selinux label */
++                              cancellable, error))
++        return FALSE;
++    }
++
+   /* Handle kernel/initramfs if we're not doing a container */
+   if (!container)
+     {
+-- 
+2.43.0
+

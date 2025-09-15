@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages for distroless containers.
 Name:           distroless-packages
 Version:        %{azl}.0
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,7 +15,6 @@ Metapackage holding sets of core packages for different applications.
 Summary:        The smallest useful package list.
 Requires:       filesystem
 Requires:       azurelinux-release
-Requires:       prebuilt-ca-certificates
 Requires:       tzdata
 
 %description minimal
@@ -32,6 +31,8 @@ Requires:       libgcc
 Requires:       azurelinux-release
 Requires:       openssl
 Requires:       openssl-libs
+Requires:       SymCrypt
+Requires:       SymCrypt-OpenSSL
 Requires:       tzdata
 
 %description base
@@ -56,6 +57,12 @@ Requires:       busybox
 %files debug
 
 %changelog
+* Fri Apr 26 2024 Tobias Brick <tobiasb@microsoft.com> - 3.0-5
+- Add SymCrypt and SymCrypt-OpenSSL
+
+* Thu Apr 04 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-4
+- Remove dependency on "prebuilt-ca-certificates".
+
 * Fri Mar 22 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 3.0-3
 - Explicitly add libgcc as a runtime dependency for distroless-base
 

@@ -1,0 +1,66 @@
+From 8a7fdf7f3e1194fa4674eea1d5442ca1660c0a67 Mon Sep 17 00:00:00 2001
+From: Aadhar Agarwal <aadagarwal@microsoft.com>
+Date: Tue, 19 Mar 2024 11:19:38 -0700
+Subject: [PATCH] [Plugin,Policy] Make an AzurePlugin class, Update the vendor
+ url, Update the check function
+
+Signed-off-by: Aadhar Agarwal <aadagarwal@microsoft.com>
+---
+ sos/policies/distros/azure.py  | 6 +++++-
+ sos/report/plugins/__init__.py | 5 +++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/sos/policies/distros/azure.py b/sos/policies/distros/azure.py
+index 950799fa83..b521d1e1be 100644
+--- a/sos/policies/distros/azure.py
++++ b/sos/policies/distros/azure.py
+@@ -8,6 +8,7 @@
+ #
+ # See the LICENSE file in the source distribution for further information.
+ 
++from sos.report.plugins import AzurePlugin
+ from sos.policies.distros.redhat import RedHatPolicy, OS_RELEASE
+ import os
+ 
+@@ -17,7 +18,7 @@ class AzurePolicy(RedHatPolicy):
+     distro = "Azure Linux"
+     vendor = "Microsoft"
+     vendor_urls = [
+-        ('Distribution Website', 'https://github.com/microsoft/CBL-Mariner')
++        ('Distribution Website', 'https://github.com/microsoft/azurelinux')
+     ]
+ 
+     def __init__(self, sysroot=None, init=None, probe_runtime=True,
+@@ -25,6 +26,7 @@ def __init__(self, sysroot=None, init=None, probe_runtime=True,
+         super(AzurePolicy, self).__init__(sysroot=sysroot, init=init,
+                                           probe_runtime=probe_runtime,
+                                           remote_exec=remote_exec)
++        self.valid_subclasses += [AzurePlugin]
+ 
+     @classmethod
+     def check(cls, remote=''):
+@@ -40,6 +42,8 @@ def check(cls, remote=''):
+                 if line.startswith('NAME'):
+                     if 'Common Base Linux Mariner' in line:
+                         return True
++                    if 'Microsoft Azure Linux' in line:
++                        return True
+         return False
+ 
+ # vim: set et ts=4 sw=4 :
+diff --git a/sos/report/plugins/__init__.py b/sos/report/plugins/__init__.py
+index 94ee50d7fd..fc674be086 100644
+--- a/sos/report/plugins/__init__.py
++++ b/sos/report/plugins/__init__.py
+@@ -3621,6 +3621,11 @@ class SCLPlugin(RedHatPlugin):
+         self.add_copy_spec(scl_copyspecs)
+ 
+ 
++class AzurePlugin(PluginDistroTag):
++    """Tagging class for Azure Linux"""
++    pass
++
++
+ def import_plugin(name, superclasses=None):
+     """Import name as a module and return a list of all classes defined in that
+     module. superclasses should be a tuple of valid superclasses to import,

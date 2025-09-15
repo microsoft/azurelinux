@@ -1,5 +1,9 @@
 {
     "packages": [
+        "azurelinux-release",
+        "azurelinux-repos",
+        "azurelinux-repos-ms-non-oss",
+        "azurelinux-repos-ms-oss",
         "bash",
         "ca-certificates",
         "cronie-anacron",
@@ -10,10 +14,7 @@
         "filesystem",
         "grub2-efi-binary",
         "logrotate",
-        "mariner-release",
-        "mariner-repos",
-        "mariner-repos-extras",
-        "mariner-repos-microsoft",
+        "openssh-server",
         "procps-ng",
         "shim",
         "sudo",
@@ -22,6 +23,8 @@
         "tdnf-plugin-repogpgcheck",
         "util-linux",
         "zlib",
+        "dracut-hostonly",
+        "dracut-vrf",
         "initramfs"
     ]
 }

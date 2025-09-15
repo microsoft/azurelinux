@@ -4,38 +4,25 @@
 set -e
 
 scriptDir="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-enlistmentRoot=$scriptDir/../../../..
+enlistmentRoot="$scriptDir/../../../.."
+
+ARCH="amd64"
+ORAS_VERSION="1.1.0"
 
 function showUsage() {
     echo
     echo "usage:"
     echo
     echo "build-mic-container.sh \\"
-    echo "    -r <container-registry> \\"
-    echo "    -n <container-name> \\"
     echo "    -t <container-tag>"
     echo
 }
 
 while getopts ":r:n:t:" OPTIONS; do
   case "${OPTIONS}" in
-    r ) containerRegistery=$OPTARG ;;
-    n ) containerName=$OPTARG ;;
     t ) containerTag=$OPTARG ;;
   esac
 done
-
-if [[ -z $containerRegistery ]]; then
-    echo "missing required argument '-r containerRegistry'"
-    showUsage
-    exit 1
-fi
-
-if [[ -z $containerName ]]; then
-    echo "missing required argument '-n containerName'"
-    showUsage
-    exit 1
-fi
 
 if [[ -z $containerTag ]]; then
     echo "missing required argument '-t containerTag'"
@@ -45,30 +32,41 @@ fi
 
 # ---- main ----
 
-containerStagingFolder=$(mktemp -d)
+buildDir="$(mktemp -d)"
+containerStagingFolder="$buildDir/container"
 
 function cleanUp() {
     local exit_code=$?
-    sudo rm -rf $containerStagingFolder
+    rm -rf "$buildDir"
     exit $exit_code
 }
 trap 'cleanUp' ERR
 
-micLocalFile=$enlistmentRoot/toolkit/tools/imagecustomizer/imagecustomizer
-micContainerFolder=/usr/bin
+micLocalFile="$enlistmentRoot/toolkit/out/tools/imagecustomizer"
+stagingBinDir="${containerStagingFolder}/usr/local/bin"
 
-containerFullPath=$containerRegistery/$containerName/$containerTag
-dockerFile=$enlistmentRoot/toolkit/tools/imagecustomizer/container/Dockerfile.mic-container
+dockerFile="$scriptDir/Dockerfile.mic-container"
+runScriptPath="$scriptDir/run.sh"
 
 # stage those files that need to be in the container
-mkdir -p ${containerStagingFolder}${micContainerFolder}
-cp $micLocalFile ${containerStagingFolder}${micContainerFolder}
+mkdir -p "${stagingBinDir}"
+cp "$micLocalFile" "${stagingBinDir}"
+cp "$runScriptPath" "${stagingBinDir}"
+
 touch ${containerStagingFolder}/.mariner-toolkit-ignore-dockerenv
 
+# download oras
+ORAS_TAR="${buildDir}/oras_${ORAS_VERSION}_linux_${ARCH}.tar.gz"
+
+curl -L "https://github.com/oras-project/oras/releases/download/v${ORAS_VERSION}/oras_${ORAS_VERSION}_linux_${ARCH}.tar.gz" \
+  -o "$ORAS_TAR"
+
+mkdir "${buildDir}/oras-install/"
+tar -zxf "$ORAS_TAR" -C "${buildDir}/oras-install/"
+mv "${buildDir}/oras-install/oras" "${stagingBinDir}"
+
 # build the container
-pushd $containerStagingFolder
-docker build -f $dockerFile . -t $containerFullPath
-popd
+docker build -f "$dockerFile" "$containerStagingFolder" -t "$containerTag"
 
 # clean-up
 cleanUp

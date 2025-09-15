@@ -3,55 +3,121 @@ Distribution:   Azure Linux
 # Created by pyp2rpm-1.1.0b
 
 %global pypi_name rfc3986
+%global common_description %{expand:
+A Python implementation of RFC 3986 including validation and authority parsing.}
 
 Name:           python-%{pypi_name}
-Version:        1.2.0
-Release:        8%{?dist}
+Version:        1.5.0
+Release:        12%{?dist}
 Summary:        Validating URI References per RFC 3986
 
-License:        ASL 2.0
-URL:            https://pypi.python.org/pypi/rfc3986
-Source0:        https://pypi.python.org/packages/source/r/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/python-%{pypi_name}-%{version}.tar.gz
+# Automatically converted from old format: ASL 2.0 - review is highly recommended.
+License:        Apache-2.0
+URL:            https://rfc3986.readthedocs.io
+Source0:        https://files.pythonhosted.org/packages/79/30/5b1b6c28c105629cc12b33bdcbb0b11b5bb1880c6cfbd955f9e792921aa8/rfc3986-1.5.0.tar.gz
 BuildArch:      noarch
 
+%description %{common_description}
+
 %package -n python3-%{pypi_name}
-Summary:        Validating URI References per RFC 3986
-%{?python_provide:%python_provide python3-%{pypi_name}}
-
+Summary:        %{summary}
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
+BuildRequires:  python3dist(wheel)
+BuildRequires:  python3dist(pytest)   
+BuildRequires:  python3dist(pytest-mock)
+BuildRequires:  python3-pip
 
-%description -n python3-%{pypi_name}
-A Python implementation of RFC 3986 including validation and authority parsing.
+%description -n python3-%{pypi_name} %{common_description}
 
-
-%description
-A Python implementation of RFC 3986 including validation and authority parsing.
-
+%pyproject_extras_subpkg -n python3-%{pypi_name} idna2008
 
 %prep
 %setup -q -n %{pypi_name}-%{version}
-# Remove bundled egg-info
-rm -rf %{pypi_name}.egg-info
+
+%generate_buildrequires
+%pyproject_buildrequires -x idna2008
 
 %build
-
-%py3_build
+%pyproject_wheel
 
 %install
+%pyproject_install
+%pyproject_save_files %{pypi_name}
 
-%py3_install
+%check
+%pytest
 
-%files -n python3-%{pypi_name}
-%doc README.rst LICENSE
-%{python3_sitelib}/%{pypi_name}
-%{python3_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
+%files -n python3-%{pypi_name} -f %{pyproject_files}
+%doc README.rst
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Mon Feb 17 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.5.0-12
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
 
+* Wed Jul 24 2024 Miroslav Suchý <msuchy@redhat.com> - 1.5.0-11
+- convert license to SPDX
+ 
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+ 
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.5.0-9
+- Rebuilt for Python 3.13
+ 
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+ 
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+ 
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+ 
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 1.5.0-5
+- Rebuilt for Python 3.12
+ 
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+ 
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+ 
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1.5.0-2
+- Rebuilt for Python 3.11
+ 
+* Wed Jan 26 2022 Carl George <carl@george.computer> - 1.5.0-1
+- Update to version 1.5.0
+ 
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+ 
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+ 
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.4.0-6
+- Rebuilt for Python 3.10
+ 
+* Wed Apr 21 2021 Carl George <carl@george.computer> - 1.4.0-5
+- Add idna build requirement to avoid skipping tests
+ 
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+ 
+* Thu Sep 03 2020 Miro Hrončok <mhroncok@redhat.com> - 1.4.0-3
+- Add metapackage for rfc3986[idna2008]
+- https://fedoraproject.org/wiki/Changes/PythonExtras
+- Fixes: rhbz#1875490
+ 
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+ 
+* Wed Jun 24 2020 Charalampos Stratakis <cstratak@redhat.com> - 1.4.0-1
+- Update to 1.4.0 (#1844405)
+ 
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1.2.0-8
+- Rebuilt for Python 3.9
+ 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 

@@ -1,6 +1,6 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
-Version:        2.4.3
+Version:        2.4.7
 Release:        1%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
@@ -15,10 +15,10 @@ BuildRequires:  npth-devel >= 1.2
 BuildRequires:  libassuan-devel >= 2.5.0
 BuildRequires:  libksba-devel >= 1.3.4
 BuildRequires:  libgcrypt-devel > 1.9.1
-BuildRequires:  libgpg-error-devel >= 1.46
+BuildRequires:  libgpg-error-devel >= 1.48
 Requires:       libksba > 1.3.4
 Requires:       libgcrypt >= 1.9.1
-Requires:       libgpg-error >= 1.46
+Requires:       libgpg-error >= 1.48
 Requires:       npth >= 1.2
 Requires:       libassuan >= 2.5.0
 Requires:       pinentry
@@ -51,17 +51,31 @@ These are the additional language files of gnupg2
 %autosetup -n gnupg-%{version}
 
 %build
+# Prevent GnuPG from using keyboxd for storing keys.
+# It tends to cause unexpected hangs of GnuPG commands and tools depending on GnuPG.
+# For more details, see:
+# - https://discussion.fedoraproject.org/t/gpg-blocking-forever-cant-git-commit-as-a-result/96605/6
+# - https://bugzilla.redhat.com/show_bug.cgi?id=2249218
+# - https://dev.gnupg.org/T6838
 %configure \
-  --enable-gpg-is-gpg2
+  --enable-gpg-is-gpg2 \
+  --disable-keyboxd
 %make_build
 
 %install
+ln -sf gpg2.1 doc/gpg.1
+ln -sf gpgv2.1 doc/gpgv.1
+
 %make_install
 
 pushd %{buildroot}%{_bindir}
 ln -s gpg2 gpg
 ln -s gpgv2 gpgv
 popd
+
+# Empty legacy global configuration file.
+# Some GnuPG commands expect it to exist.
+install -Dm 644 /dev/null %{buildroot}%{_sysconfdir}/gnupg/gpgconf.conf
 
 %find_lang %{name}
 
@@ -79,9 +93,11 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %{_mandir}/man1/*
 %{_mandir}/man7/*
 %{_mandir}/man8/*
+%{_mandir}/manh/*
 %{_infodir}/gnupg*
 %{_libexecdir}/*
 %{_datadir}/gnupg/*
+%{_sysconfdir}/gnupg
 %exclude %{_infodir}/dir
 %exclude /usr/share/doc/*
 
@@ -89,6 +105,15 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %defattr(-,root,root)
 
 %changelog
+* Mon Jun 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.4.7-1
+- Upgrade to version 2.4.7
+
+* Tue May 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.4-2
+- Disabled keyboxd.
+
+* Fri Mar 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.4-1
+- Upgrade to 2.4.4.
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.3-1
 - Auto-upgrade to 2.4.3 - Azure Linux 3.0 - package upgrades
 

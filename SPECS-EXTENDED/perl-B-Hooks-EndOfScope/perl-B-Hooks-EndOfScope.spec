@@ -8,20 +8,22 @@
 %bcond_without perl_B_Hooks_EndOfScope_enables_optional_test
 
 Name:		perl-B-Hooks-EndOfScope
-Version:	0.24
-Release:	10%{?dist}
-License:	GPL+ or Artistic
+Version:	0.28
+Release:	3%{?dist}
+License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:	Execute code after scope compilation finishes
 URL:		https://metacpan.org/release/B-Hooks-EndOfScope
-Source0:	https://cpan.metacpan.org/authors/id/E/ET/ETHER/B-Hooks-EndOfScope-%{version}.tar.gz#/perl-B-Hooks-EndOfScope-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/modules/by-module/B/B-Hooks-EndOfScope-%{version}.tar.gz#/perl-B-Hooks-EndOfScope-%{version}.tar.gz
 Patch0:		B-Hooks-EndOfScope-0.13-shellbangs.patch
 BuildArch:	noarch
 # Build
 BuildRequires:	coreutils
 BuildRequires:	findutils
+BuildRequires:	gcc
 BuildRequires:	make
+BuildRequires:	perl-devel
 BuildRequires:	perl-generators
 BuildRequires:	perl-interpreter
 BuildRequires:	perl(ExtUtils::MakeMaker)
@@ -90,6 +92,8 @@ BuildRequires:	perl(Test::Spelling), hunspell-en
 %endif
 # Runtime
 Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Dependencies
+# (none)
 
 %description
 This module allows you to execute code when Perl has finished compiling the
@@ -99,7 +103,7 @@ surrounding scope.
 %setup -q -n B-Hooks-EndOfScope-%{version}
 
 # Remove shellbangs from tests to placate rpmlint
-%patch 0
+%patch -P 0
 
 # British-English spelling LICENCE upsets US spell checker
 echo LICENCE >> xt/author/pod-spell.t
@@ -131,8 +135,76 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %{_mandir}/man3/B::Hooks::EndOfScope::XS.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.24-10
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Fri Dec 20 2024 Jyoti kanase <v-jykanase@microsoft.com> -  0.28-3
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.28-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Mar  1 2024 Paul Howarth <paul@city-fan.org> - 0.28-1
+- Update to 0.28
+  - Add optional prereqs to metadata to help prereq analysis tools
+    (CPAN RT#151992)
+- Avoid use of deprecated patch syntax
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.26-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.26-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.26-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Mar 03 2023 Michal Josef Špaček <mspacek@redhat.com> - 0.26-6
+- Update license to SPDX format
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.26-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.26-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jun 03 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.26-3
+- Perl 5.36 re-rebuild of bootstrapped packages
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.26-2
+- Perl 5.36 rebuild
+
+* Mon Feb 21 2022 Paul Howarth <paul@city-fan.org> - 0.26-1
+- Update to 0.26 (no changes)
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.25-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Oct 11 2021 Paul Howarth <paul@city-fan.org> - 0.25-1
+- Update to 0.25
+  - Add test of dieing inside an on_scope_end() (GH#8)
+  - Update bundled version of ExtUtils::HasCompiler, for new Apple include
+    paths
+- Use author-independent source URL
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.24-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon May 24 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.24-15
+- Perl 5.34 re-rebuild of bootstrapped packages
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.24-14
+- Perl 5.34 rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.24-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.24-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jun 26 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.24-11
+- Perl 5.32 re-rebuild of bootstrapped packages
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.24-10
+- Perl 5.32 rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.24-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

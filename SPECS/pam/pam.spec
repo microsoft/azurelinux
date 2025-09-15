@@ -1,7 +1,7 @@
 Summary:        Linux Pluggable Authentication Modules
 Name:           pam
 Version:        1.5.3
-Release:        1%{?dist}
+Release:        5%{?dist}
 License:        BSD and GPLv2+
 URL:            https://github.com/linux-pam/linux-pam
 Source0:        https://github.com/linux-pam/linux-pam/releases/download/v%{version}/Linux-PAM-%{version}.tar.xz
@@ -14,6 +14,12 @@ BuildRequires:  libselinux-devel
 BuildRequires:  audit-devel
 Requires:       audit-libs
 Recommends:     cracklib-dicts
+
+Patch0:         CVE-2024-22365.patch
+Patch1:         CVE-2024-10963.patch
+Patch2:         CVE-2024-10041.patch
+Patch3:         sync_pam_namespace_module_to_version_1.7.0.patch
+Patch4:         CVE-2025-6020.patch
 
 %description
 The Linux PAM package contains Pluggable Authentication Modules used to
@@ -37,7 +43,7 @@ This package contains libraries, header files and documentation
 for developing applications that use pam.
 
 %prep
-%autosetup -n Linux-PAM-%{version}
+%autosetup -n Linux-PAM-%{version} -p1
 
 %build
 ./configure \
@@ -102,6 +108,18 @@ EOF
 %{_libdir}/pkgconfig/pamc.pc
 
 %changelog
+* Tue Jun 24 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.5.3-5
+- Add patch for sync_pam_namespace_module_to_version_1.7.0.patch and CVE-2025-6020
+
+* Wed Dec 18 2024 Adit Jha <aditjha@microsoft.com> - 1.5.3-4
+- Patching CVE-2024-10041.
+
+* Fri Dec 06 2024 Adit Jha <aditjha@microsoft.com> - 1.5.3-3
+- Patching CVE-2024-10963.
+
+* Wed Oct 30 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.3-2
+- Patching CVE-2024-22365.
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.3-1
 - Auto-upgrade to 1.5.3 - Azure Linux 3.0 - package upgrades
 

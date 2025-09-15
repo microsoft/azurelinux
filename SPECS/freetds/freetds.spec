@@ -1,4 +1,6 @@
 %define bits	%{?__isa_bits:%{__isa_bits}}%{!?__isa_bits:32}
+%bcond docs 0%{!?azl:1}
+
 Summary:        Implementation of the TDS (Tabular DataStream) protocol
 Name:           freetds
 Version:        1.4.10
@@ -9,8 +11,10 @@ Distribution:   Azure Linux
 URL:            https://www.freetds.org/
 Source0:        ftp://ftp.freetds.org/pub/freetds/stable/freetds-%{version}.tar.bz2
 Source1:        freetds-tds_sysdep_public.h
-BuildRequires:  docbook-style-dsssl
+%if %{with docs}
+BuildRequires:  docbook-style-dsssl}
 BuildRequires:  doxygen
+%endif
 BuildRequires:  gnutls-devel
 BuildRequires:  krb5-devel
 BuildRequires:  libgcrypt-devel
@@ -45,6 +49,7 @@ This package contains the header files and development libraries
 for %{name}. If you like to develop programs using %{name}, you will need
 to install %{name}-devel.
 
+%if %{with docs}
 %package doc
 Summary:        Development documentation for %{name}
 BuildArch:      noarch
@@ -53,6 +58,7 @@ BuildArch:      noarch
 This package contains the development documentation for %{name}.
 If you like to develop programs using %{name}, you will need to install
 %{name}-doc.
+%endif
 
 %prep
 %setup -q
@@ -83,7 +89,7 @@ sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_RIE|' libtool
 
 
-make %{?_smp_mflags} DOCBOOK_DSL="`rpm -ql docbook-style-dsssl | grep -F html/docbook.dsl`"
+make %{?_smp_mflags} %{?with_docs:DOCBOOK_DSL="`rpm -ql docbook-style-dsssl | grep -F html/docbook.dsl`"}
 
 
 %install
@@ -134,8 +140,10 @@ find docdir -type f -print0 | xargs -0 chmod -x
 %exclude %{_libdir}/libtdsodbc.so
 %{_includedir}/*
 
+%if %{with docs}
 %files doc
 %doc docdir/reference
+%endif
 
 %changelog
 * Thu Dec 21 2023 Muhammad Falak <mwani@microsoft.com> - 1.4.10-1
@@ -316,7 +324,7 @@ find docdir -type f -print0 | xargs -0 chmod -x
 * Thu Aug 16 2007 Dmitry Butskoy <Dmitry@Butskoy.name>
 - Change License tag to "LGPLv2+ and GPLv2+"
 
-* Fri Jun 15 2007 Dmitry Butskoy <Dmitry@Butskoy.name> - 0.64-6 
+* Fri Jun 15 2007 Dmitry Butskoy <Dmitry@Butskoy.name> - 0.64-6
 - bump release to provide update path over Livna
 
 * Wed Jun 13 2007 Dmitry Butskoy <Dmitry@Butskoy.name> - 0.64-5

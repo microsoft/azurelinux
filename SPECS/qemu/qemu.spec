@@ -263,33 +263,23 @@ Distribution:   Azure Linux
 %endif
 %define requires_device_usb_host Requires: %{name}-device-usb-host = %{evr}
 %define requires_device_usb_redirect Requires: %{name}-device-usb-redirect = %{evr}
-%if %{have_ui}
 %define requires_ui_curses Requires: %{name}-ui-curses = %{evr}
+%if %{have_ui}
 %define requires_ui_gtk Requires: %{name}-ui-gtk = %{evr}
 %define requires_ui_sdl Requires: %{name}-ui-sdl = %{evr}
 %define requires_ui_egl_headless Requires: %{name}-ui-egl-headless = %{evr}
 %define requires_ui_opengl Requires: %{name}-ui-opengl = %{evr}
 %else
-%define requires_ui_curses %{nil}
 %define requires_ui_gtk %{nil}
 %define requires_ui_sdl %{nil}
 %define requires_ui_egl_headless %{nil}
 %define requires_ui_opengl %{nil}
 %endif
-#check if needs to be enabled for azl
-%if %{have_ui}
 %define requires_device_display_virtio_gpu Requires: %{name}-device-display-virtio-gpu = %{evr}
 %define requires_device_display_virtio_gpu_pci Requires: %{name}-device-display-virtio-gpu-pci = %{evr}
 %define requires_device_display_virtio_gpu_ccw Requires: %{name}-device-display-virtio-gpu-ccw = %{evr}
 %define requires_device_display_virtio_vga Requires: %{name}-device-display-virtio-vga = %{evr}
 %define requires_device_display_virtio_vga_gl Requires: %{name}-device-display-virtio-vga-gl = %{evr}
-%else
-%define requires_device_display_virtio_gpu %{nil}
-%define requires_device_display_virtio_gpu_pci %{nil}
-%define requires_device_display_virtio_gpu_ccw %{nil}
-%define requires_device_display_virtio_vga %{nil}
-%define requires_device_display_virtio_vga_gl %{nil}
-%endif
 %define requires_package_qemu_pr_helper Requires: qemu-pr-helper
 %if 0%{azl}
 %define requires_package_virtiofsd Requires: vhostuser-backend(fs)
@@ -438,7 +428,7 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 8.2.0
-Release: 4%{?dist}
+Release: 19%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -446,8 +436,20 @@ Source0: https://download.qemu.org/%{name}-%{version}%{?rcstr}.tar.xz
 
 # https://patchwork.kernel.org/project/qemu-devel/patch/20231128143647.847668-1-crobinso@redhat.com/
 # Fix pvh.img ld build failure on fedora rawhide
-Patch: 0001-pc-bios-optionrom-Fix-pvh.img-ld-build-failure-on-fe.patch
-Patch2: 0002-disable-migration-tests.patch
+Patch1:   0001-pc-bios-optionrom-Fix-pvh.img-ld-build-failure-on-fe.patch
+Patch2:   0002-Disable-failing-tests-on-azl.patch
+Patch3:   CVE-2023-6683.patch
+Patch4:   CVE-2023-6693.patch
+Patch5:   CVE-2021-20255.patch
+Patch6:   CVE-2024-3447.patch
+Patch7:   CVE-2024-4467.patch
+Patch8:   CVE-2024-6505.patch
+Patch9:   CVE-2024-4693.patch
+Patch10:  CVE-2024-7730.patch
+Patch11:  CVE-2024-3567.patch
+Patch12:  CVE-2024-26327.patch
+Patch13:  CVE-2024-26328.patch
+Patch14:  CVE-2024-7409.patch
 
 Source10: qemu-guest-agent.service
 Source11: 99-qemu-guest-agent.rules
@@ -484,11 +486,8 @@ BuildRequires: libfdt-devel >= %{libfdt_version}
 %if %{have_pmem}
 BuildRequires: libpmem-devel
 %endif
-%if %{have_ui}
 # For VNC PNG support
 BuildRequires: libpng-devel
-%endif
-
 %if %{have_block_rbd}
 BuildRequires: librbd-devel
 %endif
@@ -516,9 +515,7 @@ BuildRequires: pkgconfig(libdrm)
 BuildRequires: pkgconfig(gbm)
 %endif
 # qemu-keymap
-%if %{have_ui}
 BuildRequires: pkgconfig(xkbcommon)
-%endif
 
 BuildRequires: python3-devel
 # Required for docs. Disable for AzLinux, to reduce python package dependencies
@@ -571,10 +568,8 @@ BuildRequires: ncurses-devel
 BuildRequires: spice-protocol
 BuildRequires: spice-server-devel
 %endif
-%if %{have_ui}
 # VNC JPEG support
 BuildRequires: libjpeg-devel
-%endif
 %if %{with brltty}
 # Braille device support
 BuildRequires: brlapi-devel
@@ -584,7 +579,6 @@ BuildRequires: brlapi-devel
 BuildRequires: glusterfs-api-devel
 %endif
 BuildRequires: gnutls-devel
-%if %{have_ui}
 # gtk related?
 BuildRequires: glib2-devel
 # GTK frontend
@@ -592,7 +586,6 @@ BuildRequires: gtk3-devel
 BuildRequires: vte291-devel
 # GTK translations
 BuildRequires: gettext
-%endif
 %if %{have_xen}
 # Xen support
 BuildRequires: xen-devel
@@ -638,7 +631,7 @@ BuildRequires: fuse3-devel
 %if %{have_sdl_image}
 BuildRequires: SDL2_image-devel
 %endif
-%if %{have_gvnc_devel}
+%if %{have_ui}
 # Used by vnc-display-test
 BuildRequires: pkgconfig(gvnc-1.0)
 %endif
@@ -659,7 +652,7 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %endif
 
 %if %{user_static}
-BuildRequires: glibc-static >= 2.38-3
+BuildRequires: glibc-static >= 2.38-12%{?dist}
 BuildRequires: glib2-static zlib-static
 BuildRequires: pcre2-static
 %endif
@@ -939,13 +932,13 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 This package provides the additional D-Bus UI for QEMU.
 %endif
 
-%if %{have_ui}
 %package  ui-curses
 Summary: QEMU curses UI driver
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
 %description ui-curses
 This package provides the additional curses UI for QEMU.
 
+%if %{have_ui}
 %package  ui-gtk
 Summary: QEMU GTK UI driver
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
@@ -976,13 +969,11 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 This package provides the Baum chardev driver for QEMU.
 %endif
 
-%if %{have_ui}
 %package device-display-virtio-gpu
 Summary: QEMU virtio-gpu display device
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
 %description device-display-virtio-gpu
 This package provides the virtio-gpu display device for QEMU.
-%endif
 
 %if %{have_virgl}
 %package device-display-virtio-gpu-gl
@@ -1000,13 +991,11 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 This package provides the virtio-gpu-rutabaga display device for QEMU.
 %endif
 
-%if %{have_ui}
 %package device-display-virtio-gpu-pci
 Summary: QEMU virtio-gpu-pci display device
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
 %description device-display-virtio-gpu-pci
 This package provides the virtio-gpu-pci display device for QEMU.
-%endif
 
 %if %{have_virgl}
 %package device-display-virtio-gpu-pci-gl
@@ -1024,7 +1013,6 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 This package provides the virtio-gpu-pci-rutabaga display device for QEMU.
 %endif
 
-%if %{have_ui}
 %package device-display-virtio-gpu-ccw
 Summary: QEMU virtio-gpu-ccw display device
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
@@ -1042,7 +1030,6 @@ Summary: QEMU virtio-vga-gl display device
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
 %description device-display-virtio-vga-gl
 This package provides the virtio-vga-gl display device for QEMU.
-%endif
 
 %if %{have_rutabaga_gfx}
 %package device-display-virtio-vga-rutabaga
@@ -1940,17 +1927,13 @@ run_configure \
   --enable-vhost-user \
   --enable-vhost-user-blk-server \
   --enable-vhost-vdpa \
-%if %{have_ui}
   --enable-vnc \
   --enable-png \
   --enable-vnc-sasl \
-%endif
 %if %{enable_werror}
   --enable-werror \
 %endif
-%if %{have_ui}
   --enable-xkbcommon \
-%endif
   \
   \
   --audio-drv-list=%{?pa_drv}%{?sdl_drv}alsa,%{?jack_drv}oss \
@@ -2019,9 +2002,7 @@ run_configure \
   --enable-virtfs \
   --enable-virtfs-proxy-helper \
   --enable-vpc \
-%if %{have_ui}
   --enable-vnc-jpeg \
-%endif
   --enable-vte \
   --enable-vvfat \
 %if %{have_xen}
@@ -2127,7 +2108,7 @@ install -D -p -m 0644 %{modprobe_kvm_conf} %{buildroot}%{_sysconfdir}/modprobe.d
 %endif
 
 # Copy some static data into place
-install -D -p -m 0644 -t %{buildroot}%{qemudocdir} README.rst COPYING COPYING.LIB LICENSE docs/interop/qmp-spec.rst
+install -D -p -m 0644 -t %{buildroot}%{qemudocdir} README.rst docs/interop/qmp-spec.rst
 install -D -p -m 0644 qemu.sasl %{buildroot}%{_sysconfdir}/sasl2/%{name}.conf
 
 install -m 0644 scripts/dump-guest-memory.py %{buildroot}%{_datadir}/%{name}
@@ -2256,16 +2237,6 @@ rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-sparc64-simpletrace.
 
 %endif
 
-%if !%{have_ui}
-rm -rf %{buildroot}%{_libdir}/%{name}/hw-display-virtio-gpu-pci.so
-rm -rf %{buildroot}%{_libdir}/%{name}/hw-display-virtio-gpu.so
-rm -rf %{buildroot}%{_libdir}/%{name}/hw-display-virtio-vga-gl.so
-rm -rf %{buildroot}%{_libdir}/%{name}/hw-display-virtio-vga.so
-rm -rf %{buildroot}%{_libdir}/%{name}/hw-s390x-virtio-gpu-ccw.so
-rm -rf %{buildroot}%{_libdir}/%{name}/ui-curses.so
-# remove keymap files
-rm -rf %{buildroot}%{_datadir}/%{name}/keymaps/*
-%endif
 # Fedora specific stuff below
 # %find_lang %{name}
 
@@ -2368,6 +2339,10 @@ echo "Testing %{name}-build"
 #   Added: 2022-06
 %ifnarch %{power64}
 %make_build check
+# For debugging tests use https://www.qemu.org/docs/master/devel/testing.html
+# e.g.
+# QTEST_LOG=1 make check-qtest-x86_64 V=1 OR
+# make check-qtest-x86_64 V=1 for runs with trace off
 %endif
 
 popd
@@ -2519,7 +2494,8 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %endif
 
 %files -n qemu-guest-agent
-%doc COPYING README.rst
+%license COPYING COPYING.LIB LICENSE
+%doc README.rst
 %{_bindir}/qemu-ga
 %if ! %{azl}
 %{_mandir}/man8/qemu-ga.8*
@@ -2546,9 +2522,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %endif
 
 %files tools
-%if %{have_ui}
 %{_bindir}/qemu-keymap
-%endif
 %{_bindir}/qemu-edid
 %{_bindir}/qemu-trace-stap
 %{_datadir}/%{name}/simpletrace.py*
@@ -2573,9 +2547,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %dir %{_datadir}/%{name}/
 %dir %{_datadir}/%{name}/vhost-user/
 %{_datadir}/icons/*
-%if %{have_ui}
 %{_datadir}/%{name}/keymaps/
-%endif
 %{_datadir}/%{name}/linuxboot_dma.bin
 %attr(4755, -, -) %{_libexecdir}/qemu-bridge-helper
 %if ! %{azl}
@@ -2670,9 +2642,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %files ui-dbus
 %{_libdir}/%{name}/ui-dbus.so
 %endif
-%if %{have_ui}
 %files ui-curses
 %{_libdir}/%{name}/ui-curses.so
+%if %{have_ui}
 %files ui-gtk
 %{_libdir}/%{name}/ui-gtk.so
 %if %{with sdl}
@@ -2705,7 +2677,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_libdir}/%{name}/hw-display-virtio-gpu-pci-rutabaga.so
 %endif
 
-%if %{have_ui}
 %files device-display-virtio-gpu
 %{_libdir}/%{name}/hw-display-virtio-gpu.so
 %files device-display-virtio-gpu-pci
@@ -2716,7 +2687,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_libdir}/%{name}/hw-display-virtio-vga.so
 %files device-display-virtio-vga-gl
 %{_libdir}/%{name}/hw-display-virtio-vga-gl.so
-%endif
 
 %if %{have_rutabaga_gfx}
 %files device-display-virtio-vga-rutabaga
@@ -3463,6 +3433,56 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 8.2.0-19
+- Bump to rebuild with updated glibc
+
+* Thu Aug 14 2025 Kshitiz Godara <kgodara@microsoft.com> - 8.2.0-18
+- Added Patch for CVE-2024-7409
+
+* Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.2.0-17
+- Bump to rebuild with updated glibc
+
+* Tue May 13 2025 Kshitiz Godara <kgodara@microsoft.com> - 8.2.0-16
+- Added patch for CVE-2024-26327 CVE-2024-26328
+
+* Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 8.2.0-15
+- Bump to rebuild with updated glibc
+
+* Mon May 05 2025 Kshitiz Godara <kgodara@microsoft.com> - 8.2.0-14
+- Added patch for CVE-2024-6505 CVE-2024-4467 CVE-2024-4693 CVE-2024-7730 CVE-2024-3447 CVE-2024-3567
+
+* Thu Mar 20 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 8.2.0-13
+- Add patch for CVE-2023-6683
+- Add patch for CVE-2023-6693
+- Add patch for CVE-2021-20255
+
+* Tue Feb 25 2025 Chris Co <chrco@microsoft.com> - 8.2.0-12
+- Bump to rebuild with updated glibc
+
+* Mon Aug 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 8.2.0-11
+- Update to build dep latest glibc-static version
+
+* Wed Aug 21 2024 Chris Co <chrco@microsoft.com> - 8.2.0-10
+- Bump to rebuild with updated glibc
+
+* Wed Jun 19 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 8.2.0-9
+- Enable vnc related packages/dependencies required for Kubevirt
+- Removing the have_ui flag to install virtio required components.
+
+* Wed May 22 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 8.2.0-8
+- update to build dep latest glibc-static version
+
+* Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 8.2.0-7
+- Sanitize license files
+
+* Mon May 13 2024 Chris Co <chrco@microsoft.com> - 8.2.0-6
+- Update to build dep latest glibc-static version
+
+* Mon Apr 01 2024 Kanika Nema <kanikanema@microsoft.com> - 8.2.0-5
+- Disable eventfd based migration tests as they hang when run as part of check.
+- Diable TLS PSK tests as they fail.
+- Remove patch that disables all migration tests.
+
 * Wed Mar 20 2024 Betty Lakes <bettylakes@microsoft.com> - 8.2.0-4
 - Apply patch to disable migration tests that were getting stuck
 - Move from pcre to pcre2

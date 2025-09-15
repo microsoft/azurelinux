@@ -1,0 +1,41 @@
+From e0f2421ecf7bd9b4783901eafea1d9f386c025ac Mon Sep 17 00:00:00 2001
+From: Dridi Boukelmoune <dridi.boukelmoune@gmail.com>
+Date: Mon, 4 Mar 2024 23:19:41 +0100
+Subject: [PATCH 8/9] x86: Add missing fields to s_emr_config
+
+It looks as if EMR support had been authored before #66 was merged,
+leading to a mismatch between the struct definition and this array
+initialization.
+
+This silences the missing-field-initializers warning.
+
+Refs d3fcffc6a9cc2ad61b6f9a902796cb317bec266a
+Refs #66
+---
+ x86/skl.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/x86/skl.c b/x86/skl.c
+index 17cfbcc..a80a868 100644
+--- a/x86/skl.c
++++ b/x86/skl.c
+@@ -64,11 +64,11 @@ static plat_event_config_t s_spr_config[PERF_COUNT_NUM] = {
+ };
+ 
+ static plat_event_config_t s_emr_config[PERF_COUNT_NUM] = {
+-	{ PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES, 0x53, 0, "cpu_clk_unhalted.core" },
+-	{ PERF_TYPE_RAW, 0x012A, 0x53, 0x730000001, "off_core_response_0" },
+-	{ PERF_TYPE_HARDWARE, PERF_COUNT_HW_REF_CPU_CYCLES, 0x53, 0, "cpu_clk_unhalted.ref" },
+-	{ PERF_TYPE_HARDWARE, PERF_COUNT_HW_INSTRUCTIONS, 0x53, 0, "instr_retired.any" },
+-	{ PERF_TYPE_RAW, 0x012B, 0x53, 0x104000001, "off_core_response_1" }
++	{ PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES, 0x53, 0, 0, 0, "cpu_clk_unhalted.core" },
++	{ PERF_TYPE_RAW, 0x012A, 0x53, 0x730000001, 0, 0, "off_core_response_0" },
++	{ PERF_TYPE_HARDWARE, PERF_COUNT_HW_REF_CPU_CYCLES, 0x53, 0, 0, 0, "cpu_clk_unhalted.ref" },
++	{ PERF_TYPE_HARDWARE, PERF_COUNT_HW_INSTRUCTIONS, 0x53, 0, 0, 0, "instr_retired.any" },
++	{ PERF_TYPE_RAW, 0x012B, 0x53, 0x104000001, 0, 0, "off_core_response_1" }
+ };
+ 
+ static plat_event_config_t s_skl_ll = {
+-- 
+2.44.0
+

@@ -7,7 +7,7 @@ C++ libraries that might crash the process. To use the plugin, simply use the
 Summary:        py.test plugin for running tests in isolated forked subprocesses
 Name:           python-%{pypi_name}
 Version:        1.4.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,8 +18,10 @@ BuildRequires:  python3-py
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 BuildArch:      noarch
+Patch0:         Pytest-Output-Fix.patch  
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 
 %description %{_description}
@@ -45,7 +47,6 @@ pip3 install atomicwrites>=1.3.0 \
     attrs>=19.1.0 \
     more-itertools>=7.0.0 \
     pluggy>=0.11.0 \
-    pytest==7.1.2 \
     pytest-cov>=2.7.1
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
@@ -57,6 +58,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/pytest_forked*
 
 %changelog
+* Tue Apr 29 2025 Riken Maharjan <rmaharjan@microsoft.com> - 1.4.0-3
+- Add patch from upstream to account for new pytest output.
+
 * Wed Oct 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.0-2
 - Freezing 'pytest' test dependency to version 7.1.2.
 

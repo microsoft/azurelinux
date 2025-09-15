@@ -1,7 +1,7 @@
 Summary:        NFS client utils
 Name:           nfs-utils
 Version:        2.6.4
-Release:        1%{?dist}
+Release:        4%{?dist}
 License:        MIT and GPLv2 and GPLv2+ and BSD
 URL:            https://linux-nfs.org/
 Group:          Applications/Nfs-utils-client
@@ -82,6 +82,7 @@ sed -i 's/RPCGEN_PATH" =/rpcgen_path" =/' configure
             --enable-libmount-mount     \
             --without-tcp-wrappers      \
             --enable-gss                \
+            --enable-svcgss             \
             --enable-nfsv4              \
             --with-rpcgen=internal      \
             --disable-static
@@ -99,6 +100,7 @@ mkdir -p %{buildroot}/lib/systemd/system/
 mkdir -p %{buildroot}/etc/default
 mkdir -p %{buildroot}/etc/export.d
 mkdir -p %{buildroot}/var/lib/nfs/v4recovery
+mkdir -p %{buildroot}/etc/request-key.d
 touch %{buildroot}/etc/exports
 
 install -m644 %{SOURCE1} %{buildroot}/lib/systemd/system/
@@ -113,6 +115,10 @@ install -m644 systemd/nfs-idmapd.service %{buildroot}/lib/systemd/system/
 install -m644 systemd/rpc_pipefs.target  %{buildroot}/lib/systemd/system/
 install -m644 systemd/var-lib-nfs-rpc_pipefs.mount  %{buildroot}/lib/systemd/system/
 install -m644 systemd/rpc-svcgssd.service %{buildroot}/lib/systemd/system/
+install -m644 systemd/rpc-gssd.service %{buildroot}/lib/systemd/system/
+install -m644 support/nfsidmap/idmapd.conf %{buildroot}/etc/
+install -m644 utils/nfsidmap/id_resolver.conf %{buildroot}/etc/request-key.d/
+
 find %{buildroot}/%{_libdir} -name '*.la' -delete
 
 install -vdm755 %{buildroot}/usr/lib/systemd/system-preset
@@ -126,10 +132,10 @@ make check
 
 %pre
 if ! getent group nobody >/dev/null; then
-    groupadd -r nobody
+    groupadd -r -g 65534 nobody
 fi
 if ! getent passwd nobody >/dev/null; then
-    useradd -g named -s /bin/false -M -r nobody
+    useradd -g named -u 65534 -s /bin/false -M -r nobody
 fi
 
 %post
@@ -153,12 +159,14 @@ fi
 %{_sharedstatedir}/*
 %config(noreplace) /etc/default/nfs-utils
 %config(noreplace) /etc/exports
+%config(noreplace) /etc/request-key.d/id_resolver.conf
 /lib/systemd/system/*
 %{_libdir}/systemd/system-preset/50-nfs-server.preset
 %{_libexecdir}/nfsrahead
 %{_udevrulesdir}/99-nfs.rules
 
 %files -n libnfsidmap
+%config(noreplace) /etc/idmapd.conf
 %{_libdir}/libnfsidmap.so.*
 %{_libdir}/libnfsidmap/*.so
 
@@ -170,6 +178,16 @@ fi
 %{_libdir}/libnfsidmap.so
 
 %changelog
+* Tue Apr 1 2025 Bhagyashri Pathak <bhapathak@microsoft.com> - 2.6.4-4
+- Build nfs-utils to include idmapd.conf and id_resolver.conf
+
+* Mon Aug 26 2024 Suresh Thelkar <sthelkar@microsoft.com> - 2.6.4-3
+- Build nfs-utils to provide rsc.svcgssd service
+- Add rsc-gssd.service file to nfs-utils package
+
+* Tue Mar 12 2024 Rachel Menge <rachelmenge@microsoft.com> - 2.6.4-2
+- Cherry-pick fix post-install script to create nobody user instead of named user
+
 * Tue Jan 02 2024 Rachel Menge <rachelmenge@microsoft.com> - 2.6.4-1
 - Update to version 2.6.4
 

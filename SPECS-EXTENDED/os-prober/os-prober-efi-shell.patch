@@ -1,0 +1,30 @@
+diff --git a/os-probes/mounted/common/efi/05shell b/os-probes/mounted/common/efi/05shell
+new file mode 100644
+index 0000000..d4233c0
+--- /dev/null
++++ b/os-probes/mounted/common/efi/05shell
+@@ -0,0 +1,24 @@
++#!/usr/bin/sh
++# Detects a shell.efi bootloader on a EFI System Partition
++
++. /usr/share/os-prober/common.sh
++
++found=
++
++efi_shell=`find $1 -iname "shell.efi"`
++if [ -n "${efi_shell}" ]; then
++	bdir="${efi_shell%/*}"
++	bdir="${efi_shell##*/}"
++	filename=`basename ${efi_shell}`
++	long="EFI firmware management shell"
++	short="EFI_SHELL"
++	path=${bdir}/${filename}
++	found=true
++fi
++
++if [ -n "$found" ]; then
++	label="$(count_next_label "$short")"
++	result "${path}:${long}:${label}"
++fi
++
++exit 0

@@ -1,7 +1,7 @@
 Summary:        Read and write Changes files
 Name:           perl-CPAN-Changes
 Version:        0.500002
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,8 @@ BuildRequires:  perl-interpreter
 
 # Module Runtime
 BuildRequires:  perl(Encode)
+BuildRequires:  perl(Module::Runtime)
+
 BuildRequires:  perl(ExtUtils::MakeMaker)
 
 # Script Runtime
@@ -29,24 +31,29 @@ BuildRequires:  perl(Text::Wrap)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(version) >= 0.99.06
 BuildRequires:  perl(warnings)
+BuildRequires:  perl(Moo) >= 1.006000
+BuildRequires:  perl(Sub::Quote) >= 1.005000
+BuildRequires:  perl(Types::Standard)
 
 %if 0%{?with_check}
 # Test Suite
 BuildRequires:  perl(Test::More) >= 0.96
-
+BuildRequires:	perl(constant)
+BuildRequires:	perl(Data::Dumper)
+BuildRequires:	perl(File::Spec)
 # Extra Tests
 BuildRequires:  perl(Test::Pod) >= 1.00
 BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
-
-# Optional Tests, currently not supported in Mariner.
-%if 0
-BuildRequires:  perl(Moo)
-%endif
 %endif
 
 # Runtime
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(version) >= 0.99.06
+Requires:       perl(Module::Runtime)
+Requires:       perl(Moo) >= 1.006000 
+Requires:       perl(Sub::Quote) >= 1.005000
+Requires:       perl(Types::Standard)
+Requires:       perl(Role::Tiny)
 
 %description
 It is standard practice to include a Changes file in your distribution. The
@@ -77,6 +84,7 @@ make test
 make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 
 %files
+%license LICENSE
 %doc Changes README
 %{_bindir}/tidy_changelog
 %{perl_vendorlib}/CPAN/
@@ -87,6 +95,9 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %{_mandir}/man3/Test::CPAN::Changes.3*
 
 %changelog
+* Mon May 12 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.500002-2
+- Fix ptest and installation issue
+
 * Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.500002-1
 - Auto-upgrade to 0.500002 - Azure Linux 3.0 - package upgrades
 
