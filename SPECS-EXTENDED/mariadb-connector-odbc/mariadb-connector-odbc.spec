@@ -4,11 +4,11 @@ Distribution:   Azure Linux
 %bcond_with     debug
 
 Name:           mariadb-connector-odbc
-Version:        3.2.1
-Release:        2.rc%{?with_debug:.debug}%{?dist}.3
+Version:        3.2.2
+Release:        1%{?dist}
 Summary:        The MariaDB Native Client library (ODBC driver)
 License:        LGPL-2.1-or-later
-Source:         https://archive.mariadb.org/connector-odbc-%{version}/%{name}-%{version}-rc-src.tar.gz
+Source:         https://archive.mariadb.org/connector-odbc-%{version}/%{name}-%{version}-src.tar.gz
 Url:            https://mariadb.org/en/
 # Online documentation can be found at: https://mariadb.com/kb/en/library/mariadb-connector-odbc/
 
@@ -22,7 +22,7 @@ Standard 3.5, can be used as a drop-in replacement for MySQL Connector/ODBC,
 and it supports both Unicode and ANSI modes.
 
 %prep
-%setup -q -n %{name}-%{version}-rc-src
+%setup -q -n %{name}-%{version}-src
 
 %build
 
@@ -64,7 +64,7 @@ FCFLAGS="$FCFLAGS   -O0 -g"; export FCFLAGS
 %{_libdir}/pkgconfig/libmaodbc.pc
 
 %changelog
-* Tue Jan 14 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 3.2.1-2.rc.3
+* Tue Jan 14 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 3.2.2-1
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License Verified
 
