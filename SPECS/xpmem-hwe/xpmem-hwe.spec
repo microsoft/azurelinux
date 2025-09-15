@@ -54,7 +54,7 @@ Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/
 ExclusiveArch:   aarch64
 
 # name gets a different value in subpackages
-%global _name %{name}
+%global kernel_suffix hwe
 %global _kmp_rel %{release}%{?_kmp_build_num}%{?_dist}
 # Required for e.g. SLES12:
 %if %{undefined make_build}
@@ -93,18 +93,18 @@ repository or by downloading a tarball from the link above.
 This package includes helper tools for the kernel module.
 
 %if ! %{with kernel_only}
-%package -n libxpmem
+%package -n libxpmem-%{kernel_suffix}
 Summary: XPMEM: Userspace library
-%description -n libxpmem
+%description -n libxpmem-%{kernel_suffix}
 XPMEM is a Linux kernel module that enables a process to map the
 memory of another process into its virtual address space. Source code
 can be obtained by cloning the Git repository, original Mercurial
 repository or by downloading a tarball from the link above.
 
 
-%package -n libxpmem-devel
+%package -n libxpmem-%{kernel_suffix}-devel
 Summary: XPMEM: userspace library development headers
-%description -n libxpmem-devel
+%description -n libxpmem-%{kernel_suffix}-devel
 XPMEM is a Linux kernel module that enables a process to map the
 memory of another process into its virtual address space. Source code
 can be obtained by cloning the Git repository, original Mercurial
@@ -169,7 +169,7 @@ This package includes the kernel module (non KMP version).
 #
 
 %if 0%{?rhel} > 0 || 0%{?euleros} >= 2
-%global install_mod_dir extra/%{_name}
+%global install_mod_dir extra/%{name}
 %endif
 
 %{!?install_mod_dir: %global install_mod_dir updates}
@@ -214,8 +214,8 @@ depmod %{KVERSION} -a
 /sbin/modprobe xpmem > /dev/null 2>&1
 
 %if ! %{with kernel_only}
-%post   -n libxpmem -p /sbin/ldconfig
-%postun -n libxpmem -p /sbin/ldconfig
+%post   -n libxpmem-%{kernel_suffix} -p /sbin/ldconfig
+%postun -n libxpmem-%{kernel_suffix} -p /sbin/ldconfig
 %endif
 
 %postun modules
@@ -235,11 +235,11 @@ fi
 %license COPYING COPYING.LESSER
 
 %if ! %{with kernel_only}
-%files -n libxpmem
+%files -n libxpmem-%{kernel_suffix}
 %{_libdir}/libxpmem.so.*
 %license COPYING COPYING.LESSER
 
-%files -n libxpmem-devel
+%files -n libxpmem-%{kernel_suffix}-devel
 %{_prefix}/include/xpmem.h
 %{_libdir}/libxpmem.a
 %{_libdir}/libxpmem.so

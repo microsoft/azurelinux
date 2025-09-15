@@ -84,7 +84,7 @@ pushd rpm_contents
 
 # This spec's whole purpose is to inject the signed modules
 rpm2cpio %{SOURCE0} | cpio -idmv
-cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/extra/knem/knem.ko
+cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/extra/%{_name}/knem.ko
 popd
 
 %install
