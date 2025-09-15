@@ -1,35 +1,36 @@
 From 607d529c70e8f021003237a674beedec7b422de5 Mon Sep 17 00:00:00 2001
 From: Sharath Srikanth Chellappa <sharathsr@microsoft.com>
 Date: Mon, 7 Jul 2025 12:43:42 -0700
-Subject: [PATCH] Modifying Golang version and adding makefile targets for
- development
+Subject: [PATCH] [OPTIONAL] Adding makefile targets, templates for local development and testing
 
-These changes will potentially be removed as the upstream carries out a new release.
+This patch file is an optional patch file which provides a direction for the user to build and push Docker images, 
+generate a local clusterctl-compatible provider repository using envsubst, 
+and use the local provider repository. This is only for local development and testing purposes and is a reference for 
+anyone who wants to do local development and testing.
 
-1. Go version upgraded from 1.23.x to 1.24.0 in:
-    - Dockerfile
-    - go.mod
-    - hack/tools/go.mod
-
-2. Added Makefile targets:
+The changes are as follows:
+1. Added Makefile targets:
     - $(ENVSUBST) to build envsubst.
     - dev-release to build and push Docker images.
     - create-local-provider-repository to generate a local clusterctl-compatible provider repository using envsubst.
 
-3. templates/cluster-template-azl.yaml: A full Cluster API template for KubeVirt clusters, including:
+2. templates/cluster-template-azl.yaml: A full Cluster API template for KubeVirt clusters, including:
     - Cluster, KubevirtCluster, KubevirtMachineTemplate, KubeadmControlPlane, KubeadmConfigTemplate, and MachineDeployment resources.
     - Custom iptables rules, sysctl tuning, and kernel module loading.
     - Use of envsubst for dynamic templating via environment variables.
 
+3. hack/clusterctl.yaml: A clusterctl configuration file to use the local provider repository.
+
+4. scripts/go_install.sh: A script to install a specific version of a Go module.
+
+5. Dockerfile: Updated the Golang version to 1.24.
 ---
  Dockerfile                          |   2 +-
  Makefile                            |  52 +++-
- go.mod                              |   2 +-
  hack/clusterctl.yaml                |   5 +
- hack/tools/go.mod                   |   2 +-
  scripts/go_install.sh               |  57 +++++
- templates/cluster-template-azl.yaml | 368 ++++++++++++++++++++++++++++
- 7 files changed, 484 insertions(+), 4 deletions(-)
+ templates/cluster-template-azl.yaml | 366 ++++++++++++++++++++++++++++
+ 5 files changed, 480 insertions(+), 2 deletions(-)
  create mode 100644 hack/clusterctl.yaml
  create mode 100755 scripts/go_install.sh
  create mode 100644 templates/cluster-template-azl.yaml
@@ -124,18 +125,6 @@ index e210ed5..0b21846 100644
  ## --------------------------------------
  ## Deployment
  ## --------------------------------------
-diff --git a/go.mod b/go.mod
-index a312010..d59a315 100644
---- a/go.mod
-+++ b/go.mod
-@@ -1,6 +1,6 @@
- module sigs.k8s.io/cluster-api-provider-kubevirt
- 
--go 1.23.6
-+go 1.24.0
- 
- require (
- 	github.com/go-logr/logr v1.4.2
 diff --git a/hack/clusterctl.yaml b/hack/clusterctl.yaml
 new file mode 100644
 index 0000000..4f7e4b2
@@ -148,18 +137,6 @@ index 0000000..4f7e4b2
 +    url: "${LOCAL_REPOSITORY}/infrastructure-components.yaml"
 +    type: "InfrastructureProvider"
 \ No newline at end of file
-diff --git a/hack/tools/go.mod b/hack/tools/go.mod
-index cf216bb..7e19388 100644
---- a/hack/tools/go.mod
-+++ b/hack/tools/go.mod
-@@ -1,6 +1,6 @@
- module sigs.k8s.io/cluster-api-provider-aws/hack/tools
- 
--go 1.23.0
-+go 1.24.0
- 
- require (
- 	gotest.tools/gotestsum v1.12.0
 diff --git a/scripts/go_install.sh b/scripts/go_install.sh
 new file mode 100755
 index 0000000..56a1fd3
@@ -226,10 +203,10 @@ index 0000000..56a1fd3
 \ No newline at end of file
 diff --git a/templates/cluster-template-azl.yaml b/templates/cluster-template-azl.yaml
 new file mode 100644
-index 0000000..148ffcf
+index 0000000..dda24e4
 --- /dev/null
 +++ b/templates/cluster-template-azl.yaml
-@@ -0,0 +1,368 @@
+@@ -0,0 +1,366 @@
 +---
 +apiVersion: cluster.x-k8s.io/v1beta1
 +kind: Cluster
@@ -240,10 +217,10 @@ index 0000000..148ffcf
 +  clusterNetwork:
 +    pods:
 +      cidrBlocks:
-+        - 10.243.0.0/16
++        - ${CLUSTER_POD_CIDR:=""}
 +    services:
 +      cidrBlocks:
-+        - 10.95.0.0/16
++        - ${CLUSTER_SERVICE_CIDR:=""}
 +  infrastructureRef:
 +    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
 +    kind: KubevirtCluster
@@ -364,8 +341,6 @@ index 0000000..148ffcf
 +  kubeadmConfigSpec:
 +    clusterConfiguration:
 +      apiServer:
-+        extraArgs:
-+          cloud-provider: external
 +        timeoutForControlPlane: 20m
 +      controllerManager:
 +        extraArgs:
@@ -376,8 +351,8 @@ index 0000000..148ffcf
 +          terminated-pod-gc-threshold: "10"
 +      etcd:
 +        local:
-+          imageRepository: mcr.microsoft.com/oss/etcd-io
-+          imageTag: v3.5.6-13
++          imageRepository: mcr.microsoft.com/oss/v2/etcd-io
++          imageTag: v3.6.3
 +      imageRepository: ${CONTAINER_IMAGE_REGISTRY}
 +      scheduler:
 +        extraArgs:
@@ -437,8 +412,8 @@ index 0000000..148ffcf
 +      kind: KubevirtMachineTemplate
 +      name: "${CLUSTER_NAME}-control-plane"
 +      namespace: default
-+  replicas: 1
-+  version: v1.30.4
++  replicas: ${CONTROL_PLANE_MACHINE_COUNT}
++  version: ${KUBERNETES_VERSION}
 +---
 +apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
 +kind: KubevirtMachineTemplate
@@ -463,7 +438,7 @@ index 0000000..148ffcf
 +                  requests:
 +                    storage: ${OS_DISK_SIZE_GB}Gi
 +                storageClassName: ${STORAGE_CLASS_NAME}
-+                volumeMode: Filesystem
++                volumeMode: ${VOLUME_MODE}
 +              source:
 +                pvc:
 +                  name: ${OS_IMAGE_DATAVOLUME_PREFIX}
@@ -542,8 +517,8 @@ index 0000000..148ffcf
 +      clusterConfiguration:
 +        etcd:
 +          local:
-+            imageRepository: mcr.microsoft.com/oss/etcd-io
-+            imageTag: v3.5.6-13
++            imageRepository: mcr.microsoft.com/oss/v2/etcd-io
++            imageTag: v3.6.3
 +      joinConfiguration:
 +        nodeRegistration:
 +          kubeletExtraArgs:

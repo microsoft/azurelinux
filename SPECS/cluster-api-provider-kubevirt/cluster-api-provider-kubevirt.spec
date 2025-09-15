@@ -25,7 +25,7 @@ Source0:        https://github.com/kubernetes-sigs/cluster-api-provider-kubevirt
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         golang-version-and-makefile-targets-upgrade.patch
+Patch0:         golang-version-upgrade.patch
 Patch1:         remove-caBundle-placeholder.patch
 Patch2:         enforce-tls-1.2-on-webhooks.patch
 Patch3:         patch-datavolume-based-on-kubernetes-version.patch
