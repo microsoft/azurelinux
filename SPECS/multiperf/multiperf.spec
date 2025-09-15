@@ -9,7 +9,6 @@ Group:		 Productivity/Networking/Diagnostic
 Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/multiperf-3.0.tar.gz#/%{name}-%{version}.tar.gz
 Url:		 ""
 BuildRoot:      /var/tmp/%{name}-%{version}-build
-ExclusiveArch:   x86_64
 
 BuildRequires:  libibverbs-devel
 
@@ -37,6 +36,8 @@ rm -rf ${RPM_BUILD_ROOT}
 %_bindir/*
 
 %changelog
+* Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com>
+- Enable ARM64 build by removing ExclusiveArch
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

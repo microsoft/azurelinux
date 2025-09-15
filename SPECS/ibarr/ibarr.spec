@@ -7,7 +7,6 @@ Distribution:   Azure Linux
 Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/ibarr-0.1.3.tar.gz#/%{name}-%{version}.tar.gz
 Group:		Applications/System
 License:	(GPL-2.0 WITH Linux-syscall-note) OR BSD-2-Clause
-ExclusiveArch:   x86_64
 
 BuildRequires:	cmake
 BuildRequires:	gcc
@@ -55,6 +54,8 @@ rm -rf $RPM_BUILD_ROOT
 /lib/systemd/system/%{name}.service
 
 %changelog
+* Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com>
+- Enable ARM64 build by removing ExclusiveArch
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
