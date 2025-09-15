@@ -40,6 +40,7 @@ Patch4:        CVE-2024-28863.patch
 Patch5:        CVE-2024-12905.patch
 Patch6:        CVE-2024-6484.patch
 Patch7:        CVE-2025-48387.patch
+Patch8:        CVE-2021-23445.patch
 
 BuildRequires:  git
 BuildRequires:  javapackages-tools
@@ -192,6 +193,8 @@ fi
 - Fix the error in reaper_build_caches.sh
 - CVE-2025-9288: generate new cache tarball for reaper-local-lib-node-modules of version 3.1.1
 - CVE-2025-9288: generate new cache tarball for reaper-m2-cache-3.1.1.tar.gz of version 3.1.1
+- Patch CVE-2021-23445
+
 
 * Thu Jun 05 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.1.1-19
 - Patch CVE-2024-6484 and CVE-2025-48387
