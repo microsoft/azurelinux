@@ -5,6 +5,7 @@ package pkggraph
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 
@@ -101,7 +102,10 @@ func cycleDFS(g *PkgGraph, rootID int64, metaData *dfsData) (foundCycle bool, er
 
 	metaData.state[rootID] = inProgress
 
-	for _, neighbor := range graph.NodesOf(g.From(rootID)) {
+	nodes := graph.NodesOf(g.From(rootID))
+	sort.Slice(nodes, func(i, j int) bool { return nodes[i].ID() < nodes[j].ID() })
+
+	for _, neighbor := range nodes {
 		v := neighbor.ID()
 		if _, exists := metaData.state[v]; !exists {
 			metaData.state[v] = unvisited

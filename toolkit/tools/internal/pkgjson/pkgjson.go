@@ -78,6 +78,9 @@ func packageLess(a, b PackageVer) bool {
 	if a.Name == b.Name {
 		v1 := versioncompare.New(a.Version)
 		v2 := versioncompare.New(b.Version)
+		if v1.Compare(v2) == 0 {
+			return a.Version < b.Version
+		}
 		return v1.Compare(v2) < 0
 	}
 
@@ -88,6 +91,9 @@ func packageLess(a, b PackageVer) bool {
 // version. It will also sort the package lists (requires, buildRequires, testRequires) of each package.
 func SortPackageList(packages []*Package) {
 	sort.Slice(packages, func(i, j int) bool {
+		if !packageLess(*packages[i].Provides, *packages[j].Provides) && !packageLess(*packages[j].Provides, *packages[i].Provides) {
+			return packages[i].RpmPath < packages[j].RpmPath
+		}
 		return packageLess(*packages[i].Provides, *packages[j].Provides)
 	})
 
