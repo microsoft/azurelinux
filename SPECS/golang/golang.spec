@@ -1,5 +1,7 @@
 %global bootstrap_compiler_version_0 1.17.13
 %global bootstrap_compiler_version_1 1.21.6
+%global bootstrap_compiler_version_2 1.22.6
+
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
 %ifarch aarch64
@@ -14,8 +16,8 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.22.7
-Release:        5%{?dist}
+Version:        1.24.7
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,15 +27,8 @@ Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Source2:        https://dl.google.com/go/go%{bootstrap_compiler_version_0}.src.tar.gz
 Source3:        https://dl.google.com/go/go%{bootstrap_compiler_version_1}.src.tar.gz
+Source4:        https://dl.google.com/go/go%{bootstrap_compiler_version_2}.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
-Patch1:         CVE-2024-45336.patch
-Patch2:         CVE-2024-45341.patch
-Patch3:         CVE-2025-22871.patch
-Patch4:         CVE-2025-22870.patch
-Patch5:         CVE-2025-47907.patch
-Patch6:         CVE-2025-4674.patch
-Patch7:         CVE-2025-4673.patch
-Patch8:         CVE-2025-47906.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -49,16 +44,9 @@ patch -Np1 --ignore-whitespace < %{PATCH0}
 mv -v go go-bootstrap
 
 %setup -q -n go
-%patch 1 -p1
-%patch 2 -p1
-%patch 3 -p1
-%patch 4 -p1
-%patch 5 -p1
-%patch 6 -p1
-%patch 7 -p1
-%patch 8 -p1
 
 %build
+# Go 1.24 requires the final point release of Go 1.22.6 or later for bootstrap.
 # Go 1.22 requires the final point release of Go 1.20 or later for bootstrap.
 # And Go 1.20 requires the Go 1.17.
 # This condition makes go compiler >= 1.22 build a 4 step process:
@@ -101,7 +89,19 @@ rm -rf %{_libdir}/golang
 mv -v %{_topdir}/BUILD/go%{bootstrap_compiler_version_1} %{_libdir}/golang
 export GOROOT=%{_libdir}/golang
 
-# Use %{bootstrap_compiler_version_1} to compile %{version}
+# Use go%{bootstrap_compiler_version_1} bootstrap to compile go%{bootstrap_compiler_version_2} (bootstrap)
+export GOROOT_BOOTSTRAP=%{_libdir}/golang
+mkdir -p %{_topdir}/BUILD/go%{bootstrap_compiler_version_2}
+tar xf %{SOURCE4} -C %{_topdir}/BUILD/go%{bootstrap_compiler_version_2} --strip-components=1
+pushd %{_topdir}/BUILD/go%{bootstrap_compiler_version_2}/src
+CGO_ENABLED=0 ./make.bash
+popd
+# Nuke the older %{bootstrap_compiler_version_2}
+rm -rf %{_libdir}/golang
+mv -v %{_topdir}/BUILD/go%{bootstrap_compiler_version_2} %{_libdir}/golang
+export GOROOT=%{_libdir}/golang
+
+# Use %{bootstrap_compiler_version_2} to compile %{version}
 export GOHOSTOS=linux
 export GOHOSTARCH=%{gohostarch}
 export GOROOT_BOOTSTRAP=%{goroot}
@@ -172,6 +172,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Sep 15 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.24.7-1
+- Bump version to 1.24.7
+
 * Wed Aug 20 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.22.7-5
 - Patch CVE-2025-47907, CVE-2025-4674, CVE-2025-4673 & CVE-2025-47906
 
