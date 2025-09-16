@@ -61,45 +61,24 @@ function checkInternet {
 
 function installNodeModules {
 	echo "Installing node modules."
-	sudo tdnf install -y nodejs npm
-
-	#Verify installation
-	echo "Verifying npm installation..."
-	if ! command -v npm &> /dev/null; then
-		echo "Error: npm is not installed properly."
-		exit 1
-	fi
-
-	# Set up npm to use only user-writable directories
-	export NPM_CONFIG_USERCONFIG="$homeCacheDir/.npmrc"
-	mkdir -p "$homeCacheDir/.npm"
-	mkdir -p "$homeCacheDir/.npm-global"
-	npm config set cache "$homeCacheDir/.npm"
+	sudo tdnf install -y nodejs
+	 npm config set prefix "$homeCacheDir/.npm"
+	npm config set cache "$homeCacheDir/.npm" --global
+	# Default node/npm versions in Mariner fails to build dependency node module versions due to known
+	# incompatibilities.
+	# Backward compatible with node@v14.18.0
+	# When installing modules via npm to default prefix='/usr/local' in mariner, the permissions for 'others'
+	# is incoorectly set that causes 'which' to still point to older path, as access/newfstatat fail with -ENOPERM
+	# Setting a new global npm folder for fixing permission issues.
+	# (works well with id=0, but reaper build will fail.)
+	mkdir --mode 0777 $homeCacheDir/.npm-global
 	npm config set prefix "$homeCacheDir/.npm-global"
-	export PATH="$homeCacheDir/.npm-global/bin:$PATH"
-	export NPM_CONFIG_PREFIX="$homeCacheDir/.npm-global"
-	export NPM_CONFIG_CACHE="$homeCacheDir/.npm"
-	export XDG_CACHE_HOME="$homeCacheDir/.cache"
-
-	echo "npm config list:"
-	npm config list
-	echo "env | grep -i npm:"
-	env | grep -i npm
-
-	# Install and use Node.js v14.18.0 with n
+	export PATH="$homeCacheDir/.npm-global/bin":$PATH
 	npm install -g n
 	export N_PREFIX="$homeCacheDir/.npm-global"
 	n 14.18.0
-
-	# Ensure the shell uses the new node and npm
-	export PATH="$homeCacheDir/.npm-global/bin:$PATH"
-	hash -r
-	echo "After n:"
-	which node
-	which npm
-	node -v
-	npm -v
-
+	export PATH="$homeCacheDir/.npm-global/bin":$PATH
+	export XDG_CACHE_HOME=$homeCacheDir/.cache
 	npm install -g bower
 	# Clear bash hash tables for node/npm paths
 	hash -r
@@ -170,7 +149,8 @@ buildReaperSources
 
 createCacheTars
 
+mkdir "$HOME/reaper_caches"
 
-cp -a ${reaperCacheDir}/*.tar.gz .
+cp -a ${reaperCacheDir} "$HOME/reaper_caches"
 
-echo "Copied cache tars to SPECS/reaper/ directory"
+echo "Copied cache tars to $HOME/reaper_caches/ .Exiting."
