@@ -88,7 +88,6 @@ cp -pr docs/api/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadir}/%{full_name}.jar
 
 %files javadoc
-%license LICENSE
 %{_javadocdir}/%{name}
 
 %changelog
