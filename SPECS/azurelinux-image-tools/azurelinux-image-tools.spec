@@ -15,7 +15,7 @@ Source0:        https://github.com/microsoft/azure-linux-image-tools/archive/ref
 # Use generate_source_tarball.sh script with the package version to build this tarball.
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
-BuildRequires: golang >= 1.24.1
+BuildRequires: golang < 1.25
 BuildRequires: systemd-udev
 Requires: %{name}-imagecustomizer = %{version}-%{release}
 
@@ -103,6 +103,9 @@ go test -C toolkit/tools ./...
 - Upgrade the version.
 - Fixed imagecustomizer container files location to comply with RPM packaging guidelines
 - Moved container dependency files from /etc to /usr/lib/imagecustomizer/
+
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 0.18.0-2
+- Set BR for golang to < 1.25
 
 * Wed Aug 20 2025 Lanze Liu <lanzeliu@microsoft.com> 0.18.0-1
 - Original version for Azure Linux (license: MIT).

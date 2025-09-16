@@ -39,11 +39,11 @@ bzip2-1.0.8-1.azl3.aarch64.rpm
 bzip2-debuginfo-1.0.8-1.azl3.aarch64.rpm
 bzip2-devel-1.0.8-1.azl3.aarch64.rpm
 bzip2-libs-1.0.8-1.azl3.aarch64.rpm
-ca-certificates-3.0.0-9.azl3.noarch.rpm
-ca-certificates-base-3.0.0-9.azl3.noarch.rpm
-ca-certificates-legacy-3.0.0-9.azl3.noarch.rpm
-ca-certificates-shared-3.0.0-9.azl3.noarch.rpm
-ca-certificates-tools-3.0.0-9.azl3.noarch.rpm
+ca-certificates-3.0.0-11.azl3.noarch.rpm
+ca-certificates-base-3.0.0-11.azl3.noarch.rpm
+ca-certificates-legacy-3.0.0-11.azl3.noarch.rpm
+ca-certificates-shared-3.0.0-11.azl3.noarch.rpm
+ca-certificates-tools-3.0.0-11.azl3.noarch.rpm
 ccache-4.8.3-3.azl3.aarch64.rpm
 ccache-debuginfo-4.8.3-3.azl3.aarch64.rpm
 check-0.15.2-1.azl3.aarch64.rpm
@@ -51,8 +51,8 @@ check-debuginfo-0.15.2-1.azl3.aarch64.rpm
 chkconfig-1.25-1.azl3.aarch64.rpm
 chkconfig-debuginfo-1.25-1.azl3.aarch64.rpm
 chkconfig-lang-1.25-1.azl3.aarch64.rpm
-cmake-3.30.3-8.azl3.aarch64.rpm
-cmake-debuginfo-3.30.3-8.azl3.aarch64.rpm
+cmake-3.30.3-9.azl3.aarch64.rpm
+cmake-debuginfo-3.30.3-9.azl3.aarch64.rpm
 coreutils-9.4-6.azl3.aarch64.rpm
 coreutils-debuginfo-9.4-6.azl3.aarch64.rpm
 coreutils-lang-9.4-6.azl3.aarch64.rpm

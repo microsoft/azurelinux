@@ -1796,9 +1796,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "cloud-hypervisor-cvm",
-          "version": "41.0.79",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v41.0.79.tar.gz"
+          "name": "cloud-hypervisor",
+          "version": "41.0.139",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v41.0.139.tar.gz"
         }
       }
     },
@@ -3007,16 +3007,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "dpkg",
-          "version": "1.20.10",
-          "downloadUrl": "http://ftp.debian.org/debian/pool/main/d/dpkg/dpkg_1.20.10.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "dracut",
           "version": "102",
           "downloadUrl": "https://github.com/dracut-ng/dracut-ng/archive/refs/tags/102.tar.gz"
@@ -3368,8 +3358,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "26.2.5.13",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.13/otp-OTP-26.2.5.13.tar.gz"
+          "version": "26.2.5.15",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.15/otp-OTP-26.2.5.15.tar.gz"
         }
       }
     },
@@ -4690,8 +4680,18 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.24.6",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.6-1/go1.24.6-20250806.4.src.tar.gz"
+          "version": "1.25.1",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.1-1/go1.25.1-20250903.7.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang",
+          "version": "1.24.7",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.7-1/go1.24.7-20250903.8.src.tar.gz"
         }
       }
     },
@@ -5420,8 +5420,8 @@
         "type": "other",
         "other": {
           "name": "httpcomponents-core",
-          "version": "4.4.13",
-          "downloadUrl": "https://archive.apache.org/dist/httpcomponents/httpcore/source/httpcomponents-core-4.4.13-src.tar.gz"
+          "version": "4.4.16",
+          "downloadUrl": "https://archive.apache.org/dist/httpcomponents/httpcore/source/httpcomponents-core-4.4.16-src.tar.gz"
         }
       }
     },
@@ -8151,8 +8151,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.19.1.kata1",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.19.1.kata1.tar.gz"
+          "version": "3.19.1.kata2",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.19.1.kata2.tar.gz"
         }
       }
     },
@@ -8301,8 +8301,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "6.6.57.mshv4",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mshv-6.6.57.mshv4.tar.gz"
+          "version": "6.6.100.mshv1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.6.100.mshv1.tar.gz"
         }
       }
     },
@@ -8331,8 +8331,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.1.58.mshv8",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.58.mshv8.tar.gz"
+          "version": "6.6.96.mshv1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.6.96.mshv1.tar.gz"
         }
       }
     },
@@ -12163,16 +12163,6 @@
           "name": "libXxf86vm",
           "version": "1.1.5",
           "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXxf86vm-1.1.5.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libyami",
-          "version": "1.3.2",
-          "downloadUrl": "https://github.com/intel/libyami/archive/edd1ad15e383d32c8d67bdc9198c834b6acebca5/libyami-edd1ad1.tar.gz"
         }
       }
     },
@@ -16803,8 +16793,8 @@
         "type": "other",
         "other": {
           "name": "perl-Crypt-OpenSSL-RSA",
-          "version": "0.31",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TODDR/Crypt-OpenSSL-RSA-0.31.tar.gz"
+          "version": "0.33",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TODDR/Crypt-OpenSSL-RSA-0.33.tar.gz"
         }
       }
     },
@@ -20743,8 +20733,8 @@
         "type": "other",
         "other": {
           "name": "perl-Variable-Magic",
-          "version": "0.62",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/V/VP/VPIT/Variable-Magic-0.62.tar.gz"
+          "version": "0.64",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/V/VP/VPIT/Variable-Magic-0.64.tar.gz"
         }
       }
     },
@@ -20983,8 +20973,8 @@
         "type": "other",
         "other": {
           "name": "perl-XML-Writer",
-          "version": "0.625",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/J/JO/JOSEPHW/XML-Writer-0.625.tar.gz"
+          "version": "0.900",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/J/JO/JOSEPHW/XML-Writer-0.900.tar.gz"
         }
       }
     },
@@ -21033,8 +21023,8 @@
         "type": "other",
         "other": {
           "name": "perl-YAML-LibYAML",
-          "version": "0.81",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/YAML/YAML-LibYAML-0.81.tar.gz"
+          "version": "0.902.0",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/YAML/YAML-LibYAML-v0.902.0.tar.gz"
         }
       }
     },
@@ -21223,8 +21213,8 @@
         "type": "other",
         "other": {
           "name": "pkcs11-helper",
-          "version": "1.22",
-          "downloadUrl": "http://downloads.sourceforge.net/opensc/pkcs11-helper-1.22.tar.bz2"
+          "version": "1.30.0",
+          "downloadUrl": "https://github.com/OpenSC/pkcs11-helper/releases/download/pkcs11-helper-1.30.0/pkcs11-helper-1.30.0.tar.bz2"
         }
       }
     },
@@ -24112,9 +24102,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-pycares",
-          "version": "3.1.1",
-          "downloadUrl": "https://github.com/saghul/pycares/archive/pycares-3.1.1.tar.gz"
+          "name": "python3-pycares",
+          "version": "4.5.0",
+          "downloadUrl": "https://github.com/saghul/pycares/archive/refs/tags/v4.5.0.tar.gz"
         }
       }
     },
@@ -26093,8 +26083,8 @@
         "type": "other",
         "other": {
           "name": "resource-agents",
-          "version": "4.10.0",
-          "downloadUrl": "https://github.com/ClusterLabs/resource-agents/archive/refs/tags/v4.10.0.tar.gz"
+          "version": "4.16.0",
+          "downloadUrl": "https://github.com/ClusterLabs/resource-agents/archive/refs/tags/v4.16.0.tar.gz"
         }
       }
     },
@@ -27196,6 +27186,16 @@
           "name": "rubygem-rubyzip",
           "version": "2.3.2",
           "downloadUrl": "https://github.com/rubyzip/rubyzip/archive/refs/tags/v2.3.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rubygem-scanf",
+          "version": "1.0.0",
+          "downloadUrl": "https://rubygems.org/gems/scanf-1.0.0.gem"
         }
       }
     },
@@ -28816,8 +28816,8 @@
         "type": "other",
         "other": {
           "name": "tbb",
-          "version": "2020.2",
-          "downloadUrl": "https://github.com/intel/tbb/archive/v2020.2/tbb-2020.2.tar.gz"
+          "version": "2021.13.0",
+          "downloadUrl": "https://github.com/intel/tbb/archive/v2021.13.0/tbb-2021.13.0.tar.gz"
         }
       }
     },
@@ -30869,7 +30869,7 @@
         "other": {
           "name": "xpp3",
           "version": "1.1.4c",
-          "downloadUrl": "http://www.extreme.indiana.edu/dist/java-repository/xpp3/distributions/xpp3-1.1.4c_src.tgz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xpp3-1.1.4c_src.tgz"
         }
       }
     },
