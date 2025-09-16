@@ -41,7 +41,18 @@ func (c *Config) IsValid() (err error) {
 		if err != nil {
 			return fmt.Errorf("invalid 'os' field:\n%w", err)
 		}
-		hasResetBootLoader = c.OS.ResetBootLoaderType != ResetBootLoaderTypeDefault
+		hasResetBootLoader = c.OS.BootLoader.Reset != ResetBootLoaderTypeDefault
+
+		if c.OS.Uki != nil {
+			// Temporary limitation: We currently require 'os.bootloader.reset' to be 'hard-reset' when 'os.uki' is enabled.
+			// In the future, as we design and develop the bootloader further, this hard-reset limitation may be lifted.
+			// However, 'systemd-boot' is expected to remain tightly coupled with the 'uki' feature for the foreseeable future.
+			if c.OS.BootLoader.Type != BootLoaderTypeSystemdBoot || c.OS.BootLoader.Reset != ResetBootLoaderTypeHard {
+				return fmt.Errorf(
+					"'os.bootloader.type' must be 'systemd-boot' and 'os.bootloader.reset' must be 'hard-reset' when 'os.uki' is enabled",
+				)
+			}
+		}
 	}
 
 	err = c.Scripts.IsValid()
@@ -50,11 +61,11 @@ func (c *Config) IsValid() (err error) {
 	}
 
 	if c.CustomizePartitions() && !hasResetBootLoader {
-		return fmt.Errorf("'os.resetBootLoaderType' must be specified if 'storage.disks' is specified")
+		return fmt.Errorf("'os.bootloader.reset' must be specified if 'storage.disks' is specified")
 	}
 
 	if hasResetPartitionsUuids && !hasResetBootLoader {
-		return fmt.Errorf("'os.resetBootLoaderType' must be specified if 'storage.resetPartitionsUuidsType' is specified")
+		return fmt.Errorf("'os.bootloader.reset' must be specified if 'storage.resetPartitionsUuidsType' is specified")
 	}
 
 	return nil
