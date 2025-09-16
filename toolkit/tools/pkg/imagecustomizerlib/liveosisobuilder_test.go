@@ -81,7 +81,8 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 	savedConfigs := &SavedConfigs{}
 	err = imagecustomizerapi.UnmarshalYamlFile(savedConfigsFilePath, savedConfigs)
 	assert.NoErrorf(t, err, "read (%s) file", savedConfigsFilePath)
-	assert.Equal(t, "rd.info", string(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine))
+	expectedKernelArgs := []string{"rd.info"}
+	assert.Equal(t, expectedKernelArgs, savedConfigs.Iso.KernelCommandLine.ExtraCommandLine)
 
 	VerifyPXEArtifacts(t, savedConfigs.OS.DracutPackageInfo, isoMountDir, pxeKernelIpArg, pxeKernelRootArgV1,
 		pxeArtifactsPathVhdxToIso)
@@ -111,7 +112,7 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 		},
 		Iso: &imagecustomizerapi.Iso{
 			KernelCommandLine: imagecustomizerapi.KernelCommandLine{
-				ExtraCommandLine: "rd.debug",
+				ExtraCommandLine: []string{"rd.debug"},
 			},
 			AdditionalFiles: imagecustomizerapi.AdditionalFileList{
 				{
@@ -165,7 +166,7 @@ func TestCustomizeImageLiveCd1(t *testing.T) {
 	savedConfigs = &SavedConfigs{}
 	err = imagecustomizerapi.UnmarshalYamlFile(savedConfigsFilePath, savedConfigs)
 	assert.NoErrorf(t, err, "read (%s) file", savedConfigsFilePath)
-	assert.Equal(t, "rd.info rd.debug", string(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine))
+	assert.Equal(t, "rd.info rd.debug", strings.Join(savedConfigs.Iso.KernelCommandLine.ExtraCommandLine, " "))
 
 	VerifyPXEArtifacts(t, savedConfigs.OS.DracutPackageInfo, isoMountDir, pxeKernelIpArg, pxeKernelRootArgV2,
 		pxeArtifactsPathIsoToIso)
