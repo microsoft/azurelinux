@@ -40,10 +40,7 @@ BuildRequires:  golang
 Command line tool for working with Jenkins X.
 
 %prep
-%autosetup -N
-# Apply vendor before patching
-tar --no-same-owner -xf %{SOURCE1}
-%autopatch -p1
+%autosetup -p1 -a1
 
 %build
 export GOPATH=%{our_gopath}
