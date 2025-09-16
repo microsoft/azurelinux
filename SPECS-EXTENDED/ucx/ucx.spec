@@ -33,6 +33,12 @@ ExclusiveArch: x86_64
 Requires: %{?extra_deps}
 %endif
 
+%ifarch aarch64
+%define  arch_extension "-hwe"
+%else
+%define  arch_extension ""
+%endif
+
 BuildRequires: automake
 BuildRequires: autoconf
 BuildRequires: libtool
@@ -51,7 +57,7 @@ BuildRequires: libibverbs-devel
 BuildRequires: rdma-core-devel
 %endif
 %if %{with knem}
-BuildRequires: knem
+BuildRequires: knem%{arch_extension}
 %endif
 %if %{with rdmacm}
 BuildRequires: librdmacm-devel
@@ -60,7 +66,7 @@ BuildRequires: librdmacm-devel
 BuildRequires: hsa-rocr-dev
 %endif
 %if %{with xpmem}
-BuildRequires: pkgconfig(cray-xpmem)
+BuildRequires: pkgconfig(libxpmem%{arch_extension}-devel)
 %endif
 %if %{with vfs}
 BuildRequires: fuse3-devel
