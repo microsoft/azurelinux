@@ -8,6 +8,13 @@
 %define config_source %{SOURCE1}
 %endif
 
+%ifarch aarch64
+%global __provides_exclude_from %{_libdir}/debug/.build-id/
+%define arch arm64
+%define archdir arm64
+%define config_source %{SOURCE2}
+%endif
+
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        6.6.96.mshv1
@@ -18,6 +25,7 @@ Distribution:   Azure Linux
 Group:          System Environment/Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
+Source2:        config_aarch64
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -40,7 +48,6 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
-ExclusiveArch:  x86_64
 
 # Config file is only an inmutable copy from default config in lsg dom0 sources (arch/x86/configs/mshv_default_config)
 # to make permanent changes to config, make a PR for mshv_default_config in https://microsoft.visualstudio.com/DefaultCollection/LSG/_git/linux-dom0
@@ -64,12 +71,12 @@ ExclusiveArch:  x86_64
 %ifarch x86_64
 %define image_fname vmlinux.bin
 %define image arch/x86/boot/compressed/%{image_fname}
-%if 0%{?centos_version} && 0%{?centos_version} < 900
-%define kcflags %{nil}
-%else
 %define kcflags -Wa,-mx86-used-note=no
 %endif
-%define arch x86_64
+%ifarch aarch64
+%define kcflags %{nil}
+%define image_fname Image
+%define image arch/arm64/boot/%{image_fname}
 %endif
 
 %description
@@ -108,9 +115,7 @@ if [ -s config_diff ]; then
 fi
 
 %build
-%ifarch x86_64
 KCFLAGS="%{kcflags}" make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
-%endif
 
 %install
 install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
@@ -119,10 +124,9 @@ install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
 D=%{buildroot}%{_datadir}/cloud-hypervisor
 install -D -m 644 %{image} $D/%{image_fname}
 install -D -m 644 arch/%{arch}/boot/bzImage $D/bzImage
-%ifarch x86_64
+
 mkdir -p %{buildroot}/lib/modules/%{name}
 ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
-%endif
 
 find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
 find arch/%{archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
@@ -137,6 +141,10 @@ install -vsm 755 tools/objtool/fixdep %{buildroot}%{_prefix}/src/linux-headers-%
 cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config manually to be where it's expected to be
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
+
+%ifarch aarch64
+cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
+%endif
 
 %files
 %defattr(-,root,root)
