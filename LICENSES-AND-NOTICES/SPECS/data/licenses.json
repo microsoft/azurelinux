@@ -1742,6 +1742,7 @@
                 "python-kdcproxy",
                 "python-kerberos",
                 "python-kmod",
+		"python-krb5",
                 "python-kubernetes",
                 "python-lark",
                 "python-lazy-object-proxy",

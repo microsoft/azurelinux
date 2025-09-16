@@ -23372,6 +23372,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-krb5",
+          "version": "0.7.1",
+          "downloadUrl": "https://github.com/jborean93/pykrb5/archive/refs/tags/v0.7.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-kubernetes",
           "version": "29.0.0",
           "downloadUrl": "https://github.com/kubernetes-client/python/archive/v29.0.0.tar.gz"
