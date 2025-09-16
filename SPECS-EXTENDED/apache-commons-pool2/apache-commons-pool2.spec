@@ -4,7 +4,6 @@ Summary:        Apache Commons Pool 2.x series
 Name:           apache-commons-pool2
 Version:        2.4.2
 Release:        8%{?dist}
-Summary:        Apache Commons Pool 2.x series
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -76,6 +75,8 @@ cp -pr dist/docs/api/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadir}/%{short_name}.jar
 
 %files javadoc
+%license %{_javadocdir}/apache-commons-pool2/legal/LICENSE
+%license %{_javadocdir}/apache-commons-pool2/legal/ADDITIONAL_LICENSE_INFO
 %doc %{_javadocdir}/%{name}
 
 %changelog
