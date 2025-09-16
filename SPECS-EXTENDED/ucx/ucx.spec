@@ -34,9 +34,9 @@ Requires: %{?extra_deps}
 %endif
 
 %ifarch aarch64
-%define  arch_extension "-hwe"
+%define  arch_extension -hwe
 %else
-%define  arch_extension ""
+%define  arch_extension 
 %endif
 
 BuildRequires: automake
@@ -66,7 +66,7 @@ BuildRequires: librdmacm-devel
 BuildRequires: hsa-rocr-dev
 %endif
 %if %{with xpmem}
-BuildRequires: pkgconfig(libxpmem%{arch_extension}-devel)
+BuildRequires: pkgconfig(cray-xpmem)
 %endif
 %if %{with vfs}
 BuildRequires: fuse3-devel
