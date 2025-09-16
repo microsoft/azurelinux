@@ -147,7 +147,7 @@ export CTEST_OUTPUT_ON_FAILURE=1
 
 %files devel
 %license %{_pkgdocdir}/license.html
-%doc %{_pkgdocdir}/*.html
+%{_pkgdocdir}/*.html
 %{_pkgdocdir}/*.png
 %{_pkgdocdir}/*.css
 %{_pkgdocdir}/*.js
