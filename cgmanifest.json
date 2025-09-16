@@ -9880,6 +9880,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libimobiledevice-glue",
+          "version": "1.3.1",
+          "downloadUrl": "https://github.com/libimobiledevice/libimobiledevice-glue/releases/download/1.3.1/libimobiledevice-glue-1.3.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libindicator",
           "version": "12.10.1",
           "downloadUrl": "https://launchpad.net/libindicator/12.10/12.10.1/+download/libindicator-12.10.1.tar.gz"
