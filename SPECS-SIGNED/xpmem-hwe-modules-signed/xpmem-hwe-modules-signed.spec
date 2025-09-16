@@ -84,10 +84,20 @@ popd
 /lib/modules/%{KVERSION}/updates/xpmem.ko
 %{_datadir}/licenses
 
-%post
+%post -n %{_name}
 depmod %{KVERSION} -a
 /sbin/modprobe -r xpmem > /dev/null 2>&1
 /sbin/modprobe xpmem > /dev/null 2>&1
+
+%postun -n %{_name}
+if [ "$1" = 0 ]; then
+	if lsmod | grep -qw xpmem; then
+		# If the module fails to unload, give an error,
+		# but don't fail uninstall. User should handle this
+		# Maybe the module is in use
+		rmmod xpmem || :
+	fi
+fi
 
 %changelog
 * Mon Sep 08 2025 Elaheh Dehghani <edehghani@microsoft.com> - 2.7.4-20
