@@ -27,13 +27,16 @@ associated with functional programming, within a natural Pythonic style\
 suitable for most developers.
 Summary:        A functional standard library for Python
 Name:           python-%{srcname}
-Version:        0.12.0
+Version:        0.12.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/pytoolz/toolz/
-Source0:	https://github.com/pytoolz/toolz/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
+Source0:        https://github.com/pytoolz/toolz/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
+# This is a test patch found here: https://github.com/pytoolz/toolz/commit/0c2b43a926a3543817240c878c6ded1180c81b71.patch
+# it can be removed when upgrading to 1.0.0 or later picking up the fix
+Patch0:         python-3.12.9-test_wrapped-fix.patch
 BuildArch:      noarch
 
 %description
@@ -45,14 +48,14 @@ Summary:        A functional standard library for Python %{python3_version}
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 %if 0%{?with_check}
-BuildRequires:  python%{python3_pkgversion}-pip
+BuildRequires:  python%{python3_pkgversion}-pytest
 %endif
 
 %description -n python%{python3_pkgversion}-%{srcname}
 %{desc}
 
 %prep
-%setup -q -n %{srcname}-%{version}
+%autosetup -p1 -n %{srcname}-%{version}
 
 %build
 %py3_build
@@ -61,8 +64,8 @@ BuildRequires:  python%{python3_pkgversion}-pip
 %py3_install
 
 %check
-pip3 install nose
-nosetests
+# skip test_shakespeare due to missing directory/files in source tar (Fedora also skips this test for a similar reason)
+PYTHONPATH=%{buildroot}%{python3_sitelib} pytest -v -k 'not test_shakespeare'
 
 %files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE.txt
@@ -70,6 +73,10 @@ nosetests
 %{python3_sitelib}/tlz/
 
 %changelog
+* Thu May 16 2024 Sam Meluch <sammeluch@microsoft.com> - 0.12.1-2
+- Upgrade to 0.12.1 for python 3.12 support
+- Update %check to use pytest with test wrapped patch (referencing Fedora 41 for test skip)
+
 * Wed Dec 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.12.0-1
 - Auto-upgrade to 0.12.0 - none
 
