@@ -33,6 +33,7 @@ BuildRequires:  python3-setuptools
 # While upstream runs tests directly with Python/unittest, using pytest as the
 # runner allows us to more easily skip tests.
 BuildRequires:  python3dist(pytest)
+BuildRequires:  xorg-x11-server-Xvfb
 
 %description -n python3-pyperclip %{common_description}
 
