@@ -25272,16 +25272,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-unittest2",
-          "version": "1.1.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/u/unittest2/unittest2-1.1.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-uritemplate",
           "version": "4.1.1",
           "downloadUrl": "https://github.com/sigmavirus24/uritemplate/archive/4.1.1/uritemplate-4.1.1.tar.gz"
