@@ -122,8 +122,13 @@ install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
 
 D=%{buildroot}%{_datadir}/cloud-hypervisor
+%ifarch x86_64
 install -D -m 644 %{image} $D/%{image_fname}
 install -D -m 644 arch/%{arch}/boot/bzImage $D/bzImage
+%endif
+%ifarch aarch64
+install -D -m 644 %{image} $D/%{image_fname}
+%endif
 
 mkdir -p %{buildroot}/lib/modules/%{name}
 ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
@@ -150,11 +155,11 @@ cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/script
 %defattr(-,root,root)
 %license COPYING
 %{_datadir}/cloud-hypervisor/%{image_fname}
-%{_datadir}/cloud-hypervisor/bzImage
-%dir %{_datadir}/cloud-hypervisor
 %ifarch x86_64
-/lib/modules/%{name}/vmlinux
+%{_datadir}/cloud-hypervisor/bzImage
 %endif
+%dir %{_datadir}/cloud-hypervisor
+/lib/modules/%{name}/vmlinux
 
 %files devel
 %defattr(-,root,root)
