@@ -1,7 +1,8 @@
-diff -ur watchdog-5.15.old/watchdog.8 watchdog-5.15/watchdog.8
---- watchdog-5.15.old/watchdog.8	2016-02-26 12:05:00.000000000 +0000
-+++ watchdog-5.15/watchdog.8	2018-02-13 08:54:00.860681339 +0000
-@@ -215,6 +215,7 @@
+diff --git a/watchdog.8 b/watchdog.8
+index 9b7c6e7..052b1e1 100644
+--- a/watchdog.8
++++ b/watchdog.8
+@@ -216,6 +216,7 @@ by
  .BR watchdog .
  So you can for instance restart the server from your
  .IR repair-binary .
@@ -9,7 +10,7 @@ diff -ur watchdog-5.15.old/watchdog.8 watchdog-5.15/watchdog.8
  .PP
  .B watchdog
  will try periodically to fork itself to see whether the process
-@@ -241,6 +242,8 @@
+@@ -242,6 +243,8 @@ a given interface for traffic. If no traffic arrives the network is
  considered unreachable causing a soft reboot or action from the
  repair binary.
  .PP
@@ -18,7 +19,7 @@ diff -ur watchdog-5.15.old/watchdog.8 watchdog-5.15/watchdog.8
  .B watchdog
  can run an external command for user-defined tests. A return code not equal 0
  means an error occurred and watchdog should react. If the external command is
-@@ -350,6 +353,9 @@
+@@ -348,6 +351,9 @@ Child process did not return in time.
  246
  Free for personal watchdog-specific use (was \-10 as an unsigned 8\-bit
  number).
@@ -28,7 +29,7 @@ diff -ur watchdog-5.15.old/watchdog.8 watchdog-5.15/watchdog.8
  .TP
  245
  Reserved for an unknown result, for example a slow background test that is
-@@ -377,6 +383,9 @@
+@@ -375,6 +381,9 @@ repair-maximum
  controls the number of successive repair attempts that report 0 (i.e. success) but
  fail to clear the tested fault. If this is exceeded then a reboot takes place. If set
  to zero then a reboot can always be blocked by the repair program reporting success.
@@ -38,7 +39,7 @@ diff -ur watchdog-5.15.old/watchdog.8 watchdog-5.15/watchdog.8
  .SH "TEST DIRECTORY"
  Executables placed in the test directory are discovered by watchdog on
  startup and are automatically executed.  They are bounded time-wise by
-@@ -415,6 +424,27 @@
+@@ -413,6 +422,27 @@ As for the repair binary, the configuration parameter
  repair-maximum
  also controls the number of successive repair attempts that report success
  (return 0) but fail to clear the fault.
@@ -66,27 +67,30 @@ diff -ur watchdog-5.15.old/watchdog.8 watchdog-5.15/watchdog.8
  .SH BUGS
  None known so far.
  .SH AUTHORS
-@@ -433,4 +463,4 @@
+@@ -431,4 +461,4 @@ The watchdog device.
  The pid file of the running
  .BR watchdog .
  .SH "SEE ALSO"
 -.BR watchdog.conf (5)
 +.BR watchdog.conf (5), systemd.unit (5)
-diff -ur watchdog-5.15.old/watchdog.conf watchdog-5.15/watchdog.conf
---- watchdog-5.15.old/watchdog.conf	2016-02-26 12:05:00.000000000 +0000
-+++ watchdog-5.15/watchdog.conf	2018-02-13 08:52:18.899721271 +0000
-@@ -16,6 +16,8 @@
- #min-memory		= 1
- #allocatable-memory	= 1
- 
+diff --git a/watchdog.conf b/watchdog.conf
+index 207da3e..7dd3cb3 100644
+--- a/watchdog.conf
++++ b/watchdog.conf
+@@ -75,7 +75,9 @@ priority		= 1
+ # If you have a custom binary/script to handle errors then uncomment
+ # this line and provide the path. For 'v1' test binary files they also
+ # handle error cases.
+-
 +# With enforcing SELinux policy please use the /usr/libexec/watchdog/scripts/
++	
 +# or /etc/watchdog.d/ for your test-binary and repair-binary configuration.
  #repair-binary		= /usr/sbin/repair
  #repair-timeout		= 60
- #test-binary		=
-@@ -45,5 +47,12 @@
- realtime		= yes
- priority		= 1
+ 
+@@ -175,6 +177,13 @@ priority		= 1
+ #temperature-sensor	=
+ #max-temperature	= 90
  
 +# When using custom service pid check with custom service
 +# systemd unit file please be aware the "Requires="
@@ -95,20 +99,22 @@ diff -ur watchdog-5.15.old/watchdog.conf watchdog-5.15/watchdog.conf
 +# in the custom service unit file may be the desired operation instead.
 +# See man 5 systemd.unit for more details.
 +#
- # Check if rsyslogd is still running by enabling the following line
- #pidfile		= /var/run/rsyslogd.pid
-diff -ur watchdog-5.15.old/watchdog.conf.5 watchdog-5.15/watchdog.conf.5
---- watchdog-5.15.old/watchdog.conf.5	2016-02-26 12:05:00.000000000 +0000
-+++ watchdog-5.15/watchdog.conf.5	2018-02-13 08:52:18.898721271 +0000
-@@ -105,6 +105,7 @@
- pidfile = <pidfilename>
- Set pidfile name for server test mode.
- This option can be given as often as you like to check several servers.
+ # Check for a running process/daemon by its PID file. For example,
+ # check if rsyslogd is still running by enabling the following line:
+ 
+diff --git a/watchdog.conf.5 b/watchdog.conf.5
+index edf7c8b..72c3bc2 100644
+--- a/watchdog.conf.5
++++ b/watchdog.conf.5
+@@ -130,6 +130,7 @@ pidfile = <pidfilename>
+ Set pidfile name for daemon test mode.
+ This option can be given as often as you like to check several daemons, assuming
+ they write their post-forking PID to the specified files.
 +See the Systemd section in watchdog (8) for more information.
  .TP
  ping = <ip-addr>
  Set IPv4 address for ping mode.
-@@ -119,6 +120,8 @@
+@@ -147,6 +148,8 @@ aliased IP interfaces.
  .TP
  test-binary = <testbin>
  Execute the given binary to do some user defined tests.
@@ -117,7 +123,7 @@ diff -ur watchdog-5.15.old/watchdog.conf.5 watchdog-5.15/watchdog.conf.5
  .TP
  test-timeout = <timeout in seconds>
  User defined tests may only run for <timeout> seconds. Set to 0 for unlimited.
-@@ -126,6 +129,8 @@
+@@ -154,6 +157,8 @@ User defined tests may only run for <timeout> seconds. Set to 0 for unlimited.
  repair-binary = <repbin>
  Execute the given binary in case of a problem instead of shutting down the
  system.
@@ -126,7 +132,7 @@ diff -ur watchdog-5.15.old/watchdog.conf.5 watchdog-5.15/watchdog.conf.5
  .TP
  repair-timeout = <timeout in seconds>
  repair command may only run for <timeout> seconds. Set to 0 for 'unlimited', but
-@@ -156,6 +161,7 @@
+@@ -188,6 +193,7 @@ Set the schedule priority for realtime mode passed to sched_setscheduler().
  .TP
  test-directory = <test directory>
  Set the directory to run user test/repair scripts.  Default is '/etc/watchdog.d'
