@@ -4,7 +4,7 @@
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-hwe-signed-%{buildarch}
 Version:        6.12.40.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -96,6 +96,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.96.2-3
+- Bump to match kernel-hwe
+
 * Fri Aug 15 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.40.1-1
 - Original version for Azure Linux
 - License verified
