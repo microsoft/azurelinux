@@ -146,7 +146,9 @@ export CTEST_OUTPUT_ON_FAILURE=1
 %dir /var/lib/lensfun-updates/
 
 %files devel
-%doc %{_pkgdocdir}/*.html
+%license %{_pkgdocdir}/license.html
+%doc %{_pkgdocdir}/gpl.html
+%doc %{_pkgdocdir}/lgpl.html
 %{_pkgdocdir}/*.png
 %{_pkgdocdir}/*.css
 %{_pkgdocdir}/*.js
