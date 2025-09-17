@@ -67,7 +67,7 @@
 Summary:	 %{_name} Driver
 Name:		 iser-hwe
 Version:	 24.10
-Release:	 20%{release_suffix}%{?dist}
+Release:	 21%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -249,6 +249,9 @@ fi # 1 : closed
 %endif
 
 %changelog
+* Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-21
+- Bump to match kernel-hwe
+
 * Mon Sep 08 2025 Elaheh Dehghani <edehghani@microsoft.com> - 24.10-20
 - Build using kernel-hwe for aarch64 architecture
 

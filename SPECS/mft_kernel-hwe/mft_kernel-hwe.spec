@@ -36,7 +36,7 @@
 Name:		 mft_kernel-hwe
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 4.30.0
-Release:	 20%{release_suffix}%{?dist}
+Release:	 21%{release_suffix}%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -227,6 +227,9 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
+* Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-21
+- Bump to match kernel-hwe
+
 * Mon Sep 08 2025 Elaheh Dehghani <edehghani@microsoft.com> - 4.30.0-20
 - Build using kernel-hwe for aarch64 architecture
 

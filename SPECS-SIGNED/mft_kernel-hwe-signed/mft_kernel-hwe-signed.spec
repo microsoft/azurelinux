@@ -15,7 +15,7 @@
 Name:            %{_name}-signed
 Summary:         %{_name} Kernel Module for the %{KVERSION} kernel
 Version:         4.30.0
-Release:	     20%{release_suffix}%{?dist}
+Release:	     21%{release_suffix}%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
 
@@ -82,7 +82,10 @@ popd
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
-* Mon Sep 08 2025 Elaheh Dehghani <edehghani@microsoft.com> -4.30.0-20
+* Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-21
+- Bump to match kernel-hwe
+
+* Mon Sep 08 2025 Elaheh Dehghani <edehghani@microsoft.com> - 4.30.0-20
 - Build using kernel-hwe for aarch64 architecture
 
 * Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.30.0-19

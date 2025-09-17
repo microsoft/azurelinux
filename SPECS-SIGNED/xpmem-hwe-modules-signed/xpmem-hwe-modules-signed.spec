@@ -21,7 +21,7 @@
 Summary:	 Cross-partition memory
 Name:		 %{_name}-signed
 Version:	 2.7.4
-Release:	 20%{release_suffix}%{?dist}
+Release:	 21%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -100,6 +100,9 @@ if [ "$1" = 0 ]; then
 fi
 
 %changelog
+* Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 2.7.4-21
+- Bump to match kernel-hwe
+
 * Mon Sep 08 2025 Elaheh Dehghani <edehghani@microsoft.com> - 2.7.4-20
 - Build using kernel-hwe for aarch64 architecture
 
