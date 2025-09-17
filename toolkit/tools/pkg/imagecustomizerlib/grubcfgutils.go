@@ -611,6 +611,28 @@ func selinuxModeToArgs(selinuxMode imagecustomizerapi.SELinuxMode) ([]string, er
 	return newSELinuxArgs, nil
 }
 
+// Converts an SELinux mode into the list of required command-line args for that mode (with enforcing mode).
+func selinuxModeToArgsWithEnforcingArg(selinuxMode imagecustomizerapi.SELinuxMode) ([]string, error) {
+	newSELinuxArgs := []string(nil)
+	switch selinuxMode {
+	case imagecustomizerapi.SELinuxModeDisabled:
+		newSELinuxArgs = []string{installutils.CmdlineSELinuxDisabledArg}
+
+	case imagecustomizerapi.SELinuxModeForceEnforcing:
+		newSELinuxArgs = []string{installutils.CmdlineSELinuxSecurityArg, installutils.CmdlineSELinuxEnabledArg,
+			installutils.CmdlineSELinuxEnforcingArg}
+
+	case imagecustomizerapi.SELinuxModePermissive, imagecustomizerapi.SELinuxModeEnforcing:
+		newSELinuxArgs = []string{installutils.CmdlineSELinuxSecurityArg, installutils.CmdlineSELinuxEnabledArg,
+			installutils.CmdlineSELinuxPermissiveArg}
+
+	default:
+		return nil, fmt.Errorf("unknown SELinux mode (%s)", selinuxMode)
+	}
+
+	return newSELinuxArgs, nil
+}
+
 // Update the SELinux kernel command-line args.
 func updateSELinuxCommandLineHelperAll(grub2Config string, selinuxMode imagecustomizerapi.SELinuxMode, allowMultiple bool, requireKernelOpts bool) (string, error) {
 	newSELinuxArgs, err := selinuxModeToArgs(selinuxMode)
