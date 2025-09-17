@@ -8,7 +8,11 @@ Name:           coredns
 Version:        1.11.4
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 Release:        7%{?dist}
+=======
+Release:        9%{?dist}
+>>>>>>> 5051d6553 ([AutoPR- Security] Patch coredns for CVE-2025-58063 [HIGH] (#14651))
 =======
 Release:        9%{?dist}
 >>>>>>> 5051d6553 ([AutoPR- Security] Patch coredns for CVE-2025-58063 [HIGH] (#14651))
@@ -93,7 +97,10 @@ go install github.com/fatih/faillint@latest && \
 %changelog
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 5051d6553 ([AutoPR- Security] Patch coredns for CVE-2025-58063 [HIGH] (#14651))
 =======
 >>>>>>> 5051d6553 ([AutoPR- Security] Patch coredns for CVE-2025-58063 [HIGH] (#14651))
 * Thu Sep 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-9
