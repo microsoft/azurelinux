@@ -10,7 +10,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -371,9 +371,12 @@ grep "^FAIL: nptl/tst-mutex10" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
-* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.38-12
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.38-13
 - Fix Patch application of CVE-2025-4802
 - Add test for CVE-2025-4802
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 2.38-12
+- Bump to rebuild with build-id fix from toolchain gcc
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.38-11
 - Patch CVE-2023-4527, CVE-2023-4806, CVE-2024-33599, CVE-2024-33600, CVE-2024-33601, CVE-2025-0395, CVE-2025-4802

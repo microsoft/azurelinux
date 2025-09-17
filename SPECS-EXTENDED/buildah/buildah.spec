@@ -21,7 +21,7 @@
 Summary:        A command line tool used for creating OCI Images
 Name:           buildah
 Version:        1.18.0
-Release:        32%{?dist}
+Release:        33%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -123,7 +123,10 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 %{_datadir}/%{name}/test
 
 %changelog
-* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.18.0-32
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.18.0-33
+- Bump to rebuild with updated glibc
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.18.0-32
 - Bump to rebuild with updated glibc
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.18.0-31

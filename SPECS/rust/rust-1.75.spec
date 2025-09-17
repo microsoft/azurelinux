@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.75.0
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -180,7 +180,10 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
-* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-18
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-19
+- Bump to rebuild with updated glibc
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.75.0-18
 - Bump to rebuild with updated glibc
 
 * Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.75.0-17

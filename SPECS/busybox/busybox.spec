@@ -1,7 +1,7 @@
 Summary:        Statically linked binary providing simplified versions of system commands
 Name:           busybox
 Version:        1.36.1
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -106,7 +106,10 @@ SKIP_KNOWN_BUGS=1 ./runtest
 %{_mandir}/man1/busybox.petitboot.1.gz
 
 %changelog
-* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.36.1-15
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.36.1-16
+- Bump to rebuild with updated glibc
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.36.1-15
 - Bump to rebuild with updated glibc
 
 * Mon Jul 07 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.36.1-14
