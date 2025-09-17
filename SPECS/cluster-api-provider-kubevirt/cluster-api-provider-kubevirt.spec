@@ -35,6 +35,8 @@ Patch6:         nodeport-service-support-in-KubevirtCluster.patch
 Patch7:         cleanup-vms-which-have-never-been-ready.patch
 Patch8:         makefile-targets-local-dev-test.patch
 %global debug_package %{nil}
+BuildRequires:  gcc
+BuildRequires:  build-essential
 BuildRequires:  golang >= 1.24
 
 %define our_gopath %{_topdir}/.gopath
