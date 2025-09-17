@@ -33,7 +33,6 @@ Patch4:         replace-cloudinit-configdrive-with-nocloud.patch
 Patch5:         refactor-bootstrap-handling-for-faster-reconciliation.patch
 Patch6:         nodeport-service-support-in-KubevirtCluster.patch
 Patch7:         cleanup-vms-which-have-never-been-ready.patch
-Patch8:         makefile-targets-local-dev-test.patch
 %global debug_package %{nil}
 BuildRequires:  gcc
 BuildRequires:  build-essential
