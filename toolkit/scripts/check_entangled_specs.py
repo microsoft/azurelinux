@@ -69,36 +69,72 @@ version_release_matching_groups = [
         "SPECS/fwctl/fwctl.spec"
     ]),
     frozenset([
+        "SPECS-SIGNED/fwctl-hwe-signed/fwctl-hwe-signed.spec",
+        "SPECS/fwctl-hwe/fwctl-hwe.spec"
+    ]),
+    frozenset([
         "SPECS-SIGNED/iser-signed/iser-signed.spec",
         "SPECS/iser/iser.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/iser-hwe-signed/iser-hwe-signed.spec",
+        "SPECS/iser-hwe/iser-hwe.spec"
     ]),
     frozenset([
         "SPECS-SIGNED/isert-signed/isert-signed.spec",
         "SPECS/isert/isert.spec"
     ]),
     frozenset([
+        "SPECS-SIGNED/isert-hwe-signed/isert-hwe-signed.spec",
+        "SPECS/isert-hwe/isert-hwe.spec"
+    ]),
+    frozenset([
         "SPECS-SIGNED/knem-modules-signed/knem-modules-signed.spec",
         "SPECS/knem/knem.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/knem-hwe-modules-signed/knem-hwe-modules-signed.spec",
+        "SPECS/knem-hwe/knem-hwe.spec"
     ]),
     frozenset([
         "SPECS-SIGNED/mft_kernel-signed/mft_kernel-signed.spec",
         "SPECS/mft_kernel/mft_kernel.spec"
     ]),
     frozenset([
+        "SPECS-SIGNED/mft_kernel-hwe-signed/mft_kernel-hwe-signed.spec",
+        "SPECS/mft_kernel-hwe/mft_kernel-hwe.spec"
+    ]),
+    frozenset([
         "SPECS-SIGNED/mlnx-nfsrdma-signed/mlnx-nfsrdma-signed.spec",
         "SPECS/mlnx-nfsrdma/mlnx-nfsrdma.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/mlnx-nfsrdma-hwe-signed/mlnx-nfsrdma-hwe-signed.spec",
+        "SPECS/mlnx-nfsrdma-hwe/mlnx-nfsrdma-hwe.spec"
     ]),
     frozenset([
         "SPECS-SIGNED/mlnx-ofa_kernel-modules-signed/mlnx-ofa_kernel-modules-signed.spec",
         "SPECS/mlnx-ofa_kernel/mlnx-ofa_kernel.spec"
     ]),
     frozenset([
+        "SPECS-SIGNED/mlnx-ofa_kernel-hwe-modules-signed/mlnx-ofa_kernel-hwe-modules-signed.spec",
+        "SPECS/mlnx-ofa_kernel-hwe/mlnx-ofa_kernel-hwe.spec"
+    ]),
+    frozenset([
         "SPECS-SIGNED/srp-signed/srp-signed.spec",
         "SPECS/srp/srp.spec"
     ]),
     frozenset([
+        "SPECS-SIGNED/srp-hwe-signed/srp-hwe-signed.spec",
+        "SPECS/srp-hwe/srp-hwe.spec"
+    ]),
+    frozenset([
         "SPECS-SIGNED/xpmem-modules-signed/xpmem-modules-signed.spec",
         "SPECS/xpmem/xpmem.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/xpmem-hwe-modules-signed/xpmem-hwe-modules-signed.spec",
+        "SPECS/xpmem-hwe/xpmem-hwe.spec"
     ])
 
 ]

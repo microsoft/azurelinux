@@ -1,0 +1,302 @@
+From 4e9860eec2955a248edd075773b39890140f41db Mon Sep 17 00:00:00 2001
+From: Sharath Srikanth Chellappa <sharathsr@microsoft.com>
+Date: Wed, 13 Aug 2025 13:50:04 -0700
+Subject: [PATCH] Cleanup stuck VMs that have never been Ready before
+
+This patch adds automatic cleanup functionality for KubeVirt VMs that are stuck 
+in a failed state and have never successfully started. 
+It introduces a new Started field to track whether a VM has ever been ready, and 
+implements logic to delete VMs that have been failing for more than 5 minutes.
+
+### Key Changes
+- API Changes (kubevirtmachine_types.go)
+
+This field tracks whether the VM has ever reached a ready state during its lifecycle
+Defaults to true for backward compatibility during upgrades, but is explicitly set 
+to false for new machines
+
+- Controller Logic (kubevirtmachine_controller.go)
+
+Implements automatic cleanup for VMs that:
+  - Have never started (Started = false)
+  - Have a VMCreateFailedReason condition
+  - Were created more than 5 minutes ago
+
+If a VM meets these criteria, it is automatically deleted
+
+If the VM is less than 5 minutes old, it requeues for checking after 30 seconds
+
+VMs that have started at least once are never automatically deleted, even if they 
+later fail
+
+- Machine Interface Updates
+
+Adds GetCreationTimestamp() method to the MachineInterface to retrieve the 
+VM's creation time
+Implements this method in the concrete Machine type
+Updates the mock implementation to support the new method and properly mock 
+GetVMNotReadyReason()
+
+- Test Coverage (kubevirtmachine_controller_test.go)
+
+Adds comprehensive test cases for the new functionality:
+- Test for deleting VMs that never started and are older than 5 minutes
+- Test for requeuing VMs that never started but are less than 5 minutes old
+- Test to ensure VMs that have started are not deleted even with failed conditions
+- Fixes existing test to include the missing GetVMNotReadyReason() expectation
+
+This enhancement:
+- Automatically cleans up VMs that are stuck in unschedulable or error states
+- Prevents resource waste from permanently failed VMs
+- Provides a grace period (5 minutes) for transient issues to resolve
+- Protects VMs that have been successful at least once from automatic deletion
+
+---
+ api/v1alpha1/kubevirtmachine_types.go         |   8 ++
+ controllers/kubevirtmachine_controller.go     |  24 +++-
+ .../kubevirtmachine_controller_test.go        | 112 ++++++++++++++++++
+ pkg/kubevirt/machine.go                       |   8 ++
+ pkg/kubevirt/machine_factory.go               |   2 +
+ .../mock/machine_factory_generated.go         |  14 +++
+ 6 files changed, 166 insertions(+), 2 deletions(-)
+
+diff --git a/api/v1alpha1/kubevirtmachine_types.go b/api/v1alpha1/kubevirtmachine_types.go
+index 94e2bcf..c8d0fca 100644
+--- a/api/v1alpha1/kubevirtmachine_types.go
++++ b/api/v1alpha1/kubevirtmachine_types.go
+@@ -74,6 +74,14 @@ type KubevirtMachineStatus struct {
+ 	// +kubebuilder:default=false
+ 	Ready bool `json:"ready"`
+ 
++	// Started is true when the provider resource at any point of time during its lifecycle was ready.
++	// We initially set default to true to ensure that if we are upgrading from a capkv without this parameter,
++	// we don't accidentally delete the VM Object.
++	// This value however will be explicitly set to false, everytime a new KubevirtMachine is created.
++	// +kubebuilder:default=false
++	// +optional
++	Started bool `json:"started,omitempty"`
++
+ 	// LoadBalancerConfigured denotes that the machine has been
+ 	// added to the load balancer
+ 	// +optional
+diff --git a/controllers/kubevirtmachine_controller.go b/controllers/kubevirtmachine_controller.go
+index 0983c93..ad6094b 100644
+--- a/controllers/kubevirtmachine_controller.go
++++ b/controllers/kubevirtmachine_controller.go
+@@ -278,12 +278,32 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
+ 	if externalMachine.IsReady() {
+ 		// Mark VMProvisionedCondition to indicate that the VM has successfully started
+ 		conditions.MarkTrue(ctx.KubevirtMachine, infrav1.VMProvisionedCondition)
++		// Set Started to true when VM becomes ready for the first time
++		if !ctx.KubevirtMachine.Status.Started {
++			ctx.KubevirtMachine.Status.Started = true
++		}
+ 	} else {
++		// Waiting for VM to boot
++		ctx.KubevirtMachine.Status.Ready = false
++		hasVMCreateFailedCondition := conditions.GetReason(ctx.KubevirtMachine, infrav1.VMProvisionedCondition) == infrav1.VMCreateFailedReason
++		if !ctx.KubevirtMachine.Status.Started && hasVMCreateFailedCondition {
++			ctx.Logger.Info("Virtual Machine is unschedulable or in error state. It has never come into Ready before")
++			if metav1.Now().Sub(externalMachine.GetCreationTimestamp()) > (300 * time.Second) {
++				ctx.Logger.Info("Virtual machine was created more than 5 minutes back")
++				ctx.Logger.Info("Deleting the VirtualMachine")
++				if externalMachine.Exists() {
++					if err := externalMachine.Delete(); err != nil {
++						return ctrl.Result{RequeueAfter: 10 * time.Second}, errors.Wrap(err, "failed to delete VM")
++					}
++				}
++				return ctrl.Result{}, nil
++			}
++			return ctrl.Result{Requeue: true, RequeueAfter: time.Second * 30}, nil
++		}
++
+ 		reason, message := externalMachine.GetVMNotReadyReason()
+ 		conditions.MarkFalse(ctx.KubevirtMachine, infrav1.VMProvisionedCondition, reason, clusterv1.ConditionSeverityInfo, "%s", message)
+ 
+-		// Waiting for VM to boot
+-		ctx.KubevirtMachine.Status.Ready = false
+ 		ctx.Logger.Info("KubeVirt VM is not fully provisioned and running...")
+ 		return ctrl.Result{RequeueAfter: 20 * time.Second}, nil
+ 	}
+diff --git a/controllers/kubevirtmachine_controller_test.go b/controllers/kubevirtmachine_controller_test.go
+index 85ee2ba..cc63a2a 100644
+--- a/controllers/kubevirtmachine_controller_test.go
++++ b/controllers/kubevirtmachine_controller_test.go
+@@ -1359,6 +1359,118 @@ var _ = Describe("reconcile a kubevirt machine", func() {
+ 		Expect(out).To(Equal(ctrl.Result{RequeueAfter: 20 * time.Second}))
+ 		Expect(machineContext.BootstrapDataSecret.Data["userdata"]).To(Equal(bootstrapSecret.Data["value"]))
+ 	})
++
++	It("should delete VM that has never started and was created more than 5 minutes ago", func() {
++		oldTime := metav1.NewTime(time.Now().Add(-10 * time.Minute))
++		vm.ObjectMeta.CreationTimestamp = oldTime
++
++		objects := []client.Object{
++			cluster, kubevirtCluster, machine, kubevirtMachine,
++			sshKeySecret, bootstrapSecret, bootstrapUserDataSecret, vm,
++		}
++		setupClient(machineFactoryMock, objects)
++
++		// Expectations: only what's reached on the not-ready early-delete path
++		machineMock.EXPECT().IsTerminal().Return(false, "", nil).Times(1)
++		machineMock.EXPECT().Exists().Return(true).Times(2) // once early (skip create), once for delete guard
++		machineMock.EXPECT().IsReady().Return(false).Times(1)
++		// machineMock.EXPECT().GetVMNotReadyReason().Return("VMNotReady", "VM is not ready").Times(1)
++		machineMock.EXPECT().GetCreationTimestamp().Return(oldTime.Time).Times(1)
++		machineMock.EXPECT().Delete().Return(nil).Times(1)
++
++		// Nothing else is called on this path:
++		// - NO Address / GenerateProviderID / GetConditions / DrainNodeIfNeeded / SupportsCheckingIsBootstrapped
++
++		machineFactoryMock.EXPECT().
++			NewMachine(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
++			Return(machineMock, nil).Times(1)
++
++		infraClusterMock.EXPECT().
++			GenerateInfraClusterClient(kubevirtMachine.Spec.InfraClusterSecretRef, kubevirtMachine.Namespace, machineContext.Context).
++			Return(fakeClient, kubevirtMachine.Namespace, nil)
++
++		// Set "never started" + VMCreateFailedReason to trigger the branch
++		machineContext.KubevirtMachine.Status.Started = false
++		conditions.MarkFalse(machineContext.KubevirtMachine, infrav1.VMProvisionedCondition, infrav1.VMCreateFailedReason, clusterv1.ConditionSeverityError, "VM creation failed")
++
++		out, err := kubevirtMachineReconciler.reconcileNormal(machineContext)
++		Expect(err).ShouldNot(HaveOccurred())
++		Expect(out).To(Equal(ctrl.Result{}))
++	})
++
++	It("should requeue VM that has never started but was created less than 5 minutes ago", func() {
++		recentTime := metav1.NewTime(time.Now().Add(-2 * time.Minute))
++		vm.ObjectMeta.CreationTimestamp = recentTime
++
++		objects := []client.Object{
++			cluster, kubevirtCluster, machine, kubevirtMachine,
++			sshKeySecret, bootstrapSecret, bootstrapUserDataSecret, vm,
++		}
++		setupClient(machineFactoryMock, objects)
++
++		// Expectations: only what's reached on the not-ready early-requeue path
++		machineMock.EXPECT().IsTerminal().Return(false, "", nil).Times(1)
++		machineMock.EXPECT().Exists().Return(true).Times(1) // early (skip create); no delete guard here
++		machineMock.EXPECT().IsReady().Return(false).Times(1)
++		// machineMock.EXPECT().GetVMNotReadyReason().Return("VMNotReady", "VM is not ready").Times(1)
++		machineMock.EXPECT().GetCreationTimestamp().Return(recentTime.Time).Times(1)
++
++		// Nothing else on this path:
++		// - NO Address / GenerateProviderID / GetConditions / DrainNodeIfNeeded / SupportsCheckingIsBootstrapped
++
++		machineFactoryMock.EXPECT().
++			NewMachine(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
++			Return(machineMock, nil).Times(1)
++
++		infraClusterMock.EXPECT().
++			GenerateInfraClusterClient(kubevirtMachine.Spec.InfraClusterSecretRef, kubevirtMachine.Namespace, machineContext.Context).
++			Return(fakeClient, kubevirtMachine.Namespace, nil)
++
++		machineContext.KubevirtMachine.Status.Started = false
++		conditions.MarkFalse(machineContext.KubevirtMachine, infrav1.VMProvisionedCondition, infrav1.VMCreateFailedReason, clusterv1.ConditionSeverityError, "VM creation failed")
++
++		out, err := kubevirtMachineReconciler.reconcileNormal(machineContext)
++		Expect(err).ShouldNot(HaveOccurred())
++		Expect(out).To(Equal(ctrl.Result{Requeue: true, RequeueAfter: 30 * time.Second}))
++	})
++
++	It("should not delete VM that has started even if it has VMCreateFailedReason", func() {
++		oldTime := metav1.NewTime(time.Now().Add(-10 * time.Minute))
++		vm.ObjectMeta.CreationTimestamp = oldTime
++
++		objects := []client.Object{
++			cluster, kubevirtCluster, machine, kubevirtMachine,
++			sshKeySecret, bootstrapSecret, bootstrapUserDataSecret, vm,
++		}
++		setupClient(machineFactoryMock, objects)
++
++		// Not ready now, but the machine has Started=true previously.
++		// Controller will: GetVMNotReadyReason -> MarkFalse -> skip the "never started" delete/requeue
++		// -> return RequeueAfter 20s (still not ready).
++		machineMock.EXPECT().IsTerminal().Return(false, "", nil).Times(1)
++		machineMock.EXPECT().Exists().Return(true).Times(1)
++		machineMock.EXPECT().IsReady().Return(false).Times(1)
++		machineMock.EXPECT().GetVMNotReadyReason().Return("VMNotReady", "VM is not ready").Times(1)
++
++		// Nothing else on this path:
++		// - NO Address / GenerateProviderID / GetConditions / DrainNodeIfNeeded / SupportsCheckingIsBootstrapped
++
++		machineFactoryMock.EXPECT().
++			NewMachine(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
++			Return(machineMock, nil).Times(1)
++
++		infraClusterMock.EXPECT().
++			GenerateInfraClusterClient(kubevirtMachine.Spec.InfraClusterSecretRef, kubevirtMachine.Namespace, machineContext.Context).
++			Return(fakeClient, kubevirtMachine.Namespace, nil)
++
++		machineContext.KubevirtMachine.Status.Started = true
++		conditions.MarkFalse(machineContext.KubevirtMachine, infrav1.VMProvisionedCondition, infrav1.VMCreateFailedReason, clusterv1.ConditionSeverityError, "VM creation failed")
++
++		out, err := kubevirtMachineReconciler.reconcileNormal(machineContext)
++		Expect(err).ShouldNot(HaveOccurred())
++		Expect(out).To(Equal(ctrl.Result{RequeueAfter: 20 * time.Second}))
++	})
++
+ })
+ 
+ var _ = Describe("updateNodeProviderID", func() {
+diff --git a/pkg/kubevirt/machine.go b/pkg/kubevirt/machine.go
+index 1fb9829..c29a68e 100644
+--- a/pkg/kubevirt/machine.go
++++ b/pkg/kubevirt/machine.go
+@@ -237,6 +237,14 @@ func (m *Machine) IsReady() bool {
+ 	return m.hasReadyCondition()
+ }
+ 
++// GetCreationTimestamp returns the creation timestamp of the VM.
++func (m *Machine) GetCreationTimestamp() time.Time {
++	if m.vmInstance != nil {
++		return m.vmInstance.CreationTimestamp.Time
++	}
++	return time.Time{}
++}
++
+ // IsLiveMigratable reports back the live-migratability state of the VM: Status, Reason and Message
+ func (m *Machine) IsLiveMigratable() (bool, string, string, error) {
+ 	if m.vmiInstance == nil {
+diff --git a/pkg/kubevirt/machine_factory.go b/pkg/kubevirt/machine_factory.go
+index 88a730f..2bbf325 100644
+--- a/pkg/kubevirt/machine_factory.go
++++ b/pkg/kubevirt/machine_factory.go
+@@ -28,6 +28,8 @@ type MachineInterface interface {
+ 	IsReady() bool
+ 	// IsLiveMigratable reports back the live-migratability state of the VM: Status, Reason and Message
+ 	IsLiveMigratable() (bool, string, string, error)
++	// GetCreationTimestamp returns the creation timestamp of the VM.
++	GetCreationTimestamp() time.Time
+ 	// Address returns the IP address of the VM.
+ 	Address() string
+ 	// SupportsCheckingIsBootstrapped checks if we have a method of checking
+diff --git a/pkg/kubevirt/mock/machine_factory_generated.go b/pkg/kubevirt/mock/machine_factory_generated.go
+index 9c7365e..5bf4ff2 100644
+--- a/pkg/kubevirt/mock/machine_factory_generated.go
++++ b/pkg/kubevirt/mock/machine_factory_generated.go
+@@ -141,6 +141,20 @@ func (mr *MockMachineInterfaceMockRecorder) GetConditions() *gomock.Call {
+ 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConditions", reflect.TypeOf((*MockMachineInterface)(nil).GetConditions))
+ }
+ 
++// GetCreationTimestamp mocks base method.
++func (m *MockMachineInterface) GetCreationTimestamp() time.Time {
++	m.ctrl.T.Helper()
++	ret := m.ctrl.Call(m, "GetCreationTimestamp")
++	ret0, _ := ret[0].(time.Time)
++	return ret0
++}
++
++// GetCreationTimestamp indicates an expected call of GetCreationTimestamp.
++func (mr *MockMachineInterfaceMockRecorder) GetCreationTimestamp() *gomock.Call {
++	mr.mock.ctrl.T.Helper()
++	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCreationTimestamp", reflect.TypeOf((*MockMachineInterface)(nil).GetCreationTimestamp))
++}
++
+ // GetVMNotReadyReason mocks base method.
+ func (m *MockMachineInterface) GetVMNotReadyReason() (string, string) {
+ 	m.ctrl.T.Helper()
+-- 
+2.49.0

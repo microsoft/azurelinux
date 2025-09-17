@@ -1,0 +1,578 @@
+From 607d529c70e8f021003237a674beedec7b422de5 Mon Sep 17 00:00:00 2001
+From: Sharath Srikanth Chellappa <sharathsr@microsoft.com>
+Date: Mon, 7 Jul 2025 12:43:42 -0700
+Subject: [PATCH] [OPTIONAL] Adding makefile targets, templates for local development and testing
+
+This patch file is an optional patch file which provides a direction for the user to build and push Docker images, 
+generate a local clusterctl-compatible provider repository using envsubst, 
+and use the local provider repository. This is only for local development and testing purposes and is a reference for 
+anyone who wants to do local development and testing.
+
+The changes are as follows:
+1. Added Makefile targets:
+    - $(ENVSUBST) to build envsubst.
+    - dev-release to build and push Docker images.
+    - create-local-provider-repository to generate a local clusterctl-compatible provider repository using envsubst.
+
+2. templates/cluster-template-azl.yaml: A full Cluster API template for KubeVirt clusters, including:
+    - Cluster, KubevirtCluster, KubevirtMachineTemplate, KubeadmControlPlane, KubeadmConfigTemplate, and MachineDeployment resources.
+    - Custom iptables rules, sysctl tuning, and kernel module loading.
+    - Use of envsubst for dynamic templating via environment variables.
+
+3. hack/clusterctl.yaml: A clusterctl configuration file to use the local provider repository.
+
+4. scripts/go_install.sh: A script to install a specific version of a Go module.
+
+5. Dockerfile: Updated the Golang version to 1.24.
+---
+ Dockerfile                          |   2 +-
+ Makefile                            |  52 +++-
+ hack/clusterctl.yaml                |   5 +
+ scripts/go_install.sh               |  57 +++++
+ templates/cluster-template-azl.yaml | 366 ++++++++++++++++++++++++++++
+ 5 files changed, 480 insertions(+), 2 deletions(-)
+ create mode 100644 hack/clusterctl.yaml
+ create mode 100755 scripts/go_install.sh
+ create mode 100644 templates/cluster-template-azl.yaml
+
+diff --git a/Dockerfile b/Dockerfile
+index 55fe159..f1df6b8 100644
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -16,7 +16,7 @@
+ 
+ # Build the manager binary
+ # Run this with docker build --build-arg builder_image=<golang:x.y.z>
+-ARG builder_image=docker.io/golang:1.23
++ARG builder_image=docker.io/golang:1.24
+ FROM ${builder_image} as builder
+ WORKDIR /workspace
+ 
+diff --git a/Makefile b/Makefile
+index e210ed5..0b21846 100644
+--- a/Makefile
++++ b/Makefile
+@@ -39,6 +39,21 @@ BIN_DIR := bin
+ TOOLS_DIR := hack/tools
+ TOOLS_BIN_DIR := $(TOOLS_DIR)/bin
+ 
++ENVSUBST_VER := v2.0.0-20210730161058-179042472c46
++ENVSUBST_BIN := envsubst
++ENVSUBST := $(TOOLS_BIN_DIR)/$(ENVSUBST_BIN)-$(ENVSUBST_VER)
++
++# Version
++MAJOR_VER ?= 0
++MINOR_VER ?= 1
++PATCH_VER ?= 10
++VER_SUFFIX ?= -alpha
++TAG := $(MAJOR_VER).$(MINOR_VER).$(PATCH_VER)$(VER_SUFFIX)
++
++# Local repository path for development
++export CAPKV_REPOSITORY := local-repository/infrastructure-kubevirt/v$(TAG)
++export LOCAL_REPOSITORY := $(HOME)/$(CAPKV_REPOSITORY)
++
+ # Set --output-base for conversion-gen if we are not within GOPATH
+ ifneq ($(abspath $(ROOT_DIR)),$(shell go env GOPATH)/src/sigs.k8s.io/cluster-api-provider-kubevirt)
+ 	CONVERSION_GEN_OUTPUT_BASE := --output-base=$(ROOT_DIR)
+@@ -214,7 +229,7 @@ modules: ## Runs go mod to ensure modules are up to date.
+ .PHONY: docker-pull-prerequisites
+ docker-pull-prerequisites:
+ 	docker pull docker.io/docker/dockerfile:1.4
+-	docker pull docker.io/library/golang:1.22.0
++	docker pull docker.io/library/golang:1.24.0
+ 	docker pull gcr.io/distroless/static:latest
+ 
+ .PHONY: docker-build
+@@ -271,6 +286,41 @@ else
+ 	sed -i -e 's@imagePullPolicy: .*@imagePullPolicy: '"$(PULL_POLICY)"'@' ./config/default/manager_pull_policy.yaml
+ endif
+ 
++## --------------------------------------
++## Development
++## --------------------------------------
++
++# Directories.
++ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
++TOOLS_DIR := hack/tools
++TOOLS_BIN_DIR := $(abspath $(TOOLS_DIR)/bin)
++BIN_DIR := bin
++GO_INSTALL = ./scripts/go_install.sh
++
++$(ENVSUBST): ## Build envsubst from tools folder.
++	GOBIN=$(TOOLS_BIN_DIR) $(GO_INSTALL) github.com/drone/envsubst/v2/cmd/envsubst $(ENVSUBST_BIN) $(ENVSUBST_VER)
++
++.PHONY: dev-release
++dev-release:
++	#$(MAKE) generate
++	$(MAKE) docker-build
++	$(MAKE) docker-push
++
++.PHONY: create-local-provider-repository
++create-local-provider-repository: $(ENVSUBST) create-infrastructure-components
++	# Create the required directories
++	mkdir -p $(LOCAL_REPOSITORY)/
++	mkdir -p $(HOME)/.cluster-api/
++	# Prepare configuration file for clusterctl
++	cat hack/clusterctl.yaml | $(ENVSUBST) > $(HOME)/.cluster-api/clusterctl.yaml
++	# Prepare metadata yaml for clusterctl
++	# sed -i'' -e 's@major: .*@major: '"$(MAJOR_VER)"'@' ./metadata.yaml
++	# sed -i'' -e 's@minor: .*@minor: '"$(MINOR_VER)"'@' ./metadata.yaml
++	# Populate the local repository
++	cp metadata.yaml $(LOCAL_REPOSITORY)
++	cp infrastructure-components.yaml $(LOCAL_REPOSITORY)
++	cp templates/cluster-template-azl.yaml $(LOCAL_REPOSITORY)/cluster-template.yaml
++
+ ## --------------------------------------
+ ## Deployment
+ ## --------------------------------------
+diff --git a/hack/clusterctl.yaml b/hack/clusterctl.yaml
+new file mode 100644
+index 0000000..4f7e4b2
+--- /dev/null
++++ b/hack/clusterctl.yaml
+@@ -0,0 +1,5 @@
++providers:
++  # add CAPKV as a custom provider with local repository
++  - name: "kubevirt"
++    url: "${LOCAL_REPOSITORY}/infrastructure-components.yaml"
++    type: "InfrastructureProvider"
+\ No newline at end of file
+diff --git a/scripts/go_install.sh b/scripts/go_install.sh
+new file mode 100755
+index 0000000..56a1fd3
+--- /dev/null
++++ b/scripts/go_install.sh
+@@ -0,0 +1,57 @@
++#!/usr/bin/env bash
++# Copyright 2020 The Kubernetes Authors.
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++#     http://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++
++set -o errexit
++set -o nounset
++set -o pipefail
++
++if [ -z "${1}" ]; then
++  echo "must provide module as first parameter"
++  exit 1
++fi
++
++if [ -z "${2}" ]; then
++  echo "must provide binary name as second parameter"
++  exit 1
++fi
++
++if [ -z "${3}" ]; then
++  echo "must provide version as third parameter"
++  exit 1
++fi
++
++if [ -z "${GOBIN}" ]; then
++  echo "GOBIN is not set. Must set GOBIN to install the bin in a specified directory."
++  exit 1
++fi
++
++tmp_dir=$(mktemp -d -t goinstall_XXXXXXXXXX)
++function clean {
++  rm -rf "${tmp_dir}"
++}
++trap clean EXIT
++
++rm -f "${GOBIN}/${2}"* || true
++
++cd "${tmp_dir}"
++
++# create a new module in the tmp directory
++go mod init fake/mod
++
++# install the golang module specified as the first argument
++echo "${1}@${3}"
++go install -tags tools "${1}@${3}"
++mv "${GOBIN}/${2}" "${GOBIN}/${2}-${3}"
++ln -sf "${GOBIN}/${2}-${3}" "${GOBIN}/${2}" 
+\ No newline at end of file
+diff --git a/templates/cluster-template-azl.yaml b/templates/cluster-template-azl.yaml
+new file mode 100644
+index 0000000..dda24e4
+--- /dev/null
++++ b/templates/cluster-template-azl.yaml
+@@ -0,0 +1,366 @@
++---
++apiVersion: cluster.x-k8s.io/v1beta1
++kind: Cluster
++metadata:
++  name: "${CLUSTER_NAME}"
++  namespace: "${NAMESPACE}"
++spec:
++  clusterNetwork:
++    pods:
++      cidrBlocks:
++        - ${CLUSTER_POD_CIDR:=""}
++    services:
++      cidrBlocks:
++        - ${CLUSTER_SERVICE_CIDR:=""}
++  infrastructureRef:
++    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
++    kind: KubevirtCluster
++    name: '${CLUSTER_NAME}'
++    namespace: "${NAMESPACE}"
++  controlPlaneRef:
++    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
++    kind: KubeadmControlPlane
++    name: '${CLUSTER_NAME}-control-plane'
++    namespace: "${NAMESPACE}"
++---
++apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
++kind: KubevirtCluster
++metadata:
++  name: "${CLUSTER_NAME}"
++  namespace: "${NAMESPACE}"
++spec:
++  controlPlaneServiceTemplate:
++    spec:
++      type: NodePort
++---
++apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
++kind: KubevirtMachineTemplate
++metadata:
++  name: "${CLUSTER_NAME}-control-plane"
++  namespace: "${NAMESPACE}"
++spec:
++  template:
++    spec:
++      virtualMachineTemplate:
++        metadata:
++          namespace: "${NAMESPACE}"
++        spec:
++          dataVolumeTemplates:
++          - metadata:
++              name: root
++            spec:
++              pvc:
++                accessModes:
++                  - ReadWriteOnce
++                resources:
++                  requests:
++                    storage: ${OS_DISK_SIZE_GB}Gi
++                storageClassName: ${STORAGE_CLASS_NAME}
++                volumeMode: Filesystem
++              source:
++                pvc:
++                  name: ${OS_IMAGE_DATAVOLUME_PREFIX}
++                  namespace: ${CLUSTER_NAMESPACE}
++          runStrategy: Always
++          template:
++            spec:
++              accessCredentials:
++                - userPassword:
++                    propagationMethod:
++                      qemuGuestAgent: {}
++                    source:
++                      secret:
++                        secretName: ${ACCESS_SECRET_PASSWORD:=""}
++                - sshPublicKey:
++                    propagationMethod:
++                      qemuGuestAgent:
++                        users:
++                          - clouduser
++                    source:
++                      secret:
++                        secretName: ${ACCESS_SECRET_PUBKEY:=""}
++              domain:
++                cpu:
++                  cores: ${KUBEVIRT_CONTROL_PLANE_CORES}
++                  model: host-passthrough
++                  sockets: 1
++                  threads: 1
++                devices:
++                  disks:
++                    - disk:
++                        bus: virtio
++                      name: root
++                    - name: cluster-sa-token
++                      disk:
++                        bus: sata
++                      serial: 6MNWHK43UMVZC243BFV2
++                  interfaces:
++                    - bridge: {}
++                      name: default
++                features:
++                  smm:
++                    enabled: ${OS_IMAGE_USE_SECURE_BOOT:=false}
++                firmware:
++                  bootloader:
++                    efi:
++                      secureBoot: ${OS_IMAGE_USE_SECURE_BOOT:=false}
++                resources:
++                  limits:
++                    cpu: ${KUBEVIRT_CONTROL_PLANE_CORES}
++                    memory: ${KUBEVIRT_CONTROL_PLANE_MEMORY}
++                  requests:
++                    cpu: ${KUBEVIRT_CONTROL_PLANE_CORES}
++                    memory: ${KUBEVIRT_CONTROL_PLANE_MEMORY}
++              evictionStrategy: External
++              volumes:
++                - dataVolume:
++                    name: root
++                  name: root
++                - name: cluster-sa-token
++                  secret:
++                    secretName: capkv-cluster-token
++              networks:
++                - name: default
++                  pod: {}
++---
++apiVersion: controlplane.cluster.x-k8s.io/v1beta1
++kind: KubeadmControlPlane
++metadata:
++  name: "${CLUSTER_NAME}-control-plane"
++  namespace: "${NAMESPACE}"
++spec:
++  kubeadmConfigSpec:
++    clusterConfiguration:
++      apiServer:
++        timeoutForControlPlane: 20m
++      controllerManager:
++        extraArgs:
++          bind-address: 0.0.0.0
++          cloud-provider: external
++          leader-elect-lease-duration: 60s
++          leader-elect-renew-deadline: 55s
++          terminated-pod-gc-threshold: "10"
++      etcd:
++        local:
++          imageRepository: mcr.microsoft.com/oss/v2/etcd-io
++          imageTag: v3.6.3
++      imageRepository: ${CONTAINER_IMAGE_REGISTRY}
++      scheduler:
++        extraArgs:
++          bind-address: 0.0.0.0
++          leader-elect-lease-duration: 60s
++          leader-elect-renew-deadline: 55s
++    initConfiguration:
++      nodeRegistration:
++        criSocket: /var/run/containerd/containerd.sock
++        kubeletExtraArgs:
++          anonymous-auth: "false"
++          cgroup-driver: systemd
++          cloud-provider: external
++        name: '{{ ds.meta_data["local_hostname"] }}'
++    joinConfiguration:
++      nodeRegistration:
++        criSocket: /var/run/containerd/containerd.sock
++        kubeletExtraArgs:
++          cgroup-driver: systemd
++          cloud-provider: external
++        name: '{{ ds.meta_data["local_hostname"] }}'
++    postKubeadmCommands:
++      - mkdir /root/.kube
++      - cp /etc/kubernetes/admin.conf /root/.kube/config
++    preKubeadmCommands:
++      - export HOME=/root
++      - iptables -A INPUT -p tcp --dport 10250 -j ACCEPT -m comment --comment "Allow kubelet traffic"
++      - iptables -A INPUT -p tcp --dport 6443 -j ACCEPT -m comment --comment "Allow apiserver traffic"
++      - iptables -A INPUT -p tcp --dport 2379 -j ACCEPT -m comment --comment "Allow etcd traffic"
++      - iptables -A INPUT -p tcp --dport 2380 -j ACCEPT -m comment --comment "Allow etcd traffic"
++      - iptables -A INPUT -p tcp --dport 179 -j ACCEPT -m comment --comment "Allow bird traffic"
++      - iptables-save > /etc/systemd/scripts/ip4save
++      - echo kernel.pid_max=101382 > /etc/sysctl.d/55-pidmax.conf
++      - sysctl -p /etc/sysctl.d/55-pidmax.conf
++      - modprobe -- ip_vs
++      - modprobe -- ip_vs_rr
++      - modprobe -- ip_vs_wrr
++      - modprobe -- ip_vs_sh
++      - modprobe -- nf_conntrack
++      - |-
++        echo "---
++        apiVersion: kubeproxy.config.k8s.io/v1alpha1
++        kind: KubeProxyConfiguration
++        mode: ipvs" >> /run/kubeadm/kubeadm.yaml
++      - export SAMOUNT=/var/run/secrets/ecf/clusterserviceaccount
++      - export SADISK=/dev/disk/by-id/ata-QEMU_HARDDISK_6MNWHK43UMVZC243BFV2
++      - if [ -e $SADISK ]; then mkdir -p $SAMOUNT; echo $SADISK $SAMOUNT iso9660 ro,auto 0 0 >> /etc/fstab; mount $SAMOUNT; fi
++    useExperimentalRetryJoin: true
++    users:
++      - groups: sudo, docker
++        name: clouduser
++        shell: /bin/bash
++        sudo: ALL=(ALL) NOPASSWD:ALL
++  machineTemplate:
++    infrastructureRef:
++      apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
++      kind: KubevirtMachineTemplate
++      name: "${CLUSTER_NAME}-control-plane"
++      namespace: default
++  replicas: ${CONTROL_PLANE_MACHINE_COUNT}
++  version: ${KUBERNETES_VERSION}
++---
++apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
++kind: KubevirtMachineTemplate
++metadata:
++  name: "${CLUSTER_NAME}-md-0"
++  namespace: "${NAMESPACE}"
++spec:
++  template:
++    spec:
++      virtualMachineTemplate:
++        metadata:
++          namespace: "${NAMESPACE}"
++        spec:
++          dataVolumeTemplates:
++          - metadata:
++              name: root
++            spec:
++              pvc:
++                accessModes:
++                  - ReadWriteOnce
++                resources:
++                  requests:
++                    storage: ${OS_DISK_SIZE_GB}Gi
++                storageClassName: ${STORAGE_CLASS_NAME}
++                volumeMode: ${VOLUME_MODE}
++              source:
++                pvc:
++                  name: ${OS_IMAGE_DATAVOLUME_PREFIX}
++                  namespace: ${CLUSTER_NAMESPACE}
++          runStrategy: Always
++          template:
++            spec:
++              accessCredentials:
++                - userPassword:
++                    propagationMethod:
++                      qemuGuestAgent: {}
++                    source:
++                      secret:
++                        secretName: ${ACCESS_SECRET_PASSWORD:=""}
++                - sshPublicKey:
++                    propagationMethod:
++                      qemuGuestAgent:
++                        users:
++                          - clouduser
++                    source:
++                      secret:
++                        secretName: ${ACCESS_SECRET_PUBKEY:=""}
++              domain:
++                cpu:
++                  cores: ${KUBEVIRT_WORKER_CORES}
++                  model: host-passthrough
++                  sockets: 1
++                  threads: 1
++                devices:
++                  autoattachGraphicsDevice: false
++                  disks:
++                    - disk:
++                        bus: virtio
++                      name: root
++                    - name: cluster-sa-token
++                      disk:
++                        bus: sata
++                      serial: 6MNWHK43UMVZC243BFV2
++                  interfaces:
++                    - bridge: {}
++                      name: default
++                features:
++                  smm:
++                    enabled: false
++                firmware:
++                  bootloader:
++                    efi:
++                      secureBoot: false
++                resources:
++                  limits:
++                    cpu: ${KUBEVIRT_WORKER_CORES}
++                    memory: ${KUBEVIRT_WORKER_MEMORY}
++                  requests:
++                    cpu: ${KUBEVIRT_WORKER_CORES}
++                    memory: ${KUBEVIRT_WORKER_MEMORY}
++              evictionStrategy: External
++              volumes:
++                - dataVolume:
++                    name: root
++                  name: root
++                - name: cluster-sa-token
++                  secret:
++                    secretName: capkv-cluster-token
++              networks:
++                - name: default
++                  pod: {}
++---
++apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
++kind: KubeadmConfigTemplate
++metadata:
++  name: "${CLUSTER_NAME}-md-0"
++  namespace: "${NAMESPACE}"
++spec:
++  template:
++    spec:
++      clusterConfiguration:
++        etcd:
++          local:
++            imageRepository: mcr.microsoft.com/oss/v2/etcd-io
++            imageTag: v3.6.3
++      joinConfiguration:
++        nodeRegistration:
++          kubeletExtraArgs:
++            cgroup-driver: systemd
++            cloud-provider: external
++            cpu-manager-policy: static
++            reserved-cpus: "0"
++          name: '{{ ds.meta_data["local_hostname"] }}'
++          criSocket: /var/run/containerd/containerd.sock
++      preKubeadmCommands:
++        - export HOME=/root
++        - iptables -A INPUT -p tcp --dport 10250 -j ACCEPT
++        - iptables -A INPUT -p tcp --dport 179 -j ACCEPT
++        - iptables-save > /etc/systemd/scripts/ip4save
++        - echo kernel.pid_max=359414 > /etc/sysctl.d/55-pidmax.conf
++        - sysctl -p /etc/sysctl.d/55-pidmax.conf
++        - modprobe -- ip_vs
++        - modprobe -- ip_vs_rr
++        - modprobe -- ip_vs_wrr
++        - modprobe -- ip_vs_sh
++        - modprobe -- nf_conntrack
++      useExperimentalRetryJoin: true
++      users:
++        - groups: sudo, docker
++          name: clouduser
++          shell: /bin/bash
++          sudo: ALL=(ALL) NOPASSWD:ALL
++---
++apiVersion: cluster.x-k8s.io/v1beta1
++kind: MachineDeployment
++metadata:
++  name: "${CLUSTER_NAME}-md-0"
++  namespace: "${NAMESPACE}"
++spec:
++  clusterName: "${CLUSTER_NAME}"
++  replicas: ${WORKER_MACHINE_COUNT}
++  selector:
++    matchLabels: null
++  template:
++    spec:
++      bootstrap:
++        configRef:
++          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
++          kind: KubeadmConfigTemplate
++          name: ${CLUSTER_NAME}-md-0
++          namespace: ${NAMESPACE}
++      clusterName: ${CLUSTER_NAME}
++      infrastructureRef:
++        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
++        kind: KubevirtMachineTemplate
++        name: ${CLUSTER_NAME}-md-0
++        namespace: ${NAMESPACE}
++      version: ${KUBERNETES_VERSION}
++---
+\ No newline at end of file
+-- 
+2.49.0
