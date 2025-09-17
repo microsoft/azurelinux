@@ -44,7 +44,7 @@ https://ftp.gnu.org/gnu/coreutils/coreutils-9.4.tar.xz
 https://www.linuxfromscratch.org/patches/downloads/coreutils/coreutils-9.4-i18n-1.patch
 https://ftp.gnu.org/gnu/diffutils/diffutils-3.10.tar.xz
 https://github.com/libexpat/libexpat/releases/download/R_2_4_8/expat-2.4.8.tar.bz2
-http://ftp.astron.com/pub/file/file-5.45.tar.gz
+https://sources.buildroot.net/file/file-5.45.tar.gz
 https://ftp.gnu.org/gnu/gawk/gawk-5.2.2.tar.xz
 https://ftp.gnu.org/gnu/gettext/gettext-0.22.tar.xz
 https://ftp.gnu.org/gnu/grep/grep-3.11.tar.xz
@@ -52,7 +52,7 @@ https://ftp.gnu.org/gnu/groff/groff-1.23.0.tar.gz
 https://ftp.gnu.org/gnu/gzip/gzip-1.13.tar.xz
 https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.69.tar.xz
 https://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.7.tar.gz
-https://www.openssl.org/source/openssl-3.1.4.tar.gz
+https://www.openssl.org/source/openssl-3.3.2.tar.gz
 https://pypi.org/packages/source/s/setuptools/setuptools-69.0.3.tar.gz
 https://pypi.org/packages/source/w/wheel/wheel-0.42.0.tar.gz
 https://pypi.org/packages/source/f/flit-core/flit_core-3.9.0.tar.gz
