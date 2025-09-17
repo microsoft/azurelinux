@@ -21,7 +21,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            http://www.openucx.org
-Source0:        https://github.com/openucx/%{name}/releases/download/v%{version}-rc3/ucx-%{version}.tar.gz
+Source0:        https://github.com/openucx/ucx/releases/download/v%{version}-rc3/ucx-%{version}.tar.gz
 
 
 # UCX currently supports only the following architectures
