@@ -6,6 +6,7 @@
 %else
 %global debug_package   %{nil}
 %endif
+<<<<<<< HEAD
 
 %global gomodulesmode GO111MODULE=on
 
@@ -60,6 +61,49 @@ Requires: libcontainers-common
 BuildRequires: libseccomp-devel
 Requires: libseccomp >= 2.4.1-0
 Suggests: cpp
+=======
+%global provider github
+%global provider_tld com
+%global project containers
+%global repo buildah
+# https://github.com/containers/buildah
+%global import_path %{provider}.%{provider_tld}/%{project}/%{repo}
+%global git0 https://%{import_path}
+# Used for comparing with latest upstream tag
+# to decide whether to autobuild (non-rawhide only)
+%define built_tag v1.18.0
+%define built_tag_strip %(b=%{built_tag}; echo ${b:1})
+%define download_url https://%{import_path}/archive/%{built_tag}.tar.gz
+Summary:        A command line tool used for creating OCI Images
+Name:           buildah
+Version:        1.18.0
+Release:        33%{?dist}
+License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+URL:            https://%{name}.io
+Source:         %{download_url}#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2022-2990.patch
+BuildRequires:  btrfs-progs-devel
+BuildRequires:  device-mapper-devel
+BuildRequires:  git
+BuildRequires:  glib2-devel
+BuildRequires:  glibc-static >= 2.38-13%{?dist}
+BuildRequires:  go-md2man
+BuildRequires:  go-rpm-macros
+BuildRequires:  golang
+BuildRequires:  gpgme-devel
+BuildRequires:  libassuan-devel
+BuildRequires:  libseccomp-static
+BuildRequires:  make
+BuildRequires:  ostree-devel
+Requires:       libcontainers-common
+Requires:       libseccomp >= 2.4.1-0
+Requires:       moby-runc
+Recommends:     container-selinux
+Recommends:     fuse-overlayfs
+Recommends:     slirp4netns >= 0.3-0
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 
 %description
 The %{name} package provides a command line tool which can be used to
@@ -173,11 +217,14 @@ make test-unit
 %{_datadir}/%{name}/test
 
 %changelog
+<<<<<<< HEAD
 * Fri Sep 12 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.41.4-1
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - Added Check section
 - License verified
 
+=======
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 * Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.18.0-33
 - Bump to rebuild with updated glibc
 

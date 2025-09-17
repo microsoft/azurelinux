@@ -19,6 +19,7 @@
 # %%{name}
 %global git0 %{container_base_url}/%{name}
 
+<<<<<<< HEAD
 %define build_origin %{?packager}
 
 Name: podman
@@ -51,6 +52,51 @@ BuildRequires: glibc-devel
 BuildRequires: glibc-static >= 2.38-13%{?dist}
 BuildRequires: golang
 BuildRequires: git-core
+=======
+Name:           podman
+Version:        4.1.1
+Release:        31%{?dist}
+License:        ASL 2.0 and BSD and ISC and MIT and MPLv2.0
+Summary:        Manage Pods, Containers and Container Images
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+URL:            https://%{name}.io/
+Source0:        %{git0}/archive/%{built_tag}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        %{git_plugins}/archive/%{commit_plugins}/%{repo_plugins}-%{commit_plugins}.tar.gz#/%{repo_plugins}-%{shortcommit_plugins}.tar.gz
+Source2:        %{git_gvproxy}/archive/%{commit_gvproxy}/%{repo_gvproxy}-%{commit_gvproxy}.tar.gz#/%{repo_gvproxy}-%{shortcommit_gvproxy}.tar.gz
+Patch0:         CVE-2022-2989.patch
+Provides:       %{name}-manpages = %{version}-%{release}
+BuildRequires:  go-md2man
+BuildRequires:  golang
+BuildRequires:  gcc
+BuildRequires:  glib2-devel
+BuildRequires:  glibc-static >= 2.38-13%{?dist}
+BuildRequires:  git
+BuildRequires:  go-rpm-macros
+BuildRequires:  gpgme-devel
+BuildRequires:  libassuan-devel
+BuildRequires:  libgpg-error-devel
+BuildRequires:  libseccomp-devel
+BuildRequires:  libselinux-devel
+BuildRequires:  shadow-utils
+BuildRequires:  pkgconfig
+BuildRequires:  make
+BuildRequires:  ostree-devel
+BuildRequires:  systemd
+BuildRequires:  systemd-devel
+BuildRequires:  libcontainers-common
+Requires:       catatonit
+Requires:       iptables
+Requires:       nftables
+Requires:       conmon >= 2.0.30
+Requires:       libcontainers-common
+Requires:       netavark >= 1.0.3
+Requires:       shadow-utils-subid
+Requires:       moby-runc
+Requires:       slirp4netns
+Requires:       containernetworking-plugins >= 0.9.1
+Suggests:       qemu-user-static
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 
 BuildRequires: go-rpm-macros
 
@@ -295,11 +341,14 @@ make localunit
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
+<<<<<<< HEAD
 * Fri Sep 19 2025 Sumit Jena <v-sumitjena@microsof.com>
 - Update to version 5.6.1
 - added check section
 - License verified
 
+=======
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 * Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 4.1.1-31
 - Bump to rebuild with updated glibc
 

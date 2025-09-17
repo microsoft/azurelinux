@@ -1,5 +1,9 @@
 filesystem-1.1-21.azl3.x86_64.rpm
+<<<<<<< HEAD
 kernel-headers-6.6.104.2-2.azl3.noarch.rpm
+=======
+kernel-headers-6.6.96.2-2.azl3.noarch.rpm
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 glibc-2.38-13.azl3.x86_64.rpm
 glibc-devel-2.38-13.azl3.x86_64.rpm
 glibc-i18n-2.38-13.azl3.x86_64.rpm
