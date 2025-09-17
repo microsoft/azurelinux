@@ -1,0 +1,201 @@
+diff -up dovecot-2.3.21/m4/ssl.m4.noengine dovecot-2.3.21/m4/ssl.m4
+--- dovecot-2.3.21/m4/ssl.m4.noengine	2024-05-06 17:39:59.362886891 +0200
++++ dovecot-2.3.21/m4/ssl.m4	2024-05-06 17:42:17.945312656 +0200
+@@ -233,6 +233,27 @@ AC_DEFUN([DOVECOT_SSL], [
+       AC_CHECK_LIB(ssl, ECDSA_SIG_set0, [
+         AC_DEFINE(HAVE_ECDSA_SIG_SET0,, [Build with ECDSA_SIG_set0 support])
+       ],, $SSL_LIBS)
++      AC_CHECK_LIB(ssl, OSSL_PROVIDER_try_load, [
++        AC_DEFINE(HAVE_OSSL_PROVIDER_try_load,, [Build with OSSL_PROVIDER_try_load support])
++      ],, $SSL_LIBS)
++      AC_CHECK_LIB(ssl, OPENSSL_init_ssl, [
++        AC_DEFINE(HAVE_OPENSSL_init_ssl,, [Build with OPENSSL_init_ssl support])
++      ],, $SSL_LIBS)
++      AC_CHECK_LIB(ssl, OPENSSL_cleanup, [
++        AC_DEFINE(HAVE_OPENSSL_cleanup,, [OpenSSL supports OPENSSL_cleanup()])
++      ],, $SSL_LIBS)
++      AC_CHECK_LIB(ssl, OPENSSL_thread_stop, [
++        AC_DEFINE(HAVE_OPENSSL_thread_stop,, [OpenSSL supports OPENSSL_thread_stop()])
++      ],, $SSL_LIBS)
++      AC_CHECK_LIB(ssl, ERR_remove_thread_state, [
++        AC_DEFINE(HAVE_ERR_remove_thread_state,, [OpenSSL supports ERR_remove_thread_state()])
++      ],, $SSL_LIBS)
++      AC_CHECK_LIB(ssl, ERR_remove_state, [
++        AC_DEFINE(HAVE_ERR_remove_state,, [OpenSSL supports ERR_remove_state()])
++      ],, $SSL_LIBS)
++      AC_CHECK_LIB(ssl, ENGINE_by_id_DISABLED, [
++        AC_DEFINE(HAVE_ENGINE_by_id,, [OpenSSL supports ENGINE_by_id() - !!!EXPLICITELY DISABLED!!! ])
++      ],, $SSL_LIBS)
+       AC_CHECK_LIB(ssl, EC_GROUP_order_bits, [
+         AC_DEFINE(HAVE_EC_GROUP_order_bits,, [Build with EC_GROUP_order_bits support])
+       ],, $SSL_LIBS)
+diff --git dovecot-2.3.21/src/lib-dcrypt/dcrypt-openssl.c.noengine dovecot-2.3.21/src/lib-dcrypt/dcrypt-openssl.c
+index 1cbe352541..239a981251 100644
+--- dovecot-2.3.21/src/lib-dcrypt/dcrypt-openssl.c.noengine
++++ dovecot-2.3.21/src/lib-dcrypt/dcrypt-openssl.c
+@@ -20,7 +20,6 @@
+ #include <openssl/bio.h>
+ #include <openssl/pem.h>
+ #include <openssl/x509.h>
+-#include <openssl/engine.h>
+ #include <openssl/hmac.h>
+ #include <openssl/objects.h>
+ #include <openssl/bn.h>
+diff -up dovecot-2.3.21/src/lib-ssl-iostream/dovecot-openssl-common.c.noengine dovecot-2.3.21/src/lib-ssl-iostream/dovecot-openssl-common.c
+--- dovecot-2.3.21/src/lib-ssl-iostream/dovecot-openssl-common.c.noengine	2023-09-14 15:17:46.000000000 +0200
++++ dovecot-2.3.21/src/lib-ssl-iostream/dovecot-openssl-common.c	2024-05-06 17:39:59.363886901 +0200
+@@ -3,13 +3,23 @@
+ #include "lib.h"
+ #include "randgen.h"
+ #include "dovecot-openssl-common.h"
++#include "iostream-openssl.h"
+ 
+ #include <openssl/ssl.h>
+-#include <openssl/engine.h>
++#include <openssl/err.h>
++#ifdef HAVE_OSSL_PROVIDER_try_load
++#  include <openssl/provider.h>
++#else
++#  include <openssl/engine.h>
++#endif
+ #include <openssl/rand.h>
+ 
+ static int openssl_init_refcount = 0;
+-static ENGINE *dovecot_openssl_engine;
++#ifdef HAVE_OSSL_PROVIDER_try_load
++static OSSL_PROVIDER *dovecot_openssl_engine = NULL;
++#else
++static ENGINE *dovecot_openssl_engine = NULL;
++#endif
+ 
+ #ifdef HAVE_SSL_NEW_MEM_FUNCS
+ static void *dovecot_openssl_malloc(size_t size, const char *u0 ATTR_UNUSED, int u1 ATTR_UNUSED)
+@@ -17,12 +27,14 @@ static void *dovecot_openssl_malloc(size
+ static void *dovecot_openssl_malloc(size_t size)
+ #endif
+ {
++	if (size == 0)
++		return NULL;
+ 	/* this may be performance critical, so don't use
+ 	   i_malloc() or calloc() */
+ 	void *mem = malloc(size);
+-	if (mem == NULL) {
++	if (unlikely(mem == NULL)) {
+ 		i_fatal_status(FATAL_OUTOFMEM,
+-			"OpenSSL: malloc(%zu): Out of memory", size);
++			       "OpenSSL: malloc(%zu): Out of memory", size);
+ 	}
+ 	return mem;
+ }
+@@ -33,10 +45,14 @@ static void *dovecot_openssl_realloc(voi
+ static void *dovecot_openssl_realloc(void *ptr, size_t size)
+ #endif
+ {
++	if (size == 0) {
++		free(ptr);
++		return NULL;
++	}
+ 	void *mem = realloc(ptr, size);
+-	if (mem == NULL) {
++	if (unlikely(mem == NULL)) {
+ 		i_fatal_status(FATAL_OUTOFMEM,
+-			"OpenSSL: realloc(%zu): Out of memory", size);
++			       "OpenSSL: realloc(%zu): Out of memory", size);
+ 	}
+ 	return mem;
+ }
+@@ -63,9 +79,13 @@ void dovecot_openssl_common_global_ref(v
+ 		/*i_warning("CRYPTO_set_mem_functions() was called too late");*/
+ 	}
+ 
++#ifdef HAVE_OPENSSL_init_ssl
++	OPENSSL_init_ssl(0, NULL);
++#else
+ 	SSL_library_init();
+ 	SSL_load_error_strings();
+ 	OpenSSL_add_all_algorithms();
++#endif
+ }
+ 
+ bool dovecot_openssl_common_global_unref(void)
+@@ -76,30 +96,35 @@ bool dovecot_openssl_common_global_unref
+ 		return TRUE;
+ 
+ 	if (dovecot_openssl_engine != NULL) {
++#ifdef HAVE_OSSL_PROVIDER_try_load
++		OSSL_PROVIDER_unload(dovecot_openssl_engine);
++#else
+ 		ENGINE_finish(dovecot_openssl_engine);
++#endif
+ 		dovecot_openssl_engine = NULL;
+ 	}
++#ifdef HAVE_OPENSSL_cleanup
++	OPENSSL_cleanup();
++#else
+ 	/* OBJ_cleanup() is called automatically by EVP_cleanup() in
+ 	   newer versions. Doesn't hurt to call it anyway. */
+ 	OBJ_cleanup();
+-#ifdef HAVE_SSL_COMP_FREE_COMPRESSION_METHODS
++#  if !defined(OPENSSL_NO_COMP)
+ 	SSL_COMP_free_compression_methods();
+-#endif
++#  endif
+ 	ENGINE_cleanup();
+ 	EVP_cleanup();
+ 	CRYPTO_cleanup_all_ex_data();
+-#ifdef HAVE_OPENSSL_AUTO_THREAD_DEINIT
++#  ifdef HAVE_OPENSSL_thread_stop
+ 	/* no cleanup needed */
+-#elif defined(HAVE_OPENSSL_ERR_REMOVE_THREAD_STATE)
++#  elif defined(HAVE_ERR_remove_thread_state)
+ 	/* This was marked as deprecated in v1.1. */
+ 	ERR_remove_thread_state(NULL);
+-#else
++#  elif defined(HAVE_ERR_remove_state)
+ 	/* This was deprecated by ERR_remove_thread_state(NULL) in v1.0.0. */
+ 	ERR_remove_state(0);
+-#endif
++#  endif
+ 	ERR_free_strings();
+-#ifdef HAVE_OPENSSL_CLEANUP
+-	OPENSSL_cleanup();
+ #endif
+ 	return FALSE;
+ }
+@@ -110,6 +135,7 @@ int dovecot_openssl_common_global_set_en
+ 	if (dovecot_openssl_engine != NULL)
+ 		return 1;
+ 
++#ifdef HAVE_ENGINE_by_id
+ 	ENGINE_load_builtin_engines();
+ 	dovecot_openssl_engine = ENGINE_by_id(engine);
+ 	if (dovecot_openssl_engine == NULL) {
+@@ -128,5 +154,15 @@ int dovecot_openssl_common_global_set_en
+ 		dovecot_openssl_engine = NULL;
+ 		return -1;
+ 	}
++#elif defined(HAVE_OSSL_PROVIDER_try_load)
++	if ((dovecot_openssl_engine = OSSL_PROVIDER_try_load(NULL, engine, 1)) == NULL) {
++		*error_r = t_strdup_printf("Cannot load '%s': %s", engine,
++					   openssl_iostream_error());
++		return 0;
++	}
++	return 1;
++#else
++	*error_r = t_strdup_printf("Cannot load '%s': No engine/provider support available", engine);
++#endif
+ 	return 1;
+ }
+diff -up dovecot-2.3.21/src/lib-ssl-iostream/Makefile.am.noengine dovecot-2.3.21/src/lib-ssl-iostream/Makefile.am
+--- dovecot-2.3.21/src/lib-ssl-iostream/Makefile.am.noengine	2023-09-14 15:17:46.000000000 +0200
++++ dovecot-2.3.21/src/lib-ssl-iostream/Makefile.am	2024-05-06 17:39:59.363886901 +0200
+@@ -5,7 +5,8 @@ NOPLUGIN_LDFLAGS =
+ AM_CPPFLAGS = \
+ 	-I$(top_srcdir)/src/lib \
+ 	-I$(top_srcdir)/src/lib-test \
+-	-DMODULE_DIR=\""$(moduledir)"\"
++	-DMODULE_DIR=\""$(moduledir)"\" \
++	$(SSL_CFLAGS)
+ 
+ if BUILD_OPENSSL
+ module_LTLIBRARIES = libssl_iostream_openssl.la
