@@ -1846,6 +1846,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cluster-api-provider-kubevirt",
+          "version": "0.1.10",
+          "downloadUrl": "https://github.com/kubernetes-sigs/cluster-api-provider-kubevirt/archive/refs/tags/v0.1.10.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "clutter",
           "version": "1.26.4",
           "downloadUrl": "https://download.gnome.org/sources/clutter/1.26/clutter-1.26.4.tar.xz"
