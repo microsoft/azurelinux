@@ -68,6 +68,7 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %changelog
 * Wed Sep 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.2-1
 - Auto-upgrade to 2.7.2 - for CVE-2025-59375
+- Remove patch for CVE-2024-8176
 
 * Thu Mar 20 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.6.4-1
 - Fix CVE-2024-8176 with a patch
