@@ -129,7 +129,7 @@ make check || {
 %{_rpmconfigdir}/supermin-find-requires
 
 %changelog
-* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 5.3.4-7
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 5.3.4-7
 - Bump to rebuild with updated glibc
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 5.3.4-6

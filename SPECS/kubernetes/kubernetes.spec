@@ -278,7 +278,7 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
-* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.30.10-11
+* Fri Sep 05 2025 Andrew Phelps <anphel@microsoft.com> - 1.30.10-11
 - Bump to rebuild with updated glibc
 
 * Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.30.10-10

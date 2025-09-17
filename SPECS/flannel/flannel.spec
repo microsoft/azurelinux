@@ -52,7 +52,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 %{_bindir}/flanneld
 
 %changelog
-* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.24.2-17
+* Fri Sep 05 2025 Andrew Phelps <anphel@microsoft.com> - 0.24.2-17
 - Bump to rebuild with updated glibc
 
 * Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 0.24.2-16

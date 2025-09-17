@@ -66,7 +66,7 @@ ln -s %{_bindir}/tini-static %{buildroot}%{_bindir}/docker-init
 %{_bindir}/docker-init
 
 %changelog
-* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.19.0-22
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 0.19.0-22
 - Bump to rebuild with updated glibc
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.19.0-21
