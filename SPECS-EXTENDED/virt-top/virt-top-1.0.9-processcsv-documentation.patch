@@ -5,7 +5,7 @@ diff -ur virt-top-1.0.9.old/src/virt-top.pod virt-top-1.0.9.new/src/virt-top.pod
  
   virt-top --csv >(split -d -l 1000 - output.csv.)
  
-+RHEL provides a short Python script called C<processcsv.py> which
++A short Python script called C<processcsv.py>
 +can be used to post-process the CSV output.  Run it like this:
 +
 + virt-top --csv data.csv
