@@ -3,7 +3,7 @@
 #
 # Dockerfile to build Azure Linux toolchain from scratch
 #
-FROM mcr.microsoft.com/azurelinux/base/core:3.0.20250729
+FROM mcr.microsoft.com/azurelinux/base/core:3.0.20250910
 
 # Tag the layers so we can clean up all the containers associated with a build directory
 ARG MARINER_BUILD_DIR
