@@ -20,7 +20,7 @@
 Summary:        Linux Kernel
 Name:           kernel-hwe
 Version:        6.12.40.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -352,6 +352,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.12.40.1-2
+- Enable ipmitool for kernel-hwe
+
 * Fri Aug 15 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.40.1-1
 - Initial CBL-Mariner import from Photon (license: Apache2)
 - License verified
