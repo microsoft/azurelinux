@@ -53,6 +53,8 @@ tar -xf %{SOURCE1} --no-same-owner
 %build
 export GOPATH=%{our_gopath}
 export GOFLAGS="-mod=vendor"
+export CGO_ENABLED=1
+export GOEXPERIMENT=systemcrypto
 make manager
 
 %install
