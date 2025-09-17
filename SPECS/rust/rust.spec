@@ -9,7 +9,11 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.86.0
+<<<<<<< HEAD
 Release:        3%{?dist}
+=======
+Release:        7%{?dist}
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -59,7 +63,11 @@ BuildRequires:  python3
 # make sure rust depends on system zlib
 BuildRequires:  zlib-devel
 %if 0%{?with_check}
+<<<<<<< HEAD
 BuildRequires:  glibc-static >= 2.38-11%{?dist}
+=======
+BuildRequires:  glibc-static >= 2.38-13%{?dist}
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 BuildRequires:	sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
@@ -179,6 +187,21 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
+<<<<<<< HEAD
+=======
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.86.0-7
+- Bump to rebuild with updated glibc
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.86.0-6
+- Bump to rebuild with updated glibc
+
+* Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.86.0-5
+- Patch for CVE-2024-11738
+ 
+* Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.86.0-4
+- patch for CVE-2025-53605
+
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 * Fri Jun 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.86.0-3
 - Patch CVE-2025-4574
 

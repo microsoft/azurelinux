@@ -21,7 +21,11 @@
 Summary:        Tool for creating supermin appliances
 Name:           supermin
 Version:        5.3.4
+<<<<<<< HEAD
 Release:        6%{?dist}
+=======
+Release:        8%{?dist}
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -54,7 +58,11 @@ BuildRequires:  systemd-udev
 %if %{with dietlibc}
 BuildRequires:  dietlibc-devel
 %else
+<<<<<<< HEAD
 BuildRequires:  glibc-static >= 2.38-11%{?dist}
+=======
+BuildRequires:  glibc-static >= 2.38-13%{?dist}
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 %endif
 
 %if 0%{?with_check}
@@ -129,6 +137,15 @@ make check || {
 %{_rpmconfigdir}/supermin-find-requires
 
 %changelog
+<<<<<<< HEAD
+=======
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 5.3.4-8
+- Bump to rebuild with updated glibc
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 5.3.4-7
+- Bump to rebuild with updated glibc
+
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 5.3.4-6
 - Bump to rebuild with updated glibc
 

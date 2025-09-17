@@ -1,7 +1,11 @@
 Summary:        A tiny but valid init for containers
 Name:           tini
 Version:        0.19.0
+<<<<<<< HEAD
 Release:        21%{?dist}
+=======
+Release:        23%{?dist}
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,7 +17,11 @@ BuildRequires:  diffutils
 BuildRequires:  file
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
+<<<<<<< HEAD
 BuildRequires:  glibc-static >= 2.38-11%{?dist}
+=======
+BuildRequires:  glibc-static >= 2.38-13%{?dist}
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 BuildRequires:  kernel-headers
 BuildRequires:  make
 BuildRequires:  sed
@@ -66,6 +74,15 @@ ln -s %{_bindir}/tini-static %{buildroot}%{_bindir}/docker-init
 %{_bindir}/docker-init
 
 %changelog
+<<<<<<< HEAD
+=======
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.19.0-23
+- Bump to rebuild with updated glibc
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 0.19.0-22
+- Bump to rebuild with updated glibc
+
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.19.0-21
 - Bump to rebuild with updated glibc
 

@@ -19,8 +19,13 @@
 
 Summary:        Container native virtualization
 Name:           kubevirt
+<<<<<<< HEAD
 Version:        1.2.0
 Release:        18%{?dist}
+=======
+Version:        1.5.0
+Release:        3%{?dist}
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,7 +48,11 @@ Patch8:         CVE-2025-22872.patch
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
+<<<<<<< HEAD
 BuildRequires:  glibc-static >= 2.38-11%{?dist}
+=======
+BuildRequires:  glibc-static >= 2.38-13%{?dist}
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 BuildRequires:  golang >= 1.21
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -280,6 +289,23 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+<<<<<<< HEAD
+=======
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.5.0-3
+- Bump to rebuild with updated glibc
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.5.0-2
+- Bump to rebuild with updated glibc
+
+* Thu Jul 03 2025 Harshit Gupta <guptaharshit@microsoft.com> - 1.5.0-1
+- Upgrade to 1.5.0
+- Removed old patches
+- Remove virt_launcher.cil SELinux policy
+
+* Thu Jul 10 2025 BinduSri Adabala <v-badabala@microsoft.com> - 1.2.0-19
+- Patch CVE-2024-33394
+
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-18
 - Bump to rebuild with updated glibc
 

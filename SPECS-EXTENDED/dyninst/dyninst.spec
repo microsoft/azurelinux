@@ -1,7 +1,11 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
+<<<<<<< HEAD
 Release: 21%{?dist}
+=======
+Release: 23%{?dist}
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL: http://www.dyninst.org
@@ -31,7 +35,11 @@ BuildRequires: tbb tbb-devel
 
 # Extra requires just for the testsuite
 BuildRequires: gcc-gfortran libstdc++-static libxml2-devel
+<<<<<<< HEAD
 BuildRequires: glibc-static >= 2.38-11%{?dist}
+=======
+BuildRequires: glibc-static >= 2.38-13%{?dist}
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 
 # Testsuite files should not provide/require anything
 %{?filter_setup:
@@ -194,6 +202,15 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+<<<<<<< HEAD
+=======
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 10.1.0-23
+- Bump to rebuild with updated glibc
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 10.1.0-22
+- Bump to rebuild with updated glibc
+
+>>>>>>> d3975f800 (Fix : patch application of CVE-2025-4802 in `glibc` (re-apply: #14582) (#14669))
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 10.1.0-21
 - Bump to rebuild with updated glibc
 
