@@ -19,7 +19,7 @@ Patch5:         CVE-2023-42366.patch
 Patch6:         CVE-2023-39810.patch
 Patch7:         CVE-2022-48174.patch
 BuildRequires:  gcc
-BuildRequires:  glibc-static >= 2.38-12%{?dist}
+BuildRequires:  glibc-static >= 2.38-13%{?dist}
 BuildRequires:  libselinux-devel >= 1.27.7-2
 BuildRequires:  libsepol-devel
 %if 0%{?with_check}
