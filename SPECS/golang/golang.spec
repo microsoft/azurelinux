@@ -1,5 +1,5 @@
 %global bootstrap_compiler_version_0 1.17.13
-%global bootstrap_compiler_version_1 1.21.6
+%global bootstrap_compiler_version_1 1.20.6
 %global bootstrap_compiler_version_2 1.22.6
 
 %global goroot          %{_libdir}/golang
