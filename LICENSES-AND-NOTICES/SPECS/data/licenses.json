@@ -2678,6 +2678,7 @@
                 "alsa-lib",
                 "alsa-utils",
                 "ansible",
+                "apparmor",
                 "apr",
                 "apr-util",
                 "asciidoc",
