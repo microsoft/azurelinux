@@ -3433,7 +3433,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
-* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.2.0-19
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 8.2.0-19
 - Bump to rebuild with updated glibc
 
 * Thu Aug 14 2025 Kshitiz Godara <kgodara@microsoft.com> - 8.2.0-18

@@ -386,7 +386,7 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
-* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 4.1.1-30
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 4.1.1-30
 - Bump to rebuild with updated glibc
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 4.1.1-29

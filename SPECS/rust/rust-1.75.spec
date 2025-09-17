@@ -180,7 +180,7 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
-* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-18
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.75.0-18
 - Bump to rebuild with updated glibc
 
 * Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.75.0-17

@@ -635,14 +635,6 @@
 "Path": "/usr/share/licenses/cloud-hypervisor/LICENSE-BSD-3-Clause"
 },
 {
-"Pkg": "cloud-hypervisor-cvm",
-"Path": "/usr/share/licenses/cloud-hypervisor-cvm/LICENSE-APACHE"
-},
-{
-"Pkg": "cloud-hypervisor-cvm",
-"Path": "/usr/share/licenses/cloud-hypervisor-cvm/LICENSE-BSD-3-Clause"
-},
-{
 "Pkg": "cloud-init",
 "Path": "/usr/share/licenses/cloud-init/LICENSE"
 },
