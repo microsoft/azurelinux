@@ -1,7 +1,7 @@
 Summary:        C debugger
 Name:           gdb
 Version:        13.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,7 @@ Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 Patch0:         CVE-2023-39128.patch
 Patch1:         CVE-2023-39129.patch
 Patch2:         CVE-2023-39130.patch
+Patch3:         CVE-2025-7546.patch
 BuildRequires:  expat-devel
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
@@ -104,6 +105,9 @@ make check TESTS='gdb.base/default.exp'
 %{_mandir}/*/*
 
 %changelog
+* Fri Jul 18 2025 Akhila Guruju <v-guakhila@microsoft.com> - 13.2-5
+- Patch CVE-2025-7546
+
 * Mon Feb 03 2025 Andrew Phelps <anphel@microsoft.com> - 13.2-4
 - Enable cross-debugging on all supported targets
 
