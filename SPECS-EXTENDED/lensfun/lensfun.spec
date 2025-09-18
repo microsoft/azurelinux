@@ -126,7 +126,7 @@ mkdir -p %{buildroot}/var/lib/lensfun-updates
 rm -fv %{buildroot}%{_bindir}/g-lensfun-update-data \
        %{buildroot}%{_mandir}/man1/g-lensfun-update-data.* \
        %{buildroot}%{_docdir}/%{name}/doxygen.svg
-
+rm -fv %{buildroot}%{_pkgdocdir}/*.html
 
 %check
 %if 0%{?tests}
@@ -146,8 +146,6 @@ export CTEST_OUTPUT_ON_FAILURE=1
 %dir /var/lib/lensfun-updates/
 
 %files devel
-%license %{_pkgdocdir}/license.html
-%{_pkgdocdir}/*.html
 %{_pkgdocdir}/*.png
 %{_pkgdocdir}/*.css
 %{_pkgdocdir}/*.js
