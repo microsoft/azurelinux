@@ -5,13 +5,15 @@ Distribution:   Azure Linux
 %global gcrypt_version 1.2.2
 
 Name: gnome-keyring
-Version: 3.36.0
-Release: 2%{?dist}
+Version: 46.2
+Release: 3%{?dist}
 Summary: Framework for managing passwords and other secrets
 
-License: GPLv2+ and LGPLv2+
-URL:     https://wiki.gnome.org/Projects/GnomeKeyring
-Source0: https://download.gnome.org/sources/%{name}/3.36/%{name}-%{version}.tar.xz
+# egg/ is (GPL-2.0-or-later OR LGPL-3.0-or-later) OR BSD-3-Clause
+# pkcs11/ is MPL-1.1 OR GPL-2.0-or-later OR  LGPL-2.1-or-later
+License:        GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.1-or-later AND ((GPL-2.0-or-later OR LGPL-3.0-or-later) OR BSD-3-Clause) AND (MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.1-or-later)
+URL:            https://wiki.gnome.org/Projects/GnomeKeyring
+Source0:        https://download.gnome.org/sources/%{name}/46/%{name}-%{version}.tar.xz
 
 BuildRequires:  gcc
 BuildRequires: pkgconfig(gcr-3) >= %{gcr_version}
@@ -21,14 +23,14 @@ BuildRequires: docbook-dtds
 BuildRequires: docbook-style-xsl
 BuildRequires: gettext
 BuildRequires: intltool
-BuildRequires: libcap-ng-devel
 BuildRequires: libgcrypt-devel >= %{gcrypt_version}
 BuildRequires: libselinux-devel
+BuildRequires: make
 BuildRequires: pam-devel
 BuildRequires: /usr/bin/ssh-add
 BuildRequires: /usr/bin/ssh-agent
+BuildRequires: systemd-rpm-macros
 BuildRequires: /usr/bin/xsltproc
-
 Requires: /usr/bin/ssh-add
 Requires: /usr/bin/ssh-agent
 Requires: /usr/libexec/gcr-ssh-askpass
@@ -41,7 +43,7 @@ Applications can use the gnome-keyring library to integrate with the keyring.
 
 %package pam
 Summary: Pam module for unlocking keyrings
-License: LGPLv2+
+License: LGPL-2.1-or-later
 Requires: %{name}%{?_isa} = %{version}-%{release}
 # for /lib/security
 Requires: pam%{?_isa}
@@ -58,12 +60,15 @@ automatically unlock the "login" keyring when the user logs in.
 %build
 %configure \
            --with-pam-dir=%{_libdir}/security \
-           --enable-pam
+           --enable-pam \
+           --without-libcap-ng \
+           --with-pkcs11-config=%{_datadir}/p11-kit/modules \
+           --enable-ssh-agent
 
 # avoid unneeded direct dependencies
 sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0 /g' libtool
 
-make %{?_smp_mflags}
+%make_build
 
 
 %install
@@ -86,7 +91,7 @@ rm $RPM_BUILD_ROOT%{_libdir}/gnome-keyring/devel/*.la
 %dir %{_libdir}/pkcs11
 %{_libdir}/pkcs11/*.so
 # GPL
-%attr(0755,root,root) %caps(cap_ipc_lock=ep) %{_bindir}/gnome-keyring-daemon
+%{_bindir}/gnome-keyring-daemon
 %{_bindir}/gnome-keyring
 %{_bindir}/gnome-keyring-3
 %{_datadir}/dbus-1/services/*.service
@@ -106,8 +111,82 @@ rm $RPM_BUILD_ROOT%{_libdir}/gnome-keyring/devel/*.la
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.36.0-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Apr 22 2025 Archana Shettigar <v-shettigara@microsoft.com> - 46.2-3
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 46.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Jul 15 2024 David King <amigadave@amigadave.com> - 46.2-1
+- Update to 46.2
+
+* Mon Feb 19 2024 David King <amigadave@amigadave.com> - 46.1-1
+- Update to 46.1
+
+* Fri Jan 26 2024 Florian Weimer <fweimer@redhat.com> - 42.1-10
+- Fix C compatibility issue
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 42.1-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 42.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Tue Nov 21 2023 Daiki Ueno <dueno@redhat.com> - 42.1-7
+- Re-enable ssh-agent support (#2250704)
+
+* Fri Oct 20 2023 Dhanuka Warusadura <dhanuka@gnome.org> - 42.1-6
+- ssh-agent: update build instructions to disable ssh component
+- Introduced conditional builds based on ssh component required or not
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 42.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Apr 20 2023 Carl George <carl@george.computer> - 42.1-4
+- Switch dependency from /usr/libexec/gcr-ssh-askpass to gcr3
+- Resolves: rhbz#2188431
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 42.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 42.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 23 2022 David King <amigadave@amigadave.com> - 42.1-1
+- Update to 42.1
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 40.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+- Update the path of the PKCS#11 module
+
+* Tue Sep 21 2021 Michael Catanzaro <mcatanzaro@redhat.com> - 40.0-3
+- Drop dependency on libcapng
+- Drop cap_ipc_lock to unbreak the D-Bus service
+- Fixes #2005625
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 40.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Mar 26 2021 Kalev Lember <klember@redhat.com> - 40.0-1
+- Update to 40.0
+
+* Fri Mar 05 2021 David King <amigadave@amigadave.com> - 3.36.0-6
+- Apply upstream patch to fix capng usage (#1888978)
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.36.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.36.0-4
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 3.36.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 13 2020 Tom Stellard <tstellar@redhat.com> - 3.36.0-2
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
 
 * Wed Mar 11 2020 Kalev Lember <klember@redhat.com> - 3.36.0-1
 - Update to 3.36.0
