@@ -33,7 +33,7 @@
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
 %global target_azl_build_kernel_version 6.12.40.1
-%global target_kernel_release 1
+%global target_kernel_release 2
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -45,7 +45,7 @@
 
 %{!?_name: %define _name fwctl}
 %{!?_version: %define _version 24.10}
-%{!?_mofed_full_version: %define _mofed_full_version %{_version}-20%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version %{_version}-21%{release_suffix}%{?dist}}
 %{!?_release: %define _release OFED.24.10.0.6.7.1}
 
 # KMP is disabled by default
@@ -71,7 +71,7 @@
 Summary:	 %{_name} Driver
 Name:		 fwctl-hwe
 Version:	 24.10
-Release:	 20%{release_suffix}%{?dist}
+Release:	 21%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
@@ -253,6 +253,9 @@ fi # 1 : closed
 %endif
 
 %changelog
+* Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-21
+- Bump to match kernel-hwe
+
 * Mon Sep 08 2025 Elaheh Dehghani <edehghani@microsoft.com> - 24.10-20
 - Build using kernel-hwe for aarch64 architecture
 

@@ -32,7 +32,7 @@
 
 # hard code versions due to ADO bug:58993948
 %global target_azl_build_kernel_version 6.12.40.1
-%global target_kernel_release 1
+%global target_kernel_release 2
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
@@ -46,7 +46,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 %{_name}-signed
 Version:	 24.10
-Release:	 20%{release_suffix}%{?dist}
+Release:	 21%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -193,6 +193,9 @@ fi
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-21
+- Bump to match kernel-hwe
+
 * Mon Sep 08 2025 Elaheh Dehghani <edehghani@microsoft.com> - 24.10-20
 - Build using kernel-hwe for aarch64 architecture
 
