@@ -370,15 +370,22 @@ Daily build packages are available via `DAILY_BUILD_ID`. Use `DAILY_BUILD_ID=lkg
 
 ### Authentication
 
-If supplying custom endpoints for source/SRPM/package servers, accessing these resources may require keys and certificates. The keys and certificates can be set using:
+If supplying custom endpoints for source/SRPM/package servers, accessing these resources may require authentication.
+Keys and certificates for TLS based authentication can be set using:
 
 ```bash
 sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" CA_CERT=/path/to/rootca.crt TLS_CERT=/path/to/user.crt TLS_KEY=/path/to/user.key
 ```
 
+For SRPM packing (i.e., for retrieving package sources), Azure CLI login can be used to access authenticated Azure blob storages, which do not support anonymous access:
+```bash
+sudo make build-packages SOURCE_AUTH_MODE="azurecli"
+```
+Using this mode requires prior `az login` with your managed identity ID.
+
 ## Building Everything From Scratch
 
-**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Azure Linux source packages are available at `SOURCE_URL=https://azurelinuxsrcstorage.blob.core.windows.net/sources/core`**
+**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Azure Linux source packages are available at `SOURCE_URL=https://azurelinuxsrcstorage.blob.core.windows.net/sources/core` and support anonymous access.**
 
 The build system can operate without using pre-built components if desired. There are several variables which enable/disable build components and sources of data. They are listed here along with their default values:
 
@@ -840,6 +847,8 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | CA_CERT                       |                                                                                                          | CA cert to access the above resources, in addition to the system certificate store
 | TLS_CERT                      |                                                                                                          | TLS cert to access the above resources
 | TLS_KEY                       |                                                                                                          | TLS key to access the above resources
+| SOURCE_AUTH_MODE              |                                                                                                          |
+Authentication mode for downloading source files for SRPM packing. Valid options: anonymous, azurecli (as defined in the srpmpacker code base). The azurecli option enables Azure CLI based authentication for accessing Azure Blob Storages which do not allow for public access. The default method is anonymous access using HTTP GET.
 
 ---
 

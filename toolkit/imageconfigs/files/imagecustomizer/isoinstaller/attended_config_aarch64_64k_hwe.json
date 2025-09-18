@@ -1,0 +1,172 @@
+{
+ "Disks": null,
+ "SystemConfigs": [
+  {
+   "IsDefault": false,
+   "IsKickStartBoot": false,
+   "IsIsoInstall": true,
+   "BootType": "",
+   "EnableGrubMkconfig": true,
+   "EnableSystemdFirstboot": false,
+   "Hostname": "",
+   "Name": "Azure Linux Full",
+   "PackageLists": [
+    "packages/hyperv-packages.json",
+    "packages/developer-packages.json",
+    "packages/virtualization-host-packages.json",
+    "packages/core-packages-image-aarch64.json",
+    "packages/core-tools-packages.json",
+    "packages/selinux-full.json",
+    "packages/virt-guest-packages.json",
+    "packages/ssh-server.json"
+   ],
+   "Packages": null,
+   "KernelOptions": {
+    "default": "kernel-hwe"
+   },
+   "KernelCommandLine": {
+    "CGroup": "",
+    "ImaPolicy": null,
+    "SELinux": "permissive",
+    "SELinuxPolicy": "",
+    "EnableFIPS": false,
+    "ExtraCommandLine": "efi_mmap_nr_slack_slots=256"
+   },
+   "AdditionalFiles": {
+    "additionalfiles/99-dhcp-en.network": [
+     {
+      "Path": "/etc/systemd/network/99-dhcp-en.network",
+      "Permissions": null
+     }
+    ]
+   },
+   "PartitionSettings": null,
+   "PreInstallScripts": null,
+   "PostInstallScripts": null,
+   "FinalizeImageScripts": null,
+   "Networks": null,
+   "PackageRepos": null,
+   "Groups": null,
+   "Users": null,
+   "Encryption": {
+    "Enable": false,
+    "Password": ""
+   },
+   "RemoveRpmDb": false,
+   "PreserveTdnfCache": false,
+   "EnableHidepid": false,
+   "DisableRpmDocs": false,
+   "OverrideRpmLocales": ""
+  },
+  {
+   "IsDefault": false,
+   "IsKickStartBoot": false,
+   "IsIsoInstall": true,
+   "BootType": "",
+   "EnableGrubMkconfig": true,
+   "EnableSystemdFirstboot": false,
+   "Hostname": "",
+   "Name": "Azure Linux Core",
+   "PackageLists": [
+    "packages/hyperv-packages.json",
+    "packages/core-packages-image-aarch64.json",
+    "packages/virt-guest-packages.json",
+    "packages/ssh-server.json"
+   ],
+   "Packages": null,
+   "KernelOptions": {
+    "default": "kernel-hwe"
+   },
+   "KernelCommandLine": {
+    "CGroup": "",
+    "ImaPolicy": null,
+    "SELinux": "",
+    "SELinuxPolicy": "",
+    "EnableFIPS": false,
+    "ExtraCommandLine": "efi_mmap_nr_slack_slots=256"
+   },
+   "AdditionalFiles": {
+    "additionalfiles/99-dhcp-en.network": [
+     {
+      "Path": "/etc/systemd/network/99-dhcp-en.network",
+      "Permissions": null
+     }
+    ]
+   },
+   "PartitionSettings": null,
+   "PreInstallScripts": null,
+   "PostInstallScripts": null,
+   "FinalizeImageScripts": null,
+   "Networks": null,
+   "PackageRepos": null,
+   "Groups": null,
+   "Users": null,
+   "Encryption": {
+    "Enable": false,
+    "Password": ""
+   },
+   "RemoveRpmDb": false,
+   "PreserveTdnfCache": false,
+   "EnableHidepid": false,
+   "DisableRpmDocs": false,
+   "OverrideRpmLocales": ""
+  }
+ ],
+ "DefaultSystemConfig": {
+  "IsDefault": false,
+  "IsKickStartBoot": false,
+  "IsIsoInstall": true,
+  "BootType": "",
+  "EnableGrubMkconfig": true,
+  "EnableSystemdFirstboot": false,
+  "Hostname": "",
+  "Name": "Azure Linux Full",
+  "PackageLists": [
+   "packages/hyperv-packages.json",
+   "packages/developer-packages.json",
+   "packages/virtualization-host-packages.json",
+   "packages/core-packages-image-aarch64.json",
+   "packages/core-tools-packages.json",
+   "packages/selinux-full.json",
+   "packages/virt-guest-packages.json",
+   "packages/ssh-server.json"
+  ],
+  "Packages": null,
+  "KernelOptions": {
+   "default": "kernel-hwe"
+  },
+  "KernelCommandLine": {
+   "CGroup": "",
+   "ImaPolicy": null,
+   "SELinux": "permissive",
+   "SELinuxPolicy": "",
+   "EnableFIPS": false,
+   "ExtraCommandLine": "efi_mmap_nr_slack_slots=256"
+  },
+  "AdditionalFiles": {
+   "additionalfiles/99-dhcp-en.network": [
+    {
+     "Path": "/etc/systemd/network/99-dhcp-en.network",
+     "Permissions": null
+    }
+   ]
+  },
+  "PartitionSettings": null,
+  "PreInstallScripts": null,
+  "PostInstallScripts": null,
+  "FinalizeImageScripts": null,
+  "Networks": null,
+  "PackageRepos": null,
+  "Groups": null,
+  "Users": null,
+  "Encryption": {
+   "Enable": false,
+   "Password": ""
+  },
+  "RemoveRpmDb": false,
+  "PreserveTdnfCache": false,
+  "EnableHidepid": false,
+  "DisableRpmDocs": false,
+  "OverrideRpmLocales": ""
+ }
+}

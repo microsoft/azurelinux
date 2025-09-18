@@ -1,7 +1,7 @@
 Summary:        Multi-format archive and compression library
 Name:           libarchive
 Version:        3.7.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 # Certain files have individual licenses. For more details see contents of "COPYING".
 License:        BSD AND Public Domain AND (ASL 2.0 OR CC0 1.0 OR OpenSSL)
 Vendor:         Microsoft Corporation
@@ -10,6 +10,11 @@ URL:            https://www.libarchive.org/
 Source0:        https://github.com/libarchive/libarchive/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2025-1632.patch
 Patch1:         CVE-2025-25724.patch
+Patch2:         CVE-2025-5914.patch
+Patch3:         CVE-2025-5915.patch
+Patch4:         CVE-2025-5916.patch
+Patch5:         CVE-2025-5917.patch
+Patch6:         CVE-2025-5918.patch
 Provides:       bsdtar = %{version}-%{release}
 
 BuildRequires:  xz-libs
@@ -57,11 +62,14 @@ make %{?_smp_mflags} check
 %files devel
 %defattr(-,root,root)
 %{_includedir}
-%{_mandir}
+%doc %{_mandir}
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Jun 26 2025 Sumit Jena <v-sumitjena@microsoft.com> - 3.7.7-3
+- Patch CVE-2025-5914, CVE-2025-5915, CVE-2025-5916, CVE-2025-5917, CVE-2025-5918
+
 * Tue Mar 11 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.7.7-2
 - Patch CVE-2025-1632, CVE-2025-25724
 

@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.0.0
-Release: 12%{?dist}
+Release: 14%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -25,7 +25,7 @@ Patch5:	multi-snapshotters-support.patch
 Patch6:	tardev-support.patch
 %{?systemd_requires}
 
-BuildRequires: golang
+BuildRequires: golang < 1.25
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
@@ -39,6 +39,10 @@ Obsoletes: containerd < %{version}-%{release}
 # This package replaces the old name of moby-containerd
 Provides: moby-containerd = %{version}-%{release}
 Obsoletes: moby-containerd < %{version}-%{release}
+
+# This package replaces moby-containerd-cc
+Provides: moby-containerd-cc = %{version}-%{release}
+Obsoletes: moby-containerd-cc < %{version}-%{release}
 
 %description
 containerd is an industry-standard container runtime with an emphasis on
@@ -94,6 +98,12 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 2.0.0-14
+- Set BR for golang to < 1.25
+
+* Mon Jul 21 2025 Saul Paredes <saulparedes@microsoft.com> - 2.0.0-13
+- Add "Provides/Obsoletes:" to shift all installs of moby-containerd-cc to containerd2
+
 * Tue Jun 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-12
 - Add updated tardev-snapshotter support patch
 
