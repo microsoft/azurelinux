@@ -296,7 +296,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
-* Fri Sep 12 2025 BinduSri Adabala <v-badabala@microsoft.com> - 3.2.0.azl2-9
+* Tue Sep 16 2025 BinduSri Adabala <v-badabala@microsoft.com> - 3.2.0.azl2-9
 - Patch CVE-2025-53605
 
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.2.0.azl2-8
