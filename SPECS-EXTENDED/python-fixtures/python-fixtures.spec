@@ -13,7 +13,7 @@ Summary:        Fixtures, reusable state for writing clean tests and more
 
 License:        Apache-2.0 OR BSD-3-Clause
 URL:            https://github.com/testing-cabal/fixtures
-Source:         https://files.pythonhosted.org/packages/3c/3d/f106b3278ba50067e9cd397f836d33d141aa790853152dbb3512aaee19f3/%{pypi_name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source:         https://files.pythonhosted.org/packages/3c/3d/f106b3278ba50067e9cd397f836d33d141aa790853152dbb3512aaee19f3/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3-pip
 BuildRequires:  python3dist(wheel)
@@ -86,7 +86,7 @@ sed -e 's/import mock/import unittest.mock as mock/' -i fixtures/tests/_fixtures
 %changelog
 * Thu Feb 20 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 4.0.1-11
 - Initial CBL-Mariner import from Fedora 41 (license: MIT).
-- License verified
+- License verified.
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.1-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
