@@ -12,7 +12,6 @@
 %define with_lsm                        1
 %endif
 
-%define is_fedora                       0%{?rhel} == 0
 %define is_git                          %(git show > /dev/null 2>&1 && echo 1 || echo 0)
 %define git_hash                        %(git log -1 --pretty=format:"%h" || true)
 %define build_date                      %(date '+%Y%m%d')
@@ -96,12 +95,9 @@ Recommends: eject
 Requires: polkit >= %{polkit_version}
 
 # For mkntfs (not available on rhel or on ppc/ppc64) and f2fs
-%if %{is_fedora}
-Recommends: f2fs-tools
 Recommends: nilfs-utils
 %ifnarch ppc ppc64
 Recommends: ntfsprogs
-%endif
 %endif
 Recommends: ntfs-3g
 
@@ -257,9 +253,6 @@ fi
 %license COPYING
 
 %dir %{_sysconfdir}/udisks2
-%if %{is_fedora}
-%dir %{_sysconfdir}/udisks2/modules.conf.d
-%endif
 %{_sysconfdir}/udisks2/udisks2.conf
 %{_sysconfdir}/udisks2/mount_options.conf.example
 
