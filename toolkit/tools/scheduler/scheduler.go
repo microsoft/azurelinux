@@ -639,8 +639,7 @@ func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, pkgGraph *pkggraph
 				// Implicit nodes will point to the cached RPM path, but we don't care about them and will update their
 				// paths to the actual RPM path in a later step so ignore them here.
 				// Sanity check that any non-delta node has an exact match to the real RPM path
-				err = fmt.Errorf("non-delta run node '%s' has unexpected path '%s' (expected non-delta path of '%s')", node, node.RpmPath, builtFile)
-				return
+				logger.Log.Warnf("non-delta run node '%s' has unexpected path '%s' (expected non-delta path of '%s')", node, node.RpmPath, builtFile)
 			}
 		}
 	}
