@@ -94,7 +94,7 @@ Group: Development/Libraries
 Provides header files and examples for developing with UCX.
 
 %prep
-%setup -q
+%setup -q -n ucx-%{version}
 
 %build
 %define _with_arg()   %{expand:%%{?with_%{1}:--with-%{2}}%%{!?with_%{1}:--without-%{2}}}
