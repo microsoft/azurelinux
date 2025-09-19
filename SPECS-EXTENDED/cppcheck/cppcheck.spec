@@ -2,8 +2,8 @@
 %global gui 0
 
 Name:           cppcheck
-Version:        2.7
-Release:        2%{?dist}
+Version:        2.16.0
+Release:        1%{?dist}
 Summary:        Tool for static C/C++ code analysis
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -12,17 +12,10 @@ URL:            http://cppcheck.wiki.sourceforge.net/
 Source0:        https://github.com/danmar/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 # Fix location of translations
-Patch0:         cppcheck-2.2-translations.patch
-# Select python3 explicitly
-Patch1:         cppcheck-1.88-htmlreport-python3.patch
-# Disable one test, which fails under ppc64le
-# test/testmathlib.cpp:1246(TestMathLib::toString): Assertion failed.
-Patch2:         cppcheck-2.7-disable-test-testmathlib-tostring.patch
-# https://github.com/danmar/cppcheck/commit/974dd5d
-Patch3:         cppcheck-2.7-tinyxml2.patch
+Patch0:         cppcheck-2.11-translations.patch
 
 BuildRequires:  gcc-c++
-BuildRequires:  pcre-devel
+BuildRequires:  pcre2-devel
 BuildRequires:  docbook-style-xsl
 BuildRequires:  libxslt
 BuildRequires:  tinyxml2-devel >= 2.1.0
@@ -33,8 +26,10 @@ BuildRequires:  z3-devel >= 4.7.1
 %if %{gui}
 BuildRequires:  desktop-file-utils
 BuildRequires:  qt5-qtbase-devel
+BuildRequires:  qt5-qttools-devel
 BuildRequires:  qt5-linguist
 BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 %else
 Obsoletes:      %{name}-gui < %{version}-%{release}
 %endif
@@ -66,10 +61,10 @@ from xml files first generated using cppcheck.
 
 %prep
 %setup -q
-%patch 0 -p1 -b .translations
-%patch 1 -p1 -b .python3
-%patch 2 -p1 -b .array7
-%patch 3 -p1 -b .tinyxml2
+%patch -P 0 -p1 -b .translations
+#%patch 1 -p1 -b .python3
+#%patch 2 -p1 -b .array7
+#%patch 3 -p1 -b .tinyxml2
 # Make sure bundled tinyxml2 is not used
 rm -r externals/tinyxml2
 
@@ -79,7 +74,7 @@ make DB2MAN=%{_datadir}/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl man
 
 # Binaries
 # Upstream doesn't support shared libraries (unversioned solib)
-%cmake -DCMAKE_BUILD_TYPE=Release -DUSE_MATCHCOMPILER=yes -DUSE_Z3=yes -DHAVE_RULES=yes -DBUILD_GUI=%{gui} -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_TESTS=yes -DFILESDIR=%{_datadir}/Cppcheck -DUSE_BUNDLED_TINYXML2=OFF -DENABLE_OSS_FUZZ=OFF
+%cmake -DCMAKE_BUILD_TYPE=Release -DUSE_MATCHCOMPILER=yes -DUSE_Z3=yes -DHAVE_RULES=no -DBUILD_GUI=%{gui} -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_TESTS=yes -DFILESDIR=%{_datadir}/Cppcheck -DUSE_BUNDLED_TINYXML2=OFF -DENABLE_OSS_FUZZ=OFF
 %cmake_build
 
 %install
@@ -91,6 +86,9 @@ install -D -p -m 644 cppcheck.1 %{buildroot}%{_mandir}/man1/cppcheck.1
 desktop-file-validate %{buildroot}%{_datadir}/applications/cppcheck-gui.desktop
 # Install logo
 install -D -p -m 644 gui/cppcheck-gui.png %{buildroot}%{_datadir}/pixmaps/cppcheck-gui.png
+# Install the Qt online-help file
+install -D -p -m 644 gui/help/online-help.qhc %{buildroot}%{_datadir}/Cppcheck/help/online-help.qhc
+install -D -p -m 644 gui/help/online-help.qch %{buildroot}%{_datadir}/Cppcheck/help/online-help.qch
 %endif
 
 # Install htmlreport
@@ -120,6 +118,10 @@ install -D -p -m 755 htmlreport/cppcheck-htmlreport %{buildroot}%{_bindir}/cppch
 %{_bindir}/cppcheck-htmlreport
 
 %changelog
+* Thu May 22 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.16.0-1
+- Upgrade to 2.16.0
+- Build with pcre2-devel
+
 * Mon Aug 22 2022 Muhammad Falak <mwani@microsoft.com> - 2.7-2
 - Fix `testrunner` binary path to enable ptest
 
