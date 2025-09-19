@@ -44,7 +44,8 @@ mkdir -p $RPM_BUILD_ROOT/%{_datadir}/mythes
 %ldconfig_scriptlets
 
 %files
-%doc README COPYING AUTHORS
+%license COPYING
+%doc README AUTHORS
 %{_libdir}/*.so.*
 %{_datadir}/mythes
 
