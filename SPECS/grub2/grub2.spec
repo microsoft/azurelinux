@@ -109,18 +109,18 @@ Patch:          CVE-2025-0624.patch
 Patch:          CVE-2014-3591.patch
 Patch:          CVE-2019-13627.patch
 Patch:          CVE-2017-7526.patch
-Patch:          CVE-2024-56737-and-CVE-2024-45782.patch
+Patch:          CVE-2024-56737.patch
 Patch:          CVE-2024-45774.patch
 Patch:          CVE-2024-45781.patch
 Patch:          CVE-2024-45775.patch
 Patch:          CVE-2025-1118.patch
-Patch:          CVE-2025-0677_CVE-2025-0684_CVE-2025-0685_CVE-2025-0686_CVE-2025-0689.patch
+Patch:          CVE-2025-0677.patch
 Patch:          CVE-2024-45777.patch
 Patch:          CVE-2024-45776.patch
 Patch:          CVE-2024-45783.patch
 Patch:          CVE-2025-0690.patch
-Patch:          CVE-2024-45778-CVE-2024-45779.patch
-Patch:          CVE-2025-0678-CVE-2025-1125.patch
+Patch:          CVE-2024-45778.patch
+Patch:          CVE-2025-0678.patch
 Patch:          CVE-2024-45780.patch
 # Following are included as part of above CVEs and kept here as nopatch
 # and commented out, because from patch command perspective, these files
