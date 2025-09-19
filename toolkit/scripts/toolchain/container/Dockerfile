@@ -21,7 +21,6 @@ COPY [ "./version-check-container.sh", \
 RUN tdnf install -y \
     bison \
     build-essential \
-    byacc \
     ca-certificates \
     ccache \
     cpio \
@@ -42,6 +41,7 @@ RUN tdnf install -y \
     wget \
     zip && \
     ln    -sf bash /bin/sh && \
+    ln    -sf bison /bin/yacc && \
     mkdir -pv $LFS/sources && \
     chmod -v a+wt $LFS/sources && \
     mkdir -pv $LFS/logs/temptoolchain && \
@@ -63,7 +63,7 @@ RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolch
 # Disable downloading from remote sources by default. The 'toolchain-local-wget-list' generated for the above line will download from $(SOURCE_URL)
 # The 'toolchain-remote-wget-list' is still available and can be used as an alternate to $(SOURCE_URL) if desired.
 #RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
-RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.2.tar.gz -O kernel-6.6.96.2.tar.gz --directory-prefix=$LFS/sources; exit 0
+RUN [ -f kernel-6.6.96.2.tar.gz ] || wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.96.2.tar.gz -O kernel-6.6.96.2.tar.gz --directory-prefix=$LFS/sources; exit 0
 USER root
 
 RUN mkdir -pv $LFS/{etc,var} $LFS/usr/{bin,lib,sbin} && \
