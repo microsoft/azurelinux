@@ -54,7 +54,7 @@ rm -rf $RPM_BUILD_ROOT
 /lib/systemd/system/%{name}.service
 
 %changelog
-* Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com>
+* Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 0.1.3-2
 - Enable ARM64 build by removing ExclusiveArch
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
 - Initial Azure Linux import from NVIDIA (license: GPLv2)

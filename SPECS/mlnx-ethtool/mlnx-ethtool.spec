@@ -40,7 +40,7 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 
 
 %changelog
-* Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com>
+* Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 6.9-2
 - Enable ARM64 build by removing ExclusiveArch
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
