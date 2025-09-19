@@ -36,7 +36,6 @@ BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  objectweb-asm >= 5
 Provides:       %{name}-nohook = %{version}-%{release}
 Obsoletes:      %{name}-nohook < %{version}-%{release}
-Requires:       objectweb-asm >= 5
 BuildArch:      noarch
 %if %{with tests}
 BuildConflicts: java-devel >= 9
