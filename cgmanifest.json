@@ -1317,8 +1317,8 @@
         "type": "other",
         "other": {
           "name": "buildah",
-          "version": "1.18.0",
-          "downloadUrl": "https://github.com/containers/buildah/archive/v1.18.0.tar.gz"
+          "version": "1.41.4",
+          "downloadUrl": "https://github.com/containers/buildah/archive/v1.41.4.tar.gz"
         }
       }
     },
