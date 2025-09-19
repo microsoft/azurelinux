@@ -1128,7 +1128,7 @@
         "other": {
           "name": "binutils",
           "version": "2.41",
-          "downloadUrl": "https://ftp.gnu.org/gnu/binutils/binutils-2.41.tar.xz"
+          "downloadUrl": "https://sourceware.org/pub/binutils/releases/binutils-2.41.tar.xz"
         }
       }
     },
