@@ -20,7 +20,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        LGPL-2.1-or-later AND MIT AND GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -98,6 +98,9 @@ popd
 /boot/efi/EFI/BOOT/%{grubefiname}
 
 %changelog
+* Tue Sep 16 2025 Akhila Guruju <v-guakhila@microsoft.com> - 255-24
+- Bump release to match systemd spec
+
 * Mon Aug 18 2025 Sean Dougherty <sdougherty@microsoft.com> - 255-23
 - Add aarch64 package
 
