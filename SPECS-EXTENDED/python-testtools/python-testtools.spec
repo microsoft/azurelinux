@@ -93,6 +93,7 @@ make -C doc html
 
 %if %{with tests}
 %check
+#The check target internally executes %{python3} -m testtools.run testtools.tests.test_suite as part of the test process.
 %if %{without bootstrap}
 PYTHONPATH=%{buildroot}%{python3_sitelib} %{python3} -m testtools.run testtools.tests.test_suite
 # Typically we would want an %%else condition to run an import check, but it

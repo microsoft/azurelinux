@@ -73,6 +73,9 @@ sed -e 's/import mock/import unittest.mock as mock/' -i fixtures/tests/_fixtures
 %pyproject_save_files %{pypi_name}
 
 %if %{with tests}
+# Note: Tests are executed using the '%tox' macro rather than the direct
+# '%{__python3} -m testtools.run fixtures.test_suite' invocation, for better
+# compatibility with Python build environments.
 %check
 %if %{without bootstrap}
 %tox
