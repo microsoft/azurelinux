@@ -120,12 +120,15 @@ func (g *GraphBuildState) IsNodeDelta(node *pkggraph.PkgNode) bool {
 
 // IsSRPMCached returns true if the requested SRPM build used a cache.
 func (g *GraphBuildState) IsSRPMCached(srpmFileName string) bool {
+	logger.Log.Debugf("Checking if SRPM %q was built using cache out of %d processed nodes.", srpmFileName, len(g.nodeToState))
 	for node, state := range g.nodeToState {
 		if node.Type == pkggraph.TypeLocalBuild && node.SRPMFileName() == srpmFileName {
+			logger.Log.Debugf("SRPM %q was built using cache: %v", srpmFileName, state.cached)
 			return state.cached
 		}
 	}
 
+	logger.Log.Debugf("No processed node found for SRPM %q.", srpmFileName)
 	return false
 }
 
@@ -137,56 +140,68 @@ func (g *GraphBuildState) ActiveBuilds() map[int64]*BuildRequest {
 // ActiveBuildFromSRPM returns a build request for the queried SRPM file
 // or nil if the SRPM is not among the active builds.
 func (g *GraphBuildState) ActiveBuildFromSRPM(srpmFileName string) *BuildRequest {
+	logger.Log.Debugf("Checking for active build of SRPM %q out of %d builds.", srpmFileName, len(g.activeBuilds))
 	for _, buildRequest := range g.activeBuilds {
 		if buildRequest.Node.Type == pkggraph.TypeLocalBuild && buildRequest.Node.SRPMFileName() == srpmFileName {
+			logger.Log.Debugf("Found active build for SRPM %q: %v", srpmFileName, buildRequest)
 			return buildRequest
 		}
 	}
 
+	logger.Log.Debugf("No active build found for SRPM %q.", srpmFileName)
 	return nil
 }
 
 // IsSRPMBuildActive returns true if a given SRPM is currently queued for building.
 func (g *GraphBuildState) IsSRPMBuildActive(srpmFileName string) bool {
+	logger.Log.Debugf("Checking if SRPM %q is currently being built.", srpmFileName)
 	return g.ActiveBuildFromSRPM(srpmFileName) != nil
 }
 
 // ActiveSRPMs returns a list of all SRPMs, which are currently being built.
 func (g *GraphBuildState) ActiveSRPMs() (builtSRPMs []string) {
+	logger.Log.Debugf("Getting list of active SRPMs out of %d builds.", len(g.activeBuilds))
 	for _, buildRequest := range g.activeBuilds {
 		if buildRequest.Node.Type == pkggraph.TypeLocalBuild {
 			builtSRPMs = append(builtSRPMs, buildRequest.Node.SRPMFileName())
 		}
 	}
 
+	logger.Log.Debugf("Found %d active SRPMs.", len(builtSRPMs))
 	return
 }
 
 // ActiveTests returns a list of all tests, which are currently being run.
 func (g *GraphBuildState) ActiveTests() (testedSRPMs []string) {
+	logger.Log.Debugf("Getting list of active tests out of %d builds.", len(g.activeBuilds))
 	for _, testRequest := range g.activeBuilds {
 		if testRequest.Node.Type == pkggraph.TypeTest {
 			testedSRPMs = append(testedSRPMs, testRequest.Node.SRPMFileName())
 		}
 	}
 
+	logger.Log.Debugf("Found %d active tests.", len(testedSRPMs))
 	return
 }
 
 // ActiveTestFromSRPM returns a test request for the queried SRPM file
 // or nil if the SRPM is not among the active builds.
 func (g *GraphBuildState) ActiveTestFromSRPM(srpmFileName string) *BuildRequest {
+	logger.Log.Debugf("Checking for active test of SRPM %q out of %d builds.", srpmFileName, len(g.activeBuilds))
 	for _, buildRequest := range g.activeBuilds {
 		if buildRequest.Node.Type == pkggraph.TypeTest && buildRequest.Node.SRPMFileName() == srpmFileName {
+			logger.Log.Debugf("Found active test for SRPM %q: %v", srpmFileName, buildRequest)
 			return buildRequest
 		}
 	}
 
+	logger.Log.Debugf("No active test found for SRPM %q.", srpmFileName)
 	return nil
 }
 
 // IsSRPMTestActive returns true if a given SRPM is currently queued for testing.
 func (g *GraphBuildState) IsSRPMTestActive(srpmFileName string) bool {
+	logger.Log.Debugf("Checking if SRPM %q is currently being tested.", srpmFileName)
 	return g.ActiveTestFromSRPM(srpmFileName) != nil
 }
 
@@ -280,5 +295,6 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 	if res.HasLicenseWarnings {
 		g.licenseWarningSRPMs[filepath.Base(res.Node.SrpmPath)] = true
 	}
+	logger.Log.Debugf("Finished recording build result: %s", res.Node.FriendlyName())
 	return
 }

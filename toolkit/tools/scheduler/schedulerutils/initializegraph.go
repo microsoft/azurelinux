@@ -71,6 +71,7 @@ func PrepareGraphForBuild(pkgGraph *pkggraph.PkgGraph, packagesToBuild, testsToR
 
 // OptimizeGraph will attempt to create a solvable subgraph that satisfies the build goal node.
 func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool) (optimizedGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
+	logger.Log.Debugf("Attempting to create optimized subgraph (canUseCachedImplicit=%t)", canUseCachedImplicit)
 	buildGoalNode := pkgGraph.FindGoalNode(buildGoalNodeName)
 	if buildGoalNode == nil {
 		err = fmt.Errorf("failed to find goal node (%s)", buildGoalNodeName)
@@ -93,6 +94,8 @@ func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool) (opti
 	} else {
 		err = fmt.Errorf("failed to create solvable subgraph")
 	}
+
+	logger.Log.Debugf("Optimized graph contains %d nodes", optimizedGraph.Nodes().Len())
 
 	return
 }

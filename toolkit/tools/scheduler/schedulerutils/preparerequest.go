@@ -29,11 +29,15 @@ import (
 //     At this point the partner build nodes for these test nodes have either already finished building or are being built,
 //     thus the check for active and cached SRPMs inside testNodesToRequests().
 func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, buildState *GraphBuildState, isCacheAllowed bool) (requests []*BuildRequest, err error) {
+	logger.Log.Debugf("Converting %d nodes to build requests.", len(nodesToBuild))
+
 	timestamp.StartEvent("generate requests", nil)
 	defer timestamp.StopEvent(nil)
 
+	logger.Log.Debugf("Acquiring read lock on the package graph.")
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
+	logger.Log.Debugf("Acquired read lock on the package graph.")
 
 	// Group build and test nodes together as they will be unblocked all at once for any given SRPM,
 	// and building a single build node will result in all of them becoming available.
@@ -75,6 +79,7 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 }
 
 func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, buildNodesLists map[string][]*pkggraph.PkgNode, isCacheAllowed bool) (requests []*BuildRequest, err error) {
+	logger.Log.Debugf("Converting %d build node groups to build requests.", len(buildNodesLists))
 	for _, buildNodes := range buildNodesLists {
 		// Check if any of the build nodes is a delta node and mark it. We will use this to determine if the
 		// build is a delta build that might have pre-built .rpm files available.
@@ -107,11 +112,15 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 		}
 	}
 
+	logger.Log.Debugf("Converted %d build node groups to %d build requests.", len(buildNodesLists), len(requests))
+
 	return
 }
 
 func buildNodeToTestNode(pkgGraph *pkggraph.PkgGraph, buildNode *pkggraph.PkgNode) (testNode *pkggraph.PkgNode) {
+	logger.Log.Debugf("Finding partner test node for build node %q.", buildNode.FriendlyName())
 	dependents := pkgGraph.To(buildNode.ID())
+	logger.Log.Debugf("Found %d dependents of build node %q.", dependents.Len(), buildNode.FriendlyName())
 	for dependents.Next() {
 		dependent := dependents.Node().(*pkggraph.PkgNode)
 
@@ -121,10 +130,12 @@ func buildNodeToTestNode(pkgGraph *pkggraph.PkgGraph, buildNode *pkggraph.PkgNod
 		}
 	}
 
+	logger.Log.Debugf("Found partner test node %q for build node %q.", testNode.FriendlyName(), buildNode.FriendlyName())
 	return
 }
 
 func buildRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild []*pkgjson.PackageVer, builtNode *pkggraph.PkgNode, ancillaryNodes []*pkggraph.PkgNode, isCacheAllowed, isDelta bool) (request *BuildRequest) {
+	logger.Log.Debugf("Preparing build request for node %q.", builtNode.FriendlyName())
 	request = &BuildRequest{
 		Node:           builtNode,
 		PkgGraph:       pkgGraph,
@@ -138,6 +149,8 @@ func buildRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, pack
 		// We might be able to use the cache, set the freshness based on node's dependencies.
 		request.UseCache, request.Freshness = canUseCacheForNode(pkgGraph, request.Node, buildState)
 	}
+
+	logger.Log.Debugf("Build request for node %q done: requiredRebuild=%t, isCacheAllowed=%t, useCache=%t, freshness=%d", builtNode.FriendlyName(), requiredRebuild, isCacheAllowed, request.UseCache, request.Freshness)
 	return
 }
 
@@ -145,6 +158,7 @@ func partnerTestNodesToRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBui
 	const isDelta = false
 
 	defaultBuildNode := buildNodes[0]
+	logger.Log.Debugf("Preparing partner test request for build node %q.", defaultBuildNode.FriendlyName())
 	testNode := buildNodeToTestNode(pkgGraph, defaultBuildNode)
 	if testNode == nil {
 		return
@@ -175,6 +189,7 @@ func partnerTestNodesToRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBui
 //
 // NOTE: the caller must guarantee the build state does not change while this function is running.
 func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, testsToRerun []*pkgjson.PackageVer, testNodesLists map[string][]*pkggraph.PkgNode) (requests []*BuildRequest, err error) {
+	logger.Log.Debugf("Converting %d test node groups to build requests.", len(testNodesLists))
 	const isDelta = false
 
 	for _, testNodes := range testNodesLists {
@@ -209,7 +224,9 @@ func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildStat
 func isRequiredRebuild(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer) bool {
 	logger.Log.Debugf("Checking if node %v is required to be rebuilt.", node.FriendlyName())
 
-	return nodeHasMissingRPMs(pkgGraph, node) || nodeRequestedForRebuildByUser(node, packagesToRebuild)
+	result := nodeHasMissingRPMs(pkgGraph, node) || nodeRequestedForRebuildByUser(node, packagesToRebuild)
+	logger.Log.Debugf("Node %v required rebuild: %t", node.FriendlyName(), result)
+	return result
 }
 
 // canUseCacheForNode checks if the cache can be used for a given node by:
@@ -219,14 +236,18 @@ func isRequiredRebuild(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, pack
 //   - If any dependency is fresh (aka freshness > 0) then the node can't use the cache and will inherit the freshness of
 //     the freshest dependency (possibly adjusted by -1 for certain edges).
 func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, buildState *GraphBuildState) (canUseCache bool, freshness uint) {
+	logger.Log.Debugf("Checking if node %q can use the cache.", node.FriendlyName())
+
 	freshness = 0
 	canUseCache = true
 
 	// If any of the node's dependencies were built instead of being cached then a build is required. We treat any node
 	// with a freshness > 0 as being built. Each layer of the build completed will decrement the freshness of the node by 1.
+	logger.Log.Debugf("Getting all dependencies of node %q.", node.FriendlyName())
 	dependencies := pkgGraph.From(node.ID())
 	for dependencies.Next() {
 		dependency := dependencies.Node().(*pkggraph.PkgNode)
+		logger.Log.Debugf("Analyzing dependency %q of node %q.", dependency.FriendlyName(), node.FriendlyName())
 
 		inheritedFreshness, shouldRebuild := calculateExpectedFreshness(dependency, buildState)
 		if inheritedFreshness > freshness {
@@ -239,6 +260,7 @@ func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, bui
 		}
 	}
 
+	logger.Log.Debugf("Node %q can use cache: %t, freshness: %d", node.FriendlyName(), canUseCache, freshness)
 	return
 }
 

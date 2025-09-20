@@ -19,6 +19,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/licensecheck"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/buildagents"
@@ -121,6 +122,9 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(logFlags)
+
+	timestamp.BeginTiming("boilerplate", *timestampFile)
+	defer timestamp.CompleteTiming()
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
@@ -587,6 +591,7 @@ func performPostBuildChecks(allowToolchainRebuilds bool, buildState *schedulerut
 // updateGraphWithImplicitProvides will update the graph with new implicit provides if available.
 // It will also attempt to subgraph the graph if it becomes solvable with the new implicit provides.
 func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, useCachedImplicit bool) (didOptimize bool, newGraph *pkggraph.PkgGraph, newGoalNode *pkggraph.PkgNode, err error) {
+	logger.Log.Debugf("Updating graph with implicit provides from '%s'", res.Node)
 	// acquire a writer lock since this routine will collapse nodes
 	graphMutex.Lock()
 	defer graphMutex.Unlock()
@@ -604,6 +609,7 @@ func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *
 		}
 	}
 
+	logger.Log.Debugf("Finished updating graph with implicit provides from '%s'", res.Node)
 	return
 }
 
@@ -611,6 +617,7 @@ func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *
 // RPM paths. A delta node will normally point at the cached RPM path, but we want to point it at the actual RPM if we built it.
 // This function should only be called on delta build nodes.
 func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex) (err error) {
+	logger.Log.Debugf("Setting associated delta paths for ancillary nodes of '%s'", res.Node)
 	graphMutex.Lock()
 	defer graphMutex.Unlock()
 
@@ -645,6 +652,7 @@ func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, pkgGraph *pkggraph
 		}
 	}
 
+	logger.Log.Debugf("Finished setting associated delta paths for ancillary nodes of '%s'", res.Node)
 	return
 }
 

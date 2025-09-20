@@ -117,7 +117,7 @@ STATUS_FLAGS_DIR   ?= $(BUILD_DIR)/make_status
 CHROOT_DIR         ?= $(BUILD_DIR)/worker/chroot
 IMAGEGEN_DIR       ?= $(BUILD_DIR)/imagegen
 TOOLCHAIN_RPMS_DIR ?= $(BUILD_DIR)/toolchain_rpms
-TIMESTAMP_DIR      ?= $(BUILD_DIR)/timestamp
+TIMESTAMP_DIR      ?= $(LOGS_DIR)/timestamp
 PROFILE_DIR        ?= $(BUILD_DIR)/profile
 
 RPMRC_DIR        ?= $(MACRO_DIR)/usr/lib/rpm

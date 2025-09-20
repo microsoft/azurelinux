@@ -90,6 +90,7 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 
 // LeafNodes returns a slice of all leaf nodes in the graph.
 func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, buildState *GraphBuildState, useCachedImplicit bool) (leafNodes []*pkggraph.PkgNode) {
+	logger.Log.Debugf("Searching for leaf nodes starting from goal node: %v", goalNode)
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
@@ -134,6 +135,7 @@ func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *
 
 // FindUnblockedNodesFromResult takes a package build result and returns a list of nodes that are now unblocked for building.
 func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState) (unblockedNodes []*pkggraph.PkgNode) {
+	logger.Log.Debugf("Finding unblocked nodes from build result (%s)", res.Node.FriendlyName())
 	if res.Err != nil {
 		return
 	}
@@ -149,13 +151,14 @@ func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph,
 		findUnblockedNodesFromNode(pkgGraph, buildState, node, unblockedNodesMap)
 	}
 
+	logger.Log.Debugf("Found %d unblocked nodes from build result (%s)", len(unblockedNodesMap), res.Node.FriendlyName())
 	return sliceutils.SetToSlice(unblockedNodesMap)
 }
 
 // findUnblockedNodesFromNode takes a built node and returns a list of nodes that are now unblocked by it.
 func findUnblockedNodesFromNode(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, builtNode *pkggraph.PkgNode, unblockedNodes map[*pkggraph.PkgNode]bool) {
 	dependents := pkgGraph.To(builtNode.ID())
-
+	logger.Log.Debugf("Finding unblocked nodes from built node (%s)", builtNode.FriendlyName())
 	for dependents.Next() {
 		dependent := dependents.Node().(*pkggraph.PkgNode)
 
@@ -163,6 +166,8 @@ func findUnblockedNodesFromNode(pkgGraph *pkggraph.PkgGraph, buildState *GraphBu
 			unblockedNodes[dependent] = true
 		}
 	}
+
+	logger.Log.Debugf("Found %d unblocked nodes from built node (%s)", len(unblockedNodes), builtNode.FriendlyName())
 }
 
 // buildBlockedNodesGraph creates a subgraph of blocked nodes starting from the start node.
@@ -196,14 +201,18 @@ func buildBlockedNodesGraph(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 
 // isNodeUnblocked returns true if all nodes required to build `node` are UpToDate and do not need to be built.
 func isNodeUnblocked(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, node *pkggraph.PkgNode) bool {
+	logger.Log.Debugf("Checking if node %q is unblocked.", node.FriendlyName())
 	dependencies := pkgGraph.From(node.ID())
+	logger.Log.Debugf("Node %q has %d dependencies.", node.FriendlyName(), dependencies.Len())
 	for dependencies.Next() {
 		dependency := dependencies.Node().(*pkggraph.PkgNode)
 
 		if !buildState.IsNodeAvailable(dependency) {
+			logger.Log.Debugf("Node %q is blocked by dependency %q.", node.FriendlyName(), dependency.FriendlyName())
 			return false
 		}
 	}
 
+	logger.Log.Debugf("Node %q is unblocked.", node.FriendlyName())
 	return true
 }
