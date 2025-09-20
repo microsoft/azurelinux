@@ -95,7 +95,7 @@ func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool) (opti
 		err = fmt.Errorf("failed to create solvable subgraph")
 	}
 
-	logger.Log.Debugf("Optimized graph contains %d nodes", optimizedGraph.Nodes().Len())
+	logger.Log.Debugf("Finished attempting to create optimized subgraph with error: %v", err)
 
 	return
 }
