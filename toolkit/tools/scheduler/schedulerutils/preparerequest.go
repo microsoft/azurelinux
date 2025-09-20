@@ -130,7 +130,7 @@ func buildNodeToTestNode(pkgGraph *pkggraph.PkgGraph, buildNode *pkggraph.PkgNod
 		}
 	}
 
-	logger.Log.Debugf("Found partner test node %q for build node %q.", testNode.FriendlyName(), buildNode.FriendlyName())
+	logger.Log.Debugf("Found partner test node %v for build node %q.", testNode, buildNode.FriendlyName())
 	return
 }
 
