@@ -38,24 +38,26 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 			return
 		}
 
+		didInjectAny = didInjectAny || len(provideToNodes) > 0
+
 		for provide, nodes := range provideToNodes {
-			err = replaceNodesWithProvides(res, pkgGraph, provide, nodes, rpmFile)
+			err = replaceNodesWithProvides(pkgGraph, provide, nodes, rpmFile)
 			if err != nil {
 				return
 			}
-
-			didInjectAny = true
 		}
 	}
 
-	// Make sure the graph is still a directed acyclic graph (DAG) after manipulating it.
-	err = pkgGraph.MakeDAG()
+	if didInjectAny {
+		// Make sure the graph is still a directed acyclic graph (DAG) after manipulating it.
+		err = pkgGraph.MakeDAG()
+	}
 	logger.Log.Debugf("Finished checking build result (%s) for implicit provides to inject into graph", res.Node.FriendlyName())
 	return
 }
 
 // replaceNodesWithProvides will replace a slice of nodes with a new node with the given provides in the graph.
-func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, provides *pkgjson.PackageVer, nodes []*pkggraph.PkgNode, rpmFileProviding string) (err error) {
+func replaceNodesWithProvides(pkgGraph *pkggraph.PkgGraph, provides *pkgjson.PackageVer, nodes []*pkggraph.PkgNode, rpmFileProviding string) (err error) {
 	logger.Log.Debugf("Replacing %d nodes with implicit provide (%v) from (%s)", len(nodes), provides, rpmFileProviding)
 	var parentNode *pkggraph.PkgNode
 
