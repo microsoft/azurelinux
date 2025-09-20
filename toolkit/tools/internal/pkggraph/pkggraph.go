@@ -280,6 +280,7 @@ func (g *PkgGraph) lookupTable() map[string][]*LookupNode {
 
 // validateNodeForLookup checks if a node is valid for adding to the lookup table
 func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err error) {
+	logger.Log.Debugf("Validating node (%s) for lookup table.", pkgNode.FriendlyName())
 	// Only add run, remote, or build nodes to lookup
 	if !lookupNodesTypes[pkgNode.Type] {
 		err = fmt.Errorf("%s has invalid type for lookup", pkgNode)
@@ -336,11 +337,13 @@ func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err erro
 	}
 
 	valid = true
+	logger.Log.Debugf("Validated node (%s) for lookup table.", pkgNode.FriendlyName())
 	return
 }
 
 // addToLookup adds a node to the lookup table if it is the correct type (build/run)
 func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
+	logger.Log.Debugf("Adding node (%s) to lookup table.", pkgNode.FriendlyName())
 	// We only care about run/build nodes or remote dependencies
 	if !lookupNodesTypes[pkgNode.Type] {
 		logger.Log.Tracef("Skipping %+v, not valid for lookup", pkgNode)
@@ -393,6 +396,7 @@ func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 			return intervalI.Compare(&intervalJ) < 0
 		})
 	}
+	logger.Log.Debugf("Added node (%s) to lookup table.", pkgNode.FriendlyName())
 	return
 }
 
@@ -424,6 +428,7 @@ func (g *PkgGraph) NewNode() graph.Node {
 // - The parentNode must be a run node.
 // - The collapsed node will inherit all attributes of the parent node minus the versionedPkg.
 func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentNode *PkgNode, nodesToCollapse []*PkgNode) (newNode *PkgNode, err error) {
+	logger.Log.Debugf("Collapsing (%v) into (%s) with (%s) as a parent.", nodesToCollapse, versionedPkg, parentNode)
 	// enforce parent is run node
 	if parentNode.Type != TypeLocalRun {
 		err = fmt.Errorf("cannot collapse nodes to a non run node (%s)", parentNode.FriendlyName())
@@ -489,11 +494,13 @@ func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentN
 		g.RemovePkgNode(node)
 	}
 
+	logger.Log.Debugf("Collapsed (%v) into (%s) with (%s) as a parent.", nodesToCollapse, versionedPkg, parentNode)
 	return
 }
 
 // AddPkgNode adds a new node to the package graph. Run, Build, and Unresolved nodes are recorded in the lookup table.
 func (g *PkgGraph) AddPkgNode(versionedPkg *pkgjson.PackageVer, nodeState NodeState, nodeType NodeType, srpmPath, rpmPath, specPath, sourceDir, architecture, sourceRepo string) (newNode *PkgNode, err error) {
+	logger.Log.Debugf("Adding node (%s) to graph.", versionedPkg)
 	newNode = &PkgNode{
 		nodeID:       g.NewNode().ID(),
 		VersionedPkg: versionedPkg,
@@ -518,7 +525,7 @@ func (g *PkgGraph) AddPkgNode(versionedPkg *pkgjson.PackageVer, nodeState NodeSt
 
 	// Register the package with the lookup table if needed
 	err = g.addToLookup(newNode, false)
-
+	logger.Log.Debugf("Added node (%s) to graph.", versionedPkg)
 	return
 }
 
@@ -672,9 +679,11 @@ func (g *PkgGraph) AllUnresolvedNodes() []*PkgNode {
 // 3. LocalRun Node if both LocalRun and RemoteRun nodes are present in the graph
 // This function will return all RunNodes in the LookupTable.
 func (g *PkgGraph) AllPreferredRunNodes() []*PkgNode {
+	logger.Log.Debugf("Estimating number of run nodes in graph")
 	// We can estimate there will be ~1 run node per package.
 	foundNodes := 0
 	nodes := make([]*PkgNode, 0, len(g.lookupTable()))
+	logger.Log.Debugf("Lookup table has %d entries", len(g.lookupTable()))
 	for _, versionList := range g.lookupTable() {
 		for _, n := range versionList {
 			if n.RunNode != nil {
@@ -683,6 +692,7 @@ func (g *PkgGraph) AllPreferredRunNodes() []*PkgNode {
 			}
 		}
 	}
+	logger.Log.Debugf("Found %d run nodes in graph", foundNodes)
 	return nodes[:foundNodes]
 }
 
@@ -1405,6 +1415,7 @@ func (g *PkgGraph) MakeDAG() (err error) {
 // MakeDAGUsingUpstreamRepos ensures the graph is a directed acyclic graph (DAG).
 // If the graph is not a DAG, this routine will attempt to resolve any cycles using RPMs in the PMC to make the graph a DAG.
 func (g *PkgGraph) MakeDAGUsingUpstreamRepos(resolveCyclesFromUpstream, ignoreVersionToResolveSelfDep bool, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
+	logger.Log.Debugf("Making DAG (resolveCyclesFromUpstream=%t, ignoreVersionToResolveSelfDep=%t)", resolveCyclesFromUpstream, ignoreVersionToResolveSelfDep)
 	timestamp.StartEvent("convert to DAG", nil)
 	defer timestamp.StopEvent(nil)
 	var cycle []*PkgNode
@@ -1412,6 +1423,7 @@ func (g *PkgGraph) MakeDAGUsingUpstreamRepos(resolveCyclesFromUpstream, ignoreVe
 	for {
 		cycle, err = g.FindAnyDirectedCycle()
 		if err != nil || len(cycle) == 0 {
+			logger.Log.Debugf("No cycles found, graph is now a DAG.")
 			return
 		}
 
@@ -1721,6 +1733,7 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 
 // removePkgNodeFromLookup removes a node from the lookup tables.
 func (g *PkgGraph) removePkgNodeFromLookup(pkgNode *PkgNode) {
+	logger.Log.Debugf("Removing node (%s) from lookup table.", pkgNode.FriendlyName())
 	pkgName := pkgNode.VersionedPkg.Name
 	lookupSlice := g.lookupTable()[pkgName]
 
@@ -1730,6 +1743,7 @@ func (g *PkgGraph) removePkgNodeFromLookup(pkgNode *PkgNode) {
 			break
 		}
 	}
+	logger.Log.Debugf("Removed node (%s) from lookup table.", pkgNode.FriendlyName())
 }
 
 // safeAddNode catches panics from adding nodes to the graph and converts them to errors.
