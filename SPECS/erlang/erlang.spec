@@ -2,7 +2,7 @@
 Summary:        erlang
 Name:           erlang
 Version:        25.3.2.21
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,9 @@ BuildRequires:  unixODBC-devel
 BuildRequires:  unzip
 
 Patch0:         CVE-2025-4748.patch
+Patch1:         CVE-2025-48038.patch
+Patch2:         CVE-2025-48040.patch
+Patch3:         CVE-2025-48041.patch
 
 %description
 erlang programming language
@@ -48,6 +51,9 @@ make
 %{_libdir}/erlang/*
 
 %changelog
+* Sat Sep 13 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 25.3.2.21-3
+- Patch for CVE-2025-48041, CVE-2025-48040, CVE-2025-48038
+
 * Thu Jun 19 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 25.3.2.21-2
 - Patch CVE-2025-4748
 
