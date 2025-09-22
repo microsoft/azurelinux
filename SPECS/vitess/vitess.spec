@@ -33,6 +33,7 @@ Patch0:         CVE-2024-45339.patch
 Patch1:         CVE-2025-22868.patch
 Patch2:         CVE-2024-53257.patch
 Patch3:         CVE-2025-22870.patch
+
 BuildRequires: golang
 
 %description
