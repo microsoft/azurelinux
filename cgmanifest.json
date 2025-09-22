@@ -29527,8 +29527,8 @@
         "type": "other",
         "other": {
           "name": "vitess",
-          "version": "17.0.7",
-          "downloadUrl": "https://github.com/vitessio/vitess/archive/refs/tags/v17.0.7.tar.gz"
+          "version": "21.0.0",
+          "downloadUrl": "https://github.com/vitessio/vitess/archive/refs/tags/v21.0.0.tar.gz"
         }
       }
     },
