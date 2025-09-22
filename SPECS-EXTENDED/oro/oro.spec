@@ -89,6 +89,7 @@ cp -pr docs/api/* %{buildroot}%{_javadocdir}/%{name}/
 
 %files javadoc
 %{_javadocdir}/%{name}
+%exclude %{_javadocdir}/%{name}/legal
 
 %changelog
 * Fri Feb 28 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.0.8-298
