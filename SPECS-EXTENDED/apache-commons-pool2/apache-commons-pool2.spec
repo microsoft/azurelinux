@@ -75,9 +75,8 @@ cp -pr dist/docs/api/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadir}/%{short_name}.jar
 
 %files javadoc
-%license %{_javadocdir}/apache-commons-pool2/legal/LICENSE
-%license %{_javadocdir}/apache-commons-pool2/legal/ADDITIONAL_LICENSE_INFO
 %doc %{_javadocdir}/%{name}
+%exclude %{_javadocdir}/%{name}/legal
 
 %changelog
 * Wed May 28 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.4.2-8
