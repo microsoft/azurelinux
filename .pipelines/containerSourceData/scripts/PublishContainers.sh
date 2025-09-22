@@ -476,6 +476,14 @@ do
                     "$semantic_version" \
                     "$azure_linux_version" \
                     "$ARCHITECTURE_TO_BUILD"
+
+                echo "Creating 'latest' tag for imagecustomizer"
+                create_multi_arch_tags \
+                    "$image_name_with_noarch" \
+                    "$container_name" \
+                    "latest" \
+                    "$azure_linux_version" \
+                    "$ARCHITECTURE_TO_BUILD"
             fi
         fi
     done < "$PUBLISHED_CONTAINER_FILE"
