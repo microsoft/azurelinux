@@ -15,7 +15,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.25.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -26,6 +26,7 @@ Source0:        https://github.com/microsoft/go/releases/download/v%{version}-%{
 # bootstrap 00, same content as https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Source1:        https://github.com/microsoft/go/releases/download/v1.4.0-1/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
+Patch1:         CVE-2025-47906.patch
 # bootstrap 01
 Source2:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.20230802.5.src.tar.gz
 # bootstrap 02
@@ -57,6 +58,7 @@ tar xf %{SOURCE4} --no-same-owner
 mv -v go go-bootstrap-03
 
 %setup -q -n go
+%patch 1 -p1
 
 %build
 # go 1.4 bootstraps with C.
@@ -160,6 +162,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Sep 22 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.25.1-2
+- Patch for CVE-2025-47906
+
 * Thu Sep 04 2025 Davis Goodin <dagood@microsoft.com> - 1.25.1-1
 - Bump version to 1.25.1-1
 
