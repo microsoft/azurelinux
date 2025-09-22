@@ -66,9 +66,6 @@ Distribution:   Azure Linux
 
 
 %global user_static 1
-%if 0%{?azl}
-%global user_static 0
-%endif
 
 %global have_kvm 0
 %if 0%{?kvm_package:1}
@@ -428,7 +425,7 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 8.2.0
-Release: 19%{?dist}
+Release: 20%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -654,7 +651,7 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %if %{user_static}
 BuildRequires: glibc-static >= 2.38-12%{?dist}
 BuildRequires: glib2-static zlib-static
-BuildRequires: pcre2-static
+BuildRequires: pcre2-devel-static
 %endif
 
 # Requires for the Fedora 'qemu' metapackage
@@ -2542,7 +2539,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %doc %{qemudocdir}
 
 %files common
-# azlinux: no lang files generated yet. -f %{name}.lang
+# azlinux: no lang files generated yet. -f %%{name}.lang
 %license COPYING COPYING.LIB LICENSE
 %dir %{_datadir}/%{name}/
 %dir %{_datadir}/%{name}/vhost-user/
@@ -3433,6 +3430,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
+* Fri Sep 19 2025 Tobias Brick <tobiasb@microsoft.com> - 8.2.0-20
+- build static binaries
+
 * Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 8.2.0-19
 - Bump to rebuild with updated glibc
 
