@@ -76,7 +76,7 @@ cp -pr dist/docs/api/* %{buildroot}%{_javadocdir}/%{name}
 
 %files javadoc
 %doc %{_javadocdir}/%{name}
-%exclude %{_javadocdir}/%{name}/legal
+%exclude /usr/share/javadoc/%{name}/legal
 
 %changelog
 * Wed May 28 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.4.2-8
