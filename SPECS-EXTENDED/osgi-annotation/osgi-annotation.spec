@@ -96,8 +96,8 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %license LICENSE
 
 %files javadoc
-%license LICENSE
 %{_javadocdir}/%{name}
+%exclude %{_javadocdir}/%{name}/legal
 
 %changelog
 * Tue May 27 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 8.1.0-1
