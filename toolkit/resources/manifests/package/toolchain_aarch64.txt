@@ -158,7 +158,11 @@ intltool-0.51.0-7.azl3.noarch.rpm
 itstool-2.0.7-1.azl3.noarch.rpm
 kbd-2.2.0-2.azl3.aarch64.rpm
 kbd-debuginfo-2.2.0-2.azl3.aarch64.rpm
+<<<<<<< HEAD
 kernel-headers-6.6.96.2-3.azl3.noarch.rpm
+=======
+kernel-headers-6.6.104.2-1.azl3.noarch.rpm
+>>>>>>> 71e4c0cf4 ([fasttrack 3.0] Upgrade kernels to 6.6.104.2 (#14694))
 kmod-30-1.azl3.aarch64.rpm
 kmod-debuginfo-30-1.azl3.aarch64.rpm
 kmod-devel-30-1.azl3.aarch64.rpm

@@ -9,8 +9,13 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
+<<<<<<< HEAD
 Version:        6.6.96.2
 Release:        3%{?dist}
+=======
+Version:        6.6.104.2
+Release:        1%{?dist}
+>>>>>>> 71e4c0cf4 ([fasttrack 3.0] Upgrade kernels to 6.6.104.2 (#14694))
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -145,8 +150,13 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+<<<<<<< HEAD
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.96.2-3
 - Bump release to match kernel
+=======
+* Wed Sep 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.104.2-1
+- Auto-upgrade to 6.6.104.2
+>>>>>>> 71e4c0cf4 ([fasttrack 3.0] Upgrade kernels to 6.6.104.2 (#14694))
 
 * Fri Aug 22 2025 Siddharth Chintamaneni <siddharthc@microsoft.com> - 6.6.96.2-2
 - Bump release to match kernel
