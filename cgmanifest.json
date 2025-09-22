@@ -24303,8 +24303,8 @@
         "type": "other",
         "other": {
           "name": "python-pyperclip",
-          "version": "1.6.4",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyperclip/pyperclip-1.6.4.tar.gz"
+          "version": "1.8.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyperclip/pyperclip-1.8.2.tar.gz"
         }
       }
     },
