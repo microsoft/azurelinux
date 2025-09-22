@@ -402,12 +402,6 @@ do
             package_version_major=${package_version%%.*}             # 18
             package_version_major_minor=${package_version%.*}        # 18.18
 
-            # Special handling for imagecustomizer: use semantic version only (e.g., 0.19.0)
-            if [[ "$container_type" == "imagecustomizer" ]]; then
-                # Extract semantic version part (e.g., 0.19.0-1 -> 0.19.0)
-                package_version_major_minor=${package_version%%-*}
-            fi
-
             if [[ $package_version == *"-debug-nonroot" ]]; then
                 package_version_major=$package_version_major"-debug-nonroot"
                 package_version_major_minor=$package_version_major_minor"-debug-nonroot"
@@ -471,13 +465,15 @@ do
                     "$ARCHITECTURE_TO_BUILD"
             fi
 
-            # Special handling for imagecustomizer: create latest tag
+            # Special handling for imagecustomizer: create additional semantic version tag (e.g., 0.19.0)
             if [[ "$container_type" == "imagecustomizer" ]]; then
-                echo "Creating 'latest' tag for imagecustomizer"
+                # Extract semantic version part (e.g., 0.19.0-1 -> 0.19.0) and create additional tag
+                semantic_version=${package_version%%-*}
+                echo "Creating additional semantic version tag for imagecustomizer: $semantic_version"
                 create_multi_arch_tags \
                     "$image_name_with_noarch" \
                     "$container_name" \
-                    "latest" \
+                    "$semantic_version" \
                     "$azure_linux_version" \
                     "$ARCHITECTURE_TO_BUILD"
             fi
