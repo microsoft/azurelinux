@@ -122,6 +122,8 @@ KCFLAGS="%{kcflags}" make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="
 install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
 
+make INSTALL_MOD_PATH=%{buildroot} modules_install
+
 D=%{buildroot}%{_datadir}/cloud-hypervisor
 %ifarch x86_64
 install -D -m 644 %{image} $D/%{image_fname}
@@ -156,6 +158,10 @@ cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/script
 %defattr(-,root,root)
 %license COPYING
 %{_datadir}/cloud-hypervisor/%{image_fname}
+%{_datadir}/cloud-hypervisor/bzImage
+%dir %{_datadir}/cloud-hypervisor
+%dir /lib/modules/%{uname_r}
+/lib/modules/%{uname_r}/*
 %ifarch x86_64
 %{_datadir}/cloud-hypervisor/bzImage
 %endif
