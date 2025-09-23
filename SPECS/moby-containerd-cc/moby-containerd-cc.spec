@@ -35,7 +35,7 @@ BuildRequires: golang
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
-BuildRequires: glibc-static >= 2.38-12%{?dist}
+BuildRequires: glibc-static >= 2.38-13%{?dist}
 
 Requires: moby-runc >= 1.1.0
 

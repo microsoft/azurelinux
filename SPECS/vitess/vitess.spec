@@ -109,7 +109,7 @@ go check -t go/cmd \
 
 %changelog
 * Tue Sept 09 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 21.0.0-1
-- Upgrade to version to 21.0.0
+- Upgrade to version 21.0.0
 
 * Fri Apr 11 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 19.0.4-7
 - Add patch for CVE-2024-53257
