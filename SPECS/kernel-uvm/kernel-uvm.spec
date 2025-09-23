@@ -97,6 +97,7 @@ make mrproper
 
 cp %{config_source} .config
 cp .config current_config
+sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
 make LC_ALL= ARCH=%{arch} oldconfig
 
 # Verify the config files match
