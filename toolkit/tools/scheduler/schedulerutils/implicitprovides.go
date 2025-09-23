@@ -37,13 +37,13 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 			return
 		}
 
-		didInjectAny = didInjectAny || len(provideToNodes) > 0
-
 		for provide, nodes := range provideToNodes {
 			err = replaceNodesWithProvides(pkgGraph, provide, nodes, rpmFile)
 			if err != nil {
 				return
 			}
+
+			didInjectAny = true
 		}
 	}
 
