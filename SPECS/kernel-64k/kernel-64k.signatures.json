@@ -1,11 +1,7 @@
 {
   "Signatures": {
     "azurelinux-ca-20230216.pem": "d545401163c75878319f01470455e6bc18a5968e39dd964323225e3fe308849b",
-<<<<<<< HEAD
-    "config_aarch64": "5147c5f7eb942d5a96c2ed4156e32387c3b1a970227e80dda2f888e7551acea3",
-=======
-    "config_aarch64": "6ad358e9ddfcea88de68641adbdbff27f30363b6aeddd0a6d0e34d239a516b23",
->>>>>>> 71e4c0cf4 ([fasttrack 3.0] Upgrade kernels to 6.6.104.2 (#14694))
+    "config_aarch64": "9283c84820441e0726aa2fb0d0fea02db5d2de8b506b4ea2b74c8a3287d47750",
     "cpupower": "d7518767bf2b1110d146a49c7d42e76b803f45eb8bd14d931aa6d0d346fae985",
     "cpupower.service": "b057fe9e5d0e8c36f485818286b80e3eba8ff66ff44797940e99b1fd5361bb98",
     "sha512hmac-openssl.sh": "02ab91329c4be09ee66d759e4d23ac875037c3b56e5a598e32fd1206da06a27f",
