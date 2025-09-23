@@ -11,7 +11,7 @@
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        6.6.96.mshv1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -78,7 +78,6 @@ The kernel package contains the Linux kernel.
 %package devel
 Summary:        Lightweight kernel Devel package
 Group:          System Environment/Kernel
-Requires:       %{name} = %{version}-%{release}
 
 %description devel
 This package contains the kernel UVM devel files
@@ -154,6 +153,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Tue Sep 23 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.6.96.mshv1-2
+- Removed invalid run-time dependency from the 'devel' subpackage.
+
 * Tue Sep 09 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.96.mshv1-1
 - Upgrade to 6.6.96.mshv1
 

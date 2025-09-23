@@ -11,7 +11,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        6.6.100.mshv1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -54,7 +54,6 @@ The Mariner kernel that has MSHV Host support
 %package devel
 Summary:        MSHV kernel Dev
 Group:          System Environment/Kernel
-Requires:       %{name} = %{version}-%{release}
 Requires:       gawk
 Requires:       python3
 
@@ -245,6 +244,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Tue Sep 23 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.6.100.mshv1-2
+- Removed invalid run-time dependency from the 'devel' subpackage.
+
 * Tue Sep 09 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.100.mshv1-1
 - Upgrade to 6.6.100.mshv1
 

@@ -4,7 +4,7 @@
 Summary:        Linux API header files
 Name:           kernel-hwe-headers
 Version:        6.12.40.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -34,6 +34,9 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Tue Sep 23 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.12.40.1-3
+- Bump release to match kernel
+
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.12.40.1-2
 - Bump to match kernel-hwe
 
