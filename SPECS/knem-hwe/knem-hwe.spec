@@ -49,7 +49,7 @@
 %global KMOD_PREAMBLE "%{_vendor}" != "openEuler"
 
 # set package name
-%{!?_name: %global _name knem}
+%{!?_name: %global _name knem-hwe}
 %global non_kmp_pname %{name}-modules
 
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication

@@ -39,7 +39,7 @@
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
-%{!?_name: %define _name iser}
+%{!?_name: %define _name iser-hwe}
 %{!?_version: %define _version 24.10}
 %{!?_mofed_full_version: %define _mofed_full_version %{_version}-21%{release_suffix}%{?dist}}
 %{!?_release: %define _release OFED.24.10.0.6.7.1}
