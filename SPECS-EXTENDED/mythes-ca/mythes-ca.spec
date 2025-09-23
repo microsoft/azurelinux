@@ -37,7 +37,8 @@ done
 popd
 
 %files
-%doc dictionaries/README_th_ca.txt LICENCES-fr.txt LICENSES-en.txt LICENCIAS-es.txt LLICENCIES-ca.txt release_note-ca.txt
+%license LICENCES-fr.txt LICENSES-en.txt LICENCIAS-es.txt LLICENCIES-ca.txt
+%doc dictionaries/README_th_ca.txt release_note-ca.txt
 %{_datadir}/mythes/*
 
 %changelog
