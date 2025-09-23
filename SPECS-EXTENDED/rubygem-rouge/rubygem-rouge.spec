@@ -10,7 +10,7 @@ License:        MIT AND BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://rouge.jneen.net/
-Source0:        https://github.com/rouge-ruby/%{gem_name}/archive/refs/tags/v4.4.0.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/rouge-ruby/%{gem_name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source10:       spec_helper_assert.rb
 Source11:       bundler.rb
 BuildRequires:  ruby(release)
@@ -94,7 +94,7 @@ find spec -name \*_spec.rb -print0 | \
 %changelog
 * Tue Dec 24 2024 Akhila Guruju <v-guakhila@microsoft.com> - 4.4.0-2
 - Initial Azure Linux import from Fedora 41 (license: MIT).
-- Build with .tar.gz
+- Build from .tar.gz source
 - License verified.
 
 * Fri Sep 20 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 4.4.0-1
