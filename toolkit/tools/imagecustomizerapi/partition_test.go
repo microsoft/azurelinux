@@ -171,7 +171,7 @@ func TestPartitionIsValidUnsupportedFileSystem(t *testing.T) {
 
 	err := partition.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "FileSystemType")
+	assert.ErrorContains(t, err, "fileSystemType")
 }
 
 func TestPartitionIsValidBadEspFsType(t *testing.T) {
