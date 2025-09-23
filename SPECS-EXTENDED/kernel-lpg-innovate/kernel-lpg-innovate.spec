@@ -29,7 +29,7 @@
 Summary:        Linux Kernel
 Name:           kernel-lpg-innovate
 Version:        6.6.89.2
-Release:        1003%{?dist}
+Release:        1004%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -105,7 +105,6 @@ The kernel package contains the Linux kernel.
 %package devel
 Summary:        Kernel Dev
 Group:          System Environment/Kernel
-Requires:       %{name} = %{version}-%{release}
 Requires:       gawk
 Requires:       python3
 Obsoletes:      linux-dev
@@ -470,6 +469,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Sep 23 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.6.89.2-1004
+- Removed invalid run-time dependency from the 'devel' subpackage.
+
 * Fri Aug 22 2025 Siddharth Chintamaneni <siddharthc@microsoft.com> - 6.6.89.2-1003
 - Introducing kernel-hwe
 
