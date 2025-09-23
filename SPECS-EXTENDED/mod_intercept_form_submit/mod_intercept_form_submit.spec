@@ -56,7 +56,8 @@ install -Dp -m 0644 intercept_form_submit.module $RPM_BUILD_ROOT%{_httpd_modconf
 install -Dp -m 0644 intercept_form_submit.confx $RPM_BUILD_ROOT%{_httpd_confdir}/intercept_form_submit.conf
 
 %files
-%doc README LICENSE docs/*
+%license LICENSE
+%doc README docs/*
 %if "%{_httpd_modconfdir}" != "%{_httpd_confdir}"
 %config(noreplace) %{_httpd_modconfdir}/55-intercept_form_submit.conf
 %endif
