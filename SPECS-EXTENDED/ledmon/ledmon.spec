@@ -75,7 +75,8 @@ autoreconf -fiv
 %systemd_postun_with_restart ledmon.service
 
 %files
-%doc README.md COPYING
+%license COPYING
+%doc README.md
 %{_sbindir}/ledctl
 %{_sbindir}/ledmon
 %{_mandir}/*/*
