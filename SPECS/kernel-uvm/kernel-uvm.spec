@@ -117,6 +117,8 @@ KCFLAGS="%{kcflags}" make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="
 install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
 
+make INSTALL_MOD_PATH=%{buildroot} modules_install
+
 D=%{buildroot}%{_datadir}/cloud-hypervisor
 install -D -m 644 %{image} $D/%{image_fname}
 install -D -m 644 arch/%{arch}/boot/bzImage $D/bzImage
@@ -145,6 +147,8 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_datadir}/cloud-hypervisor/%{image_fname}
 %{_datadir}/cloud-hypervisor/bzImage
 %dir %{_datadir}/cloud-hypervisor
+%dir /lib/modules/%{uname_r}
+/lib/modules/%{uname_r}/*
 %ifarch x86_64
 /lib/modules/%{name}/vmlinux
 %endif
