@@ -96,7 +96,8 @@ echo "# Local configuration options go here (defaults are in %{_datadir}/logwatc
 echo "# Configuration overrides for specific logfiles/services may be placed here." > %{buildroot}%{_sysconfdir}/logwatch/conf/override.conf
 
 %files
-%doc README HOWTO-Customize-LogWatch LICENSE
+%license LICENSE
+%doc README HOWTO-Customize-LogWatch
 %dir %{_var}/cache/logwatch
 %dir %{_sysconfdir}/logwatch
 %dir %{_sysconfdir}/logwatch/scripts
