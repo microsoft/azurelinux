@@ -254,7 +254,7 @@ drivers against it.
 %{nil}
 
 %global __debug_package 1
-%global buildsubdir %{_name}-%{version}
+%global buildsubdir mlnx-ofa_kernel-%{version}
 # Disgusting hack alert! We need to ensure we sign modules *after* all
 # invocations of strip occur, which is in __debug_install_post if
 # find-debuginfo.sh runs, and __os_install_post if not.
@@ -292,7 +292,7 @@ drivers against it.
 %{!?install_mod_dir: %global install_mod_dir updates}
 
 %prep
-%setup -n %{_name}-%{_version}
+%setup -n mlnx-ofa_kernel-%{_version}
 %patch 0 -p1
 set -- *
 mkdir source
@@ -379,7 +379,7 @@ done
 
 # copy sources
 mkdir -p %{buildroot}/%{_prefix}/src/ofa_kernel-%{version}
-cp -a %{_builddir}/%{_name}-%{version}/source %{buildroot}/%{_prefix}/src/ofa_kernel-%{version}/source
+cp -a %{_builddir}/mlnx-ofa_kernel-%{version}/source %{buildroot}/%{_prefix}/src/ofa_kernel-%{version}/source
 ln -s ofa_kernel-%{version}/source %{buildroot}/%{_prefix}/src/mlnx-ofa_kernel-%{version}
 # Fix path of BACKPORT_INCLUDES
 sed -i -e "s@=-I.*backport_includes@=-I/usr/src/ofa_kernel-$VERSION/backport_includes@" %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION}/configure.mk.kernel || true
