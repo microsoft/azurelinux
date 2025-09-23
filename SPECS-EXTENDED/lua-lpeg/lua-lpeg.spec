@@ -72,11 +72,13 @@ popd
 lua test.lua
 
 %files
-%doc HISTORY lpeg.html re.html lpeg-128.gif test.lua
+%license lpeg.html re.html
+%doc HISTORY lpeg-128.gif test.lua
 %{lua_libdir}/*
 %{lua_pkgdir}/*
 
 %files -n lua%{lua_compat_version}-%{lua_pkg_name}
+%license lpeg.html re.html
 %{lua_compat_libdir}/*
 %{lua_compat_pkgdir}/*
 
