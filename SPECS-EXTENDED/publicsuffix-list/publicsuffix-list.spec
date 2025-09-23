@@ -80,7 +80,7 @@ ln -s public_suffix_list.dat $RPM_BUILD_ROOT/%{_datadir}/publicsuffix/effective_
 %endif
 
 %changelog
-* Wed Mar 12 2025 Akhila Guruju <v-guakhila@microsoft.com> - 20250116-2
+* Tue Mar 11 2025 Akhila Guruju <v-guakhila@microsoft.com> - 20250116-2
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
 
