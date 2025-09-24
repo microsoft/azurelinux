@@ -14,7 +14,7 @@ Source0:        https://github.com/keras-team/keras/archive/refs/tags/v%{version
 Patch00:        0001-Add-Keras-3.3.3.patch
 Patch01:        CVE-2025-1550.patch
 Patch02:        CVE-2025-8747.patch
-Patch3:         CVE-2025-9905.patch
+Patch03:        CVE-2025-9905.patch
 
 # Fix for CVE-2025-9906 included as part of CVE-2025-8747 and kept here as nopatch
 # and commented out, because from patch command perspective, these files
