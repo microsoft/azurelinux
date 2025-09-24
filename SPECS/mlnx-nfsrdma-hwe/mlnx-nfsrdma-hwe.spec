@@ -122,11 +122,11 @@ BuildRequires: %kernel_module_package_buildreqs
 %if "%{WITH_MOD_SIGN}" == "1"
 # call module sign script
 %global __modsign_install_post \
-    %{_builddir}/%{_name}-%{version}/source/tools/sign-modules %{buildroot}/lib/modules/ %{kernel_source default} || exit 1 \
+    %{_builddir}/mlnx-nfsrdma-%{version}/source/tools/sign-modules %{buildroot}/lib/modules/ %{kernel_source default} || exit 1 \
 %{nil}
 
 %global __debug_package 1
-%global buildsubdir %{_name}-%{version}
+%global buildsubdir mlnx-nfsrdma-%{version}
 # Disgusting hack alert! We need to ensure we sign modules *after* all
 # invocations of strip occur, which is in __debug_install_post if
 # find-debuginfo.sh runs, and __os_install_post if not.
@@ -165,7 +165,7 @@ BuildRequires: %kernel_module_package_buildreqs
 %{!?install_mod_dir: %global install_mod_dir updates/%{name}}
 
 %prep
-%setup -n %{_name}-%{_version}
+%setup -n mlnx-nfsrdma-%{_version}
 set -- *
 mkdir source
 mv "$@" source/
