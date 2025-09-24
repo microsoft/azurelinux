@@ -915,8 +915,8 @@
         "type": "other",
         "other": {
           "name": "azurelinux-image-tools",
-          "version": "0.19.0",
-          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v0.19.0.tar.gz"
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.0.0.tar.gz"
         }
       }
     },
