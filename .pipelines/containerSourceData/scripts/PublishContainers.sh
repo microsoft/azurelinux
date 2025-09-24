@@ -465,9 +465,9 @@ do
                     "$ARCHITECTURE_TO_BUILD"
             fi
 
-            # Special handling for imagecustomizer: create additional semantic version tag (e.g., 0.19.0)
+            # Special handling for imagecustomizer: create latest and semantic version tag (e.g., 1.0.0)
             if [[ "$container_type" == "imagecustomizer" ]]; then
-                # Extract semantic version part (e.g., 0.19.0-1 -> 0.19.0) and create additional tag
+                # Extract semantic version part (e.g., 1.0.0-1 -> 1.0.0) and create additional tag
                 semantic_version=${package_version%%-*}
                 echo "Creating additional semantic version tag for imagecustomizer: $semantic_version"
                 create_multi_arch_tags \
@@ -477,6 +477,7 @@ do
                     "$azure_linux_version" \
                     "$ARCHITECTURE_TO_BUILD"
 
+                # Create 'latest' tag pointing to the highest semantic version
                 echo "Creating 'latest' tag for imagecustomizer"
                 create_multi_arch_tags \
                     "$image_name_with_noarch" \
