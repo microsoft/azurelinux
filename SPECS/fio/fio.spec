@@ -1,12 +1,13 @@
 Summary:        Multithreaded IO generation tool
 Name:           fio
 Version:        3.37
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://git.kernel.dk/?p=fio.git;a=summary
 Source0:        https://brick.kernel.dk/snaps/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2025-10823.patch
 
 %bcond_without nbd
 %bcond_with rbd
@@ -220,6 +221,9 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 %endif
 
 %changelog
+* Wed Sep 24 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.37-3
+- Patch for CVE-2025-10823
+
 * Thu Jun 06 2024 Andrew Phelps <anphel@microsoft.com> - 3.37-2
 - Update spec based on Fedora 40 package (license: MIT)
 - Disable building rbd and rados subpackages
