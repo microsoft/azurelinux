@@ -1,12 +1,15 @@
 Summary:        Multithreaded IO generation tool
 Name:           fio
 Version:        3.30
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://git.kernel.dk/?p=fio.git;a=summary
 Source0:        https://brick.kernel.dk/snaps/%{name}-%{version}.tar.bz2
+
+Patch1:         CVE-2025-10823.patch
+
 BuildRequires:  gcc
 BuildRequires:  gnupg2
 BuildRequires:  libaio-devel
@@ -22,7 +25,7 @@ BuildRequires:  zlib-devel
 BuildRequires:  libpmem-devel
 BuildRequires:  libpmemblk-devel
 %endif
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  CUnit-devel
 %endif
 
@@ -191,6 +194,9 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 %{_libdir}/fio/fio-rdma.so
 
 %changelog
+* Wed Sep 24 2025 Akarsh Chaudhary <v-akarshc@microsoft.com>- 3.30-3
+- Patch CVE-2025-10823
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.30-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
