@@ -90,7 +90,8 @@
 
 %{!?KERNEL_SOURCES: %global KERNEL_SOURCES /lib/modules/%{KVERSION}/source}
 
-%{!?_name: %global _name mlnx-ofa_kernel-hwe}
+%global base_name mlnx-ofa_kernel
+%{!?_name: %global _name %{base_name}-hwe}
 %{!?_version: %global _version 24.10}
 %{!?_release: %global _release OFED.24.10.0.7.0.1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
@@ -250,7 +251,7 @@ drivers against it.
 %if "%{WITH_MOD_SIGN}" == "1"
 # call module sign script
 %global __modsign_install_post \
-    %{_builddir}/$NAME-$VERSION/source/ofed_scripts/tools/sign-modules %{buildroot}/lib/modules/ %{kernel_source default} || exit 1 \
+    %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/tools/sign-modules %{buildroot}/lib/modules/ %{kernel_source default} || exit 1 \
 %{nil}
 
 %global __debug_package 1
@@ -405,19 +406,19 @@ chmod +x ${INFO} > /dev/null 2>&1
 %if "%{WITH_SYSTEMD}" == "1"
 install -d %{buildroot}%{_unitdir}
 install -d %{buildroot}/etc/systemd/system
-install -m 0644 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/openibd.service %{buildroot}%{_unitdir}
-install -m 0644 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_interface_mgr\@.service %{buildroot}/etc/systemd/system
+install -m 0644 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/openibd.service %{buildroot}%{_unitdir}
+install -m 0644 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/mlnx_interface_mgr\@.service %{buildroot}/etc/systemd/system
 %endif
 
 install -d %{buildroot}/bin
-install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_conf_mgr.sh %{buildroot}/bin/
+install -m 0755 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/mlnx_conf_mgr.sh %{buildroot}/bin/
 %if "%{WINDRIVER}" == "0" && "%{BLUENIX}" == "0"
-install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_interface_mgr.sh %{buildroot}/bin/
+install -m 0755 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/mlnx_interface_mgr.sh %{buildroot}/bin/
 %else
 # Wind River and Mellanox Bluenix are rpm based, however, interfaces management is done in Debian style
 install -d %{buildroot}/usr/sbin
-install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_interface_mgr_deb.sh %{buildroot}/bin/mlnx_interface_mgr.sh
-install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/net-interfaces %{buildroot}/usr/sbin
+install -m 0755 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/mlnx_interface_mgr_deb.sh %{buildroot}/bin/mlnx_interface_mgr.sh
+install -m 0755 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/net-interfaces %{buildroot}/usr/sbin
 %endif
 
 # Install ibroute utilities
