@@ -4,7 +4,7 @@ Distribution:   Azure Linux
 
 Name:           python-gssapi
 Version:        1.7.3
-Release:        11%{?dist}
+Release:        1%{?dist}
 Summary:        Python Bindings for GSSAPI (RFC 2743/2744 and extensions)
  
 License:        ISC
@@ -60,7 +60,7 @@ Requires:       krb5-libs >= 1.19
 
 %changelog
 * Sat Feb 22 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.7.3-1
-- Upgrade to version 1.7.3
+- Initial Azure Linux import from fedora 41.
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-6
