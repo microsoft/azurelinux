@@ -168,7 +168,7 @@ BuildRequires: %kernel_module_package_buildreqs
 %{!?install_mod_dir: %global install_mod_dir updates/%{name}}
 
 %prep
-%setup -n %{_name}-%{_version}
+%setup -n fwctl-%{_version}
 set -- *
 mkdir source
 mv "$@" source/
