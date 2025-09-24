@@ -158,8 +158,6 @@ cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/script
 %defattr(-,root,root)
 %license COPYING
 %{_datadir}/cloud-hypervisor/%{image_fname}
-%{_datadir}/cloud-hypervisor/bzImage
-%dir %{_datadir}/cloud-hypervisor
 %dir /lib/modules/%{uname_r}
 /lib/modules/%{uname_r}/*
 %ifarch x86_64
