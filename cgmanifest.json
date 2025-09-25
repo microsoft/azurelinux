@@ -16353,8 +16353,8 @@
         "type": "other",
         "other": {
           "name": "perl-Business-ISBN",
-          "version": "3.005",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Business-ISBN-3.005.tar.gz"
+          "version": "3.009",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BR/BRIANDFOY/Business-ISBN-3.009.tar.gz"
         }
       }
     },
