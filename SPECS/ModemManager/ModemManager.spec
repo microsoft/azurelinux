@@ -1,7 +1,7 @@
 Summary:        Mobile broadband modem manager
 Name:           ModemManager
 Version:        1.18.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,6 +48,7 @@ make %{?_smp_mflags}
 make DESTDIR=%{buildroot} install
 
 %check
+make install
 make  %{?_smp_mflags} check
 
 %post   -p /sbin/ldconfig
