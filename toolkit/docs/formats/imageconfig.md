@@ -6,7 +6,13 @@ Image configuration consists of two sections - Disks and SystemConfigs - that de
 ## Disks
 Disks entry specifies the disk configuration like its size (for virtual disks), partitions and partition table.
 
-## TargetDisk
+The `PartitionTableType` field may be one of `gpt` or `mbr`.
+
+The `MaxSize` field specifies the size (in MiB) of the disk image.
+
+The optional `BlockSize` field sets the disk image block size (512 or 4096) and defaults to 512 if unspecified.
+
+### TargetDisk
 Required when building unattended ISO installer. This field defines the physical disk to which Mariner should be installed. The `Type` field must be set to `path` and the `Value` field must be set to the desired target disk path.
 
 ### Artifacts
