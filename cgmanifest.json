@@ -11851,8 +11851,8 @@
         "type": "other",
         "other": {
           "name": "libwpg",
-          "version": "0.3.3",
-          "downloadUrl": "https://download.sourceforge.net/libwpg/libwpg-0.3.3.tar.xz"
+          "version": "0.3.4",
+          "downloadUrl": "https://downloads.sourceforge.net/libwpg/libwpg-0.3.4.tar.xz"
         }
       }
     },
