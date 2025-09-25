@@ -1,0 +1,34 @@
+diff -Naur lasso-2.8.2.orig/bindings/python/tests/binding_tests.py lasso-2.8.2/bindings/python/tests/binding_tests.py
+--- lasso-2.8.2.orig/bindings/python/tests/binding_tests.py	2024-06-20 15:00:31.347898776 +0200
++++ lasso-2.8.2/bindings/python/tests/binding_tests.py	2024-06-20 15:18:27.921376653 +0200
+@@ -352,7 +352,7 @@
+         with self.assertRaises(TypeError, msg='value should be a tuple of PyGobject'):
+             node.attributeValue = value
+ 
+-bindingSuite = unittest.makeSuite(BindingTestCase, 'test')
++bindingSuite = unittest.defaultTestLoader.loadTestsFromTestCase(BindingTestCase)
+ 
+ allTests = unittest.TestSuite((bindingSuite, ))
+ 
+diff -Naur lasso-2.8.2.orig/bindings/python/tests/profiles_tests.py lasso-2.8.2/bindings/python/tests/profiles_tests.py
+--- lasso-2.8.2.orig/bindings/python/tests/profiles_tests.py	2024-06-20 15:00:31.347898776 +0200
++++ lasso-2.8.2/bindings/python/tests/profiles_tests.py	2024-06-20 15:17:55.092666666 +0200
+@@ -542,12 +542,12 @@
+         assert aq.response.assertion[0].attributeStatement[0].attribute[0]
+         assert aq.response.assertion[0].attributeStatement[0].attribute[0].attributeValue[0]
+ 
+-serverSuite = unittest.makeSuite(ServerTestCase, 'test')
+-loginSuite = unittest.makeSuite(LoginTestCase, 'test')
+-logoutSuite = unittest.makeSuite(LogoutTestCase, 'test')
+-defederationSuite = unittest.makeSuite(DefederationTestCase, 'test')
+-identitySuite = unittest.makeSuite(IdentityTestCase, 'test')
+-attributeSuite = unittest.makeSuite(AttributeAuthorityTestCase, 'test')
++serverSuite = unittest.defaultTestLoader.loadTestsFromTestCase(ServerTestCase)
++loginSuite = unittest.defaultTestLoader.loadTestsFromTestCase(LoginTestCase)
++logoutSuite = unittest.defaultTestLoader.loadTestsFromTestCase(LogoutTestCase)
++defederationSuite = unittest.defaultTestLoader.loadTestsFromTestCase(DefederationTestCase)
++identitySuite = unittest.defaultTestLoader.loadTestsFromTestCase(IdentityTestCase)
++attributeSuite = unittest.defaultTestLoader.loadTestsFromTestCase(AttributeAuthorityTestCase)
+ 
+ allTests = unittest.TestSuite((serverSuite, loginSuite, logoutSuite, defederationSuite,
+                                identitySuite, attributeSuite))
