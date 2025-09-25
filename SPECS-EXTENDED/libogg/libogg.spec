@@ -2,14 +2,15 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:        The Ogg bitstream file format library
 Name:           libogg
-Version:        1.3.4
-Release:        4%{?dist}
-License:        BSD
+Version:        1.3.5
+Release:        1%{?dist}
+License:        BSD-3-Clause
 URL:            http://www.xiph.org/
 
-Source:         http://downloads.xiph.org/releases/ogg/%{name}-%{version}.tar.xz
+Source:         https://downloads.xiph.org/releases/ogg/%{name}-%{version}.tar.xz
 
 BuildRequires:  gcc
+BuildRequires:  make
 
 %description
 Libogg is a library for manipulating Ogg bitstream file formats.
@@ -44,14 +45,12 @@ Documentation for developing applications with libogg
 
 
 %build
-sed -i "s|-O20|$RPM_OPT_FLAGS|" configure
-sed -i "s|-ffast-math||" configure
 %configure --disable-static
-make %{?_smp_mflags}
+%make_build
 
 
 %install
-make DESTDIR=$RPM_BUILD_ROOT install
+%make_install
 
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
@@ -81,6 +80,10 @@ mv $RPM_BUILD_ROOT%{_docdir}/%{name} __installed_docs
 
 
 %changelog
+* Wed Nov 20 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.3.5-1
+-License Verified
+- Upgrade to version 1.3.5
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.3.4-4
 - Remove epoch
 
