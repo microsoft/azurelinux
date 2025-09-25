@@ -64,8 +64,8 @@ Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
 Patch0:         CVE-2023-4039.patch
-Patch1:         CVE-2021-32256.patch
-Patch2:         fix-infinite-recursion.patch
+Patch1:         fix-infinite-recursion.patch
+Patch2:         CVE-2021-32256.patch
 
 BuildRequires:  gmp-devel
 BuildRequires:  mpfr-devel
