@@ -123,7 +123,7 @@ func updateGrubConfigForVerity(rootfsVerity imagecustomizerapi.Verity, rootHash 
 		return err
 	}
 
-	formattedCorruptionOption, err := systemdFormatCorruptionOption(rootfsVerity.CorruptionOption)
+	formattedCorruptionOption, err := SystemdFormatCorruptionOption(rootfsVerity.CorruptionOption)
 	if err != nil {
 		return err
 	}
@@ -231,7 +231,7 @@ func systemdFormatPartitionId(configDeviceId string, mountIdType imagecustomizer
 	}
 }
 
-func systemdFormatCorruptionOption(corruptionOption imagecustomizerapi.CorruptionOption) (string, error) {
+func SystemdFormatCorruptionOption(corruptionOption imagecustomizerapi.CorruptionOption) (string, error) {
 	switch corruptionOption {
 	case imagecustomizerapi.CorruptionOptionDefault, imagecustomizerapi.CorruptionOptionIoError:
 		return "", nil
