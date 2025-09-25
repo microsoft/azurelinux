@@ -1,0 +1,379 @@
+From ebb60f75d3c49ea6eb3f2f9d22563205fc2f1a05 Mon Sep 17 00:00:00 2001
+From: "Frank Ch. Eigler" <fche@redhat.com>
+Date: Thu, 22 Jul 2021 19:16:12 -0400
+Subject: [PATCH 1/4] runtime: adapt to -Werror=implicit-fallthrough=5
+
+Linux kbuild commit d936eb23874 sets $subject CFLAGS, so to play
+catch-up, we also need to use gcc attribute(fallthrough) to label such
+spots in switch() statements in our runtime / tapset.  Tested on
+linux5.14 gcc11 rawhide and linux3.10 gcc4 rhel7.
+---
+ runtime/linux/runtime.h       | 16 +++++++++
+ runtime/map-gen.c             |  4 +--
+ runtime/syscall.h             | 64 +++++++++++++++++------------------
+ runtime/unwind.c              |  6 ++--
+ runtime/unwind/unwind.h       |  4 +--
+ runtime/vsprintf.c            |  8 ++---
+ tapset/linux/aux_syscalls.stp | 12 +++----
+ 7 files changed, 65 insertions(+), 49 deletions(-)
+
+diff --git a/runtime/linux/runtime.h b/runtime/linux/runtime.h
+index 035f0bd97..e57d10a8a 100644
+--- a/runtime/linux/runtime.h
++++ b/runtime/linux/runtime.h
+@@ -65,6 +65,22 @@
+ static void *kallsyms_copy_to_kernel_nofault;
+ #endif
+ 
++
++/* A fallthrough; macro to let the runtime survive -Wimplicit-fallthrough=5 */
++/* from <linux/compiler_attribute.h> */
++#ifndef fallthrough
++#if __GNUC__ < 5
++# define fallthrough                    do {} while (0)  /* fallthrough */
++#else
++#if __has_attribute(__fallthrough__)
++# define fallthrough                    __attribute__((__fallthrough__))
++#else
++# define fallthrough                    do {} while (0)  /* fallthrough */
++#endif
++#endif
++#endif
++
++
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,23)
+ #include <linux/user_namespace.h>
+ #endif
+diff --git a/runtime/map-gen.c b/runtime/map-gen.c
+index aeeab38bf..47317d61f 100644
+--- a/runtime/map-gen.c
++++ b/runtime/map-gen.c
+@@ -112,9 +112,9 @@
+                 k1 = 0; \
+                 switch(mylen & 3) {                \
+                 case 3: k1 ^= tail[2] << 16; \
+-                        /* fallthrough */ \
++                        fallthrough; \
+                 case 2: k1 ^= tail[1] << 8; \
+-                        /* fallthrough */ \
++                        fallthrough; \
+                 case 1: k1 ^= tail[0]; \
+                         k1 *= c1; k1 = ROTL32(k1,15); k1 *= c2; h1 ^= k1; \
+                 } \
+diff --git a/runtime/syscall.h b/runtime/syscall.h
+index 6b4b3071a..f5b473b04 100644
+--- a/runtime/syscall.h
++++ b/runtime/syscall.h
+@@ -351,23 +351,23 @@ _stp_syscall_get_arguments(struct task_struct *task, struct pt_regs *regs,
+ 		case 0:
+ 			if (!n--) break;
+ 			*args++ = regs->bx;
+-			/* fallthrough */
++                        fallthrough;
+ 		case 1:
+ 			if (!n--) break;
+ 			*args++ = regs->cx;
+-			/* fallthrough */
++                        fallthrough;
+ 		case 2:
+ 			if (!n--) break;
+ 			*args++ = regs->dx;
+-			/* fallthrough */
++                        fallthrough;
+ 		case 3:
+ 			if (!n--) break;
+ 			*args++ = regs->si;
+-			/* fallthrough */
++                        fallthrough;
+ 		case 4:
+ 			if (!n--) break;
+ 			*args++ = regs->di;
+-			/* fallthrough */
++                        fallthrough;
+ 		case 5:
+ 			if (!n--) break;
+ 			*args++ = regs->bp;
+@@ -375,23 +375,23 @@ _stp_syscall_get_arguments(struct task_struct *task, struct pt_regs *regs,
+ 		case 0:
+ 			if (!n--) break;
+ 			*args++ = regs->rbx;
+-			/* fallthrough */
++                        fallthrough;
+ 		case 1:
+ 			if (!n--) break;
+ 			*args++ = regs->rcx;
+-			/* fallthrough */
++                        fallthrough;
+ 		case 2:
+ 			if (!n--) break;
+ 			*args++ = regs->rdx;
+-			/* fallthrough */
++                        fallthrough;
+ 		case 3:
+ 			if (!n--) break;
+ 			*args++ = regs->rsi;
+-			/* fallthrough */
++                        fallthrough;
+ 		case 4:
+ 			if (!n--) break;
+ 			*args++ = regs->rdi;
+-			/* fallthrough */
++                        fallthrough;
+ 		case 5:
+ 			if (!n--) break;
+ 			*args++ = regs->rbp;
+@@ -405,23 +405,23 @@ _stp_syscall_get_arguments(struct task_struct *task, struct pt_regs *regs,
+ 	case 0:
+ 		if (!n--) break;
+ 		*args++ = regs->di;
+-		/* fallthrough */
++                fallthrough;
+ 	case 1:
+ 		if (!n--) break;
+ 		*args++ = regs->si;
+-		/* fallthrough */
++                fallthrough;
+ 	case 2:
+ 		if (!n--) break;
+ 		*args++ = regs->dx;
+-		/* fallthrough */
++                fallthrough;
+ 	case 3:
+ 		if (!n--) break;
+ 		*args++ = regs->r10;
+-		/* fallthrough */
++                fallthrough;
+ 	case 4:
+ 		if (!n--) break;
+ 		*args++ = regs->r8;
+-		/* fallthrough */
++                fallthrough;
+ 	case 5:
+ 		if (!n--) break;
+ 		*args++ = regs->r9;
+@@ -429,23 +429,23 @@ _stp_syscall_get_arguments(struct task_struct *task, struct pt_regs *regs,
+ 	case 0:
+ 		if (!n--) break;
+ 		*args++ = regs->rdi;
+-		/* fallthrough */
++                fallthrough;
+ 	case 1:
+ 		if (!n--) break;
+ 		*args++ = regs->rsi;
+-		/* fallthrough */
++                fallthrough;
+ 	case 2:
+ 		if (!n--) break;
+ 		*args++ = regs->rdx;
+-		/* fallthrough */
++                fallthrough;
+ 	case 3:
+ 		if (!n--) break;
+ 		*args++ = regs->r10;
+-		/* fallthrough */
++                fallthrough;
+ 	case 4:
+ 		if (!n--) break;
+ 		*args++ = regs->r8;
+-		/* fallthrough */
++                fallthrough;
+ 	case 5:
+ 		if (!n--) break;
+ 		*args++ = regs->r9;
+@@ -575,30 +575,30 @@ static inline void _stp_syscall_get_arguments(struct task_struct *task,
+ 		case 6:
+ 			if (!n--) break;
+ 			*args++ = regs->r13;
+-			/* fallthrough */
++			fallthrough;
+ 		case 5:
+ 			if (!n--) break;
+ 			*args++ = regs->r15;
+-			/* fallthrough */
++			fallthrough;
+ 		case 4:
+ 			if (!n--) break;
+ 			*args++ = regs->r14;
+-			/* fallthrough */
++			fallthrough;
+ 		case 3:
+ 			if (!n--) break;
+ 			*args++ = regs->r10;
+-			/* fallthrough */
++			fallthrough;
+ 		case 2:
+ 			if (!n--) break;
+ 			*args++ = regs->r9;
+-			/* fallthrough */
++			fallthrough;
+ 		case 1:
+ 			if (!n--) break;
+ 			*args++ = regs->r11;
+-			/* fallthrough */
++			fallthrough;
+ 		case 0:
+ 			if (!n--) break;
+-			/* fallthrough */
++			fallthrough;
+ 		default:
+ 			BUG();
+ 			break;
+@@ -630,23 +630,23 @@ _stp_syscall_get_arguments(struct task_struct *task, struct pt_regs *regs,
+ 	case 0:
+ 		if (!n--) break;
+ 		*args++ = regs->orig_gpr2 & mask;
+-		/* fallthrough */
++		fallthrough;
+ 	case 1:
+ 		if (!n--) break;
+ 		*args++ = regs->gprs[3] & mask;
+-		/* fallthrough */
++		fallthrough;
+ 	case 2:
+ 		if (!n--) break;
+ 		*args++ = regs->gprs[4] & mask;
+-		/* fallthrough */
++		fallthrough;
+ 	case 3:
+ 		if (!n--) break;
+ 		*args++ = regs->gprs[5] & mask;
+-		/* fallthrough */
++		fallthrough;
+ 	case 4:
+ 		if (!n--) break;
+ 		*args++ = regs->gprs[6] & mask;
+-		/* fallthrough */
++		fallthrough;
+ 	case 5:
+ 		if (!n--) break;
+ 		*args++ = regs->args[0] & mask;
+diff --git a/runtime/unwind.c b/runtime/unwind.c
+index dba16a724..6916d2e96 100644
+--- a/runtime/unwind.c
++++ b/runtime/unwind.c
+@@ -527,7 +527,7 @@ static int processCFI(const u8 *start, const u8 *end, unsigned long targetLoc,
+ 					REG_STATE.cfa.reg = value;
+ 					dbug_unwind(1, "DW_CFA_def_cfa reg=%ld\n", REG_STATE.cfa.reg);
+ 				}
+-				/* fallthrough */
++				fallthrough;
+ 			case DW_CFA_def_cfa_offset:
+ 				if (REG_STATE.cfa_is_expr != 0) {
+ 					_stp_warn("Unexpected DW_CFA_def_cfa_offset\n");
+@@ -549,7 +549,7 @@ static int processCFI(const u8 *start, const u8 *end, unsigned long targetLoc,
+ 						    value, DWARF_REG_MAP(value));
+ 					REG_STATE.cfa.reg = value;
+ 				}
+-				/* fallthrough */
++				fallthrough;
+ 			case DW_CFA_def_cfa_offset_sf:
+ 				if (REG_STATE.cfa_is_expr != 0) {
+ 					_stp_warn("Unexpected DW_CFA_def_cfa_offset_sf\n");
+@@ -922,7 +922,7 @@ static int compute_expr(const u8 *expr, struct unwind_frame_info *frame,
+ 		case DW_OP_bra:
+ 			if (POP == 0)
+ 				break;
+-			/* Fall through.  */
++                        fallthrough;
+ 		case DW_OP_skip:
+ 			NEED(sizeof(u.s16));
+ 			memcpy(&u.s16, expr, sizeof(u.s16));
+diff --git a/runtime/unwind/unwind.h b/runtime/unwind/unwind.h
+index a9586a338..5c68a5f03 100644
+--- a/runtime/unwind/unwind.h
++++ b/runtime/unwind/unwind.h
+@@ -154,13 +154,13 @@ static unsigned long read_ptr_sect(const u8 **pLoc, const void *end,
+ 				value = _stp_get_unaligned(ptr.p32u++);
+ 			break;
+ 		}
+-		/* fallthrough */
++                fallthrough;
+ 	case DW_EH_PE_data8:
+ 		BUILD_BUG_ON(sizeof(u64) != sizeof(value));
+ #else
+ 		BUILD_BUG_ON(sizeof(u32) != sizeof(value));
+ #endif
+-		/* fallthrough */
++                fallthrough;
+ 	case DW_EH_PE_absptr:
+ 		if (compat_task)
+ 		{
+diff --git a/runtime/vsprintf.c b/runtime/vsprintf.c
+index 417d9f7f3..cd31a938b 100644
+--- a/runtime/vsprintf.c
++++ b/runtime/vsprintf.c
+@@ -641,7 +641,7 @@ _stp_vsnprintf(char *buf, size_t size, const char *fmt, va_list args)
+ 
+                     case 'X':
+                             flags |= STP_LARGE;
+-			    /* fallthru */
++			    fallthrough;
+                     case 'x':
+                             base = 16;
+                             break;
+@@ -649,7 +649,7 @@ _stp_vsnprintf(char *buf, size_t size, const char *fmt, va_list args)
+                     case 'd':
+                     case 'i':
+                             flags |= STP_SIGN;
+-			    /* fallthru */
++			    fallthrough;
+                     case 'u':
+                             break;
+ 
+@@ -835,7 +835,7 @@ _stp_vsnprintf(char *buf, size_t size, const char *fmt, va_list args)
+ 
+ 		case 'X':
+ 			flags |= STP_LARGE;
+-			/* fallthru */
++                        fallthrough;
+ 		case 'x':
+ 			base = 16;
+ 			break;
+@@ -843,7 +843,7 @@ _stp_vsnprintf(char *buf, size_t size, const char *fmt, va_list args)
+ 		case 'd':
+ 		case 'i':
+ 			flags |= STP_SIGN;
+-			/* fallthru */
++                        fallthrough;
+ 		case 'u':
+ 			break;
+ 
+diff --git a/tapset/linux/aux_syscalls.stp b/tapset/linux/aux_syscalls.stp
+index ad8a89898..09fb9ff41 100644
+--- a/tapset/linux/aux_syscalls.stp
++++ b/tapset/linux/aux_syscalls.stp
+@@ -156,11 +156,11 @@ sigset_from_compat(sigset_t *set, compat_sigset_t *compat)
+ {
+ 	switch (_NSIG_WORDS) {
+ 	case 4: set->sig[3] = compat->sig[6] | (((long)compat->sig[7]) << 32 );
+-	  /*fallthrough*/
++          fallthrough;
+ 	case 3: set->sig[2] = compat->sig[4] | (((long)compat->sig[5]) << 32 );
+-	  /*fallthrough*/
++          fallthrough;
+ 	case 2: set->sig[1] = compat->sig[2] | (((long)compat->sig[3]) << 32 );
+-	  /*fallthrough*/
++          fallthrough;
+ 	case 1: set->sig[0] = compat->sig[0] | (((long)compat->sig[1]) << 32 );
+ 	}
+ }
+@@ -3627,13 +3627,13 @@ function _struct_sigaction32_u:string(uaddr:long)
+ 	    {
+ 	    case 4: act.sa_mask.sig[3] = act32.sa_mask.sig[6]
+ 		| (((long)act32.sa_mask.sig[7]) << 32);
+-	      /* fallthrough */
++              fallthrough;
+ 	    case 3: act.sa_mask.sig[2] = act32.sa_mask.sig[4]
+ 		| (((long)act32.sa_mask.sig[5]) << 32);
+-	      /* fallthrough */
++              fallthrough;
+ 	    case 2: act.sa_mask.sig[1] = act32.sa_mask.sig[2]
+ 		| (((long)act32.sa_mask.sig[3]) << 32);
+-	      /* fallthrough */
++              fallthrough;
+ 	    case 1: act.sa_mask.sig[0] = act32.sa_mask.sig[0]
+ 		| (((long)act32.sa_mask.sig[1]) << 32);
+ 	    }
+-- 
+2.34.1
+
