@@ -1,22 +1,32 @@
 Summary: Enclosure LED Utilities
 Name: ledmon
-Version: 0.92
-Release: 4%{?dist}
-License: GPLv2+
+Version: 1.1.0
+Release: 2%{?dist}
+License: GPL-2.0-only AND LGPL-2.1-or-later AND GPL-3.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL: https://github.com/intel/ledmon
-Source0: https://github.com/intel/ledmon/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0: https://github.com/intel/ledmon/archive/v%{version}/%{name}-%{version}.tar.gz
 
-Patch0: ledmon_cflags.patch
-BuildRequires: perl-interpreter perl-podlators
+BuildRequires: autoconf automake
+BuildRequires: autoconf-archive
+BuildRequires: gcc make
+BuildRequires: libconfig-devel
+BuildRequires: libtool
+BuildRequires: pciutils-devel
 BuildRequires: sg3_utils-devel
-BuildRequires: gcc
+# Needed for pkgconfig usage.
+BuildRequires: pkgconfig
+BuildRequires: systemd
 # Needed for the udev dependency.
 BuildRequires: systemd-devel
+BuildRequires: systemd-rpm-macros
+
 Obsoletes: ledctl = 0.1-1
 Provides: ledctl = %{version}-%{release}
-Requires: sg3_utils-libs
+
+# https://fedoraproject.org/wiki/Changes/EncourageI686LeafRemoval
+ExcludeArch: %{ix86}
 
 %description
 The ledmon and ledctl are user space applications design to control LED
@@ -25,26 +35,148 @@ types of system: 2-LED system (Activity LED, Status LED) and 3-LED system
 (Activity LED, Locate LED, Fail LED). User must have root privileges to
 use this application.
 
+%package        libs
+Summary:        Runtime library files for %{name}
+Requires:       pciutils-libs
+Requires:       sg3_utils-libs
+
+%description    libs
+The %{name}-libs package contains runtime libraries for applications
+that use %{name}.
+
+%package        devel
+Summary:        Development files for %{name}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       pciutils-devel
+Requires:       sg3_utils-devel
+
+%description    devel
+The %{name}-devel package contains libraries and header files for
+developing applications that use %{name}.
+
 %prep
-%setup -q
-%patch 0 -p1 -b .cflags
+%autosetup -p1
+autoreconf -fiv
 
 %build
-# can't use smp_flags because -j4 makes the build fail
-make CFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS"
+%configure --enable-systemd=yes --enable-library --disable-static
+%make_build
 
 %install
-make install INSTALL="%{__install} -p" DESTDIR=$RPM_BUILD_ROOT SBIN_DIR=$RPM_BUILD_ROOT/%{_sbindir} MANDIR=$RPM_BUILD_ROOT%{_mandir}
+%make_install
+
+%post
+%systemd_post ledmon.service
+
+%preun
+%systemd_preun ledmon.service
+
+%postun
+%systemd_postun_with_restart ledmon.service
 
 %files
-%doc README COPYING
+%license COPYING
+%doc README.md
 %{_sbindir}/ledctl
 %{_sbindir}/ledmon
 %{_mandir}/*/*
+%{_unitdir}/ledmon.service
+
+%files libs
+%{_libdir}/*.so.*
+%{_libdir}/libled.la
+
+%files devel
+%{_includedir}/*
+%{_libdir}/*.so
+%{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.92-4
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Mar 11 2025 Aninda Pradhan <v-anipradhn@microsoft.com> - 1.1.0-2
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+
+* Mon Nov 11 2024 Jan Macku <jamacku@redhat.com> - 1.1.0-1
+- update to 1.1.0
+- drop Packit config
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Mar 27 2024 Jan Macku <jamacku@redhat.com> - 1.0.0-1
+- update to 1.0.0
+- package shared ledmon library by Tony Asleson
+
+* Wed Feb 14 2024 Lukáš Zaoral <lzaoral@redhat.com> - 0.97-6
+- fix incorrect License field syntax
+
+* Fri Feb 09 2024 Dan Horák <dan@danny.cz> - 0.97-5
+- rebuilt for sg3_utils 1.48
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.97-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.97-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue May 16 2023 Jan Macku <jamacku@redhat.com> - 0.97-2
+- use correct SPDX license
+
+* Tue May 16 2023 Jan Macku <jamacku@redhat.com> - 0.97-1
+- update to 0.97
+
+* Tue Apr 11 2023 Lukáš Zaoral <lzaoral@redhat.com> - 0.96-7
+- migrate to SPDX license format
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.96-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Jan 10 2023 Lukáš Zaoral <lzaoral@redhat.com> - 0.96-5
+- Fix build on Rawhide
+- Remove explicit library runtime dependency as suggested by rpmlint
+- Modernise used macros
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.96-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 27 2022 Jan Macku <jamacku@redhat.com> - 0.96-3
+- Rebuild
+
+* Mon Jun 27 2022 Jan Macku <jamacku@redhat.com> - 0.96-2
+- Use systemd-rpm-macros to handle ledmon.service (#2101300)
+
+* Wed Jun 01 2022 Jan Macku <jamacku@redhat.com> - 0.96-1
+- update to 0.96 (#2092134)
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.95-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.95-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Apr 06 2021 Tomas Bzatek <tbzatek@redhat.com> - 0.95-4
+- rebuilt for sg3_utils 1.46
+
+* Mon Feb 22 2021 Jan Macku <jamacku@redhat.com> - 0.95-3
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Tue Feb 02 2021 Jan Macku <jamacku@redhat.com> - 0.95-2
+- drop perl dependency
+
+* Tue Feb 02 2021 Jan Macku <jamacku@redhat.com> - 0.95-1
+- clean up spec based on RHEL 8.4.0 spec
+- remove -Werror=format-truncation=1 from configure
+- update to 0.95 (#1880599)
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.92-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.92-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Apr 20 2020 Dan Horák <dan@danny.cz> - 0.92-4
+- rebuilt for sg3_utils 1.45 (#1809392)
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.92-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
