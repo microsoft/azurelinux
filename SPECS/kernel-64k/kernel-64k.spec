@@ -27,7 +27,7 @@
 Summary:        Linux Kernel
 Name:           kernel-64k
 Version:        6.6.104.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -380,6 +380,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Sep 23 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.6.104.2-3
+- Bump release to match kernel
+
 * Tue Sep 23 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.104.2-2
 - Enable ipmitool for kernel-64k
 
