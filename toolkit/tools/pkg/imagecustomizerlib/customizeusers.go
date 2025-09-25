@@ -137,5 +137,40 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 		return err
 	}
 
+	// Set user's sudo access.
+	err = UpdateSudoAccess(imageChroot, user.Name, user.Sudo)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func UpdateSudoAccess(installChroot safechroot.ChrootInterface, username string, enableSudo bool) error {
+	if enableSudo {
+
+		// Define the sudo configuration file path for the user
+		sudoersFile := fmt.Sprintf("/etc/sudoers.d/%s", username)
+
+		// Content for sudo configuration
+		content := fmt.Sprintf("%s ALL=(ALL) NOPASSWD:ALL", username)
+
+		// Permissions for the sudoers file (read-only for root)
+		permissions := imagecustomizerapi.FilePermissions(0440)
+
+		// Create the AdditionalFile object
+		additionalFiles := imagecustomizerapi.AdditionalFileList{
+			imagecustomizerapi.AdditionalFile{
+				Destination: fmt.Sprintf("/etc/sudoers.d/%s", username),
+				Content:     &content,
+				Permissions: &permissions,
+			},
+		}
+
+		err := CopyAdditionalFiles(sudoersFile, additionalFiles, installChroot)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
