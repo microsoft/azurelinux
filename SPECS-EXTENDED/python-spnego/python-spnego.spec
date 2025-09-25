@@ -6,6 +6,7 @@ Summary:        Windows Negotiate Authentication Client and Server
 # SPDX License
 License:        MIT
 Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/jborean93/pyspnego
 Source0:        https://github.com/jborean93/pyspnego/archive/refs/tags/v0.12.0.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
