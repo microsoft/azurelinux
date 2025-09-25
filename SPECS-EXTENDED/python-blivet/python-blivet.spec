@@ -1,43 +1,33 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%define is_rhel 0%{?rhel} != 0
-
-# python3 is not available on RHEL <=7
-%if %{is_rhel} && 0%{?rhel} <= 7
-# disable python3 by default
-%bcond_with python3
-%else
-%bcond_without python3
-%endif
-
-# python2 is not available on RHEL > 7 and not needed on Fedora > 28
-
-# disable python2 by default
-%bcond_with python2
-
-
-
-
 Summary:  A python module for system storage configuration
 Name: python-blivet
 Url: https://storageapis.wordpress.com/projects/blivet
-Version: 3.2.2
+Version: 3.11.0
 
 #%%global prerelease .b2
 # prerelease, if defined, should be something like .a1, .b1, .b2.dev1, or .c2
-Release: 5%{?dist}
-License: GPLv2 and LGPLv2+
+Release: 4%{?dist}
+Epoch: 1
+License: LGPL-2.1-or-later
 %global realname blivet
 %global realversion %{version}%{?prerelease}
 Source0: http://github.com/storaged-project/blivet/archive/%{realname}-%{realversion}.tar.gz
 Source1: http://github.com/storaged-project/blivet/archive/%{realname}-%{realversion}-tests.tar.gz
+
+%if 0%{?rhel} >= 9
+Patch0: 0001-remove-btrfs-plugin.patch
+%endif
+
+Patch1: 0002-Do-not-raise-libblockdev-errors-in-FSMinSize-tasks.patch
+Patch2: 0003-free_space_estimate-adjust-for-compression-on-btrfs.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
 %global partedver 1.8.1
 %global pypartedver 3.10.4
 %global utillinuxver 2.15.1
-%global libblockdevver 2.19
+%global libblockdevver 3.2.0
 %global libbytesizever 0.3
 %global pyudevver 0.18
 
@@ -50,13 +40,16 @@ storage configuration.
 %package -n %{realname}-data
 Summary: Data for the %{realname} python module.
 
+BuildRequires: make
 BuildRequires: systemd
+
+Conflicts: python-blivet < 1:2.0.0
+Conflicts: python3-blivet < 1:2.0.0
 
 %description -n %{realname}-data
 The %{realname}-data package provides data files required by the %{realname}
 python module.
 
-%if %{with python3}
 %package -n python3-%{realname}
 Summary: A python3 package for examining and modifying storage configuration.
 
@@ -67,139 +60,807 @@ BuildRequires: python3-devel
 BuildRequires: python3-setuptools
 
 Requires: python3
-Requires: python3-six
 Requires: python3-pyudev >= %{pyudevver}
 Requires: parted >= %{partedver}
 Requires: python3-pyparted >= %{pypartedver}
 Requires: libselinux-python3
+Requires: python3-libmount
 Requires: python3-blockdev >= %{libblockdevver}
 Recommends: libblockdev-btrfs >= %{libblockdevver}
 Recommends: libblockdev-crypto >= %{libblockdevver}
 Recommends: libblockdev-dm >= %{libblockdevver}
 Recommends: libblockdev-fs >= %{libblockdevver}
-Recommends: libblockdev-kbd >= %{libblockdevver}
 Recommends: libblockdev-loop >= %{libblockdevver}
 Recommends: libblockdev-lvm >= %{libblockdevver}
 Recommends: libblockdev-mdraid >= %{libblockdevver}
 Recommends: libblockdev-mpath >= %{libblockdevver}
-Recommends: libblockdev-nvdimm >= %{libblockdevver}
+Recommends: libblockdev-nvme >= %{libblockdevver}
 Recommends: libblockdev-part >= %{libblockdevver}
 Recommends: libblockdev-swap >= %{libblockdevver}
+
+%ifarch s390 s390x
 Recommends: libblockdev-s390 >= %{libblockdevver}
+%endif
+
 Requires: python3-bytesize >= %{libbytesizever}
 Requires: util-linux >= %{utillinuxver}
 Requires: lsof
 Requires: python3-gobject-base
 Requires: systemd-udev
-Requires: %{realname}-data = %{version}-%{release}
+Requires: %{realname}-data = %{epoch}:%{version}-%{release}
 
 Obsoletes: blivet-data < 1:2.0.0
-
-%if %{without python2}
-Obsoletes: python2-blivet < 1:2.0.2-2
-Obsoletes: python-blivet < 1:2.0.2-2
-%else
-Obsoletes: python-blivet < 1:2.0.0
-%endif
 
 %description -n python3-%{realname}
 The python3-%{realname} is a python3 package for examining and modifying storage
 configuration.
-%endif
-
-%if %{with python2}
-%package -n python2-%{realname}
-Summary: A python2 package for examining and modifying storage configuration.
-
-%{?python_provide:%python_provide python2-%{realname}}
-
-BuildRequires: gettext
-BuildRequires: python2-devel
-BuildRequires: python2-setuptools
-
-Requires: python2
-Requires: python2-six
-Requires: python2-pyudev >= %{pyudevver}
-Requires: parted >= %{partedver}
-Requires: python2-pyparted >= %{pypartedver}
-Requires: python2-libselinux
-Requires: python2-blockdev >= %{libblockdevver}
-Recommends: libblockdev-btrfs >= %{libblockdevver}
-Recommends: libblockdev-crypto >= %{libblockdevver}
-Recommends: libblockdev-dm >= %{libblockdevver}
-Recommends: libblockdev-fs >= %{libblockdevver}
-Recommends: libblockdev-kbd >= %{libblockdevver}
-Recommends: libblockdev-loop >= %{libblockdevver}
-Recommends: libblockdev-lvm >= %{libblockdevver}
-Recommends: libblockdev-mdraid >= %{libblockdevver}
-Recommends: libblockdev-mpath >= %{libblockdevver}
-Recommends: libblockdev-nvdimm >= %{libblockdevver}
-Recommends: libblockdev-part >= %{libblockdevver}
-Recommends: libblockdev-swap >= %{libblockdevver}
-Recommends: libblockdev-s390 >= %{libblockdevver}
-Requires: python2-bytesize >= %{libbytesizever}
-Requires: util-linux >= %{utillinuxver}
-Requires: lsof
-Requires: python2-hawkey
-Requires: %{realname}-data = %{version}-%{release}
-
-Requires: systemd-udev
-Requires: python2-gobject-base
-
-Obsoletes: blivet-data < 1:2.0.0
-Obsoletes: python-blivet < 1:2.0.0
-
-%description -n python2-%{realname}
-The python2-%{realname} is a python2 package for examining and modifying storage
-configuration.
-%endif
 
 %prep
-%autosetup -n %{realname}-%{realname}-%{realversion} -N
-%autosetup -n %{realname}-%{realname}-%{realversion} -b1 -p1
+%autosetup -n %{realname}-%{realversion} -N
+%autosetup -n %{realname}-%{realversion} -b1 -p1
 
 %build
-%{?with_python2:make PYTHON=%{__python2}}
-%{?with_python3:make PYTHON=%{__python3}}
+make
 
 %install
-%{?with_python2:make PYTHON=%{__python2} DESTDIR=%{buildroot} install}
-%{?with_python3:make PYTHON=%{__python3} DESTDIR=%{buildroot} install}
+make DESTDIR=%{buildroot} install
 
-%files -n %{realname}-data
+%find_lang %{realname}
+
+%files -n %{realname}-data -f %{realname}.lang
 %{_sysconfdir}/dbus-1/system.d/*
 %{_datadir}/dbus-1/system-services/*
 %{_libexecdir}/*
 %{_unitdir}/*
 
-%if %{with python2}
-%files -n python2-%{realname}
-%license COPYING COPYING.LESSER
-%doc README examples
-%{python2_sitelib}/*
-%endif
-
-%if %{with python3}
 %files -n python3-%{realname}
-%license COPYING COPYING.LESSER
-%doc README examples
+%license COPYING
+%doc README.md ChangeLog examples
 %{python3_sitelib}/*
-%endif
 
 %changelog
-* Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.2-5
-- Making sure license files are accessible.
-
-* Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.2-4
-- Removing 'Conflicts' for old packages never present in CBL-Mariner.
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 3.11.0-4
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 3.2.2-3
-- Remove epoch
+* Wed Oct 09 2024 Vojtech Trefny <vtrefny@redhat.com> - 3.11.0-3
+- free_space_estimate: adjust for compression on btrfs (#2315638)
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:3.2.2-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Thu Sep 26 2024 Vojtech Trefny <vtrefny@redhat.com> - 3.11.0-2
+- Do not raise libblockdev errors in FSMinSize tasks (#2314637)
+
+* Fri Sep 20 2024 Packit <hello@packit.dev> - 1:3.11.0-1
+- Update to version 3.11.0
+
+* Thu Aug 15 2024 Vojtech Trefny <vtrefny@redhat.com> - 3.10.1-5
+- LUKS HW-OPAL support (#2304174)
+
+* Mon Jul 29 2024 Vojtech Trefny <vtrefny@redhat.com> - 3.10.1-4
+- part_type_uuid: guard against pyparted type_uuid being None (#2300115)
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.10.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Jun 10 2024 Python Maint <python-maint@redhat.com> - 1:3.10.1-2
+- Rebuilt for Python 3.13
+
+* Fri Jun 07 2024 Vojtech Trefny <vtrefny@redhat.com> - 3.10.1-1
+- tests: Add a test case with MD array on LUKS (vtrefny)
+- Add support for setting label when creating GFS2 format (vtrefny)
+- tests: add dbus example to traverse the devices and call test the factory() (tgill)
+- fix issue #1239 (koito_coco)
+- fix compare uuid fail (iasunsea)
+- Remove support for the MD linear RAID level (vtrefny)
+- ci: Fix repository name in job name in check.yml (vtrefny)
+- Fix pylint 'possibly-used-before-assignment' warnings (vtrefny)
+- Fix skipping btrfs calls when libblockdev btrfs plugin is missing (vtrefny)
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1:3.10.0-3
+- Rebuilt for Python 3.13
+
+* Tue Jun 04 2024 Vojtech Trefny <vtrefny@redhat.com> - 3.10.0-2
+- Remove support for the MD linear RAID level
+
+* Fri May 10 2024 Vojtech Trefny <vtrefny@redhat.com> - 3.10.0-1
+- Added support for PV grow (japokorn)
+- misc: Add stratis-cli and stratisd to test dependencies (vtrefny)
+- tests: Add a base class for stratis tests (vtrefny)
+- Add a Stratis example with pool encryption using Clevis/Tang (vtrefny)
+- Clear VG UUID from PVs after removing the PV (#2278058) (vtrefny)
+- Use longer timeout for Stratis DBus calls (vtrefny)
+- safe-dbus: Allow using custom timeouts for the DBus calls (vtrefny)
+- Catch JSONDecodeError when parsing Stratis Clevis info (vtrefny)
+- Add support for unlocking locked Stratis pools with Clevis (vtrefny)
+- Add support for creating encrypted Stratis pool with Clevis (vtrefny)
+- Round Stratis Filesystem size down to the nearest sector (vtrefny)
+- Make sure to include stderr when gathering output of stratis tools (vtrefny)
+- Add support for adding new members to existing Stratis pool (vtrefny)
+- Base StratisPoolDevice on ContainerDevice instead of StorageDevice (vtrefny)
+- Ignore invalid/empty UUIDs for NVMe namespaces (vtrefny)
+- lvm: Use more generic exception for inconsistent PV sector sizes (vtrefny)
+- Do not allow creating stratis pools with different sector sizes (vtrefny)
+- availability: Fix starting DBus services (vtrefny)
+- fstab: Use 'mount_type' when writing filesystem type to fstab (vtrefny)
+- Add basic support for BitLocker devices (vtrefny)
+- nvme: Skip startup/write when NVMe plugin isn't available (vtrefny)
+- Fix scanning partitions on RAID arrays (#2269133) (vtrefny)
+- Add a test case with DDF BIOS RAID array (vtrefny)
+- tests: Try to get distro and version from /etc/os-release (vtrefny)
+- availability: Fix checking for DBus service availability (vtrefny)
+- ci: Update packit configuration for 3.10-devel (vtrefny)
+- Remove vim formatting comments (vtrefny)
+- tests: Do not ignore entire test files in pylint (vtrefny)
+- tests: Do not try to import mock and patch from mock (vtrefny)
+- Remove util.stringize and unicodeize functions (vtrefny)
+- Remove Python SIX usage (vtrefny)
+- Remove unused flags and do not read flags from boot command line (vtrefny)
+
+* Thu Mar 28 2024 Vojtech Trefny <vtrefny@redhat.com> - 3.9.2-1
+- tests: Add a simple unit test for listing btrfs subvolumes (vtrefny)
+- Fix getting default subvolume ID for mounted btrfs volumes (vtrefny)
+- Do not try to get btrfs subvolumes without libblockdev (vtrefny)
+- Do not raise not implemented exception when checking if btrfs is empty (vtrefny)
+- Try to start stratisd before checking its availability (vtrefny)
+- Fix creating Stratis filesystem without size specified (vtrefny)
+- Fix printing the partition type UUID (vtrefny)
+- Adjust check for btrfs filesystem being empty (vtrefny)
+- Fix util.detect_virt on Amazon (vtrefny)
+- misc: Vagrantfile update (vtrefny)
+- misc: Run pip with --break-system-packages (vtrefny)
+- misc: Add missing libmount build dependencies (vtrefny)
+- availability: Check for mpath friendly names availability (vtrefny)
+- Allow running blivet without libmount Python bindings (vtrefny)
+- Fstab cleanup fix (japokorn)
+- Fix getting subvolumes for mounted btrfs volumes (vtrefny)
+
+* Tue Mar 12 2024 Vojtech Trefny <vtrefny@redhat.com> - 3.9.1-2
+- Fix scanning partitions on RAID arrays (#2269133)
+
+* Tue Feb 27 2024 Vojtech Trefny <vtrefny@redhat.com> - 3.9.1-1
+- Try to assemble MD arrays during populate (#2236356) (vtrefny)
+- Fix UnboundLocalError in MD populator (vtrefny)
+- Fix crash when scanning degraded/not fully assembled MD arrays (vtrefny)
+- pylint: Remove some old false positives (vtrefny)
+- tests: Skip MD storage tests on RHEL/CentOS 9 (vtrefny)
+- misc: Bump libblockdev version for Debian (vtrefny)
+- Fix typos (vtrefny)
+- Remove unused import (vtrefny)
+
+* Mon Feb 12 2024 Vojtech Trefny <vtrefny@redhat.com> - 3.9.0-3
+- Fix UnboundLocalError in MD populator (#2263668)
+
+* Tue Feb 06 2024 Vojtech Trefny <vtrefny@redhat.com> - 3.9.0-2
+- Fix crash when scanning degraded/not fully assembled MD arrays
+
+* Wed Jan 31 2024 Vojtech Trefny <vtrefny@redhat.com> - 3.9.0-1
+- Fix getting default LVM cache metadata size from libblockdev (vtrefny)
+- Fix checking for segment type for cache pools (vtrefny)
+- tests: Enable GFS2 tests (vtrefny)
+- tests: Move 'test_labels' to unit tests (vtrefny)
+- Add a new function to check if a filesystem is empty (vtrefny)
+- tests: Wait for array resync in MD tests (vtrefny)
+- misc: Vagrantfile update (vtrefny)
+- tests: Add a simple unit test for the NVMe module (vtrefny)
+- tests: Add a test case with multiple devices with the same name (vtrefny)
+- tests: Add basic unit tests for device_id (vtrefny)
+- tests: Add a simple test for DeviceTree.get_device_by_device_id (vtrefny)
+- Use get_device_by_device_id instead of _by_name in populator (vtrefny)
+- Add a function to get a device by device ID (vtrefny)
+- Add "device ID" that could be used as a unique device identifier (vtrefny)
+- Fix adding new members to array with redundancy (vtrefny)
+- Correctly set md_uuid when adding/removing member to/from array (vtrefny)
+- tests: Add storage test case for MD RAID (vtrefny)
+- Remove unused pylintcodediff helper script (vtrefny)
+- tests: Add a simple unit test for Btrfs (vtrefny)
+- Generate UUID for newly created btrfs volumes (vtrefny)
+- nvme: Retrieve HostNQN from a first active fabrics connection (tbzatek)
+- ci: Set custom release number for Packit (vtrefny)
+- Support partitioning of hybrid boot disks (vponcova)
+- Fix checking PV free space when removing it from a VG (#2232328) (vtrefny)
+- tests: run_tests script enhancements (vtrefny)
+- Add a BTRFS example (vtrefny)
+- tests: Add a storage test case for BTRFS (vtrefny)
+- Remove support for NVDIMM namespaces (vtrefny)
+- Fix passing extra mkfs arguments to libblockdev (vtrefny)
+- ci: Add a GH action to run blivet-gui test suite on PRs (vtrefny)
+- ci: Add a Dockerfile for building a CI container (vtrefny)
+- ci: Allow installing only build dependencies without test deps (vtrefny)
+- Fix failing tests when running as a non-root user (vtrefny)
+- Add flag to control LVM devices file support (vtrefny)
+- Use libblockdev to check for kernel modules availability (vtrefny)
+- Use libblockdev to remove filesystems instead of calling wipefs (vtrefny)
+- swap: Use libblockdev to check label and UUID format (vtrefny)
+- fs_test: Enable NTFS test case (vtrefny)
+- availability: Remove the unused "lvmdevices" application (vtrefny)
+- availability: Cleanup applications (vtrefny)
+- Remove support for Apple HFS format (vtrefny)
+- Fix raising FormatCreateError in FS._create (vtrefny)
+- Use libblockdev for filesystem mount operation (vtrefny)
+- Use os.statvfs instead of df to get tmpfs size (vtrefny)
+- Use libblockdev to create supported filesystems (vtrefny)
+- Use libblockdev for reading filesystem label (vtrefny)
+- Use libblockdev for getting filesystem info and size (vtrefny)
+- Use libblockdev for filesystem resizing (vtrefny)
+- Use libblockdev for setting and checking filesystem label and UUID (vtrefny)
+- swap: Simplify creating swap with UUID (vtrefny)
+- Use libblockdev for the filesystem sync operation (vtrefny)
+- Add libblockdev filesystem plugin to the list of required plugins (vtrefny)
+- availability: Remove unused "mlabel" application (vtrefny)
+- availability: Simplify checks for LVM VDO and shared LVM support (vtrefny)
+- availability: Do not check e2fsprogs version (vtrefny)
+- Remove JFS support (vtrefny)
+- Remove support for ReiserFS (vtrefny)
+- ci: Update default branch for Packit to 3.9-devel/release (vtrefny)
+- fcoe/iscsi: Use libblockdev to load modules instead of modprobe (vtrefny)
+- Added missing fstab object to SwapSpace (japokorn)
+- misc: Update test dependencies ansible playbook (vtrefny)
+- misc: Simplify the makebumpver script (vtrefny)
+- Do not fail when kpartx is not available (vtrefny)
+- Move kpartx dependency from DMDevice to MultipathDevice (vtrefny)
+- ci: Update default branch for Packit to 3.9-devel/release (vtrefny)
+- Include btrfs volumes names/labels in DeviceTreeBase.names (vtrefny)
+- fixed fstab.read issue (japokorn)
+- Added support for user defined values in fstab (japokorn)
+- Incorporated review comments (japokorn)
+- Fstab support (japokorn)
+- add udev-builtin-path_id property to zfcp-attached SCSI disks (maier)
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.8.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.8.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Dec 13 2023 Vojtech Trefny <vtrefny@redhat.com> - 3.8.2-2
+- add udev-builtin-path_id property to zfcp-attached SCSI disks
+
+* Thu Oct 12 2023 Vojtech Trefny <vtrefny@redhat.com> - 3.8.2-1
+- tests: Ignore new pylint false positive with pylint 3.0 (vtrefny)
+- pylint: Use 'exit' instead of 'do_exit' for pylint.lint.Run (vtrefny)
+- Revert "When creating a shared LVM VG skip pvcreate" (vtrefny)
+- Revert "Force command line based libblockdev LVM plugin" (vtrefny)
+- ci: Bump actions/checkout from v2/3 to v4 (vtrefny)
+- spec: Add libblockdev-nvme as weak dependency (vtrefny)
+- Always require NVMe plugin (vtrefny)
+- Enable LVM logging only in debug mode (vtrefny)
+- nvme: Require additional rpms for dracut (tbzatek)
+- Force command line based libblockdev LVM plugin (vtrefny)
+- When creating a shared LVM VG skip pvcreate (vtrefny)
+- Add support for creating shared LVM setups (vtrefny)
+- nvme: Align HostNQN and HostID format to TP4126 (tbzatek)
+- README: Fix typo (vtrefny)
+- README: Update Debian dependencies for libblockdev 3.0 (vtrefny)
+
+* Thu Aug 03 2023 Vojtech Trefny <vtrefny@redhat.com> - 3.8.1-1
+- Ignore new false positives with the latest pylint (vtrefny)
+- iscsi: Rename storaged to udisks (tbzatek)
+- iscsi: Rework UDisks iscsi module activation (tbzatek)
+- iscsi: Make sure to modprobe iscsi_ibft (tbzatek)
+- iscsi: Downgrade default CHAP auth algs to SHA1,MD5 (tbzatek)
+- iscsi: Save firmware initiator name to /etc/iscsi/initiatorname.iscsi (vtrefny)
+- spec: Bump release to 99 to be always ahead of Fedora in nightly (vtrefny)
+- tests: Improve iscsi_test.ISCSITestCase (vtrefny)
+- Make sure that LUKS.has_key always returns a boolean value (vtrefny)
+- Squashed 'translation-canary/' changes from d6a40985..5bb81253 (vtrefny)
+- Add btrfs subvolume specification to devicetree.resolve_device (vtrefny)
+- Revert "Makefile cleanup" (vtrefny)
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.8.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 29 2023 Python Maint <python-maint@redhat.com> - 1:3.8.0-2
+- Rebuilt for Python 3.12
+
+* Thu Jun 29 2023 Vojtech Trefny <vtrefny@redhat.com> - 3.8.0-1
+- Revert "Makefile cleanup" (blivet-ci)
+- Require libblockdev 3.0 when importing from GI (vtrefny)
+- spec: Bump required version of libblockdev to 3.0 (vtrefny)
+- md: Adapt libblockdev 3.0 mdraid bitmap arg changes (tbzatek)
+- spec: Bump release to 99 to be always ahead of Fedora in nightly (vtrefny)
+- ci: Run GH actions tests in a Fedora container (vtrefny)
+- Add new LUKS tests for add/remove key and key file usage (vtrefny)
+- Adjust to the new libblockdev 3.0 crypto API (vtrefny)
+- Adjust to libblockdev 3.0 API changes (vtrefny)
+- blivet: Enable the extended node bitmap for F2FS (akoskovich)
+- Remove all state-dependent objects when resetting Blivet DBus object. (dlehman)
+- Run callbacks when pruning actions. (dlehman)
+- Always prefer GPT disk labels on x86_64 (and clean up the logic) (awilliam)
+- Do not add new PVs to the LVM devices file if it doesn't exist and VGs are present (vtrefny)
+- Add RISCV64 architecture helper [is_riscv64()] for arch module. (48907457+nirousseau)
+- iscsi: Extend allowed CHAP auth algorithms (tbzatek)
+- Fix checking FIPS mode when /proc/sys/crypto/fips_enabled doesn't exist (vtrefny)
+- Fix creating LUKS1 on disks with mixed sector size (#2188785) (vtrefny)
+- Do not set memory limit for LUKS2 when running in FIPS mode (vtrefny)
+- Revert "tests: Skip test_lvcreate_type on CentOS/RHEL 9" (vtrefny)
+- DBus: remove extra callback invocations (dlehman)
+- Add a test case for filesystem online resize (vtrefny)
+- Add support for filesystem online resize (vtrefny)
+- iscsi: Use UDisks instead of storaged in the availability message (vtrefny)
+- tests: Fix skipping iSCSI tests if UDisks iSCSI isn't available (vtrefny)
+- Add ChangeLog to .gitignore (vtrefny)
+- Makefile cleanup (vtrefny)
+- ci: Use Packit for daily builds in Copr (vtrefny)
+- Avoid raising libblockdev exceptions from our code (vtrefny)
+- ci: Fix Packit configuration (vtrefny)
+- Add support for specifying stripe size for RAID LVs (vtrefny)
+- tests: Use blivet-specific prefix for targetcli backing files (vtrefny)
+- Add a basic test case for the iscsi module (vtrefny)
+- Allow changing iSCSI initiator name after setting it (vtrefny)
+- Prefer UUID for fstab spec for DM devices too (vtrefny)
+- Remove support for Python 2 from spec and Makefile (vtrefny)
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 1:3.7.1-5
+- Rebuilt for Python 3.12
+
+* Wed May 31 2023 Vojtech Trefny <@trefny@redhat.com> - 3.7.1-4
+- Always prefer GPT disk labels on x86_64
+
+* Tue May 23 2023 Vojtech Trefny <vtrefny@redhat.com> - 3.7.1-3
+- Add support for filesystem online resize
+
+* Thu May 04 2023 Vojtech Trefny <vtrefny@redhat.com> - 3.7.1-2
+- Add support for specifying stripe size for RAID LVs
+
+* Thu Mar 16 2023 Vojtech Trefny <vtrefny@redhat.com> - 3.7.1-1
+- Fix the get_mount_device function (vponcova)
+- Prefer using UUID for the kickstart --onpart argument (vtrefny)
+- Fix setting kickstart data (vtrefny)
+- pylint: Remove the "EXCEPTIONS" section from pylintrc (vtrefny)
+- Add "microsoft" to list of recognized VM environments (vtrefny)
+- ci: Add action to run unit tests in GH actions (vtrefny)
+- tests: Make sure that unit tests can run without root privileges (vtrefny)
+- doc: Link to the LVM VDO documentation from the index page (vtrefny)
+- Ignore missing parted disk in ActionList._post_process (#2102960) (vtrefny)
+
+* Wed Feb 08 2023 Vojtech Trefny <vtrefny@redhat.com> - 3.7.0-1
+- Remove unused BLOCKDEV_DM_RAID technology from tasks (vtrefny)
+- tests: Force remove LVM VG /dev/ entry not removed by vgremove (vtrefny)
+- Mark LUKS2 integrity devices as always controllable (vtrefny)
+- Ignore parent dependencies during action execute (vtrefny)
+- tests: Patch checking stratis pool metadata size (vtrefny)
+- Remove support for DMRAID devices (vtrefny)
+- Do not read DDF RAID UUID from udev (vtrefny)
+- Check physical and logical block size when creating a LUKS format (vtrefny)
+- Add separate properties for logical and physical block size (vtrefny)
+- Use DMI product_name for t2 mac detection. (83884198+sharpenedblade)
+- vmtests: add a --logs arg to capture blivet.log from failed tests (berrange)
+- examples: illustrate GPT GUID usage in partitioning example (berrange)
+- vmtests: add test for GPT part type UUID validation (berrange)
+- blivet: allow 'mountpoint' to be passed to PartitionDevice (berrange)
+- deviceaction: retain explicit part type UUID when formatting (berrange)
+- devices/partition: add ability to auto apply a GPT UUID (berrange)
+- gpt: add helper API for discoverable partition UUIDs (berrange)
+- devices/partition: allow passing partition type UUID (berrange)
+- formats/disklabel: allow passing partition type UUID (berrange)
+- Add a forced delay to udev settle in chroot environments (vlad.bespalov)
+- Update public API documentation (vtrefny)
+- tests/README: Clarify various test classes (vtrefny)
+- Rename unit_tests.storagetestcase to unit_tests.blivettestcase (vtrefny)
+- Add additional identifiers to NVMeNamespaceDevice (vtrefny)
+- Add transport and address to NVMeController info (vtrefny)
+- Make sure we close the streams when reading a file (vtrefny)
+- Style changes. (sharpenedblade)
+- Do not report mactel on T2 macs. (sharpenedblade)
+- Add function to check for T2 apple macs. (sharpenedblade)
+- Add a basic read-only support for UDF filesystem (vtrefny)
+- add loongarch support (mahailiang)
+- Add a basic support for NVMe and NVMe Fabrics devices (vtrefny)
+
+* Thu Feb 02 2023 Vojtech Trefny <vtrefny@redhat.com> - 3.6.1-3
+- Use mdadm to support BIOS RAID devices (#2158574)
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.6.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Nov 28 2022 Vojtech Trefny <vtrefny@redhat.com> - 3.6.1-1
+- misc: Remove "warn: false" from Ansible "command" (vtrefny)
+- spec: Change license string to the SPDX format required by Fedora (vtrefny)
+- Catch BlockDevNotImplementedError for btrfs plugin calls (vtrefny)
+- tests: document how to use the VM tests (berrange)
+- tests: allow filtering tests to run in VM (berrange)
+- tests: don't start/stop VM if it was already running (berrange)
+- tests: use correct password arg for SSH to VM (berrange)
+- tests: add logging to runvmtests.py (berrange)
+- Fix potential AttributeError when getting stratis blockdev info (vtrefny)
+- spec: Fix recommended libblockdev plugins (vtrefny)
+- tests: remove unused global variables (berrange)
+- Backport total_memory improvements from anaconda (vslavik)
+- Fix regex for checking e2fsprogs version (vtrefny)
+
+* Fri Nov 11 2022 Vojtech Trefny <vtrefny@redhat.com> - 3.6.0-2
+- Change license string to the SPDX format required by Fedora
+
+* Tue Sep 20 2022 Vojtech Trefny <vtrefny@redhat.com> - 3.6.0-1
+- pylint: Explicitly allow loading the _ped module from pyparted (vtrefny)
+- ci: Run static analysis on Ubuntu 22.04 (vtrefny)
+- tests: Create bigger devices for XFS testing (vtrefny)
+- Set XFS minimal size to 300 MiB (vtrefny)
+- Fix missing whitespaces around not keyword (vtrefny)
+- Remove the Blivet.roots attribute (vponcova)
+- packit: Set downstream_package_name to python-blivet (vtrefny)
+- packit: Add srpm_build_deps for SRPM builds in Copr (vtrefny)
+- tests: Fix message when skipping stratis tests (vtrefny)
+- tests: Tell pytest to ignore symlinks when gathering test cases (vtrefny)
+- Configure ids for Mock devices in populator_test (vtrefny)
+- Add storage tests for Stratis (vtrefny)
+- ci: Fix installing targetcli on Debian/Ubuntu (vtrefny)
+- tests: Add test for creating and attaching cache pools (vtrefny)
+- tests: Add storage tests for more LVM RAID levels (vtrefny)
+- tests: Add test for ActionAddMember/ActionRemoveMember (vtrefny)
+- tests: Add a test for creating and attaching a cache pool (vtrefny)
+- Mark LVM cache pool format as immutable (vtrefny)
+- tests: Skip test_lvcreate_type on CentOS/RHEL 9 (vtrefny)
+- Add a YAML config for skipping tests on specified distributions (vtrefny)
+- Add targetcli to the test dependencies playbook (vtrefny)
+- Add a simple LVM test case that uses real storage (vtrefny)
+- Add a test case that creates targetcli disks to run tests on (vtrefny)
+- Allow running action_test even if some dependencies are missing (vtrefny)
+- Use "fake" names for disks in DeviceTreeTestCase (vtrefny)
+- Change how we import LoopBackedTestCase in fs_test (vtrefny)
+- Add information about the new test suites to tests/README.rst (vtrefny)
+- Makefile: Add targets to run the two new test suites separately (vtrefny)
+- Fix typo in name of test_new_encrypted_stratis (vtrefny)
+- Patch access to lvs in stratis tests (vtrefny)
+- Fix pylint issues in the tests/pylint scripts (vtrefny)
+- Make sure LVM unit tests can run without dependencies (vtrefny)
+- Patch _pre_create in StorageDeviceMethodsTestCase.test_create (vtrefny)
+- Assure that tests that set LVM devices filter can run without root (vtrefny)
+- Fix running StratisFactoryTestCase as a non-root user (vtrefny)
+- Split the test suite into "unit" and "storage" tests (vtrefny)
+- Add support for attaching and creating LVM writecached LVs (vtrefny)
+- Add support for enabling/disabling compression/deduplication (vtrefny)
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.5.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jul 19 2022 Vojtech Trefny <vtrefny@redhat.com> - 3.5.0-1
+- tests: Fix patching NVDIMM static data in populator_test (vtrefny)
+- Ignore pylint false positives about missing methods in Gio and GLib (vtrefny)
+- Ignore pylint warning about missing inspect.getargspec (vtrefny)
+- Rename class ZFCPDevice to ZFCPDeviceFullPath (jstodola)
+- Move _is_associated_with_fcp() implementation to the derived class (jstodola)
+- Improve naming of zfcp classes/methods/functions (jstodola)
+- Correct zfcp comments and strings (jstodola)
+- Fix checking for stratis pool free space when adding a new filesystem (vtrefny)
+- tests: Add a VM test case for Stratis (vtrefny)
+- Use libblockdev to check for DBus service availability (vtrefny)
+- Allow specifying size for stratis filesystems (vtrefny)
+- tests: Skip Stratis DeviceFactory tests if missing dependencies (vtrefny)
+- Use availability checks in devicelibs.stratis (vtrefny)
+- Add external dependencies for Stratis devices classes (vtrefny)
+- Add availability checks for Stratis dependencies (vtrefny)
+- availability: Add a method to check for DBus service availability (vtrefny)
+- Use the new Stratis tool to predict pool and fs used size (vtrefny)
+- misc: Vagrantfile update (vtrefny)
+- Add CentOS 9 Stream to the install-test-dependencies playbook (vtrefny)
+- ci: Run static analysis checks in GitHub actions (vtrefny)
+- doc: Add LVMWriteCache and LVMCachePoolMixin to public API (vtrefny)
+- pylint: Remove deprecated pylint warnings from pylintrc and code (vtrefny)
+- Add option to attach a newly created cache pool to existing LV (vtrefny)
+- Add support for LVM RAID raid0 level (vtrefny)
+- Do not fail when we can't get LVM cache information (#2086310) (vtrefny)
+- Add a very simple NVMe module (vtrefny)
+- Do not check for "problematic" disks in ActionList._pre_process (vtrefny)
+- Change label_format_ok and uuid_format_ok to class methods (vtrefny)
+- Generate correct dracut boot arguments for NPIV devices (jstodola)
+- Add new class for NPIV-enabled devices (jstodola)
+- LUN and WWPN should not be used for NPIV zFCP devices (jstodola)
+- Add a function for reading the value of a kernel module parameter (jstodola)
+- Allow to delete more than one SCSI device (jstodola)
+- Move offline_scsi_device() to the base class (jstodola)
+- Refactor the ZFCPDevice class (jstodola)
+- misc: Vagrantfile update (vtrefny)
+- Do not crash when a disk populator doesn't return kwargs (vtrefny)
+- Disable Fedora ELN builds in packit (vtrefny)
+- Fix raising exception when trying to resize internal LVs (vtrefny)
+- Create loop devices for tests with --partscan (vtrefny)
+- Make sure configure actions obsolete only actions with same attribute (vtrefny)
+- Fix exception message when trying to format an non-existing device (vtrefny)
+- Add default arguments for mkntfs (vtrefny)
+- Mark NTFS as supported (vtrefny)
+- Do no try to read cache MD size for inactive LVs from cache stats (vtrefny)
+- Show better error when using unitialized disk in do_partitioning (vtrefny)
+- Exclude unusable disks from PartitionFactory (vtrefny)
+- Mark StratisXFS format as unsupported (vtrefny)
+- Adjust to Stratis 3.0 API (vtrefny)
+- lvm: Use blivet static data when checking if the VG is active (vtrefny)
+- examples: Add LVM cache pool example (vtrefny)
+- Add suport for creating LVM cache pools (vtrefny)
+- Do not run pvcreate with --devices and list of PVs (vtrefny)
+- Fix object type for ActionConfigureDevice (vtrefny)
+- Use subvolume mountpoints when listing btrfs subvolumes (vtrefny)
+- Squashed 'translation-canary/' changes from 4d4e65b8..d6a40985 (vtrefny)
+- Fix log message for the LVM devices filter (vtrefny)
+- Add support for creating standalone integrity devices (vtrefny)
+- Use bigger chunk size for thinpools bigger than ~15.88 TiB (vtrefny)
+- Fix removing zFCP SCSI devices (jstodola)
+- Add public functions to add/remove PV to/from the LVM system.devices (vtrefny)
+- Ignore errors for LVM devices file actions (vtrefny)
+- Make sure PVs are added/deleted to/from the LVM device file (vtrefny)
+- Use LVM devices for filtering LVM devices with LVM >= 2.02.13 (vtrefny)
+- Switch LVM devices filter from "reject" to "accept" by default (vtrefny)
+- tests: Mark "fake" disks in test_get_related_disks as non-existing (vtrefny)
+- Set correct map name for existing LUKS devices (vtrefny)
+- Do not raise deprecated IOError from iscsi and fcoe modules (vtrefny)
+- Remove unused flag multipath (vtrefny)
+- Do not add device name as a parameter for errors.DeviceError (vtrefny)
+- Add stratis filesystem metadata size and pool free space (vtrefny)
+- Fix parameters differ from overridden in StratisPoolDevice (vtrefny)
+- Fix/unify importing mock module in stratis tests (vtrefny)
+- Add fstab options for Stratis Filesystem devices (vtrefny)
+- Add MountClass for StratisXFS filesystem (vtrefny)
+- Add Stratis devices and formats to the public API documentation (vtrefny)
+- Hide the private LUKS device for unlockded Stratis pools (vtrefny)
+- Add property with list of Stratis block devices to StratisPoolDevice (vtrefny)
+- Set pool info on the block devices when adding/removing Stratis pool (vtrefny)
+- Set the StratisBlockdev format status based on whether it has a pool or not (vtrefny)
+- Add more tests for creating Stratis devices (vtrefny)
+- Add support for creating encrypted Stratis devices with DeviceFactory (vtrefny)
+- Add support for working with locked Stratis pools (vtrefny)
+- Add support for creating encrypted Stratis pools (vtrefny)
+- Add Stratis device factory (vtrefny)
+- Mark format on Stratis pool devices as immutable (vtrefny)
+- Add Stratis example (vtrefny)
+- Add simple test case for Stratis (vtrefny)
+- Add basic support for creating Stratis devices (vtrefny)
+- Add a special "XFS Stratis" filesystem for Stratis filesystem devices (vtrefny)
+- Avoid circular depency when in static_data/stratis_info.py (vtrefny)
+- Add dracut setup args for Stratis devices (vtrefny)
+- Add support for removing Stratis devices using DBus API (vtrefny)
+- Add basic support for Stratis devices (vtrefny)
+- Ignore all "private" devices during populate (vtrefny)
+- safe_dbus: Add function to get all properties for an interface (vtrefny)
+- Add support for renaming devices using ActionConfigureDevice (vtrefny)
+
+* Mon Jun 20 2022 Vojtech Trefny <vtrefny@redhat.com> - 3.4.4-3
+- Add support for NPIV-enabled zFCP devices
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1:3.4.4-2
+- Rebuilt for Python 3.11
+
+* Mon May 16 2022 Vojtech Trefny <vtrefny@redhat.com> - 3.4.4-1
+- Use LVM PV format current_size in LVMVolumeGroupDevice._remove (vtrefny)
+- Correctly set vg_name after adding/removing a PV from a VG (vtrefny)
+- Do not crash when changing disklabel on disks with active devices (vtrefny)
+- ActionDestroyDevice should not obsolete ActionRemoveMember (vtrefny)
+- Correctly set compression and deduplication for existing VDO pools (vtrefny)
+- Correctly cancel configure actions in cancel() (vtrefny)
+- Set partition flags after setting parted filesystem (#2033875) (vtrefny)
+
+* Tue Feb 15 2022 Jan Pokorny <japokorn@redhat.com> - 3.4.3-2
+- Set partition flags after setting parted filesystem (#2033875) (vtrefny)
+
+* Tue Feb 01 2022 Vojtech Trefny <vtrefny@redhat.com> - 3.4.3-1
+- Make sure we mount the top level subvolume when mounting btrfs (vtrefny)
+- README: Fix API documentation link (vtrefny)
+- iscsi: Replace all log_exception_info calls with log.info (vtrefny)
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.4.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Sep 30 2021 Vojtech Trefny <vtrefny@redhat.com> - 3.4.2-1
+- pylint: Remove pdb breakpoint in device_properties_test (vtrefny)
+- pylint: Fix exception string in get_cow_sysfs_path (vtrefny)
+- pylint: Remove redundant 'u' prefixes for strings in doc/conf.py (vtrefny)
+- pylint: Ignore the "redundant-u-string-prefix" warning in i18n.py (vtrefny)
+- pylint: Ignore the new warning W1514 "unspecified-encoding" (vtrefny)
+- pylint: Fix multuple unused variables 'e' in exceptions (vtrefny)
+- Makefile: Specify weblate repository branch for the potfile target (vtrefny)
+- flags: Fix leaking file descriptor (vtrefny)
+- README: Add info about our openSUSE/Mageia/OpenMandriva Copr repo (vtrefny)
+- Fix checking for LVM VDO support with libblockdev 2.23 and older (vtrefny)
+- tasks: Allow specifying custom error message for UnavailableMethod (vtrefny)
+- Use setuptools instead of distutils in setup.py (vtrefny)
+- Use shutil.which instead of distutils.spawn.find_executable (vtrefny)
+- Do not use FS.mount for btrfs temporary mounts (vtrefny)
+
+* Thu Aug 19 2021 Vojtech Trefny <vtrefny@redhat.com> - 3.4.1-1
+- pylint: Ignore deprecation warning about threading.currentThread (vtrefny)
+- Fix getting PV info in LVMPhysicalVolume from the cache (vtrefny)
+- Fix ActionRemoveMember requires check (#1993655) (vtrefny)
+- util: Ignore false positive assignment-from-no-return warning in ObjectID (vtrefny)
+- tasks: Ignore pylint arguments-differ warning for do_tasks (vtrefny)
+- Remove unused __save_passphrase member from LUKS_Data (vtrefny)
+- size: Ignore new pylint warning "arguments-renamed" (vtrefny)
+- Do not use deprecated (vtrefny)
+- Remove unused member __names from DeviceFactory (vtrefny)
+- Improve error message printed for missing dependecies (vtrefny)
+- tests: Print version and blivet location when running tests (vtrefny)
+- tests: Allow running tests without the tests directory in PYTHONPATH (vtrefny)
+- edd_test: Locate the edd_data based on the test file location (vtrefny)
+- Run Anaconda tests on blivet pull requests (jkonecny)
+- Do not set chunk size for RAID 1 (vtrefny)
+- When sorting devices make sure partitions are sorted correctly (vtrefny)
+- Make sure LVM config is updated before running pvcreate (vtrefny)
+- Tell LVM to ignore the new devices file for now (vtrefny)
+- Revert "Use PARTITION_ESP flag for EFIFS partitions (#1930486)" (vtrefny)
+- Fix resolving devices with names that look like BIOS drive number (vtrefny)
+- Ignore pylint false positive no-member warning (vtrefny)
+- Fix util.virt_detect on Xen (vtrefny)
+- Fix/unify importing mock module in tests (vtrefny)
+- Convert LVM filter lists to sets (vtrefny)
+- Remove action device from LVM reject list (vtrefny)
+- Fix activating old style LVM snapshots (vtrefny)
+- Make sure the device is setup before configuring its format (vtrefny)
+- Remove RHEL 9 specific patch from SPEC (vtrefny)
+- Use package list instead of cycle in our dependencies Ansible playbook (vtrefny)
+- Add vagrant file for running tests and development in a VM (vtrefny)
+- Update our playbook for installing test dependencies (vtrefny)
+- Add example for working with actions (vtrefny)
+- Add LUKS encrypted LV to LVM example (vtrefny)
+- Add example for LVM thin provisioning (vtrefny)
+- Squashed 'translation-canary/' changes from 3bc2ad68..4d4e65b8 (vtrefny)
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.4.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jul 21 2021 Vojtech Trefny <vtrefny@redhat.com> - 3.4.0-4
+- Revert "Use PARTITION_ESP flag for EFIFS partitions" (#1975375)
+
+* Wed Jun 30 2021 Vojtech Trefny <vtrefny@redhat.com> - 3.4.0-3
+- Fix resolving devices with names that look like BIOS drive number (#1960798)
+
+* Thu Jun 03 2021 Python Maint <python-maint@redhat.com> - 1:3.4.0-2
+- Rebuilt for Python 3.10
+
+* Fri May 07 2021 Vojtech Trefny <vtrefny@redhat.com> - 3.4.0-1
+- Fix setting SELinux flag in SELinuxContextTestCase (vtrefny)
+- Allow running blivet without Python SELinux module (vtrefny)
+- Adapt to dosfstools 4.2 FAT label changes (vtrefny)
+- Add LVM VDO to public API (vtrefny)
+- Add a special exception type for LVM inconsistent sector sizes (vtrefny)
+- Remove the "encryption_passphrase" attribute from Blivet class (vtrefny)
+- Use PARTITION_ESP flag for EFIFS partitions (#1930486) (vtrefny)
+- Provide better error message for LVM with inconsistent sector sizes (vtrefny)
+- Avoid AttributeError for DiskLabel formats without disklabel type (vtrefny)
+- Ignore ArithmeticError when trying to align partition size down (vtrefny)
+- Do not log entire exception when trying to get ISCSI initiator name (vtrefny)
+- Fix running BlivetLVMVDODependenciesTest test case as non-root (vtrefny)
+- Remove EDD test logs after the tests finish (vtrefny)
+- Replace IOError with OSError around file operations (vslavik)
+- spec: Add 'make' to BuildRequires (vtrefny)
+- Fix usage of assert_called_with in lvm_test (vtrefny)
+- apply directory's SELinux context to freshly created mount points (rmetrich)
+- Try to get Btrfs volume UUID using libblockdev if UDev lookup fails (vtrefny)
+- Allow removing LVM VDO devices without VDO support (vtrefny)
+- Sync spec with downstream (vtrefny)
+- Use real paths to Python site packages (vponcova)
+- Fix excessive logging in udev.__is_ignored_blockdev (vtrefny)
+- Make sure we use size >= LVM VDO min size in test_lv_unique_name (vtrefny)
+- Replace pocketlint by a custom script (vtrefny)
+- Fix pylint errors in translation canary (jkonecny)
+- Bump required libblockdev version to 2.24 (vtrefny)
+- Fix external dependencies for LVM VDO devices (vtrefny)
+- Use better description for libblockdev plugins in tasks.availability (vtrefny)
+- Set minimum size for LVM VDO pool devices (vtrefny)
+- Add LVM VDO documentation (vtrefny)
+- Add LVM VDO example (vtrefny)
+- Add nodiscard option by default when creating VDO logical volumes (vtrefny)
+- Allow adding nodiscard option when running mkfs (vtrefny)
+- Add VM test for LVM VDO (vtrefny)
+- Add LVM VDO device factory (vtrefny)
+- Allow creating LVM VDO pools and volumes using "blivet.new_lv" (vtrefny)
+- Add support for creating LVM VDO pools and LVM VDO volumes (vtrefny)
+- Add "vdo_lv" property to LVMVDOPoolMixin (vtrefny)
+- Read the LVM VDO pool current size from the internal data LV (vtrefny)
+- Add availability functions for LVM VDO (vtrefny)
+- Add VDO pool data LV to internal LVs during populate (vtrefny)
+- Fix type of LVM VDO logical volumes (vtrefny)
+
+* Mon Apr 12 2021 Vojtech Trefny <vtrefny@redhat.com> - 3.3.3-2
+- Avoid AttributeError for DiskLabel formats without disklabel type (#1945914)
+
+* Thu Feb 18 2021 Vojtech Trefny <vtrefny@redhat.com> - 3.3.3-1
+- apply compression settings from blivet.flags.btrfs_compression (#1926892) (michel)
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.3.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Jan 14 2021 Vojtech Trefny <vtrefny@redhat.com> - 3.3.2-1
+- Fix "suggest_container_name" for Anaconda (vtrefny)
+- Add test for util.get_sysfs_attr (vtrefny)
+- Use util.get_sysfs_attr in __is_ignored_blockdev to read device mode (vtrefny)
+- Fix possible UnicodeDecodeError when reading sysfs attributes (vtrefny)
+- Update LUKS device name after parent partition name change (vtrefny)
+- TFT is still broken so let's avoid failures by just doing a build (jkonecny)
+- Fix logging information about ignoring hidden devices (vtrefny)
+- Add __repr__ and __str__ methods to ParentList (vtrefny)
+- Make sure LV name is unique when adding it in device factory (vtrefny)
+- In name checks add name which is already in use to error message (vtrefny)
+- Refactor suggest device/container name functions (vtrefny)
+- Remove an unused attribute from the Blivet class (vponcova)
+- Add PyPI build artifacts to .gitignore (vtrefny)
+- Sync spec with downstream (vtrefny)
+
+* Wed Nov 11 2020 Vojtech Trefny <vtrefny@redhat.com> - 3.3.1-2
+- Remove btrfs from requested libblockdev plugins on RHEL 9
+
+* Tue Oct 20 2020 Vojtech Trefny <vtrefny@redhat.com> - 3.3.1-1
+- Make sure the product name is safe when using it for device name (vtrefny)
+- Run packit RPM builds on Fedora ELN (vtrefny)
+- Allow specifying 'mode' for the sdist command (vtrefny)
+- Enable packit RPM builds on pull requests (vtrefny)
+- Start the iscsi-init service (#1880673) (vponcova)
+- Let parted fix fixable issues with partition table (vtrefny)
+- edd: Fix UnboundLocalError when trying to close fd in collect_mbrs (vtrefny)
+- Use UnusableConfigurationError for partially hidden multipath devices (vtrefny)
+- Close fd if it fails to read the device (nashok)
+- Do not run udev.settle in StorageDevice._pre_teardown (vtrefny)
+- Try to not use udev.resolve_devspec when querying MountsCache (vtrefny)
+- Remove Zanata config file (vtrefny)
+- Ignore new pylint warning W0707 "raise-missing-from" (vtrefny)
+- Use SSH "link" for l10n repository in Makefile (vtrefny)
+- Fix source tarball cleanup in srpm and rpm Makefile targets (vtrefny)
+
+* Wed Sep 16 2020 Vojtech Trefny <vtrefny@redhat.com> - 3.3.0-2
+- Avoid using unnecessary udev.settle calls (#1876162)
+
+* Thu Aug 20 2020 Vojtech Trefny <vtrefny@redhat.com> - 3.3.0-1
+- Account for pmspare grow when adjusting thinpool metadata size (vtrefny)
+- Fix ignoring disk devices with parents or children (vtrefny)
+- Terminology cleanup, part 3 (vtrefny)
+- Terminology cleanups, part 2. (dlehman)
+- Clean up some terminology. (dlehman)
+- Add tests for udev.device_get_name for RAID devices (vtrefny)
+- Fix name resolution for MD devices and partitions on them (vtrefny)
+- Fix reading hidden sysfs attribute (vtrefny)
+- Add support for specifying sector size for LUKS 2 devices (vtrefny)
+- Do not ignore unknown/unsupported device mapper devices (vtrefny)
+- Allow specifying custom hash function for LUKS 2 format (vtrefny)
+- Ignore devices marked as hidden in sysfs (#1856974) (vtrefny)
+- Add basic F2FS support (#1794950) (vtrefny)
+- Make safe_device_name device type specific (vtrefny)
+- Add exFAT to filesystems we recognize (vtrefny)
+- Use xfs_db in read-only mode when getting XFS information (vtrefny)
+- Add support for checking and fixing XFS using xfs_repair (vtrefny)
+- Ignore zRAM devices in VMBackedTestCase (vtrefny)
+- Add tests for XFS resize (vtrefny)
+- Add support for XFS format grow (vtrefny)
+- Typo fix (vtrefny)
+- tests: Skip test_reset when running as non-root (vtrefny)
+- tests: Patch LVM availability functions for some tests (vtrefny)
+- tests: Patch LVM lvs call for some non-LVM tests (vtrefny)
+- Do not propagate ped exception from add_partition (vtrefny)
+- Do not use BlockDev.utils_have_kernel_module to check for modules (vtrefny)
+- set allowed disk labels for s390x as standard ones (msdos + gpt) plus dasd (dan)
+- Do not use FSAVAIL and FSUSE%% options when running lsblk (vtrefny)
+- Rewrite README and add it as a long_description in setup.py (vtrefny)
+- Round down to nearest MiB value when writing ks parittion info. (sbueno+anaconda)
+- Add _teardown method to IntegrityDevice (vtrefny)
+- Fix status for DM Integrity format (#1814005) (vtrefny)
+- udev: Add function to get list of device's holders (vtrefny)
+- Add basic support for LVM writecache devices (vtrefny)
+- Add test for SwapSpace max size (vtrefny)
+- Do not limit swap to 128 GiB (vtrefny)
+- Fix possible UnicodeDecodeError when reading model from sysfs (vtrefny)
+- Add install_requires and classifiers to setup.py (vtrefny)
+- Import setuptools in setup.py to make bdist_wheel work (vtrefny)
+- Set device.original_format to the new format in ActionCreateFormat (vtrefny)
+- Fix resizable property for partitions (vtrefny)
+- Update TODO. (dlehman)
+- Ignore pycodestyle warning E741 (vtrefny)
+- Skip test_mounting for filesystems that are not mountable (vtrefny)
+- Sync specfile with downstream (japokorn)
+- Make extended partitions resizable (vtrefny)
+- Fix LV min size for resize in test_action_dependencies (vtrefny)
+- Fix checking for filesystem support in action_test (vtrefny)
+- Add basic support for LVM VDO devices (vtrefny)
+- Update POT file in the Weblate repo during "make potfile" (vtrefny)
+- Skip translation canary check if POT file is not available (vtrefny)
+- Add blivet-weblate repository as a submodule (vtrefny)
+- Remove Zanata from our build process (vtrefny)
+- Remove po folder (vtrefny)
+- More consistent lvm errors (API break) (japokorn)
+- Added support for device tags (japokorn)
+
+* Wed Jul 29 2020 Vojtech Trefny <vtrefny@redhat.com> - 3.2.2-4
+- set allowed disk labels for s390x as standard ones (msdos + gpt) plus dasd
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.2.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Sat May 23 2020 Miro Hrončok <mhroncok@redhat.com> - 1:3.2.2-2
+- Rebuilt for Python 3.9
 
 * Thu May 21 2020 Jan Pokorny <japokorn@redhat.com> - 3.2.2-1
 - Allow setting size for non-existing LUKS devices (vtrefny)
