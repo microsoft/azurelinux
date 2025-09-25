@@ -192,7 +192,7 @@ func kernelCommandLineToImager(kernelCommandLine imagecustomizerapi.KernelComman
 	}
 
 	imagerKernelCommandLine := configuration.KernelCommandLine{
-		ExtraCommandLine: string(kernelCommandLine.ExtraCommandLine),
+		ExtraCommandLine: GrubArgsToString(kernelCommandLine.ExtraCommandLine),
 		SELinux:          imagerSELinuxMode,
 		SELinuxPolicy:    "",
 	}
