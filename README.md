@@ -29,6 +29,10 @@ After downloading the ISO, use [the quickstart instructions](toolkit/docs/quick_
 
 Note: Support for the ISO is community based. Before filing a new bug or feature request, please search the list of Github Issues. If you are unable to find a matching issue, please report new bugs by clicking [here](https://github.com/microsoft/CBL-Mariner/issues) or create a new feature request by clicking [here](https://github.com/microsoft/CBL-Mariner/issues/new). For additional information refer to the [support.md](https://github.com/microsoft/CBL-Mariner/blob/2.0/SUPPORT.md) file.
 
+### Docker containers
+
+When you want to use CBL-Mariner runing as Docker containers, you can find a [selection of prebuild images on the Microsoft Container Registry](https://mcr.microsoft.com/en-us/catalog?search=cbl-mariner) and build further based on these images.
+
 
 ## Getting Help
 - Bugs, feature requests and questions can be filed as GitHub issues.
