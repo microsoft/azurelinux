@@ -1,68 +1,100 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Name: hunspell-de
-Summary: German hunspell dictionaries
-%global upstreamid 20161207
-Version: 0.%{upstreamid}
-Release: 6%{?dist}
-Source: https://www.j3e.de/ispell/igerman98/dict/igerman98-%{upstreamid}.tar.bz2
-URL: https://www.j3e.de/ispell/igerman98
-License: GPLv2 or GPLv3
-BuildArch: noarch
-BuildRequires: aspell, hunspell, perl-interpreter
+Name:          hunspell-de
+Summary:       German hunspell dictionaries
+Version:       20240224
+Release:       1%{?dist}
 
-Requires: hunspell
+License:       GPL-2.0-only OR GPL-3.0-only
+URL:           https://cgit.freedesktop.org/libreoffice/dictionaries/tree/de
+# ./make_source.sh
+Source0:       dict-de-%{version}.tar.xz
+BuildArch:     noarch
+
+Requires: hunspell-filesystem
 Supplements: (hunspell and langpacks-de)
 
 %description
 German (Germany, Switzerland, etc.) hunspell dictionaries.
 
 %prep
-%setup -q -n igerman98-%{upstreamid}
-sed -i -e "s/AFFIX_EXPANDER = ispell/AFFIX_EXPANDER = aspell/g" Makefile
+%autosetup -p1 -n dict-de-%{version}
+
 
 %build
-LC_ALL=C make hunspell/de_AT.dic hunspell/de_AT.aff \
-     hunspell/de_CH.dic hunspell/de_CH.aff \
-     hunspell/de_DE.dic hunspell/de_DE.aff
-cd hunspell
-for i in README_*.txt; do
-  if ! iconv -f utf-8 -t utf-8 -o /dev/null $i > /dev/null 2>&1; then
-    iconv -f ISO-8859-1 -t UTF-8 $i > $i.new
-    touch -r $i $i.new
-    mv -f $i.new $i
-  fi
-  tr -d '\r' < $i > $i.new
-  touch -r $i $i.new
-  mv -f $i.new $i
-done
+# Nothing to build
+
 
 %install
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/myspell
-cd hunspell
-cp -p de_??.dic de_??.aff $RPM_BUILD_ROOT/%{_datadir}/myspell
+mkdir -p %{buildroot}%{_datadir}/hunspell
 
-pushd $RPM_BUILD_ROOT/%{_datadir}/myspell/
-de_DE_aliases="de_BE de_LU"
-for lang in $de_DE_aliases; do
-	ln -s de_DE.aff $lang.aff
-	ln -s de_DE.dic $lang.dic
-done
-de_CH_aliases="de_LI"
-for lang in $de_CH_aliases; do
-	ln -s de_CH.aff $lang.aff
-	ln -s de_CH.dic $lang.dic
-done
-popd
+install -pm 0644 de_AT_frami.aff %{buildroot}%{_datadir}/hunspell/de_AT.aff
+install -pm 0644 de_AT_frami.dic %{buildroot}%{_datadir}/hunspell/de_AT.dic
+
+install -pm 0644 de_CH_frami.aff %{buildroot}%{_datadir}/hunspell/de_CH.aff
+install -pm 0644 de_CH_frami.dic %{buildroot}%{_datadir}/hunspell/de_CH.dic
+install -pm 0644 de_DE_frami.aff %{buildroot}%{_datadir}/hunspell/de_LI.aff
+install -pm 0644 de_DE_frami.dic %{buildroot}%{_datadir}/hunspell/de_LI.dic
+
+install -pm 0644 de_DE_frami.aff %{buildroot}%{_datadir}/hunspell/de_DE.aff
+install -pm 0644 de_DE_frami.dic %{buildroot}%{_datadir}/hunspell/de_DE.dic
+install -pm 0644 de_DE_frami.aff %{buildroot}%{_datadir}/hunspell/de_BE.aff
+install -pm 0644 de_DE_frami.dic %{buildroot}%{_datadir}/hunspell/de_BE.dic
+install -pm 0644 de_DE_frami.aff %{buildroot}%{_datadir}/hunspell/de_LU.aff
+install -pm 0644 de_DE_frami.dic %{buildroot}%{_datadir}/hunspell/de_LU.dic
 
 
 %files
-%doc hunspell/README_de_??.txt hunspell/COPYING_GPLv2 hunspell/COPYING_GPLv3 hunspell/Copyright
-%{_datadir}/myspell/*
+%doc README_de_DE_frami.txt README_extension_owner.txt
+%license COPYING_GPLv2 COPYING_GPLv3
+%{_datadir}/hunspell/*
+
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20161207-6
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Mar 18 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 20240224-1
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20240224-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Sat Feb 24 2024 Sandro Mani <manisandro@gmail.com> - 20240224-1
+- Pull dictionaries from libreoffice git
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20161207-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20161207-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20161207-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20161207-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20161207-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Mar 22 2022 Parag Nemade <pnemade AT redhat DOT com> - 20161207-3
+- Add conditional for new hunspell dir path and update to Requires:
+  hunspell-filesystem
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20161207-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jan 04 2022 Sandro Mani <manisandro@gmail.com> - 20161207-1
+- Modernize spec
+- Set an actual version
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.20161207-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.20161207-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.20161207-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.20161207-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
