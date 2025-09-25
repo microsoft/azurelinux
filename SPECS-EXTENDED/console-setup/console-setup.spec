@@ -1,13 +1,12 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-
 Name:		console-setup
-Version:	1.194
-Release:	3%{?dist}
+Version:	1.230
+Release:	2%{?dist}
 Summary:	Tools for configuring the console using X Window System key maps
 
 # For a breakdown of the licensing, see COPYRIGHT, copyright, copyright.fonts and copyright.xkb
-License:	GPLv2+ and MIT and Public Domain
+License:	GPL-2.0-or-later AND MIT AND LicenseRef-Fedora-Public-Domain
 URL:		http://packages.debian.org/cs/sid/console-setup
 Source0:	http://ftp.de.debian.org/debian/pool/main/c/%{name}/%{name}_%{version}.tar.xz
 
@@ -22,7 +21,8 @@ Requires:	kbd
 # require 'xkeyboard-config' to have X Window keyboard descriptions?
 
 BuildRequires:	perl-generators
-BuildRequires:	perl(encoding)
+BuildRequires:	perl(encoding) perl(open)
+BuildRequires:	make
 BuildArch:	noarch
 
 %description
@@ -48,10 +48,10 @@ not wasted but used for another symbol.
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch 0 -p1 -b .paths
-%patch 1 -p1 -b .fsf-address
-%patch 2 -p1 -b .ctrll-lock
+%autopatch -p1
 
+cp -a --remove-destination debian/copyright COPYRIGHT
+cp -a --remove-destination debian/changelog CHANGES
 
 %build
 make build-linux
@@ -95,8 +95,158 @@ cp -a Fonts/fontsets Fonts/*.equivalents Fonts/*.set \
 
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.194-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Tue Dec 17 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.230-2
+- AzureLinux import from Fedora 41 
+- License verified
+
+* Wed Jul 17 2024 Packit <hello@packit.dev> - 1.230-1
+- Update to latest upstream version
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.228-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 21 2024 Packit <hello@packit.dev> - 1.228-1
+- Update to latest upstream version
+
+* Sun Jan 28 2024 Packit <hello@packit.dev> - 1.224-1
+- Update to latest upstream version
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.223-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.223-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Oct 25 2023 Packit <hello@packit.dev> - 1.223-1
+- Update to latest upstream version
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.222-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jun 23 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.222-1
+- Update to latest upstream version
+  Resolves: #2216578
+
+* Thu May 25 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.221-1
+- Update to latest upstream version
+  Resolves: #2208916
+
+* Tue May 16 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.220-1
+- Update to latest upstream version
+  Resolves: #2196018
+
+* Thu Apr 27 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.219-1
+- Update to latest upstream version
+  Resolves: #2189733
+
+* Tue Mar 28 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.218-2
+- SPDX migration
+
+* Fri Mar 17 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.218-1
+- Update to latest upstream version
+  Resolves: #2178377
+
+* Thu Feb 16 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.217-1
+- Update to latest upstream version
+  Resolves: #2170210
+
+* Fri Feb 03 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.216-1
+- Update to latest upstream version
+  Resolves: #2166117
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.215-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jan 05 2023 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.215-1
+- Update to latest upstream version
+  Resolves: #2156436
+
+* Fri Dec 16 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.212-1
+- Update to latest upstream version
+  Resolves: #2152910
+
+* Wed Oct 19 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.211-1
+- Update to latest upstream version
+  Resolves: #2135993
+
+* Thu Sep 15 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.210-1
+- Update to latest upstream version
+  Resolves: #2120120
+
+* Thu Jul 21 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.209-1
+- Update to latest upstream version
+  Resolves: #2108201
+
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.208-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 30 2022 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.208-1
+- Update to latest upstream version
+  Resolves: #2090948
+
+* Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.207-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Nov 09 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.207-1
+- Update to latest upstream version
+  Resolves: #2018840
+
+* Tue Aug 31 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.205-1
+- Update to latest upstream version
+  Resolves: #1985584
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.204-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jul 15 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.204-1
+- Update to latest upstream version
+  Resolves: #1980566
+
+* Thu Jun 03 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.203-1
+- Update to latest upstream version
+  Resolves: #1965868
+
+* Tue May 11 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.202-2
+- Use the "base" XKB files, not "xorg" (patch by Peter Hutterer)
+  Resolves: #1951453
+
+* Wed Mar 24 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.202-1
+- Update to latest upstream version
+  Resolves: #1941247
+
+* Wed Mar 10 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.201-1
+- Update to latest upstream version
+  Resolves: #1930510
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.200-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jan 11 2021 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.200-1
+- Update to latest upstream version
+  Resolves: #1911871
+
+* Mon Dec 07 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.199-1
+- Update to latest upstream version
+  Resolves: #1902975
+
+* Mon Nov 09 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.198-1
+- Update to latest upstream version
+  Resolves: #1893002
+
+* Tue Sep 22 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.197-1
+- Update to latest upstream version
+  Resolves: #1881276
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.196-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 13 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.196-1
+- Update to latest upstream version
+  Resolves: #1856118
+
+* Mon Mar 30 2020 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.195-1
+- Update to latest upstream version
+  Resolves: #1817552
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.194-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
