@@ -6,7 +6,7 @@ License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://git.kernel.dk/?p=fio.git;a=summary
-Source0:        https://brick.kernel.dk/snaps/%{name}-%{version}.tar.bz2
+Source0:        https://github.com/axboe/%{name}/archive/refs/tags/%{name}-%{version}.tar.gz
 Patch0:         CVE-2025-10823.patch
 
 %bcond_without nbd
@@ -148,7 +148,7 @@ RDMA engine for %{name}.
 %endif
 
 %prep
-%autosetup -p1
+%autosetup -n %{name}-%{name}-%{version} -p1
 
 %py3_shebang_fix \
  tools/fio_jsonplus_clat2csv \
