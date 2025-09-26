@@ -6,7 +6,7 @@ License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://git.kernel.dk/?p=fio.git;a=summary
-Source0:        https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/fio-3.30.tar.bz2
+Source0:        https://github.com/axboe/fio/archive/refs/tags/fio-3.30.tar.gz
 
 Patch1:         CVE-2025-10823.patch
 
