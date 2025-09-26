@@ -76,6 +76,7 @@ BuildRequires:  kmod
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
 
+Conflicts:      knem
 
 %description
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as offloading memory copies on to Intel I/OAT hardware.
