@@ -3,15 +3,15 @@ Distribution:   Azure Linux
 # NOTE: tests are disabled since should_be has not yet been packaged.
 
 Name:           python-gssapi
-Version:        1.7.3
-Release:        1%{?dist}
+Version:        1.10.0
+Release:        11%{?dist}
 Summary:        Python Bindings for GSSAPI (RFC 2743/2744 and extensions)
  
 License:        ISC
 URL:            https://github.com/pythongssapi/python-gssapi
 Source0:        https://github.com/pythongssapi/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 # https://github.com/pythongssapi/python-gssapi/pull/321
-Patch0:         cython3.patch
+#Patch0:         cython3.patch
 
 BuildRequires:  krb5-devel >= 1.10
 BuildRequires:  krb5-libs >= 1.10
@@ -59,8 +59,8 @@ Requires:       krb5-libs >= 1.19
 %doc README.txt
 
 %changelog
-* Sat Feb 22 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.7.3-1
-- Initial Azure Linux import from fedora 41.
+* Thu Sep 26 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.10.0-1
+- Upgrade to version 1.10.0-1
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-6
