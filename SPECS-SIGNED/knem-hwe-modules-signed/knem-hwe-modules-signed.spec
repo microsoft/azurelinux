@@ -53,6 +53,8 @@ Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 ExclusiveArch:   aarch64
 
+Conflicts:       knem
+
 #
 # To populate these sources:
 #   1. Build the unsigned packages as normal

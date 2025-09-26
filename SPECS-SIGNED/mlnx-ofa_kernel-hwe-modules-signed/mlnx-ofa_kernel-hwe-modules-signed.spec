@@ -127,6 +127,8 @@ Requires: module-init-tools
 Requires: lsof
 Requires: ofed-scripts
 
+Conflicts: mlnx-ofa_kernel
+
 %description -n %{_name}
 %{description}
 
