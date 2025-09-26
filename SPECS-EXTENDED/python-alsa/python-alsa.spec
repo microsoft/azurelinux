@@ -51,6 +51,10 @@ Summary: %summary
 %changelog
 * Fri Sep 26 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.2.14-1
 - Upgrade to version 1.2.14
+- Added check section.
+
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.2.12-4
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.12-3
