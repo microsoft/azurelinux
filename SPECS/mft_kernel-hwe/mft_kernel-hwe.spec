@@ -85,15 +85,6 @@ EOF)
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
 %endif
-
-%if "%{KMP}" == "1"
-%package utils
-Summary: KO utils for MFT
-Group: System Environment/Kernel
-Vendor: Microsoft Corporation
-%description utils
-mft utils kernel module(s)
-%endif
 #
 # setup module sign scripts if paths to the keys are given
 #
@@ -216,14 +207,6 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %config(noreplace) %{_sysconfdir}/depmod.d/kernel-mft-*.conf
 %endif
 %endif
-%endif
-%if "%{_cpu_arch}" == "ppc64" || "%{_cpu_arch}" == "ppc64le"
-%if "%{KMP}" == "1"
-%files utils
-%defattr(-,root,root,-)
-%license source/COPYING
-%endif
-%{docdir}
 %endif
 
 %changelog

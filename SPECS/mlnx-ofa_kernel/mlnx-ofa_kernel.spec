@@ -116,7 +116,6 @@ Patch0:          001-fix-module-init-for-ibt.patch
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-ExclusiveArch:   x86_64
 
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -199,6 +198,7 @@ Obsoletes: mlnx-en-sources
 Obsoletes: mlnx-rdma-rxe
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries
+ExclusiveArch:   x86_64
 %description -n %{non_kmp_pname}
 Core, HW and ULPs kernel modules
 Non-KMP format kernel modules rpm.

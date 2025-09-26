@@ -63,7 +63,6 @@ Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 Source0:	 https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/knem-1.1.4.90mlnx3.tar.gz#/knem-%{version}.tar.gz
 BuildRoot:       /var/tmp/%{name}-%{version}-build
-ExclusiveArch:   x86_64
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -119,6 +118,8 @@ EOF)
 %package -n %{non_kmp_pname}
 Summary: KNEM: High-Performance Intra-Node MPI Communication
 Group: System Environment/Libraries
+ExclusiveArch:   x86_64
+
 %description -n %{non_kmp_pname}
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as loading memory copies on to Intel I/OAT hardware.
 See http://runtime.bordeaux.inria.fr/knem/ for details.
