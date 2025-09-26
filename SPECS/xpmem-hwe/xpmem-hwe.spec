@@ -51,7 +51,6 @@ Distribution:    Azure Linux
 BuildRequires:	 automake autoconf
 URL:		 https://github.com/openucx/xpmem
 Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/xpmem-2.7.4.tar.gz#/xpmem-%{version}.tar.gz
-ExclusiveArch:   aarch64
 
 # name gets a different value in subpackages
 %global kernel_suffix hwe
@@ -75,14 +74,8 @@ BuildRequires:  kernel-hwe-devel = %{target_kernel_version_full}
 BuildRequires:  binutils
 BuildRequires:  systemd
 BuildRequires:  kmod
-BuildRequires:  mlnx-ofa_kernel-hwe-devel = %{_mofed_full_version}
-BuildRequires:  mlnx-ofa_kernel-hwe-source = %{_mofed_full_version}
-
-Requires:       mlnx-ofa_kernel-hwe = %{_mofed_full_version}
-Requires:       mlnx-ofa_kernel-hwe-modules = %{_mofed_full_version}
-Requires:       kernel-hwe = %{target_kernel_version_full}
-Requires:       kmod
-
+BuildRequires:  mlnx-ofa_kernel-devel
+BuildRequires:  mlnx-ofa_kernel-source
 
 %description
 XPMEM is a Linux kernel module that enables a process to map the
@@ -91,27 +84,6 @@ can be obtained by cloning the Git repository, original Mercurial
 repository or by downloading a tarball from the link above.
 
 This package includes helper tools for the kernel module.
-
-%if ! %{with kernel_only}
-%package -n libxpmem-%{kernel_suffix}
-Summary: XPMEM: Userspace library
-%description -n libxpmem-%{kernel_suffix}
-XPMEM is a Linux kernel module that enables a process to map the
-memory of another process into its virtual address space. Source code
-can be obtained by cloning the Git repository, original Mercurial
-repository or by downloading a tarball from the link above.
-
-
-%package -n libxpmem-%{kernel_suffix}-devel
-Summary: XPMEM: userspace library development headers
-%description -n libxpmem-%{kernel_suffix}-devel
-XPMEM is a Linux kernel module that enables a process to map the
-memory of another process into its virtual address space. Source code
-can be obtained by cloning the Git repository, original Mercurial
-repository or by downloading a tarball from the link above.
-
-This package includes development headers.
-%endif
 
 # build KMP rpms?
 %if "%{KMP}" == "1"
@@ -130,6 +102,13 @@ EOF)
 # munge the release version here as well:
 Summary: XPMEM: kernel modules
 Group: System Environment/Libraries
+ExclusiveArch:   aarch64
+
+Requires:       mlnx-ofa_kernel
+Requires:       mlnx-ofa_kernel-hwe-modules = %{_mofed_full_version}
+Requires:       kernel-hwe = %{target_kernel_version_full}
+Requires:       kmod
+
 %description modules
 XPMEM is a Linux kernel module that enables a process to map the
 memory of another process into its virtual address space. Source code
@@ -227,25 +206,6 @@ if [ "$1" = 0 ]; then
 		rmmod xpmem || :
 	fi
 fi
-
-%files
-/lib/udev/rules.d/*-xpmem.rules
-%{_prefix}/lib/modules-load.d/xpmem.conf
-%doc README AUTHORS
-%license COPYING COPYING.LESSER
-
-%if ! %{with kernel_only}
-%files -n libxpmem-%{kernel_suffix}
-%{_libdir}/libxpmem.so.*
-%license COPYING COPYING.LESSER
-
-%files -n libxpmem-%{kernel_suffix}-devel
-%{_prefix}/include/xpmem.h
-%{_libdir}/libxpmem.a
-%{_libdir}/libxpmem.so
-%{_libdir}/pkgconfig/cray-xpmem.pc
-%license COPYING COPYING.LESSER
-%endif
 
 %if "%{KMP}" != "1"
 %files modules

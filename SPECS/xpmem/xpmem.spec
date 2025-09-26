@@ -50,7 +50,6 @@ Distribution:    Azure Linux
 BuildRequires:	 automake autoconf
 URL:		 https://github.com/openucx/xpmem
 Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/xpmem-2.7.4.tar.gz#/%{name}-%{version}.tar.gz
-ExclusiveArch:   x86_64
 
 # name gets a different value in subpackages
 %global _name %{name}
@@ -79,9 +78,6 @@ BuildRequires:  mlnx-ofa_kernel-devel = %{_mofed_full_version}
 BuildRequires:  mlnx-ofa_kernel-source = %{_mofed_full_version}
 
 Requires:       mlnx-ofa_kernel = %{_mofed_full_version}
-Requires:       mlnx-ofa_kernel-modules = %{_mofed_full_version}
-Requires:       kernel = %{target_kernel_version_full}
-Requires:       kmod
 
 
 %description
@@ -130,6 +126,12 @@ EOF)
 # munge the release version here as well:
 Summary: XPMEM: kernel modules
 Group: System Environment/Libraries
+ExclusiveArch:   x86_64
+
+Requires:       mlnx-ofa_kernel-modules = %{_mofed_full_version}
+Requires:       kernel = %{target_kernel_version_full}
+Requires:       kmod
+
 %description modules
 XPMEM is a Linux kernel module that enables a process to map the
 memory of another process into its virtual address space. Source code
