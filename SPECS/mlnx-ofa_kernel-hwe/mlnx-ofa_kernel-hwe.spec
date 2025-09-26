@@ -153,6 +153,7 @@ Requires: module-init-tools
 Requires: lsof
 Requires: ofed-scripts
 
+Conflicts: mlnx-ofa_kernel
 
 %if "%{KMP}" == "1"
 BuildRequires: %kernel_module_package_buildreqs
