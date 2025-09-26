@@ -23033,8 +23033,8 @@
         "type": "other",
         "other": {
           "name": "python-gssapi",
-          "version": "1.7.3",
-          "downloadUrl": "https://github.com/pythongssapi/python-gssapi/releases/download/v1.7.3/python-gssapi-1.7.3.tar.gz"
+          "version": "1.10.0",
+          "downloadUrl": "https://github.com/pythongssapi/python-gssapi/releases/download/v1.10.0/python-gssapi-1.10.0.tar.gz"
         }
       }
     },
