@@ -56,6 +56,7 @@ Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
 
 Conflicts:      mft_kernel
+Conflicts:      kernel-mft
 
 # Azure Linux attempts to match the spec file name and the "Name" tag.
 # Upstream's mft_kernel spec set rpm name as kernel-mft. To comply, we
