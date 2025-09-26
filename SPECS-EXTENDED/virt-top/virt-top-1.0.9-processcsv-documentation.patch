@@ -1,10 +1,11 @@
---- virt-top-1.0.4.old/virt-top/virt-top.pod	2011-08-11 14:30:30.560493914 +0100
-+++ virt-top-1.0.4/virt-top/virt-top.pod	2011-08-11 14:34:00.934495607 +0100
-@@ -123,6 +123,22 @@
+diff -ur virt-top-1.0.9.old/src/virt-top.pod virt-top-1.0.9.new/src/virt-top.pod
+--- virt-top-1.0.9.old/src/virt-top.pod	2020-05-05 12:01:25.069799212 +0100
++++ virt-top-1.0.9.new/src/virt-top.pod	2020-05-05 12:02:05.234337666 +0100
+@@ -129,6 +129,22 @@
  
   virt-top --csv >(split -d -l 1000 - output.csv.)
  
-+RHEL provides a short Python script called C<processcsv.py> which
++A short Python script called C<processcsv.py>
 +can be used to post-process the CSV output.  Run it like this:
 +
 + virt-top --csv data.csv
