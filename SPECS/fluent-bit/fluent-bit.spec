@@ -58,7 +58,7 @@ Development files for %{name}
     -DFLB_OUT_TD=Off \
     -DFLB_OUT_ES=Off \
     -DFLB_SHARED_LIB=On \
-%if %{with_check}
+%if 0%{?with_check}
     -DFLB_TESTS_RUNTIME=On \
     -DFLB_TESTS_INTERNAL=On \
 %endif
