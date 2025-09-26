@@ -1,6 +1,6 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%define		baseversion 1.2.12
+%define		baseversion 1.2.14
 
 Summary:	Python binding for the ALSA library
 Name:		python-alsa
@@ -12,6 +12,9 @@ URL:		http://www.alsa-project.org/
 BuildRequires:	alsa-lib-devel >= %{version}
 BuildRequires:	python3-devel
 BuildRequires:	python3-setuptools
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
 BuildRequires:	gcc
 
 # Filter private shared library provides
@@ -31,18 +34,23 @@ Summary: %summary
 %prep
 %autosetup -n pyalsa-%{version} -p 1
 
+%generate_buildrequires
+%pyproject_buildrequires
+
 %build
-%py3_build
+%pyproject_wheel
 	
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files '*'
 
-%files -n python3-alsa
-%{python3_sitearch}/*
+%check
+%pyproject_check_import
+%files -n python3-alsa -f %{pyproject_files}
 
 %changelog
-* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.2.12-4
-- Initial Azure Linux import from Fedora 41 (license: MIT).
+* Fri Sep 26 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.2.14-1
+- Upgrade to version 1.2.14
 - License verified.
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.12-3
