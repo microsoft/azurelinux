@@ -39,7 +39,7 @@ ifneq ($(DAILY_BUILD_ID),)
     ifeq ($(DAILY_BUILD_ID),lkg)
         $(call create_folder,$(daily_lkg_workdir))
 
-        override DAILY_BUILD_ID := $(shell $(SCRIPTS_DIR)/get_lkg_id.sh $(daily_lkg_workdir))
+        override DAILY_BUILD_ID := $(shell $(SCRIPTS_DIR)/get_lkg_id.sh $(daily_lkg_workdir) | sed "s/['\"]//g")
         ifneq ($(.SHELLSTATUS),0)
             $(error Failed to auto detect DAILY_BUILD_ID)
         endif

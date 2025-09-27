@@ -66,5 +66,5 @@ endif
 $(daily_build_repo): $(daily_build_repo_source) $(STATUS_FLAGS_DIR)/daily_build_id.flag
 	@echo "Regenerating daily build repo file from '$<' to '$@'"
 	mkdir -p $(dir $@)
-	sed 's|{{.DAILY_REPO_NAME}}|$(daily_build_repo_name)|g' $< > $@
+	sed 's|{{.DAILY_REPO_NAME}}|$(subst ",,$(daily_build_repo_name))|g' $< > $@
 endif
