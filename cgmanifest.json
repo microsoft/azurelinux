@@ -17673,8 +17673,8 @@
         "type": "other",
         "other": {
           "name": "perl-File-Find-Object",
-          "version": "0.3.5",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/File/File-Find-Object-0.3.5.tar.gz"
+          "version": "0.3.8",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/File-Find-Object-0.3.8.tar.gz"
         }
       }
     },
