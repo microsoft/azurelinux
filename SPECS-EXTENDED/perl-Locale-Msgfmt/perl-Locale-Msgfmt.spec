@@ -8,6 +8,7 @@ License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Locale-Msgfmt
 Source0:        https://cpan.metacpan.org/authors/id/A/AZ/AZAWAWI/Locale-Msgfmt-%{version}.tar.gz#/perl-Locale-Msgfmt-%{version}.tar.gz
 # Update Makefile.PL to not use Module::Install::DSL CPAN RT#148295
+Source1:        Artistic
 Patch0:         Locale-Msgfmt-0.15-Remove-using-of-MI-DSL.patch
 BuildArch:      noarch
 BuildRequires:  coreutils
@@ -42,6 +43,7 @@ examples on home page.
 %prep
 %setup -q -n Locale-Msgfmt-%{version}
 %patch -P0 -p1
+cp %{SOURCE1} .
 
 # Remove bundled libraries
 rm -r inc
@@ -62,6 +64,7 @@ cp -v script/msgfmt.pl $RPM_BUILD_ROOT%{_bindir}
 make test
 
 %files
+%license Artistic
 %doc Changes README
 %{perl_vendorlib}/Locale*
 %{perl_vendorlib}/Module*
@@ -71,6 +74,7 @@ make test
 %changelog
 * Thu Feb 12 2025 Sumit Jena <v-sumitjena@microsoft.com> - 0.15-29
 - Added necessary patches as per Fedora 41.
+- Added appropriate license.
 
 * Thu Jan 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15-28
 - License verified.
