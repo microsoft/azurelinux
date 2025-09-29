@@ -21,13 +21,13 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.41
-Release:        6%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://www.gnu.org/software/binutils
-Source0:        https://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
+Source0:        https://sourceware.org/pub/binutils/releases/%{name}-%{version}.tar.xz
 # Patch was derived from source: https://src.fedoraproject.org/rpms/binutils/blob/f34/f/binutils-export-demangle.h.patch
 Patch0:         export-demangle-header.patch
 # The gold linker doesn't understand the 'module_info.ld' script passed to all linkers and the tests fail to correctly link.
@@ -40,6 +40,9 @@ Patch6:         CVE-2025-0840.patch
 Patch7:		CVE-2025-1744.patch
 Patch8:         CVE-2025-5245.patch
 Patch9:         CVE-2025-5244.patch
+Patch10:        CVE-2025-7546.patch
+Patch11:        CVE-2025-7545.patch
+Patch12:        CVE-2025-8225.patch
 Provides:       bundled(libiberty)
 
 # Moving macro before the "SourceX" tags breaks PR checks parsing the specs.
@@ -329,6 +332,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %do_files aarch64-linux-gnu %{build_aarch64}
 
 %changelog
+* Mon Jul 28 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.41-8
+- Patch for CVE-2025-8225
+
+* Thu Jul 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.41-7
+- Patch for CVE-2025-7546, CVE-2025-7545
+
 * Wed May 28 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 2.41-6
 - Patch CVE-2025-5245 , CVE-2025-5244
 

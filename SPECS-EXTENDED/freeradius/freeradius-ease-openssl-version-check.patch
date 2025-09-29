@@ -1,0 +1,35 @@
+From: Antonio Torres <antorres@redhat.com>
+Date: Tue, 12 Sep 2023
+Subject: Ease OpenSSL version check requirement
+
+FreeRADIUS includes an OpenSSL version check that compares built vs linked version,
+and fails to start if this check fails. We can ease this requirement in Fedora/RHEL as 
+ABI changes are tracked and soname is changed accordingly, as discussed in previous 
+Bugzilla for this issue [1].
+
+[1]: https://bugzilla.redhat.com/show_bug.cgi?id=1299388
+
+Resolves: https://bugzilla.redhat.com/show_bug.cgi?id=2238511
+Signed-off-by: Antonio Torres <antorres@redhat.com>
+---
+ src/main/version.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/main/version.c b/src/main/version.c
+index c190337c1d..fee2150eb2 100644
+--- a/src/main/version.c
++++ b/src/main/version.c
+@@ -79,11 +79,11 @@ int ssl_check_consistency(void)
+ 	 */
+ 	if ((ssl_linked & 0x0000000f) != (ssl_built & 0x0000000f)) {
+ 	mismatch:
+-		ERROR("libssl version mismatch.  built: %lx linked: %lx",
++		DEBUG2("libssl version mismatch.  built: %lx linked: %lx",
+ 		      (unsigned long) ssl_built,
+ 		      (unsigned long) ssl_linked);
+ 
+-		return -1;
++		return 0;
+ 	}
+ 
+ 	/*

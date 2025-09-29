@@ -2,7 +2,7 @@
 
 Name:          dbus-c++
 Version:       0.9.0
-Release:       23%{?dist}
+Release:       24%{?dist}
 Summary:       Native C++ bindings for D-Bus
 
 License:       LGPLv2+
@@ -21,6 +21,7 @@ Patch3: dbus-c++-macro_collision.patch
 Patch4: dbus-c++-threading.patch
 # https://sourceforge.net/p/dbus-cplusplus/patches/19/
 Patch5: dbus-c++-writechar.patch
+Patch6: dbus-c++-template-operators.patch
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -68,6 +69,7 @@ sed -i 's/libtoolize --force --copy/libtoolize -if --copy/' bootstrap
 %patch 3 -p1 -b .collision
 %patch 4 -p1 -b .threading
 %patch 5 -p1 -b .writechar
+%patch 6 -p1 -b .operators
 
 %build
 autoreconf -vfi
@@ -109,6 +111,10 @@ find $RPM_BUILD_ROOT -name '*.la' -print -delete
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Fri Apr 04 2025 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.9-0-24
+- Fixed build Issues (license: MIT)
+- License verified
+
 * Tue Jan 12 2021 Joe Schmitt <joschmit@microsoft.com> - 0.9.0-23
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Disable ecore support
