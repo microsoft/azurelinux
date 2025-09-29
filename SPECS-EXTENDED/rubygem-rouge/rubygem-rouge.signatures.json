@@ -1,5 +1,7 @@
 {
  "Signatures": {
-  "rouge-3.26.0.tar.gz": "d856bf074925dff523f0e1232d5ff0be81cdf7428bf9b4425d0055bce61ad43d"
+  "bundler.rb": "5568b03c72652879f7d07b9bdd27a41fc8d3fc3e2f60ae8b40ff71a2b0f2023f",
+  "rubygem-rouge-4.4.0.tar.gz": "f4cb2b74fa0db748b1f31a51f1f77cb5e0c1aa5552f6d1632a08743e1eaa1aef",
+  "spec_helper_assert.rb": "4a510a7d0ba8cd0df97b19854a8fcba3659ea8b5f3de7c8abd5879b7e5bc137c"
  }
 }
