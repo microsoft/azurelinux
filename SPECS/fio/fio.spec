@@ -128,7 +128,7 @@ Requires:       %{name} = %{version}-%{release}
 RDMA engine for %{name}.
 
 %prep
-%autosetup -p1
+%autosetup -n %{name}-%{name}-%{version} -p1 
 
 %py3_shebang_fix \
  tools/fio_jsonplus_clat2csv \
