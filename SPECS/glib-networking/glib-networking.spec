@@ -1,13 +1,14 @@
 Summary:        Glib networking modules
 Name:           glib-networking
 Version:        2.78.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Development
 URL:            https://gitlab.gnome.org/GNOME/glib-networking/
 Source0:        https://download.gnome.org/sources/%{name}/2.78/%{name}-%{version}.tar.xz
+Patch0:         CVE-2025-60019.patch
 BuildRequires:  gcc
 BuildRequires:  gettext
 BuildRequires:  meson
@@ -27,6 +28,7 @@ GProxyResolver implementations and a gnutls-based GTlsConnection
 implementation.
 
 %prep
+%patch 0 -p1
 %setup -q
 
 %build
@@ -47,6 +49,9 @@ implementation.
 %{_libdir}/gio/modules/libgiognutls.so
 
 %changelog
+* Mon Sep 29 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.78.0-2
+- Patch for CVE-2025-60019
+
 * Tue Feb 13 2024 Vince Perri <viperri@microsoft.com> - 2.78.0-1
 - Upgrade to 2.78.0
 
