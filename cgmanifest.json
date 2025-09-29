@@ -3639,7 +3639,7 @@
         "other": {
           "name": "fio",
           "version": "3.37",
-          "downloadUrl": "https://brick.kernel.dk/snaps/fio-3.37.tar.bz2"
+          "downloadUrl": "https://github.com/axboe/fio/archive/refs/tags/fio-3.37.tar.gz"
         }
       }
     },
