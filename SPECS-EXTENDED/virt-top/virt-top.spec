@@ -16,15 +16,13 @@ Source3:        processcsv.py.pod
 
 Source4:        libguestfs.keyring
 
-Patch1:         virt-top-1.0.9-processcsv-documentation.patch
 
-Patch2:         0001-virt-top-fix-to-explicitly-disconnect-from-libvirtd.patch
+Patch0:         0001-virt-top-fix-to-explicitly-disconnect-from-libvirtd.patch
 
-Patch3:         0002-virt-top-fix-to-parse-init-file-correctly.patch
+Patch1:         0002-virt-top-fix-to-parse-init-file-correctly.patch
 
-Patch4:         0003-src-Include-libxml-parser.h.patch
+Patch2:         0003-src-Include-libxml-parser.h.patch
 
-Patch5:         virt-top-1.1.1-ocaml-bytecode.patch
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -57,18 +55,9 @@ different virtualization systems.
 
 
 %prep
-%{gpgverify} --keyring='%{SOURCE4}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%setup -q
-
-%patch -P2 -p1
-%patch -P3 -p1
-%patch -P4 -p1
-%ifnarch %{ocaml_native_compiler}
-%patch -P5 -p1
-%endif
+%autosetup -p1
 
 sed -i 's/\(OCAMLBEST=\)byte/\1ocamlc/' configure
-
 
 %build
 %configure
@@ -76,7 +65,6 @@ make
 
 rm -f src/virt-top.1
 make -C src virt-top.1
-
 
 %install
 make DESTDIR=$RPM_BUILD_ROOT install
@@ -86,13 +74,11 @@ make DESTDIR=$RPM_BUILD_ROOT install
 mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
 install -m 0644 src/virt-top.1 $RPM_BUILD_ROOT%{_mandir}/man1
 
-
 %files -f %{name}.lang
 %doc README TODO
 %license COPYING
 %{_bindir}/virt-top
 %{_mandir}/man1/virt-top.1*
-
 
 %changelog
 * Fri Mar 18 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.1.1-22
