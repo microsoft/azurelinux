@@ -16,7 +16,7 @@ Source0:        %{url}/archive/v%{version}/aiodns-%{version}.tar.gz#/%{name}-%{v
 BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires: 	python3-pip
-BuildRequires: python3-wheel
+BuildRequires:  python3-wheel
 #for tests
 BuildRequires: 	python3-pycares
 BuildRequires:  python3-cffi
