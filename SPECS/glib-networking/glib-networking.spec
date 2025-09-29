@@ -28,8 +28,7 @@ GProxyResolver implementations and a gnutls-based GTlsConnection
 implementation.
 
 %prep
-%patch 0 -p1
-%setup -q
+%autosetup -p1
 
 %build
 %meson -Dlibproxy=disabled
