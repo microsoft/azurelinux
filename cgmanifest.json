@@ -13642,8 +13642,8 @@
         "type": "other",
         "other": {
           "name": "mod_security",
-          "version": "2.9.4",
-          "downloadUrl": "https://github.com/SpiderLabs/ModSecurity/releases/download/v2.9.4/modsecurity-2.9.4.tar.gz"
+          "version": "2.9.7",
+          "downloadUrl": "https://github.com/SpiderLabs/ModSecurity/releases/download/v2.9.7/modsecurity-2.9.7.tar.gz"
         }
       }
     },
