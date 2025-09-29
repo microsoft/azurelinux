@@ -62,7 +62,7 @@ function checkInternet {
 function installNodeModules {
 	echo "Installing node modules."
 	sudo tdnf install -y nodejs
-	 npm config set prefix "$homeCacheDir/.npm"
+	npm config set prefix "$homeCacheDir/.npm"
 	npm config set cache "$homeCacheDir/.npm" --global
 	# Default node/npm versions in Mariner fails to build dependency node module versions due to known
 	# incompatibilities.
