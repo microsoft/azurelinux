@@ -1,0 +1,20 @@
+diff -up dovecot-2.3.15/run-test-valgrind.supp.valbasherr dovecot-2.3.15/run-test-valgrind.supp
+--- dovecot-2.3.15/run-test-valgrind.supp.valbasherr	2021-06-21 22:52:53.272707239 +0200
++++ dovecot-2.3.15/run-test-valgrind.supp	2021-06-21 22:54:19.786668430 +0200
+@@ -1,4 +1,16 @@
+ {
++   <bashagin>
++   Memcheck:Leak
++   match-leak-kinds: definite
++   fun:malloc
++   fun:make_if_command
++   fun:yyparse
++   fun:parse_command
++   fun:read_command
++   fun:reader_loop
++   fun:main
++}
++{
+    <bash>
+    Memcheck:Leak
+    fun:malloc
