@@ -192,11 +192,6 @@ depmod %{KVERSION} -a
 /sbin/modprobe -r xpmem > /dev/null 2>&1
 /sbin/modprobe xpmem > /dev/null 2>&1
 
-%if ! %{with kernel_only}
-%post   -n libxpmem-%{kernel_suffix} -p /sbin/ldconfig
-%postun -n libxpmem-%{kernel_suffix} -p /sbin/ldconfig
-%endif
-
 %postun modules
 if [ "$1" = 0 ]; then
 	if lsmod | grep -qw xpmem; then
