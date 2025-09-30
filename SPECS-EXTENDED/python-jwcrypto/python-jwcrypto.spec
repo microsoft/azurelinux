@@ -18,6 +18,8 @@ BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-cryptography >= 2.3
 BuildRequires:  python%{python3_pkgversion}-pytest
+BuildRequires:  python%{python3_pkgversion}-deprecated
+BuildRequires:  python3-wrapt
 %if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
