@@ -9,20 +9,12 @@ License:        GPL-2.0-or-later
 
 URL:            https://people.redhat.com/~rjones/virt-top/
 Source0:        https://people.redhat.com/~rjones/virt-top/files/%{name}-%{version}.tar.gz
-Source1:        https://people.redhat.com/~rjones/virt-top/files/%{name}-%{version}.tar.gz.sig
-
-Source2:        processcsv.py
-Source3:        processcsv.py.pod
-
-Source4:        libguestfs.keyring
-
 
 Patch0:         0001-virt-top-fix-to-explicitly-disconnect-from-libvirtd.patch
 
 Patch1:         0002-virt-top-fix-to-parse-init-file-correctly.patch
 
 Patch2:         0003-src-Include-libxml-parser.h.patch
-
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -44,7 +36,6 @@ BuildRequires:  perl(Pod::Perldoc)
 BuildRequires:  gawk
 BuildRequires:  gnupg2
 
-
 %description
 virt-top is a 'top(1)'-like utility for showing stats of virtualized
 domains.  Many keys and command line options are the same as for
@@ -52,7 +43,6 @@ ordinary 'top'.
 
 It uses libvirt so it is capable of showing stats across a variety of
 different virtualization systems.
-
 
 %prep
 %autosetup -p1
