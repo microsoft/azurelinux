@@ -115,14 +115,15 @@ EOF)
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
 
+%ifarch x86_64 # We create the module package only for the x86_64 kernel
 %package -n %{non_kmp_pname}
 Summary: KNEM: High-Performance Intra-Node MPI Communication
 Group: System Environment/Libraries
-ExclusiveArch:   x86_64
 
 %description -n %{non_kmp_pname}
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as loading memory copies on to Intel I/OAT hardware.
 See http://runtime.bordeaux.inria.fr/knem/ for details.
+%endif # end ifarch x86_64
 %endif #end if "%{KMP}" == "1"
 
 #
@@ -199,7 +200,13 @@ for flavor in %flavors_to_build; do
 	make DESTDIR=$RPM_BUILD_ROOT install KERNELRELEASE=$KVERSION
 	export MODULE_DESTDIR=/lib/modules/$KVERSION/$INSTALL_MOD_DIR
 	mkdir -p $RPM_BUILD_ROOT/lib/modules/$KVERSION/$INSTALL_MOD_DIR
+# For the default kernel, we create the module package only for the x86_64 kernel.
+# Some other kernels (kernel-hwe for instance) get aarch64 modules packages built from other specs.
+# We keep the user space packages like the module configs built only in this spec, though,
+# and re-use them for kernel modules built for other kernel flavours and architectures.
+%ifarch x86_64
 	MODULE_DESTDIR=/lib/modules/$KVERSION/$INSTALL_MOD_DIR DESTDIR=$RPM_BUILD_ROOT KVERSION=$KVERSION $RPM_BUILD_ROOT/opt/knem-%{version}/sbin/knem_local_install
+%endif
 	cp knem.pc  $RPM_BUILD_ROOT/usr/lib64/pkgconfig
 	cd -
 done
@@ -252,6 +259,7 @@ if (grep -qw knem /etc/sysconfig/kernel 2>/dev/null); then
 fi
 
 %if "%{KMP}" != "1"
+%ifarch x86_64 # We create the module package only for the x86_64 kernel
 %post -n %{non_kmp_pname}
 depmod %{KVERSION} -a
 
@@ -259,6 +267,7 @@ depmod %{KVERSION} -a
 if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 	depmod %{KVERSION} -a
 fi
+%endif # end ifarch x86_64
 %endif # end KMP=1
 
 %files
@@ -272,12 +281,14 @@ fi
 
 
 %if "%{KMP}" != "1"
+%ifarch x86_64 # We create the module package only for the x86_64 kernel
 %files -n %{non_kmp_pname}
 %license source/COPYING source/COPYING.BSD-3 source/COPYING.GPL-2
 /lib/modules/%{KVERSION}/%{install_mod_dir}/
 %if %{IS_RHEL_VENDOR}
 %if ! 0%{?fedora}
 %config(noreplace) %{_sysconfdir}/depmod.d/%{_name}.conf
+%endif
 %endif
 %endif
 %endif

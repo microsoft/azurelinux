@@ -180,6 +180,7 @@ EOF)
 %kernel_module_package -f %{_builddir}/kmp.files -r %{_kmp_rel}
 %endif
 %else # not KMP
+%ifarch x86_64 # We create the module package only for the x86_64 kernel
 %global kernel_source() %{K_SRC}
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
@@ -198,11 +199,11 @@ Obsoletes: mlnx-en-sources
 Obsoletes: mlnx-rdma-rxe
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries
-ExclusiveArch:   x86_64
 %description -n %{non_kmp_pname}
 Core, HW and ULPs kernel modules
 Non-KMP format kernel modules rpm.
 The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
+%endif # end ifarch x86_64
 %endif #end if "%{KMP}" == "1"
 
 %package -n %{devel_pname}
@@ -334,7 +335,13 @@ for flavor in %flavors_to_build; do
 	export KSRC=%{kernel_source $flavor}
 	export KVERSION=%{kernel_release $KSRC}
 	cd $PWD/obj/$flavor
+# For the default kernel, we create the module package only for the x86_64 kernel.
+# Some other kernels (kernel-hwe for instance) get aarch64 modules packages built from other specs.
+# We keep the user space packages like the module configs built only in this spec, though,
+# and re-use them for kernel modules built for other kernel flavours and architectures.
+%ifarch x86_64
 	make install_modules KERNELRELEASE=$KVERSION
+%endif
 	# install script and configuration files
 	make install_scripts
 	mkdir -p %{_builddir}/src/$NAME/$flavor
@@ -482,6 +489,7 @@ rm -rf %{buildroot}
 
 
 %if "%{KMP}" != "1"
+%ifarch x86_64
 %post -n %{non_kmp_pname}
 /sbin/depmod %{KVERSION}
 # W/A for OEL6.7/7.x inbox modules get locked in memory
@@ -499,6 +507,7 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 		/sbin/dracut --force
 	fi
 fi
+%endif # end ifarch x86_64
 %endif # end KMP=1
 
 %post -n %{utils_pname}
@@ -719,12 +728,14 @@ update-alternatives --remove \
 %endif
 
 %if "%{KMP}" != "1"
+%ifarch x86_64 # We create the module package only for the x86_64 kernel
 %files -n %{non_kmp_pname}
 %license source/debian/copyright
 /lib/modules/%{KVERSION}/%{install_mod_dir}/
 %if %{IS_RHEL_VENDOR}
 %if ! 0%{?fedora}
 %config(noreplace) %{_sysconfdir}/depmod.d/zz01-%{_name}-*.conf
+%endif
 %endif
 %endif
 %endif

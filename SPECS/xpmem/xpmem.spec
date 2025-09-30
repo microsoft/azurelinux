@@ -121,12 +121,12 @@ EOF)
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
 
+%ifarch x86_64 # We create the module package only for the x86_64 kernel
 %package modules
 # %{nil}: to avoid having the script that build OFED-internal
 # munge the release version here as well:
 Summary: XPMEM: kernel modules
 Group: System Environment/Libraries
-ExclusiveArch:   x86_64
 
 Requires:       mlnx-ofa_kernel-modules = %{_mofed_full_version}
 Requires:       kernel = %{target_kernel_version_full}
@@ -139,6 +139,7 @@ can be obtained by cloning the Git repository, original Mercurial
 repository or by downloading a tarball from the link above.
 
 This package includes the kernel module (non KMP version).
+%endif # end ifarch x86_64
 %endif #end if "%{KMP}" == "1"
 
 #
@@ -196,6 +197,13 @@ fi
 
 %install
 %{make_install} moduledir=%{moduledir} %{make_kernel_only}
+# For the default kernel, we create the module package only for the x86_64 kernel.
+# Some other kernels (kernel-hwe for instance) get aarch64 modules packages built from other specs.
+# We keep the user space packages like the module configs built only in this spec, though,
+# and re-use them for kernel modules built for other kernel flavours and architectures.
+%ifnarch x86_64
+rm -rf $RPM_BUILD_ROOT/%{moduledir}
+%endif
 rm -rf $RPM_BUILD_ROOT/%{_libdir}/libxpmem.la
 rm -rf $RPM_BUILD_ROOT/etc/init.d/xpmem
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/modules-load.d
@@ -245,9 +253,11 @@ fi
 %endif
 
 %if "%{KMP}" != "1"
+%ifarch x86_64 # We create the module package only for the x86_64 kernel
 %files modules
 %{moduledir}/xpmem.ko
 %license COPYING COPYING.LESSER
+%endif
 %endif
 
 %changelog
