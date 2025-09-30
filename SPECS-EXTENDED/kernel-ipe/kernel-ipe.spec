@@ -33,7 +33,7 @@
 Summary:        Linux Kernel
 Name:           kernel-ipe
 Version:        6.6.104.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -109,7 +109,6 @@ The kernel package contains the Linux kernel.
 %package devel
 Summary:        Kernel Dev
 Group:          System Environment/Kernel
-Requires:       %{name} = %{version}-%{release}
 Requires:       gawk
 Requires:       python3
 Obsoletes:      linux-dev
@@ -460,6 +459,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Sep 23 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.6.104.2-3
+- Removed invalid run-time dependency from the 'devel' subpackage.
+
 * Tue Sep 23 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.104.2-2
 - Bump release to match kernel
 

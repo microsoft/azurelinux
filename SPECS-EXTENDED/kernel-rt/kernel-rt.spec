@@ -25,7 +25,7 @@
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
 Version:        6.6.85.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -102,7 +102,6 @@ The kernel package contains the Linux kernel.
 %package devel
 Summary:        Kernel Dev
 Group:          System Environment/Kernel
-Requires:       %{name} = %{version}-%{release}
 Requires:       gawk
 Requires:       python3
 Obsoletes:      linux-dev
@@ -426,6 +425,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Sep 23 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.6.85.1-4
+- Removed invalid run-time dependency from the 'devel' subpackage.
+
 * Fri Aug 22 2025 Siddharth Chintamaneni <siddharthc@microsoft.com> - 6.6.85.1-3
 - Introducing kernel-hwe
 
