@@ -250,7 +250,7 @@ python3-libs-3.12.9-4.azl3.aarch64.rpm
 python3-setuptools-69.0.3-5.azl3.noarch.rpm
 python3-pygments-2.7.4-2.azl3.noarch.rpm
 which-2.21-8.azl3.aarch64.rpm
-libselinux-3.6-3.azl3.aarch64.rpm
+libselinux-3.6-4.azl3.aarch64.rpm
 slang-2.3.3-1.azl3.aarch64.rpm
 newt-0.52.23-1.azl3.aarch64.rpm
 newt-lang-0.52.23-1.azl3.aarch64.rpm
