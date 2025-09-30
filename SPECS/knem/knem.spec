@@ -200,13 +200,16 @@ for flavor in %flavors_to_build; do
 	make DESTDIR=$RPM_BUILD_ROOT install KERNELRELEASE=$KVERSION
 	export MODULE_DESTDIR=/lib/modules/$KVERSION/$INSTALL_MOD_DIR
 	mkdir -p $RPM_BUILD_ROOT/lib/modules/$KVERSION/$INSTALL_MOD_DIR
+	MODULE_DESTDIR=/lib/modules/$KVERSION/$INSTALL_MOD_DIR DESTDIR=$RPM_BUILD_ROOT KVERSION=$KVERSION $RPM_BUILD_ROOT/opt/knem-%{version}/sbin/knem_local_install
+
 # For the default kernel, we create the module package only for the x86_64 kernel.
 # Some other kernels (kernel-hwe for instance) get aarch64 modules packages built from other specs.
 # We keep the user space packages like the module configs built only in this spec, though,
 # and re-use them for kernel modules built for other kernel flavours and architectures.
-%ifarch x86_64
-	MODULE_DESTDIR=/lib/modules/$KVERSION/$INSTALL_MOD_DIR DESTDIR=$RPM_BUILD_ROOT KVERSION=$KVERSION $RPM_BUILD_ROOT/opt/knem-%{version}/sbin/knem_local_install
+%ifnarch x86_64
+	rm -rf $RPM_BUILD_ROOT/$MODULE_DESTDIR
 %endif
+
 	cp knem.pc  $RPM_BUILD_ROOT/usr/lib64/pkgconfig
 	cd -
 done

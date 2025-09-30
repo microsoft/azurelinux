@@ -180,10 +180,10 @@ EOF)
 %kernel_module_package -f %{_builddir}/kmp.files -r %{_kmp_rel}
 %endif
 %else # not KMP
-%ifarch x86_64 # We create the module package only for the x86_64 kernel
 %global kernel_source() %{K_SRC}
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
+%ifarch x86_64 # We create the module package only for the x86_64 kernel
 %package -n %{non_kmp_pname}
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
