@@ -70,7 +70,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_datadir}/mythes
 * Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.5-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
 
-* Wed Feb 23 2023 Caolán McNamara <caolanm@redhat.com> - 1.2.5-3
+* Thu Feb 23 2023 Caolán McNamara <caolanm@redhat.com> - 1.2.5-3
 - migrated to SPDX license
 
 * Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.5-2
