@@ -22654,7 +22654,7 @@
         "other": {
           "name": "python-deprecated",
           "version": "1.2.18",
-          "downloadUrl": "https://github.com/tiran/defusedxml/archive/refs/tags/v0.7.1.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/deprecated/deprecated-1.2.18.tar.gz"
         }
       }
     },
