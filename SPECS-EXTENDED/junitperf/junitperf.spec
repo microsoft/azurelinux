@@ -90,6 +90,10 @@ install -p -m 0644 dist/%{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name
 # javadoc
 install -d -m 0755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
 cp -pr build/docs/api/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
+install -D -m 0644 build/docs/api/legal/ADDITIONAL_LICENSE_INFO \
+  $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}/legal/ADDITIONAL_LICENSE_INFO
+install -D -m 0644 build/docs/api/legal/ADDITIONAL_LICENSE_INFO \
+  $RPM_BUILD_ROOT%{_licensedir}/%{name}-javadoc/ADDITIONAL_LICENSE_INFO
 ln -s %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 # demo
 install -d -m 0755 $RPM_BUILD_ROOT%{_datadir}/%{name}
@@ -97,11 +101,14 @@ cp -pr samples $RPM_BUILD_ROOT%{_datadir}/%{name}
 
 %files
 %defattr(0644,root,root,0755)
-%doc LICENSE README docs/JUnitPerf.html
+%license LICENSE
+%doc  README docs/JUnitPerf.html
 %{_javadir}/%{name}.jar
 %{_javadir}/%{name}-%{version}.jar
 
 %files javadoc
+%license LICENSE
+%license %{_licensedir}/%{name}-javadoc/ADDITIONAL_LICENSE_INFO
 %defattr(0644,root,root,0755)
 %{_javadocdir}/%{name}-%{version}
 %{_javadocdir}/%{name}
