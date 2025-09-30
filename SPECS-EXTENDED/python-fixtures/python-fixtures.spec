@@ -9,7 +9,7 @@ Release:        1%{?dist}
 Summary:        Fixtures, reusable state for writing clean tests and more
 License:        Apache-2.0 OR BSD-3-Clause
 URL:            https://github.com/testing-cabal/fixtures
-Source:         %pypi_source 
+Source:         https://files.pythonhosted.org/packages/3c/3d/f106b3278ba50067e9cd397f836d33d141aa790853152dbb3512aaee19f3/fixtures-4.0.1.tar.gz 
 
 BuildRequires:  python3-pip
 BuildRequires:  python3-pbr
