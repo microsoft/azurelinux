@@ -80,6 +80,7 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 
 %files javadoc
 %license LICENSE
+%exclude /usr/share/javadoc/jboss-interceptors-1.2-api/legal/ADDITIONAL_LICENSE_INFO
 %{_javadocdir}/%{name}
 
 %changelog
