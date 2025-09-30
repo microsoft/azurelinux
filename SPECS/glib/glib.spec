@@ -15,7 +15,7 @@ Patch1:         CVE-2023-29499.patch
 Patch2:         CVE-2023-32643-CVE-2023-32636.patch
 Patch3:         CVE-2025-3360.patch
 Patch4:         CVE-2025-4373.patch
-Patch5:         CVE-2024-34397.patch
+Patch5:         CVE-2025-7039.patch
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
@@ -129,8 +129,8 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
-* Thu Jul 03 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.71.0-7
-- Patch CVE-2024-34397
+* Mon Sep 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.71.0-7
+- Patch for CVE-2025-7039
 
 * Mon Jun 09 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.71.0-6
 - Patch CVE-2025-4373

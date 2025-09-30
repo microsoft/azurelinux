@@ -2157,7 +2157,6 @@
                 "azurelinux-sysinfo",
                 "bazel",
                 "blobfuse",
-                "blobfuse2",
                 "bmon",
                 "bpftrace",
                 "ccache",
