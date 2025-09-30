@@ -41,8 +41,7 @@ except this is pure Perl. The interface is best explained through
 examples on home page.
 
 %prep
-%setup -q -n Locale-Msgfmt-%{version}
-%patch -P0 -p1
+%autosetup -p1 -n Locale-Msgfmt-%{version}
 cp %{SOURCE1} .
 
 # Remove bundled libraries
