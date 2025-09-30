@@ -361,10 +361,13 @@ for flavor in %flavors_to_build; do
 		cp ./Module.symvers %{_builddir}/src/$NAME/$flavor/Module.symvers
 	fi
 	cp -a %{_builddir}/src/$NAME/$flavor %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}/$KVERSION
-	# Cleanup unnecessary kernel-generated module dependency files.
-	find $INSTALL_MOD_PATH/lib/modules -iname 'modules.*' -exec rm {} \;
 	cd -
 done
+
+%ifarch x86_64
+	# Cleanup unnecessary kernel-generated module dependency files.
+	find $INSTALL_MOD_PATH/lib/modules -iname 'modules.*' -exec rm {} \;
+%endif
 
 # Set the module(s) to be executable, so that they will be stripped when packaged.
 find %{buildroot} \( -type f -name '*.ko' -o -name '*ko.gz' \) -exec %{__chmod} u+x \{\} \;
