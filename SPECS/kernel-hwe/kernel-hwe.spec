@@ -29,9 +29,9 @@
 %endif
 
 Summary:        Linux Kernel
-Name:           kernel-hwe
+Name:           kernel-64k-hwe
 Version:        6.12.40.1
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
