@@ -1,6 +1,6 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%global rt_version rt53
+%global rt_version rt60
 %define uname_r %{version}-%{rt_version}-%{release}
 %define mariner_version 3
 %define version_upstream %(echo %{version} | rev | cut -d'.' -f2- | rev)
@@ -24,8 +24,8 @@
 
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
-Version:        6.6.85.1
-Release:        3%{?dist}
+Version:        6.6.104.2
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -426,6 +426,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Sep 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.104.2-1
+- Auto-upgrade to 6.6.104.2
+
 * Fri Aug 22 2025 Siddharth Chintamaneni <siddharthc@microsoft.com> - 6.6.85.1-3
 - Introducing kernel-hwe
 
