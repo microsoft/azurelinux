@@ -11861,8 +11861,8 @@
         "type": "other",
         "other": {
           "name": "libwps",
-          "version": "0.4.11",
-          "downloadUrl": "http://downloads.sourceforge.net/libwps/libwps-0.4.11.tar.xz"
+          "version": "0.4.14",
+          "downloadUrl": "https://downloads.sourceforge.net/libwps/libwps-0.4.14.tar.xz"
         }
       }
     },
