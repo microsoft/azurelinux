@@ -205,7 +205,7 @@ k="${k-}${k+ and }not test_run_installpkg_targz"
 %changelog
 * Fri Feb 21 2025 Jyoti kanase <v-jykanase@microsoft.com> -  4.24.1-2
 - Initial Azure Linux import from Fedora 41 (license: MIT).
-- License verified.
+- License Verified.
 
 * Wed Jan 29 2025 Miro Hrončok <miro@hroncok.cz> - 4.24.1-1
 - Update to 4.24.1
