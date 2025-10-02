@@ -2,7 +2,7 @@
 Summary:        The Squid proxy caching server
 Name:           squid
 Version:        6.13
-Release:        1%{?dist}
+Release:        2%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 License:       GPL-2.0-or-later AND (LGPL-2.0-or-later AND MIT AND BSD-2-Clause AND BSD-3-Clause AND BSD-4-Clause AND BSD-4-Clause-UC AND LicenseRef-Fedora-Public-Domain AND Beerware)  
@@ -31,6 +31,7 @@ Patch204: squid-6.1-symlink-lang-err.patch
 Patch205: squid-6.1-crash-half-closed.patch
 # Upstream PR: https://github.com/squid-cache/squid/pull/1914
 Patch206: squid-6.11-ignore-wsp-after-chunk-size.patch
+Patch207: CVE-2025-59362.patch
 
 # cache_swap.sh
 Requires: bash gawk
@@ -314,6 +315,9 @@ fi
     chgrp squid %{_var}/cache/samba/winbindd_privileged >/dev/null 2>&1 || :
 
 %changelog
+* Mon Sep 29 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.13-2
+- Patch for CVE-2025-59362
+
 * Wed Feb 26 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 6.13-1
 - Update to 6.13
 - Promote package to Azure Linux Base repo
