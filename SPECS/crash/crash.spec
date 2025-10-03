@@ -1,7 +1,7 @@
 %global gdb_version 10.2
 Name:          crash
 Version:       8.0.4
-Release:       4%{?dist}
+Release:       5%{?dist}
 Summary:       kernel crash analysis utility for live systems, netdump, diskdump, kdump, LKCD or mcore dumpfiles
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
@@ -14,6 +14,7 @@ Source0:       https://github.com/crash-utility/%{name}/archive/%{version}.tar.g
 Source1:       gdb-%{gdb_version}-3.tar.gz
 # lzo patch sourced from https://src.fedoraproject.org/rpms/crash/blob/rawhide/f/lzo_snappy_zstd.patch
 Patch0:        lzo_snappy_zstd.patch
+Patch1:        CVE-2025-11082.patch
 License:       GPLv3+
 BuildRequires: binutils
 BuildRequires: glibc-devel
@@ -97,6 +98,9 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 %endif
 
 %changelog
+* Fri Oct 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.0.4-5
+- Patch for CVE-2025-11082
+
 * Mon Apr 21 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.4-4
 - Update gdb-10.2-3.tar.gz to address CVE-2021-20197, CVE-2022-47673, CVE-2022-47696
 
