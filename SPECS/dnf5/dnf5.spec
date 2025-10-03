@@ -37,12 +37,13 @@
 Summary:        Command-line package manager
 Name:           dnf5
 Version:        %{project_version_major}.%{project_version_minor}.%{project_version_patch}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/rpm-software-management/dnf5
 Source0:        %{url}/archive/%{version}/dnf5-%{version}.tar.gz
+Patch0:         CVE-2024-1930.patch
 # ========== build requires ==========
 BuildRequires:  bash-completion
 BuildRequires:  cmake
@@ -590,6 +591,9 @@ done
 
 
 %changelog
+* Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.0.14-3
+- Patch for CVE-2024-1930
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.0.14-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
