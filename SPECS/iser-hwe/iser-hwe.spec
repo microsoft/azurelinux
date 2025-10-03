@@ -39,9 +39,9 @@
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
-%{!?_name: %define _name iser}
+%{!?_name: %define _name iser-hwe}
 %{!?_version: %define _version 24.10}
-%{!?_mofed_full_version: %define _mofed_full_version %{_version}-21%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version %{_version}-22%{release_suffix}%{?dist}}
 %{!?_release: %define _release OFED.24.10.0.6.7.1}
 
 # KMP is disabled by default
@@ -67,7 +67,7 @@
 Summary:	 %{_name} Driver
 Name:		 iser-hwe
 Version:	 24.10
-Release:	 21%{release_suffix}%{?dist}
+Release:	 22%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -90,6 +90,8 @@ Requires:       mlnx-ofa_kernel-hwe = %{_mofed_full_version}
 Requires:       mlnx-ofa_kernel-hwe-modules  = %{_mofed_full_version}
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
+
+Conflicts:      iser
 
 %description
 %{name} kernel modules
@@ -164,7 +166,7 @@ BuildRequires: %kernel_module_package_buildreqs
 %{!?install_mod_dir: %global install_mod_dir updates/%{name}}
 
 %prep
-%setup -n %{_name}-%{_version}
+%setup -n iser-%{_version}
 set -- *
 mkdir source
 mv "$@" source/
@@ -249,6 +251,9 @@ fi # 1 : closed
 %endif
 
 %changelog
+* Sat Sep 27 2025 Binu Jose Philip <bphilip@microsoft.com> - 24.10-22_6.12.40.1.2
+- Build signed spec for -hwe variant
+
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-21
 - Bump to match kernel-hwe
 
