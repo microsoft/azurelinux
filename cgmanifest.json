@@ -14292,8 +14292,8 @@
         "type": "other",
         "other": {
           "name": "netsniff-ng",
-          "version": "0.6.8",
-          "downloadUrl": "http://www.netsniff-ng.org/pub/netsniff-ng/netsniff-ng-0.6.8.tar.xz"
+          "version": "0.6.9",
+          "downloadUrl": "https://github.com/netsniff-ng/netsniff-ng/archive/refs/tags/v0.6.9.tar.gz"
         }
       }
     },
