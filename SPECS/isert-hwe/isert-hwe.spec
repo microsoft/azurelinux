@@ -39,7 +39,7 @@
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
-%{!?_name: %define _name isert}
+%{!?_name: %define _name isert-hwe}
 %{!?_version: %define _version 24.10}
 %{!?_mofed_full_version: %define _mofed_full_version %{_version}-22%{release_suffix}%{?dist}}
 %{!?_release: %define _release OFED.24.10.0.6.7.1}
@@ -90,6 +90,7 @@ Requires:       mlnx-ofa_kernel-hwe = %{_mofed_full_version}
 Requires:       mlnx-ofa_kernel-hwe-modules  = %{_mofed_full_version}
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
+Conflicts:      isert
 
 %description
 %{name} kernel modules
@@ -121,11 +122,11 @@ BuildRequires: %kernel_module_package_buildreqs
 %if "%{WITH_MOD_SIGN}" == "1"
 # call module sign script
 %global __modsign_install_post \
-    %{_builddir}/%{_name}-%{version}/source/tools/sign-modules %{buildroot}/lib/modules/ %{kernel_source default} || exit 1 \
+    %{_builddir}/isert-%{version}/source/tools/sign-modules %{buildroot}/lib/modules/ %{kernel_source default} || exit 1 \
 %{nil}
 
 %global __debug_package 1
-%global buildsubdir %{_name}-%{version}
+%global buildsubdir isert-%{version}
 # Disgusting hack alert! We need to ensure we sign modules *after* all
 # invocations of strip occur, which is in __debug_install_post if
 # find-debuginfo.sh runs, and __os_install_post if not.
@@ -164,7 +165,7 @@ BuildRequires: %kernel_module_package_buildreqs
 %{!?install_mod_dir: %global install_mod_dir updates/%{name}}
 
 %prep
-%setup -n %{_name}-%{_version}
+%setup -n isert-%{_version}
 set -- *
 mkdir source
 mv "$@" source/
@@ -249,7 +250,7 @@ fi # 1 : closed
 %endif
 
 %changelog
-* Fri Oct 03 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22
+* Fri Oct 03 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22_6.12.50.1.1
 - Bump to match kernel-hwe
 
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-21

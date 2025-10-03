@@ -52,6 +52,7 @@ Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 ExclusiveArch:   aarch64
+Conflicts:       knem
 
 #
 # To populate these sources:
@@ -84,7 +85,7 @@ pushd rpm_contents
 
 # This spec's whole purpose is to inject the signed modules
 rpm2cpio %{SOURCE0} | cpio -idmv
-cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/extra/%{_name}/knem.ko
+cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/extra/kernel-hwe/knem.ko
 popd
 
 %install
@@ -109,7 +110,7 @@ fi
 /lib/modules/
 
 %changelog
-* Fri Oct 03 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 1.1.4.90mlnx3-22
+* Fri Oct 03 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 1.1.4.90mlnx3-22_6.12.50.1.1
 - Bump to match kernel-hwe
 
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 1.1.4.90mlnx3-21

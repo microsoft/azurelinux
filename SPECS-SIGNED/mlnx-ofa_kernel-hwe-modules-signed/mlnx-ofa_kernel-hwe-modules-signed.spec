@@ -126,6 +126,7 @@ Requires: procps
 Requires: module-init-tools
 Requires: lsof
 Requires: ofed-scripts
+Conflicts: mlnx-ofa_kernel
 
 %description -n %{_name}
 %{description}
@@ -193,7 +194,7 @@ fi
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
-* Fri Oct 03 2025 Siddharth Chintamaneni <siddharthc@microsoft.com> - 24.10-22
+* Fri Oct 03 2025 Siddharth Chintamaneni <siddharthc@microsoft.com> - 24.10-22_6.12.50.1.1
 - Bump to match kernel-hwe
 
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-21

@@ -75,6 +75,7 @@ Requires:       mlnx-ofa_kernel-hwe = %{_mofed_full_version}
 Requires:       mlnx-ofa_kernel-hwe-modules  = %{_mofed_full_version}
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
+Conflicts:      mlnx-nfsrdma
 
 %description -n %{_name}
 %{description}
@@ -118,7 +119,7 @@ fi
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-mlnx-nfsrdma-*.conf
 
 %changelog
-* Fri Oct 03 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22
+* Fri Oct 03 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22_6.12.50.1.1
 - Bump to match kernel-hwe
 
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-21

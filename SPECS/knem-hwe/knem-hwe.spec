@@ -49,7 +49,7 @@
 %global KMOD_PREAMBLE "%{_vendor}" != "openEuler"
 
 # set package name
-%{!?_name: %global _name knem}
+%{!?_name: %global _name knem-hwe}
 %global non_kmp_pname %{name}-modules
 
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
@@ -75,6 +75,7 @@ BuildRequires:  kmod
 
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
+Conflicts:      knem
 
 
 %description
@@ -282,7 +283,7 @@ fi
 %endif
 
 %changelog
-* Fri Oct 03 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 1.1.4.90mlnx3-22
+* Fri Oct 03 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 1.1.4.90mlnx3-22_6.12.50.1.1
 - Bump to match kernel-hwe
 
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 1.1.4.90mlnx3-21

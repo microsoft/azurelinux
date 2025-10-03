@@ -82,7 +82,7 @@ Requires:       mlnx-ofa_kernel-hwe = %{_mofed_full_version}
 Requires:       mlnx-ofa_kernel-hwe-modules = %{_mofed_full_version}
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
-
+Conflicts:      xpmem
 
 %description
 XPMEM is a Linux kernel module that enables a process to map the
@@ -254,7 +254,7 @@ fi
 %endif
 
 %changelog
-* Fri Oct 03 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-22
+* Fri Oct 03 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-22_6.12.50.1.1
 - Bump to match kernel-hwe
 
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 2.7.4-21
