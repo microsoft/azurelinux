@@ -1,13 +1,14 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name: pyusb
-Version: 1.0.2
-Release: 7%{?dist}
+Version: 1.3.1
+Release: 3%{?dist}
 Summary: Python bindings for libusb
-License: BSD
+License: BSD-3-Clause
 URL: https://github.com/pyusb/pyusb/
-Source0: https://github.com/pyusb/pyusb/archive/pyusb-%{version}.tar.gz
-BuildRequires: libusb-devel
+Source0: %{pypi_source}
+BuildRequires: libusb1
+BuildRequires:       libusb1-devel
 BuildArch: noarch
 
 %global _description\
@@ -20,6 +21,9 @@ methods to support most USB operations.
 Summary:       %summary
 %{?python_provide:%python_provide python3-pyusb}
 BuildRequires: python3-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-setuptools_scm
+Requires:       libusb1
 
 %description -n python3-pyusb
 PyUSB provides easy USB access to python. The module contains classes and 
@@ -35,14 +39,85 @@ sed -i -e 's/\r//g' README.rst
 %install
 %py3_install
 
+%check
+cd tests
+%{py3_test_envvars} %{python3} ./testall.py
+
 %files -n python3-pyusb
 %license LICENSE
 %doc README.rst
 %{python3_sitelib}/*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.2-7
-- Initial CBL-Mariner import from Fedora 31 (license: MIT).
+* Fri Sep 12 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.3.1-3
+- Initial Azure Linux import from Fedora 42 (license: MIT).
+- License verified
+
+* Sat Jan 18 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Thu Jan 09 2025 Gwyn Ciesla <gwync@protonmail.com> - 1.3.1-1
+- 1.3.1
+
+* Thu Jan 02 2025 Gwyn Ciesla <gwync@protonmail.com> - 1.3.0-1
+- 1.3.0
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.2.1-10
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Sun Jun 18 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 1.2.1-6
+- Update dependencies to libusb1
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 1.2.1-5
+- Rebuilt for Python 3.12
+
+* Wed Mar 08 2023 Gwyn Ciesla <gwync@protonmail.com> - 1.2.1-4
+- migrated to SPDX license
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Feb 07 2022 Gwyn Ciesla <gwync@protonmail.com> - 1.2.1-1
+- 1.2.1
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.0.2-12
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Gwyn Ciesla <gwync@protonmail.com> - 1.0.2-9
+- BR python3-setuptools
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1.0.2-8
+- Rebuilt for Python 3.9
+
+* Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
 * Mon Oct 21 2019 Gwyn Ciesla <gwync@protonmail.com> - 1.0.2-6
 - Drop Python 2.
