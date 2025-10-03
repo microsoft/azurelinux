@@ -3,7 +3,11 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.1
+<<<<<<< HEAD
 Release:        19%{?dist}
+=======
+Release:        21%{?dist}
+>>>>>>> f413e448a ([AutoPR- Security] Patch coredns for CVE-2025-58063 [HIGH] (#14652))
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +50,7 @@ Patch10:        CVE-2025-30204.patch
 Patch11:        CVE-2025-29786.patch
 Patch12:        CVE-2024-51744.patch
 Patch13:        CVE-2025-47950.patch
+Patch14:        CVE-2025-58063.patch
 
 BuildRequires:  msft-golang
 
@@ -84,6 +89,16 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %{_bindir}/%{name}
 
 %changelog
+<<<<<<< HEAD
+=======
+* Fri Oct 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.1-21
+- Patch for CVE-2025-58063
+- Fix import order for ttl test
+
+* Thu Oct 02 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.11.1-20
+- Bump to build with latest msft-golang 1.24.7
+
+>>>>>>> f413e448a ([AutoPR- Security] Patch coredns for CVE-2025-58063 [HIGH] (#14652))
 * Tue Jun 17 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.11.1-19
 - Fix CVE-2025-47950 with an upstream patch
 
