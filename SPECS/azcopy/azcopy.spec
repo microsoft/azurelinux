@@ -1,7 +1,7 @@
 Summary:        The new Azure Storage data transfer utility - AzCopy v10
 Name:           azcopy
 Version:        10.25.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,6 +67,9 @@ go test -mod=vendor
 %{_bindir}/azcopy
 
 %changelog
+* Fri Oct 03 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 10.25.1-7
+- Bump release to rebuild with golang
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 10.25.1-6
 - Bump release to rebuild with golang
 
