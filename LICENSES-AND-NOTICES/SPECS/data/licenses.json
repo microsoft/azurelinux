@@ -1851,6 +1851,7 @@
                 "python-sphinxcontrib-qthelp",
                 "python-sphinxcontrib-serializinghtml",
                 "python-sphinxygen",
+                "python-spnego",
                 "python-sqlalchemy",
                 "python-suds",
                 "python-systemd",
