@@ -352,6 +352,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Oct 03 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.50.1-1
+- Upgrade the kernel
+
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.12.40.1-2
 - Enable ipmitool for kernel-hwe
 
