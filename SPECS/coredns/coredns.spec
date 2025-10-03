@@ -4,7 +4,11 @@ Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.1
 <<<<<<< HEAD
+<<<<<<< HEAD
 Release:        19%{?dist}
+=======
+Release:        21%{?dist}
+>>>>>>> f413e448a ([AutoPR- Security] Patch coredns for CVE-2025-58063 [HIGH] (#14652))
 =======
 Release:        21%{?dist}
 >>>>>>> f413e448a ([AutoPR- Security] Patch coredns for CVE-2025-58063 [HIGH] (#14652))
@@ -90,7 +94,10 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 
 %changelog
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> f413e448a ([AutoPR- Security] Patch coredns for CVE-2025-58063 [HIGH] (#14652))
 * Fri Oct 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.1-21
 - Patch for CVE-2025-58063
 - Fix import order for ttl test
