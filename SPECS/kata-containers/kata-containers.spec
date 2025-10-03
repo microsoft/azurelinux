@@ -117,6 +117,7 @@ popd
 * Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.19.1.kata2-2
 - Bump release to rebuild with rust
 - Add patch to suppress dead_code warnings and add explicit lifetime for U32Set iterator
+- Enable build on aarch64
 
 * Mon Sep 08 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.1.kata2-1
 - Auto-upgrade to 3.19.1.kata2
