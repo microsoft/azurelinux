@@ -55,7 +55,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    9%{?dist}
+Release:    10%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND MIT AND LicenseRef-Fedora-Public-Domain
 URL:        https://www.tianocore.org
@@ -139,6 +139,7 @@ Patch1003: CVE-2024-13176.patch
 Patch1004: CVE-2024-2511.patch
 Patch1005: CVE-2024-4603.patch
 Patch1006: CVE-2025-3770.patch
+Patch1007: CVE-2025-9230.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -800,6 +801,9 @@ done
 /boot/efi/HvLoader.efi
 
 %changelog
+* Fri Oct 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-10
+- Patch for CVE-2025-9230
+
 * Mon Aug 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-9
 - Patch for CVE-2025-3770
 
