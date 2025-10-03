@@ -21,7 +21,7 @@ Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
 Source4:        50_mariner_mshv_menuentry
-ExclusiveArch:  x86_64
+# ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc

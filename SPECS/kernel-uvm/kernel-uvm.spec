@@ -40,7 +40,7 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
-ExclusiveArch:  x86_64
+# ExclusiveArch:  x86_64
 
 # Config file is only an inmutable copy from default config in lsg dom0 sources (arch/x86/configs/mshv_default_config)
 # to make permanent changes to config, make a PR for mshv_default_config in https://microsoft.visualstudio.com/DefaultCollection/LSG/_git/linux-dom0
