@@ -83,7 +83,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        3.1.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -100,6 +100,7 @@ Source7:        macros.rubygems
 # Updates default ruby-uri to 0.12.2 and vendored one to 0.10.3. Remove once ruby gets updated to a version that comes with both lib/uri/version.rb and lib/bundler/vendor/uri/lib/uri/version.rb versions >= 0.12.2 or == 0.10.3
 Patch0:         CVE-2023-36617.patch
 Patch1:         CVE-2025-6442.patch
+Patch2:         CVE-2025-24294.patch
 BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel
@@ -402,6 +403,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Tue Jul 15 2025 BinduSri Adabala <v-badabala@microsoft.com> - 3.1.7-3
+- Patch CVE-2025-24294
+
 * Mon Jun 30 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.1.7-2
 - Patch CVE-2025-6442
 

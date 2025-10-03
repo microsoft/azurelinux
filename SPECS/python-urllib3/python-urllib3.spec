@@ -1,7 +1,7 @@
 Summary:        A powerful, sanity-friendly HTTP client for Python.
 Name:           python-urllib3
 Version:        1.26.19
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,6 +24,8 @@ BuildRequires:  python3-xml
 BuildRequires:  python3-pip
 %endif
 Requires:       python3
+
+Patch0: CVE-2025-50181.patch
 
 %description -n python3-urllib3
 urllib3 is a powerful, sanity-friendly HTTP client for Python. Much of the Python ecosystem already uses urllib3 and you should too.
@@ -51,6 +53,9 @@ nox --reuse-existing-virtualenvs --sessions test-%{python3_version}
 %{python3_sitelib}/*
 
 %changelog
+* Thu Jun 26 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.26.19-2
+- Patch CVE-2025-50181
+
 * Thu Jun 20 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.26.19-1
 - Auto-upgrade to 1.26.19 - patch CVE-2024-37891
 
