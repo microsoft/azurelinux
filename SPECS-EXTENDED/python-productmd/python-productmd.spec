@@ -1,24 +1,21 @@
+Name:           python-productmd
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%if 0%{?rhel} && 0%{?rhel} <= 7
-%bcond_without python2
-%else
-%bcond_with python2
-%endif
-%bcond_without  python3
-
-%global srcname productmd
-
-Name:           python-%{srcname}
-Version:        1.30
+Version:        1.43
 Release:        2%{?dist}
 Summary:        Library providing parsers for metadata related to OS installation
 
-License:        LGPLv2+
+License:        LGPL-2.1-only
 URL:            https://github.com/release-engineering/productmd
-Source0:        https://files.pythonhosted.org/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
+Source:         %{pypi_source productmd}#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
+BuildRequires:  python3-devel
+BuildRequires:  python3-six
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pip
+BuildRequires:  python3dist(wheel)
 
 %global _description \
 Python library providing parsers for metadata related to composes\
@@ -26,86 +23,111 @@ and installation media.
 
 %description %_description
 
-%if 0%{?with_python2}
-%package -n python2-%{srcname}
-Summary:        %summary
-Obsoletes:      productmd <= %{version}-%{release}
-Provides:       productmd = %{version}-%{release}
-BuildRequires:  python2-devel
-%if 0%{?rhel} && 0%{?rhel} <= 7
-BuildRequires:  python-setuptools
-BuildRequires:  python-six
-Requires:       python-six
-%else
-BuildRequires:  python2-setuptools
-BuildRequires:  python2-six
-Requires:       python2-six
-%endif
-%{?python_provide:%python_provide python2-%{srcname}}
-
-%description -n python2-%{srcname} %_description
-%endif
-
-%if 0%{?with_python3}
-%package -n python%{python3_pkgversion}-%{srcname}
+%package -n python3-productmd
 Summary:        %{summary}
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python%{python3_pkgversion}-six
-Requires:       python%{python3_pkgversion}-six
 
-%description -n python%{python3_pkgversion}-%{srcname} %_description
-%endif
+%description -n python3-productmd %_description
 
 %prep
-%autosetup -n %{srcname}-%{version} -p1
+%autosetup -n productmd-%{version} -p1
+
+%generate_buildrequires
+%pyproject_buildrequires
 
 %build
-%if 0%{?with_python2}
-%py2_build
-%endif
-
-%if 0%{?with_python3}
-%py3_build
-%endif
+%pyproject_wheel
 
 %install
-%if 0%{?with_python2}
-%py2_install
-%endif
-
-%if 0%{?with_python3}
-%py3_install
-%endif
+%pyproject_install
+%pyproject_save_files productmd
 
 %check
-%if 0%{?with_python2}
-%{__python2} ./setup.py test
-%endif
+%pytest
 
-%if 0%{?with_python3}
-%{__python3} ./setup.py test
-%endif
-
-%if 0%{?with_python2}
-%files -n python2-%{srcname}
+%files -n python3-productmd -f %{pyproject_files}
 %license LICENSE
 %doc AUTHORS
-%{python2_sitelib}/productmd/
-%{python2_sitelib}/productmd-%{version}-py?.?.egg-info
-%endif
-
-%if 0%{?with_python3}
-%files -n python%{python3_pkgversion}-%{srcname}
-%license LICENSE
-%doc AUTHORS
-%{python3_sitelib}/productmd/
-%{python3_sitelib}/productmd-%{version}-py%{python3_version}.egg-info
-%endif
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.30-2
-- Initial CBL-Mariner import from Fedora 33 (license: MIT).
+* Wed Feb 19 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.43-2
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified
+
+* Mon Dec 09 2024 Lubomír Sedlář <lsedlar@redhat.com> - 1.43-1
+- New upstream release 1.43
+
+* Tue Nov 19 2024 Adam Williamson <awilliam@redhat.com> - 1.41-2
+- Backport #180 to add types/formats to support new FEX backing images
+
+* Mon Nov 04 2024 Lubomír Sedlář <lsedlar@redhat.com> - 1.41-1
+- Update RPM_ARCHES to match dnf
+
+* Thu Aug 29 2024 Lubomír Sedlář <lsedlar@redhat.com> - 1.40-1
+- Remove iso image type again
+
+* Wed Aug 28 2024 Lubomír Sedlář <lsedlar@redhat.com> - 1.39-1
+- New upstream release
+- Adds appx and iso as image types for kiwibuilds
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.38-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.38-4
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.38-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.38-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Dec 07 2023 Lubomír Sedlář <lsedlar@redhat.com> - 1.38-1
+- New upstream release
+
+* Fri Sep 22 2023 Lubomír Sedlář <lsedlar@redhat.com> - 1.37-1
+- New upstream release 1.37
+
+* Mon Jul 31 2023 Lubomír Sedlář <lsedlar@redhat.com> - 1.36-1
+- New upstream release 1.36
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.35-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 1.35-2
+- Rebuilt for Python 3.12
+
+* Wed Mar 01 2023 Lubomír Sedlář <lsedlar@redhat.com> - 1.35-1
+- New upstream release 1.35
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.33-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.33-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1.33-5
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.33-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.33-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.33-2
+- Rebuilt for Python 3.10
+
+* Mon May 24 2021 Lubomír Sedlář <lsedlar@redhat.com> - 1.33-1
+- New upstream release 1.33
+
+* Fri Apr 16 2021 Lubomír Sedlář <lsedlar@redhat.com> - 1.32-1
+- New upstream release
+
+* Mon Feb 08 2021 Lubomír Sedlář <lsedlar@redhat.com> - 1.31-1
+- New upstream release
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.30-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Thu Nov 26 2020 Lubomír Sedlář <lsedlar@redhat.com> - 1.30-1
 - New upstream release
