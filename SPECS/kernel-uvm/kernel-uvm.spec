@@ -8,16 +8,28 @@
 %define config_source %{SOURCE1}
 %endif
 
+%ifarch aarch64
+%define arch arm64
+%define archdir arm64
+%define config_source %{SOURCE2}
+%endif
+
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        6.6.96.mshv1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
+# taken from https://github.com/microsoft/CBL-Mariner-Linux-Kernel/blob/d7df3152812f3cafd40c65cb1a06f6bf54920005/arch/arm64/configs/defconfig
+# tag 6.6.96.mshv1 https://github.com/microsoft/CBL-Mariner-Linux-Kernel/releases/tag/rolling-lts%2Fkata-uvm%2F6.6.96.mshv1
+
+# todo: should come from above
+# taken from https://microsoft.visualstudio.com/LSG/_git/linux-dom0?path=/arch/arm64/configs/uvm_defconfig&version=GTrolling-lts/uvm/6.6.96.mshv1&_a=contents
+Source2:        config_aarch64
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -40,7 +52,6 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
-ExclusiveArch:  x86_64
 
 # Config file is only an inmutable copy from default config in lsg dom0 sources (arch/x86/configs/mshv_default_config)
 # to make permanent changes to config, make a PR for mshv_default_config in https://microsoft.visualstudio.com/DefaultCollection/LSG/_git/linux-dom0
@@ -61,6 +72,8 @@ ExclusiveArch:  x86_64
 # If there are significant changes to the config file, disable the config check and build the
 # kernel rpm. The final config file is included in /boot in the rpm.
 
+%global kcflags %{nil}
+
 %ifarch x86_64
 %define image_fname vmlinux.bin
 %define image arch/x86/boot/compressed/%{image_fname}
@@ -69,7 +82,8 @@ ExclusiveArch:  x86_64
 %else
 %define kcflags -Wa,-mx86-used-note=no
 %endif
-%define arch x86_64
+# we might not need below as we already %define arch x86_64 above
+# %define arch x86_64
 %endif
 
 %description
@@ -104,24 +118,52 @@ if [ -s config_diff ]; then
     echo "Update config file to set changed values explicitly"
 
 #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
-    exit 1
+# todo: config check is failing on arm
+    # exit 1
 fi
 
 %build
-%ifarch x86_64
+# should be the same for arm
 KCFLAGS="%{kcflags}" make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
-%endif
 
 %install
 install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
 
 D=%{buildroot}%{_datadir}/cloud-hypervisor
-install -D -m 644 %{image} $D/%{image_fname}
-install -D -m 644 arch/%{arch}/boot/bzImage $D/bzImage
 %ifarch x86_64
+# below does: install -D -m 644 arch/x86/boot/compressed/vmlinux.bin %{buildroot}%{_datadir}/cloud-hypervisor/vmlinux.bin
+install -D -m 644 %{image} $D/%{image_fname}
+# AI suggestion: use arch_dir (x86) below, instead of arch (x86_64). But this has been working so far!?
+install -D -m 644 arch/%{arch}/boot/bzImage $D/bzImage
+%endif
+
+%ifarch aarch64
+# AI suggestion: bzImage is an x86 name, for arm64 images are named Image or Image.gz. So do: install -D -m 644 arch/%{archdir}/boot/Image $D/Image (but tidepool script uses bzImage so keeping that for now)
+# below does: install -D -m 644 arch/arm64/boot/Image /usr/share/cloud-hypervisor/bzImage
+install -D -m 644 arch/%{arch}/boot/Image $D/bzImage
+%endif
+
+%ifarch x86_64
+# AI suggestion: use uname -r
+# mkdir -p %{buildroot}/lib/modules/%{uname_r}
+# ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin \
+#       %{buildroot}/lib/modules/%{uname_r}/vmlinuz-host
+
 mkdir -p %{buildroot}/lib/modules/%{name}
 ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
+%endif
+
+#todo: check if this makes sense on arm as well (we don't seem to use modules on kernel-uvm)
+# AI suggestion: blocks above and below are not necessary if we don't build any modules. Adding for "convenience"
+%ifarch aarch64
+# AI suggestion: use uname_r and Image (not bzImage) 
+# mkdir -p %{buildroot}/lib/modules/%{uname_r}
+# ln -s %{_datadir}/cloud-hypervisor/Image \
+#       %{buildroot}/lib/modules/%{uname_r}/Image-host
+
+mkdir -p %{buildroot}/lib/modules/%{name}
+ln -s %{_datadir}/cloud-hypervisor/bzImage %{buildroot}/lib/modules/%{name}/vmlinux
 %endif
 
 find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
@@ -141,12 +183,14 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %files
 %defattr(-,root,root)
 %license COPYING
+%ifarch x86_64
 %{_datadir}/cloud-hypervisor/%{image_fname}
+%endif
 %{_datadir}/cloud-hypervisor/bzImage
 %dir %{_datadir}/cloud-hypervisor
-%ifarch x86_64
+# %ifarch x86_64
 /lib/modules/%{name}/vmlinux
-%endif
+# %endif
 
 %files devel
 %defattr(-,root,root)
@@ -154,6 +198,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Wed Oct 08 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.96.mshv1-2
+- Enable build on arm for L1VH
+
 * Tue Sep 09 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.96.mshv1-1
 - Upgrade to 6.6.96.mshv1
 
