@@ -13663,8 +13663,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.24.5",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.5-1/go1.24.5-20250708.7.src.tar.gz"
+          "version": "1.24.7",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.7-1/go1.24.7-20250903.8.src.tar.gz"
         }
       }
     },
@@ -29467,8 +29467,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.1.1552",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.1552.tar.gz"
+          "version": "9.1.1616",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.1.1616.tar.gz"
         }
       }
     },
