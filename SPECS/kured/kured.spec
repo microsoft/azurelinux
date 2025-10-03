@@ -25,7 +25,7 @@
 Summary:        Kubernetes daemonset to perform safe automatic node reboots
 Name:           kured
 Version:        1.14.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -119,6 +119,9 @@ sed -i -e 's|image: .*|image: registry.opensuse.org/kubic/kured:%{version}|g' %{
 %{_datarootdir}/k8s-yaml/kured/kured.yaml
 
 %changelog
+* Fri Oct 03 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.14.2-7
+- Bump release to rebuild with golang
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.14.2-6
 - Bump release to rebuild with golang
 

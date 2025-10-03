@@ -2,7 +2,7 @@
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
 Version:        1.17.8
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -89,6 +89,9 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %{_bindir}/nvidia-cdi-hook
 
 %changelog
+* Fri Oct 03 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.17.8-4
+- Bump release to rebuild with golang
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.17.8-3
 - Bump release to rebuild with golang
 
