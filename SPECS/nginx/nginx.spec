@@ -6,7 +6,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.25.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -95,7 +95,8 @@ sh configure \
     --with-http_v2_module \
     --with-ipv6 \
     --with-stream \
-    --with-compat
+    --with-compat \
+    --with-stream_ssl_preread_module
 
 %make_build
 
@@ -164,6 +165,9 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Tue Sep 09 2025 Mayank Singh <mayansingh@microsoft.com> - 1.25.4-6
+- Enable stream ssl preread module
+
 * Tue Aug 19 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.25.4-5
 - Patch for CVE-2025-53859
 
@@ -172,7 +176,7 @@ rm -rf nginx-tests
 - Added tests to verify nginx server and its supported modules
 
 * Tue Feb 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.25.4-3
-- Fix CVE-2025-234419
+- Fix CVE-2025-23419
 
 * Tue Aug 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.25.4-2
 - Fix CVE-2024-7347
