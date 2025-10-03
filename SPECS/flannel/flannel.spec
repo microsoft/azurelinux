@@ -49,7 +49,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 %{_bindir}/flanneld
 
 %changelog
-* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 0.14.0-2
+* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 0.14.0-26
 - Bump release to rebuild with golang
 
 * Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.14.0-25
