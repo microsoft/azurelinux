@@ -28,8 +28,8 @@
 
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.40.1
-%global target_kernel_release 2
+%global target_azl_build_kernel_version 6.12.50.1
+%global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -67,7 +67,7 @@
 Summary:	 srp driver
 Name:		 srp-hwe
 Version:	 24.10
-Release:	 21%{release_suffix}%{?dist}
+Release:	 22%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -255,6 +255,9 @@ fi
 %endif
 
 %changelog
+* Fri Oct 03 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22
+- Bump to match kernel-hwe
+
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-21
 - Bump to match kernel-hwe
 

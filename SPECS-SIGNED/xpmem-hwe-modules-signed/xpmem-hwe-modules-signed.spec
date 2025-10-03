@@ -5,15 +5,15 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.40.1
-%global target_kernel_release 2
+%global target_azl_build_kernel_version 6.12.50.1
+%global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
 %global KVERSION %{target_kernel_version_full}
 
 %define _name xpmem-hwe-modules
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-21%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-22%{release_suffix}%{?dist}}
 
 # xpmem-modules is a sub-package in SPECS/xpmem.
 # We are making that into a main package for signing.
@@ -21,7 +21,7 @@
 Summary:	 Cross-partition memory
 Name:		 %{_name}-signed
 Version:	 2.7.4
-Release:	 21%{release_suffix}%{?dist}
+Release:	 22%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -100,6 +100,9 @@ if [ "$1" = 0 ]; then
 fi
 
 %changelog
+* Fri Oct 03 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-22
+- Bump to match kernel-hwe
+
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 2.7.4-21
 - Bump to match kernel-hwe
 
