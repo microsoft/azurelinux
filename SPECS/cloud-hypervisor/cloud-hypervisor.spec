@@ -38,14 +38,13 @@ Requires: glibc
 Requires: libgcc
 Requires: libcap
 
-ExclusiveArch:  x86_64
-
 %ifarch x86_64
 %define rust_def_target x86_64-unknown-linux-gnu
 %define cargo_pkg_feature_opts --features "mshv"
 %endif
 %ifarch aarch64
 %define rust_def_target aarch64-unknown-linux-gnu
+# todo: update below to --features "mshv" as well
 %define cargo_pkg_feature_opts --all
 %endif
 
@@ -139,6 +138,9 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 %license LICENSES/CC-BY-4.0.txt
 
 %changelog
+* Thu Oct 09 2025 Saul Paredes <saulparedes@microsoft.com> -  41.0.139-2
+- Enable build on aarch64
+
 * Tue Sep 09 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 41.0.139-1
 - Auto-upgrade to 41.0.139
 - Rename package to cloud-hypervisor
