@@ -90,7 +90,7 @@
 
 %{!?KERNEL_SOURCES: %global KERNEL_SOURCES /lib/modules/%{KVERSION}/source}
 
-%{!?_name: %global _name mlnx-ofa_kernel}
+%global base_name mlnx-ofa_kernel
 %{!?_name: %global _name %{base_name}-hwe}
 %{!?_version: %global _version 24.10}
 %{!?_release: %global _release OFED.24.10.0.7.0.1}
