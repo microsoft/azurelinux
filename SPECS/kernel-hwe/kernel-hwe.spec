@@ -1,5 +1,4 @@
 %global security_hardening none
-%global mstflintver 4.28.0
 %define uname_r %{version}-%{release}
 %define short_name hwe
 
