@@ -28,8 +28,8 @@
 
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.40.1
-%global target_kernel_release 2
+%global target_azl_build_kernel_version 6.12.50.2
+%global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -90,7 +90,8 @@
 
 %{!?KERNEL_SOURCES: %global KERNEL_SOURCES /lib/modules/%{KVERSION}/source}
 
-%{!?_name: %global _name mlnx-ofa_kernel}
+%global base_name mlnx-ofa_kernel
+%{!?_name: %global _name %{base_name}-hwe}
 %{!?_version: %global _version 24.10}
 %{!?_release: %global _release OFED.24.10.0.7.0.1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
@@ -107,11 +108,11 @@
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel-hwe
 Version:	 24.10
-Release:	 21%{release_suffix}%{?dist}
+Release:	 22%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
-Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ofa_kernel-24.10.tgz#/%{_name}-%{_version}.tgz
+Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ofa_kernel-24.10.tgz#/mlnx-ofa_kernel-%{_version}.tgz
 Patch0:          001-fix-module-init-for-ibt.patch
 
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -151,7 +152,7 @@ Requires: procps
 Requires: module-init-tools
 Requires: lsof
 Requires: ofed-scripts
-
+Conflicts: mlnx-ofa_kernel
 
 %if "%{KMP}" == "1"
 BuildRequires: %kernel_module_package_buildreqs
@@ -250,11 +251,11 @@ drivers against it.
 %if "%{WITH_MOD_SIGN}" == "1"
 # call module sign script
 %global __modsign_install_post \
-    %{_builddir}/$NAME-$VERSION/source/ofed_scripts/tools/sign-modules %{buildroot}/lib/modules/ %{kernel_source default} || exit 1 \
+    %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/tools/sign-modules %{buildroot}/lib/modules/ %{kernel_source default} || exit 1 \
 %{nil}
 
 %global __debug_package 1
-%global buildsubdir %{_name}-%{version}
+%global buildsubdir mlnx-ofa_kernel-%{version}
 # Disgusting hack alert! We need to ensure we sign modules *after* all
 # invocations of strip occur, which is in __debug_install_post if
 # find-debuginfo.sh runs, and __os_install_post if not.
@@ -292,7 +293,7 @@ drivers against it.
 %{!?install_mod_dir: %global install_mod_dir updates}
 
 %prep
-%setup -n %{_name}-%{_version}
+%setup -n mlnx-ofa_kernel-%{_version}
 %patch 0 -p1
 set -- *
 mkdir source
@@ -379,7 +380,7 @@ done
 
 # copy sources
 mkdir -p %{buildroot}/%{_prefix}/src/ofa_kernel-%{version}
-cp -a %{_builddir}/%{_name}-%{version}/source %{buildroot}/%{_prefix}/src/ofa_kernel-%{version}/source
+cp -a %{_builddir}/mlnx-ofa_kernel-%{version}/source %{buildroot}/%{_prefix}/src/ofa_kernel-%{version}/source
 ln -s ofa_kernel-%{version}/source %{buildroot}/%{_prefix}/src/mlnx-ofa_kernel-%{version}
 # Fix path of BACKPORT_INCLUDES
 sed -i -e "s@=-I.*backport_includes@=-I/usr/src/ofa_kernel-$VERSION/backport_includes@" %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION}/configure.mk.kernel || true
@@ -405,19 +406,19 @@ chmod +x ${INFO} > /dev/null 2>&1
 %if "%{WITH_SYSTEMD}" == "1"
 install -d %{buildroot}%{_unitdir}
 install -d %{buildroot}/etc/systemd/system
-install -m 0644 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/openibd.service %{buildroot}%{_unitdir}
-install -m 0644 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_interface_mgr\@.service %{buildroot}/etc/systemd/system
+install -m 0644 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/openibd.service %{buildroot}%{_unitdir}
+install -m 0644 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/mlnx_interface_mgr\@.service %{buildroot}/etc/systemd/system
 %endif
 
 install -d %{buildroot}/bin
-install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_conf_mgr.sh %{buildroot}/bin/
+install -m 0755 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/mlnx_conf_mgr.sh %{buildroot}/bin/
 %if "%{WINDRIVER}" == "0" && "%{BLUENIX}" == "0"
-install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_interface_mgr.sh %{buildroot}/bin/
+install -m 0755 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/mlnx_interface_mgr.sh %{buildroot}/bin/
 %else
 # Wind River and Mellanox Bluenix are rpm based, however, interfaces management is done in Debian style
 install -d %{buildroot}/usr/sbin
-install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_interface_mgr_deb.sh %{buildroot}/bin/mlnx_interface_mgr.sh
-install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/net-interfaces %{buildroot}/usr/sbin
+install -m 0755 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/mlnx_interface_mgr_deb.sh %{buildroot}/bin/mlnx_interface_mgr.sh
+install -m 0755 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/net-interfaces %{buildroot}/usr/sbin
 %endif
 
 # Install ibroute utilities
@@ -741,6 +742,9 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
+* Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22_6.12.50.2.1
+- Bump to match kernel-hwe
+
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-21
 - Bump to match kernel-hwe
 
