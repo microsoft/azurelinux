@@ -3,14 +3,15 @@
 
 Summary:        Linux API header files
 Name:           kernel-hwe-headers
-Version:        6.12.40.1
-Release:        2%{?dist}
+Version:        6.12.50.2
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/%{version}.tar.gz#/kernel-hwe-%{version}.tar.gz
+BuildArch:	noarch
 
 %description
 The Linux API Headers expose the kernel's API for use by downstream builds.
