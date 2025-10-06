@@ -4,8 +4,8 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.40.1
-%global target_kernel_release 2
+%global target_azl_build_kernel_version 6.12.50.2
+%global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
@@ -15,7 +15,7 @@
 Name:            %{_name}-signed
 Summary:         %{_name} Kernel Module for the %{KVERSION} kernel
 Version:         4.30.0
-Release:	     21%{release_suffix}%{?dist}
+Release:	     22%{release_suffix}%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
 
@@ -32,6 +32,8 @@ Source2:        mst_pciconf.ko
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 ExclusiveArch:  aarch64
+Conflicts:      mft_kernel
+Conflicts:      kernel-mft
 
 # Azure Linux attempts to match the spec file name and the "Name" tag.
 # Upstream's mft_kernel spec set rpm name as kernel-mft. To comply, we
@@ -82,6 +84,9 @@ popd
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
+* Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 4.30.0-22_6.12.50.2.1
+- Bump to match kernel-hwe
+
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-21
 - Bump to match kernel-hwe
 
