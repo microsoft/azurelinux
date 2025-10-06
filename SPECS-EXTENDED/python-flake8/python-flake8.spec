@@ -73,7 +73,6 @@ ln -s flake8 %{buildroot}%{_bindir}/python3-flake8
 %pytest -v
 
 %files -n python%{python3_pkgversion}-flake8 -f %{pyproject_files}
-%doc README.rst CONTRIBUTORS.txt
 %{_bindir}/flake8
 %{_bindir}/flake8-3
 %{_bindir}/flake8-%{python3_version}
