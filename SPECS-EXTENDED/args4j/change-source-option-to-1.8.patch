@@ -1,0 +1,25 @@
+From e9080c1382570c9b028b60210ad0779a10a82ab2 Mon Sep 17 00:00:00 2001
+From: SumitJenaHCL <v-sumitjena@microsoft.com>
+Date: Thu, 10 Jul 2025 05:15:48 +0000
+Subject: [PATCH] change source option to 1.8
+
+---
+ common.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/common.xml b/common.xml
+index 37d36f4..d3486a0 100644
+--- a/common.xml
++++ b/common.xml
+@@ -7,7 +7,7 @@
+   <property name="project.groupId" value="args4j"/>
+   <property name="bundle.version" value="${project.version}.0"/>
+ 
+-  <property name="compiler.source" value="1.6"/>
++  <property name="compiler.source" value="1.8"/>
+   <property name="compiler.target" value="${compiler.source}"/>
+ 
+ </project>
+-- 
+2.45.2
+
