@@ -127,7 +127,7 @@ USER=root SUDO_USER=root %make_build
 # We expect to generate dynamic CI contents in this folder, but it will fail since the .github folder is not included
 # with the published sources.
 mkdir -p .github/workflows
-./x.py run src/tools/expand-yaml-anchors
+./x.py run src/tools/expand-yaml-anchors || true
 
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
@@ -135,7 +135,7 @@ ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
 rm -v ./tests/rustdoc-ui/issue-98690.*
 useradd -m -d /home/test test
 chown -R test:test .
-sudo -u test %make_build check
+sudo -u test ./x.py test --stage 2
 userdel -r test
 
 %install
