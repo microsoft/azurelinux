@@ -3,8 +3,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-hwe-signed-%{buildarch}
-Version:        6.12.40.1
-Release:        2%{?dist}
+Version:        6.12.50.2
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -96,6 +96,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.50.2-1
+- Bump to match kernel-hwe
+
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.12.40.1-2
 - Bump to match kernel-hwe
 
