@@ -2,8 +2,8 @@
 %global pkgname markdown
 Summary:        Markdown implementation in Python
 Name:           python-%{pkgname}
-Version:        3.5.2
-Release:        2%{?dist}
+Version:        3.9.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -61,6 +61,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{_bindir}/markdown_py
 
 %changelog
+* Mon Oct 06 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.9.0-1
+- Auto-upgrade to 3.9.0 - fix a regression in ptest #58553340
+
 * Tue Apr 29 2025 Riken Maharjan <rmaharjan@microsoft.com> -  3.5.2-2
 - Use proper ptest command to run the test.
 
