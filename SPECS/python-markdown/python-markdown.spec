@@ -66,6 +66,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{_bindir}/markdown_py
 
 %changelog
+* Tue Oct 07 2025 Sudipta Pandit <sudpandit@microsoft.com> - 3.9-1
+- Upgrade to version 3.9
+
 * Tue Apr 29 2025 Riken Maharjan <rmaharjan@microsoft.com> -  3.5.2-2
 - Use proper ptest command to run the test.
 
