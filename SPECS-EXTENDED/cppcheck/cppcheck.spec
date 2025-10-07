@@ -16,13 +16,11 @@ Patch0:         cppcheck-2.11-translations.patch
 Patch1:         cppcheck-2.18-TestCondition.patch
 
 BuildRequires:  gcc-c++
-#BuildRequires:  pcre2-devel
 BuildRequires:  docbook-style-xsl
 BuildRequires:  libxslt
 BuildRequires:  tinyxml2-devel >= 2.1.0
 BuildRequires:  zlib-devel
 BuildRequires:  cmake
-#BuildRequires:  z3-devel >= 4.7.1
 Obsoletes:      %{name}-gui < %{version}-%{release}
 
 %description
