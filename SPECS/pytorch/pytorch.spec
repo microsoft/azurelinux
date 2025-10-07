@@ -32,9 +32,9 @@ Patch7:         CVE-2021-22569.patch
 Patch8:         CVE-2025-32434.patch
 Patch9:         CVE-2025-3730.patch
 Patch10:        CVE-2025-2953.patch
-Patch11:        CVE-2025-46149.patch
-Patch12:        CVE-2025-55558.patch
-Patch13:        CVE-2025-55560.patch
+#Patch11:        CVE-2025-46149.patch
+#Patch12:        CVE-2025-55558.patch
+Patch11:        CVE-2025-55560.patch
 
 %description
 PyTorch is a Python package that provides two high-level features:
