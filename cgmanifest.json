@@ -2157,8 +2157,8 @@
         "type": "other",
         "other": {
           "name": "cppcheck",
-          "version": "2.16.0",
-          "downloadUrl": "https://github.com/danmar/cppcheck/archive/2.16.0.tar.gz"
+          "version": "2.18.3",
+          "downloadUrl": "https://github.com/danmar/cppcheck/archive/2.18.3.tar.gz"
         }
       }
     },
