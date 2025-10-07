@@ -1,7 +1,7 @@
 Summary:        advanced key-value store
 Name:           redis
-Version:        6.2.18
-Release:        3%{?dist}
+Version:        6.2.20
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,8 +10,6 @@ URL:            https://redis.io/
 Source0:        https://download.redis.io/releases/%{name}-%{version}.tar.gz
 Patch0:         redis-conf.patch
 Patch1:         disable_active_defrag_big_keys.patch
-Patch2:         CVE-2025-32023.patch
-Patch3:         CVE-2025-48367.patch
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  openssl-devel
@@ -86,6 +84,10 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/redis.conf
 
 %changelog
+* Tue Oct 07 2025 Kanishk Bansal <kanbansal@microsoft.com> - 6.2.20-1
+- Upgrade to 6.2.20 for CVE-2025-49844.
+- Remove CVE-2025-32023, CVE-2025-48367 as they have been fixed with 6.2.19
+
 * Wed Jul 09 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 6.2.18-3
 - Patch for CVE-2025-48367
 
