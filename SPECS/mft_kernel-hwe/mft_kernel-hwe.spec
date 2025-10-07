@@ -229,7 +229,7 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
-* Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 4.30.0-22_6.12.50.2.1
+* Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 4.30.0-22_6.12.50.2-1
 - Bump to match kernel-hwe
 
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 4.30.0-21

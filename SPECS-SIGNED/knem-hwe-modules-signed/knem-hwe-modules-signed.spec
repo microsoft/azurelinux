@@ -110,8 +110,9 @@ fi
 /lib/modules/
 
 %changelog
-* Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 1.1.4.90mlnx3-22_6.12.50.2.1
+* Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 1.1.4.90mlnx3-22_6.12.50.2-1
 - Bump to match kernel-hwe
+- Fix signed spec for -hwe variant
 
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 1.1.4.90mlnx3-21
 - Bump to match kernel-hwe

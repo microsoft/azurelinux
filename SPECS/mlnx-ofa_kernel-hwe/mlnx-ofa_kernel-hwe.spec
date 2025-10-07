@@ -742,7 +742,7 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
-* Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22_6.12.50.2.1
+* Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22_6.12.50.2-1
 - Bump to match kernel-hwe
 
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-21

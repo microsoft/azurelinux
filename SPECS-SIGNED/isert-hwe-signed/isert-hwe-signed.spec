@@ -111,8 +111,9 @@ fi # 1 : closed
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-isert-*.conf
 
 %changelog
-* Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22_6.12.50.2.1
+* Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22_6.12.50.2-1
 - Bump to match kernel-hwe
+- Fix signed spec for -hwe variant
 
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-21
 - Bump to match kernel-hwe

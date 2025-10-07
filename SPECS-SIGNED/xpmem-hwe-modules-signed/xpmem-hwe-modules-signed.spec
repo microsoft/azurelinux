@@ -102,8 +102,9 @@ if [ "$1" = 0 ]; then
 fi
 
 %changelog
-* Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-22_6.12.50.2.1
+* Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-22_6.12.50.2-1
 - Bump to match kernel-hwe
+- Fix signed spec for -hwe variant
 
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 2.7.4-21
 - Bump to match kernel-hwe
