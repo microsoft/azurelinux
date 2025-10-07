@@ -40,6 +40,8 @@ Patch401:       CVE-2025-32728.patch
 # The tests fail with the following error:
 #   dlsym(sk_api_version) failed: (...)/sk-dummy.so: undefined symbol: sk_api_version
 Patch965: openssh-8.2p1-visibility.patch
+Patch966: CVE-2025-61984.patch
+Patch967: CVE-2025-61985.patch
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
 BuildRequires:  e2fsprogs-devel
@@ -100,6 +102,8 @@ The module is most useful for su and sudo service stacks.
 
 %prep
 %setup -q -a 3
+%patch 966 -p1
+%patch 967 -p1
 
 pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
 %patch -P 300 -p2 -b .psaa-build
