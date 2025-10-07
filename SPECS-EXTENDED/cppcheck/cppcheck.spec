@@ -55,7 +55,7 @@ make DB2MAN=%{_datadir}/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl man
 # Binaries
 # Upstream doesn't support shared libraries (unversioned solib)
 %cmake -DCMAKE_BUILD_TYPE=Release -DUSE_MATCHCOMPILER=yes -DUSE_Z3=yes -DHAVE_RULES=no -DBUILD_GUI=0 -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_TESTS=yes -DFILESDIR=%{_datadir}/Cppcheck -DUSE_BUNDLED_TINYXML2=OFF -DENABLE_OSS_FUZZ=OFF
-%cmake_build
+%cmake_build --parallel 2
 
 %install
 %cmake_install
