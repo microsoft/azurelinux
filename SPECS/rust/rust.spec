@@ -62,6 +62,7 @@ BuildRequires:  ninja-build
 # make sure rust relies on openssl from CBL-Mariner (instead of using its vendored flavor)
 BuildRequires:  openssl-devel
 BuildRequires:  python3
+BuildRequires:  sudo
 %if %{with_check}
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
 %endif
@@ -129,7 +130,7 @@ ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
 
 # Create dummy CI folder to satisfy expand-yaml-anchors
 mkdir -p .github/workflows
-./x.py run src/tools/expand-yaml-anchors || true
+./x.py run src/tools/expand-yaml-anchors 
 
 # Symlink rustfmt for test dependencies
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
@@ -140,8 +141,8 @@ rm -fv ./tests/rustdoc-ui/issue-98690.*
 # Create test user and run stage 2 tests
 useradd -m -d /home/test test
 chown -R test:test .
-runuser -u test -- ./x.py test --stage 2
-userdel -r test || true
+sudo -u test %make_build check
+userdel -r test
 
 %install
 USER=root SUDO_USER=root %make_install
