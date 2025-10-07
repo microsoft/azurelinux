@@ -119,7 +119,7 @@ install -Dm0644 %{SOURCE4} -t %{buildroot}%{_sysctldir}/
 
 %changelog
 * Tue Oct 07 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-34
-- Bump release for Bump release for October 2025 Update
+- Bump release for October 2025 Update
 
 * Thu Sep 04 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-33
 - Bump release for September 2025 Update
