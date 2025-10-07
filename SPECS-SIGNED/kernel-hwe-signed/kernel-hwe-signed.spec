@@ -1,4 +1,7 @@
 %global debug_package %{nil}
+%ifarch x86_64
+%global buildarch x86_64
+%endif
 %ifarch aarch64
 %global buildarch aarch64
 %endif
