@@ -34,7 +34,8 @@ BuildRequires:  libxml2-devel
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(Pod::Perldoc)
 BuildRequires:  gawk
-BuildRequires:  gnupg2
+
+Requires:       libvirt
 
 %description
 virt-top is a 'top(1)'-like utility for showing stats of virtualized
