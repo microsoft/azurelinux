@@ -1,5 +1,7 @@
 %global debug_package %{nil}
+%ifarch aarch64
 %global buildarch aarch64
+%endif
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-hwe-signed-%{buildarch}
@@ -24,7 +26,6 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 #   4. Build this spec
 Source0:        kernel-hwe-%{version}-%{release}.%{buildarch}.rpm
 Source1:        vmlinuz-%{uname_r}
-ExclusiveArch:  aarch64
 BuildRequires:  cpio
 BuildRequires:  grub2-rpm-macros
 BuildRequires:  openssl
