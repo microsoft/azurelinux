@@ -57,6 +57,7 @@ Requires:       krb5-libs >= 1.19
  
 %files -n python3-gssapi -f %{pyproject_files}
 %doc README.txt
+%license LICENSE.txt
 
 %changelog
 * Thu Sep 26 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.10.0-1
