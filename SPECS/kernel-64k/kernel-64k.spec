@@ -27,7 +27,7 @@
 Summary:        Linux Kernel
 Name:           kernel-64k
 Version:        6.6.104.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -380,6 +380,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Oct 07 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.104.2-5
+- Enable vsockets as module and enable diagnostics
+
 * Tue Sep 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.104.2-4
 - Bump release to match kernel
 

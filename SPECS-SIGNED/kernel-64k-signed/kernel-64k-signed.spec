@@ -7,7 +7,7 @@
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-64k-signed-%{buildarch}
 Version:        6.6.104.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -105,6 +105,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Tue Oct 07 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.104.2-5
+- Bump release to match kernel
+
 * Tue Sep 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.104.2-4
 - Bump release to match kernel
 
