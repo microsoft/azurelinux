@@ -180,6 +180,9 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
+* Tue Oct 07 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.88.0-1
+- Upgrade to 1.88.0
+
 * Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.86.0-7
 - Bump to rebuild with updated glibc
 
