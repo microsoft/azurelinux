@@ -64,6 +64,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  python3
 %if %{with_check}
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
+BuildRequires:	sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
@@ -124,15 +125,15 @@ sh ./configure \
 USER=root SUDO_USER=root %make_build
 
 %check
-# Symlink vendor directory before expand-yaml-anchors to avoid missing crates
-ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
-
 # Create dummy CI folder to satisfy expand-yaml-anchors
 mkdir -p .github/workflows
-./x.py run src/tools/expand-yaml-anchors || true
 
-# Symlink rustfmt for test dependencies
-ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
+ln -s %{_topdir}/BUILD/rustc-%{version}-src/vendor/ /root/vendor
+
+# Symlink rustfmt for test
+ln -s %{_topdir}/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_topdir}/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
+
+./x.py run src/tools/expand-yaml-anchors
 
 # Remove flaky rustdoc UI test
 rm -fv ./tests/rustdoc-ui/issue-98690.*
@@ -140,8 +141,8 @@ rm -fv ./tests/rustdoc-ui/issue-98690.*
 # Create test user and run stage 2 tests
 useradd -m -d /home/test test
 chown -R test:test .
-runuser -u test -- ./x.py test --stage 2
-userdel -r test || true
+sudo -u test %make_build check
+userdel -r test
 
 %install
 USER=root SUDO_USER=root %make_install
