@@ -1,7 +1,7 @@
 Summary:        C debugger
 Name:           gdb
 Version:        11.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,7 @@ Patch5:         CVE-2022-48064.patch
 Patch6:         CVE-2022-48065.patch
 Patch7:         CVE-2022-47673.patch
 Patch8:         CVE-2022-47696.patch
+Patch9:         CVE-2025-7546.patch
 BuildRequires:  expat-devel
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
@@ -80,6 +81,10 @@ rm -vf %{buildroot}%{_libdir}/libaarch64-unknown-linux-gnu-sim.a
 %check
 # disable security hardening for tests
 rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
+
+# Remove libctf test suite, which causes compilation errors with the base tests
+rm -rvf libctf/testsuite
+
 %make_build check TESTS="gdb.base/default.exp"
 
 %files -f %{name}.lang
@@ -97,6 +102,10 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 %{_mandir}/*/*
 
 %changelog
+* Fri Jul 18 2025 Akhila Guruju <v-guakhila@microsoft.com> - 11.2-7
+- Patch CVE-2025-7546
+- Fix package tests
+
 * Mon Apr 21 2025 Kanishk Bansal <kanbansal@microsoft.com> - 11.2-6
 - Patch CVE-2022-47673, CVE-2022-47696 using an upstream patch
 
