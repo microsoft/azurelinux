@@ -62,9 +62,9 @@ BuildRequires:  ninja-build
 # make sure rust relies on openssl from CBL-Mariner (instead of using its vendored flavor)
 BuildRequires:  openssl-devel
 BuildRequires:  python3
-BuildRequires:  sudo
 %if %{with_check}
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
+BuildRequires:  sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
