@@ -102,6 +102,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %changelog
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.50.2-1
 - Bump to match kernel-hwe
+- Adds support to x86_64
 
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.12.40.1-2
 - Bump to match kernel-hwe
