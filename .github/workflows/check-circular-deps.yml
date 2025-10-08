@@ -24,4 +24,11 @@ jobs:
           echo "Checking for circular dependency loops..."
           # Setup the toolchain using the LKG daily build, and then make the full package graph.
           # This will fail if any circular dependency loops are detected in the core SPECs.
-          sudo make -C toolkit graph REBUILD_TOOLS=y DAILY_BUILD_ID=lkg -j30
+          DAILY_BUILD_ID=
+          if [[ "${{ github.ref_name }}" != fasttrack/* ]]; then
+            echo "Using LKG daily build for circular dependency check."
+            DAILY_BUILD_ID=lkg
+          else
+            echo "Using latest daily build for circular dependency check."
+          fi
+          sudo make -C toolkit graph REBUILD_TOOLS=y DAILY_BUILD_ID=$DAILY_BUILD_ID -j30
