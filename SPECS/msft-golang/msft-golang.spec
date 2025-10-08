@@ -1,6 +1,6 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.24.5-20250708.7.src.tar.gz
+%global ms_go_filename  go1.24.7-20250903.8.src.tar.gz
 %global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
@@ -14,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           msft-golang
-Version:        1.24.5
+Version:        1.24.7
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -158,6 +158,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Oct 01 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.24.7-1
+- Upgrade version to 1.24.7
+
 * Wed Aug 06 2025 Muhammad Falak <mwani@microsoft.com> - 1.24.5-1
 - Bump version to 1.24.5
 - Drop un-needed patches

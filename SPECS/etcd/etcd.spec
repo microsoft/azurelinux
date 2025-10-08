@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.21
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -115,6 +115,9 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Thu Oct 02 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.5.21-2
+- Bump to build with latest msft-golang 1.24.7
+
 * Sun Mar 30 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.5.21-1
 - Upgrade to 3.5.21 for CVE-2025-30204
 - Remove previously applied patches
