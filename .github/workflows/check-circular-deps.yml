@@ -19,17 +19,25 @@ jobs:
       - name: Workflow trigger checkout
         uses: actions/checkout@v4
 
+      - name: Determine DAILY_BUILD_ID value
+        run: |
+          echo "GitHub 'base_ref': ${{ github.base_ref }}"
+          echo "GitHub 'ref': ${{ github.ref }}"
+
+          daily_build_id=
+          if [[ "${{ github.base_ref }}" == fasttrack/* || "${{ github.ref }}" == refs/heads/fasttrack/* ]]; then
+            echo "Building against a fast-track branch."
+          else
+            echo "Not building against a fast-track branch."
+            daily_build_id=lkg
+          fi
+
+          echo "DAILY_BUILD_ID is set to '$daily_build_id'"
+          echo "daily_build_id=$daily_build_id" >> $GITHUB_ENV
+
       - name: Check for circular dependencies
         run: |
           echo "Checking for circular dependency loops..."
           # Setup the toolchain using the LKG daily build, and then make the full package graph.
           # This will fail if any circular dependency loops are detected in the core SPECs.
-          DAILY_BUILD_ID=
-          echo "GitHub ref name is: ${{ github.base_ref }}"
-          if [[ "${{ github.base_ref }}" != fasttrack/* && "${{ github.ref }}" != refs/heads/fasttrack/* ]]; then
-            echo "Using LKG daily build for circular dependency check."
-            DAILY_BUILD_ID=lkg
-          else
-            echo "Using latest daily build for circular dependency check."
-          fi
-          sudo make -C toolkit graph REBUILD_TOOLS=y DAILY_BUILD_ID=$DAILY_BUILD_ID -j30
+          sudo make -C toolkit graph REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.daily_build_id }} -j30
