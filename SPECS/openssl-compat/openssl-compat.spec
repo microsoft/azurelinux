@@ -242,7 +242,6 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 Provides: openssl = %{version}-%{release}
 Conflicts: openssl
-Obsoletes: openssl
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -264,9 +263,6 @@ Requires: openssl-fips-provider
 %endif
 Provides: openssl-libs = %{version}-%{release}
 Conflicts: openssl-libs
-Obsoletes: openssl-libs
-# Obsoletes: SymCrypt >= 0.0.0
-# Obsoletes: SymCrypt-OpenSSL >= 0.0.0
 
 %description libs
 OpenSSL is a toolkit for supporting cryptography. The openssl-libs
@@ -279,7 +275,6 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
 Provides: openssl-devel = %{version}-%{release}
 Conflicts: openssl-devel
-Obsoletes: openssl-devel
 
 %description devel
 OpenSSL is a toolkit for supporting cryptography. The openssl-devel
@@ -292,7 +287,6 @@ Summary:        Libraries for static linking of applications which will use Open
 Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 Provides:       openssl-static = %{version}-%{release}
 Conflicts:      openssl-static
-Obsoletes:      openssl-static
 
 %description static
 OpenSSL is a toolkit for supporting cryptography. The openssl-static
@@ -306,7 +300,6 @@ Requires: perl-interpreter
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Provides: openssl-perl = %{version}-%{release}
 Conflicts: openssl-perl
-Obsoletes: openssl-perl
 
 %description perl
 OpenSSL is a toolkit for supporting cryptography. The openssl-perl

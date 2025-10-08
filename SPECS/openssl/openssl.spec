@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.3
-Release: 3%{?dist}
+Release: 1001%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
@@ -98,6 +98,8 @@ BuildRequires: perl(Test::More)
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
+Conflicts: openssl-compat
+
 %description
 The OpenSSL toolkit provides support for secure communications between
 machines. OpenSSL includes a certificate management tool and shared
@@ -108,6 +110,7 @@ protocols.
 Summary: A general purpose cryptography library with TLS implementation
 Recommends: SymCrypt
 Recommends: SymCrypt-OpenSSL
+Conflicts: openssl-compat-libs
 
 %description libs
 OpenSSL is a toolkit for supporting cryptography. The openssl-libs
@@ -118,6 +121,7 @@ support cryptographic algorithms and protocols.
 Summary: Files for development of applications which will use OpenSSL
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
+Conflicts: openssl-compat-devel
 
 %description devel
 OpenSSL is a toolkit for supporting cryptography. The openssl-devel
@@ -128,6 +132,7 @@ support various cryptographic algorithms and protocols.
 Summary:        Libraries for static linking of applications which will use OpenSSL
 # Group:          Development/Libraries
 Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+Conflicts: openssl-compat-static
 
 %description static
 OpenSSL is a toolkit for supporting cryptography. The openssl-static
@@ -139,6 +144,7 @@ protocols.
 Summary: Perl scripts provided with OpenSSL
 Requires: perl-interpreter
 Requires: %{name}%{?_isa} = %{version}-%{release}
+Conflicts: openssl-compat-perl
 
 %description perl
 OpenSSL is a toolkit for supporting cryptography. The openssl-perl
