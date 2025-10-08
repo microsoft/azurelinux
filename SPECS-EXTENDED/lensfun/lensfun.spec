@@ -168,7 +168,7 @@ export CTEST_OUTPUT_ON_FAILURE=1
 %endif
 
 %changelog
-* Mon Sep 05 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.3.4-3
+* Fri Sep 05 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.3.4-3
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
