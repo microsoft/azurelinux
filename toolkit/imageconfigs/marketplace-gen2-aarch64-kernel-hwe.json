@@ -5,7 +5,7 @@
             "MaxSize": 5000,
             "Artifacts": [
                 {
-                    "Name": "azurelinux-arm64-gen2-kernel-hwe",
+                    "Name": "cblmariner-arm64-gen2-kernel-hwe",
                     "Type": "vhd"
                 }
             ],
