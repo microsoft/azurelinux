@@ -38,14 +38,14 @@
 
 %global KVERSION %{target_kernel_version_full}
 
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-21%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-22%{release_suffix}%{?dist}}
 
 %{!?_name: %define _name mlnx-nfsrdma-hwe}
 
 Summary:	 %{_name} Driver
 Name:		 %{_name}-signed
 Version:	 24.10
-Release:	 21%{release_suffix}%{?dist}
+Release:	 22%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -75,6 +75,8 @@ Requires:       mlnx-ofa_kernel-hwe = %{_mofed_full_version}
 Requires:       mlnx-ofa_kernel-hwe-modules  = %{_mofed_full_version}
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
+
+Conflicts:      mlnx-nfsrdma
 
 %description -n %{_name}
 %{description}
@@ -118,6 +120,9 @@ fi
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-mlnx-nfsrdma-*.conf
 
 %changelog
+* Sat Sep 27 2025 Binu Jose Philip <bphilip@microsoft.com> - 24.10-22_6.12.40.1.2
+- Build signed spec for -hwe variant
+
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-21
 - Bump to match kernel-hwe
 

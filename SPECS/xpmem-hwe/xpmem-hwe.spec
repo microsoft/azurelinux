@@ -13,7 +13,7 @@
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-21%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-22%{release_suffix}%{?dist}}
 
 # %{!?KVERSION: %global KVERSION %(uname -r)}
 %{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
@@ -43,7 +43,7 @@
 Summary:	 Cross-partition memory
 Name:		 xpmem-hwe
 Version:	 2.7.4
-Release:	 21%{release_suffix}%{?dist}
+Release:	 22%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -83,6 +83,7 @@ Requires:       mlnx-ofa_kernel-hwe-modules = %{_mofed_full_version}
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
 
+Conflicts:      xpmem
 
 %description
 XPMEM is a Linux kernel module that enables a process to map the
@@ -254,6 +255,9 @@ fi
 %endif
 
 %changelog
+* Sat Sep 27 2025 Binu Jose Philip <bphilip@microsoft.com> - 2.7.4-22_6.12.40.1.2
+- Build signed spec for -hwe variant
+
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 2.7.4-21
 - Bump to match kernel-hwe
 

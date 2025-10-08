@@ -49,13 +49,13 @@
 %global KMOD_PREAMBLE "%{_vendor}" != "openEuler"
 
 # set package name
-%{!?_name: %global _name knem}
+%{!?_name: %global _name knem-hwe}
 %global non_kmp_pname %{name}-modules
 
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
 Name:		 knem-hwe
 Version:	 1.1.4.90mlnx3
-Release:	 21%{release_suffix}%{?dist}
+Release:	 22%{release_suffix}%{?dist}
 Provides:	 knem-hwe-mlnx = %{version}-%{release}
 Obsoletes:	 knem-hwe-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
@@ -76,6 +76,7 @@ BuildRequires:  kmod
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
 
+Conflicts:      knem
 
 %description
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as offloading memory copies on to Intel I/OAT hardware.
@@ -282,6 +283,9 @@ fi
 %endif
 
 %changelog
+* Sat Sep 27 2025 Binu Jose Philip <bphilip@microsoft.com> - 1.1.4.90mlnx3-22_6.12.40.1.2
+- Build signed spec for -hwe variant
+
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 1.1.4.90mlnx3-21
 - Bump to match kernel-hwe
 
