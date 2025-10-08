@@ -3,7 +3,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.1
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -85,6 +85,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %{_bindir}/%{name}
 
 %changelog
+* Wed Oct 08 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.11.1-22
+- Bump to build with latest msft-golang 1.24.8
+
 * Fri Oct 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.1-21
 - Patch for CVE-2025-58063
 - Fix import order for ttl test
