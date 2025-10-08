@@ -19,7 +19,7 @@ Source1: https://lensfun.sourceforge.net/db/version_1.tar.bz2
 # install manpages only when INSTALL_HELPER_SCRIPTS=ON
 Patch200: lensfun-0.3.2-INSTALL_HELPER_SCRIPTS.patch
 
-BuildRequires: cmake
+BuildRequires: cmake >=2.8.12
 BuildRequires: doxygen
 BuildRequires: gcc
 BuildRequires: gcc-c++
@@ -168,7 +168,7 @@ export CTEST_OUTPUT_ON_FAILURE=1
 %endif
 
 %changelog
-* Mon Feb 11 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.3.4-3
+* Mon Sep 05 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.3.4-3
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
