@@ -25,8 +25,8 @@ jobs:
           # Setup the toolchain using the LKG daily build, and then make the full package graph.
           # This will fail if any circular dependency loops are detected in the core SPECs.
           DAILY_BUILD_ID=
-          echo "GitHub ref name is: ${{ github.ref_name }}"
-          if [[ "${{ github.ref_name }}" != fasttrack/* ]]; then
+          echo "GitHub ref name is: ${{ github.base_ref }}"
+          if [[ "${{ github.base_ref }}" != fasttrack/* && "${{ github.ref }}" != refs/heads/fasttrack/* ]]; then
             echo "Using LKG daily build for circular dependency check."
             DAILY_BUILD_ID=lkg
           else
