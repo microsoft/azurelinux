@@ -18244,8 +18244,8 @@
         "type": "other",
         "other": {
           "name": "perl-JSON-XS",
-          "version": "4.03",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/JSON-XS-4.03.tar.gz"
+          "version": "4.04",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/JSON-XS-4.04.tar.gz"
         }
       }
     },
@@ -25574,8 +25574,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.18",
-          "downloadUrl": "https://download.redis.io/releases/redis-6.2.18.tar.gz"
+          "version": "6.2.20",
+          "downloadUrl": "https://download.redis.io/releases/redis-6.2.20.tar.gz"
         }
       }
     },
