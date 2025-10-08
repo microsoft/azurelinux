@@ -40,4 +40,4 @@ jobs:
           echo "Checking for circular dependency loops..."
           # Setup the toolchain using the LKG daily build, and then make the full package graph.
           # This will fail if any circular dependency loops are detected in the core SPECs.
-          sudo make -C toolkit graph REBUILD_TOOLS=y DAILY_BUILD_ID='${{ env.daily_build_id }}'' -j30
+          sudo make -C toolkit graph REBUILD_TOOLS=y DAILY_BUILD_ID="${{ env.daily_build_id }}" -j30
