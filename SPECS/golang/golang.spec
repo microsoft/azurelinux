@@ -16,7 +16,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.24.7
+Version:        1.24.8
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -29,6 +29,7 @@ Source2:        https://dl.google.com/go/go%{bootstrap_compiler_version_0}.src.t
 Source3:        https://dl.google.com/go/go%{bootstrap_compiler_version_1}.src.tar.gz
 Source4:        https://dl.google.com/go/go%{bootstrap_compiler_version_2}.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
+Patch1:         CVE-2025-22870.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -172,8 +173,8 @@ fi
 %{_bindir}/*
 
 %changelog
-* Mon Sep 15 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.24.7-1
-- Bump version to 1.24.7
+* Thu Oct 09 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.24.8-1
+- Bump version to 1.24.8
 
 * Wed Aug 20 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.22.7-5
 - Patch CVE-2025-47907, CVE-2025-4674, CVE-2025-4673 & CVE-2025-47906
