@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -138,8 +138,8 @@ popd
 %patch350 -p1 -b .cve-2023-28531
 %patch351 -p1 -b .cve-2024-6387
 %patch352 -p1 -b .cve-2025-26465
-%patch 354 -p1
 %patch353 -p1 -b .cve-2025-32728
+%patch354 -p1 -b .CVE-2025-61985
 
 %build
 export CFLAGS="$CFLAGS -fpic"
@@ -296,6 +296,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Thu Oct 09 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.9p1-9
+- Patch CVE-2025-61985
+
 * Fri Apr 18 2025 Sudipta Pandit <sudpandit@microsoft.com> - 8.9p1-8
 - Patch CVE-2025-32728
 
