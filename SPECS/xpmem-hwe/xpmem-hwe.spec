@@ -24,7 +24,7 @@
 # script append_number_to_package_release.sh works:
 %global _release 1.2410068
 
-%bcond_with kernel_only
+%bcond_without kernel_only
 
 %if %{with kernel_only}
 %undefine _debugsource_packages
