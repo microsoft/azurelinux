@@ -2,7 +2,7 @@
 Summary:        Node Managed Identity
 Name:           nmi
 Version:        1.8.17
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -62,6 +62,9 @@ popd
 %{_bindir}/%{name}
 
 %changelog
+* Fri Oct 03 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.8.17-7 
+- Bump release to rebuild with golang
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.8.17-6
 - Bump release to rebuild with golang
 

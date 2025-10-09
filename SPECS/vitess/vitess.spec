@@ -5,8 +5,8 @@
 %bcond_without check
 
 Name:           vitess
-Version:        17.0.7
-Release:        11%{?dist}
+Version:        21.0.0
+Release:        1%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -29,13 +29,11 @@ Source0:        %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2024-45338.patch
-Patch1:         CVE-2024-45339.patch
-Patch2:         CVE-2025-22868.patch
-Patch3:         CVE-2024-53257.patch
-Patch4:         CVE-2025-22870.patch
-# CVE-2025-22872 is fixed in go net v0.38 by https://github.com/golang/net/commit/e1fcd82abba34df74614020343be8eb1fe85f0d9
-Patch5:         CVE-2025-22872.patch
+Patch0:         CVE-2024-45339.patch
+Patch1:         CVE-2025-22868.patch
+Patch2:         CVE-2024-53257.patch
+Patch3:         CVE-2025-22870.patch
+
 BuildRequires: golang
 
 %description
@@ -105,6 +103,9 @@ go test -v ./go/cmd/... \
 %{_bindir}/*
 
 %changelog
+* Mon Sep 22 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 21.0.0-1
+- Upgrade version to 21.0.0
+
 * Tue Sep 23 2025 Archana Shettigar <v-shettigara@microsoft.com> - 17.0.7-11
 - Bump release to rebuild with golang
 
