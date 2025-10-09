@@ -16,8 +16,7 @@ Patch101:       CVE-2018-21035.nopatch
 # Vulnerability is limited to the Windows OS.
 Patch102:       CVE-2022-25634.nopatch
 Patch103:       CVE-2023-32573.patch
-Patch104:       CVE-2025-10728.patch
-Patch105:       CVE-2025-10729.patch
+Patch104:       CVE-2025-10729.patch
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 BuildRequires:  qt5-qtbase-devel >= %{version}
 BuildRequires:  qt5-qtbase-private-devel
@@ -87,7 +86,7 @@ popd
 
 %changelog
 * Tue Oct 07 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.12.11-7
-- Patch for CVE-2025-10729, CVE-2025-10728
+- Patch for CVE-2025-10729
 
 * Mon Aug 28 2023 Andrew Phelps <anphel@microsoft.com> - 5.12.11-6
 - Bump release to rebuild with qt5-qtbase >= 5.12.11-9, which contains fix for CVE-2023-37369
