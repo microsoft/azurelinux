@@ -110,6 +110,7 @@ cp -pr samples $RPM_BUILD_ROOT%{_datadir}/%{name}
 %license LICENSE
 %license %{_licensedir}/%{name}-javadoc/ADDITIONAL_LICENSE_INFO
 %exclude /usr/share/javadoc/junitperf-1.9.1/legal/ADDITIONAL_LICENSE_INFO
+%exclude /usr/share/javadoc/junitperf-1.9.1/legal/LICENSE
 %defattr(0644,root,root,0755)
 %{_javadocdir}/%{name}-%{version}
 %{_javadocdir}/%{name}
