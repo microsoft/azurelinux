@@ -103,13 +103,13 @@ go test -v ./go/cmd/... \
 
 %changelog
 * Thu Oct 09 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 17.0.7-12
-- Enable debuginfo generation
+- Enable debuginfo subpackage generation
 
 * Tue Sep 23 2025 Archana Shettigar <v-shettigara@microsoft.com> - 17.0.7-11
 - Bump release to rebuild with golang
 
 * Mon Sep 22 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 17.0.7-10
-- Disable debuginfo generation to due to a broken file
+- Disable debuginfo subpackage generation to due to a broken file
 
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 17.0.7-9
 - Bump release to rebuild with golang
