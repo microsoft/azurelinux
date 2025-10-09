@@ -920,12 +920,10 @@ cat ./CMakeFiles/CMakeError.log
 make "$CEPH_MFLAGS_JOBS"
 
 
-%if 0%{with make_check}
 %check
 # run in-tree unittests
 cd build
 ctest "$CEPH_MFLAGS_JOBS"
-%endif
 
 
 %install
