@@ -28,8 +28,8 @@
 
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.40.1
-%global target_kernel_release 2
+%global target_azl_build_kernel_version 6.12.50.2
+%global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -83,7 +83,8 @@
 
 %{!?KERNEL_SOURCES: %global KERNEL_SOURCES /lib/modules/%{KVERSION}/source}
 
-%{!?_name: %global _name mlnx-ofa_kernel}
+%global base_name mlnx-ofa_kernel
+%{!?_name: %global _name %{base_name}-hwe}
 %{!?_version: %global _version 24.10}
 %{!?_release: %global _release OFED.24.10.0.7.0.1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
@@ -100,11 +101,11 @@
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel-hwe
 Version:	 24.10
-Release:	 21%{release_suffix}%{?dist}
+Release:	 22%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
-Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ofa_kernel-24.10.tgz#/%{_name}-%{_version}.tgz
+Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ofa_kernel-24.10.tgz#/mlnx-ofa_kernel-%{_version}.tgz
 Patch0:          001-fix-module-init-for-ibt.patch
 
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -210,11 +211,11 @@ The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-o
 %if "%{WITH_MOD_SIGN}" == "1"
 # call module sign script
 %global __modsign_install_post \
-    %{_builddir}/$NAME-$VERSION/source/ofed_scripts/tools/sign-modules %{buildroot}/lib/modules/ %{kernel_source default} || exit 1 \
+    %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/tools/sign-modules %{buildroot}/lib/modules/ %{kernel_source default} || exit 1 \
 %{nil}
 
 %global __debug_package 1
-%global buildsubdir %{_name}-%{version}
+%global buildsubdir mlnx-ofa_kernel-%{version}
 # Disgusting hack alert! We need to ensure we sign modules *after* all
 # invocations of strip occur, which is in __debug_install_post if
 # find-debuginfo.sh runs, and __os_install_post if not.
@@ -252,7 +253,7 @@ The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-o
 %{!?install_mod_dir: %global install_mod_dir updates}
 
 %prep
-%setup -n %{_name}-%{_version}
+%setup -n mlnx-ofa_kernel-%{_version}
 %patch 0 -p1
 set -- *
 mkdir source
@@ -343,6 +344,9 @@ fi
 %endif
 
 %changelog
+* Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22_6.12.50.2-1
+- Bump to match kernel-hwe
+
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 24.10-21
 - Bump to match kernel-hwe
 

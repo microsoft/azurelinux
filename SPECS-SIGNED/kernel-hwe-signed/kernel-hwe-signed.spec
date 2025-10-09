@@ -1,10 +1,15 @@
 %global debug_package %{nil}
+%ifarch x86_64
+%global buildarch x86_64
+%endif
+%ifarch aarch64
 %global buildarch aarch64
+%endif
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-hwe-signed-%{buildarch}
-Version:        6.12.40.1
-Release:        2%{?dist}
+Version:        6.12.50.2
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,7 +29,6 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 #   4. Build this spec
 Source0:        kernel-hwe-%{version}-%{release}.%{buildarch}.rpm
 Source1:        vmlinuz-%{uname_r}
-ExclusiveArch:  aarch64
 BuildRequires:  cpio
 BuildRequires:  grub2-rpm-macros
 BuildRequires:  openssl
@@ -96,6 +100,10 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.50.2-1
+- Bump to match kernel-hwe
+- Adds support to x86_64
+
 * Fri Sep 12 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.12.40.1-2
 - Bump to match kernel-hwe
 

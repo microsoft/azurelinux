@@ -915,8 +915,8 @@
         "type": "other",
         "other": {
           "name": "azurelinux-image-tools",
-          "version": "0.19.0",
-          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v0.19.0.tar.gz"
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.0.0.tar.gz"
         }
       }
     },
@@ -8291,8 +8291,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe",
-          "version": "6.12.40.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.40.1.tar.gz"
+          "version": "6.12.50.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.50.2.tar.gz"
         }
       }
     },
@@ -8311,8 +8311,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe-headers",
-          "version": "6.12.40.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.40.1.tar.gz"
+          "version": "6.12.50.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.50.2.tar.gz"
         }
       }
     },
@@ -13882,8 +13882,8 @@
         "type": "other",
         "other": {
           "name": "mythes",
-          "version": "1.2.4",
-          "downloadUrl": "https://github.com/hunspell/mythes/archive/refs/heads/mythes-1.2.4.tar.gz"
+          "version": "1.2.5",
+          "downloadUrl": "https://github.com/hunspell/mythes/releases/download/v1.2.5/mythes-1.2.5.tar.xz"
         }
       }
     },
@@ -13902,8 +13902,8 @@
         "type": "other",
         "other": {
           "name": "mythes-ca",
-          "version": "1.5.0",
-          "downloadUrl": "http://www.softcatala.org/diccionaris/actualitzacions/sinonims/thesaurus-ca.oxt"
+          "version": "2.3.1",
+          "downloadUrl": "https://github.com/Softcatala/sinonims-cat/releases/download/2.3.1/thesaurus-ca.oxt"
         }
       }
     },
@@ -17673,8 +17673,8 @@
         "type": "other",
         "other": {
           "name": "perl-File-Find-Object",
-          "version": "0.3.5",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/File/File-Find-Object-0.3.5.tar.gz"
+          "version": "0.3.8",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/File-Find-Object-0.3.8.tar.gz"
         }
       }
     },
@@ -17743,8 +17743,8 @@
         "type": "other",
         "other": {
           "name": "perl-File-MimeInfo",
-          "version": "0.29",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MI/MICHIELB/File-MimeInfo-0.29.tar.gz"
+          "version": "0.35",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MI/MICHIELB/File-MimeInfo-0.35.tar.gz"
         }
       }
     },
@@ -22863,8 +22863,8 @@
         "type": "other",
         "other": {
           "name": "python-fixtures",
-          "version": "3.0.0",
-          "downloadUrl": "http://pypi.python.org/packages/source/f/fixtures/fixtures-3.0.0.tar.gz"
+          "version": "4.0.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/3c/3d/f106b3278ba50067e9cd397f836d33d141aa790853152dbb3512aaee19f3/fixtures-4.0.1.tar.gz"
         }
       }
     },
@@ -25223,8 +25223,8 @@
         "type": "other",
         "other": {
           "name": "python-testtools",
-          "version": "2.4.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/testtools/testtools-2.4.0.tar.gz"
+          "version": "2.7.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/07/a7/3f3daee7a525d5288b84581448d21a39d0b9ae9f4a235d99850682944857/testtools-2.7.1.tar.gz"
         }
       }
     },
@@ -28706,8 +28706,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.9.2",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.2.tar.gz"
+          "version": "1.9.3",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.3.tar.gz"
         }
       }
     },
@@ -29796,8 +29796,8 @@
         "type": "other",
         "other": {
           "name": "valkey",
-          "version": "8.0.4",
-          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.4.tar.gz"
+          "version": "8.0.6",
+          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.6.tar.gz"
         }
       }
     },

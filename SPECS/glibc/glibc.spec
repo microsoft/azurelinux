@@ -10,7 +10,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,7 +36,7 @@ Patch8:         CVE-2023-6779.patch
 Patch9:         CVE-2023-6780.patch
 # Upstream backport for fixing: nscd fails to build with cleanup handler if built with -fexceptions
 Patch10:        nscd-Do-not-rebuild-getaddrinfo-bug-30709.patch
-Patch11:        glibc-2.34_pthread_cond_wait.patch
+Patch11:        glibc-2.38_pthread_lost_wakeup_fix.patch
 Patch12:        CVE-2023-4527.patch
 Patch13:        CVE-2023-4806.patch
 Patch14:        CVE-2023-5156.patch
@@ -371,6 +371,9 @@ grep "^FAIL: nptl/tst-mutex10" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
+* Tue Oct 08 2025 Andrew Phelps <anphel@microsoft.com> - 2.38-14
+- Replace mitigation patch for glibc bug #25847 with proper upstream fix
+
 * Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.38-13
 - Fix Patch application of CVE-2025-4802
 - Add test for CVE-2025-4802
