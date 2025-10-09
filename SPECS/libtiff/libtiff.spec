@@ -18,7 +18,8 @@ Patch6:         CVE-2025-8177.patch
 Patch7:         CVE-2025-8534.patch
 Patch8:         CVE-2025-8851.patch
 Patch9:         CVE-2025-9165.patch
-Patch10:        CVE-2024-13978.patch
+Patch10:        CVE-2025-9900.patch
+Patch11:        CVE-2024-13978.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libjpeg-turbo-devel
@@ -71,8 +72,11 @@ make %{?_smp_mflags} -k check
 %{_docdir}/*
 
 %changelog
-* Fri Sep 12 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.6.0-9
+* Fri Oct 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.6.0-10
 - Patch for CVE-2024-13978
+
+* Mon Sep 29 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.6.0-9
+- Patch for CVE-2025-9900
 
 * Thu Aug 21 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.6.0-8
 - Patch for CVE-2025-9165, CVE-2025-8851
