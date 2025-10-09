@@ -11,8 +11,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.qt.io
 Source0:        https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qtsvg-everywhere-src-%{version}.tar.xz
-Patch0:         CVE-2025-10728.patch
-Patch1:         CVE-2025-10729.patch
+Patch0:         CVE-2025-10729.patch
 %{?_qt5:Requires: %{_qt}%{?_isa} = %{_qt_version}}
 BuildRequires:  qtbase-devel >= %{version}
 BuildRequires:  qtbase-private-devel
@@ -92,7 +91,7 @@ popd
 
 %changelog
 * Tue Oct 07 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.6.1-3
-- Patch for CVE-2025-10729, CVE-2025-10728
+- Patch for CVE-2025-10729
 
 * Mon Apr 07 2025 Andrew Phelps <anphel@microsoft.com> - 6.6.1-2
 - Bump release to recompile with qtbase-devel-6.6.3
