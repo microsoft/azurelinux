@@ -19,7 +19,7 @@ Source1: https://lensfun.sourceforge.net/db/version_1.tar.bz2
 # install manpages only when INSTALL_HELPER_SCRIPTS=ON
 Patch200: lensfun-0.3.2-INSTALL_HELPER_SCRIPTS.patch
 
-BuildRequires: cmake >=2.8.12
+BuildRequires: cmake >= 2.8.12
 BuildRequires: doxygen
 BuildRequires: gcc
 BuildRequires: gcc-c++
