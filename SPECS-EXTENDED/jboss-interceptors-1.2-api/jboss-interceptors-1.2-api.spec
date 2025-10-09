@@ -82,6 +82,7 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %license LICENSE
 %{_javadocdir}/%{name}
 %exclude /usr/share/javadoc/jboss-interceptors-1.2-api/legal/ADDITIONAL_LICENSE_INFO
+%exclude /usr/share/javadoc/jboss-interceptors-1.2-api/legal/LICENSE
 
 %changelog
 * Tue Aug 19 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.0.0-3
