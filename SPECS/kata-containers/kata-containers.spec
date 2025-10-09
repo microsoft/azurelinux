@@ -11,7 +11,7 @@ Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
 
-ExclusiveArch: x86_64
+# ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
 BuildRequires:  golang

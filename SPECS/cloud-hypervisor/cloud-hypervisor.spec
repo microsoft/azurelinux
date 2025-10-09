@@ -38,7 +38,7 @@ Requires: glibc
 Requires: libgcc
 Requires: libcap
 
-ExclusiveArch:  x86_64
+# ExclusiveArch:  x86_64
 
 %ifarch x86_64
 %define rust_def_target x86_64-unknown-linux-gnu
