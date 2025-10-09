@@ -1,6 +1,6 @@
 Name:		ibarr
 Version:	0.1.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:	Nvidia		 address and route userspace resolution services for Infiniband
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -54,8 +54,8 @@ rm -rf $RPM_BUILD_ROOT
 /lib/systemd/system/%{name}.service
 
 %changelog
-* Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 0.1.3-2
+* Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 0.1.3-3
 - Enable ARM64 build by removing ExclusiveArch
-* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 0.1.3-2
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

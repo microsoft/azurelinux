@@ -1,7 +1,7 @@
 Name:		 multiperf
 Summary:	 IB Performance tests
 Version:	 3.0
-Release:	 1%{?dist}
+Release:	 2%{?dist}
 License:	 BSD 3-Clause, GPL v2 or later
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -36,9 +36,9 @@ rm -rf ${RPM_BUILD_ROOT}
 %_bindir/*
 
 %changelog
-* Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 3.0-1
+* Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 3.0-2
 - Enable ARM64 build by removing ExclusiveArch
-* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 3.0-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
 * Sun Feb 08 2015 - gilr@mellanox.com

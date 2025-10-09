@@ -5,7 +5,7 @@
 Summary:	 InfiniBand fabric simulator for management
 Name:		 ibsim
 Version:	 0.12
-Release:	 1%{?dist}
+Release:	 2%{?dist}
 License:	 GPLv2 or BSD
 Group:		 System Environment/Libraries
 BuildRoot:	 %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -47,8 +47,8 @@ rm -rf $RPM_BUILD_ROOT
 %license COPYING
 
 %changelog
-* Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 0.12-1
+* Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 0.12-2
 - Enable ARM64 build by removing ExclusiveArch
-* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 0.12-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
