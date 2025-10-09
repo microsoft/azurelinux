@@ -1,11 +1,11 @@
 %global debug_package %{nil}
 %define upstream_name containerd
-%define commit_hash 207ad711eabd375a01713109a8a197d197ff6542
+%define commit_hash c507a0257ea6462fbd6f5ba4f5c74facb04021f4
 
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
-Version: 2.0.0
-Release: 14%{?dist}
+Version: 2.0.2
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -30,7 +30,7 @@ BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
 
-Requires: runc >= 1.2.2
+Requires: runc >= 1.2.4
 
 # This package replaces the old name of containerd
 Provides: containerd = %{version}-%{release}
@@ -98,6 +98,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Thu Oct 09 2025 Nan Liu <liunan@microsoft.com> - 2.0.2-1
+- Bump to 2.0.2
+
 * Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 2.0.0-14
 - Set BR for golang to < 1.25
 
