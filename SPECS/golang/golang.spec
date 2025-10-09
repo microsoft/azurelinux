@@ -1,6 +1,6 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.25.1-20250903.7.src.tar.gz
+%global ms_go_filename  go1.25.2-20251008.3.src.tar.gz
 %global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
@@ -14,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.25.1
+Version:        1.25.2
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -160,6 +160,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Oct 09 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.25.2-1
+- Bump version to 1.25.2-1
+
 * Thu Sep 04 2025 Davis Goodin <dagood@microsoft.com> - 1.25.1-1
 - Bump version to 1.25.1-1
 
