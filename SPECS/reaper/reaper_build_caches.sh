@@ -62,6 +62,7 @@ function checkInternet {
 function installNodeModules {
 	echo "Installing node modules."
 	sudo tdnf install -y nodejs
+	npm config set prefix "$homeCacheDir/.npm"
 	npm config set cache "$homeCacheDir/.npm" --global
 	# Default node/npm versions in Mariner fails to build dependency node module versions due to known
 	# incompatibilities.
@@ -76,6 +77,7 @@ function installNodeModules {
 	npm install -g n
 	export N_PREFIX="$homeCacheDir/.npm-global"
 	n 14.18.0
+	export PATH="$homeCacheDir/.npm-global/bin":$PATH
 	export XDG_CACHE_HOME=$homeCacheDir/.cache
 	npm install -g bower
 	# Clear bash hash tables for node/npm paths
