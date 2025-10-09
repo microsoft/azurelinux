@@ -50,6 +50,7 @@ Patch350:       CVE-2023-28531.patch
 Patch351:       CVE-2024-6387.patch
 Patch352:       CVE-2025-26465.patch
 Patch353:       CVE-2025-32728.patch
+Patch354:       CVE-2025-61985.patch
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
 BuildRequires:  e2fsprogs-devel
@@ -137,6 +138,7 @@ popd
 %patch350 -p1 -b .cve-2023-28531
 %patch351 -p1 -b .cve-2024-6387
 %patch352 -p1 -b .cve-2025-26465
+%patch 354 -p1
 %patch353 -p1 -b .cve-2025-32728
 
 %build
