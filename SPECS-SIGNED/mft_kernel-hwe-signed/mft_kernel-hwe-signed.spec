@@ -15,7 +15,7 @@
 Name:            %{_name}-signed
 Summary:         %{_name} Kernel Module for the %{KVERSION} kernel
 Version:         4.30.0
-Release:	     22%{release_suffix}%{?dist}
+Release:	     23%{release_suffix}%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
 
@@ -84,6 +84,9 @@ popd
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.30.0-23_6.12.50.2-1
+- Bump release to rebuild for new release
+
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 4.30.0-22_6.12.50.2-1
 - Bump to match kernel-hwe
 - Fix signed spec for -hwe variant
