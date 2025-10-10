@@ -39,7 +39,7 @@
 %global KVERSION %{target_kernel_version_full}
 
 %{!?_name: %define _name isert-hwe}
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-22%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-23%{release_suffix}%{?dist}}
 
 Summary:	 %{_name} Driver
 Name:		   %{_name}-signed
