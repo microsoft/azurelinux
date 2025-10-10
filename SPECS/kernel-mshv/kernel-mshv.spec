@@ -10,7 +10,7 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        6.6.100.mshv1
+Version:        6.6.100.mshv2
 Release:        1%{?dist}
 License:        GPLv2
 Group:          Development/Tools
@@ -79,7 +79,7 @@ Requires:       audit
 This package contains the 'perf' performance analysis tools for MSHV kernel.
 
 %prep
-%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-kata-%{version}
+%autosetup -p1 -n linux-dom0
 make mrproper
 cp %{SOURCE1} .config
 
@@ -245,6 +245,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Fri Oct 10 2025 Cameron Baird <cameronbaird@microsoft.com> - 6.6.100.mshv2-1
+- Upgrade to 6.6.100.mshv2 - introduces movable page support
+
 * Tue Sep 09 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.100.mshv1-1
 - Upgrade to 6.6.100.mshv1
 
