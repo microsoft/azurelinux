@@ -175,10 +175,12 @@ fi
 %{make_install} moduledir=%{moduledir} %{make_kernel_only}
 rm -rf $RPM_BUILD_ROOT/%{_libdir}/libxpmem.la
 rm -rf $RPM_BUILD_ROOT/etc/init.d/xpmem
+%if %{with kernel_only}
+rm -rf $RPM_BUILD_ROOT/lib/udev/rules.d
+rm -f $RPM_BUILD_ROOT/usr/lib*/pkgconfig/cray-xpmem.pc
+%else
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/modules-load.d
 echo "xpmem" >$RPM_BUILD_ROOT%{_prefix}/lib/modules-load.d/xpmem.conf
-%if %{with kernel_only}
-rm -f $RPM_BUILD_ROOT/usr/lib*/pkgconfig/cray-xpmem.pc
 %endif
 %if %{need_firmware_dir}
 mkdir -p $RPM_BUILD_ROOT/lib/firmware
