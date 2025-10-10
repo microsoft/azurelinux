@@ -16,13 +16,8 @@ Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{
 Source1: containerd.service
 Source2: containerd.toml
 
-Patch0:	CVE-2024-45338.patch
-Patch1:	CVE-2025-27144.patch
-Patch2:	CVE-2024-40635.patch
-Patch3:	CVE-2025-22872.patch
-Patch4:	CVE-2025-47291.patch
-Patch5:	multi-snapshotters-support.patch
-Patch6:	tardev-support.patch
+Patch0:	multi-snapshotters-support.patch
+Patch1:	tardev-support.patch
 %{?systemd_requires}
 
 BuildRequires: golang < 1.25
@@ -55,7 +50,7 @@ containerd is designed to be embedded into a larger system, rather than being
 used directly by developers or end-users.
 
 %prep
-%autosetup -p1 -n %{upstream_name}2-%{version}
+%autosetup -p1 -n %{upstream_name}-%{version}
 
 %build
 export BUILDTAGS="-mod=vendor"
