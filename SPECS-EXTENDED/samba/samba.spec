@@ -85,7 +85,7 @@
 
 Name:           samba
 Version:        4.12.5
-Release:        6%{?dist}
+Release:        7%{?dist}
 
 
 %define samba_depver %{version}-%{release}
@@ -246,6 +246,8 @@ BuildRequires: python3-markdown
 BuildRequires: krb5-server >= %{required_mit_krb5}
 BuildRequires: bind
 %endif
+
+Patch0: netlogon-fixes.patch
 
 # filter out perl requirements pulled in from examples in the docdir.
 %global __requires_exclude_from ^%{_docdir}/.*$
@@ -796,6 +798,7 @@ and use CTDB instead.
 
 
 %prep
+%autosetup -p1
 xzcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
 %autosetup -n samba-%{version}%{pre_release} -p1
 # Remove `xsltproc` binary if installed. This is only used for docs, which we do not build
@@ -3438,6 +3441,9 @@ fi
 %endif
 
 %changelog
+* Fri Oct 10 2025 Andy Zaugg <azaugg@linkedin.com> - 4.12.5-7
+- Fix winbind netlogon issue with Windows security update 2025
+
 * Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 4.12.5-6
 - Fix build issue with docs by removing xsltproc
 
