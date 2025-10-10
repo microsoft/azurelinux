@@ -371,7 +371,7 @@ rm -rf %{buildroot}
 # W/A for OEL6.7/7.x inbox modules get locked in memory
 # in dmesg we get: Module mlx4_core locked in memory until next boot
 if (grep -qiE "Oracle.*(6.([7-9]|10)| 7)" /etc/issue /etc/*release* 2>/dev/null); then
-       /sbin/dracut --force
+	/sbin/dracut --force
 fi
 
 %postun -n %{non_kmp_pname}
