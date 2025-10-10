@@ -4,7 +4,7 @@
 
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
-Version: 2.0.2
+Version: 2.0.3
 Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
@@ -93,8 +93,8 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
-* Thu Oct 09 2025 Nan Liu <liunan@microsoft.com> - 2.0.2-1
-- Bump to 2.0.2
+* Thu Oct 09 2025 Nan Liu <liunan@microsoft.com> - 2.0.3-1
+- Bump to 2.0.3
 
 * Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 2.0.0-14
 - Set BR for golang to < 1.25

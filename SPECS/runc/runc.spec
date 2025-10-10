@@ -2,7 +2,7 @@
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           runc
 # update "commit_hash" above when upgrading version
-Version:        1.2.4
+Version:        1.2.5
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -43,8 +43,8 @@ make install-man DESTDIR=%{buildroot} PREFIX=%{_prefix}
 %{_mandir}/*
 
 %changelog
-* Thu Oct 09 2025 Nan Liu <liunan@microsoft.com> - 1.2.4-1
-- Bump version to 1.2.4
+* Thu Oct 09 2025 Nan Liu <liunan@microsoft.com> - 1.2.5-1
+- Bump version to 1.2.5
 
 * Mon Nov 25 2024 Nan Liu <liunan@microsoft.com> - 1.2.2-1
 - Bump version to 1.2.2
