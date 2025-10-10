@@ -3,7 +3,7 @@
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
 Version:        0.19.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
 Group:          Applications/System
@@ -99,6 +99,9 @@ go test -C toolkit/tools ./...
 %{_libdir}/imagecustomizer/telemetry-requirements.txt
 
 %changelog
+* Fri Oct 10 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.19.0-2
+- Bump to build with latest golang 1.24.8
+
 * Wed Sep 3 2025 Lanze Liu <lanzeliu@microsoft.com> 0.19.0-1
 - Upgrade the version.
 - Fixed imagecustomizer container files location to comply with RPM packaging guidelines
