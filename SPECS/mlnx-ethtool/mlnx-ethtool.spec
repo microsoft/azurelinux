@@ -1,6 +1,6 @@
 Name:		 mlnx-ethtool
 Version:	 6.9
-Release:	 2%{?dist}
+Release:	 3%{?dist}
 Group:		 Utilities
 Summary:	 Settings tool for Ethernet and other network devices
 License:	 GPLv2
@@ -9,7 +9,6 @@ Distribution:    Azure Linux
 URL:		 https://ftp.kernel.org/pub/software/network/ethtool/
 Buildroot:	 /var/tmp/%{name}-%{version}-build
 Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ethtool-6.9.tar.gz#/%{name}-%{version}.tar.gz
-ExclusiveArch:   x86_64
 
 BuildRequires:  libmnl-devel
 
@@ -41,6 +40,8 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 
 
 %changelog
-* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+* Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 6.9-3
+- Enable ARM64 build by removing ExclusiveArch
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 6.9-2
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
