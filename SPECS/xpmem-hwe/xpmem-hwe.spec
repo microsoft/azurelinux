@@ -75,7 +75,6 @@ BuildRequires:  binutils
 BuildRequires:  systemd
 BuildRequires:  kmod
 BuildRequires:  mlnx-ofa_kernel-hwe-devel = %{_mofed_full_version}
-BuildRequires:  mlnx-ofa_kernel-source
 
 %description
 XPMEM is a Linux kernel module that enables a process to map the
