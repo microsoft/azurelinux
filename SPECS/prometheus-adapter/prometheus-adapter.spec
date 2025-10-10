@@ -1,7 +1,7 @@
 Summary:        Kubernetes Custom, Resource, and External Metric APIs implemented to work with Prometheus.
 Name:           prometheus-adapter
 Version:        0.12.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,6 +43,9 @@ make test
 %doc README.md RELEASE.md
 
 %changelog
+* Fri Oct 10 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.12.0-5
+- Bump to build with latest golang 1.24.8
+
 * Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 0.12.0-4
 - Set BR for golang to < 1.25
 

@@ -1,7 +1,7 @@
 Summary:        Command line tool for working with Jenkins X.
 Name:           jx
 Version:        3.10.182
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -62,6 +62,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./build/jx
 %{_bindir}/jx
 
 %changelog
+* Fri Oct 10 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.10.182-3
+- Bump to build with latest golang 1.24.8
+
 * Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 3.10.182-2
 - Set BR for golang to < 1.25
 

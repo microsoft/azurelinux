@@ -7,7 +7,7 @@
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.32.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -46,6 +46,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 %{_bindir}/critest
 
 %changelog
+* Fri Oct 10 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.32.0-4
+- Bump to build with latest golang 1.24.8
+
 * Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.32.0-3
 - Set BR for golang to < 1.25
 

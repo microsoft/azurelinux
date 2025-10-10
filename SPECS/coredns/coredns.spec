@@ -6,7 +6,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.4
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -83,6 +83,9 @@ go install github.com/fatih/faillint@latest && \
 %{_bindir}/%{name}
 
 %changelog
+* Fri Oct 10 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.11.4-11
+- Bump to build with latest golang 1.24.8
+
 * Thu Sep 18 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.4-10
 - Changed patch order to resolve 'make' race condition.
 

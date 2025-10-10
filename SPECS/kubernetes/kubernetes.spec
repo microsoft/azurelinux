@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.30.10
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -278,6 +278,9 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Fri Oct 10 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.30.10-13
+- Bump to build with latest golang 1.24.8
+
 * Fri Sep 17 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.30.10-12
 - Bump to rebuild with updated glibc
 

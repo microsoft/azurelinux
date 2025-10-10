@@ -18,7 +18,7 @@
 
 Name:           golang-packaging
 Version:        15.0.17
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A toolchain to help packaging golang
 License:        GPLv3
 Vendor:         Microsoft Corporation
@@ -59,6 +59,9 @@ install -m0644 macros.go %{buildroot}%{_sysconfdir}/rpm/
 %config %{_sysconfdir}/rpm/macros.go
 
 %changelog
+* Fri Oct 10 2025 Kanishk Bansal <kanbansal@microsoft.com> - 15.0.17-3
+- Bump to build with latest golang 1.24.8
+
 * Tue Sep 02 2025 Andrew Phelps <anphel@microsoft.com> - 15.0.17-2
 - Change to "Recommends: go" to resolve build conflict with golang 1.24 and 1.25
 
