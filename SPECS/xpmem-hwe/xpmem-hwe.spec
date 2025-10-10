@@ -74,7 +74,7 @@ BuildRequires:  kernel-hwe-devel = %{target_kernel_version_full}
 BuildRequires:  binutils
 BuildRequires:  systemd
 BuildRequires:  kmod
-BuildRequires:  mlnx-ofa_kernel-devel
+BuildRequires:  mlnx-ofa_kernel-hwe-devel = %{_mofed_full_version}
 BuildRequires:  mlnx-ofa_kernel-source
 
 %description

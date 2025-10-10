@@ -84,7 +84,7 @@ BuildRequires:  binutils
 BuildRequires:  systemd
 BuildRequires:  kmod
 BuildRequires:  libconfig-devel
-BuildRequires:  mlnx-ofa_kernel-devel
+BuildRequires:  mlnx-ofa_kernel-hwe-devel = %{_mofed_full_version}
 BuildRequires:  mlnx-ofa_kernel-source
 
 Requires:       mlnx-ofa_kernel

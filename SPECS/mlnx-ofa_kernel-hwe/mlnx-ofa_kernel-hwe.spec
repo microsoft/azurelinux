@@ -199,6 +199,29 @@ Non-KMP format kernel modules rpm.
 The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
 %endif #end if "%{KMP}" == "1"
 
+%package -n %{devel_pname}
+Obsoletes: kernel-ib-devel
+Obsoletes: kernel-ib
+Obsoletes: mlnx-en
+Obsoletes: mlnx_en
+Obsoletes: mlnx-en-utils
+Obsoletes: kmod-mlnx-en
+Obsoletes: mlnx-en-kmp-default
+Obsoletes: mlnx-en-kmp-xen
+Obsoletes: mlnx-en-kmp-trace
+Obsoletes: mlnx-en-doc
+Obsoletes: mlnx-en-debuginfo
+Obsoletes: mlnx-en-sources
+Requires: coreutils
+Requires: pciutils
+Requires(post): %{_sbindir}/update-alternatives
+Requires(postun): %{_sbindir}/update-alternatives
+Summary: Infiniband Driver and ULPs kernel modules sources
+Group: System Environment/Libraries
+%description -n %{devel_pname}
+Core, HW and ULPs kernel modules sources
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
+
 #
 # setup module sign scripts if paths to the keys are given
 #
@@ -295,6 +318,23 @@ for flavor in %flavors_to_build; do
 	export KVERSION=%{kernel_release $KSRC}
 	cd $PWD/obj/$flavor
 	make install_modules KERNELRELEASE=$KVERSION
+	mkdir -p %{_builddir}/src/$NAME/$flavor
+	cp -ar include/ %{_builddir}/src/$NAME/$flavor
+	cp -ar config* %{_builddir}/src/$NAME/$flavor
+	cp -ar compat*  %{_builddir}/src/$NAME/$flavor
+	cp -ar ofed_scripts %{_builddir}/src/$NAME/$flavor
+
+	modsyms=`find . -name Module.symvers -o -name Modules.symvers`
+	if [ -n "$modsyms" ]; then
+		for modsym in $modsyms
+		do
+			cat $modsym >> %{_builddir}/src/$NAME/$flavor/Module.symvers
+		done
+	else
+		./ofed_scripts/create_Module.symvers.sh
+		cp ./Module.symvers %{_builddir}/src/$NAME/$flavor/Module.symvers
+	fi
+	cp -a %{_builddir}/src/$NAME/$flavor %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}/$KVERSION
 	# Cleanup unnecessary kernel-generated module dependency files.
 	find $INSTALL_MOD_PATH/lib/modules -iname 'modules.*' -exec rm {} \;
 	cd -
@@ -318,6 +358,9 @@ done
 %endif
 %endif
 
+# Fix path of BACKPORT_INCLUDES
+sed -i -e "s@=-I.*backport_includes@=-I/usr/src/ofa_kernel-$VERSION/backport_includes@" %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION}/configure.mk.kernel || true
+
 %clean
 rm -rf %{buildroot}
 
@@ -325,12 +368,63 @@ rm -rf %{buildroot}
 %if "%{KMP}" != "1"
 %post -n %{non_kmp_pname}
 /sbin/depmod %{KVERSION}
+# W/A for OEL6.7/7.x inbox modules get locked in memory
+# in dmesg we get: Module mlx4_core locked in memory until next boot
+if (grep -qiE "Oracle.*(6.([7-9]|10)| 7)" /etc/issue /etc/*release* 2>/dev/null); then
+       /sbin/dracut --force
+fi
 
 %postun -n %{non_kmp_pname}
 if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 	/sbin/depmod %{KVERSION}
+	# W/A for OEL6.7/7.x inbox modules get locked in memory
+	# in dmesg we get: Module mlx4_core locked in memory until next boot
+	if (grep -qiE "Oracle.*(6.([7-9]|10)| 7)" /etc/issue /etc/*release* 2>/dev/null); then
+		/sbin/dracut --force
+	fi
 fi
 %endif # end KMP=1
+
+%post -n %{devel_pname}
+if [ -d "%{_prefix}/src/ofa_kernel/default" -a $1 -gt 1 ]; then
+	touch %{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION}.missing_link
+	# Will run update-alternatives in posttrans
+else
+	update-alternatives --install \
+		%{_prefix}/src/ofa_kernel/default \
+		ofa_kernel_headers \
+		%{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION} \
+		20
+fi
+
+%posttrans -n %{devel_pname}
+symlink="%{_prefix}/src/ofa_kernel/default"
+# Should only be used for upgrading from pre-5.5-0.2.6.0 packages:
+# At the time of upgrade there was still a directory, so postpone
+# generating the alternative symlink to that point:
+for flag_file in %{_prefix}/src/ofa_kernel/*/*.missing_link; do
+	dir=${flag_file%.missing_link}
+	if [ ! -d "$dir" ]; then
+		# Directory is no longer there. Nothing left to handle
+		rm -f "$flag_file"
+		continue
+	fi
+	if [ -d "$symlink" ]; then
+		echo "%{devel_pname}-%{version}: $symlink is still a non-empty directory. Deleting in preparation for a symlink."
+		rm -rf "$symlink"
+	fi
+	update-alternatives --install \
+		"$symlink" \
+		ofa_kernel_headers \
+		"$dir" \
+		20
+	rm -f "$flag_file"
+done
+
+%postun -n %{devel_pname}
+update-alternatives --remove \
+	ofa_kernel_headers \
+	%{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION} \
 
 %if "%{KMP}" != "1"
 %files -n %{non_kmp_pname}
@@ -342,6 +436,11 @@ fi
 %endif
 %endif
 %endif
+
+%files -n %{devel_pname}
+%defattr(-,root,root,-)
+%license source/debian/copyright
+%{_prefix}/src/ofa_kernel/%{_arch}/[0-9]*
 
 %changelog
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22_6.12.50.2-1
