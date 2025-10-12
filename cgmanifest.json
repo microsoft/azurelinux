@@ -3589,7 +3589,7 @@
         "other": {
           "name": "fio",
           "version": "3.30",
-          "downloadUrl": "https://brick.kernel.dk/snaps/fio-3.30.tar.bz2"
+          "downloadUrl": "https://github.com/axboe/fio/archive/refs/tags/fio-3.30.tar.gz"
         }
       }
     },
@@ -13653,8 +13653,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.24.5",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.5-1/go1.24.5-20250708.7.src.tar.gz"
+          "version": "1.24.8",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.8-1/go1.24.8-20251008.4.src.tar.gz"
         }
       }
     },
@@ -18234,8 +18234,8 @@
         "type": "other",
         "other": {
           "name": "perl-JSON-XS",
-          "version": "4.03",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/JSON-XS-4.03.tar.gz"
+          "version": "4.04",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/JSON-XS-4.04.tar.gz"
         }
       }
     },
@@ -25564,8 +25564,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.18",
-          "downloadUrl": "https://download.redis.io/releases/redis-6.2.18.tar.gz"
+          "version": "6.2.20",
+          "downloadUrl": "https://download.redis.io/releases/redis-6.2.20.tar.gz"
         }
       }
     },
