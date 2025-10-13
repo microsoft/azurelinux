@@ -1,53 +1,59 @@
-Summary:        Wireless daemon for Linux
-Name:           iwd
-Version:        1.22
-Release:        2%{?dist}
-License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://git.kernel.org/pub/scm/network/wireless/iwd.git/
+Name:           iwd
+Version:        3.3
+Release:        2%{?dist}
+Summary:        Wireless daemon for Linux
+License:        LGPL-2.1-or-later
+URL:            https://iwd.wiki.kernel.org/
 Source0:        https://www.kernel.org/pub/linux/network/wireless/%{name}-%{version}.tar.xz
+ 
 BuildRequires:  asciidoc
 BuildRequires:  gcc
 BuildRequires:  libtool
-BuildRequires:  pkgconfig
+BuildRequires:  make
+BuildRequires:  pkgconfig(dbus-1)
+BuildRequires:  pkgconfig(ell) >= 0.43
+BuildRequires:  pkgconfig(libsystemd)
 BuildRequires:  python3-docutils
 BuildRequires:  readline-devel
-BuildRequires:  pkgconfig(dbus-1)
-BuildRequires:  pkgconfig(ell) >= 0.27
-BuildRequires:  systemd-devel
 Requires:       dbus
 Requires:       systemd
+Recommends:     wireless-regdb
 
 %description
 The daemon and utilities for controlling and configuring the Wi-Fi network
 hardware.
-
+ 
 %prep
-%setup -q
-
-
+%autosetup -p1
+ 
+ 
 %build
-%configure                      \
-        --enable-external-ell   \
-        --enable-sim-hardcoded  \
-        --enable-ofono          \
-        --enable-wired          \
-        --enable-hwsim          \
-        --enable-tools
-
-%make_build V=1
-
-
+%configure			\
+	--enable-sim-hardcoded	\
+	--enable-ofono		\
+	--enable-wired		\
+	--enable-hwsim		\
+	--enable-tools		\
+	--with-systemd-unitdir=%{_unitdir} \
+	--with-systemd-networkdir=%{_systemd_util_dir}/network \
+	--with-systemd-modloaddir=%{_modulesloaddir}
+ 
+%make_build
+ 
 %install
 %make_install
 mkdir -p %{buildroot}%{_sharedstatedir}/iwd
 mkdir -p %{buildroot}%{_sharedstatedir}/ead
-
-
+ 
+# Don't let iwd adjust interface naming. It would break user configurations.
+rm %{buildroot}/usr/lib/systemd/network/80-iwd.link
+ 
+ 
 %files
 %license COPYING
-%doc AUTHORS README TODO ChangeLog
+%doc AUTHORS ChangeLog
 %{_bindir}/iwctl
 %{_bindir}/iwmon
 %{_bindir}/hwsim
@@ -61,16 +67,15 @@ mkdir -p %{buildroot}%{_sharedstatedir}/ead
 %{_datadir}/dbus-1/system.d/iwd-dbus.conf
 %{_datadir}/dbus-1/system.d/ead-dbus.conf
 %{_datadir}/dbus-1/system.d/hwsim-dbus.conf
-%{_mandir}/man1/iwmon.1*
+%{_mandir}/man*/*
 %{_sharedstatedir}/iwd
 %{_sharedstatedir}/ead
-%{_mandir}/man*/*
-
-# Don't let iwd adjust interface naming. It would break user configurations.
-%exclude /usr/lib/systemd/network/80-iwd.link
-
 
 %changelog
+* Mon Feb 24 2025 Sumit Jena <v-sumitjena@microsoft.com> - 3.3-1
+- Update to version 3.3
+- License verified
+
 * Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.22-2
 - Fix build issue for systemd/systemd-bootstrap confusion
 
