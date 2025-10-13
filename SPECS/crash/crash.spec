@@ -11,10 +11,10 @@ Source0:       https://github.com/crash-utility/%{name}/archive/%{version}.tar.g
 # crash requires gdb tarball for the build. There is no option to use the host gdb. For crash 8.0.1 the newest supported gdb version is 10.2.
 # '-2' version of the tarball contains fix for CVE-2022-37434 which cannot be applied as a .patch because source1 is only untar'ed during crash make
 # '-3' version of the tarball contains fix for CVE-2021-20197, CVE-2022-47673, CVE-2022-47696 which cannot be applied as a .patch because source1 is only untar'ed during crash make
-Source1:       gdb-%{gdb_version}-3.tar.gz
+# '-4' version of the tarball contains fix for CVE-2025-11082 which cannot be applied as a .patch because source1 is only untar'ed during crash make
+Source1:       gdb-%{gdb_version}-4.tar.gz
 # lzo patch sourced from https://src.fedoraproject.org/rpms/crash/blob/rawhide/f/lzo_snappy_zstd.patch
 Patch0:        lzo_snappy_zstd.patch
-Patch1:        CVE-2025-11082.patch
 License:       GPLv3+
 BuildRequires: binutils
 BuildRequires: glibc-devel
@@ -99,7 +99,7 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 
 %changelog
 * Fri Oct 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.0.4-5
-- Patch for CVE-2025-11082
+- Update gdb-10.2-4.tar.gz to address CVE-2025-11082
 
 * Mon Apr 21 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.4-4
 - Update gdb-10.2-3.tar.gz to address CVE-2021-20197, CVE-2022-47673, CVE-2022-47696
