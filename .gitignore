@@ -20,6 +20,8 @@ SPECS*/**/*.msp
 SPECS*/**/*.rar
 SPECS*/**/*.rpm
 SPECS*/**/*.tar
+!SPECS/cloud-hypervisor/cloud-hypervisor-41.0.149.tar.gz
+!SPECS/cloud-hypervisor/cloud-hypervisor-41.0.149-vendor.tar.gz
 SPECS*/**/*.tbz
 SPECS*/**/*.tgz
 SPECS*/**/*.txz
