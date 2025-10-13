@@ -40,9 +40,7 @@ This package contains the Python utility for generating html reports
 from xml files first generated using cppcheck.
 
 %prep
-%setup -q
-%patch -P 0 -p1 -b .translations
-%patch -P 1 -p1 -b .TestCondition
+%autosetup -p1
 # Make sure bundled tinyxml2 is not used
 rm -r externals/tinyxml2
 
