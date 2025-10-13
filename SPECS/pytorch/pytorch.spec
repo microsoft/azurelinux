@@ -32,7 +32,6 @@ Patch7:         CVE-2021-22569.patch
 Patch8:         CVE-2025-32434.patch
 Patch9:         CVE-2025-3730.patch
 Patch10:        CVE-2025-2953.patch
-#Patch11:        CVE-2025-46149.patch
 Patch11:        CVE-2025-55560.patch
 Patch12:        CVE-2025-55558.patch
 
@@ -97,7 +96,7 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 
 %changelog
 * Wed Oct 01 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.2-8
-- Patch for CVE-2025-55560, CVE-2025-55558, CVE-2025-46149
+- Patch for CVE-2025-55560, CVE-2025-55558
 
 * Tue Apr 29 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.2.2-7
 - Patch CVE-2025-2953
