@@ -182,6 +182,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %changelog
 * Tue Oct 07 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.88.0-1
 - Upgrade to 1.88.0
+- Remove CVE-2025-4574
 
 * Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 1.86.0-10
 - Bump to rebuild with updated glibc
