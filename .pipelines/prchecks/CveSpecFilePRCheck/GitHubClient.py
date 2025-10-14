@@ -28,12 +28,23 @@ import requests
 from typing import List, Dict, Optional, Any
 from datetime import datetime
 from dataclasses import dataclass
+from enum import Enum
 
 # Add parent directory to path if needed
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from AntiPatternDetector import AntiPattern, Severity
 from SpecFileResult import MultiSpecAnalysisResult
+
+
+class CheckStatus(str, Enum):
+    """GitHub check status values."""
+    SUCCESS = "success"
+    FAILURE = "failure"
+    NEUTRAL = "neutral"
+    IN_PROGRESS = "in_progress"
+    PENDING = "pending"
+
 
 class GitHubClient:
     """
