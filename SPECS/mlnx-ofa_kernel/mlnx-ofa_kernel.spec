@@ -183,7 +183,8 @@ EOF)
 %global kernel_source() %{K_SRC}
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
-%ifarch x86_64 # We create the module package only for the x86_64 kernel
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %package -n %{non_kmp_pname}
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -203,7 +204,7 @@ Group: System Environment/Libraries
 Core, HW and ULPs kernel modules
 Non-KMP format kernel modules rpm.
 The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
-%endif # end ifarch x86_64
+%endif
 %endif #end if "%{KMP}" == "1"
 
 %package -n %{devel_pname}
@@ -510,7 +511,7 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 		/sbin/dracut --force
 	fi
 fi
-%endif # end ifarch x86_64
+%endif
 %endif # end KMP=1
 
 %post -n %{utils_pname}
@@ -731,7 +732,8 @@ update-alternatives --remove \
 %endif
 
 %if "%{KMP}" != "1"
-%ifarch x86_64 # We create the module package only for the x86_64 kernel
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %files -n %{non_kmp_pname}
 %license source/debian/copyright
 /lib/modules/%{KVERSION}/%{install_mod_dir}/

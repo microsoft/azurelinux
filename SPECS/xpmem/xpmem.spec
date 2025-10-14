@@ -121,7 +121,8 @@ EOF)
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
 
-%ifarch x86_64 # We create the module package only for the x86_64 kernel
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %package modules
 # %{nil}: to avoid having the script that build OFED-internal
 # munge the release version here as well:
@@ -139,7 +140,7 @@ can be obtained by cloning the Git repository, original Mercurial
 repository or by downloading a tarball from the link above.
 
 This package includes the kernel module (non KMP version).
-%endif # end ifarch x86_64
+%endif
 %endif #end if "%{KMP}" == "1"
 
 #
@@ -253,7 +254,8 @@ fi
 %endif
 
 %if "%{KMP}" != "1"
-%ifarch x86_64 # We create the module package only for the x86_64 kernel
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %files modules
 %{moduledir}/xpmem.ko
 %license COPYING COPYING.LESSER

@@ -115,7 +115,8 @@ EOF)
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
 
-%ifarch x86_64 # We create the module package only for the x86_64 kernel
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %package -n %{non_kmp_pname}
 Summary: KNEM: High-Performance Intra-Node MPI Communication
 Group: System Environment/Libraries
@@ -123,7 +124,7 @@ Group: System Environment/Libraries
 %description -n %{non_kmp_pname}
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as loading memory copies on to Intel I/OAT hardware.
 See http://runtime.bordeaux.inria.fr/knem/ for details.
-%endif # end ifarch x86_64
+%endif
 %endif #end if "%{KMP}" == "1"
 
 #
@@ -262,7 +263,8 @@ if (grep -qw knem /etc/sysconfig/kernel 2>/dev/null); then
 fi
 
 %if "%{KMP}" != "1"
-%ifarch x86_64 # We create the module package only for the x86_64 kernel
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %post -n %{non_kmp_pname}
 depmod %{KVERSION} -a
 
@@ -270,7 +272,7 @@ depmod %{KVERSION} -a
 if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 	depmod %{KVERSION} -a
 fi
-%endif # end ifarch x86_64
+%endif
 %endif # end KMP=1
 
 %files
@@ -284,7 +286,8 @@ fi
 
 
 %if "%{KMP}" != "1"
-%ifarch x86_64 # We create the module package only for the x86_64 kernel
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %files -n %{non_kmp_pname}
 %license source/COPYING source/COPYING.BSD-3 source/COPYING.GPL-2
 /lib/modules/%{KVERSION}/%{install_mod_dir}/
