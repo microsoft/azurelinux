@@ -200,7 +200,7 @@ for flavor in %flavors_to_build; do
 done
 
 /bin/rm -rf %{buildroot}/opt/knem-%{version}
-/bin/rm -rf %{buildroot}//etc/udev/rules.d
+/bin/rm -rf %{buildroot}/etc/udev/rules.d
 
 %if %{IS_RHEL_VENDOR}
 # Set the module(s) to be executable, so that they will be stripped when packaged.
