@@ -343,7 +343,7 @@ def analyze_spec_files(diff_text, changed_spec_files):
         )
         
         # Run anti-pattern detection
-        analyzer = AntiPatternDetector()
+        analyzer = AntiPatternDetector(repo_root=".")
         spec_result.anti_patterns = analyzer.detect_all(
             spec_file, spec_content, file_list
         )
