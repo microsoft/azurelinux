@@ -247,7 +247,7 @@ BuildRequires: krb5-server >= %{required_mit_krb5}
 BuildRequires: bind
 %endif
 
-Patch0: netlogon-fixes.patch
+Patch0: CVE-2025-49716-netlogon.patch
 
 # filter out perl requirements pulled in from examples in the docdir.
 %global __requires_exclude_from ^%{_docdir}/.*$
@@ -3442,7 +3442,7 @@ fi
 
 %changelog
 * Fri Oct 10 2025 Andy Zaugg <azaugg@linkedin.com> - 4.12.5-7
-- Fix winbind netlogon issue with Windows security update 2025
+- Fix winbind netlogon issue with Windows security update 2025 CVE-2025-49716
 
 * Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 4.12.5-6
 - Fix build issue with docs by removing xsltproc
