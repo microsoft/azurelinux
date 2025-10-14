@@ -37,16 +37,16 @@ class ResultAnalyzer:
     - Determining whether to fail the pipeline based on severity
     """
     
-    def __init__(self, anti_patterns: List[AntiPattern], ai_analysis: str):
+    def __init__(self, anti_patterns: List[AntiPattern] = None, ai_analysis: str = None):
         """
         Initialize with detection results and AI analysis.
         
         Args:
-            anti_patterns: List of detected anti-patterns
-            ai_analysis: Analysis string from Azure OpenAI
+            anti_patterns: List of detected anti-patterns (optional)
+            ai_analysis: Analysis string from Azure OpenAI (optional)
         """
-        self.anti_patterns = anti_patterns
-        self.ai_analysis = ai_analysis
+        self.anti_patterns = anti_patterns or []
+        self.ai_analysis = ai_analysis or ""
         
         # Group anti-patterns by severity
         self.grouped_patterns = self._group_by_severity()

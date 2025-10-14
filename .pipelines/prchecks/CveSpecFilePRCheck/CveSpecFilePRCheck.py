@@ -181,7 +181,8 @@ def gather_diff() -> str:
                 cwd=repo_path,
                 stderr=subprocess.PIPE  # Capture stderr to avoid polluting the logs
             )
-            return diff.decode()
+            # Handle potential encoding issues in binary files
+            return diff.decode('utf-8', errors='replace')
         except subprocess.CalledProcessError as e:
             logger.warning(f"Direct diff failed: {str(e)}")
             
@@ -192,7 +193,7 @@ def gather_diff() -> str:
                 merge_base = subprocess.check_output(
                     ["git", "merge-base", src_commit, tgt_commit], 
                     cwd=repo_path
-                ).decode().strip()
+                ).decode('utf-8', errors='replace').strip()
                 
                 logger.info(f"Found merge base: {merge_base}")
                 
@@ -201,7 +202,7 @@ def gather_diff() -> str:
                     ["git", "diff", "--unified=3", merge_base, src_commit],
                     cwd=repo_path
                 )
-                return diff.decode()
+                return diff.decode('utf-8', errors='replace')
             except subprocess.CalledProcessError as e:
                 logger.error(f"Alternative diff method failed: {str(e)}")
                 
@@ -213,7 +214,7 @@ def gather_diff() -> str:
                         ["git", "show", "--unified=3", src_commit],
                         cwd=repo_path
                     )
-                    return diff.decode()
+                    return diff.decode('utf-8', errors='replace')
                 except subprocess.CalledProcessError as e:
                     logger.error(f"All diff methods failed: {str(e)}")
                     raise ValueError("Could not generate a diff between the source and target commits")
