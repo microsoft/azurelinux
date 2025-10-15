@@ -3,398 +3,447 @@
 # Licensed under the MIT License.
 
 """
-GitHub Integration Module for CVE Spec File PR Check
-====================================================
-
-This module handles all GitHub-related operations for the CVE spec file PR check,
-including fetching PR details, posting comments, and managing check statuses.
-
-Key Features:
-- Fetches PR metadata (files changed, diff content)
-- Posts formatted analysis results as PR comments
-- Updates PR check status based on analysis results
-- Handles multi-spec file results with organized formatting
-
-Usage:
-    github_client = GitHubClient()
-    pr_files = github_client.get_pr_files(pr_number)
-    github_client.post_comment(pr_number, comment_body)
+GitHubClient
+-----------
+Handles interactions with GitHub API for reporting PR check results
+with nuanced severity levels and posting detailed comments.
 """
 
 import os
-import sys
-import json
 import requests
-from typing import List, Dict, Optional, Any
-from datetime import datetime
-from dataclasses import dataclass
+import logging
+import json
+import re
 from enum import Enum
+from typing import Dict, List, Any, Optional
+from AntiPatternDetector import Severity
 
-# Add parent directory to path if needed
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("github-client")
 
-from AntiPatternDetector import AntiPattern, Severity
-from SpecFileResult import MultiSpecAnalysisResult
-
-
-class CheckStatus(str, Enum):
-    """GitHub check status values."""
-    SUCCESS = "success"
-    FAILURE = "failure"
-    NEUTRAL = "neutral"
-    IN_PROGRESS = "in_progress"
-    PENDING = "pending"
-
+class CheckStatus(Enum):
+    """GitHub Check API status values"""
+    SUCCESS = "success"      # All good, everything passes
+    NEUTRAL = "neutral"      # Informational, doesn't block merging
+    FAILURE = "failure"      # Failed check, blocks merging
+    CANCELLED = "cancelled"  # Check was cancelled
+    SKIPPED = "skipped"      # Check was skipped
+    TIMED_OUT = "timed_out"  # Check timed out
+    IN_PROGRESS = "in_progress"  # Check is running
 
 class GitHubClient:
-    """
-    GitHub API client for PR operations.
-    
-    This class encapsulates all GitHub API interactions needed for the
-    CVE spec file PR check process.
-    """
+    """Client for interacting with GitHub API for PR checks and comments"""
     
     def __init__(self):
-        """Initialize the GitHub client with authentication."""
-        self.token = os.environ.get('GITHUB_TOKEN')
-        self.repo = os.environ.get('GITHUB_REPOSITORY', 'microsoft/azurelinux')
-        self.api_base = 'https://api.github.com'
+        """Initialize the GitHub client using environment variables for auth"""
+        # Try multiple token environment variables in order of preference
+        token_vars = [
+            "GITHUB_TOKEN",  # Prioritize CBL-Mariner bot PAT from key vault
+            "SYSTEM_ACCESSTOKEN",  # Fall back to Azure DevOps OAuth token
+            "GITHUB_ACCESS_TOKEN",
+            "AZDO_GITHUB_TOKEN"
+        ]
         
+        self.token = None
+        for var in token_vars:
+            if os.environ.get(var):
+                self.token = os.environ.get(var)
+                logger.info(f"Using {var} for GitHub authentication")
+                break
+                
+        # Get repository details from environment variables
+        self.repo_name = os.environ.get("GITHUB_REPOSITORY", "")  # Format: owner/repo
+        
+        # If GITHUB_REPOSITORY not set or empty, try to construct from BUILD_REPOSITORY_NAME
+        if not self.repo_name or self.repo_name == "":
+            self.repo_name = os.environ.get("BUILD_REPOSITORY_NAME", "")
+            logger.info(f"Using BUILD_REPOSITORY_NAME: {self.repo_name}")
+            
+        # For Azure DevOps hosted repos, convert to GitHub format if needed
+        if self.repo_name and "/" not in self.repo_name:
+            if "microsoft" in self.repo_name.lower():
+                self.repo_name = f"microsoft/{self.repo_name}"
+                logger.info(f"Converted repo name to GitHub format: {self.repo_name}")
+        
+        # Get PR number from multiple possible environment variables
+        pr_vars = [
+            "GITHUB_PR_NUMBER",
+            "SYSTEM_PULLREQUEST_PULLREQUESTNUMBER", 
+            "SYSTEM_PULLREQUEST_PULLREQUESTID"
+        ]
+        
+        self.pr_number = ""
+        for var in pr_vars:
+            if os.environ.get(var):
+                self.pr_number = os.environ.get(var)
+                logger.info(f"Using {var} for PR number: {self.pr_number}")
+                break
+                
+        # If PR number still not found, try to extract from the source branch
+        if not self.pr_number:
+            source_branch = os.environ.get("BUILD_SOURCEBRANCH", "") or os.environ.get("SYSTEM_PULLREQUEST_SOURCEBRANCH", "")
+            logger.info(f"Trying to extract PR number from branch: {source_branch}")
+            
+            match = re.match(r"refs/pull/(\d+)", source_branch)
+            if match:
+                self.pr_number = match.group(1)
+                logger.info(f"Extracted PR number from branch: {self.pr_number}")
+        
+        # Validate and log configuration state
         if not self.token:
-            print("Warning: GITHUB_TOKEN not set. GitHub operations will be limited.")
+            logger.error("No GitHub token found in environment variables")
+        else:
+            # Safely log token prefix (first few chars only)
+            token_prefix = self.token[:4] if self.token else ""
+            logger.info(f"GitHub token prefix: {token_prefix}...")
+            
+        logger.info(f"GitHub repository: {self.repo_name}")
+        logger.info(f"GitHub PR number: {self.pr_number}")
         
+        # Set up base API URL and headers for GitHub API
+        self.api_base_url = "https://api.github.com"
         self.headers = {
-            'Authorization': f'token {self.token}' if self.token else '',
-            'Accept': 'application/vnd.github.v3+json'
+            "Accept": "application/vnd.github.v3+json",
+            "User-Agent": "Azure-Linux-PR-Check"
         }
+        
+        # Add authorization header if token is available
+        if self.token:
+            # For Azure DevOps System.AccessToken, use Bearer format
+            if os.environ.get("SYSTEM_ACCESSTOKEN") == self.token:
+                self.headers["Authorization"] = f"Bearer {self.token}"
+                logger.info("Using Bearer authentication format for Azure DevOps token")
+            else:
+                # GitHub PATs use the token format
+                self.headers["Authorization"] = f"token {self.token}"
+                logger.info("Using token authentication format for GitHub PAT")
     
-    def get_pr_files(self, pr_number: int) -> List[Dict[str, Any]]:
+    def create_check_run(self, name: str, head_sha: str, status: CheckStatus, 
+                         conclusion: Optional[CheckStatus] = None,
+                         output_title: Optional[str] = None, 
+                         output_summary: Optional[str] = None,
+                         output_text: Optional[str] = None) -> Dict[str, Any]:
         """
-        Get the list of files changed in a PR.
+        Create a new check run with the specified status.
         
         Args:
-            pr_number: Pull request number
+            name: The name of the check
+            head_sha: The SHA of the commit to check
+            status: The current status of the check
+            conclusion: The final conclusion (required if status is "completed")
+            output_title: Title of the check output
+            output_summary: Summary of the check output
+            output_text: Detailed text of the check output
             
         Returns:
-            List of file information dictionaries
+            Response from GitHub API
         """
-        url = f"{self.api_base}/repos/{self.repo}/pulls/{pr_number}/files"
+        if not self.token:
+            logger.warning("GitHub API token not available, skipping check run creation")
+            return {}
+            
+        url = f"{self.api_base_url}/repos/{self.repo_name}/check-runs"
+        
+        payload = {
+            "name": name,
+            "head_sha": head_sha,
+            "status": status.value
+        }
+        
+        if status == CheckStatus.COMPLETED and conclusion:
+            payload["conclusion"] = conclusion.value
+        
+        if output_title and output_summary:
+            payload["output"] = {
+                "title": output_title,
+                "summary": output_summary
+            }
+            
+            if output_text:
+                payload["output"]["text"] = output_text
+        
+        try:
+            response = requests.post(url, headers=self.headers, json=payload)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Failed to create check run: {str(e)}")
+            return {}
+    
+    def post_pr_comment(self, body: str) -> Dict[str, Any]:
+        """
+        Post a comment on the PR.
+        
+        Args:
+            body: The markdown content of the comment
+            
+        Returns:
+            Response from GitHub API
+        """
+        if not self.token or not self.repo_name or not self.pr_number:
+            logger.warning("Required GitHub params not available, skipping comment posting")
+            return {}
+            
+        url = f"{self.api_base_url}/repos/{self.repo_name}/issues/{self.pr_number}/comments"
+        
+        payload = {
+            "body": body
+        }
+        
+        try:
+            response = requests.post(url, headers=self.headers, json=payload)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Failed to post PR comment: {str(e)}")
+            return {}
+    
+    def get_pr_comments(self) -> List[Dict[str, Any]]:
+        """
+        Get existing comments on the PR.
+        
+        Returns:
+            List of comment objects from GitHub API
+        """
+        if not self.token or not self.repo_name or not self.pr_number:
+            logger.warning("Required GitHub params not available, skipping comment retrieval")
+            return []
+            
+        url = f"{self.api_base_url}/repos/{self.repo_name}/issues/{self.pr_number}/comments"
         
         try:
             response = requests.get(url, headers=self.headers)
             response.raise_for_status()
             return response.json()
-        except requests.RequestException as e:
-            print(f"Error fetching PR files: {e}")
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Failed to get PR comments: {str(e)}")
             return []
-    
-    def get_pr_diff(self, pr_number: int) -> str:
+
+    def update_pr_comment(self, comment_id: int, body: str) -> Dict[str, Any]:
         """
-        Get the full diff of a PR.
+        Update an existing comment on the PR.
         
         Args:
-            pr_number: Pull request number
+            comment_id: ID of the comment to update
+            body: New content for the comment
             
         Returns:
-            PR diff as a string
+            Response from GitHub API
         """
-        url = f"{self.api_base}/repos/{self.repo}/pulls/{pr_number}"
-        headers = {**self.headers, 'Accept': 'application/vnd.github.v3.diff'}
-        
-        try:
-            response = requests.get(url, headers=headers)
-            response.raise_for_status()
-            return response.text
-        except requests.RequestException as e:
-            print(f"Error fetching PR diff: {e}")
-            return ""
-    
-    def post_comment(self, pr_number: int, comment: str) -> bool:
-        """
-        Post a comment to a PR.
-        
-        Args:
-            pr_number: Pull request number
-            comment: Comment text (markdown supported)
+        if not self.token or not self.repo_name:
+            logger.warning("Required GitHub params not available, skipping comment update")
+            return {}
             
-        Returns:
-            True if successful, False otherwise
-        """
-        if not self.token:
-            print("Cannot post comment: GITHUB_TOKEN not set")
-            print("Comment that would be posted:")
-            print(comment)
-            return False
+        url = f"{self.api_base_url}/repos/{self.repo_name}/issues/comments/{comment_id}"
         
-        url = f"{self.api_base}/repos/{self.repo}/issues/{pr_number}/comments"
-        
-        try:
-            response = requests.post(
-                url,
-                headers=self.headers,
-                json={'body': comment}
-            )
-            response.raise_for_status()
-            print(f"Successfully posted comment to PR #{pr_number}")
-            return True
-        except requests.RequestException as e:
-            print(f"Error posting comment: {e}")
-            return False
-    
-    def format_comment(self, anti_patterns: List[AntiPattern], ai_analysis: List[str]) -> str:
-        """
-        Format the analysis results as a GitHub comment.
-        
-        Args:
-            anti_patterns: List of detected anti-patterns
-            ai_analysis: List of AI analysis results
-            
-        Returns:
-            Formatted markdown comment
-        """
-        comment = "## 🔍 CVE Spec File Check Results\n\n"
-        
-        # Determine overall status
-        has_errors = any(p.severity == Severity.ERROR for p in anti_patterns)
-        has_warnings = any(p.severity == Severity.WARNING for p in anti_patterns)
-        
-        if has_errors:
-            comment += "### ❌ Status: **FAILED**\n"
-            comment += "Critical issues found that must be addressed before merging.\n\n"
-        elif has_warnings:
-            comment += "### ⚠️ Status: **WARNING**\n"
-            comment += "Non-critical issues found. Please review.\n\n"
-        else:
-            comment += "### ✅ Status: **PASSED**\n"
-            comment += "No issues detected.\n\n"
-        
-        # Summary statistics
-        comment += "### 📊 Summary\n"
-        comment += f"- Total issues found: {len(anti_patterns)}\n"
-        
-        # Group issues by severity
-        errors = [p for p in anti_patterns if p.severity == Severity.ERROR]
-        warnings = [p for p in anti_patterns if p.severity == Severity.WARNING]
-        info = [p for p in anti_patterns if p.severity == Severity.INFO]
-        
-        comment += f"- Critical (must fix): {len(errors)}\n"
-        comment += f"- Warnings (should review): {len(warnings)}\n"
-        comment += f"- Info: {len(info)}\n\n"
-        
-        # Critical issues section
-        if errors:
-            comment += "### 🔴 Critical Issues Found:\n"
-            for pattern in errors:
-                comment += f"• **{pattern.name}**: {pattern.description}\n"
-                if pattern.file_path and pattern.line_number:
-                    comment += f"  📍 Location: `{pattern.file_path}:{pattern.line_number}`\n"
-                if pattern.recommendation:
-                    comment += f"  💡 Recommendation: {pattern.recommendation}\n"
-        else:
-            comment += "### ✅ Critical Issues:\n"
-            comment += "• No critical security issues or missing CVE patch files were identified.\n"
-        
-        comment += "\n"
-        
-        # Warning issues section
-        if warnings:
-            comment += "### ⚠️ Warnings:\n"
-            for pattern in warnings:
-                comment += f"• **{pattern.name}**: {pattern.description}\n"
-                if pattern.file_path and pattern.line_number:
-                    comment += f"  📍 Location: `{pattern.file_path}:{pattern.line_number}`\n"
-                if pattern.recommendation:
-                    comment += f"  💡 Recommendation: {pattern.recommendation}\n"
-            comment += "\n"
-        
-        # AI Analysis section
-        if ai_analysis and any(ai_analysis):
-            comment += "### 🤖 AI Analysis:\n"
-            for analysis in ai_analysis:
-                if analysis:  # Skip empty analyses
-                    comment += f"{analysis}\n\n"
-        
-        # Required actions
-        if has_errors:
-            comment += "### ⚠️ Required Actions\n"
-            comment += "Please address all critical issues before this PR can be merged.\n\n"
-        
-        # Footer
-        comment += "---\n"
-        comment += f"*Generated by CVE Spec File Check - {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}*\n"
-        
-        return comment
-    
-    def format_multi_spec_comment(self, multi_result: 'MultiSpecAnalysisResult') -> str:
-        """
-        Format analysis results for multiple spec files as a GitHub comment.
-        
-        Args:
-            multi_result: MultiSpecAnalysisResult containing all spec file results
-            
-        Returns:
-            Formatted markdown comment for GitHub
-        """
-        comment = "## 🔍 CVE Spec File Check Results\n\n"
-        
-        # Overall status
-        if multi_result.overall_severity == Severity.ERROR:
-            comment += "### ❌ Overall Status: **FAILED**\n"
-            comment += f"Found critical issues that must be addressed before merging.\n\n"
-        elif multi_result.overall_severity == Severity.WARNING:
-            comment += "### ⚠️ Overall Status: **WARNING**\n"
-            comment += f"Found issues that should be reviewed.\n\n"
-        else:
-            comment += "### ✅ Overall Status: **PASSED**\n"
-            comment += f"No critical issues found.\n\n"
-        
-        # Summary statistics
-        stats = multi_result.summary_statistics
-        comment += "### 📊 Summary by Package\n\n"
-        comment += f"- **Total Packages Analyzed:** {stats['total_specs']}\n"
-        comment += f"- **Packages with Errors:** {stats['specs_with_errors']}\n"
-        comment += f"- **Packages with Warnings:** {stats['specs_with_warnings']}\n"
-        comment += f"- **Total Issues:** {multi_result.total_issues} "
-        comment += f"({stats['total_errors']} errors, {stats['total_warnings']} warnings)\n\n"
-        
-        # Table of packages
-        comment += "| Package | Status | Issues |\n"
-        comment += "|---------|--------|--------|\n"
-        
-        for spec_result in multi_result.spec_results:
-            status_emoji = "❌" if spec_result.severity == Severity.ERROR else (
-                "⚠️" if spec_result.severity == Severity.WARNING else "✅"
-            )
-            comment += f"| {spec_result.package_name} | {status_emoji} | {spec_result.summary} |\n"
-        
-        comment += "\n"
-        
-        # Detailed issues by package (only for packages with issues)
-        failed_specs = [s for s in multi_result.spec_results if s.anti_patterns]
-        
-        if failed_specs:
-            comment += "### 📋 Detailed Issues\n\n"
-            
-            for spec_result in failed_specs:
-                comment += f"#### 📦 {spec_result.package_name} Details\n\n"
-                comment += f"**Spec File:** `{spec_result.spec_path}`\n\n"
-                
-                # Group by severity
-                errors = [p for p in spec_result.anti_patterns if p.severity == Severity.ERROR]
-                warnings = [p for p in spec_result.anti_patterns if p.severity == Severity.WARNING]
-                
-                # Only show Critical Issues section if there are errors
-                if errors:
-                    comment += "**🔴 Critical Issues Found:**\n"
-                    for pattern in errors:
-                        comment += f"• **{pattern.name}**: {pattern.description}\n"
-                        if pattern.file_path and pattern.line_number:
-                            comment += f"  📍 Location: `{pattern.file_path}:{pattern.line_number}`\n"
-                        if pattern.recommendation:
-                            comment += f"  💡 Recommendation: {pattern.recommendation}\n"
-                    comment += "\n"
-                
-                # Warning issues
-                if warnings:
-                    comment += "**⚠️ Warnings:**\n"
-                    for pattern in warnings:
-                        comment += f"• **{pattern.name}**: {pattern.description}\n"
-                        if pattern.file_path and pattern.line_number:
-                            comment += f"  📍 Location: `{pattern.file_path}:{pattern.line_number}`\n"
-                        if pattern.recommendation:
-                            comment += f"  💡 Recommendation: {pattern.recommendation}\n"
-                    comment += "\n"
-                
-                # AI Analysis
-                if spec_result.ai_analysis:
-                    comment += "**🤖 AI Analysis:**\n"
-                    comment += f"{spec_result.ai_analysis}\n\n"
-        else:
-            # No issues found in any package
-            comment += "### ✅ No Issues Found\n\n"
-            comment += "All analyzed spec files passed the CVE security checks.\n\n"
-        
-        # Required actions
-        if multi_result.overall_severity == Severity.ERROR:
-            comment += "### ⚠️ Required Actions\n\n"
-            comment += "Please address all critical issues (❌) before this PR can be merged.\n"
-        
-        # Footer
-        comment += "\n---\n"
-        comment += "*Generated by CVE Spec File Check - "
-        comment += f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}*\n"
-        
-        return comment
-    
-    def update_check_status(self, sha: str, status: str, description: str) -> bool:
-        """
-        Update the status check for a commit.
-        
-        Args:
-            sha: Git commit SHA
-            status: Status ('pending', 'success', 'failure', 'error')
-            description: Short description of the status
-            
-        Returns:
-            True if successful, False otherwise
-        """
-        if not self.token:
-            print(f"Would update status to: {status} - {description}")
-            return False
-        
-        url = f"{self.api_base}/repos/{self.repo}/statuses/{sha}"
-        
-        data = {
-            'state': status,
-            'description': description,
-            'context': 'CVE Spec File Check'
+        payload = {
+            "body": body
         }
         
         try:
-            response = requests.post(
-                url,
-                headers=self.headers,
-                json=data
-            )
+            response = requests.patch(url, headers=self.headers, json=payload)
             response.raise_for_status()
-            print(f"Successfully updated check status to: {status}")
-            return True
-        except requests.RequestException as e:
-            print(f"Error updating check status: {e}")
-            return False
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Failed to update PR comment: {str(e)}")
+            return {}
+    
+    def post_or_update_comment(self, body: str, marker: str) -> Dict[str, Any]:
+        """
+        Post a new comment or update an existing one with the same marker.
+        
+        The marker is a unique string that identifies comments from this tool,
+        allowing us to find and update our previous comments instead of creating duplicates.
+        
+        Args:
+            body: Comment content
+            marker: Unique marker to identify this type of comment
+            
+        Returns:
+            Response from GitHub API
+        """
+        # Add the marker as a hidden HTML comment
+        marked_body = f"<!-- {marker} -->\n{body}"
+        
+        # Check if required environment variables are set
+        if not self.token:
+            logger.error("GitHub token not set - cannot post comments. Check GITHUB_TOKEN environment variable.")
+            return {"error": "No GitHub token available"}
+            
+        if not self.repo_name:
+            logger.error("GitHub repository not set - cannot post comments. Check GITHUB_REPOSITORY environment variable.")
+            return {"error": "No GitHub repository specified"}
+            
+        if not self.pr_number:
+            logger.error("GitHub PR number not set - cannot post comments. Check GITHUB_PR_NUMBER environment variable.")
+            return {"error": "No GitHub PR number specified"}
+            
+        # Log authentication details (safely)
+        auth_header = self.headers.get("Authorization", "None")
+        auth_type = "Bearer" if auth_header.startswith("Bearer ") else "token" if auth_header.startswith("token ") else "Unknown"
+        token_prefix = self.token[:4] if self.token else "None"
+        
+        logger.info(f"Attempting to post or update comment with marker: {marker}")
+        logger.info(f"Repository: {self.repo_name}")
+        logger.info(f"PR number: {self.pr_number}")
+        logger.info(f"Auth type: {auth_type}, Token prefix: {token_prefix}...")
+        
+        # Get existing comments
+        comments = self.get_pr_comments()
+        
+        # Look for our previous comment with the same marker
+        for comment in comments:
+            if f"<!-- {marker} -->" in comment.get("body", ""):
+                # Found our comment, update it
+                logger.info(f"Found existing comment with ID {comment['id']}, updating it")
+                return self.update_pr_comment(comment["id"], marked_body)
+        
+        # Didn't find a comment with our marker, create a new one
+        logger.info("No existing comment found with marker, creating new comment")
+        return self.post_pr_comment(marked_body)
+    
+    def create_severity_status(self, severity: Severity, commit_sha: str) -> Dict[str, Any]:
+        """
+        Create a status for the PR based on the severity level.
+        
+        Args:
+            severity: Highest severity level of detected issues
+            commit_sha: SHA of the commit to update status for
+            
+        Returns:
+            Response from GitHub API
+        """
+        if not self.token or not self.repo_name:
+            logger.warning("Required GitHub params not available, skipping status update")
+            return {}
+        
+        url = f"{self.api_base_url}/repos/{self.repo_name}/statuses/{commit_sha}"
+        
+        # Map severity levels to status states and descriptions
+        # CRITICAL and ERROR result in failure status
+        # WARNING and INFO result in success status (PR can still be merged)
+        if severity == Severity.CRITICAL:
+            state = "failure" 
+            description = "Critical issues found - must be fixed"
+        elif severity == Severity.ERROR:
+            state = "failure"
+            description = "Errors found - must be fixed"
+        elif severity == Severity.WARNING:
+            state = "success"  # WARNING allows PR to pass
+            description = "Warnings found - review recommended"
+        else:  # INFO or None
+            state = "success"
+            description = "All checks passed successfully"
+        
+        payload = {
+            "state": state,
+            "description": description,
+            "context": "Azure Linux Spec Validator"  # This is what shows up in the GitHub UI
+        }
+        
+        try:
+            response = requests.post(url, headers=self.headers, json=payload)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Failed to create status: {str(e)}")
+            return {}
 
-
-def main():
-    """Test the GitHub client functionality."""
-    client = GitHubClient()
-    
-    # Test with a sample PR number (would need a real PR number to test)
-    pr_number = int(os.environ.get('PR_NUMBER', '1'))
-    
-    print(f"Testing GitHub client with PR #{pr_number}")
-    
-    # Test getting PR files
-    files = client.get_pr_files(pr_number)
-    print(f"Found {len(files)} changed files")
-    
-    # Create a sample comment
-    sample_patterns = [
-        AntiPattern(
-            id='test-error',
-            name='Test Error',
-            description='This is a test error',
-            severity=Severity.ERROR,
-            file_path='test.spec',
-            line_number=10,
-            context='Test context',
-            recommendation='Fix this test issue'
-        )
-    ]
-    
-    comment = client.format_comment(sample_patterns, ['Test AI analysis'])
-    print("\nFormatted comment:")
-    print(comment)
-
-
-if __name__ == '__main__':
-    main()
+    @staticmethod
+    def format_severity_comment(severity: Severity, issues: List[Dict[str, Any]], 
+                               ai_analysis: str = "") -> str:
+        """
+        Format a comment based on the severity of issues.
+        This provides a basic implementation for GitHub comment formatting.
+        
+        Args:
+            severity: Highest severity level of detected issues
+            issues: List of issue dictionaries with details
+            ai_analysis: Optional AI-generated analysis to include
+            
+        Returns:
+            Formatted markdown for a GitHub comment
+        """
+        # Basic implementation for GitHub comment formatting.
+        # The main comment generation logic is now in ResultAnalyzer.generate_pr_comment_content()
+        # which provides more sophisticated structured output handling.
+        
+        # Just return the header and issues list
+        if severity == Severity.CRITICAL:
+            header = "## 🚨 CRITICAL ISSUES DETECTED\n\n"
+            header += "These issues **must be fixed** before the PR can be merged.\n\n"
+        elif severity == Severity.ERROR:
+            header = "## ❌ ERRORS DETECTED\n\n"
+            header += "These issues **must be fixed** before the PR can be merged.\n\n"
+        elif severity == Severity.WARNING:
+            header = "## ⚠️ WARNINGS DETECTED\n\n"
+            header += "Review recommended, but PR can still be merged.\n\n"
+        else:  # INFO or None
+            header = "## ✅ VALIDATION SUCCESSFUL\n\n"
+            if issues:
+                header += "Some informational notes were detected, but they don't require action.\n\n"
+            else:
+                header += "No issues were detected in the spec files.\n\n"
+        
+        # Add issues by category
+        comment = header
+        
+        # Group issues by severity
+        critical_issues = [i for i in issues if i.get("severity") == "CRITICAL"]
+        error_issues = [i for i in issues if i.get("severity") == "ERROR"]
+        warning_issues = [i for i in issues if i.get("severity") == "WARNING"]
+        info_issues = [i for i in issues if i.get("severity") == "INFO"]
+        
+        # Add critical issues
+        if critical_issues:
+            comment += "### 🚨 Critical Issues\n\n"
+            for issue in critical_issues:
+                comment += f"- **{issue.get('name')}**: {issue.get('description')}\n"
+                if issue.get('recommendation'):
+                    comment += f"  - **Fix**: {issue.get('recommendation')}\n"
+            comment += "\n"
+        
+        # Add error issues
+        if error_issues:
+            comment += "### ❌ Errors\n\n"
+            for issue in error_issues:
+                comment += f"- **{issue.get('name')}**: {issue.get('description')}\n"
+                if issue.get('recommendation'):
+                    comment += f"  - **Fix**: {issue.get('recommendation')}\n"
+            comment += "\n"
+        
+        # Add warning issues
+        if warning_issues:
+            comment += "### ⚠️ Warnings\n\n"
+            for issue in warning_issues:
+                comment += f"- **{issue.get('name')}**: {issue.get('description')}\n"
+                if issue.get('recommendation'):
+                    comment += f"  - **Fix**: {issue.get('recommendation')}\n"
+            comment += "\n"
+        
+        # Add info issues
+        if info_issues:
+            comment += "### ℹ️ Informational\n\n"
+            for issue in info_issues:
+                comment += f"- **{issue.get('name')}**: {issue.get('description')}\n"
+            comment += "\n"
+        
+        # Add AI analysis summary if provided
+        if ai_analysis:
+            # Truncate if too long for a comment
+            max_length = 5000
+            if len(ai_analysis) > max_length:
+                ai_summary = ai_analysis[:max_length] + "...\n\n*(Analysis truncated. See full analysis in ADO logs)*"
+            else:
+                ai_summary = ai_analysis
+                
+            comment += "### 🧠 AI Analysis Summary\n\n"
+            comment += ai_summary + "\n\n"
+        
+        # Add footer
+        comment += "---\n"
+        comment += "*This comment was automatically generated by the Azure Linux PR Check system. " 
+        comment += "See ADO pipeline logs for full details.*"
+        
+        return comment

@@ -768,7 +768,7 @@ def main():
                 # Format and post organized comment
                 logger.info(f"Posting GitHub comment to PR #{pr_number}")
                 comment_text = github_client.format_multi_spec_comment(analysis_result)
-                success = github_client.post_comment(pr_number, comment_text)
+                success = github_client.post_pr_comment(comment_text)
                 
                 if success:
                     logger.info(f"Successfully posted comment to PR #{pr_number}")
