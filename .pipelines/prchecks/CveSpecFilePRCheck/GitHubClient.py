@@ -182,10 +182,11 @@ class GitHubClient:
             Response from GitHub API
         """
         if not self.token or not self.repo_name or not self.pr_number:
-            logger.warning("Required GitHub params not available, skipping comment posting")
+            logger.error(f"Missing required params - token: {'✓' if self.token else '✗'}, repo: {self.repo_name}, pr: {self.pr_number}")
             return {}
             
         url = f"{self.api_base_url}/repos/{self.repo_name}/issues/{self.pr_number}/comments"
+        logger.info(f"Posting comment to: {url}")
         
         payload = {
             "body": body
@@ -193,10 +194,15 @@ class GitHubClient:
         
         try:
             response = requests.post(url, headers=self.headers, json=payload)
+            logger.info(f"Response status: {response.status_code}")
             response.raise_for_status()
+            logger.info("✅ Successfully posted comment")
             return response.json()
         except requests.exceptions.RequestException as e:
-            logger.error(f"Failed to post PR comment: {str(e)}")
+            logger.error(f"❌ Failed to post PR comment: {str(e)}")
+            if hasattr(e, 'response') and e.response is not None:
+                logger.error(f"Response status: {e.response.status_code}")
+                logger.error(f"Response body: {e.response.text}")
             return {}
     
     def get_pr_comments(self) -> List[Dict[str, Any]]:
