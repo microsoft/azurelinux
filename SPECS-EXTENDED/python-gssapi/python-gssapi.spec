@@ -6,7 +6,7 @@ Name:           python-gssapi
 Version:        1.10.0
 Release:        11%{?dist}
 Summary:        Python Bindings for GSSAPI (RFC 2743/2744 and extensions)
- 
+
 License:        ISC
 URL:            https://github.com/pythongssapi/python-gssapi
 Source0:        https://github.com/pythongssapi/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
@@ -28,7 +28,7 @@ A set of Python bindings to the GSSAPI C library providing both\
 a high-level pythonic interfaces and a low-level interfaces\
 which more closely matches RFC 2743.  Includes support for\
 RFC 2743, as well as multiple extensions.
- 
+
 %description %_description
 %package -n python3-gssapi
 Summary:        Python 3 Bindings for GSSAPI (RFC 2743/2744 and extensions)
