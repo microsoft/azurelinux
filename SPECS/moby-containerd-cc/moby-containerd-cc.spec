@@ -33,7 +33,7 @@ BuildRequires: golang
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
-BuildRequires: glibc-static >= 2.38-14%{?dist}
+BuildRequires: glibc-static >= 2.38-15%{?dist}
 
 Requires: moby-runc >= 1.1.0
 
@@ -86,7 +86,7 @@ fi
 
 %changelog
 * Tue Sept 09 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.7.7-10
-- Bump release to rebuild with go 1.25.1
+- Bump release to rebuild with go 1.25.3
 
 * Wed Apr 16 2025 Manuel Huber <mahuber@microsoft.com> - 1.7.7-9
 - Fix CVE-2024-40635

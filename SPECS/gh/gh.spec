@@ -65,8 +65,8 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
-* Tue Sept 09 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.62.0-10
-- Bump release to rebuild with go 1.25.1
+* Tue Sep 09 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.62.0-10
+- Bump release to rebuild with go 1.25.3
 
 * Mon Jun 16 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.62.0-9
 - Patch CVE-2025-48938
