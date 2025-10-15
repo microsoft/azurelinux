@@ -53,7 +53,7 @@ popd
 %endif
 
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
-%make_build package
+%make_build all
 popd
 
 %define kata_path     /opt/kata-containers
@@ -64,7 +64,7 @@ popd
 
 %install
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
-START_SERVICES=no PREFIX=%{buildroot} %make_build deploy-package
+START_SERVICES=no PREFIX=%{buildroot} %make_build deploy
 PREFIX=%{buildroot} %make_build deploy-package-tools
 popd
 
