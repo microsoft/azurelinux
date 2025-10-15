@@ -663,13 +663,26 @@ class ResultAnalyzer:
             )
             
             if gist_url:
-                # Add styled button linking to the Gist
+                # Add styled button and direct link
                 report_lines.append('<div align="center">')
                 report_lines.append('')
-                report_lines.append(f'[![View Interactive Report](https://img.shields.io/badge/📊_View-Interactive_HTML_Report-2ea44f?style=for-the-badge)]({gist_url})')
+                report_lines.append(f'<a href="{gist_url}"><img src="https://img.shields.io/badge/📊_View-Interactive_HTML_Report-2ea44f?style=for-the-badge" alt="View Interactive Report"></a>')
+                report_lines.append('')
+                report_lines.append(f'**[📊 Click here to view the interactive HTML report]({gist_url})**')
                 report_lines.append('')
                 report_lines.append('</div>')
                 report_lines.append('')
+                logger.info(f"Added Gist button/link to comment: {gist_url}")
+            else:
+                logger.warning("Gist creation failed, falling back to embedded HTML")
+                # Fallback: embed HTML inline if Gist creation failed
+                html_report = self.generate_html_report(analysis_result)
+                report_lines.append("<details>")
+                report_lines.append("<summary>📊 <b>Interactive HTML Report</b> (Click to expand)</summary>")
+                report_lines.append("")
+                report_lines.append(html_report)
+                report_lines.append("</details>")
+                report_lines.append("")
         elif include_html:
             # Fallback: embed HTML inline if no GitHub client
             html_report = self.generate_html_report(analysis_result)
@@ -715,16 +728,22 @@ class ResultAnalyzer:
         report_lines.append("## 📦 Package Analysis Details")
         report_lines.append("")
         
-        for spec_result in sorted(analysis_result.spec_results, 
-                                  key=lambda x: x.package_name):
+        sorted_specs = sorted(analysis_result.spec_results, key=lambda x: x.package_name)
+        for idx, spec_result in enumerate(sorted_specs):
             pkg_emoji = self._get_severity_emoji(spec_result.severity)
-            report_lines.append(f"### {pkg_emoji} **{spec_result.package_name}**")
+            
+            # Wrap entire spec section in collapsible details (open by default)
+            report_lines.append("<details open>")
+            report_lines.append(f"<summary><h3>{pkg_emoji} <b>{spec_result.package_name}</b> - {spec_result.severity.name}</h3></summary>")
             report_lines.append("")
+            
+            # Spec metadata
             report_lines.append(f"- **Spec File:** `{spec_result.spec_path}`")
             report_lines.append(f"- **Status:** {pkg_emoji} **{spec_result.severity.name}**")
             report_lines.append(f"- **Issues:** {spec_result.summary}")
             report_lines.append("")
             
+            # Anti-patterns section
             if spec_result.anti_patterns:
                 report_lines.append("<details open>")
                 report_lines.append("<summary>🐛 <b>Anti-Patterns Detected</b> (Click to collapse)</summary>")
@@ -735,10 +754,10 @@ class ResultAnalyzer:
                 for issue_type, patterns in issues_by_type.items():
                     # Get severity from first pattern of this type (they should all be same severity)
                     pattern_severity = patterns[0].severity if patterns else Severity.INFO
-                    severity_emoji = self._get_severity_emoji(pattern_severity)
+                    severity_emoji_local = self._get_severity_emoji(pattern_severity)
                     severity_name = pattern_severity.name
                     
-                    report_lines.append(f"#### {severity_emoji} `{issue_type}` **({severity_name})** - {len(patterns)} occurrence(s)")
+                    report_lines.append(f"#### {severity_emoji_local} `{issue_type}` **({severity_name})** - {len(patterns)} occurrence(s)")
                     report_lines.append("")
                     for i, pattern in enumerate(patterns, 1):
                         # Truncate long descriptions
@@ -749,6 +768,7 @@ class ResultAnalyzer:
                 report_lines.append("</details>")
                 report_lines.append("")
             
+            # AI Analysis section
             if spec_result.ai_analysis:
                 report_lines.append("<details open>")
                 report_lines.append("<summary>🤖 <b>AI Analysis Summary</b> (Click to collapse)</summary>")
@@ -761,12 +781,43 @@ class ResultAnalyzer:
                 report_lines.append("")
                 report_lines.append("</details>")
                 report_lines.append("")
+            
+            # Per-spec Recommended Actions
+            if spec_result.severity >= Severity.ERROR:
+                report_lines.append("<details open>")
+                report_lines.append(f"<summary>✅ <b>Recommended Actions for {spec_result.package_name}</b> (Click to collapse)</summary>")
+                report_lines.append("")
+                
+                # Get unique recommendations
+                recommendations = set()
+                for pattern in spec_result.anti_patterns:
+                    if pattern.severity >= Severity.ERROR:
+                        recommendations.add(pattern.recommendation)
+                
+                if recommendations:
+                    for rec in sorted(recommendations):
+                        report_lines.append(f"- [ ] {rec}")
+                    report_lines.append("")
+                
+                report_lines.append("</details>")
+                report_lines.append("")
+            
+            # Close spec-level details
+            report_lines.append("</details>")
+            report_lines.append("")
+            
+            # Add subtle delimiter between specs (but not after the last one)
+            if idx < len(sorted_specs) - 1:
+                report_lines.append("---")
+                report_lines.append("")
         
-        # Recommendations
+        # Overall Recommendations (keep at bottom)
         if analysis_result.get_failed_specs():
             report_lines.append("---")
             report_lines.append("")
-            report_lines.append("## ✅ Recommended Actions")
+            report_lines.append("## ✅ All Recommended Actions")
+            report_lines.append("")
+            report_lines.append("*Complete checklist of all actions needed across all packages*")
             report_lines.append("")
             
             for spec_result in analysis_result.get_failed_specs():
@@ -779,7 +830,7 @@ class ResultAnalyzer:
                     if pattern.severity >= Severity.ERROR:
                         recommendations.add(pattern.recommendation)
                 
-                for rec in recommendations:
+                for rec in sorted(recommendations):
                     report_lines.append(f"- [ ] {rec}")
                 report_lines.append("")
         
