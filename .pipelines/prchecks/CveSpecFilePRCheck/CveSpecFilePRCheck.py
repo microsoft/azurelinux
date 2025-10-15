@@ -767,7 +767,7 @@ def main():
             if pr_number:
                 # Format and post organized comment
                 logger.info(f"Posting GitHub comment to PR #{pr_number}")
-                comment_text = github_client.format_multi_spec_comment(analysis_result)
+                comment_text = analyzer.generate_multi_spec_report(analysis_result)
                 success = github_client.post_pr_comment(comment_text)
                 
                 if success:
