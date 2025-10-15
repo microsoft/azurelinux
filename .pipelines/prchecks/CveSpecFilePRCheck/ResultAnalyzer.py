@@ -630,6 +630,7 @@ class ResultAnalyzer:
         report_lines = []
         
         # Add HTML report as a Gist link if GitHub client is provided
+        # Note: HTML embedding disabled until Azure Blob Storage is configured
         if include_html and github_client:
             html_report = self.generate_html_report(analysis_result)
             
@@ -677,24 +678,8 @@ class ResultAnalyzer:
                 report_lines.append("")
                 logger.info(f"Added HTML report link to comment: {gist_url}")
             else:
-                logger.warning("Gist creation failed, falling back to embedded HTML")
-                # Fallback: embed HTML inline if Gist creation failed
-                html_report = self.generate_html_report(analysis_result)
-                report_lines.append("<details>")
-                report_lines.append("<summary>📊 <b>Interactive HTML Report</b> (Click to expand)</summary>")
-                report_lines.append("")
-                report_lines.append(html_report)
-                report_lines.append("</details>")
-                report_lines.append("")
-        elif include_html:
-            # Fallback: embed HTML inline if no GitHub client
-            html_report = self.generate_html_report(analysis_result)
-            report_lines.append("<details>")
-            report_lines.append("<summary>📊 <b>Interactive HTML Report</b> (Click to expand)</summary>")
-            report_lines.append("")
-            report_lines.append(html_report)
-            report_lines.append("</details>")
-            report_lines.append("")
+                logger.warning("Gist creation failed, skipping HTML report section (waiting for Azure Blob Storage setup)")
+                # TODO: Replace with Azure Blob Storage upload once configured
         
         # Get severity emoji
         severity_emoji = self._get_severity_emoji(analysis_result.overall_severity)
