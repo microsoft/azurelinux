@@ -21,7 +21,7 @@ BuildRequires:  python3-pip
 BuildRequires:  python3dist(wheel)
 BuildRequires:  python3-decorator
 
-BuildRequires: git
+BuildRequires:  git
  
 %global _description\
 A set of Python bindings to the GSSAPI C library providing both\
