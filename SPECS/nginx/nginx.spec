@@ -1,12 +1,12 @@
 %global nginx_user nginx
-%global njs_version 0.8.3
+%global njs_version 0.9.3
 
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
-Version:        1.25.4
-Release:        6%{?dist}
+Version:        1.28.0
+Release:        1%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,9 +20,9 @@ Source2:        https://github.com/nginx/njs/archive/refs/tags/%{njs_version}.ta
 Source3:        nginx-tests.tgz
 %endif
 
-Patch0:         CVE-2024-7347.patch
-Patch1:         CVE-2025-23419.patch
-Patch2:         CVE-2025-53859.patch
+#Patch0:         CVE-2024-7347.patch
+#Patch1:         CVE-2025-23419.patch
+#Patch2:         CVE-2025-53859.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
