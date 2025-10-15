@@ -543,7 +543,7 @@ class ResultAnalyzer:
             if spec_result.anti_patterns:
                 issues_by_type = spec_result.get_issues_by_type()
                 html += """
-            <details style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px; margin: 10px 0; padding: 10px;">
+            <details open style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px; margin: 10px 0; padding: 10px;">
                 <summary style="cursor: pointer; font-weight: bold; color: #f85149; user-select: none;">
                     🐛 Anti-Patterns Detected
                 </summary>
@@ -578,7 +578,7 @@ class ResultAnalyzer:
             
             if recommendations:
                 html += """
-            <details style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px; margin: 10px 0; padding: 10px;">
+            <details open style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px; margin: 10px 0; padding: 10px;">
                 <summary style="cursor: pointer; font-weight: bold; color: #3fb950; user-select: none;">
                     ✅ Recommended Actions
                 </summary>
@@ -615,21 +615,63 @@ class ResultAnalyzer:
         }
         return color_map.get(severity, "#8b949e")
     
-    def generate_multi_spec_report(self, analysis_result: 'MultiSpecAnalysisResult', include_html: bool = True) -> str:
+    def generate_multi_spec_report(self, analysis_result: 'MultiSpecAnalysisResult', include_html: bool = True, github_client = None) -> str:
         """
         Generate a comprehensive report for multi-spec analysis results with enhanced formatting.
         
         Args:
             analysis_result: MultiSpecAnalysisResult with all spec data
             include_html: Whether to include interactive HTML report at the top
+            github_client: Optional GitHubClient instance for creating Gist with HTML report
             
         Returns:
             Formatted GitHub markdown report with optional HTML section
         """
         report_lines = []
         
-        # Add HTML report at the top if requested
-        if include_html:
+        # Add HTML report as a Gist link if GitHub client is provided
+        if include_html and github_client:
+            html_report = self.generate_html_report(analysis_result)
+            
+            # Create a self-contained HTML page
+            html_page = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CVE Spec File Check Report</title>
+    <style>
+        body {{
+            margin: 0;
+            padding: 20px;
+            background: #0d1117;
+            color: #c9d1d9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        }}
+    </style>
+</head>
+<body>
+{html_report}
+</body>
+</html>"""
+            
+            # Create Gist and get URL
+            gist_url = github_client.create_gist(
+                filename="cve-spec-check-report.html",
+                content=html_page,
+                description=f"CVE Spec File Check Report - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            )
+            
+            if gist_url:
+                # Add styled button linking to the Gist
+                report_lines.append('<div align="center">')
+                report_lines.append('')
+                report_lines.append(f'[![View Interactive Report](https://img.shields.io/badge/📊_View-Interactive_HTML_Report-2ea44f?style=for-the-badge)]({gist_url})')
+                report_lines.append('')
+                report_lines.append('</div>')
+                report_lines.append('')
+        elif include_html:
+            # Fallback: embed HTML inline if no GitHub client
             html_report = self.generate_html_report(analysis_result)
             report_lines.append("<details>")
             report_lines.append("<summary>📊 <b>Interactive HTML Report</b> (Click to expand)</summary>")
@@ -684,14 +726,19 @@ class ResultAnalyzer:
             report_lines.append("")
             
             if spec_result.anti_patterns:
-                report_lines.append("<details>")
-                report_lines.append("<summary>🐛 <b>Anti-Patterns Detected</b> (Click to expand)</summary>")
+                report_lines.append("<details open>")
+                report_lines.append("<summary>🐛 <b>Anti-Patterns Detected</b> (Click to collapse)</summary>")
                 report_lines.append("")
                 
                 # Group by type
                 issues_by_type = spec_result.get_issues_by_type()
                 for issue_type, patterns in issues_by_type.items():
-                    report_lines.append(f"#### `{issue_type}` - {len(patterns)} occurrence(s)")
+                    # Get severity from first pattern of this type (they should all be same severity)
+                    pattern_severity = patterns[0].severity if patterns else Severity.INFO
+                    severity_emoji = self._get_severity_emoji(pattern_severity)
+                    severity_name = pattern_severity.name
+                    
+                    report_lines.append(f"#### {severity_emoji} `{issue_type}` **({severity_name})** - {len(patterns)} occurrence(s)")
                     report_lines.append("")
                     for i, pattern in enumerate(patterns, 1):
                         # Truncate long descriptions
@@ -703,8 +750,8 @@ class ResultAnalyzer:
                 report_lines.append("")
             
             if spec_result.ai_analysis:
-                report_lines.append("<details>")
-                report_lines.append("<summary>🤖 <b>AI Analysis Summary</b></summary>")
+                report_lines.append("<details open>")
+                report_lines.append("<summary>🤖 <b>AI Analysis Summary</b> (Click to collapse)</summary>")
                 report_lines.append("")
                 # Take first 5 lines of AI analysis
                 ai_lines = spec_result.ai_analysis.split('\n')[:5]

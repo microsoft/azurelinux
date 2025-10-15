@@ -309,6 +309,50 @@ class GitHubClient:
         logger.info("No existing comment found with marker, creating new comment")
         return self.post_pr_comment(marked_body)
     
+    def create_gist(self, filename: str, content: str, description: str = "") -> Optional[str]:
+        """
+        Create a secret GitHub Gist and return its URL.
+        
+        Args:
+            filename: Name of the file in the gist
+            content: Content of the file
+            description: Description of the gist
+            
+        Returns:
+            URL of the created gist, or None if failed
+        """
+        if not self.token:
+            logger.warning("GitHub token not available, skipping gist creation")
+            return None
+            
+        url = f"{self.api_base_url}/gists"
+        
+        payload = {
+            "description": description,
+            "public": False,  # Create secret gist
+            "files": {
+                filename: {
+                    "content": content
+                }
+            }
+        }
+        
+        try:
+            logger.info(f"Creating secret gist: {filename}")
+            response = requests.post(url, headers=self.headers, json=payload)
+            response.raise_for_status()
+            gist_data = response.json()
+            gist_url = gist_data.get("html_url")
+            logger.info(f"✅ Created gist: {gist_url}")
+            return gist_url
+        except requests.exceptions.RequestException as e:
+            logger.error(f"❌ Failed to create gist: {str(e)}")
+            if hasattr(e, 'response') and e.response is not None:
+                logger.error(f"Response status: {e.response.status_code}")
+                logger.error(f"Response body: {e.response.text}")
+            return None
+
+    
     def create_severity_status(self, severity: Severity, commit_sha: str) -> Dict[str, Any]:
         """
         Create a status for the PR based on the severity level.

@@ -765,9 +765,13 @@ def main():
             pr_number = int(os.environ.get("GITHUB_PR_NUMBER", "0"))
             
             if pr_number:
-                # Format and post organized comment (with interactive HTML report)
+                # Format and post organized comment (with interactive HTML report via Gist)
                 logger.info(f"Posting GitHub comment to PR #{pr_number}")
-                comment_text = analyzer.generate_multi_spec_report(analysis_result, include_html=True)
+                comment_text = analyzer.generate_multi_spec_report(
+                    analysis_result, 
+                    include_html=True, 
+                    github_client=github_client
+                )
                 success = github_client.post_pr_comment(comment_text)
                 
                 if success:
