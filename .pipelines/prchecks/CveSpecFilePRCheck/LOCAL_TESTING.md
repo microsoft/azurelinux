@@ -64,6 +64,8 @@ After running, you'll find:
 - `pr_check_report.txt` - Human-readable report
 - `pr_check_results.json` - Machine-readable JSON results
 
+**Note:** Both files are validated to exist after the check runs. If either is missing, the script will exit with an error code (10), matching the behavior of the ADO pipeline.
+
 View them with:
 ```bash
 cat pr_check_report.txt

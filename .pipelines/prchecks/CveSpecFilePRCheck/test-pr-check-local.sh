@@ -154,11 +154,25 @@ esac
 
 echo ""
 echo -e "${BLUE}📄 Report files:${NC}"
+MISSING_FILES=0
 if [ -f "${SCRIPT_DIR}/pr_check_report.txt" ]; then
     echo -e "  ${GREEN}✓${NC} pr_check_report.txt"
+else
+    echo -e "  ${RED}✗${NC} pr_check_report.txt (MISSING)"
+    MISSING_FILES=1
 fi
 if [ -f "${SCRIPT_DIR}/pr_check_results.json" ]; then
     echo -e "  ${GREEN}✓${NC} pr_check_results.json"
+else
+    echo -e "  ${RED}✗${NC} pr_check_results.json (MISSING)"
+    MISSING_FILES=1
+fi
+
+if [ $MISSING_FILES -eq 1 ]; then
+    echo ""
+    echo -e "${RED}❌ ERROR:${NC} Expected report files were not generated!"
+    echo -e "   This would fail in ADO pipeline. Check for errors above."
+    exit 10
 fi
 
 echo ""

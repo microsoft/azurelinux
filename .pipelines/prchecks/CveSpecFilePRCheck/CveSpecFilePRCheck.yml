@@ -138,11 +138,19 @@ steps:
         # Save exit code to publish as pipeline variable
         echo "##vso[task.setvariable variable=AnalysisExitCode]$ANALYSIS_EXIT_CODE"
         
-        # Verify report file was created
-        if [ -f "spec_analysis_report.json" ]; then
-          echo "✅ Analysis report generated successfully"
+        # Verify report files were created
+        if [ -f "pr_check_results.json" ] && [ -f "pr_check_report.txt" ]; then
+          echo "✅ Analysis report files generated successfully"
+          echo "   - pr_check_report.txt"
+          echo "   - pr_check_results.json"
         else
-          echo "❌ Analysis report file not found"
+          echo "❌ Analysis report files not found"
+          if [ ! -f "pr_check_results.json" ]; then
+            echo "   Missing: pr_check_results.json"
+          fi
+          if [ ! -f "pr_check_report.txt" ]; then
+            echo "   Missing: pr_check_report.txt"
+          fi
           exit 1
         fi
         
