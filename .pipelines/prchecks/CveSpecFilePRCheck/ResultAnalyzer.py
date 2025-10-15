@@ -663,16 +663,19 @@ class ResultAnalyzer:
             )
             
             if gist_url:
-                # Add styled button and direct link
-                report_lines.append('<div align="center">')
-                report_lines.append('')
-                report_lines.append(f'<a href="{gist_url}"><img src="https://img.shields.io/badge/📊_View-Interactive_HTML_Report-2ea44f?style=for-the-badge" alt="View Interactive Report"></a>')
-                report_lines.append('')
-                report_lines.append(f'**[📊 Click here to view the interactive HTML report]({gist_url})**')
-                report_lines.append('')
-                report_lines.append('</div>')
-                report_lines.append('')
-                logger.info(f"Added Gist button/link to comment: {gist_url}")
+                # Add prominent HTML report link section
+                report_lines.append("")
+                report_lines.append("---")
+                report_lines.append("")
+                report_lines.append("## 📊 Interactive HTML Report")
+                report_lines.append("")
+                report_lines.append(f"### 🔗 **[CLICK HERE to open the Interactive HTML Report]({gist_url})**")
+                report_lines.append("")
+                report_lines.append("*Opens in a new tab with full analysis details and interactive features*")
+                report_lines.append("")
+                report_lines.append("---")
+                report_lines.append("")
+                logger.info(f"Added HTML report link to comment: {gist_url}")
             else:
                 logger.warning("Gist creation failed, falling back to embedded HTML")
                 # Fallback: embed HTML inline if Gist creation failed
