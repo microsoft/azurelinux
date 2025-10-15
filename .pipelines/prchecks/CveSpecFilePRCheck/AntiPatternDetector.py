@@ -98,6 +98,7 @@ class AntiPatternDetector:
             'cve-patch-mismatch': Severity.ERROR,
             'unused-patch-file': Severity.WARNING,
             'patch-without-cve-ref': Severity.WARNING,
+            'incorrect-patch-case': Severity.ERROR,
             
             # CVE related issues
             'missing-cve-reference': Severity.ERROR,
@@ -172,11 +173,28 @@ class AntiPatternDetector:
         
         # Extract patch references from spec file with line numbers
         # Updated regex to handle both simple filenames and full URLs
+        # Made case-insensitive to detect all patch references (we'll flag incorrect case separately)
         patch_regex = r'^Patch(\d+):\s+(.+?)$'
         patch_refs = {}
         
         for line_num, line in enumerate(spec_content.split('\n'), 1):
-            match = re.match(patch_regex, line.strip())
+            # First, check for incorrect lowercase 'patch' usage
+            if line.strip().startswith('patch') and ':' in line:
+                lowercase_match = re.match(r'^patch(\d+):\s+(.+?)$', line.strip())
+                if lowercase_match:
+                    patterns.append(AntiPattern(
+                        id='incorrect-patch-case',
+                        name="Incorrect Patch Reference Case",
+                        description=f"Patch reference uses lowercase 'patch' instead of 'Patch' (RPM spec convention requires uppercase 'P')",
+                        severity=self.severity_map.get('incorrect-patch-case', Severity.ERROR),
+                        file_path=file_path,
+                        line_number=line_num,
+                        context=line.strip(),
+                        recommendation="Change 'patch' to 'Patch' to follow RPM spec file conventions"
+                    ))
+            
+            # Now detect all patch references (case-insensitive) for further validation
+            match = re.match(patch_regex, line.strip(), re.IGNORECASE)
             if match:
                 patch_file = match.group(2).strip()
                 
