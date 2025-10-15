@@ -470,76 +470,261 @@ class ResultAnalyzer:
         
         return "\n".join(content_parts)
     
-    def generate_multi_spec_report(self, analysis_result: 'MultiSpecAnalysisResult') -> str:
+    def _get_severity_emoji(self, severity: Severity) -> str:
+        """Get emoji for severity level."""
+        emoji_map = {
+            Severity.INFO: "✅",
+            Severity.WARNING: "⚠️",
+            Severity.ERROR: "🔴",
+            Severity.CRITICAL: "🔥"
+        }
+        return emoji_map.get(severity, "ℹ️")
+    
+    def generate_html_report(self, analysis_result: 'MultiSpecAnalysisResult') -> str:
         """
-        Generate a comprehensive report for multi-spec analysis results.
+        Generate an interactive HTML report with dark theme and expandable sections.
         
         Args:
             analysis_result: MultiSpecAnalysisResult with all spec data
             
         Returns:
-            Formatted report string organized by package
+            HTML string with embedded CSS and JavaScript for interactivity
+        """
+        stats = analysis_result.summary_statistics
+        severity_color = self._get_severity_color(analysis_result.overall_severity)
+        
+        html = f"""
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; border-radius: 6px; border: 1px solid #30363d;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h2 style="color: {severity_color}; margin: 0;">
+            {self._get_severity_emoji(analysis_result.overall_severity)} CVE Spec File Analysis Report
+        </h2>
+        <p style="color: #8b949e; margin: 5px 0; font-size: 12px;">
+            Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
+        </p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px;">
+        <div style="background: #161b22; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #30363d;">
+            <div style="font-size: 24px; font-weight: bold; color: #58a6ff;">{stats['total_specs']}</div>
+            <div style="font-size: 12px; color: #8b949e;">Specs Analyzed</div>
+        </div>
+        <div style="background: #161b22; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #30363d;">
+            <div style="font-size: 24px; font-weight: bold; color: #f85149;">{stats['specs_with_errors']}</div>
+            <div style="font-size: 12px; color: #8b949e;">Errors</div>
+        </div>
+        <div style="background: #161b22; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #30363d;">
+            <div style="font-size: 24px; font-weight: bold; color: #d29922;">{stats['specs_with_warnings']}</div>
+            <div style="font-size: 12px; color: #8b949e;">Warnings</div>
+        </div>
+        <div style="background: #161b22; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #30363d;">
+            <div style="font-size: 24px; font-weight: bold; color: #c9d1d9;">{analysis_result.total_issues}</div>
+            <div style="font-size: 12px; color: #8b949e;">Total Issues</div>
+        </div>
+    </div>
+"""
+        
+        # Add package details
+        for spec_result in sorted(analysis_result.spec_results, key=lambda x: x.package_name):
+            pkg_color = self._get_severity_color(spec_result.severity)
+            html += f"""
+    <details style="background: #161b22; border: 1px solid #30363d; border-radius: 6px; margin-bottom: 10px; padding: 10px;">
+        <summary style="cursor: pointer; font-weight: bold; color: {pkg_color}; font-size: 16px; user-select: none;">
+            {self._get_severity_emoji(spec_result.severity)} {spec_result.package_name}
+            <span style="color: #8b949e; font-weight: normal; font-size: 14px;">({spec_result.summary})</span>
+        </summary>
+        <div style="margin-top: 15px; padding-left: 20px;">
+            <div style="margin-bottom: 10px;">
+                <span style="color: #8b949e;">Spec File:</span> <code style="background: #0d1117; padding: 2px 6px; border-radius: 3px; font-size: 12px;">{spec_result.spec_path}</code>
+            </div>
+"""
+            
+            # Anti-patterns section
+            if spec_result.anti_patterns:
+                issues_by_type = spec_result.get_issues_by_type()
+                html += """
+            <details style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px; margin: 10px 0; padding: 10px;">
+                <summary style="cursor: pointer; font-weight: bold; color: #f85149; user-select: none;">
+                    🐛 Anti-Patterns Detected
+                </summary>
+                <div style="margin-top: 10px;">
+"""
+                for issue_type, patterns in issues_by_type.items():
+                    html += f"""
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-weight: bold; color: #d29922; margin-bottom: 5px;">
+                            {issue_type} <span style="background: #0d1117; padding: 2px 8px; border-radius: 10px; font-size: 11px; color: #8b949e;">×{len(patterns)}</span>
+                        </div>
+                        <ul style="margin: 5px 0; padding-left: 20px; list-style-type: disc;">
+"""
+                    for pattern in patterns:
+                        html += f"""
+                            <li style="color: #c9d1d9; margin: 5px 0; font-size: 13px;">{pattern.description}</li>
+"""
+                    html += """
+                        </ul>
+                    </div>
+"""
+                html += """
+                </div>
+            </details>
+"""
+            
+            # Recommended actions
+            recommendations = set()
+            for pattern in spec_result.anti_patterns:
+                if pattern.severity >= Severity.ERROR:
+                    recommendations.add(pattern.recommendation)
+            
+            if recommendations:
+                html += """
+            <details style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px; margin: 10px 0; padding: 10px;">
+                <summary style="cursor: pointer; font-weight: bold; color: #3fb950; user-select: none;">
+                    ✅ Recommended Actions
+                </summary>
+                <ul style="margin: 10px 0; padding-left: 20px; list-style-type: none;">
+"""
+                for rec in recommendations:
+                    html += f"""
+                    <li style="color: #c9d1d9; margin: 5px 0; font-size: 13px;">
+                        <span style="color: #3fb950;">▸</span> {rec}
+                    </li>
+"""
+                html += """
+                </ul>
+            </details>
+"""
+            
+            html += """
+        </div>
+    </details>
+"""
+        
+        html += """
+</div>
+"""
+        return html
+    
+    def _get_severity_color(self, severity: Severity) -> str:
+        """Get color code for severity level (dark theme)."""
+        color_map = {
+            Severity.INFO: "#3fb950",      # Green
+            Severity.WARNING: "#d29922",   # Yellow
+            Severity.ERROR: "#f85149",     # Red
+            Severity.CRITICAL: "#ff6b6b"   # Bright red
+        }
+        return color_map.get(severity, "#8b949e")
+    
+    def generate_multi_spec_report(self, analysis_result: 'MultiSpecAnalysisResult', include_html: bool = True) -> str:
+        """
+        Generate a comprehensive report for multi-spec analysis results with enhanced formatting.
+        
+        Args:
+            analysis_result: MultiSpecAnalysisResult with all spec data
+            include_html: Whether to include interactive HTML report at the top
+            
+        Returns:
+            Formatted GitHub markdown report with optional HTML section
         """
         report_lines = []
         
-        # Header
-        report_lines.append("=" * 80)
-        report_lines.append("CVE SPEC FILE CHECK - ANALYSIS REPORT")
-        report_lines.append("=" * 80)
-        report_lines.append(f"Generated: {datetime.now().isoformat()}")
+        # Add HTML report at the top if requested
+        if include_html:
+            html_report = self.generate_html_report(analysis_result)
+            report_lines.append("<details>")
+            report_lines.append("<summary>📊 <b>Interactive HTML Report</b> (Click to expand)</summary>")
+            report_lines.append("")
+            report_lines.append(html_report)
+            report_lines.append("</details>")
+            report_lines.append("")
+        
+        # Get severity emoji
+        severity_emoji = self._get_severity_emoji(analysis_result.overall_severity)
+        severity_name = analysis_result.overall_severity.name
+        
+        # Header with emoji and severity
+        if analysis_result.overall_severity >= Severity.ERROR:
+            report_lines.append(f"# {severity_emoji} CVE Spec File Check - **FAILED**")
+        elif analysis_result.overall_severity == Severity.WARNING:
+            report_lines.append(f"# {severity_emoji} CVE Spec File Check - **PASSED WITH WARNINGS**")
+        else:
+            report_lines.append(f"# {severity_emoji} CVE Spec File Check - **PASSED**")
+        
+        report_lines.append("")
+        report_lines.append(f"**Overall Severity:** {severity_emoji} **{severity_name}**")
+        report_lines.append(f"*Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}*")
+        report_lines.append("")
+        report_lines.append("---")
         report_lines.append("")
         
         # Executive Summary
-        report_lines.append("EXECUTIVE SUMMARY")
-        report_lines.append("-" * 40)
+        report_lines.append("## 📋 Executive Summary")
+        report_lines.append("")
         stats = analysis_result.summary_statistics
-        report_lines.append(f"Total Spec Files Analyzed: {stats['total_specs']}")
-        report_lines.append(f"Specs with Errors: {stats['specs_with_errors']}")
-        report_lines.append(f"Specs with Warnings: {stats['specs_with_warnings']}")
-        report_lines.append(f"Total Issues Found: {analysis_result.total_issues}")
-        report_lines.append(f"Overall Severity: {analysis_result.overall_severity.name}")
+        report_lines.append(f"| Metric | Count |")
+        report_lines.append(f"|--------|-------|")
+        report_lines.append(f"| **Total Spec Files Analyzed** | {stats['total_specs']} |")
+        report_lines.append(f"| **Specs with Errors** | 🔴 {stats['specs_with_errors']} |")
+        report_lines.append(f"| **Specs with Warnings** | ⚠️ {stats['specs_with_warnings']} |")
+        report_lines.append(f"| **Total Issues Found** | {analysis_result.total_issues} |")
         report_lines.append("")
         
         # Package-by-package breakdown
-        report_lines.append("PACKAGE ANALYSIS DETAILS")
-        report_lines.append("-" * 40)
+        report_lines.append("## 📦 Package Analysis Details")
+        report_lines.append("")
         
         for spec_result in sorted(analysis_result.spec_results, 
                                   key=lambda x: x.package_name):
+            pkg_emoji = self._get_severity_emoji(spec_result.severity)
+            report_lines.append(f"### {pkg_emoji} **{spec_result.package_name}**")
             report_lines.append("")
-            report_lines.append(f"Package: {spec_result.package_name}")
-            report_lines.append(f"Spec File: {spec_result.spec_path}")
-            report_lines.append(f"Status: {spec_result.severity.name}")
-            report_lines.append(f"Issues: {spec_result.summary}")
+            report_lines.append(f"- **Spec File:** `{spec_result.spec_path}`")
+            report_lines.append(f"- **Status:** {pkg_emoji} **{spec_result.severity.name}**")
+            report_lines.append(f"- **Issues:** {spec_result.summary}")
+            report_lines.append("")
             
             if spec_result.anti_patterns:
-                report_lines.append("\n  Anti-Patterns Detected:")
+                report_lines.append("<details>")
+                report_lines.append("<summary>🐛 <b>Anti-Patterns Detected</b> (Click to expand)</summary>")
+                report_lines.append("")
                 
                 # Group by type
                 issues_by_type = spec_result.get_issues_by_type()
                 for issue_type, patterns in issues_by_type.items():
-                    report_lines.append(f"    - {issue_type}: {len(patterns)} occurrence(s)")
-                    for pattern in patterns[:3]:  # Show first 3 of each type
-                        report_lines.append(f"      • {pattern.description[:80]}...")
-                    if len(patterns) > 3:
-                        report_lines.append(f"      ... and {len(patterns) - 3} more")
+                    report_lines.append(f"#### `{issue_type}` - {len(patterns)} occurrence(s)")
+                    report_lines.append("")
+                    for i, pattern in enumerate(patterns, 1):
+                        # Truncate long descriptions
+                        desc = pattern.description if len(pattern.description) <= 100 else pattern.description[:97] + "..."
+                        report_lines.append(f"{i}. {desc}")
+                    report_lines.append("")
+                
+                report_lines.append("</details>")
+                report_lines.append("")
             
             if spec_result.ai_analysis:
-                report_lines.append("\n  AI Analysis Summary:")
-                # Take first 3 lines of AI analysis
-                ai_lines = spec_result.ai_analysis.split('\n')[:3]
+                report_lines.append("<details>")
+                report_lines.append("<summary>🤖 <b>AI Analysis Summary</b></summary>")
+                report_lines.append("")
+                # Take first 5 lines of AI analysis
+                ai_lines = spec_result.ai_analysis.split('\n')[:5]
                 for line in ai_lines:
                     if line.strip():
-                        report_lines.append(f"    {line[:80]}...")
+                        report_lines.append(line)
+                report_lines.append("")
+                report_lines.append("</details>")
+                report_lines.append("")
         
         # Recommendations
         if analysis_result.get_failed_specs():
+            report_lines.append("---")
             report_lines.append("")
-            report_lines.append("RECOMMENDED ACTIONS")
-            report_lines.append("-" * 40)
+            report_lines.append("## ✅ Recommended Actions")
+            report_lines.append("")
             
             for spec_result in analysis_result.get_failed_specs():
-                report_lines.append(f"\n{spec_result.package_name}:")
+                report_lines.append(f"### **{spec_result.package_name}**")
+                report_lines.append("")
                 
                 # Get unique recommendations
                 recommendations = set()
@@ -548,13 +733,12 @@ class ResultAnalyzer:
                         recommendations.add(pattern.recommendation)
                 
                 for rec in recommendations:
-                    report_lines.append(f"  • {rec}")
+                    report_lines.append(f"- [ ] {rec}")
+                report_lines.append("")
         
         # Footer
-        report_lines.append("")
-        report_lines.append("=" * 80)
-        report_lines.append("END OF REPORT")
-        report_lines.append("=" * 80)
+        report_lines.append("---")
+        report_lines.append("*🤖 Automated CVE Spec File Check | Azure Linux PR Pipeline*")
         
         return '\n'.join(report_lines)
 

@@ -747,8 +747,8 @@ def main():
     # Generate and save reports
     analyzer = ResultAnalyzer()
     
-    # Generate text report
-    text_report = analyzer.generate_multi_spec_report(analysis_result)
+    # Generate text report (without HTML for plain text file)
+    text_report = analyzer.generate_multi_spec_report(analysis_result, include_html=False)
     print("\n" + text_report)
     
     # Save to file
@@ -765,9 +765,9 @@ def main():
             pr_number = int(os.environ.get("GITHUB_PR_NUMBER", "0"))
             
             if pr_number:
-                # Format and post organized comment
+                # Format and post organized comment (with interactive HTML report)
                 logger.info(f"Posting GitHub comment to PR #{pr_number}")
-                comment_text = analyzer.generate_multi_spec_report(analysis_result)
+                comment_text = analyzer.generate_multi_spec_report(analysis_result, include_html=True)
                 success = github_client.post_pr_comment(comment_text)
                 
                 if success:
