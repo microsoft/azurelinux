@@ -765,8 +765,16 @@ def main():
             pr_number = int(os.environ.get("GITHUB_PR_NUMBER", "0"))
             
             if pr_number:
-                # Post organized comment
-                github_client.post_pr_comment(pr_number, analysis_result)
+                logger.info(f"Posting GitHub comment to PR #{pr_number}")
+                
+                # Format and post organized comment
+                comment = github_client.format_multi_spec_comment(analysis_result)
+                success = github_client.post_comment(pr_number, comment)
+                
+                if success:
+                    logger.info("Successfully posted GitHub comment")
+                else:
+                    logger.warning("Failed to post GitHub comment")
                 
                 # Update checks API if enabled
                 if os.environ.get("USE_CHECKS_API", "false").lower() == "true":
@@ -775,8 +783,10 @@ def main():
                         analysis_result.overall_severity,
                         analysis_result.summary_statistics
                     )
+            else:
+                logger.warning("GITHUB_PR_NUMBER not set, skipping GitHub comment")
         except Exception as e:
-            logger.error(f"Failed to update GitHub status: {e}")
+            logger.error(f"Failed to update GitHub status: {e}", exc_info=True)
     
     # Return appropriate exit code
     return get_severity_exit_code(analysis_result.overall_severity)

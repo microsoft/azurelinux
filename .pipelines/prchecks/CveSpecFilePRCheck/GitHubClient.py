@@ -56,7 +56,8 @@ class GitHubClient:
     
     def __init__(self):
         """Initialize the GitHub client with authentication."""
-        self.token = os.environ.get('GITHUB_TOKEN')
+        # Try GITHUB_TOKEN first, then fall back to SYSTEM_ACCESSTOKEN (for ADO)
+        self.token = os.environ.get('GITHUB_TOKEN') or os.environ.get('SYSTEM_ACCESSTOKEN')
         self.repo = os.environ.get('GITHUB_REPOSITORY', 'microsoft/azurelinux')
         self.api_base = 'https://api.github.com'
         

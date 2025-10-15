@@ -1,12 +1,12 @@
 {
-  "timestamp": "2025-10-14T17:34:56.229698",
+  "timestamp": "2025-10-14T18:15:21.601167",
   "overall_severity": "ERROR",
-  "total_issues": 8,
+  "total_issues": 9,
   "summary_statistics": {
     "total_specs": 1,
     "specs_with_errors": 1,
     "specs_with_warnings": 0,
-    "total_errors": 4,
+    "total_errors": 5,
     "total_warnings": 4
   },
   "spec_results": [
@@ -14,7 +14,7 @@
       "spec_path": "SPECS/azcopy/azcopy.spec",
       "package_name": "azcopy",
       "severity": "ERROR",
-      "summary": "4 errors, 4 warnings",
+      "summary": "5 errors, 4 warnings",
       "anti_patterns": [
         {
           "id": "unused-patch-file",
@@ -79,6 +79,14 @@
           "severity": "ERROR",
           "line_number": null,
           "recommendation": "Add CVE-2025-22868 to the spec file changelog entry"
+        },
+        {
+          "id": "missing-cve-in-changelog",
+          "name": "Missing CVE in Changelog",
+          "description": "CVE-2025-1111 is referenced in the spec file but not mentioned in any changelog entry",
+          "severity": "ERROR",
+          "line_number": null,
+          "recommendation": "Add CVE-2025-1111 to a changelog entry"
         }
       ],
       "ai_analysis": ""
