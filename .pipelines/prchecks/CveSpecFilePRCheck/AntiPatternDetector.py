@@ -130,7 +130,7 @@ class AntiPatternDetector:
         all_patterns = []
         
         # Run each detection method and collect results
-        all_patterns.extend(self.detect_patch_file_issues(file_path, file_content, file_list))
+        all_patterns.extend(self.detect_patch_file_issues(file_content, file_path, file_list))
         all_patterns.extend(self.detect_cve_issues(file_path, file_content))
         all_patterns.extend(self.detect_changelog_issues(file_path, file_content))
         
