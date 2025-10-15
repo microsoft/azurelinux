@@ -743,6 +743,11 @@ class ResultAnalyzer:
             report_lines.append(f"- **Issues:** {spec_result.summary}")
             report_lines.append("")
             
+            # Finer delimiter before anti-patterns
+            if spec_result.anti_patterns or spec_result.ai_analysis or spec_result.severity >= Severity.ERROR:
+                report_lines.append("***")
+                report_lines.append("")
+            
             # Anti-patterns section
             if spec_result.anti_patterns:
                 report_lines.append("<details open>")
@@ -767,6 +772,11 @@ class ResultAnalyzer:
                 
                 report_lines.append("</details>")
                 report_lines.append("")
+                
+                # Delimiter after anti-patterns if more content follows
+                if spec_result.ai_analysis or spec_result.severity >= Severity.ERROR:
+                    report_lines.append("***")
+                    report_lines.append("")
             
             # AI Analysis section
             if spec_result.ai_analysis:
@@ -781,6 +791,11 @@ class ResultAnalyzer:
                 report_lines.append("")
                 report_lines.append("</details>")
                 report_lines.append("")
+                
+                # Delimiter after AI analysis if recommended actions follow
+                if spec_result.severity >= Severity.ERROR:
+                    report_lines.append("***")
+                    report_lines.append("")
             
             # Per-spec Recommended Actions
             if spec_result.severity >= Severity.ERROR:
