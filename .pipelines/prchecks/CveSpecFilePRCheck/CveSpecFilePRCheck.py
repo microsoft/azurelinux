@@ -337,16 +337,18 @@ def analyze_spec_files(diff_text, changed_spec_files):
         file_list = get_package_directory_files(spec_file)
         package_name = extract_package_name(spec_content, spec_file)
         
-        # Create result container for this spec
-        spec_result = SpecFileResult(
-            spec_path=spec_file,
-            package_name=package_name
-        )
-        
         # Run anti-pattern detection
         analyzer = AntiPatternDetector(repo_root=".")
-        spec_result.anti_patterns = analyzer.detect_all(
+        anti_patterns = analyzer.detect_all(
             spec_file, spec_content, file_list
+        )
+        
+        # Create result container for this spec WITH anti_patterns
+        # so __post_init__() can calculate severity correctly
+        spec_result = SpecFileResult(
+            spec_path=spec_file,
+            package_name=package_name,
+            anti_patterns=anti_patterns
         )
         
         # Run AI analysis if enabled and configured
@@ -704,6 +706,24 @@ def main():
     
     Enhanced to handle organized multi-spec results.
     """
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description='CVE Spec File PR Check')
+    parser.add_argument('--post-github-comments', action='store_true',
+                       help='Enable posting comments to GitHub PR')
+    parser.add_argument('--use-github-checks', action='store_true',
+                       help='Enable GitHub Checks API integration')
+    parser.add_argument('--fail-on-warnings', action='store_true',
+                       help='Fail the check if warnings are found')
+    parser.add_argument('--exit-code-severity', action='store_true',
+                       help='Use severity-based exit codes')
+    args = parser.parse_args()
+    
+    # Map command-line flags to environment variables for backward compatibility
+    if args.post_github_comments:
+        os.environ["UPDATE_GITHUB_STATUS"] = "true"
+    if args.use_github_checks:
+        os.environ["USE_CHECKS_API"] = "true"
+    
     logger.info("Starting CVE Spec File PR Check")
     
     # Gather diff
