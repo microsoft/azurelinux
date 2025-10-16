@@ -615,23 +615,26 @@ class ResultAnalyzer:
         }
         return color_map.get(severity, "#8b949e")
     
-    def generate_multi_spec_report(self, analysis_result: 'MultiSpecAnalysisResult', include_html: bool = True, github_client = None) -> str:
+    def generate_multi_spec_report(self, analysis_result: 'MultiSpecAnalysisResult', include_html: bool = True, 
+                                   github_client = None, blob_storage_client = None, pr_number: int = None) -> str:
         """
         Generate a comprehensive report for multi-spec analysis results with enhanced formatting.
         
         Args:
             analysis_result: MultiSpecAnalysisResult with all spec data
             include_html: Whether to include interactive HTML report at the top
-            github_client: Optional GitHubClient instance for creating Gist with HTML report
+            github_client: Optional GitHubClient instance for creating Gist with HTML report (fallback)
+            blob_storage_client: Optional BlobStorageClient for uploading to Azure Blob Storage (preferred)
+            pr_number: PR number for blob storage upload (required if blob_storage_client provided)
             
         Returns:
             Formatted GitHub markdown report with optional HTML section
         """
         report_lines = []
         
-        # Add HTML report as a Gist link if GitHub client is provided
-        # Note: HTML embedding disabled until Azure Blob Storage is configured
-        if include_html and github_client:
+        # Add HTML report - try blob storage first, fall back to Gist
+        # Note: Blob storage preferred for production, Gist as fallback
+        if include_html and (blob_storage_client or github_client):
             html_report = self.generate_html_report(analysis_result)
             
             # Create a self-contained HTML page
@@ -656,30 +659,50 @@ class ResultAnalyzer:
 </body>
 </html>"""
             
-            # Create Gist and get URL
-            gist_url = github_client.create_gist(
-                filename="cve-spec-check-report.html",
-                content=html_page,
-                description=f"CVE Spec File Check Report - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-            )
+            html_url = None
             
-            if gist_url:
+            # Try blob storage first (preferred for production with UMI)
+            if blob_storage_client and pr_number:
+                try:
+                    logger.info("Attempting to upload HTML report to Azure Blob Storage...")
+                    html_url = blob_storage_client.upload_html(
+                        pr_number=pr_number,
+                        html_content=html_page
+                    )
+                    if html_url:
+                        logger.info(f"✅ HTML report uploaded to blob storage: {html_url}")
+                except Exception as e:
+                    logger.warning(f"Blob storage upload failed, will try Gist fallback: {e}")
+                    html_url = None
+            
+            # Fall back to Gist if blob storage failed or not available
+            if not html_url and github_client:
+                logger.info("Using Gist for HTML report (blob storage not available or failed)")
+                html_url = github_client.create_gist(
+                    filename="cve-spec-check-report.html",
+                    content=html_page,
+                    description=f"CVE Spec File Check Report - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                )
+                if html_url:
+                    logger.info(f"✅ HTML report uploaded to Gist: {html_url}")
+            
+            if html_url:
                 # Add prominent HTML report link section
                 report_lines.append("")
                 report_lines.append("---")
                 report_lines.append("")
                 report_lines.append("## 📊 Interactive HTML Report")
                 report_lines.append("")
-                report_lines.append(f"### 🔗 **[CLICK HERE to open the Interactive HTML Report]({gist_url})**")
+                report_lines.append(f"### 🔗 **[CLICK HERE to open the Interactive HTML Report]({html_url})**")
                 report_lines.append("")
                 report_lines.append("*Opens in a new tab with full analysis details and interactive features*")
                 report_lines.append("")
                 report_lines.append("---")
                 report_lines.append("")
-                logger.info(f"Added HTML report link to comment: {gist_url}")
+                logger.info(f"Added HTML report link to comment: {html_url}")
             else:
-                logger.warning("Gist creation failed, skipping HTML report section (waiting for Azure Blob Storage setup)")
-                # TODO: Replace with Azure Blob Storage upload once configured
+                logger.warning("Both blob storage and Gist failed - skipping HTML report section")
+                # No HTML report section added if both methods fail
         
         # Get severity emoji
         severity_emoji = self._get_severity_emoji(analysis_result.overall_severity)

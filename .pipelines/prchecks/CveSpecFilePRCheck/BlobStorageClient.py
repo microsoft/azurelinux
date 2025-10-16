@@ -1,0 +1,247 @@
+#!/usr/bin/env python3
+"""
+BlobStorageClient.py
+Azure Blob Storage client for uploading analysis reports and HTML files.
+Uses User Managed Identity (UMI) authentication via DefaultAzureCredential.
+"""
+
+import logging
+from datetime import datetime
+from typing import Optional
+from azure.storage.blob import BlobServiceClient, ContentSettings
+from azure.identity import DefaultAzureCredential
+from azure.core.exceptions import AzureError
+
+logger = logging.getLogger(__name__)
+
+
+class BlobStorageClient:
+    """
+    Client for uploading analysis data and HTML reports to Azure Blob Storage.
+    
+    Uses DefaultAzureCredential which automatically detects:
+    - Managed Identity (UMI/SMI) in Azure environments (e.g., Azure DevOps agents)
+    - Azure CLI credentials for local development
+    - Environment variables (AZURE_CLIENT_ID, AZURE_TENANT_ID, etc.)
+    """
+    
+    def __init__(self, storage_account_name: str, container_name: str):
+        """
+        Initialize the Blob Storage client.
+        
+        Args:
+            storage_account_name: Name of the Azure Storage account (e.g., 'radarblobstore')
+            container_name: Name of the container (e.g., 'radarcontainer')
+        """
+        self.storage_account_name = storage_account_name
+        self.container_name = container_name
+        self.account_url = f"https://{storage_account_name}.blob.core.windows.net"
+        
+        # Initialize credential (will use UMI in pipeline, Azure CLI locally)
+        self.credential = DefaultAzureCredential()
+        
+        # Initialize blob service client
+        self.blob_service_client = BlobServiceClient(
+            account_url=self.account_url,
+            credential=self.credential
+        )
+        
+        logger.info(f"Initialized BlobStorageClient for {self.account_url}/{container_name}")
+    
+    def upload_html(
+        self,
+        pr_number: int,
+        html_content: str,
+        timestamp: Optional[datetime] = None
+    ) -> Optional[str]:
+        """
+        Upload HTML report to blob storage.
+        
+        Args:
+            pr_number: GitHub PR number
+            html_content: HTML content as string
+            timestamp: Timestamp for the report (defaults to now)
+            
+        Returns:
+            Public URL of the uploaded blob, or None if upload failed
+        """
+        if timestamp is None:
+            timestamp = datetime.utcnow()
+        
+        # Format: PR-12345/report-2025-10-15T203450Z.html
+        timestamp_str = timestamp.strftime("%Y-%m-%dT%H%M%SZ")
+        blob_name = f"PR-{pr_number}/report-{timestamp_str}.html"
+        
+        try:
+            logger.info(f"Uploading HTML report to blob: {blob_name}")
+            
+            # Get blob client
+            blob_client = self.blob_service_client.get_blob_client(
+                container=self.container_name,
+                blob=blob_name
+            )
+            
+            # Set content type for HTML
+            content_settings = ContentSettings(content_type='text/html; charset=utf-8')
+            
+            # Upload
+            blob_client.upload_blob(
+                data=html_content,
+                content_settings=content_settings,
+                overwrite=True
+            )
+            
+            # Generate public URL
+            blob_url = f"{self.account_url}/{self.container_name}/{blob_name}"
+            logger.info(f"✅ HTML report uploaded successfully: {blob_url}")
+            
+            return blob_url
+            
+        except AzureError as e:
+            logger.error(f"❌ Failed to upload HTML report: {str(e)}")
+            logger.exception(e)
+            return None
+        except Exception as e:
+            logger.error(f"❌ Unexpected error uploading HTML report: {str(e)}")
+            logger.exception(e)
+            return None
+    
+    def upload_json(
+        self,
+        pr_number: int,
+        json_data: str,
+        timestamp: Optional[datetime] = None,
+        filename_prefix: str = "analysis"
+    ) -> Optional[str]:
+        """
+        Upload JSON analytics data to blob storage.
+        
+        Args:
+            pr_number: GitHub PR number
+            json_data: JSON content as string
+            timestamp: Timestamp for the data (defaults to now)
+            filename_prefix: Prefix for the JSON filename (e.g., 'analysis', 'feedback')
+            
+        Returns:
+            Public URL of the uploaded blob, or None if upload failed
+        """
+        if timestamp is None:
+            timestamp = datetime.utcnow()
+        
+        # Format: PR-12345/analysis-2025-10-15T203450Z.json
+        timestamp_str = timestamp.strftime("%Y-%m-%dT%H%M%SZ")
+        blob_name = f"PR-{pr_number}/{filename_prefix}-{timestamp_str}.json"
+        
+        try:
+            logger.info(f"Uploading JSON data to blob: {blob_name}")
+            
+            # Get blob client
+            blob_client = self.blob_service_client.get_blob_client(
+                container=self.container_name,
+                blob=blob_name
+            )
+            
+            # Set content type for JSON
+            content_settings = ContentSettings(content_type='application/json; charset=utf-8')
+            
+            # Upload
+            blob_client.upload_blob(
+                data=json_data,
+                content_settings=content_settings,
+                overwrite=True
+            )
+            
+            # Generate public URL
+            blob_url = f"{self.account_url}/{self.container_name}/{blob_name}"
+            logger.info(f"✅ JSON data uploaded successfully: {blob_url}")
+            
+            return blob_url
+            
+        except AzureError as e:
+            logger.error(f"❌ Failed to upload JSON data: {str(e)}")
+            logger.exception(e)
+            return None
+        except Exception as e:
+            logger.error(f"❌ Unexpected error uploading JSON data: {str(e)}")
+            logger.exception(e)
+            return None
+    
+    def generate_blob_url(self, pr_number: int, filename: str) -> str:
+        """
+        Generate a public blob URL for a given PR and filename.
+        
+        Args:
+            pr_number: GitHub PR number
+            filename: Filename within the PR folder
+            
+        Returns:
+            Public URL to the blob
+        """
+        blob_name = f"PR-{pr_number}/{filename}"
+        return f"{self.account_url}/{self.container_name}/{blob_name}"
+    
+    def test_connection(self) -> bool:
+        """
+        Test the connection to blob storage and verify permissions.
+        
+        Returns:
+            True if connection and permissions are OK, False otherwise
+        """
+        try:
+            logger.info("Testing blob storage connection and permissions...")
+            
+            # Try to get container properties (requires read permission)
+            container_client = self.blob_service_client.get_container_client(self.container_name)
+            properties = container_client.get_container_properties()
+            
+            logger.info(f"✅ Successfully connected to container: {self.container_name}")
+            logger.info(f"   Container last modified: {properties.last_modified}")
+            
+            return True
+            
+        except AzureError as e:
+            logger.error(f"❌ Failed to connect to blob storage: {str(e)}")
+            logger.error("   This usually means:")
+            logger.error("   1. UMI doesn't have 'Storage Blob Data Contributor' role")
+            logger.error("   2. Container doesn't exist")
+            logger.error("   3. Network/firewall issues")
+            logger.exception(e)
+            return False
+        except Exception as e:
+            logger.error(f"❌ Unexpected error testing connection: {str(e)}")
+            logger.exception(e)
+            return False
+
+
+# Example usage
+if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    
+    # Initialize client
+    client = BlobStorageClient(
+        storage_account_name="radarblobstore",
+        container_name="radarcontainer"
+    )
+    
+    # Test connection
+    if client.test_connection():
+        print("✅ Blob storage connection test passed!")
+        
+        # Test upload
+        test_html = "<html><body><h1>Test Report</h1></body></html>"
+        html_url = client.upload_html(pr_number=99999, html_content=test_html)
+        
+        if html_url:
+            print(f"✅ Test HTML uploaded: {html_url}")
+        
+        test_json = '{"test": true, "pr_number": 99999}'
+        json_url = client.upload_json(pr_number=99999, json_data=test_json)
+        
+        if json_url:
+            print(f"✅ Test JSON uploaded: {json_url}")
+    else:
+        print("❌ Blob storage connection test failed!")
+        print("   See MANUAL_ADMIN_STEPS.md for required Azure configuration")
