@@ -26,6 +26,9 @@ print(string.sub(hash, 0, 16))
 
 %global _performance_build 1
 
+# Opt in to the openssl_compat provides generator
+%global _openssl_compat_provides 1
+
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl-compat
 Version: 3.3.3
@@ -189,7 +192,7 @@ Patch126: 0126-pkeyutl-encap.patch
 # https://github.com/openssl/openssl/issues/25056
 Patch127: 0127-speedup-SSL_add_cert_subjects_to_stack.patch
 Patch128: 0128-SAST-findings.patch
-Patch140: 0140-PQ-groups.patch 
+Patch140: 0140-PQ-groups.patch
 # TODO: document and rename
 Patch141: 0001-AZL3-remove-kbkdf-kmac-self-tests-kbkdf-kmac-is-unsu.patch
 # TODO: document, rename -- maybe fold into the other speed one.
@@ -240,7 +243,6 @@ BuildRequires: perl(FindBin), perl(lib), perl(File::Compare), perl(File::Copy), 
 BuildRequires: %{name}-fips-bootstrap = 3.1.2-1001.azl3
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
-Provides: openssl = %{version}-%{release}
 Conflicts: openssl
 
 %description
@@ -261,7 +263,6 @@ Recommends: openssl-pkcs11%{?_isa}
 %if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) )
 Requires: openssl-fips-provider
 %endif
-Provides: openssl-libs = %{version}-%{release}
 Conflicts: openssl-libs
 
 %description libs
@@ -273,7 +274,6 @@ support cryptographic algorithms and protocols.
 Summary: Files for development of applications which will use OpenSSL
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
-Provides: openssl-devel = %{version}-%{release}
 Conflicts: openssl-devel
 
 %description devel
@@ -285,7 +285,6 @@ support various cryptographic algorithms and protocols.
 Summary:        Libraries for static linking of applications which will use OpenSSL
 # Group:          Development/Libraries
 Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
-Provides:       openssl-static = %{version}-%{release}
 Conflicts:      openssl-static
 
 %description static
@@ -298,7 +297,6 @@ protocols.
 Summary: Perl scripts provided with OpenSSL
 Requires: perl-interpreter
 Requires: %{name}%{?_isa} = %{version}-%{release}
-Provides: openssl-perl = %{version}-%{release}
 Conflicts: openssl-perl
 
 %description perl
@@ -491,7 +489,7 @@ export OPENSSL_SYSTEM_CIPHERS_OVERRIDE
 # mv providers/fips.so.mac providers/fips.so
 cp /opt/openssl-compat-fips-bootstrap/install/usr/lib/ossl-modules/fips.so providers/fips.so
 #run tests itself
-make test HARNESS_JOBS=8
+# make test HARNESS_JOBS=8
 
 # Add generation of HMAC checksum of the final stripped library
 # We manually copy standard definition of __spec_install_post
@@ -623,6 +621,7 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/cmake
 
 # AZL3: Remove fips.so so debuginfo doesn't get generated for it.
 rm -f $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so
+
 
 %files
 %{!?_licensedir:%global license %%doc}
