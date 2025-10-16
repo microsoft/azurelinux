@@ -256,6 +256,14 @@ fi
 %if "%{KMP}" != "1"
 # We create the module package only for the x86_64 kernel
 %ifarch x86_64
+%post modules
+/sbin/depmod %{KVERSION}
+
+%postun modules
+if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
+	/sbin/depmod %{KVERSION}
+fi
+
 %files modules
 %{moduledir}/xpmem.ko
 %license COPYING COPYING.LESSER
@@ -265,6 +273,7 @@ fi
 %changelog
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-21
 - Adjusted package dependencies on user space components.
+- Align %%post* scripts with other kmod packages.
 
 * Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 2.7.4-20
 - Add kernel version and release nb into release nb

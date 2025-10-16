@@ -79,6 +79,14 @@ cp -rp ./. %{buildroot}/
 
 popd
 
+%post -n %{_name}
+/sbin/depmod %{KVERSION}
+
+%postun -n %{_name}
+if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
+	/sbin/depmod %{KVERSION}
+fi
+
 %files -n %{_name}
 /lib/modules/%{KVERSION}/updates/xpmem.ko
 %{_datadir}/licenses
@@ -87,6 +95,7 @@ popd
 %changelog
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-21
 - Bump mofed release number
+- Align %%post* scripts with other kmod packages.
 
 * Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 2.7.4-20
 - Add kernel version and release nb into release nb

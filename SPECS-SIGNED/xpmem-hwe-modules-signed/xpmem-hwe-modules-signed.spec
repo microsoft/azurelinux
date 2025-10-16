@@ -86,23 +86,17 @@ popd
 %{_datadir}/licenses
 
 %post -n %{_name}
-depmod %{KVERSION} -a
-/sbin/modprobe -r xpmem > /dev/null 2>&1
-/sbin/modprobe xpmem > /dev/null 2>&1
+depmod %{KVERSION}
 
 %postun -n %{_name}
-if [ "$1" = 0 ]; then
-	if lsmod | grep -qw xpmem; then
-		# If the module fails to unload, give an error,
-		# but don't fail uninstall. User should handle this
-		# Maybe the module is in use
-		rmmod xpmem || :
-	fi
+if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
+	/sbin/depmod %{KVERSION}
 fi
 
 %changelog
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-23_6.12.50.2-1
 - Adjusted package dependencies on user space components.
+- Align %%post* scripts with other kmod packages.
 
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-22_6.12.50.2-1
 - Bump to match kernel-hwe

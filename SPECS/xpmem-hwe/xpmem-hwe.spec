@@ -188,22 +188,15 @@ mkdir -p $RPM_BUILD_ROOT/lib/firmware
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%if "%{KMP}" != "1"
 %post modules
-depmod %{KVERSION} -a
-/sbin/modprobe -r xpmem > /dev/null 2>&1
-/sbin/modprobe xpmem > /dev/null 2>&1
+depmod %{KVERSION}
 
 %postun modules
-if [ "$1" = 0 ]; then
-	if lsmod | grep -qw xpmem; then
-		# If the module fails to unload, give an error,
-		# but don't fail uninstall. User should handle this
-		# Maybe the module is in use
-		rmmod xpmem || :
-	fi
+if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
+	/sbin/depmod %{KVERSION}
 fi
 
-%if "%{KMP}" != "1"
 %files modules
 %{moduledir}/xpmem.ko
 %license COPYING COPYING.LESSER
@@ -212,6 +205,7 @@ fi
 %changelog
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-23_6.12.50.2-1
 - Adjusted package dependencies on user space components.
+- Align %%post* scripts with other kmod packages.
 
 * Fri Oct 03 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-22_6.12.50.2-1
 - Bump to match kernel-hwe
