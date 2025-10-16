@@ -240,6 +240,7 @@ BuildRequires: perl(FindBin), perl(lib), perl(File::Compare), perl(File::Copy), 
 # BuildRequires: git-core
 # BuildRequires: systemtap-sdt-devel
 # Requires: coreutils
+BuildRequires: azurelinux-openssl-compat-generator
 BuildRequires: %{name}-fips-bootstrap = 3.1.2-1001.azl3
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
