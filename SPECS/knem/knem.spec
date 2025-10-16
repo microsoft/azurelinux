@@ -72,7 +72,6 @@ BuildRequires:  binutils
 BuildRequires:  systemd
 BuildRequires:  kmod
 
-Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
 
@@ -120,6 +119,8 @@ EOF)
 %package -n %{non_kmp_pname}
 Summary: KNEM: High-Performance Intra-Node MPI Communication
 Group: System Environment/Libraries
+
+Requires:       kernel = %{target_kernel_version_full}
 
 %description -n %{non_kmp_pname}
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as loading memory copies on to Intel I/OAT hardware.

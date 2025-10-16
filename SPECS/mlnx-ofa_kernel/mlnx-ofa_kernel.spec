@@ -137,7 +137,6 @@ BuildRequires:  libstdc++-devel
 BuildRequires:  libunwind-devel
 BuildRequires:  pkgconfig
 
-Requires: kernel = %{target_kernel_version_full}
 Requires: kmod
 Requires: libstdc++
 Requires: libunwind
@@ -200,6 +199,9 @@ Obsoletes: mlnx-en-sources
 Obsoletes: mlnx-rdma-rxe
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries
+
+Requires: kernel = %{target_kernel_version_full}
+
 %description -n %{non_kmp_pname}
 Core, HW and ULPs kernel modules
 Non-KMP format kernel modules rpm.
