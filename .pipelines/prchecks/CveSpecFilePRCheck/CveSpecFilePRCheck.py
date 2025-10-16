@@ -793,14 +793,6 @@ def main():
                     logger.info(f"Successfully posted comment to PR #{pr_number}")
                 else:
                     logger.warning(f"Failed to post comment to PR #{pr_number}")
-                
-                # Update checks API if enabled
-                if os.environ.get("USE_CHECKS_API", "false").lower() == "true":
-                    github_client.update_check_status(
-                        pr_number,
-                        analysis_result.overall_severity,
-                        analysis_result.summary_statistics
-                    )
         except Exception as e:
             logger.error(f"Failed to update GitHub status: {e}")
     
