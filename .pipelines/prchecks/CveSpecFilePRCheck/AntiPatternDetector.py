@@ -138,6 +138,89 @@ class AntiPatternDetector:
         logger.info(f"Found {len(all_patterns)} anti-patterns in {file_path}")
         return all_patterns
 
+    def _extract_spec_macros(self, spec_content: str) -> dict:
+        """
+        Extract macro definitions from spec file content.
+        
+        Parses the spec file to extract macro values defined via:
+        - Name: package_name
+        - Version: version_number  
+        - Release: release_number
+        - %global macro_name value
+        - %define macro_name value
+        
+        Args:
+            spec_content: Full text content of the spec file
+            
+        Returns:
+            Dictionary mapping macro names to their values
+        """
+        macros = {}
+        
+        for line in spec_content.split('\n'):
+            line = line.strip()
+            
+            # Extract Name, Version, Release
+            if line.startswith('Name:'):
+                macros['name'] = line.split(':', 1)[1].strip()
+            elif line.startswith('Version:'):
+                macros['version'] = line.split(':', 1)[1].strip()
+            elif line.startswith('Release:'):
+                # Remove %{?dist} and similar from release
+                release = line.split(':', 1)[1].strip()
+                release = re.sub(r'%\{[^}]+\}', '', release)  # Remove macros
+                macros['release'] = release.strip()
+            elif line.startswith('Epoch:'):
+                macros['epoch'] = line.split(':', 1)[1].strip()
+            
+            # Extract %global and %define macros
+            global_match = re.match(r'%global\s+(\w+)\s+(.+)', line)
+            if global_match:
+                macros[global_match.group(1)] = global_match.group(2).strip()
+            
+            define_match = re.match(r'%define\s+(\w+)\s+(.+)', line)
+            if define_match:
+                macros[define_match.group(1)] = define_match.group(2).strip()
+        
+        return macros
+    
+    def _expand_macros(self, text: str, macros: dict) -> str:
+        """
+        Expand RPM macros in text using provided macro dictionary.
+        
+        Handles both %{macro_name} and %macro_name formats.
+        Performs recursive expansion (macros can reference other macros).
+        
+        Args:
+            text: Text containing macros to expand
+            macros: Dictionary of macro name -> value mappings
+            
+        Returns:
+            Text with macros expanded
+        """
+        if not text:
+            return text
+        
+        # Maximum iterations to prevent infinite loops
+        max_iterations = 10
+        iteration = 0
+        
+        while iteration < max_iterations:
+            original_text = text
+            
+            # Expand %{macro_name} format
+            for macro_name, macro_value in macros.items():
+                text = text.replace(f'%{{{macro_name}}}', str(macro_value))
+                text = text.replace(f'%{macro_name}', str(macro_value))
+            
+            # If no changes were made, we're done
+            if text == original_text:
+                break
+                
+            iteration += 1
+        
+        return text
+
     def detect_patch_file_issues(self, spec_content: str, file_path: str, file_list: List[str]) -> List[AntiPattern]:
         """
         Detect issues related to patch files in spec files.
@@ -170,6 +253,10 @@ class AntiPatternDetector:
         """
         patterns = []
         
+        # Extract macros from spec file
+        macros = self._extract_spec_macros(spec_content)
+        logger.debug(f"Extracted macros: {macros}")
+        
         # Extract patch references from spec file with line numbers
         # Updated regex to handle both simple filenames and full URLs
         patch_regex = r'^Patch(\d+):\s+(.+?)$'
@@ -180,28 +267,45 @@ class AntiPatternDetector:
             if match:
                 patch_file = match.group(2).strip()
                 
+                # Expand macros in patch filename BEFORE processing
+                patch_file_expanded = self._expand_macros(patch_file, macros)
+                
                 # Extract just the filename from URL if it's a full path
                 # Handle URLs like https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.38-fhs-1.patch
-                if '://' in patch_file:
+                if '://' in patch_file_expanded:
                     # Extract filename from URL (last part after the final /)
-                    patch_file = patch_file.split('/')[-1]
-                elif '/' in patch_file:
+                    patch_file_expanded = patch_file_expanded.split('/')[-1]
+                elif '/' in patch_file_expanded:
                     # Handle relative paths like patches/fix.patch
-                    patch_file = patch_file.split('/')[-1]
+                    patch_file_expanded = patch_file_expanded.split('/')[-1]
                 
-                patch_refs[patch_file] = (line_num, line.strip())
+                # Store both original and expanded for better error messages
+                patch_refs[patch_file_expanded] = {
+                    'line_num': line_num,
+                    'line_content': line.strip(),
+                    'original': patch_file,
+                    'expanded': patch_file_expanded
+                }
         
         # Check for missing patch files (referenced in spec but not in directory)
-        for patch_file, (line_num, line_content) in patch_refs.items():
-            if patch_file not in file_list:
+        for patch_file_expanded, patch_info in patch_refs.items():
+            if patch_file_expanded not in file_list:
+                # Show both original and expanded in description if they differ
+                if patch_info['original'] != patch_info['expanded']:
+                    description = (f"Patch file '{patch_info['original']}' "
+                                 f"(expands to '{patch_file_expanded}') "
+                                 f"referenced in spec but not found in directory")
+                else:
+                    description = f"Patch file '{patch_file_expanded}' referenced in spec but not found in directory"
+                
                 patterns.append(AntiPattern(
                     id='missing-patch-file',
                     name="Missing Patch File",
-                    description=f"Patch file '{patch_file}' referenced in spec but not found in directory",
+                    description=description,
                     severity=self.severity_map.get('missing-patch-file', Severity.ERROR),
                     file_path=file_path,
-                    line_number=line_num,
-                    context=line_content,
+                    line_number=patch_info['line_num'],
+                    context=patch_info['line_content'],
                     recommendation="Add the missing patch file or update the Patch reference"
                 ))
         

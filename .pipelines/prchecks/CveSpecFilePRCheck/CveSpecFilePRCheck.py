@@ -109,6 +109,7 @@ from PromptTemplatesClass import PromptTemplates
 from AntiPatternDetector import AntiPatternDetector, AntiPattern, Severity
 from ResultAnalyzer import ResultAnalyzer
 from GitHubClient import GitHubClient, CheckStatus
+from BlobStorageClient import BlobStorageClient
 
 # Configure logging
 logging.basicConfig(
@@ -747,8 +748,8 @@ def main():
     # Generate and save reports
     analyzer = ResultAnalyzer()
     
-    # Generate text report
-    text_report = analyzer.generate_multi_spec_report(analysis_result)
+    # Generate text report (without HTML for plain text file)
+    text_report = analyzer.generate_multi_spec_report(analysis_result, include_html=False)
     print("\n" + text_report)
     
     # Save to file
@@ -764,24 +765,34 @@ def main():
             github_client = GitHubClient()
             pr_number = int(os.environ.get("GITHUB_PR_NUMBER", "0"))
             
+            # Initialize blob storage client for HTML reports (uses UMI in pipeline)
+            blob_storage_client = None
+            try:
+                blob_storage_client = BlobStorageClient(
+                    storage_account_name="radarblobstore",
+                    container_name="radarcontainer"
+                )
+                logger.info("BlobStorageClient initialized successfully (will use UMI in pipeline)")
+            except Exception as e:
+                logger.warning(f"Failed to initialize BlobStorageClient, will fall back to Gist: {e}")
+                blob_storage_client = None
+            
             if pr_number:
-                # Format and post organized comment
+                # Format and post organized comment (with interactive HTML report via Blob Storage or Gist)
                 logger.info(f"Posting GitHub comment to PR #{pr_number}")
-                comment_text = analyzer.generate_multi_spec_report(analysis_result)
+                comment_text = analyzer.generate_multi_spec_report(
+                    analysis_result, 
+                    include_html=True, 
+                    github_client=github_client,
+                    blob_storage_client=blob_storage_client,
+                    pr_number=pr_number
+                )
                 success = github_client.post_pr_comment(comment_text)
                 
                 if success:
                     logger.info(f"Successfully posted comment to PR #{pr_number}")
                 else:
                     logger.warning(f"Failed to post comment to PR #{pr_number}")
-                
-                # Update checks API if enabled
-                if os.environ.get("USE_CHECKS_API", "false").lower() == "true":
-                    github_client.update_check_status(
-                        pr_number,
-                        analysis_result.overall_severity,
-                        analysis_result.summary_statistics
-                    )
         except Exception as e:
             logger.error(f"Failed to update GitHub status: {e}")
     
