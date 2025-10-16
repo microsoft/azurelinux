@@ -8,7 +8,7 @@ Uses User Managed Identity (UMI) authentication via DefaultAzureCredential.
 import logging
 from datetime import datetime
 from typing import Optional, List
-from azure.storage.blob import BlobServiceClient, ContentSettings, PublicAccess
+from azure.storage.blob import BlobServiceClient, ContentSettings
 from azure.identity import DefaultAzureCredential
 from azure.core.exceptions import AzureError, ResourceNotFoundError
 
@@ -62,15 +62,8 @@ class BlobStorageClient:
         else:
             logger.warning(f"⚠️  BlobStorageClient initialized but connection test failed - blob operations may fail")
         
-        # Run diagnostics
+        # Run diagnostics to verify container configuration
         self._run_diagnostics()
-        
-        # Ensure container exists with public access
-        logger.info(f"📦 Ensuring container exists with public blob access...")
-        if self._ensure_container_exists_with_public_access():
-            logger.info(f"✅ Container is ready for blob uploads")
-        else:
-            logger.error(f"❌ Container setup failed - blobs may not be publicly accessible")
     
     def _run_diagnostics(self):
         """Run diagnostic checks on storage account and container."""
@@ -147,54 +140,6 @@ class BlobStorageClient:
             return False
         except Exception as e:
             logger.error(f"❌ Error checking container status: {e}")
-            logger.exception(e)
-            return False
-    
-    def _ensure_container_exists_with_public_access(self):
-        """
-        Ensure container exists with public blob access.
-        Creates container if it doesn't exist.
-        
-        Returns:
-            True if container exists/was created with public access, False otherwise
-        """
-        try:
-            container_client = self.blob_service_client.get_container_client(self.container_name)
-            
-            # Check if container exists
-            if container_client.exists():
-                logger.info(f"✅ Container '{self.container_name}' already exists")
-                
-                # Check public access level
-                properties = container_client.get_container_properties()
-                public_access = properties.public_access
-                
-                if not public_access or public_access == "None":
-                    logger.warning(f"⚠️  Container exists but has NO public access!")
-                    logger.warning(f"   Attempting to set public access to 'blob' level...")
-                    try:
-                        container_client.set_container_access_policy(public_access=PublicAccess.Blob)
-                        logger.info(f"✅ Public access set to 'blob' level successfully!")
-                        return True
-                    except Exception as set_error:
-                        logger.error(f"❌ Failed to set public access: {set_error}")
-                        logger.error(f"   Manual action required: Set container public access via Azure Portal")
-                        return False
-                else:
-                    logger.info(f"✅ Container has public access: {public_access}")
-                    return True
-            else:
-                # Container doesn't exist - create it with public access
-                logger.warning(f"⚠️  Container '{self.container_name}' does not exist!")
-                logger.info(f"📦 Creating container with blob-level public access...")
-                
-                container_client.create_container(public_access=PublicAccess.Blob)
-                
-                logger.info(f"✅✅✅ Container created successfully with blob-level public access!")
-                return True
-                
-        except Exception as e:
-            logger.error(f"❌ Error ensuring container exists: {e}")
             logger.exception(e)
             return False
     
