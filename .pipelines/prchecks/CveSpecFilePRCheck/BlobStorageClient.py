@@ -7,10 +7,10 @@ Uses User Managed Identity (UMI) authentication via DefaultAzureCredential.
 
 import logging
 from datetime import datetime
-from typing import Optional
-from azure.storage.blob import BlobServiceClient, ContentSettings
+from typing import Optional, List
+from azure.storage.blob import BlobServiceClient, ContentSettings, PublicAccess
 from azure.identity import DefaultAzureCredential
-from azure.core.exceptions import AzureError
+from azure.core.exceptions import AzureError, ResourceNotFoundError
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +61,142 @@ class BlobStorageClient:
             logger.info(f"✅✅✅ BlobStorageClient initialized successfully!")
         else:
             logger.warning(f"⚠️  BlobStorageClient initialized but connection test failed - blob operations may fail")
+        
+        # Run diagnostics
+        self._run_diagnostics()
+        
+        # Ensure container exists with public access
+        logger.info(f"📦 Ensuring container exists with public blob access...")
+        if self._ensure_container_exists_with_public_access():
+            logger.info(f"✅ Container is ready for blob uploads")
+        else:
+            logger.error(f"❌ Container setup failed - blobs may not be publicly accessible")
+    
+    def _run_diagnostics(self):
+        """Run diagnostic checks on storage account and container."""
+        try:
+            logger.info(f"🔍 Running diagnostics on storage account and containers...")
+            
+            # List all containers
+            self._list_all_containers()
+            
+            # Check if our target container exists and its public access level
+            self._check_container_status()
+            
+        except Exception as e:
+            logger.error(f"❌ Error during diagnostics: {e}")
+            logger.exception(e)
+    
+    def _list_all_containers(self):
+        """List all containers in the storage account (diagnostic)."""
+        try:
+            logger.info(f"📦 Listing all containers in storage account '{self.storage_account_name}':")
+            
+            containers = list(self.blob_service_client.list_containers())
+            
+            if not containers:
+                logger.warning(f"⚠️  No containers found in storage account!")
+                return
+            
+            for container in containers:
+                public_access = container.public_access or "Private (None)"
+                logger.info(f"   📦 Container: '{container.name}' | Public Access: {public_access}")
+            
+            logger.info(f"✅ Found {len(containers)} container(s) total")
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to list containers: {e}")
+            logger.exception(e)
+    
+    def _check_container_status(self):
+        """Check if target container exists and log its configuration."""
+        try:
+            logger.info(f"🔍 Checking target container '{self.container_name}':")
+            
+            container_client = self.blob_service_client.get_container_client(self.container_name)
+            
+            # Check if container exists
+            exists = container_client.exists()
+            
+            if not exists:
+                logger.error(f"❌ Container '{self.container_name}' DOES NOT EXIST!")
+                logger.error(f"   This is why blobs cannot be accessed publicly!")
+                logger.error(f"   Solution: Create container with public blob access")
+                return False
+            
+            # Get container properties
+            properties = container_client.get_container_properties()
+            public_access = properties.public_access or "Private (None)"
+            
+            logger.info(f"✅ Container '{self.container_name}' exists")
+            logger.info(f"   Public Access Level: {public_access}")
+            logger.info(f"   Last Modified: {properties.last_modified}")
+            
+            if public_access == "Private (None)" or not properties.public_access:
+                logger.error(f"❌ Container has NO public access!")
+                logger.error(f"   Blobs in this container will NOT be publicly accessible!")
+                logger.error(f"   Current setting: {public_access}")
+                logger.error(f"   Required setting: 'blob' (for blob-level public access)")
+                return False
+            else:
+                logger.info(f"✅ Public access is configured: {public_access}")
+                return True
+                
+        except ResourceNotFoundError:
+            logger.error(f"❌ Container '{self.container_name}' NOT FOUND!")
+            return False
+        except Exception as e:
+            logger.error(f"❌ Error checking container status: {e}")
+            logger.exception(e)
+            return False
+    
+    def _ensure_container_exists_with_public_access(self):
+        """
+        Ensure container exists with public blob access.
+        Creates container if it doesn't exist.
+        
+        Returns:
+            True if container exists/was created with public access, False otherwise
+        """
+        try:
+            container_client = self.blob_service_client.get_container_client(self.container_name)
+            
+            # Check if container exists
+            if container_client.exists():
+                logger.info(f"✅ Container '{self.container_name}' already exists")
+                
+                # Check public access level
+                properties = container_client.get_container_properties()
+                public_access = properties.public_access
+                
+                if not public_access or public_access == "None":
+                    logger.warning(f"⚠️  Container exists but has NO public access!")
+                    logger.warning(f"   Attempting to set public access to 'blob' level...")
+                    try:
+                        container_client.set_container_access_policy(public_access=PublicAccess.Blob)
+                        logger.info(f"✅ Public access set to 'blob' level successfully!")
+                        return True
+                    except Exception as set_error:
+                        logger.error(f"❌ Failed to set public access: {set_error}")
+                        logger.error(f"   Manual action required: Set container public access via Azure Portal")
+                        return False
+                else:
+                    logger.info(f"✅ Container has public access: {public_access}")
+                    return True
+            else:
+                # Container doesn't exist - create it with public access
+                logger.warning(f"⚠️  Container '{self.container_name}' does not exist!")
+                logger.info(f"📦 Creating container with blob-level public access...")
+                
+                container_client.create_container(public_access=PublicAccess.Blob)
+                
+                logger.info(f"✅✅✅ Container created successfully with blob-level public access!")
+                return True
+                
+        except Exception as e:
+            logger.error(f"❌ Error ensuring container exists: {e}")
+            logger.exception(e)
+            return False
     
     def upload_html(
         self,
@@ -127,6 +263,19 @@ class BlobStorageClient:
                 logger.info(f"✅ Blob verified - Size: {blob_properties.size} bytes, Content-Type: {blob_properties.content_settings.content_type}")
             except Exception as verify_error:
                 logger.warning(f"⚠️  Could not verify blob properties: {verify_error}")
+            
+            # List blobs for this PR to verify it appears in container
+            logger.info(f"🔍 Verifying blob appears in container listing...")
+            try:
+                blobs = self.list_blobs_in_container(prefix=f"PR-{pr_number}/", max_results=10)
+                if blob_name in blobs:
+                    logger.info(f"✅ Blob confirmed in container listing!")
+                else:
+                    logger.warning(f"⚠️  Blob NOT found in container listing (found {len(blobs)} blob(s))")
+                    if blobs:
+                        logger.warning(f"   Blobs found: {', '.join(blobs)}")
+            except Exception as list_error:
+                logger.warning(f"⚠️  Could not list blobs for verification: {list_error}")
             
             logger.info(f"✅✅✅ HTML report uploaded successfully to blob storage!")
             return blob_url
