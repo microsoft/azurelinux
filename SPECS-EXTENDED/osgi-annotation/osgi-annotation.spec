@@ -92,16 +92,25 @@ install -dm 0744 %{buildroot}%{_javadocdir}/%{name}
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %fdupes -s %{buildroot}%{_javadocdir}
 
+# Remove LICENSE from javadoc directory to avoid duplicate license warning
+rm -f %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE
+
 %files -f .mfiles
 %license LICENSE
 
 %files javadoc
+# Mark extra legal files as documentation
+%doc %{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO
+%doc %{_javadocdir}/%{name}/legal/ASSEMBLY_EXCEPTION
+%doc %{_javadocdir}/%{name}/legal/jquery.md
+%doc %{_javadocdir}/%{name}/legal/jqueryUI.md
 %{_javadocdir}/%{name}
-%exclude %{_javadocdir}/%{name}/legal
 
 %changelog
 * Tue May 27 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 8.1.0-1
 - Initial Azure Linux import from openSUSE Tumbleweed (license: same as "License" tag).
+- Fixed duplicate LICENSE warning
+- Marked extra legal files as documentation.
 - License verified
 
 * Wed Oct  2 2024 Fridrich Strba <fstrba@suse.com>
