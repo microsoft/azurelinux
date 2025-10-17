@@ -87,7 +87,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        %{ruby_version}
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -416,6 +416,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Fri Oct 17 2025 BinduSri Adabala <v-badabala@microsoft.com> - 3.3.5-6
+- Bump release to build with new rubygem-rexml to fix CVE-2025-58767
+
 * Tue Jul 15 2025 BinduSri Adabala <v-badabala@microsoft.com> - 3.3.5-5
 - Patch CVE-2025-24294
 
