@@ -8,8 +8,8 @@
 
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
-Version: 3.3.3
-Release: 3%{?dist}
+Version: 3.3.5
+Release: 1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
@@ -29,7 +29,7 @@ Patch3:   0003-Do-not-install-html-docs.patch
 Patch5:   0005-apps-ca-fix-md-option-help-text.patch
 # # Disable signature verification with totally unsafe hash algorithms
 Patch6:   0006-Disable-signature-verification-with-totally-unsafe-h.patch
-# # Add FIPS_mode() compatibility macro
+# Add FIPS_mode() compatibility macro
 Patch8:   0008-Add-FIPS_mode-compatibility-macro.patch
 # # Add check to see if fips flag is enabled in kernel
 Patch9: 0009-Add-Kernel-FIPS-mode-flag-support.patch
@@ -62,10 +62,6 @@ Patch52:  0052-Allow-SHA1-in-seclevel-1-if-rh-allow-sha1-signatures.patch
 # # See notes in the patch for details, but this patch will not be needed if
 # # the openssl issue https://github.com/openssl/openssl/issues/7048 is ever implemented and released.
 Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
-# Fix crashes in openssl speed with providers that don't refcount keys.
-# Upstream: https://github.com/openssl/openssl/pull/26976 has been merged into 3.3, so if we
-# upgrade to 3.3.4 when it comes out, we can remove this patch.
-Patch81:  Keep-the-provided-peer-EVP_PKEY-in-the-EVP_PKEY_CTX-too.patch
 # The Symcrypt provider, which is our default, doesn't support some of the
 # algorithms that are used in the speed tests. This patch skips those tests.
 # If SymCrypt adds support, we should change and eventually remove this patch.
@@ -94,6 +90,7 @@ BuildRequires: sed
 BuildRequires: perl(Math::BigInt)
 BuildRequires: perl(Test::Harness)
 BuildRequires: perl(Test::More)
+BuildRequires: perl(Time::Piece)
 %endif
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
@@ -365,6 +362,9 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Thu Oct 02 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.5-1
+- Auto-upgrade to 3.3.5 for CVE-2025-9230 and CVE-2025-9232
+
 * Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 3.3.3-3
 - Bump to rebuild with build-id fix from toolchain gcc
 
