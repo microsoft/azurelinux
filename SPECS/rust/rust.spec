@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.72.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,7 @@ Patch1:         CVE-2024-32884.patch
 Patch2:         CVE-2024-31852.patch
 Patch3:         CVE-2024-43806.patch
 Patch4:         CVE-2024-9681.patch
+Patch5:         CVE-2025-53605.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -63,6 +64,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  python3
 %if %{with_check}
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
+BuildRequires:  sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
@@ -123,16 +125,24 @@ sh ./configure \
 USER=root SUDO_USER=root %make_build
 
 %check
-# We expect to generate dynamic CI contents in this folder, but it will fail since the .github folder is not included
-# with the published sources.
-mkdir -p .github/workflows
-./x.py run src/tools/expand-yaml-anchors
-
-ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
+# Symlink vendor directory before expand-yaml-anchors to avoid missing crates
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
-# remove rustdoc ui flaky test issue-98690.rs (which is tagged with 'unstable-options')
-rm -v ./tests/rustdoc-ui/issue-98690.*
-%make_build check
+
+# Create dummy CI folder to satisfy expand-yaml-anchors
+mkdir -p .github/workflows
+./x.py run src/tools/expand-yaml-anchors 
+
+# Symlink rustfmt for test dependencies
+ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
+
+# Remove flaky rustdoc UI test
+rm -fv ./tests/rustdoc-ui/issue-98690.*
+
+# Create test user and run stage 2 tests
+useradd -m -d /home/test test
+chown -R test:test .
+sudo -u test %make_build check
+userdel -r test
 
 %install
 USER=root SUDO_USER=root %make_install
@@ -173,6 +183,9 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Thu Aug 7 2025 Akarsh Chaudhary <v-akarshc@microsoft.com>- 1.72.0-11
+- Patch CVE-2025-53605
+
 * Fri Jan 31 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.72.0-10
 - Fix CVE-2024-9681
 
