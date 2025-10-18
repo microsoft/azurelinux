@@ -13,7 +13,7 @@
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-22%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-23%{release_suffix}%{?dist}}
 
 # %{!?KVERSION: %global KVERSION %(uname -r)}
 %{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
@@ -24,7 +24,7 @@
 # script append_number_to_package_release.sh works:
 %global _release 1.2410068
 
-%bcond_with kernel_only
+%bcond_without kernel_only
 
 %if %{with kernel_only}
 %undefine _debugsource_packages
@@ -43,7 +43,7 @@
 Summary:	 Cross-partition memory
 Name:		 xpmem-hwe
 Version:	 2.7.4
-Release:	 22%{release_suffix}%{?dist}
+Release:	 23%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -51,7 +51,6 @@ Distribution:    Azure Linux
 BuildRequires:	 automake autoconf
 URL:		 https://github.com/openucx/xpmem
 Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/xpmem-2.7.4.tar.gz#/xpmem-%{version}.tar.gz
-ExclusiveArch:   aarch64
 
 # name gets a different value in subpackages
 %global kernel_suffix hwe
@@ -76,14 +75,6 @@ BuildRequires:  binutils
 BuildRequires:  systemd
 BuildRequires:  kmod
 BuildRequires:  mlnx-ofa_kernel-hwe-devel = %{_mofed_full_version}
-BuildRequires:  mlnx-ofa_kernel-hwe-source = %{_mofed_full_version}
-
-Requires:       mlnx-ofa_kernel-hwe = %{_mofed_full_version}
-Requires:       mlnx-ofa_kernel-hwe-modules = %{_mofed_full_version}
-Requires:       kernel-hwe = %{target_kernel_version_full}
-Requires:       kmod
-Conflicts:      xpmem
-
 
 %description
 XPMEM is a Linux kernel module that enables a process to map the
@@ -92,27 +83,6 @@ can be obtained by cloning the Git repository, original Mercurial
 repository or by downloading a tarball from the link above.
 
 This package includes helper tools for the kernel module.
-
-%if ! %{with kernel_only}
-%package -n libxpmem-%{kernel_suffix}
-Summary: XPMEM: Userspace library
-%description -n libxpmem-%{kernel_suffix}
-XPMEM is a Linux kernel module that enables a process to map the
-memory of another process into its virtual address space. Source code
-can be obtained by cloning the Git repository, original Mercurial
-repository or by downloading a tarball from the link above.
-
-
-%package -n libxpmem-%{kernel_suffix}-devel
-Summary: XPMEM: userspace library development headers
-%description -n libxpmem-%{kernel_suffix}-devel
-XPMEM is a Linux kernel module that enables a process to map the
-memory of another process into its virtual address space. Source code
-can be obtained by cloning the Git repository, original Mercurial
-repository or by downloading a tarball from the link above.
-
-This package includes development headers.
-%endif
 
 # build KMP rpms?
 %if "%{KMP}" == "1"
@@ -131,6 +101,13 @@ EOF)
 # munge the release version here as well:
 Summary: XPMEM: kernel modules
 Group: System Environment/Libraries
+ExclusiveArch:   aarch64
+
+Requires:       mlnx-ofa_kernel
+Requires:       mlnx-ofa_kernel-hwe-modules = %{_mofed_full_version}
+Requires:       kernel-hwe = %{target_kernel_version_full}
+Requires:       kmod
+
 %description modules
 XPMEM is a Linux kernel module that enables a process to map the
 memory of another process into its virtual address space. Source code
@@ -197,10 +174,12 @@ fi
 %{make_install} moduledir=%{moduledir} %{make_kernel_only}
 rm -rf $RPM_BUILD_ROOT/%{_libdir}/libxpmem.la
 rm -rf $RPM_BUILD_ROOT/etc/init.d/xpmem
+%if %{with kernel_only}
+rm -rf $RPM_BUILD_ROOT/lib/udev/rules.d
+rm -f $RPM_BUILD_ROOT/usr/lib*/pkgconfig/cray-xpmem.pc
+%else
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/modules-load.d
 echo "xpmem" >$RPM_BUILD_ROOT%{_prefix}/lib/modules-load.d/xpmem.conf
-%if %{with kernel_only}
-rm -f $RPM_BUILD_ROOT/usr/lib*/pkgconfig/cray-xpmem.pc
 %endif
 %if %{need_firmware_dir}
 mkdir -p $RPM_BUILD_ROOT/lib/firmware
@@ -209,52 +188,25 @@ mkdir -p $RPM_BUILD_ROOT/lib/firmware
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%if "%{KMP}" != "1"
 %post modules
-depmod %{KVERSION} -a
-/sbin/modprobe -r xpmem > /dev/null 2>&1
-/sbin/modprobe xpmem > /dev/null 2>&1
-
-%if ! %{with kernel_only}
-%post   -n libxpmem-%{kernel_suffix} -p /sbin/ldconfig
-%postun -n libxpmem-%{kernel_suffix} -p /sbin/ldconfig
-%endif
+depmod %{KVERSION}
 
 %postun modules
-if [ "$1" = 0 ]; then
-	if lsmod | grep -qw xpmem; then
-		# If the module fails to unload, give an error,
-		# but don't fail uninstall. User should handle this
-		# Maybe the module is in use
-		rmmod xpmem || :
-	fi
+if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
+	/sbin/depmod %{KVERSION}
 fi
 
-%files
-/lib/udev/rules.d/*-xpmem.rules
-%{_prefix}/lib/modules-load.d/xpmem.conf
-%doc README AUTHORS
-%license COPYING COPYING.LESSER
-
-%if ! %{with kernel_only}
-%files -n libxpmem-%{kernel_suffix}
-%{_libdir}/libxpmem.so.*
-%license COPYING COPYING.LESSER
-
-%files -n libxpmem-%{kernel_suffix}-devel
-%{_prefix}/include/xpmem.h
-%{_libdir}/libxpmem.a
-%{_libdir}/libxpmem.so
-%{_libdir}/pkgconfig/cray-xpmem.pc
-%license COPYING COPYING.LESSER
-%endif
-
-%if "%{KMP}" != "1"
 %files modules
 %{moduledir}/xpmem.ko
 %license COPYING COPYING.LESSER
 %endif
 
 %changelog
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-23_6.12.50.2-1
+- Adjusted package dependencies on user space components.
+- Align %%post* scripts with other kmod packages.
+
 * Fri Oct 03 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-22_6.12.50.2-1
 - Bump to match kernel-hwe
 

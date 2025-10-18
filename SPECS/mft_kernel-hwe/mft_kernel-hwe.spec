@@ -36,7 +36,7 @@
 Name:		 mft_kernel-hwe
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 4.30.0
-Release:	 22%{release_suffix}%{?dist}
+Release:	 23%{release_suffix}%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -86,15 +86,6 @@ EOF)
 %global kernel_source() %{K_SRC}
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
-%endif
-
-%if "%{KMP}" == "1"
-%package utils
-Summary: KO utils for MFT
-Group: System Environment/Kernel
-Vendor: Microsoft Corporation
-%description utils
-mft utils kernel module(s)
 %endif
 #
 # setup module sign scripts if paths to the keys are given
@@ -219,16 +210,11 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 %endif
 %endif
-%if "%{_cpu_arch}" == "ppc64" || "%{_cpu_arch}" == "ppc64le"
-%if "%{KMP}" == "1"
-%files utils
-%defattr(-,root,root,-)
-%license source/COPYING
-%endif
-%{docdir}
-%endif
 
 %changelog
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.30.0-23_6.12.50.2-1
+- Adjusted package dependencies on user space components.
+
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 4.30.0-22_6.12.50.2-1
 - Bump to match kernel-hwe
 

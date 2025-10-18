@@ -45,7 +45,7 @@
 
 %{!?_name: %define _name fwctl-hwe}
 %{!?_version: %define _version 24.10}
-%{!?_mofed_full_version: %define _mofed_full_version %{_version}-22%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version %{_version}-23%{release_suffix}%{?dist}}
 %{!?_release: %define _release OFED.24.10.0.6.7.1}
 
 # KMP is disabled by default
@@ -71,7 +71,7 @@
 Summary:	 %{_name} Driver
 Name:		 fwctl-hwe
 Version:	 24.10
-Release:	 22%{release_suffix}%{?dist}
+Release:	 23%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://nvidia.com
 Group:		 System Environment/Base
@@ -88,9 +88,8 @@ BuildRequires:  binutils
 BuildRequires:  systemd
 BuildRequires:  kmod
 BuildRequires:  mlnx-ofa_kernel-hwe-devel = %{_mofed_full_version}
-BuildRequires:  mlnx-ofa_kernel-hwe-source = %{_mofed_full_version}
 
-Requires:       mlnx-ofa_kernel-hwe = %{_mofed_full_version}
+Requires:       mlnx-ofa_kernel
 Requires:       mlnx-ofa_kernel-hwe-modules  = %{_mofed_full_version}
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
@@ -254,6 +253,9 @@ fi # 1 : closed
 %endif
 
 %changelog
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-23_6.12.50.2-1
+- Adjusted package dependencies on user space components.
+
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22_6.12.50.2-1
 - Bump to match kernel-hwe
 
