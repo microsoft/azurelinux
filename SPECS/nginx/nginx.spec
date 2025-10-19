@@ -165,6 +165,9 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Thu Oct 23 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.28.0-1
+- Upgrade to 1.28.0 Upstream Stable Version
+
 * Tue Sep 09 2025 Mayank Singh <mayansingh@microsoft.com> - 1.25.4-6
 - Enable stream ssl preread module
 
