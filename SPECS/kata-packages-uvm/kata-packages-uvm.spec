@@ -62,7 +62,6 @@ Requires:       acpica-tools
 Requires:       cargo
 Requires:       clang
 Requires:       kata-containers-tools
-# we only support kata-cc in x86
 %ifarch x86_64
 Requires:       kata-containers-cc-tools
 %endif

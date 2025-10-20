@@ -72,8 +72,6 @@ Requires(postun): coreutils
 # If there are significant changes to the config file, disable the config check and build the
 # kernel rpm. The final config file is included in /boot in the rpm.
 
-%global kcflags %{nil}
-
 %ifarch x86_64
 %define image_fname vmlinux.bin
 %define image arch/x86/boot/compressed/%{image_fname}
@@ -82,8 +80,11 @@ Requires(postun): coreutils
 %else
 %define kcflags -Wa,-mx86-used-note=no
 %endif
-# we might not need below as we already %define arch x86_64 above
-# %define arch x86_64
+%endif
+%ifarch aarch64
+%define kcflags %{nil}
+%define image_fname Image
+%define image arch/arm64/boot/%{image_fname}
 %endif
 
 %description
@@ -104,6 +105,7 @@ make mrproper
 
 cp %{config_source} .config
 cp .config current_config
+sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
 make LC_ALL= ARCH=%{arch} oldconfig
 
 # Verify the config files match
@@ -118,12 +120,10 @@ if [ -s config_diff ]; then
     echo "Update config file to set changed values explicitly"
 
 #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
-# todo: config check is failing on arm
-    # exit 1
+    exit 1
 fi
 
 %build
-# should be the same for arm
 KCFLAGS="%{kcflags}" make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
 
 %install
@@ -139,17 +139,13 @@ install -D -m 644 arch/%{arch}/boot/bzImage $D/bzImage
 %endif
 
 %ifarch aarch64
-# AI suggestion: bzImage is an x86 name, for arm64 images are named Image or Image.gz. So do: install -D -m 644 arch/%{archdir}/boot/Image $D/Image (but tidepool script uses bzImage so keeping that for now)
 # below does: install -D -m 644 arch/arm64/boot/Image /usr/share/cloud-hypervisor/bzImage
-install -D -m 644 arch/%{arch}/boot/Image $D/bzImage
+# AI suggestion: bzImage is an x86 name, for arm64 images are named Image or Image.gz. So do: install -D -m 644 arch/%{archdir}/boot/Image $D/Image (but tidepool script uses bzImage so keeping that for now)
+# switching to Image might require a change in kata
+install -D -m 644 %{image} $D/bzImage
 %endif
 
 %ifarch x86_64
-# AI suggestion: use uname -r
-# mkdir -p %{buildroot}/lib/modules/%{uname_r}
-# ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin \
-#       %{buildroot}/lib/modules/%{uname_r}/vmlinuz-host
-
 mkdir -p %{buildroot}/lib/modules/%{name}
 ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
 %endif
@@ -157,14 +153,10 @@ ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/
 #todo: check if this makes sense on arm as well (we don't seem to use modules on kernel-uvm)
 # AI suggestion: blocks above and below are not necessary if we don't build any modules. Adding for "convenience"
 %ifarch aarch64
-# AI suggestion: use uname_r and Image (not bzImage) 
-# mkdir -p %{buildroot}/lib/modules/%{uname_r}
-# ln -s %{_datadir}/cloud-hypervisor/Image \
-#       %{buildroot}/lib/modules/%{uname_r}/Image-host
-
 mkdir -p %{buildroot}/lib/modules/%{name}
 ln -s %{_datadir}/cloud-hypervisor/bzImage %{buildroot}/lib/modules/%{name}/vmlinux
 %endif
+
 
 find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
 find arch/%{archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
@@ -180,6 +172,11 @@ cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config ma
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 
+# "cp: cannot stat 'scripts/module.lds': No such file or directory"
+# %ifarch aarch64
+# cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
+# %endif
+
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -188,9 +185,7 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %endif
 %{_datadir}/cloud-hypervisor/bzImage
 %dir %{_datadir}/cloud-hypervisor
-# %ifarch x86_64
 /lib/modules/%{name}/vmlinux
-# %endif
 
 %files devel
 %defattr(-,root,root)
