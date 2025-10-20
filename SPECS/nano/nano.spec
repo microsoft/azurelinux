@@ -1,7 +1,7 @@
 Summary:        Text editor
 Name:           nano
 Version:        6.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

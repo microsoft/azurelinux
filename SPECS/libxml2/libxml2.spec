@@ -1,7 +1,7 @@
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.11.5
-Release:        7%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
