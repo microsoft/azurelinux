@@ -68,9 +68,10 @@ Requires(postun): coreutils
 # If there are significant changes to the config file, disable the config check and build the
 # kernel rpm. The final config file is included in /boot in the rpm.
 
-%ifarch x86_64
 %define image_fname vmlinux.bin
+%ifarch x86_64
 %define image arch/x86/boot/compressed/%{image_fname}
+%define compressed_image_fname bzImage
 %if 0%{?centos_version} && 0%{?centos_version} < 900
 %define kcflags %{nil}
 %else
@@ -79,8 +80,8 @@ Requires(postun): coreutils
 %endif
 %ifarch aarch64
 %define kcflags %{nil}
-%define image_fname Image
-%define image arch/arm64/boot/%{image_fname}
+%define image arch/arm64/boot/Image
+%define compressed_image_fname Image.gz
 %endif
 
 %description
@@ -127,28 +128,25 @@ install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
 
 D=%{buildroot}%{_datadir}/cloud-hypervisor
-%ifarch x86_64
+# %ifarch x86_64
 install -D -m 644 %{image} $D/%{image_fname}
-install -D -m 644 arch/%{arch}/boot/bzImage $D/bzImage
-%endif
+install -D -m 644 arch/%{arch}/boot/%{compressed_image_fname} $D/%{compressed_image_fname}
+# %endif
 
-%ifarch aarch64
-# below does: install -D -m 644 arch/arm64/boot/Image /usr/share/cloud-hypervisor/bzImage
-# AI suggestion: bzImage is an x86 name, for arm64 images are named Image or Image.gz. So do: install -D -m 644 arch/%{archdir}/boot/Image $D/Image (but tidepool script uses bzImage so keeping that for now)
-# switching to Image might require a change in kata
-install -D -m 644 %{image} $D/bzImage
-%endif
+# %ifarch aarch64
+# install -D -m 644 %{image} $D/vmlinux.bin
+# %endif
 
-%ifarch x86_64
+# %ifarch x86_64
 mkdir -p %{buildroot}/lib/modules/%{name}
 ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
-%endif
+# %endif
 
-#todo: check if this makes sense on arm as well (we don't seem to use modules for kernel-uvm)
-%ifarch aarch64
-mkdir -p %{buildroot}/lib/modules/%{name}
-ln -s %{_datadir}/cloud-hypervisor/bzImage %{buildroot}/lib/modules/%{name}/vmlinux
-%endif
+# #todo: check if this makes sense on arm as well (we don't seem to use modules for kernel-uvm)
+# %ifarch aarch64
+# mkdir -p %{buildroot}/lib/modules/%{name}
+# ln -s %{_datadir}/cloud-hypervisor/bzImage %{buildroot}/lib/modules/%{name}/vmlinux
+# %endif
 
 
 find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
@@ -168,10 +166,10 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %files
 %defattr(-,root,root)
 %license COPYING
-%ifarch x86_64
+# %ifarch x86_64
 %{_datadir}/cloud-hypervisor/%{image_fname}
-%endif
-%{_datadir}/cloud-hypervisor/bzImage
+# %endif
+%{_datadir}/cloud-hypervisor/%{compressed_image_fname}
 %dir %{_datadir}/cloud-hypervisor
 /lib/modules/%{name}/vmlinux
 
