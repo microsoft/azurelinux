@@ -128,9 +128,7 @@ install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
 
 D=%{buildroot}%{_datadir}/cloud-hypervisor
 %ifarch x86_64
-# below does: install -D -m 644 arch/x86/boot/compressed/vmlinux.bin %{buildroot}%{_datadir}/cloud-hypervisor/vmlinux.bin
 install -D -m 644 %{image} $D/%{image_fname}
-# AI suggestion: use arch_dir (x86) below, instead of arch (x86_64). But this has been working so far!?
 install -D -m 644 arch/%{arch}/boot/bzImage $D/bzImage
 %endif
 
@@ -146,8 +144,7 @@ mkdir -p %{buildroot}/lib/modules/%{name}
 ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
 %endif
 
-#todo: check if this makes sense on arm as well (we don't seem to use modules on kernel-uvm)
-# AI suggestion: blocks above and below are not necessary if we don't build any modules. Adding for "convenience"
+#todo: check if this makes sense on arm as well (we don't seem to use modules for kernel-uvm)
 %ifarch aarch64
 mkdir -p %{buildroot}/lib/modules/%{name}
 ln -s %{_datadir}/cloud-hypervisor/bzImage %{buildroot}/lib/modules/%{name}/vmlinux

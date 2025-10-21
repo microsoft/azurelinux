@@ -44,7 +44,6 @@ tar -xf %{SOURCE1}
 popd
 
 %build
-
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 %make_build package
 popd
