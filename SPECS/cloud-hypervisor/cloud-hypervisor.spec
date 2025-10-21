@@ -44,7 +44,6 @@ Requires: libcap
 %endif
 %ifarch aarch64
 %define rust_def_target aarch64-unknown-linux-gnu
-# todo: update below to --features "mshv" as well
 %define cargo_pkg_feature_opts --all
 %endif
 

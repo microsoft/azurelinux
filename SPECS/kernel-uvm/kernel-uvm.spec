@@ -24,11 +24,7 @@ Distribution:   Azure Linux
 Group:          System Environment/Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
-# taken from https://github.com/microsoft/CBL-Mariner-Linux-Kernel/blob/d7df3152812f3cafd40c65cb1a06f6bf54920005/arch/arm64/configs/defconfig
-# tag 6.6.96.mshv1 https://github.com/microsoft/CBL-Mariner-Linux-Kernel/releases/tag/rolling-lts%2Fkata-uvm%2F6.6.96.mshv1
-
-# todo: should come from above
-# taken from https://microsoft.visualstudio.com/LSG/_git/linux-dom0?path=/arch/arm64/configs/uvm_defconfig&version=GTrolling-lts/uvm/6.6.96.mshv1&_a=contents
+# Config from https://microsoft.visualstudio.com/LSG/_git/linux-dom0?path=/arch/arm64/configs/uvm_defconfig&version=GTrolling-lts/uvm/6.6.96.mshv1&_a=contents
 Source2:        config_aarch64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -172,11 +168,6 @@ cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config ma
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 
-# "cp: cannot stat 'scripts/module.lds': No such file or directory"
-# %ifarch aarch64
-# cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
-# %endif
-
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -194,7 +185,7 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 
 %changelog
 * Wed Oct 08 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.96.mshv1-2
-- Enable build on arm for L1VH
+- Enable build on aarch64
 
 * Tue Sep 09 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.96.mshv1-1
 - Upgrade to 6.6.96.mshv1

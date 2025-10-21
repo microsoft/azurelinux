@@ -45,14 +45,6 @@ popd
 
 %build
 
-# we shouldn't need this if we also build kata-packages-uvm for aarch64
-# %ifarch aarch64
-# pushd %{_builddir}/%{name}-%{version}/tools/osbuilder
-# # kata-packages-uvm does not yet exist for ARM64, so we resolve the current meta-package
-# sed -i 's/^PACKAGES="kata-packages-uvm"$/PACKAGES="ca-certificates chrony cryptsetup dbus elfutils-libelf filesystem iptables irqbalance systemd tzdata zlib"/' rootfs-builder/cbl-mariner/config.sh
-# popd
-# %endif
-
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 %make_build package
 popd
