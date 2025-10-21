@@ -637,13 +637,13 @@ class ResultAnalyzer:
         if include_html and (blob_storage_client or github_client):
             html_report = self.generate_html_report(analysis_result)
             
-            # Create a self-contained HTML page
+            # Create a self-contained HTML page with authentication
             html_page = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CVE Spec File Check Report</title>
+    <title>CVE Spec File Check Report - PR #{pr_number}</title>
     <style>
         body {{
             margin: 0;
@@ -652,9 +652,230 @@ class ResultAnalyzer:
             color: #c9d1d9;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
         }}
+        
+        /* Auth UI Styles */
+        #auth-container {{
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }}
+        
+        #sign-in-btn {{
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        
+        #sign-in-btn:hover {{
+            background: #2ea043;
+        }}
+        
+        #user-menu {{
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }}
+        
+        #user-avatar {{
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }}
+        
+        #user-info {{
+            display: flex;
+            flex-direction: column;
+        }}
+        
+        #user-name {{
+            font-size: 14px;
+            font-weight: 600;
+            color: #c9d1d9;
+        }}
+        
+        #collaborator-badge {{
+            font-size: 11px;
+            color: #58a6ff;
+            background: #1f6feb20;
+            padding: 2px 6px;
+            border-radius: 12px;
+        }}
+        
+        #sign-out-btn {{
+            background: transparent;
+            color: #8b949e;
+            border: 1px solid #30363d;
+            padding: 4px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }}
+        
+        #sign-out-btn:hover {{
+            background: #21262d;
+            color: #c9d1d9;
+        }}
     </style>
+    <script>
+        // ============================================================================
+        // RADAR Authentication Module
+        // ============================================================================
+        
+        const RADAR_AUTH = (() => {{
+            const GITHUB_CLIENT_ID = 'Ov23lIafwvl8EP0Qzgcmb';
+            const AUTH_CALLBACK_URL = 'https://radarfunc-eka5fmceg4b5fub0.canadacentral-01.azurewebsites.net/api/auth/callback';
+            const STORAGE_KEY = 'radar_auth_token';
+            const USER_KEY = 'radar_user_info';
+            
+            // Get current user from localStorage
+            function getCurrentUser() {{
+                const userJson = localStorage.getItem(USER_KEY);
+                return userJson ? JSON.parse(userJson) : null;
+            }}
+            
+            // Get auth token from localStorage
+            function getAuthToken() {{
+                return localStorage.getItem(STORAGE_KEY);
+            }}
+            
+            // Check if user is authenticated
+            function isAuthenticated() {{
+                return !!getAuthToken();
+            }}
+            
+            // Initiate GitHub OAuth login
+            function signIn() {{
+                const currentUrl = window.location.href.split('#')[0]; // Remove any existing fragment
+                const state = encodeURIComponent(currentUrl);
+                const authUrl = `https://github.com/login/oauth/authorize?client_id=${{GITHUB_CLIENT_ID}}&redirect_uri=${{encodeURIComponent(AUTH_CALLBACK_URL)}}&scope=read:user%20read:org&state=${{state}}`;
+                
+                console.log('🔐 Redirecting to GitHub OAuth...');
+                window.location.href = authUrl;
+            }}
+            
+            // Sign out
+            function signOut() {{
+                localStorage.removeItem(STORAGE_KEY);
+                localStorage.removeItem(USER_KEY);
+                console.log('👋 Signed out');
+                updateUI();
+            }}
+            
+            // Handle auth callback (extract token from URL fragment)
+            function handleAuthCallback() {{
+                const fragment = window.location.hash.substring(1);
+                const params = new URLSearchParams(fragment);
+                const token = params.get('token');
+                
+                if (token) {{
+                    console.log('🎫 Token received from OAuth callback');
+                    localStorage.setItem(STORAGE_KEY, token);
+                    
+                    // Decode JWT to get user info (simple base64 decode, not verification)
+                    try {{
+                        const payload = JSON.parse(atob(token.split('.')[1]));
+                        localStorage.setItem(USER_KEY, JSON.stringify({{
+                            username: payload.username,
+                            email: payload.email,
+                            name: payload.name,
+                            avatar_url: payload.avatar_url,
+                            is_collaborator: payload.is_collaborator
+                        }}));
+                        console.log('✅ User authenticated:', payload.username);
+                    }} catch (e) {{
+                        console.error('Failed to decode token:', e);
+                    }}
+                    
+                    // Clean up URL
+                    window.history.replaceState({{}}, document.title, window.location.pathname + window.location.search);
+                    updateUI();
+                }}
+            }}
+            
+            // Update UI based on auth state
+            function updateUI() {{
+                const authContainer = document.getElementById('auth-container');
+                const user = getCurrentUser();
+                
+                if (user) {{
+                    // Show user menu
+                    authContainer.innerHTML = `
+                        <div id="user-menu">
+                            <img id="user-avatar" src="${{user.avatar_url}}" alt="${{user.username}}">
+                            <div id="user-info">
+                                <div id="user-name">${{user.name || user.username}}</div>
+                                ${{user.is_collaborator ? '<span id="collaborator-badge">✓ Collaborator</span>' : ''}}
+                            </div>
+                            <button id="sign-out-btn" onclick="RADAR_AUTH.signOut()">Sign Out</button>
+                        </div>
+                    `;
+                }} else {{
+                    // Show sign-in button
+                    authContainer.innerHTML = `
+                        <button id="sign-in-btn" onclick="RADAR_AUTH.signIn()">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                            </svg>
+                            Sign in with GitHub
+                        </button>
+                    `;
+                }}
+            }}
+            
+            // Get auth headers for API requests
+            function getAuthHeaders() {{
+                const token = getAuthToken();
+                return token ? {{
+                    'Authorization': `Bearer ${{token}}`,
+                    'Content-Type': 'application/json'
+                }} : {{
+                    'Content-Type': 'application/json'
+                }};
+            }}
+            
+            // Initialize on page load
+            function init() {{
+                console.log('🚀 RADAR Auth initialized');
+                handleAuthCallback();
+                updateUI();
+            }}
+            
+            // Public API
+            return {{
+                init,
+                signIn,
+                signOut,
+                isAuthenticated,
+                getCurrentUser,
+                getAuthToken,
+                getAuthHeaders
+            }};
+        }})();
+        
+        // Initialize auth when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {{
+            RADAR_AUTH.init();
+        }});
+    </script>
 </head>
 <body>
+    <!-- Auth UI Container -->
+    <div id="auth-container"></div>
+    
+    <!-- Main Report Content -->
 {html_report}
 </body>
 </html>"""
