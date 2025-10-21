@@ -7,138 +7,70 @@
 %global debug_package %{nil}
 %endif
 
-%global provider github
-%global provider_tld com
-%global project containers
-%global repo %{name}
-# https://github.com/containers/%%{name}
-%global import_path %{provider}.%{provider_tld}/%{project}/%{repo}
-%global git0 https://%{import_path}
+%global gomodulesmode GO111MODULE=on
 
-# dnsname
-%global repo_plugins dnsname
-# https://github.com/containers/dnsname
-%global import_path_plugins %{provider}.%{provider_tld}/%{project}/%{repo_plugins}
-%global git_plugins https://%{import_path_plugins}
-%global commit_plugins 18822f9a4fb35d1349eb256f4cd2bfd372474d84
-%global shortcommit_plugins %(c=%{commit_plugins}; echo ${c:0:7})
+%global container_base_path github.com/containers
+%global container_base_url https://%{container_base_path}
 
-# gvproxy
-%global repo_gvproxy gvisor-tap-vsock
-# https://github.com/containers/gvisor-tap-vsock
-%global import_path_gvproxy %%{provider}.%{provider_tld}/%{project}/%{repo_gvproxy}
-%global git_gvproxy https://%{import_path_gvproxy}
-%global commit_gvproxy aab0ac9367fc5142f5857c36ac2352bcb3c60ab7
-%global shortcommit_gvproxy %(c=%{commit_gvproxy}; echo ${c:0:7})
+# For LDFLAGS
+%global ld_project %{container_base_path}/%{name}/v5
+%global ld_libpod %{ld_project}/libpod
 
-%global built_tag v4.1.1
+# %%{name}
+%global git0 %{container_base_url}/%{name}
 
-Name:           podman
-Version:        4.1.1
-Release:        30%{?dist}
-License:        ASL 2.0 and BSD and ISC and MIT and MPLv2.0
-Summary:        Manage Pods, Containers and Container Images
+%define build_origin %{?packager}
+
+Name: podman
+Epoch: 0
+# DO NOT TOUCH the Version string!
+# The TRUE source of this specfile is:
+# https://github.com/containers/podman/blob/main/rpm/podman.spec
+# If that's what you're reading, Version must be 0, and will be updated by Packit for
+# copr and koji builds.
+# If you're reading this on dist-git, the version is automatically filled in by Packit.
+Version: 5.6.1
+License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
+Release: 2%{?dist}
+ExclusiveArch: aarch64 ppc64le s390x x86_64 riscv64
+Summary: Manage Pods, Containers and Container Images
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://%{name}.io/
-Source0:        %{git0}/archive/%{built_tag}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{git_plugins}/archive/%{commit_plugins}/%{repo_plugins}-%{commit_plugins}.tar.gz#/%{repo_plugins}-%{shortcommit_plugins}.tar.gz
-Source2:        %{git_gvproxy}/archive/%{commit_gvproxy}/%{repo_gvproxy}-%{commit_gvproxy}.tar.gz#/%{repo_gvproxy}-%{shortcommit_gvproxy}.tar.gz
-Patch0:         CVE-2022-2989.patch
-Provides:       %{name}-manpages = %{version}-%{release}
-BuildRequires:  go-md2man
-BuildRequires:  golang
-BuildRequires:  gcc
-BuildRequires:  glib2-devel
-BuildRequires:  glibc-static >= 2.38-12%{?dist}
-BuildRequires:  git
-BuildRequires:  go-rpm-macros
-BuildRequires:  gpgme-devel
-BuildRequires:  libassuan-devel
-BuildRequires:  libgpg-error-devel
-BuildRequires:  libseccomp-devel
-BuildRequires:  libselinux-devel
-BuildRequires:  shadow-utils
-BuildRequires:  pkgconfig
-BuildRequires:  make
-BuildRequires:  ostree-devel
-BuildRequires:  systemd
-BuildRequires:  systemd-devel
-BuildRequires:  libcontainers-common
-Requires:       catatonit
-Requires:       iptables
-Requires:       nftables
-Requires:       conmon >= 2.0.30
-Requires:       libcontainers-common
-Requires:       netavark >= 1.0.3
-Requires:       shadow-utils-subid
-Requires:       moby-runc
-Requires:       slirp4netns
-Requires:       containernetworking-plugins >= 0.9.1
-Suggests:       qemu-user-static
+URL: https://%{name}.io/
+# All SourceN files fetched from upstream
+Source0: %{git0}/archive/v%{version_no_tilde}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0: 0001-Run-selective-tests.patch
+Provides: %{name}-manpages = %{epoch}:%{version}-%{release}
+BuildRequires: %{_bindir}/envsubst
+%if %{defined build_with_btrfs}
+BuildRequires: btrfs-progs-devel
+%endif
+BuildRequires: gcc
+BuildRequires: glib2-devel
+BuildRequires: glibc-devel
+BuildRequires: glibc-static >= 2.38-14%{?dist}
+BuildRequires: golang
+BuildRequires: git-core
 
-# vendored libraries
-# awk '{print "Provides: bundled(golang("$1")) = "$2}' go.mod | sort | uniq | sed -e 's/-/_/g' -e '/bundled(golang())/d' -e '/bundled(golang(go\|module\|replace\|require))/d'
-Provides:       bundled(golang(github.com/BurntSushi/toml)) = v1.1.0
-Provides:       bundled(golang(github.com/blang/semver)) = v3.5.1+incompatible
-Provides:       bundled(golang(github.com/buger/goterm)) = v1.0.4
-Provides:       bundled(golang(github.com/checkpoint_restore/checkpointctl)) = v0.0.0_20220321135231_33f4a66335f0
-Provides:       bundled(golang(github.com/checkpoint_restore/go_criu/v5)) = v5.3.0
-Provides:       bundled(golang(github.com/container_orchestrated_devices/container_device_interface)) = v0.4.0
-Provides:       bundled(golang(github.com/containernetworking/cni)) = v1.1.0
-Provides:       bundled(golang(github.com/containernetworking/plugins)) = v1.1.1
-Provides:       bundled(golang(github.com/containers/buildah)) = v1.26.1
-Provides:       bundled(golang(github.com/containers/common)) = v0.48.0
-Provides:       bundled(golang(github.com/containers/conmon)) = v2.0.20+incompatible
-Provides:       bundled(golang(github.com/containers/image/v5)) = v5.21.1
-Provides:       bundled(golang(github.com/containers/ocicrypt)) = v1.1.4
-Provides:       bundled(golang(github.com/containers/psgo)) = v1.7.2
-Provides:       bundled(golang(github.com/containers/storage)) = v1.40.2
-Provides:       bundled(golang(github.com/coreos/go_systemd/v22)) = v22.3.2
-Provides:       bundled(golang(github.com/coreos/stream_metadata_go)) = v0.0.0_20210225230131_70edb9eb47b3
-Provides:       bundled(golang(github.com/cyphar/filepath_securejoin)) = v0.2.3
-Provides:       bundled(golang(github.com/davecgh/go_spew)) = v1.1.1
-Provides:       bundled(golang(github.com/digitalocean/go_qemu)) = v0.0.0_20210326154740_ac9e0b687001
-Provides:       bundled(golang(github.com/docker/distribution)) = v2.8.1+incompatible
-Provides:       bundled(golang(github.com/docker/docker)) = v20.10.14+incompatible
-Provides:       bundled(golang(github.com/docker/go_connections)) = v0.4.1_0.20210727194412_58542c764a11
-Provides:       bundled(golang(github.com/docker/go_plugins_helpers)) = v0.0.0_20211224144127_6eecb7beb651
-Provides:       bundled(golang(github.com/docker/go_units)) = v0.4.0
-Provides:       bundled(golang(github.com/dtylman/scp)) = v0.0.0_20181017070807_f3000a34aef4
-Provides:       bundled(golang(github.com/fsnotify/fsnotify)) = v1.5.4
-Provides:       bundled(golang(github.com/ghodss/yaml)) = v1.0.0
-Provides:       bundled(golang(github.com/godbus/dbus/v5)) = v5.1.0
-Provides:       bundled(golang(github.com/google/gofuzz)) = v1.2.0
-Provides:       bundled(golang(github.com/google/shlex)) = v0.0.0_20191202100458_e7afc7fbc510
-Provides:       bundled(golang(github.com/google/uuid)) = v1.3.0
-Provides:       bundled(golang(github.com/gorilla/handlers)) = v1.5.1
-Provides:       bundled(golang(github.com/gorilla/mux)) = v1.8.0
-Provides:       bundled(golang(github.com/gorilla/schema)) = v1.2.0
-Provides:       bundled(golang(github.com/hashicorp/go_multierror)) = v1.1.1
-Provides:       bundled(golang(github.com/json_iterator/go)) = v1.1.12
-Provides:       bundled(golang(github.com/mattn/go_isatty)) = v0.0.14
-Provides:       bundled(golang(github.com/moby/term)) = v0.0.0_20210619224110_3f7ff695adc6
-Provides:       bundled(golang(github.com/nxadm/tail)) = v1.4.8
-Provides:       bundled(golang(github.com/onsi/ginkgo)) = v1.16.5
-Provides:       bundled(golang(github.com/onsi/gomega)) = v1.19.0
-Provides:       bundled(golang(github.com/opencontainers/go_digest)) = v1.0.0
-Provides:       bundled(golang(github.com/opencontainers/image_spec)) = v1.0.3_0.20220114050600_8b9d41f48198
-Provides:       bundled(golang(github.com/opencontainers/runc)) = v1.1.1
-Provides:       bundled(golang(github.com/opencontainers/runtime_spec)) = v1.0.3_0.20211214071223_8958f93039ab
-Provides:       bundled(golang(github.com/opencontainers/runtime_tools)) = v0.9.1_0.20220110225228_7e2d60f1e41f
-Provides:       bundled(golang(github.com/opencontainers/selinux)) = v1.10.1
-Provides:       bundled(golang(github.com/pkg/errors)) = v0.9.1
-Provides:       bundled(golang(github.com/pmezard/go_difflib)) = v1.0.0
-Provides:       bundled(golang(github.com/rootless_containers/rootlesskit)) = v1.0.1
-Provides:       bundled(golang(github.com/sirupsen/logrus)) = v1.8.1
-Provides:       bundled(golang(github.com/spf13/cobra)) = v1.4.0
-Provides:       bundled(golang(github.com/spf13/pflag)) = v1.0.5
-Provides:       bundled(golang(github.com/stretchr/testify)) = v1.7.1
-Provides:       bundled(golang(github.com/syndtr/gocapability)) = v0.0.0_20200815063812_42c35b437635
-Provides:       bundled(golang(github.com/uber/jaeger_client_go)) = v2.30.0+incompatible
-Provides:       bundled(golang(github.com/ulikunitz/xz)) = v0.5.10
-Provides:       bundled(golang(github.com/vbauerster/mpb/v7)) = v7.4.1
-Provides:       bundled(golang(github.com/vishvananda/netlink)) = v1.1.1_0.20220115184804_dd687eb2f2d4
+BuildRequires: go-rpm-macros
+
+BuildRequires: gpgme-devel
+BuildRequires: libassuan-devel
+BuildRequires: libgpg-error-devel
+BuildRequires: libseccomp-devel
+BuildRequires: libselinux-devel
+BuildRequires: libcontainers-common
+BuildRequires: shadow-utils-subid-devel
+BuildRequires: pkgconfig
+BuildRequires: make
+BuildRequires: man-db
+BuildRequires: ostree-devel
+BuildRequires: systemd
+BuildRequires: systemd-devel
+Requires: catatonit
+Requires: conmon >= 2:2.1.7-2
+Requires: libcontainers-common
+Provides: %{name}-quadlet = %{epoch}:%{version}-%{release}
 
 %description
 %{name} (Pod Manager) is a fully featured container engine that is a simple
@@ -152,37 +84,36 @@ additional privileges.
 Both tools share image (not container) storage, hence each can use or
 manipulate images (but not containers) created by the other.
 
-%{summary}
-%{repo} Simple management tool for pods, containers and images
-
-%package       docker
-Summary:       Emulate Docker CLI using %{name}
-BuildArch:     noarch
-Requires:      %{name} = %{version}-%{release}
-Conflicts:     docker
-Conflicts:     docker-latest
-Conflicts:     docker-ce
-Conflicts:     docker-ee
-Conflicts:     moby-engine
+%package docker
+Summary: Emulate Docker CLI using %{name}
+BuildArch: noarch
+Requires: %{name} = %{epoch}:%{version}-%{release}
+Conflicts: docker
+Conflicts: docker-latest
+Conflicts: docker-ce
+Conflicts: docker-ee
+Conflicts: moby-engine
 
 %description docker
 This package installs a script named docker that emulates the Docker CLI by
 executes %{name} commands, it also creates links between all Docker CLI man
 pages and %{name}.
 
-%package      tests
-Summary:      Tests for %{name}
+%package tests
+Summary: Tests for %{name}
 
-Requires:     %{name} = %{version}-%{release}
-Requires:     bats
-Requires:     jq
-Requires:     skopeo
-Requires:     nmap-ncat
-Requires:     httpd-tools
-Requires:     openssl
-Requires:     socat
-Requires:     buildah
-Requires:     gnupg
+Requires: %{name} = %{epoch}:%{version}-%{release}
+Requires: attr
+Requires: jq
+Requires: skopeo
+Requires: nmap-ncat
+Requires: httpd-tools
+Requires: openssl
+Requires: socat
+Requires: slirp4netns
+Requires: buildah
+Requires: gnupg
+Requires: xfsprogs
 
 %description tests
 %{summary}
@@ -202,40 +133,25 @@ run %{name}-remote in production.
 manage pods, containers and container images. %{name}-remote supports ssh
 connections as well.
 
-%package      plugins
-Summary:      Plugins for %{name}
-Requires:     dnsmasq
-Recommends:   %{name}-gvproxy = %{version}-%{release}
+%package -n %{name}sh
+Summary: Confined login and user shell using %{name}
+Requires: %{name} = %{epoch}:%{version}-%{release}
+Provides: %{name}-shell = %{epoch}:%{version}-%{release}
+Provides: %{name}-%{name}sh = %{epoch}:%{version}-%{release}
 
-%description plugins
-This plugin sets up the use of dnsmasq on a given CNI network so
-that Pods can resolve each other by name.  When configured,
-the pod and its IP address are added to a network specific hosts file
-that dnsmasq will read in.  Similarly, when a pod
-is removed from the network, it will remove the entry from the hosts
-file.  Each CNI network will have its own dnsmasq instance.
+%description -n %{name}sh
+%{name}sh provides a confined login and user shell with access to volumes and
+capabilities specified in user quadlets.
 
-%package gvproxy
-Summary: Go replacement for libslirp and VPNKit
+It is a symlink to %{_bindir}/%{name} and execs into the `%{name}sh` container
+when `%{_bindir}/%{name}sh` is set as a login shell or set as os.Args[0].
 
-%description gvproxy
-A replacement for libslirp and VPNKit, written in pure Go.
-It is based on the network stack of gVisor. Compared to libslirp,
-gvisor-tap-vsock brings a configurable DNS server and
-dynamic port forwarding.
 
 %prep
-%autosetup -Sgit -p1
+%autosetup -p1 -Sgit -n %{name}-%{version_no_tilde}
 sed -i 's;@@PODMAN@@\;$(BINDIR);@@PODMAN@@\;%{_bindir};' Makefile
 
-# untar dnsname
-tar zxf %{SOURCE1}
-
-# untar %%{name}-gvproxy
-tar zxf %{SOURCE2}
-
 %build
-%if "%{_vendor}" != "debbuild"
 %set_build_flags
 export CGO_CFLAGS=$CFLAGS
 # These extra flags present in $CFLAGS have been skipped for now as they break the build
@@ -246,60 +162,57 @@ CGO_CFLAGS=$(echo $CGO_CFLAGS | sed 's/-specs=\/usr\/lib\/rpm\/redhat\/redhat-an
 %ifarch x86_64
 export CGO_CFLAGS+=" -m64 -mtune=generic -fcf-protection=full"
 %endif
-%endif
 
-export GO111MODULE=off
-export GOPATH=$(pwd)/_build:$(pwd)
+export GOPROXY=direct
 
-mkdir _build
-cd _build
-mkdir -p src/%{provider}.%{provider_tld}/%{project}
-ln -s ../../../../ src/%{import_path}
-cd ..
-ln -s vendor src
+LDFLAGS="-X %{ld_libpod}/define.buildInfo=${SOURCE_DATE_EPOCH:-$(date +%s)} \
+         -X \"%{ld_libpod}/define.buildOrigin=%{build_origin}\" \
+         -X %{ld_libpod}/config._installPrefix=%{_prefix} \
+         -X %{ld_libpod}/config._etcDir=%{_sysconfdir} \
+         -X %{ld_project}/pkg/systemd/quadlet._binDir=%{_bindir}"
 
-# build date. FIXME: Makefile uses '/v2/libpod', that doesn't work here?
-LDFLAGS="-X %{import_path}/libpod/define.buildInfo=$(date +%s)"
+# This variable will be set by Packit actions. See .packit.yaml in the root dir
+# of the repo (upstream as well as Fedora dist-git).
+GIT_COMMIT="e7d8226745ba07a64b7176a7f128e4ef53225a0e"
+LDFLAGS="$LDFLAGS -X %{ld_libpod}/define.gitCommit=$GIT_COMMIT"
 
 # build rootlessport first
-%gobuild -o bin/rootlessport %{import_path}/cmd/rootlessport
+%gobuild -o bin/rootlessport ./cmd/rootlessport
+
+export BASEBUILDTAGS="seccomp $(hack/systemd_tag.sh) $(hack/libsubid_tag.sh)"
+
+# libtrust_openssl buildtag switches to using the FIPS-compatible func
+# `ecdsa.HashSign`.
+# Ref 1: https://github.com/golang-fips/go/blob/main/patches/015-add-hash-sign-verify.patch#L22
+# Ref 2: https://github.com/containers/libtrust/blob/main/ec_key_openssl.go#L23
+%if %{defined fips_enabled}
+export BASEBUILDTAGS="$BASEBUILDTAGS libtrust_openssl"
+%endif
 
 # build %%{name}
-export BUILDTAGS="seccomp exclude_graphdriver_devicemapper $(hack/btrfs_installed_tag.sh) $(hack/btrfs_tag.sh) $(hack/libdm_tag.sh) $(hack/selinux_tag.sh) $(hack/systemd_tag.sh) $(hack/libsubid_tag.sh)"
-
-%gobuild -o bin/%{name} %{import_path}/cmd/%{name}
+export BUILDTAGS="$BASEBUILDTAGS $(hack/btrfs_installed_tag.sh) $(hack/btrfs_tag.sh) $(hack/libdm_tag.sh)"
+%gobuild -o bin/%{name} ./cmd/%{name}
 
 # build %%{name}-remote
-export BUILDTAGS="seccomp exclude_graphdriver_devicemapper exclude_graphdriver_btrfs btrfs_noversion $(hack/selinux_tag.sh) $(hack/systemd_tag.sh) $(hack/libsubid_tag.sh) remote"
-%gobuild -o bin/%{name}-remote %{import_path}/cmd/%{name}
+export BUILDTAGS="$BASEBUILDTAGS exclude_graphdriver_btrfs btrfs_noversion remote"
+%gobuild -o bin/%{name}-remote ./cmd/%{name}
 
-cd %{repo_plugins}-%{commit_plugins}
-mkdir _build
-cd _build
-mkdir -p src/%{provider}.%{provider_tld}/%{project}
-ln -s ../../../../ src/%{import_path_plugins}
-cd ..
-ln -s vendor src
-export GOPATH=$(pwd)/_build:$(pwd)
-%gobuild -o bin/dnsname %{import_path_plugins}/plugins/meta/dnsname
-cd ..
+# build quadlet
+export BUILDTAGS="$BASEBUILDTAGS $(hack/btrfs_installed_tag.sh) $(hack/btrfs_tag.sh)"
+%gobuild -o bin/quadlet ./cmd/quadlet
 
-cd %{repo_gvproxy}-%{commit_gvproxy}
-mkdir _build
-cd _build
-mkdir -p src/%{provider}.%{provider_tld}/%{project}
-ln -s ../../../../ src/%{import_path_gvproxy}
-cd ..
-ln -s vendor src
-export GOPATH=$(pwd)/_build:$(pwd)
-%gobuild -o bin/gvproxy %{import_path_gvproxy}/cmd/gvproxy
-cd ..
+# build %%{name}-testing
+export BUILDTAGS="$BASEBUILDTAGS $(hack/btrfs_installed_tag.sh) $(hack/btrfs_tag.sh)"
+%gobuild -o bin/podman-testing ./cmd/podman-testing
+
+# reset LDFLAGS for plugins binaries
+LDFLAGS=''
 
 %{__make} docs docker-docs
 
 %install
 install -dp %{buildroot}%{_unitdir}
-PODMAN_VERSION=%{version} %{__make} PREFIX=%{buildroot}%{_prefix} ETCDIR=%{buildroot}%{_sysconfdir} \
+PODMAN_VERSION=%{version} %{__make} DESTDIR=%{buildroot} PREFIX=%{_prefix} ETCDIR=%{_sysconfdir} \
        install.bin \
        install.man \
        install.systemd \
@@ -307,40 +220,35 @@ PODMAN_VERSION=%{version} %{__make} PREFIX=%{buildroot}%{_prefix} ETCDIR=%{build
        install.docker \
        install.docker-docs \
        install.remote \
-       install.modules-load
+       install.testing \
+       .install.ginkgo
 
-mv pkg/hooks/README.md pkg/hooks/README-hooks.md
-
-# install dnsname plugin
-cd %{repo_plugins}-%{commit_plugins}
-%{__make} PREFIX=%{_prefix} DESTDIR=%{buildroot} install
-cd ..
-
-# install gvproxy
-cd %{repo_gvproxy}-%{commit_gvproxy}
-install -dp %{buildroot}%{_libexecdir}/%{name}
-install -p -m0755 bin/gvproxy %{buildroot}%{_libexecdir}/%{name}
-cd ..
+sed -i 's;%{buildroot};;g' %{buildroot}%{_bindir}/docker
 
 # do not include docker and podman-remote man pages in main package
-for file in `find %{buildroot}%{_mandir}/man[15] -type f | sed "s,%{buildroot},," | grep -v -e remote -e docker`; do
-    echo "$file*" >> podman.file-list
+for file in `find %{buildroot}%{_mandir}/man[157] -type f | sed "s,%{buildroot},," | grep -v -e %{name}sh.1 -e remote -e docker`; do
+    echo "$file*" >> %{name}.file-list
 done
 
 rm -f %{buildroot}%{_mandir}/man5/docker*.5
 
-install -d -p %{buildroot}/%{_datadir}/%{name}/test/system
-cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
+install -d -p %{buildroot}%{_datadir}/%{name}/test/system
+cp -pav test/system %{buildroot}%{_datadir}/%{name}/test/
 
 #define license tag if not already defined
 %{!?_licensedir:%global license %doc}
 
+# Include empty check to silence rpmlint warning
+%check
+make localunit
+
 %files -f %{name}.file-list
-%license LICENSE
-%doc README.md CONTRIBUTING.md pkg/hooks/README-hooks.md install.md transfer.md
+%license LICENSE vendor/modules.txt
+%doc README.md CONTRIBUTING.md install.md transfer.md
 %{_bindir}/%{name}
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/rootlessport
+%{_libexecdir}/%{name}/quadlet
 %{_datadir}/bash-completion/completions/%{name}
 # By "owning" the site-functions dir, we don't need to Require zsh
 %dir %{_datadir}/zsh/site-functions
@@ -350,12 +258,21 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 %{_unitdir}/%{name}*
 %{_userunitdir}/%{name}*
 %{_tmpfilesdir}/%{name}.conf
+%{_systemdgeneratordir}/%{name}-system-generator
+%{_systemdusergeneratordir}/%{name}-user-generator
+# iptables modules are only needed with iptables-legacy,
+# as of f41 netavark will default to nftables so do not load unessary modules
+# https://fedoraproject.org/wiki/Changes/NetavarkNftablesDefault
+%if %{defined fedora} && 0%{?fedora} < 41
 %{_modulesloaddir}/%{name}-iptables.conf
+%endif
 
 %files docker
 %{_bindir}/docker
 %{_mandir}/man1/docker*.1*
-%{_usr}/lib/tmpfiles.d/%{name}-docker.conf
+%{_sysconfdir}/profile.d/%{name}-docker.*
+%{_tmpfilesdir}/%{name}-docker.conf
+%{_user_tmpfilesdir}/%{name}-docker.conf
 
 %files remote
 %license LICENSE
@@ -369,23 +286,26 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 
 %files tests
 %license LICENSE
+%{_bindir}/%{name}-testing
 %{_datadir}/%{name}/test
 
-%files plugins
-%license %{repo_plugins}-%{commit_plugins}/LICENSE
-%doc %{repo_plugins}-%{commit_plugins}/{README.md,README_PODMAN.md}
-%dir %{_libexecdir}/cni
-%{_libexecdir}/cni/dnsname
-
-%files gvproxy
-%license %{repo_gvproxy}-%{commit_gvproxy}/LICENSE
-%doc %{repo_gvproxy}-%{commit_gvproxy}/README.md
-%dir %{_libexecdir}/%{name}
-%{_libexecdir}/%{name}/gvproxy
-
+%files -n %{name}sh
+%{_bindir}/%{name}sh
+%{_mandir}/man1/%{name}sh.1*
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
+* Wed Oct 08 2025 Andrew Phelps <anphel@microsoft.com> - 0:5.6.1-2
+- Bump to rebuild with updated glibc
+
+* Fri Sep 19 2025 Sumit Jena <v-sumitjena@microsof.com> - 0:5.6.1-1
+- Update to version 5.6.1
+- added check section
+- License verified
+
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 4.1.1-31
+- Bump to rebuild with updated glibc
+
 * Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 4.1.1-30
 - Bump to rebuild with updated glibc
 
