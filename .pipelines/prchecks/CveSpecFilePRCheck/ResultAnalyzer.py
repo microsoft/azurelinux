@@ -735,7 +735,7 @@ class ResultAnalyzer:
         // ============================================================================
         
         const RADAR_AUTH = (() => {{
-            const GITHUB_CLIENT_ID = 'Ov23lIafwvl8EP0Qzgcmb';
+            const GITHUB_CLIENT_ID = 'Ov23limFwlBEPDQzgGmb';
             const AUTH_CALLBACK_URL = 'https://radarfunc-eka5fmceg4b5fub0.canadacentral-01.azurewebsites.net/api/auth/callback';
             const STORAGE_KEY = 'radar_auth_token';
             const USER_KEY = 'radar_user_info';
