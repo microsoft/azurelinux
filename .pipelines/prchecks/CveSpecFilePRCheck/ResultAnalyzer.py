@@ -18,6 +18,8 @@ Key Features:
 
 import json
 import re
+import os
+from datetime import datetime
 import logging
 from typing import Dict, List, Any, Optional, Tuple
 from AntiPatternDetector import AntiPattern, Severity
@@ -616,7 +618,8 @@ class ResultAnalyzer:
         return color_map.get(severity, "#8b949e")
     
     def generate_multi_spec_report(self, analysis_result: 'MultiSpecAnalysisResult', include_html: bool = True, 
-                                   github_client = None, blob_storage_client = None, pr_number: int = None) -> str:
+                                   github_client = None, blob_storage_client = None, pr_number: int = None,
+                                   pr_metadata: dict = None) -> str:
         """
         Generate a comprehensive report for multi-spec analysis results with enhanced formatting.
         
@@ -626,11 +629,24 @@ class ResultAnalyzer:
             github_client: Optional GitHubClient instance for creating Gist with HTML report (fallback)
             blob_storage_client: Optional BlobStorageClient for uploading to Azure Blob Storage (preferred)
             pr_number: PR number for blob storage upload (required if blob_storage_client provided)
+            pr_metadata: Optional dict with PR metadata (title, author, branches, sha, timestamp)
             
         Returns:
             Formatted GitHub markdown report with optional HTML section
         """
         report_lines = []
+        
+        # Use provided metadata or create default
+        if not pr_metadata:
+            pr_metadata = {
+                "pr_number": pr_number or 0,
+                "pr_title": f"PR #{pr_number}" if pr_number else "Unknown PR",
+                "pr_author": "Unknown",
+                "source_branch": os.environ.get("SYSTEM_PULLREQUEST_SOURCEBRANCH", "unknown"),
+                "target_branch": os.environ.get("SYSTEM_PULLREQUEST_TARGETBRANCH", "main"),
+                "source_commit_sha": os.environ.get("SYSTEM_PULLREQUEST_SOURCECOMMITID", "")[:8],
+                "analysis_timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC")
+            }
         
         # Add HTML report - try blob storage first, fall back to Gist
         # Note: Blob storage preferred for production, Gist as fallback
