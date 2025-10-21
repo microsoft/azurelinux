@@ -3,7 +3,7 @@
 Summary:        X Keyboard Extension configuration data
 Name:           xkeyboard-config
 Version:        2.40
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -74,6 +74,9 @@ rm -f %{buildroot}%{_datadir}/X11/xkb/compiled
 %{_datadir}/pkgconfig/xkeyboard-config.pc
 
 %changelog
+* Tue Oct 21 2025 Riken NaMaharjanme <rmaharjan@microsoft.com> - 2.40-2
+- Bump release to 2 (no code changes)
+
 * Tue Feb 13 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.40-1
 - Upgrade to 2.40
 
