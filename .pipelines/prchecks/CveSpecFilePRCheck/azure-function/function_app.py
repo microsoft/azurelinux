@@ -320,10 +320,38 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                 logger.info(f"✅ GitHub comment posted successfully")
             else:
                 logger.warning(f"⚠️  Failed to post GitHub comment: {comment_response.status_code} - {comment_response.text}")
+            
+            # Add label to PR based on challenge type (hybrid approach: comment + label)
+            logger.info(f"🏷️  Adding label to PR #{pr_number}")
+            
+            # Map challenge types to GitHub labels
+            label_map = {
+                "false-positive": "radar:false-positive",
+                "needs-context": "radar:needs-context",
+                "agree": "radar:acknowledged"
+            }
+            label_to_add = label_map.get(req_body["challenge_type"], "radar:challenge")
+            
+            # Also add a general "radar:challenged" label to indicate PR has been reviewed
+            labels_to_add = ["radar:challenged", label_to_add]
+            
+            labels_url = f"https://api.github.com/repos/microsoft/azurelinux/issues/{pr_number}/labels"
+            label_response = requests.post(
+                labels_url,
+                headers=comment_headers,
+                json={"labels": labels_to_add},
+                timeout=10
+            )
+            
+            if label_response.status_code == 200:
+                logger.info(f"✅ Labels added successfully: {', '.join(labels_to_add)}")
+            else:
+                logger.warning(f"⚠️  Failed to add labels: {label_response.status_code} - {label_response.text}")
+                logger.info("   Note: Labels might not exist in repo - they should be created first")
         
         except Exception as comment_error:
-            logger.warning(f"⚠️  Could not post GitHub comment (non-fatal): {comment_error}")
-            # Don't fail the whole request if comment posting fails
+            logger.warning(f"⚠️  Could not post GitHub comment/labels (non-fatal): {comment_error}")
+            # Don't fail the whole request if comment/label posting fails
         
         return func.HttpResponse(
             json.dumps({
