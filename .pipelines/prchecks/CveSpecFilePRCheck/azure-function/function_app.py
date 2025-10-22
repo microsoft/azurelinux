@@ -316,48 +316,53 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                 timeout=10
             )
             
+            comment_posted = False
             if comment_response.status_code == 201:
                 logger.info(f"✅ GitHub comment posted successfully")
+                comment_posted = True
             else:
-                logger.warning(f"⚠️  Failed to post GitHub comment: {comment_response.status_code} - {comment_response.text}")
+                logger.error(f"❌ Failed to post GitHub comment:")
+                logger.error(f"   Status: {comment_response.status_code}")
+                logger.error(f"   Response: {comment_response.text}")
+                logger.error(f"   GitHub Token (first 10 chars): {github_token[:10] if github_token else 'None'}...")
+                logger.error(f"   Comment URL: {comment_url}")
             
-            # Add label to PR based on challenge type (hybrid approach: comment + label)
-            logger.info(f"🏷️  Adding label to PR #{pr_number}")
-            
-            # Map challenge types to GitHub labels
-            label_map = {
-                "false-positive": "radar:false-positive",
-                "needs-context": "radar:needs-context",
-                "agree": "radar:acknowledged"
-            }
-            label_to_add = label_map.get(req_body["challenge_type"], "radar:challenge")
-            
-            # Also add a general "radar:challenged" label to indicate PR has been reviewed
-            labels_to_add = ["radar:challenged", label_to_add]
+            # Add simple label to indicate PR has been acknowledged/reviewed
+            logger.info(f"🏷️  Adding radar-acknowledged label to PR #{pr_number}")
             
             labels_url = f"https://api.github.com/repos/microsoft/azurelinux/issues/{pr_number}/labels"
             label_response = requests.post(
                 labels_url,
                 headers=comment_headers,
-                json={"labels": labels_to_add},
+                json={"labels": ["radar-acknowledged"]},
                 timeout=10
             )
             
+            label_added = False
             if label_response.status_code == 200:
-                logger.info(f"✅ Labels added successfully: {', '.join(labels_to_add)}")
+                logger.info(f"✅ Label 'radar-acknowledged' added successfully")
+                label_added = True
             else:
-                logger.warning(f"⚠️  Failed to add labels: {label_response.status_code} - {label_response.text}")
-                logger.info("   Note: Labels might not exist in repo - they should be created first")
+                logger.error(f"❌ Failed to add label:")
+                logger.error(f"   Status: {label_response.status_code}")
+                logger.error(f"   Response: {label_response.text}")
+                logger.info("   Note: Label might not exist in repo - create 'radar-acknowledged' label first")
         
         except Exception as comment_error:
-            logger.warning(f"⚠️  Could not post GitHub comment/labels (non-fatal): {comment_error}")
-            # Don't fail the whole request if comment/label posting fails
+            logger.error(f"❌ Exception during GitHub comment/label posting:")
+            logger.error(f"   Error: {comment_error}")
+            import traceback
+            logger.error(f"   Traceback: {traceback.format_exc()}")
+            comment_posted = False
+            label_added = False
         
         return func.HttpResponse(
             json.dumps({
                 "success": True,
                 "challenge_id": challenge_id,
-                "message": "Challenge submitted successfully"
+                "message": "Challenge submitted successfully",
+                "github_comment_posted": comment_posted,
+                "github_label_added": label_added
             }),
             mimetype="application/json",
             status_code=200

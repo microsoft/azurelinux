@@ -1194,7 +1194,25 @@ class ResultAnalyzer:
                 
                 if (response.ok) {{
                     console.log('✅ Challenge submitted successfully');
-                    alert('✅ Challenge submitted successfully! A comment has been posted to the PR.');
+                    console.log('   GitHub comment posted:', result.github_comment_posted);
+                    console.log('   GitHub label added:', result.github_label_added);
+                    
+                    let message = '✅ Challenge submitted successfully!\\n\\n';
+                    message += `Challenge ID: ${{result.challenge_id}}\\n`;
+                    
+                    if (result.github_comment_posted) {{
+                        message += '✅ Comment posted to PR\\n';
+                    }} else {{
+                        message += '⚠️  Comment posting failed (check function logs)\\n';
+                    }}
+                    
+                    if (result.github_label_added) {{
+                        message += '✅ Label added to PR\\n';
+                    }} else {{
+                        message += '⚠️  Label not added (may need to create radar-acknowledged label)\\n';
+                    }}
+                    
+                    alert(message);
                     closeChallengeModal();
                     
                     // Mark button as submitted
