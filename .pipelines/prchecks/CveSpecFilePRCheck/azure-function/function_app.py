@@ -195,12 +195,14 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
             current_data = json.loads(blob_data.readall())
             logger.info(f"✅ Successfully loaded analytics data")
         except ResourceNotFoundError:
-            logger.error(f"❌ Analytics blob not found: {blob_name}")
-            return func.HttpResponse(
-                json.dumps({"error": f"Analytics data not found for PR #{pr_number}"}),
-                mimetype="application/json",
-                status_code=404
-            )
+            logger.warning(f"⚠️  Analytics blob not found: {blob_name}")
+            logger.info("📝 Creating new analytics.json file for this PR")
+            # Create new analytics file on first challenge
+            current_data = {
+                "pr_number": pr_number,
+                "created_at": datetime.utcnow().isoformat() + "Z",
+                "challenges": []
+            }
         
         # Generate challenge ID
         existing_challenges = current_data.get("challenges", [])
@@ -270,11 +272,97 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
         
         logger.info(f"✅✅✅ Challenge submitted successfully: {challenge_id}")
         
+        # Post GitHub comment about the challenge
+        try:
+            logger.info(f"💬 Posting challenge notification to GitHub PR #{pr_number}")
+            
+            challenge_type_emoji = {
+                "false-positive": "🟢",
+                "needs-context": "🟡", 
+                "agree": "🔴"
+            }
+            emoji = challenge_type_emoji.get(req_body["challenge_type"], "💬")
+            
+            challenge_type_text = {
+                "false-positive": "False Alarm",
+                "needs-context": "Needs Context",
+                "agree": "Acknowledged"
+            }
+            type_text = challenge_type_text.get(req_body["challenge_type"], req_body["challenge_type"])
+            
+            comment_body = f"""## {emoji} Challenge Submitted
+
+**Finding**: {antipattern_id} in `{req_body.get("spec_file", "")}`  
+**Challenge Type**: {type_text}  
+**Submitted by**: @{username}  
+
+**Feedback**:
+> {req_body["feedback_text"]}
+
+---
+*Challenge ID: `{challenge_id}` • This challenge will be reviewed by the team.*
+"""
+            
+            comment_url = f"https://api.github.com/repos/microsoft/azurelinux/issues/{pr_number}/comments"
+            comment_headers = {
+                "Authorization": f"Bearer {github_token}",
+                "Accept": "application/vnd.github.v3+json",
+                "Content-Type": "application/json"
+            }
+            comment_response = requests.post(
+                comment_url,
+                headers=comment_headers,
+                json={"body": comment_body},
+                timeout=10
+            )
+            
+            comment_posted = False
+            if comment_response.status_code == 201:
+                logger.info(f"✅ GitHub comment posted successfully")
+                comment_posted = True
+            else:
+                logger.error(f"❌ Failed to post GitHub comment:")
+                logger.error(f"   Status: {comment_response.status_code}")
+                logger.error(f"   Response: {comment_response.text}")
+                logger.error(f"   GitHub Token (first 10 chars): {github_token[:10] if github_token else 'None'}...")
+                logger.error(f"   Comment URL: {comment_url}")
+            
+            # Add simple label to indicate PR has been acknowledged/reviewed
+            logger.info(f"🏷️  Adding radar-acknowledged label to PR #{pr_number}")
+            
+            labels_url = f"https://api.github.com/repos/microsoft/azurelinux/issues/{pr_number}/labels"
+            label_response = requests.post(
+                labels_url,
+                headers=comment_headers,
+                json={"labels": ["radar-acknowledged"]},
+                timeout=10
+            )
+            
+            label_added = False
+            if label_response.status_code == 200:
+                logger.info(f"✅ Label 'radar-acknowledged' added successfully")
+                label_added = True
+            else:
+                logger.error(f"❌ Failed to add label:")
+                logger.error(f"   Status: {label_response.status_code}")
+                logger.error(f"   Response: {label_response.text}")
+                logger.info("   Note: Label might not exist in repo - create 'radar-acknowledged' label first")
+        
+        except Exception as comment_error:
+            logger.error(f"❌ Exception during GitHub comment/label posting:")
+            logger.error(f"   Error: {comment_error}")
+            import traceback
+            logger.error(f"   Traceback: {traceback.format_exc()}")
+            comment_posted = False
+            label_added = False
+        
         return func.HttpResponse(
             json.dumps({
                 "success": True,
                 "challenge_id": challenge_id,
-                "message": "Challenge submitted successfully"
+                "message": "Challenge submitted successfully",
+                "github_comment_posted": comment_posted,
+                "github_label_added": label_added
             }),
             mimetype="application/json",
             status_code=200
