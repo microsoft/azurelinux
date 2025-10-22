@@ -649,6 +649,11 @@ def update_github_status(severity: Severity, anti_patterns: List[AntiPattern], a
                     # Post new comment
                     logger.info("Posting new PR comment")
                     github_client.post_pr_comment(comment_content)
+                
+                # Add radar-issues-detected label when issues are found
+                if severity >= Severity.WARNING:
+                    logger.info("Adding 'radar-issues-detected' label to PR")
+                    github_client.add_label("radar-issues-detected")
                     
             except Exception as e:
                 logger.error(f"Failed to post/update GitHub PR comment: {e}")
@@ -798,6 +803,11 @@ def main():
                 
                 if success:
                     logger.info(f"Successfully posted comment to PR #{pr_number}")
+                    
+                    # Add radar-issues-detected label when issues are found
+                    if analysis_result.overall_severity >= Severity.WARNING:
+                        logger.info("Adding 'radar-issues-detected' label to PR")
+                        github_client.add_label("radar-issues-detected")
                 else:
                     logger.warning(f"Failed to post comment to PR #{pr_number}")
         except Exception as e:
