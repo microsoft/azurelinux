@@ -768,13 +768,20 @@ def main():
             # Initialize blob storage client for HTML reports (uses UMI in pipeline)
             blob_storage_client = None
             try:
+                logger.info("🔐 Attempting to initialize BlobStorageClient with UMI...")
                 blob_storage_client = BlobStorageClient(
                     storage_account_name="radarblobstore",
                     container_name="radarcontainer"
                 )
-                logger.info("BlobStorageClient initialized successfully (will use UMI in pipeline)")
+                logger.info("✅ BlobStorageClient initialized successfully (using UMI in pipeline)")
             except Exception as e:
-                logger.warning(f"Failed to initialize BlobStorageClient, will fall back to Gist: {e}")
+                logger.error("❌ Failed to initialize BlobStorageClient - will fall back to Gist")
+                logger.error(f"   Error type: {type(e).__name__}")
+                logger.error(f"   Error message: {str(e)}")
+                logger.error("   Full traceback:")
+                import traceback
+                logger.error(traceback.format_exc())
+                logger.warning("⚠️  Falling back to Gist for HTML report hosting")
                 blob_storage_client = None
             
             if pr_number:
