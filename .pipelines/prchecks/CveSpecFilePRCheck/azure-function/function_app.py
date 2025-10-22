@@ -21,6 +21,8 @@ app = func.FunctionApp()
 # Configuration
 STORAGE_ACCOUNT_URL = "https://radarblobstore.blob.core.windows.net"
 CONTAINER_NAME = "radarcontainer"
+# Use GITHUB_TOKEN (CBL Mariner bot PAT) for GitHub API calls - same as GitHubClient
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 
 logger = logging.getLogger(__name__)
 
@@ -290,22 +292,33 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
             }
             type_text = challenge_type_text.get(req_body["challenge_type"], req_body["challenge_type"])
             
-            comment_body = f"""## {emoji} Challenge Submitted
+            # Format comment with prominent user attribution
+            # Posted by bot account, but clearly shows who actually submitted it
+            comment_body = f"""## {emoji} Challenge Submitted by @{username}
 
-**Finding**: {antipattern_id} in `{req_body.get("spec_file", "")}`  
+**Finding**: `{antipattern_id}` in `{req_body.get("spec_file", "")}`  
 **Challenge Type**: {type_text}  
-**Submitted by**: @{username}  
+**Submitted by**: @{username} ({email})
 
 **Feedback**:
 > {req_body["feedback_text"]}
 
 ---
-*Challenge ID: `{challenge_id}` • This challenge will be reviewed by the team.*
+*Challenge ID: `{challenge_id}` • Submitted on {datetime.utcnow().strftime('%Y-%m-%d at %H:%M UTC')}*  
+*This challenge will be reviewed by the team.*
 """
             
             comment_url = f"https://api.github.com/repos/microsoft/azurelinux/issues/{pr_number}/comments"
+            
+            # Use GITHUB_TOKEN (bot PAT) for reliable comment posting
+            # This is the same CBL Mariner bot that posts PR check comments
+            bot_token = GITHUB_TOKEN
+            if not bot_token:
+                logger.warning("⚠️  GITHUB_TOKEN not configured, falling back to user token")
+                bot_token = github_token
+            
             comment_headers = {
-                "Authorization": f"Bearer {github_token}",
+                "Authorization": f"token {bot_token}",  # Use 'token' not 'Bearer' for GitHub PATs
                 "Accept": "application/vnd.github.v3+json",
                 "Content-Type": "application/json"
             }
