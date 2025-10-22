@@ -40,7 +40,12 @@ mkdir -p "$sodiff_out_dir"
 # Isolate repo file to avoid picking up host system repos
 sodiff_isolated_reposdir="$sodiff_out_dir/isolated_repos"
 mkdir -p "$sodiff_isolated_reposdir"
-cp "$repo_file_path" "$sodiff_isolated_reposdir/"
+
+# Strip out repo_gpgcheck entries to avoid GPG check failures
+repo_file_name=$(basename "$repo_file_path")
+sed -e '/^repo_gpgcheck/d' \
+    -e 's| file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY||g' \
+    "$repo_file_path" > "$sodiff_isolated_reposdir/$repo_file_name"
 
 # Prepare mariner/ubuntu compatibility calls
 common_options="-c $repo_file_path --releasever $mariner_version --setopt=reposdir=$sodiff_isolated_reposdir"
