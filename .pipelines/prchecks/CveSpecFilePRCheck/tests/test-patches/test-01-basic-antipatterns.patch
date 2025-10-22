@@ -1,0 +1,16 @@
+--- a/SPECS/curl/curl.spec
++++ b/SPECS/curl/curl.spec
+@@ -13,6 +13,16 @@ Patch0:         CVE-2025-0665.patch
+ Patch1:         CVE-2025-0167.patch
+ Patch2:         CVE-2025-0725.patch
++Patch3:         CVE-2025-11111.patch
++Patch4:         CVE-2025-22222.patch
++Patch5:         CVE-2025-33333.patch
++Patch6:         CVE-2035-11111.patch
++Patch7:         CVE-2025-0665.patch
++Patch8:         security-hardening-fix.patch
++Patch9:         CVE-202X-INVALID.patch
++Patch10:        CVE-2025-99999.patch
+ BuildRequires:  cmake
+ BuildRequires:  krb5-devel
+ BuildRequires:  libnghttp2-devel
