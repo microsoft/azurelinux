@@ -272,6 +272,59 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
         
         logger.info(f"✅✅✅ Challenge submitted successfully: {challenge_id}")
         
+        # Post GitHub comment about the challenge
+        try:
+            logger.info(f"💬 Posting challenge notification to GitHub PR #{pr_number}")
+            
+            challenge_type_emoji = {
+                "false-positive": "🟢",
+                "needs-context": "🟡", 
+                "agree": "🔴"
+            }
+            emoji = challenge_type_emoji.get(req_body["challenge_type"], "💬")
+            
+            challenge_type_text = {
+                "false-positive": "False Alarm",
+                "needs-context": "Needs Context",
+                "agree": "Acknowledged"
+            }
+            type_text = challenge_type_text.get(req_body["challenge_type"], req_body["challenge_type"])
+            
+            comment_body = f"""## {emoji} Challenge Submitted
+
+**Finding**: {antipattern_id} in `{req_body.get("spec_file", "")}`  
+**Challenge Type**: {type_text}  
+**Submitted by**: @{username}  
+
+**Feedback**:
+> {req_body["feedback_text"]}
+
+---
+*Challenge ID: `{challenge_id}` • This challenge will be reviewed by the team.*
+"""
+            
+            comment_url = f"https://api.github.com/repos/microsoft/azurelinux/issues/{pr_number}/comments"
+            comment_headers = {
+                "Authorization": f"Bearer {github_token}",
+                "Accept": "application/vnd.github.v3+json",
+                "Content-Type": "application/json"
+            }
+            comment_response = requests.post(
+                comment_url,
+                headers=comment_headers,
+                json={"body": comment_body},
+                timeout=10
+            )
+            
+            if comment_response.status_code == 201:
+                logger.info(f"✅ GitHub comment posted successfully")
+            else:
+                logger.warning(f"⚠️  Failed to post GitHub comment: {comment_response.status_code} - {comment_response.text}")
+        
+        except Exception as comment_error:
+            logger.warning(f"⚠️  Could not post GitHub comment (non-fatal): {comment_error}")
+            # Don't fail the whole request if comment posting fails
+        
         return func.HttpResponse(
             json.dumps({
                 "success": True,
