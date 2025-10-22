@@ -1332,15 +1332,15 @@ class ResultAnalyzer:
             if html_url:
                 # Add prominent HTML report link section
                 # Note: GitHub Markdown doesn't support target="_blank" in <a> tags
-                # Users can Ctrl+Click or right-click → "Open in new tab"
+                # Use HTML anchor tag to open in new tab
                 report_lines.append("")
                 report_lines.append("---")
                 report_lines.append("")
                 report_lines.append("## 📊 Interactive HTML Report")
                 report_lines.append("")
-                report_lines.append(f"### 🔗 [**CLICK HERE to open the Interactive HTML Report**]({html_url})")
+                report_lines.append(f"### 🔗 <a href=\"{html_url}\" target=\"_blank\"><strong>CLICK HERE to open the Interactive HTML Report</strong></a>")
                 report_lines.append("")
-                report_lines.append("*💡 Tip: Right-click the link and select 'Open in new tab', or Ctrl+Click (Cmd+Click on Mac)*")
+                report_lines.append("*The report will open in a new tab automatically*")
                 report_lines.append("")
                 report_lines.append("**Features:**")
                 report_lines.append("- 🎯 Interactive anti-pattern detection results")
