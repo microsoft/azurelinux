@@ -112,6 +112,8 @@ steps:
       AZURE_OPENAI_DEPLOYMENT_NAME: $(AZURE_OPENAI_DEPLOYMENT_NAME)
       AZURE_OPENAI_MODEL_NAME: $(AZURE_OPENAI_MODEL_NAME)
       AZURE_OPENAI_API_VERSION: $(AZURE_OPENAI_API_VERSION)
+      # Managed Identity for Blob Storage (cblmargh-identity UMI)
+      AZURE_CLIENT_ID: "7bf2e2c3-009a-460e-90d4-eff987a8d71d"
       # GitHub integration environment variables
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
       GITHUB_TOKEN: $(githubPrPat)

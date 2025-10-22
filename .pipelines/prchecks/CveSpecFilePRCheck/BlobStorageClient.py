@@ -6,6 +6,7 @@ Uses User Managed Identity (UMI) authentication via DefaultAzureCredential.
 """
 
 import logging
+import os
 from datetime import datetime
 from typing import Optional, List
 from azure.storage.blob import BlobServiceClient, ContentSettings
@@ -44,6 +45,15 @@ class BlobStorageClient:
         
         # Initialize credential (will use UMI in pipeline, Azure CLI locally)
         logger.info(f"🔐 Creating DefaultAzureCredential (will auto-detect UMI in pipeline)...")
+        
+        # Check if AZURE_CLIENT_ID is set (for UMI authentication)
+        azure_client_id = os.environ.get("AZURE_CLIENT_ID")
+        if azure_client_id:
+            logger.info(f"   Using managed identity with client ID: {azure_client_id[:8]}...")
+        else:
+            logger.info("   No AZURE_CLIENT_ID set - will try default credential chain")
+            logger.info("   (ManagedIdentity → AzureCLI → Environment → ...)")
+        
         self.credential = DefaultAzureCredential()
         logger.info(f"✅ Credential created successfully")
         
