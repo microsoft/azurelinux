@@ -195,12 +195,14 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
             current_data = json.loads(blob_data.readall())
             logger.info(f"✅ Successfully loaded analytics data")
         except ResourceNotFoundError:
-            logger.error(f"❌ Analytics blob not found: {blob_name}")
-            return func.HttpResponse(
-                json.dumps({"error": f"Analytics data not found for PR #{pr_number}"}),
-                mimetype="application/json",
-                status_code=404
-            )
+            logger.warning(f"⚠️  Analytics blob not found: {blob_name}")
+            logger.info("📝 Creating new analytics.json file for this PR")
+            # Create new analytics file on first challenge
+            current_data = {
+                "pr_number": pr_number,
+                "created_at": datetime.utcnow().isoformat() + "Z",
+                "challenges": []
+            }
         
         # Generate challenge ID
         existing_challenges = current_data.get("challenges", [])
