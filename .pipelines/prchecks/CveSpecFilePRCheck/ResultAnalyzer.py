@@ -492,6 +492,7 @@ class ResultAnalyzer:
         Returns:
             HTML string with embedded CSS and JavaScript for interactivity
         """
+        import html as html_module  # For escaping HTML attributes
         stats = analysis_result.summary_statistics
         severity_color = self._get_severity_color(analysis_result.overall_severity)
         
@@ -563,8 +564,7 @@ class ResultAnalyzer:
                         # Create unique ID for this finding
                         finding_id = f"{spec_result.package_name}-{issue_type.replace(' ', '-').replace('_', '-')}-{idx}"
                         # Properly escape the description for HTML attribute
-                        import html
-                        escaped_desc = html.escape(pattern.description, quote=True)
+                        escaped_desc = html_module.escape(pattern.description, quote=True)
                         html += f"""
                             <li style="color: #c9d1d9; margin: 10px 0; font-size: 13px; position: relative;">
                                 {pattern.description}
