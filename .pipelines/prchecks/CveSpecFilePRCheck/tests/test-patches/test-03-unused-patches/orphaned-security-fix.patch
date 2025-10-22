@@ -1,0 +1,6 @@
+--- a/src/vulnerable.c
++++ b/src/vulnerable.c
+@@ -15,6 +15,7 @@ int process_request(char *data) {
++    sanitize_input(data);
+     return 0;
+ }

@@ -559,9 +559,16 @@ class ResultAnalyzer:
                         </div>
                         <ul style="margin: 5px 0; padding-left: 20px; list-style-type: disc;">
 """
-                    for pattern in patterns:
+                    for idx, pattern in enumerate(patterns):
+                        # Create unique ID for this finding
+                        finding_id = f"{spec_result.package_name}-{issue_type.replace(' ', '-').replace('_', '-')}-{idx}"
                         html += f"""
-                            <li style="color: #c9d1d9; margin: 5px 0; font-size: 13px;">{pattern.description}</li>
+                            <li style="color: #c9d1d9; margin: 10px 0; font-size: 13px; position: relative;">
+                                {pattern.description}
+                                <button class="challenge-btn" data-finding-id="{finding_id}" data-spec="{spec_result.spec_path}" data-issue-type="{issue_type}" data-description="{pattern.description.replace('"', '&quot;')}" style="margin-left: 10px; padding: 4px 8px; font-size: 11px; background: #21262d; color: #58a6ff; border: 1px solid #30363d; border-radius: 4px; cursor: pointer;">
+                                    💬 Challenge
+                                </button>
+                            </li>
 """
                     html += """
                         </ul>
@@ -744,6 +751,181 @@ class ResultAnalyzer:
             background: #21262d;
             color: #c9d1d9;
         }}
+        
+        .challenge-btn:hover {{
+            background: #30363d;
+            border-color: #58a6ff;
+        }}
+        
+        .challenge-btn:disabled {{
+            opacity: 0.5;
+            cursor: not-allowed;
+        }}
+        
+        /* Challenge Modal */
+        #challenge-modal {{
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }}
+        
+        #challenge-modal.active {{
+            display: flex;
+        }}
+        
+        .modal-content {{
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }}
+        
+        .modal-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #30363d;
+        }}
+        
+        .modal-header h3 {{
+            margin: 0;
+            color: #c9d1d9;
+            font-size: 18px;
+        }}
+        
+        .modal-close {{
+            background: transparent;
+            border: none;
+            color: #8b949e;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+        }}
+        
+        .modal-close:hover {{
+            color: #c9d1d9;
+        }}
+        
+        .finding-info {{
+            background: #0d1117;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            border: 1px solid #30363d;
+        }}
+        
+        .finding-info p {{
+            margin: 4px 0;
+            color: #8b949e;
+            font-size: 13px;
+        }}
+        
+        .finding-info strong {{
+            color: #c9d1d9;
+        }}
+        
+        .challenge-options {{
+            margin: 16px 0;
+        }}
+        
+        .challenge-options label {{
+            display: block;
+            padding: 12px;
+            margin: 8px 0;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #c9d1d9;
+        }}
+        
+        .challenge-options label:hover {{
+            border-color: #58a6ff;
+            background: #161b22;
+        }}
+        
+        .challenge-options input[type="radio"] {{
+            margin-right: 8px;
+        }}
+        
+        .challenge-options input[type="radio"]:checked + label {{
+            border-color: #58a6ff;
+            background: #1f6feb20;
+        }}
+        
+        .feedback-textarea {{
+            width: 100%;
+            min-height: 100px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 12px;
+            color: #c9d1d9;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }}
+        
+        .feedback-textarea:focus {{
+            outline: none;
+            border-color: #58a6ff;
+        }}
+        
+        .modal-actions {{
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }}
+        
+        .btn {{
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }}
+        
+        .btn-primary {{
+            background: #238636;
+            color: white;
+        }}
+        
+        .btn-primary:hover {{
+            background: #2ea043;
+        }}
+        
+        .btn-primary:disabled {{
+            opacity: 0.5;
+            cursor: not-allowed;
+        }}
+        
+        .btn-secondary {{
+            background: transparent;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+        }}
+        
+        .btn-secondary:hover {{
+            background: #21262d;
+        }}
     </style>
     <script>
         // ============================================================================
@@ -827,13 +1009,32 @@ class ResultAnalyzer:
                 const user = getCurrentUser();
                 
                 if (user) {{
-                    // Show user menu
+                    // Determine role badge
+                    let roleBadge = '';
+                    let roleColor = '';
+                    let roleIcon = '';
+                    
+                    if (user.is_admin) {{
+                        roleIcon = '👑';
+                        roleBadge = 'Admin';
+                        roleColor = '#ffd60a';
+                    }} else if (user.is_collaborator) {{
+                        roleIcon = '🔵';
+                        roleBadge = 'Collaborator';
+                        roleColor = '#0077b6';
+                    }} else {{
+                        roleIcon = '🟠';
+                        roleBadge = 'PR Owner';
+                        roleColor = '#fb8500';
+                    }}
+                    
+                    // Show user menu with role badge
                     authContainer.innerHTML = `
                         <div id="user-menu">
                             <img id="user-avatar" src="${{user.avatar_url}}" alt="${{user.username}}">
                             <div id="user-info">
                                 <div id="user-name">${{user.name || user.username}}</div>
-                                ${{user.is_collaborator ? '<span id="collaborator-badge">✓ Collaborator</span>' : ''}}
+                                <span id="collaborator-badge" style="color: ${{roleColor}};">${{roleIcon}} ${{roleBadge}}</span>
                             </div>
                             <button id="sign-out-btn" onclick="RADAR_AUTH.signOut()">Sign Out</button>
                         </div>
@@ -884,12 +1085,169 @@ class ResultAnalyzer:
         // Initialize auth when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {{
             RADAR_AUTH.init();
+            initializeChallengeButtons();
         }});
+        
+        // ============================================================================
+        // Challenge/Feedback Module
+        // ============================================================================
+        
+        function initializeChallengeButtons() {{
+            const challengeButtons = document.querySelectorAll('.challenge-btn');
+            challengeButtons.forEach(btn => {{
+                btn.addEventListener('click', (e) => {{
+                    e.stopPropagation();
+                    const findingId = btn.dataset.findingId;
+                    const spec = btn.dataset.spec;
+                    const issueType = btn.dataset.issueType;
+                    const description = btn.dataset.description;
+                    
+                    openChallengeModal({{
+                        findingId,
+                        spec,
+                        issueType,
+                        description
+                    }});
+                }});
+            }});
+        }}
+        
+        function openChallengeModal(finding) {{
+            // Check if user is authenticated
+            if (!RADAR_AUTH.isAuthenticated()) {{
+                alert('Please sign in to submit challenges');
+                RADAR_AUTH.signIn();
+                return;
+            }}
+            
+            const modal = document.getElementById('challenge-modal');
+            document.getElementById('finding-spec').textContent = finding.spec;
+            document.getElementById('finding-type').textContent = finding.issueType;
+            document.getElementById('finding-desc').textContent = finding.description;
+            
+            // Store finding data for submission
+            modal.dataset.findingId = finding.findingId;
+            modal.dataset.spec = finding.spec;
+            modal.dataset.issueType = finding.issueType;
+            modal.dataset.description = finding.description;
+            
+            modal.classList.add('active');
+        }}
+        
+        function closeChallengeModal() {{
+            const modal = document.getElementById('challenge-modal');
+            modal.classList.remove('active');
+            document.getElementById('challenge-form').reset();
+        }}
+        
+        async function submitChallenge() {{
+            const modal = document.getElementById('challenge-modal');
+            const challengeType = document.querySelector('input[name="challenge-type"]:checked');
+            const feedbackText = document.getElementById('feedback-text').value.trim();
+            const submitBtn = document.getElementById('submit-challenge-btn');
+            
+            if (!challengeType) {{
+                alert('Please select a response type');
+                return;
+            }}
+            
+            if (!feedbackText) {{
+                alert('Please provide an explanation');
+                return;
+            }}
+            
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            
+            try {{
+                const pr_number = {pr_number or 0};  // Will be filled by Python
+                
+                const response = await fetch('https://radarfunc-eka5fmceg4b5fub0.canadacentral-01.azurewebsites.net/api/challenge', {{
+                    method: 'POST',
+                    headers: RADAR_AUTH.getAuthHeaders(),
+                    body: JSON.stringify({{
+                        pr_number: pr_number,
+                        spec_file: modal.dataset.spec,
+                        antipattern_id: modal.dataset.findingId,
+                        challenge_type: challengeType.value,
+                        feedback_text: feedbackText
+                    }})
+                }});
+                
+                const result = await response.json();
+                
+                if (response.ok) {{
+                    alert('✅ Challenge submitted successfully! A comment has been posted to the PR.');
+                    closeChallengeModal();
+                    
+                    // Mark button as submitted
+                    const btn = document.querySelector(`[data-finding-id="${{modal.dataset.findingId}}"]`);
+                    if (btn) {{
+                        btn.textContent = '✅ Challenged';
+                        btn.disabled = true;
+                    }}
+                }} else {{
+                    alert(`❌ Failed to submit challenge: ${{result.error || 'Unknown error'}}`);
+                }}
+            }} catch (error) {{
+                console.error('Challenge submission error:', error);
+                alert(`❌ Network error: ${{error.message}}`);
+            }} finally {{
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Challenge';
+            }}
+        }}
     </script>
 </head>
 <body>
     <!-- Auth UI Container -->
     <div id="auth-container"></div>
+    
+    <!-- Challenge Modal -->
+    <div id="challenge-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💬 Challenge Finding</h3>
+                <button class="modal-close" onclick="closeChallengeModal()">×</button>
+            </div>
+            
+            <div class="finding-info">
+                <p><strong>Spec File:</strong> <span id="finding-spec"></span></p>
+                <p><strong>Issue Type:</strong> <span id="finding-type"></span></p>
+                <p><strong>Description:</strong> <span id="finding-desc"></span></p>
+            </div>
+            
+            <form id="challenge-form" onsubmit="event.preventDefault(); submitChallenge();">
+                <div class="challenge-options">
+                    <label style="cursor: pointer;">
+                        <input type="radio" name="challenge-type" value="false-positive">
+                        <span>🟢 <strong>False Alarm</strong> - This finding is incorrect</span>
+                    </label>
+                    <label style="cursor: pointer;">
+                        <input type="radio" name="challenge-type" value="needs-context">
+                        <span>🟡 <strong>Needs Context</strong> - This requires additional explanation</span>
+                    </label>
+                    <label style="cursor: pointer;">
+                        <input type="radio" name="challenge-type" value="disagree-with-severity">
+                        <span>🔴 <strong>Agree</strong> - I acknowledge this finding</span>
+                    </label>
+                </div>
+                
+                <div style="margin: 16px 0;">
+                    <label style="color: #8b949e; font-size: 13px; display: block; margin-bottom: 8px;">
+                        Explanation (required):
+                    </label>
+                    <textarea id="feedback-text" class="feedback-textarea" placeholder="Provide details about your response..." required></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeChallengeModal()">Cancel</button>
+                    <button type="submit" id="submit-challenge-btn" class="btn btn-primary">Submit Challenge</button>
+                </div>
+            </form>
+        </div>
+    </div>
     
     <!-- Main Report Content -->
 {html_report}
