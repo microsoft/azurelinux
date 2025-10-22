@@ -562,10 +562,13 @@ class ResultAnalyzer:
                     for idx, pattern in enumerate(patterns):
                         # Create unique ID for this finding
                         finding_id = f"{spec_result.package_name}-{issue_type.replace(' ', '-').replace('_', '-')}-{idx}"
+                        # Properly escape the description for HTML attribute
+                        import html
+                        escaped_desc = html.escape(pattern.description, quote=True)
                         html += f"""
                             <li style="color: #c9d1d9; margin: 10px 0; font-size: 13px; position: relative;">
                                 {pattern.description}
-                                <button class="challenge-btn" data-finding-id="{finding_id}" data-spec="{spec_result.spec_path}" data-issue-type="{issue_type}" data-description="{pattern.description.replace('"', '&quot;')}" style="margin-left: 10px; padding: 4px 8px; font-size: 11px; background: #21262d; color: #58a6ff; border: 1px solid #30363d; border-radius: 4px; cursor: pointer;">
+                                <button class="challenge-btn" data-finding-id="{finding_id}" data-spec="{spec_result.spec_path}" data-issue-type="{issue_type}" data-description="{escaped_desc}" style="margin-left: 10px; padding: 4px 8px; font-size: 11px; background: #21262d; color: #58a6ff; border: 1px solid #30363d; border-radius: 4px; cursor: pointer;">
                                     💬 Challenge
                                 </button>
                             </li>
