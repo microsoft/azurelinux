@@ -24,7 +24,6 @@ Distribution:   Azure Linux
 Group:          System Environment/Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
-# Config from https://microsoft.visualstudio.com/LSG/_git/linux-dom0?path=/arch/arm64/configs/uvm_defconfig&version=GTrolling-lts/uvm/6.6.96.mshv1&_a=contents
 Source2:        config_aarch64
 BuildRequires:  audit-devel
 BuildRequires:  bash

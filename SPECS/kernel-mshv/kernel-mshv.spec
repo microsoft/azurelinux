@@ -28,8 +28,6 @@ Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
 Source4:        50_mariner_mshv_menuentry
-# Current config from https://microsoft.visualstudio.com/LSG/_git/linux-dom0?path=%2Farch%2Farm64%2Fconfigs%2Fmshv_defconfig&version=GTrolling-lts%2Fmshv%2F6.6.101.mshv1&_a=contents
-# and adapted to 6.6.100.mshv1
 Source5:        config_aarch64
 BuildRequires:  audit-devel
 BuildRequires:  bash
