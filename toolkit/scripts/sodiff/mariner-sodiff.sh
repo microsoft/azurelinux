@@ -48,7 +48,7 @@ sed -e '/^repo_gpgcheck/d' \
     "$repo_file_path" > "$sodiff_isolated_reposdir/$repo_file_name"
 
 # Prepare mariner/ubuntu compatibility calls
-common_options="-c $repo_file_path --releasever $mariner_version --setopt=reposdir=$sodiff_isolated_reposdir"
+common_options="--releasever $mariner_version --setopt=reposdir=$sodiff_isolated_reposdir"
 
 dnf_command=dnf
 # Cache RPM metadata
