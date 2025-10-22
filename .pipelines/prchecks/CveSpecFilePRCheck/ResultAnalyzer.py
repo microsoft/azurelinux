@@ -1162,22 +1162,38 @@ class ResultAnalyzer:
             
             try {{
                 const pr_number = {pr_number or 0};  // Will be filled by Python
+                const headers = RADAR_AUTH.getAuthHeaders();
+                
+                console.log('📤 Submitting challenge to Azure Function...');
+                console.log('   PR Number:', pr_number);
+                console.log('   Challenge Type:', challengeType.value);
+                console.log('   Has Auth Token:', !!headers.Authorization);
+                
+                // Create abort controller for timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
                 
                 const response = await fetch('https://radarfunc-eka5fmceg4b5fub0.canadacentral-01.azurewebsites.net/api/challenge', {{
                     method: 'POST',
-                    headers: RADAR_AUTH.getAuthHeaders(),
+                    headers: headers,
                     body: JSON.stringify({{
                         pr_number: pr_number,
                         spec_file: modal.dataset.spec,
                         antipattern_id: modal.dataset.findingId,
                         challenge_type: challengeType.value,
                         feedback_text: feedbackText
-                    }})
+                    }}),
+                    signal: controller.signal
                 }});
+                
+                clearTimeout(timeoutId);
+                
+                console.log('📥 Response received:', response.status, response.statusText);
                 
                 const result = await response.json();
                 
                 if (response.ok) {{
+                    console.log('✅ Challenge submitted successfully');
                     alert('✅ Challenge submitted successfully! A comment has been posted to the PR.');
                     closeChallengeModal();
                     
@@ -1188,11 +1204,22 @@ class ResultAnalyzer:
                         btn.disabled = true;
                     }}
                 }} else {{
+                    console.error('❌ Server error:', result);
                     alert(`❌ Failed to submit challenge: ${{result.error || 'Unknown error'}}`);
                 }}
             }} catch (error) {{
-                console.error('Challenge submission error:', error);
-                alert(`❌ Network error: ${{error.message}}`);
+                console.error('❌ Challenge submission error:', error);
+                
+                if (error.name === 'AbortError') {{
+                    alert('❌ Request timeout: The server took too long to respond. Please try again.');
+                }} else if (error.message.includes('Failed to fetch')) {{
+                    alert('❌ Network error: Could not reach the server. Please check:\n' +
+                          '1. Your internet connection\n' +
+                          '2. CORS is configured on the Azure Function\n' +
+                          '3. The Azure Function is running');
+                }} else {{
+                    alert(`❌ Error: ${{error.message}}`);
+                }}
             }} finally {{
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Challenge';
@@ -1283,14 +1310,22 @@ class ResultAnalyzer:
             
             if html_url:
                 # Add prominent HTML report link section
+                # Note: GitHub Markdown doesn't support target="_blank" in <a> tags
+                # Users can Ctrl+Click or right-click → "Open in new tab"
                 report_lines.append("")
                 report_lines.append("---")
                 report_lines.append("")
                 report_lines.append("## 📊 Interactive HTML Report")
                 report_lines.append("")
-                report_lines.append(f"### 🔗 **[CLICK HERE to open the Interactive HTML Report]({html_url})**")
+                report_lines.append(f"### 🔗 [**CLICK HERE to open the Interactive HTML Report**]({html_url})")
                 report_lines.append("")
-                report_lines.append("*Opens in a new tab with full analysis details and interactive features*")
+                report_lines.append("*💡 Tip: Right-click the link and select 'Open in new tab', or Ctrl+Click (Cmd+Click on Mac)*")
+                report_lines.append("")
+                report_lines.append("**Features:**")
+                report_lines.append("- 🎯 Interactive anti-pattern detection results")
+                report_lines.append("- 🔐 GitHub OAuth sign-in for authenticated challenges")
+                report_lines.append("- 💬 Submit feedback and challenges directly from the report")
+                report_lines.append("- 📊 Comprehensive analysis with severity indicators")
                 report_lines.append("")
                 report_lines.append("---")
                 report_lines.append("")
