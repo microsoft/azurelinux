@@ -263,9 +263,9 @@ lua-libs-5.4.6-1.azl3.x86_64.rpm
 lua-rpm-macros-1-6.azl3.noarch.rpm
 lua-srpm-macros-1-6.azl3.noarch.rpm
 lua-static-5.4.6-1.azl3.x86_64.rpm
-lz4-1.9.4-1.azl3.x86_64.rpm
-lz4-debuginfo-1.9.4-1.azl3.x86_64.rpm
-lz4-devel-1.9.4-1.azl3.x86_64.rpm
+lz4-1.9.4-2.azl3.x86_64.rpm
+lz4-debuginfo-1.9.4-2.azl3.x86_64.rpm
+lz4-devel-1.9.4-2.azl3.x86_64.rpm
 m4-1.4.19-2.azl3.x86_64.rpm
 m4-debuginfo-1.4.19-2.azl3.x86_64.rpm
 make-4.4.1-2.azl3.x86_64.rpm
