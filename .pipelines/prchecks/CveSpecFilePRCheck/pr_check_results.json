@@ -1,0 +1,87 @@
+{
+  "timestamp": "2025-10-14T17:34:56.229698",
+  "overall_severity": "ERROR",
+  "total_issues": 8,
+  "summary_statistics": {
+    "total_specs": 1,
+    "specs_with_errors": 1,
+    "specs_with_warnings": 0,
+    "total_errors": 4,
+    "total_warnings": 4
+  },
+  "spec_results": [
+    {
+      "spec_path": "SPECS/azcopy/azcopy.spec",
+      "package_name": "azcopy",
+      "severity": "ERROR",
+      "summary": "4 errors, 4 warnings",
+      "anti_patterns": [
+        {
+          "id": "unused-patch-file",
+          "name": "Unused Patch File",
+          "description": "Patch file 'CVE-2025-22870.patch' exists in directory but is not referenced in spec",
+          "severity": "WARNING",
+          "line_number": null,
+          "recommendation": "Add a reference to the patch file or remove it if not needed"
+        },
+        {
+          "id": "cve-patch-mismatch",
+          "name": "CVE Patch Mismatch",
+          "description": "Patch file 'CVE-2025-22870.patch' contains CVE reference but CVE-2025-22870 is not mentioned in spec",
+          "severity": "ERROR",
+          "line_number": null,
+          "recommendation": "Add CVE-2025-22870 to the spec file changelog entry"
+        },
+        {
+          "id": "unused-patch-file",
+          "name": "Unused Patch File",
+          "description": "Patch file 'CVE-2024-51744.patch' exists in directory but is not referenced in spec",
+          "severity": "WARNING",
+          "line_number": null,
+          "recommendation": "Add a reference to the patch file or remove it if not needed"
+        },
+        {
+          "id": "cve-patch-mismatch",
+          "name": "CVE Patch Mismatch",
+          "description": "Patch file 'CVE-2024-51744.patch' contains CVE reference but CVE-2024-51744 is not mentioned in spec",
+          "severity": "ERROR",
+          "line_number": null,
+          "recommendation": "Add CVE-2024-51744 to the spec file changelog entry"
+        },
+        {
+          "id": "unused-patch-file",
+          "name": "Unused Patch File",
+          "description": "Patch file 'CVE-2025-30204.patch' exists in directory but is not referenced in spec",
+          "severity": "WARNING",
+          "line_number": null,
+          "recommendation": "Add a reference to the patch file or remove it if not needed"
+        },
+        {
+          "id": "cve-patch-mismatch",
+          "name": "CVE Patch Mismatch",
+          "description": "Patch file 'CVE-2025-30204.patch' contains CVE reference but CVE-2025-30204 is not mentioned in spec",
+          "severity": "ERROR",
+          "line_number": null,
+          "recommendation": "Add CVE-2025-30204 to the spec file changelog entry"
+        },
+        {
+          "id": "unused-patch-file",
+          "name": "Unused Patch File",
+          "description": "Patch file 'CVE-2025-22868.patch' exists in directory but is not referenced in spec",
+          "severity": "WARNING",
+          "line_number": null,
+          "recommendation": "Add a reference to the patch file or remove it if not needed"
+        },
+        {
+          "id": "cve-patch-mismatch",
+          "name": "CVE Patch Mismatch",
+          "description": "Patch file 'CVE-2025-22868.patch' contains CVE reference but CVE-2025-22868 is not mentioned in spec",
+          "severity": "ERROR",
+          "line_number": null,
+          "recommendation": "Add CVE-2025-22868 to the spec file changelog entry"
+        }
+      ],
+      "ai_analysis": ""
+    }
+  ]
+}

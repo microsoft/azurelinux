@@ -130,7 +130,7 @@ class AntiPatternDetector:
         all_patterns = []
         
         # Run each detection method and collect results
-        all_patterns.extend(self.detect_patch_file_issues(file_path, file_content, file_list))
+        all_patterns.extend(self.detect_patch_file_issues(file_content, file_path, file_list))
         all_patterns.extend(self.detect_cve_issues(file_path, file_content))
         all_patterns.extend(self.detect_changelog_issues(file_path, file_content))
         
@@ -138,44 +138,176 @@ class AntiPatternDetector:
         logger.info(f"Found {len(all_patterns)} anti-patterns in {file_path}")
         return all_patterns
 
-    def detect_patch_file_issues(self, file_path: str, file_content: str, 
-                                file_list: List[str]) -> List[AntiPattern]:
+    def _extract_spec_macros(self, spec_content: str) -> dict:
         """
-        Detect issues related to patch files.
+        Extract macro definitions from spec file content.
+        
+        Parses the spec file to extract macro values defined via:
+        - Name: package_name
+        - Version: version_number  
+        - Release: release_number
+        - %global macro_name value
+        - %define macro_name value
         
         Args:
-            file_path: Path to the spec file relative to repo root
-            file_content: Content of the spec file
-            file_list: List of files in the same directory
+            spec_content: Full text content of the spec file
             
         Returns:
-            List of detected patch-related anti-patterns
+            Dictionary mapping macro names to their values
+        """
+        macros = {}
+        
+        for line in spec_content.split('\n'):
+            line = line.strip()
+            
+            # Extract Name, Version, Release
+            if line.startswith('Name:'):
+                macros['name'] = line.split(':', 1)[1].strip()
+            elif line.startswith('Version:'):
+                macros['version'] = line.split(':', 1)[1].strip()
+            elif line.startswith('Release:'):
+                # Remove %{?dist} and similar from release
+                release = line.split(':', 1)[1].strip()
+                release = re.sub(r'%\{[^}]+\}', '', release)  # Remove macros
+                macros['release'] = release.strip()
+            elif line.startswith('Epoch:'):
+                macros['epoch'] = line.split(':', 1)[1].strip()
+            
+            # Extract %global and %define macros
+            global_match = re.match(r'%global\s+(\w+)\s+(.+)', line)
+            if global_match:
+                macros[global_match.group(1)] = global_match.group(2).strip()
+            
+            define_match = re.match(r'%define\s+(\w+)\s+(.+)', line)
+            if define_match:
+                macros[define_match.group(1)] = define_match.group(2).strip()
+        
+        return macros
+    
+    def _expand_macros(self, text: str, macros: dict) -> str:
+        """
+        Expand RPM macros in text using provided macro dictionary.
+        
+        Handles both %{macro_name} and %macro_name formats.
+        Performs recursive expansion (macros can reference other macros).
+        
+        Args:
+            text: Text containing macros to expand
+            macros: Dictionary of macro name -> value mappings
+            
+        Returns:
+            Text with macros expanded
+        """
+        if not text:
+            return text
+        
+        # Maximum iterations to prevent infinite loops
+        max_iterations = 10
+        iteration = 0
+        
+        while iteration < max_iterations:
+            original_text = text
+            
+            # Expand %{macro_name} format
+            for macro_name, macro_value in macros.items():
+                text = text.replace(f'%{{{macro_name}}}', str(macro_value))
+                text = text.replace(f'%{macro_name}', str(macro_value))
+            
+            # If no changes were made, we're done
+            if text == original_text:
+                break
+                
+            iteration += 1
+        
+        return text
+
+    def detect_patch_file_issues(self, spec_content: str, file_path: str, file_list: List[str]) -> List[AntiPattern]:
+        """
+        Detect issues related to patch files in spec files.
+        
+        This function validates patch file references in spec files against the actual
+        files present in the package directory. It performs bidirectional validation
+        to ensure consistency between spec declarations and filesystem state.
+        
+        Issues detected:
+        ----------------
+        1. Missing patch files (ERROR):
+           - Patches referenced in spec but not found in directory
+           - Example: Patch0: security.patch (but file doesn't exist)
+        
+        2. Unused patch files (WARNING):
+           - .patch files in directory but not referenced in spec
+           - Example: old-fix.patch exists but no Patch line references it
+        
+        3. CVE patch mismatches (ERROR):
+           - CVE-named patches without corresponding CVE documentation in spec
+           - Example: CVE-2023-1234.patch exists but CVE-2023-1234 not in changelog
+        
+        Args:
+            spec_content: Full text content of the spec file
+            file_path: Path to the spec file being analyzed
+            file_list: List of all files in the package directory
+            
+        Returns:
+            List of AntiPattern objects representing detected issues
         """
         patterns = []
         
-        # Extract patch references from spec file
-        patch_refs = {}
-        pattern = r'^Patch(\d+):\s+(.+?)$'
+        # Extract macros from spec file
+        macros = self._extract_spec_macros(spec_content)
+        logger.debug(f"Extracted macros: {macros}")
         
-        for line_num, line in enumerate(file_content.splitlines(), 1):
-            match = re.match(pattern, line.strip())
+        # Extract patch references from spec file with line numbers
+        # Updated regex to handle both simple filenames and full URLs
+        patch_regex = r'^Patch(\d+):\s+(.+?)$'
+        patch_refs = {}
+        
+        for line_num, line in enumerate(spec_content.split('\n'), 1):
+            match = re.match(patch_regex, line.strip())
             if match:
-                patch_num = match.group(1)
                 patch_file = match.group(2).strip()
-                patch_refs[patch_file] = line_num
                 
-                # Check if referenced patch file exists
-                if patch_file not in file_list:
-                    patterns.append(AntiPattern(
-                        id='missing-patch-file',
-                        name="Missing Patch File",
-                        description=f"Patch file '{patch_file}' is referenced in the spec but not found in the directory",
-                        severity=self.severity_map.get('missing-patch-file', Severity.ERROR),
-                        file_path=file_path,
-                        line_number=line_num,
-                        context=line.strip(),
-                        recommendation="Add the missing patch file or update the Patch reference"
-                    ))
+                # Expand macros in patch filename BEFORE processing
+                patch_file_expanded = self._expand_macros(patch_file, macros)
+                
+                # Extract just the filename from URL if it's a full path
+                # Handle URLs like https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.38-fhs-1.patch
+                if '://' in patch_file_expanded:
+                    # Extract filename from URL (last part after the final /)
+                    patch_file_expanded = patch_file_expanded.split('/')[-1]
+                elif '/' in patch_file_expanded:
+                    # Handle relative paths like patches/fix.patch
+                    patch_file_expanded = patch_file_expanded.split('/')[-1]
+                
+                # Store both original and expanded for better error messages
+                patch_refs[patch_file_expanded] = {
+                    'line_num': line_num,
+                    'line_content': line.strip(),
+                    'original': patch_file,
+                    'expanded': patch_file_expanded
+                }
+        
+        # Check for missing patch files (referenced in spec but not in directory)
+        for patch_file_expanded, patch_info in patch_refs.items():
+            if patch_file_expanded not in file_list:
+                # Show both original and expanded in description if they differ
+                if patch_info['original'] != patch_info['expanded']:
+                    description = (f"Patch file '{patch_info['original']}' "
+                                 f"(expands to '{patch_file_expanded}') "
+                                 f"referenced in spec but not found in directory")
+                else:
+                    description = f"Patch file '{patch_file_expanded}' referenced in spec but not found in directory"
+                
+                patterns.append(AntiPattern(
+                    id='missing-patch-file',
+                    name="Missing Patch File",
+                    description=description,
+                    severity=self.severity_map.get('missing-patch-file', Severity.ERROR),
+                    file_path=file_path,
+                    line_number=patch_info['line_num'],
+                    context=patch_info['line_content'],
+                    recommendation="Add the missing patch file or update the Patch reference"
+                ))
         
         # Check for CVE patch naming conventions
         for patch_file in file_list:
@@ -193,20 +325,22 @@ class AntiPatternDetector:
                         recommendation="Add a reference to the patch file or remove it if not needed"
                     ))
                 
-                # Check if CVE patches match CVE references
+                # Check for CVE-named patches
                 if patch_file.startswith('CVE-'):
-                    cve_id = re.match(r'(CVE-\d{4}-\d+)', patch_file)
-                    if cve_id and cve_id.group(1) not in file_content:
-                        patterns.append(AntiPattern(
-                            id='cve-patch-mismatch',
-                            name="CVE Patch Mismatch",
-                            description=f"Patch file '{patch_file}' appears to fix {cve_id.group(1)} but this CVE is not mentioned in the spec",
-                            severity=self.severity_map.get('cve-patch-mismatch', Severity.ERROR),
-                            file_path=file_path,
-                            line_number=None,
-                            context=None,
-                            recommendation=f"Add {cve_id.group(1)} to the spec file changelog entry"
-                        ))
+                    cve_match = re.search(r'(CVE-\d{4}-\d+)', patch_file)
+                    if cve_match:
+                        cve_id = cve_match.group(1)
+                        if cve_id not in spec_content:
+                            patterns.append(AntiPattern(
+                                id='cve-patch-mismatch',
+                                name="CVE Patch Mismatch",
+                                description=f"Patch file '{patch_file}' contains CVE reference but {cve_id} is not mentioned in spec",
+                                severity=self.severity_map.get('cve-patch-mismatch', Severity.ERROR),
+                                file_path=file_path,
+                                line_number=None,
+                                context=None,
+                                recommendation=f"Add {cve_id} to the spec file changelog entry"
+                            ))
         
         return patterns
     
