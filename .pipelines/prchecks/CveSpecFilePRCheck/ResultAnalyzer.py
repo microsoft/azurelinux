@@ -1234,9 +1234,9 @@ class ResultAnalyzer:
                 if (error.name === 'AbortError') {{
                     alert('❌ Request timeout: The server took too long to respond. Please try again.');
                 }} else if (error.message.includes('Failed to fetch')) {{
-                    alert('❌ Network error: Could not reach the server. Please check:\n' +
-                          '1. Your internet connection\n' +
-                          '2. CORS is configured on the Azure Function\n' +
+                    alert('❌ Network error: Could not reach the server. Please check:\\n' +
+                          '1. Your internet connection\\n' +
+                          '2. CORS is configured on the Azure Function\\n' +
                           '3. The Azure Function is running');
                 }} else {{
                     alert(`❌ Error: ${{error.message}}`);
