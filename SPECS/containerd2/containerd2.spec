@@ -4,8 +4,8 @@
 
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
-Version: 2.0.0
-Release: 14%{?dist}
+Version: 2.0.6
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -16,11 +16,6 @@ Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{
 Source1: containerd.service
 Source2: containerd.toml
 
-Patch0:	CVE-2024-45338.patch
-Patch1:	CVE-2025-27144.patch
-Patch2:	CVE-2024-40635.patch
-Patch3:	CVE-2025-22872.patch
-Patch4:	CVE-2025-47291.patch
 Patch5:	multi-snapshotters-support.patch
 Patch6:	tardev-support.patch
 %{?systemd_requires}
@@ -98,6 +93,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Thu Oct 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.6-1
+- Auto-upgrade to 2.0.6 - none
+
 * Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 2.0.0-14
 - Set BR for golang to < 1.25
 
