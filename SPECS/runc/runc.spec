@@ -2,7 +2,7 @@
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           runc
 # update "commit_hash" above when upgrading version
-Version:        1.2.2
+Version:        1.3.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -43,6 +43,9 @@ make install-man DESTDIR=%{buildroot} PREFIX=%{_prefix}
 %{_mandir}/*
 
 %changelog
+* Thu Oct 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.0-1
+- Auto-upgrade to 1.3.0 - none
+
 * Mon Nov 25 2024 Nan Liu <liunan@microsoft.com> - 1.2.2-1
 - Bump version to 1.2.2
 - Remove the golang version constraint
