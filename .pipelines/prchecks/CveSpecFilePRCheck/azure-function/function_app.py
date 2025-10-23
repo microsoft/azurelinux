@@ -313,9 +313,14 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
             # Use GITHUB_TOKEN (bot PAT) for reliable comment posting
             # This is the same CBL Mariner bot that posts PR check comments
             bot_token = GITHUB_TOKEN
+            logger.info(f"🔑 GITHUB_TOKEN loaded: {'Yes' if GITHUB_TOKEN else 'No (empty)'}")
+            logger.info(f"🔑 Bot token length: {len(bot_token) if bot_token else 0} chars")
+            logger.info(f"🔑 Bot token starts with: {bot_token[:10] if bot_token else 'N/A'}...")
+            
             if not bot_token:
                 logger.warning("⚠️  GITHUB_TOKEN not configured, falling back to user token")
                 bot_token = github_token
+                logger.info(f"🔑 Using user token instead (length: {len(bot_token) if bot_token else 0})")
             
             comment_headers = {
                 "Authorization": f"token {bot_token}",  # Use 'token' not 'Bearer' for GitHub PATs
@@ -337,7 +342,8 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                 logger.error(f"❌ Failed to post GitHub comment:")
                 logger.error(f"   Status: {comment_response.status_code}")
                 logger.error(f"   Response: {comment_response.text}")
-                logger.error(f"   GitHub Token (first 10 chars): {github_token[:10] if github_token else 'None'}...")
+                logger.error(f"   Bot Token (first 10 chars): {bot_token[:10] if bot_token else 'None'}...")
+                logger.error(f"   Token source: {'GITHUB_TOKEN env var' if GITHUB_TOKEN else 'User JWT token'}")
                 logger.error(f"   Comment URL: {comment_url}")
             
             # Add simple label to indicate PR has been acknowledged/reviewed
@@ -382,6 +388,8 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                 'message': label_response.text[:200]
             }
         diagnostic_info['using_bot_token'] = bool(GITHUB_TOKEN)
+        diagnostic_info['bot_token_length'] = len(GITHUB_TOKEN) if GITHUB_TOKEN else 0
+        diagnostic_info['bot_token_prefix'] = GITHUB_TOKEN[:10] if GITHUB_TOKEN else 'empty'
         
         return func.HttpResponse(
             json.dumps({

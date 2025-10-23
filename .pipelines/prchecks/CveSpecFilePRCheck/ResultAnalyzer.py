@@ -482,12 +482,13 @@ class ResultAnalyzer:
         }
         return emoji_map.get(severity, "ℹ️")
     
-    def generate_html_report(self, analysis_result: 'MultiSpecAnalysisResult') -> str:
+    def generate_html_report(self, analysis_result: 'MultiSpecAnalysisResult', pr_metadata: Optional[dict] = None) -> str:
         """
         Generate an interactive HTML report with dark theme and expandable sections.
         
         Args:
             analysis_result: MultiSpecAnalysisResult with all spec data
+            pr_metadata: Optional dict with PR metadata (pr_number, pr_title, pr_author, etc.)
             
         Returns:
             HTML string with embedded CSS and JavaScript for interactivity
@@ -506,7 +507,40 @@ class ResultAnalyzer:
             Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
         </p>
     </div>
-    
+"""
+        
+        # Add PR metadata section if provided
+        if pr_metadata:
+            pr_number = pr_metadata.get('pr_number', 'Unknown')
+            pr_title = html_module.escape(pr_metadata.get('pr_title', 'Unknown'))
+            pr_author = html_module.escape(pr_metadata.get('pr_author', 'Unknown'))
+            source_branch = html_module.escape(pr_metadata.get('source_branch', 'unknown'))
+            target_branch = html_module.escape(pr_metadata.get('target_branch', 'main'))
+            source_commit = pr_metadata.get('source_commit_sha', '')[:8]
+            
+            html += f"""
+    <div style="background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; margin-bottom: 20px;">
+        <h3 style="margin: 0 0 12px 0; color: #58a6ff; font-size: 16px;">📋 Pull Request Information</h3>
+        <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 13px;">
+            <span style="color: #8b949e;">PR Number:</span>
+            <span style="color: #c9d1d9; font-weight: 600;">#{pr_number}</span>
+            
+            <span style="color: #8b949e;">Title:</span>
+            <span style="color: #c9d1d9;">{pr_title}</span>
+            
+            <span style="color: #8b949e;">Author:</span>
+            <span style="color: #c9d1d9;">@{pr_author}</span>
+            
+            <span style="color: #8b949e;">Branches:</span>
+            <span style="color: #c9d1d9;"><code style="background: #0d1117; padding: 2px 6px; border-radius: 3px; font-size: 12px;">{source_branch}</code> → <code style="background: #0d1117; padding: 2px 6px; border-radius: 3px; font-size: 12px;">{target_branch}</code></span>
+            
+            <span style="color: #8b949e;">Commit:</span>
+            <span style="color: #c9d1d9;"><code style="background: #0d1117; padding: 2px 6px; border-radius: 3px; font-size: 12px;">{source_commit}</code></span>
+        </div>
+    </div>
+"""
+        
+        html += f"""
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px;">
         <div style="background: #161b22; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #30363d;">
             <div style="font-size: 24px; font-weight: bold; color: #58a6ff;">{stats['total_specs']}</div>
@@ -661,7 +695,7 @@ class ResultAnalyzer:
         # Add HTML report - try blob storage first, fall back to Gist
         # Note: Blob storage preferred for production, Gist as fallback
         if include_html and (blob_storage_client or github_client):
-            html_report = self.generate_html_report(analysis_result)
+            html_report = self.generate_html_report(analysis_result, pr_metadata=pr_metadata)
             
             # Create a self-contained HTML page with authentication
             html_page = f"""<!DOCTYPE html>
@@ -1201,6 +1235,9 @@ class ResultAnalyzer:
                     console.log('   GitHub label added:', result.github_label_added);
                     if (result.diagnostics) {{
                         console.log('   Diagnostics:', result.diagnostics);
+                        console.log('   Bot token loaded:', result.diagnostics.using_bot_token);
+                        console.log('   Bot token length:', result.diagnostics.bot_token_length);
+                        console.log('   Bot token prefix:', result.diagnostics.bot_token_prefix);
                     }}
                     
                     let message = '✅ Challenge submitted successfully!\\n\\n';
@@ -1351,16 +1388,14 @@ class ResultAnalyzer:
             
             if html_url:
                 # Add prominent HTML report link section
-                # Note: GitHub Markdown doesn't support target="_blank" in <a> tags
-                # Use HTML anchor tag to open in new tab
                 report_lines.append("")
                 report_lines.append("---")
                 report_lines.append("")
                 report_lines.append("## 📊 Interactive HTML Report")
                 report_lines.append("")
-                report_lines.append(f"### 🔗 <a href=\"{html_url}\" target=\"_blank\"><strong>CLICK HERE to open the Interactive HTML Report</strong></a>")
+                report_lines.append(f"### 🔗 **[CLICK HERE to open the Interactive HTML Report]({html_url})**")
                 report_lines.append("")
-                report_lines.append("*The report will open in a new tab automatically*")
+                report_lines.append("💡 **Tip:** Right-click the link above and select 'Open link in new tab' (or Ctrl+Click on Windows/Linux, Cmd+Click on Mac)")
                 report_lines.append("")
                 report_lines.append("**Features:**")
                 report_lines.append("- 🎯 Interactive anti-pattern detection results")
