@@ -9,7 +9,7 @@ audit-devel-3.1.2-1.azl3.x86_64.rpm
 audit-libs-3.1.2-1.azl3.x86_64.rpm
 autoconf-2.72-2.azl3.noarch.rpm
 automake-1.16.5-2.azl3.noarch.rpm
-azurelinux-check-macros-3.0-7.azl3.noarch.rpm
+azurelinux-check-macros-3.0-8.azl3.noarch.rpm
 azurelinux-repos-3.0-5.azl3.noarch.rpm
 azurelinux-repos-amd-3.0-5.azl3.noarch.rpm
 azurelinux-repos-amd-preview-3.0-5.azl3.noarch.rpm
@@ -27,7 +27,8 @@ azurelinux-repos-ms-oss-3.0-5.azl3.noarch.rpm
 azurelinux-repos-ms-oss-preview-3.0-5.azl3.noarch.rpm
 azurelinux-repos-preview-3.0-5.azl3.noarch.rpm
 azurelinux-repos-shared-3.0-5.azl3.noarch.rpm
-azurelinux-rpm-macros-3.0-7.azl3.noarch.rpm
+azurelinux-openssl-compat-generator-3.0-8.azl3.noarch.rpm
+azurelinux-rpm-macros-3.0-8.azl3.noarch.rpm
 bash-5.2.15-3.azl3.x86_64.rpm
 bash-debuginfo-5.2.15-3.azl3.x86_64.rpm
 bash-devel-5.2.15-3.azl3.x86_64.rpm
