@@ -1199,6 +1199,9 @@ class ResultAnalyzer:
                     console.log('✅ Challenge submitted successfully');
                     console.log('   GitHub comment posted:', result.github_comment_posted);
                     console.log('   GitHub label added:', result.github_label_added);
+                    if (result.diagnostics) {{
+                        console.log('   Diagnostics:', result.diagnostics);
+                    }}
                     
                     let message = '✅ Challenge submitted successfully!\\n\\n';
                     message += `Challenge ID: ${{result.challenge_id}}\\n`;
@@ -1206,13 +1209,21 @@ class ResultAnalyzer:
                     if (result.github_comment_posted) {{
                         message += '✅ Comment posted to PR\\n';
                     }} else {{
-                        message += '⚠️  Comment posting failed (check function logs)\\n';
+                        message += '⚠️  Comment posting failed\\n';
+                        if (result.diagnostics && result.diagnostics.comment_error) {{
+                            message += `   Error: ${{result.diagnostics.comment_error.status_code}} - ${{result.diagnostics.comment_error.message.substring(0, 50)}}...\\n`;
+                        }}
                     }}
                     
                     if (result.github_label_added) {{
                         message += '✅ Label added to PR\\n';
                     }} else {{
-                        message += '⚠️  Label not added (may need to create radar-acknowledged label)\\n';
+                        message += '⚠️  Label not added\\n';
+                        if (result.diagnostics && result.diagnostics.label_error) {{
+                            message += `   Error: ${{result.diagnostics.label_error.status_code}} - ${{result.diagnostics.label_error.message.substring(0, 50)}}...\\n`;
+                        }} else {{
+                            message += '   Note: Make sure radar-acknowledged label exists in repo\\n';
+                        }}
                     }}
                     
                     alert(message);
@@ -1226,6 +1237,15 @@ class ResultAnalyzer:
                     }}
                 }} else {{
                     console.error('❌ Server error:', result);
+                    
+                    // Handle token expiration specifically
+                    if (response.status === 401 || (result.error && result.error.includes('Token expired'))) {{
+                        alert('🔐 Your session has expired!\\n\\nPlease sign in again to submit challenges.');
+                        closeChallengeModal();
+                        RADAR_AUTH.signOut(); // Clear expired token
+                        return;
+                    }}
+                    
                     alert(`❌ Failed to submit challenge: ${{result.error || 'Unknown error'}}`);
                 }}
             }} catch (error) {{

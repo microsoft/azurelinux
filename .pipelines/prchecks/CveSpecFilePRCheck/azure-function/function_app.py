@@ -369,13 +369,28 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
             comment_posted = False
             label_added = False
         
+        # Add diagnostic info to response
+        diagnostic_info = {}
+        if not comment_posted and 'comment_response' in locals():
+            diagnostic_info['comment_error'] = {
+                'status_code': comment_response.status_code,
+                'message': comment_response.text[:200]  # First 200 chars
+            }
+        if not label_added and 'label_response' in locals():
+            diagnostic_info['label_error'] = {
+                'status_code': label_response.status_code,
+                'message': label_response.text[:200]
+            }
+        diagnostic_info['using_bot_token'] = bool(GITHUB_TOKEN)
+        
         return func.HttpResponse(
             json.dumps({
                 "success": True,
                 "challenge_id": challenge_id,
                 "message": "Challenge submitted successfully",
                 "github_comment_posted": comment_posted,
-                "github_label_added": label_added
+                "github_label_added": label_added,
+                "diagnostics": diagnostic_info
             }),
             mimetype="application/json",
             status_code=200
