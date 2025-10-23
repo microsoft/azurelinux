@@ -47,9 +47,12 @@ class GitHubClient:
         
         self.token = None
         for var in token_vars:
-            if os.environ.get(var):
-                self.token = os.environ.get(var)
+            token_value = os.environ.get(var)
+            if token_value:
+                self.token = token_value
                 logger.info(f"Using {var} for GitHub authentication")
+                logger.info(f"Token prefix: {self.token[:10] if len(self.token) > 10 else 'SHORT'}...")
+                logger.info(f"Token length: {len(self.token)}")
                 break
                 
         # Get repository details from environment variables
