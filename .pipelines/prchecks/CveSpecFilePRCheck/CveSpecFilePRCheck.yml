@@ -72,10 +72,16 @@ steps:
         echo "System.PullRequest.PullRequestNumber: $(System.PullRequest.PullRequestNumber)"
         echo "System.AccessToken exists: $([[ ! -z "${SYSTEM_ACCESSTOKEN}" ]] && echo 'Yes' || echo 'No')"
         echo "SYSTEM_ACCESSTOKEN prefix: ${SYSTEM_ACCESSTOKEN:0:4}..."
+        echo "GITHUB_TOKEN exists: $([[ ! -z "${GITHUB_TOKEN}" ]] && echo 'Yes' || echo 'No')"
+        echo "GITHUB_TOKEN prefix: ${GITHUB_TOKEN:0:10}..."
+        echo "GITHUB_TOKEN length: ${#GITHUB_TOKEN}"
         echo "Build.SourceBranch: $(Build.SourceBranch)"
         echo "Build.SourceVersion: $(Build.SourceVersion)"
         echo "System.TeamFoundationCollectionUri: $(System.TeamFoundationCollectionUri)"
         echo "System.TeamProject: $(System.TeamProject)"
+    env:
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      GITHUB_TOKEN: $(githubPrPat)
 
   # 3) Apply OpenAI config via UMI-login script
   - task: Bash@3
