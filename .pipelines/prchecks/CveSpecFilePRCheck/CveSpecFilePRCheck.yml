@@ -81,7 +81,7 @@ steps:
         echo "System.TeamProject: $(System.TeamProject)"
     env:
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-      GITHUB_TOKEN: $(githubPrPat)
+      GITHUB_TOKEN: $(cblmarghGithubPRPat)
 
   # 3) Apply OpenAI config via UMI-login script
   - task: Bash@3
@@ -122,7 +122,7 @@ steps:
       AZURE_CLIENT_ID: "7bf2e2c3-009a-460e-90d4-eff987a8d71d"
       # GitHub integration environment variables
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-      GITHUB_TOKEN: $(githubPrPat)
+      GITHUB_TOKEN: $(cblmarghGithubPRPat)
       GITHUB_REPOSITORY: $(Build.Repository.Name)
       GITHUB_PR_NUMBER: $(System.PullRequest.PullRequestNumber)
     inputs:
