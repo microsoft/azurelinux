@@ -49,10 +49,10 @@ Patch19:        CVE-2025-4802.patch
 # Add test for CVE-2025-4802. Requires additional patch for a support function
 Patch20:        add_support_record_failure_barrier.patch
 Patch21:        test-CVE-2025-4802.patch
+Patch22:        CVE-2025-8058.patch
 
 # Patches for testing
 Patch100:       0001-Remove-Wno-format-cflag-from-tests.patch
-Patch101:       CVE-2025-8058.patch
 
 BuildRequires:  bison
 BuildRequires:  gawk
