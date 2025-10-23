@@ -14,8 +14,7 @@ Source0:        https://github.com/lz4/lz4/archive/v%{version}/%{name}-%{version
 # *** NOTE: Leave this patch definition because the CVE Scan tool will flag the
 # CVE due to the above version format change.
 # CVE-2014-4715 applies to versions r* before r119.
-Patch0:         CVE-2014-4715.nopatch
-Patch1:         CVE-2025-62813.patch
+Patch0:         CVE-2025-62813.patch
 
 %description
 LZ4 is lossless compression algorithm, providing compression speed at 400 MB/s per core, scalable with multi-cores CPU.
@@ -29,8 +28,7 @@ Requires:   %{name} = %{version}-%{release}
 Static libraries and header files for the support library for lz4.
 
 %prep
-%setup -q
-%patch 1 -p1
+%autosetup -p1
 
 %build
 make %{?_smp_mflags} all
