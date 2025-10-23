@@ -790,8 +790,8 @@ def main():
                 blob_storage_client = None
             
             if pr_number:
-                # Fetch PR metadata from GitHub API
-                pr_metadata = github_client.get_pr_metadata() if github_client else None
+                # Skip PR metadata fetch for now - testing if it's causing 401 errors
+                pr_metadata = None
                 
                 # Format and post organized comment (with interactive HTML report via Blob Storage or Gist)
                 logger.info(f"Posting GitHub comment to PR #{pr_number}")
