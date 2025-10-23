@@ -5160,8 +5160,8 @@
         "type": "other",
         "other": {
           "name": "gupnp",
-          "version": "1.6.3",
-          "downloadUrl": "https://github.com/GNOME/gupnp/archive/refs/tags/gupnp-1.6.3.tar.gz"
+          "version": "1.6.9",
+          "downloadUrl": "https://github.com/GNOME/gupnp/archive/refs/tags/gupnp-1.6.9.tar.gz"
         }
       }
     },
