@@ -790,6 +790,9 @@ def main():
                 blob_storage_client = None
             
             if pr_number:
+                # Fetch PR metadata from GitHub API
+                pr_metadata = github_client.get_pr_metadata() if github_client else None
+                
                 # Format and post organized comment (with interactive HTML report via Blob Storage or Gist)
                 logger.info(f"Posting GitHub comment to PR #{pr_number}")
                 comment_text = analyzer.generate_multi_spec_report(
@@ -797,7 +800,8 @@ def main():
                     include_html=True, 
                     github_client=github_client,
                     blob_storage_client=blob_storage_client,
-                    pr_number=pr_number
+                    pr_number=pr_number,
+                    pr_metadata=pr_metadata
                 )
                 success = github_client.post_pr_comment(comment_text)
                 

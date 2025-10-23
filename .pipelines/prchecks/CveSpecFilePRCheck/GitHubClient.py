@@ -14,6 +14,7 @@ import requests
 import logging
 import json
 import re
+from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Any, Optional
 from AntiPatternDetector import Severity
@@ -225,6 +226,37 @@ class GitHubClient:
         except requests.exceptions.RequestException as e:
             logger.error(f"Failed to get PR comments: {str(e)}")
             return []
+    
+    def get_pr_metadata(self) -> Dict[str, Any]:
+        """
+        Get PR metadata including title, author, branches, etc.
+        
+        Returns:
+            Dict with pr_number, pr_title, pr_author, source_branch, target_branch, source_commit_sha
+        """
+        if not self.token or not self.repo_name or not self.pr_number:
+            logger.warning("Required GitHub params not available for PR metadata")
+            return {}
+        
+        url = f"{self.api_base_url}/repos/{self.repo_name}/pulls/{self.pr_number}"
+        
+        try:
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+            pr_data = response.json()
+            
+            return {
+                'pr_number': self.pr_number,
+                'pr_title': pr_data.get('title', f'PR #{self.pr_number}'),
+                'pr_author': pr_data.get('user', {}).get('login', 'Unknown'),
+                'source_branch': pr_data.get('head', {}).get('ref', 'unknown'),
+                'target_branch': pr_data.get('base', {}).get('ref', 'main'),
+                'source_commit_sha': pr_data.get('head', {}).get('sha', '')[:8],
+                'analysis_timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')
+            }
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Failed to get PR metadata: {str(e)}")
+            return {}
 
     def update_pr_comment(self, comment_id: int, body: str) -> Dict[str, Any]:
         """
