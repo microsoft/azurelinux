@@ -191,6 +191,17 @@ class GitHubClient:
         url = f"{self.api_base_url}/repos/{self.repo_name}/issues/{self.pr_number}/comments"
         logger.info(f"Posting comment to: {url}")
         
+        # Debug: Show what auth is being used
+        auth_header = self.headers.get('Authorization', 'NONE')
+        if auth_header != 'NONE':
+            auth_type = auth_header.split()[0] if ' ' in auth_header else 'Unknown'
+            auth_value = auth_header.split()[1] if ' ' in auth_header else auth_header
+            logger.info(f"🔑 Auth type: {auth_type}")
+            logger.info(f"🔑 Auth token prefix: {auth_value[:10]}...")
+            logger.info(f"🔑 Auth token length: {len(auth_value)}")
+        else:
+            logger.error("🔑 NO AUTHORIZATION HEADER SET!")
+        
         payload = {
             "body": body
         }
