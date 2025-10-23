@@ -28,6 +28,7 @@ Patch3:         security-fix.patch
 Patch4:         CVE-2024-7347.patch
 Patch5:         CVE-202X-INVALID.patch
 Patch6:         CVE-2025-11111-and-CVE-2025-22222.patch
+Patch7:         CVE-2025-99999.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
