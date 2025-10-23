@@ -135,7 +135,7 @@ install -D -m 644 vmlinux $D/vmlinux
 %endif
 
 mkdir -p %{buildroot}/lib/modules/%{name}
-ln -s $D/%{image_fname} %{buildroot}/lib/modules/%{name}/vmlinux
+ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
 
 find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
 find arch/%{archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
