@@ -32,6 +32,7 @@ Patch7:         CVE-2025-99999.patch
 Patch8:         fix-security-issue.patch
 Patch9:         CVE-2025-AAAAA.patch
 Patch10:        CVE-2024-7347.patch
+Patch11:        CVE-2025-BBBBB.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
