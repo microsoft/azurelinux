@@ -18,7 +18,7 @@
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        6.6.96.mshv1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -131,10 +131,11 @@ install -D -m 644 arch/%{arch}/boot/bzImage $D/bzImage
 %endif
 %ifarch aarch64
 install -D -m 644 %{image} $D/%{image_fname}
+install -D -m 644 vmlinux $D/vmlinux
 %endif
 
 mkdir -p %{buildroot}/lib/modules/%{name}
-ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
+ln -s $D/%{image_fname} %{buildroot}/lib/modules/%{name}/vmlinux
 
 find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
 find arch/%{archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
@@ -163,6 +164,9 @@ cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/script
 %ifarch x86_64
 %{_datadir}/cloud-hypervisor/bzImage
 %endif
+%ifarch aarch64
+%{_datadir}/cloud-hypervisor/vmlinux
+%endif
 %dir %{_datadir}/cloud-hypervisor
 /lib/modules/%{name}/vmlinux
 
@@ -172,6 +176,9 @@ cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/script
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Thu Oct 23 2025 Chris Co <chrco@microsoft.com> - 6.6.96.mshv1-2
+- fixup for providing vmlinux on arm64
+
 * Tue Sep 09 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.96.mshv1-1
 - Upgrade to 6.6.96.mshv1
 
