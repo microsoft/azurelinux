@@ -46,6 +46,10 @@ Patch11:  0011-Remove-EC-curves.patch
 Patch12:  0012-Disable-explicit-ec.patch
 # # Skipped tests from former 0011-Remove-EC-curves.patch
 Patch13:  0013-skipped-tests-EC-curves.patch
+# Test antipatterns
+Patch100: CVE-2025-77777.patch
+Patch101: CVE-2024-XXXXX.patch
+Patch102: general-security-fix.patch
 # # Instructions to load legacy provider in openssl.cnf
 # AZL: NOTE: Had to change this patch because of cascading changes from previous AZL note(s)
 Patch24:  0024-load-legacy-prov.patch
