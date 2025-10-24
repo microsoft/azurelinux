@@ -80,7 +80,6 @@ Requires(postun): coreutils
 %ifarch aarch64
 %define kcflags %{nil}
 %define image arch/arm64/boot/Image
-%define compressed_image_fname Image.gz
 %endif
 
 %description
@@ -128,7 +127,10 @@ install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
 
 D=%{buildroot}%{_datadir}/cloud-hypervisor
 install -D -m 644 %{image} $D/%{image_fname}
+
+%ifarch x86_64
 install -D -m 644 arch/%{arch}/boot/%{compressed_image_fname} $D/%{compressed_image_fname}
+%endif
 
 mkdir -p %{buildroot}/lib/modules/%{name}
 ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
@@ -151,7 +153,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %defattr(-,root,root)
 %license COPYING
 %{_datadir}/cloud-hypervisor/%{image_fname}
+%ifarch x86_64
 %{_datadir}/cloud-hypervisor/%{compressed_image_fname}
+%endif
 %dir %{_datadir}/cloud-hypervisor
 /lib/modules/%{name}/vmlinux
 
