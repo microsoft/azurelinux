@@ -48,6 +48,7 @@ parameters:
     default: true
 
 variables:
+  - group: mariner-pipelines-kv-secrets
   FAIL_ON_WARNINGS:      ${{ parameters.failOnWarnings }}
   USE_EXIT_CODE_SEVERITY: ${{ parameters.useExitCodeSeverity }}
   POST_GITHUB_COMMENTS:  ${{ parameters.postGitHubComments }}
