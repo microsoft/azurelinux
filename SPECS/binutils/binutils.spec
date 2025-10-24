@@ -56,10 +56,10 @@ Patch21:         CVE-2025-5244.patch
 Patch22:         CVE-2025-7545.patch
 Patch23:         CVE-2025-7546.patch
 Patch24:        CVE-2025-8225.patch
-Patch25:        CVE-2025-11082.patch
-Patch26:        CVE-2025-11083.patch
-Patch27:        CVE-2025-11412.patch
-Patch28:        CVE-2025-11414.patch
+Patch25:        CVE-2025-11412.patch
+Patch26:        CVE-2025-11414.patch
+Patch27:        CVE-2025-11082.patch
+Patch28:        CVE-2025-11083.patch
 Provides:       bundled(libiberty)
 
 # Moving macro before the "SourceX" tags breaks PR checks parsing the specs.
