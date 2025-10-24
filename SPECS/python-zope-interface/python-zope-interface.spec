@@ -2,7 +2,7 @@
 Summary:        Interfaces for Python
 Name:           python-zope-interface
 Version:        5.4.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ZPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +40,10 @@ For detailed documentation, please see http://docs.zope.org/zope.interface
 %py3_install
 
 %check
+# Install test dependencies
+pip3 install --upgrade coverage>=5.0.3
+pip3 install --upgrade zope.testing==4.3
+pip3 install --upgrade zope.event==4.6
 %python3 setup.py test
 
 %files -n python3-zope-interface
@@ -48,6 +52,9 @@ For detailed documentation, please see http://docs.zope.org/zope.interface
 %{python3_sitelib}/*
 
 %changelog
+* Tue Aug 05 2025 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.4.0-2
+- Lock down pip dependencies to avoid issues with newer versions and fix check section
+
 * Fri Mar 25 2022 Andrew Phelps <anphel@microsoft.com> - 5.4.0-1
 - Updated to version 5.4.0
 
