@@ -536,7 +536,7 @@ fi;
 %{_mandir}/man1/named-nzd2nzf.1*
 
 %changelog
-* Fri Oct 24 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.20.15-1
+* Fri Oct 24 2025 Kanishk Bansal <kanbansal@microsoft.com> - 9.20.15-1
 - Auto-upgrade to 9.20.15 - for CVE-2025-40778, CVE-2025-8677, CVE-2025-40780
 
 * Fri Jul 18 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 9.20.11-1
