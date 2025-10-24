@@ -15,16 +15,56 @@ from urllib.parse import urlencode
 from azure.storage.blob import BlobServiceClient
 from azure.identity import DefaultAzureCredential
 from azure.core.exceptions import AzureError, ResourceNotFoundError
+from azure.keyvault.secrets import SecretClient
 
 app = func.FunctionApp()
 
 # Configuration
 STORAGE_ACCOUNT_URL = "https://radarblobstore.blob.core.windows.net"
 CONTAINER_NAME = "radarcontainer"
-# Use GITHUB_TOKEN (CBL Mariner bot PAT) for GitHub API calls - same as GitHubClient
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+KEY_VAULT_URL = "https://mariner-pipelines-kv.vault.azure.net"
+GITHUB_TOKEN_SECRET_NAME = "cblmarghGithubPRPat"
 
 logger = logging.getLogger(__name__)
+
+# Global variable to cache the GitHub token
+_cached_github_token = None
+
+def get_github_token():
+    """
+    Fetch GitHub PAT token from Azure Key Vault using Managed Identity.
+    Token is cached after first retrieval for performance.
+    """
+    global _cached_github_token
+    
+    if _cached_github_token:
+        return _cached_github_token
+    
+    try:
+        # Use DefaultAzureCredential (works with Managed Identity in Azure Function)
+        credential = DefaultAzureCredential()
+        secret_client = SecretClient(vault_url=KEY_VAULT_URL, credential=credential)
+        
+        logger.info(f"🔐 Fetching GitHub token from Key Vault: {KEY_VAULT_URL}")
+        secret = secret_client.get_secret(GITHUB_TOKEN_SECRET_NAME)
+        _cached_github_token = secret.value
+        
+        logger.info(f"✅ GitHub token fetched successfully from Key Vault")
+        logger.info(f"🔑 Token prefix: {_cached_github_token[:10]}...")
+        logger.info(f"🔑 Token length: {len(_cached_github_token)}")
+        
+        return _cached_github_token
+        
+    except Exception as e:
+        logger.error(f"❌ Failed to fetch GitHub token from Key Vault: {e}")
+        # Fallback to environment variable if Key Vault fails
+        fallback_token = os.environ.get("GITHUB_TOKEN", "")
+        if fallback_token:
+            logger.warning(f"⚠️  Using fallback GITHUB_TOKEN from environment variable")
+            return fallback_token
+        else:
+            logger.error(f"❌ No fallback token available")
+            return None
 
 
 @app.route(route="challenge", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
@@ -310,15 +350,14 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
             
             comment_url = f"https://api.github.com/repos/microsoft/azurelinux/issues/{pr_number}/comments"
             
-            # Use GITHUB_TOKEN (bot PAT) for reliable comment posting
-            # This is the same CBL Mariner bot that posts PR check comments
-            bot_token = GITHUB_TOKEN
-            logger.info(f"🔑 GITHUB_TOKEN loaded: {'Yes' if GITHUB_TOKEN else 'No (empty)'}")
+            # Fetch GitHub token from Key Vault (cached after first call)
+            bot_token = get_github_token()
+            logger.info(f"🔑 Bot token fetched from Key Vault: {'Yes' if bot_token else 'No'}")
             logger.info(f"🔑 Bot token length: {len(bot_token) if bot_token else 0} chars")
             logger.info(f"🔑 Bot token starts with: {bot_token[:10] if bot_token else 'N/A'}...")
             
             if not bot_token:
-                logger.warning("⚠️  GITHUB_TOKEN not configured, falling back to user token")
+                logger.warning("⚠️  Key Vault token not available, falling back to user token")
                 bot_token = github_token
                 logger.info(f"🔑 Using user token instead (length: {len(bot_token) if bot_token else 0})")
             
@@ -343,7 +382,7 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                 logger.error(f"   Status: {comment_response.status_code}")
                 logger.error(f"   Response: {comment_response.text}")
                 logger.error(f"   Bot Token (first 10 chars): {bot_token[:10] if bot_token else 'None'}...")
-                logger.error(f"   Token source: {'GITHUB_TOKEN env var' if GITHUB_TOKEN else 'User JWT token'}")
+                logger.error(f"   Token source: {'Key Vault' if bot_token == get_github_token() else 'User JWT token'}")
                 logger.error(f"   Comment URL: {comment_url}")
             
             # Add simple label to indicate PR has been acknowledged/reviewed
@@ -387,9 +426,11 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                 'status_code': label_response.status_code,
                 'message': label_response.text[:200]
             }
-        diagnostic_info['using_bot_token'] = bool(GITHUB_TOKEN)
-        diagnostic_info['bot_token_length'] = len(GITHUB_TOKEN) if GITHUB_TOKEN else 0
-        diagnostic_info['bot_token_prefix'] = GITHUB_TOKEN[:10] if GITHUB_TOKEN else 'empty'
+        
+        kv_token = get_github_token()
+        diagnostic_info['using_bot_token'] = bool(kv_token)
+        diagnostic_info['bot_token_length'] = len(kv_token) if kv_token else 0
+        diagnostic_info['bot_token_prefix'] = kv_token[:10] if kv_token else 'empty'
         
         return func.HttpResponse(
             json.dumps({
