@@ -333,12 +333,11 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
             type_text = challenge_type_text.get(req_body["challenge_type"], req_body["challenge_type"])
             
             # Format comment with prominent user attribution
-            # Posted by bot account, but clearly shows who actually submitted it
-            comment_body = f"""## {emoji} Challenge Submitted by @{username}
+            # Posted directly by the user's account (not the bot)
+            comment_body = f"""## {emoji} Challenge Submitted
 
 **Finding**: `{antipattern_id}` in `{req_body.get("spec_file", "")}`  
 **Challenge Type**: {type_text}  
-**Submitted by**: @{username} ({email})
 
 **Feedback**:
 > {req_body["feedback_text"]}
@@ -350,61 +349,62 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
             
             comment_url = f"https://api.github.com/repos/microsoft/azurelinux/issues/{pr_number}/comments"
             
-            # Fetch GitHub token from Key Vault (cached after first call)
-            bot_token = get_github_token()
-            logger.info(f"🔑 Bot token fetched from Key Vault: {'Yes' if bot_token else 'No'}")
-            logger.info(f"🔑 Bot token length: {len(bot_token) if bot_token else 0} chars")
-            logger.info(f"🔑 Bot token starts with: {bot_token[:10] if bot_token else 'N/A'}...")
-            
-            if not bot_token:
-                logger.warning("⚠️  Key Vault token not available, falling back to user token")
-                bot_token = github_token
-                logger.info(f"🔑 Using user token instead (length: {len(bot_token) if bot_token else 0})")
-            
-            comment_headers = {
-                "Authorization": f"token {bot_token}",  # Use 'token' not 'Bearer' for GitHub PATs
+            # Use the USER's OAuth token to post the comment as themselves
+            logger.info(f"� Posting challenge comment as @{username} using their OAuth token")
+            user_comment_headers = {
+                "Authorization": f"Bearer {github_token}",  # User's OAuth token
                 "Accept": "application/vnd.github.v3+json",
                 "Content-Type": "application/json"
             }
             comment_response = requests.post(
                 comment_url,
-                headers=comment_headers,
+                headers=user_comment_headers,
                 json={"body": comment_body},
                 timeout=10
             )
             
             comment_posted = False
             if comment_response.status_code == 201:
-                logger.info(f"✅ GitHub comment posted successfully")
+                logger.info(f"✅ GitHub comment posted successfully by @{username}")
                 comment_posted = True
             else:
-                logger.error(f"❌ Failed to post GitHub comment:")
+                logger.error(f"❌ Failed to post GitHub comment as user:")
                 logger.error(f"   Status: {comment_response.status_code}")
                 logger.error(f"   Response: {comment_response.text}")
-                logger.error(f"   Bot Token (first 10 chars): {bot_token[:10] if bot_token else 'None'}...")
-                logger.error(f"   Token source: {'Key Vault' if bot_token == get_github_token() else 'User JWT token'}")
+                logger.error(f"   User: @{username}")
                 logger.error(f"   Comment URL: {comment_url}")
             
-            # Add simple label to indicate PR has been acknowledged/reviewed
-            logger.info(f"🏷️  Adding radar-acknowledged label to PR #{pr_number}")
+            # Fetch BOT token from Key Vault for label management
+            bot_token = get_github_token()
+            logger.info(f"🏷️  Adding radar-acknowledged label using bot token")
             
-            labels_url = f"https://api.github.com/repos/microsoft/azurelinux/issues/{pr_number}/labels"
-            label_response = requests.post(
-                labels_url,
-                headers=comment_headers,
-                json={"labels": ["radar-acknowledged"]},
-                timeout=10
-            )
-            
-            label_added = False
-            if label_response.status_code == 200:
-                logger.info(f"✅ Label 'radar-acknowledged' added successfully")
-                label_added = True
+            if not bot_token:
+                logger.warning("⚠️  Bot token not available from Key Vault, label cannot be added")
+                label_added = False
             else:
-                logger.error(f"❌ Failed to add label:")
-                logger.error(f"   Status: {label_response.status_code}")
-                logger.error(f"   Response: {label_response.text}")
-                logger.info("   Note: Label might not exist in repo - create 'radar-acknowledged' label first")
+                bot_comment_headers = {
+                    "Authorization": f"token {bot_token}",  # Bot PAT uses 'token' prefix
+                    "Accept": "application/vnd.github.v3+json",
+                    "Content-Type": "application/json"
+                }
+                
+                labels_url = f"https://api.github.com/repos/microsoft/azurelinux/issues/{pr_number}/labels"
+                label_response = requests.post(
+                    labels_url,
+                    headers=bot_comment_headers,
+                    json={"labels": ["radar-acknowledged"]},
+                    timeout=10
+                )
+                
+                label_added = False
+                if label_response.status_code == 200:
+                    logger.info(f"✅ Label 'radar-acknowledged' added successfully by bot")
+                    label_added = True
+                else:
+                    logger.error(f"❌ Failed to add label:")
+                    logger.error(f"   Status: {label_response.status_code}")
+                    logger.error(f"   Response: {label_response.text}")
+                    logger.info("   Note: Label might not exist in repo - create 'radar-acknowledged' label first")
         
         except Exception as comment_error:
             logger.error(f"❌ Exception during GitHub comment/label posting:")
