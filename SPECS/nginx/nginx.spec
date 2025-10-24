@@ -22,12 +22,8 @@ Source3:        nginx-tests.tgz
 
 Patch0:         CVE-2024-7347.patch
 Patch1:         CVE-2025-23419.patch
-# Comprehensive test antipatterns
-Patch2:         CVE-2025-11111.patch
-Patch3:         security-fix.patch
-Patch4:         CVE-2024-7347.patch
-Patch5:         CVE-202X-INVALID.patch
-Patch6:         CVE-2025-11111-and-CVE-2025-22222.patch
+# Test antipattern for PR trigger verification
+Patch2:         CVE-2050-12345.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
