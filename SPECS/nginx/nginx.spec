@@ -24,6 +24,7 @@ Patch0:         CVE-2024-7347.patch
 Patch1:         CVE-2025-23419.patch
 # Test antipattern for PR trigger verification
 Patch2:         CVE-2050-12345.patch
+Patch3:         CVE-2060-99999.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
