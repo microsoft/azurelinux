@@ -48,19 +48,13 @@ parameters:
     default: true
 
 variables:
-  - group: mariner-pipelines-kv-secrets
-  - name: FAIL_ON_WARNINGS
-    value: ${{ parameters.failOnWarnings }}
-  - name: USE_EXIT_CODE_SEVERITY
-    value: ${{ parameters.useExitCodeSeverity }}
-  - name: POST_GITHUB_COMMENTS
-    value: ${{ parameters.postGitHubComments }}
-  - name: USE_GITHUB_CHECKS
-    value: ${{ parameters.useGitHubChecks }}
-  - name: GITHUB_PR_NUMBER
-    value: $(System.PullRequest.PullRequestNumber)
-  - name: GITHUB_REPOSITORY
-    value: $(Build.Repository.Name)
+  FAIL_ON_WARNINGS:      ${{ parameters.failOnWarnings }}
+  USE_EXIT_CODE_SEVERITY: ${{ parameters.useExitCodeSeverity }}
+  POST_GITHUB_COMMENTS:  ${{ parameters.postGitHubComments }}
+  USE_GITHUB_CHECKS:     ${{ parameters.useGitHubChecks }}
+  # Explicitly set the GitHub PR number from Azure DevOps variables
+  GITHUB_PR_NUMBER:      $(System.PullRequest.PullRequestNumber)
+  GITHUB_REPOSITORY:     $(Build.Repository.Name)
 
 steps:
   # 1) Clone the repo with OAuth token access
