@@ -22,10 +22,8 @@ Source3:        nginx-tests.tgz
 
 Patch0:         CVE-2024-7347.patch
 Patch1:         CVE-2025-23419.patch
-# Test antipattern for PR trigger verification
-Patch2:         CVE-2050-12345.patch
-Patch3:         CVE-2060-99999.patch
-Patch4:         CVE-2070-11111.patch
+# Test with bot PAT: verify initial comment by bot, challenge by user
+Patch2:         CVE-2080-55555.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
