@@ -1,0 +1,67 @@
+From ad62a80a4a3b4861e680e17f8877ffdbe024fbda Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 19 Feb 2025 15:18:10 +0000
+Subject: [PATCH 1/2] make --gtk-vnc-debug work with new glib
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Glib 2.80 changed its logging impl so that G_MESSAGES_DEBUG is
+only ever read once, which makes it impossible for --gtk-vnc-debug
+to change in many cases.
+
+The only viable way to change logging at runtime is to register
+a custom handler and print to the console ourselves. This is what
+we probably should have done from the start.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ src/vncutil.c | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
+
+diff --git a/src/vncutil.c b/src/vncutil.c
+index b9ad611..ec14ff7 100644
+--- a/src/vncutil.c
++++ b/src/vncutil.c
+@@ -27,6 +27,15 @@
+ 
+ 
+ static gboolean debugFlag = FALSE;
++static guint debugHandler = 0;
++
++static void vnc_log_handler(
++    const gchar *log_domain G_GNUC_UNUSED,
++    GLogLevelFlags log_level G_GNUC_UNUSED,
++    const gchar *message,
++    gpointer user_data G_GNUC_UNUSED) {
++    g_printerr("%s\n", message);
++}
+ 
+ /**
+  * vnc_util_set_debug:
+@@ -38,13 +47,15 @@ static gboolean debugFlag = FALSE;
+ void vnc_util_set_debug(gboolean enabled)
+ {
+     if (enabled) {
+-        const gchar *doms = g_getenv("G_MESSAGES_DEBUG");
+-        if (!doms) {
+-            g_setenv("G_MESSAGES_DEBUG", G_LOG_DOMAIN, 1);
+-        } else if (!strstr(doms, G_LOG_DOMAIN)) {
+-            gchar *newdoms = g_strdup_printf("%s %s", doms, G_LOG_DOMAIN);
+-            g_setenv("G_MESSAGES_DEBUG", newdoms, 1);
+-            g_free(newdoms);
++        if (debugHandler == 0) {
++            debugHandler =
++                g_log_set_handler(G_LOG_DOMAIN,  G_LOG_LEVEL_DEBUG,
++                                  vnc_log_handler, NULL);
++        }
++    } else {
++        if (debugHandler != 0) {
++            g_log_remove_handler(G_LOG_DOMAIN, debugHandler);
++            debugHandler = 0;
+         }
+     }
+     debugFlag = enabled;
+-- 
+2.47.1
+
