@@ -124,6 +124,14 @@ steps:
       script: |
         echo "🔍 Running analysis of spec files with integrated GitHub posting"
         
+        # Debug: Check if GITHUB_TOKEN is set
+        if [ -n "$GITHUB_TOKEN" ]; then
+          TOKEN_PREFIX="${GITHUB_TOKEN:0:10}"
+          echo "✅ GITHUB_TOKEN is set (prefix: ${TOKEN_PREFIX}...)"
+        else
+          echo "❌ GITHUB_TOKEN is NOT set or empty - will fall back to SYSTEM_ACCESSTOKEN"
+        fi
+        
         cd .pipelines/prchecks/CveSpecFilePRCheck
         chmod +x run-pr-check.sh
 

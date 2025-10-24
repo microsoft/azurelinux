@@ -48,10 +48,18 @@ class GitHubClient:
         
         self.token = None
         for var in token_vars:
-            if os.environ.get(var):
-                self.token = os.environ.get(var)
-                logger.info(f"Using {var} for GitHub authentication")
+            token_value = os.environ.get(var, "")
+            # Only use non-empty tokens
+            if token_value and token_value.strip():
+                self.token = token_value
+                token_prefix = token_value[:10] if len(token_value) >= 10 else token_value
+                logger.info(f"✅ Using {var} for GitHub authentication (prefix: {token_prefix}...)")
                 break
+            elif var in os.environ:
+                logger.warning(f"⚠️ {var} is set but empty - skipping")
+        
+        if not self.token:
+            logger.error("❌ No valid GitHub token found in environment variables")
                 
         # Get repository details from environment variables
         self.repo_name = os.environ.get("GITHUB_REPOSITORY", "")  # Format: owner/repo
