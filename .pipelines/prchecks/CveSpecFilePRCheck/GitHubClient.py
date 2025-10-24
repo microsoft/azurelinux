@@ -14,6 +14,7 @@ import requests
 import logging
 import json
 import re
+from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Any, Optional
 from AntiPatternDetector import Severity
@@ -204,6 +205,41 @@ class GitHubClient:
                 logger.error(f"Response status: {e.response.status_code}")
                 logger.error(f"Response body: {e.response.text}")
             return {}
+    
+    def get_pr_metadata(self) -> Optional[Dict[str, Any]]:
+        """
+        Fetch PR metadata from GitHub API including author, title, branches, etc.
+        
+        Returns:
+            Dictionary with PR metadata or None if fetch fails
+        """
+        if not self.token or not self.repo_name or not self.pr_number:
+            logger.warning("Required GitHub params not available, cannot fetch PR metadata")
+            return None
+        
+        url = f"{self.api_base_url}/repos/{self.repo_name}/pulls/{self.pr_number}"
+        
+        try:
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+            pr_data = response.json()
+            
+            metadata = {
+                "pr_number": self.pr_number,
+                "pr_title": pr_data.get("title", f"PR #{self.pr_number}"),
+                "pr_author": pr_data.get("user", {}).get("login", "Unknown"),
+                "source_branch": pr_data.get("head", {}).get("ref", "unknown"),
+                "target_branch": pr_data.get("base", {}).get("ref", "main"),
+                "source_commit_sha": pr_data.get("head", {}).get("sha", "")[:8],
+                "analysis_timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC")
+            }
+            
+            logger.info(f"✅ Fetched PR metadata: author={metadata['pr_author']}, title={metadata['pr_title']}")
+            return metadata
+            
+        except requests.exceptions.RequestException as e:
+            logger.error(f"❌ Failed to fetch PR metadata: {str(e)}")
+            return None
     
     def get_pr_comments(self) -> List[Dict[str, Any]]:
         """
