@@ -8,16 +8,23 @@
 %define config_source %{SOURCE1}
 %endif
 
+%ifarch aarch64
+%define arch arm64
+%define archdir arm64
+%define config_source %{SOURCE2}
+%endif
+
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        6.6.96.mshv1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
+Source2:        config_aarch64
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -40,7 +47,6 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
-ExclusiveArch:  x86_64
 
 # Config file is only an inmutable copy from default config in lsg dom0 sources (arch/x86/configs/mshv_default_config)
 # to make permanent changes to config, make a PR for mshv_default_config in https://microsoft.visualstudio.com/DefaultCollection/LSG/_git/linux-dom0
@@ -61,15 +67,19 @@ ExclusiveArch:  x86_64
 # If there are significant changes to the config file, disable the config check and build the
 # kernel rpm. The final config file is included in /boot in the rpm.
 
-%ifarch x86_64
 %define image_fname vmlinux.bin
+%ifarch x86_64
 %define image arch/x86/boot/compressed/%{image_fname}
+%define compressed_image_fname bzImage
 %if 0%{?centos_version} && 0%{?centos_version} < 900
 %define kcflags %{nil}
 %else
 %define kcflags -Wa,-mx86-used-note=no
 %endif
-%define arch x86_64
+%endif
+%ifarch aarch64
+%define kcflags %{nil}
+%define image arch/arm64/boot/Image
 %endif
 
 %description
@@ -90,6 +100,7 @@ make mrproper
 
 cp %{config_source} .config
 cp .config current_config
+sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
 make LC_ALL= ARCH=%{arch} oldconfig
 
 # Verify the config files match
@@ -108,9 +119,7 @@ if [ -s config_diff ]; then
 fi
 
 %build
-%ifarch x86_64
 KCFLAGS="%{kcflags}" make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
-%endif
 
 %install
 install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
@@ -118,11 +127,13 @@ install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
 
 D=%{buildroot}%{_datadir}/cloud-hypervisor
 install -D -m 644 %{image} $D/%{image_fname}
-install -D -m 644 arch/%{arch}/boot/bzImage $D/bzImage
+
 %ifarch x86_64
+install -D -m 644 arch/%{arch}/boot/%{compressed_image_fname} $D/%{compressed_image_fname}
+%endif
+
 mkdir -p %{buildroot}/lib/modules/%{name}
 ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
-%endif
 
 find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
 find arch/%{archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
@@ -142,11 +153,11 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %defattr(-,root,root)
 %license COPYING
 %{_datadir}/cloud-hypervisor/%{image_fname}
-%{_datadir}/cloud-hypervisor/bzImage
-%dir %{_datadir}/cloud-hypervisor
 %ifarch x86_64
-/lib/modules/%{name}/vmlinux
+%{_datadir}/cloud-hypervisor/%{compressed_image_fname}
 %endif
+%dir %{_datadir}/cloud-hypervisor
+/lib/modules/%{name}/vmlinux
 
 %files devel
 %defattr(-,root,root)
@@ -154,6 +165,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Wed Oct 08 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.96.mshv1-2
+- Enable build on aarch64
+
 * Tue Sep 09 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.96.mshv1-1
 - Upgrade to 6.6.96.mshv1
 
