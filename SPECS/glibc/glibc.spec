@@ -10,7 +10,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        11%{?dist}
+Release:        15%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,7 +36,7 @@ Patch8:         CVE-2023-6779.patch
 Patch9:         CVE-2023-6780.patch
 # Upstream backport for fixing: nscd fails to build with cleanup handler if built with -fexceptions
 Patch10:        nscd-Do-not-rebuild-getaddrinfo-bug-30709.patch
-Patch11:        glibc-2.34_pthread_cond_wait.patch
+Patch11:        glibc-2.38_pthread_lost_wakeup_fix.patch
 Patch12:        CVE-2023-4527.patch
 Patch13:        CVE-2023-4806.patch
 Patch14:        CVE-2023-5156.patch
@@ -45,6 +45,11 @@ Patch16:        CVE-2024-33600.patch
 # Patch of CVE-2024-33601 fixes CVE-2024-33602 also
 Patch17:        CVE-2024-33601.patch
 Patch18:        CVE-2025-0395.patch
+Patch19:        CVE-2025-4802.patch
+# Add test for CVE-2025-4802. Requires additional patch for a support function
+Patch20:        add_support_record_failure_barrier.patch
+Patch21:        test-CVE-2025-4802.patch
+Patch22:        CVE-2025-8058.patch
 
 # Patches for testing
 Patch100:       0001-Remove-Wno-format-cflag-from-tests.patch
@@ -367,6 +372,19 @@ grep "^FAIL: nptl/tst-mutex10" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
+* Thu Oct 23 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.38-15
+- Patch for CVE-2025-8058
+
+* Tue Oct 08 2025 Andrew Phelps <anphel@microsoft.com> - 2.38-14
+- Replace mitigation patch for glibc bug #25847 with proper upstream fix
+
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.38-13
+- Fix Patch application of CVE-2025-4802
+- Add test for CVE-2025-4802
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 2.38-12
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.38-11
 - Patch CVE-2023-4527, CVE-2023-4806, CVE-2024-33599, CVE-2024-33600, CVE-2024-33601, CVE-2025-0395, CVE-2025-4802
 - Fix CVE-2023-5156
