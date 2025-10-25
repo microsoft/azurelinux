@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,10 +36,13 @@ Patch307:       pam_ssh_agent_auth-0.10.2-dereference.patch
 #This CVE Patches both CVE-2025-26465 and CVE-2025-26466
 Patch400:       CVE-2025-26465.patch
 Patch401:       CVE-2025-32728.patch
+Patch402:       CVE-2025-61984.patch
+Patch403:       CVE-2025-61985.patch
 # sk-dummy.so built with -fvisibility=hidden does not work
 # The tests fail with the following error:
 #   dlsym(sk_api_version) failed: (...)/sk-dummy.so: undefined symbol: sk_api_version
 Patch965: openssh-8.2p1-visibility.patch
+
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
 BuildRequires:  e2fsprogs-devel
@@ -116,6 +119,8 @@ popd
 %patch -P 400 -p1 -b .CVE-2025-26465.patch
 %patch -P 401 -p1 -b .CVE-2025-32728.patch
 %patch -P 965 -p1 -b .visibility
+%patch -P 402 -p1 -b .CVE-2025-61984.patch
+%patch -P 403 -p1 -b .CVE-2025-61985.patch
 
 %build
 # The -fvisibility=hidden is needed for clean build of the pam_ssh_agent_auth.
@@ -274,6 +279,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Tue Oct 07 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.8p1-5
+- Patch CVE-2025-61985, CVE-2025-61984
+
 * Thu Apr 17 2025 Sudipta Pandit <sudpandit@microsoft.com> - 9.8p1-4
 - Patch CVE-2025-32728
 
