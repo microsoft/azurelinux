@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 Summary:  Thai language support routines
 Name: libthai
 Version: 0.1.29
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: LGPL-2.1-or-later
 Source0: https://linux.thai.net/pub/thailinux/software/libthai/libthai-%{version}.tar.xz
 Patch0: libthai-0.1.9-multilib.patch
@@ -55,7 +55,8 @@ rm $RPM_BUILD_ROOT%{_libdir}/*.la
 %ldconfig_scriptlets
 
 %files
-%doc README AUTHORS COPYING ChangeLog
+%license COPYING
+%doc README AUTHORS ChangeLog
 %{_libdir}/lib*.so.*
 %{_datadir}/libthai
 
@@ -66,7 +67,11 @@ rm $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_libdir}/pkgconfig/*
 
 %changelog
-* Wed oNov 13 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.1.29-10
+* Thu Oct 09 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.1.29-11
+- Fix license check issue
+- License verified
+
+* Wed Nov 13 2024 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 0.1.29-10
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
