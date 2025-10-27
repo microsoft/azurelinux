@@ -54,7 +54,7 @@ Requires:       mlnx-ofa_kernel
 Requires:       mlnx-ofa_kernel-hwe-modules = %{_mofed_full_version}
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
-Conflicts:      xpmem
+Conflicts:      xpmem-modules
 
 %description -n %{_name}
 %{description}
