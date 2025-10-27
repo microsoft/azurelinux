@@ -19,9 +19,58 @@ from enum import Enum
 from typing import Dict, List, Any, Optional
 from AntiPatternDetector import Severity
 
+# Azure Key Vault imports
+try:
+    from azure.identity import DefaultAzureCredential
+    from azure.keyvault.secrets import SecretClient
+    KEY_VAULT_AVAILABLE = True
+except ImportError:
+    KEY_VAULT_AVAILABLE = False
+    logging.warning("Azure Key Vault SDK not available - will use environment variables only")
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("github-client")
+
+def fetch_github_token_from_keyvault() -> Optional[str]:
+    """
+    Fetch GitHub PAT from Azure Key Vault using Managed Identity.
+    
+    Returns:
+        str: GitHub PAT token from Key Vault, or None if unavailable
+    """
+    if not KEY_VAULT_AVAILABLE:
+        logger.warning("⚠️ Azure Key Vault SDK not available - skipping Key Vault token fetch")
+        return None
+    
+    try:
+        # Configuration from security-config-dev.json
+        vault_name = "mariner-pipelines-kv"
+        secret_name = "cblmarghGithubPRPat"
+        vault_url = f"https://{vault_name}.vault.azure.net"
+        
+        logger.info(f"🔐 Fetching GitHub PAT from Key Vault: {vault_name}/{secret_name}")
+        
+        # Use DefaultAzureCredential (will use Managed Identity in pipeline)
+        credential = DefaultAzureCredential()
+        secret_client = SecretClient(vault_url=vault_url, credential=credential)
+        
+        # Fetch the secret
+        secret = secret_client.get_secret(secret_name)
+        token = secret.value
+        
+        if token and token.strip():
+            token_prefix = token[:10] if len(token) >= 10 else token
+            logger.info(f"✅ Successfully fetched GitHub PAT from Key Vault (prefix: {token_prefix}...)")
+            return token
+        else:
+            logger.warning("⚠️ Key Vault secret is empty")
+            return None
+            
+    except Exception as e:
+        logger.warning(f"⚠️ Failed to fetch token from Key Vault: {e}")
+        logger.warning("   Will fall back to environment variables")
+        return None
 
 class CheckStatus(Enum):
     """GitHub Check API status values"""
@@ -37,29 +86,38 @@ class GitHubClient:
     """Client for interacting with GitHub API for PR checks and comments"""
     
     def __init__(self):
-        """Initialize the GitHub client using environment variables for auth"""
-        # Try multiple token environment variables in order of preference
-        token_vars = [
-            "GITHUB_TOKEN",  # Prioritize CBL-Mariner bot PAT from key vault
-            "SYSTEM_ACCESSTOKEN",  # Fall back to Azure DevOps OAuth token
-            "GITHUB_ACCESS_TOKEN",
-            "AZDO_GITHUB_TOKEN"
-        ]
-        
+        """Initialize the GitHub client using Key Vault or environment variables for auth"""
         self.token = None
-        for var in token_vars:
-            token_value = os.environ.get(var, "")
-            # Only use non-empty tokens
-            if token_value and token_value.strip():
-                self.token = token_value
-                token_prefix = token_value[:10] if len(token_value) >= 10 else token_value
-                logger.info(f"✅ Using {var} for GitHub authentication (prefix: {token_prefix}...)")
-                break
-            elif var in os.environ:
-                logger.warning(f"⚠️ {var} is set but empty - skipping")
+        
+        # FIRST: Try to fetch token from Azure Key Vault (single source of truth)
+        logger.info("🔐 Attempting to fetch GitHub PAT from Key Vault...")
+        kv_token = fetch_github_token_from_keyvault()
+        if kv_token:
+            self.token = kv_token
+            logger.info("✅ Using GitHub PAT from Key Vault")
+        else:
+            # FALLBACK: Try environment variables (for local testing or when Key Vault unavailable)
+            logger.info("⚠️ Key Vault token not available, trying environment variables...")
+            token_vars = [
+                "GITHUB_TOKEN",  # Explicit GitHub token
+                "SYSTEM_ACCESSTOKEN",  # Azure DevOps OAuth token
+                "GITHUB_ACCESS_TOKEN",
+                "AZDO_GITHUB_TOKEN"
+            ]
+            
+            for var in token_vars:
+                token_value = os.environ.get(var, "")
+                # Only use non-empty tokens
+                if token_value and token_value.strip():
+                    self.token = token_value
+                    token_prefix = token_value[:10] if len(token_value) >= 10 else token_value
+                    logger.info(f"✅ Using {var} for GitHub authentication (prefix: {token_prefix}...)")
+                    break
+                elif var in os.environ:
+                    logger.warning(f"⚠️ {var} is set but empty - skipping")
         
         if not self.token:
-            logger.error("❌ No valid GitHub token found in environment variables")
+            logger.error("❌ No valid GitHub token found in Key Vault or environment variables")
                 
         # Get repository details from environment variables
         self.repo_name = os.environ.get("GITHUB_REPOSITORY", "")  # Format: owner/repo

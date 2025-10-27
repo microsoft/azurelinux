@@ -116,21 +116,14 @@ steps:
       AZURE_CLIENT_ID: "7bf2e2c3-009a-460e-90d4-eff987a8d71d"
       # GitHub integration environment variables
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-      GITHUB_TOKEN: $(cblmarghGithubPRPat)
+      # GITHUB_TOKEN removed - now fetched from Key Vault in Python code
       GITHUB_REPOSITORY: $(Build.Repository.Name)
       GITHUB_PR_NUMBER: $(System.PullRequest.PullRequestNumber)
     inputs:
       targetType: inline
       script: |
         echo "🔍 Running analysis of spec files with integrated GitHub posting"
-        
-        # Debug: Check if GITHUB_TOKEN is set
-        if [ -n "$GITHUB_TOKEN" ]; then
-          TOKEN_PREFIX="${GITHUB_TOKEN:0:10}"
-          echo "✅ GITHUB_TOKEN is set (prefix: ${TOKEN_PREFIX}...)"
-        else
-          echo "❌ GITHUB_TOKEN is NOT set or empty - will fall back to SYSTEM_ACCESSTOKEN"
-        fi
+        echo "🔐 GitHub PAT will be fetched from Key Vault: mariner-pipelines-kv/cblmarghGithubPRPat"
         
         cd .pipelines/prchecks/CveSpecFilePRCheck
         chmod +x run-pr-check.sh
