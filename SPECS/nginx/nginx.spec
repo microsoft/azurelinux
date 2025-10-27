@@ -22,8 +22,8 @@ Source3:        nginx-tests.tgz
 
 Patch0:         CVE-2024-7347.patch
 Patch1:         CVE-2025-23419.patch
-# Test with CBL-Mariner-Bot PAT in Key Vault - verify bot posts comments/labels
-Patch2:         CVE-2083-11111.patch
+# Test with updated ADO pipeline variable githubPrPat
+Patch2:         CVE-2084-77777.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
