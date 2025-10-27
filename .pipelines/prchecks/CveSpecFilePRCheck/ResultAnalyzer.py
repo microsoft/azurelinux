@@ -663,7 +663,7 @@ class ResultAnalyzer:
     
     def generate_multi_spec_report(self, analysis_result: 'MultiSpecAnalysisResult', include_html: bool = True, 
                                    github_client = None, blob_storage_client = None, pr_number: int = None,
-                                   pr_metadata: dict = None) -> str:
+                                   pr_metadata: dict = None, categorized_issues: dict = None) -> str:
         """
         Generate a comprehensive report for multi-spec analysis results with enhanced formatting.
         
@@ -674,6 +674,7 @@ class ResultAnalyzer:
             blob_storage_client: Optional BlobStorageClient for uploading to Azure Blob Storage (preferred)
             pr_number: PR number for blob storage upload (required if blob_storage_client provided)
             pr_metadata: Optional dict with PR metadata (title, author, branches, sha, timestamp)
+            categorized_issues: Optional dict with categorized issues from AnalyticsManager
             
         Returns:
             Formatted GitHub markdown report with optional HTML section
@@ -1440,6 +1441,43 @@ class ResultAnalyzer:
         report_lines.append(f"| **Specs with Warnings** | ⚠️ {stats['specs_with_warnings']} |")
         report_lines.append(f"| **Total Issues Found** | {analysis_result.total_issues} |")
         report_lines.append("")
+        
+        # Add categorized issues breakdown if available
+        if categorized_issues:
+            report_lines.append("## 🏷️ Issue Status Tracking")
+            report_lines.append("")
+            report_lines.append("This commit's issues have been categorized based on challenge history:")
+            report_lines.append("")
+            
+            new_count = len(categorized_issues['new_issues'])
+            recurring_count = len(categorized_issues['recurring_unchallenged'])
+            challenged_count = len(categorized_issues['challenged_issues'])
+            resolved_count = len(categorized_issues['resolved_issues'])
+            
+            report_lines.append(f"| Status | Count | Description |")
+            report_lines.append(f"|--------|-------|-------------|")
+            report_lines.append(f"| 🆕 **New Issues** | {new_count} | First time detected in this PR |")
+            report_lines.append(f"| 🔄 **Recurring Unchallenged** | {recurring_count} | Previously detected but not yet challenged |")
+            report_lines.append(f"| ✅ **Previously Challenged** | {challenged_count} | Issues already acknowledged by reviewers |")
+            report_lines.append(f"| ✔️ **Resolved** | {resolved_count} | Issues fixed since last commit |")
+            report_lines.append("")
+            
+            # Show actionable issues requiring attention
+            unchallenged_total = new_count + recurring_count
+            if unchallenged_total > 0:
+                report_lines.append(f"⚠️ **{unchallenged_total} issue(s)** require attention (new or recurring unchallenged)")
+                report_lines.append("")
+            elif challenged_count > 0:
+                report_lines.append(f"✅ All {challenged_count} issue(s) have been acknowledged by reviewers")
+                report_lines.append("")
+            else:
+                report_lines.append("🎉 No issues detected in this commit!")
+                report_lines.append("")
+            
+            # Add helpful note
+            if challenged_count > 0:
+                report_lines.append("> **Note:** Previously challenged issues are not re-flagged. They remain visible for tracking purposes.")
+                report_lines.append("")
         
         # Package-by-package breakdown
         report_lines.append("## 📦 Package Analysis Details")

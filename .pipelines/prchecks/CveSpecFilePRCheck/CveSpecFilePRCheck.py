@@ -110,6 +110,7 @@ from AntiPatternDetector import AntiPatternDetector, AntiPattern, Severity
 from ResultAnalyzer import ResultAnalyzer
 from GitHubClient import GitHubClient, CheckStatus
 from BlobStorageClient import BlobStorageClient
+from AnalyticsManager import AnalyticsManager
 
 # Configure logging
 logging.basicConfig(
@@ -797,6 +798,57 @@ def main():
                     logger.warning("Failed to fetch PR metadata, using defaults")
                     pr_metadata = None
                 
+                # Track analytics and categorize issues if blob storage is available
+                categorized_issues = None
+                if blob_storage_client:
+                    try:
+                        logger.info("📊 Initializing AnalyticsManager for challenge tracking...")
+                        analytics_mgr = AnalyticsManager(blob_storage_client, pr_number)
+                        
+                        # Load existing analytics
+                        analytics = analytics_mgr.load_analytics()
+                        logger.info(f"Loaded analytics with {len(analytics.get('commits', []))} previous commits")
+                        
+                        # Get current commit SHA
+                        commit_sha = os.environ.get("GITHUB_COMMIT_SHA", "unknown")
+                        
+                        # Collect all issues with their hashes from analysis_result
+                        all_issues = []
+                        for spec_result in analysis_result.spec_results:
+                            for pattern in spec_result.antipatterns:
+                                all_issues.append({
+                                    "issue_hash": pattern.issue_hash,
+                                    "pattern_type": pattern.pattern_type,
+                                    "severity": pattern.severity.name,
+                                    "description": pattern.description,
+                                    "file_path": spec_result.spec_file
+                                })
+                        
+                        # Add current commit's analysis
+                        analytics_mgr.add_commit_analysis(commit_sha, all_issues)
+                        logger.info(f"Added commit analysis: {len(all_issues)} issues detected")
+                        
+                        # Categorize issues based on challenge history
+                        categorized_issues = analytics_mgr.categorize_issues(commit_sha)
+                        logger.info(f"📋 Issue categorization:")
+                        logger.info(f"   - New issues: {len(categorized_issues['new_issues'])}")
+                        logger.info(f"   - Recurring unchallenged: {len(categorized_issues['recurring_unchallenged'])}")
+                        logger.info(f"   - Previously challenged: {len(categorized_issues['challenged_issues'])}")
+                        logger.info(f"   - Resolved: {len(categorized_issues['resolved_issues'])}")
+                        
+                        # Update summary metrics
+                        analytics_mgr.update_summary_metrics()
+                        
+                        # Save updated analytics
+                        analytics_mgr.save_analytics()
+                        logger.info("✅ Analytics saved successfully")
+                        
+                    except Exception as e:
+                        logger.error(f"❌ Failed to track analytics: {e}")
+                        import traceback
+                        logger.error(traceback.format_exc())
+                        categorized_issues = None
+                
                 # Format and post organized comment (with interactive HTML report via Blob Storage or Gist)
                 logger.info(f"Posting GitHub comment to PR #{pr_number}")
                 comment_text = analyzer.generate_multi_spec_report(
@@ -805,17 +857,44 @@ def main():
                     github_client=github_client,
                     blob_storage_client=blob_storage_client,
                     pr_number=pr_number,
-                    pr_metadata=pr_metadata
+                    pr_metadata=pr_metadata,
+                    categorized_issues=categorized_issues
                 )
                 success = github_client.post_pr_comment(comment_text)
                 
                 if success:
                     logger.info(f"Successfully posted comment to PR #{pr_number}")
                     
-                    # Add radar-issues-detected label when issues are found
-                    if analysis_result.overall_severity >= Severity.WARNING:
-                        logger.info("Adding 'radar-issues-detected' label to PR")
-                        github_client.add_label("radar-issues-detected")
+                    # Smart label management based on analytics
+                    if categorized_issues:
+                        # Remove all existing radar labels first
+                        logger.info("🏷️  Managing radar labels based on challenge state...")
+                        for label in ["radar-issues-detected", "radar-acknowledged", "radar-issues-resolved"]:
+                            github_client.remove_label(label)
+                        
+                        # Count unchallenged issues (new + recurring unchallenged)
+                        unchallenged_count = len(categorized_issues['new_issues']) + len(categorized_issues['recurring_unchallenged'])
+                        challenged_count = len(categorized_issues['challenged_issues'])
+                        total_issues = unchallenged_count + challenged_count
+                        
+                        # Add appropriate label based on state
+                        if total_issues == 0:
+                            # No issues at all - mark as resolved
+                            logger.info("   ✅ No issues detected - adding 'radar-issues-resolved'")
+                            github_client.add_label("radar-issues-resolved")
+                        elif unchallenged_count == 0 and challenged_count > 0:
+                            # All issues have been challenged
+                            logger.info(f"   ✅ All {challenged_count} issues challenged - adding 'radar-acknowledged'")
+                            github_client.add_label("radar-acknowledged")
+                        else:
+                            # Has unchallenged issues
+                            logger.info(f"   ⚠️  {unchallenged_count} unchallenged issues - adding 'radar-issues-detected'")
+                            github_client.add_label("radar-issues-detected")
+                    else:
+                        # Fallback to old behavior if analytics unavailable
+                        if analysis_result.overall_severity >= Severity.WARNING:
+                            logger.info("Adding 'radar-issues-detected' label to PR (analytics unavailable)")
+                            github_client.add_label("radar-issues-detected")
                 else:
                     logger.warning(f"Failed to post comment to PR #{pr_number}")
         except Exception as e:
