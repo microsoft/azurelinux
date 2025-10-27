@@ -595,14 +595,15 @@ class ResultAnalyzer:
                         <ul style="margin: 5px 0; padding-left: 20px; list-style-type: disc;">
 """
                     for idx, pattern in enumerate(patterns):
-                        # Create unique ID for this finding
-                        finding_id = f"{spec_result.package_name}-{issue_type.replace(' ', '-').replace('_', '-')}-{idx}"
+                        # Use the issue_hash if available, otherwise fallback to generated ID
+                        issue_hash = pattern.issue_hash if hasattr(pattern, 'issue_hash') and pattern.issue_hash else f"{spec_result.package_name}-{issue_type.replace(' ', '-').replace('_', '-')}-{idx}"
+                        finding_id = issue_hash  # For backwards compatibility in HTML
                         # Properly escape the description for both HTML content and attributes
                         escaped_desc = html_module.escape(pattern.description, quote=True)
                         html += f"""
                             <li style="color: #c9d1d9; margin: 10px 0; font-size: 13px; position: relative;">
                                 {escaped_desc}
-                                <button class="challenge-btn" data-finding-id="{finding_id}" data-spec="{spec_result.spec_path}" data-issue-type="{issue_type}" data-description="{escaped_desc}" style="margin-left: 10px; padding: 4px 8px; font-size: 11px; background: #21262d; color: #58a6ff; border: 1px solid #30363d; border-radius: 4px; cursor: pointer;">
+                                <button class="challenge-btn" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-spec="{spec_result.spec_path}" data-issue-type="{issue_type}" data-description="{escaped_desc}" style="margin-left: 10px; padding: 4px 8px; font-size: 11px; background: #21262d; color: #58a6ff; border: 1px solid #30363d; border-radius: 4px; cursor: pointer;">
                                     💬 Challenge
                                 </button>
                             </li>
@@ -1136,12 +1137,14 @@ class ResultAnalyzer:
                 btn.addEventListener('click', (e) => {{
                     e.stopPropagation();
                     const findingId = btn.dataset.findingId;
+                    const issueHash = btn.dataset.issueHash || btn.dataset.findingId;  // Use issue_hash if available
                     const spec = btn.dataset.spec;
                     const issueType = btn.dataset.issueType;
                     const description = btn.dataset.description;
                     
                     openChallengeModal({{
                         findingId,
+                        issueHash,
                         spec,
                         issueType,
                         description
@@ -1165,6 +1168,7 @@ class ResultAnalyzer:
             
             // Store finding data for submission
             modal.dataset.findingId = finding.findingId;
+            modal.dataset.issueHash = finding.issueHash || finding.findingId;  // Store issue_hash
             modal.dataset.spec = finding.spec;
             modal.dataset.issueType = finding.issueType;
             modal.dataset.description = finding.description;
@@ -1217,7 +1221,8 @@ class ResultAnalyzer:
                     body: JSON.stringify({{
                         pr_number: pr_number,
                         spec_file: modal.dataset.spec,
-                        antipattern_id: modal.dataset.findingId,
+                        issue_hash: modal.dataset.issueHash,  // Primary identifier
+                        antipattern_id: modal.dataset.findingId,  // Legacy field for backwards compatibility
                         challenge_type: challengeType.value,
                         feedback_text: feedbackText
                     }}),
