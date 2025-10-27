@@ -8,6 +8,7 @@ Version:	%{baseversion}
 Release:	4%{?dist}
 License:	LGPL-2.1-or-later
 Source0:	https://www.alsa-project.org/files/pub/pyalsa/pyalsa-%{version}.tar.bz2
+Source1:  %{name}-LICENSE.txt
 URL:		http://www.alsa-project.org/
 BuildRequires:	alsa-lib-devel >= %{version}
 BuildRequires:	python3-devel
@@ -33,6 +34,7 @@ Summary: %summary
 
 %prep
 %autosetup -n pyalsa-%{version} -p 1
+mv %{SOURCE1} ./LICENSE.txt
 
 %generate_buildrequires
 %pyproject_buildrequires
@@ -46,7 +48,9 @@ Summary: %summary
 
 %check
 %pyproject_check_import
+
 %files -n python3-alsa -f %{pyproject_files}
+%license LICENSE.txt
 
 %changelog
 * Fri Sep 26 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.2.14-1
