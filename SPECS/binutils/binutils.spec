@@ -316,7 +316,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %do_files aarch64-linux-gnu %{build_aarch64}
 
 %changelog
-* Mon Oct 23 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.37-19
+* Thu Oct 23 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.37-19
 - Patch for CVE-2025-11083, CVE-2025-11082
 
 * Thu Oct 16 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.37-18
