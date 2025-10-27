@@ -22,8 +22,8 @@ Source3:        nginx-tests.tgz
 
 Patch0:         CVE-2024-7347.patch
 Patch1:         CVE-2025-23419.patch
-# Test with personal PAT in Key Vault - verify bot comment + user challenges
-Patch2:         CVE-2082-99999.patch
+# Test with CBL-Mariner-Bot PAT in Key Vault - verify bot posts comments/labels
+Patch2:         CVE-2083-11111.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
