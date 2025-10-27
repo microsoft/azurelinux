@@ -1,6 +1,6 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.43
+Version:        8.0.44
 Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -114,6 +114,10 @@ fi
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Wed Oct 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.44-1
+- Upgrade to 8.0.44 for CVE-2025-53069, CVE-2025-53042, CVE-2025-53044, CVE-2025-53040,
+  CVE-2025-53062, CVE-2025-53053, CVE-2025-53045, CVE-2025-53054
+
 * Wed Jul 23 2025 BinduSri Adabala <v-badabala@microsoft.com> - 8.0.43-1
 - Upgrade to 8.0.43 to fix CVE-2025-50077, CVE-2025-50078, CVE-2025-50079, CVE-2025-50080, CVE-2025-50081, CVE-2025-50082,
   CVE-2025-50083, CVE-2025-50084, CVE-2025-50085, CVE-2025-50086, CVE-2025-50087, CVE-2025-50091, CVE-2025-50092,CVE-2025-50093,
