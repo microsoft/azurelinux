@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           cjose
 Version:        0.6.2.2
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        C library implementing the Javascript Object Signing and Encryption (JOSE)
 
 License:        MIT
@@ -64,6 +64,10 @@ make check || (cat test/test-suite.log; exit 1)
 
 
 %changelog
+* Thu Aug 14 2025 Suneel Yadava <suneelyadava@microsoft.com> - 0.6.2.2-8
+- Promoted packages to core (from SPECS-EXTENDED to SPECS).
+- License verified
+
 * Tue Dec 17 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.6.2.2-7
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified
