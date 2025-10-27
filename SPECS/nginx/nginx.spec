@@ -22,8 +22,8 @@ Source3:        nginx-tests.tgz
 
 Patch0:         CVE-2024-7347.patch
 Patch1:         CVE-2025-23419.patch
-# Test with updated ADO pipeline variable githubPrPat
-Patch2:         CVE-2084-77777.patch
+# Test with Key Vault token fetching - no ADO pipeline variable needed!
+Patch2:         CVE-2085-88888.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
