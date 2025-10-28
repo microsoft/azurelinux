@@ -595,14 +595,15 @@ class ResultAnalyzer:
         for spec_result in sorted(analysis_result.spec_results, key=lambda x: x.package_name):
             pkg_color = self._get_severity_color(spec_result.severity)
             html += f"""
-    <details style="background: #161b22; border: 1px solid #30363d; border-radius: 6px; margin-bottom: 10px; padding: 10px;" data-spec-name="{spec_result.package_name}">
-        <summary style="cursor: pointer; font-weight: bold; color: {pkg_color}; font-size: 16px; user-select: none;">
+    <details class="spec-card" data-spec-name="{spec_result.package_name}">
+        <summary style="color: {pkg_color};">
             {self._get_severity_emoji(spec_result.severity)} {spec_result.package_name}
-            <span class="spec-summary" style="color: #8b949e; font-weight: normal; font-size: 14px;">({spec_result.summary})</span>
+            <span class="spec-summary" style="color: var(--text-secondary); font-weight: normal; font-size: 14px;">({spec_result.summary})</span>
         </summary>
-        <div style="margin-top: 15px; padding-left: 20px;">
-            <div style="margin-bottom: 10px;">
-                <span style="color: #8b949e;">Spec File:</span> <code style="background: #0d1117; padding: 2px 6px; border-radius: 3px; font-size: 12px;">{spec_result.spec_path}</code>
+        <div class="spec-card-content">
+            <div style="margin-bottom: 16px;">
+                <span style="color: var(--text-secondary); font-size: 13px;">Spec File:</span> 
+                <code class="spec-file-badge">{spec_result.spec_path}</code>
             </div>
 """
             
@@ -610,19 +611,20 @@ class ResultAnalyzer:
             if spec_result.anti_patterns:
                 issues_by_type = spec_result.get_issues_by_type()
                 html += """
-            <details open style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px; margin: 10px 0; padding: 10px;">
-                <summary style="cursor: pointer; font-weight: bold; color: #f85149; user-select: none;">
+            <details open class="antipattern-details">
+                <summary>
                     🐛 Anti-Patterns Detected
                 </summary>
-                <div style="margin-top: 10px;">
+                <div style="margin-top: 16px;">
 """
                 for issue_type, patterns in issues_by_type.items():
                     html += f"""
-                    <div style="margin-bottom: 15px;">
-                        <div style="font-weight: bold; color: #d29922; margin-bottom: 5px;">
-                            {issue_type} <span style="background: #0d1117; padding: 2px 8px; border-radius: 10px; font-size: 11px; color: #8b949e;">×{len(patterns)}</span>
+                    <div class="issue-type-section">
+                        <div class="issue-type-header">
+                            <span class="issue-type-title">{issue_type}</span>
+                            <span class="issue-count-badge">×{len(patterns)}</span>
                         </div>
-                        <ul style="margin: 5px 0; padding-left: 20px; list-style-type: disc;">
+                        <ul class="issue-list">
 """
                     for idx, pattern in enumerate(patterns):
                         # Use the issue_hash if available, otherwise fallback to generated ID
@@ -631,7 +633,7 @@ class ResultAnalyzer:
                         # Properly escape the description for both HTML content and attributes
                         escaped_desc = html_module.escape(pattern.description, quote=True)
                         html += f"""
-                            <li class="antipattern-item" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" style="color: #c9d1d9; margin: 10px 0; font-size: 13px; position: relative; list-style-type: disc;">
+                            <li class="antipattern-item issue-item" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}">
                                 <span class="issue-text">{escaped_desc}</span>
                                 <button class="challenge-btn" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-spec="{spec_result.spec_path}" data-issue-type="{issue_type}" data-description="{escaped_desc}">
                                     <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
@@ -1146,6 +1148,147 @@ class ResultAnalyzer:
             0% {{ transform: scale(0); }}
             50% {{ transform: scale(1.2); }}
             100% {{ transform: scale(1); }}
+        }}
+        
+        /* ============================================================================
+           Spec Details Cards - Modern Design
+           ============================================================================ */
+        
+        .spec-card {{
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }}
+        
+        .spec-card:hover {{
+            border-color: var(--border-hover);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }}
+        
+        .spec-card summary {{
+            cursor: pointer;
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 16px;
+            user-select: none;
+            background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-primary) 100%);
+            transition: background 0.2s ease;
+        }}
+        
+        .spec-card summary:hover {{
+            background: linear-gradient(180deg, var(--border-color) 0%, var(--bg-card) 100%);
+        }}
+        
+        .spec-card-content {{
+            padding: 20px;
+        }}
+        
+        .spec-file-badge {{
+            display: inline-block;
+            background: var(--bg-primary);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            color: var(--accent-blue);
+            border: 1px solid var(--border-color);
+        }}
+        
+        /* Issue Type Sections */
+        .issue-type-section {{
+            margin-bottom: 20px;
+            padding: 12px;
+            background: var(--bg-primary);
+            border-left: 3px solid var(--accent-orange);
+            border-radius: 6px;
+        }}
+        
+        .issue-type-header {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }}
+        
+        .issue-type-title {{
+            font-weight: 600;
+            color: var(--accent-orange);
+            font-size: 14px;
+        }}
+        
+        .issue-count-badge {{
+            background: var(--bg-card);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+        }}
+        
+        /* Issue List Items */
+        .issue-list {{
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }}
+        
+        .issue-item {{
+            padding: 12px;
+            margin: 8px 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            position: relative;
+        }}
+        
+        .issue-item:hover {{
+            border-color: var(--border-hover);
+            background: var(--border-color);
+        }}
+        
+        .issue-item::before {{
+            content: "▸";
+            position: absolute;
+            left: -8px;
+            top: 12px;
+            color: var(--accent-orange);
+            font-weight: bold;
+        }}
+        
+        .issue-text {{
+            color: var(--text-primary);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-right: 8px;
+        }}
+        
+        /* Antipattern Details Section */
+        .antipattern-details {{
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 16px;
+            margin: 12px 0;
+        }}
+        
+        .antipattern-details summary {{
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--accent-red);
+            user-select: none;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }}
+        
+        .antipattern-details summary:hover {{
+            background: var(--bg-card);
         }}
         
         .challenge-btn:hover {{
