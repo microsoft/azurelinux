@@ -933,6 +933,42 @@ class ResultAnalyzer:
             padding-top: 80px;
         }}
         
+        /* Top Bell Notification */
+        #top-bell-container {{
+            position: relative;
+            cursor: pointer;
+            margin-right: 16px;
+            padding: 8px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }}
+        
+        #top-bell-container:hover {{
+            background: var(--bg-hover);
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }}
+        
+        #top-bell-container .bell-icon {{
+            font-size: 20px;
+        }}
+        
+        #top-bell-badge {{
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: var(--accent-red);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }}
+        
         /* Auth UI Styles */
         #auth-container {{
             display: flex;
@@ -1950,9 +1986,10 @@ class ResultAnalyzer:
         function updateCounters(listItem, delta) {{
             console.log(`📊 Updating counters with delta: ${{delta}}`);
             
-            // 1. Update Total Issues counter in stat card and bell badge
+            // 1. Update Total Issues counter in stat card and BOTH bell badges
             const totalIssuesCount = document.getElementById('total-issues-count');
             const issuesBadge = document.getElementById('issues-badge');
+            const topBellBadge = document.getElementById('top-bell-badge');
             
             if (totalIssuesCount) {{
                 const currentTotal = parseInt(totalIssuesCount.textContent) || 0;
@@ -1960,12 +1997,15 @@ class ResultAnalyzer:
                 totalIssuesCount.textContent = newTotal;
                 console.log(`   ✅ Updated Total Issues: ${{currentTotal}} → ${{newTotal}}`);
                 
-                // Update bell badge
+                // Update both bell badges
                 if (issuesBadge) {{
                     issuesBadge.textContent = newTotal;
-                    // Trigger bell animation
-                    animateBellBadge();
                 }}
+                if (topBellBadge) {{
+                    topBellBadge.textContent = newTotal;
+                }}
+                // Trigger bell animation
+                animateBellBadge();
             }}
             
             // 2. Update spec-level issue type counter (×count badge)
@@ -2472,21 +2512,39 @@ class ResultAnalyzer:
         
         function animateBellBadge() {{
             const badge = document.getElementById('issues-badge');
+            const topBadge = document.getElementById('top-bell-badge');
             const bellIcon = document.querySelector('.bell-icon');
+            const topBellIcon = document.querySelector('#top-bell-container .bell-icon');
             
+            // Animate stats card badge
             if (badge) {{
-                // Trigger badge pop animation
                 badge.style.animation = 'none';
                 setTimeout(() => {{
                     badge.style.animation = 'badgePop 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
                 }}, 10);
             }}
             
+            // Animate top bar badge
+            if (topBadge) {{
+                topBadge.style.animation = 'none';
+                setTimeout(() => {{
+                    topBadge.style.animation = 'badgePop 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
+                }}, 10);
+            }}
+            
+            // Animate stats card bell icon
             if (bellIcon) {{
-                // Trigger bell ring animation
                 bellIcon.style.animation = 'none';
                 setTimeout(() => {{
                     bellIcon.style.animation = 'bellRing 0.5s ease';
+                }}, 10);
+            }}
+            
+            // Animate top bar bell icon
+            if (topBellIcon) {{
+                topBellIcon.style.animation = 'none';
+                setTimeout(() => {{
+                    topBellIcon.style.animation = 'bellRing 0.5s ease';
                 }}, 10);
             }}
         }}
@@ -2545,6 +2603,11 @@ class ResultAnalyzer:
                 <span id="theme-icon">🌙</span>
                 <span id="theme-label">Dark</span>
             </button>
+            <!-- Bell Notification Icon -->
+            <div id="top-bell-container" class="bell-container" title="Total Issues">
+                <span class="bell-icon">🔔</span>
+                <span id="top-bell-badge" class="bell-badge">0</span>
+            </div>
             <!-- Auth UI Container -->
             <div id="auth-container"></div>
         </div>
