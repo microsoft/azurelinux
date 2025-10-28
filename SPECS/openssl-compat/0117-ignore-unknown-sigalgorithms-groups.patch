@@ -1,0 +1,318 @@
+From 242c746690dd1d0e500fa554c60536877d77776d Mon Sep 17 00:00:00 2001
+From: Tomas Mraz <tomas@openssl.org>
+Date: Thu, 14 Dec 2023 17:08:56 +0100
+Subject: [PATCH 47/49] 0117-ignore-unknown-sigalgorithms-groups.patch
+
+Patch-name: 0117-ignore-unknown-sigalgorithms-groups.patch
+Patch-id: 117
+Patch-status: |
+    # https://github.com/openssl/openssl/issues/23050
+---
+ CHANGES.md                        | 13 +++++++
+ doc/man3/SSL_CTX_set1_curves.pod  |  6 ++-
+ doc/man3/SSL_CTX_set1_sigalgs.pod | 11 +++++-
+ ssl/t1_lib.c                      | 56 +++++++++++++++++++++-------
+ test/sslapitest.c                 | 61 +++++++++++++++++++++++++++++++
+ 5 files changed, 132 insertions(+), 15 deletions(-)
+
+diff --git a/CHANGES.md b/CHANGES.md
+index ca29762ac2..4e21d0ddf9 100644
+--- a/CHANGES.md
++++ b/CHANGES.md
+@@ -27,6 +27,19 @@ OpenSSL 3.2
+ 
+ ### Changes between 3.2.0 and 3.2.1 [30 Jan 2024]
+ 
++ * Unknown entries in TLS SignatureAlgorithms, ClientSignatureAlgorithms
++   config options and the respective calls to SSL[_CTX]_set1_sigalgs() and
++   SSL[_CTX]_set1_client_sigalgs() that start with `?` character are
++   ignored and the configuration will still be used.
++
++   Similarly unknown entries that start with `?` character in a TLS
++   Groups config option or set with SSL[_CTX]_set1_groups_list() are ignored
++   and the configuration will still be used.
++
++   In both cases if the resulting list is empty, an error is returned.
++
++   *Tomáš Mráz*
++
+  * A file in PKCS12 format can contain certificates and keys and may come from
+    an untrusted source. The PKCS12 specification allows certain fields to be
+    NULL, but OpenSSL did not correctly check for this case. A fix has been
+diff --git a/doc/man3/SSL_CTX_set1_curves.pod b/doc/man3/SSL_CTX_set1_curves.pod
+index c26ef00306..f0566e148e 100644
+--- a/doc/man3/SSL_CTX_set1_curves.pod
++++ b/doc/man3/SSL_CTX_set1_curves.pod
+@@ -58,7 +58,8 @@ string B<list>. The string is a colon separated list of group names, for example
+ are B<P-256>, B<P-384>, B<P-521>, B<X25519>, B<X448>, B<brainpoolP256r1tls13>,
+ B<brainpoolP384r1tls13>, B<brainpoolP512r1tls13>, B<ffdhe2048>, B<ffdhe3072>,
+ B<ffdhe4096>, B<ffdhe6144> and B<ffdhe8192>. Support for other groups may be
+-added by external providers.
++added by external providers. If a group name is preceded with the C<?>
++character, it will be ignored if an implementation is missing.
+ 
+ SSL_set1_groups() and SSL_set1_groups_list() are similar except they set
+ supported groups for the SSL structure B<ssl>.
+@@ -142,6 +143,9 @@ The curve functions were added in OpenSSL 1.0.2. The equivalent group
+ functions were added in OpenSSL 1.1.1. The SSL_get_negotiated_group() function
+ was added in OpenSSL 3.0.0.
+ 
++Support for ignoring unknown groups in SSL_CTX_set1_groups_list() and
++SSL_set1_groups_list() was added in OpenSSL 3.3.
++
+ =head1 COPYRIGHT
+ 
+ Copyright 2013-2022 The OpenSSL Project Authors. All Rights Reserved.
+diff --git a/doc/man3/SSL_CTX_set1_sigalgs.pod b/doc/man3/SSL_CTX_set1_sigalgs.pod
+index eb31006346..5b7de7d956 100644
+--- a/doc/man3/SSL_CTX_set1_sigalgs.pod
++++ b/doc/man3/SSL_CTX_set1_sigalgs.pod
+@@ -33,7 +33,9 @@ signature algorithms for B<ctx> or B<ssl>. The B<str> parameter
+ must be a null terminated string consisting of a colon separated list of
+ elements, where each element is either a combination of a public key
+ algorithm and a digest separated by B<+>, or a TLS 1.3-style named
+-SignatureScheme such as rsa_pss_pss_sha256.
++SignatureScheme such as rsa_pss_pss_sha256. If a list entry is preceded
++with the C<?> character, it will be ignored if an implementation is missing.
++
+ 
+ SSL_CTX_set1_client_sigalgs(), SSL_set1_client_sigalgs(),
+ SSL_CTX_set1_client_sigalgs_list() and SSL_set1_client_sigalgs_list() set
+@@ -106,6 +108,13 @@ using a string:
+ L<ssl(7)>, L<SSL_get_shared_sigalgs(3)>,
+ L<SSL_CONF_CTX_new(3)>
+ 
++=head1 HISTORY
++
++Support for ignoring unknown signature algorithms in
++SSL_CTX_set1_sigalgs_list(), SSL_set1_sigalgs_list(),
++SSL_CTX_set1_client_sigalgs_list() and SSL_set1_client_sigalgs_list()
++was added in OpenSSL 3.3.
++
+ =head1 COPYRIGHT
+ 
+ Copyright 2015-2018 The OpenSSL Project Authors. All Rights Reserved.
+diff --git a/ssl/t1_lib.c b/ssl/t1_lib.c
+index 056aae3863..fe680449c5 100644
+--- a/ssl/t1_lib.c
++++ b/ssl/t1_lib.c
+@@ -1052,9 +1052,15 @@ static int gid_cb(const char *elem, int len, void *arg)
+     size_t i;
+     uint16_t gid = 0;
+     char etmp[GROUP_NAME_BUFFER_LENGTH];
++    int ignore_unknown = 0;
+ 
+     if (elem == NULL)
+         return 0;
++    if (elem[0] == '?') {
++        ignore_unknown = 1;
++        ++elem;
++        --len;
++    }
+     if (garg->gidcnt == garg->gidmax) {
+         uint16_t *tmp =
+             OPENSSL_realloc(garg->gid_arr,
+@@ -1070,13 +1076,14 @@ static int gid_cb(const char *elem, int len, void *arg)
+ 
+     gid = tls1_group_name2id(garg->ctx, etmp);
+     if (gid == 0) {
+-        ERR_raise_data(ERR_LIB_SSL, ERR_R_PASSED_INVALID_ARGUMENT,
+-                       "group '%s' cannot be set", etmp);
+-        return 0;
++        /* Unknown group - ignore, if ignore_unknown */
++        return ignore_unknown;
+     }
+     for (i = 0; i < garg->gidcnt; i++)
+-        if (garg->gid_arr[i] == gid)
+-            return 0;
++        if (garg->gid_arr[i] == gid) {
++            /* Duplicate group - ignore */
++            return 1;
++        }
+     garg->gid_arr[garg->gidcnt++] = gid;
+     return 1;
+ }
+@@ -1097,6 +1104,11 @@ int tls1_set_groups_list(SSL_CTX *ctx, uint16_t **pext, size_t *pextlen,
+     gcb.ctx = ctx;
+     if (!CONF_parse_list(str, ':', 1, gid_cb, &gcb))
+         goto end;
++    if (gcb.gidcnt == 0) {
++        ERR_raise_data(ERR_LIB_SSL, ERR_R_PASSED_INVALID_ARGUMENT,
++                       "No valid groups in '%s'", str);
++        goto end;
++    }
+     if (pext == NULL) {
+         ret = 1;
+         goto end;
+@@ -2905,8 +2917,15 @@ static int sig_cb(const char *elem, int len, void *arg)
+     const SIGALG_LOOKUP *s;
+     char etmp[TLS_MAX_SIGSTRING_LEN], *p;
+     int sig_alg = NID_undef, hash_alg = NID_undef;
++    int ignore_unknown = 0;
++
+     if (elem == NULL)
+         return 0;
++    if (elem[0] == '?') {
++        ignore_unknown = 1;
++        ++elem;
++        --len;
++    }
+     if (sarg->sigalgcnt == TLS_MAX_SIGALGCNT)
+         return 0;
+     if (len > (int)(sizeof(etmp) - 1))
+@@ -2931,8 +2950,10 @@ static int sig_cb(const char *elem, int len, void *arg)
+                     break;
+                 }
+             }
+-            if (i == OSSL_NELEM(sigalg_lookup_tbl))
+-                return 0;
++            if (i == OSSL_NELEM(sigalg_lookup_tbl)) {
++                /* Ignore unknown algorithms if ignore_unknown */
++                return ignore_unknown;
++            }
+         }
+     } else {
+         *p = 0;
+@@ -2940,8 +2961,10 @@ static int sig_cb(const char *elem, int len, void *arg)
+             return 0;
+         get_sigorhash(&sig_alg, &hash_alg, etmp);
+         get_sigorhash(&sig_alg, &hash_alg, p);
+-        if (sig_alg == NID_undef || hash_alg == NID_undef)
+-            return 0;
++        if (sig_alg == NID_undef || hash_alg == NID_undef) {
++            /* Ignore unknown algorithms if ignore_unknown */
++            return ignore_unknown;
++        }
+         for (i = 0, s = sigalg_lookup_tbl; i < OSSL_NELEM(sigalg_lookup_tbl);
+              i++, s++) {
+             if (s->hash == hash_alg && s->sig == sig_alg) {
+@@ -2949,15 +2972,17 @@ static int sig_cb(const char *elem, int len, void *arg)
+                 break;
+             }
+         }
+-        if (i == OSSL_NELEM(sigalg_lookup_tbl))
+-            return 0;
++        if (i == OSSL_NELEM(sigalg_lookup_tbl)) {
++            /* Ignore unknown algorithms if ignore_unknown */
++            return ignore_unknown;
++        }
+     }
+ 
+-    /* Reject duplicates */
++    /* Ignore duplicates */
+     for (i = 0; i < sarg->sigalgcnt - 1; i++) {
+         if (sarg->sigalgs[i] == sarg->sigalgs[sarg->sigalgcnt - 1]) {
+             sarg->sigalgcnt--;
+-            return 0;
++            return 1;
+         }
+     }
+     return 1;
+@@ -2973,6 +2998,11 @@ int tls1_set_sigalgs_list(CERT *c, const char *str, int client)
+     }
+     if (!CONF_parse_list(str, ':', 1, sig_cb, &sig))
+         return 0;
++    if (sig.sigalgcnt == 0) {
++        ERR_raise_data(ERR_LIB_SSL, ERR_R_PASSED_INVALID_ARGUMENT,
++                       "No valid signature algorithms in '%s'", str);
++        return 0;
++    }
+     if (c == NULL)
+         return 1;
+     return tls1_set_raw_sigalgs(c, sig.sigalgs, sig.sigalgcnt, client);
+diff --git a/test/sslapitest.c b/test/sslapitest.c
+index 1c14f93ed1..184a0f1055 100644
+--- a/test/sslapitest.c
++++ b/test/sslapitest.c
+@@ -39,6 +39,7 @@
+ #include "testutil.h"
+ #include "testutil/output.h"
+ #include "internal/nelem.h"
++#include "internal/tlsgroups.h"
+ #include "internal/ktls.h"
+ #include "../ssl/ssl_local.h"
+ #include "../ssl/record/methods/recmethod_local.h"
+@@ -3147,6 +3148,7 @@ static const sigalgs_list testsigalgs[] = {
+     {validlist3, OSSL_NELEM(validlist3), NULL, 1, 0},
+ # endif
+     {NULL, 0, "RSA+SHA256", 1, 1},
++    {NULL, 0, "RSA+SHA256:?Invalid", 1, 1},
+ # ifndef OPENSSL_NO_EC
+     {NULL, 0, "RSA+SHA256:ECDSA+SHA512", 1, 1},
+     {NULL, 0, "ECDSA+SHA512", 1, 0},
+@@ -9276,6 +9278,64 @@ static int test_servername(int tst)
+     return testresult;
+ }
+ 
++static int test_unknown_sigalgs_groups(void)
++{
++    int ret = 0;
++    SSL_CTX *ctx = NULL;
++
++    if (!TEST_ptr(ctx = SSL_CTX_new_ex(libctx, NULL, TLS_server_method())))
++        goto end;
++
++    if (!TEST_int_gt(SSL_CTX_set1_sigalgs_list(ctx,
++                                               "RSA+SHA256:?nonexistent:?RSA+SHA512"),
++                                               0))
++        goto end;
++    if (!TEST_size_t_eq(ctx->cert->conf_sigalgslen, 2)
++        || !TEST_int_eq(ctx->cert->conf_sigalgs[0], TLSEXT_SIGALG_rsa_pkcs1_sha256)
++        || !TEST_int_eq(ctx->cert->conf_sigalgs[1], TLSEXT_SIGALG_rsa_pkcs1_sha512))
++        goto end;
++
++    if (!TEST_int_gt(SSL_CTX_set1_client_sigalgs_list(ctx,
++                                                      "RSA+SHA256:?nonexistent:?RSA+SHA512"),
++                                                      0))
++        goto end;
++    if (!TEST_size_t_eq(ctx->cert->client_sigalgslen, 2)
++        || !TEST_int_eq(ctx->cert->client_sigalgs[0], TLSEXT_SIGALG_rsa_pkcs1_sha256)
++        || !TEST_int_eq(ctx->cert->client_sigalgs[1], TLSEXT_SIGALG_rsa_pkcs1_sha512))
++        goto end;
++
++    if (!TEST_int_le(SSL_CTX_set1_groups_list(ctx,
++                                              "nonexistent"),
++                                              0))
++        goto end;
++
++    if (!TEST_int_le(SSL_CTX_set1_groups_list(ctx,
++                                              "?nonexistent1:?nonexistent2:?nonexistent3"),
++                                              0))
++        goto end;
++
++#ifndef OPENSSL_NO_EC
++    if (!TEST_int_le(SSL_CTX_set1_groups_list(ctx,
++                                              "P-256:nonexistent"),
++                                              0))
++        goto end;
++
++    if (!TEST_int_gt(SSL_CTX_set1_groups_list(ctx,
++                                              "P-384:?nonexistent:?P-521"),
++                                              0))
++        goto end;
++    if (!TEST_size_t_eq(ctx->ext.supportedgroups_len, 2)
++        || !TEST_int_eq(ctx->ext.supportedgroups[0], OSSL_TLS_GROUP_ID_secp384r1)
++        || !TEST_int_eq(ctx->ext.supportedgroups[1], OSSL_TLS_GROUP_ID_secp521r1))
++        goto end;
++#endif
++
++    ret = 1;
++ end:
++    SSL_CTX_free(ctx);
++    return ret;
++}
++
+ #if !defined(OPENSSL_NO_EC) \
+     && (!defined(OSSL_NO_USABLE_TLS1_3) || !defined(OPENSSL_NO_TLS1_2))
+ /*
+@@ -11519,6 +11579,7 @@ int setup_tests(void)
+     ADD_ALL_TESTS(test_multiblock_write, OSSL_NELEM(multiblock_cipherlist_data));
+ #endif
+     ADD_ALL_TESTS(test_servername, 10);
++    ADD_TEST(test_unknown_sigalgs_groups);
+ #if !defined(OPENSSL_NO_EC) \
+     && (!defined(OSSL_NO_USABLE_TLS1_3) || !defined(OPENSSL_NO_TLS1_2))
+     ADD_ALL_TESTS(test_sigalgs_available, 6);
+-- 
+2.44.0
+

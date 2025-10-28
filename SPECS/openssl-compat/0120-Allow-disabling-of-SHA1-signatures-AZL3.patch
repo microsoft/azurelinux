@@ -1,0 +1,166 @@
+From c54893217cad8669c2cc71833fe459b03b548749 Mon Sep 17 00:00:00 2001
+From: Clemens Lang <cllang@redhat.com>
+Date: Thu, 21 Mar 2024 19:10:57 +0100
+Subject: [PATCH] Instrument with USDT probes related to SHA-1 deprecation
+
+In order to discover remaining uses of SHA-1 in signatures without
+forcefully breaking the code paths, add USDT probes that can be queried
+with systemtap at runtime.
+
+This should allow identifying components that still use SHA-1 signatures
+in production so that they can be transitioned to more modern hash
+algorithms.
+
+Patch-name: 0120-Allow-disabling-of-SHA1-signatures.patch
+Patch-id: 120
+Patch-status: |
+    # https://fedoraproject.org/wiki/Changes/OpenSSLDistrustSHA1SigVer
+Submitted-by: Alexander Sosedkin <asosedkin@redhat.com>
+---
+ crypto/evp/m_sigver.c                    | 16 ++++++++++++----
+ crypto/evp/pmeth_lib.c                   | 16 ++++++++++++----
+ providers/common/securitycheck.c         | 15 +++++++++++----
+ providers/common/securitycheck_default.c | 15 +++++++++++++++
+ 4 files changed, 50 insertions(+), 12 deletions(-)
+
+diff --git a/crypto/evp/m_sigver.c b/crypto/evp/m_sigver.c
+index 8f16671..2924313 100644
+--- a/crypto/evp/m_sigver.c
++++ b/crypto/evp/m_sigver.c
+@@ -17,6 +17,9 @@
+ #include "evp_local.h"
+ #include "crypto/context.h"
+ 
++// AZL3: Don't want to take a dependency on sdt
++// #include <sys/sdt.h>
++
+ typedef struct ossl_legacy_digest_signatures_st {
+     int allowed;
+ } OSSL_LEGACY_DIGEST_SIGNATURES;
+@@ -335,10 +338,15 @@ static int do_sigver_init(EVP_MD_CTX *ctx, EVP_PKEY_CTX **pctx,
+             && !EVP_PKEY_is_a(locpctx->pkey, SN_tls1_prf)
+             && !EVP_PKEY_is_a(locpctx->pkey, SN_hkdf)) {
+         int mdnid = EVP_MD_nid(ctx->reqdigest);
+-        if (!ossl_ctx_legacy_digest_signatures_allowed(locpctx->libctx, 0)
+-                && (mdnid == NID_sha1 || mdnid == NID_md5_sha1)) {
+-            ERR_raise(ERR_LIB_EVP, EVP_R_INVALID_DIGEST);
+-            goto err;
++        if (mdnid == NID_sha1 || mdnid == NID_md5_sha1) {
++            if (!ossl_ctx_legacy_digest_signatures_allowed(locpctx->libctx, 0)) {
++                ERR_raise(ERR_LIB_EVP, EVP_R_INVALID_DIGEST);
++                goto err;
++            }
++            // AZL3: Don't want to take a dependency on sdt
++            // else {
++            //     DTRACE_PROBE1(libcrypto, fedora_do_sigver_init_1, mdnid);
++            // }
+         }
+     }
+ #endif /* !defined(FIPS_MODULE) */
+diff --git a/crypto/evp/pmeth_lib.c b/crypto/evp/pmeth_lib.c
+index d12bab8..ed4c8c1 100644
+--- a/crypto/evp/pmeth_lib.c
++++ b/crypto/evp/pmeth_lib.c
+@@ -36,6 +36,9 @@
+ #include "internal/sslconf.h"
+ #include "evp_local.h"
+ 
++// AZL3: Don't want to take a dependency on sdt
++// #include <sys/sdt.h>
++
+ #ifndef FIPS_MODULE
+ 
+ static int evp_pkey_ctx_store_cached_data(EVP_PKEY_CTX *ctx,
+@@ -941,10 +944,15 @@ static int evp_pkey_ctx_set_md(EVP_PKEY_CTX *ctx, const EVP_MD *md,
+             && !EVP_PKEY_is_a(ctx->pkey, SN_tls1_prf)
+             && !EVP_PKEY_is_a(ctx->pkey, SN_hkdf)) {
+         int mdnid = EVP_MD_nid(md);
+-        if ((mdnid == NID_sha1 || mdnid == NID_md5_sha1)
+-                && !ossl_ctx_legacy_digest_signatures_allowed(ctx->libctx, 0)) {
+-            ERR_raise(ERR_LIB_EVP, EVP_R_INVALID_DIGEST);
+-            return -1;
++        if (mdnid == NID_sha1 || mdnid == NID_md5_sha1) {
++            if (!ossl_ctx_legacy_digest_signatures_allowed(ctx->libctx, 0)) {
++                ERR_raise(ERR_LIB_EVP, EVP_R_INVALID_DIGEST);
++                return -1;
++            }
++            // AZL3: Don't want to take a dependency on sdt
++            //  else {
++            //     DTRACE_PROBE1(libcrypto, fedora_evp_pkey_ctx_set_md_1, mdnid);
++            // }
+         }
+     }
+ 
+diff --git a/providers/common/securitycheck.c b/providers/common/securitycheck.c
+index f41880e..013109b 100644
+--- a/providers/common/securitycheck.c
++++ b/providers/common/securitycheck.c
+@@ -21,6 +21,9 @@
+ #include "prov/securitycheck.h"
+ #include "internal/sslconf.h"
+ 
++// AZL3: Don't want to take a dependency on sdt
++// #include <sys/sdt.h>
++
+ /*
+  * FIPS requires a minimum security strength of 112 bits (for encryption or
+  * signing), and for legacy purposes 80 bits (for decryption or verifying).
+@@ -247,11 +250,15 @@ int ossl_digest_get_approved_nid_with_sha1(OSSL_LIB_CTX *ctx, const EVP_MD *md,
+ # endif /* OPENSSL_NO_FIPS_SECURITYCHECKS */
+ 
+ #ifndef FIPS_MODULE
+-    if (!ossl_ctx_legacy_digest_signatures_allowed(ctx, 0))
+-        /* SHA1 is globally disabled, check whether we want to locally allow
+-         * it. */
+-        if (mdnid == NID_sha1 && !sha1_allowed)
++    if (mdnid == NID_sha1 && !sha1_allowed) {
++        if (!ossl_ctx_legacy_digest_signatures_allowed(ctx, 0))
++            /* SHA1 is globally disabled, check whether we want to locally allow
++             * it. */
+             mdnid = -1;
++        // AZL3: Don't want to take a dependency on sdt
++        // else
++        //     DTRACE_PROBE1(libcrypto, fedora_ossl_digest_get_approved_nid_with_sha1_1, mdnid);
++    }
+ #endif
+ 
+     return mdnid;
+diff --git a/providers/common/securitycheck_default.c b/providers/common/securitycheck_default.c
+index 2ca7a59..9b7f28e 100644
+--- a/providers/common/securitycheck_default.c
++++ b/providers/common/securitycheck_default.c
+@@ -17,6 +17,9 @@
+ #include "internal/nelem.h"
+ #include "internal/sslconf.h"
+ 
++// AZL3: Don't want to take a dependency on sdt
++// #include <sys/sdt.h>
++
+ /* Disable the security checks in the default provider */
+ int ossl_securitycheck_enabled(OSSL_LIB_CTX *libctx)
+ {
+@@ -46,9 +49,21 @@ int ossl_digest_rsa_sign_get_md_nid(OSSL_LIB_CTX *ctx, const EVP_MD *md,
+ 
+     ldsigs_allowed = ossl_ctx_legacy_digest_signatures_allowed(ctx, 0);
+     mdnid = ossl_digest_get_approved_nid_with_sha1(ctx, md, sha1_allowed || ldsigs_allowed);
++    // AZL3: Don't want to take a dependency on sdt
++    // if (mdnid == NID_sha1)
++    //     /* This will only happen if SHA1 is allowed, otherwise mdnid is -1. */
++    //     DTRACE_PROBE1(libcrypto, fedora_ossl_digest_rsa_sign_get_md_nid_1, mdnid);
+     if (mdnid == NID_undef)
+         mdnid = ossl_digest_md_to_nid(md, name_to_nid, OSSL_NELEM(name_to_nid));
+     if (mdnid == NID_md5_sha1 && !ldsigs_allowed)
+         mdnid = -1;
++    // AZL3: Don't want to take a dependency on sdt, so leaving the above if
++    //       that handles md5 and ldsigs_allowed.
++    // if (mdnid == NID_md5_sha1) {
++    //     if (ldsigs_allowed)
++    //         DTRACE_PROBE1(libcrypto, fedora_ossl_digest_rsa_sign_get_md_nid_2, mdnid);
++    //     else
++    //         mdnid = -1;
++    // }
+     return mdnid;
+ }
+-- 
+2.45.4
+

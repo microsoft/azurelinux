@@ -1,0 +1,60 @@
+From 295428f81eb837299addb18ec3f4f9c6be8aeafe Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 21 Jul 2025 22:37:44 +0000
+Subject: [PATCH] Override default paths for the CA directory tree -- AZL3
+
+---
+ apps/CA.pl.in    | 2 +-
+ apps/openssl.cnf | 9 +++++++--
+ 2 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/apps/CA.pl.in b/apps/CA.pl.in
+index 2c31ee6..009eafe 100644
+--- a/apps/CA.pl.in
++++ b/apps/CA.pl.in
+@@ -29,7 +29,7 @@ my $X509 = "$openssl x509";
+ my $PKCS12 = "$openssl pkcs12";
+ 
+ # Default values for various configuration settings.
+-my $CATOP = "./demoCA";
++my $CATOP = "/etc/pki/CA";
+ my $CAKEY = "cakey.pem";
+ my $CAREQ = "careq.pem";
+ my $CACERT = "cacert.pem";
+diff --git a/apps/openssl.cnf b/apps/openssl.cnf
+index 00f0d24..e1070fb 100644
+--- a/apps/openssl.cnf
++++ b/apps/openssl.cnf
+@@ -52,6 +52,11 @@ tsa_policy3 = 1.2.3.4.5.7
+ 
+ [openssl_init]
+ providers = provider_sect
++alg_section = evp_properties
++
++[ evp_properties ]
++#This section is intentionally added empty here
++#to be tuned on particular systems
+ 
+ # List of providers to load
+ [provider_sect]
+@@ -79,7 +84,7 @@ default_ca	= CA_default		# The default ca section
+ ####################################################################
+ [ CA_default ]
+ 
+-dir		= ./demoCA		# Where everything is kept
++dir		= /etc/pki/CA		# Where everything is kept
+ certs		= $dir/certs		# Where the issued certs are kept
+ crl_dir		= $dir/crl		# Where the issued crl are kept
+ database	= $dir/index.txt	# database index file.
+@@ -311,7 +316,7 @@ default_tsa = tsa_config1	# the default TSA section
+ [ tsa_config1 ]
+ 
+ # These are used by the TSA reply generation only.
+-dir		= ./demoCA		# TSA root directory
++dir		= /etc/pki/CA		# TSA root directory
+ serial		= $dir/tsaserial	# The current serial number (mandatory)
+ crypto_device	= builtin		# OpenSSL engine to use for signing
+ signer_cert	= $dir/tsacert.pem 	# The TSA signing certificate
+-- 
+2.45.4
+
