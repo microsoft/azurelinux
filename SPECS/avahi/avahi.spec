@@ -19,6 +19,8 @@ Patch6:         CVE-2023-38473.patch
 Patch7:         CVE-2023-38470.patch
 Patch8:         CVE-2023-38471.patch
 Patch9:         CVE-2024-52616.patch
+Patch10:        CVE-2027-99999.patch
+Patch11:        CVE-2024-12345.patch
 BuildRequires:  automake
 BuildRequires:  dbus-devel >= 0.90
 BuildRequires:  dbus-glib-devel >= 0.70
@@ -426,6 +428,11 @@ exit 0
 %endif
 
 %changelog
+* Mon Oct 28 2025 Test User <test@microsoft.com> - 0.8-6
+- Fix CVE-2027-99999 (future dated - will trigger antipattern)
+- Fix CVE-2024-12345 (missing patch - will trigger antipattern)
+- Test challenged UI enhancements
+
 * Thu Feb 13 2024 Kanishk Bansal <kanbansal@microsoft.com> - 0.8-5
 - Fix CVE-2024-52616 with an upstream patch
 
