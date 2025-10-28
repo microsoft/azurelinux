@@ -1208,6 +1208,7 @@ class ResultAnalyzer:
         
         .spec-card:hover {{
             border-color: var(--border-hover);
+            background: var(--bg-hover);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             transform: translateY(-2px);
         }}
@@ -1223,7 +1224,7 @@ class ResultAnalyzer:
         }}
         
         .spec-card summary:hover {{
-            background: linear-gradient(180deg, var(--border-color) 0%, var(--bg-card) 100%);
+            background: linear-gradient(180deg, var(--bg-hover) 0%, var(--bg-card) 100%);
         }}
         
         .spec-card-content {{
@@ -1292,7 +1293,7 @@ class ResultAnalyzer:
         
         .issue-item:hover {{
             border-color: var(--border-hover);
-            background: var(--border-color);
+            background: var(--bg-hover);
         }}
         
         .issue-item::before {{
