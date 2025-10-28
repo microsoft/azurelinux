@@ -1200,42 +1200,45 @@ class ResultAnalyzer:
         .spec-card {{
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            margin-bottom: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
             overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }}
         
         .spec-card:hover {{
-            border-color: var(--border-hover);
-            background: var(--bg-hover);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            transform: translateY(-2px);
+            border-color: rgba(88, 166, 255, 0.3);
+            background: rgba(23, 23, 23, 0.8);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(88, 166, 255, 0.1);
+            transform: translateY(-4px);
         }}
         
         .spec-card summary {{
             cursor: pointer;
-            padding: 16px 20px;
+            padding: 20px 24px;
             font-weight: 600;
             font-size: 16px;
             user-select: none;
-            background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-primary) 100%);
-            transition: background 0.2s ease;
+            background: transparent;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid transparent;
         }}
         
         .spec-card summary:hover {{
-            background: linear-gradient(180deg, var(--bg-hover) 0%, var(--bg-card) 100%);
+            background: rgba(38, 38, 38, 0.5);
+            border-bottom-color: var(--border-color);
         }}
         
         .spec-card-content {{
-            padding: 20px;
+            padding: 24px;
+            background: rgba(13, 13, 13, 0.4);
         }}
         
         .spec-file-badge {{
             display: inline-block;
-            background: var(--bg-primary);
-            padding: 4px 10px;
-            border-radius: 4px;
+            background: rgba(13, 17, 23, 0.8);
+            padding: 6px 12px;
+            border-radius: 6px;
             font-size: 12px;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             color: var(--accent-blue);
@@ -1244,32 +1247,37 @@ class ResultAnalyzer:
         
         /* Issue Type Sections */
         .issue-type-section {{
-            margin-bottom: 20px;
-            padding: 12px;
-            background: var(--bg-primary);
+            margin-bottom: 24px;
+            padding: 16px 20px;
+            background: rgba(13, 13, 13, 0.3);
             border-left: 3px solid var(--accent-purple);
-            border-radius: 6px;
+            border-radius: 10px;
+            border: 1px solid rgba(48, 54, 61, 0.3);
+            border-left: 3px solid var(--accent-purple);
         }}
         
         .issue-type-header {{
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(48, 54, 61, 0.3);
         }}
         
         .issue-type-title {{
             font-weight: 600;
             color: var(--accent-purple);
-            font-size: 14px;
+            font-size: 15px;
+            letter-spacing: 0.3px;
         }}
         
         .issue-count-badge {{
-            background: var(--bg-card);
-            padding: 3px 10px;
-            border-radius: 12px;
+            background: rgba(163, 113, 247, 0.15);
+            padding: 4px 12px;
+            border-radius: 16px;
             font-size: 11px;
-            color: var(--text-secondary);
+            color: var(--accent-purple);
             font-weight: 600;
             border: 1px solid var(--border-color);
         }}
@@ -1282,27 +1290,26 @@ class ResultAnalyzer:
         }}
         
         .issue-item {{
-            padding: 12px;
-            margin: 8px 0;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            transition: all 0.2s ease;
+            padding: 16px 18px;
+            margin: 10px 0;
+            background: rgba(23, 23, 23, 0.6);
+            border: 1px solid rgba(48, 54, 61, 0.5);
+            border-radius: 8px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+            border-left: 3px solid transparent;
         }}
         
         .issue-item:hover {{
-            border-color: var(--border-hover);
-            background: var(--bg-hover);
+            border-color: rgba(88, 166, 255, 0.4);
+            border-left-color: var(--accent-blue);
+            background: rgba(30, 30, 30, 0.8);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transform: translateX(4px);
         }}
         
         .issue-item::before {{
-            content: "▸";
-            position: absolute;
-            left: -8px;
-            top: 12px;
-            color: var(--accent-orange);
-            font-weight: bold;
+            display: none;
         }}
         
         .issue-text {{
@@ -1314,11 +1321,11 @@ class ResultAnalyzer:
         
         /* Antipattern Details Section */
         .antipattern-details {{
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 16px;
-            margin: 12px 0;
+            background: rgba(13, 13, 13, 0.4);
+            border: 1px solid rgba(48, 54, 61, 0.4);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 16px 0;
         }}
         
         .antipattern-details summary {{
@@ -1326,13 +1333,15 @@ class ResultAnalyzer:
             font-weight: 600;
             color: var(--accent-purple);
             user-select: none;
-            padding: 8px;
-            border-radius: 4px;
-            transition: background 0.2s ease;
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            background: rgba(163, 113, 247, 0.05);
         }}
         
         .antipattern-details summary:hover {{
-            background: var(--bg-card);
+            background: rgba(163, 113, 247, 0.15);
+            transform: translateX(4px);
         }}
         
         /* ============================================================================
