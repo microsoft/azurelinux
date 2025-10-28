@@ -519,23 +519,30 @@ class ResultAnalyzer:
             source_commit = pr_metadata.get('source_commit_sha', '')[:8]
             
             html += f"""
-    <div style="background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; margin-bottom: 20px;">
-        <h3 style="margin: 0 0 12px 0; color: #58a6ff; font-size: 16px;">📋 Pull Request Information</h3>
-        <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 13px;">
-            <span style="color: #8b949e;">PR Number:</span>
-            <span style="color: #c9d1d9; font-weight: 600;">#{pr_number}</span>
+    <div class="pr-info-card">
+        <div class="pr-info-header">
+            <div class="pr-info-icon">📋</div>
+            <h3 class="pr-info-title">Pull Request Information</h3>
+        </div>
+        <div class="pr-info-grid">
+            <span class="pr-info-label">PR Number</span>
+            <span class="pr-info-value"><span class="pr-number-badge">#{pr_number}</span></span>
             
-            <span style="color: #8b949e;">Title:</span>
-            <span style="color: #c9d1d9;">{pr_title}</span>
+            <span class="pr-info-label">Title</span>
+            <span class="pr-info-value">{pr_title}</span>
             
-            <span style="color: #8b949e;">Author:</span>
-            <span style="color: #c9d1d9;">@{pr_author}</span>
+            <span class="pr-info-label">Author</span>
+            <span class="pr-info-value"><span class="author-badge">@{pr_author}</span></span>
             
-            <span style="color: #8b949e;">Branches:</span>
-            <span style="color: #c9d1d9;"><code style="background: #0d1117; padding: 2px 6px; border-radius: 3px; font-size: 12px;">{source_branch}</code> → <code style="background: #0d1117; padding: 2px 6px; border-radius: 3px; font-size: 12px;">{target_branch}</code></span>
+            <span class="pr-info-label">Branches</span>
+            <span class="pr-info-value">
+                <span class="branch-badge">{source_branch}</span> 
+                <span style="color: var(--text-secondary); margin: 0 8px;">→</span> 
+                <span class="branch-badge">{target_branch}</span>
+            </span>
             
-            <span style="color: #8b949e;">Commit:</span>
-            <span style="color: #c9d1d9;"><code style="background: #0d1117; padding: 2px 6px; border-radius: 3px; font-size: 12px;">{source_commit}</code></span>
+            <span class="pr-info-label">Commit</span>
+            <span class="pr-info-value"><span class="commit-badge">{source_commit}</span></span>
         </div>
     </div>
 """
@@ -1289,6 +1296,101 @@ class ResultAnalyzer:
         
         .antipattern-details summary:hover {{
             background: var(--bg-card);
+        }}
+        
+        /* ============================================================================
+           PR Information Card - Modern Design
+           ============================================================================ */
+        
+        .pr-info-card {{
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-primary) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }}
+        
+        .pr-info-header {{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }}
+        
+        .pr-info-icon {{
+            font-size: 24px;
+            background: var(--accent-blue-bg);
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }}
+        
+        .pr-info-title {{
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin: 0;
+        }}
+        
+        .pr-info-grid {{
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 12px 20px;
+            font-size: 14px;
+        }}
+        
+        .pr-info-label {{
+            color: var(--text-secondary);
+            font-weight: 500;
+        }}
+        
+        .pr-info-value {{
+            color: var(--text-primary);
+            font-weight: 400;
+        }}
+        
+        .pr-number-badge {{
+            display: inline-block;
+            background: var(--accent-blue-bg);
+            color: var(--accent-blue);
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 14px;
+        }}
+        
+        .branch-badge {{
+            display: inline-block;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            color: var(--accent-blue);
+            font-weight: 500;
+        }}
+        
+        .commit-badge {{
+            display: inline-block;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }}
+        
+        .author-badge {{
+            color: var(--accent-blue);
+            font-weight: 600;
         }}
         
         .challenge-btn:hover {{
