@@ -541,22 +541,52 @@ class ResultAnalyzer:
 """
         
         html += f"""
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px;">
-        <div style="background: #161b22; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #30363d;">
-            <div style="font-size: 24px; font-weight: bold; color: #58a6ff;">{stats['total_specs']}</div>
-            <div style="font-size: 12px; color: #8b949e;">Specs Analyzed</div>
+    <div class="stats-grid">
+        <!-- Total Specs Card -->
+        <div class="stat-card" style="--stat-color: var(--accent-blue);">
+            <div class="stat-icon stat-icon-blue">
+                📊
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{stats['total_specs']}</div>
+                <div class="stat-label">Specs Analyzed</div>
+            </div>
         </div>
-        <div style="background: #161b22; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #30363d;">
-            <div style="font-size: 24px; font-weight: bold; color: #f85149;">{stats['specs_with_errors']}</div>
-            <div style="font-size: 12px; color: #8b949e;">Errors</div>
+        
+        <!-- Errors Card -->
+        <div class="stat-card" style="--stat-color: var(--accent-red);">
+            <div class="stat-icon stat-icon-red">
+                ⚠️
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{stats['specs_with_errors']}</div>
+                <div class="stat-label">Errors</div>
+            </div>
         </div>
-        <div style="background: #161b22; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #30363d;">
-            <div style="font-size: 24px; font-weight: bold; color: #d29922;">{stats['specs_with_warnings']}</div>
-            <div style="font-size: 12px; color: #8b949e;">Warnings</div>
+        
+        <!-- Warnings Card -->
+        <div class="stat-card" style="--stat-color: var(--accent-orange);">
+            <div class="stat-icon stat-icon-orange">
+                📋
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{stats['specs_with_warnings']}</div>
+                <div class="stat-label">Warnings</div>
+            </div>
         </div>
-        <div style="background: #161b22; padding: 15px; border-radius: 6px; text-align: center; border: 1px solid #30363d;">
-            <div style="font-size: 24px; font-weight: bold; color: #c9d1d9;">{analysis_result.total_issues}</div>
-            <div style="font-size: 12px; color: #8b949e;">Total Issues</div>
+        
+        <!-- Total Issues Card with Bell Icon -->
+        <div class="stat-card" style="--stat-color: var(--accent-purple);">
+            <div class="stat-icon stat-icon-purple">
+                <div class="bell-container">
+                    <span class="bell-icon">🔔</span>
+                    <span class="bell-badge" id="issues-badge">{analysis_result.total_issues}</span>
+                </div>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value" id="total-issues-count">{analysis_result.total_issues}</div>
+                <div class="stat-label">Total Issues</div>
+            </div>
         </div>
     </div>
 """
@@ -728,88 +758,394 @@ class ResultAnalyzer:
     <!-- Favicon to prevent 404 errors -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛡️%3C/text%3E%3C/svg%3E">
     <style>
+        /* ============================================
+           CSS VARIABLES - THEME SYSTEM
+           ============================================ */
+        :root {{
+            /* Modern Dark Theme (Default) - Deep Black Shades */
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            --bg-tertiary: #0f0f0f;
+            --bg-card: #171717;
+            --bg-card-hover: #1f1f1f;
+            
+            --border-primary: #262626;
+            --border-secondary: #333333;
+            --border-accent: #404040;
+            
+            --text-primary: #e5e5e5;
+            --text-secondary: #a3a3a3;
+            --text-tertiary: #737373;
+            
+            --accent-blue: #3b82f6;
+            --accent-blue-dark: #2563eb;
+            --accent-blue-light: #60a5fa;
+            --accent-blue-bg: #1e3a8a;
+            
+            --accent-green: #10b981;
+            --accent-green-bg: #064e3b;
+            
+            --accent-orange: #f59e0b;
+            --accent-orange-bg: #78350f;
+            
+            --accent-red: #ef4444;
+            --accent-red-bg: #7f1d1d;
+            
+            --accent-purple: #8b5cf6;
+            --accent-purple-bg: #4c1d95;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+        }}
+        
+        /* Light Theme Override */
+        [data-theme="light"] {{
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f9fafb;
+            
+            --border-primary: #e5e7eb;
+            --border-secondary: #d1d5db;
+            --border-accent: #9ca3af;
+            
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-tertiary: #6b7280;
+            
+            --accent-blue: #2563eb;
+            --accent-blue-dark: #1d4ed8;
+            --accent-blue-light: #3b82f6;
+            --accent-blue-bg: #dbeafe;
+            
+            --accent-green: #059669;
+            --accent-green-bg: #d1fae5;
+            
+            --accent-orange: #d97706;
+            --accent-orange-bg: #fed7aa;
+            
+            --accent-red: #dc2626;
+            --accent-red-bg: #fee2e2;
+            
+            --accent-purple: #7c3aed;
+            --accent-purple-bg: #ede9fe;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }}
+        
+        * {{
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }}
+        
         body {{
             margin: 0;
             padding: 20px;
-            background: #0d1117;
-            color: #c9d1d9;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+        }}
+        
+        /* ============================================
+           THEME TOGGLE & TOP BAR
+           ============================================ */
+        #top-bar {{
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }}
+        
+        #top-bar-left {{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }}
+        
+        #top-bar-logo {{
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        
+        #top-bar-right {{
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }}
+        
+        #theme-toggle {{
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }}
+        
+        #theme-toggle:hover {{
+            background: var(--bg-card-hover);
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }}
+        
+        #theme-icon {{
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }}
+        
+        /* Adjust body padding for fixed top bar */
+        body {{
+            padding-top: 80px;
         }}
         
         /* Auth UI Styles */
         #auth-container {{
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
+            display: flex;
+            align-items: center;
         }}
         
         #sign-in-btn {{
-            background: #238636;
+            background: linear-gradient(180deg, var(--accent-blue) 0%, var(--accent-blue-dark) 100%);
             color: white;
             border: none;
             padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.2s ease;
         }}
         
         #sign-in-btn:hover {{
-            background: #2ea043;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }}
         
         #user-menu {{
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 6px 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
         }}
         
         #user-avatar {{
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
+            border: 2px solid var(--accent-blue);
         }}
         
         #user-info {{
             display: flex;
             flex-direction: column;
+            gap: 2px;
         }}
         
         #user-name {{
             font-size: 14px;
             font-weight: 600;
-            color: #c9d1d9;
+            color: var(--text-primary);
         }}
         
         #collaborator-badge {{
-            font-size: 11px;
-            color: #58a6ff;
-            background: #1f6feb20;
-            padding: 2px 6px;
+            font-size: 10px;
+            color: var(--accent-blue);
+            background: var(--accent-blue-bg);
+            padding: 2px 8px;
             border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }}
         
         #sign-out-btn {{
             background: transparent;
-            color: #8b949e;
-            border: 1px solid #30363d;
-            padding: 4px 12px;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-primary);
+            padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
         }}
         
         #sign-out-btn:hover {{
-            background: #21262d;
-            color: #c9d1d9;
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border-color: var(--accent-red);
+        }}
+        
+        /* ============================================
+           STATS CARDS - Modern Dashboard Style
+           ============================================ */
+        .stats-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }}
+        
+        .stat-card {{
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }}
+        
+        .stat-card::before {{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--stat-color), transparent);
+        }}
+        
+        .stat-card:hover {{
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--stat-color);
+        }}
+        
+        .stat-icon {{
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+            position: relative;
+        }}
+        
+        .stat-icon-blue {{
+            background: var(--accent-blue-bg);
+            color: var(--accent-blue);
+        }}
+        
+        .stat-icon-red {{
+            background: var(--accent-red-bg);
+            color: var(--accent-red);
+        }}
+        
+        .stat-icon-orange {{
+            background: var(--accent-orange-bg);
+            color: var(--accent-orange);
+        }}
+        
+        .stat-icon-purple {{
+            background: var(--accent-purple-bg);
+            color: var(--accent-purple);
+        }}
+        
+        .stat-content {{
+            flex: 1;
+        }}
+        
+        .stat-value {{
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        
+        .stat-label {{
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        
+        /* Bell Icon with Animated Badge */
+        .bell-container {{
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }}
+        
+        .bell-icon {{
+            font-size: 28px;
+            animation: bellRing 0.5s ease;
+        }}
+        
+        .bell-badge {{
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--accent-red);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 12px;
+            min-width: 20px;
+            text-align: center;
+            box-shadow: 0 0 0 2px var(--bg-card);
+            animation: badgePop 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }}
+        
+        @keyframes bellRing {{
+            0%, 100% {{ transform: rotate(0deg); }}
+            25% {{ transform: rotate(15deg); }}
+            50% {{ transform: rotate(-15deg); }}
+            75% {{ transform: rotate(10deg); }}
+        }}
+        
+        @keyframes badgePop {{
+            0% {{ transform: scale(0); }}
+            50% {{ transform: scale(1.2); }}
+            100% {{ transform: scale(1); }}
         }}
         
         .challenge-btn:hover {{
@@ -1369,15 +1705,21 @@ class ResultAnalyzer:
         function updateCounters(listItem, delta) {{
             console.log(`📊 Updating counters with delta: ${{delta}}`);
             
-            // 1. Update Total Issues counter in main stats card
-            const statsCards = document.querySelectorAll('[style*="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))"]');
-            if (statsCards.length > 0) {{
-                const totalIssuesCard = statsCards[0].querySelector('div:last-child > div:first-child');
-                if (totalIssuesCard) {{
-                    const currentTotal = parseInt(totalIssuesCard.textContent) || 0;
-                    const newTotal = Math.max(0, currentTotal + delta);
-                    totalIssuesCard.textContent = newTotal;
-                    console.log(`   ✅ Updated Total Issues: ${{currentTotal}} → ${{newTotal}}`);
+            // 1. Update Total Issues counter in stat card and bell badge
+            const totalIssuesCount = document.getElementById('total-issues-count');
+            const issuesBadge = document.getElementById('issues-badge');
+            
+            if (totalIssuesCount) {{
+                const currentTotal = parseInt(totalIssuesCount.textContent) || 0;
+                const newTotal = Math.max(0, currentTotal + delta);
+                totalIssuesCount.textContent = newTotal;
+                console.log(`   ✅ Updated Total Issues: ${{currentTotal}} → ${{newTotal}}`);
+                
+                // Update bell badge
+                if (issuesBadge) {{
+                    issuesBadge.textContent = newTotal;
+                    // Trigger bell animation
+                    animateBellBadge();
                 }}
             }}
             
@@ -1848,8 +2190,67 @@ class ResultAnalyzer:
             }}
         }}
         
+        // ============================================================================
+        // THEME TOGGLE SYSTEM
+        // ============================================================================
+        
+        function initializeTheme() {{
+            // Check localStorage for saved theme, default to dark
+            const savedTheme = localStorage.getItem('radar_theme') || 'dark';
+            applyTheme(savedTheme);
+        }}
+        
+        function toggleTheme() {{
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+            localStorage.setItem('radar_theme', newTheme);
+        }}
+        
+        function applyTheme(theme) {{
+            document.documentElement.setAttribute('data-theme', theme);
+            const themeIcon = document.getElementById('theme-icon');
+            const themeLabel = document.getElementById('theme-label');
+            
+            if (theme === 'light') {{
+                themeIcon.textContent = '☀️';
+                themeLabel.textContent = 'Light';
+            }} else {{
+                themeIcon.textContent = '🌙';
+                themeLabel.textContent = 'Dark';
+            }}
+        }}
+        
+        // ============================================================================
+        // COUNTER ANIMATIONS
+        // ============================================================================
+        
+        function animateBellBadge() {{
+            const badge = document.getElementById('issues-badge');
+            const bellIcon = document.querySelector('.bell-icon');
+            
+            if (badge) {{
+                // Trigger badge pop animation
+                badge.style.animation = 'none';
+                setTimeout(() => {{
+                    badge.style.animation = 'badgePop 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
+                }}, 10);
+            }}
+            
+            if (bellIcon) {{
+                // Trigger bell ring animation
+                bellIcon.style.animation = 'none';
+                setTimeout(() => {{
+                    bellIcon.style.animation = 'bellRing 0.5s ease';
+                }}, 10);
+            }}
+        }}
+        
         // Initialize modal verification on DOM load
         document.addEventListener('DOMContentLoaded', function() {{
+            // Initialize theme on page load
+            initializeTheme();
+            
             console.log('🔍 Verifying modal structure on page load...');
             
             const modal = document.getElementById('challenge-modal');
@@ -1886,8 +2287,23 @@ class ResultAnalyzer:
     </script>
 </head>
 <body>
-    <!-- Auth UI Container -->
-    <div id="auth-container"></div>
+    <!-- Top Navigation Bar -->
+    <div id="top-bar">
+        <div id="top-bar-left">
+            <div id="top-bar-logo">
+                🛡️ RADAR Analysis
+            </div>
+        </div>
+        <div id="top-bar-right">
+            <!-- Theme Toggle -->
+            <button id="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                <span id="theme-icon">🌙</span>
+                <span id="theme-label">Dark</span>
+            </button>
+            <!-- Auth UI Container -->
+            <div id="auth-container"></div>
+        </div>
+    </div>
     
     <!-- Challenge Modal -->
     <div id="challenge-modal">
