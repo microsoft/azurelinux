@@ -149,15 +149,22 @@ class AntiPatternDetector:
         Returns:
             Stable identifier string
         """
-        # Try to extract CVE number first (most common)
+        # For missing-patch-file, use patch filename as identifier (most specific)
+        # This prevents hash collisions when multiple patches reference same CVE
+        if antipattern.id == "missing-patch-file":
+            patch_match = re.search(r"(?:Patch file |')([A-Za-z0-9_.-]+\.patch)", antipattern.description)
+            if patch_match:
+                return patch_match.group(1).replace('.patch', '')  # e.g., "CVE-2085-88888" from "CVE-2085-88888.patch"
+        
+        # Try to extract CVE number (for CVE-related antipatterns)
         cve_match = re.search(r'CVE-\d{4}-\d+', antipattern.description)
         if cve_match:
             return cve_match.group(0)  # e.g., "CVE-2085-88888"
         
-        # Extract patch filename
+        # Extract patch filename (fallback for other patch-related issues)
         patch_match = re.search(r"(?:Patch file |')([A-Za-z0-9_.-]+\.patch)", antipattern.description)
         if patch_match:
-            return patch_match.group(1)  # e.g., "CVE-2085-88888.patch"
+            return patch_match.group(1).replace('.patch', '')  # e.g., "CVE-2085-88888"
         
         # For changelog entries, try to extract meaningful text
         entry_match = re.search(r"entry '([^']+)'", antipattern.description)
