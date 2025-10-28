@@ -821,11 +821,11 @@ def main():
                         # Add current commit's analysis
                         # Note: report_url will be filled in after HTML generation, using placeholder for now
                         report_url = f"https://radarblobstore.blob.core.windows.net/radarcontainer/pr-{pr_number}/report-latest.html"
-                        analytics_mgr.add_commit_analysis(pr_number, commit_sha, report_url, all_issues)
+                        analytics_mgr.add_commit_analysis(commit_sha, report_url, all_issues)
                         logger.info(f"Added commit analysis: {len(all_issues)} issues detected")
                         
                         # Categorize issues based on challenge history
-                        categorized_issues = analytics_mgr.categorize_issues(commit_sha)
+                        categorized_issues = analytics_mgr.categorize_issues(all_issues)
                         logger.info(f"📋 Issue categorization:")
                         logger.info(f"   - New issues: {len(categorized_issues['new_issues'])}")
                         logger.info(f"   - Recurring unchallenged: {len(categorized_issues['recurring_unchallenged'])}")
