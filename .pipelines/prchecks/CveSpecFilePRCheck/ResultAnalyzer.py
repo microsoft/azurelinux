@@ -706,6 +706,8 @@ class ResultAnalyzer:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CVE Spec File Check Report - PR #{pr_number}</title>
+    <!-- Favicon to prevent 404 errors -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛡️%3C/text%3E%3C/svg%3E">
     <style>
         body {{
             margin: 0;
@@ -1154,6 +1156,8 @@ class ResultAnalyzer:
         }}
         
         function openChallengeModal(finding) {{
+            console.log('🔍 Opening challenge modal for:', finding);
+            
             // Check if user is authenticated
             if (!RADAR_AUTH.isAuthenticated()) {{
                 alert('Please sign in to submit challenges');
@@ -1161,19 +1165,38 @@ class ResultAnalyzer:
                 return;
             }}
             
+            // Get modal elements
             const modal = document.getElementById('challenge-modal');
             const specEl = document.getElementById('finding-spec');
             const typeEl = document.getElementById('finding-type');
             const descEl = document.getElementById('finding-desc');
             
-            // Safety check - make sure modal elements exist
-            if (!modal || !specEl || !typeEl || !descEl) {{
-                console.error('Modal elements not found. Retrying after DOM load...');
-                // Wait for DOM and try again
-                setTimeout(() => openChallengeModal(finding), 100);
+            console.log('📋 Modal element check:', {{
+                modal: !!modal,
+                specEl: !!specEl,
+                typeEl: !!typeEl,
+                descEl: !!descEl
+            }});
+            
+            // Robust error handling - no retry loop
+            if (!modal) {{
+                console.error('❌ CRITICAL: Modal element #challenge-modal not found in DOM!');
+                alert('Error: Modal dialog not found. Please refresh the page and try again.');
                 return;
             }}
             
+            if (!specEl || !typeEl || !descEl) {{
+                console.error('❌ CRITICAL: Modal child elements missing!', {{
+                    specEl: !!specEl,
+                    typeEl: !!typeEl, 
+                    descEl: !!descEl
+                }});
+                alert('Error: Modal is corrupted. Please refresh the page and try again.');
+                return;
+            }}
+            
+            // Populate modal with finding data
+            console.log('✅ Populating modal with finding data');
             specEl.textContent = finding.spec;
             typeEl.textContent = finding.issueType;
             descEl.textContent = finding.description;
@@ -1185,13 +1208,41 @@ class ResultAnalyzer:
             modal.dataset.issueType = finding.issueType;
             modal.dataset.description = finding.description;
             
+            console.log('✅ Opening modal with issue_hash:', modal.dataset.issueHash);
             modal.classList.add('active');
         }}
         
         function closeChallengeModal() {{
+            console.log('🔒 Closing challenge modal');
             const modal = document.getElementById('challenge-modal');
+            const form = document.getElementById('challenge-form');
+            
+            if (!modal) {{
+                console.error('❌ Modal not found when trying to close');
+                return;
+            }}
+            
+            // Remove active class to hide modal
             modal.classList.remove('active');
-            document.getElementById('challenge-form').reset();
+            
+            // Reset form if it exists
+            if (form) {{
+                form.reset();
+                console.log('✅ Form reset successfully');
+            }} else {{
+                console.warn('⚠️  Challenge form not found during close');
+            }}
+            
+            // Clear modal data attributes for next use
+            if (modal.dataset) {{
+                modal.dataset.findingId = '';
+                modal.dataset.issueHash = '';
+                modal.dataset.spec = '';
+                modal.dataset.issueType = '';
+                modal.dataset.description = '';
+            }}
+            
+            console.log('✅ Modal closed successfully');
         }}
         
         async function submitChallenge() {{
@@ -1321,6 +1372,34 @@ class ResultAnalyzer:
                 submitBtn.textContent = 'Submit Challenge';
             }}
         }}
+        
+        // Initialize modal verification on DOM load
+        document.addEventListener('DOMContentLoaded', function() {{
+            console.log('🔍 Verifying modal structure on page load...');
+            
+            const modal = document.getElementById('challenge-modal');
+            const specEl = document.getElementById('finding-spec');
+            const typeEl = document.getElementById('finding-type');
+            const descEl = document.getElementById('finding-desc');
+            const form = document.getElementById('challenge-form');
+            
+            const modalCheck = {{
+                modal: !!modal,
+                specEl: !!specEl,
+                typeEl: !!typeEl,
+                descEl: !!descEl,
+                form: !!form
+            }};
+            
+            console.log('📋 Modal DOM elements:', modalCheck);
+            
+            if (Object.values(modalCheck).every(v => v === true)) {{
+                console.log('✅ All modal elements loaded successfully');
+            }} else {{
+                console.error('❌ WARNING: Some modal elements are missing!', modalCheck);
+                console.error('   This will prevent challenge submissions from working.');
+            }}
+        }});
     </script>
 </head>
 <body>
