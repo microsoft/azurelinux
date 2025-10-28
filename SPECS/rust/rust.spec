@@ -3,12 +3,12 @@
 
 # Release date and version of stage 0 compiler can be found in "src/stage0" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2025-05-15
-%define stage0_version 1.87.0
+%define release_date 2025-08-07
+%define stage0_version 1.89.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.88.0
+Version:        1.90.0
 Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
@@ -41,8 +41,9 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
-Patch0:         CVE-2025-53605.patch
-Patch1:         CVE-2024-11738.patch
+Patch0:         CVE-2025-4574.patch
+Patch1:         CVE-2025-53605.patch
+Patch2:         CVE-2024-11738.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -180,9 +181,8 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
-* Tue Oct 07 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.88.0-1
-- Upgrade to 1.88.0
-- Remove CVE-2025-4574
+* Tue Oct 28 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.90.0-1
+- Upgrade to 1.90.0
 
 * Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 1.86.0-10
 - Bump to rebuild with updated glibc
