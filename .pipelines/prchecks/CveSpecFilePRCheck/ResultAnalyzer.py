@@ -2632,7 +2632,7 @@ class ResultAnalyzer:
                 <div class="challenge-options">
                     <label style="cursor: pointer;">
                         <input type="radio" name="challenge-type" value="false-positive">
-                        <span>🟢 <strong>False Alarm</strong> - This finding is incorrect</span>
+                        <span>� <strong>False Alarm</strong> - This finding is incorrect</span>
                     </label>
                     <label style="cursor: pointer;">
                         <input type="radio" name="challenge-type" value="needs-context">
@@ -2640,7 +2640,7 @@ class ResultAnalyzer:
                     </label>
                     <label style="cursor: pointer;">
                         <input type="radio" name="challenge-type" value="disagree-with-severity">
-                        <span>🔴 <strong>Agree</strong> - I acknowledge this finding</span>
+                        <span>� <strong>Agree</strong> - I acknowledge this finding</span>
                     </label>
                 </div>
                 
