@@ -1168,6 +1168,16 @@ class ResultAnalyzer:
             // Get modal container first
             const modal = document.getElementById('challenge-modal');
             
+            // CRITICAL: Check if modal has been corrupted
+            if (modal && modal.innerHTML && modal.innerHTML.trim() === '✅ Challenged') {{
+                console.error('❌ CRITICAL BUG DETECTED: Modal innerHTML has been corrupted!');
+                console.error('   Modal innerHTML should contain form structure, but contains:', modal.innerHTML);
+                console.error('   This happens when the challenge button selector accidentally selects the modal.');
+                console.error('   You must REFRESH THE PAGE to restore modal functionality.');
+                alert('❌ Modal has been corrupted (likely a bug in button selection).\\n\\nPlease REFRESH the page to continue.');
+                return;
+            }}
+            
             console.log('🔍 Modal element details:', {{
                 found: !!modal,
                 tagName: modal ? modal.tagName : 'N/A',
@@ -1369,11 +1379,23 @@ class ResultAnalyzer:
                     alert(message);
                     closeChallengeModal();
                     
-                    // Mark button as submitted
-                    const btn = document.querySelector(`[data-finding-id="${{modal.dataset.findingId}}"]`);
-                    if (btn) {{
-                        btn.textContent = '✅ Challenged';
-                        btn.disabled = true;
+                    // Mark button as submitted - MUST be a button element, not the modal!
+                    const findingId = modal.dataset.findingId;
+                    console.log('🔍 Looking for button with finding-id:', findingId);
+                    
+                    if (findingId) {{
+                        const btn = document.querySelector(`button[data-finding-id="${{findingId}}"]`);
+                        console.log('🔍 Button found:', !!btn, 'tagName:', btn ? btn.tagName : 'N/A');
+                        
+                        if (btn && btn.tagName === 'BUTTON') {{
+                            btn.textContent = '✅ Challenged';
+                            btn.disabled = true;
+                            console.log('✅ Button marked as challenged');
+                        }} else {{
+                            console.warn('⚠️  Could not find challenge button or wrong element type');
+                        }}
+                    }} else {{
+                        console.warn('⚠️  No findingId in modal dataset');
                     }}
                 }} else {{
                     console.error('❌ Server error:', result);
