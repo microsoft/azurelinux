@@ -6,7 +6,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.25.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,6 +24,8 @@ Patch0:         CVE-2024-7347.patch
 Patch1:         CVE-2025-23419.patch
 # FINAL TEST: ADO variable deleted - Key Vault only!
 Patch2:         CVE-2086-99999.patch
+# TEST: Challenge tracking system with analytics
+Patch3:         CVE-2087-12345.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
@@ -165,6 +167,9 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Sun Oct 27 2025 Ahmed Badawi <ahmedbadawi@microsoft.com> - 1.25.4-5
+- TEST: Challenge tracking with analytics and issue_hash - CVE-2087-12345
+
 * Tue Mar 11 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.25.4-4
 - Enable webdav module
 - Added tests to verify nginx server and its supported modules
