@@ -431,6 +431,7 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                 unchallenged_issues = total_issues - challenged_issues
                 
                 logger.info(f"   📊 Issue status: {total_issues} total, {challenged_issues} challenged, {unchallenged_issues} unchallenged")
+                logger.info(f"   📋 Issue lifecycle keys: {list(issue_lifecycle.keys())[:10]}")  # Log first 10 issue hashes
                 
                 label_added = False
                 
