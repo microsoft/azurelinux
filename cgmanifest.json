@@ -27494,8 +27494,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.88.0",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.88.0-src.tar.xz"
+          "version": "1.90.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.90.0-src.tar.xz"
         }
       }
     },
