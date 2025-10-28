@@ -19,7 +19,6 @@ Patch6:         CVE-2023-38473.patch
 Patch7:         CVE-2023-38470.patch
 Patch8:         CVE-2023-38471.patch
 Patch9:         CVE-2024-52616.patch
-Patch10:        CVE-2027-99999.patch
 BuildRequires:  automake
 BuildRequires:  dbus-devel >= 0.90
 BuildRequires:  dbus-glib-devel >= 0.70

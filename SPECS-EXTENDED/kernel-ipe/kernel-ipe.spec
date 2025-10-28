@@ -32,8 +32,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-ipe
-Version:        6.6.96.1
-Release:        2%{?dist}
+Version:        6.6.112.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -87,6 +87,7 @@ Conflicts:      kernel
 Conflicts:      kernel-64k
 Conflicts:      kernel-lpg-innovate
 Conflicts:      kernel-rt
+Conflicts:      kernel-hwe
 %{?grub2_configuration_requires}
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
@@ -459,6 +460,28 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Oct 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.112.1-1
+- Auto-upgrade to 6.6.112.1
+
+* Tue Sep 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.104.2-4
+- Enable CONFIG_PCI_P2PDMA CONFIG_HSA_AMD CONFIG_HSA_AMD_P2P and dependency KConfigs
+
+* Tue Sep 23 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.6.104.2-3
+- Enable Aquantia AQtion ethernet driver
+
+* Tue Sep 23 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.104.2-2
+- Bump release to match kernel
+
+* Wed Sep 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.104.2-1
+- Auto-upgrade to 6.6.104.2
+
+* Fri Aug 22 2025 Siddharth Chintamaneni <siddharthc@microsoft.com> - 6.6.96.2-2
+- Added kernel-hwe as conflict.
+- Bump release to match kernel
+
+* Fri Aug 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.96.2-1
+- Auto-upgrade to 6.6.96.2
+
 * Thu Jul 17 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.96.1-2
 - Bump release to match kernel
 

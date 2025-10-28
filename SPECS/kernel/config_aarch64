@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 6.6.96.1 Kernel Configuration
+# Linux/arm64 6.6.112.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 13.2.0"
 CONFIG_CC_IS_GCC=y
@@ -2389,7 +2389,6 @@ CONFIG_ARM_SMCCC_SOC_ID=y
 #
 # Tegra firmware driver
 #
-# CONFIG_TEGRA_IVC is not set
 # end of Tegra firmware driver
 
 #
@@ -10024,7 +10023,7 @@ CONFIG_NVMEM_IMX_OCOTP_SCU=y
 # CONFIG_FPGA is not set
 # CONFIG_FSI is not set
 # CONFIG_TEE is not set
-CONFIG_MULTIPLEXER=m
+CONFIG_MULTIPLEXER=y
 
 #
 # Multiplexer drivers
