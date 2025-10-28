@@ -168,7 +168,7 @@ rm -rf nginx-tests
 
 %changelog
 * Sun Oct 27 2025 Ahmed Badawi <ahmedbadawi@microsoft.com> - 1.25.4-5
-- TEST: Challenge tracking with analytics and issue_hash - CVE-2087-12345
+- TEST: Challenge tracking with analytics and issue_hash - CVE-2087-12345 (regenerate report with issue_hash fix)
 
 * Tue Mar 11 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.25.4-4
 - Enable webdav module
