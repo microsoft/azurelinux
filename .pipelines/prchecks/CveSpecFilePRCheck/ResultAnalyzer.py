@@ -1165,11 +1165,24 @@ class ResultAnalyzer:
                 return;
             }}
             
-            // Get modal elements
+            // Get modal container first
             const modal = document.getElementById('challenge-modal');
-            const specEl = document.getElementById('finding-spec');
-            const typeEl = document.getElementById('finding-type');
-            const descEl = document.getElementById('finding-desc');
+            
+            if (!modal) {{
+                console.error('❌ CRITICAL: Modal element #challenge-modal not found in DOM!');
+                alert('Error: Modal dialog not found. Please refresh the page and try again.');
+                return;
+            }}
+            
+            // Get child elements - try both methods (getElementById and querySelector)
+            let specEl = document.getElementById('finding-spec');
+            let typeEl = document.getElementById('finding-type');
+            let descEl = document.getElementById('finding-desc');
+            
+            // Fallback to querySelector within modal if getElementById fails
+            if (!specEl) specEl = modal.querySelector('#finding-spec');
+            if (!typeEl) typeEl = modal.querySelector('#finding-type');
+            if (!descEl) descEl = modal.querySelector('#finding-desc');
             
             console.log('📋 Modal element check:', {{
                 modal: !!modal,
@@ -1178,19 +1191,14 @@ class ResultAnalyzer:
                 descEl: !!descEl
             }});
             
-            // Robust error handling - no retry loop
-            if (!modal) {{
-                console.error('❌ CRITICAL: Modal element #challenge-modal not found in DOM!');
-                alert('Error: Modal dialog not found. Please refresh the page and try again.');
-                return;
-            }}
-            
+            // Robust error handling
             if (!specEl || !typeEl || !descEl) {{
                 console.error('❌ CRITICAL: Modal child elements missing!', {{
                     specEl: !!specEl,
                     typeEl: !!typeEl, 
                     descEl: !!descEl
                 }});
+                console.error('Modal HTML structure:', modal.innerHTML.substring(0, 500));
                 alert('Error: Modal is corrupted. Please refresh the page and try again.');
                 return;
             }}
@@ -1378,10 +1386,17 @@ class ResultAnalyzer:
             console.log('🔍 Verifying modal structure on page load...');
             
             const modal = document.getElementById('challenge-modal');
-            const specEl = document.getElementById('finding-spec');
-            const typeEl = document.getElementById('finding-type');
-            const descEl = document.getElementById('finding-desc');
-            const form = document.getElementById('challenge-form');
+            
+            if (!modal) {{
+                console.error('❌ CRITICAL: Modal container not found!');
+                return;
+            }}
+            
+            // Check using querySelector within the modal (works even when display:none)
+            const specEl = modal.querySelector('#finding-spec');
+            const typeEl = modal.querySelector('#finding-type');
+            const descEl = modal.querySelector('#finding-desc');
+            const form = modal.querySelector('#challenge-form');
             
             const modalCheck = {{
                 modal: !!modal,
@@ -1398,6 +1413,7 @@ class ResultAnalyzer:
             }} else {{
                 console.error('❌ WARNING: Some modal elements are missing!', modalCheck);
                 console.error('   This will prevent challenge submissions from working.');
+                console.error('   Modal HTML:', modal.innerHTML.substring(0, 200));
             }}
         }});
     </script>
