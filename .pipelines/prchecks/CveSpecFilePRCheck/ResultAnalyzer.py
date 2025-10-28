@@ -711,12 +711,12 @@ class ResultAnalyzer:
         return html
     
     def _get_severity_color(self, severity: Severity) -> str:
-        """Get color code for severity level (dark theme)."""
+        """Get color code for severity level (cool tone palette: blue/purple/green)."""
         color_map = {
-            Severity.INFO: "#3fb950",      # Green
-            Severity.WARNING: "#d29922",   # Yellow
-            Severity.ERROR: "#f85149",     # Red
-            Severity.CRITICAL: "#ff6b6b"   # Bright red
+            Severity.INFO: "#3fb950",      # Green (keep - already cool)
+            Severity.WARNING: "#a371f7",   # Purple (was yellow/orange)
+            Severity.ERROR: "#58a6ff",     # Blue (was red)
+            Severity.CRITICAL: "#bc8cff"   # Bright purple (was bright red)
         }
         return color_map.get(severity, "#8b949e")
     
@@ -1247,7 +1247,7 @@ class ResultAnalyzer:
             margin-bottom: 20px;
             padding: 12px;
             background: var(--bg-primary);
-            border-left: 3px solid var(--accent-orange);
+            border-left: 3px solid var(--accent-purple);
             border-radius: 6px;
         }}
         
@@ -1260,7 +1260,7 @@ class ResultAnalyzer:
         
         .issue-type-title {{
             font-weight: 600;
-            color: var(--accent-orange);
+            color: var(--accent-purple);
             font-size: 14px;
         }}
         
@@ -1324,7 +1324,7 @@ class ResultAnalyzer:
         .antipattern-details summary {{
             cursor: pointer;
             font-weight: 600;
-            color: var(--accent-red);
+            color: var(--accent-purple);
             user-select: none;
             padding: 8px;
             border-radius: 4px;
