@@ -1,0 +1,33 @@
+From 97f34825327cf243fff31a35928da9015abd791c Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 23 Jul 2025 17:54:24 +0000
+Subject: [PATCH] AZL3 -- disable KMAC in speed in fips mode
+
+---
+ apps/speed.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/apps/speed.c b/apps/speed.c
+index 457a662..45c916a 100644
+--- a/apps/speed.c
++++ b/apps/speed.c
+@@ -2553,6 +2553,7 @@ int speed_main(int argc, char **argv)
+ 
+     // TOBIASB: Disable RSA sizes that aren't supported by FIPS
+     // TOBIASB: Disable DSA for FIPS provider bcecause it isn't supported.
++    // TOBIASB: Disable KMAC for FIPS provider because it isn't supported.
+     if (FIPS_mode()) {
+         for (i = 0; i < RSA_NUM; i++) {
+             if (rsa_keys[i].bits < 2048)
+@@ -2560,6 +2561,8 @@ int speed_main(int argc, char **argv)
+         }
+ 
+         memset(dsa_doit, 0, sizeof(dsa_doit));
++
++        doit[D_KMAC128] = doit[D_KMAC256] = 0;
+     }
+ 
+     for (i = 0; i < ALGOR_NUM; i++)
+-- 
+2.45.4
+
