@@ -1168,10 +1168,26 @@ class ResultAnalyzer:
             // Get modal container first
             const modal = document.getElementById('challenge-modal');
             
+            console.log('🔍 Modal element details:', {{
+                found: !!modal,
+                tagName: modal ? modal.tagName : 'N/A',
+                id: modal ? modal.id : 'N/A',
+                className: modal ? modal.className : 'N/A',
+                childCount: modal ? modal.children.length : 0,
+                innerHTML_length: modal ? modal.innerHTML.length : 0
+            }});
+            
             if (!modal) {{
                 console.error('❌ CRITICAL: Modal element #challenge-modal not found in DOM!');
                 alert('Error: Modal dialog not found. Please refresh the page and try again.');
                 return;
+            }}
+            
+            // Log first 500 chars of innerHTML to see what's actually there
+            if (modal.innerHTML) {{
+                console.log('📄 Modal innerHTML (first 500 chars):', modal.innerHTML.substring(0, 500));
+            }} else {{
+                console.error('❌ Modal innerHTML is empty or undefined!');
             }}
             
             // Get child elements - try both methods (getElementById and querySelector)
@@ -1179,13 +1195,18 @@ class ResultAnalyzer:
             let typeEl = document.getElementById('finding-type');
             let descEl = document.getElementById('finding-desc');
             
+            console.log('🔍 Direct getElementById results:', {{
+                specEl: !!specEl,
+                typeEl: !!typeEl,
+                descEl: !!descEl
+            }});
+            
             // Fallback to querySelector within modal if getElementById fails
             if (!specEl) specEl = modal.querySelector('#finding-spec');
             if (!typeEl) typeEl = modal.querySelector('#finding-type');
             if (!descEl) descEl = modal.querySelector('#finding-desc');
             
-            console.log('📋 Modal element check:', {{
-                modal: !!modal,
+            console.log('� After querySelector fallback:', {{
                 specEl: !!specEl,
                 typeEl: !!typeEl,
                 descEl: !!descEl
@@ -1193,12 +1214,17 @@ class ResultAnalyzer:
             
             // Robust error handling
             if (!specEl || !typeEl || !descEl) {{
-                console.error('❌ CRITICAL: Modal child elements missing!', {{
-                    specEl: !!specEl,
-                    typeEl: !!typeEl, 
-                    descEl: !!descEl
-                }});
-                console.error('Modal HTML structure:', modal.innerHTML.substring(0, 500));
+                console.error('❌ CRITICAL: Modal child elements missing after both methods!');
+                console.error('   Trying alternative query methods...');
+                
+                // Try finding by class or tag within modal
+                const allSpans = modal.getElementsByTagName('span');
+                console.log('   Found', allSpans.length, 'span elements in modal');
+                
+                // Try querySelectorAll
+                const spansByQuery = modal.querySelectorAll('span');
+                console.log('   querySelectorAll found', spansByQuery.length, 'spans');
+                
                 alert('Error: Modal is corrupted. Please refresh the page and try again.');
                 return;
             }}
