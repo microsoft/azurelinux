@@ -9,7 +9,6 @@
         "dracut-hostonly",
         "dracut-vrf",
         "initramfs",
-        "shadow-utils",
-        "containerd2"
+        "shadow-utils"
     ]
 }
