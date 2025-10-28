@@ -601,11 +601,30 @@ class ResultAnalyzer:
                         # Properly escape the description for both HTML content and attributes
                         escaped_desc = html_module.escape(pattern.description, quote=True)
                         html += f"""
-                            <li style="color: #c9d1d9; margin: 10px 0; font-size: 13px; position: relative;">
-                                {escaped_desc}
-                                <button class="challenge-btn" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-spec="{spec_result.spec_path}" data-issue-type="{issue_type}" data-description="{escaped_desc}" style="margin-left: 10px; padding: 4px 8px; font-size: 11px; background: #21262d; color: #58a6ff; border: 1px solid #30363d; border-radius: 4px; cursor: pointer;">
-                                    💬 Challenge
+                            <li class="antipattern-item" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" style="color: #c9d1d9; margin: 10px 0; font-size: 13px; position: relative; list-style-type: disc;">
+                                <span class="issue-text">{escaped_desc}</span>
+                                <button class="challenge-btn" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-spec="{spec_result.spec_path}" data-issue-type="{issue_type}" data-description="{escaped_desc}">
+                                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M2.5 3.5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm2-2a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7zM0 13a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 16 13V6a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 0 6v7zm1.5.5A.5.5 0 0 1 1 13V6a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13z"/>
+                                    </svg>
+                                    Challenge
                                 </button>
+                                <div class="challenge-details" data-finding-id="{finding_id}">
+                                    <div class="challenge-details-grid">
+                                        <div class="challenge-detail-row">
+                                            <span class="challenge-detail-label">Challenge Type:</span>
+                                            <span class="challenge-detail-value challenge-type"></span>
+                                        </div>
+                                        <div class="challenge-detail-row">
+                                            <span class="challenge-detail-label">Feedback:</span>
+                                            <span class="challenge-detail-value challenge-feedback"></span>
+                                        </div>
+                                        <div class="challenge-detail-row">
+                                            <span class="challenge-detail-label">Submitted:</span>
+                                            <span class="challenge-detail-value challenge-timestamp"></span>
+                                        </div>
+                                    </div>
+                                </div>
                             </li>
 """
                     html += """
@@ -798,9 +817,175 @@ class ResultAnalyzer:
             border-color: #58a6ff;
         }}
         
+        /* Modern Challenge Button */
+        .challenge-btn {{
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 500;
+            background: linear-gradient(180deg, #21262d 0%, #161b22 100%);
+            color: #58a6ff;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 10px;
+            vertical-align: middle;
+        }}
+        
+        .challenge-btn:hover {{
+            background: linear-gradient(180deg, #30363d 0%, #21262d 100%);
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+            transform: translateY(-1px);
+        }}
+        
+        .challenge-btn:active {{
+            transform: translateY(0);
+        }}
+        
         .challenge-btn:disabled {{
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
+        }}
+        
+        .challenge-btn.challenged {{
+            background: linear-gradient(180deg, #1f6feb20 0%, #1f6feb10 100%);
+            color: #3fb950;
+            border-color: #3fb950;
+        }}
+        
+        /* Challenged Item Styling */
+        .challenged-item {{
+            position: relative;
+            opacity: 0.6;
+            background: #0d111780 !important;
+            border-left: 3px solid #58a6ff !important;
+            padding-left: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }}
+        
+        .challenged-item:hover {{
+            opacity: 0.8;
+            background: #161b2280 !important;
+        }}
+        
+        .challenged-item .issue-text {{
+            text-decoration: line-through;
+            color: #6e7681 !important;
+        }}
+        
+        .challenged-badge {{
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #1f6feb30;
+            color: #58a6ff;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+            vertical-align: middle;
+        }}
+        
+        /* Expandable Challenge Details */
+        .challenge-details {{
+            display: none;
+            margin-top: 12px;
+            padding: 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            font-size: 12px;
+            animation: slideDown 0.2s ease;
+        }}
+        
+        .challenge-details.expanded {{
+            display: block;
+        }}
+        
+        @keyframes slideDown {{
+            from {{
+                opacity: 0;
+                transform: translateY(-10px);
+            }}
+            to {{
+                opacity: 1;
+                transform: translateY(0);
+            }}
+        }}
+        
+        .challenge-details-grid {{
+            display: grid;
+            gap: 8px;
+        }}
+        
+        .challenge-detail-row {{
+            display: flex;
+            gap: 8px;
+        }}
+        
+        .challenge-detail-label {{
+            color: #8b949e;
+            font-weight: 600;
+            min-width: 100px;
+        }}
+        
+        .challenge-detail-value {{
+            color: #c9d1d9;
+        }}
+        
+        .challenge-type-badge {{
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }}
+        
+        .challenge-type-false-positive {{
+            background: #1f883d20;
+            color: #3fb950;
+        }}
+        
+        .challenge-type-needs-context {{
+            background: #d2992220;
+            color: #d29922;
+        }}
+        
+        .challenge-type-acknowledge {{
+            background: #f8514920;
+            color: #f85149;
+        }}
+        
+        .expand-toggle {{
+            cursor: pointer;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #58a6ff;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }}
+        
+        .expand-toggle:hover {{
+            text-decoration: underline;
+        }}
+        
+        .expand-icon {{
+            transition: transform 0.2s ease;
+        }}
+        
+        .expand-icon.expanded {{
+            transform: rotate(90deg);
         }}
         
         /* Challenge Modal */
@@ -1133,6 +1318,121 @@ class ResultAnalyzer:
         // Challenge/Feedback Module
         // ============================================================================
         
+        // ============================================================================
+        // Challenge Details Management
+        // ============================================================================
+        
+        function toggleChallengeDetails(findingId) {{
+            const detailsDiv = document.querySelector(`.challenge-details[data-finding-id="${{findingId}}"]`);
+            const expandIcon = document.querySelector(`li[data-finding-id="${{findingId}}"] .expand-icon`);
+            
+            if (detailsDiv) {{
+                detailsDiv.classList.toggle('expanded');
+                if (expandIcon) {{
+                    expandIcon.classList.toggle('expanded');
+                }}
+            }}
+        }}
+        
+        function populateChallengeDetails(findingId, challengeType, feedback) {{
+            const detailsDiv = document.querySelector(`.challenge-details[data-finding-id="${{findingId}}"]`);
+            
+            if (detailsDiv) {{
+                const typeLabel = challengeType === 'false-positive' ? 'False Positive' :
+                                challengeType === 'needs-context' ? 'Needs Context' : 'Acknowledged';
+                const typeClass = `challenge-type-${{challengeType.replace('_', '-')}}`;
+                
+                detailsDiv.querySelector('.challenge-type').innerHTML = `<span class="challenge-type-badge ${{typeClass}}">${{typeLabel}}</span>`;
+                detailsDiv.querySelector('.challenge-feedback').textContent = feedback;
+                detailsDiv.querySelector('.challenge-timestamp').textContent = new Date().toLocaleString();
+            }}
+        }}
+        
+        function storeChallengeDetails(issueHash, details) {{
+            const key = 'radar_challenged_details_pr_{pr_number or 0}';
+            const stored = localStorage.getItem(key);
+            const allDetails = stored ? JSON.parse(stored) : {{}};
+            
+            allDetails[issueHash] = details;
+            localStorage.setItem(key, JSON.stringify(allDetails));
+        }}
+        
+        function getChallengeDetails(issueHash) {{
+            const key = 'radar_challenged_details_pr_{pr_number or 0}';
+            const stored = localStorage.getItem(key);
+            if (!stored) return null;
+            
+            const allDetails = JSON.parse(stored);
+            return allDetails[issueHash] || null;
+        }}
+        
+        function restoreChallengedState() {{
+            console.log('🔄 Restoring challenged items from localStorage...');
+            
+            const key = 'radar_challenged_details_pr_{pr_number or 0}';
+            const stored = localStorage.getItem(key);
+            
+            if (!stored) {{
+                console.log('   No challenged items to restore');
+                return;
+            }}
+            
+            const allDetails = JSON.parse(stored);
+            const itemsArray = Object.entries(allDetails);
+            
+            if (itemsArray.length === 0) {{
+                console.log('   No challenged items to restore');
+                return;
+            }}
+            
+            console.log(`   Restoring ${{itemsArray.length}} challenged items`);
+            
+            // Apply challenged state to each item
+            itemsArray.forEach(([hash, details]) => {{
+                const listItem = document.querySelector(`li.antipattern-item[data-issue-hash="${{hash}}"]`);
+                const btn = document.querySelector(`button.challenge-btn[data-issue-hash="${{hash}}"]`);
+                
+                if (listItem && btn) {{
+                    const findingId = listItem.dataset.findingId;
+                    
+                    // Add challenged class
+                    listItem.classList.add('challenged-item');
+                    
+                    // Update button
+                    btn.innerHTML = `
+                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                        </svg>
+                        Challenged
+                    `;
+                    btn.classList.add('challenged');
+                    btn.disabled = true;
+                    
+                    // Add badge and expand toggle if not already there
+                    const textSpan = listItem.querySelector('.issue-text');
+                    if (textSpan && !listItem.querySelector('.challenged-badge')) {{
+                        const badge = document.createElement('span');
+                        badge.className = 'challenged-badge';
+                        badge.innerHTML = '💬 Challenged';
+                        textSpan.after(badge);
+                        
+                        const expandToggle = document.createElement('span');
+                        expandToggle.className = 'expand-toggle';
+                        expandToggle.innerHTML = '<span class="expand-icon">▶</span> View Details';
+                        expandToggle.onclick = () => toggleChallengeDetails(findingId);
+                        badge.after(expandToggle);
+                    }}
+                    
+                    // Populate details
+                    populateChallengeDetails(findingId, details.type, details.feedback);
+                    
+                    console.log(`   ✅ Restored challenged state for: ${{hash}}`);
+                }}
+            }});
+            
+            console.log('✅ Challenged state restoration complete');
+        }}
+        
         function initializeChallengeButtons() {{
             const challengeButtons = document.querySelectorAll('.challenge-btn');
             challengeButtons.forEach(btn => {{
@@ -1377,26 +1677,63 @@ class ResultAnalyzer:
                     }}
                     
                     alert(message);
-                    closeChallengeModal();
                     
-                    // Mark button as submitted - MUST be a button element, not the modal!
+                    // Apply challenged styling and populate details
                     const findingId = modal.dataset.findingId;
-                    console.log('🔍 Looking for button with finding-id:', findingId);
+                    const issueHash = modal.dataset.issueHash;
                     
-                    if (findingId) {{
-                        const btn = document.querySelector(`button[data-finding-id="${{findingId}}"]`);
-                        console.log('🔍 Button found:', !!btn, 'tagName:', btn ? btn.tagName : 'N/A');
+                    console.log('🎨 Applying challenged styling to:', findingId);
+                    
+                    // Find the list item
+                    const listItem = document.querySelector(`li.antipattern-item[data-finding-id="${{findingId}}"]`);
+                    const btn = document.querySelector(`button.challenge-btn[data-finding-id="${{findingId}}"]`);
+                    
+                    if (listItem && btn) {{
+                        // Add challenged class
+                        listItem.classList.add('challenged-item');
                         
-                        if (btn && btn.tagName === 'BUTTON') {{
-                            btn.textContent = '✅ Challenged';
-                            btn.disabled = true;
-                            console.log('✅ Button marked as challenged');
-                        }} else {{
-                            console.warn('⚠️  Could not find challenge button or wrong element type');
+                        // Update button
+                        btn.innerHTML = `
+                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                            </svg>
+                            Challenged
+                        `;
+                        btn.classList.add('challenged');
+                        btn.disabled = true;
+                        
+                        // Add expand toggle badge
+                        const textSpan = listItem.querySelector('.issue-text');
+                        if (textSpan && !listItem.querySelector('.challenged-badge')) {{
+                            const badge = document.createElement('span');
+                            badge.className = 'challenged-badge';
+                            badge.innerHTML = '💬 Challenged';
+                            textSpan.after(badge);
+                            
+                            // Add expand toggle
+                            const expandToggle = document.createElement('span');
+                            expandToggle.className = 'expand-toggle';
+                            expandToggle.innerHTML = '<span class="expand-icon">▶</span> View Details';
+                            expandToggle.onclick = () => toggleChallengeDetails(findingId);
+                            badge.after(expandToggle);
                         }}
+                        
+                        // Store challenge data
+                        storeChallengeDetails(issueHash, {{
+                            type: challengeType.value,
+                            feedback: feedbackText,
+                            timestamp: new Date().toISOString()
+                        }});
+                        
+                        // Populate details section
+                        populateChallengeDetails(findingId, challengeType.value, feedbackText);
+                        
+                        console.log('✅ Challenged styling applied');
                     }} else {{
-                        console.warn('⚠️  No findingId in modal dataset');
+                        console.warn('⚠️  Could not find list item or button');
                     }}
+                    
+                    closeChallengeModal();
                 }} else {{
                     console.error('❌ Server error:', result);
                     
