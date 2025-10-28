@@ -5,7 +5,7 @@
 Summary:	 InfiniBand fabric simulator for management
 Name:		 ibsim
 Version:	 0.12
-Release:	 1%{?dist}
+Release:	 2%{?dist}
 License:	 GPLv2 or BSD
 Group:		 System Environment/Libraries
 BuildRoot:	 %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -13,7 +13,6 @@ Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/
 Url:		 https://github.com/linux-rdma/ibsim
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-ExclusiveArch:   x86_64
 
 BuildRequires: libibmad-devel
 BuildRequires: libibumad-devel
@@ -48,6 +47,8 @@ rm -rf $RPM_BUILD_ROOT
 %license COPYING
 
 %changelog
-* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+* Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 0.12-2
+- Enable ARM64 build by removing ExclusiveArch
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 0.12-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

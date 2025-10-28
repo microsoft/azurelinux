@@ -40,7 +40,7 @@
 
 %{!?_name: %define _name srp}
 %{!?_version: %define _version 24.10}
-%{!?_mofed_full_version: %define _mofed_full_version %{_version}-20%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version %{_version}-21%{release_suffix}%{?dist}}
 %{!?_release: %define _release OFED.24.10.0.6.7.1}
 
 # KMP is disabled by default
@@ -66,7 +66,7 @@
 Summary:	 srp driver
 Name:		 srp
 Version:	 24.10
-Release:	 20%{release_suffix}%{?dist}
+Release:	 21%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -255,6 +255,9 @@ fi
 %endif
 
 %changelog
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-21
+- Bump mofed release number
+
 * Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-20
 - Add kernel version and release nb into release nb
 
