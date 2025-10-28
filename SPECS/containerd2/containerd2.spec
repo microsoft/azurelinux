@@ -25,7 +25,7 @@ BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
 
-Requires: runc >= 1.2.2
+Requires: runc >= 1.3.2
 
 # This package replaces the old name of containerd
 Provides: containerd = %{version}-%{release}
