@@ -1,0 +1,50 @@
+From b09b258744dd20690162743a9df45356571a93b4 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 23 Jul 2025 18:58:31 +0000
+Subject: [PATCH] AZL3 -- disable brainpool in speed in fips mode
+
+---
+ apps/speed.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/apps/speed.c b/apps/speed.c
+index 45c916a..e12eadb 100644
+--- a/apps/speed.c
++++ b/apps/speed.c
+@@ -2554,6 +2554,7 @@ int speed_main(int argc, char **argv)
+     // TOBIASB: Disable RSA sizes that aren't supported by FIPS
+     // TOBIASB: Disable DSA for FIPS provider bcecause it isn't supported.
+     // TOBIASB: Disable KMAC for FIPS provider because it isn't supported.
++    // TOBIASB: Disable brainpool for FIPS provider because it isn't supported. See curve_list in ec_curve.c.
+     if (FIPS_mode()) {
+         for (i = 0; i < RSA_NUM; i++) {
+             if (rsa_keys[i].bits < 2048)
+@@ -2563,6 +2564,25 @@ int speed_main(int argc, char **argv)
+         memset(dsa_doit, 0, sizeof(dsa_doit));
+ 
+         doit[D_KMAC128] = doit[D_KMAC256] = 0;
++
++        for (i = 0; i < EC_NUM; i++) {
++            if (ec_curves[i].nid == NID_brainpoolP256r1
++                || ec_curves[i].nid == NID_brainpoolP256t1
++                || ec_curves[i].nid == NID_brainpoolP384r1
++                || ec_curves[i].nid == NID_brainpoolP384t1
++                || ec_curves[i].nid == NID_brainpoolP512r1
++                || ec_curves[i].nid == NID_brainpoolP512t1) {
++                ecdsa_doit[i] = 0;
++                ecdh_doit[i] = 0;
++            }
++        }
++        // {"brainpoolP256r1", NID_brainpoolP256r1, 256},
++        // {"brainpoolP256t1", NID_brainpoolP256t1, 256},
++        // {"brainpoolP384r1", NID_brainpoolP384r1, 384},
++        // {"brainpoolP384t1", NID_brainpoolP384t1, 384},
++        // {"brainpoolP512r1", NID_brainpoolP512r1, 512},
++        // {"brainpoolP512t1", NID_brainpoolP512t1, 512},
++
+     }
+ 
+     for (i = 0; i < ALGOR_NUM; i++)
+-- 
+2.45.4
+
