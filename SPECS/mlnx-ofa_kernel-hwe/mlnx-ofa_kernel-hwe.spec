@@ -192,6 +192,7 @@ Requires: procps
 Requires: module-init-tools
 Requires: lsof
 Requires: ofed-scripts
+Conflicts: mlnx-ofa_kernel-modules
 
 %description -n %{non_kmp_pname}
 Core, HW and ULPs kernel modules
