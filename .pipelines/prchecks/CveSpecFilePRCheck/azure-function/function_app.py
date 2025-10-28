@@ -79,7 +79,8 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
     {
         "pr_number": 14877,
         "spec_file": "SPECS/curl/curl.spec",
-        "antipattern_id": "curl-ap-001",
+        "issue_hash": "curl-CVE-2024-12345-missing-cve-in-changelog",
+        "antipattern_id": "curl-ap-001",  # Legacy field, kept for backwards compatibility
         "challenge_type": "false-positive",
         "feedback_text": "This is intentional because..."
     }
@@ -149,7 +150,7 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
             )
         
         # Validate required fields
-        required_fields = ["pr_number", "antipattern_id", "challenge_type", "feedback_text"]
+        required_fields = ["pr_number", "issue_hash", "challenge_type", "feedback_text"]
         missing_fields = [field for field in required_fields if field not in req_body]
         
         if missing_fields:
@@ -173,7 +174,11 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
             )
         
         pr_number = req_body["pr_number"]
-        antipattern_id = req_body["antipattern_id"]
+        issue_hash = req_body["issue_hash"]
+        # Keep antipattern_id for backwards compatibility (optional)
+        antipattern_id = req_body.get("antipattern_id", issue_hash)
+        
+        logger.info(f"📝 Processing challenge for issue_hash: {issue_hash}")
         
         # Step 3: Verify user has permission to submit challenge
         # Allow: PR owner, repository collaborators, or repository admins
@@ -253,8 +258,10 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
         # Create challenge entry with authenticated user info
         challenge = {
             "challenge_id": challenge_id,
-            "antipattern_id": antipattern_id,
+            "issue_hash": issue_hash,  # Primary identifier for tracking across commits
+            "antipattern_id": antipattern_id,  # Legacy field for backwards compatibility
             "spec_file": req_body.get("spec_file", ""),
+            "commit_sha": req_body.get("commit_sha", "unknown"),  # Commit where issue was challenged
             "submitted_at": datetime.utcnow().isoformat() + "Z",
             "submitted_by": {
                 "username": username,
@@ -266,29 +273,50 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
             "status": "submitted"
         }
         
-        logger.info(f"✏️  Creating challenge: {challenge_id} for antipattern: {antipattern_id} by {username}")
+        logger.info(f"✏️  Creating challenge: {challenge_id} for issue_hash: {issue_hash} by {username}")
         
         # Add challenge to data
         if "challenges" not in current_data:
             current_data["challenges"] = []
         current_data["challenges"].append(challenge)
         
-        # Update antipattern status
+        # Update issue_lifecycle to mark this issue as challenged
+        if "issue_lifecycle" not in current_data:
+            current_data["issue_lifecycle"] = {}
+        
+        if issue_hash not in current_data["issue_lifecycle"]:
+            # First time seeing this issue, create entry
+            current_data["issue_lifecycle"][issue_hash] = {
+                "first_detected": req_body.get("commit_sha", "unknown"),
+                "last_detected": req_body.get("commit_sha", "unknown"),
+                "status": "challenged",
+                "challenge_id": challenge_id
+            }
+        else:
+            # Update existing entry
+            current_data["issue_lifecycle"][issue_hash]["status"] = "challenged"
+            current_data["issue_lifecycle"][issue_hash]["challenge_id"] = challenge_id
+        
+        logger.info(f"✅ Updated issue_lifecycle for {issue_hash}: status=challenged, challenge_id={challenge_id}")
+        
+        # Legacy: Also update antipattern status in specs array (if it exists)
         antipattern_found = False
         for spec in current_data.get("specs", []):
             for ap in spec.get("antipatterns", []):
-                if ap["id"] == antipattern_id:
+                # Match by issue_hash if available, fallback to antipattern_id
+                ap_hash = ap.get("issue_hash", ap.get("id"))
+                if ap_hash == issue_hash or ap.get("id") == antipattern_id:
                     ap["status"] = "challenged"
                     if req_body["challenge_type"] == "false-positive":
                         ap["marked_false_positive"] = True
                     antipattern_found = True
-                    logger.info(f"✅ Updated antipattern status: {antipattern_id} -> challenged")
+                    logger.info(f"✅ Updated legacy antipattern status: {ap.get('id')} -> challenged")
                     break
             if antipattern_found:
                 break
         
         if not antipattern_found:
-            logger.warning(f"⚠️  Antipattern not found in data: {antipattern_id}")
+            logger.info(f"ℹ️  No legacy antipattern entry found for {issue_hash} (analytics.json might be from new schema)")
         
         # Recalculate summary metrics
         total_findings = sum(len(s.get("antipatterns", [])) for s in current_data.get("specs", []))
@@ -336,7 +364,8 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
             # Posted directly by the user's account (not the bot)
             comment_body = f"""## {emoji} Challenge Submitted
 
-**Finding**: `{antipattern_id}` in `{req_body.get("spec_file", "")}`  
+**Issue**: `{issue_hash}`  
+**File**: `{req_body.get("spec_file", "")}`  
 **Challenge Type**: {type_text}  
 
 **Feedback**:
@@ -376,12 +405,14 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
             
             # Fetch BOT token from Key Vault for label management
             bot_token = get_github_token()
-            logger.info(f"🏷️  Adding radar-acknowledged label using bot token")
             
             if not bot_token:
-                logger.warning("⚠️  Bot token not available from Key Vault, label cannot be added")
+                logger.warning("⚠️  Bot token not available from Key Vault, labels cannot be managed")
                 label_added = False
             else:
+                # Smart label management: Check if ALL issues are now challenged
+                logger.info(f"🏷️  Managing labels based on challenge state...")
+                
                 bot_comment_headers = {
                     "Authorization": f"token {bot_token}",  # Bot PAT uses 'token' prefix
                     "Accept": "application/vnd.github.v3+json",
@@ -389,22 +420,50 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                 }
                 
                 labels_url = f"https://api.github.com/repos/microsoft/azurelinux/issues/{pr_number}/labels"
-                label_response = requests.post(
-                    labels_url,
-                    headers=bot_comment_headers,
-                    json={"labels": ["radar-acknowledged"]},
-                    timeout=10
-                )
+                
+                # Calculate unchallenged vs challenged issue counts from issue_lifecycle
+                issue_lifecycle = current_data.get("issue_lifecycle", {})
+                total_issues = len(issue_lifecycle)
+                challenged_issues = sum(1 for issue in issue_lifecycle.values() if issue.get("status") == "challenged")
+                unchallenged_issues = total_issues - challenged_issues
+                
+                logger.info(f"   📊 Issue status: {total_issues} total, {challenged_issues} challenged, {unchallenged_issues} unchallenged")
                 
                 label_added = False
-                if label_response.status_code == 200:
-                    logger.info(f"✅ Label 'radar-acknowledged' added successfully by bot")
-                    label_added = True
+                
+                if total_issues > 0 and unchallenged_issues == 0:
+                    # ALL issues have been challenged - update labels
+                    logger.info(f"   ✅ All {total_issues} issues challenged! Updating labels...")
+                    
+                    # Remove radar-issues-detected
+                    try:
+                        delete_url = f"{labels_url}/radar-issues-detected"
+                        delete_response = requests.delete(delete_url, headers=bot_comment_headers, timeout=10)
+                        if delete_response.status_code in [200, 404]:
+                            logger.info(f"   ✓ Removed 'radar-issues-detected' label (or it wasn't present)")
+                        else:
+                            logger.warning(f"   Failed to remove 'radar-issues-detected': {delete_response.status_code}")
+                    except Exception as e:
+                        logger.warning(f"   Error removing 'radar-issues-detected': {e}")
+                    
+                    # Add radar-acknowledged
+                    label_response = requests.post(
+                        labels_url,
+                        headers=bot_comment_headers,
+                        json={"labels": ["radar-acknowledged"]},
+                        timeout=10
+                    )
+                    
+                    if label_response.status_code == 200:
+                        logger.info(f"   ✅ Label 'radar-acknowledged' added successfully")
+                        label_added = True
+                    else:
+                        logger.error(f"   ❌ Failed to add 'radar-acknowledged': {label_response.status_code}")
+                        logger.error(f"   Response: {label_response.text}")
                 else:
-                    logger.error(f"❌ Failed to add label:")
-                    logger.error(f"   Status: {label_response.status_code}")
-                    logger.error(f"   Response: {label_response.text}")
-                    logger.info("   Note: Label might not exist in repo - create 'radar-acknowledged' label first")
+                    # Still have unchallenged issues - keep radar-issues-detected label
+                    logger.info(f"   ⚠️  Still {unchallenged_issues} unchallenged issue(s) - keeping 'radar-issues-detected' label")
+                    label_added = False
         
         except Exception as comment_error:
             logger.error(f"❌ Exception during GitHub comment/label posting:")

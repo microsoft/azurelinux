@@ -391,6 +391,41 @@ class GitHubClient:
                 logger.error(f"Response body: {e.response.text}")
             return {}
     
+    def remove_label(self, label: str) -> bool:
+        """
+        Remove a label from the PR.
+        
+        Args:
+            label: The label name to remove
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        if not self.token or not self.repo_name or not self.pr_number:
+            logger.error(f"Missing required params - token: {'✓' if self.token else '✗'}, repo: {self.repo_name}, pr: {self.pr_number}")
+            return False
+            
+        url = f"{self.api_base_url}/repos/{self.repo_name}/issues/{self.pr_number}/labels/{label}"
+        logger.info(f"Removing label '{label}' from PR #{self.pr_number}")
+        
+        try:
+            response = requests.delete(url, headers=self.headers)
+            logger.info(f"Response status: {response.status_code}")
+            
+            # 200 = successfully removed, 404 = label wasn't there (still success from our perspective)
+            if response.status_code in [200, 404]:
+                logger.info(f"✅ Successfully removed label '{label}' (or it wasn't present)")
+                return True
+            
+            response.raise_for_status()
+            return True
+        except requests.exceptions.RequestException as e:
+            logger.error(f"❌ Failed to remove label '{label}': {str(e)}")
+            if hasattr(e, 'response') and e.response is not None:
+                logger.error(f"Response status: {e.response.status_code}")
+                logger.error(f"Response body: {e.response.text}")
+            return False
+    
     def post_or_update_comment(self, body: str, marker: str) -> Dict[str, Any]:
         """
         Post a new comment or update an existing one with the same marker.

@@ -595,14 +595,15 @@ class ResultAnalyzer:
                         <ul style="margin: 5px 0; padding-left: 20px; list-style-type: disc;">
 """
                     for idx, pattern in enumerate(patterns):
-                        # Create unique ID for this finding
-                        finding_id = f"{spec_result.package_name}-{issue_type.replace(' ', '-').replace('_', '-')}-{idx}"
+                        # Use the issue_hash if available, otherwise fallback to generated ID
+                        issue_hash = pattern.issue_hash if hasattr(pattern, 'issue_hash') and pattern.issue_hash else f"{spec_result.package_name}-{issue_type.replace(' ', '-').replace('_', '-')}-{idx}"
+                        finding_id = issue_hash  # For backwards compatibility in HTML
                         # Properly escape the description for both HTML content and attributes
                         escaped_desc = html_module.escape(pattern.description, quote=True)
                         html += f"""
                             <li style="color: #c9d1d9; margin: 10px 0; font-size: 13px; position: relative;">
                                 {escaped_desc}
-                                <button class="challenge-btn" data-finding-id="{finding_id}" data-spec="{spec_result.spec_path}" data-issue-type="{issue_type}" data-description="{escaped_desc}" style="margin-left: 10px; padding: 4px 8px; font-size: 11px; background: #21262d; color: #58a6ff; border: 1px solid #30363d; border-radius: 4px; cursor: pointer;">
+                                <button class="challenge-btn" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-spec="{spec_result.spec_path}" data-issue-type="{issue_type}" data-description="{escaped_desc}" style="margin-left: 10px; padding: 4px 8px; font-size: 11px; background: #21262d; color: #58a6ff; border: 1px solid #30363d; border-radius: 4px; cursor: pointer;">
                                     💬 Challenge
                                 </button>
                             </li>
@@ -663,7 +664,7 @@ class ResultAnalyzer:
     
     def generate_multi_spec_report(self, analysis_result: 'MultiSpecAnalysisResult', include_html: bool = True, 
                                    github_client = None, blob_storage_client = None, pr_number: int = None,
-                                   pr_metadata: dict = None) -> str:
+                                   pr_metadata: dict = None, categorized_issues: dict = None) -> str:
         """
         Generate a comprehensive report for multi-spec analysis results with enhanced formatting.
         
@@ -674,6 +675,7 @@ class ResultAnalyzer:
             blob_storage_client: Optional BlobStorageClient for uploading to Azure Blob Storage (preferred)
             pr_number: PR number for blob storage upload (required if blob_storage_client provided)
             pr_metadata: Optional dict with PR metadata (title, author, branches, sha, timestamp)
+            categorized_issues: Optional dict with categorized issues from AnalyticsManager
             
         Returns:
             Formatted GitHub markdown report with optional HTML section
@@ -1135,12 +1137,14 @@ class ResultAnalyzer:
                 btn.addEventListener('click', (e) => {{
                     e.stopPropagation();
                     const findingId = btn.dataset.findingId;
+                    const issueHash = btn.dataset.issueHash || btn.dataset.findingId;  // Use issue_hash if available
                     const spec = btn.dataset.spec;
                     const issueType = btn.dataset.issueType;
                     const description = btn.dataset.description;
                     
                     openChallengeModal({{
                         findingId,
+                        issueHash,
                         spec,
                         issueType,
                         description
@@ -1164,6 +1168,7 @@ class ResultAnalyzer:
             
             // Store finding data for submission
             modal.dataset.findingId = finding.findingId;
+            modal.dataset.issueHash = finding.issueHash || finding.findingId;  // Store issue_hash
             modal.dataset.spec = finding.spec;
             modal.dataset.issueType = finding.issueType;
             modal.dataset.description = finding.description;
@@ -1216,7 +1221,8 @@ class ResultAnalyzer:
                     body: JSON.stringify({{
                         pr_number: pr_number,
                         spec_file: modal.dataset.spec,
-                        antipattern_id: modal.dataset.findingId,
+                        issue_hash: modal.dataset.issueHash,  // Primary identifier
+                        antipattern_id: modal.dataset.findingId,  // Legacy field for backwards compatibility
                         challenge_type: challengeType.value,
                         feedback_text: feedbackText
                     }}),
@@ -1440,6 +1446,43 @@ class ResultAnalyzer:
         report_lines.append(f"| **Specs with Warnings** | ⚠️ {stats['specs_with_warnings']} |")
         report_lines.append(f"| **Total Issues Found** | {analysis_result.total_issues} |")
         report_lines.append("")
+        
+        # Add categorized issues breakdown if available
+        if categorized_issues:
+            report_lines.append("## 🏷️ Issue Status Tracking")
+            report_lines.append("")
+            report_lines.append("This commit's issues have been categorized based on challenge history:")
+            report_lines.append("")
+            
+            new_count = len(categorized_issues['new_issues'])
+            recurring_count = len(categorized_issues['recurring_unchallenged'])
+            challenged_count = len(categorized_issues['challenged_issues'])
+            resolved_count = len(categorized_issues['resolved_issues'])
+            
+            report_lines.append(f"| Status | Count | Description |")
+            report_lines.append(f"|--------|-------|-------------|")
+            report_lines.append(f"| 🆕 **New Issues** | {new_count} | First time detected in this PR |")
+            report_lines.append(f"| 🔄 **Recurring Unchallenged** | {recurring_count} | Previously detected but not yet challenged |")
+            report_lines.append(f"| ✅ **Previously Challenged** | {challenged_count} | Issues already acknowledged by reviewers |")
+            report_lines.append(f"| ✔️ **Resolved** | {resolved_count} | Issues fixed since last commit |")
+            report_lines.append("")
+            
+            # Show actionable issues requiring attention
+            unchallenged_total = new_count + recurring_count
+            if unchallenged_total > 0:
+                report_lines.append(f"⚠️ **{unchallenged_total} issue(s)** require attention (new or recurring unchallenged)")
+                report_lines.append("")
+            elif challenged_count > 0:
+                report_lines.append(f"✅ All {challenged_count} issue(s) have been acknowledged by reviewers")
+                report_lines.append("")
+            else:
+                report_lines.append("🎉 No issues detected in this commit!")
+                report_lines.append("")
+            
+            # Add helpful note
+            if challenged_count > 0:
+                report_lines.append("> **Note:** Previously challenged issues are not re-flagged. They remain visible for tracking purposes.")
+                report_lines.append("")
         
         # Package-by-package breakdown
         report_lines.append("## 📦 Package Analysis Details")

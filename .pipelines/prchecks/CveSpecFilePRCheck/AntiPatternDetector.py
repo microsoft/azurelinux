@@ -76,6 +76,7 @@ class AntiPattern:
     line_number: Optional[int]  # Line number (if applicable)
     context: Optional[str]      # Surrounding context from the file
     recommendation: str         # Suggested fix or improvement
+    issue_hash: str = ""        # Stable hash for tracking across commits (generated automatically)
 
 class AntiPatternDetector:
     """Detects common anti-patterns in spec files"""
@@ -111,6 +112,90 @@ class AntiPatternDetector:
             'missing-cve-in-changelog': Severity.ERROR,
         }
 
+    def _extract_package_name(self, file_path: str) -> str:
+        """
+        Extract package name from spec file path.
+        
+        Args:
+            file_path: Path like 'SPECS/nginx/nginx.spec'
+            
+        Returns:
+            Package name like 'nginx'
+        """
+        # Handle both full paths and relative paths
+        parts = file_path.split('/')
+        if 'SPECS' in parts:
+            # Path like SPECS/nginx/nginx.spec
+            specs_idx = parts.index('SPECS')
+            if specs_idx + 1 < len(parts):
+                return parts[specs_idx + 1]
+        
+        # Fallback: use filename without .spec extension
+        filename = parts[-1]
+        return filename.replace('.spec', '')
+    
+    def _extract_key_identifier(self, antipattern: 'AntiPattern') -> str:
+        """
+        Extract the stable identifier from antipattern description.
+        
+        This extracts:
+        - CVE numbers (e.g., CVE-2085-88888)
+        - Patch filenames (e.g., CVE-2080-12345.patch)
+        - Other unique identifiers from the description
+        
+        Args:
+            antipattern: The AntiPattern to extract identifier from
+            
+        Returns:
+            Stable identifier string
+        """
+        # Try to extract CVE number first (most common)
+        cve_match = re.search(r'CVE-\d{4}-\d+', antipattern.description)
+        if cve_match:
+            return cve_match.group(0)  # e.g., "CVE-2085-88888"
+        
+        # Extract patch filename
+        patch_match = re.search(r"(?:Patch file |')([A-Za-z0-9_.-]+\.patch)", antipattern.description)
+        if patch_match:
+            return patch_match.group(1)  # e.g., "CVE-2085-88888.patch"
+        
+        # For changelog entries, try to extract meaningful text
+        entry_match = re.search(r"entry '([^']+)'", antipattern.description)
+        if entry_match:
+            # Use first few words of entry as identifier
+            entry_text = entry_match.group(1)
+            words = entry_text.split()[:3]  # First 3 words
+            return "-".join(words)
+        
+        # Fallback: use antipattern.id as identifier for generic issues
+        return antipattern.id
+    
+    def generate_issue_hash(self, antipattern: 'AntiPattern') -> str:
+        """
+        Generate stable hash for tracking issues across commits.
+        
+        Hash format: {package}-{key_identifier}-{antipattern_id}
+        
+        Examples:
+          - nginx-CVE-2085-88888-future-dated-cve
+          - nginx-CVE-2080-12345.patch-missing-patch-file
+          - openssl-CVE-2025-23419-missing-cve-in-changelog
+        
+        Args:
+            antipattern: The AntiPattern to generate hash for
+            
+        Returns:
+            Stable hash string for tracking across commits
+        """
+        package_name = self._extract_package_name(antipattern.file_path)
+        key_id = self._extract_key_identifier(antipattern)
+        
+        # Format: package-identifier-antipattern_type
+        # Example: nginx-CVE-2085-88888-future-dated-cve
+        issue_hash = f"{package_name}-{key_id}-{antipattern.id}"
+        
+        return issue_hash
+
     def detect_all(self, file_path: str, file_content: str, 
                    file_list: List[str]) -> List[AntiPattern]:
         """
@@ -122,7 +207,7 @@ class AntiPatternDetector:
             file_list: List of files in the same directory
             
         Returns:
-            List of detected anti-patterns
+            List of detected anti-patterns with issue_hash generated
         """
         logger.info(f"Running all anti-pattern detections on {file_path}")
         
@@ -133,6 +218,11 @@ class AntiPatternDetector:
         all_patterns.extend(self.detect_patch_file_issues(file_content, file_path, file_list))
         all_patterns.extend(self.detect_cve_issues(file_path, file_content))
         all_patterns.extend(self.detect_changelog_issues(file_path, file_content))
+        
+        # Generate issue_hash for each detected pattern
+        for pattern in all_patterns:
+            pattern.issue_hash = self.generate_issue_hash(pattern)
+            logger.debug(f"Generated issue_hash: {pattern.issue_hash}")
         
         # Return combined results
         logger.info(f"Found {len(all_patterns)} anti-patterns in {file_path}")
