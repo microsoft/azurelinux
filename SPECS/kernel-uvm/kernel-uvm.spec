@@ -18,7 +18,7 @@
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        6.6.96.mshv1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -122,8 +122,6 @@ KCFLAGS="%{kcflags}" make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="
 install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
 
-make INSTALL_MOD_PATH=%{buildroot} modules_install
-
 D=%{buildroot}%{_datadir}/cloud-hypervisor
 %ifarch x86_64
 install -D -m 644 %{image} $D/%{image_fname}
@@ -151,16 +149,10 @@ cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config ma
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 
-%ifarch aarch64
-cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
-%endif
-
 %files
 %defattr(-,root,root)
 %license COPYING
 %{_datadir}/cloud-hypervisor/%{image_fname}
-%dir /lib/modules/%{uname_r}
-/lib/modules/%{uname_r}/*
 %ifarch x86_64
 %{_datadir}/cloud-hypervisor/bzImage
 %endif
@@ -176,6 +168,9 @@ cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/script
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Tue Oct 28 2025 Chris Co <chrco@microsoft.com> - 6.6.96.mshv1-3
+- Use arm64 uvm kconfig for kata pods
+
 * Thu Oct 23 2025 Chris Co <chrco@microsoft.com> - 6.6.96.mshv1-2
 - fixup for providing vmlinux on arm64
 
