@@ -6,7 +6,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.25.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -172,6 +172,9 @@ rm -rf nginx-tests
 
 %changelog
 %changelog
+* Mon Oct 27 2025 Ahmed Badawi <abadawi@microsoft.com> - 1.25.4-8
+- TEST: Trigger new pipeline with fixed modal code
+
 * Mon Oct 27 2025 Ahmed Badawi <abadawi@microsoft.com> - 1.25.4-7
 - TEST: Add outdated CVE patch (CVE-2020-12345)
 
