@@ -89,6 +89,8 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}/osgi.annotation.pom
 %add_maven_depmap %{name}/osgi.annotation.pom %{name}/osgi.annotation.jar -a org.osgi:org.osgi.annotation
 # javadoc
 install -dm 0744 %{buildroot}%{_javadocdir}/%{name}
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO \
+   %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO.txt
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %fdupes -s %{buildroot}%{_javadocdir}
 
@@ -100,7 +102,7 @@ rm -f %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE
 
 %files javadoc
 # Mark extra legal files as documentation
-%doc %{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO
+%doc %{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO.txt
 %doc %{_javadocdir}/%{name}/legal/ASSEMBLY_EXCEPTION
 %doc %{_javadocdir}/%{name}/legal/jquery.md
 %doc %{_javadocdir}/%{name}/legal/jqueryUI.md
