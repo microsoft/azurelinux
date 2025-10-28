@@ -281,23 +281,24 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
         current_data["challenges"].append(challenge)
         
         # Update issue_lifecycle to mark this issue as challenged
+        # CRITICAL: Only update if issue already exists (was detected by PR check)
+        # Do NOT create new entries - this prevents counting challenged-only issues
+        # toward "all issues resolved" calculation
         if "issue_lifecycle" not in current_data:
             current_data["issue_lifecycle"] = {}
         
-        if issue_hash not in current_data["issue_lifecycle"]:
-            # First time seeing this issue, create entry
-            current_data["issue_lifecycle"][issue_hash] = {
-                "first_detected": req_body.get("commit_sha", "unknown"),
-                "last_detected": req_body.get("commit_sha", "unknown"),
-                "status": "challenged",
-                "challenge_id": challenge_id
-            }
-        else:
-            # Update existing entry
+        if issue_hash in current_data["issue_lifecycle"]:
+            # Issue was detected by PR check - update its status
             current_data["issue_lifecycle"][issue_hash]["status"] = "challenged"
             current_data["issue_lifecycle"][issue_hash]["challenge_id"] = challenge_id
-        
-        logger.info(f"✅ Updated issue_lifecycle for {issue_hash}: status=challenged, challenge_id={challenge_id}")
+            logger.info(f"✅ Updated issue_lifecycle for {issue_hash}: status=challenged, challenge_id={challenge_id}")
+        else:
+            # Issue not in lifecycle (PR check hasn't run yet or issue is not real)
+            # Do NOT add to issue_lifecycle to avoid false "all resolved" calculation
+            logger.warning(f"⚠️  Issue {issue_hash} not found in issue_lifecycle")
+            logger.warning(f"   This issue was not detected by PR check yet")
+            logger.warning(f"   Challenge recorded but issue_lifecycle not modified")
+            logger.warning(f"   Issue will appear in lifecycle after next PR check run")
         
         # Legacy: Also update antipattern status in specs array (if it exists)
         antipattern_found = False
