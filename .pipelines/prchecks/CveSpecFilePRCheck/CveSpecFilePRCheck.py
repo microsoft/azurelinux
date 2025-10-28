@@ -868,23 +868,35 @@ def main():
                         for label in ["radar-issues-detected", "radar-acknowledged", "radar-issues-resolved"]:
                             github_client.remove_label(label)
                         
-                        # Count unchallenged issues (new + recurring unchallenged)
-                        unchallenged_count = len(categorized_issues['new_issues']) + len(categorized_issues['recurring_unchallenged'])
-                        challenged_count = len(categorized_issues['challenged_issues'])
-                        total_issues = unchallenged_count + challenged_count
+                        # CRITICAL: Count from issue_lifecycle (same as Azure Function) 
+                        # NOT from current commit's categorized issues, to ensure consistency
+                        # even when commits don't touch spec files
+                        issue_lifecycle = analytics_mgr.analytics.get("issue_lifecycle", {})
+                        total_issues = len(issue_lifecycle)
+                        challenged_count = sum(1 for issue in issue_lifecycle.values() 
+                                              if issue.get("status") == "challenged")
+                        unchallenged_count = total_issues - challenged_count
+                        
+                        logger.info(f"   📊 Issue lifecycle: {total_issues} total, {challenged_count} challenged, {unchallenged_count} unchallenged")
+                        logger.info(f"   📋 Issue lifecycle keys: {list(issue_lifecycle.keys())[:10]}")  # Log first 10 issue hashes
                         
                         # Add appropriate label based on state
                         if total_issues == 0:
-                            # No issues at all - mark as resolved
-                            logger.info("   ✅ No issues detected - adding 'radar-issues-resolved'")
-                            github_client.add_label("radar-issues-resolved")
-                        elif unchallenged_count == 0 and challenged_count > 0:
+                            # No issues detected (or all resolved)
+                            if len(analytics_mgr.analytics.get("commits", [])) > 1:
+                                # Had issues before, now resolved
+                                logger.info("   ✅ All issues resolved - adding 'radar-issues-resolved'")
+                                github_client.add_label("radar-issues-resolved")
+                            else:
+                                # First commit with no issues, no label needed
+                                logger.info("   ℹ️  No issues detected in first commit - no radar label added")
+                        elif unchallenged_count == 0:
                             # All issues have been challenged
-                            logger.info(f"   ✅ All {challenged_count} issues challenged - adding 'radar-acknowledged'")
+                            logger.info(f"   ✅ All {total_issues} issues challenged - adding 'radar-acknowledged'")
                             github_client.add_label("radar-acknowledged")
                         else:
                             # Has unchallenged issues
-                            logger.info(f"   ⚠️  {unchallenged_count} unchallenged issues - adding 'radar-issues-detected'")
+                            logger.info(f"   ⚠️  {unchallenged_count}/{total_issues} unchallenged issues - adding 'radar-issues-detected'")
                             github_client.add_label("radar-issues-detected")
                     else:
                         # Fallback to old behavior if analytics unavailable
