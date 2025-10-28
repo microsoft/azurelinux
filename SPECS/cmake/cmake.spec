@@ -34,12 +34,12 @@ Patch19:        CVE-2024-28182.patch
 Patch20:        CVE-2024-7264.patch
 Patch21:        CVE-2024-11053.patch
 Patch22:        CVE-2024-9681.patch
-Patch23:	CVE-2024-48615.patch
-Patch24:	CVE-2024-8096.patch
-Patch25:	CVE-2025-9301.patch
-Patch26:	CVE-2025-5916.patch
-Patch27:	CVE-2025-5917.patch
-Patch28:	CVE-2025-5918.patch
+Patch23:	    CVE-2024-48615.patch
+Patch24:	    CVE-2024-8096.patch
+Patch25:	    CVE-2025-9301.patch
+Patch26:	    CVE-2025-5916.patch
+Patch27:	    CVE-2025-5917.patch
+Patch28:	    CVE-2025-5918.patch
 
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
