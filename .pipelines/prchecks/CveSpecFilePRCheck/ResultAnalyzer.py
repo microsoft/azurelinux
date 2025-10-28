@@ -647,6 +647,21 @@ class ResultAnalyzer:
     </details>
 """
         
+        # Add challenged issues section (initially empty, populated by JavaScript)
+        html += """
+    <!-- Challenged Issues Section -->
+    <div id="challenged-section" style="display: none;">
+        <h3>
+            💬 Challenged Issues
+            <span class="challenged-badge" id="challenged-count">0</span>
+        </h3>
+        <p style="color: #8b949e; font-size: 13px; margin-bottom: 12px;">
+            Issues that have been challenged by PR authors or reviewers. These findings remain documented but are marked for further review.
+        </p>
+        <div id="challenged-issues-container"></div>
+    </div>
+"""
+        
         html += """
 </div>
 """
@@ -801,6 +816,82 @@ class ResultAnalyzer:
         .challenge-btn:disabled {{
             opacity: 0.5;
             cursor: not-allowed;
+        }}
+        
+        /* Challenged/Greyed out items */
+        .challenged-item {{
+            opacity: 0.5;
+            text-decoration: line-through;
+            color: #6e7681 !important;
+            background: #161b2280 !important;
+            border-left: 3px solid #58a6ff !important;
+            padding-left: 8px;
+            transition: opacity 0.3s ease, background 0.3s ease;
+        }}
+        
+        .challenged-item:hover {{
+            opacity: 0.7;
+        }}
+        
+        /* Challenged section */
+        #challenged-section {{
+            margin-top: 20px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 16px;
+        }}
+        
+        #challenged-section h3 {{
+            color: #58a6ff;
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        
+        .challenged-badge {{
+            background: #1f6feb20;
+            color: #58a6ff;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }}
+        
+        #challenged-issues-container {{
+            display: none;
+        }}
+        
+        #challenged-issues-container.has-items {{
+            display: block;
+        }}
+        
+        .challenged-spec-group {{
+            margin-bottom: 16px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 12px;
+        }}
+        
+        .challenged-spec-name {{
+            font-weight: 600;
+            color: #8b949e;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }}
+        
+        .challenged-issue {{
+            padding: 8px;
+            margin: 4px 0;
+            background: #161b22;
+            border-left: 3px solid #58a6ff;
+            border-radius: 3px;
+            font-size: 13px;
+            color: #6e7681;
+            text-decoration: line-through;
         }}
         
         /* Challenge Modal */
@@ -1127,11 +1218,142 @@ class ResultAnalyzer:
         document.addEventListener('DOMContentLoaded', () => {{
             RADAR_AUTH.init();
             initializeChallengeButtons();
+            restoreChallengedState(); // Restore previously challenged items
         }});
         
         // ============================================================================
         // Challenge/Feedback Module
         // ============================================================================
+        
+        // LocalStorage key for challenged issues
+        const CHALLENGED_ITEMS_KEY = 'radar_challenged_items_pr_{pr_number or 0}';
+        
+        function getChallengedItems() {{
+            const stored = localStorage.getItem(CHALLENGED_ITEMS_KEY);
+            return stored ? JSON.parse(stored) : {{}};
+        }}
+        
+        function saveChallengedItems(items) {{
+            localStorage.setItem(CHALLENGED_ITEMS_KEY, JSON.stringify(items));
+        }}
+        
+        function moveToChallengedSection(item) {{
+            console.log('📦 Moving to challenged section:', item);
+            
+            // Get or create challenged items store
+            const challengedItems = getChallengedItems();
+            
+            // Add to store (keyed by issue hash for deduplication)
+            challengedItems[item.issueHash] = {{
+                spec: item.spec,
+                issueType: item.issueType,
+                description: item.description,
+                challengeType: item.challengeType,
+                timestamp: new Date().toISOString()
+            }};
+            
+            saveChallengedItems(challengedItems);
+            renderChallengedSection();
+            updateIssueCounts();
+        }}
+        
+        function renderChallengedSection() {{
+            const section = document.getElementById('challenged-section');
+            const container = document.getElementById('challenged-issues-container');
+            const countBadge = document.getElementById('challenged-count');
+            
+            if (!section || !container || !countBadge) {{
+                console.warn('⚠️  Challenged section elements not found');
+                return;
+            }}
+            
+            const challengedItems = getChallengedItems();
+            const itemsArray = Object.entries(challengedItems);
+            
+            if (itemsArray.length === 0) {{
+                section.style.display = 'none';
+                return;
+            }}
+            
+            // Show section and update count
+            section.style.display = 'block';
+            countBadge.textContent = itemsArray.length;
+            
+            // Group by spec file
+            const bySpec = {{}};
+            itemsArray.forEach(([hash, item]) => {{
+                if (!bySpec[item.spec]) {{
+                    bySpec[item.spec] = [];
+                }}
+                bySpec[item.spec].push({{ hash, ...item }});
+            }});
+            
+            // Render grouped items
+            let html = '';
+            Object.entries(bySpec).forEach(([spec, items]) => {{
+                html += `
+                    <div class="challenged-spec-group">
+                        <div class="challenged-spec-name">📄 ${{spec}}</div>
+                `;
+                items.forEach(item => {{
+                    const typeIcon = item.challengeType === 'false-positive' ? '🟢' :
+                                    item.challengeType === 'needs-context' ? '🟡' : '🔴';
+                    html += `
+                        <div class="challenged-issue">
+                            ${{typeIcon}} <strong>${{item.issueType}}:</strong> ${{item.description}}
+                            <br><span style="font-size: 11px; color: #6e7681;">Challenged: ${{new Date(item.timestamp).toLocaleString()}}</span>
+                        </div>
+                    `;
+                }});
+                html += `</div>`;
+            }});
+            
+            container.innerHTML = html;
+            console.log(`✅ Rendered ${{itemsArray.length}} challenged items`);
+        }}
+        
+        function updateIssueCounts() {{
+            // Update error/warning counts based on challenged items
+            const challengedItems = getChallengedItems();
+            const challengedCount = Object.keys(challengedItems).length;
+            
+            console.log(`📊 ${{challengedCount}} items challenged`);
+            
+            // You could also update the main stats cards here if needed
+            // For example, decrement the error/warning counts
+        }}
+        
+        function restoreChallengedState() {{
+            console.log('🔄 Restoring challenged items from localStorage...');
+            
+            const challengedItems = getChallengedItems();
+            const itemsArray = Object.entries(challengedItems);
+            
+            if (itemsArray.length === 0) {{
+                console.log('   No challenged items to restore');
+                return;
+            }}
+            
+            console.log(`   Restoring ${{itemsArray.length}} challenged items`);
+            
+            // Grey out buttons and list items for challenged issues
+            itemsArray.forEach(([hash, item]) => {{
+                const btn = document.querySelector(`button[data-issue-hash="${{hash}}"]`);
+                
+                if (btn && btn.tagName === 'BUTTON') {{
+                    const listItem = btn.closest('li');
+                    
+                    if (listItem) {{
+                        listItem.classList.add('challenged-item');
+                        btn.textContent = '✅ Challenged';
+                        btn.disabled = true;
+                    }}
+                }}
+            }});
+            
+            // Render the challenged section
+            renderChallengedSection();
+        }}
         
         function initializeChallengeButtons() {{
             const challengeButtons = document.querySelectorAll('.challenge-btn');
@@ -1377,26 +1599,46 @@ class ResultAnalyzer:
                     }}
                     
                     alert(message);
-                    closeChallengeModal();
                     
-                    // Mark button as submitted - MUST be a button element, not the modal!
+                    // Move item to challenged section and grey it out
                     const findingId = modal.dataset.findingId;
-                    console.log('🔍 Looking for button with finding-id:', findingId);
+                    const issueHash = modal.dataset.issueHash;
+                    const spec = modal.dataset.spec;
+                    const issueType = modal.dataset.issueType;
+                    const description = modal.dataset.description;
                     
-                    if (findingId) {{
-                        const btn = document.querySelector(`button[data-finding-id="${{findingId}}"]`);
-                        console.log('🔍 Button found:', !!btn, 'tagName:', btn ? btn.tagName : 'N/A');
+                    console.log('🔍 Moving item to challenged section:', findingId);
+                    
+                    // Find the list item containing the challenge button
+                    const btn = document.querySelector(`button[data-finding-id="${{findingId}}"]`);
+                    
+                    if (btn && btn.tagName === 'BUTTON') {{
+                        const listItem = btn.closest('li');
                         
-                        if (btn && btn.tagName === 'BUTTON') {{
+                        if (listItem) {{
+                            // Apply greyed-out styling
+                            listItem.classList.add('challenged-item');
                             btn.textContent = '✅ Challenged';
                             btn.disabled = true;
-                            console.log('✅ Button marked as challenged');
+                            
+                            // Store in challenged issues
+                            moveToChallengedSection({{
+                                spec: spec,
+                                issueType: issueType,
+                                description: description,
+                                issueHash: issueHash,
+                                challengeType: challengeType.value
+                            }});
+                            
+                            console.log('✅ Item marked as challenged and moved');
                         }} else {{
-                            console.warn('⚠️  Could not find challenge button or wrong element type');
+                            console.warn('⚠️  Could not find list item parent');
                         }}
                     }} else {{
-                        console.warn('⚠️  No findingId in modal dataset');
+                        console.warn('⚠️  Could not find challenge button');
                     }}
+                    
+                    closeChallengeModal();
                 }} else {{
                     console.error('❌ Server error:', result);
                     
