@@ -494,6 +494,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "apparmor",
+          "version": "3.1.7",
+          "downloadUrl": "https://launchpad.net/apparmor/3.1/3.1.7/+download/apparmor-3.1.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "application-gateway-kubernetes-ingress",
           "version": "1.7.7",
           "downloadUrl": "https://github.com/Azure/application-gateway-kubernetes-ingress/archive/refs/tags/1.7.7.tar.gz"
@@ -905,8 +915,8 @@
         "type": "other",
         "other": {
           "name": "azurelinux-image-tools",
-          "version": "0.19.0",
-          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v0.19.0.tar.gz"
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.0.0.tar.gz"
         }
       }
     },
@@ -1118,7 +1128,7 @@
         "other": {
           "name": "binutils",
           "version": "2.41",
-          "downloadUrl": "https://ftp.gnu.org/gnu/binutils/binutils-2.41.tar.xz"
+          "downloadUrl": "https://sourceware.org/pub/binutils/releases/binutils-2.41.tar.xz"
         }
       }
     },
@@ -1307,8 +1317,8 @@
         "type": "other",
         "other": {
           "name": "buildah",
-          "version": "1.18.0",
-          "downloadUrl": "https://github.com/containers/buildah/archive/v1.18.0.tar.gz"
+          "version": "1.41.4",
+          "downloadUrl": "https://github.com/containers/buildah/archive/v1.41.4.tar.gz"
         }
       }
     },
@@ -2147,8 +2157,8 @@
         "type": "other",
         "other": {
           "name": "cppcheck",
-          "version": "2.7",
-          "downloadUrl": "https://github.com/danmar/cppcheck/archive/2.7.tar.gz"
+          "version": "2.18.3",
+          "downloadUrl": "https://github.com/danmar/cppcheck/archive/2.18.3.tar.gz"
         }
       }
     },
@@ -3358,8 +3368,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "26.2.5.13",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.13/otp-OTP-26.2.5.13.tar.gz"
+          "version": "26.2.5.15",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.5.15/otp-OTP-26.2.5.15.tar.gz"
         }
       }
     },
@@ -3629,7 +3639,7 @@
         "other": {
           "name": "fio",
           "version": "3.37",
-          "downloadUrl": "https://brick.kernel.dk/snaps/fio-3.37.tar.bz2"
+          "downloadUrl": "https://github.com/axboe/fio/archive/refs/tags/fio-3.37.tar.gz"
         }
       }
     },
@@ -4040,6 +4050,16 @@
         "type": "other",
         "other": {
           "name": "fwctl",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/fwctl-24.10.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "fwctl-hwe",
           "version": "24.10",
           "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/fwctl-24.10.tgz"
         }
@@ -7610,7 +7630,27 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "iser-hwe",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/iser-24.10.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "isert",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/isert-24.10.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "isert-hwe",
           "version": "24.10",
           "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/isert-24.10.tgz"
         }
@@ -8251,8 +8291,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe",
-          "version": "6.12.40.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.40.1.tar.gz"
+          "version": "6.12.50.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.50.2.tar.gz"
         }
       }
     },
@@ -8271,8 +8311,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe-headers",
-          "version": "6.12.40.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.40.1.tar.gz"
+          "version": "6.12.50.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.50.2.tar.gz"
         }
       }
     },
@@ -8440,6 +8480,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "knem-hwe",
+          "version": "1.1.4.90mlnx3",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/knem-1.1.4.90mlnx3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "koan",
           "version": "2.9.0",
           "downloadUrl": "https://github.com/cobbler/koan/archive/cff96a08ced93eb065c35a08c7e27a6925556202/koan-cff96a08ced93eb065c35a08c7e27a6925556202.tar.gz"
@@ -8481,8 +8531,8 @@
         "type": "other",
         "other": {
           "name": "kronosnet",
-          "version": "1.20",
-          "downloadUrl": "https://kronosnet.org/releases/kronosnet-1.20.tar.xz"
+          "version": "1.29",
+          "downloadUrl": "https://kronosnet.org/releases/kronosnet-1.29.tar.xz"
         }
       }
     },
@@ -9880,6 +9930,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libimobiledevice-glue",
+          "version": "1.3.1",
+          "downloadUrl": "https://github.com/libimobiledevice/libimobiledevice-glue/releases/download/1.3.1/libimobiledevice-glue-1.3.1.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libindicator",
           "version": "12.10.1",
           "downloadUrl": "https://launchpad.net/libindicator/12.10/12.10.1/+download/libindicator-12.10.1.tar.gz"
@@ -10721,8 +10781,8 @@
         "type": "other",
         "other": {
           "name": "libpeas",
-          "version": "1.26.0",
-          "downloadUrl": "https://download.gnome.org/sources/libpeas/1.26/libpeas-1.26.0.tar.xz"
+          "version": "1.36.0",
+          "downloadUrl": "https://download.gnome.org/sources/libpeas/1.36/libpeas-1.36.0.tar.xz"
         }
       }
     },
@@ -12170,16 +12230,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libyami",
-          "version": "1.3.2",
-          "downloadUrl": "https://github.com/intel/libyami/archive/edd1ad15e383d32c8d67bdc9198c834b6acebca5/libyami-edd1ad1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libyaml",
           "version": "0.2.5",
           "downloadUrl": "https://pyyaml.org/download/libyaml/yaml-0.2.5.tar.gz"
@@ -13250,6 +13300,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mft_kernel-hwe",
+          "version": "4.30.0",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/kernel-mft-4.30.0.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "microcode_ctl",
           "version": "2.1",
           "downloadUrl": "https://releases.pagure.org/microcode_ctl/microcode_ctl-2.1-29.tar.xz"
@@ -13361,7 +13421,27 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mlnx-nfsrdma-hwe",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-nfsrdma-24.10.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "mlnx-ofa_kernel",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ofa_kernel-24.10.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "mlnx-ofa_kernel-hwe",
           "version": "24.10",
           "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ofa_kernel-24.10.tgz"
         }
@@ -13552,8 +13632,8 @@
         "type": "other",
         "other": {
           "name": "mod_md",
-          "version": "2.2.7",
-          "downloadUrl": "https://github.com/icing/mod_md/releases/download/v2.2.7/mod_md-2.2.7.tar.gz"
+          "version": "2.4.26",
+          "downloadUrl": "https://github.com/icing/mod_md/releases/download/v2.4.26/mod_md-2.4.26.tar.gz"
         }
       }
     },
@@ -13562,8 +13642,8 @@
         "type": "other",
         "other": {
           "name": "mod_security",
-          "version": "2.9.4",
-          "downloadUrl": "https://github.com/SpiderLabs/ModSecurity/releases/download/v2.9.4/modsecurity-2.9.4.tar.gz"
+          "version": "2.9.7",
+          "downloadUrl": "https://github.com/SpiderLabs/ModSecurity/releases/download/v2.9.7/modsecurity-2.9.7.tar.gz"
         }
       }
     },
@@ -13802,8 +13882,8 @@
         "type": "other",
         "other": {
           "name": "mythes",
-          "version": "1.2.4",
-          "downloadUrl": "https://github.com/hunspell/mythes/archive/refs/heads/mythes-1.2.4.tar.gz"
+          "version": "1.2.5",
+          "downloadUrl": "https://github.com/hunspell/mythes/releases/download/v1.2.5/mythes-1.2.5.tar.xz"
         }
       }
     },
@@ -13822,8 +13902,8 @@
         "type": "other",
         "other": {
           "name": "mythes-ca",
-          "version": "1.5.0",
-          "downloadUrl": "http://www.softcatala.org/diccionaris/actualitzacions/sinonims/thesaurus-ca.oxt"
+          "version": "2.3.1",
+          "downloadUrl": "https://github.com/Softcatala/sinonims-cat/releases/download/2.3.1/thesaurus-ca.oxt"
         }
       }
     },
@@ -14212,8 +14292,8 @@
         "type": "other",
         "other": {
           "name": "netsniff-ng",
-          "version": "0.6.8",
-          "downloadUrl": "http://www.netsniff-ng.org/pub/netsniff-ng/netsniff-ng-0.6.8.tar.xz"
+          "version": "0.6.9",
+          "downloadUrl": "https://github.com/netsniff-ng/netsniff-ng/archive/refs/tags/v0.6.9.tar.gz"
         }
       }
     },
@@ -17593,8 +17673,8 @@
         "type": "other",
         "other": {
           "name": "perl-File-Find-Object",
-          "version": "0.3.5",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/File/File-Find-Object-0.3.5.tar.gz"
+          "version": "0.3.8",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/File-Find-Object-0.3.8.tar.gz"
         }
       }
     },
@@ -17663,8 +17743,8 @@
         "type": "other",
         "other": {
           "name": "perl-File-MimeInfo",
-          "version": "0.29",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MI/MICHIELB/File-MimeInfo-0.29.tar.gz"
+          "version": "0.35",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MI/MICHIELB/File-MimeInfo-0.35.tar.gz"
         }
       }
     },
@@ -20353,8 +20433,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Script",
-          "version": "1.26",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Test-Script-1.26.tar.gz"
+          "version": "1.29",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Test-Script-1.29.tar.gz"
         }
       }
     },
@@ -21403,8 +21483,8 @@
         "type": "other",
         "other": {
           "name": "podman",
-          "version": "4.1.1",
-          "downloadUrl": "https://github.com/containers/podman/archive/v4.1.1.tar.gz"
+          "version": "5.6.1",
+          "downloadUrl": "https://github.com/containers/podman/archive/v5.6.1.tar.gz"
         }
       }
     },
@@ -21943,8 +22023,8 @@
         "type": "other",
         "other": {
           "name": "python-aiodns",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/saghul/aiodns/archive/aiodns-2.0.0.tar.gz"
+          "version": "3.2.0",
+          "downloadUrl": "https://github.com/saghul/aiodns/archive/v3.2.0/aiodns-3.2.0.tar.gz"
         }
       }
     },
@@ -22783,8 +22863,8 @@
         "type": "other",
         "other": {
           "name": "python-fixtures",
-          "version": "3.0.0",
-          "downloadUrl": "http://pypi.python.org/packages/source/f/fixtures/fixtures-3.0.0.tar.gz"
+          "version": "4.0.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/3c/3d/f106b3278ba50067e9cd397f836d33d141aa790853152dbb3512aaee19f3/fixtures-4.0.1.tar.gz"
         }
       }
     },
@@ -23673,8 +23753,8 @@
         "type": "other",
         "other": {
           "name": "python-mutagen",
-          "version": "1.43.0",
-          "downloadUrl": "https://github.com/quodlibet/mutagen/releases/download/release-1.43.0/mutagen-1.43.0.tar.gz"
+          "version": "1.47.0",
+          "downloadUrl": "https://github.com/quodlibet/mutagen/releases/download/release-1.47.0/mutagen-1.47.0.tar.gz"
         }
       }
     },
@@ -24223,8 +24303,8 @@
         "type": "other",
         "other": {
           "name": "python-pyperclip",
-          "version": "1.6.4",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyperclip/pyperclip-1.6.4.tar.gz"
+          "version": "1.8.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyperclip/pyperclip-1.8.2.tar.gz"
         }
       }
     },
@@ -25002,6 +25082,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-spnego",
+          "version": "0.12.0",
+          "downloadUrl": "https://github.com/jborean93/pyspnego/archive/refs/tags/v0.12.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-sqlalchemy",
           "version": "2.0.27",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/S/SQLAlchemy/SQLAlchemy-2.0.27.tar.gz"
@@ -25143,8 +25233,8 @@
         "type": "other",
         "other": {
           "name": "python-testtools",
-          "version": "2.4.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/testtools/testtools-2.4.0.tar.gz"
+          "version": "2.7.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/07/a7/3f3daee7a525d5288b84581448d21a39d0b9ae9f4a235d99850682944857/testtools-2.7.1.tar.gz"
         }
       }
     },
@@ -25275,16 +25365,6 @@
           "name": "python-uamqp",
           "version": "1.5.1",
           "downloadUrl": "https://github.com/Azure/azure-uamqp-python/archive/v1.5.1/uamqp-1.5.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "python-unittest2",
-          "version": "1.1.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/u/unittest2/unittest2-1.1.0.tar.gz"
         }
       }
     },
@@ -27114,8 +27194,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rouge",
-          "version": "3.26.0",
-          "downloadUrl": "https://github.com/rouge-ruby/rouge/archive/refs/tags/v3.26.0.tar.gz"
+          "version": "4.4.0",
+          "downloadUrl": "https://github.com/rouge-ruby/rouge/archive/refs/tags/v4.4.0.tar.gz"
         }
       }
     },
@@ -28425,6 +28505,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "srp-hwe",
+          "version": "24.10",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/srp-24.10.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "sscg",
           "version": "3.0.5",
           "downloadUrl": "https://github.com/sgallagher/sscg/archive/refs/tags/sscg-3.0.5.tar.gz"
@@ -28626,8 +28716,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.9.1",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.1.tar.gz"
+          "version": "1.9.3",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.3.tar.gz"
         }
       }
     },
@@ -29796,8 +29886,8 @@
         "type": "other",
         "other": {
           "name": "virt-top",
-          "version": "1.0.9",
-          "downloadUrl": "http://people.redhat.com/~rjones/virt-top/files/virt-top-1.0.9.tar.gz"
+          "version": "1.1.1",
+          "downloadUrl": "https://people.redhat.com/~rjones/virt-top/files/virt-top-1.1.1.tar.gz"
         }
       }
     },
@@ -30848,6 +30938,16 @@
         "type": "other",
         "other": {
           "name": "xpmem",
+          "version": "2.7.4",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/xpmem-2.7.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xpmem-hwe",
           "version": "2.7.4",
           "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/xpmem-2.7.4.tar.gz"
         }
