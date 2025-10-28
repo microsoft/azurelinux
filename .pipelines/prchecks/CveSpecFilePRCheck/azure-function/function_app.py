@@ -346,70 +346,73 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
         try:
             logger.info(f"💬 Posting challenge notification to GitHub PR #{pr_number}")
             
-            challenge_type_emoji = {
-                "false-positive": "🟢",
-                "needs-context": "🟡", 
-                "agree": "🔴"
-            }
-            emoji = challenge_type_emoji.get(req_body["challenge_type"], "💬")
+            # Fetch BOT token from Key Vault for posting comment and managing labels
+            bot_token = get_github_token()
             
-            challenge_type_text = {
-                "false-positive": "False Alarm",
-                "needs-context": "Needs Context",
-                "agree": "Acknowledged"
-            }
-            type_text = challenge_type_text.get(req_body["challenge_type"], req_body["challenge_type"])
-            
-            # Format comment with prominent user attribution
-            # Posted directly by the user's account (not the bot)
-            comment_body = f"""## {emoji} Challenge Submitted
+            if not bot_token:
+                logger.warning("⚠️  Bot token not available from Key Vault, comment and labels cannot be managed")
+                comment_posted = False
+                label_added = False
+            else:
+                challenge_type_emoji = {
+                    "false-positive": "🟢",
+                    "needs-context": "🟡", 
+                    "agree": "🔴"
+                }
+                emoji = challenge_type_emoji.get(req_body["challenge_type"], "💬")
+                
+                challenge_type_text = {
+                    "false-positive": "False Alarm",
+                    "needs-context": "Needs Context",
+                    "agree": "Acknowledged"
+                }
+                type_text = challenge_type_text.get(req_body["challenge_type"], req_body["challenge_type"])
+                
+                # Format comment with prominent user attribution
+                comment_body = f"""## {emoji} Challenge Submitted by @{username}
+
+> **👤 Submitted by: @{username}**  
+> This challenge was submitted by the user above through the RADAR system.
 
 **Issue**: `{issue_hash}`  
 **File**: `{req_body.get("spec_file", "")}`  
 **Challenge Type**: {type_text}  
 
-**Feedback**:
+**Feedback from @{username}**:
 > {req_body["feedback_text"]}
 
 ---
 *Challenge ID: `{challenge_id}` • Submitted on {datetime.utcnow().strftime('%Y-%m-%d at %H:%M UTC')}*  
 *This challenge will be reviewed by the team.*
 """
+                
+                comment_url = f"https://api.github.com/repos/microsoft/azurelinux/issues/{pr_number}/comments"
+                
+                # Use the BOT token from Key Vault to post the comment
+                logger.info(f"💬 Posting challenge comment using BOT token (on behalf of @{username})")
+                bot_comment_headers = {
+                    "Authorization": f"token {bot_token}",  # Bot PAT from Key Vault
+                    "Accept": "application/vnd.github.v3+json",
+                    "Content-Type": "application/json"
+                }
+                comment_response = requests.post(
+                    comment_url,
+                    headers=bot_comment_headers,
+                    json={"body": comment_body},
+                    timeout=10
+                )
+                
+                comment_posted = False
+                if comment_response.status_code == 201:
+                    logger.info(f"✅ GitHub comment posted successfully on behalf of @{username}")
+                    comment_posted = True
+                else:
+                    logger.error(f"❌ Failed to post GitHub comment:")
+                    logger.error(f"   Status: {comment_response.status_code}")
+                    logger.error(f"   Response: {comment_response.text}")
+                    logger.error(f"   User: @{username}")
+                    logger.error(f"   Comment URL: {comment_url}")
             
-            comment_url = f"https://api.github.com/repos/microsoft/azurelinux/issues/{pr_number}/comments"
-            
-            # Use the USER's OAuth token to post the comment as themselves
-            logger.info(f"� Posting challenge comment as @{username} using their OAuth token")
-            user_comment_headers = {
-                "Authorization": f"Bearer {github_token}",  # User's OAuth token
-                "Accept": "application/vnd.github.v3+json",
-                "Content-Type": "application/json"
-            }
-            comment_response = requests.post(
-                comment_url,
-                headers=user_comment_headers,
-                json={"body": comment_body},
-                timeout=10
-            )
-            
-            comment_posted = False
-            if comment_response.status_code == 201:
-                logger.info(f"✅ GitHub comment posted successfully by @{username}")
-                comment_posted = True
-            else:
-                logger.error(f"❌ Failed to post GitHub comment as user:")
-                logger.error(f"   Status: {comment_response.status_code}")
-                logger.error(f"   Response: {comment_response.text}")
-                logger.error(f"   User: @{username}")
-                logger.error(f"   Comment URL: {comment_url}")
-            
-            # Fetch BOT token from Key Vault for label management
-            bot_token = get_github_token()
-            
-            if not bot_token:
-                logger.warning("⚠️  Bot token not available from Key Vault, labels cannot be managed")
-                label_added = False
-            else:
                 # Smart label management: Check if ALL issues are now challenged
                 logger.info(f"🏷️  Managing labels based on challenge state...")
                 

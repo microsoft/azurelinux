@@ -1162,9 +1162,21 @@ class ResultAnalyzer:
             }}
             
             const modal = document.getElementById('challenge-modal');
-            document.getElementById('finding-spec').textContent = finding.spec;
-            document.getElementById('finding-type').textContent = finding.issueType;
-            document.getElementById('finding-desc').textContent = finding.description;
+            const specEl = document.getElementById('finding-spec');
+            const typeEl = document.getElementById('finding-type');
+            const descEl = document.getElementById('finding-desc');
+            
+            // Safety check - make sure modal elements exist
+            if (!modal || !specEl || !typeEl || !descEl) {{
+                console.error('Modal elements not found. Retrying after DOM load...');
+                // Wait for DOM and try again
+                setTimeout(() => openChallengeModal(finding), 100);
+                return;
+            }}
+            
+            specEl.textContent = finding.spec;
+            typeEl.textContent = finding.issueType;
+            descEl.textContent = finding.description;
             
             // Store finding data for submission
             modal.dataset.findingId = finding.findingId;
