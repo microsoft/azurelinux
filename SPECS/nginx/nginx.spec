@@ -6,7 +6,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.25.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,6 +28,8 @@ Patch3:         security-fix.patch
 Patch4:         CVE-2024-7347.patch
 Patch5:         CVE-202X-INVALID.patch
 Patch6:         CVE-2025-11111-and-CVE-2025-22222.patch
+# TEST: Modal debugging - future dated CVE
+Patch7:         CVE-2099-12345.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
@@ -169,6 +171,9 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Mon Oct 27 2025 Ahmed Badawi <abadawi@microsoft.com> - 1.25.4-5
+- TEST: Modal debugging with comprehensive diagnostics
+
 * Tue Mar 11 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.25.4-4
 - Enable webdav module
 - Added tests to verify nginx server and its supported modules
