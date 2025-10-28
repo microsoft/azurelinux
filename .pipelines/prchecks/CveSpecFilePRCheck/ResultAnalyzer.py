@@ -565,10 +565,10 @@ class ResultAnalyzer:
         for spec_result in sorted(analysis_result.spec_results, key=lambda x: x.package_name):
             pkg_color = self._get_severity_color(spec_result.severity)
             html += f"""
-    <details style="background: #161b22; border: 1px solid #30363d; border-radius: 6px; margin-bottom: 10px; padding: 10px;">
+    <details style="background: #161b22; border: 1px solid #30363d; border-radius: 6px; margin-bottom: 10px; padding: 10px;" data-spec-name="{spec_result.package_name}">
         <summary style="cursor: pointer; font-weight: bold; color: {pkg_color}; font-size: 16px; user-select: none;">
             {self._get_severity_emoji(spec_result.severity)} {spec_result.package_name}
-            <span style="color: #8b949e; font-weight: normal; font-size: 14px;">({spec_result.summary})</span>
+            <span class="spec-summary" style="color: #8b949e; font-weight: normal; font-size: 14px;">({spec_result.summary})</span>
         </summary>
         <div style="margin-top: 15px; padding-left: 20px;">
             <div style="margin-bottom: 10px;">
@@ -1398,6 +1398,44 @@ class ResultAnalyzer:
                         counterSpan.textContent = `×${{newCount}}`;
                         console.log(`   ✅ Updated spec-level counter: ×${{currentCount}} → ×${{newCount}}`);
                     }}
+                }}
+            }}
+            
+            // 3. Update spec summary text (e.g., "4 errors, 1 warnings")
+            // Find the details element containing this spec
+            let specDetails = listItem.closest('details[data-spec-name]');
+            if (specDetails) {{
+                const summarySpan = specDetails.querySelector('.spec-summary');
+                if (summarySpan) {{
+                    // Parse current summary text like "(4 errors, 1 warnings)"
+                    const summaryText = summarySpan.textContent;
+                    const errorMatch = summaryText.match(/(\d+)\s+errors?/i);
+                    const warningMatch = summaryText.match(/(\d+)\s+warnings?/i);
+                    
+                    // Determine if this is an error or warning based on the issue type
+                    const issueTypeDiv = listItem.closest('div[style*="margin-bottom: 15px"]');
+                    const isError = issueTypeDiv && issueTypeDiv.textContent.toLowerCase().includes('error');
+                    
+                    let newSummary = '';
+                    if (errorMatch) {{
+                        let errorCount = parseInt(errorMatch[1]) || 0;
+                        if (isError) {{
+                            errorCount = Math.max(0, errorCount + delta);
+                        }}
+                        newSummary += `${{errorCount}} error${{errorCount !== 1 ? 's' : ''}}`;
+                    }}
+                    
+                    if (warningMatch) {{
+                        let warningCount = parseInt(warningMatch[1]) || 0;
+                        if (!isError) {{
+                            warningCount = Math.max(0, warningCount + delta);
+                        }}
+                        if (newSummary) newSummary += ', ';
+                        newSummary += `${{warningCount}} warning${{warningCount !== 1 ? 's' : ''}}`;
+                    }}
+                    
+                    summarySpan.textContent = `(${{newSummary}})`;
+                    console.log(`   ✅ Updated spec summary: ${{summaryText}} → (${{newSummary}})`);
                 }}
             }}
             

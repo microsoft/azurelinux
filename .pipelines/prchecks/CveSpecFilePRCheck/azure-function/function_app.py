@@ -433,41 +433,51 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                 logger.info(f"   📊 Issue status: {total_issues} total, {challenged_issues} challenged, {unchallenged_issues} unchallenged")
                 logger.info(f"   📋 Issue lifecycle keys: {list(issue_lifecycle.keys())[:10]}")  # Log first 10 issue hashes
                 
-                label_added = False
+                # CRITICAL: Only manage labels if we have commit history (analytics.json was populated by PR check)
+                # This prevents premature label removal when analytics.json is created on first challenge
+                has_commit_history = len(current_data.get("commits", [])) > 0
                 
-                if total_issues > 0 and unchallenged_issues == 0:
-                    # ALL issues have been challenged - update labels
-                    logger.info(f"   ✅ All {total_issues} issues challenged! Updating labels...")
-                    
-                    # Remove radar-issues-detected
-                    try:
-                        delete_url = f"{labels_url}/radar-issues-detected"
-                        delete_response = requests.delete(delete_url, headers=bot_comment_headers, timeout=10)
-                        if delete_response.status_code in [200, 404]:
-                            logger.info(f"   ✓ Removed 'radar-issues-detected' label (or it wasn't present)")
-                        else:
-                            logger.warning(f"   Failed to remove 'radar-issues-detected': {delete_response.status_code}")
-                    except Exception as e:
-                        logger.warning(f"   Error removing 'radar-issues-detected': {e}")
-                    
-                    # Add radar-acknowledged
-                    label_response = requests.post(
-                        labels_url,
-                        headers=bot_comment_headers,
-                        json={"labels": ["radar-acknowledged"]},
-                        timeout=10
-                    )
-                    
-                    if label_response.status_code == 200:
-                        logger.info(f"   ✅ Label 'radar-acknowledged' added successfully")
-                        label_added = True
-                    else:
-                        logger.error(f"   ❌ Failed to add 'radar-acknowledged': {label_response.status_code}")
-                        logger.error(f"   Response: {label_response.text}")
-                else:
-                    # Still have unchallenged issues - keep radar-issues-detected label
-                    logger.info(f"   ⚠️  Still {unchallenged_issues} unchallenged issue(s) - keeping 'radar-issues-detected' label")
+                if not has_commit_history:
+                    logger.warning(f"   ⚠️  No commit history in analytics.json - skipping label management")
+                    logger.warning(f"   This analytics.json was likely created by a challenge before PR check ran")
+                    logger.warning(f"   Labels will be managed correctly after next PR check run")
                     label_added = False
+                else:
+                    label_added = False
+                    
+                    if total_issues > 0 and unchallenged_issues == 0:
+                        # ALL issues have been challenged - update labels
+                        logger.info(f"   ✅ All {total_issues} issues challenged! Updating labels...")
+                        
+                        # Remove radar-issues-detected
+                        try:
+                            delete_url = f"{labels_url}/radar-issues-detected"
+                            delete_response = requests.delete(delete_url, headers=bot_comment_headers, timeout=10)
+                            if delete_response.status_code in [200, 404]:
+                                logger.info(f"   ✓ Removed 'radar-issues-detected' label (or it wasn't present)")
+                            else:
+                                logger.warning(f"   Failed to remove 'radar-issues-detected': {delete_response.status_code}")
+                        except Exception as e:
+                            logger.warning(f"   Error removing 'radar-issues-detected': {e}")
+                        
+                        # Add radar-acknowledged
+                        label_response = requests.post(
+                            labels_url,
+                            headers=bot_comment_headers,
+                            json={"labels": ["radar-acknowledged"]},
+                            timeout=10
+                        )
+                        
+                        if label_response.status_code == 200:
+                            logger.info(f"   ✅ Label 'radar-acknowledged' added successfully")
+                            label_added = True
+                        else:
+                            logger.error(f"   ❌ Failed to add 'radar-acknowledged': {label_response.status_code}")
+                            logger.error(f"   Response: {label_response.text}")
+                    else:
+                        # Still have unchallenged issues - keep radar-issues-detected label
+                        logger.info(f"   ⚠️  Still {unchallenged_issues} unchallenged issue(s) - keeping 'radar-issues-detected' label")
+                        label_added = False
         
         except Exception as comment_error:
             logger.error(f"❌ Exception during GitHub comment/label posting:")
