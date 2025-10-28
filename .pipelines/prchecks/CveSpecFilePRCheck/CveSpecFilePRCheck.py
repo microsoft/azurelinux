@@ -812,20 +812,16 @@ def main():
                         # Get current commit SHA
                         commit_sha = os.environ.get("GITHUB_COMMIT_SHA", "unknown")
                         
-                        # Collect all issues with their hashes from analysis_result
+                        # Collect all AntiPattern objects from analysis_result
                         all_issues = []
                         for spec_result in analysis_result.spec_results:
                             for pattern in spec_result.antipatterns:
-                                all_issues.append({
-                                    "issue_hash": pattern.issue_hash,
-                                    "pattern_type": pattern.pattern_type,
-                                    "severity": pattern.severity.name,
-                                    "description": pattern.description,
-                                    "file_path": spec_result.spec_file
-                                })
+                                all_issues.append(pattern)
                         
                         # Add current commit's analysis
-                        analytics_mgr.add_commit_analysis(commit_sha, all_issues)
+                        # Note: report_url will be filled in after HTML generation, using placeholder for now
+                        report_url = f"https://radarblobstore.blob.core.windows.net/radarcontainer/pr-{pr_number}/report-latest.html"
+                        analytics_mgr.add_commit_analysis(pr_number, commit_sha, report_url, all_issues)
                         logger.info(f"Added commit analysis: {len(all_issues)} issues detected")
                         
                         # Categorize issues based on challenge history
