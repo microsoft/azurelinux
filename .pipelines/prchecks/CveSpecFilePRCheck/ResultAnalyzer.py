@@ -1366,6 +1366,44 @@ class ResultAnalyzer:
             return allDetails[issueHash] || null;
         }}
         
+        function updateCounters(listItem, delta) {{
+            console.log(`📊 Updating counters with delta: ${{delta}}`);
+            
+            // 1. Update Total Issues counter in main stats card
+            const statsCards = document.querySelectorAll('[style*="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))"]');
+            if (statsCards.length > 0) {{
+                const totalIssuesCard = statsCards[0].querySelector('div:last-child > div:first-child');
+                if (totalIssuesCard) {{
+                    const currentTotal = parseInt(totalIssuesCard.textContent) || 0;
+                    const newTotal = Math.max(0, currentTotal + delta);
+                    totalIssuesCard.textContent = newTotal;
+                    console.log(`   ✅ Updated Total Issues: ${{currentTotal}} → ${{newTotal}}`);
+                }}
+            }}
+            
+            // 2. Update spec-level issue type counter (×count badge)
+            // Find the issue type div that contains this list item
+            let currentEl = listItem;
+            while (currentEl && !currentEl.querySelector('span[style*="border-radius: 10px"]')) {{
+                currentEl = currentEl.parentElement;
+            }}
+            
+            if (currentEl) {{
+                const counterSpan = currentEl.querySelector('span[style*="border-radius: 10px"]');
+                if (counterSpan) {{
+                    const match = counterSpan.textContent.match(/×(\d+)/);
+                    if (match) {{
+                        const currentCount = parseInt(match[1]) || 0;
+                        const newCount = Math.max(0, currentCount + delta);
+                        counterSpan.textContent = `×${{newCount}}`;
+                        console.log(`   ✅ Updated spec-level counter: ×${{currentCount}} → ×${{newCount}}`);
+                    }}
+                }}
+            }}
+            
+            console.log('✅ Counter update complete');
+        }}
+        
         function restoreChallengedState() {{
             console.log('🔄 Restoring challenged items from localStorage...');
             
@@ -1425,6 +1463,9 @@ class ResultAnalyzer:
                     
                     // Populate details
                     populateChallengeDetails(findingId, details.type, details.feedback);
+                    
+                    // Update counters for this challenged item
+                    updateCounters(listItem, -1);
                     
                     console.log(`   ✅ Restored challenged state for: ${{hash}}`);
                 }}
@@ -1727,6 +1768,9 @@ class ResultAnalyzer:
                         
                         // Populate details section
                         populateChallengeDetails(findingId, challengeType.value, feedbackText);
+                        
+                        // Update counters for this newly challenged item
+                        updateCounters(listItem, -1);
                         
                         console.log('✅ Challenged styling applied');
                     }} else {{
