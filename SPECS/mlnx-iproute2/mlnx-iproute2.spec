@@ -111,7 +111,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Wed Oct 29 2025 Elaheh Dehghani <edehghani@microsoft.com> - 6.10.0-3
-- Removed ExclusiveArch
+- Enable build on aarch64.
 
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 6.10.0-2
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
