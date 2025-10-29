@@ -1570,7 +1570,7 @@ class HtmlReportGenerator:
         }})();
         
         // Wrap all code in DOMContentLoaded to ensure DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {{
         
         // Initialize RADAR Auth
         RADAR_AUTH.init();
