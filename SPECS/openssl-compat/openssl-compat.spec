@@ -194,7 +194,7 @@ BuildRequires: /usr/bin/pod2man
 BuildRequires: perl(Test::Harness), perl(Test::More), perl(Math::BigInt)
 %endif
 BuildRequires: perl(Module::Load::Conditional), perl(File::Temp)
-BuildRequires: perl(Time::HiRes), perl(IPC::Cmd), perl(Pod::Html), perl(Digest::SHA)
+BuildRequires: perl(Time::HiRes), perl(IPC::Cmd), perl(Pod::Html), perl(Digest::SHA), perl(Time::Piece)
 BuildRequires: perl(FindBin), perl(lib), perl(File::Compare), perl(File::Copy), perl(bigint)
 # BuildRequires: git-core
 # BuildRequires: systemtap-sdt-devel
