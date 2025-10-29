@@ -35,14 +35,13 @@
 Summary:	Advanced IP routing and network device configuration tools
 Name:		mlnx-iproute2
 Version:	6.10.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:	GPLv2
 Group:		Networking/Admin
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-iproute2-6.10.0.tar.gz#/%{name}-%{version}.tar.gz
 URL:		http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2
-ExclusiveArch:   x86_64
 
 BuildRequires:	bison
 BuildRequires:	flex
@@ -111,6 +110,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/*
 
 %changelog
-* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+* Wed Oct 29 2025 Elaheh Dehghani <edehghani@microsoft.com> - 6.10.0-3
+- Removed ExclusiveArch
+
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 6.10.0-2
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
