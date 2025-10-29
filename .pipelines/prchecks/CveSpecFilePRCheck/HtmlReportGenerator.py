@@ -134,7 +134,7 @@ class HtmlReportGenerator:
         </div>
         
         <!-- Errors Card -->
-        <div class="stat-card" style="--stat-color: var(--accent-red);">
+        <div class="stat-card filterable-stat" data-filter-severity="ERROR" style="--stat-color: var(--accent-red); cursor: pointer;" title="Click to filter ERROR issues">
             <div class="stat-icon stat-icon-red">
                 ⚠️
             </div>
@@ -145,7 +145,7 @@ class HtmlReportGenerator:
         </div>
         
         <!-- Warnings Card -->
-        <div class="stat-card" style="--stat-color: var(--accent-orange);">
+        <div class="stat-card filterable-stat" data-filter-severity="WARNING" style="--stat-color: var(--accent-orange); cursor: pointer;" title="Click to filter WARNING issues">
             <div class="stat-icon stat-icon-orange">
                 📋
             </div>
@@ -780,6 +780,40 @@ class HtmlReportGenerator:
             border-color: rgba(88, 166, 255, 0.3);
         }
         
+        .stat-card.filter-active {
+            background: rgba(88, 166, 255, 0.15);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .stat-card.filter-active:hover {
+            transform: scale(1.05) translateY(-2px);
+        }
+        
+        .issue-item.filtered-out {
+            opacity: 0.3;
+            filter: blur(1px);
+            pointer-events: none;
+        }
+        
+        .issue-item.filtered-in {
+            animation: highlightIssue 0.5s ease-out;
+            border-left-color: rgba(88, 166, 255, 0.8) !important;
+            background: rgba(88, 166, 255, 0.1);
+        }
+        
+        @keyframes highlightIssue {
+            0% {
+                background: rgba(88, 166, 255, 0.3);
+                transform: translateX(10px);
+            }
+            100% {
+                background: rgba(88, 166, 255, 0.1);
+                transform: translateX(0);
+            }
+        }
+        
         .stat-icon {
             font-size: 36px;
             width: 56px;
@@ -1370,6 +1404,58 @@ class HtmlReportGenerator:
         }
         
         updateCounters();
+        
+        // Severity filtering functionality
+        let activeSeverityFilter = null;
+        
+        document.querySelectorAll('.filterable-stat').forEach(card => {
+            card.addEventListener('click', function() {
+                const severity = this.getAttribute('data-filter-severity');
+                
+                // Toggle filter
+                if (activeSeverityFilter === severity) {
+                    // Clear filter
+                    activeSeverityFilter = null;
+                    this.classList.remove('filter-active');
+                    document.querySelectorAll('.issue-item').forEach(item => {
+                        item.classList.remove('filtered-out', 'filtered-in');
+                    });
+                } else {
+                    // Apply new filter
+                    activeSeverityFilter = severity;
+                    
+                    // Update active stat card
+                    document.querySelectorAll('.filterable-stat').forEach(c => c.classList.remove('filter-active'));
+                    this.classList.add('filter-active');
+                    
+                    // Filter and highlight issues
+                    let firstMatchingIssue = null;
+                    document.querySelectorAll('.issue-item').forEach(item => {
+                        const itemSeverity = item.getAttribute('data-severity');
+                        if (itemSeverity === severity) {
+                            item.classList.remove('filtered-out');
+                            item.classList.add('filtered-in');
+                            if (!firstMatchingIssue) {
+                                firstMatchingIssue = item;
+                            }
+                        } else {
+                            item.classList.add('filtered-out');
+                            item.classList.remove('filtered-in');
+                        }
+                    });
+                    
+                    // Scroll to first matching issue with smooth animation
+                    if (firstMatchingIssue) {
+                        setTimeout(() => {
+                            firstMatchingIssue.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'center' 
+                            });
+                        }, 100);
+                    }
+                }
+            });
+        });
         
         // Close modal on outside click
         document.getElementById('challenge-modal').addEventListener('click', function(e) {
