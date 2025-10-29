@@ -329,11 +329,18 @@ class HtmlReportGenerator:
         css = self._get_css_styles()
         javascript = self._get_javascript()
         
+        # Generate cache-busting timestamp
+        cache_buster = datetime.now().strftime('%Y%m%d%H%M%S')
+        
         return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="report-version" content="{cache_buster}">
     <title>CVE Spec File Check Report - PR #{pr_number}</title>
     <!-- Favicon to prevent 404 errors -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛡️%3C/text%3E%3C/svg%3E">
@@ -341,13 +348,16 @@ class HtmlReportGenerator:
 {css}
     </style>
 </head>
-<body>
+<body data-report-version="{cache_buster}">
     <!-- Top Navigation Bar -->
     <div id="top-bar">
         <div id="top-bar-left">
             <div id="top-bar-logo">
                 <span>🛡️</span>
                 <span>CVE Spec Analysis</span>
+            </div>
+            <div style="font-size: 10px; color: var(--text-tertiary); margin-left: 12px; font-family: monospace;">
+                v{cache_buster}
             </div>
         </div>
         <div id="top-bar-right">
