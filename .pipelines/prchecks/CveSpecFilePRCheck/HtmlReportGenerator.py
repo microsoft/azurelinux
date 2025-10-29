@@ -380,7 +380,7 @@ class HtmlReportGenerator:
                         </svg>
                     </button>
                     <div id="user-dropdown" style="display: none;">
-                        <button id="sign-out-btn" onclick="signOut()">
+                        <button id="sign-out-btn">
                             <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
                                 <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
@@ -403,7 +403,7 @@ class HtmlReportGenerator:
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Challenge Finding</h2>
-                <button class="modal-close" onclick="closeChallengeModal()">&times;</button>
+                <button class="modal-close" id="modal-close-btn">&times;</button>
             </div>
             <div class="modal-body">
                 <p id="modal-finding-text"></p>
@@ -1452,6 +1452,9 @@ class HtmlReportGenerator:
             alert('Signed out successfully');
         }
         
+        // Attach sign out button event listener
+        document.getElementById('sign-out-btn').addEventListener('click', signOut);
+        
         // Challenge Modal Management
         let currentFindingId = null;
         let currentIssueHash = null;
@@ -1477,6 +1480,9 @@ class HtmlReportGenerator:
         function closeChallengeModal() {
             document.getElementById('challenge-modal').classList.remove('visible');
         }
+        
+        // Attach close button event listener
+        document.getElementById('modal-close-btn').addEventListener('click', closeChallengeModal);
         
         // Challenge option selection
         document.querySelectorAll('.challenge-option').forEach(btn => {
