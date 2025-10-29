@@ -1,7 +1,7 @@
 Summary:        C debugger
 Name:           gdb
 Version:        11.2
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,9 @@ Patch8:         CVE-2022-47696.patch
 Patch9:         CVE-2025-7546.patch
 Patch10:        CVE-2025-11082.patch
 Patch11:        CVE-2025-11083.patch
+Patch12:        CVE-2021-32256.patch
+Patch13:        fix-infinite-recursion.patch
+Patch14:        CVE-2025-5244.patch
 BuildRequires:  expat-devel
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
@@ -104,6 +107,9 @@ rm -rvf libctf/testsuite
 %{_mandir}/*/*
 
 %changelog
+* Mon Oct 27 2025 Archana Shettigar <v-shettigara@microsoft.com> - 11.2-9
+- Patch CVE-2021-32256 & CVE-2025-5244 using an upstream patch
+
 * Fri Oct 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 11.2-8
 - Patch for CVE-2025-11083, CVE-2025-11082
 
