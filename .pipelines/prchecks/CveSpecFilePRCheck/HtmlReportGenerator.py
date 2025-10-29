@@ -245,15 +245,23 @@ class HtmlReportGenerator:
         issue_hash = pattern.issue_hash if hasattr(pattern, 'issue_hash') and pattern.issue_hash else f"{package_name}-{issue_type.replace(' ', '-').replace('_', '-')}-{idx}"
         finding_id = issue_hash  # For backwards compatibility in HTML
         
+        # Get severity info for badge
+        severity_color = self.get_severity_color(pattern.severity)
+        severity_name = pattern.severity.name
+        severity_emoji = self.get_severity_emoji(pattern.severity)
+        
         # Properly escape the description for both HTML content and attributes
         escaped_desc = html_module.escape(pattern.description, quote=True)
         
         return f"""
-                            <li class="antipattern-item issue-item" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}">
+                            <li class="antipattern-item issue-item" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-severity="{severity_name}">
+                                <span class="severity-badge" style="background: {severity_color}20; color: {severity_color}; border: 1px solid {severity_color}40;">
+                                    {severity_emoji} {severity_name}
+                                </span>
                                 <span class="issue-text">{escaped_desc}</span>
                                 <button class="challenge-btn" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-spec="{spec_path}" data-issue-type="{issue_type}" data-description="{escaped_desc}">
                                     <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-                                        <path d="M2.5 3.5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm2-2a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7zM0 13a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 16 13V6a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 0 6v7zm1.5.5A.5.5 0 0 1 1 13V6a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13z"/>
+                                        <path d="M2.5 3.5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0-1h-11zm2-2a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7zM0 13a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 16 13V6a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 0 6v7zm1.5.5A.5.5 0 0 1 1 13V6a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13z"/>
                                     </svg>
                                     Challenge
                                 </button>
@@ -1014,6 +1022,20 @@ class HtmlReportGenerator:
         
         .issue-item::before {
             display: none;
+        }
+        
+        .severity-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         
         .issue-text {
