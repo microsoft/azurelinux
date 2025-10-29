@@ -15,6 +15,8 @@ Patch4:         CVE-2025-54349.patch
 Patch5:         openssl_encrypt_buffer_size.patch
 BuildRequires:  autoconf >= 2.71
 BuildRequires:  automake
+BuildRequires:  openssl
+Requires:       openssl
 
 %description
 ipref is a network performance measurement tool that can measure the maximum
