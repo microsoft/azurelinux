@@ -378,7 +378,20 @@ class HtmlReportGenerator:
                             <div id="user-name"></div>
                             <span id="collaborator-badge"></span>
                         </div>
-                        <button id="sign-out-btn">Sign Out</button>
+                        <button id="user-menu-toggle" aria-label="User menu">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="user-dropdown" class="dropdown-menu">
+                        <button id="sign-out-btn" class="dropdown-item">
+                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+                                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+                            </svg>
+                            Sign Out
+                        </button>
                     </div>
                 </div>
             </div>
@@ -667,6 +680,7 @@ class HtmlReportGenerator:
             border: 1px solid var(--border-primary);
             border-radius: 12px;
             padding: 8px 12px;
+            position: relative;
         }
         
         #user-avatar {
@@ -698,22 +712,72 @@ class HtmlReportGenerator:
             letter-spacing: 0.5px;
         }
         
-        #sign-out-btn {
+        #user-menu-toggle {
             background: transparent;
+            border: none;
             color: var(--text-secondary);
-            border: 1px solid var(--border-primary);
-            padding: 6px 12px;
-            border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
+            padding: 6px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.2s ease;
         }
         
-        #sign-out-btn:hover {
+        #user-menu-toggle:hover {
             background: var(--bg-card-hover);
             color: var(--text-primary);
-            border-color: var(--accent-red);
+        }
+        
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            min-width: 180px;
+            z-index: 1001;
+            overflow: hidden;
+        }
+        
+        .dropdown-menu.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            width: 100%;
+            background: transparent;
+            border: none;
+            padding: 10px 16px;
+            text-align: left;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background: var(--bg-card-hover);
+        }
+        
+        .dropdown-item svg {
+            flex-shrink: 0;
+        }
+        
+        #user-menu-container {
+            position: relative;
+        }
+        
+        #sign-out-btn:hover {
+            color: var(--accent-red);
         }
         
         /* PR Info Card */
@@ -1378,11 +1442,39 @@ class HtmlReportGenerator:
             localStorage.removeItem('github_username');
             localStorage.removeItem('github_avatar');
             localStorage.removeItem('github_role');
+            
+            // Close dropdown
+            const dropdown = document.getElementById('user-dropdown');
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
+            
             alert('Signed out successfully');
         }
         
+        // Dropdown toggle functionality
+        const userMenuToggle = document.getElementById('user-menu-toggle');
+        const userDropdown = document.getElementById('user-dropdown');
+        
+        if (userMenuToggle && userDropdown) {
+            userMenuToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userDropdown.classList.toggle('show');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!userMenuToggle.contains(e.target) && !userDropdown.contains(e.target)) {
+                    userDropdown.classList.remove('show');
+                }
+            });
+        }
+        
         // Attach sign out button event listener
-        document.getElementById('sign-out-btn').addEventListener('click', signOut);
+        const signOutBtn = document.getElementById('sign-out-btn');
+        if (signOutBtn) {
+            signOutBtn.addEventListener('click', signOut);
+        }
         
         // Function to populate user profile and determine role
         function populateUserProfile() {
