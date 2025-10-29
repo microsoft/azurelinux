@@ -1567,7 +1567,7 @@ class HtmlReportGenerator:
                 getAuthToken,
                 getAuthHeaders
             }};
-        }})();
+        }}})();
         
         // Wrap all code in DOMContentLoaded to ensure DOM is ready
         document.addEventListener('DOMContentLoaded', function() {{
