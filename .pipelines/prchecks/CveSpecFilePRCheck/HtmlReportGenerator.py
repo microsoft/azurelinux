@@ -327,7 +327,7 @@ class HtmlReportGenerator:
             Complete HTML page as string
         """
         css = self._get_css_styles()
-        javascript = self._get_javascript()
+        javascript = self._get_javascript(pr_number)
         
         # Generate cache-busting timestamp
         cache_buster = datetime.now().strftime('%Y%m%d%H%M%S')
@@ -1410,9 +1410,9 @@ class HtmlReportGenerator:
             transform: none;
         }"""
     
-    def _get_javascript(self) -> str:
+    def _get_javascript(self, pr_number: int) -> str:
         """Get all JavaScript code for the HTML page."""
-        return """        // ============================================================================
+        js_code = """        // ============================================================================
         // RADAR Authentication Module
         // ============================================================================
         
@@ -1857,3 +1857,6 @@ class HtmlReportGenerator:
         });
         
         }); // End DOMContentLoaded"""
+        
+        # Replace the pr_number placeholder with actual value
+        return js_code.replace('{pr_number}', str(pr_number))
