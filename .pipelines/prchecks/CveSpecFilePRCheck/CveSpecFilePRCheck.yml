@@ -27,8 +27,7 @@ pr:
 name: Automaton-OpenAI-PR-Check
 
 pool:
-  # name: mariner-dev-build-1es-mariner2-amd64
-  name: mariner-core-amd64-1es-mariner3
+  name: mariner-dev-build-1es-mariner2-amd64
 
 parameters:
   - name: failOnWarnings
