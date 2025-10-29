@@ -375,13 +375,13 @@ class HtmlReportGenerator:
             
             <!-- Auth Container -->
             <div id="auth-container">
-                <button id="sign-in-btn">
+                <button id="sign-in-btn" style="display: none;">
                     <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
                     </svg>
                     Sign in with GitHub
                 </button>
-                <div id="user-menu-container" style="display: none;">
+                <div id="user-menu-container">
                     <div id="user-menu">
                         <img id="user-avatar" src="" alt="User">
                         <div id="user-info">
@@ -1491,20 +1491,27 @@ class HtmlReportGenerator:
             // In production, this would fetch from GitHub API and check repo permissions
             // For now, using mock data - replace with actual API call
             const userData = {
-                username: localStorage.getItem('github_username') || 'abadawi-msft',
-                avatar: localStorage.getItem('github_avatar') || 'https://avatars.githubusercontent.com/u/yourusername',
+                username: localStorage.getItem('github_username') || 'GitHub User',
+                avatar: localStorage.getItem('github_avatar') || 'https://avatars.githubusercontent.com/u/6154722?v=4',
                 role: localStorage.getItem('github_role') || 'PR_OWNER' // PR_OWNER, COLLABORATOR, ADMIN
             };
             
             // Populate user avatar
             const avatarEl = document.getElementById('user-avatar');
-            avatarEl.src = userData.avatar;
+            if (avatarEl) {
+                avatarEl.src = userData.avatar;
+            }
             
             // Populate username
-            document.getElementById('user-name').textContent = userData.username;
+            const nameEl = document.getElementById('user-name');
+            if (nameEl) {
+                nameEl.textContent = userData.username;
+            }
             
             // Populate role badge
             const roleBadge = document.getElementById('collaborator-badge');
+            if (!roleBadge) return;
+            
             let roleIcon = '';
             let roleText = '';
             let roleColor = '';
@@ -1532,12 +1539,8 @@ class HtmlReportGenerator:
             roleBadge.style.background = `${roleColor}20`;
         }
         
-        // Check if user is already signed in and populate profile
-        if (localStorage.getItem('github_token')) {
-            document.getElementById('user-menu-container').style.display = 'block';
-            document.getElementById('sign-in-btn').style.display = 'none';
-            populateUserProfile();
-        }
+        // Always populate user profile on page load
+        populateUserProfile();
         
         // Challenge Modal Management
         let currentFindingId = null;
