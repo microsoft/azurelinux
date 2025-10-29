@@ -1,0 +1,8 @@
+--- a/lib/curl_setup.h
++++ b/lib/curl_setup.h
+@@ -100,6 +100,7 @@
+ /* This is a test patch that is not referenced in the spec file */
++/* This should trigger the UNREFERENCED_PATCH_FILES anti-pattern */
+ 
+ #ifdef HAVE_CONFIG_H
+ #include "curl_config.h"
