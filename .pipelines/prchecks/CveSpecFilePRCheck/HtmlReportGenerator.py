@@ -1412,10 +1412,168 @@ class HtmlReportGenerator:
     
     def _get_javascript(self) -> str:
         """Get all JavaScript code for the HTML page."""
-        # This would contain the full JavaScript - returning a placeholder
-        # In production, you'd import this from a separate file or template
-        return """        // Wrap all code in DOMContentLoaded to ensure DOM is ready
+        return """        // ============================================================================
+        // RADAR Authentication Module
+        // ============================================================================
+        
+        const RADAR_AUTH = (() => {{
+            const GITHUB_CLIENT_ID = 'Ov23limFwlBEPDQzgGmb';
+            const AUTH_CALLBACK_URL = 'https://radarfunc-eka5fmceg4b5fub0.canadacentral-01.azurewebsites.net/api/auth/callback';
+            const STORAGE_KEY = 'radar_auth_token';
+            const USER_KEY = 'radar_user_info';
+            
+            // Get current user from localStorage
+            function getCurrentUser() {{
+                const userJson = localStorage.getItem(USER_KEY);
+                return userJson ? JSON.parse(userJson) : null;
+            }}
+            
+            // Get auth token from localStorage
+            function getAuthToken() {{
+                return localStorage.getItem(STORAGE_KEY);
+            }}
+            
+            // Check if user is authenticated
+            function isAuthenticated() {{
+                return !!getAuthToken();
+            }}
+            
+            // Initiate GitHub OAuth login
+            function signIn() {{
+                const currentUrl = window.location.href.split('#')[0];
+                const state = encodeURIComponent(currentUrl);
+                const authUrl = `https://github.com/login/oauth/authorize?client_id=${{GITHUB_CLIENT_ID}}&redirect_uri=${{encodeURIComponent(AUTH_CALLBACK_URL)}}&scope=read:user%20read:org&state=${{state}}`;
+                
+                console.log('🔐 Redirecting to GitHub OAuth...');
+                window.location.href = authUrl;
+            }}
+            
+            // Sign out
+            function signOut() {{
+                localStorage.removeItem(STORAGE_KEY);
+                localStorage.removeItem(USER_KEY);
+                console.log('👋 Signed out');
+                updateUI();
+            }}
+            
+            // Handle auth callback (extract token from URL fragment)
+            function handleAuthCallback() {{
+                const fragment = window.location.hash.substring(1);
+                const params = new URLSearchParams(fragment);
+                const token = params.get('token');
+                
+                if (token) {{
+                    console.log('🎫 Token received from OAuth callback');
+                    localStorage.setItem(STORAGE_KEY, token);
+                    
+                    // Decode JWT to get user info (simple base64 decode, not verification)
+                    try {{
+                        const payload = JSON.parse(atob(token.split('.')[1]));
+                        localStorage.setItem(USER_KEY, JSON.stringify({{
+                            username: payload.username,
+                            email: payload.email,
+                            name: payload.name,
+                            avatar_url: payload.avatar_url,
+                            is_collaborator: payload.is_collaborator,
+                            is_admin: payload.is_admin
+                        }}));
+                        console.log('✅ User authenticated:', payload.username);
+                    }} catch (e) {{
+                        console.error('Failed to decode token:', e);
+                    }}
+                    
+                    // Clean up URL
+                    window.history.replaceState({{}}, document.title, window.location.pathname + window.location.search);
+                    updateUI();
+                }}
+            }}
+            
+            // Update UI based on auth state
+            function updateUI() {{
+                const user = getCurrentUser();
+                const userMenuContainer = document.getElementById('user-menu-container');
+                const signInBtn = document.getElementById('sign-in-btn');
+                
+                if (!userMenuContainer || !signInBtn) return;
+                
+                if (user) {{
+                    // Show user menu
+                    userMenuContainer.style.display = 'block';
+                    signInBtn.style.display = 'none';
+                    
+                    // Populate user data
+                    const avatarEl = document.getElementById('user-avatar');
+                    const nameEl = document.getElementById('user-name');
+                    const badgeEl = document.getElementById('collaborator-badge');
+                    
+                    if (avatarEl) avatarEl.src = user.avatar_url;
+                    if (nameEl) nameEl.textContent = user.name || user.username;
+                    
+                    if (badgeEl) {{
+                        let roleIcon = '';
+                        let roleText = '';
+                        let roleColor = '';
+                        
+                        if (user.is_admin) {{
+                            roleIcon = '🔴';
+                            roleText = 'Admin';
+                            roleColor = '#ef4444';
+                        }} else if (user.is_collaborator) {{
+                            roleIcon = '🟢';
+                            roleText = 'Collaborator';
+                            roleColor = '#22c55e';
+                        }} else {{
+                            roleIcon = '🟠';
+                            roleText = 'PR Owner';
+                            roleColor = '#fb8500';
+                        }}
+                        
+                        badgeEl.textContent = `${{roleIcon}} ${{roleText}}`;
+                        badgeEl.style.color = roleColor;
+                        badgeEl.style.background = `${{roleColor}}20`;
+                    }}
+                }} else {{
+                    // Show sign-in button
+                    userMenuContainer.style.display = 'none';
+                    signInBtn.style.display = 'flex';
+                }}
+            }}
+            
+            // Get auth headers for API requests
+            function getAuthHeaders() {{
+                const token = getAuthToken();
+                return token ? {{
+                    'Authorization': `Bearer ${{token}}`,
+                    'Content-Type': 'application/json'
+                }} : {{
+                    'Content-Type': 'application/json'
+                }};
+            }}
+            
+            // Initialize on page load
+            function init() {{
+                console.log('🚀 RADAR Auth initialized');
+                handleAuthCallback();
+                updateUI();
+            }}
+            
+            // Public API
+            return {{
+                init,
+                signIn,
+                signOut,
+                isAuthenticated,
+                getCurrentUser,
+                getAuthToken,
+                getAuthHeaders
+            }};
+        }})();
+        
+        // Wrap all code in DOMContentLoaded to ensure DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
+        
+        // Initialize RADAR Auth
+        RADAR_AUTH.init();
         
         // Theme Management
         const themeToggle = document.getElementById('theme-toggle');
@@ -1442,24 +1600,10 @@ class HtmlReportGenerator:
             setTheme(currentTheme === 'dark' ? 'light' : 'dark');
         });
         
-        // Sign out function
-        function signOut() {
-            console.log('User signed out');
-            // In production, this would clear auth tokens and redirect
-            document.getElementById('user-menu-container').style.display = 'none';
-            document.getElementById('sign-in-btn').style.display = 'flex';
-            localStorage.removeItem('github_token');
-            localStorage.removeItem('github_username');
-            localStorage.removeItem('github_avatar');
-            localStorage.removeItem('github_role');
-            
-            // Close dropdown
-            const dropdown = document.getElementById('user-dropdown');
-            if (dropdown) {
-                dropdown.classList.remove('show');
-            }
-            
-            alert('Signed out successfully');
+        // Attach Sign In button event listener
+        const signInBtn = document.getElementById('sign-in-btn');
+        if (signInBtn) {
+            signInBtn.addEventListener('click', () => RADAR_AUTH.signIn());
         }
         
         // Dropdown toggle functionality
@@ -1480,67 +1624,14 @@ class HtmlReportGenerator:
             });
         }
         
-        // Attach sign out button event listener
+        // Attach Sign Out button event listener
         const signOutBtn = document.getElementById('sign-out-btn');
         if (signOutBtn) {
-            signOutBtn.addEventListener('click', signOut);
+            signOutBtn.addEventListener('click', () => {
+                userDropdown.classList.remove('show');
+                RADAR_AUTH.signOut();
+            });
         }
-        
-        // Function to populate user profile and determine role
-        function populateUserProfile() {
-            // In production, this would fetch from GitHub API and check repo permissions
-            // For now, using mock data - replace with actual API call
-            const userData = {
-                username: localStorage.getItem('github_username') || 'GitHub User',
-                avatar: localStorage.getItem('github_avatar') || 'https://avatars.githubusercontent.com/u/6154722?v=4',
-                role: localStorage.getItem('github_role') || 'PR_OWNER' // PR_OWNER, COLLABORATOR, ADMIN
-            };
-            
-            // Populate user avatar
-            const avatarEl = document.getElementById('user-avatar');
-            if (avatarEl) {
-                avatarEl.src = userData.avatar;
-            }
-            
-            // Populate username
-            const nameEl = document.getElementById('user-name');
-            if (nameEl) {
-                nameEl.textContent = userData.username;
-            }
-            
-            // Populate role badge
-            const roleBadge = document.getElementById('collaborator-badge');
-            if (!roleBadge) return;
-            
-            let roleIcon = '';
-            let roleText = '';
-            let roleColor = '';
-            
-            switch(userData.role) {
-                case 'ADMIN':
-                    roleIcon = '🔴';
-                    roleText = 'Admin';
-                    roleColor = '#ef4444';
-                    break;
-                case 'COLLABORATOR':
-                    roleIcon = '🟢';
-                    roleText = 'Collaborator';
-                    roleColor = '#22c55e';
-                    break;
-                case 'PR_OWNER':
-                default:
-                    roleIcon = '🟠';
-                    roleText = 'PR Owner';
-                    roleColor = '#fb8500';
-            }
-            
-            roleBadge.textContent = `${roleIcon} ${roleText}`;
-            roleBadge.style.color = roleColor;
-            roleBadge.style.background = `${roleColor}20`;
-        }
-        
-        // Always populate user profile on page load
-        populateUserProfile();
         
         // Challenge Modal Management
         let currentFindingId = null;
@@ -1579,8 +1670,15 @@ class HtmlReportGenerator:
             });
         });
         
-        // Submit challenge (placeholder - would integrate with Azure Function)
+        // Submit challenge to Azure Function
         async function submitChallenge() {
+            // Check authentication first
+            if (!RADAR_AUTH.isAuthenticated()) {
+                alert('Please sign in to submit challenges');
+                RADAR_AUTH.signIn();
+                return;
+            }
+            
             const selectedOption = document.querySelector('.challenge-option.selected');
             if (!selectedOption) {
                 alert('Please select a feedback type');
@@ -1588,22 +1686,90 @@ class HtmlReportGenerator:
             }
             
             const challengeType = selectedOption.getAttribute('data-type');
-            const feedback = document.getElementById('challenge-feedback').value;
+            const feedback = document.getElementById('challenge-feedback').value.trim();
             
-            // Placeholder for API call
-            console.log('Challenge submitted:', {
-                findingId: currentFindingId,
-                issueHash: currentIssueHash,
-                spec: currentSpec,
-                issueType: currentIssueType,
-                description: currentDescription,
-                challengeType,
-                feedback
-            });
+            if (!feedback) {
+                alert('Please provide an explanation');
+                return;
+            }
             
-            // Show success and close modal
-            alert('Feedback submitted successfully!');
-            closeChallengeModal();
+            const submitBtn = document.getElementById('submit-challenge-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            
+            try {
+                const pr_number = {pr_number};
+                const headers = RADAR_AUTH.getAuthHeaders();
+                
+                console.log('📤 Submitting challenge to Azure Function...');
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
+                
+                const response = await fetch('https://radarfunc-eka5fmceg4b5fub0.canadacentral-01.azurewebsites.net/api/challenge', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({
+                        pr_number: pr_number,
+                        spec_file: currentSpec,
+                        issue_hash: currentIssueHash,
+                        antipattern_id: currentFindingId,
+                        challenge_type: challengeType,
+                        feedback_text: feedback
+                    }),
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    console.log('✅ Challenge submitted successfully');
+                    
+                    let message = '✅ Challenge submitted successfully!\\n\\n';
+                    message += `Challenge ID: ${result.challenge_id}\\n`;
+                    
+                    if (result.github_comment_posted) {
+                        message += '✅ Comment posted to PR\\n';
+                    }
+                    if (result.github_label_added) {
+                        message += '✅ Label added to PR\\n';
+                    }
+                    
+                    alert(message);
+                    
+                    // Update button UI
+                    const btn = document.querySelector(`button.challenge-btn[data-finding-id="${currentFindingId}"]`);
+                    if (btn) {
+                        btn.textContent = '✅ Challenged';
+                        btn.disabled = true;
+                        btn.classList.add('challenged');
+                    }
+                    
+                    closeChallengeModal();
+                } else {
+                    console.error('❌ Server error:', result);
+                    
+                    if (response.status === 401) {
+                        alert('🔐 Your session has expired!\\n\\nPlease sign in again.');
+                        RADAR_AUTH.signOut();
+                        return;
+                    }
+                    
+                    alert(`❌ Failed to submit challenge: ${result.error || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('❌ Challenge submission error:', error);
+                
+                if (error.name === 'AbortError') {
+                    alert('❌ Request timeout: Server took too long to respond.');
+                } else {
+                    alert(`❌ Error: ${error.message}`);
+                }
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Feedback';
+            }
         }
         
         // Attach submit button event listener
