@@ -1387,7 +1387,10 @@ class HtmlReportGenerator:
         """Get all JavaScript code for the HTML page."""
         # This would contain the full JavaScript - returning a placeholder
         # In production, you'd import this from a separate file or template
-        return """        // Theme Management
+        return """        // Wrap all code in DOMContentLoaded to ensure DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+        
+        // Theme Management
         const themeToggle = document.getElementById('theme-toggle');
         const themeIcon = document.getElementById('theme-icon');
         const themeText = document.getElementById('theme-text');
@@ -1589,4 +1592,6 @@ class HtmlReportGenerator:
             if (e.target === this) {
                 closeChallengeModal();
             }
-        });"""
+        });
+        
+        }); // End DOMContentLoaded"""
