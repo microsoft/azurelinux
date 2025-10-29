@@ -38,6 +38,15 @@
             "IgnoredFilesRegexList": [
                 "^/usr/share/man/man3/.*NOTICE.*\\.3ossl\\.gz$"
             ]
+        },
+        {
+            "_comment1": "Rust documentation contains font license files that are embedded in the documentation.",
+            "_comment2": "These are license files for fonts used in the web documentation, not the main package licenses.",
+            "PackageName": "rust-doc",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/doc/docs/html/.*/fonts/.*\\.txt$",
+                "^/usr/share/doc/docs/html/static\\.files/.*LICENSE.*\\.txt$"
+            ]
         }
     ],
     "GlobalExceptionsRegexList": [
