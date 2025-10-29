@@ -372,21 +372,13 @@ class HtmlReportGenerator:
                     Sign in with GitHub
                 </button>
                 <div id="user-menu-container" style="display: none;">
-                    <button id="user-menu-trigger">
-                        <div id="user-avatar"></div>
-                        <span id="user-name"></span>
-                        <svg id="user-menu-chevron" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
-                        </svg>
-                    </button>
-                    <div id="user-dropdown" style="display: none;">
-                        <button id="sign-out-btn">
-                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
-                                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
-                            </svg>
-                            Sign Out
-                        </button>
+                    <div id="user-menu">
+                        <img id="user-avatar" src="" alt="User">
+                        <div id="user-info">
+                            <div id="user-name"></div>
+                            <span id="collaborator-badge"></span>
+                        </div>
+                        <button id="sign-out-btn">Sign Out</button>
                     </div>
                 </div>
             </div>
@@ -667,31 +659,28 @@ class HtmlReportGenerator:
             position: relative;
         }
         
-        #user-menu-trigger {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-primary);
-            border-radius: 10px;
-            padding: 6px 12px;
+        #user-menu {
             display: flex;
             align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        #user-menu-trigger:hover {
-            background: var(--bg-hover);
-            border-color: var(--accent-blue);
-            transform: translateY(-2px);
+            gap: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 8px 12px;
         }
         
         #user-avatar {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background-size: cover;
-            background-position: center;
-            border: 2px solid var(--border-primary);
+            border: 2px solid var(--accent-blue);
+            object-fit: cover;
+        }
+        
+        #user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
         
         #user-name {
@@ -700,67 +689,31 @@ class HtmlReportGenerator:
             color: var(--text-primary);
         }
         
-        #user-menu-chevron {
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            color: var(--text-secondary);
-        }
-        
-        #user-menu-trigger:hover #user-menu-chevron {
-            color: var(--accent-blue);
-        }
-        
-        #user-menu-trigger.dropdown-open #user-menu-chevron {
-            transform: rotate(180deg);
-        }
-        
-        #user-dropdown {
-            position: absolute;
-            top: calc(100% + 8px);
-            right: 0;
-            background: var(--bg-card);
-            border: 1px solid var(--border-primary);
-            border-radius: 10px;
-            box-shadow: var(--shadow-lg);
-            min-width: 180px;
-            padding: 6px;
-            z-index: 1001;
-            animation: dropdownSlide 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        @keyframes dropdownSlide {
-            from {
-                opacity: 0;
-                transform: translateY(-8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        #collaborator-badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         #sign-out-btn {
-            width: 100%;
             background: transparent;
-            border: none;
-            padding: 10px 14px;
-            border-radius: 8px;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-primary);
+            padding: 6px 12px;
+            border-radius: 6px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 500;
-            color: var(--text-primary);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
         }
         
         #sign-out-btn:hover {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--accent-red);
-        }
-        
-        #sign-out-btn svg {
-            flex-shrink: 0;
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border-color: var(--accent-red);
         }
         
         /* PR Info Card */
@@ -1415,33 +1368,6 @@ class HtmlReportGenerator:
             setTheme(currentTheme === 'dark' ? 'light' : 'dark');
         });
         
-        // User Dropdown Menu Management
-        const userMenuTrigger = document.getElementById('user-menu-trigger');
-        const userDropdown = document.getElementById('user-dropdown');
-        
-        if (userMenuTrigger && userDropdown) {
-            userMenuTrigger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const isOpen = userDropdown.style.display === 'block';
-                
-                if (isOpen) {
-                    userDropdown.style.display = 'none';
-                    userMenuTrigger.classList.remove('dropdown-open');
-                } else {
-                    userDropdown.style.display = 'block';
-                    userMenuTrigger.classList.add('dropdown-open');
-                }
-            });
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!userMenuTrigger.contains(e.target) && !userDropdown.contains(e.target)) {
-                    userDropdown.style.display = 'none';
-                    userMenuTrigger.classList.remove('dropdown-open');
-                }
-            });
-        }
-        
         // Sign out function
         function signOut() {
             console.log('User signed out');
@@ -1449,11 +1375,67 @@ class HtmlReportGenerator:
             document.getElementById('user-menu-container').style.display = 'none';
             document.getElementById('sign-in-btn').style.display = 'flex';
             localStorage.removeItem('github_token');
+            localStorage.removeItem('github_username');
+            localStorage.removeItem('github_avatar');
+            localStorage.removeItem('github_role');
             alert('Signed out successfully');
         }
         
         // Attach sign out button event listener
         document.getElementById('sign-out-btn').addEventListener('click', signOut);
+        
+        // Function to populate user profile and determine role
+        function populateUserProfile() {
+            // In production, this would fetch from GitHub API and check repo permissions
+            // For now, using mock data - replace with actual API call
+            const userData = {
+                username: localStorage.getItem('github_username') || 'abadawi-msft',
+                avatar: localStorage.getItem('github_avatar') || 'https://avatars.githubusercontent.com/u/yourusername',
+                role: localStorage.getItem('github_role') || 'PR_OWNER' // PR_OWNER, COLLABORATOR, ADMIN
+            };
+            
+            // Populate user avatar
+            const avatarEl = document.getElementById('user-avatar');
+            avatarEl.src = userData.avatar;
+            
+            // Populate username
+            document.getElementById('user-name').textContent = userData.username;
+            
+            // Populate role badge
+            const roleBadge = document.getElementById('collaborator-badge');
+            let roleIcon = '';
+            let roleText = '';
+            let roleColor = '';
+            
+            switch(userData.role) {
+                case 'ADMIN':
+                    roleIcon = '🔴';
+                    roleText = 'Admin';
+                    roleColor = '#ef4444';
+                    break;
+                case 'COLLABORATOR':
+                    roleIcon = '🟢';
+                    roleText = 'Collaborator';
+                    roleColor = '#22c55e';
+                    break;
+                case 'PR_OWNER':
+                default:
+                    roleIcon = '🟠';
+                    roleText = 'PR Owner';
+                    roleColor = '#fb8500';
+            }
+            
+            roleBadge.textContent = `${roleIcon} ${roleText}`;
+            roleBadge.style.color = roleColor;
+            roleBadge.style.background = `${roleColor}20`;
+        }
+        
+        // Check if user is already signed in and populate profile
+        if (localStorage.getItem('github_token')) {
+            document.getElementById('user-menu-container').style.display = 'block';
+            document.getElementById('sign-in-btn').style.display = 'none';
+            populateUserProfile();
+        }
         
         // Challenge Modal Management
         let currentFindingId = null;
