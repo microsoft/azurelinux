@@ -10,7 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
-
+Patch0:         0001-warnings.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
