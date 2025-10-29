@@ -52,7 +52,7 @@ Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 ExclusiveArch:   aarch64
-Conflicts:       knem
+
 
 #
 # To populate these sources:
@@ -73,6 +73,7 @@ See http://knem.gitlabpages.inria.fr for details.
 Summary:        KNEM: High-Performance Intra-Node MPI Communication
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
+Conflicts:      knem-modules
 
 %description -n %{_name}
 %{description}
