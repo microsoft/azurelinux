@@ -87,11 +87,6 @@ class MultiSpecAnalysisResult:
                 key=lambda x: x.value
             )
             
-            # Total issues
-            self.total_issues = sum(
-                len(r.anti_patterns) for r in self.spec_results
-            )
-            
             # Summary statistics
             self.summary_statistics = {
                 'total_specs': len(self.spec_results),
@@ -112,6 +107,12 @@ class MultiSpecAnalysisResult:
                     for r in self.spec_results
                 )
             }
+            
+            # Total issues (only ERROR + WARNING, not INFO)
+            self.total_issues = (
+                self.summary_statistics['total_errors'] + 
+                self.summary_statistics['total_warnings']
+            )
     
     def get_failed_specs(self) -> List[SpecFileResult]:
         """Get spec files with ERROR or higher severity."""
