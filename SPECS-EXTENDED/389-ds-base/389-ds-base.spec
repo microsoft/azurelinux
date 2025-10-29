@@ -83,6 +83,7 @@ Source4:          389-ds-base.sysusers
 Source5:          https://fedorapeople.org/groups/389ds/libdb-5.3.28-59.tar.bz2
 %endif
 
+Patch0:           0001-warnings.patch
 Provides:         ldif2ldbm >= 0
 
 # Attach the buildrequires to the top level package:
