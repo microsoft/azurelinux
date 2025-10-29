@@ -1416,87 +1416,87 @@ class HtmlReportGenerator:
         // RADAR Authentication Module
         // ============================================================================
         
-        const RADAR_AUTH = (() => {{
+        const RADAR_AUTH = (() => {
             const GITHUB_CLIENT_ID = 'Ov23limFwlBEPDQzgGmb';
             const AUTH_CALLBACK_URL = 'https://radarfunc-eka5fmceg4b5fub0.canadacentral-01.azurewebsites.net/api/auth/callback';
             const STORAGE_KEY = 'radar_auth_token';
             const USER_KEY = 'radar_user_info';
             
             // Get current user from localStorage
-            function getCurrentUser() {{
+            function getCurrentUser() {
                 const userJson = localStorage.getItem(USER_KEY);
                 return userJson ? JSON.parse(userJson) : null;
-            }}
+            }
             
             // Get auth token from localStorage
-            function getAuthToken() {{
+            function getAuthToken() {
                 return localStorage.getItem(STORAGE_KEY);
-            }}
+            }
             
             // Check if user is authenticated
-            function isAuthenticated() {{
+            function isAuthenticated() {
                 return !!getAuthToken();
-            }}
+            }
             
             // Initiate GitHub OAuth login
-            function signIn() {{
+            function signIn() {
                 const currentUrl = window.location.href.split('#')[0];
                 const state = encodeURIComponent(currentUrl);
-                const authUrl = `https://github.com/login/oauth/authorize?client_id=${{GITHUB_CLIENT_ID}}&redirect_uri=${{encodeURIComponent(AUTH_CALLBACK_URL)}}&scope=read:user%20read:org&state=${{state}}`;
+                const authUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(AUTH_CALLBACK_URL)}&scope=read:user%20read:org&state=${state}`;
                 
                 console.log('🔐 Redirecting to GitHub OAuth...');
                 window.location.href = authUrl;
-            }}
+            }
             
             // Sign out
-            function signOut() {{
+            function signOut() {
                 localStorage.removeItem(STORAGE_KEY);
                 localStorage.removeItem(USER_KEY);
                 console.log('👋 Signed out');
                 updateUI();
-            }}
+            }
             
             // Handle auth callback (extract token from URL fragment)
-            function handleAuthCallback() {{
+            function handleAuthCallback() {
                 const fragment = window.location.hash.substring(1);
                 const params = new URLSearchParams(fragment);
                 const token = params.get('token');
                 
-                if (token) {{
+                if (token) {
                     console.log('🎫 Token received from OAuth callback');
                     localStorage.setItem(STORAGE_KEY, token);
                     
                     // Decode JWT to get user info (simple base64 decode, not verification)
-                    try {{
+                    try {
                         const payload = JSON.parse(atob(token.split('.')[1]));
-                        localStorage.setItem(USER_KEY, JSON.stringify({{
+                        localStorage.setItem(USER_KEY, JSON.stringify({
                             username: payload.username,
                             email: payload.email,
                             name: payload.name,
                             avatar_url: payload.avatar_url,
                             is_collaborator: payload.is_collaborator,
                             is_admin: payload.is_admin
-                        }}));
+                        }));
                         console.log('✅ User authenticated:', payload.username);
-                    }} catch (e) {{
+                    } catch (e) {
                         console.error('Failed to decode token:', e);
-                    }}
+                    }
                     
                     // Clean up URL
-                    window.history.replaceState({{}}, document.title, window.location.pathname + window.location.search);
+                    window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
                     updateUI();
-                }}
-            }}
+                }
+            }
             
             // Update UI based on auth state
-            function updateUI() {{
+            function updateUI() {
                 const user = getCurrentUser();
                 const userMenuContainer = document.getElementById('user-menu-container');
                 const signInBtn = document.getElementById('sign-in-btn');
                 
                 if (!userMenuContainer || !signInBtn) return;
                 
-                if (user) {{
+                if (user) {
                     // Show user menu
                     userMenuContainer.style.display = 'block';
                     signInBtn.style.display = 'none';
@@ -1509,56 +1509,56 @@ class HtmlReportGenerator:
                     if (avatarEl) avatarEl.src = user.avatar_url;
                     if (nameEl) nameEl.textContent = user.name || user.username;
                     
-                    if (badgeEl) {{
+                    if (badgeEl) {
                         let roleIcon = '';
                         let roleText = '';
                         let roleColor = '';
                         
-                        if (user.is_admin) {{
+                        if (user.is_admin) {
                             roleIcon = '🔴';
                             roleText = 'Admin';
                             roleColor = '#ef4444';
-                        }} else if (user.is_collaborator) {{
+                        } else if (user.is_collaborator) {
                             roleIcon = '🟢';
                             roleText = 'Collaborator';
                             roleColor = '#22c55e';
-                        }} else {{
+                        } else {
                             roleIcon = '🟠';
                             roleText = 'PR Owner';
                             roleColor = '#fb8500';
-                        }}
+                        }
                         
-                        badgeEl.textContent = `${{roleIcon}} ${{roleText}}`;
+                        badgeEl.textContent = `${roleIcon} ${roleText}`;
                         badgeEl.style.color = roleColor;
-                        badgeEl.style.background = `${{roleColor}}20`;
-                    }}
-                }} else {{
+                        badgeEl.style.background = `${roleColor}20`;
+                    }
+                } else {
                     // Show sign-in button
                     userMenuContainer.style.display = 'none';
                     signInBtn.style.display = 'flex';
-                }}
-            }}
+                }
+            }
             
             // Get auth headers for API requests
-            function getAuthHeaders() {{
+            function getAuthHeaders() {
                 const token = getAuthToken();
-                return token ? {{
-                    'Authorization': `Bearer ${{token}}`,
+                return token ? {
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
-                }} : {{
+                } : {
                     'Content-Type': 'application/json'
-                }};
-            }}
+                };
+            }
             
             // Initialize on page load
-            function init() {{
+            function init() {
                 console.log('🚀 RADAR Auth initialized');
                 handleAuthCallback();
                 updateUI();
-            }}
+            }
             
             // Public API
-            return {{
+            return {
                 init,
                 signIn,
                 signOut,
@@ -1566,11 +1566,11 @@ class HtmlReportGenerator:
                 getCurrentUser,
                 getAuthToken,
                 getAuthHeaders
-            }};
-        }}})();
+            };
+        })();
         
         // Wrap all code in DOMContentLoaded to ensure DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {{
+        document.addEventListener('DOMContentLoaded', function() {
         
         // Initialize RADAR Auth
         RADAR_AUTH.init();
