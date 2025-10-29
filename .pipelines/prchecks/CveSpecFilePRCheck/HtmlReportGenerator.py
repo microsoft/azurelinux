@@ -371,9 +371,23 @@ class HtmlReportGenerator:
                     </svg>
                     Sign in with GitHub
                 </button>
-                <div id="user-menu" style="display: none;">
-                    <div id="user-avatar"></div>
-                    <span id="user-name"></span>
+                <div id="user-menu-container" style="display: none;">
+                    <button id="user-menu-trigger">
+                        <div id="user-avatar"></div>
+                        <span id="user-name"></span>
+                        <svg id="user-menu-chevron" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </button>
+                    <div id="user-dropdown" style="display: none;">
+                        <button id="sign-out-btn" onclick="signOut()">
+                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+                                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+                            </svg>
+                            Sign Out
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -649,14 +663,26 @@ class HtmlReportGenerator:
             box-shadow: var(--shadow-lg);
         }
         
-        #user-menu {
+        #user-menu-container {
+            position: relative;
+        }
+        
+        #user-menu-trigger {
             background: var(--bg-tertiary);
             border: 1px solid var(--border-primary);
             border-radius: 10px;
-            padding: 8px 12px;
+            padding: 6px 12px;
             display: flex;
             align-items: center;
             gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        #user-menu-trigger:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
         }
         
         #user-avatar {
@@ -665,12 +691,76 @@ class HtmlReportGenerator:
             border-radius: 50%;
             background-size: cover;
             background-position: center;
+            border: 2px solid var(--border-primary);
         }
         
         #user-name {
             font-size: 14px;
             font-weight: 600;
             color: var(--text-primary);
+        }
+        
+        #user-menu-chevron {
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-secondary);
+        }
+        
+        #user-menu-trigger:hover #user-menu-chevron {
+            color: var(--accent-blue);
+        }
+        
+        #user-menu-trigger.dropdown-open #user-menu-chevron {
+            transform: rotate(180deg);
+        }
+        
+        #user-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 10px;
+            box-shadow: var(--shadow-lg);
+            min-width: 180px;
+            padding: 6px;
+            z-index: 1001;
+            animation: dropdownSlide 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes dropdownSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        #sign-out-btn {
+            width: 100%;
+            background: transparent;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        #sign-out-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+        }
+        
+        #sign-out-btn svg {
+            flex-shrink: 0;
         }
         
         /* PR Info Card */
@@ -1321,6 +1411,43 @@ class HtmlReportGenerator:
             const currentTheme = document.documentElement.getAttribute('data-theme');
             setTheme(currentTheme === 'dark' ? 'light' : 'dark');
         });
+        
+        // User Dropdown Menu Management
+        const userMenuTrigger = document.getElementById('user-menu-trigger');
+        const userDropdown = document.getElementById('user-dropdown');
+        
+        if (userMenuTrigger && userDropdown) {
+            userMenuTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = userDropdown.style.display === 'block';
+                
+                if (isOpen) {
+                    userDropdown.style.display = 'none';
+                    userMenuTrigger.classList.remove('dropdown-open');
+                } else {
+                    userDropdown.style.display = 'block';
+                    userMenuTrigger.classList.add('dropdown-open');
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!userMenuTrigger.contains(e.target) && !userDropdown.contains(e.target)) {
+                    userDropdown.style.display = 'none';
+                    userMenuTrigger.classList.remove('dropdown-open');
+                }
+            });
+        }
+        
+        // Sign out function
+        function signOut() {
+            console.log('User signed out');
+            // In production, this would clear auth tokens and redirect
+            document.getElementById('user-menu-container').style.display = 'none';
+            document.getElementById('sign-in-btn').style.display = 'flex';
+            localStorage.removeItem('github_token');
+            alert('Signed out successfully');
+        }
         
         // Challenge Modal Management
         let currentFindingId = null;
