@@ -424,7 +424,7 @@ class HtmlReportGenerator:
                         ⚠️ Please sign in with GitHub to submit feedback.
                     </p>
                 </div>
-                <button id="submit-challenge-btn" onclick="submitChallenge()">Submit Feedback</button>
+                <button id="submit-challenge-btn">Submit Feedback</button>
             </div>
         </div>
     </div>
@@ -1512,6 +1512,9 @@ class HtmlReportGenerator:
             alert('Feedback submitted successfully!');
             closeChallengeModal();
         }
+        
+        // Attach submit button event listener
+        document.getElementById('submit-challenge-btn').addEventListener('click', submitChallenge);
         
         // Attach challenge buttons
         document.querySelectorAll('.challenge-btn').forEach(btn => {
