@@ -139,7 +139,7 @@ class HtmlReportGenerator:
                 ⚠️
             </div>
             <div class="stat-content">
-                <div class="stat-value">{stats['specs_with_errors']}</div>
+                <div class="stat-value">{stats['total_errors']}</div>
                 <div class="stat-label">Errors</div>
             </div>
         </div>
@@ -150,7 +150,7 @@ class HtmlReportGenerator:
                 📋
             </div>
             <div class="stat-content">
-                <div class="stat-value">{stats['specs_with_warnings']}</div>
+                <div class="stat-value">{stats['total_warnings']}</div>
                 <div class="stat-label">Warnings</div>
             </div>
         </div>
@@ -424,7 +424,7 @@ class HtmlReportGenerator:
                 <p id="modal-finding-text"></p>
                 <div id="challenge-options">
                     <button class="challenge-option" data-type="false-positive">
-                        🔴 False Positive
+                        ❌ False Positive
                     </button>
                     <button class="challenge-option" data-type="needs-context">
                         ⚠️ Needs More Context
