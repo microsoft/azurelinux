@@ -57,7 +57,7 @@ class HtmlReportGenerator:
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; border-radius: 6px; border: 1px solid #30363d;">
     <div style="text-align: center; margin-bottom: 20px;">
         <h1 style="color: {severity_color}; margin: 0; font-size: 2.5em; line-height: 1.2;">
-            <span class="radar-title" data-tooltip="Realtime Anti-pattern Detection with AI Reasoning">RADAR</span> Code Review Analysis Report
+            Code Review Analysis Report
         </h1>
         <p style="color: #8b949e; margin: 10px 0 5px 0; font-size: 13px; font-style: italic;">
             Realtime Anti-pattern Detection with AI Reasoning
@@ -356,8 +356,7 @@ class HtmlReportGenerator:
     <div id="top-bar">
         <div id="top-bar-left">
             <div id="top-bar-logo">
-                <span>🛡️</span>
-                <span>CVE Spec Analysis</span>
+                <span class="radar-title">RADAR</span>
             </div>
             <div style="font-size: 10px; color: var(--text-tertiary); margin-left: 12px; font-family: monospace;">
                 v{cache_buster}
@@ -501,42 +500,42 @@ class HtmlReportGenerator:
         
         /* Light Theme Override */
         [data-theme="light"] {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f9fafb;
-            --bg-tertiary: #f3f4f6;
+            --bg-primary: #f0f4f8;
+            --bg-secondary: #e7f3ff;
+            --bg-tertiary: #d6e9f8;
             --bg-card: #ffffff;
-            --bg-card-hover: #f9fafb;
-            --bg-hover: rgba(249, 250, 251, 0.9);
+            --bg-card-hover: #f7fbff;
+            --bg-hover: rgba(231, 243, 255, 0.9);
             
-            --border-primary: #e5e7eb;
-            --border-secondary: #d1d5db;
-            --border-accent: #9ca3af;
+            --border-primary: #b8d4ed;
+            --border-secondary: #93b8d6;
+            --border-accent: #6b9dc4;
             
-            --text-primary: #111827;
-            --text-secondary: #4b5563;
-            --text-tertiary: #6b7280;
+            --text-primary: #1a2332;
+            --text-secondary: #3d5266;
+            --text-tertiary: #5f7589;
             
-            --accent-blue: #2563eb;
-            --accent-blue-dark: #1d4ed8;
-            --accent-blue-light: #3b82f6;
-            --accent-blue-bg: #dbeafe;
+            --accent-blue: #1e73be;
+            --accent-blue-dark: #155a8a;
+            --accent-blue-light: #2e8ed9;
+            --accent-blue-bg: #cfe5f7;
             
-            --accent-green: #059669;
-            --accent-green-bg: #d1fae5;
+            --accent-green: #16a34a;
+            --accent-green-bg: #bbf7d0;
             
-            --accent-orange: #d97706;
+            --accent-orange: #ea580c;
             --accent-orange-bg: #fed7aa;
             
             --accent-red: #dc2626;
-            --accent-red-bg: #fee2e2;
+            --accent-red-bg: #fecaca;
             
             --accent-purple: #7c3aed;
-            --accent-purple-bg: #ede9fe;
+            --accent-purple-bg: #ddd6fe;
             
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
         }
         
         * {
@@ -1633,10 +1632,13 @@ class HtmlReportGenerator:
         function setTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
-            if (theme === 'light') {
+            // Show icon/text for the mode you can switch TO
+            if (theme === 'dark') {
+                // Currently dark, show sun to switch to light
                 themeIcon.textContent = '☀️';
                 themeText.textContent = 'Light';
             } else {
+                // Currently light, show moon to switch to dark
                 themeIcon.textContent = '🌙';
                 themeText.textContent = 'Dark';
             }
