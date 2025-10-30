@@ -54,9 +54,9 @@ class HtmlReportGenerator:
         severity_color = self.get_severity_color(analysis_result.overall_severity)
         
         html = f"""
-<div style="font-family: 'Orbitron', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-card); color: var(--text-primary); padding: 20px; border-radius: 12px; border: 1px solid var(--border-primary); box-shadow: var(--shadow-lg);">
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg-card); color: var(--text-primary); padding: 20px; border-radius: 12px; border: 1px solid var(--border-primary); box-shadow: var(--shadow-lg);">
     <div style="text-align: center; margin-bottom: 20px;">
-        <h1 class="matrix-title" style="color: {severity_color}; margin: 0; font-size: 2.5em; line-height: 1.2;">
+        <h1 class="matrix-title" style="margin: 0; font-size: 2.5em; line-height: 1.2;">
             Code Review Analysis Report
         </h1>
         <p style="color: var(--text-secondary); margin: 10px 0 5px 0; font-size: 13px; font-style: italic;">
@@ -366,12 +366,22 @@ class HtmlReportGenerator:
     <div id="top-bar">
         <div id="top-bar-left">
             <div id="top-bar-logo">
+                <!-- OPTION 1: Humanoid as Background -->
                 <div class="radar-humanoid-container">
                     <div class="radar-humanoid-bg"></div>
                     <span class="radar-title" data-tooltip="Realtime Anti-pattern Detection with AI Reasoning">RADAR</span>
                 </div>
+                
+                <!-- OPTION 2: Humanoid as Separate Icon (uncomment to use)
+                <div class="radar-logo-group">
+                    <div class="humanoid-icon-wrapper">
+                        <img src="{humanoid_image_data}" alt="RADAR" class="humanoid-icon" />
+                    </div>
+                    <span class="radar-title" data-tooltip="Realtime Anti-pattern Detection with AI Reasoning">RADAR</span>
+                </div>
+                -->
             </div>
-            <div style="font-size: 10px; color: var(--text-tertiary); margin-left: 12px; font-family: 'Share Tech Mono', monospace;">
+            <div style="font-size: 10px; color: var(--text-tertiary); margin-left: 12px; font-family: monospace;">
                 v{cache_buster}
             </div>
         </div>
@@ -602,26 +612,141 @@ class HtmlReportGenerator:
             transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
         }
         
-        /* Matrix-style title font */
+        /* Matrix-style title font - ONLY for main title */
         .matrix-title {
             font-family: 'Orbitron', monospace !important;
             font-weight: 900 !important;
             letter-spacing: 0.02em !important;
             text-transform: uppercase;
+            /* Green matrix color in dark mode */
+            color: #00ff41;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.8), 0 0 20px rgba(0, 255, 65, 0.4);
+            animation: matrix-glow 2s ease-in-out infinite alternate;
+        }
+        
+        /* Light theme - use blue/purple gradient */
+        [data-theme="light"] .matrix-title {
             background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: matrix-glow 2s ease-in-out infinite alternate;
+            text-shadow: none;
         }
         
         @keyframes matrix-glow {
             from {
-                filter: drop-shadow(0 0 10px rgba(74, 158, 255, 0.5));
+                filter: drop-shadow(0 0 10px rgba(0, 255, 65, 0.5));
             }
             to {
-                filter: drop-shadow(0 0 20px rgba(175, 82, 222, 0.8));
+                filter: drop-shadow(0 0 20px rgba(0, 255, 65, 0.8));
             }
+        }
+        
+        /* Apply matrix font to specific UI elements */
+        .stat-value,
+        .stat-label,
+        .spec-card summary,
+        .severity-badge,
+        .issue-type-title,
+        .issue-count-badge,
+        .antipattern-details summary {
+            font-family: 'Share Tech Mono', 'Courier New', monospace !important;
+        }
+        
+        /* Make stat values more prominent with matrix style */
+        .stat-value {
+            font-family: 'Orbitron', monospace !important;
+            font-weight: 900 !important;
+            letter-spacing: 0.02em !important;
+        }
+        
+        /* Spec card names with code font */
+        .spec-card summary {
+            font-family: 'Share Tech Mono', monospace !important;
+            letter-spacing: 0.01em !important;
+        }
+        
+        /* Severity badges with code font */
+        .severity-badge {
+            font-family: 'Share Tech Mono', monospace !important;
+            letter-spacing: 0.05em !important;
+        }
+        
+        /* Humanoid Background Container - Enhanced */
+        .radar-humanoid-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            min-width: 150px;
+            min-height: 60px;
+            border-radius: 12px;
+            overflow: visible;
+            background: rgba(0, 20, 0, 0.5);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+        }
+        
+        [data-theme="light"] .radar-humanoid-container {
+            background: rgba(99, 102, 241, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        /* Option 1: Humanoid as large background behind RADAR */
+        .radar-humanoid-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background-image: var(--humanoid-image);
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.2;
+            filter: var(--humanoid-filter);
+            z-index: 0;
+        }
+        
+        /* Option 2: Humanoid as floating icon next to RADAR */
+        .radar-humanoid-icon {
+            position: absolute;
+            left: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-image: var(--humanoid-image);
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.7;
+            filter: var(--humanoid-filter);
+        }
+        
+        /* Option 3: Humanoid as watermark in top bar */
+        #top-bar::before {
+            content: '';
+            position: absolute;
+            right: 50%;
+            top: 50%;
+            transform: translate(50%, -50%);
+            width: 200px;
+            height: 200px;
+            background-image: var(--humanoid-image);
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.05;
+            filter: var(--humanoid-filter);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .radar-humanoid-container:hover .radar-humanoid-bg {
+            opacity: 0.4;
+            animation: pulse-bg 2s ease-in-out infinite;
         }
         
         /* Top Bar Styles */
@@ -651,6 +776,7 @@ class HtmlReportGenerator:
             display: flex;
             align-items: center;
             gap: 12px;
+            z-index: 10;
         }
         
         #top-bar-logo {
@@ -662,39 +788,74 @@ class HtmlReportGenerator:
             gap: 12px;
         }
         
-        /* Humanoid Background Container */
-        .radar-humanoid-container {
-            position: relative;
+        /* ===== HUMANOID DESIGN OPTIONS ===== */
+        
+        /* Option 1: Direct Icon Display */
+        .humanoid-icon-wrapper {
+            width: 45px;
+            height: 45px;
             display: flex;
             align-items: center;
-            padding: 8px 16px;
-            border-radius: 12px;
-            overflow: hidden;
-            background: rgba(0, 0, 0, 0.3);
+            justify-content: center;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 255, 65, 0.1), transparent);
+            border: 2px solid rgba(0, 255, 65, 0.3);
+            animation: radar-pulse 3s ease-in-out infinite;
         }
         
-        [data-theme="light"] .radar-humanoid-container {
-            background: rgba(99, 102, 241, 0.05);
+        @keyframes radar-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.4); }
+            50% { box-shadow: 0 0 20px 10px rgba(0, 255, 65, 0.2); }
         }
         
-        .radar-humanoid-bg {
+        .humanoid-icon {
+            width: 35px;
+            height: 35px;
+            filter: brightness(1.2) contrast(1.1);
+        }
+        
+        [data-theme="light"] .humanoid-icon {
+            filter: invert(1) hue-rotate(180deg) brightness(1.2);
+        }
+        
+        .radar-logo-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        /* Option 2: CSS-based Radar Animation */
+        .radar-effect {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: var(--humanoid-image);
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.15;
-            filter: var(--humanoid-filter);
-            z-index: 0;
+            width: 100px;
+            height: 100px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
         }
         
-        .radar-humanoid-container:hover .radar-humanoid-bg {
-            opacity: 0.25;
-            animation: pulse-bg 2s ease-in-out infinite;
+        .radar-effect::before,
+        .radar-effect::after {
+            content: '';
+            position: absolute;
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-radius: 50%;
+            animation: radar-scan 3s linear infinite;
+        }
+        
+        .radar-effect::before {
+            width: 100%;
+            height: 100%;
+            animation-delay: 0s;
+        }
+        
+        .radar-effect::after {
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            animation-delay: 1.5s;
         }
         
         @keyframes pulse-bg {
@@ -1008,6 +1169,7 @@ class HtmlReportGenerator:
             font-weight: 600;
             display: inline-block;
             border: 1px solid var(--accent-blue);
+            font-family: 'Share Tech Mono', monospace !important;
         }
         
         .author-badge {
@@ -1018,6 +1180,7 @@ class HtmlReportGenerator:
             font-weight: 600;
             display: inline-block;
             border: 1px solid var(--accent-purple);
+            font-family: 'Share Tech Mono', monospace !important;
         }
         
         .branch-badge {
@@ -1026,7 +1189,7 @@ class HtmlReportGenerator:
             padding: 4px 10px;
             border-radius: 20px;
             font-weight: 600;
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'Share Tech Mono', monospace !important;
             font-size: 12px;
             display: inline-block;
             border: 1px solid var(--accent-green);
@@ -1037,7 +1200,7 @@ class HtmlReportGenerator:
             color: var(--text-secondary);
             padding: 4px 10px;
             border-radius: 6px;
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'Share Tech Mono', monospace !important;
             font-size: 12px;
             display: inline-block;
             border: 1px solid var(--border-primary);
@@ -1309,10 +1472,17 @@ class HtmlReportGenerator:
             color: var(--text-secondary);
             padding: 6px 12px;
             border-radius: 6px;
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'Share Tech Mono', monospace !important;
             font-size: 12px;
             display: inline-block;
             border: 1px solid var(--border-primary);
+        }
+        
+        /* Card headers with code font */
+        .pr-info-title,
+        .modal-header h2 {
+            font-family: 'Share Tech Mono', monospace !important;
+            letter-spacing: 0.02em;
         }
         
         /* Anti-pattern Details */
