@@ -56,7 +56,7 @@ class HtmlReportGenerator:
         html = f"""
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; border-radius: 6px; border: 1px solid #30363d;">
     <div style="text-align: center; margin-bottom: 20px;">
-        <h1 style="color: {severity_color}; margin: 0; font-size: 2.5em; line-height: 1.2;">
+        <h1 style="color: {severity_color}; margin: 0; font-size: 2em; line-height: 1.2;">
             Code Review Analysis Report
         </h1>
         <p style="color: #8b949e; margin: 10px 0 5px 0; font-size: 13px; font-style: italic;">
@@ -1070,7 +1070,7 @@ class HtmlReportGenerator:
         
         /* Anti-pattern Details */
         .antipattern-details {
-            background: rgba(13, 13, 13, 0.3);
+            background: var(--bg-secondary);
             border: 1px solid var(--border-primary);
             border-left: 3px solid var(--accent-purple);
             border-radius: 10px;
@@ -1085,8 +1085,8 @@ class HtmlReportGenerator:
             user-select: none;
             padding: 10px 12px;
             border-radius: 6px;
-            background: rgba(163, 113, 247, 0.08);
-            border: 1px solid rgba(163, 113, 247, 0.2);
+            background: var(--accent-purple-bg);
+            border: 1px solid var(--accent-purple);
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
@@ -1094,9 +1094,10 @@ class HtmlReportGenerator:
         }
         
         .antipattern-details summary:hover {
-            background: rgba(163, 113, 247, 0.15);
-            border-color: rgba(163, 113, 247, 0.3);
+            background: var(--accent-purple-bg);
+            border-color: var(--accent-purple);
             transform: translateX(2px);
+            filter: brightness(1.1);
         }
         
         .antipattern-details summary::marker {
@@ -1416,7 +1417,7 @@ class HtmlReportGenerator:
         .radar-title {
             font-weight: 900;
             font-style: italic;
-            font-size: 1.1em;
+            font-size: 1.5em;
             letter-spacing: 0.05em;
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             -webkit-background-clip: text;
@@ -1436,9 +1437,9 @@ class HtmlReportGenerator:
         .radar-title::after {
             content: attr(data-tooltip);
             position: absolute;
-            bottom: 100%;
+            top: 100%;
             left: 0;
-            transform: translateY(-8px);
+            transform: translateY(8px);
             background: #1a1a1a;
             color: #FFD700;
             padding: 8px 16px;
@@ -1459,7 +1460,7 @@ class HtmlReportGenerator:
         
         .radar-title:hover::after {
             opacity: 1;
-            transform: translateY(-12px);
+            transform: translateY(12px);
         }"""
     
     def _get_javascript(self, pr_number: int) -> str:
