@@ -39,12 +39,12 @@
 %global KVERSION %{target_kernel_version_full}
 
 %{!?_name: %define _name isert-hwe}
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-22%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-23%{release_suffix}%{?dist}}
 
 Summary:	 %{_name} Driver
 Name:		   %{_name}-signed
 Version:	 24.10
-Release:	 22%{release_suffix}%{?dist}
+Release:	 23%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -68,7 +68,7 @@ isert signed kernel modules
 
 %package -n %{_name}
 Summary:        %{summary}
-Requires:       mlnx-ofa_kernel-hwe = %{_mofed_full_version}
+Requires:       mlnx-ofa_kernel
 Requires:       mlnx-ofa_kernel-hwe-modules  = %{_mofed_full_version}
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
@@ -111,6 +111,9 @@ fi # 1 : closed
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-isert-*.conf
 
 %changelog
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-23_6.12.50.2-1
+- Adjusted package dependencies on user space components.
+
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22_6.12.50.2-1
 - Bump to match kernel-hwe
 - Fix signed spec for -hwe variant

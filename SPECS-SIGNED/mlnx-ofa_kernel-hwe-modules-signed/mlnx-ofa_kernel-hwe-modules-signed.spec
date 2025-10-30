@@ -46,7 +46,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 %{_name}-signed
 Version:	 24.10
-Release:	 22%{release_suffix}%{?dist}
+Release:	 23%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -126,7 +126,7 @@ Requires: procps
 Requires: module-init-tools
 Requires: lsof
 Requires: ofed-scripts
-Conflicts: mlnx-ofa_kernel
+Conflicts: mlnx-ofa_kernel-modules
 
 %description -n %{_name}
 %{description}
@@ -194,6 +194,9 @@ fi
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-23_6.12.50.2-1
+- Bump release to rebuild for new release
+
 * Fri Oct 06 2025 Siddharth Chintamaneni <siddharthc@microsoft.com> - 24.10-22_6.12.50.2-1
 - Bump to match kernel-hwe
 - Fix signed spec for -hwe variant

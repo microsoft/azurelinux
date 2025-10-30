@@ -4700,8 +4700,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.25.1",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.1-1/go1.25.1-20250903.7.src.tar.gz"
+          "version": "1.25.3",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.3-1/go1.25.3-20251013.2.src.tar.gz"
         }
       }
     },
@@ -4710,8 +4710,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.24.7",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.7-1/go1.24.7-20250903.8.src.tar.gz"
+          "version": "1.24.9",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.9-1/go1.24.9-20251013.3.src.tar.gz"
         }
       }
     },
@@ -6620,8 +6620,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.104.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.104.2.tar.gz"
+          "version": "6.6.112.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.112.1.tar.gz"
         }
       }
     },
@@ -8271,8 +8271,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.104.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.104.2.tar.gz"
+          "version": "6.6.112.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.112.1.tar.gz"
         }
       }
     },
@@ -8281,8 +8281,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.104.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.104.2.tar.gz"
+          "version": "6.6.112.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.112.1.tar.gz"
         }
       }
     },
@@ -8301,8 +8301,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.104.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.104.2.tar.gz"
+          "version": "6.6.112.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.112.1.tar.gz"
         }
       }
     },
@@ -8321,8 +8321,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.104.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.104.2.tar.gz"
+          "version": "6.6.112.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.112.1.tar.gz"
         }
       }
     },
@@ -13872,8 +13872,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.43",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.43.tar.gz"
+          "version": "8.0.44",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.44.tar.gz"
         }
       }
     },
@@ -14292,8 +14292,8 @@
         "type": "other",
         "other": {
           "name": "netsniff-ng",
-          "version": "0.6.8",
-          "downloadUrl": "http://www.netsniff-ng.org/pub/netsniff-ng/netsniff-ng-0.6.8.tar.xz"
+          "version": "0.6.9",
+          "downloadUrl": "https://github.com/netsniff-ng/netsniff-ng/archive/refs/tags/v0.6.9.tar.gz"
         }
       }
     },
@@ -15593,8 +15593,8 @@
         "type": "other",
         "other": {
           "name": "openssl",
-          "version": "3.3.3",
-          "downloadUrl": "https://github.com/openssl/openssl/releases/download/openssl-3.3.3/openssl-3.3.3.tar.gz"
+          "version": "3.3.5",
+          "downloadUrl": "https://github.com/openssl/openssl/releases/download/openssl-3.3.5/openssl-3.3.5.tar.gz"
         }
       }
     },
@@ -25082,6 +25082,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-spnego",
+          "version": "0.12.0",
+          "downloadUrl": "https://github.com/jborean93/pyspnego/archive/refs/tags/v0.12.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-sqlalchemy",
           "version": "2.0.27",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/S/SQLAlchemy/SQLAlchemy-2.0.27.tar.gz"
@@ -29876,8 +29886,8 @@
         "type": "other",
         "other": {
           "name": "virt-top",
-          "version": "1.0.9",
-          "downloadUrl": "http://people.redhat.com/~rjones/virt-top/files/virt-top-1.0.9.tar.gz"
+          "version": "1.1.1",
+          "downloadUrl": "https://people.redhat.com/~rjones/virt-top/files/virt-top-1.1.1.tar.gz"
         }
       }
     },

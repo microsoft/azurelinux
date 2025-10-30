@@ -13,7 +13,7 @@
 %global KVERSION %{target_kernel_version_full}
 
 %define _name xpmem-hwe-modules
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-22%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-23%{release_suffix}%{?dist}}
 
 # xpmem-modules is a sub-package in SPECS/xpmem.
 # We are making that into a main package for signing.
@@ -21,7 +21,7 @@
 Summary:	 Cross-partition memory
 Name:		 %{_name}-signed
 Version:	 2.7.4
-Release:	 22%{release_suffix}%{?dist}
+Release:	 23%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -50,11 +50,11 @@ This package includes the kernel module.
 
 %package -n %{_name}
 Summary:        %{summary}
-Requires:       mlnx-ofa_kernel-hwe = %{_mofed_full_version}
+Requires:       mlnx-ofa_kernel
 Requires:       mlnx-ofa_kernel-hwe-modules = %{_mofed_full_version}
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
-Conflicts:      xpmem
+Conflicts:      xpmem-modules
 
 %description -n %{_name}
 %{description}
@@ -86,21 +86,18 @@ popd
 %{_datadir}/licenses
 
 %post -n %{_name}
-depmod %{KVERSION} -a
-/sbin/modprobe -r xpmem > /dev/null 2>&1
-/sbin/modprobe xpmem > /dev/null 2>&1
+depmod %{KVERSION}
 
 %postun -n %{_name}
-if [ "$1" = 0 ]; then
-	if lsmod | grep -qw xpmem; then
-		# If the module fails to unload, give an error,
-		# but don't fail uninstall. User should handle this
-		# Maybe the module is in use
-		rmmod xpmem || :
-	fi
+if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
+	/sbin/depmod %{KVERSION}
 fi
 
 %changelog
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-23_6.12.50.2-1
+- Adjusted package dependencies on user space components.
+- Align %%post* scripts with other kmod packages.
+
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-22_6.12.50.2-1
 - Bump to match kernel-hwe
 - Fix signed spec for -hwe variant
