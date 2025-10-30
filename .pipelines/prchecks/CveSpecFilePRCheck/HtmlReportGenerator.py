@@ -158,8 +158,8 @@ class HtmlReportGenerator:
             </div>
         </div>
         
-        <!-- Total Issues Card with Bell Icon -->
-        <div class="stat-card" style="--stat-color: var(--accent-purple);">
+        <!-- Total Issues Card with Bell Icon (Clickable Reset) -->
+        <div class="stat-card reset-filter-stat" style="--stat-color: var(--accent-purple); cursor: pointer;" title="Click to show all issues">
             <div class="stat-icon stat-icon-purple">
                 <div class="bell-container">
                     <span class="bell-icon">🔔</span>
@@ -1097,6 +1097,45 @@ class HtmlReportGenerator:
         
         .stat-card.filter-active:hover {
             transform: scale(1.05) translateY(-2px);
+        }
+        
+        /* Reset Filter Card (Total Issues) Styling */
+        .reset-filter-stat {
+            position: relative;
+        }
+        
+        .reset-filter-stat::after {
+            content: 'Reset Filters';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-purple);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .reset-filter-stat:hover::after {
+            opacity: 0.9;
+            transform: translate(-50%, -150%);
+        }
+        
+        .reset-filter-stat:hover {
+            border-color: var(--accent-purple) !important;
+            box-shadow: 0 0 20px rgba(175, 82, 222, 0.4) !important;
+        }
+        
+        .reset-filter-stat:active {
+            transform: scale(0.98) !important;
         }
         
         .issue-item.filtered-out {
@@ -2176,18 +2215,44 @@ class HtmlReportGenerator:
         // Severity filtering functionality
         let activeSeverityFilter = null;
         
+        // Reset filter function
+        function resetAllFilters() {
+            activeSeverityFilter = null;
+            // Remove filter-active class from all filterable stats
+            document.querySelectorAll('.filterable-stat').forEach(card => {
+                card.classList.remove('filter-active');
+            });
+            // Remove filtered classes from all issue items
+            document.querySelectorAll('.issue-item').forEach(item => {
+                item.classList.remove('filtered-out', 'filtered-in');
+            });
+            // Add a brief highlight animation to Total Issues card
+            const resetCard = document.querySelector('.reset-filter-stat');
+            if (resetCard) {
+                resetCard.style.transform = 'scale(1.08)';
+                resetCard.style.boxShadow = '0 0 30px rgba(175, 82, 222, 0.5)';
+                setTimeout(() => {
+                    resetCard.style.transform = '';
+                    resetCard.style.boxShadow = '';
+                }, 300);
+            }
+        }
+        
+        // Add click handler for Total Issues card (reset filters)
+        document.querySelector('.reset-filter-stat')?.addEventListener('click', function() {
+            resetAllFilters();
+            console.log('📊 Filters reset - showing all issues');
+        });
+        
+        // Existing filter functionality for Error and Warning cards
         document.querySelectorAll('.filterable-stat').forEach(card => {
             card.addEventListener('click', function() {
                 const severity = this.getAttribute('data-filter-severity');
                 
                 // Toggle filter
                 if (activeSeverityFilter === severity) {
-                    // Clear filter
-                    activeSeverityFilter = null;
-                    this.classList.remove('filter-active');
-                    document.querySelectorAll('.issue-item').forEach(item => {
-                        item.classList.remove('filtered-out', 'filtered-in');
-                    });
+                    // Clear filter - same as reset
+                    resetAllFilters();
                 } else {
                     // Apply new filter
                     activeSeverityFilter = severity;
