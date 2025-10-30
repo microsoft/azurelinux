@@ -20,9 +20,7 @@ Source2:        https://github.com/nginx/njs/archive/refs/tags/%{njs_version}.ta
 Source3:        nginx-tests.tgz
 %endif
 
-#Patch0:         CVE-2024-7347.patch
-#Patch1:         CVE-2025-23419.patch
-#Patch2:         CVE-2025-53859.patch
+Patch1:         CVE-2025-53859.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
@@ -136,6 +134,7 @@ cd nginx-tests
 su nginx -s /bin/sh -c 'TEST_NGINX_BINARY=%{_sbindir}/nginx prove ./*.t'
 cd ..
 rm -rf nginx-tests
+exit 1
 %endif
 
 %files
