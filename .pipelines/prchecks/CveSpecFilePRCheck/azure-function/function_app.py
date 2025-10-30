@@ -369,10 +369,19 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                 }
                 type_text = challenge_type_text.get(req_body["challenge_type"], req_body["challenge_type"])
                 
+                # Determine role badge for user
+                role_badge = ""
+                if is_admin:
+                    role_badge = " 🔴 **Admin**"
+                elif is_collaborator:
+                    role_badge = " 🟢 **Collaborator**"
+                elif is_pr_owner:
+                    role_badge = " 🟠 **PR Owner**"
+                
                 # Format comment with prominent user attribution
-                comment_body = f"""## {emoji} Challenge Submitted by @{username}
+                comment_body = f"""## {emoji} Challenge Submitted by @{username}{role_badge}
 
-> **👤 Submitted by: @{username}**  
+> **👤 Submitted by: @{username}{role_badge}**  
 > This challenge was submitted by the user above through the RADAR system.
 
 **Issue**: `{issue_hash}`  
