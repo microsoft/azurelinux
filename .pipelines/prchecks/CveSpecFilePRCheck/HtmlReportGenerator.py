@@ -54,15 +54,15 @@ class HtmlReportGenerator:
         severity_color = self.get_severity_color(analysis_result.overall_severity)
         
         html = f"""
-<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; border-radius: 6px; border: 1px solid #30363d;">
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg-card); color: var(--text-primary); padding: 20px; border-radius: 12px; border: 1px solid var(--border-primary); box-shadow: var(--shadow-lg);">
     <div style="text-align: center; margin-bottom: 20px;">
         <h1 style="color: {severity_color}; margin: 0; font-size: 2em; line-height: 1.2;">
             Code Review Analysis Report
         </h1>
-        <p style="color: #8b949e; margin: 10px 0 5px 0; font-size: 13px; font-style: italic;">
+        <p style="color: var(--text-secondary); margin: 10px 0 5px 0; font-size: 13px; font-style: italic;">
             Realtime Anti-pattern Detection with AI Reasoning
         </p>
-        <p style="color: #8b949e; margin: 5px 0; font-size: 12px;">
+        <p style="color: var(--text-tertiary); margin: 5px 0; font-size: 12px;">
             Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
         </p>
     </div>
@@ -264,7 +264,7 @@ class HtmlReportGenerator:
                                 <span class="issue-text">{escaped_desc}</span>
                                 <button class="challenge-btn" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-spec="{spec_path}" data-issue-type="{issue_type}" data-description="{escaped_desc}">
                                     <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-                                        <path d="M2.5 3.5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0-1h-11zm2-2a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7zM0 13a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 16 13V6a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 0 6v7zm1.5.5A.5.5 0 0 1 1 13V6a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13z"/>
+                                        <path d="M2.5 3.5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm2-2a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7zM0 13a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 16 13V6a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 0 6v7zm1.5.5A.5.5 0 0 1 1 13V6a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13z"/>
                                     </svg>
                                     Challenge
                                 </button>
@@ -300,16 +300,16 @@ class HtmlReportGenerator:
             return ""
         
         html = """
-            <details open style="background: #0d1117; border: 1px solid #30363d; border-radius: 6px; margin: 10px 0; padding: 10px;">
-                <summary style="cursor: pointer; font-weight: bold; color: #3fb950; user-select: none;">
+            <details open style="background: var(--bg-tertiary); border: 1px solid var(--border-primary); border-radius: 6px; margin: 10px 0; padding: 10px;">
+                <summary style="cursor: pointer; font-weight: bold; color: var(--accent-green); user-select: none;">
                     ✅ Recommended Actions
                 </summary>
                 <ul style="margin: 10px 0; padding-left: 20px; list-style-type: none;">
 """
         for rec in recommendations:
             html += f"""
-                    <li style="color: #c9d1d9; margin: 5px 0; font-size: 13px;">
-                        <span style="color: #3fb950;">▸</span> {rec}
+                    <li style="color: var(--text-primary); margin: 5px 0; font-size: 13px;">
+                        <span style="color: var(--accent-green);">▸</span> {rec}
                     </li>
 """
         html += """
@@ -335,6 +335,58 @@ class HtmlReportGenerator:
         # Generate cache-busting timestamp
         cache_buster = datetime.now().strftime('%Y%m%d%H%M%S')
         
+        # SVG for humanoid robot logo
+        robot_svg = """<svg class="radar-robot" width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="robot-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
+                </linearGradient>
+                <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+            </defs>
+            <!-- Robot Head -->
+            <rect x="25" y="20" width="50" height="40" rx="8" fill="url(#robot-gradient)" stroke="#333" stroke-width="2"/>
+            <!-- Antenna -->
+            <line x1="50" y1="20" x2="50" y2="10" stroke="#333" stroke-width="2"/>
+            <circle cx="50" cy="10" r="4" fill="#FFD700" stroke="#333" stroke-width="1.5"/>
+            <!-- Eyes -->
+            <circle cx="38" cy="35" r="6" fill="#333" filter="url(#glow)"/>
+            <circle cx="62" cy="35" r="6" fill="#333" filter="url(#glow)"/>
+            <circle cx="38" cy="35" r="3" fill="#4a9eff"/>
+            <circle cx="62" cy="35" r="3" fill="#4a9eff"/>
+            <!-- Mouth/Display -->
+            <rect x="35" y="46" width="30" height="8" rx="2" fill="#333"/>
+            <rect x="38" y="48" width="4" height="4" fill="#4a9eff" opacity="0.8">
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite"/>
+            </rect>
+            <rect x="44" y="48" width="4" height="4" fill="#4a9eff" opacity="0.8">
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+            </rect>
+            <rect x="50" y="48" width="4" height="4" fill="#4a9eff" opacity="0.8">
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" begin="1s" repeatCount="indefinite"/>
+            </rect>
+            <rect x="56" y="48" width="4" height="4" fill="#4a9eff" opacity="0.8">
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" begin="1.5s" repeatCount="indefinite"/>
+            </rect>
+            <!-- Body -->
+            <rect x="30" y="60" width="40" height="25" rx="4" fill="url(#robot-gradient)" stroke="#333" stroke-width="2"/>
+            <!-- Radar Waves -->
+            <circle cx="50" cy="35" r="15" fill="none" stroke="#4a9eff" stroke-width="1" opacity="0">
+                <animate attributeName="r" values="15;25;35" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.6;0.3;0" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="50" cy="35" r="15" fill="none" stroke="#4a9eff" stroke-width="1" opacity="0">
+                <animate attributeName="r" values="15;25;35" dur="2s" begin="0.7s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.6;0.3;0" dur="2s" begin="0.7s" repeatCount="indefinite"/>
+            </circle>
+        </svg>"""
+        
         return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -356,7 +408,8 @@ class HtmlReportGenerator:
     <div id="top-bar">
         <div id="top-bar-left">
             <div id="top-bar-logo">
-                <span class="radar-title">RADAR</span>
+                {robot_svg}
+                <span class="radar-title" data-tooltip="Realtime Anti-pattern Detection with AI Reasoning">RADAR</span>
             </div>
             <div style="font-size: 10px; color: var(--text-tertiary); margin-left: 12px; font-family: monospace;">
                 v{cache_buster}
@@ -455,91 +508,97 @@ class HtmlReportGenerator:
     
     def _get_css_styles(self) -> str:
         """Get all CSS styles for the HTML page."""
-        # This would contain the full CSS - for now, returning a placeholder
-        # In production, you'd import this from a separate file or template
         return """        /* CSS VARIABLES - THEME SYSTEM */
         :root {
-            /* Modern Dark Theme (Default) - Deep Black Shades */
-            --bg-primary: #000000;
-            --bg-secondary: #0a0a0a;
-            --bg-tertiary: #0f0f0f;
-            --bg-card: #171717;
-            --bg-card-hover: #1f1f1f;
-            --bg-hover: rgba(31, 31, 31, 0.8);
+            /* Modern Dark Theme (Default) - Enhanced */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --bg-card: #161616;
+            --bg-card-hover: #202020;
+            --bg-hover: rgba(255, 255, 255, 0.05);
+            --bg-modal-overlay: rgba(0, 0, 0, 0.85);
             
-            --border-primary: #262626;
+            --border-primary: #2a2a2a;
             --border-secondary: #333333;
             --border-accent: #404040;
             
-            --text-primary: #e5e5e5;
-            --text-secondary: #a3a3a3;
-            --text-tertiary: #737373;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0b0;
+            --text-tertiary: #808080;
             
-            --accent-blue: #3b82f6;
+            --accent-blue: #4a9eff;
             --accent-blue-dark: #2563eb;
             --accent-blue-light: #60a5fa;
-            --accent-blue-bg: #1e3a8a;
+            --accent-blue-bg: rgba(74, 158, 255, 0.1);
             
-            --accent-green: #10b981;
-            --accent-green-bg: #064e3b;
+            --accent-green: #22c55e;
+            --accent-green-bg: rgba(34, 197, 94, 0.1);
             
-            --accent-orange: #f59e0b;
-            --accent-orange-bg: #78350f;
+            --accent-orange: #ff9500;
+            --accent-orange-bg: rgba(255, 149, 0, 0.1);
             
-            --accent-red: #ef4444;
-            --accent-red-bg: #7f1d1d;
+            --accent-red: #ff453a;
+            --accent-red-bg: rgba(255, 69, 58, 0.1);
             
-            --accent-purple: #8b5cf6;
-            --accent-purple-bg: #4c1d95;
+            --accent-purple: #af52de;
+            --accent-purple-bg: rgba(175, 82, 222, 0.1);
             
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+            --accent-gold: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            
+            --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.8);
+            --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.8), 0 2px 4px -1px rgba(0, 0, 0, 0.6);
+            --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.8), 0 4px 10px -2px rgba(0, 0, 0, 0.6);
+            --shadow-xl: 0 20px 40px -5px rgba(0, 0, 0, 0.9), 0 10px 20px -5px rgba(0, 0, 0, 0.7);
+            --shadow-glow: 0 0 20px rgba(74, 158, 255, 0.3);
         }
         
-        /* Light Theme Override */
+        /* Professional Light Theme */
         [data-theme="light"] {
-            --bg-primary: #f0f4f8;
-            --bg-secondary: #e7f3ff;
-            --bg-tertiary: #d6e9f8;
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f3f4f6;
             --bg-card: #ffffff;
-            --bg-card-hover: #f7fbff;
-            --bg-hover: rgba(231, 243, 255, 0.9);
+            --bg-card-hover: #f9fafb;
+            --bg-hover: rgba(0, 0, 0, 0.02);
+            --bg-modal-overlay: rgba(0, 0, 0, 0.5);
             
-            --border-primary: #b8d4ed;
-            --border-secondary: #93b8d6;
-            --border-accent: #6b9dc4;
+            --border-primary: #e5e7eb;
+            --border-secondary: #d1d5db;
+            --border-accent: #9ca3af;
             
-            --text-primary: #1a2332;
-            --text-secondary: #3d5266;
-            --text-tertiary: #5f7589;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-tertiary: #6b7280;
             
-            --accent-blue: #1e73be;
-            --accent-blue-dark: #155a8a;
-            --accent-blue-light: #2e8ed9;
-            --accent-blue-bg: #cfe5f7;
+            --accent-blue: #2563eb;
+            --accent-blue-dark: #1e40af;
+            --accent-blue-light: #3b82f6;
+            --accent-blue-bg: rgba(37, 99, 235, 0.08);
             
-            --accent-green: #16a34a;
-            --accent-green-bg: #bbf7d0;
+            --accent-green: #059669;
+            --accent-green-bg: rgba(5, 150, 105, 0.08);
             
             --accent-orange: #ea580c;
-            --accent-orange-bg: #fed7aa;
+            --accent-orange-bg: rgba(234, 88, 12, 0.08);
             
             --accent-red: #dc2626;
-            --accent-red-bg: #fecaca;
+            --accent-red-bg: rgba(220, 38, 38, 0.08);
             
             --accent-purple: #7c3aed;
-            --accent-purple-bg: #ddd6fe;
+            --accent-purple-bg: rgba(124, 58, 237, 0.08);
             
-            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            --accent-gold: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.15);
         }
         
         * {
-            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+            box-sizing: border-box;
         }
         
         body {
@@ -550,6 +609,12 @@ class HtmlReportGenerator:
             color: var(--text-primary);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
             min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        /* Smooth transitions for theme switching */
+        body * {
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
         
         /* Top Bar Styles */
@@ -566,7 +631,13 @@ class HtmlReportGenerator:
             justify-content: space-between;
             padding: 0 24px;
             z-index: 1000;
-            box-shadow: var(--shadow-sm);
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(10px);
+            background: rgba(22, 22, 22, 0.95);
+        }
+        
+        [data-theme="light"] #top-bar {
+            background: rgba(255, 255, 255, 0.95);
         }
         
         #top-bar-left {
@@ -581,7 +652,17 @@ class HtmlReportGenerator:
             color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+        }
+        
+        /* Robot SVG Styles */
+        .radar-robot {
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+            transition: transform 0.3s ease;
+        }
+        
+        #top-bar-logo:hover .radar-robot {
+            transform: scale(1.1) rotate(5deg);
         }
         
         #top-bar-right {
@@ -609,6 +690,7 @@ class HtmlReportGenerator:
             border-color: var(--accent-blue);
             color: var(--text-primary);
             transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
         
         #theme-icon {
@@ -633,10 +715,18 @@ class HtmlReportGenerator:
             background: var(--bg-hover);
             border-color: var(--accent-blue);
             transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
         
         #top-bell-container .bell-icon {
             font-size: 20px;
+            animation: bell-ring 2s ease-in-out infinite;
+        }
+        
+        @keyframes bell-ring {
+            0%, 100% { transform: rotate(0); }
+            10%, 30% { transform: rotate(-10deg); }
+            20%, 40% { transform: rotate(10deg); }
         }
         
         #top-bell-badge {
@@ -678,6 +768,7 @@ class HtmlReportGenerator:
         #sign-in-btn:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-lg);
+            filter: brightness(1.1);
         }
         
         #user-menu-container {
@@ -747,10 +838,10 @@ class HtmlReportGenerator:
             position: absolute;
             top: calc(100% + 8px);
             right: 0;
-            background: var(--bg-tertiary);
+            background: var(--bg-card);
             border: 1px solid var(--border-primary);
             border-radius: 8px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            box-shadow: var(--shadow-xl);
             min-width: 180px;
             z-index: 1001;
             overflow: hidden;
@@ -758,6 +849,18 @@ class HtmlReportGenerator:
         
         .dropdown-menu.show {
             display: block;
+            animation: slideDown 0.2s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .dropdown-item {
@@ -777,19 +880,33 @@ class HtmlReportGenerator:
         }
         
         .dropdown-item:hover {
-            background: var(--bg-card-hover);
+            background: var(--bg-hover);
         }
         
         .dropdown-item svg {
             flex-shrink: 0;
         }
         
-        #user-menu-container {
-            position: relative;
-        }
-        
         #sign-out-btn:hover {
             color: var(--accent-red);
+        }
+        
+        /* Main Container */
+        #main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         /* PR Info Card */
@@ -799,6 +916,13 @@ class HtmlReportGenerator:
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+        
+        .pr-info-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
         }
         
         .pr-info-header {
@@ -842,67 +966,95 @@ class HtmlReportGenerator:
         .pr-number-badge {
             background: var(--accent-blue-bg);
             color: var(--accent-blue);
-            padding: 2px 8px;
-            border-radius: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
             font-weight: 600;
+            display: inline-block;
+            border: 1px solid var(--accent-blue);
         }
         
         .author-badge {
             background: var(--accent-purple-bg);
             color: var(--accent-purple);
-            padding: 2px 8px;
-            border-radius: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
             font-weight: 600;
+            display: inline-block;
+            border: 1px solid var(--accent-purple);
         }
         
         .branch-badge {
             background: var(--accent-green-bg);
             color: var(--accent-green);
-            padding: 2px 8px;
-            border-radius: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
             font-weight: 600;
-            font-family: 'Courier New', monospace;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
             font-size: 12px;
+            display: inline-block;
+            border: 1px solid var(--accent-green);
         }
         
         .commit-badge {
             background: var(--bg-tertiary);
             color: var(--text-secondary);
-            padding: 2px 8px;
+            padding: 4px 10px;
             border-radius: 6px;
-            font-family: 'Courier New', monospace;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
             font-size: 12px;
+            display: inline-block;
+            border: 1px solid var(--border-primary);
         }
         
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
             margin-bottom: 24px;
         }
         
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border-primary);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 16px;
+            padding: 24px;
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--stat-color, var(--accent-blue));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover::before {
+            transform: scaleX(1);
         }
         
         .stat-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(88, 166, 255, 0.1);
-            border-color: rgba(88, 166, 255, 0.3);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--stat-color, var(--accent-blue));
         }
         
         .stat-card.filter-active {
-            background: rgba(88, 166, 255, 0.15);
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.3);
+            background: var(--stat-color, var(--accent-blue));
+            background: linear-gradient(135deg, var(--stat-color, var(--accent-blue)), transparent);
+            border-color: var(--stat-color, var(--accent-blue));
+            box-shadow: 0 0 20px rgba(74, 158, 255, 0.3);
             transform: scale(1.05);
         }
         
@@ -911,36 +1063,37 @@ class HtmlReportGenerator:
         }
         
         .issue-item.filtered-out {
-            opacity: 0.3;
-            filter: blur(1px);
+            opacity: 0.2;
+            filter: blur(2px);
             pointer-events: none;
+            transform: scale(0.95);
         }
         
         .issue-item.filtered-in {
             animation: highlightIssue 0.5s ease-out;
-            border-left-color: rgba(88, 166, 255, 0.8) !important;
-            background: rgba(88, 166, 255, 0.1);
+            border-left-color: var(--accent-blue) !important;
+            background: linear-gradient(90deg, var(--accent-blue-bg), transparent);
         }
         
         @keyframes highlightIssue {
             0% {
-                background: rgba(88, 166, 255, 0.3);
-                transform: translateX(10px);
+                background: var(--accent-blue-bg);
+                transform: translateX(20px);
             }
             100% {
-                background: rgba(88, 166, 255, 0.1);
+                background: linear-gradient(90deg, var(--accent-blue-bg), transparent);
                 transform: translateX(0);
             }
         }
         
         .stat-icon {
             font-size: 36px;
-            width: 56px;
-            height: 56px;
+            width: 64px;
+            height: 64px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 12px;
+            border-radius: 16px;
             background: var(--stat-color, var(--accent-blue-bg));
         }
         
@@ -965,11 +1118,15 @@ class HtmlReportGenerator:
         }
         
         .stat-value {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1;
             margin-bottom: 4px;
+            background: var(--accent-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .stat-label {
@@ -977,6 +1134,7 @@ class HtmlReportGenerator:
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-weight: 600;
         }
         
         /* Bell Icon in Stats */
@@ -1001,42 +1159,45 @@ class HtmlReportGenerator:
             border-radius: 10px;
             min-width: 20px;
             text-align: center;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
         
         /* Spec Cards */
         .spec-card {
-            background: rgba(23, 23, 23, 0.6);
+            background: var(--bg-card);
             border: 1px solid var(--border-primary);
             border-radius: 12px;
             margin-bottom: 16px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
         }
         
         .spec-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(88, 166, 255, 0.1);
-            border-color: rgba(88, 166, 255, 0.3);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent-blue);
         }
         
         .spec-card summary {
             cursor: pointer;
-            padding: 16px 20px;
+            padding: 20px;
             font-weight: 600;
             font-size: 16px;
             user-select: none;
-            background: rgba(88, 166, 255, 0.08);
-            border: 1px solid rgba(88, 166, 255, 0.2);
-            border-radius: 8px;
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-tertiary));
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
         }
         
         .spec-card summary:hover {
-            background: rgba(88, 166, 255, 0.15);
-            border-color: rgba(88, 166, 255, 0.3);
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-card));
         }
         
         .spec-card summary::marker {
@@ -1048,34 +1209,44 @@ class HtmlReportGenerator:
             font-size: 12px;
             transition: transform 0.2s ease;
             color: var(--accent-blue);
+            display: inline-block;
         }
         
         .spec-card[open] summary::before {
             transform: rotate(90deg);
         }
         
+        .spec-summary {
+            color: var(--text-secondary);
+            font-weight: normal;
+            font-size: 14px;
+            margin-left: auto;
+        }
+        
         .spec-card-content {
             padding: 0 20px 20px 20px;
-            background: rgba(13, 13, 13, 0.4);
+            background: var(--bg-secondary);
         }
         
         .spec-file-badge {
             background: var(--bg-tertiary);
             color: var(--text-secondary);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
             font-size: 12px;
+            display: inline-block;
+            border: 1px solid var(--border-primary);
         }
         
         /* Anti-pattern Details */
         .antipattern-details {
-            background: var(--bg-secondary);
+            background: var(--bg-card);
             border: 1px solid var(--border-primary);
             border-left: 3px solid var(--accent-purple);
             border-radius: 10px;
-            margin: 10px 0;
-            padding: 10px;
+            margin: 16px 0;
+            padding: 12px;
         }
         
         .antipattern-details summary {
@@ -1083,21 +1254,19 @@ class HtmlReportGenerator:
             font-weight: bold;
             color: var(--text-primary);
             user-select: none;
-            padding: 10px 12px;
-            border-radius: 6px;
-            background: var(--accent-purple-bg);
+            padding: 12px 16px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent-purple-bg), transparent);
             border: 1px solid var(--accent-purple);
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
         
         .antipattern-details summary:hover {
             background: var(--accent-purple-bg);
-            border-color: var(--accent-purple);
-            transform: translateX(2px);
-            filter: brightness(1.1);
+            transform: translateX(4px);
         }
         
         .antipattern-details summary::marker {
@@ -1109,6 +1278,7 @@ class HtmlReportGenerator:
             font-size: 10px;
             transition: transform 0.2s ease;
             color: var(--accent-purple);
+            display: inline-block;
         }
         
         .antipattern-details[open] summary::before {
@@ -1138,12 +1308,13 @@ class HtmlReportGenerator:
         }
         
         .issue-count-badge {
-            background: rgba(163, 113, 247, 0.15);
+            background: var(--accent-purple-bg);
             color: var(--accent-purple);
-            padding: 2px 8px;
-            border-radius: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
+            border: 1px solid var(--accent-purple);
         }
         
         /* Issue List Items */
@@ -1154,12 +1325,12 @@ class HtmlReportGenerator:
         }
         
         .issue-item {
-            background: transparent;
-            border: 1px solid transparent;
-            border-left: 2px solid transparent;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-left: 3px solid var(--accent-blue);
             border-radius: 8px;
-            padding: 12px;
-            margin: 8px 0;
+            padding: 16px;
+            margin: 12px 0;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
@@ -1168,10 +1339,10 @@ class HtmlReportGenerator:
         }
         
         .issue-item:hover {
-            background: var(--bg-hover);
-            border-left-color: rgba(88, 166, 255, 0.6);
+            background: var(--bg-card-hover);
+            border-left-width: 5px;
             transform: translateX(4px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow-md);
         }
         
         .issue-item::before {
@@ -1182,31 +1353,33 @@ class HtmlReportGenerator:
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 6px 12px;
+            border-radius: 6px;
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             white-space: nowrap;
             flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
         }
         
         .issue-text {
             flex: 1;
             color: var(--text-primary);
             font-size: 14px;
-            line-height: 1.5;
+            line-height: 1.6;
         }
         
         .challenge-btn {
-            background: var(--bg-tertiary);
+            background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-card));
             border: 1px solid var(--border-primary);
             color: var(--text-secondary);
-            padding: 6px 12px;
-            border-radius: 6px;
+            padding: 8px 14px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 12px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -1215,9 +1388,11 @@ class HtmlReportGenerator:
         }
         
         .challenge-btn:hover {
-            background: var(--accent-blue-bg);
+            background: linear-gradient(135deg, var(--accent-blue-bg), var(--accent-blue));
             border-color: var(--accent-blue);
-            color: var(--accent-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
         
         .challenge-btn svg {
@@ -1225,17 +1400,26 @@ class HtmlReportGenerator:
             height: 14px;
         }
         
+        .challenge-btn.challenged {
+            background: var(--accent-green-bg);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            cursor: not-allowed;
+        }
+        
         .challenge-details {
             display: none;
             margin-top: 12px;
             padding: 12px;
-            background: var(--bg-tertiary);
+            background: var(--bg-secondary);
             border: 1px solid var(--border-primary);
-            border-radius: 6px;
+            border-radius: 8px;
+            box-shadow: inset var(--shadow-sm);
         }
         
         .challenge-details.visible {
             display: block;
+            animation: slideDown 0.3s ease;
         }
         
         .challenge-details-grid {
@@ -1268,32 +1452,48 @@ class HtmlReportGenerator:
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: var(--bg-modal-overlay);
             z-index: 2000;
             align-items: center;
             justify-content: center;
+            backdrop-filter: blur(5px);
         }
         
         .modal.visible {
             display: flex;
+            animation: fadeIn 0.2s ease;
         }
         
         .modal-content {
             background: var(--bg-card);
             border: 1px solid var(--border-primary);
-            border-radius: 12px;
+            border-radius: 16px;
             max-width: 600px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px;
+            padding: 24px;
             border-bottom: 1px solid var(--border-primary);
+            background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-card));
         }
         
         .modal-header h2 {
@@ -1309,31 +1509,34 @@ class HtmlReportGenerator:
             color: var(--text-secondary);
             cursor: pointer;
             padding: 0;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 6px;
+            border-radius: 8px;
             transition: all 0.2s ease;
         }
         
         .modal-close:hover {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
+            background: var(--bg-hover);
+            color: var(--accent-red);
+            transform: rotate(90deg);
         }
         
         .modal-body {
-            padding: 20px;
+            padding: 24px;
         }
         
         #modal-finding-text {
             background: var(--bg-tertiary);
-            padding: 12px;
-            border-radius: 6px;
+            padding: 16px;
+            border-radius: 8px;
             border-left: 3px solid var(--accent-blue);
             margin-bottom: 20px;
             color: var(--text-primary);
+            font-size: 14px;
+            line-height: 1.6;
         }
         
         #challenge-options {
@@ -1346,62 +1549,68 @@ class HtmlReportGenerator:
             background: var(--bg-tertiary);
             border: 2px solid var(--border-primary);
             color: var(--text-primary);
-            padding: 12px 16px;
-            border-radius: 8px;
+            padding: 14px 18px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             transition: all 0.2s ease;
         }
         
         .challenge-option:hover {
             border-color: var(--accent-blue);
             background: var(--bg-card-hover);
+            transform: translateX(4px);
         }
         
         .challenge-option.selected {
             background: var(--accent-blue-bg);
             border-color: var(--accent-blue);
             color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
         }
         
         #challenge-feedback {
             width: 100%;
-            min-height: 100px;
+            min-height: 120px;
             background: var(--bg-tertiary);
             border: 1px solid var(--border-primary);
             color: var(--text-primary);
-            padding: 12px;
-            border-radius: 6px;
+            padding: 14px;
+            border-radius: 8px;
             font-size: 14px;
             font-family: inherit;
             resize: vertical;
             margin-bottom: 16px;
+            transition: all 0.2s ease;
         }
         
         #challenge-feedback:focus {
             outline: none;
             border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
         }
         
         #submit-challenge-btn {
-            background: var(--accent-blue);
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-blue-dark));
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 14px 28px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
             width: 100%;
             transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
-        #submit-challenge-btn:hover {
-            background: var(--accent-blue-dark);
+        #submit-challenge-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, var(--accent-blue-light), var(--accent-blue));
             transform: translateY(-2px);
             box-shadow: var(--shadow-lg);
         }
@@ -1409,17 +1618,17 @@ class HtmlReportGenerator:
         #submit-challenge-btn:disabled {
             background: var(--bg-tertiary);
             color: var(--text-tertiary);
-            cursor: not-started;
+            cursor: not-allowed;
             transform: none;
         }
         
-        /* RADAR BRANDING STYLES */
+        /* RADAR Branding */
         .radar-title {
             font-weight: 900;
             font-style: italic;
             font-size: 1.5em;
             letter-spacing: 0.05em;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            background: var(--accent-gold);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -1427,6 +1636,7 @@ class HtmlReportGenerator:
             cursor: help;
             display: inline-block;
             transition: all 0.3s ease;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         
         .radar-title:hover {
@@ -1438,12 +1648,12 @@ class HtmlReportGenerator:
             content: attr(data-tooltip);
             position: absolute;
             top: 100%;
-            left: 0;
-            transform: translateY(8px);
-            background: #1a1a1a;
-            color: #FFD700;
-            padding: 8px 16px;
-            border-radius: 6px;
+            left: 50%;
+            transform: translateX(-50%) translateY(8px);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 10px 16px;
+            border-radius: 8px;
             font-size: 0.7em;
             font-weight: 600;
             font-style: normal;
@@ -1452,15 +1662,59 @@ class HtmlReportGenerator:
             max-width: 300px;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            border: 1px solid #FFD700;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--accent-gold);
             z-index: 10000;
         }
         
         .radar-title:hover::after {
             opacity: 1;
-            transform: translateY(12px);
+            transform: translateX(-50%) translateY(12px);
+        }
+        
+        /* Smooth scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-accent);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-blue);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pr-info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            #top-bar {
+                padding: 0 12px;
+            }
+            
+            .radar-title {
+                font-size: 1.2em;
+            }
+            
+            .radar-robot {
+                width: 24px;
+                height: 24px;
+            }
         }"""
     
     def _get_javascript(self, pr_number: int) -> str:
@@ -1636,23 +1890,22 @@ class HtmlReportGenerator:
         function setTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
-            // Show icon/text for the mode you can switch TO
+            // Update button to show what mode you can switch TO
             if (theme === 'dark') {
-                // Currently dark, show sun to switch to light
                 themeIcon.textContent = '☀️';
                 themeText.textContent = 'Light';
             } else {
-                // Currently light, show moon to switch to dark
                 themeIcon.textContent = '🌙';
                 themeText.textContent = 'Dark';
             }
         }
         
+        // Load saved theme or default to dark
         const savedTheme = localStorage.getItem('theme') || 'dark';
         setTheme(savedTheme);
         
         themeToggle.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
             setTheme(currentTheme === 'dark' ? 'light' : 'dark');
         });
         
@@ -1870,9 +2123,15 @@ class HtmlReportGenerator:
         
         // Bell notification update
         function updateCounters() {
-            const totalIssues = document.getElementById('total-issues-count').textContent;
-            document.getElementById('issues-badge').textContent = totalIssues;
-            document.getElementById('top-bell-badge').textContent = totalIssues;
+            const totalIssuesEl = document.getElementById('total-issues-count');
+            const topBellBadge = document.getElementById('top-bell-badge');
+            const issuesBadge = document.getElementById('issues-badge');
+            
+            if (totalIssuesEl) {
+                const totalIssues = totalIssuesEl.textContent;
+                if (issuesBadge) issuesBadge.textContent = totalIssues;
+                if (topBellBadge) topBellBadge.textContent = totalIssues;
+            }
         }
         
         updateCounters();
@@ -1933,6 +2192,37 @@ class HtmlReportGenerator:
         document.getElementById('challenge-modal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeChallengeModal();
+            }
+        });
+        
+        // Add smooth scroll behavior for all internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Add keyboard shortcut support
+        document.addEventListener('keydown', function(e) {
+            // Escape to close modal
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('challenge-modal');
+                if (modal && modal.classList.contains('visible')) {
+                    closeChallengeModal();
+                }
+            }
+            
+            // Ctrl/Cmd + K to toggle theme
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                themeToggle.click();
             }
         });
         
