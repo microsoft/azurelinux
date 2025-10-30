@@ -1437,10 +1437,10 @@ class HtmlReportGenerator:
             content: attr(data-tooltip);
             position: absolute;
             bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%) translateY(-8px);
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: #000;
+            left: 0;
+            transform: translateY(-8px);
+            background: #1a1a1a;
+            color: #FFD700;
             padding: 8px 16px;
             border-radius: 6px;
             font-size: 0.7em;
@@ -1448,15 +1448,18 @@ class HtmlReportGenerator:
             font-style: normal;
             letter-spacing: normal;
             white-space: nowrap;
+            max-width: 300px;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease, transform 0.3s ease;
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #FFD700;
+            z-index: 10000;
         }
         
         .radar-title:hover::after {
             opacity: 1;
-            transform: translateX(-50%) translateY(-12px);
+            transform: translateY(-12px);
         }"""
     
     def _get_javascript(self, pr_number: int) -> str:

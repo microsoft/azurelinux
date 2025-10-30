@@ -613,11 +613,11 @@ class ResultAnalyzer:
         
         # Header with emoji and severity
         if analysis_result.overall_severity >= Severity.ERROR:
-            report_lines.append(f"# {severity_emoji} CVE Spec File Check - **FAILED**")
+            report_lines.append(f"# {severity_emoji} RADAR PR Check - **FAILED**")
         elif analysis_result.overall_severity == Severity.WARNING:
-            report_lines.append(f"# {severity_emoji} CVE Spec File Check - **PASSED WITH WARNINGS**")
+            report_lines.append(f"# {severity_emoji} RADAR PR Check - **PASSED WITH WARNINGS**")
         else:
-            report_lines.append(f"# {severity_emoji} CVE Spec File Check - **PASSED**")
+            report_lines.append(f"# {severity_emoji} RADAR PR Check - **PASSED**")
         
         report_lines.append("")
         report_lines.append(f"**Overall Severity:** {severity_emoji} **{severity_name}**")
@@ -802,7 +802,7 @@ class ResultAnalyzer:
         
         # Footer
         report_lines.append("---")
-        report_lines.append("*🤖 Automated CVE Spec File Check | Azure Linux PR Pipeline*")
+        report_lines.append("*🤖 RADAR Code Review PR Check*")
         
         return '\n'.join(report_lines)
 
