@@ -60,7 +60,7 @@ class HtmlReportGenerator:
             Code Review Analysis Report
         </h1>
         <p style="color: var(--text-secondary); margin: 10px 0 5px 0; font-size: 13px; font-style: italic;">
-            Realtime Anti-pattern Detection with AI Reasoning
+            By RADAR | Realtime Anti-pattern Detection with AI Reasoning
         </p>
         <p style="color: var(--text-tertiary); margin: 5px 0; font-size: 12px;">
             Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
@@ -366,20 +366,11 @@ class HtmlReportGenerator:
     <div id="top-bar">
         <div id="top-bar-left">
             <div id="top-bar-logo">
-                <!-- OPTION 1: Humanoid as Background -->
-                <div class="radar-humanoid-container">
-                    <div class="radar-humanoid-bg"></div>
+                <!-- Clean design with radar icon -->
+                <div class="radar-logo-clean">
+                    <img src=".pipelines/prchecks/CveSpecFilePRCheck/assets/radar.png" alt="RADAR" class="radar-icon-img" />
                     <span class="radar-title" data-tooltip="Realtime Anti-pattern Detection with AI Reasoning">RADAR</span>
                 </div>
-                
-                <!-- OPTION 2: Humanoid as Separate Icon (uncomment to use)
-                <div class="radar-logo-group">
-                    <div class="humanoid-icon-wrapper">
-                        <img src="{humanoid_image_data}" alt="RADAR" class="humanoid-icon" />
-                    </div>
-                    <span class="radar-title" data-tooltip="Realtime Anti-pattern Detection with AI Reasoning">RADAR</span>
-                </div>
-                -->
             </div>
             <div style="font-size: 10px; color: var(--text-tertiary); margin-left: 12px; font-family: monospace;">
                 v{cache_buster}
@@ -618,27 +609,24 @@ class HtmlReportGenerator:
             font-weight: 900 !important;
             letter-spacing: 0.02em !important;
             text-transform: uppercase;
-            /* Green matrix color in dark mode */
-            color: #00ff41;
-            text-shadow: 0 0 10px rgba(0, 255, 65, 0.8), 0 0 20px rgba(0, 255, 65, 0.4);
-            animation: matrix-glow 2s ease-in-out infinite alternate;
+            /* Blue matrix color for both themes */
+            color: #4a9eff;
+            text-shadow: 0 0 8px rgba(74, 158, 255, 0.6), 0 0 16px rgba(74, 158, 255, 0.3);
+            animation: matrix-glow 3s ease-in-out infinite alternate;
         }
         
-        /* Light theme - use blue/purple gradient */
+        /* Light theme - slightly darker blue */
         [data-theme="light"] .matrix-title {
-            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: none;
+            color: #2563eb;
+            text-shadow: 0 0 8px rgba(37, 99, 235, 0.4), 0 0 16px rgba(37, 99, 235, 0.2);
         }
         
         @keyframes matrix-glow {
             from {
-                filter: drop-shadow(0 0 10px rgba(0, 255, 65, 0.5));
+                filter: drop-shadow(0 0 8px rgba(74, 158, 255, 0.4));
             }
             to {
-                filter: drop-shadow(0 0 20px rgba(0, 255, 65, 0.8));
+                filter: drop-shadow(0 0 16px rgba(74, 158, 255, 0.6));
             }
         }
         
@@ -672,7 +660,7 @@ class HtmlReportGenerator:
             letter-spacing: 0.05em !important;
         }
         
-        /* Humanoid Background Container - Enhanced */
+        /* Humanoid Background Container - Simplified */
         .radar-humanoid-container {
             position: relative;
             display: inline-flex;
@@ -683,16 +671,16 @@ class HtmlReportGenerator:
             min-height: 60px;
             border-radius: 12px;
             overflow: visible;
-            background: rgba(0, 20, 0, 0.5);
-            border: 1px solid rgba(0, 255, 65, 0.2);
+            background: rgba(74, 158, 255, 0.05);
+            border: 1px solid rgba(74, 158, 255, 0.2);
         }
         
         [data-theme="light"] .radar-humanoid-container {
-            background: rgba(99, 102, 241, 0.05);
-            border: 1px solid rgba(99, 102, 241, 0.2);
+            background: rgba(37, 99, 235, 0.05);
+            border: 1px solid rgba(37, 99, 235, 0.2);
         }
         
-        /* Option 1: Humanoid as large background behind RADAR */
+        /* Use actual image from assets */
         .radar-humanoid-bg {
             position: absolute;
             top: 50%;
@@ -700,53 +688,26 @@ class HtmlReportGenerator:
             transform: translate(-50%, -50%);
             width: 120px;
             height: 120px;
-            background-image: var(--humanoid-image);
+            background-image: url('/assets/radar.png');
             background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
-            opacity: 0.2;
+            opacity: 0.15;
             filter: var(--humanoid-filter);
             z-index: 0;
         }
         
-        /* Option 2: Humanoid as floating icon next to RADAR */
-        .radar-humanoid-icon {
-            position: absolute;
-            left: -60px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 50px;
-            height: 50px;
-            background-image: var(--humanoid-image);
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.7;
-            filter: var(--humanoid-filter);
+        /* Radar icon next to title */
+        .radar-icon-img {
+            width: 40px;
+            height: 40px;
+            margin-right: 12px;
+            opacity: 0.9;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
         }
         
-        /* Option 3: Humanoid as watermark in top bar */
-        #top-bar::before {
-            content: '';
-            position: absolute;
-            right: 50%;
-            top: 50%;
-            transform: translate(50%, -50%);
-            width: 200px;
-            height: 200px;
-            background-image: var(--humanoid-image);
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.05;
-            filter: var(--humanoid-filter);
-            pointer-events: none;
-            z-index: 0;
-        }
-        
-        .radar-humanoid-container:hover .radar-humanoid-bg {
-            opacity: 0.4;
-            animation: pulse-bg 2s ease-in-out infinite;
+        [data-theme="light"] .radar-icon-img {
+            filter: brightness(0.9) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
         }
         
         /* Top Bar Styles */
@@ -1868,7 +1829,14 @@ class HtmlReportGenerator:
             transform: none;
         }
         
-        /* RADAR Branding */
+        /* Clean RADAR logo design */
+        .radar-logo-clean {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+        
+        /* RADAR Branding - Simplified */
         .radar-title {
             font-weight: 900;
             font-style: italic;
@@ -1881,16 +1849,12 @@ class HtmlReportGenerator:
             position: relative;
             cursor: help;
             display: inline-block;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             z-index: 1;
         }
         
-        .radar-title:hover {
-            transform: scale(1.05);
-            filter: brightness(1.2);
-        }
-        
+        /* Simplified tooltip without hover animation */
         .radar-title::after {
             content: attr(data-tooltip);
             position: absolute;
@@ -1909,7 +1873,7 @@ class HtmlReportGenerator:
             max-width: 300px;
             opacity: 0;
             pointer-events: none;
-            transition: all 0.3s ease;
+            transition: opacity 0.3s ease;
             box-shadow: var(--shadow-xl);
             border: 1px solid var(--accent-gold);
             z-index: 10000;
@@ -1917,7 +1881,6 @@ class HtmlReportGenerator:
         
         .radar-title:hover::after {
             opacity: 1;
-            transform: translateX(-50%) translateY(12px);
         }
         
         /* Smooth scrollbar styling */
@@ -2385,6 +2348,13 @@ class HtmlReportGenerator:
         // Severity filtering functionality
         let activeSeverityFilter = null;
         
+        // Function to expand all spec cards
+        function expandAllSpecCards() {
+            document.querySelectorAll('.spec-card').forEach(card => {
+                card.setAttribute('open', '');
+            });
+        }
+        
         // Reset filter function
         function resetAllFilters() {
             activeSeverityFilter = null;
@@ -2427,6 +2397,9 @@ class HtmlReportGenerator:
                     // Apply new filter
                     activeSeverityFilter = severity;
                     
+                    // First, expand all spec cards to show the filtered issues
+                    expandAllSpecCards();
+                    
                     // Update active stat card
                     document.querySelectorAll('.filterable-stat').forEach(c => c.classList.remove('filter-active'));
                     this.classList.add('filter-active');
@@ -2454,7 +2427,7 @@ class HtmlReportGenerator:
                                 behavior: 'smooth', 
                                 block: 'center' 
                             });
-                        }, 100);
+                        }, 300); // Slight delay to let expansion happen first
                     }
                 }
             });
