@@ -54,9 +54,9 @@ class HtmlReportGenerator:
         severity_color = self.get_severity_color(analysis_result.overall_severity)
         
         html = f"""
-<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg-card); color: var(--text-primary); padding: 20px; border-radius: 12px; border: 1px solid var(--border-primary); box-shadow: var(--shadow-lg);">
+<div style="font-family: 'Orbitron', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-card); color: var(--text-primary); padding: 20px; border-radius: 12px; border: 1px solid var(--border-primary); box-shadow: var(--shadow-lg);">
     <div style="text-align: center; margin-bottom: 20px;">
-        <h1 style="color: {severity_color}; margin: 0; font-size: 2em; line-height: 1.2;">
+        <h1 class="matrix-title" style="color: {severity_color}; margin: 0; font-size: 2.5em; line-height: 1.2;">
             Code Review Analysis Report
         </h1>
         <p style="color: var(--text-secondary); margin: 10px 0 5px 0; font-size: 13px; font-style: italic;">
@@ -335,57 +335,9 @@ class HtmlReportGenerator:
         # Generate cache-busting timestamp
         cache_buster = datetime.now().strftime('%Y%m%d%H%M%S')
         
-        # SVG for humanoid robot logo
-        robot_svg = """<svg class="radar-robot" width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <linearGradient id="robot-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
-                </linearGradient>
-                <filter id="glow">
-                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                    <feMerge>
-                        <feMergeNode in="coloredBlur"/>
-                        <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                </filter>
-            </defs>
-            <!-- Robot Head -->
-            <rect x="25" y="20" width="50" height="40" rx="8" fill="url(#robot-gradient)" stroke="#333" stroke-width="2"/>
-            <!-- Antenna -->
-            <line x1="50" y1="20" x2="50" y2="10" stroke="#333" stroke-width="2"/>
-            <circle cx="50" cy="10" r="4" fill="#FFD700" stroke="#333" stroke-width="1.5"/>
-            <!-- Eyes -->
-            <circle cx="38" cy="35" r="6" fill="#333" filter="url(#glow)"/>
-            <circle cx="62" cy="35" r="6" fill="#333" filter="url(#glow)"/>
-            <circle cx="38" cy="35" r="3" fill="#4a9eff"/>
-            <circle cx="62" cy="35" r="3" fill="#4a9eff"/>
-            <!-- Mouth/Display -->
-            <rect x="35" y="46" width="30" height="8" rx="2" fill="#333"/>
-            <rect x="38" y="48" width="4" height="4" fill="#4a9eff" opacity="0.8">
-                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite"/>
-            </rect>
-            <rect x="44" y="48" width="4" height="4" fill="#4a9eff" opacity="0.8">
-                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" begin="0.5s" repeatCount="indefinite"/>
-            </rect>
-            <rect x="50" y="48" width="4" height="4" fill="#4a9eff" opacity="0.8">
-                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" begin="1s" repeatCount="indefinite"/>
-            </rect>
-            <rect x="56" y="48" width="4" height="4" fill="#4a9eff" opacity="0.8">
-                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" begin="1.5s" repeatCount="indefinite"/>
-            </rect>
-            <!-- Body -->
-            <rect x="30" y="60" width="40" height="25" rx="4" fill="url(#robot-gradient)" stroke="#333" stroke-width="2"/>
-            <!-- Radar Waves -->
-            <circle cx="50" cy="35" r="15" fill="none" stroke="#4a9eff" stroke-width="1" opacity="0">
-                <animate attributeName="r" values="15;25;35" dur="2s" repeatCount="indefinite"/>
-                <animate attributeName="opacity" values="0.6;0.3;0" dur="2s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="50" cy="35" r="15" fill="none" stroke="#4a9eff" stroke-width="1" opacity="0">
-                <animate attributeName="r" values="15;25;35" dur="2s" begin="0.7s" repeatCount="indefinite"/>
-                <animate attributeName="opacity" values="0.6;0.3;0" dur="2s" begin="0.7s" repeatCount="indefinite"/>
-            </circle>
-        </svg>"""
+        # NOTE: Replace this data URL with your actual humanoid image converted to base64
+        # You can use: https://www.base64-image.de/ to convert your image
+        humanoid_image_data = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
         
         return f"""<!DOCTYPE html>
 <html lang="en">
@@ -397,9 +349,15 @@ class HtmlReportGenerator:
     <meta http-equiv="Expires" content="0">
     <meta name="report-version" content="{cache_buster}">
     <title>CVE Spec File Check Report - PR #{pr_number}</title>
+    <!-- Matrix/Code Style Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <!-- Favicon to prevent 404 errors -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛡️%3C/text%3E%3C/svg%3E">
     <style>
+        /* Store humanoid image as CSS variable */
+        :root {{
+            --humanoid-image: url('{humanoid_image_data}');
+        }}
 {css}
     </style>
 </head>
@@ -408,10 +366,12 @@ class HtmlReportGenerator:
     <div id="top-bar">
         <div id="top-bar-left">
             <div id="top-bar-logo">
-                {robot_svg}
-                <span class="radar-title" data-tooltip="Realtime Anti-pattern Detection with AI Reasoning">RADAR</span>
+                <div class="radar-humanoid-container">
+                    <div class="radar-humanoid-bg"></div>
+                    <span class="radar-title" data-tooltip="Realtime Anti-pattern Detection with AI Reasoning">RADAR</span>
+                </div>
             </div>
-            <div style="font-size: 10px; color: var(--text-tertiary); margin-left: 12px; font-family: monospace;">
+            <div style="font-size: 10px; color: var(--text-tertiary); margin-left: 12px; font-family: 'Share Tech Mono', monospace;">
                 v{cache_buster}
             </div>
         </div>
@@ -551,50 +511,75 @@ class HtmlReportGenerator:
             --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.8), 0 4px 10px -2px rgba(0, 0, 0, 0.6);
             --shadow-xl: 0 20px 40px -5px rgba(0, 0, 0, 0.9), 0 10px 20px -5px rgba(0, 0, 0, 0.7);
             --shadow-glow: 0 0 20px rgba(74, 158, 255, 0.3);
+            
+            --humanoid-filter: brightness(1) contrast(1.2);
         }
         
-        /* Professional Light Theme */
+        /* Professional Light Theme with Blue/Purple Accents */
         [data-theme="light"] {
-            --bg-primary: #f8f9fa;
+            --bg-primary: #f5f7ff;
             --bg-secondary: #ffffff;
-            --bg-tertiary: #f3f4f6;
-            --bg-card: #ffffff;
-            --bg-card-hover: #f9fafb;
-            --bg-hover: rgba(0, 0, 0, 0.02);
+            --bg-tertiary: #e8ecff;
+            --bg-card: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+            --bg-card-hover: linear-gradient(135deg, #f8faff 0%, #e8ecff 100%);
+            --bg-hover: rgba(99, 102, 241, 0.05);
             --bg-modal-overlay: rgba(0, 0, 0, 0.5);
             
-            --border-primary: #e5e7eb;
-            --border-secondary: #d1d5db;
-            --border-accent: #9ca3af;
+            --border-primary: #d4d8ff;
+            --border-secondary: #c1c7ff;
+            --border-accent: #a5adff;
             
-            --text-primary: #111827;
-            --text-secondary: #4b5563;
-            --text-tertiary: #6b7280;
+            --text-primary: #1a1d3a;
+            --text-secondary: #4a5178;
+            --text-tertiary: #6b7299;
             
-            --accent-blue: #2563eb;
-            --accent-blue-dark: #1e40af;
-            --accent-blue-light: #3b82f6;
-            --accent-blue-bg: rgba(37, 99, 235, 0.08);
+            --accent-blue: #4f46e5;
+            --accent-blue-dark: #4338ca;
+            --accent-blue-light: #6366f1;
+            --accent-blue-bg: rgba(99, 102, 241, 0.1);
             
             --accent-green: #059669;
-            --accent-green-bg: rgba(5, 150, 105, 0.08);
+            --accent-green-bg: rgba(5, 150, 105, 0.1);
             
             --accent-orange: #ea580c;
-            --accent-orange-bg: rgba(234, 88, 12, 0.08);
+            --accent-orange-bg: rgba(234, 88, 12, 0.1);
             
             --accent-red: #dc2626;
-            --accent-red-bg: rgba(220, 38, 38, 0.08);
+            --accent-red-bg: rgba(220, 38, 38, 0.1);
             
-            --accent-purple: #7c3aed;
-            --accent-purple-bg: rgba(124, 58, 237, 0.08);
+            --accent-purple: #9333ea;
+            --accent-purple-bg: rgba(147, 51, 234, 0.1);
             
             --accent-gold: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             
-            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.15);
+            --shadow-sm: 0 1px 3px 0 rgba(99, 102, 241, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(99, 102, 241, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(99, 102, 241, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(99, 102, 241, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.25);
+            
+            --humanoid-filter: invert(1) hue-rotate(180deg) brightness(1.2);
+        }
+        
+        /* Light theme specific card backgrounds */
+        [data-theme="light"] .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f7ff 100%);
+        }
+        
+        [data-theme="light"] .pr-info-card {
+            background: linear-gradient(135deg, #fafbff 0%, #e8ecff 100%);
+        }
+        
+        [data-theme="light"] .spec-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 50%, #e8ecff 100%);
+        }
+        
+        [data-theme="light"] .antipattern-details {
+            background: linear-gradient(135deg, #f5f7ff 0%, #eef2ff 100%);
+        }
+        
+        [data-theme="light"] .issue-item {
+            background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
         }
         
         * {
@@ -614,7 +599,29 @@ class HtmlReportGenerator:
         
         /* Smooth transitions for theme switching */
         body * {
-            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+        }
+        
+        /* Matrix-style title font */
+        .matrix-title {
+            font-family: 'Orbitron', monospace !important;
+            font-weight: 900 !important;
+            letter-spacing: 0.02em !important;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: matrix-glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes matrix-glow {
+            from {
+                filter: drop-shadow(0 0 10px rgba(74, 158, 255, 0.5));
+            }
+            to {
+                filter: drop-shadow(0 0 20px rgba(175, 82, 222, 0.8));
+            }
         }
         
         /* Top Bar Styles */
@@ -655,14 +662,44 @@ class HtmlReportGenerator:
             gap: 12px;
         }
         
-        /* Robot SVG Styles */
-        .radar-robot {
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-            transition: transform 0.3s ease;
+        /* Humanoid Background Container */
+        .radar-humanoid-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
         }
         
-        #top-bar-logo:hover .radar-robot {
-            transform: scale(1.1) rotate(5deg);
+        [data-theme="light"] .radar-humanoid-container {
+            background: rgba(99, 102, 241, 0.05);
+        }
+        
+        .radar-humanoid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: var(--humanoid-image);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.15;
+            filter: var(--humanoid-filter);
+            z-index: 0;
+        }
+        
+        .radar-humanoid-container:hover .radar-humanoid-bg {
+            opacity: 0.25;
+            animation: pulse-bg 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-bg {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         
         #top-bar-right {
@@ -989,7 +1026,7 @@ class HtmlReportGenerator:
             padding: 4px 10px;
             border-radius: 20px;
             font-weight: 600;
-            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+            font-family: 'Share Tech Mono', monospace;
             font-size: 12px;
             display: inline-block;
             border: 1px solid var(--accent-green);
@@ -1000,7 +1037,7 @@ class HtmlReportGenerator:
             color: var(--text-secondary);
             padding: 4px 10px;
             border-radius: 6px;
-            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+            font-family: 'Share Tech Mono', monospace;
             font-size: 12px;
             display: inline-block;
             border: 1px solid var(--border-primary);
@@ -1233,7 +1270,7 @@ class HtmlReportGenerator:
             color: var(--text-secondary);
             padding: 6px 12px;
             border-radius: 6px;
-            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+            font-family: 'Share Tech Mono', monospace;
             font-size: 12px;
             display: inline-block;
             border: 1px solid var(--border-primary);
@@ -1637,6 +1674,7 @@ class HtmlReportGenerator:
             display: inline-block;
             transition: all 0.3s ease;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 1;
         }
         
         .radar-title:hover {
@@ -1711,9 +1749,8 @@ class HtmlReportGenerator:
                 font-size: 1.2em;
             }
             
-            .radar-robot {
-                width: 24px;
-                height: 24px;
+            .radar-humanoid-container {
+                padding: 4px 8px;
             }
         }"""
     
