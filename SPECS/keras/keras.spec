@@ -15,7 +15,7 @@ Patch00:        0001-Add-Keras-3.3.3.patch
 Patch01:        CVE-2025-1550.patch
 Patch02:        CVE-2025-8747.patch
 Patch03:        CVE-2025-9905.patch
-Patch4:        CVE-2025-12058.patch
+Patch04:        CVE-2025-12058.patch
 
 # Fix for CVE-2025-9906 included as part of CVE-2025-8747 and kept here as nopatch
 # and commented out, because from patch command perspective, these files
