@@ -391,7 +391,7 @@ class HtmlReportGenerator:
                 <!-- Clean design with radar icon -->
                 <div class="radar-logo-clean">
                     <img src="{radar_image_data}" alt="RADAR" class="radar-icon-img" />
-                    <span class="radar-title" data-tooltip="Realtime Anti-pattern Detection with AI Reasoning">RADAR</span>
+                    <span class="radar-title">RADAR</span>
                 </div>
             </div>
             <div style="font-size: 10px; color: var(--text-tertiary); margin-left: 12px; font-family: monospace;">
@@ -534,8 +534,6 @@ class HtmlReportGenerator:
             --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.8), 0 4px 10px -2px rgba(0, 0, 0, 0.6);
             --shadow-xl: 0 20px 40px -5px rgba(0, 0, 0, 0.9), 0 10px 20px -5px rgba(0, 0, 0, 0.7);
             --shadow-glow: 0 0 20px rgba(74, 158, 255, 0.3);
-            
-            --humanoid-filter: brightness(1) contrast(1.2);
         }
         
         /* Professional Light Theme with Blue/Purple Accents */
@@ -580,8 +578,6 @@ class HtmlReportGenerator:
             --shadow-lg: 0 10px 15px -3px rgba(99, 102, 241, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             --shadow-xl: 0 20px 25px -5px rgba(99, 102, 241, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.25);
-            
-            --humanoid-filter: invert(1) hue-rotate(180deg) brightness(1.2);
         }
         
         /* Light theme specific card backgrounds */
@@ -625,16 +621,17 @@ class HtmlReportGenerator:
             transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
         }
         
-        /* Matrix-style title font - ONLY for main title */
+        /* Matrix-style title font - Using same font as PR Info */
         .matrix-title {
-            font-family: 'Orbitron', monospace !important;
-            font-weight: 900 !important;
+            font-family: 'Share Tech Mono', monospace !important;
+            font-weight: 700 !important;
             letter-spacing: 0.02em !important;
             text-transform: uppercase;
-            /* Blue matrix color for both themes */
+            /* Blue color for both themes */
             color: #4a9eff;
             text-shadow: 0 0 8px rgba(74, 158, 255, 0.6), 0 0 16px rgba(74, 158, 255, 0.3);
             animation: matrix-glow 3s ease-in-out infinite alternate;
+            font-size: 2.5em;
         }
         
         /* Light theme - slightly darker blue */
