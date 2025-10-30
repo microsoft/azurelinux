@@ -4590,8 +4590,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.24.8",
-          "downloadUrl": "https://golang.org/dl/go1.24.8.src.tar.gz"
+          "version": "1.24.9",
+          "downloadUrl": "https://golang.org/dl/go1.24.9.src.tar.gz"
         }
       }
     },

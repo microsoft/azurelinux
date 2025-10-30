@@ -16,7 +16,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.24.8
+Version:        1.24.9
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -173,8 +173,8 @@ fi
 %{_bindir}/*
 
 %changelog
-* Thu Oct 09 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.24.8-1
-- Bump version to 1.24.8
+* Thu Oct 30 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.24.9-1
+- Bump version to 1.24.9
 
 * Wed Aug 20 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.22.7-5
 - Patch CVE-2025-47907, CVE-2025-4674, CVE-2025-4673 & CVE-2025-47906
