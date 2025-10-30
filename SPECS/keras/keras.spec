@@ -3,7 +3,7 @@
 Summary:        Keras is a high-level neural networks API.
 Name:           keras
 Version:        3.3.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,6 +15,7 @@ Patch00:        0001-Add-Keras-3.3.3.patch
 Patch01:        CVE-2025-1550.patch
 Patch02:        CVE-2025-8747.patch
 Patch03:        CVE-2025-9905.patch
+Patch4:        CVE-2025-12058.patch
 
 # Fix for CVE-2025-9906 included as part of CVE-2025-8747 and kept here as nopatch
 # and commented out, because from patch command perspective, these files
@@ -79,6 +80,9 @@ python3 pip_build.py --install
 
 
 %changelog
+* Thu Oct 30 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.3-5
+- Patch for CVE-2025-12058
+
 * Sat Sep 20 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.3-4
 - Patch for CVE-2025-9905
 - Add nopatch for CVE-2025-9906 (vulnerability addressed by patch of CVE-2025-8747)
