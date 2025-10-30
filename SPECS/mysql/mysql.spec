@@ -1,7 +1,7 @@
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.44
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ Patch1:         CVE-2024-2410.patch
 # AZL's OpenSSL builds with the "no-chacha" option making all ChaCha
 # ciphers unavailable.
 Patch2:         fix-tests-for-unsupported-chacha-ciphers.patch
+Patch3:         CVE-2025-62813.patch
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
 BuildRequires:  openssl-devel
@@ -114,6 +115,9 @@ fi
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Mon Oct 27 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.0.44-2
+- Patch for CVE-2025-62813
+
 * Wed Oct 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.44-1
 - Upgrade to 8.0.44 for CVE-2025-53069, CVE-2025-53042, CVE-2025-53044, CVE-2025-53040,
   CVE-2025-53062, CVE-2025-53053, CVE-2025-53045, CVE-2025-53054
