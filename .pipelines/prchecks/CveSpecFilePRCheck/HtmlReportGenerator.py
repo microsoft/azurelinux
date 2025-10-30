@@ -423,14 +423,14 @@ class HtmlReportGenerator:
             <div class="modal-body">
                 <p id="modal-finding-text"></p>
                 <div id="challenge-options">
-                    <button class="challenge-option" data-type="false_alarm">
-                        🔴 False Alarm
+                    <button class="challenge-option" data-type="false-positive">
+                        🔴 False Positive
                     </button>
-                    <button class="challenge-option" data-type="agree">
-                        🟢 Agree with Finding
+                    <button class="challenge-option" data-type="needs-context">
+                        � Needs More Context
                     </button>
-                    <button class="challenge-option" data-type="needs_context">
-                        🟡 Needs More Context
+                    <button class="challenge-option" data-type="disagree-with-severity">
+                        � Disagree with Severity
                     </button>
                 </div>
                 <textarea id="challenge-feedback" placeholder="Additional feedback (optional)"></textarea>
