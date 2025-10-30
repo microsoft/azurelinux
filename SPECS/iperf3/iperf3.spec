@@ -72,7 +72,7 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/libiperf.3.gz
 
 %changelog
-* Tues 10 Oct 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 3.17.1-4
+* Tue Oct 14 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 3.17.1-4
 - Patch for openssl buffer size issue during RSA encryption
 
 * Mon Aug 04 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.17.1-3
