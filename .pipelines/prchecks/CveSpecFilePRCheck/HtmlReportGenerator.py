@@ -427,10 +427,10 @@ class HtmlReportGenerator:
                         🔴 False Positive
                     </button>
                     <button class="challenge-option" data-type="needs-context">
-                        � Needs More Context
+                        ⚠️ Needs More Context
                     </button>
                     <button class="challenge-option" data-type="disagree-with-severity">
-                        � Disagree with Severity
+                        ⚡ Disagree with Severity
                     </button>
                 </div>
                 <textarea id="challenge-feedback" placeholder="Additional feedback (optional)"></textarea>
@@ -1744,6 +1744,30 @@ class HtmlReportGenerator:
                         btn.textContent = '✅ Challenged';
                         btn.disabled = true;
                         btn.classList.add('challenged');
+                    }
+                    
+                    // Update issue counters dynamically
+                    const totalIssuesEl = document.getElementById('total-issues-count');
+                    const bellBadge = document.getElementById('top-bell-badge');
+                    const issuesBadge = document.getElementById('issues-badge');
+                    
+                    if (totalIssuesEl) {
+                        const currentCount = parseInt(totalIssuesEl.textContent) || 0;
+                        const newCount = Math.max(0, currentCount - 1);
+                        totalIssuesEl.textContent = newCount;
+                        console.log(`📊 Updated total issues: ${currentCount} → ${newCount}`);
+                    }
+                    
+                    if (bellBadge) {
+                        const currentCount = parseInt(bellBadge.textContent) || 0;
+                        const newCount = Math.max(0, currentCount - 1);
+                        bellBadge.textContent = newCount;
+                    }
+                    
+                    if (issuesBadge) {
+                        const currentCount = parseInt(issuesBadge.textContent) || 0;
+                        const newCount = Math.max(0, currentCount - 1);
+                        issuesBadge.textContent = newCount;
                     }
                     
                     closeChallengeModal();
