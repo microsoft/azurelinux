@@ -96,7 +96,7 @@ class MultiSpecAnalysisResult:
                 ),
                 'specs_with_warnings': sum(
                     1 for r in self.spec_results 
-                    if r.severity == Severity.WARNING
+                    if any(p.severity == Severity.WARNING for p in r.anti_patterns)
                 ),
                 'total_errors': sum(
                     sum(1 for p in r.anti_patterns if p.severity == Severity.ERROR)
