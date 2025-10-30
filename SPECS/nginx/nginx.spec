@@ -134,7 +134,6 @@ cd nginx-tests
 su nginx -s /bin/sh -c 'TEST_NGINX_BINARY=%{_sbindir}/nginx prove ./*.t'
 cd ..
 rm -rf nginx-tests
-exit 1
 %endif
 
 %files
