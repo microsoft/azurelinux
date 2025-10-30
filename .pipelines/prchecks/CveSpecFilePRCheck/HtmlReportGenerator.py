@@ -16,6 +16,8 @@ import html as html_module
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
 import logging
+import os
+import base64
 
 if TYPE_CHECKING:
     from AntiPatternDetector import Severity
@@ -335,9 +337,29 @@ class HtmlReportGenerator:
         # Generate cache-busting timestamp
         cache_buster = datetime.now().strftime('%Y%m%d%H%M%S')
         
-        # NOTE: Replace this data URL with your actual humanoid image converted to base64
-        # You can use: https://www.base64-image.de/ to convert your image
-        humanoid_image_data = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+        # Try to load and encode the radar.png image
+        radar_image_data = ""
+        try:
+            import os
+            import base64
+            # Get the directory where this script is located
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            # Construct path to radar.png
+            image_path = os.path.join(script_dir, 'assets', 'radar.png')
+            
+            if os.path.exists(image_path):
+                with open(image_path, 'rb') as img_file:
+                    img_data = base64.b64encode(img_file.read()).decode('utf-8')
+                    radar_image_data = f"data:image/png;base64,{img_data}"
+                    logger.info(f"Successfully loaded radar.png from {image_path}")
+            else:
+                logger.warning(f"radar.png not found at {image_path}, using placeholder")
+                # Fallback to a simple SVG radar icon if image not found
+                radar_image_data = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='none' stroke='%234a9eff' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='35' fill='none' stroke='%234a9eff' stroke-width='1.5' opacity='0.7'/%3E%3Ccircle cx='50' cy='50' r='25' fill='none' stroke='%234a9eff' stroke-width='1' opacity='0.5'/%3E%3Ccircle cx='50' cy='50' r='15' fill='none' stroke='%234a9eff' stroke-width='0.5' opacity='0.3'/%3E%3Ccircle cx='50' cy='50' r='5' fill='%234a9eff'/%3E%3Cpath d='M50 5 L50 95 M5 50 L95 50' stroke='%234a9eff' stroke-width='0.5' opacity='0.3'/%3E%3Cpath d='M50 50 L80 20' stroke='%2300ff00' stroke-width='2' opacity='0.8'%3E%3Canimate attributeName='opacity' values='0.8;0;0.8' dur='2s' repeatCount='indefinite'/%3E%3C/path%3E%3C/svg%3E"
+        except Exception as e:
+            logger.error(f"Error loading radar.png: {e}")
+            # Fallback SVG
+            radar_image_data = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='none' stroke='%234a9eff' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='5' fill='%234a9eff'/%3E%3C/svg%3E"
         
         return f"""<!DOCTYPE html>
 <html lang="en">
@@ -354,9 +376,9 @@ class HtmlReportGenerator:
     <!-- Favicon to prevent 404 errors -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛡️%3C/text%3E%3C/svg%3E">
     <style>
-        /* Store humanoid image as CSS variable */
+        /* Store radar image as CSS variable */
         :root {{
-            --humanoid-image: url('{humanoid_image_data}');
+            --radar-image: url('{radar_image_data}');
         }}
 {css}
     </style>
@@ -368,7 +390,7 @@ class HtmlReportGenerator:
             <div id="top-bar-logo">
                 <!-- Clean design with radar icon -->
                 <div class="radar-logo-clean">
-                    <img src=".pipelines/prchecks/CveSpecFilePRCheck/assets/radar.png" alt="RADAR" class="radar-icon-img" />
+                    <img src="{radar_image_data}" alt="RADAR" class="radar-icon-img" />
                     <span class="radar-title" data-tooltip="Realtime Anti-pattern Detection with AI Reasoning">RADAR</span>
                 </div>
             </div>
@@ -680,7 +702,7 @@ class HtmlReportGenerator:
             border: 1px solid rgba(37, 99, 235, 0.2);
         }
         
-        /* Use actual image from assets */
+        /* Use actual image from CSS variable */
         .radar-humanoid-bg {
             position: absolute;
             top: 50%;
@@ -688,7 +710,7 @@ class HtmlReportGenerator:
             transform: translate(-50%, -50%);
             width: 120px;
             height: 120px;
-            background-image: url('/assets/radar.png');
+            background-image: var(--radar-image);
             background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
