@@ -56,9 +56,12 @@ class HtmlReportGenerator:
         html = f"""
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; border-radius: 6px; border: 1px solid #30363d;">
     <div style="text-align: center; margin-bottom: 20px;">
-        <h2 style="color: {severity_color}; margin: 0;">
-            {self.get_severity_emoji(analysis_result.overall_severity)} CVE Spec File Analysis Report
-        </h2>
+        <h1 style="color: {severity_color}; margin: 0; font-size: 2.5em; line-height: 1.2;">
+            <span class="radar-title" data-tooltip="Realtime Anti-pattern Detection with AI Reasoning">RADAR</span> Code Review Analysis Report
+        </h1>
+        <p style="color: #8b949e; margin: 10px 0 5px 0; font-size: 13px; font-style: italic;">
+            Realtime Anti-pattern Detection with AI Reasoning
+        </p>
         <p style="color: #8b949e; margin: 5px 0; font-size: 12px;">
             Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
         </p>
@@ -1406,8 +1409,55 @@ class HtmlReportGenerator:
         #submit-challenge-btn:disabled {
             background: var(--bg-tertiary);
             color: var(--text-tertiary);
-            cursor: not-allowed;
+            cursor: not-started;
             transform: none;
+        }
+        
+        /* RADAR BRANDING STYLES */
+        .radar-title {
+            font-weight: 900;
+            font-style: italic;
+            font-size: 1.1em;
+            letter-spacing: 0.05em;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            cursor: help;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .radar-title:hover {
+            transform: scale(1.05);
+            filter: brightness(1.2);
+        }
+        
+        .radar-title::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.7em;
+            font-weight: 600;
+            font-style: normal;
+            letter-spacing: normal;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+        }
+        
+        .radar-title:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-12px);
         }"""
     
     def _get_javascript(self, pr_number: int) -> str:
