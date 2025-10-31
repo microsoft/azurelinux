@@ -17,6 +17,8 @@ import html as html_module
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
 import logging
+import base64
+import os
 
 if TYPE_CHECKING:
     from AntiPatternDetector import Severity
@@ -37,6 +39,27 @@ class HtmlReportGenerator:
         """
         self.get_severity_color = severity_color_fn
         self.get_severity_emoji = severity_emoji_fn
+    
+    def _load_logo_as_data_uri(self, logo_path: str) -> str:
+        """
+        Load a logo file and convert it to a base64 data URI.
+        
+        Args:
+            logo_path: Path to the logo file
+            
+        Returns:
+            Data URI string for embedding in HTML
+        """
+        try:
+            if os.path.exists(logo_path):
+                with open(logo_path, 'rb') as f:
+                    logo_data = base64.b64encode(f.read()).decode('utf-8')
+                    return f"data:image/png;base64,{logo_data}"
+        except Exception as e:
+            logger.warning(f"Failed to load logo {logo_path}: {e}")
+        
+        # Fallback to placeholder SVG
+        return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%230969da'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-size='18' fill='white' font-weight='bold'%3ER%3C/text%3E%3C/svg%3E"
     
     def generate_report_body(self, analysis_result, pr_metadata: Optional[dict] = None) -> str:
         """
@@ -332,10 +355,11 @@ class HtmlReportGenerator:
         # Generate cache-busting timestamp
         cache_buster = datetime.now().strftime('%Y%m%d%H%M%S')
         
-        # TODO: Replace these with actual logos from the files
-        # For now using placeholder data URIs that can be replaced with actual logos
-        radar_logo_light = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%230969da'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-size='18' fill='white' font-weight='bold'%3ER%3C/text%3E%3C/svg%3E"
-        radar_logo_dark = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%2358a6ff'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-size='18' fill='white' font-weight='bold'%3ER%3C/text%3E%3C/svg%3E"
+        # Load actual logo files
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        assets_dir = os.path.join(script_dir, 'assets')
+        radar_logo_light = self._load_logo_as_data_uri(os.path.join(assets_dir, 'radar_light.png'))
+        radar_logo_dark = self._load_logo_as_data_uri(os.path.join(assets_dir, 'radar_dark.png'))
         
         return f"""<!DOCTYPE html>
 <html lang="en" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
