@@ -1,7 +1,7 @@
 Summary:        Extremely fast compression.
 Name:           lz4
 Version:        1.9.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD 2-Clause and GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,7 +14,8 @@ Source0:        https://github.com/lz4/lz4/archive/v%{version}/%{name}-%{version
 # *** NOTE: Leave this patch definition because the CVE Scan tool will flag the
 # CVE due to the above version format change.
 # CVE-2014-4715 applies to versions r* before r119.
-Patch0:         CVE-2014-4715.nopatch
+#Patch0:        CVE-2014-4715.nopatch
+Patch1:         CVE-2025-62813.patch
 
 %description
 LZ4 is lossless compression algorithm, providing compression speed at 400 MB/s per core, scalable with multi-cores CPU.
@@ -28,7 +29,7 @@ Requires:   %{name} = %{version}-%{release}
 Static libraries and header files for the support library for lz4.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 make %{?_smp_mflags} all
@@ -56,6 +57,9 @@ make install DESTDIR=%{buildroot} LIBDIR=%{_libdir} PREFIX=%{_prefix}
 %{_includedir}/*
 
 %changelog
+*   Sat Oct 25 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.4-2
+-   Patch for CVE-2025-62813
+
 *   Mon Feb 05 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.9.4-1
 -   Upgrade to 1.9.4-1 to fix CVE-2021-3520
 
@@ -66,7 +70,7 @@ make install DESTDIR=%{buildroot} LIBDIR=%{_libdir} PREFIX=%{_prefix}
 *   Fri Jun 12 2020 Eric Li <eli@microsoft.com> 1.9.2-2
 -   Mark CVE-2014-4715 as not applicable due to version format change
 
-*   Tue May 18 2020 Andrew Phelps <anphel@microsoft.com> 1.9.2-1
+*   Mon May 18 2020 Andrew Phelps <anphel@microsoft.com> 1.9.2-1
 -   Update to version 1.9.2
 
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.8.2-3
