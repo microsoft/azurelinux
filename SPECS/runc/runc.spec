@@ -1,4 +1,4 @@
-%define         commit_hash 7cb363254b69e10320360b63fb73e0ffb5da7bf2
+%define         commit_hash aeabe4e711d903ef0ea86a4155da0f9e00eabd29
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           runc
 # update "commit_hash" above when upgrading version
@@ -12,7 +12,7 @@ URL:            https://github.com/opencontainers/runc
 Source0:        https://github.com/opencontainers/runc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  go-md2man
-BuildRequires:  golang
+BuildRequires:  golang < 1.25
 BuildRequires:  libseccomp-devel
 BuildRequires:  make
 Requires:       glibc
@@ -43,8 +43,9 @@ make install-man DESTDIR=%{buildroot} PREFIX=%{_prefix}
 %{_mandir}/*
 
 %changelog
-* Fri Oct 24 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.2-1
-- Auto-upgrade to 1.3.2 - none
+* Fri Oct 31 2025 Nan Liu <liunan@microsoft.com> - 1.3.2-1
+- Upgrade to 1.3.2
+- Set BR golang < 1.25
 
 * Mon Nov 25 2024 Nan Liu <liunan@microsoft.com> - 1.2.2-1
 - Bump version to 1.2.2
