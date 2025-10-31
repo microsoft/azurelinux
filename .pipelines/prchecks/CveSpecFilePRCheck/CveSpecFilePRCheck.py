@@ -815,7 +815,7 @@ def main():
                         # Collect all AntiPattern objects from analysis_result
                         all_issues = []
                         for spec_result in analysis_result.spec_results:
-                            for pattern in spec_result.antipatterns:
+                            for pattern in spec_result.anti_patterns:
                                 all_issues.append(pattern)
                         
                         # Add current commit's analysis
