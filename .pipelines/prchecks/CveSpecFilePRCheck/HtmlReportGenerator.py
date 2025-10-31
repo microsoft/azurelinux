@@ -8,7 +8,7 @@ HtmlReportGenerator creates interactive HTML reports for CVE spec file analysis.
 This module handles all HTML generation logic, including:
 - Complete self-contained HTML pages with CSS and JavaScript
 - Interactive dashboard components (stats cards, spec details, challenge system)
-- Theme system (dark/light mode) with enhanced colors
+- Professional theme system (dark/light mode)
 - Authentication UI integration
 - Bell icon spec expansion functionality
 """
@@ -55,15 +55,15 @@ class HtmlReportGenerator:
         severity_color = self.get_severity_color(analysis_result.overall_severity)
         
         html = f"""
-<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg-card); color: var(--text-primary); padding: 20px; border-radius: 12px; border: 1px solid var(--border-primary); box-shadow: var(--shadow-lg);">
-    <div style="text-align: center; margin-bottom: 20px;">
-        <h1 class="matrix-title" style="margin: 0; font-size: 2.5em; line-height: 1.2;">
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg-card); color: var(--text-primary); padding: 24px; border-radius: 8px; border: 1px solid var(--border-primary); box-shadow: var(--shadow-lg);">
+    <div style="text-align: center; margin-bottom: 32px;">
+        <h1 class="main-title" style="margin: 0; font-size: 2em; line-height: 1.2;">
             Code Review Analysis Report
         </h1>
-        <p style="color: var(--text-secondary); margin: 10px 0 5px 0; font-size: 13px; font-style: italic;">
-            By RADAR | Realtime Anti-pattern Detection with AI Reasoning
+        <p style="color: var(--text-secondary); margin: 12px 0 5px 0; font-size: 14px;">
+            Automated Anti-pattern Detection System
         </p>
-        <p style="color: var(--text-tertiary); margin: 5px 0; font-size: 12px;">
+        <p style="color: var(--text-tertiary); margin: 5px 0; font-size: 13px;">
             Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
         </p>
     </div>
@@ -96,8 +96,7 @@ class HtmlReportGenerator:
         return f"""
     <div class="pr-info-card">
         <div class="pr-info-header">
-            <div class="pr-info-icon">📋</div>
-            <h3 class="pr-info-title">Pull Request Information</h3>
+            <h3 class="pr-info-title">Pull Request Details</h3>
         </div>
         <div class="pr-info-grid">
             <span class="pr-info-label">PR Number</span>
@@ -112,7 +111,7 @@ class HtmlReportGenerator:
             <span class="pr-info-label">Branches</span>
             <span class="pr-info-value">
                 <span class="branch-badge">{source_branch}</span> 
-                <span style="color: var(--text-secondary); margin: 0 8px;">→</span> 
+                <span class="arrow-separator">→</span> 
                 <span class="branch-badge">{target_branch}</span>
             </span>
             
@@ -127,50 +126,36 @@ class HtmlReportGenerator:
         return f"""
     <div class="stats-grid">
         <!-- Total Specs Card -->
-        <div class="stat-card" style="--stat-color: var(--accent-blue);">
-            <div class="stat-icon stat-icon-blue">
-                📊
+        <div class="stat-card" style="--stat-accent: var(--accent-blue);">
+            <div class="stat-header">
+                <span class="stat-label">Specs Analyzed</span>
             </div>
-            <div class="stat-content">
-                <div class="stat-value">{stats['total_specs']}</div>
-                <div class="stat-label">Specs Analyzed</div>
-            </div>
+            <div class="stat-value">{stats['total_specs']}</div>
         </div>
         
         <!-- Errors Card -->
-        <div class="stat-card filterable-stat" data-filter-severity="ERROR" style="--stat-color: var(--accent-red); cursor: pointer;" title="Click to filter ERROR issues">
-            <div class="stat-icon stat-icon-red">
-                ⚠️
+        <div class="stat-card filterable-stat" data-filter-severity="ERROR" style="--stat-accent: var(--error-color);">
+            <div class="stat-header">
+                <span class="stat-label">Critical Issues</span>
             </div>
-            <div class="stat-content">
-                <div class="stat-value">{stats['total_errors']}</div>
-                <div class="stat-label">Errors</div>
-            </div>
+            <div class="stat-value">{stats['total_errors']}</div>
         </div>
         
         <!-- Warnings Card -->
-        <div class="stat-card filterable-stat" data-filter-severity="WARNING" style="--stat-color: var(--accent-orange); cursor: pointer;" title="Click to filter WARNING issues">
-            <div class="stat-icon stat-icon-orange">
-                📋
+        <div class="stat-card filterable-stat" data-filter-severity="WARNING" style="--stat-accent: var(--warning-color);">
+            <div class="stat-header">
+                <span class="stat-label">Warnings</span>
             </div>
-            <div class="stat-content">
-                <div class="stat-value">{stats['total_warnings']}</div>
-                <div class="stat-label">Warnings</div>
-            </div>
+            <div class="stat-value">{stats['total_warnings']}</div>
         </div>
         
-        <!-- Total Issues Card with Bell Icon (Clickable Reset) -->
-        <div class="stat-card reset-filter-stat" style="--stat-color: var(--accent-purple); cursor: pointer;" title="Click to show all issues">
-            <div class="stat-icon stat-icon-purple">
-                <div class="bell-container">
-                    <span class="bell-icon">🔔</span>
-                    <span class="bell-badge" id="issues-badge">{total_issues}</span>
-                </div>
+        <!-- Total Issues Card -->
+        <div class="stat-card reset-filter-stat" style="--stat-accent: var(--primary-color);">
+            <div class="stat-header">
+                <span class="stat-label">Total Issues</span>
+                <span class="notification-dot" id="issues-badge">{total_issues}</span>
             </div>
-            <div class="stat-content">
-                <div class="stat-value" id="total-issues-count">{total_issues}</div>
-                <div class="stat-label">Total Issues</div>
-            </div>
+            <div class="stat-value" id="total-issues-count">{total_issues}</div>
         </div>
     </div>
 """
@@ -181,16 +166,16 @@ class HtmlReportGenerator:
         
         html = ""
         for spec_result in sorted(spec_results, key=lambda x: x.package_name):
-            pkg_color = self.get_severity_color(spec_result.severity)
+            severity_indicator = "high" if spec_result.severity >= Severity.ERROR else "medium" if spec_result.severity >= Severity.WARNING else "low"
             html += f"""
-    <details class="spec-card" data-spec-name="{spec_result.package_name}">
-        <summary style="color: {pkg_color};">
-            {self.get_severity_emoji(spec_result.severity)} {spec_result.package_name}
-            <span class="spec-summary" style="color: var(--text-secondary); font-weight: normal; font-size: 14px;">({spec_result.summary})</span>
+    <details class="spec-card" data-spec-name="{spec_result.package_name}" data-severity="{severity_indicator}">
+        <summary>
+            <span class="spec-name">{spec_result.package_name}</span>
+            <span class="spec-summary">{spec_result.summary}</span>
         </summary>
         <div class="spec-card-content">
-            <div style="margin-bottom: 16px;">
-                <span style="color: var(--text-secondary); font-size: 13px;">Spec File:</span> 
+            <div class="spec-file-info">
+                <span class="spec-file-label">File:</span> 
                 <code class="spec-file-badge">{spec_result.spec_path}</code>
             </div>
 """
@@ -213,11 +198,8 @@ class HtmlReportGenerator:
         issues_by_type = spec_result.get_issues_by_type()
         
         html = """
-            <details open class="antipattern-details">
-                <summary>
-                    🐛 Anti-Patterns Detected
-                </summary>
-                <div style="margin-top: 16px;">
+            <div class="antipattern-container">
+                <h4 class="section-title">Detected Issues</h4>
 """
         
         for issue_type, patterns in issues_by_type.items():
@@ -225,67 +207,43 @@ class HtmlReportGenerator:
                     <div class="issue-type-section">
                         <div class="issue-type-header">
                             <span class="issue-type-title">{issue_type}</span>
-                            <span class="issue-count-badge">×{len(patterns)}</span>
+                            <span class="issue-count-badge">{len(patterns)}</span>
                         </div>
-                        <ul class="issue-list">
+                        <div class="issue-list">
 """
             for idx, pattern in enumerate(patterns):
                 html += self._generate_issue_item(spec_result.package_name, issue_type, pattern, idx, spec_result.spec_path)
             
             html += """
-                        </ul>
+                        </div>
                     </div>
 """
         
         html += """
-                </div>
-            </details>
+            </div>
 """
         return html
     
     def _generate_issue_item(self, package_name: str, issue_type: str, pattern, idx: int, spec_path: str) -> str:
         """Generate a single issue item with challenge button."""
-        # Use the issue_hash if available, otherwise fallback to generated ID
         issue_hash = pattern.issue_hash if hasattr(pattern, 'issue_hash') and pattern.issue_hash else f"{package_name}-{issue_type.replace(' ', '-').replace('_', '-')}-{idx}"
-        finding_id = issue_hash  # For backwards compatibility in HTML
+        finding_id = issue_hash
         
-        # Get severity info for badge
-        severity_color = self.get_severity_color(pattern.severity)
         severity_name = pattern.severity.name
-        severity_emoji = self.get_severity_emoji(pattern.severity)
+        severity_class = "severity-high" if severity_name == "ERROR" else "severity-medium" if severity_name == "WARNING" else "severity-low"
         
-        # Properly escape the description for both HTML content and attributes
         escaped_desc = html_module.escape(pattern.description, quote=True)
         
         return f"""
-                            <li class="antipattern-item issue-item" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-severity="{severity_name}">
-                                <span class="severity-badge" style="background: {severity_color}20; color: {severity_color}; border: 1px solid {severity_color}40;">
-                                    {severity_emoji} {severity_name}
-                                </span>
-                                <span class="issue-text">{escaped_desc}</span>
+                            <div class="issue-item {severity_class}" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-severity="{severity_name}">
+                                <div class="issue-content">
+                                    <span class="severity-indicator"></span>
+                                    <span class="issue-text">{escaped_desc}</span>
+                                </div>
                                 <button class="challenge-btn" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-spec="{spec_path}" data-issue-type="{issue_type}" data-description="{escaped_desc}">
-                                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-                                        <path d="M2.5 3.5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm2-2a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7zM0 13a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 16 13V6a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 0 6v7zm1.5.5A.5.5 0 0 1 1 13V6a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13z"/>
-                                    </svg>
                                     Challenge
                                 </button>
-                                <div class="challenge-details" data-finding-id="{finding_id}">
-                                    <div class="challenge-details-grid">
-                                        <div class="challenge-detail-row">
-                                            <span class="challenge-detail-label">Challenge Type:</span>
-                                            <span class="challenge-detail-value challenge-type"></span>
-                                        </div>
-                                        <div class="challenge-detail-row">
-                                            <span class="challenge-detail-label">Feedback:</span>
-                                            <span class="challenge-detail-value challenge-feedback"></span>
-                                        </div>
-                                        <div class="challenge-detail-row">
-                                            <span class="challenge-detail-label">Submitted:</span>
-                                            <span class="challenge-detail-value challenge-timestamp"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
+                            </div>
 """
     
     def _generate_recommendations_section(self, anti_patterns: list) -> str:
@@ -301,21 +259,17 @@ class HtmlReportGenerator:
             return ""
         
         html = """
-            <details open style="background: var(--bg-tertiary); border: 1px solid var(--border-primary); border-radius: 6px; margin: 10px 0; padding: 10px;">
-                <summary style="cursor: pointer; font-weight: bold; color: var(--accent-green); user-select: none;">
-                    ✅ Recommended Actions
-                </summary>
-                <ul style="margin: 10px 0; padding-left: 20px; list-style-type: none;">
+            <div class="recommendations-section">
+                <h4 class="section-title">Recommended Actions</h4>
+                <ul class="recommendations-list">
 """
         for rec in recommendations:
             html += f"""
-                    <li style="color: var(--text-primary); margin: 5px 0; font-size: 13px;">
-                        <span style="color: var(--accent-green);">▸</span> {rec}
-                    </li>
+                    <li>{rec}</li>
 """
         html += """
                 </ul>
-            </details>
+            </div>
 """
         return html
     
@@ -345,109 +299,108 @@ class HtmlReportGenerator:
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <meta name="report-version" content="{cache_buster}">
-    <title>CVE Spec File Check Report - PR #{pr_number}</title>
-    <!-- Matrix/Code Style Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <!-- Favicon to prevent 404 errors -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛡️%3C/text%3E%3C/svg%3E">
+    <title>Code Review Report - PR #{pr_number}</title>
+    <!-- Professional fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232563eb'/%3E%3Ctext x='50' y='50' text-anchor='middle' dominant-baseline='central' font-size='50' fill='white' font-weight='bold'%3ER%3C/text%3E%3C/svg%3E">
     <style>
 {css}
     </style>
 </head>
 <body data-report-version="{cache_buster}">
     <!-- Top Navigation Bar -->
-    <div id="top-bar">
+    <nav id="top-bar">
         <div id="top-bar-left">
-            <div id="top-bar-logo">
-                <!-- Clean design without image -->
-                <div class="radar-logo-clean">
-                    <span class="radar-title">RADAR</span>
-                </div>
-            </div>
-            <div style="font-size: 10px; color: var(--text-tertiary); margin-left: 12px; font-family: monospace;">
-                v{cache_buster}
+            <div id="logo">
+                <span class="logo-text">RADAR</span>
+                <span class="logo-subtitle">Analysis Report</span>
             </div>
         </div>
         <div id="top-bar-right">
-            <!-- Bell notification icon -->
-            <div id="top-bell-container">
-                <span class="bell-icon">🔔</span>
-                <span id="top-bell-badge" class="bell-badge">0</span>
-            </div>
+            <!-- Notification Bell -->
+            <button id="top-bell-container" class="icon-btn" aria-label="Expand all sections">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <span id="top-bell-badge" class="badge">0</span>
+            </button>
             
             <!-- Theme Toggle -->
-            <button id="theme-toggle" aria-label="Toggle theme">
-                <span id="theme-icon">🌙</span>
-                <span id="theme-text">Dark</span>
+            <button id="theme-toggle" class="icon-btn" aria-label="Toggle theme">
+                <svg id="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+                <svg id="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
             </button>
             
             <!-- Auth Container -->
             <div id="auth-container">
-                <button id="sign-in-btn" style="display: none;">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
-                    </svg>
+                <button id="sign-in-btn" class="primary-btn" style="display: none;">
                     Sign in with GitHub
                 </button>
                 <div id="user-menu-container">
-                    <div id="user-menu">
+                    <button id="user-menu" class="user-menu-btn">
                         <img id="user-avatar" src="" alt="User">
                         <div id="user-info">
-                            <div id="user-name"></div>
+                            <span id="user-name"></span>
                             <span id="collaborator-badge"></span>
                         </div>
-                        <button id="user-menu-toggle" aria-label="User menu">
-                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
-                            </svg>
-                        </button>
-                    </div>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </button>
                     <div id="user-dropdown" class="dropdown-menu">
                         <button id="sign-out-btn" class="dropdown-item">
-                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
-                                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
-                            </svg>
                             Sign Out
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </nav>
     
     <!-- Main Content -->
-    <div id="main-container">
+    <main id="main-container">
 {report_body}
-    </div>
+    </main>
     
     <!-- Challenge Modal -->
     <div id="challenge-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Challenge Finding</h2>
-                <button class="modal-close" id="modal-close-btn">&times;</button>
+                <button class="modal-close" id="modal-close-btn" aria-label="Close">&times;</button>
             </div>
             <div class="modal-body">
-                <p id="modal-finding-text"></p>
+                <div id="modal-finding-text" class="finding-display"></div>
                 <div id="challenge-options">
-                    <button class="challenge-option" data-type="false-positive">
-                        ❌ False Positive
-                    </button>
-                    <button class="challenge-option" data-type="needs-context">
-                        ⚠️ Needs More Context
-                    </button>
-                    <button class="challenge-option" data-type="disagree-with-severity">
-                        ⚡ Disagree with Severity
-                    </button>
+                    <label class="challenge-option">
+                        <input type="radio" name="challenge-type" value="false-positive">
+                        <span>False Positive</span>
+                    </label>
+                    <label class="challenge-option">
+                        <input type="radio" name="challenge-type" value="needs-context">
+                        <span>Needs More Context</span>
+                    </label>
+                    <label class="challenge-option">
+                        <input type="radio" name="challenge-type" value="disagree-with-severity">
+                        <span>Disagree with Severity</span>
+                    </label>
                 </div>
-                <textarea id="challenge-feedback" placeholder="Additional feedback (optional)"></textarea>
-                <div id="challenge-auth-required" style="display: none;">
-                    <p style="color: var(--accent-orange); margin: 10px 0;">
-                        ⚠️ Please sign in with GitHub to submit feedback.
-                    </p>
-                </div>
-                <button id="submit-challenge-btn">Submit Feedback</button>
+                <textarea id="challenge-feedback" placeholder="Please provide additional details about why you're challenging this finding..." rows="4"></textarea>
+                <button id="submit-challenge-btn" class="primary-btn">Submit Feedback</button>
             </div>
         </div>
     </div>
@@ -460,271 +413,113 @@ class HtmlReportGenerator:
 """
     
     def _get_css_styles(self) -> str:
-        """Get all CSS styles for the HTML page with enhanced colors."""
-        return """        /* CSS VARIABLES - THEME SYSTEM */
+        """Get all CSS styles for the HTML page with professional design."""
+        return """        /* CSS VARIABLES - Professional Theme System */
         :root {
-            /* Modern Dark Theme - Ultra Dark Backgrounds for Better Card Contrast */
-            --bg-primary: #050505;  /* Much darker main background */
-            --bg-secondary: #0a0a0a;  /* Darker secondary */
-            --bg-tertiary: #131313;  /* Darker tertiary */
-            --bg-card: #1a1a1a;  /* Cards stand out more */
-            --bg-card-hover: #242424;
-            --bg-hover: rgba(255, 255, 255, 0.05);
-            --bg-modal-overlay: rgba(0, 0, 0, 0.9);
+            /* Professional Dark Theme */
+            --bg-primary: #0f0f10;
+            --bg-secondary: #18181b;
+            --bg-tertiary: #1f1f23;
+            --bg-card: #18181b;
+            --bg-card-hover: #202024;
+            --bg-hover: rgba(255, 255, 255, 0.04);
+            --bg-modal-overlay: rgba(0, 0, 0, 0.8);
             
-            --border-primary: #2a2a2a;
-            --border-secondary: #333333;
-            --border-accent: #404040;
+            --border-primary: #27272a;
+            --border-secondary: #3f3f46;
+            --border-accent: #52525b;
             
-            --text-primary: #f0f0f0;
-            --text-secondary: #b0b0b0;
-            --text-tertiary: #808080;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1aa;
+            --text-tertiary: #71717a;
             
-            --accent-blue: #4a9eff;
-            --accent-blue-dark: #2563eb;
-            --accent-blue-light: #60a5fa;
-            --accent-blue-bg: rgba(74, 158, 255, 0.1);
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --accent-blue: #3b82f6;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --success-color: #10b981;
             
-            --accent-green: #22c55e;
-            --accent-green-bg: rgba(34, 197, 94, 0.1);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
             
-            --accent-orange: #ff9500;
-            --accent-orange-bg: rgba(255, 149, 0, 0.1);
-            
-            --accent-red: #ff453a;
-            --accent-red-bg: rgba(255, 69, 58, 0.1);
-            
-            --accent-purple: #af52de;
-            --accent-purple-bg: rgba(175, 82, 222, 0.1);
-            
-            --accent-gold: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            
-            --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.9);
-            --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.9), 0 2px 4px -1px rgba(0, 0, 0, 0.7);
-            --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.9), 0 4px 10px -2px rgba(0, 0, 0, 0.7);
-            --shadow-xl: 0 20px 40px -5px rgba(0, 0, 0, 0.95), 0 10px 20px -5px rgba(0, 0, 0, 0.8);
-            --shadow-glow: 0 0 20px rgba(74, 158, 255, 0.3);
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
         }
         
-        /* Professional Light Theme with Vibrant, Saturated Colors */
+        /* Professional Light Theme */
         [data-theme="light"] {
-            --bg-primary: #e8edff;  /* More colorful background with purple tint */
-            --bg-secondary: #ffffff;
-            --bg-tertiary: #dce5ff;  /* More saturated blue-purple */
-            --bg-card: linear-gradient(135deg, #ffffff 0%, #eef3ff 100%);
-            --bg-card-hover: linear-gradient(135deg, #f5f9ff 0%, #dce5ff 100%);
-            --bg-hover: rgba(99, 102, 241, 0.08);
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-tertiary: #f4f4f5;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f9fafb;
+            --bg-hover: rgba(0, 0, 0, 0.02);
             --bg-modal-overlay: rgba(0, 0, 0, 0.5);
             
-            --border-primary: #b8c4ff;  /* More vibrant borders */
-            --border-secondary: #a5b4ff;
-            --border-accent: #8b9cff;
+            --border-primary: #e4e4e7;
+            --border-secondary: #d4d4d8;
+            --border-accent: #a1a1aa;
             
-            --text-primary: #0f1139;  /* Deeper, richer text */
-            --text-secondary: #3a4170;  /* More saturated secondary text */
-            --text-tertiary: #5a6394;
+            --text-primary: #09090b;
+            --text-secondary: #52525b;
+            --text-tertiary: #71717a;
             
-            --accent-blue: #5046ff;  /* More vibrant, saturated blue */
-            --accent-blue-dark: #3730ff;
-            --accent-blue-light: #6b66ff;
-            --accent-blue-bg: rgba(80, 70, 255, 0.12);
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --accent-blue: #2563eb;
+            --error-color: #dc2626;
+            --warning-color: #ea580c;
+            --success-color: #059669;
             
-            --accent-green: #00a870;  /* Richer, more vibrant green */
-            --accent-green-bg: rgba(0, 168, 112, 0.12);
-            
-            --accent-orange: #ff6b00;  /* More saturated orange */
-            --accent-orange-bg: rgba(255, 107, 0, 0.12);
-            
-            --accent-red: #e02424;  /* Vibrant red */
-            --accent-red-bg: rgba(224, 36, 36, 0.12);
-            
-            --accent-purple: #a336ff;  /* Vivid purple */
-            --accent-purple-bg: rgba(163, 54, 255, 0.12);
-            
-            --accent-gold: linear-gradient(135deg, #ffb300 0%, #ff8800 100%);
-            
-            --shadow-sm: 0 1px 3px 0 rgba(80, 70, 255, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 4px 6px -1px rgba(80, 70, 255, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(80, 70, 255, 0.18), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(80, 70, 255, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --shadow-glow: 0 0 20px rgba(80, 70, 255, 0.35);
-        }
-        
-        /* Light theme specific card backgrounds */
-        [data-theme="light"] .stat-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f5f7ff 100%);
-        }
-        
-        [data-theme="light"] .pr-info-card {
-            background: linear-gradient(135deg, #fafbff 0%, #e8ecff 100%);
-        }
-        
-        [data-theme="light"] .spec-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 50%, #e8ecff 100%);
-        }
-        
-        [data-theme="light"] .antipattern-details {
-            background: linear-gradient(135deg, #f5f7ff 0%, #eef2ff 100%);
-        }
-        
-        [data-theme="light"] .issue-item {
-            background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
-        }
-        
-        /* Bell glow animation */
-        @keyframes bell-glow {
-            0%, 100% { 
-                box-shadow: 0 0 10px rgba(175, 82, 222, 0.3);
-                filter: brightness(1);
-            }
-            50% { 
-                box-shadow: 0 0 25px rgba(175, 82, 222, 0.7), 0 0 40px rgba(175, 82, 222, 0.4);
-                filter: brightness(1.2);
-            }
-        }
-        
-        /* Bell glow effect class */
-        #top-bell-container.glowing {
-            animation: bell-glow 1s ease-in-out;
-            background: linear-gradient(135deg, var(--accent-purple-bg), transparent) !important;
-            border-color: var(--accent-purple) !important;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
         
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
         
         body {
-            margin: 0;
-            padding: 20px;
-            padding-top: 80px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
             min-height: 100vh;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.2s, color 0.2s;
         }
         
-        /* Smooth transitions for theme switching */
-        body * {
-            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+        code, pre {
+            font-family: 'JetBrains Mono', 'Monaco', 'Consolas', monospace;
         }
         
-        /* Matrix-style title font - Using same font as PR Info */
-        .matrix-title {
-            font-family: 'Share Tech Mono', monospace !important;
-            font-weight: 700 !important;
-            letter-spacing: 0.02em !important;
-            text-transform: uppercase;
-            /* Blue color for both themes */
-            color: #4a9eff;
-            text-shadow: 0 0 8px rgba(74, 158, 255, 0.6), 0 0 16px rgba(74, 158, 255, 0.3);
-            animation: matrix-glow 3s ease-in-out infinite alternate;
-            font-size: 2.5em;
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-weight: 600;
+            line-height: 1.3;
         }
         
-        /* Light theme - slightly darker blue */
-        [data-theme="light"] .matrix-title {
-            color: #2563eb;
-            text-shadow: 0 0 8px rgba(37, 99, 235, 0.4), 0 0 16px rgba(37, 99, 235, 0.2);
+        .main-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
         }
         
-        @keyframes matrix-glow {
-            from {
-                filter: drop-shadow(0 0 8px rgba(74, 158, 255, 0.4));
-            }
-            to {
-                filter: drop-shadow(0 0 16px rgba(74, 158, 255, 0.6));
-            }
-        }
-        
-        /* Apply matrix font to specific UI elements */
-        .stat-value,
-        .stat-label,
-        .spec-card summary,
-        .severity-badge,
-        .issue-type-title,
-        .issue-count-badge,
-        .antipattern-details summary {
-            font-family: 'Share Tech Mono', 'Courier New', monospace !important;
-        }
-        
-        /* Make stat values more prominent with matrix style */
-        .stat-value {
-            font-family: 'Orbitron', monospace !important;
-            font-weight: 900 !important;
-            letter-spacing: 0.02em !important;
-        }
-        
-        /* Spec card names with code font */
-        .spec-card summary {
-            font-family: 'Share Tech Mono', monospace !important;
-            letter-spacing: 0.01em !important;
-        }
-        
-        /* Severity badges with code font */
-        .severity-badge {
-            font-family: 'Share Tech Mono', monospace !important;
-            letter-spacing: 0.05em !important;
-        }
-        
-        /* Humanoid Background Container - Simplified */
-        .radar-humanoid-container {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 20px;
-            min-width: 150px;
-            min-height: 60px;
-            border-radius: 12px;
-            overflow: visible;
-            background: rgba(74, 158, 255, 0.05);
-            border: 1px solid rgba(74, 158, 255, 0.2);
-        }
-        
-        [data-theme="light"] .radar-humanoid-container {
-            background: rgba(37, 99, 235, 0.05);
-            border: 1px solid rgba(37, 99, 235, 0.2);
-        }
-        
-        /* Use actual image from CSS variable */
-        .radar-humanoid-bg {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 120px;
-            height: 120px;
-            background-image: var(--radar-image);
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.15;
-            filter: var(--humanoid-filter);
-            z-index: 0;
-        }
-        
-        /* Radar icon next to title */
-        .radar-icon-img {
-            width: 40px;
-            height: 40px;
-            margin-right: 12px;
-            opacity: 0.9;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-        }
-        
-        [data-theme="light"] .radar-icon-img {
-            filter: brightness(0.9) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-        }
-        
-        /* Top Bar Styles */
+        /* Top Navigation Bar */
         #top-bar {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: 60px;
+            height: 56px;
             background: var(--bg-card);
             border-bottom: 1px solid var(--border-primary);
             display: flex;
@@ -732,272 +527,159 @@ class HtmlReportGenerator:
             justify-content: space-between;
             padding: 0 24px;
             z-index: 1000;
-            box-shadow: var(--shadow-md);
-            backdrop-filter: blur(10px);
-            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(8px);
+            background: rgba(24, 24, 27, 0.8);
         }
         
         [data-theme="light"] #top-bar {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.8);
         }
         
         #top-bar-left {
             display: flex;
             align-items: center;
-            gap: 12px;
-            z-index: 10;
+            gap: 24px;
         }
         
-        #top-bar-logo {
-            font-size: 20px;
+        #logo {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        
+        .logo-text {
+            font-size: 18px;
             font-weight: 700;
             color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            letter-spacing: -0.02em;
         }
         
-        /* ===== HUMANOID DESIGN OPTIONS ===== */
-        
-        /* Option 1: Direct Icon Display */
-        .humanoid-icon-wrapper {
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 255, 65, 0.1), transparent);
-            border: 2px solid rgba(0, 255, 65, 0.3);
-            animation: radar-pulse 3s ease-in-out infinite;
-        }
-        
-        @keyframes radar-pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.4); }
-            50% { box-shadow: 0 0 20px 10px rgba(0, 255, 65, 0.2); }
-        }
-        
-        .humanoid-icon {
-            width: 35px;
-            height: 35px;
-            filter: brightness(1.2) contrast(1.1);
-        }
-        
-        [data-theme="light"] .humanoid-icon {
-            filter: invert(1) hue-rotate(180deg) brightness(1.2);
-        }
-        
-        .radar-logo-group {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        /* Option 2: CSS-based Radar Animation */
-        .radar-effect {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
-        
-        .radar-effect::before,
-        .radar-effect::after {
-            content: '';
-            position: absolute;
-            border: 1px solid rgba(0, 255, 65, 0.3);
-            border-radius: 50%;
-            animation: radar-scan 3s linear infinite;
-        }
-        
-        .radar-effect::before {
-            width: 100%;
-            height: 100%;
-            animation-delay: 0s;
-        }
-        
-        .radar-effect::after {
-            width: 150%;
-            height: 150%;
-            top: -25%;
-            left: -25%;
-            animation-delay: 1.5s;
-        }
-        
-        @keyframes pulse-bg {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        .logo-subtitle {
+            font-size: 14px;
+            color: var(--text-tertiary);
+            font-weight: 400;
         }
         
         #top-bar-right {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
         }
         
-        #theme-toggle {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-primary);
-            border-radius: 8px;
-            padding: 8px 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 14px;
-            color: var(--text-secondary);
-            transition: all 0.2s ease;
-        }
-        
-        #theme-toggle:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--accent-blue);
-            color: var(--text-primary);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-        }
-        
-        #theme-icon {
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-        }
-        
-        /* Bell Notification */
-        #top-bell-container {
+        /* Icon Buttons */
+        .icon-btn {
             position: relative;
-            cursor: pointer;
-            margin-right: 16px;
-            padding: 8px 12px;
-            background: var(--bg-tertiary);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
             border: 1px solid var(--border-primary);
-            border-radius: 10px;
-            transition: all 0.2s ease;
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
         }
         
-        #top-bell-container:hover {
+        .icon-btn:hover {
             background: var(--bg-hover);
-            border-color: var(--accent-blue);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+            color: var(--text-primary);
+            border-color: var(--border-secondary);
         }
         
-        #top-bell-container .bell-icon {
-            font-size: 20px;
-            animation: bell-ring 2s ease-in-out infinite;
+        .icon-btn:active {
+            transform: scale(0.96);
         }
         
-        @keyframes bell-ring {
-            0%, 100% { transform: rotate(0); }
-            10%, 30% { transform: rotate(-10deg); }
-            20%, 40% { transform: rotate(10deg); }
-        }
-        
-        #top-bell-badge {
+        .badge {
             position: absolute;
-            top: 2px;
-            right: 2px;
-            background: var(--accent-red);
+            top: -4px;
+            right: -4px;
+            background: var(--error-color);
             color: white;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 6px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 1px 5px;
             border-radius: 10px;
             min-width: 18px;
             text-align: center;
         }
         
-        /* Auth UI */
-        #auth-container {
-            display: flex;
-            align-items: center;
-        }
-        
-        #sign-in-btn {
-            background: linear-gradient(180deg, var(--accent-blue) 0%, var(--accent-blue-dark) 100%);
+        /* Buttons */
+        .primary-btn {
+            background: var(--primary-color);
             color: white;
             border: none;
             padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
+            border-radius: var(--radius-md);
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .primary-btn:hover {
+            background: var(--primary-hover);
+        }
+        
+        .primary-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .primary-btn:disabled {
+            background: var(--bg-tertiary);
+            color: var(--text-tertiary);
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* User Menu */
+        #user-menu-container {
+            position: relative;
+            display: none;
+        }
+        
+        .user-menu-btn {
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: var(--shadow-md);
-            transition: all 0.2s ease;
-        }
-        
-        #sign-in-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-            filter: brightness(1.1);
-        }
-        
-        #user-menu-container {
-            position: relative;
-        }
-        
-        #user-menu {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: var(--bg-tertiary);
+            background: transparent;
             border: 1px solid var(--border-primary);
-            border-radius: 12px;
-            padding: 8px 12px;
-            position: relative;
+            border-radius: var(--radius-md);
+            padding: 4px 12px 4px 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-primary);
+        }
+        
+        .user-menu-btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-secondary);
         }
         
         #user-avatar {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            border: 2px solid var(--accent-blue);
             object-fit: cover;
         }
         
         #user-info {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            align-items: flex-start;
+            text-align: left;
         }
         
         #user-name {
             font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
+            font-weight: 500;
         }
         
         #collaborator-badge {
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        #user-menu-toggle {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            padding: 6px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-        
-        #user-menu-toggle:hover {
-            background: var(--bg-card-hover);
-            color: var(--text-primary);
+            font-size: 11px;
+            color: var(--text-tertiary);
         }
         
         .dropdown-menu {
@@ -1007,27 +689,14 @@ class HtmlReportGenerator:
             right: 0;
             background: var(--bg-card);
             border: 1px solid var(--border-primary);
-            border-radius: 8px;
-            box-shadow: var(--shadow-xl);
-            min-width: 180px;
-            z-index: 1001;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            min-width: 160px;
             overflow: hidden;
         }
         
         .dropdown-menu.show {
             display: block;
-            animation: slideDown 0.2s ease;
-        }
-        
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
         
         .dropdown-item {
@@ -1038,91 +707,53 @@ class HtmlReportGenerator:
             text-align: left;
             cursor: pointer;
             color: var(--text-primary);
-            font-size: 13px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
+            font-size: 14px;
+            transition: background 0.2s;
         }
         
         .dropdown-item:hover {
             background: var(--bg-hover);
         }
         
-        .dropdown-item svg {
-            flex-shrink: 0;
-        }
-        
-        #sign-out-btn:hover {
-            color: var(--accent-red);
-        }
-        
         /* Main Container */
         #main-container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            padding: 80px 24px 24px;
         }
         
         /* PR Info Card */
         .pr-info-card {
             background: var(--bg-card);
             border: 1px solid var(--border-primary);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: var(--radius-lg);
+            padding: 24px;
             margin-bottom: 24px;
-            box-shadow: var(--shadow-md);
-            transition: all 0.3s ease;
-        }
-        
-        .pr-info-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-2px);
         }
         
         .pr-info-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border-primary);
-        }
-        
-        .pr-info-icon {
-            font-size: 24px;
+            margin-bottom: 20px;
         }
         
         .pr-info-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-primary);
-            margin: 0;
         }
         
         .pr-info-grid {
             display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 12px 20px;
+            grid-template-columns: 120px 1fr;
+            gap: 16px;
             align-items: center;
         }
         
         .pr-info-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
         }
         
         .pr-info-value {
@@ -1130,381 +761,221 @@ class HtmlReportGenerator:
             color: var(--text-primary);
         }
         
-        .pr-number-badge {
-            background: var(--accent-blue-bg);
-            color: var(--accent-blue);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-weight: 600;
-            display: inline-block;
-            border: 1px solid var(--accent-blue);
-            font-family: 'Share Tech Mono', monospace !important;
-        }
-        
-        .author-badge {
-            background: var(--accent-purple-bg);
-            color: var(--accent-purple);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-weight: 600;
-            display: inline-block;
-            border: 1px solid var(--accent-purple);
-            font-family: 'Share Tech Mono', monospace !important;
-        }
-        
-        .branch-badge {
-            background: var(--accent-green-bg);
-            color: var(--accent-green);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-family: 'Share Tech Mono', monospace !important;
-            font-size: 12px;
-            display: inline-block;
-            border: 1px solid var(--accent-green);
-        }
-        
+        .pr-number-badge,
+        .author-badge,
+        .branch-badge,
         .commit-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-family: 'JetBrains Mono', monospace;
             background: var(--bg-tertiary);
             color: var(--text-secondary);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-family: 'Share Tech Mono', monospace !important;
-            font-size: 12px;
-            display: inline-block;
             border: 1px solid var(--border-primary);
+        }
+        
+        .arrow-separator {
+            color: var(--text-tertiary);
+            margin: 0 8px;
         }
         
         /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 24px;
+            gap: 16px;
+            margin-bottom: 32px;
         }
         
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border-primary);
-            border-radius: 16px;
-            padding: 24px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--shadow-sm);
+            border-radius: var(--radius-lg);
+            padding: 20px;
             position: relative;
-            overflow: hidden;
+            transition: all 0.2s;
+            cursor: pointer;
         }
         
         .stat-card::before {
             content: '';
             position: absolute;
-            top: 0;
             left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--stat-color, var(--accent-blue));
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-        
-        .stat-card:hover::before {
-            transform: scaleX(1);
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--stat-accent, transparent);
+            border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+            transition: width 0.2s;
         }
         
         .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--stat-color, var(--accent-blue));
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .stat-card:hover::before {
+            width: 4px;
+        }
+        
+        .filterable-stat:hover,
+        .reset-filter-stat:hover {
+            border-color: var(--stat-accent);
         }
         
         .stat-card.filter-active {
-            background: var(--stat-color, var(--accent-blue));
-            background: linear-gradient(135deg, var(--stat-color, var(--accent-blue)), transparent);
-            border-color: var(--stat-color, var(--accent-blue));
-            box-shadow: 0 0 20px rgba(74, 158, 255, 0.3);
-            transform: scale(1.05);
+            background: var(--bg-card-hover);
+            border-color: var(--stat-accent);
+            box-shadow: 0 0 0 1px var(--stat-accent);
         }
         
-        .stat-card.filter-active:hover {
-            transform: scale(1.05) translateY(-2px);
-        }
-        
-        /* Reset Filter Card (Total Issues) Styling */
-        .reset-filter-stat {
-            position: relative;
-        }
-        
-        .reset-filter-stat::after {
-            content: 'Reset Filters';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--accent-purple);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-        
-        .reset-filter-stat:hover::after {
-            opacity: 0.9;
-            transform: translate(-50%, -150%);
-        }
-        
-        .reset-filter-stat:hover {
-            border-color: var(--accent-purple) !important;
-            box-shadow: 0 0 20px rgba(175, 82, 222, 0.4) !important;
-        }
-        
-        .reset-filter-stat:active {
-            transform: scale(0.98) !important;
-        }
-        
-        .issue-item.filtered-out {
-            opacity: 0.2;
-            filter: blur(2px);
-            pointer-events: none;
-            transform: scale(0.95);
-        }
-        
-        .issue-item.filtered-in {
-            animation: highlightIssue 0.5s ease-out;
-            border-left-color: var(--accent-blue) !important;
-            background: linear-gradient(90deg, var(--accent-blue-bg), transparent);
-        }
-        
-        @keyframes highlightIssue {
-            0% {
-                background: var(--accent-blue-bg);
-                transform: translateX(20px);
-            }
-            100% {
-                background: linear-gradient(90deg, var(--accent-blue-bg), transparent);
-                transform: translateX(0);
-            }
-        }
-        
-        .stat-icon {
-            font-size: 36px;
-            width: 64px;
-            height: 64px;
+        .stat-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            border-radius: 16px;
-            background: var(--stat-color, var(--accent-blue-bg));
-        }
-        
-        .stat-icon-blue {
-            background: var(--accent-blue-bg);
-        }
-        
-        .stat-icon-red {
-            background: var(--accent-red-bg);
-        }
-        
-        .stat-icon-orange {
-            background: var(--accent-orange-bg);
-        }
-        
-        .stat-icon-purple {
-            background: var(--accent-purple-bg);
-        }
-        
-        .stat-content {
-            flex: 1;
-        }
-        
-        .stat-value {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--text-primary);
-            line-height: 1;
-            margin-bottom: 4px;
-            background: var(--accent-gold);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            justify-content: space-between;
+            margin-bottom: 8px;
         }
         
         .stat-label {
-            font-size: 14px;
-            color: var(--text-secondary);
+            font-size: 13px;
+            color: var(--text-tertiary);
+            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
+            letter-spacing: 0.02em;
         }
         
-        /* Bell Icon in Stats */
-        .bell-container {
-            position: relative;
-            display: inline-flex;
-        }
-        
-        .bell-icon {
-            font-size: 36px;
-        }
-        
-        .bell-badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: var(--accent-red);
-            color: white;
-            font-size: 12px;
+        .stat-value {
+            font-size: 32px;
             font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 10px;
-            min-width: 20px;
-            text-align: center;
-            animation: pulse 2s ease-in-out infinite;
+            color: var(--text-primary);
+            line-height: 1;
         }
         
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+        .notification-dot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: var(--error-color);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 50%;
         }
         
         /* Spec Cards */
         .spec-card {
             background: var(--bg-card);
             border: 1px solid var(--border-primary);
-            border-radius: 12px;
+            border-radius: var(--radius-lg);
             margin-bottom: 16px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
         }
         
-        .spec-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--accent-blue);
+        .spec-card[data-severity="high"] {
+            border-left: 3px solid var(--error-color);
+        }
+        
+        .spec-card[data-severity="medium"] {
+            border-left: 3px solid var(--warning-color);
+        }
+        
+        .spec-card[data-severity="low"] {
+            border-left: 3px solid var(--success-color);
         }
         
         .spec-card summary {
             cursor: pointer;
             padding: 20px;
-            font-weight: 600;
-            font-size: 16px;
-            user-select: none;
-            background: linear-gradient(135deg, var(--bg-card), var(--bg-tertiary));
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            list-style: none;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 12px;
+            transition: background 0.2s;
+        }
+        
+        .spec-card summary::-webkit-details-marker {
+            display: none;
         }
         
         .spec-card summary:hover {
-            background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-card));
-        }
-        
-        .spec-card summary::marker {
-            content: '';
+            background: var(--bg-hover);
         }
         
         .spec-card summary::before {
-            content: '▶';
-            font-size: 12px;
-            transition: transform 0.2s ease;
-            color: var(--accent-blue);
+            content: '';
             display: inline-block;
+            width: 0;
+            height: 0;
+            border-left: 5px solid var(--text-tertiary);
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            margin-right: 12px;
+            transition: transform 0.2s;
         }
         
         .spec-card[open] summary::before {
             transform: rotate(90deg);
         }
         
+        .spec-name {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+        }
+        
         .spec-summary {
-            color: var(--text-secondary);
-            font-weight: normal;
-            font-size: 14px;
-            margin-left: auto;
+            font-size: 13px;
+            color: var(--text-tertiary);
         }
         
         .spec-card-content {
-            padding: 0 20px 20px 20px;
-            background: var(--bg-secondary);
+            padding: 0 20px 20px;
+            border-top: 1px solid var(--border-primary);
         }
         
-        .spec-file-badge {
-            background: var(--bg-tertiary);
-            color: var(--text-secondary);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-family: 'Share Tech Mono', monospace !important;
-            font-size: 12px;
-            display: inline-block;
-            border: 1px solid var(--border-primary);
-        }
-        
-        /* Card headers with code font */
-        .pr-info-title,
-        .modal-header h2 {
-            font-family: 'Share Tech Mono', monospace !important;
-            letter-spacing: 0.02em;
-        }
-        
-        /* Anti-pattern Details */
-        .antipattern-details {
-            background: var(--bg-card);
-            border: 1px solid var(--border-primary);
-            border-left: 3px solid var(--accent-purple);
-            border-radius: 10px;
-            margin: 16px 0;
-            padding: 12px;
-        }
-        
-        .antipattern-details summary {
-            cursor: pointer;
-            font-weight: bold;
-            color: var(--text-primary);
-            user-select: none;
-            padding: 12px 16px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, var(--accent-purple-bg), transparent);
-            border: 1px solid var(--accent-purple);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        .spec-file-info {
+            margin: 20px 0;
             display: flex;
             align-items: center;
             gap: 8px;
         }
         
-        .antipattern-details summary:hover {
-            background: var(--accent-purple-bg);
-            transform: translateX(4px);
+        .spec-file-label {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            font-weight: 500;
         }
         
-        .antipattern-details summary::marker {
-            content: '';
+        .spec-file-badge {
+            padding: 4px 8px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            color: var(--text-secondary);
         }
         
-        .antipattern-details summary::before {
-            content: '▶';
-            font-size: 10px;
-            transition: transform 0.2s ease;
-            color: var(--accent-purple);
-            display: inline-block;
+        /* Issues Section */
+        .antipattern-container {
+            margin-top: 24px;
         }
         
-        .antipattern-details[open] summary::before {
-            transform: rotate(90deg);
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
         }
         
-        /* Issue Type Sections */
         .issue-type-section {
-            margin: 16px 0;
-            background: transparent;
-            border-radius: 8px;
+            margin-bottom: 20px;
         }
         
         .issue-type-header {
@@ -1512,151 +983,142 @@ class HtmlReportGenerator:
             justify-content: space-between;
             align-items: center;
             padding-bottom: 8px;
-            border-bottom: 1px solid var(--border-primary);
             margin-bottom: 12px;
+            border-bottom: 1px solid var(--border-primary);
         }
         
         .issue-type-title {
-            font-weight: 600;
-            color: var(--text-primary);
             font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
         }
         
         .issue-count-badge {
-            background: var(--accent-purple-bg);
-            color: var(--accent-purple);
-            padding: 4px 10px;
-            border-radius: 20px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 2px 8px;
+            border-radius: 12px;
             font-size: 12px;
-            font-weight: 600;
-            border: 1px solid var(--accent-purple);
+            font-weight: 500;
         }
         
-        /* Issue List Items */
         .issue-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
         
         .issue-item {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-primary);
-            border-left: 3px solid var(--accent-blue);
-            border-radius: 8px;
-            padding: 16px;
-            margin: 12px 0;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
         }
         
         .issue-item:hover {
-            background: var(--bg-card-hover);
-            border-left-width: 5px;
+            background: var(--bg-hover);
             transform: translateX(4px);
-            box-shadow: var(--shadow-md);
         }
         
-        .issue-item::before {
-            display: none;
+        .issue-item.filtered-out {
+            opacity: 0.3;
+            pointer-events: none;
         }
         
-        .severity-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
+        .issue-item.filtered-in {
+            box-shadow: 0 0 0 2px var(--primary-color);
+        }
+        
+        .issue-content {
+            display: flex;
+            gap: 12px;
+            flex: 1;
+            align-items: flex-start;
+        }
+        
+        .severity-indicator {
+            width: 3px;
+            height: 100%;
+            min-height: 20px;
+            border-radius: 2px;
             flex-shrink: 0;
-            box-shadow: var(--shadow-sm);
+        }
+        
+        .severity-high .severity-indicator {
+            background: var(--error-color);
+        }
+        
+        .severity-medium .severity-indicator {
+            background: var(--warning-color);
+        }
+        
+        .severity-low .severity-indicator {
+            background: var(--success-color);
         }
         
         .issue-text {
-            flex: 1;
-            color: var(--text-primary);
             font-size: 14px;
-            line-height: 1.6;
+            color: var(--text-primary);
+            line-height: 1.5;
         }
         
         .challenge-btn {
-            background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-card));
+            padding: 6px 12px;
+            background: transparent;
             border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
             color: var(--text-secondary);
-            padding: 8px 14px;
-            border-radius: 8px;
-            cursor: pointer;
             font-size: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s ease;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
             white-space: nowrap;
         }
         
         .challenge-btn:hover {
-            background: linear-gradient(135deg, var(--accent-blue-bg), var(--accent-blue));
-            border-color: var(--accent-blue);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-        
-        .challenge-btn svg {
-            width: 14px;
-            height: 14px;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: var(--bg-hover);
         }
         
         .challenge-btn.challenged {
-            background: var(--accent-green-bg);
-            border-color: var(--accent-green);
-            color: var(--accent-green);
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
             cursor: not-allowed;
         }
         
-        .challenge-details {
-            display: none;
-            margin-top: 12px;
-            padding: 12px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-primary);
-            border-radius: 8px;
-            box-shadow: inset var(--shadow-sm);
+        /* Recommendations */
+        .recommendations-section {
+            margin-top: 24px;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
         }
         
-        .challenge-details.visible {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-        
-        .challenge-details-grid {
-            display: grid;
+        .recommendations-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
             gap: 8px;
         }
         
-        .challenge-detail-row {
-            display: grid;
-            grid-template-columns: 140px 1fr;
-            gap: 12px;
-        }
-        
-        .challenge-detail-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            font-weight: 600;
-        }
-        
-        .challenge-detail-value {
-            font-size: 12px;
+        .recommendations-list li {
+            font-size: 14px;
             color: var(--text-primary);
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .recommendations-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
         }
         
         /* Modal */
@@ -1671,214 +1133,139 @@ class HtmlReportGenerator:
             z-index: 2000;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(4px);
         }
         
         .modal.visible {
             display: flex;
-            animation: fadeIn 0.2s ease;
         }
         
         .modal-content {
             background: var(--bg-card);
             border: 1px solid var(--border-primary);
-            border-radius: 16px;
-            max-width: 600px;
+            border-radius: var(--radius-lg);
+            max-width: 500px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
             box-shadow: var(--shadow-xl);
-            animation: slideUp 0.3s ease;
-        }
-        
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
         
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 24px;
+            padding: 20px 24px;
             border-bottom: 1px solid var(--border-primary);
-            background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-card));
         }
         
         .modal-header h2 {
-            margin: 0;
-            font-size: 20px;
+            font-size: 18px;
+            font-weight: 600;
             color: var(--text-primary);
         }
         
         .modal-close {
             background: none;
             border: none;
-            font-size: 28px;
-            color: var(--text-secondary);
+            font-size: 24px;
+            color: var(--text-tertiary);
             cursor: pointer;
-            padding: 0;
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 8px;
-            transition: all 0.2s ease;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
         }
         
         .modal-close:hover {
             background: var(--bg-hover);
-            color: var(--accent-red);
-            transform: rotate(90deg);
+            color: var(--text-primary);
         }
         
         .modal-body {
             padding: 24px;
         }
         
-        #modal-finding-text {
+        .finding-display {
+            padding: 12px;
             background: var(--bg-tertiary);
-            padding: 16px;
-            border-radius: 8px;
-            border-left: 3px solid var(--accent-blue);
+            border-radius: var(--radius-md);
             margin-bottom: 20px;
-            color: var(--text-primary);
             font-size: 14px;
-            line-height: 1.6;
+            color: var(--text-primary);
+            line-height: 1.5;
         }
         
         #challenge-options {
-            display: grid;
+            display: flex;
+            flex-direction: column;
             gap: 12px;
             margin-bottom: 20px;
         }
         
         .challenge-option {
-            background: var(--bg-tertiary);
-            border: 2px solid var(--border-primary);
-            color: var(--text-primary);
-            padding: 14px 18px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 10px;
-            transition: all 0.2s ease;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
         }
         
         .challenge-option:hover {
-            border-color: var(--accent-blue);
-            background: var(--bg-card-hover);
-            transform: translateX(4px);
+            background: var(--bg-hover);
+            border-color: var(--border-secondary);
         }
         
-        .challenge-option.selected {
-            background: var(--accent-blue-bg);
-            border-color: var(--accent-blue);
-            color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
+        .challenge-option input[type="radio"] {
+            margin: 0;
+        }
+        
+        .challenge-option input[type="radio"]:checked + span {
+            color: var(--primary-color);
+            font-weight: 500;
         }
         
         #challenge-feedback {
             width: 100%;
-            min-height: 120px;
+            padding: 12px;
             background: var(--bg-tertiary);
             border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
             color: var(--text-primary);
-            padding: 14px;
-            border-radius: 8px;
             font-size: 14px;
             font-family: inherit;
             resize: vertical;
-            margin-bottom: 16px;
-            transition: all 0.2s ease;
+            margin-bottom: 20px;
         }
         
         #challenge-feedback:focus {
             outline: none;
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
+            border-color: var(--primary-color);
         }
         
-        #submit-challenge-btn {
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-blue-dark));
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            width: 100%;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        #submit-challenge-btn:hover:not(:disabled) {
-            background: linear-gradient(135deg, var(--accent-blue-light), var(--accent-blue));
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 0 2px var(--primary-color); }
+            50% { box-shadow: 0 0 10px 2px var(--primary-color); }
         }
         
-        #submit-challenge-btn:disabled {
-            background: var(--bg-tertiary);
-            color: var(--text-tertiary);
-            cursor: not-allowed;
-            transform: none;
+        #top-bell-container.glowing {
+            animation: glow 1s ease-in-out;
         }
         
-        /* Clean RADAR logo design */
-        .radar-logo-clean {
-            display: flex;
-            align-items: center;
-            gap: 0;
-        }
-        
-        /* RADAR Branding - Simple, no tooltip or hover effects */
-        .radar-title {
-            font-weight: 900;
-            font-style: italic;
-            font-size: 1.5em;
-            letter-spacing: 0.05em;
-            background: var(--accent-gold);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: inline-block;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* Smooth scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--bg-tertiary);
-            border-radius: 5px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-accent);
-            border-radius: 5px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-blue);
-        }
-        
-        /* Responsive adjustments */
+        /* Responsive */
         @media (max-width: 768px) {
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -1886,23 +1273,33 @@ class HtmlReportGenerator:
             
             .pr-info-grid {
                 grid-template-columns: 1fr;
+                gap: 8px;
             }
             
             #top-bar {
-                padding: 0 12px;
+                padding: 0 16px;
             }
             
-            .radar-title {
-                font-size: 1.2em;
+            .logo-subtitle {
+                display: none;
             }
-            
-            .radar-humanoid-container {
-                padding: 4px 8px;
-            }
+        }
+        
+        /* Utility Classes */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
         }"""
     
     def _get_javascript(self, pr_number: int) -> str:
-        """Get all JavaScript code for the HTML page with enhanced bell functionality."""
+        """Get all JavaScript code for the HTML page with professional interactions."""
         js_code = """        // ============================================================================
         // RADAR Authentication Module
         // ============================================================================
@@ -1913,51 +1310,40 @@ class HtmlReportGenerator:
             const STORAGE_KEY = 'radar_auth_token';
             const USER_KEY = 'radar_user_info';
             
-            // Get current user from localStorage
             function getCurrentUser() {
                 const userJson = localStorage.getItem(USER_KEY);
                 return userJson ? JSON.parse(userJson) : null;
             }
             
-            // Get auth token from localStorage
             function getAuthToken() {
                 return localStorage.getItem(STORAGE_KEY);
             }
             
-            // Check if user is authenticated
             function isAuthenticated() {
                 return !!getAuthToken();
             }
             
-            // Initiate GitHub OAuth login
             function signIn() {
                 const currentUrl = window.location.href.split('#')[0];
                 const state = encodeURIComponent(currentUrl);
                 const authUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(AUTH_CALLBACK_URL)}&scope=read:user%20read:org&state=${state}`;
-                
-                console.log('🔐 Redirecting to GitHub OAuth...');
                 window.location.href = authUrl;
             }
             
-            // Sign out
             function signOut() {
                 localStorage.removeItem(STORAGE_KEY);
                 localStorage.removeItem(USER_KEY);
-                console.log('👋 Signed out');
                 updateUI();
             }
             
-            // Handle auth callback (extract token from URL fragment)
             function handleAuthCallback() {
                 const fragment = window.location.hash.substring(1);
                 const params = new URLSearchParams(fragment);
                 const token = params.get('token');
                 
                 if (token) {
-                    console.log('🎫 Token received from OAuth callback');
                     localStorage.setItem(STORAGE_KEY, token);
                     
-                    // Decode JWT to get user info (simple base64 decode, not verification)
                     try {
                         const payload = JSON.parse(atob(token.split('.')[1]));
                         localStorage.setItem(USER_KEY, JSON.stringify({
@@ -1968,18 +1354,15 @@ class HtmlReportGenerator:
                             is_collaborator: payload.is_collaborator,
                             is_admin: payload.is_admin
                         }));
-                        console.log('✅ User authenticated:', payload.username);
                     } catch (e) {
                         console.error('Failed to decode token:', e);
                     }
                     
-                    // Clean up URL
                     window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
                     updateUI();
                 }
             }
             
-            // Update UI based on auth state
             function updateUI() {
                 const user = getCurrentUser();
                 const userMenuContainer = document.getElementById('user-menu-container');
@@ -1988,11 +1371,9 @@ class HtmlReportGenerator:
                 if (!userMenuContainer || !signInBtn) return;
                 
                 if (user) {
-                    // Show user menu
                     userMenuContainer.style.display = 'block';
                     signInBtn.style.display = 'none';
                     
-                    // Populate user data
                     const avatarEl = document.getElementById('user-avatar');
                     const nameEl = document.getElementById('user-name');
                     const badgeEl = document.getElementById('collaborator-badge');
@@ -2001,36 +1382,20 @@ class HtmlReportGenerator:
                     if (nameEl) nameEl.textContent = user.name || user.username;
                     
                     if (badgeEl) {
-                        let roleIcon = '';
-                        let roleText = '';
-                        let roleColor = '';
-                        
                         if (user.is_admin) {
-                            roleIcon = '🔴';
-                            roleText = 'Admin';
-                            roleColor = '#ef4444';
+                            badgeEl.textContent = 'Admin';
                         } else if (user.is_collaborator) {
-                            roleIcon = '🟢';
-                            roleText = 'Collaborator';
-                            roleColor = '#22c55e';
+                            badgeEl.textContent = 'Collaborator';
                         } else {
-                            roleIcon = '🟠';
-                            roleText = 'PR Owner';
-                            roleColor = '#fb8500';
+                            badgeEl.textContent = 'PR Owner';
                         }
-                        
-                        badgeEl.textContent = `${roleIcon} ${roleText}`;
-                        badgeEl.style.color = roleColor;
-                        badgeEl.style.background = `${roleColor}20`;
                     }
                 } else {
-                    // Show sign-in button
                     userMenuContainer.style.display = 'none';
-                    signInBtn.style.display = 'flex';
+                    signInBtn.style.display = 'block';
                 }
             }
             
-            // Get auth headers for API requests
             function getAuthHeaders() {
                 const token = getAuthToken();
                 return token ? {
@@ -2041,14 +1406,11 @@ class HtmlReportGenerator:
                 };
             }
             
-            // Initialize on page load
             function init() {
-                console.log('🚀 RADAR Auth initialized');
                 handleAuthCallback();
                 updateUI();
             }
             
-            // Public API
             return {
                 init,
                 signIn,
@@ -2060,31 +1422,30 @@ class HtmlReportGenerator:
             };
         })();
         
-        // Wrap all code in DOMContentLoaded to ensure DOM is ready
+        // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
         
-        // Initialize RADAR Auth
+        // Initialize Auth
         RADAR_AUTH.init();
         
         // Theme Management
         const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        const themeText = document.getElementById('theme-text');
+        const lightIcon = document.getElementById('theme-icon-light');
+        const darkIcon = document.getElementById('theme-icon-dark');
         
         function setTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
-            // Update button to show what mode you can switch TO
+            
             if (theme === 'dark') {
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Light';
+                lightIcon.style.display = 'block';
+                darkIcon.style.display = 'none';
             } else {
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Dark';
+                lightIcon.style.display = 'none';
+                darkIcon.style.display = 'block';
             }
         }
         
-        // Load saved theme or default to dark
         const savedTheme = localStorage.getItem('theme') || 'dark';
         setTheme(savedTheme);
         
@@ -2093,31 +1454,29 @@ class HtmlReportGenerator:
             setTheme(currentTheme === 'dark' ? 'light' : 'dark');
         });
         
-        // Attach Sign In button event listener
+        // Auth UI Events
         const signInBtn = document.getElementById('sign-in-btn');
         if (signInBtn) {
             signInBtn.addEventListener('click', () => RADAR_AUTH.signIn());
         }
         
-        // Dropdown toggle functionality
-        const userMenuToggle = document.getElementById('user-menu-toggle');
+        // User Menu Dropdown
+        const userMenu = document.getElementById('user-menu');
         const userDropdown = document.getElementById('user-dropdown');
         
-        if (userMenuToggle && userDropdown) {
-            userMenuToggle.addEventListener('click', (e) => {
+        if (userMenu && userDropdown) {
+            userMenu.addEventListener('click', (e) => {
                 e.stopPropagation();
                 userDropdown.classList.toggle('show');
             });
             
-            // Close dropdown when clicking outside
             document.addEventListener('click', (e) => {
-                if (!userMenuToggle.contains(e.target) && !userDropdown.contains(e.target)) {
+                if (!userMenu.contains(e.target) && !userDropdown.contains(e.target)) {
                     userDropdown.classList.remove('show');
                 }
             });
         }
         
-        // Attach Sign Out button event listener
         const signOutBtn = document.getElementById('sign-out-btn');
         if (signOutBtn) {
             signOutBtn.addEventListener('click', () => {
@@ -2126,18 +1485,16 @@ class HtmlReportGenerator:
             });
         }
         
-        // Bell icon expand/glow functionality
+        // Bell Icon - Expand All Specs
         const topBellContainer = document.getElementById('top-bell-container');
         
         if (topBellContainer) {
             topBellContainer.addEventListener('click', function(e) {
                 e.preventDefault();
                 
-                // Get all spec cards
                 const specCards = document.querySelectorAll('.spec-card');
                 let allExpanded = true;
                 
-                // Check if all cards are already expanded
                 specCards.forEach(card => {
                     if (!card.hasAttribute('open')) {
                         allExpanded = false;
@@ -2145,71 +1502,37 @@ class HtmlReportGenerator:
                 });
                 
                 if (allExpanded) {
-                    // All cards are already expanded - show glow effect
-                    console.log('🔔 All specs already expanded - showing glow effect');
-                    
-                    // Add glowing class for animation
                     this.classList.add('glowing');
-                    
-                    // Remove glow after animation
                     setTimeout(() => {
                         this.classList.remove('glowing');
                     }, 1000);
                     
-                    // Optional: Scroll to first spec card smoothly
                     if (specCards.length > 0) {
-                        setTimeout(() => {
-                            specCards[0].scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'center'
-                            });
-                        }, 200);
+                        specCards[0].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
                     }
-                    
                 } else {
-                    // Expand all spec cards
-                    console.log('🔔 Expanding all spec cards');
-                    
-                    // Expand with staggered animation
                     specCards.forEach((card, index) => {
                         setTimeout(() => {
                             card.setAttribute('open', '');
-                            // Add a subtle highlight effect
-                            card.style.transition = 'all 0.3s ease';
-                            card.style.boxShadow = '0 0 20px rgba(74, 158, 255, 0.4)';
-                            setTimeout(() => {
-                                card.style.boxShadow = '';
-                            }, 500);
-                        }, index * 50); // Stagger by 50ms
+                        }, index * 30);
                     });
                     
-                    // Add a temporary glow to indicate action
-                    this.style.background = 'linear-gradient(135deg, var(--accent-blue-bg), transparent)';
-                    this.style.borderColor = 'var(--accent-blue)';
-                    setTimeout(() => {
-                        this.style.background = '';
-                        this.style.borderColor = '';
-                    }, 800);
-                    
-                    // Scroll to first card after expansion
                     if (specCards.length > 0) {
                         setTimeout(() => {
                             specCards[0].scrollIntoView({
                                 behavior: 'smooth',
-                                block: 'start',
-                                inline: 'nearest'
+                                block: 'start'
                             });
-                        }, 300);
+                        }, 200);
                     }
                 }
             });
-            
-            // Add hover effect for bell container
-            topBellContainer.style.cursor = 'pointer';
-            topBellContainer.title = 'Click to expand all specs or show notifications';
         }
         
-        // Challenge Modal Management
+        // Challenge Modal
         let currentFindingId = null;
         let currentIssueHash = null;
         let currentSpec = null;
@@ -2227,7 +1550,9 @@ class HtmlReportGenerator:
             document.getElementById('challenge-modal').classList.add('visible');
             
             // Reset form
-            document.querySelectorAll('.challenge-option').forEach(btn => btn.classList.remove('selected'));
+            document.querySelectorAll('input[name="challenge-type"]').forEach(radio => {
+                radio.checked = false;
+            });
             document.getElementById('challenge-feedback').value = '';
         }
         
@@ -2235,37 +1560,27 @@ class HtmlReportGenerator:
             document.getElementById('challenge-modal').classList.remove('visible');
         }
         
-        // Attach close button event listener
         document.getElementById('modal-close-btn').addEventListener('click', closeChallengeModal);
         
-        // Challenge option selection
-        document.querySelectorAll('.challenge-option').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.challenge-option').forEach(b => b.classList.remove('selected'));
-                this.classList.add('selected');
-            });
-        });
-        
-        // Submit challenge to Azure Function
+        // Submit Challenge
         async function submitChallenge() {
-            // Check authentication first
             if (!RADAR_AUTH.isAuthenticated()) {
                 alert('Please sign in to submit challenges');
                 RADAR_AUTH.signIn();
                 return;
             }
             
-            const selectedOption = document.querySelector('.challenge-option.selected');
+            const selectedOption = document.querySelector('input[name="challenge-type"]:checked');
             if (!selectedOption) {
                 alert('Please select a feedback type');
                 return;
             }
             
-            const challengeType = selectedOption.getAttribute('data-type');
+            const challengeType = selectedOption.value;
             const feedback = document.getElementById('challenge-feedback').value.trim();
             
             if (!feedback) {
-                alert('Please provide an explanation');
+                alert('Please provide additional details');
                 return;
             }
             
@@ -2276,8 +1591,6 @@ class HtmlReportGenerator:
             try {
                 const pr_number = {pr_number};
                 const headers = RADAR_AUTH.getAuthHeaders();
-                
-                console.log('📤 Submitting challenge to Azure Function...');
                 
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 15000);
@@ -2300,71 +1613,32 @@ class HtmlReportGenerator:
                 const result = await response.json();
                 
                 if (response.ok) {
-                    console.log('✅ Challenge submitted successfully');
+                    alert('Challenge submitted successfully!');
                     
-                    let message = '✅ Challenge submitted successfully!\\n\\n';
-                    message += `Challenge ID: ${result.challenge_id}\\n`;
-                    
-                    if (result.github_comment_posted) {
-                        message += '✅ Comment posted to PR\\n';
-                    }
-                    if (result.github_label_added) {
-                        message += '✅ Label added to PR\\n';
-                    }
-                    
-                    alert(message);
-                    
-                    // Update button UI
+                    // Update button
                     const btn = document.querySelector(`button.challenge-btn[data-finding-id="${currentFindingId}"]`);
                     if (btn) {
-                        btn.textContent = '✅ Challenged';
-                        btn.disabled = true;
+                        btn.textContent = 'Challenged';
                         btn.classList.add('challenged');
+                        btn.disabled = true;
                     }
                     
-                    // Update issue counters dynamically
-                    const totalIssuesEl = document.getElementById('total-issues-count');
-                    const bellBadge = document.getElementById('top-bell-badge');
-                    const issuesBadge = document.getElementById('issues-badge');
-                    
-                    if (totalIssuesEl) {
-                        const currentCount = parseInt(totalIssuesEl.textContent) || 0;
-                        const newCount = Math.max(0, currentCount - 1);
-                        totalIssuesEl.textContent = newCount;
-                        console.log(`📊 Updated total issues: ${currentCount} → ${newCount}`);
-                    }
-                    
-                    if (bellBadge) {
-                        const currentCount = parseInt(bellBadge.textContent) || 0;
-                        const newCount = Math.max(0, currentCount - 1);
-                        bellBadge.textContent = newCount;
-                    }
-                    
-                    if (issuesBadge) {
-                        const currentCount = parseInt(issuesBadge.textContent) || 0;
-                        const newCount = Math.max(0, currentCount - 1);
-                        issuesBadge.textContent = newCount;
-                    }
-                    
+                    // Update counters
+                    updateIssueCounts(-1);
                     closeChallengeModal();
                 } else {
-                    console.error('❌ Server error:', result);
-                    
                     if (response.status === 401) {
-                        alert('🔐 Your session has expired!\\n\\nPlease sign in again.');
+                        alert('Your session has expired. Please sign in again.');
                         RADAR_AUTH.signOut();
                         return;
                     }
-                    
-                    alert(`❌ Failed to submit challenge: ${result.error || 'Unknown error'}`);
+                    alert(`Failed to submit challenge: ${result.error || 'Unknown error'}`);
                 }
             } catch (error) {
-                console.error('❌ Challenge submission error:', error);
-                
                 if (error.name === 'AbortError') {
-                    alert('❌ Request timeout: Server took too long to respond.');
+                    alert('Request timeout: Server took too long to respond.');
                 } else {
-                    alert(`❌ Error: ${error.message}`);
+                    alert(`Error: ${error.message}`);
                 }
             } finally {
                 submitBtn.disabled = false;
@@ -2372,10 +1646,9 @@ class HtmlReportGenerator:
             }
         }
         
-        // Attach submit button event listener
         document.getElementById('submit-challenge-btn').addEventListener('click', submitChallenge);
         
-        // Attach challenge buttons
+        // Attach challenge button events
         document.querySelectorAll('.challenge-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -2388,81 +1661,72 @@ class HtmlReportGenerator:
             });
         });
         
-        // Bell notification update
-        function updateCounters() {
+        // Update issue counters
+        function updateIssueCounts(delta) {
             const totalIssuesEl = document.getElementById('total-issues-count');
             const topBellBadge = document.getElementById('top-bell-badge');
-            const issuesBadge = document.getElementById('issues-badge');
             
             if (totalIssuesEl) {
-                const totalIssues = totalIssuesEl.textContent;
-                if (issuesBadge) issuesBadge.textContent = totalIssues;
-                if (topBellBadge) topBellBadge.textContent = totalIssues;
+                const currentCount = parseInt(totalIssuesEl.textContent) || 0;
+                const newCount = Math.max(0, currentCount + delta);
+                totalIssuesEl.textContent = newCount;
+            }
+            
+            if (topBellBadge) {
+                const currentCount = parseInt(topBellBadge.textContent) || 0;
+                const newCount = Math.max(0, currentCount + delta);
+                topBellBadge.textContent = newCount;
             }
         }
         
-        updateCounters();
+        // Initialize counters
+        function initializeCounters() {
+            const totalIssuesEl = document.getElementById('total-issues-count');
+            const topBellBadge = document.getElementById('top-bell-badge');
+            
+            if (totalIssuesEl && topBellBadge) {
+                topBellBadge.textContent = totalIssuesEl.textContent;
+            }
+        }
         
-        // Severity filtering functionality
+        initializeCounters();
+        
+        // Severity filtering
         let activeSeverityFilter = null;
         
-        // Function to expand all spec cards
         function expandAllSpecCards() {
             document.querySelectorAll('.spec-card').forEach(card => {
                 card.setAttribute('open', '');
             });
         }
         
-        // Reset filter function
         function resetAllFilters() {
             activeSeverityFilter = null;
-            // Remove filter-active class from all filterable stats
             document.querySelectorAll('.filterable-stat').forEach(card => {
                 card.classList.remove('filter-active');
             });
-            // Remove filtered classes from all issue items
             document.querySelectorAll('.issue-item').forEach(item => {
                 item.classList.remove('filtered-out', 'filtered-in');
             });
-            // Add a brief highlight animation to Total Issues card
-            const resetCard = document.querySelector('.reset-filter-stat');
-            if (resetCard) {
-                resetCard.style.transform = 'scale(1.08)';
-                resetCard.style.boxShadow = '0 0 30px rgba(175, 82, 222, 0.5)';
-                setTimeout(() => {
-                    resetCard.style.transform = '';
-                    resetCard.style.boxShadow = '';
-                }, 300);
-            }
         }
         
-        // Add click handler for Total Issues card (reset filters)
         document.querySelector('.reset-filter-stat')?.addEventListener('click', function() {
             resetAllFilters();
-            console.log('📊 Filters reset - showing all issues');
         });
         
-        // Existing filter functionality for Error and Warning cards
         document.querySelectorAll('.filterable-stat').forEach(card => {
             card.addEventListener('click', function() {
                 const severity = this.getAttribute('data-filter-severity');
                 
-                // Toggle filter
                 if (activeSeverityFilter === severity) {
-                    // Clear filter - same as reset
                     resetAllFilters();
                 } else {
-                    // Apply new filter
                     activeSeverityFilter = severity;
-                    
-                    // First, expand all spec cards to show the filtered issues
                     expandAllSpecCards();
                     
-                    // Update active stat card
                     document.querySelectorAll('.filterable-stat').forEach(c => c.classList.remove('filter-active'));
                     this.classList.add('filter-active');
                     
-                    // Filter and highlight issues
                     let firstMatchingIssue = null;
                     document.querySelectorAll('.issue-item').forEach(item => {
                         const itemSeverity = item.getAttribute('data-severity');
@@ -2478,14 +1742,13 @@ class HtmlReportGenerator:
                         }
                     });
                     
-                    // Scroll to first matching issue with smooth animation
                     if (firstMatchingIssue) {
                         setTimeout(() => {
                             firstMatchingIssue.scrollIntoView({ 
                                 behavior: 'smooth', 
                                 block: 'center' 
                             });
-                        }, 300); // Slight delay to let expansion happen first
+                        }, 300);
                     }
                 }
             });
@@ -2498,23 +1761,8 @@ class HtmlReportGenerator:
             }
         });
         
-        // Add smooth scroll behavior for all internal links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-        
-        // Add keyboard shortcut support
+        // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
-            // Escape to close modal
             if (e.key === 'Escape') {
                 const modal = document.getElementById('challenge-modal');
                 if (modal && modal.classList.contains('visible')) {
@@ -2522,7 +1770,6 @@ class HtmlReportGenerator:
                 }
             }
             
-            // Ctrl/Cmd + K to toggle theme
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                 e.preventDefault();
                 themeToggle.click();
@@ -2531,5 +1778,4 @@ class HtmlReportGenerator:
         
         }); // End DOMContentLoaded"""
         
-        # Replace the pr_number placeholder with actual value
         return js_code.replace('{pr_number}', str(pr_number))
