@@ -1,24 +1,35 @@
 %global tls_priority "@LIBVIRT,SYSTEM"
-%global verdir 1.3
+%global verdir 1.5
 
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary: A GTK widget for VNC clients
 Name: gtk-vnc
-Version: 1.3.0
+Version: 1.5.0
 Release: 3%{?dist}
-License: LGPLv2+
+License: LGPL-2.1-or-later
 Source: https://download.gnome.org/sources/%{name}/%{verdir}/%{name}-%{version}.tar.xz
+Patch: 0001-make-gtk-vnc-debug-work-with-new-glib.patch
+Patch: 0002-Expand-log-message-to-include-log-domain-and-timesta.patch
 URL: https://gitlab.gnome.org/GNOME/gtk-vnc
 Requires: gvnc = %{version}-%{release}
+BuildRequires: gcc
 BuildRequires: python3-devel
-BuildRequires: gnutls-devel libgcrypt-devel cyrus-sasl-devel zlib-devel
+BuildRequires: gnutls-devel
+BuildRequires: gmp-devel
+BuildRequires: cyrus-sasl-devel
+BuildRequires: zlib-devel
 BuildRequires: gobject-introspection-devel
 BuildRequires: gtk3-devel
 BuildRequires: vala
 BuildRequires: pulseaudio-libs-devel
-BuildRequires: /usr/bin/pod2man
+BuildRequires: perl-podlators
 BuildRequires: meson
+BuildRequires: gi-docgen
+BuildRequires: python-markdown
+BuildRequires: python-markupsafe
+BuildRequires: python-typogrify
+BuildRequires: python-jinja2
 
 %description
 gtk-vnc is a VNC viewer widget for GTK. It is built using coroutines
@@ -97,7 +108,7 @@ allowing it to be completely asynchronous while remaining single threaded.
 Libraries, includes, etc. to compile with the gtk-vnc library
 
 %prep
-%autosetup -n gtk-vnc-%{version}
+%autosetup -n gtk-vnc-%{version} -p1
 
 %build
 %meson
@@ -115,6 +126,8 @@ chmod -x examples/*.pl examples/*.js examples/*.py
 %files -n gvnc -f %{name}.lang
 %{_libdir}/libgvnc-1.0.so.*
 %{_libdir}/girepository-1.0/GVnc-1.0.typelib
+%dir %{_datadir}/vala/
+%dir %{_datadir}/vala/vapi/
 %{_datadir}/vala/vapi/gvnc-1.0.deps
 %{_datadir}/vala/vapi/gvnc-1.0.vapi
 
@@ -124,6 +137,8 @@ chmod -x examples/*.pl examples/*.js examples/*.py
 %{_includedir}/gvnc-1.0/*.h
 %{_libdir}/pkgconfig/gvnc-1.0.pc
 %{_datadir}/gir-1.0/GVnc-1.0.gir
+%{_datadir}/doc/gvnc/
+%{_datadir}/doc/gvnc.toml
 
 %files -n gvncpulse -f %{name}.lang
 %{_libdir}/libgvncpulse-1.0.so.*
@@ -164,11 +179,52 @@ chmod -x examples/*.pl examples/*.js examples/*.py
 %{_includedir}/%{name}-2.0/*.h
 %{_libdir}/pkgconfig/%{name}-2.0.pc
 %{_datadir}/gir-1.0/GtkVnc-2.0.gir
+%{_datadir}/doc/gtk-vnc/
+%{_datadir}/doc/gtk-vnc.toml
 
 %changelog
-* Mon Mar 06 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.3.0-3
-- Initial CBL-Mariner import from Fedora 36 (license: MIT).
-- License Verified
+* Mon Oct 06 2025 Aditya Singh <v-aditysing@microsoft.com> - 1.5.0-3
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License Verified.
+
+* Wed Feb 19 2025 Daniel P. Berrangé <berrange@redhat.com> - 1.5.0-2
+- Fix --gtk-vnc-debug flag with new glib2
+
+* Fri Feb 07 2025 Daniel P. Berrangé <berrange@redhat.com> - 1.5.0-1
+- Update to 1.5.0 release
+
+* Fri Jan 17 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Mon Jan 13 2025 Daniel P. Berrangé <berrange@redhat.com> - 1.4.0-3
+- Own vala dirs (rhbz#2305567)
+
+* Mon Jan  6 2025 Daniel P. Berrangé <berrange@redhat.com> - 1.4.0-1
+- Update to 1.4.0 release
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Jan 16 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 1.3.1-1
+- Update to 1.3.1 release
+
+* Mon Aug  8 2022 Daniel P. Berrangé <berrange@redhat.com> - 1.3.0-5
+- Pull in mingw sub-packages
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
 * Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
