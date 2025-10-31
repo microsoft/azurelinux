@@ -64,7 +64,7 @@ class HtmlReportGenerator:
         </div>
         <div class="Box-body">
             <p class="text-secondary mb-0">
-                Automated Anti-pattern Detection System • Generated {datetime.now().strftime('%b %d, %Y at %H:%M UTC')}
+                By RADAR | Realtime Anti-pattern Detection with AI Reasoning • Generated {datetime.now().strftime('%b %d, %Y at %H:%M UTC')}
             </p>
         </div>
     </div>
@@ -102,13 +102,20 @@ class HtmlReportGenerator:
         <div class="Box-body">
             <dl class="form-group">
                 <dt class="input-label">PR</dt>
-                <dd><span class="Label Label--primary">#{pr_number}</span></dd>
+                <dd>
+                    <a href="#" class="Link--primary">#{pr_number}</a>
+                </dd>
                 
                 <dt class="input-label">Title</dt>
                 <dd>{pr_title}</dd>
                 
                 <dt class="input-label">Author</dt>
-                <dd><a href="#" class="Link--primary">@{pr_author}</a></dd>
+                <dd>
+                    <svg class="octicon octicon-person mr-1" viewBox="0 0 16 16" width="16" height="16" style="color: var(--color-fg-muted);">
+                        <path fill-rule="evenodd" d="M10.5 5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zm.061 3.073a4 4 0 10-5.123 0 6.004 6.004 0 00-3.431 5.142.75.75 0 001.498.07 4.5 4.5 0 018.99 0 .75.75 0 101.498-.07 6.005 6.005 0 00-3.432-5.142z"/>
+                    </svg>
+                    <a href="#" class="Link--primary">@{pr_author}</a>
+                </dd>
                 
                 <dt class="input-label">Branches</dt>
                 <dd>
@@ -166,22 +173,27 @@ class HtmlReportGenerator:
         for spec_result in sorted(spec_results, key=lambda x: x.package_name):
             severity_class = "color-border-danger-emphasis" if spec_result.severity >= Severity.ERROR else "color-border-attention-emphasis" if spec_result.severity >= Severity.WARNING else "color-border-success-emphasis"
             
+            # Count issues by type for summary
+            errors = sum(1 for p in spec_result.anti_patterns if p.severity >= Severity.ERROR)
+            warnings = sum(1 for p in spec_result.anti_patterns if p.severity >= Severity.WARNING and p.severity < Severity.ERROR)
+            
             html += f"""
     <details class="Box mt-3 Details {severity_class}">
         <summary class="Box-header Details-summary">
-            <div class="d-flex flex-justify-between flex-items-center width-full">
-                <span class="text-bold">{spec_result.package_name}</span>
-                <span class="text-secondary text-small">{spec_result.summary}</span>
-            </div>
+            <svg class="octicon octicon-chevron mr-2" viewBox="0 0 16 16" width="16" height="16">
+                <path fill-rule="evenodd" d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z"/>
+            </svg>
+            <span class="text-bold mr-2">{spec_result.package_name}</span>
+            <span class="text-secondary text-small">({errors} errors, {warnings} warnings)</span>
         </summary>
         <div class="Box-body">
             <div class="mb-3">
-                <span class="text-secondary text-small">File:</span> 
-                <code class="text-mono text-small">{spec_result.spec_path}</code>
+                <span class="text-secondary text-small">Spec File:</span> 
+                <code class="text-mono text-small px-1 py-1">{spec_result.spec_path}</code>
             </div>
 """
             
-            # Anti-patterns section
+            # Anti-patterns section with better grouping
             if spec_result.anti_patterns:
                 html += self._generate_antipattern_section(spec_result)
             
@@ -199,27 +211,37 @@ class HtmlReportGenerator:
         issues_by_type = spec_result.get_issues_by_type()
         
         html = """
-            <div class="mb-3">
-                <h4 class="text-bold mb-2">Detected Issues</h4>
+            <details open class="Details mb-3">
+                <summary class="Details-summary">
+                    <svg class="octicon octicon-bug mr-1" viewBox="0 0 16 16" width="16" height="16">
+                        <path fill-rule="evenodd" d="M4.72.22a.75.75 0 011.06 0l1 .999a3.492 3.492 0 012.441 0l1-.999a.75.75 0 111.06 1.06l-.35.35a3.499 3.499 0 01.9 1.622L12.78 3.3a.75.75 0 010 1.5l-1.95.046A3.5 3.5 0 018 7.843v1.657h2.5a2.5 2.5 0 012.5 2.5v.5a.75.75 0 01-1.5 0V12a1 1 0 00-1-1H8v2.75a.75.75 0 01-1.5 0V11H4a1 1 0 00-1 1v.5a.75.75 0 01-1.5 0V12A2.5 2.5 0 014 9.5h2.5V7.843A3.5 3.5 0 013.67 4.846L1.72 4.8a.75.75 0 010-1.5l1.95-.047a3.499 3.499 0 01.9-1.622l-.35-.35A.75.75 0 014.72.22zM8 1.5a2 2 0 00-2 2V5h4V3.5a2 2 0 00-2-2z"/>
+                    </svg>
+                    Detected Issues
+                </summary>
+                <div class="mt-3">
 """
         
         for issue_type, patterns in issues_by_type.items():
+            # Create a collapsible section for each issue type
             html += f"""
-                <div class="mb-3">
-                    <div class="d-flex flex-justify-between flex-items-center mb-2">
-                        <span class="text-bold text-small">{issue_type}</span>
-                        <span class="Counter">{len(patterns)}</span>
-                    </div>
+                    <details open class="Details mb-2">
+                        <summary class="Details-summary py-2 px-2 bg-subtle">
+                            <span class="text-bold text-small">{issue_type}</span>
+                            <span class="Counter ml-2">{len(patterns)}</span>
+                        </summary>
+                        <div class="mt-2">
 """
             for idx, pattern in enumerate(patterns):
                 html += self._generate_issue_item(spec_result.package_name, issue_type, pattern, idx, spec_result.spec_path)
             
             html += """
-                </div>
+                        </div>
+                    </details>
 """
         
         html += """
-            </div>
+                </div>
+            </details>
 """
         return html
     
@@ -230,21 +252,35 @@ class HtmlReportGenerator:
         
         severity_name = pattern.severity.name
         severity_label_class = "Label--danger" if severity_name == "ERROR" else "Label--attention" if severity_name == "WARNING" else "Label--success"
+        severity_display = "ERROR" if severity_name == "ERROR" else "WARNING" if severity_name == "WARNING" else "INFO"
+        
+        # Add GitHub-style octicons for severity
+        severity_icon = """<svg class="octicon octicon-issue-opened mr-1" viewBox="0 0 16 16" width="16" height="16">
+            <path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+            <path fill-rule="evenodd" d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"/>
+        </svg>""" if severity_name == "ERROR" else """<svg class="octicon octicon-alert mr-1" viewBox="0 0 16 16" width="16" height="16">
+            <path fill-rule="evenodd" d="M8.22 1.754a.25.25 0 00-.44 0L1.698 13.132a.25.25 0 00.22.368h12.164a.25.25 0 00.22-.368L8.22 1.754zm-1.763-.707c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0114.082 15H1.918a1.75 1.75 0 01-1.543-2.575L6.457 1.047zM9 11a1 1 0 11-2 0 1 1 0 012 0zm-.25-5.25a.75.75 0 00-1.5 0v2.5a.75.75 0 001.5 0v-2.5z"/>
+        </svg>""" if severity_name == "WARNING" else ""
         
         escaped_desc = html_module.escape(pattern.description, quote=True)
         
         return f"""
-                    <div class="Box-row issue-item" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-severity="{severity_name}">
-                        <div class="d-flex flex-justify-between flex-items-start">
-                            <div class="flex-1 mr-3">
-                                <span class="Label {severity_label_class} mr-2">{severity_name}</span>
-                                <span class="text-normal">{escaped_desc}</span>
+                            <div class="Box-row issue-item" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-severity="{severity_name}">
+                                <div class="d-flex flex-justify-between flex-items-start">
+                                    <div class="flex-1 mr-3">
+                                        <div class="d-flex flex-items-start">
+                                            {severity_icon}
+                                            <div class="flex-1">
+                                                <span class="Label {severity_label_class} mr-2">{severity_display}</span>
+                                                <span class="text-normal">{escaped_desc}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-sm challenge-btn" type="button" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-spec="{spec_path}" data-issue-type="{issue_type}" data-description="{escaped_desc}">
+                                        Challenge
+                                    </button>
+                                </div>
                             </div>
-                            <button class="btn-sm challenge-btn" type="button" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-spec="{spec_path}" data-issue-type="{issue_type}" data-description="{escaped_desc}">
-                                Challenge
-                            </button>
-                        </div>
-                    </div>
 """
     
     def _generate_recommendations_section(self, anti_patterns: list) -> str:
@@ -260,15 +296,22 @@ class HtmlReportGenerator:
             return ""
         
         html = """
-            <div class="flash flash-success mt-3">
-                <h5 class="mb-2">Recommended Actions</h5>
+            <details open class="Details">
+                <summary class="Details-summary">
+                    <svg class="octicon octicon-check-circle mr-1" viewBox="0 0 16 16" width="16" height="16" style="color: var(--color-success-fg);">
+                        <path fill-rule="evenodd" d="M1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0zM8 0a8 8 0 100 16A8 8 0 008 0zm3.28 5.78a.75.75 0 00-1.06-1.06L7 7.94 5.78 6.72a.75.75 0 00-1.06 1.06l1.75 1.75a.75.75 0 001.06 0l3.75-3.75z"/>
+                    </svg>
+                    Recommended Actions
+                </summary>
+                <div class="flash flash-success mt-3">
 """
         for rec in recommendations:
             html += f"""
-                <div class="ml-3">• {rec}</div>
+                    <div class="mb-1">• {rec}</div>
 """
         html += """
-            </div>
+                </div>
+            </details>
 """
         return html
     
@@ -289,6 +332,11 @@ class HtmlReportGenerator:
         # Generate cache-busting timestamp
         cache_buster = datetime.now().strftime('%Y%m%d%H%M%S')
         
+        # TODO: Replace these with actual logos from the files
+        # For now using placeholder data URIs that can be replaced with actual logos
+        radar_logo_light = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%230969da'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-size='18' fill='white' font-weight='bold'%3ER%3C/text%3E%3C/svg%3E"
+        radar_logo_dark = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%2358a6ff'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-size='18' fill='white' font-weight='bold'%3ER%3C/text%3E%3C/svg%3E"
+        
         return f"""<!DOCTYPE html>
 <html lang="en" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
 <head>
@@ -298,7 +346,7 @@ class HtmlReportGenerator:
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <meta name="report-version" content="{cache_buster}">
-    <title>Pull Request #{pr_number} · Code Review Report</title>
+    <title>PR #{pr_number} · Code Review Report</title>
     <!-- GitHub-like fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Favicon -->
@@ -312,24 +360,29 @@ class HtmlReportGenerator:
     <div class="Header">
         <div class="Header-item">
             <a href="#" class="Header-link f4 d-flex flex-items-center">
-                <svg class="octicon octicon-mark-github mr-2" height="32" viewBox="0 0 16 16" width="32">
-                    <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-                </svg>
-                RADAR / Analysis
+                <img class="radar-logo mr-2" id="radar-logo" src="{radar_logo_light}" alt="RADAR" width="32" height="32">
+                <span class="Header-title">
+                    <span class="text-bold">RADAR</span>
+                    <span class="text-secondary mx-1">/</span>
+                    <span>Analysis</span>
+                </span>
             </a>
         </div>
         <div class="Header-item Header-item--full">
             <nav class="Header-nav">
-                <a href="#" class="Header-navItem">Pull Request #{pr_number}</a>
+                <span class="Header-navItem">
+                    <span class="text-secondary">PR</span>
+                    <a href="#" class="Label Label--primary ml-1">#{pr_number}</a>
+                </span>
             </nav>
         </div>
         <div class="Header-item mr-2">
-            <button id="notification-indicator" class="btn-octicon notification-indicator" type="button" aria-label="Expand all sections">
-                <span class="mail-status unread" id="notification-dot"></span>
+            <button id="notification-indicator" class="btn-octicon notification-indicator position-relative" type="button" aria-label="Expand all sections">
                 <svg class="octicon octicon-bell" viewBox="0 0 16 16" width="16" height="16">
                     <path d="M8 16a2 2 0 001.985-1.75c.017-.137-.097-.25-.235-.25h-3.5c-.138 0-.252.113-.235.25A2 2 0 008 16z"/>
                     <path fill-rule="evenodd" d="M8 1.5A3.5 3.5 0 004.5 5v2.947c0 .346-.102.683-.294.97l-1.703 2.556a.018.018 0 00-.003.01l.001.006c0 .002.002.004.004.006a.017.017 0 00.006.004l.007.001h10.964l.007-.001a.016.016 0 00.006-.004.016.016 0 00.004-.006l.001-.007a.017.017 0 00-.003-.01l-1.703-2.554a1.75 1.75 0 01-.294-.97V5A3.5 3.5 0 008 1.5zM3 5a5 5 0 0110 0v2.947c0 .05.015.098.042.139l1.703 2.555A1.518 1.518 0 0113.482 13H2.518a1.518 1.518 0 01-1.263-2.36l1.703-2.554A.25.25 0 003 7.947V5z"/>
                 </svg>
+                <span class="notification-badge" id="notification-badge">0</span>
             </button>
         </div>
         <div class="Header-item">
@@ -348,14 +401,16 @@ class HtmlReportGenerator:
                     Sign in with GitHub
                 </button>
                 <details class="details-reset details-overlay" id="user-menu-container" style="display: none;">
-                    <summary class="Header-link" aria-label="View profile and more">
-                        <img id="user-avatar" class="avatar avatar-small circle" src="" alt="@user" width="20" height="20">
-                        <span class="dropdown-caret"></span>
+                    <summary class="Header-link d-flex flex-items-center" aria-label="View profile and more">
+                        <img id="user-avatar" class="avatar avatar-small circle mr-2" src="" alt="@user" width="20" height="20">
+                        <span id="user-name" class="text-bold mr-1"></span>
+                        <span id="collaborator-badge" class="Label Label--accent"></span>
+                        <span class="dropdown-caret ml-1"></span>
                     </summary>
                     <details-menu class="dropdown-menu dropdown-menu-sw">
                         <div class="dropdown-header">
-                            <strong id="user-name"></strong>
-                            <div class="text-secondary text-small" id="collaborator-badge"></div>
+                            <strong id="dropdown-user-name"></strong>
+                            <div class="text-secondary text-small" id="dropdown-user-role"></div>
                         </div>
                         <div class="dropdown-divider"></div>
                         <button id="sign-out-btn" class="dropdown-item" type="button">Sign out</button>
@@ -429,6 +484,9 @@ class HtmlReportGenerator:
     </div>
     
     <script>
+        // Store logo URLs
+        const RADAR_LOGO_LIGHT = "{radar_logo_light}";
+        const RADAR_LOGO_DARK = "{radar_logo_dark}";
 {javascript}
     </script>
 </body>
@@ -553,10 +611,24 @@ class HtmlReportGenerator:
             text-decoration: none;
         }
         
+        .Header-title {
+            display: flex;
+            align-items: center;
+        }
+        
+        .Header-navItem {
+            padding: 0 8px;
+        }
+        
         /* Octicons */
         .octicon {
             vertical-align: text-bottom;
             fill: currentColor;
+        }
+        
+        /* RADAR Logo */
+        .radar-logo {
+            border-radius: 6px;
         }
         
         /* GitHub Box Component */
@@ -643,7 +715,7 @@ class HtmlReportGenerator:
         }
         
         .btn {
-            --color-btn-hover-bg: var(--color-canvas-subtle);
+            --color-btn-hover-bg: #f3f4f6;
             --color-btn-hover-border: rgba(27, 31, 36, 0.15);
         }
         
@@ -691,6 +763,28 @@ class HtmlReportGenerator:
             color: var(--color-accent-fg);
         }
         
+        /* Challenge button specific styling */
+        .challenge-btn {
+            background-color: var(--color-btn-bg);
+            border-color: var(--color-btn-border);
+        }
+        
+        .challenge-btn:hover {
+            background-color: var(--color-btn-hover-bg);
+            border-color: var(--color-accent-emphasis);
+        }
+        
+        .challenge-btn.challenged {
+            color: var(--color-success-fg);
+            background-color: rgba(46, 160, 67, 0.1);
+            border-color: var(--color-success-emphasis);
+            cursor: not-allowed;
+        }
+        
+        .challenge-btn.challenged::before {
+            content: "✓ ";
+        }
+        
         /* Container */
         .container-lg {
             max-width: 1012px;
@@ -699,15 +793,23 @@ class HtmlReportGenerator:
         }
         
         /* Padding utilities */
+        .px-1 { padding-right: 4px !important; padding-left: 4px !important; }
+        .px-2 { padding-right: 8px !important; padding-left: 8px !important; }
         .px-3 { padding-right: 16px !important; padding-left: 16px !important; }
+        .py-1 { padding-top: 4px !important; padding-bottom: 4px !important; }
+        .py-2 { padding-top: 8px !important; padding-bottom: 8px !important; }
         .py-4 { padding-top: 24px !important; padding-bottom: 24px !important; }
+        .mt-2 { margin-top: 8px !important; }
         .mt-3 { margin-top: 16px !important; }
         .mb-0 { margin-bottom: 0 !important; }
+        .mb-1 { margin-bottom: 4px !important; }
         .mb-2 { margin-bottom: 8px !important; }
         .mb-3 { margin-bottom: 16px !important; }
+        .ml-1 { margin-left: 4px !important; }
+        .ml-2 { margin-left: 8px !important; }
+        .mr-1 { margin-right: 4px !important; }
         .mr-2 { margin-right: 8px !important; }
         .mr-3 { margin-right: 16px !important; }
-        .ml-3 { margin-left: 16px !important; }
         .mx-1 { margin-right: 4px !important; margin-left: 4px !important; }
         
         /* Display utilities */
@@ -720,6 +822,7 @@ class HtmlReportGenerator:
         .flex-justify-between { justify-content: space-between !important; }
         .flex-1 { flex: 1 !important; min-width: 0; }
         .width-full { width: 100% !important; }
+        .position-relative { position: relative !important; }
         
         /* Text utilities */
         .text-secondary { color: var(--color-fg-muted) !important; }
@@ -730,13 +833,16 @@ class HtmlReportGenerator:
         .f1 { font-size: 26px !important; }
         .f4 { font-size: 16px !important; }
         
+        /* Background utilities */
+        .bg-subtle { background-color: var(--color-canvas-subtle) !important; }
+        
         /* Color utilities */
         .color-fg-danger { color: var(--color-danger-fg) !important; }
         .color-fg-attention { color: var(--color-attention-fg) !important; }
         .color-fg-success { color: var(--color-success-fg) !important; }
-        .color-border-danger-emphasis { border-color: var(--color-danger-emphasis) !important; }
-        .color-border-attention-emphasis { border-color: var(--color-attention-emphasis) !important; }
-        .color-border-success-emphasis { border-color: var(--color-success-emphasis) !important; }
+        .color-border-danger-emphasis { border-color: var(--color-danger-emphasis) !important; border-left-width: 3px !important; }
+        .color-border-attention-emphasis { border-color: var(--color-attention-emphasis) !important; border-left-width: 3px !important; }
+        .color-border-success-emphasis { border-color: var(--color-success-emphasis) !important; border-left-width: 3px !important; }
         
         /* Labels */
         .Label {
@@ -745,44 +851,58 @@ class HtmlReportGenerator:
             font-size: 12px;
             font-weight: 500;
             line-height: 18px;
-            border-radius: 20px;
+            border-radius: 2em;
+            white-space: nowrap;
             border: 1px solid transparent;
         }
         
         .Label--primary {
-            color: var(--color-accent-fg);
-            background-color: var(--color-accent-subtle);
-            border-color: var(--color-accent-muted);
+            color: #ffffff;
+            background-color: #0969da;
+            border-color: transparent;
+        }
+        
+        [data-color-mode="dark"] .Label--primary {
+            background-color: #1f6feb;
         }
         
         .Label--success {
-            color: var(--color-success-fg);
-            background-color: var(--color-success-subtle);
-            border-color: var(--color-success-muted);
+            color: #ffffff;
+            background-color: #2da44e;
+            border-color: transparent;
         }
         
         [data-color-mode="dark"] .Label--success {
-            background-color: rgba(46, 160, 67, 0.1);
+            background-color: #238636;
         }
         
         .Label--attention {
-            color: var(--color-attention-fg);
-            background-color: var(--color-attention-subtle);
-            border-color: var(--color-attention-muted);
+            color: #000000;
+            background-color: #fff8c5;
+            border-color: rgba(212, 167, 44, 0.4);
         }
         
         [data-color-mode="dark"] .Label--attention {
-            background-color: rgba(187, 128, 9, 0.1);
+            color: #f0f6fc;
+            background-color: rgba(187, 128, 9, 0.15);
+            border-color: rgba(187, 128, 9, 0.4);
         }
         
         .Label--danger {
-            color: var(--color-danger-fg);
-            background-color: var(--color-danger-subtle);
-            border-color: var(--color-danger-muted);
+            color: #ffffff;
+            background-color: #d1242f;
+            border-color: transparent;
         }
         
         [data-color-mode="dark"] .Label--danger {
-            background-color: rgba(248, 81, 73, 0.1);
+            background-color: #da3633;
+        }
+        
+        .Label--accent {
+            color: var(--color-fg-default);
+            background-color: var(--color-accent-subtle);
+            border-color: var(--color-accent-muted);
+            font-size: 11px;
         }
         
         /* Counter */
@@ -885,23 +1005,18 @@ class HtmlReportGenerator:
         .Details-summary {
             display: list-item;
             cursor: pointer;
+            list-style: none;
         }
         
         .Details-summary::-webkit-details-marker {
             display: none;
         }
         
-        .Details-summary::before {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            margin-right: 8px;
-            content: "";
-            background: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='%236e7781' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z'/%3E%3C/svg%3E") center no-repeat;
-            transition: transform 0.1s;
+        .Details-summary .octicon-chevron {
+            transition: transform 0.2s;
         }
         
-        [open] > .Details-summary::before {
+        [open] > .Details-summary .octicon-chevron {
             transform: rotate(90deg);
         }
         
@@ -929,6 +1044,24 @@ class HtmlReportGenerator:
             transition: all 0.2s;
         }
         
+        .issue-item:hover {
+            background-color: var(--color-canvas-subtle);
+        }
+        
+        .issue-item .octicon {
+            color: var(--color-fg-muted);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .issue-item .octicon-issue-opened {
+            color: var(--color-danger-fg);
+        }
+        
+        .issue-item .octicon-alert {
+            color: var(--color-attention-fg);
+        }
+        
         .issue-item.filtered-out {
             opacity: 0.3;
             pointer-events: none;
@@ -936,12 +1069,8 @@ class HtmlReportGenerator:
         
         .issue-item.filtered-in {
             background-color: var(--color-accent-subtle);
-        }
-        
-        .challenge-btn.challenged {
-            color: var(--color-success-fg);
-            background-color: var(--color-success-subtle);
-            border-color: var(--color-success-emphasis);
+            border-left: 3px solid var(--color-accent-emphasis);
+            padding-left: 13px;
         }
         
         /* Flash messages */
@@ -956,12 +1085,34 @@ class HtmlReportGenerator:
         
         .flash-success {
             color: var(--color-success-fg);
-            background-color: var(--color-success-subtle);
+            background-color: rgba(46, 160, 67, 0.1);
             border-color: var(--color-success-emphasis);
         }
         
         [data-color-mode="dark"] .flash-success {
             background-color: rgba(46, 160, 67, 0.1);
+        }
+        
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            font-size: 10px;
+            font-weight: 600;
+            line-height: 16px;
+            color: #fff;
+            text-align: center;
+            background-color: var(--color-danger-emphasis);
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .notification-badge.active {
+            display: block;
         }
         
         /* Dropdown */
@@ -975,7 +1126,7 @@ class HtmlReportGenerator:
             right: 0;
             left: auto;
             z-index: 100;
-            width: 160px;
+            width: 180px;
             padding-top: 4px;
             padding-bottom: 4px;
             margin-top: 2px;
@@ -1054,34 +1205,12 @@ class HtmlReportGenerator:
         
         /* Link styles */
         .Link--primary {
-            color: var(--color-fg-default) !important;
+            color: var(--color-accent-fg) !important;
+            font-weight: 600;
         }
         
         .Link--primary:hover {
-            color: var(--color-accent-fg) !important;
-        }
-        
-        /* Notification indicator */
-        .notification-indicator {
-            position: relative;
-        }
-        
-        .mail-status {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            z-index: 2;
-            display: none;
-            width: 10px;
-            height: 10px;
-            background-image: linear-gradient(#54a3ff, #006eed);
-            background-clip: padding-box;
-            border: 2px solid var(--color-canvas-default);
-            border-radius: 50%;
-        }
-        
-        .mail-status.unread {
-            display: block;
+            text-decoration: underline;
         }
         
         /* Modal/Overlay */
@@ -1235,18 +1364,31 @@ class HtmlReportGenerator:
                     const avatarEl = document.getElementById('user-avatar');
                     const nameEl = document.getElementById('user-name');
                     const badgeEl = document.getElementById('collaborator-badge');
+                    const dropdownNameEl = document.getElementById('dropdown-user-name');
+                    const dropdownRoleEl = document.getElementById('dropdown-user-role');
                     
                     if (avatarEl) avatarEl.src = user.avatar_url || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"%3E%3Cpath fill="%23959da5" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/%3E%3C/svg%3E';
                     if (nameEl) nameEl.textContent = user.name || user.username;
+                    if (dropdownNameEl) dropdownNameEl.textContent = user.name || user.username;
+                    
+                    let roleText = 'Member';
+                    if (user.is_admin) {
+                        roleText = 'Admin';
+                        if (badgeEl) badgeEl.style.backgroundColor = 'var(--color-danger-subtle)';
+                    } else if (user.is_collaborator) {
+                        roleText = 'Collaborator';
+                        if (badgeEl) badgeEl.style.backgroundColor = 'var(--color-success-subtle)';
+                    } else {
+                        roleText = 'PR Owner';
+                        if (badgeEl) badgeEl.style.backgroundColor = 'var(--color-attention-subtle)';
+                    }
                     
                     if (badgeEl) {
-                        if (user.is_admin) {
-                            badgeEl.textContent = 'Admin';
-                        } else if (user.is_collaborator) {
-                            badgeEl.textContent = 'Collaborator';
-                        } else {
-                            badgeEl.textContent = 'PR Owner';
-                        }
+                        badgeEl.textContent = roleText;
+                        badgeEl.style.display = 'inline-block';
+                    }
+                    if (dropdownRoleEl) {
+                        dropdownRoleEl.textContent = roleText;
                     }
                 } else {
                     userMenuContainer.style.display = 'none';
@@ -1291,6 +1433,7 @@ class HtmlReportGenerator:
         const lightIcon = document.getElementById('theme-icon-light');
         const darkIcon = document.getElementById('theme-icon-dark');
         const htmlElement = document.documentElement;
+        const radarLogo = document.getElementById('radar-logo');
         
         function setTheme(mode) {
             htmlElement.setAttribute('data-color-mode', mode);
@@ -1299,9 +1442,11 @@ class HtmlReportGenerator:
             if (mode === 'dark') {
                 lightIcon.style.display = 'block';
                 darkIcon.style.display = 'none';
+                if (radarLogo) radarLogo.src = RADAR_LOGO_DARK;
             } else {
                 lightIcon.style.display = 'none';
                 darkIcon.style.display = 'block';
+                if (radarLogo) radarLogo.src = RADAR_LOGO_LIGHT;
             }
         }
         
@@ -1328,20 +1473,28 @@ class HtmlReportGenerator:
             });
         }
         
-        // Notification Bell - Expand All Specs
-        const notificationIndicator = document.getElementById('notification-indicator');
-        const notificationDot = document.getElementById('notification-dot');
-        
-        if (notificationIndicator) {
-            // Update notification dot based on issues
+        // Update notification badge
+        function updateNotificationBadge() {
             const totalIssuesEl = document.getElementById('total-issues-count');
-            if (totalIssuesEl) {
+            const notificationBadge = document.getElementById('notification-badge');
+            
+            if (totalIssuesEl && notificationBadge) {
                 const count = parseInt(totalIssuesEl.textContent) || 0;
+                notificationBadge.textContent = count;
                 if (count > 0) {
-                    notificationDot.classList.add('unread');
+                    notificationBadge.classList.add('active');
+                } else {
+                    notificationBadge.classList.remove('active');
                 }
             }
-            
+        }
+        
+        updateNotificationBadge();
+        
+        // Notification Bell - Expand All Specs
+        const notificationIndicator = document.getElementById('notification-indicator');
+        
+        if (notificationIndicator) {
             notificationIndicator.addEventListener('click', function(e) {
                 e.preventDefault();
                 
@@ -1472,9 +1625,28 @@ class HtmlReportGenerator:
                     // Update button
                     const btn = document.querySelector(`.challenge-btn[data-finding-id="${currentFindingId}"]`);
                     if (btn) {
-                        btn.textContent = '✓ Challenged';
+                        btn.textContent = 'Challenged';
                         btn.classList.add('challenged');
                         btn.disabled = true;
+                    }
+                    
+                    // Update notification badge
+                    const notificationBadge = document.getElementById('notification-badge');
+                    if (notificationBadge) {
+                        const currentCount = parseInt(notificationBadge.textContent) || 0;
+                        const newCount = Math.max(0, currentCount - 1);
+                        notificationBadge.textContent = newCount;
+                        if (newCount === 0) {
+                            notificationBadge.classList.remove('active');
+                        }
+                    }
+                    
+                    // Update total issues count
+                    const totalIssuesEl = document.getElementById('total-issues-count');
+                    if (totalIssuesEl) {
+                        const currentCount = parseInt(totalIssuesEl.textContent) || 0;
+                        const newCount = Math.max(0, currentCount - 1);
+                        totalIssuesEl.textContent = newCount;
                     }
                     
                     closeChallengeModal();
