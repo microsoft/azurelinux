@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.7
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -29,10 +29,11 @@ Patch9: CVE-2024-40635.patch
 %{?systemd_requires}
 
 BuildRequires: git
-BuildRequires: golang < 1.23
+BuildRequires: golang
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
+BuildRequires: glibc-static >= 2.38-15%{?dist}
 
 Requires: moby-runc >= 1.1.0
 
@@ -47,10 +48,12 @@ This is the containerd runtime meant for use with confidential containers
 
 %build
 export BUILDTAGS="-mod=vendor"
+export SHIM_CGO_ENABLED=1
 make VERSION="%{version}" REVISION="%{commit_hash}" binaries man
 
 %check
 export BUILDTAGS="-mod=vendor"
+export SHIM_CGO_ENABLED=1
 make VERSION="%{version}" REVISION="%{commit_hash}" test
 
 %install
@@ -82,6 +85,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Tue Sept 09 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.7.7-10
+- Bump release to rebuild with go 1.25.3
+
 * Wed Apr 16 2025 Manuel Huber <mahuber@microsoft.com> - 1.7.7-9
 - Fix CVE-2024-40635
 
