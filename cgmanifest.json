@@ -22652,6 +22652,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-deprecated",
+          "version": "1.2.18",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/deprecated/deprecated-1.2.18.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-distlib",
           "version": "0.3.8",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/d/distlib/distlib-0.3.8.tar.gz"
