@@ -8,16 +8,15 @@ HtmlReportGenerator creates interactive HTML reports for CVE spec file analysis.
 This module handles all HTML generation logic, including:
 - Complete self-contained HTML pages with CSS and JavaScript
 - Interactive dashboard components (stats cards, spec details, challenge system)
-- Theme system (dark/light mode)
+- Theme system (dark/light mode) with enhanced colors
 - Authentication UI integration
+- Bell icon spec expansion functionality
 """
 
 import html as html_module
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
 import logging
-import os
-import base64
 
 if TYPE_CHECKING:
     from AntiPatternDetector import Severity
@@ -337,30 +336,6 @@ class HtmlReportGenerator:
         # Generate cache-busting timestamp
         cache_buster = datetime.now().strftime('%Y%m%d%H%M%S')
         
-        # Try to load and encode the radar.png image
-        radar_image_data = ""
-        try:
-            import os
-            import base64
-            # Get the directory where this script is located
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            # Construct path to radar.png
-            image_path = os.path.join(script_dir, 'assets', 'radar.png')
-            
-            if os.path.exists(image_path):
-                with open(image_path, 'rb') as img_file:
-                    img_data = base64.b64encode(img_file.read()).decode('utf-8')
-                    radar_image_data = f"data:image/png;base64,{img_data}"
-                    logger.info(f"Successfully loaded radar.png from {image_path}")
-            else:
-                logger.warning(f"radar.png not found at {image_path}, using placeholder")
-                # Fallback to a simple SVG radar icon if image not found
-                radar_image_data = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='none' stroke='%234a9eff' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='35' fill='none' stroke='%234a9eff' stroke-width='1.5' opacity='0.7'/%3E%3Ccircle cx='50' cy='50' r='25' fill='none' stroke='%234a9eff' stroke-width='1' opacity='0.5'/%3E%3Ccircle cx='50' cy='50' r='15' fill='none' stroke='%234a9eff' stroke-width='0.5' opacity='0.3'/%3E%3Ccircle cx='50' cy='50' r='5' fill='%234a9eff'/%3E%3Cpath d='M50 5 L50 95 M5 50 L95 50' stroke='%234a9eff' stroke-width='0.5' opacity='0.3'/%3E%3Cpath d='M50 50 L80 20' stroke='%2300ff00' stroke-width='2' opacity='0.8'%3E%3Canimate attributeName='opacity' values='0.8;0;0.8' dur='2s' repeatCount='indefinite'/%3E%3C/path%3E%3C/svg%3E"
-        except Exception as e:
-            logger.error(f"Error loading radar.png: {e}")
-            # Fallback SVG
-            radar_image_data = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='none' stroke='%234a9eff' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='5' fill='%234a9eff'/%3E%3C/svg%3E"
-        
         return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -376,10 +351,6 @@ class HtmlReportGenerator:
     <!-- Favicon to prevent 404 errors -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛡️%3C/text%3E%3C/svg%3E">
     <style>
-        /* Store radar image as CSS variable */
-        :root {{
-            --radar-image: url('{radar_image_data}');
-        }}
 {css}
     </style>
 </head>
@@ -388,9 +359,8 @@ class HtmlReportGenerator:
     <div id="top-bar">
         <div id="top-bar-left">
             <div id="top-bar-logo">
-                <!-- Clean design with radar icon -->
+                <!-- Clean design without image -->
                 <div class="radar-logo-clean">
-                    <img src="{radar_image_data}" alt="RADAR" class="radar-icon-img" />
                     <span class="radar-title">RADAR</span>
                 </div>
             </div>
@@ -490,17 +460,17 @@ class HtmlReportGenerator:
 """
     
     def _get_css_styles(self) -> str:
-        """Get all CSS styles for the HTML page."""
+        """Get all CSS styles for the HTML page with enhanced colors."""
         return """        /* CSS VARIABLES - THEME SYSTEM */
         :root {
-            /* Modern Dark Theme (Default) - Enhanced */
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #111111;
-            --bg-tertiary: #1a1a1a;
-            --bg-card: #161616;
-            --bg-card-hover: #202020;
+            /* Modern Dark Theme - Ultra Dark Backgrounds for Better Card Contrast */
+            --bg-primary: #050505;  /* Much darker main background */
+            --bg-secondary: #0a0a0a;  /* Darker secondary */
+            --bg-tertiary: #131313;  /* Darker tertiary */
+            --bg-card: #1a1a1a;  /* Cards stand out more */
+            --bg-card-hover: #242424;
             --bg-hover: rgba(255, 255, 255, 0.05);
-            --bg-modal-overlay: rgba(0, 0, 0, 0.85);
+            --bg-modal-overlay: rgba(0, 0, 0, 0.9);
             
             --border-primary: #2a2a2a;
             --border-secondary: #333333;
@@ -529,55 +499,55 @@ class HtmlReportGenerator:
             
             --accent-gold: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             
-            --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.8);
-            --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.8), 0 2px 4px -1px rgba(0, 0, 0, 0.6);
-            --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.8), 0 4px 10px -2px rgba(0, 0, 0, 0.6);
-            --shadow-xl: 0 20px 40px -5px rgba(0, 0, 0, 0.9), 0 10px 20px -5px rgba(0, 0, 0, 0.7);
+            --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.9);
+            --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.9), 0 2px 4px -1px rgba(0, 0, 0, 0.7);
+            --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.9), 0 4px 10px -2px rgba(0, 0, 0, 0.7);
+            --shadow-xl: 0 20px 40px -5px rgba(0, 0, 0, 0.95), 0 10px 20px -5px rgba(0, 0, 0, 0.8);
             --shadow-glow: 0 0 20px rgba(74, 158, 255, 0.3);
         }
         
-        /* Professional Light Theme with Blue/Purple Accents */
+        /* Professional Light Theme with Vibrant, Saturated Colors */
         [data-theme="light"] {
-            --bg-primary: #f5f7ff;
+            --bg-primary: #e8edff;  /* More colorful background with purple tint */
             --bg-secondary: #ffffff;
-            --bg-tertiary: #e8ecff;
-            --bg-card: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
-            --bg-card-hover: linear-gradient(135deg, #f8faff 0%, #e8ecff 100%);
-            --bg-hover: rgba(99, 102, 241, 0.05);
+            --bg-tertiary: #dce5ff;  /* More saturated blue-purple */
+            --bg-card: linear-gradient(135deg, #ffffff 0%, #eef3ff 100%);
+            --bg-card-hover: linear-gradient(135deg, #f5f9ff 0%, #dce5ff 100%);
+            --bg-hover: rgba(99, 102, 241, 0.08);
             --bg-modal-overlay: rgba(0, 0, 0, 0.5);
             
-            --border-primary: #d4d8ff;
-            --border-secondary: #c1c7ff;
-            --border-accent: #a5adff;
+            --border-primary: #b8c4ff;  /* More vibrant borders */
+            --border-secondary: #a5b4ff;
+            --border-accent: #8b9cff;
             
-            --text-primary: #1a1d3a;
-            --text-secondary: #4a5178;
-            --text-tertiary: #6b7299;
+            --text-primary: #0f1139;  /* Deeper, richer text */
+            --text-secondary: #3a4170;  /* More saturated secondary text */
+            --text-tertiary: #5a6394;
             
-            --accent-blue: #4f46e5;
-            --accent-blue-dark: #4338ca;
-            --accent-blue-light: #6366f1;
-            --accent-blue-bg: rgba(99, 102, 241, 0.1);
+            --accent-blue: #5046ff;  /* More vibrant, saturated blue */
+            --accent-blue-dark: #3730ff;
+            --accent-blue-light: #6b66ff;
+            --accent-blue-bg: rgba(80, 70, 255, 0.12);
             
-            --accent-green: #059669;
-            --accent-green-bg: rgba(5, 150, 105, 0.1);
+            --accent-green: #00a870;  /* Richer, more vibrant green */
+            --accent-green-bg: rgba(0, 168, 112, 0.12);
             
-            --accent-orange: #ea580c;
-            --accent-orange-bg: rgba(234, 88, 12, 0.1);
+            --accent-orange: #ff6b00;  /* More saturated orange */
+            --accent-orange-bg: rgba(255, 107, 0, 0.12);
             
-            --accent-red: #dc2626;
-            --accent-red-bg: rgba(220, 38, 38, 0.1);
+            --accent-red: #e02424;  /* Vibrant red */
+            --accent-red-bg: rgba(224, 36, 36, 0.12);
             
-            --accent-purple: #9333ea;
-            --accent-purple-bg: rgba(147, 51, 234, 0.1);
+            --accent-purple: #a336ff;  /* Vivid purple */
+            --accent-purple-bg: rgba(163, 54, 255, 0.12);
             
-            --accent-gold: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --accent-gold: linear-gradient(135deg, #ffb300 0%, #ff8800 100%);
             
-            --shadow-sm: 0 1px 3px 0 rgba(99, 102, 241, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 4px 6px -1px rgba(99, 102, 241, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(99, 102, 241, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(99, 102, 241, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.25);
+            --shadow-sm: 0 1px 3px 0 rgba(80, 70, 255, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(80, 70, 255, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(80, 70, 255, 0.18), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(80, 70, 255, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-glow: 0 0 20px rgba(80, 70, 255, 0.35);
         }
         
         /* Light theme specific card backgrounds */
@@ -599,6 +569,25 @@ class HtmlReportGenerator:
         
         [data-theme="light"] .issue-item {
             background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+        }
+        
+        /* Bell glow animation */
+        @keyframes bell-glow {
+            0%, 100% { 
+                box-shadow: 0 0 10px rgba(175, 82, 222, 0.3);
+                filter: brightness(1);
+            }
+            50% { 
+                box-shadow: 0 0 25px rgba(175, 82, 222, 0.7), 0 0 40px rgba(175, 82, 222, 0.4);
+                filter: brightness(1.2);
+            }
+        }
+        
+        /* Bell glow effect class */
+        #top-bell-container.glowing {
+            animation: bell-glow 1s ease-in-out;
+            background: linear-gradient(135deg, var(--accent-purple-bg), transparent) !important;
+            border-color: var(--accent-purple) !important;
         }
         
         * {
@@ -745,7 +734,7 @@ class HtmlReportGenerator:
             z-index: 1000;
             box-shadow: var(--shadow-md);
             backdrop-filter: blur(10px);
-            background: rgba(22, 22, 22, 0.95);
+            background: rgba(26, 26, 26, 0.95);
         }
         
         [data-theme="light"] #top-bar {
@@ -1855,7 +1844,7 @@ class HtmlReportGenerator:
             gap: 0;
         }
         
-        /* RADAR Branding - Simplified */
+        /* RADAR Branding - Simple, no tooltip or hover effects */
         .radar-title {
             font-weight: 900;
             font-style: italic;
@@ -1865,41 +1854,8 @@ class HtmlReportGenerator:
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            position: relative;
-            cursor: help;
             display: inline-block;
-            transition: transform 0.3s ease;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            z-index: 1;
-        }
-        
-        /* Simplified tooltip without hover animation */
-        .radar-title::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%) translateY(8px);
-            background: var(--bg-card);
-            color: var(--text-primary);
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-size: 0.7em;
-            font-weight: 600;
-            font-style: normal;
-            letter-spacing: normal;
-            white-space: nowrap;
-            max-width: 300px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            box-shadow: var(--shadow-xl);
-            border: 1px solid var(--accent-gold);
-            z-index: 10000;
-        }
-        
-        .radar-title:hover::after {
-            opacity: 1;
         }
         
         /* Smooth scrollbar styling */
@@ -1946,7 +1902,7 @@ class HtmlReportGenerator:
         }"""
     
     def _get_javascript(self, pr_number: int) -> str:
-        """Get all JavaScript code for the HTML page."""
+        """Get all JavaScript code for the HTML page with enhanced bell functionality."""
         js_code = """        // ============================================================================
         // RADAR Authentication Module
         // ============================================================================
@@ -2168,6 +2124,89 @@ class HtmlReportGenerator:
                 userDropdown.classList.remove('show');
                 RADAR_AUTH.signOut();
             });
+        }
+        
+        // Bell icon expand/glow functionality
+        const topBellContainer = document.getElementById('top-bell-container');
+        
+        if (topBellContainer) {
+            topBellContainer.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Get all spec cards
+                const specCards = document.querySelectorAll('.spec-card');
+                let allExpanded = true;
+                
+                // Check if all cards are already expanded
+                specCards.forEach(card => {
+                    if (!card.hasAttribute('open')) {
+                        allExpanded = false;
+                    }
+                });
+                
+                if (allExpanded) {
+                    // All cards are already expanded - show glow effect
+                    console.log('🔔 All specs already expanded - showing glow effect');
+                    
+                    // Add glowing class for animation
+                    this.classList.add('glowing');
+                    
+                    // Remove glow after animation
+                    setTimeout(() => {
+                        this.classList.remove('glowing');
+                    }, 1000);
+                    
+                    // Optional: Scroll to first spec card smoothly
+                    if (specCards.length > 0) {
+                        setTimeout(() => {
+                            specCards[0].scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center'
+                            });
+                        }, 200);
+                    }
+                    
+                } else {
+                    // Expand all spec cards
+                    console.log('🔔 Expanding all spec cards');
+                    
+                    // Expand with staggered animation
+                    specCards.forEach((card, index) => {
+                        setTimeout(() => {
+                            card.setAttribute('open', '');
+                            // Add a subtle highlight effect
+                            card.style.transition = 'all 0.3s ease';
+                            card.style.boxShadow = '0 0 20px rgba(74, 158, 255, 0.4)';
+                            setTimeout(() => {
+                                card.style.boxShadow = '';
+                            }, 500);
+                        }, index * 50); // Stagger by 50ms
+                    });
+                    
+                    // Add a temporary glow to indicate action
+                    this.style.background = 'linear-gradient(135deg, var(--accent-blue-bg), transparent)';
+                    this.style.borderColor = 'var(--accent-blue)';
+                    setTimeout(() => {
+                        this.style.background = '';
+                        this.style.borderColor = '';
+                    }, 800);
+                    
+                    // Scroll to first card after expansion
+                    if (specCards.length > 0) {
+                        setTimeout(() => {
+                            specCards[0].scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start',
+                                inline: 'nearest'
+                            });
+                        }, 300);
+                    }
+                }
+            });
+            
+            // Add hover effect for bell container
+            topBellContainer.style.cursor = 'pointer';
+            topBellContainer.title = 'Click to expand all specs or show notifications';
         }
         
         // Challenge Modal Management
