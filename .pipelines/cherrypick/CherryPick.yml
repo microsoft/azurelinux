@@ -21,7 +21,7 @@ jobs:
     pool:
       type: linux
       isCustom: true
-      name: "$(DEV_AMD64_Ubuntu_Managed)"
+      name: "$(DEV_AMD64_Unmanaged)"
     timeoutInMinutes: 15
     displayName: 'Cherry-pick commit'
 
