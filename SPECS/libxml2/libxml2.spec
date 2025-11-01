@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.11.5
@@ -7,8 +5,6 @@ Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Group:          System Environment/General Libraries
-URL:            https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 Source0:        https://gitlab.gnome.org/GNOME/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
 Patch0:         CVE-2024-40896.patch
 Patch1:         CVE-2023-45322.patch
