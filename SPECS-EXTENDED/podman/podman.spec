@@ -36,7 +36,7 @@
 
 Name:           podman
 Version:        4.1.1
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        ASL 2.0 and BSD and ISC and MIT and MPLv2.0
 Summary:        Manage Pods, Containers and Container Images
 Vendor:         Microsoft Corporation
@@ -387,6 +387,9 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
+* Fri Oct 03 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 4.1.1-24
+- Bump release to rebuild with golang
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 4.1.1-23
 - Bump release to rebuild with golang
 

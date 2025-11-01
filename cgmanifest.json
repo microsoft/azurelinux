@@ -3698,8 +3698,8 @@
         "type": "other",
         "other": {
           "name": "flux",
-          "version": "0.191.0",
-          "downloadUrl": "https://github.com/influxdata/flux/archive/refs/tags/v0.191.0.tar.gz"
+          "version": "0.193.0",
+          "downloadUrl": "https://github.com/influxdata/flux/archive/refs/tags/v0.193.0.tar.gz"
         }
       }
     },
@@ -4590,18 +4590,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.18.8",
-          "downloadUrl": "https://golang.org/dl/go1.18.8.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "golang",
-          "version": "1.22.7",
-          "downloadUrl": "https://golang.org/dl/go1.22.7.src.tar.gz"
+          "version": "1.24.9",
+          "downloadUrl": "https://golang.org/dl/go1.24.9.src.tar.gz"
         }
       }
     },
@@ -7211,8 +7201,8 @@
         "type": "other",
         "other": {
           "name": "influx-cli",
-          "version": "2.6.1",
-          "downloadUrl": "https://github.com/influxdata/influx-cli/archive/refs/tags/v2.6.1.tar.gz"
+          "version": "2.7.0",
+          "downloadUrl": "https://github.com/influxdata/influx-cli/archive/refs/tags/v2.7.0.tar.gz"
         }
       }
     },
@@ -7221,8 +7211,8 @@
         "type": "other",
         "other": {
           "name": "influxdb",
-          "version": "2.6.1",
-          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.6.1.tar.gz"
+          "version": "2.7.0",
+          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.7.0.tar.gz"
         }
       }
     },
@@ -29537,8 +29527,8 @@
         "type": "other",
         "other": {
           "name": "vitess",
-          "version": "17.0.7",
-          "downloadUrl": "https://github.com/vitessio/vitess/archive/refs/tags/v17.0.7.tar.gz"
+          "version": "21.0.0",
+          "downloadUrl": "https://github.com/vitessio/vitess/archive/refs/tags/v21.0.0.tar.gz"
         }
       }
     },

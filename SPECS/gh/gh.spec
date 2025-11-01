@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.13.0
-Release:        25%{?dist}
+Release:        26%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -77,6 +77,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Fri Oct 03 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.13.0-26
+- Bump release to rebuild with golang
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.13.0-25
 - Bump release to rebuild with golang
 
