@@ -71,7 +71,7 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{oname}.pom
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
-cp -pr target/site/apidocs/legal/ADDITIONAL_LICENSE_INFO .
+mv -pr target/site/apidocs/legal/ADDITIONAL_LICENSE_INFO .
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
