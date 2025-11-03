@@ -25362,16 +25362,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-uamqp",
-          "version": "1.5.1",
-          "downloadUrl": "https://github.com/Azure/azure-uamqp-python/archive/v1.5.1/uamqp-1.5.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-uritemplate",
           "version": "4.1.1",
           "downloadUrl": "https://github.com/sigmavirus24/uritemplate/archive/4.1.1/uritemplate-4.1.1.tar.gz"
