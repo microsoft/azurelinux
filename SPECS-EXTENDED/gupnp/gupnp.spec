@@ -66,6 +66,7 @@ This package contains developer documentation for %{name}.
 %meson_install
 
 %check
+glib-compile-schemas %{_datadir}/glib-2.0/schemas/
 %meson_test
 
 %files
