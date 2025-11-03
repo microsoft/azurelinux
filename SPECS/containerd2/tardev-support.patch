@@ -1,0 +1,38 @@
+From b11c8fadd114d1c75480fcfb600587351e1789bc Mon Sep 17 00:00:00 2001
+From: Mitch Zhu <mitchzhu@microsoft.com>
+Date: Tue, 27 May 2025 21:19:31 +0000
+Subject: [PATCH] tardev-snapshotter support patch
+
+---
+ client/image.go | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/client/image.go b/client/image.go
+index 355bcba..54b5890 100644
+--- a/client/image.go
++++ b/client/image.go
+@@ -31,6 +31,7 @@ import (
+ 	"github.com/containerd/containerd/v2/internal/kmutex"
+ 	"github.com/containerd/containerd/v2/pkg/labels"
+ 	"github.com/containerd/containerd/v2/pkg/rootfs"
++	"github.com/containerd/containerd/v2/pkg/snapshotters"
+ 	"github.com/containerd/errdefs"
+ 	"github.com/containerd/platforms"
+ 	"github.com/opencontainers/go-digest"
+@@ -333,7 +334,12 @@ func (i *image) Unpack(ctx context.Context, snapshotterName string, opts ...Unpa
+ 	}
+ 
+ 	for _, layer := range layers {
+-		unpacked, err = rootfs.ApplyLayerWithOpts(ctx, layer, chain, sn, a, config.SnapshotOpts, config.ApplyOpts)
++		snOpts := append(config.SnapshotOpts, snapshots.WithLabels(map[string]string{
++			snapshotters.TargetLayerDigestLabel:    layer.Blob.Digest.String(),
++			snapshotters.TargetManifestDigestLabel: i.Target().Digest.String(),
++			snapshotters.TargetRefLabel: 		  	i.Name(),
++		}))
++		unpacked, err = rootfs.ApplyLayerWithOpts(ctx, layer, chain, sn, a, snOpts, config.ApplyOpts)
+ 		if err != nil {
+ 			return fmt.Errorf("apply layer error for %q: %w", i.Name(), err)
+ 		}
+-- 
+2.34.1
+

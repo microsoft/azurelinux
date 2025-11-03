@@ -1,13 +1,14 @@
 Summary:        Portable Hardware Locality - portable abstraction of hierarchical architectures
 Name:           hwloc
 Version:        2.9.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.open-mpi.org/projects/hwloc/
 Source0:        http://www.open-mpi.org/software/hwloc/v2.9/downloads/%{name}-%{version}.tar.bz2
 Patch0:         CVE-2022-47022.patch
+Patch1:         fix-test-gather-topology.patch
 BuildRequires:  gcc
 # C++ only for hwloc-hello-cpp test:
 BuildRequires:  gcc-c++
@@ -168,6 +169,9 @@ LD_LIBRARY_PATH=$PWD/hwloc/.libs make check
 %{_libdir}/%{name}/hwloc*
 
 %changelog
+* Fri Jun 06 2025 Andrew Phelps <anphel@microsoft.com> - 2.9.2-3
+- Add patch fix-test-gather-topology.patch
+
 * Wed Jan 29 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.9.2-2
 - Fix CVE-2022-47022
 

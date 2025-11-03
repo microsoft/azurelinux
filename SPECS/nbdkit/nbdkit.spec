@@ -51,13 +51,16 @@ Distribution:   Azure Linux
 
 Name:           nbdkit
 Version:        1.35.3
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        NBD server
 
 License:        BSD
 URL:            https://gitlab.com/nbdkit/nbdkit
 
 Source0:        http://libguestfs.org/download/nbdkit/%{source_directory}/%{name}-%{version}.tar.gz
+
+Patch0:  CVE-2025-47711.patch 
+Patch1:  CVE-2025-47712.patch
 
 BuildRequires: make
 %if 0%{patches_touch_autotools}
@@ -1195,6 +1198,9 @@ export LIBGUESTFS_TRACE=1
 
 
 %changelog
+* Thu Jun 19 2025 Akarsh Chaudhary <v-akarshc@microsoft.com>- 1.35.3-7
+- Patch CVE-2025-47712 ,CVE-2025-47711
+
 * Thu Aug 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35.3-6
 - Fixed test-time dependencies to match correct AZL paths.
 

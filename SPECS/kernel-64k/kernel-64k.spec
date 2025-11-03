@@ -14,6 +14,8 @@
 %undefine _unique_debug_names
 %global _missing_build_ids_terminate_build 1
 %global _no_recompute_build_ids 1
+# Prevent find_debuginfo.sh from removing the BTF section from modules
+%define _find_debuginfo_opts --keep-section '.BTF'
 
 %ifarch aarch64
 %global __provides_exclude_from %{_libdir}/debug/.build-id/
@@ -24,7 +26,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel-64k
-Version:        6.6.85.1
+Version:        6.6.112.1
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -38,7 +40,7 @@ Source3:        azurelinux-ca-20230216.pem
 Source4:        cpupower
 Source5:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
-Patch1:         0002-Increase-EFI_MMAP_NR_SLACK_SLOTS-for-GB200.patch
+Patch1:         0002-efi-Added-efi-cmdline-line-option-to-dynamically-adj.patch
 ExclusiveArch:  aarch64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -70,6 +72,11 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+Conflicts:      kernel
+Conflicts:      kernel-ipe
+Conflicts:      kernel-lpg-innovate
+Conflicts:      kernel-rt
+Conflicts:      kernel-hwe
 %{?grub2_configuration_requires}
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
@@ -142,6 +149,7 @@ This package contains the 'perf' performance analysis tools for Linux kernel.
 
 %package -n     python3-perf-%{short_name}
 Summary:        Python 3 extension for perf tools
+Provides:       python3-perf
 Requires:       %{name} = %{version}-%{release}
 Requires:       python3
 
@@ -150,6 +158,7 @@ This package contains the Python 3 extension for the 'perf' performance analysis
 
 %package -n     bpftool-%{short_name}
 Summary:        Inspection and simple manipulation of eBPF programs and maps
+Provides:       bpftool
 Requires:       %{name} = %{version}-%{release}
 
 %description -n bpftool-%{short_name}
@@ -371,6 +380,55 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Oct 27 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.112.1-2
+- Bump release to match kernel
+
+* Wed Oct 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.112.1-1
+- Auto-upgrade to 6.6.112.1
+
+* Tue Sep 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.104.2-4
+- Bump release to match kernel
+
+* Tue Sep 23 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.6.104.2-3
+- Bump release to match kernel
+
+* Tue Sep 23 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.104.2-2
+- Enable ipmitool for kernel-64k
+
+* Wed Sep 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.104.2-1
+- Auto-upgrade to 6.6.104.2
+
+* Fri Aug 22 2025 Siddharth Chintamaneni <siddharthc@microsoft.com> - 6.6.96.2-2
+- Bump release to match kernel
+
+* Fri Aug 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.96.2-1
+- Auto-upgrade to 6.6.96.2
+
+* Thu Jul 17 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.96.1-2
+- Bump release to match kernel
+
+* Mon Jul 07 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.96.1-1
+- Auto-upgrade to 6.6.96.1
+
+* Mon Jun 16 2025 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.92.2-3
+- Add Conflicts with other kernels
+- Rename bpftool and python3-perf to be kernel specific
+
+* Mon Jun 09 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.92.2-2
+- Prevent debuginfo from stripping BTF data
+
+* Fri May 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.92.2-1
+- Auto-upgrade to 6.6.92.2
+
+* Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.90.1-1
+- Auto-upgrade to 6.6.90.1
+
+* Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.6.85.1-4
+- Added a new patch to EFI slack slots issue
+
+* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.6.85.1-3
+- Updated config_aarch64 based on nvidia patch guide recommendations
+
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 6.6.85.1-2
 - Bump release to rebuild for new kernel release
 

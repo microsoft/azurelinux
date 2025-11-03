@@ -3,7 +3,7 @@
 Summary:        Adds a metaclass method to all Ruby objects
 Name:           rubygem-%{gem_name}
 Version:        0.0.4
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,6 +36,7 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %check
 # test_helper.rb currently references bundler, so it is easier to avoid
 # its usage at all.
+sed -i '/require "bundler\/setup"/ d' test/test_helper.rb
 ruby -Ilib:test -e 'Dir.glob "./test/**/*_test.rb", &method(:require)'
 
 %files
@@ -43,6 +44,9 @@ ruby -Ilib:test -e 'Dir.glob "./test/**/*_test.rb", &method(:require)'
 %{gemdir}
 
 %changelog
+* Wed May 21 2025 Riken Maharjan <rmaharjan@microsoft.com> - 0.0.4-17
+- Fix ptest by not using bundler 
+
 * Tue Jul 19 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.0.4-16
 - Add provides, add missing files, remove doc package
 

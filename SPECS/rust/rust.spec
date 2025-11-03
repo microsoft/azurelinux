@@ -3,13 +3,13 @@
 
 # Release date and version of stage 0 compiler can be found in "src/stage0" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2025-01-09
-%define stage0_version 1.84.0
+%define release_date 2025-02-20
+%define stage0_version 1.85.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.85.0
-Release:        1%{?dist}
+Version:        1.86.0
+Release:        9%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,9 +41,9 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
-# These ci tests are expecting rust source to be git repository, since we are using a tarball
-# we are missing git metadata so these tests are failing, hence ignoring these tests
-Patch0:         Ignore_failing_ci_tests.patch
+Patch0:		CVE-2025-4574.patch
+Patch1:         CVE-2025-53605.patch
+Patch2:         CVE-2024-11738.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -61,7 +61,7 @@ BuildRequires:  python3
 # make sure rust depends on system zlib
 BuildRequires:  zlib-devel
 %if 0%{?with_check}
-BuildRequires:  glibc-static >= 2.38-9%{?dist}
+BuildRequires:  glibc-static >= 2.38-15%{?dist}
 BuildRequires:	sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
@@ -141,7 +141,7 @@ userdel -r test
 %install
 USER=root SUDO_USER=root %make_install
 mv %{buildroot}%{_docdir}/cargo/LICENSE-THIRD-PARTY .
-rm %{buildroot}%{_docdir}/rustc/{COPYRIGHT,LICENSE-APACHE,LICENSE-MIT}
+rm %{buildroot}%{_docdir}/rustc/{COPYRIGHT-library.html,COPYRIGHT.html}
 rm %{buildroot}%{_docdir}/cargo/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/clippy/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/rustfmt/{LICENSE-APACHE,LICENSE-MIT}
@@ -169,6 +169,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 
 %files doc
 %license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
+%license %{_docdir}/rustc/licenses/*
 %doc %{_docdir}/rustc/README.md
 %doc %{_docdir}/cargo/*
 %doc %{_docdir}/rustfmt/*
@@ -180,6 +181,37 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
+* Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.86.0-9
+- Bump to rebuild with updated glibc
+
+* Wed Oct 08 2025 Andrew Phelps <anphel@microsoft.com> - 1.86.0-8
+- Bump to rebuild with updated glibc
+
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.86.0-7
+- Bump to rebuild with updated glibc
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.86.0-6
+- Bump to rebuild with updated glibc
+
+* Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.86.0-5
+- Patch for CVE-2024-11738
+ 
+* Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.86.0-4
+- patch for CVE-2025-53605
+
+* Fri Jun 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.86.0-3
+- Patch CVE-2025-4574
+
+* Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.86.0-2
+- Bump to rebuild with updated glibc
+
+
+* Tue May 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.86.0-1
+- Upgrade to 1.86.0
+
+* Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 1.85.0-2
+- Bump to rebuild with updated glibc
+
 * Sun Apr 20 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.85.0-1
 - Upgrade to 1.85.0
 - Drop patches

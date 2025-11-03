@@ -37,7 +37,7 @@ set -eo pipefail
 
 
 # Do our best to match the logging requested by the user running the container.
-declare -rA LOG_LEVELS=([error]=0 [warn]=1 [info]=2 [debug]=3)
+declare -rA LOG_LEVELS=( [error]=0 [warn]=1 [info]=2 [debug]=3 )
 declare LOG_LEVEL=error
 
 # Mimic the structured logging used by InfluxDB.
@@ -63,11 +63,13 @@ function log () {
 # Set the global log-level for the entry-point to match the config passed to influxd.
 function set_global_log_level () {
     local level
-    level="$(influxd print-config --key-name log-level "${@}")"
+    level="$(influxd::config::get log-level "${@}")"
+
     if [ -z "${level}" ] || [ -z "${LOG_LEVELS[${level}]}" ]; then
-        return 1
+      LOG_LEVEL=info
+    else
+      LOG_LEVEL=${level}
     fi
-    LOG_LEVEL=${level}
 }
 
 # Look for standard config names in the volume configured in our Dockerfile.
@@ -92,23 +94,97 @@ function set_config_path () {
     export INFLUXD_CONFIG_PATH="${config_path}"
 }
 
+function influxd::config::get()
+{
+  # The configuration is a mixture of both configuration files, environment
+  # variables, and command line options. Consequentially, this prevents the
+  # configuration from being known *before* executing influxd. This
+  # emulates what `influx server-config` would return.
+  declare -r COLUMN_ENVIRONMENT=0
+  declare -r COLUMN_DEFAULT=1
+  declare -rA table=(
+    ##################################################################################
+    # PRIMARY_KEY       # ENVIRONMENT VARIABLE      # DEFAULT                        #
+    ##################################################################################
+            [bolt-path]=" INFLUXD_BOLT_PATH         | /var/lib/influxdb/influxd.bolt"
+          [engine-path]=" INFLUXD_ENGINE_PATH       | /var/lib/influxdb/engine"
+            [log-level]=" INFLUXD_LOG_LEVEL         | info"
+              [tls-key]=" INFLUXD_TLS_KEY           | "
+             [tls-cert]=" INFLUXD_TLS_CERT          | "
+    [http-bind-address]=" INFLUXD_HTTP_BIND_ADDRESS | :8086"
+  )
+
+  function table::get()
+  {
+    ( # don't leak shopt options
+      local row
+      local value
+
+      shopt -s extglob
+      # Unfortunately, bash doesn't support multidimensional arrays. This
+      # retrieves the corresponding row from the array, splits the column
+      # from row, and strips leading and trailing whitespace. `extglob`
+      # is required for this to delete multiple spaces.
+      IFS='|' row=(${table[${1}]})
+      value=${row[${2}]}
+      value="${value##+([[:space:]])}"
+      value="${value%%+([[:space:]])}"
+      echo "${value}"
+    )
+  }
+
+  #
+  # Parse Value from Arguments
+  #
+
+  local primary_key="${1}" && shift
+
+  # Command line arguments take precedence over all other configuration
+  # sources. This supports two argument formats and ignores unspecified
+  # arguments even if they contain errors. These will be caught when
+  # influxd is started.
+  while [[ "${#}" -gt 0 ]] ; do
+    case ${1} in
+      --${primary_key}=*) echo "${1/#"--${primary_key}="}" && return ;;
+      --${primary_key}* ) echo "${2}"                      && return ;;
+      *) shift ;;
+    esac
+  done
+
+  #
+  # Parse Value from Environment
+  #
+
+  local value
+
+  # If no command line arguments match, retrieve the corresponding environment
+  # variable. This differentiates between unset and empty variables. If empty,
+  # it is possible that variable was intentionally emptied; therefore, this
+  # returns nothing when empty.
+  value="$(table::get "${primary_key}" ${COLUMN_ENVIRONMENT})"
+  if [[ ${!value+x} ]] ; then
+    echo "${!value}" && return
+  fi
+
+  #
+  # Parse Value from Configuration
+  #
+  dasel -f "${INFLUXD_CONFIG_PATH}" -s "${primary_key}" -w - 2>/dev/null || \
+    table::get "${primary_key}" "${COLUMN_DEFAULT}"
+}
+
 function set_data_paths () {
-    BOLT_PATH="$(influxd print-config --key-name bolt-path "${@}")"
-    ENGINE_PATH="$(influxd print-config --key-name engine-path "${@}")"
+    BOLT_PATH="$(influxd::config::get bolt-path "${@}")"
+    ENGINE_PATH="$(influxd::config::get engine-path "${@}")"
     export BOLT_PATH ENGINE_PATH
 }
 
 # Ensure all the data directories needed by influxd exist with the right permissions.
 function create_directories () {
-    log info "creating folders with the right permissions"
     local -r bolt_dir="$(dirname "${BOLT_PATH}")"
     local user
     user=$(id -u)
 
-    if [ "$(id -u)" != 0 ]; then
-        log warn "cannot create folders as non-root"
-        return
-    fi
 
     mkdir -p "${bolt_dir}" "${ENGINE_PATH}"
     chmod 700 "${bolt_dir}" "${ENGINE_PATH}" || :
@@ -126,9 +202,15 @@ function create_directories () {
 # Read password and username from file to avoid unsecure env variables
 if [ -n "${DOCKER_INFLUXDB_INIT_PASSWORD_FILE}" ]; then [ -e "${DOCKER_INFLUXDB_INIT_PASSWORD_FILE}" ] && DOCKER_INFLUXDB_INIT_PASSWORD=$(cat "${DOCKER_INFLUXDB_INIT_PASSWORD_FILE}") || echo "DOCKER_INFLUXDB_INIT_PASSWORD_FILE defined, but file not existing, skipping."; fi
 if [ -n "${DOCKER_INFLUXDB_INIT_USERNAME_FILE}" ]; then [ -e "${DOCKER_INFLUXDB_INIT_USERNAME_FILE}" ] && DOCKER_INFLUXDB_INIT_USERNAME=$(cat "${DOCKER_INFLUXDB_INIT_USERNAME_FILE}") || echo "DOCKER_INFLUXDB_INIT_USERNAME_FILE defined, but file not existing, skipping."; fi
+if [ -n "${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN_FILE}" ]; then [ -e "${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN_FILE}" ] && DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=$(cat "${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN_FILE}") || echo "DOCKER_INFLUXDB_INIT_ADMIN_TOKEN_FILE defined, but file not existing, skipping."; fi
 
 # List of env vars required to auto-run setup or upgrade processes.
-declare -ra REQUIRED_INIT_VARS=(DOCKER_INFLUXDB_INIT_USERNAME DOCKER_INFLUXDB_INIT_PASSWORD DOCKER_INFLUXDB_INIT_ORG DOCKER_INFLUXDB_INIT_BUCKET)
+declare -ra REQUIRED_INIT_VARS=(
+  DOCKER_INFLUXDB_INIT_USERNAME
+  DOCKER_INFLUXDB_INIT_PASSWORD
+  DOCKER_INFLUXDB_INIT_ORG
+  DOCKER_INFLUXDB_INIT_BUCKET
+)
 
 # Ensure all env vars required to run influx setup or influxd upgrade are set in the env.
 function ensure_init_vars_set () {
@@ -302,21 +384,36 @@ function init_influxd () {
         return
     fi
 
-    local -r final_bind_addr="$(influxd print-config --key-name http-bind-address "${@}")"
+    local -r final_bind_addr="$(influxd::config::get http-bind-address "${@}")"
     local -r init_bind_addr=":${INFLUXD_INIT_PORT}"
     if [ "${init_bind_addr}" = "${final_bind_addr}" ]; then
       log warn "influxd setup binding to same addr as final config, server will be exposed before ready" addr "${init_bind_addr}"
     fi
     local final_host_scheme="http"
-    if [ "$(influxd print-config --key-name tls-cert "${@}")" != '""' ] && [ "$(influxd print-config --key-name tls-key "${@}")" != '""' ]; then
-        final_host_scheme="https"
+    if [ -n "$(influxd::config::get tls-cert "${@}")" ] &&
+       [ -n "$(influxd::config::get tls-key  "${@}")" ]
+    then
+      final_host_scheme="https"
     fi
 
+    case ${INFLUXD_CONFIG_PATH,,} in
+      *.toml)       local influxd_config_format=toml ;;
+      *.json)       local influxd_config_format=json ;;
+      *.yaml|*.yml) local influxd_config_format=yaml ;;
+    esac
+
     # Generate a config file with a known HTTP port, and TLS disabled.
-    local -r init_config=/tmp/config.yml
-    influxd print-config "${@}" | \
-        sed -e "s#${final_bind_addr}#${init_bind_addr}#" -e '/^tls/d' > \
-        "${init_config}"
+    local -r init_config=/tmp/config.json
+    (
+      dasel -r "${influxd_config_format}" -w json \
+        | dasel -r json put http-bind-address -v "${init_bind_addr}" \
+        `# insert "tls-cert" and "tls-key" so delete succeeds` \
+        | dasel -r json put tls-cert -v ''                     \
+        | dasel -r json put tls-key  -v ''                     \
+        `# delete "tls-cert" and "tls-key"` \
+        | dasel -r json delete tls-cert     \
+        | dasel -r json delete tls-key
+    ) <"${INFLUXD_CONFIG_PATH}" | tee "${init_config}"
 
     # Start influxd in the background.
     log info "booting influxd server in the background"
@@ -341,7 +438,7 @@ function init_influxd () {
     wait "${influxd_init_pid}" || true
     trap - EXIT INT TERM
 
-    # Rewrite the ClI configs to point at the server's final HTTP address.
+    # Rewrite the CLI configs to point at the server's final HTTP address.
     local -r final_port="$(echo "${final_bind_addr}" | sed -E 's#[^:]*:(.*)#\1#')"
     sed -i "s#http://localhost:${INFLUXD_INIT_PORT}#${final_host_scheme}://localhost:${final_port}#g" "${INFLUX_CONFIGS_PATH}"
 }
@@ -390,7 +487,7 @@ function main () {
     if [ -f "${BOLT_PATH}" ]; then
         log info "found existing boltdb file, skipping setup wrapper" bolt_path "${BOLT_PATH}"
     elif [ -z "${DOCKER_INFLUXDB_INIT_MODE}" ]; then
-        log warn "boltdb not found at configured path, but DOCKER_INFLUXDB_INIT_MODE not specified, skipping setup wrapper" bolt_path "${bolt_path}"
+        log warn "boltdb not found at configured path, but DOCKER_INFLUXDB_INIT_MODE not specified, skipping setup wrapper" bolt_path "${BOLT_PATH}"
     else
         init_influxd "${@}"
         # Set correct permission on volume directories again. This is necessary so that if the container was run as the
@@ -400,11 +497,11 @@ function main () {
     fi
 
     if [ "$(id -u)" = 0 ]; then
-        exec setpriv --reuid=influxdb --regid=influxdb --init-groups --inh-caps=-all "$BASH_SOURCE" "$@"
+        exec setpriv --reuid=influxdb --regid=influxdb --init-groups --inh-caps=-all "$BASH_SOURCE" "${@}"
     fi
 
     # Run influxd.
-    exec influxd "$@"
+    exec influxd "${@}"
 }
 
-main "$@"
+main "${@}"

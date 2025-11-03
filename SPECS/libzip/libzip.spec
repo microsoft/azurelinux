@@ -1,12 +1,13 @@
 Summary:        C library for reading, creating, and modifying zip archives
 Name:           libzip
 Version:        1.10.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://libzip.org/
-Source0:        https://libzip.org/download/libzip-%{version}.tar.xz
+# Note that scrubbed version of the source tarball contains upstream source minus password protected files which password is not known
+Source0:        https://libzip.org/download/libzip-%{version}.tar.xz#/libzip-%{version}-scrubbed.tar.xz
 BuildRequires:  bzip2-devel
 BuildRequires:  cmake >= 3.0.2
 BuildRequires:  gcc
@@ -115,6 +116,9 @@ make test
 %{_libdir}/pkgconfig/libzip.pc
 
 %changelog
+* Tue May 27 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 1.10.1-3
+- Remove password protected zip files from upstream src tarball
+
 * Mon Aug 19 2024 Andrew Phelps <anphel@microsoft.com> - 1.10.1-2
 - Fix package tests
 - Switch to out-of-source build

@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        18.2.2
-Release:        8%{?dist}
+Release:        11%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -28,6 +28,9 @@ Patch13:        CVE-2020-10724.patch
 Patch14:        CVE-2025-1744.patch
 Patch15:        CVE-2021-28361.patch
 Patch16:        CVE-2020-14378.patch
+Patch17:        CVE-2025-52555.patch
+Patch18:        CVE-2024-48916.patch
+Patch19:        CVE-2025-9648.patch
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
 # at the top-level directory of this distribution and at
@@ -2018,6 +2021,15 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Fri Oct 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 18.2.2-11
+- Patch for CVE-2025-9648
+
+* Fri Aug 01 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 18.2.2-10
+- Patch for CVE-2024-48916
+
+* Tue Jul 01 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 18.2.2-9
+- Patch for CVE-2025-52555
+
 * Wed 16 Apr 2025 Archana Shettigar <v-shettigara@microsoft.com> - 18.2.2-8
 - Patch CVE-2020-14378
 

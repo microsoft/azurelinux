@@ -7,14 +7,18 @@
 %endif
 Summary: Performance Application Programming Interface
 Name: papi
-Version: 5.7.0
-Release: 5%{?dist}
+Version: 7.1.0
+Release: 1%{?dist}
 License: BSD
 Requires: papi-libs = %{version}-%{release}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://icl.cs.utk.edu/papi/
-Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
+URL: https://icl.cs.utk.edu/papi/
+Source0: https://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
+Patch1: papi-python3.patch
+Patch2: papi-nostatic.patch
+Patch3: papi-libsde.patch
+
 BuildRequires: autoconf
 BuildRequires: doxygen
 BuildRequires: ncurses-devel
@@ -23,8 +27,8 @@ BuildRequires: kernel-headers >= 2.6.32
 BuildRequires: chrpath
 BuildRequires: lm_sensors-devel
 %if %{without bundled_libpfm}
-BuildRequires: libpfm-devel >= 4.6.0-1
-BuildRequires: libpfm-static >= 4.6.0-1
+BuildRequires: libpfm-devel >= 4.6.0
+BuildRequires: libpfm-static >= 4.6.0
 %endif
 # Following required for net component
 BuildRequires: net-tools
@@ -72,7 +76,7 @@ PAPI-static includes the static versions of the library files for
 the PAPI user-space libraries and interfaces.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %if %{without bundled_libpfm}
@@ -90,19 +94,6 @@ autoconf
 #components currently left out because of build configure/build issues
 # --with-components="bgpm coretemp_freebsd cuda host_micpower nvml vmware"
 
-pushd components
-#pushd cuda; ./configure; popd
-#pushd host_micpower; ./configure; popd
-%if  %{with_rdma}
-pushd infiniband_umad; %configure; popd
-%endif
-pushd lmsensors; \
- %configure --with-sensors_incdir=/usr/include/sensors \
- --with-sensors_libdir=%{_libdir}; \
- popd
-#pushd vmware; ./configure; popd
-popd
-
 #DBG workaround to make sure libpfm just uses the normal CFLAGS
 DBG="" make %{?_smp_mflags}
 
@@ -118,23 +109,25 @@ rm -rf $RPM_BUILD_ROOT
 cd src
 make DESTDIR=$RPM_BUILD_ROOT LDCONFIG=/bin/true install-all
 
-chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
+# Scrub the rpath/runpath from all the binaries.
+find %{buildroot} -type f -executable ! -iname "*.py" ! -iname "*.sh" | xargs chrpath --delete      
 
 %files
 %{_bindir}/*
 %dir /usr/share/papi
 /usr/share/papi/papi_events.csv
-%doc INSTALL.txt README LICENSE.txt RELEASENOTES.txt
+%doc INSTALL.txt README.md LICENSE.txt RELEASENOTES.txt
 %doc %{_mandir}/man1/*
 
 %ldconfig_scriptlets libs
 
 %files libs
 %{_libdir}/*.so.*
-%doc INSTALL.txt README LICENSE.txt RELEASENOTES.txt
+%doc INSTALL.txt README.md LICENSE.txt RELEASENOTES.txt
 
 %files devel
 %{_includedir}/*.h
+%{_includedir}/*.hpp
 %if %{with bundled_libpfm}
 %{_includedir}/perfmon/*.h
 %endif
@@ -154,6 +147,10 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/*.so*
 %{_libdir}/*.a
 
 %changelog
+* Tue Apr 29 2025 Jyoti kanase <v-jykanase@microsoft.com> -  7.1.0-1
+- Upgrade to 7.1.0
+- License verified.
+
 * Tue Mar 23 2021 Henry Li <lihl@microsoft.com> - 5.7.0-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove infiniband-diags-devel from build requirement since it's already obsoleted

@@ -1,15 +1,18 @@
 %{!?KMP: %global KMP 0}
 
-%global last-known-kernel 6.6.85.1-2
-
 %if 0%{azl}
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
+%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
 %global target_kernel_version_full f.a.k.e
 %endif
 
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
+
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-21%{release_suffix}%{?dist}}
 
 # %{!?KVERSION: %global KVERSION %(uname -r)}
 %{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
@@ -39,7 +42,7 @@
 Summary:	 Cross-partition memory
 Name:		 xpmem
 Version:	 2.7.4
-Release:	 16%{?dist}
+Release:	 21%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -47,7 +50,6 @@ Distribution:    Azure Linux
 BuildRequires:	 automake autoconf
 URL:		 https://github.com/openucx/xpmem
 Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/xpmem-2.7.4.tar.gz#/%{name}-%{version}.tar.gz
-ExclusiveArch:   x86_64
 
 # name gets a different value in subpackages
 %global _name %{name}
@@ -72,13 +74,10 @@ BuildRequires:  kernel-headers = %{target_kernel_version_full}
 BuildRequires:  binutils
 BuildRequires:  systemd
 BuildRequires:  kmod
-BuildRequires:  mlnx-ofa_kernel-devel
-BuildRequires:  mlnx-ofa_kernel-source
+BuildRequires:  mlnx-ofa_kernel-devel = %{_mofed_full_version}
+BuildRequires:  mlnx-ofa_kernel-source = %{_mofed_full_version}
 
-Requires:       mlnx-ofa_kernel
-Requires:       mlnx-ofa_kernel-modules
-Requires:       kernel = %{target_kernel_version_full}
-Requires:       kmod
+Requires:       mlnx-ofa_kernel = %{_mofed_full_version}
 
 
 %description
@@ -122,11 +121,18 @@ EOF)
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
 
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %package modules
 # %{nil}: to avoid having the script that build OFED-internal
 # munge the release version here as well:
 Summary: XPMEM: kernel modules
 Group: System Environment/Libraries
+
+Requires:       mlnx-ofa_kernel-modules = %{_mofed_full_version}
+Requires:       kernel = %{target_kernel_version_full}
+Requires:       kmod
+
 %description modules
 XPMEM is a Linux kernel module that enables a process to map the
 memory of another process into its virtual address space. Source code
@@ -134,6 +140,7 @@ can be obtained by cloning the Git repository, original Mercurial
 repository or by downloading a tarball from the link above.
 
 This package includes the kernel module (non KMP version).
+%endif
 %endif #end if "%{KMP}" == "1"
 
 #
@@ -191,6 +198,13 @@ fi
 
 %install
 %{make_install} moduledir=%{moduledir} %{make_kernel_only}
+# For the default kernel, we create the module package only for the x86_64 kernel.
+# Some other kernels (kernel-hwe for instance) get aarch64 modules packages built from other specs.
+# We keep the user space packages like the module configs built only in this spec, though,
+# and re-use them for kernel modules built for other kernel flavours and architectures.
+%ifnarch x86_64
+rm -rf $RPM_BUILD_ROOT/%{moduledir}
+%endif
 rm -rf $RPM_BUILD_ROOT/%{_libdir}/libxpmem.la
 rm -rf $RPM_BUILD_ROOT/etc/init.d/xpmem
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/modules-load.d
@@ -240,12 +254,39 @@ fi
 %endif
 
 %if "%{KMP}" != "1"
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
+%post modules
+/sbin/depmod %{KVERSION}
+
+%postun modules
+if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
+	/sbin/depmod %{KVERSION}
+fi
+
 %files modules
 %{moduledir}/xpmem.ko
 %license COPYING COPYING.LESSER
 %endif
+%endif
 
 %changelog
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-21
+- Adjusted package dependencies on user space components.
+- Align %%post* scripts with other kmod packages.
+
+* Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 2.7.4-20
+- Add kernel version and release nb into release nb
+
+* Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.4-19
+- Bump release to rebuild for new kernel release
+
+* Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-18
+- Bump release to rebuild for new kernel release
+
+* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-17
+- Bump release to rebuild for new kernel release
+
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 2.7.4-16
 - Bump release to rebuild for new kernel release
 

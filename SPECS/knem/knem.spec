@@ -26,10 +26,11 @@
 # KMP is disabled by default
 %{!?KMP: %global KMP 0}
 
-%global last-known-kernel 6.6.85.1-2
-
 %if 0%{azl}
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
+%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
 %global target_kernel_version_full f.a.k.e
 %endif
@@ -53,7 +54,7 @@
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
 Name:		 knem
 Version:	 1.1.4.90mlnx3
-Release:	 16%{?dist}
+Release:	 21%{release_suffix}%{?dist}
 Provides:	 knem-mlnx = %{version}-%{release}
 Obsoletes:	 knem-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
@@ -62,7 +63,6 @@ Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 Source0:	 https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/knem-1.1.4.90mlnx3.tar.gz#/knem-%{version}.tar.gz
 BuildRoot:       /var/tmp/%{name}-%{version}-build
-ExclusiveArch:   x86_64
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -72,7 +72,6 @@ BuildRequires:  binutils
 BuildRequires:  systemd
 BuildRequires:  kmod
 
-Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
 
@@ -115,12 +114,18 @@ EOF)
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
 
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %package -n %{non_kmp_pname}
 Summary: KNEM: High-Performance Intra-Node MPI Communication
 Group: System Environment/Libraries
+
+Requires:       kernel = %{target_kernel_version_full}
+
 %description -n %{non_kmp_pname}
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as loading memory copies on to Intel I/OAT hardware.
 See http://runtime.bordeaux.inria.fr/knem/ for details.
+%endif
 %endif #end if "%{KMP}" == "1"
 
 #
@@ -198,6 +203,15 @@ for flavor in %flavors_to_build; do
 	export MODULE_DESTDIR=/lib/modules/$KVERSION/$INSTALL_MOD_DIR
 	mkdir -p $RPM_BUILD_ROOT/lib/modules/$KVERSION/$INSTALL_MOD_DIR
 	MODULE_DESTDIR=/lib/modules/$KVERSION/$INSTALL_MOD_DIR DESTDIR=$RPM_BUILD_ROOT KVERSION=$KVERSION $RPM_BUILD_ROOT/opt/knem-%{version}/sbin/knem_local_install
+
+# For the default kernel, we create the module package only for the x86_64 kernel.
+# Some other kernels (kernel-hwe for instance) get aarch64 modules packages built from other specs.
+# We keep the user space packages like the module configs built only in this spec, though,
+# and re-use them for kernel modules built for other kernel flavours and architectures.
+%ifnarch x86_64
+	rm -rf $RPM_BUILD_ROOT/$MODULE_DESTDIR
+%endif
+
 	cp knem.pc  $RPM_BUILD_ROOT/usr/lib64/pkgconfig
 	cd -
 done
@@ -250,6 +264,8 @@ if (grep -qw knem /etc/sysconfig/kernel 2>/dev/null); then
 fi
 
 %if "%{KMP}" != "1"
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %post -n %{non_kmp_pname}
 depmod %{KVERSION} -a
 
@@ -257,6 +273,7 @@ depmod %{KVERSION} -a
 if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 	depmod %{KVERSION} -a
 fi
+%endif
 %endif # end KMP=1
 
 %files
@@ -270,6 +287,8 @@ fi
 
 
 %if "%{KMP}" != "1"
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %files -n %{non_kmp_pname}
 %license source/COPYING source/COPYING.BSD-3 source/COPYING.GPL-2
 /lib/modules/%{KVERSION}/%{install_mod_dir}/
@@ -279,8 +298,24 @@ fi
 %endif
 %endif
 %endif
+%endif
 
 %changelog
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.4.90mlnx3-21
+- Adjusted package dependencies on user space components.
+
+* Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 1.1.4.90mlnx3-20
+- Add kernel version and release nb into release nb
+
+* Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.4.90mlnx3-19
+- Bump release to rebuild for new kernel release
+
+* Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 1.1.4.90mlnx3-18
+- Bump release to rebuild for new kernel release
+
+* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 1.1.4.90mlnx3-17
+- Bump release to rebuild for new kernel release
+
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 1.1.4.90mlnx3-16
 - Bump release to rebuild for new kernel release
 

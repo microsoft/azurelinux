@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 
 Name:           kata-containers
-Version:        3.2.0.azl5
-Release:        2%{?dist}
+Version:        3.19.1.kata2
+Release:        1%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
@@ -16,7 +16,7 @@ ExclusiveArch: x86_64
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
-BuildRequires:  rust < 1.85.0
+BuildRequires:  rust >= 1.85.0
 BuildRequires:  libseccomp-devel
 BuildRequires:  openssl-devel
 BuildRequires:  clang
@@ -26,6 +26,7 @@ BuildRequires:  cmake
 Requires:       kernel-uvm
 # Must match the version specified by the `assets.virtiofsd.version` field in the source's versions.yaml.
 Requires:       virtiofsd = 1.8.0
+Requires:       containerd2
 
 %description
 The Kata Containers package ships the Kata components for Pod Sandboxing on AKS.
@@ -67,6 +68,7 @@ popd
 %{kata_bin}/kata-runtime
 
 %{defaults_kata}/configuration.toml
+%{defaults_kata}/configuration-clh-debug.toml
 
 %{kata_shim_bin}/containerd-shim-kata-v2
 
@@ -92,6 +94,7 @@ popd
 
 %dir %{tools_pkg}/tools/osbuilder/image-builder
 %{tools_pkg}/tools/osbuilder/image-builder/image_builder.sh
+%{tools_pkg}/tools/osbuilder/image-builder/nsdax.gpl.c
 
 %dir %{tools_pkg}/tools/osbuilder/node-builder
 %dir %{tools_pkg}/tools/osbuilder/node-builder/azure-linux
@@ -112,6 +115,30 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Mon Sep 08 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.1.kata2-1
+- Auto-upgrade to 3.19.1.kata2
+
+* Wed Aug 27 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.1.kata1-1
+- Auto-upgrade to 3.19.1.kata1
+
+* Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.18.0.kata0-4
+- Bump release to rebuild with rust
+
+* Tue Jul 22 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.18.0.kata0-3
+- Bump release to rebuild with rust
+
+* Mon Jul 21 2025 Saul Paredes <saulparedes@microsoft.com> - 3.18.0.kata0-2
+- Add dependency on containerd2
+
+* Wed Jun 25 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.18.0.kata0-1
+- Auto-upgrade to 3.18.0.kata0
+
+* Fri Jun 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0.aks0-2
+- Bump release to rebuild with rust
+
+* Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.15.0.aks0-1
+- Auto-upgrade to 3.15.0.aks0
+
 * Mon Apr 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.2.0.azl5-2
 - Pin rust version
 
@@ -121,7 +148,7 @@ popd
 * Wed Jan 22 2025 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl4-1
 - Upgrade to 3.2.0.azl4 release
 
-* Thu Oct 25 2024 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl3-2
+* Fri Oct 25 2024 Saul Paredes <saulparedes@microsoft.com> - 3.2.0.azl3-2
 - Only build for x86_64
 
 * Fri Sep 20 2024 Manuel Huber <mahuber@microsoft.com> - 3.2.0.azl3-1

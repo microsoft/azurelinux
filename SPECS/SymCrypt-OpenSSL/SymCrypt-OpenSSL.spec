@@ -1,6 +1,6 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
-Version:        1.8.0
+Version:        1.9.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -49,6 +49,7 @@ mkdir -p %{buildroot}%{_libdir}/engines-3/
 mkdir -p %{buildroot}%{_libdir}/ossl-modules/
 mkdir -p %{buildroot}%{_includedir}
 mkdir -p %{buildroot}%{_sysconfdir}/pki/tls/
+mkdir -p %{buildroot}%{_localstatedir}/log/keysinuse/
 
 # We still install the engine for backwards compatibility with legacy applications. Callers must
 # explicitly load the engine to use it. It will be removed in a future release.
@@ -57,17 +58,15 @@ install bin/SymCryptProvider/symcryptprovider.so %{buildroot}%{_libdir}/ossl-mod
 install SymCryptEngine/inc/e_scossl.h %{buildroot}%{_includedir}/e_scossl.h
 install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/symcrypt_prov.cnf
 
-%post
-mkdir -p -m 1733 /var/log/keysinuse
-
-%preun
-# Remove the logging directory on uninstall, leaving it there on upgrade.
-if [ "${1}" = "0" ]; then
-    rm -rf /var/log/keysinuse
-fi
-
 %check
-./bin/SslPlay/SslPlay
+# Run in a subshell so the exit code of the test does not affect the main shell's exit code.
+# This is important because the entire section is wrapped in a script by rpmbuild itself.
+# The test is run twice: once with the default provider and once with the SymCrypt provider.
+(
+        set -e
+        ./bin/SslPlay/SslPlay
+        ./bin/SslPlay/SslPlay --provider-path ./bin/SymCryptProvider/ --provider symcryptprovider --no-engine
+)
 
 %files
 %license LICENSE
@@ -76,7 +75,37 @@ fi
 %{_includedir}/e_scossl.h
 %{_sysconfdir}/pki/tls/symcrypt_prov.cnf
 
+# The log directory for certsinuse logging has permissions set to 1733.
+# These permissions are a result of a security review to mitigate potential risks:
+# - Group and others are denied read access to prevent user-level code from inferring
+#   details about other running applications and their certsinuse usage.
+# - All users have write and execute permissions to create new log files and to 
+#   check file attributes (e.g., to ensure a log file hasn't been tampered with or 
+#   replaced by a symlink).
+# - The sticky bit is set to prevent malicious users from deleting the log files
+#   and interfering with certsinuse alerting mechanisms.
+%dir %attr(1733, root, root) %{_localstatedir}/log/keysinuse/
+
 %changelog
+* Tue Sep 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.3-1
+- Auto-upgrade to 1.9.3 - bug fixes
+
+* Mon Sep 22 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.2-1
+- Auto-upgrade to 1.9.2 - bug fixes
+
+* Fri Jul 25 2025 Tobias Brick <tobiasb@microsoft.com> - 1.9.1-1
+- Upgrade SymCrypt-OpenSSL to 1.9.1 for compatability and bug fixes.
+
+* Wed Jun 11 2025 Tobias Brick <tobiasb@microsoft.com> - 1.9.0-1
+- Auto-upgrade to 1.9.0 - Support digest state exports.
+- Added second test run that forces the use of the SymCrypt provider.
+
+* Tue May 13 2025 Tobias Brick <tobiasb@microsoft.com> - 1.8.1-1
+- Upgrade to SymCrypt-OpenSSL 1.8.1 with minor bugfixes.
+
+* Thu May 08 2025 Tobias Brick <tobiasb@microsoft.com> - 1.8.0-2
+- Update mechanism for creating keysinuse logging directory.
+
 * Thu Mar 27 2025 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.8.0-1
 - Upgrade to SymCrypt-OpenSSL 1.8.0 with PBKDF2 and minor bugfixes
 

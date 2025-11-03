@@ -19,8 +19,8 @@
 
 Summary:        Container native virtualization
 Name:           kubevirt
-Version:        1.2.0
-Release:        16%{?dist}
+Version:        1.5.0
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,20 +30,13 @@ Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{versio
 # The containers_meta packages and associated files are not required for the Mariner build
 # Nexus team needs these to-be-upstreamed patches for the operator Edge to work
 # correctly.
-Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
-Patch1:         CVE-2023-48795.patch
-Patch2:         CVE-2024-24786.patch
-Patch3:         CVE-2024-45337.patch
-Patch4:         CVE-2024-45338.patch
-Patch5:         CVE-2023-45288.patch
-Patch6:         CVE-2023-44487.patch
-Patch7:         CVE-2025-22869.patch
-Patch8:         CVE-2025-22872.patch
+Patch0:         CVE-2025-22869.patch
+Patch1:         CVE-2025-22872.patch
 
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-9%{?dist}
+BuildRequires:  glibc-static >= 2.38-15%{?dist}
 BuildRequires:  golang >= 1.21
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -197,9 +190,6 @@ install -p -m 0755 cmd/virt-launcher/node-labeller/node-labeller.sh %{buildroot}
 mkdir -p %{buildroot}%{_datadir}/kube-virt/virt-handler
 install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-virt/virt-handler/
 
-# virt-launcher SELinux policy needs to land in virt-handler container
-install -p -m 0644 cmd/virt-handler/virt_launcher.cil %{buildroot}/
-
 # Persistent reservation helper configuration files
 mkdir -p %{buildroot}%{_datadir}/kube-virt/pr-helper
 install -p -m 0644 cmd/pr-helper/multipath.conf %{buildroot}%{_datadir}/kube-virt/pr-helper/
@@ -246,7 +236,6 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_datadir}/kube-virt/virt-handler
 %{_bindir}/virt-handler
 %{_bindir}/virt-chroot
-/virt_launcher.cil
 
 %files virt-launcher
 %license LICENSE
@@ -280,8 +269,34 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
-* Thu Apr 24 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.2.0-16
+* Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.5.0-5
+- Bump to rebuild with updated glibc
+
+* Wed Oct 08 2025 Andrew Phelps <anphel@microsoft.com> - 1.5.0-4
+- Bump to rebuild with updated glibc
+
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.5.0-3
+- Bump to rebuild with updated glibc
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.5.0-2
+- Bump to rebuild with updated glibc
+
+* Thu Jul 03 2025 Harshit Gupta <guptaharshit@microsoft.com> - 1.5.0-1
+- Upgrade to 1.5.0
+- Removed old patches
+- Remove virt_launcher.cil SELinux policy
+
+* Thu Jul 10 2025 BinduSri Adabala <v-badabala@microsoft.com> - 1.2.0-19
+- Patch CVE-2024-33394
+
+* Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-18
+- Bump to rebuild with updated glibc
+
+* Tue May 13 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 1.2.0-17
 - Patch CVE-2025-22872
+
+* Mon May 12 2025 Andrew Phelps <anphel@microsoft.com> - 1.2.0-16
+- Bump to rebuild with updated glibc
 
 * Mon Mar 03 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 1.2.0-15
 - Address CVE-2023-44487

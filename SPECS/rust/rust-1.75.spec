@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.75.0
-Release:        13%{?dist}
+Release:        21%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -44,6 +44,8 @@ Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Patch0:         CVE-2023-45853.patch
 Patch1:         CVE-2024-32884.patch
 Patch2:         CVE-2024-31852.patch
+Patch3:         CVE-2025-4574_1.75.patch
+Patch4:         CVE-2025-53605_1.75.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -62,7 +64,8 @@ BuildRequires:  python3
 # make sure rust depends on system zlib
 BuildRequires:  zlib-devel
 %if 0%{?with_check}
-BuildRequires:  glibc-static >= 2.38-9%{?dist}
+BuildRequires:  glibc-static >= 2.38-15%{?dist}
+BuildRequires:  sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
@@ -133,7 +136,10 @@ ln -s %{_topdir}/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage
 ln -s %{_topdir}/BUILD/rustc-%{version}-src/vendor/ /root/vendor
 # remove rustdoc ui flaky test issue-98690.rs (which is tagged with 'unstable-options')
 rm -v ./tests/rustdoc-ui/issue-98690.*
-%make_build check
+useradd -m -d /home/test test
+chown -R test:test .
+sudo -u test %make_build check
+userdel -r test
 
 %install
 USER=root SUDO_USER=root %make_install
@@ -174,6 +180,32 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-21
+- Bump to rebuild with updated glibc
+
+* Wed Oct 08 2025 Andrew Phelps <anphel@microsoft.com> - 1.75.0-20
+- Bump to rebuild with updated glibc
+
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-19
+- Bump to rebuild with updated glibc
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.75.0-18
+- Bump to rebuild with updated glibc
+
+* Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.75.0-17
+- Add patch for CVE-2025-53605
+
+* Tue Jun 10 2025 Kavya Sree Kaitepalli kkaitepalli@microsoft.com - 1.75.0-16
+- Run %check as non root user to fix ptests
+- Patch CVE-2025-4574
+
+* Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-15
+- Bump to rebuild with updated glibc
+
+
+* Mon May 12 2025 Andrew Phelps anphel@microsoft.com - 1.75.0-14
+- Bump to rebuild with updated glibc
+
 * Sun Apr 20 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.75.0-13
 - Support rust 1.75 version
 - Add explicit build dependency on zlib

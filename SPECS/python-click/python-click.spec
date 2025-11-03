@@ -8,7 +8,7 @@ comes with good defaults out of the box.
 Summary:        Simple wrapper around optparse for powerful command line utilities
 Name:           python-%{pypi_name}
 Version:        8.1.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,7 @@ Source0:        https://github.com/mitsuhiko/click/archive/%{version}/%{name}-%{
 BuildArch:      noarch
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 
 %description %{_description}
@@ -39,7 +40,6 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 %py3_install
 
 %check
-pip3 install pytest==7.2.2
 pip3 install .
 pytest -v tests
 
@@ -50,6 +50,9 @@ pytest -v tests
 %{python3_sitelib}/%{pypi_name}-*.egg-info/
 
 %changelog
+* Wed May 28 2025 Riken Maharjan <rmaharjan@microsoft.com> - 8.1.7-2
+- Fix Ptest by using ptest version above 7.4.0. Use system pytest.
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.1.7-1
 - Auto-upgrade to 8.1.7 - Azure Linux 3.0 - package upgrades
 

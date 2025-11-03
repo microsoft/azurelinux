@@ -10,11 +10,12 @@
 Summary:       Builds packages inside chroots
 Name:          mock
 Version:       5.6
-Release:       1%{?dist}
+Release:       2%{?dist}
 Vendor:        Microsoft Corporation
 Distribution:  Azure Linux
 License:       GPL-2.0-or-later
 Source:        https://github.com/rpm-software-management/mock/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:        disable-copying-ca-trust-dirs.patch
 URL:           https://github.com/rpm-software-management/mock/
 BuildArch:     noarch
 Requires:      tar
@@ -152,7 +153,7 @@ Requires(pre): shadow-utils
 Filesystem layout and group for Mock.
 
 %prep
-%setup -q -n mock-%{name}-%{version}-1/%{name}
+%autosetup -p2 -n mock-%{name}-%{version}-1/%{name}
 for file in py/mock.py py/mock-parse-buildlog.py; do
   sed -i 1"s|#!/usr/bin/python3 |#!%{__python} |" $file
 done
@@ -298,6 +299,9 @@ pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
 %dir  %{_datadir}/cheat
 
 %changelog
+* Wed May 07 2025 Reuben Olinsky <reubeno@microsoft.com> - 5.6-2
+- Backport change allowing disabling ca-trust file copying.
+
 * Wed Aug 28 2024 Reuben Olinsky <reubeno@microsoft.com> - 5.6-1
 - Sync with Fedora 41 version of spec.
 

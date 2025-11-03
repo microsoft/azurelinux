@@ -1,6 +1,6 @@
 Summary:        Sudo
 Name:           sudo
-Version:        1.9.15p5
+Version:        1.9.17
 Release:        1%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
@@ -8,6 +8,8 @@ Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://www.sudo.ws/sudo/dist/%{name}-%{version}.tar.gz
+Patch0:         CVE-2025-32462.patch
+Patch1:         CVE-2025-32463.patch
 BuildRequires:  audit-devel
 BuildRequires:  man-db
 BuildRequires:  openssl-devel
@@ -99,6 +101,10 @@ fi
 %exclude  /etc/sudoers.dist
 
 %changelog
+* Fri Jun 27 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.17-1
+- Upgrade to version 1.9.17.
+- Patching CVEs: 2025-32462 and 2025-32463.
+
 * Thu Jan 25 2024 Thien Trung Vuong <cblmargh@microsoft.com> - 1.9.15p5-1
 - Auto-upgrade to 1.9.15p5 - Update to latest version
 - Remove NETGROUP_QUERY patch - upstream fix is added in 1.9.15p5

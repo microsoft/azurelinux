@@ -1,0 +1,109 @@
+From cf7fb47788dfb83bb5d8bd0bffdb582e381a2f0a Mon Sep 17 00:00:00 2001
+From: Thomas Egerer <thomas.egerer@secunet.com>
+Date: Fri, 6 Sep 2024 13:29:40 +0200
+Subject: [PATCH] array: Don't use realloc() with zero size in array_compress()
+
+The behavior of realloc(3) with zero size was apparently implementation
+defined.  While glibc documents the behavior as equivalent to free(3),
+that might not apply to other C libraries.  With C17, this behavior has
+been deprecated, and with C23, the behavior is now undefined.  It's also
+why valgrind warns about this use.
+
+Hence, when array_compress() would call realloc() with a zero size, we
+now call free() explicitly and set the pointer to NULL.
+
+Signed-off-by: Thomas Egerer <thomas.egerer@secunet.com>
+---
+ src/libstrongswan/collections/array.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/src/libstrongswan/collections/array.c b/src/libstrongswan/collections/array.c
+index 8acc8051d53..8b6c6d7397e 100644
+--- a/src/libstrongswan/collections/array.c
++++ b/src/libstrongswan/collections/array.c
+@@ -197,7 +197,17 @@ void array_compress(array_t *array)
+ 		}
+ 		if (tail)
+ 		{
+-			array->data = realloc(array->data, get_size(array, array->count));
++			size_t size = get_size(array, array->count);
++
++			if (size)
++			{
++				array->data = realloc(array->data, size);
++			}
++			else
++			{
++				free(array->data);
++				array->data = NULL;
++			}
+ 			array->tail = 0;
+ 		}
+ 	}
+---
+
+From f1f0bd9de60e2697a712e72b7ae9f79763a0901d Mon Sep 17 00:00:00 2001
+From: Tobias Brunner <tobias@strongswan.org>
+Date: Thu, 9 Jan 2025 16:05:39 +0100
+Subject: [PATCH] ctr: Remove parameter-less constructor prototype
+
+Useless and causes a compiler warning/error:
+
+  error: a function declaration without a prototype is deprecated in all versions of C and is treated as a zero-parameter prototype in C23, conflicting with a subsequent declaration [-Werror,-Wdeprecated-non-prototype]
+---
+ src/libstrongswan/plugins/ctr/ctr_ipsec_crypter.h | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/src/libstrongswan/plugins/ctr/ctr_ipsec_crypter.h b/src/libstrongswan/plugins/ctr/ctr_ipsec_crypter.h
+index e9421a1be9f..3814465e48b 100644
+--- a/src/libstrongswan/plugins/ctr/ctr_ipsec_crypter.h
++++ b/src/libstrongswan/plugins/ctr/ctr_ipsec_crypter.h
+@@ -37,11 +37,6 @@ struct ctr_ipsec_crypter_t {
+ 	crypter_t crypter;
+ };
+ 
+-/**
+- * Create a ctr_ipsec_crypter instance.
+- */
+-ctr_ipsec_crypter_t *ctr_ipsec_crypter_create();
+-
+ /**
+  * Create a ctr_ipsec_crypter instance.
+  *
+---
+
+From 227d7ef9a24b8c62d6965c1c1690252bde7c698d Mon Sep 17 00:00:00 2001
+From: Tobias Brunner <tobias@strongswan.org>
+Date: Fri, 10 Jan 2025 15:43:11 +0100
+Subject: [PATCH] tnc-imv: Add missing argument to IMV recommendations
+ constructor
+
+This avoids the following warning/error:
+
+tnc_imv_manager.c:244:39: error: passing arguments to 'tnc_imv_recommendations_create' without a prototype is deprecated in all versions of C and is not supported in C23 [-Werror,-Wdeprecated-non-prototype]
+  244 |         return tnc_imv_recommendations_create(this->imvs);
+      |                                              ^
+---
+ src/libtnccs/plugins/tnc_imv/tnc_imv_recommendations.h | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/src/libtnccs/plugins/tnc_imv/tnc_imv_recommendations.h b/src/libtnccs/plugins/tnc_imv/tnc_imv_recommendations.h
+index f7178876cfd..60272978ad3 100644
+--- a/src/libtnccs/plugins/tnc_imv/tnc_imv_recommendations.h
++++ b/src/libtnccs/plugins/tnc_imv/tnc_imv_recommendations.h
+@@ -27,8 +27,11 @@
+ #include <collections/linked_list.h>
+ 
+ /**
+- * Create an IMV empty recommendations instance
++ * Create an empty IMV recommendations instance
++ *
++ * @param imv_list		list of IMVs that could provide recommendations
++ * @return				created instance
+  */
+-recommendations_t *tnc_imv_recommendations_create();
++recommendations_t *tnc_imv_recommendations_create(linked_list_t *imv_list);
+ 
+ #endif /** TNC_IMV_RECOMMENDATIONS_H_ @}*/
+---
+

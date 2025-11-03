@@ -1,6 +1,6 @@
-From d9f795c8181d2db70626b7d43ebb2e6e8d2fbed8 Mon Sep 17 00:00:00 2001
-From: Rohit Rawat <xordux@gmail.com>
-Date: Tue, 29 Oct 2024 14:10:20 +0000
+From e10d46d1cb92c25d1f72735661496fe8527d499c Mon Sep 17 00:00:00 2001
+From: Kanishk Bansal <kanbansal@microsoft.com>
+Date: Wed, 8 Oct 2025 06:42:39 +0000
 Subject: [PATCH] Disable flaky mem defrag tests
 
 ---
@@ -8,23 +8,23 @@ Subject: [PATCH] Disable flaky mem defrag tests
  1 file changed, 2 insertions(+)
 
 diff --git a/tests/unit/memefficiency.tcl b/tests/unit/memefficiency.tcl
-index d5a6a6e..37e1711 100644
+index 4dc04f6..7418980 100644
 --- a/tests/unit/memefficiency.tcl
 +++ b/tests/unit/memefficiency.tcl
-@@ -720,6 +720,7 @@ run_solo {defrag} {
+@@ -721,6 +721,7 @@ run_solo {defrag} {
      }
      }
  
 +    if {0} {
-     start_cluster 1 0 {tags {"defrag external:skip cluster"} overrides {appendonly yes auto-aof-rewrite-percentage 0 save ""}} {
+     start_cluster 1 0 {tags {"defrag external:skip cluster"} overrides {appendonly yes auto-aof-rewrite-percentage 0 save "" lazyfree-lazy-user-del no}} {
          test_active_defrag "cluster"
      }
-@@ -727,4 +728,5 @@ run_solo {defrag} {
-     start_server {tags {"defrag external:skip standalone"} overrides {appendonly yes auto-aof-rewrite-percentage 0 save ""}} {
+@@ -728,4 +729,5 @@ run_solo {defrag} {
+     start_server {tags {"defrag external:skip standalone"} overrides {appendonly yes auto-aof-rewrite-percentage 0 save "" lazyfree-lazy-user-del no}} {
          test_active_defrag "standalone"
      }
 +    }
  } ;# run_solo
 -- 
-2.39.4
+2.45.4
 

@@ -1,7 +1,7 @@
 Summary:        Modular Assembler
 Name:           yasm
 Version:        1.3.0
-Release:        15%{?dist}
+Release:        17%{?dist}
 License:        BSD and (GPLv2+ or Artistic or LGPLv2+) and LGPLv2
 URL:            https://yasm.tortall.net/
 Vendor:         Microsoft Corporation
@@ -10,6 +10,9 @@ Source0:        https://www.tortall.net/projects/%{name}/releases/%{name}-%{vers
 Patch1:         0001-Update-elf-objfmt.c.patch
 Patch2:         CVE-2023-31975.patch
 Patch3:         CVE-2021-33454.patch
+Patch4:         CVE-2023-51258.patch
+Patch5:         CVE-2023-37732.patch
+Patch6:         CVE-2024-22653.patch
 
 BuildRequires:  gcc
 BuildRequires:  bison
@@ -74,6 +77,12 @@ make install DESTDIR=%{buildroot}
 
 
 %changelog
+* Mon Jun 23 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.3.0-17
+- Patch CVE-2024-22653
+
+* Wed May 14 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.3.0-16
+- Patch CVE-2023-51258 and CVE-2023-37732
+
 * Thu Aug 01 2024 Aditya Dubey <adityadubey@microsoft.com> - 1.3.0-15
 - Apply upstream patch for CVE-2021-33454
 

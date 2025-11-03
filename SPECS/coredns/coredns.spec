@@ -6,7 +6,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.4
-Release:        6%{?dist}
+Release:        11%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,17 +40,17 @@ Patch1:         coredns-example-net-test.patch
 Patch2:         CVE-2025-29786.patch
 Patch3:         CVE-2025-30204.patch
 Patch4:         CVE-2024-53259.patch
+Patch5:         CVE-2025-47950.patch
+Patch6:         CVE-2025-58063.patch
+Patch7:         CVE-2025-59530.patch
 
-BuildRequires:  golang >= 1.23
+BuildRequires:  golang < 1.25
 
 %description
 CoreDNS is a fast and flexible DNS server.
 
 %prep
-%autosetup -N
-# Apply vendor before patching
-tar --no-same-owner -xf %{SOURCE1}
-%autopatch -p1
+%autosetup -a1 -p1
 
 %build
 export BUILDOPTS="-mod=vendor -v"
@@ -84,6 +84,21 @@ go install github.com/fatih/faillint@latest && \
 %{_bindir}/%{name}
 
 %changelog
+* Mon Oct 27 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-11
+- Patch for CVE-2025-59530
+
+* Thu Sep 18 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.4-10
+- Changed patch order to resolve 'make' race condition.
+
+* Thu Sep 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-9
+- Patch for CVE-2025-58063
+
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.11.4-8
+- Set BR for golang to < 1.25
+
+* Tue Jun 17 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.11.4-7
+- Fix CVE-2025-47950 with an upstream patch
+
 * Tue Apr 01 2025 Ankita Pareek <ankitapareek@microsoft.com> - 1.11.4-6
 - Add patch for CVE-2024-53259
 

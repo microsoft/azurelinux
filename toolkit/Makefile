@@ -23,6 +23,8 @@ PACKAGE_BUILD_LIST      ?=
 PACKAGE_REBUILD_LIST    ?=
 ##help:var:PACKAGE_IGNORE_LIST:<spec_list>=List of space-separated spec folders to ignore during the build. Must not overlap with "PACKAGE_REBUILD_LIST", may overlap with "PACKAGE_BUILD_LIST". Example: PACKAGE_IGNORE_LIST="zlib".
 PACKAGE_IGNORE_LIST     ?=
+##help:var:SOURCE_AUTH_MODE:<mode>=Mode to use for downloading source files for SRPM packing. Valid options: anonymous, azurecli (as defined in the srpmpacker code base).
+SOURCE_AUTH_MODE        ?=
 ##help:var:SRPM_PACK_LIST:<spec_list>=List of space-separated spec folders inside "SPECS_DIR" to analyze for the build. If empty, all items inside the "SPECS_DIR" will be analyzed. Example: SRPM_PACK_LIST="kernel go which".
 SRPM_PACK_LIST          ?=
 ##help:var:TEST_RUN_LIST:<spec_list>=List of space-separated spec folders to consider for package tests. Specs from the listed folders MUST contain the "%check" section. If empty, all testable items from "SRPM_PACK_LIST" will be considered. Will not re-test previously built packages. Example: TEST_RUN_LIST="libguestfs zlib".
@@ -134,6 +136,9 @@ SRPMS_DIR       ?= $(OUT_DIR)/SRPMS
 IMAGES_DIR      ?= $(OUT_DIR)/images
 
 PRECACHER_SNAPSHOT   ?= $(rpms_snapshot)
+# Turning on non-fatal mode by default. The precacher is not critical to the build
+# if the user is depending on failures from the precacher, it can be turned off with this option or with the tool directly.
+PRECACHER_NON_FATAL ?= y
 
 # External source server
 SOURCE_URL         ?= https://azurelinuxsrcstorage.blob.core.windows.net/sources/core
@@ -197,6 +202,9 @@ all: toolchain go-tools chroot-tools
 # General help information used by 'help' target; this should be included first so
 # its help will be displayed at the top of the help output.
 include $(SCRIPTS_DIR)/help.mk
+
+# Set-up the Azure configuration for the build
+include $(SCRIPTS_DIR)/azure_config.mk
 
 # Set up for the timestamp feature
 include $(SCRIPTS_DIR)/timestamp.mk

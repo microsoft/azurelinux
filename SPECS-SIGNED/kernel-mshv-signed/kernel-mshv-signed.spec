@@ -6,8 +6,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed MSHV-enabled Linux Kernel for %{buildarch} systems
 Name:           kernel-mshv-signed-%{buildarch}
-Version:        5.15.157.mshv1
-Release:        3%{?dist}
+Version:        6.6.100.mshv1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -136,6 +136,12 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 
 %changelog
+* Tue Sep 09 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.100.mshv1-1
+- Upgrade to 6.6.100.mshv1
+
+* Tue May 06 2025 Manuel Huber <mahuber@microsoft.com> - 6.6.57.mshv4-1
+- Upgrade to 6.6.57.mshv4
+
 * Fri Jan 24 2025 Cameron Baird <cameronbaird@microsoft.com> - 5.15.157.mshv1-3
 - Original version for Azure Linux.
 - license: MIT

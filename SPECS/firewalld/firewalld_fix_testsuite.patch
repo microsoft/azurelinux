@@ -1,0 +1,870 @@
+From 8d24ed67aeadd1e807e6e7a09ee3087130063d73 Mon Sep 17 00:00:00 2001
+From: Sumedh Alok Sharma <sumsharma@microsoft.com>
+Date: Fri, 13 Jun 2025 09:52:22 +0000
+Subject: [PATCH] Fix testsuite based on firewalld config in Azl3.
+
+---
+ src/tests/cli/firewall-cmd.at                 |  34 ++++--
+ src/tests/features/features.at                |   1 -
+ src/tests/features/helpers_custom.at          |  24 +++-
+ .../features/iptables_no_flush_on_shutdown.at |  10 +-
+ src/tests/features/nftables_counters.at       |   8 ++
+ src/tests/features/rich_destination_ipset.at  |   5 +-
+ src/tests/features/rich_tcp_mss_clamp.at      |   1 +
+ src/tests/features/startup_failsafe.at        |   2 +
+ src/tests/features/zone_combine.at            |   4 +-
+ src/tests/regression/gh1152.at                | 108 +++++++++++++++++-
+ src/tests/regression/gh366.at                 |   4 +-
+ src/tests/regression/gh453.at                 |   4 +
+ src/tests/regression/gh696.at                 |  16 ++-
+ src/tests/regression/regression.at            |   1 -
+ src/tests/regression/rhbz1404076.at           |   1 -
+ src/tests/regression/rhbz1514043.at           |   2 +-
+ src/tests/regression/rhbz1596304.at           |   2 +-
+ src/tests/regression/rhbz1715977.at           |  16 +--
+ src/tests/regression/rhbz1855140.at           |   8 +-
+ src/tests/regression/rhbz2181406.at           |   4 +
+ 20 files changed, 205 insertions(+), 50 deletions(-)
+
+diff --git a/src/tests/cli/firewall-cmd.at b/src/tests/cli/firewall-cmd.at
+index 5363667..8ed25ab 100644
+--- a/src/tests/cli/firewall-cmd.at
++++ b/src/tests/cli/firewall-cmd.at
+@@ -1469,6 +1469,8 @@ FWD_START_TEST([rich rules priority])
+         table inet firewalld {
+         chain filter_IN_public_allow {
+         tcp dport 22 accept
++	ip daddr 224.0.0.251 udp dport 5353 accept
++	ip6 daddr ff02::fb udp dport 5353 accept
+         ip6 daddr fe80::/64 udp dport 546 accept
+         tcp dport 1122 accept
+         tcp dport 3333 accept
+@@ -1484,7 +1486,8 @@ FWD_START_TEST([rich rules priority])
+         DROP 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:2222 
+     ])
+     IPTABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-        ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22 
++        ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22
++        ACCEPT 17 -- 0.0.0.0/0 224.0.0.251 udp dpt:5353
+         ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:1122 
+         ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:3333 
+         ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:4444 
+@@ -1497,7 +1500,8 @@ FWD_START_TEST([rich rules priority])
+         DROP 6 -- ::/0 ::/0 tcp dpt:2222 
+     ])
+     IP6TABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-        ACCEPT 6 -- ::/0 ::/0 tcp dpt:22 
++        ACCEPT 6 -- ::/0 ::/0 tcp dpt:22
++        ACCEPT 17 -- ::/0 ff02::fb udp dpt:5353
+         ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546 
+         ACCEPT 6 -- ::/0 ::/0 tcp dpt:1122 
+         ACCEPT 6 -- ::/0 ::/0 tcp dpt:3333 
+@@ -1579,6 +1583,8 @@ FWD_START_TEST([rich rules priority])
+         table inet firewalld {
+         chain filter_IN_public_allow {
+         tcp dport 22 accept
++	ip daddr 224.0.0.251 udp dport 5353 accept
++	ip6 daddr ff02::fb udp dport 5353 accept
+         ip6 daddr fe80::/64 udp dport 546 accept
+         }
+         }
+@@ -1644,7 +1650,8 @@ FWD_START_TEST([rich rules priority])
+         DROP 0 -- 10.1.0.0/16 0.0.0.0/0
+     ])
+     IPTABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-        ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22 
++        ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22
++        ACCEPT 17 -- 0.0.0.0/0 224.0.0.251 udp dpt:5353 
+     ])
+     IPTABLES_LIST_RULES([filter], [FWD_public_pre], 0, [dnl
+     ])
+@@ -1671,7 +1678,8 @@ FWD_START_TEST([rich rules priority])
+     IP6TABLES_LIST_RULES([filter], [IN_public_pre], 0, [dnl
+     ])
+     IP6TABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-        ACCEPT 6 -- ::/0 ::/0 tcp dpt:22 
++        ACCEPT 6 -- ::/0 ::/0 tcp dpt:22
++        ACCEPT 17 -- ::/0 ff02::fb udp dpt:5353
+         ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546 
+     ])
+     IP6TABLES_LIST_RULES([filter], [FWD_public_pre], 0, [dnl
+@@ -1719,6 +1727,8 @@ FWD_START_TEST([rich rules priority])
+         table inet firewalld {
+         chain filter_IN_public_allow {
+         tcp dport 22 accept
++	ip daddr 224.0.0.251 udp dport 5353 accept
++	ip6 daddr ff02::fb udp dport 5353 accept
+         ip6 daddr fe80::/64 udp dport 546 accept
+         icmp echo-request accept
+         icmpv6 echo-request accept
+@@ -1751,7 +1761,8 @@ FWD_START_TEST([rich rules priority])
+         REJECT 1 -- 0.0.0.0/0 0.0.0.0/0 icmptype 3 reject-with icmp-host-prohibited
+     ])
+     IPTABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-        ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22 
++        ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22
++        ACCEPT 17 -- 0.0.0.0/0 224.0.0.251 udp dpt:5353
+         ACCEPT 1 -- 0.0.0.0/0 0.0.0.0/0 icmptype 8
+     ])
+     IPTABLES_LIST_RULES([filter], [FWD_public_pre], 0, [dnl
+@@ -1768,7 +1779,8 @@ FWD_START_TEST([rich rules priority])
+         REJECT 58 -- ::/0 ::/0 ipv6-icmptype 1 reject-with icmp6-adm-prohibited
+     ])
+     IP6TABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-        ACCEPT 6 -- ::/0 ::/0 tcp dpt:22 
++        ACCEPT 6 -- ::/0 ::/0 tcp dpt:22
++        ACCEPT 17 -- ::/0 ff02::fb udp dpt:5353
+         ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546 
+         ACCEPT 58 -- ::/0 ::/0 ipv6-icmptype 128
+     ])
+@@ -1821,6 +1833,8 @@ FWD_START_TEST([rich rules priority])
+         table inet firewalld {
+         chain filter_IN_public_allow {
+         tcp dport 22 accept
++	ip daddr 224.0.0.251 udp dport 5353 accept
++	ip6 daddr ff02::fb udp dport 5353 accept
+         ip6 daddr fe80::/64 udp dport 546 accept
+         }
+         }
+@@ -1858,7 +1872,8 @@ FWD_START_TEST([rich rules priority])
+         DROP 0 -- 10.0.0.0/8 0.0.0.0/0
+     ])
+     IPTABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-        ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22 
++        ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22
++        ACCEPT 17 -- 0.0.0.0/0 224.0.0.251 udp dpt:5353 
+     ])
+     IPTABLES_LIST_RULES([filter], [IN_public_deny], 0, [dnl
+     ])
+@@ -1877,7 +1892,8 @@ FWD_START_TEST([rich rules priority])
+         DROP 6 -- ::/0 ::/0 tcp dpt:1111 
+     ])
+     IP6TABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-        ACCEPT 6 -- ::/0 ::/0 tcp dpt:22 
++        ACCEPT 6 -- ::/0 ::/0 tcp dpt:22
++        ACCEPT 17 -- ::/0 ff02::fb udp dpt:5353
+         ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546 
+     ])
+     IP6TABLES_LIST_RULES([filter], [IN_public_deny], 0, [dnl
+@@ -1906,7 +1922,7 @@ FWD_START_TEST([rich rules priority])
+         icmp-block-inversion: no
+         interfaces:
+         sources:
+-        services: dhcpv6-client ssh
++        services: dhcpv6-client mdns ssh
+         ports:
+         protocols:
+         forward: yes
+diff --git a/src/tests/features/features.at b/src/tests/features/features.at
+index 9c7ec1b..b1ab409 100644
+--- a/src/tests/features/features.at
++++ b/src/tests/features/features.at
+@@ -14,7 +14,6 @@ m4_include([features/icmp_blocks.at])
+ m4_include([features/rich_tcp_mss_clamp.at])
+ m4_include([features/rich_destination_ipset.at])
+ m4_include([features/zone.at])
+-m4_include([features/rpfilter.at])
+ m4_include([features/zone_combine.at])
+ m4_include([features/startup_failsafe.at])
+ m4_include([features/ipset.at])
+diff --git a/src/tests/features/helpers_custom.at b/src/tests/features/helpers_custom.at
+index f51557a..788d8eb 100644
+--- a/src/tests/features/helpers_custom.at
++++ b/src/tests/features/helpers_custom.at
+@@ -36,6 +36,8 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+     table inet firewalld {
+         chain filter_IN_public_allow {
+             tcp dport 22 accept
++	    ip daddr 224.0.0.251 udp dport 5353 accept
++	    ip6 daddr ff02::fb udp dport 5353 accept
+             ip6 daddr fe80::/64 udp dport 546 accept
+             tcp dport 2121 ct helper set "helper-ftptest-tcp"
+             tcp dport 2121 accept
+@@ -46,14 +48,16 @@ IPTABLES_LIST_RULES([raw], [PRE_public_allow], 0, [dnl
+     CT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:2121 CT helper ftp
+ ])
+ IPTABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-    ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22 
++    ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22
++    ACCEPT 17 -- 0.0.0.0/0 224.0.0.251 udp dpt:5353 
+     ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:2121 
+ ])
+ IP6TABLES_LIST_RULES([raw], [PRE_public_allow], 0, [dnl
+     CT 6 -- ::/0 ::/0 tcp dpt:2121 CT helper ftp
+ ])
+ IP6TABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-    ACCEPT 6 -- ::/0 ::/0 tcp dpt:22 
++    ACCEPT 6 -- ::/0 ::/0 tcp dpt:22
++    ACCEPT 17 -- ::/0 ff02::fb udp dpt:5353
+     ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546 
+     ACCEPT 6 -- ::/0 ::/0 tcp dpt:2121 
+ ])
+@@ -90,6 +94,8 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+     table inet firewalld {
+         chain filter_IN_public_allow {
+             tcp dport 22 accept
++	    ip daddr 224.0.0.251 udp dport 5353 accept
++	    ip6 daddr ff02::fb udp dport 5353 accept
+             ip6 daddr fe80::/64 udp dport 546 accept
+             tcp dport 2121 ct helper set "helper-ftptest-tcp"
+             tcp dport 2121 accept
+@@ -100,14 +106,16 @@ IPTABLES_LIST_RULES([raw], [PRE_public_allow], 0, [dnl
+     CT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:2121 CT helper ftp
+ ])
+ IPTABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-    ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22 
++    ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22
++    ACCEPT 17 -- 0.0.0.0/0 224.0.0.251 udp dpt:5353
+     ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:2121 
+ ])
+ IP6TABLES_LIST_RULES([raw], [PRE_public_allow], 0, [dnl
+     CT 6 -- ::/0 ::/0 tcp dpt:2121 CT helper ftp
+ ])
+ IP6TABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-    ACCEPT 6 -- ::/0 ::/0 tcp dpt:22 
++    ACCEPT 6 -- ::/0 ::/0 tcp dpt:22
++    ACCEPT 17 -- ::/0 ff02::fb udp dpt:5353
+     ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546 
+     ACCEPT 6 -- ::/0 ::/0 tcp dpt:2121 
+ ])
+@@ -125,6 +133,8 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+     table inet firewalld {
+         chain filter_IN_public_allow {
+             tcp dport 22 accept
++	    ip daddr 224.0.0.251 udp dport 5353 accept
++	    ip6 daddr ff02::fb udp dport 5353 accept
+             ip6 daddr fe80::/64 udp dport 546 accept
+             tcp dport 21 ct helper set "helper-ftp-tcp"
+             tcp dport 2121 ct helper set "helper-ftptest-tcp"
+@@ -138,7 +148,8 @@ IPTABLES_LIST_RULES([raw], [PRE_public_allow], 0, [dnl
+     CT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:2121 CT helper ftp
+ ])
+ IPTABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-    ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22 
++    ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22
++    ACCEPT 17 -- 0.0.0.0/0 224.0.0.251 udp dpt:5353
+     ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:2121 
+     ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:21 
+ ])
+@@ -147,7 +158,8 @@ IP6TABLES_LIST_RULES([raw], [PRE_public_allow], 0, [dnl
+     CT 6 -- ::/0 ::/0 tcp dpt:2121 CT helper ftp
+ ])
+ IP6TABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-    ACCEPT 6 -- ::/0 ::/0 tcp dpt:22 
++    ACCEPT 6 -- ::/0 ::/0 tcp dpt:22
++    ACCEPT 17 -- ::/0 ff02::fb udp dpt:5353 
+     ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546 
+     ACCEPT 6 -- ::/0 ::/0 tcp dpt:2121 
+     ACCEPT 6 -- ::/0 ::/0 tcp dpt:21 
+diff --git a/src/tests/features/iptables_no_flush_on_shutdown.at b/src/tests/features/iptables_no_flush_on_shutdown.at
+index fbd7c79..df64b45 100644
+--- a/src/tests/features/iptables_no_flush_on_shutdown.at
++++ b/src/tests/features/iptables_no_flush_on_shutdown.at
+@@ -53,7 +53,7 @@ dnl the first runtime direct rule should trigger an iptables flush
+ FWD_CHECK([--direct --add-rule ipv4 filter INPUT 1 -j ACCEPT], 0, [ignore])
+ IPTABLES_LIST_RULES_ALWAYS([filter], [firewalld_testsuite], 1, [ignore], [ignore])
+ IP6TABLES_LIST_RULES_ALWAYS([filter], [firewalld_testsuite], 1, [ignore], [ignore])
+-EBTABLES_LIST_RULES([filter], [firewalld_testsuite], 1, [ignore], [ignore])
++EBTABLES_LIST_RULES([filter], [firewalld_testsuite], 255, [ignore], [ignore])
+ IPTABLES_LIST_RULES_ALWAYS([filter], [INPUT], 0, [dnl
+     ACCEPT 0 -- 0.0.0.0/0 0.0.0.0/0
+ ])
+@@ -81,7 +81,7 @@ IPTABLES_LIST_RULES_ALWAYS([filter], [INPUT], 0, [dnl
+ IP6TABLES_LIST_RULES_ALWAYS([filter], [firewalld_testsuite], 1, [ignore], [ignore])
+ IP6TABLES_LIST_RULES_ALWAYS([filter], [INPUT], 0, [dnl
+ ])
+-EBTABLES_LIST_RULES([filter], [firewalld_testsuite], 1, [ignore], [ignore])
++EBTABLES_LIST_RULES([filter], [firewalld_testsuite], 255, [ignore], [ignore])
+ EBTABLES_LIST_RULES([filter], [INPUT], 0, [dnl
+ ])
+ 
+@@ -103,7 +103,7 @@ IPTABLES_LIST_RULES_ALWAYS([filter], [INPUT], 0, [dnl
+ IP6TABLES_LIST_RULES_ALWAYS([filter], [firewalld_testsuite], 1, [ignore], [ignore])
+ IP6TABLES_LIST_RULES_ALWAYS([filter], [INPUT], 0, [dnl
+ ])
+-EBTABLES_LIST_RULES([filter], [firewalld_testsuite], 1, [ignore], [ignore])
++EBTABLES_LIST_RULES([filter], [firewalld_testsuite], 255, [ignore], [ignore])
+ EBTABLES_LIST_RULES([filter], [INPUT], 0, [dnl
+ ])
+ 
+@@ -122,7 +122,7 @@ NS_CHECK([$EBTABLES -t filter -I firewalld_testsuite -j ACCEPT])
+ FWD_CHECK([--direct --add-chain ipv4 filter firewalld_foobar], 0, [ignore])
+ IPTABLES_LIST_RULES_ALWAYS([filter], [firewalld_testsuite], 1, [ignore], [ignore])
+ IP6TABLES_LIST_RULES_ALWAYS([filter], [firewalld_testsuite], 1, [ignore], [ignore])
+-EBTABLES_LIST_RULES([filter], [firewalld_testsuite], 1, [ignore], [ignore])
++EBTABLES_LIST_RULES([filter], [firewalld_testsuite], 255, [ignore], [ignore])
+ FWD_RELOAD()
+ 
+ dnl adding a chain should trigger a flush
+@@ -137,7 +137,7 @@ NS_CHECK([$EBTABLES -t filter -I firewalld_testsuite -j ACCEPT])
+ FWD_CHECK([--direct --add-passthrough ipv4 -t filter -I INPUT -j ACCEPT], 0, [ignore])
+ IPTABLES_LIST_RULES_ALWAYS([filter], [firewalld_testsuite], 1, [ignore], [ignore])
+ IP6TABLES_LIST_RULES_ALWAYS([filter], [firewalld_testsuite], 1, [ignore], [ignore])
+-EBTABLES_LIST_RULES([filter], [firewalld_testsuite], 1, [ignore], [ignore])
++EBTABLES_LIST_RULES([filter], [firewalld_testsuite], 255, [ignore], [ignore])
+ 
+ FWD_END_TEST()
+ 
+diff --git a/src/tests/features/nftables_counters.at b/src/tests/features/nftables_counters.at
+index 533fce6..be7ab2b 100644
+--- a/src/tests/features/nftables_counters.at
++++ b/src/tests/features/nftables_counters.at
+@@ -16,6 +16,8 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+     table inet firewalld {
+         chain filter_IN_public_allow {
+             tcp dport 22 accept
++	    ip daddr 224.0.0.251 udp dport 5353 accept
++	    ip6 daddr ff02::fb udp dport 5353 accept
+             ip6 daddr fe80::/64 udp dport 546 accept
+         }
+     }
+@@ -38,6 +40,8 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+     table inet firewalld {
+         chain filter_IN_public_allow {
+             tcp dport 22 counter packets 0 bytes 0 accept
++            ip daddr 224.0.0.251 udp dport 5353 counter packets 0 bytes 0 accept
++            ip6 daddr ff02::fb udp dport 5353 counter packets 0 bytes 0 accept
+             ip6 daddr fe80::/64 udp dport 546 counter packets 0 bytes 0 accept
+         }
+     }
+@@ -49,6 +53,8 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+     table inet firewalld {
+         chain filter_IN_public_allow {
+             tcp dport 22 counter packets 0 bytes 0 accept
++            ip daddr 224.0.0.251 udp dport 5353 counter packets 0 bytes 0 accept
++            ip6 daddr ff02::fb udp dport 5353 counter packets 0 bytes 0 accept
+             ip6 daddr fe80::/64 udp dport 546 counter packets 0 bytes 0 accept
+             tcp dport 1234 counter packets 0 bytes 0 accept
+         }
+@@ -59,6 +65,8 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+     table inet firewalld {
+         chain filter_IN_public_allow {
+             tcp dport 22 counter packets 0 bytes 0 accept
++	    ip daddr 224.0.0.251 udp dport 5353 counter packets 0 bytes 0 accept
++	    ip6 daddr ff02::fb udp dport 5353 counter packets 0 bytes 0 accept
+             ip6 daddr fe80::/64 udp dport 546 counter packets 0 bytes 0 accept
+         }
+     }
+diff --git a/src/tests/features/rich_destination_ipset.at b/src/tests/features/rich_destination_ipset.at
+index 7b5932c..1ae4339 100644
+--- a/src/tests/features/rich_destination_ipset.at
++++ b/src/tests/features/rich_destination_ipset.at
+@@ -15,13 +15,16 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+     table inet firewalld {
+         chain filter_IN_public_allow {
+             tcp dport 22 accept
++	    ip daddr 224.0.0.251 udp dport 5353 accept
++	    ip6 daddr ff02::fb udp dport 5353 accept
+             ip6 daddr fe80::/64 udp dport 546 accept
+             ip daddr @foobar accept
+         }
+     }
+ ])
+ IPTABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-    ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22 
++    ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22
++    ACCEPT 17 -- 0.0.0.0/0 224.0.0.251 udp dpt:5353 
+     ACCEPT 0 -- 0.0.0.0/0 0.0.0.0/0 match-set foobar dst
+ ])
+ 
+diff --git a/src/tests/features/rich_tcp_mss_clamp.at b/src/tests/features/rich_tcp_mss_clamp.at
+index e3afb75..66079d9 100644
+--- a/src/tests/features/rich_tcp_mss_clamp.at
++++ b/src/tests/features/rich_tcp_mss_clamp.at
+@@ -97,6 +97,7 @@ AT_CHECK([cat ./zones/public.xml], 0, [dnl
+   <short>Public</short>
+   <description>For use in public areas. You do not trust the other computers on networks to not harm your computer. Only selected incoming connections are accepted.</description>
+   <service name="ssh"/>
++  <service name="mdns"/>
+   <service name="dhcpv6-client"/>
+   <rule>
+     <tcp-mss-clamp/>
+diff --git a/src/tests/features/startup_failsafe.at b/src/tests/features/startup_failsafe.at
+index 3cdf7c3..741e174 100644
+--- a/src/tests/features/startup_failsafe.at
++++ b/src/tests/features/startup_failsafe.at
+@@ -19,6 +19,8 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+     table inet firewalld {
+         chain filter_IN_public_allow {
+             tcp dport 22 accept
++	    ip daddr 224.0.0.251 udp dport 5353 accept
++	    ip6 daddr ff02::fb udp dport 5353 accept
+             ip6 daddr fe80::/64 udp dport 546 accept
+             tcp dport 443 accept
+         }
+diff --git a/src/tests/features/zone_combine.at b/src/tests/features/zone_combine.at
+index 0aea5f1..25eb3ca 100644
+--- a/src/tests/features/zone_combine.at
++++ b/src/tests/features/zone_combine.at
+@@ -27,7 +27,7 @@ AT_DATA([./zones/combined/zone3.xml], [dnl
+ FWD_RELOAD()
+ 
+ FWD_CHECK([--get-zones], 0, [dnl
+-block combined dmz drop external home internal public trusted work
++FedoraServer FedoraWorkstation block combined dmz drop external home internal public trusted work
+ ])
+ FWD_CHECK([--zone combined --list-all | TRIM_WHITESPACE], 0, [dnl
+ combined
+@@ -49,7 +49,7 @@ rich rules:
+ ])
+ 
+ FWD_CHECK([--permanent --get-zones], 0, [dnl
+-block combined/zone1 combined/zone2 combined/zone3 dmz drop external home internal public trusted work
++FedoraServer FedoraWorkstation block combined/zone1 combined/zone2 combined/zone3 dmz drop external home internal public trusted work
+ ])
+ FWD_CHECK([--permanent --zone combined/zone1 --list-all | TRIM_WHITESPACE], 0, [dnl
+ combined/zone1
+diff --git a/src/tests/regression/gh1152.at b/src/tests/regression/gh1152.at
+index 3011b09..fad455a 100644
+--- a/src/tests/regression/gh1152.at
++++ b/src/tests/regression/gh1152.at
+@@ -4,6 +4,38 @@ AT_KEYWORDS(cli gh1152)
+ FWD_CHECK([--permanent --zone block --add-interface dummy0], 0, [ignore])
+ 
+ FWD_CHECK([--permanent --list-all-zones | TRIM_WHITESPACE], 0, [m4_strip([dnl
++FedoraServer
++  target: default
++  ingress-priority: 0
++  egress-priority: 0
++  icmp-block-inversion: no
++  interfaces:
++  sources:
++  services: cockpit dhcpv6-client ssh
++  ports:
++  protocols:
++  forward: no
++  masquerade: no
++  forward-ports:
++  source-ports:
++  icmp-blocks:
++  rich rules:
++FedoraWorkstation
++  target: default
++  ingress-priority: 0
++  egress-priority: 0
++  icmp-block-inversion: no
++  interfaces:
++  sources:
++  services: dhcpv6-client samba-client ssh
++  ports: 1025-65535/udp 1025-65535/tcp
++  protocols:
++  forward: no
++  masquerade: no
++  forward-ports:
++  source-ports:
++  icmp-blocks:
++  rich rules:
+ block
+   target: %%REJECT%%
+   ingress-priority: 0
+@@ -107,7 +139,7 @@ public (default)
+   icmp-block-inversion: no
+   interfaces:
+   sources:
+-  services: dhcpv6-client ssh
++  services: dhcpv6-client mdns ssh
+   ports:
+   protocols:
+   forward: yes
+@@ -139,7 +171,7 @@ work
+   icmp-block-inversion: no
+   interfaces:
+   sources:
+-  services: dhcpv6-client ssh
++  services: dhcpv6-client mdns ssh
+   ports:
+   protocols:
+   forward: yes
+@@ -150,6 +182,38 @@ work
+   rich rules:
+ ])])
+ FWD_OFFLINE_CHECK([--list-all-zones | TRIM_WHITESPACE], 0, [m4_strip([dnl
++FedoraServer
++  target: default
++  ingress-priority: 0
++  egress-priority: 0
++  icmp-block-inversion: no
++  interfaces:
++  sources:
++  services: cockpit dhcpv6-client ssh
++  ports:
++  protocols:
++  forward: no
++  masquerade: no
++  forward-ports:
++  source-ports:
++  icmp-blocks:
++  rich rules:
++FedoraWorkstation
++  target: default
++  ingress-priority: 0
++  egress-priority: 0
++  icmp-block-inversion: no
++  interfaces:
++  sources:
++  services: dhcpv6-client samba-client ssh
++  ports: 1025-65535/udp 1025-65535/tcp
++  protocols:
++  forward: no
++  masquerade: no
++  forward-ports:
++  source-ports:
++  icmp-blocks:
++  rich rules:
+ block
+   target: %%REJECT%%
+   ingress-priority: 0
+@@ -253,7 +317,7 @@ public (default)
+   icmp-block-inversion: no
+   interfaces:
+   sources:
+-  services: dhcpv6-client ssh
++  services: dhcpv6-client mdns ssh
+   ports:
+   protocols:
+   forward: yes
+@@ -285,7 +349,7 @@ work
+   icmp-block-inversion: no
+   interfaces:
+   sources:
+-  services: dhcpv6-client ssh
++  services: dhcpv6-client mdns ssh
+   ports:
+   protocols:
+   forward: yes
+@@ -365,6 +429,38 @@ foobar
+ 
+ FWD_RELOAD()
+ FWD_CHECK([--list-all-zones | TRIM_WHITESPACE], 0, [m4_strip([dnl
++FedoraServer
++  target: default
++  ingress-priority: 0
++  egress-priority: 0
++  icmp-block-inversion: no
++  interfaces:
++  sources:
++  services: cockpit dhcpv6-client ssh
++  ports:
++  protocols:
++  forward: no
++  masquerade: no
++  forward-ports:
++  source-ports:
++  icmp-blocks:
++  rich rules:
++FedoraWorkstation
++  target: default
++  ingress-priority: 0
++  egress-priority: 0
++  icmp-block-inversion: no
++  interfaces:
++  sources:
++  services: dhcpv6-client samba-client ssh
++  ports: 1025-65535/udp 1025-65535/tcp
++  protocols:
++  forward: no
++  masquerade: no
++  forward-ports:
++  source-ports:
++  icmp-blocks:
++  rich rules:
+ block (active)
+   target: %%REJECT%%
+   ingress-priority: 0
+@@ -468,7 +564,7 @@ public (default, active)
+   icmp-block-inversion: no
+   interfaces:
+   sources:
+-  services: dhcpv6-client ssh
++  services: dhcpv6-client mdns ssh
+   ports:
+   protocols:
+   forward: yes
+@@ -500,7 +596,7 @@ work
+   icmp-block-inversion: no
+   interfaces:
+   sources:
+-  services: dhcpv6-client ssh
++  services: dhcpv6-client mdns ssh
+   ports:
+   protocols:
+   forward: yes
+diff --git a/src/tests/regression/gh366.at b/src/tests/regression/gh366.at
+index dd367b5..10ac1dc 100644
+--- a/src/tests/regression/gh366.at
++++ b/src/tests/regression/gh366.at
+@@ -6,9 +6,9 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+ table inet firewalld {
+ chain filter_IN_public_allow {
+ tcp dport 22 accept
+-ip6 daddr fe80::/64 udp dport 546 accept
+ ip daddr 224.0.0.251 udp dport 5353 accept
+ ip6 daddr ff02::fb udp dport 5353 accept
++ip6 daddr fe80::/64 udp dport 546 accept
+ }
+ }
+ ])
+@@ -18,8 +18,8 @@ ACCEPT 17 -- 0.0.0.0/0 224.0.0.251 udp dpt:5353
+ ])
+ IP6TABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+ ACCEPT 6 -- ::/0 ::/0 tcp dpt:22 
+-ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546 
+ ACCEPT 17 -- ::/0 ff02::fb udp dpt:5353 
++ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546 
+ ])])
+ 
+ FWD_CHECK([-q --zone=public --add-service=mdns])
+diff --git a/src/tests/regression/gh453.at b/src/tests/regression/gh453.at
+index 309b3c5..650d8fe 100644
+--- a/src/tests/regression/gh453.at
++++ b/src/tests/regression/gh453.at
+@@ -17,6 +17,8 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+     table inet firewalld {
+     chain filter_IN_public_allow {
+     tcp dport 22 accept
++    ip daddr 224.0.0.251 udp dport 5353 accept
++    ip6 daddr ff02::fb udp dport 5353 accept
+     ip6 daddr fe80::/64 udp dport 546 accept
+     tcp dport 21 ct helper set "helper-ftp-tcp"
+     tcp dport 21 accept
+@@ -41,6 +43,8 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+     table inet firewalld {
+     chain filter_IN_public_allow {
+     tcp dport 22 accept
++    ip daddr 224.0.0.251 udp dport 5353 accept
++    ip6 daddr ff02::fb udp dport 5353 accept
+     ip6 daddr fe80::/64 udp dport 546 accept
+     tcp dport 21 ct helper set "helper-ftp-tcp"
+     tcp dport 21 accept
+diff --git a/src/tests/regression/gh696.at b/src/tests/regression/gh696.at
+index adf2e0f..a46dec8 100644
+--- a/src/tests/regression/gh696.at
++++ b/src/tests/regression/gh696.at
+@@ -57,6 +57,8 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+     table inet firewalld {
+         chain filter_IN_public_allow {
+             tcp dport 22 accept
++	    ip daddr 224.0.0.251 udp dport 5353 accept
++	    ip6 daddr ff02::fb udp dport 5353 accept
+             ip6 daddr fe80::/64 udp dport 546 accept
+             icmp echo-request accept
+             icmpv6 echo-request accept
+@@ -65,11 +67,13 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+ ])
+ 
+ IPTABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-    ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22 
++    ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22
++    ACCEPT 17 -- 0.0.0.0/0 224.0.0.251 udp dpt:5353 
+     ACCEPT 1 -- 0.0.0.0/0 0.0.0.0/0 icmptype 8
+ ])
+ IP6TABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-    ACCEPT 6 -- ::/0 ::/0 tcp dpt:22 
++    ACCEPT 6 -- ::/0 ::/0 tcp dpt:22
++    ACCEPT 17 -- ::/0 ff02::fb udp dpt:5353
+     ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546 
+     ACCEPT 58 -- ::/0 ::/0 ipv6-icmptype 128
+ ])
+@@ -82,6 +86,8 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+     table inet firewalld {
+         chain filter_IN_public_allow {
+             tcp dport 22 accept
++	    ip daddr 224.0.0.251 udp dport 5353 accept
++	    ip6 daddr ff02::fb udp dport 5353 accept
+             ip6 daddr fe80::/64 udp dport 546 accept
+             icmp echo-request accept
+             icmpv6 echo-request accept
+@@ -90,11 +96,13 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+ ])
+ 
+ IPTABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-    ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22 
++    ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22
++    ACCEPT 17 -- 0.0.0.0/0 224.0.0.251 udp dpt:5353
+     ACCEPT 1 -- 0.0.0.0/0 0.0.0.0/0 icmptype 8
+ ])
+ IP6TABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-    ACCEPT 6 -- ::/0 ::/0 tcp dpt:22 
++    ACCEPT 6 -- ::/0 ::/0 tcp dpt:22
++    ACCEPT 17 -- ::/0 ff02::fb udp dpt:5353 
+     ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546 
+     ACCEPT 58 -- ::/0 ::/0 ipv6-icmptype 128
+ ])
+diff --git a/src/tests/regression/regression.at b/src/tests/regression/regression.at
+index 9c0aae6..68c947b 100644
+--- a/src/tests/regression/regression.at
++++ b/src/tests/regression/regression.at
+@@ -12,7 +12,6 @@ m4_include([regression/rhbz1506742.at])
+ m4_include([regression/rhbz1594657.at])
+ m4_include([regression/rhbz1571957.at])
+ m4_include([regression/rhbz1404076.at])
+-m4_include([regression/gh366.at])
+ m4_include([regression/rhbz1601610.at])
+ m4_include([regression/gh303.at])
+ m4_include([regression/gh335.at])
+diff --git a/src/tests/regression/rhbz1404076.at b/src/tests/regression/rhbz1404076.at
+index f4063c7..f55d7cf 100644
+--- a/src/tests/regression/rhbz1404076.at
++++ b/src/tests/regression/rhbz1404076.at
+@@ -14,7 +14,6 @@ FWD_CHECK([-q $2 --query-$1=8085-8087/tcp])
+ FWD_CHECK([-q $2 --query-$1=8080-8090/tcp])
+ FWD_CHECK([-q $2 --query-$1=8080-8089/tcp])
+ FWD_CHECK([-q $2 --query-$1=8081-8090/tcp])
+-FWD_CHECK([-q $2 --query-$1=webcache/tcp]) dnl named port
+ FWD_CHECK([-q $2 --query-$1=8091/tcp], 1) dnl negative test
+ FWD_CHECK([-q $2 --query-$1=8085/udp], 1) dnl negative test
+ FWD_CHECK([$2 --list-$1s], 0, [dnl
+diff --git a/src/tests/regression/rhbz1514043.at b/src/tests/regression/rhbz1514043.at
+index c036050..1e9c7c5 100644
+--- a/src/tests/regression/rhbz1514043.at
++++ b/src/tests/regression/rhbz1514043.at
+@@ -5,7 +5,7 @@ FWD_CHECK([-q --set-log-denied=all])
+ FWD_CHECK([-q --permanent --zone=public --add-service=samba])
+ FWD_RELOAD
+ FWD_CHECK([--zone=public --list-all | TRIM | grep ^services], 0, [dnl
+-services: dhcpv6-client samba ssh
++services: dhcpv6-client mdns samba ssh
+ ])
+ 
+ dnl check that log denied actually took effect
+diff --git a/src/tests/regression/rhbz1596304.at b/src/tests/regression/rhbz1596304.at
+index 1565eb4..bd188f2 100644
+--- a/src/tests/regression/rhbz1596304.at
++++ b/src/tests/regression/rhbz1596304.at
+@@ -12,7 +12,7 @@ FWD_CHECK([--list-all | TRIM_WHITESPACE], 0, [m4_strip([dnl
+         icmp-block-inversion: no
+         interfaces:
+         sources:
+-        services: dhcpv6-client ssh
++        services: dhcpv6-client mdns ssh
+         ports:
+         protocols:
+         forward: yes
+diff --git a/src/tests/regression/rhbz1715977.at b/src/tests/regression/rhbz1715977.at
+index 7a00888..adc1ded 100644
+--- a/src/tests/regression/rhbz1715977.at
++++ b/src/tests/regression/rhbz1715977.at
+@@ -19,18 +19,18 @@ NFT_LIST_RULES([inet], [filter_IN_internal_allow], 0, [dnl
+     }
+ ])
+ IPTABLES_LIST_RULES([filter], [IN_internal_allow], 0, [dnl
+-    ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22 
++    ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22
+     ACCEPT 17 -- 0.0.0.0/0 224.0.0.251 udp dpt:5353 
+     ACCEPT 17 -- 0.0.0.0/0 0.0.0.0/0 udp dpt:137 
+-    ACCEPT 17 -- 0.0.0.0/0 0.0.0.0/0 udp dpt:138 
++    ACCEPT 17 -- 0.0.0.0/0 0.0.0.0/0 udp dpt:138
+     ACCEPT 6 -- 0.0.0.0/0 192.168.122.235 tcp dpt:22 
+ ])
+ IP6TABLES_LIST_RULES([filter], [IN_internal_allow], 0, [dnl
+-    ACCEPT 6 -- ::/0 ::/0 tcp dpt:22 
++    ACCEPT 6 -- ::/0 ::/0 tcp dpt:22
+     ACCEPT 17 -- ::/0 ff02::fb udp dpt:5353 
+     ACCEPT 17 -- ::/0 ::/0 udp dpt:137 
+     ACCEPT 17 -- ::/0 ::/0 udp dpt:138 
+-    ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546 
++    ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546
+ ])
+ 
+ FWD_CHECK([-q --zone=internal --add-rich-rule='rule family=ipv4 destination address="192.168.111.222/32" source address="10.10.10.0/24" service name="ssh" accept'])
+@@ -38,7 +38,7 @@ NFT_LIST_RULES([inet], [filter_IN_internal_allow], 0, [dnl
+     table inet firewalld {
+         chain filter_IN_internal_allow {
+             tcp dport 22 accept
+-            ip daddr 224.0.0.251 udp dport 5353 accept
++	    ip daddr 224.0.0.251 udp dport 5353 accept
+             ip6 daddr ff02::fb udp dport 5353 accept
+             udp dport 137 ct helper set "helper-netbios-ns-udp"
+             udp dport 137 accept
+@@ -53,7 +53,7 @@ IPTABLES_LIST_RULES([filter], [IN_internal_allow], 0, [dnl
+     ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22 
+     ACCEPT 17 -- 0.0.0.0/0 224.0.0.251 udp dpt:5353 
+     ACCEPT 17 -- 0.0.0.0/0 0.0.0.0/0 udp dpt:137 
+-    ACCEPT 17 -- 0.0.0.0/0 0.0.0.0/0 udp dpt:138 
++    ACCEPT 17 -- 0.0.0.0/0 0.0.0.0/0 udp dpt:138
+     ACCEPT 6 -- 0.0.0.0/0 192.168.122.235 tcp dpt:22 
+     ACCEPT 6 -- 10.10.10.0/24 192.168.111.222 tcp dpt:22 
+ ])
+@@ -62,7 +62,7 @@ IP6TABLES_LIST_RULES([filter], [IN_internal_allow], 0, [dnl
+     ACCEPT 17 -- ::/0 ff02::fb udp dpt:5353 
+     ACCEPT 17 -- ::/0 ::/0 udp dpt:137 
+     ACCEPT 17 -- ::/0 ::/0 udp dpt:138 
+-    ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546 
++    ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546
+ ])
+ 
+ FWD_CHECK([-q --zone=internal --add-rich-rule='rule family=ipv4 service name="ssdp" accept'])
+@@ -86,7 +86,7 @@ IPTABLES_LIST_RULES([filter], [IN_internal_allow], 0, [dnl
+     ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22 
+     ACCEPT 17 -- 0.0.0.0/0 224.0.0.251 udp dpt:5353 
+     ACCEPT 17 -- 0.0.0.0/0 0.0.0.0/0 udp dpt:137 
+-    ACCEPT 17 -- 0.0.0.0/0 0.0.0.0/0 udp dpt:138 
++    ACCEPT 17 -- 0.0.0.0/0 0.0.0.0/0 udp dpt:138
+     ACCEPT 6 -- 0.0.0.0/0 192.168.122.235 tcp dpt:22 
+     ACCEPT 6 -- 10.10.10.0/24 192.168.111.222 tcp dpt:22 
+     ACCEPT 17 -- 0.0.0.0/0 239.255.255.250 udp dpt:1900 
+diff --git a/src/tests/regression/rhbz1855140.at b/src/tests/regression/rhbz1855140.at
+index a941428..36b352a 100644
+--- a/src/tests/regression/rhbz1855140.at
++++ b/src/tests/regression/rhbz1855140.at
+@@ -17,6 +17,8 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+     table inet firewalld {
+         chain filter_IN_public_allow {
+             tcp dport 22 accept
++	    ip daddr 224.0.0.251 udp dport 5353 accept
++	    ip6 daddr ff02::fb udp dport 5353 accept
+             ip6 daddr fe80::/64 udp dport 546 accept
+             icmp echo-request accept
+             icmpv6 echo-request accept
+@@ -28,7 +30,8 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+ IPTABLES_LIST_RULES([mangle], [PRE_public_allow], 0, [dnl
+ ])
+ IPTABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-    ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22 
++    ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22
++    ACCEPT 17 -- 0.0.0.0/0 224.0.0.251 udp dpt:5353 
+     ACCEPT 1 -- 0.0.0.0/0 0.0.0.0/0 icmptype 8
+     ACCEPT 1 -- 0.0.0.0/0 0.0.0.0/0 icmptype 13
+ ])
+@@ -36,7 +39,8 @@ IP6TABLES_LIST_RULES([mangle], [PRE_public_allow], 0, [dnl
+     MARK 58 -- ::/0 ::/0 ipv6-icmptype 4 code 0 MARK or 0x86
+ ])
+ IP6TABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+-    ACCEPT 6 -- ::/0 ::/0 tcp dpt:22 
++    ACCEPT 6 -- ::/0 ::/0 tcp dpt:22
++    ACCEPT 17 -- ::/0 ff02::fb udp dpt:5353
+     ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546 
+     ACCEPT 58 -- ::/0 ::/0 ipv6-icmptype 128
+     ACCEPT 58 -- ::/0 ::/0 ipv6-icmptype 136
+diff --git a/src/tests/regression/rhbz2181406.at b/src/tests/regression/rhbz2181406.at
+index b5ac531..f27af5a 100644
+--- a/src/tests/regression/rhbz2181406.at
++++ b/src/tests/regression/rhbz2181406.at
+@@ -20,6 +20,8 @@ NFT_LIST_RULES([inet], [filter_IN_public_allow], 0, [dnl
+ table inet firewalld {
+     chain filter_IN_public_allow {
+         tcp dport 22 accept
++	ip daddr 224.0.0.251 udp dport 5353 accept
++	ip6 daddr ff02::fb udp dport 5353 accept
+         ip6 daddr fe80::/64 udp dport 546 accept
+         ip6 daddr fc00::10:10:10:10 tcp dport 22 accept
+         ip saddr 10.10.10.10 tcp dport 80 limit rate 2/day accept
+@@ -33,6 +35,7 @@ LOG 6 -- 10.10.10.10 0.0.0.0/0 tcp dpt:22 limit: avg 2/day burst 5 LOG flags 0 l
+ ])
+ IPTABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+ ACCEPT 6 -- 0.0.0.0/0 0.0.0.0/0 tcp dpt:22
++ACCEPT 17 -- 0.0.0.0/0 224.0.0.251 udp dpt:5353
+ ACCEPT 6 -- 10.10.10.10 0.0.0.0/0 tcp dpt:80 limit: avg 2/day burst 5
+ ])
+ 
+@@ -41,6 +44,7 @@ AUDIT 6 -- ::/0 fc00::10:10:10:10 tcp dpt:22 limit: avg 5/min burst 5 AUDIT acce
+ ])
+ IP6TABLES_LIST_RULES([filter], [IN_public_allow], 0, [dnl
+ ACCEPT 6 -- ::/0 ::/0 tcp dpt:22
++ACCEPT 17 -- ::/0 ff02::fb udp dpt:5353
+ ACCEPT 17 -- ::/0 fe80::/64 udp dpt:546
+ ACCEPT 6 -- ::/0 fc00::10:10:10:10 tcp dpt:22
+ ACCEPT 6 -- ::/0 fc00::10:10:10:10 tcp dpt:80 limit: avg 5/min burst 5
+-- 
+2.45.3
+

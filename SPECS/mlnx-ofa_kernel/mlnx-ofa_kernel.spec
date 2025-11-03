@@ -25,10 +25,12 @@
 # and/or other materials provided with the distribution.
 #
 #
-%global last-known-kernel 6.6.85.1-2
 
 %if 0%{azl}
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}' kernel-headers)
+%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
+%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
 %global target_kernel_version_full f.a.k.e
 %endif
@@ -96,10 +98,15 @@
 %global devel_pname %{_name}-devel
 %global non_kmp_pname %{_name}-modules
 
+# !!!! some OOT spec depends on this the exact version and release nb of this component
+# !!!! do not forget to upgrade those spec when upgrading version or release nb
+# !!!! e.g.: when going from version 24.10 to 24.11 or going from release 20 to 21
+# !!!! to identify the depend spec look for "_mofed_full_version"
+
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel
 Version:	 24.10
-Release:	 16%{?dist}
+Release:	 21%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -109,7 +116,6 @@ Patch0:          001-fix-module-init-for-ibt.patch
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-ExclusiveArch:   x86_64
 
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -131,7 +137,6 @@ BuildRequires:  libstdc++-devel
 BuildRequires:  libunwind-devel
 BuildRequires:  pkgconfig
 
-Requires: kernel = %{target_kernel_version_full}
 Requires: kmod
 Requires: libstdc++
 Requires: libunwind
@@ -177,6 +182,8 @@ EOF)
 %global kernel_source() %{K_SRC}
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %package -n %{non_kmp_pname}
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -192,10 +199,14 @@ Obsoletes: mlnx-en-sources
 Obsoletes: mlnx-rdma-rxe
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries
+
+Requires: kernel = %{target_kernel_version_full}
+
 %description -n %{non_kmp_pname}
 Core, HW and ULPs kernel modules
 Non-KMP format kernel modules rpm.
 The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
+%endif
 %endif #end if "%{KMP}" == "1"
 
 %package -n %{devel_pname}
@@ -327,7 +338,13 @@ for flavor in %flavors_to_build; do
 	export KSRC=%{kernel_source $flavor}
 	export KVERSION=%{kernel_release $KSRC}
 	cd $PWD/obj/$flavor
+# For the default kernel, we create the module package only for the x86_64 kernel.
+# Some other kernels (kernel-hwe for instance) get aarch64 modules packages built from other specs.
+# We keep the user space packages like the module configs built only in this spec, though,
+# and re-use them for kernel modules built for other kernel flavours and architectures.
+%ifarch x86_64
 	make install_modules KERNELRELEASE=$KVERSION
+%endif
 	# install script and configuration files
 	make install_scripts
 	mkdir -p %{_builddir}/src/$NAME/$flavor
@@ -347,10 +364,13 @@ for flavor in %flavors_to_build; do
 		cp ./Module.symvers %{_builddir}/src/$NAME/$flavor/Module.symvers
 	fi
 	cp -a %{_builddir}/src/$NAME/$flavor %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}/$KVERSION
-	# Cleanup unnecessary kernel-generated module dependency files.
-	find $INSTALL_MOD_PATH/lib/modules -iname 'modules.*' -exec rm {} \;
 	cd -
 done
+
+%ifarch x86_64
+	# Cleanup unnecessary kernel-generated module dependency files.
+	find $INSTALL_MOD_PATH/lib/modules -iname 'modules.*' -exec rm {} \;
+%endif
 
 # Set the module(s) to be executable, so that they will be stripped when packaged.
 find %{buildroot} \( -type f -name '*.ko' -o -name '*ko.gz' \) -exec %{__chmod} u+x \{\} \;
@@ -475,6 +495,7 @@ rm -rf %{buildroot}
 
 
 %if "%{KMP}" != "1"
+%ifarch x86_64
 %post -n %{non_kmp_pname}
 /sbin/depmod %{KVERSION}
 # W/A for OEL6.7/7.x inbox modules get locked in memory
@@ -492,6 +513,7 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 		/sbin/dracut --force
 	fi
 fi
+%endif
 %endif # end KMP=1
 
 %post -n %{utils_pname}
@@ -712,12 +734,15 @@ update-alternatives --remove \
 %endif
 
 %if "%{KMP}" != "1"
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %files -n %{non_kmp_pname}
 %license source/debian/copyright
 /lib/modules/%{KVERSION}/%{install_mod_dir}/
 %if %{IS_RHEL_VENDOR}
 %if ! 0%{?fedora}
 %config(noreplace) %{_sysconfdir}/depmod.d/zz01-%{_name}-*.conf
+%endif
 %endif
 %endif
 %endif
@@ -734,6 +759,21 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-21
+- Adjusted package dependencies on user space components.
+
+* Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-20
+- Add kernel version and release nb into release nb
+
+* Fri May 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-19
+- Bump release to rebuild for new kernel release
+
+* Tue May 13 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-18
+- Bump release to rebuild for new kernel release
+
+* Tue Apr 29 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-17
+- Bump release to rebuild for new kernel release
+
 * Fri Apr 25 2025 Chris Co <chrco@microsoft.com> - 24.10-16
 - Bump release to rebuild for new kernel release
 

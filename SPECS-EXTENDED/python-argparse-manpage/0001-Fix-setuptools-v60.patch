@@ -1,0 +1,22 @@
+From 867fbbfc8637de32bb4169ce7b02141f08da66b6 Mon Sep 17 00:00:00 2001
+From: Kavya Sree Kaitepalli <kkaitepalli@microsoft.com>
+Date: Thu, 29 May 2025 08:05:48 +0000
+Subject: [PATCH] Fix-setuptools-v60
+
+---
+ examples/old_format/expected-output.1 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/examples/old_format/expected-output.1 b/examples/old_format/expected-output.1
+index 6486146..2040d2a 100644
+--- a/examples/old_format/expected-output.1
++++ b/examples/old_format/expected-output.1
+@@ -1,4 +1,4 @@
+-.TH example 1 2017\-09\-24 "example v.0.1.0-dev"
++.TH example 1 2017\-09\-24 "example v.0.1.0.dev0"
+ .SH NAME
+ example \- This script does nothing.
+ .SH SYNOPSIS
+-- 
+2.45.3
+
