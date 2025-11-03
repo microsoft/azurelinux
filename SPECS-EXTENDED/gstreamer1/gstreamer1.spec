@@ -7,20 +7,20 @@
 
 Summary:        GStreamer streaming media framework runtime
 Name:           gstreamer1
-Version:        1.20.0
-Release:        2%{?dist}
+Version:        1.24.8
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://gstreamer.freedesktop.org/
-Source0:        http://gstreamer.freedesktop.org/src/gstreamer/gstreamer-%{version}.tar.xz
+URL:            https://gstreamer.freedesktop.org/
+Source0:        https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-%{version}.tar.xz
 ## For GStreamer RPM provides
-Patch0:         gstreamer-inspect-rpm-format.patch
 Source1:        gstreamer1.prov
 Source2:        gstreamer1.attr
 
 BuildRequires:  meson >= 0.48.0
 BuildRequires:  gcc
+BuildRequires:  rust
 BuildRequires:  glib2-devel >= %{_glib2}
 BuildRequires:  libxml2-devel >= %{_libxml2}
 BuildRequires:  gobject-introspection-devel >= %{_gobject_introspection}
@@ -57,7 +57,6 @@ developing applications that use %{name}.
 
 %prep
 %setup -q -n gstreamer-%{version}
-%patch 0 -p1 -b .rpm-provides
 
 %build
 %meson	\
@@ -84,7 +83,7 @@ install -m0644 -D %{SOURCE2} $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/gstreamer
 
 %files -f gstreamer-%{majorminor}.lang
 %license COPYING
-%doc AUTHORS NEWS README RELEASE
+%doc AUTHORS NEWS README.md RELEASE
 %{_libdir}/libgstreamer-%{majorminor}.so.*
 %{_libdir}/libgstbase-%{majorminor}.so.*
 %{_libdir}/libgstcheck-%{majorminor}.so.*
@@ -158,6 +157,10 @@ install -m0644 -D %{SOURCE2} $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/gstreamer
 %{_libdir}/pkgconfig/gstreamer-net-%{majorminor}.pc
 
 %changelog
+* Fri Oct 18 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.24.8-1
+- Update to 1.24.8 for azl 3.0
+- Verified license
+
 * Wed Feb 28 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.20.0-2
 - Fix remaining issues linked to CBL-Mariner re-branding to Azure Linux
 
