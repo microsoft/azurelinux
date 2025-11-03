@@ -10,7 +10,7 @@
   
   <property name="project.groupId" value="commons-net"/>
   <property name="project.artifactId" value="commons-net"/>
-  <property name="project.version" value="3.6"/>
+  <property name="project.version" value="3.9.0"/>
   <property name="project.name" value="Apache Commons Net"/>
   <property name="project.description" value="Apache Commons Net library contains a collection of network utilities and protocol implementations. Supported protocols include: Echo, Finger, FTP, NNTP, NTP, POP3(S), SMTP(S), Telnet, Whois"/>
   <property name="project.url" value="http://commons.apache.org/proper/commons-net/"/>
@@ -19,12 +19,12 @@
   <property name="project.organization.name" value="The Apache Software Foundation"/>
   <property name="project.organization.id" value="org.apache"/>
   
-  <property name="bundle.version" value="${project.version}.0"/>
-
-  <property name="compiler.source" value="1.6"/>
+  <property name="spec.version" value="3.9"/>
+  
+  <property name="compiler.source" value="1.8"/>
   <property name="compiler.target" value="${compiler.source}"/>
 
-  <property name="build.finalName" value="${project.artifactId}-3.6"/>
+  <property name="build.finalName" value="${project.artifactId}-${project.version}"/>
   <property name="build.dir" value="target"/>
   <property name="build.outputDir" value="${build.dir}/classes"/>
   <property name="build.srcDir" value="src/main/java"/>
@@ -235,15 +235,15 @@
 		<attribute name="Bundle-Name" value="${project.name}"/>
 		<attribute name="Bundle-SymbolicName" value="org.apache.commons.${project.artifactId}"/>
 		<attribute name="Bundle-Vendor" value="${project.organization.name}"/>
-		<attribute name="Bundle-Version" value="${bundle.version}"/>
-		<attribute name="Export-Package" value="org.apache.commons.net;version=&quot;${project.version}&quot;,org.apache.commons.net.bsd;version=&quot;${project.version}&quot;,org.apache.commons.net.chargen;version=&quot;${project.version}&quot;,org.apache.commons.net.daytime;version=&quot;${project.version}&quot;,org.apache.commons.net.discard;version=&quot;${project.version}&quot;,org.apache.commons.net.echo;version=&quot;${project.version}&quot;,org.apache.commons.net.finger;version=&quot;${project.version}&quot;,org.apache.commons.net.ftp;version=&quot;${project.version}&quot;,org.apache.commons.net.ftp.parser;version=&quot;${project.version}&quot;,org.apache.commons.net.imap;version=&quot;${project.version}&quot;,org.apache.commons.net.io;version=&quot;${project.version}&quot;,org.apache.commons.net.nntp;version=&quot;${project.version}&quot;,org.apache.commons.net.ntp;version=&quot;${project.version}&quot;,org.apache.commons.net.pop3;version=&quot;${project.version}&quot;,org.apache.commons.net.smtp;version=&quot;${project.version}&quot;,org.apache.commons.net.telnet;version=&quot;${project.version}&quot;,org.apache.commons.net.tftp;version=&quot;${project.version}&quot;,org.apache.commons.net.time;version=&quot;${project.version}&quot;,org.apache.commons.net.util;version=&quot;${project.version}&quot;,org.apache.commons.net.whois;version=&quot;${project.version}&quot;"/>
+		<attribute name="Bundle-Version" value="${project.version}"/>
+		<attribute name="Export-Package" value="org.apache.commons.net.bsd;version=&quot;${project.version}&quot;,org.apache.commons.net.chargen;version=&quot;${project.version}&quot;,org.apache.commons.net.daytime;version=&quot;${project.version}&quot;,org.apache.commons.net.discard;version=&quot;${project.version}&quot;,org.apache.commons.net.echo;version=&quot;${project.version}&quot;,org.apache.commons.net.examples.cidr;version=&quot;${project.version}&quot;,org.apache.commons.net.examples.ftp;version=&quot;${project.version}&quot;,org.apache.commons.net.examples.mail;version=&quot;${project.version}&quot;,org.apache.commons.net.examples.nntp;version=&quot;${project.version}&quot;,org.apache.commons.net.examples.ntp;version=&quot;${project.version}&quot;,org.apache.commons.net.examples.telnet;version=&quot;${project.version}&quot;,org.apache.commons.net.examples.unix;version=&quot;${project.version}&quot;,org.apache.commons.net.examples.util;version=&quot;${project.version}&quot;,org.apache.commons.net.examples;version=&quot;${project.version}&quot;,org.apache.commons.net.finger;version=&quot;${project.version}&quot;,org.apache.commons.net.ftp.parser;version=&quot;${project.version}&quot;,org.apache.commons.net.ftp;version=&quot;${project.version}&quot;,org.apache.commons.net.imap;version=&quot;${project.version}&quot;,org.apache.commons.net.io;version=&quot;${project.version}&quot;,org.apache.commons.net.nntp;version=&quot;${project.version}&quot;,org.apache.commons.net.ntp;version=&quot;${project.version}&quot;,org.apache.commons.net.pop3;version=&quot;${project.version}&quot;,org.apache.commons.net.smtp;version=&quot;${project.version}&quot;,org.apache.commons.net.telnet;version=&quot;${project.version}&quot;,org.apache.commons.net.tftp;version=&quot;${project.version}&quot;,org.apache.commons.net.time;version=&quot;${project.version}&quot;,org.apache.commons.net.util;version=&quot;${project.version}&quot;,org.apache.commons.net.whois;version=&quot;${project.version}&quot;,org.apache.commons.net;version=&quot;${project.version}&quot;"/>
 		<attribute name="Implementation-Title" value="${project.name}"/>
 		<attribute name="Implementation-URL" value="${project.url}"/>
 		<attribute name="Implementation-Vendor" value="${project.organization.name}"/>
 		<attribute name="Implementation-Vendor-Id" value="${project.organization.id}"/>
 		<attribute name="Implementation-Version" value="${project.version}"/>
 		<attribute name="Import-Package" value="javax.crypto,javax.crypto.spec,javax.net,javax.net.ssl"/>
-		<attribute name="Include-Resource" value="examples/examples.properties=src/main/resources/examples/examples.properties,META-INF/NOTICE.txt=NOTICE.txt,META-INF/LICENSE.txt=LICENSE.txt"/>
+		<attribute name="Include-Resource" value="org/apache/commons/net/examples/examples.properties=src/main/resources/org/apache/commons/net/examples/examples.properties,META-INF/NOTICE.txt=NOTICE.txt,META-INF/LICENSE.txt=LICENSE.txt"/>
 		<attribute name="JavaPackages-ArtifactId" value="${project.artifactId}"/>
 		<attribute name="JavaPackages-GroupId" value="${project.groupId}"/>
 		<attribute name="JavaPackages-Version" value="${project.version}"/>
@@ -251,7 +251,7 @@
 		<attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=${compiler.target}))&quot;"/>
 		<attribute name="Specification-Title" value="${project.name}"/>
 		<attribute name="Specification-Vendor" value="${project.organization.name}"/>
-		<attribute name="Specification-Version" value="${project.version}"/>
+		<attribute name="Specification-Version" value="${spec.version}"/>
       </manifest>
     </jar>
   </target>
@@ -263,3 +263,4 @@
   <target name="jar" depends="package" description="Builds the jar for the application"/>
 
 </project>
+

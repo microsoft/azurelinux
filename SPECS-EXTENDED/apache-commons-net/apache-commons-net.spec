@@ -22,8 +22,8 @@ Distribution:   Azure Linux
 %global short_name   commons-%{base_name}
 %bcond_with tests
 Name:           apache-%{short_name}
-Version:        3.6
-Release:        3%{?dist}
+Version:        3.9.0
+Release:        1%{?dist}
 Summary:        Internet protocol suite Java library
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -57,7 +57,7 @@ Group:          Documentation/HTML
 %{summary}.
 
 %prep
-%setup -q -n %{short_name}-%{version}-src
+%autosetup -p1 -n %{short_name}-%{version}-src
 cp %{SOURCE1} build.xml
 %pom_remove_parent .
 
@@ -92,6 +92,9 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Tue Nov 04 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 3.12.0-1
+- Upgrade to 3.9.0
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6-3
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
