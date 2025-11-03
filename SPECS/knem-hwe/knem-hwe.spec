@@ -116,6 +116,7 @@ Summary: KNEM: High-Performance Intra-Node MPI Communication
 Group: System Environment/Libraries
 Requires: kernel-hwe = %{target_kernel_version_full}
 Requires: kmod
+Conflicts: knem-modules
 ExclusiveArch: aarch64
 
 %description -n %{non_kmp_pname}

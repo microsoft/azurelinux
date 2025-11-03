@@ -107,6 +107,7 @@ Requires:       mlnx-ofa_kernel
 Requires:       mlnx-ofa_kernel-hwe-modules = %{_mofed_full_version}
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
+Conflicts:      xpmem-modules
 
 %description modules
 XPMEM is a Linux kernel module that enables a process to map the
