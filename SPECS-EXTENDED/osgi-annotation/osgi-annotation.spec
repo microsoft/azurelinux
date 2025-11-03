@@ -90,9 +90,8 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}/osgi.annotation.pom
 # javadoc
 install -dm 0744 %{buildroot}%{_javadocdir}/%{name}
 install -dm 0755 %{buildroot}%{_docdir}/%{name}
-mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO \
-   %{buildroot}%{_docdir}/%{name}/
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
 %fdupes -s %{buildroot}%{_javadocdir}
 
 # Remove LICENSE from javadoc directory to avoid duplicate license warning
@@ -100,13 +99,9 @@ rm -f %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE
 
 %files -f .mfiles
 %license LICENSE
+%license ADDITIONAL_LICENSE_INFO
 
 %files javadoc
-# Mark extra legal files as documentation
-%doc %{_docdir}/%{name}/ADDITIONAL_LICENSE_INFO
-%doc %{_javadocdir}/%{name}/legal/ASSEMBLY_EXCEPTION
-%doc %{_javadocdir}/%{name}/legal/jquery.md
-%doc %{_javadocdir}/%{name}/legal/jqueryUI.md
 %{_javadocdir}/%{name}
 
 %changelog
