@@ -79,9 +79,8 @@ install -pm 0644 %{SOURCE1} %{buildroot}%{_mavenpomdir}/%{name}.pom
 %add_maven_depmap %{name}.pom %{name}.jar
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
-mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO \
-   %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO.txt
 cp -pr docs/api/* %{buildroot}%{_javadocdir}/%{name}/
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
 %fdupes %{buildroot}%{_javadocdir}
 
 # Remove LICENSE from javadoc directory to avoid duplicate license warning
@@ -90,14 +89,10 @@ rm -f %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE
 %files -f .mfiles
 %doc COMPILE ISSUES README TODO CHANGES CONTRIBUTORS STYLE
 %license LICENSE
+%license ADDITIONAL_LICENSE_INFO
 %{_javadir}/%{full_name}.jar
 
 %files javadoc
-# Mark extra legal files as documentation
-%doc %{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO.txt
-%doc %{_javadocdir}/%{name}/legal/ASSEMBLY_EXCEPTION
-%doc %{_javadocdir}/%{name}/legal/jquery.md
-%doc %{_javadocdir}/%{name}/legal/jqueryUI.md
 %{_javadocdir}/%{name}
 
 %changelog
