@@ -94,6 +94,8 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %changelog
 * Tue Nov 04 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 3.12.0-1
 - Upgrade to 3.9.0
+- Fix Build Issues
+- License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6-3
 - Converting the 'Release' tag to the '[number].[distribution]' format.
