@@ -71,6 +71,7 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{oname}.pom
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
+cp -pr target/site/apidocs/legal/ADDITIONAL_LICENSE_INFO .
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
@@ -82,7 +83,6 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %license LICENSE
 %license ADDITIONAL_LICENSE_INFO
 %{_javadocdir}/%{name}
-#%exclude /usr/share/javadoc/jboss-interceptors-1.2-api/legal/ADDITIONAL_LICENSE_INFO
 %exclude /usr/share/javadoc/jboss-interceptors-1.2-api/legal/LICENSE
 
 %changelog
