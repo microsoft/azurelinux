@@ -29765,16 +29765,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "uw-imap",
-          "version": "2007f",
-          "downloadUrl": "https://github.com/uw-imap/imap/archive/refs/tags/imap-2007f.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "v4l-utils",
           "version": "1.22.1",
           "downloadUrl": "https://www.linuxtv.org/downloads/v4l-utils/v4l-utils-1.22.1.tar.bz2"
