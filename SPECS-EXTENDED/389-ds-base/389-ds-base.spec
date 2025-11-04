@@ -83,7 +83,7 @@ Source4:          389-ds-base.sysusers
 Source5:          https://fedorapeople.org/groups/389ds/libdb-5.3.28-59.tar.bz2
 %endif
 
-Patch0:           0001-warnings.patch
+Patch0:           rust-1.90-fixes.patch
 Provides:         ldif2ldbm >= 0
 
 # Attach the buildrequires to the top level package:
@@ -735,6 +735,7 @@ exit 0
 %changelog
 * Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.1.1-8
 - Bump release to rebuild with rust
+- Add patch add explicit lifetime for ValueArrayRef iterator
 
 * Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.1.1-7
 - Bump release to rebuild with rust
