@@ -1,0 +1,56 @@
+From e5297e702065728483ab8d9a390ee4a5b7fc0e0c Mon Sep 17 00:00:00 2001
+From: Clint Adams <clint@debian.org>
+Date: Wed, 5 Jun 2024 15:03:20 -0400
+Subject: Use close_range when available.  closes: #1072521.
+
+
+diff --git a/configure.ac b/configure.ac
+index 8933962..206cb9e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -601,7 +601,7 @@ AC_SUBST(LDPRELOADABS)
+ AC_SUBST(LDEXTRAVAR)
+ 
+ dnl Checks for library functions.
+-AC_CHECK_FUNCS(strdup strstr getresuid setresuid getresgid setresgid setfsuid setfsgid fts_read fts_children)
++AC_CHECK_FUNCS(strdup strstr getresuid setresuid getresgid setresgid setfsuid setfsgid fts_read fts_children close_range)
+ 
+ AC_CHECK_DECLS([setenv, unsetenv])
+ AC_REPLACE_FUNCS([setenv])
+diff --git a/faked.c b/faked.c
+index ea51a23..50f7190 100644
+--- a/faked.c
++++ b/faked.c
+@@ -79,6 +79,8 @@
+    (def in ./linux/msg.h, couldn't find other def in /usr/include/
+    */
+ 
++#define _GNU_SOURCE
++
+ #ifdef __APPLE__
+ /*
+    In this file, we want 'struct stat' to have a 32-bit 'ino_t'.
+@@ -1511,12 +1513,21 @@ int main(int argc, char **argv){
+ 
+       fflush(stdout);
+ 
++#ifdef HAVE_CLOSE_RANGE
++# ifdef FAKEROOT_FAKENET
++      close_range(0, sd-1, 0);
++      close_range(sd+1, num_fds, 0);
++# else /* !FAKEROOT_FAKENET */
++      close_range(0, num_fds, 0);
++# endif
++#else /* ! HAVE_CLOSE_RANGE */
+       /* This is the child closing its file descriptors. */
+       for (fl= 0; fl <= num_fds; ++fl)
+-#ifdef FAKEROOT_FAKENET
++# ifdef FAKEROOT_FAKENET
+ 	if (fl != sd)
+-#endif /* FAKEROOT_FAKENET */
++# endif /* FAKEROOT_FAKENET */
+ 	  close(fl);
++#endif
+       setsid();
+     } else {
+       printf("%li:%i\n",(long)FAKE_KEY,pid);

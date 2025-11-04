@@ -3,7 +3,7 @@
 Summary:        Gives a fake root environment
 Name:           fakeroot
 Version:        1.32.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 # setenv.c: LGPLv2+
 # contrib/Fakeroot-Stat-1.8.8: Perl (GPL+ or Artistic)
 # the rest: GPLv3+
@@ -19,6 +19,9 @@ Patch2:         debian_fix-shell-in-fakeroot.patch
 # Fix LD_LIBRARY_PATH for multilib: https://bugzilla.redhat.com/show_bug.cgi?id=1241527
 Patch5:         fakeroot-multilib.patch
 Patch7:         relax_tartest.patch
+# Backport Use close_range syscall to fix hanging issues: https://bugs.launchpad.net/ubuntu/+source/fakeroot/+bug/2068702
+Patch8:         fakeroot-close_range1.patch
+Patch9:         fakeroot-close_range2.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -177,6 +180,9 @@ fi
 %ghost %{_libdir}/libfakeroot/libfakeroot-0.so
 
 %changelog
+* Tue Nov 04 2025 Chris PeBenito <chpebeni@microsoft.com> - 1.32.2-2
+- Backport change to use close_range to fix performance issue in containers.
+
 * Tue Jan 23 2024 Andrew Phelps <anphel@microsoft.com> - 1.32.2-1
 - Upgrade to version 1.32.2
 

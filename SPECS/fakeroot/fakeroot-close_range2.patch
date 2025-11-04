@@ -1,0 +1,37 @@
+From 533376e8cb501146c2f9326a99c88cbb13ecccac Mon Sep 17 00:00:00 2001
+From: Shengjing Zhu <shengjing.zhu@canonical.com>
+Date: Tue, 25 Jun 2024 08:10:06 +0800
+Subject: fallback to close fds with looping when close_range syscall is not
+ implemented
+
+close_range syscall is added in Linux 5.9.
+
+Bug-Ubuntu: https://launchpad.net/bugs/2068702
+
+diff --git a/faked.c b/faked.c
+index 50f7190..3c5a540 100644
+--- a/faked.c
++++ b/faked.c
+@@ -1520,14 +1520,20 @@ int main(int argc, char **argv){
+ # else /* !FAKEROOT_FAKENET */
+       close_range(0, num_fds, 0);
+ # endif
+-#else /* ! HAVE_CLOSE_RANGE */
++      if (errno == ENOSYS) {
++#endif /* HAVE_CLOSE_RANGE */
++
+       /* This is the child closing its file descriptors. */
+       for (fl= 0; fl <= num_fds; ++fl)
+ # ifdef FAKEROOT_FAKENET
+ 	if (fl != sd)
+ # endif /* FAKEROOT_FAKENET */
+ 	  close(fl);
+-#endif
++
++#ifdef HAVE_CLOSE_RANGE
++     }
++#endif /* HAVE_CLOSE_RANGE */
++
+       setsid();
+     } else {
+       printf("%li:%i\n",(long)FAKE_KEY,pid);
