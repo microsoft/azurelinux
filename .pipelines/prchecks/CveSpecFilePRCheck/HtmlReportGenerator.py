@@ -1692,35 +1692,15 @@ class HtmlReportGenerator:
                 const result = await response.json();
                 
                 if (response.ok) {
-                    // Update button
-                    const btn = document.querySelector(`.challenge-btn[data-finding-id="${currentFindingId}"]`);
-                    if (btn) {
-                        btn.textContent = 'Challenged';
-                        btn.classList.add('challenged');
-                        btn.disabled = true;
-                    }
-                    
-                    // Update notification badge
-                    const notificationBadge = document.getElementById('notification-badge');
-                    if (notificationBadge) {
-                        const currentCount = parseInt(notificationBadge.textContent) || 0;
-                        const newCount = Math.max(0, currentCount - 1);
-                        notificationBadge.textContent = newCount;
-                        if (newCount === 0) {
-                            notificationBadge.classList.remove('active');
-                        }
-                    }
-                    
-                    // Update total issues count
-                    const totalIssuesEl = document.getElementById('total-issues-count');
-                    if (totalIssuesEl) {
-                        const currentCount = parseInt(totalIssuesEl.textContent) || 0;
-                        const newCount = Math.max(0, currentCount - 1);
-                        totalIssuesEl.textContent = newCount;
-                    }
-                    
                     closeChallengeModal();
-                    alert('Thank you for your feedback! It has been submitted successfully.');
+                    
+                    // Show success message with reload notification
+                    alert('✅ Challenge submitted successfully!\\n\\nThe page will reload in 3 seconds to fetch the updated report with your challenge marked.');
+                    
+                    // Wait 3 seconds then reload to get fresh HTML with challenged item marked
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
                 } else {
                     if (response.status === 401) {
                         alert('Your session has expired. Please sign in again.');

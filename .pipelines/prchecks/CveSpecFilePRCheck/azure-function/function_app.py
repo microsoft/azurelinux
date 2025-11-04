@@ -518,6 +518,35 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
         diagnostic_info['bot_token_length'] = len(kv_token) if kv_token else 0
         diagnostic_info['bot_token_prefix'] = kv_token[:10] if kv_token else 'empty'
         
+        # Trigger HTML report regeneration by posting a refresh comment
+        try:
+            logger.info(f"🔄 Triggering PR check re-run to regenerate HTML report for PR #{pr_number}")
+            if bot_token:
+                # Post /azp run command to trigger pipeline re-evaluation
+                trigger_comment_body = "/azp run"
+                trigger_comment_url = f"https://api.github.com/repos/microsoft/azurelinux/issues/{pr_number}/comments"
+                trigger_headers = {
+                    "Authorization": f"token {bot_token}",
+                    "Accept": "application/vnd.github.v3+json",
+                    "Content-Type": "application/json"
+                }
+                trigger_response = requests.post(
+                    trigger_comment_url,
+                    headers=trigger_headers,
+                    json={"body": trigger_comment_body},
+                    timeout=10
+                )
+                
+                if trigger_response.status_code == 201:
+                    logger.info(f"✅ Posted /azp run command to trigger pipeline re-run")
+                    diagnostic_info['pipeline_triggered'] = True
+                else:
+                    logger.warning(f"⚠️  Failed to post /azp run command: {trigger_response.status_code}")
+                    diagnostic_info['pipeline_triggered'] = False
+        except Exception as e:
+            logger.warning(f"⚠️  Could not trigger pipeline re-run: {e}")
+            diagnostic_info['pipeline_triggered'] = False
+        
         return func.HttpResponse(
             json.dumps({
                 "success": True,
