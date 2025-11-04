@@ -30959,7 +30959,7 @@
         "other": {
           "name": "xpp2",
           "version": "2.1.10",
-          "downloadUrl": "http://www.extreme.indiana.edu/xgws/xsoap/xpp/download/PullParser2/PullParser2.1.10.tar.bz2"
+          "downloadUrl": "https://www.extreme.indiana.edu/xgws/xsoap/xpp/download/PullParser2/PullParser2.1.10.tar.bz2"
         }
       }
     },

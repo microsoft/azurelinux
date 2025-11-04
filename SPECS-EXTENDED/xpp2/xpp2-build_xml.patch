@@ -5,8 +5,8 @@
  
  
 -  <property name="target" value="1.1" />
-+  <property name="target" value="1.6" />
-+  <property name="source" value="1.6" />
++  <property name="target" value="1.8" />
++  <property name="source" value="1.8" />
    <!-- set global properties for this build -->
  
    <property name="name" value="XML Pull Parser"/>
@@ -185,7 +185,7 @@
      <javadoc packagenames="${apidoc_packages}"
               sourcepath="${src_intf}"
               destdir="${build_apidoc}"
-+             source="1.6"
++             source="1.8"
               author="true"
               version="true"
               use="true"
@@ -193,7 +193,7 @@
      <javadoc packagenames="${javadoc_packages}"
               sourcepath="${src_intf}:${src_impl_factory}:${src_impl_small}:${src_impl_tag}:${src_impl_pp}:${src_impl_node}:${src_impl_format}:${src_x2impl}:${src_x2impl_factory}:${src_x2impl_pp}"
               destdir="${build_javadoc}"
-+             source="1.6"
++             source="1.8"
               author="true"
               version="true"
               use="true"

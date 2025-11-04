@@ -21,12 +21,12 @@ Distribution:   Azure Linux
 %define originalname PullParser
 Name:           xpp2
 Version:        2.1.10
-Release:        29%{?dist}
+Release:        30%{?dist}
 Summary:        XML Pull Parser
 License:        Apache-1.1
 Group:          Development/Libraries/Java
-Url:            http://www.extreme.indiana.edu/xgws/xsoap/xpp/
-Source0:        http://www.extreme.indiana.edu/xgws/xsoap/xpp/download/PullParser2/PullParser2.1.10.tar.bz2
+Url:            https://www.extreme.indiana.edu/xgws/xsoap/xpp/
+Source0:        https://www.extreme.indiana.edu/xgws/xsoap/xpp/download/PullParser2/PullParser2.1.10.tar.bz2
 Patch0:         xpp2-build_xml.patch
 Patch1:         xpp2-enum.patch
 BuildRequires:  ant >= 1.6
@@ -143,6 +143,10 @@ cp -pr src/java/samples/* %{buildroot}%{_datadir}/%{name}
 %{_datadir}/%{name}
 
 %changelog
+* Fri Nov 07 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.1.10-30
+- Fixed the build failure
+- License Verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.10-29
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
