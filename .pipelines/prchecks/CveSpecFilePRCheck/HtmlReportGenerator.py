@@ -1668,7 +1668,7 @@ class HtmlReportGenerator:
             submitBtn.textContent = 'Submitting...';
             
             try {
-                const pr_number = {pr_number};
+                const pr_number = {{PR_NUMBER}};
                 const headers = RADAR_AUTH.getAuthHeaders();
                 
                 const controller = new AbortController();
@@ -1939,4 +1939,4 @@ class HtmlReportGenerator:
         
         }); // End DOMContentLoaded"""
         
-        return js_code.replace('{pr_number}', str(pr_number))
+        return js_code.replace('{{PR_NUMBER}}', str(pr_number))
