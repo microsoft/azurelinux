@@ -61,13 +61,15 @@ class HtmlReportGenerator:
         # Fallback to placeholder SVG
         return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%230969da'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-size='18' fill='white' font-weight='bold'%3ER%3C/text%3E%3C/svg%3E"
     
-    def generate_report_body(self, analysis_result, pr_metadata: Optional[dict] = None) -> str:
+    def generate_report_body(self, analysis_result, pr_metadata: Optional[dict] = None, categorized_issues: Optional[dict] = None) -> str:
         """
         Generate the HTML report body (content only, no page wrapper).
         
         Args:
             analysis_result: MultiSpecAnalysisResult with all spec data
             pr_metadata: Optional dict with PR metadata
+            categorized_issues: Optional dict with categorized issues from AnalyticsManager
+                               (contains challenged_issues, recurring_issues, etc.)
             
         Returns:
             HTML string with report content
@@ -100,8 +102,8 @@ class HtmlReportGenerator:
         # Add stats grid
         html += self._generate_stats_grid(stats, analysis_result.total_issues)
         
-        # Add package details
-        html += self._generate_spec_cards(analysis_result.spec_results)
+        # Add package details with challenge data
+        html += self._generate_spec_cards(analysis_result.spec_results, categorized_issues)
         
         html += """
 </div>
@@ -188,7 +190,7 @@ class HtmlReportGenerator:
     </div>
 """
     
-    def _generate_spec_cards(self, spec_results: list) -> str:
+    def _generate_spec_cards(self, spec_results: list, categorized_issues: Optional[dict] = None) -> str:
         """Generate expandable cards for each spec file."""
         from AntiPatternDetector import Severity
         
@@ -218,7 +220,7 @@ class HtmlReportGenerator:
             
             # Anti-patterns section with better grouping
             if spec_result.anti_patterns:
-                html += self._generate_antipattern_section(spec_result)
+                html += self._generate_antipattern_section(spec_result, categorized_issues)
             
             # Recommended actions
             html += self._generate_recommendations_section(spec_result.anti_patterns)
@@ -229,7 +231,7 @@ class HtmlReportGenerator:
 """
         return html
     
-    def _generate_antipattern_section(self, spec_result) -> str:
+    def _generate_antipattern_section(self, spec_result, categorized_issues: Optional[dict] = None) -> str:
         """Generate anti-pattern detection results for a spec."""
         issues_by_type = spec_result.get_issues_by_type()
         
@@ -255,7 +257,7 @@ class HtmlReportGenerator:
                         <div class="mt-2">
 """
             for idx, pattern in enumerate(patterns):
-                html += self._generate_issue_item(spec_result.package_name, issue_type, pattern, idx, spec_result.spec_path)
+                html += self._generate_issue_item(spec_result.package_name, issue_type, pattern, idx, spec_result.spec_path, categorized_issues)
             
             html += """
                         </div>
@@ -268,8 +270,10 @@ class HtmlReportGenerator:
 """
         return html
     
-    def _generate_issue_item(self, package_name: str, issue_type: str, pattern, idx: int, spec_path: str) -> str:
+    def _generate_issue_item(self, package_name: str, issue_type: str, pattern, idx: int, spec_path: str, categorized_issues: Optional[dict] = None) -> str:
         """Generate a single issue item with challenge button."""
+        import json
+        
         issue_hash = pattern.issue_hash if hasattr(pattern, 'issue_hash') and pattern.issue_hash else f"{package_name}-{issue_type.replace(' ', '-').replace('_', '-')}-{idx}"
         finding_id = issue_hash
         
@@ -287,6 +291,31 @@ class HtmlReportGenerator:
         
         escaped_desc = html_module.escape(pattern.description, quote=True)
         
+        # Check if this issue has been challenged
+        is_challenged = False
+        challenge_data = {}
+        if categorized_issues and 'challenged_issues' in categorized_issues:
+            for challenged_issue in categorized_issues['challenged_issues']:
+                if challenged_issue.issue_hash == issue_hash:
+                    is_challenged = True
+                    # Store challenge metadata for display
+                    challenge_data = {
+                        'type': getattr(challenged_issue, 'challenge_type', 'unknown'),
+                        'feedback': getattr(challenged_issue, 'challenge_feedback', ''),
+                        'user': getattr(challenged_issue, 'challenge_user', 'unknown'),
+                        'timestamp': getattr(challenged_issue, 'challenge_timestamp', '')
+                    }
+                    break
+        
+        # Build button attributes
+        btn_class = "btn btn-sm challenge-btn challenged" if is_challenged else "btn btn-sm challenge-btn"
+        btn_text = "Challenged" if is_challenged else "Challenge"
+        btn_extra_attrs = ""
+        if is_challenged and challenge_data:
+            # Store challenge metadata in data attributes
+            challenge_json = html_module.escape(json.dumps(challenge_data), quote=True)
+            btn_extra_attrs = f' data-challenge-info="{challenge_json}"'
+        
         return f"""
                             <div class="Box-row issue-item" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-severity="{severity_name}">
                                 <div class="d-flex flex-justify-between flex-items-start">
@@ -299,8 +328,8 @@ class HtmlReportGenerator:
                                             </div>
                                         </div>
                                     </div>
-                                    <button class="btn btn-sm challenge-btn" type="button" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-spec="{spec_path}" data-issue-type="{issue_type}" data-description="{escaped_desc}">
-                                        Challenge
+                                    <button class="{btn_class}" type="button" data-finding-id="{finding_id}" data-issue-hash="{issue_hash}" data-spec="{spec_path}" data-issue-type="{issue_type}" data-description="{escaped_desc}"{btn_extra_attrs}>
+                                        {btn_text}
                                     </button>
                                 </div>
                             </div>
@@ -759,6 +788,8 @@ class HtmlReportGenerator:
         .challenge-btn {
             background-color: var(--color-btn-bg);
             border-color: var(--color-btn-border);
+            margin-left: 12px;
+            flex-shrink: 0;
         }
         
         .challenge-btn:hover {
@@ -770,7 +801,7 @@ class HtmlReportGenerator:
             color: var(--color-success-fg);
             background-color: rgba(46, 160, 67, 0.1);
             border-color: var(--color-success-emphasis);
-            cursor: not-allowed;
+            cursor: pointer;  /* Changed from not-allowed to allow viewing details */
         }
         
         .challenge-btn.challenged::before {
@@ -1724,7 +1755,8 @@ class HtmlReportGenerator:
                 
                 // If already challenged, show challenge details instead of opening challenge modal
                 if (this.classList.contains('challenged')) {
-                    showChallengeDetails(findingId, issueHash, description);
+                    const challengeInfo = this.getAttribute('data-challenge-info');
+                    showChallengeDetails(findingId, issueHash, description, challengeInfo);
                 } else {
                     openChallengeModal(findingId, issueHash, spec, issueType, description);
                 }
@@ -1732,7 +1764,7 @@ class HtmlReportGenerator:
         });
         
         // Function to show challenge details for already challenged items
-        function showChallengeDetails(findingId, issueHash, description) {{
+        function showChallengeDetails(findingId, issueHash, description, challengeInfoJson) {{
             const modal = document.getElementById('challenge-modal');
             const modalTitle = document.getElementById('challenge-modal-title');
             const modalBody = document.getElementById('challenge-modal-body');
@@ -1740,7 +1772,17 @@ class HtmlReportGenerator:
             
             modalTitle.textContent = 'Challenge Details';
             
-            // Build challenge details HTML
+            // Parse challenge metadata
+            let challengeInfo = null;
+            try {{
+                if (challengeInfoJson) {{
+                    challengeInfo = JSON.parse(challengeInfoJson);
+                }}
+            }} catch (e) {{
+                console.error('Failed to parse challenge info:', e);
+            }}
+            
+            // Build challenge details HTML with actual data
             let detailsHTML = `
                 <div class="Box mb-3">
                     <div class="Box-header">
@@ -1756,6 +1798,42 @@ class HtmlReportGenerator:
                     </svg>
                     <p class="mb-0">This issue has been challenged and is under review.</p>
                 </div>
+            `;
+            
+            // Add challenge metadata if available
+            if (challengeInfo) {{
+                const challengeTypeLabels = {{
+                    'false-positive': 'False Positive',
+                    'needs-context': 'Needs More Context',
+                    'disagree-with-severity': 'Disagree with Severity'
+                }};
+                
+                detailsHTML += `
+                <div class="Box mt-3">
+                    <div class="Box-header">
+                        <h3 class="Box-title">Challenge Information</h3>
+                    </div>
+                    <div class="Box-body">
+                        <dl class="mb-0">
+                            <dt class="text-bold">Challenge Type:</dt>
+                            <dd class="mb-2">${{challengeTypeLabels[challengeInfo.type] || challengeInfo.type}}</dd>
+                            ${{challengeInfo.feedback ? `
+                            <dt class="text-bold">Feedback:</dt>
+                            <dd class="mb-2">${{challengeInfo.feedback}}</dd>
+                            ` : ''}}
+                            <dt class="text-bold">Submitted By:</dt>
+                            <dd class="mb-2">${{challengeInfo.user || 'Unknown'}}</dd>
+                            ${{challengeInfo.timestamp ? `
+                            <dt class="text-bold">Timestamp:</dt>
+                            <dd class="mb-0">${{challengeInfo.timestamp}}</dd>
+                            ` : ''}}
+                        </dl>
+                    </div>
+                </div>
+                `;
+            }}
+            
+            detailsHTML += `
                 <p class="text-small text-secondary mt-3">
                     The challenge has been submitted to the repository for team review.
                     Check the PR comments for updates from the RADAR system.
