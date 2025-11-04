@@ -8,7 +8,6 @@ import azure.functions as func
 import json
 import logging
 import os
-import sys
 import jwt
 import requests
 from datetime import datetime
@@ -18,8 +17,7 @@ from azure.identity import DefaultAzureCredential
 from azure.core.exceptions import AzureError, ResourceNotFoundError
 from azure.keyvault.secrets import SecretClient
 
-# Add parent directory to path to import HtmlReportGenerator
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+# Import HTML generator from same directory
 from HtmlReportGenerator import HtmlReportGenerator
 from AntiPatternDetector import Severity
 
