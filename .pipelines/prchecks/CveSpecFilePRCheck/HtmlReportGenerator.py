@@ -1671,6 +1671,14 @@ class HtmlReportGenerator:
                 const pr_number = """ + str(pr_number) + """;
                 const headers = RADAR_AUTH.getAuthHeaders();
                 
+                console.log('🚀 Submitting challenge:', {
+                    pr_number,
+                    spec_file: currentSpec,
+                    issue_hash: currentIssueHash,
+                    antipattern_id: currentFindingId,
+                    challenge_type: challengeType
+                });
+                
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 15000);
                 
@@ -1689,24 +1697,35 @@ class HtmlReportGenerator:
                 });
                 
                 clearTimeout(timeoutId);
+                console.log('📡 Response status:', response.status);
+                
                 const result = await response.json();
+                console.log('📦 Response data:', result);
                 
                 if (response.ok) {
                     closeChallengeModal();
                     
+                    console.log('✅ Challenge submitted successfully');
+                    console.log('🔗 Report URL from backend:', result.report_url);
+                    
                     // The backend regenerates the report and returns the new URL
                     if (result.report_url) {
                         // Redirect to the updated report immediately
+                        const newUrl = result.report_url + '?_t=' + Date.now();
+                        console.log('🔄 Redirecting to:', newUrl);
                         alert('✅ Challenge submitted successfully!\\n\\nRedirecting to updated report...');
-                        window.location.href = result.report_url + '?_t=' + Date.now();
+                        window.location.href = newUrl;
                     } else {
                         // Fallback: reload current page with cache-busting
+                        console.warn('⚠️  No report_url in response, using fallback reload');
                         alert('✅ Challenge submitted successfully!\\n\\nReloading report...');
                         const url = new URL(window.location.href);
                         url.searchParams.set('_t', Date.now());
+                        console.log('🔄 Fallback reload to:', url.toString());
                         window.location.href = url.toString();
                     }
                 } else {
+                    console.error('❌ Challenge submission failed:', response.status, result);
                     if (response.status === 401) {
                         alert('Your session has expired. Please sign in again.');
                         RADAR_AUTH.signOut();
@@ -1715,6 +1734,7 @@ class HtmlReportGenerator:
                     alert(`Failed to submit feedback: ${result.error || 'Unknown error'}`);
                 }
             } catch (error) {
+                console.error('💥 Challenge submission error:', error);
                 if (error.name === 'AbortError') {
                     alert('Request timeout: Server took too long to respond.');
                 } else {
