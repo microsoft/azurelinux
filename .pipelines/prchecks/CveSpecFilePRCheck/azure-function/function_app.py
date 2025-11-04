@@ -399,6 +399,7 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
             }
             
             # Map challenges to issues
+            logger.info(f"📝 Building categorized_issues from {len(current_data.get('challenges', []))} challenges")
             for challenge in current_data.get("challenges", []):
                 issue_hash = challenge.get("issue_hash")
                 if issue_hash:
@@ -409,34 +410,47 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                         'timestamp': challenge.get('timestamp', challenge.get('submitted_at', ''))
                     }
             
+            logger.info(f"📊 Categorized issues: {len(categorized_issues['challenged_issues'])} challenged")
+            
             # Generate HTML report
+            logger.info(f"🎨 Generating HTML report body...")
             html_body = html_generator.generate_report_body(
                 analysis_result=analysis_result,
                 pr_metadata=None,  # Optional, can add PR info if needed
                 categorized_issues=categorized_issues
             )
             
+            logger.info(f"📄 Generating complete HTML page...")
             html_content = html_generator.generate_complete_page(html_body, pr_number)
+            logger.info(f"✅ HTML generated successfully, size: {len(html_content)} bytes")
             
             # Upload HTML report to blob storage
             timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H%M%SZ')
             html_blob_name = f"PR-{pr_number}/report-{timestamp}.html"
+            logger.info(f"📤 Uploading to blob: {html_blob_name}")
+            
             html_blob_client = blob_service_client.get_blob_client(
                 container=CONTAINER_NAME,
                 blob=html_blob_name
             )
             
             html_blob_client.upload_blob(html_content, overwrite=True)
+            logger.info(f"✅ HTML report uploaded successfully")
             
             # Generate the public URL for the report
             report_url = f"{STORAGE_ACCOUNT_URL}/{CONTAINER_NAME}/{html_blob_name}"
-            logger.info(f"✅ HTML report regenerated and uploaded: {report_url}")
+            logger.info(f"✅✅✅ HTML report regenerated and uploaded: {report_url}")
+            logger.info(f"🔗 Report URL will be returned to client: {report_url}")
             
         except Exception as html_error:
-            logger.error(f"❌ Failed to regenerate HTML report: {html_error}")
+            logger.error(f"❌❌❌ Failed to regenerate HTML report!")
+            logger.error(f"   Error type: {type(html_error).__name__}")
+            logger.error(f"   Error message: {str(html_error)}")
             import traceback
-            logger.error(f"   Traceback: {traceback.format_exc()}")
+            logger.error(f"   Full traceback:")
+            logger.error(traceback.format_exc())
             report_url = None
+            logger.warning(f"⚠️  report_url set to None due to error")
         
         # Post GitHub comment about the challenge
         try:
