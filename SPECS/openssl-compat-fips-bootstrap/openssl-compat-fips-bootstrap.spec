@@ -56,16 +56,10 @@ Patch1:   0001-Aarch64-and-ppc64le-use-lib64.patch
 Patch2:   0002-Use-more-general-default-values-in-openssl.cnf.patch
 # Do not install html docs
 Patch3:   0003-Do-not-install-html-docs.patch
-# Override default paths for the CA directory tree
-# AZL: NOTE: We do not use crypto-policies, so this patch does not apply.
-# Patch4:   0004-Override-default-paths-for-the-CA-directory-tree.patch
 # apps/ca: fix md option help text
 Patch5:   0005-apps-ca-fix-md-option-help-text.patch
 # Disable signature verification with totally unsafe hash algorithms
 Patch6:   0006-Disable-signature-verification-with-totally-unsafe-h.patch
-# Add support for PROFILE=SYSTEM system default cipherlist
-# AZL: NOTE: We do not use crypto-policies, so this patch does not apply.
-# Patch7:   0007-Add-support-for-PROFILE-SYSTEM-system-default-cipher.patch
 # Add FIPS_mode() compatibility macro
 Patch8:   0008-Add-FIPS_mode-compatibility-macro-compat-3.3.5-AZL3.patch
 # Add check to see if fips flag is enabled in kernel
