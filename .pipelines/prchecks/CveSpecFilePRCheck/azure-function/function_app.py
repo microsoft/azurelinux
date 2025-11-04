@@ -8,6 +8,7 @@ import azure.functions as func
 import json
 import logging
 import os
+import sys
 import jwt
 import requests
 from datetime import datetime
@@ -16,6 +17,11 @@ from azure.storage.blob import BlobServiceClient
 from azure.identity import DefaultAzureCredential
 from azure.core.exceptions import AzureError, ResourceNotFoundError
 from azure.keyvault.secrets import SecretClient
+
+# Add parent directory to path to import HtmlReportGenerator
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+from HtmlReportGenerator import HtmlReportGenerator
+from AntiPatternDetector import Severity
 
 app = func.FunctionApp()
 
@@ -346,6 +352,58 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
         
         logger.info(f"✅✅✅ Challenge submitted successfully: {challenge_id}")
         
+        # Regenerate HTML report with updated analytics data
+        logger.info(f"📄 Regenerating HTML report with updated challenge data...")
+        try:
+            # Initialize HTML report generator
+            def get_severity_color(severity):
+                colors = {"ERROR": "danger", "WARNING": "attention", "INFO": "success"}
+                return colors.get(severity, "primary")
+            
+            def get_severity_emoji(severity):
+                emojis = {"ERROR": "🔴", "WARNING": "🟡", "INFO": "🔵"}
+                return emojis.get(severity, "⚪")
+            
+            html_generator = HtmlReportGenerator(get_severity_color, get_severity_emoji)
+            
+            # Convert analytics data to spec results format for HTML generation
+            spec_results = []
+            for spec_data in current_data.get("specs", []):
+                # Create a minimal SpecFileResult-like object
+                spec_result = type('obj', (object,), {
+                    'spec_file_path': spec_data.get('spec_file', ''),
+                    'antipatterns': spec_data.get('antipatterns', []),
+                    'all_antipatterns': spec_data.get('antipatterns', [])
+                })()
+                spec_results.append(spec_result)
+            
+            # Generate HTML report
+            html_content = html_generator.generate_report(
+                spec_results=spec_results,
+                pr_number=pr_number,
+                analytics_data=current_data
+            )
+            
+            # Upload HTML report to blob storage
+            timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H%M%SZ')
+            html_blob_name = f"PR-{pr_number}/report-{timestamp}.html"
+            html_blob_client = blob_service_client.get_blob_client(
+                container=CONTAINER_NAME,
+                blob=html_blob_name
+            )
+            
+            html_blob_client.upload_blob(html_content, overwrite=True)
+            
+            # Generate the public URL for the report
+            report_url = f"{STORAGE_ACCOUNT_URL}/{CONTAINER_NAME}/{html_blob_name}"
+            logger.info(f"✅ HTML report regenerated and uploaded: {report_url}")
+            
+        except Exception as html_error:
+            logger.error(f"❌ Failed to regenerate HTML report: {html_error}")
+            import traceback
+            logger.error(f"   Traceback: {traceback.format_exc()}")
+            report_url = None
+        
         # Post GitHub comment about the challenge
         try:
             logger.info(f"💬 Posting challenge notification to GitHub PR #{pr_number}")
@@ -517,35 +575,7 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
         diagnostic_info['using_bot_token'] = bool(kv_token)
         diagnostic_info['bot_token_length'] = len(kv_token) if kv_token else 0
         diagnostic_info['bot_token_prefix'] = kv_token[:10] if kv_token else 'empty'
-        
-        # Trigger HTML report regeneration by posting a refresh comment
-        try:
-            logger.info(f"🔄 Triggering PR check re-run to regenerate HTML report for PR #{pr_number}")
-            if bot_token:
-                # Post /azp run command to trigger pipeline re-evaluation
-                trigger_comment_body = "/azp run"
-                trigger_comment_url = f"https://api.github.com/repos/microsoft/azurelinux/issues/{pr_number}/comments"
-                trigger_headers = {
-                    "Authorization": f"token {bot_token}",
-                    "Accept": "application/vnd.github.v3+json",
-                    "Content-Type": "application/json"
-                }
-                trigger_response = requests.post(
-                    trigger_comment_url,
-                    headers=trigger_headers,
-                    json={"body": trigger_comment_body},
-                    timeout=10
-                )
-                
-                if trigger_response.status_code == 201:
-                    logger.info(f"✅ Posted /azp run command to trigger pipeline re-run")
-                    diagnostic_info['pipeline_triggered'] = True
-                else:
-                    logger.warning(f"⚠️  Failed to post /azp run command: {trigger_response.status_code}")
-                    diagnostic_info['pipeline_triggered'] = False
-        except Exception as e:
-            logger.warning(f"⚠️  Could not trigger pipeline re-run: {e}")
-            diagnostic_info['pipeline_triggered'] = False
+        diagnostic_info['report_regenerated'] = bool(report_url)
         
         return func.HttpResponse(
             json.dumps({
@@ -554,6 +584,7 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                 "message": "Challenge submitted successfully",
                 "github_comment_posted": comment_posted,
                 "github_label_added": label_added,
+                "report_url": report_url,
                 "diagnostics": diagnostic_info
             }),
             mimetype="application/json",

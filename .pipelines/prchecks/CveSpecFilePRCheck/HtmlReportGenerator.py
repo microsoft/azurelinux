@@ -1694,13 +1694,18 @@ class HtmlReportGenerator:
                 if (response.ok) {
                     closeChallengeModal();
                     
-                    // Show success message with reload notification
-                    alert('✅ Challenge submitted successfully!\\n\\nThe page will reload in 3 seconds to fetch the updated report with your challenge marked.');
-                    
-                    // Wait 3 seconds then reload to get fresh HTML with challenged item marked
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 3000);
+                    // The backend regenerates the report and returns the new URL
+                    if (result.report_url) {
+                        // Redirect to the updated report immediately
+                        alert('✅ Challenge submitted successfully!\\n\\nRedirecting to updated report...');
+                        window.location.href = result.report_url + '?_t=' + Date.now();
+                    } else {
+                        // Fallback: reload current page with cache-busting
+                        alert('✅ Challenge submitted successfully!\\n\\nReloading report...');
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('_t', Date.now());
+                        window.location.href = url.toString();
+                    }
                 } else {
                     if (response.status === 401) {
                         alert('Your session has expired. Please sign in again.');
