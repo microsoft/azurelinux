@@ -1744,7 +1744,7 @@ class HtmlReportGenerator:
         });
         
         // Function to show challenge details for already challenged items
-        function showChallengeDetails(findingId, issueHash, description, challengeInfoJson) {{
+        function showChallengeDetails(findingId, issueHash, description, challengeInfoJson) {
             const modal = document.getElementById('challenge-modal');
             const modalTitle = document.getElementById('challenge-modal-title');
             const modalBody = document.getElementById('challenge-modal-body');
@@ -1754,13 +1754,13 @@ class HtmlReportGenerator:
             
             // Parse challenge metadata
             let challengeInfo = null;
-            try {{
-                if (challengeInfoJson) {{
+            try {
+                if (challengeInfoJson) {
                     challengeInfo = JSON.parse(challengeInfoJson);
-                }}
-            }} catch (e) {{
+                }
+            } catch (e) {
                 console.error('Failed to parse challenge info:', e);
-            }}
+            }
             
             // Build challenge details HTML with actual data
             let detailsHTML = '<div class="Box mb-3">' +
@@ -1779,12 +1779,12 @@ class HtmlReportGenerator:
                 '</div>';
             
             // Add challenge metadata if available
-            if (challengeInfo) {{
-                const challengeTypeLabels = {{
+            if (challengeInfo) {
+                const challengeTypeLabels = {
                     'false-positive': 'False Positive',
                     'needs-context': 'Needs More Context',
                     'disagree-with-severity': 'Disagree with Severity'
-                }};
+                };
                 
                 let challengeHTML = '<div class="Box mt-3">' +
                     '<div class="Box-header">' +
@@ -1795,25 +1795,25 @@ class HtmlReportGenerator:
                     '<dt class="text-bold">Challenge Type:</dt>' +
                     '<dd class="mb-2">' + (challengeTypeLabels[challengeInfo.type] || challengeInfo.type) + '</dd>';
                 
-                if (challengeInfo.feedback) {{
+                if (challengeInfo.feedback) {
                     challengeHTML += '<dt class="text-bold">Feedback:</dt>' +
                         '<dd class="mb-2">' + challengeInfo.feedback + '</dd>';
-                }}
+                }
                 
                 challengeHTML += '<dt class="text-bold">Submitted By:</dt>' +
                     '<dd class="mb-2">' + (challengeInfo.user || 'Unknown') + '</dd>';
                 
-                if (challengeInfo.timestamp) {{
+                if (challengeInfo.timestamp) {
                     challengeHTML += '<dt class="text-bold">Timestamp:</dt>' +
                         '<dd class="mb-0">' + challengeInfo.timestamp + '</dd>';
-                }}
+                }
                 
                 challengeHTML += '</dl>' +
                     '</div>' +
                     '</div>';
                 
                 detailsHTML += challengeHTML;
-            }}
+            }
             
             detailsHTML += '<p class="text-small text-secondary mt-3">' +
                 'The challenge has been submitted to the repository for team review. ' +
@@ -1824,7 +1824,7 @@ class HtmlReportGenerator:
             submitBtn.style.display = 'none';  // Hide submit button for view-only mode
             
             modal.style.display = 'flex';
-        }}
+        }
         
         // Severity filtering
         let activeSeverityFilter = null;
