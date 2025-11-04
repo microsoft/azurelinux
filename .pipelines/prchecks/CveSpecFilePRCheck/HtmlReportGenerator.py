@@ -1783,22 +1783,20 @@ class HtmlReportGenerator:
             }}
             
             // Build challenge details HTML with actual data
-            let detailsHTML = `
-                <div class="Box mb-3">
-                    <div class="Box-header">
-                        <h3 class="Box-title">Issue Description</h3>
-                    </div>
-                    <div class="Box-body">
-                        <p class="text-normal">${{description}}</p>
-                    </div>
-                </div>
-                <div class="flash flash-success">
-                    <svg class="octicon" viewBox="0 0 16 16" width="16" height="16">
-                        <path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path>
-                    </svg>
-                    <p class="mb-0">This issue has been challenged and is under review.</p>
-                </div>
-            `;
+            let detailsHTML = '<div class="Box mb-3">' +
+                '<div class="Box-header">' +
+                '<h3 class="Box-title">Issue Description</h3>' +
+                '</div>' +
+                '<div class="Box-body">' +
+                '<p class="text-normal">' + description + '</p>' +
+                '</div>' +
+                '</div>' +
+                '<div class="flash flash-success">' +
+                '<svg class="octicon" viewBox="0 0 16 16" width="16" height="16">' +
+                '<path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path>' +
+                '</svg>' +
+                '<p class="mb-0">This issue has been challenged and is under review.</p>' +
+                '</div>';
             
             // Add challenge metadata if available
             if (challengeInfo) {{
@@ -1808,51 +1806,39 @@ class HtmlReportGenerator:
                     'disagree-with-severity': 'Disagree with Severity'
                 }};
                 
-                let challengeHTML = `
-                <div class="Box mt-3">
-                    <div class="Box-header">
-                        <h3 class="Box-title">Challenge Information</h3>
-                    </div>
-                    <div class="Box-body">
-                        <dl class="mb-0">
-                            <dt class="text-bold">Challenge Type:</dt>
-                            <dd class="mb-2">${{challengeTypeLabels[challengeInfo.type] || challengeInfo.type}}</dd>
-                `;
+                let challengeHTML = '<div class="Box mt-3">' +
+                    '<div class="Box-header">' +
+                    '<h3 class="Box-title">Challenge Information</h3>' +
+                    '</div>' +
+                    '<div class="Box-body">' +
+                    '<dl class="mb-0">' +
+                    '<dt class="text-bold">Challenge Type:</dt>' +
+                    '<dd class="mb-2">' + (challengeTypeLabels[challengeInfo.type] || challengeInfo.type) + '</dd>';
                 
                 if (challengeInfo.feedback) {{
-                    challengeHTML += `
-                            <dt class="text-bold">Feedback:</dt>
-                            <dd class="mb-2">${{challengeInfo.feedback}}</dd>
-                    `;
+                    challengeHTML += '<dt class="text-bold">Feedback:</dt>' +
+                        '<dd class="mb-2">' + challengeInfo.feedback + '</dd>';
                 }}
                 
-                challengeHTML += `
-                            <dt class="text-bold">Submitted By:</dt>
-                            <dd class="mb-2">${{challengeInfo.user || 'Unknown'}}</dd>
-                `;
+                challengeHTML += '<dt class="text-bold">Submitted By:</dt>' +
+                    '<dd class="mb-2">' + (challengeInfo.user || 'Unknown') + '</dd>';
                 
                 if (challengeInfo.timestamp) {{
-                    challengeHTML += `
-                            <dt class="text-bold">Timestamp:</dt>
-                            <dd class="mb-0">${{challengeInfo.timestamp}}</dd>
-                    `;
+                    challengeHTML += '<dt class="text-bold">Timestamp:</dt>' +
+                        '<dd class="mb-0">' + challengeInfo.timestamp + '</dd>';
                 }}
                 
-                challengeHTML += `
-                        </dl>
-                    </div>
-                </div>
-                `;
+                challengeHTML += '</dl>' +
+                    '</div>' +
+                    '</div>';
                 
                 detailsHTML += challengeHTML;
             }}
             
-            detailsHTML += `
-                <p class="text-small text-secondary mt-3">
-                    The challenge has been submitted to the repository for team review.
-                    Check the PR comments for updates from the RADAR system.
-                </p>
-            `;
+            detailsHTML += '<p class="text-small text-secondary mt-3">' +
+                'The challenge has been submitted to the repository for team review. ' +
+                'Check the PR comments for updates from the RADAR system.' +
+                '</p>';
             
             modalBody.innerHTML = detailsHTML;
             submitBtn.style.display = 'none';  // Hide submit button for view-only mode
