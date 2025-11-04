@@ -608,11 +608,8 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so
 %ldconfig_scriptlets libs
 
 %changelog
-* Mon Aug 04 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.3-500000
-- use bootstrap package for fips.so
-
-* Fri Aug 01 2025 tobiasb <tobiasb@microsoft.com> - 3.3.3-300000
-- TEMP: Initial fedora-like upgrade to 3.3.3
+* Wed Nov 05 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.5-1
+- OpenSSL built like Fedora.
 
 * Mon Jul 14 2025 gstarovo <gstarovo@redhat.com> - 1:3.2.4-4
 - Assign IANA numbers for hybrid PQ KEX
