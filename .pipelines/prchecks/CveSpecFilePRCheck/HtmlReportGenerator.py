@@ -384,7 +384,7 @@ class HtmlReportGenerator:
     <div class="Header">
         <div class="Header-item">
             <a href="#" class="Header-link f4 d-flex flex-items-center">
-                <img class="radar-logo mr-2" id="radar-logo" src="{radar_logo_light}" alt="RADAR" height="48">
+                <img class="radar-logo mr-2" id="radar-logo" src="{radar_logo_light}" alt="RADAR" height="64">
                 <span class="Header-title">
                     <span class="text-bold">RADAR</span>
                     <span class="text-secondary mx-1">/</span>
