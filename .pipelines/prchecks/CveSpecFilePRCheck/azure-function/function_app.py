@@ -263,13 +263,16 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
             "spec_file": req_body.get("spec_file", ""),
             "commit_sha": req_body.get("commit_sha", "unknown"),  # Commit where issue was challenged
             "submitted_at": datetime.utcnow().isoformat() + "Z",
+            "timestamp": datetime.utcnow().isoformat() + "Z",  # For HTML display compatibility
             "submitted_by": {
                 "username": username,
                 "email": email,
                 "is_collaborator": is_collaborator
             },
+            "user": username,  # For HTML display compatibility
             "challenge_type": req_body["challenge_type"],
-            "feedback_text": req_body["feedback_text"],
+            "feedback_text": req_body["feedback_text"],  # Keep for backwards compatibility
+            "feedback": req_body["feedback_text"],  # For HTML display compatibility
             "status": "submitted"
         }
         
