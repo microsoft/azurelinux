@@ -1,4 +1,4 @@
-From 5c3487824ab21c93f213a86e17c9ff8dcf89c8da Mon Sep 17 00:00:00 2001
+From 3f4982f42374014e8646d831189a9e0b91ab09ed Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <dbelyavs@redhat.com>
 Date: Mon, 21 Aug 2023 12:55:57 +0200
 Subject: [PATCH] 0045-FIPS-services-minimize.patch
@@ -73,7 +73,7 @@ index f723461..0d4c0e3 100644
      TLS_GROUP_ENTRY("brainpoolP256r1tls13", "brainpoolP256r1", "EC", 30),
      TLS_GROUP_ENTRY("brainpoolP384r1tls13", "brainpoolP384r1", "EC", 31),
 diff --git a/providers/fips/fipsprov.c b/providers/fips/fipsprov.c
-index 86c18de..42bf50e 100644
+index 86c18de..cc9a31d 100644
 --- a/providers/fips/fipsprov.c
 +++ b/providers/fips/fipsprov.c
 @@ -199,13 +199,13 @@ static int fips_get_params(void *provctx, OSSL_PARAM params[])
@@ -81,7 +81,7 @@ index 86c18de..42bf50e 100644
  
      p = OSSL_PARAM_locate(params, OSSL_PROV_PARAM_NAME);
 -    if (p != NULL && !OSSL_PARAM_set_utf8_ptr(p, "OpenSSL FIPS Provider"))
-+    if (p != NULL && !OSSL_PARAM_set_utf8_ptr(p, "Red Hat Enterprise Linux 9 - OpenSSL FIPS Provider"))
++    if (p != NULL && !OSSL_PARAM_set_utf8_ptr(p, "AZL3 - OpenSSL FIPS Provider"))
          return 0;
      p = OSSL_PARAM_locate(params, OSSL_PROV_PARAM_VERSION);
 -    if (p != NULL && !OSSL_PARAM_set_utf8_ptr(p, OPENSSL_VERSION_STR))
