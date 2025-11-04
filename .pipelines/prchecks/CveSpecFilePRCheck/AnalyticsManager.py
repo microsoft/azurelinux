@@ -287,17 +287,21 @@ class AnalyticsManager:
                 for issue in last_commit.get("issues_detected", [])
             }
         
-        # Get challenged issue hashes
-        challenged_hashes = {
-            challenge["issue_hash"] 
-            for challenge in self.analytics.get("challenges", [])
-        }
+        # Get challenged issue hashes and build a map of challenge metadata
+        challenged_hashes = {}
+        for challenge in self.analytics.get("challenges", []):
+            challenged_hashes[challenge["issue_hash"]] = {
+                "challenge_type": challenge.get("challenge_type", "unknown"),
+                "challenge_feedback": challenge.get("feedback", ""),
+                "challenge_user": challenge.get("user", "unknown"),
+                "challenge_timestamp": challenge.get("timestamp", "")
+            }
         
         # Get current issue hashes
         current_hashes = {issue.issue_hash for issue in current_issues}
         
         # Calculate resolved issues (in previous, not in current, not challenged)
-        resolved_hashes = previous_hashes - current_hashes - challenged_hashes
+        resolved_hashes = previous_hashes - current_hashes - set(challenged_hashes.keys())
         
         # Categorize current issues
         new_issues = []
@@ -308,7 +312,13 @@ class AnalyticsManager:
             issue_hash = issue.issue_hash
             
             if issue_hash in challenged_hashes:
-                # Issue was previously challenged
+                # Issue was previously challenged - enrich with challenge metadata
+                challenge_data = challenged_hashes[issue_hash]
+                # Add challenge metadata as attributes to the AntiPattern object
+                issue.challenge_type = challenge_data["challenge_type"]
+                issue.challenge_feedback = challenge_data["challenge_feedback"]
+                issue.challenge_user = challenge_data["challenge_user"]
+                issue.challenge_timestamp = challenge_data["challenge_timestamp"]
                 challenged_issues.append(issue)
             elif issue_hash not in previous_hashes:
                 # New issue (not in previous commit, not challenged)
