@@ -550,8 +550,12 @@ class ResultAnalyzer:
                 severity_emoji_fn=self._get_severity_emoji
             )
             
-            # Generate the report body
-            html_report = html_generator.generate_report_body(analysis_result, pr_metadata=pr_metadata)
+            # Generate the report body with categorized issues for challenge persistence
+            html_report = html_generator.generate_report_body(
+                analysis_result, 
+                pr_metadata=pr_metadata,
+                categorized_issues=categorized_issues
+            )
             
             # Generate the complete HTML page with CSS and JavaScript
             html_page = html_generator.generate_complete_page(html_report, pr_number or 0)
