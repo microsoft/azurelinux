@@ -455,49 +455,17 @@ class HtmlReportGenerator:
         <div class="Overlay-content">
             <div class="Box">
                 <div class="Box-header">
-                    <h3 class="Box-title">Challenge Finding</h3>
+                    <h3 id="challenge-modal-title" class="Box-title">Challenge Finding</h3>
                     <button id="modal-close-btn" class="btn-octicon" type="button" aria-label="Close">
                         <svg class="octicon octicon-x" viewBox="0 0 16 16" width="16" height="16">
                             <path fill-rule="evenodd" d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/>
                         </svg>
                     </button>
                 </div>
-                <div class="Box-body">
-                    <div class="flash mb-3">
-                        <div id="modal-finding-text"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <div class="form-group-header">
-                            <label>Feedback Type</label>
-                        </div>
-                        <div class="form-checkbox">
-                            <label>
-                                <input type="radio" name="challenge-type" value="false-positive">
-                                False Positive
-                            </label>
-                        </div>
-                        <div class="form-checkbox">
-                            <label>
-                                <input type="radio" name="challenge-type" value="needs-context">
-                                Needs More Context
-                            </label>
-                        </div>
-                        <div class="form-checkbox">
-                            <label>
-                                <input type="radio" name="challenge-type" value="disagree-with-severity">
-                                Disagree with Severity
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <div class="form-group-header">
-                            <label for="challenge-feedback">Additional Details</label>
-                        </div>
-                        <textarea id="challenge-feedback" class="form-control" rows="4" placeholder="Explain why you're challenging this finding..."></textarea>
-                    </div>
-                    
+                <div id="challenge-modal-body" class="Box-body">
+                    <!-- Content will be dynamically generated -->
+                </div>
+                <div class="Box-footer">
                     <div class="form-actions">
                         <button id="submit-challenge-btn" class="btn btn-primary" type="button">Submit feedback</button>
                         <button class="btn" type="button" onclick="document.getElementById('challenge-modal').classList.add('Overlay--hidden')">Cancel</button>
@@ -1576,14 +1544,61 @@ class HtmlReportGenerator:
             currentIssueType = issueType;
             currentDescription = description;
             
-            document.getElementById('modal-finding-text').textContent = description;
-            document.getElementById('challenge-modal').classList.remove('Overlay--hidden');
+            const modal = document.getElementById('challenge-modal');
+            const modalTitle = document.getElementById('challenge-modal-title');
+            const modalBody = document.getElementById('challenge-modal-body');
+            const submitBtn = document.getElementById('submit-challenge-btn');
             
-            // Reset form
-            document.querySelectorAll('input[name="challenge-type"]').forEach(radio => {
-                radio.checked = false;
-            });
-            document.getElementById('challenge-feedback').value = '';
+            // Reset modal to challenge submission mode
+            modalTitle.textContent = 'Challenge Finding';
+            submitBtn.style.display = 'block';  // Show submit button
+            
+            // Build the challenge form HTML
+            modalBody.innerHTML = `
+                <div class="Box mb-3">
+                    <div class="Box-header">
+                        <h3 class="Box-title">Finding Details</h3>
+                    </div>
+                    <div class="Box-body">
+                        <p id="modal-finding-text" class="text-normal">${description}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="text-bold mb-2 d-block">Select challenge type:</label>
+                    <div class="form-checkbox mb-2">
+                        <label class="d-flex flex-items-center">
+                            <input type="radio" name="challenge-type" value="false-positive">
+                            <span class="ml-2">
+                                <strong>False Positive</strong> - This finding is incorrect
+                            </span>
+                        </label>
+                    </div>
+                    <div class="form-checkbox mb-2">
+                        <label class="d-flex flex-items-center">
+                            <input type="radio" name="challenge-type" value="needs-context">
+                            <span class="ml-2">
+                                <strong>Needs Context</strong> - More information is needed
+                            </span>
+                        </label>
+                    </div>
+                    <div class="form-checkbox mb-2">
+                        <label class="d-flex flex-items-center">
+                            <input type="radio" name="challenge-type" value="disagree-with-severity">
+                            <span class="ml-2">
+                                <strong>Disagree with Severity</strong> - The severity level is incorrect
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="text-bold mb-2 d-block" for="challenge-feedback">
+                        Additional feedback (optional):
+                    </label>
+                    <textarea id="challenge-feedback" class="form-control" rows="4" placeholder="Provide any additional context or information..."></textarea>
+                </div>
+            `;
+            
+            modal.classList.remove('Overlay--hidden');
         }
         
         function closeChallengeModal() {
@@ -1706,9 +1721,52 @@ class HtmlReportGenerator:
                 const spec = this.getAttribute('data-spec');
                 const issueType = this.getAttribute('data-issue-type');
                 const description = this.getAttribute('data-description');
-                openChallengeModal(findingId, issueHash, spec, issueType, description);
+                
+                // If already challenged, show challenge details instead of opening challenge modal
+                if (this.classList.contains('challenged')) {
+                    showChallengeDetails(findingId, issueHash, description);
+                } else {
+                    openChallengeModal(findingId, issueHash, spec, issueType, description);
+                }
             });
         });
+        
+        // Function to show challenge details for already challenged items
+        function showChallengeDetails(findingId, issueHash, description) {{
+            const modal = document.getElementById('challenge-modal');
+            const modalTitle = document.getElementById('challenge-modal-title');
+            const modalBody = document.getElementById('challenge-modal-body');
+            const submitBtn = document.getElementById('submit-challenge-btn');
+            
+            modalTitle.textContent = 'Challenge Details';
+            
+            // Build challenge details HTML
+            let detailsHTML = `
+                <div class="Box mb-3">
+                    <div class="Box-header">
+                        <h3 class="Box-title">Issue Description</h3>
+                    </div>
+                    <div class="Box-body">
+                        <p class="text-normal">${{description}}</p>
+                    </div>
+                </div>
+                <div class="flash flash-success">
+                    <svg class="octicon" viewBox="0 0 16 16" width="16" height="16">
+                        <path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path>
+                    </svg>
+                    <p class="mb-0">This issue has been challenged and is under review.</p>
+                </div>
+                <p class="text-small text-secondary mt-3">
+                    The challenge has been submitted to the repository for team review.
+                    Check the PR comments for updates from the RADAR system.
+                </p>
+            `;
+            
+            modalBody.innerHTML = detailsHTML;
+            submitBtn.style.display = 'none';  // Hide submit button for view-only mode
+            
+            modal.style.display = 'flex';
+        }}
         
         // Severity filtering
         let activeSeverityFilter = null;
