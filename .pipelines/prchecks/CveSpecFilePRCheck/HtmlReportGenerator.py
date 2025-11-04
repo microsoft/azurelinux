@@ -1473,12 +1473,12 @@ class HtmlReportGenerator:
             }
         }
         
-        // Check for saved theme or default to light
-        const savedTheme = localStorage.getItem('theme') || 'light';
+        // Check for saved theme or default to dark
+        const savedTheme = localStorage.getItem('theme') || 'dark';
         setTheme(savedTheme);
         
         themeToggle.addEventListener('click', () => {
-            const currentTheme = htmlElement.getAttribute('data-color-mode') || 'light';
+            const currentTheme = htmlElement.getAttribute('data-color-mode') || 'dark';
             setTheme(currentTheme === 'dark' ? 'light' : 'dark');
         });
         
@@ -1808,7 +1808,7 @@ class HtmlReportGenerator:
                     'disagree-with-severity': 'Disagree with Severity'
                 }};
                 
-                detailsHTML += `
+                let challengeHTML = `
                 <div class="Box mt-3">
                     <div class="Box-header">
                         <h3 class="Box-title">Challenge Information</h3>
@@ -1817,20 +1817,34 @@ class HtmlReportGenerator:
                         <dl class="mb-0">
                             <dt class="text-bold">Challenge Type:</dt>
                             <dd class="mb-2">${{challengeTypeLabels[challengeInfo.type] || challengeInfo.type}}</dd>
-                            ${{challengeInfo.feedback ? `
+                `;
+                
+                if (challengeInfo.feedback) {{
+                    challengeHTML += `
                             <dt class="text-bold">Feedback:</dt>
                             <dd class="mb-2">${{challengeInfo.feedback}}</dd>
-                            ` : ''}}
+                    `;
+                }}
+                
+                challengeHTML += `
                             <dt class="text-bold">Submitted By:</dt>
                             <dd class="mb-2">${{challengeInfo.user || 'Unknown'}}</dd>
-                            ${{challengeInfo.timestamp ? `
+                `;
+                
+                if (challengeInfo.timestamp) {{
+                    challengeHTML += `
                             <dt class="text-bold">Timestamp:</dt>
                             <dd class="mb-0">${{challengeInfo.timestamp}}</dd>
-                            ` : ''}}
+                    `;
+                }}
+                
+                challengeHTML += `
                         </dl>
                     </div>
                 </div>
                 `;
+                
+                detailsHTML += challengeHTML;
             }}
             
             detailsHTML += `
