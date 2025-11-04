@@ -366,23 +366,59 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
             
             html_generator = HtmlReportGenerator(get_severity_color, get_severity_emoji)
             
-            # Convert analytics data to spec results format for HTML generation
-            spec_results = []
+            # Convert analytics data to analysis_result format for HTML generation
+            # Create a minimal analysis result object
+            analysis_result = type('obj', (object,), {
+                'spec_results': [],
+                'summary_statistics': {
+                    'total_specs': len(current_data.get("specs", [])),
+                    'specs_with_issues': len([s for s in current_data.get("specs", []) if s.get("antipatterns")]),
+                    'total_issues': sum(len(s.get("antipatterns", [])) for s in current_data.get("specs", [])),
+                    'severity_counts': {
+                        'ERROR': sum(len([ap for ap in s.get("antipatterns", []) if ap.get("severity") == "ERROR"]) for s in current_data.get("specs", [])),
+                        'WARNING': sum(len([ap for ap in s.get("antipatterns", []) if ap.get("severity") == "WARNING"]) for s in current_data.get("specs", [])),
+                        'INFO': sum(len([ap for ap in s.get("antipatterns", []) if ap.get("severity") == "INFO"]) for s in current_data.get("specs", []))
+                    }
+                },
+                'overall_severity': 'ERROR' if any(ap.get("severity") == "ERROR" for s in current_data.get("specs", []) for ap in s.get("antipatterns", [])) else 'WARNING',
+                'total_issues': sum(len(s.get("antipatterns", [])) for s in current_data.get("specs", []))
+            })()
+            
+            # Convert spec data to spec_results format
             for spec_data in current_data.get("specs", []):
-                # Create a minimal SpecFileResult-like object
                 spec_result = type('obj', (object,), {
                     'spec_file_path': spec_data.get('spec_file', ''),
                     'antipatterns': spec_data.get('antipatterns', []),
                     'all_antipatterns': spec_data.get('antipatterns', [])
                 })()
-                spec_results.append(spec_result)
+                analysis_result.spec_results.append(spec_result)
+            
+            # Build categorized_issues from analytics data (challenges)
+            categorized_issues = {
+                'challenged_issues': {},
+                'recurring_issues': {},
+                'newly_resolved_issues': {}
+            }
+            
+            # Map challenges to issues
+            for challenge in current_data.get("challenges", []):
+                issue_hash = challenge.get("issue_hash")
+                if issue_hash:
+                    categorized_issues['challenged_issues'][issue_hash] = {
+                        'type': challenge.get('challenge_type', 'unknown'),
+                        'feedback': challenge.get('feedback_text', challenge.get('feedback', '')),
+                        'user': challenge.get('user', challenge.get('submitted_by', {}).get('username', 'Unknown')),
+                        'timestamp': challenge.get('timestamp', challenge.get('submitted_at', ''))
+                    }
             
             # Generate HTML report
-            html_content = html_generator.generate_report(
-                spec_results=spec_results,
-                pr_number=pr_number,
-                analytics_data=current_data
+            html_body = html_generator.generate_report_body(
+                analysis_result=analysis_result,
+                pr_metadata=None,  # Optional, can add PR info if needed
+                categorized_issues=categorized_issues
             )
+            
+            html_content = html_generator.generate_complete_page(html_body, pr_number)
             
             # Upload HTML report to blob storage
             timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H%M%SZ')
