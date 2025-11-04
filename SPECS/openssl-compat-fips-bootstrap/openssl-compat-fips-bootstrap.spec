@@ -161,31 +161,10 @@ Patch126: 0126-pkeyutl-encap.patch
 Patch127: 0127-speedup-SSL_add_cert_subjects_to_stack.patch
 Patch128: 0128-SAST-findings.patch
 Patch140: 0140-PQ-groups.patch
-Patch141: 0001-AZL3-remove-kbkdf-kmac-self-tests-kbkdf-kmac-is-unsu.patch
-# # TODO: document, rename -- maybe fold into the other speed one.
-Patch142: 0050-Make-openssl-speed-run-in-FIPS-mode.patch
-# TODO: document, rename -- maybe fold into the other speed one.
-Patch143: 0001-AZL3-disable-small-rsa-keys-in-fips-mode.patch
-# TODO: document, rename, look at difference between 3.2.4 and 3.5
-Patch144: 0001-AZL3-enable-all-padding-similar-to-3.5.patch
-# TODO: document, rename -- maybe fold into the other speed one.
-Patch145: 0001-AZL3-disable-DSA-in-speed-in-fips-mode.patch
-# TODO: document, rename -- maybe fold into the other speed one.
-Patch146: 0001-AZL3-disable-KMAC-in-speed-in-fips-mode.patch
-# TODO: document, rename -- maybe fold into the other speed one.
-Patch147: 0001-AZL3-disable-brainpool-in-speed-in-fips-mode.patch
-# TODO: document, rename -- maybe fold into the other speed one.
-Patch148: 0001-AZL3-disable-x25519-in-speed-in-fips-mode.patch
-# TODO: document, rename -- maybe fold into the other speed one.
-Patch149: 0001-AZL3-disable-x448-in-speed-in-fips-mode.patch
-# TODO: document, rename -- maybe fold into the other speed one.
-Patch150: 0001-AZL3-disable-eddsa-in-speed-in-fips-mode.patch
-# TODO: document, rename -- maybe fold into the other speed one.
-Patch151: 0001-AZL3-disable-kems-for-unsupported-rsa-sizes-in-speed.patch
-# TODO: document, rename -- maybe fold into the other speed one.
-Patch152: 0001-AZL3-disable-signatures-for-unsupported-rsa-sizes-in.patch
-# TODO: document, rename -- maybe fold into 0045
-Patch153: 0001-AZL3-skip-eddsa-test-in-30-test_pairwise_fail.t.patch
+# Patches we added just for Azure Linux 3.
+Patch201: AZL3-rsa-enable-all-padding-similar-to-3.5.patch
+Patch200: AZL3-Make-speed-work-in-FIPS-mode.patch
+Patch202: AZL3-fix-tests-for-FIPS-mode.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
