@@ -15,8 +15,8 @@ Patch00:        0001-Add-Keras-3.3.3.patch
 Patch01:        CVE-2025-1550.patch
 Patch02:        CVE-2025-8747.patch
 Patch03:        CVE-2025-9905.patch
-Patch04:        CVE-2025-12058.patch
-Patch05:        CVE-2025-12060.patch
+Patch04:        CVE-2025-12060.patch
+Patch05:        CVE-2025-12058.patch
 
 # Fix for CVE-2025-9906 included as part of CVE-2025-8747 and kept here as nopatch
 # and commented out, because from patch command perspective, these files
@@ -81,11 +81,11 @@ python3 pip_build.py --install
 
 
 %changelog
-* Fri Oct 31 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.3-6
-- Patch for CVE-2025-12060
-
-* Thu Oct 30 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.3-5
+* Mon Nov 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.3-6
 - Patch for CVE-2025-12058
+
+* Fri Oct 31 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.3-5
+- Patch for CVE-2025-12060
 
 * Sat Sep 20 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.3-4
 - Patch for CVE-2025-9905
