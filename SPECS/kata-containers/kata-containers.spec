@@ -10,7 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
-Patch0:         0001-warnings.patch
+Patch0:         rust-1.90-fixes.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -117,6 +117,7 @@ popd
 %changelog
 * Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.19.1.kata2-2
 - Bump release to rebuild with rust
+- Add patch to suppress dead_code warnings and add explicit lifetime for U32Set iterator
 
 * Thu Oct 09 2025 Saul Paredes <saulparedes@microsoft.com> - 3.19.1.kata2-2
 - Enable build on aarch64
