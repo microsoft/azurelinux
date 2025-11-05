@@ -1,0 +1,58 @@
+From 1241f2005d08673c28a595c5a6cd61350b95a929 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Tue, 2 Jan 2018 18:13:07 +0100
+Subject: [PATCH] Fix pkcs11 variants atf tests
+
+Add dns-pkcs11 tests Makefile to configure
+
+Add pkcs11 Kyuafile, fix dh_test to pass in pkcs11 mode
+---
+ configure.ac                   | 1 +
+ lib/Kyuafile                   | 2 ++
+ lib/dns-pkcs11/tests/dh_test.c | 3 ++-
+ 3 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index d80ae31..0fb9328 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3090,6 +3090,7 @@ AC_CONFIG_FILES([
+ 	lib/dns-pkcs11/include/Makefile
+ 	lib/dns-pkcs11/include/dns/Makefile
+ 	lib/dns-pkcs11/include/dst/Makefile
++	lib/dns-pkcs11/tests/Makefile
+ 	lib/irs/Makefile
+ 	lib/irs/include/Makefile
+ 	lib/irs/include/irs/Makefile
+diff --git a/lib/Kyuafile b/lib/Kyuafile
+index 39ce986..037e5ef 100644
+--- a/lib/Kyuafile
++++ b/lib/Kyuafile
+@@ -2,8 +2,10 @@ syntax(2)
+ test_suite('bind9')
+ 
+ include('dns/Kyuafile')
++include('dns-pkcs11/Kyuafile')
+ include('irs/Kyuafile')
+ include('isc/Kyuafile')
+ include('isccc/Kyuafile')
+ include('isccfg/Kyuafile')
+ include('ns/Kyuafile')
++include('ns-pkcs11/Kyuafile')
+diff --git a/lib/dns-pkcs11/tests/dh_test.c b/lib/dns-pkcs11/tests/dh_test.c
+index 934e8fd..658d1af 100644
+--- a/lib/dns-pkcs11/tests/dh_test.c
++++ b/lib/dns-pkcs11/tests/dh_test.c
+@@ -87,7 +87,8 @@ dh_computesecret(void **state) {
+ 	result = dst_key_computesecret(key, key, &buf);
+ 	assert_int_equal(result, DST_R_NOTPRIVATEKEY);
+ 	result = key->func->computesecret(key, key, &buf);
+-	assert_int_equal(result, DST_R_COMPUTESECRETFAILURE);
++	/* PKCS11 variant gives different result, accept both */
++	assert_true(result == DST_R_COMPUTESECRETFAILURE || result == DST_R_INVALIDPRIVATEKEY);
+ 
+ 	dst_key_free(&key);
+ }
+-- 
+2.20.1
+

@@ -33,13 +33,14 @@ Source14:       setup-named-softhsm.sh
 Source15:       named-chroot.files
 Patch9:         bind-9.14-config-pkcs11.patch
 Patch10:        bind-9.10-dist-native-pkcs11.patch
-Patch11:        CVE-2024-1737.patch
-Patch12:        CVE-2024-1975.patch
-Patch13:        CVE-2024-4076.patch
-Patch14:        CVE-2024-11187.patch
-Patch15:        CVE-2025-8677.patch
-Patch16:        CVE-2025-40778.patch
-Patch17:        CVE-2025-40780.patch
+Patch11:        bind-9.11-kyua-pkcs11.patch
+Patch12:        CVE-2024-1737.patch
+Patch13:        CVE-2024-1975.patch
+Patch14:        CVE-2024-4076.patch
+Patch15:        CVE-2024-11187.patch
+Patch16:        CVE-2025-8677.patch
+Patch17:        CVE-2025-40778.patch
+Patch18:        CVE-2025-40780.patch
 
 BuildRequires:  gcc
 BuildRequires:  json-c-devel
@@ -57,6 +58,9 @@ BuildRequires:  python3
 BuildRequires:  python3-ply
 BuildRequires:  sqlite-devel
 BuildRequires:  systemd-rpm-macros
+BuildRequires:  pkgconfig
+BuildRequires:  libcmocka-devel
+BuildRequires:  kyua
 
 Requires:       libuv
 Requires:       openssl
@@ -241,7 +245,8 @@ cp -r bin/dnssec{,-pkcs11}
 cp -r lib/dns{,-pkcs11}
 cp -r lib/ns{,-pkcs11}
 %patch10 -p1 -b .dist_pkcs11
-%autopatch -p1 -m 11
+%patch11 -p1 -b .kyua_pkcs11
+%autopatch -p1 -m 12
 
 libtoolize -c -f; aclocal -I libtool.m4 --force; autoconf -f
 
@@ -264,6 +269,7 @@ cp -frp contrib/dlz/modules build/contrib/dlz/modules
     --enable-fixed-rrset \
     --with-docbook-xsl=%{_datadir}/sgml/docbook/xsl-ns-stylesheets \
     --enable-full-report \
+    --with-cmocka \
 
 %make_build
 
@@ -277,6 +283,19 @@ for DIR in filesystem ldap mysql mysqldyn sqlite3; do
   make -C $DIR CFLAGS="-fPIC -I../include $CFLAGS $LDFLAGS"
 done
 popd
+
+%check
+CPUS=$(nproc)
+THREADS=$((CPUS>16 ? 16 : CPUS))
+export CI=true
+
+echo "Running BIND library unit tests..."
+make unit -j${THREADS} || {
+  echo "ERROR: unit tests failed"
+  cat tests/*/test-suite.log || true
+  exit 1
+}
+
 
 %install
 mkdir -p %{buildroot}%{_sysconfdir}/logrotate.d
@@ -623,6 +642,7 @@ fi;
 %changelog
 * Tue Oct 28 2025 Akhila Guruju <v-guakhila@microsoft.com> - 9.16.50-3
 - Patch CVE-2025-8677, CVE-2025-40778 & CVE-2025-40780
+- Add ptest
 
 * Wed Jun 25 2025 Archana Shettigar <v-shettigara@microsoft.com> - 9.16.50-2
 - Patch CVE-2024-11187
