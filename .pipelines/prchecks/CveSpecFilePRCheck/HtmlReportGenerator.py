@@ -1709,19 +1709,31 @@ class HtmlReportGenerator:
                     console.log('🔗 Report URL from backend:', result.report_url);
                     
                     // Backend updates the HTML in-place
-                    // If report_url is null, reload current page to see updates
-                    if (result.report_url) {
+                    // Update the button in the current DOM to show challenged state
+                    if (!result.report_url) {
+                        // Standard flow: Update button client-side (no reload needed)
+                        console.log('🎨 Updating button in DOM...');
+                        
+                        // Find the button for this issue
+                        const button = document.querySelector(`button[data-issue-hash="${currentIssueHash}"]`);
+                        if (button) {
+                            // Add 'challenged' class for styling
+                            button.classList.add('challenged');
+                            // Update button text
+                            button.textContent = 'Challenged';
+                            console.log('✅ Button updated in DOM');
+                            
+                            alert('✅ Challenge submitted successfully!');
+                        } else {
+                            console.error('❌ Could not find button to update');
+                            alert('✅ Challenge submitted successfully!\\n\\nPlease refresh the page to see updates.');
+                        }
+                    } else {
                         // Legacy: redirect to new report (for backwards compatibility)
                         const newUrl = result.report_url + '?_t=' + Date.now();
                         console.log('🔄 Redirecting to:', newUrl);
                         alert('✅ Challenge submitted successfully!\\n\\nRedirecting to updated report...');
                         window.location.href = newUrl;
-                    } else {
-                        // Standard flow: HTML updated in-place, reload to see changes
-                        console.log('🔄 HTML updated in-place, reloading page...');
-                        alert('✅ Challenge submitted successfully!\\n\\nReloading to show updates...');
-                        // Hard reload to bypass cache
-                        window.location.reload(true);
                     }
                 } else {
                     console.error('❌ Challenge submission failed:', response.status, result);
