@@ -11,7 +11,6 @@ Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
 Patch0:         rust-1.90-fixes.patch
-ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
