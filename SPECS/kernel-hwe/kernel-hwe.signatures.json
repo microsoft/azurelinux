@@ -5,6 +5,6 @@
     "config_aarch64": "4281645e8b008e9756e04e97961573f7f54430dbfb1bb9b495e33657c0819cee",
     "cpupower": "d7518767bf2b1110d146a49c7d42e76b803f45eb8bd14d931aa6d0d346fae985",
     "cpupower.service": "b057fe9e5d0e8c36f485818286b80e3eba8ff66ff44797940e99b1fd5361bb98",
-    "kernel-hwe-6.12.57.1.tar.gz": "be6f5b4d927f628538e2c515044f71389ba1ebec6bd8394dbb0495f0e256a64a"
+    "kernel-hwe-6.12.57.1.tar.gz": "859cc1f4becef5aae11fd0fa0d81a4431c1a80ce77a6c617a42caa3c02e2f780"
   }
 }
