@@ -1286,7 +1286,8 @@ class HtmlReportGenerator:
             max-width: 640px;
             max-height: 80vh;
             overflow: auto;
-            margin: auto;
+            margin: 24px auto;
+            padding: 0 16px;
         }
         
         /* Form data list */
