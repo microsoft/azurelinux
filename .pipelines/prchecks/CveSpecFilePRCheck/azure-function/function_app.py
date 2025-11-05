@@ -383,17 +383,25 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                 logger.info(f"✅ Downloaded HTML report ({len(original_html)} bytes)")
                 
                 # Update the button for this issue_hash
-                # Find: <button class="btn btn-sm challenge-btn" data-issue-hash="HASH"...>Challenge</button>
-                # Replace with: <button class="btn btn-sm challenge-btn challenged" data-issue-hash="HASH"...>Challenged</button>
+                # Find: <button class="btn btn-sm challenge-btn" data-issue-hash="HASH"...>
+                #           Challenge
+                #       </button>
+                # Replace with: <button class="btn btn-sm challenge-btn challenged" data-issue-hash="HASH"...>
+                #                   Challenged ✓
+                #               </button>
                 import re
                 
                 # Pattern to match button with this specific issue_hash
-                # Capture: (1) full button opening tag, (2) closing </button>
-                pattern = f'(<button[^>]*data-issue-hash="{re.escape(issue_hash)}"[^>]*>)Challenge(</button>)'
+                # NOTE: Button text has whitespace/newlines around it in generated HTML
+                # Capture: (1) full button opening tag, (2) whitespace, (3) button text, (4) whitespace, (5) closing tag
+                pattern = f'(<button[^>]*data-issue-hash="{re.escape(issue_hash)}"[^>]*>)(\\s*)(Challenge|Challenged)(\\s*)(</button>)'
                 
                 def update_button(match):
                     button_tag = match.group(1)  # Full opening <button...> tag
-                    button_close = match.group(2)  # </button>
+                    ws_before = match.group(2)   # Whitespace before text
+                    current_text = match.group(3)  # Current button text
+                    ws_after = match.group(4)    # Whitespace after text
+                    button_close = match.group(5)  # </button>
                     
                     # Add 'challenged' class if not already present
                     if 'challenged' not in button_tag:
@@ -404,10 +412,10 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                             button_tag
                         )
                     
-                    # Replace 'Challenge' text with 'Challenged ✓'
-                    return button_tag + 'Challenged ✓' + button_close
+                    # Replace button text with 'Challenged ✓', preserve whitespace
+                    return button_tag + ws_before + 'Challenged ✓' + ws_after + button_close
                 
-                updated_html = re.sub(pattern, update_button, original_html)
+                updated_html = re.sub(pattern, update_button, original_html, flags=re.DOTALL)
                 
                 if updated_html != original_html:
                     logger.info(f"✅ Updated challenge checkbox for issue {issue_hash}")
