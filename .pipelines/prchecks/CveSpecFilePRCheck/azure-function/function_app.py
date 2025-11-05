@@ -350,117 +350,98 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
         
         logger.info(f"✅✅✅ Challenge submitted successfully: {challenge_id}")
         
-        # Regenerate HTML report with updated analytics data
-        logger.info(f"📄 Attempting to regenerate HTML report with updated challenge data...")
+        # Update existing HTML report with challenge marker
+        # This is much simpler than regenerating - just download, modify checkbox, re-upload
+        logger.info(f"📄 Updating existing HTML report with challenge marker...")
         report_url = None
         
-        # Only regenerate HTML if we have spec data from a previous PR check run
-        if current_data.get("specs"):
-            logger.info(f"✅ Found {len(current_data.get('specs', []))} specs in analytics data")
-            try:
-                # Initialize HTML report generator
-                def get_severity_color(severity):
-                    colors = {"ERROR": "danger", "WARNING": "attention", "INFO": "success"}
-                    return colors.get(severity, "primary")
+        try:
+            # Find the latest HTML report in blob storage
+            latest_html_blob = None
+            list_blobs = blob_service_client.get_container_client(CONTAINER_NAME).list_blobs(
+                name_starts_with=f"PR-{pr_number}/report-"
+            )
+            
+            # Find the most recent report
+            blobs = sorted(list_blobs, key=lambda b: b.last_modified, reverse=True)
+            if blobs:
+                latest_html_blob = blobs[0].name
+                logger.info(f"📥 Found latest HTML report: {latest_html_blob}")
+            else:
+                logger.warning(f"⚠️  No HTML report found for PR-{pr_number}")
+                report_url = None
                 
-                def get_severity_emoji(severity):
-                    emojis = {"ERROR": "🔴", "WARNING": "🟡", "INFO": "🔵"}
-                    return emojis.get(severity, "⚪")
-                
-                html_generator = HtmlReportGenerator(get_severity_color, get_severity_emoji)
-                
-                # Convert analytics data to analysis_result format for HTML generation
-                # Create a minimal analysis result object
-                analysis_result = type('obj', (object,), {
-                    'spec_results': [],
-                    'summary_statistics': {
-                        'total_specs': len(current_data.get("specs", [])),
-                        'specs_with_issues': len([s for s in current_data.get("specs", []) if s.get("antipatterns")]),
-                        'total_issues': sum(len(s.get("antipatterns", [])) for s in current_data.get("specs", [])),
-                        'severity_counts': {
-                            'ERROR': sum(len([ap for ap in s.get("antipatterns", []) if ap.get("severity") == "ERROR"]) for s in current_data.get("specs", [])),
-                            'WARNING': sum(len([ap for ap in s.get("antipatterns", []) if ap.get("severity") == "WARNING"]) for s in current_data.get("specs", [])),
-                            'INFO': sum(len([ap for ap in s.get("antipatterns", []) if ap.get("severity") == "INFO"]) for s in current_data.get("specs", []))
-                        }
-                    },
-                    'overall_severity': 'ERROR' if any(ap.get("severity") == "ERROR" for s in current_data.get("specs", []) for ap in s.get("antipatterns", [])) else 'WARNING',
-                    'total_issues': sum(len(s.get("antipatterns", [])) for s in current_data.get("specs", []))
-                })()
-                
-                # Convert spec data to spec_results format
-                for spec_data in current_data.get("specs", []):
-                    spec_result = type('obj', (object,), {
-                        'spec_file_path': spec_data.get('spec_file', ''),
-                        'antipatterns': spec_data.get('antipatterns', []),
-                        'all_antipatterns': spec_data.get('antipatterns', [])
-                    })()
-                    analysis_result.spec_results.append(spec_result)
-                
-                # Build categorized_issues from analytics data (challenges)
-                categorized_issues = {
-                    'challenged_issues': {},
-                    'recurring_issues': {},
-                    'newly_resolved_issues': {}
-                }
-                
-                # Map challenges to issues
-                logger.info(f"📝 Building categorized_issues from {len(current_data.get('challenges', []))} challenges")
-                for challenge in current_data.get("challenges", []):
-                    issue_hash = challenge.get("issue_hash")
-                    if issue_hash:
-                        categorized_issues['challenged_issues'][issue_hash] = {
-                            'type': challenge.get('challenge_type', 'unknown'),
-                            'feedback': challenge.get('feedback_text', challenge.get('feedback', '')),
-                            'user': challenge.get('user', challenge.get('submitted_by', {}).get('username', 'Unknown')),
-                            'timestamp': challenge.get('timestamp', challenge.get('submitted_at', ''))
-                        }
-                
-                logger.info(f"📊 Categorized issues: {len(categorized_issues['challenged_issues'])} challenged")
-                
-                # Generate HTML report
-                logger.info(f"🎨 Generating HTML report body...")
-                html_body = html_generator.generate_report_body(
-                    analysis_result=analysis_result,
-                    pr_metadata=None,  # Optional, can add PR info if needed
-                    categorized_issues=categorized_issues
-                )
-                
-                logger.info(f"📄 Generating complete HTML page...")
-                html_content = html_generator.generate_complete_page(html_body, pr_number)
-                logger.info(f"✅ HTML generated successfully, size: {len(html_content)} bytes")
-                
-                # Upload HTML report to blob storage
-                timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H%M%SZ')
-                html_blob_name = f"PR-{pr_number}/report-{timestamp}.html"
-                logger.info(f"📤 Uploading to blob: {html_blob_name}")
-                
+            if latest_html_blob:
+                # Download existing HTML
                 html_blob_client = blob_service_client.get_blob_client(
                     container=CONTAINER_NAME,
-                    blob=html_blob_name
+                    blob=latest_html_blob
                 )
                 
-                html_blob_client.upload_blob(html_content, overwrite=True)
-                logger.info(f"✅ HTML report uploaded successfully")
+                blob_data = html_blob_client.download_blob()
+                original_html = blob_data.readall().decode('utf-8')
+                logger.info(f"✅ Downloaded HTML report ({len(original_html)} bytes)")
                 
-                # Generate the public URL for the report
-                report_url = f"{STORAGE_ACCOUNT_URL}/{CONTAINER_NAME}/{html_blob_name}"
-                logger.info(f"✅✅✅ HTML report regenerated and uploaded: {report_url}")
-                logger.info(f"🔗 Report URL will be returned to client: {report_url}")
+                # Update the button for this issue_hash
+                # Find: <button class="btn btn-sm challenge-btn" data-issue-hash="HASH"...>Challenge</button>
+                # Replace with: <button class="btn btn-sm challenge-btn challenged" data-issue-hash="HASH"...>Challenged</button>
+                import re
                 
-            except Exception as html_error:
-                logger.error(f"❌❌❌ Failed to regenerate HTML report!")
-                logger.error(f"   Error type: {type(html_error).__name__}")
-                logger.error(f"   Error message: {str(html_error)}")
-                import traceback
-                logger.error(f"   Full traceback:")
-                logger.error(traceback.format_exc())
-                report_url = None
-                logger.warning(f"⚠️  report_url set to None due to error")
-        else:
-            logger.warning(f"⚠️  No 'specs' data in analytics.json - cannot regenerate HTML")
-            logger.warning(f"   This usually means analytics.json was created by first challenge before PR check ran")
-            logger.warning(f"   Frontend will use fallback reload which will fetch report from next PR check run")
+                # Pattern to match button with this specific issue_hash
+                # Capture: (1) full button opening tag, (2) closing </button>
+                pattern = f'(<button[^>]*data-issue-hash="{re.escape(issue_hash)}"[^>]*>)Challenge(</button>)'
+                
+                def update_button(match):
+                    button_tag = match.group(1)  # Full opening <button...> tag
+                    button_close = match.group(2)  # </button>
+                    
+                    # Add 'challenged' class if not already present
+                    if 'challenged' not in button_tag:
+                        # Find the class attribute and add 'challenged' to it
+                        button_tag = re.sub(
+                            r'(class="[^"]*challenge-btn)([^"]*")',
+                            r'\1 challenged\2',
+                            button_tag
+                        )
+                    
+                    # Replace 'Challenge' text with 'Challenged ✓'
+                    return button_tag + 'Challenged ✓' + button_close
+                
+                updated_html = re.sub(pattern, update_button, original_html)
+                
+                if updated_html != original_html:
+                    logger.info(f"✅ Updated challenge checkbox for issue {issue_hash}")
+                    
+                    # Upload updated HTML with new timestamp
+                    timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H%M%SZ')
+                    new_html_blob_name = f"PR-{pr_number}/report-{timestamp}.html"
+                    logger.info(f"📤 Uploading updated HTML to: {new_html_blob_name}")
+                    
+                    new_html_blob_client = blob_service_client.get_blob_client(
+                        container=CONTAINER_NAME,
+                        blob=new_html_blob_name
+                    )
+                    
+                    new_html_blob_client.upload_blob(updated_html, overwrite=True)
+                    logger.info(f"✅ Updated HTML uploaded successfully")
+                    
+                    # Return the new URL
+                    report_url = f"{STORAGE_ACCOUNT_URL}/{CONTAINER_NAME}/{new_html_blob_name}"
+                    logger.info(f"✅✅✅ Updated HTML report URL: {report_url}")
+                else:
+                    logger.warning(f"⚠️  Checkbox already checked or issue_hash not found in HTML")
+                    # Still return the original URL
+                    report_url = f"{STORAGE_ACCOUNT_URL}/{CONTAINER_NAME}/{latest_html_blob}"
+                    
+        except Exception as html_error:
+            logger.error(f"❌ Failed to update HTML report!")
+            logger.error(f"   Error type: {type(html_error).__name__}")
+            logger.error(f"   Error message: {str(html_error)}")
+            import traceback
+            logger.error(f"   Full traceback:")
+            logger.error(traceback.format_exc())
             report_url = None
+            logger.warning(f"⚠️  report_url set to None due to error")
         
         # Post GitHub comment about the challenge
         try:
