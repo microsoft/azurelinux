@@ -1723,6 +1723,11 @@ class HtmlReportGenerator:
                             button.textContent = 'Challenged';
                             console.log('✅ Button updated in DOM');
                             
+                            // Update the issue counts
+                            // Note: "Total Issues" stays the same (all detected issues)
+                            // But we could add a "Challenged Issues" counter if needed
+                            console.log('📊 Counts remain unchanged (total issues = all detected issues)');
+                            
                             alert('✅ Challenge submitted successfully!');
                         } else {
                             console.error('❌ Could not find button to update');
