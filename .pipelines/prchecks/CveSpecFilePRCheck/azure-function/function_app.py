@@ -391,10 +391,26 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                 #               </button>
                 import re
                 
+                # DEBUG: Find the button in HTML to see exact structure
+                button_search = f'data-issue-hash="{issue_hash}"'
+                if button_search in original_html:
+                    # Find and log the button HTML snippet
+                    start_idx = original_html.find(button_search)
+                    snippet_start = max(0, start_idx - 200)
+                    snippet_end = min(len(original_html), start_idx + 300)
+                    snippet = original_html[snippet_start:snippet_end]
+                    logger.info(f"🔍 Found button in HTML:")
+                    logger.info(f"   Snippet: {repr(snippet[:500])}")
+                else:
+                    logger.error(f"❌ Button with issue_hash '{issue_hash}' NOT FOUND in HTML!")
+                    logger.error(f"   HTML size: {len(original_html)} bytes")
+                    logger.error(f"   Searching for: {button_search}")
+                
                 # Pattern to match button with this specific issue_hash
                 # NOTE: Button text has whitespace/newlines around it in generated HTML
                 # Capture: (1) full button opening tag, (2) whitespace, (3) button text, (4) whitespace, (5) closing tag
                 pattern = f'(<button[^>]*data-issue-hash="{re.escape(issue_hash)}"[^>]*>)(\\s*)(Challenge|Challenged)(\\s*)(</button>)'
+                logger.info(f"🔍 Regex pattern: {pattern[:200]}...")
                 
                 def update_button(match):
                     button_tag = match.group(1)  # Full opening <button...> tag
@@ -402,6 +418,8 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                     current_text = match.group(3)  # Current button text
                     ws_after = match.group(4)    # Whitespace after text
                     button_close = match.group(5)  # </button>
+                    
+                    logger.info(f"🔧 Updating button: current_text='{current_text}'")
                     
                     # Add 'challenged' class if not already present
                     if 'challenged' not in button_tag:
@@ -411,33 +429,38 @@ def submit_challenge(req: func.HttpRequest) -> func.HttpResponse:
                             r'\1 challenged\2',
                             button_tag
                         )
+                        logger.info(f"✅ Added 'challenged' class to button")
                     
-                    # Replace button text with 'Challenged ✓', preserve whitespace
-                    return button_tag + ws_before + 'Challenged ✓' + ws_after + button_close
+                    # Replace button text: "Challenge" -> "Challenged" (CSS adds ✓ via ::before)
+                    new_text = 'Challenged' if current_text == 'Challenge' else current_text
+                    return button_tag + ws_before + new_text + ws_after + button_close
                 
                 updated_html = re.sub(pattern, update_button, original_html, flags=re.DOTALL)
                 
+                # DEBUG: Check if regex matched anything
+                match_count = len(re.findall(pattern, original_html, flags=re.DOTALL))
+                logger.info(f"🔍 Regex matched {match_count} button(s)")
+                
                 if updated_html != original_html:
                     logger.info(f"✅ Updated challenge checkbox for issue {issue_hash}")
+                    logger.info(f"   HTML changed: {len(original_html)} -> {len(updated_html)} bytes")
                     
-                    # Upload updated HTML with new timestamp
-                    timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H%M%SZ')
-                    new_html_blob_name = f"PR-{pr_number}/report-{timestamp}.html"
-                    logger.info(f"📤 Uploading updated HTML to: {new_html_blob_name}")
+                    # OVERWRITE the existing HTML file (don't create new one)
+                    # This allows the user's current page to refresh and see the update
+                    logger.info(f"📤 Overwriting existing HTML: {latest_html_blob}")
                     
-                    new_html_blob_client = blob_service_client.get_blob_client(
-                        container=CONTAINER_NAME,
-                        blob=new_html_blob_name
-                    )
+                    html_blob_client.upload_blob(updated_html, overwrite=True)
+                    logger.info(f"✅ HTML updated in-place successfully")
                     
-                    new_html_blob_client.upload_blob(updated_html, overwrite=True)
-                    logger.info(f"✅ Updated HTML uploaded successfully")
-                    
-                    # Return the new URL
-                    report_url = f"{STORAGE_ACCOUNT_URL}/{CONTAINER_NAME}/{new_html_blob_name}"
-                    logger.info(f"✅✅✅ Updated HTML report URL: {report_url}")
+                    # Return success without URL - frontend will reload the page
+                    report_url = None  # Signal frontend to reload current page
+                    logger.info(f"✅✅✅ HTML updated - frontend should reload current page")
                 else:
-                    logger.warning(f"⚠️  Checkbox already checked or issue_hash not found in HTML")
+                    logger.warning(f"⚠️  Regex did NOT modify HTML!")
+                    logger.warning(f"   Possible reasons:")
+                    logger.warning(f"   1. Pattern didn't match any buttons")
+                    logger.warning(f"   2. Button already has 'challenged' class AND text is already 'Challenged'")
+                    logger.warning(f"   3. Button structure doesn't match expected format")
                     # Still return the original URL
                     report_url = f"{STORAGE_ACCOUNT_URL}/{CONTAINER_NAME}/{latest_html_blob}"
                     
