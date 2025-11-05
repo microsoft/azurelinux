@@ -1708,21 +1708,20 @@ class HtmlReportGenerator:
                     console.log('✅ Challenge submitted successfully');
                     console.log('🔗 Report URL from backend:', result.report_url);
                     
-                    // The backend regenerates the report and returns the new URL
+                    // Backend updates the HTML in-place
+                    // If report_url is null, reload current page to see updates
                     if (result.report_url) {
-                        // Redirect to the updated report immediately
+                        // Legacy: redirect to new report (for backwards compatibility)
                         const newUrl = result.report_url + '?_t=' + Date.now();
                         console.log('🔄 Redirecting to:', newUrl);
                         alert('✅ Challenge submitted successfully!\\n\\nRedirecting to updated report...');
                         window.location.href = newUrl;
                     } else {
-                        // Fallback: reload current page with cache-busting
-                        console.warn('⚠️  No report_url in response, using fallback reload');
-                        alert('✅ Challenge submitted successfully!\\n\\nReloading report...');
-                        const url = new URL(window.location.href);
-                        url.searchParams.set('_t', Date.now());
-                        console.log('🔄 Fallback reload to:', url.toString());
-                        window.location.href = url.toString();
+                        // Standard flow: HTML updated in-place, reload to see changes
+                        console.log('🔄 HTML updated in-place, reloading page...');
+                        alert('✅ Challenge submitted successfully!\\n\\nReloading to show updates...');
+                        // Hard reload to bypass cache
+                        window.location.reload(true);
                     }
                 } else {
                     console.error('❌ Challenge submission failed:', response.status, result);
