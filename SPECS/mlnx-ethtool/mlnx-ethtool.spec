@@ -1,6 +1,6 @@
 Name:		 mlnx-ethtool
 Version:	 6.9
-Release:	 3%{?dist}
+Release:	 4%{?dist}
 Group:		 Utilities
 Summary:	 Settings tool for Ethernet and other network devices
 License:	 GPLv2
@@ -11,6 +11,10 @@ Buildroot:	 /var/tmp/%{name}-%{version}-build
 Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ethtool-6.9.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  libmnl-devel
+
+Provides:       ethtool
+# To avoid file conflicts
+Conflicts:      ethtool
 
 %description
 This utility allows querying and changing settings such as speed,
@@ -40,6 +44,13 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 
 
 %changelog
+* Tue Nov 11 2025 Mayank Singh <mayansingh@microsoft.com> - 6.9-4
+- Updated dependency handling for kexec-tools:
+  Changed from hard dependency on a single package.
+  Allows installation to satisfy dependency with either `ethtool` or `mlnx-ethtool`.
+  Ensures flexibility for image builds and user choice at install time.
+  Added mutual exclusivity between providers to prevent file conflicts.
+
 * Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 6.9-3
 - Enable ARM64 build by removing ExclusiveArch
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 6.9-2

@@ -6,7 +6,7 @@
 Summary:        The kexec/kdump userspace component
 Name:           kexec-tools
 Version:        2.0.27
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -59,7 +59,8 @@ Requires(preun): systemd
 Requires(postun): systemd
 Requires(pre): coreutils sed zlib
 Requires: dracut
-Requires: ethtool
+Requires: (ethtool or mlnx-ethtool)
+Recommends: ethtool
 Requires: awk
 Requires: squashfs-tools
 %{?grub2_configuration_requires}
@@ -251,7 +252,6 @@ then
 	mv /etc/sysconfig/kdump.new /etc/sysconfig/kdump
 fi
 
-
 %postun
 %systemd_postun_with_restart kdump.service
 %grub2_postun
@@ -330,6 +330,13 @@ done
 /usr/share/makedumpfile/
 
 %changelog
+* Tue Nov 11 2025 Mayank Singh <mayansingh@microsoft.com> - 2.0.27-8
+- Updated dependency handling for kexec-tools:
+  Changed from hard dependency on a single package.
+  Allows installation to satisfy dependency with either `ethtool` or `mlnx-ethtool`.
+  Ensures flexibility for image builds and user choice at install time.
+  Added mutual exclusivity between providers to prevent file conflicts.
+
 * Tue Jul 09 2024 Chris Co <chrco@microsoft.com> - 2.0.27-7
 - Remove requires on dhcp-client
 
