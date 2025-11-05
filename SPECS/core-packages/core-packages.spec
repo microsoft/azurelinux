@@ -141,10 +141,6 @@ Requires:       azurelinux-repos
 Requires:       ncurses-libs
 Requires:       openssl-compat
 Requires:       openssl-compat-libs
-Requires:       openssl-compat-devel
-Requires:       openssl-compat-perl
-Requires:       openssl-compat-static
-Requires:       openssl-compat-debuginfo
 Requires:       readline
 Requires:       rpm
 Requires:       rpm-libs
