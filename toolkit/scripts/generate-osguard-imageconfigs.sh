@@ -50,13 +50,14 @@ if [[ ! -d "$TPL_DIR" ]]; then
 	exit 2
 fi
 
-
 # List of generation jobs:
 #   "<base-template-filename>|<delta-template-filename>|<output-filename>"
 # Add new entries here to support additional outputs.
 GEN_JOBS=(
 	"osguard-base.yaml|osguard-no-ci-delta.yaml|osguard-amd64.yaml"
 	"osguard-base.yaml|osguard-ci-delta.yaml|osguard-ci-amd64.yaml"
+	"osguard-base.yaml|osguard-arm64-delta.yaml|osguard-arm64.yaml"
+	"osguard-base.yaml|osguard-ci-arm64-delta.yaml|osguard-ci-arm64.yaml"
 )
 
 run_generate() {
