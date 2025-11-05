@@ -99,8 +99,13 @@ class HtmlReportGenerator:
         if pr_metadata:
             html += self._generate_pr_info_section(pr_metadata)
         
-        # Add stats grid
-        html += self._generate_stats_grid(stats, analysis_result.total_issues)
+        # Calculate challenged issues count
+        challenged_count = 0
+        if categorized_issues and 'challenged_issues' in categorized_issues:
+            challenged_count = len(categorized_issues['challenged_issues'])
+        
+        # Add stats grid with open issues count
+        html += self._generate_stats_grid(stats, analysis_result.total_issues, challenged_count)
         
         # Add package details with challenge data
         html += self._generate_spec_cards(analysis_result.spec_results, categorized_issues)
@@ -156,14 +161,23 @@ class HtmlReportGenerator:
     </div>
 """
     
-    def _generate_stats_grid(self, stats: dict, total_issues: int) -> str:
+    def _generate_stats_grid(self, stats: dict, total_issues: int, challenged_count: int = 0) -> str:
         """Generate statistics cards grid."""
+        open_issues = total_issues - challenged_count
         return f"""
     <div class="d-flex flex-wrap mt-3" style="gap: 12px;">
         <div class="Box flex-1 stats-card">
             <div class="Box-body d-flex flex-column">
                 <span class="text-secondary text-small">Specs Analyzed</span>
                 <span class="f1 text-bold">{stats['total_specs']}</span>
+            </div>
+        </div>
+        
+        <div class="Box flex-1 stats-card">
+            <div class="Box-body d-flex flex-column">
+                <span class="text-secondary text-small">Open Issues</span>
+                <span class="f1 text-bold color-fg-attention" id="open-issues-count">{open_issues}</span>
+                <span class="text-secondary text-small" id="open-issues-detail">{open_issues} of {total_issues} unchallenged</span>
             </div>
         </div>
         
@@ -1498,11 +1512,11 @@ class HtmlReportGenerator:
         
         // Update notification badge
         function updateNotificationBadge() {
-            const totalIssuesEl = document.getElementById('total-issues-count');
+            const openIssuesEl = document.getElementById('open-issues-count');
             const notificationBadge = document.getElementById('notification-badge');
             
-            if (totalIssuesEl && notificationBadge) {
-                const count = parseInt(totalIssuesEl.textContent) || 0;
+            if (openIssuesEl && notificationBadge) {
+                const count = parseInt(openIssuesEl.textContent) || 0;
                 notificationBadge.textContent = count;
                 if (count > 0) {
                     notificationBadge.classList.add('active');
@@ -1722,6 +1736,25 @@ class HtmlReportGenerator:
                             // Update button text
                             button.textContent = 'Challenged';
                             console.log('✅ Button updated in DOM');
+                            
+                            // Update counters
+                            const openIssuesEl = document.getElementById('open-issues-count');
+                            const openIssuesDetailEl = document.getElementById('open-issues-detail');
+                            const totalIssuesEl = document.getElementById('total-issues-count');
+                            
+                            if (openIssuesEl && totalIssuesEl) {
+                                const currentOpen = parseInt(openIssuesEl.textContent) || 0;
+                                const newOpen = Math.max(0, currentOpen - 1);
+                                const total = parseInt(totalIssuesEl.textContent) || 0;
+                                
+                                openIssuesEl.textContent = newOpen;
+                                if (openIssuesDetailEl) {
+                                    openIssuesDetailEl.textContent = `${newOpen} of ${total} unchallenged`;
+                                }
+                                
+                                // Update notification badge
+                                updateNotificationBadge();
+                            }
                             
                             alert('✅ Challenge submitted successfully!');
                         } else {
