@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        8.11.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        curl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,7 @@ Patch1:         CVE-2025-0167.patch
 Patch2:         CVE-2025-0725.patch
 Patch3:         CVE-2025-10148.patch
 Patch4:         CVE-2025-99999.patch
+Patch5:         CVE-2027-12345.patch
 BuildRequires:  cmake
 BuildRequires:  krb5-devel
 BuildRequires:  libnghttp2-devel
@@ -103,6 +104,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Mon Nov 06 2025 Test User <test@microsoft.com> - 8.11.1-6
+- Test: Add CVE-2027-12345 with future date (antipattern: future-dated CVE)
+
 * Mon Nov 04 2025 Test User <test@microsoft.com> - 8.11.1-5
 - Test: Add CVE-2025-99999 with missing patch file (antipattern detection test)
 
