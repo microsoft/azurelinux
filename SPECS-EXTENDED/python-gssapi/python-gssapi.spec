@@ -4,7 +4,7 @@ Distribution:   Azure Linux
 
 Name:           python-gssapi
 Version:        1.10.0
-Release:        11%{?dist}
+Release:        1%{?dist}
 Summary:        Python Bindings for GSSAPI (RFC 2743/2744 and extensions)
 
 License:        ISC
