@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        36%{?dist}
+Release:        37%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -66,6 +66,8 @@ Patch42:        openssl-1.1.1-Only-free-the-read-buffers-if-we-re-not-using-them
 Patch43:        openssl-1.1.1-jitterentropy-fix-intermittent-fips-selftest-failure.patch
 Patch44:        CVE-2024-5535.patch
 Patch45:        openssl-1.1.1-Fix-timing-side-channel-in-ECDSA-signature-computation.patch
+Patch46:        openssl-1.1.1-fix-incorrect-check-of-unwrapped-key-size.patch
+
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
@@ -329,6 +331,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Thu Nov 06 2025 Lynsey Rydberg <lyrydber@microsoft.com> - 1.1.1k-37
+- Fix incorrect check of unwrapped key size
+
 * Wed Mar 26 2025 Tobias Brick <tobiasb@microsoft.com> - 1.1.1k-36
 - Fix timing side-channel in ECDSA signature computation.
 
