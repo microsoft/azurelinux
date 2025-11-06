@@ -60,6 +60,8 @@ sed -i "s,59,51,;s,Temple Place,Franklin Street,;s,Suite 330,Fifth Floor,;s,0211
 %{ant} jar javadoc
 
 %install
+mv target/site/apidocs/legal/ADDITIONAL_LICENSE_INFO .
+mv target/site/apidocs/legal/LICENSE .
 # jar
 install -dm 0755 %{buildroot}%{_javadir}
 install -pm 0644 target/%{oname}-%{namedversion}.jar %{buildroot}%{_javadir}/%{oname}.jar
@@ -71,7 +73,6 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{oname}.pom
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
-mv target/site/apidocs/legal/ADDITIONAL_LICENSE_INFO .
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
