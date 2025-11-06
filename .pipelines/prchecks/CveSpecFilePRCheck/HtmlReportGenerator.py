@@ -1063,7 +1063,7 @@ class HtmlReportGenerator:
         
         /* Stats cards */
         .stats-card {
-            transition: all 0.2s ease-in-out;
+            transition: all 0.25s ease-in-out;
         }
         
         .stats-card:hover {
@@ -1079,24 +1079,29 @@ class HtmlReportGenerator:
         .filterable-stat::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 6px;
-            border: 2px solid transparent;
-            transition: all 0.2s ease-in-out;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 8px;
+            border: 3px solid transparent;
+            transition: all 0.25s ease-in-out;
             pointer-events: none;
         }
         
         .filterable-stat:hover::before {
             border-color: var(--color-accent-emphasis);
-            box-shadow: 0 0 0 4px var(--color-accent-subtle);
+            box-shadow: 0 0 0 6px var(--color-accent-subtle), 0 0 20px rgba(9, 105, 218, 0.3);
         }
         
         .filterable-stat:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--color-shadow-large);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(140, 149, 159, 0.3);
+            background-color: var(--color-canvas-subtle);
+        }
+        
+        [data-color-mode="dark"] .filterable-stat:hover {
+            box-shadow: 0 12px 24px rgba(1, 4, 9, 0.5);
         }
         
         .filterable-stat.filter-active {
