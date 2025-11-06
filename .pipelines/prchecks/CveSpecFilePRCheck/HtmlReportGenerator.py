@@ -54,7 +54,10 @@ class HtmlReportGenerator:
             if os.path.exists(logo_path):
                 with open(logo_path, 'rb') as f:
                     logo_data = base64.b64encode(f.read()).decode('utf-8')
+                    logger.info(f"Successfully loaded logo: {logo_path} ({len(logo_data)} bytes base64)")
                     return f"data:image/png;base64,{logo_data}"
+            else:
+                logger.warning(f"Logo file not found: {logo_path}")
         except Exception as e:
             logger.warning(f"Failed to load logo {logo_path}: {e}")
         
@@ -416,10 +419,9 @@ class HtmlReportGenerator:
     <title>PR #{pr_number} · Code Review Report</title>
     <!-- GitHub-like fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="{radar_web_logo}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{radar_web_logo}">
-    <link rel="shortcut icon" href="{radar_web_logo}">
+    <!-- Favicon - RADAR Logo -->
+    <link rel="icon" href="{radar_web_logo}" type="image/png">
+    <link rel="apple-touch-icon" href="{radar_web_logo}">
     <style>
 {css}
     </style>
