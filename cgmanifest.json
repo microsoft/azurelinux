@@ -435,8 +435,8 @@
         "type": "other",
         "other": {
           "name": "apache-commons-net",
-          "version": "3.9.0",
-          "downloadUrl": "https://archive.apache.org/dist/commons/net/source/commons-net-3.9.0-src.tar.gz"
+          "version": "3.11.0",
+          "downloadUrl": "https://archive.apache.org/dist/commons/net/source/commons-net-3.11.0-src.tar.gz"
         }
       }
     },
