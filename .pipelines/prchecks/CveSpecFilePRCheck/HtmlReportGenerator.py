@@ -417,7 +417,9 @@ class HtmlReportGenerator:
     <!-- GitHub-like fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{radar_web_logo}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{radar_web_logo}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{radar_web_logo}">
+    <link rel="shortcut icon" href="{radar_web_logo}">
     <style>
 {css}
     </style>
