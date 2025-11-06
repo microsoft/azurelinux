@@ -69,6 +69,8 @@ cp %{SOURCE1} build.xml
   jar javadoc
 
 %install
+mv target/site/apidocs/legal/ADDITIONAL_LICENSE_INFO .
+mv target/site/apidocs/legal/LICENSE .
 # pom
 install -dm 0755 %{buildroot}%{_javadir}
 install -pm 0644 target/%{short_name}-%{version}.jar %{buildroot}%{_javadir}/%{short_name}.jar
