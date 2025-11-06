@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "apache-commons-net-build.xml": "53417a74df5aa814974b1280e865d8743a4fd7d9c94de3241aef32190ce4f91b",
-  "commons-net-3.9.0-src.tar.gz": "7235fb3d5cdc45032edd7b4efcd47a722e184210150b57b77f813aa440a78163"
+  "apache-commons-net-build.xml": "8b443492e8d6ee653df12c019fd65cf4c9843108c46ec9aa3e126dcf16ccf724",
+  "commons-net-3.11.0-src.tar.gz": "e52a91b3fad129cbe8401bb6477c65596b12b9eebb554342a6e6fe13f77f9ff6"
  }
 }

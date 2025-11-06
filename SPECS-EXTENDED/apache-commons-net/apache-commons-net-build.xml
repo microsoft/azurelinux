@@ -10,7 +10,7 @@
   
   <property name="project.groupId" value="commons-net"/>
   <property name="project.artifactId" value="commons-net"/>
-  <property name="project.version" value="3.9.0"/>
+  <property name="project.version" value="3.11.0"/>
   <property name="project.name" value="Apache Commons Net"/>
   <property name="project.description" value="Apache Commons Net library contains a collection of network utilities and protocol implementations. Supported protocols include: Echo, Finger, FTP, NNTP, NTP, POP3(S), SMTP(S), Telnet, Whois"/>
   <property name="project.url" value="http://commons.apache.org/proper/commons-net/"/>
@@ -19,7 +19,7 @@
   <property name="project.organization.name" value="The Apache Software Foundation"/>
   <property name="project.organization.id" value="org.apache"/>
   
-  <property name="spec.version" value="3.9"/>
+  <property name="spec.version" value="3.11"/>
   
   <property name="compiler.source" value="1.8"/>
   <property name="compiler.target" value="${compiler.source}"/>

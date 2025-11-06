@@ -22,7 +22,7 @@ Distribution:   Azure Linux
 %global short_name   commons-%{base_name}
 %bcond_with tests
 Name:           apache-%{short_name}
-Version:        3.9.0
+Version:        3.11.0
 Release:        1%{?dist}
 Summary:        Internet protocol suite Java library
 License:        Apache-2.0
