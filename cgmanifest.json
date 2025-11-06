@@ -404,16 +404,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "apache-commons-lang",
-          "version": "2.6",
-          "downloadUrl": "http://archive.apache.org/dist/commons/lang/source/commons-lang-2.6-src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "apache-commons-lang3",
           "version": "3.8.1",
           "downloadUrl": "https://archive.apache.org/dist/commons/lang/source/commons-lang3-3.8.1-src.tar.gz"
