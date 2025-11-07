@@ -15,7 +15,7 @@ Distribution:   Mariner
 Source0:        https://github.com/opencontainers/runc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  git
-BuildRequires:  golang => 1.16
+BuildRequires:  msft-golang < 1.25
 BuildRequires:  go-md2man
 BuildRequires:  libseccomp-devel
 BuildRequires:  make
@@ -59,6 +59,7 @@ make install-man DESTDIR="%{buildroot}" PREFIX="%{_prefix}"
 %changelog
 * Fri Nov 07 2025 Nan Liu <liunan@microsoft.com> - 1.3.3-1
 - Upgrade to 1.3.3
+- Set BR: msft-golang < 1.25
 - Fix CVE-2025-31133, CVE-2025-52565, CVE-2025-52881
 
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.1.9-9
