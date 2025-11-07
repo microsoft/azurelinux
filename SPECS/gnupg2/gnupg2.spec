@@ -1,13 +1,14 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
 Version:        2.4.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Cryptography.
 URL:            https://gnupg.org/index.html
 Source0:        https://gnupg.org/ftp/gcrypt/gnupg/gnupg-%{version}.tar.bz2
+Patch0:         CVE-2025-30258.patch
 BuildRequires:  zlib-devel
 BuildRequires:  bzip2-devel
 BuildRequires:  readline-devel
@@ -48,7 +49,7 @@ Requires: %{name} = %{version}-%{release}
 These are the additional language files of gnupg2
 
 %prep
-%autosetup -n gnupg-%{version}
+%autosetup -p1 -n gnupg-%{version}
 
 %build
 %configure \
@@ -89,6 +90,9 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %defattr(-,root,root)
 
 %changelog
+* Wed Nov 05 2025 Ratiranjan Behera <v-ratbehera@microsoft.com> - 2.4.0-3
+- Add patch for CVE-2025-30258
+
 * Tue Mar 21 2023 Muhammad Falak <mwani@microsoft.com> - 2.4.0-2
 - Add correct version for libgpg-error-devel as a BR
 
