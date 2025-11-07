@@ -420,7 +420,8 @@ class HtmlReportGenerator:
     <!-- GitHub-like fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Favicon - RADAR Logo -->
-    <link rel="icon" href="{radar_web_logo}" type="image/png">
+    <link rel="icon" type="image/png" href="{radar_web_logo}">
+    <link rel="shortcut icon" type="image/png" href="{radar_web_logo}">
     <link rel="apple-touch-icon" href="{radar_web_logo}">
     <style>
 {css}
@@ -1063,45 +1064,44 @@ class HtmlReportGenerator:
         
         /* Stats cards */
         .stats-card {
-            transition: all 0.25s ease-in-out;
+            transition: all 0.3s ease-in-out;
+            position: relative;
+        }
+        
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 8px;
+            border: 4px solid transparent;
+            transition: all 0.3s ease-in-out;
+            pointer-events: none;
         }
         
         .stats-card:hover {
-            box-shadow: var(--color-shadow-medium);
-            transform: translateY(-2px);
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 15px 30px rgba(140, 149, 159, 0.4);
+            background-color: var(--color-canvas-subtle);
+        }
+        
+        .stats-card:hover::before {
+            border-color: var(--color-accent-emphasis);
+            box-shadow: 0 0 0 8px var(--color-accent-subtle), 0 0 30px rgba(9, 105, 218, 0.4);
+        }
+        
+        [data-color-mode="dark"] .stats-card:hover {
+            box-shadow: 0 15px 30px rgba(1, 4, 9, 0.6);
+        }
+        
+        [data-color-mode="dark"] .stats-card:hover::before {
+            box-shadow: 0 0 0 8px var(--color-accent-subtle), 0 0 30px rgba(88, 166, 255, 0.4);
         }
         
         .filterable-stat {
             cursor: pointer;
-            position: relative;
-        }
-        
-        .filterable-stat::before {
-            content: '';
-            position: absolute;
-            top: -3px;
-            left: -3px;
-            right: -3px;
-            bottom: -3px;
-            border-radius: 8px;
-            border: 3px solid transparent;
-            transition: all 0.25s ease-in-out;
-            pointer-events: none;
-        }
-        
-        .filterable-stat:hover::before {
-            border-color: var(--color-accent-emphasis);
-            box-shadow: 0 0 0 6px var(--color-accent-subtle), 0 0 20px rgba(9, 105, 218, 0.3);
-        }
-        
-        .filterable-stat:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 12px 24px rgba(140, 149, 159, 0.3);
-            background-color: var(--color-canvas-subtle);
-        }
-        
-        [data-color-mode="dark"] .filterable-stat:hover {
-            box-shadow: 0 12px 24px rgba(1, 4, 9, 0.5);
         }
         
         .filterable-stat.filter-active {
