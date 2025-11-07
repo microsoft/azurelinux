@@ -1,12 +1,12 @@
 Summary:	Backup and restore utilities for the XFS filesystem
 Name:		xfsdump
-Version:	3.1.12
-Release:	6%{?dist}
+Version:	3.2.0
+Release:	1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 # Licensing based on generic "GNU GENERAL PUBLIC LICENSE"
 # in source, with no mention of version.
-License:	GPL-1.0-or-later
+License:	GPL-2.0-or-later
 Source0:	https://kernel.org/pub/linux/utils/fs/xfs/%{name}/%{name}-%{version}.tar.xz
 Source1:	https://kernel.org/pub/linux/utils/fs/xfs/%{name}/%{name}-%{version}.tar.sign
 Source2:	https://git.kernel.org/pub/scm/docs/kernel/pgpkeys.git/plain/keys/13F703E6C11CF6F0.asc
@@ -65,6 +65,10 @@ mkdir -p $RPM_BUILD_ROOT/%{_sharedstatedir}/xfsdump/inventory
 %{_sharedstatedir}/xfsdump/inventory
 
 %changelog
+* Thu Aug 28 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.2.0-1
+- Upgrade to 3.2.0
+- License verified.
+
 * Fri Mar 14 2025 Jyoti kanase <v-jykanase@microsoft.com> - 3.1.12-6
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
