@@ -1,10 +1,10 @@
 {
- "Signatures": {
-  "10-auth_mellon.conf": "bf68b6c91ef98cd535b7032ce6b706b73a196d6997af6c2faf470e657701de5b",
-  "README.redhat.rst": "dd7d64ef0d6da199263029c17d19bec891a896da29b09ccf59a2f35220183cea",
-  "auth_mellon.conf": "56f9b29f88ac1cda0e51ae4cbd8500477a1c47515d9a85ffcb1fc9f4b85ec6e5",
-  "mellon_create_metadata.sh": "3304a5713b79124ce06b1af1b9e043fa6b6b0a1bf703ef02633ee789278dbecc",
-  "mod_auth_mellon-0.16.0.tar.gz": "ee313045a58b18e34b11358f94dd4e683c38b0be83258f5d095bbb99f1801173",
-  "mod_auth_mellon.conf": "a4dcebeeed8f9698f03cb7b2048e6e1aca7400245f8e08efd983da3271b43b24"
- }
-}
+    "Signatures": {
+     "10-auth_mellon.conf": "bf68b6c91ef98cd535b7032ce6b706b73a196d6997af6c2faf470e657701de5b",
+     "README.redhat.rst": "dd7d64ef0d6da199263029c17d19bec891a896da29b09ccf59a2f35220183cea",
+     "auth_mellon.conf": "56f9b29f88ac1cda0e51ae4cbd8500477a1c47515d9a85ffcb1fc9f4b85ec6e5",
+     "mellon_create_metadata.sh": "bee95d49865773284494aae06d440b4e46ee72c101115b4cb24ec2546bea8cb0",
+     "mod_auth_mellon-0.19.0.tar.gz": "998f9ad77466c9b302da7f20d5562d2db649bcec438bbf9149841d5634554afb",
+     "mod_auth_mellon.conf": "a4dcebeeed8f9698f03cb7b2048e6e1aca7400245f8e08efd983da3271b43b24"
+    }
+   }
