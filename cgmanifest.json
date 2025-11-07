@@ -8442,7 +8442,7 @@
         "other": {
           "name": "knem",
           "version": "1.1.4.90mlnx3",
-          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/knem-1.1.4.90mlnx3.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/knem-1.1.4.90mlnx3.tar.gz"
         }
       }
     },
@@ -8452,7 +8452,7 @@
         "other": {
           "name": "knem-hwe",
           "version": "1.1.4.90mlnx3",
-          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/knem-1.1.4.90mlnx3.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/knem-1.1.4.90mlnx3.tar.gz"
         }
       }
     },
@@ -30899,7 +30899,7 @@
         "other": {
           "name": "xpmem",
           "version": "2.7.4",
-          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/xpmem-2.7.4.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xpmem-2.7.4.tar.gz"
         }
       }
     },
@@ -30909,7 +30909,7 @@
         "other": {
           "name": "xpmem-hwe",
           "version": "2.7.4",
-          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/xpmem-2.7.4.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xpmem-2.7.4.tar.gz"
         }
       }
     },
@@ -30919,7 +30919,7 @@
         "other": {
           "name": "xpmem-lib",
           "version": "2.7",
-          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/xpmem-lib-2.7.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xpmem-lib-2.7.tar.gz"
         }
       }
     },

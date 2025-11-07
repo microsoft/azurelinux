@@ -8,7 +8,7 @@
 
 Name:           libvma
 Version:        9.8.72
-Release:        %{use_rel}%{?dist}
+Release:        1%{?dist}
 Summary:        A library for boosting TCP and UDP traffic (over RDMA hardware)
 Group:          System Environment/Libraries
 License:        GPLv2 or BSD
@@ -57,7 +57,7 @@ Summary: Header files required to develop with libvma
 %if 0%{?rhl}%{?fedora} == 0
 Group: System Environment/Libraries
 %endif
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 
 %description devel
 This package includes headers for building programs with libvma's
