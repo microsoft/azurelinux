@@ -28,7 +28,7 @@ Patch8:         CVE-2025-47279.patch
 Patch9:         CVE-2025-23166.patch
 Patch10:        CVE-2025-7656.patch
 Patch11:        CVE-2025-5889.patch
-Patch12:        CVE-2025-5222_nodejs18.patch
+Patch12:        CVE-2025-5222.patch
 BuildRequires:  brotli-devel
 BuildRequires:  coreutils >= 8.22
 BuildRequires:  gcc
