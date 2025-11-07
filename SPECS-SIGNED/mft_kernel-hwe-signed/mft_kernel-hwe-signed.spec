@@ -14,8 +14,8 @@
 
 Name:            %{_name}-signed
 Summary:         %{_name} Kernel Module for the %{KVERSION} kernel
-Version:         4.30.0
-Release:	     23%{release_suffix}%{?dist}
+Version:         4.33.0
+Release:	 1%{release_suffix}%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
 
@@ -31,7 +31,7 @@ Source1:        mst_pci.ko
 Source2:        mst_pciconf.ko
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-ExclusiveArch:  aarch64
+
 Conflicts:      mft_kernel
 Conflicts:      kernel-mft
 
@@ -84,6 +84,10 @@ popd
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-1_6.12.50.2-1
+- Upgrade version to 4.33.0.
+- Enable build on x86_64 kernel hwe.
+
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.30.0-23_6.12.50.2-1
 - Bump release to rebuild for new release
 

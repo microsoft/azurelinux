@@ -26,18 +26,20 @@
 #
 #
 
-%global         MLNX_OFED_VERSION 24.10-0.7.0.0
+%global         MLNX_OFED_VERSION 25.07.0.9.7.1
 
 Summary:        Mellanox userland tools and scripts
 Name:           mlnx-tools
-Version:        24.10
+Version:        25.07
 Release:        1%{?dist}
 License:        GPLv2 or BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/Mellanox/mlnx-tools
-Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/%{MLNX_OFED_VERSION}/SRPMS/%{name}-%{version}.tar.gz
+# DOCA OFED feature sources come from the following repo MLNX_OFED_SRC tgz
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Obsoletes:      mlnx-ofa_kernel < 5.4
 Obsoletes:      mlnx_en-utils < 5.4
 
@@ -103,6 +105,7 @@ rm -rf %{buildroot}
 /sbin/sysctl_perf_tuning
 /sbin/mlnx_bf_configure
 /sbin/mlnx-sf
+/sbin/doca-hugepages
 %{_sbindir}/*
 %{_bindir}/*
 %{_mandir}/man8/*.8*
@@ -112,6 +115,10 @@ rm -rf %{buildroot}
 /lib/udev/mlnx_bf_udev
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1
+- Upgrade version to 25.07.
+- Update source path
+
 * Thu Jan 09 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> 24.10-1
 - Upgrade package to version 24.10
 

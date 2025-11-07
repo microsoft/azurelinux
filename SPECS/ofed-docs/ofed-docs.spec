@@ -28,16 +28,18 @@
 #  $Id: ofed-docs.spec 7948 2006-06-13 12:42:34Z vlad $
 #
 
-%global         MLNX_OFED_VERSION 24.10-0.7.0.0
+%global         MLNX_OFED_VERSION 25.07.0.9.7.1
 Summary:        OFED docs
 Name:           ofed-docs
-Version:        24.10
+Version:        25.07
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.openfabrics.org
-Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/%{MLNX_OFED_VERSION}/SRPMS/%{name}-%{version}.tar.gz
+# DOCA OFED feature sources come from the following repo MLNX_OFED_SRC tgz
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Group:          Documentation/Man
 
 BuildRoot: %{?build_root:%{build_root}}%{!?build_root:/var/tmp/%{name}-%{version}-root}
@@ -61,6 +63,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_defaultdocdir}/%{name}-%{version}
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1
+- Upgrade version to 25.07.
+- Update source path
+
 * Wed Jan 08 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> 24.10-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2).
 - License verified.

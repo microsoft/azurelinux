@@ -85,8 +85,8 @@
 
 %global base_name mlnx-ofa_kernel
 %{!?_name: %global _name %{base_name}-hwe}
-%{!?_version: %global _version 24.10}
-%{!?_release: %global _release OFED.24.10.0.7.0.1}
+%{!?_version: %global _version 25.07}
+%{!?_release: %global _release OFED.25.07.0.9.7.1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
 
 %global utils_pname %{name}
@@ -100,18 +100,18 @@
 
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel-hwe
-Version:	 24.10
-Release:	 23%{release_suffix}%{?dist}
+Version:	 25.07
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
-Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ofa_kernel-24.10.tgz#/mlnx-ofa_kernel-%{_version}.tgz
-Patch0:          001-fix-module-init-for-ibt.patch
+# DOCA OFED feature sources come from the following repo MLNX_OFED_SRC tgz
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/mlnx-ofa_kernel-%{_version}.tgz
 
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-ExclusiveArch:   aarch64
 
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -139,7 +139,7 @@ BuildRequires: /usr/bin/perl
 %description
 InfiniBand "verbs", Access Layer  and ULPs.
 Utilities rpm.
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-25.07-0.9.7.tgz
 
 
 # build KMP rpms?
@@ -197,7 +197,7 @@ Conflicts: mlnx-ofa_kernel-modules
 %description -n %{non_kmp_pname}
 Core, HW and ULPs kernel modules
 Non-KMP format kernel modules rpm.
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-25.07-0.9.7.tgz
 %endif #end if "%{KMP}" == "1"
 
 %package -n %{devel_pname}
@@ -221,7 +221,7 @@ Summary: Infiniband Driver and ULPs kernel modules sources
 Group: System Environment/Libraries
 %description -n %{devel_pname}
 Core, HW and ULPs kernel modules sources
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/
 
 #
 # setup module sign scripts if paths to the keys are given
@@ -278,7 +278,7 @@ The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-o
 
 %prep
 %setup -n mlnx-ofa_kernel-%{_version}
-%patch 0 -p1
+
 set -- *
 mkdir source
 mv "$@" source/
@@ -444,6 +444,11 @@ update-alternatives --remove \
 %{_prefix}/src/ofa_kernel/%{_arch}/[0-9]*
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1_6.12.50.2-1
+- Upgrade version to 25.07.
+- Enable build on x86_64 kernel hwe.
+- Update source path
+
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-23_6.12.50.2-1
 - Adjusted package dependencies on user space components.
 

@@ -1,13 +1,14 @@
-Name:		ibarr
-Version:	0.1.3
-Release:        3%{?dist}
-Summary:	Nvidia		 address and route userspace resolution services for Infiniband
+Name:           ibarr
+Version:        0.1.5
+Release:        1%{?dist}
+Summary:        Nvidia address and route userspace resolution services for Infiniband
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/ibarr-0.1.3.tar.gz#/%{name}-%{version}.tar.gz
+# DOCA OFED feature sources come from the following repo MLNX_OFED_SRC tgz
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Group:		Applications/System
 License:	(GPL-2.0 WITH Linux-syscall-note) OR BSD-2-Clause
-
 BuildRequires:	cmake
 BuildRequires:	gcc
 BuildRequires:	libnl3-devel
@@ -54,6 +55,9 @@ rm -rf $RPM_BUILD_ROOT
 /lib/systemd/system/%{name}.service
 
 %changelog
+* Tue Oct 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.1.5-1
+- Upgrade version to 0.1.5.
+- Update source path
 * Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 0.1.3-3
 - Enable ARM64 build by removing ExclusiveArch
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 0.1.3-2

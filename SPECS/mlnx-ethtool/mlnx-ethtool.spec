@@ -1,6 +1,6 @@
 Name:		 mlnx-ethtool
-Version:	 6.9
-Release:	 3%{?dist}
+Version:	 6.14
+Release:	 1%{?dist}
 Group:		 Utilities
 Summary:	 Settings tool for Ethernet and other network devices
 License:	 GPLv2
@@ -8,7 +8,9 @@ Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 URL:		 https://ftp.kernel.org/pub/software/network/ethtool/
 Buildroot:	 /var/tmp/%{name}-%{version}-build
-Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ethtool-6.9.tar.gz#/%{name}-%{version}.tar.gz
+# DOCA OFED feature sources come from the following repo MLNX_OFED_SRC tgz
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
 
 BuildRequires:  libmnl-devel
 
@@ -35,11 +37,15 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 %{_sbindir}/ethtool
 %{_mandir}/man8/ethtool.8*
 %{_datadir}/bash-completion/completions/ethtool
+%{_datadir}/metainfo/org.kernel.software.network.ethtool.metainfo.xml
 %doc AUTHORS NEWS README
 %license COPYING
 
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.14-1
+- Upgrade version to 6.14.
+- Update source path
 * Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 6.9-3
 - Enable ARM64 build by removing ExclusiveArch
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 6.9-2

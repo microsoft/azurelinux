@@ -1,15 +1,17 @@
 
-%define RELEASE 2
+%define RELEASE 1
 %define rel %{?CUSTOM_RELEASE}%{!?CUSTOM_RELEASE:%RELEASE}
 
 Summary:	 InfiniBand fabric simulator for management
 Name:		 ibsim
-Version:	 0.12
-Release:	 2%{?dist}
+Version:	 0.12.1
+Release:	 1%{?dist}
 License:	 GPLv2 or BSD
 Group:		 System Environment/Libraries
 BuildRoot:	 %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/ibsim-0.12.tar.gz#/ibsim-%{version}.tar.gz
+# DOCA OFED feature sources come from the following repo MLNX_OFED_SRC tgz
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/ibsim-%{version}.tar.gz
 Url:		 https://github.com/linux-rdma/ibsim
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -47,6 +49,9 @@ rm -rf $RPM_BUILD_ROOT
 %license COPYING
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.12.1-1
+- Upgrade version to 0.12.1.
+- Update source path
 * Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 0.12-2
 - Enable ARM64 build by removing ExclusiveArch
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 0.12-1

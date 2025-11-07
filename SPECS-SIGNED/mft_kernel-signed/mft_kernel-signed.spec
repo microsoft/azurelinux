@@ -13,8 +13,8 @@
 
 Name:            %{_name}-signed
 Summary:         %{_name} Kernel Module for the %{KVERSION} kernel
-Version:         4.30.0
-Release:	     20%{release_suffix}%{?dist}
+Version:         4.33.0
+Release:	 1%{release_suffix}%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
 
@@ -81,6 +81,9 @@ popd
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-1
+- Upgrade version to 4.33.0.
+
 * Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 4.30.0-20
 - Add kernel version and release nb into release nb
 

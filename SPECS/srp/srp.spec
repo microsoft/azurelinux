@@ -39,9 +39,9 @@
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
 %{!?_name: %define _name srp}
-%{!?_version: %define _version 24.10}
-%{!?_mofed_full_version: %define _mofed_full_version %{_version}-21%{release_suffix}%{?dist}}
-%{!?_release: %define _release OFED.24.10.0.6.7.1}
+%{!?_version: %define _version 25.07}
+%{!?_mofed_full_version: %define _mofed_full_version %{_version}-1%{release_suffix}%{?dist}}
+%{!?_release: %define _release OFED.25.07.0.9.7.1}
 
 # KMP is disabled by default
 %{!?KMP: %global KMP 0}
@@ -65,12 +65,14 @@
 
 Summary:	 srp driver
 Name:		 srp
-Version:	 24.10
-Release:	 21%{release_suffix}%{?dist}
+Version:	 25.07
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
-Source:		 https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/srp-24.10.tgz#/%{name}-%{version}.tgz
+# DOCA OFED feature sources come from the following repo MLNX_OFED_SRC tgz
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/%{name}-%{version}.tgz
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -255,6 +257,10 @@ fi
 %endif
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1
+- Upgrade version to 25.07.
+- Update source path
+
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-21
 - Bump mofed release number
 
