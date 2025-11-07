@@ -1042,6 +1042,7 @@ class HtmlReportGenerator:
         /* Details/Summary (GitHub dropdown style) */
         .Details {
             display: block;
+            transition: background-color 0.3s ease, border-color 0.3s ease, border-width 0.3s ease;
         }
         
         .Details-summary {
@@ -1089,7 +1090,7 @@ class HtmlReportGenerator:
         
         .stats-card:hover::before {
             border-color: var(--color-accent-emphasis);
-            box-shadow: 0 0 0 8px var(--color-accent-subtle), 0 0 30px rgba(9, 105, 218, 0.4);
+            box-shadow: 0 0 0 4px var(--color-accent-subtle), 0 0 30px rgba(9, 105, 218, 0.4);
         }
         
         [data-color-mode="dark"] .stats-card:hover {
@@ -1097,7 +1098,7 @@ class HtmlReportGenerator:
         }
         
         [data-color-mode="dark"] .stats-card:hover::before {
-            box-shadow: 0 0 0 8px var(--color-accent-subtle), 0 0 30px rgba(88, 166, 255, 0.4);
+            box-shadow: 0 0 0 4px var(--color-accent-subtle), 0 0 30px rgba(88, 166, 255, 0.4);
         }
         
         .filterable-stat {
@@ -1948,9 +1949,73 @@ class HtmlReportGenerator:
             });
         }
         
-        document.querySelector('.reset-filter-stat')?.addEventListener('click', function() {
-            resetAllFilters();
+        // Overview cards (Specs Analyzed, Total Issues) - click for temporary highlight
+        const overviewCards = [
+            document.querySelector('.reset-filter-stat'), // Total Issues
+            document.querySelector('.stats-card:nth-child(1)') // Specs Analyzed
+        ].filter(card => card !== null);
+        
+        overviewCards.forEach(card => {
+            // Hover preview
+            card.addEventListener('mouseenter', function() {
+                document.querySelectorAll('.Details').forEach(specCard => {
+                    specCard.style.backgroundColor = 'var(--color-accent-subtle)';
+                    specCard.style.borderColor = 'var(--color-accent-emphasis)';
+                    specCard.style.borderLeftWidth = '4px';
+                });
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                document.querySelectorAll('.Details').forEach(specCard => {
+                    specCard.style.backgroundColor = '';
+                    specCard.style.borderColor = '';
+                    specCard.style.borderLeftWidth = '';
+                });
+            });
+            
+            // Click for reset + temporary highlight
+            card.addEventListener('click', function() {
+                // Reset any active filters
+                resetAllFilters();
+                
+                // Temporary highlight all spec cards
+                document.querySelectorAll('.Details').forEach(specCard => {
+                    specCard.style.backgroundColor = 'var(--color-accent-subtle)';
+                    specCard.style.borderColor = 'var(--color-accent-emphasis)';
+                    specCard.style.borderLeftWidth = '4px';
+                    specCard.style.transition = 'all 0.3s ease';
+                });
+                
+                // Remove highlight after 1 second
+                setTimeout(() => {
+                    document.querySelectorAll('.Details').forEach(specCard => {
+                        specCard.style.backgroundColor = '';
+                        specCard.style.borderColor = '';
+                        specCard.style.borderLeftWidth = '';
+                    });
+                }, 1000);
+            });
         });
+        
+        // Open Issues card - hover preview only (filtering handled by filterable-stat)
+        const openIssuesCard = document.querySelector('.stats-card:nth-child(2)');
+        if (openIssuesCard) {
+            openIssuesCard.addEventListener('mouseenter', function() {
+                document.querySelectorAll('.Details').forEach(specCard => {
+                    specCard.style.backgroundColor = 'var(--color-accent-subtle)';
+                    specCard.style.borderColor = 'var(--color-accent-emphasis)';
+                    specCard.style.borderLeftWidth = '4px';
+                });
+            });
+            
+            openIssuesCard.addEventListener('mouseleave', function() {
+                document.querySelectorAll('.Details').forEach(specCard => {
+                    specCard.style.backgroundColor = '';
+                    specCard.style.borderColor = '';
+                    specCard.style.borderLeftWidth = '';
+                });
+            });
+        }
         
         document.querySelectorAll('.filterable-stat').forEach(card => {
             card.addEventListener('click', function() {
