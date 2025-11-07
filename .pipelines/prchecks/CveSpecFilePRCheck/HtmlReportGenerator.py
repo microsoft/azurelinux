@@ -64,6 +64,33 @@ class HtmlReportGenerator:
         # Fallback to placeholder SVG
         return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%230969da'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-size='18' fill='white' font-weight='bold'%3ER%3C/text%3E%3C/svg%3E"
     
+    def _load_svg_as_data_uri(self, svg_path: str) -> str:
+        """
+        Load an SVG file and convert it to a data URI.
+        
+        Args:
+            svg_path: Path to the SVG file
+            
+        Returns:
+            Data URI string for embedding in HTML
+        """
+        try:
+            if os.path.exists(svg_path):
+                with open(svg_path, 'r', encoding='utf-8') as f:
+                    svg_content = f.read()
+                    # URL-encode the SVG for data URI
+                    from urllib.parse import quote
+                    svg_encoded = quote(svg_content)
+                    logger.info(f"Successfully loaded SVG: {svg_path} ({len(svg_content)} bytes)")
+                    return f"data:image/svg+xml,{svg_encoded}"
+            else:
+                logger.warning(f"SVG file not found: {svg_path}")
+        except Exception as e:
+            logger.warning(f"Failed to load SVG {svg_path}: {e}")
+        
+        # Fallback to placeholder SVG
+        return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%230969da'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-size='18' fill='white' font-weight='bold'%3ER%3C/text%3E%3C/svg%3E"
+    
     def generate_report_body(self, analysis_result, pr_metadata: Optional[dict] = None, categorized_issues: Optional[dict] = None) -> str:
         """
         Generate the HTML report body (content only, no page wrapper).
@@ -405,7 +432,7 @@ class HtmlReportGenerator:
         assets_dir = os.path.join(script_dir, 'assets')
         radar_logo_light = self._load_logo_as_data_uri(os.path.join(assets_dir, 'radar_light.png'))
         radar_logo_dark = self._load_logo_as_data_uri(os.path.join(assets_dir, 'radar_dark.png'))
-        radar_web_logo = self._load_logo_as_data_uri(os.path.join(assets_dir, 'radar_web_logo.png'))
+        radar_favicon = self._load_svg_as_data_uri(os.path.join(assets_dir, 'radar_favicon.svg'))
         
         return f"""<!DOCTYPE html>
 <html lang="en" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
@@ -419,10 +446,10 @@ class HtmlReportGenerator:
     <title>PR #{pr_number} · Code Review Report</title>
     <!-- GitHub-like fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Favicon - RADAR Logo -->
-    <link rel="icon" type="image/png" href="{radar_web_logo}">
-    <link rel="shortcut icon" type="image/png" href="{radar_web_logo}">
-    <link rel="apple-touch-icon" href="{radar_web_logo}">
+    <!-- Favicon - RADAR Logo (SVG for small file size) -->
+    <link rel="icon" type="image/svg+xml" href="{radar_favicon}">
+    <link rel="alternate icon" type="image/svg+xml" href="{radar_favicon}">
+    <link rel="apple-touch-icon" href="{radar_favicon}">
     <style>
 {css}
     </style>
