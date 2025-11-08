@@ -112,15 +112,18 @@ steps:
       AZURE_OPENAI_DEPLOYMENT_NAME: $(AZURE_OPENAI_DEPLOYMENT_NAME)
       AZURE_OPENAI_MODEL_NAME: $(AZURE_OPENAI_MODEL_NAME)
       AZURE_OPENAI_API_VERSION: $(AZURE_OPENAI_API_VERSION)
+      # Managed Identity for Blob Storage (cblmargh-identity UMI)
+      AZURE_CLIENT_ID: "7bf2e2c3-009a-460e-90d4-eff987a8d71d"
       # GitHub integration environment variables
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-      GITHUB_TOKEN: $(githubPrPat)
+      # GITHUB_TOKEN removed - now fetched from Key Vault in Python code
       GITHUB_REPOSITORY: $(Build.Repository.Name)
       GITHUB_PR_NUMBER: $(System.PullRequest.PullRequestNumber)
     inputs:
       targetType: inline
       script: |
         echo "🔍 Running analysis of spec files with integrated GitHub posting"
+        echo "🔐 GitHub PAT will be fetched from Key Vault: mariner-pipelines-kv/cblmarghGithubPRPat"
         
         cd .pipelines/prchecks/CveSpecFilePRCheck
         chmod +x run-pr-check.sh
@@ -138,11 +141,19 @@ steps:
         # Save exit code to publish as pipeline variable
         echo "##vso[task.setvariable variable=AnalysisExitCode]$ANALYSIS_EXIT_CODE"
         
-        # Verify report file was created
-        if [ -f "spec_analysis_report.json" ]; then
-          echo "✅ Analysis report generated successfully"
+        # Verify report files were created
+        if [ -f "pr_check_results.json" ] && [ -f "pr_check_report.txt" ]; then
+          echo "✅ Analysis report files generated successfully"
+          echo "   - pr_check_report.txt"
+          echo "   - pr_check_results.json"
         else
-          echo "❌ Analysis report file not found"
+          echo "❌ Analysis report files not found"
+          if [ ! -f "pr_check_results.json" ]; then
+            echo "   Missing: pr_check_results.json"
+          fi
+          if [ ! -f "pr_check_report.txt" ]; then
+            echo "   Missing: pr_check_report.txt"
+          fi
           exit 1
         fi
         

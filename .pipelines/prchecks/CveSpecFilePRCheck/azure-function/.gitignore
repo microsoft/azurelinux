@@ -1,0 +1,28 @@
+.venv/
+__pycache__/
+*.pyc
+.python_version
+.vscode/
+local.settings.json
+.funcignore
+
+# Documentation and deployment guides (not for public repo)
+docs/
+
+# Deployment packages
+*.zip
+
+# Extracted files
+extracted/
+
+# Workspace files
+*.code-workspace
+
+# Shell scripts
+*.sh
+
+# Docker files (if using containerized deployment)
+Dockerfile
+
+# Development test file
+app.py

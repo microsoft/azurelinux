@@ -1,0 +1,45 @@
+================================================================================
+CVE SPEC FILE CHECK - ANALYSIS REPORT
+================================================================================
+Generated: 2025-10-14T17:34:56.229364
+
+EXECUTIVE SUMMARY
+----------------------------------------
+Total Spec Files Analyzed: 1
+Specs with Errors: 1
+Specs with Warnings: 0
+Total Issues Found: 8
+Overall Severity: ERROR
+
+PACKAGE ANALYSIS DETAILS
+----------------------------------------
+
+Package: azcopy
+Spec File: SPECS/azcopy/azcopy.spec
+Status: ERROR
+Issues: 4 errors, 4 warnings
+
+  Anti-Patterns Detected:
+    - unused-patch-file: 4 occurrence(s)
+      • Patch file 'CVE-2025-22870.patch' exists in directory but is not referenced in s...
+      • Patch file 'CVE-2024-51744.patch' exists in directory but is not referenced in s...
+      • Patch file 'CVE-2025-30204.patch' exists in directory but is not referenced in s...
+      ... and 1 more
+    - cve-patch-mismatch: 4 occurrence(s)
+      • Patch file 'CVE-2025-22870.patch' contains CVE reference but CVE-2025-22870 is n...
+      • Patch file 'CVE-2024-51744.patch' contains CVE reference but CVE-2024-51744 is n...
+      • Patch file 'CVE-2025-30204.patch' contains CVE reference but CVE-2025-30204 is n...
+      ... and 1 more
+
+RECOMMENDED ACTIONS
+----------------------------------------
+
+azcopy:
+  • Add CVE-2025-30204 to the spec file changelog entry
+  • Add CVE-2024-51744 to the spec file changelog entry
+  • Add CVE-2025-22870 to the spec file changelog entry
+  • Add CVE-2025-22868 to the spec file changelog entry
+
+================================================================================
+END OF REPORT
+================================================================================

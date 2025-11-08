@@ -109,6 +109,8 @@ from PromptTemplatesClass import PromptTemplates
 from AntiPatternDetector import AntiPatternDetector, AntiPattern, Severity
 from ResultAnalyzer import ResultAnalyzer
 from GitHubClient import GitHubClient, CheckStatus
+from BlobStorageClient import BlobStorageClient
+from AnalyticsManager import AnalyticsManager
 
 # Configure logging
 logging.basicConfig(
@@ -181,7 +183,8 @@ def gather_diff() -> str:
                 cwd=repo_path,
                 stderr=subprocess.PIPE  # Capture stderr to avoid polluting the logs
             )
-            return diff.decode()
+            # Handle potential encoding issues in binary files
+            return diff.decode('utf-8', errors='replace')
         except subprocess.CalledProcessError as e:
             logger.warning(f"Direct diff failed: {str(e)}")
             
@@ -192,7 +195,7 @@ def gather_diff() -> str:
                 merge_base = subprocess.check_output(
                     ["git", "merge-base", src_commit, tgt_commit], 
                     cwd=repo_path
-                ).decode().strip()
+                ).decode('utf-8', errors='replace').strip()
                 
                 logger.info(f"Found merge base: {merge_base}")
                 
@@ -201,7 +204,7 @@ def gather_diff() -> str:
                     ["git", "diff", "--unified=3", merge_base, src_commit],
                     cwd=repo_path
                 )
-                return diff.decode()
+                return diff.decode('utf-8', errors='replace')
             except subprocess.CalledProcessError as e:
                 logger.error(f"Alternative diff method failed: {str(e)}")
                 
@@ -213,7 +216,7 @@ def gather_diff() -> str:
                         ["git", "show", "--unified=3", src_commit],
                         cwd=repo_path
                     )
-                    return diff.decode()
+                    return diff.decode('utf-8', errors='replace')
                 except subprocess.CalledProcessError as e:
                     logger.error(f"All diff methods failed: {str(e)}")
                     raise ValueError("Could not generate a diff between the source and target commits")
@@ -284,70 +287,155 @@ def get_package_directory_files(spec_path: str) -> List[str]:
         logger.warning(f"Could not list files in directory {dir_path}: {str(e)}")
         return []
 
-def analyze_spec_files(diff_text: str, changed_spec_files: List[str]) -> Tuple[List[AntiPattern], str, bool]:
+def extract_package_name(spec_content: str, spec_path: str) -> str:
     """
-    Analyzes spec files for anti-patterns and issues.
+    Extract package name from spec file content or path.
     
     Args:
-        diff_text: Git diff output as text
-        changed_spec_files: List of changed spec file paths
+        spec_content: Content of the spec file
+        spec_path: Path to the spec file
         
     Returns:
-        Tuple containing:
-        - List of detected anti-patterns
-        - OpenAI analysis results
-        - Boolean indicating if fatal errors occurred
+        Package name extracted from spec or derived from path
     """
-    repo_root = os.environ["BUILD_SOURCESDIRECTORY"]
-    detector = AntiPatternDetector(repo_root)
-    all_anti_patterns = []
-    ai_analysis = ""
+    # Try to extract from Name: field in spec
+    match = re.search(r'^Name:\s+(.+)$', spec_content, re.MULTILINE)
+    if match:
+        return match.group(1).strip()
     
-    try:
-        # Initialize OpenAI client for analysis and recommendations
-        openai_client = _initialize_openai_client()
+    # Fallback to directory name
+    path_parts = spec_path.split('/')
+    if 'SPECS' in path_parts:
+        idx = path_parts.index('SPECS')
+        if idx + 1 < len(path_parts):
+            return path_parts[idx + 1]
+    
+    # Last resort: use filename without extension
+    return os.path.splitext(os.path.basename(spec_path))[0]
+
+def analyze_spec_files(diff_text, changed_spec_files):
+    """
+    Analyze changed spec files for anti-patterns and AI insights.
+    
+    Enhanced to return organized results by spec file.
+    
+    Returns:
+        MultiSpecAnalysisResult: Organized results by spec file
+    """
+    from SpecFileResult import SpecFileResult, MultiSpecAnalysisResult
+    
+    result = MultiSpecAnalysisResult()
+    
+    # Analyze each spec file individually
+    for spec_file in changed_spec_files:
+        logger.info(f"Analyzing spec file: {spec_file}")
         
-        # Call OpenAI for analysis
-        ai_analysis = call_openai(openai_client, diff_text, changed_spec_files)
+        # Get spec content and file list
+        spec_content = get_spec_file_content(spec_file)
+        if not spec_content:
+            logger.warning(f"Could not read spec file: {spec_file}")
+            continue
         
-        # Dynamic recommendations have been consolidated into AI analysis; deprecated FixRecommender
+        file_list = get_package_directory_files(spec_file)
+        package_name = extract_package_name(spec_content, spec_file)
         
-        # Early exit if no spec files changed
-        if not changed_spec_files:
-            return [], ai_analysis, False
-            
-        # Process each changed spec file for anti-patterns
-        for spec_path in changed_spec_files:
-            logger.info(f"Running anti-pattern detection on: {spec_path}")
-            
-            spec_content = get_spec_file_content(spec_path)
-            if not spec_content:
-                logger.warning(f"Could not read spec file content for {spec_path}, skipping detailed analysis")
-                continue
-                
-            file_list = get_package_directory_files(spec_path)
-            
-            # Detect anti-patterns
-            anti_patterns = detector.detect_all(spec_path, spec_content, file_list)
-            
-            all_anti_patterns.extend(anti_patterns)
-            
-            # Log detected issues
-            if anti_patterns:
-                critical_count = sum(1 for p in anti_patterns if p.severity >= Severity.ERROR)
-                warning_count = sum(1 for p in anti_patterns if p.severity == Severity.WARNING)
-                
-                logger.warning(f"Found {len(anti_patterns)} anti-patterns in {spec_path}:")
-                logger.warning(f"   - {critical_count} critical/error issues")
-                logger.warning(f"   - {warning_count} warnings")
-            else:
-                logger.info(f"No anti-patterns detected in {spec_path}")
+        # Run anti-pattern detection
+        analyzer = AntiPatternDetector(repo_root=".")
+        anti_patterns = analyzer.detect_all(
+            spec_file, spec_content, file_list
+        )
         
-        return all_anti_patterns, ai_analysis, False
+        # Create result container for this spec WITH anti_patterns
+        # so __post_init__() can calculate severity correctly
+        spec_result = SpecFileResult(
+            spec_path=spec_file,
+            package_name=package_name,
+            anti_patterns=anti_patterns
+        )
         
-    except Exception as e:
-        logger.error(f"Error in analyze_spec_files: {str(e)}", exc_info=True)
-        return all_anti_patterns, ai_analysis, True
+        # Run AI analysis if enabled and configured
+        if os.environ.get("ENABLE_AI_ANALYSIS", "false").lower() == "true":
+            try:
+                openai_client = _initialize_openai_client()
+                if openai_client:
+                    # Get AI analysis for this specific spec
+                    spec_ai_analysis = call_openai_for_single_spec(
+                        openai_client, spec_file, spec_content, diff_text
+                    )
+                    spec_result.ai_analysis = spec_ai_analysis
+            except Exception as e:
+                logger.warning(f"AI analysis failed for {spec_file}: {e}")
+        
+        result.spec_results.append(spec_result)
+    
+    # Trigger post-init calculations
+    result.__post_init__()
+    
+    return result
+
+def call_openai_for_single_spec(openai_client, spec_file, spec_content, diff_text):
+    """
+    Call OpenAI for analysis of a single spec file.
+    
+    Args:
+        openai_client: Configured OpenAI client
+        spec_file: Path to the spec file
+        spec_content: Content of the spec file
+        diff_text: Git diff text
+        
+    Returns:
+        str: AI analysis for this specific spec file
+    """
+    # Extract relevant diff for this spec file
+    spec_diff = extract_spec_specific_diff(diff_text, spec_file)
+    
+    prompt = f"""
+    Analyze the following spec file changes for package '{os.path.basename(os.path.dirname(spec_file))}':
+    
+    Spec File: {spec_file}
+    
+    Relevant Diff:
+    ```diff
+    {spec_diff}
+    ```
+    
+    Full Spec Content:
+    ```spec
+    {spec_content[:5000]}  # Limit for token management
+    ```
+    
+    Please provide:
+    1. Summary of changes in this spec file
+    2. Potential security implications
+    3. Recommendations specific to this package
+    """
+    
+    # Call OpenAI (existing logic)
+    response = openai_client.chat.completions.create(
+        model=openai_client.model,
+        messages=[
+            {"role": "system", "content": "You are a security-focused package reviewer."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.3,
+        max_tokens=1000
+    )
+    
+    return response.choices[0].message.content
+
+def extract_spec_specific_diff(diff_text, spec_file):
+    """Extract diff sections relevant to a specific spec file."""
+    lines = diff_text.split('\n')
+    spec_diff_lines = []
+    in_spec_diff = False
+    
+    for line in lines:
+        if line.startswith('diff --git'):
+            in_spec_diff = spec_file in line
+        elif in_spec_diff:
+            spec_diff_lines.append(line)
+    
+    return '\n'.join(spec_diff_lines)
 
 def _initialize_openai_client() -> OpenAIClient:
     """
@@ -562,6 +650,11 @@ def update_github_status(severity: Severity, anti_patterns: List[AntiPattern], a
                     # Post new comment
                     logger.info("Posting new PR comment")
                     github_client.post_pr_comment(comment_content)
+                
+                # Add radar-issues-detected label when issues are found
+                if severity >= Severity.WARNING:
+                    logger.info("Adding 'radar-issues-detected' label to PR")
+                    github_client.add_label("radar-issues-detected")
                     
             except Exception as e:
                 logger.error(f"Failed to post/update GitHub PR comment: {e}")
@@ -615,143 +708,208 @@ def _derive_github_context():
         os.environ["GITHUB_PR_NUMBER"] = pr_num
 
 def main():
-    """Main entry point for the script"""
-    parser = argparse.ArgumentParser(description="CVE Spec File PR Check")
-    parser.add_argument('--fail-on-warnings', action='store_true', 
-                      help='Fail the pipeline even when only warnings are detected')
-    parser.add_argument('--exit-code-severity', action='store_true', 
-                      help='Use different exit codes based on severity (0=success, 1=critical, 2=error, 3=warning)')
+    """
+    Main entry point for the CVE Spec File PR check.
+    
+    Enhanced to handle organized multi-spec results.
+    """
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description='CVE Spec File PR Check')
     parser.add_argument('--post-github-comments', action='store_true',
-                      help='Post analysis results as comments on GitHub PR')
+                       help='Enable posting comments to GitHub PR')
     parser.add_argument('--use-github-checks', action='store_true',
-                      help='Use GitHub Checks API for multi-level notifications')
+                       help='Enable GitHub Checks API integration')
+    parser.add_argument('--fail-on-warnings', action='store_true',
+                       help='Fail the check if warnings are found')
+    parser.add_argument('--exit-code-severity', action='store_true',
+                       help='Use severity-based exit codes')
     args = parser.parse_args()
     
-    # Derive GitHub context from environment variables
-    _derive_github_context()
+    # Map command-line flags to environment variables for backward compatibility
+    if args.post_github_comments:
+        os.environ["UPDATE_GITHUB_STATUS"] = "true"
+    if args.use_github_checks:
+        os.environ["USE_CHECKS_API"] = "true"
     
-    # Debug environment variables related to GitHub authentication and context
-    logger.info("GitHub Environment Variables:")
-    logger.info(f"  - GITHUB_TOKEN: {'Set' if os.environ.get('GITHUB_TOKEN') else 'Not Set'}")
-    logger.info(f"  - SYSTEM_ACCESSTOKEN: {'Set' if os.environ.get('SYSTEM_ACCESSTOKEN') else 'Not Set'}")
-    logger.info(f"  - GITHUB_REPOSITORY: {os.environ.get('GITHUB_REPOSITORY', 'Not Set')}")
-    logger.info(f"  - GITHUB_PR_NUMBER: {os.environ.get('GITHUB_PR_NUMBER', 'Not Set')}")
-    logger.info(f"  - BUILD_REPOSITORY_NAME: {os.environ.get('BUILD_REPOSITORY_NAME', 'Not Set')}")
-    logger.info(f"  - SYSTEM_PULLREQUEST_PULLREQUESTNUMBER: {os.environ.get('SYSTEM_PULLREQUEST_PULLREQUESTNUMBER', 'Not Set')}")
+    logger.info("Starting CVE Spec File PR Check")
     
-    try:
-        # Gather git diff
-        diff = gather_diff()
-        
-        if not diff.strip():
-            logger.warning("No changes detected in the diff.")
-            return EXIT_SUCCESS
-        
-        logger.info(f"Found diff of {len(diff.splitlines())} lines")
-        
-        # Extract changed spec files from diff
-        changed_spec_files = get_changed_spec_files(diff)
-        logger.info(f"Found {len(changed_spec_files)} changed spec files in the diff")
-        
-        # Run analysis on spec files
-        anti_patterns, ai_analysis, fatal_error = analyze_spec_files(diff, changed_spec_files)
-        
-        # Process results with structured analysis
-        analyzer = ResultAnalyzer(anti_patterns, ai_analysis)
-        
-        # Print console summary (contains brief overview)
-        console_summary = analyzer.generate_console_summary()
-        print(f"\n{console_summary}")
-        
-        # Log detailed analysis to Azure DevOps pipeline logs
-        detailed_analysis = analyzer.extract_detailed_analysis_for_logs()
-        if detailed_analysis:
-            logger.info("=== DETAILED ANALYSIS FOR PIPELINE LOGS ===")
-            for line in detailed_analysis.split('\n'):
-                if line.strip():
-                    logger.info(line)
-            logger.info("=== END DETAILED ANALYSIS ===")
-        
-        # Generate and save comprehensive report files
-        detailed_report = analyzer.generate_detailed_report()
-        report_file = os.path.join(os.getcwd(), "spec_analysis_report.txt")
-        with open(report_file, "w") as f:
-            f.write(detailed_report)
-        logger.info(f"Detailed analysis report saved to {report_file}")
-        
-        # Save enhanced JSON report with structured content for pipeline and GitHub integration
-        json_file = os.path.join(os.getcwd(), "spec_analysis_report.json")
-        json_report = analyzer.to_json()
-        with open(json_file, "w") as f:
-            f.write(json_report)
-        logger.info(f"Enhanced JSON analysis report saved to {json_file}")
-        
-        # Log brief summary for quick reference
-        brief_summary = analyzer.extract_brief_summary_for_pr()
-        if brief_summary:
-            logger.info("=== BRIEF SUMMARY FOR PR ===")
-            logger.info(brief_summary)
-            logger.info("=== END BRIEF SUMMARY ===")
-        
-        # Determine exit code
-        if fatal_error:
-            logger.error("Fatal error occurred during analysis")
-            return EXIT_FATAL
-            
-        # Get highest severity
-        highest_severity = analyzer.get_highest_severity()
-        
-        # Update GitHub status with integrated comment posting using structured content
-        update_github_status(
-            highest_severity, 
-            anti_patterns, 
-            ai_analysis,
-            analyzer,
-            post_comments=args.post_github_comments,
-            use_checks_api=args.use_github_checks
-        )
-        
-        if args.exit_code_severity:
-            # Return exit codes based on severity, but do not fail on warnings unless requested
-            if highest_severity.value >= Severity.ERROR.value:
-                exit_code = get_severity_exit_code(highest_severity)
-            elif highest_severity == Severity.WARNING:
-                exit_code = EXIT_WARNING if args.fail_on_warnings else EXIT_SUCCESS
-            else:
-                exit_code = EXIT_SUCCESS
-            
-            # Log exit details
-            if exit_code == EXIT_SUCCESS:
-                logger.info("Analysis completed successfully - no issues detected or warnings only.")
-            else:
-                severity_name = highest_severity.name
-                logger.warning(f"Analysis completed with highest severity: {severity_name} (exit code {exit_code})")
-                
-            return exit_code
-        else:
-            # Traditional exit behavior (0 = success, 1 = failure)
-            # Determine if we should fail based on severity and fail_on_warnings flag
-            should_fail = False
-            
-            if highest_severity >= Severity.ERROR:
-                # Always fail on ERROR or CRITICAL
-                should_fail = True
-            elif highest_severity == Severity.WARNING and args.fail_on_warnings:
-                # Fail on WARNING only if fail_on_warnings is True
-                should_fail = True
-                
-            if should_fail:
-                # Generate structured error message for failure case
-                error_message = analyzer.generate_error_message()
-                print(f"\n{error_message}")
-                return EXIT_CRITICAL  # Traditional error exit code
-            else:
-                logger.info("Analysis completed - no critical issues detected")
-                return EXIT_SUCCESS
-        
-    except Exception as e:
-        logger.error(f"Unhandled exception: {str(e)}", exc_info=True)
+    # Gather diff
+    diff_text = gather_diff()
+    if not diff_text:
+        logger.error("Failed to gather diff")
         return EXIT_FATAL
+    
+    # Find changed spec files
+    changed_spec_files = get_changed_spec_files(diff_text)
+    
+    if not changed_spec_files:
+        logger.info("No spec files changed in this PR")
+        return EXIT_SUCCESS
+    
+    logger.info(f"Found {len(changed_spec_files)} changed spec file(s)")
+    
+    # Analyze spec files (now returns MultiSpecAnalysisResult)
+    analysis_result = analyze_spec_files(diff_text, changed_spec_files)
+    
+    # Generate and save reports
+    analyzer = ResultAnalyzer()
+    
+    # Generate text report (without HTML for plain text file)
+    text_report = analyzer.generate_multi_spec_report(analysis_result, include_html=False)
+    print("\n" + text_report)
+    
+    # Save to file
+    with open("pr_check_report.txt", "w") as f:
+        f.write(text_report)
+    
+    # Save JSON results
+    analyzer.save_json_results(analysis_result, "pr_check_results.json")
+    
+    # Update GitHub status if configured
+    if os.environ.get("UPDATE_GITHUB_STATUS", "false").lower() == "true":
+        try:
+            github_client = GitHubClient()
+            pr_number = int(os.environ.get("GITHUB_PR_NUMBER", "0"))
+            
+            # Initialize blob storage client for HTML reports (uses UMI in pipeline)
+            blob_storage_client = None
+            try:
+                logger.info("🔐 Attempting to initialize BlobStorageClient with UMI...")
+                blob_storage_client = BlobStorageClient(
+                    storage_account_name="radarblobstore",
+                    container_name="radarcontainer"
+                )
+                logger.info("✅ BlobStorageClient initialized successfully (using UMI in pipeline)")
+            except Exception as e:
+                logger.error("❌ Failed to initialize BlobStorageClient - will fall back to Gist")
+                logger.error(f"   Error type: {type(e).__name__}")
+                logger.error(f"   Error message: {str(e)}")
+                logger.error("   Full traceback:")
+                import traceback
+                logger.error(traceback.format_exc())
+                logger.warning("⚠️  Falling back to Gist for HTML report hosting")
+                blob_storage_client = None
+            
+            if pr_number:
+                # Fetch PR metadata from GitHub API
+                logger.info(f"Fetching PR metadata for PR #{pr_number}")
+                pr_metadata = github_client.get_pr_metadata()
+                if not pr_metadata:
+                    logger.warning("Failed to fetch PR metadata, using defaults")
+                    pr_metadata = None
+                
+                # Track analytics and categorize issues if blob storage is available
+                categorized_issues = None
+                if blob_storage_client:
+                    try:
+                        logger.info("📊 Initializing AnalyticsManager for challenge tracking...")
+                        analytics_mgr = AnalyticsManager(blob_storage_client, pr_number)
+                        
+                        # Load existing analytics
+                        analytics = analytics_mgr.load_analytics()
+                        logger.info(f"Loaded analytics with {len(analytics.get('commits', []))} previous commits")
+                        
+                        # Get current commit SHA
+                        commit_sha = os.environ.get("GITHUB_COMMIT_SHA", "unknown")
+                        
+                        # Collect all AntiPattern objects from analysis_result
+                        all_issues = []
+                        for spec_result in analysis_result.spec_results:
+                            for pattern in spec_result.anti_patterns:
+                                all_issues.append(pattern)
+                        
+                        # Add current commit's analysis
+                        # Note: report_url will be filled in after HTML generation, using placeholder for now
+                        report_url = f"https://radarblobstore.blob.core.windows.net/radarcontainer/pr-{pr_number}/report-latest.html"
+                        analytics_mgr.add_commit_analysis(commit_sha, report_url, all_issues)
+                        logger.info(f"Added commit analysis: {len(all_issues)} issues detected")
+                        
+                        # Categorize issues based on challenge history
+                        categorized_issues = analytics_mgr.categorize_issues(all_issues)
+                        logger.info(f"📋 Issue categorization:")
+                        logger.info(f"   - New issues: {len(categorized_issues['new_issues'])}")
+                        logger.info(f"   - Recurring unchallenged: {len(categorized_issues['recurring_unchallenged'])}")
+                        logger.info(f"   - Previously challenged: {len(categorized_issues['challenged_issues'])}")
+                        logger.info(f"   - Resolved: {len(categorized_issues['resolved_issues'])}")
+                        
+                        # Update summary metrics
+                        analytics_mgr.update_summary_metrics()
+                        
+                        # Save updated analytics
+                        analytics_mgr.save_analytics()
+                        logger.info("✅ Analytics saved successfully")
+                        
+                    except Exception as e:
+                        logger.error(f"❌ Failed to track analytics: {e}")
+                        import traceback
+                        logger.error(traceback.format_exc())
+                        categorized_issues = None
+                
+                # Format and post organized comment (with interactive HTML report via Blob Storage or Gist)
+                logger.info(f"Posting GitHub comment to PR #{pr_number}")
+                comment_text = analyzer.generate_multi_spec_report(
+                    analysis_result, 
+                    include_html=True, 
+                    github_client=github_client,
+                    blob_storage_client=blob_storage_client,
+                    pr_number=pr_number,
+                    pr_metadata=pr_metadata,
+                    categorized_issues=categorized_issues
+                )
+                success = github_client.post_pr_comment(comment_text)
+                
+                if success:
+                    logger.info(f"Successfully posted comment to PR #{pr_number}")
+                    
+                    # Smart label management based on analytics
+                    if categorized_issues:
+                        # Remove all existing radar labels first
+                        logger.info("🏷️  Managing radar labels based on challenge state...")
+                        for label in ["radar-issues-detected", "radar-acknowledged", "radar-issues-resolved"]:
+                            github_client.remove_label(label)
+                        
+                        # CRITICAL: Count from issue_lifecycle (same as Azure Function) 
+                        # NOT from current commit's categorized issues, to ensure consistency
+                        # even when commits don't touch spec files
+                        issue_lifecycle = analytics_mgr.analytics.get("issue_lifecycle", {})
+                        total_issues = len(issue_lifecycle)
+                        challenged_count = sum(1 for issue in issue_lifecycle.values() 
+                                              if issue.get("status") == "challenged")
+                        unchallenged_count = total_issues - challenged_count
+                        
+                        logger.info(f"   📊 Issue lifecycle: {total_issues} total, {challenged_count} challenged, {unchallenged_count} unchallenged")
+                        logger.info(f"   📋 Issue lifecycle keys: {list(issue_lifecycle.keys())[:10]}")  # Log first 10 issue hashes
+                        
+                        # Add appropriate label based on state
+                        if total_issues == 0:
+                            # No issues detected (or all resolved)
+                            if len(analytics_mgr.analytics.get("commits", [])) > 1:
+                                # Had issues before, now resolved
+                                logger.info("   ✅ All issues resolved - adding 'radar-issues-resolved'")
+                                github_client.add_label("radar-issues-resolved")
+                            else:
+                                # First commit with no issues, no label needed
+                                logger.info("   ℹ️  No issues detected in first commit - no radar label added")
+                        elif unchallenged_count == 0:
+                            # All issues have been challenged
+                            logger.info(f"   ✅ All {total_issues} issues challenged - adding 'radar-acknowledged'")
+                            github_client.add_label("radar-acknowledged")
+                        else:
+                            # Has unchallenged issues
+                            logger.info(f"   ⚠️  {unchallenged_count}/{total_issues} unchallenged issues - adding 'radar-issues-detected'")
+                            github_client.add_label("radar-issues-detected")
+                    else:
+                        # Fallback to old behavior if analytics unavailable
+                        if analysis_result.overall_severity >= Severity.WARNING:
+                            logger.info("Adding 'radar-issues-detected' label to PR (analytics unavailable)")
+                            github_client.add_label("radar-issues-detected")
+                else:
+                    logger.warning(f"Failed to post comment to PR #{pr_number}")
+        except Exception as e:
+            logger.error(f"Failed to update GitHub status: {e}")
+    
+    # Return appropriate exit code
+    return get_severity_exit_code(analysis_result.overall_severity)
 
 if __name__ == "__main__":
     sys.exit(main())
