@@ -88,6 +88,7 @@
 %{!?_version: %global _version 25.07}
 %{!?_release: %global _release OFED.25.07.0.9.7.1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
+%global MLNX_OFA_DRV_SRC 24.10-0.7.0
 
 %global utils_pname %{name}
 %global devel_pname %{name}-devel
@@ -139,7 +140,7 @@ BuildRequires: /usr/bin/perl
 %description
 InfiniBand "verbs", Access Layer  and ULPs.
 Utilities rpm.
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-25.07-0.9.7.tgz
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-%{MLNX_OFA_DRV_SRC}.tgz
 
 
 # build KMP rpms?
@@ -176,6 +177,9 @@ Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
 Obsoletes: mlnx-rdma-rxe
+Obsoletes: fwctl-hwe <= 24.10
+Provides:  fwctl-hwe
+
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries
 
@@ -197,7 +201,7 @@ Conflicts: mlnx-ofa_kernel-modules
 %description -n %{non_kmp_pname}
 Core, HW and ULPs kernel modules
 Non-KMP format kernel modules rpm.
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-25.07-0.9.7.tgz
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-%{MLNX_OFA_DRV_SRC}.tgz
 %endif #end if "%{KMP}" == "1"
 
 %package -n %{devel_pname}

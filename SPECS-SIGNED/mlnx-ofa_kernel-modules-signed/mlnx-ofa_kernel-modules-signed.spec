@@ -115,6 +115,8 @@ Obsoletes: mlnx-en-kmp-trace
 Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
+Obsoletes: fwctl <= 24.10
+Provides:  fwctl
 
 Requires: kernel = %{target_kernel_version_full}
 Requires: kmod

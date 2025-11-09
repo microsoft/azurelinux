@@ -4,7 +4,8 @@
 %{!?make_build: %global make_build %{__make} %{?_smp_mflags} %{?mflags} V=1}
 %{!?run_ldconfig: %global run_ldconfig %{?ldconfig}}
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
-%global use_systemd %(if command -v systemctl >/dev/null 2>&1; then echo -n '1'; else echo -n '0'; fi)
+# Azure Linux build with use_systemd
+%global use_systemd 1
 
 Name:           libvma
 Version:        9.8.72
@@ -68,7 +69,7 @@ Summary: Utilities used with libvma
 %if 0%{?rhl}%{?fedora} == 0
 Group: System Environment/Libraries
 %endif
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 
 %description utils
 This package contains the tool for collecting and analyzing libvma statistic.
@@ -109,60 +110,16 @@ install -m 755 ./%{name}-debug.so $RPM_BUILD_ROOT/%{_libdir}/%{name}-debug.so
 %endif
 
 %post
-%if 0%{?fedora} || 0%{?rhel} > 7
-# https://fedoraproject.org/wiki/Changes/Removing_ldconfig_scriptlets
-%else
-%{run_ldconfig}
-%endif
-if [ $1 = 1 ]; then
-    if command -v systemctl >/dev/null 2>&1; then
-        %if 0%{?rhel} >= 9 || 0%{?fedora} >= 30 || 0%{?suse_version} >= 1210
-            %if 0%{?suse_version}
-            %service_add_post vma.service
-            %else
-            %systemd_post vma.service
-            %endif
-        %else
-            systemctl --no-reload enable vma.service >/dev/null 2>&1 || true
-        %endif
-    fi
-fi
+%systemd_post vma.service
 
 %preun
-if [ $1 = 0 ]; then
-    if command -v systemctl >/dev/null 2>&1; then
-        %if 0%{?rhel} >= 9 || 0%{?fedora} >= 30 || 0%{?suse_version} >= 1210
-            %if 0%{?suse_version}
-            %service_del_preun vma.service
-            %else
-            %systemd_preun vma.service
-            %endif
-        %else
-            systemctl --no-reload disable vma.service >/dev/null 2>&1 || true
-            systemctl stop vma.service || true
-        %endif
-    fi
-fi
+%systemd_preun vma.service
 
 %postun
-%if 0%{?fedora} || 0%{?rhel} > 7
-# https://fedoraproject.org/wiki/Changes/Removing_ldconfig_scriptlets
-%else
-%{run_ldconfig}
-%endif
-if command -v systemctl >/dev/null 2>&1; then
-        %if 0%{?rhel} >= 9 || 0%{?fedora} >= 30 || 0%{?suse_version} >= 1210
-            %if 0%{?suse_version}
-            %service_del_postun vma.service
-            %else
-            %systemd_postun_with_restart vma.service
-            %endif
-        %else
-            systemctl --system daemon-reload >/dev/null 2>&1 || true
-        %endif
-fi
+%systemd_postun_with_restart vma.service
 
 %files
+%license LICENSE
 %{_libdir}/%{name}.so*
 %dir %{_pkgdocdir}
 %doc %{_pkgdocdir}/README
@@ -174,9 +131,6 @@ fi
 %endif
 %{_mandir}/man7/vma.*
 %{_mandir}/man8/vmad.*
-%if 0%{?rhel} >= 7 || 0%{?fedora} >= 24 || 0%{?suse_version} >= 1500
-%license LICENSE
-%endif
 
 %files devel
 %dir %{_includedir}/mellanox
@@ -193,6 +147,7 @@ fi
 * Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 9.8.72-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
+- Update build with use_systemd=1
 
 * Wed Feb 28 2024 NVIDIA CORPORATION <networking-support@nvidia.com> 9.8.60-1
 - Bump version to 9.8.60
