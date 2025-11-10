@@ -187,6 +187,7 @@ install -d -m 0755 %{buildroot}/run/%{name}/
 %changelog
 * Fri Nov 07 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 4.1.1-1
 - Upgrade to 4.1.1 ref from Fedora 42
+- License verified
 
 * Tue Sep 21 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.15-3
 - Added a patch to fix build errors by unifying struct names across the source code.

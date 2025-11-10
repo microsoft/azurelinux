@@ -147,6 +147,7 @@
                 "cpufrequtils",
                 "cpuid",
                 "criu",
+                "crun",
                 "crypto-policies",
                 "cryptsetup",
                 "cscope",
