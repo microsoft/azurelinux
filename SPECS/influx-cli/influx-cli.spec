@@ -17,8 +17,8 @@
 
 Summary:        CLI for managing resources in InfluxDB
 Name:           influx-cli
-Version:        2.6.1
-Release:        19%{?dist}
+Version:        2.7.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -81,6 +81,9 @@ bin/influx completion zsh > %{buildroot}/%{_datadir}/zsh/site-functions/_influx
 %{_datadir}/zsh
 
 %changelog
+* Fri Sep 05 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.7.0-1
+- Upgrade to version 2.7.0.
+
 * Mon Sep 22 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.6.1-19
 - Bump release to rebuild with golang
 
