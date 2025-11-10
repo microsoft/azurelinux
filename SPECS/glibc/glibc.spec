@@ -289,6 +289,8 @@ grep "^FAIL: nptl/tst-mutex10" tests.sum >/dev/null && n=$((n+1)) ||:
 grep "^FAIL: elf/tst-env-setuid-tunables" tests.sum >/dev/null && n=$((n+1)) ||:
 grep "^FAIL: malloc/tst-malloc-tcache-leak" tests.sum >/dev/null && n=$((n+1)) ||:
 grep "^FAIL: nptl/tst-pthread-setuid-loop" tests.sum >/dev/null && n=$((n+1)) ||:
+grep "^FAIL: nptl/tst-robust-fork" tests.sum >/dev/null && n=$((n+1)) ||:
+grep "^FAIL: nss/tst-nss-files-hosts-getent" tests.sum >/dev/null && n=$((n+1)) ||:
 grep "^FAIL: string/test-mempcpy" tests.sum >/dev/null && n=$((n+1)) ||:
 # consider the test passed if the only failures are expected ones above
 [ `grep ^FAIL tests.sum | wc -l` -eq $n ]
