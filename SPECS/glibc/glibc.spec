@@ -279,20 +279,27 @@ cd %{_builddir}/glibc-build
 #      79 UNSUPPORTED
 #      12 XFAIL
 #       8 XPASS
-
-make test t=nptl/tst-cancel1
-make test t=io/tst-lchmod
-make test t=nptl/tst-mutex10
-make test t=nptl/tst-pthread-setuid-loop
-make test t=nptl/tst-robust-fork
-make test t=nss/tst-nss-files-hosts-getent
-make test t=string/test-mempcpy
-make test t=elf/tst-env-setuid-tunables
-make test t=malloc/tst-malloc-tcache-leak
-make test t=nptl/tst-pthread-setuid-loop
-#exit 0
+#make test t=nptl/tst-cancel1
+#make test t=io/tst-lchmod
+#make test t=nptl/tst-mutex10
+#make test t=nptl/tst-pthread-setuid-loop
+#make test t=nptl/tst-robust-fork
+#make test t=nss/tst-nss-files-hosts-getent
+#make test t=string/test-mempcpy
+#make test t=elf/tst-env-setuid-tunables
+#make test t=malloc/tst-malloc-tcache-leak
 
 make %{?_smp_mflags} check ||:
+# print failing test logs if available
+cat %{_builddir}/glibc-build/nptl/tst-cancel1.out ||:
+cat %{_builddir}/glibc-build/io/tst-lchmod.out ||:
+cat %{_builddir}/glibc-build/nptl/tst-mutex10.out ||:
+cat %{_builddir}/glibc-build/nptl/tst-pthread-setuid-loop.out ||:
+cat %{_builddir}/glibc-build/nptl/tst-robust-fork.out ||:
+cat %{_builddir}/glibc-build/nss/tst-nss-files-hosts-getent.out ||:
+cat %{_builddir}/glibc-build/string/test-mempcpy.out ||:
+cat %{_builddir}/glibc-build/elf/tst-env-setuid-tunables.out ||:
+cat %{_builddir}/glibc-build/malloc/tst-malloc-tcache-leak.out ||:
 n=0
 # expected failures in local VM
 grep "^FAIL: nptl/tst-cancel1" tests.sum >/dev/null && n=$((n+1)) ||:
@@ -305,10 +312,6 @@ grep "^FAIL: nptl/tst-pthread-setuid-loop" tests.sum >/dev/null && n=$((n+1)) ||
 grep "^FAIL: nptl/tst-robust-fork" tests.sum >/dev/null && n=$((n+1)) ||:
 grep "^FAIL: nss/tst-nss-files-hosts-getent" tests.sum >/dev/null && n=$((n+1)) ||:
 grep "^FAIL: string/test-mempcpy" tests.sum >/dev/null && n=$((n+1)) ||:
-#tests.sum → summary of pass/fail status.
-#tests.log → verbose output for all tests.
-cat tests.sum
-cat tests.log
 # consider the test passed if the only failures are expected ones above
 [ `grep ^FAIL tests.sum | wc -l` -eq $n ]
 
