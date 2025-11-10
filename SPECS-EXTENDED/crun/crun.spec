@@ -48,7 +48,7 @@ BuildRequires: wasmedge-devel
 %endif
 
 BuildRequires: python
-BuildRequires: glibc-static
+BuildRequires: glibc-static >= 2.38-15%{?dist}
 Provides:      oci-runtime
 
 %description
