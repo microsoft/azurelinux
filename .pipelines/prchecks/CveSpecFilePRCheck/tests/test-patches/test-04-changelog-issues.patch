@@ -1,0 +1,20 @@
+--- a/SPECS/curl/curl.spec
++++ b/SPECS/curl/curl.spec
+@@ -10,6 +10,7 @@ URL:            https://curl.haxx.se
+ Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
+ Patch0:         CVE-2025-0665.patch
+ Patch1:         CVE-2025-0167.patch
+ Patch2:         CVE-2025-0725.patch
++Patch11:        CVE-2025-88888.patch
+ BuildRequires:  cmake
+ BuildRequires:  krb5-devel
+@@ -295,6 +296,9 @@ make DESTDIR=%{buildroot} install
+ %{_mandir}/man3/*
+ 
+ %changelog
++* Mon Oct 21 2024 Test User <test@example.com> - 8.11.1-4
++Applied CVE-2025-88888 fix
++* Invalid Date Entry
+ * Wed Dec 18 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 8.11.1-3
+ - Bump release to rebuild with new openssl
+ * Tue Dec 17 2024 Thien Trung Vuong <tvuong@microsoft.com> - 8.11.1-2
