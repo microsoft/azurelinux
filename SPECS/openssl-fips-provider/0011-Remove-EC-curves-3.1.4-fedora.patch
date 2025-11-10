@@ -1,8 +1,12 @@
-From ffab71090fd4c1cc81cd3e3458a4348b0805fe17 Mon Sep 17 00:00:00 2001
-From: Tobias Brick <tobiasb@microsoft.com>
-Date: Wed, 17 Apr 2024 21:39:03 +0000
-Subject: [PATCH] Remove EC curves
+From 4a275f852b61238161c053774736dc07b3ade200 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <dbelyavs@redhat.com>
+Date: Mon, 21 Aug 2023 11:46:40 +0200
+Subject: [PATCH 11/48] 0011-Remove-EC-curves.patch
 
+Patch-name: 0011-Remove-EC-curves.patch
+Patch-id: 11
+Patch-status: |
+    # remove unsupported EC curves
 ---
  apps/speed.c                 |  8 +---
  crypto/evp/ec_support.c      | 87 ------------------------------------
@@ -12,10 +16,10 @@ Subject: [PATCH] Remove EC curves
  5 files changed, 1 insertion(+), 147 deletions(-)
 
 diff --git a/apps/speed.c b/apps/speed.c
-index b978323..84a4ee3 100644
+index cace25eda1..d527f12f18 100644
 --- a/apps/speed.c
 +++ b/apps/speed.c
-@@ -404,7 +404,7 @@ static double ffdh_results[FFDH_NUM][1];  /* 1 op: derivation */
+@@ -385,7 +385,7 @@ static double ffdh_results[FFDH_NUM][1];  /* 1 op: derivation */
  #endif /* OPENSSL_NO_DH */
  
  enum ec_curves_t {
@@ -24,7 +28,7 @@ index b978323..84a4ee3 100644
  #ifndef OPENSSL_NO_EC2M
      R_EC_K163, R_EC_K233, R_EC_K283, R_EC_K409, R_EC_K571,
      R_EC_B163, R_EC_B233, R_EC_B283, R_EC_B409, R_EC_B571,
-@@ -414,8 +414,6 @@ enum ec_curves_t {
+@@ -395,8 +395,6 @@ enum ec_curves_t {
  };
  /* list of ecdsa curves */
  static const OPT_PAIR ecdsa_choices[ECDSA_NUM] = {
@@ -33,8 +37,8 @@ index b978323..84a4ee3 100644
      {"ecdsap224", R_EC_P224},
      {"ecdsap256", R_EC_P256},
      {"ecdsap384", R_EC_P384},
-@@ -448,8 +446,6 @@ enum {
- };
+@@ -423,8 +421,6 @@ static const OPT_PAIR ecdsa_choices[ECDSA_NUM] = {
+ enum { R_EC_X25519 = ECDSA_NUM, R_EC_X448, EC_NUM };
  /* list of ecdh curves, extension of |ecdsa_choices| list above */
  static const OPT_PAIR ecdh_choices[EC_NUM] = {
 -    {"ecdhp160", R_EC_P160},
@@ -42,7 +46,7 @@ index b978323..84a4ee3 100644
      {"ecdhp224", R_EC_P224},
      {"ecdhp256", R_EC_P256},
      {"ecdhp384", R_EC_P384},
-@@ -1825,8 +1821,6 @@ int speed_main(int argc, char **argv)
+@@ -1442,8 +1438,6 @@ int speed_main(int argc, char **argv)
       */
      static const EC_CURVE ec_curves[EC_NUM] = {
          /* Prime Curves */
@@ -52,7 +56,7 @@ index b978323..84a4ee3 100644
          {"nistp256", NID_X9_62_prime256v1, 256},
          {"nistp384", NID_secp384r1, 384},
 diff --git a/crypto/evp/ec_support.c b/crypto/evp/ec_support.c
-index 1ec1014..82b9529 100644
+index 1ec10143d2..82b95294b4 100644
 --- a/crypto/evp/ec_support.c
 +++ b/crypto/evp/ec_support.c
 @@ -20,89 +20,15 @@ typedef struct ec_name2nid_st {
@@ -173,7 +177,7 @@ index 1ec1014..82b9529 100644
      {"P-256", NID_X9_62_prime256v1},
      {"P-384", NID_secp384r1},
 diff --git a/test/acvp_test.inc b/test/acvp_test.inc
-index ad11d3a..894a0bf 100644
+index ad11d3ae1e..894a0bff9d 100644
 --- a/test/acvp_test.inc
 +++ b/test/acvp_test.inc
 @@ -211,15 +211,6 @@ static const unsigned char ecdsa_sigver_s1[] = {
@@ -193,7 +197,7 @@ index ad11d3a..894a0bf 100644
          "SHA2-512",
          "P-521",
 diff --git a/test/ecdsatest.h b/test/ecdsatest.h
-index 63fe319..06b5c0a 100644
+index 63fe319025..06b5c0aac5 100644
 --- a/test/ecdsatest.h
 +++ b/test/ecdsatest.h
 @@ -32,23 +32,6 @@ typedef struct {
@@ -221,7 +225,7 @@ index 63fe319..06b5c0a 100644
      {NID_secp224r1, NID_sha224,
       "699325d6fc8fbbb4981a6ded3c3a54ad2e4e3db8a5669201912064c64e700c139248cdc1"
 diff --git a/test/recipes/15-test_genec.t b/test/recipes/15-test_genec.t
-index 4d5090f..0a90a60 100644
+index 2dfed387ca..c733b68f83 100644
 --- a/test/recipes/15-test_genec.t
 +++ b/test/recipes/15-test_genec.t
 @@ -41,37 +41,11 @@ plan skip_all => "This test is unsupported in a no-ec build"
@@ -271,5 +275,5 @@ index 4d5090f..0a90a60 100644
      P-256
      P-384
 -- 
-2.33.8
+2.41.0
 
