@@ -1,3 +1,6 @@
+%global pypkg python3
+%global pyver 3
+
 %define majminorver %(echo %{version} | cut -d. -f1-2)
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
@@ -63,6 +66,17 @@ Group:          Development/Libraries
 %description libs
 These are library files of util-linux.
 
+%package -n %{pypkg}-libmount
+Summary:        Python bindings for the libmount library
+Requires:       %{name}-libs = %{version}-%{release}
+License:        LGPL-2.1-or-later
+
+%description -n %{pypkg}-libmount
+The libmount-python package contains a module that permits applications
+written in the Python programming language to use the interface
+supplied by the libmount library to work with mount tables (fstab,
+mountinfo, etc) and mount filesystems.
+
 %prep
 %autosetup -p1
 sed -i -e 's@etc/adjtime@var/lib/hwclock/adjtime@g' $(grep -rl '%{_sysconfdir}/adjtime' .)
@@ -78,7 +92,7 @@ autoreconf -fi
     --disable-static \
     --disable-use-tty-group \
     --disable-liblastlog2 \
-    --without-python \
+    --with-python=%{pyver} \
     --with-selinux \
     --with-audit
 make %{?_smp_mflags}
@@ -142,6 +156,10 @@ rm -rf %{buildroot}/lib/systemd/system
 /lib/libuuid.so.*
 /lib/libsmartcols.so.*
 /lib/libfdisk.so.*
+
+%files -n %{pypkg}-libmount
+%license Documentation/licenses/COPYING.LGPL-2.1-or-later
+%{_libdir}/python*/site-packages/libmount/
 
 %files devel
 %defattr(-,root,root)
