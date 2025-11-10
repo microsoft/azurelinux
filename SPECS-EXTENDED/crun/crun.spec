@@ -12,7 +12,7 @@
 Summary:       OCI runtime written in C
 Name:          crun
 Version:       1.24
-Release:       1
+Release:       1%{?dist}
 Vendor:        Microsoft Corporation
 Distribution:  Azure Linux
 URL:           https://github.com/containers/%{name}
