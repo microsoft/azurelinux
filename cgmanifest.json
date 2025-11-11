@@ -8730,6 +8730,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "leptonica",
+          "version": "1.85.0",
+          "downloadUrl": "https://github.com/DanBloomberg/leptonica/archive/1.85.0/leptonica-1.85.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "less",
           "version": "643",
           "downloadUrl": "https://www.greenwoodsoftware.com/less/less-643.tar.gz"
@@ -29018,6 +29028,16 @@
           "name": "tensorflow",
           "version": "2.16.1",
           "downloadUrl": "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.16.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "tesseract",
+          "version": "5.5.1",
+          "downloadUrl": "https://github.com/tesseract-ocr/tesseract/archive/5.5.1/tesseract-5.5.1.tar.gz"
         }
       }
     },
