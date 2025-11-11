@@ -31,7 +31,7 @@ Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{versio
 # Nexus team needs these to-be-upstreamed patches for the operator Edge to work
 # correctly.
 
-Patch1:         CVE-2025-22872.patch
+Patch0:         CVE-2025-22872.patch
 
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
