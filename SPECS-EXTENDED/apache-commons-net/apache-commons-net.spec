@@ -94,8 +94,8 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
-* Tue Nov 04 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 3.12.0-1
-- Upgrade to 3.9.0
+* Tue Nov 04 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 3.11.0-1
+- Upgrade to 3.11.0
 - Fix Build Issues
 - License verified
 
