@@ -66,6 +66,9 @@ install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
+# Remove LICENSE from javadoc directory to avoid duplicate license warning
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
