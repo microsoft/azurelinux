@@ -48,7 +48,7 @@ Group:          Documentation/HTML
 This package provides %{summary}.
 
 %prep
-%setup -q -n commons-collections4-%{version}-src
+%autosetup -n commons-collections4-%{version}-src
 cp %{SOURCE1} build.xml
 
 %build
@@ -95,14 +95,17 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
   * commons-collections4-4.1-jdk11.patch
     + All changes factored into the generated build.xml
 
--------------------------------------------------------------------
-Fri Mar 18 18:14:43 UTC 2022 - Fridrich Strba <fstrba@suse.com>
-
+* Fri Mar 18 18:14:43 UTC 2022 - Fridrich Strba <fstrba@suse.com>
 - Build with source/target levels 8
 
--------------------------------------------------------------------
-Mon Mar  4 10:41:43 UTC 2019 - Fridrich Strba <fstrba@suse.com>
+* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1-2
+- Converting the 'Release' tag to the '[number].[distribution]' format.
 
+* Tue Nov 17 2020 Ruying Chen <v-ruyche@microsoft.com> - 4.1-1.7
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
+- Use javapackages-local-bootstrap to avoid build cycle.
+
+* Mon Mar  4 2019 Fridrich Strba <fstrba@suse.com>
 - Initial packaging of apache-commons-collections4 4.1
 - Added patches:
   * commons-collections4-4.1-bundle.patch
