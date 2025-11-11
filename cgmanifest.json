@@ -1108,7 +1108,7 @@
         "other": {
           "name": "binutils",
           "version": "2.37",
-          "downloadUrl": "https://ftp.gnu.org/gnu/binutils/binutils-2.37.tar.xz"
+          "downloadUrl": "https://sourceware.org/pub/binutils/releases/binutils-2.37.tar.xz"
         }
       }
     },
@@ -13793,8 +13793,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.43",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.43.tar.gz"
+          "version": "8.0.44",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.44.tar.gz"
         }
       }
     },
