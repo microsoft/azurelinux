@@ -25104,8 +25104,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.9.19",
-          "downloadUrl": "https://www.python.org/ftp/python/3.9.19/Python-3.9.19.tar.xz"
+          "version": "3.9.25",
+          "downloadUrl": "https://www.python.org/ftp/python/3.9.25/Python-3.9.25.tar.xz"
         }
       }
     },
