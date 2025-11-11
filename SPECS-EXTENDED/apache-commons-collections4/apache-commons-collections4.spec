@@ -74,6 +74,7 @@ mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 %files -f .mfiles
 %doc RELEASE-NOTES.txt
 %license LICENSE.txt NOTICE.txt
+%license ADDITIONAL_LICENSE_INFO
 %{_javadir}/%{short_name}.jar
 
 %files javadoc
