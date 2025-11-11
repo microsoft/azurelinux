@@ -8331,8 +8331,8 @@
         "type": "other",
         "other": {
           "name": "kernel-rt",
-          "version": "6.6.85.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.85.1.tar.gz"
+          "version": "6.6.116.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.116.1.tar.gz"
         }
       }
     },
