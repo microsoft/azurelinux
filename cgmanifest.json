@@ -21933,7 +21933,7 @@
         "type": "other",
         "other": {
           "name": "pylint",
-          "version": "4.0,2",
+          "version": "4.0.2",
           "downloadUrl": "https://github.com/PyCQA/pylint/archive/v4.0.2/pylint-4.0.2.tar.gz"
         }
       }
