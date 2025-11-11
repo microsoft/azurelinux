@@ -32,7 +32,7 @@
             ]
         },
         {
-            "PackageName": ""apache-commons-net,
+            "PackageName": "apache-commons-net",
             "IgnoredFilesRegexList": [
                 "/usr/share/javadoc/apache-commons-net/org/apache/commons/net/bsd/*",
                 "/usr/share/javadoc/apache-commons-net/src-html/org/apache/commons/net/bsd/*"
