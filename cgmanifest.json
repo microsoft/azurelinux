@@ -1108,7 +1108,7 @@
         "other": {
           "name": "binutils",
           "version": "2.37",
-          "downloadUrl": "https://ftp.gnu.org/gnu/binutils/binutils-2.37.tar.xz"
+          "downloadUrl": "https://sourceware.org/pub/binutils/releases/binutils-2.37.tar.xz"
         }
       }
     },
@@ -10831,8 +10831,8 @@
         "type": "other",
         "other": {
           "name": "libseccomp",
-          "version": "2.5.3",
-          "downloadUrl": "https://github.com/seccomp/libseccomp/releases/download/v2.5.3/libseccomp-2.5.3.tar.gz"
+          "version": "2.5.5",
+          "downloadUrl": "https://github.com/seccomp/libseccomp/releases/download/v2.5.5/libseccomp-2.5.5.tar.gz"
         }
       }
     },
@@ -13403,8 +13403,8 @@
         "type": "other",
         "other": {
           "name": "moby-runc",
-          "version": "1.1.9",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.1.9.tar.gz"
+          "version": "1.2.8",
+          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.2.8.tar.gz"
         }
       }
     },
@@ -13793,8 +13793,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.43",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.43.tar.gz"
+          "version": "8.0.44",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.44.tar.gz"
         }
       }
     },
