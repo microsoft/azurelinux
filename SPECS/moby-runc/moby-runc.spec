@@ -1,11 +1,11 @@
 %define         upstream_name runc
-%define         commit_hash ccaecfcbc907d70a7aa870a6650887b901b25b82
+%define         commit_hash eeb7e6024f9ee43876301b1d23c353384fa6dcdd
 
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           moby-%{upstream_name}
 # update "commit_hash" above when upgrading version
-Version:        1.1.9
-Release:        9%{?dist}
+Version:        1.2.8
+Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/opencontainers/runc
 Group:          Virtualization/Libraries
@@ -13,11 +13,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 Source0:        https://github.com/opencontainers/runc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2024-21626.patch
-Patch1:         CVE-2024-45310.patch
 
 BuildRequires:  git
-BuildRequires:  golang => 1.16
+BuildRequires:  msft-golang < 1.25
 BuildRequires:  go-md2man
 BuildRequires:  libseccomp-devel
 BuildRequires:  make
@@ -59,6 +57,11 @@ make install-man DESTDIR="%{buildroot}" PREFIX="%{_prefix}"
 %{_mandir}/*
 
 %changelog
+* Fri Nov 07 2025 Nan Liu <liunan@microsoft.com> - 1.2.8-1
+- Upgrade to 1.2.8
+- Set BR: msft-golang < 1.25
+- Fix CVE-2025-31133, CVE-2025-52565, CVE-2025-52881
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.1.9-9
 - Bump release to rebuild with golang
 

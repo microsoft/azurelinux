@@ -1,7 +1,7 @@
 %global gdb_version 10.2
 Name:          crash
 Version:       8.0.1
-Release:       4%{?dist}
+Release:       5%{?dist}
 Summary:       kernel crash analysis utility for live systems, netdump, diskdump, kdump, LKCD or mcore dumpfiles
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
@@ -10,7 +10,8 @@ URL:           https://github.com/crash-utility/crash
 Source0:       https://github.com/crash-utility/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # crash requires gdb tarball for the build. There is no option to use the host gdb. For crash 8.0.1 the newest supported gdb version is 10.2.
 # '-3' version of the tarball contains fix for CVE-2021-20197, CVE-2022-47673, CVE-2022-47696, CVE-2022-37434 which cannot be applied as a .patch because source1 is only untar'ed during crash make
-Source1:       gdb-%{gdb_version}-3.tar.gz
+# '-4' version of the tarball contains fix for CVE-2025-11082 which cannot be applied as a .patch because source1 is only untar'ed during crash make
+Source1:       gdb-%{gdb_version}-4.tar.gz
 # lzo patch sourced from https://src.fedoraproject.org/rpms/crash/blob/rawhide/f/lzo_snappy_zstd.patch
 Patch0:        lzo_snappy_zstd.patch
 License:       GPLv3+
@@ -66,6 +67,9 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 %{_includedir}/crash/*.h
 
 %changelog
+* Fri Oct 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.0.1-5
+- Update gdb-10.2-4.tar.gz to address CVE-2025-11082
+
 * Mon Apr 21 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.1-4
 - Update gdb-10.2-3.tar.gz to address CVE-2021-20197, CVE-2022-47673, CVE-2022-47696, CVE-2022-37434
 
