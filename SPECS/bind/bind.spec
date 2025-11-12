@@ -278,7 +278,6 @@ for DIR in filesystem ldap mysql mysqldyn sqlite3; do
 done
 popd
 
-
 %install
 mkdir -p %{buildroot}%{_sysconfdir}/logrotate.d
 mkdir -p %{buildroot}%{_libdir}/{bind,named}
