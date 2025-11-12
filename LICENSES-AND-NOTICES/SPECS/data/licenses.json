@@ -2565,7 +2565,6 @@
                 "apache-commons-httpclient",
                 "apache-commons-io",
                 "apache-commons-jexl",
-                "apache-commons-lang",
                 "apache-commons-lang3",
                 "apache-commons-logging",
                 "apache-commons-net",
