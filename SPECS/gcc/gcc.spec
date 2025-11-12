@@ -398,13 +398,8 @@ EOF
 chmod +x %{__ar_no_strip}
 %undefine __strip
 %global __strip %{__ar_no_strip}
-# Copy libcc1 libray files on the systems where it is not copied
-if [[ ! -f %{buildroot}%{_libdir}/libcc1.so ]]
-then
-    cp -p %{buildroot}%{_lib64dir}/libcc1.* %{buildroot}%{_libdir}/
-fi
 
-# Copy libcc1 libray files on the systems where it is not copied
+# Copy libcc1 library files on the systems where it is not copied
 if [[ ! -f %{buildroot}%{_libdir}/libcc1.so ]]
 then
     cp -p %{buildroot}%{_lib64dir}/libcc1.* %{buildroot}%{_libdir}/
