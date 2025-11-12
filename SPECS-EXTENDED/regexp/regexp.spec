@@ -73,7 +73,7 @@ install -p -m 0644 %{SOURCE1} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
 
 %files
 %defattr(0644,root,root,0755)
-%doc LICENSE
+%license LICENSE
 %{_javadir}/*.jar
 %{_mavenpomdir}/*
 %{_datadir}/maven-metadata/%{name}.xml*

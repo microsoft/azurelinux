@@ -26,7 +26,7 @@ Summary:        XML Pull Parser
 License:        Apache-1.1
 Group:          Development/Libraries/Java
 Url:            http://www.extreme.indiana.edu/xgws/xsoap/xpp/
-Source0:        http://www.extreme.indiana.edu/xgws/xsoap/xpp/download/PullParser2/PullParser2.1.10.tar.bz2
+Source0:        https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/PullParser2.1.10.tar.bz2
 Patch0:         xpp2-build_xml.patch
 Patch1:         xpp2-enum.patch
 BuildRequires:  ant >= 1.6
@@ -130,7 +130,13 @@ cp -pr src/java/samples/* %{buildroot}%{_datadir}/%{name}
 %files javadoc
 %defattr(0644,root,root,0755)
 %license LICENSE.txt
-%{_javadocdir}/%{name}
+%license %{_javadocdir}/%{name}/api/legal/LICENSE
+%license %{_javadocdir}/%{name}/api/legal/ADDITIONAL_LICENSE_INFO
+%license %{_javadocdir}/%{name}/api_impl/legal/LICENSE
+%license %{_javadocdir}/%{name}/api_impl/legal/ADDITIONAL_LICENSE_INFO
+
+# Other javadoc files
+%{_javadocdir}/%{name}/*
 
 %files manual
 %defattr(0644,root,root,0755)
