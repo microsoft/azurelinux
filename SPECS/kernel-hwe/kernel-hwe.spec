@@ -424,7 +424,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 
 %changelog
 * Tue Nov 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.12.50.2-2
-- Test only main kernel
+- Enable dm-cache for kernel-hwe
 
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.50.2-1
 - Update kernel
