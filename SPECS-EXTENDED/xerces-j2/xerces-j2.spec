@@ -143,6 +143,8 @@ install -pD -m755 -T %{SOURCE2} %{buildroot}%{_bindir}/%{name}-constants
 install -d -m 755 %{buildroot}%{_mandir}/man1
 install -p -m 644 %{SOURCE3} %{buildroot}%{_mandir}/man1
 install -p -m 644 %{SOURCE4} %{buildroot}%{_mandir}/man1
+mv %{buildroot}%{_javadocdir}/%{name}/other/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/other/legal/LICENSE .
 
 # demo
 install -pD -T build/xercesSamples.jar %{buildroot}%{_datadir}/%{name}/%{name}-samples.jar
@@ -154,8 +156,8 @@ update-alternatives --remove jaxp_parser_impl %{_javadir}/%{name}.jar >/dev/null
 ln -sf %{name}.jar %{_javadir}/jaxp_parser_impl.jar
 
 %files
-%license LICENSE LICENSE.DOM-documentation.html LICENSE.DOM-software.html LICENSE.resolver.txt LICENSE-SAX.html LICENSE.DOM-documentation.html LICENSE.serializer.txt
-%doc NOTICE README
+%license NOTICE LICENSE LICENSE.DOM-software.html LICENSE.resolver.txt LICENSE-SAX.html LICENSE.DOM-documentation.html LICENSE.serializer.txt
+%doc README
 %{_bindir}/*
 %{_javadir}/*
 %{_mandir}/*/*
@@ -167,7 +169,11 @@ ln -sf %{name}.jar %{_javadir}/jaxp_parser_impl.jar
 %endif
 
 %files javadoc
-%{_javadocdir}/%{name}
+%license LICENSE
+%license ADDITIONAL_LICENSE_INFO
+
+# Other javadoc files
+%{_javadocdir}/%{name}/*
 
 %files demo
 %{_datadir}/%{name}
