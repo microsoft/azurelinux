@@ -162,7 +162,7 @@ The test package contains all regression tests for Python as well as the modules
 
 %prep
 # We need to patch setuptools later, so manually manage patches with -N
-%autosetup -p1 -n Python-%{version} -N
+%autosetup -p1 -n cpython-%{version} -N
 
 # Ideally we would use '%%autopatch -p1 -M 999', but unfortunately the GitHub CI pipelines use a very old version of rpm which doesn't support it.
 # We use the CI to validate the toolchain manifests, which means we need to parse this .spec file
