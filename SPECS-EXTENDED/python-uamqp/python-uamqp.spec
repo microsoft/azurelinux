@@ -69,8 +69,7 @@ pip3 install pytest six
 
 %changelog
 * Wed Nov 12 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.5.1-4
-- Add cython3.0-support.patch to fix build
-- Add u_OpenSSL3.0-support.patch from openSUSE
+- Add cython3.0-support.patch & u_OpenSSL3.0-support.patch to fix build
 
 * Fri Apr 29 2022 Muhammad Falak <mwani@microsoft.com> - 1.5.1-3
 - Drop BR on pytest, six & pip install deps to enable ptest
