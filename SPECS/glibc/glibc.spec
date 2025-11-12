@@ -10,7 +10,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -49,6 +49,7 @@ Patch19:        CVE-2025-4802.patch
 # Add test for CVE-2025-4802. Requires additional patch for a support function
 Patch20:        add_support_record_failure_barrier.patch
 Patch21:        test-CVE-2025-4802.patch
+Patch22:        CVE-2025-8058.patch
 
 # Patches for testing
 Patch100:       0001-Remove-Wno-format-cflag-from-tests.patch
@@ -371,6 +372,9 @@ grep "^FAIL: nptl/tst-mutex10" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
+* Thu Oct 23 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.38-15
+- Patch for CVE-2025-8058
+
 * Tue Oct 08 2025 Andrew Phelps <anphel@microsoft.com> - 2.38-14
 - Replace mitigation patch for glibc bug #25847 with proper upstream fix
 
