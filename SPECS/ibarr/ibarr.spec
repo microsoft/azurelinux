@@ -4,9 +4,10 @@ Release:        1%{?dist}
 Summary:        Nvidia address and route userspace resolution services for Infiniband
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-# DOCA OFED feature sources come from the following repo MLNX_OFED_SRC tgz
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
 # https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
-Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Group:		Applications/System
 License:	(GPL-2.0 WITH Linux-syscall-note) OR BSD-2-Clause
 BuildRequires:	cmake
