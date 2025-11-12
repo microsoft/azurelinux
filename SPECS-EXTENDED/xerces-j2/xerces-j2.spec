@@ -154,8 +154,8 @@ update-alternatives --remove jaxp_parser_impl %{_javadir}/%{name}.jar >/dev/null
 ln -sf %{name}.jar %{_javadir}/jaxp_parser_impl.jar
 
 %files
-%license LICENSE LICENSE.DOM-documentation.html LICENSE.DOM-software.html LICENSE.resolver.txt LICENSE-SAX.html LICENSE.DOM-documentation.html LICENSE.serializer.txt
-%doc NOTICE README
+%license NOTICE LICENSE LICENSE.DOM-software.html LICENSE.resolver.txt LICENSE-SAX.html LICENSE.DOM-documentation.html LICENSE.serializer.txt
+%doc README
 %{_bindir}/*
 %{_javadir}/*
 %{_mandir}/*/*
@@ -167,7 +167,22 @@ ln -sf %{name}.jar %{_javadir}/jaxp_parser_impl.jar
 %endif
 
 %files javadoc
-%{_javadocdir}/%{name}
+%license %{_javadocdir}/%{name}/other/legal/LICENSE
+%license %{_javadocdir}/%{name}/other/legal/ADDITIONAL_LICENSE_INFO
+%license %{_javadocdir}/%{name}/xni/legal/LICENSE
+%license %{_javadocdir}/%{name}/xni/legal/ADDITIONAL_LICENSE_INFO
+%license %{_javadocdir}/%{name}/xs/legal/LICENSE
+%license %{_javadocdir}/%{name}/xs/legal/ADDITIONAL_LICENSE_INFO
+
+%exclude %{_javadocdir}/%{name}/other/legal/LICENSE
+%exclude %{_javadocdir}/%{name}/other/legal/ADDITIONAL_LICENSE_INFO
+%exclude %{_javadocdir}/%{name}/xni/legal/LICENSE
+%exclude %{_javadocdir}/%{name}/xni/legal/ADDITIONAL_LICENSE_INFO
+%exclude %{_javadocdir}/%{name}/xs/legal/LICENSE
+%exclude %{_javadocdir}/%{name}/xs/legal/ADDITIONAL_LICENSE_INFO
+
+# Other javadoc files
+%{_javadocdir}/%{name}/*
 
 %files demo
 %{_datadir}/%{name}
