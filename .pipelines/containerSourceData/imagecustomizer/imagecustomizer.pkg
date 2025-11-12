@@ -21,4 +21,3 @@ python3
 python3-pip
 jq
 azurelinux-image-tools-imagecustomizer
-btrfs-progs
