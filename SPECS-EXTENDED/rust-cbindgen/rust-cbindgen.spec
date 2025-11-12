@@ -2,7 +2,7 @@
 Summary:        Tool for generating C bindings to Rust code
 Name:           rust-cbindgen
 Version:        0.24.3
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -96,6 +96,9 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %endif
 
 %changelog
+* Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 0.24.3-7
+- Bump release to rebuild with rust
+
 * Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.24.3-6
 - Bump release to rebuild with rust
 
