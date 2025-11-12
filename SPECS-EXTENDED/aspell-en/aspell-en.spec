@@ -5,15 +5,28 @@ Distribution:   Azure Linux
 %define aspellversion 6
 Summary: English dictionaries for Aspell
 Name: aspell-%{lang}
-Version: 2019.10.06
-Release: 4%{?dist}
+Epoch: 50
+Version: 2020.12.07
+Release: 12%{?dist}
 License: MIT and BSD
 URL: http://aspell.net/
-Source: ftp://ftp.gnu.org/gnu/aspell/dict/%{lang}/aspell%{aspellversion}-%{lang}-%{version}-%{langrelease}.tar.bz2
+Source: https://ftp.gnu.org/gnu/aspell/dict/%{lang}/aspell%{aspellversion}-%{lang}-%{version}-%{langrelease}.tar.bz2
+
+# IMPORTANT
+# This package has been deprecated since Fedora 39
+# The reason behind this is that upstream has been inactive for more than 4 years
+# and there are other variants like hunspell or enchant which has active upstream
+# FESCo approval is located here: https://pagure.io/fesco/issue/3009
+# Change proposal is located here: https://fedoraproject.org/wiki/Changes/AspellDeprecation
+Provides:  deprecated()
+
 Buildrequires: aspell >= 0.60
+BuildRequires: make
 Requires: aspell >= 0.60
 Obsoletes: aspell-en-gb <= 0.33.7.1
 Obsoletes: aspell-en-ca <= 0.33.7.1
+Supplements: (aspell and langpacks-en)
+Supplements: (aspell and langpacks-en_GB)
 
 %define debug_package %{nil}
 
@@ -33,15 +46,50 @@ rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 
 %files
-%doc Copyright
+%license Copyright
 %{_libdir}/aspell-0.60/*
 
 %changelog
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 2019.10.06-4
-- Remove epoch
+* Thu Mar 13 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 50:2020.12.07-12
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 50:2019.10.06-3
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 50:2020.12.07-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 50:2020.12.07-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 50:2020.12.07-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 50:2020.12.07-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Wed Jan 18 2023 Fedora Release Engineering <releng@fedoraproject.org> - 50:2020.12.07-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Jul 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 50:2020.12.07-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jan 19 2022 Fedora Release Engineering <releng@fedoraproject.org> - 50:2020.12.07-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 50:2020.12.07-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Feb  3 2021 Peter Oliver <rpm@mavit.org.uk> - 50:2020.12.07-3
+- Recommend the installation of these dictionaries when both aspell and an English langpack are installed.
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 50:2020.12.07-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Dec 11 2020 Nikola Forró <nforro@redhat.com> - 50:2020.12.07-1
+- Update to version 2020.12.07
+  resolves #1905302
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 50:2019.10.06-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 50:2019.10.06-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -188,3 +236,4 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 * Fri Jun 20 2003 Adrian Havill <havill@redhat.com> 0.51-5
 - first build for new aspell (0.50)
+

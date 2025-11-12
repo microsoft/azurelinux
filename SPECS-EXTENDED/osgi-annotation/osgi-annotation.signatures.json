@@ -1,8 +1,8 @@
 {
  "Signatures": {
   "LICENSE-2.0": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
-  "osgi-annotation-build.xml": "455668ebead4b9060352ac683fcd4b4508963e4598d4c346d8b0902ec86f66c3",
-  "osgi.annotation-7.0.0-sources.jar": "57e6da6079004fb2e5d249be66ada95a9b8c1bf8be2155c6714b66d307eb0a95",
-  "osgi.annotation-7.0.0.pom": "f47e44669cc613b5c13d38768171d0d2344af83fe3cc7f33ea5fae146afdfcb5"
+  "osgi-annotation-build.xml": "440bd47d2d47ddbc85d26ce59eaa4def9cb4d707d6c4a78d6dbb1daf1b2ca163",
+  "osgi.annotation-8.1.0-sources.jar": "b1f418597a5029764973731d9e68835f13eb3bf4e7a69898e690ec50445a7a76",
+  "osgi.annotation-8.1.0.pom": "229a7e0c6023e693e50b93bcd30e49d1cd10e519d9615e18696dd0ecfa1b9dd7"
  }
 }
