@@ -157,7 +157,6 @@
                 "Cython",
                 "dbus-c++",
                 "dbus-python",
-                "dbxtool",
                 "dconf",
                 "dcraw",
                 "debootstrap",
