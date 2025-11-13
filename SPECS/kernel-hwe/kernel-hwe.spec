@@ -30,7 +30,7 @@
 Summary:        Linux Kernel
 Name:           kernel-hwe
 Version:        6.12.50.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -423,6 +423,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Nov 11 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.12.50.2-2
+- Enable dm-cache for kernel-hwe
+
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.50.2-1
 - Update kernel
 - Changes to SPEC file to support x86_64 build
