@@ -201,7 +201,7 @@ Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
 Obsoletes: mlnx-rdma-rxe
 Obsoletes: fwctl <= 24.10
-Provides:  fwctl
+Provides:  fwctl = %{version}-%{release}
 
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries

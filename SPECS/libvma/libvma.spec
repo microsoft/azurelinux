@@ -29,16 +29,7 @@ BuildRequires: gcc-c++
 BuildRequires: rdma-core-devel
 BuildRequires: libnl3-devel
 %if "%{use_systemd}" == "1"
-%if 0%{?rhel} >= 9 || 0%{?fedora} >= 30 || 0%{?suse_version} >= 1210
-BuildRequires: systemd-rpm-macros
-%{?systemd_requires}
-%else
 BuildRequires: systemd
-%endif
-%endif
-%if 0%{?rhel} >= 7 || 0%{?fedora} >= 24 || 0%{?suse_version} >= 1500
-BuildRequires: pkgconfig(libnl-3.0)
-BuildRequires: pkgconfig(libnl-route-3.0)
 %endif
 BuildRequires: make
 
@@ -55,9 +46,7 @@ IBV_QPT_RAW_PACKET QP for Ethernet and/or IBV_QPT_UD QP for IPoIB.
 
 %package devel
 Summary: Header files required to develop with libvma
-%if 0%{?rhl}%{?fedora} == 0
 Group: System Environment/Libraries
-%endif
 Requires: %{name} = %{version}-%{release}
 
 %description devel
@@ -66,9 +55,7 @@ interfaces.
 
 %package utils
 Summary: Utilities used with libvma
-%if 0%{?rhl}%{?fedora} == 0
 Group: System Environment/Libraries
-%endif
 Requires: %{name} = %{version}-%{release}
 
 %description utils

@@ -14,7 +14,7 @@
 Name:            %{_name}-signed
 Summary:         %{_name} Kernel Module for the %{KVERSION} kernel
 Version:         4.33.0
-Release:	 1%{release_suffix}%{?dist}
+Release:         1%{release_suffix}%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
 
