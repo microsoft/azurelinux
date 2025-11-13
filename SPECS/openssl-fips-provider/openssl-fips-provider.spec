@@ -313,6 +313,10 @@ find $RPM_BUILD_ROOT -type d -empty -delete
 %ldconfig_scriptlets libs
 
 %changelog
+* Thu Nov 13 2025 Tobias Brick <tobiasb@microsoft.com> - 3.1.2-1
+- Initial implementation of OpenSSL FIPS provider package for AZL.
+- Copied from openssl.spec and modified to only package the FIPS provider and config file.
+
 * Thu Oct 02 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.5-1
 - Auto-upgrade to 3.3.5 for CVE-2025-9230 and CVE-2025-9232
 
