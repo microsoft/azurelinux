@@ -18,6 +18,7 @@ Source3: genpatches
 Source9: configuration-switch.h
 Source10: configuration-prefix.h
 Source14: 0025-for-tests.patch
+Source15: fips_prov.cnf
 # Use more general default values in openssl.cnf
 Patch2:   0002-Use-more-general-default-values-in-openssl.cnf.patch
 # # Do not install html docs
@@ -292,13 +293,20 @@ install -m644 %{SOURCE9} \
 
 # TODO: TOBIASB: REVIEW
 # Delete everything but fips.so, since that's all we ship.
-# To do this, we delete all files and links that aren't fips.so, and then clean up empty directories.
+# To do this, we delete all files and links that aren't fips.so.
 find $RPM_BUILD_ROOT -type f ! -name fips.so -delete
 find $RPM_BUILD_ROOT -type l ! -name fips.so -delete
+
+# Now add our fips_prov.cnf file
+install -m644 %{SOURCE15} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fips_prov.cnf
+
+# Clean up any empty directories left over from the deletions above.
 find $RPM_BUILD_ROOT -type d -empty -delete
 
 %files
 %attr(0755,root,root) %{_libdir}/ossl-modules
+# TODO: TOBIASB: Do we want noreplace here?
+%config(noreplace) %{_sysconfdir}/pki/tls/fips_prov.cnf
 
 %ldconfig_scriptlets libs
 

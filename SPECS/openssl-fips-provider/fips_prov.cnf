@@ -1,0 +1,5 @@
+# Matches Fedora's config.
+# Does not need to be included from openss.cnf because it's manually loaded.
+[fips_sect]
+tls1-prf-ems-check = 1
+activate = 1
