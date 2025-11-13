@@ -383,7 +383,7 @@ grep "^FAIL: string/test-mempcpy" tests.sum >/dev/null && n=$((n+1)) ||:
 
 %changelog
 * Fri Nov 07 2025 Andrew Phelps <anphel@microsoft.com> - 2.38-16
-- Set ptest baseline
+- Ignore additional expected package test failures
 
 * Thu Oct 23 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.38-15
 - Patch for CVE-2025-8058
