@@ -425,8 +425,8 @@
         "type": "other",
         "other": {
           "name": "apache-commons-net",
-          "version": "3.6",
-          "downloadUrl": "http://archive.apache.org/dist/commons/net/source/commons-net-3.6-src.tar.gz"
+          "version": "3.11.0",
+          "downloadUrl": "https://archive.apache.org/dist/commons/net/source/commons-net-3.11.0-src.tar.gz"
         }
       }
     },
@@ -2479,16 +2479,6 @@
           "name": "dbus-python",
           "version": "1.3.2",
           "downloadUrl": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.3.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "dbxtool",
-          "version": "8",
-          "downloadUrl": "https://github.com/vathpela/dbxtool/releases/download/dbxtool-8/dbxtool-8.tar.bz2"
         }
       }
     },
@@ -8571,8 +8561,8 @@
         "type": "other",
         "other": {
           "name": "kubevirt",
-          "version": "1.5.0",
-          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.5.0.tar.gz"
+          "version": "1.5.3",
+          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.5.3.tar.gz"
         }
       }
     },
@@ -16343,8 +16333,8 @@
         "type": "other",
         "other": {
           "name": "perl-Business-ISBN",
-          "version": "3.005",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Business-ISBN-3.005.tar.gz"
+          "version": "3.009",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/B/BR/BRIANDFOY/Business-ISBN-3.009.tar.gz"
         }
       }
     },
