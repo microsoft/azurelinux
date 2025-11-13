@@ -3,6 +3,7 @@ From: akhila-guruju <v-guakhila@microsoft.com>
 Date: Wed, 12 Nov 2025 07:22:20 +0000
 Subject: [PATCH] fix cython-0.29 compatibility error
 
+Patch Reference: https://cython.readthedocs.io/en/latest/src/userguide/migrating_to_cy30.html#exception-values-and-noexcept
 ---
  src/amqp_management.pyx  | 6 +++---
  src/connection.pyx       | 6 +++---
