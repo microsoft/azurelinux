@@ -1,0 +1,235 @@
+From 91bdd9b816b22bc1464ec323f3272b866b24114d Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 31 Jul 2023 09:41:28 +0200
+Subject: [PATCH 12/35] 0012-Disable-explicit-ec.patch
+
+Patch-name: 0012-Disable-explicit-ec.patch
+Patch-id: 12
+Patch-status: |
+    # Disable explicit EC curves
+    # https://bugzilla.redhat.com/show_bug.cgi?id=2066412
+From-dist-git-commit: 9409bc7044cf4b5773639cce20f51399888c45fd
+---
+ crypto/ec/ec_asn1.c                           | 11 ++++++++++
+ crypto/ec/ec_lib.c                            |  6 +++++
+ test/ectest.c                                 | 22 ++++++++++---------
+ test/endecode_test.c                          | 20 ++++++++---------
+ .../30-test_evp_data/evppkey_ecdsa.txt        | 12 ----------
+ 5 files changed, 39 insertions(+), 32 deletions(-)
+
+diff --git a/crypto/ec/ec_asn1.c b/crypto/ec/ec_asn1.c
+index 7a0b35a594..d19d57344e 100644
+--- a/crypto/ec/ec_asn1.c
++++ b/crypto/ec/ec_asn1.c
+@@ -905,6 +905,12 @@ EC_GROUP *d2i_ECPKParameters(EC_GROUP **a, const unsigned char **in, long len)
+     if (params->type == ECPKPARAMETERS_TYPE_EXPLICIT)
+         group->decoded_from_explicit_params = 1;
+ 
++    if (EC_GROUP_check_named_curve(group, 0, NULL) == NID_undef) {
++        EC_GROUP_free(group);
++        ECPKPARAMETERS_free(params);
++        return NULL;
++    }
++
+     if (a) {
+         EC_GROUP_free(*a);
+         *a = group;
+@@ -964,6 +970,11 @@ EC_KEY *d2i_ECPrivateKey(EC_KEY **a, const unsigned char **in, long len)
+         goto err;
+     }
+ 
++    if (EC_GROUP_check_named_curve(ret->group, 0, NULL) == NID_undef) {
++        ERR_raise(ERR_LIB_EC, EC_R_UNKNOWN_GROUP);
++        goto err;
++    }
++
+     ret->version = priv_key->version;
+ 
+     if (priv_key->privateKey) {
+diff --git a/crypto/ec/ec_lib.c b/crypto/ec/ec_lib.c
+index a84e088c19..6c37bf78ae 100644
+--- a/crypto/ec/ec_lib.c
++++ b/crypto/ec/ec_lib.c
+@@ -1724,6 +1724,11 @@ EC_GROUP *EC_GROUP_new_from_params(const OSSL_PARAM params[],
+         goto err;
+     }
+     if (named_group == group) {
++        if (EC_GROUP_check_named_curve(group, 0, NULL) == NID_undef) {
++            ERR_raise(ERR_LIB_EC, EC_R_UNKNOWN_GROUP);
++            goto err;
++        }
++#if 0
+         /*
+          * If we did not find a named group then the encoding should be explicit
+          * if it was specified
+@@ -1739,6 +1744,7 @@ EC_GROUP *EC_GROUP_new_from_params(const OSSL_PARAM params[],
+             goto err;
+         }
+         EC_GROUP_set_asn1_flag(group, OPENSSL_EC_EXPLICIT_CURVE);
++#endif
+     } else {
+         EC_GROUP_free(group);
+         group = named_group;
+diff --git a/test/ectest.c b/test/ectest.c
+index 4890b0555e..e11aec5b3b 100644
+--- a/test/ectest.c
++++ b/test/ectest.c
+@@ -2301,10 +2301,11 @@ static int do_test_custom_explicit_fromdata(EC_GROUP *group, BN_CTX *ctx,
+     if (!TEST_ptr(params = OSSL_PARAM_BLD_to_param(bld))
+         || !TEST_ptr(pctx = EVP_PKEY_CTX_new_from_name(NULL, "EC", NULL))
+         || !TEST_int_gt(EVP_PKEY_fromdata_init(pctx), 0)
+-        || !TEST_int_gt(EVP_PKEY_fromdata(pctx, &pkeyparam,
++        || !TEST_int_le(EVP_PKEY_fromdata(pctx, &pkeyparam,
+                                           EVP_PKEY_KEY_PARAMETERS, params), 0))
+         goto err;
+-
++/* As creating the key should fail, the rest of the test is pointless */
++# if 0
+     /*- Check that all the set values are retrievable -*/
+ 
+     /* There should be no match to a group name since the generator changed */
+@@ -2433,6 +2434,7 @@ static int do_test_custom_explicit_fromdata(EC_GROUP *group, BN_CTX *ctx,
+ #endif
+         )
+         goto err;
++#endif
+     ret = 1;
+ err:
+     BN_free(order_out);
+@@ -2714,21 +2716,21 @@ static int custom_params_test(int id)
+ 
+     /* Compute keyexchange in both directions */
+     if (!TEST_ptr(pctx1 = EVP_PKEY_CTX_new(pkey1, NULL))
+-            || !TEST_int_eq(EVP_PKEY_derive_init(pctx1), 1)
+-            || !TEST_int_eq(EVP_PKEY_derive_set_peer(pctx1, pkey2), 1)
++            || !TEST_int_le(EVP_PKEY_derive_init(pctx1), 0)
++/*          || !TEST_int_eq(EVP_PKEY_derive_set_peer(pctx1, pkey2), 1)
+             || !TEST_int_eq(EVP_PKEY_derive(pctx1, NULL, &sslen), 1)
+             || !TEST_int_gt(bsize, sslen)
+-            || !TEST_int_eq(EVP_PKEY_derive(pctx1, buf1, &sslen), 1))
++            || !TEST_int_eq(EVP_PKEY_derive(pctx1, buf1, &sslen), 1)*/)
+         goto err;
+     if (!TEST_ptr(pctx2 = EVP_PKEY_CTX_new(pkey2, NULL))
+-            || !TEST_int_eq(EVP_PKEY_derive_init(pctx2), 1)
+-            || !TEST_int_eq(EVP_PKEY_derive_set_peer(pctx2, pkey1), 1)
++            || !TEST_int_le(EVP_PKEY_derive_init(pctx2), 1)
++/*          || !TEST_int_eq(EVP_PKEY_derive_set_peer(pctx2, pkey1), 1)
+             || !TEST_int_eq(EVP_PKEY_derive(pctx2, NULL, &t), 1)
+             || !TEST_int_gt(bsize, t)
+             || !TEST_int_le(sslen, t)
+-            || !TEST_int_eq(EVP_PKEY_derive(pctx2, buf2, &t), 1))
++            || !TEST_int_eq(EVP_PKEY_derive(pctx2, buf2, &t), 1) */)
+         goto err;
+-
++#if 0
+     /* Both sides should expect the same shared secret */
+     if (!TEST_mem_eq(buf1, sslen, buf2, t))
+         goto err;
+@@ -2780,7 +2782,7 @@ static int custom_params_test(int id)
+             /* compare with previous result */
+             || !TEST_mem_eq(buf1, t, buf2, sslen))
+         goto err;
+-
++#endif
+     ret = 1;
+ 
+  err:
+diff --git a/test/endecode_test.c b/test/endecode_test.c
+index 14648287eb..9a437d8c64 100644
+--- a/test/endecode_test.c
++++ b/test/endecode_test.c
+@@ -62,7 +62,7 @@ static BN_CTX *bnctx = NULL;
+ static OSSL_PARAM_BLD *bld_prime_nc = NULL;
+ static OSSL_PARAM_BLD *bld_prime = NULL;
+ static OSSL_PARAM *ec_explicit_prime_params_nc = NULL;
+-static OSSL_PARAM *ec_explicit_prime_params_explicit = NULL;
++/*static OSSL_PARAM *ec_explicit_prime_params_explicit = NULL;*/
+ 
+ # ifndef OPENSSL_NO_EC2M
+ static OSSL_PARAM_BLD *bld_tri_nc = NULL;
+@@ -1009,9 +1009,9 @@ IMPLEMENT_TEST_SUITE_LEGACY(EC, "EC")
+ DOMAIN_KEYS(ECExplicitPrimeNamedCurve);
+ IMPLEMENT_TEST_SUITE(ECExplicitPrimeNamedCurve, "EC", 1)
+ IMPLEMENT_TEST_SUITE_LEGACY(ECExplicitPrimeNamedCurve, "EC")
+-DOMAIN_KEYS(ECExplicitPrime2G);
+-IMPLEMENT_TEST_SUITE(ECExplicitPrime2G, "EC", 0)
+-IMPLEMENT_TEST_SUITE_LEGACY(ECExplicitPrime2G, "EC")
++/*DOMAIN_KEYS(ECExplicitPrime2G);*/
++/*IMPLEMENT_TEST_SUITE(ECExplicitPrime2G, "EC", 0)*/
++/*IMPLEMENT_TEST_SUITE_LEGACY(ECExplicitPrime2G, "EC")*/
+ # ifndef OPENSSL_NO_EC2M
+ DOMAIN_KEYS(ECExplicitTriNamedCurve);
+ IMPLEMENT_TEST_SUITE(ECExplicitTriNamedCurve, "EC", 1)
+@@ -1352,7 +1352,7 @@ int setup_tests(void)
+         || !create_ec_explicit_prime_params_namedcurve(bld_prime_nc)
+         || !create_ec_explicit_prime_params(bld_prime)
+         || !TEST_ptr(ec_explicit_prime_params_nc = OSSL_PARAM_BLD_to_param(bld_prime_nc))
+-        || !TEST_ptr(ec_explicit_prime_params_explicit = OSSL_PARAM_BLD_to_param(bld_prime))
++/*        || !TEST_ptr(ec_explicit_prime_params_explicit = OSSL_PARAM_BLD_to_param(bld_prime))*/
+ # ifndef OPENSSL_NO_EC2M
+         || !TEST_ptr(bld_tri_nc = OSSL_PARAM_BLD_new())
+         || !TEST_ptr(bld_tri = OSSL_PARAM_BLD_new())
+@@ -1380,7 +1380,7 @@ int setup_tests(void)
+     TEST_info("Generating EC keys...");
+     MAKE_DOMAIN_KEYS(EC, "EC", EC_params);
+     MAKE_DOMAIN_KEYS(ECExplicitPrimeNamedCurve, "EC", ec_explicit_prime_params_nc);
+-    MAKE_DOMAIN_KEYS(ECExplicitPrime2G, "EC", ec_explicit_prime_params_explicit);
++/*    MAKE_DOMAIN_KEYS(ECExplicitPrime2G, "EC", ec_explicit_prime_params_explicit);*/
+ # ifndef OPENSSL_NO_EC2M
+     MAKE_DOMAIN_KEYS(ECExplicitTriNamedCurve, "EC", ec_explicit_tri_params_nc);
+     MAKE_DOMAIN_KEYS(ECExplicitTri2G, "EC", ec_explicit_tri_params_explicit);
+@@ -1423,8 +1423,8 @@ int setup_tests(void)
+         ADD_TEST_SUITE_LEGACY(EC);
+         ADD_TEST_SUITE(ECExplicitPrimeNamedCurve);
+         ADD_TEST_SUITE_LEGACY(ECExplicitPrimeNamedCurve);
+-        ADD_TEST_SUITE(ECExplicitPrime2G);
+-        ADD_TEST_SUITE_LEGACY(ECExplicitPrime2G);
++/*        ADD_TEST_SUITE(ECExplicitPrime2G);*/
++/*        ADD_TEST_SUITE_LEGACY(ECExplicitPrime2G);*/
+ # ifndef OPENSSL_NO_EC2M
+         ADD_TEST_SUITE(ECExplicitTriNamedCurve);
+         ADD_TEST_SUITE_LEGACY(ECExplicitTriNamedCurve);
+@@ -1461,7 +1461,7 @@ void cleanup_tests(void)
+ {
+ #ifndef OPENSSL_NO_EC
+     OSSL_PARAM_free(ec_explicit_prime_params_nc);
+-    OSSL_PARAM_free(ec_explicit_prime_params_explicit);
++/*    OSSL_PARAM_free(ec_explicit_prime_params_explicit);*/
+     OSSL_PARAM_BLD_free(bld_prime_nc);
+     OSSL_PARAM_BLD_free(bld_prime);
+ # ifndef OPENSSL_NO_EC2M
+@@ -1483,7 +1483,7 @@ void cleanup_tests(void)
+ #ifndef OPENSSL_NO_EC
+     FREE_DOMAIN_KEYS(EC);
+     FREE_DOMAIN_KEYS(ECExplicitPrimeNamedCurve);
+-    FREE_DOMAIN_KEYS(ECExplicitPrime2G);
++/*    FREE_DOMAIN_KEYS(ECExplicitPrime2G);*/
+ # ifndef OPENSSL_NO_EC2M
+     FREE_DOMAIN_KEYS(ECExplicitTriNamedCurve);
+     FREE_DOMAIN_KEYS(ECExplicitTri2G);
+diff --git a/test/recipes/30-test_evp_data/evppkey_ecdsa.txt b/test/recipes/30-test_evp_data/evppkey_ecdsa.txt
+index ec3c032aba..584ecee0eb 100644
+--- a/test/recipes/30-test_evp_data/evppkey_ecdsa.txt
++++ b/test/recipes/30-test_evp_data/evppkey_ecdsa.txt
+@@ -133,18 +133,6 @@ AAAA//////////+85vqtpxeehPO5ysL8YyVRAgEBBG0wawIBAQQgiUTxtr5vLVjj
+ 3ev1gTwRBduzqqlwd54AUSgI+pjttW8zrWNitO8H1sf59MPWOESKxNtZ1+Nl
+ -----END PRIVATE KEY-----
+ 
+-PrivateKey = EC_EXPLICIT
+------BEGIN PRIVATE KEY-----
+-MIIBeQIBADCCAQMGByqGSM49AgEwgfcCAQEwLAYHKoZIzj0BAQIhAP////8AAAAB
+-AAAAAAAAAAAAAAAA////////////////MFsEIP////8AAAABAAAAAAAAAAAAAAAA
+-///////////////8BCBaxjXYqjqT57PrvVV2mIa8ZR0GsMxTsPY7zjw+J9JgSwMV
+-AMSdNgiG5wSTamZ44ROdJreBn36QBEEE5JcIvn36opqjEm/k59Al40rBAxWM2TPG
+-l0L13Je51zHpfXQ9Z2o7IQicMXP4wSfJ0qCgg2bgydqoxlYrlLGuVQIhAP////8A
+-AAAA//////////+85vqtpxeehPO5ysL8YyVRAgEBBG0wawIBAQQgec92jwduadCk
+-OjoNRI+YT5Be5TkzZXzYCyTLkMOikDmhRANCAATtECEhQbLEaiUj/Wu0qjcr81lL
+-46dx5zYgArz/iaSNJ3W80oO+F7v04jlQ7wxQzg96R0bwKiMeq5CcW9ZFt6xg
+------END PRIVATE KEY-----
+-
+ PrivateKey = B-163
+ -----BEGIN PRIVATE KEY-----
+ MGMCAQAwEAYHKoZIzj0CAQYFK4EEAA8ETDBKAgEBBBUDnQW0mLiHVha/jqFznX/K
+-- 
+2.41.0
+

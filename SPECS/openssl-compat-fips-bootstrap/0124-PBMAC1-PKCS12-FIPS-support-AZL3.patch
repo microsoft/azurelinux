@@ -1,0 +1,1046 @@
+From 8fabd70483958148044e614b456549816eea9303 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Fri, 7 Jun 2024 14:37:57 +0200
+Subject: [PATCH 1/4] Implementation of the RFC 9579, PBMAC1 in PKCS#12
+
+---
+ apps/pkcs12.c               |  89 ++++++++---
+ crypto/asn1/p5_pbev2.c      |   7 +
+ crypto/evp/digest.c         |  54 +++++++
+ crypto/pkcs12/p12_mutl.c    | 296 ++++++++++++++++++++++++++++++++----
+ include/crypto/evp.h        |   3 +
+ include/openssl/pkcs12.h.in |   3 +
+ include/openssl/x509.h.in   |  15 +-
+ 7 files changed, 412 insertions(+), 55 deletions(-)
+
+diff --git a/apps/pkcs12.c b/apps/pkcs12.c
+index c6a0006..d572bed 100644
+--- a/apps/pkcs12.c
++++ b/apps/pkcs12.c
+@@ -70,7 +70,7 @@ typedef enum OPTION_choice {
+     OPT_NAME, OPT_CSP, OPT_CANAME,
+     OPT_IN, OPT_OUT, OPT_PASSIN, OPT_PASSOUT, OPT_PASSWORD, OPT_CAPATH,
+     OPT_CAFILE, OPT_CASTORE, OPT_NOCAPATH, OPT_NOCAFILE, OPT_NOCASTORE, OPT_ENGINE,
+-    OPT_R_ENUM, OPT_PROV_ENUM, OPT_JDKTRUST,
++    OPT_R_ENUM, OPT_PROV_ENUM, OPT_JDKTRUST, OPT_PBMAC1_PBKDF2, OPT_PBMAC1_PBKDF2_MD,
+ #ifndef OPENSSL_NO_DES
+     OPT_LEGACY_ALG
+ #endif
+@@ -147,6 +147,8 @@ const OPTIONS pkcs12_options[] = {
+ #endif
+     {"macalg", OPT_MACALG, 's',
+      "Digest algorithm to use in MAC (default SHA256)"},
++    {"pbmac1_pbkdf2", OPT_PBMAC1_PBKDF2, '-', "Use PBMAC1 with PBKDF2 instead of MAC"},
++    {"pbmac1_pbkdf2_md", OPT_PBMAC1_PBKDF2_MD, 's', "Digest to use for PBMAC1 KDF (default SHA256)"},
+     {"iter", OPT_ITER, 'p', "Specify the iteration count for encryption and MAC"},
+     {"noiter", OPT_NOITER, '-', "Don't use encryption iteration"},
+     {"nomaciter", OPT_NOMACITER, '-', "Don't use MAC iteration)"},
+@@ -170,14 +172,14 @@ int pkcs12_main(int argc, char **argv)
+     int use_legacy = 0;
+ #endif
+     /* use library defaults for the iter, maciter, cert, and key PBE */
+-    int iter = 0, maciter = 0;
++    int iter = 0, maciter = 0, pbmac1_pbkdf2 = 0;
+     int macsaltlen = PKCS12_SALT_LEN;
+     int cert_pbe = NID_undef;
+     int key_pbe = NID_undef;
+     int ret = 1, macver = 1, add_lmk = 0, private = 0;
+     int noprompt = 0;
+     char *passinarg = NULL, *passoutarg = NULL, *passarg = NULL;
+-    char *passin = NULL, *passout = NULL, *macalg = NULL;
++    char *passin = NULL, *passout = NULL, *macalg = NULL, *pbmac1_pbkdf2_md = NULL;
+     char *cpass = NULL, *mpass = NULL, *badpass = NULL;
+     const char *CApath = NULL, *CAfile = NULL, *CAstore = NULL, *prog;
+     int noCApath = 0, noCAfile = 0, noCAstore = 0;
+@@ -283,6 +285,12 @@ int pkcs12_main(int argc, char **argv)
+         case OPT_MACALG:
+             macalg = opt_arg();
+             break;
++        case OPT_PBMAC1_PBKDF2:
++            pbmac1_pbkdf2 = 1;
++            break;
++        case OPT_PBMAC1_PBKDF2_MD:
++            pbmac1_pbkdf2_md = opt_arg();
++            break;
+         case OPT_CERTPBE:
+             if (!set_pbe(&cert_pbe, opt_arg()))
+                 goto opthelp;
+@@ -701,10 +709,20 @@ int pkcs12_main(int argc, char **argv)
+         }
+ 
+         if (maciter != -1) {
+-            if (!PKCS12_set_mac(p12, mpass, -1, NULL, macsaltlen, maciter, macmd)) {
+-                BIO_printf(bio_err, "Error creating PKCS12 MAC; no PKCS12KDF support?\n");
+-                BIO_printf(bio_err, "Use -nomac if MAC not required and PKCS12KDF support not available.\n");
+-                goto export_end;
++            if (pbmac1_pbkdf2 == 1) {
++                if (!PKCS12_set_pbmac1_pbkdf2(p12, mpass, -1, NULL,
++                                              macsaltlen, maciter,
++                                              macmd, pbmac1_pbkdf2_md)) {
++                    BIO_printf(bio_err, "Error creating PBMAC1\n");
++                    goto export_end;
++                }
++            } else {
++                if (!PKCS12_set_mac(p12, mpass, -1, NULL, macsaltlen, maciter, macmd)) {
++                    BIO_printf(bio_err, "Error creating PKCS12 MAC; no PKCS12KDF support?\n");
++                    BIO_printf(bio_err,
++                               "Use -nomac or -pbmac1_pbkdf2 if PKCS12KDF support not available\n");
++                    goto export_end;
++                }
+             }
+         }
+         assert(private);
+@@ -775,23 +793,54 @@ int pkcs12_main(int argc, char **argv)
+         X509_ALGOR_get0(&macobj, NULL, NULL, macalgid);
+         BIO_puts(bio_err, "MAC: ");
+         i2a_ASN1_OBJECT(bio_err, macobj);
+-        BIO_printf(bio_err, ", Iteration %ld\n",
+-                   tmaciter != NULL ? ASN1_INTEGER_get(tmaciter) : 1L);
+-        BIO_printf(bio_err, "MAC length: %ld, salt length: %ld\n",
+-                   tmac != NULL ? ASN1_STRING_length(tmac) : 0L,
+-                   tsalt != NULL ? ASN1_STRING_length(tsalt) : 0L);
++        if (OBJ_obj2nid(macobj) == NID_pbmac1) {
++            PBKDF2PARAM *pbkdf2_param = PBMAC1_get1_pbkdf2_param(macalgid);
++
++            if (pbkdf2_param == NULL) {
++                BIO_printf(bio_err, ", Unsupported KDF or params for PBMAC1\n");
++            } else {
++                const ASN1_OBJECT *prfobj;
++
++                BIO_printf(bio_err, " using PBKDF2, Iteration %ld\n",
++                           ASN1_INTEGER_get(pbkdf2_param->iter));
++                BIO_printf(bio_err, "Key length: %ld, Salt length: %d\n",
++                           ASN1_INTEGER_get(pbkdf2_param->keylength),
++                           ASN1_STRING_length(pbkdf2_param->salt->value.octet_string));
++                X509_ALGOR_get0(&prfobj, NULL, NULL, pbkdf2_param->prf);
++                BIO_printf(bio_err, "PBKDF2 PRF: ");
++                i2a_ASN1_OBJECT(bio_err, prfobj);
++                BIO_printf(bio_err, "\n");
++            }
++            PBKDF2PARAM_free(pbkdf2_param);
++        } else {
++            BIO_printf(bio_err, ", Iteration %ld\n",
++                       tmaciter != NULL ? ASN1_INTEGER_get(tmaciter) : 1L);
++            BIO_printf(bio_err, "MAC length: %ld, salt length: %ld\n",
++                       tmac != NULL ? ASN1_STRING_length(tmac) : 0L,
++                       tsalt != NULL ? ASN1_STRING_length(tsalt) : 0L);
++        }
+     }
++
+     if (macver) {
+-        EVP_KDF *pkcs12kdf;
++        const X509_ALGOR *macalgid;
++        const ASN1_OBJECT *macobj;
+ 
+-        pkcs12kdf = EVP_KDF_fetch(app_get0_libctx(), "PKCS12KDF",
+-                                  app_get0_propq());
+-        if (pkcs12kdf == NULL) {
+-            BIO_printf(bio_err, "Error verifying PKCS12 MAC; no PKCS12KDF support.\n");
+-            BIO_printf(bio_err, "Use -nomacver if MAC verification is not required.\n");
+-            goto end;
++        PKCS12_get0_mac(NULL, &macalgid, NULL, NULL, p12);
++        X509_ALGOR_get0(&macobj, NULL, NULL, macalgid);
++
++        if (OBJ_obj2nid(macobj) != NID_pbmac1) {
++            EVP_KDF *pkcs12kdf;
++
++            pkcs12kdf = EVP_KDF_fetch(app_get0_libctx(), "PKCS12KDF",
++                                      app_get0_propq());
++            if (pkcs12kdf == NULL) {
++                BIO_printf(bio_err, "Error verifying PKCS12 MAC; no PKCS12KDF support.\n");
++                BIO_printf(bio_err, "Use -nomacver if MAC verification is not required.\n");
++                goto end;
++            }
++            EVP_KDF_free(pkcs12kdf);
+         }
+-        EVP_KDF_free(pkcs12kdf);
++
+         /* If we enter empty password try no password first */
+         if (!mpass[0] && PKCS12_verify_mac(p12, NULL, 0)) {
+             /* If mac and crypto pass the same set it to NULL too */
+diff --git a/crypto/asn1/p5_pbev2.c b/crypto/asn1/p5_pbev2.c
+index 8575d05..c22cc6b 100644
+--- a/crypto/asn1/p5_pbev2.c
++++ b/crypto/asn1/p5_pbev2.c
+@@ -35,6 +35,13 @@ ASN1_SEQUENCE(PBKDF2PARAM) = {
+ 
+ IMPLEMENT_ASN1_FUNCTIONS(PBKDF2PARAM)
+ 
++ASN1_SEQUENCE(PBMAC1PARAM) = {
++    ASN1_SIMPLE(PBMAC1PARAM, keyDerivationFunc, X509_ALGOR),
++    ASN1_SIMPLE(PBMAC1PARAM, messageAuthScheme, X509_ALGOR)
++} ASN1_SEQUENCE_END(PBMAC1PARAM)
++
++IMPLEMENT_ASN1_FUNCTIONS(PBMAC1PARAM)
++
+ /*
+  * Return an algorithm identifier for a PKCS#5 v2.0 PBE algorithm: yes I know
+  * this is horrible! Extended version to allow application supplied PRF NID
+diff --git a/crypto/evp/digest.c b/crypto/evp/digest.c
+index 487e801..8c14f10 100644
+--- a/crypto/evp/digest.c
++++ b/crypto/evp/digest.c
+@@ -20,6 +20,7 @@
+ #include <openssl/params.h>
+ #include <openssl/core_names.h>
+ #include "internal/cryptlib.h"
++#include "internal/nelem.h"
+ #include "internal/provider.h"
+ #include "internal/core.h"
+ #include "crypto/evp.h"
+@@ -1188,3 +1189,56 @@ void EVP_MD_do_all_provided(OSSL_LIB_CTX *libctx,
+                        (void (*)(void *, void *))fn, arg,
+                        evp_md_from_algorithm, evp_md_up_ref, evp_md_free);
+ }
++
++typedef struct {
++    int md_nid;
++    int hmac_nid;
++} ossl_hmacmd_pair;
++
++static const ossl_hmacmd_pair ossl_hmacmd_pairs[] = {
++    {NID_sha1, NID_hmacWithSHA1},
++    {NID_md5, NID_hmacWithMD5},
++    {NID_sha224, NID_hmacWithSHA224},
++    {NID_sha256, NID_hmacWithSHA256},
++    {NID_sha384, NID_hmacWithSHA384},
++    {NID_sha512, NID_hmacWithSHA512},
++    {NID_id_GostR3411_94, NID_id_HMACGostR3411_94},
++    {NID_id_GostR3411_2012_256, NID_id_tc26_hmac_gost_3411_2012_256},
++    {NID_id_GostR3411_2012_512, NID_id_tc26_hmac_gost_3411_2012_512},
++    {NID_sha3_224, NID_hmac_sha3_224},
++    {NID_sha3_256, NID_hmac_sha3_256},
++    {NID_sha3_384, NID_hmac_sha3_384},
++    {NID_sha3_512, NID_hmac_sha3_512},
++    {NID_sha512_224, NID_hmacWithSHA512_224},
++    {NID_sha512_256, NID_hmacWithSHA512_256}
++};
++
++int ossl_hmac2mdnid(int hmac_nid)
++{
++    int md_nid = NID_undef;
++    size_t i;
++
++    for (i = 0; i < OSSL_NELEM(ossl_hmacmd_pairs); i++) {
++        if (ossl_hmacmd_pairs[i].hmac_nid == hmac_nid) {
++            md_nid = ossl_hmacmd_pairs[i].md_nid;
++            break;
++        }
++    }
++
++    return md_nid;
++}
++
++int ossl_md2hmacnid(int md_nid)
++{
++    int hmac_nid = NID_undef;
++    size_t i;
++
++    for (i = 0; i < OSSL_NELEM(ossl_hmacmd_pairs); i++) {
++        if (ossl_hmacmd_pairs[i].md_nid == md_nid) {
++            hmac_nid = ossl_hmacmd_pairs[i].hmac_nid;
++            break;
++        }
++    }
++
++    return hmac_nid;
++}
+diff --git a/crypto/pkcs12/p12_mutl.c b/crypto/pkcs12/p12_mutl.c
+index 4091e61..d410978 100644
+--- a/crypto/pkcs12/p12_mutl.c
++++ b/crypto/pkcs12/p12_mutl.c
+@@ -15,12 +15,19 @@
+ 
+ #include <stdio.h>
+ #include "internal/cryptlib.h"
++#include "crypto/evp.h"
+ #include <openssl/crypto.h>
+ #include <openssl/hmac.h>
+ #include <openssl/rand.h>
+ #include <openssl/pkcs12.h>
+ #include "p12_local.h"
+ 
++static int pkcs12_pbmac1_pbkdf2_key_gen(const char *pass, int passlen,
++                                        unsigned char *salt, int saltlen,
++                                        int id, int iter, int keylen,
++                                        unsigned char *out,
++                                        const EVP_MD *md_type);
++
+ int PKCS12_mac_present(const PKCS12 *p12)
+ {
+     return p12->mac ? 1 : 0;
+@@ -72,9 +79,76 @@ static int pkcs12_gen_gost_mac_key(const char *pass, int passlen,
+     return 1;
+ }
+ 
+-/* Generate a MAC */
++PBKDF2PARAM *PBMAC1_get1_pbkdf2_param(const X509_ALGOR *macalg)
++{
++    PBMAC1PARAM *param = NULL;
++    PBKDF2PARAM *pbkdf2_param = NULL;
++    const ASN1_OBJECT *kdf_oid;
++
++    param = ASN1_TYPE_unpack_sequence(ASN1_ITEM_rptr(PBMAC1PARAM), macalg->parameter);
++    if (param == NULL) {
++        ERR_raise(ERR_LIB_PKCS12, ERR_R_PASSED_INVALID_ARGUMENT);
++        return NULL;
++    }
++
++    X509_ALGOR_get0(&kdf_oid, NULL, NULL, param->keyDerivationFunc);
++    if (OBJ_obj2nid(kdf_oid) != NID_id_pbkdf2) {
++        ERR_raise(ERR_LIB_PKCS12, ERR_R_PASSED_INVALID_ARGUMENT);
++        PBMAC1PARAM_free(param);
++        return NULL;
++    }
++
++    pbkdf2_param = ASN1_TYPE_unpack_sequence(ASN1_ITEM_rptr(PBKDF2PARAM),
++                                             param->keyDerivationFunc->parameter);
++    PBMAC1PARAM_free(param);
++
++    return pbkdf2_param;
++}
++
++static int PBMAC1_PBKDF2_HMAC(OSSL_LIB_CTX *ctx, const char *propq,
++                              const char *pass, int passlen,
++                              const X509_ALGOR *macalg, unsigned char *key)
++{
++    PBKDF2PARAM *pbkdf2_param = NULL;
++    const ASN1_OBJECT *kdf_hmac_oid;
++    int ret = -1;
++    int keylen = 0;
++    EVP_MD *kdf_md = NULL;
++    const ASN1_OCTET_STRING *pbkdf2_salt = NULL;
++
++    pbkdf2_param = PBMAC1_get1_pbkdf2_param(macalg);
++    if (pbkdf2_param == NULL) {
++        ERR_raise(ERR_LIB_PKCS12, ERR_R_UNSUPPORTED);
++        goto err;
++    }
++    keylen = ASN1_INTEGER_get(pbkdf2_param->keylength);
++    pbkdf2_salt = pbkdf2_param->salt->value.octet_string;
++    X509_ALGOR_get0(&kdf_hmac_oid, NULL, NULL, pbkdf2_param->prf);
++
++    kdf_md = EVP_MD_fetch(ctx, OBJ_nid2sn(ossl_hmac2mdnid(OBJ_obj2nid(kdf_hmac_oid))), propq);
++    if (kdf_md == NULL) {
++        ERR_raise(ERR_LIB_PKCS12, ERR_R_FETCH_FAILED);
++        goto err;
++    }
++
++    if (PKCS5_PBKDF2_HMAC(pass, passlen, pbkdf2_salt->data, pbkdf2_salt->length,
++                          ASN1_INTEGER_get(pbkdf2_param->iter), kdf_md, keylen, key) <= 0) {
++        ERR_raise(ERR_LIB_PKCS12, ERR_R_INTERNAL_ERROR);
++        goto err;
++    }
++    ret = keylen;
++
++ err:
++    EVP_MD_free(kdf_md);
++    PBKDF2PARAM_free(pbkdf2_param);
++
++    return ret;
++}
++
++/* Generate a MAC, also used for verification */
+ static int pkcs12_gen_mac(PKCS12 *p12, const char *pass, int passlen,
+                           unsigned char *mac, unsigned int *maclen,
++                          int pbmac1_md_nid, int pbmac1_kdf_nid,
+                           int (*pkcs12_key_gen)(const char *pass, int passlen,
+                                                 unsigned char *salt, int slen,
+                                                 int id, int iter, int n,
+@@ -88,8 +162,8 @@ static int pkcs12_gen_mac(PKCS12 *p12, const char *pass, int passlen,
+     unsigned char key[EVP_MAX_MD_SIZE], *salt;
+     int saltlen, iter;
+     char md_name[80];
+-    int md_size = 0;
+-    int md_nid;
++    int keylen = 0;
++    int md_nid = NID_undef;
+     const X509_ALGOR *macalg;
+     const ASN1_OBJECT *macoid;
+ 
+@@ -111,9 +185,13 @@ static int pkcs12_gen_mac(PKCS12 *p12, const char *pass, int passlen,
+         iter = ASN1_INTEGER_get(p12->mac->iter);
+     X509_SIG_get0(p12->mac->dinfo, &macalg, NULL);
+     X509_ALGOR_get0(&macoid, NULL, NULL, macalg);
+-    if (OBJ_obj2txt(md_name, sizeof(md_name), macoid, 0) < 0)
+-        return 0;
+-
++    if (OBJ_obj2nid(macoid) == NID_pbmac1) {
++        if (OBJ_obj2txt(md_name, sizeof(md_name), OBJ_nid2obj(pbmac1_md_nid), 0) < 0)
++            return 0;
++    } else {
++        if (OBJ_obj2txt(md_name, sizeof(md_name), macoid, 0) < 0)
++            return 0;
++    }
+     (void)ERR_set_mark();
+     md = md_fetch = EVP_MD_fetch(p12->authsafes->ctx.libctx, md_name,
+                                  p12->authsafes->ctx.propq);
+@@ -127,40 +205,61 @@ static int pkcs12_gen_mac(PKCS12 *p12, const char *pass, int passlen,
+     }
+     (void)ERR_pop_to_mark();
+ 
+-    md_size = EVP_MD_get_size(md);
++    keylen = EVP_MD_get_size(md);
+     md_nid = EVP_MD_get_type(md);
+-    if (md_size < 0)
++    if (keylen < 0)
+         goto err;
+-    if ((md_nid == NID_id_GostR3411_94
+-         || md_nid == NID_id_GostR3411_2012_256
+-         || md_nid == NID_id_GostR3411_2012_512)
+-        && ossl_safe_getenv("LEGACY_GOST_PKCS12") == NULL) {
+-        md_size = TK26_MAC_KEY_LEN;
++
++    /* For PBMAC1 we use a special keygen callback if not provided (e.g. on verification) */
++    if (pbmac1_md_nid != NID_undef && pkcs12_key_gen == NULL) {
++        keylen = PBMAC1_PBKDF2_HMAC(p12->authsafes->ctx.libctx, p12->authsafes->ctx.propq,
++                                    pass, passlen, macalg, key);
++        if (keylen < 0)
++            goto err;
++    } else if ((md_nid == NID_id_GostR3411_94
++                || md_nid == NID_id_GostR3411_2012_256
++                || md_nid == NID_id_GostR3411_2012_512)
++               && ossl_safe_getenv("LEGACY_GOST_PKCS12") == NULL) {
++        keylen = TK26_MAC_KEY_LEN;
+         if (!pkcs12_gen_gost_mac_key(pass, passlen, salt, saltlen, iter,
+-                                     md_size, key, md)) {
++                                     keylen, key, md)) {
+             ERR_raise(ERR_LIB_PKCS12, PKCS12_R_KEY_GEN_ERROR);
+             goto err;
+         }
+     } else {
++        EVP_MD *hmac_md = (EVP_MD *)md;
++        int fetched = 0;
++
++        if (pbmac1_kdf_nid != NID_undef) {
++            char hmac_md_name[128];
++
++            if (OBJ_obj2txt(hmac_md_name, sizeof(hmac_md_name), OBJ_nid2obj(pbmac1_kdf_nid), 0) < 0)
++                goto err;
++            hmac_md = EVP_MD_fetch(NULL, hmac_md_name, NULL);
++            fetched = 1;
++        }
+         if (pkcs12_key_gen != NULL) {
+-            if (!(*pkcs12_key_gen)(pass, passlen, salt, saltlen, PKCS12_MAC_ID,
+-                                   iter, md_size, key, md)) {
++            int res = (*pkcs12_key_gen)(pass, passlen, salt, saltlen, PKCS12_MAC_ID,
++                                        iter, keylen, key, hmac_md);
++
++            if (fetched)
++                EVP_MD_free(hmac_md);
++            if (res != 1) {
+                 ERR_raise(ERR_LIB_PKCS12, PKCS12_R_KEY_GEN_ERROR);
+                 goto err;
+             }
+         } else {
+             /* Default to UTF-8 password */
+             if (!PKCS12_key_gen_utf8_ex(pass, passlen, salt, saltlen, PKCS12_MAC_ID,
+-                                       iter, md_size, key, md,
+-                                       p12->authsafes->ctx.libctx,
+-                                       p12->authsafes->ctx.propq)) {
++                                        iter, keylen, key, md,
++                                        p12->authsafes->ctx.libctx, p12->authsafes->ctx.propq)) {
+                 ERR_raise(ERR_LIB_PKCS12, PKCS12_R_KEY_GEN_ERROR);
+                 goto err;
+             }
+         }
+     }
+     if ((hmac = HMAC_CTX_new()) == NULL
+-        || !HMAC_Init_ex(hmac, key, md_size, md, NULL)
++        || !HMAC_Init_ex(hmac, key, keylen, md, NULL)
+         || !HMAC_Update(hmac, p12->authsafes->d.data->data,
+                         p12->authsafes->d.data->length)
+         || !HMAC_Final(hmac, mac, maclen)) {
+@@ -178,7 +277,7 @@ err:
+ int PKCS12_gen_mac(PKCS12 *p12, const char *pass, int passlen,
+                    unsigned char *mac, unsigned int *maclen)
+ {
+-    return pkcs12_gen_mac(p12, pass, passlen, mac, maclen, NULL);
++    return pkcs12_gen_mac(p12, pass, passlen, mac, maclen, NID_undef, NID_undef, NULL);
+ }
+ 
+ /* Verify the mac */
+@@ -187,14 +286,40 @@ int PKCS12_verify_mac(PKCS12 *p12, const char *pass, int passlen)
+     unsigned char mac[EVP_MAX_MD_SIZE];
+     unsigned int maclen;
+     const ASN1_OCTET_STRING *macoct;
++    const X509_ALGOR *macalg;
++    const ASN1_OBJECT *macoid;
+ 
+     if (p12->mac == NULL) {
+         ERR_raise(ERR_LIB_PKCS12, PKCS12_R_MAC_ABSENT);
+         return 0;
+     }
+-    if (!pkcs12_gen_mac(p12, pass, passlen, mac, &maclen, NULL)) {
+-        ERR_raise(ERR_LIB_PKCS12, PKCS12_R_MAC_GENERATION_ERROR);
+-        return 0;
++
++    X509_SIG_get0(p12->mac->dinfo, &macalg, NULL);
++    X509_ALGOR_get0(&macoid, NULL, NULL, macalg);
++    if (OBJ_obj2nid(macoid) == NID_pbmac1) {
++        PBMAC1PARAM *param = NULL;
++        const ASN1_OBJECT *hmac_oid;
++        int md_nid = NID_undef;
++
++        param = ASN1_TYPE_unpack_sequence(ASN1_ITEM_rptr(PBMAC1PARAM), macalg->parameter);
++        if (param == NULL) {
++            ERR_raise(ERR_LIB_PKCS12, ERR_R_UNSUPPORTED);
++            return 0;
++        }
++        X509_ALGOR_get0(&hmac_oid, NULL, NULL, param->messageAuthScheme);
++        md_nid = ossl_hmac2mdnid(OBJ_obj2nid(hmac_oid));
++
++        if (!pkcs12_gen_mac(p12, pass, passlen, mac, &maclen, md_nid, NID_undef, NULL)) {
++            ERR_raise(ERR_LIB_PKCS12, PKCS12_R_MAC_GENERATION_ERROR);
++            PBMAC1PARAM_free(param);
++            return 0;
++        }
++        PBMAC1PARAM_free(param);
++    } else {
++        if (!pkcs12_gen_mac(p12, pass, passlen, mac, &maclen, NID_undef, NID_undef, NULL)) {
++            ERR_raise(ERR_LIB_PKCS12, PKCS12_R_MAC_GENERATION_ERROR);
++            return 0;
++        }
+     }
+     X509_SIG_get0(p12->mac->dinfo, NULL, &macoct);
+     if ((maclen != (unsigned int)ASN1_STRING_length(macoct))
+@@ -205,7 +330,6 @@ int PKCS12_verify_mac(PKCS12 *p12, const char *pass, int passlen)
+ }
+ 
+ /* Set a mac */
+-
+ int PKCS12_set_mac(PKCS12 *p12, const char *pass, int passlen,
+                    unsigned char *salt, int saltlen, int iter,
+                    const EVP_MD *md_type)
+@@ -226,7 +350,7 @@ int PKCS12_set_mac(PKCS12 *p12, const char *pass, int passlen,
+     /*
+      * Note that output mac is forced to UTF-8...
+      */
+-    if (!pkcs12_gen_mac(p12, pass, passlen, mac, &maclen, NULL)) {
++    if (!pkcs12_gen_mac(p12, pass, passlen, mac, &maclen, NID_undef, NID_undef, NULL)) {
+         ERR_raise(ERR_LIB_PKCS12, PKCS12_R_MAC_GENERATION_ERROR);
+         return 0;
+     }
+@@ -238,9 +362,18 @@ int PKCS12_set_mac(PKCS12 *p12, const char *pass, int passlen,
+     return 1;
+ }
+ 
+-/* Set up a mac structure */
+-int PKCS12_setup_mac(PKCS12 *p12, int iter, unsigned char *salt, int saltlen,
+-                     const EVP_MD *md_type)
++static int pkcs12_pbmac1_pbkdf2_key_gen(const char *pass, int passlen,
++                                        unsigned char *salt, int saltlen,
++                                        int id, int iter, int keylen,
++                                        unsigned char *out,
++                                        const EVP_MD *md_type)
++{
++    return PKCS5_PBKDF2_HMAC(pass, passlen, salt, saltlen, iter,
++                             md_type, keylen, out);
++}
++
++static int pkcs12_setup_mac(PKCS12 *p12, int iter, unsigned char *salt, int saltlen,
++                            int nid)
+ {
+     X509_ALGOR *macalg;
+ 
+@@ -274,11 +407,112 @@ int PKCS12_setup_mac(PKCS12 *p12, int iter, unsigned char *salt, int saltlen,
+         memcpy(p12->mac->salt->data, salt, saltlen);
+     }
+     X509_SIG_getm(p12->mac->dinfo, &macalg, NULL);
+-    if (!X509_ALGOR_set0(macalg, OBJ_nid2obj(EVP_MD_get_type(md_type)),
+-                         V_ASN1_NULL, NULL)) {
++    if (!X509_ALGOR_set0(macalg, OBJ_nid2obj(nid), V_ASN1_NULL, NULL)) {
+         ERR_raise(ERR_LIB_PKCS12, ERR_R_ASN1_LIB);
+         return 0;
+     }
+ 
+     return 1;
+ }
++
++/* Set up a mac structure */
++int PKCS12_setup_mac(PKCS12 *p12, int iter, unsigned char *salt, int saltlen,
++                     const EVP_MD *md_type)
++{
++    return pkcs12_setup_mac(p12, iter, salt, saltlen, EVP_MD_get_type(md_type));
++}
++
++int PKCS12_set_pbmac1_pbkdf2(PKCS12 *p12, const char *pass, int passlen,
++                             unsigned char *salt, int saltlen, int iter,
++                             const EVP_MD *md_type, const char *prf_md_name)
++{
++    unsigned char mac[EVP_MAX_MD_SIZE];
++    unsigned int maclen;
++    ASN1_OCTET_STRING *macoct;
++    X509_ALGOR *alg = NULL;
++    int ret = 0;
++    int prf_md_nid = NID_undef, prf_nid = NID_undef, hmac_nid;
++    unsigned char *known_salt = NULL;
++    int keylen = 0;
++    PBMAC1PARAM *param = NULL;
++    X509_ALGOR  *hmac_alg = NULL, *macalg = NULL;
++
++    if (md_type == NULL)
++        /* No need to do a fetch as the md_type is used only to get a NID */
++        md_type = EVP_sha256();
++
++    if (prf_md_name == NULL)
++        prf_md_nid = EVP_MD_get_type(md_type);
++    else
++        prf_md_nid = OBJ_txt2nid(prf_md_name);
++
++    if (iter == 0)
++        iter = PKCS12_DEFAULT_ITER;
++
++    keylen = EVP_MD_get_size(md_type);
++
++    prf_nid  = ossl_md2hmacnid(prf_md_nid);
++    hmac_nid = ossl_md2hmacnid(EVP_MD_get_type(md_type));
++
++    if (prf_nid == NID_undef || hmac_nid == NID_undef) {
++        ERR_raise(ERR_LIB_PKCS12, PKCS12_R_UNKNOWN_DIGEST_ALGORITHM);
++        goto err;
++    }
++
++    if (salt == NULL) {
++        known_salt = OPENSSL_malloc(saltlen);
++        if (known_salt == NULL)
++            goto err;
++
++        if (RAND_bytes_ex(NULL, known_salt, saltlen, 0) <= 0) {
++            ERR_raise(ERR_LIB_PKCS12, ERR_R_RAND_LIB);
++            goto err;
++        }
++    }
++
++    param = PBMAC1PARAM_new();
++    hmac_alg = X509_ALGOR_new();
++    alg = PKCS5_pbkdf2_set(iter, salt ? salt : known_salt, saltlen, prf_nid, keylen);
++    if (param == NULL || hmac_alg == NULL || alg == NULL)
++        goto err;
++
++    if (pkcs12_setup_mac(p12, iter, salt ? salt : known_salt, saltlen,
++                         NID_pbmac1) == PKCS12_ERROR) {
++        ERR_raise(ERR_LIB_PKCS12, PKCS12_R_MAC_SETUP_ERROR);
++        goto err;
++    }
++
++    if (!X509_ALGOR_set0(hmac_alg, OBJ_nid2obj(hmac_nid), V_ASN1_NULL, NULL)) {
++        ERR_raise(ERR_LIB_PKCS12, PKCS12_R_MAC_SETUP_ERROR);
++        goto err;
++    }
++
++    X509_ALGOR_free(param->keyDerivationFunc);
++    X509_ALGOR_free(param->messageAuthScheme);
++    param->keyDerivationFunc = alg;
++    param->messageAuthScheme = hmac_alg;
++
++    X509_SIG_getm(p12->mac->dinfo, &macalg, &macoct);
++    if (!ASN1_TYPE_pack_sequence(ASN1_ITEM_rptr(PBMAC1PARAM), param, &macalg->parameter))
++        goto err;
++
++    /*
++     * Note that output mac is forced to UTF-8...
++     */
++    if (!pkcs12_gen_mac(p12, pass, passlen, mac, &maclen,
++                        EVP_MD_get_type(md_type), prf_md_nid,
++                        pkcs12_pbmac1_pbkdf2_key_gen)) {
++        ERR_raise(ERR_LIB_PKCS12, PKCS12_R_MAC_GENERATION_ERROR);
++        goto err;
++    }
++    if (!ASN1_OCTET_STRING_set(macoct, mac, maclen)) {
++        ERR_raise(ERR_LIB_PKCS12, PKCS12_R_MAC_STRING_SET_ERROR);
++        goto err;
++    }
++    ret = 1;
++
++ err:
++    PBMAC1PARAM_free(param);
++    OPENSSL_free(known_salt);
++    return ret;
++}
+diff --git a/include/crypto/evp.h b/include/crypto/evp.h
+index 7e8bdf6..8f6fe83 100644
+--- a/include/crypto/evp.h
++++ b/include/crypto/evp.h
+@@ -983,4 +983,7 @@ int evp_pkey_decrypt_alloc(EVP_PKEY_CTX *ctx, unsigned char **outp,
+                            size_t *outlenp, size_t expected_outlen,
+                            const unsigned char *in, size_t inlen);
+ 
++int ossl_md2hmacnid(int mdnid);
++int ossl_hmac2mdnid(int hmac_nid);
++
+ #endif /* OSSL_CRYPTO_EVP_H */
+diff --git a/include/openssl/pkcs12.h.in b/include/openssl/pkcs12.h.in
+index 35759d4..ab62207 100644
+--- a/include/openssl/pkcs12.h.in
++++ b/include/openssl/pkcs12.h.in
+@@ -269,6 +269,9 @@ int PKCS12_verify_mac(PKCS12 *p12, const char *pass, int passlen);
+ int PKCS12_set_mac(PKCS12 *p12, const char *pass, int passlen,
+                    unsigned char *salt, int saltlen, int iter,
+                    const EVP_MD *md_type);
++int PKCS12_set_pbmac1_pbkdf2(PKCS12 *p12, const char *pass, int passlen,
++                             unsigned char *salt, int saltlen, int iter,
++                             const EVP_MD *md_type, const char *prf_md_name);
+ int PKCS12_setup_mac(PKCS12 *p12, int iter, unsigned char *salt,
+                      int saltlen, const EVP_MD *md_type);
+ unsigned char *OPENSSL_asc2uni(const char *asc, int asclen,
+diff --git a/include/openssl/x509.h.in b/include/openssl/x509.h.in
+index 7210391..a5f502e 100644
+--- a/include/openssl/x509.h.in
++++ b/include/openssl/x509.h.in
+@@ -271,7 +271,12 @@ typedef struct PBKDF2PARAM_st {
+     X509_ALGOR *prf;
+ } PBKDF2PARAM;
+ 
+-#ifndef OPENSSL_NO_SCRYPT
++typedef struct {
++    X509_ALGOR *keyDerivationFunc;
++    X509_ALGOR *messageAuthScheme;
++} PBMAC1PARAM;
++
++# ifndef OPENSSL_NO_SCRYPT
+ typedef struct SCRYPT_PARAMS_st {
+     ASN1_OCTET_STRING *salt;
+     ASN1_INTEGER *costParameter;
+@@ -279,7 +284,7 @@ typedef struct SCRYPT_PARAMS_st {
+     ASN1_INTEGER *parallelizationParameter;
+     ASN1_INTEGER *keyLength;
+ } SCRYPT_PARAMS;
+-#endif
++# endif
+ 
+ #ifdef  __cplusplus
+ }
+@@ -1012,9 +1017,10 @@ X509 *X509_find_by_subject(STACK_OF(X509) *sk, const X509_NAME *name);
+ DECLARE_ASN1_FUNCTIONS(PBEPARAM)
+ DECLARE_ASN1_FUNCTIONS(PBE2PARAM)
+ DECLARE_ASN1_FUNCTIONS(PBKDF2PARAM)
+-#ifndef OPENSSL_NO_SCRYPT
++DECLARE_ASN1_FUNCTIONS(PBMAC1PARAM)
++# ifndef OPENSSL_NO_SCRYPT
+ DECLARE_ASN1_FUNCTIONS(SCRYPT_PARAMS)
+-#endif
++# endif
+ 
+ int PKCS5_pbe_set0_algor(X509_ALGOR *algor, int alg, int iter,
+                          const unsigned char *salt, int saltlen);
+@@ -1051,6 +1057,7 @@ X509_ALGOR *PKCS5_pbkdf2_set_ex(int iter, unsigned char *salt, int saltlen,
+                                 int prf_nid, int keylen,
+                                 OSSL_LIB_CTX *libctx);
+ 
++PBKDF2PARAM *PBMAC1_get1_pbkdf2_param(const X509_ALGOR *macalg);
+ /* PKCS#8 utilities */
+ 
+ DECLARE_ASN1_FUNCTIONS(PKCS8_PRIV_KEY_INFO)
+-- 
+2.45.4
+
+
+From 906f30f1130a271ee6eaec3825a1c6a2990351f9 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Fri, 7 Jun 2024 14:38:40 +0200
+Subject: [PATCH 2/4] Implementation of the RFC 9579, PBMAC1 in PKCS#12 -
+ documentation
+
+---
+ doc/man1/openssl-pkcs12.pod.in        | 11 +++++++
+ doc/man3/PBMAC1_get1_pbkdf2_param.pod | 46 +++++++++++++++++++++++++++
+ doc/man3/PKCS12_gen_mac.pod           | 37 ++++++++++++++++-----
+ doc/man3/X509_dup.pod                 |  3 ++
+ doc/man3/d2i_X509.pod                 |  2 ++
+ util/missingcrypto.txt                |  1 -
+ util/missingcrypto111.txt             |  1 -
+ 7 files changed, 91 insertions(+), 10 deletions(-)
+ create mode 100644 doc/man3/PBMAC1_get1_pbkdf2_param.pod
+
+diff --git a/doc/man1/openssl-pkcs12.pod.in b/doc/man1/openssl-pkcs12.pod.in
+index 665b22b..020543c 100644
+--- a/doc/man1/openssl-pkcs12.pod.in
++++ b/doc/man1/openssl-pkcs12.pod.in
+@@ -62,6 +62,8 @@ PKCS#12 output (export) options:
+ [B<-certpbe> I<cipher>]
+ [B<-descert>]
+ [B<-macalg> I<digest>]
++[B<-pbmac1_pbkdf2>]
++[B<-pbmac1_pbkdf2_md> I<digest>]
+ [B<-iter> I<count>]
+ [B<-noiter>]
+ [B<-nomaciter>]
+@@ -345,6 +347,15 @@ then both, the private key and the certificates are encrypted using triple DES.
+ 
+ Specify the MAC digest algorithm. If not included SHA256 will be used.
+ 
++=item B<-pbmac1_pbkdf2>
++
++Use PBMAC1 with PBKDF2 for MAC protection of the PKCS#12 file.
++
++=item B<-pbmac1_pbkdf2_md> I<digest>
++
++Specify the PBKDF2 KDF digest algorithm. If not specified, SHA256 will be used.
++Unless C<-pbmac1_pbkdf2> is specified, this parameter is ignored.
++
+ =item B<-iter> I<count>
+ 
+ This option specifies the iteration count for the encryption key and MAC. The
+diff --git a/doc/man3/PBMAC1_get1_pbkdf2_param.pod b/doc/man3/PBMAC1_get1_pbkdf2_param.pod
+new file mode 100644
+index 0000000..415c3cd
+--- /dev/null
++++ b/doc/man3/PBMAC1_get1_pbkdf2_param.pod
+@@ -0,0 +1,46 @@
++=pod
++
++=head1 NAME
++
++PBMAC1_get1_pbkdf2_param - Function to manipulate a PBMAC1
++MAC structure
++
++=head1 SYNOPSIS
++
++ #include <openssl/x509.h>
++
++ PBKDF2PARAM *PBMAC1_get1_pbkdf2_param(const X509_ALGOR *macalg);
++
++=head1 DESCRIPTION
++
++PBMAC1_get1_pbkdf2_param() retrieves a B<PBKDF2PARAM> structure from an
++I<X509_ALGOR> structure.
++
++=head1 RETURN VALUES
++
++PBMAC1_get1_pbkdf2_param() returns NULL in case when PBMAC1 uses an algorithm
++apart from B<PBKDF2> or when passed incorrect parameters and a pointer to
++B<PBKDF2PARAM> structure otherwise.
++
++=head1 CONFORMING TO
++
++IETF RFC 9579 (L<https://tools.ietf.org/html/rfc9579>)
++
++=head1 SEE ALSO
++
++L<openssl-pkcs12(1)>
++
++=head1 HISTORY
++
++The I<PBMAC1_get1_pbkdf2_param> function was added in OpenSSL 3.4.
++
++=head1 COPYRIGHT
++
++Copyright 2021-2024 The OpenSSL Project Authors. All Rights Reserved.
++
++Licensed under the Apache License 2.0 (the "License").  You may not use
++this file except in compliance with the License.  You can obtain a copy
++in the file LICENSE in the source distribution or at
++L<https://www.openssl.org/source/license.html>.
++
++=cut
+diff --git a/doc/man3/PKCS12_gen_mac.pod b/doc/man3/PKCS12_gen_mac.pod
+index a72df14..ebeee98 100644
+--- a/doc/man3/PKCS12_gen_mac.pod
++++ b/doc/man3/PKCS12_gen_mac.pod
+@@ -3,7 +3,8 @@
+ =head1 NAME
+ 
+ PKCS12_gen_mac, PKCS12_setup_mac, PKCS12_set_mac,
+-PKCS12_verify_mac - Functions to create and manipulate a PKCS#12 structure
++PKCS12_set_pbmac1_pbkdf2, PKCS12_verify_mac, PKCS12_get0_mac -
++Functions to create and manipulate a PKCS#12 MAC structure
+ 
+ =head1 SYNOPSIS
+ 
+@@ -15,9 +16,19 @@ PKCS12_verify_mac - Functions to create and manipulate a PKCS#12 structure
+  int PKCS12_set_mac(PKCS12 *p12, const char *pass, int passlen,
+                     unsigned char *salt, int saltlen, int iter,
+                     const EVP_MD *md_type);
++ int PKCS12_set_pbmac1_pbkdf2(PKCS12 *p12, const char *pass, int passlen,
++                                   unsigned char *salt, int saltlen, int iter,
++                                   const EVP_MD *md_type,
++                                   const char *prf_md_name);
+  int PKCS12_setup_mac(PKCS12 *p12, int iter, unsigned char *salt,
+                       int saltlen, const EVP_MD *md_type);
+ 
++ void PKCS12_get0_mac(const ASN1_OCTET_STRING **pmac,
++                      const X509_ALGOR **pmacalg,
++                      const ASN1_OCTET_STRING **psalt,
++                      const ASN1_INTEGER **piter,
++                      const PKCS12 *p12);
++
+ =head1 DESCRIPTION
+ 
+ PKCS12_gen_mac() generates an HMAC over the entire PKCS#12 object using the
+@@ -31,10 +42,15 @@ PKCS12_setup_mac() sets the MAC part of the PKCS#12 structure with the supplied
+ parameters.
+ 
+ PKCS12_set_mac() sets the MAC and MAC parameters into the PKCS#12 object.
++PKCS12_set_pbmac1_pbkdf2() sets the MAC and MAC parameters into the PKCS#12
++object when B<PBMAC1> with PBKDF2 is used for protection of the PKCS#12 object.
+ 
+ I<pass> is the passphrase to use in the HMAC. I<salt> is the salt value to use,
+-I<iter> is the iteration count and I<md_type> is the message digest
+-function to use.
++I<iter> is the iteration count and I<md_type> is the message digest function to
++use. I<prf_md_name> specifies the digest used for the PBKDF2 in PBMAC1 KDF.
++
++PKCS12_get0_mac() retrieves any included MAC value, B<X509_ALGOR> object,
++I<salt>, and I<iter> count from the PKCS12 object.
+ 
+ =head1 NOTES
+ 
+@@ -43,17 +59,18 @@ If I<salt> is NULL then a suitable salt will be generated and used.
+ If I<iter> is 1 then an iteration count will be omitted from the PKCS#12
+ structure.
+ 
+-PKCS12_gen_mac(), PKCS12_verify_mac() and PKCS12_set_mac() make assumptions
+-regarding the encoding of the given passphrase. See L<passphrase-encoding(7)>
+-for more information.
++PKCS12_gen_mac(), PKCS12_verify_mac(), PKCS12_set_mac() and
++PKCS12_set_pbmac1_pbkdf2() make assumptions regarding the encoding of the
++given passphrase. See L<passphrase-encoding(7)> for more information.
+ 
+ =head1 RETURN VALUES
+ 
+-All functions return 1 on success and 0 if an error occurred.
++All functions returning an integer return 1 on success and 0 if an error occurred.
+ 
+ =head1 CONFORMING TO
+ 
+ IETF RFC 7292 (L<https://tools.ietf.org/html/rfc7292>)
++IETF RFC 9579 (L<https://tools.ietf.org/html/rfc9579>)
+ 
+ =head1 SEE ALSO
+ 
+@@ -62,9 +79,13 @@ L<EVP_KDF-PKCS12KDF(7)>,
+ L<PKCS12_create(3)>,
+ L<passphrase-encoding(7)>
+ 
++=head1 HISTORY
++
++The I<PKCS12_set_pbmac1_pbkdf2> function was added in OpenSSL 3.4.
++
+ =head1 COPYRIGHT
+ 
+-Copyright 2021-2023 The OpenSSL Project Authors. All Rights Reserved.
++Copyright 2021-2024 The OpenSSL Project Authors. All Rights Reserved.
+ 
+ Licensed under the Apache License 2.0 (the "License").  You may not use
+ this file except in compliance with the License.  You can obtain a copy
+diff --git a/doc/man3/X509_dup.pod b/doc/man3/X509_dup.pod
+index 029958d..ab29844 100644
+--- a/doc/man3/X509_dup.pod
++++ b/doc/man3/X509_dup.pod
+@@ -179,6 +179,9 @@ PBEPARAM_free,
+ PBEPARAM_new,
+ PBKDF2PARAM_free,
+ PBKDF2PARAM_new,
++PBMAC1PARAM_free,
++PBMAC1PARAM_it,
++PBMAC1PARAM_new,
+ PKCS12_BAGS_free,
+ PKCS12_BAGS_new,
+ PKCS12_MAC_DATA_free,
+diff --git a/doc/man3/d2i_X509.pod b/doc/man3/d2i_X509.pod
+index c4b589d..bb03a32 100644
+--- a/doc/man3/d2i_X509.pod
++++ b/doc/man3/d2i_X509.pod
+@@ -104,6 +104,7 @@ d2i_OTHERNAME,
+ d2i_PBE2PARAM,
+ d2i_PBEPARAM,
+ d2i_PBKDF2PARAM,
++d2i_PBMAC1PARAM,
+ d2i_PKCS12,
+ d2i_PKCS12_BAGS,
+ d2i_PKCS12_MAC_DATA,
+@@ -275,6 +276,7 @@ i2d_OTHERNAME,
+ i2d_PBE2PARAM,
+ i2d_PBEPARAM,
+ i2d_PBKDF2PARAM,
++i2d_PBMAC1PARAM,
+ i2d_PKCS12,
+ i2d_PKCS12_BAGS,
+ i2d_PKCS12_MAC_DATA,
+diff --git a/util/missingcrypto.txt b/util/missingcrypto.txt
+index 08231ed..53afc80 100644
+--- a/util/missingcrypto.txt
++++ b/util/missingcrypto.txt
+@@ -758,7 +758,6 @@ PKCS12_MAC_DATA_it(3)
+ PKCS12_PBE_add(3)
+ PKCS12_SAFEBAGS_it(3)
+ PKCS12_SAFEBAG_it(3)
+-PKCS12_get0_mac(3)
+ PKCS12_get_attr(3)
+ PKCS12_it(3)
+ PKCS12_item_pack_safebag(3)
+diff --git a/util/missingcrypto111.txt b/util/missingcrypto111.txt
+index 0386701..f3402ad 100644
+--- a/util/missingcrypto111.txt
++++ b/util/missingcrypto111.txt
+@@ -1027,7 +1027,6 @@ PKCS12_add_safe(3)
+ PKCS12_add_safes(3)
+ PKCS12_decrypt_skey(3)
+ PKCS12_gen_mac(3)
+-PKCS12_get0_mac(3)
+ PKCS12_get_attr(3)
+ PKCS12_get_attr_gen(3)
+ PKCS12_get_friendlyname(3)
+-- 
+2.45.4
+
+
+From fcca322f7e799bfeeaa947e347acf2e8d7e2a39f Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 6 Jun 2024 13:07:48 +0200
+Subject: [PATCH 3/4] Make update
+
+---
+ doc/build.info     | 6 ++++++
+ util/libcrypto.num | 7 +++++++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/doc/build.info b/doc/build.info
+index d8d3a95..ec4325b 100644
+--- a/doc/build.info
++++ b/doc/build.info
+@@ -1811,6 +1811,10 @@ DEPEND[html/man3/OpenSSL_version.html]=man3/OpenSSL_version.pod
+ GENERATE[html/man3/OpenSSL_version.html]=man3/OpenSSL_version.pod
+ DEPEND[man/man3/OpenSSL_version.3]=man3/OpenSSL_version.pod
+ GENERATE[man/man3/OpenSSL_version.3]=man3/OpenSSL_version.pod
++DEPEND[html/man3/PBMAC1_get1_pbkdf2_param.html]=man3/PBMAC1_get1_pbkdf2_param.pod
++GENERATE[html/man3/PBMAC1_get1_pbkdf2_param.html]=man3/PBMAC1_get1_pbkdf2_param.pod
++DEPEND[man/man3/PBMAC1_get1_pbkdf2_param.3]=man3/PBMAC1_get1_pbkdf2_param.pod
++GENERATE[man/man3/PBMAC1_get1_pbkdf2_param.3]=man3/PBMAC1_get1_pbkdf2_param.pod
+ DEPEND[html/man3/PEM_X509_INFO_read_bio_ex.html]=man3/PEM_X509_INFO_read_bio_ex.pod
+ GENERATE[html/man3/PEM_X509_INFO_read_bio_ex.html]=man3/PEM_X509_INFO_read_bio_ex.pod
+ DEPEND[man/man3/PEM_X509_INFO_read_bio_ex.3]=man3/PEM_X509_INFO_read_bio_ex.pod
+@@ -3388,6 +3392,7 @@ html/man3/OSSL_trace_get_category_num.html \
+ html/man3/OSSL_trace_set_channel.html \
+ html/man3/OpenSSL_add_all_algorithms.html \
+ html/man3/OpenSSL_version.html \
++html/man3/PBMAC1_get1_pbkdf2_param.html \
+ html/man3/PEM_X509_INFO_read_bio_ex.html \
+ html/man3/PEM_bytes_read_bio.html \
+ html/man3/PEM_read.html \
+@@ -4034,6 +4039,7 @@ man/man3/OSSL_trace_get_category_num.3 \
+ man/man3/OSSL_trace_set_channel.3 \
+ man/man3/OpenSSL_add_all_algorithms.3 \
+ man/man3/OpenSSL_version.3 \
++man/man3/PBMAC1_get1_pbkdf2_param.3 \
+ man/man3/PEM_X509_INFO_read_bio_ex.3 \
+ man/man3/PEM_bytes_read_bio.3 \
+ man/man3/PEM_read.3 \
+diff --git a/util/libcrypto.num b/util/libcrypto.num
+index d4440a9..cd8d440 100644
+--- a/util/libcrypto.num
++++ b/util/libcrypto.num
+@@ -5552,3 +5552,10 @@ OPENSSL_LH_doall_arg_thunk              5677	3_3_0	EXIST::FUNCTION:
+ OSSL_HTTP_REQ_CTX_set_max_response_hdr_lines 5678	3_3_0	EXIST::FUNCTION:HTTP
+ ossl_ctx_legacy_digest_signatures_allowed ?	3_0_1	EXIST::FUNCTION:
+ ossl_ctx_legacy_digest_signatures_allowed_set ?	3_0_1	EXIST::FUNCTION:
++PKCS12_set_pbmac1_pbkdf2                ?	3_4_0	EXIST::FUNCTION:
++PBMAC1_get1_pbkdf2_param                ?	3_4_0	EXIST::FUNCTION:
++d2i_PBMAC1PARAM                         ?	3_4_0	EXIST::FUNCTION:
++i2d_PBMAC1PARAM                         ?	3_4_0	EXIST::FUNCTION:
++PBMAC1PARAM_free                        ?	3_4_0	EXIST::FUNCTION:
++PBMAC1PARAM_new                         ?	3_4_0	EXIST::FUNCTION:
++PBMAC1PARAM_it                          ?	3_4_0	EXIST::FUNCTION:
+-- 
+2.45.4
