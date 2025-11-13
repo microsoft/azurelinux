@@ -32,7 +32,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.112.1
-Release:        2%{?dist}
+Release:        10000%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -46,6 +46,7 @@ Source4:        azurelinux-ca-20230216.pem
 Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
+Patch1:         0001-Make-use-of-platform-keyring-for-module-signature-ve.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
