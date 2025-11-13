@@ -144,7 +144,7 @@ pip3 install tomlkit==0.12.5 \
 
 %changelog
 * Tue Nov 11 2025 Akhila Guruju <guakhila@microsoft.com> 4.0.2-2
-- Initial Azure Linux import from Fedora 44 (license: MIT).
+- Initial Azure Linux import from Fedora 43 (license: MIT).
 - License verified
 
 * Mon Oct 20 2025 Gwyn Ciesla <gwync@protonmail.com> - 4.0.2-1
