@@ -1,7 +1,7 @@
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
 Version:        4.4.3.P1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
 Source0:        https://downloads.isc.org/isc/dhcp/4.4.3-P1/dhcp-4.4.3-P1.tar.gz
@@ -15,6 +15,7 @@ Patch2:         CVE-2022-2795.patch
 Patch3:         CVE-2023-2828.patch
 Patch4:         CVE-2024-1737.patch
 Patch5:         CVE-2024-1975.patch
+Patch6:         CVE-2024-11187.patch
 
 %description
 The ISC DHCP package contains both the client and server programs for DHCP. dhclient (the client) is used for connecting to a network which uses DHCP to assign network addresses. dhcpd (the server) is used for assigning network addresses on private networks
@@ -182,6 +183,9 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+* Thu Nov 13 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 4.4.3-p1-3
+- Patch for CVE-2024-11187
+
 * Mon Jul 29 2024 Sumedh Sharma <sumsharma@microsoft.com> - 4.4.3-P1-2
 - Add patch for CVE-2024-1737 & CVE-2024-1975 in bundled bind-9
 - Apply old patches meant for bundled bind-9
