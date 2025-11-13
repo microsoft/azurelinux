@@ -2034,7 +2034,7 @@ exit 0
 * Tue Jul 01 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 18.2.2-9
 - Patch for CVE-2025-52555
 
-* Wed 16 Apr 2025 Archana Shettigar <v-shettigara@microsoft.com> - 18.2.2-8
+* Wed Apr 16 2025 Archana Shettigar <v-shettigara@microsoft.com> - 18.2.2-8
 - Patch CVE-2020-14378
 
 * Thu Apr 10 2025 Kanishk Bansal <kanbansal@microsoft.com> - 18.2.2-7
