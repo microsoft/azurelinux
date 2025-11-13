@@ -3,6 +3,7 @@ From: Kashif Khan <kashifkhan@microsoft.com>
 Date: Fri, 27 Jan 2023 14:32:34 -0600
 Subject: [PATCH] update c module for openssl 3
 
+Upstream Patch Reference: https://github.com/Azure/azure-uamqp-python/commit/d9fca37b925e8087e26e4fd15924b02445df3df3.patch
 ---
  .../deps/azure-c-shared-utility/CMakeLists.txt       | 12 ++++++++++++
  .../azure-c-shared-utility/adapters/tlsio_openssl.c  |  4 ++--
