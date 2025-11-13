@@ -29,7 +29,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel-hwe
-Version:        6.12.50.2
+Version:        6.12.57.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -423,6 +423,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Nov 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.12.57.1-1
+- Auto-upgrade to 6.12.57.1
+
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.50.2-1
 - Update kernel
 - Changes to SPEC file to support x86_64 build

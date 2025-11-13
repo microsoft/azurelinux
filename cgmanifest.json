@@ -8271,8 +8271,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe",
-          "version": "6.12.50.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.50.2.tar.gz"
+          "version": "6.12.57.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.57.1.tar.gz"
         }
       }
     },
@@ -8291,8 +8291,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe-headers",
-          "version": "6.12.50.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.50.2.tar.gz"
+          "version": "6.12.57.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.57.1.tar.gz"
         }
       }
     },

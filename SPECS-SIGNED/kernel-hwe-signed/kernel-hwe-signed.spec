@@ -8,7 +8,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-hwe-signed-%{buildarch}
-Version:        6.12.50.2
+Version:        6.12.57.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -100,6 +100,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Thu Nov 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.12.57.1-1
+- Auto-upgrade to 6.12.57.1
+
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.50.2-1
 - Bump to match kernel-hwe
 - Adds support to x86_64
