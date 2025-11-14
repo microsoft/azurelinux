@@ -29,6 +29,10 @@ Group:           System Environment/Kernel
 Source0:        %{_name}-%{version}-%{release}.%{_arch}.rpm
 Source1:        mst_pci.ko
 Source2:        mst_pciconf.ko
+%ifarch aarch64
+Source3:        bf3_livefish.ko
+%endif
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
@@ -61,6 +65,9 @@ pushd rpm_contents
 rpm2cpio %{SOURCE0} | cpio -idmv
 cp -rf %{SOURCE1} ./lib/modules/%{KVERSION}/updates/mst_pci.ko
 cp -rf %{SOURCE2} ./lib/modules/%{KVERSION}/updates/mst_pciconf.ko
+%ifarch aarch64
+cp -rf %{SOURCE3} ./lib/modules/%{KVERSION}/updates/bf3_livefish.ko
+%endif
 
 popd
 
