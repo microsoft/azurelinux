@@ -1,0 +1,52 @@
+From 0e1a8d973c105a1bbc9d60b2e71f49268d9a8617 Mon Sep 17 00:00:00 2001
+From: Sandeep Karambelkar <skarambelkar@microsoft.com>
+Date: Fri, 14 Nov 2025 14:49:32
+Subject: [PATCH] Patch out plist.h redefinitions
+
+---
+ common/utils.c | 4 ++++
+ common/utils.h | 6 ++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/common/utils.c b/common/utils.c
+index 7f66ec2..e06debf 100644
+--- a/common/utils.c
++++ b/common/utils.c
+@@ -314,7 +314,11 @@ int plist_read_from_filename(plist_t *plist, const char *filename)
+        return 1;
+ }
+
++#ifndef LIBPLIST_H
+ int plist_write_to_filename(plist_t plist, const char *filename, enum plist_format_t format)
++#else
++int plist_write_to_filename(plist_t plist, const char *filename, plist_format_t format)
++#endif
+ {
+        char *buffer = NULL;
+        uint32_t length;
+diff --git a/common/utils.h b/common/utils.h
+index 2c3acec..661f170 100644
+--- a/common/utils.h
++++ b/common/utils.h
+@@ -51,13 +51,19 @@ char *generate_uuid(void);
+ void buffer_read_from_filename(const char *filename, char **buffer, uint64_t *length);
+ void buffer_write_to_filename(const char *filename, const char *buffer, uint64_t length);
+
++#ifndef LIBPLIST_H
+ enum plist_format_t {
+        PLIST_FORMAT_XML,
+        PLIST_FORMAT_BINARY
+ };
++#endif
+
+ int plist_read_from_filename(plist_t *plist, const char *filename);
++#ifndef LIBPLIST_H
+ int plist_write_to_filename(plist_t plist, const char *filename, enum plist_format_t format);
++#else
++int plist_write_to_filename(plist_t plist, const char *filename, plist_format_t format);
++#endif
+
+ void plist_print_to_stream(plist_t plist, FILE* stream);
+
+--
+2.34.1
