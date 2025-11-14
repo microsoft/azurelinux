@@ -9901,8 +9901,8 @@
         "type": "other",
         "other": {
           "name": "libimobiledevice",
-          "version": "1.2.1",
-          "downloadUrl": "http://www.libimobiledevice.org/downloads/libimobiledevice-1.2.0.tar.bz2"
+          "version": "1.3.0",
+          "downloadUrl": "https://github.com/libimobiledevice/libimobiledevice/releases/download/1.3.0/libimobiledevice-1.3.0.tar.bz2"
         }
       }
     },
@@ -11591,8 +11591,8 @@
         "type": "other",
         "other": {
           "name": "libusbmuxd",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/libimobiledevice/libusbmuxd/archive/2.0.0.tar.gz"
+          "version": "2.1.0",
+          "downloadUrl": "https://github.com/libimobiledevice/libusbmuxd/releases/download/2.1.0/libusbmuxd-2.1.0.tar.bz2"
         }
       }
     },
