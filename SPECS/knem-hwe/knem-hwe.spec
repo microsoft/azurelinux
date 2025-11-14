@@ -28,7 +28,7 @@
 
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.50.2
+%global target_azl_build_kernel_version 6.12.57.1
 %global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
@@ -55,7 +55,7 @@
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
 Name:		 knem-hwe
 Version:	 1.1.4.90mlnx3
-Release:	 23%{release_suffix}%{?dist}
+Release:	 24%{release_suffix}%{?dist}
 Provides:	 knem-hwe-mlnx = %{version}-%{release}
 Obsoletes:	 knem-hwe-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
@@ -239,6 +239,9 @@ fi
 %endif
 
 %changelog
+* Thu Nov 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.4.90mlnx3-24
+- Bump release to rebuild for new kernel release
+
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.4.90mlnx3-23_6.12.50.2-1
 - Adjusted package dependencies on user space components.
 

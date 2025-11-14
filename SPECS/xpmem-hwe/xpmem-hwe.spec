@@ -2,7 +2,7 @@
 
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.50.2
+%global target_azl_build_kernel_version 6.12.57.1
 %global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
@@ -13,7 +13,7 @@
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-23%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-24%{release_suffix}%{?dist}}
 
 # %{!?KVERSION: %global KVERSION %(uname -r)}
 %{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
@@ -43,7 +43,7 @@
 Summary:	 Cross-partition memory
 Name:		 xpmem-hwe
 Version:	 2.7.4
-Release:	 23%{release_suffix}%{?dist}
+Release:	 24%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -204,6 +204,9 @@ fi
 %endif
 
 %changelog
+* Thu Nov 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.4-24
+- Bump release to rebuild for new kernel release
+
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-23_6.12.50.2-1
 - Adjusted package dependencies on user space components.
 - Align %%post* scripts with other kmod packages.

@@ -31,7 +31,7 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.50.2
+%global target_azl_build_kernel_version 6.12.57.1
 %global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
@@ -39,12 +39,12 @@
 %global KVERSION %{target_kernel_version_full}
 
 %{!?_name: %define _name iser-hwe}
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-23%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 24.10-24%{release_suffix}%{?dist}}
 
 Summary:	 %{_name} Driver
 Name:		 %{_name}-signed
 Version:	 24.10
-Release:	 23%{release_suffix}%{?dist}
+Release:	 24%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -112,6 +112,9 @@ fi # 1 : closed
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-iser-*.conf
 
 %changelog
+* Thu Nov 13 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.10-24
+- Bump release to rebuild for new kernel release
+
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-23_6.12.50.2-1
 - Adjusted package dependencies on user space components.
 
