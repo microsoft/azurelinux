@@ -1,5 +1,5 @@
-%global git_date 20250714
-%global git_commit cd6043a774abf6e4d17116f1497a2032f5351d49
+%global git_date 20241011
+%global git_commit 5930b9a4d5b6dd12af897eb52be9674d9c2ebd6d
 %{?git_commit:%global git_commit_hash %(c=%{git_commit}; echo ${c:0:7})}
 
 %global _python_bytecompile_extra 0
@@ -20,22 +20,29 @@ BuildRequires:  nss-tools
 BuildRequires:  libxslt
 BuildRequires:  openssl
 BuildRequires:  openssh-clients
-BuildRequires:  python3-devel
+BuildRequires:  perl-interpreter
+BuildRequires:  perl-generators
 BuildRequires:  perl(File::Copy)
 BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(File::Which)
 BuildRequires:  perl(File::pushd)
 BuildRequires:  python3-devel >= 3.6
 BuildRequires:  python3-pytest
+#BuildRequires:  python3-pylint
+BuildRequires:  python3-flake8
+BuildRequires:  python3-coverage
+BuildRequires:  codespell
 BuildRequires:  make
+BuildRequires:  krb5-devel
 BuildRequires:  sequoia-policy-config
-BuildRequires:  systemd-rpm-macros
 Conflicts:      gnutls < 3.7.3
 Conflicts:      libreswan < 3.28
 Conflicts:      nss < 3.90.0
 Conflicts:      openssh < 9.0p1-5
-Conflicts:      gnutls < 3.8.3
 BuildArch:      noarch
+
+# Most users want this
+Recommends: crypto-policies-scripts
 
 %description
 This package provides pre-built configuration files with
@@ -198,7 +205,7 @@ end
 
 %changelog
 * Mon Nov 11 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 20250714-1
-- Upgrade to latest. Source: Fedora rawhide
+- Upgrade to Fedora40 version due to gnutls version compatibility. Source: Fedora 40
 - License verified
 
 * Wed Mar 01 2023 Muhammad Falak <mwani@microsoft.com> - 20200619-5
