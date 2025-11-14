@@ -134,7 +134,7 @@
 Name:           pacemaker
 Summary:        Scalable High-Availability cluster resource manager
 Version:        3.0.1
-Release:        13%{?dist}
+Release:        1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 License:        GPL-2.0-or-later AND LGPL-2.1-or-later
@@ -720,219 +720,19 @@ fi
 %{_datadir}/pkgconfig/pacemaker-schemas.pc
 
 %changelog
-* Mon Nov 10 2025 Jyoti kanase <v-jykanase@microsoft.com> - 3.0.1-13
-- Initial Azure Linux import from Fedora 43 (license: MIT).
+* Mon Nov 10 2025 Jyoti kanase <v-jykanase@microsoft.com> - 3.0.1-1
+- Upgrade to 3.0.1
 - License verified.
 
-* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 3.0.1-12
-- Rebuilt for Python 3.14.0rc3 bytecode (rhbz#2396740)
+* Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.1.5-5
+- Fix build issue for systemd/systemd-bootstrap confusion
 
-* Mon Sep 08 2025 Klaus Wenninger <kwenning@redhat.com> - 3.0.1-11
-- Convert STI tests to TMT (rhbz#2383013)
-- Update for new upstream release tarball: Pacemaker-3.0.1,
-  for full details, see included ChangeLog.md file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-3.0.1
-- now you can add a new revision
-  rpmdev-bumpspec -c "test" pacemaker.spec
-- or run tests locally
-  tmt run discover provision prepare execute --how tmt --verbose -v -v --debug
-- Removed tier1 test again as it was just for investigation of a CI issue
+* Wed Mar 08 2023 Sumedh Sharma <sumsharma@microsoft.com> - 2.1.5-4
+- Initial CBL-Mariner import from Fedora 37 (license: MIT)
+- Disable nagios-plugins-metadata
+- license verified
 
-* Fri Aug 15 2025 Python Maint <python-maint@redhat.com> - 3.0.1-0.4.rc2.1
-- Rebuilt for Python 3.14.0rc2 bytecode
-
-* Thu Jul 24 2025 Klaus Wenninger <kwenning@redhat.com> - 3.0.1-0.4.rc2
-- Update for new upstream release tarball: Pacemaker-3.0.1-rc2,
-  for full details, see included ChangeLog.md file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-3.0.1-rc2
-
-* Fri Jun 27 2025 Klaus Wenninger <kwenning@redhat.com> - 3.0.1-0.4.rc1
-- seems as if pre-tasks need to have tags to be executed
-  at least that worked on a pull request via pagure
-
-* Fri Jun 27 2025 Klaus Wenninger <kwenning@redhat.com> - 3.0.1-0.3.rc1
-- New corosync package is leaving /var/lib/corosync to be created by systemd
-  we're running our test without systemd so have it done by playbook
-- Enable fencing regression tests again
-
-* Wed Jun 25 2025 Klaus Wenninger <kwenning@redhat.com> - 3.0.1-0.2.rc1
-- Disable fencing regression tests for now
-
-* Wed Jun 25 2025 Klaus Wenninger <kwenning@redhat.com> - 3.0.1-1
-- Update for new upstream release tarball: Pacemaker-3.0.1-rc1,
-  for full details, see included ChangeLog.md file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-3.0.1-rc1
-- sync cts/cts-cli -V in check with upstream
-
-* Tue Jun 03 2025 Python Maint <python-maint@redhat.com> - 3.0.0-5.2
-- Rebuilt for Python 3.14
-
-* Fri Jan 17 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-5.1
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
-
-* Fri Jan 10 2025 Klaus Wenninger <kwenning@redhat.com> - 3.0.0-5
-- Update for new upstream release tarball: Pacemaker-3.0.0,
-  for full details, see included ChangeLog.md file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-3.0.0
-- Regarding noteworthy changes coming with the bump of the major version see
-  https://projects.clusterlabs.org/w/projects/pacemaker/pacemaker_3.0_changes/
-- add patch to when resetting scheduler as well reset error and warning flags
-  lacking pcmk_reset_scheduler in 3.0.0 branch pcmk__set_scheduler_defaults
-  seems to be the most reasonable alternative for now
-
-* Tue Jan 7 2025 Klaus Wenninger <kwenning@redhat.com> - 3.0.0-0.4.rc3
-- Update for new upstream release tarball: Pacemaker-3.0.0-rc3,
-  for full details, see included ChangeLog.md file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-3.0.0-rc3
-- synced dropping inkscape build-requirement with upstream
-
-* Tue Dec 17 2024 Klaus Wenninger <kwenning@redhat.com> - 3.0.0-0.3.rc2
-- re-enable docs as inkscape dependencies seem to be fixed in rawhide
-
-* Fri Dec 13 2024 Klaus Wenninger <kwenning@redhat.com> - 3.0.0-0.2.rc2
-- Update for new upstream release tarball: Pacemaker-3.0.0-rc2,
-  for full details, see included ChangeLog.md file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-3.0.0-rc2
-- disable docs for now as koji build shows issues with python requirements
-  for inkscape
-
-* Tue Nov 19 2024 Klaus Wenninger <kwenning@redhat.com> - 3.0.0-0.1.rc1
-- Update for new upstream release tarball: Pacemaker-3.0.0-rc1,
-  for full details, see included ChangeLog.md file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-3.0.0-rc1
-- syncing with upstream spec-file (removed nagios)
-
-* Tue Nov 5 2024 Klaus Wenninger <kwenning@redhat.com> - 2.1.9-1
-- Update for new upstream release tarball: Pacemaker-2.1.9,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.9
-
-* Tue Oct 22 2024 Klaus Wenninger <kwenning@redhat.com> - 2.1.9-0.1.rc3
-- Update for new upstream release tarball: Pacemaker-2.1.9-rc3,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.9-rc3
-
-* Wed Oct 16 2024 Klaus Wenninger <kwenning@redhat.com> - 2.1.9-0.1.rc2
-- Update for new upstream release tarball: Pacemaker-2.1.9-rc2,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.9-rc2
-
-* Mon Oct 7 2024 Klaus Wenninger <kwenning@redhat.com> - 2.1.9-0.1.rc1
-- Update for new upstream release tarball: Pacemaker-2.1.9-rc1,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.9-rc1
-
-* Mon Aug 12 2024 Klaus Wenninger <kwenning@redhat.com> - 2.1.8-1
-- Update for new upstream release tarball: Pacemaker-2.1.8,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.8
-- automated SPDX license update seems to be fine
-
-* Mon Jul 29 2024 Miroslav Suchý <msuchy@redhat.com> - 2.1.8-0.1.rc4.1
-- convert license to SPDX
-
-* Mon Jul 22 2024 Klaus Wenninger <kwenning@redhat.com> - 2.1.8-0.1.rc4
-- Update for new upstream tarball for release candidate: Pacemaker-2.1.8-rc4,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.8-rc4
-
-* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.8-0.1.rc3.1
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
-
-* Wed Jul 10 2024 Klaus Wenninger <kwenning@redhat.com> - 2.1.8-0.1.rc3
-- Update for new upstream tarball for release candidate: Pacemaker-2.1.8-rc3,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.8-rc3
-
-* Wed Jun 12 2024 Klaus Wenninger <kwenning@redhat.com> - 2.1.8-0.1.rc2
-- Update for new upstream tarball for release candidate: Pacemaker-2.1.8-rc2,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.8-rc2
-
-* Sat Jun 08 2024 Python Maint <python-maint@redhat.com> - 2.1.8-0.1.rc1.1
-- Rebuilt for Python 3.13
-
-* Thu May 16 2024 Klaus Wenninger <kwenning@redhat.com> - 2.1.8-0.1.rc1
-- Update for new upstream tarball for release candidate: Pacemaker-2.1.8-rc1,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.8-rc1
-
-* Wed Apr 10 2024 Klaus Wenninger <kwenning@redhat.com> - 2.1.7-5
-- Fix handling of compat20 and Conflict incompatible pcs versions
-
-* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.7-4.2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.7-4.1
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Thu Dec 21 2023 Klaus Wenninger <kwenning@redhat.com> - 2.1.7-4
-- Update for new upstream release tarball: Pacemaker-2.1.7,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.7
-
-* Wed Dec 13 2023 Klaus Wenninger <kwenning@redhat.com> - 2.1.7-0.4.rc4
-- Update for new upstream tarball for release candidate: Pacemaker-2.1.7-rc4,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.7-rc4
-
-* Thu Dec 7 2023 Klaus Wenninger <kwenning@redhat.com> - 2.1.7-0.4.rc3
-- Update for new upstream tarball for release candidate: Pacemaker-2.1.7-rc3,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.7-rc3
-
-* Mon Nov 27 2023 Klaus Wenninger <kwenning@redhat.com> - 2.1.7-0.3.rc2
-- Update for new upstream tarball for release candidate: Pacemaker-2.1.7-rc2,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.7-rc2
-
-* Tue Nov 21 2023 Klaus Wenninger <kwenning@redhat.com> - 2.1.7-0.2.rc1
-- Fix build with libxml-2.12.0
-
-* Fri Nov 3 2023 Klaus Wenninger <kwenning@redhat.com> - 2.1.7-0.1.rc1
-- Update for new upstream tarball for release candidate: Pacemaker-2.1.7-rc1,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.7-rc1
-
-* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.6-4.2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
-
-* Fri Jun 16 2023 Python Maint <python-maint@redhat.com> - 2.1.6-4.1
-- Rebuilt for Python 3.12
-
-* Thu May 25 2023 Klaus Wenninger <kwenning@redhat.com> - 2.1.6-4
-- Update for new upstream release tarball: Pacemaker-2.1.6,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.6
-
-* Mon May 22 2023 Klaus Wenninger <kwenning@redhat.com> - 2.1.6-0.3.rc2
-- have users/groups created via sysusers(compat)
-  f37 and below seem not to support 189:haclient as ID needed to mimic
-  the user-group-configuration we had up to now
-
-* Wed May 3 2023 Klaus Wenninger <kwenning@redhat.com> - 2.1.6-0.2.rc2
-- Update for new upstream tarball for release candidate: Pacemaker-2.1.6-rc2,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.6-rc2
-
-* Wed Apr 19 2023 Klaus Wenninger <kwenning@redhat.com> - 2.1.6-0.1.rc1
-- Update for new upstream tarball for release candidate: Pacemaker-2.1.6-rc1,
-  for full details, see included ChangeLog file or
-  https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.6-rc1
-- Changed licenses to SPDX
-- Removed non-packet-specific wildcards from files-sections
-
-* Wed Mar 1 2023 Klaus Wenninger <kwenning@redhat.com> - 2.1.5-5
-- fix pcmk__output_and_clear_error
-
-* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.5-4.1
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
-
-* Wed Jan 18 2023 Klaus Wenninger <kwenning@redhat.com> - 2.1.5-4
-- use enum fenced_target_by consistency to cope with increased
-  pickiness of gcc
-
-* Thu Dec 8 2022 Klaus Wenninger <kwenning@redhat.com> - 2.1.5-3
+* Thu Dec 08 2022 Klaus Wenninger <kwenning@redhat.com> - 2.1.5-3
 - Update for new upstream release tarball: Pacemaker-2.1.5,
   for full details, see included ChangeLog file or
   https://github.com/ClusterLabs/pacemaker/releases/tag/Pacemaker-2.1.5
@@ -1003,7 +803,6 @@ fi
 
 * Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.2-3.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
-
 
 * Fri Nov 26 2021 Klaus Wenninger <kwenning@redhat.com> - 2.1.2-3
 - Update for new upstream release tarball: Pacemaker-2.1.2
@@ -1620,7 +1419,6 @@ fi
 * Thu Jun 20 2013 Andrew Beekhof <abeekhof@redhat.com> - 1.1.9-3
 - Update to upstream 7d8acec
 - See included ChangeLog file or https://raw.github.com/ClusterLabs/pacemaker/master/ChangeLog for full details
-
   + Feature: Turn off auto-respawning of systemd services when the cluster starts them
   + Fix: crmd: Ensure operations for cleaned up resources don't block recovery
   + Fix: logging: If SIGTRAP is sent before tracing is turned on, turn it on instead of crashing
