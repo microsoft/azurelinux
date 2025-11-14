@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        16.2.10
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -21,6 +21,7 @@ Patch6:		CVE-2025-1744.patch
 Patch7:         CVE-2025-52939.patch
 Patch8:         CVE-2024-48916.patch
 Patch9:         CVE-2025-9648.patch
+Patch10:        CVE-2024-47866.patch
 # 
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
 # at the top-level directory of this distribution and at
@@ -1814,6 +1815,9 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Fri Nov 14 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 16.2.10-11
+- Patch for CVE-2024-47866
+
 * Fri Oct 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 16.2.10-10
 - Patch for CVE-2025-9648
 
