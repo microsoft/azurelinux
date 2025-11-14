@@ -143,7 +143,7 @@ pip3 install tomlkit==0.12.5 \
 %{_bindir}/*-%{python3_version}
 
 %changelog
-* Tue Nov 11 2025 Akhila Guruju <guakhila@microsoft.com> 4.0.2-2
+* Tue Nov 11 2025 Akhila Guruju <guakhila@microsoft.com> - 4.0.2-2
 - Upgrade to 4.0.2 by taking reference from Fedora 43 (license: MIT).
 - License verified
 
