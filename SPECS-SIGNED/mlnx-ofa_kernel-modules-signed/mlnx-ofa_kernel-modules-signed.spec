@@ -90,7 +90,6 @@ Source29:       xprtrdma.ko
 Source30:       fwctl.ko
 Source31:       mlx5_fwctl.ko
 Source32:       mana_ib.ko
-Source33:       mlx5_dpll.ko
 
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -176,7 +175,6 @@ cp -rf %{SOURCE29} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/xprtrdm
 cp -rf %{SOURCE30} ./lib/modules/%{KVERSION}/updates/drivers/fwctl/fwctl.ko
 cp -rf %{SOURCE31} ./lib/modules/%{KVERSION}/updates/drivers/fwctl/mlx5/mlx5_fwctl.ko
 cp -rf %{SOURCE32} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mana/mana_ib.ko
-cp -rf %{SOURCE33} ./lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlx5/core/mlx5_dpll.ko
 
 popd
 

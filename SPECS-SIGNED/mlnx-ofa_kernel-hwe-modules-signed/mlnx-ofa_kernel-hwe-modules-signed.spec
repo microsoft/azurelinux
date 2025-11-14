@@ -92,6 +92,23 @@ Source30:       fwctl.ko
 Source31:       mlx5_fwctl.ko
 Source32:       mana_ib.ko
 Source33:       mlx5_dpll.ko
+%ifarch aarch64
+Source34:       mbd-client.ko
+Source35:       mbd-server.ko
+Source36:       iw_cxgb4.ko
+Source37:       erdma.ko
+Source38:       ib_mthca.ko
+Source39:       ocrdma.ko
+Source40:       qedr.ko
+Source41:       siw.ko
+Source42:       rtrs-client.ko
+Source43:       rtrs-core.ko
+Source44:       rtrs-server.ko
+Source45:       ib_srpt.ko
+Source46:       mlx5-vfio-pci.ko
+Source47:       9pnet_rdma.ko
+Source48:       rds_rdma.ko
+%endif
 
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -178,6 +195,23 @@ cp -rf %{SOURCE30} ./lib/modules/%{KVERSION}/updates/drivers/fwctl/fwctl.ko
 cp -rf %{SOURCE31} ./lib/modules/%{KVERSION}/updates/drivers/fwctl/mlx5/mlx5_fwctl.ko
 cp -rf %{SOURCE32} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mana/mana_ib.ko
 cp -rf %{SOURCE33} ./lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlx5/core/mlx5_dpll.ko
+%ifarch aarch64
+cp -rf %{SOURCE34} ./lib/modules/%{KVERSION}/updates/drivers/block/mbd/mbd-client.ko
+cp -rf %{SOURCE35} ./lib/modules/%{KVERSION}/updates/drivers/block/mbd/mbd-server.ko
+cp -rf %{SOURCE36} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/cxgb4/iw_cxgb4.ko
+cp -rf %{SOURCE37} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/erdma/erdma.ko
+cp -rf %{SOURCE38} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mthca/ib_mthca.ko
+cp -rf %{SOURCE39} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/ocrdma/ocrdma.ko
+cp -rf %{SOURCE40} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/qedr/qedr.ko
+cp -rf %{SOURCE41} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/sw/siw/siw.ko
+cp -rf %{SOURCE42} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/rtrs/rtrs-client.ko
+cp -rf %{SOURCE43} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/rtrs/rtrs-core.ko
+cp -rf %{SOURCE44} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/rtrs/rtrs-server.ko
+cp -rf %{SOURCE45} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/srpt/ib_srpt.ko
+cp -rf %{SOURCE46} ./lib/modules/%{KVERSION}/updates/drivers/vfio/pci/mlx5/mlx5-vfio-pci.ko
+cp -rf %{SOURCE47} ./lib/modules/%{KVERSION}/updates/net/9p/9pnet_rdma.ko
+cp -rf %{SOURCE48} ./lib/modules/%{KVERSION}/updates/net/rds/rds_rdma.ko
+%endif
 
 popd
 
