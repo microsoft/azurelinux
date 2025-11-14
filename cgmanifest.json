@@ -23282,6 +23282,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-joblib",
+          "version": "1.5.3",
+          "downloadUrl": "https://github.com/joblib/joblib/archive/refs/tags/1.5.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-jsonpatch",
           "version": "1.33",
           "downloadUrl": "https://github.com/stefankoegl/python-json-patch/archive/refs/tags/v1.33.tar.gz"
