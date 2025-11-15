@@ -15,7 +15,7 @@
 Summary:        Go
 Name:           msft-golang
 Version:        1.24.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +31,8 @@ Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.
 # bootstrap 03
 Source4:        https://github.com/microsoft/go/releases/download/v1.22.12-2/go1.22.12-20250211.4.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
+Patch1:         CVE-2025-58188.patch
+Patch2:         CVE-2025-61724.patch
 Conflicts:      go
 Conflicts:      golang
 
@@ -53,6 +55,8 @@ tar xf %{SOURCE4} --no-same-owner
 mv -v go go-bootstrap-03
 
 %setup -q -n go
+%patch 1 -p1
+%patch 2 -p1
 %build
 # go 1.4 bootstraps with C.
 # go 1.20 bootstraps with go >= 1.17.13
@@ -158,6 +162,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Sat Nov 15 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.24.10-2
+- Patch for CVE-2025-61724, CVE-2025-58188
+
 * Sat Nov 08 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.24.10-1
 - Upgrade to 1.24.10
 
