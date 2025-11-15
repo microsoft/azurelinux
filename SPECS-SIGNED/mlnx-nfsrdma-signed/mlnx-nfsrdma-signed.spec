@@ -37,14 +37,14 @@
 
 %global KVERSION %{target_kernel_version_full}
 
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-21%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 25.07-1%{release_suffix}%{?dist}}
 
 %{!?_name: %define _name mlnx-nfsrdma}
 
 Summary:	 %{_name} Driver
 Name:		 %{_name}-signed
-Version:	 24.10
-Release:	 21%{release_suffix}%{?dist}
+Version:	 25.07
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -117,6 +117,9 @@ fi
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-%{_name}-*.conf
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1
+- Upgrade version to 25.07.
+
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-21
 - Bump mofed release number
 
