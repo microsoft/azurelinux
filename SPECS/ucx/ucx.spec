@@ -10,6 +10,7 @@
 %bcond_without xpmem
 %bcond_with    vfs
 %bcond_with    mad
+%bcond_with    ze
 %bcond_without mlx5
 %bcond_with    efa
 
@@ -413,7 +414,7 @@ library internals, protocol objects, transports status, and more.
 %if %{with ze}
 %package ze
 Requires: %{name}%{?_isa} = %{version}-%{release}
-Summary: UCX Virtual Filesystem support.
+Summary: UCX ZE GPU support.
 Group: System Environment/Libraries
 
 %description ze
@@ -421,7 +422,7 @@ Provides oneAPI Level Zero (ZE) Runtime support for UCX.
 
 %files ze
 %{_libdir}/ucx/libuct_ze.so.*
-%{_bindir}/ucx/libucm_ze.so.*
+%{_libdir}/ucx/libucm_ze.so.*
 %endif
 
 
