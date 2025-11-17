@@ -7881,8 +7881,8 @@
         "type": "other",
         "other": {
           "name": "jdepend",
-          "version": "2.9.1",
-          "downloadUrl": "http://www.clarkware.com/software/jdepend-2.9.1.tar.bz2"
+          "version": "2.10",
+          "downloadUrl": "https://github.com/clarkware/jdepend/archive/refs/tags/2.10.tar.gz#/jdepend-2.10.tar.gz"
         }
       }
     },
