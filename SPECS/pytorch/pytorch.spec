@@ -20,7 +20,7 @@ Patch5:         CVE-2022-1941.patch
 Patch6:         CVE-2025-32434.patch
 Patch7:         CVE-2025-3730.patch
 Patch8:         CVE-2025-2953.patch
-Patch9:        CVE-2025-55560.patch
+Patch9:         CVE-2025-55560.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc
