@@ -204,7 +204,7 @@ fi
 %endif
 
 %changelog
-* Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-24_6.12.57.1-1
+* Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-24_6.12.57.1.1
 - Bump to match kernel-hwe
 
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-23_6.12.50.2-1
