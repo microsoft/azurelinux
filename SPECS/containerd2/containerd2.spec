@@ -23,7 +23,11 @@ Patch3:	CVE-2025-22872.patch
 Patch4:	CVE-2025-47291.patch
 Patch5:	multi-snapshotters-support.patch
 Patch6:	tardev-support.patch
+<<<<<<< HEAD
 Patch7:	CVE-2025-64329.patch
+=======
+Patch7:	CVE-2024-25621.patch
+>>>>>>> 02a30ce23 ([AutoPR- Security] Patch containerd2 for CVE-2024-25621 [HIGH] (#15053))
 %{?systemd_requires}
 
 BuildRequires: golang < 1.25
@@ -99,8 +103,13 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+<<<<<<< HEAD
 * Sat Nov 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-15
 - Patch for CVE-2025-64329
+=======
+* Tue Nov 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-15
+- Patch for CVE-2024-25621
+>>>>>>> 02a30ce23 ([AutoPR- Security] Patch containerd2 for CVE-2024-25621 [HIGH] (#15053))
 
 * Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 2.0.0-14
 - Set BR for golang to < 1.25
