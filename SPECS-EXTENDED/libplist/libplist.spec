@@ -97,6 +97,10 @@ make check
 %{python3_sitearch}/plist*
 
 %changelog
+* Fri Nov 14 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.7.0-1
+- Update to version 2.7.0
+- License verified
+
 * Tue Oct 29 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 2.6.0-1
 - Update to 2.6.0
 - License verified.
