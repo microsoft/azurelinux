@@ -11,21 +11,35 @@
 %endif
 Summary:        A general purpose library and file format for storing scientific data
 Name:           hdf5
-Version:        1.14.4.3
+Version:        1.14.6
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://portal.hdfgroup.org/display/HDF5/HDF5
-Source0:        https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.14/hdf5-1.14.4/src/hdf5-1.14.4-3.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_6/downloads/hdf5-1.14.6.tar.gz
 Source1:        h5comp
 
-Patch3:         hdf5-build.patch
+Patch0:         hdf5-build.patch
 # Remove Fedora build flags from h5cc/h5c++/h5fc
 # https://bugzilla.redhat.com/show_bug.cgi?id=1794625
-Patch5:         hdf5-wrappers.patch
+Patch1:         hdf5-wrappers.patch
+Patch2:         CVE-2025-2153.patch
+Patch3:         CVE-2025-2310.patch
+Patch4:         CVE-2025-2914.patch
+Patch5:         CVE-2025-2926.patch
+Patch6:         CVE-2025-2915.patch
+Patch7:         CVE-2025-6816.patch
+Patch8:         CVE-2025-2925.patch
+Patch9:         CVE-2025-2924.patch
+Patch10:        CVE-2025-44905.patch
+Patch11:        CVE-2025-6269.patch
+Patch12:        CVE-2025-6750.patch
+Patch13:        CVE-2025-6857.patch
+Patch14:        CVE-2025-7067.patch
+Patch15:        CVE-2025-7068.patch
+Patch16:        CVE-2025-6858.patch
 
-# For patches/rpath
 # For patches/rpath
 BuildRequires:  automake
 # Needed for mpi tests
@@ -130,7 +144,7 @@ HDF5 parallel openmpi static libraries
 
 
 %prep
-%autosetup -n %{name}-1.14.4-3 -p1
+%autosetup -p1
 
 # Force shared by default for compiler wrappers (bug #1266645)
 sed -i -e '/^STATIC_AVAILABLE=/s/=.*/=no/' */*/h5[cf]*.in
@@ -221,8 +235,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
   mkdir -p %{buildroot}%{_libdir}/$mpi/hdf5/plugin
   module purge
 done
-#Fixup example permissions
-find %{buildroot}%{_datadir} \( -name '*.[ch]*' -o -name '*.f90' \) -exec chmod -x {} +
 
 #Fixup headers and scripts for multiarch
 %ifarch x86_64 ppc64 ia64 s390x sparc64 alpha
@@ -309,7 +321,6 @@ done
 %{_libdir}/*.so
 %{_libdir}/*.settings
 %{_fmoddir}/*.mod
-%{_datadir}/hdf5_examples/
 
 %files static
 %{_libdir}/*.a
@@ -398,6 +409,13 @@ done
 
 
 %changelog
+* Tue Nov 19 2025 Jyoti kanase <v-jykanase@microsoft.com> - 1.14.6-1
+- Upgrade to 1.14.6
+- Patch hdf5 for CVE-2025-2153, CVE-2025-2310, CVE-2025-2914, CVE-2025-2926, CVE-2025-2915,
+  CVE-2025-6816, CVE-2025-2925, CVE-2025-2924, CVE-2025-44905,CVE-2025-6269, CVE-2025-6750,
+  CVE-2025-6857, CVE-2025-7067, CVE-2025-7068, CVE-2025-6858, CVE_2025-2923, CVE-2025-2913,
+  CVE-2025-6516, CVE-2025-6818, CVE-2025-6817, CVE-2025-6856, CVE-2025-7069
+
 * Tue Jun 04 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.14.4.3-1
 - Upgrade to v1.14.4.3 to fix CVEs 2024-29157, 2024-29158, 2024-29159, 2024-29160,
   2024-29161, 2024-29162, 2024-29163, 2024-29164, 2024-29165, 2024-29166, 2024-32605,
