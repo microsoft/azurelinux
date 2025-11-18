@@ -3707,16 +3707,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "fluent-bit",
-          "version": "3.1.9",
-          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v3.1.9.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "flux",
           "version": "0.194.5",
           "downloadUrl": "https://github.com/influxdata/flux/archive/refs/tags/v0.194.5.tar.gz"
