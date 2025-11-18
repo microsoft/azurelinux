@@ -26,7 +26,7 @@ Summary:        OCI-based implementation of Kubernetes Container Runtime Interfa
 # Define macros for further referenced sources
 Name:           cri-o
 Version:        1.22.3
-Release:        14%{?dist}
+Release:        16%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -77,6 +77,7 @@ Patch21:        CVE-2024-44337.patch
 Patch22:        CVE-2025-27144.patch
 Patch23:        CVE-2025-21614.patch
 Patch24:        CVE-2024-9676.patch
+Patch25:        CVE-2025-58058.patch
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  fdupes
@@ -123,9 +124,7 @@ Provides:       kubernetes-kubeadm-criconfig
 This package provides the CRI-O container runtime configuration for kubeadm
 
 %prep
-%setup -q
-tar -xf %{SOURCE1} --no-same-owner
-%autopatch -p1
+%autosetup -p1 -a1
 
 %build
 
@@ -229,6 +228,12 @@ mkdir -p /opt/cni/bin
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
+* Wed Sep 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.22.3-16
+- Patch for CVE-2025-58058
+
+* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.22.3-15
+- Bump release to rebuild with golang
+
 * Thu Apr 17 2025 Sean Dougherty <sdougherty@microsoft.com> - 1.22.3-14
 - Add patch for CVE-2024-9676.
 

@@ -6,7 +6,7 @@ Name:           nodejs18
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        18.20.3
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -28,8 +28,9 @@ Patch8:         CVE-2025-47279.patch
 Patch9:         CVE-2025-23166.patch
 Patch10:        CVE-2025-7656.patch
 Patch11:        CVE-2025-5889.patch
-Patch12:        upgrade_llhttp-v6.1.1_to_llhttp-v9.1.2.patch
-Patch13:        update_callBack_pointers_in_llhttp_settings_t_structure_fix_http_parser_error.patch
+Patch12:        CVE-2025-5222.patch
+Patch13:        upgrade_llhttp-v6.1.1_to_llhttp-v9.1.2.patch
+Patch14:        update_callBack_pointers_in_llhttp_settings_t_structure_fix_http_parser_error.patch
 
 BuildRequires:  brotli-devel
 BuildRequires:  coreutils >= 8.22
@@ -131,9 +132,12 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
-* Tue Aug 04 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 18.20.3-10
+* Tue Aug 04 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 18.20.3-11
 - Patch to upgrade the subpackage llhttp-v6.1.1 to llhttp-v9.1.2 to address CVE-2025-23167
 - Patch to update callBack pointers in llhttp settings_t_structure to fix http_parser error.
+
+* Fri Nov 07 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 18.20.3-10
+- Patch for CVE-2025-5222
 
 * Mon Aug 04 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 18.20.3-9
 - Patch CVE-2025-5889

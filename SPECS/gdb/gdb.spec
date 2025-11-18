@@ -1,7 +1,7 @@
 Summary:        C debugger
 Name:           gdb
 Version:        11.2
-Release:        6%{?dist}
+Release:        10%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,14 @@ Patch5:         CVE-2022-48064.patch
 Patch6:         CVE-2022-48065.patch
 Patch7:         CVE-2022-47673.patch
 Patch8:         CVE-2022-47696.patch
+Patch9:         CVE-2025-7546.patch
+Patch10:        CVE-2025-11082.patch
+Patch11:        CVE-2025-11083.patch
+Patch12:        CVE-2021-32256.patch
+Patch13:        fix-infinite-recursion.patch
+Patch14:        CVE-2025-5244.patch
+Patch15:        CVE-2025-11412.patch
+Patch16:        CVE-2025-11414.patch
 BuildRequires:  expat-devel
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
@@ -26,7 +34,7 @@ BuildRequires:  python3-libs
 BuildRequires:  readline-devel
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  dejagnu
 BuildRequires:  systemtap-sdt-devel
 %endif
@@ -80,6 +88,10 @@ rm -vf %{buildroot}%{_libdir}/libaarch64-unknown-linux-gnu-sim.a
 %check
 # disable security hardening for tests
 rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
+
+# Remove libctf test suite, which causes compilation errors with the base tests
+rm -rvf libctf/testsuite
+
 %make_build check TESTS="gdb.base/default.exp"
 
 %files -f %{name}.lang
@@ -97,6 +109,19 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 %{_mandir}/*/*
 
 %changelog
+* Mon Oct 27 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 11.2-10
+- Patch for CVE-2025-11414, CVE-2025-11412
+
+* Mon Oct 27 2025 Archana Shettigar <v-shettigara@microsoft.com> - 11.2-9
+- Patch CVE-2021-32256 & CVE-2025-5244 using an upstream patch
+
+* Fri Oct 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 11.2-8
+- Patch for CVE-2025-11083, CVE-2025-11082
+
+* Fri Jul 18 2025 Akhila Guruju <v-guakhila@microsoft.com> - 11.2-7
+- Patch CVE-2025-7546
+- Fix package tests
+
 * Mon Apr 21 2025 Kanishk Bansal <kanbansal@microsoft.com> - 11.2-6
 - Patch CVE-2022-47673, CVE-2022-47696 using an upstream patch
 

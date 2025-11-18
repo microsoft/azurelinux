@@ -2,7 +2,7 @@
 
 Name:          helm
 Version:       3.14.2
-Release:       7%{?dist}
+Release:       9%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
@@ -29,6 +29,7 @@ Patch1:        CVE-2024-45338.patch
 Patch2:        CVE-2025-32386.patch
 Patch3:        CVE-2025-22872.patch
 Patch4:        CVE-2025-53547.patch
+Patch5:        CVE-2025-55198.patch
 BuildRequires: golang
 
 %description
@@ -58,6 +59,12 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 go test -v ./cmd/helm
 
 %changelog
+* Fri Sep 19 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.14.2-9
+- Patch for CVE-2025-55198
+
+* Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 3.14.2-8
+- Bump release to rebuild with golang
+
 * Fri Jul 11 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.14.2-7
 - Add patch for CVE-2025-53547
 
