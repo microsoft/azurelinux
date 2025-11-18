@@ -29646,8 +29646,8 @@
         "type": "other",
         "other": {
           "name": "usbmuxd",
-          "version": "1.1.0",
-          "downloadUrl": "http://www.libimobiledevice.org/downloads/usbmuxd-1.1.0.tar.bz2"
+          "version": "1.1.1",
+          "downloadUrl": "https://github.com/libimobiledevice/usbmuxd/releases/download/1.1.1/usbmuxd-1.1.1.tar.bz2"
         }
       }
     },
