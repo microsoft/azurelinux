@@ -93,8 +93,8 @@ Source31:       mlx5_fwctl.ko
 Source32:       mana_ib.ko
 Source33:       mlx5_dpll.ko
 %ifarch aarch64
-Source34:       mbd-client.ko
-Source35:       mbd-server.ko
+Source34:       rnbd-client.ko
+Source35:       rnbd-server.ko
 Source36:       iw_cxgb4.ko
 Source37:       erdma.ko
 Source38:       ib_mthca.ko
@@ -196,8 +196,8 @@ cp -rf %{SOURCE31} ./lib/modules/%{KVERSION}/updates/drivers/fwctl/mlx5/mlx5_fwc
 cp -rf %{SOURCE32} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mana/mana_ib.ko
 cp -rf %{SOURCE33} ./lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlx5/core/mlx5_dpll.ko
 %ifarch aarch64
-cp -rf %{SOURCE34} ./lib/modules/%{KVERSION}/updates/drivers/block/mbd/mbd-client.ko
-cp -rf %{SOURCE35} ./lib/modules/%{KVERSION}/updates/drivers/block/mbd/mbd-server.ko
+cp -rf %{SOURCE34} ./lib/modules/%{KVERSION}/updates/drivers/block/rnbd/rnbd-client.ko
+cp -rf %{SOURCE35} ./lib/modules/%{KVERSION}/updates/drivers/block/rnbd/rnbd-server.ko
 cp -rf %{SOURCE36} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/cxgb4/iw_cxgb4.ko
 cp -rf %{SOURCE37} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/erdma/erdma.ko
 cp -rf %{SOURCE38} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mthca/ib_mthca.ko
