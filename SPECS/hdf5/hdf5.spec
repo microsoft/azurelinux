@@ -17,7 +17,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://portal.hdfgroup.org/display/HDF5/HDF5
-Source0:        https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_6/downloads/hdf5-1.14.6.tar.gz
+Source0:        https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_6/downloads/%{name}-%{version}.tar.gz
 Source1:        h5comp
 
 Patch0:         hdf5-build.patch
