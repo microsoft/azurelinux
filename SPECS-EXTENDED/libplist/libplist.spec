@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 %{!?python3_sitearch: %global python_sitearch %(%{__python3} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
 
 Name:     libplist
-Version:  2.6.0
+Version:  2.7.0
 Release:  1%{?dist}
 Summary:  Library for manipulating Apple Binary and XML Property Lists
 
@@ -62,6 +62,8 @@ export PYTHON='%{_bindir}/python3'
 
 %install
 %make_install
+cd %{buildroot}%{_libdir}/pkgconfig/
+ln -s libplist-2.0.pc libplist.pc
 
 find $RPM_BUILD_ROOT -type f -name "*.la" -delete
 
@@ -83,6 +85,8 @@ make check
 %{_libdir}/libplist++-2.0.so.4*
 
 %files devel
+# This is required for some old package reference
+%{_libdir}/pkgconfig/libplist.pc
 %{_libdir}/pkgconfig/libplist-2.0.pc
 %{_libdir}/pkgconfig/libplist++-2.0.pc
 %{_libdir}/libplist-2.0.so
