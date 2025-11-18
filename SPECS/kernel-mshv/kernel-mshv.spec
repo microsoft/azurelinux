@@ -10,13 +10,13 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        6.6.57.mshv4
+Version:        6.6.100.mshv1
 Release:        1%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
@@ -79,8 +79,7 @@ Requires:       audit
 This package contains the 'perf' performance analysis tools for MSHV kernel.
 
 %prep
-%autosetup -p1
-
+%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-kata-%{version}
 make mrproper
 cp %{SOURCE1} .config
 
@@ -88,8 +87,24 @@ cp %{SOURCE1} .config
 cp %{SOURCE2} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
+cp .config current_config
+
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
 make LC_ALL=  ARCH=%{arch} olddefconfig
+# Verify the config files match
+cp .config new_config
+sed -i 's/CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION=""/' new_config
+diff --unified new_config current_config > config_diff || true
+if [ -s config_diff ]; then
+    printf "\n\n\n\n\n\n\n\n"
+    cat config_diff
+    printf "\n\n\n\n\n\n\n\n"
+    echo "Config file has unexpected changes"
+    echo "Update config file to set changed values explicitly"
+
+#  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
+    exit 1
+fi
 
 %build
 make VERBOSE=1 V=1 KBUILD_VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
@@ -230,6 +245,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Tue Sep 09 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.100.mshv1-1
+- Upgrade to 6.6.100.mshv1
+
 * Mon Apr 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.57.mshv4-1
 - Auto-upgrade to 6.6.57.mshv4
 

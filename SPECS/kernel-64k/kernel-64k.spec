@@ -26,7 +26,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel-64k
-Version:        6.6.96.1
+Version:        6.6.116.1
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -76,6 +76,7 @@ Conflicts:      kernel
 Conflicts:      kernel-ipe
 Conflicts:      kernel-lpg-innovate
 Conflicts:      kernel-rt
+Conflicts:      kernel-hwe
 %{?grub2_configuration_requires}
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
@@ -379,6 +380,36 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Nov 14 2025 Hamza Mahfooz <hamzamahfooz@linux.microsoft.com> - 6.6.116.1-2
+- Bump release to match kernel
+
+* Mon Nov 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.116.1-1
+- Auto-upgrade to 6.6.116.1
+
+* Mon Oct 27 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.112.1-2
+- Bump release to match kernel
+
+* Wed Oct 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.112.1-1
+- Auto-upgrade to 6.6.112.1
+
+* Tue Sep 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.104.2-4
+- Bump release to match kernel
+
+* Tue Sep 23 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.6.104.2-3
+- Bump release to match kernel
+
+* Tue Sep 23 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.104.2-2
+- Enable ipmitool for kernel-64k
+
+* Wed Sep 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.104.2-1
+- Auto-upgrade to 6.6.104.2
+
+* Fri Aug 22 2025 Siddharth Chintamaneni <siddharthc@microsoft.com> - 6.6.96.2-2
+- Bump release to match kernel
+
+* Fri Aug 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.96.2-1
+- Auto-upgrade to 6.6.96.2
+
 * Thu Jul 17 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.96.1-2
 - Bump release to match kernel
 

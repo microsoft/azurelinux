@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           libssh
 Version:        0.10.6
-Release:        2%{?dist}
+Release:        5%{?dist}
 Summary:        A library implementing the SSH protocol
 License:        LGPLv2+
 URL:            http://www.libssh.org
@@ -16,6 +16,9 @@ Patch0:         CVE-2025-5987.patch
 Patch1:         CVE-2025-5372.patch
 Patch2:         CVE-2025-5351.patch
 Patch3:         CVE-2025-5318.patch
+Patch4:         CVE-2025-4878.patch
+Patch5:         CVE-2025-8277.patch
+Patch6:         CVE-2025-8114.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
@@ -130,8 +133,9 @@ pushd obj
 popd
 
 %files
-%doc AUTHORS BSD CHANGELOG README
+%doc AUTHORS CHANGELOG README
 %license COPYING
+%license BSD
 %{_libdir}/libssh.so.4*
 %{_libdir}/libssh_threads.so.4*
 
@@ -148,6 +152,15 @@ popd
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/libssh/libssh_server.config
 
 %changelog
+* Wed Nov 12 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.10.6-5
+- Patch for CVE-2025-8114
+
+* Thu Sep 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.10.6-4
+- Patch for CVE-2025-8277
+
+* Thu Jul 24 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.10.6-3
+- Patch for CVE-2025-4878
+
 * Thu Jul 10 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.10.6-2
 - Patch for CVE-2025-5987, CVE-2025-5372, CVE-2025-5351, CVE-2025-5318
 

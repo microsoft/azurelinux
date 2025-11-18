@@ -1,54 +1,53 @@
+# Sphinx-generated HTML documentation is not suitable for packaging; see
+# https://bugzilla.redhat.com/show_bug.cgi?id=2006555 for discussion.
+#
+# We can generate PDF documentation as a substitute.
+%bcond_without doc_pdf
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global pypi_name pyperclip
 
-
-Name:           python-%{pypi_name}
-Version:        1.6.4
-Release:        9%{?dist}
+Name:           python-pyperclip
+Version:        1.8.2
+Release:        12%{?dist}
 Summary:        A cross-platform clipboard module for Python
 
-License:        BSD
+License:        BSD-3-Clause
 URL:            https://github.com/asweigart/pyperclip
-Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/python-%{pypi_name}-%{version}.tar.gz
-Source1:        %{name}-LICENSE.txt
-# Fix tests suite execution
-# Disable all tests requiring a display or toolkit to be available at build time
-Patch001:       0001-Skip-tests-irrelevant-in-the-context-of-Fedora-packa.patch
+Source0:        %{pypi_source pyperclip}
 BuildArch:      noarch
 
-BuildRequires:  git
- 
-%description
+%global common_description %{expand:
 Pyperclip is a cross-platform Python module for copy and paste clipboard
-functions.
+functions.}
 
-%package -n     python3-%{pypi_name}
+%description %{common_description}
+
+
+%package -n     python3-pyperclip
 Summary:        %{summary}
-%{?python_provide:%python_provide python3-%{pypi_name}}
 
 BuildRequires:  python3-devel
+BuildRequires:  python3-wheel
 BuildRequires:  python3-setuptools
 
-%description -n python3-%{pypi_name}
-Pyperclip is a cross-platform Python module for copy and paste clipboard
-functions.
+# While upstream runs tests directly with Python/unittest, using pytest as the
+# runner allows us to more easily skip tests.
+BuildRequires:  python3dist(pytest)
+BuildRequires:  xorg-x11-server-Xvfb
 
+%description -n python3-pyperclip %{common_description}
 
-%package -n python-%{pypi_name}-doc
+%package -n python-pyperclip-doc
 Summary:        Pyperclip documentation
-BuildRequires:  python3-sphinx
+BuildRequires:  python3dist(sphinx)
+BuildRequires:  make
 
-%description -n python-%{pypi_name}-doc
+%description -n python-pyperclip-doc
 Documentation for pyperclip
 
 
 %prep
-%autosetup -n %{pypi_name}-%{version} -S git
-cp %{SOURCE1} ./LICENSE.txt
-# Remove bundled egg-info
-rm -rf %{pypi_name}.egg-info
-
+%autosetup -p1 -n pyperclip-%{version}
 # Fix ends of line encoding
 sed -i 's/\r$//' README.md docs/*
 
@@ -63,25 +62,92 @@ rm -rf html/.{doctrees,buildinfo}
 %py3_install
 
 %check
-%{__python3} setup.py test
+%global __pytest /usr/bin/xvfb-run -a %{python3} -m pytest
+# Explicitly skip backends that we know will fail in the mock environment if
+# their dependencies happen to be present. See notes in the BuildRequires.
+k="${k-}${k+ and }not TestGtk"
+k="${k-}${k+ and }not TestKlipper"
+k="${k-}${k+ and }not TestWlCLipboard"
+k="${k-}${k+ and }not TestXSel"
+%pytest -k "${k-}" -v
 
-
-%files -n python3-%{pypi_name}
+%files -n python3-pyperclip
 %license LICENSE.txt
+%doc AUTHORS.txt
+%doc CHANGES.txt
 %doc README.md
-%{python3_sitelib}/%{pypi_name}
-%{python3_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
+%{python3_sitelib}/pyperclip
+%{python3_sitelib}/pyperclip-%{version}-py%{python3_version}.egg-info
 
-%files -n python-%{pypi_name}-doc
+%files -n python-pyperclip-doc
 %license LICENSE.txt
-%doc html
 
 %changelog
-* Fri Dec 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.6.4-9
+* Mon Jun 16 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.8.2-12
+- Initial Azure Linux import from Fedora 42 (license: MIT).
 - License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.4-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Sat Jan 18 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.2-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.2-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.8.2-9
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jun 16 2023 Python Maint <python-maint@redhat.com> - 1.8.2-5
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Nov 29 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 1.8.2-3
+- Update License to SPDX
+
+* Fri Aug 12 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 1.8.2-2
+- Enable running most of the graphical tests
+- Switch Sphinx documentation to PDF to sidestep guidelines issues
+
+* Mon Aug 08 2022 Jonathan Wright <jonathan@almalinux.org> - 1.8.2-1
+- Update to 1.8.2
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1.8.0-7
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.8.0-4
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 16 2020 Ken Dreyer <kdreyer@redhat.com> - 1.8.0-1
+- Update to 1.8.0 (rhbz#1697423)
+- Use non-git autosetup for simplicity
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1.6.4-8
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.4-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

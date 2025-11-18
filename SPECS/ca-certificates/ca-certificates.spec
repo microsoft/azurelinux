@@ -47,7 +47,7 @@ Name:           ca-certificates
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "prebuilt-ca-certificates*" packages as well.
 Epoch:          1
 Version:        %{azl}.0.0
-Release:        8%{?dist}
+Release:        13%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -340,6 +340,21 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Mon Oct 27 2025 Andrew Phelps <anphel@microsoft.com> - 1:3.0.0-13
+- Revert: Adding 2 new base CAs: 'Microsoft TLS RSA Root G2' and 'Microsoft TLS ECC Root G2'.
+
+* Wed Sep 24 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1:3.0.0-12
+- Updating Microsoft trusted root CAs.
+
+* Fri Sep 05 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1:3.0.0-11
+- Updating Microsoft trusted root CAs.
+
+* Tue Sep 02 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:3.0.0-10
+- Adding 2 new base CAs: 'Microsoft TLS RSA Root G2' and 'Microsoft TLS ECC Root G2'.
+
+* Thu Aug 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1:3.0.0-9
+- Updating Microsoft trusted root CAs.
+
 * Wed Dec 11 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.0-8
 - Update adding Microsoft distrusted CAs.
 - Explicitly set default file ownership to root:root.

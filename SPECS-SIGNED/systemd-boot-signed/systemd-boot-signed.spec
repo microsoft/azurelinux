@@ -1,6 +1,12 @@
 %global debug_package %{nil}
 %ifarch x86_64
 %global buildarch x86_64
+%global grubefiname grubx64.efi
+%global sdbootefiname systemd-bootx64.efi
+%elifarch aarch64
+%global buildarch aarch64
+%global grubefiname grubaa64.efi
+%global sdbootefiname systemd-bootaa64.efi
 %endif
 
 # Support for quick builds with rpmbuild --build-in-place.
@@ -14,7 +20,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        21%{?dist}
+Release:        24%{?dist}
 License:        LGPL-2.1-or-later AND MIT AND GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,8 +38,7 @@ URL:            https://systemd.io
 #   3. Place the unsigned package and signed binary in this spec's folder
 #   4. Build this spec
 Source0:        systemd-boot-%{version}-%{release}.%{buildarch}.rpm
-Source1:        systemd-bootx64.efi
-ExclusiveArch:  x86_64
+Source1:        %{sdbootefiname}
 
 %description
 This package contains the systemd-boot EFI binary signed for secure boot. The package is
@@ -71,8 +76,8 @@ pushd rpm_contents
 
 # This spec's whole purpose is to inject the signed systemd-boot binary
 rpm2cpio %{SOURCE0} | cpio -idmv
-cp %{SOURCE1} ./usr/lib/systemd/boot/efi/systemd-bootx64.efi
 
+cp %{SOURCE1} ./usr/lib/systemd/boot/efi/%{sdbootefiname}
 popd
 
 %install
@@ -81,7 +86,7 @@ pushd rpm_contents
 # Don't use * wildcard. It does not copy over hidden files in the root folder...
 cp -rp ./. %{buildroot}/
 
-cp %{buildroot}/usr/lib/systemd/boot/efi/systemd-bootx64.efi %{buildroot}/boot/efi/EFI/BOOT/grubx64.efi
+cp %{buildroot}/usr/lib/systemd/boot/efi/%{sdbootefiname} %{buildroot}/boot/efi/EFI/BOOT/%{grubefiname}
 
 popd
 
@@ -90,9 +95,18 @@ popd
 /usr/share/man/man5/loader.conf.5.gz
 /usr/share/man/man7/sd-boot.7.gz
 /usr/share/man/man7/systemd-boot.7.gz
-/boot/efi/EFI/BOOT/grubx64.efi
+/boot/efi/EFI/BOOT/%{grubefiname}
 
 %changelog
+* Tue Sep 16 2025 Akhila Guruju <v-guakhila@microsoft.com> - 255-24
+- Bump release to match systemd spec
+
+* Mon Aug 18 2025 Sean Dougherty <sdougherty@microsoft.com> - 255-23
+- Add aarch64 package
+
+* Wed Aug 06 2025 Sean Dougherty <sdougherty@microsoft.com> - 255-22
+- Bump release to match systemd spec
+
 * Mon Apr 14 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 255-21
 - Updating SRPM name to systemd-boot-signed-%%{buildarch}.
 

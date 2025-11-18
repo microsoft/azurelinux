@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.0.0
-Release: 13%{?dist}
+Release: 15%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -23,9 +23,10 @@ Patch3:	CVE-2025-22872.patch
 Patch4:	CVE-2025-47291.patch
 Patch5:	multi-snapshotters-support.patch
 Patch6:	tardev-support.patch
+Patch7:	CVE-2025-64329.patch
 %{?systemd_requires}
 
-BuildRequires: golang
+BuildRequires: golang < 1.25
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
@@ -98,6 +99,12 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Sat Nov 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-15
+- Patch for CVE-2025-64329
+
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 2.0.0-14
+- Set BR for golang to < 1.25
+
 * Mon Jul 21 2025 Saul Paredes <saulparedes@microsoft.com> - 2.0.0-13
 - Add "Provides/Obsoletes:" to shift all installs of moby-containerd-cc to containerd2
 
