@@ -13,7 +13,7 @@ index 7f66ec2..e06debf 100644
 --- a/common/utils.c
 +++ b/common/utils.c
 @@ -314,7 +314,11 @@ int plist_read_from_filename(plist_t *plist, const char *filename)
-        return 1;
+ 	return 1;
  }
 
 +#ifndef LIBPLIST_H
@@ -22,8 +22,8 @@ index 7f66ec2..e06debf 100644
 +int plist_write_to_filename(plist_t plist, const char *filename, plist_format_t format)
 +#endif
  {
-        char *buffer = NULL;
-        uint32_t length;
+ 	char *buffer = NULL;
+ 	uint32_t length;
 diff --git a/common/utils.h b/common/utils.h
 index 2c3acec..661f170 100644
 --- a/common/utils.h
@@ -34,8 +34,8 @@ index 2c3acec..661f170 100644
 
 +#ifndef LIBPLIST_H
  enum plist_format_t {
-        PLIST_FORMAT_XML,
-        PLIST_FORMAT_BINARY
+ 	PLIST_FORMAT_XML,
+ 	PLIST_FORMAT_BINARY
  };
 +#endif
 
