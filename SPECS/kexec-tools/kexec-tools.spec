@@ -6,7 +6,7 @@
 Summary:        The kexec/kdump userspace component
 Name:           kexec-tools
 Version:        2.0.27
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -59,7 +59,8 @@ Requires(preun): systemd
 Requires(postun): systemd
 Requires(pre): coreutils sed zlib
 Requires: dracut
-Requires: ethtool
+#Requires: ethtool
+Requires: ethtool-capability
 Requires: awk
 Requires: squashfs-tools
 %{?grub2_configuration_requires}
@@ -330,6 +331,11 @@ done
 /usr/share/makedumpfile/
 
 %changelog
+* Tue Nov 11 2025 Mayank Singh <mayansingh@microsoft.com> - 2.0.27-8
+- Make kexec-tools depend on a capability instead of a specific package name.
+  Lets the user (or image build) choose either ethtool or mlnx-ethtool at install time,
+  while preventing file conflicts by making the providers mutually exclusive.
+
 * Tue Jul 09 2024 Chris Co <chrco@microsoft.com> - 2.0.27-7
 - Remove requires on dhcp-client
 
