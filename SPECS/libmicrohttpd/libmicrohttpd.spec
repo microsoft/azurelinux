@@ -2,7 +2,7 @@ Name:           libmicrohttpd
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Version:        0.9.77
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Lightweight library for embedding a webserver in applications
 
 # * COPYING says that some main sources are only under LGPL-2.1-or-later
@@ -14,6 +14,7 @@ License:        LGPL-2.1-or-later AND (LGPL-2.1-or-later OR GPL-2.0-or-later WIT
 URL:            http://www.gnu.org/software/libmicrohttpd/
 Source0:        https://ftp.gnu.org/gnu/libmicrohttpd/%{name}-%{version}.tar.gz
 Patch0:         gnutls-utilize-system-crypto-policy.patch
+Patch1:         CVE-2025-59777.patch
 
 BuildRequires:  libtool
 BuildRequires:  texinfo
@@ -111,6 +112,9 @@ fi
 %doc html
 
 %changelog
+* Thu Nov 13 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.9.77-4
+- Patch for CVE-2025-59777
+
 * Thu Feb 01 2024 Dan Streetman <ddstreet@ieee.org> - 0.9.77-3
 - Update to version from Fedora 39.
 - Next line is present only to avoid tooling failures, and does not indicate the actual package license.
