@@ -2334,7 +2334,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
-* Thu Aug 14 2025 Kshitiz Godara <kgodara@microsoft.com> - 6.2.0-26
+* Wed Nov 19 2025 Kshitiz Godara <kgodara@microsoft.com> - 6.2.0-26
 - Add Patch for CVE-2024-7409
 
 * Thu Oct 09 2025 Ratiranjan Behera <v-ratbehera@microsoft.com> - 6.2.0-25
