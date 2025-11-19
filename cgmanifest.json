@@ -7882,7 +7882,7 @@
         "other": {
           "name": "jdepend",
           "version": "2.10",
-          "downloadUrl": "https://github.com/clarkware/jdepend/archive/refs/tags/2.10.tar.gz#/jdepend-2.10.tar.gz"
+          "downloadUrl": "https://github.com/clarkware/jdepend/archive/refs/tags/2.10.tar.gz"
         }
       }
     },
