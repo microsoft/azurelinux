@@ -200,7 +200,7 @@ fi
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
-* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1
+* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1
 - Upgrade version to 25.07.
 - Update additional kernel modules fwctl mana and mlx5_dpll included from 25.07
 
