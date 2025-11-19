@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.19
-Release:        14%{?dist}
+Release:        16%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -36,6 +36,9 @@ Patch12:        CVE-2025-1795.patch
 Patch13:        CVE-2025-6069.patch
 Patch14:        CVE-2025-4516.patch
 Patch15:        CVE-2025-4138.patch
+Patch16:        CVE-2025-8194.patch
+Patch17:        CVE-2025-8291.patch
+
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
 Patch1001:      CVE-2024-6345.patch
@@ -70,7 +73,8 @@ Provides:       /bin/python3
 Provides:       %{name}-docs = %{version}-%{release}
 Provides:       python%{majmin} = %{version}-%{release}
 Provides:       python%{majmin_nodots} = %{version}-%{release}
-%if %{with_check}
+
+%if 0%{?with_check}
 BuildRequires:  iana-etc
 BuildRequires:  tzdata
 %endif
@@ -196,6 +200,8 @@ The test package contains all regression tests for Python as well as the modules
 %patch13 -p1
 %patch14 -p1
 %patch15 -p1
+%patch16 -p1
+%patch17 -p1
 
 %build
 # Remove GCC specs and build environment linker scripts
@@ -371,6 +377,12 @@ make test TESTOPTS="-x test_multiprocessing_spawn -x test_socket -x test_email"
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Thu Oct 09 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.9.19-16
+- Patch for CVE-2025-8291
+
+* Thu Sep 18 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.9.19-15
+- Patch CVE-2025-8194
+
 * Mon Jun 30 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 3.9.19-14
 - Addresses CVE-2025-6069, CVE-2025-4516, CVE-2025-50181, CVE-2023-5752, CVE-2023-45803
 - Patch for CVE-2025-4138: Addresses CVE-2024-12718, CVE-2025-4138, CVE-2025-4330, CVE-2025-4517, CVE-2025-4435

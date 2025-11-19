@@ -6,7 +6,7 @@ Name:           nodejs18
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        18.20.3
-Release:        8%{?dist}
+Release:        10%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -27,7 +27,8 @@ Patch7:         CVE-2025-27516.patch
 Patch8:         CVE-2025-47279.patch
 Patch9:         CVE-2025-23166.patch
 Patch10:        CVE-2025-7656.patch
-
+Patch11:        CVE-2025-5889.patch
+Patch12:        CVE-2025-5222.patch
 BuildRequires:  brotli-devel
 BuildRequires:  coreutils >= 8.22
 BuildRequires:  gcc
@@ -128,6 +129,12 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Fri Nov 07 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 18.20.3-10
+- Patch for CVE-2025-5222
+
+* Mon Aug 04 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 18.20.3-9
+- Patch CVE-2025-5889
+
 * Mon Jul 21 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 18.20.3-8
 - Patch CVE-2025-7656
 
