@@ -44,6 +44,7 @@ BuildRequires:  perl(Test::Pod) >= 1.14
 BuildRequires:  perl(Test::Pod::Coverage) >= 1.04
 BuildRequires:  perl(Test::TrailingSpace)
 %endif
+BuildRequires:  iana-etc
 # Runtime
 
 %description
