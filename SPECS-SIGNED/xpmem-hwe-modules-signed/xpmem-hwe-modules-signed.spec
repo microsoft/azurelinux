@@ -93,7 +93,7 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 fi
 
 %changelog
-* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7.4-25_6.12.57.1-1
+* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7.4-25_6.12.57.1.1
 - Build with OFED 25.07.0.9.7.1.
 - Enable build on x86_64 kernel hwe.
 

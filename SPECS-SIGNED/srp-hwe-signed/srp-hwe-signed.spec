@@ -111,7 +111,7 @@ popd
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
-* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1_6.12.57.1-1
+* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1_6.12.57.1.1
 - Upgrade version to 25.07.
 - Enable build on x86_64 kernel hwe.
 

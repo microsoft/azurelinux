@@ -213,7 +213,7 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
-* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-1_6.12.57.1-1
+* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-1_6.12.57.1.1
 - Upgrade version to 4.33.0.
 - Enable build on x86_64 kernel hwe.
 - Update source path
