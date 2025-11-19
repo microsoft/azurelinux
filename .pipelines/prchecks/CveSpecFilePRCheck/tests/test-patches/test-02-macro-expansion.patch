@@ -1,0 +1,24 @@
+--- a/SPECS/python-tomli/python-tomli.spec
++++ b/SPECS/python-tomli/python-tomli.spec
+@@ -1,5 +1,9 @@
+ %global pypi_name tomli
+ %global distinfo %{pypi_name}-%{version}+rpmbootstrap.dist-info
++%global cve_year 2025
++%global cve_base CVE-
++%global security_patch_num 12345
++%global future_year 2035
+ %global _description %{expand:
+ Tomli is a Python library for parsing TOML.
+ Tomli is fully compatible with TOML v1.0.0.}
+@@ -14,6 +18,11 @@ Distribution:   Azure Linux
+ URL:            https://pypi.org/project/%{pypi_name}/
+ Source0:        https://github.com/hukkin/%{pypi_name}/archive/refs/tags/%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
+ 
++# Test macro expansion in CVE detection
++Patch0:         %{cve_base}%{cve_year}-%{security_patch_num}.patch
++Patch1:         CVE-%{cve_year}-54321.patch
++Patch2:         %{cve_base}%{future_year}-99999.patch
++
+ BuildArch:      noarch
+ 
+ BuildRequires:  python3-devel
