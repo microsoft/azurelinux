@@ -29,8 +29,7 @@ Release: 27%{?dist}
 # See LICENSE.txt, http://www.apache.org/licenses/LICENSE-2.0
 License: ASL 2.0 
 URL:	 https://github.com/uw-imap/imap
-# Source0: https://github.com/uw-imap/imap/archive/refs/tags/imap-2007f_upstream.tar.gz
-Source0: https://github.com/uw-imap/imap/archive/refs/tags/imap-%{version}%{?beta}%{?dev}%{?snap}.tar.gz
+Source0: https://github.com/uw-imap/imap/archive/refs/tags/imap-2007f_upstream.tar.gz#/%{name}-%{version}.tar.gz
 
 %global soname    c-client
 %global shlibname lib%{soname}.so.%{somajor}
@@ -155,7 +154,7 @@ This package contains some utilities for managing UW IMAP email,including:
 
 
 %prep
-%setup -q -n imap-%{version}%{?dev}%{?snap}
+%setup -q -n imap-imap-%{version}_upstream
 
 %patch 1 -p1 -b .paths
 %patch 2 -p1 -b .doc
