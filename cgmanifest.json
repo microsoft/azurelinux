@@ -17583,8 +17583,8 @@
         "type": "other",
         "other": {
           "name": "perl-FFI-CheckLib",
-          "version": "0.26",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/FFI-CheckLib-0.26.tar.gz"
+          "version": "0.31",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/FFI-CheckLib-0.31.tar.gz"
         }
       }
     },
