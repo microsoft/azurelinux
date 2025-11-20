@@ -5,8 +5,8 @@ Subject: [PATCH] Skip redefinition of plist enums
 
 ---
  src/utils.c | 2 +-
- src/utils.h | 4 +++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ src/utils.h | 8 +++++---
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/src/utils.c b/src/utils.c
 index 206c684..a91faea 100644
@@ -22,18 +22,20 @@ index 206c684..a91faea 100644
  	char *buffer = NULL;
  	uint32_t length;
 diff --git a/src/utils.h b/src/utils.h
-index b5cab3f..aa95c00 100644
+index b5cab3f..0e0657c 100644
 --- a/src/utils.h
 +++ b/src/utils.h
 @@ -78,13 +78,15 @@ char *string_concat(const char *str, ...);
  int buffer_read_from_filename(const char *filename, char **buffer, uint64_t *length);
  int buffer_write_to_filename(const char *filename, const char *buffer, uint64_t length);
 
+-enum plist_format_t {
 +#ifndef LIBPLIST_H
- enum plist_format_t {
++typedef enum plist_format_t {
  	PLIST_FORMAT_XML,
  	PLIST_FORMAT_BINARY
- };
+-};
++} plist_format_t;
 +#endif
 
  int plist_read_from_filename(plist_t *plist, const char *filename);
@@ -44,3 +46,4 @@ index b5cab3f..aa95c00 100644
  void get_tick_count(struct timeval * tv);
 --
 2.45.4
+

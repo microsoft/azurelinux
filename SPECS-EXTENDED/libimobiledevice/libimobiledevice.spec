@@ -9,7 +9,7 @@ License:        LGPLv2+
 URL:            http://www.libimobiledevice.org/
 Source0:        https://github.com/libimobiledevice/libimobiledevice/releases/download/%{version}/%{name}-%{version}.tar.bz2
 # Patch to fix 1.3.0 redefining enum from libplist
-Patch0:        upgrade-fixes-1.3.0.patch
+Patch0:         upgrade-fixes-1.3.0.patch
 
 BuildRequires: glib2-devel
 BuildRequires: openssl-devel
