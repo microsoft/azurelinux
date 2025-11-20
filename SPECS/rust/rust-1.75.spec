@@ -181,7 +181,7 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
-* Sat Oct 25 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.75.0-22
+* Sat Oct 25 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.75.0-22
 - Patch for CVE-2023-48795
 
 * Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-21

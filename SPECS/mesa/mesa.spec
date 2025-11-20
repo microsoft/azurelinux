@@ -741,7 +741,7 @@ popd
 %endif
 
 %changelog
-* Mon Aug 26 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.0.1-5
+* Mon Aug 26 2025 Kshitiz Godara <kgodara@microsoft.com> - 24.0.1-5
 - Bump release to rebuild with rust
 
 * Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 24.0.1-4

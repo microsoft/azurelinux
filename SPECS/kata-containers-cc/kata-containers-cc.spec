@@ -150,10 +150,10 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Mon Aug 26 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-6
+* Mon Aug 26 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.15.0.aks0-6
 - Bump release to rebuild with rust
 
-* Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0-aks0-5
+* Fri Aug 08 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.15.0-aks0-5
 - Bump release to rebuild with rust
 
 * Tue Jul 22 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.15.0.aks0-4

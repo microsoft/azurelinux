@@ -178,7 +178,7 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
-* Mon Aug 26 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2024.4-6
+* Mon Aug 26 2025 Kshitiz Godara <kgodara@microsoft.com> - 2024.4-6
 - Bump release to rebuild with rust
 
 * Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2024.4-5

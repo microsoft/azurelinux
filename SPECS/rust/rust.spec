@@ -182,7 +182,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
-* Sat Oct 25 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.86.0-10
+* Sat Oct 25 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.86.0-10
 - Patch for CVE-2023-48795
 
 * Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.86.0-9
@@ -197,7 +197,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 * Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.86.0-6
 - Bump to rebuild with updated glibc
 
-* Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.86.0-5
+* Fri Aug 08 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.86.0-5
 - Patch for CVE-2024-11738
  
 * Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.86.0-4
