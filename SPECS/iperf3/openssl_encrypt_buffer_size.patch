@@ -1,0 +1,24 @@
+From aab262afe1770b55bb865fd4dad2d5e737c758a6 Mon Sep 17 00:00:00 2001
+From: Michael Lowman <michael.d.lowman@gmail.com>
+Date: Wed, 8 Oct 2025 22:40:07 +0200
+Subject: [PATCH] Set output buffer size prior to encrypt operation
+
+When calling EVP_PKEY_encrypt with a non-null output buffer,
+the output buffer length must be provided. Attempts to write
+beyond this length will fail.
+---
+ src/iperf_auth.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/iperf_auth.c b/src/iperf_auth.c
+index eda015099..774e1b701 100644
+--- a/src/iperf_auth.c
++++ b/src/iperf_auth.c
+@@ -255,6 +255,7 @@ int encrypt_rsa_message(const char *plaintext, EVP_PKEY *public_key, unsigned ch
+ #endif
+     rsa_buffer  = OPENSSL_malloc(keysize * 2);
+     *encryptedtext = (unsigned char*)OPENSSL_malloc(keysize);
++    encryptedtext_len = keysize;
+
+     BIO *bioBuff   = BIO_new_mem_buf((void*)plaintext, (int)strlen(plaintext));
+     rsa_buffer_len = BIO_read(bioBuff, rsa_buffer, keysize * 2);

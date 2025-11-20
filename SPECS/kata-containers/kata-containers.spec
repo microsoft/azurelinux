@@ -2,7 +2,7 @@
 
 Name:           kata-containers
 Version:        3.19.1.kata2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
@@ -10,8 +10,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
-
-ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
@@ -115,8 +113,11 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Sat Oct 25 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.19.1.kata2-2
+* Sat Oct 25 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.19.1.kata2-3
 - Bump release to rebuild with rust
+
+* Thu Oct 09 2025 Saul Paredes <saulparedes@microsoft.com> - 3.19.1.kata2-2
+- Enable build on aarch64
 
 * Mon Sep 08 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.1.kata2-1
 - Auto-upgrade to 3.19.1.kata2

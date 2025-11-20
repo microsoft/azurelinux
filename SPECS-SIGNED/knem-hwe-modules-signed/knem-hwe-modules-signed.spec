@@ -28,7 +28,7 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.50.2
+%global target_azl_build_kernel_version 6.12.57.1
 %global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
@@ -44,7 +44,7 @@
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
 Name:		 %{_name}-signed
 Version:	 1.1.4.90mlnx3
-Release:	 23%{release_suffix}%{?dist}
+Release:	 24%{release_suffix}%{?dist}
 Provides:	 knem-hwe-mlnx = %{version}-%{release}
 Obsoletes:	 knem-hwe-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
@@ -52,7 +52,7 @@ Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 ExclusiveArch:   aarch64
-Conflicts:       knem
+
 
 #
 # To populate these sources:
@@ -73,6 +73,7 @@ See http://knem.gitlabpages.inria.fr for details.
 Summary:        KNEM: High-Performance Intra-Node MPI Communication
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
+Conflicts:      knem-modules
 
 %description -n %{_name}
 %{description}
@@ -110,6 +111,9 @@ fi
 /lib/modules/
 
 %changelog
+* Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 1.1.4.90mlnx3-24_6.12.57.1.1
+- Bump to match kernel-hwe
+
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.4.90mlnx3-23_6.12.50.2-1
 - Bump release to rebuild for new release
 
