@@ -24,7 +24,7 @@ Distribution:   Azure Linux
 Summary: UW Server daemons for IMAP and POP network mail protocols
 Name:	 uw-imap 
 Version: 2007f
-Release: 26%{?dist}
+Release: 27%{?dist}
 
 # See LICENSE.txt, http://www.apache.org/licenses/LICENSE-2.0
 License: ASL 2.0 
@@ -202,7 +202,7 @@ export EXTRACFLAGS="$EXTRACFLAGS -Wno-pointer-sign"
 
 
 echo -e "y\ny" | \
-make %{?_smp_mflags} lnp \
+make -j1 lnp \
 IP=6 \
 EXTRACFLAGS="$EXTRACFLAGS" \
 EXTRALDFLAGS="$EXTRALDFLAGS $RPM_LD_FLAGS" \
@@ -348,6 +348,9 @@ done
 
 
 %changelog
+* Thu Nov 20 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2007f-27
+- Fix build
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2007f-26
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
