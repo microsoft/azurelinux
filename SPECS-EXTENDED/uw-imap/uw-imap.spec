@@ -350,6 +350,7 @@ done
 %changelog
 * Thu Nov 20 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2007f-27
 - Fix build
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2007f-26
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
