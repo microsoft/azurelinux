@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.0.0
-Release: 15%{?dist}
+Release: 16%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -31,7 +31,7 @@ BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
 
-Requires: runc >= 1.2.2
+Requires: runc = 1.2.2
 
 # This package replaces the old name of containerd
 Provides: containerd = %{version}-%{release}
@@ -99,6 +99,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Thu Nov 20 2025 Muhammad Falak <mwani@microsoft.com> - 2.0.0-16
+- Pin runc to 1.2.2 for testing purprose
+
 * Sat Nov 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-15
 - Patch for CVE-2025-64329
 
