@@ -104,10 +104,10 @@ install -Dm 644 complete/_rg %{buildroot}%{_datadir}/zsh/site-functions/_rg
 %{_datadir}/zsh
 
 %changelog
-* Mon Aug 26 2025 Kshitiz Godara <kgodara@microsoft.com> - 13.0.0-11
+* Mon Aug 26 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 13.0.0-11
 - Bump release to rebuild with rust
 
-* Fri Aug 08 2025 Kshitiz Godara <kgodara@microsoft.com> - 13.0.0-10
+* Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 13.0.0-10
 - Bump release to rebuild with rust
 
 * Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 13.0.0-9

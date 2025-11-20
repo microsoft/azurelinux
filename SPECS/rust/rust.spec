@@ -62,7 +62,7 @@ BuildRequires:  python3
 # make sure rust depends on system zlib
 BuildRequires:  zlib-devel
 %if 0%{?with_check}
-BuildRequires:  glibc-static >= 2.38-16%{?dist}
+BuildRequires:  glibc-static >= 2.38-15%{?dist}
 BuildRequires:	sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
@@ -182,11 +182,8 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
-* Thu Nov 20 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.86.0-10
+* Sat Oct 25 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.86.0-10
 - Patch for CVE-2023-48795
-
-* Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 1.86.0-10
-- Bump to rebuild with updated glibc
 
 * Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.86.0-9
 - Bump to rebuild with updated glibc
@@ -200,7 +197,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 * Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.86.0-6
 - Bump to rebuild with updated glibc
 
-* Fri Aug 08 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.86.0-5
+* Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.86.0-5
 - Patch for CVE-2024-11738
  
 * Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.86.0-4
