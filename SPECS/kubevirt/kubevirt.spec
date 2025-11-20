@@ -50,6 +50,7 @@ Patch17:        CVE-2025-64324.patch
 Patch18:        CVE-2025-64432.patch
 Patch19:        CVE-2025-64433.patch
 Patch20:        CVE-2025-64437.patch
+Patch21:        CVE-2025-64435.patch
 
 
 %global debug_package %{nil}
@@ -232,7 +233,7 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 
 %changelog
 * Tue Nov 25 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.59.0-32
-- Patch for CVE-2025-64437, CVE-2025-64433, CVE-2025-64432
+- Patch for CVE-2025-64437, CVE-2025-64433, CVE-2025-64432, CVE-2025-64435
 
 * Thu Nov 20 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.59.0-31
 - Patch for CVE-2025-64324
@@ -261,11 +262,11 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 * Fri Jan 03 2025 Sumedh Sharma <sumsharma@microsoft.com> - 0.59.0-23
 - Add patch to fix CVE-2024-45338
 
-* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-22
-- Bump release to rebuild with go 1.22.7
-
 * Wed Sep 11 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.59.0-21
 - Remove hotplug detach patch since it is no longer required.
+
+* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-22
+- Bump release to rebuild with go 1.22.7
 
 * Thu Aug 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.59.0-20
 - Fix for CVE-2022-32149
