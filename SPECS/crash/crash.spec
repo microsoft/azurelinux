@@ -1,7 +1,7 @@
 %global gdb_version 10.2
 Name:          crash
-Version:       8.0.4
-Release:       5%{?dist}
+Version:       9.0.0
+Release:       1%{?dist}
 Summary:       kernel crash analysis utility for live systems, netdump, diskdump, kdump, LKCD or mcore dumpfiles
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
@@ -98,6 +98,9 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 %endif
 
 %changelog
+* Thu Nov 20 2025 Chris Co <chrco@microsoft.com> - 9.0.0-1
+- Update to 9.0.0
+
 * Fri Oct 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.0.4-5
 - Update gdb-10.2-4.tar.gz to address CVE-2025-11082
 
