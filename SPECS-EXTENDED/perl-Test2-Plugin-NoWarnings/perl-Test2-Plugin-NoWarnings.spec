@@ -35,29 +35,29 @@ BuildRequires:	perl(CPAN::Meta) >= 2.120900
 BuildRequires:	perl(CPAN::Meta::Prereqs)
 # Dependencies
 # (none)
- 
+
 %description
 Loading this plugin causes your tests to fail if there are any warnings while
 they run. Each warning generates a new failing test and the warning content is
 outputted via diag.
- 
+
 This module uses $SIG{__WARN__}, so if the code you're testing sets this, then
 this module will stop working.
- 
+
 %prep
 %setup -q -n Test2-Plugin-NoWarnings-%{version}
- 
+
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PERLLOCAL=1 NO_PACKLIST=1
 %{make_build}
- 
+
 %install
 %{make_install}
 %{_fixperms} -c %{buildroot}
  
 %check
 make test
- 
+
 %files
 %license LICENSE
 %doc Changes CODE_OF_CONDUCT.md README.md
