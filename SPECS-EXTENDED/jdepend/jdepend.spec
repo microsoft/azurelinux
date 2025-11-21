@@ -1,40 +1,22 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-#
-# spec file for package jdepend
-#
-# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
-#
-# All modifications and additions to the file contributed by third parties
-# remain the property of their copyright owners, unless otherwise agreed
-# upon. The license for this file, and modifications and additions to the
-# file, is the same license as for the pristine package itself (unless the
-# license for the pristine package is not an Open Source License, in which
-# case the license is the MIT License). An "Open Source License" is a
-# license that conforms to the Open Source Definition (Version 1.9)
-# published by the Open Source Initiative.
-
-# Please submit bugfixes or comments via https://bugs.opensuse.org/
-#
-
-
-%define section		free
 Name:           jdepend
-Version:        2.9.1
-Release:        96%{?dist}
+Version:        2.10
+Release:        1%{?dist}
 Summary:        Java Design Quality Metrics
-License:        BSD-3-Clause
-Group:          Development/Libraries/Java
-URL:            http://www.clarkware.com/
-Source0:        %{url}software/%{name}-%{version}.tar.bz2
-Source1:        https://repo1.maven.org/maven2/jdepend/%{name}/%{version}/%{name}-%{version}.pom
-Patch0:         jdepend-target16.patch
-BuildRequires:  ant
-BuildRequires:  java-devel
+License:        MIT
+URL:            https://github.com/clarkware/jdepend
+#BuildArch:      noarch
+#ExclusiveArch:  %{java_arches} noarch
+ 
+Source0:        https://github.com/clarkware/jdepend/archive/refs/tags/2.10.tar.gz#/jdepend-2.10.tar.gz
+ 
 BuildRequires:  javapackages-local-bootstrap
-Obsoletes:      %{name}-javadoc
 BuildArch:      noarch
+BuildRequires:  ant 
+# TODO Remove in Fedora 46
 
+ 
 %description
 JDepend traverses a set of Java class and source file directories and
 generates design quality metrics for each Java package. JDepend allows
@@ -55,49 +37,44 @@ extensibility, reusability, and maintainability to effectively manage
 and control package dependencies.
 
 This package contains demonstration and sample files for JDepend.
-
+ 
 %prep
-%setup -q
+%autosetup -p1 
 # remove all binary libs
-find . -name "*.jar" -exec rm -f {} \;
+find . -name "*.jar" -delete
 # fix strange permissions
 find . -type d -exec chmod 755 {} \;
-%patch 0 -b .target15
-
+find . -type f -exec chmod 644 {} \;
+ 
 %build
 ant jar
-
+ 
 %install
 # jars
 install -d -m 755 %{buildroot}%{_javadir}
 install -m 644 dist/%{name}-%{version}.jar \
     %{buildroot}%{_javadir}/%{name}-%{version}.jar
-(cd %{buildroot}%{_javadir} && for jar in *-%{version}*; do ln -sf ${jar} ${jar/-%{version}/}; done)
 
-# pom
-install -d -m 755 %{buildroot}%{_mavenpomdir}
-install -m 655 %{SOURCE1} %{buildroot}%{_mavenpomdir}/%{name}-%{version}.pom
-%add_maven_depmap %{name}-%{version}.pom %{name}-%{version}.jar
+# provide unversioned symlink for convenience
+(cd %{buildroot}%{_javadir} && ln -sf %{name}-%{version}.jar %{name}.jar)
 
-# demo
+# demo files
 install -d -m 755 %{buildroot}%{_datadir}/%{name}
 cp -pr sample %{buildroot}%{_datadir}/%{name}
 
+
 %files
-%license LICENSE
-%doc CHANGES README
-%{_javadir}/*
-%{_mavenpomdir}/*
-%if %{defined _maven_repository}
-%{_mavendepmapfragdir}/%{name}
-%else
-%{_datadir}/maven-metadata/%{name}.xml*
-%endif
+%license LICENSE.md
+%doc README.md CHANGELOG.md docs
+%{_javadir}/jdepend*.jar
 
 %files demo
 %{_datadir}/%{name}
 
 %changelog
+* Mon Nov 17 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 2.10-1
+- Upgrade to version 2.10 (license: MIT).
+- License verified
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.1-96
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
