@@ -30,8 +30,7 @@ It contains the documentation and manpages for haproxy package.
 Requires:       %{name} = %{version}-%{release}
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1
 
 %build
 make %{?_smp_mflags} TARGET="linux-glibc" USE_PCRE=1 USE_OPENSSL=1 \
