@@ -5150,8 +5150,8 @@
         "type": "other",
         "other": {
           "name": "gupnp",
-          "version": "1.6.3",
-          "downloadUrl": "https://github.com/GNOME/gupnp/archive/refs/tags/gupnp-1.6.3.tar.gz"
+          "version": "1.6.9",
+          "downloadUrl": "https://github.com/GNOME/gupnp/archive/refs/tags/gupnp-1.6.9.tar.gz"
         }
       }
     },
@@ -15583,6 +15583,16 @@
         "type": "other",
         "other": {
           "name": "openssl",
+          "version": "3.1.2",
+          "downloadUrl": "https://github.com/openssl/openssl/releases/download/openssl-3.1.2/openssl-3.1.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "openssl",
           "version": "3.3.5",
           "downloadUrl": "https://github.com/openssl/openssl/releases/download/openssl-3.3.5/openssl-3.3.5.tar.gz"
         }
@@ -23023,8 +23033,8 @@
         "type": "other",
         "other": {
           "name": "python-gssapi",
-          "version": "1.6.1",
-          "downloadUrl": "https://github.com/pythongssapi/python-gssapi/releases/download/v1.6.1/python-gssapi-1.6.1.tar.gz"
+          "version": "1.10.0",
+          "downloadUrl": "https://github.com/pythongssapi/python-gssapi/releases/download/v1.10.0/python-gssapi-1.10.0.tar.gz"
         }
       }
     },
