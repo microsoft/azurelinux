@@ -1,13 +1,14 @@
 Summary:        A fast, reliable HA, load balancing, and proxy solution.
 Name:           haproxy
 Version:        2.4.24
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.haproxy.org
 Source0:        http://www.haproxy.org/download/2.4/src/%{name}-%{version}.tar.gz
+Patch0:         CVE-2025-11230.patch
 BuildRequires:  lua-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
@@ -29,7 +30,7 @@ It contains the documentation and manpages for haproxy package.
 Requires:       %{name} = %{version}-%{release}
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 make %{?_smp_mflags} TARGET="linux-glibc" USE_PCRE=1 USE_OPENSSL=1 \
@@ -59,6 +60,9 @@ install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/hapr
 %{_mandir}/*
 
 %changelog
+* Fri Nov 21 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.4.24-2
+- Patch for CVE-2025-11230
+
 * Mon Aug 21 2023 Bala <balakumaran.kannan@microsoft.com> - 2.4.24-1
 - Update to 2.4.24 to fix CVE-2023-40225
 
