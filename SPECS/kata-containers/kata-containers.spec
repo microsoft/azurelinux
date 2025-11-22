@@ -11,6 +11,8 @@ Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
 
+ExclusiveArch: x86_64
+
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
@@ -113,8 +115,8 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Thu Oct 09 2025 Saul Paredes <saulparedes@microsoft.com> - 3.19.1.kata2-2
-- Enable build on aarch64
+* Sat Oct 25 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.19.1.kata2-2
+- Bump release to rebuild with rust
 
 * Mon Sep 08 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.1.kata2-1
 - Auto-upgrade to 3.19.1.kata2

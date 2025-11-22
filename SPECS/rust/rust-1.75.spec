@@ -46,6 +46,7 @@ Patch1:         CVE-2024-32884.patch
 Patch2:         CVE-2024-31852.patch
 Patch3:         CVE-2025-4574_1.75.patch
 Patch4:         CVE-2025-53605_1.75.patch
+Patch5:         CVE-2023-48795_1.75.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -64,7 +65,7 @@ BuildRequires:  python3
 # make sure rust depends on system zlib
 BuildRequires:  zlib-devel
 %if 0%{?with_check}
-BuildRequires:  glibc-static >= 2.38-16%{?dist}
+BuildRequires:  glibc-static >= 2.38-15%{?dist}
 BuildRequires:  sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
@@ -180,8 +181,8 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
-* Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 1.75.0-22
-- Bump to rebuild with updated glibc
+* Sat Oct 25 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.75.0-22
+- Patch for CVE-2023-48795
 
 * Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-21
 - Bump to rebuild with updated glibc
