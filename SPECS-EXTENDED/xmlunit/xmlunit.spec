@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 #
 # spec file for package xmlunit
 #
-# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
+# Copyright (c) 2022 SUSE LLC
 # Copyright (c) 2000-2008, JPackage Project
 #
 # All modifications and additions to the file contributed by third parties
@@ -20,14 +20,14 @@ Distribution:   Azure Linux
 
 
 Name:           xmlunit
-Version:        1.5
-Release:        10%{?dist}
+Version:        1.6
+Release:        1%{?dist}
 Summary:        Provides classes to do asserts on XML
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
 URL:            http://xmlunit.sourceforge.net/
-Source0:        http://download.sourceforge.net/%{name}/%{name}-%{version}-src.zip
-Source1:        http://repo1.maven.org/maven2/%{name}/%{name}/%{version}/%{name}-%{version}.pom
+Source0:        https://download.sourceforge.net/%{name}/%{name}-%{version}-src.zip
+Source1:        https://repo1.maven.org/maven2/%{name}/%{name}/%{version}/%{name}-%{version}.pom
 BuildRequires:  ant
 BuildRequires:  ant-junit
 BuildRequires:  fdupes
@@ -59,10 +59,9 @@ Group:          Documentation/HTML
 Javadoc for %{name}. Also contains userguide.
 
 %prep
-%setup -q
+%autosetup
 
-perl -pi -e 's/
-$//g' README.txt LICENSE.txt
+perl -pi -e 's/\r$//g' README.txt LICENSE.txt
 
 # remove all binary libs and javadocs
 find . -name "*.jar" -delete
@@ -81,7 +80,7 @@ EOF
 
 export CLASSPATH=
 export OPT_JAR_LIST="junit ant/ant-junit jaxp_transform_impl ant/ant-trax xalan-j2-serializer"
-ant -Djavac.source=1.6 -Djavac.target=1.6 -Dbuild.compiler=modern -Dhaltonfailure=yes jar javadocs
+ant -Djavac.source=1.8 -Djavac.target=1.8 -Dbuild.compiler=modern -Dhaltonfailure=yes jar javadocs
 
 %install
 mkdir -p %{buildroot}%{_javadir}
@@ -115,6 +114,10 @@ install -m 644 %{SOURCE1} \
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Nov 24 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.6-1
+- Upgrade to 1.6
+- License Verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-10
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
