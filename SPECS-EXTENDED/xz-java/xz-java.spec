@@ -1,7 +1,9 @@
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 #
 # spec file for package xz-java
 #
-# Copyright (c) 2019 SUSE LINUX GmbH, Nuernberg, Germany.
+# Copyright (c) 2025 SUSE LLC
 # Copyright (c) 2013 Peter Conrad
 #
 # All modifications and additions to the file contributed by third parties
@@ -16,25 +18,23 @@
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
-Summary:        Pure Java implementation of XZ compression
 Name:           xz-java
-Version:        1.8
-Release:        5%{?dist}
-License:        Public Domain
+Version:        1.10
+Release:        3%{?dist}
+Summary:        Pure Java implementation of XZ compression
+License:        0BSD
 Group:          Development/Libraries/Java
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            http://tukaani.org/xz/java.html
-Source:         http://tukaani.org/xz/xz-java-%{version}.zip
-Patch0:         xz-java-source-version.patch
+URL:            https://tukaani.org/xz/java.html
+Source0:        https://tukaani.org/xz/xz-java-%{version}.zip
+Patch0:         xz-java-module-info.patch
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  java-devel >= 1.8
-BuildRequires:  javapackages-local-bootstrap
+BuildRequires:  javapackages-local-bootstrap >= 6
 BuildRequires:  unzip
+Provides:       java-xz = %{version}-%{release}
+Obsoletes:      java-xz < 1.8-5
 BuildArch:      noarch
-Provides:       java-xz
-Obsoletes:      java-xz
 
 %description
 This is an implementation of XZ data compression in pure Java.
@@ -49,12 +49,10 @@ Group:          Documentation/HTML
 This package contains the API documentation of xz-java.
 
 %prep
-%setup -q -c -n %{name}
-%patch 0 -p1
+%autosetup -p1 -n %{name} -c
 
 %build
-sed -i 's/linkoffline="[^"]*"//;/extdoc_/d' build.xml
-ant  -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 clean jar doc maven
+ant -Dant.build.javac.{source,target}=8 clean jar doc maven
 
 %install
 # jar
@@ -66,30 +64,110 @@ install -dm 0755 %{buildroot}%{_mavenpomdir}
 install -pm 0644 build/maven/xz-%{version}.pom %{buildroot}%{_mavenpomdir}/%{name}.pom
 %add_maven_depmap %{name}.pom %{name}.jar
 # javadoc
-mkdir -p %{buildroot}%{_javadocdir}/%{name}
+install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr build/doc/* %{buildroot}%{_javadocdir}/%{name}
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
 %license COPYING
-%doc NEWS README THANKS
+%doc {NEWS,README,THANKS}.md
 %{_javadir}/xz.jar
 
 %files javadoc
 %{_javadocdir}/%{name}
 
 %changelog
-* Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.8-5
-- Move to SPECS
+* Mon Nov 24 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.10-3
+- Initial Azure Linux import from openSUSE Tumbleweed (license: same as "License" tag).
 - License verified
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8-4
-- Converting the 'Release' tag to the '[number].[distribution]' format.
-
-* Thu Nov 12 2020 Joe Schmitt <joschmit@microsoft.com> - 1.8-3.7
-- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
-- Use javapackages-local-bootstrap to avoid build cycle.
-
+* Thu Jul  3 2025 Fridrich Strba <fstrba@suse.com>
+- Added patch:
+  * xz-java-module-info.patch
+    + Do not put the module-info.class into multirelease directory
+    + If building with Java 8 only, specify in the manifest the
+    Automatic-Module-Name, so that it can be recognized as
+    modular jar even in that configuration
+* Fri Aug  2 2024 Anton Shvetz <shvetz.anton@gmail.com>
+- Update to version 1.10
+  * Licensing change: From version 1.10 onwards, XZ for Java is
+    under the BSD Zero Clause License (0BSD). 1.9 and older are in
+    the public domain and obviously remain so; the change only
+    affects the new releases.
+    0BSD is an extremely permissive license which doesn't require
+    retaining or reproducing copyright or license notices when
+    distributing the code, thus in practice there is extremely
+    little difference to public domain.
+  * Mark copyright and license information in the source package so
+    that it is compliant to the REUSE Specification version 3.2.
+  * Improve LZMAInputStream.enableRelaxedEndCondition():
+    + Error detection is slightly better.
+    + The input position will always be at the end of the stream
+    after successful decompression.
+  * Support .lzma files that have both a known uncompressed size
+    and the end marker. Such files are uncommon but valid. The same
+    issue was fixed in XZ Utils 5.2.6 in 2022.
+  * Add ARM64 and RISC-V BCJ filters.
+  * Speed optimizations:
+    + Delta filter
+    + LZMA/LZMA2 decoder
+    + LZMA/LZMA2 encoder (partially Java >= 9 only)
+    + CRC64 (Java >= 9 only)
+  * Changes that affect API/ABI compatibility:
+    + Change XZOutputStream constructors to not call the method
+    public void updateFilters(FilterOptions[] filterOptions).
+    + In SeekableXZInputStream, change the method public void
+    seekToBlock(int blockNumber) to not call the method public
+    long getBlockPos(int blockNumber).
+    + Make the filter options classes final:
+    ~ ARM64Options
+    ~ ARMOptions
+    ~ ARMThumbOptions
+    ~ DeltaOptions
+    ~ IA64Options
+    ~ LZMA2Options
+    ~ PowerPCOptions
+    ~ RISCVOptions
+    ~ SPARCOptions
+    ~ X86Options
+  * Add new system properties:
+    + org.tukaani.xz.ArrayCache sets the default ArrayCache: Dummy
+    (default) or Basic. See the documentation of ArrayCache and
+    BasicArrayCache.
+    + org.tukaani.xz.MatchLengthFinder (Java >= 9 only) sets the
+    byte array comparison method used for finding match lengths
+    in LZMA/LZMA2 encoder: UnalignedLongLE (default on x86-64 and
+    ARM64) or Basic (default on other systems). The former could
+    be worth testing on other 64-bit little endian systems that
+    support fast unaligned memory access.
+  * Build system (Apache Ant):
+    + Building the documentation no longer downloads element-list
+    or package-list file; the build is now fully offline. Such
+    files aren't needed with OpenJDK >= 16 whose javadoc can
+    auto-link to platform documentation on docs.oracle.com. With
+    older OpenJDK versions, links to platform documentation
+    aren't generated anymore.
+    + Don't require editing of build.properties to build with
+    OpenJDK 8. Now it's enough to use ant -Djava8only=true. Older
+    OpenJDK versions are no longer supported because the main
+    source tree uses Java 8 features.
+    + Support reproducible builds. See the notes in README.md.
+    + Add a new Ant target pom that only creates xz.pom.
+    + Change ant dist to use git archive to create a .zip file.
+  * Convert the plain text documentation in the source tree to
+    Markdown (CommonMark).
+  * The binaries of 1.10 in the Maven Central require Java 8 and
+    contain optimized classes for Java >= 9 as multi-release JAR.
+    They were built with OpenJDK 21.0.4 on GNU/Linux using the
+    following command:
+    SOURCE_DATE_EPOCH=1722262226 TZ=UTC0 ant maven
+* Thu Sep 21 2023 Fridrich Strba <fstrba@suse.com>
+- Build with java source/target levels 8
+* Mon Dec 12 2022 Anton Shvetz <shvetz.anton@gmail.com>
+- Update to version 1.9
+  * Release notes at /usr/share/doc/packages/xz-java/NEWS
+- Remove obsolete patch:
+  * xz-java-source-version.patch
 * Wed Feb 13 2019 Klaus Kämpf <kkaempf@suse.com>
 - add provides/obsoletes for xz-java (boo#1125298)
 * Sat Jan 26 2019 Jan Engelhardt <jengelh@inai.de>
