@@ -27,18 +27,18 @@ Patch1:         hdf5-wrappers.patch
 Patch2:         CVE-2025-2153.patch
 Patch3:         CVE-2025-2310.patch
 Patch4:         CVE-2025-2914.patch
-Patch5:         CVE-2025-2926.patch
-Patch6:         CVE-2025-2915.patch
-Patch7:         CVE-2025-6816.patch
-Patch8:         CVE-2025-2925.patch
-Patch9:         CVE-2025-2924.patch
-Patch10:        CVE-2025-44905.patch
-Patch11:        CVE-2025-6269.patch
-Patch12:        CVE-2025-6750.patch
+#Patch5:         CVE-2025-2915.patch
+Patch6:         CVE-2025-2924.patch
+Patch7:         CVE-2025-2925.patch
+Patch8:         CVE-2025-2926.patch
+Patch9:         CVE-2025-44905.patch
+Patch10:        CVE-2025-6269.patch
+Patch11:        CVE-2025-6750.patch
+Patch12:        CVE-2025-6816.patch
 Patch13:        CVE-2025-6857.patch
-Patch14:        CVE-2025-7067.patch
-Patch15:        CVE-2025-7068.patch
-Patch16:        CVE-2025-6858.patch
+Patch14:        CVE-2025-6858.patch
+Patch15:        CVE-2025-7067.patch
+Patch16:        CVE-2025-7068.patch
 
 # For patches/rpath
 BuildRequires:  automake
