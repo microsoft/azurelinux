@@ -29,8 +29,7 @@ Release: 27%{?dist}
 # See LICENSE.txt, http://www.apache.org/licenses/LICENSE-2.0
 License: ASL 2.0 
 URL:	 https://github.com/uw-imap/imap
-# Source0: https://github.com/uw-imap/imap/archive/refs/tags/imap-2007f_upstream.tar.gz
-Source0: https://github.com/uw-imap/imap/archive/refs/tags/imap-%{version}%{?beta}%{?dev}%{?snap}.tar.gz
+Source0: https://github.com/uw-imap/imap/archive/refs/tags/imap-%{version}_upstream.tar.gz#/imap-%{version}.tar.gz
 
 %global soname    c-client
 %global shlibname lib%{soname}.so.%{somajor}
