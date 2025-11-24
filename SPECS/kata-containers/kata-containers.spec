@@ -115,7 +115,7 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Sat Oct 25 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.19.1.kata2-2
+* Sun Nov 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.19.1.kata2-2
 - Bump release to rebuild with rust
 
 * Mon Sep 08 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.1.kata2-1

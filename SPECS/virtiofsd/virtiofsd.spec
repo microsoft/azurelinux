@@ -75,7 +75,7 @@ cargo test --release
 %{_datadir}/qemu/vhost-user/50-qemu-virtiofsd.json
 
 %changelog
-* Mon Aug 26 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.8.0-6
+* Sun Nov 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.8.0-6
 - Bump release to rebuild with rust
 
 * Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.8.0-5

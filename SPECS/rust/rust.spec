@@ -182,7 +182,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
-* Sat Oct 25 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.86.0-10
+* Sun Nov 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.86.0-10
 - Patch for CVE-2023-48795
 
 * Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.86.0-9
