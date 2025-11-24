@@ -327,7 +327,7 @@ done
 %ldconfig_scriptlets -n %{imap_libs}
 
 %files -n %{imap_libs} 
-%doc LICENSE.txt NOTICE SUPPORT 
+%license LICENSE.txt NOTICE SUPPORT
 %doc docs/RELNOTES docs/*.txt
 %ghost %config(missingok,noreplace) %{_sysconfdir}/c-client.cf
 %{_libdir}/lib%{soname}.so.*
