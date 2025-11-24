@@ -29747,7 +29747,7 @@
         "other": {
           "name": "uw-imap",
           "version": "2007f",
-          "downloadUrl": "https://github.com/uw-imap/imap/archive/refs/tags/imap-2007f.tar.gz"
+          "downloadUrl": "https://github.com/uw-imap/imap/archive/refs/tags/imap-2007f_upstream.tar.gz"
         }
       }
     },
