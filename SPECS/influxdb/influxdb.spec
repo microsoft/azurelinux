@@ -156,7 +156,7 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
-* Sun Nov 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.7.5-9
+* Mon Nov 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.7.5-9
 - Bump release to rebuild with rust
 
 * Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.7.5-8

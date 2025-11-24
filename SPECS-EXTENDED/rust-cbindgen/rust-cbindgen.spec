@@ -96,7 +96,7 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %endif
 
 %changelog
-* Sun Nov 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 0.24.3-7
+* Mon Nov 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 0.24.3-7
 - Bump release to rebuild with rust
 
 * Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.24.3-6

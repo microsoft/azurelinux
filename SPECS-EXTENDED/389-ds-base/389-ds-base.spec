@@ -732,7 +732,7 @@ exit 0
 %endif
 
 %changelog
-* Sun Nov 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.1.1-8
+* Mon Nov 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.1.1-8
 - Bump release to rebuild with rust
 
 * Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.1.1-7

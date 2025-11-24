@@ -125,7 +125,7 @@ rm -vrf %{buildroot}%{_docdir}
 %{_bindir}/rsvg-convert
 
 %changelog
-* Sun Nov 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.58.1-5
+* Mon Nov 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.58.1-5
 - Bump release to rebuild with rust
 
 * Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.58.1-4
