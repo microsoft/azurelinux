@@ -36,7 +36,7 @@ BuildRequires: yajl-devel
 %endif
 
 BuildRequires: libseccomp-devel
-BuildRequires: python3-libmount
+#BuildRequires: python3-libmount
 BuildRequires: libtool
 BuildRequires: protobuf-c-devel
 BuildRequires: criu-devel >= 3.17.1-2

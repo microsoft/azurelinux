@@ -1,11 +1,8 @@
-%global pypkg python3
-%global pyver 3
-
 %define majminorver %(echo %{version} | cut -d. -f1-2)
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.40.2
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -66,17 +63,6 @@ Group:          Development/Libraries
 %description libs
 These are library files of util-linux.
 
-%package -n %{pypkg}-libmount
-Summary:        Python bindings for the libmount library
-Requires:       %{name}-libs = %{version}-%{release}
-License:        LGPL-2.1-or-later
-
-%description -n %{pypkg}-libmount
-The libmount-python package contains a module that permits applications
-written in the Python programming language to use the interface
-supplied by the libmount library to work with mount tables (fstab,
-mountinfo, etc) and mount filesystems.
-
 %prep
 %autosetup -p1
 sed -i -e 's@etc/adjtime@var/lib/hwclock/adjtime@g' $(grep -rl '%{_sysconfdir}/adjtime' .)
@@ -92,7 +78,7 @@ autoreconf -fi
     --disable-static \
     --disable-use-tty-group \
     --disable-liblastlog2 \
-    --with-python=%{pyver} \
+    --without-python \
     --with-selinux \
     --with-audit
 make %{?_smp_mflags}
@@ -157,10 +143,6 @@ rm -rf %{buildroot}/lib/systemd/system
 /lib/libsmartcols.so.*
 /lib/libfdisk.so.*
 
-%files -n %{pypkg}-libmount
-%license Documentation/licenses/COPYING.LGPL-2.1-or-later
-%{_libdir}/python*/site-packages/libmount/
-
 %files devel
 %defattr(-,root,root)
 %license Documentation/licenses/COPYING.LGPL-2.1-or-later libsmartcols/COPYING
@@ -170,10 +152,6 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
-* Mon Nov 10 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.40.2-1
-- Compiled with python
-- Added the package python3-libmount
-
 * Wed Sep 18 2024 Vince Perri <viperri@microsoft.com> - 2.40.2-1
 - Upgrade to 2.40.2:
 -   Added --disable-liblastlog2 to avoid building new liblastlog2 libraries
