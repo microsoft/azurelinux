@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.0.0
-Release: 15%{?dist}
+Release: 16%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
