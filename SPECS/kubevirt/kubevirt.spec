@@ -49,9 +49,8 @@ Patch16:        CVE-2024-33394.patch
 Patch17:        CVE-2025-64324.patch
 Patch18:        CVE-2025-64432.patch
 Patch19:        CVE-2025-64433.patch
-Patch20:        CVE-2025-64437.patch
-Patch21:        CVE-2025-64435.patch
-
+Patch20:        CVE-2025-64435.patch
+Patch21:        CVE-2025-64437.patch
 
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
@@ -233,7 +232,7 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 
 %changelog
 * Tue Nov 25 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.59.0-32
-- Patch for CVE-2025-64437, CVE-2025-64433, CVE-2025-64432, CVE-2025-64435
+- Patch for CVE-2025-64432, CVE-2025-64433, CVE-2025-64435, CVE-2025-64437
 
 * Thu Nov 20 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.59.0-31
 - Patch for CVE-2025-64324
