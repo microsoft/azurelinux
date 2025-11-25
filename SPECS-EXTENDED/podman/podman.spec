@@ -89,6 +89,7 @@ Summary: Emulate Docker CLI using %{name}
 BuildArch: noarch
 Requires: %{name} = %{epoch}:%{version}-%{release}
 Conflicts: docker
+Conflicts: docker-cli
 Conflicts: docker-latest
 Conflicts: docker-ce
 Conflicts: docker-ee
