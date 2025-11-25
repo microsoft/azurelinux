@@ -132,6 +132,9 @@ mv %{buildroot}%{_javadocdir}/%{name}/api/legal/ADDITIONAL_LICENSE_INFO .
 %defattr(0644,root,root,0755)
 %license LICENSE.txt
 %license ADDITIONAL_LICENSE_INFO
+%exclude /usr/share/javadoc/xpp2/api/legal/LICENSE
+%exclude /usr/share/javadoc/xpp2/api_impl/legal/ADDITIONAL_LICENSE_INFO
+%exclude /usr/share/javadoc/xpp2/api_impl/legal/LICENSE
 
 # Other javadoc files
 %{_javadocdir}/%{name}

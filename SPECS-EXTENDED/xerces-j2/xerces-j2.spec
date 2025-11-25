@@ -171,6 +171,10 @@ ln -sf %{name}.jar %{_javadir}/jaxp_parser_impl.jar
 %files javadoc
 %license LICENSE
 %license ADDITIONAL_LICENSE_INFO
+%exclude /usr/share/javadoc/xerces-j2/xni/legal/ADDITIONAL_LICENSE_INFO
+%exclude /usr/share/javadoc/xerces-j2/xni/legal/LICENSE
+%exclude /usr/share/javadoc/xerces-j2/xs/legal/ADDITIONAL_LICENSE_INFO
+%exclude /usr/share/javadoc/xerces-j2/xs/legal/LICENSE
 
 # Other javadoc files
 %{_javadocdir}/%{name}/*
