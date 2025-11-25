@@ -90,6 +90,8 @@ install -m 0644 build/lib/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}
 # Javadoc
 mkdir -p %{buildroot}%{_javadocdir}/%{name}
 cp -pr build/doc/* %{buildroot}%{_javadocdir}/%{name}
+mv %{buildroot}/usr/share/javadoc/xmlunit/api/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}/usr/share/javadoc/xmlunit/api/legal/LICENSE .
 %fdupes -s %{buildroot}%{_javadocdir}/%{name}
 
 # poms
@@ -111,6 +113,8 @@ install -m 644 %{SOURCE1} \
 
 %files javadoc
 %doc userguide
+%license ADDITIONAL_LICENSE_INFO
+%license LICENSE
 %{_javadocdir}/%{name}
 
 %changelog
