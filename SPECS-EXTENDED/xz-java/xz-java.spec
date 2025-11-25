@@ -66,15 +66,22 @@ install -pm 0644 build/maven/xz-%{version}.pom %{buildroot}%{_mavenpomdir}/%{nam
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr build/doc/* %{buildroot}%{_javadocdir}/%{name}
+# Remove LICENSE from javadoc directory to avoid duplicate license warning
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
+
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
 %license COPYING
+%license ADDITIONAL_LICENSE_INFO
 %doc {NEWS,README,THANKS}.md
 %{_javadir}/xz.jar
 
 %files javadoc
 %{_javadocdir}/%{name}
+%exclude /usr/share/javadoc/xz-java/legal/ADDITIONAL_LICENSE_INFO
+%exclude /usr/share/javadoc/xz-java/legal/LICENSE
 
 %changelog
 * Mon Nov 24 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.10-3
