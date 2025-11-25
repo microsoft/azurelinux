@@ -82,15 +82,22 @@ install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{short_name}.pom
 # javadoc
 install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
+# Remove LICENSE from javadoc directory to avoid duplicate license warning
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
+
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
 %license LICENSE.txt NOTICE.txt
+%license ADDITIONAL_LICENSE_INFO
 %doc RELEASE-NOTES.txt
 %{_javadir}/%{name}.jar
 
 %files javadoc
 %doc %{_javadocdir}/%{name}
+%exclude /usr/share/javadoc/apache-commons-io/legal/ADDITIONAL_LICENSE_INFO
+%exclude /usr/share/javadoc/apache-commons-io/legal/LICENSE
 
 %changelog
 * Mon Oct 7 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 2.14.0-1

@@ -104,6 +104,10 @@ install -p -m 644 pom.xml %{buildroot}%{_mavenpomdir}/%{short_name}.pom
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
+# Remove LICENSE from javadoc directory to avoid duplicate license warning
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
+
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %pre javadoc
@@ -113,15 +117,20 @@ fi
 
 %files -f .mfiles
 %license LICENSE.txt
+%license ADDITIONAL_LICENSE_INFO
 %doc RELEASE-NOTES.txt
 %{_javadir}/%{name}.jar
 
 %files javadoc
 %{_javadocdir}/%{name}
+%exclude /usr/share/javadoc/apache-commons-codec/legal/ADDITIONAL_LICENSE_INFO
+%exclude /usr/share/javadoc/apache-commons-codec/legal/LICENSE
+
 
 %changelog
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.15-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
+- License verified
 
 * Thu Nov 12 2020 Joe Schmitt <joschmit@microsoft.com> - 1.15-1.2
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
