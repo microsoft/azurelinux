@@ -1,11 +1,11 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Name:		       perl-Test2-Plugin-NoWarnings
+Name:		perl-Test2-Plugin-NoWarnings
 Version:	      0.10
 Release:	      1%{?dist}
 Summary:	      Fail if tests warn
 License:	      Artistic-2.0
-URL:		       https://metacpan.org/release/Test2-Plugin-NoWarnings
+URL:		     https://metacpan.org/release/Test2-Plugin-NoWarnings
 Source0:	      https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Test2-Plugin-NoWarnings-%{version}.tar.gz#/perl-Test2-Plugin-NoWarnings-%{version}.tar.gz
 BuildArch:	    noarch
 # Build
