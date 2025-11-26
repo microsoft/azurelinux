@@ -1,13 +1,13 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Name:		perl-Test2-Plugin-NoWarnings
-Version:	0.10
-Release:	1%{?dist}
-Summary:	Fail if tests warn
-License:	Artistic-2.0
-URL:		https://metacpan.org/release/Test2-Plugin-NoWarnings
-Source0:	https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Test2-Plugin-NoWarnings-%{version}.tar.gz#/perl-Test2-Plugin-NoWarnings-%{version}.tar.gz
-BuildArch:	noarch
+Name:		        perl-Test2-Plugin-NoWarnings
+Version:	      0.10
+Release:	      1%{?dist}
+Summary:	      Fail if tests warn
+License:	      Artistic-2.0
+URL:		        https://metacpan.org/release/Test2-Plugin-NoWarnings
+Source0:	      https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Test2-Plugin-NoWarnings-%{version}.tar.gz#/perl-Test2-Plugin-NoWarnings-%{version}.tar.gz
+BuildArch:	    noarch
 # Build
 BuildRequires:	coreutils
 BuildRequires:	make
@@ -34,7 +34,6 @@ BuildRequires:	perl(Test::More) >= 0.96
 BuildRequires:	perl(CPAN::Meta) >= 2.120900
 BuildRequires:	perl(CPAN::Meta::Prereqs)
 # Dependencies
-# (none)
 
 %description
 Loading this plugin causes your tests to fail if there are any warnings while
