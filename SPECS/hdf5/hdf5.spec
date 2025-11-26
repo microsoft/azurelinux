@@ -27,7 +27,7 @@ Patch1:         hdf5-wrappers.patch
 Patch2:         CVE-2025-2153.patch
 Patch3:         CVE-2025-2310.patch
 Patch4:         CVE-2025-2914.patch
-#Patch5:         CVE-2025-2915.patch
+Patch5:         CVE-2025-2915.patch
 Patch6:         CVE-2025-2924.patch
 Patch7:         CVE-2025-2925.patch
 Patch8:         CVE-2025-2926.patch
@@ -266,7 +266,8 @@ cat > %{buildroot}%{macrosdir}/macros.hdf5 <<EOF
 EOF
 
 %check
-make -C build check
+# Do not ignore make error code
+make -C build check || exit 1
 #export HDF5_Make_Ignore=yes
 export OMPI_MCA_rmaps_base_oversubscribe=1
 # openmpi 5+
