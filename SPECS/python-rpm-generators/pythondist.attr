@@ -1,4 +1,3 @@
 %__pythondist_provides	%{_rpmconfigdir}/pythondistdeps.py --provides --normalized-names-format pep503 --package-name %{name} --majorver-provides-versions %{__default_python3_version} %{?!_python_dist_allow_version_zero:--fail-if-zero}
-# We have never enabled pythondist requires; keep disabled until we can verify compatibility with the toolkit
-#%%__pythondist_requires	%%{_rpmconfigdir}/pythondistdeps.py --requires --normalized-names-format pep503 --package-name %%{name} %%{?!_python_no_extras_requires:--require-extras-subpackages} --console-scripts-nodep-setuptools-since 3.10
+%__pythondist_requires	%{_rpmconfigdir}/pythondistdeps.py --requires --normalized-names-format pep503 --package-name %{name} %{?!_python_no_extras_requires:--require-extras-subpackages} --console-scripts-nodep-setuptools-since 3.10
 %__pythondist_path	^%{?!flatpak:/usr}%{?flatpak:/app}/lib(64)?/python[3-9]\\.[[:digit:]]+/site-packages/[^/]+\\.(dist-info|egg-info|egg-link)$
