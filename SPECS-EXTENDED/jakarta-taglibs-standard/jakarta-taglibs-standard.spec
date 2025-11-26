@@ -90,11 +90,15 @@ cp -p standard/dist/standard/lib/standard.jar %{buildroot}%{_javadir}/jakarta-ta
 # javadoc
 mkdir -p %{buildroot}%{_javadocdir}/%{name}
 cp -pr standard/dist/standard/javadoc/* %{buildroot}%{_javadocdir}/%{name}
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 %fdupes -s %{buildroot}%{_javadocdir}/%{name}
 
 %files
 %license LICENSE
+%license ADDITIONAL_LICENSE_INFO
 %doc standard/README_src.txt standard/README_bin.txt standard/dist/doc/doc/standard-doc/*.html
+%exclude %{_javadocdir}/%{name}/legal/LICENSE
 %{_javadir}/*
 
 %files javadoc
