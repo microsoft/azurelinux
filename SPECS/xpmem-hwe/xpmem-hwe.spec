@@ -13,7 +13,7 @@
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-24%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 25.07-1%{release_suffix}%{?dist}}
 
 # %{!?KVERSION: %global KVERSION %(uname -r)}
 %{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
@@ -22,7 +22,7 @@
 %{!?K_SRC: %global K_SRC /lib/modules/%{KVERSION}/build}
 # A separate variable _release is required because of the odd way the
 # script append_number_to_package_release.sh works:
-%global _release 1.2410068
+%global _release 1.2507097
 
 %bcond_without kernel_only
 
@@ -43,14 +43,17 @@
 Summary:	 Cross-partition memory
 Name:		 xpmem-hwe
 Version:	 2.7.4
-Release:	 24%{release_suffix}%{?dist}
+Release:	 25%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 BuildRequires:	 automake autoconf
 URL:		 https://github.com/openucx/xpmem
-Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/xpmem-2.7.4.tar.gz#/xpmem-%{version}.tar.gz
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/xpmem-%{version}.tar.gz
 
 # name gets a different value in subpackages
 %global kernel_suffix hwe
@@ -101,7 +104,6 @@ EOF)
 # munge the release version here as well:
 Summary: XPMEM: kernel modules
 Group: System Environment/Libraries
-ExclusiveArch:   aarch64
 
 Requires:       mlnx-ofa_kernel
 Requires:       mlnx-ofa_kernel-hwe-modules = %{_mofed_full_version}
@@ -204,6 +206,11 @@ fi
 %endif
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7.4-25_6.12.57.1.1
+- Build with OFED 25.07.0.9.7.1.
+- Enable build on x86_64 kernel hwe.
+- Update source path
+
 * Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 2.7.4-24_6.12.57.1.1
 - Bump to match kernel-hwe
 
