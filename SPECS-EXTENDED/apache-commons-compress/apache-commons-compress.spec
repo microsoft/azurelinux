@@ -97,7 +97,7 @@ install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 # Remove LICENSE from javadoc directory to avoid duplicate license warning
 mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
-
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
@@ -110,8 +110,8 @@ mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
 %{_javadocdir}/%{name}
 %license LICENSE.txt
 %doc NOTICE.txt
-%exclude /usr/share/javadoc/apache-commons-compress/legal/ADDITIONAL_LICENSE_INFO
 %exclude /usr/share/doc/apache-commons-compress-javadoc/NOTICE.txt
+%exclude /usr/share/doc/apache-commons-compress/NOTICE.txt
 
 %changelog
 * Fri Nov 21 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.26.1-1
