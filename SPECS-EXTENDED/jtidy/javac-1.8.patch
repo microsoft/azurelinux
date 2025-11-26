@@ -1,0 +1,22 @@
+diff --git a/build.xml b/build.xml
+index 8abb466..945f41d 100755
+--- a/build.xml
++++ b/build.xml
+@@ -16,7 +16,7 @@
+ 	<target name="jar" depends="clean">
+ 		<mkdir dir="${target}"/>
+ 		<mkdir dir="${bin}"/>
+-		<javac srcdir="${src}" destdir="${bin}" source="1.4" target="1.4"/>
++		<javac srcdir="${src}" destdir="${bin}" source="1.8" target="1.8" encoding="UTF-8"/>
+ 		<jar destfile="${target}/${jar}">
+ 			<manifest>
+ 				<attribute name="Main-Class" value="org.w3c.tidy.Tidy"/>
+@@ -31,7 +31,7 @@
+ 	</target>
+ 	
+ 	<target name="javadoc" depends="clean">
+-		<javadoc sourcepath="${src}" destdir="${target}/${doc}" windowtitle=" JTidy ${version} " doctitle="JTidy ${version} API documentation">
++		<javadoc sourcepath="${src}" destdir="${target}/${doc}" windowtitle=" JTidy ${version} " doctitle="JTidy ${version} API documentation" encoding="UTF-8">
+ 			<tag name="todo" scope="all" description="To do:"/>
+ 		</javadoc>
+ 	</target>
