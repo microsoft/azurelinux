@@ -14,7 +14,7 @@ fi
 
 # Configuration
 MAIN_CLASS=org.w3c.tidy.Tidy
-BASE_JARS="jtidy xerces-j2 xml-commons-apis"
+BASE_JARS="jtidy"
 
 # Set parameters
 set_jvm
