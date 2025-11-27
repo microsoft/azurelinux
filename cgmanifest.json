@@ -10832,7 +10832,7 @@
         "other": {
           "name": "libpng",
           "version": "1.6.51",
-          "downloadUrl": "https://github.com/pnggroup/libpng/archive/refs/tags/v1.6.51.tar.gz"
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.51.tar.xz"
         }
       }
     },
