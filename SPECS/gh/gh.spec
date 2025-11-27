@@ -25,7 +25,7 @@ Patch9:         CVE-2025-22872.patch
 Patch10:        CVE-2025-48938.patch
 Patch11:        CVE-2025-58183.patch
 
-BuildRequires:  golang < 1.23
+BuildRequires:  golang < 1.24
 BuildRequires:  git
 Requires:       git
 %global debug_package %{nil}
@@ -51,6 +51,7 @@ make GH_VERSION="v%{version}" bin/gh manpages
 install -Dm755 bin/gh %{buildroot}%{_bindir}/gh
 install -d %{buildroot}%{_mandir}/man1/
 cp share/man/man1/* %{buildroot}%{_mandir}/man1
+rm %{buildroot}%{_mandir}/man1/gh-repo-license*
 
 %check
 make test
