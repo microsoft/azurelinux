@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.5.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -115,6 +115,13 @@ Group:          System/Packages
 %description    virt-operator
 The virt-opertor package provides an operator for kubevirt CRD
 
+%package        manifests
+Summary:        Manifests for kubevirt
+Group:          System/Packages
+
+%description    manifests
+The manifests package provides the kubevirt-{cr, operator}.yaml manifests for installing kubevirt
+
 %package        pr-helper-conf
 Summary:        Configuration files for persistent reservation helper
 Group:          System/Packages
@@ -185,6 +192,10 @@ install -p -m 0755 _out/cmd/virt-operator/virt-operator %{buildroot}%{_bindir}/
 install -p -m 0755 _out/tests/tests.test %{buildroot}%{_bindir}/virt-tests
 install -p -m 0755 cmd/virt-launcher/node-labeller/node-labeller.sh %{buildroot}%{_bindir}/
 
+# Install manifests
+mkdir -p %{buildroot}/usr/share/kubevirt-manifests
+install -p -m 0755 _out/manifests/release/kubevirt-{cr,operator}.yaml %{buildroot}/usr/share/kubevirt-manifests/
+
 # Install network stuff
 mkdir -p %{buildroot}%{_datadir}/kube-virt/virt-handler
 install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-virt/virt-handler/
@@ -254,6 +265,13 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %doc README.md
 %{_bindir}/virt-operator
 
+%files manifests
+%license LICENSE
+%doc README.md
+%dir /usr/share/kubevirt-manifests
+/usr/share/kubevirt-manifests/kubevirt-cr.yaml
+/usr/share/kubevirt-manifests/kubevirt-operator.yaml
+
 %files pr-helper-conf
 %license LICENSE
 %doc README.md
@@ -268,6 +286,9 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Thu Nov 27 2025 Harshit Gupta <guptaharshit> - 1.5.3-3
+- Add kubevirt-{cr,operator}.yaml files to manifests package
+
 * Mon Nov 24 2025 Andrew Phelps <anphel@microsoft.com> - 1.5.3-2
 - Bump to rebuild with updated glibc
 
