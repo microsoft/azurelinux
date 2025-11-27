@@ -33,7 +33,7 @@
 Name:         qt5-qtbase
 Summary:      Qt5 - QtBase components
 Version:      5.12.11
-Release:      18%{?dist}
+Release:      19%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -170,6 +170,10 @@ Patch95: CVE-2023-34410.patch
 Patch96: CVE-2025-30348.patch
 Patch97: CVE-2025-6558.patch
 Patch98: CVE-2025-5455.patch
+Patch99: CVE-2025-64505.patch
+Patch100:CVE-2025-64506.patch
+Patch101:CVE-2025-64720.patch
+Patch102:CVE-2025-65018.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -779,6 +783,9 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 
 %changelog
+* Thu Nov 27 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.12.11-19
+- Patch for CVE-2025-65018, CVE-2025-64720, CVE-2025-64506, CVE-2025-64505
+
 * Fri Jul 25 2025 Akhila Guruju <v-guakhila@microsoft.com> - 5.12.11-18
 - Patch CVE-2025-5455
 
@@ -1347,7 +1354,7 @@ fi
 - Crash in QXcbWindow::setParent() due to NULL xcbScreen (QTBUG-50081, #1291003)
 
 * Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.17.beta
-- fix/update Release: 1%%{?dist}
+- fix/update Release: 19%{?dist}
 
 * Fri Dec 18 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.16
 - 5.6.0-beta (final)
