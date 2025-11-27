@@ -3,7 +3,7 @@
 Summary:        Apache Commons Pool 2.x series
 Name:           apache-commons-pool2
 Version:        2.4.2
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,12 +12,11 @@ URL:            https://commons.apache.org/proper/commons-pool/
 Source0:        https://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
 Patch0:         jakarta-commons-pool-build.patch
 BuildRequires:  ant
-BuildRequires:  ant-junit
 BuildRequires:  cglib
 BuildRequires:  fdupes
 BuildRequires:  java-devel >= 1.8
-BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  xml-commons-apis
+BuildRequires:  javapackages-local-bootstrap >= 6
+BuildRequires:  junit
 Requires:       cglib
 Provides:       %{short_name} = %{version}
 Obsoletes:      %{short_name} < %{version}
@@ -44,55 +43,46 @@ This package contains the javadoc documentation for the Apache Commons
 Pool 2.x Package.
 
 %prep
-%autosetup -p0 -n %{short_name}-%{version}-src
+%setup -q -n %{short_name}-%{version}-src
 # remove all binary libs
-find . -name "*.jar" -exec rm -f {} \;
-
-%pom_remove_parent .
-%pom_xpath_inject "pom:project" "<groupId>org.apache.commons</groupId>" .
+find . -name "*.jar" -print -delete
+%patch -P 0
 
 %build
-export CLASSPATH=%(build-classpath cglib objectweb-asm/asm objectweb-asm/asm-tree objectweb-asm/asm-util)
-%{ant} -Dbuild.sysclasspath=first clean dist
+echo "cglib.jar=$(build-classpath cglib)" >> build.properties
+ant \
+    -Djavac.target.version=8 -Djavac.src.version=8 \
+    -Djava.io.tmpdir=. clean dist
 
 %install
 # jars
 install -d -m 755 %{buildroot}%{_javadir}
-install -m 644 dist/%{short_name}-%{version}.jar %{buildroot}%{_javadir}/%{name}-%{version}.jar
-(cd %{buildroot}%{_javadir} && for jar in *-%{version}*; do ln -sf ${jar} `echo $jar| sed  "s|apache-||g"`; done)
-(cd %{buildroot}%{_javadir} && for jar in *-%{version}*; do ln -sf ${jar} `echo $jar| sed  "s|-%{version}||g"`; done)
+install -m 644 dist/%{short_name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
+ln -sf %{_javadir}/%{name}.jar %{buildroot}%{_javadir}/%{short_name}.jar
 # pom
 install -d -m 755 %{buildroot}%{_mavenpomdir}
-install -m 644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}-%{version}.pom
-%add_maven_depmap %{name}-%{version}.pom %{name}-%{version}.jar
+install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
+%add_maven_depmap %{name}.pom %{name}.jar
 
 # javadoc
 install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr dist/docs/api/* %{buildroot}%{_javadocdir}/%{name}
 %fdupes -s %{buildroot}%{_javadocdir}/%{name}
 
-%check
-export CLASSPATH=%(build-classpath cglib objectweb-asm/asm objectweb-asm/asm-tree objectweb-asm/asm-util)
-%{ant} -Dbuild.sysclasspath=first test
-
-%files
+%files -f .mfiles
 %license LICENSE.txt
 %doc README.txt
-%{_javadir}/%{name}.jar
-%{_javadir}/%{name}-%{version}.jar
 %{_javadir}/%{short_name}.jar
-%{_javadir}/%{short_name}-%{version}.jar
-%{_mavenpomdir}/%{name}-%{version}.pom
-%if %{defined _maven_repository}
-%{_mavendepmapfragdir}/%{name}
-%else
-%{_datadir}/maven-metadata/%{name}.xml*
-%endif
 
 %files javadoc
 %doc %{_javadocdir}/%{name}
+%exclude /usr/share/javadoc/%{name}/legal
 
 %changelog
+* Wed May 28 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.4.2-8
+- Initial Azure Linux import from openSUSE Tumbleweed (license: same as "License" tag).
+- License verified
+
 * Wed Nov 09 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.4.2-7
 - Enable check section
 - License verified
@@ -107,32 +97,25 @@ export CLASSPATH=%(build-classpath cglib objectweb-asm/asm objectweb-asm/asm-tre
 * Mon Mar 25 2019 Fridrich Strba <fstrba@suse.com>
 - Remove pom parent, since we don't use it when not building with
   maven
-
 * Thu Dec 13 2018 Fridrich Strba <fstrba@suse.com>
 - Add maven pom file
-
 * Tue May 15 2018 fstrba@suse.com
 - Build with source and target 8 to prepare for a possible removal
   of 1.6 compatibility
 - Run fdupes on documentation
-
 * Thu Sep 14 2017 fstrba@suse.com
 - Fix javadoc build
-
 * Thu Sep 29 2016 tchvatal@suse.com
 - Version update to 2.4.2 release from pool2:
   * rename to latest 2.x pool series for dbcp and other packages
-
 * Thu Sep 29 2016 tchvatal@suse.com
 - Rename from jakarta-commons-pool to apache-commons-pool
 - Version update to 1.6:
   * drop the tomcat5 package, we need pool2 to work with new tomcat
   * Last and final from the pool1 series, new pool2 was introduced
     for future developement.
-
 * Mon Sep  9 2013 tchvatal@suse.com
 - Move from jpackage-utils to javapackage-tools
-
 * Thu Mar 13 2008 mvyskocil@suse.cz
 - merged with jpackage 1.7
 - update to 1.3
@@ -147,21 +130,15 @@ export CLASSPATH=%(build-classpath cglib objectweb-asm/asm objectweb-asm/asm-tre
 - provides and obsoletes of main package contains the version
 - new tomcat5 subpackage
 - new manual subpackage (build only with maven)
-
 * Fri Sep 15 2006 ro@suse.de
 - set source=1.4 for java
-
 * Wed Jan 25 2006 mls@suse.de
 - converted neededforbuild to BuildRequires
-
 * Thu Jul 28 2005 jsmeix@suse.de
 - Adjustments in the spec file.
-
 * Mon Jul 18 2005 jsmeix@suse.de
 - Current version 1.2 from JPackage.org
-
 * Thu Sep 16 2004 skh@suse.de
 - Fix prerequires of javadoc subpackage
-
 * Thu Sep  2 2004 skh@suse.de
 - Initial package created with version 1.2 (JPackage 1.5)

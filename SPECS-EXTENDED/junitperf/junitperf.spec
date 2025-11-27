@@ -22,7 +22,7 @@ Distribution:   Azure Linux
 
 Name:           junitperf
 Version:        1.9.1
-Release:        27%{?dist}
+Release:        28%{?dist}
 Summary:        JUnit extension for performance and scalability testing
 License:        BSD
 Group:          Development/Libraries/Java
@@ -79,8 +79,8 @@ find . -name "*.jar" | xargs -t rm
 export CLASSPATH=
 export OPT_JAR_LIST="junit ant/ant-junit"
 # performance tests sometimes failed on build farm, so lets disable them to avoid unpredictable build fails
-#ant -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 -Dbuild.sysclasspath=first jar test javadoc
-ant -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 -Dbuild.sysclasspath=first jar javadoc
+#ant -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 -Dbuild.sysclasspath=first jar test javadoc
+ant -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 -Dbuild.sysclasspath=first jar javadoc
 
 %install
 # jars
@@ -90,6 +90,10 @@ install -p -m 0644 dist/%{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name
 # javadoc
 install -d -m 0755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
 cp -pr build/docs/api/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
+install -D -m 0644 build/docs/api/legal/ADDITIONAL_LICENSE_INFO \
+  $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}/legal/ADDITIONAL_LICENSE_INFO
+install -D -m 0644 build/docs/api/legal/ADDITIONAL_LICENSE_INFO \
+  $RPM_BUILD_ROOT%{_licensedir}/%{name}-javadoc/ADDITIONAL_LICENSE_INFO
 ln -s %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 # demo
 install -d -m 0755 $RPM_BUILD_ROOT%{_datadir}/%{name}
@@ -97,11 +101,16 @@ cp -pr samples $RPM_BUILD_ROOT%{_datadir}/%{name}
 
 %files
 %defattr(0644,root,root,0755)
-%doc LICENSE README docs/JUnitPerf.html
+%license LICENSE
+%doc  README docs/JUnitPerf.html
 %{_javadir}/%{name}.jar
 %{_javadir}/%{name}-%{version}.jar
 
 %files javadoc
+%license LICENSE
+%license %{_licensedir}/%{name}-javadoc/ADDITIONAL_LICENSE_INFO
+%exclude /usr/share/javadoc/junitperf-1.9.1/legal/ADDITIONAL_LICENSE_INFO
+%exclude /usr/share/javadoc/junitperf-1.9.1/legal/LICENSE
 %defattr(0644,root,root,0755)
 %{_javadocdir}/%{name}-%{version}
 %{_javadocdir}/%{name}
@@ -111,6 +120,9 @@ cp -pr samples $RPM_BUILD_ROOT%{_datadir}/%{name}
 %{_datadir}/%{name}
 
 %changelog
+* Mon Feb 24 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.9.1-28
+- Bumped build option to 8.
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.1-27
 - Removing the explicit %%clean stage.
 - License verified.

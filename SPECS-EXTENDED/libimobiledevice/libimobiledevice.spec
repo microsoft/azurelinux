@@ -1,20 +1,15 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Name:          libimobiledevice
-Version:       1.2.1
-Release:       1%{?dist}
-Summary:       Library for connecting to mobile devices
+Name:           libimobiledevice
+Version:        1.3.0
+Release:        1%{?dist}
+Summary:        Library for connecting to mobile devices
 
-License:       LGPLv2+
-URL:           http://www.libimobiledevice.org/
-Source0:       http://www.libimobiledevice.org/downloads/%{name}-1.2.0.tar.bz2
-# Upstream patches, generated with:
-# git format-patch --stdout  344409e1d1ad917d377b256214c5411dda82e6b0...9b857fc42cdc4921e1e3f190c5ea907774e04758
-# b5a70e9aaf538dad0aba0b800b122955e8ac494b
-# 26373b334889f5ae2e2737ff447eb25b1700fa2f
-# 97f8ac9e9ad9ee73ca635a26831bfe950a5d673b
-# were manually removed
-Patch0:        a7568f456d10f1aff61534e3216201a857865247...9b857fc42cdc4921e1e3f190c5ea907774e04758.patch
+License:        LGPLv2+
+URL:            http://www.libimobiledevice.org/
+Source0:        https://github.com/libimobiledevice/libimobiledevice/releases/download/%{version}/%{name}-%{version}.tar.bz2
+# Patch to fix 1.3.0 redefining enum from libplist
+Patch0:         upgrade-fixes-1.3.0.patch
 
 BuildRequires: glib2-devel
 BuildRequires: openssl-devel
@@ -30,7 +25,7 @@ BuildRequires: git-core
 BuildRequires: autoconf automake libtool
 
 %description
-libimobiledevice is a library for connecting to mobile devices including phones 
+libimobiledevice is a library for connecting to mobile devices including phones
 and music players
 
 %package devel
@@ -48,11 +43,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 Utilites for use with libimobiledevice.
 
 %prep
-%autosetup -S git_am -n %{name}-1.2.0
-
-# Fix dir permissions on html docs
-chmod +x docs/html
-
+%autosetup -p1 -S git_am -n %{name}-%{version}
 ACLOCAL="aclocal -I m4" autoreconf -f -i
 
 %build
@@ -60,14 +51,15 @@ ACLOCAL="aclocal -I m4" autoreconf -f -i
 # Remove rpath as per https://fedoraproject.org/wiki/Packaging/Guidelines#Beware_of_Rpath
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-
-make %{?_smp_mflags} V=1
+%make_build
+#make %{?_smp_mflags} V=1
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
+#make install DESTDIR=%{buildroot}
 
 #Remove libtool archives.
-find %{buildroot} -type f -name "*.la" -delete
+#find %{buildroot} -type f -name "*.la" -delete
 
 %ldconfig_scriptlets
 
@@ -75,7 +67,7 @@ find %{buildroot} -type f -name "*.la" -delete
 %{!?_licensedir:%global license %%doc}
 %license COPYING.LESSER
 %doc AUTHORS README.md
-%{_libdir}/libimobiledevice.so.6*
+%{_libdir}/libimobiledevice-1.0.so.6*
 
 %files utils
 %doc %{_datadir}/man/man1/idevice*
@@ -84,10 +76,14 @@ find %{buildroot} -type f -name "*.la" -delete
 %files devel
 %doc docs/html/
 %{_libdir}/pkgconfig/libimobiledevice-1.0.pc
-%{_libdir}/libimobiledevice.so
+%{_libdir}/libimobiledevice-1.0.*
 %{_includedir}/libimobiledevice/
 
 %changelog
+* Fri Nov 14 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.3.0-1
+- Update to version 1.3.0
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.1-1
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
@@ -317,7 +313,7 @@ find %{buildroot} -type f -name "*.la" -delete
 - New git snapshot
 
 * Mon Dec 8 2008 Peter Robinson <pbrobinson@gmail.com> 0.1.0-6.git8c3a01e
-- Fix devel dependency 
+- Fix devel dependency
 
 * Mon Dec 8 2008 Peter Robinson <pbrobinson@gmail.com> 0.1.0-5.git8c3a01e
 - Fix gnutls check for new rawhide version

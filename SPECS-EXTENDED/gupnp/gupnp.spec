@@ -1,10 +1,10 @@
 %global apiver 1.6
-%global gssdp_version 1.6.2
+%global gssdp_version 1.6.3
 %global docs 0
 Summary:        A framework for creating UPnP devices & control points
 Name:           gupnp
-Version:        1.6.3
-Release:        3%{?dist}
+Version:        1.6.9
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -66,6 +66,7 @@ This package contains developer documentation for %{name}.
 %meson_install
 
 %check
+glib-compile-schemas %{_datadir}/glib-2.0/schemas/
 %meson_test
 
 %files
@@ -87,6 +88,8 @@ This package contains developer documentation for %{name}.
 %{_datadir}/vala/vapi/gupnp*
 %if %{with docs}
 %{_mandir}/man1/gupnp-binding-tool-%{apiver}.1*
+%else
+%exclude %{_mandir}/man1/gupnp-binding-tool-%{apiver}.1*
 %endif
 
 %if %{with docs}
@@ -95,6 +98,10 @@ This package contains developer documentation for %{name}.
 %endif
 
 %changelog
+* Mon Nov 03 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.6.9-1
+- Upgrade to 1.6.9
+- License verified
+
 * Wed Feb 01 2023 Sumedh Sharma <sumsharma@microsoft.com> - 1.6.3-3
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - Disable docs

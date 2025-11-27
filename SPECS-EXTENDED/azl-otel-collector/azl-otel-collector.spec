@@ -26,7 +26,6 @@ also includes receivers developed by the Azure Linux team.
 tar -xf %{SOURCE1} --no-same-owner -C cmd/azl-otelcol
 
 %build
-export CGO_ENABLED=0
 %make_build MODFLAGS="-mod=vendor" BUILDTAGS="netgo osusergo static_build" LDFLAGS="-s -w" TRIMPATH=1
 
 %install

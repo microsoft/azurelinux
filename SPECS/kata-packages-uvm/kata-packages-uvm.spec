@@ -1,14 +1,12 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
-
-ExclusiveArch:  x86_64
 
 Requires:       ca-certificates
 Requires:       chrony
@@ -64,7 +62,9 @@ Requires:       acpica-tools
 Requires:       cargo
 Requires:       clang
 Requires:       kata-containers-tools
+%ifarch x86_64
 Requires:       kata-containers-cc-tools
+%endif
 Requires:       kernel-uvm
 Requires:       kernel-uvm-devel
 Requires:       make
@@ -110,6 +110,9 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Mon Oct 13 2025 Saul Paredes <saulparedes@microsoft.com> - 1.0.0-9
+- Enable build on aarch64
+
 * Tue Feb 11 2025 Cameron Baird <cameronbaird@microsoft.com> - 1.0.0-8
 - Introduce debug metapackage
 - Move curl, cpio, gzip, iputils, lvm2, tar, procps-ng to debug metapackage

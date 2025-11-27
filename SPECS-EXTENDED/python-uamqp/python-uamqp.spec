@@ -5,25 +5,26 @@ Distribution:   Azure Linux
 
 Name:           python-%{srcname}
 Version:        1.5.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        AMQP 1.0 client library for Python
 
 License:        MIT
 URL:            https://github.com/Azure/azure-uamqp-python
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz#/azure-%{srcname}-python-%{version}.tar.gz
 # Fix build with GCC 11
-Patch1:         %{name}-treat-warnings-as-warnings.patch
-
+Patch0:         %{name}-treat-warnings-as-warnings.patch
+Patch1:         cython3.0-support.patch
+Patch2:         u_OpenSSL3.0-support.patch
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  openssl-devel
 BuildRequires:  python3-devel
-BuildRequires:  %{py3_dist cython}
-BuildRequires:  %{py3_dist setuptools}
+BuildRequires:  python3-Cython
+BuildRequires:  python3-setuptools
 
 %if 0%{?with_check}
-BuildRequires:  %{py3_dist certifi}
-BuildRequires:  %{py3_dist pytest-asyncio}
+BuildRequires:  python3-certifi
+BuildRequires:  python3-pytest-asyncio
 BuildRequires:  python3-pip
 %endif
 
@@ -67,6 +68,9 @@ pip3 install pytest six
 
 
 %changelog
+* Wed Nov 12 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.5.1-4
+- Add cython3.0-support.patch & u_OpenSSL3.0-support.patch to fix build
+
 * Fri Apr 29 2022 Muhammad Falak <mwani@microsoft.com> - 1.5.1-3
 - Drop BR on pytest, six & pip install deps to enable ptest
 

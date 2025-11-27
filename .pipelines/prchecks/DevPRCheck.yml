@@ -25,6 +25,9 @@ variables:
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
   parameters:
+    featureFlags:
+      LinuxHostVersion:
+        Network: R1
     globalSdl:
       credscan:
         suppressionsFile: .config/CredScanSuppressions.json

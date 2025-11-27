@@ -12,7 +12,7 @@
 
 Summary:        Unified Kernel Image
 Name:           kernel-uki
-Version:        6.6.104.2
+Version:        6.6.116.1
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -70,6 +70,24 @@ cp %{buildroot}/boot/vmlinuz-uki-%{kernelver}.efi %{buildroot}/boot/efi/EFI/Linu
 /boot/efi/EFI/Linux/vmlinuz-uki-%{kernelver}.efi
 
 %changelog
+* Tue Nov 18 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.116.1-2
+- Bump release to match kernel,kernel-ipe,kernel-64k
+
+* Mon Nov 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.116.1-1
+- Auto-upgrade to 6.6.116.1
+
+* Mon Oct 27 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.112.1-2
+- Bump release to match kernel
+
+* Wed Oct 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.112.1-1
+- Auto-upgrade to 6.6.112.1
+
+* Tue Sep 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.104.2-4
+- Bump release to match kernel
+
+* Tue Sep 23 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.6.104.2-3
+- Bump release to match kernel
+
 * Tue Sep 23 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.104.2-2
 - Bump release to match kernel
 

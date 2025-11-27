@@ -2,7 +2,7 @@
 Summary:        rabbitmq-server
 Name:           rabbitmq-server
 Version:        3.13.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache-2.0 and MPL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,7 @@ Group:          Development/Languages
 URL:            https://rabbitmq.com
 Source0:        https://github.com/rabbitmq/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Patch0:			CVE-2025-30219.patch
+Patch1:			CVE-2025-50200.patch
 
 BuildRequires:  elixir
 BuildRequires:  erlang
@@ -66,6 +67,9 @@ done
 %{_libdir}/rabbitmq/lib/rabbitmq_server-%{version}/*
 
 %changelog
+* Wed Oct 29 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-3
+- Patch for CVE-2025-50200
+
 * Mon Mar 31 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.13.7-2
 - Address CVE-2025-30219 with a patch
 

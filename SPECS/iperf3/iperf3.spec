@@ -1,7 +1,7 @@
 Summary:        A network performance benchmark tool.
 Name:           iperf3
 Version:        3.17.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD and MIT and Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,8 +12,11 @@ Patch1:         disablepg.patch
 Patch2:         CVE-2024-53580.patch
 Patch3:         CVE-2025-54350.patch
 Patch4:         CVE-2025-54349.patch
+Patch5:         openssl_encrypt_buffer_size.patch
 BuildRequires:  autoconf >= 2.71
 BuildRequires:  automake
+BuildRequires:  openssl
+Requires:       openssl
 
 %description
 ipref is a network performance measurement tool that can measure the maximum
@@ -69,6 +72,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/libiperf.3.gz
 
 %changelog
+* Tue Oct 14 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 3.17.1-4
+- Patch for openssl buffer size issue during RSA encryption
+
 * Mon Aug 04 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.17.1-3
 - Patch for CVE-2025-54350, CVE-2025-54349
 

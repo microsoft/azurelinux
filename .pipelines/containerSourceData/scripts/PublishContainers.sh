@@ -454,13 +454,26 @@ do
                 "$azure_linux_version" \
                 "$ARCHITECTURE_TO_BUILD"
 
-            if $IS_HCI_GOLDEN_IMAGE; then
+            if $IS_HCI_GOLDEN_IMAGE || [[ "$container_type" == "imagecustomizer" ]]; then
                 # create multi-arch tag with major, minor, and patch version
                 # e.g. azurelinuxpreview.azurecr.io/base/kubevirt/cdi-controller:1.55.0
+                # e.g. azurelinuxpreview.azurecr.io/base/imagecustomizer:1.0.0
                 create_multi_arch_tags \
                     "$image_name_with_noarch" \
                     "$container_name" \
                     "$package_version" \
+                    "$azure_linux_version" \
+                    "$ARCHITECTURE_TO_BUILD"
+            fi
+
+            # Special handling for imagecustomizer: create latest tag
+            if [[ "$container_type" == "imagecustomizer" ]]; then
+                # Create 'latest' tag pointing to the current version
+                echo "Creating 'latest' tag for imagecustomizer"
+                create_multi_arch_tags \
+                    "$image_name_with_noarch" \
+                    "$container_name" \
+                    "latest" \
                     "$azure_linux_version" \
                     "$ARCHITECTURE_TO_BUILD"
             fi

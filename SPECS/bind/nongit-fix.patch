@@ -1,18 +1,18 @@
-From 87098009404ea5d372be6268bd1d1ce356c1a4f5 Mon Sep 17 00:00:00 2001
-From: Kshitiz Godara <kgodara@microsoft.com>
-Date: Mon, 2 Jun 2025 16:33:19 +0000
-Subject: [PATCH 2/2] non-git download issue
+From 701de7b23826b983ba5ad674ca85e1ab607b79f6 Mon Sep 17 00:00:00 2001
+From: Kanishk Bansal <kanbansal@microsoft.com>
+Date: Fri, 24 Oct 2025 13:43:37 +0000
+Subject: [PATCH] nongit-fix.patch
 
 ---
  configure.ac | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 9701cdb..b7c84f6 100644
+index a79b9d6..514587d 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -19,7 +19,7 @@ m4_define([bind_VERSION_MINOR], 20)dnl
- m4_define([bind_VERSION_PATCH], 11)dnl
+ m4_define([bind_VERSION_PATCH], 15)dnl
  m4_define([bind_VERSION_EXTRA], )dnl
  m4_define([bind_DESCRIPTION], [(Stable Release)])dnl
 -m4_define([bind_SRCID], [m4_esyscmd_s([git rev-parse --short HEAD | cut -b1-7])])dnl
@@ -32,5 +32,5 @@ index 9701cdb..b7c84f6 100644
  
  #
 -- 
-2.45.3
+2.45.4
 

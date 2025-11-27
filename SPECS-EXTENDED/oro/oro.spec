@@ -21,13 +21,14 @@ Distribution:   Azure Linux
 %define full_name	jakarta-%{name}
 Name:           oro
 Version:        2.0.8
-Release:        297%{?dist}
+Release:        298%{?dist}
 Summary:        Full regular expressions API
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-Url:            http://jakarta.apache.org/oro/
-Source0:        http://archive.apache.org/dist/jakarta/oro/%{full_name}-%{version}.tar.gz
-Source1:        http://repo1.maven.org/maven2/%{name}/%{name}/%{version}/%{name}-%{version}.pom
+Url:            https://jakarta.apache.org/oro/
+Source0:        https://archive.apache.org/dist/jakarta/oro/source/%{full_name}-%{version}.tar.gz
+Source1:        https://repo1.maven.org/maven2/%{name}/%{name}/%{version}/%{name}-%{version}.pom
+
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  javapackages-local-bootstrap
@@ -64,7 +65,7 @@ for file in `find . -type f -name .cvsignore`; do rm -rf $file; done
 
 %build
 ant \
-	-Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 \
+	-Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 \
 	-Dfinal.name=%{name} jar javadocs
 
 %install
@@ -79,18 +80,28 @@ install -pm 0644 %{SOURCE1} %{buildroot}%{_mavenpomdir}/%{name}.pom
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr docs/api/* %{buildroot}%{_javadocdir}/%{name}/
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
 %fdupes %{buildroot}%{_javadocdir}
+
+# Remove LICENSE from javadoc directory to avoid duplicate license warning
+rm -f %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE
 
 %files -f .mfiles
 %doc COMPILE ISSUES README TODO CHANGES CONTRIBUTORS STYLE
 %license LICENSE
+%license ADDITIONAL_LICENSE_INFO
 %{_javadir}/%{full_name}.jar
 
 %files javadoc
-%license LICENSE
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Feb 28 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.0.8-298
+- Build error fix, bump up the java source version from 1.6 to 1.8.
+- Fixed duplicate LICENSE warning
+- Marked extra legal files as documentation
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.8-297
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
