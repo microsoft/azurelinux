@@ -35,7 +35,7 @@
 Name:         qtbase
 Summary:      Qt6 - QtBase components
 Version:      6.6.3
-Release:      4%{?dist}
+Release:      5%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -99,6 +99,8 @@ Patch61: qtbase-cxxflag.patch
 Patch65: qtbase-mysql.patch
 Patch66: CVE-2025-30348.patch
 Patch67: CVE-2025-5455.patch
+Patch68: CVE-2025-64506.patch
+Patch69: CVE-2025-65018.patch
 
 # Do not check any files in %%{_qt_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -703,6 +705,9 @@ fi
 %{_qt_plugindir}/platformthemes/libqxdgdesktopportal.so
 
 %changelog
+* Thu Nov 27 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.6.3-5
+- Patch for CVE-2025-65018, CVE-2025-64506
+
 * Fri Jun 27 2025 Akhila Guruju <v-guakhila@microsoft.com> - 6.6.3-4
 - Patch CVE-2025-5455
 
@@ -1262,7 +1267,7 @@ fi
 - Crash in QXcbWindow::setParent() due to NULL xcbScreen (QTBUG-50081, #1291003)
 
 * Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.17.beta
-- fix/update Release: 1%%{?dist}
+- fix/update Release: 5%{?dist}
 
 * Fri Dec 18 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.16
 - 5.6.0-beta (final)
