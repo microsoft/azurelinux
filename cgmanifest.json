@@ -10571,8 +10571,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.39",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.39.tar.xz"
+          "version": "1.6.51",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.51.tar.xz"
         }
       }
     },
