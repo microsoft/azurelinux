@@ -468,7 +468,7 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 
 %changelog
 * Mon Nov 24 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.06-26
-- CVE-2025-61661, CVE-2025-61662 & CVE-2025-61663
+- Patch CVE-2025-61661, CVE-2025-61662 & CVE-2025-61663
 
 * Tue Jun 17 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.06-25
 - Addressed following grub2 CVEs
