@@ -30777,8 +30777,8 @@
         "type": "other",
         "other": {
           "name": "xmlunit",
-          "version": "1.5",
-          "downloadUrl": "http://download.sourceforge.net/xmlunit/xmlunit-1.5-src.zip"
+          "version": "1.6",
+          "downloadUrl": "https://download.sourceforge.net/xmlunit/xmlunit-1.6-src.zip"
         }
       }
     },
