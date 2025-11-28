@@ -722,7 +722,7 @@ fi
 %changelog
 * Mon Nov 10 2025 Jyoti kanase <v-jykanase@microsoft.com> - 3.0.1-1
 - Upgrade to 3.0.1
-- License verified.
+- License Verified.
 
 * Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.1.5-5
 - Fix build issue for systemd/systemd-bootstrap confusion
