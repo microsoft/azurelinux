@@ -88,6 +88,17 @@ mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 - Initial Azure Linux import from openSUSE Tumbleweed (license: same as "License" tag).
 - License verified
 
+* Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.8-5
+- Move to SPECS
+- License verified
+
+* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8-4
+- Converting the 'Release' tag to the '[number].[distribution]' format.
+
+* Thu Nov 12 2020 Joe Schmitt <joschmit@microsoft.com> - 1.8-3.7
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
+- Use javapackages-local-bootstrap to avoid build cycle.
+
 * Thu Jul  3 2025 Fridrich Strba <fstrba@suse.com>
 - Added patch:
   * xz-java-module-info.patch
