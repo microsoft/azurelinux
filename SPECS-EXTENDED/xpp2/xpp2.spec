@@ -21,7 +21,7 @@ Distribution:   Azure Linux
 %define originalname PullParser
 Name:           xpp2
 Version:        2.1.10
-Release:        29%{?dist}
+Release:        30%{?dist}
 Summary:        XML Pull Parser
 License:        Apache-1.1
 Group:          Development/Libraries/Java
@@ -112,6 +112,7 @@ cp -p README.html %{buildroot}%{_datadir}/doc/%{name}
 # demo
 mkdir -p %{buildroot}%{_datadir}/%{name}
 cp -pr src/java/samples/* %{buildroot}%{_datadir}/%{name}
+mv %{buildroot}%{_javadocdir}/%{name}/api/legal/ADDITIONAL_LICENSE_INFO .
 %fdupes -s %{buildroot}/%{_javadocdir}/%{name}
 
 %files
@@ -130,6 +131,12 @@ cp -pr src/java/samples/* %{buildroot}%{_datadir}/%{name}
 %files javadoc
 %defattr(0644,root,root,0755)
 %license LICENSE.txt
+%license ADDITIONAL_LICENSE_INFO
+%exclude /usr/share/javadoc/xpp2/api/legal/LICENSE
+%exclude /usr/share/javadoc/xpp2/api_impl/legal/ADDITIONAL_LICENSE_INFO
+%exclude /usr/share/javadoc/xpp2/api_impl/legal/LICENSE
+
+# Other javadoc files
 %{_javadocdir}/%{name}
 
 %files manual
@@ -143,6 +150,10 @@ cp -pr src/java/samples/* %{buildroot}%{_datadir}/%{name}
 %{_datadir}/%{name}
 
 %changelog
+* Fri Nov 07 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.1.10-30
+- Fixed the build failure
+- License Verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.10-29
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
