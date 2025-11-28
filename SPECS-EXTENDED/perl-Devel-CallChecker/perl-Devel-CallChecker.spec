@@ -8,8 +8,8 @@
 %endif
 
 Name:           perl-Devel-CallChecker
-Version:        0.008
-Release:        10%{?dist}
+Version:        0.009
+Release:        1%{?dist}
 Summary:        Custom op checking attached to subroutines
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -82,6 +82,10 @@ find $RPM_BUILD_ROOT -type f -name '*.bs' -size 0 -delete
 %{_mandir}/man3/*
 
 %changelog
+* Tue Dec 17 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 0.009-1
+- Updated to 0.009
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.008-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
