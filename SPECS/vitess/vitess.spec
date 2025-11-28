@@ -2,8 +2,8 @@
 %bcond_without check
 
 Name:           vitess
-Version:        19.0.4
-Release:        7%{?dist}
+Version:        21.0.0
+Release:        1%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -31,7 +31,7 @@ Patch1:         CVE-2024-45339.patch
 Patch2:         CVE-2025-22868.patch
 Patch3:         CVE-2025-22870.patch
 Patch4:         CVE-2024-53257.patch
-BuildRequires: golang < 1.23
+BuildRequires: golang
 
 %description
 Vitess is a database clustering system for horizontal scaling of MySQL through
@@ -108,6 +108,9 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
+* Tue Sept 09 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 21.0.0-1
+- Upgrade to version 21.0.0
+
 * Fri Apr 11 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 19.0.4-7
 - Add patch for CVE-2024-53257
 
