@@ -23,7 +23,7 @@ Distribution:   Azure Linux
 %bcond_with tests
 Name:           apache-%{short_name}
 Version:        2.14.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Utilities to assist with developing IO functionality
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -100,6 +100,9 @@ mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 %exclude /usr/share/javadoc/apache-commons-io/legal/LICENSE
 
 %changelog
+* Fri Nov 28 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.14.0-2
+- Address build error caused by license warning
+
 * Mon Oct 7 2024 Bhagyashri Pathak <bhapathak@microsoft.com> - 2.14.0-1
 - Upgrade to 2.14.0 to fix the CVE-2024-47554.
 - License verified

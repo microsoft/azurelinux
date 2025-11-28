@@ -24,7 +24,7 @@ Distribution:   Azure Linux
 %bcond_with tests
 Name:           apache-commons-codec
 Version:        1.15
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Apache Commons Codec Package
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -128,6 +128,9 @@ fi
 
 
 %changelog
+* Fri Nov 28 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.15-3
+- Address build error caused by license warning
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.15-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 - License verified
