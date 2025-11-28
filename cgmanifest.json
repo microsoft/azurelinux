@@ -25612,9 +25612,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-scikit-build-core",
+          "version": "0.11.5",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/scikit_build_core/scikit_build_core-0.11.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-zmq",
-          "version": "18.1.0",
-          "downloadUrl": "https://github.com/zeromq/pyzmq/archive/v18.1.0.tar.gz"
+          "version": "27.1.0",
+          "downloadUrl": "https://github.com/zeromq/pyzmq/archive/refs/tags/v27.1.0.tar.gz"
         }
       }
     },
