@@ -246,11 +246,11 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 * Tue Apr 22 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 0.59.0-28
 - Patch CVE-2025-22872
 
-* Fri Apr 04 2025 Sumedh Sharma <sumsharma@microsoft.com> - 0.59.0-26
-- Add patch to resolve CVE-2023-48795
-
-* Thu Mar 27 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.59.0-27
+* Tue Apr 15 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.59.0-27
 - Fix CVE-2024-51744
+
+* Tue Apr 08 2025 Sumedh Sharma <sumsharma@microsoft.com> - 0.59.0-26
+- Add patch to resolve CVE-2023-48795
 
 * Mon Mar 10 2025 Sudipta Pandit <sudpandit@microsoft.com> - 0.59.0-25
 - Backport patch for CVE-2025-22869
@@ -261,11 +261,11 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 * Fri Jan 03 2025 Sumedh Sharma <sumsharma@microsoft.com> - 0.59.0-23
 - Add patch to fix CVE-2024-45338
 
-* Wed Sep 11 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.59.0-21
-- Remove hotplug detach patch since it is no longer required.
-
-* Mon Sep 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-22
+* Sat Oct 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-22
 - Bump release to rebuild with go 1.22.7
+
+* Fri Sep 13 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.59.0-21
+- Remove hotplug detach patch since it is no longer required.
 
 * Thu Aug 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.59.0-20
 - Fix for CVE-2022-32149
