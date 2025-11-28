@@ -118,6 +118,16 @@ mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 - Initial Azure Linux import from openSUSE Tumbleweed (license: same as "License" tag).
 - License verified
 
+* Mon Nov 14 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.19-3
+- Add Requires on xz instead of mvn(org.tukaani:xz) to fix package install failure
+
+* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.19-2
+- Converting the 'Release' tag to the '[number].[distribution]' format.
+
+* Thu Nov 12 2020 Joe Schmitt <joschmit@microsoft.com> - 1.19-1.5
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
+- Use javapackages-local-bootstrap to avoid build cycle.
+
 * Tue May 14 2024 Fridrich Strba <fstrba@suse.com>
 - Upgrade to 1.26.1
   * Fixed Bugs
