@@ -20533,8 +20533,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test2-Plugin-NoWarnings",
-          "version": "0.08",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Test2-Plugin-NoWarnings-0.08.tar.gz"
+          "version": "0.10",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Test2-Plugin-NoWarnings-0.10.tar.gz"
         }
       }
     },
