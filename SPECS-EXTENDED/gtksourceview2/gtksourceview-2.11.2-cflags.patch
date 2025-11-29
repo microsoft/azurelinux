@@ -1,0 +1,24 @@
+diff -up gtksourceview-2.11.2/gtksourceview/Makefile.am.cflags gtksourceview-2.11.2/gtksourceview/Makefile.am
+--- gtksourceview-2.11.2/gtksourceview/Makefile.am.cflags	2010-12-21 17:05:03.000000000 +0100
++++ gtksourceview-2.11.2/gtksourceview/Makefile.am	2010-12-21 17:05:17.000000000 +0100
+@@ -163,7 +163,7 @@ if HAVE_INTROSPECTION
+ INTROSPECTION_GIRS = GtkSource-2.0.gir
+ 
+ GtkSource-2.0.gir: libgtksourceview-2.0.la
+-INTROSPECTION_SCANNER_ARGS = -I$(top_srcdir)
++INTROSPECTION_SCANNER_ARGS = -I$(top_srcdir) $(DEP_CFLAGS)
+ GtkSource_2_0_gir_NAMESPACE = GtkSource
+ GtkSource_2_0_gir_VERSION = 2.0
+ GtkSource_2_0_gir_LIBS = libgtksourceview-2.0.la
+diff -up gtksourceview-2.11.2/gtksourceview/Makefile.in.cflags gtksourceview-2.11.2/gtksourceview/Makefile.in
+--- gtksourceview-2.11.2/gtksourceview/Makefile.in.cflags	2010-12-21 17:05:07.000000000 +0100
++++ gtksourceview-2.11.2/gtksourceview/Makefile.in	2010-12-21 17:05:32.000000000 +0100
+@@ -459,7 +459,7 @@ EXTRA_DIST = \
+ CLEANFILES = $(BUILT_SOURCES) stamp-gtksourceview-typebuiltins.h \
+ 	stamp-gtksourceview-typebuiltins.c $(am__append_1)
+ @HAVE_INTROSPECTION_TRUE@INTROSPECTION_GIRS = GtkSource-2.0.gir
+-@HAVE_INTROSPECTION_TRUE@INTROSPECTION_SCANNER_ARGS = -I$(top_srcdir)
++@HAVE_INTROSPECTION_TRUE@INTROSPECTION_SCANNER_ARGS = -I$(top_srcdir) $(DEP_CFLAGS)
+ @HAVE_INTROSPECTION_TRUE@GtkSource_2_0_gir_NAMESPACE = GtkSource
+ @HAVE_INTROSPECTION_TRUE@GtkSource_2_0_gir_VERSION = 2.0
+ @HAVE_INTROSPECTION_TRUE@GtkSource_2_0_gir_LIBS = libgtksourceview-2.0.la
