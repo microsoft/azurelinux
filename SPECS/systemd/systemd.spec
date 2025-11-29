@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        24%{?dist}
+Release:        25%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -144,6 +144,7 @@ Patch0900:      do-not-test-openssl-sm3.patch
 Patch0901:      networkd-default-use-domains.patch
 Patch0902:      CVE-2023-7008.patch
 Patch0903:      CVE-2025-4598.patch
+Patch0904:      fix-stackoverflow-when-dropping-tclass-or-qdisc.patch
 
 %ifarch %{ix86} x86_64 aarch64
 %global want_bootloader 1
@@ -1229,6 +1230,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Tue Nov 25 2025 Rohit Rawat <rohitrawat@microsoft.com> - 255-25
+- Add fix-stackoverflow-when-dropping-tclass-or-qdisc.patch
+
 * Tue Sep 16 2025 Akhila Guruju <v-guakhila@microsoft.com> - 255-24
 - Patch CVE-2025-4598
 
