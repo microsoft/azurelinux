@@ -7,7 +7,7 @@
 Summary:        OCaml Format pretty-printer combinators
 Name:           ocaml-%{srcname}
 Version:        0.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,7 +15,7 @@ URL:            https://erratique.ch/software/fmt
 Source0:        https://github.com/dbuenzli/fmt/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 4.05.0
-BuildRequires:  ocaml-cmdliner-devel >= 0.9.8
+BuildRequires:  ocaml-cmdliner-devel >= 1.3.0 
 BuildRequires:  ocaml-findlib
 BuildRequires:  ocaml-ocamlbuild
 BuildRequires:  ocaml-ocamldoc
@@ -101,6 +101,10 @@ ocaml pkg/pkg.ml test
 %{_libdir}/ocaml/%{srcname}/%{srcname}*.mli
 
 %changelog
+* Fri Nov 28 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.9.0-2
+- Updated ocaml-cmdliner-devel dependency to 1.3.0
+- License Verified
+
 * Tue Jun 04 2024 Andrew Phelps <anphel@microsoft.com> - 0.9.0-1
 - Upgrade to version 0.9.0
 

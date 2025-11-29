@@ -1,20 +1,24 @@
-%define libname %(echo %{name} | sed -e 's/^ocaml-//')
+# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
+ExcludeArch: %{ix86}
 
-Summary:        Declarative definition of command line interfaces for OCaml
+%ifnarch %{ocaml_native_compiler}
+%global debug_package %{nil}
+%endif
+
 Name:           ocaml-cmdliner
-Version:        1.0.4
-Release:        20%{?dist}
+Version:        1.3.0
+Release:        6%{?dist}
+Summary:        Declarative definition of command line interfaces for OCaml
+
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/dbuenzli/cmdliner/
-Source0:        https://github.com/dbuenzli/%{libname}/archive/v%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/dbuenzli/cmdliner/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  make
 BuildRequires:  ocaml
-BuildRequires:  ocaml-findlib-devel
-BuildRequires:  ocaml-ocamlbuild
-BuildRequires:  ocaml-result-devel
+BuildRequires:  ocaml-dune
 
 %description
 Cmdliner allows the declarative definition of command line
@@ -39,74 +43,102 @@ The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -n %{libname}-%{version}
-
-# The makefile requires some cleanup to put things in correct place.
-sed 's,/lib/,/%{_lib}/,g' -i Makefile
-
-# Enable debuginfo generation.
-sed 's/, package(result)/, package(result), debug/g' -i _tags
-sed 's/ocamlbuild/ocamlbuild -lflag -g/g' -i Makefile
-
-# Use install -p.
-sed 's/INSTALL=install/INSTALL=install -p/g' -i Makefile
+%autosetup -n cmdliner-%{version}
 
 %build
-make build-byte %{?_smp_mflags}
-%ifarch %{ocaml_native_compiler}
-make build-native %{?_smp_mflags}
-%endif
-
-%ifarch %{ocaml_natdynlink}
-make build-native-dynlink %{?_smp_mflags}
-%endif
+%dune_build
 
 %install
-make install-common DESTDIR=%{buildroot}
-make install-byte DESTDIR=%{buildroot}
-%ifarch %{ocaml_native_compiler}
-make install-native DESTDIR=%{buildroot}
-%endif
+%dune_install
 
-%ifarch %{ocaml_natdynlink}
-make install-native-dynlink DESTDIR=%{buildroot}
-%endif
+%check
+%dune_check
 
-# Fix some spurious executable perms?
-chmod -x %{buildroot}%{_libdir}/ocaml/%{libname}/*.cmx
-chmod -x %{buildroot}%{_libdir}/ocaml/%{libname}/*.cmxa
-chmod -x %{buildroot}%{_libdir}/ocaml/%{libname}/*.mli
-chmod -x %{buildroot}%{_libdir}/ocaml/%{libname}/*.a
-chmod -x %{buildroot}%{_libdir}/ocaml/%{libname}/META
-chmod -x %{buildroot}%{_libdir}/ocaml/%{libname}/opam
-
-%files
+%files -f .ofiles
 %license LICENSE.md
 %doc README.md CHANGES.md
-%{_libdir}/ocaml/%{libname}
-%ifarch %{ocaml_native_compiler}
-%exclude %{_libdir}/ocaml/%{libname}/*.a
-%exclude %{_libdir}/ocaml/%{libname}/*.cmxa
-%exclude %{_libdir}/ocaml/%{libname}/*.cmx
-%endif
-%exclude %{_libdir}/ocaml/%{libname}/*.mli
 
-%files devel
+%files devel -f .ofiles-devel
 %doc README.md CHANGES.md
 %license LICENSE.md
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{libname}/*.a
-%{_libdir}/ocaml/%{libname}/*.cmxa
-%{_libdir}/ocaml/%{libname}/*.cmx
-%endif
-%{_libdir}/ocaml/%{libname}/*.mli
 
 %changelog
-* Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-20
-- Cleaning-up spec. License verified.
+* Fri Nov 28 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.3.0-6
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-19
-- Initial CBL-Mariner import from Fedora 34 (license: MIT).
+* Tue Jan 28 2025 Jerry James <loganjerry@gmail.com> - 1.3.0-5
+- OCaml 5.2.1 rebuild for Fedora 41
+- Add VCS field
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jun 19 2024 Richard W.M. Jones <rjones@redhat.com> - 1.3.0-3
+- OCaml 5.2.0 ppc64le fix
+
+* Wed May 29 2024 Richard W.M. Jones <rjones@redhat.com> - 1.3.0-2
+- OCaml 5.2.0 for Fedora 41
+
+* Fri May 24 2024 Jerry James <loganjerry@gmail.com> - 1.3.0-1
+- Version 1.3.0
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 18 2023 Richard W.M. Jones <rjones@redhat.com> - 1.2.0-6
+- OCaml 5.1.1 + s390x code gen fix for Fedora 40
+
+* Tue Dec 12 2023 Richard W.M. Jones <rjones@redhat.com> - 1.2.0-5
+- OCaml 5.1.1 rebuild for Fedora 40
+
+* Thu Oct 05 2023 Richard W.M. Jones <rjones@redhat.com> - 1.2.0-4
+- OCaml 5.1 rebuild for Fedora 40
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Richard W.M. Jones <rjones@redhat.com> - 1.2.0-2
+- OCaml 5.0 rebuild for Fedora 39
+
+* Mon Jul 10 2023 Jerry James <loganjerry@gmail.com> - 1.2.0-1
+- Version 1.2.0
+
+* Tue Jan 24 2023 Richard W.M. Jones <rjones@redhat.com> - 1.1.1-3
+- Rebuild OCaml packages for F38
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Tue Sep 20 2022 Jerry James <loganjerry@gmail.com> - 1.1.1-1
+- Version 1.1.1
+- Updated URLs
+- Build with dune
+- Use new OCaml macros
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.4-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jun 18 2022 Richard W.M. Jones <rjones@redhat.com> - 1.0.4-24
+- OCaml 4.14.0 rebuild
+
+* Fri Feb 04 2022 Richard W.M. Jones <rjones@redhat.com> - 1.0.4-23
+- OCaml 4.13.1 rebuild to remove package notes
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.4-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Oct 04 2021 Richard W.M. Jones <rjones@redhat.com> - 1.0.4-21
+- OCaml 4.13.1 build
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.4-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Mar  1 10:09:49 GMT 2021 Richard W.M. Jones <rjones@redhat.com> - 1.0.4-19
+- OCaml 4.12.0 build
 
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.4-18
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild

@@ -1,0 +1,110 @@
+--- gtksourceview-2.11.2/gtksourceview/gtksourcelanguagemanager.c	2011-06-29 14:17:02.417251696 +0200
++++ gtksourceview-2.11.2/gtksourceview/gtksourcelanguagemanager.c	2011-06-29 14:21:54.888666004 +0200
+@@ -274,7 +274,7 @@ gtk_source_language_manager_set_search_p
+  * containg a list of language files directories.
+  * The array is owned by @lm and must not be modified.
+  */
+-G_CONST_RETURN gchar* G_CONST_RETURN *
++const gchar* const *
+ gtk_source_language_manager_get_search_path (GtkSourceLanguageManager *lm)
+ {
+ 	g_return_val_if_fail (GTK_IS_SOURCE_LANGUAGE_MANAGER (lm), NULL);
+@@ -392,7 +392,7 @@ ensure_languages (GtkSourceLanguageManag
+  * available languages or %NULL if no language is available. The array
+  * is owned by @lm and must not be modified.
+  */
+-G_CONST_RETURN gchar* G_CONST_RETURN *
++const gchar* const *
+ gtk_source_language_manager_get_language_ids (GtkSourceLanguageManager *lm)
+ {
+ 	g_return_val_if_fail (GTK_IS_SOURCE_LANGUAGE_MANAGER (lm), NULL);
+--- gtksourceview-2.11.2/gtksourceview/gtksourcelanguagemanager.h	2011-06-29 14:04:04.670270338 +0200
++++ gtksourceview-2.11.2/gtksourceview/gtksourcelanguagemanager.h	2011-06-29 14:04:46.002746893 +0200
+@@ -62,14 +62,12 @@ GtkSourceLanguageManager *gtk_source_lan
+ 
+ GtkSourceLanguageManager *gtk_source_language_manager_get_default		(void);
+ 
+-G_CONST_RETURN gchar* G_CONST_RETURN *
+-			  gtk_source_language_manager_get_search_path		(GtkSourceLanguageManager *lm);
++const gchar* const*	  gtk_source_language_manager_get_search_path		(GtkSourceLanguageManager *lm);
+ 
+ void			  gtk_source_language_manager_set_search_path		(GtkSourceLanguageManager *lm,
+ 										 gchar                   **dirs);
+ 
+-G_CONST_RETURN gchar* G_CONST_RETURN *
+-			  gtk_source_language_manager_get_language_ids		(GtkSourceLanguageManager *lm);
++const gchar* const*	  gtk_source_language_manager_get_language_ids		(GtkSourceLanguageManager *lm);
+ 
+ GtkSourceLanguage	 *gtk_source_language_manager_get_language		(GtkSourceLanguageManager *lm,
+ 										 const gchar              *id);
+--- gtksourceview-2.11.2/gtksourceview/gtksourcestylescheme.c	2011-06-29 14:17:24.801512364 +0200
++++ gtksourceview-2.11.2/gtksourceview/gtksourcestylescheme.c	2011-06-29 14:22:13.798887363 +0200
+@@ -310,7 +310,7 @@ gtk_source_style_scheme_get_description 
+  *
+  * Since: 2.0
+  */
+-G_CONST_RETURN gchar* G_CONST_RETURN *
++const gchar* const *
+ gtk_source_style_scheme_get_authors (GtkSourceStyleScheme *scheme)
+ {
+ 	g_return_val_if_fail (GTK_IS_SOURCE_STYLE_SCHEME (scheme), NULL);
+@@ -318,7 +318,7 @@ gtk_source_style_scheme_get_authors (Gtk
+ 	if (scheme->priv->authors == NULL)
+ 		return NULL;
+ 
+-	return (G_CONST_RETURN gchar* G_CONST_RETURN *)scheme->priv->authors->pdata;
++	return (const gchar* const *)scheme->priv->authors->pdata;
+ }
+ 
+ /**
+--- gtksourceview-2.11.2/gtksourceview/gtksourcestylescheme.h	2010-03-29 15:02:56.000000000 +0200
++++ gtksourceview-2.11.2/gtksourceview/gtksourcestylescheme.h	2011-06-29 14:01:07.442115911 +0200
+@@ -61,8 +61,7 @@ const gchar             *gtk_source_styl
+ const gchar             *gtk_source_style_scheme_get_name       (GtkSourceStyleScheme *scheme);
+ const gchar             *gtk_source_style_scheme_get_description(GtkSourceStyleScheme *scheme);
+ 
+-G_CONST_RETURN gchar* G_CONST_RETURN *
+-			 gtk_source_style_scheme_get_authors	(GtkSourceStyleScheme *scheme);
++const gchar* const*	 gtk_source_style_scheme_get_authors	(GtkSourceStyleScheme *scheme);
+ 
+ const gchar             *gtk_source_style_scheme_get_filename	(GtkSourceStyleScheme *scheme);
+ 
+--- gtksourceview-2.11.2/gtksourceview/gtksourcestyleschememanager.c	2011-06-29 14:16:27.856849457 +0200
++++ gtksourceview-2.11.2/gtksourceview/gtksourcestyleschememanager.c	2011-06-29 14:22:33.335116123 +0200
+@@ -515,7 +515,7 @@ gtk_source_style_scheme_manager_prepend_
+  * of string containing the search path.
+  * The array is owned by the @manager and must not be modified.
+  */
+-G_CONST_RETURN gchar* G_CONST_RETURN *
++const gchar* const *
+ gtk_source_style_scheme_manager_get_search_path (GtkSourceStyleSchemeManager *manager)
+ {
+ 	g_return_val_if_fail (GTK_IS_SOURCE_STYLE_SCHEME_MANAGER (manager), NULL);
+@@ -554,7 +554,7 @@ gtk_source_style_scheme_manager_force_re
+  * of string containing the ids of the available style schemes or %NULL if no
+  * style scheme is available. The array is owned by the @manager and must not be modified.
+  */
+-G_CONST_RETURN gchar* G_CONST_RETURN *
++const gchar* const *
+ gtk_source_style_scheme_manager_get_scheme_ids (GtkSourceStyleSchemeManager *manager)
+ {
+ 	g_return_val_if_fail (GTK_IS_SOURCE_STYLE_SCHEME_MANAGER (manager), NULL);
+--- gtksourceview-2.11.2/gtksourceview/gtksourcestyleschememanager.h	2011-06-29 14:04:21.008460977 +0200
++++ gtksourceview-2.11.2/gtksourceview/gtksourcestyleschememanager.h	2011-06-29 14:06:38.768039315 +0200
+@@ -73,13 +73,11 @@ void 			 gtk_source_style_scheme_manager
+ void 			 gtk_source_style_scheme_manager_prepend_search_path   (GtkSourceStyleSchemeManager	*manager,
+ 						    				 const gchar			*path);
+ 
+-G_CONST_RETURN gchar* G_CONST_RETURN *
+-			 gtk_source_style_scheme_manager_get_search_path	(GtkSourceStyleSchemeManager	*manager);
++const gchar* const*	 gtk_source_style_scheme_manager_get_search_path	(GtkSourceStyleSchemeManager	*manager);
+ 
+ void			 gtk_source_style_scheme_manager_force_rescan		(GtkSourceStyleSchemeManager	*manager);
+ 
+-G_CONST_RETURN gchar* G_CONST_RETURN *
+-			 gtk_source_style_scheme_manager_get_scheme_ids		(GtkSourceStyleSchemeManager	*manager);
++const gchar* const*	 gtk_source_style_scheme_manager_get_scheme_ids		(GtkSourceStyleSchemeManager	*manager);
+ 
+ GtkSourceStyleScheme	*gtk_source_style_scheme_manager_get_scheme		(GtkSourceStyleSchemeManager	*manager,
+ 										 const gchar			*scheme_id);
+

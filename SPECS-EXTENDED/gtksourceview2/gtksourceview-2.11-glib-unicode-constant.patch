@@ -1,0 +1,13 @@
+Index: gtksourceview-2.11.2/gtksourceview/gtksourceiter.c
+===================================================================
+--- gtksourceview-2.11.2.orig/gtksourceview/gtksourceiter.c
++++ gtksourceview-2.11.2/gtksourceview/gtksourceiter.c
+@@ -80,7 +80,7 @@ exact_prefix_cmp (const gchar *string,
+ 	/* If string contains prefix, check that prefix is not followed
+ 	 * by a unicode mark symbol, e.g. that trailing 'a' in prefix
+ 	 * is not part of two-char a-with-hat symbol in string. */
+-	return type != G_UNICODE_COMBINING_MARK &&
++	return type != G_UNICODE_SPACING_MARK &&
+ 		type != G_UNICODE_ENCLOSING_MARK &&
+ 		type != G_UNICODE_NON_SPACING_MARK;
+ }
