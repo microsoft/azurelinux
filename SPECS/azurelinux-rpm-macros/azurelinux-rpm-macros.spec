@@ -7,7 +7,7 @@
 Summary:        Azure Linux specific rpm macro files
 Name:           azurelinux-rpm-macros
 Version:        %{azl}.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -48,6 +48,7 @@ Source29:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/
 Source30:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/brp-python-hardlink
 Source31:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/import_all_modules.py
 Source32:       macros.grub2
+Source33:       openssl_compat.attr
 ###
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
@@ -78,6 +79,13 @@ Provides:       mariner-check-macros = %{version}-%{release}
 %description -n azurelinux-check-macros
 Azure Linux specific rpm macros to override default %%check behavior
 
+%package -n azurelinux-openssl-compat-generator
+Summary:        RPM Generator for OpenSSL compatibility packages
+Group:          Development/System
+
+%description -n azurelinux-openssl-compat-generator
+This package provides an RPM generator script for OpenSSL compatibility packages.
+
 %prep
 %setup -q -c -T
 cp -p %{sources} .
@@ -100,6 +108,7 @@ install -p -m 755 -t %{buildroot}%{rcdir} verify-package-notes.sh
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 mkdir -p %{buildroot}%{_fileattrsdir}
+install -p -m 644 -t %{buildroot}%{_fileattrsdir} openssl_compat.attr
 
 mkdir -p %{buildroot}%{rcluadir}/{rpm,srpm}
 install -p -m 644 -t %{buildroot}%{rcluadir} common.lua
@@ -142,7 +151,13 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 %files -n azurelinux-check-macros
 %{_rpmconfigdir}/macros.d/macros.check
 
+%files -n azurelinux-openssl-compat-generator
+%{_fileattrsdir}/openssl_compat.attr
+
 %changelog
+* Thu Oct 16 2025 Tobias Brick <tobiasb@microsoft.com> - 3.0-8
+- add azurelinux-openssl-compat-generator subpackage
+
 * Mon Sep 09 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-7
 - Include release information in ELF metadata version field
 

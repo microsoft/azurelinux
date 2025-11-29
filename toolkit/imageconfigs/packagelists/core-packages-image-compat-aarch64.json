@@ -1,0 +1,14 @@
+{
+    "packages": [
+        "shim",
+        "grub2-efi-binary",
+        "ca-certificates",
+        "cronie-anacron",
+        "logrotate",
+        "core-packages-base-image-compat",
+        "dracut-hostonly",
+        "dracut-vrf",
+        "shadow-utils",
+        "initramfs"
+    ]
+}

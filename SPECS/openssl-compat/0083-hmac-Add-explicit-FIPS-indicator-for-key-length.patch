@@ -1,0 +1,120 @@
+From a061dba4f6bb52b647aa8f411d32f0c8898a9cb2 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 6 Mar 2024 19:17:17 +0100
+Subject: [PATCH 35/49] 
+ 0083-hmac-Add-explicit-FIPS-indicator-for-key-length.patch
+
+Patch-name: 0083-hmac-Add-explicit-FIPS-indicator-for-key-length.patch
+Patch-id: 83
+Patch-status: |
+    # [PATCH 37/46]
+    # 0083-hmac-Add-explicit-FIPS-indicator-for-key-length.patch
+From-dist-git-commit: 4334bc837fbc64d14890fdc51679a80770d498ce
+---
+ include/crypto/evp.h                       |  7 +++++++
+ include/openssl/evp.h                      |  3 +++
+ providers/implementations/macs/hmac_prov.c | 17 +++++++++++++++++
+ util/perl/OpenSSL/paramnames.pm            | 13 +++++++------
+ 4 files changed, 34 insertions(+), 6 deletions(-)
+
+diff --git a/include/crypto/evp.h b/include/crypto/evp.h
+index 1e4895959b..5a2b324762 100644
+--- a/include/crypto/evp.h
++++ b/include/crypto/evp.h
+@@ -206,6 +206,13 @@ const EVP_PKEY_METHOD *ossl_ed448_pkey_method(void);
+ const EVP_PKEY_METHOD *ossl_rsa_pkey_method(void);
+ const EVP_PKEY_METHOD *ossl_rsa_pss_pkey_method(void);
+ 
++#ifdef FIPS_MODULE
++/* NIST SP 800-131Ar2, Table 9: Approval Status of MAC Algorithms specifies key
++ * lengths < 112 bytes are disallowed for HMAC generation and legacy use for
++ * HMAC verification. */
++# define EVP_HMAC_GEN_FIPS_MIN_KEY_LEN (112 / 8)
++#endif
++
+ struct evp_mac_st {
+     OSSL_PROVIDER *prov;
+     int name_id;
+diff --git a/include/openssl/evp.h b/include/openssl/evp.h
+index ea7620d631..48d5886d1e 100644
+--- a/include/openssl/evp.h
++++ b/include/openssl/evp.h
+@@ -1199,6 +1199,9 @@ void EVP_MD_do_all_provided(OSSL_LIB_CTX *libctx,
+                             void *arg);
+ 
+ /* MAC stuff */
++# define EVP_MAC_REDHAT_FIPS_INDICATOR_UNDETERMINED 0
++# define EVP_MAC_REDHAT_FIPS_INDICATOR_APPROVED     1
++# define EVP_MAC_REDHAT_FIPS_INDICATOR_NOT_APPROVED 2
+ 
+ EVP_MAC *EVP_MAC_fetch(OSSL_LIB_CTX *libctx, const char *algorithm,
+                        const char *properties);
+diff --git a/providers/implementations/macs/hmac_prov.c b/providers/implementations/macs/hmac_prov.c
+index a1f3c2db84..f65215f532 100644
+--- a/providers/implementations/macs/hmac_prov.c
++++ b/providers/implementations/macs/hmac_prov.c
+@@ -21,6 +21,8 @@
+ #include <openssl/evp.h>
+ #include <openssl/hmac.h>
+ 
++#include "crypto/evp.h"
++
+ #include "internal/ssl3_cbc.h"
+ 
+ #include "prov/implementations.h"
+@@ -235,6 +237,9 @@ static int hmac_final(void *vmacctx, unsigned char *out, size_t *outl,
+ static const OSSL_PARAM known_gettable_ctx_params[] = {
+     OSSL_PARAM_size_t(OSSL_MAC_PARAM_SIZE, NULL),
+     OSSL_PARAM_size_t(OSSL_MAC_PARAM_BLOCK_SIZE, NULL),
++#ifdef FIPS_MODULE
++    OSSL_PARAM_int(OSSL_MAC_PARAM_REDHAT_FIPS_INDICATOR, NULL),
++#endif /* defined(FIPS_MODULE) */
+     OSSL_PARAM_END
+ };
+ static const OSSL_PARAM *hmac_gettable_ctx_params(ossl_unused void *ctx,
+@@ -256,6 +261,18 @@ static int hmac_get_ctx_params(void *vmacctx, OSSL_PARAM params[])
+             && !OSSL_PARAM_set_int(p, hmac_block_size(macctx)))
+         return 0;
+ 
++#ifdef FIPS_MODULE
++    if ((p = OSSL_PARAM_locate(params, OSSL_MAC_PARAM_REDHAT_FIPS_INDICATOR)) != NULL) {
++        int fips_indicator = EVP_MAC_REDHAT_FIPS_INDICATOR_APPROVED;
++        /* NIST SP 800-131Ar2, Table 9: Approval Status of MAC Algorithms
++         * specifies key lengths < 112 bytes are disallowed for HMAC generation
++         * and legacy use for HMAC verification. */
++        if (macctx->keylen < EVP_HMAC_GEN_FIPS_MIN_KEY_LEN)
++            fips_indicator = EVP_MAC_REDHAT_FIPS_INDICATOR_NOT_APPROVED;
++        return OSSL_PARAM_set_int(p, fips_indicator);
++    }
++#endif /* defined(FIPS_MODULE) */
++
+     return 1;
+ }
+ 
+diff --git a/util/perl/OpenSSL/paramnames.pm b/util/perl/OpenSSL/paramnames.pm
+index 6618122417..8b2d430f17 100644
+--- a/util/perl/OpenSSL/paramnames.pm
++++ b/util/perl/OpenSSL/paramnames.pm
+@@ -137,12 +137,13 @@ my %params = (
+ # If "engine",or "properties",are specified, they should always be paired
+ # with "cipher",or "digest".
+ 
+-    'MAC_PARAM_CIPHER' =>           '*ALG_PARAM_CIPHER',        # utf8 string
+-    'MAC_PARAM_DIGEST' =>           '*ALG_PARAM_DIGEST',        # utf8 string
+-    'MAC_PARAM_PROPERTIES' =>       '*ALG_PARAM_PROPERTIES',    # utf8 string
+-    'MAC_PARAM_SIZE' =>             "size",                     # size_t
+-    'MAC_PARAM_BLOCK_SIZE' =>       "block-size",               # size_t
+-    'MAC_PARAM_TLS_DATA_SIZE' =>    "tls-data-size",            # size_t
++    'MAC_PARAM_CIPHER' =>                '*ALG_PARAM_CIPHER',        # utf8 string
++    'MAC_PARAM_DIGEST' =>                '*ALG_PARAM_DIGEST',        # utf8 string
++    'MAC_PARAM_PROPERTIES' =>            '*ALG_PARAM_PROPERTIES',    # utf8 string
++    'MAC_PARAM_SIZE' =>                  "size",                     # size_t
++    'MAC_PARAM_BLOCK_SIZE' =>            "block-size",               # size_t
++    'MAC_PARAM_TLS_DATA_SIZE' =>         "tls-data-size",            # size_t
++    'MAC_PARAM_REDHAT_FIPS_INDICATOR' => "redhat-fips-indicator",    # size_t
+ 
+ # KDF / PRF parameters
+     'KDF_PARAM_SECRET' =>       "secret",                   # octet string
+-- 
+2.44.0
+
