@@ -23,7 +23,7 @@ Summary:        Python bindings for zeromq
 #   - zmq/ssh/forward.py, which is derived from a Paramiko demo, is
 #     LGPL-2.1-or-later
 #   - zmq/eventloop/zmqstream.py is Apache-2.0
-# See also the “Inherited licenses in pyzmq” section in CONTRIBUTING.md.
+# See also the Inherited licenses in pyzmq section in CONTRIBUTING.md.
 License:        %{shrink:
                 BSD-3-Clause AND
                 LGPL-2.1-or-later AND
@@ -31,14 +31,14 @@ License:        %{shrink:
                 }
 # Additionally, the following do not affect the license of the binary RPMs:
 #   - tools/run_with_env.cmd is CC0-1.0; for distribution in the source RPM, it
-#     is covered by “Existing uses of CC0-1.0 on code files in Fedora packages
+#     is covered by Existing uses of CC0-1.0 on code files in Fedora packages
 #     prior to 2022-08-01, and subsequent upstream versions of those files in
 #     those packages, continue to be allowed. We encourage Fedora package
-#     maintainers to ask upstreams to relicense such files.”
+#     maintainers to ask upstreams to relicense such files.
 #     https://gitlab.com/fedora/legal/fedora-license-data/-/issues/91#note_1151947383
 #   - examples/device/device.py and examples/win32-interrupt/display.py are
-#     LicenseRef-Fedora-Public-Domain; approved in “Review of
-#     python-zmq examples dedicated to the public domain,”
+#     LicenseRef-Fedora-Public-Domain; approved in Review of
+#     python-zmq examples dedicated to the public domain,
 #     https://gitlab.com/fedora/legal/fedora-license-data/-/issues/616; see
 #     https://gitlab.com/fedora/legal/fedora-license-data/-/merge_requests/716
 SourceLicense:  %{shrink:
@@ -69,7 +69,7 @@ BuildRequires:  python3dist(cython)
 
 
 
-# Add some manual test dependencies that aren't in test-requirements.txt, but
+# Add some manual test dependencies that are not in test-requirements.txt, but
 # which enable additional tests.
 #
 # Tests in zmq/tests/mypy.py require mypy, but see:
@@ -85,7 +85,7 @@ BuildRequires:  %{py3_dist gevent}
 %endif
 
 %global common_description %{expand:
-This package contains Python bindings for ZeroMQ. ØMQ is a lightweight and fast
+This package contains Python bindings for ZeroMQ. MQ is a lightweight and fast
 messaging implementation.}
 
 %description %{common_description}
@@ -101,7 +101,7 @@ Summary:        %{summary}
 # Beginning with Fedora 42, the binary packages are renamed from
 # python3-zmq/python3-zmq-tests to python3-pyzmq/python3-pyzmq-tests to match
 # the canonical package name. Ideally, the source package would also be called
-# python-pyzmq, but it’s not worth going through the package renaming process
+# python-pyzmq, but it is not worth going through the package renaming process
 # for this. The Obsoletes/Conflicts provide a clean upgrade path, and can be
 # removed after Fedora 44 end-of-life.
 Obsoletes:      python3-zmq < 25.1.1-29
@@ -133,7 +133,7 @@ find 'src' -type f -name '*.py' \
 
 
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#_linters
-# - pymongo is used only in examples/mongodb/, and we don�t run examples
+# - pymongo is used only in examples/mongodb/, and we do not run examples
 sed -r \
     -e 's/^(black|codecov|coverage|flake8|mypy|pytest-cov)\b/# &/' \
     -e 's/^(pymongo)\b/# &/' \
@@ -161,7 +161,7 @@ ln -s ../tests/ ../pytest.ini ./
 # With Python 3.14, in test_process_teardown, while spawning the multiprocess
 # forkserver child:
 #   ModuleNotFoundError: No module named 'tests'
-# This doesn�t really make sense to report upstream because the problem doesn�t
+# This does not really make sense to report upstream because the problem does not
 # happen when running tests against an editable install in a virtualenv as they
 # do. Adding the working directory to PYTHONPATH is a workaround.
 export PYTHONPATH="%{buildroot}%{python3_sitearch}:${PWD}"
@@ -348,10 +348,10 @@ pytest -k "not cffi ${k-}" -v -rs tests/
 * Sat Jun 08 2024 Python Maint <python-maint@redhat.com> - 25.1.1-10
 - Bootstrap for Python 3.13
 
-* Sat Apr 13 2024 Miroslav Suchý <msuchy@redhat.com> - 25.1.1-9
+* Sat Apr 13 2024 Miroslav Suchy <msuchy@redhat.com> - 25.1.1-9
 - convert MPLv2.0 license to SPDX
 
-* Tue Mar 12 2024 Miro Hrončok <miro@hroncok.cz> - 25.1.1-8
+* Tue Mar 12 2024 Miro Hroncok <miro@hroncok.cz> - 25.1.1-8
 - Python 3.13 compatibility
 
 * Sun Feb 18 2024 Orion Poplawski <orion@nwra.com> - 25.1.1-6
@@ -375,7 +375,7 @@ pytest -k "not cffi ${k-}" -v -rs tests/
 * Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 25.1.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
 
-* Wed Jun 28 2023 Miro Hrončok <miro@hroncok.cz> - 25.1.0-2
+* Wed Jun 28 2023 Miro Hroncok <miro@hroncok.cz> - 25.1.0-2
 - Temporarily deselect tests crashing on ppc64le to unblock the Py3.12
   rebuild
 
@@ -394,10 +394,10 @@ pytest -k "not cffi ${k-}" -v -rs tests/
 * Sun Sep 18 2022 Kevin Fenzi <kevin@scrye.com> - 24.0.0-1
 - Update to 24.0.0. Fixes rhbz#2127189
 
-* Wed Aug 03 2022 Miro Hrončok <miro@hroncok.cz> - 23.2.0-3
+* Wed Aug 03 2022 Miro Hroncok <miro@hroncok.cz> - 23.2.0-3
 - Remove old cruft
 
-* Wed Aug 03 2022 Miro Hrončok <miro@hroncok.cz> - 23.2.0-2
+* Wed Aug 03 2022 Miro Hroncok <miro@hroncok.cz> - 23.2.0-2
 - Run the tests
 
 * Wed Aug 03 2022 Charalampos Stratakis <cstratak@redhat.com> - 23.2.0-1
@@ -448,7 +448,7 @@ pytest -k "not cffi ${k-}" -v -rs tests/
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 19.0.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
-* Sat May 23 2020 Miro Hrončok <miro@hroncok.cz> - 19.0.0-2
+* Sat May 23 2020 Miro Hroncok <miro@hroncok.cz> - 19.0.0-2
 - Rebuilt for Python 3.9
 
 * Sat Apr 04 2020 Carl George <carl@george.computer> - 19.0.0-1
@@ -460,16 +460,16 @@ pytest -k "not cffi ${k-}" -v -rs tests/
 * Tue Jan 14 2020 Jochen Breuer <brejoc@gmail.com> - 18.1.0-3
 - Adding python-pyzqm in provides
 
-* Fri Nov 29 2019 Miro Hrončok <miro@hroncok.cz> - 18.1.0-2
+* Fri Nov 29 2019 Miro Hroncok <miro@hroncok.cz> - 18.1.0-2
 - Subpackages python2-zmq, python2-zmq-test have been removed
 
 * Sun Oct 06 2019 Kevin Fenzi <kevin@scrye.com> - 18.1.0-1
 - Update to 18.1.0. Fixes bug #1742606
 
-* Thu Oct 03 2019 Miro Hrončok <miro@hroncok.cz> - 18.0.2-4
+* Thu Oct 03 2019 Miro Hroncok <miro@hroncok.cz> - 18.0.2-4
 - Rebuilt for Python 3.8.0rc1 (#1748018)
 
-* Fri Aug 16 2019 Miro Hrončok <miro@hroncok.cz> - 18.0.2-3
+* Fri Aug 16 2019 Miro Hroncok <miro@hroncok.cz> - 18.0.2-3
 - Rebuilt for Python 3.8
 
 * Fri Jul 26 2019 Fedora Release Engineering <releng@fedoraproject.org> - 18.0.2-2
@@ -478,13 +478,13 @@ pytest -k "not cffi ${k-}" -v -rs tests/
 * Sun Jun 30 2019 Kevin Fenzi <kevin@scrye.com> - 18.0.2-1
 - Update to 18.0.2. Fixes bug #1724706
 
-* Tue May 14 2019 Miro Hrončok <miro@hroncok.cz> - 18.0.1-2
+* Tue May 14 2019 Miro Hroncok <miro@hroncok.cz> - 18.0.1-2
 - Regenerate Cython files
 
 * Mon Apr 29 2019 Kevin Fenzi <kevin@scrye.com> - 18.0.1-1
 - Update to 18.0.1. Fixes bug #1601128
 
-* Tue Feb 12 2019 Miro Hrončok <miro@hroncok.cz> - 17.0.0-7
+* Tue Feb 12 2019 Miro Hroncok <miro@hroncok.cz> - 17.0.0-7
 - https://fedoraproject.org/wiki/Changes/Python_Extension_Flags
 
 * Sat Feb 02 2019 Fedora Release Engineering <releng@fedoraproject.org> - 17.0.0-6
@@ -499,10 +499,10 @@ pytest -k "not cffi ${k-}" -v -rs tests/
 * Tue Jul 10 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 17.0.0-3
 - add BuildRequires: gcc
 
-* Sun Jun 17 2018 Miro Hrončok <miro@hroncok.cz> - 17.0.0-2
+* Sun Jun 17 2018 Miro Hroncok <miro@hroncok.cz> - 17.0.0-2
 - Rebuilt for Python 3.7
 
-* Sat May 12 2018 Miro Hrončok <miro@hroncok.cz> - 17.0.0-1
+* Sat May 12 2018 Miro Hroncok <miro@hroncok.cz> - 17.0.0-1
 - Update to 17.0.0 (#1538381), fix shebangs
 
 * Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 16.0.2-7
@@ -521,7 +521,7 @@ pytest -k "not cffi ${k-}" -v -rs tests/
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 16.0.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
-* Mon Dec 19 2016 Miro Hrončok <miro@hroncok.cz> - 16.0.2-2
+* Mon Dec 19 2016 Miro Hroncok <miro@hroncok.cz> - 16.0.2-2
 - Rebuild for Python 3.6
 
 * Wed Nov 23 2016 Kevin Fenzi <kevin@scrye.com> - 16.0.2-1
