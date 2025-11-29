@@ -1,0 +1,12 @@
+--- lablgtk-2.18.13/src/ml_rsvg.c.orig	2022-10-06 01:55:37.000000000 -0600
++++ lablgtk-2.18.13/src/ml_rsvg.c	2022-10-12 09:01:06.544979170 -0600
+@@ -52,6 +52,9 @@ ML_0(rsvg_handle_new, Val_pointer)
+ #ifdef HAVE_SVGZ
+ #include <librsvg/rsvg-gz.h>
+ ML_0 (rsvg_handle_new_gz, Val_pointer)
++#elif defined(LIBRSVG_HAVE_SVGZ) && LIBRSVG_HAVE_SVGZ
++CAMLprim value ml_rsvg_handle_new_gz()
++{ return Val_pointer(rsvg_handle_new ()); }
+ #else
+ CAMLprim value ml_rsvg_handle_new_gz()
+ { failwith ("Doesn't support GZipped SVG files"); return Val_unit; }

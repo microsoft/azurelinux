@@ -1,0 +1,14 @@
+--- gtksourceview-2.11.2/tests/test-languagemanager.c.path	2009-12-02 04:02:24.000000000 +0900
++++ gtksourceview-2.11.2/tests/test-languagemanager.c	2024-01-26 12:20:51.628998429 +0900
+@@ -21,6 +21,11 @@ test_get_language (void)
+ 	const gchar * const *ids;
+ 
+ 	lm = gtk_source_language_manager_get_default ();
++	{
++		gchar *builtin_lang_dirs[] = {TOP_SRCDIR "/data/language-specs", NULL};
++		gtk_source_language_manager_set_search_path (lm, builtin_lang_dirs);
++
++	}
+ 	ids = gtk_source_language_manager_get_language_ids (lm);
+ 	g_assert (ids != NULL);
+ 

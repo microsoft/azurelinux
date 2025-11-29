@@ -1,0 +1,15 @@
+--- camlp5-rel8.00.old/configure	2020-12-27 22:26:24.000000000 +0000
++++ camlp5-rel8.00/configure	2021-02-28 22:38:08.341646880 +0000
+@@ -243,11 +243,7 @@
+   OCAMLC_W_Y=""
+ fi
+ 
+-if [ "$($ocamlc -warn-error +A-11 2>&1)" = "" ]; then
+-  WARNERR="-warn-error +A-11"
+-else
+-  WARNERR=""
+-fi
++WARNERR=""
+ 
+ if make -f config/Makefile.check --no-print-directory >/dev/null 2>&1; then
+   NO_PR_DIR=--no-print-directory
