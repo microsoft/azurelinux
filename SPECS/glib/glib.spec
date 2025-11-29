@@ -166,7 +166,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 * Wed May 19 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-4
 - Require schemas subpackage from devel subpackage
 
-* Fri Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-3
+* Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-3
 - Remove CVE-2019-13012 patch (already in the this version)
 - Exclude doubly-packaged files from devel subpackage
 - Merge the following releases from 1.0 to dev branch
