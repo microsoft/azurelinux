@@ -51,6 +51,9 @@
       - [`DISABLE_DEFAULT_REPOS=...`](#disable_default_repos)
         - [`DISABLE_DEFAULT_REPOS=`**`n`** *(default)*](#disable_default_reposn-default)
         - [`DISABLE_DEFAULT_REPOS=`**`y`**](#disable_default_reposy)
+      - [`NO_TOOLCHAIN_CONTAINER=...`](#no_toolchain_container)
+        - [`NO_TOOLCHAIN_CONTAINER=`**`n`** *(default)*](#no_toolchain_containern-default)
+        - [`NO_TOOLCHAIN_CONTAINER=`**`y`**](#no_toolchain_containery)
       - [`REBUILD_PACKAGES=...`](#rebuild_packages)
         - [`REBUILD_PACKAGES=`**`y`** *(default)*](#rebuild_packagesy-default)
         - [`REBUILD_PACKAGES=`**`n`**](#rebuild_packagesn)
@@ -151,6 +154,13 @@ Depending on hardware, rebuilding the toolchain can take several hours. The foll
 # Add REBUILD_TOOLCHAIN=y to any subsequent command to ensure locally built toolchain packages are used
 sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y
 ```
+
+This builds the first stage of the toolchain in an Azure Linux container. This can be disabled by passing the `NO_TOOLCHAIN_CONTAINER=y` parameter:
+```bash
+sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y NO_TOOLCHAIN_CONTAINER=y
+```
+
+This way, the dependency on an already built container for building a new toolchain (and therefore a new build container) is broken, at the cost of stricter requirements on the host environment's toolchain. This is useful for performing full source bootstraps or diverse double compilation for high-trust environments.
 
 ## **Package Stage**
 
@@ -399,6 +409,7 @@ REPO_LIST          ?=
 ```makefile
 DOWNLOAD_SRPMS         ?= n
 REBUILD_TOOLCHAIN      ?= n
+NO_TOOLCHAIN_CONTAINER ?= n
 REBUILD_PACKAGES       ?= y
 REBUILD_TOOLS          ?= n
 DISABLE_UPSTREAM_REPOS ?= n
@@ -624,6 +635,16 @@ also augment the URL list.
 
 > Only pull missing packages from local and repositories specified in `$(REPO_LIST)` files.
 
+#### `NO_TOOLCHAIN_CONTAINER=...`
+
+##### `NO_TOOLCHAIN_CONTAINER=`**`n`** *(default)*
+
+> First stage of the toolchain will be built in a prebuilt Azure Linux container.
+
+##### `NO_TOOLCHAIN_CONTAINER=`**`y`**
+
+> First stage of the toolchain will be built using the host operating system's tools. Useful for full source bootstrapping, but requires a more complicated host setup.
+
 #### `REBUILD_PACKAGES=...`
 
 ##### `REBUILD_PACKAGES=`**`y`** *(default)*
@@ -833,6 +854,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | DISABLE_UPSTREAM_REPOS        | n                                                                                                      | Only pull missing packages from local repositories? This does not affect hydrating the toolchain from `$(PACKAGE_URL_LIST)`.
 | DISABLE_DEFAULT_REPOS         | n                                                                                                      | Disable pulling packages from PMC. Use this option with `REPO_LIST` if you want to use your own repository exclusively.
 | CACHED_PACKAGES_ARCHIVE       |                                                                                                        | Use with `make hydrate-cached-rpms` to populate the external RPMs cache from an archive.
+| NO_TOOLCHAIN_CONTAINER        | n                                                                                                      | Use locally available tools for building the toolchain, or download a prebuilt container with the right tools?
 
 ---
 
