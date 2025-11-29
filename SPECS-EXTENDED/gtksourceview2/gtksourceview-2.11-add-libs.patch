@@ -1,0 +1,22 @@
+--- gtksourceview-2.11.2/gtksourceview/Makefile.am.orig	2011-12-12 15:37:53.674460066 +0000
++++ gtksourceview-2.11.2/gtksourceview/Makefile.am	2011-12-12 15:40:54.795452873 +0000
+@@ -166,7 +166,7 @@
+ INTROSPECTION_SCANNER_ARGS = -I$(top_srcdir) $(DEP_CFLAGS) -lgio-2.0 -lgobject-2.0 -lgthread-2.0 -lgmodule-2.0 -lglib-2.0
+ GtkSource_2_0_gir_NAMESPACE = GtkSource
+ GtkSource_2_0_gir_VERSION = 2.0
+-GtkSource_2_0_gir_LIBS = libgtksourceview-2.0.la
++GtkSource_2_0_gir_LIBS = libgtksourceview-2.0.la gio-2.0 gobject-2.0 gmodule-2.0 gthread-2.0 glib-2.0
+ GtkSource_2_0_gir_FILES = $(libgtksourceview_headers) $(libgtksourceview_c_files)
+ GtkSource_2_0_gir_INCLUDES = $(GTK_TYPELIB)
+ GtkSource_2_0_gir_PACKAGES = gtksourceview-2.0
+--- gtksourceview-2.11.2/gtksourceview/Makefile.in.orig	2011-12-12 15:37:53.677460066 +0000
++++ gtksourceview-2.11.2/gtksourceview/Makefile.in	2011-12-12 15:40:54.799452554 +0000
+@@ -462,7 +462,7 @@
+ @HAVE_INTROSPECTION_TRUE@INTROSPECTION_SCANNER_ARGS = -I$(top_srcdir) $(DEP_CFLAGS) -lgio-2.0 -lgobject-2.0 -lgthread-2.0 -lgmodule-2.0 -lglib-2.0
+ @HAVE_INTROSPECTION_TRUE@GtkSource_2_0_gir_NAMESPACE = GtkSource
+ @HAVE_INTROSPECTION_TRUE@GtkSource_2_0_gir_VERSION = 2.0
+-@HAVE_INTROSPECTION_TRUE@GtkSource_2_0_gir_LIBS = libgtksourceview-2.0.la
++@HAVE_INTROSPECTION_TRUE@GtkSource_2_0_gir_LIBS = libgtksourceview-2.0.la gio-2.0 gobject-2.0 gmodule-2.0 gthread-2.0 glib-2.0
+ @HAVE_INTROSPECTION_TRUE@GtkSource_2_0_gir_FILES = $(libgtksourceview_headers) $(libgtksourceview_c_files)
+ @HAVE_INTROSPECTION_TRUE@GtkSource_2_0_gir_INCLUDES = $(GTK_TYPELIB)
+ @HAVE_INTROSPECTION_TRUE@GtkSource_2_0_gir_PACKAGES = gtksourceview-2.0
