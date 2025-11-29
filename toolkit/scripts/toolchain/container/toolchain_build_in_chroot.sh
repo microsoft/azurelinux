@@ -356,6 +356,7 @@ LD=ld \
 ../configure --prefix=/usr            \
              --enable-default-pie     \
              --enable-default-ssp     \
+             --enable-linker-build-id \
              --disable-multilib       \
              --disable-bootstrap      \
              --disable-fixincludes    \
