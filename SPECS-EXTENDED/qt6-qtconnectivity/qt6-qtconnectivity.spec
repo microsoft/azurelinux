@@ -121,7 +121,7 @@ popd
  
 %changelog
 * Tue Dec 02 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 6.5.7-1
-- Initial import from Fedora 37
+- Initial Azure Linux import from Fedora 37 (license: MIT)
 - Upgrade to 6.5.7
 - License Verified
 
