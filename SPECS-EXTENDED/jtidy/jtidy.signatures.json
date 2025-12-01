@@ -1,6 +1,7 @@
 {
  "Signatures": {
-  "jtidy.tar.xz": "97654df194fda0c4199297bfedda9c0d60c40cb5ab35f80782ca83274dbdd69a",
-  "jtidy.jtidy.script": "e353bba9f2fc384472bc5bb519be70cac0d6eba4fa65e00c7f48a74af7b18787"
+  "jtidy-1.0.4.tar.gz": "1df3eca7077a1290f1e9b633422a3d8ac4f2fc5a0f487a129a193d58b039ea45",
+  "jtidy-build.xml": "f933286ec074603c3f748bd79f6c874feb0880b12067ba88c1d9f6fc27d0d28a",
+  "jtidy-rpmlintrc": "ee1003144292574a34c0f5cddf05a52ed1a2b27489b5ab550cc393d9cb7d9449"
  }
 }

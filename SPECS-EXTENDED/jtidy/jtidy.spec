@@ -1,71 +1,98 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Epoch:            2
 Name:           jtidy
-Version:          1.0
-Release:          1%{?dist}
+VCS: https://src.suse.de/pool/jtidy?trackingbranch=slfo-1.2#0765e5b9560995812fcac0bb88fd0e409490c8343acc52ef06cfa2af91680a0d
+Version:        1.0.4
+Release:        1%{?dist}
 Summary:        HTML syntax checker and pretty printer
-License:          zlib
-URL:            http://jtidy.sourceforge.net/
-# svn export -r1125 https://jtidy.svn.sourceforge.net/svnroot/jtidy/trunk/jtidy/ jtidy
-# tar caf jtidy.tar.xz jtidy
-Source0:        %{name}.tar.xz
-Source1:        %{name}.jtidy.script
-Patch0:          javac-1.8.patch
-%global debug_package %{nil}
+License:        HTMLTIDY
+Group:          Development/Libraries/Java
+URL:            https://github.com/jtidy/jtidy
+Source0:        https://github.com/jtidy/jtidy/archive/refs/tags/jtidy-1.0.4.tar.gz
+Source1:        %{name}-build.xml
+Source100:      %{name}-rpmlintrc
+BuildRequires:  ant >= 1.6
+BuildRequires:  ant-junit
+BuildRequires:  fdupes
 BuildRequires:  javapackages-local-bootstrap
-BuildRequires:    ant
-# Explicit javapackages-tools requires since jtidy script uses
-# /usr/share/java-utils/java-functions
-Requires:         javapackages-tools
+BuildRequires:  xerces-j2
+BuildRequires:  xml-apis
+Requires:       xerces-j2
+Requires:       xml-apis
+BuildArch:      noarch
 
 %description
 JTidy is a Java port of HTML Tidy, a HTML syntax checker and pretty
 printer. Like its non-Java cousin, JTidy can be used as a tool for
 cleaning up malformed and faulty HTML. In addition, JTidy provides a
-DOM interface to the document that is being processed, which
-effectively makes you able to use JTidy as a DOM parser for real-world
-HTML.
+DOM parser for real-world HTML.
 
 %package javadoc
-Summary:          API documentation for %{name}
+Summary:        HTML syntax checker and pretty printer
+Group:          Development/Libraries/Java
 
 %description javadoc
-This package contains %{summary}.
+JTidy is a Java port of HTML Tidy, a HTML syntax checker and pretty
+printer. Like its non-Java cousin, JTidy can be used as a tool for
+cleaning up malformed and faulty HTML. In addition, JTidy provides a
+DOM parser for real-world HTML.
+
+%package scripts
+Summary:        HTML syntax checker and pretty printer
+Group:          Development/Libraries/Java
+Requires:       %{name} = %{version}
+Requires:       javapackages-tools
+
+%description scripts
+JTidy is a Java port of HTML Tidy, a HTML syntax checker and pretty
+printer. Like its non-Java cousin, JTidy can be used as a tool for
+cleaning up malformed and faulty HTML. In addition, JTidy provides a
+DOM parser for real-world HTML.
 
 %prep
-%setup -q -n %{name}
-%patch -P0 -p1
+%setup -q -n %{name}-%{name}-%{version}
+cp -p %{SOURCE1} build.xml
 
 %build
-ant
+mkdir -p lib
+build-jar-repository -s lib xerces-j2 xml-apis
+%{ant} \
+    package javadoc
 
 %install
-install -d -m 755 %{buildroot}%{_javadir}
-install -m 644 target/%{name}-*.jar \
-    %{buildroot}%{_javadir}/%{name}-%{version}.jar
-(cd %{buildroot}%{_javadir} && ln -sf %{name}-%{version}.jar %{name}.jar)
-install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
-cp -pr target/javadoc/* %{buildroot}%{_javadocdir}/%{name}
-mkdir -p %{buildroot}%{_bindir}
-cp -ap %{SOURCE1} %{buildroot}%{_bindir}/%{name}
-mkdir -p %{buildroot}%{_sysconfdir}/ant.d
-echo jtidy > %{buildroot}%{_sysconfdir}/ant.d/%{name}
+# jar
+install -d -m 0755 %{buildroot}%{_javadir}
+install -m 644 target/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
+# javadoc
+install -d -m 0755 %{buildroot}%{_javadocdir}/%{name}
+cp -aL target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
+%fdupes -s %{buildroot}%{_javadocdir}/%{name}
+
+# shell script
+%jpackage_script org.w3c.tidy.Tidy "" "" %{name}:xerces-j2:xml-apis %{name} true
+
+# ant.d
+install -d -m 0755 %{buildroot}%{_sysconfdir}/ant.d
+cat > %{buildroot}%{_sysconfdir}/ant.d/%{name} << EOF
+jtidy xerces-j2 xml-apis
+EOF
 
 %files
 %license LICENSE.txt
-%{_javadir}/jtidy*.jar
-%attr(755, root, root) %{_bindir}/%{name}
+%{_javadir}/%{name}.jar
 %config(noreplace) %{_sysconfdir}/ant.d/%{name}
 
 %files javadoc
 %defattr(0644,root,root,0755)
 %doc %{_javadocdir}/%{name}
 
+%files scripts
+%defattr(0755,root,root,0755)
+%{_bindir}/*
 
 %changelog
-* Fri Nov 21 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.0-1
-- Upgrade to version 1.0 (license: MIT).
+* Fri Nov 21 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.0.4-1
+- Upgrade to version 1.0.4 (license: MIT).
 - License verified
 
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0-32
