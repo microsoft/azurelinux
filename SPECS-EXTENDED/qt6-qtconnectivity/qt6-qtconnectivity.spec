@@ -27,6 +27,7 @@ Source0:       https://download.qt.io/official_releases/qt/%{majmin}/%{version}/
 %endif
 
 Patch0:        build_fix_quint128.patch
+Patch1:        CVE-2025-23050-qtconnectivity-6.5.diff
  
 # filter qml provides
 %global __provides_exclude_from ^%{_qt_archdatadir}/qml/.*\\.so$
