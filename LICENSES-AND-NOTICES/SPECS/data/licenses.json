@@ -147,7 +147,6 @@
                 "cpufrequtils",
                 "cpuid",
                 "criu",
-                "crypto-policies",
                 "cryptsetup",
                 "cscope",
                 "ctags",
@@ -2667,7 +2666,6 @@
                 "xmldb-api",
                 "xmlrpc-c",
                 "xmlunit",
-                "xpp2",
                 "xz-java"
             ]
         },
