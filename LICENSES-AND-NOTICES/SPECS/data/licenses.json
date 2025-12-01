@@ -1909,7 +1909,12 @@
                 "qperf",
                 "qr-code-generator",
                 "qt-rpm-macros",
+<<<<<<< HEAD
                 "qt5-qtsensors",
+=======
+                "qt5-qtconnectivity",
+                "qt6-qtsensors",
+>>>>>>> 57474c950 (Remove qt5-qtsensors and add qt6-qtsensors)
                 "qt5-qtserialport",
                 "qt6-qtconnectivity",
                 "qtbase",

@@ -25842,7 +25842,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "qt5-qtsensors",
+          "name": "qt6-qtsensors",
           "version": "5.14.2",
           "downloadUrl": "https://download.qt.io/official_releases/qt/5.14/5.14.2/submodules/qtsensors-everywhere-src-5.14.2.tar.xz"
         }
