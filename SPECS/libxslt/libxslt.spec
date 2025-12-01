@@ -1,18 +1,13 @@
 Summary:        Libxslt is the XSLT C library developed for the GNOME project. XSLT is a an XML language to define transformation for XML.
 Name:           libxslt
-Version:        1.1.34
-Release:        8%{?dist}
+Version:        1.1.45
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/General Libraries
 URL:            http://xmlsoft.org/libxslt/
-Source0:        http://xmlsoft.org/sources/%{name}-%{version}.tar.gz
-Patch0:         CVE-2021-30560.patch
-# CVE-2022-29824 is fixed by shared object from libxml2 version 2.9.14
-Patch1:         CVE-2022-29824.nopatch
-Patch2:         CVE-2024-55549.patch
-Patch3:         CVE-2025-24855.patch
+Source0:        https://download.gnome.org/sources/libxslt/%{majminorver}/%{name}-%{version}.tar.xz
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libxml2-devel
 Requires:       libgcrypt
@@ -59,10 +54,10 @@ make %{?_smp_mflags} check
 
 %files
 %defattr(-,root,root)
-%license COPYING
+%license Copyright
+%doc AUTHORS NEWS README.md FEATURES
 %{_libdir}/*.so.*
 %{_libdir}/*.sh
-%{_libdir}/libxslt-plugins
 %{_bindir}/*
 %{_mandir}/man1/*
 
@@ -70,12 +65,18 @@ make %{?_smp_mflags} check
 %defattr(-,root,root,-)
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/*.so
+%{_libdir}/cmake/libxslt/FindGcrypt.cmake
+%{_libdir}/cmake/libxslt/libxslt-config.cmake
 %{_includedir}/*
 %{_docdir}/*
-%{_datadir}/aclocal/*
+%{_datadir}/gtk-doc/*
 %{_mandir}/man3/*
 
+
 %changelog
+* Mon Dec 01 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.1.45-1
+- Upgrade to 1.1. for CVE-2025-7424, CVE-2025-11731
+
 * Mon Mar 17 2025 Sindhu Karri <lakarri@microsoft.com> - 1.1.34-8
 - Fix CVE-2025-24855 and CVE-2024-55549
 
