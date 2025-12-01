@@ -93,6 +93,8 @@ BuildRequires: perl(Test::More)
 BuildRequires: perl(Time::Piece)
 %endif
 
+Conflicts: SymCrypt-OpenSSL
+
 %description
 # TODO: TOBIASB: Wording review
 The OpenSSL toolkit provides support for secure communications between
