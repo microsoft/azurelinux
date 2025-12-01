@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.30.10
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -280,13 +280,12 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
-<<<<<<< HEAD
-* Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 1.30.10-15
+
+* Mon Dec 1 2025 Andrew Phelps <anphel@microsoft.com> - 1.30.10-16
 - Bump to rebuild with updated glibc
-=======
+
 * Mon Nov 24 2025 Aditya Singh <v-aditysing@microsoft.com> - 1.30.10-15
 - Address CVE-2025-31133, CVE-2025-52565
->>>>>>> fe9cb347e ([High] Patch kubernetes for CVE-2025-31133 and CVE-2025-52565 (#15167))
 
 * Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.30.10-14
 - Bump to rebuild with updated glibc
