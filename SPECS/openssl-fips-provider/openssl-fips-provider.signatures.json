@@ -5,6 +5,7 @@
   "configuration-prefix.h": "11aba0dcfab381269e7e6ba1fdde1e4e8dfe51e39d8c7a2918f3b28a32cb98fd",
   "configuration-switch.h": "400439d7e8c551e7d5de8bfc648dcc0ddf6f4a7552750af4813449f68941b928",
   "genpatches": "9da7f988d4378adf499b1322e79f29e94c889c4bf10cd6e79e6991b673de2463",
-  "openssl-3.1.2.tar.gz": "a0ce69b8b97ea6a35b96875235aa453b966ba3cba8af2de23657d8b6767d6539"
+  "openssl-3.1.2.tar.gz": "a0ce69b8b97ea6a35b96875235aa453b966ba3cba8af2de23657d8b6767d6539",
+  "fips_prov.cnf": "67dec91a51d7c32060b89951557df2fdb8e9bf2bade890459936336cb838a5a1"
  }
 }
