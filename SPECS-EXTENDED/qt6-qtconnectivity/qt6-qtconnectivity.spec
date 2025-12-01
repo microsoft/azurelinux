@@ -7,34 +7,38 @@
  
 %global examples 1
  
-Summary: Qt6 - Connectivity components
-Name:    qt6-%{qt_module}
-Version: 6.5.7
-Release: 1%{?dist}
- 
-# See LICENSE.GPL3, respectively, for exception details
-License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
-Url:     http://qt.io
+Summary:       Qt6 - Connectivity components
+Name:          qt6-%{qt_module}
+Version:       6.5.7
+
 %global majmin %(echo %{version} | cut -d. -f1-2)
 %global  qt_version %(echo %{version} | cut -d~ -f1)
+
+Release:       1%{?dist}
+ 
+# See LICENSE.GPL3, respectively, for exception details
+License:       LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
+Url:           http://qt.io
  
 %if 0%{?unstable}
-Source0: https://download.qt.io/development_releases/qt/%{majmin}/%{qt_version}/submodules/%{qt_module}-everywhere-src-%{qt_version}-%{prerelease}.tar.xz
+Source0:       https://download.qt.io/development_releases/qt/%{majmin}/%{qt_version}/submodules/%{qt_module}-everywhere-src-%{qt_version}-%{prerelease}.tar.xz
 %else
-Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
+Source0:       https://download.qt.io/official_releases/qt/%{majmin}/%{version}/src/submodules/%{qt_module}-everywhere-opensource-src-%{version}.tar.xz#/%{qt_module}-everywhere-src-%{version}.tar.xz
 %endif
+
+Patch0:        build_fix_quint128.patch
  
 # filter qml provides
-%global __provides_exclude_from ^%{_qt6_archdatadir}/qml/.*\\.so$
+%global __provides_exclude_from ^%{_qt_archdatadir}/qml/.*\\.so$
  
 BuildRequires: cmake
 BuildRequires: gcc-c++
 BuildRequires: ninja-build
-BuildRequires: qt6-rpm-macros
-BuildRequires: qt6-qtbase-devel >= %{version}
-BuildRequires: qt6-qtbase-private-devel >= %{version}
+BuildRequires: qt-rpm-macros
+BuildRequires: qtbase-devel >= %{version}
+BuildRequires: qtbase-private-devel >= %{version}
 %{?_qt6:Requires: %{_qt6}%{?_isa} = %{_qt6_version}}
-BuildRequires: qt6-qtdeclarative-devel >= %{version}
+BuildRequires: qtdeclarative-devel >= %{version}
 BuildRequires: pkgconfig(bluez)
 BuildRequires: pkgconfig(xkbcommon) >= 0.4.1
 BuildRequires: openssl-devel
@@ -43,16 +47,16 @@ BuildRequires: openssl-devel
 %{summary}.
  
 %package devel
-Summary: Development files for %{name}
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: qt6-qtbase-devel%{?_isa}
+Summary:       Development files for %{name}
+Requires:      %{name}%{?_isa} = %{version}-%{release}
+Requires:      qtbase-devel%{?_isa}
 %description devel
 %{summary}.
  
 %if 0%{?examples}
 %package examples
-Summary: Programming examples for %{name}
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:       Programming examples for %{name}
+Requires:      %{name}%{?_isa} = %{version}-%{release}
 %description examples
 %{summary}.
 %endif
@@ -62,15 +66,14 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
  
  
 %build
-%cmake_qt6 -DQT_BUILD_EXAMPLES:BOOL=%{?examples:ON}%{!?examples:OFF}
- 
+%cmake_qt -DQT_BUILD_EXAMPLES:BOOL=%{?examples:ON}%{!?examples:OFF}
 %cmake_build
  
 %install
 %cmake_install
 ## .prl/.la file love
 # nuke .prl reference(s) to %%buildroot, excessive (.la-like) libs
-pushd %{buildroot}%{_qt6_libdir}
+pushd %{buildroot}%{_qt_libdir}
 for prl_file in libQt6*.prl ; do
   sed -i -e "/^QMAKE_PRL_BUILD_DIR/d" ${prl_file}
   if [ -f "$(basename ${prl_file} .prl).so" ]; then
@@ -84,36 +87,41 @@ popd
 %ldconfig_scriptlets
 %files
 %license LICENSES/GPL* LICENSES/LGPL*
-%{_qt6_libexecdir}/sdpscanner
-%{_qt6_libdir}/libQt6Bluetooth.so.6*
-%{_qt6_libdir}/libQt6Nfc.so.6*
+%{_qt_libexecdir}/sdpscanner
+%{_qt_libdir}/libQt6Bluetooth.so.6*
+%{_qt_libdir}/libQt6Nfc.so.6*
  
 %files devel
-%{_qt6_headerdir}/QtBluetooth/
-%{_qt6_libdir}/libQt6Bluetooth.so
-%{_qt6_libdir}/libQt6Bluetooth.prl
-%{_qt6_headerdir}/QtNfc/
-%{_qt6_libdir}/libQt6Nfc.so
-%{_qt6_libdir}/libQt6Nfc.prl
-%dir %{_qt6_libdir}/cmake/Qt6Bluetooth/
-%dir %{_qt6_libdir}/cmake/Qt6Nfc/
-%{_qt6_libdir}/cmake/Qt6/FindBlueZ.cmake
-%{_qt6_libdir}/cmake/Qt6/FindPCSCLITE.cmake
-%{_qt6_libdir}/cmake/Qt6BuildInternals/StandaloneTests/*.cmake
-%{_qt6_libdir}/cmake/Qt6Bluetooth/*.cmake
-%{_qt6_libdir}/cmake/Qt6Nfc/*.cmake
-%{_qt6_archdatadir}/mkspecs/modules/qt_lib_bluetooth*.pri
-%{_qt6_archdatadir}/mkspecs/modules/qt_lib_nfc*.pri
-%{_qt6_libdir}/qt6/modules/*.json
-%{_qt6_libdir}/qt6/metatypes/qt6*_metatypes.json
-%{_qt6_libdir}/pkgconfig/*.pc
+%{_qt_headerdir}/QtBluetooth/
+%{_qt_libdir}/libQt6Bluetooth.so
+%{_qt_libdir}/libQt6Bluetooth.prl
+%{_qt_headerdir}/QtNfc/
+%{_qt_libdir}/libQt6Nfc.so
+%{_qt_libdir}/libQt6Nfc.prl
+%dir %{_qt_libdir}/cmake/Qt6Bluetooth/
+%dir %{_qt_libdir}/cmake/Qt6Nfc/
+%{_qt_libdir}/cmake/Qt6/FindBlueZ.cmake
+%{_qt_libdir}/cmake/Qt6/FindPCSCLITE.cmake
+%{_qt_libdir}/cmake/Qt6BuildInternals/StandaloneTests/*.cmake
+%{_qt_libdir}/cmake/Qt6Bluetooth/*.cmake
+%{_qt_libdir}/cmake/Qt6Nfc/*.cmake
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_bluetooth*.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_nfc*.pri
+/usr/modules/*.json
+%{_qt_libdir}/qt6/metatypes/qt6*_metatypes.json
+%{_qt_libdir}/pkgconfig/*.pc
  
 %if 0%{?examples}
 %files examples
-%{_qt6_examplesdir}/
+%{_qt_examplesdir}/
 %endif
  
 %changelog
+* Tue Dec 02 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 6.5.7-1
+- Initial import from Fedora 37
+- Upgrade to 6.5.7
+- License Verified
+
 * Wed Jul 12 2023 Jan Grulich <jgrulich@redhat.com> - 6.5.1-2
 - Rebuild for qtbase private API version change
  
