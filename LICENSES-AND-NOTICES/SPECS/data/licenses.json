@@ -1910,7 +1910,7 @@
                 "qr-code-generator",
                 "qt-rpm-macros",
                 "qt5-qtconnectivity",
-                "qt5-qtsensors",
+                "qt6-qtsensors",
                 "qt5-qtserialport",
                 "qtbase",
                 "qtdeclarative",
