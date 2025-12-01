@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.5
-Release: 1001%{?dist}
+Release: 4%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
@@ -371,6 +371,9 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Tue Feb 3 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.5-4
+- Enable switching between SymCrypt-OpenSSL and openssl-fips-provider.
+
 * Thu Jan 29 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.3.5-3
 - Patch CVE-2025-69419, CVE-2026-22795, and CVE-2026-22796
 
