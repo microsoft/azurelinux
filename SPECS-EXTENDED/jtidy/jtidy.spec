@@ -63,6 +63,12 @@ build-jar-repository -s lib xerces-j2 xml-apis
 # jar
 install -d -m 0755 %{buildroot}%{_javadir}
 install -m 644 target/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
+
+# pom
+install -d -m 755 %{buildroot}%{_mavenpomdir}
+install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
+%add_maven_depmap %{name}.pom %{name}.jar -a net.sf.jtidy:%{name}
+
 # javadoc
 install -d -m 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -aL target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
@@ -81,6 +87,8 @@ EOF
 %license LICENSE.txt
 %{_javadir}/%{name}.jar
 %config(noreplace) %{_sysconfdir}/ant.d/%{name}
+/usr/share/maven-poms/%{name}.pom
+/usr/share/maven-metadata/%{name}.xml
 
 %files javadoc
 %defattr(0644,root,root,0755)
