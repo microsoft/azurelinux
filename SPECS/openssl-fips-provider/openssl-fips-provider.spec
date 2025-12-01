@@ -52,6 +52,10 @@ Patch24:  0024-load-legacy-prov.patch
 # # Load the SymCrypt provider by default if present in non-FIPS mode,
 # # and always load it implicitly in FIPS mode
 Patch32:  0032-Force-fips-3.1.2-AZL3-TEMP-SYMCRYPT.patch
+# # Embed HMAC into the fips.so
+Patch33:  0033-FIPS-embed-hmac-3.1.2-AZL.patch
+# # Comment out fipsinstall command-line utility
+Patch34:  0034.fipsinstall_disable-3.1.4-fedora.patch
 # # Skip unavailable algorithms running `openssl speed`
 Patch35:  0035-speed-skip-unavailable-dgst.patch
 # # Selectively disallow SHA1 signatures rhbz#2070977
@@ -178,6 +182,7 @@ export HASHBANGPERL=/usr/bin/perl
     enable-ec_nistp_64_gcc_128 \
     enable-ecdh \
     enable-ecdsa \
+    enable-fips \
     no-gost \
     no-idea \
     no-mdc2 \
@@ -228,8 +233,27 @@ export OPENSSL_ENABLE_SHA1_SIGNATURES
 %endif
 OPENSSL_SYSTEM_CIPHERS_OVERRIDE=xyz_nonexistent_file
 export OPENSSL_SYSTEM_CIPHERS_OVERRIDE
+#embed HMAC into fips provider for test run
+OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl dgst -binary -sha256 -mac HMAC -macopt hexkey:f4556650ac31d35461610bac4ed81b1a181b2d8a43ea2854cbae22ca74560813 < providers/fips.so > providers/fips.so.hmac
+objcopy --update-section .rodata1=providers/fips.so.hmac providers/fips.so providers/fips.so.mac
+mv providers/fips.so.mac providers/fips.so
 #run tests itself
 make test HARNESS_JOBS=8
+
+# Add generation of HMAC checksum of the final stripped library
+# We manually copy standard definition of __spec_install_post
+# and add hmac calculation/embedding to fips.so
+%define __spec_install_post \
+    %{?__debug_package:%{__debug_install_post}} \
+    %{__arch_install_post} \
+    %{__os_install_post} \
+    set -x \
+    OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl dgst -binary -sha256 -mac HMAC -macopt hexkey:f4556650ac31d35461610bac4ed81b1a181b2d8a43ea2854cbae22ca74560813 < $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so > $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.hmac \
+    objcopy --update-section .rodata1=$RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.hmac $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.mac \
+    mv $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.mac $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so \
+    rm $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so.hmac \
+    set +x \
+%{nil}
 
 %define __provides_exclude_from %{_libdir}/openssl
 
@@ -272,6 +296,10 @@ touch -r %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf
 
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.cnf.dist
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
+# TODO: TOBISAB: This is directly from https://src.fedoraproject.org/rpms/openssl/blob/f39/f/openssl.spec
+#                I need to do some sort of validation
+#we don't use native fipsmodule.cnf because FIPS module is loaded automatically
+rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fipsmodule.cnf
 
 # Determine which arch opensslconf.h is going to try to #include.
 basearch=%{_arch}
