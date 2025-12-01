@@ -10,6 +10,8 @@
 Summary:       Qt6 - Connectivity components
 Name:          qt6-%{qt_module}
 Version:       6.5.7
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
 
 %global majmin %(echo %{version} | cut -d. -f1-2)
 %global  qt_version %(echo %{version} | cut -d~ -f1)
