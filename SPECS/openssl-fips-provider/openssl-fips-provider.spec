@@ -7,7 +7,7 @@
 %global _performance_build 1
 
 Summary: Utilities from the general purpose cryptography library with TLS implementation
-Name: openssl
+Name: openssl-fips-provider
 Version: 3.3.5
 Release: 1%{?dist}
 Vendor:         Microsoft Corporation
@@ -143,7 +143,7 @@ package provides Perl scripts for converting certificates and keys
 from other formats to the formats used by the OpenSSL toolkit.
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
+%autosetup -p1 -n openssl-%{version}
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
