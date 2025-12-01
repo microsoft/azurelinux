@@ -51,7 +51,7 @@ make GH_VERSION="v%{version}" bin/gh manpages
 install -Dm755 bin/gh %{buildroot}%{_bindir}/gh
 install -d %{buildroot}%{_mandir}/man1/
 cp share/man/man1/* %{buildroot}%{_mandir}/man1
-rm %{buildroot}%{_mandir}/man1/gh-repo-license*
+mv %{buildroot}%{_mandir}/man1/gh-repo-license* .
 
 %check
 make test
@@ -61,6 +61,7 @@ make test
 %license LICENSE
 %doc README.md
 %{_bindir}/gh
+%license gh-repo-license*
 %{_mandir}/man1/*
 %{_datadir}/bash-completion/completions/gh
 %{_datadir}/fish/vendor_completions.d/gh.fish
