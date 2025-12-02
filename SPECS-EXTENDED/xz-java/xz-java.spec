@@ -85,7 +85,7 @@ mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 
 %changelog
 * Mon Nov 24 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.10-3
-- Initial Azure Linux import from openSUSE Tumbleweed (license: same as "License" tag).
+- Upgrade from openSUSE Tumbleweed.
 - License verified
 
 * Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.8-5
