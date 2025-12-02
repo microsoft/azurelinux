@@ -400,7 +400,7 @@ func tdnfInstall(packages []string) (err error) {
 			}
 
 			if !strings.HasSuffix(trimmedLine, alreadyInstalledPostfix) && trimmedLine != noMatchingPackagesErr {
-				err = fmt.Errorf("%s", trimmedLine)
+				err = fmt.Errorf(trimmedLine)
 				return
 			}
 		}

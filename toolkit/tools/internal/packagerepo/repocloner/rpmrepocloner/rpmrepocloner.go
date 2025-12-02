@@ -818,7 +818,7 @@ func tdnfDownload(args ...string) (err error, retriable bool) {
 		trimmedLine := strings.TrimSpace(line)
 		// If a package was not available, update err
 		if strings.HasPrefix(trimmedLine, unresolvedOutputPrefix) && strings.HasSuffix(trimmedLine, unresolvedOutputSuffix) {
-			err = fmt.Errorf("%s", trimmedLine)
+			err = fmt.Errorf(trimmedLine)
 			return
 		}
 	}

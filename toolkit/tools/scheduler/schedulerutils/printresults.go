@@ -344,11 +344,11 @@ func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuil
 	logger.Log.Info("--------- Summary ---------")
 	logger.Log.Info("---------------------------")
 
-	logger.Log.Info(color.GreenString(summaryLine("Number of prebuilt SRPMs:", len(prebuiltSRPMs))))
-	logger.Log.Info(color.GreenString(summaryLine("Number of prebuilt delta SRPMs:", len(prebuiltDeltaSRPMs))))
-	logger.Log.Info(color.GreenString(summaryLine("Number of skipped SRPMs tests:", len(skippedSRPMsTests))))
-	logger.Log.Info(color.GreenString(summaryLine("Number of built SRPMs:", len(builtSRPMs))))
-	logger.Log.Info(color.GreenString(summaryLine("Number of passed SRPMs tests:", len(passedSRPMsTests))))
+	logger.Log.Infof(color.GreenString(summaryLine("Number of prebuilt SRPMs:", len(prebuiltSRPMs))))
+	logger.Log.Infof(color.GreenString(summaryLine("Number of prebuilt delta SRPMs:", len(prebuiltDeltaSRPMs))))
+	logger.Log.Infof(color.GreenString(summaryLine("Number of skipped SRPMs tests:", len(skippedSRPMsTests))))
+	logger.Log.Infof(color.GreenString(summaryLine("Number of built SRPMs:", len(builtSRPMs))))
+	logger.Log.Infof(color.GreenString(summaryLine("Number of passed SRPMs tests:", len(passedSRPMsTests))))
 	printErrorInfoByCondition(len(unresolvedDependencies) > 0, summaryLine("Number of unresolved dependencies:", len(unresolvedDependencies)))
 	printErrorInfoByCondition(len(blockedSRPMs) > 0, summaryLine("Number of blocked SRPMs:", len(blockedSRPMs)))
 	printErrorInfoByCondition(len(blockedSRPMsTests) > 0, summaryLine("Number of blocked SRPMs tests:", len(blockedSRPMsTests)))
@@ -366,9 +366,9 @@ func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuil
 // If the condition is true, it prints an error level log and an info level one otherwise.
 func printErrorInfoByCondition(condition bool, format string, arg ...any) {
 	if condition {
-		logger.Log.Error(color.RedString(format, arg...))
+		logger.Log.Errorf(color.RedString(format, arg...))
 	} else {
-		logger.Log.Info(color.GreenString(format, arg...))
+		logger.Log.Infof(color.GreenString(format, arg...))
 	}
 }
 

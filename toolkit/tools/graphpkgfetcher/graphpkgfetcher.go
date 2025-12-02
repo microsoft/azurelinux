@@ -311,7 +311,7 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile stri
 		for _, dependant := range graph.NodesOf(dependencyGraph.To(n.ID())) {
 			errorMessage.WriteString(fmt.Sprintf("\t'%s' depends on '%s'\n", dependant.(*pkggraph.PkgNode), n))
 		}
-		logger.Log.Debug(errorMessage.String())
+		logger.Log.Debugf(errorMessage.String())
 	}
 	timestamp.StopEvent(nil) // clone graph
 	if stopOnFailure && !cachingSucceeded {

@@ -29,7 +29,7 @@ var partitionTableTypeToPartedArgument = map[PartitionTableType]string{
 }
 
 func (p PartitionTableType) String() string {
-	return string(p)
+	return fmt.Sprintf(string(p))
 }
 
 // GetValidPartitionTableTypes returns a list of all the supported
