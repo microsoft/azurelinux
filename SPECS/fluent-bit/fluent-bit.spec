@@ -91,8 +91,10 @@ Development files for %{name}
 
 %changelog
 * Mon Dec 01 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.1.10-2
-- Upgrade to 3.1.10
 - Patch for CVE-2025-12970
+
+* Mon Dec 01 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.1.10-1
+- Upgrade to 3.1.10
 
 * Thu Sep 25 2025 Aditya Singh <v-aditysing@microsoft.com> - 3.1.9-6
 - Patch for CVE-2025-58749
