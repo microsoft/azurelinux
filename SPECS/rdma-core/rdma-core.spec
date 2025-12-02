@@ -1,7 +1,7 @@
 Summary:        RDMA core userspace libraries and daemons
 Name:           rdma-core
-Version:        49.1
-Release:        1%{?dist}
+Version:        55.0
+Release:        2%{?dist}
 URL:            https://github.com/linux-rdma/rdma-core
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,7 +12,6 @@ Distribution:   Azure Linux
 #  providers/hfi1verbs Uses the 3 Clause BSD license
 License: GPLv2 or BSD
 Source0: https://github.com/linux-rdma/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
-Patch1: 0001-kernel-boot-Do-not-perform-device-rename-on-OPA-devi.patch
 
 # Do not build static libs by default.
 %define with_static %{?_with_static: 1} %{?!_with_static: 0}
@@ -400,20 +399,21 @@ fi
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/*.pc
 %{_mandir}/man3/efadv*
+%{_mandir}/man3/hnsdv*
 %{_mandir}/man3/ibv_*
 %{_mandir}/man3/rdma*
 %{_mandir}/man3/umad*
 %{_mandir}/man3/*_to_ibv_rate.*
 %{_mandir}/man7/rdma_cm.*
+%{_mandir}/man3/manadv*
 %{_mandir}/man3/mlx5dv*
 %{_mandir}/man3/mlx4dv*
 %{_mandir}/man7/efadv*
+%{_mandir}/man7/hnsdv*
+%{_mandir}/man7/manadv*
 %{_mandir}/man7/mlx5dv*
 %{_mandir}/man7/mlx4dv*
 %{_mandir}/man3/ibnd_*
-# New in v49.0
-%{_mandir}/man3/manadv*
-%{_mandir}/man7/manadv*
 
 %files -n infiniband-diags-compat
 %{_sbindir}/ibcheckerrs
@@ -528,6 +528,7 @@ fi
 %dir %{_sysconfdir}/libibverbs.d
 %dir %{_libdir}/libibverbs
 %{_libdir}/libefa.so.*
+%{_libdir}/libhns.so.*
 %{_libdir}/libibverbs*.so.*
 %{_libdir}/libibverbs/*.so
 %{_libdir}/libmlx5.so.*
@@ -624,6 +625,13 @@ fi
 %endif
 
 %changelog
+* Wed Oct 29 2025 Elaheh Dehghani <edehghani@microsoft.com> - 55.0-2
+- Promote rdma-core to PMC core repo
+
+* Tue Jan 07 2025 Elaheh Dehghani <edehghani@microsoft.com> - 55.0-1
+- Upgrade to version 55.0
+- Add rdma-core to PMC extended repo
+
 * Mon Jan 22 2024 Kanika Nema <kanikanema@microsoft.com> - 49.1-1
 - Upgrade to version 49.1 for AzL 3.0 release
 - Disable pyverbs as it cannot build with Cython > 3, the default for AzL 3.0

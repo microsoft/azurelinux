@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "rdma-core-49.1.tar.gz": "2e531d398073dd7ed28d95c94fa698e1a831952b508e9af93e36644dcd399936"
- }
+    "Signatures": {
+     "rdma-core-55.0.tar.gz": "6F8B97267807CDAE54845F542EE3D75DE80FDC24FE2632F5DB1573ECEF132D0F"
+    }
 }
