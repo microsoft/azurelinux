@@ -13,7 +13,7 @@ Release:       1%{?dist}
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License:       LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
 Url:           http://www.qt.io/
-Source0:       https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-opensource-src-%{version}.tar.xz#/%{qt_module}-everywhere-src-%{version}.tar.xz
+Source0:       https://download.qt.io/official_releases/qt/%{majmin}/%{version}/src/submodules/%{qt_module}-everywhere-opensource-src-%{version}.tar.xz#/%{qt_module}-everywhere-src-%{version}.tar.xz
 
 # filter qml/plugin provides
 %global __provides_exclude_from ^(%{_qt_archdatadir}/qml/.*\\.so|%{_qt_plugindir}/.*\\.so)$
