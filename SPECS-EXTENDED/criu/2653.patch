@@ -1,0 +1,134 @@
+From 22fdffbdde9476b27988b3ee0a4013a4453784c9 Mon Sep 17 00:00:00 2001
+From: Andrei Vagin <avagin@gmail.com>
+Date: Mon, 21 Apr 2025 06:33:41 +0000
+Subject: [PATCH] net: nftables: avoid restore failure if the CRIU nft table
+ already exist
+
+CRIU locks the network during restore in an "empty" network namespace.
+However, "empty" in this context means CRIU isn't restoring the
+namespace. This network namespace can be the same namespace where
+processes have been dumped and so the network is already locked in it.
+
+Fixes #2650
+
+Signed-off-by: Andrei Vagin <avagin@gmail.com>
+---
+ criu/cr-restore.c  |  2 +-
+ criu/include/net.h |  2 +-
+ criu/net.c         | 30 +++++++++++++++++-------------
+ 3 files changed, 19 insertions(+), 15 deletions(-)
+
+diff --git a/criu/cr-restore.c b/criu/cr-restore.c
+index 583b446e0b..30932f60a2 100644
+--- a/criu/cr-restore.c
++++ b/criu/cr-restore.c
+@@ -2119,7 +2119,7 @@ static int restore_root_task(struct pstree_item *init)
+ 		 * the '--empty-ns net' mode no iptables C/R is done and we
+ 		 * need to return these rules by hands.
+ 		 */
+-		ret = network_lock_internal();
++		ret = network_lock_internal(/* restore = */ true);
+ 		if (ret)
+ 			goto out_kill;
+ 	}
+diff --git a/criu/include/net.h b/criu/include/net.h
+index 5e8a848620..7c5ede21e1 100644
+--- a/criu/include/net.h
++++ b/criu/include/net.h
+@@ -31,7 +31,7 @@ extern int collect_net_namespaces(bool for_dump);
+ 
+ extern int network_lock(void);
+ extern void network_unlock(void);
+-extern int network_lock_internal(void);
++extern int network_lock_internal(bool restore);
+ 
+ extern struct ns_desc net_ns_desc;
+ 
+diff --git a/criu/net.c b/criu/net.c
+index ee46f1c495..300df480b0 100644
+--- a/criu/net.c
++++ b/criu/net.c
+@@ -3206,12 +3206,12 @@ static inline FILE *redirect_nftables_output(struct nft_ctx *nft)
+ }
+ #endif
+ 
+-static inline int nftables_lock_network_internal(void)
++static inline int nftables_lock_network_internal(bool restore)
+ {
+ #if defined(CONFIG_HAS_NFTABLES_LIB_API_0) || defined(CONFIG_HAS_NFTABLES_LIB_API_1)
+ 	cleanup_file FILE *fp = NULL;
+ 	struct nft_ctx *nft;
+-	int ret = 0;
++	int ret = 0, exit_code = -1;
+ 	char table[32];
+ 	char buf[128];
+ 
+@@ -3224,11 +3224,16 @@ static inline int nftables_lock_network_internal(void)
+ 
+ 	fp = redirect_nftables_output(nft);
+ 	if (!fp)
+-		goto out;
++		goto err2;
+ 
+ 	snprintf(buf, sizeof(buf), "create table %s", table);
+-	if (NFT_RUN_CMD(nft, buf))
++	ret = NFT_RUN_CMD(nft, buf);
++	if (ret) {
++		/* The network has been locked on dump. */
++		if (restore && errno == EEXIST)
++			return 0;
+ 		goto err2;
++	}
+ 
+ 	snprintf(buf, sizeof(buf), "add chain %s output { type filter hook output priority 0; policy drop; }", table);
+ 	if (NFT_RUN_CMD(nft, buf))
+@@ -3246,17 +3251,16 @@ static inline int nftables_lock_network_internal(void)
+ 	if (NFT_RUN_CMD(nft, buf))
+ 		goto err1;
+ 
+-	goto out;
+-
++	exit_code = 0;
++out:
++	nft_ctx_free(nft);
++	return exit_code;
+ err1:
+ 	snprintf(buf, sizeof(buf), "delete table %s", table);
+ 	NFT_RUN_CMD(nft, buf);
+ err2:
+-	ret = -1;
+ 	pr_err("Locking network failed using nftables\n");
+-out:
+-	nft_ctx_free(nft);
+-	return ret;
++	goto out;
+ #else
+ 	pr_err("CRIU was built without libnftables support\n");
+ 	return -1;
+@@ -3288,7 +3292,7 @@ static int iptables_network_lock_internal(void)
+ 	return ret;
+ }
+ 
+-int network_lock_internal(void)
++int network_lock_internal(bool restore)
+ {
+ 	int ret = 0, nsret;
+ 
+@@ -3301,7 +3305,7 @@ int network_lock_internal(void)
+ 	if (opts.network_lock_method == NETWORK_LOCK_IPTABLES)
+ 		ret = iptables_network_lock_internal();
+ 	else if (opts.network_lock_method == NETWORK_LOCK_NFTABLES)
+-		ret = nftables_lock_network_internal();
++		ret = nftables_lock_network_internal(restore);
+ 
+ 	if (restore_ns(nsret, &net_ns_desc))
+ 		ret = -1;
+@@ -3427,7 +3431,7 @@ int network_lock(void)
+ 	if (run_scripts(ACT_NET_LOCK))
+ 		return -1;
+ 
+-	return network_lock_internal();
++	return network_lock_internal(false);
+ }
+ 
+ void network_unlock(void)
