@@ -25843,8 +25843,8 @@
         "type": "other",
         "other": {
           "name": "qt6-qtsensors",
-          "version": "5.14.2",
-          "downloadUrl": "https://download.qt.io/official_releases/qt/5.14/5.14.2/submodules/qtsensors-everywhere-src-5.14.2.tar.xz"
+          "version": "6.5.7",
+          "downloadUrl": "https://download.qt.io/official_releases/qt/6.5/6.5.7/src/submodules/qtsensors-everywhere-opensource-src-6.5.7.tar.xz"
         }
       }
     },
