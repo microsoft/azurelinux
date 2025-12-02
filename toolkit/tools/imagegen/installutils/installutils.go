@@ -1652,7 +1652,7 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 		// Find the primary group of the user
 		stdout, stderr, err := shell.Execute("id", "-g", username)
 		if err != nil {
-			logger.Log.Warnf(stderr)
+			logger.Log.Warn(stderr)
 			return
 		}
 
