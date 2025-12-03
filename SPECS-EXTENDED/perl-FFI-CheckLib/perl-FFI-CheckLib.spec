@@ -63,23 +63,16 @@ Devel::CheckLib, but will find dynamic libraries even when development
 packages are not installed. It also provides a find_lib function that will
 return the full path to the found dynamic library, which can be feed directly
 into FFI::Platypus or FFI::Raw.
- 
+
+%if %{with tests}
 %package tests
-Summary:        Tests for %{name}
-Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       perl-Test-Harness
-# Tests:
-# File::Which is a run-time dependency on Darwin only. The code is exhibited by a test,
-# but never on Linux in production.
-Requires:       perl(File::Which)
-Requires:       perl(Test2::API) >= 1.302015
-Requires:       perl(Test2::Require::EnvVar) >= 0.000121
-Requires:       perl(Test2::Require::Module) >= 0.000121
-Requires:       perl(Test2::V0) >= 0.000121
- 
+Summary: Tests for %{name}
+Requires: %{name} = %{version}-%{release}
+
 %description tests
 Tests from %{name}. Execute them
 with "%{_libexecdir}/%{name}/test".
+%endif
  
 %prep
 %setup -q -n FFI-CheckLib-%{version}
@@ -121,10 +114,9 @@ make test
 %dir %{perl_vendorlib}/FFI
 %{perl_vendorlib}/FFI/CheckLib.pm
 %{_mandir}/man3/FFI::CheckLib.*
- 
-%files tests
 %{_libexecdir}/%{name}
 
+ 
 %changelog
 * Thu Nov 20 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.31-1
 - Upgrade to version 0.31 (license: MIT).
