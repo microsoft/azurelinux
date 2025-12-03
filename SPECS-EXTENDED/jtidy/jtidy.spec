@@ -87,8 +87,8 @@ EOF
 %license LICENSE.txt
 %{_javadir}/%{name}.jar
 %config(noreplace) %{_sysconfdir}/ant.d/%{name}
-/usr/share/maven-poms/%{name}.pom
-/usr/share/maven-metadata/%{name}.xml
+%exclude /usr/share/maven-poms/%{name}.pom
+%exclude /usr/share/maven-metadata/%{name}.xml
 
 %files javadoc
 %defattr(0644,root,root,0755)
@@ -100,7 +100,7 @@ EOF
 
 %changelog
 * Fri Nov 21 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.0.4-1
-- Upgrade to version 1.0.4 (license: MIT).
+- Upgrade to version 1.0.4 reference:openSUSE (license: MIT).
 - License verified
 
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0-32
