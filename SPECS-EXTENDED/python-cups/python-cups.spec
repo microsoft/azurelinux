@@ -1,25 +1,37 @@
 %{?filter_setup:
-%filter_provides_in %{python_sitearch}/.*\.so$ 
+%filter_provides_in %{python3_sitearch}/.*\.so$
 %filter_setup
 }
 
 Summary:       Python bindings for CUPS
 Name:          python-cups
-Version:       2.0.1
-Release:       2%{?dist}
+Version:       2.0.4
+Release:       4%{?dist}
 # older URL, but still with useful information about pycups
 #URL:           http://cyberelk.net/tim/software/pycups/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:           https://github.com/OpenPrinting/pycups/
 Source:        https://github.com/OpenPrinting/pycups/releases/download/v%{version}/pycups-%{version}.tar.gz
-License:       GPLv2+
+License:       GPL-2.0-or-later
+
+# all taken from upstream
+
 
 # gcc is no longer in buildroot by default
 BuildRequires: gcc
-
+# for autosetup
+BuildRequires: git-core
+# uses make
+BuildRequires: make
+BuildRequires: python3-pytest
+BuildRequires: python3-pytest-runner
 BuildRequires: cups-devel
 BuildRequires: python3-devel
+# distutils are removed from python3 project, use the one
+# from setuptools
+BuildRequires: python3-setuptools
+Provides: python3-cups
 
 %description
 This package provides Python bindings for CUPS API,
@@ -42,9 +54,7 @@ Summary:       Documentation for python-cups
 Documentation for python-cups.
 
 %prep
-%setup -n pycups-%{version}
-
-sed -i '/^#!\/usr\/bin\/python/d' examples/cupstree.py
+%autosetup -S git -n pycups-%{version}
 
 %build
 %py3_build
@@ -56,6 +66,9 @@ export PYTHONPATH=%{buildroot}%{python3_sitearch}
 %{__python3} -m pydoc -w cups
 %{_bindir}/mkdir html
 %{_bindir}/mv cups.html html
+
+%check
+python3 test.py
 
 %files -n python3-cups
 %doc README NEWS TODO
@@ -69,8 +82,82 @@ export PYTHONPATH=%{buildroot}%{python3_sitearch}
 %doc examples html
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.1-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.0.4-4
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 2.0.4-2
+- Rebuilt for Python 3.13
+
+* Thu Apr 18 2024 Zdenek Dohnal <zdohnal@redhat.com> - 2.0.4-1
+- 2275527,2275779 - 2.0.4, fix python-cups installation
+
+* Wed Apr 17 2024 Zdenek Dohnal <zdohnal@redhat.com> - 2.0.3-1
+- rebase to 2.0.3
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Nov 16 2023 Zdenek Dohnal <zdohnal@redhat.com> - 2.0.1-19
+- SPDX migration
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 2.0.1-17
+- Rebuilt for Python 3.12
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Oct 19 2022 Zdenek Dohnal <zdohnal@redhat.com> - 2.0.1-15
+- distutils will be removed in Python3.12, use setuptools instead
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 2.0.1-13
+- Rebuilt for Python 3.11
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jun 28 2021 Zdenek Dohnal <zdohnal@redhat.com> - 2.0.1-10
+- IPPRequest.writeIO() tracebacks because PY_SSIZE_T_CLEAN is not defined
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.0.1-9
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Dec 14 2020 Zdenek Dohnal <zdohnal@redhat.com> - 2.0.1-7
+- fix invalid delete (upstream ticket #11)
+
+* Thu Nov 05 2020 Zdenek Dohnal <zdohnal@redhat.com> - 2.0.1-6
+- make is no longer in buildroot by default
+- use smaller git-core instead of git
+
+* Fri Aug 28 2020 Zdenek Dohnal <zdohnal@redhat.com> - 2.0.1-5
+- 1873385 - ignore driverless utilities during tags creation
+
+* Wed Jul 29 2020 Zdenek Dohnal <zdohnal@redhat.com> - 2.0.1-4
+- use %%python3_sitearch in filter_provides_in, otherwise the package fails to build
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 2.0.1-2
+- Rebuilt for Python 3.9
 
 * Fri Apr 24 2020 Zdenek Dohnal <zdohnal@redhat.com> - 2.0.1-1
 - 2.0.1, fixes #1816107
