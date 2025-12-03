@@ -682,7 +682,13 @@ fi
 
 %files doc
 %doc %{pcmk_docdir}
+%exclude %{pcmk_docdir}/licenses/*
+%exclude %{pcmk_docdir}/COPYING
+%license COPYING
+%license licenses/GPLv2
 %license licenses/CC-BY-SA-4.0
+%license licenses/RevisedBSD
+%license licenses/LGPLv2.1
 
 %files cts
 %{python3_sitelib}/pacemaker/_cts/
