@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 # Run optional test
 %{bcond_without perl_FFI_Changes_enables_optional_test}
- 
+
 Name:           perl-FFI-CheckLib
 Version:        0.31
 Release:        1%{?dist}
@@ -98,7 +98,7 @@ done
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 %{make_build}
- 
+
 %install
 %{make_install}
 %{_fixperms} %{buildroot}/*
@@ -116,7 +116,7 @@ chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 unset CIPSOMETHING FFI_CHECKLIB_PATH
 export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 make test
- 
+
 %files
 %license LICENSE
 %doc Changes README
