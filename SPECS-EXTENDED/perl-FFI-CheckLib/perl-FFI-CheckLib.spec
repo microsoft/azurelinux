@@ -66,9 +66,18 @@ into FFI::Platypus or FFI::Raw.
 
 %if %{with tests}
 %package tests
-Summary: Tests for %{name}
-Requires: %{name} = %{version}-%{release}
-
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+# Tests:
+# File::Which is a run-time dependency on Darwin only. The code is exhibited by a test,
+# but never on Linux in production.
+Requires:       perl(File::Which)
+Requires:       perl(Test2::API) >= 1.302015
+Requires:       perl(Test2::Require::EnvVar) >= 0.000121
+Requires:       perl(Test2::Require::Module) >= 0.000121
+Requires:       perl(Test2::V0) >= 0.000121
+ 
 %description tests
 Tests from %{name}. Execute them
 with "%{_libexecdir}/%{name}/test".
