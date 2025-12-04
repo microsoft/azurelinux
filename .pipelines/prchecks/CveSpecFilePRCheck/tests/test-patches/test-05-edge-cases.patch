@@ -1,0 +1,14 @@
+--- a/SPECS/openssl/openssl.spec
++++ b/SPECS/openssl/openssl.spec
+@@ -68,6 +68,12 @@ Patch81:  Keep-the-provided-peer-EVP_PKEY-in-the-EVP_PKEY_CTX-too.patch
+ # algorithms that are used in the speed tests. This patch skips those tests.
+ # If SymCrypt adds support, we should change and eventually remove this patch.
+ Patch82:  prevent-unsupported-calls-into-symcrypt-in-speed.patch
++Patch100: cve-2024-11111.patch
++Patch101: CVE-2024-00999.patch
++Patch102: CVE-1999-00001.patch
++Patch103: CVE-2026-11111.patch
++Patch104: CVE-2024-11111-and-CVE-2024-22222-combined.patch
+ 
+ License: Apache-2.0
+ URL: http://www.openssl.org/
