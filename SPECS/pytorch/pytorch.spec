@@ -32,8 +32,12 @@ Patch7:         CVE-2021-22569.patch
 Patch8:         CVE-2025-32434.patch
 Patch9:         CVE-2025-3730.patch
 Patch10:        CVE-2025-2953.patch
+<<<<<<< HEAD
 Patch11:        CVE-2025-55560.patch
 Patch12:        CVE-2025-46152.patch
+=======
+Patch11:        CVE-2025-55552.patch
+>>>>>>> b449aded0 ([HIGH] Patch pytorch for CVE-2025-55552 (#15166))
 
 %description
 PyTorch is a Python package that provides two high-level features:
@@ -95,8 +99,13 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+<<<<<<< HEAD
 * Wed Oct 01 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.2-8
 - Patch for CVE-2025-55560 & CVE-2025-46152
+=======
+* Mon Nov 24 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.2.2-8
+- Patch CVE-2025-55552
+>>>>>>> b449aded0 ([HIGH] Patch pytorch for CVE-2025-55552 (#15166))
 
 * Tue Apr 29 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.2.2-7
 - Patch CVE-2025-2953
