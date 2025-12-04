@@ -1,6 +1,6 @@
 Summary:	Connection pooler for PostgreSQL.
 Name:		pgbouncer
-Version:	1.24.1
+Version:	1.25.1
 Release:	1%{?dist}
 License:	ISC License
 URL:		https://www.pgbouncer.org/
@@ -80,6 +80,9 @@ fi
 /usr/share/doc/pgbouncer/*
 
 %changelog
+* Thu Dec 04 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.1-1
+- Auto-upgrade to 1.25.1 - for CVE-2025-12819
+
 * Tue Apr 22 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.24.1-1
 - Auto-upgrade to 1.24.1 - bump version to fix CVE-2025-2291
 
