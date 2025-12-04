@@ -32,8 +32,7 @@ Patch10:        CVE-2025-22869.patch
 Patch11:        CVE-2025-30204.patch
 Patch12:        CVE-2024-51744.patch
 Patch13:        CVE-2025-22872.patch
-Patch14:        CVE-2025-52565.patch
-Patch15:        CVE-2025-52881.patch
+Patch14:        CVE-2025-52881.patch
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
 BuildRequires:  golang
@@ -280,7 +279,7 @@ fi
 
 %changelog
 * Fri Nov 21 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.4-20
-- Patch for CVE-2025-52881, CVE-2025-52565
+- Patch for CVE-2025-52881
 
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.28.4-19
 - Bump release to rebuild with golang
