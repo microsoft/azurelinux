@@ -10571,8 +10571,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.39",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.39.tar.xz"
+          "version": "1.6.51",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.51.tar.xz"
         }
       }
     },
@@ -13653,8 +13653,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.24.10",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.10-1/go1.24.10-20251105.4.src.tar.gz"
+          "version": "1.24.11",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.11-1/go1.24.11-20251202.3.src.tar.gz"
         }
       }
     },
