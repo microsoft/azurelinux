@@ -22,6 +22,8 @@ Pgbouncer is a light-weight, robust connection pooler for PostgreSQL.
 
 %prep
 %setup
+#Prevent the installation of manpages since it depends on the pandoc package
+sed -i 's|dist_man_MANS = doc/pgbouncer.1 doc/pgbouncer.5|dist_man_MANS =|' Makefile
 
 %build
 %configure --datadir=%{_datadir}
@@ -75,13 +77,12 @@ fi
 %{_bindir}/*
 /etc/systemd/system/%{name}.service
 %config(noreplace) %{_sysconfdir}/%{name}.ini
-%{_mandir}/man1/%{name}.*
-%{_mandir}/man5/%{name}.*
 /usr/share/doc/pgbouncer/*
 
 %changelog
 * Thu Dec 04 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.1-1
 - Auto-upgrade to 1.25.1 - for CVE-2025-12819
+- Prevent the installation of manpages since it depends on the pandoc package
 
 * Tue Apr 22 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.24.1-1
 - Auto-upgrade to 1.24.1 - bump version to fix CVE-2025-2291
