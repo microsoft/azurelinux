@@ -1,0 +1,63 @@
+From 607d529c70e8f021003237a674beedec7b422de5 Mon Sep 17 00:00:00 2001
+From: Sharath Srikanth Chellappa <sharathsr@microsoft.com>
+Date: Mon, 7 Jul 2025 12:43:42 -0700
+Subject: [PATCH] Modifying Golang version and adding makefile targets for
+ development
+
+These changes will potentially be removed as the upstream carries out a new release.
+
+1. Go version upgraded from 1.23.x to 1.24.0 in:
+    - Dockerfile
+    - go.mod
+    - hack/tools/go.mod
+
+2. Makefile updated to use CGO_ENABLED=1 for building the manager binary
+   to support the building of the manager binary in Azure Linux [0].
+
+   [0] - https://devblogs.microsoft.com/go/microsoft-go-defaults-to-system-crypto/#will-this-break-my-builds
+
+---
+ Makefile          | 2 +-
+ go.mod            | 2 +-
+ hack/tools/go.mod | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index e210ed5..0d1b09c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -127,7 +127,7 @@ run-conformance:
+ 
+ .PHONY: manager
+ manager: ## Build manager binary
+-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o $(BIN_DIR)/manager
++	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o $(BIN_DIR)/manager
+ 
+ $(CONTROLLER_GEN): $(TOOLS_DIR)/go.mod # Build controller-gen from tools folder.
+ 	cd $(TOOLS_DIR); go build -tags=tools -o $(BIN_DIR)/controller-gen sigs.k8s.io/controller-tools/cmd/controller-gen
+diff --git a/go.mod b/go.mod
+index a312010..d59a315 100644
+--- a/go.mod
++++ b/go.mod
+@@ -1,6 +1,6 @@
+ module sigs.k8s.io/cluster-api-provider-kubevirt
+ 
+-go 1.23.6
++go 1.24.0
+ 
+ require (
+ 	github.com/go-logr/logr v1.4.2
+diff --git a/hack/tools/go.mod b/hack/tools/go.mod
+index cf216bb..7e19388 100644
+--- a/hack/tools/go.mod
++++ b/hack/tools/go.mod
+@@ -1,6 +1,6 @@
+ module sigs.k8s.io/cluster-api-provider-aws/hack/tools
+ 
+-go 1.23.0
++go 1.24.0
+ 
+ require (
+ 	gotest.tools/gotestsum v1.12.0
+-- 
+2.49.0
