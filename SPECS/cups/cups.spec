@@ -9,7 +9,7 @@
 %bcond_with missing_dependencies
 Summary:        CUPS printing system
 Name:           cups
-Version:        2.4.13
+Version:        2.4.16
 Release:        1%{?dist}
 License:        ASL 2.0 with exceptions
 Vendor:         Microsoft Corporation
@@ -511,6 +511,13 @@ rm -f %{cups_serverbin}/backend/smb
 %{_datadir}/cups/ppdc/*.h
 %dir %{_datadir}/cups/templates
 %{_datadir}/cups/templates/*.tmpl
+%{_datadir}/cups/templates/da/*.tmpl
+%{_datadir}/cups/templates/de/*.tmpl
+%{_datadir}/cups/templates/es/*.tmpl
+%{_datadir}/cups/templates/fr/*.tmpl
+%{_datadir}/cups/templates/ja/*.tmpl
+%{_datadir}/cups/templates/pt_BR/*.tmpl
+%{_datadir}/cups/templates/ru/*.tmpl
 %dir %{_datadir}/%{name}/usb
 %{_datadir}/%{name}/usb/org.cups.usb-quirks
 %dir %{_datadir}/%{name}/www
@@ -523,6 +530,13 @@ rm -f %{cups_serverbin}/backend/smb
 %{_datadir}/%{name}/www/help
 %{_datadir}/%{name}/www/robots.txt
 %{_datadir}/%{name}/www/apple-touch-icon.png
+%{_datadir}/%{name}/www/da/index.html
+%{_datadir}/%{name}/www/de/index.html
+%{_datadir}/%{name}/www/es/index.html
+%{_datadir}/%{name}/www/fr/index.html
+%{_datadir}/%{name}/www/ja/index.html
+%{_datadir}/%{name}/www/pt_BR/index.html
+%{_datadir}/%{name}/www/ru/index.html
 %{_datadir}/pixmaps/cupsprinter.png
 %dir %attr(1770,root,lp) %{_localstatedir}/spool/cups/tmp
 %dir %attr(0710,root,lp) %{_localstatedir}/spool/cups
@@ -628,6 +642,9 @@ rm -f %{cups_serverbin}/backend/smb
 %{_mandir}/man7/ippeveps.7.gz
 
 %changelog
+* Thu Dec 04 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.16-1
+- Auto-upgrade to 2.4.16 - for CVE-2025-58436, CVE-2025-61915
+
 * Fri Sep 12 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.13-1
 - Auto-upgrade to 2.4.13 - for CVE-2025-58060
 
