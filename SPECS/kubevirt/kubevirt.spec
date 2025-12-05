@@ -19,8 +19,8 @@
 
 Summary:        Container native virtualization
 Name:           kubevirt
-Version:        1.5.0
-Release:        5%{?dist}
+Version:        1.5.3
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,13 +30,12 @@ Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{versio
 # The containers_meta packages and associated files are not required for the Mariner build
 # Nexus team needs these to-be-upstreamed patches for the operator Edge to work
 # correctly.
-Patch0:         CVE-2025-22869.patch
-Patch1:         CVE-2025-22872.patch
+Patch0:         CVE-2025-47913.patch
 
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-15%{?dist}
+BuildRequires:  glibc-static >= 2.38-16%{?dist}
 BuildRequires:  golang >= 1.21
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -269,6 +268,15 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Mon Nov 24 2025 Andrew Phelps <anphel@microsoft.com> - 1.5.3-2
+- Bump to rebuild with updated glibc
+
+* Mon Nov 24 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.3-1
+- Auto-upgrade to 1.5.3 - for CVE-2025-64437, CVE-2025-64433, CVE-2025-64434, CVE-2025-64432
+
+* Tue Nov 18 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.5.0-6
+- Patch for CVE-2025-47913
+
 * Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.5.0-5
 - Bump to rebuild with updated glibc
 
