@@ -5,13 +5,15 @@
 Summary:	 XPMEM: Cross-partition memory
 Name:		 xpmem-lib
 Version:	 2.7
-Release:	 1%{?dist}
+Release:	 2%{?dist}
 License:	 GPLv2
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/xpmem-lib-2.7.tar.gz#/%{name}-%{version}.tar.gz
-ExclusiveArch:   x86_64
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
 
 BuildRequires: automake
 BuildRequires: autoconf
@@ -83,6 +85,10 @@ rm -rf ${RPM_BUILD_ROOT}/etc  # /etc/.version , udev rules
 %{_libdir}/pkgconfig/cray-xpmem.pc
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7-2
+- Build with MOFED 25.07-0.9.7.1.
+- Update source path
+
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

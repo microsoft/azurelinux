@@ -28,18 +28,21 @@
 #  $Id: ofed-scripts.spec 8402 2006-07-06 06:35:57Z vlad $
 #
 
-%global         MLNX_OFED_VERSION 24.10-0.7.0.0
+%global         MLNX_OFED_VERSION 25.07.0.9.7.1
 
 Summary:        OFED scripts
 Name:           ofed-scripts
-Version:        24.10
+Version:        25.07
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://www.openfabrics.org
-Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/%{MLNX_OFED_VERSION}/SRPMS/%{name}-%{version}.tar.gz
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
 
 BuildRoot:      %{?build_root:%{build_root}}%{!?build_root:/var/tmp/%{name}-%{version}-root}
 
@@ -147,6 +150,10 @@ echo "/etc/ld.so.conf.d/ofed.conf" >> ofed-files
 %{_prefix}/sbin/*
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1
+- Upgrade version to 25.07.
+- Update source path
+
 * Wed Jan 08 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> 24.10-1
 - Upgrade version to 24.10.0
 

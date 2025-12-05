@@ -9,7 +9,7 @@
 %global _prefix /opt/mellanox/iproute2
 %global _exec_prefix %{_prefix}
 %global package_name mlnx-iproute2
-%global package_version 6.10.0
+%global package_version 6.15.0
 %global configs_under_prefix 1
 %global netns_package_name netns-mlnx
 
@@ -32,20 +32,23 @@
 	%global netns_config_dir %{_sysconfdir}/%{netns_package_name}
 %endif
 
-Summary:	Advanced IP routing and network device configuration tools
-Name:		mlnx-iproute2
-Version:	6.10.0
-Release:        2%{?dist}
-License:	GPLv2
-Group:		Networking/Admin
+Summary:        Advanced IP routing and network device configuration tools
+Name:           mlnx-iproute2
+Version:        6.15.0
+Release:        1%{?dist}
+License:        GPLv2
+Group:          Networking/Admin
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-iproute2-6.10.0.tar.gz#/%{name}-%{version}.tar.gz
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
 URL:		http://www.linuxfoundation.org/collaborate/workgroups/networking/iproute2
-ExclusiveArch:   x86_64
 
 BuildRequires:	bison
 BuildRequires:	flex
+BuildRequires:  libmnl-devel
 BuildRoot:	/var/tmp/%{name}-%{version}-build
 
 %description
@@ -111,6 +114,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/*
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.15.0-1
+- Upgrade version to 6.15.0.
+- Update source path
+
+* Wed Oct 29 2025 Elaheh Dehghani <edehghani@microsoft.com> - 6.10.0-3
+- Enable build on aarch64.
+
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified

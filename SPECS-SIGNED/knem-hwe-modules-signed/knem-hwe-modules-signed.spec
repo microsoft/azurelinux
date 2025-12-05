@@ -44,14 +44,13 @@
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
 Name:		 %{_name}-signed
 Version:	 1.1.4.90mlnx3
-Release:	 24%{release_suffix}%{?dist}
+Release:	 25%{release_suffix}%{?dist}
 Provides:	 knem-hwe-mlnx = %{version}-%{release}
 Obsoletes:	 knem-hwe-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-ExclusiveArch:   aarch64
 
 
 #
@@ -111,6 +110,10 @@ fi
 /lib/modules/
 
 %changelog
+* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.4.90mlnx3-25_6.12.57.1.1
+- Build with OFED 25.07.0.9.7.1.
+- Enable build on x86_64 kernel hwe.
+
 * Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 1.1.4.90mlnx3-24_6.12.57.1.1
 - Bump to match kernel-hwe
 
