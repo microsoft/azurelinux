@@ -20,11 +20,8 @@ Patch5:         CVE-2022-1941.patch
 Patch6:         CVE-2025-32434.patch
 Patch7:         CVE-2025-3730.patch
 Patch8:         CVE-2025-2953.patch
-<<<<<<< HEAD
-Patch9:         CVE-2025-55560.patch
-=======
-Patch9:         CVE-2025-55552.patch
->>>>>>> 49861f978 ([HIGH] Patch pytorch for CVE-2025-55552 (#15198))
+ Patch9:         CVE-2025-55552.patch
+ Patch10:        CVE-2025-55560.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -97,13 +94,10 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
-<<<<<<< HEAD
-* Wed Oct 01 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-10
-- Patch for CVE-2025-55560
-=======
-* Fri Nov 28 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.0.0-10
-- Patch CVE-2025-55552
->>>>>>> 49861f978 ([HIGH] Patch pytorch for CVE-2025-55552 (#15198))
+ * Fri Nov 28 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.0.0-11
+ - Patch CVE-2025-55552
+ * Wed Oct 01 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-10
+ - Patch for CVE-2025-55560
 
 * Tue Apr 29 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.0.0-9
 - Patch CVE-2025-2953
