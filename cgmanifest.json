@@ -25852,9 +25852,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "qt5-qtserialport",
-          "version": "5.15.9",
-          "downloadUrl": "https://download.qt.io/official_releases/qt/5.15/5.15.9/submodules/qtserialport-everywhere-opensource-src-5.15.9.tar.xz"
+          "name": "qt6-qtserialport",
+          "version": "6.5.7",
+          "downloadUrl": "https://download.qt.io/official_releases/qt/6.5/6.5.7/src/submodules/qtserialport-everywhere-opensource-src-6.5.7.tar.xz"
         }
       }
     },
