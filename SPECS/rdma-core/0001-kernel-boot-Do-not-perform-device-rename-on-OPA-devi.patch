@@ -1,0 +1,17 @@
+diff -Naur rdma-core-36.3-a/kernel-boot/rdma-persistent-naming.rules rdma-core-36.3-b/kernel-boot/rdma-persistent-naming.rules
+--- rdma-core-36.3-a/kernel-boot/rdma-persistent-naming.rules	2022-01-07 00:54:18.000000000 -0800
++++ rdma-core-36.3-b/kernel-boot/rdma-persistent-naming.rules	2022-02-03 15:10:26.763415015 -0800
+@@ -26,10 +26,10 @@
+ #   Device type = RoCE
+ #   mlx5_0 -> rocex525400c0fe123455
+ #
+-ACTION=="add", SUBSYSTEM=="infiniband", PROGRAM="rdma_rename %k NAME_FALLBACK"
++ACTION=="add", SUBSYSTEM=="infiniband", KERNEL!="hfi1*", PROGRAM="rdma_rename %k NAME_FALLBACK"
+ 
+ # Example:
+ # * NAME_FIXED 
+ #   fixed name for specific board_id
+ #
+-#ACTION=="add", ATTR{board_id}=="MSF0010110035", SUBSYSTEM=="infiniband", PROGRAM="rdma_rename %k NAME_FIXED myib"
+\ No newline at end of file
++#ACTION=="add", ATTR{board_id}=="MSF0010110035", SUBSYSTEM=="infiniband", PROGRAM="rdma_rename %k NAME_FIXED myib"

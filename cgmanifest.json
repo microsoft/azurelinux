@@ -26023,6 +26023,16 @@
         "type": "other",
         "other": {
           "name": "rdma-core",
+          "version": "49.1",
+          "downloadUrl": "https://github.com/linux-rdma/rdma-core/releases/download/v49.1/rdma-core-49.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rdma-core",
           "version": "59.0",
           "downloadUrl": "https://github.com/linux-rdma/rdma-core/releases/download/v59.0/rdma-core-59.0.tar.gz"
         }
@@ -29368,6 +29378,16 @@
           "name": "ucs-miscfixed-fonts",
           "version": "0.3",
           "downloadUrl": "http://www.cl.cam.ac.uk/~mgk25/download/ucs-fonts.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ucx",
+          "version": "1.15.0",
+          "downloadUrl": "https://github.com/openucx/ucx/releases/download/v1.15.0/ucx-1.15.0.tar.gz"
         }
       }
     },
