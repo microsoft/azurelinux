@@ -8101,8 +8101,8 @@
         "type": "other",
         "other": {
           "name": "jtidy",
-          "version": "8.0",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/jtidy-r813.tar.bz2"
+          "version": "1.0.4",
+          "downloadUrl": "https://github.com/jtidy/jtidy/archive/refs/tags/jtidy-1.0.4.tar.gz"
         }
       }
     },
