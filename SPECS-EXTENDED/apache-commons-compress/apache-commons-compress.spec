@@ -111,8 +111,6 @@ mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 %{_javadocdir}/%{name}
 %license LICENSE.txt
 %license NOTICE.txt
-%exclude /usr/share/doc/apache-commons-compress-javadoc/NOTICE.txt
-%exclude /usr/share/doc/apache-commons-compress/NOTICE.txt
 
 %changelog
 * Fri Nov 21 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.26.1-1
