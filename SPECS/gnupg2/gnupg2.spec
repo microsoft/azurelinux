@@ -1,13 +1,14 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
 Version:        2.4.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Cryptography.
 URL:            https://gnupg.org/index.html
 Source0:        https://gnupg.org/ftp/gcrypt/gnupg/gnupg-%{version}.tar.bz2
+Patch0:         CVE-2025-30258.patch
 BuildRequires:  zlib-devel
 BuildRequires:  bzip2-devel
 BuildRequires:  readline-devel
@@ -48,7 +49,7 @@ Requires: %{name} = %{version}-%{release}
 These are the additional language files of gnupg2
 
 %prep
-%autosetup -n gnupg-%{version}
+%autosetup -p1 -n gnupg-%{version}
 
 %build
 # Prevent GnuPG from using keyboxd for storing keys.
@@ -105,6 +106,9 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %defattr(-,root,root)
 
 %changelog
+* Mon Nov 10 2025 Ratiranjan Behera <v-ratbehera@microsoft.com> - 2.4.7-2
+- Add patch for CVE-2025-30258
+
 * Mon Jun 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.4.7-1
 - Upgrade to version 2.4.7
 
