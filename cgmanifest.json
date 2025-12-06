@@ -335,8 +335,8 @@
         "type": "other",
         "other": {
           "name": "apache-commons-compress",
-          "version": "1.19",
-          "downloadUrl": "http://archive.apache.org/dist/commons/compress/source/commons-compress-1.19-src.tar.gz"
+          "version": "1.26.1",
+          "downloadUrl": "https://archive.apache.org/dist/commons/compress/source/commons-compress-1.26.1-src.tar.gz"
         }
       }
     },
@@ -31139,8 +31139,8 @@
         "type": "other",
         "other": {
           "name": "xz-java",
-          "version": "1.8",
-          "downloadUrl": "http://tukaani.org/xz/xz-java-1.8.zip"
+          "version": "1.10",
+          "downloadUrl": "https://tukaani.org/xz/xz-java-1.10.zip"
         }
       }
     },
