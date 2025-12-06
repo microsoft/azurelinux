@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.0.0
-Release: 15%{?dist}
+Release: 16%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -20,14 +20,11 @@ Patch0:	CVE-2024-45338.patch
 Patch1:	CVE-2025-27144.patch
 Patch2:	CVE-2024-40635.patch
 Patch3:	CVE-2025-22872.patch
-Patch4:	CVE-2025-47291.patch
-Patch5:	multi-snapshotters-support.patch
-Patch6:	tardev-support.patch
-<<<<<<< HEAD
-Patch7:	CVE-2025-64329.patch
-=======
-Patch7:	CVE-2024-25621.patch
->>>>>>> 02a30ce23 ([AutoPR- Security] Patch containerd2 for CVE-2024-25621 [HIGH] (#15053))
+Patch4: CVE-2025-47291.patch
+Patch5: multi-snapshotters-support.patch
+Patch6: tardev-support.patch
+Patch7: CVE-2024-25621.patch
+Patch8: CVE-2025-64329.patch
 %{?systemd_requires}
 
 BuildRequires: golang < 1.25
@@ -103,14 +100,10 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
-<<<<<<< HEAD
-* Sat Nov 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-15
-- Patch for CVE-2025-64329
-=======
 * Tue Nov 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-15
 - Patch for CVE-2024-25621
->>>>>>> 02a30ce23 ([AutoPR- Security] Patch containerd2 for CVE-2024-25621 [HIGH] (#15053))
-
+* Sat Dec 06 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-16
+- Patch for CVE-2025-64329
 * Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 2.0.0-14
 - Set BR for golang to < 1.25
 
