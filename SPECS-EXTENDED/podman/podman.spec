@@ -68,7 +68,7 @@ BuildRequires: ostree-devel
 BuildRequires: systemd
 BuildRequires: systemd-devel
 Requires: catatonit
-Requires: conmon >= 2:2.1.7-2
+Requires: conmon >= 2.1.7-2
 Requires: libcontainers-common
 Provides: %{name}-quadlet = %{epoch}:%{version}-%{release}
 
@@ -89,6 +89,7 @@ Summary: Emulate Docker CLI using %{name}
 BuildArch: noarch
 Requires: %{name} = %{epoch}:%{version}-%{release}
 Conflicts: docker
+Conflicts: docker-cli
 Conflicts: docker-latest
 Conflicts: docker-ce
 Conflicts: docker-ee
@@ -114,6 +115,8 @@ Requires: slirp4netns
 Requires: buildah
 Requires: gnupg
 Requires: xfsprogs
+Requires: crun
+Requires: netavark
 
 %description tests
 %{summary}

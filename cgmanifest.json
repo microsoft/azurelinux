@@ -2297,8 +2297,18 @@
         "type": "other",
         "other": {
           "name": "criu",
-          "version": "3.15",
-          "downloadUrl": "http://download.openvz.org/criu/criu-3.15.tar.bz2"
+          "version": "4.1.1",
+          "downloadUrl": "https://github.com/checkpoint-restore/criu/archive/v4.1.1/criu-4.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "crun",
+          "version": "1.24",
+          "downloadUrl": "https://github.com/containers/crun/releases/download/1.24/crun-1.24.tar.gz"
         }
       }
     },
