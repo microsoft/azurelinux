@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.75.0
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -46,6 +46,7 @@ Patch1:         CVE-2024-32884.patch
 Patch2:         CVE-2024-31852.patch
 Patch3:         CVE-2025-4574_1.75.patch
 Patch4:         CVE-2025-53605_1.75.patch
+Patch5:         CVE-2023-48795_1.75.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -180,6 +181,9 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Mon Nov 24 2025 Kshitiz Godara <kgodara@microsoft.com> - 1.75.0-23
+- Patch for CVE-2023-48795
+
 * Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 1.75.0-22
 - Bump to rebuild with updated glibc
 
