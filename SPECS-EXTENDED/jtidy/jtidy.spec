@@ -73,6 +73,8 @@ install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 install -d -m 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -aL target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 %fdupes -s %{buildroot}%{_javadocdir}/%{name}
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 
 # shell script
 %jpackage_script org.w3c.tidy.Tidy "" "" %{name}:xerces-j2:xml-apis %{name} true
@@ -85,6 +87,8 @@ EOF
 
 %files
 %license LICENSE.txt
+%license LICENSE
+%license ADDITIONAL_LICENSE_INFO
 %{_javadir}/%{name}.jar
 %config(noreplace) %{_sysconfdir}/ant.d/%{name}
 %exclude /usr/share/maven-poms/%{name}.pom
