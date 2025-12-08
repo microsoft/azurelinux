@@ -21,10 +21,7 @@ BuildRequires:  git
 The command line for DC/OS.
 
 %prep
-%autosetup -N
-%autopatch -p1 0 1
-cd vendor/github.com/dgrijalva/jwt-go
-%autopatch 2
+%autosetup -p1
 
 %build
 export GOPATH=%{our_gopath}
