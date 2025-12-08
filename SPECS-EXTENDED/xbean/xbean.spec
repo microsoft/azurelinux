@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 #
 # spec file for package xbean
 #
-# Copyright (c) 2020 SUSE LLC
+# Copyright (c) 2024 SUSE LLC
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -19,34 +19,27 @@ Distribution:   Azure Linux
 
 
 Name:           xbean
-Version:        4.18
+Version:        4.20
 Release:        1%{?dist}
 Summary:        Java plugin based web server
 License:        ASL 2.0
 Group:          Development/Libraries/Java
 URL:            https://geronimo.apache.org/xbean/
-Source0:        http://repo2.maven.org/maven2/org/apache/%{name}/%{name}/%{version}/%{name}-%{version}-source-release.zip
-Patch1:         0001-Remove-unused-import.patch
-# Fix dependency on xbean-asm4-shaded to original objectweb-asm
+Source0:        https://repo1.maven.org/maven2/org/apache/%{name}/%{name}/%{version}/%{name}-%{version}-source-release.zip
+Source1:        %{name}-build.tar.xz
 Patch2:         0002-Unbundle-ASM.patch
 Patch3:         0003-Remove-dependency-on-log4j-and-commons-logging.patch
-Patch4:         downgrading-asm-version.patch
-Patch5:         jdk-11-fix.patch
-
+BuildRequires:  ant
+BuildRequires:  ant-junit
+BuildRequires:  junit
 BuildRequires:  fdupes
 BuildRequires:  java-devel >= 1.8
-BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  objectweb-asm >= 5
+BuildRequires:  javapackages-local-bootstrap >= 6
+BuildRequires:  javapackages-tools
+BuildRequires:  objectweb-asm >= 9
 BuildRequires:  slf4j
 BuildRequires:  unzip
-# The code uses sun.misc.URLClassloader
-BuildConflicts: java-devel >= 9
-BuildConflicts: java-headless >= 9
-# Avoid build cycles
-BuildConflicts: java-devel-openj9
-BuildConflicts: java-headless-openj9
-Requires:       objectweb-asm >= 5
-Requires:       slf4j
+BuildRequires:  xml-commons-apis
 BuildArch:      noarch
 
 %description
@@ -65,91 +58,59 @@ Group:          Documentation/HTML
 This package provides API documentation for xbean.
 
 %prep
-%setup -q
-# build failing on this due to doxia-sitetools problems
-rm src/site/site.xml
+%autosetup -p1 -a1
 
-%patch 1 -p1
-%patch 2 -p1
-%patch 3 -p1
-%patch 4 -p1
-%patch 5 -p1
+cp xbean-asm-util/src/main/java/org/apache/xbean/asm9/original/commons/AsmConstants.java xbean-reflect/src/main/java/org/apache/xbean/recipe/
 
-%pom_remove_parent
-%pom_remove_dep mx4j:mx4j
-
-%pom_remove_dep -r :xbean-finder-shaded
-%pom_disable_module xbean-finder-shaded
-
-%pom_xpath_remove pom:scope xbean-asm-util
-%pom_xpath_remove pom:optional xbean-asm-util
-
-# Prevent modules depending on springframework from building.
-%pom_remove_dep org.springframework:
 %pom_disable_module xbean-classloader
-%pom_disable_module xbean-spring
-%pom_disable_module maven-xbean-plugin
-rm -rf maven-xbean-plugin
-# blueprint FTBFS, disable for now
-%pom_disable_module xbean-blueprint
-
-%pom_remove_dep :xbean-bundleutils xbean-finder
-rm -r xbean-finder/src/main/java/org/apache/xbean/finder{,/archive}/Bundle*
+%pom_disable_module xbean-classpath
 %pom_disable_module xbean-bundleutils
-
+%pom_disable_module xbean-asm9-shaded
+%pom_disable_module xbean-finder-shaded
+%pom_disable_module xbean-naming
+%pom_disable_module xbean-blueprint
+%pom_disable_module xbean-spring
 %pom_disable_module xbean-telnet
+%pom_disable_module maven-xbean-plugin
 
-# maven-xbean-plugin invocation makes no sense as there are no namespaces
-%pom_remove_plugin :maven-xbean-plugin xbean-classloader
-
-# As auditing tool RAT is useful for upstream only.
-%pom_remove_plugin :apache-rat-plugin
-
-# disable copy of internal aries-blueprint
-sed -i "s|<Private-Package>|<!--Private-Package>|" xbean-blueprint/pom.xml
-sed -i "s|</Private-Package>|</Private-Package-->|" xbean-blueprint/pom.xml
-
-%pom_change_dep -r -f ::::: :::::
-
-# Removing dependency on Apache commons logging
 %pom_remove_dep :commons-logging-api xbean-reflect
-find -name CommonsLoggingConverter.java -delete
-
-# Removing dependency on log4j.
 %pom_remove_dep :log4j xbean-reflect
+%pom_remove_dep :xbean-asm9-shaded xbean-reflect
+find -name CommonsLoggingConverter.java -delete
 find -name Log4jConverter.java -delete
 
+# Plugins useful for upstream only
+%pom_remove_plugin :apache-rat-plugin
+%pom_remove_plugin :maven-source-plugin
+
+%pom_remove_dep :xbean-bundleutils xbean-finder
+%pom_remove_dep org.osgi:org.osgi.core xbean-finder
+rm -r xbean-finder/src/main/java/org/apache/xbean/finder{,/archive}/Bundle*
+find . -name '*.java' -exec sed -i 's|<p/>|<p>|g' {} +
 %build
-for i in xbean-asm-util xbean-classpath xbean-finder xbean-naming xbean-reflect; do
-  pushd $i
-    mkdir -p build/classes
-    javac -d build/classes  -encoding utf-8 -source 6 -target 6 \
-      -cp $(build-classpath commons-logging-api slf4j/api objectweb-asm/asm objectweb-asm/asm-commons):../xbean-asm-util/xbean-asm-util.jar \
-      $(find src/main/java -name *.java)
-    jar cf $i.jar -C build/classes .
-  popd
-done
-mkdir -p build/apidoc
-javadoc -d build/apidoc -source 6 -encoding utf-8 \
-  -Xdoclint:none \
-  -classpath $(build-classpath commons-logging-api slf4j/api objectweb-asm/asm objectweb-asm/asm-commons) \
-  $(for i in xbean-asm-util xbean-classpath xbean-finder xbean-naming xbean-reflect; do find $i/src/main/java -name *.java; done | xargs)
+mkdir -p lib
+build-jar-repository -s lib objectweb-asm slf4j
+%{ant} package javadoc
 
 %install
-# jars && poms
+# jars
 install -dm 755 %{buildroot}%{_javadir}/%{name}
+for i in xbean-asm-util xbean-finder xbean-reflect; do
+  install -m 0644 ${i}/target/${i}-%{version}.jar %{buildroot}%{_javadir}/%{name}/${i}.jar
+done
+
+# poms
 install -dm 755 %{buildroot}%{_mavenpomdir}/%{name}
-for i in xbean-asm-util xbean-classpath xbean-finder xbean-naming xbean-reflect; do
-  install -m 0644 $i/$i.jar %{buildroot}%{_javadir}/%{name}
-  %pom_remove_parent ${i}
-  %pom_xpath_inject pom:project "<groupId>org.apache.xbean</groupId><version>%{version}</version>" ${i}
-  install -m 0644 $i/pom.xml %{buildroot}%{_mavenpomdir}/%{name}/$i.pom
-  %add_maven_depmap %{name}/$i.pom %{name}/$i.jar
+for i in xbean-asm-util xbean-finder xbean-reflect; do
+  install -pm 644 ${i}/pom.xml %{buildroot}%{_mavenpomdir}/%{name}/${i}.pom
+  %add_maven_depmap %{name}/${i}.pom %{name}/${i}.jar
 done
 
 # javadoc
 install -dm 755 %{buildroot}/%{_javadocdir}/%{name}
-cp -aL build/apidoc/* %{buildroot}/%{_javadocdir}/%{name}
+for i in xbean-asm-util xbean-finder xbean-reflect; do
+  cp -r ${i}/target/site/apidocs %{buildroot}/%{_javadocdir}/%{name}/${i}
+done
 %fdupes -s %{buildroot}/%{_javadocdir}/%{name}
 
 %files -f .mfiles
@@ -160,19 +121,61 @@ cp -aL build/apidoc/* %{buildroot}/%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
-* Mon Jan 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.18-1
-- Updating to version 4.18.
-- Removing dependency on "log4j12".
+* Tue Nov 11 2025 Aditya Singh <v-aditysing@microsoft.com> - 4.20-1
+- Initial Azure Linux import from openSUSE Tumbleweed (license: same as "License" tag).
 - License verified.
 
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.5-6
-- Converting the 'Release' tag to the '[number].[distribution]' format.
-
-* Fri Nov 13 2020 Ruying Chen <v-ruyche@microsoft.com> - 4.5-5.5
-- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
-- Use javapackages-local-bootstrap to avoid build cycle.
-- Disable javadoc Xdoclint.
-
+* Wed Feb 21 2024 Gus Kenion <gus.kenion@suse.com>
+- Use %%patch -P N instead of deprecated %%patchN.
+* Wed Oct 25 2023 Fridrich Strba <fstrba@suse.com>
+- Build with source/target 8 to fix build with jdk 21
+* Mon Mar  7 2022 Fridrich Strba <fstrba@suse.com>
+- Upgrade to version 4.20
+  * Bugs
+    + XBEAN-298: FileArchive can lead to NPE
+    + XBEAN-326: NullpointerException in BundleAssignableClassFinder
+    + XBEAN-327: ASM9 bundle
+    + XBEAN-328: Upgrade to asm 9.0
+    + XBEAN-329: trunk does not build due to unused import
+    + XBEAN-330: Wrong OSGi manifests in xbean-asm9-shaded
+    + XBEAN-331: Upgrade to asm 9.1
+  * Improvements
+    + XBEAN-301: Add Automatic-Module-Name to xbean manifest
+    + XBEAN-303: asm shade NOTICE file shouldnt exist
+    + XBEAN-306: MultiJar release support enhancements
+    + XBEAN-309: Support Constructors and Static Factory Methods
+    in xbean-reflect
+    + XBEAN-310: Provide a PropertyEditorRegistry
+    + XBEAN-312: Ensure multi-jar are not scanned twice
+    + XBEAN-318: xbean-finder should log the class name on errors
+    + XBEAN-319: Enable xbean-finder to not store classes without
+    annotations
+    + XBEAN-320: Enable xbean-finder to not track some annotations
+    + XBEAN-322: Upgrade to ASM 7.2
+  * New Features
+    + XBEAN-305: Asm 6.1.1 upgrade
+    + XBEAN-313: Create asm7 bundle
+  * Tasks
+    + XBEAN-296: upgrade to asm 6
+    + XBEAN-302: Upgrade to asm 6.1
+    + XBEAN-308: ASM 6.2 upgrade
+    + XBEAN-311: ASM 6.2.1
+    + XBEAN-314: ASM 7.0 upgrade
+    + XBEAN-316: Upgrade ASM to 7.1
+    + XBEAN-321: Upgrade to asm 7.2-beta
+    + XBEAN-323: Upgrade ASM to 7.3.1
+    + XBEAN-325: Upgrade to asm 8
+- Removed patch:
+  * 0003-Port-to-QDox-2.0.patch
+    + not needed in modules that we build
+- Changed patch:
+  * 0001-Unshade-ASM.patch -> 0002-Unbundle-ASM.patch
+    + Different ASM version and code structure
+- Added patch:
+  * 0003-Remove-dependency-on-log4j-and-commons-logging.patch
+    + Remove unnecessary dependency on log4j and commons-logging
+* Tue Feb 22 2022 Fridrich Strba <fstrba@suse.com>
+- Do not build against the log4j12 packages, use the new reload4j
 * Mon Jan 27 2020 Fridrich Strba <fstrba@suse.com>
 - On supported platforms, avoid building with OpenJ9, in order to
   prevent build cycles
