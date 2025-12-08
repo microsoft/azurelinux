@@ -12,7 +12,7 @@ specify that by (a) the module name or corresponding python filename and \
 There is a limited support for (deprecated) optparse objects, too.
 
 
-Name:           python-%{modname}
+Name:           %{modname}
 Version:        1.5
 Release:        4%{?dist}
 Summary:        %{sum Python}
@@ -64,8 +64,6 @@ pip3 install pytest==7.1.2 six==1.16.0
 %license LICENSE
 %{python3_sitelib}/build_manpages
 %{python3_sitelib}/argparse_manpage-%{version}*.egg-info
-%exclude %{python3_sitelib}/build_manpages/cli
-
 
 %changelog
 * Thu May 29 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.5-4
