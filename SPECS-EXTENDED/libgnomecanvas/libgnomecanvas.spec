@@ -5,8 +5,8 @@ Summary: GnomeCanvas widget
 Name: libgnomecanvas
 Version: 2.30.3
 Release: 33%{?dist}
-URL: http://www.gnome.org/
-Source0: http://download.gnome.org/sources/libgnomecanvas/2.30/%{name}-%{version}.tar.bz2
+URL: https://www.gnome.org/
+Source0: https://download.gnome.org/sources/libgnomecanvas/2.30/%{name}-%{version}.tar.bz2
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License: LicenseRef-Callaway-LGPLv2+
 BuildRequires: gtk2-devel

@@ -14963,7 +14963,7 @@
         "other": {
           "name": "libgnomecanvas",
           "version": "2.30.3",
-          "downloadUrl": "http://download.gnome.org/sources/libgnomecanvas/2.30/libgnomecanvas-2.30.3.tar.bz2"
+          "downloadUrl": "https://download.gnome.org/sources/libgnomecanvas/2.30/libgnomecanvas-2.30.3.tar.bz2"
         }
       }
     },
@@ -14973,7 +14973,7 @@
         "other": {
           "name": "gtksourceview2",
           "version": "2.11.2",
-          "downloadUrl": "http://download.gnome.org/sources/gtksourceview/2.11/gtksourceview-2.11.2.tar.bz2"
+          "downloadUrl": "https://download.gnome.org/sources/gtksourceview/2.11/gtksourceview-2.11.2.tar.bz2"
         }
       }
     },
