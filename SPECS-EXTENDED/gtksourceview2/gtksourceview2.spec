@@ -15,9 +15,9 @@ Distribution:   Azure Linux
 # SPDX confirmed
 License:	LGPL-2.0-or-later AND GPL-2.0-or-later
 
-URL:		http://gtksourceview.sourceforge.net/
+URL:		https://gtksourceview.sourceforge.net/
 #VCS: git:git://git.gnome.org/gtksourceview
-Source0:	http://download.gnome.org/sources/gtksourceview/2.11/gtksourceview-%{version}.tar.bz2
+Source0:	https://download.gnome.org/sources/gtksourceview/2.11/gtksourceview-%{version}.tar.bz2
 # https://bugzilla.redhat.com/show_bug.cgi?id=661068
 Patch0:	gtksourceview-2.11.2-cflags.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=672823
