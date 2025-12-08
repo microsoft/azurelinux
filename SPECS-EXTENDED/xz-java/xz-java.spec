@@ -80,8 +80,6 @@ mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 
 %files javadoc
 %{_javadocdir}/%{name}
-%exclude /usr/share/javadoc/xz-java/legal/ADDITIONAL_LICENSE_INFO
-%exclude /usr/share/javadoc/xz-java/legal/LICENSE
 
 %changelog
 * Mon Nov 24 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.10-3

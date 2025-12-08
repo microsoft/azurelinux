@@ -96,8 +96,6 @@ mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 
 %files javadoc
 %doc %{_javadocdir}/%{name}
-%exclude /usr/share/javadoc/apache-commons-io/legal/ADDITIONAL_LICENSE_INFO
-%exclude /usr/share/javadoc/apache-commons-io/legal/LICENSE
 
 %changelog
 * Fri Nov 28 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.14.0-2
