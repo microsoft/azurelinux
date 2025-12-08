@@ -86,7 +86,6 @@ find -name Log4jConverter.java -delete
 %pom_remove_dep :xbean-bundleutils xbean-finder
 %pom_remove_dep org.osgi:org.osgi.core xbean-finder
 rm -r xbean-finder/src/main/java/org/apache/xbean/finder{,/archive}/Bundle*
-find . -name '*.java' -exec sed -i 's|<p/>|<p>|g' {} +
 %build
 mkdir -p lib
 build-jar-repository -s lib objectweb-asm slf4j
@@ -121,7 +120,7 @@ done
 %{_javadocdir}/%{name}
 
 %changelog
-* Tue Nov 11 2025 Aditya Singh <v-aditysing@microsoft.com> - 4.20-1
+* Mon Dec 08 2025 Aditya Singh <v-aditysing@microsoft.com> - 4.20-1
 - Initial Azure Linux import from openSUSE Tumbleweed (license: same as "License" tag).
 - License verified.
 
