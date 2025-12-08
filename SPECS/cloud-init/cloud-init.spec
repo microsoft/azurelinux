@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        24.3.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,8 +11,9 @@ Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version
 Source1:        10-azure-kvp.cfg
 Patch0:         Add-Network-Interface-Renaming-Support-for-CAPM3-Met.patch
 Patch1:         no-single-process.patch
-Patch2:         CVE-2024-6174.patch
-Patch3:         CVE-2024-11584.patch
+Patch2:         0001-cloud-local-experimentation.patch
+Patch3:         CVE-2024-6174.patch
+Patch4:         CVE-2024-11584.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -144,6 +145,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Mon Dec 08 2025 Kshitiz Godara <kgodara@microsoft.com> - 24.3.1-3
+- Test changes for cloud-init
+
 * Fri Jun 27 2025 Archana Shettigar <v-shettigara@microsoft.com> - 24.3.1-2
 - Patch CVE-2024-6174 & CVE-2024-11584
 

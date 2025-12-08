@@ -1,0 +1,24 @@
+From 69d5424255cca8705d8c88d6baa4cf7d72e3e067 Mon Sep 17 00:00:00 2001
+From: Kshitiz Godara <kgodara@microsoft.com>
+Date: Mon, 8 Dec 2025 11:41:01 +0000
+Subject: [PATCH] cloud local experimentation
+
+---
+ systemd/cloud-init-local.service.tmpl | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/systemd/cloud-init-local.service.tmpl b/systemd/cloud-init-local.service.tmpl
+index 0da2d83..e922dbe 100644
+--- a/systemd/cloud-init-local.service.tmpl
++++ b/systemd/cloud-init-local.service.tmpl
+@@ -2,6 +2,7 @@
+ [Unit]
+ # https://cloudinit.readthedocs.io/en/latest/explanation/boot.html
+ Description=Cloud-init: Local Stage (pre-network)
++DefaultDependencies=no
+ {% if variant in ["almalinux", "cloudlinux", "ubuntu", "unknown", "debian", "rhel"] %}
+ DefaultDependencies=no
+ {% endif %}
+-- 
+2.45.4
+
