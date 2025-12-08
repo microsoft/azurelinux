@@ -98,19 +98,18 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 # Remove LICENSE from javadoc directory to avoid duplicate license warning
 mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
 mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
-
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
 %{_javadir}/%{name}.jar
 %license LICENSE.txt
 %license ADDITIONAL_LICENSE_INFO
-%license NOTICE.txt
+%doc NOTICE.txt
 
 %files javadoc
 %{_javadocdir}/%{name}
 %license LICENSE.txt
-%license NOTICE.txt
+%doc NOTICE.txt
 %exclude /usr/share/doc/apache-commons-compress-javadoc/NOTICE.txt
 %exclude /usr/share/doc/apache-commons-compress/NOTICE.txt
 
