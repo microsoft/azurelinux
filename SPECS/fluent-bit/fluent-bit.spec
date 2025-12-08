@@ -17,6 +17,7 @@ Patch6:         CVE-2025-54126.patch
 Patch7:         CVE-2025-58749.patch
 Patch8:         CVE-2025-12970.patch
 Patch9:         CVE-2025-12977.patch
+Patch10:        CVE-2025-12969.patch
 BuildRequires:  bison
 BuildRequires:  cmake
 BuildRequires:  cyrus-sasl-devel
@@ -92,7 +93,7 @@ Development files for %{name}
 
 %changelog
 * Mon Dec 08 2025 BinduSri Adabala <v-badabala@microsoft.com> - 3.1.10-3
-- Patch for CVE-2025-12977
+- Patch for CVE-2025-12977 and CVE-2025-12969
 
 * Mon Dec 01 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.1.10-2
 - Patch for CVE-2025-12970
