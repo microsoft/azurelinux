@@ -1351,7 +1351,7 @@ fi
 - Crash in QXcbWindow::setParent() due to NULL xcbScreen (QTBUG-50081, #1291003)
 
 * Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.17.beta
-- fix/update Release: 19%{?dist}
+- fix/update Release: 1%%{?dist}
 
 * Fri Dec 18 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.16
 - 5.6.0-beta (final)
