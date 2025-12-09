@@ -51,7 +51,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %{summary}.
 
 %prep
-%autosetup -n qtdeclarative-everywhere-src-%{version}
+%autosetup -p1 -n qtdeclarative-everywhere-src-%{version}
 
 %build
 # HACK so calls to "python" get what we want
