@@ -26,7 +26,6 @@ Group:          System/Packages
 URL:            https://github.com/kubevirt/containerized-data-importer
 Source0:        https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch1:         CVE-2022-2879.patch
-Patch4:         CVE-2023-39325.patch
 Patch5:         CVE-2023-44487.patch
 Patch6:         CVE-2024-28180.patch
 Patch7:         CVE-2023-45288.patch
