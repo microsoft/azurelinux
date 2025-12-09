@@ -17,19 +17,19 @@
 
 Summary:        Container native virtualization
 Name:           containerized-data-importer
-Version:        1.57.0
-Release:        18%{?dist}
+Version:        1.62.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Packages
 URL:            https://github.com/kubevirt/containerized-data-importer
 Source0:        https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch1:         CVE-2022-2879.patch
-Patch11:        CVE-2025-22872.patch
-Patch12:        CVE-2025-58058.patch
-Patch13:        CVE-2025-58183.patch
-Patch14:        CVE-2025-65637.patch
+Patch0:         CVE-2022-2879.patch
+Patch1:         CVE-2025-22872.patch
+Patch2:         CVE-2025-58058.patch
+Patch3:         CVE-2025-58183.patch
+Patch4:         CVE-2025-65637.patch
 BuildRequires:  golang < 1.25
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
@@ -224,6 +224,11 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Tue Dec 09 2025 Harshit Gupta <guptaharshit@microsoft.com> - 1.62.0-1
+- Upgrade to 1.62.0-1
+- Update patches CVE-2025-58058.patch, CVE-2022-2879.patch
+- Remove old CVE patches
+
 * Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.57.0-18
 - Patch for CVE-2025-65637
 
