@@ -96,7 +96,7 @@ fi
 
 echo "Unpacking source tarball..."
 tar -xf "$SOURCE_FILE"
-cd "$NAME_VER/toolkit/tools"
+cd "$NAME_VER"
 
 echo "Generate vendored modules tarball"
 go mod tidy
