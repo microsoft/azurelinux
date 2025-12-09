@@ -25,7 +25,6 @@ Distribution:   Azure Linux
 Group:          System/Packages
 URL:            https://github.com/kubevirt/containerized-data-importer
 Source0:        https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2024-3727.patch
 Patch1:         CVE-2022-2879.patch
 Patch2:         CVE-2024-24786.patch
 Patch3:         CVE-2024-45338.patch
