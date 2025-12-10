@@ -25373,8 +25373,8 @@
         "type": "other",
         "other": {
           "name": "python-urllib3",
-          "version": "2.0.7",
-          "downloadUrl": "https://github.com/urllib3/urllib3/archive/2.0.7.tar.gz"
+          "version": "2.6.1",
+          "downloadUrl": "https://github.com/urllib3/urllib3/archive/2.6.1.tar.gz"
         }
       }
     },

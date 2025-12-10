@@ -1,7 +1,7 @@
 Summary:        A powerful, sanity-friendly HTTP client for Python.
 Name:           python-urllib3
-Version:        2.0.7
-Release:        2%{?dist}
+Version:        2.6.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,10 +9,6 @@ Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/urllib3
 Source0:        https://github.com/urllib3/urllib3/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
-Patch0:         urllib3_test_recent_date.patch
-Patch1:         change-backend-to-flit_core.patch
-Patch2:         CVE-2024-37891.patch
-Patch3:         CVE-2025-50181.patch
 
 %description
 A powerful, sanity-friendly HTTP client for Python.
@@ -26,7 +22,6 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
-BuildRequires:  python-flit-core
 Requires:       python3
 
 %description -n python3-urllib3
@@ -37,6 +32,52 @@ urllib3 is a powerful, sanity-friendly HTTP client for Python. Much of the Pytho
 # remove tests that are failing when running in chroot.
 rm -rf test/with_dummyserver/
 rm -rf test/contrib/
+
+# Make sure that the RECENT_DATE value doesn't get too far behind what the current date is.
+# RECENT_DATE must not be older that 2 years from the build time, or else test_recent_date
+# (from test/test_connection.py) would fail. However, it shouldn't be to close to the build time either,
+# since a user's system time could be set to a little in the past from what build time is (because of timezones,
+# corner cases, etc). As stated in the comment in src/urllib3/connection.py:
+#   When updating RECENT_DATE, move it to within two years of the current date,
+#   and not less than 6 months ago.
+#   Example: if Today is 2018-01-01, then RECENT_DATE should be any date on or
+#   after 2016-01-01 (today - 2 years) AND before 2017-07-01 (today - 6 months)
+# There is also a test_ssl_wrong_system_time test (from test/with_dummyserver/test_https.py) that tests if
+# user's system time isn't set as too far in the past, because it could lead to SSL verification errors.
+# That is why we need RECENT_DATE to be set at most 2 years ago (or else test_ssl_wrong_system_time would
+# result in false positive), but before at least 6 month ago (so this test could tolerate user's system time being
+# set to some time in the past, but not to far away from the present).
+# Next few lines update RECENT_DATE dynamically.
+recent_date=$(date --date "7 month ago" +"%Y, %_m, %_d")
+sed -i "s/^RECENT_DATE = datetime.date(.*)/RECENT_DATE = datetime.date($recent_date)/" src/urllib3/connection.py
+
+%if %{with tests}
+# Possible improvements to dependency groups
+# https://github.com/urllib3/urllib3/issues/3594
+# Adjust the contents of the "dev" dependency group by removing:
+remove_from_dev() {
+  tomcli set pyproject.toml lists delitem 'dependency-groups.dev' "($1)\b.*"
+}
+#   - Linters, coverage tools, profilers, etc.:
+#     https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#_linters
+remove_from_dev 'coverage|pytest-memray'
+#   - Dependencies for maintainer tasks
+remove_from_dev 'build|towncrier'
+#   - Dependencies that are not packaged and not strictly required
+remove_from_dev 'pytest-socket'
+#   - Hypercorn, because we have a special forked version we must use for
+#     testing instead, so we do not want to generate a dependency on the system
+#     copy. Note that the system copy is still an indirect dependency via quart
+#     and quart-trio.
+remove_from_dev 'hypercorn'
+
+# Remove all version bounds for test dependencies. We must attempt to make do
+# with what we have. (This also removes any python version or platform
+# constraints, which is currently fine, but could theoretically cause trouble
+# in the future. We’ll cross that bridge if we ever arrive at it.)
+tomcli set pyproject.toml lists replace --type regex_search \
+    'dependency-groups.dev' '[>=]=.*' ''
+%endif
 
 %build
 %pyproject_wheel
@@ -84,6 +125,13 @@ skiplist+=" or test_respect_retry_after_header_sleep"
 %{python3_sitelib}/*
 
 %changelog
+* Wed Dec 10 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.6.1-1
+- Upgrade to 2.6.1 for CVE-2025-66418 & CVE-2025-66471
+- Removed urllib3_test_recent_date.patch and replaced it with a sed-based
+  dynamic update of RECENT_DATE during build. This computes the date
+  ~6 months prior to the build time automatically, eliminating the need
+  for maintaining a static patch and ensuring test_recent_date remains valid.
+
 * Tue Jun 24 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.0.7-2
 - add patch for CVE-2025-50181
 

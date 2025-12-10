@@ -1,15 +1,22 @@
 diff --git a/pyproject.toml b/pyproject.toml
-index 1e5f448..d0df969 100644
+index 45538a6..5768298 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
-@@ -1,8 +1,8 @@
+@@ -1,15 +1,13 @@
  # This file is protected via CODEOWNERS
  
  [build-system]
--requires = ["hatchling>=1.6.0,<2"]
+-requires = ["hatchling>=1.27.0,<2", "hatch-vcs>=0.4.0,<0.6.0", "setuptools-scm>=8,<10"]
 -build-backend = "hatchling.build"
 +requires = ["flit_core >=3.2,<4"]
 +build-backend = "flit_core.buildapi"
  
  [project]
  name = "urllib3"
+ description = "HTTP library with thread-safe connection pooling, file post, and more."
+ readme = "README.md"
+-license = "MIT"
+-license-files = ["LICENSE.txt"]
+ keywords = ["urllib", "httplib", "threadsafe", "filepost", "http", "https", "ssl", "pooling"]
+ authors = [
+   {name = "Andrey Petrov", email = "andrey.petrov@shazow.net"}
