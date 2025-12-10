@@ -1,14 +1,13 @@
 Summary:        Irqbalance daemon
 Name:           irqbalance
-Version:        1.9.3
-Release:        2%{?dist}
+Version:        1.9.5
+Release:        1%{?dist}
 License:        GPLv2
 URL:            https://github.com/Irqbalance/irqbalance
 Group:          System Environment/Services
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/Irqbalance/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         0001-define-IRQBALANCE_ARGS-as-empty-string.patch
 BuildRequires:  systemd-devel
 BuildRequires:  glib-devel
 Requires:       systemd
@@ -33,8 +32,6 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-install -D -m 0644 misc/irqbalance.env %{buildroot}/etc/sysconfig/irqbalance
-sed -i 's#/path/to/irqbalance.env#/etc/sysconfig/irqbalance#' misc/irqbalance.service
 install -D -m 0644 misc/irqbalance.service %{buildroot}%{_prefix}/lib/systemd/system/irqbalance.service
 
 %check
@@ -50,13 +47,18 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %files
 %defattr(-,root,root)
 %license COPYING
-%config(noreplace) %{_sysconfdir}/*
+%config(noreplace) %{_prefix}/etc/default/irqbalance.env
 %{_sbindir}/*
 %exclude %{_libdir}/debug/*
 %{_libdir}/systemd/*
 %{_datadir}/*
 
 %changelog
+* Tue Dec 09 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.5-1
+- Bumping version to 1.9.5.
+- Removed redundant patch that is now included upstream.
+- Updated default config file path.
+
 * Mon Jul 01 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.9.3-2
 - Define IRQBALANCE_ARGS variable in EnvironmentFile for irqbalance.service
     to squelch systemd warning. 

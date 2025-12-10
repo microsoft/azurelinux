@@ -4680,8 +4680,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.25.5",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.5-1/go1.25.5-20251202.2.src.tar.gz"
+          "version": "1.24.11",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.11-1/go1.24.11-20251202.3.src.tar.gz"
         }
       }
     },
@@ -4690,8 +4690,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.24.11",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.11-1/go1.24.11-20251202.3.src.tar.gz"
+          "version": "1.25.5",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.5-1/go1.25.5-20251202.2.src.tar.gz"
         }
       }
     },
@@ -7571,8 +7571,8 @@
         "type": "other",
         "other": {
           "name": "irqbalance",
-          "version": "1.9.3",
-          "downloadUrl": "https://github.com/Irqbalance/irqbalance/archive/v1.9.3.tar.gz"
+          "version": "1.9.5",
+          "downloadUrl": "https://github.com/Irqbalance/irqbalance/archive/v1.9.5.tar.gz"
         }
       }
     },
@@ -8270,9 +8270,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kernel-hwe",
-          "version": "6.12.57.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.57.1.tar.gz"
+          "name": "kernel-headers",
+          "version": "6.6.117.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.117.1.tar.gz"
         }
       }
     },
@@ -8280,9 +8280,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kernel-headers",
-          "version": "6.6.117.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.117.1.tar.gz"
+          "name": "kernel-hwe",
+          "version": "6.12.57.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.57.1.tar.gz"
         }
       }
     },
@@ -24172,16 +24172,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python3-pycares",
-          "version": "4.5.0",
-          "downloadUrl": "https://github.com/saghul/pycares/archive/refs/tags/v4.5.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-pycdlib",
           "version": "1.9.0",
           "downloadUrl": "https://github.com/clalancette/pycdlib/archive/v1.9.0/pycdlib-1.9.0.tar.gz"
@@ -25685,6 +25675,16 @@
           "name": "python3-mallard-ducktype",
           "version": "1.0.2",
           "downloadUrl": "https://github.com/projectmallard/mallard-ducktype/archive/1.0.2/1.0.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python3-pycares",
+          "version": "4.5.0",
+          "downloadUrl": "https://github.com/saghul/pycares/archive/refs/tags/v4.5.0.tar.gz"
         }
       }
     },
