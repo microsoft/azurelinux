@@ -36,14 +36,14 @@ in the mtr-gtk package).
 %autosetup -p1
 
 %build
-export CFLAGS="%{optflags} -fPIE"
-export LDFLAGS="-z now -pie"
+export CFLAGS="%{optflags} -fPIE $(pkg-config --cflags ncursesw)"
+export LDFLAGS="-z now -pie $(pkg-config --libs ncursesw)"
 
 # Upstream forgot to ship .tarball-version
 echo "%{version}" > .tarball-version
 
 ./bootstrap.sh
-%configure --without-gtk
+%configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS"  --without-gtk
 %make_build
 
 %install
