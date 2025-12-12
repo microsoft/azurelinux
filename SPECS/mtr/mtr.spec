@@ -62,7 +62,7 @@ install -D -p -m 0755 mtr %{buildroot}%{_sbindir}/mtr
 %{_datadir}/bash-completion/completions/%{name}
 
 %changelog
-*Thu Dev 11 2025 Andy Zaugg <azaugg@linkedin.com> - 0.95-4
+* Thu Dev 11 2025 Andy Zaugg <azaugg@linkedin.com> - 0.95-4
 - Fix mtr segfault
 
 * Mon Jul 14 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.95-3
