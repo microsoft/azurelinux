@@ -15,6 +15,10 @@ Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
 
 BuildRequires:  libmnl-devel
 
+Provides:       ethtool
+# To avoid file conflicts
+Conflicts:      ethtool
+
 %description
 This utility allows querying and changing settings such as speed,
 port, auto-negotiation, PCI locations and checksum offload on many
@@ -44,9 +48,15 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 
 
 %changelog
-* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.14-1
+* Thu Dec 11 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.14-1
 - Upgrade version to 6.14.
 - Update source path
+* Tue Nov 11 2025 Mayank Singh <mayansingh@microsoft.com> - 6.9-4
+- Updated dependency handling for kexec-tools:
+  Changed from hard dependency on a single package.
+  Allows installation to satisfy dependency with either `ethtool` or `mlnx-ethtool`.
+  Ensures flexibility for image builds and user choice at install time.
+  Added mutual exclusivity between providers to prevent file conflicts.
 * Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 6.9-3
 - Enable ARM64 build by removing ExclusiveArch
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 6.9-2

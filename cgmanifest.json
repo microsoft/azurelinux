@@ -25822,9 +25822,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "qt5-qtconnectivity",
-          "version": "5.14.2",
-          "downloadUrl": "https://download.qt.io/official_releases/qt/5.14/5.14.2/submodules/qtconnectivity-everywhere-src-5.14.2.tar.xz"
+          "name": "qt6-qtconnectivity",
+          "version": "6.5.7",
+          "downloadUrl": "https://download.qt.io/official_releases/qt/6.5/6.5.7/src/submodules/qtconnectivity-everywhere-opensource-src-6.5.7.tar.xz"
         }
       }
     },
@@ -29336,8 +29336,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2025a",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2025a.tar.gz"
+          "version": "2025b",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2025b.tar.gz"
         }
       }
     },
