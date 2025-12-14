@@ -15783,8 +15783,8 @@
         "type": "other",
         "other": {
           "name": "pacemaker",
-          "version": "2.1.5",
-          "downloadUrl": "https://github.com/ClusterLabs/pacemaker/archive/refs/tags/Pacemaker-2.1.5.tar.gz"
+          "version": "3.0.1",
+          "downloadUrl": "https://github.com/ClusterLabs/pacemaker/archive/refs/tags/Pacemaker-3.0.1.tar.gz"
         }
       }
     },
