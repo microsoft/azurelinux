@@ -1,13 +1,13 @@
-Name:		perl-Test2-Plugin-NoWarnings
-Version:	0.08
-Release:	3%{?dist}
-Summary:	Fail if tests warn
-License:	Artistic 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:		https://metacpan.org/release/Test2-Plugin-NoWarnings
-Source0:	https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Test2-Plugin-NoWarnings-%{version}.tar.gz#/perl-Test2-Plugin-NoWarnings-%{version}.tar.gz
-BuildArch:	noarch
+Name:		    perl-Test2-Plugin-NoWarnings
+Version:	    0.10
+Release:	    1%{?dist}
+Summary:	    Fail if tests warn
+License:	    Artistic-2.0
+URL:		    https://metacpan.org/release/Test2-Plugin-NoWarnings
+Source0:	    https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Test2-Plugin-NoWarnings-%{version}.tar.gz#/perl-Test2-Plugin-NoWarnings-%{version}.tar.gz
+BuildArch:	    noarch
 # Build
 BuildRequires:	coreutils
 BuildRequires:	make
@@ -18,7 +18,7 @@ BuildRequires:	perl(ExtUtils::MakeMaker) > 6.75
 BuildRequires:	perl(Carp)
 BuildRequires:	perl(parent)
 BuildRequires:	perl(strict)
-BuildRequires:	perl(Test2) >= 1.302096
+BuildRequires:	perl(Test2) >= 1.302167
 BuildRequires:	perl(Test2::API)
 BuildRequires:	perl(Test2::Event)
 BuildRequires:	perl(Test2::Util::HashBase)
@@ -26,6 +26,7 @@ BuildRequires:	perl(warnings)
 # Test Suite
 BuildRequires:	perl(File::Spec)
 BuildRequires:	perl(IPC::Run3)
+BuildRequires:	perl(Module::Pluggable)
 BuildRequires:	perl(Test2::Require::Module)
 BuildRequires:	perl(Test2::V0)
 BuildRequires:	perl(Test::More) >= 0.96
@@ -33,7 +34,6 @@ BuildRequires:	perl(Test::More) >= 0.96
 BuildRequires:	perl(CPAN::Meta) >= 2.120900
 BuildRequires:	perl(CPAN::Meta::Prereqs)
 # Dependencies
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 Loading this plugin causes your tests to fail if there are any warnings while
@@ -65,6 +65,10 @@ make test
 %{_mandir}/man3/Test2::Plugin::NoWarnings.3*
 
 %changelog
+* Thu Nov 20 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.10-1
+- Upgrade to version 0.10 (license: MIT).
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.08-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
