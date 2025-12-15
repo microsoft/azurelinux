@@ -5250,8 +5250,8 @@
         "type": "other",
         "other": {
           "name": "hdf5",
-          "version": "1.14.4.3",
-          "downloadUrl": "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.14/hdf5-1.14.4/src/hdf5-1.14.4-3.tar.gz"
+          "version": "1.14.6",
+          "downloadUrl": "https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_6/downloads/hdf5-1.14.6.tar.gz"
         }
       }
     },
