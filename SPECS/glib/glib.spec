@@ -116,6 +116,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %{_libdir}/glib-*/*
 %{_includedir}/*
 %{_datadir}/*
+%license %{_datadir}/licenses/glib/LGPL-2.1-or-later.txt
 %exclude %{_datadir}/gtk-doc/html/
 %exclude %{_datadir}/glib-2.0/schemas/
 
