@@ -2,7 +2,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.78.6
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,6 +15,8 @@ Patch2:         CVE-2025-4373.patch
 Patch3:         CVE-2025-6052.patch
 Patch4:         CVE-2025-7039.patch
 Patch5:         CVE-2025-13601.patch
+Patch6:         CVE-2025-14087.patch
+Patch7:         CVE-2025-14512.patch
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
@@ -127,6 +129,9 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Mon Dec 15 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.78.6-6
+- Patch for CVE-2025-14087, CVE-2025-14512
+
 * Sat Nov 29 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.78.6-5
 - Patch for CVE-2025-13601
 
