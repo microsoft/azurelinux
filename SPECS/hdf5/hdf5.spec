@@ -27,18 +27,17 @@ Patch1:         hdf5-wrappers.patch
 Patch2:         CVE-2025-2153.patch
 Patch3:         CVE-2025-2310.patch
 Patch4:         CVE-2025-2914.patch
-Patch5:         CVE-2025-2915.patch
-Patch6:         CVE-2025-2924.patch
-Patch7:         CVE-2025-2925.patch
-Patch8:         CVE-2025-2926.patch
-Patch9:         CVE-2025-44905.patch
-Patch10:        CVE-2025-6269.patch
-Patch11:        CVE-2025-6750.patch
-Patch12:        CVE-2025-6816.patch
-Patch13:        CVE-2025-6857.patch
-Patch14:        CVE-2025-6858.patch
-Patch15:        CVE-2025-7067.patch
-Patch16:        CVE-2025-7068.patch
+Patch5:         CVE-2025-2924.patch
+Patch6:         CVE-2025-2925.patch
+Patch7:         CVE-2025-2926.patch
+Patch8:         CVE-2025-44905.patch
+Patch9:         CVE-2025-6269.patch
+Patch10:        CVE-2025-6750.patch
+Patch11:        CVE-2025-6816.patch
+Patch12:        CVE-2025-6857.patch
+Patch13:        CVE-2025-6858.patch
+Patch14:        CVE-2025-7067.patch
+Patch15:        CVE-2025-7068.patch
 
 # For patches/rpath
 BuildRequires:  automake
@@ -412,10 +411,10 @@ done
 %changelog
 * Tue Nov 19 2025 Jyoti kanase <v-jykanase@microsoft.com> - 1.14.6-1
 - Upgrade to 1.14.6
-- Patch hdf5 for CVE-2025-2153, CVE-2025-2310, CVE-2025-2914, CVE-2025-2926, CVE-2025-2915,
-  CVE-2025-6816, CVE-2025-2925, CVE-2025-2924, CVE-2025-44905,CVE-2025-6269, CVE-2025-6750,
-  CVE-2025-6857, CVE-2025-7067, CVE-2025-7068, CVE-2025-6858, CVE_2025-2923, CVE-2025-2913,
-  CVE-2025-6516, CVE-2025-6818, CVE-2025-6817, CVE-2025-6856, CVE-2025-7069
+- Patch hdf5 for CVE-2025-2153, CVE-2025-2310, CVE-2025-2914, CVE-2025-2926, CVE-2025-6816,
+  CVE-2025-2925, CVE-2025-2924, CVE-2025-44905, CVE-2025-6269, CVE-2025-6750, CVE-2025-6857,
+  CVE-2025-7067, CVE-2025-7068, CVE-2025-6858, CVE_2025-2923, CVE-2025-2913, CVE-2025-6516,
+  CVE-2025-6818, CVE-2025-6817, CVE-2025-6856, CVE-2025-7069
 
 * Tue Jun 04 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.14.4.3-1
 - Upgrade to v1.14.4.3 to fix CVEs 2024-29157, 2024-29158, 2024-29159, 2024-29160,
