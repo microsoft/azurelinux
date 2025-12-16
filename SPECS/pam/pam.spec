@@ -1,7 +1,7 @@
 Summary:        Linux Pluggable Authentication Modules
 Name:           pam
 Version:        1.5.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD and GPLv2+
 URL:            https://github.com/linux-pam/linux-pam
 Source0:        https://github.com/linux-pam/linux-pam/releases/download/v%{version}/Linux-PAM-%{version}.tar.xz
@@ -87,7 +87,20 @@ EOF
 %files
 %defattr(-,root,root)
 %license COPYING
-%{_sysconfdir}/*
+%config(noreplace) %{_sysconfdir}/environment
+%dir %{_sysconfdir}/security
+%config(noreplace) %{_sysconfdir}/security/access.conf
+%config(noreplace) %{_sysconfdir}/security/faillock.conf
+%config(noreplace) %{_sysconfdir}/security/group.conf
+%config(noreplace) %{_sysconfdir}/security/limits.conf
+%dir %{_sysconfdir}/security/limits.d
+%config(noreplace) %{_sysconfdir}/security/namespace.conf
+%dir %{_sysconfdir}/security/namespace.d
+%attr(755,root,root) %config(noreplace) %{_sysconfdir}/security/namespace.init
+%config(noreplace) %{_sysconfdir}/security/pam_env.conf
+%config(noreplace) %{_sysconfdir}/security/pwhistory.conf
+%config(noreplace) %{_sysconfdir}/security/sepermit.conf
+%config(noreplace) %{_sysconfdir}/security/time.conf
 /sbin/*
 %{_libdir}/security/*
 %{_libdir}/systemd/system/pam_namespace.service
@@ -108,6 +121,9 @@ EOF
 %{_libdir}/pkgconfig/pamc.pc
 
 %changelog
+* Thu Jul 24 2025 Chris Co <chrco@microsoft.com> - 1.5.3-6
+- Set config files in /etc as noreplace
+
 * Tue Jun 24 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.5.3-5
 - Add patch for sync_pam_namespace_module_to_version_1.7.0.patch and CVE-2025-6020
 
