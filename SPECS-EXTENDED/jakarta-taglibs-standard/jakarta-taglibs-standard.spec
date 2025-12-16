@@ -21,7 +21,7 @@ Distribution:   Azure Linux
 %define short_name      taglibs-standard
 Name:           jakarta-taglibs-standard
 Version:        1.1.1
-Release:        261%{?dist}
+Release:        262%{?dist}
 Summary:        Open Source Implementation of the JSP Standard Tag Library
 License:        ASL 2.0
 Group:          Development/Libraries/Java
@@ -74,7 +74,7 @@ EOBP
 
 %build
 ant \
-  -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 \
+  -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 \
   -Dfinal.name=%{short_name} \
   -Dj2se.javadoc=%{_javadocdir}/java \
   -f standard/build.xml \
@@ -90,11 +90,15 @@ cp -p standard/dist/standard/lib/standard.jar %{buildroot}%{_javadir}/jakarta-ta
 # javadoc
 mkdir -p %{buildroot}%{_javadocdir}/%{name}
 cp -pr standard/dist/standard/javadoc/* %{buildroot}%{_javadocdir}/%{name}
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 %fdupes -s %{buildroot}%{_javadocdir}/%{name}
 
 %files
 %license LICENSE
+%license ADDITIONAL_LICENSE_INFO
 %doc standard/README_src.txt standard/README_bin.txt standard/dist/doc/doc/standard-doc/*.html
+%exclude %{_javadocdir}/%{name}/legal/LICENSE
 %{_javadir}/*
 
 %files javadoc
@@ -102,6 +106,10 @@ cp -pr standard/dist/standard/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Thu Nov 20 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.1.1-262
+- Setting compiler.source to value 1.8 to fix the Build.
+- License verified
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-261
 - Updating naming for 3.0 version of Azure Linux.
 

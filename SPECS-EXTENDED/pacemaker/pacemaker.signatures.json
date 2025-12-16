@@ -1,5 +1,6 @@
 {
  "Signatures": {
-  "pacemaker-2.1.5.tar.gz": "7654b78f08d4994b9fd31b8592addbd7f4b173e2cbf30336722419f1ce45e185"
+  "pacemaker-3.0.1.tar.gz": "17a823c52d5448de817162f334b038598e22ea3e24e63a8819f978fac2b252e4",
+  "pacemaker.sysusers": "b599209cf97e03f192393c16ca8a93ffd8ddcb1ea9db73a60d6480fa7d89800b"
  }
 }
