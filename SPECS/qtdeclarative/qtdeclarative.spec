@@ -349,7 +349,7 @@ popd
 - Upstream Release Candidate 1
 
 * Sun May 14 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-0.5.beta3
-- Conflict in qt5-qtdeclarative-devel (#1441343), fix Release: 1%{?dist}
+- Conflict in qt5-qtdeclarative-devel (#1441343), fix Release: 1%%{?dist}
 
 * Mon May 08 2017 Than Ngo <than@redhat.com> - 5.9.0-0.beta.4
 - drop useless qtdeclarative-opensource-src-5.9.0-v4bootstrap.patch,
@@ -462,7 +462,7 @@ popd
 - use %%license
 
 * Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.5.beta3
-- fix Source URL, Release: 1%{?dist}
+- fix Source URL, Release: 1%%{?dist}
 
 * Mon Dec 21 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.4
 - Update to final beta3 release
