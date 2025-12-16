@@ -99,7 +99,7 @@ true
 
 %changelog
 * Fri Nov 28 2025 BinduSri Adabala <v-badabala@microsoft.com> - 0.11.5-5
-- Initial Azure Linux import from Fedora 44 (license: MIT).
+- Initial Azure Linux import from Fedora 43 (license: MIT).
 - License verified
 
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.11.5-4
