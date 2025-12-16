@@ -1,7 +1,7 @@
 Summary:        Container Network Interface (CNI) plugins
 Name:           cni-plugins
 Version:        1.3.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ Source0:        %{name}-%{version}.tar.gz
 Patch0:         CVE-2023-3978.patch
 Patch1:         CVE-2024-45338.patch
 Patch2:         CVE-2025-22872.patch
+Patch3:         CVE-2025-65637.patch
 %define _default_cni_plugins_dir /opt/cni/bin
 BuildRequires:  golang
 Provides:       kubernetes-cni
@@ -42,6 +43,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_default_cni_plugins_dir}/*
 
 %changelog
+* Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.3.0-10
+- Patch for CVE-2025-65637
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.3.0-9
 - Bump release to rebuild with golang
 
