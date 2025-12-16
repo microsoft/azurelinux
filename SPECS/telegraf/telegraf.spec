@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.29.4
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,6 +28,8 @@ Patch14:        CVE-2024-51744.patch
 Patch15:        CVE-2025-30215.patch
 Patch16:        CVE-2025-22872.patch
 Patch17:        CVE-2025-10543.patch
+Patch18:        CVE-2025-46327-prereqs.patch
+Patch19:        CVE-2025-46327.patch
 BuildRequires:  golang
 BuildRequires:  iana-etc
 BuildRequires:  systemd-devel
@@ -98,6 +100,9 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Mon Dec 15 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.29.4-19
+- Add patch for CVE-2025-46327
+
 * Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.29.4-18
 - Patch for CVE-2025-10543
 
