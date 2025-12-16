@@ -163,16 +163,6 @@ sed -e 's|-O -finline-functions|-O3 -finline-functions|g' -i config/gnu-flags
 # --with-mpe=DIR Use MPE instrumentation [default=no]
 # --enable-cxx/fortran/parallel and --enable-threadsafe flags are incompatible
 
-# temporarily disable _FLOAT16 for ARM64 until a fix is checked-in.
-# See:
-# - https://github.com/HDFGroup/hdf5/pull/4495
-# - https://github.com/HDFGroup/hdf5/pull/4507
-%ifarch aarch64
-%global disable_float16 \\\
-  --disable-nonstandard-feature-float16 \\\
-%{nil}
-%endif
-
 #Serial build
 export CC=gcc
 export CXX=g++
@@ -185,7 +175,6 @@ ln -s ../configure .
   %{configure_opts} \
   --enable-cxx \
   --enable-hlgiftools \
-  %{disable_float16} \
   --with-default-plugindir=%{_libdir}/hdf5/plugin
 sed -i -e 's| -shared | -Wl,--as-needed\0|g' libtool
 sed -r -i 's|^prefix=/usr|prefix=%{buildroot}/usr|' java/test/junit.sh
@@ -430,6 +419,14 @@ done
 
 
 %changelog
+* Tue Dec 16 2025 Jyoti kanase <v-jykanase@microsoft.com> - 1.14.6-1
+- Upgrade to 1.14.6
+- Patch hdf5 for CVE-2025-2153, CVE-2025-2310, CVE-2025-2914, CVE-2025-2926, CVE-2025-6816,
+  CVE-2025-2925, CVE-2025-2924, CVE-2025-44905, CVE-2025-6269, CVE-2025-6750, CVE-2025-6857,
+  CVE-2025-7067, CVE-2025-7068, CVE-2025-6858, CVE_2025-2923, CVE-2025-2913, CVE-2025-6516,
+  CVE-2025-6818, CVE-2025-6817, CVE-2025-6856, CVE-2025-7069
+- Remove the _FLOAT16 temporary work-around for hdf5 arm64 builds
+
 * Mon May 20 2024 George Mileka <gmileka@microsoft.com> - 1.14.4-1
 - Upgrade to 1.14.4 - Fix critical CVEs
 
