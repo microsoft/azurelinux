@@ -31,7 +31,11 @@ Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{versio
 # Nexus team needs these to-be-upstreamed patches for the operator Edge to work
 # correctly.
 Patch0:         CVE-2025-47913.patch
+<<<<<<< HEAD
 Patch1:         CVE-2025-64435.patch
+=======
+Patch1:         CVE-2025-64324.patch
+>>>>>>> 9f821c795 ([AutoPR- Security] Patch kubevirt for CVE-2025-64324 [HIGH] (#15299))
 
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
@@ -269,8 +273,13 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+<<<<<<< HEAD
 * Thu Nov 27 2025 Aditya Singh <v-aditysing@microsoft.com> - 1.5.3-3
 - Added patch for CVE-2025-64435.
+=======
+* Tue Dec 16 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.5.3-3
+- Patch for CVE-2025-64324
+>>>>>>> 9f821c795 ([AutoPR- Security] Patch kubevirt for CVE-2025-64324 [HIGH] (#15299))
 
 * Mon Nov 24 2025 Andrew Phelps <anphel@microsoft.com> - 1.5.3-2
 - Bump to rebuild with updated glibc
