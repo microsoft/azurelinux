@@ -3167,6 +3167,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ed25519-java",
+          "version": "0.3.0",
+          "downloadUrl": "https://github.com/str4d/ed25519-java/archive/v0.3.0/ed25519-java-0.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "edac-utils",
           "version": "0.18",
           "downloadUrl": "https://github.com/grondo/edac-utils/archive/0.18/edac-utils-0.18.tar.gz"
@@ -7833,6 +7843,16 @@
           "name": "javassist",
           "version": "3.30.2",
           "downloadUrl": "https://github.com/jboss-javassist/javassist/archive/refs/tags/rel_3_30_2_ga.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "jbcrypt",
+          "version": "1.0.2",
+          "downloadUrl": "https://github.com/kruton/jbcrypt/archive/refs/tags/1.0.2.tar.gz"
         }
       }
     },
@@ -29266,8 +29286,8 @@
         "type": "other",
         "other": {
           "name": "trilead-ssh2",
-          "version": "217.8",
-          "downloadUrl": "https://github.com/jenkinsci/trilead-ssh2/archive/trilead-ssh2-build217-jenkins-8.tar.gz"
+          "version": "217.293.v56de4d4d3515",
+          "downloadUrl": "https://github.com/jenkinsci/trilead-ssh2/archive/refs/tags/build-217-jenkins-293.v56de4d4d3515.tar.gz"
         }
       }
     },
