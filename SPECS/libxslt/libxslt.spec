@@ -1,7 +1,7 @@
 Summary:        Libxslt is the XSLT C library developed for the GNOME project. XSLT is a an XML language to define transformation for XML.
 Name:           libxslt
 Version:        1.1.34
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ Patch0:         CVE-2021-30560.patch
 Patch1:         CVE-2022-29824.nopatch
 Patch2:         CVE-2024-55549.patch
 Patch3:         CVE-2025-24855.patch
+Patch4:         CVE-2025-11731.patch
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libxml2-devel
 Requires:       libgcrypt
@@ -76,6 +77,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/*
 
 %changelog
+* Fri Nov 21 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.1.34-9
+- Patch for CVE-2025-11731
+
 * Mon Mar 17 2025 Sindhu Karri <lakarri@microsoft.com> - 1.1.34-8
 - Fix CVE-2025-24855 and CVE-2024-55549
 
