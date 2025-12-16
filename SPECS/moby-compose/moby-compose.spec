@@ -1,7 +1,7 @@
 Summary:        Define and run multi-container applications with Docker
 Name:           moby-compose
 Version:        2.17.3
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,6 +38,7 @@ Patch9:         CVE-2024-36623.patch
 Patch10:        CVE-2024-45337.patch
 Patch11:        CVE-2025-22869.patch
 Patch12:        CVE-2025-47913.patch
+Patch13:        CVE-2025-65637.patch
 
 # Leverage the `generate_source_tarball.sh` to create the vendor sources
 # NOTE: govendor-v1 format is for inplace CVE updates so that we do not have to overwrite in the blob-store.
@@ -75,6 +76,9 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 %{_libexecdir}/docker/cli-plugins/docker-compose
 
 %changelog
+* Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.17.3-13
+- Patch for CVE-2025-65637
+
 * Tue Nov 18 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.17.3-12
 - Patch for CVE-2025-47913
 
