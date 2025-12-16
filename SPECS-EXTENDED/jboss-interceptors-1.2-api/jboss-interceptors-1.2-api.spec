@@ -23,7 +23,7 @@ Distribution:   Azure Linux
 %global oname jboss-interceptors-api_1.2_spec
 Name:           jboss-interceptors-1.2-api
 Version:        1.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Java EE Interceptors 1.2 API
 License:        CDDL-1.0 OR GPL-2.0-only WITH Classpath-exception-2.0
 Group:          Development/Libraries/Java
@@ -60,6 +60,8 @@ sed -i "s,59,51,;s,Temple Place,Franklin Street,;s,Suite 330,Fifth Floor,;s,0211
 %{ant} jar javadoc
 
 %install
+mv target/site/apidocs/legal/ADDITIONAL_LICENSE_INFO .
+mv target/site/apidocs/legal/LICENSE .
 # jar
 install -dm 0755 %{buildroot}%{_javadir}
 install -pm 0644 target/%{oname}-%{namedversion}.jar %{buildroot}%{_javadir}/%{oname}.jar
@@ -80,9 +82,15 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 
 %files javadoc
 %license LICENSE
+%license ADDITIONAL_LICENSE_INFO
 %{_javadocdir}/%{name}
+%exclude /usr/share/javadoc/jboss-interceptors-1.2-api/legal/LICENSE
 
 %changelog
+* Tue Aug 19 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.0.0-3
+- Setting compiler.source to value 1.8 to fix the Build.
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
