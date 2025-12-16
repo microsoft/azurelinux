@@ -70,6 +70,8 @@ install -m 644 dist/lib/servlet.jar %{buildroot}%{_javadir}/%{name}-%{version}.j
 # javadoc
 install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr build/docs/api/* %{buildroot}%{_javadocdir}/%{name}
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 # alternatives
 mkdir -p %{buildroot}%{_sysconfdir}/alternatives/
 ln -sf %{_sysconfdir}/alternatives/servlet.jar %{buildroot}%{_javadir}/servlet.jar
@@ -93,6 +95,8 @@ fi
 %files javadoc
 %defattr(-,root,root)
 %{_javadocdir}/%{name}
+%license ADDITIONAL_LICENSE_INFO
+%license LICENSE
 
 %changelog
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.4-302

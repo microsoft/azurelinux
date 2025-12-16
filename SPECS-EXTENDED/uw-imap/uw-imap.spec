@@ -24,13 +24,12 @@ Distribution:   Azure Linux
 Summary: UW Server daemons for IMAP and POP network mail protocols
 Name:	 uw-imap 
 Version: 2007f
-Release: 26%{?dist}
+Release: 27%{?dist}
 
 # See LICENSE.txt, http://www.apache.org/licenses/LICENSE-2.0
 License: ASL 2.0 
 URL:	 https://github.com/uw-imap/imap
-# Source0: https://github.com/uw-imap/imap/archive/refs/tags/imap-2007f_upstream.tar.gz
-Source0: https://github.com/uw-imap/imap/archive/refs/tags/imap-%{version}%{?beta}%{?dev}%{?snap}.tar.gz
+Source0: https://github.com/uw-imap/imap/archive/refs/tags/imap-%{version}_upstream.tar.gz#/imap-%{version}.tar.gz
 
 %global soname    c-client
 %global shlibname lib%{soname}.so.%{somajor}
@@ -202,7 +201,7 @@ export EXTRACFLAGS="$EXTRACFLAGS -Wno-pointer-sign"
 
 
 echo -e "y\ny" | \
-make %{?_smp_mflags} lnp \
+make -j1 lnp \
 IP=6 \
 EXTRACFLAGS="$EXTRACFLAGS" \
 EXTRALDFLAGS="$EXTRALDFLAGS $RPM_LD_FLAGS" \
@@ -328,7 +327,7 @@ done
 %ldconfig_scriptlets -n %{imap_libs}
 
 %files -n %{imap_libs} 
-%doc LICENSE.txt NOTICE SUPPORT 
+%license LICENSE.txt NOTICE SUPPORT
 %doc docs/RELNOTES docs/*.txt
 %ghost %config(missingok,noreplace) %{_sysconfdir}/c-client.cf
 %{_libdir}/lib%{soname}.so.*
@@ -348,6 +347,10 @@ done
 
 
 %changelog
+* Thu Nov 20 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2007f-27
+- Fix build
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2007f-26
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

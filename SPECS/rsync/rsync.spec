@@ -1,13 +1,14 @@
 Summary:        Fast incremental file transfer.
 Name:           rsync
 Version:        3.4.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Appication/Internet
 URL:            https://rsync.samba.org/
 Source0:        https://download.samba.org/pub/rsync/src/%{name}-%{version}.tar.gz
+Patch0:         CVE-2025-10158.patch
 BuildRequires:  lz4-devel
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  zlib-devel
@@ -60,6 +61,9 @@ EOF
 %{_sysconfdir}/rsyncd.conf
 
 %changelog
+* Tue Nov 18 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.1-2
+- Patch for CVE-2025-10158
+
 * Wed Jan 15 2025 Henry Beberman <henry.beberman@microsoft.com> - 3.4.1-1
 - Upgrade to version 3.4.1 to fix CVE-2024-12084, CVE-2024-12085, CVE-2024-12086, CVE-2024-12087, CVE-2024-12088, CVE-2024-12747
 
