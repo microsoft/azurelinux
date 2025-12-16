@@ -5360,8 +5360,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.65",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.65.tar.bz2"
+          "version": "2.4.66",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.66.tar.bz2"
         }
       }
     },
