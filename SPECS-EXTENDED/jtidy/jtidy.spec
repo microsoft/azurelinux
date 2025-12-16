@@ -104,5 +104,5 @@ EOF
 
 %changelog
 * Fri Nov 21 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.0.4-1
-- Initial import from openSUSE (license: MIT).
+- Initial Azure Linux import from openSUSE (license: MIT).
 - License verified
