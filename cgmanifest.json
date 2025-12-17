@@ -30707,8 +30707,8 @@
         "type": "other",
         "other": {
           "name": "xmldb-api",
-          "version": "0.1",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xmldb-xapi-20041010-src.tar.bz2"
+          "version": "1.7.0",
+          "downloadUrl": "https://github.com/xmldb-org/xmldb-api/archive/xmldb-api-1.7.tar.gz"
         }
       }
     },
