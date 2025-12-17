@@ -12,7 +12,7 @@ and efficiently checking for PEP8 compliance of a project.
 
 Name:           python-%{pypi_name}
 Version:        1.3.0
-Release:        1%{?dist} 
+Release:        1%{?dist}
 Summary:        Plugin for pytest to check PEP8 compliance with Flake8
 
 License:        BSD
