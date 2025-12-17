@@ -31,7 +31,6 @@ Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{versio
 # Nexus team needs these to-be-upstreamed patches for the operator Edge to work
 # correctly.
 Patch0:         CVE-2025-47913.patch
-Patch0:         CVE-2025-47913.patch
 Patch1:         CVE-2025-64324.patch
 Patch2:         CVE-2025-64435.patch
 
