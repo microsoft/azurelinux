@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 #
 # spec file for package osgi-core
 #
-# Copyright (c) 2020 SUSE LLC
+# Copyright (c) 2024 SUSE LLC
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -19,8 +19,8 @@ Distribution:   Azure Linux
 
 
 Name:           osgi-core
-Version:        7.0.0
-Release:        2%{?dist}
+Version:        8.0.0
+Release:        3%{?dist}
 Summary:        OSGi Core API
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -31,13 +31,13 @@ Source2:        http://www.apache.org/licenses/LICENSE-2.0
 Source3:        %{name}-build.xml
 BuildRequires:  ant
 BuildRequires:  fdupes
-BuildRequires:  javapackages-local-bootstrap
+BuildRequires:  javapackages-local-bootstrap >= 6
 BuildRequires:  osgi-annotation
 BuildRequires:  unzip
 BuildArch:      noarch
 
 %description
-OSGi Core Release 7, Interfaces and Classes for use in compiling bundles.
+OSGi Core Release 8, Interfaces and Classes for use in compiling bundles.
 
 %package javadoc
 Summary:        API documentation for %{name}
@@ -104,6 +104,10 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Wed Dec 17 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 8.0.0-3
+- Upgrade to 8.0.0 (Reference: openSUSE Tumbleweed)
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.0.0-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
