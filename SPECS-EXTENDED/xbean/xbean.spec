@@ -26,7 +26,11 @@ License:        ASL 2.0
 Group:          Development/Libraries/Java
 URL:            https://geronimo.apache.org/xbean/
 Source0:        https://repo1.maven.org/maven2/org/apache/%{name}/%{name}/%{version}/%{name}-%{version}-source-release.zip
-Source1:        %{name}-build.tar.xz
+Source1:        build.xml
+Source2:        common.xml
+Source3:        xbean-asm-util-build.xml
+Source4:        xbean-finder-build.xml
+Source5:        xbean-reflect-build.xml
 Patch2:         0002-Unbundle-ASM.patch
 Patch3:         0003-Remove-dependency-on-log4j-and-commons-logging.patch
 BuildRequires:  ant
@@ -58,8 +62,14 @@ Group:          Documentation/HTML
 This package provides API documentation for xbean.
 
 %prep
-%autosetup -p1 -a1
+%autosetup -p1
 
+mkdir -p xbean-asm-util xbean-finder xbean-reflect
+cp -f %{SOURCE1} . 
+cp -f %{SOURCE2} .
+cp -f %{SOURCE3} xbean-asm-util/build.xml
+cp -f %{SOURCE4} xbean-finder/build.xml
+cp -f %{SOURCE5} xbean-reflect/build.xml
 cp xbean-asm-util/src/main/java/org/apache/xbean/asm9/original/commons/AsmConstants.java xbean-reflect/src/main/java/org/apache/xbean/recipe/
 
 %pom_disable_module xbean-classloader
