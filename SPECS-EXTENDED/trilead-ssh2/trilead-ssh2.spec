@@ -57,8 +57,7 @@ Group:          Documentation/HTML
 API documentation for %{name}.
 
 %prep
-%setup -q -n %{name}-build-%{buildver}-jenkins-%{patchlvl}.%{githash}
-%patch -P 0 -p1
+%autosetup -n %{name}-build-%{buildver}-jenkins-%{patchlvl}.%{githash} -p1
 cp %{SOURCE1} build.xml
 
 %pom_remove_dep :tink
