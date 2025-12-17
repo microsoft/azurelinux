@@ -2,7 +2,7 @@
 Summary:        BPF Compiler Collection (BCC)
 Name:           bcc
 Version:        0.29.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -67,7 +67,6 @@ Command line tools for BPF Compiler Collection (BCC)
 %package -n libbpf-tools
 Summary:        Command line libbpf tools for BPF Compiler Collection (BCC)
 BuildRequires:  libbpf-devel
-#BuildRequires:  libbpf-static 
 BuildRequires:  bpftool
  
 %description -n libbpf-tools
@@ -166,6 +165,9 @@ find %{buildroot}%{_lib64dir} -name '*.a' -delete
 %{_sbindir}/bpf-*
 
 %changelog
+* Tue Dec 16 2025 Rachel Menge <rachelmenge@microsoft.com> - 0.29.1-4
+- Add libbpf-tools subpackage
+
 * Mon Apr 14 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.29.1-3
 - Patch CVE-2025-29481
 
