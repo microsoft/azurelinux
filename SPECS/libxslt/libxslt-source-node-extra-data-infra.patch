@@ -9,6 +9,7 @@ document. This will later be used to store key and id status.
 Provide a function to find the psvi member of a node.
 
 Revert any changes to the source document after the transformation.
+Upstream Patch Reference: https://gitlab.gnome.org/GNOME/libxslt/-/commit/adebe45f6ef9f9d036acacd8aec7411d4ea84e25
 ---
  libxslt/transform.c     |  34 ++++++++++
  libxslt/xsltInternals.h |   1 +
