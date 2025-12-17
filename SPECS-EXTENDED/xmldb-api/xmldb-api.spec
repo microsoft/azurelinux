@@ -94,6 +94,8 @@ install -m 644 dist/xmldb/%{name}-sdk.jar %{buildroot}%{_javadir}/%{name}-sdk-%{
 # javadoc
 install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr src/build/javadoc/full/* %{buildroot}%{_javadocdir}/%{name}
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 
 %files
 %defattr(0644,root,root,0755)
@@ -110,6 +112,8 @@ cp -pr src/build/javadoc/full/* %{buildroot}%{_javadocdir}/%{name}
 %files javadoc
 %defattr(0644,root,root,0755)
 %{_javadocdir}/%{name}
+%license ADDITIONAL_LICENSE_INFO
+%license LICENSE
 
 %changelog
 * Fri Dec 12 2025 Aditya Singh <v-aditysing@microsoft.com> - 1.7.0-1
