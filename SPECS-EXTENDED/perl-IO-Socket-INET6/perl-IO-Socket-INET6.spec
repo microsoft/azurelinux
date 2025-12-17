@@ -1,22 +1,29 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %if ! (0%{?rhel})
 %{bcond_without perl_IO_Socket_INET6_enables_optional_test}
 %else
 %{bcond_with perl_IO_Socket_INET6_enables_optional_test}
 %endif
 
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Name:           perl-IO-Socket-INET6
-Version:        2.72
-Release:        19%{?dist}
+Version:        2.73
+Release:        1%{?dist}
 Summary:        Perl Object interface for AF_INET|AF_INET6 domain sockets
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/IO-Socket-INET6
-Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/IO-Socket-INET6-%{version}.tar.gz#/perl-IO-Socket-INET6-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/modules/by-module/IO/IO-Socket-INET6-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Fix bad code in test. Original code hides error, related to BZ#1207174
+Patch0:         IO-Socket-INET6-2.72-fix_die_in_test.patch
+# Fix random test error in binding to socket BZ#1207174
+Patch1:         IO-Socket-INET6-2.72-bz1207174-fix_random_test_error.patch
 BuildArch:      noarch
 # Module Build
-BuildRequires:  perl-interpreter
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  make
 BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker)
 # Module Runtime
 BuildRequires:  perl(Carp)
@@ -37,14 +44,14 @@ BuildRequires:  perl(Test::Pod) >= 1.14
 BuildRequires:  perl(Test::Pod::Coverage) >= 1.04
 BuildRequires:  perl(Test::TrailingSpace)
 %endif
+BuildRequires:  iana-etc
 # Runtime
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description
 Perl Object interface for AF_INET|AF_INET6 domain sockets.
 
 %prep
-%setup -q -n IO-Socket-INET6-%{version}
+%autosetup -n IO-Socket-INET6-%{version} -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor
@@ -52,8 +59,8 @@ make %{?_smp_mflags}
 
 %install
 make pure_install DESTDIR=%{buildroot}
-find %{buildroot} -type f -name .packlist -exec rm -f {} ';'
-%{_fixperms} %{buildroot}
+find %{buildroot} -type f -name .packlist -delete
+%{_fixperms} -c %{buildroot}
 
 %check
 make test
@@ -65,6 +72,10 @@ make test
 %{_mandir}/man3/IO::Socket::INET6.3*
 
 %changelog
+* Wed Apr 09 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.73-1
+- Upgrade to 2.73 as per Fedora 41 (license: MIT).
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.72-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

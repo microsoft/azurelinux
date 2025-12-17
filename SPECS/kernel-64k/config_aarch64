@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 6.6.112.1 Kernel Configuration
+# Linux/arm64 6.6.117.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 13.2.0"
 CONFIG_CC_IS_GCC=y
@@ -3006,7 +3006,8 @@ CONFIG_DM_PERSISTENT_DATA=m
 CONFIG_DM_CRYPT=m
 CONFIG_DM_SNAPSHOT=m
 CONFIG_DM_THIN_PROVISIONING=m
-# CONFIG_DM_CACHE is not set
+CONFIG_DM_CACHE=m
+CONFIG_DM_CACHE_SMQ=m
 # CONFIG_DM_WRITECACHE is not set
 # CONFIG_DM_EBS is not set
 # CONFIG_DM_ERA is not set
