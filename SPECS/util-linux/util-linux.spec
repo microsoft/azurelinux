@@ -2,7 +2,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.40.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,7 @@ Source1:        runuser
 Source2:        runuser-l
 Source3:        su
 Source4:        su-l
+Patch0:         CVE-2025-14104.patch
 BuildRequires:  audit-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
@@ -152,6 +153,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Wed Dec 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.40.2-2
+- Patch for CVE-2025-14104
+
 * Wed Sep 18 2024 Vince Perri <viperri@microsoft.com> - 2.40.2-1
 - Upgrade to 2.40.2:
 -   Added --disable-liblastlog2 to avoid building new liblastlog2 libraries
