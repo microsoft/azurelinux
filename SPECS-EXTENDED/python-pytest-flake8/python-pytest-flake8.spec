@@ -2,40 +2,39 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 # Enable Python dependency generation
 %{?python_enable_dependency_generator}
- 
+
 # Created by pyp2rpm-3.3.2
 %global pypi_name pytest-flake8
 
 %global desc \
 %{name} is a plugin for pytest to leverage flake8 to automatically\
 and efficiently checking for PEP8 compliance of a project.
- 
+
 Name:           python-%{pypi_name}
 Version:        1.3.0
 Release:        1%{?dist} 
 Summary:        Plugin for pytest to check PEP8 compliance with Flake8
- 
+
 License:        BSD
 URL:            https://github.com/tholo/pytest-flake8
 Source0:        https://github.com/coherent-oss/pytest-flake8/archive/refs/tags/v%{version}.tar.gz#/python-%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
- 
+
 BuildRequires:  python3-devel
 BuildRequires:  python3dist(flake8) >= 3.5
 BuildRequires:  python3dist(pytest) >= 3.5
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
- 
+
 %description %{desc}
- 
+
 %package -n     python3-%{pypi_name}
 Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{pypi_name}}
- 
+
 %description -n python3-%{pypi_name} %{desc}
 
- 
 %prep
 %autosetup -n %{pypi_name}-%{version}
 # Remove bundled egg-info
