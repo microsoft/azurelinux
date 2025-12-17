@@ -31,7 +31,7 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.50.2
+%global target_azl_build_kernel_version 6.12.57.1
 %global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
@@ -45,8 +45,8 @@
 
 Summary:	 Infiniband HCA Driver
 Name:		 %{_name}-signed
-Version:	 24.10
-Release:	 23%{release_suffix}%{?dist}
+Version:	 25.07
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -88,10 +88,30 @@ Source26:       smc_diag.ko
 Source27:       rpcrdma.ko
 Source28:       svcrdma.ko
 Source29:       xprtrdma.ko
+Source30:       fwctl.ko
+Source31:       mlx5_fwctl.ko
+Source32:       mana_ib.ko
+Source33:       mlx5_dpll.ko
+%ifarch aarch64
+Source34:       rnbd-client.ko
+Source35:       rnbd-server.ko
+Source36:       iw_cxgb4.ko
+Source37:       erdma.ko
+Source38:       ib_mthca.ko
+Source39:       ocrdma.ko
+Source40:       qedr.ko
+Source41:       siw.ko
+Source42:       rtrs-client.ko
+Source43:       rtrs-core.ko
+Source44:       rtrs-server.ko
+Source45:       ib_srpt.ko
+Source46:       mlx5-vfio-pci.ko
+Source47:       9pnet_rdma.ko
+Source48:       rds_rdma.ko
+%endif
 
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-ExclusiveArch:   aarch64
 
 
 %description 
@@ -112,6 +132,8 @@ Obsoletes: mlnx-en-kmp-trace
 Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
+Obsoletes: fwctl-hwe <= 24.10
+Provides:  fwctl-hwe = %{version}-%{release}
 
 Requires: kernel-hwe = %{target_kernel_version_full}
 Requires: kmod
@@ -169,6 +191,27 @@ cp -rf %{SOURCE26} ./lib/modules/%{KVERSION}/updates/net/smc/smc_diag.ko
 cp -rf %{SOURCE27} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/rpcrdma.ko
 cp -rf %{SOURCE28} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/svcrdma.ko
 cp -rf %{SOURCE29} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/xprtrdma.ko
+cp -rf %{SOURCE30} ./lib/modules/%{KVERSION}/updates/drivers/fwctl/fwctl.ko
+cp -rf %{SOURCE31} ./lib/modules/%{KVERSION}/updates/drivers/fwctl/mlx5/mlx5_fwctl.ko
+cp -rf %{SOURCE32} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mana/mana_ib.ko
+cp -rf %{SOURCE33} ./lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlx5/core/mlx5_dpll.ko
+%ifarch aarch64
+cp -rf %{SOURCE34} ./lib/modules/%{KVERSION}/updates/drivers/block/rnbd/rnbd-client.ko
+cp -rf %{SOURCE35} ./lib/modules/%{KVERSION}/updates/drivers/block/rnbd/rnbd-server.ko
+cp -rf %{SOURCE36} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/cxgb4/iw_cxgb4.ko
+cp -rf %{SOURCE37} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/erdma/erdma.ko
+cp -rf %{SOURCE38} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mthca/ib_mthca.ko
+cp -rf %{SOURCE39} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/ocrdma/ocrdma.ko
+cp -rf %{SOURCE40} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/qedr/qedr.ko
+cp -rf %{SOURCE41} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/sw/siw/siw.ko
+cp -rf %{SOURCE42} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/rtrs/rtrs-client.ko
+cp -rf %{SOURCE43} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/rtrs/rtrs-core.ko
+cp -rf %{SOURCE44} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/rtrs/rtrs-server.ko
+cp -rf %{SOURCE45} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/ulp/srpt/ib_srpt.ko
+cp -rf %{SOURCE46} ./lib/modules/%{KVERSION}/updates/drivers/vfio/pci/mlx5/mlx5-vfio-pci.ko
+cp -rf %{SOURCE47} ./lib/modules/%{KVERSION}/updates/net/9p/9pnet_rdma.ko
+cp -rf %{SOURCE48} ./lib/modules/%{KVERSION}/updates/net/rds/rds_rdma.ko
+%endif
 
 popd
 
@@ -194,6 +237,14 @@ fi
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1_6.12.57.1.1
+- Upgrade version to 25.07.
+- Enable build on x86_64 kernel hwe.
+- Update additional kernel modules fwctl mana and mlx5_dpll included from 25.07
+
+* Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-24_6.12.57.1.1
+- Bump to match kernel-hwe
+
 * Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-23_6.12.50.2-1
 - Bump release to rebuild for new release
 
