@@ -469,7 +469,7 @@ done
 
 %changelog
 * Mon Dec 15 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 7.11.0-1
-- Upgrade to 7.11.0
+- Upgrade to 7.11.0 (Reference: Fedora 42)
 - License verified
 
 * Mon Nov 28 2022 Muhammad Falak <mwani@microsoft.com> - 5.4.0-5
