@@ -119,14 +119,18 @@ done
 install -dm 755 %{buildroot}/%{_javadocdir}/%{name}
 for i in xbean-asm-util xbean-finder xbean-reflect; do
   cp -r ${i}/target/site/apidocs %{buildroot}/%{_javadocdir}/%{name}/${i}
+  mv %{buildroot}/%{_javadocdir}/%{name}/${i}/legal/ADDITIONAL_LICENSE_INFO .
+  mv %{buildroot}/%{_javadocdir}/%{name}/${i}/legal/LICENSE .
 done
 %fdupes -s %{buildroot}/%{_javadocdir}/%{name}
 
 %files -f .mfiles
 %license LICENSE
-%doc NOTICE
+%license NOTICE
 
 %files javadoc
+%license LICENSE
+%license ADDITIONAL_LICENSE_INFO
 %{_javadocdir}/%{name}
 
 %changelog
