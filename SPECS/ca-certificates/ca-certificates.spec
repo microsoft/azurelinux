@@ -47,7 +47,7 @@ Name:           ca-certificates
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "prebuilt-ca-certificates*" packages as well.
 Epoch:          1
 Version:        2.0.0
-Release:        24%{?dist}
+Release:        25%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -340,6 +340,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Mon Nov 24 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:2.0.0-25
+- Adding 2 new base CAs: 'Microsoft TLS RSA Root G2' and 'Microsoft TLS ECC Root G2'.
+
 * Thu Oct 30 2025 Andrew Phelps <anphel@microsoft.com> - 1:2.0.0-24
 - Revert: Adding 2 new base CAs: 'Microsoft TLS RSA Root G2' and 'Microsoft TLS ECC Root G2'.
 

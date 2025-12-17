@@ -56,7 +56,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        11.2.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +64,8 @@ Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
 Patch0:         CVE-2023-4039.patch
+Patch1:         fix-infinite-recursion.patch
+Patch2:         CVE-2021-32256.patch
 
 BuildRequires:  gmp-devel
 BuildRequires:  mpfr-devel
@@ -397,6 +399,12 @@ chmod +x %{__ar_no_strip}
 %undefine __strip
 %global __strip %{__ar_no_strip}
 
+# Copy libcc1 library files on the systems where it is not copied
+if [[ ! -f %{buildroot}%{_libdir}/libcc1.so ]]
+then
+    cp -p %{buildroot}%{_lib64dir}/libcc1.* %{buildroot}%{_libdir}/
+fi
+
 %check
 ulimit -s 32768
 
@@ -425,6 +433,8 @@ $tests_ok
 %exclude %{_bindir}/*gfortran
 %exclude %{_bindir}/*c++
 %exclude %{_bindir}/*g++
+%exclude %{_lib64dir}/libcc1.*
+%exclude %{_libdir}/libcc1.*
 %{_bindir}/*
 # Libraries
 %{_lib64dir}/*
@@ -520,6 +530,9 @@ $tests_ok
 %do_files aarch64-linux-gnu %{build_cross}
 
 %changelog
+* Fri Apr 18 2025 Archana Shettigar <v-shettigara@microsoft.com> - 11.2.0-9
+- Patch CVE-2021-32256 along with supporting patch
+
 * Mon Dec 11 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.0-8
 - Added cross-compilation support for aarch64.
 - Used Fedora 36 spec (license: MIT) for guidance.
