@@ -279,11 +279,11 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
-* Tue Nov 25 2025 Ratiranjan Behera <v-ratbehera@microsoft.com> - 1.28.4-21
-- Patch CVE-2025-31133
-
-* Fri Nov 21 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.4-20
+* Fri Nov 28 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.4-21
 - Patch for CVE-2025-52881
+
+* Tue Nov 25 2025 Ratiranjan Behera <v-ratbehera@microsoft.com> - 1.28.4-20
+- Patch CVE-2025-31133
 
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.28.4-19
 - Bump release to rebuild with golang
