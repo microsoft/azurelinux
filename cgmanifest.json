@@ -14831,16 +14831,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "ocaml-alcotest",
-          "version": "1.9.1",
-          "downloadUrl": "https://github.com/mirage/alcotest/archive/1.9.1/alcotest-1.9.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ocaml-bos",
           "version": "0.2.1",
           "downloadUrl": "https://erratique.ch/software/bos/releases/bos-0.2.1.tbz"
