@@ -1,0 +1,15 @@
+#!/bin/sh
+# Fixes patch from upstream tracker view
+gawk '
+BEGIN {
+   dir=""
+}
+/^Index: openssl\// {
+   dir = $2
+}
+/^(---|\+\+\+)/ {
+   $2 = dir
+}
+{
+   print
+}'
