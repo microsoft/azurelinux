@@ -82,6 +82,10 @@ sed -e 's/import mock/import unittest.mock as mock/' -i fixtures/tests/_fixtures
 %doc README.rst GOALS NEWS
 
 %changelog
+* Thu Dec 18 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 4.0.1-12
+- Build fix by removing unwanted if-else conditions (license: MIT).
+- License verified.
+
 * Thu Feb 20 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 4.0.1-11
 - Initial CBL-Mariner import from Fedora 41 (license: MIT).
 - License verified.
