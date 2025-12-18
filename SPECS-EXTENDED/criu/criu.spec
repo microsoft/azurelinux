@@ -25,7 +25,11 @@ Source5:        criu-tmpfiles.conf
 BuildRequires:  gcc
 BuildRequires:  systemd
 BuildRequires:  libnet-devel
-BuildRequires:  protobuf-devel protobuf-c-devel %{py_prefix}-devel libnl3-devel libcap-devel
+BuildRequires:  protobuf-devel
+BuildRequires:  protobuf-c-devel
+BuildRequires:  %{py_prefix}-devel
+BuildRequires:  libnl3-devel
+BuildRequires:  libcap-devel
 BuildRequires:  %{py_prefix}-pip
 BuildRequires:  %{py_prefix}-setuptools
 BuildRequires:  %{py_prefix}-wheel
