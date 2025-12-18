@@ -3,7 +3,7 @@
 <project name="common" basedir=".">
 
   <property file="build.properties"/>
-  <property name="project.version" value="4.20"/>
+  <property name="project.version" value="4.24"/>
   <property name="project.groupId" value="org.apache.xbean"/>
 
   <property name="bundle.version" value="${project.version}.0"/>

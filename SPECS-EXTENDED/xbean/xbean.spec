@@ -19,7 +19,7 @@ Distribution:   Azure Linux
 
 
 Name:           xbean
-Version:        4.20
+Version:        4.24
 Release:        1%{?dist}
 Summary:        Java plugin based web server
 License:        ASL 2.0
@@ -31,8 +31,8 @@ Source2:        common.xml
 Source3:        xbean-asm-util-build.xml
 Source4:        xbean-finder-build.xml
 Source5:        xbean-reflect-build.xml
-Patch2:         0002-Unbundle-ASM.patch
-Patch3:         0003-Remove-dependency-on-log4j-and-commons-logging.patch
+Patch0:         0001-Unbundle-ASM.patch
+Patch1:         0002-Remove-dependency-on-log4j-and-commons-logging.patch
 BuildRequires:  ant
 BuildRequires:  ant-junit
 BuildRequires:  junit
@@ -134,8 +134,8 @@ done
 %{_javadocdir}/%{name}
 
 %changelog
-* Mon Dec 08 2025 Aditya Singh <v-aditysing@microsoft.com> - 4.20-1
-- Upgrade to version 4.20.
+* Mon Dec 08 2025 Aditya Singh <v-aditysing@microsoft.com> - 4.24-1
+- Upgrade to version 4.24.
 - License verified.
 
 * Mon Jan 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.18-1

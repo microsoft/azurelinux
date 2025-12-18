@@ -1,10 +1,10 @@
 {
  "Signatures": {
   "build.xml": "ea7d1e03fddfd101b70c2440cae7d62a9638e32a8b7f7a76aefdd4fd185cbdf4",
-  "common.xml": "ec2796b531396cac35387fbd39ec9930d6753e55bb7d3e22f84f70cc25f05e9f",
-  "xbean-4.20-source-release.zip": "3789adec66e88a99502cc0b9e0ede174e32521ada59522bf2c5cb5090292533f",
+  "common.xml": "66d29c5b2bebc9226ff5073bb3ec655fc1cba5a49dca4a8d8f60fc56fa1f9196",
+  "xbean-4.24-source-release.zip": "e4b64b40641ffe64eb5d27361addf132ab0db5d712da9e4b67c7a71b78be2b5b",
   "xbean-asm-util-build.xml": "c755f2810f93664211bcccb2863ead961d43165f39ec9c3821a27fcaa8b2e5e6",
-  "xbean-finder-build.xml": "6b2e0c5415cdc1cfdf42e5f4e1788b61b0caa5e68ee0e06dd582da29a87e0c45",
-  "xbean-reflect-build.xml": "8bde97b552f2a8850fb1609b5c783d6d40b3d898bc2e98973a1d62371d9cc0dc"
+  "xbean-finder-build.xml": "12aa5696fc9dd8694c219432155ab3a7cd11b0bf78b4052577812447f32b43cd",
+  "xbean-reflect-build.xml": "c7fcd36cd6db1098e0dd9ace2a44efcd6a572fd7d61b05d30f83944b9d951b6a"
  }
 }

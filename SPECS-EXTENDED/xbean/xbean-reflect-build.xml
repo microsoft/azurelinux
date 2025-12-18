@@ -59,9 +59,6 @@
       </src>
       <classpath refid="build.classpath"/>
     </javac>
-    <copy todir="${build.outputDir}">
-      <fileset dir="${build.resourceDir}"/>
-    </copy>
   </target>
 
   <!-- ====================================================================== -->
