@@ -19,7 +19,6 @@ BuildRequires:  python3-pip
 BuildRequires:  python3dist(wheel)
 BuildRequires:  python3-pbr
 
-%if %{with tests}
 BuildRequires:  python3-tox
 BuildRequires:  python3-pluggy
 BuildRequires:  python3-py 
@@ -31,7 +30,6 @@ BuildRequires:  python3-chardet
 BuildRequires:  python3-platformdirs
 BuildRequires:  python3-testtools
 BuildRequires:  python3-tox-current-env
-%endif
 
 %global _description %{expand:
 Fixtures defines a Python contract for reusable state / support logic,
@@ -77,10 +75,7 @@ sed -e 's/import mock/import unittest.mock as mock/' -i fixtures/tests/_fixtures
 # '%{__python3} -m testtools.run fixtures.test_suite' invocation, for better
 # compatibility with Python build environments.
 %check
-%if %{without bootstrap}
 %tox
-%endif
-%endif
 
 %files -n python%{python3_pkgversion}-%{pypi_name} -f %{pyproject_files}
 %license Apache-2.0 BSD
