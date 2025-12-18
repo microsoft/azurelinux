@@ -68,8 +68,7 @@ in Compress::Bzip2. Compress::Bzip2 is not well integrated into PerlIO, use
 the preferred IO::Compress::Bzip2 instead.
 
 %prep
-%setup -q -n Compress-Bzip2-%{version}
-%patch 0 -p1
+%autosetup -p1 -n Compress-Bzip2-%{version}
 # Remove bundled bzip2 library
 find bzlib-src -mindepth 1 -type f \! -name 'sample*' -delete
 perl -i -ne 'print $_ unless m{^bzlib-src/}' MANIFEST
