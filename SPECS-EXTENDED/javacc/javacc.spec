@@ -21,7 +21,7 @@ Distribution:   Azure Linux
 Summary:        A Parser and Scanner Generator for Java
 Name:           javacc
 Version:        7.0.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
 URL:            http://javacc.org
@@ -84,7 +84,7 @@ find ./examples -type f -exec sed -i 's/\r//' {} \;
 
 %build
 %{ant} \
-  -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 \
+  -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 \
   jar javadoc
 
 %install
@@ -127,6 +127,10 @@ ln -s %{_bindir}/javacc %{buildroot}%{_bindir}/javacc.sh
 %{_javadocdir}/%{name}
 
 %changelog
+* Wed Dec 17 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 7.0.4-4
+- Updated javac to use 1.8 to resolve build issues.
+- License verified
+
 * Sat Jul 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.0.4-3
 - Splitting as separate 'javacc' package with a build-time dependency on 'javacc-bootstrap'.
 - Switching to using single digit 'Release' tags.
