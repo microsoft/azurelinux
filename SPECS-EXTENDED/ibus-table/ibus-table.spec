@@ -2,17 +2,15 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 # This package depends on automagic byte compilation
 # https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
-%global _python_bytecompile_extra 1
 
 Name:       ibus-table
-Version:    1.12.4
-Release:    4%{?dist}
+Version:    1.17.16
+Release:    1%{?dist}
 Summary:    The Table engine for IBus platform
-License:    LGPLv2+
+License:    LGPL-2.1-or-later
 URL:        https://github.com/mike-fabian/ibus-table
-Source0:    https://github.com/mike-fabian/ibus-table/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:    https://github.com/mike-fabian/ibus-table/releases/download/%{version}/%{name}-%{version}.tar.gz
 Requires:       ibus > 1.3.0
-Requires:       python(abi) >= 3.3
 %{?__python3:Requires: %{__python3}}
 BuildRequires:  gcc
 BuildRequires:  ibus-devel > 1.3.0
@@ -65,17 +63,19 @@ The %{name}-tests package contains tests that can be used to verify
 the functionality of the installed %{name} package.
 
 %prep
-%setup -q
+%autosetup
 
 %build
 export PYTHON=%{__python3}
 %configure --disable-static --disable-additional --enable-installed-tests
-%__make %{?_smp_mflags}
+%make_build
 
 %install
 %__rm -rf $RPM_BUILD_ROOT
 export PYTHON=%{__python3}
-%__make DESTDIR=${RPM_BUILD_ROOT} NO_INDEX=true install pkgconfigdir=%{_datadir}/pkgconfig
+%make_install DESTDIR=${RPM_BUILD_ROOT} NO_INDEX=true pkgconfigdir=%{_datadir}/pkgconfig
+%py_byte_compile %{python3} %{buildroot}/usr/share/ibus-table/engine
+%py_byte_compile %{python3} %{buildroot}/usr/share/ibus-table/setup
 
 %find_lang %{name}
 
@@ -139,8 +139,16 @@ export PYTHON=%{__python3}
 %files -f %{name}.lang
 %doc AUTHORS COPYING README
 %{_datadir}/%{name}
-%{_datadir}/metainfo/*.appdata.xml
+%{_datadir}/metainfo/*.metainfo.xml
 %{_datadir}/ibus/component/table.xml
+%{_datadir}/icons/hicolor/16x16/apps/ibus-table.png
+%{_datadir}/icons/hicolor/22x22/apps/ibus-table.png
+%{_datadir}/icons/hicolor/32x32/apps/ibus-table.png
+%{_datadir}/icons/hicolor/48x48/apps/ibus-table.png
+%{_datadir}/icons/hicolor/64x64/apps/ibus-table.png
+%{_datadir}/icons/hicolor/128x128/apps/ibus-table.png
+%{_datadir}/icons/hicolor/256x256/apps/ibus-table.png
+%{_datadir}/icons/hicolor/scalable/apps/ibus-table.svg
 %{_datadir}/applications/ibus-setup-table.desktop
 %{_datadir}/glib-2.0/schemas/org.freedesktop.ibus.engine.table.gschema.xml
 %{_bindir}/%{name}-createdb
@@ -158,6 +166,10 @@ export PYTHON=%{__python3}
 %{_datadir}/installed-tests/%{name}
 
 %changelog
+* Tue Dec 16 2025 Aditya Singh <v-aditysing@microsoft.com> - 1.17.16-1
+- Upgrade to version 1.17.16.
+- License verified.
+
 * Fri Sep 01 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.4-4
 - Disabling test dependencies due to build failures.
 
