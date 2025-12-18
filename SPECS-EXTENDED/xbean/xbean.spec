@@ -135,60 +135,22 @@ done
 
 %changelog
 * Mon Dec 08 2025 Aditya Singh <v-aditysing@microsoft.com> - 4.20-1
-- Initial Azure Linux import from openSUSE Tumbleweed (license: same as "License" tag).
+- Upgrade to version 4.20.
 - License verified.
 
-* Wed Feb 21 2024 Gus Kenion <gus.kenion@suse.com>
-- Use %%patch -P N instead of deprecated %%patchN.
-* Wed Oct 25 2023 Fridrich Strba <fstrba@suse.com>
-- Build with source/target 8 to fix build with jdk 21
-* Mon Mar  7 2022 Fridrich Strba <fstrba@suse.com>
-- Upgrade to version 4.20
-  * Bugs
-    + XBEAN-298: FileArchive can lead to NPE
-    + XBEAN-326: NullpointerException in BundleAssignableClassFinder
-    + XBEAN-327: ASM9 bundle
-    + XBEAN-328: Upgrade to asm 9.0
-    + XBEAN-329: trunk does not build due to unused import
-    + XBEAN-330: Wrong OSGi manifests in xbean-asm9-shaded
-    + XBEAN-331: Upgrade to asm 9.1
-  * Improvements
-    + XBEAN-301: Add Automatic-Module-Name to xbean manifest
-    + XBEAN-303: asm shade NOTICE file shouldnt exist
-    + XBEAN-306: MultiJar release support enhancements
-    + XBEAN-309: Support Constructors and Static Factory Methods
-    in xbean-reflect
-    + XBEAN-310: Provide a PropertyEditorRegistry
-    + XBEAN-312: Ensure multi-jar are not scanned twice
-    + XBEAN-318: xbean-finder should log the class name on errors
-    + XBEAN-319: Enable xbean-finder to not store classes without
-    annotations
-    + XBEAN-320: Enable xbean-finder to not track some annotations
-    + XBEAN-322: Upgrade to ASM 7.2
-  * New Features
-    + XBEAN-305: Asm 6.1.1 upgrade
-    + XBEAN-313: Create asm7 bundle
-  * Tasks
-    + XBEAN-296: upgrade to asm 6
-    + XBEAN-302: Upgrade to asm 6.1
-    + XBEAN-308: ASM 6.2 upgrade
-    + XBEAN-311: ASM 6.2.1
-    + XBEAN-314: ASM 7.0 upgrade
-    + XBEAN-316: Upgrade ASM to 7.1
-    + XBEAN-321: Upgrade to asm 7.2-beta
-    + XBEAN-323: Upgrade ASM to 7.3.1
-    + XBEAN-325: Upgrade to asm 8
-- Removed patch:
-  * 0003-Port-to-QDox-2.0.patch
-    + not needed in modules that we build
-- Changed patch:
-  * 0001-Unshade-ASM.patch -> 0002-Unbundle-ASM.patch
-    + Different ASM version and code structure
-- Added patch:
-  * 0003-Remove-dependency-on-log4j-and-commons-logging.patch
-    + Remove unnecessary dependency on log4j and commons-logging
-* Tue Feb 22 2022 Fridrich Strba <fstrba@suse.com>
-- Do not build against the log4j12 packages, use the new reload4j
+* Mon Jan 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.18-1
+- Updating to version 4.18.
+- Removing dependency on "log4j12".
+- License verified.
+
+* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.5-6
+- Converting the 'Release' tag to the '[number].[distribution]' format.
+
+* Fri Nov 13 2020 Ruying Chen <v-ruyche@microsoft.com> - 4.5-5.5
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
+- Use javapackages-local-bootstrap to avoid build cycle.
+- Disable javadoc Xdoclint.
+
 * Mon Jan 27 2020 Fridrich Strba <fstrba@suse.com>
 - On supported platforms, avoid building with OpenJ9, in order to
   prevent build cycles
