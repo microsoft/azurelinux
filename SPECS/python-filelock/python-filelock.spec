@@ -1,7 +1,7 @@
 %global srcname filelock
 Summary:        A platform independent file lock
 Name:           python-filelock
-Version:        3.14.0
+Version:        3.20.1
 Release:        1%{?dist}
 License:        Unlicense
 Vendor:         Microsoft Corporation
@@ -63,6 +63,9 @@ pip3 install iniconfig
 %license %{python3_sitelib}/%{srcname}-%{version}.dist-info/licenses/LICENSE
 
 %changelog
+* Fri Dec 19 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.20.1-1
+- Auto-upgrade to 3.20.1 - for CVE-2025-68146
+
 * Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.14.0-1
 - Lot of redoing to use pyproject
 - Removing 'docs' subpackage since the new src doesn't include that folder
