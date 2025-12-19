@@ -29286,8 +29286,8 @@
         "type": "other",
         "other": {
           "name": "trilead-ssh2",
-          "version": "217.293.v56de4d4d3515",
-          "downloadUrl": "https://github.com/jenkinsci/trilead-ssh2/archive/refs/tags/build-217-jenkins-293.v56de4d4d3515.tar.gz"
+          "version": "217.371.vc1d30dc5a_b_32",
+          "downloadUrl": "https://github.com/jenkinsci/trilead-ssh2/archive/refs/tags/build-217-jenkins-371.vc1d30dc5a_b_32.tar.gz"
         }
       }
     },

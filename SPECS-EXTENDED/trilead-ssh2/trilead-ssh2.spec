@@ -19,8 +19,8 @@ Distribution:   Azure Linux
 
 
 %global buildver 217
-%global patchlvl 293
-%global githash  v56de4d4d3515
+%global patchlvl 371
+%global githash  vc1d30dc5a_b_32
 
 Name:           trilead-ssh2
 Version:        %{buildver}.%{patchlvl}.%{githash}
@@ -35,7 +35,7 @@ Patch0:         0001-Remove-the-dependency-on-google-tink.patch
 BuildRequires:  ant
 BuildRequires:  ed25519-java
 BuildRequires:  fdupes
-BuildRequires:  java-devel >= 1.8
+BuildRequires:  java-devel >= 1.9
 BuildRequires:  javapackages-local-bootstrap >= 6
 BuildRequires:  javapackages-tools
 BuildRequires:  jbcrypt
@@ -92,8 +92,8 @@ cp -aL target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
-* Tue Dec 16 2025 BinduSri Adabala <v-badabala@microsoft.com> - 217.293.v56de4d4d3515-1
-- Upgrade to 217.293.v56de4d4d3515
+* Fri Dec 19 2025 BinduSri Adabala <v-badabala@microsoft.com> - 217.371.vc1d30dc5a_b_32-1
+- Upgrade to 217.371.vc1d30dc5a_b_32
 - License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 217.8-2

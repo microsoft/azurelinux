@@ -10,7 +10,7 @@
   <property name="project.artifactId" value="trilead-ssh2"/>
   <property name="project.version" value="bogusVersion"/>
 
-  <property name="compiler.release" value="8"/>
+  <property name="compiler.release" value="9"/>
   <property name="compiler.source" value="1.${compiler.release}"/>
   <property name="compiler.target" value="${compiler.source}"/>
 
