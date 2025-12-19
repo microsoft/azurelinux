@@ -30237,8 +30237,8 @@
         "type": "other",
         "other": {
           "name": "xbean",
-          "version": "4.18",
-          "downloadUrl": "http://repo2.maven.org/maven2/org/apache/xbean/xbean/4.18/xbean-4.18-source-release.zip"
+          "version": "4.24",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/xbean/xbean/4.24/xbean-4.24-source-release.zip"
         }
       }
     },
