@@ -1,7 +1,7 @@
 Summary:        The command line for DC/OS
 Name:           dcos-cli
 Version:        1.2.0
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://github.com/dcos/dcos-cli/archive/refs/tags/%{version}.ta
 Patch0:         CVE-2024-28180.patch
 Patch1:         CVE-2025-27144.patch
 Patch2:         CVE-2024-51744.patch
+Patch3:         CVE-2025-65637.patch
 BuildRequires:  golang
 BuildRequires:  git
 %global debug_package %{nil}
@@ -20,10 +21,7 @@ BuildRequires:  git
 The command line for DC/OS.
 
 %prep
-%autosetup -N
-%autopatch -p1 0 1
-cd vendor/github.com/dgrijalva/jwt-go
-%autopatch 2
+%autosetup -p1
 
 %build
 export GOPATH=%{our_gopath}
@@ -50,6 +48,9 @@ go test -mod=vendor
 %{_bindir}/dcos
 
 %changelog
+* Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.0-23
+- Patch for CVE-2025-65637
+
 * Thu Sep 04 2025 Akhila Guruju <v-guakhila@microsoft.com> - 1.2.0-22
 - Bump release to rebuild with golang
 
