@@ -17,7 +17,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://portal.hdfgroup.org/display/HDF5/HDF5
-Source0:         https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_6/downloads/hdf5-1.14.6.tar.gz
+Source0:        https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_6/downloads/hdf5-1.14.6.tar.gz
 Source1:        h5comp
 Patch0:         hdf5-build.patch
 Patch1:         hdf5-wrappers.patch
@@ -264,7 +264,8 @@ cat > %{buildroot}%{macrosdir}/macros.hdf5 <<EOF
 EOF
 
 %check
-make -C build check
+# Do not ignore make error code
+make -C build check || exit 1
 #export HDF5_Make_Ignore=yes
 export OMPI_MCA_rmaps_base_oversubscribe=1
 # openmpi 5+
