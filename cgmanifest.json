@@ -7140,8 +7140,8 @@
         "type": "other",
         "other": {
           "name": "ibus-table",
-          "version": "1.12.4",
-          "downloadUrl": "https://github.com/mike-fabian/ibus-table/archive/refs/tags/1.12.4.tar.gz"
+          "version": "1.17.16",
+          "downloadUrl": "https://github.com/mike-fabian/ibus-table/releases/download/1.17.16/ibus-table-1.17.16.tar.gz"
         }
       }
     },
