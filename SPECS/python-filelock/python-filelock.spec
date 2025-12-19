@@ -8,6 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/toxdev/filelock
 Source0:        https://files.pythonhosted.org/packages/source/f/%{srcname}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         remove-python-3.14-classifier.patch
 BuildArch:      noarch
 
 %description
