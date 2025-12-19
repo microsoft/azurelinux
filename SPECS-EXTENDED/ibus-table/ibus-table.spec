@@ -137,7 +137,7 @@ export PYTHON=%{__python3}
 
 
 %files -f %{name}.lang
-%doc AUTHORS COPYING README
+%doc AUTHORS README
 %{_datadir}/%{name}
 %{_datadir}/metainfo/*.metainfo.xml
 %{_datadir}/ibus/component/table.xml
@@ -155,6 +155,7 @@ export PYTHON=%{__python3}
 %{_libexecdir}/ibus-engine-table
 %{_libexecdir}/ibus-setup-table
 %{_mandir}/man1/*
+%license COPYING
 
 %files devel
 %{_datadir}/pkgconfig/%{name}.pc
