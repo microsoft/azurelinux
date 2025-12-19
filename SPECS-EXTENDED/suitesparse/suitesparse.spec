@@ -254,13 +254,23 @@ pushd SuiteSparse-%{version}
         install -m0644 -D "$f" "../Licenses/$b/$x"
     done
 
-  find -type f -a \( -iname \*.pdf -o -iname ChangeLog -o -iname README\* -o -iname \*.txt \) |
-    while read f; do
-        b="${f%%/*}"
-        r="${f#$b}"
-        x="$(echo "$r" | sed 's|/doc/|/|gi')"
-        install -m0644 -D "$f" "../Doc/$b/$x"
-    done
+    # Copy documentation files but EXCLUDE License.txt, gpl.txt, GPLv2.txt, lesserv3.txt
+  find . -type f \( \
+          -iname "*.pdf" -o \
+          -iname "ChangeLog" -o \
+          -iname "README*" -o \
+          -iname "*.txt" \
+      \) \
+      ! -iname "License.txt" \
+      ! -iname "gpl.txt" \
+      ! -iname "GPLv2.txt" \
+      ! -iname "lesserv3.txt" \
+  | while read f; do
+      b="${f%%/*}"
+      r="${f#$b}"
+      x="$(echo "$r" | sed 's|/doc/|/|gi')"
+      install -m0644 -D "$f" "../Doc/$b/$x"
+  done
 popd
 %if 0%{?build64}
 cp -al SuiteSparse-%{version} SuiteSparse64-%{version}
@@ -316,71 +326,7 @@ do
 done
 
 %files
-%license Licenses/AMD/Doc/License.txt
-%license Licenses/BTF/Doc/License.txt
-%license Licenses/CAMD/Doc/License.txt
-%license Licenses/CCOLAMD/Doc/License.txt
-%license Licenses/COLAMD/Doc/License.txt
-%license Licenses/CSparse/Doc/License.txt
-%license Licenses/CSparse/MATLAB/ssget/Doc/License.txt
-%license Licenses/CXSparse/Doc/License.txt
-%license Licenses/Example/License.txt
-%license Licenses/GraphBLAS/CUDA/License.txt
-%license Licenses/KLU/Doc/License.txt
-%license Licenses/LDL/Doc/License.txt
-%license Licenses/LICENSE.txt
-%license Licenses/MATLAB_Tools/Doc/License.txt
-%license Licenses/Mongoose/Doc/License.txt
-%license Licenses/ParU/LICENSE.txt
-%license Licenses/RBio/Doc/License.txt
-%license Licenses/SPEX/LICENSE.txt
-
-# SPEX Backslash
-%license Licenses/SPEX/SPEX_Backslash/CONTRIBUTOR-LICENSE.txt
-%license Licenses/SPEX/SPEX_Backslash/GPLv2.txt
-%license Licenses/SPEX/SPEX_Backslash/lesserv3.txt
-
-# SPEX Cholesky
-%license Licenses/SPEX/SPEX_Cholesky/CONTRIBUTOR-LICENSE.txt
-%license Licenses/SPEX/SPEX_Cholesky/GPLv2.txt
-%license Licenses/SPEX/SPEX_Cholesky/lesserv3.txt
-
-# SPEX LU
-%license Licenses/SPEX/SPEX_LU/CONTRIBUTOR-LICENSE.txt
-%license Licenses/SPEX/SPEX_LU/GPLv2.txt
-%license Licenses/SPEX/SPEX_LU/lesserv3.txt
-
-# SPEX Utilities
-%license Licenses/SPEX/SPEX_Utilities/CONTRIBUTOR-LICENSE.txt
-%license Licenses/SPEX/SPEX_Utilities/GPLv2.txt
-%license Licenses/SPEX/SPEX_Utilities/lesserv3.txt
-
-# SPQR
-%license Licenses/SPQR/Doc/License.txt
-%license Licenses/SPQR/GPUQREngine/Doc/License.txt
-%license Licenses/SPQR/GPURuntime/Doc/License.txt
-%license Licenses/SPQR/Doc/gpl.txt
-%license Licenses/SPQR/GPUQREngine/Doc/gpl.txt
-%license Licenses/SPQR/GPURuntime/Doc/gpl.txt
-
-# CHOLMOD GPL files
-%license Licenses/CHOLMOD/Demo/gpl.txt
-%license Licenses/CHOLMOD/MATLAB/gpl.txt
-%license Licenses/CHOLMOD/MatrixOps/gpl.txt
-%license Licenses/CHOLMOD/Modify/gpl.txt
-%license Licenses/CHOLMOD/Supernodal/gpl.txt
-%license Licenses/CHOLMOD/Tcov/gpl.txt
-
-# RBio GPL
-%license Licenses/RBio/Doc/gpl.txt
-
-# UMFPACK GPL
-%license Licenses/UMFPACK/Doc/gpl.txt
-
-# Contributor PDFs
-%license Licenses/Contributor_License/SuiteSparse_Individual_Contributor_License_Agreement_20241011.pdf
-%license Licenses/GraphBLAS_Contributor_License/SuiteSparse_Individual_Contributor_License_Agreement_20241011.pdf
-
+%license Licenses
 %{_libdir}/libamd.so.%{amd_version_major}*
 %{_libdir}/libbtf.so.%{btf_version_major}*
 %{_libdir}/libcamd.so.%{camd_version_major}*
@@ -529,7 +475,7 @@ done
 %endif
 
 %files doc
-%doc Doc/
+%doc Doc/*
 
 %changelog
 * Mon Dec 15 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 7.11.0-1
