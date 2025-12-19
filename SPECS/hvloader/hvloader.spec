@@ -4,7 +4,7 @@
 Summary:        HvLoader.efi is an EFI application for loading an external hypervisor loader.
 Name:           hvloader
 Version:        1.0.1
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,7 @@ Patch17: 	CVE-2023-45237.patch
 Patch18: 	CVE-2023-45236.patch
 Patch19: 	CVE-2024-38796.patch
 Patch20:  	CVE-2025-3770.patch
+Patch21:        CVE-2025-2296.patch
 
 BuildRequires:  bc
 BuildRequires:  gcc
@@ -80,6 +81,9 @@ cp ./Build/MdeModule/RELEASE_GCC5/X64/MdeModulePkg/Application/%{name_github}-%{
 /boot/efi/HvLoader.efi
 
 %changelog
+* Wed Nov 20 2025 Jyoti kanase <v-jykanase@microsoft.com> - 1.0.1-15
+- Patch for CVE-2025-2296
+
 * Tue Aug 12 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.1-14
 - Patch for CVE-2025-3770
 
