@@ -7,7 +7,7 @@
 
 Name:           perl-Compress-Bzip2
 Version:        2.28
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Interface to Bzip2 compression library
 # bzlib-src/win-tst-dlltest.c (unbundled):  Public Domain
 # bzlib-src/LICENSE (unbundled):            BSD
@@ -18,6 +18,7 @@ URL:            https://metacpan.org/release/Compress-Bzip2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Compress-Bzip2-%{version}.tar.gz
+Patch0:         CVE-2016-3189.patch
 BuildRequires:  bzip2-devel >= 1.0.5
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -67,7 +68,7 @@ in Compress::Bzip2. Compress::Bzip2 is not well integrated into PerlIO, use
 the preferred IO::Compress::Bzip2 instead.
 
 %prep
-%setup -q -n Compress-Bzip2-%{version}
+%autosetup -p1 -n Compress-Bzip2-%{version}
 # Remove bundled bzip2 library
 find bzlib-src -mindepth 1 -type f \! -name 'sample*' -delete
 perl -i -ne 'print $_ unless m{^bzlib-src/}' MANIFEST
@@ -94,6 +95,9 @@ make test
 %{_mandir}/man3/*.3pm*
 
 %changelog
+* Fri Dec 19 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.28-4
+- Patch CVE-2016-3189
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.28-3
 - Adding 'BuildRequires: perl-generators'.
 
