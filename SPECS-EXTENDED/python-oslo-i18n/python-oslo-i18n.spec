@@ -1,13 +1,4 @@
-%{!?sources_gpg: %{!?dlrn:%global sources_gpg 1} }
-%global sources_gpg_sign 0x2ef3fe0ec2b075ab7458b5f8b702b20b13df2318
 %{!?upstream_version: %global upstream_version %{version}%{?milestone}}
-# we are excluding some BRs from automatic generator
-%global excluded_brs doc8 bandit pre-commit hacking flake8-import-order
-# Exclude sphinx from BRs if docs are disabled
-%if ! 0%{?with_doc}
-%global excluded_brs %{excluded_brs} sphinx openstackdocstheme
-%endif
-
 %global pypi_name oslo.i18n
 %global pkg_name oslo-i18n
 %global with_doc 1
@@ -18,19 +9,14 @@ The oslo.i18n library contain utilities for working with internationalization \
 or library.
 
 Name:           python-oslo-i18n
-Version:        6.3.0
-Release:        6%{?dist}
+Version:        6.7.1
+Release:        2%{?dist}
 Summary:        OpenStack i18n library
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/openstack/%{pypi_name}
 Source0:        https://tarballs.openstack.org/%{pypi_name}/%{pypi_name}-%{upstream_version}.tar.gz#/%{name}-%{version}.tar.gz
-# Required for tarball sources verification
-%if 0%{?sources_gpg} == 1
-Source101:        https://tarballs.openstack.org/%{pypi_name}/%{pypi_name}-%{upstream_version}.tar.gz.asc
-Source102:        https://releases.openstack.org/_static/%{sources_gpg_sign}.txt
-%endif
 
 BuildArch:      noarch
 
@@ -48,6 +34,7 @@ BuildRequires:  git-core
 Summary:        OpenStack i18n Python 2 library
 
 BuildRequires:  python3-devel
+BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-pbr
 BuildRequires:  python3-babel
@@ -89,7 +76,7 @@ Translation files for Oslo i18n library
 %if 0%{?sources_gpg} == 1
 %{gpgverify}  --keyring=%{SOURCE102} --signature=%{SOURCE101} --data=%{SOURCE0}
 %endif
-%autosetup -n %{pypi_name}-%{upstream_version} -S git
+%autosetup -n oslo_i18n-%{upstream_version} -S git
 
 
 sed -i /^[[:space:]]*-c{env:.*_CONSTRAINTS_FILE.*/d tox.ini
@@ -159,9 +146,36 @@ mv %{buildroot}%{python3_sitelib}/oslo_i18n/locale %{buildroot}%{_datadir}/local
 %license LICENSE
 
 %changelog
-* Mon Feb 24 2025 Archana Shettigar <v-shettigara@microsoft.com> - 6.3.0-6
-- Initial Azure Linux import from Fedora 41 (license: MIT)
+* Mon Dec 22 2025 Archana Shettigar <v-shettigara@microsoft.com> - 6.7.1-2
+- Initial Azure Linux import from Fedora 44 (license: MIT)
 - License verified
+
+* Thu Nov 20 2025 Gwyn Ciesla <gwync@protonmail.com> - 6.7.1-1
+- 6.7.1
+
+* Thu Nov 13 2025 Gwyn Ciesla <gwync@protonmail.com> - 6.7.0-1
+- 6.7.0
+
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 6.4.0-7
+- Rebuilt for Python 3.14.0rc3 bytecode
+
+* Fri Aug 15 2025 Python Maint <python-maint@redhat.com> - 6.4.0-6
+- Rebuilt for Python 3.14.0rc2 bytecode
+
+* Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 6.4.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
+
+* Tue Jun 03 2025 Python Maint <python-maint@redhat.com> - 6.4.0-4
+- Rebuilt for Python 3.14
+
+* Mon Jun 02 2025 Python Maint <python-maint@redhat.com> - 6.4.0-3
+- Bootstrap for Python 3.14
+
+* Sat Jan 18 2025 Fedora Release Engineering <releng@fedoraproject.org> - 6.4.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Mon Oct 07 2024 Joel Capitao <jcapitao@redhat.com> 6.4.0-1
+- Update to upstream version 6.4.0
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 6.3.0-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
