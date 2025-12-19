@@ -1227,8 +1227,8 @@
         "type": "other",
         "other": {
           "name": "booth",
-          "version": "1.0",
-          "downloadUrl": "https://github.com/ClusterLabs/booth/archive/5d837d2b5bf1c240a5f1c5efe4e8d79f55727cca/booth-5d837d2.tar.gz"
+          "version": "1.2",
+          "downloadUrl": "https://github.com/ClusterLabs/booth/releases/download/v1.2/booth-1.2.tar.gz"
         }
       }
     },

@@ -1,12 +1,9 @@
 # Disable automatic compilation of Python files in extra directories
 %global _python_bytecompile_extra 0
-# set following to the actual commit or, for final release, concatenate
-# "boothver" macro to "v" (will yield a tag per the convention)
-%global commit 5d837d2b5bf1c240a5f1c5efe4e8d79f55727cca
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}}
 %{!?_licensedir:%global license %doc}
 %global test_path   %{_datadir}/booth/tests
+%global booth_user booth_test_user
 # RPMs are split as follows:
 # * booth:
 #   - envelope package serving as a syntactic shortcut to install
@@ -31,14 +28,13 @@
 %bcond_with glue
 Summary:        Ticket Manager for Multi-site Clusters
 Name:           booth
-Version:        1.0
-Release:        8%{?dist}
-License:        GPLv2+
+Version:        1.2
+Release:        1%{?dist}
+License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/ClusterLabs/%{name}
-Source0:        https://github.com/ClusterLabs/%{name}/archive/%{commit}/%{name}-%{shortcommit}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:    CVE-2022-2553.patch
+Source0:        https://github.com/ClusterLabs/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 # direct build process dependencies
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -78,7 +74,9 @@ Requires:       %{name}-core%{?_isa}
 Requires:       %{name}-site
 
 %files
-# intentionally empty
+%license COPYING
+%dir %{_datadir}/pkgconfig
+%{_datadir}/pkgconfig/booth.pc
 
 %description
 Booth manages tickets which authorize cluster sites located
@@ -154,7 +152,7 @@ BuildArch:      noarch
 Automated tests for running Booth, ticket manager for multi-site clusters.
 
 %prep
-%autosetup -p1 -n %{name}-%{commit}
+%autosetup -n %{name}-%{version}
 
 %build
 export CFLAGS=" %{build_cflags} -I/usr/include/pacemaker "
@@ -183,21 +181,35 @@ rm -rf %{buildroot}/%{_initrddir}/booth-arbitrator
 rm -rf %{buildroot}/%{_pkgdocdir}/README.upgrade-from-v0.1
 rm -rf %{buildroot}/%{_pkgdocdir}/COPYING
 # tests
-mkdir -p %{buildroot}/%{test_path}
-cp -a -t %{buildroot}/%{test_path} \
-        -- conf test unit-tests script/unit-test.py
-chmod +x %{buildroot}/%{test_path}/test/booth_path
-chmod +x %{buildroot}/%{test_path}/test/live_test.sh
-mkdir -p %{buildroot}/%{test_path}/src
-ln -s -t %{buildroot}/%{test_path}/src \
-        -- %{_sbindir}/boothd
+mkdir -p %{test_path}
+cp -a -t %{test_path} \
+        -- conf test
+chmod +x %{test_path}/test/booth_path
+chmod +x %{test_path}/test/live_test.sh
+mkdir -p %{test_path}/src
+ln -s -t %{test_path}/src \
+        -- %{buildroot}/%{_sbindir}/boothd
+# Generate runtests.py and boothtestenv.py
+sed -e 's#PYTHON_SHEBANG#%{__python3} -Es#g' \
+    -e 's#TEST_SRC_DIR#%{test_path}/test#g' \
+    -e 's#TEST_BUILD_DIR#%{test_path}/test#g' \
+    %{test_path}/test/runtests.py.in > %{test_path}/test/runtests.py
+
+chmod +x %{test_path}/test/runtests.py
+
+sed -e 's#PYTHON_SHEBANG#%{__python3} -Es#g' \
+    -e 's#TEST_SRC_DIR#%{test_path}/test#g' \
+    -e 's#TEST_BUILD_DIR#%{test_path}/test#g' \
+    %{test_path}/test/boothtestenv.py.in > %{test_path}/test/boothtestenv.py
 
 # https://fedoraproject.org/wiki/Packaging:Python_Appendix#Manual_byte_compilation
-%py_byte_compile %{__python3} %{buildroot}/%{test_path}
+%py_byte_compile %{__python3} %{test_path}
 
 %check
 # alternatively: test/runtests.py
-VERBOSE=1 make check
+# Booth tests cannot run as root in RPM build system
+useradd -s /usr/bin/sh %{booth_user}
+su %{booth_user} -s /bin/sh -c "VERBOSE=1 %{test_path}/test/runtests.py"
 
 %files core
 %license COPYING
@@ -211,6 +223,9 @@ VERBOSE=1 make check
 # configuration
 %dir %{_sysconfdir}/booth
 %exclude %{_sysconfdir}/booth/booth.conf.example
+
+%dir %attr (750, %{uname}, %{gname}) %{_var}/lib/booth/
+%dir %attr (750, %{uname}, %{gname}) %{_var}/lib/booth/cores
 
 %files arbitrator
 %{_unitdir}/booth@.service
@@ -233,11 +248,14 @@ VERBOSE=1 make check
 %files test
 %doc %{_pkgdocdir}/README-testing
 # /usr/share/booth provided by -site
-%{test_path}
 # /usr/lib/ocf/resource.d/booth provided by -site
 %{_libdir}/ocf/resource.d/booth/sharedrsc
 
 %changelog
+* Thu Dec 18 2025 Aditya Singh <v-aditysing@microsoft.com> - 1.2-1
+- Upgrade to version 1.2
+- License verified.
+
 * Wed Aug 30 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0-8
 - Add patch for CVE-2022-2553
 
