@@ -8,7 +8,7 @@ Distribution:   Azure Linux
 
 Name:           python-%{pypi_name}
 Version:        4.0.1
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        Fixtures, reusable state for writing clean tests and more
 
 License:        Apache-2.0 OR BSD-3-Clause
