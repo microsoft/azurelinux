@@ -1,6 +1,6 @@
 %{!?upstream_version: %global upstream_version %{version}%{?milestone}}
-%global pypi_name oslo.i18n
-%global pkg_name oslo-i18n
+%global pypi_name oslo_i18n
+%global pkg_name oslo_i18n
 %global with_doc 1
 
 %global common_desc \
@@ -16,7 +16,7 @@ License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/openstack/%{pypi_name}
-Source0:        https://tarballs.openstack.org/%{pypi_name}/%{pypi_name}-%{upstream_version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/o/%{pypi_name}/%{pypi_name}-%{upstream_version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -76,7 +76,7 @@ Translation files for Oslo i18n library
 %if 0%{?sources_gpg} == 1
 %{gpgverify}  --keyring=%{SOURCE102} --signature=%{SOURCE101} --data=%{SOURCE0}
 %endif
-%autosetup -n oslo_i18n-%{upstream_version} -S git
+%autosetup -n %{pypi_name}-%{upstream_version} -S git
 
 
 sed -i /^[[:space:]]*-c{env:.*_CONSTRAINTS_FILE.*/d tox.ini
