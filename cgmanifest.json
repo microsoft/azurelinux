@@ -23944,7 +23944,7 @@
         "other": {
           "name": "python-oslo-i18n",
           "version": "6.7.1",
-          "downloadUrl": "https://tarballs.openstack.org/oslo.i18n/oslo.i18n-6.7.1.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/o/oslo_i18n/oslo_i18n-6.7.1.tar.gz"
         }
       }
     },
