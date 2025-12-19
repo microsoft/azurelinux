@@ -23943,8 +23943,8 @@
         "type": "other",
         "other": {
           "name": "python-oslo-i18n",
-          "version": "6.3.0",
-          "downloadUrl": "https://tarballs.openstack.org/oslo.i18n/oslo.i18n-6.3.0.tar.gz"
+          "version": "6.7.1",
+          "downloadUrl": "https://tarballs.openstack.org/oslo.i18n/oslo.i18n-6.7.1.tar.gz"
         }
       }
     },
