@@ -18,11 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.6.1
-<<<<<<< HEAD
-Release:        26%{?dist}
-=======
-Release:        24%{?dist}
->>>>>>> 8066ae009 (Revert InfluxDB change.  PTEST regressed  (#15357))
+Release:        25%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,11 +63,7 @@ Patch4:         CVE-2024-28180.patch
 Patch5:         CVE-2025-27144.patch
 Patch6:         CVE-2025-22870.patch
 Patch7:         CVE-2024-51744.patch
-<<<<<<< HEAD
 Patch8:         CVE-2025-65637.patch
-Patch9:         CVE-2025-10543.patch
-=======
->>>>>>> 8066ae009 (Revert InfluxDB change.  PTEST regressed  (#15357))
 BuildRequires:  clang
 BuildRequires:  golang <= 1.18.8
 BuildRequires:  kernel-headers
@@ -161,15 +153,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
-<<<<<<< HEAD
-* Wed Dec 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.6.1-26
-- Patch for CVE-2025-10543
-
 * Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.6.1-25
 - Patch for CVE-2025-65637
 
-=======
->>>>>>> 8066ae009 (Revert InfluxDB change.  PTEST regressed  (#15357))
 * Mon Sep 22 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.6.1-24
 - Bump release to rebuild with golang
 
