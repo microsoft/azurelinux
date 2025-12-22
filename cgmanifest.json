@@ -22874,7 +22874,7 @@
         "other": {
           "name": "python-flake8",
           "version": "7.3.0",
-          "downloadUrl": " https://github.com/PyCQA/flake8/archive/refs/tags/7.3.0.tar.gz"
+          "downloadUrl": "https://github.com/PyCQA/flake8/archive/refs/tags/7.3.0.tar.gz"
         }
       }
     },
