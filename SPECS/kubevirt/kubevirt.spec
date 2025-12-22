@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.5.3
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,6 +31,8 @@ Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{versio
 # Nexus team needs these to-be-upstreamed patches for the operator Edge to work
 # correctly.
 Patch0:         CVE-2025-47913.patch
+Patch1:         CVE-2025-64324.patch
+Patch2:         CVE-2025-64435.patch
 
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
@@ -268,6 +270,12 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Wed Dec 17 2025 Aditya Singh <v-aditysing@microsoft.com> - 1.5.3-4
+- Added patch for CVE-2025-64435
+
+* Tue Dec 16 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.5.3-3
+- Patch for CVE-2025-64324
+
 * Mon Nov 24 2025 Andrew Phelps <anphel@microsoft.com> - 1.5.3-2
 - Bump to rebuild with updated glibc
 
@@ -289,7 +297,7 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 * Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.5.0-2
 - Bump to rebuild with updated glibc
 
-* Thu Jul 03 2025 Harshit Gupta <guptaharshit@microsoft.com> - 1.5.0-1
+* Fri Jul 11 2025 Harshit Gupta <guptaharshit@microsoft.com> - 1.5.0-1
 - Upgrade to 1.5.0
 - Removed old patches
 - Remove virt_launcher.cil SELinux policy
@@ -309,7 +317,7 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 * Mon Mar 03 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 1.2.0-15
 - Address CVE-2023-44487
 
-* Sun March 02 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-14
+* Sun Mar 02 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-14
 - Address CVE-2025-22869
 
 * Tue Feb 25 2025 Chris Co <chrco@microsoft.com> - 1.2.0-14

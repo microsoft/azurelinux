@@ -5250,8 +5250,8 @@
         "type": "other",
         "other": {
           "name": "hdf5",
-          "version": "1.14.4.3",
-          "downloadUrl": "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.14/hdf5-1.14.4/src/hdf5-1.14.4-3.tar.gz"
+          "version": "1.14.6",
+          "downloadUrl": "https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_6/downloads/hdf5-1.14.6.tar.gz"
         }
       }
     },
@@ -5410,8 +5410,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.65",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.65.tar.bz2"
+          "version": "2.4.66",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.66.tar.bz2"
         }
       }
     },
@@ -7140,8 +7140,8 @@
         "type": "other",
         "other": {
           "name": "ibus-table",
-          "version": "1.12.4",
-          "downloadUrl": "https://github.com/mike-fabian/ibus-table/archive/refs/tags/1.12.4.tar.gz"
+          "version": "1.17.16",
+          "downloadUrl": "https://github.com/mike-fabian/ibus-table/releases/download/1.17.16/ibus-table-1.17.16.tar.gz"
         }
       }
     },
@@ -8081,8 +8081,8 @@
         "type": "other",
         "other": {
           "name": "jtidy",
-          "version": "8.0",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/jtidy-r813.tar.bz2"
+          "version": "1.0.4",
+          "downloadUrl": "https://github.com/jtidy/jtidy/archive/refs/tags/jtidy-1.0.4.tar.gz"
         }
       }
     },
@@ -17573,8 +17573,8 @@
         "type": "other",
         "other": {
           "name": "perl-FFI-CheckLib",
-          "version": "0.26",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/FFI-CheckLib-0.26.tar.gz"
+          "version": "0.31",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/FFI-CheckLib-0.31.tar.gz"
         }
       }
     },
@@ -21143,8 +21143,8 @@
         "type": "other",
         "other": {
           "name": "pgbouncer",
-          "version": "1.24.1",
-          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.24.1/pgbouncer-1.24.1.tar.gz"
+          "version": "1.25.1",
+          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.25.1/pgbouncer-1.25.1.tar.gz"
         }
       }
     },
@@ -25832,9 +25832,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "qt5-qtsensors",
-          "version": "5.14.2",
-          "downloadUrl": "https://download.qt.io/official_releases/qt/5.14/5.14.2/submodules/qtsensors-everywhere-src-5.14.2.tar.xz"
+          "name": "qt6-qtsensors",
+          "version": "6.5.7",
+          "downloadUrl": "https://download.qt.io/official_releases/qt/6.5/6.5.7/src/submodules/qtsensors-everywhere-opensource-src-6.5.7.tar.xz"
         }
       }
     },
@@ -25842,9 +25842,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "qt5-qtserialport",
-          "version": "5.15.9",
-          "downloadUrl": "https://download.qt.io/official_releases/qt/5.15/5.15.9/submodules/qtserialport-everywhere-opensource-src-5.15.9.tar.xz"
+          "name": "qt6-qtserialport",
+          "version": "6.5.7",
+          "downloadUrl": "https://download.qt.io/official_releases/qt/6.5/6.5.7/src/submodules/qtserialport-everywhere-opensource-src-6.5.7.tar.xz"
         }
       }
     },
@@ -29336,8 +29336,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2025b",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2025b.tar.gz"
+          "version": "2025c",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2025c.tar.gz"
         }
       }
     },
@@ -30237,8 +30237,8 @@
         "type": "other",
         "other": {
           "name": "xbean",
-          "version": "4.18",
-          "downloadUrl": "http://repo2.maven.org/maven2/org/apache/xbean/xbean/4.18/xbean-4.18-source-release.zip"
+          "version": "4.24",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/xbean/xbean/4.24/xbean-4.24-source-release.zip"
         }
       }
     },
@@ -30707,8 +30707,8 @@
         "type": "other",
         "other": {
           "name": "xmldb-api",
-          "version": "0.1",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xmldb-xapi-20041010-src.tar.bz2"
+          "version": "1.7.0",
+          "downloadUrl": "https://github.com/xmldb-org/xmldb-api/archive/xmldb-api-1.7.tar.gz"
         }
       }
     },

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="xbean" default="package" basedir=".">
+
+  <!-- ====================================================================== -->
+  <!-- Cleaning up target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="clean" description="Clean the output directory">
+    <ant antfile="build.xml" dir="xbean-asm-util" target="clean"/>
+    <ant antfile="build.xml" dir="xbean-finder" target="clean"/>
+    <ant antfile="build.xml" dir="xbean-reflect" target="clean"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Compilation target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="compile" description="Compile the code">
+    <ant antfile="build.xml" dir="xbean-asm-util" target="compile"/>
+    <ant antfile="build.xml" dir="xbean-finder" target="compile"/>
+    <ant antfile="build.xml" dir="xbean-reflect" target="compile"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Javadoc target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="javadoc" description="Generates the Javadoc of the application">
+    <ant antfile="build.xml" dir="xbean-asm-util" target="javadoc"/>
+    <ant antfile="build.xml" dir="xbean-finder" target="javadoc"/>
+    <ant antfile="build.xml" dir="xbean-reflect" target="javadoc"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Package target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="package" description="Package the application">
+    <ant antfile="build.xml" dir="xbean-asm-util" target="package"/>
+    <ant antfile="build.xml" dir="xbean-finder" target="package"/>
+    <ant antfile="build.xml" dir="xbean-reflect" target="package"/>
+  </target>
+
+</project>
