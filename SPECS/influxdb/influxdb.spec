@@ -154,7 +154,7 @@ go test ./...
 
 %changelog
 * Mon Dec 22 2025 Jon Slobodzian <joslobo@microsoft.com> - 2.6.1-27
-- Revert Patch for CVE-2025-10543 as it breaks selftest
+- Revert Patch for CVE-2025-65637 as it breaks selftest
 
 * Wed Dec 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.6.1-26
 - Patch for CVE-2025-10543
