@@ -63,7 +63,7 @@ Patch4:         CVE-2024-28180.patch
 Patch5:         CVE-2025-27144.patch
 Patch6:         CVE-2025-22870.patch
 Patch7:         CVE-2024-51744.patch
-Patch9:         CVE-2025-10543.patch
+Patch8:         CVE-2025-10543.patch
 BuildRequires:  clang
 BuildRequires:  golang <= 1.18.8
 BuildRequires:  kernel-headers
