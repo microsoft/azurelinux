@@ -5430,8 +5430,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.65",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.65.tar.bz2"
+          "version": "2.4.66",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.66.tar.bz2"
         }
       }
     },
@@ -21153,8 +21153,8 @@
         "type": "other",
         "other": {
           "name": "pgbouncer",
-          "version": "1.24.1",
-          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.24.1/pgbouncer-1.24.1.tar.gz"
+          "version": "1.25.1",
+          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.25.1/pgbouncer-1.25.1.tar.gz"
         }
       }
     },
