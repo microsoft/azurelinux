@@ -6,7 +6,7 @@ Distribution:   Azure Linux
 %else
 %bcond_with perl_Params_ValidationCompiler_enables_optional_test
 %endif
- 
+
 Name:		perl-Params-ValidationCompiler
 Version:	0.31
 Release:	1%{?dist}
@@ -60,25 +60,25 @@ BuildRequires:	perl(Types::Standard)
 # Dependencies
 Recommends:	perl(Class::XSAccessor) >= 1.17
 Recommends:	perl(Sub::Util) >= 1.40
- 
+
 %description
 Create a customized, optimized, non-lobotomized, uncompromised, and thoroughly
 specialized parameter checking subroutine.
- 
+
 %prep
 %setup -q -n Params-ValidationCompiler-%{version}
- 
+
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PERLLOCAL=1 NO_PACKLIST=1
 make %{?_smp_mflags}
- 
+
 %install
 make install DESTDIR=%{buildroot}
 %{_fixperms} -c %{buildroot}
- 
+
 %check
 make test
- 
+
 %files
 %license LICENSE
 %doc Changes CODE_OF_CONDUCT.md CONTRIBUTING.md eg/ README.md
