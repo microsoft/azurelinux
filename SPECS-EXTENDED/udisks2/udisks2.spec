@@ -23,8 +23,8 @@
 
 Name:    udisks2
 Summary: Disk Manager
-Version: 2.10.1
-Release: 7%{?dist}
+Version: 2.11.0
+Release: 1%{?dist}
 License: GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -332,6 +332,9 @@ fi
 %endif
 
 %changelog
+* Mon Dec 22 2025 Sumit Jena <v-sumitjena@microsoft.com> - 2.11.0-1
+- Upgrade to version 2.11.0
+
 * Wed Mar 19 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.10.1-7
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License Verified
