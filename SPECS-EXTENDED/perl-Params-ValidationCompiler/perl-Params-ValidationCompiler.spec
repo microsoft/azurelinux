@@ -1,19 +1,19 @@
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 # Run optional test
 %if ! (0%{?rhel})
 %bcond_without perl_Params_ValidationCompiler_enables_optional_test
 %else
 %bcond_with perl_Params_ValidationCompiler_enables_optional_test
 %endif
-
+ 
 Name:		perl-Params-ValidationCompiler
-Version:	0.30
-Release:	7%{?dist}
+Version:	0.31
+Release:	1%{?dist}
 Summary:	Build an optimized subroutine parameter validator once, use it forever
-License:	Artistic 2.0
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+License:	Artistic-2.0
 URL:		https://metacpan.org/release/Params-ValidationCompiler
-Source0:	https://cpan.metacpan.org/modules/by-module/Params/Params-ValidationCompiler-%{version}.tar.gz#/perl-Params-ValidationCompiler-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/modules/by-module/Params/Params-ValidationCompiler-%{version}.tar.gz
 BuildArch:	noarch
 # Build
 BuildRequires:	coreutils
@@ -24,7 +24,7 @@ BuildRequires:	perl(ExtUtils::MakeMaker) > 6.75
 # Module
 BuildRequires:	perl(B)
 BuildRequires:	perl(Carp)
-BuildRequires:	perl(Class::XSAccessor)
+BuildRequires:	perl(Class::XSAccessor) >= 1.17
 BuildRequires:	perl(Eval::Closure)
 BuildRequires:	perl(Exception::Class)
 BuildRequires:	perl(Exporter)
@@ -58,28 +58,27 @@ BuildRequires:	perl(Types::Standard)
 %endif
 %endif
 # Dependencies
-Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Recommends:	perl(Class::XSAccessor)
+Recommends:	perl(Class::XSAccessor) >= 1.17
 Recommends:	perl(Sub::Util) >= 1.40
-
+ 
 %description
 Create a customized, optimized, non-lobotomized, uncompromised, and thoroughly
 specialized parameter checking subroutine.
-
+ 
 %prep
 %setup -q -n Params-ValidationCompiler-%{version}
-
+ 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PERLLOCAL=1 NO_PACKLIST=1
 make %{?_smp_mflags}
-
+ 
 %install
 make install DESTDIR=%{buildroot}
 %{_fixperms} -c %{buildroot}
-
+ 
 %check
 make test
-
+ 
 %files
 %license LICENSE
 %doc Changes CODE_OF_CONDUCT.md CONTRIBUTING.md eg/ README.md
@@ -89,6 +88,10 @@ make test
 %{_mandir}/man3/Params::ValidationCompiler::Exceptions.3*
 
 %changelog
+* Mon Dec 22 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.31-1
+- Upgrade to version 0.31 (license: MIT).
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.30-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
