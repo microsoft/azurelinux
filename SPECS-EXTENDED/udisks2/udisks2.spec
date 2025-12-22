@@ -21,20 +21,20 @@
 %define with_btrfs 0
 %endif
 
-Name:    udisks2
-Summary: Disk Manager
-Version: 2.11.0
-Release: 1%{?dist}
-License: GPL-2.0-or-later
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:     https://github.com/storaged-project/udisks
-Source0: https://github.com/storaged-project/udisks/releases/download/udisks-%{version}/udisks-%{version}.tar.bz2
+Name:          udisks2
+Summary:       Disk Manager
+Version:       2.11.0
+Release:       1%{?dist}
+License:       GPL-2.0-or-later
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
+URL:           https://github.com/storaged-project/udisks
+Source0:       https://github.com/storaged-project/udisks/releases/download/udisks-%{version}/udisks-%{version}.tar.bz2
 
-Patch0:  udisks-2.11.0-BLKRRPART_harder.patch
-Patch1:  udisks-2.11.0-targetcli_config.json_netif_timeout.patch
-Patch2:  udisks-2.11.0-udiskslinuxmanager_use_after_free.patch
-Patch3:  udisks-2.11.0-udiskslinuxblock_survive_missing_fstab.patch
+Patch0:        udisks-2.11.0-BLKRRPART_harder.patch
+Patch1:        udisks-2.11.0-targetcli_config.json_netif_timeout.patch
+Patch2:        udisks-2.11.0-udiskslinuxmanager_use_after_free.patch
+Patch3:        udisks-2.11.0-udiskslinuxblock_survive_missing_fstab.patch
 
 BuildRequires: make
 BuildRequires: glib2-devel >= %{glib2_version}
@@ -60,54 +60,54 @@ BuildRequires: libblockdev-crypto-devel >= %{libblockdev_version}
 BuildRequires: libblockdev-nvme-devel   >= %{libblockdev_version}
 BuildRequires: libuuid-devel
 
-Requires: libblockdev        >= %{libblockdev_version}
-Requires: libblockdev-part   >= %{libblockdev_version}
-Requires: libblockdev-loop   >= %{libblockdev_version}
-Requires: libblockdev-swap   >= %{libblockdev_version}
-Requires: libblockdev-mdraid >= %{libblockdev_version}
-Requires: libblockdev-fs     >= %{libblockdev_version}
-Requires: libblockdev-crypto >= %{libblockdev_version}
-Requires: libblockdev-nvme   >= %{libblockdev_version}
+Requires:      libblockdev        >= %{libblockdev_version}
+Requires:      libblockdev-part   >= %{libblockdev_version}
+Requires:      libblockdev-loop   >= %{libblockdev_version}
+Requires:      libblockdev-swap   >= %{libblockdev_version}
+Requires:      libblockdev-mdraid >= %{libblockdev_version}
+Requires:      libblockdev-fs     >= %{libblockdev_version}
+Requires:      libblockdev-crypto >= %{libblockdev_version}
+Requires:      libblockdev-nvme   >= %{libblockdev_version}
 
-Requires: lib%{name}%{?_isa} = %{version}-%{release}
+Requires:      lib%{name}%{?_isa} = %{version}-%{release}
 
 # Needed to pull in the system bus daemon
-Requires: dbus >= %{dbus_version}
+Requires:      dbus >= %{dbus_version}
 # Needed to pull in the udev daemon
-Requires: udev >= %{systemd_version}
+Requires:      udev >= %{systemd_version}
 # We need at least this version for bugfixes/features etc.
-Requires: libatasmart >= %{libatasmart_version}
+Requires:      libatasmart >= %{libatasmart_version}
 # For mount, umount, mkswap
-Requires: util-linux
+Requires:      util-linux
 # For mkfs.ext3, mkfs.ext3, e2label
-Recommends: e2fsprogs
+Recommends:    e2fsprogs
 # For mkfs.xfs, xfs_admin
-Recommends: xfsprogs
+Recommends:    xfsprogs
 # For mkfs.vfat
-Recommends: dosfstools
+Recommends:    dosfstools
 # For exfat
-Recommends: exfatprogs
+Recommends:    exfatprogs
 # For UDF
-Recommends: udftools
+Recommends:    udftools
 # For ejecting removable disks
-Recommends: eject
+Recommends:    eject
 # The actual polkit agent
-Requires: polkit >= %{polkit_version}
+Requires:      polkit >= %{polkit_version}
 
 # For mkntfs (not available on rhel or on ppc/ppc64) and f2fs
-Recommends: nilfs-utils
+Recommends:    nilfs-utils
 %ifnarch ppc ppc64
-Recommends: ntfsprogs
+Recommends:    ntfsprogs
 %endif
-Recommends: ntfs-3g
+Recommends:    ntfs-3g
 
 # btrfs
 %if 0%{?with_btrfs}
-Recommends: btrfs-progs
+Recommends:   btrfs-progs
 %endif
 
-Provides:  storaged = %{version}-%{release}
-Obsoletes: storaged < %{version}-%{release}
+Provides:     storaged = %{version}-%{release}
+Obsoletes:    storaged < %{version}-%{release}
 
 %description
 The Udisks project provides a daemon, tools and libraries to access and
