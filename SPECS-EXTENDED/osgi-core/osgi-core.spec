@@ -94,10 +94,14 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}/osgi.core.pom
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
+
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
 %license LICENSE
+%license ADDITIONAL_LICENSE_INFO
 
 %files javadoc
 %license LICENSE
