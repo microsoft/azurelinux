@@ -180,6 +180,13 @@ cp -a -t %{buildroot}/%{_pkgdocdir} \
 rm -rf %{buildroot}/%{_initrddir}/booth-arbitrator
 rm -rf %{buildroot}/%{_pkgdocdir}/README.upgrade-from-v0.1
 rm -rf %{buildroot}/%{_pkgdocdir}/COPYING
+
+# Removing absolute symlinks
+rm -f %{buildroot}%{_sbindir}/booth
+rm -f %{buildroot}%{_sbindir}/geostore
+ln -s boothd %{buildroot}%{_sbindir}/booth
+ln -s boothd %{buildroot}%{_sbindir}/geostore
+
 # tests
 mkdir -p %{test_path}
 cp -a -t %{test_path} \
