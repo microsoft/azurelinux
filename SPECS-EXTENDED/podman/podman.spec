@@ -31,7 +31,7 @@ Epoch: 0
 # If you're reading this on dist-git, the version is automatically filled in by Packit.
 Version: 5.6.1
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 ExclusiveArch: aarch64 ppc64le s390x x86_64 riscv64
 Summary: Manage Pods, Containers and Container Images
 Vendor:         Microsoft Corporation
@@ -68,7 +68,7 @@ BuildRequires: ostree-devel
 BuildRequires: systemd
 BuildRequires: systemd-devel
 Requires: catatonit
-Requires: conmon >= 2:2.1.7-2
+Requires: conmon >= 2.1.7-2
 Requires: libcontainers-common
 Provides: %{name}-quadlet = %{epoch}:%{version}-%{release}
 
@@ -89,6 +89,7 @@ Summary: Emulate Docker CLI using %{name}
 BuildArch: noarch
 Requires: %{name} = %{epoch}:%{version}-%{release}
 Conflicts: docker
+Conflicts: docker-cli
 Conflicts: docker-latest
 Conflicts: docker-ce
 Conflicts: docker-ee
@@ -114,6 +115,8 @@ Requires: slirp4netns
 Requires: buildah
 Requires: gnupg
 Requires: xfsprogs
+Requires: crun
+Requires: netavark
 
 %description tests
 %{summary}
@@ -295,6 +298,10 @@ make localunit
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
+* Thu Dec 18 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 0:5.6.1-5
+- Fix install issues
+- Add runtime required packages for installation along with podman
+
 * Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 0:5.6.1-4
 - Bump to rebuild with updated glibc
 
