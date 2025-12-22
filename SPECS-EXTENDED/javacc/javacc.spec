@@ -123,12 +123,14 @@ ln -s %{_bindir}/javacc %{buildroot}%{_bindir}/javacc.sh
 %doc examples
 
 %files javadoc
-%license LICENSE
+%license %{_javadocdir}/%{name}/legal/LICENSE
+%license %{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO
 %{_javadocdir}/%{name}
 
 %changelog
 * Wed Dec 17 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 7.0.4-4
 - Updated javac to use 1.8 to resolve build issues.
+- Fixed license path warnings
 - License verified
 
 * Sat Jul 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.0.4-3

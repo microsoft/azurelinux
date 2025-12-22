@@ -4,7 +4,7 @@
 Summary:        Java Expression Language (JEXL)
 Name:           apache-%{short_name}
 Version:        2.1.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -128,16 +128,21 @@ cp -pr jexl2-compat/target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/jex
   test
 
 %files -f .mfiles
-%license LICENSE.txt
-%doc NOTICE.txt RELEASE-NOTES.txt
+%license LICENSE.txt NOTICE.txt
+%doc RELEASE-NOTES.txt
 %{_javadir}/%{short_name}*.jar
 
 %files javadoc
-%license LICENSE.txt
-%doc NOTICE.txt
+%license LICENSE.txt NOTICE.txt
+%license %{_javadocdir}/%{name}/jexl2-compat/legal/ADDITIONAL_LICENSE_INFO
+%license %{_javadocdir}/%{name}/jexl2-compat/legal/LICENSE
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Dec 22 2025 Aninda Pradhan <v-anindap@microsoft.com> - 2.1.1-4
+- Fixed license path warnings
+- License verified
+
 * Mon Nov 14 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.1.1-3
 - Fix build errors
   * create 'Packages' directory under JDK_HOME
