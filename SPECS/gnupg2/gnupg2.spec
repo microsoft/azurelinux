@@ -1,14 +1,13 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
-Version:        2.4.7
-Release:        2%{?dist}
+Version:        2.4.8
+Release:        1%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Cryptography.
 URL:            https://gnupg.org/index.html
 Source0:        https://gnupg.org/ftp/gcrypt/gnupg/gnupg-%{version}.tar.bz2
-Patch0:         CVE-2025-30258.patch
 BuildRequires:  zlib-devel
 BuildRequires:  bzip2-devel
 BuildRequires:  readline-devel
@@ -94,7 +93,6 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %{_mandir}/man1/*
 %{_mandir}/man7/*
 %{_mandir}/man8/*
-%{_mandir}/manh/*
 %{_infodir}/gnupg*
 %{_libexecdir}/*
 %{_datadir}/gnupg/*
@@ -106,8 +104,8 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %defattr(-,root,root)
 
 %changelog
-* Mon Nov 10 2025 Ratiranjan Behera <v-ratbehera@microsoft.com> - 2.4.7-2
-- Add patch for CVE-2025-30258
+* Mon Dec 22 2025 Ratiranjan Behera <v-ratbehera@microsoft.com> - 2.4.8-1
+- Upgrade gnupg2 to 2.4.8 for CVE-2025-30258
 
 * Mon Jun 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.4.7-1
 - Upgrade to version 2.4.7
