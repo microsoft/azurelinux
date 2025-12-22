@@ -1,24 +1,15 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-# This package depends on automagic byte compilation
-# https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
-%global _python_bytecompile_extra 1
-
-%global snapshot 0
 
 Name:       ibus-libzhuyin
-Version:    1.9.1
-Release:    6%{?dist}
+Version:    1.10.4
+Release:    1%{?dist}
 Summary:    New Zhuyin engine based on libzhuyin for IBus
 License:    GPLv2+
 URL:        https://github.com/libzhuyin/ibus-libzhuyin
 Source0:    http://downloads.sourceforge.net/libzhuyin/ibus-libzhuyin/%{name}-%{version}.tar.gz
-%if %snapshot
-Patch0:     ibus-libzhuyin-1.9.x-HEAD.patch
-%endif
 
 BuildRequires:  gcc-c++
-BuildRequires:  perl(File::Find)
 BuildRequires:  gettext-devel
 BuildRequires:  intltool
 BuildRequires:  libtool
@@ -41,16 +32,12 @@ based on libzhuyin for IBus.
 
 %prep
 %setup -q
-%if %snapshot
-%patch 0 -p1 -b .head
-%endif
-
 
 %build
 %configure --disable-static \
            --disable-boost \
            --with-python=python3
-
+#exit 1
 # make -C po update-gmo
 make %{?_smp_mflags} V=1
 
