@@ -81,16 +81,21 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{artifactId}.pom
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -r target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
 %{_javadir}/%{name}.jar
-%doc README.md
 %license LICENSE.txt
+%doc README.md
+
 
 %files javadoc
-%{_javadocdir}/%{name}
 %license LICENSE.txt
+%license LICENSE ADDITIONAL_LICENSE_INFO
+%{_javadocdir}/%{name}
+
 
 %changelog
 * Tue Dec 16 2025 BinduSri Adabala <v-badabala@microsoft.com> - 0.3.0-1

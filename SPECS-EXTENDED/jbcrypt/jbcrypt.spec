@@ -68,15 +68,19 @@ install -pm 0644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/%{name}.pom
 
 install -dm 0755 %{buildroot}%{_javadocdir}
 cp -r target/site/apidocs %{buildroot}%{_javadocdir}/%{name}
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
-%doc README
 %license LICENSE
+%doc README
+
 
 %files javadoc
+%license LICENSE ADDITIONAL_LICENSE_INFO
 %{_javadocdir}/%{name}
-%license LICENSE
+
 
 %changelog
 * Tue Dec 16 2025 BinduSri Adabala <v-badabala@microsoft.com> - 1.0.2-1
