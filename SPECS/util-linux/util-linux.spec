@@ -27,6 +27,7 @@ Provides:       hardlink = 1.3-9
 Provides:       uuidd = %{version}-%{release}
 %if 0%{?with_check}
 BuildRequires:  ncurses-term
+BuildRequires:  sudo
 %endif
 
 %description
@@ -104,7 +105,7 @@ install -vm644 %{SOURCE4} %{buildroot}%{_sysconfdir}/pam.d/
 
 %check
 chown -Rv nobody .
-sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
+sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check" || exit 1
 rm -rf %{buildroot}/lib/systemd/system
 
 %post   -p /sbin/ldconfig
