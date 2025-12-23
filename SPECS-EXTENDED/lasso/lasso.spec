@@ -3,24 +3,14 @@ Distribution:   Azure Linux
 %global with_java 0
 %global with_php 0
 %global with_perl 1
-%global with_python2 0
 %global with_python3 0
 %global with_wsf 0
-%global obsolete_old_lang_subpackages 0
 %global default_sign_algo "rsa-sha1"
 %global min_hash_algo "sha1"
-%global default_sign_algo "rsa-sha256"
-%global min_hash_algo "sha256"
 
 %if %{with_php}
-%if "%{php_version}" < "5.6"
-%global ini_name     %{name}.ini
-%else
 %global ini_name     40-%{name}.ini
 %endif
-%endif
-
-%global with_python3 1
 
 %global configure_args %{nil}
 %global configure_args %{configure_args}
@@ -51,30 +41,18 @@ Distribution:   Azure Linux
   %global configure_args %{configure_args} --enable-wsf --with-sasl2=%{_prefix}/sasl2
 %endif
 
-%if !%{with_python2} && !%{with_python3}
+%if !%{with_python3}
   %global configure_args %{configure_args} --disable-python
 %endif
 
 
 Summary: Liberty Alliance Single Sign On
 Name: lasso
-Version: 2.8.2
-Release: 15%{?dist}
+Version: 2.9.0
+Release: 1%{?dist}
 License: GPL-2.0-or-later
 URL: https://lasso.entrouvert.org/
-Source: https://dev.entrouvert.org/lasso/lasso-%{version}.tar.gz
-
-Patch01: fix-removed-xmlsec-deprecations.patch
-Patch02: fix-openssl-implicit-declarations.patch
-Patch3: lasso-libxml2.patch
-# https://git.entrouvert.org/entrouvert/lasso/commit/253e8abe7b83d4d8f3d8dd5f886a54f4e173cc28
-Patch4: 253e8abe7b83d4d8f3d8dd5f886a54f4e173cc28.patch
-# https://git.entrouvert.org/entrouvert/lasso/commit/625bf7d9c11ec366c45514d5ec12ab1cdd8ce094
-Patch5: 625bf7d9c11ec366c45514d5ec12ab1cdd8ce094.patch
-# https://git.entrouvert.org/entrouvert/lasso/commit/3e6f9076e19368b29a932373955a5dccd2f3cc46
-Patch6: 3e6f9076e19368b29a932373955a5dccd2f3cc46.patch
-# https://dev.entrouvert.org/issues/92106
-Patch7: lasso-2.8.2-python_313.patch
+Source0: https://dev.entrouvert.org/lasso/lasso-%{version}.tar.gz
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -145,11 +123,6 @@ BuildRequires: jpackage-utils
 Requires: java-headless
 Requires: jpackage-utils
 Requires: %{name}%{?_isa} = %{version}-%{release}
-%if %{obsolete_old_lang_subpackages}
-Provides: %{name}-java = %{version}-%{release}
-Provides: %{name}-java%{?_isa} = %{version}-%{release}
-Obsoletes: %{name}-java < %{version}-%{release}
-%endif
 
 %description -n java-%{name}
 Java language bindings for the lasso (Liberty Alliance Single Sign On) library.
@@ -169,24 +142,6 @@ PHP language bindings for the lasso (Liberty Alliance Single Sign On) library.
 
 %endif
 
-%if %{with_python2}
-%package -n python2-%{name}
-%{?python_provide:%python_provide python2-%{name}}
-Summary: Liberty Alliance Single Sign On (lasso) Python bindings
-BuildRequires: python2-devel
-
-Requires: python2
-Requires: %{name}%{?_isa} = %{version}-%{release}
-%if %{obsolete_old_lang_subpackages}
-Provides: %{name}-python = %{version}-%{release}
-Provides: %{name}-python%{?_isa} = %{version}-%{release}
-Obsoletes: %{name}-python < %{version}-%{release}
-%endif
-
-%description -n python2-%{name}
-Python language bindings for the lasso (Liberty Alliance Single Sign On)
-library.
-%endif
 
 %if %{with_python3}
 %package -n python3-%{name}
@@ -204,35 +159,16 @@ library.
 
 %prep
 %setup -q
-%{!?el7:%patch -P 01 -p1}
-%patch -P 02 -p1
-%patch -P 3 -p1
-%patch -P 4 -p1
-%patch -P 5 -p1
-%patch -P 6 -p1
-%patch -P 7 -p1
 
 # Remove any python script shebang lines (unless they refer to python3)
 sed -i -E -e '/^#![[:blank:]]*(\/usr\/bin\/env[[:blank:]]+python[^3]?\>)|(\/usr\/bin\/python[^3]?\>)/d' \
   `grep -r -l -E '^#![[:blank:]]*(/usr/bin/python[^3]?)|(/usr/bin/env[[:blank:]]+python[^3]?)' *`
 
 %build
-%{?with_java:export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk}
-./autogen.sh
-%if 0%{?with_python2}
-  %configure %{configure_args} --with-python=%{__python2}
-  pushd lasso
-  %make_build CFLAGS="%{optflags}"
-  popd
-  pushd bindings/python
-  %make_build CFLAGS="%{optflags}"
-  make check CK_TIMEOUT_MULTIPLIER=5
-  mkdir py2
-  mv lasso.py .libs/_lasso.so py2
-  popd
-  make clean
+%if 0%{?with_java}
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
 %endif
-
+./autogen.sh
 %if 0%{?with_python3}
   %configure %{configure_args} --with-python=%{__python3}
 %else
@@ -247,13 +183,6 @@ make check CK_TIMEOUT_MULTIPLIER=10
 %make_install exec_prefix=%{_prefix}
 find %{buildroot} -type f -name '*.la' -exec rm -f {} \;
 find %{buildroot} -type f -name '*.a' -exec rm -f {} \;
-
-%if 0%{?with_python2}
-  # Install Python 2 files saved from first build
-  install -d -m 0755 %{buildroot}/%{python2_sitearch}
-  install -m 0644 bindings/python/py2/lasso.py %{buildroot}/%{python2_sitearch}
-  install -m 0755 bindings/python/py2/_lasso.so %{buildroot}/%{python2_sitearch}
-%endif
 
 # Perl subpackage
 %if %{with_perl}
@@ -276,7 +205,6 @@ fi
 rm -fr %{buildroot}%{_docdir}/%{name}
 
 %ldconfig_scriptlets
-
 %files
 %{_libdir}/liblasso.so.3*
 %doc AUTHORS NEWS README
@@ -305,12 +233,6 @@ rm -fr %{buildroot}%{_docdir}/%{name}
 %config(noreplace) %{php_inidir}/%{ini_name}
 %dir %{_datadir}/php/%{name}
 %{_datadir}/php/%{name}/lasso.php
-%endif
-
-%if %{with_python2}
-%files -n python2-%{name}
-%{python2_sitearch}/lasso.py*
-%{python2_sitearch}/_lasso.so
 %endif
 
 %if %{with_python3}
