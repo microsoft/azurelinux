@@ -6,13 +6,13 @@ Name:             python-%{modname}
 Version:          7.3.0
 Release:          1%{?dist}
 Summary:          Python code checking using pyflakes, pycodestyle, and mccabe
- 
+
 License:          MIT
 URL:              https://github.com/PyCQA/flake8
 Source:           https://github.com/PyCQA/%{modname}/archive/refs/tags/%{version}.tar.gz#/python-%{modname}-%{version}.tar.gz
  
 BuildArch:        noarch
- 
+
 BuildRequires:    python%{python3_pkgversion}-devel
 BuildRequires:    python3-pip
 BuildRequires:    python3-wheel
@@ -28,7 +28,7 @@ BuildRequires:    python%{python3_pkgversion}-pytest
 Flake8 is a wrapper around PyFlakes, pycodestyle, and Ned's McCabe
 script. It runs all the tools by launching the single flake8 script,
 and displays the warnings in a per-file, merged output.
- 
+
 It also adds a few features: files that contain "# flake8: noqa" are
 skipped, lines that contain a "# noqa" comment at the end will not
 issue warnings, Git and Mercurial hooks are included, a McCabe
@@ -48,22 +48,22 @@ skipped, lines that contain a "# noqa" comment at the end will not
 issue warnings, Git and Mercurial hooks are included, a McCabe
 complexity checker is included, and it is extendable through
 flake8.extension entry points.
- 
+
 %prep
 %autosetup -p1 -n flake8-%{version}
 # Allow pycodestyle 2.12, https://bugzilla.redhat.com/2325146
 sed -i 's/pycodestyle>=2.11.0,<2.12.0/pycodestyle>=2.11.0,<2.13.0/' setup.cfg
- 
+
 %generate_buildrequires
 %pyproject_buildrequires
- 
+
 %build
 %pyproject_wheel
- 
+
 %install
 %pyproject_install
 %pyproject_save_files flake8
- 
+
 # Backwards-compatibility symbolic links from when we had both Python 2 and 3
 ln -s flake8 %{buildroot}%{_bindir}/flake8-3
 ln -s flake8 %{buildroot}%{_bindir}/flake8-%{python3_version}
@@ -94,7 +94,7 @@ do
   fi
 done
   %pytest -v --deselect tests/unit/test_pyflakes_codes.py::test_all_pyflakes_messages_have_flake8_codes_assigned
-
+  
 %files -n python%{python3_pkgversion}-flake8 -f %{pyproject_files}
 %{_bindir}/flake8
 %{_bindir}/flake8-3
