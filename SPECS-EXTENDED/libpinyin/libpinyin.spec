@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 %global snapshot 0
 
 Name:           libpinyin
-Version:        2.9.92
+Version:        2.10.3
 Release:        1%{?dist}
 Summary:        Library to deal with pinyin
 
@@ -70,11 +70,12 @@ The libzhuyin package contains libzhuyin compatibility library.
            --with-dbm=KyotoCabinet \
            --enable-libzhuyin
 %make_build
+
 %check
 make check
 
 %install
-%make_install
+%make_install DESTDIR=$RPM_BUILD_ROOT
 find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
@@ -90,9 +91,8 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %doc
 %dir %{_includedir}/libpinyin-%{version}
 %{_includedir}/libpinyin-%{version}/*
-%{_libdir}/libpinyin.so
+%{_libdir}/*.so
 %{_libdir}/pkgconfig/libpinyin.pc
-%{_libdir}/libzhuyin.so
 %{_libdir}/pkgconfig/libzhuyin.pc
 
 %files data
