@@ -168,7 +168,7 @@ pytest -k "not cffi ${k-}" -v -rs tests/
 
 
 %changelog
-* Fri Nov 28 2025 BinduSri Adabala <v-badabala@microsoft.com> - 27.1.0-1
+* Tue Dec 23 2025 BinduSri Adabala <v-badabala@microsoft.com> - 27.1.0-1
 - Upgrade to 27.1.0
 - License verified
 
