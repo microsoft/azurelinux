@@ -20,7 +20,7 @@ Distribution:   Azure Linux
 
 Name:           osgi-core
 Version:        8.0.0
-Release:        3%{?dist}
+Release:        1%{?dist}
 Summary:        OSGi Core API
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -108,7 +108,7 @@ mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 %{_javadocdir}/%{name}
 
 %changelog
-* Wed Dec 17 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 8.0.0-3
+* Wed Dec 17 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 8.0.0-1
 - Upgrade to 8.0.0 (Reference: openSUSE Tumbleweed)
 - License verified
 
