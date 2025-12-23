@@ -1,6 +1,6 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%bcond_with python3
+%bcond_without python3
 
 %define libdw_devel elfutils-devel
 %define libelf_devel elfutils-libelf-devel
