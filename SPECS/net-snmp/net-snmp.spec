@@ -48,6 +48,7 @@ binaries and applications.
 
 %build
 MIBS="ucd-snmp/diskio"
+export NETSNMP_DONT_CHECK_VERSION=1
 
 %configure \
     --host=ia64-linux \
@@ -129,7 +130,7 @@ popd
 * Wed Feb 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.9.4-1
 - Auto-upgrade to 5.9.4 - none
 
-* Fri Apr 07 2022 Minghe Ren <mingheren@microsoft.com> - 5.9.1-2
+* Thu Apr 07 2022 Minghe Ren <mingheren@microsoft.com> - 5.9.1-2
 - Add net-snmp-lib subpackage and UCD-SNMP
 
 * Fri Mar 04 2022 Minghe Ren <mingheren@microsoft.com> - 5.9.1-1
