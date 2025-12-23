@@ -265,8 +265,8 @@ pushd SuiteSparse-%{version}
       ! -iname "gpl.txt" \
       ! -iname "GPLv2.txt" \
       ! -iname "lesserv3.txt" \
-      ! -iname "SuiteSparse Individual Contributor License Agreement (20241011).pdf"
       ! -iname "CONTRIBUTOR-LICENSE.txt" \
+      ! -iname "SuiteSparse Individual Contributor License Agreement (20241011).pdf" \
   | while read f; do
       b="${f%%/*}"
       r="${f#$b}"
