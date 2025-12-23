@@ -72,7 +72,8 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %ldconfig_scriptlets
 
 %files
-%doc AUTHORS COPYING README
+%doc AUTHORS README
+%license COPYING
 %{_libdir}/libpinyin*.so.*
 %dir %{_libdir}/libpinyin
 
