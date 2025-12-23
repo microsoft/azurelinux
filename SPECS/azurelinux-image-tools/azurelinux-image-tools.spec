@@ -2,7 +2,7 @@
 
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
-Version:        1.0.0
+Version:        1.1.0
 Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
@@ -39,6 +39,7 @@ Requires: parted
 Requires: e2fsprogs
 Requires: dosfstools
 Requires: xfsprogs
+Requires: btrfs-progs
 Requires: zstd
 Requires: veritysetup
 Requires: grub2
@@ -62,12 +63,12 @@ enabling DM-Verity.
 
 %prep
 %autosetup -p1 -n azure-linux-image-tools-%{version}
-tar -xf %{SOURCE1} --no-same-owner -C toolkit/tools
+tar -xf %{SOURCE1} --no-same-owner
 
 %build
 export GOPATH=%{our_gopath}
 export GOFLAGS="-mod=vendor"
-make -C toolkit go-imagecustomizer REBUILD_TOOLS=y SKIP_LICENSE_SCAN=y
+make -C toolkit go-imagecustomizer REBUILD_TOOLS=y SKIP_LICENSE_SCAN=y IMAGE_CUSTOMIZER_VERSION_PREVIEW=
 
 %install
 mkdir -p %{buildroot}%{_bindir}
@@ -99,6 +100,9 @@ go test -C toolkit/tools ./...
 %{_libdir}/imagecustomizer/telemetry-requirements.txt
 
 %changelog
+* Mon Dec 8 2025 Chris Gunn <chrisgun@microsoft.com> 1.1.0-1
+- Upgrade to version 1.1.0
+
 * Wed Sep 24 2025 Lanze Liu <lanzeliu@microsoft.com> 1.0.0-1
 - Upgrade to GA version 1.0.0-1
 
