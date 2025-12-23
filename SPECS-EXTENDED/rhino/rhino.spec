@@ -23,7 +23,7 @@ Distribution:   Azure Linux
 %define scm_version 1_7_15_1
 Name:           rhino
 Version:        1.7.15.1
-Release:        1%{dist}
+Release:        1%{?dist}
 Summary:        JavaScript for Java
 License:        MPL-2.0
 Group:          Development/Libraries/Java
