@@ -18,6 +18,7 @@ BuildArch:      noarch
 BuildRequires:  python3-pip
 BuildRequires:  python3dist(wheel)
 BuildRequires:  python3-pbr
+
 %if %{with tests}
 BuildRequires:  python3-tox
 BuildRequires:  python3-pluggy
@@ -31,6 +32,7 @@ BuildRequires:  python3-platformdirs
 BuildRequires:  python3-testtools
 BuildRequires:  python3-tox-current-env
 %endif
+
 %global _description %{expand:
 Fixtures defines a Python contract for reusable state / support logic,
 primarily for unit testing.  Helper and adaption logic is included to make it
