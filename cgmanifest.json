@@ -5320,8 +5320,8 @@
         "type": "other",
         "other": {
           "name": "highlight",
-          "version": "3.54",
-          "downloadUrl": "http://www.andre-simon.de/zip/highlight-3.54.tar.bz2"
+          "version": "4.18",
+          "downloadUrl": "http://www.andre-simon.de/zip/highlight-4.18.tar.bz2"
         }
       }
     },
