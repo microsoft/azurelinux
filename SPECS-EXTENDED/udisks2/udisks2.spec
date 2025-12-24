@@ -31,10 +31,6 @@ Distribution:  Azure Linux
 URL:           https://github.com/storaged-project/udisks
 Source0:       https://github.com/storaged-project/udisks/releases/download/udisks-%{version}/udisks-%{version}.tar.bz2
 
-Patch0:        udisks-2.11.0-BLKRRPART_harder.patch
-Patch1:        udisks-2.11.0-targetcli_config.json_netif_timeout.patch
-Patch2:        udisks-2.11.0-udiskslinuxmanager_use_after_free.patch
-Patch3:        udisks-2.11.0-udiskslinuxblock_survive_missing_fstab.patch
 
 BuildRequires: make
 BuildRequires: glib2-devel >= %{glib2_version}
@@ -58,6 +54,8 @@ BuildRequires: libblockdev-mdraid-devel >= %{libblockdev_version}
 BuildRequires: libblockdev-fs-devel     >= %{libblockdev_version}
 BuildRequires: libblockdev-crypto-devel >= %{libblockdev_version}
 BuildRequires: libblockdev-nvme-devel   >= %{libblockdev_version}
+BuildRequires: libblockdev-smart-devel  >= %{libblockdev_version}
+
 BuildRequires: libuuid-devel
 
 Requires:      libblockdev        >= %{libblockdev_version}
@@ -68,6 +66,7 @@ Requires:      libblockdev-mdraid >= %{libblockdev_version}
 Requires:      libblockdev-fs     >= %{libblockdev_version}
 Requires:      libblockdev-crypto >= %{libblockdev_version}
 Requires:      libblockdev-nvme   >= %{libblockdev_version}
+Requires:      libblockdev-smart  >= %{libblockdev_version}
 
 Requires:      lib%{name}%{?_isa} = %{version}-%{release}
 
