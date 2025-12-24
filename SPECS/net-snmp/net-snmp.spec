@@ -48,7 +48,7 @@ binaries and applications.
 
 %build
 MIBS="ucd-snmp/diskio"
-export NETSNMP_DONT_CHECK_VERSION=1
+sed -i 's/5\.9\.4/5\.9\.5/g' configure
 
 %configure \
     --host=ia64-linux \
@@ -103,6 +103,7 @@ popd
 /sbin/*
 
 %files devel
+%license COPYING
 %defattr(-,root,root)
 %{_datadir}/*
 %{_includedir}/*
@@ -115,10 +116,7 @@ popd
 %license COPYING
 %doc README FAQ NEWS TODO
 %{_libdir}/*.so.*
-%{_datadir}/snmp
-%{_datadir}/snmp/mibs
 %{_datadir}/snmp/mibs/*
-%{_localstatedir}/lib/net-snmp
 %{_localstatedir}/lib/net-snmp/mib_indexes
 %{_localstatedir}/lib/net-snmp/cert_indexes
 %{_localstatedir}/run/net-snmp
