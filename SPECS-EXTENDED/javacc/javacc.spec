@@ -99,6 +99,9 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr target/javadoc/* %{buildroot}%{_javadocdir}/%{name}/
+# remove any stray ADDITIONAL_LICENSE_INFO files under javadoc legal/ dirs
+find %{buildroot}%{_javadocdir} -type f -name 'ADDITIONAL_LICENSE_INFO' -exec rm -f {} \; || true
+
 %fdupes -s %{buildroot}%{_javadocdir}
 %fdupes -s www
 %fdupes -s examples
@@ -123,9 +126,12 @@ ln -s %{_bindir}/javacc %{buildroot}%{_bindir}/javacc.sh
 %doc examples
 
 %files javadoc
+# keep license metadata
 %license %{_javadocdir}/%{name}/legal/LICENSE
-%license %{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO
-%{_javadocdir}/%{name}
+# prevent wildcard from re-listing it
+%exclude %{_javadocdir}/%{name}/legal/LICENSE 
+# include the rest of javadoc
+%{_javadocdir}/%{name}                        
 
 %changelog
 * Wed Dec 17 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 7.0.4-4

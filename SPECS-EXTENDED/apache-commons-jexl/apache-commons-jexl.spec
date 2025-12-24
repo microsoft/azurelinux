@@ -114,6 +114,16 @@ install -pm 0644 jexl2-compat/pom.xml  %{buildroot}%{_mavenpomdir}/%{name}/%{sho
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}/jexl2-compat
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 cp -pr jexl2-compat/target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/jexl2-compat/
+
+# ensure jexl2-compat has an accessible license path (symlink to canonical)
+if [ -f %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE ]; then
+  mkdir -p %{buildroot}%{_javadocdir}/%{name}/jexl2-compat/legal
+  ln -sf /usr/share/javadoc/%{name}/legal/LICENSE %{buildroot}%{_javadocdir}/%{name}/jexl2-compat/legal/LICENSE
+  ln -sf ../legal/LICENSE %{buildroot}%{_javadocdir}/%{name}/jexl2-compat/legal/LICENSE
+fi
+# Remove any remaining ADDITIONAL_LICENSE_INFO (they are license-notes, not docs)
+find %{buildroot}%{_javadocdir}/%{name} -type f -iname 'ADDITIONAL_LICENSE_INFO' -exec rm -f {} \; || true
+
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %check
@@ -133,9 +143,11 @@ cp -pr jexl2-compat/target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/jex
 %{_javadir}/%{short_name}*.jar
 
 %files javadoc
-%license LICENSE.txt NOTICE.txt
-%license %{_javadocdir}/%{name}/jexl2-compat/legal/ADDITIONAL_LICENSE_INFO
-%license %{_javadocdir}/%{name}/jexl2-compat/legal/LICENSE
+%license %{_javadocdir}/%{name}/legal/LICENSE
+%exclude %{_javadocdir}/%{name}/legal/LICENSE
+%exclude %{_javadocdir}/%{name}/jexl2-compat/legal/LICENSE
+%exclude %{_javadocdir}/%{name}/**/ADDITIONAL_LICENSE_INFO
+%exclude %{_javadocdir}/%{name}/ADDITIONAL_LICENSE_INFO
 %{_javadocdir}/%{name}
 
 %changelog
