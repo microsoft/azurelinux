@@ -1,0 +1,58 @@
+From d40e25cd45ed9c6b2b66e6b97573a0413e4c23bd Mon Sep 17 00:00:00 2001
+From: Paul Holzinger <pholzing@redhat.com>
+Date: Wed, 17 May 2023 15:39:49 +0200
+Subject: [PATCH] fix panic in Writer
+
+Commit 766cfece introduced this bug by defining an incorrect split
+function. First it breaks the old behavior because it never splits at
+newlines now. Second, it causes a panic because it never tells the
+scanner to stop. See the bufio.ScanLines function, something like:
+```
+if atEOF && len(data) == 0 {
+	return 0, nil, nil
+}
+```
+is needed to do that.
+
+This commit fixes it by restoring the old behavior and calling
+bufio.ScanLines but also keep the 64KB check in place to avoid buffering
+for to long.
+
+Two tests are added to ensure it is working as expected.
+
+Fixes #1383
+Upstream Reference Patch: https://github.com/sirupsen/logrus/commit/d40e25cd45ed9c6b2b66e6b97573a0413e4c23bd.patch
+
+Signed-off-by: Paul Holzinger <pholzing@redhat.com>
+---
+ vendor/github.com/sirupsen/logrus/writer.go | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/vendor/github.com/sirupsen/logrus/writer.go b/vendor/github.com/sirupsen/logrus/writer.go
+index 7e7703c7..074fd4b8 100644
+--- a/vendor/github.com/sirupsen/logrus/writer.go
++++ b/vendor/github.com/sirupsen/logrus/writer.go
+@@ -70,16 +70,16 @@ func (entry *Entry) writerScanner(reader *io.PipeReader, printFunc func(args ...
+ 	scanner.Buffer(make([]byte, bufio.MaxScanTokenSize), bufio.MaxScanTokenSize)
+ 
+ 	// Define a split function to split the input into chunks of up to 64KB
+-	chunkSize := 64 * 1024 // 64KB
++	chunkSize := bufio.MaxScanTokenSize // 64KB
+ 	splitFunc := func(data []byte, atEOF bool) (int, []byte, error) {
+-		if len(data) > chunkSize {
++		if len(data) >= chunkSize {
+ 			return chunkSize, data[:chunkSize], nil
+ 		}
+ 
+-		return len(data), data, nil
++		return bufio.ScanLines(data, atEOF)
+ 	}
+ 
+-	//Use the custom split function to split the input
++	// Use the custom split function to split the input
+ 	scanner.Split(splitFunc)
+ 
+ 	// Scan the input and write it to the logger using the specified print function
+-- 
+2.45.4
+

@@ -31,6 +31,7 @@ Patch9:         CVE-2025-31133.patch
 Patch10:        CVE-2025-52565.patch
 Patch11:        CVE-2025-13281.patch
 Patch12:        CVE-2025-65637.patch
+Patch13:        Fix-panic-in-writer.patch
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.38-16%{?dist}
 BuildRequires:  golang < 1.25
