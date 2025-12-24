@@ -24,7 +24,6 @@ function runbtest() {
     var summary = {};
  
     try {
-        var i = Intl;
         summary.haveIntl = true;
         console.log("+ Congrats, you have the Intl object.");
     } catch(e) {
@@ -48,7 +47,6 @@ function runbtest() {
             } catch (e) {
                 console.log("SLO err: " + e);
             }
-            var dstr = "ERR";
             try {
                 lsummary.dstr = d.toLocaleString(loc,{month: "long",day:"numeric",weekday:"long",year:"numeric"});
                 console.log(" date: (supported:"+sl+") " + lsummary.dstr);
@@ -71,7 +69,7 @@ function runbtest() {
     // print summary
     console.log();
     console.log("--------- Analysis ---------");
-    stxt = "";
+    var stxt = "";
     if( summary.haveIntl ) {
         console.log("* You have the 'Intl' object. Congratulations! You have the possibility of being EcmaScript 402 compliant.");
         stxt += "Have Intl, ";
