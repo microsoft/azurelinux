@@ -199,7 +199,7 @@ libxml2-devel-2.10.4-9.cm2.x86_64.rpm
 docbook-dtd-xml-4.5-11.cm2.noarch.rpm
 docbook-style-xsl-1.79.1-14.cm2.noarch.rpm
 libsepol-3.2-2.cm2.x86_64.rpm
-glib-2.71.0-9.cm2.x86_64.rpm
+glib-2.71.0-10.cm2.x86_64.rpm
 libltdl-2.4.6-8.cm2.x86_64.rpm
 libltdl-devel-2.4.6-8.cm2.x86_64.rpm
 pcre-8.45-2.cm2.x86_64.rpm
