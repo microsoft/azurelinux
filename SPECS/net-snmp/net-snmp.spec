@@ -45,10 +45,10 @@ binaries and applications.
 
 %prep
 %autosetup
+sed -i 's/5\.9\.4/5\.9\.5/g' configure
 
 %build
 MIBS="ucd-snmp/diskio"
-export NETSNMP_DONT_CHECK_VERSION=1
 
 %configure \
     --host=ia64-linux \
