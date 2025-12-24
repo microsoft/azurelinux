@@ -173,8 +173,8 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
-* Tue Dec 23 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 24.11.1-1
-- Upgrade to 24.11.1
+* Tue Dec 23 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 24.12.0-1
+- Upgrade to 24.12.0
 - Add support for passing runtime internationalization data
 
 * Fri Nov 07 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-10
