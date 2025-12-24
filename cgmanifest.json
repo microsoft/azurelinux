@@ -27534,8 +27534,8 @@
         "type": "other",
         "other": {
           "name": "satyr",
-          "version": "0.30",
-          "downloadUrl": "https://github.com/abrt/satyr/archive/0.30/satyr-0.30.tar.gz"
+          "version": "0.43",
+          "downloadUrl": "https://github.com/abrt/satyr/releases/download/0.43/satyr-0.43.tar.gz"
         }
       }
     },
