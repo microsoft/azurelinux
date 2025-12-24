@@ -109,6 +109,7 @@ done
 * Tue Apr 26 2022 Muhammad Falak <mwani@microsoft.com> - 3.7.7-9
 - Drop BR on `pytest` and add an explict BR pip
 - pip install latest deps to enable ptest
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.7-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
