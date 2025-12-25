@@ -352,7 +352,6 @@ done
 %{_libdir}/libspqr.so.%{spqr_version_major}*
 %{_libdir}/libsuitesparseconfig.so.%{SuiteSparse_config_major}*
 %{_libdir}/libumfpack.so.%{umfpack_version_major}*
-%{_libdir}/libumfpack.so.*
 
 %files devel
 %{_includedir}/%{name}/
