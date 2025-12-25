@@ -103,7 +103,6 @@ popd
 /sbin/*
 
 %files devel
-%license COPYING
 %defattr(-,root,root)
 %{_datadir}/*
 %{_includedir}/*
@@ -111,6 +110,7 @@ popd
 %{perl_vendorarch}/*
 %{_libdir}/*.so
 %exclude %{_libdir}/perl5/perllocal.pod
+%exclude /usr/share/licenses/net-snmp/COPYING
 
 %files libs
 %license COPYING
