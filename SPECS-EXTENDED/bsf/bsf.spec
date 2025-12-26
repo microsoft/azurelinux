@@ -95,6 +95,7 @@ cp -pr build/javadocs/* %{buildroot}%{_javadocdir}/%{name}
 %license LICENSE.txt NOTICE.txt
 %{_javadocdir}/%{name}
 %exclude /usr/share/javadoc/bsf/legal/ADDITIONAL_LICENSE_INFO
+%exclude /usr/share/javadoc/bsf/legal/LICENSE
 
 %changelog
 * Tue Jan 03 2023 Sumedh Sharma <sumsharma@microsoft.com> - 2.4.0-19
