@@ -95,7 +95,8 @@ desktop-file-install \
 %{_datadir}/zsh/site-functions/_highlight
 %config(noreplace) %{_sysconfdir}/highlight/
 
-%doc ChangeLog* AUTHORS README* extras/
+%doc ChangeLog* AUTHORS README*
+%exclude /usr/share/doc/highlight/extras
 %license COPYING
 
  %if %{with qt}
