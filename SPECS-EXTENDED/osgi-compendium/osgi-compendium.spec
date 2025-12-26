@@ -20,7 +20,7 @@ Distribution:   Azure Linux
 
 Name:           osgi-compendium
 Version:        7.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Interfaces and Classes for use in compiling OSGi bundles
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -108,10 +108,14 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}/osgi.cmpn.pom
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
+
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
 %license LICENSE
+%license ADDITIONAL_LICENSE_INFO
 %doc about.html
 
 %files javadoc
@@ -119,6 +123,10 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Wed Dec 24 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 7.0.0-3
+- address license warning.
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.0.0-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

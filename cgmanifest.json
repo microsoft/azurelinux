@@ -15713,8 +15713,8 @@
         "type": "other",
         "other": {
           "name": "osgi-core",
-          "version": "7.0.0",
-          "downloadUrl": "https://repo1.maven.org/maven2/org/osgi/osgi.core/7.0.0/osgi.core-7.0.0-sources.jar"
+          "version": "8.0.0",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/osgi/osgi.core/8.0.0/osgi.core-8.0.0-sources.jar"
         }
       }
     },
