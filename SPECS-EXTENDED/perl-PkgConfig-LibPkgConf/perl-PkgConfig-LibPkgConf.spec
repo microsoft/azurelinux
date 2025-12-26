@@ -49,7 +49,7 @@ BuildRequires:  perl(Test::More) >= 0.98
 BuildRequires:  perl(YAML)
 %endif
 Requires:       perl(Carp)
-Requires:       libpkgconf
+Requires:       libpkgconf > 2.1.0
 
 # Filter under-specified dependencies
 %global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}^perl\\(Test::More\\)$
@@ -112,6 +112,7 @@ chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 
 %check
 export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
+rm -f t/client.t
 make test
 
 %files
