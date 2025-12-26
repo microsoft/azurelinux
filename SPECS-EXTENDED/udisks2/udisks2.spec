@@ -334,41 +334,10 @@ fi
 * Mon Dec 22 2025 Sumit Jena <v-sumitjena@microsoft.com> - 2.11.0-1
 - Upgrade to version 2.11.0
 
-* Wed Mar 19 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.10.1-7
-- Initial Azure Linux import from Fedora 41 (license: MIT)
-- License Verified
-
-* Sat Jul 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.10.1-6
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
-
-* Fri Mar 01 2024 Tomas Bzatek <tbzatek@redhat.com> - 2.10.1-5
-- udiskslinuxblock: Survive a missing /etc/fstab (#2264922)
-
-* Mon Feb 12 2024 Tomas Bzatek <tbzatek@redhat.com> - 2.10.1-4
-- Use SPDX license tags for subpackages
-
-* Mon Feb 12 2024 Tomas Bzatek <tbzatek@redhat.com> - 2.10.1-3
-- Use a SPDX license tag
-- udiskslinuxblockobject: Try issuing BLKRRPART ioctl harder
-- udiskslinuxmanager: Fix use after free
-- tests: Fix targetcli_config.json
-
-* Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.10.1-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Thu Sep 07 2023 Tomas Bzatek <tbzatek@redhat.com> - 2.10.1-1
-- Version 2.10.1
-- Default to ntfs-3g for stability reasons (#2182206)
-- Use Recommends: for filesystem tools (#2169848)
-
-* Sat Jul 22 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.10.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
-
-* Thu Jun 29 2023 Tomas Bzatek <tbzatek@redhat.com> - 2.10.0-1
-- Version 2.10.0
-
-* Sat Jan 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.4-6
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+* Fri Feb 03 2023 Sumedh Sharma <sumsharma@microsoft.com> - 2.9.4-6
+- Initial CBL-Mariner import from Fedora 37 (license: MIT)
+- Disable sub-packages iSCSI, LSM, docs and manpage
+- License verified
 
 * Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.4-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
@@ -599,4 +568,5 @@ fi
 
 * Sun Jan 12 2014 Patrick Uiterwijk <puiterwijk@redhat.com> - 0.1.0-1
 - Rename from udisks2-lvm
+
 
