@@ -1,0 +1,24 @@
+# This is a workflow that runs periodically to mark issues/prs with no recent activity as stale, it also closes/removes label based on following activity
+
+name: Mark and close stale issues/PRs
+on: 
+  schedule:
+  - cron: '0 0 * * *' # runs daily at 12:00 am UTC
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v8
+        with:
+          stale-issue-label: stale
+          stale-pr-label: stale
+          days-before-stale: 90
+          days-before-close: 90
+          remove-stale-when-updated: true
+          stale-issue-message: > 
+            Issue has been automatically marked as stale due to inactivity for 90 days. Update the issue to remove label, otherwise it will be automatically closed.
+          stale-pr-message: > 
+            PR has been automatically marked as stale due to inactivity for 90 days. Update the PR to remove label, otherwise it will be automatically closed.
+          exempt-issue-labels: keep-alive
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
