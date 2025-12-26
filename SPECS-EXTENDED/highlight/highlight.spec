@@ -111,6 +111,7 @@ desktop-file-install \
 %changelog
 * Wed Dec 24 2025 Sumit Jena <v-sumitjena@microsoft.com> - 4.18-1
 - Update to version 4.18
+- Disabling GUI based subpackages.
 - License Verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.54-3
