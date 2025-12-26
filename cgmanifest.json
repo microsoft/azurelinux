@@ -5321,7 +5321,7 @@
         "other": {
           "name": "highlight",
           "version": "4.18",
-          "downloadUrl": "http://www.andre-simon.de/zip/highlight-4.18.tar.bz2"
+          "downloadUrl": "https://gitlab.com/saalen/highlight/-/archive/v4.18/highlight-v4.18.tar.bz2"
         }
       }
     },
