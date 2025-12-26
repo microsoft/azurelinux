@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "cdio_config.h": "e4997d5f11882ffe1901724cb1617f0c2e8ac7df8295cd12c85fd4d5244f0984",
-  "libcdio-2.0.0.tar.gz": "1b481b5da009bea31db875805665974e2fc568e2b2afa516f4036733657cf958",
-  "libcdio-2.0.0.tar.gz.sig": "1ca33fe6e86266f7829f0d4cdef36e0268144484c86090d6608fa53da782e8ac",
-  "libcdio-no_date_footer.hml": "09b8cec866f439f326dfb058ce8a1efcbab6ebf5a9699828a5f291edd86e0989"
- }
-}

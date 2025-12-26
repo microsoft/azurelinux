@@ -1,8 +1,0 @@
---- t/00-report-prereqs.t
-+++ t/00-report-prereqs.t
-@@ -1,4 +1,4 @@
--#!perl
-+#!/usr/bin/perl
- 
- use strict;
- use warnings;

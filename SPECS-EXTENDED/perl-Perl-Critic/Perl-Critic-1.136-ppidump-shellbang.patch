@@ -1,8 +1,0 @@
---- tools/ppidump
-+++ tools/ppidump
-@@ -1,4 +1,4 @@
--#!/usr/bin/env perl
-+#!/usr/bin/perl
- 
- use strict;
- use warnings;

@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "build.xml": "cb208ad5964b0f39f8093117c81729f6550792abe30e113e900a25e0452636c3",
-  "common.xml": "376795538937c929cdd962a1a9d08a876494aef8b6bccb5f8b0572c2807eacc6",
-  "commons-vfs2-build.xml": "897f698ef7fed037b80b6cdda2f384a24461c1f3b187d807261da28f0b579b7b",
-  "commons-vfs2-distribution-2.2-src.tar.gz": "4307a7d8e1cf5d0eadc75ae778502743ec1207ba8b6f7ba966e42ef8540cd8b2",
-  "commons-vfs2-examples-build.xml": "2d95750b7e427d418ef23c0a128e609e8472a8daa43ea654fd094fe23f4d7c84"
- }
-}

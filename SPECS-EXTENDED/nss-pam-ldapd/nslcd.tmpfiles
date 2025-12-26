@@ -1,2 +1,0 @@
-# nslcd needs a directory in /var/run to store its pid file and socket
-d /var/run/nslcd 0775 nslcd root

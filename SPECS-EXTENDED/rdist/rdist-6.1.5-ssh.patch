@@ -1,9 +1,0 @@
---- rdist-6.1.5/src/rshrcmd.c.dist	Tue Dec 12 08:20:56 1995
-+++ rdist-6.1.5/src/rshrcmd.c	Wed Dec 11 07:14:13 1996
-@@ -92,5 +92,5 @@
- 		   sp[0]. */
- 		(void) close(sp[0]);
--		if (dup2(sp[1], 0) < 0 || dup2(0,1) < 0 || dup2(0, 2) < 0) {
-+		if (dup2(sp[1], 0) < 0 || dup2(0,1) < 0) {
- 			error("dup2 failed: %s.", SYSERR);
- 			_exit(255);

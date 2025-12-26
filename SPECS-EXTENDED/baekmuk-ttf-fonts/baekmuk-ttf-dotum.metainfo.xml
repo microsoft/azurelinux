@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2014 Parag Nemade <pnemade AT redhat DOT com> -->
-<component type="font">
-  <id>baekmuk-dotum</id>
-  <metadata_license>CC-BY-3.0</metadata_license>
-  <extends>baekmuk</extends>
-</component>

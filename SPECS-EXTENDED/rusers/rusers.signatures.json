@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "netkit-rusers-0.17.tar.gz": "f00138651865ad2dcfec5dedda0cda403cb80c4ab68efcc3bbccafe198c24b6d",
-  "rstatd.service": "a699d793bf34d43e488629d91a63b67fc0794e0f67058cc43c3f2d48bfe0015e",
-  "rstatd.tar.gz": "6279bd073f228e953b2cdd4bedf818b6ae33d5b06eb3cd28502da931f4f2f6ae",
-  "rusersd.service": "4b80182f687e092a2c77a2a1537daeb0f7b9dbb88f5be80b7fc7191a5ca84e5c"
- }
-}

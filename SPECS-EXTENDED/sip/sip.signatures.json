@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "macros.sip": "6f6ce6cb3c5bd6f26c7188130bb2bf83042a8ef57c2cf03ce4f5264cff11526c",
-  "sip-4.19.21.tar.gz": "6af9979ab41590e8311b8cc94356718429ef96ba0e3592bdd630da01211200ae",
-  "sip-wrapper.sh": "45aa47401bdf1f09355e9e3af07f01faafce524025771401705ce7eccee230fd"
- }
-}

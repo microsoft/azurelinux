@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "auth.socket": "81a6d8c174a5b123fbd57a20c2119e450e3b0e08cd9fcc33b70b7c5bf592672d",
-  "auth@.service": "609d6f96c5e71cd48e8bb482c067f9a076d6a57c6a2538217fa230df95f9516a",
-  "authd-1.4.4.tar.gz": "71ee3d1c3e107c93e082148f75ee460c949b203c861dd20d48f7c5cfdc272bf8"
- }
-}

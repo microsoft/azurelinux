@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "cmocka-1.1.5.tar.xz": "f0ccd8242d55e2fd74b16ba518359151f6f8383ff8aef4976e48393f77bba8b6",
-  "cmocka-1.1.5.tar.xz.asc": "0dbc0cf7c9cde72d0c911483607421da2aeee5aa99712d7fb393b3da307ee315",
-  "cmocka.keyring": "3861ac6763ff3edf0bbbb05fe890962a5dbcd99b2e00fae16687fd480c7fab0f"
- }
-}

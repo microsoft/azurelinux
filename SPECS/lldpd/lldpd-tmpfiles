@@ -1,2 +1,0 @@
-d /run/lldpd 0755 root root -
-d /run/lldpd/chroot 0755 root root -

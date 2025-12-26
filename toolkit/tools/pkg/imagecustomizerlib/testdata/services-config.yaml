@@ -1,6 +1,0 @@
-SystemConfig:
-  Services:
-    Enable:
-      - Name: console-getty
-    Disable:
-      - Name: chronyd

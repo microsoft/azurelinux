@@ -1,5 +1,0 @@
-# Begin /etc/pam.d/system-account
-
-account   required    pam_unix.so
-
-# End /etc/pam.d/system-account

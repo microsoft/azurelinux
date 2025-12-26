@@ -1,7 +1,0 @@
-## Path           : System/Management
-## Description    : Extra cli switches for crio daemon
-## Type           : string
-## Default        : ""
-## ServiceRestart : crio
-#
-CRIO_OPTIONS=""

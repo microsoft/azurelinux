@@ -1,9 +1,0 @@
-[Unit]
-Description=ACPID Listen Socket
-Documentation=man:acpid(8)
-
-[Socket]
-ListenStream=/var/run/acpid.socket
-
-[Install]
-WantedBy=sockets.target

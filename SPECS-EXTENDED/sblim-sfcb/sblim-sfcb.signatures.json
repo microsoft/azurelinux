@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "sblim-sfcb-1.4.9.tar.bz2": "634a67b2f7ac3b386a79160eb44413d618e33e4e7fc74ae68b0240484af149dd",
-  "sfcb.service": "de79501a22cce5576f8e6bc5f9573b498a976cb5124af573b07600de9ed07f95",
-  "sfcbdump.1.gz": "9491280f3856f19ebe65e405c4ac4c948210f49580e0f00383e0c8db60080942",
-  "sfcbinst2mof.1.gz": "3ef0c788fbb51f6841a5d65b8e6be2b087d46a9ca892369b10808282e1aa19e9",
-  "sfcbtrace.1.gz": "6d5276d43d536ccb59bbb291f450490c8b9dbf3c6b2bab6d9ef71fbf74f9b8f2"
- }
-}

@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "generate-tarball.sh": "97321b2d07728ec186a6f0d3315aa0cf6f7b07994251ee8a1baff4a01f311c74",
-  "jsoup-1.11.3.tar.gz": "6054c9a7f5cc99b2e6c12016e68075a59b76d4415a626cc609f6a2bc8bddf805",
-  "jsoup-build.xml": "2f8cafe17a9374c0a8675459a026389a3f18b503d13d6019a661c989711346ad"
- }
-}

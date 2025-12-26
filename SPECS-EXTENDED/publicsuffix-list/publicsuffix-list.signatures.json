@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "index.txt": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85",
-  "public_suffix_list.dat": "64d487bce3f6e71ef4ffb00d64ca418f9e53b29b5ff2d29656c09d627e44c416",
-  "test_psl.txt": "8f50ad958916d6a8f79fba2363501475571acce752757f9126fe9d2f17dd920d"
- }
-}

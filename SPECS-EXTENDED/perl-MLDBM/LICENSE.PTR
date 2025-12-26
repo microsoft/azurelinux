@@ -1,7 +1,0 @@
-License information taken from META.yml:
-
-(...)
-dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.112621'
-license: perl
-...

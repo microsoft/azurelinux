@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "mtr-0.95.tar.gz": "12490fb660ba5fb34df8c06a0f62b4f9cbd11a584fc3f6eceda0a99124e8596f",
-  "mtr-gtk-pkexec-wrapper.sh": "91056edeecd5081414719ae6c78a74d2dff6e6262e02cf5e0e663cf4025352f5",
-  "net-xmtr.desktop": "a2620ff1d6e6e3c4c8716d6e0b77437e0e7117dea37d71452802dfc2993e957c",
-  "org.fedoraproject.mtr.policy": "bbfaea2b2800555bfce9e36c0103693654b16b62fd718812d44aaf908f142efc"
- }
-}

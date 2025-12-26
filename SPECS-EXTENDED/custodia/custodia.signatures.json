@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "custodia-0.6.0.tar.gz": "3ed56cfedf56f48967c26ffafd1a82d97a8b799ff1a404fc0e39ab063aac0c02",
-  "custodia.conf": "296f5945b904215a085bdf2f560c53fbb2affb76014c3c6ceb540b04c55af74a",
-  "custodia.tmpfiles.conf": "c5ae5f8aaccbc727852e5484cc7e94e1130e9c820b51fe99f061b4d954e40d4e",
-  "custodia@.service": "9c83cfd33b5b2dbc8ca39dc9a013d3d8387f37a5b187af540c9118e9911b1eea",
-  "custodia@.socket": "86e108c2ece9c7c248eb310b9998128b02acb36e64dd361187ffb0d3b902e68c"
- }
-}

@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "apache-commons-daemon-build.xml": "967a05bbd089c5c475818fb464e3b10b47b85d3a473d224a6bb5d4efc9fc0baf",
-  "apache-commons-daemon.keyring": "c79fd010016d480581a97453b640971899a806a4a848695411f66f100330964e",
-  "commons-daemon-1.2.3-src.tar.gz": "37b8c461c52e76c1ed6cd290431237611dfe496df36cd70e5afa30659d9bce4c",
-  "commons-daemon-1.2.3-src.tar.gz.asc": "a91cdf4d0ad90c17d2dbf367ce722722977561a752056ffc4b1600844c2c719c"
- }
-}

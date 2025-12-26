@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "quagga-1.2.4.tar.gz": "e364c082c3309910e1eb7b068bf39ee298e2f2f3f31a6431a5c115193bd653d3",
-  "quagga-filter-perl-requires.sh": "8b1710f800746e4b9fa3ac7d0aa04487776a19605fce7c372721d4ce9adb8233",
-  "quagga-tmpfs.conf": "047024ea4a004afbe78241ec3df4e10b529755f1cbeea43645a5dc944a94990d"
- }
-}

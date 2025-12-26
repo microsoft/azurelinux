@@ -1,9 +1,0 @@
-{
- "Signatures": {
-    "ypbind-mt-2.7.2.tar.gz": "3d20741ba04d9d421a5462555177e1b88aefd279b4f882b0f0083077a557f51f",
-    "nis.sh": "dfc35e29a9141871a45244e1a15f8ae396e9197444b65feecd841f9bf96909c9",
-    "ypbind-pre-setdomain": "c298ac2911b9ff0711573ee65e053bf1ab6806fa19c4fa99600c63a3ccbd1fd7",
-    "ypbind-post-waitbind": "3f067f201f4d5d5340d849d80bb5953a367594b196d473a09a6fd26d4702012d",
-    "ypbind.service": "9ec61d56aac59cf98c104a8b1f7dcbcf73edd405515226e93aac4f3706a184ae"
- }
-}

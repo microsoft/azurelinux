@@ -1,9 +1,0 @@
-diff -up qtbase-everywhere-src-5.11.1/mkspecs/features/uikit/devices.py.me qtbase-everywhere-src-5.11.1/mkspecs/features/uikit/devices.py
---- qtbase-everywhere-src-5.11.1/mkspecs/features/uikit/devices.py.me	2018-06-23 11:29:21.750066271 +0200
-+++ qtbase-everywhere-src-5.11.1/mkspecs/features/uikit/devices.py	2018-06-23 11:30:07.457292033 +0200
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/python3
- 
- #############################################################################
- ##

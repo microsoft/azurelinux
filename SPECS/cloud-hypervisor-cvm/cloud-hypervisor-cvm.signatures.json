@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "cloud-hypervisor-cvm-38.0.72.2-2-cargo.tar.gz": "68d1dc8f2a70fddad934e9131ccad7ce2c96323869433419e2f488062396bcc8",
-  "cloud-hypervisor-cvm-38.0.72.2.tar.gz": "1a357a0805f7b6d90993d5ae246c2dedff88cf98c9c0eab0903dc8071be0dae2",
-  "config.toml": "74c28b7520c157109b8990b325fe8f13504e56561a9bac51499d4c6bf4a66e52"
- }
-}

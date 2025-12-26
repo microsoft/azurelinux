@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "build.xml": "d2015a7ad262e893f7ecdd3c50ebbbe2be103b0c7b4722e521ab612d7deaba30",
-  "common.xml": "c5fa49a0b9561aeb972a4ae3f059daf3164cb282ff49710ef3d64b040714cbef",
-  "commons-jexl-2.1.1-src.tar.gz": "5f06cfec88f0ce1bc51958e9ec1410af7029f2a5eb2e0b167d5d71bec43027aa",
-  "jexl2-compat-build.xml": "5c90115b37805d07ada118205191bcd3d9f5c431bd7c5761d2ff072d868fdbe5"
- }
-}

@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "openslp-2.0.0.tar.gz": "924337a2a8e5be043ebaea2a78365c7427ac6e9cee24610a0780808b2ba7579b",
-  "slpd.8.gz": "43c67e71c7571d8752f8782a750ed10997b84cb7e3fa99125cfd58c05053d6a2",
-  "slpd.service": "581e9f9d138756b1ccf02a935bbec31a50b7f219c46c0a98410ccba0c5264b36",
-  "slptool.1.gz": "9feb0b0a19c4a2a20073a92c4325951cdc3ef9d4630a7def65ac897ab3fb62b4"
- }
-}

@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "GeoLite2-ASN_20191217.tar.gz": "2e4895376e853efe42eeba0bc370ee8730455a9c9e981ee51dcf96f224acdad6",
-  "GeoLite2-City_20191217.tar.gz": "cca0d3045c6608a0b32a485a479d32def16228e4b384d8ecfff34372ae1d5be4",
-  "GeoLite2-Country_20191217.tar.gz": "ac56bca9b5aed6f1e462f386d49b58953250990652caf4cbd7b422c6a96e352c"
- }
-}

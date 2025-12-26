@@ -1,6 +1,0 @@
-# Make libfoo.so symlinks require the soname-provide of the target library
-%__mpilibsymlink_requires %{_rpmconfigdir}/mpi.prov %{buildroot} --soname-only
-%__mpilibsymlink_magic    ^symbolic link to .*lib.*\.so\..*$
-%__mpilibsymlink_path     ^%{_prefix}/lib(64)?/.*\.so$
-%__mpilibsymlink_flags    magic_and_path
-%__libsymlink_exclude_path ^%{_prefix}/lib(64)?/.*$

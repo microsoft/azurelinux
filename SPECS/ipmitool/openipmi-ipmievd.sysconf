@@ -1,1 +1,0 @@
-IPMIEVD_OPTIONS="sel daemon pidfile=/var/run/ipmievd.pid"

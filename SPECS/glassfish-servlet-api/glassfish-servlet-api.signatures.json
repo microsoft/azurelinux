@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "LICENSE-2.0.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
-  "glassfish-servlet-api-3.1.0.tar.gz": "00538e954d89c91acabecce7c9e483e28ffa9a8680e75a8d2e8681fb9175a413",
-  "glassfish-servlet-api-build.properties": "141f45b12ebd23ae3705197fcdae7c378dc60e2dde59fafa65a32e74b045d0cd",
-  "glassfish-servlet-api-build.xml": "70766a7640cda185a800b6f8796c6a771b6e424b40f4e71d298d3abbc6334d5b"
- }
-}

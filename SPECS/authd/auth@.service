@@ -1,8 +1,0 @@
-[Unit]
-Description=Authd Ident Protocol Requests Server
-After=local-fs.target
-
-[Service]
-User=ident
-ExecStart=/usr/sbin/in.authd -t60 --xerror --os -E
-StandardInput=socket

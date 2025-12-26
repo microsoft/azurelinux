@@ -1,5 +1,0 @@
-cmake
-lua
-mariner-rpm-macros
-rpm
-rpm-libs

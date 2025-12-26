@@ -1,7 +1,0 @@
-License information taken from META.yml:
-
-(...)
-dynamic_config: 0
-generated_by: 'Module::Install version 1.19'
-license: perl
-...

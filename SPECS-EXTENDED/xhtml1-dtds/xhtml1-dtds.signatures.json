@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "LICENSE.PTR": "9b7eded05ad80f5b94fd79efa0bbb51f4264ca2a336a6b3636913e646bb86b0c",
-  "xhtml1-dtds-20020801.tar.xz": "d6c90d23210f1133af5eb2b2c511dd97a34a54ee95ce3631be0bad7324e4d947",
-  "xhtml1-dtds-prepare-tarball.sh": "a6c5c89072896ab623d7f88daec80b64ff83574515a452cc44961e18df0ce288",
-  "xhtml1-dtds.catalog.xml": "30926fca23ab7edd899706effcceb3e4fa6ff2aa289e17aad53d195d61513ce9"
- }
-}

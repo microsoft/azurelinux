@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "nslcd.service": "88be4a3d700dcc8bbfd38b609168b4c049fd9216dd5348aa4f6202eb4d4d2d03",
-  "nslcd.tmpfiles": "3002c52666e7187ce021a81fe854619f1505ec09c5c269dfe5d355372cb54602",
-  "nss-pam-ldapd-0.9.10.tar.gz": "809d5692ed1e58ad31b04a41c091cab22a79b53c6f9a4c65ecfc5d6c32ab0ab3",
-  "nss-pam-ldapd-0.9.10.tar.gz.sig": "27cfa213f7ca22d97b20c03726c92a2d31115437cdd336ef99afc7f23fd4063a"
- }
-}

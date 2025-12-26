@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=XMMS
-Exec=xmms -p -e %F
-Icon=xmms
-MimeType=audio/x-flac;audio/flac;
-Categories=AudioVideo;Player;
-Terminal=false
-Type=Application
-NoDisplay=true

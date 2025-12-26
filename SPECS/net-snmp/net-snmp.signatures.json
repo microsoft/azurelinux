@@ -1,7 +1,0 @@
-{
-  "Signatures": {
-    "snmpd.service": "5e17bf9f66f2b77e1a6c6dff7356cecb8ed488ce3df361738a72b4436096b694",
-    "snmptrapd.service": "ef3e3dbe80c8ab455b30cd83db23db136263c1295ce2f23dcc4a1a1b60799229",
-    "net-snmp-5.9.4.tar.gz": "8b4de01391e74e3c7014beb43961a2d6d6fa03acc34280b9585f4930745b0544"
-  }
-}

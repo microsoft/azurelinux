@@ -1,6 +1,0 @@
-%__mpi_provides            %{_rpmconfigdir}/mpi.prov %{?__filter_GLIBC_PRIVATE:--filter-private}
-%__mpi_requires            %{_rpmconfigdir}/mpi.req %{?__filter_GLIBC_PRIVATE:--filter-private}
-%__mpi_path                ^%{_prefix}/lib(64)?/.*$
-%__mpi_magic               ^(setuid )?(setgid )?(sticky )?ELF (32|64)-bit.*$
-%__mpi_flags               exeonly,magic_and_path
-%__elf_exclude_path        ^%{_prefix}/lib(64)?/.*$

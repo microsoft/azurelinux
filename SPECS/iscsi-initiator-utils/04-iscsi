@@ -1,7 +1,0 @@
-#!/bin/sh
-
-case "$2" in
-	up|vpn-up)
-		/bin/systemctl --no-block reload iscsi.service || :
-		;;
-esac

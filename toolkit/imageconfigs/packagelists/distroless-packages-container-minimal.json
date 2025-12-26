@@ -1,6 +1,0 @@
-{
-    "packages": [
-        "distroless-packages-minimal",
-        "prebuilt-ca-certificates"
-    ]
-}

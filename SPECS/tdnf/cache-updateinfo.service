@@ -1,9 +1,0 @@
-[Unit]
-Description=Cache tdnf updateinfo
-
-[Service]
-ExecStart=/usr/bin/tdnf-cache-updateinfo
-Type=oneshot
-Nice=19
-IOSchedulingClass=2
-IOSchedulingPriority=7

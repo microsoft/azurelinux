@@ -1,5 +1,0 @@
-#!/bin/sh
-ACCTFILE=/var/account/pacct
-if [ ! -r $ACCTFILE ];then
-  touch $ACCTFILE && chmod 600 $ACCTFILE
-fi

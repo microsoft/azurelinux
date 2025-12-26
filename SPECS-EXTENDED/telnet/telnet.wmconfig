@@ -1,4 +1,0 @@
-telnet name "telnet"
-telnet description "Telnet Client"
-telnet exec "xterm -e telnet &"
-telnet group "Networking"

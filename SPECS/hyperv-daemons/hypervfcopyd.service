@@ -1,7 +1,0 @@
-[Unit]
-Description=Hyper-V FCOPY daemon
-BindsTo=sys-devices-virtual-misc-vmbus\x21hv_fcopy.device
-IgnoreOnIsolate=1
-
-[Service]
-ExecStart=/usr/sbin/hypervfcopyd -n
