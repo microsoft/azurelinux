@@ -43,7 +43,7 @@ A Qt-based GUI for the highlight source code formatter source.
 %endif
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -n %{name}-v%{version}
 
 %build
 CFLAGS="$CFLAGS -fPIC %{optflags}"; export CFLAGS
