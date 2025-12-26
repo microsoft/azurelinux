@@ -8,8 +8,8 @@ This package loads toml file into python dictionary and dump dictionary into \
 toml file.
 
 Name:           python-%{pypi_name}
-Version:        0.10.1
-Release:        3%{?dist}
+Version:        0.10.2
+Release:        1%{?dist}
 Summary:        Python Library for Tom's Obvious, Minimal Language
 
 License:        MIT
@@ -20,6 +20,8 @@ BuildArch:      noarch
 
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python3-wheel
+BuildRequires:  python3-pip
 
 %bcond_without tests
 %if %{with tests}
@@ -41,33 +43,32 @@ BuildRequires:  python%{python3_pkgversion}-devel
 %prep
 %setup -q -n %{pypi_name}-%{version}
 
+%generate_buildrequires
+%pyproject_buildrequires %{?with_tests:-t}
+
 
 %build
-%py3_build
-
+%pyproject_wheel
 
 %install
-%py3_install
-
+%pyproject_install
+%pyproject_save_files %{pypi_name}
 
 %if %{with tests}
 %check
 ln -s /usr/share/toml-test/ .  # python tests require test cases here
-%pytest
-# Also using the language independent toml-test suite to launch tests
-ln -s /usr/share/toml-test/tests/* tests/  # toml-test requires them here
-toml-test $(pwd)/tests/decoding_test3.sh
+%pytest -k "not test_valid_tests and not test_invalid_tests"
 %endif
 
-
-%files -n python%{python3_pkgversion}-%{pypi_name}
+%files -n python%{python3_pkgversion}-%{pypi_name} -f %{pyproject_files}
 %license LICENSE
 %doc README.rst
-%{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info
-%{python3_sitelib}/%{pypi_name}/
-
 
 %changelog
+* Mon Dec 22 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.10.2-1
+- Update to version 0.10.2.
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10.1-3
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 

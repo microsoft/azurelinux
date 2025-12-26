@@ -8,7 +8,7 @@ Distribution:   Azure Linux
 
 Name:           python-%{pypi_name}
 Version:        4.0.1
-Release:        11%{?dist}
+Release:        12%{?dist}
 Summary:        Fixtures, reusable state for writing clean tests and more
 
 License:        Apache-2.0 OR BSD-3-Clause
@@ -72,21 +72,18 @@ sed -e 's/import mock/import unittest.mock as mock/' -i fixtures/tests/_fixtures
 %pyproject_install
 %pyproject_save_files %{pypi_name}
 
-%if %{with tests}
-# Note: Tests are executed using the '%tox' macro rather than the direct
-# '%{__python3} -m testtools.run fixtures.test_suite' invocation, for better
-# compatibility with Python build environments.
 %check
-%if %{without bootstrap}
 %tox
-%endif
-%endif
 
 %files -n python%{python3_pkgversion}-%{pypi_name} -f %{pyproject_files}
 %license Apache-2.0 BSD
 %doc README.rst GOALS NEWS
 
 %changelog
+* Thu Dec 18 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 4.0.1-12
+- Build fix by removing unwanted if-else conditions (license: MIT).
+- License verified.
+
 * Thu Feb 20 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 4.0.1-11
 - Initial CBL-Mariner import from Fedora 41 (license: MIT).
 - License verified.
