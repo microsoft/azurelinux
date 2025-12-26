@@ -2,7 +2,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.78.6
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,9 @@ Patch1:         CVE-2025-3360.patch
 Patch2:         CVE-2025-4373.patch
 Patch3:         CVE-2025-6052.patch
 Patch4:         CVE-2025-7039.patch
+Patch5:         CVE-2025-13601.patch
+Patch6:         CVE-2025-14087.patch
+Patch7:         CVE-2025-14512.patch
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
@@ -113,6 +116,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %{_libdir}/glib-*/*
 %{_includedir}/*
 %{_datadir}/*
+%license %{_datadir}/licenses/glib/LGPL-2.1-or-later.txt
 %exclude %{_datadir}/gtk-doc/html/
 %exclude %{_datadir}/glib-2.0/schemas/
 
@@ -126,6 +130,12 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Mon Dec 15 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.78.6-6
+- Patch for CVE-2025-14087, CVE-2025-14512
+
+* Sat Nov 29 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.78.6-5
+- Patch for CVE-2025-13601
+
 * Mon Sep 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.78.6-4
 - Patch for CVE-2025-7039
 
@@ -171,7 +181,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 * Wed May 19 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-4
 - Require schemas subpackage from devel subpackage
 
-* Fri Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-3
+* Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-3
 - Remove CVE-2019-13012 patch (already in the this version)
 - Exclude doubly-packaged files from devel subpackage
 - Merge the following releases from 1.0 to dev branch

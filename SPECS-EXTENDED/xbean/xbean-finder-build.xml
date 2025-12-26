@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="xbean-finder" default="package" basedir=".">
+
+  <!-- ====================================================================== -->
+  <!-- Build environment properties                                           -->
+  <!-- ====================================================================== -->
+
+  <include file="../common.xml"/>
+  <property file="build.properties"/>
+
+  <property name="project.artifactId" value="xbean-finder"/>
+
+  <property name="build.finalName" value="${project.artifactId}-${project.version}"/>
+  <property name="build.dir" value="target"/>
+  <property name="build.outputDir" value="${build.dir}/classes"/>
+  <property name="build.srcDir" value="src/main/java"/>
+  <property name="build.resourceDir" value="src/main/resources"/>
+
+  <property name="reporting.outputDirectory" value="${build.dir}/site"/>
+
+  <!-- ====================================================================== -->
+  <!-- Defining classpaths                                                    -->
+  <!-- ====================================================================== -->
+
+  <path id="build.classpath">
+    <pathelement location="../xbean-asm-util/target/classes"/>
+    <fileset dir="../lib">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- ====================================================================== -->
+  <!-- Cleaning up target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="clean" description="Clean the output directory">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Compilation target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="compile" description="Compile the code">
+    <mkdir dir="${build.outputDir}"/>
+    <javac destdir="${build.outputDir}"
+           nowarn="false"
+           debug="true"
+           encoding="utf-8"
+           optimize="false"
+           deprecation="false"
+           release="${compiler.release}"
+           target="${compiler.target}"
+           verbose="false"
+           fork="false"
+           source="${compiler.source}">
+      <src>
+        <pathelement location="${build.srcDir}"/>
+      </src>
+      <classpath refid="build.classpath"/>
+    </javac>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Javadoc target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="javadoc" description="Generates the Javadoc of the application">
+    <javadoc sourcepath="${build.srcDir}"
+             packagenames="*"
+             destdir="${reporting.outputDirectory}/apidocs"
+             access="protected"
+             verbose="false"
+             version="true"
+             use="true"
+             author="true"
+             splitindex="false"
+             nodeprecated="false"
+             nodeprecatedlist="false"
+             notree="false"
+             noindex="false"
+             nohelp="false"
+             nonavbar="false"
+             serialwarn="false"
+             encoding="utf-8"
+             source="${compiler.source}"
+             linksource="true"
+             breakiterator="true">
+      <classpath refid="build.classpath"/>
+    </javadoc>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Package target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="package" depends="compile" description="Package the application">
+    <jar jarfile="${build.dir}/${build.finalName}.jar"
+         compress="true"
+         index="false"
+         basedir="${build.outputDir}"
+         excludes="**/package.html">
+      <manifest>
+		<attribute name="Automatic-Module-Name" value="org.apache.xbean.finder"/>
+		<attribute name="Bundle-Description" value="XBean Finder helps to find annotations in classes"/>
+		<attribute name="Bundle-DocURL" value="http://geronimo.apache.org/maven/xbean/${project.version}/${project.artifactId}"/>
+		<attribute name="Bundle-ManifestVersion" value="2"/>
+		<attribute name="Bundle-Name" value="Apache XBean :: Classpath Resource Finder"/>
+		<attribute name="Bundle-SymbolicName" value="org.apache.xbean.finder"/>
+		<attribute name="Bundle-Version" value="${bundle.version}"/>
+		<attribute name="Export-Package" value="org.apache.xbean.finder.archive;version=&quot;${project.version}&quot;;uses:=&quot;org.apache.xbean.finder.filter&quot;,org.apache.xbean.finder.filter;version=&quot;${project.version}&quot;,org.apache.xbean.finder.util;version=&quot;${project.version}&quot;,org.apache.xbean.finder;version=&quot;${project.version}&quot;;uses:=&quot;org.apache.xbean.finder.archive,org.apache.xbean.finder.filter,org.objectweb.asm&quot;"/>
+		<attribute name="Import-Package" value="org.objectweb.asm.commons;version=&quot;[9.0,10.0)&quot;,org.objectweb.asm;version=&quot;[9.0,10.0)&quot;"/>
+		<attribute name="JavaPackages-ArtifactId" value="${project.artifactId}"/>
+		<attribute name="JavaPackages-GroupId" value="${project.groupId}"/>
+		<attribute name="JavaPackages-Version" value="${project.version}"/>
+		<attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=${compiler.target}))&quot;"/>
+      </manifest>
+    </jar>
+  </target>
+
+</project>

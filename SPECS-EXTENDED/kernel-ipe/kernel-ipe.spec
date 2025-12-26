@@ -32,8 +32,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-ipe
-Version:        6.6.104.2
-Release:        4%{?dist}
+Version:        6.6.117.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -460,6 +460,21 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Nov 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.117.1-1
+- Auto-upgrade to 6.6.117.1
+
+* Tue Nov 18 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.116.1-2
+- Enable dm-cache
+
+* Mon Nov 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.116.1-1
+- Auto-upgrade to 6.6.116.1
+
+* Mon Oct 27 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.112.1-2
+- Bump release to match kernel
+
+* Wed Oct 15 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.112.1-1
+- Auto-upgrade to 6.6.112.1
+
 * Tue Sep 30 2025 Rachel Menge <rachelmenge@microsoft.com> - 6.6.104.2-4
 - Enable CONFIG_PCI_P2PDMA CONFIG_HSA_AMD CONFIG_HSA_AMD_P2P and dependency KConfigs
 

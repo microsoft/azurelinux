@@ -12,7 +12,7 @@
 %global KVERSION %{target_kernel_version_full}
 
 %define _name xpmem-modules
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-20%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 25.07-1%{release_suffix}%{?dist}}
 
 # xpmem-modules is a sub-package in SPECS/xpmem.
 # We are making that into a main package for signing.
@@ -20,7 +20,7 @@
 Summary:	 Cross-partition memory
 Name:		 %{_name}-signed
 Version:	 2.7.4
-Release:	 20%{release_suffix}%{?dist}
+Release:	 22%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -79,12 +79,27 @@ cp -rp ./. %{buildroot}/
 
 popd
 
+%post -n %{_name}
+/sbin/depmod %{KVERSION}
+
+%postun -n %{_name}
+if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
+	/sbin/depmod %{KVERSION}
+fi
+
 %files -n %{_name}
 /lib/modules/%{KVERSION}/updates/xpmem.ko
 %{_datadir}/licenses
 
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7.4-22
+- Build with OFED 25.07.0.9.7.1.
+
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-21
+- Bump mofed release number
+- Align %%post* scripts with other kmod packages.
+
 * Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 2.7.4-20
 - Add kernel version and release nb into release nb
 

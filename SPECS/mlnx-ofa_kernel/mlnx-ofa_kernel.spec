@@ -90,9 +90,10 @@
 %{!?KERNEL_SOURCES: %global KERNEL_SOURCES /lib/modules/%{KVERSION}/source}
 
 %{!?_name: %global _name mlnx-ofa_kernel}
-%{!?_version: %global _version 24.10}
-%{!?_release: %global _release OFED.24.10.0.7.0.1}
+%{!?_version: %global _version 25.07}
+%{!?_release: %global _release OFED.25.07.0.9.7.1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
+%global MLNX_OFA_DRV_SRC 24.10-0.7.0
 
 %global utils_pname %{_name}
 %global devel_pname %{_name}-devel
@@ -105,18 +106,19 @@
 
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel
-Version:	 24.10
-Release:	 20%{release_suffix}%{?dist}
+Version:	 25.07
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
-Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ofa_kernel-24.10.tgz#/%{_name}-%{_version}.tgz
-Patch0:          001-fix-module-init-for-ibt.patch
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/%{_name}-%{_version}.tgz
 
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-ExclusiveArch:   x86_64
 
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -138,7 +140,6 @@ BuildRequires:  libstdc++-devel
 BuildRequires:  libunwind-devel
 BuildRequires:  pkgconfig
 
-Requires: kernel = %{target_kernel_version_full}
 Requires: kmod
 Requires: libstdc++
 Requires: libunwind
@@ -160,7 +161,7 @@ BuildRequires: /usr/bin/perl
 %description
 InfiniBand "verbs", Access Layer  and ULPs.
 Utilities rpm.
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-%{MLNX_OFA_DRV_SRC}.tgz
 
 
 # build KMP rpms?
@@ -184,6 +185,8 @@ EOF)
 %global kernel_source() %{K_SRC}
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %package -n %{non_kmp_pname}
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -197,12 +200,19 @@ Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
 Obsoletes: mlnx-rdma-rxe
+Obsoletes: fwctl <= 24.10
+Provides:  fwctl = %{version}-%{release}
+
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries
+
+Requires: kernel = %{target_kernel_version_full}
+
 %description -n %{non_kmp_pname}
 Core, HW and ULPs kernel modules
 Non-KMP format kernel modules rpm.
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-%{MLNX_OFA_DRV_SRC}.tgz
+%endif
 %endif #end if "%{KMP}" == "1"
 
 %package -n %{devel_pname}
@@ -226,7 +236,7 @@ Summary: Infiniband Driver and ULPs kernel modules sources
 Group: System Environment/Libraries
 %description -n %{devel_pname}
 Core, HW and ULPs kernel modules sources
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-%{MLNX_OFA_DRV_SRC}.tgz
 
 %package source
 Summary: Source of the MLNX_OFED main kernel driver
@@ -293,7 +303,6 @@ drivers against it.
 
 %prep
 %setup -n %{_name}-%{_version}
-%patch 0 -p1
 set -- *
 mkdir source
 mv "$@" source/
@@ -334,7 +343,13 @@ for flavor in %flavors_to_build; do
 	export KSRC=%{kernel_source $flavor}
 	export KVERSION=%{kernel_release $KSRC}
 	cd $PWD/obj/$flavor
+# For the default kernel, we create the module package only for the x86_64 kernel.
+# Some other kernels (kernel-hwe for instance) get aarch64 modules packages built from other specs.
+# We keep the user space packages like the module configs built only in this spec, though,
+# and re-use them for kernel modules built for other kernel flavours and architectures.
+%ifarch x86_64
 	make install_modules KERNELRELEASE=$KVERSION
+%endif
 	# install script and configuration files
 	make install_scripts
 	mkdir -p %{_builddir}/src/$NAME/$flavor
@@ -354,10 +369,13 @@ for flavor in %flavors_to_build; do
 		cp ./Module.symvers %{_builddir}/src/$NAME/$flavor/Module.symvers
 	fi
 	cp -a %{_builddir}/src/$NAME/$flavor %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}/$KVERSION
-	# Cleanup unnecessary kernel-generated module dependency files.
-	find $INSTALL_MOD_PATH/lib/modules -iname 'modules.*' -exec rm {} \;
 	cd -
 done
+
+%ifarch x86_64
+	# Cleanup unnecessary kernel-generated module dependency files.
+	find $INSTALL_MOD_PATH/lib/modules -iname 'modules.*' -exec rm {} \;
+%endif
 
 # Set the module(s) to be executable, so that they will be stripped when packaged.
 find %{buildroot} \( -type f -name '*.ko' -o -name '*ko.gz' \) -exec %{__chmod} u+x \{\} \;
@@ -482,6 +500,7 @@ rm -rf %{buildroot}
 
 
 %if "%{KMP}" != "1"
+%ifarch x86_64
 %post -n %{non_kmp_pname}
 /sbin/depmod %{KVERSION}
 # W/A for OEL6.7/7.x inbox modules get locked in memory
@@ -499,6 +518,7 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 		/sbin/dracut --force
 	fi
 fi
+%endif
 %endif # end KMP=1
 
 %post -n %{utils_pname}
@@ -701,6 +721,8 @@ update-alternatives --remove \
 /lib/udev/auxdev-sf-netdev-rename
 /usr/sbin/setup_mr_cache.sh
 %_datadir/mlnx_ofed/mlnx_bf_assign_ct_cores.sh
+%_datadir/mlnx_ofed/mlnx_drv_ctl
+%_datadir/mlnx_ofed/mod_load_funcs
 %config(noreplace) /etc/modprobe.d/mlnx.conf
 %config(noreplace) /etc/modprobe.d/mlnx-bf.conf
 %{_sbindir}/*
@@ -719,12 +741,15 @@ update-alternatives --remove \
 %endif
 
 %if "%{KMP}" != "1"
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %files -n %{non_kmp_pname}
 %license source/debian/copyright
 /lib/modules/%{KVERSION}/%{install_mod_dir}/
 %if %{IS_RHEL_VENDOR}
 %if ! 0%{?fedora}
 %config(noreplace) %{_sysconfdir}/depmod.d/zz01-%{_name}-*.conf
+%endif
 %endif
 %endif
 %endif
@@ -741,6 +766,13 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1
+- Upgrade version to 25.07.
+- Update source path
+
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-21
+- Adjusted package dependencies on user space components.
+
 * Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-20
 - Add kernel version and release nb into release nb
 

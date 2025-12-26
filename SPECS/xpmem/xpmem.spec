@@ -12,7 +12,7 @@
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-20%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 25.07-1%{release_suffix}%{?dist}}
 
 # %{!?KVERSION: %global KVERSION %(uname -r)}
 %{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
@@ -21,7 +21,7 @@
 %{!?K_SRC: %global K_SRC /lib/modules/%{KVERSION}/build}
 # A separate variable _release is required because of the odd way the
 # script append_number_to_package_release.sh works:
-%global _release 1.2410068
+%global _release 1.2507097
 
 %bcond_with kernel_only
 
@@ -42,15 +42,17 @@
 Summary:	 Cross-partition memory
 Name:		 xpmem
 Version:	 2.7.4
-Release:	 20%{release_suffix}%{?dist}
+Release:	 22%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 BuildRequires:	 automake autoconf
 URL:		 https://github.com/openucx/xpmem
-Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/xpmem-2.7.4.tar.gz#/%{name}-%{version}.tar.gz
-ExclusiveArch:   x86_64
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
 
 # name gets a different value in subpackages
 %global _name %{name}
@@ -79,9 +81,6 @@ BuildRequires:  mlnx-ofa_kernel-devel = %{_mofed_full_version}
 BuildRequires:  mlnx-ofa_kernel-source = %{_mofed_full_version}
 
 Requires:       mlnx-ofa_kernel = %{_mofed_full_version}
-Requires:       mlnx-ofa_kernel-modules = %{_mofed_full_version}
-Requires:       kernel = %{target_kernel_version_full}
-Requires:       kmod
 
 
 %description
@@ -125,11 +124,18 @@ EOF)
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
 
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %package modules
 # %{nil}: to avoid having the script that build OFED-internal
 # munge the release version here as well:
 Summary: XPMEM: kernel modules
 Group: System Environment/Libraries
+
+Requires:       mlnx-ofa_kernel-modules = %{_mofed_full_version}
+Requires:       kernel = %{target_kernel_version_full}
+Requires:       kmod
+
 %description modules
 XPMEM is a Linux kernel module that enables a process to map the
 memory of another process into its virtual address space. Source code
@@ -137,6 +143,7 @@ can be obtained by cloning the Git repository, original Mercurial
 repository or by downloading a tarball from the link above.
 
 This package includes the kernel module (non KMP version).
+%endif
 %endif #end if "%{KMP}" == "1"
 
 #
@@ -194,6 +201,13 @@ fi
 
 %install
 %{make_install} moduledir=%{moduledir} %{make_kernel_only}
+# For the default kernel, we create the module package only for the x86_64 kernel.
+# Some other kernels (kernel-hwe for instance) get aarch64 modules packages built from other specs.
+# We keep the user space packages like the module configs built only in this spec, though,
+# and re-use them for kernel modules built for other kernel flavours and architectures.
+%ifnarch x86_64
+rm -rf $RPM_BUILD_ROOT/%{moduledir}
+%endif
 rm -rf $RPM_BUILD_ROOT/%{_libdir}/libxpmem.la
 rm -rf $RPM_BUILD_ROOT/etc/init.d/xpmem
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/modules-load.d
@@ -243,12 +257,31 @@ fi
 %endif
 
 %if "%{KMP}" != "1"
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
+%post modules
+/sbin/depmod %{KVERSION}
+
+%postun modules
+if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
+	/sbin/depmod %{KVERSION}
+fi
+
 %files modules
 %{moduledir}/xpmem.ko
 %license COPYING COPYING.LESSER
 %endif
+%endif
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.7.4-22
+- Build with OFED 25.07.0.9.7.1.
+- Update source path
+
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.4-21
+- Adjusted package dependencies on user space components.
+- Align %%post* scripts with other kmod packages.
+
 * Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 2.7.4-20
 - Add kernel version and release nb into release nb
 

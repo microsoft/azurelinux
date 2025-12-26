@@ -32,7 +32,7 @@
 
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.50.2
+%global target_azl_build_kernel_version 6.12.57.1
 %global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
@@ -43,12 +43,12 @@
 %global KVERSION %{target_kernel_version_full}
 
 %define _name srp-hwe
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-22%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 25.07-1%{release_suffix}%{?dist}}
 
 Summary:	 srp driver
 Name:		 %{_name}-signed
-Version:	 24.10
-Release:	 22%{release_suffix}%{?dist}
+Version:	 25.07
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -66,14 +66,13 @@ Source2:         scsi_transport_srp.ko
 
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-ExclusiveArch:   aarch64
 
 %description
 srp kernel modules
 
 %package -n %{_name}
 Summary:        %{summary}
-Requires:       mlnx-ofa_kernel-hwe = %{_mofed_full_version}
+Requires:       mlnx-ofa_kernel
 Requires:       mlnx-ofa_kernel-hwe-modules = %{_mofed_full_version}
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
@@ -112,6 +111,16 @@ popd
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1_6.12.57.1.1
+- Upgrade version to 25.07.
+- Enable build on x86_64 kernel hwe.
+
+* Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-24_6.12.57.1.1
+- Bump to match kernel-hwe
+
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-23_6.12.50.2-1
+- Adjusted package dependencies on user space components.
+
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22_6.12.50.2-1
 - Bump to match kernel-hwe
 - Fix signed spec for -hwe variant

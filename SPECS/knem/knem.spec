@@ -38,7 +38,7 @@
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
-%{!?_release: %global _release OFED.23.10.0.2.1.1}
+%{!?_release: %global _release OFED.25.07.0.9.7.1}
 # %{!?KVERSION: %global KVERSION %(uname -r)}
 %global kernel_version %{KVERSION}
 %global krelver %(echo -n %{KVERSION} | sed -e 's/-/_/g')
@@ -54,16 +54,18 @@
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
 Name:		 knem
 Version:	 1.1.4.90mlnx3
-Release:	 20%{release_suffix}%{?dist}
+Release:	 22%{release_suffix}%{?dist}
 Provides:	 knem-mlnx = %{version}-%{release}
 Obsoletes:	 knem-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-Source0:	 https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/knem-1.1.4.90mlnx3.tar.gz#/knem-%{version}.tar.gz
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/knem-%{version}.tar.gz
 BuildRoot:       /var/tmp/%{name}-%{version}-build
-ExclusiveArch:   x86_64
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -73,7 +75,6 @@ BuildRequires:  binutils
 BuildRequires:  systemd
 BuildRequires:  kmod
 
-Requires:       kernel = %{target_kernel_version_full}
 Requires:       kmod
 
 
@@ -116,12 +117,18 @@ EOF)
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
 
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %package -n %{non_kmp_pname}
 Summary: KNEM: High-Performance Intra-Node MPI Communication
 Group: System Environment/Libraries
+
+Requires:       kernel = %{target_kernel_version_full}
+
 %description -n %{non_kmp_pname}
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as loading memory copies on to Intel I/OAT hardware.
 See http://runtime.bordeaux.inria.fr/knem/ for details.
+%endif
 %endif #end if "%{KMP}" == "1"
 
 #
@@ -199,6 +206,15 @@ for flavor in %flavors_to_build; do
 	export MODULE_DESTDIR=/lib/modules/$KVERSION/$INSTALL_MOD_DIR
 	mkdir -p $RPM_BUILD_ROOT/lib/modules/$KVERSION/$INSTALL_MOD_DIR
 	MODULE_DESTDIR=/lib/modules/$KVERSION/$INSTALL_MOD_DIR DESTDIR=$RPM_BUILD_ROOT KVERSION=$KVERSION $RPM_BUILD_ROOT/opt/knem-%{version}/sbin/knem_local_install
+
+# For the default kernel, we create the module package only for the x86_64 kernel.
+# Some other kernels (kernel-hwe for instance) get aarch64 modules packages built from other specs.
+# We keep the user space packages like the module configs built only in this spec, though,
+# and re-use them for kernel modules built for other kernel flavours and architectures.
+%ifnarch x86_64
+	rm -rf $RPM_BUILD_ROOT/$MODULE_DESTDIR
+%endif
+
 	cp knem.pc  $RPM_BUILD_ROOT/usr/lib64/pkgconfig
 	cd -
 done
@@ -251,6 +267,8 @@ if (grep -qw knem /etc/sysconfig/kernel 2>/dev/null); then
 fi
 
 %if "%{KMP}" != "1"
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %post -n %{non_kmp_pname}
 depmod %{KVERSION} -a
 
@@ -258,6 +276,7 @@ depmod %{KVERSION} -a
 if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 	depmod %{KVERSION} -a
 fi
+%endif
 %endif # end KMP=1
 
 %files
@@ -271,6 +290,8 @@ fi
 
 
 %if "%{KMP}" != "1"
+# We create the module package only for the x86_64 kernel
+%ifarch x86_64
 %files -n %{non_kmp_pname}
 %license source/COPYING source/COPYING.BSD-3 source/COPYING.GPL-2
 /lib/modules/%{KVERSION}/%{install_mod_dir}/
@@ -280,8 +301,16 @@ fi
 %endif
 %endif
 %endif
+%endif
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.4.90mlnx3-22
+- Build with OFED 25.07.0.9.7.1.
+- Update source path
+
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.4.90mlnx3-21
+- Adjusted package dependencies on user space components.
+
 * Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 1.1.4.90mlnx3-20
 - Add kernel version and release nb into release nb
 

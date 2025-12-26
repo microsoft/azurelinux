@@ -28,7 +28,7 @@
 
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.50.2
+%global target_azl_build_kernel_version 6.12.57.1
 %global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
@@ -40,9 +40,9 @@
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
 %{!?_name: %define _name srp-hwe}
-%{!?_version: %define _version 24.10}
-%{!?_mofed_full_version: %define _mofed_full_version %{_version}-22%{release_suffix}%{?dist}}
-%{!?_release: %define _release OFED.24.10.0.6.7.1}
+%{!?_version: %define _version 25.07}
+%{!?_mofed_full_version: %define _mofed_full_version %{_version}-1%{release_suffix}%{?dist}}
+%{!?_release: %define _release OFED.25.07.0.9.7.1}
 
 # KMP is disabled by default
 %{!?KMP: %global KMP 0}
@@ -66,16 +66,18 @@
 
 Summary:	 srp driver
 Name:		 srp-hwe
-Version:	 24.10
-Release:	 22%{release_suffix}%{?dist}
+Version:	 25.07
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
-Source:		 https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/srp-24.10.tgz#/srp-%{version}.tgz
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/srp-%{version}.tgz
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-ExclusiveArch:   aarch64
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -85,9 +87,8 @@ BuildRequires:  systemd
 BuildRequires:  kmod
 BuildRequires:  libconfig-devel
 BuildRequires:  mlnx-ofa_kernel-hwe-devel = %{_mofed_full_version}
-BuildRequires:  mlnx-ofa_kernel-hwe-source = %{_mofed_full_version}
 
-Requires:       mlnx-ofa_kernel-hwe = %{_mofed_full_version}
+Requires:       mlnx-ofa_kernel
 Requires:       mlnx-ofa_kernel-hwe-modules  = %{_mofed_full_version}
 Requires:       kernel-hwe = %{target_kernel_version_full}
 Requires:       kmod
@@ -256,6 +257,17 @@ fi
 %endif
 
 %changelog
+* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1_6.12.57.1.1
+- Upgrade version to 25.07.
+- Enable build on x86_64 kernel hwe.
+- Update source path
+
+* Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-24_6.12.57.1.1
+- Bump to match kernel-hwe
+
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-23_6.12.50.2-1
+- Adjusted package dependencies on user space components.
+
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22_6.12.50.2-1
 - Bump to match kernel-hwe
 

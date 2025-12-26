@@ -28,7 +28,7 @@
 
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.50.2
+%global target_azl_build_kernel_version 6.12.57.1
 %global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
@@ -41,8 +41,6 @@
 
 # KMP is disabled by default
 %{!?KMP: %global KMP 0}
-
-%global WITH_SYSTEMD %(if ( test -d "%{_unitdir}" > /dev/null); then echo -n '1'; else echo -n '0'; fi)
 
 %{!?configure_options: %global configure_options --with-core-mod --with-user_mad-mod --with-user_access-mod --with-addr_trans-mod --with-mlx5-mod --with-mlxfw-mod --with-ipoib-mod}
 
@@ -79,11 +77,6 @@
 
 # Select packages to build
 
-# Kernel module packages to be included into kernel-ib
-%global build_ipoib %(if ( echo %{configure_options} | grep "with-ipoib-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
-%global build_oiscsi %(if ( echo %{configure_options} | grep "with-iscsi-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
-%global build_mlx5 %(if ( echo %{configure_options} | grep "with-mlx5-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
-
 %{!?LIB_MOD_DIR: %global LIB_MOD_DIR /lib/modules/%{KVERSION}/updates}
 
 %{!?IB_CONF_DIR: %global IB_CONF_DIR /etc/infiniband}
@@ -92,9 +85,10 @@
 
 %global base_name mlnx-ofa_kernel
 %{!?_name: %global _name %{base_name}-hwe}
-%{!?_version: %global _version 24.10}
-%{!?_release: %global _release OFED.24.10.0.7.0.1}
+%{!?_version: %global _version 25.07}
+%{!?_release: %global _release OFED.25.07.0.9.7.1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
+%global MLNX_OFA_DRV_SRC 24.10-0.7.0
 
 %global utils_pname %{name}
 %global devel_pname %{name}-devel
@@ -107,18 +101,19 @@
 
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel-hwe
-Version:	 24.10
-Release:	 22%{release_suffix}%{?dist}
+Version:	 25.07
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
-Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-ofa_kernel-24.10.tgz#/mlnx-ofa_kernel-%{_version}.tgz
-Patch0:          001-fix-module-init-for-ibt.patch
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/mlnx-ofa_kernel-%{_version}.tgz
 
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-ExclusiveArch:   aarch64
 
 Obsoletes: kernel-ib
 Obsoletes: mlnx-en
@@ -139,21 +134,6 @@ BuildRequires:  libstdc++-devel
 BuildRequires:  libunwind-devel
 BuildRequires:  pkgconfig
 
-Requires: kernel-hwe = %{target_kernel_version_full}
-Requires: kmod
-Requires: libstdc++
-Requires: libunwind
-
-Requires: mlnx-tools >= 5.2.0
-Requires: coreutils
-Requires: pciutils
-Requires: grep
-Requires: procps
-Requires: module-init-tools
-Requires: lsof
-Requires: ofed-scripts
-Conflicts: mlnx-ofa_kernel
-
 %if "%{KMP}" == "1"
 BuildRequires: %kernel_module_package_buildreqs
 BuildRequires: /usr/bin/perl
@@ -161,7 +141,7 @@ BuildRequires: /usr/bin/perl
 %description
 InfiniBand "verbs", Access Layer  and ULPs.
 Utilities rpm.
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-%{MLNX_OFA_DRV_SRC}.tgz
 
 
 # build KMP rpms?
@@ -198,12 +178,31 @@ Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
 Obsoletes: mlnx-rdma-rxe
+Obsoletes: fwctl-hwe <= 24.10
+Provides:  fwctl-hwe = %{version}-%{release}
+
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries
+
+Requires: kernel-hwe = %{target_kernel_version_full}
+Requires: kmod
+Requires: libstdc++
+Requires: libunwind
+
+Requires: mlnx-tools >= 5.2.0
+Requires: coreutils
+Requires: pciutils
+Requires: grep
+Requires: procps
+Requires: module-init-tools
+Requires: lsof
+Requires: ofed-scripts
+Conflicts: mlnx-ofa_kernel-modules
+
 %description -n %{non_kmp_pname}
 Core, HW and ULPs kernel modules
 Non-KMP format kernel modules rpm.
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-%{MLNX_OFA_DRV_SRC}.tgz
 %endif #end if "%{KMP}" == "1"
 
 %package -n %{devel_pname}
@@ -227,17 +226,7 @@ Summary: Infiniband Driver and ULPs kernel modules sources
 Group: System Environment/Libraries
 %description -n %{devel_pname}
 Core, HW and ULPs kernel modules sources
-The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-24.10-0.7.0.tgz
-
-%package source
-Summary: Source of the MLNX_OFED main kernel driver
-Group: System Environment/Libraries
-%description source
-Source of the mlnx-ofa_kernel modules.
-
-You should probably only install this package if you want to view the
-sourecs of driver. Use the -devel package if you want to build other
-drivers against it.
+The driver sources are located at: http://www.mellanox.com/downloads/ofed/
 
 #
 # setup module sign scripts if paths to the keys are given
@@ -294,7 +283,7 @@ drivers against it.
 
 %prep
 %setup -n mlnx-ofa_kernel-%{_version}
-%patch 0 -p1
+
 set -- *
 mkdir source
 mv "$@" source/
@@ -319,7 +308,6 @@ for flavor in %flavors_to_build; do
 	find compat -type f -exec touch -t 200012201010 '{}' \; || true
 	./configure --build-dummy-mods --prefix=%{_prefix} --kernel-version $KVERSION --kernel-sources $KSRC --modules-dir $LIB_MOD_DIR $CONF_OPTIONS %{?_smp_mflags}
 	make %{?_smp_mflags} kernel
-	make build_py_scripts
 	cd -
 done
 
@@ -336,8 +324,6 @@ for flavor in %flavors_to_build; do
 	export KVERSION=%{kernel_release $KSRC}
 	cd $PWD/obj/$flavor
 	make install_modules KERNELRELEASE=$KVERSION
-	# install script and configuration files
-	make install_scripts
 	mkdir -p %{_builddir}/src/$NAME/$flavor
 	cp -ar include/ %{_builddir}/src/$NAME/$flavor
 	cp -ar config* %{_builddir}/src/$NAME/$flavor
@@ -378,105 +364,8 @@ done
 %endif
 %endif
 
-# copy sources
-mkdir -p %{buildroot}/%{_prefix}/src/ofa_kernel-%{version}
-cp -a %{_builddir}/mlnx-ofa_kernel-%{version}/source %{buildroot}/%{_prefix}/src/ofa_kernel-%{version}/source
-ln -s ofa_kernel-%{version}/source %{buildroot}/%{_prefix}/src/mlnx-ofa_kernel-%{version}
 # Fix path of BACKPORT_INCLUDES
 sed -i -e "s@=-I.*backport_includes@=-I/usr/src/ofa_kernel-$VERSION/backport_includes@" %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION}/configure.mk.kernel || true
-rm -rf %{_builddir}/src
-
-INFO=${RPM_BUILD_ROOT}/etc/infiniband/info
-/bin/rm -f ${INFO}
-mkdir -p ${RPM_BUILD_ROOT}/etc/infiniband
-touch ${INFO}
-
-cat >> ${INFO} << EOFINFO
-#!/bin/bash
-
-echo prefix=%{_prefix}
-echo Kernel=%{KVERSION}
-echo
-echo "Configure options: %{configure_options}"
-echo
-EOFINFO
-
-chmod +x ${INFO} > /dev/null 2>&1
-
-%if "%{WITH_SYSTEMD}" == "1"
-install -d %{buildroot}%{_unitdir}
-install -d %{buildroot}/etc/systemd/system
-install -m 0644 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/openibd.service %{buildroot}%{_unitdir}
-install -m 0644 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/mlnx_interface_mgr\@.service %{buildroot}/etc/systemd/system
-%endif
-
-install -d %{buildroot}/bin
-install -m 0755 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/mlnx_conf_mgr.sh %{buildroot}/bin/
-%if "%{WINDRIVER}" == "0" && "%{BLUENIX}" == "0"
-install -m 0755 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/mlnx_interface_mgr.sh %{buildroot}/bin/
-%else
-# Wind River and Mellanox Bluenix are rpm based, however, interfaces management is done in Debian style
-install -d %{buildroot}/usr/sbin
-install -m 0755 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/mlnx_interface_mgr_deb.sh %{buildroot}/bin/mlnx_interface_mgr.sh
-install -m 0755 %{_builddir}/%{base_name}-$VERSION/source/ofed_scripts/net-interfaces %{buildroot}/usr/sbin
-%endif
-
-# Install ibroute utilities
-# TBD: move these utilities into standalone package
-install -d %{buildroot}%{_sbindir}
-
-# update /etc/init.d/openibd header
-is_euler=`grep 'NAME=".*Euler' /etc/os-release 2>/dev/null || :`
-if [[ -f /etc/redhat-release || -f /etc/rocks-release || "$is_euler" != '' ]]; then
-perl -i -ne 'if (m@^#!/bin/bash@) {
-        print q@#!/bin/bash
-#
-# Bring up/down openib
-#
-# chkconfig: 2345 05 95
-# description: Activates/Deactivates InfiniBand Driver to \
-#              start at boot time.
-#
-### BEGIN INIT INFO
-# Provides:       openibd
-### END INIT INFO
-@;
-                 } else {
-                     print;
-                 }' %{buildroot}/etc/init.d/openibd
-fi
-
-if grep -qwE 'suse|SLES' /etc/os-release 2>/dev/null; then
-    local_fs='$local_fs'
-    openiscsi=''
-    %if %{build_oiscsi}
-        openiscsi='open-iscsi'
-    %endif
-        perl -i -ne "if (m@^#!/bin/bash@) {
-        print q@#!/bin/bash
-### BEGIN INIT INFO
-# Provides:       openibd
-# Required-Start: $local_fs
-# Required-Stop: opensmd $openiscsi
-# Default-Start:  2 3 5
-# Default-Stop: 0 1 2 6
-# Description:    Activates/Deactivates InfiniBand Driver to \
-#                 start at boot time.
-### END INIT INFO
-@;
-                 } else {
-                     print;
-                 }" %{buildroot}/etc/init.d/openibd
-fi
-
-%if %{build_ipoib}
-case $(uname -m) in
-	i[3-6]86)
-	# Decrease send/receive queue sizes on 32-bit arcitecture
-	echo "options ib_ipoib send_queue_size=64 recv_queue_size=128" >> %{buildroot}/etc/modprobe.d/ib_ipoib.conf
-	;;
-esac
-%endif
 
 %clean
 rm -rf %{buildroot}
@@ -501,144 +390,6 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 	fi
 fi
 %endif # end KMP=1
-
-%post -n %{utils_pname}
-if [ $1 -eq 1 ]; then # 1 : This package is being installed
-#############################################################################################################
-is_euler=`grep 'NAME=".*Euler' /etc/os-release 2>/dev/null || :`
-is_kylin=`grep 'NAME=".*Kylin' /etc/os-release 2>/dev/null || :`
-if [[ -f /etc/redhat-release || -f /etc/rocks-release || -f /etc/UnionTech-release || -f /etc/ctyunos-release || "$is_euler" != '' || "$is_kylin" != '' ]]; then
-        /sbin/chkconfig openibd off >/dev/null 2>&1 || true
-        /usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-        /sbin/chkconfig --del openibd >/dev/null 2>&1 || true
-
-%if "%{WITH_SYSTEMD}" != "1"
-        /sbin/chkconfig --add openibd >/dev/null 2>&1 || true
-        /sbin/chkconfig openibd on >/dev/null 2>&1 || true
-%else
-        /usr/bin/systemctl enable openibd >/dev/null  2>&1 || true
-%endif
-fi
-
-if grep -qwE 'suse|SLES' /etc/os-release 2>/dev/null; then
-        /sbin/chkconfig openibd off >/dev/null  2>&1 || true
-        /usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-        /sbin/insserv -r openibd >/dev/null 2>&1 || true
-
-%if "%{WITH_SYSTEMD}" != "1"
-        /sbin/insserv openibd >/dev/null 2>&1 || true
-        /sbin/chkconfig openibd on >/dev/null 2>&1 || true
-%else
-        /usr/bin/systemctl enable openibd >/dev/null  2>&1 || true
-%endif
-fi
-
-%if "%{WINDRIVER}" == "1" || "%{BLUENIX}" == "1"
-/usr/sbin/update-rc.d openibd defaults || true
-%endif
-
-%if "%{POWERKVM}" == "1"
-/usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-/usr/bin/systemctl enable openibd >/dev/null  2>&1 || true
-%endif
-
-%if "%{WITH_SYSTEMD}" == "1"
-/usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-cat /proc/sys/kernel/random/boot_id 2>/dev/null | sed -e 's/-//g' > /var/run/openibd.bootid || true
-test -s /var/run/openibd.bootid || echo manual > /var/run/openibd.bootid || true
-%endif
-
-# Comment core modules loading hack
-if [ -e /etc/modprobe.conf.dist ]; then
-	sed -i -r -e 's/^(\s*install ib_core.*)/#MLX# \1/' /etc/modprobe.conf.dist
-	sed -i -r -e 's/^(\s*alias ib.*)/#MLX# \1/' /etc/modprobe.conf.dist
-fi
-
-%if %{build_ipoib}
-if [ -e /etc/modprobe.d/ipv6 ]; then
-	sed -i -r -e 's/^(\s*install ipv6.*)/#MLX# \1/' /etc/modprobe.d/ipv6
-fi
-%endif
-
-# Update limits.conf (but not for Containers)
-if [ ! -e "/.dockerenv" ] && ! (grep -q docker /proc/self/cgroup 2>/dev/null); then
-	if [ -e /etc/security/limits.conf ]; then
-		LIMITS_UPDATED=0
-		if ! (grep -qE "soft.*memlock" /etc/security/limits.conf 2>/dev/null); then
-			echo "* soft memlock unlimited" >> /etc/security/limits.conf
-			LIMITS_UPDATED=1
-		fi
-		if ! (grep -qE "hard.*memlock" /etc/security/limits.conf 2>/dev/null); then
-			echo "* hard memlock unlimited" >> /etc/security/limits.conf
-			LIMITS_UPDATED=1
-		fi
-		if [ $LIMITS_UPDATED -eq 1 ]; then
-			echo "Configured /etc/security/limits.conf"
-		fi
-	fi
-fi
-
-# Make IPoIB interfaces be unmanaged on XenServer
-if (grep -qi xenserver /etc/issue /etc/*-release 2>/dev/null); then
-	IPOIB_PNUM=$(lspci -d 15b3: 2>/dev/null | wc -l 2>/dev/null)
-	IPOIB_PNUM=$(($IPOIB_PNUM * 2))
-	for i in $(seq 1 $IPOIB_PNUM)
-	do
-		uuid=$(xe pif-list 2>/dev/null | grep -B2 ib${i} | grep uuid | cut -d : -f 2 | sed -e 's/ //g')
-		if [ "X${uuid}" != "X" ]; then
-			xe pif-forget uuid=${uuid} >/dev/null 2>&1 || true
-		fi
-	done
-fi
-
-fi # 1 : closed
-# END of post
-
-%preun -n %{utils_pname}
-is_euler=`grep 'NAME=".*Euler' /etc/os-release 2>/dev/null || :`
-is_kylin=`grep 'NAME=".*Kylin' /etc/os-release 2>/dev/null || :`
-if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
-          if [[ -f /etc/redhat-release || -f /etc/rocks-release || -f /etc/UnionTech-release || "$is_euler" != '' || "$is_kylin" != '' ]]; then
-                /sbin/chkconfig openibd off >/dev/null 2>&1 || true
-                /usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-                /sbin/chkconfig --del openibd  >/dev/null 2>&1 || true
-          fi
-	  if grep -qwE 'suse|SLES' /etc/os-release 2>/dev/null; then
-                /sbin/chkconfig openibd off >/dev/null 2>&1 || true
-                /usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-                /sbin/insserv -r openibd >/dev/null 2>&1 || true
-          fi
-          if [ -f /etc/debian_version ]; then
-                if ! ( /usr/sbin/update-rc.d openibd remove > /dev/null 2>&1 ); then
-                        true
-                fi
-          fi
-%if "%{WINDRIVER}" == "1" || "%{BLUENIX}" == "1"
-/usr/sbin/update-rc.d -f openibd remove || true
-%endif
-
-%if "%{POWERKVM}" == "1"
-/usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-%endif
-fi
-
-%postun -n %{utils_pname}
-%if "%{WITH_SYSTEMD}" == "1"
-/usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-%endif
-
-# Uncomment core modules loading hack
-if [ -e /etc/modprobe.conf.dist ]; then
-	sed -i -r -e 's/^#MLX# (.*)/\1/' /etc/modprobe.conf.dist
-fi
-
-%if %{build_ipoib}
-if [ -e /etc/modprobe.d/ipv6 ]; then
-	sed -i -r -e 's/^#MLX# (.*)/\1/' /etc/modprobe.d/ipv6
-fi
-%endif
-
-#end of post uninstall
 
 %post -n %{devel_pname}
 if [ -d "%{_prefix}/src/ofa_kernel/default" -a $1 -gt 1 ]; then
@@ -681,44 +432,6 @@ update-alternatives --remove \
 	ofa_kernel_headers \
 	%{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION} \
 
-%files -n %{utils_pname}
-%defattr(-,root,root,-)
-%license source/debian/copyright
-%doc source/ofed_scripts/82-net-setup-link.rules source/ofed_scripts/vf-net-link-name.sh
-%if "%{KMP}" == "1"
-%if %{IS_RHEL_VENDOR}
-%endif # end rh
-%endif # end KMP=1
-%dir /etc/infiniband
-%config(noreplace) /etc/infiniband/openib.conf
-%config(noreplace) /etc/infiniband/mlx5.conf
-/etc/infiniband/info
-/etc/init.d/openibd
-%if "%{WITH_SYSTEMD}" == "1"
-%{_unitdir}/openibd.service
-/etc/systemd/system/mlnx_interface_mgr@.service
-%endif
-/lib/udev/sf-rep-netdev-rename
-/lib/udev/auxdev-sf-netdev-rename
-/usr/sbin/setup_mr_cache.sh
-%_datadir/mlnx_ofed/mlnx_bf_assign_ct_cores.sh
-%config(noreplace) /etc/modprobe.d/mlnx.conf
-%config(noreplace) /etc/modprobe.d/mlnx-bf.conf
-%{_sbindir}/*
-/lib/udev/rules.d/83-mlnx-sf-name.rules
-/lib/udev/rules.d/90-ib.rules
-/bin/mlnx_interface_mgr.sh
-/bin/mlnx_conf_mgr.sh
-%if "%{WINDRIVER}" == "1" || "%{BLUENIX}" == "1"
-/usr/sbin/net-interfaces
-%endif
-%if %{build_ipoib}
-%config(noreplace) /etc/modprobe.d/ib_ipoib.conf
-%endif
-%if %{build_mlx5}
-%{_sbindir}/ibdev2netdev
-%endif
-
 %if "%{KMP}" != "1"
 %files -n %{non_kmp_pname}
 %license source/debian/copyright
@@ -735,13 +448,18 @@ update-alternatives --remove \
 %license source/debian/copyright
 %{_prefix}/src/ofa_kernel/%{_arch}/[0-9]*
 
-%files source
-%defattr(-,root,root,-)
-%license source/debian/copyright
-%{_prefix}/src/ofa_kernel-%version/source
-%{_prefix}/src/mlnx-ofa_kernel-%version
-
 %changelog
+* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1_6.12.57.1.1
+- Upgrade version to 25.07.
+- Enable build on x86_64 kernel hwe.
+- Update source path
+
+* Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-24_6.12.57.1.1
+- Bump to match kernel-hwe
+
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-23_6.12.50.2-1
+- Adjusted package dependencies on user space components.
+
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-22_6.12.50.2-1
 - Bump to match kernel-hwe
 

@@ -28,7 +28,7 @@
 
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.50.2
+%global target_azl_build_kernel_version 6.12.57.1
 %global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
@@ -39,7 +39,7 @@
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
-%{!?_release: %global _release OFED.23.10.0.2.1.1}
+%{!?_release: %global _release OFED.25.07.0.9.7.1}
 # %{!?KVERSION: %global KVERSION %(uname -r)}
 %global kernel_version %{KVERSION}
 %global krelver %(echo -n %{KVERSION} | sed -e 's/-/_/g')
@@ -55,16 +55,18 @@
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
 Name:		 knem-hwe
 Version:	 1.1.4.90mlnx3
-Release:	 22%{release_suffix}%{?dist}
+Release:	 25%{release_suffix}%{?dist}
 Provides:	 knem-hwe-mlnx = %{version}-%{release}
 Obsoletes:	 knem-hwe-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-Source0:	 https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/knem-1.1.4.90mlnx3.tar.gz#/knem-%{version}.tar.gz
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/knem-%{version}.tar.gz
 BuildRoot:       /var/tmp/%{name}-%{version}-build
-ExclusiveArch:   aarch64
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -72,11 +74,6 @@ BuildRequires:  kernel-hwe-devel = %{target_kernel_version_full}
 BuildRequires:  binutils
 BuildRequires:  systemd
 BuildRequires:  kmod
-
-Requires:       kernel-hwe = %{target_kernel_version_full}
-Requires:       kmod
-Conflicts:      knem
-
 
 %description
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as offloading memory copies on to Intel I/OAT hardware.
@@ -120,6 +117,10 @@ EOF)
 %package -n %{non_kmp_pname}
 Summary: KNEM: High-Performance Intra-Node MPI Communication
 Group: System Environment/Libraries
+Requires: kernel-hwe = %{target_kernel_version_full}
+Requires: kmod
+Conflicts: knem-modules
+
 %description -n %{non_kmp_pname}
 KNEM is a Linux kernel module enabling high-performance intra-node MPI communication for large messages. KNEM offers support for asynchronous and vectorial data transfers as well as loading memory copies on to Intel I/OAT hardware.
 See http://runtime.bordeaux.inria.fr/knem/ for details.
@@ -190,8 +191,6 @@ done
 export INSTALL_MOD_PATH=$RPM_BUILD_ROOT
 export INSTALL_MOD_DIR=%install_mod_dir
 export KPNAME=%{_name}
-mkdir -p $RPM_BUILD_ROOT/etc/udev/rules.d
-install -d $RPM_BUILD_ROOT/usr/lib64/pkgconfig
 for flavor in %flavors_to_build; do
 	cd $PWD/obj/$flavor
 	export KSRC=%{kernel_source $flavor}
@@ -200,11 +199,11 @@ for flavor in %flavors_to_build; do
 	export MODULE_DESTDIR=/lib/modules/$KVERSION/$INSTALL_MOD_DIR
 	mkdir -p $RPM_BUILD_ROOT/lib/modules/$KVERSION/$INSTALL_MOD_DIR
 	MODULE_DESTDIR=/lib/modules/$KVERSION/$INSTALL_MOD_DIR DESTDIR=$RPM_BUILD_ROOT KVERSION=$KVERSION $RPM_BUILD_ROOT/opt/knem-%{version}/sbin/knem_local_install
-	cp knem.pc  $RPM_BUILD_ROOT/usr/lib64/pkgconfig
 	cd -
 done
 
-/bin/rm -rf %{buildroot}/opt/knem-%{version}/lib/modules || true
+/bin/rm -rf %{buildroot}/opt/knem-%{version}
+/bin/rm -rf %{buildroot}/etc/udev/rules.d
 
 %if %{IS_RHEL_VENDOR}
 # Set the module(s) to be executable, so that they will be stripped when packaged.
@@ -219,38 +218,6 @@ echo "override knem * extra/%{_name}" >> $RPM_BUILD_ROOT%{_sysconfdir}/depmod.d/
 find %{buildroot} \( -type f -name '*.ko' -o -name '*ko.gz' \) -exec %{__strip} -p --strip-debug --discard-locals -R .comment -R .note \{\} \;
 %endif
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
-%post
-getent group rdma >/dev/null 2>&1 || groupadd -r rdma
-touch /etc/udev/rules.d/10-knem.rules
-# load knem
-/sbin/modprobe -r knem > /dev/null 2>&1
-/sbin/modprobe knem > /dev/null 2>&1
-
-# automatically load knem onboot
-if [ -d /etc/sysconfig/modules ]; then
-	# RH
-	echo "/sbin/modprobe knem > /dev/null 2>&1" > /etc/sysconfig/modules/knem.modules
-	chmod +x /etc/sysconfig/modules/knem.modules
-elif [ -e /etc/sysconfig/kernel ]; then
-	# SLES
-	if ! (grep -w knem /etc/sysconfig/kernel); then
-		sed -i -r -e 's/^(MODULES_LOADED_ON_BOOT=)"(.*)"/\1"\2 knem"/' /etc/sysconfig/kernel
-	fi
-fi
-
-%preun
-# unload knem
-/sbin/modprobe -r knem > /dev/null 2>&1
-# RH
-/bin/rm -f /etc/sysconfig/modules/knem.modules
-# SLES
-if (grep -qw knem /etc/sysconfig/kernel 2>/dev/null); then
-	sed -i -e 's/ knem//g' /etc/sysconfig/kernel 2>/dev/null
-fi
-
 %if "%{KMP}" != "1"
 %post -n %{non_kmp_pname}
 depmod %{KVERSION} -a
@@ -260,15 +227,6 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 	depmod %{KVERSION} -a
 fi
 %endif # end KMP=1
-
-%files
-%defattr(-, root, root)
-%license source/COPYING source/COPYING.BSD-3 source/COPYING.GPL-2
-/opt/knem-%{version}
-/usr/lib64/pkgconfig/knem.pc
-
-%config(noreplace)
-/etc/udev/rules.d/10-knem.rules
 
 
 %if "%{KMP}" != "1"
@@ -283,6 +241,17 @@ fi
 %endif
 
 %changelog
+* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.4.90mlnx3-25_6.12.57.1.1
+- Build with OFED 25.07.0.9.7.1.
+- Enable build on x86_64 kernel hwe.
+- Update source path
+
+* Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 1.1.4.90mlnx3-24_6.12.57.1.1
+- Bump to match kernel-hwe
+
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.4.90mlnx3-23_6.12.50.2-1
+- Adjusted package dependencies on user space components.
+
 * Fri Oct 06 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 1.1.4.90mlnx3-22_6.12.50.2-1
 - Bump to match kernel-hwe
 

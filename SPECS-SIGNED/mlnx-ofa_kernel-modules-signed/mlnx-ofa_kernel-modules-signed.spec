@@ -44,8 +44,8 @@
 
 Summary:	 Infiniband HCA Driver
 Name:		 %{_name}-signed
-Version:	 24.10
-Release:	 20%{release_suffix}%{?dist}
+Version:	 25.07
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -87,6 +87,9 @@ Source26:       smc_diag.ko
 Source27:       rpcrdma.ko
 Source28:       svcrdma.ko
 Source29:       xprtrdma.ko
+Source30:       fwctl.ko
+Source31:       mlx5_fwctl.ko
+Source32:       mana_ib.ko
 
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -111,6 +114,8 @@ Obsoletes: mlnx-en-kmp-trace
 Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
+Obsoletes: fwctl <= 24.10
+Provides:  fwctl = %{version}-%{release}
 
 Requires: kernel = %{target_kernel_version_full}
 Requires: kmod
@@ -167,6 +172,9 @@ cp -rf %{SOURCE26} ./lib/modules/%{KVERSION}/updates/net/smc/smc_diag.ko
 cp -rf %{SOURCE27} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/rpcrdma.ko
 cp -rf %{SOURCE28} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/svcrdma.ko
 cp -rf %{SOURCE29} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/xprtrdma.ko
+cp -rf %{SOURCE30} ./lib/modules/%{KVERSION}/updates/drivers/fwctl/fwctl.ko
+cp -rf %{SOURCE31} ./lib/modules/%{KVERSION}/updates/drivers/fwctl/mlx5/mlx5_fwctl.ko
+cp -rf %{SOURCE32} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mana/mana_ib.ko
 
 popd
 
@@ -192,6 +200,13 @@ fi
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1
+- Upgrade version to 25.07.
+- Update additional kernel modules fwctl mana and mlx5_dpll included from 25.07
+
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-21
+- Bump release to rebuild for new release
+
 * Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-20
 - Add kernel version and release nb into release nb
 
