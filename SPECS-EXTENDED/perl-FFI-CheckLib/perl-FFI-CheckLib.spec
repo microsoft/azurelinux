@@ -5,7 +5,7 @@ Distribution:   Azure Linux
 
 Name:           perl-FFI-CheckLib
 Version:        0.31
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Check that a library is available for FFI
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/FFI-CheckLib
@@ -55,7 +55,10 @@ Requires:       perl(File::Basename)
 # Remove private modules
 %global __requires_exclude %{__requires_exclude}|^perl\\((Test2::Plugin::FauxOS|Test2::Tools::FauxDynaLoader|Test2::Tools::NoteStderr)\\)
 %global __provides_exclude %{?__provides_exclude:%{__provides_exclude}|}^perl\\((Alien::libbar|Test2::Plugin::FauxOS|Test2::Tools::FauxDynaLoader|Test2::Tools::NoteStderr)\\)
- 
+
+# Removed dependency on external modules perl(FFI::Platypus) and perl(Test2::Tools::Process) to correct install failure.
+%global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}(^perl\\(FFI::Platypus\\)$|^perl\\(Test2::Tools::Process\\)$)
+
 %description
 This Perl module checks whether a particular dynamic library is available for
 Foreign Function Interface (FFI) to use. It is modeled heavily on
@@ -127,6 +130,9 @@ make test
 
  
 %changelog
+* Wed Dec 24 2025 Aditya Singh <v-aditysing@microsoft.com> - 0.31-2
+- Removed dependency on external modules to correct install failure.
+
 * Thu Nov 20 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.31-1
 - Upgrade to version 0.31 (license: MIT).
 - License verified
