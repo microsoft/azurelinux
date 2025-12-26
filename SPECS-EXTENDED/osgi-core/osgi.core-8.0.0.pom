@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.osgi</groupId>
   <artifactId>osgi.core</artifactId>
-  <version>7.0.0</version>
-  <description>OSGi Core Release 7, Interfaces and Classes for use in compiling bundles</description>
+  <version>8.0.0</version>
+  <description>OSGi Core Release 8, Interfaces and Classes for use in compiling bundles</description>
   <name>org.osgi:osgi.core</name>
   <url>https://www.osgi.org/</url>
   <organization>
@@ -14,7 +14,7 @@
   <licenses>
     <license>
       <name>Apache-2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
       <distribution>repo</distribution>
       <comments>Apache License, Version 2.0</comments>
     </license>
@@ -23,7 +23,7 @@
     <url>https://osgi.org/gitweb/build.git</url>
     <connection>scm:git:https://osgi.org/git/build.git</connection>
     <developerConnection>scm:git:https://osgi.org/git/build.git</developerConnection>
-    <tag>hudson-build.core-1432</tag>
+    <tag>r8-core-final</tag>
   </scm>
   <developers>
     <developer>
@@ -34,4 +34,12 @@
       <organizationUrl>https://www.osgi.org/</organizationUrl>
     </developer>
   </developers>
+  <dependencies>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi.annotation</artifactId>
+      <version>7.0.0</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
 </project>
