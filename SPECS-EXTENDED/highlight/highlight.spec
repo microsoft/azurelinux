@@ -6,7 +6,7 @@ Version:        4.18
 Release:        1%{?dist}
 License:        GPL-3.0-only
 URL:            http://www.andre-simon.de/
-Source0:        http://www.andre-simon.de/zip/%{name}-%{version}.tar.bz2
+Source0:        https://gitlab.com/saalen/highlight/-/archive/v4.18/highlight-v4.18.tar.bz2#/%{name}-%{version}.tar.bz2
 
 %bcond qt 0
 
@@ -43,7 +43,7 @@ A Qt-based GUI for the highlight source code formatter source.
 %endif
 
 %prep
-%autosetup
+%autosetup -n %{name}-%{version}
 
 %build
 CFLAGS="$CFLAGS -fPIC %{optflags}"; export CFLAGS
