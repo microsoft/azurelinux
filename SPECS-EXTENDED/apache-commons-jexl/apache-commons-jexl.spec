@@ -4,7 +4,7 @@
 Summary:        Java Expression Language (JEXL)
 Name:           apache-%{short_name}
 Version:        2.1.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -108,13 +108,39 @@ ln -sf %{name}/%{short_name}-compat.jar %{buildroot}%{_javadir}/%{short_name}-co
 install -dm 0755 %{buildroot}%{_mavenpomdir}/%{name}
 install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}/%{short_name}.pom
 %add_maven_depmap %{name}/%{short_name}.pom %{name}/%{short_name}.jar
-install -pm 0644 jexl2-compat/pom.xml  %{buildroot}%{_mavenpomdir}/%{name}/%{short_name}-compat.pom
+install -pm 0644 jexl2-compat/pom.xml %{buildroot}%{_mavenpomdir}/%{name}/%{short_name}-compat.pom
 %add_maven_depmap %{name}/%{short_name}-compat.pom %{name}/%{short_name}-compat.jar
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}/jexl2-compat
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 cp -pr jexl2-compat/target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/jexl2-compat/
+
+# Extract LICENSE if present
+legaldir=%{buildroot}%{_javadocdir}/%{name}/legal
+if [ -d "$legaldir" ]; then
+    install -Dm 0644 $legaldir/LICENSE \
+        %{buildroot}%{_licensedir}/apache-commons-jexl/LICENSE.javadoc
+fi
+
+# Delete ALL legal/ dirs
+find %{buildroot}%{_javadocdir}/%{name} -type d -name legal -exec rm -rf {} +
+
+# Run fdupes (this may create new symlinks)
 %fdupes -s %{buildroot}%{_javadocdir}
+
+# Fix absolute symlinks inside jexl2-compat by rewriting relative to parent directory structure
+pushd %{buildroot}%{_javadocdir}/%{name}
+for f in $(find jexl2-compat -type l); do
+    tgt=$(readlink "$f")
+    if [[ "$tgt" = /* ]]; then
+        base=$(basename "$tgt")
+        # Compute depth-aware relative path
+        depth=$(dirname "$f" | awk -F/ '{ print NF-1 }')
+        rel=$(printf '../%.0s' $(seq 1 $depth))"$base"
+        ln -snf "$rel" "$f"
+    fi
+done
+popd
 
 %check
 # commons-jexl
@@ -128,16 +154,20 @@ cp -pr jexl2-compat/target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/jex
   test
 
 %files -f .mfiles
-%license LICENSE.txt
-%doc NOTICE.txt RELEASE-NOTES.txt
+%license LICENSE.txt NOTICE.txt
+%doc RELEASE-NOTES.txt
 %{_javadir}/%{short_name}*.jar
 
 %files javadoc
-%license LICENSE.txt
-%doc NOTICE.txt
+%license %{_licensedir}/apache-commons-jexl/LICENSE.javadoc
 %{_javadocdir}/%{name}
 
 %changelog
+
+* Mon Dec 22 2025 Aninda Pradhan <v-anindap@microsoft.com> - 2.1.1-4
+- Fixed license path warnings
+- License verified
+
 * Mon Nov 14 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.1.1-3
 - Fix build errors
   * create 'Packages' directory under JDK_HOME
