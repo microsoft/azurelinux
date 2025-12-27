@@ -45,11 +45,9 @@ binaries and applications.
 
 %prep
 %autosetup
-sed -i 's/5\.9\.4/5\.9\.5/g' configure
 
 %build
 MIBS="ucd-snmp/diskio"
-sed -i 's/5\.9\.4/5\.9\.5/g' configure
 
 %configure \
     --host=ia64-linux \
