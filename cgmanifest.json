@@ -7100,8 +7100,8 @@
         "type": "other",
         "other": {
           "name": "ibus-libzhuyin",
-          "version": "1.9.1",
-          "downloadUrl": "http://downloads.sourceforge.net/libzhuyin/ibus-libzhuyin/ibus-libzhuyin-1.9.1.tar.gz"
+          "version": "1.10.4",
+          "downloadUrl": "https://downloads.sourceforge.net/libzhuyin/ibus-libzhuyin/ibus-libzhuyin-1.10.4.tar.gz"
         }
       }
     },
@@ -10761,8 +10761,8 @@
         "type": "other",
         "other": {
           "name": "libpinyin",
-          "version": "2.9.92",
-          "downloadUrl": "https://downloads.sourceforge.net/libpinyin/libpinyin/libpinyin-2.9.92.tar.gz"
+          "version": "2.10.3",
+          "downloadUrl": "https://downloads.sourceforge.net/libpinyin/libpinyin/libpinyin-2.10.3.tar.gz"
         }
       }
     },
