@@ -125,8 +125,8 @@ popd
 %{_localstatedir}/run/net-snmp
 
 %changelog
-* Tue Dec 23 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.9.5-1
-- Auto-upgrade to 5.9.5 - for CVE-2025-68615
+* Mon Dec 29 2025 Archana Shettigar <v-shettigara@microsoft.com> - 5.9.5.2-1
+- Auto-upgrade to 5.9.5.2 - for CVE-2025-68615
 
 * Wed Feb 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.9.4-1
 - Auto-upgrade to 5.9.4 - none
