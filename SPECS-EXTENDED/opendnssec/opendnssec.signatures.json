@@ -4,7 +4,7 @@
   "ods-enforcerd.service": "5d7e6b425071eda5f8a7675bb51be05ed6634e030282af460481ed5862c837de",
   "ods-signerd.service": "55d2ac2cc949335061287a8660c98600b80fe9896286496306b9e32d0be79ee3",
   "ods.sysconfig": "25adeae8fa3ee4c4d95ce737685dbc01e7e23060d8655f5d86bbdf1dd28c1119",
-  "opendnssec-2.1.7.tar.gz": "4cf3a797b8ff9fb0c02432187ef22adeb03d007074d70ec2b48b18ae6c1d09a4",
+  "opendnssec-2.1.14.tar.gz": "5a68d62ea0ea3a6c61e9f4946f462c7b907fbe6bccc9e8a721b7fe0f906f95d0",
   "opendnssec-2.1.sqlite_convert.sql": "179228af60fd3a9db3aeeefb5946c89b2668902465d8d8b25c7bd224aaa4e7d0",
   "opendnssec-2.1.sqlite_rpmversion.sql": "51dfa30d3d126063395121e63471e33dbf5fb4c46e367176ab0e0a9ea9ad55d4",
   "opendnssec.cron": "477753010aada1be1cfcf18ea095841aaa6f2868cf12f8f5d6c13ab4737a4ebf",
