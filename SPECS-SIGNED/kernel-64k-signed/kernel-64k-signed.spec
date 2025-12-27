@@ -6,7 +6,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-64k-signed-%{buildarch}
-Version:        6.6.117.1
+Version:        6.6.119.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -105,6 +105,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Sat Dec 27 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.119.1-1
+- Auto-upgrade to 6.6.119.1
+
 * Wed Nov 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.117.1-1
 - Auto-upgrade to 6.6.117.1
 

@@ -6580,8 +6580,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.117.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.117.1.tar.gz"
+          "version": "6.6.119.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.1.tar.gz"
         }
       }
     },
@@ -8231,8 +8231,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.117.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.117.1.tar.gz"
+          "version": "6.6.119.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.1.tar.gz"
         }
       }
     },
@@ -8241,8 +8241,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.117.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.117.1.tar.gz"
+          "version": "6.6.119.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.1.tar.gz"
         }
       }
     },
@@ -8261,8 +8261,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.117.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.117.1.tar.gz"
+          "version": "6.6.119.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.1.tar.gz"
         }
       }
     },
@@ -8281,8 +8281,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.117.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.117.1.tar.gz"
+          "version": "6.6.119.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.1.tar.gz"
         }
       }
     },
