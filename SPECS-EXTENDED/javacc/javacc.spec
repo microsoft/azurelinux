@@ -99,15 +99,31 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr target/javadoc/* %{buildroot}%{_javadocdir}/%{name}/
-# remove any stray ADDITIONAL_LICENSE_INFO files under javadoc legal/ dirs
-find %{buildroot}%{_javadocdir} -type f -name 'ADDITIONAL_LICENSE_INFO' -exec rm -f {} \; || true
+
+# Move license-like files out of javadoc tree to avoid license warnings
+legaldir=%{buildroot}%{_javadocdir}/%{name}/legal
+
+if [ -d "$legaldir" ]; then
+    # install renamed copies into licensedir
+    install -Dm 0644 $legaldir/LICENSE \
+        %{buildroot}%{_licensedir}/javacc/LICENSE.javadoc
+
+    install -Dm 0644 $legaldir/ADDITIONAL_LICENSE_INFO \
+        %{buildroot}%{_licensedir}/javacc/ADDITIONAL_LICENSE_INFO.javadoc
+
+    # remove the originals to avoid confusion
+    rm -rf $legaldir
+fi
+
+# Remove all javadoc legal directories afterward
+find %{buildroot}%{_javadocdir}/%{name} -type d -name legal
 
 %fdupes -s %{buildroot}%{_javadocdir}
 %fdupes -s www
 %fdupes -s examples
 
 %jpackage_script javacc '' '' javacc javacc true
-ln -s %{_bindir}/javacc %{buildroot}%{_bindir}/javacc.sh
+ln -s javacc %{buildroot}%{_bindir}/javacc.sh
 %jpackage_script jjdoc '' '' javacc jjdoc true
 %jpackage_script jjtree '' '' javacc jjtree true
 
@@ -126,12 +142,9 @@ ln -s %{_bindir}/javacc %{buildroot}%{_bindir}/javacc.sh
 %doc examples
 
 %files javadoc
-# keep license metadata
-%license %{_javadocdir}/%{name}/legal/LICENSE
-# prevent wildcard from re-listing it
-%exclude %{_javadocdir}/%{name}/legal/LICENSE 
-# include the rest of javadoc
-%{_javadocdir}/%{name}                        
+%license LICENSE
+%doc %{_javadocdir}/%{name}   
+%license %{_licensedir}/javacc/*                 
 
 %changelog
 * Wed Dec 17 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 7.0.4-4

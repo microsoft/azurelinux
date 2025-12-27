@@ -108,23 +108,39 @@ ln -sf %{name}/%{short_name}-compat.jar %{buildroot}%{_javadir}/%{short_name}-co
 install -dm 0755 %{buildroot}%{_mavenpomdir}/%{name}
 install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}/%{short_name}.pom
 %add_maven_depmap %{name}/%{short_name}.pom %{name}/%{short_name}.jar
-install -pm 0644 jexl2-compat/pom.xml  %{buildroot}%{_mavenpomdir}/%{name}/%{short_name}-compat.pom
+install -pm 0644 jexl2-compat/pom.xml %{buildroot}%{_mavenpomdir}/%{name}/%{short_name}-compat.pom
 %add_maven_depmap %{name}/%{short_name}-compat.pom %{name}/%{short_name}-compat.jar
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}/jexl2-compat
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 cp -pr jexl2-compat/target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/jexl2-compat/
 
-# ensure jexl2-compat has an accessible license path (symlink to canonical)
-if [ -f %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE ]; then
-  mkdir -p %{buildroot}%{_javadocdir}/%{name}/jexl2-compat/legal
-  ln -sf /usr/share/javadoc/%{name}/legal/LICENSE %{buildroot}%{_javadocdir}/%{name}/jexl2-compat/legal/LICENSE
-  ln -sf ../legal/LICENSE %{buildroot}%{_javadocdir}/%{name}/jexl2-compat/legal/LICENSE
+# Extract LICENSE if present
+legaldir=%{buildroot}%{_javadocdir}/%{name}/legal
+if [ -d "$legaldir" ]; then
+    install -Dm 0644 $legaldir/LICENSE \
+        %{buildroot}%{_licensedir}/apache-commons-jexl/LICENSE.javadoc
 fi
-# Remove any remaining ADDITIONAL_LICENSE_INFO (they are license-notes, not docs)
-find %{buildroot}%{_javadocdir}/%{name} -type f -iname 'ADDITIONAL_LICENSE_INFO' -exec rm -f {} \; || true
 
+# Delete ALL legal/ dirs
+find %{buildroot}%{_javadocdir}/%{name} -type d -name legal -exec rm -rf {} +
+
+# Run fdupes (this may create new symlinks)
 %fdupes -s %{buildroot}%{_javadocdir}
+
+# Fix absolute symlinks inside jexl2-compat by rewriting relative to parent directory structure
+pushd %{buildroot}%{_javadocdir}/%{name}
+for f in $(find jexl2-compat -type l); do
+    tgt=$(readlink "$f")
+    if [[ "$tgt" = /* ]]; then
+        base=$(basename "$tgt")
+        # Compute depth-aware relative path
+        depth=$(dirname "$f" | awk -F/ '{ print NF-1 }')
+        rel=$(printf '../%.0s' $(seq 1 $depth))"$base"
+        ln -snf "$rel" "$f"
+    fi
+done
+popd
 
 %check
 # commons-jexl
@@ -143,14 +159,11 @@ find %{buildroot}%{_javadocdir}/%{name} -type f -iname 'ADDITIONAL_LICENSE_INFO'
 %{_javadir}/%{short_name}*.jar
 
 %files javadoc
-%license %{_javadocdir}/%{name}/legal/LICENSE
-%exclude %{_javadocdir}/%{name}/legal/LICENSE
-%exclude %{_javadocdir}/%{name}/jexl2-compat/legal/LICENSE
-%exclude %{_javadocdir}/%{name}/**/ADDITIONAL_LICENSE_INFO
-%exclude %{_javadocdir}/%{name}/ADDITIONAL_LICENSE_INFO
+%license %{_licensedir}/apache-commons-jexl/LICENSE.javadoc
 %{_javadocdir}/%{name}
 
 %changelog
+
 * Mon Dec 22 2025 Aninda Pradhan <v-anindap@microsoft.com> - 2.1.1-4
 - Fixed license path warnings
 - License verified
