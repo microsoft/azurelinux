@@ -32,13 +32,6 @@
             ]
         },
         {
-            "PackageName": "apache-commons-net-javadoc",
-            "IgnoredFilesRegexList": [
-                "^/usr/share/javadoc/apache-commons-net/org/apache/commons/net/bsd/.*",
-                "^/usr/share/javadoc/apache-commons-net/src-html/org/apache/commons/net/bsd/.*"
-            ]
-        },
-        {
             "_comment1": "OpenSSL has multiple structs, constants and procedures that have the word 'NOTICE' in them, like 'NOTICEREF_free'.",
             "_comment2": "These man pages are for those items, not actual license notices.",
             "PackageName": "openssl-devel",
