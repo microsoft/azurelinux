@@ -8,7 +8,7 @@ import (
 )
 
 type Service struct {
-	Name string `yaml:"Name"`
+	Name string `yaml:"name"`
 }
 
 func (s *Service) IsValid() error {
@@ -20,8 +20,8 @@ func (s *Service) IsValid() error {
 }
 
 type Services struct {
-	Enable  []Service `yaml:"Enable"`
-	Disable []Service `yaml:"Disable"`
+	Enable  []Service `yaml:"enable"`
+	Disable []Service `yaml:"disable"`
 }
 
 func (s *Services) IsValid() error {
