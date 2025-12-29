@@ -12881,8 +12881,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.6.21",
-          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.21.tar.gz"
+          "version": "10.6.24",
+          "downloadUrl": "https://github.com/MariaDB/server/archive/mariadb-10.6.24.tar.gz"
         }
       }
     },
