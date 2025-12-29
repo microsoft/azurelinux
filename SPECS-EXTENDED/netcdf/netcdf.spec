@@ -12,7 +12,7 @@
 Summary:        Libraries for the Unidata network Common Data Form
 Name:           netcdf
 Version:        4.9.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        NetCDF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -398,6 +398,11 @@ done
 
 
 %changelog
+* Mon Dec 29 2025 Kshitiz Godara <kgodara@microsoft.com> - 4.9.0-7
+- Bumping the release version so that this package is re-built with
+  the newer 1.14.6 hdf5 libraries. This ensures that the matching
+  1.14.6 .so files Will be used at run time.
+
 * Wed May 22 2024 George Mileka <gmileka@microsoft.com> - 4.9.0-6
   Remove the use of the '_hdf5_version' and explicit hdf5 version from the
   build-time dependencies.

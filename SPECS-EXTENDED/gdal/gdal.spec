@@ -15,7 +15,7 @@ Summary:        GIS file format library
 #global pre rc1
 Name:           gdal
 Version:        3.6.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -316,6 +316,11 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 
 
 %changelog
+* Mon Dec 29 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.6.3-5
+- Bumping the release version so that this package is re-built with
+  the newer 1.14.6 hdf5 libraries. This ensures that the matching
+  1.14.6 .so files Will be used at run time.
+
 * Wed May 22 2024 George Mileka <gmileka@microsoft.com> - 3.6.3-4
   Remove the use of explicit hdf5 version from the build-time dependencies.
 
