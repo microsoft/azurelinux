@@ -1,7 +1,7 @@
 %global __requires_exclude perl\\(.*\\)
 Summary:        Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.
 Name:           net-snmp
-Version:        5.9.4
+Version:        5.9.5.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -123,6 +123,9 @@ popd
 %{_localstatedir}/run/net-snmp
 
 %changelog
+* Mon Dec 29 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.9.5.2-1
+- Auto-upgrade to 5.9.5.2 - for CVE-2025-68615
+
 * Tue Apr 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.9.4-1
 - Auto-upgrade to 5.9.4 - Fixes for CVE-2022-44792 and CVE-2022-44793
 
