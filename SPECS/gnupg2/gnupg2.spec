@@ -49,7 +49,7 @@ Requires: %{name} = %{version}-%{release}
 These are the additional language files of gnupg2
 
 %prep
-%autosetup -n gnupg-%{version}
+%autosetup -n gnupg-%{version} -p1
 
 %build
 # Prevent GnuPG from using keyboxd for storing keys.
