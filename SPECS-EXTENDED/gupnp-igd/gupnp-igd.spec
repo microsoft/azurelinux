@@ -1,9 +1,10 @@
 %global docs 0
+%global short_version 1.6
 Summary:        Library to handle UPnP IGD port mapping
 Name:           gupnp-igd
-Version:        1.2.0
-Release:        7%{?dist}
-License:        LGPLv2+
+Version:        1.6.0
+Release:        1%{?dist}
+License:        LGPLv2.1+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://wiki.gnome.org/Projects/GUPnP
@@ -55,23 +56,27 @@ sed -i 's/\(.*\)gupnp-1.2\(.*\)/\1gupnp-1.6\2/' meson.build
 %files
 %license COPYING
 %doc README
-%{_libdir}/libgupnp-igd-1.0.so.4*
+%{_libdir}/libgupnp-igd-%{short_version}.so.0*
 %dir %{_libdir}/girepository-1.0
-%{_libdir}/girepository-1.0/GUPnPIgd-1.0.typelib
+%{_libdir}/girepository-1.0/GUPnPIgd-%{short_version}.typelib
 
 %files devel
 %{_includedir}/*
-%{_libdir}/libgupnp-igd-1.0.so
-%{_libdir}/pkgconfig/%{name}-1.0*.pc
+%{_libdir}/libgupnp-igd-%{short_version}.so
+%{_libdir}/pkgconfig/%{name}-%{short_version}*.pc
 %if %{with docs}
 %dir %{_datadir}/gtk-doc
 %dir %{_datadir}/gtk-doc/html
 %{_datadir}/gtk-doc/html/%{name}/
 %endif
 %dir %{_datadir}/gir-1.0
-%{_datadir}/gir-1.0/GUPnPIgd-1.0.gir
+%{_datadir}/gir-1.0/GUPnPIgd-%{short_version}.gir
 
 %changelog
+* Fri Oct 25 2024 Kevin Lockwood <v-klockwood@microsoft.com> - 1.6.0-1
+- Update to 1.6.0
+- License verified
+
 * Wed Feb 01 2023 Sumedh Sharma <sumsharma@microsoft.com> - 1.2.0-7
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Patch build to use api versions 1.6 for BR's gssdp and gupnp
