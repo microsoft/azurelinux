@@ -13,7 +13,7 @@ simplifies the process of reading and writing data from Python.
 Summary:        A Python interface to the HDF5 library
 Name:           h5py
 Version:        3.10.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,7 +21,7 @@ URL:            https://www.h5py.org/
 Source0:        https://files.pythonhosted.org/packages/source/h/h5py/h5py-%{version}.tar.gz
 
 BuildRequires:  gcc
-BuildRequires:  hdf5-devel >= 1.14.4
+BuildRequires:  hdf5-devel >= 1.14.6
 BuildRequires:  liblzf-devel
 BuildRequires:  python%{python3_pkgversion}-Cython >= 0.23
 BuildRequires:  python%{python3_pkgversion}-cached_property
@@ -38,7 +38,7 @@ BuildRequires:  python%{python3_pkgversion}-sphinx
 %package     -n python%{python3_pkgversion}-h5py
 %{?python_provide:%python_provide python%{python3_pkgversion}-h5py}
 Summary:        %{summary}
-Requires:       hdf5 >= 1.14.4
+Requires:       hdf5 >= 1.14.6
 Requires:       python%{python3_pkgversion}-cached_property
 Requires:       python%{python3_pkgversion}-numpy >= 1.7
 Requires:       python%{python3_pkgversion}-six
@@ -93,6 +93,11 @@ cd -
 %{python3_sitearch}/%{name}-%{version}-*.egg-info
 
 %changelog
+* Mon Dec 29 2025 Kshitiz Godara <kgodara@microsoft.com> - 3.10.0-2
+- Bumping the release version so that this package is re-built with
+  the newer 1.14.6 hdf5 libraries. This ensures that the matching
+  1.14.6 .so files Will be used at run time.
+
 * Thu May 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.10.0-1
 - Update to 3.10.0 to match hdf5 1.14.4
 
