@@ -3,7 +3,7 @@
 Summary: Network diagnostic tool combining 'traceroute' and 'ping'
 Name: mtr
 Version: 0.95
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,14 +36,14 @@ in the mtr-gtk package).
 %autosetup -p1
 
 %build
-export CFLAGS="%{optflags} -fPIE"
-export LDFLAGS="-z now -pie"
+export CFLAGS="%{optflags} -fPIE $(pkg-config --cflags ncursesw)"
+export LDFLAGS="-z now -pie $(pkg-config --libs ncursesw)"
 
 # Upstream forgot to ship .tarball-version
 echo "%{version}" > .tarball-version
 
 ./bootstrap.sh
-%configure --without-gtk
+%configure CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS"  --without-gtk
 %make_build
 
 %install
@@ -62,6 +62,9 @@ install -D -p -m 0755 mtr %{buildroot}%{_sbindir}/mtr
 %{_datadir}/bash-completion/completions/%{name}
 
 %changelog
+* Thu Dev 11 2025 Andy Zaugg <azaugg@linkedin.com> - 0.95-4
+- Fix mtr segfault
+
 * Mon Jul 14 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.95-3
 - Patch for CVE-2025-49809
 
