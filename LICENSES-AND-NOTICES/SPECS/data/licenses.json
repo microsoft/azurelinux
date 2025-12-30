@@ -1829,6 +1829,7 @@
                 "python-ruamel-yaml-clib",
                 "python-s3transfer",
                 "python-schedutils",
+                "python-scikit-build-core",
                 "python-semantic_version",
                 "python-should_dsl",
                 "python-simpleline",

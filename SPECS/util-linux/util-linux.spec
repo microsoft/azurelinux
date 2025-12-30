@@ -5,7 +5,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.40.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,6 +16,7 @@ Source1:        runuser
 Source2:        runuser-l
 Source3:        su
 Source4:        su-l
+Patch0:         CVE-2025-14104.patch
 BuildRequires:  audit-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
@@ -29,6 +30,7 @@ Provides:       hardlink = 1.3-9
 Provides:       uuidd = %{version}-%{release}
 %if 0%{?with_check}
 BuildRequires:  ncurses-term
+BuildRequires:  sudo
 %endif
 
 %description
@@ -117,7 +119,7 @@ install -vm644 %{SOURCE4} %{buildroot}%{_sysconfdir}/pam.d/
 
 %check
 chown -Rv nobody .
-sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
+sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check" || exit 1
 rm -rf %{buildroot}/lib/systemd/system
 
 %post   -p /sbin/ldconfig
@@ -170,9 +172,12 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
-* Mon Nov 10 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.40.2-2
+* Tue Dec 30 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.40.2-3
 - Compiled with python
 - Added the package python3-libmount
+
+* Wed Dec 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.40.2-2
+- Patch for CVE-2025-14104
 
 * Wed Sep 18 2024 Vince Perri <viperri@microsoft.com> - 2.40.2-1
 - Upgrade to 2.40.2:

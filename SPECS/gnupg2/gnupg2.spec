@@ -1,6 +1,6 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
-Version:        2.4.7
+Version:        2.4.8
 Release:        1%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
@@ -48,7 +48,7 @@ Requires: %{name} = %{version}-%{release}
 These are the additional language files of gnupg2
 
 %prep
-%autosetup -n gnupg-%{version}
+%autosetup -p1 -n gnupg-%{version}
 
 %build
 # Prevent GnuPG from using keyboxd for storing keys.
@@ -93,7 +93,6 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %{_mandir}/man1/*
 %{_mandir}/man7/*
 %{_mandir}/man8/*
-%{_mandir}/manh/*
 %{_infodir}/gnupg*
 %{_libexecdir}/*
 %{_datadir}/gnupg/*
@@ -105,6 +104,9 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %defattr(-,root,root)
 
 %changelog
+* Mon Dec 22 2025 Ratiranjan Behera <v-ratbehera@microsoft.com> - 2.4.8-1
+- Upgrade gnupg2 to 2.4.8 for CVE-2025-30258
+
 * Mon Jun 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.4.7-1
 - Upgrade to version 2.4.7
 
