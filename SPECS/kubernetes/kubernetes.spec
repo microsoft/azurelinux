@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.30.10
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -29,7 +29,9 @@ Patch7:         CVE-2025-22872.patch
 Patch8:         CVE-2025-4563.patch
 Patch9:         CVE-2025-31133.patch
 Patch10:        CVE-2025-52565.patch
-Patch11:        CVE-2024-7598.patch
+Patch11:        CVE-2025-13281.patch
+Patch12:        CVE-2025-65637.patch
+Patch13:        CVE-2024-7598.patch
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.38-16%{?dist}
 BuildRequires:  golang < 1.25
@@ -281,8 +283,11 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
-* Fri Dec 05 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-17
+* Fri Dec 19 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-18
 - Patch for CVE-2024-7598
+
+* Tue Dec 16 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-17
+- Patch for CVE-2025-13281, CVE-2025-65637
 
 * Mon Dec 1 2025 Andrew Phelps <anphel@microsoft.com> - 1.30.10-16
 - Bump to rebuild with updated glibc
