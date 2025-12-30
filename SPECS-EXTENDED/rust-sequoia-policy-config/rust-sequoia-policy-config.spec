@@ -147,7 +147,7 @@ mv config.toml .cargo/config.toml
 
 %changelog
 * Fri Dec 26 2025 Aditya Singh <v-aditysing@microsoft.com> - 0.8.1-2
-- Intial Azure Linux import from Fedora 44(License: MIT).
+- Initial Azure Linux import from Fedora 44(License: MIT).
 - License verified. 
 
 * Tue Nov 18 2025 Fabio Valentini <decathorpe@gmail.com> - 0.8.1-1
