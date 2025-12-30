@@ -1,0 +1,38 @@
+diff --git a/isisd/isis_snmp.c b/isisd/isis_snmp.c
+index a184b5b..de56b85 100644
+--- a/isisd/isis_snmp.c
++++ b/isisd/isis_snmp.c
+@@ -859,6 +859,7 @@ static int isis_snmp_area_addr_lookup_exact(oid *oid_idx, size_t oid_idx_len,
+ 	struct area_addr *addr = NULL;
+ 	struct listnode *addr_node;
+ 	struct isis *isis = isis_lookup_by_vrfid(VRF_DEFAULT);
++	int res;
+ 
+ 	if (isis == NULL)
+ 		return 0;
+@@ -870,7 +871,7 @@ static int isis_snmp_area_addr_lookup_exact(oid *oid_idx, size_t oid_idx_len,
+ 
+ 	area = listgetdata(listhead(isis->area_list));
+ 
+-	int res = isis_snmp_conv_exact(cmp_buf, sizeof(cmp_buf), &addr_len,
++	res = isis_snmp_conv_exact(cmp_buf, sizeof(cmp_buf), &addr_len,
+ 				       oid_idx, oid_idx_len);
+ 
+ 
+@@ -909,6 +910,7 @@ static int isis_snmp_area_addr_lookup_next(oid *oid_idx, size_t oid_idx_len,
+ 	struct area_addr *addr = NULL;
+ 	struct listnode *addr_node;
+ 	struct isis *isis = isis_lookup_by_vrfid(VRF_DEFAULT);
++	int res;
+ 
+ 	if (isis == NULL)
+ 		return 0;
+@@ -920,7 +922,7 @@ static int isis_snmp_area_addr_lookup_next(oid *oid_idx, size_t oid_idx_len,
+ 
+ 	area = listgetdata(listhead(isis->area_list));
+ 
+-	int res = isis_snmp_conv_next(cmp_buf, sizeof(cmp_buf), &addr_len,
++	res = isis_snmp_conv_next(cmp_buf, sizeof(cmp_buf), &addr_len,
+ 				      &try_exact, oid_idx, oid_idx_len);
+ 
+ 	if (!res)
