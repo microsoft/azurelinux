@@ -2107,8 +2107,8 @@
         "type": "other",
         "other": {
           "name": "corosync",
-          "version": "3.0.4",
-          "downloadUrl": "http://build.clusterlabs.org/corosync/releases/corosync-3.0.4.tar.gz"
+          "version": "3.1.9",
+          "downloadUrl": "https://build.clusterlabs.org/corosync/releases/corosync-3.1.9.tar.gz"
         }
       }
     },
