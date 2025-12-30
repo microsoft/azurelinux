@@ -29,7 +29,6 @@ Patch0:         CVE-2022-2879.patch
 Patch1:         CVE-2025-22872.patch
 Patch2:         CVE-2025-58058.patch
 Patch3:         CVE-2025-58183.patch
-Patch4:         CVE-2025-65637.patch
 BuildRequires:  golang < 1.25
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
