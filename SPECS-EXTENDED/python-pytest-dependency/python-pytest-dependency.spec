@@ -50,7 +50,7 @@ Summary:        %{summary}
 
 %changelog
 * Fri Dec 26 2025 Aditya Singh <v-aditysing@microsoft.com> - 0.6.0-8
-- Intial Azure Linux import from Fedora 44(License: MIT).
+- Initial Azure Linux import from Fedora 44(License: MIT).
 - License verified. 
 
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.6.0-7
