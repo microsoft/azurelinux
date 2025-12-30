@@ -1,0 +1,13 @@
+diff -rupN shapelib-1.6.2/CMakeLists.txt shapelib-1.6.2-new/CMakeLists.txt
+--- shapelib-1.6.2/CMakeLists.txt	2025-09-23 17:40:50.000000000 +0200
++++ shapelib-1.6.2-new/CMakeLists.txt	2025-09-23 22:28:21.851170095 +0200
+@@ -176,6 +176,9 @@ set_target_properties(${PACKAGE} PROPERT
+   SOVERSION ${shp_SOVERSION}
+   VERSION ${shp_VERSION}
+ )
++if(MINGW)
++    set_target_properties(${PACKAGE} PROPERTIES SUFFIX "-${shp_SOVERSION}${CMAKE_SHARED_LIBRARY_SUFFIX}")
++endif(MINGW)
+ 
+ if(USE_RPATH)
+   set_target_properties(${PACKAGE} PROPERTIES

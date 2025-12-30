@@ -1,0 +1,24 @@
+diff -rupN shapelib-1.6.2/dbfadd.c shapelib-1.6.2-new/dbfadd.c
+--- shapelib-1.6.2/dbfadd.c	2024-12-16 02:47:36.000000000 +0100
++++ shapelib-1.6.2-new/dbfadd.c	2025-09-23 19:57:08.604461488 +0200
+@@ -45,7 +45,7 @@ int main(int argc, char **argv)
+     const int iRecord = DBFGetRecordCount(hDBF);
+ 
+     SHPDate date;
+-    char bool;
++    char boolean;
+ 
+     // Loop assigning the new field values.
+     for (int i = 0; i < DBFGetFieldCount(hDBF); i++)
+@@ -64,9 +64,9 @@ int main(int argc, char **argv)
+         }
+         else if (DBFGetFieldInfo(hDBF, i, NULL, NULL, NULL) == FTLogical)
+         {
+-            if (1 == sscanf(argv[i + 2], "%c", &bool))
++            if (1 == sscanf(argv[i + 2], "%c", &boolean))
+             {
+-                DBFWriteLogicalAttribute(hDBF, iRecord, i, bool);
++                DBFWriteLogicalAttribute(hDBF, iRecord, i, boolean);
+             }
+         }
+         else

@@ -5,7 +5,7 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:          shapelib
-Version:       1.6.1
+Version:       1.6.2
 Release:       2%{?dist}
 Summary:       C library for handling ESRI Shapefiles
 # The core library is dual-licensed LGPLv2 or MIT.
@@ -22,7 +22,12 @@ Source0:       https://download.osgeo.org/shapelib/%{name}-%{version}%{?pre:%pre
 # tar -czf shapelib-man.tar.gz man/
 # rm -r man
 Source1:       %{name}-man-1.tar.gz
+# Don't use bool as variable name as it is a reserved keyword in C23
+Patch0:        shapelib_bool.patch
+# Add library version suffix for mingw dlls
+Patch1:        shapelib_libver.patch
 
+BuildRequires: cmake
 BuildRequires: automake autoconf libtool
 BuildRequires: gcc-c++
 BuildRequires: make
@@ -58,19 +63,12 @@ This package contains various utility programs distributed with shapelib.
 
 
 %build
-# Kill rpath
-autoreconf -ifv
-
 # Native build
-mkdir build_native
-pushd build_native
-%define _configure ../configure
-%configure --disable-static
-%make_build
-popd
+%cmake -DBUILD_TESTING=OFF -DUSE_RPATH=OFF -DCMAKE_INSTALL_LIBDIR=%{_libdir} -DCMAKE_INSTALL_CMAKEDIR=%{_libdir}/cmake/%{name}
+%cmake_build
 
 %install
-%make_install -C build_native
+%cmake_install
 
 # Remove static libraries
 find %{buildroot} -name '*.la' -exec rm -f {} ';'
@@ -84,12 +82,14 @@ install -pm 0644 man/*.1 %{buildroot}%{_mandir}/man1/
 %files
 %doc README README.tree ChangeLog web/*.html
 %license LICENSE*
+%{_libdir}/libshp.so.%{version}
 %{_libdir}/libshp.so.4*
 
 %files devel
 %{_includedir}/shapefil.h
 %{_libdir}/libshp.so
 %{_libdir}/pkgconfig/%{name}.pc
+%{_libdir}/cmake/%{name}/
 
 %files tools
 %doc contrib/doc/
@@ -97,9 +97,18 @@ install -pm 0644 man/*.1 %{buildroot}%{_mandir}/man1/
 %{_mandir}/man1/*.1*
 
 %changelog
-* Thu May 15 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.6.1-2
-- Initial Azure Linux import from Fedora 41 (license: MIT).
+* Wed Dec 31 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.6.2-2
+- Initial Azure Linux import from Fedora 44 (license: MIT).
 - License verified
+
+* Tue Sep 23 2025 Sandro Mani <manisandro@gmail.com> - 1.6.2-1
+- Update to 1.6.2
+
+* Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
+
+* Sun Jan 19 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
 
 * Wed Aug 14 2024 Sandro Mani <manisandro@gmail.com> - 1.6.1-1
 - Update to 1.6.1
