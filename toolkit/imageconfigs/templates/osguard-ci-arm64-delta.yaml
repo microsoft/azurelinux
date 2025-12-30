@@ -1,0 +1,54 @@
+# The OS Guard Code Integrity image variant extends code integrity features
+# beyond the host binaries, to include container images and their layers. This
+# is achieved through configuring containerd to use erofs-snapshotter with
+# dm-verity support and requiring dm-verity signature verification. On container
+# execution, IPE will only allow the execution of containers that are dm-verity 
+# verified.
+#
+# This file defines the delta (differences) to apply to the osguard-base.yaml
+# template in order to generate the OS Guard Code Integrity (CI) ARM64 image variant.
+# This template is merged with the base template by the
+# generate-osguard-imageconfigs.sh script to produce osguard-ci-arm64.yaml
+# Only settings that differ from the base should be included here.
+os:
+  # Ensure SELinux is in Enforcing Mode for OS Guard Code Integrity image.
+  selinux:
+    mode: enforcing
+  kernelCommandLine:
+    extraCommandLine:
+      # Tells the Linux kernel to use the first ARM PL011 UART device as the primary system console after initialization 
+      - console=ttyAMA0
+      # Enables an early debug console using the ARM PL011 UART at base address `0xeffec000` to output kernel messages from the earliest stages of the boot process
+      - earlycon=pl011,0xeffec000
+      # Stopping ACPI-based ARM PMU initialization
+      - initcall_blacklist=arm_pmu_acpi_init
+      # Enforce signatures for all dm-verity volumes on the system. This
+      # verification is needed in conjunction with our dm-verity-enabled
+      # erofs-snapshotter to ensure erofs container layers, which are
+      # dm-verity volumes, are signed by a trusted entity
+      - dm_verity.require_signatures=1
+  packages:
+    install:
+    # For containerd erofs-snapshotter to function, supply its userland
+    # utilities
+    - erofs-utils
+  modules:
+  # Ensure the erofs kernel module is always loaded so containerd
+  # erofs-snapshotter can use it.
+  - name: erofs
+    loadMode: always
+  additionalFiles:
+  # Place custom containerd config that configures erofs-snapshotter as the
+  # default snapshotter when setting up container images
+  - source: files/osguard-ci/config.toml
+    destination: /etc/containerd/config.toml
+    permissions: "644"
+scripts:
+  # Tag this image variant with its specific variant-id
+  postCustomization:
+  - path: scripts/set_os_release_variant_entries.sh
+    arguments:
+    - --variant-id
+    - osguard-ci-arm64
+    - --variant
+    - OS Guard Code Integrity Image (ARM64)
