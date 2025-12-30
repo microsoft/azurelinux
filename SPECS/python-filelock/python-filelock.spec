@@ -30,9 +30,11 @@ BuildRequires:  python%{python3_pkgversion}-pluggy
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-setuptools_scm
 BuildRequires:  python%{python3_pkgversion}-trove-classifiers
+%if %{with check}
 BuildRequires:  python%{python3_pkgversion}-pytest-asyncio
 BuildRequires:  python%{python3_pkgversion}-pytest
 BuildRequires:  python%{python3_pkgversion}-pytest-mock
+%endif
 
 %description -n python%{python3_pkgversion}-%{srcname}
 This package contains a single module, which implements a platform independent
