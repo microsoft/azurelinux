@@ -1,8 +1,7 @@
 # Plain package name for cases, where %%{name} differs (e.g. for versioned packages)
 %global majorname mariadb
-%define package_version 10.11.11
+%define package_version 10.11.15
 %define majorversion %(echo %{package_version} | cut -d'.' -f1-2 )
-
 
 %define _vpath_builddir .
 
@@ -201,7 +200,6 @@ Patch12:          rocksdb-6.8-gcc13.patch
 Patch13:          %{majorname}-libfmt.patch
 #   Patch14: make MTR port calculation reasonably predictable
 Patch14:          %{majorname}-mtr.patch
-Patch15:          CVE-2023-52971.patch
 
 %global pkgname %{majorname}
  
@@ -823,7 +821,6 @@ rm -r storage/rocksdb/
 %endif
  
 %patch -P14 -p1
-%patch -P15 -p1
 
 # generate a list of tests that fail, but are not disabled by upstream
 cat %{SOURCE50} | tee -a mysql-test/unstable-tests
@@ -1772,6 +1769,9 @@ fi
 %endif
  
 %changelog
+* Mon Dec 29 2025 BinduSri Adabala <v-badabala@microsoft.com> - 10.11.15-1
+- Upgrade to 10.11.15 for CVE-2025-13699
+
 * Fri Apr 04 2025 Mayank Singh <mayansingh@microsoft.com> - 10.11.11-1
 - Initial Azure Linux import from Fedora 42 (license: MIT).
 - License verified

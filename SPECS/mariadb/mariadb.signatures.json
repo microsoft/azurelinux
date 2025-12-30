@@ -4,7 +4,7 @@
   "README.mariadb-docs": "c3c6584dbdc35445014ac48023da59cafc5abc6996859cebb4e357c2f380990f",
   "README.wsrep_sst_rsync_tunnel": "f121b2f6e804a8aaf01e0c835e62b64a0d0bf6cd922cc1a21897f196f8b0714f",
   "clustercheck.sh": "4be47a46f99b714bc3681fdf11b09d242dae5e3eb81274b3040a73f9d7800d50",
-  "mariadb-10.11.11.tar.gz": "14cc0d9d9a7a330231d9ed91ac28f29b502d2f1e7021d81c940280db52bac812",
+  "mariadb-10.11.15.tar.gz": "6190529d9d047163259967a92095b505df15b39195ea55cdf856314eef4546f5",
   "mariadb-check-socket.sh": "6d04410549275140f07b89a1dcef99f31cd47751ef9142d14e7898e7cbcff023",
   "mariadb-check-upgrade.sh": "e49c23e79155d416f7bad292d073213c0beafed99c172a06d909ec3e24ee6e75",
   "mariadb-prepare-db-dir.sh": "ff8d2e719f6db158eda0acb58a9d84b43c959baf0d2a8f4d9ce7a62f13af36d0",
