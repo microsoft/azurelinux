@@ -1,0 +1,50 @@
+From e954ed6417af175f02bb9a80c3ba4b31b423b89b Mon Sep 17 00:00:00 2001
+From: Archana Shettigar <v-shettigara@microsoft.com>
+Date: Sat, 27 Dec 2025 22:38:28 +0530
+Subject: [PATCH] Fix frr c90 complaint error
+
+---
+ isisd/isis_snmp.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/isisd/isis_snmp.c b/isisd/isis_snmp.c
+index f9e3780..9328cf1 100644
+--- a/isisd/isis_snmp.c
++++ b/isisd/isis_snmp.c
+@@ -841,6 +841,7 @@ static int isis_snmp_area_addr_lookup_exact(oid *oid_idx, size_t oid_idx_len,
+ 	struct iso_address *addr = NULL;
+ 	struct listnode *addr_node;
+ 	struct isis *isis = isis_lookup_by_vrfid(VRF_DEFAULT);
++	int res;
+ 
+ 	if (isis == NULL)
+ 		return 0;
+@@ -852,7 +853,7 @@ static int isis_snmp_area_addr_lookup_exact(oid *oid_idx, size_t oid_idx_len,
+ 
+ 	area = listgetdata(listhead(isis->area_list));
+ 
+-	int res = isis_snmp_conv_exact(cmp_buf, sizeof(cmp_buf), &addr_len,
++	res = isis_snmp_conv_exact(cmp_buf, sizeof(cmp_buf), &addr_len,
+ 				       oid_idx, oid_idx_len);
+ 
+ 
+@@ -891,6 +892,7 @@ static int isis_snmp_area_addr_lookup_next(oid *oid_idx, size_t oid_idx_len,
+ 	struct iso_address *addr = NULL;
+ 	struct listnode *addr_node;
+ 	struct isis *isis = isis_lookup_by_vrfid(VRF_DEFAULT);
++	int res;
+ 
+ 	if (isis == NULL)
+ 		return 0;
+@@ -902,7 +904,7 @@ static int isis_snmp_area_addr_lookup_next(oid *oid_idx, size_t oid_idx_len,
+ 
+ 	area = listgetdata(listhead(isis->area_list));
+ 
+-	int res = isis_snmp_conv_next(cmp_buf, sizeof(cmp_buf), &addr_len,
++	res = isis_snmp_conv_next(cmp_buf, sizeof(cmp_buf), &addr_len,
+ 				      &try_exact, oid_idx, oid_idx_len);
+ 
+ 	if (!res)
+-- 
+2.45.4
+
