@@ -1,0 +1,8 @@
+# Documentation and development notes (not for public repo)
+docs/
+
+# Shell scripts for local development
+*.sh
+
+# Test files
+test_*.py
