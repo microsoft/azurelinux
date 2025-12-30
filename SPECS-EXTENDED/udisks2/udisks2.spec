@@ -8,9 +8,7 @@
 %global libblockdev_version             3.0
 
 %define with_btrfs                      1
-%ifnarch %{ix86}
-%define with_lsm                        1
-%endif
+%define with_lsm                        0
 
 %define is_git                          %(git show > /dev/null 2>&1 && echo 1 || echo 0)
 %define git_hash                        %(git log -1 --pretty=format:"%h" || true)
@@ -122,18 +120,6 @@ Obsoletes: libstoraged < %{version}-%{release}
 This package contains the dynamic library, which provides
 access to the udisksd daemon.
 
-%package -n %{name}-iscsi
-Summary: Module for iSCSI
-Requires: %{name}%{?_isa} = %{version}-%{release}
-License: LGPL-2.0-or-later
-Requires: iscsi-initiator-utils
-BuildRequires: iscsi-initiator-utils-devel
-Provides:  storaged-iscsi = %{version}-%{release}
-Obsoletes: storaged-iscsi < %{version}-%{release}
-
-%description -n %{name}-iscsi
-This package contains module for iSCSI configuration.
-
 %package -n %{name}-lvm2
 Summary: Module for LVM2
 Requires: %{name}%{?_isa} = %{version}-%{release}
@@ -210,7 +196,7 @@ sed -i data/builtin_mount_options.conf -e 's/ntfs_drivers=ntfs3,ntfs/ntfs_driver
     --enable-lsm      \
 %endif
     --enable-lvm2     \
-    --enable-iscsi
+    --disable-iscsi
 make %{?_smp_mflags}
 
 %install
@@ -291,10 +277,6 @@ fi
 %{_libdir}/udisks2/modules/libudisks2_lvm2.so
 %{_datadir}/polkit-1/actions/org.freedesktop.UDisks2.lvm2.policy
 
-%files -n %{name}-iscsi
-%{_libdir}/udisks2/modules/libudisks2_iscsi.so
-%{_datadir}/polkit-1/actions/org.freedesktop.UDisks2.iscsi.policy
-
 %files -n lib%{name}-devel
 %{_libdir}/libudisks2.so
 %dir %{_includedir}/udisks2
@@ -307,7 +289,6 @@ fi
 %endif
 %{_libdir}/pkgconfig/udisks2.pc
 %{_libdir}/pkgconfig/udisks2-lvm2.pc
-%{_libdir}/pkgconfig/udisks2-iscsi.pc
 %if 0%{?with_btrfs}
 %{_libdir}/pkgconfig/udisks2-btrfs.pc
 %endif
