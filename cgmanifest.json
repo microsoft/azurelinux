@@ -12951,8 +12951,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.11.11",
-          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.11/source/mariadb-10.11.11.tar.gz"
+          "version": "10.11.15",
+          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.15/source/mariadb-10.11.15.tar.gz"
         }
       }
     },
