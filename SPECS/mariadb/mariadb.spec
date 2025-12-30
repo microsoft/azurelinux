@@ -1,5 +1,7 @@
 # Plain package name for cases, where %%{name} differs (e.g. for versioned packages)
 %global majorname mariadb
+%define package_version 10.11.15
+%define majorversion %(echo %{package_version} | cut -d'.' -f1-2 )
 
 %define _vpath_builddir .
 
@@ -128,8 +130,8 @@
 # Make long macros shorter
 %global sameevr   %{epoch}:%{version}-%{release}
  
-Name:             mariadb
-Version:          10.11.15
+Name:             %{majorname}
+Version:          %{package_version}
 Release:          1%{?dist}
 Epoch:            3
  
