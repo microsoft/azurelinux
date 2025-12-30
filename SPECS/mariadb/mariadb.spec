@@ -128,7 +128,7 @@
 # Make long macros shorter
 %global sameevr   %{epoch}:%{version}-%{release}
  
-Name:             %{majorname}
+Name:             mariadb
 Version:          10.11.15
 Release:          1%{?dist}
 Epoch:            3
@@ -1482,7 +1482,7 @@ fi
 %{_mandir}/man1/galera_recovery.1*
 %config(noreplace) %{_sysconfdir}/my.cnf.d/galera.cnf
 %attr(0640,root,root) %ghost %config(noreplace) %{_sysconfdir}/sysconfig/clustercheck
-#%%{_datadir}/selinux/packages/targeted/%%{majorname}-server-galera.pp
+#%{_datadir}/selinux/packages/targeted/%{majorname}-server-galera.pp
 %endif
  
 %files -n %{pkgname}-server
