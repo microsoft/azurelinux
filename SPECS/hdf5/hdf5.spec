@@ -1,7 +1,6 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 %define version_main %(echo %{version} | cut -d. -f-2)
-%global so_version_1 310
-%global so_version_2 311
+%global so_version 310
 %global with_mpich 0
 %global with_openmpi 0
 %if %{with_mpich}
@@ -12,16 +11,30 @@
 %endif
 Summary:        A general purpose library and file format for storing scientific data
 Name:           hdf5
-Version:        1.14.4
+Version:        1.14.6
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://portal.hdfgroup.org/display/HDF5/HDF5
-Source0:        https://github.com/hdfgroup/hdf5/releases/download/%{name}_%{version}.2/%{name}-%{version}-2.tar.gz
+Source0:        https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_6/downloads/hdf5-1.14.6.tar.gz
 Source1:        h5comp
 Patch0:         hdf5-build.patch
 Patch1:         hdf5-wrappers.patch
+Patch2:         CVE-2025-2153.patch
+Patch3:         CVE-2025-2310.patch
+Patch4:         CVE-2025-2914.patch
+Patch5:         CVE-2025-2924.patch
+Patch6:         CVE-2025-2925.patch
+Patch7:         CVE-2025-2926.patch
+Patch8:         CVE-2025-44905.patch
+Patch9:         CVE-2025-6269.patch
+Patch10:        CVE-2025-6750.patch
+Patch11:        CVE-2025-6816.patch
+Patch12:        CVE-2025-6857.patch
+Patch13:        CVE-2025-6858.patch
+Patch14:        CVE-2025-7067.patch
+Patch15:        CVE-2025-7068.patch
 
 # For patches/rpath
 BuildRequires:  automake
@@ -127,7 +140,7 @@ HDF5 parallel openmpi static libraries
 
 
 %prep
-%autosetup -p1 -n %{name}-%{version}-2
+%autosetup -p1 
 
 # Force shared by default for compiler wrappers (bug #1266645)
 sed -i -e '/^STATIC_AVAILABLE=/s/=.*/=no/' */*/h5[cf]*.in
@@ -150,16 +163,6 @@ sed -e 's|-O -finline-functions|-O3 -finline-functions|g' -i config/gnu-flags
 # --with-mpe=DIR Use MPE instrumentation [default=no]
 # --enable-cxx/fortran/parallel and --enable-threadsafe flags are incompatible
 
-# temporarily disable _FLOAT16 for ARM64 until a fix is checked-in.
-# See:
-# - https://github.com/HDFGroup/hdf5/pull/4495
-# - https://github.com/HDFGroup/hdf5/pull/4507
-%ifarch aarch64
-%global disable_float16 \\\
-  --disable-nonstandard-feature-float16 \\\
-%{nil}
-%endif
-
 #Serial build
 export CC=gcc
 export CXX=g++
@@ -172,7 +175,6 @@ ln -s ../configure .
   %{configure_opts} \
   --enable-cxx \
   --enable-hlgiftools \
-  %{disable_float16} \
   --with-default-plugindir=%{_libdir}/hdf5/plugin
 sed -i -e 's| -shared | -Wl,--as-needed\0|g' libtool
 sed -r -i 's|^prefix=/usr|prefix=%{buildroot}/usr|' java/test/junit.sh
@@ -231,8 +233,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
   mkdir -p %{buildroot}%{_libdir}/$mpi/hdf5/plugin
   module purge
 done
-#Fixup example permissions
-find %{buildroot}%{_datadir} \( -name '*.[ch]*' -o -name '*.f90' \) -exec chmod -x {} +
 
 #Fixup headers and scripts for multiarch
 %ifarch x86_64 ppc64 ia64 s390x sparc64 alpha
@@ -264,7 +264,8 @@ cat > %{buildroot}%{macrosdir}/macros.hdf5 <<EOF
 EOF
 
 %check
-make -C build check
+# Do not ignore make error code
+make -C build check || exit 1
 #export HDF5_Make_Ignore=yes
 export OMPI_MCA_rmaps_base_oversubscribe=1
 # openmpi 5+
@@ -305,12 +306,12 @@ done
 %{_bindir}/mirror_server
 %{_bindir}/mirror_server_stop
 %{_libdir}/hdf5/
-%{_libdir}/libhdf5.so.%{so_version_2}*
-%{_libdir}/libhdf5_cpp.so.%{so_version_1}*
-%{_libdir}/libhdf5_fortran.so.%{so_version_2}*
-%{_libdir}/libhdf5hl_fortran.so.%{so_version_1}*
-%{_libdir}/libhdf5_hl.so.%{so_version_1}*
-%{_libdir}/libhdf5_hl_cpp.so.%{so_version_1}*
+%{_libdir}/libhdf5.so.%{so_version}*
+%{_libdir}/libhdf5_cpp.so.%{so_version}*
+%{_libdir}/libhdf5_fortran.so.%{so_version}*
+%{_libdir}/libhdf5hl_fortran.so.%{so_version}*
+%{_libdir}/libhdf5_hl.so.%{so_version}*
+%{_libdir}/libhdf5_hl_cpp.so.%{so_version}*
 
 %files devel
 %{macrosdir}/macros.hdf5
@@ -323,7 +324,6 @@ done
 %{_libdir}/*.so
 %{_libdir}/*.settings
 %{_fmoddir}/*.mod
-%{_datadir}/hdf5_examples/
 
 %files static
 %{_libdir}/*.a
@@ -357,7 +357,7 @@ done
 %{_libdir}/mpich/bin/mirror_server_stop
 %{_libdir}/mpich/bin/ph5diff
 %{_libdir}/mpich/hdf5/
-%{_libdir}/mpich/lib/*.so.%{so_version_1}*
+%{_libdir}/mpich/lib/*.so.%{so_version}*
 
 %files mpich-devel
 %{_includedir}/mpich-%{_arch}
@@ -401,7 +401,7 @@ done
 %{_libdir}/openmpi/bin/mirror_server_stop
 %{_libdir}/openmpi/bin/ph5diff
 %{_libdir}/openmpi/hdf5/
-%{_libdir}/openmpi/lib/*.so.%{so_version_1}*
+%{_libdir}/openmpi/lib/*.so.%{so_version}*
 
 %files openmpi-devel
 %{_includedir}/openmpi-%{_arch}
@@ -420,6 +420,14 @@ done
 
 
 %changelog
+* Tue Dec 16 2025 Jyoti kanase <v-jykanase@microsoft.com> - 1.14.6-1
+- Upgrade to 1.14.6
+- Patch hdf5 for CVE-2025-2153, CVE-2025-2310, CVE-2025-2914, CVE-2025-2926, CVE-2025-6816,
+  CVE-2025-2925, CVE-2025-2924, CVE-2025-44905, CVE-2025-6269, CVE-2025-6750, CVE-2025-6857,
+  CVE-2025-7067, CVE-2025-7068, CVE-2025-6858, CVE_2025-2923, CVE-2025-2913, CVE-2025-6516,
+  CVE-2025-6818, CVE-2025-6817, CVE-2025-6856, CVE-2025-7069
+- Remove the _FLOAT16 temporary work-around for hdf5 arm64 builds
+
 * Mon May 20 2024 George Mileka <gmileka@microsoft.com> - 1.14.4-1
 - Upgrade to 1.14.4 - Fix critical CVEs
 
