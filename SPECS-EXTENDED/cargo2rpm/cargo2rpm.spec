@@ -52,7 +52,7 @@ and a Python API (which rust2rpm is built upon).
 
 %changelog
 * Fri Dec 26 2025 Aditya Singh <v-aditysing@microsoft.com> - 0.3.2-2
-- Intial Azure Linux import from Fedora 44(License: MIT).
+- Initial Azure Linux import from Fedora 44(License: MIT).
 - License verified. 
 
 * Sat Dec 06 2025 Fabio Valentini <decathorpe@gmail.com> - 0.3.2-1
