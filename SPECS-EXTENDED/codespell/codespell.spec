@@ -50,7 +50,7 @@ sed -i -e 's/--cov-report=//' pyproject.toml
 
 %changelog
 * Fri Dec 26 2025 Aditya Singh <v-aditysing@microsoft.com> - 2.4.1-7
-- Intial Azure Linux import from Fedora 44(License: MIT).
+- Initial Azure Linux import from Fedora 44(License: MIT).
 - License verified. 
 
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 2.4.1-6
