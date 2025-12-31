@@ -32,7 +32,7 @@
 %global with_qdbm     0
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
-Version:        8.3.23
+Version:        8.3.29
 Release:        1%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
@@ -1514,6 +1514,9 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Sun Dec 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.3.29-1
+- Auto-upgrade to 8.3.29 - for CVE-2025-14177, CVE-2025-14178, CVE-2025-14180
+
 * Tue Jul 15 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 8.3.23-1
 - Upgrade to 8.3.23 to fix CVE-2025-1735, CVE-2025-6491, CVE-2025-1220
 - Fixed build issue by replacing php-8.0.0-embed.patch with php-8.3.20-embed.patch
