@@ -277,6 +277,55 @@ mkdir -p %{buildroot}/%{_datadir}/%{name}/workflows/
 # After everything is installed, remove info dir
 rm -f %{buildroot}/%{_infodir}/dir
 
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraCCpp.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraKerneloops.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraPython.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraPython3.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraVmcore.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraXorg.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraLibreport.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraJava.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_FedoraJavaScript.xml
+rm -f %{buildroot}/%{_sysconfdir}/libreport/workflows.d/report_fedora.conf
+rm -f %{buildroot}%{_mandir}/man5/report_fedora.conf.5
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_AnacondaFedora.xml
+
+# Remove unwanted RHEL specific workflow configuration files
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELCCpp.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELKerneloops.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELPython.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELvmcore.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELxorg.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELLibreport.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELJava.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELJavaScript.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_uReport.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_AnacondaRHEL.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_AnacondaRHELBugzilla.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELBugzillaCCpp.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELBugzillaKerneloops.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELBugzillaPython.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELBugzillaVmcore.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELBugzillaXorg.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELBugzillaLibreport.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELBugzillaJava.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELBugzillaJavaScript.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELAddDataCCpp.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELAddDataKerneloops.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELAddDataPython.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELAddDatavmcore.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELAddDataxorg.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELAddDataLibreport.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELAddDataJava.xml
+rm -f %{buildroot}/%{_datadir}/libreport/workflows/workflow_RHELAddDataJavaScript.xml
+rm -f %{buildroot}/%{_sysconfdir}/libreport/workflows.d/report_rhel.conf
+rm -f %{buildroot}/%{_sysconfdir}/libreport/workflows.d/report_rhel_add_data.conf
+rm -f %{buildroot}/%{_sysconfdir}/libreport/workflows.d/report_uReport.conf
+rm -f %{buildroot}/%{_sysconfdir}/libreport/workflows.d/report_rhel_bugzilla.conf
+rm -f %{buildroot}%{_mandir}/man5/report_rhel.conf.5
+rm -f %{buildroot}%{_mandir}/man5/report_uReport.conf.5
+rm -f %{buildroot}%{_mandir}/man5/report_rhel_bugzilla.conf.5
+
 %check
 make check|| {
     # find and print the logs of failed test
