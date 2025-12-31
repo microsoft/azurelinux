@@ -8021,8 +8021,8 @@
         "type": "other",
         "other": {
           "name": "js-jquery",
-          "version": "3.5.0",
-          "downloadUrl": "https://github.com/jquery/jquery/archive/3.5.0/jquery-3.5.0.tar.gz"
+          "version": "3.7.1",
+          "downloadUrl": "https://github.com/jquery/jquery/archive/3.7.1/jquery-3.7.1.tar.gz"
         }
       }
     },

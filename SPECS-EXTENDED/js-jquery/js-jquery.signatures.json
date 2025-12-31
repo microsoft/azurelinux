@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "jquery-3.5.0.tar.gz": "449b24d27fcf01827008cf6d1356693d3bac7e7f6ec4e54dd1f018ec7a5d521b",
-  "jquery_3.5.0_node_modules.tar.gz": "eb975de8e4037518c7aec235648124c730633f08388f87f0eead6e33496a7aaf"
+  "jquery-3.7.1.tar.gz": "6150ac588f06b2bbcb277bbba6d696c296f1ee88160065a84b56e93c54fd1f64",
+  "jquery_3.7.1_node_modules.tar.gz": "c0092c962e506d5854c2ea0a8018588af712ce884590af6bfe10af376089065e"
  }
 }
