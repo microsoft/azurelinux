@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "ed25519-java-0.3.0.tar.gz": "a89a2331afb1db0bd06ce029c731db2d24684cebf111e796b51deb6e2a20a310",
+  "ed25519-java-build.xml": "2eb416752ef86be27a06581dfb60c6c4693d530ffa7f8e12f28112b40d65fab7"
+ }
+}
