@@ -34,7 +34,7 @@ skipped, lines that contain a "# noqa" comment at the end will not
 issue warnings, Git and Mercurial hooks are included, a McCabe
 complexity checker is included, and it is extendable through
 flake8.extension entry points.
- 
+
 %package -n python%{python3_pkgversion}-%{modname}
 Summary:          %{summary}
  
