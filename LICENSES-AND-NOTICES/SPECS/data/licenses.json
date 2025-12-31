@@ -848,6 +848,7 @@
                 "linuxptp",
                 "lksctp-tools",
                 "lldpd",
+                "llhttp",
                 "lockdev",
                 "logwatch",
                 "lpsolve",

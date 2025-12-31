@@ -4510,8 +4510,8 @@
         "type": "other",
         "other": {
           "name": "gnome-desktop-testing",
-          "version": "2018.1",
-          "downloadUrl": "https://gitlab.gnome.org/GNOME/gnome-desktop-testing/-/archive/v2018.1/gnome-desktop-testing-v2018.1.tar.gz"
+          "version": "2021.1",
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/gnome-desktop-testing/-/archive/v2021.1/gnome-desktop-testing-v2021.1.tar.gz"
         }
       }
     },
@@ -12350,6 +12350,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "llhttp",
+          "version": "9.3.0",
+          "downloadUrl": "https://github.com/nodejs/llhttp/archive/refs/tags/release/v9.3.0/llhttp-release-v9.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "llvm",
           "version": "18.1.8",
           "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.8.tar.gz"
@@ -19303,8 +19313,8 @@
         "type": "other",
         "other": {
           "name": "perl-Params-ValidationCompiler",
-          "version": "0.30",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Params/Params-ValidationCompiler-0.30.tar.gz"
+          "version": "0.31",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Params/Params-ValidationCompiler-0.31.tar.gz"
         }
       }
     },
