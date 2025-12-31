@@ -516,6 +516,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_mandir}/man5/bugzilla_formatdup_analyzer_libreport.conf.5.*
 %{_mandir}/man5/bugzilla_format_kernel.conf.5.*
 %{_bindir}/reporter-bugzilla
+%{_bindir}/reporter-bugzilla-python
 
 %endif
 
