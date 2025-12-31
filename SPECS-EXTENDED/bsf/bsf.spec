@@ -92,9 +92,8 @@ cp -pr build/javadocs/* %{buildroot}%{_javadocdir}/%{name}
 %doc AUTHORS.txt CHANGES.txt README.txt TODO.txt RELEASE-NOTE.txt
 
 %files javadoc
-%license LICENSE.txt NOTICE.txt
+%license LICENSE.txt NOTICE.txt %{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO
 %{_javadocdir}/%{name}
-%exclude /usr/share/javadoc/bsf/legal/ADDITIONAL_LICENSE_INFO
 %exclude /usr/share/javadoc/bsf/legal/LICENSE
 
 %changelog
