@@ -35,7 +35,7 @@ issue warnings, Git and Mercurial hooks are included, a McCabe
 complexity checker is included, and it is extendable through
 flake8.extension entry points.
  
-%package -n python%{python3_pkgversion}-flake8
+%package -n python%{python3_pkgversion}-%{modname}
 Summary:          %{summary}
  
 %description -n python%{python3_pkgversion}-flake8
