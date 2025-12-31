@@ -52,7 +52,8 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %ldconfig_scriptlets
 
 %files -f %{gettext_package}.lang
-%doc COPYING.LIB AUTHORS NEWS README
+%doc AUTHORS NEWS README
+%license COPYING.LIB
 %{_libdir}/lib*.so.*
 %{_libdir}/libglade/2.0/libcanvas.so
 
