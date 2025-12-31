@@ -50,7 +50,7 @@ complexity checker is included, and it is extendable through
 flake8.extension entry points.
 
 %prep
-%autosetup -p1 -n flake8-%{version}
+%autosetup -p1 -n %{modname}-%{version}
 # Allow pycodestyle 2.12, https://bugzilla.redhat.com/2325146
 sed -i 's/pycodestyle>=2.11.0,<2.12.0/pycodestyle>=2.11.0,<2.13.0/' setup.cfg
 
@@ -99,7 +99,7 @@ done
 %{_bindir}/flake8
 %{_bindir}/flake8-3
 %{_bindir}/flake8-%{python3_version}
-%{_bindir}/python3-flake8
+%{_bindir}/python3-%{modname}
 
 %changelog
 * Tue Apr 22 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 7.3.0-1
