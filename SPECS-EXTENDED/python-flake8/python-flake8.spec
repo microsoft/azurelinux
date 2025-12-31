@@ -38,11 +38,11 @@ flake8.extension entry points.
 %package -n python%{python3_pkgversion}-%{modname}
 Summary:          %{summary}
  
-%description -n python%{python3_pkgversion}-flake8
+%description -n python%{python3_pkgversion}-%{modname}
 Flake8 is a wrapper around PyFlakes, pycodestyle, and Ned's McCabe
 script. It runs all the tools by launching the single flake8 script,
 and displays the warnings in a per-file, merged output.
- 
+
 It also adds a few features: files that contain "# flake8: noqa" are
 skipped, lines that contain a "# noqa" comment at the end will not
 issue warnings, Git and Mercurial hooks are included, a McCabe
