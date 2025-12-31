@@ -65,9 +65,9 @@ sed -i 's/pycodestyle>=2.11.0,<2.12.0/pycodestyle>=2.11.0,<2.13.0/' setup.cfg
 %pyproject_save_files %{modname}
 
 # Backwards-compatibility symbolic links from when we had both Python 2 and 3
-ln -s flake8 %{buildroot}%{_bindir}/%{modname}-3
-ln -s flake8 %{buildroot}%{_bindir}/%{modname}-%{python3_version}
-ln -s flake8 %{buildroot}%{_bindir}/python3-%{modname}
+ln -s %{modname} %{buildroot}%{_bindir}/%{modname}-3
+ln -s %{modname} %{buildroot}%{_bindir}/%{modname}-%{python3_version}
+ln -s %{modname} %{buildroot}%{_bindir}/python3-%{modname}
 
 %check
 # Patch mccabe upstream module used in tests so argparse receives a callable
