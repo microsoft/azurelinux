@@ -4500,8 +4500,8 @@
         "type": "other",
         "other": {
           "name": "gnome-desktop-testing",
-          "version": "2018.1",
-          "downloadUrl": "https://gitlab.gnome.org/GNOME/gnome-desktop-testing/-/archive/v2018.1/gnome-desktop-testing-v2018.1.tar.gz"
+          "version": "2021.1",
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/gnome-desktop-testing/-/archive/v2021.1/gnome-desktop-testing-v2021.1.tar.gz"
         }
       }
     },
