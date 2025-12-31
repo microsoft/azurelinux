@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 Summary: An Enchanting Spell Checking Library
 Name: enchant
 Version: 1.6.0
-Release: 28%{?dist}
+Release: 27%{?dist}
 License: LGPLv2+
 Source: http://www.abisource.com/downloads/enchant/%{version}/enchant-%{version}.tar.gz
 URL: http://www.abisource.com/
@@ -54,8 +54,7 @@ rm -f $RPM_BUILD_ROOT/%{_libdir}/*.la
 rm -f $RPM_BUILD_ROOT/%{_libdir}/enchant/*.la
 
 %files
-%doc AUTHORS README
-%license COPYING.LIB
+%doc AUTHORS COPYING.LIB README
 %{_bindir}/*
 %{_libdir}/lib*.so.*
 %dir %{_libdir}/enchant
@@ -77,9 +76,6 @@ rm -f $RPM_BUILD_ROOT/%{_libdir}/enchant/*.la
 %ldconfig_scriptlets
 
 %changelog
-* Tue Dec 30 2025 Aninda Pradhan <v-anindap@microsoft.com> - 1.6.0-28
-- Fixed license warning by moving COPYING.LIB to license directory
-
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.6.0-27
 - Remove epoch
 

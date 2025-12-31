@@ -73,6 +73,7 @@ make test
 %changelog
 * Tue Dec 30 2025 Aninda Pradhan <v-anindap@microsoft.com> - 1.291.100-13
 - Fixed license warning by excluding changelog from doc and BSD::Resource.3pm.gz from man directory
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.291.100-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

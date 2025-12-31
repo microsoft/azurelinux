@@ -76,6 +76,7 @@ EOF
 %changelog
 * Tue Dec 30 2025 Aninda Pradhan <v-anindap@microsoft.com> - 2.3.21-25
 - Fixed license warning by removing NEWS file from doc directory
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.21-24
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
