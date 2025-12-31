@@ -62,12 +62,12 @@ sed -i 's/pycodestyle>=2.11.0,<2.12.0/pycodestyle>=2.11.0,<2.13.0/' setup.cfg
 
 %install
 %pyproject_install
-%pyproject_save_files flake8
+%pyproject_save_files %{modname}
 
 # Backwards-compatibility symbolic links from when we had both Python 2 and 3
-ln -s flake8 %{buildroot}%{_bindir}/flake8-3
-ln -s flake8 %{buildroot}%{_bindir}/flake8-%{python3_version}
-ln -s flake8 %{buildroot}%{_bindir}/python3-flake8
+ln -s flake8 %{buildroot}%{_bindir}/%{modname}-3
+ln -s flake8 %{buildroot}%{_bindir}/%{modname}-%{python3_version}
+ln -s flake8 %{buildroot}%{_bindir}/python3-%{modname}
 
 %check
 # Patch mccabe upstream module used in tests so argparse receives a callable
@@ -95,10 +95,10 @@ do
 done
   %pytest -v --deselect tests/unit/test_pyflakes_codes.py::test_all_pyflakes_messages_have_flake8_codes_assigned
   
-%files -n python%{python3_pkgversion}-flake8 -f %{pyproject_files}
-%{_bindir}/flake8
-%{_bindir}/flake8-3
-%{_bindir}/flake8-%{python3_version}
+%files -n python%{python3_pkgversion}-%{modname} -f %{pyproject_files}
+%{_bindir}/%{modname}
+%{_bindir}/%{modname}-3
+%{_bindir}/%{modname}-%{python3_version}
 %{_bindir}/python3-%{modname}
 
 %changelog
