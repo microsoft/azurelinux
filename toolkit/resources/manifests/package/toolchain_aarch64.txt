@@ -542,6 +542,7 @@ python3-flit-core-3.9.0-1.azl3.noarch.rpm
 python3-gpg-1.23.2-2.azl3.aarch64.rpm
 python3-jinja2-3.1.2-3.azl3.noarch.rpm
 python3-libcap-ng-0.8.4-1.azl3.aarch64.rpm
+python3-libmount-2.40.2-3.azl3.aarch64.rpm
 python3-libs-3.12.9-7.azl3.aarch64.rpm
 python3-libxml2-2.11.5-7.azl3.aarch64.rpm
 python3-lxml-4.9.3-1.azl3.aarch64.rpm
@@ -598,11 +599,11 @@ texinfo-7.0.3-1.azl3.aarch64.rpm
 texinfo-debuginfo-7.0.3-1.azl3.aarch64.rpm
 unzip-6.0-22.azl3.aarch64.rpm
 unzip-debuginfo-6.0-22.azl3.aarch64.rpm
-util-linux-2.40.2-2.azl3.aarch64.rpm
-util-linux-debuginfo-2.40.2-2.azl3.aarch64.rpm
-util-linux-devel-2.40.2-2.azl3.aarch64.rpm
-util-linux-lang-2.40.2-2.azl3.aarch64.rpm
-util-linux-libs-2.40.2-2.azl3.aarch64.rpm
+util-linux-2.40.2-3.azl3.aarch64.rpm
+util-linux-debuginfo-2.40.2-3.azl3.aarch64.rpm
+util-linux-devel-2.40.2-3.azl3.aarch64.rpm
+util-linux-lang-2.40.2-3.azl3.aarch64.rpm
+util-linux-libs-2.40.2-3.azl3.aarch64.rpm
 which-2.21-8.azl3.aarch64.rpm
 which-debuginfo-2.21-8.azl3.aarch64.rpm
 xz-5.4.4-2.azl3.aarch64.rpm
