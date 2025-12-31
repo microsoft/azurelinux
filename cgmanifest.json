@@ -19293,8 +19293,8 @@
         "type": "other",
         "other": {
           "name": "perl-Params-ValidationCompiler",
-          "version": "0.30",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Params/Params-ValidationCompiler-0.30.tar.gz"
+          "version": "0.31",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Params/Params-ValidationCompiler-0.31.tar.gz"
         }
       }
     },
