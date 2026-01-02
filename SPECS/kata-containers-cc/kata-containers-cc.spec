@@ -3,7 +3,7 @@
 
 Name:         kata-containers-cc
 Version:      3.15.0.aks0
-Release:      5%{?dist}
+Release:      6%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 URL:          https://github.com/microsoft/kata-containers
@@ -11,7 +11,7 @@ Vendor:       Microsoft Corporation
 Distribution: Azure Linux
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{sourceName}-%{version}.tar.gz
 Source1:      %{sourceName}-%{version}-cargo.tar.gz
-
+Patch0:       rust-1.90-fixes.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -150,6 +150,10 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0-aks0-6
+- Bump release to rebuild with rust
+- Add patch to suppress dead_code warnings and add explicit lifetime for U32Set iterator
+
 * Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0-aks0-5
 - Bump release to rebuild with rust
 
