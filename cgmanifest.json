@@ -10711,8 +10711,8 @@
         "type": "other",
         "other": {
           "name": "libotf",
-          "version": "0.9.13",
-          "downloadUrl": "http://download.savannah.gnu.org/releases/m17n/libotf-0.9.13.tar.gz"
+          "version": "0.9.16",
+          "downloadUrl": "https://download.savannah.gnu.org/releases/m17n/libotf-0.9.16.tar.gz"
         }
       }
     },
