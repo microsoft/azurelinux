@@ -28676,8 +28676,8 @@
         "type": "other",
         "other": {
           "name": "suitesparse",
-          "version": "5.4.0",
-          "downloadUrl": "https://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-5.4.0.tar.gz"
+          "version": "7.11.0",
+          "downloadUrl": "https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/v7.11.0/suitesparse-7.11.0.tar.gz"
         }
       }
     },
