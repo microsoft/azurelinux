@@ -6,12 +6,13 @@ Distribution:   Azure Linux
 Summary:        Optimizer for PNG (Portable Network Graphics) files
 Name:           pngcrush
 Version:        1.8.13
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        zlib
 URL:            http://pmt.sourceforge.net/%{name}/
 Source0:        http://downloads.sourceforge.net/pmt/%{name}-%{version}-nolib.tar.xz
 # from Debian sid.
 Source1:        %{name}.sgml
+Patch0:         pngcrush-1.8.13-fix-undeclared-identifier.patch
 BuildRequires:  docbook-utils
 BuildRequires:  gcc
 BuildRequires:  libpng-devel
@@ -26,7 +27,7 @@ remove unwanted ancillary chunks, or to add certain chunks including gAMA,
 tRNS, iCCP, and textual chunks. 
 
 %prep
-%autosetup -n %{name}-%{version}-nolib
+%autosetup -p1 -n %{name}-%{version}-nolib
 cp %{SOURCE1} . 
 
 %build
@@ -46,6 +47,9 @@ docbook2man %{name}.sgml
 %doc %{_mandir}/man1/%{name}.1.gz
 
 %changelog
+* Fri Dec 19 2025 Ratiranjan Behera <v-ratbehera@microsoft.com> - 1.8.13-12
+- Added patch from Fedora to fix build.
+
 * Mon Mar 06 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.8.13-11
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License Verified
