@@ -63,7 +63,7 @@ Patch4:         CVE-2025-27144.patch
 Patch5:         CVE-2025-22868.patch
 Patch6:         CVE-2025-10543.patch
 BuildRequires:  clang
-BuildRequires:  msft-golang
+BuildRequires:  golang
 BuildRequires:  kernel-headers
 BuildRequires:  protobuf-devel
 BuildRequires:  rust < 1.85.0
@@ -151,6 +151,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Fri Jan 02 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.8.0-1
+- Upgrade to 2.8.0 for CVE-CVE-2024-30896
+
 * Wed Dec 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-10
 - Patch for CVE-2025-10543
 
