@@ -137,7 +137,7 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 %license LICENSES/CC-BY-4.0.txt
 
 %changelog
-* Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 41.0.139-2
+* Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 41.0.139-3
 - Bump release to rebuild with rust
 
 * Thu Oct 09 2025 Saul Paredes <saulparedes@microsoft.com> -  41.0.139-2
