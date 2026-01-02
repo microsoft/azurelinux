@@ -1518,7 +1518,6 @@
                 "perl-Test-Requires",
                 "perl-Test-RequiresInternet",
                 "perl-Test-Script",
-                "perl-Test-Simple",
                 "perl-Test-SubCalls",
                 "perl-Test-Synopsis",
                 "perl-Test-Taint",
