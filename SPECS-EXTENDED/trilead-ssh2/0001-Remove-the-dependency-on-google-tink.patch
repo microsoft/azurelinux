@@ -1,0 +1,161 @@
+From 933d197b30e797d4b82eeef1953fd82e617f4cf0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Fridrich=20=C5=A0trba?= <fridrich.strba@bluewin.ch>
+Date: Wed, 13 Mar 2024 07:05:36 +0100
+Subject: [PATCH] Remove the dependency on google tink
+
+---
+ .../ssh2/crypto/dh/Curve25519Exchange.java    | 85 -------------------
+ .../ssh2/crypto/dh/GenericDhExchange.java     |  3 -
+ .../trilead/ssh2/transport/KexManager.java    |  9 +-
+ 3 files changed, 1 insertion(+), 96 deletions(-)
+ delete mode 100644 src/com/trilead/ssh2/crypto/dh/Curve25519Exchange.java
+
+diff --git a/src/com/trilead/ssh2/crypto/dh/Curve25519Exchange.java b/src/com/trilead/ssh2/crypto/dh/Curve25519Exchange.java
+deleted file mode 100644
+index 01d4ab4..0000000
+--- a/src/com/trilead/ssh2/crypto/dh/Curve25519Exchange.java
++++ /dev/null
+@@ -1,85 +0,0 @@
+-package com.trilead.ssh2.crypto.dh;
+-
+-import com.google.crypto.tink.subtle.X25519;
+-
+-import java.io.IOException;
+-import java.math.BigInteger;
+-import java.security.InvalidKeyException;
+-
+-/**
+- * Created by Kenny Root on 1/23/16.
+- */
+-public class Curve25519Exchange extends GenericDhExchange {
+-	public static final String NAME = "curve25519-sha256";
+-	public static final String ALT_NAME = "curve25519-sha256@libssh.org";
+-	public static final int KEY_SIZE = 32;
+-
+-	private byte[] clientPublic;
+-	private byte[] clientPrivate;
+-	private byte[] serverPublic;
+-
+-	public Curve25519Exchange() {
+-		super();
+-	}
+-
+-	/*
+-	 * Used to test known vectors.
+-	 */
+-	public Curve25519Exchange(byte[] secret) throws InvalidKeyException {
+-		if (secret.length != KEY_SIZE) {
+-			throw new AssertionError("secret must be key size");
+-		}
+-		clientPrivate = secret.clone();
+-	}
+-
+-	@Override
+-	public void init(String name) throws IOException {
+-		if (!NAME.equals(name) && !ALT_NAME.equals(name)) {
+-			throw new IOException("Invalid name " + name);
+-		}
+-
+-		clientPrivate = X25519.generatePrivateKey();
+-		try {
+-			clientPublic = X25519.publicFromPrivate(clientPrivate);
+-		} catch (InvalidKeyException e) {
+-			throw new IOException(e);
+-		}
+-	}
+-
+-	@Override
+-	public byte[] getE() {
+-		return clientPublic.clone();
+-	}
+-
+-	@Override
+-	protected byte[] getServerE() {
+-		return serverPublic.clone();
+-	}
+-
+-	@Override
+-	public void setF(byte[] f) throws IOException {
+-		if (f.length != KEY_SIZE) {
+-			throw new IOException("Server sent invalid key length " + f.length + " (expected " +
+-					KEY_SIZE + ")");
+-		}
+-		serverPublic = f.clone();
+-		try {
+-			byte[] sharedSecretBytes = X25519.computeSharedSecret(clientPrivate, serverPublic);
+-			int allBytes = 0;
+-			for (int i = 0; i < sharedSecretBytes.length; i++) {
+-				allBytes |= sharedSecretBytes[i];
+-			}
+-			if (allBytes == 0) {
+-				throw new IOException("Invalid key computed; all zeroes");
+-			}
+-			sharedSecret = new BigInteger(1, sharedSecretBytes);
+-		} catch (InvalidKeyException e) {
+-			throw new IOException(e);
+-		}
+-	}
+-
+-	@Override
+-	public String getHashAlgo() {
+-		return "SHA-256";
+-	}
+-}
+diff --git a/src/com/trilead/ssh2/crypto/dh/GenericDhExchange.java b/src/com/trilead/ssh2/crypto/dh/GenericDhExchange.java
+index c2436e3..a63b9fd 100644
+--- a/src/com/trilead/ssh2/crypto/dh/GenericDhExchange.java
++++ b/src/com/trilead/ssh2/crypto/dh/GenericDhExchange.java
+@@ -29,9 +29,6 @@ public abstract class GenericDhExchange
+ 	}
+ 
+ 	public static GenericDhExchange getInstance(String algo) {
+-		if (Curve25519Exchange.NAME.equals(algo) || Curve25519Exchange.ALT_NAME.equals(algo)) {
+-			return new Curve25519Exchange();
+-		}
+ 		if (algo.startsWith("ecdh-sha2-")) {
+ 			return new EcDhExchange();
+ 		} else {
+diff --git a/src/com/trilead/ssh2/transport/KexManager.java b/src/com/trilead/ssh2/transport/KexManager.java
+index c2ec2b0..2c8056a 100644
+--- a/src/com/trilead/ssh2/transport/KexManager.java
++++ b/src/com/trilead/ssh2/transport/KexManager.java
+@@ -17,7 +17,6 @@ import com.trilead.ssh2.crypto.CryptoWishList;
+ import com.trilead.ssh2.crypto.KeyMaterial;
+ import com.trilead.ssh2.crypto.cipher.BlockCipher;
+ import com.trilead.ssh2.crypto.cipher.BlockCipherFactory;
+-import com.trilead.ssh2.crypto.dh.Curve25519Exchange;
+ import com.trilead.ssh2.crypto.dh.DhGroupExchange;
+ import com.trilead.ssh2.crypto.dh.GenericDhExchange;
+ import com.trilead.ssh2.crypto.digest.MessageMac;
+@@ -397,8 +396,6 @@ public class KexManager implements MessageHandler
+ 
+ 			if ("ecdh-sha2-nistp521".equals(algo))
+ 				continue;
+-			if (Curve25519Exchange.NAME.equals(algo)||Curve25519Exchange.ALT_NAME.equals(algo))
+-				continue;
+ 			throw new IllegalArgumentException("Unknown kex algorithm '" + algo + "'");
+ 		}
+ 	}
+@@ -489,8 +486,6 @@ public class KexManager implements MessageHandler
+ 			}
+ 
+ 			if (kxs.np.kex_algo.equals("diffie-hellman-group1-sha1")
+-					|| kxs.np.kex_algo.equals(Curve25519Exchange.NAME)
+-					|| kxs.np.kex_algo.equals(Curve25519Exchange.ALT_NAME)
+ 					|| kxs.np.kex_algo.equals("diffie-hellman-group14-sha1")
+ 					|| kxs.np.kex_algo.equals("ecdh-sha2-nistp521")
+ 					|| kxs.np.kex_algo.equals("ecdh-sha2-nistp384")
+@@ -630,9 +625,7 @@ public class KexManager implements MessageHandler
+ 				|| kxs.np.kex_algo.equals("diffie-hellman-group14-sha1")
+ 				|| kxs.np.kex_algo.equals("ecdh-sha2-nistp256")
+ 				|| kxs.np.kex_algo.equals("ecdh-sha2-nistp384")
+-				|| kxs.np.kex_algo.equals("ecdh-sha2-nistp521")
+-				|| kxs.np.kex_algo.equals(Curve25519Exchange.NAME)
+-				|| kxs.np.kex_algo.equals(Curve25519Exchange.ALT_NAME))
++				|| kxs.np.kex_algo.equals("ecdh-sha2-nistp521"))
+ 		{
+ 			if (kxs.state == 1)
+ 			{
+-- 
+2.44.0
+

@@ -2297,8 +2297,18 @@
         "type": "other",
         "other": {
           "name": "criu",
-          "version": "3.15",
-          "downloadUrl": "http://download.openvz.org/criu/criu-3.15.tar.bz2"
+          "version": "4.1.1",
+          "downloadUrl": "https://github.com/checkpoint-restore/criu/archive/v4.1.1/criu-4.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "crun",
+          "version": "1.24",
+          "downloadUrl": "https://github.com/containers/crun/releases/download/1.24/crun-1.24.tar.gz"
         }
       }
     },
@@ -3160,6 +3170,16 @@
           "name": "ed",
           "version": "1.20",
           "downloadUrl": "https://ftp.gnu.org/gnu/ed/ed-1.20.tar.lz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ed25519-java",
+          "version": "0.3.0",
+          "downloadUrl": "https://github.com/str4d/ed25519-java/archive/v0.3.0/ed25519-java-0.3.0.tar.gz"
         }
       }
     },
@@ -7100,8 +7120,8 @@
         "type": "other",
         "other": {
           "name": "ibus-libzhuyin",
-          "version": "1.9.1",
-          "downloadUrl": "http://downloads.sourceforge.net/libzhuyin/ibus-libzhuyin/ibus-libzhuyin-1.9.1.tar.gz"
+          "version": "1.10.4",
+          "downloadUrl": "https://downloads.sourceforge.net/libzhuyin/ibus-libzhuyin/ibus-libzhuyin-1.10.4.tar.gz"
         }
       }
     },
@@ -7833,6 +7853,16 @@
           "name": "javassist",
           "version": "3.30.2",
           "downloadUrl": "https://github.com/jboss-javassist/javassist/archive/refs/tags/rel_3_30_2_ga.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "jbcrypt",
+          "version": "1.0.2",
+          "downloadUrl": "https://github.com/kruton/jbcrypt/archive/refs/tags/1.0.2.tar.gz"
         }
       }
     },
@@ -10761,8 +10791,8 @@
         "type": "other",
         "other": {
           "name": "libpinyin",
-          "version": "2.9.92",
-          "downloadUrl": "https://downloads.sourceforge.net/libpinyin/libpinyin/libpinyin-2.9.92.tar.gz"
+          "version": "2.10.3",
+          "downloadUrl": "https://downloads.sourceforge.net/libpinyin/libpinyin/libpinyin-2.10.3.tar.gz"
         }
       }
     },
@@ -19673,8 +19703,8 @@
         "type": "other",
         "other": {
           "name": "perl-Return-MultiLevel",
-          "version": "0.05",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MA/MAUKE/Return-MultiLevel-0.05.tar.gz"
+          "version": "0.08",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Return-MultiLevel-0.08.tar.gz"
         }
       }
     },
@@ -22833,8 +22863,8 @@
         "type": "other",
         "other": {
           "name": "python-filelock",
-          "version": "3.14.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/f/filelock/filelock-3.14.0.tar.gz"
+          "version": "3.20.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/f/filelock/filelock-3.20.1.tar.gz"
         }
       }
     },
@@ -29296,8 +29326,8 @@
         "type": "other",
         "other": {
           "name": "trilead-ssh2",
-          "version": "217.8",
-          "downloadUrl": "https://github.com/jenkinsci/trilead-ssh2/archive/trilead-ssh2-build217-jenkins-8.tar.gz"
+          "version": "217.371.vc1d30dc5a_b_32",
+          "downloadUrl": "https://github.com/jenkinsci/trilead-ssh2/archive/refs/tags/build-217-jenkins-371.vc1d30dc5a_b_32.tar.gz"
         }
       }
     },
