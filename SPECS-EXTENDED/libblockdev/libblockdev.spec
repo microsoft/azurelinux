@@ -914,7 +914,7 @@ find %{buildroot} -type f -name "*.la" | xargs %{__rm}
 %files plugins-all
 
 %changelog
-* Thu Dec 24 2025 Sumit Jena <v-sumitjena@microsoft.com> - 3.4.0-1
+* Wed Dec 24 2025 Sumit Jena <v-sumitjena@microsoft.com> - 3.4.0-1
 - Update to 3.4.0
 
 * Thu Nov 7 2024 Jyoti Kanase <v-jykanase@microsoft.com> - 3.2.0-1
