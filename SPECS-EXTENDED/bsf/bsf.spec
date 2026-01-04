@@ -85,15 +85,17 @@ install -DTm 644 %{SOURCE1} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
 # javadoc
 install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr build/javadocs/* %{buildroot}%{_javadocdir}/%{name}
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
 %fdupes -s %{buildroot}%{_javadocdir}/%{name}
 
 %files -f .mfiles
-%license LICENSE.txt NOTICE.txt
+%license LICENSE.txt NOTICE.txt 
 %doc AUTHORS.txt CHANGES.txt README.txt TODO.txt RELEASE-NOTE.txt
 
 %files javadoc
-%license LICENSE.txt NOTICE.txt
+%license LICENSE.txt NOTICE.txt ADDITIONAL_LICENSE_INFO
 %{_javadocdir}/%{name}
+%exclude /usr/share/javadoc/bsf/legal/LICENSE
 
 %changelog
 * Tue Jan 03 2023 Sumedh Sharma <sumsharma@microsoft.com> - 2.4.0-19
