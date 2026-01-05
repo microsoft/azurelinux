@@ -246,9 +246,7 @@ pushd SuiteSparse-%{version}
 
   # collect docs and licenses in one place to ship
   find -iname lesser.txt -o -iname lesserv3.txt -o -iname license.txt -o \
-    -iname gpl.txt -o -iname GPLv2.txt -o -iname license -o \
-    -iname "CONTRIBUTOR-LICENSE.txt" -o \
-    -iname "SuiteSparse Individual Contributor License Agreement (20241011).pdf" \
+    -iname gpl.txt -o -iname GPLv2.txt -o -iname CONTRIBUTOR-LICENSE.txt -o -iname "SuiteSparse Individual Contributor License Agreement (20241011).pdf" -o -iname license \
     -a -not -type d | while read f; do
         b="${f%%/*}"
         r="${f#$b}"
