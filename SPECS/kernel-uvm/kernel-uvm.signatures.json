@@ -1,7 +1,7 @@
 {
   "Signatures": {
     "config": "11d7dcd506392b4933011b7144fe1a27c9b1b1d8610fc808d1e4606c1c19bf31",
-    "kernel-uvm-6.6.96.mshv1.tar.gz": "cb98adbb01b3c0aba96e9e80b1d8a8531028b1b7e33e583c931cb83f1e7df713",
-    "config_aarch64": "38352aeef618347c3b5b14316126fdcb12107fc1431ef9c9b1b779a74eecee2b"
+    "config_aarch64": "38352aeef618347c3b5b14316126fdcb12107fc1431ef9c9b1b779a74eecee2b",
+    "mshv-bootloader-lx-amd64-26100.7436.2511151828.1.tar.gz": "c8bee68ce7d31f04758fc81da0e70d32f15edcd6cc6da94c7701ac7e5fe23548"
   }
 }

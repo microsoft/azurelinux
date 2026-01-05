@@ -16,8 +16,8 @@
 
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
-Version:        6.6.96.mshv1
-Release:        2%{?dist}
+Version:        26100.7436.2511151828.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -165,6 +165,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Mon Jan 05 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 26100.7436.2511151828.1-1
+- Auto-upgrade to 26100.7436.2511151828.1
+
 * Wed Oct 08 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.96.mshv1-2
 - Enable build on aarch64
 
