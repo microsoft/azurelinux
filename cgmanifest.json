@@ -4610,8 +4610,13 @@
         "type": "other",
         "other": {
           "name": "gnupg2",
+<<<<<<< HEAD
           "version": "2.4.8",
           "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.4.8.tar.bz2"
+=======
+          "version": "2.4.9",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.4.9.tar.bz2"
+>>>>>>> 5936bd63f ([AUTOPATCHER-CORE] Upgrade `gnupg2` to 2.4.9 for CVE-2025-68973 [HIGH] (#15430))
         }
       }
     },

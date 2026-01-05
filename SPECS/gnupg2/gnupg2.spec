@@ -1,6 +1,10 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
+<<<<<<< HEAD
 Version:        2.4.8
+=======
+Version:        2.4.9
+>>>>>>> 5936bd63f ([AUTOPATCHER-CORE] Upgrade `gnupg2` to 2.4.9 for CVE-2025-68973 [HIGH] (#15430))
 Release:        1%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
@@ -104,8 +108,13 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %defattr(-,root,root)
 
 %changelog
+<<<<<<< HEAD
 * Mon Dec 22 2025 Ratiranjan Behera <v-ratbehera@microsoft.com> - 2.4.8-1
 - Upgrade gnupg2 to 2.4.8 for CVE-2025-30258
+=======
+* Mon Jan 05 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.9-1
+- Auto-upgrade to 2.4.9 - for CVE-2025-68973
+>>>>>>> 5936bd63f ([AUTOPATCHER-CORE] Upgrade `gnupg2` to 2.4.9 for CVE-2025-68973 [HIGH] (#15430))
 
 * Mon Jun 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.4.7-1
 - Upgrade to version 2.4.7
