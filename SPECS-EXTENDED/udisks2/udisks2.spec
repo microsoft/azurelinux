@@ -7,9 +7,9 @@
 %global with_gtk_doc                    1
 %global libblockdev_version             3.0
 
-%define enable_iscsi                    0
+%define enable_iscsi                    1
 %define with_btrfs                      1
-%define with_lsm                        0
+%define with_lsm                        1
 
 %define is_git                          %(git show > /dev/null 2>&1 && echo 1 || echo 0)
 %define git_hash                        %(git log -1 --pretty=format:"%h" || true)
