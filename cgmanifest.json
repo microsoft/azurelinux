@@ -29275,6 +29275,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "trident",
+          "version": "0.20.0",
+          "downloadUrl": "https://github.com/microsoft/trident/archive/refs/tags/v0.20.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "trilead-ssh2",
           "version": "217.8",
           "downloadUrl": "https://github.com/jenkinsci/trilead-ssh2/archive/trilead-ssh2-build217-jenkins-8.tar.gz"

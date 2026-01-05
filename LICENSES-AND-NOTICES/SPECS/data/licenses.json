@@ -2450,6 +2450,7 @@
                 "tinyxml2",
                 "toml11",
                 "tracelogging",
+                "trident",
                 "umoci",
                 "usrsctp",
                 "vala",
