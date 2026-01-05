@@ -98,7 +98,7 @@ mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
 %exclude /usr/share/javadoc/bsf/legal/LICENSE
 
 %changelog
-* Fri Jan 02 2025 Sumit Jena <v-sumitjena@microsoft.com> - 2.4.0-20
+* Fri Jan 02 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.4.0-20
 - Fixed License Warnings.
 - Added additional License file.
 
