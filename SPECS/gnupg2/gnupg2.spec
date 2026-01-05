@@ -93,7 +93,6 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %{_mandir}/man1/*
 %{_mandir}/man7/*
 %{_mandir}/man8/*
-%{_mandir}/manh/*
 %{_infodir}/gnupg*
 %{_libexecdir}/*
 %{_datadir}/gnupg/*
