@@ -1815,11 +1815,8 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 ) (err error) {
 	var (
 		pubKeyData []string
-		exists     bool
 	)
 	const squashErrors = false
-	const authorizedKeysTempFilePerms = 0644
-	const authorizedKeysTempFile = "/tmp/authorized_keys"
 	const sshDirectoryPermission = "0700"
 
 	// Skip user SSH directory generation when not provided with public keys
@@ -1835,25 +1832,15 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 
 	authorizedKeysFile := filepath.Join(userSSHKeyDir, userutils.SSHAuthorizedKeysFileName)
 
-	exists, err = file.PathExists(authorizedKeysTempFile)
+	// Create a guaranteed unique temporary file for authorized_keys as a staging file which we will copy
+	// into the chroot.
+	tmpFile, err := os.CreateTemp("", "authorized_keys_*")
 	if err != nil {
-		logger.Log.Warnf("Error accessing %s file : %v", authorizedKeysTempFile, err)
+		logger.Log.Warnf("Failed to create temporary authorized_keys file: %v", err)
 		return
 	}
-	if !exists {
-		logger.Log.Debugf("File %s does not exist. Creating file...", authorizedKeysTempFile)
-		err = file.Create(authorizedKeysTempFile, authorizedKeysTempFilePerms)
-		if err != nil {
-			logger.Log.Warnf("Failed to create %s file : %v", authorizedKeysTempFile, err)
-			return
-		}
-	} else {
-		err = os.Truncate(authorizedKeysTempFile, 0)
-		if err != nil {
-			logger.Log.Warnf("Failed to truncate %s file : %v", authorizedKeysTempFile, err)
-			return
-		}
-	}
+	authorizedKeysTempFile := tmpFile.Name()
+	tmpFile.Close()
 	defer os.Remove(authorizedKeysTempFile)
 
 	allSSHKeys := []string(nil)
