@@ -35,7 +35,7 @@ This package contains libraries and header files for
 developing applications that use %{name} libraries.
 
 %prep
-%autosetup -n %{name}-stable
+%autosetup -p1 -n %{name}-stable
 
 %build
 %configure \
