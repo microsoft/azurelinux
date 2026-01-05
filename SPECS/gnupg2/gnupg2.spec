@@ -1,6 +1,6 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
-Version:        2.4.7
+Version:        2.4.9
 Release:        1%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
@@ -105,6 +105,9 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %defattr(-,root,root)
 
 %changelog
+* Mon Jan 05 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.9-1
+- Auto-upgrade to 2.4.9 - for CVE-2025-68973
+
 * Mon Jun 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.4.7-1
 - Upgrade to version 2.4.7
 
