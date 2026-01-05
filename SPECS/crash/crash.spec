@@ -11,7 +11,18 @@ Source0:       https://github.com/crash-utility/%{name}/archive/%{version}.tar.g
 # crash requires gdb tarball for the build. There is no option to use the host gdb. For crash 9.0.0 requires minimum gdb version is 16.2.
 Source1:       gdb-%{gdb_version}.tar.gz
 # lzo patch sourced from https://src.fedoraproject.org/rpms/crash/blob/rawhide/f/lzo_snappy_zstd.patch
+
+# Since we have two source tarballs to patch, we use separate patch numbering
+# to indicate where patches are applied where during the prep section.
+# Patch 0-99 will automatically apply to Source0 (crash)
+# Patch 100+ will automatically apply to Source1 (gdb)
+
+# Patches for crash sources
 Patch0:        lzo_snappy_zstd.patch
+# Patches for gdb sources
+Patch100:      CVE-2022-37434.patch
+Patch101:      CVE-2025-11082.patch
+
 License:       GPLv3+
 BuildRequires: binutils
 BuildRequires: glibc-devel
@@ -45,9 +56,24 @@ This package contains the "crash-target-arm64" binary for analyzing arm64 crash 
 %endif
 
 %prep
-%autosetup -n %{name}-%{version}
-# make expect the gdb tarball to be named with its version only, gdb-[version].tar.gz, e.g.: gdb-10.2.tar.gz
-cp %{SOURCE1} ./gdb-%{gdb_version}.tar.gz
+# -N skips automatic patch application
+%autosetup -n %{name}-%{version} -N
+
+# Apply only patches 0-99 to original crash source
+%autopatch -p1 -M 99
+
+# Extract and patch secondary gdb sources, re-tar.gz it, and clean up the working directory.
+# Note: crash's make expects the gdb tarball to be named with its version only, gdb-[version].tar.gz, e.g.: gdb-10.2.tar.gz
+tar -xzf %{SOURCE1}
+pushd gdb-%{gdb_version}
+%autopatch -p1 -m 100
+popd
+# Re-tar with consistent timestamps for reproducibility
+tar --sort=name \
+    --mtime="@${SOURCE_DATE_EPOCH:-$(date +%s)}" \
+    --owner=0 --group=0 --numeric-owner \
+    -czf gdb-%{gdb_version}.tar.gz gdb-%{gdb_version}
+rm -rf gdb-%{gdb_version}/
 
 %build
 %ifarch x86_64
