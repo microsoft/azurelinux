@@ -1,0 +1,25 @@
+From 8c38540d5ab78c856b07d799015cb0c94d2f9a55 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Lubo=C5=A1=20Uhliarik?= <luhliari@redhat.com>
+Date: Wed, 31 Jul 2024 17:47:10 +0200
+Subject: [PATCH 5/5] Compile perl module with O2
+
+---
+ src/http/modules/perl/Makefile.PL | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/http/modules/perl/Makefile.PL b/src/http/modules/perl/Makefile.PL
+index 7edadcb3d53e..2ebb7c4c6eb4 100644
+--- a/src/http/modules/perl/Makefile.PL
++++ b/src/http/modules/perl/Makefile.PL
+@@ -14,7 +14,7 @@ WriteMakefile(
+     AUTHOR            => 'Igor Sysoev',
+ 
+     CCFLAGS           => "$ENV{NGX_PM_CFLAGS}",
+-    OPTIMIZE          => '-O',
++    OPTIMIZE          => '-O2',
+ 
+     LDDLFLAGS         => "$ENV{NGX_PM_LDFLAGS}",
+ 
+-- 
+2.52.0
+
