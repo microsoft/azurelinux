@@ -1,7 +1,7 @@
 Summary:        Bean Scripting Framework
 Name:           bsf
 Version:        2.4.0
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -98,6 +98,10 @@ mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
 %exclude /usr/share/javadoc/bsf/legal/LICENSE
 
 %changelog
+* Fri Jan 02 2025 Sumit Jena <v-sumitjena@microsoft.com> - 2.4.0-20
+- Fixed License Warnings.
+- Added additional License file.
+
 * Tue Jan 03 2023 Sumedh Sharma <sumsharma@microsoft.com> - 2.4.0-19
 - License verified
 
