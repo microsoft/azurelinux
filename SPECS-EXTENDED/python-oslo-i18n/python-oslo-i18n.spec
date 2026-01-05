@@ -111,6 +111,7 @@ done
 %tox -e docs
 # remove the sphinx-build-3 leftovers
 rm -rf doc/build/html/.{doctrees,buildinfo}
+rm -f doc/build/html/_static/images/docs/license.png
 
 # Fix this rpmlint warning
 if [ -f html/_static/jquery.js ]; then
@@ -140,7 +141,6 @@ mv %{buildroot}%{python3_sitelib}/oslo_i18n/locale %{buildroot}%{_datadir}/local
 %files -n python-%{pkg_name}-doc
 %license LICENSE
 %doc doc/build/html
-%exclude %{_pkgdocdir}/html/_static/images/docs/license.png
 %endif
 
 %files -n python-%{pkg_name}-lang -f oslo_i18n.lang
