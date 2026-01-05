@@ -89,7 +89,7 @@ mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
 %fdupes -s %{buildroot}%{_javadocdir}/%{name}
 
 %files -f .mfiles
-%license LICENSE.txt NOTICE.txt 
+%license LICENSE.txt NOTICE.txt
 %doc AUTHORS.txt CHANGES.txt README.txt TODO.txt RELEASE-NOTE.txt
 
 %files javadoc
