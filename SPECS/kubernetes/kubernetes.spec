@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.30.10
-Release:        14%{?dist}
+Release:        18%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,8 +27,13 @@ Patch5:         CVE-2024-51744.patch
 Patch6:         CVE-2025-30204.patch
 Patch7:         CVE-2025-22872.patch
 Patch8:         CVE-2025-4563.patch
+Patch9:         CVE-2025-31133.patch
+Patch10:        CVE-2025-52565.patch
+Patch11:        CVE-2025-13281.patch
+Patch12:        CVE-2025-65637.patch
+Patch13:        CVE-2025-52881.patch
 BuildRequires:  flex-devel
-BuildRequires:  glibc-static >= 2.38-15%{?dist}
+BuildRequires:  glibc-static >= 2.38-16%{?dist}
 BuildRequires:  golang < 1.25
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
@@ -278,13 +283,25 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Thu Dec 18 2025 Aditya Singh <v-aditysing@microsoft.com> - 1.30.10-18
+- Address CVE-2025-52881
+
+* Tue Dec 16 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-17
+- Patch for CVE-2025-13281, CVE-2025-65637
+
+* Mon Dec 1 2025 Andrew Phelps <anphel@microsoft.com> - 1.30.10-16
+- Bump to rebuild with updated glibc
+
+* Mon Nov 24 2025 Aditya Singh <v-aditysing@microsoft.com> - 1.30.10-15
+- Address CVE-2025-31133, CVE-2025-52565
+
 * Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.30.10-14
 - Bump to rebuild with updated glibc
 
 * Wed Oct 08 2025 Andrew Phelps <anphel@microsoft.com> - 1.30.10-13
 - Bump to rebuild with updated glibc
 
-* Fri Sep 17 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.30.10-12
+* Wed Sep 17 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.30.10-12
 - Bump to rebuild with updated glibc
 
 * Fri Sep 05 2025 Andrew Phelps <anphel@microsoft.com> - 1.30.10-11

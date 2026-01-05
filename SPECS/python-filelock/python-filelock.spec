@@ -1,13 +1,14 @@
 %global srcname filelock
 Summary:        A platform independent file lock
 Name:           python-filelock
-Version:        3.14.0
+Version:        3.20.1
 Release:        1%{?dist}
 License:        Unlicense
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/toxdev/filelock
 Source0:        https://files.pythonhosted.org/packages/source/f/%{srcname}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         remove-python-3.14-classifier.patch
 BuildArch:      noarch
 
 %description
@@ -30,6 +31,7 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-setuptools_scm
 BuildRequires:  python%{python3_pkgversion}-trove-classifiers
 %if %{with check}
+BuildRequires:  python%{python3_pkgversion}-pytest-asyncio
 BuildRequires:  python%{python3_pkgversion}-pytest
 BuildRequires:  python%{python3_pkgversion}-pytest-mock
 %endif
@@ -55,14 +57,22 @@ the same lock object twice, it will not block.
 %pyproject_save_files %{srcname}
 
 %check
+sed -i '/asyncio_default_fixture_loop_scope/d' pyproject.toml
+sed -i '/verbosity_assertions/d' pyproject.toml
 pip3 install iniconfig
-%pytest
+pip3 install pytest-virtualenv
+pip3 install pytest-timeout
+pip3 install pytest-asyncio
+%pytest -k "not test_mtime_zero_exit_branch" -v
 
 %files -n python%{python3_pkgversion}-%{srcname} -f %{pyproject_files}
 %doc README.md
 %license %{python3_sitelib}/%{srcname}-%{version}.dist-info/licenses/LICENSE
 
 %changelog
+* Tue Dec 23 2025 Archana Shettigar <v-shettigara@microsoft.com> - 3.20.1-1
+- Auto-upgrade to 3.20.1 - for CVE-2025-68146
+
 * Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.14.0-1
 - Lot of redoing to use pyproject
 - Removing 'docs' subpackage since the new src doesn't include that folder

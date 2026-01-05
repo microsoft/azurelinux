@@ -3,7 +3,7 @@
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.44
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,7 @@ Source0:        https://dev.mysql.com/get/Downloads/MySQL-%{majmin}/%{name}-boos
 # ciphers unavailable.
 Patch1:         fix-tests-for-unsupported-chacha-ciphers.patch
 Patch2:         CVE-2012-2677.patch
+Patch3:         CVE-2025-62813.patch
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
 BuildRequires:  openssl-devel
@@ -113,6 +114,9 @@ sudo -u test ctest || { cat Testing/Temporary/LastTest.log || echo 'No log found
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Tue Oct 28 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.0.44-2
+- Patch for CVE-2025-62813
+
 * Wed Oct 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.44-1
 - Upgrade to 8.0.44 for CVE-2025-53069, CVE-2025-53042, CVE-2025-53044, CVE-2025-53040, CVE-2025-53062, CVE-2025-53053, CVE-2025-53045, CVE-2025-53054
 

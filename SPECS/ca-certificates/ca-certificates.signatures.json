@@ -10,7 +10,7 @@
     "README.src": "86184318d451bec55d70c84e618cbfe10c8adb7dc893964ce4aaecff99d83433",
     "README.usr": "0d2e90b6cf575678cd9d4f409d92258ef0d676995d4d733acdb2425309a38ff8",
     "bundle2pem.sh": "a61e0d9f34e21456cfe175e9a682f56959240e66dfeb75bd2457226226aa413a",
-    "certdata.base.txt": "8896c309aef808c7769dc630abee75adbb6bfb5c8a961461b51f845a1740ea66",
+    "certdata.base.txt": "4bef2bd5e4f4693c424b92a4b9862d9fa8a62a654c998a4ca8c1e82bdcd62e99",
     "certdata.distrusted.txt": "536b1235c5b0b3c82ddf303eca696ec164cdb21899cd9e5313d8b29ce9cdc268",
     "certdata.microsoft.txt": "38cd7da10bce27751cfee01b2fdaa55f52321cdf1a408ec658bbf591b64cc484",
     "certdata2pem.py": "4f5848c14210758f19ab9fdc9ffd83733303a48642a3d47c4d682f904fdc0f33",

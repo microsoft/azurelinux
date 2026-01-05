@@ -1,16 +1,19 @@
-%global         extended_release 0.65.g9093bae
-%global         MLNX_OFED_VERSION 24.10-0.7.0.0
+%global         extended_release 0.104.g0c03534
+%global         MLNX_OFED_VERSION 25.07-0.9.7.1
 Summary:        IB Performance tests
 Name:           perftest
 # Update extended_release with version updates
-Version:        24.10.0
+Version:        25.07.0
 Release:        1%{?dist}
 License:        BSD or GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Productivity/Networking/Diagnostic
 URL:            https://www.openfabrics.org
-Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/%{MLNX_OFED_VERSION}/SRPMS/%{name}-%{version}-%{extended_release}.tar.gz#/%{name}-%{version}.tar.gz
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:        %{_distro_sources_url}/%{name}-%{version}-%{extended_release}.tar.gz
 BuildRequires:  libibumad-devel
 BuildRequires:  libibverbs-devel
 BuildRequires:  librdmacm-devel
@@ -38,6 +41,10 @@ chmod -x runme
 %_mandir/man1/*.1*
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07.0-1
+- Upgrade version to 25.07.0.
+- Update source path
+
 * Wed Jan 08 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 24.10.0-1
 - Upgrade version to 24.10.0
 
