@@ -3,12 +3,13 @@
 Summary:        The Sodium crypto library
 Name:           libsodium
 Version:        1.0.19
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://libsodium.org/
 Source0:        https://download.libsodium.org/%{name}/releases/%{name}-%{version}.tar.gz
+Patch0:         CVE-2025-69277.patch
 BuildRequires:  gcc
 BuildRequires:  make
 
@@ -68,6 +69,9 @@ find %{buildroot} -type f -name "*.a" -delete -print
 
 
 %changelog
+* Mon Jan 05 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.19-2
+- Patch for CVE-2025-69277
+
 * Fri Feb 02 2024 Thien Trung Vuong <tvuong@microsoft.com> - 1.0.19-1
 - Update to version 1.0.19
 - Update soname to 26
