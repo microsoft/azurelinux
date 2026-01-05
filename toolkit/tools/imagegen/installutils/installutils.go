@@ -1840,8 +1840,12 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 		return
 	}
 	authorizedKeysTempFile := tmpFile.Name()
-	tmpFile.Close()
 	defer os.Remove(authorizedKeysTempFile)
+
+	if err = tmpFile.Close(); err != nil {
+		logger.Log.Warnf("Failed to close temporary authorized_keys file: %v", err)
+		return
+	}
 
 	allSSHKeys := []string(nil)
 
