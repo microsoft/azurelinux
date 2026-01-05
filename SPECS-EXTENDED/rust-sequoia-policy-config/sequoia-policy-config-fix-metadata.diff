@@ -1,0 +1,18 @@
+--- sequoia-policy-config-0.8.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ sequoia-policy-config-0.8.1/Cargo.toml	2025-11-18T14:38:34.380555+00:00
+@@ -75,11 +75,8 @@
+ version = "1"
+ default-features = false
+ 
+-[target."cfg(not(windows))".dev-dependencies.sequoia-openpgp]
+-version = "2"
+-features = [
+-    "crypto-nettle",
+-    "__implicit-crypto-backend-for-tests",
+-]
+-default-features = false
++[features]
++crypto-nettle = ["sequoia-openpgp/crypto-nettle"]
++crypto-openssl = ["sequoia-openpgp/crypto-openssl"]
++crypto-rust = ["sequoia-openpgp/crypto-rust"]
+ 
