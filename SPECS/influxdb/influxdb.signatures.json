@@ -1,8 +1,8 @@
 {
   "Signatures": {
     "influxdb-2.8.0-vendor.tar.gz": "498ba467b6b5b0adbe9a5e6e1079725fbcba6aabb6e130239063b0ea3170ce8e",
-    "influxdb-2.8.0-static-data.tar.gz": "954c7914fa46cd0dd8b672676f15b408195fb794c15acdf67777e59efa3aab37",
-    "config.yaml": "d3c2224c67665929764d9056583df9796f71c36499ace0ef9dccd1df235d5ee5",
+    "influxdb-2.8.0-static-data.tar.gz": "066b616fc1a27acf96b2c1ebc158769b9a82d2053ead8db2298f074e0da4f2ae",
+    "config.yaml": "59328d9d5e8441d08baaa59996845311018877fb71d73c132ceec2e3f6a36305",
     "influxdb.service": "570fdbb685c8468f3c4e75b7f482bbc5c0ab4382ad2259a595e7839244747645",
     "influxdb-user.conf": "ca5a50bb6ca9f4fcb91d745d552e70af934fdad86196c535c4eb8699a20e7aa0",
     "influxdb.tmpfiles": "2e1880f1d7675464b93984a635e770f6f8ac1777d21a607f7e4d9d1480776f68",
