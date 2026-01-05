@@ -10751,8 +10751,8 @@
         "type": "other",
         "other": {
           "name": "libpcap",
-          "version": "1.10.5",
-          "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.10.5.tar.gz"
+          "version": "1.10.6",
+          "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.10.6.tar.gz"
         }
       }
     },
