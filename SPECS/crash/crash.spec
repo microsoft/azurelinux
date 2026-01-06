@@ -8,7 +8,7 @@ Vendor:        Microsoft Corporation
 Distribution:  Azure Linux
 URL:           https://github.com/crash-utility/crash
 Source0:       https://github.com/crash-utility/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# crash requires gdb tarball for the build. There is no option to use the host gdb. For crash 9.0.0 requires minimum gdb version is 16.2.
+# crash requires gdb tarball for the build. There is no option to use the host gdb. For crash 9.0.0, the minimum required gdb version is 16.2.
 Source1:       gdb-%{gdb_version}.tar.gz
 # lzo patch sourced from https://src.fedoraproject.org/rpms/crash/blob/rawhide/f/lzo_snappy_zstd.patch
 
