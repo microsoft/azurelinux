@@ -1,4 +1,4 @@
-%define our_gopath %{_topdir}/.gopath
+%global selinuxtype targeted
 
 Summary:        Agent for bare metal platform
 Name:           trident
@@ -20,13 +20,9 @@ Source0:        https://github.com/microsoft/trident/archive/refs/tags/v%{versio
 #
 Source1:        %{name}-%{version}-cargo.tar.gz
 
-%description
-Trident. This package provides the Trident tool
-and its dependencies for managing the lifecycle of Azure Linux hosts.
-
-BuildRequires:  rust < 1.85.0
+BuildRequires:  cargo >= 1.85.0
+BuildRequires:  rust >= 1.85.0
 BuildRequires:  openssl-devel
-BuildRequires:  rust
 BuildRequires:  systemd-units
 
 Requires:       e2fsprogs
@@ -55,6 +51,9 @@ Suggests:       ntfs-3g
 # For creating NTFS filesystems
 Suggests:       ntfsprogs
 
+%description
+Trident. This package provides the Trident tool
+and its dependencies for managing the lifecycle of Azure Linux hosts.
 
 %files
 %{_bindir}/%{name}
@@ -166,7 +165,8 @@ BuildRequires:       selinux-policy-devel
 Custom SELinux policy module
 
 %files selinux
-%{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.*
+%{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
+
 %{_datadir}/selinux/devel/include/distributed/%{name}.if
 %ghost %verify(not md5 size mode mtime) %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/%{name}
 
@@ -202,17 +202,35 @@ be removed once the fix is merged in AZL 4.0.
 
 # ------------------------------------------------------------------------------
 
+%prep
+%autosetup -n %{name}-%{version} -p1
+
+# Do vendor expansion here manually by
+# calling `tar x` and setting up
+# .cargo/config to use it.
+tar fx %{SOURCE1}
+mkdir -p .cargo
+
+cat >.cargo/config << EOF
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"
+EOF
+
 %build
 export TRIDENT_VERSION="%{trident_version}"
 cargo build --release
 
 mkdir selinux
-cp -p %{SOURCE2} selinux/
-cp -p %{SOURCE3} selinux/
-cp -p %{SOURCE4} selinux/
+cp -p packaging/selinux-policy-trident/trident.fc selinux/
+cp -p packaging/selinux-policy-trident/trident.if selinux/
+cp -p packaging/selinux-policy-trident/trident.te selinux/
 
 make -f %{_datadir}/selinux/devel/Makefile %{name}.pp
 bzip2 -9 %{name}.pp
+
 
 %check
 test "$(./target/release/trident --version)" = "trident %{trident_version}"
@@ -225,13 +243,14 @@ install -D -m 755 target/release/%{name} %{buildroot}/%{_bindir}/%{name}
 # Copy Trident SELinux policy module to /usr/share/selinux/packages
 install -D -m 0644 %{name}.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
 install -D -p -m 0644 selinux/%{name}.if %{buildroot}%{_datadir}/selinux/devel/include/distributed/%{name}.if
+find /usr/src/azl/BUILDROOT/trident-0.20.0-1.azl3.x86_64/usr/share/selinux/packages/%{selinuxtype}
 
 mkdir -p %{buildroot}%{_unitdir}
-install -D -m 644 systemd/%{name}.service %{buildroot}%{_unitdir}/%{name}.service
-install -D -m 644 systemd/%{name}-install.service %{buildroot}%{_unitdir}/%{name}-install.service
-install -D -m 644 systemd/%{name}-update.service %{buildroot}%{_unitdir}/%{name}-update.service
-install -D -m 644 systemd/%{name}-network.service %{buildroot}%{_unitdir}/%{name}-network.service
-install -D -m 644 systemd/%{name}-update.timer %{buildroot}%{_unitdir}/%{name}-update.timer
+install -D -m 644 packaging/systemd/%{name}.service %{buildroot}%{_unitdir}/%{name}.service
+install -D -m 644 packaging/systemd/%{name}-install.service %{buildroot}%{_unitdir}/%{name}-install.service
+install -D -m 644 packaging/systemd/%{name}-update.service %{buildroot}%{_unitdir}/%{name}-update.service
+install -D -m 644 packaging/systemd/%{name}-network.service %{buildroot}%{_unitdir}/%{name}-network.service
+install -D -m 644 packaging/systemd/%{name}-update.timer %{buildroot}%{_unitdir}/%{name}-update.timer
 
 mkdir -p %{buildroot}/etc/%{name}
 
@@ -239,7 +258,7 @@ mkdir -p %{buildroot}/etc/%{name}
 pcrlockroot="%{buildroot}%{_sharedstatedir}/pcrlock.d"
 mkdir -p "$pcrlockroot"
 (
-  cd %{_sourcedir}/static-pcrlock-files
+  cd packaging/static-pcrlock-files
   find . -type f -print0 | while IFS= read -r -d '' f; do
       mkdir -p "$pcrlockroot/$(dirname "$f")"
       install -m 644 "$f" "$pcrlockroot/$f"
