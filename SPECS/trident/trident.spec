@@ -1,14 +1,27 @@
+# This spec file is used for both the Trident repo builds and as the
+# basis for the azurelinux build. For the Trident repo builds, `rpm_ver`
+# is defined, dictating the build version. If `rpm_ver` is undefined,
+# the spec defines the azurelinux distro build (using source and vendor
+# tarballs, etc)
+
 %global selinuxtype targeted
 
-Summary:        Agent for bare metal platform
+Summary:        Declarative, security-first OS lifecycle agent designed primarily for Azure Linux
 Name:           trident
+%if %{undefined rpm_ver}
 Version:        0.20.0
 Release:        1%{?dist}
-License:        ASL 2.0 and BSD and MIT
+%else
+Version:        %{rpm_ver}
+Release:        %{rpm_rel}%{?dist}
+%endif
+License:        MIT
 Vendor:         Microsoft Corporation
-URL:            https://github.com/microsoft/trident/
 Group:          Applications/System
 Distribution:   Azure Linux
+
+%if %{undefined rpm_ver}
+URL:            https://github.com/microsoft/trident/
 Source0:        https://github.com/microsoft/trident/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
@@ -21,6 +34,11 @@ Source0:        https://github.com/microsoft/trident/archive/refs/tags/v%{versio
 Source1:        %{name}-%{version}-cargo.tar.gz
 
 BuildRequires:  cargo >= 1.85.0
+Requires:       azurelinux-image-tools-osmodifier
+%else
+Source2:        osmodifier
+%endif
+
 BuildRequires:  rust >= 1.85.0
 BuildRequires:  openssl-devel
 BuildRequires:  systemd-units
@@ -32,7 +50,6 @@ Requires:       efibootmgr
 Requires:       lsof
 Requires:       systemd >= 255
 Requires:       systemd-udev
-Requires:       azurelinux-image-tools-osmodifier
 Requires:       (%{name}-selinux if selinux-policy-%{selinuxtype})
 
 # Optional dependencies for various optional features
@@ -50,6 +67,7 @@ Suggests:       veritysetup
 Suggests:       ntfs-3g
 # For creating NTFS filesystems
 Suggests:       ntfsprogs
+
 
 %description
 Trident. This package provides the Trident tool
@@ -166,7 +184,6 @@ Custom SELinux policy module
 
 %files selinux
 %{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
-
 %{_datadir}/selinux/devel/include/distributed/%{name}.if
 %ghost %verify(not md5 size mode mtime) %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/%{name}
 
@@ -202,6 +219,7 @@ be removed once the fix is merged in AZL 4.0.
 
 # ------------------------------------------------------------------------------
 
+%if %{undefined rpm_ver}
 %prep
 %autosetup -n %{name}-%{version} -p1
 
@@ -218,6 +236,7 @@ replace-with = "vendored-sources"
 [source.vendored-sources]
 directory = "vendor"
 EOF
+%endif
 
 %build
 export TRIDENT_VERSION="%{trident_version}"
@@ -231,19 +250,20 @@ cp -p packaging/selinux-policy-trident/trident.te selinux/
 make -f %{_datadir}/selinux/devel/Makefile %{name}.pp
 bzip2 -9 %{name}.pp
 
-
 %check
 test "$(./target/release/trident --version)" = "trident %{trident_version}"
 
 %install
-install -D -m 755 %{SOURCE1} %{buildroot}%{_bindir}/osmodifier
-
+%if %{undefined rpm_ver}
+install -D -m 755 osmodifier %{buildroot}%{_bindir}/osmodifier
+%else
+install -D -m 755 %{SOURCE2} %{buildroot}%{_bindir}/osmodifier
+%endif
 install -D -m 755 target/release/%{name} %{buildroot}/%{_bindir}/%{name}
 
 # Copy Trident SELinux policy module to /usr/share/selinux/packages
 install -D -m 0644 %{name}.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
 install -D -p -m 0644 selinux/%{name}.if %{buildroot}%{_datadir}/selinux/devel/include/distributed/%{name}.if
-find /usr/src/azl/BUILDROOT/trident-0.20.0-1.azl3.x86_64/usr/share/selinux/packages/%{selinuxtype}
 
 mkdir -p %{buildroot}%{_unitdir}
 install -D -m 644 packaging/systemd/%{name}.service %{buildroot}%{_unitdir}/%{name}.service
