@@ -44,7 +44,6 @@ install -pm 755 gcore.so %{buildroot}%{_libdir}/crash/extensions/
 %defattr(-,root,root)
 %license COPYING
 %{_libdir}/crash/extensions/gcore.so
-%doc COPYING
 
 %changelog
 * Tue Jan 06 2026 Chris Co <chrco@microsoft.com> - 1.6.1-3
