@@ -62,7 +62,7 @@ This package contains the "crash-target-arm64" binary for analyzing arm64 crash 
 # Apply only patches 0-99 to original crash source
 %autopatch -p1 -M 99
 
-# Extract and patch secondary gdb sources, re-tar.gz it, and clean up the working directory.
+# Extract and patch secondary gdb sources, re-tar and gzip them, and clean up the working directory.
 # Note: crash's make expects the gdb tarball to be named with its version only, gdb-[version].tar.gz, e.g.: gdb-10.2.tar.gz
 tar -xzf %{SOURCE1}
 pushd gdb-%{gdb_version}
