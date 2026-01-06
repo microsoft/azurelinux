@@ -155,6 +155,12 @@ find %{buildroot}%{_lib64dir} -name '*.a' -delete
 
 %files examples
 %{_datadir}/%{name}/examples/*
+%exclude %{_datadir}/%{name}/examples/*.pyc
+%exclude %{_datadir}/%{name}/examples/*.pyo
+%exclude %{_datadir}/%{name}/examples/*/*.pyc
+%exclude %{_datadir}/%{name}/examples/*/*.pyo
+%exclude %{_datadir}/%{name}/examples/*/*/*.pyc
+%exclude %{_datadir}/%{name}/examples/*/*/*.pyo
 
 %files tools
 %{_datadir}/%{name}/introspection/*
