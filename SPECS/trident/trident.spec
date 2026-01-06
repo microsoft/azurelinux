@@ -9,6 +9,7 @@
 Summary:        Declarative, security-first OS lifecycle agent designed primarily for Azure Linux
 Name:           trident
 %if %{undefined rpm_ver}
+# Use hard-coded versions for distro build
 Version:        0.20.0
 Release:        1%{?dist}
 %else
@@ -21,6 +22,7 @@ Group:          Applications/System
 Distribution:   Azure Linux
 
 %if %{undefined rpm_ver}
+# Use source and vendor tarballs for distro build
 URL:            https://github.com/microsoft/trident/
 Source0:        https://github.com/microsoft/trident/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
@@ -32,16 +34,19 @@ Source0:        https://github.com/microsoft/trident/archive/refs/tags/v%{versio
 #   tar -czf %%{name}-%%{version}-cargo.tar.gz vendor/
 #
 Source1:        %{name}-%{version}-cargo.tar.gz
-
-BuildRequires:  cargo >= 1.85.0
-Requires:       azurelinux-image-tools-osmodifier
 %else
-Source2:        osmodifier
+Source1:        osmodifier
 %endif
 
-BuildRequires:  rust >= 1.85.0
 BuildRequires:  openssl-devel
 BuildRequires:  systemd-units
+BuildRequires:  rust
+
+%if %{undefined rpm_ver}
+# For distro build, require cargo to build and osmodifier
+BuildRequires:  cargo
+Requires:       azurelinux-image-tools-osmodifier
+%endif
 
 Requires:       e2fsprogs
 Requires:       util-linux
@@ -76,7 +81,10 @@ and its dependencies for managing the lifecycle of Azure Linux hosts.
 %files
 %{_bindir}/%{name}
 %dir /etc/%{name}
+%if %{defined rpm_ver}
+# For Trident repo build, package osmodifier included via `Source1`
 %{_bindir}/osmodifier
+%endif
 
 # ------------------------------------------------------------------------------
 
@@ -220,6 +228,7 @@ be removed once the fix is merged in AZL 4.0.
 # ------------------------------------------------------------------------------
 
 %if %{undefined rpm_ver}
+# Use cargo with source and vendor tarballs for distro build
 %prep
 %autosetup -n %{name}-%{version} -p1
 
@@ -252,12 +261,17 @@ bzip2 -9 %{name}.pp
 
 %check
 test "$(./target/release/trident --version)" = "trident %{trident_version}"
+%if %{undefined rpm_ver}
+# Run unit tests as part of check for distro build, skip 3 tests that do not work
+# in RPM chroot environment
+cargo test --all --no-fail-fast -- --skip test_run_systemd_check --skip test_prepare_mount_directory --skip test_read
+%endif
 
 %install
-%if %{undefined rpm_ver}
-install -D -m 755 osmodifier %{buildroot}%{_bindir}/osmodifier
-%else
-install -D -m 755 %{SOURCE2} %{buildroot}%{_bindir}/osmodifier
+%if %{defined rpm_ver}
+# For Trident repo build, package osmodifier included via `Source1`.
+# Distro RPM will use distro osmodifier RPM via Requires directive.
+install -D -m 755 %{SOURCE1} %{buildroot}%{_bindir}/osmodifier
 %endif
 install -D -m 755 target/release/%{name} %{buildroot}/%{_bindir}/%{name}
 
