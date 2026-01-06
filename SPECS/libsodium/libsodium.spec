@@ -2,7 +2,7 @@
 %global soname  26
 Summary:        The Sodium crypto library
 Name:           libsodium
-Version:        1.0.19
+Version:        1.0.20
 Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
@@ -34,7 +34,7 @@ This package contains libraries and header files for
 developing applications that use %{name} libraries.
 
 %prep
-%autosetup -n %{name}-stable
+%autosetup -p1 -n %{name}-stable
 
 %build
 %configure \
@@ -68,6 +68,9 @@ find %{buildroot} -type f -name "*.a" -delete -print
 
 
 %changelog
+* Tue Jan 06 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.0.20-1
+- Update to version 1.0.20 for CVE-2025-69277
+
 * Fri Feb 02 2024 Thien Trung Vuong <tvuong@microsoft.com> - 1.0.19-1
 - Update to version 1.0.19
 - Update soname to 26
