@@ -86,6 +86,7 @@ install -DTm 644 %{SOURCE1} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
 install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr build/javadocs/* %{buildroot}%{_javadocdir}/%{name}
 mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 %fdupes -s %{buildroot}%{_javadocdir}/%{name}
 
 %files -f .mfiles
@@ -93,9 +94,8 @@ mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
 %doc AUTHORS.txt CHANGES.txt README.txt TODO.txt RELEASE-NOTE.txt
 
 %files javadoc
-%license LICENSE.txt NOTICE.txt ADDITIONAL_LICENSE_INFO
+%license LICENSE LICENSE.txt NOTICE.txt ADDITIONAL_LICENSE_INFO
 %{_javadocdir}/%{name}
-%exclude /usr/share/javadoc/bsf/legal/LICENSE
 
 %changelog
 * Fri Jan 02 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.4.0-20
