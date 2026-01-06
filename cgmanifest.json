@@ -28746,8 +28746,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.9.3",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.3.tar.gz"
+          "version": "1.9.4",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.4.tar.gz"
         }
       }
     },
