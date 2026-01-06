@@ -70,7 +70,7 @@ pushd gdb-%{gdb_version}
 popd
 # Re-tar with consistent timestamps for reproducibility
 tar --sort=name \
-    --mtime="@${SOURCE_DATE_EPOCH:-$(date +%s)}" \
+    --mtime="2021-04-26 00:00Z" \
     --owner=0 --group=0 --numeric-owner \
     -czf gdb-%{gdb_version}.tar.gz gdb-%{gdb_version}
 rm -rf gdb-%{gdb_version}/
