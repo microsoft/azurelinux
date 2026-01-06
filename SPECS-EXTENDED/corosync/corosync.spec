@@ -19,7 +19,7 @@ Distribution:   Azure Linux
 Name: corosync
 Summary: The Corosync Cluster Engine and Application Programming Interfaces
 Version: 3.0.4
-Release: 4%{?dist}
+Release: 3%{?dist}
 License: BSD
 URL: http://corosync.github.io/corosync/
 Source0: http://build.clusterlabs.org/corosync/releases/%{name}-%{version}%{?gittarver}.tar.gz
@@ -287,9 +287,6 @@ network splits)
 %endif
 
 %changelog
-* Tue Jan 06 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.4-4
-- Bumping release to rebuild with new 'net-snmp' libs.
-
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.4-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.
