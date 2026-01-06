@@ -18,7 +18,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        6.6.100.mshv1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -267,6 +267,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Mon Jan 06 2026 Roaa Sakr <romoh@microsoft.com> - 6.6.100.mshv1-3
+- Enable ftrace syscalls tracing support in kernel config
+
 * Wed Oct 08 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.100.mshv1-2
 - Enable build on aarch64
 
