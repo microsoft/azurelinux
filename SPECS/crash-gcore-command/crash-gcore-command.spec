@@ -1,14 +1,16 @@
 Name:          crash-gcore-command
-Version:       1.6.1
-Release:       3%{?dist}
+Version:       1.6.4
+Release:       1%{?dist}
 Summary:       gcore extension module for crash utility
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
 Distribution:   Azure Linux
-URL:           https://github.com/crash-utility/crash-extensions
-Source0:       https://github.com/crash-utility/crash-extensions/raw/master/%{name}-%{version}.tar.gz
-Source1:       gcore_defs.patch
-Patch0:        set_context-third-arg.patch
+URL:           https://github.com/fujitsu/crash-gcore
+Source0:       https://github.com/fujitsu/crash-gcore/archive/v%{version}/%{name}-%{version}.tar.gz
+Patch0:        fix-maple-tree-macros.patch
+Patch1:        set_context-third-arg.patch
+Patch2:        fix-coredump-gate_vma-failure.patch
+Patch3:        fix-error-when-accessing-gate_vma-kernel-symbol.patch
 License:       GPLv2+
 BuildRequires: zlib-devel
 BuildRequires: crash-devel >= 9.0.0
@@ -21,24 +23,19 @@ Command for creating a core dump file of a user-space task that was
 running in a kernel dumpfile.
 
 %prep
-# Note: we use -p2 here since patches come from upstream crash-gcore, but the
-# source tarball comes from official crash-utilities/crash-extensions
-# repository which already removes the top layer of directory nesting from the
-# upstream crash-gcore code tree.
-%autosetup -p2 -n %{name}-%{version}
+%autosetup -p1 -n crash-gcore-%{version}
 
 %build
 %ifarch x86_64
-make -f gcore.mk ARCH=SUPPORTED TARGET=X86_64
+make -C src -f gcore.mk ARCH=SUPPORTED TARGET=X86_64
 %endif
 %ifarch aarch64
-patch -p1 < %{SOURCE1}
-make -f gcore.mk ARCH=SUPPORTED TARGET=ARM64
+make -C src -f gcore.mk ARCH=SUPPORTED TARGET=ARM64
 %endif
 
 %install
 mkdir -p %{buildroot}%{_libdir}/crash/extensions/
-install -pm 755 gcore.so %{buildroot}%{_libdir}/crash/extensions/
+install -pm 755 src/gcore.so %{buildroot}%{_libdir}/crash/extensions/
 
 %files
 %defattr(-,root,root)
@@ -46,6 +43,12 @@ install -pm 755 gcore.so %{buildroot}%{_libdir}/crash/extensions/
 %{_libdir}/crash/extensions/gcore.so
 
 %changelog
+* Tue Jan 06 2026 Chris Co <chrco@microsoft.com> - 1.6.4-1
+- update to v1.6.4
+- add patch to fix building failure due to undefined macros MAPLE_TREE_{COUNT,GATHER}
+- add patch to fix the issue that core files for 64-bit tasks are generated in the 32-bit format
+- add patch to fix read errors when gate_vma symbol does not exist
+
 * Tue Jan 06 2026 Chris Co <chrco@microsoft.com> - 1.6.1-3
 - add patch to fix build break with newer crash v9.0.0
 

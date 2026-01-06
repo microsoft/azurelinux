@@ -1,0 +1,82 @@
+From e03ff7341a9a624a46cea4e60ee097606b1687a8 Mon Sep 17 00:00:00 2001
+From: HATAYAMA Daisuke <d.hatayama@fujitsu.com>
+Date: Sat, 23 Nov 2024 17:30:41 +0900
+Subject: [PATCH] x86: fix the issue that core files for 64-bit tasks are
+ generated in the 32-bit format
+
+Core files for 64-bit tasks are falsely generated in the 32-bit
+formats.
+
+The root cause of this issue is that location of saving register
+values on kernel stacks is changed by the kernel commit
+65c9cc9e2c14602d98f1ca61c51ac954e9529303 (x86/fred: Reserve space for
+the FRED stack frame) in Linux kernel 6.9-rc1 to add some reserved
+area for FRED feature and gcore doesn't take this into
+consideration. Hence, the value of CS register retrieved from kernel
+stacks based on the existing logic is wrong and thus checking
+execution mode of a given task based on the value also works wrong.
+
+To fix this issue, let's take the FRED feature into account. If FRED
+data structure is defined, retrieve register values from the address
+next to the reserved for the FRED feature.
+
+This logic is borrowed from the commit
+48764a14bc5856f0b0bb30685336c68b832154fc (x86_64: fix for adding
+top_of_kernel_stack_padding for kernel stack) and the commit
+196c4b79c13d1c0e6d7b21c8321eca07d3838d6a (X86 64: fix a regression
+issue about kernel stack padding) of crash utility.
+---
+ src/libgcore/gcore_x86.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/src/libgcore/gcore_x86.c b/src/libgcore/gcore_x86.c
+index 3ddf510..4f43956 100644
+--- a/src/libgcore/gcore_x86.c
++++ b/src/libgcore/gcore_x86.c
+@@ -514,10 +514,11 @@ convert_from_fxsr(struct user_i387_ia32_struct *env, struct task_context *target
+ 		char *pt_regs_buf;
+ 		uint16_t ds;
+ 		struct machine_specific *ms = machdep->machspec;
++		ulong padding_size = VALID_SIZE(fred_frame) > 0 ? (2 * 8) : 0;
+ 
+ 		pt_regs_buf = GETBUF(SIZE(pt_regs));
+ 
+-		readmem(machdep->get_stacktop(target->task) - SIZE(pt_regs),
++		readmem(machdep->get_stacktop(target->task) - padding_size - SIZE(pt_regs),
+ 			KVADDR,	pt_regs_buf, SIZE(pt_regs),
+ 			"convert_from_fxsr: regs",
+ 			gcore_verbose_error_handle());
+@@ -1837,6 +1838,7 @@ static int genregs_get(struct task_context *target,
+ 	struct user_regs_struct active_regs;
+ 	const int active = is_task_active(target->task);
+ 	struct machine_specific *ms = machdep->machspec;
++	ulong padding_size = VALID_SIZE(fred_frame) > 0 ? (2 * 8) : 0;
+ 
+ 	BZERO(regs, sizeof(*regs));
+ 
+@@ -1854,7 +1856,7 @@ static int genregs_get(struct task_context *target,
+ 	 */
+ 	pt_regs_buf = GETBUF(SIZE(pt_regs));
+ 
+-	readmem(machdep->get_stacktop(target->task) - SIZE(pt_regs), KVADDR,
++	readmem(machdep->get_stacktop(target->task) - padding_size - SIZE(pt_regs), KVADDR,
+ 		pt_regs_buf, SIZE(pt_regs), "genregs_get: pt_regs",
+ 		gcore_verbose_error_handle());
+ 
+@@ -2188,6 +2190,7 @@ static int genregs_get32(struct task_context *target,
+ 	struct user_regs_struct *regs = (struct user_regs_struct *)buf;
+ 	char *pt_regs_buf;
+ 	ulonglong pt_regs_addr;
++	ulong padding_size = VALID_SIZE(fred_frame) > 0 ? (2 * 8) : 0;
+ 
+ 	if (is_task_active(target->task) && KVMDUMP_DUMPFILE()) {
+ 		get_regs_from_kvmdump_notes(target, regs);
+@@ -2198,7 +2201,7 @@ static int genregs_get32(struct task_context *target,
+ 
+ 	pt_regs_buf = GETBUF(SIZE(pt_regs));
+ 
+-	pt_regs_addr = machdep->get_stacktop(target->task) - SIZE(pt_regs);
++	pt_regs_addr = machdep->get_stacktop(target->task) - padding_size - SIZE(pt_regs);
+ 
+ 	/*
+ 	 * The commit 07b047fc2466249aff7cdb23fa0b0955a7a00d48

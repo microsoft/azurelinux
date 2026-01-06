@@ -1,0 +1,35 @@
+From 9b6f1dcbeabd5a5c58d5b492eb1ca2d0ddeb70a1 Mon Sep 17 00:00:00 2001
+From: Chris Co <chrco@microsoft.com>
+Date: Tue, 6 Jan 2026 16:58:46 -0800
+Subject: [PATCH] fix error when accessing gate_vma kernel symbol
+
+---
+ src/libgcore/gcore_x86.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/libgcore/gcore_x86.c b/src/libgcore/gcore_x86.c
+index 4f43956..059cd14 100644
+--- a/src/libgcore/gcore_x86.c
++++ b/src/libgcore/gcore_x86.c
+@@ -2429,6 +2429,9 @@ ulong gcore_arch_get_gate_vma(void)
+ #ifdef X86_64
+ 	if (gcore_is_arch_32bit_emulation(CURRENT_CONTEXT()))
+ 		return 0UL;
++	
++	if (!symbol_exists("gate_vma"))
++		return 0UL;
+ 
+ 	if (symbol_exists("vsyscall_mode")) {
+ 		int vsyscall_mode;
+@@ -2482,7 +2485,7 @@ char *gcore_arch_vma_name(ulong vma)
+ 
+ 	if (mm && vm_start == vdso)
+ 		return "[vdso]";
+-	if (vma == symbol_value("gate_vma"))
++	if (symbol_exists("gate_vma") && vma == symbol_value("gate_vma"))
+ 		return "[vsyscall]";
+ 	return NULL;
+ }
+-- 
+2.45.2
+
