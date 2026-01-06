@@ -79,6 +79,11 @@ mkdir -p $RPM_BUILD_ROOT%{_datadir}/pixmaps
 make install-gui DESTDIR=$RPM_BUILD_ROOT PREFIX="%{_prefix}" conf_dir="%{_sysconfdir}/"
 %endif
 
+mv extras/langDefs-resources/UNLICENCE .
+mv extras/pandoc/LICENSE .
+rm extras/themes-resources/base16/LICENSE
+rm extras/themes-resources/css-themes/UNLICENCE
+
 rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}/
 
 desktop-file-install \
@@ -95,8 +100,8 @@ desktop-file-install \
 %{_datadir}/zsh/site-functions/_highlight
 %config(noreplace) %{_sysconfdir}/highlight/
 
-%doc ChangeLog* AUTHORS README*
-%license COPYING
+%doc ChangeLog* AUTHORS README* extras/
+%license COPYING LICENSE UNLICENCE
 
  %if %{with qt}
 %files gui
