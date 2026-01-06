@@ -12,7 +12,7 @@ Distribution:   Azure Linux
 
 Name: quagga
 Version: 1.2.4
-Release: 15%{?dist}
+Release: 16%{?dist}
 Summary: Routing daemon
 License: GPLv2+
 URL: http://www.quagga.net
@@ -225,6 +225,9 @@ fi
 %{_includedir}/quagga/ospfd/*.h
 
 %changelog
+* Tue Jan 06 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-16
+- Bumping release to rebuild with new 'net-snmp' libs.
+
 * Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.4-15
 - Conditionalize building of tex-based documentation
 
