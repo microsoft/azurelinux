@@ -160,7 +160,7 @@ fi
 %endif
 
 %files
-%doc LICENSE
+%license LICENSE
 %{_sbindir}/corosync
 %{_sbindir}/corosync-keygen
 %{_sbindir}/corosync-cmapctl
@@ -219,7 +219,7 @@ Summary: The Corosync Cluster Engine Libraries
 This package contains corosync libraries.
 
 %files -n corosynclib
-%doc LICENSE
+%license LICENSE
 %{_libdir}/libcfg.so.*
 %{_libdir}/libcpg.so.*
 %{_libdir}/libcmap.so.*
@@ -242,7 +242,6 @@ This package contains include files and man pages used to develop using
 The Corosync Cluster Engine APIs.
 
 %files -n corosynclib-devel
-%doc LICENSE
 %dir %{_includedir}/corosync/
 %{_includedir}/corosync/corodefs.h
 %{_includedir}/corosync/cfg.h
@@ -281,7 +280,6 @@ Nodes can be added and removed as well as partitioned (to simulate
 network splits)
 
 %files -n corosync-vqsim
-%doc LICENSE
 %{_bindir}/corosync-vqsim
 %{_mandir}/man8/corosync-vqsim.8*
 %endif
@@ -289,6 +287,7 @@ network splits)
 %changelog
 * Tue Jan 06 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.4-4
 - Bumping release to rebuild with new 'net-snmp' libs.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.4-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

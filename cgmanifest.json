@@ -2306,16 +2306,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "crun",
-          "version": "1.24",
-          "downloadUrl": "https://github.com/containers/crun/releases/download/1.24/crun-1.24.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "cronie",
           "version": "1.6.1",
           "downloadUrl": "https://github.com/cronie-crond/cronie/releases/download/cronie-1.6.1/cronie-1.6.1.tar.gz"
@@ -2329,6 +2319,16 @@
           "name": "crontabs",
           "version": "1.11",
           "downloadUrl": "https://github.com/cronie-crond/crontabs/releases/download/crontabs-20190603/crontabs-1.11-20190603git.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "crun",
+          "version": "1.24",
+          "downloadUrl": "https://github.com/containers/crun/releases/download/1.24/crun-1.24.tar.gz"
         }
       }
     },
@@ -4680,8 +4680,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.25.5",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.5-1/go1.25.5-20251202.2.src.tar.gz"
+          "version": "1.24.11",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.11-1/go1.24.11-20251202.3.src.tar.gz"
         }
       }
     },
@@ -4690,8 +4690,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.24.11",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.11-1/go1.24.11-20251202.3.src.tar.gz"
+          "version": "1.25.5",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.5-1/go1.25.5-20251202.2.src.tar.gz"
         }
       }
     },
@@ -8280,9 +8280,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kernel-hwe",
-          "version": "6.12.57.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.57.1.tar.gz"
+          "name": "kernel-headers",
+          "version": "6.6.119.3",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
         }
       }
     },
@@ -8290,9 +8290,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kernel-headers",
-          "version": "6.6.119.3",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
+          "name": "kernel-hwe",
+          "version": "6.12.57.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.57.1.tar.gz"
         }
       }
     },
@@ -24202,16 +24202,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python3-pycares",
-          "version": "4.5.0",
-          "downloadUrl": "https://github.com/saghul/pycares/archive/refs/tags/v4.5.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-pycdlib",
           "version": "1.9.0",
           "downloadUrl": "https://github.com/clalancette/pycdlib/archive/v1.9.0/pycdlib-1.9.0.tar.gz"
@@ -25742,6 +25732,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python3-pycares",
+          "version": "4.5.0",
+          "downloadUrl": "https://github.com/saghul/pycares/archive/refs/tags/v4.5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python3-pytest-asyncio",
           "version": "0.23.6",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-asyncio/pytest-asyncio-0.23.6.tar.gz"
@@ -25954,7 +25954,7 @@
         "other": {
           "name": "quagga",
           "version": "1.2.4",
-          "downloadUrl": "http://download.savannah.gnu.org/releases/quagga/quagga-1.2.4.tar.gz"
+          "downloadUrl": "https://github.com/quagga/quagga/releases/download/quagga-1.2.4/quagga-1.2.4.tar.gz"
         }
       }
     },
