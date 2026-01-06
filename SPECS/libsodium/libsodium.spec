@@ -11,6 +11,9 @@ URL:            https://libsodium.org/
 Source0:        https://github.com/jedisct1/%{name}/archive/refs/tags/%{version}-FINAL.tar.gz#/%{name}-%{version}-final.tar.gz
 BuildRequires:  gcc
 BuildRequires:  make
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
 
 %description
 Sodium is a new, easy-to-use software library for encryption, decryption,
@@ -37,6 +40,8 @@ developing applications that use %{name} libraries.
 %autosetup -p1 -n %{name}-%{version}-FINAL
 
 %build
+autoreconf -fiv
+
 %configure \
   --disable-silent-rules \
   --disable-opt
