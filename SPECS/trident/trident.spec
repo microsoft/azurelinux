@@ -6,11 +6,6 @@
 
 %global selinuxtype targeted
 
-%define our_gopath %{_topdir}/.gopath
-%define osmodifier_packagename azurelinux-image-tools
-%define osmodifier_version 1.0.0
-%define osmodifier_foldername azure-linux-image-tools
-
 Summary:        Declarative, security-first OS lifecycle agent designed primarily for Azure Linux
 Name:           trident
 %if %{undefined rpm_ver}
@@ -27,7 +22,7 @@ Group:          Applications/System
 Distribution:   Azure Linux
 
 %if %{undefined rpm_ver}
-# Use source and vendor tarballs for distro build
+# For distro build, use Source0 for source tarball and Source1 for vendor tarball
 URL:            https://github.com/microsoft/trident/
 Source0:        https://github.com/microsoft/trident/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
@@ -39,10 +34,8 @@ Source0:        https://github.com/microsoft/trident/archive/refs/tags/v%{versio
 #   tar -czf %%{name}-%%{version}-cargo.tar.gz vendor/
 #
 Source1:        %{name}-%{version}-cargo.tar.gz
-# Define osmodifier sources
-Source2:        %{osmodifier_packagename}-%{osmodifier_version}.tar.gz
-Source3:        %{osmodifier_packagename}-%{osmodifier_version}-vendor.tar.gz
 %else
+# For Trident repo build, use osmodifier is passed in as Source1
 Source1:        osmodifier
 %endif
 
@@ -53,9 +46,8 @@ BuildRequires:  rust
 %if %{undefined rpm_ver}
 # For distro build, require cargo to build trident
 BuildRequires:  cargo
-# For distro build, require go to build osmodifier
-BuildRequires:  golang < 1.25
-BuildRequires:  systemd-udev
+# For distro build, require osmodifier RPM at runtime
+Requires:       azurelinux-image-tools-osmodifier
 %endif
 
 Requires:       e2fsprogs
@@ -91,7 +83,11 @@ and its dependencies for managing the lifecycle of Azure Linux hosts.
 %files
 %{_bindir}/%{name}
 %dir /etc/%{name}
+%if %{defined rpm_ver}
+# For Trident repo build, install osmodifier (distro build will require
+# azurelinux-image-tools-osmodifier RPM at runtimme)
 %{_bindir}/osmodifier
+%endif
 
 # ------------------------------------------------------------------------------
 
@@ -235,27 +231,10 @@ be removed once the fix is merged in AZL 4.0.
 # ------------------------------------------------------------------------------
 
 %if %{undefined rpm_ver}
-# Use cargo with source and vendor tarballs for distro build
+# For distro build, unpack source and vendor tarballs for building trident
 %prep
-# Create 2 source directories, 1 for trident and 1 for azurelinux-image-tools
-# Use %setup for more control:
-#  -q: quietly
-#  -c: create source directory before unpacking
-#  -T: do not unpack Source0 automatically
-#  -D: do not delete source directory before operation
-#  -n: specify name of source directory
-#  -b: unpack source tarball before changing to source directory
-#  -a: unpack vendor tarball after changing to source directory
-
-# Set up azurelinux-image-tools source directory
-%setup -q -c -T -D -n %{osmodifier_foldername}-%{osmodifier_version} -b 2
-tar -xf %{SOURCE3} --no-same-owner -C toolkit/tools
-cd %{_builddir}
-
-# Set up trident source directory
-%setup -q -c -T -D -n %{name}-%{version} -b 0
-%setup -q -c -T -D -n %{name}-%{version} -a 1
-cd %{_builddir}/%{name}-%{version}
+%autosetup -n %{name}-%{version} -p1
+tar -xf %{SOURCE1}
 
 mkdir -p .cargo
 cat >.cargo/config << EOF
@@ -268,14 +247,6 @@ EOF
 %endif
 
 %build
-%if %{undefined rpm_ver}
-pushd %{_builddir}/%{osmodifier_foldername}-%{osmodifier_version}
-export GOPATH=%{our_gopath}
-export GOFLAGS="-mod=vendor"
-make -C toolkit go-osmodifier REBUILD_TOOLS=y SKIP_LICENSE_SCAN=y
-popd
-%endif
-
 export TRIDENT_VERSION="%{trident_version}"
 cargo build --release
 
@@ -290,19 +261,19 @@ bzip2 -9 %{name}.pp
 %check
 test "$(./target/release/trident --version)" = "trident %{trident_version}"
 %if %{undefined rpm_ver}
+# For distro builds, allow trident unit tests to execute as part of check
 %ifarch x86_64
-# Run unit tests as part of check for distro build, skip 3 tests that do not work
-# in RPM chroot environment
+# Run unit tests only for x86_g4.
+# Skip 3 tests that do not work in RPM chroot environment
 cargo test --all --no-fail-fast -- --skip test_run_systemd_check --skip test_prepare_mount_directory --skip test_read
 %endif
 %endif
 
 %install
-%if %{undefined rpm_ver}
-# For distro RPM use osmodifier built from osmodifier source/vendor tarballs.
-install -D -m 755 %{_builddir}/%{osmodifier_foldername}-%{osmodifier_version}/toolkit/out/tools/osmodifier %{buildroot}%{_bindir}/osmodifier
-%else
-# For Trident repo build, package osmodifier included via `Source1`.
+%if %{defined rpm_ver}
+# For Trident repo build, install osmodifier included via `Source1` (for
+# distro build, osmodifier will be provided via azurelinux-image-tools-osmodifier
+# runtime Requires)
 install -D -m 755 %{SOURCE1} %{buildroot}%{_bindir}/osmodifier
 %endif
 
