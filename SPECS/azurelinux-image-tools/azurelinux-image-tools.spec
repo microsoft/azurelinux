@@ -3,7 +3,7 @@
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
 Version:        1.0.0
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
 Group:          Applications/System
@@ -60,12 +60,6 @@ file specifying how they want the image to be customized. For example, this
 could include the installation of certain RPMs, updating the SELinux mode, and
 enabling DM-Verity.
 
-%package osmodifier
-Summary: OS Modifier
-
-%description osmodifier
-The Azure Linux OS Modifier is a tool that can modify an OS.
-
 %prep
 %autosetup -p1 -n azure-linux-image-tools-%{version}
 tar -xf %{SOURCE1} --no-same-owner -C toolkit/tools
@@ -74,12 +68,10 @@ tar -xf %{SOURCE1} --no-same-owner -C toolkit/tools
 export GOPATH=%{our_gopath}
 export GOFLAGS="-mod=vendor"
 make -C toolkit go-imagecustomizer REBUILD_TOOLS=y SKIP_LICENSE_SCAN=y
-make -C toolkit go-osmodifier REBUILD_TOOLS=y SKIP_LICENSE_SCAN=y
 
 %install
 mkdir -p %{buildroot}%{_bindir}
 install -p -m 0755 toolkit/out/tools/imagecustomizer %{buildroot}%{_bindir}/imagecustomizer
-install -p -m 0755 toolkit/out/tools/osmodifier %{buildroot}%{_bindir}/osmodifier
 
 # Install container support files for imagecustomizer subpackage
 # These files are used when building the imagecustomizer container
@@ -106,14 +98,7 @@ go test -C toolkit/tools ./...
 %{_libdir}/imagecustomizer/telemetry_hopper.py
 %{_libdir}/imagecustomizer/telemetry-requirements.txt
 
-%files osmodifier
-%license LICENSE
-%{_bindir}/osmodifier
-
 %changelog
-* Mon Jan 5 2026 Brian Fjeldstad <bfjelds@microsoft.com> 1.0.0-2
-- Add osmodifier
-
 * Wed Sep 24 2025 Lanze Liu <lanzeliu@microsoft.com> 1.0.0-1
 - Upgrade to GA version 1.0.0-1
 
