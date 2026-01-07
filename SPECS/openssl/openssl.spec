@@ -62,10 +62,10 @@ Patch52:  0052-Allow-SHA1-in-seclevel-1-if-rh-allow-sha1-signatures.patch
 # # See notes in the patch for details, but this patch will not be needed if
 # # the openssl issue https://github.com/openssl/openssl/issues/7048 is ever implemented and released.
 Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
-# The Symcrypt provider, which is our default, doesn't support some of the
+# The FIPS providers (SymCrypt and OpenSSL FIPS) don't support some of the
 # algorithms that are used in the speed tests. This patch skips those tests.
-# If SymCrypt adds support, we should change and eventually remove this patch.
-Patch82:  prevent-unsupported-calls-into-symcrypt-in-speed.patch
+# If OpenSSL updates speed to be FIPS-tolerant, remove this patch.
+Patch82:  filter-unsupported-algs-key-lengths-dynamically.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -361,6 +361,7 @@ install -m644 %{SOURCE9} \
 %changelog
 * Thu Nov 13 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.5-2
 - Enable switching between SymCrypt-OpenSSL and openssl-fips-provider.
+- Patch OpenSSL speed to skip algorithms not supported by the selected FIPS provider.
 
 * Thu Oct 02 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.5-1
 - Auto-upgrade to 3.3.5 for CVE-2025-9230 and CVE-2025-9232
