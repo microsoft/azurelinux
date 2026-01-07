@@ -32,10 +32,10 @@ bash-5.2.15-3.azl3.x86_64.rpm
 bash-debuginfo-5.2.15-3.azl3.x86_64.rpm
 bash-devel-5.2.15-3.azl3.x86_64.rpm
 bash-lang-5.2.15-3.azl3.x86_64.rpm
-binutils-2.41-10.azl3.x86_64.rpm
-binutils-aarch64-linux-gnu-2.41-10.azl3.x86_64.rpm
-binutils-debuginfo-2.41-10.azl3.x86_64.rpm
-binutils-devel-2.41-10.azl3.x86_64.rpm
+binutils-2.41-11.azl3.x86_64.rpm
+binutils-aarch64-linux-gnu-2.41-11.azl3.x86_64.rpm
+binutils-debuginfo-2.41-11.azl3.x86_64.rpm
+binutils-devel-2.41-11.azl3.x86_64.rpm
 bison-3.8.2-1.azl3.x86_64.rpm
 bison-debuginfo-3.8.2-1.azl3.x86_64.rpm
 bzip2-1.0.8-1.azl3.x86_64.rpm
@@ -70,7 +70,7 @@ cracklib-lang-2.9.11-1.azl3.x86_64.rpm
 createrepo_c-1.0.3-1.azl3.x86_64.rpm
 createrepo_c-debuginfo-1.0.3-1.azl3.x86_64.rpm
 createrepo_c-devel-1.0.3-1.azl3.x86_64.rpm
-cross-binutils-common-2.41-10.azl3.noarch.rpm
+cross-binutils-common-2.41-11.azl3.noarch.rpm
 cross-gcc-common-13.2.0-7.azl3.noarch.rpm
 curl-8.11.1-5.azl3.x86_64.rpm
 curl-debuginfo-8.11.1-5.azl3.x86_64.rpm

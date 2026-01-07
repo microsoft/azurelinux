@@ -341,7 +341,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Wed Jan 07 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.41-11
-- VE-2025-1147, CVE-2025-1148, CVE-2025-11839
+- Patch for CVE-2025-1147, CVE-2025-1148, CVE-2025-11839
 
 * Thu Oct 16 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.41-10
 - Patch for CVE-2025-11414, CVE-2025-11412
