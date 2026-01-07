@@ -3,7 +3,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.2308.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -204,6 +204,9 @@ fi
 %{_libdir}/rsyslog/omsnmp.so
 
 %changelog
+* Tue Jan 06 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.2308.0-5
+- Bumping release to rebuild with new 'net-snmp' libs.
+
 * Tue Feb 04 2025 Andrew Phelps <anphel@microsoft.com> - 8.2308.0-4
 - Add patch to fix upstream issue #5158
 
