@@ -1,10 +1,9 @@
 {
  "Signatures": {
-  "Rhino1_7_7_1_RELEASE.tar.gz": "277478f81c160953976c198beceab61a0b23b5d2633a84effd9236284aa301b1",
-  "rhino-1.7.7.1.pom": "bd274ebb729e421e83028f05a31c701e95fb755c03d1911258bff35d779bea3f",
-  "rhino-debugger.script": "abf22a063ef36feb0f09da72952a25d5d4ab1001afa6f5974654ebbc322d6191",
-  "rhino-idswitch.script": "334586fd570b6c5e8c52787808a12f071f30efc1ff20254a062fa5128ca37cca",
-  "rhino-jsc.script": "65cc0ac893193a84e024d3b66811afbe747f63c5910ac3ae7691b251ac32bd1c",
-  "rhino.script": "550cbb089c12752a888ecc1bda8d5384095e948699c49ffc995c98bb907cfb7f"
+  "Rhino1_7_15_1_Release.tar.gz": "729c4ffc0405fad09b22190c2dd95da8c6a79fe353d667dc852352464bfe5955",
+  "rhino-1.7.15.1.pom": "b40decfa0e24c80bfd957ba3adfac7f6e3eed7730a06b551c01493faa2e76883",
+  "rhino-build.xml": "db62671eb039c402b203b08d7ecb6dfcfc575be75c7828e01013733727fa4531",
+  "rhino-engine-1.7.15.1.pom": "2794a4adbecd9837b5e406c0f4a7e40d8620105a44ff11ccd3cae1a2de4615aa",
+  "rhino-runtime-1.7.15.1.pom": "f96738c51ba7b081ebebec9fa298e950b18b2ed8acf4099cf7c54ec16b8ec493"
  }
 }

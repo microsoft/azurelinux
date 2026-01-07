@@ -26244,8 +26244,8 @@
         "type": "other",
         "other": {
           "name": "rhino",
-          "version": "1.7.7.1",
-          "downloadUrl": "https://github.com/mozilla/rhino/archive/Rhino1_7_7_1_RELEASE.tar.gz"
+          "version": "1.7.15.1",
+          "downloadUrl": "https://github.com/mozilla/rhino/archive/Rhino1_7_15_1_Release.tar.gz"
         }
       }
     },
