@@ -3,7 +3,7 @@
 Summary:        Statistics collection daemon for filling RRD files
 Name:           collectd
 Version:        5.12.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv2 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -867,6 +867,9 @@ make check
 %{_libdir}/collectd/write_tsdb.so
 
 %changelog
+* Tue Jan 06 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.0-11
+- Bumping release to rebuild with new 'net-snmp' libs.
+
 * Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 5.12.0-10
 - Add patch to fix build break.
 
