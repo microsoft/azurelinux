@@ -51,7 +51,7 @@ var (
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages cloned").String()
 
 	enableGpgCheck = app.Flag("enable-gpg-check", "Enable RPM GPG signature verification for all repositories during package fetching.").Bool()
-	gpgKeyPaths    = app.Flag("gpg-keys", "Paths to GPG key files for signature validation (required if enable-gpg-check is set).").ExistingFiles()
+	gpgKeyPaths    = app.Flag("gpg-key", "Path to a GPG key file for signature validation. May be specified multiple times. Required if enable-gpg-check is set.").ExistingFiles()
 
 	logFlags      = exe.SetupLogFlags(app)
 	profFlags     = exe.SetupProfileFlags(app)
@@ -78,7 +78,7 @@ func main() {
 	}
 
 	if *enableGpgCheck && len(*gpgKeyPaths) == 0 {
-		logger.Log.Fatal("--enable-gpg-check requires at least one --gpg-keys path")
+		logger.Log.Fatal("--enable-gpg-check requires at least one --gpg-key path")
 	}
 
 	timestamp.StartEvent("initialize and configure cloner", nil)
@@ -120,7 +120,7 @@ func main() {
 
 	// Validate GPG signatures of downloaded packages if enabled
 	if *enableGpgCheck {
-		err = rpm.ValidateDirectoryRpmSignatures(cloner.CloneDirectory(), *gpgKeyPaths)
+		err = rpm.ValidateDirectoryRPMSignatures(cloner.CloneDirectory(), *gpgKeyPaths)
 		if err != nil {
 			logger.Log.Panicf("Failed to validate RPM signatures. Error: %s", err)
 		}

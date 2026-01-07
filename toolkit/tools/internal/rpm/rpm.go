@@ -505,39 +505,39 @@ func InstallRPM(rpmFile string) (err error) {
 
 const rpmKeysProgram = "rpmkeys"
 
-// ImportGpgKeysToRpmDb imports GPG keys into an RPM database for signature verification.
+// importGPGKeysToRpmDb imports GPG keys into an RPM database for signature verification.
 // - rpmDbRoot: path to a directory to use as the RPM database root (will be created if it doesn't exist)
 // - gpgKeyPaths: paths to GPG key files to import into the RPM database
-// This should be called once before validating multiple RPMs with CheckRpmSignature.
-func ImportGpgKeysToRpmDb(rpmDbRoot string, gpgKeyPaths []string) (err error) {
+// This should be called once before validating multiple RPMs with checkRPMSignature.
+func importGPGKeysToRpmDb(rpmDbRoot string, gpgKeyPaths []string) (err error) {
 	if _, err := exec.LookPath(rpmKeysProgram); err != nil {
-		return fmt.Errorf("%s command not found - explicit GPG signature enforcement requires this tool", rpmKeysProgram)
+		return fmt.Errorf("%s command not found - explicit GPG signature enforcement requires this tool:\n%w", rpmKeysProgram, err)
 	}
 	for _, keyPath := range gpgKeyPaths {
 		_, stderr, importErr := shell.Execute(rpmKeysProgram, "--root", rpmDbRoot, "--import", keyPath)
 		if importErr != nil {
-			return fmt.Errorf("failed to import GPG key (%s) into RPM database:\n%v\n%w", keyPath, stderr, importErr)
+			return fmt.Errorf("failed to import GPG key (%s) into RPM database: %v:\n%w", keyPath, stderr, importErr)
 		}
 	}
 	return nil
 }
 
-// CheckRpmSignature validates the GPG signature of an RPM file.
+// checkRPMSignature validates the GPG signature of an RPM file.
 // - rpmFile: path to the RPM file to validate
-// - rpmDbRoot: path to a directory used as the RPM database root (must have GPG keys already imported via ImportGpgKeysToRpmDb)
+// - rpmDbRoot: path to a directory used as the RPM database root (must have GPG keys already imported via importGPGKeysToRpmDb)
 // Returns an error if the RPM signature is missing or invalid.
-func CheckRpmSignature(rpmFile string, rpmDbRoot string) (err error) {
+func checkRPMSignature(rpmFile string, rpmDbRoot string) (err error) {
 	_, stderr, err := shell.Execute(rpmKeysProgram, "--root", rpmDbRoot, "--checksig", rpmFile, "-D", "%_pkgverify_level signature")
 	if err != nil {
-		return fmt.Errorf("RPM signature validation failed for (%s):\n%v\n%w", rpmFile, stderr, err)
+		return fmt.Errorf("RPM signature validation failed for (%s): %v\n%w", rpmFile, stderr, err)
 	}
 	return nil
 }
 
-// ValidateDirectoryRpmSignatures validates the GPG signatures of all RPM files in a directory.
+// ValidateDirectoryRPMSignatures validates the GPG signatures of all RPM files in a directory.
 // It creates an isolated RPM database, imports the provided GPG keys, and validates each RPM.
 // Returns an error if any RPM has a missing or invalid signature.
-func ValidateDirectoryRpmSignatures(rpmDir string, gpgKeyPaths []string) (err error) {
+func ValidateDirectoryRPMSignatures(rpmDir string, gpgKeyPaths []string) (err error) {
 	logger.Log.Info("Validating GPG signatures of downloaded packages")
 
 	// Create a temporary directory for the isolated RPM database
@@ -548,7 +548,7 @@ func ValidateDirectoryRpmSignatures(rpmDir string, gpgKeyPaths []string) (err er
 	defer os.RemoveAll(rpmDbRoot)
 
 	// Import GPG keys once before validating all RPMs
-	err = ImportGpgKeysToRpmDb(rpmDbRoot, gpgKeyPaths)
+	err = importGPGKeysToRpmDb(rpmDbRoot, gpgKeyPaths)
 	if err != nil {
 		return err
 	}
@@ -578,7 +578,7 @@ func ValidateDirectoryRpmSignatures(rpmDir string, gpgKeyPaths []string) (err er
 	// Validate each RPM
 	for _, rpmFile := range rpmFiles {
 		logger.Log.Debugf("Validating signature of: %s", filepath.Base(rpmFile))
-		err = CheckRpmSignature(rpmFile, rpmDbRoot)
+		err = checkRPMSignature(rpmFile, rpmDbRoot)
 		if err != nil {
 			return fmt.Errorf("GPG signature validation failed:\n%w", err)
 		}
