@@ -1,90 +1,91 @@
 # Building
+
 - [Overview](#overview)
 - [Building in Stages](#building-in-stages)
-   - [Install Prerequisites](#install-prerequisites)
-   - [Clone and Sync To Stable Commit](#clone-and-sync-to-stable-commit)
-   - [Toolchain Stage](#toolchain-stage)
-     - [Populate Toolchain](#populate-toolchain)
-     - [Rebuild Toolchain](#rebuild-toolchain)
-   - [Package Stage](#package-stage)
-     - [Rebuild All Packages](#rebuild-all-packages)
-     - [Rebuild Minimal Required Packages](#rebuild-minimal-required-packages)
-     - [Targeted Package Building](#targeted-package-building)
-   - [Image Stage](#image-stage)
-     - [Virtual Hard Disks and Containers](#virtual-hard-disks-and-containers)
-     - [ISO Images](#iso-images)
+  - [Install Prerequisites](#install-prerequisites)
+  - [Clone and Sync To Stable Commit](#clone-and-sync-to-stable-commit)
+  - [Toolchain Stage](#toolchain-stage)
+    - [Populate Toolchain](#populate-toolchain)
+    - [Rebuild Toolchain](#rebuild-toolchain)
+  - [Package Stage](#package-stage)
+    - [Rebuild All Packages](#rebuild-all-packages)
+    - [Rebuild Minimal Required Packages](#rebuild-minimal-required-packages)
+    - [Targeted Package Building](#targeted-package-building)
+  - [Image Stage](#image-stage)
+    - [Virtual Hard Disks and Containers](#virtual-hard-disks-and-containers)
+    - [ISO Images](#iso-images)
 - [Further Reading](#further-reading)
- - [Packages](#packages)
-   - [Working on Packages](#working-on-packages)
-      - [DOWNLOAD_SRPMS](#download_srpms)
-      - [Force Rebuilds](#force-rebuilds)
-      - [Ignoring Packages](#ignoring-packages)
-      - [Source Hashes](#source-hashes)
-  - [packages.microsoft.com Repository Structure](#packagesmicrosoftcom-repository-structure)
-      - [Azure Linux 1.0](#azure-linux-10)
-      - [Azure Linux 2.0](#azure-linux-20)
-      - [Azure Linux 3.0](#azure-linux-30)
-  - [Keys, Certs, and Remote Sources](#keys-certs-and-remote-sources)
-    - [Sources](#sources)
-    - [Authentication](#authentication)
-  - [Building Everything From Scratch](#building-everything-from-scratch)
-    - [Bootstrapping the Toolchain and Building Everything from Scratch](#bootstrapping-the-toolchain-and-building-everything-from-scratch)
-    - [Local Build Variables](#local-build-variables)
-      - [URLS and Repos](#urls-and-repos)
-      - [`SOURCE_URL=...`](#source_url)
-      - [`PACKAGE_URL_LIST=...`](#package_url_list)
-      - [`SRPM_URL_LIST=...`](#srpm_url_list)
-      - [`REPO_LIST=...`](#repo_list)
-      - [Build Enable/Disable Flags](#build-enabledisable-flags)
-      - [`REBUILD_TOOLCHAIN=...`](#rebuild_toolchain)
-        - [`REBUILD_TOOLCHAIN=`**`n`** *(default)*](#rebuild_toolchainn-default)
-        - [`REBUILD_TOOLCHAIN=`**`y`**](#rebuild_toolchainy)
-      - [`DOWNLOAD_SRPMS=...`](#download_srpms-1)
-        - [`DOWNLOAD_SRPMS=`**`n`** *(default)*](#download_srpmsn-default)
-        - [`DOWNLOAD_SRPMS=`**`y`**](#download_srpmsy)
-      - [`USE_PREVIEW_REPO=...`](#use_preview_repo)
-        - [`USE_PREVIEW_REPO=`**`n`** *(default)*](#use_preview_repon-default)
-        - [`USE_PREVIEW_REPO=`**`y`**](#use_preview_repoy)
-      - [`DISABLE_UPSTREAM_REPOS=...`](#disable_upstream_repos)
-        - [`DISABLE_UPSTREAM_REPOS=`**`n`** *(default)*](#disable_upstream_reposn-default)
-        - [`DISABLE_UPSTREAM_REPOS=`**`y`**](#disable_upstream_reposy)
-      - [`DISABLE_DEFAULT_REPOS=...`](#disable_default_repos)
-        - [`DISABLE_DEFAULT_REPOS=`**`n`** *(default)*](#disable_default_reposn-default)
-        - [`DISABLE_DEFAULT_REPOS=`**`y`**](#disable_default_reposy)
-      - [`REBUILD_PACKAGES=...`](#rebuild_packages)
-        - [`REBUILD_PACKAGES=`**`y`** *(default)*](#rebuild_packagesy-default)
-        - [`REBUILD_PACKAGES=`**`n`**](#rebuild_packagesn)
-      - [`REBUILD_TOOLS=...`](#rebuild_tools)
-        - [`REBUILD_TOOLS=`**`n`** *(default)*](#rebuild_toolsn-default)
-        - [`REBUILD_TOOLS=`**`y`**](#rebuild_toolsy)
-      - [`REFRESH_WORKER_CHROOT=...`](#refresh_worker_chroot)
-        - [`REFRESH_WORKER_CHROOT=`**`n`**](#refresh_worker_chrootn)
-        - [`REFRESH_WORKER_CHROOT=`**`y`** *(default)*](#refresh_worker_chrooty-default)
-      - [`HYDRATED_BUILD=...`](#hydrated_build)
-        - [`HYDRATED_BUILD=`**`y`**](#hydraded_buildy)
-        - [`HYDRATED_BUILD=`**`n`** *(default)*](#hydrated_build-default)
-      - [`DELTA_BUILD=...`](#delta_build)
-        - [`DELTA_BUILD=`**`y`**`](#delta_buildy)
-        - [`DELTA_BUILD=`**`n`** *(default)*](#delta_build-default)
-  - [All Build Targets](#all-build-targets)
-  - [Reproducing a Build](#reproducing-a-build)
-    - [Build Summaries](#build-summaries)
-    - [Building From Summaries](#building-from-summaries)
-    - [Reproducing a Package Build](#reproducing-a-package-build)
-    - [Reproducing an Image Build](#reproducing-an-image-build)
-    - [Reproducing an ISO Build](#reproducing-an-iso-build)
-  - [All Build Variables](#all-build-variables)
-    - [Targets](#targets)
-    - [Rebuild vs. Download](#rebuild-vs-download)
-    - [Remote Connections](#remote-connections)
-    - [Misc Build](#misc-build)
-    - [Reproducing Builds](#reproducing-builds)
-    - [Directory Customization](#directory-customization)
-    - [Build Details](#build-details)
+- [Packages](#packages)
+  - [Working on Packages](#working-on-packages)
+    - [DOWNLOAD_SRPMS](#download_srpms)
+    - [Force Rebuilds](#force-rebuilds)
+    - [Ignoring Packages](#ignoring-packages)
+    - [Source Hashes](#source-hashes)
+- [packages.microsoft.com Repository Structure](#packagesmicrosoftcom-repository-structure)
+  - [Azure Linux 1.0](#azure-linux-10)
+  - [Azure Linux 2.0](#azure-linux-20)
+  - [Azure Linux 3.0](#azure-linux-30)
+- [Keys, Certs, and Remote Sources](#keys-certs-and-remote-sources)
+  - [Sources](#sources)
+  - [Authentication](#authentication)
+- [Building Everything From Scratch](#building-everything-from-scratch)
+  - [Bootstrapping the Toolchain and Building Everything from Scratch](#bootstrapping-the-toolchain-and-building-everything-from-scratch)
+  - [Local Build Variables](#local-build-variables)
+    - [URLS and Repos](#urls-and-repos)
+    - [`SOURCE_URL=...`](#source_url)
+    - [`PACKAGE_URL_LIST=...`](#package_url_list)
+    - [`SRPM_URL_LIST=...`](#srpm_url_list)
+    - [`REPO_LIST=...`](#repo_list)
+    - [Build Enable/Disable Flags](#build-enabledisable-flags)
+    - [`REBUILD_TOOLCHAIN=...`](#rebuild_toolchain)
+      - [`REBUILD_TOOLCHAIN=`**`n`** *(default)*](#rebuild_toolchainn-default)
+      - [`REBUILD_TOOLCHAIN=`**`y`**](#rebuild_toolchainy)
+    - [`DOWNLOAD_SRPMS=...`](#download_srpms-1)
+      - [`DOWNLOAD_SRPMS=`**`n`** *(default)*](#download_srpmsn-default)
+      - [`DOWNLOAD_SRPMS=`**`y`**](#download_srpmsy)
+    - [`USE_PREVIEW_REPO=...`](#use_preview_repo)
+      - [`USE_PREVIEW_REPO=`**`n`** *(default)*](#use_preview_repon-default)
+      - [`USE_PREVIEW_REPO=`**`y`**](#use_preview_repoy)
+    - [`DISABLE_UPSTREAM_REPOS=...`](#disable_upstream_repos)
+      - [`DISABLE_UPSTREAM_REPOS=`**`n`** *(default)*](#disable_upstream_reposn-default)
+      - [`DISABLE_UPSTREAM_REPOS=`**`y`**](#disable_upstream_reposy)
+    - [`DISABLE_DEFAULT_REPOS=...`](#disable_default_repos)
+      - [`DISABLE_DEFAULT_REPOS=`**`n`** *(default)*](#disable_default_reposn-default)
+      - [`DISABLE_DEFAULT_REPOS=`**`y`**](#disable_default_reposy)
+    - [`REBUILD_PACKAGES=...`](#rebuild_packages)
+      - [`REBUILD_PACKAGES=`**`y`** *(default)*](#rebuild_packagesy-default)
+      - [`REBUILD_PACKAGES=`**`n`**](#rebuild_packagesn)
+    - [`REBUILD_TOOLS=...`](#rebuild_tools)
+      - [`REBUILD_TOOLS=`**`n`** *(default)*](#rebuild_toolsn-default)
+      - [`REBUILD_TOOLS=`**`y`**](#rebuild_toolsy)
+    - [`REFRESH_WORKER_CHROOT=...`](#refresh_worker_chroot)
+      - [`REFRESH_WORKER_CHROOT=`**`n`**](#refresh_worker_chrootn)
+      - [`REFRESH_WORKER_CHROOT=`**`y`** *(default)*](#refresh_worker_chrooty-default)
+    - [`HYDRATED_BUILD=...`](#hydrated_build)
+      - [`HYDRATED_BUILD=`**`y`**](#hydraded_buildy)
+      - [`HYDRATED_BUILD=`**`n`** *(default)*](#hydrated_build-default)
+    - [`DELTA_BUILD=...`](#delta_build)
+      - [`DELTA_BUILD=`**`y`**`](#delta_buildy)
+      - [`DELTA_BUILD=`**`n`** *(default)*](#delta_build-default)
+- [All Build Targets](#all-build-targets)
+- [Reproducing a Build](#reproducing-a-build)
+  - [Build Summaries](#build-summaries)
+  - [Building From Summaries](#building-from-summaries)
+  - [Reproducing a Package Build](#reproducing-a-package-build)
+  - [Reproducing an Image Build](#reproducing-an-image-build)
+  - [Reproducing an ISO Build](#reproducing-an-iso-build)
+- [All Build Variables](#all-build-variables)
+  - [Targets](#targets)
+  - [Rebuild vs. Download](#rebuild-vs-download)
+  - [Remote Connections](#remote-connections)
+  - [Misc Build](#misc-build)
+  - [Reproducing Builds](#reproducing-builds)
+  - [Directory Customization](#directory-customization)
+  - [Build Details](#build-details)
 
 ## Overview
 
-The following documentation describes how to fully build Azure Linux end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of Azure Linux _**is not**_ generally needed.  All Azure Linux packages are built signed and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/3.0/prod/)
+The following documentation describes how to fully build Azure Linux end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of Azure Linux ***is not*** generally needed.  All Azure Linux packages are built signed and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/3.0/prod/)
 
 If you simply want to test-drive Azure Linux you may download and install the ISO (see: [readme.md](../../README.md)).  If you want to experiment with Azure Linux and build custom images or add packages in a more focused environment, refer to the tutorial in the [AzureLinux-Tutorials](https://github.com/microsoft/AzureLinux-Tutorials) repository.
 
@@ -97,7 +98,6 @@ The Azure Linux build system consists of several phases and tools, but at a high
 - **Image** This stage generates the resulting ISO, VHD, VHDX, and/or container images from the rpm packages built in the package stage.
 
 Each stage can be built completely from scratch, or in many cases may be seeded from pre-built packages and then partially built.
-
 
 ## **Building in Stages**
 
@@ -120,7 +120,7 @@ cd azurelinux/toolkit
 git checkout 3.0-stable
 ```
 
-**IMPORTANT:** The `3.0-stable` tag always points to the latest known good build of Azure Linux of the 3.0 branch. A similar tag, `2.0-stable`, exists for the 2.0 branch. Other branches are also buildable but not guaranteed to be stable.  The 2.0 and 3.0 branches are periodically updated with bug fixes, security vulnerability fixes or occasional feature enhancements.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable.  The `3.0-stable` tag will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the `3.0-stable` tag is advanced.  To ensure you have the latest invoke _git fetch --all --tags_ before building.
+**IMPORTANT:** The `3.0-stable` tag always points to the latest known good build of Azure Linux of the 3.0 branch. A similar tag, `2.0-stable`, exists for the 2.0 branch. Other branches are also buildable but not guaranteed to be stable.  The 2.0 and 3.0 branches are periodically updated with bug fixes, security vulnerability fixes or occasional feature enhancements.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable.  The `3.0-stable` tag will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the `3.0-stable` tag is advanced.  To ensure you have the latest invoke *git fetch --all --tags* before building.
 
 It is also possible to build an older version of Azure Linux from the 3.0 branch.  Azure Linux may be updated at any time, but an aggregate release is declared monthly and [tagged in github](https://github.com/microsoft/azurelinux/releases).  These monthly builds are stable and their tags can be substituted for the `3.0-stable` label above.
 
@@ -130,7 +130,7 @@ Alternate branches are not generally buildable because community builds require 
 
 ## **Toolchain Stage**
 
-The toolchain builds in two sub-phases.  The first phase builds an initial _bootstrap_ toolchain which is then used to build the _final_ toolchain used in package building.  In the first phase, the bootstrap toolchain downloads a series of source packages from upstream sources.  The second phase downloads SRPMS from packages.microsoft.com.
+The toolchain builds in two sub-phases.  The first phase builds an initial *bootstrap* toolchain which is then used to build the *final* toolchain used in package building.  In the first phase, the bootstrap toolchain downloads a series of source packages from upstream sources.  The second phase downloads SRPMS from packages.microsoft.com.
 
 For expediency, the toolchain may be populated from upstream binaries, or may be completely rebuilt.
 
@@ -182,15 +182,17 @@ The following command rebuilds packages for the basic VHD.
 sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y
 ```
 
-Note that the image config file passed to the CONFIG_FILE option _only_ builds the packages included in the image plus all packages needed to build those packages.  That is, more will be built than needed by the image, but only a subset of packages will be built.
+Note that the image config file passed to the CONFIG_FILE option *only* builds the packages included in the image plus all packages needed to build those packages.  That is, more will be built than needed by the image, but only a subset of packages will be built.
 
 ### **Targeted Package Building**
+
 Beginning with the Azure Linux 2.0's 2022 October Release (2.0.20221007) it is possible to rapidly build one or more packages "in-tree".  This technique can be helpful for modifying an existing SPEC file or adding a new one to Azure Linux.
 
 ```bash
 # Build targeted packages
 sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="openssh"
 ```
+
 Note that this process will download dependencies from packages.microsoft.com and rebuild just the SPEC files indicated by the SRPM_PACK_LIST
 
 After building a package you may choose to rebuild it or build additional packages.  The optional `REFRESH_WORKER_CHROOT=n` option (default is `y`) will avoid rebuilding the worker chroot saving some additional build overhead
@@ -206,7 +208,7 @@ sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="at" PACKAGE_
 
 ## **Image Stage**
 
-Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/AzureLinux-Tutorials#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/azurelinux/tree/3.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
+Different images and image formats can be produced from the build system.  Images are assembled from a combination of *Image Configuration* files and *Package list* files.  Each [Package List](https://github.com/microsoft/AzureLinux-Tutorials#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/azurelinux/tree/3.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
 
 By default, the `make image` and `make iso` commands (discussed below) build missing packages before starting the image build sequence.  By adding the `REBUILD_PACKAGES=n` argument, the image build phase will supplement missing packages with those on packages.microsoft.com.  This can accelerate the image build process, especially when performing targeted package builds ([targeted Package Building](#targeted-package-building))
 
@@ -226,18 +228,19 @@ sudo make image CONFIG_FILE=./imageconfigs/core-container.json REBUILD_TOOLS=y
 ```
 
 ### ISO Images
+
 ISOs are bootable images that install Azure Linux to either a physical or virtual machine.  The installation process can be manually guided through user prompting, or automated through unattended installation.
 
 NOTE: ISOs require additional packaging and build steps (such as the creation of a separate `initrd` installer image used to install the final image to disk).  These additional resources are stored in the toolkit/resources/imagesconfigs folder.
 
-
 The following builds an ISO with an interactive UI and selectable image configurations.
+
 ```bash
 # To build an Azure Linux ISO Image (ISO folder: ../out/images/full)
 sudo make iso CONFIG_FILE=./imageconfigs/full.json REBUILD_TOOLS=y
 ```
 
-To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y` and run with a [`CONFIG_FILE`](https://github.com/microsoft/AzureLinux-Tutorials#image-config-file) that only specifies a _single_ SystemConfig.
+To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y` and run with a [`CONFIG_FILE`](https://github.com/microsoft/AzureLinux-Tutorials#image-config-file) that only specifies a *single* SystemConfig.
 
 ```bash
 # Build the standard ISO with unattended installer that installs onto the default Gen1 HyperV VM. Needs to cloud-init provision the user once unattended installation finishes.
@@ -338,7 +341,6 @@ For Azure Linux 3.0, the repositories are structured as follows:
 - **ms-oss:** Packages built by other, non-Azure Linux, Microsoft teams. Formerly known as **Microsoft**
 - **nvidia:** Specially licensed NVIDIA/CUDA packages.
 
-
 ## Keys, Certs, and Remote Sources
 
 ### Sources
@@ -378,9 +380,11 @@ sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" CA_CERT=/path/to/root
 ```
 
 For SRPM packing (i.e., for retrieving package sources), Azure CLI login can be used to access authenticated Azure blob storages, which do not support anonymous access:
+
 ```bash
 sudo make build-packages SOURCE_AUTH_MODE="azurecli"
 ```
+
 Using this mode requires prior `az login` with your managed identity ID.
 
 ## Building Everything From Scratch
@@ -446,7 +450,7 @@ Quickrebuild flags will set some flags to try and optimize builds for speed. Thi
 
 #### `QUICK_REBUILD=...`
 
-##### `QUICK_REBUILD=`**`n`** _(default)_
+##### `QUICK_REBUILD=`**`n`** *(default)*
 
 > Do not set any additional quickbuild flags
 
@@ -456,7 +460,7 @@ Quickrebuild flags will set some flags to try and optimize builds for speed. Thi
 
 #### `QUICK_REBUILD_TOOLCHAIN=...`
 
-##### `QUICK_REBUILD_TOOLCHAIN=`**`n`** _(default)_
+##### `QUICK_REBUILD_TOOLCHAIN=`**`n`** *(default)*
 
 > Do not set toolchain specific quick rebuild flags
 
@@ -466,7 +470,7 @@ Quickrebuild flags will set some flags to try and optimize builds for speed. Thi
 
 #### `QUICK_REBUILD_PACKAGES=...`
 
-##### `QUICK_REBUILD_PACKAGES=`**`n`** _(default)_
+##### `QUICK_REBUILD_PACKAGES=`**`n`** *(default)*
 
 > Do not set toolchain specific quick rebuild flags
 
@@ -711,6 +715,7 @@ sudo make hydrate-rpms PACKAGE_ARCHIVE=./rpms.tar.gz
 **Help is available via `make help`**
 
 These are the useful build targets:
+
 | Target                           | Description
 |:---------------------------------|:---
 | build-packages                   | Build requested `*.rpm` files (see [Packages](#packages)).
@@ -865,6 +870,10 @@ Authentication mode for downloading source files for SRPM packing. Valid options
 | INCREMENTAL_TOOLCHAIN            | n                                                                                                      | Only build toolchain RPM packages if they are not already present
 | RUN_CHECK                        | n                                                                                                      | Run the %check sections when compiling packages
 | ALLOW_TOOLCHAIN_REBUILDS         | n                                                                                                      | Do not treat rebuilds of toolchain packages during regular package build phase as errors.
+| VALIDATE_TOOLCHAIN_GPG           | (auto - based on toolchain build mode)                                                                 | Enable RPM GPG signature verification for toolchain packages. Automatically set to `y` when downloading pre-built toolchain packages (`REBUILD_TOOLCHAIN=n`), and `n` when rebuilding locally. Packages are validated against keys specified in `TOOLCHAIN_GPG_VALIDATION_KEYS`.
+| TOOLCHAIN_GPG_VALIDATION_KEYS    | `$(PROJECT_ROOT)/SPECS/azurelinux-repos/MICROSOFT-*-GPG-KEY $(toolkit_root)/repos/MICROSOFT-*-GPG-KEY` | Space separated list of GPG key files used to validate RPM signatures when `VALIDATE_TOOLCHAIN_GPG=y`.
+| VALIDATE_IMAGE_GPG               | n                                                                                                      | Enable RPM GPG signature verification during image builds. When set to `y`, all packages fetched for image generation must have valid GPG signatures. Packages are validated against keys specified in `IMAGE_GPG_VALIDATION_KEYS`. Production builds should enable this to ensure all packages have completed the signing process.
+| IMAGE_GPG_VALIDATION_KEYS        | `$(PROJECT_ROOT)/SPECS/azurelinux-repos/MICROSOFT-*-GPG-KEY $(toolkit_root)/repos/MICROSOFT-*-GPG-KEY`  | Space separated list of GPG key files used to validate RPM signatures when `VALIDATE_IMAGE_GPG=y.
 |  PACKAGE_BUILD_RETRIES           | 1                                                                                                      | Number of build retries for each package
 | CHECK_BUILD_RETRIES              | 1                                                                                                      | Minimum number of check section retries for each package if RUN_CHECK=y and tests fail.
 | MAX_CASCADING_REBUILDS           |                                                                                                        | When a package rebuilds, how many additional layers of dependent packages will be forced to rebuild (leave unset for unbounded, i.e., all downstream packages will rebuild)
