@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="common" basedir=".">
+
+  <property file="build.properties"/>
+  <property name="project.version" value="4.24"/>
+  <property name="project.groupId" value="org.apache.xbean"/>
+
+  <property name="bundle.version" value="${project.version}.0"/>
+
+  <property name="compiler.release" value="8"/>
+  <property name="compiler.source" value="1.${compiler.release}"/>
+  <property name="compiler.target" value="${compiler.source}"/>
+
+</project>
