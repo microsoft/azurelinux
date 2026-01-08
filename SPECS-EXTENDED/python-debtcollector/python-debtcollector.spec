@@ -32,23 +32,23 @@ Source101:        https://tarballs.openstack.org/%{pypi_name}/%{pypi_name}-%{ups
 Source102:        https://releases.openstack.org/_static/%{sources_gpg_sign}.txt
 %endif
 
-BuildRequires: python3-pip
-BuildRequires: python3-pbr
-BuildRequires: python3-wheel
-BuildRequires: python3-setuptools
+BuildRequires: python-pip
+BuildRequires: python-pbr
+BuildRequires: python-wheel
+BuildRequires: python-setuptools
 BuildRequires: python3-pytest
-BuildRequires: python3-dulwich
-BuildRequires: python3-openstackdocstheme
-BuildRequires: python3-toml
-BuildRequires: python3-tox
-BuildRequires: python3-wrapt
-BuildRequires: python3-extras
-BuildRequires: python3-sphinx
-BuildRequires: python3-tox-current-env
-BuildRequires: python3-virtualenv
-BuildRequires: python3-sphinx  
-BuildRequires: python3-testtools
-BuildRequires: python3-fixtures
+BuildRequires: python-dulwich
+BuildRequires: python-openstackdocstheme
+BuildRequires: python-toml
+BuildRequires: python-tox
+BuildRequires: python-wrapt
+BuildRequires: python-extras
+BuildRequires: python-sphinx
+BuildRequires: python-tox-current-env
+BuildRequires: python-virtualenv
+BuildRequires: python-sphinx
+BuildRequires: python-testtools
+BuildRequires: python-fixtures
 
 BuildArch:   noarch
 
@@ -102,7 +102,6 @@ for pkg in %{excluded_brs};do
   done
 done
 
-# Automatic BR generation
 %generate_buildrequires
 %if 0%{?with_doc}
   %pyproject_buildrequires -t -e %{default_toxenv},docs
