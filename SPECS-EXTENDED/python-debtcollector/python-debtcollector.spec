@@ -102,13 +102,6 @@ for pkg in %{excluded_brs};do
   done
 done
 
-%generate_buildrequires
-%if 0%{?with_doc}
-  %pyproject_buildrequires -t -e %{default_toxenv},docs
-%else
-  %pyproject_buildrequires -t -e %{default_toxenv}
-%endif
-
 %build
 %pyproject_wheel
 
