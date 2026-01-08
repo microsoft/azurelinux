@@ -7,8 +7,8 @@ The oslo.i18n library contain utilities for working with internationalization \
 or library.
 Summary:        OpenStack i18n library
 Name:           python-oslo-i18n
-Version:        5.1.0
-Release:        4%{?dist}
+Version:        6.3.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -104,6 +104,9 @@ mv oslo_i18n/locale %{buildroot}%{_datadir}/locale
 %license LICENSE
 
 %changelog
+* Mon Feb 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.3.0-1
+- Auto-upgrade to 6.3.0 - Extended package upgrade to IDC
+
 * Wed Mar 08 2023 Sumedh Sharma <sumsharma@microsoft.com> - 5.1.0-4
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - license verified
