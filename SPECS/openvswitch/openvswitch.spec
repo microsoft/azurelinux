@@ -396,7 +396,7 @@ fi
 %{_sbindir}/ovs-bugtool
 %{_mandir}/man8/ovs-dpctl-top.8*
 %{_mandir}/man8/ovs-bugtool.8*
-%doc LICENSE
+%license LICENSE
 
 %files test
 %{_bindir}/ovs-pcap
@@ -497,7 +497,8 @@ fi
 %{_mandir}/man8/ovs-vswitchd.8*
 %{_mandir}/man8/ovs-parse-backtrace.8*
 %{_udevrulesdir}/91-vfio.rules
-%doc LICENSE NOTICE README.rst NEWS rhel/README.RHEL.rst
+%license LICENSE NOTICE
+%doc README.rst NEWS rhel/README.RHEL.rst
 /var/lib/openvswitch
 %attr(750,openvswitch,openvswitch) %verify(not owner group) /var/log/openvswitch
 %ghost %attr(755,root,root) %verify(not owner group) %{_rundir}/openvswitch
@@ -506,6 +507,7 @@ fi
 %changelog
 * Thu Jan 08 2026 Tobias Brick <tobiasb@microsoft.com> - 3.3.0-2
 - Add patches from fedora f40 to fix tests with new versions of openssl and python.
+- Update to use correct locations for license files.
 
 * Wed Feb 21 2024 Thien Trung Vuong <tvuong@microsoft.com> - 3.3.0-1
 - Update to version 3.3.0
