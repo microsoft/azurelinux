@@ -3,14 +3,17 @@
 Summary:        The Sodium crypto library
 Name:           libsodium
 Version:        1.0.18
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://libsodium.org/
-Source0:        https://download.libsodium.org/%{name}/releases/%{name}-%{version}.tar.gz
+Source0:        https://github.com/jedisct1/%{name}/archive/refs/tags/%{version}-FINAL.tar.gz#/%{name}-%{version}-final.tar.gz
 BuildRequires:  gcc
 BuildRequires:  make
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
 
 %description
 Sodium is a new, easy-to-use software library for encryption, decryption,
@@ -34,9 +37,11 @@ This package contains libraries and header files for
 developing applications that use %{name} libraries.
 
 %prep
-%autosetup
+%autosetup -p1 -n %{name}-%{version}-FINAL
 
 %build
+autoreconf -fiv
+
 %configure \
   --disable-silent-rules \
   --disable-opt
@@ -68,6 +73,9 @@ find %{buildroot} -type f -name "*.a" -delete -print
 
 
 %changelog
+* Tue Jan 06 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.0.18-7
+- Update to version 1.0.18-FINAL for CVE-2025-69277
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.0.18-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
