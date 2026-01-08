@@ -44,6 +44,7 @@ Requires:       brotli
 Requires:       c-ares
 Requires:       coreutils >= 8.22
 Requires:       openssl >= 1.1.1
+Provides:       nodejs
 
 %description
 Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine.
