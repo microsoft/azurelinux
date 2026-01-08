@@ -6,6 +6,8 @@ Subject: [PATCH] Enforcing webhookserver to use TLS 1.2
 This patch introduces TLS configuration enforcement for the webhook server in main.go. 
 Specifically, it ensures that the server uses TLS 1.2 or higher.
 
+PR has been merged upstream - https://github.com/nunnatsa/cluster-api-provider-kubevirt/commit/8c739ccf4f39712241c9aabbf7ed3504612ecdc6
+
 ---
  main.go | 11 ++++++++++-
  1 file changed, 10 insertions(+), 1 deletion(-)
