@@ -1,0 +1,403 @@
+Index: commons-compress-1.19-src/src/main/java/org/apache/commons/compress/archivers/sevenz/BoundedSeekableByteChannelInputStream.java
+===================================================================
+--- commons-compress-1.19-src.orig/src/main/java/org/apache/commons/compress/archivers/sevenz/BoundedSeekableByteChannelInputStream.java
++++ commons-compress-1.19-src/src/main/java/org/apache/commons/compress/archivers/sevenz/BoundedSeekableByteChannelInputStream.java
+@@ -19,6 +19,7 @@ package org.apache.commons.compress.arch
+ 
+ import java.io.IOException;
+ import java.io.InputStream;
++import java.nio.Buffer;
+ import java.nio.ByteBuffer;
+ import java.nio.channels.SeekableByteChannel;
+ 
+@@ -69,7 +70,7 @@ class BoundedSeekableByteChannelInputStr
+         } else {
+             buf = ByteBuffer.allocate(bytesToRead);
+             bytesRead = channel.read(buf);
+-            buf.flip();
++            ((Buffer)buf).flip();
+         }
+         if (bytesRead >= 0) {
+             buf.get(b, off, bytesRead);
+@@ -79,9 +80,9 @@ class BoundedSeekableByteChannelInputStr
+     }
+ 
+     private int read(int len) throws IOException {
+-        buffer.rewind().limit(len);
++        ((Buffer)buffer).rewind().limit(len);
+         int read = channel.read(buffer);
+-        buffer.flip();
++        ((Buffer)buffer).flip();
+         return read;
+     }
+ 
+Index: commons-compress-1.19-src/src/main/java/org/apache/commons/compress/archivers/sevenz/SevenZFile.java
+===================================================================
+--- commons-compress-1.19-src.orig/src/main/java/org/apache/commons/compress/archivers/sevenz/SevenZFile.java
++++ commons-compress-1.19-src/src/main/java/org/apache/commons/compress/archivers/sevenz/SevenZFile.java
+@@ -25,6 +25,7 @@ import java.io.File;
+ import java.io.FilterInputStream;
+ import java.io.IOException;
+ import java.io.InputStream;
++import java.nio.Buffer;
+ import java.nio.ByteBuffer;
+ import java.nio.ByteOrder;
+ import java.nio.CharBuffer;
+@@ -1305,9 +1306,9 @@ public class SevenZFile implements Close
+     }
+ 
+     private void readFully(ByteBuffer buf) throws IOException {
+-        buf.rewind();
++        ((Buffer)buf).rewind();
+         IOUtils.readFully(channel, buf);
+-        buf.flip();
++        ((Buffer)buf).flip();
+     }
+ 
+     @Override
+Index: commons-compress-1.19-src/src/main/java/org/apache/commons/compress/archivers/sevenz/SevenZOutputFile.java
+===================================================================
+--- commons-compress-1.19-src.orig/src/main/java/org/apache/commons/compress/archivers/sevenz/SevenZOutputFile.java
++++ commons-compress-1.19-src/src/main/java/org/apache/commons/compress/archivers/sevenz/SevenZOutputFile.java
+@@ -24,6 +24,7 @@ import java.io.DataOutputStream;
+ import java.io.File;
+ import java.io.IOException;
+ import java.io.OutputStream;
++import java.nio.Buffer;
+ import java.nio.ByteBuffer;
+ import java.nio.ByteOrder;
+ import java.nio.channels.SeekableByteChannel;
+@@ -288,7 +289,7 @@ public class SevenZOutputFile implements
+         crc32.reset();
+         crc32.update(bb.array(), SevenZFile.sevenZSignature.length + 6, 20);
+         bb.putInt(SevenZFile.sevenZSignature.length + 2, (int) crc32.getValue());
+-        bb.flip();
++        ((Buffer)bb).flip();
+         channel.write(bb);
+     }
+ 
+@@ -772,7 +773,7 @@ public class SevenZOutputFile implements
+         private final ByteBuffer buffer = ByteBuffer.allocate(BUF_SIZE);
+         @Override
+         public void write(final int b) throws IOException {
+-            buffer.clear();
++            ((Buffer)buffer).clear();
+             buffer.put((byte) b).flip();
+             channel.write(buffer);
+             compressedCrc32.update(b);
+@@ -790,7 +791,7 @@ public class SevenZOutputFile implements
+             if (len > BUF_SIZE) {
+                 channel.write(ByteBuffer.wrap(b, off, len));
+             } else {
+-                buffer.clear();
++                ((Buffer)buffer).clear();
+                 buffer.put(b, off, len).flip();
+                 channel.write(buffer);
+             }
+Index: commons-compress-1.19-src/src/main/java/org/apache/commons/compress/archivers/zip/NioZipEncoding.java
+===================================================================
+--- commons-compress-1.19-src.orig/src/main/java/org/apache/commons/compress/archivers/zip/NioZipEncoding.java
++++ commons-compress-1.19-src/src/main/java/org/apache/commons/compress/archivers/zip/NioZipEncoding.java
+@@ -20,6 +20,7 @@
+ package org.apache.commons.compress.archivers.zip;
+ 
+ import java.io.IOException;
++import java.nio.Buffer;
+ import java.nio.ByteBuffer;
+ import java.nio.CharBuffer;
+ import java.nio.charset.Charset;
+@@ -121,8 +122,8 @@ class NioZipEncoding implements ZipEncod
+         enc.encode(cb, out, true);
+         // may have caused underflow, but that's been ignored traditionally
+ 
+-        out.limit(out.position());
+-        out.rewind();
++        ((Buffer)out).limit(out.position());
++        ((Buffer)out).rewind();
+         return out;
+     }
+ 
+Index: commons-compress-1.19-src/src/main/java/org/apache/commons/compress/archivers/zip/ZipArchiveInputStream.java
+===================================================================
+--- commons-compress-1.19-src.orig/src/main/java/org/apache/commons/compress/archivers/zip/ZipArchiveInputStream.java
++++ commons-compress-1.19-src/src/main/java/org/apache/commons/compress/archivers/zip/ZipArchiveInputStream.java
+@@ -25,6 +25,7 @@ import java.io.IOException;
+ import java.io.InputStream;
+ import java.io.PushbackInputStream;
+ import java.math.BigInteger;
++import java.nio.Buffer;
+ import java.nio.ByteBuffer;
+ import java.util.Arrays;
+ import java.util.zip.CRC32;
+@@ -220,7 +221,7 @@ public class ZipArchiveInputStream exten
+         this.allowStoredEntriesWithDataDescriptor =
+             allowStoredEntriesWithDataDescriptor;
+         // haven't read anything so far
+-        buf.limit(0);
++        ((Buffer)buf).limit(0);
+     }
+ 
+     public ZipArchiveEntry getNextZipEntry() throws IOException {
+@@ -522,13 +523,13 @@ public class ZipArchiveInputStream exten
+         }
+ 
+         if (buf.position() >= buf.limit()) {
+-            buf.position(0);
++            ((Buffer)buf).position(0);
+             final int l = in.read(buf.array());
+             if (l == -1) {
+-                buf.limit(0);
++                ((Buffer)buf).limit(0);
+                 throw new IOException("Truncated ZIP file");
+             }
+-            buf.limit(l);
++            ((Buffer)buf).limit(l);
+ 
+             count(l);
+             current.bytesReadFromStream += l;
+@@ -719,7 +720,7 @@ public class ZipArchiveInputStream exten
+         }
+ 
+         inf.reset();
+-        buf.clear().flip();
++        ((Buffer)buf).clear().flip();
+         current = null;
+         lastStoredEntry = null;
+     }
+@@ -784,7 +785,7 @@ public class ZipArchiveInputStream exten
+         }
+         final int length = in.read(buf.array());
+         if (length > 0) {
+-            buf.limit(length);
++            ((Buffer)buf).limit(length);
+             count(buf.limit());
+             inf.setInput(buf.array(), 0, buf.limit());
+         }
+Index: commons-compress-1.19-src/src/main/java/org/apache/commons/compress/archivers/zip/ZipEncodingHelper.java
+===================================================================
+--- commons-compress-1.19-src.orig/src/main/java/org/apache/commons/compress/archivers/zip/ZipEncodingHelper.java
++++ commons-compress-1.19-src/src/main/java/org/apache/commons/compress/archivers/zip/ZipEncodingHelper.java
+@@ -18,6 +18,7 @@
+ 
+ package org.apache.commons.compress.archivers.zip;
+ 
++import java.nio.Buffer;
+ import java.nio.ByteBuffer;
+ import java.nio.charset.Charset;
+ import java.nio.charset.StandardCharsets;
+@@ -85,8 +86,8 @@ public abstract class ZipEncodingHelper
+     }
+ 
+     static ByteBuffer growBufferBy(ByteBuffer buffer, int increment) {
+-        buffer.limit(buffer.position());
+-        buffer.rewind();
++        ((Buffer)buffer).limit(buffer.position());
++        ((Buffer)buffer).rewind();
+ 
+         final ByteBuffer on = ByteBuffer.allocate(buffer.capacity() + increment);
+ 
+Index: commons-compress-1.19-src/src/main/java/org/apache/commons/compress/archivers/zip/ZipFile.java
+===================================================================
+--- commons-compress-1.19-src.orig/src/main/java/org/apache/commons/compress/archivers/zip/ZipFile.java
++++ commons-compress-1.19-src/src/main/java/org/apache/commons/compress/archivers/zip/ZipFile.java
+@@ -25,6 +25,7 @@ import java.io.File;
+ import java.io.IOException;
+ import java.io.InputStream;
+ import java.io.SequenceInputStream;
++import java.nio.Buffer;
+ import java.nio.ByteBuffer;
+ import java.nio.channels.FileChannel;
+ import java.nio.channels.SeekableByteChannel;
+@@ -693,7 +694,7 @@ public class ZipFile implements Closeabl
+ 
+         positionAtCentralDirectory();
+ 
+-        wordBbuf.rewind();
++        ((Buffer)wordBbuf).rewind();
+         IOUtils.readFully(archive, wordBbuf);
+         long sig = ZipLong.getValue(wordBuf);
+ 
+@@ -704,7 +705,7 @@ public class ZipFile implements Closeabl
+ 
+         while (sig == CFH_SIG) {
+             readCentralDirectoryEntry(noUTF8Flag);
+-            wordBbuf.rewind();
++            ((Buffer)wordBbuf).rewind();
+             IOUtils.readFully(archive, wordBbuf);
+             sig = ZipLong.getValue(wordBuf);
+         }
+@@ -723,7 +724,7 @@ public class ZipFile implements Closeabl
+     private void
+         readCentralDirectoryEntry(final Map<ZipArchiveEntry, NameAndComment> noUTF8Flag)
+         throws IOException {
+-        cfhBbuf.rewind();
++        ((Buffer)cfhBbuf).rewind();
+         IOUtils.readFully(archive, cfhBbuf);
+         int off = 0;
+         final Entry ze = new Entry();
+@@ -961,7 +962,7 @@ public class ZipFile implements Closeabl
+             archive.position() > ZIP64_EOCDL_LENGTH;
+         if (searchedForZip64EOCD) {
+             archive.position(archive.position() - ZIP64_EOCDL_LENGTH);
+-            wordBbuf.rewind();
++            ((Buffer)wordBbuf).rewind();
+             IOUtils.readFully(archive, wordBbuf);
+             found = Arrays.equals(ZipArchiveOutputStream.ZIP64_EOCD_LOC_SIG,
+                                   wordBuf);
+@@ -990,10 +991,10 @@ public class ZipFile implements Closeabl
+         throws IOException {
+         skipBytes(ZIP64_EOCDL_LOCATOR_OFFSET
+                   - WORD /* signature has already been read */);
+-        dwordBbuf.rewind();
++        ((Buffer)dwordBbuf).rewind();
+         IOUtils.readFully(archive, dwordBbuf);
+         archive.position(ZipEightByteInteger.getLongValue(dwordBuf));
+-        wordBbuf.rewind();
++        ((Buffer)wordBbuf).rewind();
+         IOUtils.readFully(archive, wordBbuf);
+         if (!Arrays.equals(wordBuf, ZipArchiveOutputStream.ZIP64_EOCD_SIG)) {
+             throw new ZipException("Archive's ZIP64 end of central "
+@@ -1001,7 +1002,7 @@ public class ZipFile implements Closeabl
+         }
+         skipBytes(ZIP64_EOCD_CFD_LOCATOR_OFFSET
+                   - WORD /* signature has already been read */);
+-        dwordBbuf.rewind();
++        ((Buffer)dwordBbuf).rewind();
+         IOUtils.readFully(archive, dwordBbuf);
+         archive.position(ZipEightByteInteger.getLongValue(dwordBuf));
+     }
+@@ -1016,7 +1017,7 @@ public class ZipFile implements Closeabl
+     private void positionAtCentralDirectory32()
+         throws IOException {
+         skipBytes(CFD_LOCATOR_OFFSET);
+-        wordBbuf.rewind();
++        ((Buffer)wordBbuf).rewind();
+         IOUtils.readFully(archive, wordBbuf);
+         archive.position(ZipLong.getValue(wordBuf));
+     }
+@@ -1050,9 +1051,9 @@ public class ZipFile implements Closeabl
+             for (; off >= stopSearching; off--) {
+                 archive.position(off);
+                 try {
+-                    wordBbuf.rewind();
++                    ((Buffer)wordBbuf).rewind();
+                     IOUtils.readFully(archive, wordBbuf);
+-                    wordBbuf.flip();
++                    ((Buffer)wordBbuf).flip();
+                 } catch (EOFException ex) { // NOSONAR
+                     break;
+                 }
+@@ -1153,9 +1154,9 @@ public class ZipFile implements Closeabl
+     private int[] setDataOffset(ZipArchiveEntry ze) throws IOException {
+         final long offset = ze.getLocalHeaderOffset();
+         archive.position(offset + LFH_OFFSET_FOR_FILENAME_LENGTH);
+-        wordBbuf.rewind();
++        ((Buffer)wordBbuf).rewind();
+         IOUtils.readFully(archive, wordBbuf);
+-        wordBbuf.flip();
++        ((Buffer)wordBbuf).flip();
+         wordBbuf.get(shortBuf);
+         final int fileNameLen = ZipShort.getValue(shortBuf);
+         wordBbuf.get(shortBuf);
+@@ -1180,7 +1181,7 @@ public class ZipFile implements Closeabl
+      */
+     private boolean startsWithLocalFileHeader() throws IOException {
+         archive.position(0);
+-        wordBbuf.rewind();
++        ((Buffer)wordBbuf).rewind();
+         IOUtils.readFully(archive, wordBbuf);
+         return Arrays.equals(wordBuf, ZipArchiveOutputStream.LFH_SIG);
+     }
+@@ -1223,7 +1224,7 @@ public class ZipFile implements Closeabl
+                 singleByteBuffer = ByteBuffer.allocate(1);
+             }
+             else {
+-                singleByteBuffer.rewind();
++                ((Buffer)singleByteBuffer).rewind();
+             }
+             int read = read(loc, singleByteBuffer);
+             if (read < 0) {
+@@ -1262,7 +1263,7 @@ public class ZipFile implements Closeabl
+                 archive.position(pos);
+                 read = archive.read(buf);
+             }
+-            buf.flip();
++            ((Buffer)buf).flip();
+             return read;
+         }
+     }
+@@ -1284,7 +1285,7 @@ public class ZipFile implements Closeabl
+         @Override
+         protected int read(long pos, ByteBuffer buf) throws IOException {
+             int read = archive.read(buf, pos);
+-            buf.flip();
++            ((Buffer)buf).flip();
+             return read;
+         }
+     }
+Index: commons-compress-1.19-src/src/main/java/org/apache/commons/compress/utils/FixedLengthBlockOutputStream.java
+===================================================================
+--- commons-compress-1.19-src.orig/src/main/java/org/apache/commons/compress/utils/FixedLengthBlockOutputStream.java
++++ commons-compress-1.19-src/src/main/java/org/apache/commons/compress/utils/FixedLengthBlockOutputStream.java
+@@ -21,6 +21,7 @@ package org.apache.commons.compress.util
+ import java.io.FileOutputStream;
+ import java.io.IOException;
+ import java.io.OutputStream;
++import java.nio.Buffer;
+ import java.nio.ByteBuffer;
+ import java.nio.ByteOrder;
+ import java.nio.channels.ClosedChannelException;
+@@ -88,7 +89,7 @@ public class FixedLengthBlockOutputStrea
+     }
+ 
+     private void writeBlock() throws IOException {
+-        buffer.flip();
++        ((Buffer)buffer).flip();
+         int i = out.write(buffer);
+         boolean hasRemaining = buffer.hasRemaining();
+         if (i != blockSize || hasRemaining) {
+@@ -97,7 +98,7 @@ public class FixedLengthBlockOutputStrea
+                     blockSize, i);
+             throw new IOException(msg);
+         }
+-        buffer.clear();
++        ((Buffer)buffer).clear();
+     }
+ 
+     @Override
+@@ -142,7 +143,7 @@ public class FixedLengthBlockOutputStrea
+             // fill up the reset of buffer and write the block.
+             if (buffer.position() != 0) {
+                 int n = buffer.remaining();
+-                src.limit(src.position() + n);
++                ((Buffer)src).limit(src.position() + n);
+                 buffer.put(src);
+                 writeBlock();
+                 srcLeft -= n;
+@@ -150,12 +151,12 @@ public class FixedLengthBlockOutputStrea
+             // whilst we have enough bytes in src for complete blocks,
+             // write them directly from src without copying them to buffer
+             while (srcLeft >= blockSize) {
+-                src.limit(src.position() + blockSize);
++                ((Buffer)src).limit(src.position() + blockSize);
+                 out.write(src);
+                 srcLeft -= blockSize;
+             }
+             // copy any remaining bytes into buffer
+-            src.limit(savedLimit);
++            ((Buffer)src).limit(savedLimit);
+             buffer.put(src);
+         }
+         return srcRemaining;
+@@ -240,9 +241,9 @@ public class FixedLengthBlockOutputStrea
+ 
+             try {
+                 int pos = buffer.position();
+-                int len = buffer.limit() - pos;
++                int len = ((Buffer)buffer).limit() - pos;
+                 out.write(buffer.array(), buffer.arrayOffset() + pos, len);
+-                buffer.position(buffer.limit());
++                ((Buffer)buffer).position(buffer.limit());
+                 return len;
+             } catch (IOException e) {
+                 try {
