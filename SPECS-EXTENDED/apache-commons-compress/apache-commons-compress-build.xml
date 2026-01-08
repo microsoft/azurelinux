@@ -9,24 +9,27 @@
   <property file="build.properties"/>
 
   <property name="build.name" value="commons-compress"/>
-  <property name="build.version" value="1.26.1"/>
+  <property name="build.version" value="1.19"/>
   <property name="build.finalName" value="${build.name}-${build.version}"/>
   <property name="build.dir" value="target"/>
   <property name="build.javadocDir" value="${build.dir}/site/apidocs"/>
   <property name="build.outputDir" value="${build.dir}/classes"/>
-  <property name="build.srcDir" value="src/main/java"/>
-  <property name="build.resourceDir" value="src/main/resources"/>
+  <property name="build.srcDir.0" value="src/main/java"/>
+  <property name="build.resourceDir.0" value="src/main/resources"/>
+  <property name="build.resourceDir.1" value="."/>
+
+  <property name="commons.javadoc.javaee.link" value="http://docs.oracle.com/javaee/6/api/"/>
+  <property name="commons.javadoc.java.link" value="http://docs.oracle.com/javase/7/docs/api/"/>
 
   <property name="commons.osgi.dynamicImport" value=""/>
   <property name="commons.osgi.excludeDependencies" value="true"/>
-  <property name="commons.osgi.export" value="org.apache.commons.compress.archivers.ar;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.arj;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.cpio;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.dump;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.examples;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.jar;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.sevenz;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.tar;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.zip;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers;version=&quot;${build.version}&quot;,org.apache.commons.compress.changes;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.bzip2;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.deflate64;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.deflate;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.gzip;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.lz4;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.lz77support;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.lzma;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.lzw;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.snappy;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.xz;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.z;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors;version=&quot;${build.version}&quot;,org.apache.commons.compress.java.util.jar;version=&quot;${build.version}&quot;,org.apache.commons.compress.parallel;version=&quot;${build.version}&quot;,org.apache.commons.compress.utils;version=&quot;${build.version}&quot;,org.apache.commons.compress;version=&quot;${build.version}&quot;"/>
-  <property name="commons.osgi.import" value="javax.crypto.spec;resolution:=optional,javax.crypto;resolution:=optional,org.apache.commons.codec.digest;resolution:=optional,org.apache.commons.codec;resolution:=optional,org.apache.commons.io.build;resolution:=optional,org.apache.commons.io.file.attribute;resolution:=optional,org.apache.commons.io.input;resolution:=optional,org.apache.commons.io.output;resolution:=optional,org.apache.commons.io;resolution:=optional,org.apache.commons.lang3.reflect;resolution:=optional,org.apache.commons.lang3;resolution:=optional,org.objectweb.asm;resolution:=optional,org.tukaani.xz;resolution:=optional"/>
+  <property name="commons.osgi.export" value="org.apache.commons.compress;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.ar;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.arj;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.cpio;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.dump;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.examples;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.jar;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.sevenz;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.tar;version=&quot;${build.version}&quot;,org.apache.commons.compress.archivers.zip;version=&quot;${build.version}&quot;,org.apache.commons.compress.changes;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.bzip2;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.deflate;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.deflate64;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.gzip;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.lz4;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.lz77support;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.lzma;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.lzw;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.pack200;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.snappy;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.xz;version=&quot;${build.version}&quot;,org.apache.commons.compress.compressors.z;version=&quot;${build.version}&quot;,org.apache.commons.compress.parallel;version=&quot;${build.version}&quot;,org.apache.commons.compress.utils;version=&quot;${build.version}&quot;"/>
+  <property name="commons.osgi.import" value="org.tukaani.xz;resolution:=optional,javax.crypto;resolution:=optional,javax.crypto.spec;resolution:=optional,org.brotli.dec;resolution:=optional,com.github.luben.zstd;resolution:=optional"/>
   <property name="commons.osgi.private" value=""/>
   <property name="commons.osgi.symbolicName" value="org.apache.commons.compress"/>
 
-  <property name="compiler.release" value="8"/>
-  <property name="compiler.source" value="1.${compiler.release}"/>
-  <property name="compiler.target" value="${compiler.source}"/>
+  <property name="compiler.source" value="1.7"/>
+  <property name="compiler.target" value="1.7"/>
 
 
   <!-- ====================================================================== -->
@@ -61,15 +64,21 @@
            optimize="false" 
            deprecation="true" 
            target="${compiler.target}" 
-           release="${compiler.release}"
            verbose="false" 
            fork="false" 
            source="${compiler.source}">
       <src>
-        <pathelement location="${build.srcDir}"/>
+        <pathelement location="${build.srcDir.0}"/>
       </src>
       <classpath refid="build.classpath"/>
     </javac>
+    <mkdir dir="${build.outputDir}/META-INF"/>
+    <copy todir="${build.outputDir}/META-INF">
+      <fileset dir="${build.resourceDir.1}">
+        <include name="NOTICE.txt"/>
+        <include name="LICENSE.txt"/>
+      </fileset>
+    </copy>
   </target>
 
   <!-- ====================================================================== -->
@@ -78,7 +87,7 @@
 
   <target name="javadoc" description="Generates the Javadoc of the application">
     <mkdir dir="${build.javadocDir}"/>
-    <javadoc sourcepath="${build.srcDir}" 
+    <javadoc sourcepath="${build.srcDir.0}" 
              packagenames="*" 
              destdir="${build.javadocDir}" 
              access="protected" 
@@ -99,6 +108,8 @@
              linksource="true" 
              breakiterator="false">
       <classpath refid="build.classpath"/>
+      <!-- <link href="${commons.javadoc.java.link}"/> -->
+      <!-- <link href="${commons.javadoc.javaee.link}"/> -->
     </javadoc>
   </target>
 
@@ -113,12 +124,10 @@
          basedir="${build.outputDir}" 
          excludes="**/package.html">
       <manifest>
-        <attribute name="Automatic-Module-Name" value="${commons.osgi.symbolicName}"/>
         <attribute name="Bundle-SymbolicName" value="${commons.osgi.symbolicName}"/>
         <attribute name="Bundle-Version" value="${build.version}"/>
-        <attribute name="Export-Package" value="${commons.osgi.export}"/>
-        <attribute name="Import-Package" value="${commons.osgi.import}"/>
-        <attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=${compiler.target}))&quot;"/>
+		<attribute name="Export-Package" value="${commons.osgi.export}"/>
+		<attribute name="Import-Package" value="${commons.osgi.import}"/>
       </manifest>
     </jar>
   </target>
