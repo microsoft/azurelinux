@@ -20,7 +20,7 @@
 Summary:           Open vSwitch daemon/database/utilities
 Name:              openvswitch
 Version:           3.3.0
-Release:           1%{?dist}
+Release:           2%{?dist}
 License:           ASL 2.0 AND LGPLv2+ AND SISSL
 Vendor:            Microsoft Corporation
 Distribution:      Azure Linux
@@ -504,6 +504,9 @@ fi
 %{_sysusersdir}/openvswitch.conf
 
 %changelog
+* Thu Jan 08 2026 Tobias Brick <tobiasb@microsoft.com> - 3.3.0-2
+- Add patches from fedora f40 to fix tests with new versions of openssl and python.
+
 * Wed Feb 21 2024 Thien Trung Vuong <tvuong@microsoft.com> - 3.3.0-1
 - Update to version 3.3.0
 
