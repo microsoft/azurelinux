@@ -32,6 +32,8 @@ Source1:           openvswitch.sysusers
 # ovs-patches
 
 # OVS (including OVN) backports (0 - 300)
+Patch0: 0001-tests-Fix-SSL-db-implementation-test-with-openssl-3..patch
+Patch10: 0001-tests-Fix-compatibility-issue-with-Python-3.13-in-vl.patch
 
 BuildRequires: gcc gcc-c++ make
 BuildRequires: autoconf automake libtool
