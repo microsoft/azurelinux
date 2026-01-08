@@ -1,0 +1,256 @@
+From adebe45f6ef9f9d036acacd8aec7411d4ea84e25 Mon Sep 17 00:00:00 2001
+From: Nick Wellnhofer <wellnhofer@aevum.de>
+Date: Wed, 31 Aug 2022 15:29:57 +0200
+Subject: [PATCH] Infrastructure to store extra data in source nodes
+
+Provide a mechanism to store bit flags in nodes from the source
+document. This will later be used to store key and id status.
+
+Provide a function to find the psvi member of a node.
+
+Revert any changes to the source document after the transformation.
+Upstream Patch Reference: https://gitlab.gnome.org/GNOME/libxslt/-/commit/adebe45f6ef9f9d036acacd8aec7411d4ea84e25
+---
+ libxslt/transform.c     |  34 ++++++++++
+ libxslt/xsltInternals.h |   1 +
+ libxslt/xsltutils.c     | 135 ++++++++++++++++++++++++++++++++++++++++
+ libxslt/xsltutils.h     |  13 ++++
+ 4 files changed, 183 insertions(+)
+
+diff --git a/libxslt/transform.c b/libxslt/transform.c
+index cb43bb47..512eb024 100644
+--- a/libxslt/transform.c
++++ b/libxslt/transform.c
+@@ -5746,6 +5746,37 @@ xsltCountKeys(xsltTransformContextPtr ctxt)
+     return(ctxt->nbKeys);
+ }
+ 
++/**
++ * xsltCleanupSourceDoc:
++ * @doc:  Document
++ *
++ * Resets source node flags and ids stored in 'psvi' member.
++ */
++static void
++xsltCleanupSourceDoc(xmlDocPtr doc) {
++    xmlNodePtr cur = (xmlNodePtr) doc;
++    void **psviPtr;
++
++    while (1) {
++        xsltClearSourceNodeFlags(cur, XSLT_SOURCE_NODE_MASK);
++        psviPtr = xsltGetPSVIPtr(cur);
++        if (psviPtr)
++            *psviPtr = NULL;
++
++        if (cur->children != NULL && cur->type != XML_ENTITY_REF_NODE) {
++            cur = cur->children;
++        } else {
++            while (cur->next == NULL) {
++                cur = cur->parent;
++                if (cur == (xmlNodePtr) doc)
++                    return;
++            }
++
++            cur = cur->next;
++        }
++    }
++}
++
+ /**
+  * xsltApplyStylesheetInternal:
+  * @style:  a parsed XSLT stylesheet
+@@ -6144,6 +6175,9 @@ xsltApplyStylesheetInternal(xsltStylesheetPtr style, xmlDocPtr doc,
+     printf("# Reused variables     : %d\n", ctxt->cache->dbgReusedVars);
+ #endif
+ 
++    if (ctxt->sourceDocDirty)
++        xsltCleanupSourceDoc(doc);
++
+     if ((ctxt != NULL) && (userCtxt == NULL))
+ 	xsltFreeTransformContext(ctxt);
+ 
+diff --git a/libxslt/xsltInternals.h b/libxslt/xsltInternals.h
+index 14343d27..b0125c21 100644
+--- a/libxslt/xsltInternals.h
++++ b/libxslt/xsltInternals.h
+@@ -1786,6 +1786,7 @@ struct _xsltTransformContext {
+     int maxTemplateVars;
+     unsigned long opLimit;
+     unsigned long opCount;
++    int sourceDocDirty;
+ };
+ 
+ /**
+diff --git a/libxslt/xsltutils.c b/libxslt/xsltutils.c
+index f352ca1b..9f0feb53 100644
+--- a/libxslt/xsltutils.c
++++ b/libxslt/xsltutils.c
+@@ -1834,6 +1834,141 @@ xsltSaveResultToString(xmlChar **doc_txt_ptr, int * doc_txt_len,
+     return 0;
+ }
+ 
++/**
++ * xsltGetSourceNodeFlags:
++ * @node:  Node from source document
++ *
++ * Returns the flags for a source node.
++ */
++int
++xsltGetSourceNodeFlags(xmlNodePtr node) {
++    /*
++     * Squeeze the bit flags into the upper bits of
++     *
++     * - 'int properties' member in struct _xmlDoc
++     * - 'xmlAttributeType atype' member in struct _xmlAttr
++     * - 'unsigned short extra' member in struct _xmlNode
++     */
++    switch (node->type) {
++        case XML_DOCUMENT_NODE:
++        case XML_HTML_DOCUMENT_NODE:
++            return ((xmlDocPtr) node)->properties >> 27;
++
++        case XML_ATTRIBUTE_NODE:
++            return ((xmlAttrPtr) node)->atype >> 27;
++
++        case XML_ELEMENT_NODE:
++        case XML_TEXT_NODE:
++        case XML_CDATA_SECTION_NODE:
++        case XML_PI_NODE:
++        case XML_COMMENT_NODE:
++            return node->extra >> 12;
++
++        default:
++            return 0;
++    }
++}
++
++/**
++ * xsltSetSourceNodeFlags:
++ * @node:  Node from source document
++ * @flags:  Flags
++ *
++ * Sets the specified flags to 1.
++ *
++ * Returns 0 on success, -1 on error.
++ */
++int
++xsltSetSourceNodeFlags(xsltTransformContextPtr ctxt, xmlNodePtr node,
++                       int flags) {
++    if (node->doc == ctxt->initialContextDoc)
++        ctxt->sourceDocDirty = 1;
++
++    switch (node->type) {
++        case XML_DOCUMENT_NODE:
++        case XML_HTML_DOCUMENT_NODE:
++            ((xmlDocPtr) node)->properties |= flags << 27;
++            return 0;
++
++        case XML_ATTRIBUTE_NODE:
++            ((xmlAttrPtr) node)->atype |= flags << 27;
++            return 0;
++
++        case XML_ELEMENT_NODE:
++        case XML_TEXT_NODE:
++        case XML_CDATA_SECTION_NODE:
++        case XML_PI_NODE:
++        case XML_COMMENT_NODE:
++            node->extra |= flags << 12;
++            return 0;
++
++        default:
++            return -1;
++    }
++}
++
++/**
++ * xsltClearSourceNodeFlags:
++ * @node:  Node from source document
++ * @flags:  Flags
++ *
++ * Sets the specified flags to 0.
++ *
++ * Returns 0 on success, -1 on error.
++ */
++int
++xsltClearSourceNodeFlags(xmlNodePtr node, int flags) {
++    switch (node->type) {
++        case XML_DOCUMENT_NODE:
++        case XML_HTML_DOCUMENT_NODE:
++            ((xmlDocPtr) node)->properties &= ~(flags << 27);
++            return 0;
++
++        case XML_ATTRIBUTE_NODE:
++            ((xmlAttrPtr) node)->atype &= ~(flags << 27);
++            return 0;
++
++        case XML_ELEMENT_NODE:
++        case XML_TEXT_NODE:
++        case XML_CDATA_SECTION_NODE:
++        case XML_PI_NODE:
++        case XML_COMMENT_NODE:
++            node->extra &= ~(flags << 12);
++            return 0;
++
++        default:
++            return -1;
++    }
++}
++
++/**
++ * xsltGetPSVIPtr:
++ * @cur:  Node
++ *
++ * Returns a pointer to the psvi member of a node or NULL on error.
++ */
++void **
++xsltGetPSVIPtr(xmlNodePtr cur) {
++    switch (cur->type) {
++        case XML_DOCUMENT_NODE:
++        case XML_HTML_DOCUMENT_NODE:
++            return &((xmlDocPtr) cur)->psvi;
++
++        case XML_ATTRIBUTE_NODE:
++            return &((xmlAttrPtr) cur)->psvi;
++
++        case XML_ELEMENT_NODE:
++        case XML_TEXT_NODE:
++        case XML_CDATA_SECTION_NODE:
++        case XML_PI_NODE:
++        case XML_COMMENT_NODE:
++            return &cur->psvi;
++
++        default:
++            return NULL;
++    }
++}
++
+ #ifdef WITH_PROFILER
+ 
+ /************************************************************************
+diff --git a/libxslt/xsltutils.h b/libxslt/xsltutils.h
+index 7a12f7b3..65ef78e0 100644
+--- a/libxslt/xsltutils.h
++++ b/libxslt/xsltutils.h
+@@ -244,6 +244,19 @@ XSLTPUBFUN xmlXPathCompExprPtr XSLTCALL
+ 						 const xmlChar *str,
+ 						 int flags);
+ 
++#ifdef IN_LIBXSLT
++#define XSLT_SOURCE_NODE_MASK       15
++int
++xsltGetSourceNodeFlags(xmlNodePtr node);
++int
++xsltSetSourceNodeFlags(xsltTransformContextPtr ctxt, xmlNodePtr node,
++                       int flags);
++int
++xsltClearSourceNodeFlags(xmlNodePtr node, int flags);
++void **
++xsltGetPSVIPtr(xmlNodePtr cur);
++#endif
++
+ /*
+  * Profiling.
+  */
+-- 
+GitLab
+

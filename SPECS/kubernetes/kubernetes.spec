@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.28.4
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,6 +33,8 @@ Patch11:        CVE-2025-30204.patch
 Patch12:        CVE-2024-51744.patch
 Patch13:        CVE-2025-22872.patch
 Patch14:        CVE-2025-31133.patch
+Patch15:        CVE-2025-13281.patch
+Patch16:        CVE-2025-65637.patch
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.35-7%{?dist}
 BuildRequires:  golang
@@ -278,6 +280,9 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Tue Dec 16 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.4-21
+- Patch for CVE-2025-65637, CVE-2025-13281
+
 * Tue Nov 25 2025 Ratiranjan Behera <v-ratbehera@microsoft.com> - 1.28.4-20
 - Patch CVE-2025-31133
 
