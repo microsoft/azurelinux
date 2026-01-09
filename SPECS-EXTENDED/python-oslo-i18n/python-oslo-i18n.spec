@@ -20,11 +20,6 @@ Source0:        https://files.pythonhosted.org/packages/source/o/%{pypi_name}/%{
 
 BuildArch:      noarch
 
-# Required for tarball sources verification
-%if 0%{?sources_gpg} == 1
-BuildRequires:  /usr/bin/gpgv2
-%endif
-
 BuildRequires:  git-core
 
 %description
@@ -72,10 +67,6 @@ Summary:   Translation files for Oslo i18n library
 Translation files for Oslo i18n library
 
 %prep
-# Required for tarball sources verification
-%if 0%{?sources_gpg} == 1
-%{gpgverify}  --keyring=%{SOURCE102} --signature=%{SOURCE101} --data=%{SOURCE0}
-%endif
 %autosetup -n %{pypi_name}-%{upstream_version} -S git
 
 
