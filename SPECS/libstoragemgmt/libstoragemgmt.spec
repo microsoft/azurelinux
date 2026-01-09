@@ -1,7 +1,7 @@
 Summary:        Storage array management library
 Name:           libstoragemgmt
 Version:        1.9.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -455,6 +455,9 @@ fi
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
+* Fri Jan 09 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.9.8-2
+- Added shadow-utils as runtime dependency.
+
 * Tue Feb 06 2024 Nan Liu <liunan@microsoft.com> - 1.9.8-1
 - Upgrade to 1.9.8 in Azure Linux 3.0
 - Remove the unneeded patch
