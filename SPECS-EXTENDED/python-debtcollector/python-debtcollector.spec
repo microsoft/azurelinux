@@ -130,73 +130,12 @@ rm -fr doc/build/html/.{doctrees,buildinfo}
 %endif
 
 %changelog
-* Mon Apr 28 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.0.0-5
-- Upgrade to the latest version with the reference of Fedora 41
+* Fri Jan 09 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.0.0-5
+- Upgrade to 3.0.0 (Reference: Fedora 42)
 - License verified
 
-* Fri Nov 29 2024 Tim Semeijn <tim@semeijn.net> - 3.0.0-4
-- Use autorelease and autochangelog (current version fixes rhbz#1214707)
-
-* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
-
-* Sat Jun 08 2024 Python Maint <python-maint@redhat.com> - 3.0.0-2
-- Rebuilt for Python 3.13
-
-* Mon May 06 2024 Alfredo Moralejo <amoralej@redhat.com> 3.0.0-1
-- Update to upstream version 3.0.0
-
-* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-8
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-7
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-6
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
-
-* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 2.5.0-5
-- Rebuilt for Python 3.12
-
-* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
-
-* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.0-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
-
-* Thu Jun 16 2022 Python Maint <python-maint@redhat.com> - 2.5.0-2
-- Rebuilt for Python 3.11
-
-* Thu May 19 2022 Joel Capitao <jcapitao@redhat.com> 2.5.0-1
-- Update to upstream version 2.5.0
-
-* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.0-7
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
-
-* Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.0-6
-- Second attempt - Rebuilt for
-  https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
-
-* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.2.0-5
-- Rebuilt for Python 3.10
-
-* Wed Feb 10 2021 Charalampos Stratakis <cstratak@redhat.com> - 2.2.0-4
-- Remove redundant python-funcsigs dependency
-
-* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.0-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
-
-* Wed Oct 28 2020 Alfredo Moralejo <amoralej@redhat.com> 2.2.0-2
-- Update to upstream version 2.2.0
-
-* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
-
-* Wed Jun 03 2020 Joel Capitao <jcapitao@redhat.com> 2.0.1-1
-- Update to upstream version 2.0.1
-
-* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1.22.0-4
-- Rebuilt for Python 3.9
+* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.22.0-4
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.22.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
@@ -215,52 +154,3 @@ rm -fr doc/build/html/.{doctrees,buildinfo}
 
 * Fri Mar 08 2019 RDO <dev@lists.rdoproject.org> 1.21.0-1
 - Update to 1.21.0
-
-* Tue Feb 07 2017 Alfredo Moralejo <amoralej@redhat.com> 1.11.0-1
-- Update to 1.11.0
-
-* Mon Dec 19 2016 Miro Hrončok <mhroncok@redhat.com> - 1.8.0-2
-- Rebuild for Python 3.6
-
-* Fri Sep 02 2016 Haikel Guemar <hguemar@fedoraproject.org> 1.8.0-1
-- Update to 1.8.0
-
-* Tue Jul 19 2016 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.0-2
-- https://fedoraproject.org/wiki/Changes/Automatic_Provides_for_Python_RPM_Packages
-
-* Fri Mar 18 2016 Haikel Guemar <hguemar@fedoraproject.org> 1.3.0-1
-- Update to 1.3.0
-
-* Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.0-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
-
-* Tue Nov 10 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.8.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Changes/python3.5
-
-* Fri Sep 18 2015 Alan Pevec <alan.pevec@redhat.com> 0.8.0-1
-- Update to upstream 0.8.0
-
-* Mon Sep 07 2015 Chandan Kumar <chkumar246@gmail.com> 0.7.0-3
-- Fixed obseletes
-- Fixed package namespaces
-
-* Wed Sep 02 2015 Chandan Kumar <chkumar246@gmail.com> 0.7.0-2
-- Added python 2 and python 3 subpackage
-
-* Wed Aug 05 2015 Alan Pevec <alan.pevec@redhat.com> 0.7.0-1
-- Update to upstream 0.7.0
-
-* Sun Jun 28 2015 Alan Pevec <alan.pevec@redhat.com> 0.5.0-1
-- Update to upstream 0.5.0
-
-* Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.3.0-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
-
-* Fri Mar 27 2015 Chandan Kumar <chkumar246@gmail.com> - 0.3.0-3
-- Fixed jquery doc issues
-
-* Wed Mar 25 2015 Chandan Kumar <chkumar246@gmail.com> - 0.3.0-2
-- Fixed doc and license macro in spec file
-
-* Tue Mar 10 2015 Chandan Kumar <chkumar246@gmail.com> - 0.3.0-1
-- Initial Package
