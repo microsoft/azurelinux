@@ -32,6 +32,7 @@ BuildRequires:  valgrind
 %if 0%{?with_check}
 BuildRequires:  git
 %endif
+Requires(pre):  shadow-utils
 Requires:       python3-%{name}
 
 %description
