@@ -8652,7 +8652,7 @@
         "other": {
           "name": "lasso",
           "version": "2.9.0",
-          "downloadUrl": "https://dev.entrouvert.org/lasso/lasso-2.9.0.tar.gz"
+          "downloadUrl": "https://git.entrouvert.org/entrouvert/lasso/archive/v2.9.0.tar.gz"
         }
       }
     },

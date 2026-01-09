@@ -52,7 +52,7 @@ Version: 2.9.0
 Release: 1%{?dist}
 License: GPL-2.0-or-later
 URL: https://lasso.entrouvert.org/
-Source0: https://dev.entrouvert.org/lasso/lasso-%{version}.tar.gz
+Source0: https://git.entrouvert.org/entrouvert/lasso/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires: autoconf
 BuildRequires: automake
@@ -158,7 +158,7 @@ library.
 %endif
 
 %prep
-%setup -q
+%autosetup -n %{name}
 
 # Remove any python script shebang lines (unless they refer to python3)
 sed -i -E -e '/^#![[:blank:]]*(\/usr\/bin\/env[[:blank:]]+python[^3]?\>)|(\/usr\/bin\/python[^3]?\>)/d' \
@@ -168,6 +168,7 @@ sed -i -E -e '/^#![[:blank:]]*(\/usr\/bin\/env[[:blank:]]+python[^3]?\>)|(\/usr\
 %if 0%{?with_java}
 export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
 %endif
+echo %{version} > .tarball-version
 ./autogen.sh
 %if 0%{?with_python3}
   %configure %{configure_args} --with-python=%{__python3}
