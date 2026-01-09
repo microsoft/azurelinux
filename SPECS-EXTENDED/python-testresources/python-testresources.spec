@@ -53,63 +53,13 @@ sed -i 's/failIf/assertFalse/' testresources/tests/test_resourced_test_case.py
 %doc README.rst NEWS doc
 
 %changelog
-* Mon Mar 24 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.0.1-17
-- Initial Azure Linux import from Fedora 41 (license: MIT)
+* Fri Jan 09 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.0.1-17
+- Upgrade to 2.0.1 (Reference: Fedora 41)
 - License verified
 
-* Wed Aug 14 2024 Carl George <carlwgeorge@fedoraproject.org> - 2.0.1-16
-- Run tests with testtools instead of setup.py
-
-* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-15
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
-
-* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 2.0.1-14
-- Rebuilt for Python 3.13
-
-* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-13
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-12
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-11
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
-
-* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 2.0.1-10
-- Rebuilt for Python 3.12
-
-* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-9
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
-
-* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-8
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
-
-* Wed Jun 15 2022 Python Maint <python-maint@redhat.com> - 2.0.1-7
-- Rebuilt for Python 3.11
-
-* Sat Apr 30 2022 Carl George <carl@george.computer> - 2.0.1-6
-- Convert to pyproject macros
-
-* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-5
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
-
-* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
-
-* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.0.1-3
-- Rebuilt for Python 3.10
-
-* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
-
-* Thu Sep 10 2020 Joel Capitao <jcapitao@redhat.com> - 2.0.1-1
-- Update to 2.0.1
-
-* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-17
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
-
-* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1.0.0-16
-- Rebuilt for Python 3.9
+* Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 1.0.0-16
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- Add understated dependency on python3-pbr
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
