@@ -3,7 +3,7 @@
 Summary:        The Sodium crypto library
 Name:           libsodium
 Version:        1.0.19
-Release:        2
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
