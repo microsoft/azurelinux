@@ -92,9 +92,8 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
-* Fri Feb 21 2025 Jyoti kanase <v-jykanase@microsoft.com> - 1.31.0-13
-- Patch CVE-2025-29923
-- Patch CVE-2025-46327
+* Fri Jan 09 2026 Jyoti kanase <v-jykanase@microsoft.com> - 1.31.0-13
+- Patch for CVE-2025-29923, CVE-2025-46327
 
 * Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-12
 - Patch for CVE-2025-10543
