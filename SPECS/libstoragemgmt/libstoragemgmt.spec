@@ -455,7 +455,7 @@ fi
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
-* Fri Jan 09 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.9.8-2
+* Fri Jan 09 2026 Sumit Jena <v-sumitjena@microsoft.com> - 1.9.8-2
 - Added shadow-utils as runtime dependency.
 
 * Tue Feb 06 2024 Nan Liu <liunan@microsoft.com> - 1.9.8-1
