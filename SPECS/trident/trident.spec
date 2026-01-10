@@ -247,7 +247,11 @@ EOF
 %endif
 
 %build
+%if %{undefined rpm_ver}
+export TRIDENT_VERSION="%{version}-%{release}"
+%else
 export TRIDENT_VERSION="%{trident_version}"
+%endif
 cargo build --release
 
 mkdir selinux
@@ -259,14 +263,17 @@ make -f %{_datadir}/selinux/devel/Makefile %{name}.pp
 bzip2 -9 %{name}.pp
 
 %check
-test "$(./target/release/trident --version)" = "trident %{trident_version}"
 %if %{undefined rpm_ver}
+test "$(./target/release/trident --version)" = "trident %{version}-%{release}"
+export TRIDENT_VERSION="%{version}-%{release}"
 # For distro builds, allow trident unit tests to execute as part of check
 %ifarch x86_64
 # Run unit tests only for x86_g4.
 # Skip 3 tests that do not work in RPM chroot environment
 cargo test --all --no-fail-fast -- --skip test_run_systemd_check --skip test_prepare_mount_directory --skip test_read
 %endif
+%else
+test "$(./target/release/trident --version)" = "trident %{trident_version}"
 %endif
 
 %install
