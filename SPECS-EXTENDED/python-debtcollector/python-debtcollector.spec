@@ -130,7 +130,7 @@ rm -fr doc/build/html/.{doctrees,buildinfo}
 %endif
 
 %changelog
-* Fri Jan 09 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.0.0-5
+* Fri Jan 09 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.0.0-5
 - Upgrade to 3.0.0 (Reference: Fedora 42)
 - License verified
 
