@@ -15,7 +15,7 @@ Summary:        GIS file format library
 #global pre rc1
 Name:           gdal
 Version:        3.6.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -71,7 +71,7 @@ BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 # Run time dependency for gpsbabel driver
-Requires:       gpsbabel
+#Requires:       gpsbabel
 %if %{with_spatialite}
 BuildRequires:  libspatialite-devel
 %endif
@@ -217,7 +217,7 @@ mv %{buildroot}%{_bindir}/%{name}-config %{buildroot}%{_bindir}/%{name}-config-%
 cp -a %{SOURCE3} %{buildroot}%{_bindir}/%{name}-config
 
 %check
-ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
+ctest -E "test-unit|autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 
 
 %files -f gdal_python_manpages_excludes.txt
@@ -315,6 +315,9 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 
 
 %changelog
+* Mon Jan 12 2026 Aditya Singh <v-aditysing@microsoft.com> - 3.6.3-3
+- Removed dependency on gpsbabel and test-unit test.
+
 * Thu Aug 17 2023 Archana Choudhary <archana1@microsoft.com> - 3.6.3-2
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - License verified.
