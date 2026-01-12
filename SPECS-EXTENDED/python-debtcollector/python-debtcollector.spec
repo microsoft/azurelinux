@@ -131,7 +131,7 @@ rm -fr doc/build/html/.{doctrees,buildinfo}
 
 %changelog
 * Fri Jan 09 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.0.0-5
-- Upgrade to 3.0.0 (Reference: Fedora 42)
+- Upgrade to 3.0.0 (Reference: Fedora 44)
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.22.0-4
