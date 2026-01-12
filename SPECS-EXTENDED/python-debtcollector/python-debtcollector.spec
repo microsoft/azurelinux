@@ -46,9 +46,8 @@ BuildRequires: python-extras
 BuildRequires: python-sphinx
 BuildRequires: python-tox-current-env
 BuildRequires: python-virtualenv
-BuildRequires: python-sphinx
-BuildRequires: python-testtools
-BuildRequires: python-fixtures
+BuildRequires: python3-testtools
+BuildRequires: python3-fixtures
 
 BuildArch:   noarch
 
