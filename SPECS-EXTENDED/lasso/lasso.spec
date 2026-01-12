@@ -67,7 +67,7 @@ BuildRequires: make
 BuildRequires: openssl-devel
 BuildRequires: python3
 BuildRequires: python3-six
-BuildRequires: (python3-setuptools if python3 >= 3.12)
+BuildRequires: python3-setuptools
 BuildRequires: swig
 BuildRequires: xmlsec1-devel
 BuildRequires: xmlsec1-openssl-devel
@@ -158,8 +158,7 @@ library.
 %endif
 
 %prep
-%setup -q
-
+%autosetup -n %{name}
 # Remove any python script shebang lines (unless they refer to python3)
 sed -i -E -e '/^#![[:blank:]]*(\/usr\/bin\/env[[:blank:]]+python[^3]?\>)|(\/usr\/bin\/python[^3]?\>)/d' \
   `grep -r -l -E '^#![[:blank:]]*(/usr/bin/python[^3]?)|(/usr/bin/env[[:blank:]]+python[^3]?)' *`
@@ -168,6 +167,8 @@ sed -i -E -e '/^#![[:blank:]]*(\/usr\/bin\/env[[:blank:]]+python[^3]?\>)|(\/usr\
 %if 0%{?with_java}
 export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
 %endif
+#export VERSION=%{version}
+echo %{version} > .tarball-version
 ./autogen.sh
 %if 0%{?with_python3}
   %configure %{configure_args} --with-python=%{__python3}
