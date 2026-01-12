@@ -20,7 +20,7 @@ It is a collection of functions/decorators which is used to signal a user when \
 
 Name:        python-%{pypi_name}
 Version:     3.0.0
-Release:     5%{?dist}
+Release:     10%{?dist}
 Summary:     A collection of Python deprecation patterns and strategies
 
 License:     Apache-2.0
@@ -130,7 +130,7 @@ rm -fr doc/build/html/.{doctrees,buildinfo}
 %endif
 
 %changelog
-* Fri Jan 09 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.0.0-5
+* Fri Jan 09 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.0.0-10
 - Upgrade to 3.0.0 (Reference: Fedora 44)
 - License verified
 
