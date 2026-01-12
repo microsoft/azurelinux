@@ -244,6 +244,9 @@ rm -fr %{buildroot}%{_docdir}/%{name}
 %endif
 
 %changelog
+* Wed Dec 24 2025 Sumit Jena <v-sumitjena@microsoft.com> - 2.9.0-1
+- Upgrade to version 2.9.0
+
 * Wed Feb 05 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.8.2-15
 - Initial Azure Linux import from Fedora 41 (license: MIT)
 - License Verified
