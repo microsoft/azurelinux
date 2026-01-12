@@ -11232,7 +11232,7 @@
         "other": {
           "name": "libsodium",
           "version": "1.0.19",
-          "downloadUrl": "https://download.libsodium.org/libsodium/releases/libsodium-1.0.19.tar.gz"
+          "downloadUrl": "https://github.com/jedisct1/libsodium/archive/refs/tags/1.0.19-FINAL.tar.gz"
         }
       }
     },
