@@ -14,9 +14,9 @@ Patch1:         CVE-2024-6232.patch
 Patch2:         CVE-2024-8088.patch
 Patch3:         CVE-2024-3651.patch
 Patch4:         CVE-2024-35195.patch
-Patch5:		CVE-2024-5569.patch
-Patch6:		CVE-2024-6923.patch
-Patch7:		CVE-2026-21441.patch
+Patch5:         CVE-2024-5569.patch
+Patch6:         CVE-2024-6923.patch
+Patch7:         CVE-2026-21441.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -99,11 +99,11 @@ patch -p1 < %{PATCH4}
 patch -p1 < %{PATCH5}
 
 pushd python_x86_64-unknown-linux-gnu/lib/python3.12/email/
-%patch 7 -p1
 patch -p1 < %{PATCH6}
 popd
 
 popd
+patch -p1 < %{PATCH7}
 
 export TF_PYTHON_VERSION=3.12
 ln -s %{_bindir}/python3 %{_bindir}/python
