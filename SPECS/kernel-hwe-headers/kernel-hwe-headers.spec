@@ -3,7 +3,7 @@
 
 Summary:        Linux API header files
 Name:           kernel-hwe-headers
-Version:        6.18.3.1
+Version:        6.18.5.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
