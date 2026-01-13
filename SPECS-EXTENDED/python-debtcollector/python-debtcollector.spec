@@ -113,6 +113,7 @@ PYTHONPATH="%{buildroot}/%{python3_sitelib}"
 %tox -e docs
 # Fix hidden-file-or-dir warnings
 rm -fr doc/build/html/.{doctrees,buildinfo}
+rm -f doc/build/html/_static/images/docs/license.png
 %endif
 
 %files -n python3-%{pypi_name}
