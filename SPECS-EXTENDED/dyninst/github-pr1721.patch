@@ -1,0 +1,55 @@
+commit e70b1001eb5082bb0204b602e3ca1cfccd67fc94
+gpg: Signature made Tue 09 Apr 2024 11:21:17 AM EDT
+gpg:                using RSA key B5690EEEBB952194
+gpg: Can't check signature: No public key
+Author: kupsch <kupsch@cs.wisc.edu>
+Date:   Tue Apr 9 10:21:17 2024 -0500
+
+    improve cmake install dirs (#1721)
+    
+    * Use cmake's GNUInstallDirs to get the lib, bin and include directory
+      names instead of always using 'lib', 'bin', and 'include'.  This
+      results in two changes to the installation:
+    
+      - lib directory becomes 'lib64' on platforms where this is the
+        convention
+    
+      - the lib, bin and include may be overwritten using the cmake
+        variables CMAKE_INSTALL_BINDIR, CMAKE_INSTALL_LIBDIR and
+        CMAKE_INSTALL_INCLUDEDIR respectively
+    
+    * Update github workflows to handle the lib install dir lib64:
+    
+      - use Dyninst_ROOT instead of Dyninst_DIR as it searches for the
+        directory used
+    
+      - for non-cmake uses search for lib* to find either lib or lib64
+
+diff --git a/cmake/DyninstLibrarySettings.cmake b/cmake/DyninstLibrarySettings.cmake
+index d3627f8789f2..e8cb26b95c39 100644
+--- a/cmake/DyninstLibrarySettings.cmake
++++ b/cmake/DyninstLibrarySettings.cmake
+@@ -25,9 +25,10 @@ else()
+   set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+ endif()
+ 
+-set(DYNINST_INSTALL_BINDIR "bin")
+-set(DYNINST_INSTALL_LIBDIR "lib")
+-set(DYNINST_INSTALL_INCLUDEDIR "include")
++include(GNUInstallDirs)
++set(DYNINST_INSTALL_BINDIR "${CMAKE_INSTALL_BINDIR}")
++set(DYNINST_INSTALL_LIBDIR "${CMAKE_INSTALL_LIBDIR}")
++set(DYNINST_INSTALL_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}")
+ set(DYNINST_INSTALL_CMAKEDIR "${DYNINST_INSTALL_LIBDIR}/cmake/Dyninst")
+ 
+ # -- Set up the RPATH ---
+diff --git a/parseThat/CMakeLists.txt b/parseThat/CMakeLists.txt
+index ffe4b7aea29c..d4697a8a1d99 100644
+--- a/parseThat/CMakeLists.txt
++++ b/parseThat/CMakeLists.txt
+@@ -29,4 +29,4 @@ target_link_libraries(parseThat PRIVATE dyninstAPI)
+ target_include_directories(parseThat BEFORE
+                            PRIVATE "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/common/h>")
+ 
+-install(TARGETS parseThat RUNTIME DESTINATION bin)
++install(TARGETS parseThat RUNTIME DESTINATION "${DYNINST_INSTALL_BINDIR}")

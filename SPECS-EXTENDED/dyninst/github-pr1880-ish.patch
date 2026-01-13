@@ -1,0 +1,36 @@
+diff --git a/common/h/Annotatable.h b/common/h/Annotatable.h
+index 6588e3dd36da..262a193ffbb8 100644
+--- a/common/h/Annotatable.h
++++ b/common/h/Annotatable.h
+@@ -44,6 +44,7 @@
+ #include <assert.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <cstdint>
+ #include "util.h"
+ #include "compiler_annotations.h"
+ 
+diff --git a/instructionAPI/h/ArchSpecificFormatters.h b/instructionAPI/h/ArchSpecificFormatters.h
+index b32d4cc14e03..145c604f9619 100644
+--- a/instructionAPI/h/ArchSpecificFormatters.h
++++ b/instructionAPI/h/ArchSpecificFormatters.h
+@@ -34,6 +34,7 @@
+ #include <map>
+ #include <vector>
+ #include <string>
++#include <cstdint>
+ #include "Architecture.h"
+ #include "registers/MachRegister.h"
+ 
+diff --git a/common/src/arch-x86.h b/common/src/arch-x86.h
+index ecdc3dc13..7745306d3 100644
+--- a/common/src/arch-x86.h
++++ b/common/src/arch-x86.h
+@@ -40,6 +40,7 @@
+ #include <set>
+ #include <map>
+ #include <vector>
++#include <cstdint>
+ #include "entryIDs.h"
+ #include "registers/MachRegister.h"
+ #include "common/src/ia32_locations.h"

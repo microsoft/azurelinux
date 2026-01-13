@@ -3128,8 +3128,8 @@
         "type": "other",
         "other": {
           "name": "dyninst",
-          "version": "10.1.0",
-          "downloadUrl": "https://github.com/dyninst/dyninst/archive/v10.1.0/dyninst-10.1.0.tar.gz"
+          "version": "13.0.0",
+          "downloadUrl": "https://github.com/dyninst/dyninst/archive/refs/tags/v13.0.0.tar.gz"
         }
       }
     },

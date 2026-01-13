@@ -1,24 +1,19 @@
 Summary: An API for Run-time Code Generation
-License: LGPLv2+
+License: LGPL-2.1-or-later AND GPL-3.0-or-later WITH Bison-exception-2.2 AND LicenseRef-Fedora-Public-Domain AND BSD-3-Clause
 Name: dyninst
-Release: 26%{?dist}
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL: http://www.dyninst.org
-Version: 10.1.0
-ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
+Group: Development/Libraries
+Release: 1%{?dist}
+URL: https://www.paradyn.org
+Version: 13.0.0
+ExclusiveArch: x86_64 ppc64le aarch64
 
-Source0: https://github.com/dyninst/dyninst/archive/v%{version}/dyninst-%{version}.tar.gz
-Source1: https://github.com/dyninst/testsuite/archive/v%{version}/testsuite-%{version}.tar.gz
-
-Patch1: dyninst-10.1.0-result.patch
-Patch2: testsuite-10.1.0-gettid.patch
-Patch3: testsuite-10.1.0-386.patch
-Patch4: dyninst-10.1.0-aarch-regs.patch
-Patch5: gcc-11-fix.patch
+Source0: https://github.com/dyninst/dyninst/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch1: github-pr1721.patch
+Patch2: github-pr1880.patch
+Patch3: github-pr1880-ish.patch
+Patch4: github-pr1730.patch
 
 %global dyninst_base dyninst-%{version}
-%global testsuite_base testsuite-%{version}
 
 BuildRequires: gcc-c++
 BuildRequires: elfutils-devel
@@ -28,17 +23,11 @@ BuildRequires: binutils-devel
 BuildRequires: cmake
 BuildRequires: libtirpc-devel
 BuildRequires: tbb tbb-devel
+BuildRequires: make
 
-# Extra requires just for the testsuite
-BuildRequires: gcc-gfortran libstdc++-static libxml2-devel
-BuildRequires: glibc-static >= 2.38-16%{?dist}
-
-# Testsuite files should not provide/require anything
-%{?filter_setup:
-%filter_provides_in %{_libdir}/dyninst/testsuite/
-%filter_requires_in %{_libdir}/dyninst/testsuite/
-%filter_setup
-}
+# https://fedoraproject.org/wiki/Changes/Linker_Error_On_Security_Issues
+# may impact the RT library
+%undefine _hardened_linker_errors
 
 %description
 
@@ -52,51 +41,40 @@ the creation of tools and applications that use run-time code patching.
 
 %package doc
 Summary: Documentation for using the Dyninst API
+Group: Documentation
 %description doc
 dyninst-doc contains API documentation for the Dyninst libraries.
+License: LGPL-2.1-or-later
 
 %package devel
 Summary: Header files for compiling programs with Dyninst
+Group: Development/System
 Requires: dyninst = %{version}-%{release}
 Requires: boost-devel
 Requires: tbb-devel
+License: LGPL-2.1-or-later AND BSD-3-Clause AND MIT
+# FindTBB.cmake: presumed MIT, removed in next version of dyninst
 
 %description devel
 dyninst-devel includes the C header files that specify the Dyninst user-space
 libraries and interfaces. This is required for rebuilding any program
 that uses Dyninst.
 
-%package static
-Summary: Static libraries for the compiling programs with Dyninst
-Requires: dyninst-devel = %{version}-%{release}
-%description static
-dyninst-static includes the static versions of the library files for
-the dyninst user-space libraries and interfaces.
-
-%package testsuite
-Summary: Programs for testing Dyninst
-Requires: dyninst = %{version}-%{release}
-Requires: dyninst-devel = %{version}-%{release}
-Requires: dyninst-static = %{version}-%{release}
-Requires: glibc-static
-%description testsuite
-dyninst-testsuite includes the test harness and target programs for
-making sure that dyninst works properly.
-
 %prep
 %setup -q -n %{name}-%{version} -c
-%setup -q -T -D -a 1
+# %setup -q -T -D -a 1
 
-%patch 1 -p1 -b.result
-%patch 2 -p1 -b.gettid
-%patch 3 -p1 -b.386
-%patch 4 -p1 -b.aarch
-%patch 5 -p1
+pushd %{dyninst_base}
+%patch -P1 -p1
+%patch -P2 -p1
+%patch -P3 -p1
+%patch -P4 -p1
+popd
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
-sed -i.cotire -e 's/USE_COTIRE true/USE_COTIRE false/' \
-  %{dyninst_base}/cmake/shared.cmake
+# sed -i.cotire -e 's/USE_COTIRE true/USE_COTIRE false/' \
+#  %{dyninst_base}/cmake/shared.cmake
 
 %build
 
@@ -104,46 +82,34 @@ cd %{dyninst_base}
 
 CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
 LDFLAGS="$LDFLAGS $RPM_LD_FLAGS"
+%ifarch %{ix86}
+    CFLAGS="$CFLAGS -fno-lto -march=i686"
+    LDFLAGS="$LDFLAGS -fno-lto"
+%endif    
 CXXFLAGS="$CFLAGS"
 export CFLAGS CXXFLAGS LDFLAGS
 
-%cmake \
- -DENABLE_STATIC_LIBS=1 \
- -DINSTALL_LIB_DIR:PATH=%{_libdir}/dyninst \
- -DINSTALL_INCLUDE_DIR:PATH=%{_includedir}/dyninst \
- -DINSTALL_CMAKE_DIR:PATH=%{_libdir}/cmake/Dyninst \
+%cmake --log-level=DEBUG \
+ -DENABLE_DEBUGINFOD=1 \
  -DCMAKE_BUILD_TYPE=None \
  -DCMAKE_SKIP_RPATH:BOOL=YES \
- .
-%make_build
-
-# Hack to install dyninst nearby, so the testsuite can use it
-make DESTDIR=../install install
-find ../install -name '*.cmake' -execdir \
-     sed -i -e 's!%{_prefix}!../install&!' '{}' '+'
-# cmake mistakenly looks for libtbb.so in the dyninst install dir
-sed -i '/libtbb.so/ s/".*usr/"\/usr/' $PWD/../install%{_libdir}/cmake/Dyninst/commonTargets.cmake
-
-cd ../%{testsuite_base}
-%cmake \
- -DDyninst_DIR:PATH=$PWD/../install%{_libdir}/cmake/Dyninst \
- -DINSTALL_DIR:PATH=%{_libdir}/dyninst/testsuite \
- -DCMAKE_BUILD_TYPE:STRING=Debug \
- -DCMAKE_SKIP_RPATH:BOOL=YES \
- .
-%make_build
+ -DINSTALL_CMAKE_DIR:PATH=/usr/lib64/cmake/Dyninst \
+ -DCMAKE_INSTALL_PREFIX:PATH=/usr \
+ -DCMAKE_INSTALL_INCLUDEDIR:PATH=/usr/include/dyninst \
+ -DCMAKE_INSTALL_LIBDIR:PATH=/usr/lib64/dyninst
+%cmake_build -v -v -v
 
 %install
 
 cd %{dyninst_base}
-%make_install
+%cmake_install -v -v -v
 
-# It doesn't install docs the way we want, so remove them.
-# We'll just grab the pdfs later, directly from the build dir.
-rm -v %{buildroot}%{_docdir}/*-%{version}.pdf
+# move /usr/lib64//dyninst/cmake/Dyninst to /usr/lib64/cmake/Dyninst
+mkdir -p %{buildroot}%{_lib64dir}/cmake
+mv %{buildroot}%{_lib64dir}/dyninst/cmake/Dyninst %{buildroot}%{_lib64dir}/cmake/Dyninst
 
-cd ../%{testsuite_base}
-%make_install
+# this is a testsuite-like binary, not needed in main package
+rm -f "%{buildroot}%{_bindir}/parseThat"
 
 mkdir -p %{buildroot}/etc/ld.so.conf.d
 echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
@@ -152,10 +118,11 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %postun -p /sbin/ldconfig
 
 %files
-%dir %{_libdir}/dyninst
-%{_libdir}/dyninst/*.so.*
+%dir %{_lib64dir}/dyninst
+%{_lib64dir}/dyninst/*.so.*
 # dyninst mutators dlopen the runtime library
-%{_libdir}/dyninst/libdyninstAPI_RT.so
+%{_lib64dir}/dyninst/libdyninstAPI_RT.so
+%{_lib64dir}/dyninst/libdyninstAPI_RT.a
 
 %doc %{dyninst_base}/COPYRIGHT
 %doc %{dyninst_base}/LICENSE.md
@@ -175,25 +142,14 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 
 %files devel
 %{_includedir}/dyninst
-%{_libdir}/dyninst/*.so
-%{_libdir}/cmake/Dyninst
-
-%files static
-%{_libdir}/dyninst/*.a
-
-%files testsuite
-%{_bindir}/parseThat
-%exclude %{_bindir}/cfg_to_dot
-%exclude /usr/bin/codeCoverage
-%exclude /usr/bin/unstrip
-%exclude /usr/bin/ddb.db
-%exclude /usr/bin/params.db
-%exclude /usr/bin/unistd.db
-%dir %{_libdir}/dyninst/testsuite/
-%attr(755,root,root) %{_libdir}/dyninst/testsuite/*[!a]
-%attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
+%{_lib64dir}/dyninst/*.so
+%{_lib64dir}/cmake/Dyninst
 
 %changelog
+* Tue Jan 13 2026 Sumit Jena <v-sumitjena@microsoft.com> 13.0.0-1
+- Update to version 13.0.0
+- license verified.
+
 * Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 10.1.0-26
 - Bump to rebuild with updated glibc
 
