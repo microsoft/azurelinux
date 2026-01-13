@@ -107,6 +107,9 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 * Mon Jan 05 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.9-1
 - Auto-upgrade to 2.4.9 - for CVE-2025-68973
 
+* Mon Dec 22 2025 Ratiranjan Behera <v-ratbehera@microsoft.com> - 2.4.8-1
+- Upgrade gnupg2 to 2.4.8 for CVE-2025-30258
+
 * Mon Jun 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.4.7-1
 - Upgrade to version 2.4.7
 

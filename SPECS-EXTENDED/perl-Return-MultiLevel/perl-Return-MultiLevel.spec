@@ -1,12 +1,12 @@
 Name:           perl-Return-MultiLevel
-Version:        0.05
-Release:        10%{?dist}
+Version:        0.08
+Release:        1%{?dist}
 Summary:        Return across multiple call levels
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Return-MultiLevel
-Source0:        https://cpan.metacpan.org/authors/id/M/MA/MAUKE/Return-MultiLevel-%{version}.tar.gz#/perl-Return-MultiLevel-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Return-MultiLevel-%{version}.tar.gz
 BuildArch:      noarch
 # Build
 BuildRequires:  coreutils
@@ -14,27 +14,21 @@ BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(File::Find)
-BuildRequires:  perl(File::Spec)
 # Module
 BuildRequires:  perl(Carp)
-BuildRequires:  perl(Data::Munge) >= 0.07
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(parent)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 # Test Suite
+BuildRequires:  perl(Config)
 BuildRequires:  perl(Test::Fatal)
 BuildRequires:  perl(Test::More)
 # Dependencies
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
-Requires:       perl(Data::Munge) >= 0.07
+# (none)
 # Optional Functionality
 BuildRequires:  perl(Scope::Upper) >= 0.29
 Requires:       perl(Scope::Upper) >= 0.29
-
-# Filter under-specified dependencies
-%global __requires_exclude %{?__requires_exclude:__requires_exclude|}^perl\\(Data::Munge\\)$
 
 %description
 This module provides a way to return immediately from a deeply nested call
@@ -43,7 +37,7 @@ at a target frame (and they can be caught by intermediate stack frames using
 eval). In other words, this is more like setjmp(3)/longjmp(3) than die.
 
 %prep
-%setup -q -n Return-MultiLevel-%{version}
+%autosetup -n Return-MultiLevel-%{version}
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
@@ -57,11 +51,16 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 make test
 
 %files
+%license LICENSE
 %doc Changes README
 %{perl_vendorlib}/Return/
 %{_mandir}/man3/Return::MultiLevel.3*
 
 %changelog
+* Fri Dec 26 2025 Aditya Singh <v-aditysing@microsoft.com> - 0.08-1
+- Upgrade to version 0.08
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.05-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="xmldb-api" default="dist" basedir=".">
+  <!-- source directories -->
+  <property name="src.main" value="src/main/java"/>
+
+  <!-- build output directories -->
+  <property name="build.main" value="build/classes/main"/>
+  <property name="dist.dir"   value="dist/xmldb"/>
+
+  <!-- compile main sources -->
+  <target name="compile">
+    <mkdir dir="${build.main}"/>
+    <javac srcdir="${src.main}" destdir="${build.main}"
+           source="1.8" target="1.8" includeantruntime="false"/>
+  </target>
+
+  <!-- package jars -->
+  <target name="dist" depends="compile">
+    <mkdir dir="${dist.dir}"/>
+    <jar destfile="${dist.dir}/xmldb-api.jar" basedir="${build.main}"/>
+    <jar destfile="${dist.dir}/xmldb-api-sdk.jar" basedir="${build.main}"/>
+  </target>
+
+  <!-- javadoc -->
+  <target name="javadoc">
+    <javadoc destdir="src/build/javadoc/full"
+             sourcepath="${src.main}"
+             use="true"/>
+  </target>
+</project>

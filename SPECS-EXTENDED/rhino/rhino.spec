@@ -1,9 +1,10 @@
+%global debug_package %{nil}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 #
 # spec file for package rhino
 #
-# Copyright (c) 2020 SUSE LLC
+# Copyright (c) 2025 SUSE LLC and contributors
 # Copyright (c) 2000-2009, JPackage Project
 #
 # All modifications and additions to the file contributed by third parties
@@ -19,34 +20,42 @@ Distribution:   Azure Linux
 #
 
 
-%define scm_version 1_7_7_1
+%define scm_version 1_7_15_1
 Name:           rhino
-Version:        1.7.7.1
-Release:        2%{?dist}
+Version:        1.7.15.1
+Release:        1%{?dist}
 Summary:        JavaScript for Java
 License:        MPL-2.0
 Group:          Development/Libraries/Java
-URL:            https://github.com/mozilla/rhino
-Source0:        https://github.com/mozilla/rhino/archive/Rhino%{scm_version}_RELEASE.tar.gz
+URL:            https://www.mozilla.org/rhino/
+Source0:        https://github.com/mozilla/rhino/archive/Rhino%{scm_version}_Release.tar.gz
 Source1:        https://repo1.maven.org/maven2/org/mozilla/rhino/%{version}/rhino-%{version}.pom
-Source2:        rhino.script
-Source3:        rhino-debugger.script
-Source4:        rhino-idswitch.script
-Source5:        rhino-jsc.script
-Patch0:         rhino-build.patch
-# Add OSGi metadata from Eclipse Orbit project
-Patch1:         rhino-addOrbitManifest.patch
+Source2:        https://repo1.maven.org/maven2/org/mozilla/rhino-engine/%{version}/rhino-engine-%{version}.pom
+Source3:        https://repo1.maven.org/maven2/org/mozilla/rhino-runtime/%{version}/rhino-runtime-%{version}.pom
+Source10:       %{name}-build.xml
 BuildRequires:  ant
-BuildRequires:  java-devel >= 1.7
+BuildRequires:  fdupes
+BuildRequires:  java-devel >= 1.8
 BuildRequires:  javapackages-local-bootstrap
 Requires:       javapackages-tools
-Requires:       jline
-BuildArch:      noarch
 
 %description
 Rhino is an open-source implementation of JavaScript written entirely
 in Java. It is typically embedded into Java applications to provide
 scripting to end users.
+
+%package engine
+Summary:        Rhino Engine
+Requires:       %{name} = %{version}
+
+%description engine
+Rhino Javascript JSR-223 Script Engine wrapper.
+
+%package runtime
+Summary:        Rhino Runtime
+
+%description runtime
+Rhino JavaScript runtime jar, excludes tools & JSR-223 Script Engine wrapper.
 
 %package demo
 Summary:        Examples for %{name}
@@ -56,76 +65,79 @@ Group:          Development/Libraries/Java
 Examples for %{name}
 
 %prep
-%setup -q -n %{name}-Rhino%{scm_version}_RELEASE
-%patch 0 -b .build
-%patch 1 -b .fixManifest
-cp %{SOURCE1} pom.xml
-%pom_remove_parent
-
-# Fix manifest
-sed -i -e '/^Class-Path:.*$/d' src/manifest
-
-# Add jpp release info to version
-sed -i -e 's|^implementation.version: Rhino .* release .* \${implementation.date}|implementation.version: Rhino %{version} release %{release} \${implementation.date}|' build.properties
+%setup -q -n %{name}-Rhino%{scm_version}_Release
+cp %{SOURCE10} build.xml
 
 %build
-%{ant} \
-    -Dtarget-jvm=6 -Dsource-level=6 \
-    deepclean jar copy-all
+%{ant} jar
 
 pushd examples
 
-export CLASSPATH=../build/%{name}%{version}/js.jar
-SOURCEPATH=../build/%{name}%{version}/src
-%javac -sourcepath ${SOURCEPATH} -source 6 -target 6 *.java
-%jar cvf ../build/%{name}%{version}/%{name}-examples.jar *.class
+export CLASSPATH=../target/%{name}-%{version}.jar
+SOURCEPATH=../src
+javac -sourcepath ${SOURCEPATH} -source 8 -target 8 *.java
+jar --create --verbose \
+%if %{?pkg_vcmp:%pkg_vcmp java-devel >= 17}%{!?pkg_vcmp:0}
+    --date="$(date -u -d @${SOURCE_DATE_EPOCH:-$(date +%%s)} +%%Y-%%m-%%dT%%H:%%M:%%SZ)" \
+%endif
+    --file=../target/%{name}-examples-%{version}.jar *.class
 
 popd
 
 %install
 
-# man page
-mkdir -p %{buildroot}%{_mandir}/man1/
-install -m 644 man/%{name}.1 %{buildroot}%{_mandir}/man1/%{name}.1
-
 # jars
-mkdir -p %{buildroot}%{_javadir}
-cp -a build/%{name}%{version}/js.jar %{buildroot}%{_javadir}/%{name}.jar
+install -dm 0755 %{buildroot}%{_javadir}
+install -pm 0644 target/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
 ln -s %{name}.jar %{buildroot}%{_javadir}/js.jar
+install -pm 0644 target/%{name}-engine-%{version}.jar %{buildroot}%{_javadir}/%{name}-engine.jar
+install -pm 0644 target/%{name}-runtime-%{version}.jar %{buildroot}%{_javadir}/%{name}-runtime.jar
 
 # pom
-mkdir -p %{buildroot}%{_mavenpomdir}
-cp -a pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
+install -dm 0755 %{buildroot}%{_mavenpomdir}
+cp -a %{SOURCE1} %{buildroot}%{_mavenpomdir}/%{name}.pom
 %add_maven_depmap %{name}.pom %{name}.jar -a "rhino:js"
+cp -a %{SOURCE2} %{buildroot}%{_mavenpomdir}/%{name}-engine.pom
+%add_maven_depmap %{name}-engine.pom %{name}-engine.jar -f engine
+cp -a %{SOURCE3} %{buildroot}%{_mavenpomdir}/%{name}-runtime.pom
+%add_maven_depmap %{name}-runtime.pom %{name}-runtime.jar -f runtime
 
 # scripts
-mkdir -p %{buildroot}%{_bindir}
-install -m 0755 %{SOURCE2} %{buildroot}%{_bindir}/%{name}
-install -m 0755 %{SOURCE3} %{buildroot}%{_bindir}/%{name}-debugger
-install -m 0755 %{SOURCE4} %{buildroot}%{_bindir}/%{name}-idswitch
-install -m 0755 %{SOURCE5} %{buildroot}%{_bindir}/%{name}-jsc
+%jpackage_script org.mozilla.javascript.tools.shell.Main "" "" rhino rhino true
+%jpackage_script org.mozilla.javascript.tools.debugger.Main "" "" rhino rhino-debugger true
+%jpackage_script org.mozilla.javascript.tools.jsc.Main "" "" rhino rhino-jsc true
 
 # examples
-mkdir -p %{buildroot}%{_datadir}/%{name}
+install -dm 0755 %{buildroot}%{_datadir}/%{name}
 cp -a examples/* %{buildroot}%{_datadir}/%{name}
-cp -a build/%{name}%{version}/%{name}-examples.jar %{buildroot}%{_javadir}/%{name}-examples.jar
-
-find %{buildroot}%{_datadir}/%{name} -name '*.build' -delete
+install -pm 0644 target/%{name}-examples-%{version}.jar %{buildroot}%{_javadir}/%{name}-examples.jar
+%fdupes -s %{buildroot}%{_datadir}/%{name}
 
 %files -f .mfiles
-%license LICENSE.txt
 %attr(0755,root,root) %{_bindir}/%{name}
 %attr(0755,root,root) %{_bindir}/%{name}-debugger
-%attr(0755,root,root) %{_bindir}/%{name}-idswitch
 %attr(0755,root,root) %{_bindir}/%{name}-jsc
 %{_javadir}/js.jar
 %{_javadir}/%{name}-examples.jar
-%{_mandir}/man1/%{name}.1*
+%license LICENSE.txt NOTICE.txt NOTICE-tools.txt
+%doc README.md CODE_OF_CONDUCT.md RELEASE-NOTES.md
+
+%files engine -f .mfiles-engine
+%license LICENSE.txt
+%doc README.md CODE_OF_CONDUCT.md RELEASE-NOTES.md
+
+%files runtime -f .mfiles-runtime
+%license LICENSE.txt NOTICE.txt
+%doc README.md CODE_OF_CONDUCT.md RELEASE-NOTES.md
 
 %files demo
 %{_datadir}/%{name}
 
 %changelog
+* Tue Dec 23 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.7.15.1-1
+- Upgrade to version 1.7.15.1
+- License Verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.7.1-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

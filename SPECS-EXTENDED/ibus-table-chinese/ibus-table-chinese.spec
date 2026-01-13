@@ -6,7 +6,7 @@ Distribution:   Azure Linux
 %global createdb ibus-table-createdb
 Name:           ibus-table-chinese
 Version:        1.8.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Chinese input tables for IBus
 Summary(zh_CN): 中文码表输入法
 Summary(zh_TW): 中文碼表輸入法
@@ -556,7 +556,8 @@ rm -fr %{buildroot}%{_docdir}/*
 
 %files wubi-haifeng
 %{_datadir}/appdata/wubi-haifeng86.appdata.xml
-%doc tables/wubi-haifeng/COPYING tables/wubi-haifeng/README
+%doc tables/wubi-haifeng/README
+%license tables/wubi-haifeng/COPYING
 %{ibus_icons_dir}/wubi-haifeng86.*
 %verify(not size md5 mtime) %{ibus_tables_dir}/wubi-haifeng86.db
 
@@ -575,6 +576,10 @@ rm -fr %{buildroot}%{_docdir}/*
 %verify(not size md5 mtime) %{ibus_tables_dir}/cantonyale.db
 
 %changelog
+* Thu Dec 18 2025 Aditya Singh <v-aditysing@microsoft.com> - 1.8.3-4
+- Addressed license warning issue.
+- License verified.
+
 * Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.3-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Supplement CMake module search path with the location of cmake-fedora's modules
