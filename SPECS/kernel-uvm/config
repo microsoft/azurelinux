@@ -2404,7 +2404,6 @@ CONFIG_HYPERV=y
 # CONFIG_HYPERV_VTL_MODE is not set
 CONFIG_HYPERV_TIMER=y
 # CONFIG_HYPERV_BALLOON is not set
-# CONFIG_DXGKRNL is not set
 # end of Microsoft Hyper-V guest support
 
 # CONFIG_GREYBUS is not set
