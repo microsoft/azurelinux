@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 #
 # spec file for package trilead-ssh2
 #
-# Copyright (c) 2019 SUSE LINUX GmbH, Nuernberg, Germany.
+# Copyright (c) 2024 SUSE LLC
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -19,18 +19,26 @@ Distribution:   Azure Linux
 
 
 %global buildver 217
-%global patchlvl 8
+%global patchlvl 371
+%global githash  vc1d30dc5a_b_32
+
 Name:           trilead-ssh2
-Version:        %{buildver}.%{patchlvl}
-Release:        2%{?dist}
+Version:        %{buildver}.%{patchlvl}.%{githash}
+Release:        1%{?dist}
 Summary:        SSH-2 protocol implementation in pure Java
 License:        BSD-3-Clause AND MIT
 Group:          Development/Libraries/Java
 URL:            https://github.com/jenkinsci/trilead-ssh2
-Source0:        https://github.com/jenkinsci/%{name}/archive/%{name}-build%{buildver}-jenkins-%{patchlvl}.tar.gz
+Source0:        https://github.com/jenkinsci/%{name}/archive/refs/tags/build-%{buildver}-jenkins-%{patchlvl}.%{githash}.tar.gz
+Source1:        %{name}-build.xml
+Patch0:         0001-Remove-the-dependency-on-google-tink.patch
+BuildRequires:  ant
+BuildRequires:  ed25519-java
 BuildRequires:  fdupes
-BuildRequires:  java-devel
-BuildRequires:  javapackages-local-bootstrap
+BuildRequires:  java-devel >= 1.9
+BuildRequires:  javapackages-local-bootstrap >= 6
+BuildRequires:  javapackages-tools
+BuildRequires:  jbcrypt
 BuildArch:      noarch
 
 %description
@@ -49,19 +57,21 @@ Group:          Documentation/HTML
 API documentation for %{name}.
 
 %prep
-%setup -q -n %{name}-%{name}-build%{buildver}-jenkins-%{patchlvl}
+%autosetup -n %{name}-build-%{buildver}-jenkins-%{patchlvl}.%{githash} -p1
+cp %{SOURCE1} build.xml
+
+%pom_remove_dep :tink
+%pom_xpath_set pom:project/pom:version "build-%{buildver}-jenkins-%{patchlvl}.%{githash}"
 
 %build
-mkdir -p build/classes
-javac -d build/classes -source 6 -target 6 $(find src -name \*.java | xargs)
-(cd build/classes && jar cf ../%{name}-%{version}.jar  $(find . -name \*.class))
-mkdir -p build/docs
-javadoc -d build/docs -source 6  $(find src -name \*.java | xargs) -Xdoclint:none
+mkdir -p lib
+build-jar-repository -s lib eddsa jbcrypt
+%{ant} package javadoc
 
 %install
 # jars
 install -d -m 0755 %{buildroot}%{_javadir}
-install -m 644 build/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
+install -m 644 target/%{name}-*.jar %{buildroot}%{_javadir}/%{name}.jar
 
 # pom
 install -d -m 755 %{buildroot}%{_mavenpomdir}
@@ -70,7 +80,9 @@ install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 
 # javadoc
 install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
-cp -aL build/docs/* %{buildroot}%{_javadocdir}/%{name}
+cp -aL target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}/%{_javadocdir}/%{name}/legal/LICENSE .
 %fdupes -s %{buildroot}%{_javadocdir}/%{name}
 
 %files -f .mfiles
@@ -79,9 +91,15 @@ cp -aL build/docs/* %{buildroot}%{_javadocdir}/%{name}
 
 %files javadoc
 %license LICENSE.txt
+%license LICENSE ADDITIONAL_LICENSE_INFO
 %{_javadocdir}/%{name}
 
+
 %changelog
+* Fri Dec 19 2025 BinduSri Adabala <v-badabala@microsoft.com> - 217.371.vc1d30dc5a_b_32-1
+- Upgrade to 217.371.vc1d30dc5a_b_32
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 217.8-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
