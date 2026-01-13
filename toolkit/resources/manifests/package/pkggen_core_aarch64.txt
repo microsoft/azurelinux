@@ -1,5 +1,5 @@
 filesystem-1.1-21.azl3.aarch64.rpm
-kernel-headers-6.6.117.1-1.azl3.noarch.rpm
+kernel-headers-6.6.119.3-1.azl3.noarch.rpm
 glibc-2.38-16.azl3.aarch64.rpm
 glibc-devel-2.38-16.azl3.aarch64.rpm
 glibc-i18n-2.38-16.azl3.aarch64.rpm
@@ -70,9 +70,9 @@ make-4.4.1-2.azl3.aarch64.rpm
 patch-2.7.6-9.azl3.aarch64.rpm
 libcap-ng-0.8.4-1.azl3.aarch64.rpm
 libcap-ng-devel-0.8.4-1.azl3.aarch64.rpm
-util-linux-2.40.2-1.azl3.aarch64.rpm
-util-linux-devel-2.40.2-1.azl3.aarch64.rpm
-util-linux-libs-2.40.2-1.azl3.aarch64.rpm
+util-linux-2.40.2-3.azl3.aarch64.rpm
+util-linux-devel-2.40.2-3.azl3.aarch64.rpm
+util-linux-libs-2.40.2-3.azl3.aarch64.rpm
 tar-1.35-2.azl3.aarch64.rpm
 xz-5.4.4-2.azl3.aarch64.rpm
 xz-devel-5.4.4-2.azl3.aarch64.rpm
@@ -208,7 +208,7 @@ libxml2-devel-2.11.5-8.azl3.aarch64.rpm
 docbook-dtd-xml-4.5-11.azl3.noarch.rpm
 docbook-style-xsl-1.79.1-14.azl3.noarch.rpm
 libsepol-3.6-2.azl3.aarch64.rpm
-glib-2.78.6-5.azl3.aarch64.rpm
+glib-2.78.6-6.azl3.aarch64.rpm
 libltdl-2.4.7-1.azl3.aarch64.rpm
 libltdl-devel-2.4.7-1.azl3.aarch64.rpm
 lua-5.4.6-1.azl3.aarch64.rpm
@@ -244,9 +244,9 @@ ca-certificates-base-3.0.0-14.azl3.noarch.rpm
 ca-certificates-3.0.0-14.azl3.noarch.rpm
 dwz-0.14-2.azl3.aarch64.rpm
 unzip-6.0-22.azl3.aarch64.rpm
-python3-3.12.9-6.azl3.aarch64.rpm
-python3-devel-3.12.9-6.azl3.aarch64.rpm
-python3-libs-3.12.9-6.azl3.aarch64.rpm
+python3-3.12.9-7.azl3.aarch64.rpm
+python3-devel-3.12.9-7.azl3.aarch64.rpm
+python3-libs-3.12.9-7.azl3.aarch64.rpm
 python3-setuptools-69.0.3-5.azl3.noarch.rpm
 python3-pygments-2.7.4-2.azl3.noarch.rpm
 which-2.21-8.azl3.aarch64.rpm

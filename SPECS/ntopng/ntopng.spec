@@ -2,7 +2,7 @@
 Summary:        Web-based Network Traffic Monitoring Application
 Name:           ntopng
 Version:        5.2.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,7 @@ Patch3:         CVE-2017-18214.patch
 Patch4:         CVE-2022-33099.patch
 Patch5:         CVE-2021-44647.patch
 Patch6:         CVE-2021-43519.patch
+Patch7:         CVE-2021-44964.patch
 BuildRequires:  curl-devel
 BuildRequires:  gcc
 BuildRequires:  glib-devel
@@ -67,6 +68,9 @@ mv nDPI-%{nDPIver} nDPI
 %{_datadir}/ntopng/*
 
 %changelog
+* Fri Dec 26 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 5.2.1-6
+- Patch to fix CVE-2021-44964
+
 * Thu Feb 06 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 5.2.1-5
 - Patch to fix CVE-2021-44647 and CVE-2021-43519.
 

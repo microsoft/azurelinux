@@ -1,6 +1,6 @@
 Summary:        RDMA core userspace libraries and daemons
 Name:           rdma-core
-Version:        55.0
+Version:        59.0
 Release:        1%{?dist}
 URL:            https://github.com/linux-rdma/rdma-core
 Vendor:         Microsoft Corporation
@@ -625,6 +625,9 @@ fi
 %endif
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 59.0-1
+- Upgrade version to 59.0.
+
 * Tue Jan 07 2025 Elaheh Dehghani <edehghani@microsoft.com> - 55.0-1
 - Upgrade to version 55.0
 - Add rdma-core to PMC extended repo

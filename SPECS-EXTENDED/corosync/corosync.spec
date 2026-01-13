@@ -19,7 +19,7 @@ Distribution:   Azure Linux
 Name: corosync
 Summary: The Corosync Cluster Engine and Application Programming Interfaces
 Version: 3.0.4
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: BSD
 URL: http://corosync.github.io/corosync/
 Source0: http://build.clusterlabs.org/corosync/releases/%{name}-%{version}%{?gittarver}.tar.gz
@@ -160,7 +160,7 @@ fi
 %endif
 
 %files
-%doc LICENSE
+%license LICENSE
 %{_sbindir}/corosync
 %{_sbindir}/corosync-keygen
 %{_sbindir}/corosync-cmapctl
@@ -219,7 +219,7 @@ Summary: The Corosync Cluster Engine Libraries
 This package contains corosync libraries.
 
 %files -n corosynclib
-%doc LICENSE
+%license LICENSE
 %{_libdir}/libcfg.so.*
 %{_libdir}/libcpg.so.*
 %{_libdir}/libcmap.so.*
@@ -242,7 +242,6 @@ This package contains include files and man pages used to develop using
 The Corosync Cluster Engine APIs.
 
 %files -n corosynclib-devel
-%doc LICENSE
 %dir %{_includedir}/corosync/
 %{_includedir}/corosync/corodefs.h
 %{_includedir}/corosync/cfg.h
@@ -281,12 +280,15 @@ Nodes can be added and removed as well as partitioned (to simulate
 network splits)
 
 %files -n corosync-vqsim
-%doc LICENSE
 %{_bindir}/corosync-vqsim
 %{_mandir}/man8/corosync-vqsim.8*
 %endif
 
 %changelog
+* Tue Jan 06 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.4-4
+- Bumping release to rebuild with new 'net-snmp' libs.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.4-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

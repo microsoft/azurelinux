@@ -1,6 +1,6 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
-Version:        1.9.3
+Version:        1.9.4
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -87,6 +87,9 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 %dir %attr(1733, root, root) %{_localstatedir}/log/keysinuse/
 
 %changelog
+* Tue Oct 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.4-1
+- Auto-upgrade to 1.9.4 - bug fixes
+
 * Tue Sep 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.3-1
 - Auto-upgrade to 1.9.3 - bug fixes
 
