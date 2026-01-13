@@ -1,7 +1,7 @@
 Summary:        Time zone data
 Name:           tzdata
 Version:        2025c
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
