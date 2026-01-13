@@ -335,8 +335,8 @@
         "type": "other",
         "other": {
           "name": "apache-commons-compress",
-          "version": "1.26.1",
-          "downloadUrl": "https://archive.apache.org/dist/commons/compress/source/commons-compress-1.26.1-src.tar.gz"
+          "version": "1.19",
+          "downloadUrl": "http://archive.apache.org/dist/commons/compress/source/commons-compress-1.19-src.tar.gz"
         }
       }
     },
@@ -2057,8 +2057,8 @@
         "type": "other",
         "other": {
           "name": "containerized-data-importer",
-          "version": "1.57.0",
-          "downloadUrl": "https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v1.57.0.tar.gz"
+          "version": "1.62.0",
+          "downloadUrl": "https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v1.62.0.tar.gz"
         }
       }
     },
@@ -2237,8 +2237,8 @@
         "type": "other",
         "other": {
           "name": "crash",
-          "version": "8.0.4",
-          "downloadUrl": "https://github.com/crash-utility/crash/archive/8.0.4.tar.gz"
+          "version": "9.0.0",
+          "downloadUrl": "https://github.com/crash-utility/crash/archive/9.0.0.tar.gz"
         }
       }
     },
@@ -2306,16 +2306,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "crun",
-          "version": "1.24",
-          "downloadUrl": "https://github.com/containers/crun/releases/download/1.24/crun-1.24.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "cronie",
           "version": "1.6.1",
           "downloadUrl": "https://github.com/cronie-crond/cronie/releases/download/cronie-1.6.1/cronie-1.6.1.tar.gz"
@@ -2329,6 +2319,16 @@
           "name": "crontabs",
           "version": "1.11",
           "downloadUrl": "https://github.com/cronie-crond/crontabs/releases/download/crontabs-20190603/crontabs-1.11-20190603git.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "crun",
+          "version": "1.24",
+          "downloadUrl": "https://github.com/containers/crun/releases/download/1.24/crun-1.24.tar.gz"
         }
       }
     },
@@ -4610,8 +4610,8 @@
         "type": "other",
         "other": {
           "name": "gnupg2",
-          "version": "2.4.8",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.4.8.tar.bz2"
+          "version": "2.4.9",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.4.9.tar.bz2"
         }
       }
     },
@@ -4680,8 +4680,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.25.5",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.5-1/go1.25.5-20251202.2.src.tar.gz"
+          "version": "1.24.11",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.11-1/go1.24.11-20251202.3.src.tar.gz"
         }
       }
     },
@@ -4690,8 +4690,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.24.11",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.24.11-1/go1.24.11-20251202.3.src.tar.gz"
+          "version": "1.25.5",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.5-1/go1.25.5-20251202.2.src.tar.gz"
         }
       }
     },
@@ -5340,8 +5340,8 @@
         "type": "other",
         "other": {
           "name": "highlight",
-          "version": "3.54",
-          "downloadUrl": "http://www.andre-simon.de/zip/highlight-3.54.tar.bz2"
+          "version": "4.18",
+          "downloadUrl": "https://gitlab.com/saalen/highlight/-/archive/v4.18/highlight-v4.18.tar.bz2"
         }
       }
     },
@@ -6600,8 +6600,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.117.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.117.1.tar.gz"
+          "version": "6.6.119.3",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
         }
       }
     },
@@ -8261,8 +8261,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.117.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.117.1.tar.gz"
+          "version": "6.6.119.3",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
         }
       }
     },
@@ -8271,8 +8271,18 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.117.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.117.1.tar.gz"
+          "version": "6.6.119.3",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kernel-headers",
+          "version": "6.6.119.3",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
         }
       }
     },
@@ -8283,16 +8293,6 @@
           "name": "kernel-hwe",
           "version": "6.12.57.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.57.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kernel-headers",
-          "version": "6.6.117.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.117.1.tar.gz"
         }
       }
     },
@@ -8311,8 +8311,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.117.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.117.1.tar.gz"
+          "version": "6.6.119.3",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.119.3.tar.gz"
         }
       }
     },
@@ -8571,8 +8571,8 @@
         "type": "other",
         "other": {
           "name": "kubevirt",
-          "version": "1.5.3",
-          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.5.3.tar.gz"
+          "version": "1.6.3",
+          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.6.3.tar.gz"
         }
       }
     },
@@ -10751,8 +10751,8 @@
         "type": "other",
         "other": {
           "name": "libpcap",
-          "version": "1.10.5",
-          "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.10.5.tar.gz"
+          "version": "1.10.6",
+          "downloadUrl": "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.10.6.tar.gz"
         }
       }
     },
@@ -11232,7 +11232,7 @@
         "other": {
           "name": "libsodium",
           "version": "1.0.19",
-          "downloadUrl": "https://download.libsodium.org/libsodium/releases/libsodium-1.0.19.tar.gz"
+          "downloadUrl": "https://github.com/jedisct1/libsodium/archive/refs/tags/1.0.19-FINAL.tar.gz"
         }
       }
     },
@@ -23943,8 +23943,8 @@
         "type": "other",
         "other": {
           "name": "python-oslo-i18n",
-          "version": "5.1.0",
-          "downloadUrl": "https://tarballs.openstack.org/oslo.i18n/oslo.i18n-5.1.0.tar.gz"
+          "version": "6.7.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/o/oslo_i18n/oslo_i18n-6.7.1.tar.gz"
         }
       }
     },
@@ -24195,16 +24195,6 @@
           "name": "python-pyasn1",
           "version": "0.4.8",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyasn1/pyasn1-0.4.8.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "python3-pycares",
-          "version": "4.5.0",
-          "downloadUrl": "https://github.com/saghul/pycares/archive/refs/tags/v4.5.0.tar.gz"
         }
       }
     },
@@ -25742,6 +25732,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python3-pycares",
+          "version": "4.5.0",
+          "downloadUrl": "https://github.com/saghul/pycares/archive/refs/tags/v4.5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python3-pytest-asyncio",
           "version": "0.23.6",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-asyncio/pytest-asyncio-0.23.6.tar.gz"
@@ -25954,7 +25954,7 @@
         "other": {
           "name": "quagga",
           "version": "1.2.4",
-          "downloadUrl": "http://download.savannah.gnu.org/releases/quagga/quagga-1.2.4.tar.gz"
+          "downloadUrl": "https://github.com/quagga/quagga/releases/download/quagga-1.2.4/quagga-1.2.4.tar.gz"
         }
       }
     },
@@ -26244,8 +26244,8 @@
         "type": "other",
         "other": {
           "name": "rhino",
-          "version": "1.7.7.1",
-          "downloadUrl": "https://github.com/mozilla/rhino/archive/Rhino1_7_7_1_RELEASE.tar.gz"
+          "version": "1.7.15.1",
+          "downloadUrl": "https://github.com/mozilla/rhino/archive/Rhino1_7_15_1_Release.tar.gz"
         }
       }
     },
@@ -28676,8 +28676,8 @@
         "type": "other",
         "other": {
           "name": "suitesparse",
-          "version": "5.4.0",
-          "downloadUrl": "https://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-5.4.0.tar.gz"
+          "version": "7.11.0",
+          "downloadUrl": "https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/v7.11.0/suitesparse-7.11.0.tar.gz"
         }
       }
     },
@@ -28746,8 +28746,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.9.3",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.3.tar.gz"
+          "version": "1.9.4",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.4.tar.gz"
         }
       }
     },
@@ -31189,8 +31189,8 @@
         "type": "other",
         "other": {
           "name": "xz-java",
-          "version": "1.10",
-          "downloadUrl": "https://tukaani.org/xz/xz-java-1.10.zip"
+          "version": "1.8",
+          "downloadUrl": "http://tukaani.org/xz/xz-java-1.8.zip"
         }
       }
     },

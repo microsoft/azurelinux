@@ -24,7 +24,7 @@ Distribution:   Azure Linux
 %bcond_with tests
 Name:           apache-commons-codec
 Version:        1.15
-Release:        3%{?dist}
+Release:        2%{?dist}
 Summary:        Apache Commons Codec Package
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -104,10 +104,6 @@ install -p -m 644 pom.xml %{buildroot}%{_mavenpomdir}/%{short_name}.pom
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
-# Remove LICENSE from javadoc directory to avoid duplicate license warning
-mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
-mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
-
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %pre javadoc
@@ -117,7 +113,6 @@ fi
 
 %files -f .mfiles
 %license LICENSE.txt
-%license ADDITIONAL_LICENSE_INFO
 %doc RELEASE-NOTES.txt
 %{_javadir}/%{name}.jar
 
@@ -125,10 +120,6 @@ fi
 %{_javadocdir}/%{name}
 
 %changelog
-* Fri Nov 28 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.15-3
-- Address build error caused by license warning
-- License verified
-
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.15-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
