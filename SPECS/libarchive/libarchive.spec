@@ -15,7 +15,7 @@ Patch2:         CVE-2024-20696.patch
 Patch3:         CVE-2024-48958.patch
 Patch4:         CVE-2024-48957.patch
 Patch5:         CVE-2025-25724.patch
-Patch6:		CVE-2024-48615.patch
+Patch6:         CVE-2024-48615.patch
 Patch7:         CVE-2025-5914.patch
 Patch8:         CVE-2025-5915.patch
 Patch9:         CVE-2025-5916.patch
