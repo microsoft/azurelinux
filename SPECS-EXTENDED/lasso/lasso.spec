@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 %global with_java 0
 %global with_php 0
 %global with_perl 1
-%global with_python3 0
+%global with_python3 1
 %global with_wsf 0
 %global default_sign_algo "rsa-sha1"
 %global min_hash_algo "sha1"
