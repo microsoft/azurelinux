@@ -70,8 +70,6 @@ BuildRequires:  xerces-c-devel
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-# Run time dependency for gpsbabel driver
-#Requires:       gpsbabel
 %if %{with_spatialite}
 BuildRequires:  libspatialite-devel
 %endif
