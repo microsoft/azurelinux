@@ -418,7 +418,7 @@ exit 0
 * Wed Jan 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.8-5
 - Patch for CVE-2025-68471, CVE-2025-68468, CVE-2025-68276
 
-* Thu Feb 13 2024 Kanishk Bansal <kanbansal@microsoft.com> - 0.8-4
+* Thu Feb 13 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.8-4
 - Fix CVE-2024-52616 with an upstream patch
 
 * Mon Dec 02 2024 Kanishk Bansal <kanbansal@microsoft.com> - 0.8-3
