@@ -29,12 +29,12 @@ Patch11:        CVE-2024-0727.patch
 Patch12:        CVE-2023-3817.patch
 Patch13:        CVE-2023-5678.patch
 Patch14:        vendored-openssl-1.1.1-Only-free-the-read-buffers-if-we-re-not-using-them.patch
-Patch15: 	CVE-2022-36763_CVE-2023-36764.patch
-Patch16: 	CVE-2022-36765.patch
-Patch17: 	CVE-2023-45237.patch
-Patch18: 	CVE-2023-45236.patch
-Patch19: 	CVE-2024-38796.patch
-Patch20:  	CVE-2025-3770.patch
+Patch15:        CVE-2022-36763_CVE-2023-36764.patch
+Patch16:        CVE-2022-36765.patch
+Patch17:        CVE-2023-45237.patch
+Patch18:        CVE-2023-45236.patch
+Patch19:        CVE-2024-38796.patch
+Patch20:        CVE-2025-3770.patch
 Patch21:        CVE-2025-2296.patch
 Patch22:        CVE-2025-2295.patch
 
