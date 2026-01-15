@@ -200,8 +200,7 @@ Patch1:         CVE-2024-1441.patch
 Patch2:         CVE-2024-2494.patch
 Patch3:         CVE-2024-4418.patch
 Patch4:         CVE-2025-13193.patch
-Patch5:         Pre-CVE-2025-12748.patch
-Patch6:         CVE-2025-12748.patch
+Patch5:         CVE-2025-12748.patch
 
 Requires: libvirt-daemon = %{version}-%{release}
 Requires: libvirt-daemon-config-network = %{version}-%{release}
