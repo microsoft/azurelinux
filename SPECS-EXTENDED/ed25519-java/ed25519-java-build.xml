@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="eddsa" default="package" basedir=".">
+
+  <!-- ====================================================================== -->
+  <!-- Build environment properties                                           -->
+  <!-- ====================================================================== -->
+
+  <property name="compiler.release" value="8"/>
+  <property name="compiler.source" value="1.${compiler.release}"/>
+  <property name="compiler.target" value="${compiler.source}"/>
+
+  <property name="project.groupId" value="net.i2p.crypto"/>
+  <property name="project.artifactId" value="eddsa"/>
+  <property name="project.version" value="0.3.0"/>
+
+  <property name="build.finalName" value="${project.artifactId}-${project.version}"/>
+  <property name="build.dir" value="target"/>
+  <property name="build.outputDir" value="${build.dir}/classes"/>
+  <property name="build.srcDir" value="src"/>
+
+  <property name="reporting.outputDirectory" value="${build.dir}/site"/>
+
+  <!-- ====================================================================== -->
+  <!-- Cleaning up target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="clean" description="Clean the output directory">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Compilation target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="compile" description="Compile the code">
+    <mkdir dir="${build.outputDir}"/>
+    <javac destdir="${build.outputDir}" 
+           encoding="UTF-8" 
+           nowarn="false" 
+           debug="true" 
+           optimize="false" 
+           deprecation="true" 
+           release="${compiler.release}"
+           target="${compiler.target}"
+           verbose="false"
+           fork="false"
+           source="${compiler.source}">
+      <src>
+        <pathelement location="${build.srcDir}"/>
+      </src>
+    </javac>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Javadoc target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="javadoc" description="Generates the Javadoc of the application">
+    <javadoc sourcepath="${build.srcDir}" 
+             packagenames="*" 
+             destdir="${reporting.outputDirectory}/apidocs" 
+             access="protected" 
+             encoding="UTF-8" 
+             source="${compiler.source}"
+             verbose="false" 
+             version="true" 
+             use="true" 
+             author="true" 
+             splitindex="false" 
+             nodeprecated="false" 
+             nodeprecatedlist="false" 
+             notree="false" 
+             noindex="false" 
+             nohelp="false" 
+             nonavbar="false" 
+             serialwarn="false" 
+             linksource="false" 
+             breakiterator="false"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Package target                                                         -->
+  <!-- ====================================================================== -->
+
+  <target name="package" depends="compile" description="Package the application">
+    <jar jarfile="${build.dir}/${build.finalName}.jar" 
+         compress="true" 
+         index="false" 
+         basedir="${build.outputDir}" 
+         excludes="**/package.html">
+      <manifest>
+        <attribute name="Automatic-Module-Name" value="${project.groupId}.${project.artifactId}"/>
+        <attribute name="Bundle-Description" value="Implementation of EdDSA in Java"/>
+        <attribute name="Bundle-License" value="https://creativecommons.org/publicdomain/zero/1.0/"/>
+        <attribute name="Bundle-ManifestVersion" value="2"/>
+        <attribute name="Bundle-Name" value="EdDSA-Java"/>
+        <attribute name="Bundle-SymbolicName" value="${project.groupId}.${project.artifactId}"/>
+        <attribute name="Bundle-Version" value="${project.version}"/>
+        <attribute name="Export-Package" value="net.i2p.crypto.eddsa.spec;version=&quot;${project.version}&quot;,net.i2p.crypto.eddsa;uses:=&quot;net.i2p.crypto.eddsa.spec&quot;;version=&quot;${project.version}&quot;"/>
+        <attribute name="Import-Package" value="sun.security.x509;resolution:=optional"/>
+        <attribute name="JavaPackages-ArtifactId" value="${project.artifactId}"/>
+        <attribute name="JavaPackages-GroupId" value="${project.groupId}"/>
+        <attribute name="JavaPackages-Version" value="${project.version}"/>
+        <attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=${compiler.target}))&quot;"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- A dummy target for the package named after the type it creates         -->
+  <!-- ====================================================================== -->
+
+  <target name="jar" depends="package" description="Builds the jar for the application"/>
+
+</project>

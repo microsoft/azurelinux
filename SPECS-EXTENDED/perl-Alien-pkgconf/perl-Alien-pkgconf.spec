@@ -1,15 +1,16 @@
 Name:           perl-Alien-pkgconf
-Version:        0.20
+Version:        0.21
 Release:        1%{?dist}
 Summary:        Discover pkgconf and libpkgconf
-# Other files:  GPL+ or Artistic
+# Other files:  GPL-1.0-or-later OR Artistic-1.0-Perl
 ## Not used
 # pkgconf-1.3.9/aclocal.m4: GPLv3+ with exceptions
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+SourceLicense:  (%{license}) AND GPL-3.0-or-later WITH Autoconf-exception-macro
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Alien-pkgconf
-Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Alien-pkgconf-%{version}.tar.gz#/perl-Alien-pkgconf-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Alien-pkgconf-%{version}.tar.gz
 Patch0:         Alien-pkgconf-0.19-Accept-pkgconf-1.9.patch
 # This is a full-arch package because it stores data about arch-specific
 # libpkgconf.so library and it stores them into arch-specific directory.
@@ -58,7 +59,7 @@ but rather to provide the necessary package by a CPAN module that needs
 libpkgconf, such as PkgConfig::LibPkgConf.
 
 %prep
-%setup -q -n Alien-pkgconf-%{version}
+%autosetup -p1 -n Alien-pkgconf-%{version}
 
 %build
 unset ALIEN_FORCE ALIEN_INSTALL_TYPE
@@ -72,11 +73,20 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 %files
 %license LICENSE
 %doc Changes README
-%{perl_vendorarch}/auto/*
-%{perl_vendorarch}/Alien
-%{_mandir}/man3/*
+%dir %{perl_vendorarch}/auto/Alien
+%{perl_vendorarch}/auto/Alien/pkgconf
+%dir %{perl_vendorarch}/auto/share
+%dir %{perl_vendorarch}/auto/share/dist
+%{perl_vendorarch}/auto/share/dist/Alien-pkgconf
+%dir %{perl_vendorarch}/Alien
+%{perl_vendorarch}/Alien/pkgconf.pm
+%{_mandir}/man3/Alien::pkgconf.*
 
 %changelog
+* Tue Dec 23 2025 Aditya Singh <v-aditysing@microsoft.com> - 0.21-1
+- Upgrade to version 0.21
+- License verified
+
 * Fri Mar 14 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.20-1
 - Upgrade to 0.20
 - License verified
