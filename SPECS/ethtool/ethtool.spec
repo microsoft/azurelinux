@@ -1,7 +1,7 @@
 Summary:	    Standard Linux utility for controlling network drivers and hardware
 Name:		    ethtool
 Version:        6.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:	    GPLv2
 URL:		    https://www.kernel.org/pub/software/network/ethtool/
 Group:		    Productivity/Networking/Diagnostic
@@ -10,6 +10,9 @@ Distribution:   Azure Linux
 Source0:	    https://www.kernel.org/pub/software/network/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires: libmnl-devel
+
+# To avoid file conflicts
+Conflicts:      mlnx-ethtool
 
 %description
 ethtool is the standard Linux utility for controlling network drivers and hardware,
@@ -38,6 +41,13 @@ make %{?_smp_mflags} check
 %{_datadir}/bash-completion/completions/ethtool
 
 %changelog
+* Tue Nov 11 2025 Mayank Singh <mayansingh@microsoft.com> - 6.4-3
+- Updated dependency handling for kexec-tools:
+  Changed from hard dependency on a single package.
+  Allows installation to satisfy dependency with either `ethtool` or `mlnx-ethtool`.
+  Ensures flexibility for image builds and user choice at install time.
+  Added mutual exclusivity between providers to prevent file conflicts.
+
 * Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 6.4-2
 - Sanitize license files
 

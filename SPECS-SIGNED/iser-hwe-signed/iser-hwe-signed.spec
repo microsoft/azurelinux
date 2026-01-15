@@ -39,12 +39,12 @@
 %global KVERSION %{target_kernel_version_full}
 
 %{!?_name: %define _name iser-hwe}
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-24%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version 25.07-1%{release_suffix}%{?dist}}
 
 Summary:	 %{_name} Driver
 Name:		 %{_name}-signed
-Version:	 24.10
-Release:	 24%{release_suffix}%{?dist}
+Version:	 25.07
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -61,7 +61,6 @@ Source1:         ib_iser.ko
 
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-ExclusiveArch:   aarch64
 
 %description
 iser signed kernel modules
@@ -112,6 +111,10 @@ fi # 1 : closed
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-iser-*.conf
 
 %changelog
+* Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1_6.12.57.1.1
+- Upgrade version to 25.07.
+- Enable build on x86_64 kernel hwe.
+
 * Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 24.10-24_6.12.57.1.1
 - Bump to match kernel-hwe
 
