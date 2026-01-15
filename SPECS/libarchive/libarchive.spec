@@ -60,10 +60,13 @@ make %{?_smp_mflags} check
 %{_bindir}
 %exclude %{_libdir}/debug/
 
+%{_mandir}/man1/*.1.gz
+%{_mandir}/man3/*.3.gz
+%{_mandir}/man5/*.5.gz
+
 %files devel
 %defattr(-,root,root)
 %{_includedir}
-%doc %{_mandir}
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 
