@@ -46,6 +46,7 @@ make %{?_smp_mflags}
 rm -rf %{buildroot}%{_infodir}
 make DESTDIR=%{buildroot} install
 find %{buildroot} -type f -name "*.la" -delete -print
+rm %{buildroot}%{_mandir}/man1/*
 
 %check
 make %{?_smp_mflags} check
