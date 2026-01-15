@@ -1,6 +1,6 @@
-From efa2c18a0c114f2d32e2c101401b716e4ac9e6f4 Mon Sep 17 00:00:00 2001
-From: Kanishk-Bansal <kbkanishk975@gmail.com>
-Date: Wed, 26 Feb 2025 06:31:14 +0000
+From a778f8a379f75100d24159c4c3ffdbce4ff36e07 Mon Sep 17 00:00:00 2001
+From: Archana Shettigar <v-shettigara@microsoft.com>
+Date: Wed, 14 Jan 2026 15:30:01 +0530
 Subject: [PATCH] replace-to-flit
 
 ---
@@ -8,7 +8,7 @@ Subject: [PATCH] replace-to-flit
  1 file changed, 4 insertions(+), 19 deletions(-)
 
 diff --git a/pyproject.toml b/pyproject.toml
-index fabf434..179525d 100644
+index 0a7ca00..03706b2 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
 @@ -1,9 +1,6 @@
@@ -41,9 +41,9 @@ index fabf434..179525d 100644
 -]
 +version = "3.10.0"
  dependencies = [
-   "distlib<1,>=0.3.7",
-   "filelock<4,>=3.12.2",
-@@ -95,16 +90,6 @@ entry-points."virtualenv.discovery".builtin = "virtualenv.discovery.builtin:Buil
+   "distlib>=0.3.7,<1",
+   "filelock>=3.16.1,<4; python_version<'3.10'",
+@@ -99,16 +94,6 @@ entry-points."virtualenv.discovery".builtin = "virtualenv.discovery.builtin:Buil
  entry-points."virtualenv.seed".app-data = "virtualenv.seed.embed.via_app_data.via_app_data:FromAppData"
  entry-points."virtualenv.seed".pip = "virtualenv.seed.embed.pip_invoke:PipInvoke"
  
@@ -58,8 +58,8 @@ index fabf434..179525d 100644
 -version.source = "vcs"
 -
  [tool.ruff]
- target-version = "py37"
  line-length = 120
+ format.preview = true
 -- 
-2.45.2
+2.45.4
 

@@ -24914,8 +24914,8 @@
         "type": "other",
         "other": {
           "name": "python-virtualenv",
-          "version": "20.26.6",
-          "downloadUrl": "https://files.pythonhosted.org/packages/3f/40/abc5a766da6b0b2457f819feab8e9203cbeae29327bd241359f866a3da9d/virtualenv-20.26.6.tar.gz"
+          "version": "20.36.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/aa/a3/4d310fa5f00863544e1d0f4de93bddec248499ccf97d4791bc3122c9d4f3/virtualenv-20.36.1.tar.gz"
         }
       }
     },
