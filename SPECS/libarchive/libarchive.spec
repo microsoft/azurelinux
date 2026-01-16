@@ -46,7 +46,7 @@ make %{?_smp_mflags}
 rm -rf %{buildroot}%{_infodir}
 make DESTDIR=%{buildroot} install
 find %{buildroot} -type f -name "*.la" -delete -print
-rm %{buildroot}%{_mandir}/man1/*
+mv %{buildroot}%{_mandir}/man1/* .
 
 %check
 make %{?_smp_mflags} check
@@ -57,6 +57,10 @@ make %{?_smp_mflags} check
 %files
 %defattr(-,root,root)
 %license COPYING
+%license bsdcat.1
+%license bsdtar.1
+%license bsdcpio.1
+%license bsdunzip.1
 %{_libdir}/*.so.*
 %{_bindir}
 %exclude %{_libdir}/debug/
@@ -64,7 +68,7 @@ make %{?_smp_mflags} check
 %files devel
 %defattr(-,root,root)
 %{_includedir}
-%{_mandir}
+%doc %{_mandir}
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 
