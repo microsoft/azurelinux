@@ -32,7 +32,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.119.3
-Release:        1%{?dist}
+Release:        1000%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
