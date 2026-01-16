@@ -1,30 +1,26 @@
 %global debug_package %{nil}
 %define upstream_name containerd
-%define commit_hash 207ad711eabd375a01713109a8a197d197ff6542
+%define commit_hash 09d0c0304aeefa26050b3d400af0cc19e1268d0a
 
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
-Version: 2.0.0
-Release: 16%{?dist}
+Version: 2.2.0
+Release: 2000%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
 Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
-Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{upstream_name}-%{version}.tar.gz
+Source0: https://github.com/aadhar-agarwal/containerd/archive/refs/heads/aadagarwal/containerd-v2.2.0-add-dmverity.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
 
-Patch0:	CVE-2024-45338.patch
-Patch1:	CVE-2025-27144.patch
-Patch2:	CVE-2024-40635.patch
-Patch3:	CVE-2025-22872.patch
-Patch4:	CVE-2025-47291.patch
-Patch5:	multi-snapshotters-support.patch
-Patch6:	tardev-support.patch
-Patch7: CVE-2024-25621.patch
-Patch8: CVE-2025-64329.patch
+# Patches disabled - built for custom fork with dmverity support
+# These CVE patches are for 2.0.0 and may not apply to 2.2.0
+# Patch0: CVE-2024-45338.patch
+# ... (comment out all patches)
+
 %{?systemd_requires}
 
 BuildRequires: golang < 1.25
@@ -57,7 +53,7 @@ containerd is designed to be embedded into a larger system, rather than being
 used directly by developers or end-users.
 
 %prep
-%autosetup -p1 -n %{upstream_name}-%{version}
+%autosetup -p1 -n %{upstream_name}-aadagarwal-containerd-v2.2.0-add-dmverity
 
 %build
 export BUILDTAGS="-mod=vendor"
@@ -100,52 +96,5 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
-* Mon Nov 24 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-16
-- Patch for CVE-2025-64329
-
-* Tue Nov 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-15
-- Patch for CVE-2024-25621
-
-* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 2.0.0-14
-- Set BR for golang to < 1.25
-
-* Mon Jul 21 2025 Saul Paredes <saulparedes@microsoft.com> - 2.0.0-13
-- Add "Provides/Obsoletes:" to shift all installs of moby-containerd-cc to containerd2
-
-* Tue Jun 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-12
-- Add updated tardev-snapshotter support patch
-
-* Tue Jun 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-11
-- Add updated multi-snapshotters-support patch
-
-* Fri May 30 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.0.0-10
-- Patch CVE-2025-47291
-
-* Thu May 22 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.0.0-9
-- Patch CVE-2025-22872
-
-* Wed Apr 09 2025 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.0.0-8
-- Fix CVE-2024-40635
-
-* Tue Apr 01 2025 Nan Liu <liunan@microsoft.com> - 2.0.0-7
-- Remove the tardev-snapshotter patch for Kata CC support.
-
-* Fri Mar 21 2025 Dallas Delaney <dadelan@microsoft.com> - 2.0.0-6
-- Fix CVE-2025-27144
-
-* Mon Mar 03 2025 Nan Liu <liunan@microsoft.com> - 2.0.0-5
-- Add "Provides/Obsoletes:" to shift all installs of containerd and moby-containerd to containerd2
-
-* Mon Feb 03 2025 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-4
-- Fix ptest in tardev-snapshotter support patch
-
-* Sun Jan 26 2025 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-3
-- Added patch to support tardev-snapshotter for Kata CC.
-
-* Thu Jan 23 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.0.0-2
-- Fix CVE-2024-45338 by an unstream patch
-
-* Wed Dec 11 2024 Nan Liu <liunan@microsoft.com> - 2.0.0-1
-- Created a standalone package for containerd 2.0.0
-- Initial CBL-Mariner import from Azure
-- Initial version and License verified
+* Fri Jan 16 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.0.0-2000
+- Build from forked branch aaadagarwal/containerd-v2.2.0-add-dmverity
