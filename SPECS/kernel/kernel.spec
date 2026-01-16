@@ -32,7 +32,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.119.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -440,6 +440,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Jan 16 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.119.3-3
+- Enable XFRM_INTERFACE
+
 * Thu Jan 08 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.119.3-2
 - Enable CONFIG_INET_DIAG_DESTROY
 
