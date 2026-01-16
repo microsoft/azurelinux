@@ -15,6 +15,12 @@ build_arch := $(shell uname -m)
 
 no_repo_acl = $(STATUS_FLAGS_DIR)/no_repo_acl.flag
 
+# Define newline for use in error messages and output formatting
+define newline
+
+
+endef
+
 ######## MISC. MAKEFILE Functions ########
 
 # Creates a folder if it doesn't exist. Also sets the timestamp to 0 if it is
