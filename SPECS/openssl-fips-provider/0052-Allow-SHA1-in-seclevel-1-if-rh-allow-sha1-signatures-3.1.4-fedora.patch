@@ -1,0 +1,221 @@
+From f470b130139919f32926b3f5a75ba4d161cbcf88 Mon Sep 17 00:00:00 2001
+From: Clemens Lang <cllang@redhat.com>
+Date: Tue, 1 Mar 2022 15:44:18 +0100
+Subject: [PATCH 2/2] Allow SHA1 in seclevel 1 if rh-allow-sha1-signatures =
+ yes
+
+NOTE: This patch is ported from CentOS 9 / RHEL 9, where it allows SHA1
+in seclevel 2 if rh-allow-sha1-signatures = yes. This was chosen because
+on CentOS 9 and RHEL 9, the LEGACY crypto policy sets the security level
+to 2.
+
+On Fedora 35 (with OpenSSL 1.1) the legacy crypto policy uses security
+level 1. Because Fedora 36 supports both OpenSSL 1.1 and OpenSSL 3, and
+we want the legacy crypto policy to allow SHA-1 in TLS, the only option
+to make this happen consistently in both OpenSSL 1.1 and OpenSSL 3 is
+SECLEVEL=1 (which will allow SHA-1 in OpenSSL 1.1) and this change to
+allow SHA-1 in SECLEVEL=1 with rh-allow-sha1-signatures = yes (which
+will allow SHA-1 in OpenSSL 3).
+
+The change from CentOS 9 / RHEL 9 cannot be applied unmodified, because
+rh-allow-sha1-signatures will default to yes in Fedora (according to our
+current plans including until F38), and the security level in the
+DEFAULT crypto policy is 2, i.e., the unmodified change would weaken the
+default configuration.
+
+Related: rhbz#2055796
+Related: rhbz#2070977
+---
+ crypto/x509/x509_vfy.c        | 20 ++++++++++-
+ doc/man5/config.pod           |  7 ++++
+ ssl/t1_lib.c                  | 67 ++++++++++++++++++++++++++++-------
+ test/recipes/25-test_verify.t |  4 +--
+ 4 files changed, 82 insertions(+), 16 deletions(-)
+
+diff --git a/crypto/x509/x509_vfy.c b/crypto/x509/x509_vfy.c
+index 2f175ca517..bf0c608839 100644
+--- a/crypto/x509/x509_vfy.c
++++ b/crypto/x509/x509_vfy.c
+@@ -25,6 +25,7 @@
+ #include <openssl/objects.h>
+ #include <openssl/core_names.h>
+ #include "internal/dane.h"
++#include "internal/sslconf.h"
+ #include "crypto/x509.h"
+ #include "x509_local.h"
+ 
+@@ -3441,14 +3442,31 @@ static int check_sig_level(X509_STORE_CTX *ctx, X509 *cert)
+ {
+     int secbits = -1;
+     int level = ctx->param->auth_level;
++    int nid;
++    OSSL_LIB_CTX *libctx = NULL;
+ 
+     if (level <= 0)
+         return 1;
+     if (level > NUM_AUTH_LEVELS)
+         level = NUM_AUTH_LEVELS;
+ 
+-    if (!X509_get_signature_info(cert, NULL, NULL, &secbits, NULL))
++    if (ctx->libctx)
++        libctx = ctx->libctx;
++    else if (cert->libctx)
++        libctx = cert->libctx;
++    else
++        libctx = OSSL_LIB_CTX_get0_global_default();
++
++    if (!X509_get_signature_info(cert, &nid, NULL, &secbits, NULL))
+         return 0;
+ 
++    if ((nid == NID_sha1 || nid == NID_md5_sha1)
++            && ossl_ctx_legacy_digest_signatures_allowed(libctx, 0)
++            && ctx->param->auth_level < 2)
++        /* When rh-allow-sha1-signatures = yes and security level <= 1,
++         * explicitly allow SHA1 for backwards compatibility. Also allow
++         * MD5-SHA1 because TLS 1.0 is still supported, which uses it. */
++        return 1;
++
+     return secbits >= minbits_table[level - 1];
+ }
+diff --git a/doc/man5/config.pod b/doc/man5/config.pod
+index 0c9110d28a..e0516d20b8 100644
+--- a/doc/man5/config.pod
++++ b/doc/man5/config.pod
+@@ -309,6 +309,13 @@ this option is set to B<no>.  Because TLS 1.1 or lower use MD5-SHA1 as
+ pseudorandom function (PRF) to derive key material, disabling
+ B<rh-allow-sha1-signatures> requires the use of TLS 1.2 or newer.
+ 
++Note that enabling B<rh-allow-sha1-signatures> will allow TLS signature
++algorithms that use SHA1 in security level 1, despite the definition of
++security level 1 of 80 bits of security, which SHA1 and MD5-SHA1 do not meet.
++This allows using SHA1 and MD5-SHA1 in TLS in the LEGACY crypto-policy on
++Fedora without requiring to set the security level to 0, which would include
++further insecure algorithms, and thus restores support for TLS 1.0 and 1.1.
++
+ =item B<fips_mode> (deprecated)
+ 
+ The value is a boolean that can be B<yes> or B<no>.  If the value is
+diff --git a/ssl/t1_lib.c b/ssl/t1_lib.c
+index dcd487ec2e..0b50266b69 100644
+--- a/ssl/t1_lib.c
++++ b/ssl/t1_lib.c
+@@ -20,6 +20,7 @@
+ #include <openssl/bn.h>
+ #include <openssl/provider.h>
+ #include <openssl/param_build.h>
++#include "crypto/x509.h"
+ #include "internal/sslconf.h"
+ #include "internal/nelem.h"
+ #include "internal/sizes.h"
+@@ -1561,19 +1562,28 @@ int tls12_check_peer_sigalg(SSL *s, uint16_t sig, EVP_PKEY *pkey)
+         SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE, SSL_R_UNKNOWN_DIGEST);
+         return 0;
+     }
+-    /*
+-     * Make sure security callback allows algorithm. For historical
+-     * reasons we have to pass the sigalg as a two byte char array.
+-     */
+-    sigalgstr[0] = (sig >> 8) & 0xff;
+-    sigalgstr[1] = sig & 0xff;
+-    secbits = sigalg_security_bits(s->ctx, lu);
+-    if (secbits == 0 ||
+-        !ssl_security(s, SSL_SECOP_SIGALG_CHECK, secbits,
+-                      md != NULL ? EVP_MD_get_type(md) : NID_undef,
+-                      (void *)sigalgstr)) {
+-        SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE, SSL_R_WRONG_SIGNATURE_TYPE);
+-        return 0;
++
++    if ((lu->hash == NID_sha1 || lu->hash == NID_md5_sha1)
++            && ossl_ctx_legacy_digest_signatures_allowed(s->ctx->libctx, 0)
++            && SSL_get_security_level(s) < 2) {
++        /* When rh-allow-sha1-signatures = yes and security level <= 1,
++         * explicitly allow SHA1 for backwards compatibility. Also allow
++         * MD5-SHA1 because TLS 1.0 is still supported, which uses it. */
++    } else {
++        /*
++         * Make sure security callback allows algorithm. For historical
++         * reasons we have to pass the sigalg as a two byte char array.
++         */
++        sigalgstr[0] = (sig >> 8) & 0xff;
++        sigalgstr[1] = sig & 0xff;
++        secbits = sigalg_security_bits(s->ctx, lu);
++        if (secbits == 0 ||
++            !ssl_security(s, SSL_SECOP_SIGALG_CHECK, secbits,
++                          md != NULL ? EVP_MD_get_type(md) : NID_undef,
++                          (void *)sigalgstr)) {
++            SSLfatal(s, SSL_AD_HANDSHAKE_FAILURE, SSL_R_WRONG_SIGNATURE_TYPE);
++            return 0;
++        }
+     }
+     /* Store the sigalg the peer uses */
+     s->s3.tmp.peer_sigalg = lu;
+@@ -2106,6 +2116,15 @@ static int tls12_sigalg_allowed(const SSL *s, int op, const SIGALG_LOOKUP *lu)
+         }
+     }
+ 
++    if ((lu->hash == NID_sha1 || lu->hash == NID_md5_sha1)
++            && ossl_ctx_legacy_digest_signatures_allowed(s->ctx->libctx, 0)
++            && SSL_get_security_level(s) < 2) {
++        /* When rh-allow-sha1-signatures = yes and security level <= 1,
++         * explicitly allow SHA1 for backwards compatibility. Also allow
++         * MD5-SHA1 because TLS 1.0 is still supported, which uses it. */
++        return 1;
++    }
++
+     /* Finally see if security callback allows it */
+     secbits = sigalg_security_bits(s->ctx, lu);
+     sigalgstr[0] = (lu->sigalg >> 8) & 0xff;
+@@ -2977,6 +2996,8 @@ static int ssl_security_cert_sig(SSL *s, SSL_CTX *ctx, X509 *x, int op)
+ {
+     /* Lookup signature algorithm digest */
+     int secbits, nid, pknid;
++    OSSL_LIB_CTX *libctx = NULL;
++
+     /* Don't check signature if self signed */
+     if ((X509_get_extension_flags(x) & EXFLAG_SS) != 0)
+         return 1;
+@@ -2985,6 +3006,26 @@ static int ssl_security_cert_sig(SSL *s, SSL_CTX *ctx, X509 *x, int op)
+     /* If digest NID not defined use signature NID */
+     if (nid == NID_undef)
+         nid = pknid;
++
++    if (x && x->libctx)
++        libctx = x->libctx;
++    else if (ctx && ctx->libctx)
++        libctx = ctx->libctx;
++    else if (s && s->ctx && s->ctx->libctx)
++        libctx = s->ctx->libctx;
++    else
++        libctx = OSSL_LIB_CTX_get0_global_default();
++
++    if ((nid == NID_sha1 || nid == NID_md5_sha1)
++            && ossl_ctx_legacy_digest_signatures_allowed(libctx, 0)
++            && ((s != NULL && SSL_get_security_level(s) < 2)
++                || (ctx != NULL && SSL_CTX_get_security_level(ctx) < 2)
++            ))
++        /* When rh-allow-sha1-signatures = yes and security level <= 1,
++         * explicitly allow SHA1 for backwards compatibility. Also allow
++         * MD5-SHA1 because TLS 1.0 is still supported, which uses it. */
++        return 1;
++
+     if (s)
+         return ssl_security(s, op, secbits, nid, x);
+     else
+diff --git a/test/recipes/25-test_verify.t b/test/recipes/25-test_verify.t
+index 700bbd849c..280477bc9d 100644
+--- a/test/recipes/25-test_verify.t
++++ b/test/recipes/25-test_verify.t
+@@ -387,8 +387,8 @@ ok(verify("ee-pss-sha1-cert", "", ["root-cert"], ["ca-cert"], "-auth_level", "0"
+ ok(verify("ee-pss-sha256-cert", "", ["root-cert"], ["ca-cert"], ),
+     "CA with PSS signature using SHA256");
+ 
+-ok(!verify("ee-pss-sha1-cert", "", ["root-cert"], ["ca-cert"], "-auth_level", "1"),
+-    "Reject PSS signature using SHA1 and auth level 1");
++ok(!verify("ee-pss-sha1-cert", "", ["root-cert"], ["ca-cert"], "-auth_level", "2"),
++    "Reject PSS signature using SHA1 and auth level 2");
+ 
+ ok(verify("ee-pss-sha256-cert", "", ["root-cert"], ["ca-cert"], "-auth_level", "2"),
+     "PSS signature using SHA256 and auth level 2");
+-- 
+2.35.1
+
