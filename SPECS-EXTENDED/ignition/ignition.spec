@@ -14,6 +14,8 @@ Version:                2.25.1
 
 Name:           ignition
 Release:        1%{?dist}
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Summary:        First boot installer and configuration tool
 
 # Upstream license specification: Apache-2.0
