@@ -22,7 +22,6 @@ Summary:        First boot installer and configuration tool
 License:        Apache-2.0
 URL:            %{gourl}
 Source0:        https://github.com/coreos/ignition/archive/refs/tags/v2.25.1.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        https://github.com/fedora-iot/ignition-edge/archive/%{ignedgecommit}/ignition-edge-%{ignedgeshortcommit}.tar.gz
 
 
 BuildRequires: libblkid-devel
@@ -201,17 +200,6 @@ This package contains a tool for validating Ignition configurations.
 
 ############## validate-redistributable subpackage ##############
 
-############## ignition-edge subpackage ##############
-
-%package edge
-
-Summary:  Enablement glue for Ignition on IoT/Edge systems
-License:  Apache-2.0
-
-%description edge
-This package contains dracut modules, services and binaries needed to enable
-Ignition on IoT/Edge systems.
-
 ############## grub subpackage ##############
 
 %package grub
@@ -226,8 +214,6 @@ This package contains the grub2 config which is compatable with bootupd.
 
 %prep
 %forgeautosetup -p1
-
-tar xvf %{SOURCE1}
 
 %build
 export LDFLAGS="-X github.com/coreos/ignition/v2/internal/version.Raw=%{version} -X github.com/coreos/ignition/v2/internal/distro.selinuxRelabel=true "
@@ -285,8 +271,6 @@ install -p -m 0755 ./ignition-validate %{buildroot}%{_bindir}
 # the command line.  Install directly into the dracut module dir.
 install -p -m 0755 ./ignition %{buildroot}/%{dracutlibdir}/modules.d/30ignition
 
-%make_install -C ignition-edge-%{ignedgecommit}
-
 %if %{with check}
 %check
 #to do
@@ -304,19 +288,6 @@ install -p -m 0755 ./ignition %{buildroot}/%{dracutlibdir}/modules.d/30ignition
 %doc README.md
 %license %{golicenses}
 %{_bindir}/ignition-validate
-
-%files edge
-%license %{golicenses}
-%doc %{godocs}
-%{dracutlibdir}/modules.d/35ignition-edge/*
-%{dracutlibdir}/modules.d/10coreos-sysctl/*
-%{dracutlibdir}/modules.d/99emergency-shell-setup/*
-%{dracutlibdir}/modules.d/99journal-conf/*
-%{_unitdir}/coreos-check-ssh-keys.service
-%{_unitdir}/coreos-ignition-write-issues.service
-%{_unitdir}/ignition-firstboot-complete.service
-%{_libexecdir}/coreos-ignition-write-issues
-%{_libexecdir}/coreos-check-ssh-keys
 
 %files grub
 %doc README.md
