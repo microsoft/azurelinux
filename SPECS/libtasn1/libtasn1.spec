@@ -62,7 +62,7 @@ make %{?_smp_mflags} check
 * Mon Jan 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.19.0-3
 - Patch for CVE-2025-13151
 
-* Fri Feb 21 2024 Ankita Pareek <ankitapareek@microsoft.com> - 4.19.0-2
+* Fri Feb 21 2025 Ankita Pareek <ankitapareek@microsoft.com> - 4.19.0-2
 - Address CVE-2024-12133
 
 * Tue Oct 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.19.0-1
