@@ -1,14 +1,12 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-# Macros for py2/py3 compatibility
-%global pyver %{python3_pkgversion}
-%global pyver_bin python%{pyver}
-%global pyver_sitelib %{expand:%{python%{pyver}_sitelib}}
-%global pyver_install %{expand:%{py%{pyver}_install}}
-%global pyver_build %{expand:%{py%{pyver}_build}}
-# End of macros for py2/py3 compatibility
+
+%{!?sources_gpg: %{!?dlrn:%global sources_gpg 1} }
+%global sources_gpg_sign 0x2ef3fe0ec2b075ab7458b5f8b702b20b13df2318
 
 %{!?upstream_version: %global upstream_version %{version}%{?milestone}}
+# we are excluding some BRs from automatic generator
+%global excluded_brs doc8 bandit pre-commit hacking flake8-import-order
 
 %global pypi_name debtcollector
 %global with_doc 1
@@ -21,35 +19,55 @@ It is a collection of functions/decorators which is used to signal a user when \
 * further customizing the emitted messages
 
 Name:        python-%{pypi_name}
-Version:     1.22.0
-Release:     4%{?dist}
+Version:     3.0.0
+Release:     10%{?dist}
 Summary:     A collection of Python deprecation patterns and strategies
 
-License:     ASL 2.0
+License:     Apache-2.0
 URL:         https://pypi.python.org/pypi/%{pypi_name}
-Source0:     https://tarballs.openstack.org/%{pypi_name}/%{pypi_name}-%{upstream_version}.tar.gz#/python-%{pypi_name}-%{upstream_version}.tar.gz
+Source0:     https://tarballs.openstack.org/%{pypi_name}/%{pypi_name}-%{upstream_version}.tar.gz
+# Required for tarball sources verification
+%if 0%{?sources_gpg} == 1
+Source101:        https://tarballs.openstack.org/%{pypi_name}/%{pypi_name}-%{upstream_version}.tar.gz.asc
+Source102:        https://releases.openstack.org/_static/%{sources_gpg_sign}.txt
+%endif
+
+BuildRequires: python-pip
+BuildRequires: python-pbr
+BuildRequires: python-wheel
+BuildRequires: python-setuptools
+BuildRequires: python3-pytest
+BuildRequires: python-dulwich
+BuildRequires: python-openstackdocstheme
+BuildRequires: python-toml
+BuildRequires: python-tox
+BuildRequires: python-wrapt
+BuildRequires: python-extras
+BuildRequires: python-sphinx
+BuildRequires: python-tox-current-env
+BuildRequires: python-virtualenv
+BuildRequires: python3-testtools
+BuildRequires: python3-fixtures
 
 BuildArch:   noarch
 
-BuildRequires: git
+# Required for tarball sources verification
+%if 0%{?sources_gpg} == 1
+BuildRequires:  /usr/bin/gpgv2
+%endif
+
+BuildRequires: git-core
 
 %description
 %{common_desc}
 
-%package -n python%{pyver}-%{pypi_name}
+%package -n python3-%{pypi_name}
 Summary:     A collection of Python deprecation patterns and strategies
-%{?python_provide:%python_provide python%{pyver}-%{pypi_name}}
 
-BuildRequires: python%{pyver}-devel
-BuildRequires: python%{pyver}-setuptools
-BuildRequires: python%{pyver}-pbr
+BuildRequires: python3-devel
+BuildRequires: pyproject-rpm-macros
 
-Requires:    python%{pyver}-funcsigs
-Requires:    python%{pyver}-pbr
-Requires:    python%{pyver}-six
-Requires:    python%{pyver}-wrapt
-
-%description -n python%{pyver}-%{pypi_name}
+%description -n python3-%{pypi_name}
 %{common_desc}
 
 
@@ -57,42 +75,53 @@ Requires:    python%{pyver}-wrapt
 %package -n python-%{pypi_name}-doc
 Summary:        Documentation for the debtcollector module
 
-BuildRequires:  python%{pyver}-sphinx
-BuildRequires:  python%{pyver}-openstackdocstheme
-BuildRequires:  python%{pyver}-fixtures
-BuildRequires:  python%{pyver}-six
-BuildRequires:  python%{pyver}-wrapt
-
 %description -n python-%{pypi_name}-doc
 Documentation for the debtcollector module
 %endif
 
-
 %prep
+# Required for tarball sources verification
+%if 0%{?sources_gpg} == 1
+%{gpgverify}  --keyring=%{SOURCE102} --signature=%{SOURCE101} --data=%{SOURCE0}
+%endif
 %autosetup -n %{pypi_name}-%{upstream_version} -S git
 
-# let RPM handle deps
-rm -rf *requirements.txt
+
+sed -i /^[[:space:]]*-c{env:.*_CONSTRAINTS_FILE.*/d tox.ini
+sed -i "s/^deps = -c{env:.*_CONSTRAINTS_FILE.*/deps =/" tox.ini
+sed -i /^minversion.*/d tox.ini
+sed -i /^requires.*virtualenv.*/d tox.ini
+
+# Exclude some bad-known BRs
+for pkg in %{excluded_brs};do
+  for reqfile in doc/requirements.txt test-requirements.txt; do
+    if [ -f $reqfile ]; then
+      sed -i /^${pkg}.*/d $reqfile
+    fi
+  done
+done
 
 %build
-%{pyver_build}
+%pyproject_wheel
+
+%install
+%pyproject_install
 
 %if 0%{?with_doc}
 # doc
-%{pyver_bin} setup.py build_sphinx -b html
+PYTHONPATH="%{buildroot}/%{python3_sitelib}"
+%tox -e docs
 # Fix hidden-file-or-dir warnings
-rm -fr doc/build/html/.buildinfo
+rm -fr doc/build/html/.{doctrees,buildinfo}
+rm -f doc/build/html/_static/images/docs/license.png
 %endif
 
-%install
-%{pyver_install}
-
-%files -n python%{pyver}-%{pypi_name}
+%files -n python3-%{pypi_name}
 %doc README.rst CONTRIBUTING.rst
 %license LICENSE
-%{pyver_sitelib}/%{pypi_name}
-%{pyver_sitelib}/%{pypi_name}*.egg-info
-%exclude %{pyver_sitelib}/%{pypi_name}/tests
+%{python3_sitelib}/%{pypi_name}
+%{python3_sitelib}/%{pypi_name}*.dist-info
+%exclude %{python3_sitelib}/%{pypi_name}/tests
 
 %if 0%{?with_doc}
 %files -n python-%{pypi_name}-doc
@@ -101,6 +130,10 @@ rm -fr doc/build/html/.buildinfo
 %endif
 
 %changelog
+* Fri Jan 09 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.0.0-10
+- Upgrade to 3.0.0 (Reference: Fedora 44)
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.22.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -121,4 +154,3 @@ rm -fr doc/build/html/.buildinfo
 
 * Fri Mar 08 2019 RDO <dev@lists.rdoproject.org> 1.21.0-1
 - Update to 1.21.0
-
