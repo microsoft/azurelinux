@@ -140,7 +140,12 @@ ifneq ($(REPO_SNAPSHOT_TIME),)
 imagepkgfetcher_extra_flags += --repo-snapshot-time=$(REPO_SNAPSHOT_TIME)
 endif
 
-$(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(toolchain_rpms) $(imggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(RPMS_DIR) $(imggen_rpms) $(depend_REPO_SNAPSHOT_TIME) $(STATUS_FLAGS_DIR)/imagegen_cleanup.flag
+ifeq ($(VALIDATE_IMAGE_GPG),y)
+imagepkgfetcher_extra_flags += --enable-gpg-check
+imagepkgfetcher_extra_flags += $(foreach key,$(IMAGE_GPG_VALIDATION_KEYS),--gpg-key=$(key))
+endif
+
+$(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(toolchain_rpms) $(imggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(RPMS_DIR) $(imggen_rpms) $(depend_REPO_SNAPSHOT_TIME) $(depend_VALIDATE_IMAGE_GPG) $(depend_IMAGE_GPG_VALIDATION_KEYS) $(IMAGE_GPG_VALIDATION_KEYS) $(STATUS_FLAGS_DIR)/imagegen_cleanup.flag
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imagepkgfetcher) \
 		--input=$(CONFIG_FILE) \
