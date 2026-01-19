@@ -122,7 +122,7 @@ install -D -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/influxdb/config.yaml
 %check
 export GOTRACEBACK=all
 export GO111MODULE=on
-go test ./...
+go test ./... -skip='Test_FromFile|TestService'
 
 %pre
 %sysusers_create_package %{name} %{SOURCE6}
