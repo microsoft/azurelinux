@@ -214,6 +214,7 @@ NOCONFIGURE=1 ./autogen.sh
         --disable-gtk \
         --disable-gtk3 \
         --disable-mono \
+	--enable-tests \
 ;
 
 # workaround parallel build issues (aarch64 only so far, bug #1564553)
