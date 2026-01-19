@@ -10,7 +10,7 @@
 Summary:        Signed MSHV-enabled Linux Kernel for %{buildarch} systems
 Name:           kernel-mshv-signed-%{buildarch}
 Version:        6.6.100.mshv1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -140,6 +140,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 
 %changelog
+* Mon Jan 06 2026 Roaa Sakr <romoh@microsoft.com> - 6.6.100.mshv1-3
+- Enable ftrace syscalls tracing support in kernel config
+
 * Wed Oct 22 2025 Saul Paredes <saulparedes@microsoft.com> - 6.6.100.mshv1-2
 - Enable build on aarch64
 
