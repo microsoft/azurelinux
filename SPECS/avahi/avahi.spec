@@ -258,6 +258,7 @@ rm -fv  %{buildroot}%{_datadir}/avahi/interfaces/avahi-discover.ui
 
 
 %check
+%make_build -k V=1 check || make check V=1
 
 %pre
 getent group avahi >/dev/null || groupadd -f -g 70 -r avahi
