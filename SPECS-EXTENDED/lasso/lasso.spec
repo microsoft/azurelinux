@@ -248,10 +248,6 @@ rm -fr %{buildroot}%{_docdir}/%{name}
 - Upgrade to version 2.9.0
 - License verified
 
-* Wed Feb 05 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.8.2-1
-- Upgrade to version 2.8.2
-- License Verified
-
 * Mon Sep 12 2022 Muhammad Falak <mwani@microsoft.com> - 2.8.0-1
 - Bump version to 2.8.0
 - Drop un-needed patches
