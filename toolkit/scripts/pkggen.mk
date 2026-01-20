@@ -121,6 +121,32 @@ ifeq ($(RESOLVE_CYCLES_FROM_UPSTREAM),y)
    endif
 endif
 
+# Parse specs in $(SPECS_DIR) and generate a specs.json file encoding all dependency information
+# We look at the same pack list as the srpmpacker tool via the target $(SRPM_PACK_LIST) if it is set.
+# We only parse the spec files we will actually pack.
+$(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-kernelverprocessor) $(depend_SPECS_DIR) $(depend_SRPM_PACK_LIST) $(depend_RUN_CHECK)
+	$(go-kernelverprocessor) \
+		--dir $(SPECS_DIR) \
+		$(if $(SRPM_PACK_LIST),--spec-list="$(SRPM_PACK_LIST)") \
+		--build-dir $(parse_working_dir) \
+		--srpm-dir $(BUILD_SRPMS_DIR) \
+		--rpm-dir $(RPMS_DIR) \
+		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
+		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
+		--dist-tag $(DIST_TAG) \
+		--worker-tar $(chroot_worker) \
+		$(if $(filter y,$(RUN_CHECK)),--run-check) \
+		$(logging_command) \
+		--cpu-prof-file=$(PROFILE_DIR)/kernelverprocessor.cpu.pprof \
+		--mem-prof-file=$(PROFILE_DIR)/kernelverprocessor.mem.pprof \
+		--trace-file=$(PROFILE_DIR)/kernelverprocessor.trace \
+		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
+		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
+		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
+		--timestamp-file=$(TIMESTAMP_DIR)/kernelverprocessor.jsonl \
+		$(if $(TARGET_ARCH),--target-arch="$(TARGET_ARCH)") \
+		--output $@
+
 # Convert the dependency information in the json file into a graph structure
 # We require all the toolchain RPMs to be available here to help resolve unfixable cyclic dependencies
 $(graph_file): $(specs_file) $(go-grapher) $(toolchain_rpms) $(TOOLCHAIN_MANIFEST) $(pkggen_local_repo) $(graphpkgfetcher_cloned_repo) $(chroot_worker) $(depend_REPO_LIST) $(REPO_LIST) $(depend_REPO_SNAPSHOT_TIME)

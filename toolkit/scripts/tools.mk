@@ -62,6 +62,7 @@ go_tool_list = \
 	scheduler \
 	specarchchecker \
 	specreader \
+	kernelverprocessor \
 	srpmpacker \
 	validatechroot \
 
