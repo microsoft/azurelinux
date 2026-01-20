@@ -60,7 +60,7 @@ export LD_LIBRARY_PATH=.
 %{_libdir}/pkgconfig/Lerc.pc
 
 %changelog
-* Mon Jan 19 2026 Aditya Singh <v-aditysing@microsoft.com> - 4.0.0-3
+* Mon Jan 19 2026 Aditya Singh <v-aditysing@microsoft.com> - 4.0.0-4
 - Resolved test failure and license issue.
 
 * Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 4.0.0-3
