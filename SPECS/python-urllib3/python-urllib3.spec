@@ -1,7 +1,7 @@
 Summary:        A powerful, sanity-friendly HTTP client for Python.
 Name:           python-urllib3
 Version:        1.26.19
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,10 +22,14 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %if %{with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-mock
 %endif
 Requires:       python3
 
-Patch0: CVE-2025-50181.patch
+Patch0:         CVE-2025-50181.patch
+Patch1:         CVE-2025-66418.patch
+Patch2:         CVE-2026-21441.patch
 
 %description -n python3-urllib3
 urllib3 is a powerful, sanity-friendly HTTP client for Python. Much of the Python ecosystem already uses urllib3 and you should too.
@@ -43,9 +47,20 @@ rm -rf test/contrib/
 %py3_install
 
 %check
-pip3 install --user --upgrade nox
-PATH="$PATH:/root/.local/bin/"
-nox --reuse-existing-virtualenvs --sessions test-%{python3_version}
+# Install nox to handle test environment setup
+pip3 install nox
+
+# Patch dev-requirements.txt to use compatible versions with setuptools 69.x:
+# - pytest 7.x+ is compatible with newer setuptools
+# - flaky 3.8.0+ is compatible with pytest 7.x+
+sed -i 's/pytest==4.6.9.*/pytest>=7.0.0/' dev-requirements.txt
+sed -i 's/pytest==6.2.4.*/pytest>=7.0.0/' dev-requirements.txt
+sed -i 's/flaky==3.7.0/flaky>=3.8.0/' dev-requirements.txt
+
+# Run the test session for Python 3.9
+# Skip test_recent_date which uses hardcoded date that is now in the past
+# Note: test/with_dummyserver and test/contrib are removed in %prep
+nox -s test-3.9 -- -k "not test_recent_date"
 
 %files -n python3-urllib3
 %defattr(-,root,root,-)
@@ -53,6 +68,9 @@ nox --reuse-existing-virtualenvs --sessions test-%{python3_version}
 %{python3_sitelib}/*
 
 %changelog
+* Fri Jan 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.26.19-3
+- Patch for CVE-2025-66418, CVE-2026-21441
+
 * Thu Jun 26 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 1.26.19-2
 - Patch CVE-2025-50181
 
