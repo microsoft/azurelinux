@@ -424,7 +424,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 
 %changelog
 * Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-2
-- Enable MLRU kernel configs for performance improvements.
+- Enable aarch64 kernel configs for performance improvements.
 
 * Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.57.1-1
 - Kernel upgrade
