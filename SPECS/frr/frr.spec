@@ -3,7 +3,7 @@
 Summary:        Routing daemon
 Name:           frr
 Version:        9.1.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,6 +19,7 @@ Patch4:         0004-remove-grpc-test.patch
 Patch5:         CVE-2024-44070.patch
 Patch6:         CVE-2024-55553.patch
 Patch7:         0001-Fix-frr-c90-complaint-error.patch
+Patch8:         CVE-2025-61100.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -201,6 +202,9 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Tue Jan 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.1.1-5
+- Patch for CVE-2025-61100
+
 * Mon Dec 29 2025 Archana Shettigar <v-shettigara@microsoft.com> - 9.1.1-4
 - Rebuilt for net-snmp version up with c90 fix
 
