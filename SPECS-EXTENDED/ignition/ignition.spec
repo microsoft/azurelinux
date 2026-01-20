@@ -273,7 +273,8 @@ install -p -m 0755 ./ignition %{buildroot}/%{dracutlibdir}/modules.d/30ignition
 
 %if %{with check}
 %check
-#to do
+sed -i '34d' ./test
+VERSION=%{version} GOARCH=amd64 ./test
 %endif
 
 %files
