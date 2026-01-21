@@ -35,7 +35,6 @@ allowing for true Kubevirt hybrid deployments of Kubernetes.
 
 %build
 export GOPATH=%{our_gopath}
-export GOFLAGS="-mod=vendor"
 make manager
 
 %install
