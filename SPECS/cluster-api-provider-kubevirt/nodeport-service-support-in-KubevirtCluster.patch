@@ -16,16 +16,16 @@ Through this patch, if the service type is NodePort:
  config/default/credentials.yaml               | 11 ++++
  config/default/kustomization.yaml             |  2 +
  config/default/manager_credentials_patch.yaml | 32 +++++++++
- controllers/kubevirtcluster_controller.go     | 19 +++++-
+ controllers/kubevirtcluster_controller.go     | 24 ++++++-
  pkg/loadbalancer/loadbalancer.go              | 14 ++++
  pkg/loadbalancer/loadbalancer_test.go         | 65 +++++++++++++++++++
- 6 files changed, 142 insertions(+), 1 deletion(-)
+ 6 files changed, 147 insertions(+), 1 deletion(-)
  create mode 100644 config/default/credentials.yaml
  create mode 100644 config/default/manager_credentials_patch.yaml
 
 diff --git a/config/default/credentials.yaml b/config/default/credentials.yaml
 new file mode 100644
-index 0000000..4ac5134
+index 0000000..d19e561
 --- /dev/null
 +++ b/config/default/credentials.yaml
 @@ -0,0 +1,11 @@
@@ -40,30 +40,29 @@ index 0000000..4ac5134
 +  fabric-control-endpoint: ${FABRIC_CLUSTER_CONTROL_ENDPOINT_B64}
 +  fabric-cluster-ca-data: ${FABRIC_CLUSTER_CA_DATA_B64}
 +  fabric-host-override: ${FABRIC_HOST_OVERRIDE_B64}
-\ No newline at end of file
 diff --git a/config/default/kustomization.yaml b/config/default/kustomization.yaml
-index dc58c95..8b459dc 100644
+index b7c6ed1..22590fb 100644
 --- a/config/default/kustomization.yaml
 +++ b/config/default/kustomization.yaml
 @@ -12,6 +12,7 @@ commonLabels:
  
  resources:
-   - namespace.yaml
-+  - credentials.yaml
- 
- bases:
-   - ../crd
-@@ -22,6 +23,7 @@ bases:
- 
- patchesStrategicMerge:
-   # Provide customizable hook for make targets.
-+  - manager_credentials_patch.yaml
-   - manager_image_patch.yaml
-   - manager_pull_policy.yaml
+ - namespace.yaml
++- credentials.yaml
+ - ../crd
+ - ../rbac
+ - ../manager
+@@ -23,6 +24,7 @@ resources:
    # Enable webhook.
+   # Inject certificate in the webhook definition.
+ patchesStrategicMerge:
++- manager_credentials_patch.yaml
+ - manager_image_patch.yaml
+ - manager_pull_policy.yaml
+ - manager_webhook_patch.yaml
 diff --git a/config/default/manager_credentials_patch.yaml b/config/default/manager_credentials_patch.yaml
 new file mode 100644
-index 0000000..7ebd3c3
+index 0000000..a05fcb4
 --- /dev/null
 +++ b/config/default/manager_credentials_patch.yaml
 @@ -0,0 +1,32 @@
@@ -99,8 +98,9 @@ index 0000000..7ebd3c3
 +                name: manager-bootstrap-credentials
 +                key: fabric-host-override
 +                optional: true
+\ No newline at end of file
 diff --git a/controllers/kubevirtcluster_controller.go b/controllers/kubevirtcluster_controller.go
-index e6b8924..41df42a 100644
+index 9323bd5..f6adc5e 100644
 --- a/controllers/kubevirtcluster_controller.go
 +++ b/controllers/kubevirtcluster_controller.go
 @@ -19,6 +19,7 @@ package controllers
@@ -108,10 +108,10 @@ index e6b8924..41df42a 100644
  	gocontext "context"
  	"fmt"
 +	"os"
+ 	"slices"
  	"time"
  
- 	"sigs.k8s.io/controller-runtime/pkg/builder"
-@@ -188,7 +189,23 @@ func (r *KubevirtClusterReconciler) reconcileNormal(ctx *context.ClusterContext,
+@@ -209,7 +210,28 @@ func (r *KubevirtClusterReconciler) reconcileNormal(ctx *context.ClusterContext,
  			Port: 6443,
  		}
  
@@ -122,7 +122,12 @@ index e6b8924..41df42a 100644
 +			return ctrl.Result{}, errors.Errorf("NodePort selected but no FabricHostOverride specified")
 +		}
 +		if externalLoadBalancer.GetNodePort() == 0 {
-+			conditions.MarkFalse(ctx.KubevirtCluster, infrav1.LoadBalancerAvailableCondition, infrav1.LoadBalancerProvisioningFailedReason, clusterv1.ConditionSeverityWarning, "NodePort not yet available")
++			conditions.Set(ctx.KubevirtCluster, metav1.Condition{
++				Type:    infrav1.LoadBalancerAvailableCondition,
++				Status:  metav1.ConditionFalse,
++				Reason:  infrav1.LoadBalancerProvisioningFailedReason,
++				Message: "NodePort not yet available",
++			})
 +			return ctrl.Result{}, errors.Errorf("failed to get NodePort for the load balancer")
 +		}
 +
@@ -137,7 +142,7 @@ index e6b8924..41df42a 100644
  		lbip4, err := externalLoadBalancer.IP(ctx)
  		if err != nil {
 diff --git a/pkg/loadbalancer/loadbalancer.go b/pkg/loadbalancer/loadbalancer.go
-index f440231..0cab0fd 100644
+index 782d5d4..d6a8af9 100644
 --- a/pkg/loadbalancer/loadbalancer.go
 +++ b/pkg/loadbalancer/loadbalancer.go
 @@ -121,6 +121,20 @@ func (l *LoadBalancer) Create(ctx *context.ClusterContext) error {

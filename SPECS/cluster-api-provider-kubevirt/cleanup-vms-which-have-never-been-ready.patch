@@ -53,18 +53,18 @@ This enhancement:
 
 ---
  api/v1alpha1/kubevirtmachine_types.go         |   8 ++
- controllers/kubevirtmachine_controller.go     |  24 +++-
- .../kubevirtmachine_controller_test.go        | 112 ++++++++++++++++++
+ controllers/kubevirtmachine_controller.go     |  25 +++-
+ .../kubevirtmachine_controller_test.go        | 127 ++++++++++++++++++
  pkg/kubevirt/machine.go                       |   8 ++
  pkg/kubevirt/machine_factory.go               |   2 +
- .../mock/machine_factory_generated.go         |  14 +++
- 6 files changed, 166 insertions(+), 2 deletions(-)
+ .../mock/machine_factory_generated.go         |  14 ++
+ 6 files changed, 182 insertions(+), 2 deletions(-)
 
 diff --git a/api/v1alpha1/kubevirtmachine_types.go b/api/v1alpha1/kubevirtmachine_types.go
-index 94e2bcf..c8d0fca 100644
+index 64e0228..1a59339 100644
 --- a/api/v1alpha1/kubevirtmachine_types.go
 +++ b/api/v1alpha1/kubevirtmachine_types.go
-@@ -74,6 +74,14 @@ type KubevirtMachineStatus struct {
+@@ -73,6 +73,14 @@ type KubevirtMachineStatus struct {
  	// +kubebuilder:default=false
  	Ready bool `json:"ready"`
  
@@ -80,18 +80,19 @@ index 94e2bcf..c8d0fca 100644
  	// added to the load balancer
  	// +optional
 diff --git a/controllers/kubevirtmachine_controller.go b/controllers/kubevirtmachine_controller.go
-index 0983c93..ad6094b 100644
+index fbaf77e..b92e1ae 100644
 --- a/controllers/kubevirtmachine_controller.go
 +++ b/controllers/kubevirtmachine_controller.go
-@@ -278,12 +278,32 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
- 	if externalMachine.IsReady() {
- 		// Mark VMProvisionedCondition to indicate that the VM has successfully started
- 		conditions.MarkTrue(ctx.KubevirtMachine, infrav1.VMProvisionedCondition)
+@@ -319,7 +319,30 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
+ 			Reason:  clusterv1.UpToDateReason,
+ 			Message: "",
+ 		})
 +		// Set Started to true when VM becomes ready for the first time
 +		if !ctx.KubevirtMachine.Status.Started {
 +			ctx.KubevirtMachine.Status.Started = true
 +		}
  	} else {
++
 +		// Waiting for VM to boot
 +		ctx.KubevirtMachine.Status.Ready = false
 +		hasVMCreateFailedCondition := conditions.GetReason(ctx.KubevirtMachine, infrav1.VMProvisionedCondition) == infrav1.VMCreateFailedReason
@@ -111,7 +112,11 @@ index 0983c93..ad6094b 100644
 +		}
 +
  		reason, message := externalMachine.GetVMNotReadyReason()
- 		conditions.MarkFalse(ctx.KubevirtMachine, infrav1.VMProvisionedCondition, reason, clusterv1.ConditionSeverityInfo, "%s", message)
+ 		conditions.Set(ctx.KubevirtMachine, metav1.Condition{
+ 			Type:    infrav1.VMProvisionedCondition,
+@@ -328,8 +351,6 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
+ 			Message: message,
+ 		})
  
 -		// Waiting for VM to boot
 -		ctx.KubevirtMachine.Status.Ready = false
@@ -119,10 +124,10 @@ index 0983c93..ad6094b 100644
  		return ctrl.Result{RequeueAfter: 20 * time.Second}, nil
  	}
 diff --git a/controllers/kubevirtmachine_controller_test.go b/controllers/kubevirtmachine_controller_test.go
-index 85ee2ba..cc63a2a 100644
+index 9571130..2a6d1a7 100644
 --- a/controllers/kubevirtmachine_controller_test.go
 +++ b/controllers/kubevirtmachine_controller_test.go
-@@ -1359,6 +1359,118 @@ var _ = Describe("reconcile a kubevirt machine", func() {
+@@ -1376,6 +1376,133 @@ var _ = Describe("reconcile a kubevirt machine", func() {
  		Expect(out).To(Equal(ctrl.Result{RequeueAfter: 20 * time.Second}))
  		Expect(machineContext.BootstrapDataSecret.Data["userdata"]).To(Equal(bootstrapSecret.Data["value"]))
  	})
@@ -158,7 +163,12 @@ index 85ee2ba..cc63a2a 100644
 +
 +		// Set "never started" + VMCreateFailedReason to trigger the branch
 +		machineContext.KubevirtMachine.Status.Started = false
-+		conditions.MarkFalse(machineContext.KubevirtMachine, infrav1.VMProvisionedCondition, infrav1.VMCreateFailedReason, clusterv1.ConditionSeverityError, "VM creation failed")
++		conditions.Set(machineContext.KubevirtMachine, metav1.Condition{
++			Type:    infrav1.VMProvisionedCondition,
++			Reason:  infrav1.VMCreateFailedReason,
++			Message: "VM creation failed",
++			Status:  metav1.ConditionFalse,
++		})
 +
 +		out, err := kubevirtMachineReconciler.reconcileNormal(machineContext)
 +		Expect(err).ShouldNot(HaveOccurred())
@@ -194,7 +204,12 @@ index 85ee2ba..cc63a2a 100644
 +			Return(fakeClient, kubevirtMachine.Namespace, nil)
 +
 +		machineContext.KubevirtMachine.Status.Started = false
-+		conditions.MarkFalse(machineContext.KubevirtMachine, infrav1.VMProvisionedCondition, infrav1.VMCreateFailedReason, clusterv1.ConditionSeverityError, "VM creation failed")
++		conditions.Set(machineContext.KubevirtMachine, metav1.Condition{
++			Type:    infrav1.VMProvisionedCondition,
++			Reason:  infrav1.VMCreateFailedReason,
++			Message: "VM creation failed",
++			Status:  metav1.ConditionFalse,
++		})
 +
 +		out, err := kubevirtMachineReconciler.reconcileNormal(machineContext)
 +		Expect(err).ShouldNot(HaveOccurred())
@@ -231,7 +246,12 @@ index 85ee2ba..cc63a2a 100644
 +			Return(fakeClient, kubevirtMachine.Namespace, nil)
 +
 +		machineContext.KubevirtMachine.Status.Started = true
-+		conditions.MarkFalse(machineContext.KubevirtMachine, infrav1.VMProvisionedCondition, infrav1.VMCreateFailedReason, clusterv1.ConditionSeverityError, "VM creation failed")
++		conditions.Set(machineContext.KubevirtMachine, metav1.Condition{
++			Type:    infrav1.VMProvisionedCondition,
++			Reason:  infrav1.VMCreateFailedReason,
++			Message: "VM creation failed",
++			Status:  metav1.ConditionFalse,
++		})
 +
 +		out, err := kubevirtMachineReconciler.reconcileNormal(machineContext)
 +		Expect(err).ShouldNot(HaveOccurred())
@@ -242,7 +262,7 @@ index 85ee2ba..cc63a2a 100644
  
  var _ = Describe("updateNodeProviderID", func() {
 diff --git a/pkg/kubevirt/machine.go b/pkg/kubevirt/machine.go
-index 1fb9829..c29a68e 100644
+index 2fb2a0f..155f53d 100644
 --- a/pkg/kubevirt/machine.go
 +++ b/pkg/kubevirt/machine.go
 @@ -237,6 +237,14 @@ func (m *Machine) IsReady() bool {
@@ -261,7 +281,7 @@ index 1fb9829..c29a68e 100644
  func (m *Machine) IsLiveMigratable() (bool, string, string, error) {
  	if m.vmiInstance == nil {
 diff --git a/pkg/kubevirt/machine_factory.go b/pkg/kubevirt/machine_factory.go
-index 88a730f..2bbf325 100644
+index 534c7e8..df46f20 100644
 --- a/pkg/kubevirt/machine_factory.go
 +++ b/pkg/kubevirt/machine_factory.go
 @@ -28,6 +28,8 @@ type MachineInterface interface {

@@ -12,7 +12,7 @@ This ensures the correct OS image is selected during VM creation, especially whe
  1 file changed, 40 insertions(+)
 
 diff --git a/pkg/kubevirt/utils.go b/pkg/kubevirt/utils.go
-index afd1441..5f5de35 100644
+index 137a334..485dde4 100644
 --- a/pkg/kubevirt/utils.go
 +++ b/pkg/kubevirt/utils.go
 @@ -18,7 +18,9 @@ package kubevirt
@@ -59,15 +59,15 @@ index afd1441..5f5de35 100644
  // their corresponding disks/volume references within the vm. Appending a
  // unique prefix allows each DataVolume to be unique per vm in a capi
 @@ -99,6 +127,18 @@ func newVirtualMachineFromKubevirtMachine(ctx *context.MachineContext, namespace
- 	virtualMachine.ObjectMeta.Labels["cluster.x-k8s.io/role"] = nodeRole(ctx)
- 	virtualMachine.ObjectMeta.Labels["cluster.x-k8s.io/cluster-name"] = ctx.Cluster.Name
+ 	virtualMachine.Labels["cluster.x-k8s.io/role"] = nodeRole(ctx)
+ 	virtualMachine.Labels["cluster.x-k8s.io/cluster-name"] = ctx.Cluster.Name
  
 +	// Patch root DataVolume source PVC name based on Kubernetes version for faster cloning
-+	if ctx.Machine.Spec.Version != nil {
++	if ctx.Machine.Spec.Version != "" {
 +		err := patchRootDVSourcePVCName(
 +			ctx.KubevirtMachine.Spec.VirtualMachineTemplate.Spec.DataVolumeTemplates,
 +			virtualMachine,
-+			*ctx.Machine.Spec.Version,
++			ctx.Machine.Spec.Version,
 +		)
 +		if err != nil {
 +			ctx.Logger.Error(err, "Failed to patch root DataVolume source PVC name, falling back to original source")

@@ -1,0 +1,32 @@
+From 607d529c70e8f021003237a674beedec7b422de5 Mon Sep 17 00:00:00 2001
+From: Sharath Srikanth Chellappa <sharathsr@microsoft.com>
+Date: Mon, 7 Jul 2025 12:43:42 -0700
+Subject: [PATCH] Modifying makefile targets for integration with Azure Linux
+ build system.
+
+These changes will not be removed since these are required for building the manager binary in Azure Linux.
+
+1 . Makefile updated to use CGO_ENABLED=1 for building the manager binary
+   to support the building of the manager binary in Azure Linux [0].
+
+   [0] - https://devblogs.microsoft.com/go/microsoft-go-defaults-to-system-crypto/#will-this-break-my-builds
+
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 44ebe46..bb811b8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -128,7 +128,7 @@ run-conformance:
+ 
+ .PHONY: manager
+ manager: ## Build manager binary
+-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o $(BIN_DIR)/manager
++	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o $(BIN_DIR)/manager
+ 
+ $(CONTROLLER_GEN): $(TOOLS_DIR)/go.mod # Build controller-gen from tools folder.
+ 	cd $(TOOLS_DIR); go build -tags=tools -o $(BIN_DIR)/controller-gen sigs.k8s.io/controller-tools/cmd/controller-gen
+-- 
+2.49.0

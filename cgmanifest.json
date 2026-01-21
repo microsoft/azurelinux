@@ -1847,8 +1847,8 @@
         "type": "other",
         "other": {
           "name": "cluster-api-provider-kubevirt",
-          "version": "0.1.10",
-          "downloadUrl": "https://github.com/kubernetes-sigs/cluster-api-provider-kubevirt/archive/refs/tags/v0.1.10.tar.gz"
+          "version": "0.11.0",
+          "downloadUrl": "https://github.com/kubernetes-sigs/cluster-api-provider-kubevirt/archive/refs/tags/v0.11.0.tar.gz"
         }
       }
     },
