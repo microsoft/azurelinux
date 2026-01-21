@@ -3,7 +3,7 @@
 Summary:        Routing daemon
 Name:           frr
 Version:        9.1.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,6 +19,17 @@ Patch4:         0004-remove-grpc-test.patch
 Patch5:         CVE-2024-44070.patch
 Patch6:         CVE-2024-55553.patch
 Patch7:         0001-Fix-frr-c90-complaint-error.patch
+Patch8:         CVE-2025-61099.patch
+# Following CVEs are included as part of CVE-2025-60199 and kept here as nopatch and commented out.
+# Because from patch command perspective these files have garbage content. 
+Patch9:         CVE-2025-61100.nopatch
+Patch10:        CVE-2025-61101.nopatch
+Patch11:        CVE-2025-61102.nopatch
+Patch12:        CVE-2025-61103.nopatch
+Patch13:        CVE-2025-61104.nopatch
+Patch14:        CVE-2025-61105.nopatch
+Patch15:        CVE-2025-61106.nopatch
+Patch16:        CVE-2025-61107.nopatch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -201,6 +212,10 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Wed Jan 21 2026 Archana Shettigar <v-shettigara@microsoft.com> - 9.1.1-5
+- Patch CVE-2025-61099, CVE-2025-61100, CVE-2025-61101, CVE-2025-61102,
+  CVE-2025-61103, CVE-2025-61104, CVE-2025-61105, CVE-2025-61106 and CVE-2025-61107
+
 * Mon Dec 29 2025 Archana Shettigar <v-shettigara@microsoft.com> - 9.1.1-4
 - Rebuilt for net-snmp version up with c90 fix
 
