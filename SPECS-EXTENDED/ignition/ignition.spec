@@ -3,6 +3,14 @@
 %global ignedgecommit a2587490b2a9a215ad12cf15866025efbe027552
 %global ignedgeshortcommit %(c=%{ignedgecommit}; echo ${c:0:7})
 
+%global goarch %{_arch}
+%ifarch x86_64
+%global goarch amd64
+%endif
+%ifarch aarch64
+%global goarch arm64
+%endif
+
 # https://github.com/coreos/ignition
 %global goipath         github.com/coreos/ignition
 %global gomodulesmode   GO111MODULE=on
@@ -235,6 +243,19 @@ echo "Building ignition-validate..."
 
 %global gocrossbuild go build -ldflags "${LDFLAGS:-} -B 0x$(cat /dev/urandom | tr -d -c '0-9a-f' | head -c16)" -a -v -x
 
+echo "Building statically-linked Linux ignition-validate..."
+GOEXPERIMENT= CGO_ENABLED=0 GOARCH=%{goarch} GOOS=linux %gocrossbuild -o ./ignition-validate-aarch64-unknown-linux-gnu-static validate/main.go
+GOEXPERIMENT= CGO_ENABLED=0 GOARCH=s390x GOOS=linux %gocrossbuild -o ./ignition-validate-s390x-unknown-linux-gnu-static validate/main.go
+GOEXPERIMENT= CGO_ENABLED=0 GOARCH=ppc64le GOOS=linux %gocrossbuild -o ./ignition-validate-ppc64le-unknown-linux-gnu-static validate/main.go
+
+echo "Building macOS ignition-validate..."
+GOEXPERIMENT= GOARCH=%{goarch} GOOS=darwin %gocrossbuild -o ./ignition-validate-x86_64-apple-darwin validate/main.go
+
+%ifarch x86_64
+echo "Building Windows ignition-validate..."
+GOEXPERIMENT= GOARCH=amd64 GOOS=windows %gocrossbuild -o ./ignition-validate-x86_64-pc-windows-gnu.exe validate/main.go
+%endif
+
 %install
 # dracut modules
 install -d -p %{buildroot}/%{dracutlibdir}/modules.d
@@ -252,6 +273,9 @@ install -p -m 0644 grub2/05_ignition.cfg  %{buildroot}%{_prefix}/lib/bootupd/gru
 install -d -p %{buildroot}%{_bindir}
 install -p -m 0755 ./ignition-validate %{buildroot}%{_bindir}
 
+install -d -p %{buildroot}%{_datadir}/ignition
+install -p -m 0644 ./ignition-validate-* %{buildroot}%{_datadir}/ignition
+
 # The ignition binary is only for dracut, and is dangerous to run from
 # the command line.  Install directly into the dracut module dir.
 install -p -m 0755 ./ignition %{buildroot}/%{dracutlibdir}/modules.d/30ignition
@@ -259,7 +283,7 @@ install -p -m 0755 ./ignition %{buildroot}/%{dracutlibdir}/modules.d/30ignition
 %if %{with check}
 %check
 sed -i '34d' ./test
-VERSION=%{version} GOARCH=%{_target_cpu} ./test
+VERSION=%{version} GOARCH=%{goarch} ./test
 %endif
 
 %files
@@ -274,6 +298,8 @@ VERSION=%{version} GOARCH=%{_target_cpu} ./test
 %doc README.md
 %license %{golicenses}
 %{_bindir}/ignition-validate
+%dir %{_datadir}/ignition
+%{_datadir}/ignition/ignition-validate-*
 
 %files grub
 %doc README.md
