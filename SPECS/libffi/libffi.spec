@@ -1,16 +1,15 @@
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           libffi
 Version:        3.4.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/GeneralLibraries
 URL:            https://sourceware.org/libffi/
 Source0:        https://github.com/libffi/libffi/releases/download/v%{version}/%{name}-%{version}.tar.gz
-#%if 0%{?with_check}
-#BuildRequires:  dejagnu
-#%endif
+
+BuildRequires:  dejagnu
 
 %description
 The libffi library provides a portable, high level programming interface
@@ -51,8 +50,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}/%{_infodir}
 %{_fixperms} %{buildroot}/*
 
-#%check
-#make %{?_smp_mflags} check
+%check
+make %{?_smp_mflags} check
 
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
@@ -75,6 +74,9 @@ rm -rf %{buildroot}/%{_infodir}
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 21 2026 Sudhanshu Pandit <sudpandit@microsoft.com> - 3.4.4-2
+- Add check section to run unit tests using dejagnu
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.4.4-1
 - Auto-upgrade to 3.4.4 - Azure Linux 3.0 - package upgrades
 
