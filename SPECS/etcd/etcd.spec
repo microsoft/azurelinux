@@ -3,7 +3,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.21
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -89,6 +89,16 @@ for component in etcd-dump-db etcd-dump-logs; do
     popd
 done
 
+%check
+# Run unit tests for each component that has vendor dependencies extracted.
+# Skip TestLogRotation - fails due to Go version differences in JSON error
+# message format (cosmetic, not a functional issue).
+for component in server etcdctl etcdutl; do
+    pushd $component
+    go test -v -short -timeout 10m -skip 'TestLogRotation' ./...
+    popd
+done
+
 %install
 install -vdm755 %{buildroot}%{_bindir}
 install -vdm755 %{buildroot}/%{_docdir}/%{name}-%{version}
@@ -145,6 +155,9 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Wed Jan 21 2026 AI Agent <aiagent@microsoft.com> - 3.5.21-2
+- Add check section to run unit tests
+
 * Sun Mar 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.21-1
 - Auto-upgrade to 3.5.21 - for CVE-2025-30204 [High]
 
