@@ -3,20 +3,24 @@ Distribution:   Azure Linux
 
 Name:           python-testresources
 Version:        2.0.2
-Release:        17%{?dist}
+Release:        1%{?dist}
 Summary:        Testresources, a pyunit extension for managing expensive test resources
 
 License:        (Apache-2.0 OR BSD-3-Clause) AND GPL-2.0-or-later
 # file testresources/tests/TestUtil.py is GPLv2+
 URL:            https://github.com/testing-cabal/testresources
-Source:         https://github.com/testing-cabal/testresources/archive/refs/tags/2.0.2.tar.gz#/%{name}-%{version}.tar.gz
+Source:         https://files.pythonhosted.org/packages/source/t/testresources/testresources-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 %define _python_dist_allow_version_zero 1
 
 BuildRequires: python3-setuptools_scm
 BuildRequires: python3-pip
+BuildRequires: python3-pbr
+BuildRequires: python3-toml
 BuildRequires: python3-wheel
 BuildRequires: python3-pytest
+BuildRequires: python3-testtools
+BuildRequires: python3-fixtures
 
 %global _description %{expand:
 testresources: extensions to python unittest to allow declarative use
@@ -32,6 +36,8 @@ BuildRequires:  python3-devel
 
 %prep
 %setup -q -n testresources-%{version}
+# replace removed unittest aliases
+sed -i 's/failIf/assertFalse/' testresources/tests/test_resourced_test_case.py
 
 %generate_buildrequires
 %pyproject_buildrequires -x test
@@ -51,7 +57,7 @@ BuildRequires:  python3-devel
 %doc README.rst NEWS doc
 
 %changelog
-* Mon Jan 12 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.0.2-1
+* Wed Jan 21 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.0.2-1
 - Upgrade to 2.0.2 (Reference: Fedora 44)
 - License verified
 
