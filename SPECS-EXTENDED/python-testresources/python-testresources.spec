@@ -13,14 +13,16 @@ Source:         https://files.pythonhosted.org/packages/source/t/testresources/t
 BuildArch:      noarch
 %define _python_dist_allow_version_zero 1
 
-BuildRequires: python3-setuptools_scm
-BuildRequires: python3-pip
-BuildRequires: python3-pbr
-BuildRequires: python3-toml
-BuildRequires: python3-wheel
+BuildRequires: python-setuptools_scm
+BuildRequires: python-pip
+BuildRequires: python-pbr
+BuildRequires: python-toml
+BuildRequires: python-wheel
 BuildRequires: python3-pytest
 BuildRequires: python3-testtools
 BuildRequires: python3-fixtures
+
+Requires: python-pbr
 
 %global _description %{expand:
 testresources: extensions to python unittest to allow declarative use
@@ -30,17 +32,12 @@ of resources by test cases.}
 
 %package -n python3-testresources
 Summary:        %{summary}
-BuildRequires:  python3-devel
+BuildRequires:  python-devel
 
 %description -n python3-testresources %{_description}
 
 %prep
 %setup -q -n testresources-%{version}
-# replace removed unittest aliases
-sed -i 's/failIf/assertFalse/' testresources/tests/test_resourced_test_case.py
-
-%generate_buildrequires
-%pyproject_buildrequires -x test
 
 %build
 %pyproject_wheel
