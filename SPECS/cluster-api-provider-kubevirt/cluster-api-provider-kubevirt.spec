@@ -31,8 +31,6 @@ allowing for true Kubevirt hybrid deployments of Kubernetes.
 
 %prep
 %autosetup -N
-rm -rf vendor
-tar -xf %{SOURCE1} --no-same-owner
 %autopatch -p1
 
 %build
