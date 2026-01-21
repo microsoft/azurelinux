@@ -1,69 +1,75 @@
+%global forgeurl https://github.com/rhinstaller/isomd5sum
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary: Utilities for working with md5sum implanted in ISO images
 Name:    isomd5sum
-Version: 1.2.3
-Release: 10%{?dist}
-License: GPLv2+1.25.12-4
+Version: 1.2.5
+Release: 1%{?dist}
+License: GPL-2.0-or-later
 
-Url:     https://github.com/rhinstaller/isomd5sum
-Source0: https://github.com/rhinstaller/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:  fix-lib-path.patch
-
+%global tag %{version}
+%forgemeta
+Url:     %{forgeurl}
+Source0: %{forgesource}
+ 
 BuildRequires: gcc
 BuildRequires: popt-devel
 BuildRequires: python3-devel
-
+BuildRequires: make
+ 
 %description
 The isomd5sum package contains utilities for implanting and verifying
 an md5sum implanted into an ISO9660 image.
-
+ 
 %package devel
 Summary: Development headers and library for using isomd5sum 
 Requires: %{name} = %{version}-%{release}
 Provides: %{name}-static = %{version}-%{release}
-
+ 
 %description devel
 This contains header files and a library for working with the isomd5sum
 implanting and checking.
-
+ 
 %package -n python3-isomd5sum
 Summary: Python bindings for isomd5sum
-
+ 
 %description -n python3-isomd5sum
 The isomd5sum package contains utilities for implanting and verifying
 an md5sum implanted into an ISO9660 image.
-
-
+ 
+ 
 %prep
-%autosetup
-
-
+%forgeautosetup
+ 
 %build
 CFLAGS="$RPM_OPT_FLAGS -Wno-strict-aliasing"; export CFLAGS
 LDFLAGS="$RPM_LD_FLAGS"; export LDFLAGS
-
+ 
 PYTHON=%{__python3} make checkisomd5 implantisomd5 pyisomd5sum.so
-
+ 
 %install
-
+ 
 PYTHON=%{__python3} make DESTDIR=$RPM_BUILD_ROOT install-bin install-devel install-python
-
+ 
 %files
 %license COPYING
 %{_bindir}/implantisomd5
 %{_bindir}/checkisomd5
 %{_mandir}/man*/*
-
+ 
 %files devel
 %{_includedir}/*.h
-%{_libdir}/*.a
+%{_exec_prefix}/lib64/*.a
 /usr/share/pkgconfig/isomd5sum.pc
-
+ 
 %files -n python3-isomd5sum
 %{python3_sitearch}/pyisomd5sum.so
 
 %changelog
+* Thu Nov 28 2024 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.2.5-1
+- Upgrade to version 1.2.5
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.2.3-10
 - Remove epoch
 
