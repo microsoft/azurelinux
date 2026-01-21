@@ -1,6 +1,5 @@
 {
  "Signatures": {
-  "dyninst-10.1.0.tar.gz": "4a121d70c1bb020408a7a697d74602e18250c3c85800f230566fcccd593c0129",
-  "testsuite-10.1.0.tar.gz": "06ec330c8c83d6bb25f349c677ba07a1e5cb58868a54808fb6b94f248983122b"
+  "dyninst-13.0.0.tar.gz": "1bc48d26478b677a6c090c25586a447507bd1b4cf88d369bd61820005ce1be39"
  }
 }
