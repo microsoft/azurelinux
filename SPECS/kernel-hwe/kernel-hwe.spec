@@ -29,7 +29,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel-hwe
-Version:        6.12.57.1
+Version:        6.18.5.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -408,8 +408,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %endif
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
-%{_datadir}/perf-core/strace/groups/file
-%{_datadir}/perf-core/strace/groups/string
+#%{_datadir}/perf-core/strace/groups/file
+#%{_datadir}/perf-core/strace/groups/string
 %{_docdir}/*
 %{_includedir}/perf/perf_dlfilter.h
 %{_unitdir}/cpupower.service
@@ -423,6 +423,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Sun Dec 07 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.18.0.1-1
+- Upgrade to kernel version 6.18.0
+
 * Wed Nov 05 2025 Siddharth Chintamaneni <sidchintamaneni@gmail.com> - 6.12.57.1-1
 - Kernel upgrade
 
