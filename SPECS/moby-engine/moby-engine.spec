@@ -29,6 +29,7 @@ Patch11: CVE-2025-22869.patch
 Patch12: CVE-2025-30204.patch
 Patch13: CVE-2024-51744.patch
 Patch14: CVE-2025-58183.patch
+#This can be removed when upgraded to v28.2.0
 Patch15: fix-multiarch-image-push-tag.patch
 
 %{?systemd_requires}
