@@ -1,5 +1,6 @@
 {
     "Signatures": {
-     "cluster-api-provider-kubevirt-0.11.0.tar.gz": "74cb6ffd4ced7f3d48d1707cf80504a5af8d13629370f2b31e1bbdcc949f91b4"
+     "cluster-api-provider-kubevirt-0.11.0.tar.gz": "74cb6ffd4ced7f3d48d1707cf80504a5af8d13629370f2b31e1bbdcc949f91b4",
+     "cluster-api-provider-kubevirt-0.11.0-vendor.tar.gz": "d950b9fc69fb0b3cbe47a8c3c2bfd89f102ea5810ef35707d83587b1329fa34a"
     }
 }
