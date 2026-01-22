@@ -1,15 +1,16 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+%global pypi_name testresources
 
-Name:           python-testresources
+Name:           python-%{pypi_name}
 Version:        2.0.2
 Release:        1%{?dist}
 Summary:        Testresources, a pyunit extension for managing expensive test resources
 
 License:        (Apache-2.0 OR BSD-3-Clause) AND GPL-2.0-or-later
 # file testresources/tests/TestUtil.py is GPLv2+
-URL:            https://github.com/testing-cabal/testresources
-Source:         https://files.pythonhosted.org/packages/source/t/testresources/testresources-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+URL:            https://github.com/testing-cabal/%{pypi_name}
+Source:         https://files.pythonhosted.org/packages/source/t/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 %define _python_dist_allow_version_zero 1
 
@@ -30,26 +31,26 @@ of resources by test cases.}
 
 %description %{_description}
 
-%package -n python3-testresources
+%package -n python3-%{pypi_name}
 Summary:        %{summary}
 BuildRequires:  python-devel
 
-%description -n python3-testresources %{_description}
+%description -n python3-%{pypi_name} %{_description}
 
 %prep
-%setup -q -n testresources-%{version}
+%autosetup -n %{pypi_name}-%{version}
 
 %build
 %pyproject_wheel
 
 %install
 %pyproject_install
-%pyproject_save_files testresources
+%pyproject_save_files %{pypi_name}
 
 %check
 %{python3} -m testtools.run testresources.tests.test_suite
 
-%files -n python3-testresources -f %{pyproject_files}
+%files -n python3-%{pypi_name} -f %{pyproject_files}
 %license Apache-2.0 BSD
 %doc README.rst NEWS doc
 
