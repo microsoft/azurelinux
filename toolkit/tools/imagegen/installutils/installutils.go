@@ -766,7 +766,9 @@ func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesIns
 		return
 	}
 
-	// TDNF 3.x uses repositories from installchroot instead of host. Passing setopt for repo files directory to use local repo for installroot installation
+	// TDNF 3.x uses repositories from installchroot instead of host. Passing setopt for repo files directory to use local repo for installroot installation.
+	// Note: --nogpgcheck is used here because GPG signature validation is performed earlier during package fetching (imagepkgfetcher)
+	// when VALIDATE_IMAGE_GPG=y is set. Packages in the local repo have already been verified.
 	err = shell.NewExecBuilder("tdnf", "-v", "install", packageName, "--installroot", installRoot, "--nogpgcheck",
 		"--assumeyes", "--setopt", "reposdir=/etc/yum.repos.d/", releaseverCliArg).
 		StdoutCallback(onStdout).
@@ -830,7 +832,9 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 			stderr string
 		)
 
-		// Issue an install request but stop right before actually performing the install (assumeno)
+		// Issue an install request but stop right before actually performing the install (assumeno).
+		// Note: --nogpgcheck is safe here because this is a dry-run (--assumeno) and packages are validated
+		// during fetching when VALIDATE_IMAGE_GPG=y is set.
 		stdout, stderr, err = shell.Execute("tdnf", "install", releaseverCliArg, "--assumeno", "--nogpgcheck", pkg, "--installroot", installRoot)
 		if err != nil {
 			// tdnf aborts the process when it detects an install with --assumeno.
@@ -1815,11 +1819,8 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 ) (err error) {
 	var (
 		pubKeyData []string
-		exists     bool
 	)
 	const squashErrors = false
-	const authorizedKeysTempFilePerms = 0644
-	const authorizedKeysTempFile = "/tmp/authorized_keys"
 	const sshDirectoryPermission = "0700"
 
 	// Skip user SSH directory generation when not provided with public keys
@@ -1835,26 +1836,20 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 
 	authorizedKeysFile := filepath.Join(userSSHKeyDir, userutils.SSHAuthorizedKeysFileName)
 
-	exists, err = file.PathExists(authorizedKeysTempFile)
+	// Create a guaranteed unique temporary file for authorized_keys as a staging file which we will copy
+	// into the chroot.
+	tmpFile, err := os.CreateTemp("", "authorized_keys_*")
 	if err != nil {
-		logger.Log.Warnf("Error accessing %s file : %v", authorizedKeysTempFile, err)
+		logger.Log.Warnf("Failed to create temporary authorized_keys file: %v", err)
 		return
 	}
-	if !exists {
-		logger.Log.Debugf("File %s does not exist. Creating file...", authorizedKeysTempFile)
-		err = file.Create(authorizedKeysTempFile, authorizedKeysTempFilePerms)
-		if err != nil {
-			logger.Log.Warnf("Failed to create %s file : %v", authorizedKeysTempFile, err)
-			return
-		}
-	} else {
-		err = os.Truncate(authorizedKeysTempFile, 0)
-		if err != nil {
-			logger.Log.Warnf("Failed to truncate %s file : %v", authorizedKeysTempFile, err)
-			return
-		}
-	}
+	authorizedKeysTempFile := tmpFile.Name()
 	defer os.Remove(authorizedKeysTempFile)
+
+	if err = tmpFile.Close(); err != nil {
+		logger.Log.Warnf("Failed to close temporary authorized_keys file: %v", err)
+		return
+	}
 
 	allSSHKeys := []string(nil)
 

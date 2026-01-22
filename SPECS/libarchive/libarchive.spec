@@ -1,7 +1,7 @@
 Summary:        Multi-format archive and compression library
 Name:           libarchive
 Version:        3.7.7
-Release:        3%{?dist}
+Release:        4%{?dist}
 # Certain files have individual licenses. For more details see contents of "COPYING".
 License:        BSD AND Public Domain AND (ASL 2.0 OR CC0 1.0 OR OpenSSL)
 Vendor:         Microsoft Corporation
@@ -15,6 +15,7 @@ Patch3:         CVE-2025-5915.patch
 Patch4:         CVE-2025-5916.patch
 Patch5:         CVE-2025-5917.patch
 Patch6:         CVE-2025-5918.patch
+Patch7:         CVE-2025-60753.patch
 Provides:       bsdtar = %{version}-%{release}
 
 BuildRequires:  xz-libs
@@ -45,6 +46,7 @@ make %{?_smp_mflags}
 rm -rf %{buildroot}%{_infodir}
 make DESTDIR=%{buildroot} install
 find %{buildroot} -type f -name "*.la" -delete -print
+mv %{buildroot}%{_mandir}/man1/* .
 
 %check
 make %{?_smp_mflags} check
@@ -55,6 +57,10 @@ make %{?_smp_mflags} check
 %files
 %defattr(-,root,root)
 %license COPYING
+%license bsdcat.1
+%license bsdtar.1
+%license bsdcpio.1
+%license bsdunzip.1
 %{_libdir}/*.so.*
 %{_bindir}
 %exclude %{_libdir}/debug/
@@ -67,6 +73,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Jan 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.7.7-4
+- Patch for CVE-2025-60753
+
 * Thu Jun 26 2025 Sumit Jena <v-sumitjena@microsoft.com> - 3.7.7-3
 - Patch CVE-2025-5914, CVE-2025-5915, CVE-2025-5916, CVE-2025-5917, CVE-2025-5918
 

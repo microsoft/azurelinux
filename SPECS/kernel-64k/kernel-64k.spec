@@ -26,8 +26,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-64k
-Version:        6.6.117.1
-Release:        1%{?dist}
+Version:        6.6.119.3
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -380,6 +380,15 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Jan 16 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.119.3-3
+- Bump release to match kernel,kernel-ipe
+
+* Thu Jan 08 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.119.3-2
+- Enable CONFIG_INET_DIAG_DESTROY
+
+* Tue Jan 06 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.119.3-1
+- Auto-upgrade to 6.6.119.3
+
 * Wed Nov 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.117.1-1
 - Auto-upgrade to 6.6.117.1
 

@@ -2,7 +2,7 @@
 Summary:        BPF Compiler Collection (BCC)
 Name:           bcc
 Version:        0.29.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -64,6 +64,14 @@ Requires:       python3-%{name} = %{version}-%{release}
 %description tools
 Command line tools for BPF Compiler Collection (BCC)
 
+%package -n libbpf-tools
+Summary:        Command line libbpf tools for BPF Compiler Collection (BCC)
+BuildRequires:  libbpf-devel
+BuildRequires:  bpftool
+ 
+%description -n libbpf-tools
+Command line libbpf tools for BPF Compiler Collection (BCC)
+
 %prep
 %autosetup -p1 -n %{name}
 
@@ -77,12 +85,48 @@ cmake .. \
       -DPYTHON_CMD=python3 \
       -DREVISION_LAST=%{version} \
       -DREVISION=%{version}
+
 make %{?_smp_mflags}
+popd
+# It was discussed and agreed to package libbpf-tools with
+# 'bpf-' prefix (https://github.com/iovisor/bcc/pull/3263)
+# Installing libbpf-tools binaries in temp directory and
+# renaming them in there and the install code will just
+# take them.
+# Note this is no longer needed in versions which contain 
+# commit https://github.com/iovisor/bcc/commit/3469bf1d94a6b8f5deb34586e6c8e4ffec8dd0be
+# as APP_PREFIX can be used (ex: APP_PREFIX='bpf-' \)
+
+pushd libbpf-tools
+make BPFTOOL=bpftool CFLAGS="%{optflags}" LDFLAGS="%{build_ldflags}"
+make DESTDIR=./tmp-install prefix= install
+(
+    cd tmp-install/bin
+    for file in *; do
+        mv $file bpf-$file
+    done
+    # now fix the broken symlinks
+    for file in `find . -type l`; do
+        dest=$(readlink "$file")
+        ln -s -f bpf-$dest $file
+    done
+)
 popd
 
 %install
 pushd build
 make install/strip DESTDIR=%{buildroot}
+popd
+
+# Install libbpf-tools
+# We cannot use `install` because some of the tools are symlinks and `install`
+# follows those. Since all the tools already have the correct permissions set,
+# we just need to copy them to the right place while preserving those
+pushd libbpf-tools
+mkdir -p %{buildroot}%{_sbindir}
+install -m 755 tmp-install/bin/* %{buildroot}%{_sbindir}/
+popd
+
 # mangle shebangs
 find %{buildroot}/usr/share/bcc/{tools,examples} -type f -exec \
     sed -i -e '1 s|^#!/usr/bin/python$|#!'%{__python3}'|' \
@@ -123,7 +167,13 @@ find %{buildroot}%{_lib64dir} -name '*.a' -delete
 %{_datadir}/%{name}/tools/*
 %{_datadir}/%{name}/man/*
 
+%files -n libbpf-tools
+%{_sbindir}/bpf-*
+
 %changelog
+* Tue Dec 16 2025 Rachel Menge <rachelmenge@microsoft.com> - 0.29.1-4
+- Add libbpf-tools subpackage
+
 * Mon Apr 14 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.29.1-3
 - Patch CVE-2025-29481
 

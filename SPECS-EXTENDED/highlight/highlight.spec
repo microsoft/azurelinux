@@ -2,15 +2,21 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           highlight
 Summary:        Universal source code to formatted text converter
-Version:        3.54
-Release:        3%{?dist}
-License:        GPLv3
+Version:        4.18
+Release:        1%{?dist}
+License:        GPL-3.0-only
 URL:            http://www.andre-simon.de/
-Source0:        http://www.andre-simon.de/zip/%{name}-%{version}.tar.bz2
+Source0:        https://gitlab.com/saalen/highlight/-/archive/v4.18/highlight-v4.18.tar.bz2#/%{name}-%{version}.tar.bz2
+
+%bcond qt 0
+
 BuildRequires:  gcc-c++
+%if %{with qt}
 BuildRequires:  qt5-qtbase-devel
+%endif
 BuildRequires:  lua-devel, boost-devel
 BuildRequires:  desktop-file-utils
+BuildRequires:  make
 
 %{?filter_setup:
 %filter_from_provides /^perl(/d;
@@ -27,15 +33,17 @@ Language descriptions are configurable and support regular expressions.
 The utility offers indentation and reformatting capabilities.
 It is easily possible to create new language definitions and colour themes.
 
+%if %{with qt}
 %package gui
-Summary:        GUI for the hihghlight source code formatter
+Summary:        GUI for the highlight source code formatter
 Requires:       %{name} = %{version}-%{release}
 
 %description gui
 A Qt-based GUI for the highlight source code formatter source.
+%endif
 
 %prep
-%autosetup
+%autosetup -n %{name}-v%{version}
 
 %build
 CFLAGS="$CFLAGS -fPIC %{optflags}"; export CFLAGS
@@ -44,21 +52,37 @@ LDFLAGS="$LDFLAGS %{?__global_ldflags}"; export LDFLAGS
 
 # disabled paralell builds to fix FTBFS on rawhide & highlight 3.52+
 #make_build all gui           CFLAGS="${CFLAGS}"          \
-      make all gui            CFLAGS="${CFLAGS}"          \
+ %{__make} all                CFLAGS="${CFLAGS}"          \
                               CXXFLAGS="${CXXFLAGS}"      \
                               LDFLAGS="${LDFLAGS}"        \
                               LFLAGS="-Wl,-O1 ${LDFLAGS}" \
                               PREFIX="%{_prefix}"         \
-                              conf_dir="%{_sysconfdir}/highlight/" \
+                              conf_dir="%{_sysconfdir}/"
+
+%if %{with qt}
+ %{__make} gui                CFLAGS="${CFLAGS}"          \
+                              CXXFLAGS="${CXXFLAGS}"      \
+                              LDFLAGS="${LDFLAGS}"        \
+                              LFLAGS="-Wl,-O1 ${LDFLAGS}" \
+                              PREFIX="%{_prefix}"         \
+                              conf_dir="%{_sysconfdir}/" \
                               QMAKE="%{_qt5_qmake}"       \
                               QMAKE_STRIP=
+%endif
 
 %install
-%make_install PREFIX="%{_prefix}" conf_dir="%{_sysconfdir}/highlight/"
+%make_install PREFIX="%{_prefix}" conf_dir="%{_sysconfdir}/"
 
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/applications
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/pixmaps
-make install-gui DESTDIR=$RPM_BUILD_ROOT PREFIX="%{_prefix}" conf_dir="%{_sysconfdir}/highlight/"
+%if %{with qt}
+make install-gui DESTDIR=$RPM_BUILD_ROOT PREFIX="%{_prefix}" conf_dir="%{_sysconfdir}/"
+%endif
+
+mv extras/langDefs-resources/UNLICENCE .
+mv extras/pandoc/LICENSE .
+rm extras/themes-resources/base16/LICENSE
+rm extras/themes-resources/css-themes/UNLICENCE
 
 rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}/
 
@@ -71,18 +95,30 @@ desktop-file-install \
 %{_datadir}/highlight/
 %{_mandir}/man1/highlight.1*
 %{_mandir}/man5/filetypes.conf.5*
+%{_datadir}/bash-completion/completions/highlight
+%{_datadir}/fish/vendor_completions.d/highlight.fish
+%{_datadir}/zsh/site-functions/_highlight
 %config(noreplace) %{_sysconfdir}/highlight/
 
 %doc ChangeLog* AUTHORS README* extras/
-%license COPYING
+%license COPYING LICENSE UNLICENCE
 
+ %if %{with qt}
 %files gui
 %{_bindir}/highlight-gui
 %{_datadir}/applications/highlight.desktop
-%{_datadir}/pixmaps/highlight.xpm
+%{_datadir}/icons/hicolor/256x256/apps/highlight.png
+%else
+%exclude %{_datadir}/applications/highlight.desktop
+%endif
 
 
 %changelog
+* Wed Dec 24 2025 Sumit Jena <v-sumitjena@microsoft.com> - 4.18-1
+- Update to version 4.18
+- Disabling GUI based subpackages.
+- License Verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.54-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
