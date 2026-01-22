@@ -19,17 +19,9 @@ Patch4:         0004-remove-grpc-test.patch
 Patch5:         CVE-2024-44070.patch
 Patch6:         CVE-2024-55553.patch
 Patch7:         0001-Fix-frr-c90-complaint-error.patch
+# Following CVE fixes CVE-2025-61100, CVE-2025-61101, CVE-2025-61102, CVE-2025-61103,
+# CVE-2025-61104, CVE-2025-61105, CVE-2025-61106 and CVE-2025-61107.
 Patch8:         CVE-2025-61099.patch
-# Following CVEs are included as part of CVE-2025-60199 and kept here as nopatch and commented out.
-# Because from patch command perspective these files have garbage content. 
-Patch9:         CVE-2025-61100.nopatch
-Patch10:        CVE-2025-61101.nopatch
-Patch11:        CVE-2025-61102.nopatch
-Patch12:        CVE-2025-61103.nopatch
-Patch13:        CVE-2025-61104.nopatch
-Patch14:        CVE-2025-61106.nopatch
-Patch15:        CVE-2025-61107.nopatch
-
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
