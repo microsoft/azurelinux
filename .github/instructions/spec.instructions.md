@@ -47,7 +47,7 @@ applyTo: 'SPECS*/**/*.spec'
   - For OOT modules built against the default `kernel-devel` you can get this value through this set of macros:
     ```rpm-spec
     %global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-    %global target_mariner_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
+    %global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
     %global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
     ```
   - For OOT modules built against a specific kernel flavour `kernel-flavour1-devel` this value must be hard-coded into the spec file as we cannot detect it dynamically:
