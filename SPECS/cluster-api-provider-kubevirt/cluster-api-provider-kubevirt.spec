@@ -35,6 +35,7 @@ allowing for true Kubevirt hybrid deployments of Kubernetes.
 
 %build
 export GOPATH=%{our_gopath}
+export GOPROXY=https://proxy.golang.org
 make manager
 
 %install
