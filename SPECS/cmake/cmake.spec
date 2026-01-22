@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.21.4
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,10 @@ Patch26:        CVE-2025-5916.patch
 Patch27:        CVE-2025-5917.patch
 Patch28:        CVE-2025-5918.patch
 Patch29:        CVE-2025-14017.patch
+Patch30:        CVE-2025-10966.patch
+Patch31:        CVE-2025-14524.patch
+Patch32:        CVE-2025-15079.patch
+Patch33:        CVE-2025-15224.patch
 
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
@@ -107,6 +111,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Thu Jan 22 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.21.4-22
+- Patch for CVE-2025-15224, CVE-2025-15079, CVE-2025-14524, CVE-2025-10966
+
 * Fri Jan 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.21.4-21
 - Patch for CVE-2025-14017
 
