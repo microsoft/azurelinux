@@ -3,7 +3,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 25.0.3
-Release: 14%{?dist}
+Release: 15%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -105,6 +105,8 @@ mkdir -p %{buildroot}%{_unitdir}
 install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/docker.service
 install -p -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/docker.socket
 
+install -vpDm 644 profiles/seccomp/default.json %{buildroot}%{_sysconfdir}/seccomp/default-profile-template.json
+
 %post
 if ! grep -q "^docker:" /etc/group; then
     groupadd --system docker
@@ -120,10 +122,14 @@ fi
 %license LICENSE NOTICE
 %{_bindir}/dockerd
 %{_libexecdir}/docker-proxy
-%{_sysconfdir}/*
+%{_sysconfdir}/udev
+%config(noreplace) %{_sysconfdir}/seccomp/default-profile-template.json
 %{_unitdir}/*
 
 %changelog
+* Thu Jan 22 2026 Madhur Aggarwal <madaggarwal@microsoft.com> - 25.0.3-15
+- Provide seccomp/default.json as a Config (noreplace) File
+
 * Sat Nov 15 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 25.0.3-14
 - Patch for CVE-2025-58183
 
