@@ -9,7 +9,8 @@ Name:           rust-afterburn
 Version:        5.10.0
 Release:        3%{?dist}
 Summary:        Simple cloud provider agent
-
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 License:        Apache-2.0
 URL:            https://crates.io/crates/afterburn
 Source0:        https://github.com/coreos/afterburn/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
